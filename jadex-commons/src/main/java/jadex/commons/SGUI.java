@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -14,11 +15,24 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.ImageObserver;
+import java.awt.image.RenderedImage;
+import java.awt.image.WritableRaster;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.EventObject;
+import java.util.Iterator;
 import java.util.LinkedList;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.ImageWriter;
+import javax.imageio.spi.ImageWriterSpi;
+import javax.imageio.stream.ImageOutputStream;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -37,6 +51,9 @@ import javax.swing.UIDefaults;
 import javax.swing.border.LineBorder;
 import javax.swing.event.CellEditorListener;
 import javax.swing.table.TableCellEditor;
+
+import sun.awt.image.ImageRepresentation;
+import sun.awt.image.ToolkitImage;
 
 
 /**
@@ -389,5 +406,132 @@ public class SGUI
 			}
 		});
 		return table;
+	}
+	
+	/**
+	 *  Convert image to bytes.
+	 *  
+	 *  Method is a direct copy from protected method
+	 *  sun.awt.datatransfer.DataTransferer
+	 */
+	public static byte[] imageToStandardBytes(Image image, String mimeType) throws IOException
+	{
+		IOException originalIOE = null;
+		Iterator writerIterator = ImageIO.getImageWritersByMIMEType(mimeType);
+		if(!writerIterator.hasNext())
+		{
+			throw new IOException("No registered service provider can encode "
+					+ " an image to " + mimeType);
+		}
+		if(image instanceof RenderedImage)
+		{
+			// Try to encode the original image.
+			try
+			{
+				return imageToStandardBytesImpl((RenderedImage)image, mimeType);
+			}
+			catch(IOException ioe)
+			{
+				originalIOE = ioe;
+			}
+		}
+		// Retry with a BufferedImage.
+		int width = 0;
+		int height = 0;
+		if(image instanceof ToolkitImage)
+		{
+			ImageRepresentation ir = ((ToolkitImage)image).getImageRep();
+			ir.reconstruct(ImageObserver.ALLBITS);
+			width = ir.getWidth();
+			height = ir.getHeight();
+		}
+		else
+		{
+			width = image.getWidth(null);
+			height = image.getHeight(null);
+		}
+		ColorModel model = ColorModel.getRGBdefault();
+		WritableRaster raster = model.createCompatibleWritableRaster(width, height);
+		BufferedImage bufferedImage = new BufferedImage(model, raster,
+			model.isAlphaPremultiplied(), null);
+		Graphics g = bufferedImage.getGraphics();
+		try
+		{
+			g.drawImage(image, 0, 0, width, height, null);
+		}
+		finally
+		{
+			g.dispose();
+		}
+		try
+		{
+			return imageToStandardBytesImpl(bufferedImage, mimeType);
+		}
+		catch(IOException ioe)
+		{
+			if(originalIOE != null)
+			{
+				throw originalIOE;
+			}
+			else
+			{
+				throw ioe;
+			}
+		}
+	}
+
+	/**
+	 *  Convert image to bytes.
+	 *  
+	 *  Method is a direct copy from protected method
+	 *  sun.awt.datatransfer.DataTransferer
+	 */
+	protected static byte[] imageToStandardBytesImpl(RenderedImage renderedImage, String mimeType) throws IOException
+	{
+		Iterator writerIterator = ImageIO.getImageWritersByMIMEType(mimeType);
+		ImageTypeSpecifier typeSpecifier = new ImageTypeSpecifier(renderedImage);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		IOException ioe = null;
+		while(writerIterator.hasNext())
+		{
+			ImageWriter imageWriter = (ImageWriter)writerIterator.next();
+			ImageWriterSpi writerSpi = imageWriter.getOriginatingProvider();
+			if(!writerSpi.canEncodeImage(typeSpecifier))
+			{
+				continue;
+			}
+			try
+			{
+				ImageOutputStream imageOutputStream = ImageIO
+						.createImageOutputStream(baos);
+				try
+				{
+					imageWriter.setOutput(imageOutputStream);
+					imageWriter.write(renderedImage);
+					imageOutputStream.flush();
+				}
+				finally
+				{
+					imageOutputStream.close();
+				}
+			}
+			catch(IOException e)
+			{
+				imageWriter.dispose();
+				baos.reset();
+				ioe = e;
+				continue;
+			}
+			imageWriter.dispose();
+			baos.close();
+			return baos.toByteArray();
+		}
+		baos.close();
+		if(ioe == null)
+		{
+			ioe = new IOException("Registered service providers failed to encode "
+				+ renderedImage + " to " + mimeType);
+		}
+		throw ioe;
 	}
 }

@@ -181,7 +181,7 @@ public class	DefaultNodeFunctionality
 				// todo: todo: replace null with classloader
 				String type = (String)SComponentFactory.getFileType(jcc.getExternalAccess(), fn.getFile().getAbsolutePath()).get(new ThreadSuspendable());
 				if(type!=null)
-					icon = (Icon)SComponentFactory.getFileTypeIcon(jcc.getExternalAccess().getServiceProvider(), type).get(new ThreadSuspendable());
+					icon = (Icon)SComponentFactory.getFileTypeIcon(jcc.getExternalAccess(), type).get(new ThreadSuspendable());
 				
 				if(icon==null)
 				{
@@ -190,7 +190,7 @@ public class	DefaultNodeFunctionality
 					// todo: todo: replace null with classloader
 					type = (String)SComponentFactory.getFileType(jcc.getExternalAccess(), fn.getFile().getAbsolutePath()).get(new ThreadSuspendable());
 					if(type!=null)
-						icon = (Icon)SComponentFactory.getFileTypeIcon(jcc.getExternalAccess().getServiceProvider(), type).get(new ThreadSuspendable());
+						icon = (Icon)SComponentFactory.getFileTypeIcon(jcc.getExternalAccess(), type).get(new ThreadSuspendable());
 				}
 			}
 		}

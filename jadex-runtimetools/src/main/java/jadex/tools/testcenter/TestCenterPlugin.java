@@ -234,7 +234,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 					{
 						final String model = ((FileNode)node).getRelativePath();
 //						if(SXML.isAgentFilename(model))
-						SComponentFactory.isStartable(getJCC().getExternalAccess().getServiceProvider(), model).addResultListener(new SwingDefaultResultListener(mpanel)
+						SComponentFactory.isStartable(getJCC().getExternalAccess(), model).addResultListener(new SwingDefaultResultListener(mpanel)
 						{
 							public void customResultAvailable(Object result)
 							{
@@ -340,7 +340,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 				if(n instanceof FileNode && !(n instanceof DirNode))
 				{
 					final String model = ((FileNode)n).getRelativePath();
-					SComponentFactory.isStartable(getJCC().getExternalAccess().getServiceProvider(), model).addResultListener(new SwingDefaultResultListener(mpanel)
+					SComponentFactory.isStartable(getJCC().getExternalAccess(), model).addResultListener(new SwingDefaultResultListener(mpanel)
 					{
 						public void customResultAvailable(Object result)
 						{
@@ -358,7 +358,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		{
 			final String model = ((FileNode)node).getRelativePath();
 //			if(SXML.isAgentFilename(model) && ((FileNode)node).isValid())
-			SComponentFactory.isStartable(getJCC().getExternalAccess().getServiceProvider(), model).addResultListener(new SwingDefaultResultListener(mpanel)
+			SComponentFactory.isStartable(getJCC().getExternalAccess(), model).addResultListener(new SwingDefaultResultListener(mpanel)
 			{
 				public void customResultAvailable(Object result)
 				{

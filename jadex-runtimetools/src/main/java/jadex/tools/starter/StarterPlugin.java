@@ -335,7 +335,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 							final String type = ((FileNode)node).getFile().getAbsolutePath();
 //							if(getJCC().getComponent().getPlatform().getComponentFactory().isStartable(type))
 							// todo: resultcollect = false?
-							SComponentFactory.isStartable(getJCC().getExternalAccess().getServiceProvider(), type).addResultListener(new SwingDefaultResultListener(spanel)
+							SComponentFactory.isStartable(getJCC().getExternalAccess(), type).addResultListener(new SwingDefaultResultListener(spanel)
 							{
 								public void customResultAvailable(Object result)
 								{
@@ -659,7 +659,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 				{
 					final String type = ((FileNode)node).getFile().getAbsolutePath();
 					
-					if(((Boolean)SComponentFactory.isStartable(getJCC().getExternalAccess().getServiceProvider(), type).get(new ThreadSuspendable())).booleanValue())//&& ((FileNode)node).isValid())
+					if(((Boolean)SComponentFactory.isStartable(getJCC().getExternalAccess(), type).get(new ThreadSuspendable())).booleanValue())//&& ((FileNode)node).isValid())
 					{
 						try
 						{
@@ -737,7 +737,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 			if(node instanceof FileNode)
 			{
 				String type = ((FileNode)node).getFile().getAbsolutePath();
-				if(((Boolean)SComponentFactory.isStartable(getJCC().getExternalAccess().getServiceProvider(), type).get(new ThreadSuspendable())))
+				if(((Boolean)SComponentFactory.isStartable(getJCC().getExternalAccess(), type).get(new ThreadSuspendable())))
 					ret = true;
 			}
 			return ret;

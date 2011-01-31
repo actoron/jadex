@@ -141,6 +141,9 @@ public class Writer
 		
 //		if(tagname!=null)
 //			System.out.println("tagname: "+tagname);
+		if(object.getClass().getName().indexOf("ComponentFactorySelector")!=-1)
+			System.out.println("cfs");
+		
 		TypeInfo typeinfo = handler.getTypeInfo(object, getXMLPath(stack), wc); 
 		QName[] path = new QName[0];
 		
@@ -340,7 +343,14 @@ public class Writer
 			}
 			else
 			{
+				try
+				{
 				writeObject(wc, ((Object[])tmp)[1], (QName)((Object[])tmp)[0]);
+				}
+				catch(StackOverflowError e)
+				{
+					e.printStackTrace();
+				}
 //				writeObject(wc, ((Object[])tmp)[1]);
 			}
 		}

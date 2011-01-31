@@ -185,7 +185,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 									final String type = ((FileNode)node).getFile().getAbsolutePath();
 		//							if(getJCC().getComponent().getPlatform().getComponentFactory().isStartable(type))
 									// todo: resultcollect = false?
-									SComponentFactory.isStartable(jcc.getExternalAccess().getServiceProvider(), type).addResultListener(new SwingDefaultResultListener(spanel)
+									SComponentFactory.isStartable(jcc.getExternalAccess(), type).addResultListener(new SwingDefaultResultListener(spanel)
 									{
 										public void customResultAvailable(Object result)
 										{
@@ -317,7 +317,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 				{
 					final String type = ((FileNode)node).getFile().getAbsolutePath();
 					
-					if(((Boolean)SComponentFactory.isStartable(exta.getServiceProvider(), type).get(new ThreadSuspendable())).booleanValue())//&& ((FileNode)node).isValid())
+					if(((Boolean)SComponentFactory.isStartable(exta, type).get(new ThreadSuspendable())).booleanValue())//&& ((FileNode)node).isValid())
 					{
 						try
 						{
@@ -395,7 +395,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 			if(node instanceof FileNode)
 			{
 				String type = ((FileNode)node).getFile().getAbsolutePath();
-				if(((Boolean)SComponentFactory.isStartable(exta.getServiceProvider(), type).get(new ThreadSuspendable())))
+				if(((Boolean)SComponentFactory.isStartable(exta, type).get(new ThreadSuspendable())))
 					ret = true;
 			}
 			return ret;

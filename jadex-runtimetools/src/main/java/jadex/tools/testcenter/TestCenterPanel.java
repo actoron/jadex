@@ -139,7 +139,7 @@ public class TestCenterPanel extends JSplitPane
 				String name = f.getName();
 //				return f.isDirectory() || SXML.isAgentFilename(name);
 				return f.isDirectory() || ((Boolean)SComponentFactory.isStartable(plugin.getJCC()
-					.getExternalAccess().getServiceProvider(), name).get(new ThreadSuspendable())).booleanValue();
+					.getExternalAccess(), name).get(new ThreadSuspendable())).booleanValue();
 			}
 		};
 		addchooser.addChoosableFileFilter(load_filter);

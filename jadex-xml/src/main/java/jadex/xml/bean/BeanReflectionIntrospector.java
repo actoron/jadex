@@ -148,7 +148,7 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 
 				if(!ret.containsKey(SXML.XML_CLASSNAME))
 				{
-					System.err.println("Warning: Anonymous class without XML class name property / annotation: "+clazz.getName());
+					System.err.println("Warning: Anonymous class without XML class name property (XML_CLASSNAME) / annotation (@XMLClassname): "+clazz.getName());
 				}
 			}
 

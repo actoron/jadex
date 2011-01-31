@@ -49,6 +49,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -284,25 +286,34 @@ public class StarterPanel extends JPanel
 			{
 				if(model!=null)
 				{
+					final Map rawargs = new HashMap();
+					for(int i=0; i<argelems.size(); i++)
+					{
+						String argname = ((JLabel)arguments.getComponent(i*4+1)).getText();
+						String argval = ((JTextField)arguments.getComponent(i*4+3)).getText();
+						rawargs.put(argname, argval);
+					}
+					
 					exta.scheduleStep(new IComponentStep()
 					{
 						@XMLClassname("start")
 						public Object execute(IInternalAccess ia)
 						{
+							final Future ret = new Future();
 							SServiceProvider.getService(ia.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //							ia.getRequiredService("libservice")
-								.addResultListener(new SwingDefaultResultListener(StarterPanel.this)
+								.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 							{
 								public void customResultAvailable(Object result)
 								{
 									ILibraryService ls = (ILibraryService)result;
-									String configname = (String)config.getModel().getSelectedItem();
+									
 									Map args = SCollection.createHashMap();
 									String errortext = null;
-									for(int i=0; i<argelems.size(); i++)
+									for(Iterator it = rawargs.keySet().iterator(); it.hasNext(); )
 									{
-										String argname = ((JLabel)arguments.getComponent(i*4+1)).getText();
-										String argval = ((JTextField)arguments.getComponent(i*4+3)).getText();
+										String argname = (String)it.next();
+										String argval = (String)rawargs.get(argname);
 										if(argval.length()>0)
 										{
 											Object arg = null;
@@ -320,51 +331,60 @@ public class StarterPanel extends JPanel
 											
 										}
 									}
-									
-									if(errortext!=null)
+									if(errortext==null)
 									{
-										JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), errortext, 
-											"Display Problem", JOptionPane.INFORMATION_MESSAGE);
+										ret.setResult(args);
 									}
 									else
 									{
-										String typename = /*ac!=null? ac.getComponentType(filename.getText()):*/ filename.getText();
-										final String fullname = model.getPackage()+"."+model.getName();
-										final IModelInfo mymodel = model;
-										boolean dokilllis = storeresults!=null && storeresults.isSelected();
-												
-										String an = genname.isSelected()?  null: componentname.getText();
-										if(an==null) // i.e. name auto generate
-										{
-											int max = ((Integer)numcomponents.getValue()).intValue();
-											for(int i=0; i<max; i++)
-											{
-												Future fut = new Future();
-												IResultListener killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
-												createComponent(exta, StarterPanel.this.jcc, typename, an, configname, args, 
-													suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-													mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-													daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-													autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, killlistener, StarterPanel.this.parent, StarterPanel.this)
-												.addResultListener(new DelegationResultListener(fut));
-											}
-										}
-										else
-										{
-											Future fut = new Future();
-											IResultListener killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
-											createComponent(exta, StarterPanel.this.jcc, typename, an, configname, args, 
-												suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-												mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-												daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-												autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, killlistener, StarterPanel.this.parent, StarterPanel.this)
-											.addResultListener(new DelegationResultListener(fut));
-										}
+										ret.setException(new RuntimeException(errortext));
 									}
-									
 								}
-							});
-							return null;
+							}));
+							
+							return ret;
+						}
+					}).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
+					{
+//						JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), errortext, 
+//							"Display Problem", JOptionPane.INFORMATION_MESSAGE);
+						
+						public void customResultAvailable(Object result)
+						{
+							Map args = (Map)result;
+							final String typename = /*ac!=null? ac.getComponentType(filename.getText()):*/ filename.getText();
+							final String fullname = model.getPackage()+"."+model.getName();
+							final IModelInfo mymodel = model;
+							final boolean dokilllis = storeresults!=null && storeresults.isSelected();
+							final String an = genname.isSelected()?  null: componentname.getText();
+							final String configname = (String)config.getModel().getSelectedItem();
+							final int max = ((Integer)numcomponents.getValue()).intValue();
+								
+							if(an==null) // i.e. name auto generate
+							{
+								for(int i=0; i<max; i++)
+								{
+									Future fut = new Future();
+									IResultListener killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
+									createComponent(exta, StarterPanel.this.jcc, typename, an, configname, args, 
+										suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
+										mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
+										daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
+										autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, killlistener, StarterPanel.this.parent, StarterPanel.this)
+									.addResultListener(new DelegationResultListener(fut));
+								}
+							}
+							else
+							{
+								Future fut = new Future();
+								IResultListener killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
+								createComponent(exta, StarterPanel.this.jcc, typename, an, configname, args, 
+									suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
+									mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
+									daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
+									autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, killlistener, StarterPanel.this.parent, StarterPanel.this)
+								.addResultListener(new DelegationResultListener(fut));
+							}
 						}
 					});
 				}
@@ -661,7 +681,7 @@ public class StarterPanel extends JPanel
 								{
 									public void customResultAvailable(Object result)
 									{
-										SComponentFactory.getFileTypeIcon(exta.getServiceProvider(), (String)result)
+										SComponentFactory.getFileTypeIcon(exta, (String)result)
 											.addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 										{
 											public void customResultAvailable(Object result)
@@ -998,34 +1018,35 @@ public class StarterPanel extends JPanel
 			@XMLClassname("create-arguments")
 			public Object execute(IInternalAccess ia)
 			{
+				Future ret = new Future();
 				SServiceProvider.getService(ia.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //				ia.getRequiredService("libservice")
-					.addResultListener(new SwingDefaultResultListener(StarterPanel.this)		
+					.addResultListener(new DelegationResultListener(ret));
+				return ret;
+			}
+		}).addResultListener(new SwingDefaultResultListener()
+		{
+			public void customResultAvailable(Object result)
+			{
+				ILibraryService ls = (ILibraryService)result;
+				argelems = SCollection.createArrayList();
+				arguments.removeAll();
+				arguments.setBorder(null);
+				
+				if(model!=null)
 				{
-					public void customResultAvailable(Object result)
+					IArgument[] args = model.getArguments();
+					
+					for(int i=0; i<args.length; i++)
 					{
-						ILibraryService ls = (ILibraryService)result;
-						argelems = SCollection.createArrayList();
-						arguments.removeAll();
-						arguments.setBorder(null);
-						
-						if(model!=null)
-						{
-							IArgument[] args = model.getArguments();
-							
-							for(int i=0; i<args.length; i++)
-							{
-								argelems.add(args[i]);
-								createArgumentGui(args[i], i, ls);
-							}
-							loadargs	= null;
-							
-							if(args.length>0)
-								arguments.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Arguments "));
-						}
+						argelems.add(args[i]);
+						createArgumentGui(args[i], i, ls);
 					}
-				});
-				return null;
+					loadargs	= null;
+					
+					if(args.length>0)
+						arguments.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Arguments "));
+				}
 			}
 		});
 	}
@@ -1459,31 +1480,33 @@ public class StarterPanel extends JPanel
 			@XMLClassname("create-component")
 			public Object execute(IInternalAccess ia)
 			{
+				Future ret = new Future();
 				SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //				ia.getRequiredService("cms")
-					.addResultListener(new SwingDefaultResultListener(panel)
+					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
+				
+				return ret;
+			}
+		}).addResultListener(new SwingDefaultResultListener(panel)
+		{
+			public void customResultAvailable(Object result)
+			{
+				IComponentManagementService cms = (IComponentManagementService)result;
+				cms.createComponent(name, type, new CreationInfo(configname, arguments, parco, suspend, master, daemon, autosd), killlistener)
+					.addResultListener(new IResultListener()
 				{
-					public void customResultAvailable(Object result)
+					public void resultAvailable(Object result)
 					{
-						IComponentManagementService cms = (IComponentManagementService)result;
-						cms.createComponent(name, type, new CreationInfo(configname, arguments, parco, suspend, master, daemon, autosd), killlistener)
-							.addResultListener(new IResultListener()
-						{
-							public void resultAvailable(Object result)
-							{
-								ret.setResult(result);
-								jcc.setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								ret.setException(exception);
-								jcc.displayError("Problem Starting Component", "Component could not be started.", exception);
-							}
-						});
+						ret.setResult(result);
+						jcc.setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setException(exception);
+						jcc.displayError("Problem Starting Component", "Component could not be started.", exception);
 					}
 				});
-				return null;
 			}
 		});
 		return ret;

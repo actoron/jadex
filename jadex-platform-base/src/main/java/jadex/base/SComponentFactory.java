@@ -13,6 +13,7 @@ import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.ServiceNotFoundException;
 import jadex.commons.service.library.ILibraryService;
+import jadex.xml.annotation.XMLClassname;
 
 
 /**
@@ -32,6 +33,7 @@ public class SComponentFactory
 		
 		exta.scheduleStep(new IComponentStep()
 		{
+			@XMLClassname("loadModel")
 			public Object execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
@@ -82,10 +84,11 @@ public class SComponentFactory
 	 */
 	public static IFuture isLoadable(IExternalAccess exta, final String model)
 	{
-		final Future ret = new Future();
+		Future ret = new Future();
 		
 		exta.scheduleStep(new IComponentStep()
 		{
+			@XMLClassname("isLoadable")
 			public Object execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
@@ -132,41 +135,50 @@ public class SComponentFactory
 	 * @param model The model.
 	 * @return True, if startable (and should therefore also be loadable).
 	 */
-	public static IFuture isStartable(final IServiceProvider provider, final String model)
+	public static IFuture isStartable(IExternalAccess exta, final String model)
 	{
-		final Future ret = new Future();
+		Future ret = new Future();
 		
-		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new DelegationResultListener(ret)
+		exta.scheduleStep(new IComponentStep()
 		{
-			public void customResultAvailable(Object result)
+			@XMLClassname("isStartable")
+			public Object execute(final IInternalAccess ia)
 			{
-				final ILibraryService ls = (ILibraryService)result;
-				
-				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader()))
-					.addResultListener(new DelegationResultListener(ret)
+				final Future ret = new Future();
+				SServiceProvider.getService(ia.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						IComponentFactory fac = (IComponentFactory)result;
-						fac.isStartable(model, null, ls.getClassLoader())
-							.addResultListener(new DelegationResultListener(ret));
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						if(exception instanceof ServiceNotFoundException)
+						final ILibraryService ls = (ILibraryService)result;
+						
+						SServiceProvider.getService(ia.getServiceProvider(), new ComponentFactorySelector(model, null, ls.getClassLoader()))
+							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
-							ret.setResult(Boolean.FALSE);
-						}
-						else
-						{
-							super.exceptionOccurred(exception);
-						}
-					}
-				});
-			}			
-		});
+							public void customResultAvailable(Object result)
+							{
+								IComponentFactory fac = (IComponentFactory)result;
+								fac.isStartable(model, null, ls.getClassLoader())
+									.addResultListener(new DelegationResultListener(ret));
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								if(exception instanceof ServiceNotFoundException)
+								{
+									ret.setResult(Boolean.FALSE);
+								}
+								else
+								{
+									super.exceptionOccurred(exception);
+								}
+							}
+						}));
+					}			
+				}));
+				return ret;
+			}
+		}).addResultListener(new DelegationResultListener(ret));
 
 		return ret;
 	}
@@ -174,32 +186,41 @@ public class SComponentFactory
 	/**
 	 * Get a default icon for a file type.
 	 */
-	public static IFuture getFileTypeIcon(IServiceProvider provider, final String type)
+	public static IFuture getFileTypeIcon(IExternalAccess exta, final String type)
 	{
-		final Future ret = new Future();
+		Future ret = new Future();
 		
-		SServiceProvider.getService(provider, new ComponentFactorySelector(type))
-			.addResultListener(new DelegationResultListener(ret)
+		exta.scheduleStep(new IComponentStep()
 		{
-			public void customResultAvailable(Object result)
+			@XMLClassname("getFileTypeIcon")
+			public Object execute(final IInternalAccess ia)
 			{
-				IComponentFactory fac = (IComponentFactory)result;
-				fac.getComponentTypeIcon(type).addResultListener(new DelegationResultListener(ret));
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				if(exception instanceof ServiceNotFoundException)
+				final Future ret = new Future();
+				SServiceProvider.getService(ia.getServiceProvider(), new ComponentFactorySelector(type))
+					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
-					ret.setResult(null);
-				}
-				else
-				{
-					super.exceptionOccurred(exception);
-				}
+					public void customResultAvailable(Object result)
+					{
+						IComponentFactory fac = (IComponentFactory)result;
+						fac.getComponentTypeIcon(type).addResultListener(new DelegationResultListener(ret));
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						if(exception instanceof ServiceNotFoundException)
+						{
+							ret.setResult(null);
+						}
+						else
+						{
+							super.exceptionOccurred(exception);
+						}
+					}
+				}));
+				return ret;
 			}
-		});
-
+		}).addResultListener(new DelegationResultListener(ret));
+		
 		return ret;
 	}
 
@@ -244,6 +265,7 @@ public class SComponentFactory
 		
 		exta.scheduleStep(new IComponentStep()
 		{
+			@XMLClassname("getFileType")
 			public Object execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();

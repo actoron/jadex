@@ -4,9 +4,9 @@ import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
+import jadex.bridge.IErrorReport;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
-import jadex.bridge.IErrorReport;
 import jadex.bridge.IModelValueProvider;
 import jadex.bridge.ModelInfo;
 import jadex.bridge.ModelValueProvider;
@@ -46,7 +46,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.Icon;
 import javax.swing.UIDefaults;
 
 /**

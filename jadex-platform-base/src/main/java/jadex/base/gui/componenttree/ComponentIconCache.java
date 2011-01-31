@@ -9,6 +9,7 @@ import jadex.commons.Future;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;
+import jadex.xml.annotation.XMLClassname;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -66,6 +67,7 @@ public class ComponentIconCache
 			
 			exta.scheduleStep(new IComponentStep()
 			{
+				@XMLClassname("getFactoryService")
 				public Object execute(IInternalAccess ia)
 				{
 					final Future ret = new Future();

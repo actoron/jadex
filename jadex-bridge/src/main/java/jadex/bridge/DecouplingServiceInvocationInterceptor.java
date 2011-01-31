@@ -207,6 +207,7 @@ public class DecouplingServiceInvocationInterceptor implements IServiceInvocatio
 			}
 			catch(Exception e)
 			{
+				e.printStackTrace();
 				fut.setException(e);
 			}
 			
