@@ -6,6 +6,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
 import jadex.commons.IRemoteFilter;
+import jadex.commons.IntermediateDelegationResultListener;
 import jadex.commons.IntermediateFuture;
 import jadex.commons.Tuple;
 import jadex.commons.concurrent.DelegationResultListener;
@@ -176,7 +177,7 @@ public class BasicResultSelector implements IResultSelector
 				if(i+1<services.length)
 				{
 					getAllResults(filter, services, i+1)
-						.addResultListener(new DelegationResultListener(ret));
+						.addResultListener(new IntermediateDelegationResultListener(ret));
 				}
 				else
 				{

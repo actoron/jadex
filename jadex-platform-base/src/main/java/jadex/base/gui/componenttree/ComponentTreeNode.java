@@ -293,6 +293,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 //		});
 		
 		// Search services and only add container node when services are found.
+//		System.out.println("name: "+desc.getName());
 		cms.getExternalAccess(desc.getName())
 			.addResultListener(new SwingDefaultResultListener()
 		{
