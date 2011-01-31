@@ -1,9 +1,9 @@
 package jadex.tools.ruleprofiler;
 
+import jadex.base.gui.asynctree.INodeHandler;
+import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
-import jadex.base.gui.componenttree.IComponentTreeNode;
-import jadex.base.gui.componenttree.INodeHandler;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bdi.BDIAgentFactory;
 import jadex.bridge.ICMSComponentListener;
@@ -153,7 +153,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 		
 		comptree.addNodeHandler(new INodeHandler()
 		{
-			public Action[] getPopupActions(IComponentTreeNode[] nodes)
+			public Action[] getPopupActions(ITreeNode[] nodes)
 			{
 				Action[]	ret	= null;
 				
@@ -209,7 +209,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 				return ret;
 			}
 			
-			public Icon getOverlay(IComponentTreeNode node)
+			public Icon getOverlay(ITreeNode node)
 			{
 				Icon ret	= null;
 				if(node instanceof IActiveComponentTreeNode)
@@ -223,7 +223,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 				return ret;
 			}
 			
-			public Action getDefaultAction(IComponentTreeNode node)
+			public Action getDefaultAction(ITreeNode node)
 			{
 				Action	a	= null;
 				if(node instanceof IActiveComponentTreeNode)

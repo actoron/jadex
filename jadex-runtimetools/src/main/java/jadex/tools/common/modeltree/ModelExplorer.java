@@ -945,7 +945,7 @@ public class ModelExplorer extends JTree
 			int	children	= ((ModelExplorerTreeModel)getModel()).getChildCount(node);
 			for(int i=0; i<children; i++)
 			{
-				IExplorerTreeNode	child	= (IExplorerTreeNode) ((ModelExplorerTreeModel)getModel()).getChild(node, i);
+				IExplorerTreeNode	child	= (IExplorerTreeNode)((ModelExplorerTreeModel)getModel()).getChild(node, i);
 				nodes_crawler.add(child);
 			}
 

@@ -1,11 +1,14 @@
 package jadex.base.gui.componenttree;
 
-import java.util.List;
-
+import jadex.base.gui.asynctree.AbstractTreeNode;
+import jadex.base.gui.asynctree.AsyncTreeModel;
+import jadex.base.gui.asynctree.ITreeNode;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.service.IServiceContainer;
+
+import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.JTree;
@@ -14,7 +17,7 @@ import javax.swing.UIDefaults;
 /**
  *  Node object representing a service container.
  */
-public class ServiceContainerNode	extends AbstractComponentTreeNode
+public class ServiceContainerNode	extends AbstractTreeNode
 {
 	//-------- constants --------
 	
@@ -38,7 +41,7 @@ public class ServiceContainerNode	extends AbstractComponentTreeNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public ServiceContainerNode(IComponentTreeNode parent, ComponentTreeModel model, JTree tree, IServiceContainer container)
+	public ServiceContainerNode(ITreeNode parent, AsyncTreeModel model, JTree tree, IServiceContainer container)
 	{
 		super(parent, model, tree);
 		this.container = container;

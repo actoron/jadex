@@ -1,4 +1,4 @@
-package jadex.base.gui.componenttree;
+package jadex.base.gui.asynctree;
 
 import jadex.commons.gui.CombiIcon;
 
@@ -16,14 +16,14 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 /**
  * Renderer for component tree cells.
  */
-public class ComponentTreeCellRenderer extends DefaultTreeCellRenderer
+public class AsyncTreeCellRenderer extends DefaultTreeCellRenderer
 {
 	// -------- constructors --------
 
 	/**
 	 * Create a new component tree cell renderer.
 	 */
-	public ComponentTreeCellRenderer()
+	public AsyncTreeCellRenderer()
 	{
 	}
 
@@ -37,13 +37,13 @@ public class ComponentTreeCellRenderer extends DefaultTreeCellRenderer
 			boolean hasFocus)
 	{
 		// Change icons depending on node type.
-		IComponentTreeNode node = (IComponentTreeNode)value;
+		ITreeNode node = (ITreeNode)value;
 		Icon icon = node.getIcon();
 		// Add overlays to icon (if any).
-		if(tree.getModel() instanceof ComponentTreeModel)
+		if(tree.getModel() instanceof AsyncTreeModel)
 		{
 			List icons = null;
-			INodeHandler[] handlers = ((ComponentTreeModel)tree.getModel())
+			INodeHandler[] handlers = ((AsyncTreeModel)tree.getModel())
 					.getNodeHandlers();
 			for(int i = 0; handlers != null && i < handlers.length; i++)
 			{

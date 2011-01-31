@@ -1,5 +1,7 @@
 package jadex.base.gui.componenttree;
 
+import jadex.base.gui.asynctree.AsyncTreeModel;
+import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentStep;
@@ -52,7 +54,7 @@ public class ComponentIconCache
 	/**
 	 *  Get an icon.
 	 */
-	public Icon	getIcon(final IComponentTreeNode node, final String type)
+	public Icon	getIcon(final ITreeNode node, final String type)
 	{
 		Icon	ret	= null;
 		
@@ -89,9 +91,9 @@ public class ComponentIconCache
 							{
 								icons.put(type, result);
 								TreeModel	model	= tree.getModel();
-								if(model instanceof ComponentTreeModel)
+								if(model instanceof AsyncTreeModel)
 								{
-									((ComponentTreeModel)model).fireNodeChanged(node);
+									((AsyncTreeModel)model).fireNodeChanged(node);
 								}
 								else
 								{

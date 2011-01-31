@@ -1,10 +1,10 @@
 package jadex.base.gui.componentviewer;
 
+import jadex.base.gui.asynctree.INodeHandler;
+import jadex.base.gui.asynctree.INodeListener;
+import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
-import jadex.base.gui.componenttree.IComponentTreeNode;
-import jadex.base.gui.componenttree.INodeHandler;
-import jadex.base.gui.componenttree.INodeListener;
 import jadex.base.gui.componenttree.ServiceNode;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.IComponentIdentifier;
@@ -159,7 +159,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 				JTree tree = comptree.getTree();
 				if(tree.getSelectionPath()!=null)
 				{
-					IComponentTreeNode node = (IComponentTreeNode)tree.getSelectionPath().getLastPathComponent();
+					ITreeNode node = (ITreeNode)tree.getSelectionPath().getLastPathComponent();
 					Object nodeid = node.getId();
 					if(nodeid!=null)
 					{
@@ -177,7 +177,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 		
 		comptree.addNodeHandler(new INodeHandler()
 		{
-			public Action[] getPopupActions(IComponentTreeNode[] nodes)
+			public Action[] getPopupActions(ITreeNode[] nodes)
 			{
 				Action[]	ret	= null;
 				
@@ -232,7 +232,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 				return ret;
 			}
 			
-			public Icon getOverlay(IComponentTreeNode node)
+			public Icon getOverlay(ITreeNode node)
 			{
 				Icon ret	= null;
 				if(cards.getComponent(node.getId())!=null)
@@ -246,7 +246,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 				return ret;
 			}
 			
-			public Action getDefaultAction(IComponentTreeNode node)
+			public Action getDefaultAction(ITreeNode node)
 			{
 				Action	a	= null;
 				if(cards.getComponent(node.getId())!=null)
@@ -283,7 +283,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 		// Listener to remove panels, when services vanish!
 		comptree.getModel().addNodeListener(new INodeListener()
 		{
-			public void nodeRemoved(IComponentTreeNode node)
+			public void nodeRemoved(ITreeNode node)
 			{
 //				System.out.println("node rem: "+node);
 				Object nodeid = node.getId();
@@ -298,7 +298,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 				}
 			}
 			
-			public void nodeAdded(IComponentTreeNode node)
+			public void nodeAdded(ITreeNode node)
 			{
 			}
 		});
@@ -313,7 +313,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 			TreePath[]	paths	= comptree.getTree().getSelectionPaths();
 			for(int i=0; paths!=null && i<paths.length; i++)
 			{
-				if(isNodeViewable((IComponentTreeNode)paths[i].getLastPathComponent()))
+				if(isNodeViewable((ITreeNode)paths[i].getLastPathComponent()))
 				{
 					final Object tmp = paths[i].getLastPathComponent();
 					
@@ -453,10 +453,10 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 			TreePath[]	paths	= comptree.getTree().getSelectionPaths();
 			for(int i=0; paths!=null && i<paths.length; i++)
 			{
-				if(isNodeViewable((IComponentTreeNode)paths[i].getLastPathComponent()))
+				if(isNodeViewable((ITreeNode)paths[i].getLastPathComponent()))
 				{
 					storeCurrentPanelSettings();
-					final IComponentTreeNode node = (IComponentTreeNode)paths[i].getLastPathComponent();
+					final ITreeNode node = (ITreeNode)paths[i].getLastPathComponent();
 					Object nodeid = node.getId();
 					detail.remove(cards.getComponent(nodeid));
 					IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.remove(nodeid);
@@ -486,7 +486,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	 *  @param node	The node.
 	 *  @return True, if the node is viewable.
 	 */
-	protected boolean isNodeViewable(final IComponentTreeNode node)
+	protected boolean isNodeViewable(final ITreeNode node)
 	{
 		boolean ret = false;
 		if(node instanceof ServiceNode)

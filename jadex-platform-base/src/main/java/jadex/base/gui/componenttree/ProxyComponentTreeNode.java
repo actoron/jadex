@@ -1,5 +1,7 @@
 package jadex.base.gui.componenttree;
 
+import jadex.base.gui.asynctree.AsyncTreeModel;
+import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.service.remote.ProxyAgent;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
@@ -62,7 +64,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public ProxyComponentTreeNode(final IComponentTreeNode parent, ComponentTreeModel model, JTree tree, IComponentDescription desc,
+	public ProxyComponentTreeNode(final ITreeNode parent, AsyncTreeModel model, JTree tree, IComponentDescription desc,
 		IComponentManagementService cms, ComponentIconCache iconcache)
 	{
 		super(parent, model, tree, desc, cms, iconcache);
@@ -167,7 +169,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	 *  Called once for each node.
 	 *  Should call setChildren() once children are found.
 	 */
-	protected static IFuture searchChildren(final IComponentManagementService cms, final IComponentTreeNode parentnode,
+	protected static IFuture searchChildren(final IComponentManagementService cms, final ITreeNode parentnode,
 		final IComponentDescription desc, final IComponentIdentifier cid, final  ComponentIconCache iconcache,
 		final // future for determining when services can be added to service container.
 		Future future, final boolean force)
@@ -177,7 +179,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		final List children = new ArrayList();
 		final boolean	ready[]	= new boolean[2];	// 0: children, 1: services;
 
-		IComponentTreeNode tmp = parentnode;
+		ITreeNode tmp = parentnode;
 		while(!(tmp instanceof ProxyComponentTreeNode))
 			tmp = tmp.getParent();
 		final ProxyComponentTreeNode proxy = (ProxyComponentTreeNode)tmp;
@@ -207,7 +209,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 							((Collection)result).toArray(new IComponentDescription[((Collection)result).size()]);
 						for(int i=0; i<descs.length; i++)
 						{
-							IComponentTreeNode node = proxy.getModel().getNode(descs[i].getName());
+							ITreeNode node = proxy.getModel().getNode(descs[i].getName());
 							if(node==null)
 							{
 								node = new VirtualComponentTreeNode(parentnode, proxy.getModel(), proxy.getTree(), descs[i], cms, iconcache);

@@ -1,12 +1,13 @@
 package jadex.base.gui.componenttree;
 
+import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 
 /**
  *  Interface for all active component tree nodes.
  */
-public interface IActiveComponentTreeNode extends IComponentTreeNode
+public interface IActiveComponentTreeNode extends ITreeNode
 {
 	/**
 	 *  Get the component description.

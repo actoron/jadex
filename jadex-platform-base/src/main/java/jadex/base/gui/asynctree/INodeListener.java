@@ -1,4 +1,4 @@
-package jadex.base.gui.componenttree;
+package jadex.base.gui.asynctree;
 
 /**
  *  Notified when nodes are added or removed from the component tree.
@@ -8,10 +8,10 @@ public interface INodeListener
 	/**
 	 *  A node was added.
 	 */
-	public void	nodeAdded(IComponentTreeNode node);
+	public void	nodeAdded(ITreeNode node);
 	
 	/**
 	 *  A node was removed.
 	 */
-	public void	nodeRemoved(IComponentTreeNode node);
+	public void	nodeRemoved(ITreeNode node);
 }

@@ -1,4 +1,4 @@
-package jadex.base.gui.componenttree;
+package jadex.base.gui.asynctree;
 
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -18,7 +18,7 @@ import javax.swing.tree.TreePath;
  *  A mouse listener to add popup-menus to a component tree.
  *  Uses the actions given by the selected nodes.
  */
-public class ComponentTreePopupListener	extends MouseAdapter
+public class TreePopupListener	extends MouseAdapter
 {
 	// Is only mouseReleased a popup trigger???
 	public void	mousePressed(MouseEvent e)	{doPopup(e);}
@@ -31,7 +31,7 @@ public class ComponentTreePopupListener	extends MouseAdapter
 			TreePath[]	paths	= tree.getSelectionPaths();
 			if(paths!=null)
 			{
-				ComponentTreeModel	model	= (ComponentTreeModel)tree.getModel();
+				AsyncTreeModel	model	= (AsyncTreeModel)tree.getModel();
 				INodeHandler[]	handlers	= model.getNodeHandlers();
 				if(handlers!=null)
 				{
@@ -40,7 +40,7 @@ public class ComponentTreePopupListener	extends MouseAdapter
 						Action	a	= null;
 						for(int j=handlers.length-1; a==null && j>=0; j--)
 						{
-							a	= handlers[j].getDefaultAction((IComponentTreeNode)paths[i].getLastPathComponent());
+							a	= handlers[j].getDefaultAction((ITreeNode)paths[i].getLastPathComponent());
 						}
 						if(a!=null)
 						{
@@ -81,11 +81,11 @@ public class ComponentTreePopupListener	extends MouseAdapter
 				TreePath[]	paths	= tree.getSelectionPaths();
 				if(paths!=null)
 				{
-					IComponentTreeNode[]	nodes	= new IComponentTreeNode[paths.length];
+					ITreeNode[]	nodes	= new ITreeNode[paths.length];
 					for(int i=0; i<nodes.length; i++)
-						nodes[i]	= (IComponentTreeNode)paths[i].getLastPathComponent();
+						nodes[i]	= (ITreeNode)paths[i].getLastPathComponent();
 					
-					ComponentTreeModel	model	= (ComponentTreeModel)tree.getModel();
+					AsyncTreeModel	model	= (AsyncTreeModel)tree.getModel();
 					INodeHandler[]	handlers	= model.getNodeHandlers();
 					if(handlers!=null)
 					{

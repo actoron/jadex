@@ -1,4 +1,4 @@
-package jadex.base.gui.componenttree;
+package jadex.base.gui.asynctree;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
@@ -18,35 +18,35 @@ import javax.swing.tree.TreePath;
 /**
  *  Basic node object.
  */
-public abstract class AbstractComponentTreeNode	implements IComponentTreeNode 
+public abstract class AbstractTreeNode	implements ITreeNode 
 {
 	//-------- attributes --------
 	
 	/** The parent node. */
-	private final IComponentTreeNode	parent;
+	protected final ITreeNode	parent;
 	
 	/** The tree model. */
-	private final ComponentTreeModel	model;
+	protected final AsyncTreeModel	model;
 	
 	/** The tree. */
 	// Hack!!! Model should not have access to ui, required for refresh only on expanded nodes.
-	private final JTree	tree;
+	protected final JTree	tree;
 	
 	/** The component description. */
-	private List	children;
+	protected List	children;
 	
 	/** Flag to indicate search in progress. */
-	private boolean	searching;
+	protected boolean	searching;
 
 	/** Flag to indicate recursive refresh. */
-	private boolean	recurse;
+	protected boolean	recurse;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a node.
 	 */
-	public AbstractComponentTreeNode(IComponentTreeNode parent, ComponentTreeModel model, JTree tree)
+	public AbstractTreeNode(ITreeNode parent, AsyncTreeModel model, JTree tree)
 	{
 		this.parent	= parent;
 		this.model	= model;
@@ -65,7 +65,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	/**
 	 *  Get the parent node.
 	 */
-	public IComponentTreeNode	getParent()
+	public ITreeNode	getParent()
 	{
 		return parent;
 	}
@@ -88,7 +88,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	/**
 	 *  Get the given child.
 	 */
-	public IComponentTreeNode	getChild(int index)
+	public ITreeNode	getChild(int index)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
@@ -97,13 +97,13 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 			searching	= true;
 			searchChildren(false);
 		}
-		return children==null ? null : (IComponentTreeNode)children.get(index);
+		return children==null ? null : (ITreeNode)children.get(index);
 	}
 	
 	/**
 	 *  Get the index of a child.
 	 */
-	public int	getIndexOfChild(IComponentTreeNode child)
+	public int	getIndexOfChild(ITreeNode child)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
@@ -220,8 +220,8 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 				searching	= false;
 				recurse	= false;
 				
-				List	oldcs	= AbstractComponentTreeNode.this.children;
-				AbstractComponentTreeNode.this.children	= children;
+				List	oldcs	= AbstractTreeNode.this.children;
+				AbstractTreeNode.this.children	= children;
 				List	added	= new ArrayList();
 				List	removed	= new ArrayList();
 				if(oldcs!=null)
@@ -262,22 +262,22 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 					{
 						for(int i=removed.size()-1; i>=0; i--)
 						{
-							IComponentTreeNode	node	= (IComponentTreeNode)removed.get(i);
+							ITreeNode	node	= (ITreeNode)removed.get(i);
 							model.deregisterNode(node);
-							model.fireNodeRemoved(AbstractComponentTreeNode.this, node, oldcs.indexOf(node));
+							model.fireNodeRemoved(AbstractTreeNode.this, node, oldcs.indexOf(node));
 						}
 						if(added.isEmpty())
-							model.fireNodeChanged(AbstractComponentTreeNode.this);
+							model.fireNodeChanged(AbstractTreeNode.this);
 					}
 					/*else*/ if(!added.isEmpty())
 					{
 						for(int i=0; i<added.size(); i++)
 						{
-							IComponentTreeNode	node	= (IComponentTreeNode)added.get(i);
+							ITreeNode	node	= (ITreeNode)added.get(i);
 							model.addNode(node);
-							model.fireNodeAdded(AbstractComponentTreeNode.this, node, children.indexOf(node));
+							model.fireNodeAdded(AbstractTreeNode.this, node, children.indexOf(node));
 						}
-						model.fireNodeChanged(AbstractComponentTreeNode.this);
+						model.fireNodeChanged(AbstractTreeNode.this);
 					}
 //				}
 //				catch(RuntimeException e)
@@ -291,11 +291,11 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 //					throw e;
 //				}
 				
-				if(dorecurse && tree.isExpanded(new TreePath(model.buildTreePath(AbstractComponentTreeNode.this).toArray())))
+				if(dorecurse && tree.isExpanded(new TreePath(model.buildTreePath(AbstractTreeNode.this).toArray())))
 				{
 					for(int i=0; children!=null && i<children.size(); i++)
 					{
-						((IComponentTreeNode)children.get(i)).refresh(dorecurse, false);
+						((ITreeNode)children.get(i)).refresh(dorecurse, false);
 					}
 				}
 				
@@ -332,7 +332,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	/**
 	 *  Get the model.
 	 */
-	public ComponentTreeModel	getModel()
+	public AsyncTreeModel	getModel()
 	{
 		return model;
 	}
@@ -349,7 +349,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	 *  Add a child and update the tree.
 	 *  Must be called from swing thread.
 	 */
-	public void addChild(int index, IComponentTreeNode node)
+	public void addChild(int index, ITreeNode node)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
@@ -372,7 +372,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	 *  Add a child and update the tree.
 	 *  Must be called from swing thread.
 	 */
-	public void addChild(IComponentTreeNode node)
+	public void addChild(ITreeNode node)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
@@ -383,7 +383,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	 *  Remove a child and update the tree.
 	 *  Must be called from swing thread.
 	 */
-	public void removeChild(IComponentTreeNode node)
+	public void removeChild(ITreeNode node)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 

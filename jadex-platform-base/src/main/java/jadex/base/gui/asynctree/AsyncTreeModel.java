@@ -1,4 +1,4 @@
-package jadex.base.gui.componenttree;
+package jadex.base.gui.asynctree;
 
 import jadex.commons.collection.MultiCollection;
 
@@ -20,40 +20,40 @@ import javax.swing.tree.TreePath;
 /**
  *  Tree model, which dynamically represents running components.
  */
-public class ComponentTreeModel implements TreeModel
+public class AsyncTreeModel implements TreeModel
 {
 	//-------- attributes --------
 	
 	/** The root node. */
-	private IComponentTreeNode	root;
+	protected ITreeNode	root;
 	
 	/** The tree listeners. */
-	private final List	listeners;
+	protected final List	listeners;
 	
 	/** The node listeners. */
-	private final List	nodelisteners;
+	protected final List	nodelisteners;
 	
 	/** The node lookup table. */
-	private final Map	nodes;
+	protected final Map	nodes;
 	
 	/** The added nodes. */
-	private final Map	added;
+	protected final Map	added;
 	
 	/** The zombie node ids. */
-	private final Set	zombies;
+	protected final Set	zombies;
 	
 	/** The icon overlays. */
-	private final List	overlays;
+	protected final List	overlays;
 	
 	/** The changed nodes (delayed update for improving perceived speed). */
-	private MultiCollection	changed;
+	protected MultiCollection	changed;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a component tree model.
 	 */
-	public ComponentTreeModel()
+	public AsyncTreeModel()
 	{
 		this.listeners	= new ArrayList();
 		this.nodelisteners	= new ArrayList();
@@ -82,7 +82,7 @@ public class ComponentTreeModel implements TreeModel
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
-		return ((IComponentTreeNode)parent).getChild(index);
+		return ((ITreeNode)parent).getChild(index);
 	}
 	
 	/**
@@ -92,7 +92,7 @@ public class ComponentTreeModel implements TreeModel
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
-		return ((IComponentTreeNode)parent).getChildCount();
+		return ((ITreeNode)parent).getChildCount();
 	}
 	
 	/**
@@ -102,7 +102,7 @@ public class ComponentTreeModel implements TreeModel
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
-		return ((IComponentTreeNode)parent).getIndexOfChild((IComponentTreeNode)child);
+		return ((ITreeNode)parent).getIndexOfChild((ITreeNode)child);
 	}
 	
 	/**
@@ -112,7 +112,7 @@ public class ComponentTreeModel implements TreeModel
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
-		return ((IComponentTreeNode)node).isLeaf();
+		return ((ITreeNode)node).isLeaf();
 	}
 	
 	/**
@@ -150,7 +150,7 @@ public class ComponentTreeModel implements TreeModel
 	/**
 	 *  Set the root node.
 	 */
-	public void	setRoot(IComponentTreeNode root)
+	public void	setRoot(ITreeNode root)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
@@ -167,7 +167,7 @@ public class ComponentTreeModel implements TreeModel
     /**
      *  Inform listeners that tree has changed from given node on.
      */
-	public void fireTreeChanged(IComponentTreeNode node)
+	public void fireTreeChanged(ITreeNode node)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
@@ -184,7 +184,7 @@ public class ComponentTreeModel implements TreeModel
     /**
      *  Inform listeners that a node has changed.
      */
-	public void fireNodeChanged(IComponentTreeNode node)
+	public void fireNodeChanged(ITreeNode node)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
@@ -196,7 +196,7 @@ public class ComponentTreeModel implements TreeModel
 //			{
 //				public void run()
 //				{
-					IComponentTreeNode[]	parents	= (IComponentTreeNode[])changed.getKeys(IComponentTreeNode.class);
+					ITreeNode[]	parents	= (ITreeNode[])changed.getKeys(ITreeNode.class);
 					for(int i=0; i<parents.length; i++)
 					{
 						// Only throw event when root node or parent still in tree
@@ -216,9 +216,9 @@ public class ComponentTreeModel implements TreeModel
 								for(int j=0; j<nodes.length; j++)
 								{
 									nodes[cnt]	= it.next();
-									if(getAddedNode(((IComponentTreeNode)nodes[cnt]).getId())!=null)
+									if(getAddedNode(((ITreeNode)nodes[cnt]).getId())!=null)
 									{
-										indices[cnt]	= parents[i].getIndexOfChild((IComponentTreeNode)nodes[cnt]);
+										indices[cnt]	= parents[i].getIndexOfChild((ITreeNode)nodes[cnt]);
 										if(indices[cnt]!=-1)
 										{
 											cnt++;
@@ -250,7 +250,7 @@ public class ComponentTreeModel implements TreeModel
 								assert set.size()==1 : set;
 								indices	= null;
 								nodes	= null;
-								path = buildTreePath((IComponentTreeNode)set.iterator().next());
+								path = buildTreePath((ITreeNode)set.iterator().next());
 								
 							}
 							
@@ -275,7 +275,7 @@ public class ComponentTreeModel implements TreeModel
     /**
      *  Inform listeners that a node has been removed
      */
-	public void fireNodeRemoved(IComponentTreeNode parent, IComponentTreeNode child, int index)
+	public void fireNodeRemoved(ITreeNode parent, ITreeNode child, int index)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
@@ -292,7 +292,7 @@ public class ComponentTreeModel implements TreeModel
     /**
      *  Inform listeners that a node has been added
      */
-	public void fireNodeAdded(IComponentTreeNode parent, IComponentTreeNode child, int index)
+	public void fireNodeAdded(ITreeNode parent, ITreeNode child, int index)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
@@ -311,12 +311,12 @@ public class ComponentTreeModel implements TreeModel
 	 *  @param desc The node.
 	 *  @return The path items.
 	 */
-	public List buildTreePath(IComponentTreeNode node)
+	public List buildTreePath(ITreeNode node)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
 		List	path	= new LinkedList();
-		IComponentTreeNode	pnode	= node;
+		ITreeNode	pnode	= node;
 		while(pnode!=null)
 		{
 			path.add(0, pnode);
@@ -329,7 +329,7 @@ public class ComponentTreeModel implements TreeModel
 	 *  Register a node.
 	 *  Nodes can be registered for easy access.
 	 */
-	public void	registerNode(IComponentTreeNode node)
+	public void	registerNode(ITreeNode node)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
@@ -346,7 +346,7 @@ public class ComponentTreeModel implements TreeModel
 	 *  Add a node.
 	 *  Informs listeners.
 	 */
-	public void	addNode(IComponentTreeNode node)
+	public void	addNode(ITreeNode node)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
@@ -360,21 +360,21 @@ public class ComponentTreeModel implements TreeModel
 
 		for(int i=0; i<node.getCachedChildren().size(); i++)
 		{
-			addNode((IComponentTreeNode)node.getCachedChildren().get(i));
+			addNode((ITreeNode)node.getCachedChildren().get(i));
 		}		
 	}
 	
 	/**
 	 *  Get a node by its id.
 	 */
-	public IComponentTreeNode	getNode(Object id)
+	public ITreeNode	getNode(Object id)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
-		IComponentTreeNode	ret;
+		ITreeNode	ret;
 		synchronized(nodes)
 		{
-			ret	= (IComponentTreeNode)nodes.get(id);
+			ret	= (ITreeNode)nodes.get(id);
 		}
 		return ret;
 	}
@@ -382,17 +382,17 @@ public class ComponentTreeModel implements TreeModel
 	/**
 	 *  Get a node by its id.
 	 */
-	public IComponentTreeNode	getAddedNode(Object id)
+	public ITreeNode	getAddedNode(Object id)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
-		return (IComponentTreeNode)added.get(id);
+		return (ITreeNode)added.get(id);
 	}
 	
 	/**
 	 *  Remove a node registration.
 	 */
-	public void	deregisterNode(IComponentTreeNode node)
+	public void	deregisterNode(ITreeNode node)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
@@ -425,7 +425,7 @@ public class ComponentTreeModel implements TreeModel
 
 		for(int i=0; i<node.getCachedChildren().size(); i++)
 		{
-			deregisterNode((IComponentTreeNode)node.getCachedChildren().get(i));
+			deregisterNode((ITreeNode)node.getCachedChildren().get(i));
 		}
 	}
 	
@@ -505,10 +505,10 @@ public class ComponentTreeModel implements TreeModel
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
-		IComponentTreeNode[]	anodes;
+		ITreeNode[]	anodes;
 		synchronized(nodes)
 		{
-			anodes	= (IComponentTreeNode[])nodes.values().toArray(new IComponentTreeNode[nodes.values().size()]);
+			anodes	= (ITreeNode[])nodes.values().toArray(new ITreeNode[nodes.values().size()]);
 		}
 		
 		for(int i=0; i<anodes.length; i++)
@@ -521,12 +521,12 @@ public class ComponentTreeModel implements TreeModel
 	 *  Get a node for removal.
 	 *  Add a zombie node, if node does not exist.
 	 */
-	public IComponentTreeNode getNodeOrAddZombie(Object id)
+	public ITreeNode getNodeOrAddZombie(Object id)
 	{
-		IComponentTreeNode	ret;
+		ITreeNode	ret;
 		synchronized(nodes)
 		{
-			ret	= (IComponentTreeNode)nodes.get(id);
+			ret	= (ITreeNode)nodes.get(id);
 			if(ret==null)
 			{
 				zombies.add(id);

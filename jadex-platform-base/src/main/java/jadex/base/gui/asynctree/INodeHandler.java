@@ -1,4 +1,4 @@
-package jadex.base.gui.componenttree;
+package jadex.base.gui.asynctree;
 
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -12,15 +12,15 @@ public interface INodeHandler
 	/**
 	 *  Get the overlay for a node if any.
 	 */
-	public Icon	getOverlay(IComponentTreeNode node);
+	public Icon	getOverlay(ITreeNode node);
 
 	/**
 	 *  Get the popup actions available for all of the given nodes, if any.
 	 */
-	public Action[]	getPopupActions(IComponentTreeNode[] nodes);
+	public Action[]	getPopupActions(ITreeNode[] nodes);
 
 	/**
 	 *  Get the default action to be performed after a double click.
 	 */
-	public Action	getDefaultAction(IComponentTreeNode node);
+	public Action	getDefaultAction(ITreeNode node);
 }

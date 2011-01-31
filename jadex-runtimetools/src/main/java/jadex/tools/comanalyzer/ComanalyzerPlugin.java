@@ -1,9 +1,9 @@
 package jadex.tools.comanalyzer;
 
+import jadex.base.gui.asynctree.INodeHandler;
+import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
-import jadex.base.gui.componenttree.IComponentTreeNode;
-import jadex.base.gui.componenttree.INodeHandler;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
@@ -402,7 +402,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		
 		comptree.addNodeHandler(new INodeHandler()
 		{
-			public Icon getOverlay(IComponentTreeNode node)
+			public Icon getOverlay(ITreeNode node)
 			{
 				Icon	ret	= null;
 				if(node instanceof IActiveComponentTreeNode)
@@ -417,7 +417,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 				return ret;
 			}
 			
-			public Action[] getPopupActions(IComponentTreeNode[] nodes)
+			public Action[] getPopupActions(ITreeNode[] nodes)
 			{
 				Action[]	ret	= null;
 				
@@ -472,7 +472,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 				return ret;
 			}
 			
-			public Action getDefaultAction(IComponentTreeNode node)
+			public Action getDefaultAction(ITreeNode node)
 			{
 				Action	a	= null;
 				if(node instanceof IActiveComponentTreeNode)

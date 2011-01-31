@@ -1,10 +1,10 @@
 package jadex.tools.debugger;
 
+import jadex.base.gui.asynctree.INodeHandler;
+import jadex.base.gui.asynctree.INodeListener;
+import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
-import jadex.base.gui.componenttree.IComponentTreeNode;
-import jadex.base.gui.componenttree.INodeHandler;
-import jadex.base.gui.componenttree.INodeListener;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.IComponentDescription;
 import jadex.commons.Properties;
@@ -173,7 +173,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 		
 		comptree.addNodeHandler(new INodeHandler()
 		{
-			public Action[] getPopupActions(IComponentTreeNode[] nodes)
+			public Action[] getPopupActions(ITreeNode[] nodes)
 			{
 				Action[]	ret	= null;
 				
@@ -228,7 +228,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 				return ret;
 			}
 			
-			public Icon getOverlay(IComponentTreeNode node)
+			public Icon getOverlay(ITreeNode node)
 			{
 				Icon ret	= null;
 				if(node instanceof IActiveComponentTreeNode)
@@ -242,7 +242,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 				return ret;
 			}
 			
-			public Action getDefaultAction(IComponentTreeNode node)
+			public Action getDefaultAction(ITreeNode node)
 			{
 				Action	a	= null;
 				if(node instanceof IActiveComponentTreeNode)
@@ -262,7 +262,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 		
 		comptree.getModel().addNodeListener(new INodeListener()
 		{
-			public void nodeRemoved(IComponentTreeNode node)
+			public void nodeRemoved(ITreeNode node)
 			{
 				if(node instanceof IActiveComponentTreeNode)
 				{
@@ -276,7 +276,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 				}
 			}
 			
-			public void nodeAdded(IComponentTreeNode node)
+			public void nodeAdded(ITreeNode node)
 			{
 			}
 		});

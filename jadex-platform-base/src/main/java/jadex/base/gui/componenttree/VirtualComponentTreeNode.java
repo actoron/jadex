@@ -1,5 +1,8 @@
 package jadex.base.gui.componenttree;
 
+import jadex.base.gui.asynctree.AbstractTreeNode;
+import jadex.base.gui.asynctree.AsyncTreeModel;
+import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.service.remote.ProxyAgent;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
@@ -23,7 +26,7 @@ import javax.swing.JTree;
 /**
  *  Node for a virtual component, i.e. a node for a remote component.
  */
-public class VirtualComponentTreeNode extends AbstractComponentTreeNode implements IActiveComponentTreeNode
+public class VirtualComponentTreeNode extends AbstractTreeNode implements IActiveComponentTreeNode
 {
 	//-------- attributes --------
 	
@@ -47,7 +50,7 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 	/**
 	 *  Create a new service container node.
 	 */
-	public VirtualComponentTreeNode(IComponentTreeNode parent, ComponentTreeModel model, JTree tree, IComponentDescription desc,
+	public VirtualComponentTreeNode(ITreeNode parent, AsyncTreeModel model, JTree tree, IComponentDescription desc,
 		IComponentManagementService cms, ComponentIconCache iconcache)
 	{
 		super(parent, model, tree);
@@ -90,7 +93,7 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 	 */
 	public void refresh(boolean recurse, boolean force)
 	{
-		IComponentTreeNode tmp = getParent();
+		ITreeNode tmp = getParent();
 		while(!(tmp instanceof ProxyComponentTreeNode))
 			tmp = tmp.getParent();
 		ProxyComponentTreeNode proxy = (ProxyComponentTreeNode)tmp;
@@ -125,7 +128,7 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 					
 					public void customExceptionOccurred(Exception exception)
 					{
-						AbstractComponentTreeNode parent = (AbstractComponentTreeNode)getParent();
+						AbstractTreeNode parent = (AbstractTreeNode)getParent();
 						parent.removeChild(VirtualComponentTreeNode.this);
 					}
 				});
@@ -133,7 +136,7 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 			
 			public void customExceptionOccurred(Exception exception)
 			{
-				AbstractComponentTreeNode parent = (AbstractComponentTreeNode)getParent();
+				AbstractTreeNode parent = (AbstractTreeNode)getParent();
 				parent.removeChild(VirtualComponentTreeNode.this);
 			}
 		});

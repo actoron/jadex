@@ -1,4 +1,4 @@
-package jadex.base.gui.componenttree;
+package jadex.base.gui.asynctree;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import javax.swing.JComponent;
 /**
  *  Node for the component tree panel.
  */
-public interface IComponentTreeNode
+public interface ITreeNode
 {
 	/**
 	 *  Called when the node is removed or the tree is closed.
@@ -23,7 +23,7 @@ public interface IComponentTreeNode
 	/**
 	 *  Get the parent node.
 	 */
-	public IComponentTreeNode	getParent();
+	public ITreeNode	getParent();
 	
 	/**
 	 *  Get the child count.
@@ -33,12 +33,12 @@ public interface IComponentTreeNode
 	/**
 	 *  Get the given child.
 	 */
-	public IComponentTreeNode	getChild(int index);
+	public ITreeNode	getChild(int index);
 	
 	/**
 	 *  Get the index of a child.
 	 */
-	public int	getIndexOfChild(IComponentTreeNode child);
+	public int	getIndexOfChild(ITreeNode child);
 	
 	/**
 	 *  Check if the node is a leaf.
@@ -65,7 +65,6 @@ public interface IComponentTreeNode
 	 *  True, if the node has properties that can be displayed.
 	 */
 	public boolean	hasProperties();
-
 	
 	/**
 	 *  Get or create a component displaying the node properties.

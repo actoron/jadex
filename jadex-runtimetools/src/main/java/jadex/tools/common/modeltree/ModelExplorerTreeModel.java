@@ -44,7 +44,7 @@ public class ModelExplorerTreeModel implements TreeModel
 		Object	ret;
 		if(parent instanceof FileNode)
 		{
-			List	children	= nof.getChildren((FileNode)parent);
+			List children = nof.getChildren((FileNode)parent);
 			if(children!=null)
 				ret	= children.get(index);
 			else

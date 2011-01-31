@@ -1,5 +1,8 @@
 package jadex.base.gui.componenttree;
 
+import jadex.base.gui.asynctree.AbstractTreeNode;
+import jadex.base.gui.asynctree.AsyncTreeModel;
+import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
@@ -22,7 +25,7 @@ import javax.swing.JTree;
 /**
  *  Node object representing a service container.
  */
-public class ComponentTreeNode	extends AbstractComponentTreeNode implements IActiveComponentTreeNode
+public class ComponentTreeNode	extends AbstractTreeNode implements IActiveComponentTreeNode
 {
 	//-------- attributes --------
 	
@@ -43,7 +46,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 	/**
 	 *  Create a new service container node.
 	 */
-	public ComponentTreeNode(IComponentTreeNode parent, ComponentTreeModel model, JTree tree, IComponentDescription desc,
+	public ComponentTreeNode(ITreeNode parent, AsyncTreeModel model, JTree tree, IComponentDescription desc,
 		IComponentManagementService cms, ComponentIconCache iconcache)
 	{
 		super(parent, model, tree);
@@ -125,7 +128,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 							public void customResultAvailable(Object result)
 							{
 								IComponentDescription	desc	= (IComponentDescription)result;
-								IComponentTreeNode	node	= getModel().getNode(desc.getName());
+								ITreeNode	node	= getModel().getNode(desc.getName());
 								if(node==null)
 								{
 									createComponentNode(desc).addResultListener(new SwingDefaultResultListener()
@@ -378,7 +381,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 		{
 			public void customResultAvailable(Object result)
 			{
-				IComponentTreeNode node	= getModel().getNode(desc.getName());
+				ITreeNode node	= getModel().getNode(desc.getName());
 				if(node==null)
 				{
 					IExternalAccess exta = (IExternalAccess)result;

@@ -1,6 +1,12 @@
 package jadex.base.gui.componenttree;
 
 import jadex.base.gui.ObjectInspectorPanel;
+import jadex.base.gui.asynctree.AbstractTreeNode;
+import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
+import jadex.base.gui.asynctree.AsyncTreeModel;
+import jadex.base.gui.asynctree.INodeHandler;
+import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.TreePopupListener;
 import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
@@ -89,7 +95,7 @@ public class ComponentTreePanel extends JSplitPane
 	protected final IExternalAccess	access;
 	
 	/** The component tree model. */
-	protected final ComponentTreeModel	model;
+	protected final AsyncTreeModel	model;
 	
 	/** The component tree. */
 	protected final JTree	tree;
@@ -156,10 +162,10 @@ public class ComponentTreePanel extends JSplitPane
 		this.setOneTouchExpandable(true);
 		
 		this.access	= access;
-		this.model	= new ComponentTreeModel();
+		this.model	= new AsyncTreeModel();
 		this.tree	= new JTree(model);
-		tree.setCellRenderer(new ComponentTreeCellRenderer());
-		tree.addMouseListener(new ComponentTreePopupListener());
+		tree.setCellRenderer(new AsyncTreeCellRenderer());
+		tree.addMouseListener(new TreePopupListener());
 		tree.setShowsRootHandles(true);
 		tree.setToggleClickCount(0);
 		final ComponentIconCache	cic	= new ComponentIconCache(access, tree);
@@ -176,7 +182,7 @@ public class ComponentTreePanel extends JSplitPane
 		{
 			public IFuture componentRemoved(final IComponentDescription desc, Map results)
 			{
-				final IComponentTreeNode node = model.getNodeOrAddZombie(desc.getName());
+				final ITreeNode node = model.getNodeOrAddZombie(desc.getName());
 				if(node!=null)
 				{
 					SwingUtilities.invokeLater(new Runnable()
@@ -185,7 +191,7 @@ public class ComponentTreePanel extends JSplitPane
 						{
 							if(node.getParent()!=null)
 							{
-								((AbstractComponentTreeNode)node.getParent()).removeChild(node);
+								((AbstractTreeNode)node.getParent()).removeChild(node);
 							}
 						}
 					});
@@ -224,7 +230,7 @@ public class ComponentTreePanel extends JSplitPane
 							{
 								public void customResultAvailable(Object result)
 								{
-									IComponentTreeNode	node = (IComponentTreeNode)result;
+									ITreeNode	node = (ITreeNode)result;
 //									System.out.println("addChild: "+parentnode+", "+node);
 									try
 									{
@@ -267,7 +273,7 @@ public class ComponentTreePanel extends JSplitPane
 					{
 						// note: cannot use getComponentIdenfier() due to proxy components return their remote cid
 						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
-						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
+						final ITreeNode sel = (ITreeNode)paths[i].getLastPathComponent();
 						cms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -278,7 +284,7 @@ public class ComponentTreePanel extends JSplitPane
 									{
 										if(sel instanceof VirtualComponentTreeNode && sel.getParent()!=null)
 										{
-											((AbstractComponentTreeNode)sel.getParent()).removeChild(sel);
+											((AbstractTreeNode)sel.getParent()).removeChild(sel);
 										}
 									}
 									
@@ -332,7 +338,7 @@ public class ComponentTreePanel extends JSplitPane
 														rcms.destroyComponent(cid);
 														if(sel.getParent()!=null)
 														{
-															((AbstractComponentTreeNode)sel.getParent()).removeChild(sel);
+															((AbstractTreeNode)sel.getParent()).removeChild(sel);
 														}
 														
 														// Hack!!! Result will not be received when remote comp is platform. 
@@ -370,7 +376,7 @@ public class ComponentTreePanel extends JSplitPane
 					for(int i=0; paths!=null && i<paths.length; i++)
 					{
 						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
-						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
+						final ITreeNode sel = (ITreeNode)paths[i].getLastPathComponent();
 						cms.suspendComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -396,7 +402,7 @@ public class ComponentTreePanel extends JSplitPane
 					for(int i=0; paths!=null && i<paths.length; i++)
 					{
 						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
-						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
+						final ITreeNode sel = (ITreeNode)paths[i].getLastPathComponent();
 						cms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -423,7 +429,7 @@ public class ComponentTreePanel extends JSplitPane
 					{
 						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
 
-						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
+						final ITreeNode sel = (ITreeNode)paths[i].getLastPathComponent();
 						cms.stepComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -446,7 +452,7 @@ public class ComponentTreePanel extends JSplitPane
 				TreePath[]	paths	= tree.getSelectionPaths();
 				for(int i=0; paths!=null && i<paths.length; i++)
 				{
-					((IComponentTreeNode)paths[i].getLastPathComponent()).refresh(false, true);
+					((ITreeNode)paths[i].getLastPathComponent()).refresh(false, true);
 				}
 			}
 		};
@@ -458,7 +464,7 @@ public class ComponentTreePanel extends JSplitPane
 				TreePath[]	paths	= tree.getSelectionPaths();
 				for(int i=0; paths!=null && i<paths.length; i++)
 				{
-					((IComponentTreeNode)paths[i].getLastPathComponent()).refresh(true, true);
+					((ITreeNode)paths[i].getLastPathComponent()).refresh(true, true);
 				}
 			}
 		};
@@ -468,9 +474,9 @@ public class ComponentTreePanel extends JSplitPane
 			public void actionPerformed(ActionEvent e)
 			{
 				TreePath	path	= tree.getSelectionPath();
-				if(path!=null && ((IComponentTreeNode)path.getLastPathComponent()).hasProperties())
+				if(path!=null && ((ITreeNode)path.getLastPathComponent()).hasProperties())
 				{
-					showProperties(((IComponentTreeNode)path.getLastPathComponent()).getPropertiesComponent());
+					showProperties(((ITreeNode)path.getLastPathComponent()).getPropertiesComponent());
 				}
 			}
 		};
@@ -502,7 +508,7 @@ public class ComponentTreePanel extends JSplitPane
 				TreePath path = tree.getSelectionPath();
 				if(path!=null)
 				{
-					final IComponentTreeNode node = (IComponentTreeNode)path.getLastPathComponent();
+					final ITreeNode node = (ITreeNode)path.getLastPathComponent();
 					if(node instanceof ServiceNode)
 					{
 						Object obj = ((ServiceNode)node).getService();
@@ -530,12 +536,12 @@ public class ComponentTreePanel extends JSplitPane
 		// Default overlays and popups.
 		model.addNodeHandler(new INodeHandler()
 		{
-			public Icon getOverlay(IComponentTreeNode node)
+			public Icon getOverlay(ITreeNode node)
 			{
 				return null;
 			}
 
-			public Action[] getPopupActions(IComponentTreeNode[] nodes)
+			public Action[] getPopupActions(ITreeNode[] nodes)
 			{
 				List ret = new ArrayList();
 				Icon	base	= nodes[0].getIcon();
@@ -604,7 +610,7 @@ public class ComponentTreePanel extends JSplitPane
 				return (Action[])ret.toArray(new Action[0]);
 			}
 
-			public Action getDefaultAction(final IComponentTreeNode node)
+			public Action getDefaultAction(final ITreeNode node)
 			{
 				Action	ret	= null;
 				if(node.hasProperties())
@@ -617,7 +623,7 @@ public class ComponentTreePanel extends JSplitPane
 		
 		model.addNodeHandler(new INodeHandler()
 		{
-			public Icon getOverlay(IComponentTreeNode node)
+			public Icon getOverlay(ITreeNode node)
 			{
 				Icon	ret	= null;
 				
@@ -646,7 +652,7 @@ public class ComponentTreePanel extends JSplitPane
 				return ret;
 			}
 			
-			public Action[] getPopupActions(final IComponentTreeNode[] nodes)
+			public Action[] getPopupActions(final ITreeNode[] nodes)
 			{
 				List ret = new ArrayList();
 				
@@ -743,7 +749,7 @@ public class ComponentTreePanel extends JSplitPane
 				return (Action[])ret.toArray(new Action[ret.size()]);
 			}
 			
-			public Action getDefaultAction(IComponentTreeNode node)
+			public Action getDefaultAction(ITreeNode node)
 			{
 				return null;
 			}
@@ -886,7 +892,7 @@ public class ComponentTreePanel extends JSplitPane
 	/**
 	 *  Get the tree model.
 	 */
-	public ComponentTreeModel	getModel()
+	public AsyncTreeModel	getModel()
 	{
 		return model;
 	}
