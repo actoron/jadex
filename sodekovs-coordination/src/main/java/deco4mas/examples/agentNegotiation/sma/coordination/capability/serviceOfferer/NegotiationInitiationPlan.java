@@ -64,8 +64,8 @@ public class NegotiationInitiationPlan extends Plan
 				if (mediumName.equals("by_neg"))
 				{
 					// extra info
-					information.put("deadline", 2000L);
-					smaLogger.info("deadline 2000L");
+					information.put("deadline", 100L);
+					smaLogger.info("deadline 100L");
 				}
 
 				info = new DirectNegotiationInitatorInformation(id, this.getComponentIdentifier(), service, utilityFunction, selector,

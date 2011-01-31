@@ -39,7 +39,7 @@ public class ExecuteServicePlan extends Plan
 				saLogger.info("execute servicerequest by " + (String) request.getParameter("action").getValue() + " for " + duration);
 
 				// EXECUTE
-				waitFor(duration.longValue());
+//				waitFor(duration.longValue());
 
 				// blackout during execution?
 				if (!(Boolean) getBeliefbase().getBelief("blackout").getFact())

@@ -117,12 +117,25 @@ public class AllocateServicePlan extends Plan
 				} else
 				{
 					System.out.println(this.getComponentIdentifier().getLocalName() + ": No/False response by + " + currentSa
-						+ "Assign new!");
+						+ "-> Assign new!");
 					//Hack: Penalty-Time. Wait for a certain amount of time before re-negotiationstarts:
-					waitFor(250);
+//					waitFor(100);
 					
 					workflowLogger.info("No/False response by " + currentSa + " at " + this.getComponentName());
 					// getParameter("result").setValue(Boolean.FALSE);
+					
+					//HACK: For evaluation via automated simulation component.
+					//*************************************************************
+					// This is a hack for this special application.xml -> AgentNegotiation
+					//: save result also to space in order to enable evaluation by automated simulation component
+					AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace("mycoordspace"));
+					//substring: geht the "right" part of the id -> only the type: billig, normal, teuer
+					String keyOfSA = currentSa.getLocalName().substring(currentSa.getLocalName().indexOf("(")+1, currentSa.getLocalName().lastIndexOf(")"));
+					keyOfSA = keyOfSA.replace("-", "");						
+					int counter = (Integer) space.getSpaceObjectsByType("KIVSeval")[0].getProperty(keyOfSA + "FALSE");						
+					space.getSpaceObjectsByType("KIVSeval")[0].setProperty(keyOfSA + "FALSE", counter+1);
+					counter = counter+1;						
+					//*******************************************************************************
 					
 					((WorkflowData)getBeliefbase().getBelief("workflowData").getFact()).addCost(0.25 * needService.getContract().getServiceBid().getBidFactor("cost"));
 

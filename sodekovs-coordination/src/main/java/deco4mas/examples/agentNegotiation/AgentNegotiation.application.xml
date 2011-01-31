@@ -27,9 +27,9 @@
 
 	<arguments>
 		<!-- The initial weights for the utility function of the SMA. -->		
-		<argument name="TrustWeight" typename="Double">-2.0</argument>
-		<argument name="CostWeight" typename="Double">-2.1</argument>
-		<argument name="DurationWeight" typename="Double">-2.3</argument>
+		<argument name="TrustWeight" typename="Double">0.6</argument>
+		<argument name="CostWeight" typename="Double">0.2</argument>
+		<argument name="DurationWeight" typename="Double">0.2</argument>
 	</arguments>
 	
 	<spacetypes>
@@ -45,6 +45,10 @@
 					<env:property name="Chassisbaubillig">0</env:property>
 					<env:property name="Chassisbaunormal">0</env:property>
 					<env:property name="Chassisbauteuer">0</env:property>
+					<!-- Counts how often the Service Type was executed false -->
+					<env:property name="ChassisbaubilligFALSE">0</env:property>
+					<env:property name="ChassisbaunormalFALSE">0</env:property>
+					<env:property name="ChassisbauteuerFALSE">0</env:property>
 					<!-- logs the trust value for each service type -->
 					<env:property name="ChassisbaubilligTrustValue">0</env:property>
 					<env:property name="ChassisbaunormalTrustValue">0</env:property>
@@ -136,7 +140,7 @@
 						<argument name="serviceTypes">
 							new ServiceType[]
 							{
-							new ServiceType("Chassisbau",1000.0,500.0)
+							new ServiceType("Chassisbau",1000.0,50.0)
 							<!--
 								new ServiceType("Reifenhersteller",200.0,200.0),
 							-->
@@ -151,8 +155,8 @@
 							new ServiceAgentType[]
 							{
 							new ServiceAgentType("normal",0.5,0.5,0.5),
-							new ServiceAgentType("billig",0.3,0.5,0.999),
-							new	ServiceAgentType("teuer",0.7,0.5,0.1)																															
+							new ServiceAgentType("billig",0.3,0.5,1.0),
+							new	ServiceAgentType("teuer",0.7,0.5,0.0)																															
 							<!--
 								new ServiceAgentType("ausfall",0.2,0.2,1.0)
 							-->
@@ -199,7 +203,7 @@
 							new Long(1100L)
 						</argument>
 						<argument name="negotiationCosts">
-							new Double(800.0)
+							new Double(3000.0)
 						</argument>
 					<argument name="TrustWeight">$args.TrustWeight</argument>
 					<argument name="CostWeight">$args.CostWeight</argument>

@@ -72,15 +72,15 @@
 		
 		<!-- (Initial) Configuration of the weights of the utility function -->
 		<belief name="DurationWeight" class="Double">
-			<fact>true</fact>
+			<fact>1.0</fact>
 			<assignto ref="socap.DurationWeight" />
 		</belief>
 		<belief name="CostWeight" class="Double">
-			<fact>-1.0</fact>
+			<fact>1.0</fact>
 			<assignto ref="socap.CostWeight" />
 		</belief>
 		<belief name="TrustWeight" class="Double">
-			<fact>-1.0</fact>
+			<fact>1.0</fact>
 			<assignto ref="socap.TrustWeight" />
 		</belief>
 		
@@ -212,7 +212,7 @@
 				</initialbelief>
 				<!-- timeout for requests -->
 				<initialbelief ref="reqcap.timeout">
-					<fact>1500L</fact>
+					<fact>100L</fact>
 				</initialbelief>
 			</beliefs>
 			<plans>

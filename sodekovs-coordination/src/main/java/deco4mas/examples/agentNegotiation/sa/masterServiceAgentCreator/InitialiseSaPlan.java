@@ -67,7 +67,7 @@ public class InitialiseSaPlan extends Plan
 				id++;
 				saLogger.info("Agent start");
 			}
-			killAgent();
+//			killAgent();
 		} catch (Exception e)
 		{
 			e.printStackTrace();

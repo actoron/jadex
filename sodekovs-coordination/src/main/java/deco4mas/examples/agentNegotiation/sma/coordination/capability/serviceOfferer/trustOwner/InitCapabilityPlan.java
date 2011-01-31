@@ -28,7 +28,7 @@ public class InitCapabilityPlan extends Plan
 			// trustFunc
 			Map<TrustEvent, Double> eventWeight = new HashMap<TrustEvent, Double>();
 			eventWeight.put(TrustEvent.SuccessfullRequest, 0.5);
-			eventWeight.put(TrustEvent.FailedRequest, -10.0);
+			eventWeight.put(TrustEvent.FailedRequest, -13.0);
 			eventWeight.put(TrustEvent.CancelContract, -1.0);
 			HistorytimeTrustFunction trustFunction = new HistorytimeTrustFunction(this.getComponentIdentifier(), history, eventWeight);
 			getBeliefbase().getBelief("trustFunction").setFact(trustFunction);
