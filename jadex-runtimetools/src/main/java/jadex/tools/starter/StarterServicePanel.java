@@ -123,7 +123,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 				lsplit.setResizeWeight(0.7);
 		
 //				mpanel = new ModelExplorer(jcc.getExternalAccess(), new StarterNodeFunctionality(jcc));
-				mpanel = new ModelTreePanel(jcc.getExternalAccess());
+				mpanel = new ModelTreePanel(exta);
 		//		mpanel.setAction(FileNode.class, new INodeAction()
 		//		{
 		//			public void validStateChanged(TreeNode node, boolean valid)

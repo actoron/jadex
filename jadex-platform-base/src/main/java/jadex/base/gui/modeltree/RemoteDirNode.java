@@ -84,6 +84,7 @@ public class RemoteDirNode extends RemoteFileNode
 		final Future ret = new Future();
 		
 		final RemoteFile myfile = file;
+		final IRemoteFilter myfilter = filter;
 		exta.scheduleStep(new IComponentStep()
 		{
 			@XMLClassname("listFiles")
@@ -98,21 +99,21 @@ public class RemoteDirNode extends RemoteFileNode
 				
 				for(int i=0; i<files.length; i++)
 				{
-					if(filter==null)
+					if(myfilter==null)
 					{
 						lis.resultAvailable(files[i]);
 					}
 					else
 					{
 						final File file = files[i];
-						filter.filter(files[i]).addResultListener(new IResultListener()
+						myfilter.filter(files[i]).addResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
-								if(((Boolean)result).booleanValue())
+//								if(((Boolean)result).booleanValue())
 									lis.resultAvailable(new RemoteFile(file.getName(), file.getAbsolutePath(), file.isDirectory()));
-								else
-									lis.exceptionOccurred(null);
+//								else
+//									lis.exceptionOccurred(null);
 							}
 							
 							public void exceptionOccurred(Exception exception)
