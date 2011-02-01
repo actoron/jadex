@@ -1,7 +1,10 @@
 package jadex.tools.starter;
 
 import jadex.base.SComponentFactory;
+import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
+import jadex.base.gui.modeltree.FileNode;
+import jadex.base.gui.modeltree.ModelTreePanel;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
@@ -19,14 +22,11 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.IMenuItemConstructor;
-import jadex.commons.gui.PopupBuilder;
 import jadex.commons.service.IService;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
-import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.IExplorerTreeNode;
-import jadex.tools.common.modeltree.ModelExplorer;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
@@ -75,8 +75,9 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 	protected StarterPanel spanel;
 
 	/** The panel showing the classpath models. */
-	protected ModelExplorer mpanel;
-
+//	protected ModelExplorer mpanel;
+	protected ModelTreePanel mpanel;
+	
 	/** The component instances in a tree. */
 	protected ComponentTreePanel comptree;
 	
@@ -121,7 +122,8 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 				lsplit.setOneTouchExpandable(true);
 				lsplit.setResizeWeight(0.7);
 		
-				mpanel = new ModelExplorer(jcc.getExternalAccess(), new StarterNodeFunctionality(jcc));
+//				mpanel = new ModelExplorer(jcc.getExternalAccess(), new StarterNodeFunctionality(jcc));
+				mpanel = new ModelTreePanel(jcc.getExternalAccess());
 		//		mpanel.setAction(FileNode.class, new INodeAction()
 		//		{
 		//			public void validStateChanged(TreeNode node, boolean valid)
@@ -135,13 +137,13 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 		//				}
 		//			}
 		//		});
-				mpanel.setPopupBuilder(new PopupBuilder(new Object[]{new StartComponentMenuItemConstructor(), mpanel.ADD_PATH,
-					mpanel.REMOVE_PATH, mpanel.REFRESH}));
-				mpanel.addTreeSelectionListener(new TreeSelectionListener()
+//				mpanel.setPopupBuilder(new PopupBuilder(new Object[]{new StartComponentMenuItemConstructor(), mpanel.ADD_PATH,
+//					mpanel.REMOVE_PATH, mpanel.REFRESH}));
+				mpanel.getTree().addTreeSelectionListener(new TreeSelectionListener()
 				{
 					public void valueChanged(TreeSelectionEvent e)
 					{
-						Object	node = mpanel.getLastSelectedPathComponent();
+						Object	node = mpanel.getTree().getLastSelectedPathComponent();
 						if(node instanceof FileNode)
 						{
 							// Models have to be loaded with absolute path.
@@ -169,16 +171,17 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 						}
 					}
 				});
+				
 				MouseListener ml = new MouseAdapter()
 				{
 					public void mousePressed(MouseEvent e)
 					{
-						int row = mpanel.getRowForLocation(e.getX(), e.getY());
+						int row = mpanel.getTree().getRowForLocation(e.getX(), e.getY());
 						if(row != -1)
 						{
 							if(e.getClickCount() == 2)
 							{
-								Object	node = mpanel.getLastSelectedPathComponent();
+								Object	node = mpanel.getTree().getLastSelectedPathComponent();
 								if(node instanceof FileNode)
 								{
 									mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -199,7 +202,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 						}
 		      		}
 		  		};
-		  		mpanel.addMouseListener(ml);
+		  		mpanel.getTree().addMouseListener(ml);
 		
 				comptree = new ComponentTreePanel(exta, JSplitPane.HORIZONTAL_SPLIT);
 				comptree.setMinimumSize(new Dimension(0, 0));
@@ -312,7 +315,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 
 			if(isEnabled())
 			{
-				IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
+				ITreeNode node = (ITreeNode)mpanel.getTree().getLastSelectedPathComponent();
 				if(node instanceof FileNode)
 				{
 					final String type = ((FileNode)node).getFile().getAbsolutePath();
@@ -391,7 +394,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 		public boolean isEnabled()
 		{
 			boolean ret = false;
-			IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
+			IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getTree().getLastSelectedPathComponent();
 			if(node instanceof FileNode)
 			{
 				String type = ((FileNode)node).getFile().getAbsolutePath();

@@ -3,40 +3,51 @@ package jadex.base.gui.modeltree;
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
-import jadex.base.gui.componenttree.ComponentProperties;
-
-import java.util.ArrayList;
-import java.util.List;
+import jadex.bridge.IExternalAccess;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 
 /**
  * 
  */
-public class RootNode extends AbstractTreeNode
+public class RemoteFileNode  extends AbstractTreeNode
 {
 	//-------- attributes --------
 	
-	/** The list of child nodes. */
-	protected List children;
+	/** The file. */
+	protected RemoteFile file;
+	
+	/** The external access. */
+	protected IExternalAccess exta;
+	
+	/** The icon cache. */
+	protected final ComponentIconCache	iconcache;
+	
+	/** The relative file name. */
+//	protected String relative;
 	
 	/** The properties component (if any). */
-	protected ComponentProperties	propcomp;
+//	protected ComponentProperties	propcomp;
 		
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service container node.
 	 */
-	public RootNode(AsyncTreeModel model, JTree tree)
+	public RemoteFileNode(ITreeNode parent, AsyncTreeModel model, JTree tree, RemoteFile file, ComponentIconCache iconcache, IExternalAccess exta)
 	{
-		super(null, model, tree);
+		super(parent, model, tree);
+		
+		assert file!=null;
 		
 //		System.out.println("node: "+getClass()+" "+desc.getName());
-		this.children = new ArrayList();
+		
+		this.iconcache = iconcache;
+		this.file = file;
+		this.exta = exta;
+//		this.relative = convertPathToRelative(file);
 		
 		model.registerNode(this);
 	}
@@ -48,7 +59,7 @@ public class RootNode extends AbstractTreeNode
 	 */
 	public Object	getId()
 	{
-		return "root";
+		return file.toString();
 	}
 
 	/**
@@ -56,7 +67,7 @@ public class RootNode extends AbstractTreeNode
 	 */
 	public Icon	getIcon()
 	{
-		return null;//iconcache.getIcon(this, desc.getType());
+		return iconcache.getIcon(this);
 	}
 	
 	/**
@@ -89,24 +100,6 @@ public class RootNode extends AbstractTreeNode
 	{
 	}
 	
-	/**
-	 * 
-	 */
-	public void addChild(ITreeNode child)
-	{
-		children.add(child);
-		setChildren(children);
-	}
-	
-	/**
-	 *  Remove a path entry from the tree.
-	 */
-	public void removeChild(ITreeNode child)
-	{
-		children.remove(child);
-		setChildren(children);
-	}
-	
 	//-------- methods --------
 	
 	/**
@@ -114,7 +107,7 @@ public class RootNode extends AbstractTreeNode
 	 */
 	public String toString()
 	{
-		return "root";
+		return file.getFilename();
 	}
 
 	/**
@@ -140,14 +133,43 @@ public class RootNode extends AbstractTreeNode
 //		propcomp.setDescription(desc);
 //		return propcomp;
 	}
-	
-	/**
-	 *  Check if the node is a leaf.
-	 */
-	public boolean	isLeaf()
-	{
-		assert SwingUtilities.isEventDispatchThread();
 
-		return false;
-	}
+//	/**
+//	 *  Get the file.
+//	 *  @return the file.
+//	 */
+//	public File getFile()
+//	{
+//		return file;
+//	}
+//	
+//	/**
+//	 *  Get the relative path.
+//	 */
+//	public String	getRelativePath()
+//	{
+//		return this.relative;
+//	}
+	
+//	/**
+//	 *  Get the corresponding relative path for a file.
+//	 *  Handles jars specially.
+//	 */
+//	protected String convertPathToRelative(File file)
+//	{
+//		String	ret;
+//		if(file instanceof JarAsDirectory)
+//		{
+//			JarAsDirectory	jar	= (JarAsDirectory) file;
+//			if(jar.getZipEntry()!=null)
+//				ret	= jar.getZipEntry().getName();
+//			else
+//				ret	= SUtil.convertPathToRelative(jar.getJarPath());
+//		}
+//		else
+//		{
+//			ret	= file!=null ? SUtil.convertPathToRelative(file.getAbsolutePath()) : null;
+//		}
+//		return ret;
+//	}
 }

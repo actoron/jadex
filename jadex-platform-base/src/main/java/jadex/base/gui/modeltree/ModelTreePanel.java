@@ -1,5 +1,6 @@
 package jadex.base.gui.modeltree;
 
+import jadex.base.SComponentFactory;
 import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.INodeHandler;
@@ -8,9 +9,14 @@ import jadex.base.gui.asynctree.TreePopupListener;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.TreeExpansionHandler;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.gui.PopupBuilder;
 import jadex.commons.gui.ToolTipAction;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
@@ -20,6 +26,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -29,6 +37,8 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
@@ -36,6 +46,7 @@ import javax.swing.UIDefaults;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
+import javax.swing.tree.TreePath;
 
 /**
  *  A panel displaying components on the platform as tree.
@@ -48,7 +59,7 @@ public class ModelTreePanel extends JSplitPane
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"addpath",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/new_addfolder.png"),
-//		"removepath",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/tools/common/images/new_removefolder.png"),
+		"removepath",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/tools/common/images/new_removefolder.png"),
 //		"checker",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/tools/common/images/new_checker.png"),
 //		"refresh",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/tools/common/images/new_refresh.png"),
 //		"refresh_menu",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/tools/common/images/new_refresh_small.png"),
@@ -65,24 +76,6 @@ public class ModelTreePanel extends JSplitPane
 	/** The component tree. */
 	protected final JTree	tree;
 	
-	/** The component management service. */
-//	protected IComponentManagementService	cms;
-	
-	/** The action for killing selected components. */
-//	protected final Action	kill;
-	
-	/** The action for killing selected proxy component. */
-//	protected final Action	proxykill;
-	
-	/** The action for suspending selected components. */
-//	protected final Action	suspend;
-	
-	/** The action for resuming selected components. */
-//	protected final Action	resume;
-	
-	/** The action for stepping selected components. */
-//	protected final Action	step;
-	
 	/** The action for refreshing selected components. */
 	protected Action	refresh;
 	
@@ -95,12 +88,6 @@ public class ModelTreePanel extends JSplitPane
 	/** The action for showing object details of the selected node. */
 	protected Action showobject;
 	
-	/** The action for removing a service. */
-//	protected final Action removeservice;
-
-	/** The component listener. */
-//	protected final ICMSComponentListener listener;
-	
 	/** The properties panel. */
 	protected final JScrollPane	proppanel;
 	
@@ -109,6 +96,16 @@ public class ModelTreePanel extends JSplitPane
 
 	/** The file chooser. */
 	protected JFileChooser filechooser;
+	
+	/** The iconcache. */
+	protected ComponentIconCache iconcache;
+	
+	/** Popup rightclick. */
+	protected PopupBuilder pubuilder;
+	
+	/** The filter. */
+	protected IRemoteFilter filefilter;
+
 	
 	//-------- constructors --------
 	
@@ -131,13 +128,21 @@ public class ModelTreePanel extends JSplitPane
 		this.exta	= exta;
 		this.model	= new AsyncTreeModel();
 		this.tree	= new JTree(model);
+		this.iconcache = new ComponentIconCache(exta, tree);
 		tree.setCellRenderer(new AsyncTreeCellRenderer());
 		tree.addMouseListener(new TreePopupListener());
 		tree.setShowsRootHandles(true);
 		tree.setToggleClickCount(0);
-//		final ComponentIconCache	cic	= new ComponentIconCache(access, tree);
+		tree.setRootVisible(false);
+		tree.setShowsRootHandles(true);
+		
 		JScrollPane	scroll	= new JScrollPane(tree);
 		this.add(scroll);
+		
+		new TreeExpansionHandler(tree);
+		RootNode root = new RootNode(model, tree);
+		model.setRoot(root);
+		tree.expandPath(new TreePath(root));
 		
 		this.proppanel	= new JScrollPane();
 		proppanel.setMinimumSize(new Dimension(0, 0));
@@ -160,274 +165,51 @@ public class ModelTreePanel extends JSplitPane
 				return f.isDirectory() || name.endsWith(".jar");
 			}
 		});
+		
+		this.pubuilder = new PopupBuilder(new Object[]{ADD_PATH, REMOVE_PATH, ADD_REMOTEPATH});
+		tree.addMouseListener(new MouseAdapter()
+		{
+			public void mousePressed(MouseEvent e)
+			{
+				if(e.isPopupTrigger())
+					showPopUp(e.getX(), e.getY());
+			}
+
+			public void mouseReleased(MouseEvent e)
+			{
+				if(e.isPopupTrigger())
+					showPopUp(e.getX(), e.getY());
+			}
+		});
+		
+		
+		this.filefilter = new IRemoteFilter()
+		{
+			public IFuture filter(Object obj)
+			{
+				Future ret =  new Future();
 				
-//		listener	= new ICMSComponentListener()
-//		{
-//			public IFuture componentRemoved(final IComponentDescription desc, Map results)
-//			{
-//				final ITreeNode node = model.getNodeOrAddZombie(desc.getName());
-//				if(node!=null)
-//				{
-//					SwingUtilities.invokeLater(new Runnable()
-//					{
-//						public void run()
-//						{
-//							if(node.getParent()!=null)
-//							{
-//								((AbstractTreeNode)node.getParent()).removeChild(node);
-//							}
-//						}
-//					});
-//				}
-//				return new Future(null);
-//			}
-//			
-//			public IFuture componentChanged(final IComponentDescription desc)
-//			{
-//				SwingUtilities.invokeLater(new Runnable()
-//				{
-//					public void run()
-//					{
-//						ITreeNode node = model.getAddedNode(desc.getName());
-//						if(node!=null)
-//						{
-//							node.setDescription(desc);
-//							model.fireNodeChanged(node);
-//						}
-//					}
-//				});
-//				return new Future(null);
-//			}
-//			
-//			public IFuture componentAdded(final IComponentDescription desc)
-//			{
-////				System.err.println(""+model.hashCode()+" Panel->addChild queued: "+desc.getName()+", "+desc.getParent());
-//				SwingUtilities.invokeLater(new Runnable()
-//				{
-//					public void run()
-//					{
-//						final ComponentTreeNode	parentnode = desc.getParent()==null? null: (ComponentTreeNode)model.getAddedNode(desc.getParent());
-//						if(parentnode!=null)
-//						{
-//							parentnode.createComponentNode(desc).addResultListener(new SwingDefaultResultListener()
-//							{
-//								public void customResultAvailable(Object result)
-//								{
-//									IComponentTreeNode	node = (IComponentTreeNode)result;
-////									System.out.println("addChild: "+parentnode+", "+node);
-//									try
-//									{
-//										if(parentnode.getIndexOfChild(node)==-1)
-//										{
-////											System.err.println(""+model.hashCode()+" Panel->addChild: "+node+", "+parentnode);
-//											parentnode.addChild(node);
-//										}
-//									}
-//									catch(Exception e)
-//									{
-//										System.err.println(""+model.hashCode()+" Broken node: "+node);
-//										System.err.println(""+model.hashCode()+" Parent: "+parentnode+", "+parentnode.getCachedChildren());
-//										e.printStackTrace();
-////										model.fireNodeAdded(parentnode, node, parentnode.getIndexOfChild(node));
-//									}
-//								}
-//								
-//								public void customExceptionOccurred(Exception exception)
-//								{
-//									// May happen, when component removed in mean time.
-//								}										
-//							});
-//						}
-//					}
-//				});
-//				
-//				return new Future(null);
-//			}
-//		};
-//
-//		kill = new AbstractAction("Kill component", icons.getIcon("kill_component"))
-//		{
-//			public void actionPerformed(ActionEvent e)
-//			{
-//				if(cms!=null)
-//				{
-//					TreePath[]	paths	= tree.getSelectionPaths();
-//					for(int i=0; paths!=null && i<paths.length; i++)
-//					{
-//						// note: cannot use getComponentIdenfier() due to proxy components return their remote cid
-//						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
-//						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
-//						cms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-//						{
-//							public void customResultAvailable(Object result)
-//							{
-//								cms.destroyComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-//								{
-//									public void customResultAvailable(Object result)
-//									{
-//										if(sel instanceof VirtualComponentTreeNode && sel.getParent()!=null)
-//										{
-//											((AbstractComponentTreeNode)sel.getParent()).removeChild(sel);
-//										}
-//									}
-//									
-//									public void customExceptionOccurred(Exception exception)
-//									{
-//										super.customExceptionOccurred(new RuntimeException("Could not kill component: "+cid, exception));
-//									}
-//								});
-//							}
-//						});
-//					}
-//				}
-//			}
-//		};
-//		
-//		proxykill = new AbstractAction("Kill also remote component", icons.getIcon("kill_component"))
-//		{
-//			public void actionPerformed(ActionEvent e)
-//			{
-//				if(cms!=null)
-//				{
-//					TreePath[]	paths	= tree.getSelectionPaths();
-//					for(int i=0; paths!=null && i<paths.length; i++)
-//					{
-//						final ProxyComponentTreeNode sel = (ProxyComponentTreeNode)paths[i].getLastPathComponent();
-//						
-//						sel.getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-//						{
-//							public void customResultAvailable(Object result)
-//							{
-//								final IComponentIdentifier cid = (IComponentIdentifier)result;
-//								
-//								access.scheduleStep(new IComponentStep()
-//								{
-//									@XMLClassname("proxykill")
-//									public Object	execute(IInternalAccess ia)
-//									{
-//										SServiceProvider.getService(ia.getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-////										ia.getRequiredService("rms")
-//											.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-//										{
-//											public void customResultAvailable(Object result)
-//											{
-//												IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
-//												
-//												rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-//												{
-//													public void customResultAvailable(Object result)
-//													{
-//														final IComponentManagementService rcms = (IComponentManagementService)result;
-//														rcms.destroyComponent(cid);
-//														if(sel.getParent()!=null)
-//														{
-//															((AbstractComponentTreeNode)sel.getParent()).removeChild(sel);
-//														}
-//														
-//														// Hack!!! Result will not be received when remote comp is platform. 
-//		//													.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-//		//												{
-//		//													public void customResultAvailable(Object source, Object result)
-//		//													{
-//		//														if(sel.getParent()!=null)
-//		//														{
-//		//															((AbstractComponentTreeNode)sel.getParent()).removeChild(sel);
-//		//														}
-//		//													}
-//		//												});
-//													}
-//												});
-//											}
-//										});
-//										return null;
-//									}
-//								});								
-//							}
-//						});
-//					}
-//				}
-//			}
-//		};
-//		
-//		suspend	= new AbstractAction("Suspend component", icons.getIcon("suspend_component"))
-//		{
-//			public void actionPerformed(ActionEvent e)
-//			{
-//				if(cms!=null)
-//				{
-//					TreePath[]	paths	= tree.getSelectionPaths();
-//					for(int i=0; paths!=null && i<paths.length; i++)
-//					{
-//						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
-//						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
-//						cms.suspendComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-//						{
-//							public void customResultAvailable(Object result)
-//							{
-//								if(sel instanceof VirtualComponentTreeNode)
-//								{
-//									sel.refresh(false, false);
-//								}
-//							}
-//						});
-//					}
-//				}
-//			}
-//		};
-//		
-//		resume	= new AbstractAction("Resume component", icons.getIcon("resume_component"))
-//		{
-//			public void actionPerformed(ActionEvent e)
-//			{
-//				if(cms!=null)
-//				{
-//					TreePath[]	paths	= tree.getSelectionPaths();
-//					for(int i=0; paths!=null && i<paths.length; i++)
-//					{
-//						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
-//						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
-//						cms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-//						{
-//							public void customResultAvailable(Object result)
-//							{
-//								if(sel instanceof VirtualComponentTreeNode)
-//								{
-//									sel.refresh(false, false);
-//								}
-//							}
-//						});
-//					}
-//				}
-//			}
-//		};
-//		
-//		step	= new AbstractAction("Step component", icons.getIcon("step_component"))
-//		{
-//			public void actionPerformed(ActionEvent e)
-//			{
-//				if(cms!=null)
-//				{
-//					TreePath[]	paths	= tree.getSelectionPaths();
-//					for(int i=0; paths!=null && i<paths.length; i++)
-//					{
-//						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
-//
-//						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
-//						cms.stepComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-//						{
-//							public void customResultAvailable(Object result)
-//							{
-//								if(sel instanceof VirtualComponentTreeNode)
-//								{
-//									sel.refresh(false, false);
-//								}
-//							}
-//						});
-//					}
-//				}
-//			}
-//		};
-//
+				if(obj instanceof File)
+				{
+					File file = (File)obj;
+					if(file.isDirectory())
+					{
+						ret.setResult(Boolean.TRUE);
+					}
+					else
+					{
+						SComponentFactory.isLoadable(exta, file.getAbsolutePath())
+							.addResultListener(new DelegationResultListener(ret));
+					}
+				}
+				else
+				{
+					ret.setResult(Boolean.FALSE);
+				}
+				return ret;
+			}
+		};
+
 //		refresh	= new AbstractAction("Refresh", icons.getIcon("refresh"))
 //		{
 //			public void actionPerformed(ActionEvent e)
@@ -460,26 +242,6 @@ public class ModelTreePanel extends JSplitPane
 //				if(path!=null && ((IComponentTreeNode)path.getLastPathComponent()).hasProperties())
 //				{
 //					showProperties(((IComponentTreeNode)path.getLastPathComponent()).getPropertiesComponent());
-//				}
-//			}
-//		};
-//		
-//		removeservice = new AbstractAction("Remove service", icons.getIcon("show_properties"))
-//		{
-//			public void actionPerformed(ActionEvent e)
-//			{
-//				TreePath path = tree.getSelectionPath();
-//				if(path!=null)
-//				{
-//					final ServiceContainerNode scn = (ServiceContainerNode)path.getPathComponent(path.getPathCount()-2);
-//					final ServiceNode sn = (ServiceNode)path.getLastPathComponent();
-//					scn.getContainer().removeService(sn.getService().getServiceIdentifier()).addResultListener(new SwingDefaultResultListener(proppanel)
-//					{
-//						public void customResultAvailable(Object result)
-//						{
-//							scn.removeChild(sn);
-//						}
-//					});
 //				}
 //			}
 //		};
@@ -615,7 +377,7 @@ public class ModelTreePanel extends JSplitPane
 			public Action[] getPopupActions(final ITreeNode[] nodes)
 			{
 				java.util.List ret = new ArrayList();
-				ret.add(ADD_PATH);
+//				ret.add(ADD_PATH);
 				return (Action[])ret.toArray(new Action[ret.size()]);
 			}
 			
@@ -624,53 +386,6 @@ public class ModelTreePanel extends JSplitPane
 				return null;
 			}
 		});
-//
-//		access.scheduleStep(new IComponentStep()
-//		{
-//			@XMLClassname("init")
-//			public Object execute(IInternalAccess ia)
-//			{
-//				final Future ret = new Future();
-//				SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-////				ia.getRequiredService("cms")
-//					.addResultListener(new DelegationResultListener(ret));
-//				return ret;
-//			}
-//		}).addResultListener(new DefaultResultListener()
-//		{
-//			public void resultAvailable(Object result)
-//			{
-//				cms	= (IComponentManagementService)result;
-//				
-//				// Hack!!! How to find root node?
-//				cms.getComponentDescriptions().addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-//				{
-//					public void customResultAvailable(Object result)
-//					{
-//						IComponentDescription[]	descriptions	= (IComponentDescription[])result;
-//						if(descriptions.length!=0)
-//						{
-//							IComponentDescription	root	= null;
-//							for(int i=0; root==null && i<descriptions.length; i++)
-//							{
-//								if(descriptions[i].getParent()==null)
-//								{
-//									root	= descriptions[i];
-//								}
-//							}
-//							if(root==null)
-//								throw new RuntimeException("No root node found: "+SUtil.arrayToString(descriptions));
-//							model.setRoot(new ComponentTreeNode(null, model, tree, root, cms, cic));
-//							// Expand root node.
-//							TreeExpansionHandler	teh	= new TreeExpansionHandler(tree);
-//							teh.treeExpanded(new TreeExpansionEvent(tree, new TreePath(model.getRoot())));
-//						}
-//					}
-//				});
-//				
-//				cms.addComponentListener(null, listener);		
-//			}
-//		});
 //		
 //		// Remove selection in tree, when user clicks in background.
 //		tree.addMouseListener(new MouseAdapter()
@@ -776,6 +491,20 @@ public class ModelTreePanel extends JSplitPane
 	}
 	
 	/**
+	 * Show the popup.
+	 * @param x The x position.
+	 * @param y The y position.
+	 */
+	protected void showPopUp(int x, int y)
+	{
+		TreePath sel = tree.getPathForLocation(x, y);
+		tree.setSelectionPath(sel);
+
+		JPopupMenu pop = pubuilder.buildPopupMenu();
+		pop.show(this, x, y);
+	}
+	
+	/**
 	 *  Set the title and contents of the properties panel.
 	 */
 	public void	showProperties(JComponent content)
@@ -846,26 +575,30 @@ public class ModelTreePanel extends JSplitPane
 //						ITreeNode	node	= getModel().getRoot().addPathEntry(file);
 						
 						// todo: jars
-						final File fcopy = file;
-//						SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-//						{
-//							public void resultAvailable(Object result)
-//							{
-//								ILibraryService ls = (ILibraryService)result;
-//								File f = new File(fcopy.getParentFile(), fcopy.getName());
-//								try
-//								{
-//									ls.addURL(f.toURI().toURL());
-//								}
-//								catch(MalformedURLException ex)
-//								{
-//									ex.printStackTrace();
-//								}
-//							}
-//						});
+						if(exta!=null)
+						{
+							final File fcopy = file;
+							SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+							{
+								public void resultAvailable(Object result)
+								{
+									ILibraryService ls = (ILibraryService)result;
+									File f = new File(fcopy.getParentFile(), fcopy.getName());
+									try
+									{
+										ls.addURL(f.toURI().toURL());
+									}
+									catch(MalformedURLException ex)
+									{
+										ex.printStackTrace();
+									}
+								}
+							});
+						}
 						
 						final RootNode root = (RootNode)getModel().getRoot();
-						ModelTreePanel.createNode(root, model, tree, file).addResultListener(new DefaultResultListener()
+						ModelTreePanel.createNode(root, model, tree, file, iconcache, filefilter, exta)
+							.addResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
@@ -877,8 +610,8 @@ public class ModelTreePanel extends JSplitPane
 					else
 					{
 						String	msg	= SUtil.wrapText("Cannot find file or directory:\n"+file);
-//						JOptionPane.showMessageDialog(SGUI.getWindowParent(ModelExplorer.this),
-//							msg, "Cannot find file or directory", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(SGUI.getWindowParent(ModelTreePanel.this),
+							msg, "Cannot find file or directory", JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			}
@@ -890,67 +623,122 @@ public class ModelTreePanel extends JSplitPane
 		 */
 		public boolean isEnabled()
 		{
-//			ITreeNode rm = (ITreeNode)getLastSelectedPathComponent();
-//			return rm==null;
-			return true;
+			ITreeNode rm = (ITreeNode)tree.getLastSelectedPathComponent();
+			return rm==null;
+		}
+	};
+	
+	/**
+	 *  Add a new path to the explorer.
+	 */
+	public final Action ADD_REMOTEPATH = new ToolTipAction("Add Remote Path", icons.getIcon("addpath"),
+		"Add a new remote directory path (package root) to the project structure")
+	{
+		/**
+		 *  Called when action should be performed.
+		 *  @param e The event.
+		 */
+		public void actionPerformed(ActionEvent e)
+		{
+			String filename = JOptionPane.showInputDialog("Enter remote path");
+			if(exta!=null)
+			{
+				final File fcopy = new File(filename);
+				SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+						ILibraryService ls = (ILibraryService)result;
+						File f = new File(fcopy.getParentFile(), fcopy.getName());
+						try
+						{
+							ls.addURL(f.toURI().toURL());
+						}
+						catch(MalformedURLException ex)
+						{
+							ex.printStackTrace();
+						}
+					}
+				});
+			}
+				
+			final RootNode root = (RootNode)getModel().getRoot();
+			ModelTreePanel.createNode(root, model, tree, new RemoteFile(null, filename, true), iconcache, filefilter, exta)
+				.addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object result)
+				{
+					root.addChild((ITreeNode)result);
+				}
+			});
+		}
+
+		/**
+		 *  Test if action is available in current context.
+		 *  @return True, if available.
+		 */
+		public boolean isEnabled()
+		{
+			ITreeNode rm = (ITreeNode)tree.getLastSelectedPathComponent();
+			return rm==null;
 		}
 	};
 
-//	/**
-//	 *  Remove an existing path from the explorer.
-//	 */
-//	public final Action REMOVE_PATH = new ToolTipAction("Remove Path", icons.getIcon("removepath"),
-//		"Remove a directory path to the project structure")
-//	{
-//		/**
-//		 *  Called when action should be performed.
-//		 *  @param e The event.
-//		 */
-//		public void actionPerformed(ActionEvent e)
-//		{
-//			if(isEnabled())
-//			{
-//				final FileNode	node = (FileNode)getLastSelectedPathComponent();
-//				final int index	= ((ModelExplorerTreeModel)getModel()).getIndexOfChild(root, node);
-//				getRootNode().removePathEntry(node);
-//				
-//				// todo: jars
-//				SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ModelExplorer.this)
-//				{
-//					public void customResultAvailable(Object result)
-//					{
-//						ILibraryService ls = (ILibraryService)result;
-//						File file = node.getFile();
-//						file = new File(file.getParentFile(), file.getName());
-//						try
-//						{
-//							ls.removeURL(file.toURI().toURL());
-//						}
-//						catch(MalformedURLException ex)
-//						{
-//							ex.printStackTrace();
-//						}
-//						
-//						resetCrawler();
-//
-//						((ModelExplorerTreeModel)getModel()).fireNodeRemoved(getRootNode(), node, index);
-//			
-//					}
-//				});
-//			}
-//		}
-//
-//		/**
-//		 *  Test if action is available in current context.
-//		 *  @return True, if available.
-//		 */
-//		public boolean isEnabled()
-//		{
-//			ITreeNode rm = (ITreeNode)getLastSelectedPathComponent();
-//			return rm!=null && rm.getParent()==getRootNode();
-//		}
-//	};
-//
+	/**
+	 *  Remove an existing path from the explorer.
+	 */
+	public final Action REMOVE_PATH = new ToolTipAction("Remove Path", icons.getIcon("removepath"),
+		"Remove a directory path to the project structure")
+	{
+		/**
+		 *  Called when action should be performed.
+		 *  @param e The event.
+		 */
+		public void actionPerformed(ActionEvent e)
+		{
+			if(isEnabled())
+			{
+				final ITreeNode	node = (ITreeNode)tree.getLastSelectedPathComponent();
+				((RootNode)tree.getModel().getRoot()).removeChild(node);
+				
+				// todo: jars
+				if(exta!=null && node instanceof FileNode)
+				{
+					SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(new SwingDefaultResultListener(ModelTreePanel.this)
+					{
+						public void customResultAvailable(Object result)
+						{
+							ILibraryService ls = (ILibraryService)result;
+							File file = ((FileNode)node).getFile();
+							file = new File(file.getParentFile(), file.getName());
+							try
+							{
+								ls.removeURL(file.toURI().toURL());
+							}
+							catch(MalformedURLException ex)
+							{
+								ex.printStackTrace();
+							}
+//							resetCrawler();
+//							((ModelExplorerTreeModel)getModel()).fireNodeRemoved(getRootNode(), node, index);
+						}
+					});
+				}
+			}
+		}
+
+		/**
+		 *  Test if action is available in current context.
+		 *  @return True, if available.
+		 */
+		public boolean isEnabled()
+		{
+			ITreeNode rm = (ITreeNode)tree.getLastSelectedPathComponent();
+			return rm!=null && rm.getParent()==tree.getModel().getRoot();
+		}
+	};
+
 //	/**
 //	 *  Refresh the selected path.
 //	 */
@@ -962,29 +750,54 @@ public class ModelTreePanel extends JSplitPane
 //		 */
 //		public void actionPerformed(ActionEvent e)
 //		{
-//			ITreeNode	node	= (ITreeNode)getLastSelectedPathComponent();
-//			refreshAll(node!=null? node: getRootNode());
+//			ITreeNode	node	= (ITreeNode)tree.getLastSelectedPathComponent();
+//			refreshAll(node!=null? node: tree.getModel().getRoot());
 //		}
 //	};
 	
 	/**
 	 *  Create a new component node.
 	 */
-	public static IFuture createNode(ITreeNode parent, AsyncTreeModel model, JTree tree, Object node)
+	public static IFuture createNode(ITreeNode parent, AsyncTreeModel model, 
+		JTree tree, Object value, ComponentIconCache iconcache, IRemoteFilter filter, IExternalAccess exta)
 	{
 		final Future ret = new Future();
 		
-		if(node instanceof File)
+		if(value instanceof File)
 		{
-			File file = (File)node;
-			if(((File)node).isDirectory())
+			File file = (File)value;
+			if(file.isDirectory())
 			{
-				ret.setResult(new DirNode(parent, model, tree, file));
+				ret.setResult(new DirNode(parent, model, tree, file, iconcache, filter));
+			}
+			else if(parent!=model.getRoot())
+			{
+				ret.setResult(new FileNode(parent, model, tree, file, iconcache));
 			}
 			else
 			{
-				ret.setResult(new FileNode(parent, model, tree, file));
+				ret.setResult(new JarNode(parent, model, tree, file, iconcache, filter));
 			}
+		}
+		else if(value instanceof RemoteFile)
+		{
+			RemoteFile file = (RemoteFile)value;
+			if(file.isDirectory())
+			{
+				ret.setResult(new RemoteDirNode(parent, model, tree, file, iconcache, filter, exta));
+			}
+			else if(parent!=model.getRoot())
+			{
+				ret.setResult(new RemoteFileNode(parent, model, tree, file, iconcache, exta));
+			}
+//			else
+//			{
+//				ret.setResult(new JarNode(parent, model, tree, file, iconcache, filter));
+//			}
+		}
+		else
+		{
+			ret.setException(new IllegalArgumentException("Unknown value: "+value));
 		}
 		return ret;
 	}
@@ -996,7 +809,6 @@ public class ModelTreePanel extends JSplitPane
 	{
 		JFrame f =  new JFrame();
 		ModelTreePanel mtp = new ModelTreePanel(null);
-		mtp.getModel().setRoot(new RootNode(mtp.getModel(), mtp.getTree()));
 		f.add(mtp, BorderLayout.CENTER);
 		f.pack();
 		f.setLocation(SGUI.calculateMiddlePosition(f));

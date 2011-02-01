@@ -33,7 +33,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	protected final JTree	tree;
 	
 	/** The component description. */
-	protected List	children;
+	private List	children;
 	
 	/** Flag to indicate search in progress. */
 	protected boolean	searching;
@@ -221,7 +221,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 				recurse	= false;
 				
 				List	oldcs	= AbstractTreeNode.this.children;
-				AbstractTreeNode.this.children	= children;
+				AbstractTreeNode.this.children	= new ArrayList(children);
 				List	added	= new ArrayList();
 				List	removed	= new ArrayList();
 				if(oldcs!=null)

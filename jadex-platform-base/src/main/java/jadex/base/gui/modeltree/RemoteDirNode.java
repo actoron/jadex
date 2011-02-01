@@ -2,14 +2,18 @@ package jadex.base.gui.modeltree;
 
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IRemoteFilter;
-import jadex.commons.IntermediateFuture;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.xml.annotation.XMLClassname;
 
 import java.io.File;
 import java.util.Collection;
@@ -19,9 +23,9 @@ import java.util.List;
 import javax.swing.JTree;
 
 /**
- *  Node object representing a service container.
+ * 
  */
-public class DirNode extends FileNode
+public class RemoteDirNode extends RemoteFileNode
 {
 	//-------- attributes --------
 	
@@ -33,10 +37,10 @@ public class DirNode extends FileNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public DirNode(ITreeNode parent, AsyncTreeModel model, JTree tree, File file, ComponentIconCache iconcache, IRemoteFilter filter)
+	public RemoteDirNode(ITreeNode parent, AsyncTreeModel model, JTree tree, RemoteFile file, 
+		ComponentIconCache iconcache, IRemoteFilter filter, IExternalAccess exta)
 	{
-		super(parent, model, tree, file, iconcache);
-		assert file.isDirectory();
+		super(parent, model, tree, file, iconcache, exta);
 		this.filter = filter;
 //		System.out.println("node: "+getClass()+" "+desc.getName());
 	}
@@ -65,8 +69,8 @@ public class DirNode extends FileNode
 				
 				for(Iterator it=files.iterator(); it.hasNext();)
 				{
-					ModelTreePanel.createNode(DirNode.this, model, tree, (File)it.next(), iconcache, filter, null)
-						.addResultListener(lis);
+					ModelTreePanel.createNode(RemoteDirNode.this, model, tree, 
+						it.next(), iconcache, filter, exta).addResultListener(lis);
 				}
 			}
 		});
@@ -77,36 +81,52 @@ public class DirNode extends FileNode
 	 */
 	protected IFuture listFiles()
 	{
-		final IntermediateFuture ret = new IntermediateFuture();
-		final File[] files = file.listFiles();
-		final CollectionResultListener lis = new CollectionResultListener(files.length, true, new DelegationResultListener(ret));
+		final Future ret = new Future();
 		
-		for(int i=0; i<files.length; i++)
+		final RemoteFile myfile = file;
+		exta.scheduleStep(new IComponentStep()
 		{
-			if(filter==null)
+			@XMLClassname("listFiles")
+			public Object execute(IInternalAccess ia)
 			{
-				lis.resultAvailable(files[i]);
-			}
-			else
-			{
-				final File file = files[i];
-				filter.filter(files[i]).addResultListener(new IResultListener()
+				Future ret = new Future();
+				
+				File f = new File(myfile.getPath());
+				final File[] files = f.listFiles();
+				final CollectionResultListener lis = new CollectionResultListener(files.length, 
+					true, new DelegationResultListener(ret));
+				
+				for(int i=0; i<files.length; i++)
 				{
-					public void resultAvailable(Object result)
+					if(filter==null)
 					{
-						if(((Boolean)result).booleanValue())
-							lis.resultAvailable(file);
-						else
-							lis.exceptionOccurred(null);
+						lis.resultAvailable(files[i]);
 					}
-					
-					public void exceptionOccurred(Exception exception)
+					else
 					{
-						lis.exceptionOccurred(null);
+						final File file = files[i];
+						filter.filter(files[i]).addResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object result)
+							{
+								if(((Boolean)result).booleanValue())
+									lis.resultAvailable(new RemoteFile(file.getName(), file.getAbsolutePath(), file.isDirectory()));
+								else
+									lis.exceptionOccurred(null);
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								lis.exceptionOccurred(null);
+							}
+						});
 					}
-				});
+				}
+				
+				return ret;
 			}
-		}
+		}).addResultListener(new DelegationResultListener(ret));
+		
 		return ret;
 	}
 	

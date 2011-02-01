@@ -1,4 +1,4 @@
-package jadex.tools.common.modeltree;
+package jadex.base.gui.modeltree;
 
 import jadex.commons.collection.MultiCollection;
 

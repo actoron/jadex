@@ -3,7 +3,7 @@ package jadex.base.gui.modeltree;
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
-import jadex.base.gui.componenttree.ComponentProperties;
+import jadex.commons.SUtil;
 
 import java.io.File;
 
@@ -21,15 +21,21 @@ public class FileNode	extends AbstractTreeNode
 	/** The file. */
 	protected File file;
 	
+	/** The icon cache. */
+	protected final ComponentIconCache	iconcache;
+	
+	/** The relative file name. */
+	protected String relative;
+	
 	/** The properties component (if any). */
-	protected ComponentProperties	propcomp;
+//	protected ComponentProperties	propcomp;
 		
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service container node.
 	 */
-	public FileNode(ITreeNode parent, AsyncTreeModel model, JTree tree, File file)
+	public FileNode(ITreeNode parent, AsyncTreeModel model, JTree tree, File file, ComponentIconCache iconcache)
 	{
 		super(parent, model, tree);
 		
@@ -37,7 +43,9 @@ public class FileNode	extends AbstractTreeNode
 		
 //		System.out.println("node: "+getClass()+" "+desc.getName());
 		
+		this.iconcache = iconcache;
 		this.file = file;
+		this.relative = convertPathToRelative(file);
 		
 		model.registerNode(this);
 	}
@@ -57,7 +65,7 @@ public class FileNode	extends AbstractTreeNode
 	 */
 	public Icon	getIcon()
 	{
-		return null;//iconcache.getIcon(this, desc.getType());
+		return iconcache.getIcon(this);
 	}
 	
 	/**
@@ -122,5 +130,44 @@ public class FileNode	extends AbstractTreeNode
 //		}
 //		propcomp.setDescription(desc);
 //		return propcomp;
+	}
+
+	/**
+	 *  Get the file.
+	 *  @return the file.
+	 */
+	public File getFile()
+	{
+		return file;
+	}
+	
+	/**
+	 *  Get the relative path.
+	 */
+	public String	getRelativePath()
+	{
+		return this.relative;
+	}
+	
+	/**
+	 *  Get the corresponding relative path for a file.
+	 *  Handles jars specially.
+	 */
+	protected String convertPathToRelative(File file)
+	{
+		String	ret;
+		if(file instanceof JarAsDirectory)
+		{
+			JarAsDirectory	jar	= (JarAsDirectory) file;
+			if(jar.getZipEntry()!=null)
+				ret	= jar.getZipEntry().getName();
+			else
+				ret	= SUtil.convertPathToRelative(jar.getJarPath());
+		}
+		else
+		{
+			ret	= file!=null ? SUtil.convertPathToRelative(file.getAbsolutePath()) : null;
+		}
+		return ret;
 	}
 }
