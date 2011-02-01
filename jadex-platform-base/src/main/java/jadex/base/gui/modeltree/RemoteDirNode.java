@@ -8,7 +8,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IRemoteFilter;
-import jadex.commons.SUtil;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
@@ -114,10 +113,10 @@ public class RemoteDirNode extends RemoteFileNode
 							{
 								public void resultAvailable(Object result)
 								{
-	//								if(((Boolean)result).booleanValue())
+									if(((Boolean)result).booleanValue())
 										lis.resultAvailable(new RemoteFile(file.getName(), file.getAbsolutePath(), file.isDirectory()));
-	//								else
-	//									lis.exceptionOccurred(null);
+									else
+										lis.exceptionOccurred(null);
 								}
 								
 								public void exceptionOccurred(Exception exception)

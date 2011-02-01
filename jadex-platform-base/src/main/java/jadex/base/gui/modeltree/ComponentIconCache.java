@@ -70,7 +70,7 @@ public class ComponentIconCache
 		{
 			ret = (Icon)icons.get("src_jar");
 		}
-		else if(node instanceof DirNode)
+		else if(node instanceof DirNode || node instanceof RemoteDirNode)
 		{
 			if(node.getParent() instanceof RootNode)
 			{
@@ -81,11 +81,14 @@ public class ComponentIconCache
 				ret = (Icon)icons.get("package");
 			}
 		}
-		else if(node instanceof FileNode && exta!=null)
+		else if((node instanceof FileNode || node instanceof RemoteFileNode)  && exta!=null)
 		{
 			// Todo: remember ongoing searches for efficiency?
 //			System.out.println("getIcon: "+type);
-			final String file = ((FileNode)node).getFile().getAbsolutePath();
+			final String file = node instanceof FileNode? 
+				((FileNode)node).getFile().getAbsolutePath():
+				((RemoteFileNode)node).getRemoteFile().getPath();
+			
 			SComponentFactory.getFileType(exta, file)
 				.addResultListener(new SwingDefaultResultListener(tree)
 			{

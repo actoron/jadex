@@ -134,14 +134,14 @@ public class RemoteFileNode  extends AbstractTreeNode
 //		return propcomp;
 	}
 
-//	/**
-//	 *  Get the file.
-//	 *  @return the file.
-//	 */
-//	public File getFile()
-//	{
-//		return file;
-//	}
+	/**
+	 *  Get the file.
+	 *  @return the file.
+	 */
+	public RemoteFile getRemoteFile()
+	{
+		return file;
+	}
 //	
 //	/**
 //	 *  Get the relative path.
