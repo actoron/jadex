@@ -8,6 +8,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IRemoteFilter;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
@@ -94,6 +95,7 @@ public class RemoteDirNode extends RemoteFileNode
 				
 				File f = new File(myfile.getPath());
 				final File[] files = f.listFiles();
+				System.out.println("files: "+SUtil.arrayToString(files));
 				final CollectionResultListener lis = new CollectionResultListener(files.length, 
 					true, new DelegationResultListener(ret));
 				

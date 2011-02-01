@@ -644,7 +644,8 @@ public class ModelTreePanel extends JSplitPane
 			if(exta!=null)
 			{
 				final File fcopy = new File(filename);
-				SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
