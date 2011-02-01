@@ -71,7 +71,7 @@ public class NetLogoExperimentService extends BasicService implements IExecuteEx
                 ( new Runnable()
                     { public void run() {
                         try {
-                        	String filePre = new File("..").getCanonicalPath() + "/sodekovs-simulationcontrol/src/main/java/jadex/simulation/analysis/model";
+                        	String filePre = new File("..").getCanonicalPath() + "/sodekovs-simulationcontrol/src/main/java/jadex/simulation/analysis/models";
 							String fileName = filePre + "/netLogo/" + expJob.getModel().getName();
                           comp.open(fileName);
                         }

@@ -47,6 +47,7 @@ public class DesmoJExperimentService extends BasicService implements IExecuteExp
 	public IFuture executeExperiment(IAExperimentJob expJob) {
 		final Future res = new Future();
 
+		//TODO find Model class
 		comp.append("***** DESMO-J version 2.2.0 ***** " + "\n");
 		VancarrierModel model = new VancarrierModel();
 		Experiment exp = new Experiment(expJob.getModel().getName());

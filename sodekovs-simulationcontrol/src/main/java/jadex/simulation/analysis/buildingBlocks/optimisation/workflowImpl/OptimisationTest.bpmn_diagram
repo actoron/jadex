@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_4Oi-MC2DEeCUWO2EIzYFAw" type="Bpmn" name="OptimisationTest.bpmn_diagram" measurementUnit="Pixel">
+  <children xmi:type="notation:Node" xmi:id="_4SRAkC2DEeCUWO2EIzYFAw" type="1001">
+    <children xmi:type="notation:Node" xmi:id="_4SUD4C2DEeCUWO2EIzYFAw" type="4008"/>
+    <children xmi:type="notation:Node" xmi:id="_4SUq8C2DEeCUWO2EIzYFAw" type="5001">
+      <children xmi:type="notation:Node" xmi:id="_4SWgIC2DEeCUWO2EIzYFAw" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_4SXHMC2DEeCUWO2EIzYFAw" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_4SWgIS2DEeCUWO2EIzYFAw" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_4SWgIi2DEeCUWO2EIzYFAw"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_4SWgIy2DEeCUWO2EIzYFAw"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_4SWgJC2DEeCUWO2EIzYFAw" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="OptimisationTest.bpmn#_4Q8x8S2DEeCUWO2EIzYFAw"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_4SXHMS2DEeCUWO2EIzYFAw" x="187" y="70" width="111" height="61"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_6bqWAC2DEeCUWO2EIzYFAw" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_6bq9EC2DEeCUWO2EIzYFAw" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_6bqWAS2DEeCUWO2EIzYFAw" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_6bqWAi2DEeCUWO2EIzYFAw"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_6bqWAy2DEeCUWO2EIzYFAw"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_6bqWBC2DEeCUWO2EIzYFAw" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="OptimisationTest.bpmn#_6a0BcS2DEeCUWO2EIzYFAw"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_6bqWBS2DEeCUWO2EIzYFAw" x="87" y="85"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_61DtcC2DEeCUWO2EIzYFAw" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_61EUgi2DEeCUWO2EIzYFAw" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_61DtcS2DEeCUWO2EIzYFAw" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_61Dtci2DEeCUWO2EIzYFAw"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_61Dtcy2DEeCUWO2EIzYFAw"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_61EUgC2DEeCUWO2EIzYFAw" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="OptimisationTest.bpmn#_61DGYS2DEeCUWO2EIzYFAw"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_61EUgS2DEeCUWO2EIzYFAw" x="359" y="84"/>
+      </children>
+      <styles xmi:type="notation:DrawerStyle" xmi:id="_4SUq8S2DEeCUWO2EIzYFAw"/>
+      <styles xmi:type="notation:SortingStyle" xmi:id="_4SUq8i2DEeCUWO2EIzYFAw"/>
+      <styles xmi:type="notation:FilteringStyle" xmi:id="_4SUq8y2DEeCUWO2EIzYFAw"/>
+    </children>
+    <styles xmi:type="notation:FontStyle" xmi:id="_4SRAkS2DEeCUWO2EIzYFAw" fontName="Arial"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_4SRAki2DEeCUWO2EIzYFAw"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_4SRAky2DEeCUWO2EIzYFAw" fillColor="16771304"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_4SRAlC2DEeCUWO2EIzYFAw" lineColor="11119017"/>
+    <element xmi:type="bpmn:Pool" href="OptimisationTest.bpmn#_4PTzMS2DEeCUWO2EIzYFAw"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_4SVSAC2DEeCUWO2EIzYFAw" x="16" y="16" width="1500" height="200"/>
+  </children>
+  <styles xmi:type="notation:PageStyle" xmi:id="_4Oi-MS2DEeCUWO2EIzYFAw"/>
+  <styles xmi:type="notation:GuideStyle" xmi:id="_4OjlQC2DEeCUWO2EIzYFAw"/>
+  <styles xmi:type="notation:DescriptionStyle" xmi:id="_4OjlQS2DEeCUWO2EIzYFAw"/>
+  <element xmi:type="bpmn:BpmnDiagram" href="OptimisationTest.bpmn#_4N9IUS2DEeCUWO2EIzYFAw"/>
+  <edges xmi:type="notation:Edge" xmi:id="_7Gy9sC2DEeCUWO2EIzYFAw" type="3001" source="_6bqWAC2DEeCUWO2EIzYFAw" target="_4SWgIC2DEeCUWO2EIzYFAw">
+    <children xmi:type="notation:Node" xmi:id="_7G0L0C2DEeCUWO2EIzYFAw" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="_7G0L0S2DEeCUWO2EIzYFAw" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="_7G0L0i2DEeCUWO2EIzYFAw" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_7G0L0y2DEeCUWO2EIzYFAw" y="40"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_7Gy9sS2DEeCUWO2EIzYFAw" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_7Gy9si2DEeCUWO2EIzYFAw" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_7Gy9sy2DEeCUWO2EIzYFAw" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="OptimisationTest.bpmn#_7GxIgC2DEeCUWO2EIzYFAw"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_7Gy9tC2DEeCUWO2EIzYFAw" points="[15, -2, -123, 0]$[85, -12, -53, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_7WowgC2DEeCUWO2EIzYFAw" type="3001" source="_4SWgIC2DEeCUWO2EIzYFAw" target="_61DtcC2DEeCUWO2EIzYFAw">
+    <children xmi:type="notation:Node" xmi:id="_7WpXkC2DEeCUWO2EIzYFAw" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="_7WpXkS2DEeCUWO2EIzYFAw" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="_7WpXki2DEeCUWO2EIzYFAw" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_7WpXky2DEeCUWO2EIzYFAw" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_7WowgS2DEeCUWO2EIzYFAw" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_7Wowgi2DEeCUWO2EIzYFAw" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_7Wowgy2DEeCUWO2EIzYFAw" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="OptimisationTest.bpmn#_7WoJcS2DEeCUWO2EIzYFAw"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_7WowhC2DEeCUWO2EIzYFAw" points="[54, 6, -80, -17]$[136, 8, 2, -15]"/>
+  </edges>
+</notation:Diagram>
