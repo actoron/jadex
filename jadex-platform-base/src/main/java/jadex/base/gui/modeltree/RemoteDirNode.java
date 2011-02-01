@@ -18,6 +18,7 @@ import jadex.xml.annotation.XMLClassname;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -95,35 +96,41 @@ public class RemoteDirNode extends RemoteFileNode
 				
 				File f = new File(myfile.getPath());
 				final File[] files = f.listFiles();
-				System.out.println("files: "+SUtil.arrayToString(files));
-				final CollectionResultListener lis = new CollectionResultListener(files.length, 
-					true, new DelegationResultListener(ret));
-				
-				for(int i=0; i<files.length; i++)
+				if(files!=null)
 				{
-					if(myfilter==null)
+					final CollectionResultListener lis = new CollectionResultListener(files.length, 
+						true, new DelegationResultListener(ret));
+					
+					for(int i=0; i<files.length; i++)
 					{
-						lis.resultAvailable(files[i]);
-					}
-					else
-					{
-						final File file = files[i];
-						myfilter.filter(files[i]).addResultListener(new IResultListener()
+						if(myfilter==null)
 						{
-							public void resultAvailable(Object result)
+							lis.resultAvailable(files[i]);
+						}
+						else
+						{
+							final File file = files[i];
+							myfilter.filter(files[i]).addResultListener(new IResultListener()
 							{
-//								if(((Boolean)result).booleanValue())
-									lis.resultAvailable(new RemoteFile(file.getName(), file.getAbsolutePath(), file.isDirectory()));
-//								else
-//									lis.exceptionOccurred(null);
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								lis.exceptionOccurred(null);
-							}
-						});
+								public void resultAvailable(Object result)
+								{
+	//								if(((Boolean)result).booleanValue())
+										lis.resultAvailable(new RemoteFile(file.getName(), file.getAbsolutePath(), file.isDirectory()));
+	//								else
+	//									lis.exceptionOccurred(null);
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									lis.exceptionOccurred(null);
+								}
+							});
+						}
 					}
+				}
+				else
+				{
+					ret.setResult(Collections.EMPTY_LIST);
 				}
 				
 				return ret;
