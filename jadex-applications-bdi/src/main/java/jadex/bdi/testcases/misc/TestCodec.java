@@ -34,7 +34,7 @@ public class TestCodec implements IContentCodec, Serializable
 	 */
 	public String encode(Object val, ClassLoader classloader)
 	{
-		return ""+val;
+		return "97";
 	}
 
 	/**
@@ -44,7 +44,7 @@ public class TestCodec implements IContentCodec, Serializable
 	 */
 	public Object decode(String val, ClassLoader classloader)
 	{
-		return new Integer(98);
+		return "97".equals(val) ? new Integer(98) : new Integer(96);
 //		try
 //		{
 //			return new Integer(val);

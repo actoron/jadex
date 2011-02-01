@@ -54,6 +54,9 @@ public class ComponentTest implements	Test
 		// Start the component.
 //		System.out.println("Starting test: "+comp);
 		TestResultListener	trl	= new TestResultListener();
+//		Map	args	= new HashMap();
+//		args.put("timeout", new Long(3000000));
+//		CreationInfo	ci	= new CreationInfo(args);
 		cms.createComponent(null, comp, null, trl);
 
 		// Evaluate the results.

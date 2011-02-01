@@ -23,6 +23,9 @@ public class ReteMemory
 	/** The state. */
 	protected IOAVState	state;
 	
+//	/** Used for logging debug output. */
+//	protected List	debug;
+	
 	//-------- constructors --------
 	
 	/**

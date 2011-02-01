@@ -4,7 +4,6 @@ import jadex.commons.IIntermediateFuture;
 import jadex.commons.IntermediateFuture;
 import jadex.commons.concurrent.DelegationResultListener;
 
-import java.util.Collection;
 import java.util.Map;
 
 /**

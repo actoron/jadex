@@ -22,7 +22,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.Icon;
 import javax.swing.UIDefaults;
 
 /**
@@ -137,7 +136,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 //		System.out.println("filename: "+filename);
 		try
 		{
-			ret.setResult(loader.loadBpmnModel(model, imports, classloader));
+			ret.setResult(loader.loadBpmnModel(model, imports, classloader).getModelInfo());
 //			ClassLoader	cl = libservice.getClassLoader();
 //			ret.setClassloader(cl);
 		}

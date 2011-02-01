@@ -4,11 +4,9 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.service.IService;
 import jadex.commons.service.annotation.Excluded;
-import jadex.commons.service.annotation.Uncached;
 
 import java.util.Map;
 
-import javax.swing.Icon;
 
 /**
  *  A factory is responsible for one or more component types

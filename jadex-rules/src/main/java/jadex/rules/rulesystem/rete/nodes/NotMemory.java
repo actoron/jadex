@@ -20,6 +20,9 @@ public class NotMemory	extends BetaMemory
 	
 	/** The mappings (lefttuple -> {rightvalues}). */
 	protected Map mappings;
+	
+	/** The delay flag. */
+	protected boolean	delay;
 
 	//-------- constructors --------
 	
@@ -95,6 +98,22 @@ public class NotMemory	extends BetaMemory
 	}
 	
 	/**
+	 *  Set the delay flag.
+	 */
+	public void	setDelay(boolean delay)
+	{
+		this.delay	= delay;
+	}
+	
+	/**
+	 *  Get the delay flag.
+	 */
+	public boolean	isDelay()
+	{
+		return delay;
+	}
+	
+	/**
 	 *  Get the string representation.
 	 *  @return The string representation. 
 	 */
@@ -105,6 +124,8 @@ public class NotMemory	extends BetaMemory
 		ret	+= ", mappings=";
 		ret	+= mappings;
 		ret	+= ")";
+		ret	+= ", delay=";
+		ret	+= delay;
 		return ret;
 	}
 }

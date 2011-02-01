@@ -2,7 +2,10 @@ package jadex.jade;
 
 import jade.Boot;
 import jade.core.AID;
+import jade.wrapper.AgentController;
+import jade.wrapper.ControllerException;
 import jade.wrapper.PlatformController;
+import jadex.application.runtime.IApplication;
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentAdapter;
@@ -11,6 +14,8 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
+
+import java.util.Map;
 
 /**
  *  JADE version of the adapter factory.
@@ -30,6 +35,9 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 	
 	/** The container controller. */
 	protected PlatformController controller;
+	
+	/** Flag for init step. */
+	protected boolean	inited;
 
 	//-------- constructors --------
 	
@@ -42,22 +50,6 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 				throw new RuntimeException("Currently only one JADE instance per VM supported.");
 			}
 			FACTORY	= this;
-		}
-		
-		// Start Jade platform with gateway agent
-		// This agent makes accessible the platform controller
-		Boot.main(new String[]{"-gui", "jadexgateway:jadex.jade.PlatformGatewayAgent"});
-		// Hack! Busy waiting for gateway agent init finished.
-		while(gatewayagent==null)
-		{
-			System.out.print(".");
-			try
-			{
-				Thread.sleep(100);
-			}
-			catch(Exception e)
-			{
-			}
 		}
 	}
 	
@@ -73,9 +65,41 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 	 */
 	public IComponentAdapter createComponentAdapter(IComponentDescription desc, IModelInfo model, IComponentInstance instance, IExternalAccess parent)
 	{
-		// Change name of root component to match JADE platform name (hack!!!).
-		if(desc.getParent()==null)
+		// Start JADE platform on first component creation.
+		if(!inited)
 		{
+			inited	= true;
+			assert	desc.getParent()==null : "First component must be root component.";
+			
+			Map	args	= null;
+			if(instance instanceof IApplication)
+			{
+				args	= ((IApplication)instance).getArguments();
+			}
+			Object	rma	= args!=null ? args.get("rma") : null;
+			boolean	gui	= rma!=null && rma instanceof Boolean && ((Boolean)rma).booleanValue();
+			
+			// Start Jade platform with gateway agent
+			// This agent makes accessible the platform controller
+			if(gui)
+				Boot.main(new String[]{"-gui", "jadexgateway:jadex.jade.PlatformGatewayAgent"});
+			else
+				Boot.main(new String[]{"-agents", "jadexgateway:jadex.jade.PlatformGatewayAgent"});
+				
+			// Hack! Busy waiting for gateway agent init finished.
+			while(gatewayagent==null)
+			{
+				System.out.print(".");
+				try
+				{
+					Thread.sleep(100);
+				}
+				catch(Exception e)
+				{
+				}
+			}
+
+			// Change name of root component to match JADE platform name (hack!!!).
 			((CMSComponentDescription)desc).setName(new ComponentIdentifier(gatewayagent.getHap()));
 		}
 		
@@ -128,6 +152,14 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 	public AID getGatewayAgent()
 	{
 		return gatewayagent;
+	}
+	
+	/**
+	 *  Get the platform gateway controller.
+	 */
+	public AgentController	getGatewayController()	throws ControllerException
+	{
+		return controller.getAgent(gatewayagent.getLocalName());
 	}
 	
 	/**

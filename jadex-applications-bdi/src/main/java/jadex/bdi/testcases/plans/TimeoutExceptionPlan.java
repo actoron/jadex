@@ -23,17 +23,17 @@ public class TimeoutExceptionPlan extends Plan
 	{
 		TestReport tr = new TestReport("#1", "Test normal timed wait.");
 		long start = getTime();
-		long test = 200;
+		long test = 300;
 		waitFor(test);
 		long dur = getTime()-start;
 		double diff = ((double)Math.abs(dur-test))/((double)test)*100;
-		if(diff<5)
+		if(diff<=10)
 		{
 			tr.setSucceeded(true);
 		}
 		else
 		{
-			tr.setReason("Difference greater than 5 percent: "+diff);
+			tr.setReason("Difference greater than 10 percent: "+diff);
 		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 

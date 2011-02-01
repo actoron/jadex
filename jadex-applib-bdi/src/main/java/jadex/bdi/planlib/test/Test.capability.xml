@@ -21,7 +21,7 @@
 			<fact>1</fact>
 		</belief>
 
-		<!-- Default timeout is never. -->
+		<!-- Default timeout is 20 seconds. -->
 		<belief name="timeout" class="long" exported="true">
 			<!--  <fact>0L</fact>-->
 			<fact>20000L</fact>

@@ -152,7 +152,6 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 		this.instances = new MultiCollection(); 
 		this.steps	= new ArrayList();
 		this.willdostep	= true;
-		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
 	
 		// Init the arguments with default values.
 		String[] configs = model.getModelInfo().getConfigurations();
@@ -184,7 +183,8 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 		fetcher.setValue("$properties", properties);
 		fetcher.setValue("$results", getResults());
 		fetcher.setValue("$component", ComponentInterpreter.this);
-		ComponentInterpreter.this.fetcher = fetcher;		
+		this.fetcher = fetcher;		
+		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
 		fetcher.setValue("$provider", getServiceProvider());
 		
 		// Schedule the futures (first) init step.

@@ -18,11 +18,6 @@ import java.util.Set;
  */
 public class NotNode extends AbstractBetaNode
 {
-	//-------- attributes --------
-	
-	/** Flag to temporarily delay propagation of tuples. */
-	protected boolean	delay;	
-
 	//-------- constructors --------
 	
 	/**
@@ -47,13 +42,14 @@ public class NotNode extends AbstractBetaNode
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEADDED);
 
+		NotMemory	nomem	= (NotMemory)mem.getNodeMemory(this);
+		
 		// Use super implementation to update matches, but don't propagate
-		this.delay	= true;
+		nomem.setDelay(true);
 		super.addTuple(left, state, mem, agenda);
-		this.delay	= false;
+		nomem.setDelay(false);
 		
 		// When no mapping exists, tuple can be propagated.
-		NotMemory	nomem	= (NotMemory)mem.getNodeMemory(this);
 		if(nomem.getMappings(left).isEmpty())
 		{
 			nomem.addResultTuple(left);
@@ -62,7 +58,7 @@ public class NotNode extends AbstractBetaNode
 				tcs[j].addTuple(left, state, mem, agenda);
 		}
 
-		checkConsistency(mem);
+//		checkConsistency(mem);
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEADDED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
 	}
@@ -105,7 +101,7 @@ public class NotNode extends AbstractBetaNode
 			nomem.removeMappings(left);
 		}
 
-		checkConsistency(mem);
+//		checkConsistency(mem);
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEREMOVED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
 	}
@@ -125,11 +121,13 @@ public class NotNode extends AbstractBetaNode
 
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEMODIFIED);
+		
+		NotMemory	nomem	= (NotMemory)mem.getNodeMemory(this);
 
 		// Use super implementation to update matches, but don't propagate
-		this.delay	= true;
+		nomem.setDelay(true);
 		super.modifyTuple(left, tupleindex, type, oldvalue, newvalue, state, mem, agenda);
-		this.delay	= false;
+		nomem.setDelay(false);
 
 		boolean	oldprop	= mem.hasNodeMemory(this)
 			&& ((NotMemory)mem.getNodeMemory(this)).getResultMemory().contains(left);
@@ -174,7 +172,7 @@ public class NotNode extends AbstractBetaNode
 				tcs[j].modifyTuple(left, tupleindex, type, oldvalue, newvalue, state, mem, agenda);
 		}
 
-		checkConsistency(mem);
+//		checkConsistency(mem);
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEMODIFIED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
 	}
@@ -186,10 +184,12 @@ public class NotNode extends AbstractBetaNode
 	 */
 	public void modifyIndirectObject(Object object, OAVAttributeType type, Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
+		NotMemory	nomem	= (NotMemory)mem.getNodeMemory(this);
+
 		// Use super implementation to update matches, but don't propagate
-		this.delay	= true;
+		nomem.setDelay(true);
 		super.modifyIndirectObject(object, type, oldvalue, newvalue, state, mem, agenda);
-		this.delay	= false;
+		nomem.setDelay(false);
 
 		Collection	linput	= getTupleSource().getNodeMemory(mem);
 		if(linput!=null)
@@ -226,7 +226,7 @@ public class NotNode extends AbstractBetaNode
 				}
 			}
 		}
-		checkConsistency(mem);
+//		checkConsistency(mem);
 	}
 
 	//-------- template methods --------
@@ -241,7 +241,7 @@ public class NotNode extends AbstractBetaNode
 
 		NotMemory nomem = (NotMemory)mem.getNodeMemory(this);
 		nomem.addMapping(state, left, right);
-		if(!delay && nomem.removeResultTuple(left))
+		if(!nomem.isDelay() && nomem.removeResultTuple(left))
 		{
 			ITupleConsumerNode[] tcs = tconsumers;
 			for(int j=0; tcs!=null && j<tcs.length; j++)
@@ -255,14 +255,19 @@ public class NotNode extends AbstractBetaNode
 	protected void removeMatch(Tuple left, Object right, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
 //		if(getNodeId()==1137)
-//			System.out.println(this+".removeMatch: "+left+", "+right);
+//		if(mem.debug!=null)
+//			mem.debug.add(this+".removeMatch?: "+left+", "+right);
 
 		if(mem.hasNodeMemory(this))
 		{
 			NotMemory nomem = (NotMemory)mem.getNodeMemory(this);
 			boolean	removed	= nomem.removeMapping(left, right);
-			if(removed && !delay && (nomem.getMappings(left)==null || nomem.getMappings(left).isEmpty()))
+//			if(mem.debug!=null)
+//				mem.debug.add(this+".removeMatch: removed="+removed+", delay="+nomem.isDelay()+", mappings="+nomem.getMappings(left));
+			if(removed && !nomem.isDelay() && (nomem.getMappings(left)==null || nomem.getMappings(left).isEmpty()))
 			{
+//				if(mem.debug!=null)
+//					mem.debug.add(this+".removeMatch: add result tuple "+left);
 				nomem.addResultTuple(left);
 				ITupleConsumerNode[] tcs = tconsumers;
 				for(int j=0; tcs!=null && j<tcs.length; j++)

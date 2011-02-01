@@ -34,9 +34,7 @@ import jadex.base.fipa.IComponentAction;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentInstance;
 import jadex.bridge.IContentCodec;
-import jadex.jade.service.MessageService;
 
 
 /**
@@ -50,7 +48,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 	// -------- attributes --------
 	
 	/** The jadex agent. */
-	protected IComponentInstance		agent;
+	protected JadeComponentAdapter		agent;
 
 	// -------- constructors --------
 
@@ -58,7 +56,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 	 * Create the message receiver behaviour.
 	 * @param agent The bdi agent.
 	 */
-	public MessageReceiverBehaviour(IComponentInstance agent)
+	public MessageReceiverBehaviour(JadeComponentAdapter agent)
 	{
 		this.agent = agent;
 	}
@@ -82,12 +80,16 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 		{
 			// Otherwise dispatch message to agent.
 			JadeMessageAdapter ma = new JadeMessageAdapter(msg);
-				
+			
+			
 			// Conversion via platform specific codecs
+			IContentCodec[] compcodecs = jadex.base.service.message.MessageService.getContentCodecs(agent.getModel().getProperties());
 			String[] params = ma.getMessageType().getParameterNames();
 			for(int i=0; i<params.length; i++)
 			{
-				IContentCodec codec = ma.getMessageType().findContentCodec(MessageService.DEFCODECS, ma, params[i]);
+				IContentCodec codec = ma.getMessageType().findContentCodec(compcodecs, ma, params[i]);
+				if(codec==null)
+					codec = ma.getMessageType().findContentCodec(jadex.base.service.message.MessageService.DEFCODECS, ma, params[i]);
 				if(codec!=null)
 				{
 					try
@@ -95,7 +97,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 						String	val	= (String)ma.getValue(params[i]);
 						if(val!=null)
 						{
-							ClassLoader	cl	= agent.getClassLoader();
+							ClassLoader	cl	= agent.getModel().getClassLoader();
 							ma.setDecodedValue(params[i], codec.decode(val, cl));
 						}
 					}
@@ -226,7 +228,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 				}
 			}
 			
-			agent.messageArrived(ma);
+			agent.getComponentInstance().messageArrived(ma);
 		}
 	}
 }

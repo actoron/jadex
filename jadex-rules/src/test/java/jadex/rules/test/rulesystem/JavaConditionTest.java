@@ -1,7 +1,6 @@
 package jadex.rules.test.rulesystem;
 
-import jadex.rules.parser.conditions.ClipsJadexLexer;
-import jadex.rules.parser.conditions.ClipsJadexParser;
+import jadex.rules.parser.conditions.ParserHelper;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;
@@ -17,9 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
-
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CommonTokenStream;
 
 /**
  *  Test if conditions on Java objects are working.
@@ -52,11 +48,12 @@ public class JavaConditionTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		String c	= "?block = (jadex.rules.test.rulesystem.Block (clear true))";
-		ANTLRStringStream exp = new ANTLRStringStream(c);
-		ClipsJadexLexer lexer = new ClipsJadexLexer(exp);			
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		ClipsJadexParser parser = new ClipsJadexParser(tokens);
-		ICondition cond = parser.rhs(Blocks.blocksworld_type_model);
+//		ANTLRStringStream exp = new ANTLRStringStream(c);
+//		ClipsJadexLexer lexer = new ClipsJadexLexer(exp);			
+//		CommonTokenStream tokens = new CommonTokenStream(lexer);
+//		ClipsJadexParser parser = new ClipsJadexParser(tokens);
+//		ICondition cond = parser.rhs(Blocks.blocksworld_type_model);
+		ICondition cond	= ParserHelper.parseClipsCondition(c, Blocks.blocksworld_type_model);//, new String[]{"jadex.rules.test.rulesystem.*"});
 //		System.out.println(cond);
 		
 		this.triggers = new ArrayList();

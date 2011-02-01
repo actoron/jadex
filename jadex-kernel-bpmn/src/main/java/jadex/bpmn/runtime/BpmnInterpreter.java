@@ -251,10 +251,10 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
 		IValueFetcher fetcher, Future inited)
 	{
-		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
 		this.inited = inited;
 		this.variables	= new HashMap();
 		construct(model, arguments, config, parent, activityhandlers, stephandlers, fetcher);
+		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
 	}
 	
 	/**

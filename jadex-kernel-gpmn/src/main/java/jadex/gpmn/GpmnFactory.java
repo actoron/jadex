@@ -22,7 +22,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Map;
 
-import javax.swing.Icon;
 import javax.swing.UIDefaults;
 
 /**

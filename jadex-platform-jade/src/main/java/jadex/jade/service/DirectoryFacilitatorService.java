@@ -148,7 +148,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		
 		try
 		{
-			ComponentAdapterFactory.getInstance().getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
+			ComponentAdapterFactory.getInstance().getGatewayController().putO2AObject(e, AgentController.ASYNC);
 		}
 		catch(Exception ex)
 		{
@@ -241,7 +241,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		
 		try
 		{
-			ComponentAdapterFactory.getInstance().getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
+			ComponentAdapterFactory.getInstance().getGatewayController().putO2AObject(e, AgentController.ASYNC);
 		}
 		catch(Exception ex)
 		{
@@ -337,7 +337,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		
 		try
 		{
-			ComponentAdapterFactory.getInstance().getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
+			ComponentAdapterFactory.getInstance().getGatewayController().putO2AObject(e, AgentController.ASYNC);
 		}
 		catch(Exception ex)
 		{
@@ -460,7 +460,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		
 		try
 		{
-			ComponentAdapterFactory.getInstance().getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
+			ComponentAdapterFactory.getInstance().getGatewayController().putO2AObject(e, AgentController.ASYNC);
 		}
 		catch(Exception ex)
 		{

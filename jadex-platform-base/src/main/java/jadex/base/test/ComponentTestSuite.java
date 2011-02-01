@@ -46,8 +46,22 @@ public class ComponentTestSuite extends TestSuite
 	 * @param path	The path to look for test cases in.
 	 * @param root	The classpath root corresponding to the path.
 	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
+	 * @param timeout	The test suite timeout (if tests are not completed, execution will be aborted). 
 	 */
-	public ComponentTestSuite(final File path, final File root, final String[] excludes, final long timeout) throws Exception
+	public ComponentTestSuite(File path, File root, String[] excludes, long timeout) throws Exception
+	{
+		this(new String[]{"-configname", "testcases", "-simulation", "true"}, path, root, excludes, timeout);
+	}
+	
+	/**
+	 * Create a component test suite for components contained in a given path.
+	 * @param args	The platform arguments.
+	 * @param path	The path to look for test cases in.
+	 * @param root	The classpath root corresponding to the path.
+	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
+	 * @param timeout	The test suite timeout (if tests are not completed, execution will be aborted). 
+	 */
+	public ComponentTestSuite(String[] args, File path, File root, String[] excludes, final long timeout) throws Exception
 	{
 		super(path.getName());
 		
@@ -58,7 +72,7 @@ public class ComponentTestSuite extends TestSuite
 				public void run()
 				{
 					System.out.println("Aborting test suite due to excessive run time (>"+timeout+" ms).");
-					System.exit(0);
+					System.exit(1);
 				}
 			}, timeout);
 		}
@@ -67,7 +81,7 @@ public class ComponentTestSuite extends TestSuite
 		// Todo: get rid of thread suspendable!?
 		ISuspendable	ts	= new ThreadSuspendable();
 		
-		IExternalAccess	rootcomp	= (IExternalAccess)Starter.createPlatform(new String[]{"-configname", "testcases", "-simulation", "true"}).get(ts);
+		IExternalAccess	rootcomp	= (IExternalAccess)Starter.createPlatform(args).get(ts);
 		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(rootcomp.getServiceProvider(), IComponentManagementService.class).get(ts);
 		ILibraryService libsrv	= (ILibraryService)SServiceProvider.getService(rootcomp.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(ts);
 		

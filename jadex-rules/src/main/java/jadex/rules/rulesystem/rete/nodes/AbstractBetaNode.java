@@ -373,8 +373,8 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 			}
 		}
 				
-		if(this instanceof NotNode)
-			checkConsistency(mem);
+//		if(this instanceof NotNode)
+//			checkConsistency(mem);
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTADDED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
 	}
@@ -387,8 +387,20 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	{
 //		if(getNodeId()==1137)
 //			System.out.println(this+".removeObject: "+right);
-
-		//System.out.println("Remove object called: "+this+" "+right);
+		
+//		if(this.getNodeId()==161)
+//			mem.debug++;
+//		
+//		if(mem.debug>0)
+//		if(this instanceof NotNode)
+//		{
+//			if(mem.debug==null)
+//			{
+//				mem.debug	= new ArrayList();
+//			}
+//			mem.debug.add("+++Remove object called: "+this+" "+right+", "+mem.getNodeMemory(this));
+//		}
+	
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTREMOVED);
 		
@@ -408,12 +420,18 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 			BetaMemory bmem = (BetaMemory)mem.getNodeMemory(this);
 			for(int i=0; i<indexers.length; i++)
 			{
+//				if(mem.debug!=null)
+//					mem.debug.add("removeObject(): indexer "+this+" "+indexers[i]);
 				indexers[i].removeObject(right, bmem);
 			}			
 		}
+	
+//		if(this instanceof NotNode)
+//		{
+//			checkConsistency(mem);
+////			mem.debug	= null;
+//		}
 		
-		if(this instanceof NotNode)
-			checkConsistency(mem);
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTREMOVED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
 	}
@@ -505,8 +523,8 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 		// else
 		// propagation of unaffected nodes is handled by subtypes.
 
-		if(this instanceof NotNode)
-			checkConsistency(mem);
+//		if(this instanceof NotNode)
+//			checkConsistency(mem);
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTMODIFIED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
 	}
@@ -666,11 +684,15 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 					ret = intersection(state, ret, cres);
 				}
 			}
+//			if(mem.debug!=null)
+//				mem.debug.add("fetchTupleMemory (indexers): "+this+", "+ret);
 		}
 		else
 		{
 			// Fetch the tuple memory
 			ret = getTupleSource().getNodeMemory(mem);
+//			if(mem.debug!=null)
+//				mem.debug.add("fetchTupleMemory (no indexers): "+this+", "+ret);
 		}
 		
 		return ret;
@@ -877,25 +899,25 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	protected abstract boolean isMatchContained(IOAVState state, Tuple left, Object right, ReteMemory mem);
 	
 	
-	/**
-	 *  Test if there is left input and no right input, but no value propagated
-	 */
-	protected void	checkConsistency(ReteMemory mem)
-	{
-		Collection	left	= tsource.getNodeMemory(mem);
-		if(left!=null && !left.isEmpty())
-		{
-			Collection right	= osource.getNodeMemory(mem);
-			if(right==null || right.isEmpty())
-			{
-				Collection	own	= getNodeMemory(mem);
-				if(own==null || own.isEmpty())
-				{
-					Thread.dumpStack();
-					System.exit(0);
-				}
-			}
-		}
-	}
+//	/**
+//	 *  Test if there is left input and no right input, but no value propagated
+//	 */
+//	protected void	checkConsistency(ReteMemory mem)
+//	{
+//		Collection	left	= tsource.getNodeMemory(mem);
+//		if(left!=null && !left.isEmpty())
+//		{
+//			Collection right	= osource.getNodeMemory(mem);
+//			if(right==null || right.isEmpty())
+//			{
+//				Collection	own	= getNodeMemory(mem);
+//				if(own==null || own.isEmpty())
+//				{
+//					Thread.dumpStack();
+//					System.exit(0);
+//				}
+//			}
+//		}
+//	}
 
 }
