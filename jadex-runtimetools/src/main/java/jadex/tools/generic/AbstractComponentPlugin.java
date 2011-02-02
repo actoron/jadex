@@ -139,8 +139,8 @@ public abstract class AbstractComponentPlugin extends AbstractGenericPlugin
 									{
 //										System.out.println("add: "+result+" "+sel);
 										IComponentViewerPanel panel = (IComponentViewerPanel)result;
-										panels.put(cid, panel);
-										centerp.add(panel.getComponent(), cid);
+//										panels.put(cid, panel);
+//										centerp.add(panel.getComponent(), cid);
 										if(getPanelProperties()!=null)
 											panel.setProperties(getPanelProperties());
 										ret.setResult(panel);

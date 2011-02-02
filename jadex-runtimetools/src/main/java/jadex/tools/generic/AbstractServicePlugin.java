@@ -94,8 +94,8 @@ public abstract class AbstractServicePlugin extends AbstractGenericPlugin
 			{
 //				System.out.println("add: "+result+" "+sel);
 				IServiceViewerPanel panel = (IServiceViewerPanel)result;
-				panels.put(service, panel);
-				centerp.add(panel.getComponent(), service);
+//				panels.put(service, panel);
+//				centerp.add(panel.getComponent(), service);
 				if(getPanelProperties()!=null)
 					panel.setProperties(getPanelProperties());
 				ret.setResult(panel);

@@ -1,6 +1,7 @@
 package jadex.tools.generic;
 
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
+import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.commons.IFuture;
 import jadex.commons.Properties;
@@ -140,7 +141,16 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 				}
 				else
 				{
-					createPanel(sel);
+					createPanel(sel).addResultListener(new SwingDefaultResultListener()
+					{
+						public void customResultAvailable(Object result)
+						{
+							IAbstractViewerPanel panel = (IAbstractViewerPanel)result;
+							panels.put(sel, panel);
+							centerp.add(panel.getComponent(), sel);
+							ocl.show(sel);
+						}
+					});
 				}
 			}
 		});
@@ -164,7 +174,7 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 		int sel = selcb.getSelectedIndex();
 		if(sel!=-1)
 		{
-			Object element =  selcb.getItemAt(sel);
+			final Object element =  selcb.getItemAt(sel);
 			if(panels.containsKey(element))
 			{
 				IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.get(element);
@@ -177,6 +187,8 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 					public void customResultAvailable(Object result)
 					{
 						IAbstractViewerPanel panel = (IAbstractViewerPanel)result;
+						panels.put(element, panel);
+						centerp.add(panel.getComponent(), element);
 						panel.setProperties(props);
 					}
 				});

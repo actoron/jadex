@@ -5,6 +5,7 @@ import jadex.base.gui.componentviewer.dfservice.DFBrowserPanel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.IService;
 
 import javax.swing.Icon;
@@ -39,9 +40,16 @@ public class DFServicePlugin extends AbstractServicePlugin
 	 */
 	public IFuture createServicePanel(IService service)
 	{
-		DFBrowserPanel ret = new DFBrowserPanel();
-		ret.init(getJCC(), service);
-		return new Future(ret);
+		final Future ret = new Future();
+		final DFBrowserPanel brp = new DFBrowserPanel();
+		brp.init(getJCC(), service).addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				ret.setResult(brp);
+			}
+		});
+		return ret;
 	}
 	
 	/**

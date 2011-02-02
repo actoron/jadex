@@ -4,6 +4,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.IService;
 import jadex.tools.starter.StarterViewerPanel;
 
@@ -38,9 +39,16 @@ public class StarterServicePlugin extends AbstractServicePlugin
 	 */
 	public IFuture createServicePanel(IService service)
 	{
-		StarterViewerPanel awap = new StarterViewerPanel();
-		awap.init(getJCC(), service);
-		return new Future(awap);
+		final Future ret = new Future();
+		final StarterViewerPanel stp = new StarterViewerPanel();
+		stp.init(getJCC(), service).addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				ret.setResult(stp);
+			}
+		});
+		return ret;
 	}
 	
 	/**

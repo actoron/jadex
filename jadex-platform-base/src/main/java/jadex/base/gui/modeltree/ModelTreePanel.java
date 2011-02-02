@@ -44,9 +44,9 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.UIDefaults;
 import javax.swing.filechooser.FileFilter;
@@ -57,7 +57,7 @@ import javax.swing.tree.TreePath;
 /**
  *  A panel displaying components on the platform as tree.
  */
-public class ModelTreePanel extends JSplitPane
+public class ModelTreePanel extends JPanel // JSplitPane
 {
 	//-------- constants --------
 
@@ -109,7 +109,7 @@ public class ModelTreePanel extends JSplitPane
 //	protected Action showobject;
 	
 	/** The properties panel. */
-	protected final JScrollPane	proppanel;
+//	protected final JScrollPane	proppanel;
 	
 //	/** The object panel. */
 //	protected final JScrollPane	objectpanel;
@@ -137,21 +137,22 @@ public class ModelTreePanel extends JSplitPane
 		this(exta, false);
 	}
 	
-	/**
-	 *  Create a new component tree panel.
-	 */
-	public ModelTreePanel(IExternalAccess exta, boolean remote)
-	{
-		this(exta, VERTICAL_SPLIT, remote);
-	}
+//	/**
+//	 *  Create a new component tree panel.
+//	 */
+//	public ModelTreePanel(IExternalAccess exta, boolean remote)
+//	{
+//		this(exta, VERTICAL_SPLIT, remote);
+//	}
 	
 	/**
 	 *  Create a new component tree panel.
 	 */
-	public ModelTreePanel(final IExternalAccess exta, int orientation, boolean remote)
+	public ModelTreePanel(final IExternalAccess exta, boolean remote)
 	{
-		super(orientation);
-		this.setOneTouchExpandable(true);
+		this.setLayout(new BorderLayout());
+//		super(orientation);
+//		this.setOneTouchExpandable(true);
 		
 		this.exta	= exta;
 		this.remote = remote;
@@ -165,19 +166,19 @@ public class ModelTreePanel extends JSplitPane
 		tree.setRootVisible(false);
 		tree.setShowsRootHandles(true);
 		
-		JScrollPane	scroll	= new JScrollPane(tree);
-		this.add(scroll);
+//		JScrollPane	scroll	= new JScrollPane(tree);
+		this.add(tree, BorderLayout.CENTER);
 		
 		new TreeExpansionHandler(tree);
 		RootNode root = new RootNode(model, tree);
 		model.setRoot(root);
 		tree.expandPath(new TreePath(root));
 		
-		this.proppanel	= new JScrollPane();
-		proppanel.setMinimumSize(new Dimension(0, 0));
-		proppanel.setPreferredSize(new Dimension(0, 0));
-		this.add(proppanel);
-		this.setResizeWeight(1.0);
+//		this.proppanel	= new JScrollPane();
+//		proppanel.setMinimumSize(new Dimension(0, 0));
+//		proppanel.setPreferredSize(new Dimension(0, 0));
+//		this.add(proppanel);
+//		this.setResizeWeight(1.0);
 		
 		filechooser = new JFileChooser(".");
 		filechooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -592,49 +593,49 @@ public class ModelTreePanel extends JSplitPane
 		}
 	}
 	
-	/**
-	 *  Set the title and contents of the properties panel.
-	 */
-	public void	showProperties(JComponent content)
-	{
-		proppanel.setViewportView(content);
-		proppanel.repaint();
-
-		// Code to simulate a one touch expandable click,
-	 	// see BasicSplitPaneDivider.OneTouchActionHandler)
-		
-		Insets  insets = getInsets();
-		int lastloc = getLastDividerLocation();
-	    int currentloc = getUI().getDividerLocation(this);
-		int newloc = currentloc;
-		BasicSplitPaneDivider divider = ((BasicSplitPaneUI)getUI()).getDivider();
-
-		boolean	adjust	= false;
-		if(getOrientation()==VERTICAL_SPLIT)
-		{
-			if(currentloc >= (getHeight() - insets.bottom - divider.getHeight())) 
-			{
-				adjust	= true;
-				int maxloc = getMaximumDividerLocation();
-				newloc = lastloc>=0 && lastloc<maxloc? lastloc: maxloc*1/2;
-	        }			
-		}
-		else
-		{
-			if(currentloc >= (getWidth() - insets.right - divider.getWidth())) 
-			{
-				adjust	= true;
-				int maxloc = getMaximumDividerLocation();
-				newloc = lastloc>=0 && lastloc<maxloc? lastloc: maxloc*1/2;
-	        }			
-		}
-
-		if(adjust && currentloc!=newloc) 
-		{
-			setDividerLocation(newloc);
-			setLastDividerLocation(currentloc);
-		}
-	}
+//	/**
+//	 *  Set the title and contents of the properties panel.
+//	 */
+//	public void	showProperties(JComponent content)
+//	{
+//		proppanel.setViewportView(content);
+//		proppanel.repaint();
+//
+//		// Code to simulate a one touch expandable click,
+//	 	// see BasicSplitPaneDivider.OneTouchActionHandler)
+//		
+//		Insets  insets = getInsets();
+//		int lastloc = getLastDividerLocation();
+//	    int currentloc = getUI().getDividerLocation(this);
+//		int newloc = currentloc;
+//		BasicSplitPaneDivider divider = ((BasicSplitPaneUI)getUI()).getDivider();
+//
+//		boolean	adjust	= false;
+//		if(getOrientation()==VERTICAL_SPLIT)
+//		{
+//			if(currentloc >= (getHeight() - insets.bottom - divider.getHeight())) 
+//			{
+//				adjust	= true;
+//				int maxloc = getMaximumDividerLocation();
+//				newloc = lastloc>=0 && lastloc<maxloc? lastloc: maxloc*1/2;
+//	        }			
+//		}
+//		else
+//		{
+//			if(currentloc >= (getWidth() - insets.right - divider.getWidth())) 
+//			{
+//				adjust	= true;
+//				int maxloc = getMaximumDividerLocation();
+//				newloc = lastloc>=0 && lastloc<maxloc? lastloc: maxloc*1/2;
+//	        }			
+//		}
+//
+//		if(adjust && currentloc!=newloc) 
+//		{
+//			setDividerLocation(newloc);
+//			setLastDividerLocation(currentloc);
+//		}
+//	}
 	
 	/**
 	 *  Add a new path to the explorer.

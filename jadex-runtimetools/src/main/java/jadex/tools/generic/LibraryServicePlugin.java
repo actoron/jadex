@@ -4,6 +4,7 @@ import jadex.base.gui.componentviewer.libservice.LibServiceBrowser;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.IService;
 import jadex.commons.service.library.ILibraryService;
 
@@ -38,9 +39,16 @@ public class LibraryServicePlugin extends AbstractServicePlugin
 	 */
 	public IFuture createServicePanel(IService service)
 	{
-		LibServiceBrowser ret = new LibServiceBrowser();
-		ret.init(getJCC(), service);
-		return new Future(ret);
+		final Future ret = new Future();
+		final LibServiceBrowser lib = new LibServiceBrowser();
+		lib.init(getJCC(), service).addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				ret.setResult(lib);
+			}
+		});
+		return ret;
 	}
 	
 	/**
