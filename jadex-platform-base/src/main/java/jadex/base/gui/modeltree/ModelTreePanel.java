@@ -33,6 +33,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,8 +71,8 @@ public class ModelTreePanel extends JSplitPane
 //		"refresh_menu",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/tools/common/images/new_refresh_small.png"),
 		"refresh", SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/refresh_component.png"),
 		"refresh_tree", SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/refresh_tree.png"),
-		"show_properties", SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/new_agent_props.png"),
-		"show_details", SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/new_agent_details.png"),
+//		"show_properties", SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/new_agent_props.png"),
+//		"show_details", SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/new_agent_details.png"),
 		"overlay_refresh", SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/overlay_refresh.png"),
 		"overlay_refreshtree", SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/overlay_refresh.png"),
 		"overlay_showprops", SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/overlay_doc.png"),
@@ -93,16 +94,19 @@ public class ModelTreePanel extends JSplitPane
 	protected final JTree	tree;
 	
 	/** The action for refreshing selected components. */
-	protected Action	refresh;
+	protected Action refresh;
 	
 	/** The action for recursively refreshing selected components. */
-	protected Action	refreshtree;
+	protected Action refreshtree;
+	
+	/** The remove path action. */
+	protected Action removepath;
 	
 	/** The action for showing properties of the selected node. */
-	protected Action	showprops;
+//	protected Action showprops;
 	
 	/** The action for showing object details of the selected node. */
-	protected Action showobject;
+//	protected Action showobject;
 	
 	/** The properties panel. */
 	protected final JScrollPane	proppanel;
@@ -218,7 +222,7 @@ public class ModelTreePanel extends JSplitPane
 			}
 		};
 
-		this.pubuilder = new PopupBuilder(new Object[]{ADD_PATH, REMOVE_PATH, ADD_REMOTEPATH});
+		this.pubuilder = new PopupBuilder(new Object[]{ADD_PATH, ADD_REMOTEPATH});
 		tree.addMouseListener(new MouseAdapter()
 		{
 			public void mousePressed(MouseEvent e)
@@ -261,14 +265,48 @@ public class ModelTreePanel extends JSplitPane
 			}
 		};
 		
-//		showprops	= new AbstractAction("Show properties", icons.getIcon("show_properties"))
+		removepath	= new AbstractAction("Remove Path", icons.getIcon("removepath"))
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				final ITreeNode	node = (ITreeNode)tree.getLastSelectedPathComponent();
+				((RootNode)tree.getModel().getRoot()).removeChild(node);
+				
+				// todo: jars
+				if(exta!=null && node instanceof FileNode)
+				{
+					SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(new SwingDefaultResultListener(ModelTreePanel.this)
+					{
+						public void customResultAvailable(Object result)
+						{
+							ILibraryService ls = (ILibraryService)result;
+							File file = ((FileNode)node).getFile();
+							file = new File(file.getParentFile(), file.getName());
+							try
+							{
+								ls.removeURL(file.toURI().toURL());
+							}
+							catch(MalformedURLException ex)
+							{
+								ex.printStackTrace();
+							}
+//								resetCrawler();
+//								((ModelExplorerTreeModel)getModel()).fireNodeRemoved(getRootNode(), node, index);
+						}
+					});
+				}
+			}
+		};
+		
+//		showprops = new AbstractAction("Show properties", icons.getIcon("show_properties"))
 //		{
 //			public void actionPerformed(ActionEvent e)
 //			{
 //				TreePath	path	= tree.getSelectionPath();
-//				if(path!=null && ((IComponentTreeNode)path.getLastPathComponent()).hasProperties())
+//				if(path!=null && ((ITreeNode)path.getLastPathComponent()).hasProperties())
 //				{
-//					showProperties(((IComponentTreeNode)path.getLastPathComponent()).getPropertiesComponent());
+//					showProperties(((ITreeNode)path.getLastPathComponent()).getPropertiesComponent());
 //				}
 //			}
 //		};
@@ -320,18 +358,32 @@ public class ModelTreePanel extends JSplitPane
 				
 				if(nodes.length==1)
 				{
-					if(nodes[0].hasProperties())
+//					if(nodes[0].hasProperties())
+//					{
+//						Action pshowprops = new AbstractAction((String)showprops.getValue(Action.NAME),
+//							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_showprops")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
+//						{
+//							public void actionPerformed(ActionEvent e)
+//							{
+//								showprops.actionPerformed(e);
+//							}
+//						};
+//						ret.add(pshowprops);
+//					}
+					
+					if(nodes[0].getParent()==tree.getModel().getRoot())
 					{
-						Action pshowprops = new AbstractAction((String)showprops.getValue(Action.NAME),
-							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_showprops")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
+						Action premovepath = new AbstractAction((String)removepath.getValue(Action.NAME),
+							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_showprops")}) : (Icon)removepath.getValue(Action.SMALL_ICON))
 						{
 							public void actionPerformed(ActionEvent e)
 							{
-								showprops.actionPerformed(e);
+								removepath.actionPerformed(e);
 							}
 						};
-						ret.add(pshowprops);
+						ret.add(removepath);
 					}
+//					return rm!=null && rm.getParent()==tree.getModel().getRoot();
 					
 //					if(nodes[0] instanceof ServiceNode || nodes[0] instanceof IActiveComponentTreeNode)
 //					{
@@ -385,10 +437,10 @@ public class ModelTreePanel extends JSplitPane
 			public Action getDefaultAction(final ITreeNode node)
 			{
 				Action	ret	= null;
-				if(node.hasProperties())
-				{
-					ret	= showprops;
-				}
+//				if(node.hasProperties())
+//				{
+//					ret	= showprops;
+//				}
 				return ret;
 			}
 		});
@@ -414,17 +466,6 @@ public class ModelTreePanel extends JSplitPane
 //			}
 //		});
 //		
-//		// Remove selection in tree, when user clicks in background.
-//		tree.addMouseListener(new MouseAdapter()
-//		{
-//			public void mouseClicked(MouseEvent e)
-//			{
-//				if(tree.getPathForLocation(e.getX(), e.getY())==null)
-//				{
-//					tree.clearSelection();
-//				}
-//			}
-//		});
 		
 		addKeyListener(new KeyListener()
 		{
@@ -544,7 +585,8 @@ public class ModelTreePanel extends JSplitPane
 		TreePath sel = tree.getPathForLocation(x, y);
 		if(sel==null)
 		{
-//			tree.setSelectionPath(sel);
+			tree.clearSelection();
+//			System.out.println("show");
 			JPopupMenu pop = pubuilder.buildPopupMenu();
 			pop.show(this, x, y);
 		}
@@ -632,7 +674,7 @@ public class ModelTreePanel extends JSplitPane
 									File f = new File(fcopy.getParentFile(), fcopy.getName());
 									try
 									{
-										System.out.println("adding:"+f.toURI().toURL());
+//										System.out.println("adding:"+f.toURI().toURL());
 										ls.addURL(f.toURI().toURL());
 									}
 									catch(MalformedURLException ex)
@@ -687,8 +729,8 @@ public class ModelTreePanel extends JSplitPane
 		 */
 		public void actionPerformed(ActionEvent e)
 		{
-			String filename = JOptionPane.showInputDialog("Enter remote path");
-			if(exta!=null)
+			final String filename = JOptionPane.showInputDialog("Enter remote path");
+			if(filename!=null && exta!=null)
 			{
 				final File fcopy = new File(filename);
 				SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -700,7 +742,15 @@ public class ModelTreePanel extends JSplitPane
 						File f = new File(fcopy.getParentFile(), fcopy.getName());
 						try
 						{
-							ls.addURL(f.toURI().toURL());
+							URL url = f.toURI().toURL();
+							if((filename.endsWith("\\") || filename.endsWith("/")) && 
+								(!url.toString().endsWith("\\") || url.toString().endsWith("/")))
+							{
+								// Hack! f.toURI().toURL() does not append when file is not local
+								// and it cannot be determined if it is a directory
+								url = new URL(url.toString()+"/");
+							}
+							ls.addURL(url);
 						}
 						catch(MalformedURLException ex)
 						{
@@ -729,61 +779,7 @@ public class ModelTreePanel extends JSplitPane
 		{
 			ITreeNode rm = (ITreeNode)tree.getLastSelectedPathComponent();
 			return rm==null && remote;
-		}
-	};
-
-	/**
-	 *  Remove an existing path from the explorer.
-	 */
-	public final Action REMOVE_PATH = new ToolTipAction("Remove Path", icons.getIcon("removepath"),
-		"Remove a directory path to the project structure")
-	{
-		/**
-		 *  Called when action should be performed.
-		 *  @param e The event.
-		 */
-		public void actionPerformed(ActionEvent e)
-		{
-			if(isEnabled())
-			{
-				final ITreeNode	node = (ITreeNode)tree.getLastSelectedPathComponent();
-				((RootNode)tree.getModel().getRoot()).removeChild(node);
-				
-				// todo: jars
-				if(exta!=null && node instanceof FileNode)
-				{
-					SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-						.addResultListener(new SwingDefaultResultListener(ModelTreePanel.this)
-					{
-						public void customResultAvailable(Object result)
-						{
-							ILibraryService ls = (ILibraryService)result;
-							File file = ((FileNode)node).getFile();
-							file = new File(file.getParentFile(), file.getName());
-							try
-							{
-								ls.removeURL(file.toURI().toURL());
-							}
-							catch(MalformedURLException ex)
-							{
-								ex.printStackTrace();
-							}
-//							resetCrawler();
-//							((ModelExplorerTreeModel)getModel()).fireNodeRemoved(getRootNode(), node, index);
-						}
-					});
-				}
-			}
-		}
-
-		/**
-		 *  Test if action is available in current context.
-		 *  @return True, if available.
-		 */
-		public boolean isEnabled()
-		{
-			ITreeNode rm = (ITreeNode)tree.getLastSelectedPathComponent();
-			return rm!=null && rm.getParent()==tree.getModel().getRoot();
+//			return true;
 		}
 	};
 
