@@ -229,7 +229,7 @@ public class Starter
 			//					System.out.println("starting component execution");
 								
 								// Start normal execution of root component (i.e. platform).
-			//					adapter.wakeup();
+								adapter.wakeup();
 							}
 							catch(Exception e)
 							{

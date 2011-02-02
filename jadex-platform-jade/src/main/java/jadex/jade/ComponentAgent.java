@@ -23,10 +23,12 @@ public class ComponentAgent extends Agent
 	protected void setup()
 	{
 		adapter	= (JadeComponentAdapter)getArguments()[0];
-		adapter.setJadeAgent(this);
 		
 		execution	= new ActionExecutionBehaviour(adapter); 
 		addBehaviour(execution);
+		execution.block();	// Do not execute before first wakeup.
+
+		adapter.setJadeAgent(this);
 
 		addBehaviour(new MessageReceiverBehaviour(adapter));
 	}

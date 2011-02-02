@@ -149,6 +149,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				{
 					((ComponentManagementService)result).setProcessingState(cid, IComponentDescription.PROCESSINGSTATE_READY);
 				}
+				public void exceptionOccurred(Exception exception)
+				{
+					// Might happen during platform init -> ignore
+				}
 			});				
 		}
 		

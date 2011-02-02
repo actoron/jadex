@@ -23,7 +23,10 @@ public class JadeComponentAdapter	extends AbstractComponentAdapter	implements IC
 	//-------- attributes --------
 	
 	/** The JADE agent. */
-	protected ComponentAgent	agent;	
+	protected ComponentAgent	agent;
+	
+	/** The wakeup flag. */
+	protected boolean	wakeup; 
 	
 	//-------- constructors --------
 
@@ -53,9 +56,25 @@ public class JadeComponentAdapter	extends AbstractComponentAdapter	implements IC
 	 */
 	public void	doWakeup()
 	{
-		// Todo: What if agent isn't yet available!? 
-		if(agent!=null)
+		boolean	dowakeup;
+		synchronized(this)
+		{
+//			System.out.println("doWakeup "+this+", "+agent);
+			if(agent!=null)
+			{
+				dowakeup	= true;
+			}
+			else
+			{
+				dowakeup	= false;
+				wakeup	= true;
+			}
+		}
+		
+		if(dowakeup)
+		{
 			agent.wakeup();
+		}
 	}
 	
 	/**
@@ -86,8 +105,19 @@ public class JadeComponentAdapter	extends AbstractComponentAdapter	implements IC
 	 */
 	protected void setJadeAgent(ComponentAgent agent)
 	{
-		this.agent	= agent;
-	}
+		boolean	dowakeup;
+		synchronized(this)
+		{
+//			System.out.println("setJadeAgent "+this+", "+wakeup);
+			dowakeup	= wakeup;
+			this.agent	= agent;
+		}
+
+		if(dowakeup)
+		{
+			agent.wakeup();
+		}
+}
 
 	/**
 	 *  Get the agent.
