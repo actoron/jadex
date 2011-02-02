@@ -78,8 +78,8 @@ public class RemoteDirNode extends RemoteFileNode
 					}
 					else
 					{
-						ModelTreePanel.createNode(RemoteDirNode.this, model, tree, 
-							file, iconcache, filter, exta).addResultListener(lis);
+						lis.resultAvailable(ModelTreePanel.createNode(RemoteDirNode.this, model, tree, 
+							file, iconcache, filter, exta));
 					}
 				}
 			}

@@ -73,8 +73,7 @@ public class DirNode extends FileNode
 					}
 					else
 					{
-						ModelTreePanel.createNode(DirNode.this, model, tree, file, iconcache, filter, null)
-							.addResultListener(lis);
+						lis.resultAvailable(ModelTreePanel.createNode(DirNode.this, model, tree, file, iconcache, filter, null));
 					}
 				}
 			}

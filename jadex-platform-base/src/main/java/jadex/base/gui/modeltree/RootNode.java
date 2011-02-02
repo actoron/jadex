@@ -6,6 +6,7 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentProperties;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.Icon;
@@ -56,7 +57,7 @@ public class RootNode extends AbstractTreeNode
 	 */
 	public Icon	getIcon()
 	{
-		return null;//iconcache.getIcon(this, desc.getType());
+		return null;
 	}
 	
 	/**
@@ -65,6 +66,8 @@ public class RootNode extends AbstractTreeNode
 	 */
 	public void refresh(boolean recurse, boolean force)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
 //		cms.getComponentDescription(desc.getName()).addResultListener(new SwingDefaultResultListener()
 //		{
 //			public void customResultAvailable(Object result)
@@ -94,6 +97,8 @@ public class RootNode extends AbstractTreeNode
 	 */
 	public void addChild(ITreeNode child)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
 		children.add(child);
 		setChildren(children);
 	}
@@ -103,8 +108,20 @@ public class RootNode extends AbstractTreeNode
 	 */
 	public void removeChild(ITreeNode child)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
 		children.remove(child);
 		setChildren(children);
+	}
+	
+	/**
+	 *  Remove a path entry from the tree.
+	 */
+	public void removeAll()
+	{
+		assert SwingUtilities.isEventDispatchThread();
+		
+		setChildren(Collections.EMPTY_LIST);
 	}
 	
 	//-------- methods --------
@@ -149,5 +166,47 @@ public class RootNode extends AbstractTreeNode
 		assert SwingUtilities.isEventDispatchThread();
 
 		return false;
+	}
+	
+	/**
+	 *  Get all children.
+	 */
+	public ITreeNode[] getChildren()
+	{
+		assert SwingUtilities.isEventDispatchThread();
+		
+		return (ITreeNode[])children.toArray(new ITreeNode[0]);
+	}
+	
+	/**
+	 *  Returns the index of node in the receivers children. If the receiver
+	 *  does not contain node, -1 will be returned.
+	 *  @param node
+	 *  @return an int.
+	 */
+	public int getIndex(ITreeNode node)
+	{
+		return children!=null ? children.indexOf(node) : -1;
+	}
+	
+	/**
+	 *  Get the path entries.
+	 */
+	public String[]	getPathEntries()
+	{
+		String[]	ret	= new String[getChildCount()];
+		for(int i=0; i<ret.length; i++)
+		{
+			ITreeNode	node	= getChild(i);
+			if(node instanceof DirNode)
+			{
+				ret[i]	= ((DirNode)node).getFile().getAbsolutePath();
+			}
+			else
+			{
+				ret[i]	= ((RemoteDirNode)node).getRemoteFile().getPath();
+			}
+		}
+		return ret;
 	}
 }

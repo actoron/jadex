@@ -10,8 +10,11 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IRemoteFilter;
+import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.TreeExpansionHandler;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
@@ -22,10 +25,10 @@ import jadex.commons.gui.ToolTipAction;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -35,23 +38,20 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.UIDefaults;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.plaf.basic.BasicSplitPaneDivider;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.tree.TreePath;
 
 /**
@@ -125,7 +125,9 @@ public class ModelTreePanel extends JPanel // JSplitPane
 	
 	/** The filter. */
 	protected IRemoteFilter filefilter;
-
+	
+	/** Tree expansion handler remembers open tree nodes. */
+	protected ExpansionHandler expansionhandler;
 	
 	//-------- constructors --------
 	
@@ -159,6 +161,7 @@ public class ModelTreePanel extends JPanel // JSplitPane
 		this.model	= new AsyncTreeModel();
 		this.tree	= new JTree(model);
 		this.iconcache = new ModelIconCache(exta, tree);
+		this.expansionhandler = new ExpansionHandler(tree);
 		tree.setCellRenderer(new AsyncTreeCellRenderer());
 		tree.addMouseListener(new TreePopupListener());
 		tree.setShowsRootHandles(true);
@@ -687,15 +690,8 @@ public class ModelTreePanel extends JPanel // JSplitPane
 						}
 						
 						final RootNode root = (RootNode)getModel().getRoot();
-						ModelTreePanel.createNode(root, model, tree, file, iconcache, filefilter, exta)
-							.addResultListener(new DefaultResultListener()
-						{
-							public void resultAvailable(Object result)
-							{
-								root.addChild((ITreeNode)result);
-							}
-						});
-						
+						ITreeNode node = createNode(root, model, tree, file, iconcache, filefilter, exta);
+						root.addChild(node);
 					}
 					else
 					{
@@ -762,14 +758,8 @@ public class ModelTreePanel extends JPanel // JSplitPane
 			}
 				
 			final RootNode root = (RootNode)getModel().getRoot();
-			ModelTreePanel.createNode(root, model, tree, new RemoteFile(filename, filename, true), iconcache, filefilter, exta)
-				.addResultListener(new DefaultResultListener()
-			{
-				public void resultAvailable(Object result)
-				{
-					root.addChild((ITreeNode)result);
-				}
-			});
+			ITreeNode node = ModelTreePanel.createNode(root, model, tree, new RemoteFile(filename, filename, true), iconcache, filefilter, exta);
+			root.addChild(node);
 		}
 
 		/**
@@ -803,25 +793,25 @@ public class ModelTreePanel extends JPanel // JSplitPane
 	/**
 	 *  Create a new component node.
 	 */
-	public static IFuture createNode(ITreeNode parent, AsyncTreeModel model, 
+	public static ITreeNode createNode(ITreeNode parent, AsyncTreeModel model, 
 		JTree tree, Object value, ModelIconCache iconcache, IRemoteFilter filter, IExternalAccess exta)
 	{
-		final Future ret = new Future();
+		ITreeNode ret = null;
 		
 		if(value instanceof File)
 		{
 			File file = (File)value;
 			if(file.isDirectory())
 			{
-				ret.setResult(new DirNode(parent, model, tree, file, iconcache, filter));
+				ret = new DirNode(parent, model, tree, file, iconcache, filter);
 			}
 			else if(parent!=model.getRoot())
 			{
-				ret.setResult(new FileNode(parent, model, tree, file, iconcache));
+				ret = new FileNode(parent, model, tree, file, iconcache);
 			}
 			else
 			{
-				ret.setResult(new JarNode(parent, model, tree, file, iconcache, filter));
+				ret = new JarNode(parent, model, tree, file, iconcache, filter);
 			}
 		}
 		else if(value instanceof RemoteFile)
@@ -829,22 +819,213 @@ public class ModelTreePanel extends JPanel // JSplitPane
 			RemoteFile file = (RemoteFile)value;
 			if(file.isDirectory())
 			{
-				ret.setResult(new RemoteDirNode(parent, model, tree, file, iconcache, filter, exta));
+				ret = new RemoteDirNode(parent, model, tree, file, iconcache, filter, exta);
 			}
 			else if(parent!=model.getRoot())
 			{
-				ret.setResult(new RemoteFileNode(parent, model, tree, file, iconcache, exta));
+				ret = new RemoteFileNode(parent, model, tree, file, iconcache, exta);
 			}
 //			else
 //			{
 //				ret.setResult(new JarNode(parent, model, tree, file, iconcache, filter));
 //			}
 		}
-		else
-		{
-			ret.setException(new IllegalArgumentException("Unknown value: "+value));
-		}
+//		else
+//		{
+//			ret.setException(new IllegalArgumentException("Unknown value: "+value));
+//		}
+		
+		if(ret==null)
+			new IllegalArgumentException("Unknown value: "+value);
+		
 		return ret;
+	}
+	
+	/**
+	 *  Write current state into properties.
+	 */
+	public Properties	getProperties()
+	{
+		Properties	props	= new Properties();
+		// Save tree properties.
+		
+		ModelExplorerProperties	mep	= new ModelExplorerProperties();
+		RootNode root = (RootNode)getTree().getModel().getRoot();
+		String[] paths	= root.getPathEntries();
+		for(int i=0; i<paths.length; i++)
+			paths[i]	= SUtil.convertPathToRelative(paths[i]);
+		mep.setRootPathEntries(paths);
+		mep.setSelectedNode(getTree().getSelectionPath()==null ? null
+			: NodePath.createNodePath((FileNode)getTree().getSelectionPath().getLastPathComponent()));
+		List	expanded	= new ArrayList();
+		Enumeration exp = getTree().getExpandedDescendants(new TreePath(root));
+		if(exp!=null)
+		{
+			while(exp.hasMoreElements())
+			{
+				TreePath	path	= (TreePath)exp.nextElement();
+				if(path.getLastPathComponent() instanceof FileNode)
+				{
+					expanded.add(NodePath.createNodePath((FileNode)path.getLastPathComponent()));
+				}
+			}
+		}
+		mep.setExpandedNodes((NodePath[])expanded.toArray(new NodePath[expanded.size()]));
+		// todo: remove ThreadSuspendable()
+		ClassLoader cl = ((ILibraryService)SServiceProvider.getService(exta.getServiceProvider(), 
+			ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable())).getClassLoader();
+		String	treesave	= JavaWriter.objectToXML(mep, cl);	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
+		props.addProperty(new Property("tree", treesave));
+				
+		// Save the last loaded file.
+		File sf = filechooser.getSelectedFile();
+		if(sf!=null)
+		{
+			String	lastpath	= SUtil.convertPathToRelative(sf.getAbsolutePath());
+			props.addProperty(new Property("lastpath", lastpath));
+		}
+
+		// Save refresh/checking flags.
+//		props.addProperty(new Property("refresh", Boolean.toString(refresh)));
+		
+		// Save the state of file filters
+//		if(filtermenu!=null && filtermenu.getComponentCount()>0)
+//		{
+//			Properties	filterprops	= new Properties(null, "filter", null);
+//			for(int i=0; i<filtermenu.getComponentCount(); i++)
+//			{
+//				String	name	= ((JCheckBoxMenuItem)filtermenu.getComponent(i)).getText();
+//				boolean	selected	= ((JCheckBoxMenuItem)filtermenu.getComponent(i)).isSelected();
+//				filterprops.addProperty(new Property(name, ""+selected));
+//			}
+//			props.addSubproperties(filterprops);
+//		}
+		
+		return props;
+	}
+
+	/**
+	 *  Update tool from given properties.
+	 */
+	public void setProperties(final Properties props)
+	{
+//		refresh	= false;	// stops crawler task, if any
+		
+		// Load root node.
+		String	treexml	= props.getStringProperty("tree");
+		// todo: hack!
+		ILibraryService ls = (ILibraryService)SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
+		if(treexml!=null)
+		{
+			try
+			{
+				// todo: hack!
+				ClassLoader cl = ls.getClassLoader();
+				ModelExplorerProperties	mep	= (ModelExplorerProperties)JavaReader.objectFromXML(treexml, cl); 	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
+//				ModelExplorerProperties	mep	= (ModelExplorerProperties)Nuggets.objectFromXML(treexml, cl);
+//				this.root	= new RootNode();
+				RootNode root = (RootNode)getTree().getModel().getRoot();
+				root.removeAll();
+				String[] entries = mep.getRootPathEntries();
+				for(int i=0; i<entries.length; i++)
+				{
+					ITreeNode node = createNode(root, model, tree, new File(entries[i]), iconcache, filefilter, exta);
+					root.addChild(node);
+//					root.addPathEntry(new File(entries[i]));
+				}
+//				((ModelExplorerTreeModel)getModel()).setRoot(this.root);
+
+				ITreeNode[] childs = root.getChildren();
+				for(int i=0; i<childs.length; i++)
+				{
+					// Todo: support non-file (e.g. url nodes).
+					File file = ((FileNode)childs[i]).getFile();
+					
+					// Hack!!! Build new file object. This strips trailing "/" from jar file nodes.
+					file	= new File(file.getParentFile(), file.getName());
+		//			String fname = file.getAbsolutePath();
+					// Todo: slash is needed for package determination(?)
+					// but breaks for jar files...
+		//			if(file.isDirectory() && !fname.endsWith(System.getProperty("file.separator", "/"))
+		//				&& !file.getName().endsWith(".jar"))
+		//			{
+		//				fname += "/";
+		//			}
+//						try
+					{
+//							ls.addPath(file.getAbsolutePath());
+						try
+						{
+							ls.addURL(file.toURI().toURL());
+						}
+						catch(MalformedURLException ex)
+						{
+							ex.printStackTrace();
+						}
+						//					urls.add(file.toURL());
+					}
+//						catch(MalformedURLException ex)
+//						{
+//							String failed = SUtil.wrapText("Could not add path\n\n"+ex.getMessage());
+//							JOptionPane.showMessageDialog(SGUI.getWindowParent(ModelExplorer.this), failed, "Path Error", JOptionPane.ERROR_MESSAGE);
+						//e.printStackTrace();
+//						}
+				}
+				
+				// Select the last selected model in the tree.
+				expansionhandler.setSelectedPath(mep.getSelectedNode());
+
+				// Load the expanded tree nodes.
+				expansionhandler.setExpandedPaths(mep.getExpandedNodes());
+
+				((AsyncTreeModel)getModel()).fireTreeChanged(root);
+			}
+			catch(Exception e)
+			{
+				System.err.println("Cannot load project tree: "+e.getClass().getName());
+//				e.printStackTrace();
+			}
+		}
+				
+		// Load last selected model.
+		String lastpath = props.getStringProperty("lastpath");
+		if(lastpath!=null)
+		{
+			try
+			{
+				File mo_file = new File(lastpath);
+				filechooser.setCurrentDirectory(mo_file.getParentFile());
+				filechooser.setSelectedFile(mo_file);
+			}
+			catch(Exception e)
+			{
+			}
+		}				
+				
+		// Load refresh/checking flag (defaults to true).
+//		refresh	= !"false".equals(props.getStringProperty("refresh"));
+//		if(refreshmenu!=null)
+//			refreshmenu.setState(this.refresh);
+//		resetCrawler();
+		
+		// Load the filter settings
+//		Properties	filterprops	= props.getSubproperty("filter");
+//		if(filterprops!=null && filtermenu!=null && filtermenu.getComponentCount()>0)
+//		{
+//			for(int i=0; i<filtermenu.getComponentCount(); i++)
+//			{
+//				JCheckBoxMenuItem	item	= (JCheckBoxMenuItem)filtermenu.getComponent(i);
+//				String	name	= item.getText();
+//				if(filterprops.getProperty(name)!=null)
+//				{
+//					item.setSelected(filterprops.getBooleanProperty(name));
+//				}
+//				else
+//				{
+//					item.setSelected(true);
+//				}
+//			}
+//		}
 	}
 	
 	/**

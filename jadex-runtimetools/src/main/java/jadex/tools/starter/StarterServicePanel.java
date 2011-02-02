@@ -6,6 +6,7 @@ import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.modeltree.FileNode;
 import jadex.base.gui.modeltree.ModelTreePanel;
 import jadex.base.gui.modeltree.RemoteFileNode;
+import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
@@ -17,6 +18,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
@@ -39,6 +42,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JMenu;
@@ -466,5 +474,47 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 * Load the properties.
+	 */
+	public void setProperties(Properties props)
+	{
+		// todo: checking
+		
+//		checkingmenu.setSelected(false);
+//		System.out.println("Starter set props: "+props);
+		
+		Properties	mpanelprops	= props.getSubproperty("mpanel");
+		if(mpanelprops!=null)
+			mpanel.setProperties(mpanelprops);
+		Properties	spanelprops	= props.getSubproperty("spanel");
+		if(spanelprops!=null)
+			spanel.setProperties(spanelprops);
+
+		lsplit.setDividerLocation(props.getIntProperty("leftsplit_location"));
+		csplit.setDividerLocation(props.getIntProperty("mainsplit_location"));
+
+//		checkingmenu.setSelected(props.getBooleanProperty("checking"));
+	}
+
+	/**
+	 * Save the properties.
+	 * @param props
+	 */
+	public Properties	getProperties()
+	{
+		Properties	props	= new Properties();
+		
+		AbstractJCCPlugin.addSubproperties(props, "mpanel", mpanel.getProperties());
+		AbstractJCCPlugin.addSubproperties(props, "spanel", spanel.getProperties());
+		
+		props.addProperty(new Property("leftsplit_location", ""+lsplit.getDividerLocation()));
+		props.addProperty(new Property("mainsplit_location", ""+csplit.getDividerLocation()));
+		
+//		props.addProperty(new Property("checking", ""+checkingmenu.isSelected()));
+		
+		return props;
 	}
 }
