@@ -111,7 +111,7 @@ public class LibraryService extends BasicService implements ILibraryService
 	 */
 	public void addURL(URL url)
 	{
-//		System.out.println("add "+url);
+		System.out.println("add "+url);
 		
 		ILibraryServiceListener[] lis;
 		synchronized(this)

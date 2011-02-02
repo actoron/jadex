@@ -82,12 +82,12 @@ public class Test //extends TestCase
 //				t.testSet();
 //				t.testMap();
 //				t.testInnerClass();
-//				t.testURL();
+				t.testURL();
 //				t.testLoggingLevel();
 //				t.testInetAddress();
 //				t.testBeanWithPublicFields();
 //				t.testAnonymousInnerClass();
-				t.testImage();
+//				t.testImage();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -369,7 +369,8 @@ public class Test //extends TestCase
 	 */
 	public void testURL() throws Exception
 	{
-		URL url = new URL("http", "host", 4711, "file");
+//		URL url = new URL("http", "host", 4711, "file");
+		URL url = new URL("file:/C:/projects/jadex/jadex-applications-micro/target/classes/");
 		
 		doWriteAndRead(url);
 	}

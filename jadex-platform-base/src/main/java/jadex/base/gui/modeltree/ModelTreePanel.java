@@ -632,6 +632,7 @@ public class ModelTreePanel extends JSplitPane
 									File f = new File(fcopy.getParentFile(), fcopy.getName());
 									try
 									{
+										System.out.println("adding:"+f.toURI().toURL());
 										ls.addURL(f.toURI().toURL());
 									}
 									catch(MalformedURLException ex)
