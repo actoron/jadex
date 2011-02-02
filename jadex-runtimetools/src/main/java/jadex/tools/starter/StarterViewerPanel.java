@@ -5,6 +5,7 @@ import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IService;
 
@@ -36,7 +37,7 @@ public class StarterViewerPanel extends AbstractServiceViewerPanel
 			public void resultAvailable(Object result)
 			{
 				panel = new StarterServicePanel(jcc, (IComponentManagementService)service);
-				ret.setResult(result);
+				panel.init().addResultListener(new DelegationResultListener(ret));
 			}
 			
 			public void exceptionOccurred(Exception exception)

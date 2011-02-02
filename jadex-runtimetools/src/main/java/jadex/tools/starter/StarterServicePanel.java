@@ -109,6 +109,14 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 		super(new BorderLayout());
 		this.jcc = jcc;
 		this.cms = (IComponentManagementService)cms;
+	}
+	
+	/**
+	 * 
+	 */
+	public IFuture init()
+	{
+		final Future ret = new Future();
 		
 		getComponentForService(jcc.getExternalAccess().getServiceProvider(), cms)
 			.addResultListener(new SwingDefaultResultListener()
@@ -124,7 +132,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 				lsplit.setOneTouchExpandable(true);
 				lsplit.setResizeWeight(0.7);
 		
-//				mpanel = new ModelExplorer(jcc.getExternalAccess(), new StarterNodeFunctionality(jcc));
+	//			mpanel = new ModelExplorer(jcc.getExternalAccess(), new StarterNodeFunctionality(jcc));
 				mpanel = new ModelTreePanel(exta, !SUtil.equals(exta.getComponentIdentifier().getPlatformName(), jcc.getComponentIdentifier().getPlatformName()));
 		//		mpanel.setAction(FileNode.class, new INodeAction()
 		//		{
@@ -139,8 +147,8 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 		//				}
 		//			}
 		//		});
-//				mpanel.setPopupBuilder(new PopupBuilder(new Object[]{new StartComponentMenuItemConstructor(), mpanel.ADD_PATH,
-//					mpanel.REMOVE_PATH, mpanel.REFRESH}));
+	//			mpanel.setPopupBuilder(new PopupBuilder(new Object[]{new StartComponentMenuItemConstructor(), mpanel.ADD_PATH,
+	//				mpanel.REMOVE_PATH, mpanel.REFRESH}));
 				mpanel.getTree().addTreeSelectionListener(new TreeSelectionListener()
 				{
 					public void valueChanged(TreeSelectionEvent e)
@@ -273,8 +281,11 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 				});
 				
 				add(csplit, BorderLayout.CENTER);
+				ret.setResult(null);
 			}
 		});
+		
+		return ret;
 	}
 	
 	/**
