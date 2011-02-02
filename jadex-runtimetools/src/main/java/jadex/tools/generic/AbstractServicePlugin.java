@@ -43,7 +43,7 @@ public abstract class AbstractServicePlugin extends AbstractGenericPlugin
 	 */
 	public String convertToString(Object element)
 	{
-		return ((IService)element).getServiceIdentifier().getServiceName();
+		return ((IService)element).getServiceIdentifier().toString();
 	}
 	
 	/**

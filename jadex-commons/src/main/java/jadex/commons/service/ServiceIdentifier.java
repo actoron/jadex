@@ -128,8 +128,9 @@ public class ServiceIdentifier implements IServiceIdentifier
 	 */
 	public String toString()
 	{
-		return "ServiceIdentifier(providerid=" + providerid + ", type=" + type
-				+ ", servicename=" + servicename + ")";
+		return getServiceName()+"@"+getProviderId();
+//		return "ServiceIdentifier(providerid=" + providerid + ", type=" + type
+//				+ ", servicename=" + servicename + ")";
 	}
 	
 	

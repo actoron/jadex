@@ -1,7 +1,6 @@
 package jadex.tools.generic;
 
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
-import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.commons.IFuture;
 import jadex.commons.Properties;
@@ -10,6 +9,7 @@ import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.ObjectCardLayout;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,10 +21,12 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 
 /**
@@ -113,6 +115,16 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 		northp.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Instance Settings "));
 
 		selcb = new JComboBox(); 
+		selcb.setRenderer(new BasicComboBoxRenderer()
+		{
+		    public Component getListCellRendererComponent(JList list, 
+		    	Object value, int index, boolean isSelected, boolean cellHasFocus) 
+		    {
+		    	this.setText(value!=null? convertToString(value): null);
+		    	return this;
+		    }
+		});
+		
 		remotecb = new JCheckBox("Remote");
 		final JButton refreshb = new JButton("Refresh");
 		northp.add(new JLabel("Select instance"));

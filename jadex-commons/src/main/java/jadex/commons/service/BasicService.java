@@ -209,7 +209,7 @@ public class BasicService implements IInternalService
 	{
 		synchronized(BasicService.class)
 		{
-			return service.getName()+"_#"+idcnt++;
+			return SReflect.getInnerClassName(service)+"_#"+idcnt++;
 		}
 	}
 	
