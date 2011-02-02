@@ -39,7 +39,7 @@ public class RemoteDirNode extends RemoteFileNode
 	 *  Create a new service container node.
 	 */
 	public RemoteDirNode(ITreeNode parent, AsyncTreeModel model, JTree tree, RemoteFile file, 
-		ComponentIconCache iconcache, IRemoteFilter filter, IExternalAccess exta)
+		ModelIconCache iconcache, IRemoteFilter filter, IExternalAccess exta)
 	{
 		super(parent, model, tree, file, iconcache, exta);
 		this.filter = filter;

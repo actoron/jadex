@@ -42,7 +42,7 @@ public class TreeTableNodeType
 	protected boolean[]	excludes;
 
 	/** The validators for editable columns (if any). */
-	protected IValidator[]	validators;
+//	protected IValidator[]	validators;
 
 	/** The supported popup actions. */
 	protected List	actions;
@@ -251,33 +251,33 @@ public class TreeTableNodeType
 		return (Action[])ret.toArray(new Action[ret.size()]);
 	}
 	
-	/**
-	 *  Get the validator for a column (if any).
-	 */
-	public IValidator	getValidator(int column)
-	{
-		return (validators!=null && validators.length>column && validators[column]!=null)
-			? validators[column]
-			: supertype!=null ? supertype.getValidator(column) : null;
-	}
-	
-	/**
-	 *  Set the validator for a given column.
-	 */
-	public void	setValidator(String column, IValidator validator)
-	{
-		String[] columns	= getColumns();
-		if(validators==null)
-		{
-			this.validators	= new IValidator[columns.length];
-		}
-		for(int i=0; i<columns.length; i++)
-		{
-			if(columns[i].equals(column))
-			{
-				validators[i]	= validator;
-				break;
-			}
-		}		
-	}
+//	/**
+//	 *  Get the validator for a column (if any).
+//	 */
+//	public IValidator	getValidator(int column)
+//	{
+//		return (validators!=null && validators.length>column && validators[column]!=null)
+//			? validators[column]
+//			: supertype!=null ? supertype.getValidator(column) : null;
+//	}
+//	
+//	/**
+//	 *  Set the validator for a given column.
+//	 */
+//	public void	setValidator(String column, IValidator validator)
+//	{
+//		String[] columns	= getColumns();
+//		if(validators==null)
+//		{
+//			this.validators	= new IValidator[columns.length];
+//		}
+//		for(int i=0; i<columns.length; i++)
+//		{
+//			if(columns[i].equals(column))
+//			{
+//				validators[i]	= validator;
+//				break;
+//			}
+//		}		
+//	}
 }

@@ -33,7 +33,7 @@ public class DirNode extends FileNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public DirNode(ITreeNode parent, AsyncTreeModel model, JTree tree, File file, ComponentIconCache iconcache, IRemoteFilter filter)
+	public DirNode(ITreeNode parent, AsyncTreeModel model, JTree tree, File file, ModelIconCache iconcache, IRemoteFilter filter)
 	{
 		super(parent, model, tree, file, iconcache);
 		assert file.isDirectory();

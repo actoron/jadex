@@ -23,7 +23,7 @@ public class RemoteFileNode  extends AbstractTreeNode
 	protected IExternalAccess exta;
 	
 	/** The icon cache. */
-	protected final ComponentIconCache	iconcache;
+	protected final ModelIconCache	iconcache;
 	
 	/** The relative file name. */
 //	protected String relative;
@@ -36,7 +36,7 @@ public class RemoteFileNode  extends AbstractTreeNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public RemoteFileNode(ITreeNode parent, AsyncTreeModel model, JTree tree, RemoteFile file, ComponentIconCache iconcache, IExternalAccess exta)
+	public RemoteFileNode(ITreeNode parent, AsyncTreeModel model, JTree tree, RemoteFile file, ModelIconCache iconcache, IExternalAccess exta)
 	{
 		super(parent, model, tree);
 		

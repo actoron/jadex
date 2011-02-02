@@ -5,6 +5,7 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.modeltree.FileNode;
 import jadex.base.gui.modeltree.ModelTreePanel;
+import jadex.base.gui.modeltree.RemoteFileNode;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
@@ -17,6 +18,7 @@ import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
+import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
@@ -123,7 +125,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 				lsplit.setResizeWeight(0.7);
 		
 //				mpanel = new ModelExplorer(jcc.getExternalAccess(), new StarterNodeFunctionality(jcc));
-				mpanel = new ModelTreePanel(exta);
+				mpanel = new ModelTreePanel(exta, !SUtil.equals(exta.getComponentIdentifier().getPlatformName(), jcc.getComponentIdentifier().getPlatformName()));
 		//		mpanel.setAction(FileNode.class, new INodeAction()
 		//		{
 		//			public void validStateChanged(TreeNode node, boolean valid)
@@ -144,7 +146,18 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 					public void valueChanged(TreeSelectionEvent e)
 					{
 						Object	node = mpanel.getTree().getLastSelectedPathComponent();
+						String filename = null;
 						if(node instanceof FileNode)
+						{
+							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+							filename = ((FileNode)node).getFile().getAbsolutePath();
+						}
+						else if(node instanceof RemoteFileNode)
+						{
+							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+							filename = ((RemoteFileNode)node).getRemoteFile().getPath();
+						}
+						if(filename!=null)
 						{
 							// Models have to be loaded with absolute path.
 							// An example to facilitate understanding:
@@ -154,14 +167,15 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 							//  +-classes2
 							//  |  +- MyComponent.component.xml
 		
-							final String model = ((FileNode)node).getRelativePath();
 		//					if(getJCC().getComponent().getPlatform().getComponentFactory().isLoadable(model))
-							SComponentFactory.isLoadable(jcc.getExternalAccess(), model).addResultListener(new SwingDefaultResultListener(spanel)
+							final String ffilename = filename;
+							SComponentFactory.isLoadable(exta, filename).addResultListener(new SwingDefaultResultListener(spanel)
 							{
 								public void customResultAvailable(Object result)
 								{
 									if(((Boolean)result).booleanValue())
-										loadModel(model);
+										loadModel(ffilename);
+									mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 								}
 							});
 		//					else if(getJCC().getComponent().getPlatform().getApplicationFactory().isLoadable(model))
@@ -182,18 +196,28 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 							if(e.getClickCount() == 2)
 							{
 								Object	node = mpanel.getTree().getLastSelectedPathComponent();
+								String filename = null;
 								if(node instanceof FileNode)
 								{
 									mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-									final String type = ((FileNode)node).getFile().getAbsolutePath();
-		//							if(getJCC().getComponent().getPlatform().getComponentFactory().isStartable(type))
-									// todo: resultcollect = false?
-									SComponentFactory.isStartable(jcc.getExternalAccess(), type).addResultListener(new SwingDefaultResultListener(spanel)
+									filename = ((FileNode)node).getFile().getAbsolutePath();
+								}
+								else if(node instanceof RemoteFileNode)
+								{
+									mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+									filename = ((RemoteFileNode)node).getRemoteFile().getPath();
+								}
+		//						if(getJCC().getComponent().getPlatform().getComponentFactory().isStartable(type))
+								// todo: resultcollect = false?
+								if(filename!=null)
+								{
+									final String ftype = filename;
+									SComponentFactory.isStartable(jcc.getExternalAccess(), filename).addResultListener(new SwingDefaultResultListener(spanel)
 									{
 										public void customResultAvailable(Object result)
 										{
 											if(((Boolean)result).booleanValue())
-												StarterPanel.createComponent(exta, jcc, type, null, null, null, false, null, null, null, null, null, StarterServicePanel.this);
+												StarterPanel.createComponent(exta, jcc, ftype, null, null, null, false, null, null, null, null, null, StarterServicePanel.this);
 											mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 										}
 									});

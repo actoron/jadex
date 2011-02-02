@@ -1197,8 +1197,14 @@ public class StarterPanel extends JPanel
 		
 		JLabel namel = new JLabel(arg.getName());
 		final JValidatorTextField valt = new JValidatorTextField(loadargs!=null && loadargs.length>y ? loadargs[y] : "", 15);
-		valt.setValidator(new ParserValidator(ls.getClassLoader()));
-		
+		try
+		{
+			valt.setValidator(new ParserValidator(ls.getClassLoader()));
+		}
+		catch(Exception e)
+		{
+			// ignore, currently validator does not work remotely
+		}
 		String configname = (String)config.getSelectedItem();
 		JTextField mvalt = new JTextField(""+arg.getDefaultValue(configname));
 		// Java JTextField bug: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4247013

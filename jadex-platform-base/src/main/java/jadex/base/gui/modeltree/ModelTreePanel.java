@@ -67,6 +67,9 @@ public class ModelTreePanel extends JSplitPane
 	
 	//-------- attributes --------
 	
+	/** The remote flag. */
+	protected final boolean remote;
+	
 	/** The external access. */
 	protected final IExternalAccess	exta;
 	
@@ -98,7 +101,7 @@ public class ModelTreePanel extends JSplitPane
 	protected JFileChooser filechooser;
 	
 	/** The iconcache. */
-	protected ComponentIconCache iconcache;
+	protected ModelIconCache iconcache;
 	
 	/** Popup rightclick. */
 	protected PopupBuilder pubuilder;
@@ -114,21 +117,30 @@ public class ModelTreePanel extends JSplitPane
 	 */
 	public ModelTreePanel(IExternalAccess exta)
 	{
-		this(exta, VERTICAL_SPLIT);
+		this(exta, false);
 	}
 	
 	/**
 	 *  Create a new component tree panel.
 	 */
-	public ModelTreePanel(final IExternalAccess exta, int orientation)
+	public ModelTreePanel(IExternalAccess exta, boolean remote)
+	{
+		this(exta, VERTICAL_SPLIT, remote);
+	}
+	
+	/**
+	 *  Create a new component tree panel.
+	 */
+	public ModelTreePanel(final IExternalAccess exta, int orientation, boolean remote)
 	{
 		super(orientation);
 		this.setOneTouchExpandable(true);
 		
 		this.exta	= exta;
+		this.remote = remote;
 		this.model	= new AsyncTreeModel();
 		this.tree	= new JTree(model);
-		this.iconcache = new ComponentIconCache(exta, tree);
+		this.iconcache = new ModelIconCache(exta, tree);
 		tree.setCellRenderer(new AsyncTreeCellRenderer());
 		tree.addMouseListener(new TreePopupListener());
 		tree.setShowsRootHandles(true);
@@ -181,7 +193,6 @@ public class ModelTreePanel extends JSplitPane
 					showPopUp(e.getX(), e.getY());
 			}
 		});
-		
 		
 		this.filefilter = new IRemoteFilter()
 		{
@@ -624,7 +635,7 @@ public class ModelTreePanel extends JSplitPane
 		public boolean isEnabled()
 		{
 			ITreeNode rm = (ITreeNode)tree.getLastSelectedPathComponent();
-			return rm==null;
+			return rm==null && !remote;
 		}
 	};
 	
@@ -664,7 +675,7 @@ public class ModelTreePanel extends JSplitPane
 			}
 				
 			final RootNode root = (RootNode)getModel().getRoot();
-			ModelTreePanel.createNode(root, model, tree, new RemoteFile(null, filename, true), iconcache, filefilter, exta)
+			ModelTreePanel.createNode(root, model, tree, new RemoteFile(filename, filename, true), iconcache, filefilter, exta)
 				.addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -681,7 +692,7 @@ public class ModelTreePanel extends JSplitPane
 		public boolean isEnabled()
 		{
 			ITreeNode rm = (ITreeNode)tree.getLastSelectedPathComponent();
-			return rm==null;
+			return rm==null && remote;
 		}
 	};
 
@@ -760,7 +771,7 @@ public class ModelTreePanel extends JSplitPane
 	 *  Create a new component node.
 	 */
 	public static IFuture createNode(ITreeNode parent, AsyncTreeModel model, 
-		JTree tree, Object value, ComponentIconCache iconcache, IRemoteFilter filter, IExternalAccess exta)
+		JTree tree, Object value, ModelIconCache iconcache, IRemoteFilter filter, IExternalAccess exta)
 	{
 		final Future ret = new Future();
 		

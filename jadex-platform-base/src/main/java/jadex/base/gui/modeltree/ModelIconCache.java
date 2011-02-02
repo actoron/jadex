@@ -17,7 +17,7 @@ import javax.swing.tree.TreeModel;
  *  Cache for component icons.
  *  Asynchronously loads icons and updates tree.
  */
-public class ComponentIconCache
+public class ModelIconCache
 {
 	/**
 	 * The image icons.
@@ -25,9 +25,9 @@ public class ComponentIconCache
 	protected final UIDefaults icons = new UIDefaults(new Object[]
 	{
 //		"scanning_on",	SGUI.makeIcon(DefaultNodeFunctionality.class, "/jadex/base/gui/images/new_refresh_anim.gif"),
-		"src_folder", SGUI.makeIcon(ComponentIconCache.class, "/jadex/base/gui/images/new_src_folder.png"),
-		"src_jar", SGUI.makeIcon(ComponentIconCache.class, "/jadex/base/gui/images/new_src_jar.png"),
-		"package", SGUI.makeIcon(ComponentIconCache.class, "/jadex/base/gui/images/new_package.png")
+		"src_folder", SGUI.makeIcon(ModelIconCache.class, "/jadex/base/gui/images/new_src_folder.png"),
+		"src_jar", SGUI.makeIcon(ModelIconCache.class, "/jadex/base/gui/images/new_src_jar.png"),
+		"package", SGUI.makeIcon(ModelIconCache.class, "/jadex/base/gui/images/new_package.png")
 	});
 	
 	//-------- attributes --------
@@ -46,7 +46,7 @@ public class ComponentIconCache
 	/**
 	 *  Create an icon cache.
 	 */
-	public ComponentIconCache(IExternalAccess exta, JTree tree)
+	public ModelIconCache(IExternalAccess exta, JTree tree)
 	{
 //		this.icons	= new HashMap();
 		this.exta	= exta;

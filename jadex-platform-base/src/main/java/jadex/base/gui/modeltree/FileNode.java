@@ -22,7 +22,7 @@ public class FileNode	extends AbstractTreeNode
 	protected File file;
 	
 	/** The icon cache. */
-	protected final ComponentIconCache	iconcache;
+	protected final ModelIconCache	iconcache;
 	
 	/** The relative file name. */
 	protected String relative;
@@ -35,7 +35,7 @@ public class FileNode	extends AbstractTreeNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public FileNode(ITreeNode parent, AsyncTreeModel model, JTree tree, File file, ComponentIconCache iconcache)
+	public FileNode(ITreeNode parent, AsyncTreeModel model, JTree tree, File file, ModelIconCache iconcache)
 	{
 		super(parent, model, tree);
 		
