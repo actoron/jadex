@@ -70,8 +70,17 @@ public class RemoteDirNode extends RemoteFileNode
 				
 				for(Iterator it=files.iterator(); it.hasNext();)
 				{
-					ModelTreePanel.createNode(RemoteDirNode.this, model, tree, 
-						it.next(), iconcache, filter, exta).addResultListener(lis);
+					RemoteFile file = (RemoteFile)it.next();
+					ITreeNode node = getModel().getNode(file);
+					if(node!=null)
+					{
+						lis.resultAvailable(node);
+					}
+					else
+					{
+						ModelTreePanel.createNode(RemoteDirNode.this, model, tree, 
+							file, iconcache, filter, exta).addResultListener(lis);
+					}
 				}
 			}
 		});

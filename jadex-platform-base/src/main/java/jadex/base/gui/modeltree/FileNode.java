@@ -57,7 +57,7 @@ public class FileNode	extends AbstractTreeNode
 	 */
 	public Object	getId()
 	{
-		return file.toString();
+		return file;
 	}
 
 	/**

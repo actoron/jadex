@@ -65,8 +65,17 @@ public class DirNode extends FileNode
 				
 				for(Iterator it=files.iterator(); it.hasNext();)
 				{
-					ModelTreePanel.createNode(DirNode.this, model, tree, (File)it.next(), iconcache, filter, null)
-						.addResultListener(lis);
+					File file = (File)it.next();
+					ITreeNode node = getModel().getNode(file);
+					if(node!=null)
+					{
+						lis.resultAvailable(node);
+					}
+					else
+					{
+						ModelTreePanel.createNode(DirNode.this, model, tree, file, iconcache, filter, null)
+							.addResultListener(lis);
+					}
 				}
 			}
 		});

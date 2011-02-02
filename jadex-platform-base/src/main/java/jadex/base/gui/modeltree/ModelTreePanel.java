@@ -16,6 +16,7 @@ import jadex.commons.TreeExpansionHandler;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.PopupBuilder;
 import jadex.commons.gui.ToolTipAction;
 import jadex.commons.service.RequiredServiceInfo;
@@ -26,12 +27,16 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -59,10 +64,18 @@ public class ModelTreePanel extends JSplitPane
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"addpath",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/new_addfolder.png"),
-		"removepath",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/tools/common/images/new_removefolder.png"),
+		"removepath",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/new_removefolder.png"),
 //		"checker",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/tools/common/images/new_checker.png"),
-//		"refresh",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/tools/common/images/new_refresh.png"),
+		"refresh",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/tools/common/images/new_refresh.png"),
 //		"refresh_menu",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/tools/common/images/new_refresh_small.png"),
+		"refresh", SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/refresh_component.png"),
+		"refresh_tree", SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/refresh_tree.png"),
+		"show_properties", SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/new_agent_props.png"),
+		"show_details", SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/new_agent_details.png"),
+		"overlay_refresh", SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/overlay_refresh.png"),
+		"overlay_refreshtree", SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/overlay_refresh.png"),
+		"overlay_showprops", SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/overlay_doc.png"),
+		"overlay_showobject", SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/overlay_bean.png")
 	});
 	
 	//-------- attributes --------
@@ -178,22 +191,6 @@ public class ModelTreePanel extends JSplitPane
 			}
 		});
 		
-		this.pubuilder = new PopupBuilder(new Object[]{ADD_PATH, REMOVE_PATH, ADD_REMOTEPATH});
-		tree.addMouseListener(new MouseAdapter()
-		{
-			public void mousePressed(MouseEvent e)
-			{
-				if(e.isPopupTrigger())
-					showPopUp(e.getX(), e.getY());
-			}
-
-			public void mouseReleased(MouseEvent e)
-			{
-				if(e.isPopupTrigger())
-					showPopUp(e.getX(), e.getY());
-			}
-		});
-		
 		this.filefilter = new IRemoteFilter()
 		{
 			public IFuture filter(Object obj)
@@ -221,30 +218,49 @@ public class ModelTreePanel extends JSplitPane
 			}
 		};
 
-//		refresh	= new AbstractAction("Refresh", icons.getIcon("refresh"))
-//		{
-//			public void actionPerformed(ActionEvent e)
-//			{
-//				TreePath[]	paths	= tree.getSelectionPaths();
-//				for(int i=0; paths!=null && i<paths.length; i++)
-//				{
-//					((IComponentTreeNode)paths[i].getLastPathComponent()).refresh(false, true);
-//				}
-//			}
-//		};
-//
-//		refreshtree	= new AbstractAction("Refresh subtree", icons.getIcon("refresh_tree"))
-//		{
-//			public void actionPerformed(ActionEvent e)
-//			{
-//				TreePath[]	paths	= tree.getSelectionPaths();
-//				for(int i=0; paths!=null && i<paths.length; i++)
-//				{
-//					((IComponentTreeNode)paths[i].getLastPathComponent()).refresh(true, true);
-//				}
-//			}
-//		};
-//
+		this.pubuilder = new PopupBuilder(new Object[]{ADD_PATH, REMOVE_PATH, ADD_REMOTEPATH});
+		tree.addMouseListener(new MouseAdapter()
+		{
+			public void mousePressed(MouseEvent e)
+			{
+				if(e.isPopupTrigger())
+					showPopUp(e.getX(), e.getY());
+			}
+
+			public void mouseReleased(MouseEvent e)
+			{
+				if(e.isPopupTrigger())
+					showPopUp(e.getX(), e.getY());
+			}
+		});
+		
+//		RootNode r = (RootNode)getModel().getRoot();
+//		((RootNode)getModel().getRoot()).addChild(new DirNode(r, getModel(), tree, new File("c:"), iconcache, null));
+		
+		refresh	= new AbstractAction("Refresh", icons.getIcon("refresh"))
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				TreePath[]	paths	= tree.getSelectionPaths();
+				for(int i=0; paths!=null && i<paths.length; i++)
+				{
+					((ITreeNode)paths[i].getLastPathComponent()).refresh(false, true);
+				}
+			}
+		};
+
+		refreshtree	= new AbstractAction("Refresh subtree", icons.getIcon("refresh_tree"))
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				TreePath[]	paths	= tree.getSelectionPaths();
+				for(int i=0; paths!=null && i<paths.length; i++)
+				{
+					((ITreeNode)paths[i].getLastPathComponent()).refresh(true, true);
+				}
+			}
+		};
+		
 //		showprops	= new AbstractAction("Show properties", icons.getIcon("show_properties"))
 //		{
 //			public void actionPerformed(ActionEvent e)
@@ -289,34 +305,34 @@ public class ModelTreePanel extends JSplitPane
 //			}
 //		};
 //
-//		// Default overlays and popups.
-//		model.addNodeHandler(new INodeHandler()
-//		{
-//			public Icon getOverlay(IComponentTreeNode node)
-//			{
-//				return null;
-//			}
-//
-//			public Action[] getPopupActions(IComponentTreeNode[] nodes)
-//			{
-//				List ret = new ArrayList();
-//				Icon	base	= nodes[0].getIcon();
-//				
-//				if(nodes.length==1)
-//				{
-//					if(nodes[0].hasProperties())
-//					{
-//						Action pshowprops = new AbstractAction((String)showprops.getValue(Action.NAME),
-//							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_showprops")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
-//						{
-//							public void actionPerformed(ActionEvent e)
-//							{
-//								showprops.actionPerformed(e);
-//							}
-//						};
-//						ret.add(pshowprops);
-//					}
-//					
+		// Default overlays and popups.
+		model.addNodeHandler(new INodeHandler()
+		{
+			public Icon getOverlay(ITreeNode node)
+			{
+				return null;
+			}
+
+			public Action[] getPopupActions(ITreeNode[] nodes)
+			{
+				List ret = new ArrayList();
+				Icon	base	= nodes[0].getIcon();
+				
+				if(nodes.length==1)
+				{
+					if(nodes[0].hasProperties())
+					{
+						Action pshowprops = new AbstractAction((String)showprops.getValue(Action.NAME),
+							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_showprops")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								showprops.actionPerformed(e);
+							}
+						};
+						ret.add(pshowprops);
+					}
+					
 //					if(nodes[0] instanceof ServiceNode || nodes[0] instanceof IActiveComponentTreeNode)
 //					{
 //						Action pshowobject = new AbstractAction((String)showobject.getValue(Action.NAME),
@@ -329,7 +345,7 @@ public class ModelTreePanel extends JSplitPane
 //						};
 //						ret.add(pshowobject);
 //					}
-//					
+					
 //					if(nodes[0] instanceof ServiceNode && !Proxy.isProxyClass(((ServiceNode)nodes[0]).getService().getClass()))
 //					{
 //						Action premoveservice = new AbstractAction((String)removeservice.getValue(Action.NAME),
@@ -342,61 +358,61 @@ public class ModelTreePanel extends JSplitPane
 //						};
 //						ret.add(premoveservice);
 //					}
-//				}
-//				
-//				Action	prefresh	= new AbstractAction((String)refresh.getValue(Action.NAME),
-//					base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_refresh")}) : (Icon)refresh.getValue(Action.SMALL_ICON))
-//				{
-//					public void actionPerformed(ActionEvent e)
-//					{
-//						refresh.actionPerformed(e);
-//					}
-//				};
-//				ret.add(prefresh);
-//				Action	prefreshtree	= new AbstractAction((String)refreshtree.getValue(Action.NAME),
-//					base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_refreshtree")}) : (Icon)refreshtree.getValue(Action.SMALL_ICON))
-//				{
-//					public void actionPerformed(ActionEvent e)
-//					{
-//						refreshtree.actionPerformed(e);
-//					}
-//				};
-//				ret.add(prefreshtree);
-//			
-//				return (Action[])ret.toArray(new Action[0]);
-//			}
-//
-//			public Action getDefaultAction(final IComponentTreeNode node)
-//			{
-//				Action	ret	= null;
-//				if(node.hasProperties())
-//				{
-//					ret	= showprops;
-//				}
-//				return ret;
-//			}
-//		});
-//		
-		model.addNodeHandler(new INodeHandler()
-		{
-			public Icon getOverlay(ITreeNode node)
+				}
+				
+				Action	prefresh	= new AbstractAction((String)refresh.getValue(Action.NAME),
+					base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_refresh")}) : (Icon)refresh.getValue(Action.SMALL_ICON))
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						refresh.actionPerformed(e);
+					}
+				};
+				ret.add(prefresh);
+				Action	prefreshtree	= new AbstractAction((String)refreshtree.getValue(Action.NAME),
+					base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_refreshtree")}) : (Icon)refreshtree.getValue(Action.SMALL_ICON))
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						refreshtree.actionPerformed(e);
+					}
+				};
+				ret.add(prefreshtree);
+			
+				return (Action[])ret.toArray(new Action[0]);
+			}
+
+			public Action getDefaultAction(final ITreeNode node)
 			{
-				Icon	ret	= null;
+				Action	ret	= null;
+				if(node.hasProperties())
+				{
+					ret	= showprops;
+				}
 				return ret;
 			}
-			
-			public Action[] getPopupActions(final ITreeNode[] nodes)
-			{
-				java.util.List ret = new ArrayList();
-//				ret.add(ADD_PATH);
-				return (Action[])ret.toArray(new Action[ret.size()]);
-			}
-			
-			public Action getDefaultAction(ITreeNode node)
-			{
-				return null;
-			}
 		});
+		
+//		model.addNodeHandler(new INodeHandler()
+//		{
+//			public Icon getOverlay(ITreeNode node)
+//			{
+//				Icon	ret	= null;
+//				return ret;
+//			}
+//			
+//			public Action[] getPopupActions(final ITreeNode[] nodes)
+//			{
+//				java.util.List ret = new ArrayList();
+////				ret.add(ADD_PATH);
+//				return (Action[])ret.toArray(new Action[ret.size()]);
+//			}
+//			
+//			public Action getDefaultAction(ITreeNode node)
+//			{
+//				return null;
+//			}
+//		});
 //		
 //		// Remove selection in tree, when user clicks in background.
 //		tree.addMouseListener(new MouseAdapter()
@@ -409,41 +425,58 @@ public class ModelTreePanel extends JSplitPane
 //				}
 //			}
 //		});
+		
+		addKeyListener(new KeyListener()
+		{
+			public void keyTyped(KeyEvent e)
+			{
+			}
+			
+			public void keyReleased(KeyEvent e)
+			{
+				if(KeyEvent.VK_F5==e.getKeyCode())
+					((ITreeNode)getModel().getRoot()).refresh(true, true);
+			}
+			
+			public void keyPressed(KeyEvent e)
+			{
+			}
+		});
 	}
 	
 	//-------- methods --------
 	
-	/**
-	 *  Get the action for refreshing the components selected in the tree.
-	 */
-	public Action	getRefreshAction()
-	{
-		return refresh;
-	}
-	
-	/**
-	 *  Get the action for recursively refreshing the components selected in the tree.
-	 */
-	public Action	getRefreshTreeAction()
-	{
-		return refreshtree;
-	}
-	
-	/**
-	 *  Get the action for showing component properties.
-	 */
-	public Action	getShowPropertiesAction()
-	{
-		return showprops;
-	}
-	
-	/**
-	 *  Get the action for showing component details.
-	 */
-	public Action	getShowObjectDetailsAction()
-	{
-		return showobject;
-	}
+//	/**
+//	 *  Get the action for refreshing the components selected in the tree.
+//	 */
+//	public Action	getRefreshAction()
+//	{
+//		return refresh;
+//	}
+//	
+//	/**
+//	 *  Get the action for recursively refreshing the components selected in the tree.
+//	 */
+//	public Action	getRefreshTreeAction()
+//	{
+//		return refreshtree;
+//	}
+//	
+//	/**
+//	 *  Get the action for showing component properties.
+//	 */
+//	public Action	getShowPropertiesAction()
+//	{
+//		return showprops;
+//	}
+//	
+//	/**
+//	 *  Get the action for showing component details.
+//	 */
+//	public Action	getShowObjectDetailsAction()
+//	{
+//		return showobject;
+//	}
 	
 	/**
 	 *  Add a node handler.
@@ -509,10 +542,12 @@ public class ModelTreePanel extends JSplitPane
 	protected void showPopUp(int x, int y)
 	{
 		TreePath sel = tree.getPathForLocation(x, y);
-		tree.setSelectionPath(sel);
-
-		JPopupMenu pop = pubuilder.buildPopupMenu();
-		pop.show(this, x, y);
+		if(sel==null)
+		{
+//			tree.setSelectionPath(sel);
+			JPopupMenu pop = pubuilder.buildPopupMenu();
+			pop.show(this, x, y);
+		}
 	}
 	
 	/**
