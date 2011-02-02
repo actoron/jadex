@@ -247,6 +247,7 @@ public class StarterPanel extends JPanel
 		
 		numcomponents = new JSpinner(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
 		((JSpinner.DefaultEditor)numcomponents.getEditor()).getTextField().setColumns(4);
+		numcomponents.setEnabled(genname.isSelected());
 		
 		// The arguments.
 		arguments = new JPanel(new GridBagLayout());
