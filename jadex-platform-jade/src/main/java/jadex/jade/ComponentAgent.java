@@ -1,6 +1,7 @@
 package jadex.jade;
 
 import jade.core.Agent;
+import jadex.jade.service.message.MessageReceiverBehaviour;
 
 /**
  *  Representing a component on the JADE platform.

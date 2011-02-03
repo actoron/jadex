@@ -10,6 +10,11 @@
 	
 	<imports>
 		<import>jadex.jade.service.*</import>
+		<import>jadex.jade.service.message.*</import>
+		<import>jadex.base.service.message.transport.*</import>
+		<import>jadex.base.service.message.transport.localmtp.*</import>
+		<import>jadex.base.service.message.transport.tcpmtp.*</import>
+		<import>jadex.base.service.message.transport.niotcpmtp.*</import>
 		<import>java.util.*</import>
 		<import>jadex.commons.*</import>
 		<import>jadex.commons.service.library.*</import>
@@ -57,6 +62,12 @@
 		
 		<providedservice class="IMessageService" direct="true">
 			new MessageService($component.getServiceProvider(),
+				new ITransport[]
+				{
+					new LocalTransport($component.getServiceProvider()),
+					new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport)
+					//new TCPTransport($component.getServiceProvider(), $args.tcpport)
+				},
 				new MessageType[]
 				{
 					new FIPAMessageType()

@@ -14,7 +14,10 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
+import jadex.jade.service.message.JadexMessageTransportProtocol;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,6 +38,9 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 	
 	/** The container controller. */
 	protected PlatformController controller;
+	
+	/** The Jadex root component. */
+	protected IExternalAccess root;
 	
 	/** Flag for init step. */
 	protected boolean	inited;
@@ -69,7 +75,9 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 		if(!inited)
 		{
 			inited	= true;
+			this.root	= instance.getExternalAccess();
 			assert	desc.getParent()==null : "First component must be root component.";
+			
 			
 			Map	args	= null;
 			if(instance instanceof IApplication)
@@ -79,13 +87,19 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 			Object	rma	= args!=null ? args.get("rma") : null;
 			boolean	gui	= rma!=null && rma instanceof Boolean && ((Boolean)rma).booleanValue();
 			
+			List	jadeargs	= new ArrayList();
+			jadeargs.add("-mtp");
+			jadeargs.add(JadexMessageTransportProtocol.class.getName());
+			if(gui)
+				jadeargs.add("-gui");
+			else
+				jadeargs.add("-agents");
+			
 			// Start Jade platform with gateway agent
 			// This agent makes accessible the platform controller
-			if(gui)
-				Boot.main(new String[]{"-gui", "jadexgateway:jadex.jade.PlatformGatewayAgent"});
-			else
-				Boot.main(new String[]{"-agents", "jadexgateway:jadex.jade.PlatformGatewayAgent"});
-				
+			jadeargs.add("jadexgateway:jadex.jade.PlatformGatewayAgent");
+			Boot.main((String[])jadeargs.toArray(new String[jadeargs.size()]));
+			
 			// Hack! Busy waiting for gateway agent init finished.
 			while(gatewayagent==null)
 			{
@@ -160,6 +174,14 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 	public AgentController	getGatewayController()	throws ControllerException
 	{
 		return controller.getAgent(gatewayagent.getLocalName());
+	}
+	
+	/**
+	 *  Get the Jadex root platform component.
+	 */
+	public IExternalAccess	getRootComponent()
+	{
+		return root;
 	}
 	
 	/**

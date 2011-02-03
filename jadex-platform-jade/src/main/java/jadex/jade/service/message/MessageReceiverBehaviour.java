@@ -1,4 +1,4 @@
-package jadex.jade;
+package jadex.jade.service.message;
 
 import jade.content.Concept;
 import jade.content.ContentElementList;
@@ -35,6 +35,9 @@ import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IContentCodec;
+import jadex.jade.JadeComponentAdapter;
+import jadex.jade.JadeMessageAdapter;
+import jadex.jade.SJade;
 
 
 /**

@@ -2,11 +2,11 @@
 <metadata>
   <groupId>jade</groupId>
   <artifactId>jade-core</artifactId>
-  <version>4.0.1</version>
   <versioning>
+    <release>4.0.1</release>
     <versions>
       <version>4.0.1</version>
     </versions>
-    <lastUpdated>20100826132112</lastUpdated>
+    <lastUpdated>20110203104427</lastUpdated>
   </versioning>
 </metadata>
