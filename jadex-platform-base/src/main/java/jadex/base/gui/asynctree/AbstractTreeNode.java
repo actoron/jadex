@@ -197,9 +197,10 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	 *  ongoing search for children.
 	 *  Method may be called from any thread.
 	 */
-	protected IFuture	setChildren(final List children)
+	protected IFuture	setChildren(List newchildren)
 	{
 		final Future	ret	= new Future();
+		final List newcs	= 	new ArrayList(newchildren);
 		
 //		// For debugging: todo:remove
 //		final	RuntimeException	rte;
@@ -222,8 +223,8 @@ public abstract class AbstractTreeNode	implements ITreeNode
 				searching	= false;
 				recurse	= false;
 				
-				List	oldcs	= AbstractTreeNode.this.children;
-				AbstractTreeNode.this.children	= new ArrayList(children);
+				List	oldcs	= children;
+				children	= newcs;
 				List	added	= new ArrayList();
 				List	removed	= new ArrayList();
 				if(oldcs!=null)
