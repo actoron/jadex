@@ -8,7 +8,6 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.asynctree.TreePopupListener;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IRemoteFilter;
@@ -44,8 +43,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -111,18 +114,6 @@ public class ModelTreePanel extends JPanel // JSplitPane
 	/** The remove path action. */
 	protected Action removepath;
 	
-	/** The action for showing properties of the selected node. */
-//	protected Action showprops;
-	
-	/** The action for showing object details of the selected node. */
-//	protected Action showobject;
-	
-	/** The properties panel. */
-//	protected final JScrollPane	proppanel;
-	
-//	/** The object panel. */
-//	protected final JScrollPane	objectpanel;
-
 	/** The file chooser. */
 	protected JFileChooser filechooser;
 	
@@ -147,14 +138,6 @@ public class ModelTreePanel extends JPanel // JSplitPane
 	{
 		this(exta, false);
 	}
-	
-//	/**
-//	 *  Create a new component tree panel.
-//	 */
-//	public ModelTreePanel(IExternalAccess exta, boolean remote)
-//	{
-//		this(exta, VERTICAL_SPLIT, remote);
-//	}
 	
 	/**
 	 *  Create a new component tree panel.
@@ -208,6 +191,10 @@ public class ModelTreePanel extends JPanel // JSplitPane
 			}
 		});
 		
+		final FileFilterMenuItemConstructor ffm = new FileFilterMenuItemConstructor();
+		this.pubuilder = new PopupBuilder(new Object[]{ADD_PATH, ADD_REMOTEPATH, ffm});
+
+		
 		this.filefilter = new IRemoteFilter()
 		{
 			public IFuture filter(Object obj)
@@ -217,14 +204,16 @@ public class ModelTreePanel extends JPanel // JSplitPane
 				if(obj instanceof File)
 				{
 					File file = (File)obj;
-					if(file.isDirectory())
+					if(ffm.isAll() || file.isDirectory())
 					{
 						ret.setResult(Boolean.TRUE);
 					}
 					else
 					{
-						SComponentFactory.isLoadable(exta, file.getAbsolutePath())
+						SComponentFactory.isModelType(exta, file.getAbsolutePath(), ffm.getComponentTypes())
 							.addResultListener(new DelegationResultListener(ret));
+//						SComponentFactory.isLoadable(exta, file.getAbsolutePath())
+//							.addResultListener(new DelegationResultListener(ret));
 					}
 				}
 				else
@@ -235,7 +224,6 @@ public class ModelTreePanel extends JPanel // JSplitPane
 			}
 		};
 
-		this.pubuilder = new PopupBuilder(new Object[]{ADD_PATH, ADD_REMOTEPATH, new FileFilterMenuItemConstructor()});
 		tree.addMouseListener(new MouseAdapter()
 		{
 			public void mousePressed(MouseEvent e)
@@ -397,21 +385,87 @@ public class ModelTreePanel extends JPanel // JSplitPane
 	 */
 	class FileFilterMenuItemConstructor implements IMenuItemConstructor
 	{
+		/** The menu. */
+		protected JMenu menu;
+		
+		/** The supported file types to menu items. */
+		protected Map filetypes;
+		
+		/** The all checkbox. */
+		protected JCheckBoxMenuItem all;
+		
+		/**
+		 * 
+		 */
+		public FileFilterMenuItemConstructor()
+		{
+			menu = new JMenu("File Filter");
+			filetypes = new HashMap();
+			
+			all = new JCheckBoxMenuItem();
+			all.setAction(new AbstractAction("All files")
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					for(int i=2; i<menu.getItemCount(); i++)
+					{
+						JMenuItem item = (JMenuItem)menu.getItem(i);
+						if(item!=null)
+							item.setEnabled(!all.isSelected());
+						((ITreeNode)getModel().getRoot()).refresh(true, true);
+					}
+				}
+			});
+			menu.add(all);
+			menu.addSeparator();
+			
+			// Init menu
+			getMenuItem();
+		}
+		
+		/**
+		 * 
+		 */
+		public boolean isAll()
+		{
+			return all.isSelected();
+		}
+		
+		/**
+		 * 
+		 */
+		public List getComponentTypes()
+		{
+			List ret = new ArrayList();
+			
+			if(!isAll())
+			{
+				for(Iterator it=filetypes.keySet().iterator(); it.hasNext(); )
+				{
+					String key = (String)it.next();
+					Object val = filetypes.get(key);
+					if(val instanceof JCheckBoxMenuItem)
+					{
+						JCheckBoxMenuItem cb = (JCheckBoxMenuItem)val;
+						if(cb.isSelected())
+						{
+							ret.add(key);
+						}
+					}	
+				}
+			}
+			
+			return ret;
+		}
+		
 		/**
 		 *  Get or create a new menu item (struture).
 		 *  @return The menu item (structure).
 		 */
 		public JMenuItem getMenuItem()
 		{
-			final JMenu ret;
-
 			if(isEnabled())
 			{
-				ret = new JMenu("File Filter");
-				JMenuItem all = new JMenuItem("All files");
-				ret.add(all);
-				ret.addSeparator();
-				
 				SServiceProvider.getServices(exta.getServiceProvider(), 
 					IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener()
 				{
@@ -419,43 +473,60 @@ public class ModelTreePanel extends JPanel // JSplitPane
 					{
 						Collection facts = (Collection)result;
 						
+						Set supported = new HashSet();
 						if(facts!=null)
 						{
 							for(Iterator it=facts.iterator(); it.hasNext(); )
 							{
 								IComponentFactory fac = (IComponentFactory)it.next();
 								
-								String[] filetypes = fac.getComponentTypes();
-								for(int i=0; i<filetypes.length; i++)
+								String[] fts = fac.getComponentTypes();
+								
+								// add new file types
+								for(int i=0; i<fts.length; i++)
 								{
-									final JCheckBoxMenuItem ff = new JCheckBoxMenuItem(filetypes[i], true);
-									fac.getComponentTypeIcon(filetypes[i]).addResultListener(new DefaultResultListener()
+									supported.add(fts[i]);
+									if(!filetypes.containsKey(fts[i]))
 									{
-										public void resultAvailable(Object result)
+										final JCheckBoxMenuItem ff = new JCheckBoxMenuItem(fts[i], true);
+										fac.getComponentTypeIcon(fts[i]).addResultListener(new DefaultResultListener()
 										{
-											ff.setIcon((Icon)result);
-										}
-									});
-									
-									ret.add(ff);
-									ff.addActionListener(new ActionListener()
-									{
-										public void actionPerformed(ActionEvent e)
+											public void resultAvailable(Object result)
+											{
+												ff.setIcon((Icon)result);
+											}
+										});
+										
+										menu.add(ff);
+										ff.addActionListener(new ActionListener()
 										{
-											((ITreeNode)getModel().getRoot()).refresh(true, true);
-										}
-									});
+											public void actionPerformed(ActionEvent e)
+											{
+												((ITreeNode)getModel().getRoot()).refresh(true, true);
+											}
+										});
+										filetypes.put(fts[i], ff);
+									}
 								}
+							}
+						}
+						
+						// remove obsolete filetypes
+						for(Iterator it=filetypes.keySet().iterator(); it.hasNext(); )
+						{
+							Object next = it.next();
+							if(!supported.contains(next))
+							{
+								JMenuItem rem = (JMenuItem)filetypes.get(next);
+								menu.remove(rem);
+								it.remove();
 							}
 						}
 					}
 				});
 			}
-			else
-			{
-				ret = null;
-			}
-			return ret;
+			
+			return isEnabled()? menu: null;
 		}
 
 		/**
@@ -542,51 +613,7 @@ public class ModelTreePanel extends JPanel // JSplitPane
 			pop.show(this, x, y);
 		}
 	}
-	
-//	/**
-//	 *  Set the title and contents of the properties panel.
-//	 */
-//	public void	showProperties(JComponent content)
-//	{
-//		proppanel.setViewportView(content);
-//		proppanel.repaint();
-//
-//		// Code to simulate a one touch expandable click,
-//	 	// see BasicSplitPaneDivider.OneTouchActionHandler)
-//		
-//		Insets  insets = getInsets();
-//		int lastloc = getLastDividerLocation();
-//	    int currentloc = getUI().getDividerLocation(this);
-//		int newloc = currentloc;
-//		BasicSplitPaneDivider divider = ((BasicSplitPaneUI)getUI()).getDivider();
-//
-//		boolean	adjust	= false;
-//		if(getOrientation()==VERTICAL_SPLIT)
-//		{
-//			if(currentloc >= (getHeight() - insets.bottom - divider.getHeight())) 
-//			{
-//				adjust	= true;
-//				int maxloc = getMaximumDividerLocation();
-//				newloc = lastloc>=0 && lastloc<maxloc? lastloc: maxloc*1/2;
-//	        }			
-//		}
-//		else
-//		{
-//			if(currentloc >= (getWidth() - insets.right - divider.getWidth())) 
-//			{
-//				adjust	= true;
-//				int maxloc = getMaximumDividerLocation();
-//				newloc = lastloc>=0 && lastloc<maxloc? lastloc: maxloc*1/2;
-//	        }			
-//		}
-//
-//		if(adjust && currentloc!=newloc) 
-//		{
-//			setDividerLocation(newloc);
-//			setLastDividerLocation(currentloc);
-//		}
-//	}
-	
+		
 	/**
 	 *  Add a new path to the explorer.
 	 */
@@ -720,22 +747,6 @@ public class ModelTreePanel extends JPanel // JSplitPane
 //			return true;
 		}
 	};
-
-//	/**
-//	 *  Refresh the selected path.
-//	 */
-//	public final Action REFRESH = new ToolTipAction("Refresh [F5]", icons.getIcon("refresh"), null)
-//	{
-//		/**
-//		 *  Called when action should be performed.
-//		 *  @param e The event.
-//		 */
-//		public void actionPerformed(ActionEvent e)
-//		{
-//			ITreeNode	node	= (ITreeNode)tree.getLastSelectedPathComponent();
-//			refreshAll(node!=null? node: tree.getModel().getRoot());
-//		}
-//	};
 	
 	/**
 	 *  Create a new component node.

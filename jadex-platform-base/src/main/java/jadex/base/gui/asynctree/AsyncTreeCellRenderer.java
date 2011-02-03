@@ -10,6 +10,7 @@ import java.util.List;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 
@@ -36,6 +37,8 @@ public class AsyncTreeCellRenderer extends DefaultTreeCellRenderer
 			boolean selected, boolean expanded, boolean leaf, int row,
 			boolean hasFocus)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
 		// Change icons depending on node type.
 		ITreeNode node = (ITreeNode)value;
 		Icon icon = node.getIcon();

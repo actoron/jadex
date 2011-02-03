@@ -85,7 +85,6 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 	protected StarterPanel spanel;
 
 	/** The panel showing the classpath models. */
-//	protected ModelExplorer mpanel;
 	protected ModelTreePanel mpanel;
 	
 	/** The component instances in a tree. */
@@ -140,23 +139,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 				lsplit.setOneTouchExpandable(true);
 				lsplit.setResizeWeight(0.7);
 		
-	//			mpanel = new ModelExplorer(jcc.getExternalAccess(), new StarterNodeFunctionality(jcc));
 				mpanel = new ModelTreePanel(exta, !SUtil.equals(exta.getComponentIdentifier().getPlatformName(), jcc.getComponentIdentifier().getPlatformName()));
-		//		mpanel.setAction(FileNode.class, new INodeAction()
-		//		{
-		//			public void validStateChanged(TreeNode node, boolean valid)
-		//			{
-		//				String file1 = ((FileNode)node).getFile().getAbsolutePath();
-		//				String file2 = spanel.getFilename();
-		//				//System.out.println(file1+" "+file2);
-		//				if(file1!=null && file1.equals(file2))
-		//				{
-		//					spanel.reloadModel(file1);
-		//				}
-		//			}
-		//		});
-	//			mpanel.setPopupBuilder(new PopupBuilder(new Object[]{new StartComponentMenuItemConstructor(), mpanel.ADD_PATH,
-	//				mpanel.REMOVE_PATH, mpanel.REFRESH}));
 				mpanel.getTree().addTreeSelectionListener(new TreeSelectionListener()
 				{
 					public void valueChanged(TreeSelectionEvent e)
@@ -183,7 +166,6 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 							//  +-classes2
 							//  |  +- MyComponent.component.xml
 		
-		//					if(getJCC().getComponent().getPlatform().getComponentFactory().isLoadable(model))
 							final String ffilename = filename;
 							SComponentFactory.isLoadable(exta, filename).addResultListener(new SwingDefaultResultListener(spanel)
 							{

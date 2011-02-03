@@ -90,6 +90,7 @@ public class RootNode extends AbstractTreeNode
 	 */
 	protected void	searchChildren(boolean force)
 	{
+		setChildren(children);
 	}
 	
 	/**

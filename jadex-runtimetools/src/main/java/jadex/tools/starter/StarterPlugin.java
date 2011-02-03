@@ -737,7 +737,6 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 			if(node instanceof FileNode)
 			{
 				String type = ((FileNode)node).getFile().getAbsolutePath();
-				if(((Boolean)SComponentFactory.isStartable(getJCC().getExternalAccess(), type).get(new ThreadSuspendable())))
 					ret = true;
 			}
 			return ret;
