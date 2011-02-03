@@ -1,65 +1,162 @@
 package jadex.simulation.analysis.common.dataObjects;
 
-import java.util.Map;
+import jadex.simulation.analysis.common.dataObjects.parameter.AParameterEnsemble;
+import jadex.simulation.analysis.common.dataObjects.parameter.IAParameter;
+import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
 
-public class AExperimentalFrame implements IAExperimentalFrame {
+public class AExperimentalFrame extends ABasicDataObject implements IAExperimentalFrame
+{
 
-	public ABasicParameter replication = new ABasicParameter("replication", new Integer(1), Integer.class, false,false);
-	public ABasicParameter onlineVisualisation = new ABasicParameter("onlineVisualisation", Boolean.FALSE, Boolean.class, false,false);
-	
 	private IAModel model;
-	private IAParameterCollection expParameters = new AParameterCollection();
-	private IAParameterCollection inputParameter = new AParameterCollection();
-	
-	public AExperimentalFrame(IAModel model, IAParameterCollection expParameters, IAParameterCollection inputParameter) {
-		this.model = model;
-		if (expParameters != null)
-			this.expParameters = expParameters;
-		else
-		{
-			this.expParameters.put("replication", replication);
-			this.expParameters.put("onlineVisualisation", onlineVisualisation);
-		}
-		if (inputParameter != null)
-			this.inputParameter = inputParameter;
+	private IAParameterEnsemble expParameters = new AParameterEnsemble();
+	private IAParameterEnsemble inputParameters = new AParameterEnsemble();
+	private IAParameterEnsemble outputParameters = new AParameterEnsemble();
+
+	public AExperimentalFrame(IAModel model, IAParameterEnsemble expParameters, IAParameterEnsemble inputParameters, IAParameterEnsemble outputParameters)
+	{
+		setModel(model);
+		setExperimentParamters(expParameters);
+		setInputParamters(inputParameters);
+		setOutputParamters(outputParameters);
 	}
-	
+
+	// ------ IAExperimentalFrame ------
+
+	// model
+
+	public IAModel getModel()
+	{
+		return model;
+	}
+
+	public void setModel(IAModel model)
+	{
+		synchronized (mutex)
+		{
+			this.model = model;
+		}
+	}
+
+	// Input
+
 	@Override
-	public IAParameter getExperimentParameter(String name) {
-		return expParameters.get(name);
+	public void removeInputParamter(String name)
+	{
+		synchronized (mutex)
+		{
+			inputParameters.removeParameter(name);
+		}
 	}
 
 	@Override
-	public IAParameterCollection getExperimentParameters() {
+	public void setInputParamters(IAParameterEnsemble parameters)
+	{
+		synchronized (mutex)
+		{
+			inputParameters = parameters;
+		}
+	}
+
+	@Override
+	public IAParameter getInputParameter(String name)
+	{
+		return inputParameters.getParameter(name);
+	}
+
+	@Override
+	public IAParameterEnsemble getInputParameters()
+	{
+		return inputParameters;
+	}
+
+	@Override
+	public void addInputParamter(IAParameter parameter)
+	{
+		synchronized (mutex)
+		{
+			inputParameters.addParameter(parameter);
+		}
+	}
+
+	// Output
+
+	@Override
+	public IAParameterEnsemble getOutputParameters()
+	{
+		return outputParameters;
+	}
+
+	@Override
+	public void setOutputParamters(IAParameterEnsemble parameters)
+	{
+		synchronized (mutex)
+		{
+			outputParameters = parameters;
+		}
+	}
+
+	@Override
+	public void addOutputParamter(IAParameter parameter)
+	{
+		synchronized (mutex)
+		{
+			outputParameters.addParameter(parameter);
+		}
+	}
+
+	@Override
+	public void removeOutputParamter(String name)
+	{
+		synchronized (mutex)
+		{
+			outputParameters.removeParameter(name);
+		}
+	}
+
+	@Override
+	public IAParameter getOutputParameter(String name)
+	{
+		return outputParameters.getParameter(name);
+	}
+
+	// Experiment
+
+	@Override
+	public void addExperimentParamter(IAParameter parameter)
+	{
+		synchronized (mutex)
+		{
+			expParameters.addParameter(parameter);
+		}
+	}
+
+	@Override
+	public void removeExperimentParamter(String name)
+	{
+		synchronized (mutex)
+		{
+			expParameters.removeParameter(name);
+		}
+	}
+
+	@Override
+	public IAParameter getExperimentParameter(String name)
+	{
+		return expParameters.getParameter(name);
+	}
+
+	@Override
+	public IAParameterEnsemble getExperimentParameters()
+	{
 		return expParameters;
 	}
 
 	@Override
-	public IAParameter getInputParameter(String name) {
-		return inputParameter.get(name);
-	}
-
-	@Override
-	public IAParameterCollection getInputParameters() {
-		return inputParameter;
-	}
-
-	@Override
-	public IAModel getModel() {
-		return model;
-	}
-
-	@Override
-	public void setInputParamterValue(String name, Object value) {
-		if (inputParameter.containsKey(name)) inputParameter.get(name).setValue(value);
-
-	}
-
-	@Override
-	public void setInputParamtersValues(Map<String, Object> values) {
-		for (Map.Entry<String, Object> valueEntry : values.entrySet()) {
-			setInputParamterValue(valueEntry.getKey(), valueEntry.getValue());
+	public void setExperimentParamters(IAParameterEnsemble parameters)
+	{
+		synchronized (mutex)
+		{
+			expParameters = parameters;
 		}
 	}
-
 }

@@ -11,8 +11,8 @@ public class GeneralAnalysisServiceViewerPanel extends AbstractServiceViewerPane
 	@Override
 	public JComponent getComponent() {
 		// No use of spezial comp Class
-		BasicGeneralAnalysisServiceView comp = new BasicGeneralAnalysisServiceView();
-		comp.init((IGeneralAnalysisService) service);
+		BasicGeneralAnalysisServiceView comp = new BasicGeneralAnalysisServiceView((IGeneralAnalysisService) service);
+		comp.init();
 		return comp;
 	}
 

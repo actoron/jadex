@@ -1,12 +1,11 @@
 package jadex.simulation.analysis.buildingBlocks.visualisation.basicImpl;
 
 import jadex.bdi.runtime.ICapability;
-import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.service.BasicService;
 import jadex.simulation.analysis.buildingBlocks.simulation.IExecuteExperimentService;
 import jadex.simulation.analysis.buildingBlocks.visualisation.IPresentResultService;
-import jadex.simulation.analysis.common.dataObjects.IAExperimentResult;
+import jadex.simulation.analysis.common.dataObjects.IAExperimentalFrame;
 
 public class BasicPresentResultService extends BasicService implements IPresentResultService{
 
@@ -18,9 +17,10 @@ public class BasicPresentResultService extends BasicService implements IPresentR
 	}
 
 	@Override
-	public IFuture presentResult(IAExperimentResult result) {
-		Future res = new Future();
-		return res;
+	public IFuture presentResult(IAExperimentalFrame result)
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

@@ -5,7 +5,6 @@ import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.commons.service.IService;
 import jadex.simulation.analysis.buildingBlocks.generalAnalysis.IGeneralAnalysisService;
-import jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.view.BasicGeneralAnalysisServiceView;
 import jadex.tools.generic.AbstractServicePlugin;
 
 import javax.swing.Icon;

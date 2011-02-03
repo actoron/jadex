@@ -1,28 +1,36 @@
 package jadex.simulation.analysis.common.dataObjects;
 
-public interface IAModel {
-	
+import jadex.simulation.analysis.common.dataObjects.parameter.IAParameter;
+import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
+
+public interface IAModel extends IADataObject
+{
+
 	public String getName();
-	
+
+	public void setName(String name);
+
 	public String getType();
-	
-//	public void setInputParameter(IAParameter parameter);
-	
-//	public void setInputParameters(IAParameterCollection parameters);
-	
-	public IAParameterCollection getInputParameters();
-	
+
+	public void setType(String type);
+
+	public IAParameterEnsemble getInputParameters();
+
 	public IAParameter getInputParameter(String name);
-	
-//	public void setOutputParameter(IAParameter parameter);
-	
-//	public void setOutputParameters(IAParameterCollection parameters);
-	
-	public IAParameterCollection getOutputParameters();
-	
+
+	public void setInputParameters(IAParameterEnsemble parameters);
+
+	public void addInputParameter(IAParameter parameter);
+
+	public void removeInputParameter(String name);
+
+	public IAParameterEnsemble getOutputParameters();
+
 	public IAParameter getOutputParameter(String name);
-	
-	public IAExperimentalFrame createExperimentalFrame(IAParameterCollection inputParameter);
-	
-	public IAExperimentResult createExperimentResult();
+
+	public void setOutputParameters(IAParameterEnsemble parameters);
+
+	public void addOutputParameter(IAParameter parameter);
+
+	public void removeOutputParameter(String name);
 }

@@ -73,7 +73,7 @@ end
 ;;;;;;;;;;;;;;;;;;;;;
 
 to go
-  while [foodout > 0]
+  while [foodout > 0 and ticks < 3000]
   [ goTick ]
 end
 
@@ -285,7 +285,7 @@ population
 population
 0.0
 200.0
-100
+80
 1.0
 1
 NIL

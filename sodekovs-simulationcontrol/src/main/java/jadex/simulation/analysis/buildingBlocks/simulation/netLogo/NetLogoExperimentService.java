@@ -1,35 +1,23 @@
 package jadex.simulation.analysis.buildingBlocks.simulation.netLogo;
 
-import java.awt.Frame;
-import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.media.ExtendedCachingControl;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JTextArea;
-
-import org.apache.commons.collections15.ExtendedProperties;
-import org.nlogo.api.ClassManager;
-import org.nlogo.app.App;
-import org.nlogo.awt.UserCancelException;
-import org.nlogo.headless.HeadlessWorkspace;
-import org.nlogo.lite.InterfaceComponent;
-import org.nlogo.workspace.ExtensionPrimitiveManager;
-
-import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.bdi.runtime.ICapability;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.service.BasicService;
 import jadex.simulation.analysis.buildingBlocks.simulation.IExecuteExperimentService;
 import jadex.simulation.analysis.common.dataObjects.IAExperimentJob;
-import jadex.simulation.analysis.common.dataObjects.IAExperimentResult;
-import jadex.simulation.analysis.common.dataObjects.IAParameter;
-import jadex.simulation.analysis.common.dataObjects.IAParameterCollection;
+import jadex.simulation.analysis.common.dataObjects.parameter.IAParameter;
+import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
+
+import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.swing.JFrame;
+import javax.swing.JTextArea;
+
+import org.nlogo.headless.HeadlessWorkspace;
+import org.nlogo.lite.InterfaceComponent;
 
 /**
  * Implementation of a NetLogo service for (single) experiments.
@@ -79,8 +67,8 @@ public class NetLogoExperimentService extends BasicService implements IExecuteEx
                           ex.printStackTrace();
                         }
                     } } ) ;
-            IAParameterCollection inputPara = expJob.getModel().getInputParameters();
-            for (IAParameter parameter : inputPara.values()) {
+            IAParameterEnsemble inputPara = expJob.getModel().getInputParameters();
+            for (IAParameter parameter : inputPara.getParameters().values()) {
 				String comm = "set " + parameter.getName() + " " + parameter.getValue().toString();
 				comp.command(comm);
 			}
@@ -92,7 +80,7 @@ public class NetLogoExperimentService extends BasicService implements IExecuteEx
 			{
 				comp.command("setup");
 		        comp.command("go");
-		        expJob.getExperimentResult().setResultParamterValue("ticks", comp.report("ticks"));
+		        expJob.getExperimentalFrame().getOutputParameter("ticks").setValue(comp.report("ticks"));
 				rep++;
 			}
 			}
@@ -110,8 +98,8 @@ public class NetLogoExperimentService extends BasicService implements IExecuteEx
 			compLite.append("Open file" + FileName + "\n");
 			
 			workspace.open(FileName);
-			 IAParameterCollection inputPara = expJob.getModel().getInputParameters();
-	            for (IAParameter parameter : inputPara.values()) {
+			 IAParameterEnsemble inputPara = expJob.getModel().getInputParameters();
+	            for (IAParameter parameter : inputPara.getParameters().values()) {
 					String comm = "set " + parameter.getName() + " " + parameter.getValue().toString();
 					workspace.command(comm);
 				}
@@ -122,9 +110,9 @@ public class NetLogoExperimentService extends BasicService implements IExecuteEx
 				while(rep < replicationen)
 				{
 					compLite.append("Start " +  expJob.getModel().getName() + "\n");
-					comp.command("setup");
-			        comp.command("go");
-			        expJob.getExperimentResult().setResultParamterValue("ticks", comp.report("ticks"));
+					workspace.command("setup");
+					workspace.command("go");
+			        expJob.getExperimentalFrame().getOutputParameter("ticks").setValue(workspace.report("ticks"));
 					compLite.append("End " +  expJob.getModel().getName() + "\n");
 					rep++;
 				}

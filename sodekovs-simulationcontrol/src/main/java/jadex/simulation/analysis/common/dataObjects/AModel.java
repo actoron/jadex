@@ -1,15 +1,24 @@
 package jadex.simulation.analysis.common.dataObjects;
 
-public class AModel implements IAModel {
+import com.sun.media.datasink.BasicDataSink;
+
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
+import jadex.simulation.analysis.common.dataObjects.parameter.AParameterEnsemble;
+import jadex.simulation.analysis.common.dataObjects.parameter.IAParameter;
+import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
+
+public class AModel extends ABasicDataObject implements IAModel
+{
 
 	private String name;
 	private String type;
 	// private String identifier;
 
-	private IAParameterCollection inputParameters = new AParameterCollection();
-	private IAParameterCollection outputParameters = new AParameterCollection();
+	private IAParameterEnsemble inputParameters = new AParameterEnsemble();
+	private IAParameterEnsemble outputParameters = new AParameterEnsemble();
 
-	public AModel(String name, String type, IAParameterCollection inputParameters, IAParameterCollection outputParameters) {
+	public AModel(String name, String type, IAParameterEnsemble inputParameters, IAParameterEnsemble outputParameters)
+	{
 		this.name = name;
 		this.type = type;
 		if (inputParameters != null)
@@ -18,88 +27,127 @@ public class AModel implements IAModel {
 			this.outputParameters = outputParameters;
 	}
 
-	public AModel(String name, String type) {
+	public AModel(String name, String type)
+	{
 		this(name, type, null, null);
 	}
 
+	// ------ Interface IAModel ------
+
+	// Name
+
 	@Override
-	public String getName() {
+	public String getName()
+	{
 		return name;
 	}
 
 	@Override
-	public String getType() {
+	public void setName(String name)
+	{
+		synchronized (name)
+		{
+			this.name = name;
+		}
+	}
+
+	// Type
+
+	@Override
+	public String getType()
+	{
 		return type;
 	}
 
-//	@Override
-//	public void setName(String name) {
-//		this.name = name;
-//	}
-
-//	@Override
-//	public void setType(String type) {
-//		this.type = type;
-//	}
-
-//	@Override
-//	public void setInputParameter(IAParameter parameter) {
-//		inputParameters.put(parameter.getName(), parameter);
-//
-//	}
-
-//	@Override
-//	public void setOutputParameter(IAParameter parameter) {
-//		outputParameters.put(parameter.getName(), parameter);
-//	}
-
-//	@Override
-//	public void setInputParameters(IAParameterCollection parameters) {
-//		this.inputParameters = parameters;
-//
-//	}
-
-//	@Override
-//	public void setOutputParameters(IAParameterCollection parameters) {
-//		this.outputParameters = parameters;
-//	}
-
-	@Override
-	public IAExperimentResult createExperimentResult() {
-		IAParameterCollection paramters = new AParameterCollection();
-		for (IAParameter outputPara : outputParameters.values()) {
-			if (outputPara.isVariable()) paramters.put(outputPara.getName(), outputPara);
+	public void setType(String type)
+	{
+		synchronized (name)
+		{
+			this.type = type;
 		}
-		return new AExperimentResult(this, paramters);
 	}
 
+	// Input
+
 	@Override
-	public IAExperimentalFrame createExperimentalFrame(IAParameterCollection expParameter) {
-		IAParameterCollection paramters = new AParameterCollection();
-		for (IAParameter inputPara : inputParameters.values()) {
-			if (inputPara.isVariable()) paramters.put(inputPara.getName(), inputPara);
+	public void addInputParameter(IAParameter parameter)
+	{
+		synchronized (mutex)
+		{
+			inputParameters.addParameter(parameter);
 		}
-		return new AExperimentalFrame(this, expParameter, paramters);
 	}
 
 	@Override
-	public IAParameter getInputParameter(String name) {
-		return inputParameters.get(name);
+	public void removeInputParameter(String name)
+	{
+		synchronized (mutex)
+		{
+			inputParameters.removeParameter(name);
+		}
 	}
 
 	@Override
-	public IAParameterCollection getInputParameters() {
+	public void setInputParameters(IAParameterEnsemble parameters)
+	{
+		synchronized (mutex)
+		{
+			inputParameters = parameters;
+		}
+
+	}
+
+	@Override
+	public IAParameter getInputParameter(String name)
+	{
+		return inputParameters.getParameter(name);
+	}
+
+	@Override
+	public IAParameterEnsemble getInputParameters()
+	{
 		return inputParameters;
 	}
 
+	// Output
+
 	@Override
-	public IAParameter getOutputParameter(String name) {
-		return outputParameters.get(name);
+	public IAParameter getOutputParameter(String name)
+	{
+		return outputParameters.getParameter(name);
 	}
 
 	@Override
-	public IAParameterCollection getOutputParameters() {
+	public IAParameterEnsemble getOutputParameters()
+	{
 		return outputParameters;
 	}
 
+	@Override
+	public void removeOutputParameter(String name)
+	{
+		synchronized (mutex)
+		{
+			outputParameters.removeParameter(name);
+		}
+	}
+
+	@Override
+	public void setOutputParameters(IAParameterEnsemble parameters)
+	{
+		synchronized (mutex)
+		{
+			outputParameters = parameters;
+		}
+
+	}
+
+	@Override
+	public void addOutputParameter(IAParameter parameter)
+	{
+		synchronized (mutex)
+		{
+			outputParameters.addParameter(parameter);
+		}
+	}
 }

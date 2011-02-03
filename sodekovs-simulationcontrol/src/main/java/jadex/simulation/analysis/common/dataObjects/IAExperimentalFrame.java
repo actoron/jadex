@@ -1,26 +1,41 @@
 package jadex.simulation.analysis.common.dataObjects;
 
-import java.util.Map;
+import jadex.simulation.analysis.common.dataObjects.parameter.IAParameter;
+import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
 
-public interface IAExperimentalFrame {
-	
+public interface IAExperimentalFrame extends IADataObject
+{
 	public IAModel getModel();
-	
-//	public void setModel(IAModel model);
-	
-	public IAParameterCollection getInputParameters();
-	
+
+	public void setModel(IAModel model);
+
+	public IAParameterEnsemble getInputParameters();
+
 	public IAParameter getInputParameter(String name);
-	
-	public void setInputParamtersValues(Map<String, Object> values);
-	
-	public void setInputParamterValue(String name, Object value);
-	
-	public IAParameterCollection getExperimentParameters();
-	
+
+	public void setInputParamters(IAParameterEnsemble parameters);
+
+	public void addInputParamter(IAParameter parameter);
+
+	public void removeInputParamter(String name);
+
+	public IAParameterEnsemble getOutputParameters();
+
+	public IAParameter getOutputParameter(String name);
+
+	public void setOutputParamters(IAParameterEnsemble parameters);
+
+	public void addOutputParamter(IAParameter parameter);
+
+	public void removeOutputParamter(String name);
+
+	public IAParameterEnsemble getExperimentParameters();
+
 	public IAParameter getExperimentParameter(String name);
-	
-//	public void addExperimentParamter(IAParameter paramter);
-	
-//	public void removeExperimentParamter(String name);
+
+	public void setExperimentParamters(IAParameterEnsemble parameters);
+
+	public void addExperimentParamter(IAParameter parameter);
+
+	public void removeExperimentParamter(String name);
 }

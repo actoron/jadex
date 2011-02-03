@@ -5,9 +5,9 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.service.BasicService;
 import jadex.simulation.analysis.buildingBlocks.simulation.IModelInspectionService;
-import jadex.simulation.analysis.common.dataObjects.ABasicParameter;
-import jadex.simulation.analysis.common.dataObjects.AParameterCollection;
-import jadex.simulation.analysis.common.dataObjects.IAParameterCollection;
+import jadex.simulation.analysis.common.dataObjects.parameter.ABasicParameter;
+import jadex.simulation.analysis.common.dataObjects.parameter.AParameterEnsemble;
+import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,10 +26,10 @@ public class NetLogoModelService extends BasicService implements IModelInspectio
 		Future res = new Future();
 		
 		// TODO: Search right Model (globals in netLogo model)
-		IAParameterCollection paramters = new AParameterCollection();
-		paramters.add(new ABasicParameter("population", "100",String.class,false,false));
-		paramters.add(new ABasicParameter("diffusion-rate", "40",String.class,false,false));
-		paramters.add(new ABasicParameter("evaporation-rate", "10",String.class,true,false));
+		IAParameterEnsemble paramters = new AParameterEnsemble();
+		paramters.addParameter(new ABasicParameter("population", Double.class, new Double(100)));
+		paramters.addParameter(new ABasicParameter("diffusion-rate", Double.class, new Double(40)));
+		paramters.addParameter(new ABasicParameter("evaporation-rate", Double.class, new Double(10)));
 		res.setResult(paramters);
 		return res;
 	}
@@ -39,8 +39,8 @@ public class NetLogoModelService extends BasicService implements IModelInspectio
 		Future res = new Future();
 		
 		// TODO: Search right Model
-		IAParameterCollection paramters = new AParameterCollection();
-		paramters.add(new ABasicParameter("ticks", null, String.class,true,true));
+		IAParameterEnsemble paramters = new AParameterEnsemble();
+		paramters.addParameter(new ABasicParameter("ticks", Double.class));
 		res.setResult(paramters);
 		return res;
 	}

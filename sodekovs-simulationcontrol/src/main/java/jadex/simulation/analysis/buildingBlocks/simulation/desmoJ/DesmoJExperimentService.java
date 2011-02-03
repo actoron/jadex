@@ -65,7 +65,7 @@ public class DesmoJExperimentService extends BasicService implements IExecuteExp
 				comp.append(" ...please wait... "+ "\n");
 				exp.finish();
 				comp.append(expJob.getModel().getName() + " stopped at simulation time 10000.0000" + "\n");
-				expJob.getExperimentResult().setResultParamterValue("zeit", "10000");
+				expJob.getExperimentalFrame().getOutputParameter("zeit").setValue(10000);
 				comp.append("\n");
 				rep++;
 			}

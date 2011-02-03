@@ -12,7 +12,8 @@ import org.opt4j.core.Objective.Sign;
 import org.opt4j.core.problem.Evaluator;
 import org.opt4j.core.problem.PhenotypeWrapper;
 
-public class SimulationEvaluator implements Evaluator<PhenotypeWrapper<Map<String, Integer>>> {
+public class SimulationEvaluator implements Evaluator<PhenotypeWrapper<Map<String, Integer>>>
+{
 
 	Objective objective = new Objective("Ticks", Sign.MIN);
 	final javax.swing.JFrame frame = new javax.swing.JFrame();
@@ -22,9 +23,12 @@ public class SimulationEvaluator implements Evaluator<PhenotypeWrapper<Map<Strin
 	}
 
 	@Override
-	public Objectives evaluate(PhenotypeWrapper<Map<String, Integer>> phenotype) {
-		if (!comp.isVisible()) {
-			try {
+	public Objectives evaluate(PhenotypeWrapper<Map<String, Integer>> phenotype)
+	{
+		if (!comp.isVisible())
+		{
+			try
+			{
 				java.awt.EventQueue.invokeAndWait
 						(new Runnable()
 								{
@@ -33,7 +37,8 @@ public class SimulationEvaluator implements Evaluator<PhenotypeWrapper<Map<Strin
 										frame.setSize(1000, 700);
 										frame.add(comp);
 										frame.setVisible(true);
-										try {
+										try
+										{
 											String filePre = new File("..").getCanonicalPath()
 													+ "/sodekovs-simulationcontrol/src/main/java/jadex/simulation/analysis/models";
 											String fileName = filePre + "/netLogo/" + "AntsStop.nlogo";
@@ -46,16 +51,20 @@ public class SimulationEvaluator implements Evaluator<PhenotypeWrapper<Map<Strin
 										}
 									}
 								});
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				e.printStackTrace();
 			}
 		}
 
 		Double result = 0.0;
 
-		try {
+		try
+		{
 			Map<String, Integer> paraMap = phenotype.get();
-			for (Map.Entry<String, Integer> parameter : paraMap.entrySet()) {
+			for (Map.Entry<String, Integer> parameter : paraMap.entrySet())
+			{
 				parameter.getValue();
 				String comm = "set " + parameter.getKey() + " " + parameter.getValue().toString();
 				comp.command(comm);
@@ -69,11 +78,13 @@ public class SimulationEvaluator implements Evaluator<PhenotypeWrapper<Map<Strin
 			result = (Double) comp.report("ticks");
 
 			// comp.setVisible(false);
-//			frame.dispose();
+			// frame.dispose();
 			System.gc();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 
 		Objectives objectives = new Objectives();
 		objectives.add(objective, result);
@@ -81,7 +92,8 @@ public class SimulationEvaluator implements Evaluator<PhenotypeWrapper<Map<Strin
 	}
 
 	@Override
-	public Collection<Objective> getObjectives() {
+	public Collection<Objective> getObjectives()
+	{
 		return Arrays.asList(objective);
 	}
 

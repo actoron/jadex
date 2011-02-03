@@ -6,9 +6,9 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.service.BasicService;
 import jadex.simulation.analysis.buildingBlocks.simulation.IModelInspectionService;
-import jadex.simulation.analysis.common.dataObjects.ABasicParameter;
-import jadex.simulation.analysis.common.dataObjects.AParameterCollection;
-import jadex.simulation.analysis.common.dataObjects.IAParameterCollection;
+import jadex.simulation.analysis.common.dataObjects.parameter.ABasicParameter;
+import jadex.simulation.analysis.common.dataObjects.parameter.AParameterEnsemble;
+import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -28,8 +28,8 @@ public class DesmoJModelService extends BasicService implements IModelInspection
 		Future res = new Future();
 		
 		// TODO: Search right Model (DesmoJ Reflect)
-		IAParameterCollection paramters = new AParameterCollection();
-		paramters.add(new ABasicParameter("vcNumber", "2",String.class,false,false));
+		IAParameterEnsemble paramters = new AParameterEnsemble();
+		paramters.addParameter(new ABasicParameter("vcNumber", Integer.class, new Integer(2)));
 		res.setResult(paramters);
 		return res;
 	}
@@ -39,8 +39,8 @@ public class DesmoJModelService extends BasicService implements IModelInspection
 		Future res = new Future();
 		
 		// TODO: Search right Model (DesmoJ Reflect)
-		IAParameterCollection paramters = new AParameterCollection();
-		paramters.add(new ABasicParameter("zeit", null,String.class,true,true));
+		IAParameterEnsemble paramters = new AParameterEnsemble();
+		paramters.addParameter(new ABasicParameter("zeit", Double.class));
 		res.setResult(paramters);
 		return res;
 	}
