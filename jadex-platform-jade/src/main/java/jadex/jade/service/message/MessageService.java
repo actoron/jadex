@@ -29,7 +29,6 @@ import jadex.base.fipa.DFRegister;
 import jadex.base.fipa.DFSearch;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.SFipa;
-import jadex.base.service.message.transport.ITransport;
 import jadex.bridge.ContentException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
@@ -110,9 +109,6 @@ public class MessageService  extends BasicService implements IMessageService
 	
 	/** The cashed clock service. */
 	protected IComponentManagementService cms;
-
-	/** The Jadex transport to communicate with Jadex standalone platforms. */
-	protected ITransport	transport;
 	
 	//-------- constructors --------
 
@@ -120,12 +116,11 @@ public class MessageService  extends BasicService implements IMessageService
 	 *  Constructor for Outbox.
 	 *  @param platform
 	 */
-	public MessageService(IServiceProvider provider, ITransport transport, MessageType[] messagetypes)
+	public MessageService(IServiceProvider provider, MessageType[] messagetypes)
 	{
 		super(provider.getId(), IMessageService.class, null);
 		this.provider = provider;
 		this.logger = Logger.getLogger("JADE_Platform.mts");
-		this.transport	= transport;
 		
 		this.messagetypes	= SCollection.createHashMap();
 		for(int i=0; i<messagetypes.length; i++)
@@ -512,14 +507,6 @@ public class MessageService  extends BasicService implements IMessageService
 		});
 		
 		return ret;
-	}
-
-	/**
-	 *  Get the Jadex transport (if any).
-	 */
-	public ITransport getTransport()
-	{
-		return transport;
 	}
 	
 	/**

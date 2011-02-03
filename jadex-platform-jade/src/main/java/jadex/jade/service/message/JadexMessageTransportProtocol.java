@@ -6,10 +6,10 @@ import jade.mtp.MTP;
 import jade.mtp.MTPException;
 import jade.mtp.TransportAddress;
 import jadex.base.service.message.transport.ITransport;
-import jadex.bridge.IMessageService;
-import jadex.commons.IFuture;
-import jadex.commons.service.SServiceProvider;
 import jadex.jade.ComponentAdapterFactory;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SJavaParser;
+import jadex.javaparser.SimpleValueFetcher;
 
 
 /**
@@ -29,11 +29,12 @@ public class JadexMessageTransportProtocol implements MTP
 	public TransportAddress activate(Dispatcher disp, Profile p)
 			throws MTPException
 	{
-		IFuture	future	= SServiceProvider.getService(ComponentAdapterFactory.getInstance().getRootComponent().getServiceProvider(), IMessageService.class);
-		assert future.isDone();
-		MessageService	ms	= (MessageService)future.get(null);
-		ITransport	trans	= ms.getTransport();
-		System.out.println("JadexMessageTransportProtocol.activate(): "+trans);		
+		String	jadextransport	= p.getParameter("jadextransport", null);
+		IParsedExpression	exp	= SJavaParser.parseExpression(jadextransport, null, getClass().getClassLoader());
+		SimpleValueFetcher	fetcher	= new SimpleValueFetcher();
+		fetcher.setValue("$provider", ComponentAdapterFactory.getInstance().getRootComponent().getServiceContainer());
+		ITransport	trans	= (ITransport)exp.getValue(fetcher);
+		System.out.println("JadexMessageTransportProtocol.activate(): "+trans);
 		return null;
 	}
 

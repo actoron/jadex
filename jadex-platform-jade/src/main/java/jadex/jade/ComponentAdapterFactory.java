@@ -40,7 +40,7 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 	protected PlatformController controller;
 	
 	/** The Jadex root component. */
-	protected IExternalAccess root;
+	protected IComponentInstance root;
 	
 	/** Flag for init step. */
 	protected boolean	inited;
@@ -75,7 +75,7 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 		if(!inited)
 		{
 			inited	= true;
-			this.root	= instance.getExternalAccess();
+			this.root	= instance;
 			assert	desc.getParent()==null : "First component must be root component.";
 			
 			
@@ -86,10 +86,16 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 			}
 			Object	rma	= args!=null ? args.get("rma") : null;
 			boolean	gui	= rma!=null && rma instanceof Boolean && ((Boolean)rma).booleanValue();
+			Object	jadextransport	= args!=null ? args.get("jadextransport") : null;
 			
 			List	jadeargs	= new ArrayList();
-			jadeargs.add("-mtp");
-			jadeargs.add(JadexMessageTransportProtocol.class.getName());
+			if(jadextransport!=null)
+			{
+				jadeargs.add("-mtp");
+				jadeargs.add(JadexMessageTransportProtocol.class.getName());
+				jadeargs.add("-jadextransport");
+				jadeargs.add(jadextransport);
+			}
 			if(gui)
 				jadeargs.add("-gui");
 			else
@@ -179,7 +185,7 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 	/**
 	 *  Get the Jadex root platform component.
 	 */
-	public IExternalAccess	getRootComponent()
+	public IComponentInstance	getRootComponent()
 	{
 		return root;
 	}
