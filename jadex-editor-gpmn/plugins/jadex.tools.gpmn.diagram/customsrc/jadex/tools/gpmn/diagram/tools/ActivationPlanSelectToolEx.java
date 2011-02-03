@@ -106,6 +106,7 @@ public class ActivationPlanSelectToolEx extends DragEditPartsTrackerEx
 		CompoundCommand cc = new CompoundCommand();
 		cc.add(cmd);
 		
+		final List<VirtualActivationEdgeEditPart> virtParts = new ArrayList<VirtualActivationEdgeEditPart>();
 		cmd = new ICommandProxy(new AbstractTransactionalCommand((TransactionalEditingDomain) AdapterFactoryEditingDomain.getEditingDomainFor(diagramEditPart.resolveSemanticElement()),
 				"Hide Activation Plan.",
 				Arrays.asList(new Object[] {WorkspaceSynchronizer.getFile(diagramEditPart.resolveSemanticElement().eResource())}))
@@ -118,7 +119,6 @@ public class ActivationPlanSelectToolEx extends DragEditPartsTrackerEx
 				for (CreateConnectionViewRequest request : virtEdges)
 					virtSet.add((View) ((ConnectionViewDescriptor) request.getNewObject()).getAdapter(View.class));
 				
-				List<VirtualActivationEdgeEditPart> virtParts = new ArrayList<VirtualActivationEdgeEditPart>();
 				for (Object connPart : diagramEditPart.getConnections())
 					if (connPart instanceof VirtualActivationEdgeEditPart && virtSet.contains(((VirtualActivationEdgeEditPart) connPart).getPrimaryView()))
 						virtParts.add((VirtualActivationEdgeEditPart) connPart);
@@ -132,6 +132,28 @@ public class ActivationPlanSelectToolEx extends DragEditPartsTrackerEx
 				}
 				
 				planPart.getPrimaryView().setVisible(false);
+				
+				return CommandResult.newOKCommandResult();
+			}
+			
+			@Override
+			public boolean canExecute()
+			{
+				return (planPart.getSourceConnections().size() > 0 && planPart.getTargetConnections().size() > 0);
+			}
+		});
+		cc.add(cmd);
+		
+		cmd = new ICommandProxy(new AbstractTransactionalCommand((TransactionalEditingDomain) AdapterFactoryEditingDomain.getEditingDomainFor(diagramEditPart.resolveSemanticElement()),
+				"Hide Activation Plan.",
+				Arrays.asList(new Object[] {WorkspaceSynchronizer.getFile(diagramEditPart.resolveSemanticElement().eResource())}))
+		{
+			protected CommandResult doExecuteWithResult(
+					IProgressMonitor monitor, IAdaptable info)
+					throws ExecutionException
+			{
+				for (VirtualActivationEdgeEditPart vaePart : virtParts)
+					((EditPart) vaePart.getChildren().get(0)).refresh();
 				
 				return CommandResult.newOKCommandResult();
 			}

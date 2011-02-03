@@ -10,9 +10,8 @@ package jadex.tools.gpmn.diagram.edit.parts;
 import jadex.tools.gpmn.ActivationPlan;
 import jadex.tools.gpmn.ModeType;
 import jadex.tools.gpmn.diagram.edit.policies.GpmnTextSelectionEditPolicy;
+import jadex.tools.gpmn.diagram.parsers.ActivationOrderParser;
 import jadex.tools.gpmn.diagram.part.GpmnVisualIDRegistry;
-import jadex.tools.gpmn.diagram.providers.GpmnElementTypes;
-import jadex.tools.gpmn.diagram.providers.GpmnParserProvider;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +36,7 @@ import org.eclipse.gmf.runtime.common.ui.services.parser.IParser;
 import org.eclipse.gmf.runtime.common.ui.services.parser.IParserEditStatus;
 import org.eclipse.gmf.runtime.common.ui.services.parser.ParserEditStatus;
 import org.eclipse.gmf.runtime.common.ui.services.parser.ParserOptions;
+import org.eclipse.gmf.runtime.diagram.ui.editparts.DiagramEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.ITextAwareEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.LabelEditPart;
@@ -405,12 +405,12 @@ public class ActivationEdgeOrderEditPart extends LabelEditPart implements
 	{
 		if (parser == null)
 		{
-			parser = GpmnParserProvider
+			parser = new ActivationOrderParser((DiagramEditPart) getRoot().getContents());/*  GpmnParserProvider
 					.getParser(
 							GpmnElementTypes.ActivationEdge_4001,
 							getParserElement(),
 							GpmnVisualIDRegistry
-									.getType(jadex.tools.gpmn.diagram.edit.parts.ActivationEdgeOrderEditPart.VISUAL_ID));
+									.getType(jadex.tools.gpmn.diagram.edit.parts.ActivationEdgeOrderEditPart.VISUAL_ID));*/
 		}
 		return parser;
 	}

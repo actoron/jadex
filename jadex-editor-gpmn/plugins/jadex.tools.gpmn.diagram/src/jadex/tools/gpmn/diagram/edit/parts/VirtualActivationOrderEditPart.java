@@ -7,15 +7,15 @@
  */
 package jadex.tools.gpmn.diagram.edit.parts;
 
+import jadex.tools.gpmn.ActivationPlan;
+import jadex.tools.gpmn.ModeType;
 import jadex.tools.gpmn.diagram.edit.policies.GpmnTextSelectionEditPolicy;
+import jadex.tools.gpmn.diagram.parsers.VirtualOrderParser;
 import jadex.tools.gpmn.diagram.part.GpmnVisualIDRegistry;
-import jadex.tools.gpmn.diagram.providers.GpmnElementTypes;
-import jadex.tools.gpmn.diagram.providers.GpmnParserProvider;
 
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.ConnectionLocator;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
@@ -34,6 +34,7 @@ import org.eclipse.gmf.runtime.common.ui.services.parser.IParser;
 import org.eclipse.gmf.runtime.common.ui.services.parser.IParserEditStatus;
 import org.eclipse.gmf.runtime.common.ui.services.parser.ParserEditStatus;
 import org.eclipse.gmf.runtime.common.ui.services.parser.ParserOptions;
+import org.eclipse.gmf.runtime.diagram.ui.editparts.DiagramEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.ITextAwareEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.LabelEditPart;
@@ -45,7 +46,9 @@ import org.eclipse.gmf.runtime.diagram.ui.tools.TextDirectEditManager;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel;
 import org.eclipse.gmf.runtime.emf.core.util.EObjectAdapter;
 import org.eclipse.gmf.runtime.emf.ui.services.parser.ISemanticParser;
+import org.eclipse.gmf.runtime.notation.Edge;
 import org.eclipse.gmf.runtime.notation.FontStyle;
+import org.eclipse.gmf.runtime.notation.Node;
 import org.eclipse.gmf.runtime.notation.NotationPackage;
 import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
@@ -235,6 +238,24 @@ public class VirtualActivationOrderEditPart extends LabelEditPart implements
 		return resolveSemanticElement();
 	}
 	
+	public EObject resolveSemanticElement()
+	{
+		Edge veEdge = (Edge) ((VirtualActivationEdgeEditPart) getParent()).getNotationView();
+		if (veEdge.getTargetEdges().size() == 0)
+			return null;
+		Node aeNode =  (Node) ((Edge) veEdge.getTargetEdges().get(0)).getSource();
+		if (((ActivationPlan) aeNode.getElement()).getMode() != ModeType.SEQUENTIAL)
+			return null;
+		for (Object edge : aeNode.getSourceEdges())
+			if ((edge instanceof Edge) && (((Edge) edge).getTarget().equals(veEdge.getTarget())))
+			{
+				System.out.println(((Edge) edge).getElement());
+				return ((Edge) edge).getElement();
+			}
+		
+		return null;
+	}
+	
 	/**
 	 * @generated
 	 */
@@ -367,18 +388,19 @@ public class VirtualActivationOrderEditPart extends LabelEditPart implements
 	}
 	
 	/**
-	 * @generated
+	 * @generated NOT
 	 */
 	public IParser getParser()
 	{
 		if (parser == null)
 		{
-			parser = GpmnParserProvider
+			parser = new VirtualOrderParser((DiagramEditPart) getRoot().getContents());
+			/*parser = GpmnParserProvider
 					.getParser(
 							GpmnElementTypes.Link_4003,
 							getParserElement(),
 							GpmnVisualIDRegistry
-									.getType(jadex.tools.gpmn.diagram.edit.parts.VirtualActivationOrderEditPart.VISUAL_ID));
+									.getType(jadex.tools.gpmn.diagram.edit.parts.VirtualActivationOrderEditPart.VISUAL_ID));*/
 		}
 		return parser;
 	}

@@ -4,7 +4,8 @@ import jadex.tools.gpmn.AbstractEdge;
 import jadex.tools.gpmn.AbstractNode;
 import jadex.tools.gpmn.ActivationEdge;
 import jadex.tools.gpmn.ActivationPlan;
-import jadex.tools.gpmn.GpmnDiagram;
+import jadex.tools.gpmn.Goal;
+import jadex.tools.gpmn.PlanEdge;
 import jadex.tools.gpmn.diagram.edit.parts.ActivationPlanEditPart;
 import jadex.tools.gpmn.diagram.edit.parts.GoalEditPart;
 import jadex.tools.gpmn.diagram.providers.GpmnElementTypes;
@@ -28,12 +29,10 @@ import org.eclipse.gmf.runtime.diagram.ui.requests.CreateViewAndElementRequest.V
 import org.eclipse.gmf.runtime.diagram.ui.type.DiagramNotationType;
 import org.eclipse.gmf.runtime.emf.type.core.IElementType;
 import org.eclipse.gmf.runtime.emf.type.core.IHintedType;
-import org.eclipse.gmf.runtime.notation.Diagram;
 import org.eclipse.gmf.runtime.notation.Edge;
 import org.eclipse.gmf.runtime.notation.Location;
 import org.eclipse.gmf.runtime.notation.Node;
 import org.eclipse.gmf.runtime.notation.View;
-import org.eclipse.swt.widgets.Display;
 
 public final class SGpmnUtilities
 {
@@ -298,6 +297,18 @@ public final class SGpmnUtilities
 	public static final int getPlanEdgeCount(Node plan)
 	{
 		return plan.getTargetEdges().size();
+	}
+	
+	public static final List<PlanEdge> getPlanEdges(Goal goal)
+	{
+		List<PlanEdge> allPlanEdges = goal.getGpmnDiagram().getPlanEdges();
+		List<PlanEdge> planEdges = new ArrayList<PlanEdge>();
+		
+		for (PlanEdge planEdge : allPlanEdges)
+			if (planEdge.getSource().equals(goal))
+				planEdges.add(planEdge);
+		
+		return planEdges;
 	}
 	
 	public static final Edge unwrapView(CreateConnectionViewRequest req)

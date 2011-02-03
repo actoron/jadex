@@ -119,9 +119,6 @@ public class ConnectionHandleToolEx extends ConnectionHandleTool
 				//DiagramNotationType.NOTE_ATTACHMENT;
 				//((DiagramEditPart) connHandle.getOwner().getParent()).getPrimaryView().getDiagram().get
 				//DiagramViewFactory.
-				System.out.println(elem.getId());
-				System.out.println(ViewType.NOTEATTACHMENT);
-				System.out.println(((INotationType) elem).getSemanticHint());
 				//it.remove();
 			}
 		}
