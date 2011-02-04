@@ -71,7 +71,7 @@ public class PackageBasedTaskProvider extends TaskProviderSupport
 	/**
 	 * Initialize the discovered classes list
 	 */
-	private void initializeDiscoverdClasses()
+	protected void initializeDiscoverdClasses()
 	{
 		discoveredTasks = new UniqueEList<String>();
 		for (String aPackage : searchPackages)
@@ -92,7 +92,7 @@ public class PackageBasedTaskProvider extends TaskProviderSupport
 		}
 	}
 	
-	private void initializeSearchPackages()
+	protected void initializeSearchPackages()
 	{
 		searchPackages = JadexPackageListEditor
 						.parseStringList(JadexBpmnEditorActivator

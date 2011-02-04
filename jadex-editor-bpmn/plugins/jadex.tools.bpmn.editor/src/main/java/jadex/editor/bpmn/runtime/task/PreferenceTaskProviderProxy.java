@@ -11,13 +11,15 @@ import jadex.editor.bpmn.editor.preferences.JadexTaskProviderTypeListEditor;
 import java.io.InvalidObjectException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.emf.common.util.UniqueEList;
+import org.eclipse.emf.ecore.EModelElement;
 
 /**
  * This TaskProvider reads the Jadex BPMN preference list for TaskProvider,
@@ -31,21 +33,44 @@ import org.eclipse.emf.common.util.UniqueEList;
  */
 public class PreferenceTaskProviderProxy implements IEditorTaskProvider
 {
+	// ---- instance ----
+	
+	/** The provider-proxy instance */
+	private static IEditorTaskProvider instance;
+	
+	/** Access the default instance for {@link PreferenceTaskProviderProxy} */
+	public static IEditorTaskProvider getInstance()
+	{
+		if (instance == null)
+		{
+			instance = new PreferenceTaskProviderProxy();
+		}
+		
+		return instance;
+	}
+	
+	// ---- class ----
+	
 	/** The list of ITaskProvider */
-	private static List<String> iTaskProviderCache;
+	private static HashMap<String, IEditorTaskProvider> iTaskProviderCache;
 
 	/** Map for IRuntimeProvider access. className -> provider */
-	private SortedMap<String, Object> providerMap;
-
+	private SortedMap<String, Object> fqClassname2providerMap;
+	
+	/** The lastly selected input EModelElement */
+	private EModelElement inputElement;
+	
+	
+	
 	/**
 	 * Default constructor
 	 */
-	public PreferenceTaskProviderProxy()
+	private PreferenceTaskProviderProxy()
 	{
 		super();
 
-		iTaskProviderCache = new UniqueEList<String>();
-		providerMap = new TreeMap<String, Object>();
+		iTaskProviderCache = new HashMap<String, IEditorTaskProvider>();
+		fqClassname2providerMap = new TreeMap<String, Object>();
 
 		// initialize map and cache
 		getAvailableTaskImplementations();
@@ -57,11 +82,25 @@ public class PreferenceTaskProviderProxy implements IEditorTaskProvider
 	@Override
 	public void dispose()
 	{
-		// TODO Auto-generated method stub
+		// nothing to dispose
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see jadex.editor.bpmn.runtime.task.IEditorTaskProvider#setInput(org.eclipse.emf.ecore.EModelElement)
+	 */
+	@Override
+	public void setInput(EModelElement selectedElement)
+	{
+		this.inputElement = selectedElement;
 		
+		// set selected element in all task providers
+		for (IEditorTaskProvider provider : iTaskProviderCache.values())
+		{
+			provider.setInput(selectedElement);
+		}
 	}
 
-	
 	/* (non-Javadoc)
 	 * @see jadex.tools.bpmn.runtime.task.IEditorTaskProvider#refresh()
 	 */
@@ -69,9 +108,9 @@ public class PreferenceTaskProviderProxy implements IEditorTaskProvider
 	public void refresh()
 	{
 		iTaskProviderCache.clear();
-		providerMap.clear();
+		fqClassname2providerMap.clear();
 		WorkspaceClassLoaderHelper.getWorkspaceClassLoader(true);
-		getAvailableTaskImplementations();
+		//getAvailableTaskImplementations();
 	}
 
 	/**
@@ -85,14 +124,18 @@ public class PreferenceTaskProviderProxy implements IEditorTaskProvider
 	public String[] getAvailableTaskImplementations()
 	{
 
-		List<String> preferenceList = JadexTaskProviderTypeListEditor.parseStringList(JadexBpmnEditorActivator.getDefault().getPreferenceStore().getString(JadexPreferencesPage.PREFERENCE_TASKPROVIDER_STRINGLIST));
+		Set<String> preferenceSet = new HashSet<String>(
+				JadexTaskProviderTypeListEditor
+						.parseStringList(JadexBpmnEditorActivator
+								.getDefault()
+								.getPreferenceStore()
+								.getString(
+										JadexPreferencesPage.PREFERENCE_TASKPROVIDER_STRINGLIST)));
+
+		boolean clearProviderCache = !iTaskProviderCache.keySet().equals(preferenceSet);
+		loadTaskMetaInfos(preferenceSet, clearProviderCache);
 		
-		if (!iTaskProviderCache.equals(preferenceList))
-		{
-			loadTaskMetaInfos(preferenceList);
-		}
-		
-		return providerMap.keySet().toArray(new String[providerMap.size()]);
+		return fqClassname2providerMap.keySet().toArray(new String[fqClassname2providerMap.size()]);
 
 	}
 	
@@ -101,18 +144,15 @@ public class PreferenceTaskProviderProxy implements IEditorTaskProvider
 	 * 
 	 * @param iTaskProviderList to load
 	 */
-	protected void loadTaskMetaInfos(List<String> iTaskProviderList)
+	protected void loadTaskMetaInfos(Set<String> iTaskProviderList, boolean clearProviderCache)
 	{
-		// replace cache and clear map
-		if (iTaskProviderList == null)
+		if (clearProviderCache)
 		{
 			iTaskProviderCache.clear();
 		}
-		else
-		{
-			iTaskProviderCache = iTaskProviderList;
-		}
-		providerMap.clear();
+		
+		// clear task list 2 provider map
+		fqClassname2providerMap.clear();
 		
 		ClassLoader classLoader = WorkspaceClassLoaderHelper
 				.getWorkspaceClassLoader(false);
@@ -124,36 +164,50 @@ public class PreferenceTaskProviderProxy implements IEditorTaskProvider
 
 		for (String className : iTaskProviderList)
 		{
-			try
+			// load new classes
+			if (!iTaskProviderCache.containsKey(className))
 			{
-				
-				Class<?> clazz = classLoader.loadClass(className);
-				Object instance = clazz.newInstance();
-				String[] tasks;
-				IEditorTaskProvider provider;
-				
-				if (instance instanceof IEditorTaskProvider)
+				try
 				{
-					provider = (IEditorTaskProvider) instance;
-					tasks = provider.getAvailableTaskImplementations();
-				} 
-				else
-				{
-					// use reflection proxy
-					provider = new TaskProviderProxy(instance);
-					tasks = provider.getAvailableTaskImplementations();
+					Class<?> clazz = classLoader.loadClass(className);
+					Object instance = clazz.newInstance();
+					
+					IEditorTaskProvider provider;
+					
+					if (instance instanceof IEditorTaskProvider)
+					{
+						provider = (IEditorTaskProvider) instance;
+					} 
+					else
+					{
+						// use reflection proxy
+						provider = new TaskProviderProxy(instance);
+					}
+
+					iTaskProviderCache.put(className, provider);
+					
 				}
-				for (int i = 0; i < tasks.length; i++)
+				catch (Exception e)
 				{
-					providerMap.put(tasks[i], provider);
+					JadexBpmnEditor.log("Problem during TaskMetaInfo load in "+this.getClass().getSimpleName(), e, IStatus.ERROR);
 				}
-				
-			}
-			catch (Exception e)
-			{
-				JadexBpmnEditor.log("Problem during TaskMetaInfo load in "+this.getClass().getSimpleName(), e, IStatus.ERROR);
 			}
 			
+			String[] tasks;
+			for (IEditorTaskProvider provider : iTaskProviderCache.values())
+			{
+				provider.setInput(inputElement);
+				provider.refresh();
+				
+				// retrieve tasks
+				tasks = provider.getAvailableTaskImplementations();
+				
+				for (int i = 0; i < tasks.length; i++)
+				{
+					fqClassname2providerMap.put(tasks[i], provider);
+				}
+			}
+
 		}
 	}
 
@@ -168,7 +222,7 @@ public class PreferenceTaskProviderProxy implements IEditorTaskProvider
 	public IEditorTaskMetaInfo getTaskMetaInfo(String fqClassName)
 	{
 
-		Object obj = providerMap.get(fqClassName);
+		Object obj = fqClassname2providerMap.get(fqClassName);
 		if (obj != null && obj instanceof IEditorTaskProvider)
 		{
 			// use interface if implemented
@@ -189,7 +243,7 @@ public class PreferenceTaskProviderProxy implements IEditorTaskProvider
 	{
 		IStatus status = null;
 		
-		if (iTaskProviderCache.contains(fullQualifiedClassName))
+		if (iTaskProviderCache.keySet().contains(fullQualifiedClassName))
 		{
 			status = new Status(IStatus.OK, JadexBpmnEditorActivator.ID, "Already in list");;
 		}
@@ -235,5 +289,9 @@ public class PreferenceTaskProviderProxy implements IEditorTaskProvider
 		
 		return status;
 	}
+
+	
+
+	
 
 }

@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.emf.common.util.UniqueEList;
 import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.IJavaModel;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
@@ -222,8 +221,13 @@ class WorkspaceClassLoaderHelper
 					for (JarEntry entry : Collections.list(jar.entries())) {
 
 						if (entry.getName().startsWith(pkgName.replace('.', '/'))
+								// given extension found
 								&& entry.getName().endsWith(classSuffix)
-								&& !entry.getName().contains("$")) {
+								// no inner classes allowed
+								&& !entry.getName().contains("$")
+								// no sub packages allowed
+								&& entry.getName().indexOf('/', pkgName.length()) == -1) {
+							
 							// remove class extension
 							String className = entry.getName().replace("/", ".")
 									.substring(0, entry.getName().length() - 6);
@@ -233,6 +237,9 @@ class WorkspaceClassLoaderHelper
 							if (!Modifier.isAbstract(clazz.getModifiers())
 									&& !Modifier.isInterface(clazz.getModifiers()))
 							{
+								
+								System.err.println("Found: " + className + " in " + urlRessource);
+								
 								classes.add(clazz);
 							}
 							
@@ -393,6 +400,33 @@ class WorkspaceClassLoaderHelper
 			Method method = source.getClass()
 					.getMethod(methodName);
 			Object returnValue = method.invoke(source);
+			
+			return returnValue;
+		}
+		catch (Exception e)
+		{
+			JadexBpmnEditor.log("Exception in callUnparametrizedReflectionMethod("+source+", "+methodName+")", e, IStatus.WARNING);
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Call an Parameterized method on an object with reflection
+	 * 
+	 * @param source the source object to call the method
+	 * @param methodName the method identifier
+	 * @param args the method arguments
+	 * @return the return value from called method, may be null
+	 */
+	protected static Object callParametrizedReflectionMethod(Object source, String methodName, Object...  args)
+	{
+		try
+		{
+			// use reflection
+			Method method = source.getClass()
+					.getMethod(methodName);
+			Object returnValue = method.invoke(source, args);
 			
 			return returnValue;
 		}

@@ -53,7 +53,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  */
 public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 {
-
+	
 	// ---- constants ----
 
 	private static final String DESCRIPTION 	= "Description:  ";
@@ -89,7 +89,7 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 	{
 		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
 				JadexBpmnPropertiesUtil.JADEX_ACTIVITY_CLASS_DETAIL);
-		this.taskProvider = new PreferenceTaskProviderProxy();
+		this.taskProvider = PreferenceTaskProviderProxy.getInstance();
 	}
 
 	// ---- override methods ----
@@ -100,7 +100,6 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 	@Override
 	public void dispose()
 	{
-		this.taskProvider.dispose();
 		this.taskProvider = null;
 		// dispose is done in superclass, see addDisposable
 		super.dispose();
@@ -123,10 +122,16 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 	public void setInput(IWorkbenchPart part, ISelection selection)
 	{
 		super.setInput(part, selection);
-		if (modelElement != null && cCombo != null)
+		if (modelElement != null)
 		{
-			updateTaskMetaInfo(cCombo.getText());
+			taskProvider.setInput(modelElement);
+			
+			if (cCombo != null)
+			{
+				updateTaskMetaInfo(cCombo.getText());
+			}
 		}
+		
 	}
 
 	/*
@@ -169,6 +174,7 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 					if (taskProvider != null)
 					{
 						cCombo.setEnabled(false);
+						taskProvider.setInput(modelElement);
 						taskProvider.refresh();
 						cCombo.setItems(getComboItems());
 						sectionComposite.changed(new Control[] { cCombo });
@@ -656,9 +662,8 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 
 	// ---- BUGFIX METHOD ----
 
-	
-
 	/**
+	 * ---- BUGFIX METHOD ----
 	 * Needed to fix legacy BPMN files corrupted through a bug
 	 * 
 	 * @param parameterTable

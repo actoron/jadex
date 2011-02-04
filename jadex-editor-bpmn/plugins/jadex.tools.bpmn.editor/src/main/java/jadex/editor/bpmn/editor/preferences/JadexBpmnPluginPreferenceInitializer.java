@@ -36,13 +36,13 @@ public class JadexBpmnPluginPreferenceInitializer extends
 		
 		store.setDefault(JadexPreferencesPage.PREFERENCE_TASKPROVIDER_STRINGLIST,
 				AbstractPreferenceListEditor.createStringList(new String[] {
-				/* "jadex.tools.bpmn.runtime.task.StaticJadexTaskProvider" , */
-				"jadex.editor.bpmn.runtime.task.PackageBasedTaskProvider" }));
+				jadex.editor.bpmn.runtime.task.PackageBasedTaskProvider.class.getName(),
+				jadex.editor.bpmn.runtime.task.DiagramImportsTaskProvider.class.getName() }));
 
 		store.setDefault(
 				JadexPreferencesPage.PREFERENCE_TASKPROVIDER_SEARCH_PACKAGE_STRINGLIST,
 				AbstractPreferenceListEditor.createStringList(new String[] {
-						"jadex.bpmn.runtime.task", 
+						"jadex.bpmn.runtime.task",
 						"jadex.bdibpmn.task",
 						"jadex.wfms.client.task"}));
 

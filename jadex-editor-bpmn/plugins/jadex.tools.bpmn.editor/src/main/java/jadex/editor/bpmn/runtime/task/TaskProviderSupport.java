@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.emf.ecore.EModelElement;
+import org.eclipse.stp.bpmn.BpmnDiagram;
 
 /**
  * @author Claas
@@ -22,6 +24,8 @@ public abstract class TaskProviderSupport implements IEditorTaskProvider
 	/** The default meta info if class not found */
 	static final IEditorTaskMetaInfo NO_TASK_META_INFO_PROVIDED = new TaskMetaInfo("No TaskMetaInfo provided", new IEditorParameterMetaInfo[0]);
 
+	// ---- attributes ----
+	
 	/**
 	 * The provided task implementation classes for this {@link IRuntimeTaskProvider}
 	 */
@@ -33,7 +37,7 @@ public abstract class TaskProviderSupport implements IEditorTaskProvider
 	 */
 	protected Map<String, IEditorTaskMetaInfo> metaInfoMap;
 
-
+	
 	// ---- constructor ----
 	
 	/**
@@ -86,7 +90,13 @@ public abstract class TaskProviderSupport implements IEditorTaskProvider
 		taskImplementations = new String[0];
 		metaInfoMap.clear();
 	}
-	
+
+	@Override
+	public void setInput(EModelElement selectedElement)
+	{
+		// default - ignore
+	}
+
 	/**
 	 * Get the provided task implementations
 	 * Per default return an String[] with an empty String
@@ -96,9 +106,6 @@ public abstract class TaskProviderSupport implements IEditorTaskProvider
 	{
 		return taskImplementations;
 	}
-
-	
-	
 
 	/**
 	 * Get {@link TaskMetaInfo} for provided task implementation.

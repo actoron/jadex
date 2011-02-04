@@ -3,6 +3,7 @@ package jadex.editor.bpmn.runtime.task;
 import jadex.editor.bpmn.editor.JadexBpmnEditor;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.emf.ecore.EModelElement;
 
 public class TaskProviderProxy implements IEditorTaskProvider
 {
@@ -28,7 +29,23 @@ public class TaskProviderProxy implements IEditorTaskProvider
 	public void dispose()
 	{
 		// TODO Auto-generated method stub
-		
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * jadex.editor.bpmn.runtime.task.IEditorTaskProvider#setInput(org.eclipse
+	 * .emf.ecore.EModelElement)
+	 */
+	@Override
+	public void setInput(EModelElement selectedElement)
+	{
+		WorkspaceClassLoaderHelper
+		.callParametrizedReflectionMethod(
+				provider,
+				METHOD_IJADEXTASKPROVIDER_SET_INPUT, 
+				selectedElement);
 	}
 
 	/* (non-Javadoc)
@@ -37,7 +54,10 @@ public class TaskProviderProxy implements IEditorTaskProvider
 	@Override
 	public void refresh()
 	{
-		// nothing to refresh
+		WorkspaceClassLoaderHelper
+		.callUnparametrizedReflectionMethod(
+				provider,
+				METHOD_IJADEXTASKPROVIDER_REFRESH);
 	}
 
 	@Override

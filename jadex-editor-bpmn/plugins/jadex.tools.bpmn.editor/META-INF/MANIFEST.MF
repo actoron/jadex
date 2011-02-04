@@ -44,4 +44,3 @@ Export-Package: jadex.editor.bpmn.diagram,
    jadex.tools.eclipse.ui,
    org.eclipse.swt.widgets,
    org.eclipse.swt.layout"
-DynamicImport-Package: *

@@ -1,5 +1,7 @@
 package jadex.editor.bpmn.runtime.task;
 
+import org.eclipse.emf.ecore.EModelElement;
+
 public interface IEditorTaskProvider
 {
 
@@ -8,12 +10,17 @@ public interface IEditorTaskProvider
 	/** The implementing dispose() method name*/
 	public static final String METHOD_IJADEXTASKPROVIDER_DISPOSE = "dispose";
 	
-	/** The method to dispose all resources */
+	/** The method to refresh all resources */
 	public abstract void refresh();
-	/** The implementing dispose() method name*/
+	/** The implementing refresh() method name*/
 	public static final String METHOD_IJADEXTASKPROVIDER_REFRESH = "refresh";
 	
+	/** Set selected model element  */
+	public abstract void setInput(EModelElement selectedElement);
+	/** The implementing setInput() method name*/
+	public static final String METHOD_IJADEXTASKPROVIDER_SET_INPUT = "setInput";
 	
+
 	/** The method to access the provided task implementations */
 	public abstract String[] getAvailableTaskImplementations();
 	/** The implementing getAvailableTaskImplementations() method name*/
