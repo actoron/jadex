@@ -240,7 +240,7 @@ public class ModelTreePanel extends JPanel // JSplitPane
 				TreePath[]	paths	= tree.getSelectionPaths();
 				for(int i=0; paths!=null && i<paths.length; i++)
 				{
-					((ITreeNode)paths[i].getLastPathComponent()).refresh(false, true);
+					((ITreeNode)paths[i].getLastPathComponent()).refresh(false);
 				}
 			}
 		};
@@ -252,7 +252,7 @@ public class ModelTreePanel extends JPanel // JSplitPane
 				TreePath[]	paths	= tree.getSelectionPaths();
 				for(int i=0; paths!=null && i<paths.length; i++)
 				{
-					((ITreeNode)paths[i].getLastPathComponent()).refresh(true, true);
+					((ITreeNode)paths[i].getLastPathComponent()).refresh(true);
 				}
 			}
 		};
@@ -316,7 +316,7 @@ public class ModelTreePanel extends JPanel // JSplitPane
 								removepath.actionPerformed(e);
 							}
 						};
-						ret.add(removepath);
+						ret.add(premovepath);
 					}
 				}
 				
@@ -362,7 +362,7 @@ public class ModelTreePanel extends JPanel // JSplitPane
 			public void keyReleased(KeyEvent e)
 			{
 				if(KeyEvent.VK_F5==e.getKeyCode())
-					((ITreeNode)getModel().getRoot()).refresh(true, true);
+					((ITreeNode)getModel().getRoot()).refresh(true);
 			}
 			
 			public void keyPressed(KeyEvent e)
@@ -407,7 +407,7 @@ public class ModelTreePanel extends JPanel // JSplitPane
 						if(item!=null)
 							item.setEnabled(!isAll());
 					}
-					((ITreeNode)getModel().getRoot()).refresh(true, true);
+					((ITreeNode)getModel().getRoot()).refresh(true);
 				}
 			});
 			
@@ -516,7 +516,7 @@ public class ModelTreePanel extends JPanel // JSplitPane
 										{
 											public void actionPerformed(ActionEvent e)
 											{
-												((ITreeNode)getModel().getRoot()).refresh(true, true);
+												((ITreeNode)getModel().getRoot()).refresh(true);
 											}
 										});
 										filetypes.put(fts[i], ff);

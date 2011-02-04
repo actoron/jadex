@@ -1,6 +1,5 @@
 package jadex.base.gui.modeltree;
 
-import jadex.base.gui.asynctree.ITreeNode;
 import jadex.commons.IFuture;
 import jadex.commons.TreeExpansionHandler;
 import jadex.commons.concurrent.IResultListener;

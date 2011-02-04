@@ -1,7 +1,6 @@
 package jadex.base;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.IComponentFactory;

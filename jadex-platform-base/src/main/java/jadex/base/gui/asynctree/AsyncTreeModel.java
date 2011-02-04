@@ -1,11 +1,8 @@
 package jadex.base.gui.asynctree;
 
-import jadex.commons.collection.MultiCollection;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -36,8 +33,8 @@ public class AsyncTreeModel implements TreeModel
 	/** The node lookup table. */
 	protected final Map	nodes;
 	
-	/** The added nodes. */
-	protected final Map	added;
+//	/** The added nodes. */
+//	protected final Map	added;
 	
 	/** The zombie node ids. */
 	protected final Set	zombies;
@@ -45,8 +42,8 @@ public class AsyncTreeModel implements TreeModel
 	/** The icon overlays. */
 	protected final List	overlays;
 	
-	/** The changed nodes (delayed update for improving perceived speed). */
-	protected MultiCollection	changed;
+//	/** The changed nodes (delayed update for improving perceived speed). */
+//	protected MultiCollection	changed;
 	
 	//-------- constructors --------
 	
@@ -58,7 +55,7 @@ public class AsyncTreeModel implements TreeModel
 		this.listeners	= new ArrayList();
 		this.nodelisteners	= new ArrayList();
 		this.nodes	= new HashMap();
-		this.added	= new HashMap();
+//		this.added	= new HashMap();
 		this.zombies	= new HashSet();
 		this.overlays	= new ArrayList();
 	}
@@ -71,6 +68,8 @@ public class AsyncTreeModel implements TreeModel
 	public Object getRoot()
 	{
 		assert SwingUtilities.isEventDispatchThread();
+		
+//		System.err.println("model."+hashCode()+" getRoot");
 
 		return root;
 	}
@@ -81,6 +80,8 @@ public class AsyncTreeModel implements TreeModel
 	public Object getChild(Object parent, int index)
 	{
 		assert SwingUtilities.isEventDispatchThread();
+		
+//		System.err.println("model."+hashCode()+" getChild "+parent+", "+index);
 
 		return ((ITreeNode)parent).getChild(index);
 	}
@@ -92,6 +93,8 @@ public class AsyncTreeModel implements TreeModel
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
+//		System.err.println("model."+hashCode()+" getChildCount "+parent);
+		
 		return ((ITreeNode)parent).getChildCount();
 	}
 	
@@ -101,6 +104,8 @@ public class AsyncTreeModel implements TreeModel
 	public int getIndexOfChild(Object parent, Object child)
 	{
 		assert SwingUtilities.isEventDispatchThread();
+		
+//		System.err.println("model."+hashCode()+" getIndexOfChild "+parent+", "+child);
 
 		return ((ITreeNode)parent).getIndexOfChild((ITreeNode)child);
 	}
@@ -111,6 +116,8 @@ public class AsyncTreeModel implements TreeModel
 	public boolean isLeaf(Object node)
 	{
 		assert SwingUtilities.isEventDispatchThread();
+
+//		System.err.println("model."+hashCode()+" isLeaf "+node);
 
 		return ((ITreeNode)node).isLeaf();
 	}
@@ -173,7 +180,7 @@ public class AsyncTreeModel implements TreeModel
 		
 		List path = buildTreePath(node);
 
-//		System.err.println(""+hashCode()+" Path changed: "+node+", "+path+", "+node.getCachedChildren());
+//		System.err.println(""+hashCode()+" Tree changed: "+node+", "+path+", "+node.getCachedChildren());
 		
 		for(int i=0; i<listeners.size(); i++)
 		{
@@ -187,87 +194,110 @@ public class AsyncTreeModel implements TreeModel
 	public void fireNodeChanged(ITreeNode node)
 	{
 		assert SwingUtilities.isEventDispatchThread();
-
-		if(changed==null)
+		
+		List path;
+		int[]	indices;
+		Object[]	children;
+		if(node.getParent()!=null)
 		{
-			changed	= new MultiCollection(new HashMap(), HashSet.class);
-			changed.put(node.getParent(), node);
-//			SwingUtilities.invokeLater(new Runnable()
-//			{
-//				public void run()
-//				{
-					ITreeNode[]	parents	= (ITreeNode[])changed.getKeys(ITreeNode.class);
-					for(int i=0; i<parents.length; i++)
-					{
-						// Only throw event when root node or parent still in tree
-						if(parents[i]==null || getAddedNode(parents[i].getId())!=null)
-						{
-							boolean	skip	= false;
-							Set	set	= (Set)changed.get(parents[i]);
-							int[]	indices;
-							Object[]	nodes;
-							List	path	= null;
-							if(parents[i]!=null)
-							{
-								int cnt	= 0;
-								nodes	= new Object[set.size()];
-								indices	= new int[nodes.length];
-								Iterator	it	= set.iterator();
-								for(int j=0; j<nodes.length; j++)
-								{
-									nodes[cnt]	= it.next();
-									if(getAddedNode(((ITreeNode)nodes[cnt]).getId())!=null)
-									{
-										indices[cnt]	= parents[i].getIndexOfChild((ITreeNode)nodes[cnt]);
-										if(indices[cnt]!=-1)
-										{
-											cnt++;
-										}
-									}
-								}
-								if(cnt==0)
-								{
-									skip	= true;
-								}
-								else
-								{
-									if(cnt<nodes.length)
-									{
-										Object[]	ntmp	= new Object[cnt];
-										int[]	itmp	= new int[cnt];
-										System.arraycopy(nodes, 0, ntmp, 0, cnt);
-										System.arraycopy(indices, 0, itmp, 0, cnt);
-										nodes	= ntmp;
-										indices	= itmp;
-									}
-									path = buildTreePath(parents[i]);
-								}
-							}
-							
-							// Root node (there can be only one with parent==null)
-							else
-							{
-								assert set.size()==1 : set;
-								indices	= null;
-								nodes	= null;
-								path = buildTreePath((ITreeNode)set.iterator().next());
-								
-							}
-							
-							if(!skip)	// Nodes might be removed already.
-							{
-								for(int j=0; j<listeners.size(); j++)
-								{
-									((TreeModelListener)listeners.get(j)).treeNodesChanged(new TreeModelEvent(this, path.toArray(), indices, nodes));
-								}
-							}
-						}
-					}
-					
-					changed	= null;
-//				}
-//			});
+			path = buildTreePath(node.getParent());
+			indices	= new int[]{node.getParent().getIndexOfChild(node)};
+			children	= new Object[]{node};
 		}
+		else
+		{
+			path = buildTreePath(node);
+			indices	= null;
+			children	= null;
+		}
+
+//		System.err.println(""+hashCode()+" Node changed: "+node+", "+path+", "+node.getCachedChildren());
+		
+		for(int i=0; i<listeners.size(); i++)
+		{
+			((TreeModelListener)listeners.get(i)).treeNodesChanged(new TreeModelEvent(this, path.toArray(), indices, children));
+		}
+
+//		if(changed==null)
+//		{
+//			changed	= new MultiCollection(new HashMap(), HashSet.class);
+//			changed.put(node.getParent(), node);
+////			SwingUtilities.invokeLater(new Runnable()
+////			{
+////				public void run()
+////				{
+//					ITreeNode[]	parents	= (ITreeNode[])changed.getKeys(ITreeNode.class);
+//					for(int i=0; i<parents.length; i++)
+//					{
+//						// Only throw event when root node or parent still in tree
+//						if(parents[i]==null || getAddedNode(parents[i].getId())!=null)
+//						{
+//							boolean	skip	= false;
+//							Set	set	= (Set)changed.get(parents[i]);
+//							int[]	indices;
+//							Object[]	nodes;
+//							List	path	= null;
+//							if(parents[i]!=null)
+//							{
+//								int cnt	= 0;
+//								nodes	= new Object[set.size()];
+//								indices	= new int[nodes.length];
+//								Iterator	it	= set.iterator();
+//								for(int j=0; j<nodes.length; j++)
+//								{
+//									nodes[cnt]	= it.next();
+//									if(getAddedNode(((ITreeNode)nodes[cnt]).getId())!=null)
+//									{
+//										indices[cnt]	= parents[i].getIndexOfChild((ITreeNode)nodes[cnt]);
+//										if(indices[cnt]!=-1)
+//										{
+//											cnt++;
+//										}
+//									}
+//								}
+//								if(cnt==0)
+//								{
+//									skip	= true;
+//								}
+//								else
+//								{
+//									if(cnt<nodes.length)
+//									{
+//										Object[]	ntmp	= new Object[cnt];
+//										int[]	itmp	= new int[cnt];
+//										System.arraycopy(nodes, 0, ntmp, 0, cnt);
+//										System.arraycopy(indices, 0, itmp, 0, cnt);
+//										nodes	= ntmp;
+//										indices	= itmp;
+//									}
+//									path = buildTreePath(parents[i]);
+//								}
+//							}
+//							
+//							// Root node (there can be only one with parent==null)
+//							else
+//							{
+//								assert set.size()==1 : set;
+//								indices	= null;
+//								nodes	= null;
+//								path = buildTreePath((ITreeNode)set.iterator().next());
+//								
+//							}
+//							
+//							if(!skip)	// Nodes might be removed already.
+//							{
+//								for(int j=0; j<listeners.size(); j++)
+//								{
+//									((TreeModelListener)listeners.get(j)).treeNodesChanged(new TreeModelEvent(this, path.toArray(), indices, nodes));
+//								}
+//							}
+//						}
+//					}
+//					
+//					changed	= null;
+////				}
+////			});
+//		}
 		
 //		System.out.println("Node changed: "+node+", "+path);		
 	}
@@ -275,34 +305,38 @@ public class AsyncTreeModel implements TreeModel
     /**
      *  Inform listeners that a node has been removed
      */
-	public void fireNodeRemoved(ITreeNode parent, ITreeNode child, int index)
+	public void fireNodesRemoved(ITreeNode parent, ITreeNode[] children, int[] indices)
 	{
 		assert SwingUtilities.isEventDispatchThread();
-		
+
 		List path = buildTreePath(parent);
 		
-//		System.err.println(""+hashCode()+" Node removed: "+child+", "+index+", "+path);
+//		System.err.println(""+hashCode()+" Nodes removed: "+SUtil.arrayToString(children)+", "+SUtil.arrayToString(indices)+", "+path);
 		
 		for(int i=0; i<listeners.size(); i++)
 		{
-			((TreeModelListener)listeners.get(i)).treeNodesRemoved(new TreeModelEvent(this, path.toArray(), new int[]{index}, new Object[]{child}));
+			((TreeModelListener)listeners.get(i)).treeNodesRemoved(
+//				new TreeModelEvent(this, path.toArray(), new int[]{index}, new Object[]{child}));
+				new TreeModelEvent(this, path.toArray(), indices, children));
 		}
 	}
 
     /**
      *  Inform listeners that a node has been added
      */
-	public void fireNodeAdded(ITreeNode parent, ITreeNode child, int index)
+	public void fireNodesAdded(ITreeNode parent, ITreeNode[] children, int[] indices)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
 		List path = buildTreePath(parent);
 		
-//		System.err.println(""+hashCode()+" Node added: "+child+", "+index+", "+path);
+//		System.err.println(""+hashCode()+" Nodes added: "+SUtil.arrayToString(children)+", "+SUtil.arrayToString(indices)+", "+path);
 		
 		for(int i=0; i<listeners.size(); i++)
 		{
-			((TreeModelListener)listeners.get(i)).treeNodesInserted(new TreeModelEvent(this, path.toArray(), new int[]{index}, new Object[]{child}));
+			((TreeModelListener)listeners.get(i)).treeNodesInserted(
+//				new TreeModelEvent(this, path.toArray(), new int[]{index}, new Object[]{child}));
+				new TreeModelEvent(this, path.toArray(), indices, children));
 		}
 	}
 	
@@ -350,7 +384,7 @@ public class AsyncTreeModel implements TreeModel
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
-		added.put(node.getId(), node);
+//		added.put(node.getId(), node);
 		
 		INodeListener[]	lis	= (INodeListener[])nodelisteners.toArray(new INodeListener[nodelisteners.size()]);
 		for(int i=0; i<lis.length; i++)
@@ -360,6 +394,7 @@ public class AsyncTreeModel implements TreeModel
 
 		for(int i=0; i<node.getCachedChildren().size(); i++)
 		{
+			System.out.println("Complex node: "+node);
 			addNode((ITreeNode)node.getCachedChildren().get(i));
 		}		
 	}
@@ -379,15 +414,15 @@ public class AsyncTreeModel implements TreeModel
 		return ret;
 	}
 	
-	/**
-	 *  Get a node by its id.
-	 */
-	public ITreeNode	getAddedNode(Object id)
-	{
-		assert SwingUtilities.isEventDispatchThread();
-
-		return (ITreeNode)added.get(id);
-	}
+//	/**
+//	 *  Get a node by its id.
+//	 */
+//	public ITreeNode	getAddedNode(Object id)
+//	{
+//		assert SwingUtilities.isEventDispatchThread();
+//
+//		return (ITreeNode)added.get(id);
+//	}
 	
 	/**
 	 *  Remove a node registration.
@@ -409,7 +444,7 @@ public class AsyncTreeModel implements TreeModel
 			{
 	//			System.out.println("Removed: "+node.getId());
 				nodes.remove(node.getId());
-				added.remove(node.getId());
+//				added.remove(node.getId());
 				notify	= true;
 			}
 		}

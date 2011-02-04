@@ -77,7 +77,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 			public void actionPerformed(ActionEvent e)
 			{
 				// hmm?! with or without subtree?
-				refresh(true, false);
+				refresh(true);
 			}
 		});
 		timer.start();
@@ -122,14 +122,14 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	 *  Called once for each node.
 	 *  Should call setChildren() once children are found.
 	 */
-	protected void	searchChildren(final boolean force)
+	protected void	searchChildren()
 	{
 		getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
 			{
 				final Future	future	= new Future();
-				searchChildren(cms, ProxyComponentTreeNode.this, desc, cid, iconcache, future, force)
+				searchChildren(cms, ProxyComponentTreeNode.this, desc, cid, iconcache, future)
 					.addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object result)
@@ -172,7 +172,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	protected static IFuture searchChildren(final IComponentManagementService cms, final ITreeNode parentnode,
 		final IComponentDescription desc, final IComponentIdentifier cid, final  ComponentIconCache iconcache,
 		final // future for determining when services can be added to service container.
-		Future future, final boolean force)
+		Future future)
 	{
 		final Future ret = new Future();
 	

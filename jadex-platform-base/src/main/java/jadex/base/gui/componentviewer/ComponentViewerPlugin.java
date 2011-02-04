@@ -531,7 +531,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 											final Object clid = exta.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
 											viewables.put(cid, clid==null? Boolean.FALSE: Boolean.TRUE);
 			//								System.out.println("node: "+viewables.get(cid));
-											node.refresh(false, false);
+											node.refresh(false);
 										}
 										
 										public void customExceptionOccurred(Exception exception)

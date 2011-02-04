@@ -1,6 +1,5 @@
 package jadex.base.gui.modeltree;
 
-import jadex.base.gui.asynctree.ITreeNode;
 
 import java.util.Arrays;
 import java.util.LinkedList;

@@ -31,10 +31,10 @@ public class JarNode extends DirNode
 	 *  Asynchronously search for children.
 	 *  Should call setChildren() once children are found.
 	 */
-	protected void	searchChildren(boolean force)
+	protected void	searchChildren()
 	{
 		((JarAsDirectory)getFile()).refresh();
-		super.searchChildren(force);
+		super.searchChildren();
 	}
 	
 	//-------- methods --------

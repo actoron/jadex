@@ -74,7 +74,7 @@ public class RemoteFileNode  extends AbstractTreeNode
 	 *  Refresh the node.
 	 *  @param recurse	Recursively refresh subnodes, if true.
 	 */
-	public void refresh(boolean recurse, boolean force)
+	public void refresh(boolean recurse)
 	{
 //		cms.getComponentDescription(desc.getName()).addResultListener(new SwingDefaultResultListener()
 //		{
@@ -89,14 +89,14 @@ public class RemoteFileNode  extends AbstractTreeNode
 //			}
 //		});
 
-		super.refresh(recurse, force);
+		super.refresh(recurse);
 	}
 	
 	/**
 	 *  Asynchronously search for children.
 	 *  Should call setChildren() once children are found.
 	 */
-	protected void	searchChildren(boolean force)
+	protected void	searchChildren()
 	{
 	}
 	

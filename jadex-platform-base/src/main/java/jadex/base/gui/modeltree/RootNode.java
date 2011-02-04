@@ -64,7 +64,7 @@ public class RootNode extends AbstractTreeNode
 	 *  Refresh the node.
 	 *  @param recurse	Recursively refresh subnodes, if true.
 	 */
-	public void refresh(boolean recurse, boolean force)
+	public void refresh(boolean recurse)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
@@ -81,14 +81,14 @@ public class RootNode extends AbstractTreeNode
 //			}
 //		});
 
-		super.refresh(recurse, force);
+		super.refresh(recurse);
 	}
 	
 	/**
 	 *  Asynchronously search for children.
 	 *  Should call setChildren() once children are found.
 	 */
-	protected void	searchChildren(boolean force)
+	protected void	searchChildren()
 	{
 		setChildren(children);
 	}

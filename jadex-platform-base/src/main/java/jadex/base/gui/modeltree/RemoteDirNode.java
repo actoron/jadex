@@ -52,7 +52,7 @@ public class RemoteDirNode extends RemoteFileNode
 	 *  Asynchronously search for children.
 	 *  Should call setChildren() once children are found.
 	 */
-	protected void	searchChildren(boolean force)
+	protected void	searchChildren()
 	{
 		listFiles().addResultListener(new SwingDefaultResultListener()
 		{

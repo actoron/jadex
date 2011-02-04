@@ -84,7 +84,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	 *  Refresh the node.
 	 *  @param recurse	Recursively refresh subnodes, if true.
 	 */
-	public void refresh(boolean recurse, boolean force)
+	public void refresh(boolean recurse)
 	{
 		cms.getComponentDescription(desc.getName()).addResultListener(new SwingDefaultResultListener()
 		{
@@ -99,14 +99,14 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 			}
 		});
 
-		super.refresh(recurse, force);
+		super.refresh(recurse);
 	}
 	
 	/**
 	 *  Asynchronously search for children.
 	 *  Should call setChildren() once children are found.
 	 */
-	protected void	searchChildren(boolean force)
+	protected void	searchChildren()
 	{
 		final List	children	= new ArrayList();
 		final boolean	ready[]	= new boolean[2];	// 0: children, 1: services;

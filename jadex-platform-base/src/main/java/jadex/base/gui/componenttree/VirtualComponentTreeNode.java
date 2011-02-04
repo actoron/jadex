@@ -66,11 +66,11 @@ public class VirtualComponentTreeNode extends AbstractTreeNode implements IActiv
 	 *  Called once for each node.
 	 *  Should call setChildren() once children are found.
 	 */
-	protected void	searchChildren(boolean force)
+	protected void	searchChildren()
 	{
 		final Future	future	= new Future();
 //		System.out.println("virt children called: "+desc.getName());
-		ProxyComponentTreeNode.searchChildren(cms, this, desc, desc.getName(), iconcache, future, force)
+		ProxyComponentTreeNode.searchChildren(cms, this, desc, desc.getName(), iconcache, future)
 			.addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
@@ -91,7 +91,7 @@ public class VirtualComponentTreeNode extends AbstractTreeNode implements IActiv
 	 *  Refresh the node.
 	 *  @param recurse	Recursively refresh subnodes, if true.
 	 */
-	public void refresh(boolean recurse, boolean force)
+	public void refresh(boolean recurse)
 	{
 		ITreeNode tmp = getParent();
 		while(!(tmp instanceof ProxyComponentTreeNode))
@@ -141,7 +141,7 @@ public class VirtualComponentTreeNode extends AbstractTreeNode implements IActiv
 			}
 		});
 
-		super.refresh(recurse, force);
+		super.refresh(recurse);
 	}
 	
 	/**

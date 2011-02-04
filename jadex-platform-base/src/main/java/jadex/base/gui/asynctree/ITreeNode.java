@@ -54,7 +54,7 @@ public interface ITreeNode
 	 *  Refresh the node.
 	 *  @param recurse	Recursively refresh subnodes, if true.
 	 */
-	public void	refresh(boolean recurse, boolean force);
+	public void	refresh(boolean recurse);
 	
 	/**
 	 *  Get the cached children, i.e. do not start any background processes for updating the children.
