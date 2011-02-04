@@ -157,7 +157,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
-		return children!=null ? children : Collections.EMPTY_LIST;
+		return children!=null ? new ArrayList(children) : Collections.EMPTY_LIST;
 	}
 
 	/**
@@ -226,6 +226,9 @@ public abstract class AbstractTreeNode	implements ITreeNode
 				boolean	dorecurse	= recurse;
 				searching	= false;
 				recurse	= false;
+				
+				// Children must not be changed in mean time
+				assert SUtil.equals(children, oldcs) : "Children changed: "+oldcs+", "+children;
 				
 				if(children==null)
 					children	= new ArrayList();
@@ -314,7 +317,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 //					throw e;
 //				}
 					
-				assert SUtil.equals(children, newcs) : "Node inconsistency: added="+added+", removed="+removed+", oldcs="+oldcs+", children="+children+", newcs="+newcs;
+				assert SUtil.equals(children, newcs) : "Node inconsistency:\noldcs="+oldcs+"\nnewcs="+newcs+"\nadded="+added+"\nremoved="+removed+"\nresult="+children;
 				
 				if(dorecurse && tree.isExpanded(new TreePath(model.buildTreePath(AbstractTreeNode.this).toArray())))
 				{
@@ -391,54 +394,54 @@ public abstract class AbstractTreeNode	implements ITreeNode
 		return tree;
 	}
 
-	/**
-	 *  Add a child and update the tree.
-	 *  Must be called from swing thread.
-	 */
-	public void addChild(int index, ITreeNode node)
-	{
-		assert SwingUtilities.isEventDispatchThread();
-
-		// Ignore when node already removed.
-		if(!model.isZombieNode(node.getId()))
-		{
-			if(children==null)
-				children = new ArrayList();
-			children.add(index, node);
-			model.addNode(node);
-			model.fireNodesAdded(this, new ITreeNode[]{node}, new int[]{index});
-		}
-		else
-		{
-			model.deregisterNode(node);
-		}
-	}
-	
-	/**
-	 *  Add a child and update the tree.
-	 *  Must be called from swing thread.
-	 */
-	public void addChild(ITreeNode node)
-	{
-		assert SwingUtilities.isEventDispatchThread();
-
-		addChild(getChildCount(), node);
-	}
-	
-	/**
-	 *  Remove a child and update the tree.
-	 *  Must be called from swing thread.
-	 */
-	public void removeChild(ITreeNode node)
-	{
-		assert SwingUtilities.isEventDispatchThread();
-
-		int index	= getIndexOfChild(node);
-		if(index!=-1)
-		{
-			children.remove(node);
-			model.deregisterNode(node);
-			model.fireNodesRemoved(this, new ITreeNode[]{node}, new int[]{index});
-		}
-	}
+//	/**
+//	 *  Add a child and update the tree.
+//	 *  Must be called from swing thread.
+//	 */
+//	public void addChild(int index, ITreeNode node)
+//	{
+//		assert SwingUtilities.isEventDispatchThread();
+//
+//		// Ignore when node already removed.
+//		if(!model.isZombieNode(node.getId()))
+//		{
+//			if(children==null)
+//				children = new ArrayList();
+//			children.add(index, node);
+//			model.addNode(node);
+//			model.fireNodesAdded(this, new ITreeNode[]{node}, new int[]{index});
+//		}
+//		else
+//		{
+//			model.deregisterNode(node);
+//		}
+//	}
+//	
+//	/**
+//	 *  Add a child and update the tree.
+//	 *  Must be called from swing thread.
+//	 */
+//	public void addChild(ITreeNode node)
+//	{
+//		assert SwingUtilities.isEventDispatchThread();
+//
+//		addChild(getChildCount(), node);
+//	}
+//	
+//	/**
+//	 *  Remove a child and update the tree.
+//	 *  Must be called from swing thread.
+//	 */
+//	public void removeChild(ITreeNode node)
+//	{
+//		assert SwingUtilities.isEventDispatchThread();
+//
+//		int index	= getIndexOfChild(node);
+//		if(index!=-1)
+//		{
+//			children.remove(node);
+//			model.deregisterNode(node);
+//			model.fireNodesRemoved(this, new ITreeNode[]{node}, new int[]{index});
+//		}
+//	}
 }

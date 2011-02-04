@@ -16,7 +16,6 @@ import jadex.xml.writer.Writer;
 
 import java.awt.Color;
 import java.awt.Image;
-import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.Date;
@@ -242,7 +241,6 @@ public class JavaWriter extends Writer
 				{
 					try
 					{
-						ByteArrayOutputStream baos = new ByteArrayOutputStream();
 						byte[] buf = SGUI.imageToStandardBytes((Image)val, "image/png");
 						return new String(Base64.encode(buf));						
 					}

@@ -191,7 +191,8 @@ public class ComponentTreePanel extends JSplitPane
 						{
 							if(node.getParent()!=null)
 							{
-								((AbstractTreeNode)node.getParent()).removeChild(node);
+//								((AbstractTreeNode)node.getParent()).removeChild(node);
+								((AbstractTreeNode)node.getParent()).refresh(false);
 							}
 						}
 					});
@@ -225,37 +226,38 @@ public class ComponentTreePanel extends JSplitPane
 					public void run()
 					{
 //						final ComponentTreeNode	parentnode = desc.getParent()==null? null: (ComponentTreeNode)model.getAddedNode(desc.getParent());
-						final ComponentTreeNode	parentnode = desc.getParent()==null? null: (ComponentTreeNode)model.getNode(desc.getParent());
+						ComponentTreeNode	parentnode = desc.getParent()==null? null: (ComponentTreeNode)model.getNode(desc.getParent());
 						if(parentnode!=null)
 						{
-							parentnode.createComponentNode(desc).addResultListener(new SwingDefaultResultListener()
-							{
-								public void customResultAvailable(Object result)
-								{
-									ITreeNode	node = (ITreeNode)result;
-//									System.out.println("addChild: "+parentnode+", "+node);
-									try
-									{
-										if(parentnode.getIndexOfChild(node)==-1)
-										{
-//											System.err.println(""+model.hashCode()+" Panel->addChild: "+node+", "+parentnode);
-											parentnode.addChild(node);
-										}
-									}
-									catch(Exception e)
-									{
-										System.err.println(""+model.hashCode()+" Broken node: "+node);
-										System.err.println(""+model.hashCode()+" Parent: "+parentnode+", "+parentnode.getCachedChildren());
-										e.printStackTrace();
-//										model.fireNodeAdded(parentnode, node, parentnode.getIndexOfChild(node));
-									}
-								}
-								
-								public void customExceptionOccurred(Exception exception)
-								{
-									// May happen, when component removed in mean time.
-								}										
-							});
+							parentnode.refresh(false);
+//							parentnode.createComponentNode(desc).addResultListener(new SwingDefaultResultListener()
+//							{
+//								public void customResultAvailable(Object result)
+//								{
+//									ITreeNode	node = (ITreeNode)result;
+////									System.out.println("addChild: "+parentnode+", "+node);
+//									try
+//									{
+//										if(parentnode.getIndexOfChild(node)==-1)
+//										{
+////											System.err.println(""+model.hashCode()+" Panel->addChild: "+node+", "+parentnode);
+//											parentnode.addChild(node);
+//										}
+//									}
+//									catch(Exception e)
+//									{
+//										System.err.println(""+model.hashCode()+" Broken node: "+node);
+//										System.err.println(""+model.hashCode()+" Parent: "+parentnode+", "+parentnode.getCachedChildren());
+//										e.printStackTrace();
+////										model.fireNodeAdded(parentnode, node, parentnode.getIndexOfChild(node));
+//									}
+//								}
+//								
+//								public void customExceptionOccurred(Exception exception)
+//								{
+//									// May happen, when component removed in mean time.
+//								}										
+//							});
 						}
 					}
 				});
@@ -286,7 +288,8 @@ public class ComponentTreePanel extends JSplitPane
 									{
 										if(sel instanceof VirtualComponentTreeNode && sel.getParent()!=null)
 										{
-											((AbstractTreeNode)sel.getParent()).removeChild(sel);
+//											((AbstractTreeNode)sel.getParent()).removeChild(sel);
+											((AbstractTreeNode)sel.getParent()).refresh(false);
 										}
 									}
 									
@@ -340,7 +343,8 @@ public class ComponentTreePanel extends JSplitPane
 														rcms.destroyComponent(cid);
 														if(sel.getParent()!=null)
 														{
-															((AbstractTreeNode)sel.getParent()).removeChild(sel);
+//															((AbstractTreeNode)sel.getParent()).removeChild(sel);
+															((AbstractTreeNode)sel.getParent()).refresh(false);
 														}
 														
 														// Hack!!! Result will not be received when remote comp is platform. 
@@ -496,7 +500,8 @@ public class ComponentTreePanel extends JSplitPane
 					{
 						public void customResultAvailable(Object result)
 						{
-							scn.removeChild(sn);
+//							scn.removeChild(sn);
+							scn.refresh(false);
 						}
 					});
 				}

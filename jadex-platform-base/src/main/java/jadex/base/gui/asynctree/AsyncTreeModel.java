@@ -391,12 +391,13 @@ public class AsyncTreeModel implements TreeModel
 		{
 			lis[i].nodeAdded(node);
 		}
-
-		for(int i=0; i<node.getCachedChildren().size(); i++)
-		{
-			System.out.println("Complex node: "+node);
-			addNode((ITreeNode)node.getCachedChildren().get(i));
-		}		
+		
+		assert node.getCachedChildren().isEmpty() : "Only empty nodes may be added: "+node;
+//		for(int i=0; i<node.getCachedChildren().size(); i++)
+//		{
+//			System.out.println("Complex node: "+node);
+//			addNode((ITreeNode)node.getCachedChildren().get(i));
+//		}		
 	}
 	
 	/**
@@ -458,9 +459,11 @@ public class AsyncTreeModel implements TreeModel
 			}			
 		}
 
-		for(int i=0; i<node.getCachedChildren().size(); i++)
+		List	cs	= node.getCachedChildren();
+		for(int i=0; i<cs.size(); i++)
 		{
-			deregisterNode((ITreeNode)node.getCachedChildren().get(i));
+//			System.out.println("Warning: Deregistering non-empty node: "+node);
+			deregisterNode((ITreeNode)cs.get(i));
 		}
 	}
 	

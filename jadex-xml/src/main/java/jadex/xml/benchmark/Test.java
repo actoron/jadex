@@ -1,17 +1,12 @@
 package jadex.xml.benchmark;
 
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.URL;
@@ -24,11 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 
 /**
  *  Testcases for writer and reader.

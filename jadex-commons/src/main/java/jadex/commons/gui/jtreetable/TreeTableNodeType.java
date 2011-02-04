@@ -1,6 +1,5 @@
 package jadex.commons.gui.jtreetable;
 
-import jadex.commons.IValidator;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 
