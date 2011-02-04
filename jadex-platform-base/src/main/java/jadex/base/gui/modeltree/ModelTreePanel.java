@@ -186,34 +186,7 @@ public class ModelTreePanel extends JPanel // JSplitPane
 		this.filtercon = new FileFilterMenuItemConstructor();
 		this.pubuilder = new PopupBuilder(new Object[]{ADD_PATH, ADD_REMOTEPATH, filtercon});
 
-		this.filefilter = new IRemoteFilter()
-		{
-			public IFuture filter(Object obj)
-			{
-				Future ret =  new Future();
-				
-				if(obj instanceof File)
-				{
-					File file = (File)obj;
-					if(filtercon.isAll() || file.isDirectory())
-					{
-						ret.setResult(Boolean.TRUE);
-					}
-					else
-					{
-						SComponentFactory.isModelType(exta, file.getAbsolutePath(), filtercon.getSelectedComponentTypes())
-							.addResultListener(new DelegationResultListener(ret));
-//						SComponentFactory.isLoadable(exta, file.getAbsolutePath())
-//							.addResultListener(new DelegationResultListener(ret));
-					}
-				}
-				else
-				{
-					ret.setResult(Boolean.FALSE);
-				}
-				return ret;
-			}
-		};
+		this.filefilter = new GuiFileFilter(filtercon, exta);
 
 		tree.addMouseListener(new MouseAdapter()
 		{
@@ -890,7 +863,6 @@ public class ModelTreePanel extends JPanel // JSplitPane
 				ClassLoader cl = ls.getClassLoader();
 				ModelExplorerProperties	mep	= (ModelExplorerProperties)JavaReader.objectFromXML(treexml, cl); 	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
 //				ModelExplorerProperties	mep	= (ModelExplorerProperties)Nuggets.objectFromXML(treexml, cl);
-//				this.root	= new RootNode();
 				RootNode root = (RootNode)getTree().getModel().getRoot();
 				root.removeAll();
 				String[] entries = mep.getRootPathEntries();
@@ -898,9 +870,7 @@ public class ModelTreePanel extends JPanel // JSplitPane
 				{
 					ITreeNode node = createNode(root, model, tree, new File(entries[i]), iconcache, filefilter, exta);
 					root.addChild(node);
-//					root.addPathEntry(new File(entries[i]));
 				}
-//				((ModelExplorerTreeModel)getModel()).setRoot(this.root);
 
 				ITreeNode[] childs = root.getChildren();
 				for(int i=0; i<childs.length; i++)
@@ -909,34 +879,15 @@ public class ModelTreePanel extends JPanel // JSplitPane
 					File file = ((FileNode)childs[i]).getFile();
 					
 					// Hack!!! Build new file object. This strips trailing "/" from jar file nodes.
-					file	= new File(file.getParentFile(), file.getName());
-		//			String fname = file.getAbsolutePath();
-					// Todo: slash is needed for package determination(?)
-					// but breaks for jar files...
-		//			if(file.isDirectory() && !fname.endsWith(System.getProperty("file.separator", "/"))
-		//				&& !file.getName().endsWith(".jar"))
-		//			{
-		//				fname += "/";
-		//			}
-//						try
+					file = new File(file.getParentFile(), file.getName());
+					try
 					{
-//							ls.addPath(file.getAbsolutePath());
-						try
-						{
-							ls.addURL(file.toURI().toURL());
-						}
-						catch(MalformedURLException ex)
-						{
-							ex.printStackTrace();
-						}
-						//					urls.add(file.toURL());
+						ls.addURL(file.toURI().toURL());
 					}
-//						catch(MalformedURLException ex)
-//						{
-//							String failed = SUtil.wrapText("Could not add path\n\n"+ex.getMessage());
-//							JOptionPane.showMessageDialog(SGUI.getWindowParent(ModelExplorer.this), failed, "Path Error", JOptionPane.ERROR_MESSAGE);
-						//e.printStackTrace();
-//						}
+					catch(MalformedURLException ex)
+					{
+						ex.printStackTrace();
+					}
 				}
 				
 				// Select the last selected model in the tree.
@@ -950,7 +901,7 @@ public class ModelTreePanel extends JPanel // JSplitPane
 			catch(Exception e)
 			{
 				System.err.println("Cannot load project tree: "+e.getClass().getName());
-//				e.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 				
@@ -987,6 +938,93 @@ public class ModelTreePanel extends JPanel // JSplitPane
 					selected.add(mps[i].getType());
 			}
 			filtercon.setSelectedComponentTypes(selected);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static class GuiFileFilter implements IRemoteFilter
+	{
+		protected boolean all;
+		protected List selectedcomponents;
+		protected FileFilterMenuItemConstructor filtercon;
+		protected IExternalAccess exta;
+		
+		public GuiFileFilter()
+		{
+		}
+
+		public GuiFileFilter(FileFilterMenuItemConstructor filtercon, IExternalAccess exta)
+		{
+			this.filtercon = filtercon;
+			this.exta = exta;
+		}
+
+		public void setAll(boolean all)
+		{
+			this.all = all;
+		}
+		
+		public boolean isAll()
+		{
+			boolean ret;
+			if(filtercon!=null)
+				ret = filtercon.isAll();
+			else
+				ret = all;
+			return ret;
+		}
+		
+		public List getSelectedComponents()
+		{
+			List ret;
+			if(filtercon!=null)
+				ret = filtercon.getSelectedComponentTypes();
+			else
+				ret = selectedcomponents;
+			return ret;
+		}
+
+		public void setSelectedComponents(List selectedcomponents)
+		{
+			this.selectedcomponents = selectedcomponents;
+		}
+		
+		public IExternalAccess getExternalAccess()
+		{
+			return exta;
+		}
+
+		public void setExternalAccess(IExternalAccess exta)
+		{
+			this.exta = exta;
+		}
+
+		public IFuture filter(Object obj)
+		{
+			Future ret =  new Future();
+			
+			if(obj instanceof File)
+			{
+				File file = (File)obj;
+				if(isAll() || file.isDirectory())
+				{
+					ret.setResult(Boolean.TRUE);
+				}
+				else
+				{
+					SComponentFactory.isModelType(exta, file.getAbsolutePath(), getSelectedComponents())
+						.addResultListener(new DelegationResultListener(ret));
+//						SComponentFactory.isLoadable(exta, file.getAbsolutePath())
+//							.addResultListener(new DelegationResultListener(ret));
+				}
+			}
+			else
+			{
+				ret.setResult(Boolean.FALSE);
+			}
+			return ret;
 		}
 	}
 	

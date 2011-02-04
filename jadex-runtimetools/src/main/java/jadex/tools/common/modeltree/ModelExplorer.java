@@ -475,7 +475,7 @@ public class ModelExplorer extends JTree
 			catch(Exception e)
 			{
 				System.err.println("Cannot load project tree: "+e.getClass().getName());
-//				e.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 				

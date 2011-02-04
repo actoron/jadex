@@ -33,6 +33,7 @@ public class ExceptionInfo
 	 */
 	public ExceptionInfo(Exception ex)
 	{
+		ex.printStackTrace();
 		this.type = ex.getClass();
 		this.message = ex.getMessage();
 		StackTraceElement[] stes =  ex.getStackTrace();
