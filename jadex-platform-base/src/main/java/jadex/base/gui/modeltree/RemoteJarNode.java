@@ -54,6 +54,7 @@ public class RemoteJarNode extends RemoteDirNode
 				Future ret = new Future();
 				
 				JarAsDirectory jad = new JarAsDirectory(myfile.getPath());
+				jad.refresh();
 				
 				final File[] files = jad.listFiles();
 				if(files!=null)

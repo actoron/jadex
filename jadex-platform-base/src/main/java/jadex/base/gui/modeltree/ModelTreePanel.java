@@ -719,7 +719,7 @@ public class ModelTreePanel extends JPanel // JSplitPane
 			}
 				
 			final RootNode root = (RootNode)getModel().getRoot();
-			ITreeNode node = ModelTreePanel.createNode(root, model, tree, new RemoteFile(filename, filename, true), iconcache, filefilter, exta);
+			ITreeNode node = ModelTreePanel.createNode(root, model, tree, new RemoteFile(filename, filename, false), iconcache, filefilter, exta);
 			root.addChild(node);
 		}
 
@@ -901,7 +901,7 @@ public class ModelTreePanel extends JPanel // JSplitPane
 			catch(Exception e)
 			{
 				System.err.println("Cannot load project tree: "+e.getClass().getName());
-				e.printStackTrace();
+//				e.printStackTrace();
 			}
 		}
 				
