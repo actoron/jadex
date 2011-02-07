@@ -916,7 +916,7 @@ public class ModelTreePanel extends JPanel // JSplitPane
 				// Load the expanded tree nodes.
 				expansionhandler.setExpandedPaths(mep.getExpandedNodes());
 
-				((AsyncTreeModel)getModel()).fireTreeChanged(root);
+				root.refresh(true);
 				
 				// Load last selected model.
 				String lastpath = props.getStringProperty("lastpath");

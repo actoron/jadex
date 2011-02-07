@@ -41,6 +41,9 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	/** Flag to indicate recursive refresh. */
 	protected boolean	recurse;
 	
+	/** Flag to indicate that children were added / removed during ongoing search (->restart search). */
+	protected boolean	dirty;
+	
 	//-------- constructors --------
 	
 	/**
@@ -97,8 +100,6 @@ public abstract class AbstractTreeNode	implements ITreeNode
 			searching	= true;
 			searchChildren();
 		}
-//		if(children!=null && index>=children.size())
-//			System.out.println("wurstegbjoakl");
 		return children==null ? null : (ITreeNode)children.get(index);
 	}
 	
@@ -157,7 +158,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
-		return children!=null ? new ArrayList(children) : Collections.EMPTY_LIST;
+		return children!=null ? children : Collections.EMPTY_LIST;
 	}
 
 	/**
@@ -205,16 +206,6 @@ public abstract class AbstractTreeNode	implements ITreeNode
 		final List	oldcs	= children!=null ? new ArrayList(children) : null;
 		final List	newcs	= newchildren!=null ? new ArrayList(newchildren) : null;
 		
-//		// For debugging: todo:remove
-//		final	RuntimeException	rte;
-//		try
-//		{
-//			throw new RuntimeException();
-//		}
-//		catch (RuntimeException e)
-//		{
-//			rte	= e;
-//		}
 		assert false || checkChildren(oldcs, newcs);
 		
 //		System.err.println(""+model.hashCode()+" setChildren queued: "+parent+"/"+this+", "+children+", "+newcs);
@@ -222,57 +213,39 @@ public abstract class AbstractTreeNode	implements ITreeNode
 		{
 			public void run()
 			{
-//				System.err.println(""+model.hashCode()+" setChildren executing: "+parent+"/"+AbstractTreeNode.this+", "+children+", "+newcs);
-				boolean	dorecurse	= recurse;
 				searching	= false;
-				recurse	= false;
-				
-				// Children must not be changed in mean time
-				assert SUtil.equals(children, oldcs) : "Children changed: "+oldcs+", "+children;
-				
-				if(children==null)
-					children	= new ArrayList();
-//				children	= newcs;
-				List	added	= new ArrayList();
-				List	removed	= new ArrayList();
-				if(oldcs!=null)
+				if(dirty)
 				{
-					removed.addAll(oldcs);
+					// Restart search when nodes have been added/removed in the mean time.
+					dirty	= false;
+					searchChildren();
 				}
-				if(newcs!=null)
+				else
 				{
-					added.addAll(newcs);
-					removed.removeAll(newcs);
-				}
-				if(oldcs!=null)
-				{
-					added.removeAll(oldcs);
-				}
-
-//				try
-//				{
-					/*if(!added.isEmpty() && !removed.isEmpty())
+	//				System.err.println(""+model.hashCode()+" setChildren executing: "+parent+"/"+AbstractTreeNode.this+", "+children+", "+newcs);
+					boolean	dorecurse	= recurse;
+					recurse	= false;
+					
+					if(children==null)
+						children	= new ArrayList();
+					List	added	= new ArrayList();
+					List	removed	= new ArrayList();
+					if(oldcs!=null)
 					{
-						for(int i=0; oldcs!=null && i<oldcs.size(); i++)
-						{
-							model.deregisterNode((IComponentTreeNode)oldcs.get(i));
-						}
-						for(int i=0; children!=null && i<children.size(); i++)
-						{
-							model.addNode((IComponentTreeNode)children.get(i));
-						}
-//						System.err.println(""+model.hashCode()+" tree change: "+AbstractComponentTreeNode.this+"#"+AbstractComponentTreeNode.this.hashCode());
-//						System.err.println(""+model.hashCode()+" added: "+added);
-//						System.err.println(""+model.hashCode()+" removed: "+removed);
-//						System.err.println(""+model.hashCode()+" children: "+children);
-//						System.err.println(""+model.hashCode()+" oldcs: "+oldcs);
-//						rte.printStackTrace();
-						model.fireTreeChanged(AbstractComponentTreeNode.this);
-					}*/
-					/*else*/ if(!removed.isEmpty())
+						removed.addAll(oldcs);
+					}
+					if(newcs!=null)
 					{
-//						ITreeNode[]	nodes	= new ITreeNode[removed.size()];
-//						int[]	indices	= new int[removed.size()];
+						added.addAll(newcs);
+						removed.removeAll(newcs);
+					}
+					if(oldcs!=null)
+					{
+						added.removeAll(oldcs);
+					}
+	
+					if(!removed.isEmpty())
+					{
 						for(int i=removed.size()-1; i>=0; i--)
 						{
 							ITreeNode	node	= (ITreeNode)removed.get(i);
@@ -280,50 +253,32 @@ public abstract class AbstractTreeNode	implements ITreeNode
 							Object	r	= children.remove(index);
 							assert SUtil.equals(r, node) : "Node inconsistency: "+oldcs+", "+newcs;
 							model.deregisterNode(node);
-//							nodes[i]	= node;
-//							indices[i]	= oldcs.indexOf(node);
-							model.fireNodesRemoved(AbstractTreeNode.this, new ITreeNode[]{node}, new int[]{index});
+							model.fireNodeRemoved(AbstractTreeNode.this, node, index);
 						}
-//						model.fireNodesRemoved(AbstractTreeNode.this, nodes, indices);
 						if(added.isEmpty())
 							model.fireNodeChanged(AbstractTreeNode.this);
 					}
-					/*else*/ if(!added.isEmpty())
+					if(!added.isEmpty())
 					{
-//						ITreeNode[]	nodes	= new ITreeNode[added.size()];
-//						int[]	indices	= new int[added.size()];
 						for(int i=0; i<added.size(); i++)
 						{
 							ITreeNode	node	= (ITreeNode)added.get(i);
 							int index	= newcs.indexOf(node);
 							children.add(index, node);
 							model.addNode(node);
-//							nodes[i]	= node;
-//							indices[i]	= children.indexOf(node);
-							model.fireNodesAdded(AbstractTreeNode.this, new ITreeNode[]{node}, new int[]{index});
+							model.fireNodeAdded(AbstractTreeNode.this, node, index);
 						}
-//						model.fireNodesAdded(AbstractTreeNode.this, nodes, indices);
 						model.fireNodeChanged(AbstractTreeNode.this);
 					}
-//				}
-//				catch(RuntimeException e)
-//				{
-//					System.err.println("node problem: "+AbstractComponentTreeNode.this+"#"+AbstractComponentTreeNode.this.hashCode());
-//					System.err.println("added: "+added);
-//					System.err.println("removed: "+removed);
-//					System.err.println("children: "+children);
-//					System.err.println("oldcs: "+oldcs);
-//					rte.printStackTrace();
-//					throw e;
-//				}
+						
+					assert SUtil.equals(children, newcs) : "Node inconsistency:\noldcs="+oldcs+"\nnewcs="+newcs+"\nadded="+added+"\nremoved="+removed+"\nresult="+children;
 					
-				assert SUtil.equals(children, newcs) : "Node inconsistency:\noldcs="+oldcs+"\nnewcs="+newcs+"\nadded="+added+"\nremoved="+removed+"\nresult="+children;
-				
-				if(dorecurse && tree.isExpanded(new TreePath(model.buildTreePath(AbstractTreeNode.this).toArray())))
-				{
-					for(int i=0; children!=null && i<children.size(); i++)
+					if(dorecurse && tree.isExpanded(new TreePath(model.buildTreePath(AbstractTreeNode.this).toArray())))
 					{
-						((ITreeNode)children.get(i)).refresh(dorecurse);
+						for(int i=0; children!=null && i<children.size(); i++)
+						{
+							((ITreeNode)children.get(i)).refresh(dorecurse);
+						}
 					}
 				}
 				
@@ -341,7 +296,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	 */
 	protected boolean checkChildren(List oldcs, List newcs)
 	{
-		// Called by assert so throw exception when called and invalid.
+		// Check if duplicates are present. 
 		if(newcs!=null && newcs.size()>1)
 		{
 			for(int i=0; i<newcs.size()-1; i++)
@@ -369,7 +324,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 					int index2	= newcs.indexOf(intersection.get(j));
 					if(index1>=index2)
 					{
-						throw new RuntimeException("Found unequal ordering: "+oldcs+", "+newcs);
+						throw new RuntimeException("Found unequal ordering:\n oldcs = "+oldcs+"\nnewcs = "+newcs);
 					}
 				}
 			}
@@ -377,7 +332,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 
 		return true;
 	}
-
+	
 	/**
 	 *  Get the model.
 	 */
@@ -394,54 +349,60 @@ public abstract class AbstractTreeNode	implements ITreeNode
 		return tree;
 	}
 
-//	/**
-//	 *  Add a child and update the tree.
-//	 *  Must be called from swing thread.
-//	 */
-//	public void addChild(int index, ITreeNode node)
-//	{
-//		assert SwingUtilities.isEventDispatchThread();
-//
-//		// Ignore when node already removed.
-//		if(!model.isZombieNode(node.getId()))
-//		{
-//			if(children==null)
-//				children = new ArrayList();
-//			children.add(index, node);
-//			model.addNode(node);
-//			model.fireNodesAdded(this, new ITreeNode[]{node}, new int[]{index});
-//		}
-//		else
-//		{
-//			model.deregisterNode(node);
-//		}
-//	}
-//	
-//	/**
-//	 *  Add a child and update the tree.
-//	 *  Must be called from swing thread.
-//	 */
-//	public void addChild(ITreeNode node)
-//	{
-//		assert SwingUtilities.isEventDispatchThread();
-//
-//		addChild(getChildCount(), node);
-//	}
-//	
-//	/**
-//	 *  Remove a child and update the tree.
-//	 *  Must be called from swing thread.
-//	 */
-//	public void removeChild(ITreeNode node)
-//	{
-//		assert SwingUtilities.isEventDispatchThread();
-//
-//		int index	= getIndexOfChild(node);
-//		if(index!=-1)
-//		{
-//			children.remove(node);
-//			model.deregisterNode(node);
-//			model.fireNodesRemoved(this, new ITreeNode[]{node}, new int[]{index});
-//		}
-//	}
+	/**
+	 *  Add a child and update the tree.
+	 *  Must be called from swing thread.
+	 */
+	public void addChild(int index, ITreeNode node)
+	{
+		assert SwingUtilities.isEventDispatchThread();
+
+		// Ignore when node already removed.
+		if(!model.isZombieNode(node.getId()))
+		{
+			if(children==null)
+				children = new ArrayList();
+			children.add(index, node);
+			model.addNode(node);
+			model.fireNodeAdded(this, node, index);
+			if(searching)
+				dirty	= true;
+			
+			System.err.println("Node added: "+children);
+		}
+		else
+		{
+			model.deregisterNode(node);
+		}
+	}
+	
+	/**
+	 *  Add a child and update the tree.
+	 *  Must be called from swing thread.
+	 */
+	public void addChild(ITreeNode node)
+	{
+		assert SwingUtilities.isEventDispatchThread();
+
+		addChild(getCachedChildren().size(), node);
+	}
+	
+	/**
+	 *  Remove a child and update the tree.
+	 *  Must be called from swing thread.
+	 */
+	public void removeChild(ITreeNode node)
+	{
+		assert SwingUtilities.isEventDispatchThread();
+
+		int index	= getIndexOfChild(node);
+		if(index!=-1)
+		{
+			children.remove(node);
+			model.deregisterNode(node);
+			model.fireNodeRemoved(this, node, index);
+			if(searching)
+				dirty	= true;
+		}
+	}
 }

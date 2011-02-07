@@ -12,9 +12,6 @@
 	</imports>
 
 	<capabilities>
-		<capability name="cms" file="jadex.bdi.planlib.cms.CMS" />
-		<capability name="df" file="jadex.bdi.planlib.df.DF" />
-		<!-- <capability name="loggercap" file="jadex.tools.logger.Logger"/> -->
 		<capability name="testcentercap" file="jadex.tools.testcenter.TestCenter" />
 	</capabilities>
 
@@ -31,46 +28,6 @@
 	</beliefs>
 
 	<goals>
-		<achievegoalref name="cms_create_component">
-			<concrete ref="cms.cms_create_component" />
-		</achievegoalref>
-
-		<achievegoalref name="cms_destroy_component">
-			<concrete ref="cms.cms_destroy_component" />
-		</achievegoalref>
-
-		<achievegoalref name="cms_suspend_component">
-			<concrete ref="cms.cms_suspend_component" />
-		</achievegoalref>
-
-		<achievegoalref name="cms_resume_component">
-			<concrete ref="cms.cms_resume_component" />
-		</achievegoalref>
-
-		<achievegoalref name="cms_shutdown_platform">
-			<concrete ref="cms.cms_shutdown_platform" />
-		</achievegoalref>
-
-		<achievegoalref name="cms_search_components">
-			<concrete ref="cms.cms_search_components" />
-		</achievegoalref>
-
-		<achievegoalref name="df_register">
-			<concrete ref="df.df_register" />
-		</achievegoalref>
-
-		<achievegoalref name="df_deregister">
-			<concrete ref="df.df_deregister" />
-		</achievegoalref>
-
-		<achievegoalref name="df_search">
-			<concrete ref="df.df_search" />
-		</achievegoalref>
-
-		<!-- <achievegoalref name="logger_tool_request"> <concrete ref="loggercap.tool_request" 
-			/> </achievegoalref> <performgoalref name="logger_manage_tool"> <concrete 
-			ref="loggercap.manage_tool" /> </performgoalref> -->
-
 		<performgoalref name="perform_test">
 			<concrete ref="testcentercap.perform_test" />
 		</performgoalref>
@@ -145,9 +102,6 @@
 
 	<configurations>
 		<configuration name="default">
-			<capabilities>
-				<initialcapability ref="cms" configuration="componentlist" />
-			</capabilities>
 			<beliefs>
 				<initialbelief ref="jcc">
 					<fact>

@@ -129,8 +129,7 @@ public class VirtualComponentTreeNode extends AbstractTreeNode implements IActiv
 					public void customExceptionOccurred(Exception exception)
 					{
 						AbstractTreeNode parent = (AbstractTreeNode)getParent();
-//						parent.removeChild(VirtualComponentTreeNode.this);
-						parent.refresh(false);
+						parent.removeChild(VirtualComponentTreeNode.this);
 					}
 				});
 			}
@@ -138,8 +137,7 @@ public class VirtualComponentTreeNode extends AbstractTreeNode implements IActiv
 			public void customExceptionOccurred(Exception exception)
 			{
 				AbstractTreeNode parent = (AbstractTreeNode)getParent();
-//				parent.removeChild(VirtualComponentTreeNode.this);
-				parent.refresh(false);
+				parent.removeChild(VirtualComponentTreeNode.this);
 			}
 		});
 
