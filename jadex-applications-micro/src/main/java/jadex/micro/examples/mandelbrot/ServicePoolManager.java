@@ -2,10 +2,10 @@ package jadex.micro.examples.mandelbrot;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.IIntermediateFuture;
-import jadex.commons.IIntermediateResultListener;
-import jadex.commons.IntermediateFuture;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.service.IService;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;

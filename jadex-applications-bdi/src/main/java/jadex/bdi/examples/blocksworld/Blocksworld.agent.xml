@@ -108,6 +108,7 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 	<imports>
 		<import>java.awt.Color</import>
 		<import>java.util.*</import>
+		<import>jadex.commons.future.*</import>
 	</imports>
 
 	<beliefs>

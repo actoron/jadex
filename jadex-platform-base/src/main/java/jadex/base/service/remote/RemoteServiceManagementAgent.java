@@ -4,7 +4,7 @@ import jadex.base.fipa.SFipa;
 import jadex.base.service.remote.commands.RemoteResultCommand;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.MessageType;
-import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;

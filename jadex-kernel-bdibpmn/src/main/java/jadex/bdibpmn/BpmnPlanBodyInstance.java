@@ -59,7 +59,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.javaparser.IExpressionParser;

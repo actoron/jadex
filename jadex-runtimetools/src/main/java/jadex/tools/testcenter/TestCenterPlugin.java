@@ -4,10 +4,14 @@ import jadex.base.SComponentFactory;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.SGUI;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.gui.PopupBuilder;
+import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
 import jadex.tools.common.modeltree.DirNode;
 import jadex.tools.common.modeltree.FileNode;
@@ -275,7 +279,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	 * Load the properties.
 	 * @param props
 	 */
-	public void setProperties(Properties props)
+	public IFuture setProperties(Properties props)
 	{
 		Properties	mpanelprops	= props.getSubproperty("modelpanel");
 		if(mpanelprops!=null)
@@ -290,24 +294,36 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 			tcpanel.setDividerLocation(props.getIntProperty("tcsplit_location"));
 
 		checkingmenu.setSelected(props.getBooleanProperty("checking"));
+		
+		return new Future(null);
 	}
 
 	/**
 	 * Save the properties.
 	 * @param props
 	 */
-	public Properties	getProperties()
+	public IFuture getProperties()
 	{
-		Properties	props	= new Properties();
-		addSubproperties(props, "modelpanel", mpanel.getProperties());
-		addSubproperties(props, "testspanel", tcpanel.getProperties());
-
-		props.addProperty(new Property("mainsplit_location", Integer.toString(((JSplitPane)getView()).getDividerLocation())));
-		props.addProperty(new Property("tcsplit_location", Integer.toString(tcpanel.getDividerLocation())));
+		final Future ret = new Future();
 		
-		props.addProperty(new Property("checking", ""+checkingmenu.isSelected()));
+		mpanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				Properties	props	= new Properties();
+				addSubproperties(props, "modelpanel", (Properties)result);
+				addSubproperties(props, "testspanel", tcpanel.getProperties());
 
-		return props;
+				props.addProperty(new Property("mainsplit_location", Integer.toString(((JSplitPane)getView()).getDividerLocation())));
+				props.addProperty(new Property("tcsplit_location", Integer.toString(tcpanel.getDividerLocation())));
+				
+				props.addProperty(new Property("checking", ""+checkingmenu.isSelected()));
+				
+				ret.setResult(props);
+			}
+		});
+	
+		return ret;
 	}
 
 	/**

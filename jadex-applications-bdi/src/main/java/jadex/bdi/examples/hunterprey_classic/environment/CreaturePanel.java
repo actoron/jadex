@@ -3,12 +3,12 @@ package jadex.bdi.examples.hunterprey_classic.environment;
 import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.Hunter;
 import jadex.bdi.examples.hunterprey_classic.Observer;
-import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.commons.jtable.ObjectTableModel;
-import jadex.commons.jtable.ResizeableTableHeader;
-import jadex.commons.jtable.SorterFilterTableModel;
-import jadex.commons.jtable.VisibilityTableColumnModel;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.jtable.ObjectTableModel;
+import jadex.commons.gui.jtable.ResizeableTableHeader;
+import jadex.commons.gui.jtable.SorterFilterTableModel;
+import jadex.commons.gui.jtable.VisibilityTableColumnModel;
 
 import java.awt.BorderLayout;
 import java.awt.Font;

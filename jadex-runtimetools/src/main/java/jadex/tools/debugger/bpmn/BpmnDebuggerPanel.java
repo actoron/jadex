@@ -6,7 +6,7 @@ import jadex.bpmn.tools.ProcessViewPanel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IBreakpointPanel;
-import jadex.commons.SGUI;
+import jadex.commons.gui.SGUI;
 import jadex.tools.debugger.IDebuggerPanel;
 
 import javax.swing.Icon;

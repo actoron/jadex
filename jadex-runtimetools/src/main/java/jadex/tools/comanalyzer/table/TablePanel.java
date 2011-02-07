@@ -1,8 +1,8 @@
 package jadex.tools.comanalyzer.table;
 
-import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.commons.jtable.ResizeableTableHeader;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.jtable.ResizeableTableHeader;
 import jadex.tools.comanalyzer.ComanalyzerPlugin;
 import jadex.tools.comanalyzer.ToolCanvas;
 import jadex.tools.comanalyzer.ToolTab;

@@ -4,12 +4,12 @@ import jadex.base.service.remote.commands.RemoteMethodInvocationCommand;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.IIntermediateFuture;
-import jadex.commons.IntermediateFuture;
 import jadex.commons.SUtil;
-import jadex.commons.ThreadSuspendable;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.xml.annotation.XMLClassname;
 
 import java.lang.reflect.InvocationHandler;

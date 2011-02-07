@@ -6,7 +6,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.micro.MicroAgent;
 import jadex.xml.annotation.XMLClassname;

@@ -1,6 +1,6 @@
 package jadex.bdibpmn.examples.puzzle;
 
-import jadex.commons.SGUI;
+import jadex.commons.gui.SGUI;
 
 import java.awt.Color;
 import java.awt.Graphics;

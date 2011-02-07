@@ -1,6 +1,6 @@
 package jadex.bridge;
 
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 
 import java.util.logging.Logger;
 

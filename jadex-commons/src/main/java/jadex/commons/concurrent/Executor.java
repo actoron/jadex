@@ -1,7 +1,7 @@
 package jadex.commons.concurrent;
 
-import jadex.commons.Future;
-import jadex.commons.IFuture;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 import java.util.ArrayList;
 import java.util.List;

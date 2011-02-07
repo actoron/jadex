@@ -1,7 +1,7 @@
 package jadex.tools.jcc;
 
 import jadex.commons.MultiStream;
-import jadex.commons.SGUI;
+import jadex.commons.gui.SGUI;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

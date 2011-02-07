@@ -13,11 +13,16 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.Properties;
-import jadex.commons.SGUI;
 import jadex.commons.SReflect;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.ObjectCardLayout;
+import jadex.commons.gui.SGUI;
 import jadex.commons.service.IService;
 import jadex.xml.annotation.XMLClassname;
 
@@ -556,49 +561,65 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	/**
 	 *  Return properties to be saved in project.
 	 */
-	public Properties getProperties()
+	public IFuture getProperties()
 	{
 		storeCurrentPanelSettings();
 		
-		return props;
+		return new Future(props);
 	}
 	
 	/**
 	 *  Set properties loaded from project.
 	 */
-	public void setProperties(Properties ps)
+	public IFuture setProperties(Properties ps)
 	{
+		Future ret = new Future();
 		this.props	=	ps;
-		for(Iterator it=panels.values().iterator(); it.hasNext(); )
+		
+		IAbstractViewerPanel[] pans = (IAbstractViewerPanel[])panels.values().toArray(new IAbstractViewerPanel[0]);
+		CounterResultListener lis = new CounterResultListener(pans.length, new SwingDelegationResultListener(ret));
+		
+		for(int i=0; i<pans.length; i++)
 		{
-			IAbstractViewerPanel	panel	= (IAbstractViewerPanel)it.next();
-			Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
-			panel.setProperties(sub);
+			Properties	sub	= props!=null? props.getSubproperty(pans[i].getId()): null;
+			pans[i].setProperties(sub).addResultListener(lis);
 		}
+		return ret;
 	}
 
 	
 	/**
 	 *  Store settings of current panel.
 	 */
-	protected void storeCurrentPanelSettings()
+	protected IFuture storeCurrentPanelSettings()
 	{
+		final Future ret = new Future();
+		
 		Object	old	= cards.getCurrentKey();
 		if(old!=null)
 		{
-			IAbstractViewerPanel	panel	= (IAbstractViewerPanel)panels.get(old);
+			final IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.get(old);
 			if(panel!=null)
 			{
 				if(props==null)
 					props	= new Properties();
-				Properties	sub	= panel.getProperties();
-				props.removeSubproperties(panel.getId());
-				if(sub!=null)
+				panel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
 				{
-					sub.setType(panel.getId());
-					props.addSubproperties(sub);
-				}
+					public void customResultAvailable(Object result) 
+					{
+						Properties sub = (Properties)result;
+						props.removeSubproperties(panel.getId());
+						if(sub!=null)
+						{
+							sub.setType(panel.getId());
+							props.addSubproperties(sub);
+						}
+						ret.setResult(props);
+					};
+				});
 			}
 		}
+		
+		return ret;
 	}
 }

@@ -6,7 +6,7 @@ import jadex.bridge.IArgument;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.MessageType;
-import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 

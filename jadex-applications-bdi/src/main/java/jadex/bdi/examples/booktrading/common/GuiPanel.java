@@ -9,8 +9,8 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.SGUI;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.gui.SGUI;
 import jadex.commons.service.clock.IClockService;
 import jadex.xml.annotation.XMLClassname;
 

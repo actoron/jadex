@@ -1,6 +1,6 @@
 package jadex.micro.examples.helpline;
 
-import jadex.commons.IIntermediateFuture;
+import jadex.commons.future.IIntermediateFuture;
 
 /**
  *  Basic interface for helpline.

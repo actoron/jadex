@@ -3,9 +3,9 @@ package jadex.bpmn.runtime.task;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bridge.IComponentStep;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 /**
  *  Execute an external step.

@@ -6,12 +6,12 @@ import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.IDFServiceDescription;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.SGUI;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.gui.SGUI;
 import jadex.commons.service.IService;
 
 import java.awt.BorderLayout;
@@ -250,7 +250,7 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 	/**
 	 *  Advices the the panel to restore its properties from the argument
 	 */
-	public void setProperties(Properties ps)
+	public IFuture setProperties(Properties ps)
 	{
 		int	refresh	= 5000;
 		if(ps!=null)
@@ -264,18 +264,22 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 			if(((Integer)rb_refresh[i].getClientProperty("refresh")).intValue()==refresh)
 				rb_refresh[i].doClick();
 		}
+		
+		return new Future(null);
 	}
 
 	/**
 	 *  Advices the panel provide its setting as properties (if any).
 	 *  This is done on project close or save.
 	 */
-	public Properties	getProperties()
+	public IFuture getProperties()
 	{
+		final Future ret = new Future();
 		Properties	props	= new Properties();
 		props.addProperty(new Property("defrefresh", Integer.toString(defrefresh)));
 		props.addProperty(new Property("dfremote", Boolean.toString(remotecb.isSelected())));
-		return props;
+		ret.setResult(props);
+		return ret;
 	}
 
 	//-------- methods --------

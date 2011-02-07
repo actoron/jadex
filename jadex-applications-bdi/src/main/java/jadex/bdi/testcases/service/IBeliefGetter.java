@@ -1,6 +1,6 @@
 package jadex.bdi.testcases.service;
 
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 
 /**
  *  Simple interface for fetching a belief.

@@ -3,8 +3,8 @@ package jadex.bpmn.runtime.task;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 /**
  *  Simple task implementation with basic result and exception handling.

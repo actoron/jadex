@@ -1,7 +1,7 @@
 package jadex.xml.bean;
 
 import jadex.commons.Base64;
-import jadex.commons.SGUI;
+import jadex.commons.gui.SGUI;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;

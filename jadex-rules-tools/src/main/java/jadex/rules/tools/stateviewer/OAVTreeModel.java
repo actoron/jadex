@@ -1,7 +1,7 @@
 package jadex.rules.tools.stateviewer;
 
-import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.gui.SGUI;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;

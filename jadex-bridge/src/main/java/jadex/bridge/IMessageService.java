@@ -1,6 +1,6 @@
 package jadex.bridge;
 
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.IService;
 
 import java.util.Map;

@@ -2,17 +2,17 @@ package jadex.micro.examples.helpline;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.IIntermediateFuture;
-import jadex.commons.IntermediateFuture;
-import jadex.commons.SGUI;
-import jadex.commons.concurrent.CollectionResultListener;
-import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.IResultListener;
-import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.commons.jtable.DateTimeRenderer;
+import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.jtable.DateTimeRenderer;
 import jadex.micro.IMicroExternalAccess;
 
 import java.awt.BorderLayout;

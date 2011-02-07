@@ -7,11 +7,11 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.Properties;
-import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.commons.jtable.DateTimeRenderer;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.gui.jtable.DateTimeRenderer;
 import jadex.micro.IMicroExternalAccess;
 
 import java.awt.BorderLayout;
@@ -418,20 +418,18 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/**
 	 *  Advices the the panel to restore its properties from the argument
 	 */
-	public void setProperties(Properties ps)
+	public IFuture setProperties(Properties ps)
 	{
-		// todo: proerties?
+		return new Future(null);
 	}
 
 	/**
 	 *  Advices the panel provide its setting as properties (if any).
 	 *  This is done on project close or save.
 	 */
-	public Properties	getProperties()
+	public IFuture getProperties()
 	{
-		// todo: proerties?
-		
-		return null;
+		return new Future(null);
 	}
 	
 	/**

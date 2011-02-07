@@ -8,9 +8,9 @@ import jadex.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.bpmn.runtime.task.TaskMetaInfo;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 import java.util.HashMap;
 import java.util.Map;

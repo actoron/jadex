@@ -1,6 +1,6 @@
 package jadex.tools.comanalyzer.graph;
 
-import jadex.commons.SGUI;
+import jadex.commons.gui.SGUI;
 import jadex.tools.comanalyzer.Component;
 import jadex.tools.comanalyzer.Message;
 import jadex.tools.comanalyzer.PaintMaps;

@@ -8,8 +8,8 @@ import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
-import jadex.commons.ISuspendable;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISuspendable;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;

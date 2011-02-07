@@ -1,7 +1,7 @@
 package jadex.commons.service.threadpool;
 
-import jadex.commons.IFuture;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
 

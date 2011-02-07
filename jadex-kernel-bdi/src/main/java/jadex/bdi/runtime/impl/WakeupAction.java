@@ -11,7 +11,7 @@ import jadex.bdi.runtime.impl.flyweights.MessageEventFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.CheckedAction;
-import jadex.commons.Future;
+import jadex.commons.future.Future;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVObjectType;
 

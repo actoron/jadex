@@ -3,8 +3,8 @@ package jadex.base.gui.componenttree;
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
-import jadex.commons.SGUI;
 import jadex.commons.SReflect;
+import jadex.commons.gui.SGUI;
 import jadex.commons.service.IService;
 
 import java.lang.reflect.Proxy;

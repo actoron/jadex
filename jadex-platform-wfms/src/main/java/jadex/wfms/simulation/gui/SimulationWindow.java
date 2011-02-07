@@ -2,8 +2,8 @@ package jadex.wfms.simulation.gui;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
-import jadex.commons.SGUI;
 import jadex.commons.collection.TreeNode;
+import jadex.commons.gui.SGUI;
 import jadex.commons.service.library.ILibraryService;
 import jadex.wfms.simulation.ModelTreeNode;
 import jadex.wfms.simulation.Scenario;

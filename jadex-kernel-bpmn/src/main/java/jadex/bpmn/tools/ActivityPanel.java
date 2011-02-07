@@ -3,7 +3,7 @@ package jadex.bpmn.tools;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.commons.ISteppable;
-import jadex.commons.jtable.TableSorter;
+import jadex.commons.gui.jtable.TableSorter;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

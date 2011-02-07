@@ -1,6 +1,6 @@
 package jadex.wfms.service;
 
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 import jadex.wfms.listeners.IProcessRepositoryListener;
 
 import java.net.URL;

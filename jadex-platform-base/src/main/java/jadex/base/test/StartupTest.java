@@ -2,8 +2,8 @@ package jadex.base.test;
 
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.IFuture;
-import jadex.commons.ThreadSuspendable;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.ThreadSuspendable;
 
 /**
  *  Try to reproduce startup test.

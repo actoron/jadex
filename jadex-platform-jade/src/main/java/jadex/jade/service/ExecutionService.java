@@ -1,9 +1,9 @@
 package jadex.jade.service;
 
-import jadex.commons.Future;
 import jadex.commons.ICommand;
-import jadex.commons.IFuture;
 import jadex.commons.concurrent.IExecutable;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.execution.IExecutionService;

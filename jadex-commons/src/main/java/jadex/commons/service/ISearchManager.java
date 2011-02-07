@@ -1,6 +1,6 @@
 package jadex.commons.service;
 
-import jadex.commons.IIntermediateFuture;
+import jadex.commons.future.IIntermediateFuture;
 
 import java.util.Map;
 

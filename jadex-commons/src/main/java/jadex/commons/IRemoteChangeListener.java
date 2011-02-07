@@ -1,5 +1,7 @@
 package jadex.commons;
 
+import jadex.commons.future.IFuture;
+
 
 /**
  *  Remote version of the change listener.

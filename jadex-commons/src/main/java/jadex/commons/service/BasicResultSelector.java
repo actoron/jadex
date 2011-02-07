@@ -2,14 +2,14 @@ package jadex.commons.service;
 
 import jadex.commons.ComposedFilter;
 import jadex.commons.ComposedRemoteFilter;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.IIntermediateFuture;
 import jadex.commons.IRemoteFilter;
-import jadex.commons.IntermediateDelegationResultListener;
-import jadex.commons.IntermediateFuture;
 import jadex.commons.Tuple;
-import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
 
 import java.util.ArrayList;
 import java.util.Collection;

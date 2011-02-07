@@ -1,7 +1,7 @@
 package jadex.micro.examples.compositeservice;
 
-import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;

@@ -1,7 +1,7 @@
 package jadex.bdi.examples.shop;
 
 import jadex.bdi.runtime.Plan;
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 
 /**
  *  Buy a specific item in a given shop.

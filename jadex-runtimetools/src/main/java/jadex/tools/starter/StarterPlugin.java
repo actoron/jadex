@@ -13,17 +13,18 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IModelInfo;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.SGUI;
-import jadex.commons.ThreadSuspendable;
-import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.IResultListener;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.future.SwingDelegationResultListener;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.IMenuItemConstructor;
 import jadex.commons.gui.PopupBuilder;
+import jadex.commons.gui.SGUI;
 import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.IExplorerTreeNode;
 import jadex.tools.common.modeltree.ModelExplorer;
@@ -422,7 +423,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 	/**
 	 * Load the properties.
 	 */
-	public void setProperties(Properties props)
+	public IFuture setProperties(Properties props)
 	{
 		checkingmenu.setSelected(false);
 //		System.out.println("Starter set props: "+props);
@@ -438,25 +439,36 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 		csplit.setDividerLocation(props.getIntProperty("mainsplit_location"));
 
 		checkingmenu.setSelected(props.getBooleanProperty("checking"));
+	
+		return new Future(null);
 	}
 
 	/**
 	 * Save the properties.
 	 * @param props
 	 */
-	public Properties	getProperties()
+	public IFuture getProperties()
 	{
-		Properties	props	= new Properties();
+		final Future ret = new Future();
 		
-		addSubproperties(props, "mpanel", mpanel.getProperties());
-		addSubproperties(props, "spanel", spanel.getProperties());
-		
-		props.addProperty(new Property("leftsplit_location", ""+lsplit.getDividerLocation()));
-		props.addProperty(new Property("mainsplit_location", ""+csplit.getDividerLocation()));
-		
-		props.addProperty(new Property("checking", ""+checkingmenu.isSelected()));
-		
-		return props;
+		mpanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				Properties	props	= new Properties();
+				addSubproperties(props, "mpanel", (Properties)result);
+				addSubproperties(props, "spanel", spanel.getProperties());
+
+				props.addProperty(new Property("leftsplit_location", ""+lsplit.getDividerLocation()));
+				props.addProperty(new Property("mainsplit_location", ""+csplit.getDividerLocation()));
+
+				props.addProperty(new Property("checking", ""+checkingmenu.isSelected()));
+				
+				ret.setResult(props);
+			}
+		});
+	
+		return ret;
 	}
 	
 	/**

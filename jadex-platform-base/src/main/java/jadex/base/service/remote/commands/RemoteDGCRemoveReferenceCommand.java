@@ -4,8 +4,8 @@ import jadex.base.service.remote.IRemoteCommand;
 import jadex.base.service.remote.RemoteReference;
 import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.micro.IMicroExternalAccess;
 
 /**

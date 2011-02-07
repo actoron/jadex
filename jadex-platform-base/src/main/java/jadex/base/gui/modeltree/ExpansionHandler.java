@@ -1,8 +1,8 @@
 package jadex.base.gui.modeltree;
 
-import jadex.commons.IFuture;
-import jadex.commons.TreeExpansionHandler;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.TreeExpansionHandler;
 
 import java.util.Arrays;
 import java.util.HashSet;

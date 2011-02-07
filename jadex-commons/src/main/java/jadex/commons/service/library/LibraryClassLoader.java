@@ -1,6 +1,6 @@
 package jadex.commons.service.library;
 
-import jadex.commons.ThreadSuspendable;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;

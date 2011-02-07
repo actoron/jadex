@@ -1,7 +1,7 @@
 package jadex.bridge;
 
-import jadex.commons.IFuture;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.service.IService;
 
 /**

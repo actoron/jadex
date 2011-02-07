@@ -1,8 +1,8 @@
 package jadex.wfms.common;
 
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.library.ILibraryService;
 
 import java.io.File;

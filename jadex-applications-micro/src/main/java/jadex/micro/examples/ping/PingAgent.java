@@ -2,7 +2,7 @@ package jadex.micro.examples.ping;
 
 import jadex.base.fipa.SFipa;
 import jadex.bridge.MessageType;
-import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.micro.MicroAgent;
 
 import java.util.Map;

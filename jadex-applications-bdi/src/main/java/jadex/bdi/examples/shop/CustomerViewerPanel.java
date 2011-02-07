@@ -4,9 +4,9 @@ import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;

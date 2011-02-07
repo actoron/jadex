@@ -5,9 +5,9 @@ import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.micro.IMicroExternalAccess;
 

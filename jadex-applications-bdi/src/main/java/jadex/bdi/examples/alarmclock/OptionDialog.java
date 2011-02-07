@@ -4,7 +4,7 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.SGUI;
+import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;

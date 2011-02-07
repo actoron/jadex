@@ -1,5 +1,8 @@
 package jadex.commons;
 
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+
 /**
  *  Generic filter interface.
  */

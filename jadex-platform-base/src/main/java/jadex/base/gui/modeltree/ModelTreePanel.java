@@ -8,22 +8,23 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.asynctree.TreePopupListener;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.commons.ThreadSuspendable;
-import jadex.commons.TreeExpansionHandler;
-import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.future.SwingDelegationResultListener;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.IMenuItemConstructor;
 import jadex.commons.gui.PopupBuilder;
+import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
+import jadex.commons.gui.TreeExpansionHandler;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
@@ -785,12 +786,15 @@ public class ModelTreePanel extends JPanel // JSplitPane
 	/**
 	 *  Write current state into properties.
 	 */
-	public Properties	getProperties()
+	public IFuture getProperties()
 	{
-		Properties	props	= new Properties();
-		// Save tree properties.
+		final Future ret = new Future();
+		final Properties props = new Properties();
+		if(remote)
+			return new Future(props);
 		
-		ModelExplorerProperties	mep	= new ModelExplorerProperties();
+		// Save tree properties.
+		final ModelExplorerProperties	mep	= new ModelExplorerProperties();
 		RootNode root = (RootNode)getTree().getModel().getRoot();
 		String[] paths	= root.getPathEntries();
 		for(int i=0; i<paths.length; i++)
@@ -813,42 +817,58 @@ public class ModelTreePanel extends JPanel // JSplitPane
 		}
 		mep.setExpandedNodes((NodePath[])expanded.toArray(new NodePath[expanded.size()]));
 		// todo: remove ThreadSuspendable()
-		ClassLoader cl = ((ILibraryService)SServiceProvider.getService(exta.getServiceProvider(), 
-			ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable())).getClassLoader();
-		String	treesave	= JavaWriter.objectToXML(mep, cl);	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
-		props.addProperty(new Property("tree", treesave));
-				
-		// Save the last loaded file.
-		File sf = filechooser.getSelectedFile();
-		if(sf!=null)
+		SServiceProvider.getService(exta.getServiceProvider(), 
+			ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new SwingDelegationResultListener(ret)
 		{
-			String	lastpath	= SUtil.convertPathToRelative(sf.getAbsolutePath());
-			props.addProperty(new Property("lastpath", lastpath));
-		}
+			public void customResultAvailable(Object result)
+			{
+				ClassLoader cl = ((ILibraryService)result).getClassLoader();
+				String	treesave	= JavaWriter.objectToXML(mep, cl);	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
+				props.addProperty(new Property("tree", treesave));
+						
+				// Save the last loaded file.
+				File sf = filechooser.getSelectedFile();
+				if(sf!=null)
+				{
+					String	lastpath	= SUtil.convertPathToRelative(sf.getAbsolutePath());
+					props.addProperty(new Property("lastpath", lastpath));
+				}
 
-		// Save refresh/checking flags.
-//		props.addProperty(new Property("refresh", Boolean.toString(refresh)));
+				// Save refresh/checking flags.
+//				props.addProperty(new Property("refresh", Boolean.toString(refresh)));
+				
+				// Save the state of file filters
+				Properties	filterprops	= new Properties(null, "filter", null);
+//				filtercon.isAll();
+//				filterprops.addProperty(new Property("all", ""+filtercon.isAll()));
+				List ctypes = filtercon.getSelectedComponentTypes();
+				for(int i=0; i<ctypes.size(); i++)
+				{
+					String ctype = (String)ctypes.get(i);
+					filterprops.addProperty(new Property(ctype, "true"));
+				}
+				props.addSubproperties(filterprops);
+				
+				ret.setResult(props);
+			}
+		});
 		
-		// Save the state of file filters
-		Properties	filterprops	= new Properties(null, "filter", null);
-//		filtercon.isAll();
-//		filterprops.addProperty(new Property("all", ""+filtercon.isAll()));
-		List ctypes = filtercon.getSelectedComponentTypes();
-		for(int i=0; i<ctypes.size(); i++)
-		{
-			String ctype = (String)ctypes.get(i);
-			filterprops.addProperty(new Property(ctype, "true"));
-		}
-		props.addSubproperties(filterprops);
-		
-		return props;
+		return ret;
 	}
 
 	/**
 	 *  Update tool from given properties.
 	 */
-	public void setProperties(final Properties props)
+	public IFuture setProperties(final Properties props)
 	{
+		final Future ret = new Future();
+		
+		if(remote)
+		{
+			ret.setResult(null);
+			return ret;
+		}
 //		refresh	= false;	// stops crawler task, if any
 		
 		// Load root node.
@@ -897,48 +917,53 @@ public class ModelTreePanel extends JPanel // JSplitPane
 				expansionhandler.setExpandedPaths(mep.getExpandedNodes());
 
 				((AsyncTreeModel)getModel()).fireTreeChanged(root);
+				
+				// Load last selected model.
+				String lastpath = props.getStringProperty("lastpath");
+				if(lastpath!=null)
+				{
+					try
+					{
+						File mo_file = new File(lastpath);
+						filechooser.setCurrentDirectory(mo_file.getParentFile());
+						filechooser.setSelectedFile(mo_file);
+					}
+					catch(Exception e)
+					{
+					}
+				}				
+						
+				// Load refresh/checking flag (defaults to true).
+//				refresh	= !"false".equals(props.getStringProperty("refresh"));
+//				if(refreshmenu!=null)
+//					refreshmenu.setState(this.refresh);
+//				resetCrawler();
+				
+				// Load the filter settings
+				Properties	filterprops	= props.getSubproperty("filter");
+				if(filterprops!=null)
+				{
+					Property[] mps = filterprops.getProperties();
+					Set selected = new HashSet();
+					for(int i=0; i<mps.length; i++)
+					{
+						if(Boolean.parseBoolean(mps[i].getValue())) 
+							selected.add(mps[i].getType());
+					}
+					filtercon.setSelectedComponentTypes(selected);
+				}
+				
+				ret.setResult(null);
 			}
 			catch(Exception e)
 			{
+				ret.setException(e);
 				System.err.println("Cannot load project tree: "+e.getClass().getName());
 //				e.printStackTrace();
 			}
 		}
-				
-		// Load last selected model.
-		String lastpath = props.getStringProperty("lastpath");
-		if(lastpath!=null)
-		{
-			try
-			{
-				File mo_file = new File(lastpath);
-				filechooser.setCurrentDirectory(mo_file.getParentFile());
-				filechooser.setSelectedFile(mo_file);
-			}
-			catch(Exception e)
-			{
-			}
-		}				
-				
-		// Load refresh/checking flag (defaults to true).
-//		refresh	= !"false".equals(props.getStringProperty("refresh"));
-//		if(refreshmenu!=null)
-//			refreshmenu.setState(this.refresh);
-//		resetCrawler();
 		
-		// Load the filter settings
-		Properties	filterprops	= props.getSubproperty("filter");
-		if(filterprops!=null)
-		{
-			Property[] mps = filterprops.getProperties();
-			Set selected = new HashSet();
-			for(int i=0; i<mps.length; i++)
-			{
-				if(Boolean.parseBoolean(mps[i].getValue())) 
-					selected.add(mps[i].getType());
-			}
-			filtercon.setSelectedComponentTypes(selected);
-		}
+		return ret;
 	}
 	
 	/**

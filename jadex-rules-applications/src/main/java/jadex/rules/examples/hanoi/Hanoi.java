@@ -1,6 +1,6 @@
 package jadex.rules.examples.hanoi;
 
-import jadex.commons.SGUI;
+import jadex.commons.gui.SGUI;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IRule;

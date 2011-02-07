@@ -1,7 +1,7 @@
 package jadex.micro.examples.remoteservice;
 
 import jadex.bridge.IExternalAccess;
-import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.micro.MicroAgent;

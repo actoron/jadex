@@ -6,10 +6,10 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.SServiceProvider;
 
 /**

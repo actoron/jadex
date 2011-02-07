@@ -15,8 +15,8 @@ import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.IFuture;
 import jadex.commons.Tuple;
+import jadex.commons.future.IFuture;
 import jadex.rules.state.IOAVState;
 
 /**

@@ -4,7 +4,7 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.IResultListener;
 
 /**
  *  Handler for (external) tasks.

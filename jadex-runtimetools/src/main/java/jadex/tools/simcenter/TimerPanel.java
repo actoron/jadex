@@ -1,8 +1,8 @@
 package jadex.tools.simcenter;
 
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.commons.jtable.ObjectTableModel;
+import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.gui.jtable.ObjectTableModel;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.clock.ITimer;

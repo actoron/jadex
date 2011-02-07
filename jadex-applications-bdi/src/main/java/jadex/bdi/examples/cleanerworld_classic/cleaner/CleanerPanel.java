@@ -14,8 +14,8 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.IFuture;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.SwingDefaultResultListener;
 
 import java.awt.Color;
 import java.awt.Graphics;

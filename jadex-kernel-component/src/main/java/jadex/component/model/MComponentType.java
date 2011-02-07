@@ -6,11 +6,11 @@ import jadex.bridge.IErrorReport;
 import jadex.bridge.ModelInfo;
 import jadex.bridge.ModelValueProvider;
 import jadex.commons.ICacheableModel;
-import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.javaparser.IParsedExpression;
@@ -219,7 +219,15 @@ public class MComponentType extends MStartable implements ICacheableModel
 				Class type = ser.getClazz()!=null? ser.getClazz(): 
 					tmp[i]==null && ser.getParsedValue()!=null? 
 					ser.getParsedValue().getStaticType(): null;
+					
+				try
+				{
 				tmp[i] = new ProvidedServiceInfo(type, ser.getParsedValue().getExpressionText(), ser.isDirect());
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 			
 			modelinfo.setProvidedServices(tmp);

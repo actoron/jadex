@@ -1,7 +1,7 @@
 package jadex.commons.service.fetcher;
 
-import jadex.commons.IFuture;
-import jadex.commons.IIntermediateFuture;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.service.IRequiredServiceFetcher;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.RequiredServiceInfo;

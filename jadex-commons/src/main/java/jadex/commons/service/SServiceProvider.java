@@ -1,11 +1,11 @@
 package jadex.commons.service;
 
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.IIntermediateFuture;
-import jadex.commons.IntermediateDelegationResultListener;
-import jadex.commons.IntermediateFuture;
-import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -200,7 +200,7 @@ public class SServiceProvider
 //							System.out.println("rrr: "+result);
 //						}
 //					});
-					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()));
+					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()+" scope: "+scope));
 				}
 				else
 					super.customResultAvailable(res.iterator().next());

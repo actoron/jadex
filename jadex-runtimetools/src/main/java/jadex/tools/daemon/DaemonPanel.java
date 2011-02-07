@@ -1,13 +1,13 @@
 package jadex.tools.daemon;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.SGUI;
-import jadex.commons.concurrent.IResultListener;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.PropertiesPanel;
-import jadex.commons.jtable.ObjectTableModel;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.jtable.ObjectTableModel;
 import jadex.commons.service.SServiceProvider;
 import jadex.micro.IMicroExternalAccess;
 

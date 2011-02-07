@@ -1,9 +1,9 @@
 package jadex.base.gui.componenttree;
 
-import jadex.commons.SGUI;
 import jadex.commons.SReflect;
 import jadex.commons.gui.PropertiesPanel;
-import jadex.commons.jtable.ResizeableTableHeader;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.jtable.ResizeableTableHeader;
 import jadex.commons.service.IService;
 import jadex.commons.service.IServiceIdentifier;
 

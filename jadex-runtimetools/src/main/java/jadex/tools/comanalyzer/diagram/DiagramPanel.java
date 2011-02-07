@@ -1,7 +1,7 @@
 package jadex.tools.comanalyzer.diagram;
 
-import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.gui.SGUI;
 import jadex.tools.comanalyzer.ComanalyzerPlugin;
 import jadex.tools.comanalyzer.PaintMaps;
 import jadex.tools.comanalyzer.ToolCanvas;

@@ -1,7 +1,7 @@
 package jadex.commons.service.library;
 
-import jadex.commons.IFuture;
 import jadex.commons.IRemotable;
+import jadex.commons.future.IFuture;
 
 import java.net.URL;
 

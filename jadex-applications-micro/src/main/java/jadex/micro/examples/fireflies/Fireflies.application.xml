@@ -23,6 +23,7 @@
 		<import>jadex.bdi.planlib.*</import>
 		<import>jadex.application.space.envsupport.evaluation.*</import>
 		<import>jadex.commons.*</import>
+		<import>jadex.commons.future.*</import>
 		<import>jadex.application.space.envsupport.observer.gui.plugin.*</import>
 		<import>java.awt.*</import>
 	</imports>

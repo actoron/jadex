@@ -10,7 +10,7 @@
 	package="jadex.bdi.testcases.misc">
 
 	<imports>
-		<import>jadex.commons.IFuture</import>
+		<import>jadex.commons.future.*</import>
 	</imports>
 
 	<beliefs>

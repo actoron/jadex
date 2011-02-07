@@ -1,6 +1,6 @@
 package jadex.base.service.remote;
 
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 import jadex.micro.IMicroExternalAccess;
 
 

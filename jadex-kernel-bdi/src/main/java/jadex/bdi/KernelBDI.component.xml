@@ -10,6 +10,7 @@
 	
 	<imports>
 		<import>jadex.commons.*</import>
+		<import>jadex.commons.future.*</import>
 		<import>jadex.bridge.*</import>
 		<import>jadex.base.fipa.*</import>
 		<import>jadex.commons.service.*</import>

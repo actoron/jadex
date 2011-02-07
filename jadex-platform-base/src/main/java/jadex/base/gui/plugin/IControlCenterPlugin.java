@@ -1,6 +1,7 @@
 package jadex.base.gui.plugin;
 
 import jadex.commons.Properties;
+import jadex.commons.future.IFuture;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -71,12 +72,12 @@ public interface IControlCenterPlugin
 	/**
 	 *  Advices the the plugin to restore its properties from the argument
 	 */
-	public void setProperties(Properties ps);
+	public IFuture setProperties(Properties ps);
 
 	/**
 	 *  Advices the plugin to store its properties in the argument This is done
 	 *  on project close or save.
 	 */
-	public Properties	getProperties();
+	public IFuture getProperties();
 
 }

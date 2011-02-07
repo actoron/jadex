@@ -1,7 +1,7 @@
 package jadex.tools.comanalyzer;
 
-import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.gui.SGUI;
 import jadex.tools.comanalyzer.table.TablePanel;
 
 import java.awt.event.ActionEvent;

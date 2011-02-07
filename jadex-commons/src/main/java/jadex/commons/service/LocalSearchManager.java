@@ -1,8 +1,8 @@
 package jadex.commons.service;
 
-import jadex.commons.IIntermediateFuture;
-import jadex.commons.IntermediateFuture;
-import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IntermediateFuture;
 
 import java.util.Map;
 

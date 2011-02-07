@@ -1,7 +1,7 @@
 package jadex.base.gui;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.SGUI;
+import jadex.commons.gui.SGUI;
 import jadex.commons.service.IServiceProvider;
 
 import java.awt.Component;

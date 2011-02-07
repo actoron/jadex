@@ -10,8 +10,8 @@ import jadex.bpmn.runtime.ThreadContext;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.IChangeListener;
-import jadex.commons.jtable.ResizeableTableHeader;
-import jadex.commons.jtable.TableSorter;
+import jadex.commons.gui.jtable.ResizeableTableHeader;
+import jadex.commons.gui.jtable.TableSorter;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;

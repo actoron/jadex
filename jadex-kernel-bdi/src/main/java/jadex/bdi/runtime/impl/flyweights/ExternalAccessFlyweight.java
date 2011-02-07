@@ -7,10 +7,10 @@ import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IModelInfo;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.IServiceProvider;
 import jadex.rules.state.IOAVState;
 

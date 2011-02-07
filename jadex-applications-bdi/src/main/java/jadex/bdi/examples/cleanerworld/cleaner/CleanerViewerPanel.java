@@ -6,8 +6,8 @@ import java.awt.event.ActionListener;
 import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;

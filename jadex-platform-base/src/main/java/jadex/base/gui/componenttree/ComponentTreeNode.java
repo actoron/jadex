@@ -7,10 +7,10 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.service.IService;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.SServiceProvider;
@@ -361,7 +361,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 
 			public void customExceptionOccurred(Exception exception)
 			{
-				System.out.println("here2: "+exception);
+//				System.out.println("here2: "+exception);
 				// May happen, when components already removed.
 			}
 		});

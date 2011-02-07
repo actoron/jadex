@@ -4,7 +4,7 @@ import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IExternalCondition;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.IResultCommand;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.clock.ITimer;
 import jadex.rules.state.OAVAttributeType;

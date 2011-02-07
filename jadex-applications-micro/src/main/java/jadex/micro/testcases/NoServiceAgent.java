@@ -6,7 +6,7 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.Argument;
 import jadex.bridge.IArgument;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.service.IService;
 import jadex.commons.service.SServiceProvider;
 import jadex.micro.MicroAgent;

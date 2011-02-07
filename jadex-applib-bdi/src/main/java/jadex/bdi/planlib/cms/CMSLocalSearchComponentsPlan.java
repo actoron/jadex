@@ -4,7 +4,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.ISearchConstraints;
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 
 
 /**

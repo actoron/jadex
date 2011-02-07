@@ -13,6 +13,7 @@
 	<imports>
 		<import>jadex.base.fipa.*</import>
 		<import>jadex.commons.*</import>
+		<import>jadex.commons.future.*</import>
 		<import>jadex.commons.service.*</import>
 	</imports>
 	

@@ -4,7 +4,7 @@ import jadex.base.fipa.IDF;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ISearchConstraints;
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 
 
 /**

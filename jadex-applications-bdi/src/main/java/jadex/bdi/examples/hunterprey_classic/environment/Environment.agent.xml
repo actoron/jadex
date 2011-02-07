@@ -14,6 +14,7 @@
 		<import>jadex.commons.IFilter</import>
 		<import>jadex.base.fipa.*</import>
 		<import>jadex.commons.*</import>
+		<import>jadex.commons.future.*</import>
 		<import>jadex.commons.service.*</import>
 	</imports>
 
@@ -272,7 +273,7 @@
 
 	<properties>
 		<property name="logging.level">java.util.logging.Level.SEVERE</property>
-	 	<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class)</property>
+	 	<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)</property>
 	</properties>
 	
 	<configurations>

@@ -1,8 +1,8 @@
 package jadex.base.gui;
 
 import jadex.commons.BrowserLauncher2;
-import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.gui.SGUI;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;

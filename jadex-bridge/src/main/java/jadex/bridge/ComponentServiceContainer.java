@@ -1,10 +1,10 @@
 package jadex.bridge;
 
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.concurrent.CollectionResultListener;
-import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.service.BasicServiceContainer;
 import jadex.commons.service.SServiceProvider;
 

@@ -5,8 +5,8 @@ import jadex.base.fipa.IDFServiceDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.SGUI;
-import jadex.commons.jtable.TableSorter;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.jtable.TableSorter;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;

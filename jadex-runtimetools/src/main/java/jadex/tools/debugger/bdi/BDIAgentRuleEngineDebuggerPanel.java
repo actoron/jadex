@@ -6,7 +6,7 @@ import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IBreakpointPanel;
-import jadex.commons.SGUI;
+import jadex.commons.gui.SGUI;
 import jadex.rules.tools.reteviewer.RetePanel;
 import jadex.tools.debugger.IDebuggerPanel;
 

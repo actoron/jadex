@@ -2,14 +2,14 @@ package jadex.base.gui.modeltree;
 
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
-import jadex.commons.IFuture;
 import jadex.commons.IRemoteFilter;
-import jadex.commons.IntermediateFuture;
 import jadex.commons.collection.SortedList;
-import jadex.commons.concurrent.CollectionResultListener;
-import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.IResultListener;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.SwingDefaultResultListener;
 
 import java.io.File;
 import java.util.Collection;

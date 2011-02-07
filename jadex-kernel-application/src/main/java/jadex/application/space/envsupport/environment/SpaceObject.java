@@ -3,7 +3,7 @@ package jadex.application.space.envsupport.environment;
 import jadex.application.space.envsupport.MObjectType;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.service.clock.IClockService;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;

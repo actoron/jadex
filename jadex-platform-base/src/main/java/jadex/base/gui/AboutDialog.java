@@ -1,8 +1,8 @@
 package jadex.base.gui;
 
 import jadex.bridge.IVersionInfo;
-import jadex.commons.SGUI;
 import jadex.commons.gui.BrowserPane;
+import jadex.commons.gui.SGUI;
 
 import java.awt.Color;
 import java.awt.Container;

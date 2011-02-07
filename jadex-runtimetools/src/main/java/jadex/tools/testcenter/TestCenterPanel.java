@@ -11,12 +11,12 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.commons.ThreadSuspendable;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.BrowserPane;
 import jadex.commons.gui.EditableList;
+import jadex.commons.gui.SGUI;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.tools.jcc.AgentControlCenter;
@@ -525,7 +525,7 @@ public class TestCenterPanel extends JSplitPane
 	/**
 	 * Save the properties.
 	 */
-	public Properties	getProperties()
+	public Properties getProperties()
 	{
 		Properties	props	= new Properties();
 		String[]	entries	= teststable.getEntries();

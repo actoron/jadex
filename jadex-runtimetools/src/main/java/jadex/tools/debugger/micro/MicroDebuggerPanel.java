@@ -4,7 +4,7 @@ import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IBreakpointPanel;
-import jadex.commons.SGUI;
+import jadex.commons.gui.SGUI;
 import jadex.micro.ExternalAccess;
 import jadex.tools.debugger.IDebuggerPanel;
 

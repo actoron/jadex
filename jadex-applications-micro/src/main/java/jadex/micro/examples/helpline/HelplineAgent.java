@@ -2,7 +2,7 @@ package jadex.micro.examples.helpline;
 
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
-import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.annotation.GuiClass;
 import jadex.commons.service.clock.IClockService;

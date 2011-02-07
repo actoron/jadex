@@ -22,6 +22,7 @@
 		<import>java.util.logging.*</import>
 		<import>jadex.commons.*</import>
 		<import>jadex.commons.service.*</import>
+		<import>jadex.commons.future.*</import>
 	</imports>
 
 	<capabilities>

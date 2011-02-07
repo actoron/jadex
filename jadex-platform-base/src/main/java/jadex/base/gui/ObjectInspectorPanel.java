@@ -1,7 +1,7 @@
 package jadex.base.gui;
 
 import jadex.base.gui.ObjectTreeModel.ObjectTreeCellRenderer;
-import jadex.commons.TreeExpansionHandler;
+import jadex.commons.gui.TreeExpansionHandler;
 
 import java.awt.BorderLayout;
 

@@ -1,8 +1,8 @@
 package jadex.commons.service;
 
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.IRemoteFilter;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 import java.lang.reflect.Proxy;
 import java.rmi.server.RemoteObjectInvocationHandler;

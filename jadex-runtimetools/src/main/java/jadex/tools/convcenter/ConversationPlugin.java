@@ -15,8 +15,10 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.Properties;
-import jadex.commons.SGUI;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.gui.SGUI;
 import jadex.commons.service.SServiceProvider;
 import jadex.tools.jcc.AgentControlCenter;
 import jadex.tools.starter.StarterPlugin;
@@ -275,21 +277,22 @@ public class ConversationPlugin extends AbstractJCCPlugin
 	/**
 	 *  Set properties loaded from project.
 	 */
-	public void setProperties(Properties props)
+	public IFuture setProperties(Properties props)
 	{
 		Properties ps = props.getSubproperty("convcenter");
 		if(ps!=null)
 			convcenter.setProperties(ps);
+		return new Future(null);
 	}
 
 	/**
 	 *  Return properties to be saved in project.
 	 */
-	public Properties	getProperties()
+	public IFuture getProperties()
 	{
 		Properties props = new Properties();
 		addSubproperties(props, "convcenter", convcenter.getProperties());
-		return props;
+		return new Future(props);
 	}
 
 	/** 

@@ -2,7 +2,7 @@ package jadex.component.runtime;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.IServiceProvider;
 import jadex.component.model.MComponentType;
 

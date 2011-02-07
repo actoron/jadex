@@ -1,6 +1,6 @@
 package jadex.rules.tools.stateviewer;
 
-import jadex.commons.TreeExpansionHandler;
+import jadex.commons.gui.TreeExpansionHandler;
 import jadex.rules.state.IOAVState;
 import jadex.rules.tools.stateviewer.OAVTreeModel.OAVTreeCellRenderer;
 import jadex.rules.tools.stateviewer.OAVTreeModel.ObjectInspectorNode;

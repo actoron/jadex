@@ -1,7 +1,7 @@
 package jadex.micro.examples.helpline;
 
-import jadex.commons.IIntermediateFuture;
-import jadex.commons.IntermediateFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.service.BasicService;
 
 /**

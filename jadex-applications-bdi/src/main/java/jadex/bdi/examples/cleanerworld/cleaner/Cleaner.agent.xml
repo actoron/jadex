@@ -28,6 +28,7 @@
 		<import>jadex.application.space.envsupport.environment.space2d.*</import>
 		<import>jadex.application.space.envsupport.math.*</import>
 		<import>jadex.bdi.examples.cleanerworld.*</import>
+		<import>jadex.commons.future.*</import>
 	</imports>
 
 	<beliefs>

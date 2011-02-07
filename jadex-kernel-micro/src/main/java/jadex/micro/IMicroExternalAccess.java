@@ -3,7 +3,7 @@ package jadex.micro;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.MessageType;
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 
 import java.util.Map;
 

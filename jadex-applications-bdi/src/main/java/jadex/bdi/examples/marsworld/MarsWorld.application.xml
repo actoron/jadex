@@ -42,7 +42,7 @@
 		<import>jadex.application.space.envsupport.observer.gui.plugin.*</import>
 		<import>jadex.commons.service.clock.IClockService</import>
 		<import>jadex.commons.service.SServiceProvider</import>
-		<import>jadex.commons.IFuture</import>
+		<import>jadex.commons.future.*</import>
 		<import>jadex.commons.service.*</import>
 	</imports>
 	

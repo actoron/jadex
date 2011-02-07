@@ -5,7 +5,7 @@ import jadex.application.runtime.IApplication;
 import jadex.application.space.envsupport.dataview.IDataView;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IPropertyObject;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.meta.IPropertyMetaDataSet;
 
 import java.util.List;

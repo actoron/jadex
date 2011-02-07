@@ -1,8 +1,8 @@
 package jadex.commons.service.execution;
 
 import jadex.commons.ICommand;
-import jadex.commons.IFuture;
 import jadex.commons.concurrent.IExecutable;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.IService;
 
 /**

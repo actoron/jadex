@@ -10,17 +10,18 @@
 	
 	<imports>
 		<import>jadex.commons.*</import>
+		<import>jadex.commons.future.*</import>
 		<import>jadex.bridge.*</import>
 		<import>jadex.commons.service.*</import>
 		<import>jadex.commons.service.clock.*</import>
 		<import>jadex.commons.service.execution.*</import>
 		<import>jadex.commons.service.library.*</import>
 		<import>jadex.commons.service.threadpool.*</import>
+		<import>jadex.commons.concurrent.*</import>
 		<import>jadex.base.fipa.*</import>
 		<import>jadex.base.*</import>
 		<import>jadex.base.service.simulation.*</import>
 		<import>jadex.base.service.remote.*</import>
-		<import>jadex.commons.concurrent.*</import>
 		<import>jadex.standalone.service.*</import>
 		<import>jadex.base.service.message.*</import>
 		<import>jadex.base.service.message.transport.*</import>

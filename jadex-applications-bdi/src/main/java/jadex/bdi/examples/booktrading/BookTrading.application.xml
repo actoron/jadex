@@ -17,7 +17,7 @@
 		<import>java.util.*</import>
 		<import>jadex.commons.service.clock.IClockService</import>
 		<import>jadex.commons.service.SServiceProvider</import>
-		<import>jadex.commons.IFuture</import>
+		<import>jadex.commons.future.*</import>
 	</imports>
 	
 	<componenttypes>

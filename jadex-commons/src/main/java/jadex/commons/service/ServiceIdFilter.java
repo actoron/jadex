@@ -1,8 +1,8 @@
 package jadex.commons.service;
 
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.IRemoteFilter;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 /**
  *  Filter for service ids.

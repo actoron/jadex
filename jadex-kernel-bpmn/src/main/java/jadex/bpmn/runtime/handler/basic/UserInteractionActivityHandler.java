@@ -4,7 +4,7 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
-import jadex.commons.SGUI;
+import jadex.commons.gui.SGUI;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;

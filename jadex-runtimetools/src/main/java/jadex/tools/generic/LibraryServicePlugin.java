@@ -1,10 +1,10 @@
 package jadex.tools.generic;
 
 import jadex.base.gui.componentviewer.libservice.LibServiceBrowser;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.SGUI;
-import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.SGUI;
 import jadex.commons.service.IService;
 import jadex.commons.service.library.ILibraryService;
 

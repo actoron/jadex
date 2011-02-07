@@ -1,8 +1,8 @@
 package jadex.wfms.service;
 
-import jadex.commons.Future;
 import jadex.commons.ICommand;
-import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.SServiceProvider;
 import jadex.wfms.client.IClient;

@@ -9,12 +9,12 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;

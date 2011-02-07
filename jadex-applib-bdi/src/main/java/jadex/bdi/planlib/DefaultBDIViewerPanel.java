@@ -9,11 +9,11 @@ import jadex.bdi.runtime.ICapability;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.SReflect;
-import jadex.commons.concurrent.CollectionResultListener;
-import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;

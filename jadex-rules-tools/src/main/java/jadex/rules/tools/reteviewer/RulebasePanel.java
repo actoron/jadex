@@ -4,7 +4,7 @@ import jadex.commons.ChangeEvent;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.IChangeListener;
 import jadex.commons.ISteppable;
-import jadex.commons.SGUI;
+import jadex.commons.gui.SGUI;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.IRulebase;
 import jadex.rules.rulesystem.IRulebaseListener;

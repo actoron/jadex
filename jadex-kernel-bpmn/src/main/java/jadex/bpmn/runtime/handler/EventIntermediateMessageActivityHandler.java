@@ -10,8 +10,8 @@ import jadex.bridge.MessageType;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 

@@ -1,14 +1,14 @@
 package jadex.base.service.simulation;
 
 import jadex.commons.ChangeEvent;
-import jadex.commons.Future;
 import jadex.commons.IChangeListener;
 import jadex.commons.ICommand;
-import jadex.commons.IFuture;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.RequiredServiceInfo;

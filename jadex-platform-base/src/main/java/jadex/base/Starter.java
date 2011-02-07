@@ -9,13 +9,13 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IModelInfo;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 
 import java.net.InetAddress;

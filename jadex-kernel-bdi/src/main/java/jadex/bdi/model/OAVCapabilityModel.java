@@ -6,13 +6,13 @@ import jadex.bridge.Argument;
 import jadex.bridge.IArgument;
 import jadex.bridge.ModelInfo;
 import jadex.commons.ICacheableModel;
-import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.javaparser.IParsedExpression;
@@ -673,6 +673,14 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	 */
 	public RequiredServiceInfo[] getRequiredServices()
 	{
+		return (RequiredServiceInfo[])getRequiredServices(handle).toArray(new RequiredServiceInfo[0]);
+	}
+	
+	/**
+	 *  Get the required services.
+	 */
+	protected List getRequiredServices(Object handle)
+	{
 		List ret = new ArrayList();
 		Collection own = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_requiredservices) : null;
 		if(own!=null)
@@ -701,34 +709,25 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 			{
 				Object subcaparef = it.next();
 				Object subcapa  = state.getAttributeValue(subcaparef, OAVBDIMetaModel.capabilityref_has_capability);
-				Collection sub = state.getAttributeValues(subcapa, OAVBDIMetaModel.capability_has_requiredservices);
-				if(sub!=null)
-				{
-					for(Iterator it2=sub.iterator(); it2.hasNext(); )
-					{
-						Object req = it2.next();
-						String name = (String)state.getAttributeValue(req, OAVBDIMetaModel.modelelement_has_name);
-						Class clazz = (Class)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_class);
-						boolean dynamic = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_dynamic));
-						boolean multiple = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_multiple));
-//						boolean forced = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_forced));
-//						boolean remote = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_remote));
-//						boolean declared = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_declared));
-//						boolean upwards = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_upwards));
-						String scope = ((String)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_scope));
-						ret.add(new RequiredServiceInfo(name, clazz, dynamic, multiple, scope));
-					}
-				}
+				ret.addAll(getRequiredServices(subcapa));
 			}
 		}
 		
-		return (RequiredServiceInfo[])ret.toArray(new RequiredServiceInfo[ret.size()]);
+		return ret;
 	}
 	
 	/**
 	 *  Get the provided services.
 	 */
 	public ProvidedServiceInfo[] getProvidedServices()
+	{
+		return (ProvidedServiceInfo[])getProvidedServices(handle).toArray(new ProvidedServiceInfo[0]);
+	}
+	
+	/**
+	 *  Get the required services.
+	 */
+	protected List getProvidedServices(Object handle)
 	{
 		List ret = new ArrayList();
 		Collection own = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_providedservices) : null;
@@ -752,23 +751,10 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 			{
 				Object subcaparef = it.next();
 				Object subcapa  = state.getAttributeValue(subcaparef, OAVBDIMetaModel.capabilityref_has_capability);
-				Collection sub = state.getAttributeValues(subcapa, OAVBDIMetaModel.capability_has_providedservices);
-				if(sub!=null)
-				{
-					for(Iterator it2=sub.iterator(); it2.hasNext(); )
-					{
-						Object ob = it2.next();
-						Class clazz = (Class)state.getAttributeValue(ob, OAVBDIMetaModel.expression_has_class);
-						String text = (String)state.getAttributeValue(ob, OAVBDIMetaModel.expression_has_text);
-						Boolean direct = (Boolean)state.getAttributeValue(ob, OAVBDIMetaModel.providedservice_has_direct);
-						ProvidedServiceInfo psi = new ProvidedServiceInfo(clazz, text, direct!=null? direct.booleanValue(): false); 
-						ret.add(psi);
-					}
-				}
+				ret.addAll(getProvidedServices(subcapa));
 			}
 		}
-		
-		return (ProvidedServiceInfo[])ret.toArray(new ProvidedServiceInfo[ret.size()]);
+		return ret;
 	}
 	
 	//-------- helpers --------

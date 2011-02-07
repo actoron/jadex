@@ -1,7 +1,7 @@
 package jadex.wfms.simulation.stateset.gui;
 
 import jadex.bpmn.model.MParameter;
-import jadex.commons.SGUI;
+import jadex.commons.gui.SGUI;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.wfms.guicomponents.ButtonPanel;
 import jadex.wfms.guicomponents.ChoiceTable;

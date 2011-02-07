@@ -1,10 +1,10 @@
 package jadex.commons.service;
 
-import jadex.commons.IFuture;
-import jadex.commons.IIntermediateFuture;
-import jadex.commons.IntermediateFuture;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateFuture;
 
 import java.util.Collection;
 import java.util.Iterator;

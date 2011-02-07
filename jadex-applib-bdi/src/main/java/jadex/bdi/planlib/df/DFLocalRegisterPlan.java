@@ -4,7 +4,7 @@ import jadex.base.fipa.IDF;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 
 import java.util.Date;
 

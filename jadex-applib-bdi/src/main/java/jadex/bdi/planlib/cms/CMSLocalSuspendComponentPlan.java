@@ -4,7 +4,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 
 /**
  *  Plan for suspending a Jadex component on the platform.

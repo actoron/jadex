@@ -8,7 +8,7 @@ import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.SimplePropertyObject;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.service.SServiceProvider;
 
 import java.util.Map;

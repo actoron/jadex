@@ -1,6 +1,6 @@
 package jadex.commons.service;
 
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 
 import java.util.Collection;
 import java.util.Map;

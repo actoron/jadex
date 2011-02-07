@@ -1,6 +1,6 @@
 package jadex.bpmn.runtime;
 
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 
 /**
  *  Interface for domain specific tasks.

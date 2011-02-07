@@ -1,10 +1,10 @@
 package jadex.tools.daemon;
 
 import jadex.commons.ChangeEvent;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.IRemoteChangeListener;
-import jadex.commons.jtable.ObjectTableModel;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.jtable.ObjectTableModel;
 
 import javax.swing.JTable;
 

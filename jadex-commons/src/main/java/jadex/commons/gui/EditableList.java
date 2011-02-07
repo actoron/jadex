@@ -1,6 +1,5 @@
 package jadex.commons.gui;
 
-import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 
 import java.awt.Component;

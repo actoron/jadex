@@ -4,7 +4,7 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IMessageService;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.EditableList;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.RequiredServiceInfo;

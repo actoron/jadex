@@ -2,7 +2,7 @@ package jadex.application.space.envsupport.environment;
 
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
 import java.util.Collection;

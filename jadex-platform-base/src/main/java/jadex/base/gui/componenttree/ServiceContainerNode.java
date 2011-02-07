@@ -3,9 +3,9 @@ package jadex.base.gui.componenttree;
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
-import jadex.commons.IFuture;
-import jadex.commons.SGUI;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.CombiIcon;
+import jadex.commons.gui.SGUI;
 import jadex.commons.service.IServiceContainer;
 
 import java.util.List;

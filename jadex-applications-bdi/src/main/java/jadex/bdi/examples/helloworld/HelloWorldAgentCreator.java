@@ -9,7 +9,7 @@ import jadex.bdi.model.editable.IMEPlan;
 import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.service.SServiceProvider;
 
 /**

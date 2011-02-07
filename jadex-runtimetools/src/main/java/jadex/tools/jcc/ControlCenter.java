@@ -11,9 +11,12 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IVersionInfo;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.future.SwingDelegationResultListener;
+import jadex.commons.gui.SGUI;
 import jadex.commons.service.library.ILibraryService;
 import jadex.xml.PropertiesXMLHelper;
 import jadex.xml.annotation.XMLClassname;
@@ -399,53 +402,76 @@ public class ControlCenter implements IControlCenter
 			}
 
 			// Save properties of all plugins.
-			for(Iterator it = plugins.keySet().iterator(); it.hasNext();)
+			final IControlCenterPlugin[] plugs = (IControlCenterPlugin[])plugins.keySet().toArray(new IControlCenterPlugin[plugins.keySet().size()]);
+			final CounterResultListener lis = new CounterResultListener(plugs.length, true, 
+				new SwingDefaultResultListener()
 			{
-				IControlCenterPlugin plugin = (IControlCenterPlugin)it.next();
+				public void customResultAvailable(Object result)
+				{
+					final File	project	= ControlCenter.this.project;
+					final Properties	props	=  ControlCenter.this.props;
+					access.scheduleStep(new IComponentStep()
+					{
+						@XMLClassname("save-project")
+						public Object execute(IInternalAccess ia)
+						{
+							ia.getRequiredService("libservice")
+								.addResultListener(new SwingDefaultResultListener(window)
+							{
+								public void customResultAvailable(Object result)
+								{
+									try
+									{
+										FileOutputStream os = new FileOutputStream(project);
+										PropertiesXMLHelper.getPropertyWriter().write(props, os, ((ILibraryService)result).getClassLoader(), null);
+										os.close();
+										setStatusText("Project saved successfully: "+ project.getAbsolutePath());
+									}
+									catch(Exception e)
+									{
+										e.printStackTrace();
+										String failed = SUtil
+											.wrapText("Could not save data in properties file\n\n"+ e.getMessage());
+										JOptionPane.showMessageDialog(window, failed,
+													"Properties Error", JOptionPane.ERROR_MESSAGE);
+									}
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+			
+			for(int i=0; i<plugs.length; i++)
+			{
+				final IControlCenterPlugin plugin = plugs[i];
 				Properties plugprops = null;
 				// Only overwrite active plugin settings.
 				if(plugins.get(plugin) != null)
-					plugprops = plugin.getProperties();
-				// Otherwise keep old settings.
-				else if(oldprops != null)
-					plugprops = oldprops.getSubproperty(plugin.getName());
-
-				if(plugprops != null)
-					AbstractJCCPlugin.addSubproperties(props, plugin.getName(), plugprops);
-			}
-
-			final File	project	= this.project;
-			final Properties	props	= this.props;
-			access.scheduleStep(new IComponentStep()
-			{
-				@XMLClassname("save-project")
-				public Object execute(IInternalAccess ia)
 				{
-					ia.getRequiredService("libservice")
-						.addResultListener(new SwingDefaultResultListener(window)
+					plugin.getProperties().addResultListener(new SwingDefaultResultListener()
 					{
 						public void customResultAvailable(Object result)
 						{
-							try
-							{
-								FileOutputStream os = new FileOutputStream(project);
-								PropertiesXMLHelper.getPropertyWriter().write(props, os, ((ILibraryService)result).getClassLoader(), null);
-								os.close();
-								setStatusText("Project saved successfully: "+ project.getAbsolutePath());
-							}
-							catch(Exception e)
-							{
-								e.printStackTrace();
-								String failed = SUtil
-									.wrapText("Could not save data in properties file\n\n"+ e.getMessage());
-								JOptionPane.showMessageDialog(window, failed,
-											"Properties Error", JOptionPane.ERROR_MESSAGE);
-							}
+							Properties plugprops = (Properties)result;
+							AbstractJCCPlugin.addSubproperties(props, plugin.getName(), plugprops);
+							lis.resultAvailable(null);
 						}
 					});
-					return null;
 				}
-			});
+				// Otherwise keep old settings.
+				else if(oldprops != null)
+				{
+					plugprops = oldprops.getSubproperty(plugin.getName());
+					AbstractJCCPlugin.addSubproperties(props, plugin.getName(), plugprops);
+					lis.resultAvailable(null);
+				}
+				else
+				{
+					lis.resultAvailable(null);
+				}
+			}
 		}
 	}
 

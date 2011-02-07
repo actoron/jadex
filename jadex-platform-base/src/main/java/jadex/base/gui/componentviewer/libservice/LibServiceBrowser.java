@@ -2,16 +2,17 @@ package jadex.base.gui.componentviewer.libservice;
 
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.commons.ThreadSuspendable;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.future.SwingDelegationResultListener;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.EditableListEvent;
+import jadex.commons.gui.SGUI;
 import jadex.commons.service.IService;
 import jadex.commons.service.library.ILibraryService;
 import jadex.commons.service.library.ILibraryServiceListener;
@@ -330,14 +331,16 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 	/**
 	 *  Advices the the panel to restore its properties from the argument
 	 */
-	public void setProperties(Properties props)
+	public IFuture setProperties(Properties props)
 	{
+		Future ret = new Future();
+		
 		Property[] ps = props.getProperties("cp");
 		for(int i=0; i<ps.length; i++)
 		{
 			try
 			{
-				
+				// todo: make addURL return IFuture
 				File	file = new File(URLDecoder.decode(ps[i].getValue(), Charset.defaultCharset().name()));
 				if(file.exists())
 				{
@@ -354,35 +357,45 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 				System.out.println("Classpath problem: "+ps[i].getValue());
 			}
 		}
+		
+		return ret;
 	}
 
 	/**
 	 *  Advices the panel provide its setting as properties (if any).
 	 *  This is done on project close or save.
 	 */
-	public Properties	getProperties()
+	public IFuture getProperties()
 	{
-		Properties	props	= new Properties();
+		final Future ret = new Future();
 		
 		// todo: hack remove thread suspendable
-		List urls = (List)libservice.getURLs().get(new ThreadSuspendable());
-
-		for(int i=0; i<urls.size(); i++)
+		libservice.getURLs().addResultListener(new SwingDelegationResultListener(ret)
 		{
-			URL	url	= (URL) urls.get(i);
-			String	urlstring;
-			if(url.getProtocol().equals("file"))
+			public void customResultAvailable(Object result)
 			{
-				urlstring	= SUtil.convertPathToRelative(url.getPath());
+				Properties	props	= new Properties();
+				List urls = (List)result;
+				for(int i=0; i<urls.size(); i++)
+				{
+					URL	url	= (URL) urls.get(i);
+					String	urlstring;
+					if(url.getProtocol().equals("file"))
+					{
+						urlstring	= SUtil.convertPathToRelative(url.getPath());
+					}
+					else
+					{
+						urlstring	= url.toString();
+					}
+					
+					props.addProperty(new Property("cp", urlstring));
+				}
+				ret.setResult(props);
 			}
-			else
-			{
-				urlstring	= url.toString();
-			}
-			
-			props.addProperty(new Property("cp", urlstring));
-		}
-		return props;
+		});
+		
+		return ret;
 	}
 	
 	

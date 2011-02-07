@@ -3,11 +3,11 @@ package jadex.tools.starter;
 import jadex.base.gui.componentviewer.AbstractServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.Properties;
-import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.service.IService;
 
 import javax.swing.JComponent;
@@ -69,16 +69,16 @@ public class StarterViewerPanel extends AbstractServiceViewerPanel
 	/**
 	 *  Advices the the panel to restore its properties from the argument
 	 */
-	public void setProperties(Properties props)
+	public IFuture setProperties(Properties props)
 	{
-		panel.setProperties(props);
+		return panel.setProperties(props);
 	}
 
 	/**
 	 *  Advices the panel provide its setting as properties (if any).
 	 *  This is done on project close or save.
 	 */
-	public Properties	getProperties()
+	public IFuture getProperties()
 	{
 		return panel.getProperties();
 	}

@@ -4,8 +4,8 @@ import jadex.base.SComponentFactory;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.SGUI;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.gui.SGUI;
 
 import javax.swing.Icon;
 import javax.swing.JTree;

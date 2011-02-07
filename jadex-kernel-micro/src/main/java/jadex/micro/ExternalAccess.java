@@ -5,9 +5,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.MessageType;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.IServiceProvider;
 
 import java.util.Map;

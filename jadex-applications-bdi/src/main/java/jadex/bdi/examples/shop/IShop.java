@@ -1,6 +1,6 @@
 package jadex.bdi.examples.shop;
 
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.IService;
 
 /**

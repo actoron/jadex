@@ -13,16 +13,16 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageListener;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.SGUI;
 import jadex.commons.SReflect;
-import jadex.commons.ThreadSuspendable;
-import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.IResultListener;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.future.ThreadSuspendable;
+import jadex.commons.gui.SGUI;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.library.ILibraryService;
@@ -217,7 +217,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	/**
 	 * Get plugin properties to be saved in a project.
 	 */
-	public Properties getProperties()
+	public IFuture getProperties()
 	{
 		Properties	props	= new Properties();
 		for(int i=0; i<checkboxes.length; i++)
@@ -225,14 +225,14 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 //			System.out.println(""+checkboxes[i].getText()+" "+checkboxes[i].isSelected());
 			props.addProperty(new Property(checkboxes[i].getText(), ""+checkboxes[i].isSelected()));
 		}
-		return props;
+		return new Future(props);
 	}
 	
 
 	/**
 	 * Set plugin properties loaded from a project.
 	 */
-	public void setProperties(Properties props)
+	public IFuture setProperties(Properties props)
 	{
 		for(int i = 0; i < checkboxes.length; i++)
 		{
@@ -267,6 +267,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 				selected = true;
 			}
 		}
+		
+		return new Future(null);
 	}
 
 	/**

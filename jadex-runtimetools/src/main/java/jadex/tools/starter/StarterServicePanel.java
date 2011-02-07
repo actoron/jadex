@@ -16,17 +16,18 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IModelInfo;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.commons.ThreadSuspendable;
-import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.future.SwingDelegationResultListener;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.IMenuItemConstructor;
+import jadex.commons.gui.SGUI;
 import jadex.commons.service.IService;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.RequiredServiceInfo;
@@ -42,11 +43,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.Charset;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.JMenu;
@@ -461,7 +457,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 	/**
 	 * Load the properties.
 	 */
-	public void setProperties(Properties props)
+	public IFuture setProperties(Properties props)
 	{
 		// todo: checking
 		
@@ -479,24 +475,36 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 		csplit.setDividerLocation(props.getIntProperty("mainsplit_location"));
 
 //		checkingmenu.setSelected(props.getBooleanProperty("checking"));
+		
+		return new Future(null);
 	}
 
 	/**
 	 * Save the properties.
 	 * @param props
 	 */
-	public Properties	getProperties()
+	public IFuture getProperties()
 	{
-		Properties	props	= new Properties();
+		final Future ret = new Future();
 		
-		AbstractJCCPlugin.addSubproperties(props, "mpanel", mpanel.getProperties());
-		AbstractJCCPlugin.addSubproperties(props, "spanel", spanel.getProperties());
-		
-		props.addProperty(new Property("leftsplit_location", ""+lsplit.getDividerLocation()));
-		props.addProperty(new Property("mainsplit_location", ""+csplit.getDividerLocation()));
+		mpanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				Properties	props	= new Properties();
+				
+				AbstractJCCPlugin.addSubproperties(props, "mpanel", (Properties)result);
+				AbstractJCCPlugin.addSubproperties(props, "spanel", spanel.getProperties());
+				
+				props.addProperty(new Property("leftsplit_location", ""+lsplit.getDividerLocation()));
+				props.addProperty(new Property("mainsplit_location", ""+csplit.getDividerLocation()));
+			
+				ret.setResult(props);
+			}
+		});
 		
 //		props.addProperty(new Property("checking", ""+checkingmenu.isSelected()));
 		
-		return props;
+		return ret;
 	}
 }

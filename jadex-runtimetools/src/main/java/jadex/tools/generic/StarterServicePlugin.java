@@ -7,14 +7,14 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.commons.ThreadSuspendable;
-import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.ThreadSuspendable;
+import jadex.commons.gui.SGUI;
 import jadex.commons.service.IService;
 import jadex.tools.starter.StarterViewerPanel;
 

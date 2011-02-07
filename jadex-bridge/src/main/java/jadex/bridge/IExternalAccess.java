@@ -1,7 +1,7 @@
 package jadex.bridge;
 
-import jadex.commons.IFuture;
 import jadex.commons.IRemotable;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.IServiceProvider;
 
 /**

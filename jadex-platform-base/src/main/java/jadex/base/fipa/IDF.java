@@ -3,7 +3,7 @@ package jadex.base.fipa;
 import jadex.base.gui.componentviewer.dfservice.DFBrowserPanel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.IService;
 import jadex.commons.service.annotation.GuiClass;
 

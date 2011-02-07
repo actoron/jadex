@@ -1,7 +1,7 @@
 package jadex.base.gui.componentviewer;
 
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.IService;
 
 /**

@@ -1,6 +1,6 @@
 package jadex.bdi.tutorial;
 
-import jadex.commons.SGUI;
+import jadex.commons.gui.SGUI;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;

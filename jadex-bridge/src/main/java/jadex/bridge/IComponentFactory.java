@@ -1,7 +1,7 @@
 package jadex.bridge;
 
-import jadex.commons.Future;
-import jadex.commons.IFuture;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.IService;
 import jadex.commons.service.annotation.Excluded;
 

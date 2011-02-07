@@ -1,7 +1,7 @@
 package jadex.base.gui;
 
-import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.gui.SGUI;
 
 import java.awt.Component;
 import java.awt.Dimension;

@@ -8,10 +8,10 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IExecutable;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 import java.io.Serializable;
 

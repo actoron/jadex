@@ -1,6 +1,6 @@
 package jadex.micro.examples.compositeservice;
 
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 
 /**
  * 

@@ -2,9 +2,9 @@ package jadex.base.gui.componentviewer.executionservice;
 
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.Properties;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.IService;
 import jadex.commons.service.execution.IExecutionService;
 
@@ -67,17 +67,17 @@ public class ExecutionServiceViewer	implements IServiceViewerPanel
 	/**
 	 *  Advices the the panel to restore its properties from the argument
 	 */
-	public void setProperties(Properties ps)
+	public IFuture setProperties(Properties ps)
 	{
-		
+		return new Future(null);
 	}
 
 	/**
 	 *  Advices the panel provide its setting as properties (if any).
 	 *  This is done on project close or save.
 	 */
-	public Properties	getProperties()
+	public IFuture getProperties()
 	{
-		return null;
+		return new Future(null);
 	}
 }

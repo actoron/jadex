@@ -1,10 +1,10 @@
 package jadex.commons.service.library;
 
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
 

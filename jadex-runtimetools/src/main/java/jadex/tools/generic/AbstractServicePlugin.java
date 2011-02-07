@@ -2,10 +2,10 @@ package jadex.tools.generic;
 
 import jadex.base.gui.componentviewer.IComponentViewerPanel;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.SReflect;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.service.IService;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;

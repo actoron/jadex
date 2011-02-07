@@ -1,6 +1,6 @@
 package jadex.bridge;
 
-import jadex.commons.IIntermediateResultListener;
+import jadex.commons.future.IIntermediateResultListener;
 
 /**
  * 

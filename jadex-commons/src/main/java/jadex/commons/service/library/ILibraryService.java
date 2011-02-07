@@ -1,6 +1,6 @@
 package jadex.commons.service.library;
 
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.IService;
 
 import java.net.URL;
@@ -24,12 +24,14 @@ public interface ILibraryService extends IService
 	 *  Add a new url.
 	 *  @param url The url.
 	 */
+	// todo: make return IFuture
 	public void addURL(URL url);
 	
 	/**
 	 *  Add a path.
 	 *  @param path The path.
 	 */
+	// todo: make return IFuture
 	public void addPath(String path);
 	
 	/**

@@ -1,8 +1,8 @@
 package jadex.base.gui.asynctree;
 
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.SUtil;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 import java.util.ArrayList;
 import java.util.Collections;

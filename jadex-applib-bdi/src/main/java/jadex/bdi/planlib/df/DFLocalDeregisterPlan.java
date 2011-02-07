@@ -3,7 +3,7 @@ package jadex.bdi.planlib.df;
 import jadex.base.fipa.IDF;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.bdi.runtime.Plan;
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 
 
 /**

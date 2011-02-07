@@ -2,7 +2,7 @@ package jadex.bpmn.examples.execute;
 
 import jadex.bpmn.runtime.handler.IExternalNotifier;
 import jadex.bpmn.runtime.handler.Notifier;
-import jadex.commons.SGUI;
+import jadex.commons.gui.SGUI;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;

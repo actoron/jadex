@@ -3,8 +3,8 @@ package jadex.base.service.remote.commands;
 import jadex.base.service.remote.ExceptionInfo;
 import jadex.base.service.remote.IRemoteCommand;
 import jadex.base.service.remote.RemoteServiceManagementService;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.micro.IMicroExternalAccess;
 
 /**

@@ -2,7 +2,7 @@ package jadex.base.test;
 
 
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.IResultListener;
 
 import java.util.Map;
 

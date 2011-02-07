@@ -6,9 +6,9 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
-import jadex.commons.SGUI;
-import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;

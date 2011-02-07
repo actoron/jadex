@@ -1,7 +1,7 @@
 package jadex.application.runtime;
 
 import jadex.bridge.IExternalAccess;
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 
 
 /**

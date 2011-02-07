@@ -4,8 +4,8 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.IFuture;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;
 
 import java.awt.Color;

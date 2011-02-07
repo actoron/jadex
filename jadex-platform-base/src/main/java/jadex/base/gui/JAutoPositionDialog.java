@@ -1,6 +1,6 @@
 package jadex.base.gui;
 
-import jadex.commons.SGUI;
+import jadex.commons.gui.SGUI;
 
 import java.awt.Dialog;
 import java.awt.Frame;

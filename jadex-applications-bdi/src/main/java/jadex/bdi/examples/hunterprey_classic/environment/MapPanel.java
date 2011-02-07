@@ -9,7 +9,7 @@ import jadex.bdi.examples.hunterprey_classic.Observer;
 import jadex.bdi.examples.hunterprey_classic.Obstacle;
 import jadex.bdi.examples.hunterprey_classic.Prey;
 import jadex.bdi.examples.hunterprey_classic.WorldObject;
-import jadex.commons.SGUI;
+import jadex.commons.gui.SGUI;
 
 import java.awt.Color;
 import java.awt.Component;

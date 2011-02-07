@@ -1,8 +1,8 @@
 package jadex.commons.service;
 
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.SReflect;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.annotation.GuiClass;
 import jadex.commons.service.annotation.GuiClassName;
 

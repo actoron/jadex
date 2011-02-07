@@ -1,8 +1,8 @@
 package jadex.commons.service;
 
-import jadex.commons.IFuture;
-import jadex.commons.IIntermediateFuture;
 import jadex.commons.IRemotable;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 
 /**
  *  Interface for service providers.

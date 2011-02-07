@@ -3,7 +3,7 @@ package jadex.micro.examples.chat;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IRemoteChangeListener;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.service.BasicService;
 
 import java.util.ArrayList;

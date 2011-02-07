@@ -2,9 +2,9 @@ package jadex.tools.generic;
 
 import jadex.base.service.awareness.AwarenessAgentPanel;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.SGUI;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.SGUI;
 
 import javax.swing.Icon;
 

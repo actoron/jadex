@@ -5,8 +5,8 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.IFuture;
 import jadex.commons.collection.SCollection;
+import jadex.commons.future.IFuture;
 
 import java.util.Map;
 

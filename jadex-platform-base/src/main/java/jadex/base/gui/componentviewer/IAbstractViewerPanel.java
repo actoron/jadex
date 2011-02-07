@@ -1,7 +1,7 @@
 package jadex.base.gui.componentviewer;
 
-import jadex.commons.IFuture;
 import jadex.commons.Properties;
+import jadex.commons.future.IFuture;
 
 import javax.swing.JComponent;
 
@@ -36,11 +36,11 @@ public interface IAbstractViewerPanel
 	/**
 	 *  Advices the the panel to restore its properties from the argument
 	 */
-	public void setProperties(Properties ps);
+	public IFuture setProperties(Properties ps);
 
 	/**
 	 *  Advices the panel provide its setting as properties (if any).
 	 *  This is done on project close or save.
 	 */
-	public Properties	getProperties();
+	public IFuture getProperties();
 }

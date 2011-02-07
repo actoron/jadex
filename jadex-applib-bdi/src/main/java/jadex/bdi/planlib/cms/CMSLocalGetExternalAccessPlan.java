@@ -3,7 +3,7 @@ package jadex.bdi.planlib.cms;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 
 /**
  *  Plan for terminating a Jadex component on the platform.

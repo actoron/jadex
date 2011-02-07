@@ -1,7 +1,7 @@
 package jadex.wfms.service;
 
-import jadex.commons.IFuture;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.listeners.IActivityListener;

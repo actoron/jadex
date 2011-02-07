@@ -1,18 +1,19 @@
 package jadex.tools.libtool;
 
 import jadex.base.gui.plugin.AbstractJCCPlugin;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.commons.ThreadSuspendable;
-import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.IResultListener;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.future.SwingDelegationResultListener;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.EditableListEvent;
+import jadex.commons.gui.SGUI;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.commons.service.library.ILibraryServiceListener;
@@ -375,7 +376,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	/**
 	 *  Set properties loaded from project.
 	 */
-	public void setProperties(Properties props)
+	public IFuture setProperties(Properties props)
 	{
 		Property[] ps = props.getProperties("cp");
 		// Hack: todo!?
@@ -385,7 +386,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		{
 			try
 			{
-				
+				// todo: make addURL return future
 				File	file = new File(URLDecoder.decode(ps[i].getValue(), Charset.defaultCharset().name()));
 				if(file.exists())
 				{
@@ -402,37 +403,54 @@ public class LibraryPlugin extends AbstractJCCPlugin
 				System.out.println("Classpath problem: "+ps[i].getValue());
 			}
 		}
+		
+		return new Future(null);
 	}
 
 	/**
 	 *  Return properties to be saved in project.
 	 */
-	public Properties	getProperties()
+	public IFuture getProperties()
 	{
-		Properties	props	= new Properties();
-		// Hack: todo!?
-		ILibraryService ls = (ILibraryService)SServiceProvider.getService(getJCC()
-			.getExternalAccess().getServiceProvider(), ILibraryService.class).get(new ThreadSuspendable());
+		final Future ret = new Future();
 		
-		// todo: hack remove thread suspendable
-		List urls = (List)ls.getURLs().get(new ThreadSuspendable());
-
-		for(int i=0; i<urls.size(); i++)
+		SServiceProvider.getService(getJCC()
+			.getExternalAccess().getServiceProvider(), ILibraryService.class)
+			.addResultListener(new SwingDelegationResultListener(ret)
 		{
-			URL	url	= (URL) urls.get(i);
-			String	urlstring;
-			if(url.getProtocol().equals("file"))
+			public void customResultAvailable(Object result)
 			{
-				urlstring	= SUtil.convertPathToRelative(url.getPath());
+				ILibraryService ls = (ILibraryService)result;
+				ls.getURLs().addResultListener(new SwingDelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						List urls = (List)result;
+						Properties props = new Properties();
+						
+						for(int i=0; i<urls.size(); i++)
+						{
+							URL	url	= (URL) urls.get(i);
+							String	urlstring;
+							if(url.getProtocol().equals("file"))
+							{
+								urlstring	= SUtil.convertPathToRelative(url.getPath());
+							}
+							else
+							{
+								urlstring	= url.toString();
+							}
+							
+							props.addProperty(new Property("cp", urlstring));
+						}
+						
+						ret.setResult(props);
+					}
+				});
 			}
-			else
-			{
-				urlstring	= url.toString();
-			}
-			
-			props.addProperty(new Property("cp", urlstring));
-		}
-		return props;
+		});
+		
+		return ret;
 	}
 
 	/** 

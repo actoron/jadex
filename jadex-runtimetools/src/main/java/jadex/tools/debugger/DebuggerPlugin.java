@@ -8,9 +8,11 @@ import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.IComponentDescription;
 import jadex.commons.Properties;
-import jadex.commons.SGUI;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.ObjectCardLayout;
+import jadex.commons.gui.SGUI;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -81,17 +83,17 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 	/**
 	 *  Get plugin properties to be saved in a project.
 	 */
-	public Properties getProperties()
+	public IFuture getProperties()
 	{
-		Properties	props	= new Properties();
-		return props;
+		return new Future(null);
 	}
 	
 	/**
 	 *  Set plugin properties loaded from a project.
 	 */
-	public void setProperties(Properties props)
+	public IFuture setProperties(Properties props)
 	{
+		return new Future(null);
 	}
 	
 	/**

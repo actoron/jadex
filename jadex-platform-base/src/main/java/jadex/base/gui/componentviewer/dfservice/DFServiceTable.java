@@ -5,7 +5,7 @@ import jadex.base.fipa.IProperty;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.jtable.TableSorter;
+import jadex.commons.gui.jtable.TableSorter;
 
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;

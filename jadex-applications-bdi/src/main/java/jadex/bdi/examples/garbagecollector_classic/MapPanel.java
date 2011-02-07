@@ -1,6 +1,6 @@
 package jadex.bdi.examples.garbagecollector_classic;
 
-import jadex.commons.SGUI;
+import jadex.commons.gui.SGUI;
 
 import java.awt.Color;
 import java.awt.Component;

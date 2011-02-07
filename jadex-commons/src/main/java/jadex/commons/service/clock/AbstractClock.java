@@ -3,7 +3,7 @@ package jadex.commons.service.clock;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
 import java.util.Collections;

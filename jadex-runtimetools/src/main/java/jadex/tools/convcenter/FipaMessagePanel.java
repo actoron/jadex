@@ -4,8 +4,8 @@ import jadex.base.fipa.SFipa;
 import jadex.base.gui.ComponentSelectorDialog;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.gui.SGUI;
 
 import java.awt.Component;
 import java.awt.Dimension;

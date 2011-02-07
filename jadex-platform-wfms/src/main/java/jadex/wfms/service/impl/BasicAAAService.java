@@ -2,10 +2,10 @@ package jadex.wfms.service.impl;
 
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.IRemoteFilter;
-import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.BasicResultSelector;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceContainer;

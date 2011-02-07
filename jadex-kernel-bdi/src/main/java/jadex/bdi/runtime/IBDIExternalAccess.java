@@ -1,7 +1,7 @@
 package jadex.bdi.runtime;
 
 import jadex.bridge.IExternalAccess;
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 
 /**
  *  The interface for external threads.

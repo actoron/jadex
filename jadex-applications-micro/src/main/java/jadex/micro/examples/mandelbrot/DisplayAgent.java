@@ -6,7 +6,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
-import jadex.commons.SGUI;
+import jadex.commons.gui.SGUI;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Description;

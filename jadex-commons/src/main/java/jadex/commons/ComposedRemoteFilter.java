@@ -1,6 +1,8 @@
 package jadex.commons;
 
-import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 import java.io.Serializable;
 import java.util.Arrays;

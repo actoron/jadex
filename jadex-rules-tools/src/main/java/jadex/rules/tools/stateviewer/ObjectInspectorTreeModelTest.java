@@ -1,6 +1,6 @@
 package jadex.rules.tools.stateviewer;
 
-import jadex.commons.TreeExpansionHandler;
+import jadex.commons.gui.TreeExpansionHandler;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.awt.BorderLayout;

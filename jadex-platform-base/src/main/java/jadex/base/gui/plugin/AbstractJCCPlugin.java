@@ -6,10 +6,10 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.Properties;
-import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.library.ILibraryService;
 import jadex.xml.annotation.XMLClassname;
 
@@ -106,16 +106,17 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	/**
 	 *  Set properties loaded from project.
 	 */
-	public void setProperties(Properties ps)
+	public IFuture setProperties(Properties ps)
 	{
+		return new Future(null);
 	}
 
 	/**
 	 *  Return properties to be saved in project.
 	 */
-	public Properties	getProperties()
+	public IFuture getProperties()
 	{
-		return null;
+		return new Future(null);
 	}
 
 	/**

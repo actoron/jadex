@@ -1,6 +1,6 @@
 package jadex.bridge;
 
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.IResultListener;
 
 /**
  *  The result listener for executing listener invocations as a component step.

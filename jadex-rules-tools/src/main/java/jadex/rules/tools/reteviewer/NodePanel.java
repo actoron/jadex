@@ -1,8 +1,8 @@
 package jadex.rules.tools.reteviewer;
 
-import jadex.commons.SGUI;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.gui.SGUI;
 import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.rulesystem.rete.constraints.ConstraintIndexer;
 import jadex.rules.rulesystem.rete.constraints.IConstraintEvaluator;

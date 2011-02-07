@@ -3,20 +3,22 @@ package jadex.tools.common.modeltree;
 import jadex.base.SComponentFactory;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.commons.ThreadSuspendable;
-import jadex.commons.TreeExpansionHandler;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IExecutable;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.LoadManagingExecutionService;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.future.SwingDelegationResultListener;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.PopupBuilder;
+import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
+import jadex.commons.gui.TreeExpansionHandler;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
@@ -343,11 +345,14 @@ public class ModelExplorer extends JTree
 	/**
 	 *  Write current state into properties.
 	 */
-	public Properties	getProperties()
+	public IFuture getProperties()
 	{
-		Properties	props	= new Properties();
+		final Future ret = new Future();
+		
+		final Properties props	= new Properties();
+		
 		// Save tree properties.
-		ModelExplorerProperties	mep	= new ModelExplorerProperties();
+		final ModelExplorerProperties	mep	= new ModelExplorerProperties();
 		String[]	paths	= getRootNode().getPathEntries();
 		for(int i=0; i<paths.length; i++)
 			paths[i]	= SUtil.convertPathToRelative(paths[i]);
@@ -368,36 +373,44 @@ public class ModelExplorer extends JTree
 			}
 		}
 		mep.setExpandedNodes((NodePath[])expanded.toArray(new NodePath[expanded.size()]));
-		// todo: remove ThreadSuspendable()
-		ClassLoader cl = ((ILibraryService)SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable())).getClassLoader();
-		String	treesave	= JavaWriter.objectToXML(mep, cl);	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
-		props.addProperty(new Property("tree", treesave));
-				
-		// Save the last loaded file.
-		File sf = filechooser.getSelectedFile();
-		if(sf!=null)
+		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDelegationResultListener(ret)
 		{
-			String	lastpath	= SUtil.convertPathToRelative(sf.getAbsolutePath());
-			props.addProperty(new Property("lastpath", lastpath));
-		}
-
-		// Save refresh/checking flags.
-		props.addProperty(new Property("refresh", Boolean.toString(refresh)));
-		
-		// Save the state of file filters
-		if(filtermenu!=null && filtermenu.getComponentCount()>0)
-		{
-			Properties	filterprops	= new Properties(null, "filter", null);
-			for(int i=0; i<filtermenu.getComponentCount(); i++)
+			public void customResultAvailable(Object result) 
 			{
-				String	name	= ((JCheckBoxMenuItem)filtermenu.getComponent(i)).getText();
-				boolean	selected	= ((JCheckBoxMenuItem)filtermenu.getComponent(i)).isSelected();
-				filterprops.addProperty(new Property(name, ""+selected));
-			}
-			props.addSubproperties(filterprops);
-		}
+				ClassLoader cl = ((ILibraryService)result).getClassLoader();
+				
+				String	treesave	= JavaWriter.objectToXML(mep, cl);	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
+				props.addProperty(new Property("tree", treesave));
+						
+				// Save the last loaded file.
+				File sf = filechooser.getSelectedFile();
+				if(sf!=null)
+				{
+					String	lastpath	= SUtil.convertPathToRelative(sf.getAbsolutePath());
+					props.addProperty(new Property("lastpath", lastpath));
+				}
+
+				// Save refresh/checking flags.
+				props.addProperty(new Property("refresh", Boolean.toString(refresh)));
+				
+				// Save the state of file filters
+				if(filtermenu!=null && filtermenu.getComponentCount()>0)
+				{
+					Properties	filterprops	= new Properties(null, "filter", null);
+					for(int i=0; i<filtermenu.getComponentCount(); i++)
+					{
+						String	name	= ((JCheckBoxMenuItem)filtermenu.getComponent(i)).getText();
+						boolean	selected	= ((JCheckBoxMenuItem)filtermenu.getComponent(i)).isSelected();
+						filterprops.addProperty(new Property(name, ""+selected));
+					}
+					props.addSubproperties(filterprops);
+				}
+				
+				ret.setResult(props);
+			};
+		});
 		
-		return props;
+		return ret;
 	}
 
 	/**

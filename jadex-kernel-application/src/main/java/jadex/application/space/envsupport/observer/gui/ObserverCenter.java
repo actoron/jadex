@@ -11,7 +11,7 @@ import jadex.application.space.envsupport.observer.perspective.IPerspective;
 import jadex.application.space.envsupport.observer.perspective.Perspective2D;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IChangeListener;
-import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;

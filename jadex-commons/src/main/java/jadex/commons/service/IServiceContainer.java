@@ -1,7 +1,7 @@
 package jadex.commons.service;
 
-import jadex.commons.IFuture;
-import jadex.commons.IIntermediateFuture;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 
 /**
  *  Internal interface for a service container. Allows
