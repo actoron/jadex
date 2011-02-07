@@ -13,6 +13,8 @@ import jadex.tools.gpmn.diagram.edit.policies.GpmnTextSelectionEditPolicy;
 import jadex.tools.gpmn.diagram.parsers.ActivationOrderParser;
 import jadex.tools.gpmn.diagram.part.GpmnVisualIDRegistry;
 
+import jadex.tools.gpmn.diagram.providers.GpmnElementTypes;
+import jadex.tools.gpmn.diagram.providers.GpmnParserProvider;
 import java.util.Collections;
 import java.util.List;
 
@@ -405,12 +407,12 @@ public class ActivationEdgeOrderEditPart extends LabelEditPart implements
 	{
 		if (parser == null)
 		{
-			parser = new ActivationOrderParser((DiagramEditPart) getRoot().getContents());/*  GpmnParserProvider
+			parser = GpmnParserProvider
 					.getParser(
 							GpmnElementTypes.ActivationEdge_4001,
 							getParserElement(),
 							GpmnVisualIDRegistry
-									.getType(jadex.tools.gpmn.diagram.edit.parts.ActivationEdgeOrderEditPart.VISUAL_ID));*/
+									.getType(jadex.tools.gpmn.diagram.edit.parts.ActivationEdgeOrderEditPart.VISUAL_ID));
 		}
 		return parser;
 	}

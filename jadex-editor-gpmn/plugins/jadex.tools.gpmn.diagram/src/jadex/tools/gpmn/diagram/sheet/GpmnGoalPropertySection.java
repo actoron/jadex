@@ -7,7 +7,6 @@
  */
 package jadex.tools.gpmn.diagram.sheet;
 
-import jadex.editor.model.common.properties.AbstractCommonPropertySection;
 import jadex.editor.model.common.properties.ModifyEObjectCommand;
 import jadex.tools.gpmn.ActivationPlan;
 import jadex.tools.gpmn.Goal;
@@ -23,37 +22,39 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.gmf.runtime.common.core.command.CommandResult;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
- * @generated
+ * @generated NOT
  */
-public class GpmnGoalPropertySection extends AbstractCommonPropertySection
+public class GpmnGoalPropertySection extends GpmnCustomPropertySection
 {
 	public static final String GOAL_CONFIGURATION_TITLE = "Goal Configuration";
-	public static final String GOAL_TYPE_DESC 			= "Type:";
-	public static final String GOAL_NAME_DESC 			= "Name:";
-	public static final String GOAL_DESCRIPTION_DESC	= "Description:";
-	public static final String CONTEXT_CONDITION_DESC	= "Context Condition:";
-	public static final String MAINTAIN_CONDITION_DESC	= "Maintain Condition:";
-	public static final String TARGET_CONDITION_DESC	= "Target Condition:";
-	public static final String PLAN_SEMANTICS_DESC		= "Activation Plan Semantics:";
+	public static final String GOAL_TYPE_DESC = "Type:";
+	public static final String GOAL_NAME_DESC = "Name:";
+	public static final String GOAL_DESCRIPTION_DESC = "Description:";
+	public static final String CONTEXT_CONDITION_DESC = "Context Condition:";
+	public static final String MAINTAIN_CONDITION_DESC = "Maintain Condition:";
+	public static final String TARGET_CONDITION_DESC = "Target Condition:";
+	public static final String CREATION_CONDITION_DESC = "Creation Condition:";
+	public static final String DROP_CONDITION_DESC = "Drop Condition:";
+	public static final String PLAN_SEMANTICS_DESC = "Activation Plan Semantics:";
+	public static final String RANDOM_PLANS_DESC = "Random Plan Selection";
+	public static final String RETRY_PLANS_DESC = "Retry Plans";
 	
 	protected static final Map<String, GoalType> GOAL_TYPE_MAP = new HashMap<String, GoalType>();
 	static
@@ -75,24 +76,11 @@ public class GpmnGoalPropertySection extends AbstractCommonPropertySection
 	protected Map<GoalType, Integer> invGoalTypeMap;
 	protected Map<ModeType, Integer> invPlanSemanticsMap;
 	
-	protected Map<String, Label> labels;
-	protected Map<String, Control> controls;
-	
-	protected Group confGroup;
-	
 	public void createControls(Composite parent,
 			TabbedPropertySheetPage aTabbedPropertySheetPage)
 	{
-		//super.createControls(parent, aTabbedPropertySheetPage);
+		super.createControls(parent, aTabbedPropertySheetPage);
 		
-		labels = new HashMap<String, Label>();
-		controls = new HashMap<String, Control>();
-		parent.setLayout(new FillLayout());
-		
-		confGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
-		addDisposable(confGroup);
-		confGroup.setLayout(new FillLayout());
-		((FillLayout) confGroup.getLayout()).type = SWT.HORIZONTAL;
 		confGroup.setText(GOAL_CONFIGURATION_TITLE);
 		
 		Composite leftComposite = new Composite(confGroup, SWT.NULL);
@@ -105,6 +93,8 @@ public class GpmnGoalPropertySection extends AbstractCommonPropertySection
 		addContextConditionControl(leftComposite);
 		addMaintainConditionControl(leftComposite);
 		addTargetConditionControl(leftComposite);
+		addCreationConditionControl(leftComposite);
+		addDropConditionControl(leftComposite);
 		
 		Composite rightComposite = new Composite(confGroup, SWT.NULL);
 		addDisposable(rightComposite);
@@ -113,21 +103,10 @@ public class GpmnGoalPropertySection extends AbstractCommonPropertySection
 		rightComposite.setLayout(gridLayout);
 		
 		addPlanSemanticsControl(rightComposite);
+		addRandomPlanControl(rightComposite);
+		addRetryPlansControl(rightComposite);
 		addNameControl(rightComposite);
 		addDescriptionControl(rightComposite);
-	}
-	
-	@Override
-	public void setInput(IWorkbenchPart part, ISelection selection)
-	{
-		super.setInput(part, selection);
-		refreshControls();
-	}
-	
-	@Override
-	public boolean shouldUseExtraSpace()
-	{
-		return true;
 	}
 	
 	protected void refreshControls()
@@ -137,11 +116,24 @@ public class GpmnGoalPropertySection extends AbstractCommonPropertySection
 		
 		Goal goal = (Goal) modelElement;
 		
-		((Combo) controls.get(GOAL_TYPE_DESC)).select(invGoalTypeMap.get(goal.getGoalType()));
-		setTextControlValue(((Text) controls.get(GOAL_NAME_DESC)), goal.getName());
-		setTextControlValue(((Text) controls.get(CONTEXT_CONDITION_DESC)), goal.getContextcondition());
-		setTextControlValue(((Text) controls.get(MAINTAIN_CONDITION_DESC)), goal.getMaintaincondition());
-		setTextControlValue(((Text) controls.get(TARGET_CONDITION_DESC)), goal.getTargetcondition());
+		((Combo) controls.get(GOAL_TYPE_DESC)).select(invGoalTypeMap.get(goal
+				.getGoalType()));
+		setTextControlValue(((Text) controls.get(GOAL_NAME_DESC)), conv(goal
+				.getName()));
+		setTextControlValue(((Text) controls.get(CONTEXT_CONDITION_DESC)),
+				conv(goal.getContextcondition()));
+		setTextControlValue(((Text) controls.get(MAINTAIN_CONDITION_DESC)),
+				conv(goal.getMaintaincondition()));
+		setTextControlValue(((Text) controls.get(TARGET_CONDITION_DESC)),
+				conv(goal.getTargetcondition()));
+		setTextControlValue(((Text) controls.get(CREATION_CONDITION_DESC)),
+				conv(goal.getCreationcondition()));
+		setTextControlValue(((Text) controls.get(DROP_CONDITION_DESC)),
+				conv(goal.getDropcondition()));
+		
+		((Button) controls.get(RANDOM_PLANS_DESC)).setSelection(goal
+				.isRandomselection());
+		((Button) controls.get(RETRY_PLANS_DESC)).setSelection(goal.isRetry());
 		
 		boolean mVisible = GoalType.MAINTAIN_GOAL.equals(goal.getGoalType());
 		Label label = labels.get(MAINTAIN_CONDITION_DESC);
@@ -174,7 +166,8 @@ public class GpmnGoalPropertySection extends AbstractCommonPropertySection
 				psMode = ap.getMode();
 			}
 		}
-		((Combo) controls.get(PLAN_SEMANTICS_DESC)).select(invPlanSemanticsMap.get(psMode));
+		((Combo) controls.get(PLAN_SEMANTICS_DESC)).select(invPlanSemanticsMap
+				.get(psMode));
 		((Combo) controls.get(PLAN_SEMANTICS_DESC)).setEnabled(psMode != null);
 		
 		confGroup.layout();
@@ -184,14 +177,6 @@ public class GpmnGoalPropertySection extends AbstractCommonPropertySection
 		{
 			((Composite) children[i]).layout();
 			children[i].update();
-		}
-	}
-	
-	protected void setTextControlValue(Text control, String value)
-	{
-		if (value != null)
-		{
-			control.setText(value);
 		}
 	}
 	
@@ -224,13 +209,16 @@ public class GpmnGoalPropertySection extends AbstractCommonPropertySection
 		{
 			public void widgetSelected(SelectionEvent se)
 			{
-				final GoalType gt = GOAL_TYPE_MAP.get(((Combo) controls.get(GOAL_TYPE_DESC)).getText());
+				final GoalType gt = GOAL_TYPE_MAP.get(((Combo) controls
+						.get(GOAL_TYPE_DESC)).getText());
 				if (gt != null && modelElement != null)
 				{
 					dispatchCommand(new ModifyEObjectCommand(modelElement,
-					"Change GoalType Property")
+							"Change GoalType Property")
 					{
-						protected CommandResult doExecuteWithResult(IProgressMonitor monitor, IAdaptable info) throws ExecutionException
+						protected CommandResult doExecuteWithResult(
+								IProgressMonitor monitor, IAdaptable info)
+								throws ExecutionException
 						{
 							((Goal) modelElement).setGoalType(gt);
 							return CommandResult.newOKCommandResult();
@@ -256,9 +244,11 @@ public class GpmnGoalPropertySection extends AbstractCommonPropertySection
 			{
 				final String name = ((Text) e.widget).getText();
 				dispatchCommand(new ModifyEObjectCommand(modelElement,
-				"Change Name Property")
+						"Change Name Property")
 				{
-					protected CommandResult doExecuteWithResult(IProgressMonitor monitor, IAdaptable info) throws ExecutionException
+					protected CommandResult doExecuteWithResult(
+							IProgressMonitor monitor, IAdaptable info)
+							throws ExecutionException
 					{
 						parent.layout();
 						if (name.isEmpty())
@@ -281,9 +271,11 @@ public class GpmnGoalPropertySection extends AbstractCommonPropertySection
 			{
 				final String description = ((Text) e.widget).getText();
 				dispatchCommand(new ModifyEObjectCommand(modelElement,
-				"Change Description Property")
+						"Change Description Property")
 				{
-					protected CommandResult doExecuteWithResult(IProgressMonitor monitor, IAdaptable info) throws ExecutionException
+					protected CommandResult doExecuteWithResult(
+							IProgressMonitor monitor, IAdaptable info)
+							throws ExecutionException
 					{
 						parent.layout();
 						if (description.isEmpty())
@@ -306,9 +298,11 @@ public class GpmnGoalPropertySection extends AbstractCommonPropertySection
 			{
 				final String cc = ((Text) e.widget).getText();
 				dispatchCommand(new ModifyEObjectCommand(modelElement,
-				"Change Contextcondition Property")
+						"Change Contextcondition Property")
 				{
-					protected CommandResult doExecuteWithResult(IProgressMonitor monitor, IAdaptable info) throws ExecutionException
+					protected CommandResult doExecuteWithResult(
+							IProgressMonitor monitor, IAdaptable info)
+							throws ExecutionException
 					{
 						parent.layout();
 						if (cc.isEmpty())
@@ -324,16 +318,19 @@ public class GpmnGoalPropertySection extends AbstractCommonPropertySection
 	
 	protected void addMaintainConditionControl(final Composite parent)
 	{
-		Text mCondControl = addLabeledTextControl(parent, MAINTAIN_CONDITION_DESC);
+		Text mCondControl = addLabeledTextControl(parent,
+				MAINTAIN_CONDITION_DESC);
 		mCondControl.addModifyListener(new ModifyListener()
 		{
 			public void modifyText(ModifyEvent e)
 			{
 				final String mc = ((Text) e.widget).getText();
 				dispatchCommand(new ModifyEObjectCommand(modelElement,
-				"Change Maintain Condition Property")
+						"Change Maintain Condition Property")
 				{
-					protected CommandResult doExecuteWithResult(IProgressMonitor monitor, IAdaptable info) throws ExecutionException
+					protected CommandResult doExecuteWithResult(
+							IProgressMonitor monitor, IAdaptable info)
+							throws ExecutionException
 					{
 						parent.layout();
 						if (mc.isEmpty())
@@ -356,15 +353,72 @@ public class GpmnGoalPropertySection extends AbstractCommonPropertySection
 			{
 				final String tc = ((Text) e.widget).getText();
 				dispatchCommand(new ModifyEObjectCommand(modelElement,
-				"Change Achieve Condition Property")
+						"Change Achieve Condition Property")
 				{
-					protected CommandResult doExecuteWithResult(IProgressMonitor monitor, IAdaptable info) throws ExecutionException
+					protected CommandResult doExecuteWithResult(
+							IProgressMonitor monitor, IAdaptable info)
+							throws ExecutionException
 					{
 						parent.layout();
 						if (tc.isEmpty())
 							((Goal) modelElement).unsetTargetcondition();
 						else
 							((Goal) modelElement).setTargetcondition(tc);
+						return CommandResult.newOKCommandResult();
+					}
+				});
+			}
+		});
+	}
+	
+	protected void addCreationConditionControl(final Composite parent)
+	{
+		Text cCondControl = addLabeledTextControl(parent,
+				CREATION_CONDITION_DESC);
+		cCondControl.addModifyListener(new ModifyListener()
+		{
+			public void modifyText(ModifyEvent e)
+			{
+				final String cc = ((Text) e.widget).getText();
+				dispatchCommand(new ModifyEObjectCommand(modelElement,
+						"Change Creation Condition Property")
+				{
+					protected CommandResult doExecuteWithResult(
+							IProgressMonitor monitor, IAdaptable info)
+							throws ExecutionException
+					{
+						parent.layout();
+						if (cc.isEmpty())
+							((Goal) modelElement).unsetCreationcondition();
+						else
+							((Goal) modelElement).setCreationcondition(cc);
+						return CommandResult.newOKCommandResult();
+					}
+				});
+			}
+		});
+	}
+	
+	protected void addDropConditionControl(final Composite parent)
+	{
+		Text dCondControl = addLabeledTextControl(parent, DROP_CONDITION_DESC);
+		dCondControl.addModifyListener(new ModifyListener()
+		{
+			public void modifyText(ModifyEvent e)
+			{
+				final String dc = ((Text) e.widget).getText();
+				dispatchCommand(new ModifyEObjectCommand(modelElement,
+						"Change Creation Condition Property")
+				{
+					protected CommandResult doExecuteWithResult(
+							IProgressMonitor monitor, IAdaptable info)
+							throws ExecutionException
+					{
+						parent.layout();
+						if (dc.isEmpty())
+							((Goal) modelElement).unsetDropcondition();
+						else
+							((Goal) modelElement).setDropcondition(dc);
 						return CommandResult.newOKCommandResult();
 					}
 				});
@@ -381,14 +435,16 @@ public class GpmnGoalPropertySection extends AbstractCommonPropertySection
 		GridData gd = new GridData();
 		label.setLayoutData(gd);
 		
-		Combo planSemanticsCombo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+		Combo planSemanticsCombo = new Combo(parent, SWT.DROP_DOWN
+				| SWT.READ_ONLY);
 		addDisposable(planSemanticsCombo);
 		controls.put(PLAN_SEMANTICS_DESC, planSemanticsCombo);
 		gd = new GridData();
 		gd.grabExcessHorizontalSpace = true;
 		planSemanticsCombo.setLayoutData(gd);
 		
-		invPlanSemanticsMap = new HashMap<ModeType, Integer>(PLAN_SEMANTICS_MAP.size());
+		invPlanSemanticsMap = new HashMap<ModeType, Integer>(PLAN_SEMANTICS_MAP
+				.size());
 		int index = 0;
 		for (Map.Entry<String, ModeType> entry : PLAN_SEMANTICS_MAP.entrySet())
 		{
@@ -400,19 +456,24 @@ public class GpmnGoalPropertySection extends AbstractCommonPropertySection
 		{
 			public void widgetSelected(SelectionEvent se)
 			{
-				final ModeType mt = PLAN_SEMANTICS_MAP.get(((Combo) controls.get(PLAN_SEMANTICS_DESC)).getText());
+				final ModeType mt = PLAN_SEMANTICS_MAP.get(((Combo) controls
+						.get(PLAN_SEMANTICS_DESC)).getText());
 				if (modelElement != null)
 				{
 					if (mt != null)
 					{
 						dispatchCommand(new ModifyEObjectCommand(modelElement,
-						"Change Plan Semantics")
+								"Change Plan Semantics")
 						{
-							protected CommandResult doExecuteWithResult(IProgressMonitor monitor, IAdaptable info) throws ExecutionException
+							protected CommandResult doExecuteWithResult(
+									IProgressMonitor monitor, IAdaptable info)
+									throws ExecutionException
 							{
-								for (PlanEdge planEdge : SGpmnUtilities.getPlanEdges(((Goal) modelElement)))
+								for (PlanEdge planEdge : SGpmnUtilities
+										.getPlanEdges(((Goal) modelElement)))
 									if (planEdge.getTarget() instanceof ActivationPlan)
-										((ActivationPlan) planEdge.getTarget()).setMode(mt);
+										((ActivationPlan) planEdge.getTarget())
+												.setMode(mt);
 								
 								return CommandResult.newOKCommandResult();
 							}
@@ -429,39 +490,75 @@ public class GpmnGoalPropertySection extends AbstractCommonPropertySection
 		});
 	}
 	
-	protected Text addLabeledTextControl(Composite parent, String id)
+	protected void addRandomPlanControl(final Composite parent)
 	{
-		return addLabeledTextControl(parent, id, SWT.MULTI | SWT.BORDER);
+		Button rpControl = new Button(parent, SWT.CHECK);
+		addDisposable(rpControl);
+		controls.put(RANDOM_PLANS_DESC, rpControl);
+		rpControl.setText(RANDOM_PLANS_DESC);
+		rpControl.addSelectionListener(new SelectionListener()
+		{
+			public void widgetSelected(SelectionEvent se)
+			{
+				final boolean selected = ((Button) controls
+						.get(RANDOM_PLANS_DESC)).getSelection();
+				if (modelElement != null)
+				{
+					dispatchCommand(new ModifyEObjectCommand(modelElement,
+							"Change Random Property")
+					{
+						protected CommandResult doExecuteWithResult(
+								IProgressMonitor monitor, IAdaptable info)
+								throws ExecutionException
+						{
+							((Goal) modelElement).setRandomselection(selected);
+							return CommandResult.newOKCommandResult();
+						}
+					});
+					refreshControls();
+				}
+			}
+			
+			public void widgetDefaultSelected(SelectionEvent se)
+			{
+				widgetSelected(se);
+			}
+		});
 	}
 	
-	protected Text addLabeledTextControl(Composite parent, String id, int style)
+	protected void addRetryPlansControl(final Composite parent)
 	{
-		Label label = new Label(parent, SWT.LEFT);
-		addDisposable(label);
-		labels.put(id, label);
-		label.setText(id);
-		label.setLayoutData(new GridData());
-		
-		Text text = new Text(parent, style);
-		addDisposable(text);
-		controls.put(id, text);
-		GridData gd = new GridData();
-		gd.grabExcessHorizontalSpace = true;
-		gd.horizontalAlignment = GridData.FILL;
-		text.setLayoutData(gd);
-		
-		return text;
-	}
-	
-	protected void dispatchCommand(ModifyEObjectCommand cmd)
-	{
-		try
+		Button rpControl = new Button(parent, SWT.CHECK);
+		addDisposable(rpControl);
+		controls.put(RETRY_PLANS_DESC, rpControl);
+		rpControl.setText(RETRY_PLANS_DESC);
+		rpControl.addSelectionListener(new SelectionListener()
 		{
-			cmd.execute(null, null);
-		}
-		catch (ExecutionException e)
-		{
-			e.printStackTrace();
-		}
+			public void widgetSelected(SelectionEvent se)
+			{
+				final boolean selected = ((Button) controls
+						.get(RANDOM_PLANS_DESC)).getSelection();
+				if (modelElement != null)
+				{
+					dispatchCommand(new ModifyEObjectCommand(modelElement,
+							"Change Random Property")
+					{
+						protected CommandResult doExecuteWithResult(
+								IProgressMonitor monitor, IAdaptable info)
+								throws ExecutionException
+						{
+							((Goal) modelElement).setRetry(selected);
+							return CommandResult.newOKCommandResult();
+						}
+					});
+					refreshControls();
+				}
+			}
+			
+			public void widgetDefaultSelected(SelectionEvent se)
+			{
+				widgetSelected(se);
+			}
+		});
 	}
 }

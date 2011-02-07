@@ -13,6 +13,8 @@ import jadex.tools.gpmn.diagram.edit.policies.GpmnTextSelectionEditPolicy;
 import jadex.tools.gpmn.diagram.parsers.VirtualOrderParser;
 import jadex.tools.gpmn.diagram.part.GpmnVisualIDRegistry;
 
+import jadex.tools.gpmn.diagram.providers.GpmnElementTypes;
+import jadex.tools.gpmn.diagram.providers.GpmnParserProvider;
 import java.util.Collections;
 import java.util.List;
 
@@ -240,14 +242,17 @@ public class VirtualActivationOrderEditPart extends LabelEditPart implements
 	
 	public EObject resolveSemanticElement()
 	{
-		Edge veEdge = (Edge) ((VirtualActivationEdgeEditPart) getParent()).getNotationView();
+		Edge veEdge = (Edge) ((VirtualActivationEdgeEditPart) getParent())
+				.getNotationView();
 		if (veEdge.getTargetEdges().size() == 0)
 			return null;
-		Node aeNode =  (Node) ((Edge) veEdge.getTargetEdges().get(0)).getSource();
+		Node aeNode = (Node) ((Edge) veEdge.getTargetEdges().get(0))
+				.getSource();
 		if (((ActivationPlan) aeNode.getElement()).getMode() != ModeType.SEQUENTIAL)
 			return null;
 		for (Object edge : aeNode.getSourceEdges())
-			if ((edge instanceof Edge) && (((Edge) edge).getTarget().equals(veEdge.getTarget())))
+			if ((edge instanceof Edge)
+					&& (((Edge) edge).getTarget().equals(veEdge.getTarget())))
 			{
 				System.out.println(((Edge) edge).getElement());
 				return ((Edge) edge).getElement();
@@ -394,7 +399,8 @@ public class VirtualActivationOrderEditPart extends LabelEditPart implements
 	{
 		if (parser == null)
 		{
-			parser = new VirtualOrderParser((DiagramEditPart) getRoot().getContents());
+			parser = new VirtualOrderParser((DiagramEditPart) getRoot()
+					.getContents());
 			/*parser = GpmnParserProvider
 					.getParser(
 							GpmnElementTypes.Link_4003,

@@ -16,7 +16,7 @@ public class Messages extends NLS
 {
 	
 	/**
-	 * @generated
+	 * @generated NOT
 	 */
 	static
 	{

@@ -1,10 +1,16 @@
 package jadex.tools.gpmn.diagram.parsers;
 
 import jadex.tools.gpmn.ActivationEdge;
+import jadex.tools.gpmn.ActivationPlan;
 import jadex.tools.gpmn.diagram.edit.commands.ModifyActivationEdgeOrder;
+import jadex.tools.gpmn.diagram.tools.SGpmnUtilities;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.gef.ConnectionEditPart;
+import org.eclipse.gef.EditPart;
+import org.eclipse.gef.EditPartListener;
+import org.eclipse.gef.NodeListener;
 import org.eclipse.gmf.runtime.common.core.command.ICommand;
 import org.eclipse.gmf.runtime.common.ui.services.parser.IParser;
 import org.eclipse.gmf.runtime.common.ui.services.parser.IParserEditStatus;
@@ -21,6 +27,7 @@ public class VirtualOrderParser implements IParser
 	
 	public VirtualOrderParser(DiagramEditPart diagramEditPart)
 	{
+		//diagramEditPart.getDiagramView().
 		this.diagramEditPart = diagramEditPart;
 	}
 
@@ -102,6 +109,8 @@ public class VirtualOrderParser implements IParser
 	@Override
 	public boolean isAffectingEvent(Object event, int flags)
 	{
+		System.out.print("EVENT: ");
+		System.out.println(event);
 		return false;
 	}
 
