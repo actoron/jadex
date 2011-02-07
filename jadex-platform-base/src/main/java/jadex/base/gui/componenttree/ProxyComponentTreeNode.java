@@ -134,13 +134,15 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 				{
 					public void customResultAvailable(Object result)
 					{
-						setChildren((List)result).addResultListener(new DelegationResultListener(future));
+						setChildren((List)result);
+						future.setResult(null);
 						connected = true;
 					}
 					
 					public void customExceptionOccurred(Exception exception)
 					{
 						setChildren(Collections.EMPTY_LIST);
+						future.setResult(null);
 						connected = false;
 //						exception.printStackTrace();
 					}

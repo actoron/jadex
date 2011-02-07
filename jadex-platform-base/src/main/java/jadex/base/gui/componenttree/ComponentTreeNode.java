@@ -7,7 +7,6 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
@@ -112,11 +111,14 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 		final boolean	ready[]	= new boolean[2];	// 0: children, 1: services;
 		final Future	future	= new Future();	// future for determining when services can be added to service container.
 
-		cms.getChildren(desc.getName())
-			.addResultListener(new SwingDefaultResultListener()
+//		if(ComponentTreeNode.this.toString().startsWith("alex"))
+//			System.err.println("searchChildren queued: "+this);
+		cms.getChildren(desc.getName()).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
 			{
+//				if(ComponentTreeNode.this.toString().startsWith("alex"))
+//					System.err.println("searchChildren queued2: "+ComponentTreeNode.this);
 				final IComponentIdentifier[] achildren = (IComponentIdentifier[])result;
 				final int[]	childcnt	= new int[]{0};
 				if(achildren!=null && achildren.length > 0)
@@ -127,6 +129,8 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 						{
 							public void customResultAvailable(Object result)
 							{
+//								if(ComponentTreeNode.this.toString().startsWith("alex"))
+//									System.err.println("searchChildren queued3: "+ComponentTreeNode.this);
 								IComponentDescription	desc	= (IComponentDescription)result;
 								ITreeNode	node	= getModel().getNode(desc.getName());
 								if(node==null)
@@ -135,6 +139,8 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 									{
 										public void customResultAvailable(Object result)
 										{
+//											if(ComponentTreeNode.this.toString().startsWith("alex"))
+//												System.err.println("searchChildren done1?: "+ComponentTreeNode.this);
 //											System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+result);
 											children.add(result);
 											childcnt[0]++;
@@ -145,13 +151,18 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 												ready[0]	= true;
 												if(ready[0] &&  ready[1])
 												{
-													setChildren(children).addResultListener(new DelegationResultListener(future));
+//													if(ComponentTreeNode.this.toString().startsWith("alex"))
+//														System.err.println("searchChildren done1: "+ComponentTreeNode.this);
+													setChildren(children);
+													future.setResult(null);
 												}
 											}
 										}
 										
 										public void customExceptionOccurred(Exception exception)
 										{
+//											if(ComponentTreeNode.this.toString().startsWith("alex"))
+//												System.err.println("searchChildren done2?: "+ComponentTreeNode.this);
 											// May happen, when component removed in mean time.
 											childcnt[0]++;
 											
@@ -161,7 +172,10 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 												ready[0]	= true;
 												if(ready[0] &&  ready[1])
 												{
-													setChildren(children).addResultListener(new DelegationResultListener(future));
+//													if(ComponentTreeNode.this.toString().startsWith("alex"))
+//														System.err.println("searchChildren done2: "+ComponentTreeNode.this);
+													setChildren(children);
+													future.setResult(null);
 												}
 											}
 										}
@@ -169,6 +183,8 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 								}
 								else
 								{
+//									if(ComponentTreeNode.this.toString().startsWith("alex"))
+//										System.err.println("searchChildren done3?: "+ComponentTreeNode.this);
 //									System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+node);
 									children.add(node);
 									childcnt[0]++;
@@ -179,13 +195,18 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 										ready[0]	= true;
 										if(ready[0] &&  ready[1])
 										{
-											setChildren(children).addResultListener(new DelegationResultListener(future));
+//											if(ComponentTreeNode.this.toString().startsWith("alex"))
+//												System.err.println("searchChildren done3: "+ComponentTreeNode.this);
+											setChildren(children);
+											future.setResult(null);
 										}
 									}
 								}
 							}
 							public void customExceptionOccurred(Exception exception)
 							{
+//								if(ComponentTreeNode.this.toString().startsWith("alex"))
+//									System.err.println("searchChildren done4?: "+ComponentTreeNode.this);
 								childcnt[0]++;
 								
 								// Last child? -> inform listeners
@@ -194,7 +215,10 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 									ready[0]	= true;
 									if(ready[0] &&  ready[1])
 									{
-										setChildren(children).addResultListener(new DelegationResultListener(future));
+//										if(ComponentTreeNode.this.toString().startsWith("alex"))
+//											System.err.println("searchChildren done4: "+ComponentTreeNode.this);
+										setChildren(children);
+										future.setResult(null);
 									}
 								}
 							}
@@ -203,16 +227,21 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 				}
 				else
 				{
+//					if(ComponentTreeNode.this.toString().startsWith("alex"))
+//						System.err.println("searchChildren done5?: "+ComponentTreeNode.this);
 					ready[0]	= true;
 					if(ready[0] &&  ready[1])
 					{
-						setChildren(children).addResultListener(new DelegationResultListener(future));
+//						if(ComponentTreeNode.this.toString().startsWith("alex"))
+//							System.err.println("searchChildren done5: "+ComponentTreeNode.this);
+						setChildren(children);
+						future.setResult(null);
 					}
 				}
 			}
 			public void customExceptionOccurred(Exception exception)
 			{
-				System.out.println("here1: "+exception);
+//				System.out.println("here1: "+exception);
 				// ignore
 			}
 		});
@@ -302,6 +331,8 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 		{
 			public void customResultAvailable(Object result)
 			{
+//				if(ComponentTreeNode.this.toString().startsWith("alex"))
+//					System.err.println("searchChildren queued4: "+ComponentTreeNode.this);
 				final IExternalAccess	ea	= (IExternalAccess)result;
 				
 				SServiceProvider.getDeclaredServices(ea.getServiceProvider())
@@ -309,6 +340,8 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 				{
 					public void customResultAvailable(Object result)
 					{
+//						if(ComponentTreeNode.this.toString().startsWith("alex"))
+//							System.err.println("searchChildren done6?: "+ComponentTreeNode.this);
 						List	services	= (List)result;
 						if(services!=null && !services.isEmpty())
 						{
@@ -345,15 +378,23 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 						ready[1]	= true;
 						if(ready[0] &&  ready[1])
 						{
-							setChildren(children).addResultListener(new DelegationResultListener(future));
+//							if(ComponentTreeNode.this.toString().startsWith("alex"))
+//								System.err.println("searchChildren done6: "+ComponentTreeNode.this);
+							setChildren(children);
+							future.setResult(null);
 						}
 					}
 					public void customExceptionOccurred(Exception exception)
 					{
+//						if(ComponentTreeNode.this.toString().startsWith("alex"))
+//							System.err.println("searchChildren done7: "+ComponentTreeNode.this);
 						ready[1]	= true;
 						if(ready[0] &&  ready[1])
 						{
-							setChildren(children).addResultListener(new DelegationResultListener(future));
+//							if(ComponentTreeNode.this.toString().startsWith("alex"))
+//								System.err.println("searchChildren done7?: "+ComponentTreeNode.this);
+							setChildren(children);
+							future.setResult(null);
 						}
 					}
 				});
@@ -365,7 +406,6 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 				// May happen, when components already removed.
 			}
 		});
-
 	}
 	
 	//-------- methods --------

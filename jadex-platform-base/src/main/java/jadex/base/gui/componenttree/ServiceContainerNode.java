@@ -3,7 +3,6 @@ package jadex.base.gui.componenttree;
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
-import jadex.commons.future.IFuture;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 import jadex.commons.service.IServiceContainer;
@@ -102,10 +101,10 @@ public class ServiceContainerNode	extends AbstractTreeNode
 	/**
 	 *  Set the children.
 	 */
-	protected IFuture setChildren(List children)
+	protected void setChildren(List children)
 	{
 		this.broken	= false;
-		return super.setChildren(children);
+		super.setChildren(children);
 	}
 	
 	/**

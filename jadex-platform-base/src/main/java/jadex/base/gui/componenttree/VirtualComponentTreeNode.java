@@ -76,13 +76,15 @@ public class VirtualComponentTreeNode extends AbstractTreeNode implements IActiv
 			public void customResultAvailable(Object result)
 			{
 //				System.out.println("virt children: "+desc.getName()+" "+result);
-				setChildren((List)result).addResultListener(new DelegationResultListener(future));
+				setChildren((List)result);
+				future.setResult(null);
 			}
 			
 			public void customExceptionOccurred(Exception exception)
 			{
 //				System.out.println("virt children error: "+exception);
 				setChildren(Collections.EMPTY_LIST);
+				future.setResult(null);
 			}
 		});
 	}

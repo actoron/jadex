@@ -1,8 +1,6 @@
 package jadex.base.gui.asynctree;
 
 import jadex.commons.SUtil;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -200,104 +198,134 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	 *  ongoing search for children.
 	 *  Method may be called from any thread.
 	 */
-	protected IFuture	setChildren(List newchildren)
+	protected void	setChildren(List newchildren)
 	{
-		final Future	ret	= new Future();
-		final List	newcs	= newchildren!=null ? new ArrayList(newchildren) : null;
+		assert SwingUtilities.isEventDispatchThread();
+
+		List	oldcs	= children!=null ? new ArrayList(children) : null;
+		List	newcs	= newchildren!=null ? new ArrayList(newchildren) : null;
 		
-		assert false || checkChildren(newcs);
+		assert false || checkChildren(oldcs, newcs);
 		
-//		System.err.println(""+model.hashCode()+" setChildren queued: "+parent+"/"+this+", "+children+", "+newcs);
-		SwingUtilities.invokeLater(new Runnable()
+		searching	= false;
+		if(dirty)
 		{
-			public void run()
+			// Restart search when nodes have been added/removed in the mean time.
+			dirty	= false;
+			searchChildren();
+		}
+		else
+		{
+//			System.err.println(""+model.hashCode()+" setChildren executing: "+parent+"/"+AbstractTreeNode.this+", "+children+", "+newcs);
+			boolean	dorecurse	= recurse;
+			recurse	= false;
+			
+			if(children==null)
+				children	= new ArrayList();
+			
+			// New update algorithm (can cope with changing orderings)
+			boolean	changed	= false;
+			// Traverse through source list and remove changed nodes
+			int	newidx	= 0;	// Pointer to target list.
+			int removed	= 0;	// Counter for correct tree event index
+			for(int i=0; oldcs!=null && i<oldcs.size(); i++)
 			{
-				searching	= false;
-				if(dirty)
+				ITreeNode	node	= (ITreeNode)oldcs.get(i);
+				if(newcs!=null && newidx<newcs.size() && node.equals(newcs.get(newidx)))
 				{
-					// Restart search when nodes have been added/removed in the mean time.
-					dirty	= false;
-					searchChildren();
+					// Node at correct position -> move on
+					newidx++;
 				}
 				else
 				{
-					final List	oldcs	= children!=null ? new ArrayList(children) : null;
-					assert false || checkChildren(newcs);
-
-//					System.err.println(""+model.hashCode()+" setChildren executing: "+parent+"/"+AbstractTreeNode.this+", "+children+", "+newcs);
-					boolean	dorecurse	= recurse;
-					recurse	= false;
-					
-					if(children==null)
-						children	= new ArrayList();
-					List	added	= new ArrayList();
-					List	removed	= new ArrayList();
-					if(oldcs!=null)
-					{
-						removed.addAll(oldcs);
-					}
-					if(newcs!=null)
-					{
-						added.addAll(newcs);
-						removed.removeAll(newcs);
-					}
-					if(oldcs!=null)
-					{
-						added.removeAll(oldcs);
-					}
-	
-					if(!removed.isEmpty())
-					{
-						for(int i=removed.size()-1; i>=0; i--)
-						{
-							ITreeNode	node	= (ITreeNode)removed.get(i);
-							int index	= oldcs.indexOf(node);
-							Object	r	= children.remove(index);
-							assert SUtil.equals(r, node) : "Node inconsistency: "+oldcs+", "+newcs;
-							model.deregisterNode(node);
-							model.fireNodeRemoved(AbstractTreeNode.this, node, index);
-						}
-						if(added.isEmpty())
-							model.fireNodeChanged(AbstractTreeNode.this);
-					}
-					if(!added.isEmpty())
-					{
-						for(int i=0; i<added.size(); i++)
-						{
-							ITreeNode	node	= (ITreeNode)added.get(i);
-							int index	= newcs.indexOf(node);
-							children.add(index, node);
-							model.addNode(node);
-							model.fireNodeAdded(AbstractTreeNode.this, node, index);
-						}
-						model.fireNodeChanged(AbstractTreeNode.this);
-					}
-						
-					if(!SUtil.equals(children, newcs))
-						System.out.println("dfklöjhkl");
-					assert SUtil.equals(children, newcs) : "Node inconsistency:\noldcs="+oldcs+"\nnewcs="+newcs+"\nadded="+added+"\nremoved="+removed+"\nresult="+children;
-					
-					if(dorecurse && tree.isExpanded(new TreePath(model.buildTreePath(AbstractTreeNode.this).toArray())))
-					{
-						for(int i=0; children!=null && i<children.size(); i++)
-						{
-							((ITreeNode)children.get(i)).refresh(dorecurse);
-						}
-					}
+					// Node removed or moved -> remove (moved nodes will be re-added later at correct position)
+					children.remove(node);
+					model.deregisterNode(node);
+					model.fireNodeRemoved(AbstractTreeNode.this, node, i-removed);
+					removed++;
+					changed	= true;
 				}
-				
-				ret.setResult(null);
 			}
-		});
-		
-		return ret;
+			// Traverse through target list and add missing nodes
+			for(int i=0; newcs!=null && i<newcs.size(); i++)
+			{
+				ITreeNode	node	= (ITreeNode)newcs.get(i);
+				if(i>=children.size() || !node.equals(children.get(i)))
+				{
+					// Add missing or moved node.
+					children.add(i, node);
+					model.addNode(node);
+					model.fireNodeAdded(AbstractTreeNode.this, node, i);
+					changed	= true;
+				}
+			}
+			if(changed)
+				model.fireNodeChanged(AbstractTreeNode.this);
+			
+			// Old update algorithm (only when order does not change)
+//			List	added	= new ArrayList();
+//			List	removed	= new ArrayList();
+//			if(oldcs!=null)
+//			{
+//				removed.addAll(oldcs);
+//			}
+//			if(newcs!=null)
+//			{
+//				added.addAll(newcs);
+//				removed.removeAll(newcs);
+//			}
+//			if(oldcs!=null)
+//			{
+//				added.removeAll(oldcs);
+//			}
+//
+//			if(!removed.isEmpty())
+//			{
+//				for(int i=removed.size()-1; i>=0; i--)
+//				{
+//					ITreeNode	node	= (ITreeNode)removed.get(i);
+//					int index	= oldcs.indexOf(node);
+//					Object	r	= children.remove(index);
+//					assert SUtil.equals(r, node) : "Node inconsistency: "+oldcs+", "+newcs;
+//					model.deregisterNode(node);
+//					model.fireNodeRemoved(AbstractTreeNode.this, node, index);
+//				}
+//				if(added.isEmpty())
+//					model.fireNodeChanged(AbstractTreeNode.this);
+//			}
+//			if(!added.isEmpty())
+//			{
+//				for(int i=0; i<added.size(); i++)
+//				{
+//					ITreeNode	node	= (ITreeNode)added.get(i);
+//					int index	= newcs.indexOf(node);
+//					children.add(index, node);
+//					model.addNode(node);
+//					model.fireNodeAdded(AbstractTreeNode.this, node, index);
+//				}
+//				model.fireNodeChanged(AbstractTreeNode.this);
+//			}
+				
+			assert SUtil.equals(children, newcs) : "Node inconsistency:\noldcs="+oldcs+"\nnewcs="+newcs
+//				+"\nadded="+added+"\nremoved="+removed
+				+"\nresult="+children;
+			
+			if(dorecurse && tree.isExpanded(new TreePath(model.buildTreePath(AbstractTreeNode.this).toArray())))
+			{
+				for(int i=0; children!=null && i<children.size(); i++)
+				{
+					((ITreeNode)children.get(i)).refresh(dorecurse);
+				}
+			}
+		}
 	}
 	
 	/**
 	 *  Check the children for validity.
-	 *  I.e. it is not allowed to have two equal children in the list.
+	 *  I.e. it is not allowed to have two equal children in the list
+	 *  or to alter the ordering of existing children.
 	 */
-	protected boolean checkChildren(List newcs)
+	protected boolean checkChildren(List oldcs, List newcs)
 	{
 		// Check if duplicates are present. 
 		if(newcs!=null && newcs.size()>1)
@@ -313,34 +341,25 @@ public abstract class AbstractTreeNode	implements ITreeNode
 				}
 			}
 		}
-
-		return true;
-	}
 		
-	/**
-	 *  Check the children for validity.
-	 *  I.e. it is not allowed to alter the ordering of existing children.
-	 */
-	protected boolean checkChildren(List oldcs, List newcs)
-	{
-		// Check ordering of existing children.
-		if(oldcs!=null && newcs!=null)
-		{
-			List	intersection	= new ArrayList(oldcs);
-			intersection.retainAll(newcs);
-			for(int i=0; i<intersection.size()-1; i++)
-			{
-				for(int j=i+1; j<intersection.size(); j++)
-				{
-					int	index1	= newcs.indexOf(intersection.get(i));
-					int index2	= newcs.indexOf(intersection.get(j));
-					if(index1>=index2)
-					{
-						throw new RuntimeException("Found unequal ordering:\n oldcs = "+oldcs+"\nnewcs = "+newcs);
-					}
-				}
-			}
-		}
+//		// Check ordering of existing children.
+//		if(oldcs!=null && newcs!=null)
+//		{
+//			List	intersection	= new ArrayList(oldcs);
+//			intersection.retainAll(newcs);
+//			for(int i=0; i<intersection.size()-1; i++)
+//			{
+//				for(int j=i+1; j<intersection.size(); j++)
+//				{
+//					int	index1	= newcs.indexOf(intersection.get(i));
+//					int index2	= newcs.indexOf(intersection.get(j));
+//					if(index1>=index2)
+//					{
+//						throw new RuntimeException("Found unequal ordering:\n oldcs = "+oldcs+"\nnewcs = "+newcs);
+//					}
+//				}
+//			}
+//		}
 
 		return true;
 	}
@@ -380,7 +399,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 			if(searching)
 				dirty	= true;
 			
-			System.err.println("Node added: "+children);
+//			System.err.println("Node added: "+children);
 		}
 		else
 		{

@@ -223,6 +223,7 @@ public class ComponentTreePanel extends JSplitPane
 				{
 					public void run()
 					{
+//						System.err.println(""+model.hashCode()+" Panel->addChild queued2: "+desc.getName()+", "+desc.getParent());
 						final ComponentTreeNode	parentnode = desc.getParent()==null? null: (ComponentTreeNode)model.getAddedNode(desc.getParent());
 						if(parentnode!=null)
 						{
