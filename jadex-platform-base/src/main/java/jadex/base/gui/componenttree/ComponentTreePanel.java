@@ -794,11 +794,10 @@ public class ComponentTreePanel extends JSplitPane
 							// Expand root node.
 							TreeExpansionHandler	teh	= new TreeExpansionHandler(tree);
 							teh.treeExpanded(new TreeExpansionEvent(tree, new TreePath(model.getRoot())));
+							cms.addComponentListener(null, listener);
 						}
 					}
 				});
-				
-				cms.addComponentListener(null, listener);		
 			}
 		});
 		

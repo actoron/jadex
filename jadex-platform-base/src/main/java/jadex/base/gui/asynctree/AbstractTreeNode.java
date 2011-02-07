@@ -203,10 +203,9 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	protected IFuture	setChildren(List newchildren)
 	{
 		final Future	ret	= new Future();
-		final List	oldcs	= children!=null ? new ArrayList(children) : null;
 		final List	newcs	= newchildren!=null ? new ArrayList(newchildren) : null;
 		
-		assert false || checkChildren(oldcs, newcs);
+		assert false || checkChildren(newcs);
 		
 //		System.err.println(""+model.hashCode()+" setChildren queued: "+parent+"/"+this+", "+children+", "+newcs);
 		SwingUtilities.invokeLater(new Runnable()
@@ -222,7 +221,10 @@ public abstract class AbstractTreeNode	implements ITreeNode
 				}
 				else
 				{
-	//				System.err.println(""+model.hashCode()+" setChildren executing: "+parent+"/"+AbstractTreeNode.this+", "+children+", "+newcs);
+					final List	oldcs	= children!=null ? new ArrayList(children) : null;
+					assert false || checkChildren(newcs);
+
+//					System.err.println(""+model.hashCode()+" setChildren executing: "+parent+"/"+AbstractTreeNode.this+", "+children+", "+newcs);
 					boolean	dorecurse	= recurse;
 					recurse	= false;
 					
@@ -271,6 +273,8 @@ public abstract class AbstractTreeNode	implements ITreeNode
 						model.fireNodeChanged(AbstractTreeNode.this);
 					}
 						
+					if(!SUtil.equals(children, newcs))
+						System.out.println("dfklöjhkl");
 					assert SUtil.equals(children, newcs) : "Node inconsistency:\noldcs="+oldcs+"\nnewcs="+newcs+"\nadded="+added+"\nremoved="+removed+"\nresult="+children;
 					
 					if(dorecurse && tree.isExpanded(new TreePath(model.buildTreePath(AbstractTreeNode.this).toArray())))
@@ -291,10 +295,9 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	
 	/**
 	 *  Check the children for validity.
-	 *  I.e. it is not allowed to have two equal children in the list
-	 *  or to alter the ordering of existing children.
+	 *  I.e. it is not allowed to have two equal children in the list.
 	 */
-	protected boolean checkChildren(List oldcs, List newcs)
+	protected boolean checkChildren(List newcs)
 	{
 		// Check if duplicates are present. 
 		if(newcs!=null && newcs.size()>1)
@@ -310,7 +313,16 @@ public abstract class AbstractTreeNode	implements ITreeNode
 				}
 			}
 		}
+
+		return true;
+	}
 		
+	/**
+	 *  Check the children for validity.
+	 *  I.e. it is not allowed to alter the ordering of existing children.
+	 */
+	protected boolean checkChildren(List oldcs, List newcs)
+	{
 		// Check ordering of existing children.
 		if(oldcs!=null && newcs!=null)
 		{
