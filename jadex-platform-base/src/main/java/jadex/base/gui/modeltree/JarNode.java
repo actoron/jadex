@@ -21,7 +21,6 @@ public class JarNode extends DirNode
 	public JarNode(ITreeNode parent, AsyncTreeModel model, JTree tree, File file, ModelIconCache iconcache, IRemoteFilter filter)
 	{
 		super(parent, model, tree, new JarAsDirectory(file.getAbsolutePath()), iconcache, filter);
-		assert file.isDirectory();
 //		System.out.println("node: "+getClass()+" "+desc.getName());
 	}
 	
