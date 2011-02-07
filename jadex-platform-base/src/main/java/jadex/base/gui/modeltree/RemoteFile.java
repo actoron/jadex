@@ -11,7 +11,7 @@ public class RemoteFile
 	/** The path. */
 	protected String path;
 	
-	/** the boolean for directory. */
+	/** The boolean for directory. */
 	protected boolean directory;
 
 	/**
@@ -30,7 +30,7 @@ public class RemoteFile
 		this.path = path;
 		this.directory = directory;
 	}
-
+	
 	/**
 	 *  Get the filename.
 	 *  @return the filename.

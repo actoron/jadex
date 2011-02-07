@@ -158,7 +158,7 @@ public class RemoteFileNode  extends AbstractTreeNode
 //	protected String convertPathToRelative(File file)
 //	{
 //		String	ret;
-//		if(file instanceof JarAsDirectory)
+//		if(file instanceof RemoteJarFile)
 //		{
 //			JarAsDirectory	jar	= (JarAsDirectory) file;
 //			if(jar.getZipEntry()!=null)

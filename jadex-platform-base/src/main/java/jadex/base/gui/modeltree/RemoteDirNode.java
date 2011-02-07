@@ -93,57 +93,89 @@ public class RemoteDirNode extends RemoteFileNode
 	{
 		final Future ret = new Future();
 		
-		final RemoteFile myfile = file;
-		final IRemoteFilter myfilter = filter;
-		exta.scheduleStep(new IComponentStep()
+		if(file instanceof RemoteJarFile)
 		{
-			@XMLClassname("listFiles")
-			public Object execute(IInternalAccess ia)
+			RemoteJarFile myfile = (RemoteJarFile)file;
+			Collection files = myfile.listFiles();
+			
+			ret.setResult(files);
+			
+//			for(int i=0; i<files.length; i++)
+//			{
+//				final CollectionResultListener lis = new CollectionResultListener(files.length, 
+//					true, new DelegationResultListener(ret));
+//				final RemoteJarFile ff = (RemoteJarFile)files[i];
+//				filter.filter(files[i]).addResultListener(new IResultListener()
+//				{
+//					public void resultAvailable(Object result)
+//					{
+//						if(((Boolean)result).booleanValue())
+//							lis.resultAvailable(ff);
+//						else
+//							lis.exceptionOccurred(null);
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						lis.exceptionOccurred(null);
+//					}
+//				});
+//			}
+		}
+		else
+		{
+			final RemoteFile myfile = file;
+			final IRemoteFilter myfilter = filter;
+			exta.scheduleStep(new IComponentStep()
 			{
-				Future ret = new Future();
-				
-				File f = new File(myfile.getPath());
-				final File[] files = f.listFiles();
-				if(files!=null)
+				@XMLClassname("listFiles")
+				public Object execute(IInternalAccess ia)
 				{
-					final CollectionResultListener lis = new CollectionResultListener(files.length, 
-						true, new DelegationResultListener(ret));
+					Future ret = new Future();
 					
-					for(int i=0; i<files.length; i++)
+					File f = new File(myfile.getPath());
+					final File[] files = f.listFiles();
+					if(files!=null)
 					{
-						if(myfilter==null)
+						final CollectionResultListener lis = new CollectionResultListener(files.length, 
+							true, new DelegationResultListener(ret));
+						
+						for(int i=0; i<files.length; i++)
 						{
-							lis.resultAvailable(files[i]);
-						}
-						else
-						{
-							final File file = files[i];
-							myfilter.filter(files[i]).addResultListener(new IResultListener()
+							if(myfilter==null)
 							{
-								public void resultAvailable(Object result)
+								lis.resultAvailable(files[i]);
+							}
+							else
+							{
+								final File file = files[i];
+								myfilter.filter(files[i]).addResultListener(new IResultListener()
 								{
-									if(((Boolean)result).booleanValue())
-										lis.resultAvailable(new RemoteFile(file.getName(), file.getAbsolutePath(), file.isDirectory()));
-									else
+									public void resultAvailable(Object result)
+									{
+										if(((Boolean)result).booleanValue())
+											lis.resultAvailable(new RemoteFile(file.getName(), file.getAbsolutePath(), file.isDirectory()));
+										else
+											lis.exceptionOccurred(null);
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
 										lis.exceptionOccurred(null);
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									lis.exceptionOccurred(null);
-								}
-							});
+									}
+								});
+							}
 						}
 					}
+					else
+					{
+						ret.setResult(Collections.EMPTY_LIST);
+					}
+					
+					return ret;
 				}
-				else
-				{
-					ret.setResult(Collections.EMPTY_LIST);
-				}
-				
-				return ret;
-			}
-		}).addResultListener(new DelegationResultListener(ret));
+			}).addResultListener(new DelegationResultListener(ret));
+		}
 		
 		return ret;
 	}

@@ -45,8 +45,8 @@ public class JarNode extends DirNode
 	{
 		if(file==null)
 		{
-			String	absolute	= new File(relative).getAbsolutePath();
-			file	= new JarAsDirectory(absolute);
+			String absolute = new File(relative).getAbsolutePath();
+			file = new JarAsDirectory(absolute);
 		}
 		return this.file;
 	}

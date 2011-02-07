@@ -165,46 +165,7 @@ public class JarAsDirectory	extends File
 			changed	= true;
 			this.lastmodified	= new File(jarpath).lastModified();
 			// Read entries into multi-collection (path->entries).
-			MultiCollection	entries	= new MultiCollection();
-			Set	contained	= new HashSet();
-			try
-			{
-				JarFile	jar = new JarFile(jarpath);
-				Enumeration	e	= jar.entries();
-				while(e.hasMoreElements())
-				{
-					ZipEntry	entry	= (ZipEntry)e.nextElement();
-					boolean	finished	= false;
-					while(!finished)
-					{
-						String	dir	= "/";
-						int	slash	= entry.getName().lastIndexOf("/", entry.getName().length()-2);
-						if(slash!=-1)
-						{
-							dir	= entry.getName().substring(0, slash+1);
-						}
-						if(!contained.contains(entry.getName()))
-						{
-							entries.put(dir, entry);
-							contained.add(entry.getName());
-						}
-						
-						if(dir.equals("/"))
-						{
-							finished	= true;
-						}
-						else
-						{
-							// Add directory entries manually, because some tools (like eclipse) do not include these in the jar.
-							entry	= new ZipEntry(dir);
-						}
-					}
-				}
-			}
-			catch(IOException e)
-			{
-				e.printStackTrace();
-			}
+			MultiCollection	entries	= createEntries();
 			
 			// Recursively create files for entries.
 			this.entryfiles	= new HashMap();
@@ -213,6 +174,55 @@ public class JarAsDirectory	extends File
 		}
 //		System.out.println("refresh: "+entry+", "+changed);
 		return changed;
+	}
+	
+	/**
+	 * 
+	 */
+	public MultiCollection createEntries()
+	{
+		MultiCollection	entries	= new MultiCollection();
+		Set	contained	= new HashSet();
+		try
+		{
+			JarFile	jar = new JarFile(jarpath);
+			Enumeration	e	= jar.entries();
+			while(e.hasMoreElements())
+			{
+				ZipEntry	entry	= (ZipEntry)e.nextElement();
+				boolean	finished	= false;
+				while(!finished)
+				{
+					String	dir	= "/";
+					int	slash	= entry.getName().lastIndexOf("/", entry.getName().length()-2);
+					if(slash!=-1)
+					{
+						dir	= entry.getName().substring(0, slash+1);
+					}
+					if(!contained.contains(entry.getName()))
+					{
+						entries.put(dir, entry);
+						contained.add(entry.getName());
+					}
+					
+					if(dir.equals("/"))
+					{
+						finished	= true;
+					}
+					else
+					{
+						// Add directory entries manually, because some tools (like eclipse) do not include these in the jar.
+						entry	= new ZipEntry(dir);
+					}
+				}
+			}
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return entries;
 	}
 	
 	/**
@@ -273,4 +283,14 @@ public class JarAsDirectory	extends File
 		
 		return (File)entryfiles.get(path);
 	}
+
+	/**
+	 *  Get the entryfiles.
+	 *  @return the entryfiles.
+	 */
+	public Map getEntryFiles()
+	{
+		return entryfiles;
+	}
+	
 }
