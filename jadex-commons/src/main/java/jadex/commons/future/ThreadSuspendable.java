@@ -52,6 +52,7 @@ public class ThreadSuspendable implements ISuspendable
 			}
 			catch(InterruptedException e)
 			{
+				e.printStackTrace();
 				throw new RuntimeException(e);
 			}	
 		}

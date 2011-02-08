@@ -231,9 +231,16 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 								
 							if(clazz!=null)
 							{
+								try
+								{
 								Constructor	c	= clazz.getDeclaredConstructors()[0];
 								c.setAccessible(true);
 								ret	= c.newInstance(new Object[c.getParameterTypes().length]);
+								}
+								catch(Exception e)
+								{
+									e.printStackTrace();
+								}
 							}
 							else
 							{

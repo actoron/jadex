@@ -6,6 +6,7 @@ import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.asynctree.TreePopupListener;
+import jadex.base.gui.filechooser.RemoteFileSystemView;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IRemoteFilter;
@@ -688,40 +689,62 @@ public class ModelTreePanel extends JPanel // JSplitPane
 		 */
 		public void actionPerformed(ActionEvent e)
 		{
-			final String filename = JOptionPane.showInputDialog("Enter remote path");
-			if(filename!=null && exta!=null)
+//			final String filename = JOptionPane.showInputDialog("Enter remote path");
+			
+			JFileChooser chooser = new JFileChooser();
+			chooser.setFileSystemView(new RemoteFileSystemView(exta, chooser));
+			chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			chooser.addChoosableFileFilter(new FileFilter()
 			{
-				final File fcopy = new File(filename);
-				SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new DefaultResultListener()
+				public String getDescription()
 				{
-					public void resultAvailable(Object result)
+					return "Paths or .jar files";
+				}
+
+				public boolean accept(File f)
+				{
+					String name = f.getName().toLowerCase();
+					return f.isDirectory() || name.endsWith(".jar");
+				}
+			});
+			if(chooser.showDialog(SGUI.getWindowParent(ModelTreePanel.this), 
+				"Add Path")==JFileChooser.APPROVE_OPTION)
+			{
+				final File file = chooser.getSelectedFile();
+				if(file!=null)
+				{
+					SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(new DefaultResultListener()
 					{
-						ILibraryService ls = (ILibraryService)result;
-						File f = new File(fcopy.getParentFile(), fcopy.getName());
-						try
+						public void resultAvailable(Object result)
 						{
-							URL url = f.toURI().toURL();
-							if((filename.endsWith("\\") || filename.endsWith("/")) && 
-								(!url.toString().endsWith("\\") || url.toString().endsWith("/")))
+							ILibraryService ls = (ILibraryService)result;
+							File f = new File(file.getParentFile(), file.getName());
+							try
 							{
-								// Hack! f.toURI().toURL() does not append when file is not local
-								// and it cannot be determined if it is a directory
-								url = new URL(url.toString()+"/");
+								URL url = f.toURI().toURL();
+								String filename = file.getAbsolutePath();
+								if((filename.endsWith("\\") || filename.endsWith("/")) && 
+									(!url.toString().endsWith("\\") || url.toString().endsWith("/")))
+								{
+									// Hack! f.toURI().toURL() does not append when file is not local
+									// and it cannot be determined if it is a directory
+									url = new URL(url.toString()+"/");
+								}
+								ls.addURL(url);
 							}
-							ls.addURL(url);
+							catch(MalformedURLException ex)
+							{
+								ex.printStackTrace();
+							}
 						}
-						catch(MalformedURLException ex)
-						{
-							ex.printStackTrace();
-						}
-					}
-				});
+					});
+					
+					final RootNode root = (RootNode)getModel().getRoot();
+					ITreeNode node = ModelTreePanel.createNode(root, model, tree, new RemoteFile(file.getName(), file.getAbsolutePath(), file.isDirectory()), iconcache, filefilter, exta);
+					root.addChild(node);
+				}
 			}
-				
-			final RootNode root = (RootNode)getModel().getRoot();
-			ITreeNode node = ModelTreePanel.createNode(root, model, tree, new RemoteFile(filename, filename, false), iconcache, filefilter, exta);
-			root.addChild(node);
 		}
 
 		/**
