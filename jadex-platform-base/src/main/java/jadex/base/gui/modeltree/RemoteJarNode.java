@@ -7,11 +7,14 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.xml.annotation.XMLClassname;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -43,7 +46,7 @@ public class RemoteJarNode extends RemoteDirNode
 	 */
 	protected IFuture listFiles()
 	{
-		final Future ret = new Future();
+		Future ret = new Future();
 		
 		final RemoteFile myfile = file;
 		final IRemoteFilter myfilter = filter;
@@ -52,73 +55,66 @@ public class RemoteJarNode extends RemoteDirNode
 			@XMLClassname("listFiles")
 			public Object execute(IInternalAccess ia)
 			{
-				Future ret = new Future();
+				final Future ret = new Future();
 				
-				JarAsDirectory jad = new JarAsDirectory(myfile.getPath());
+				final JarAsDirectory jad = new JarAsDirectory(myfile.getPath());
 				jad.refresh();
-//				final File[] files = jad.listFiles();
-				
-				Map rjfentries = new MultiCollection();
-				Map zipentries = jad.createEntries();
+								
+				final Map rjfentries = new MultiCollection();
+				MultiCollection zipentries = jad.createEntries();
+				final CollectionResultListener lis = new CollectionResultListener(zipentries.size(), 
+					true, new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						Collection col = (Collection)result;
+						for(Iterator it=col.iterator(); it.hasNext(); )
+						{
+							Object[] tmp = (Object[])it.next();
+							rjfentries.put(tmp[0], tmp[1]);
+						}
+						RemoteJarFile rjf = new RemoteJarFile(jad.getName(), jad.getAbsolutePath(), true, rjfentries, "/");
+						Collection files = rjf.listFiles();
+						ret.setResult(files);
+					}
+				});
+
 				for(Iterator it=zipentries.keySet().iterator(); it.hasNext(); )
 				{
-					String name = (String)it.next();
+					final String name = (String)it.next();
 					Collection childs = (Collection)zipentries.get(name);
 //					System.out.println("childs: "+childs);
 					for(Iterator it2=childs.iterator(); it2.hasNext(); )
 					{
-						ZipEntry child = (ZipEntry)it2.next();
-						RemoteJarFile tmp = new RemoteJarFile(child.getName(), name+"/"+child.getName(), child.isDirectory(), rjfentries, name);
-						rjfentries.put(name, tmp);
+						ZipEntry entry = (ZipEntry)it2.next();
+						String ename = entry.getName();
+						int	slash = ename.lastIndexOf("/", ename.length()-2);
+						ename = ename.substring(slash!=-1? slash+1: 0, ename.endsWith("/")? ename.length()-1: ename.length());
+//						System.out.println("ename: "+ename+" "+entry.getName());
+						final RemoteJarFile tmp = new RemoteJarFile(ename, myfile.getPath()+"/"+entry.getName(), entry.isDirectory(), rjfentries, entry.getName());
+						
+						myfilter.filter(jad.getFile(entry.getName())).addResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object result)
+							{
+								if(((Boolean)result).booleanValue())
+								{
+									lis.resultAvailable(new Object[]{name, tmp});
+								}
+								else
+								{
+									lis.exceptionOccurred(null);
+								}
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								lis.exceptionOccurred(null);
+							}
+						});
+						
 					}
 				}
-				
-				RemoteJarFile rjf = new RemoteJarFile(jad.getName(), jad.getAbsolutePath(), true, rjfentries, "/");
-				
-				Collection files = rjf.listFiles();
-				
-				ret.setResult(files);
-				
-//				if(files!=null)
-//				{
-//					final CollectionResultListener lis = new CollectionResultListener(files.length, 
-//						true, new DelegationResultListener(ret));
-//					
-//					for(int i=0; i<files.length; i++)
-//					{
-//						if(myfilter==null)
-//						{
-//							lis.resultAvailable(files[i]);
-//						}
-//						else
-//						{
-//							final File file = files[i];
-//							myfilter.filter(files[i]).addResultListener(new IResultListener()
-//							{
-//								public void resultAvailable(Object result)
-//								{
-//									if(((Boolean)result).booleanValue())
-//									{
-//										lis.resultAvailable(new RemoteFile(file.getName(), file.getAbsolutePath(), file.isDirectory()));
-//									}
-//									else
-//									{
-//										lis.exceptionOccurred(null);
-//									}
-//								}
-//								
-//								public void exceptionOccurred(Exception exception)
-//								{
-//									lis.exceptionOccurred(null);
-//								}
-//							});
-//						}
-//					}
-//				}
-//				else
-//				{
-//					ret.setResult(Collections.EMPTY_LIST);
-//				}
 				
 				return ret;
 			}

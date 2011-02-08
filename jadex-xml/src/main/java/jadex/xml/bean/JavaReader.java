@@ -2,6 +2,7 @@ package jadex.xml.bean;
 
 import jadex.commons.Base64;
 import jadex.commons.SReflect;
+import jadex.commons.collection.MultiCollection;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -24,6 +25,7 @@ import java.awt.Toolkit;
 import java.io.ByteArrayInputStream;
 import java.net.InetAddress;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -99,6 +101,15 @@ public class JavaReader extends Reader
 				new SubobjectInfo(new AccessInfo("value"))
 			}));
 			typeinfos.add(ti_mapentry);
+			
+			// jadex.commons.collection.MultiCollection
+			TypeInfo ti_mc = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.commons.collection", "MultiCollection")}),
+				new ObjectInfo(MultiCollection.class), new MappingInfo(null, new SubobjectInfo[]{
+				new SubobjectInfo(new XMLInfo("entry"), new AccessInfo("entry", null, null, null,  
+					new BeanAccessInfo(MultiCollection.class.getMethod("putCollection", new Class[]{Object.class, Collection.class}), null, "", MapEntry.class.getMethod("getKey", new Class[0]))), 
+				new SubObjectConverter(entryconv, null), true, null)
+			}));
+			typeinfos.add(ti_mc);
 			
 			// java.util.List
 			TypeInfo ti_list = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "List")}),

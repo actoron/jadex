@@ -389,6 +389,14 @@ public class MultiCollection implements Map, Serializable, Cloneable
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Directly store a collection entry.
+	 */
+	public void putCollection(Object key, Collection value)
+	{
+		map.put(key, value);
+	}
 
 
 	/**

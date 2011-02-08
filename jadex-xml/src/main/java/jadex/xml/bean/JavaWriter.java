@@ -1,6 +1,7 @@
 package jadex.xml.bean;
 
 import jadex.commons.Base64;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.gui.SGUI;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
@@ -92,6 +93,14 @@ public class JavaWriter extends Writer
 				new BeanAccessInfo(null, Map.Entry.class.getMethod("getValue", new Class[0]))))
 			}));
 			typeinfos.add(ti_mapentry);
+			
+			// jadex.commons.collection.MultiCollection
+			TypeInfo ti_mc = new TypeInfo(null, new ObjectInfo(MultiCollection.class),
+				new MappingInfo(null, new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo("entries", null, null, null,
+				new BeanAccessInfo(null, Map.class.getMethod("entrySet", new Class[0]))), null, true)
+			}));
+			typeinfos.add(ti_mc);
 			
 			// java.util.List
 			TypeInfo ti_list = new TypeInfo(null, new ObjectInfo(List.class), new MappingInfo(null,

@@ -1,6 +1,7 @@
 package jadex.xml.benchmark;
 
 import jadex.commons.SReflect;
+import jadex.commons.collection.MultiCollection;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -54,6 +55,7 @@ public class Test //extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
+				t.testMultiCollection();
 //				t.testEmptySet();
 //				t.testEmptyList();
 //				t.testEmptyMap();
@@ -72,7 +74,7 @@ public class Test //extends TestCase
 //				t.testSet();
 //				t.testMap();
 //				t.testInnerClass();
-				t.testURL();
+//				t.testURL();
 //				t.testLoggingLevel();
 //				t.testInetAddress();
 //				t.testBeanWithPublicFields();
@@ -118,6 +120,20 @@ public class Test //extends TestCase
 				+wo.getClass()+" \n"+ro.getClass()+" \n"+xml);
 		
 //		assertEquals("Written and read objects should be equal:", wo, ro);
+	}
+	
+	/**
+	 * 
+	 */
+	public void testMultiCollection() throws Exception
+	{
+		MultiCollection col = new MultiCollection();
+		col.put("a", "a");
+		col.put("a", "b");
+		col.put("a", "c");
+		col.put("b", "b");
+
+		doWriteAndRead(col);
 	}
 	
 	/**

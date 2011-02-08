@@ -1041,8 +1041,6 @@ public class ModelTreePanel extends JPanel // JSplitPane
 				{
 					SComponentFactory.isModelType(exta, file.getAbsolutePath(), getSelectedComponents())
 						.addResultListener(new DelegationResultListener(ret));
-//						SComponentFactory.isLoadable(exta, file.getAbsolutePath())
-//							.addResultListener(new DelegationResultListener(ret));
 				}
 			}
 			else

@@ -1,6 +1,7 @@
 package jadex.base.gui.modeltree;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -10,9 +11,6 @@ public class RemoteJarFile extends RemoteFile
 {
 	/** The map of jar entries. */
 	protected Map jarentries;
-	
-//	/** The jar path. */
-//	protected String jarpath;
 	
 	/** The relative path inside of the jar file. */
 	protected String relativepath;
@@ -31,7 +29,6 @@ public class RemoteJarFile extends RemoteFile
 	{
 		super(filename, path, directory);
 		this.jarentries = jarentries;
-//		this.jarpath = jarpath;
 		this.relativepath = relativepath;
 	}
 	
@@ -40,7 +37,7 @@ public class RemoteJarFile extends RemoteFile
 	 */
 	public Collection listFiles()
 	{
-		return (Collection)jarentries.get(relativepath);
+		return jarentries.get(relativepath)!=null? (Collection)jarentries.get(relativepath): Collections.EMPTY_LIST;
 	}
 
 	/**
@@ -60,24 +57,6 @@ public class RemoteJarFile extends RemoteFile
 	{
 		this.jarentries = jarentries;
 	}
-
-//	/**
-//	 *  Get the jarpath.
-//	 *  @return the jarpath.
-//	 */
-//	public String getJarPath()
-//	{
-//		return jarpath;
-//	}
-//
-//	/**
-//	 *  Set the jarpath.
-//	 *  @param jarpath The jarpath to set.
-//	 */
-//	public void setJarPath(String jarpath)
-//	{
-//		this.jarpath = jarpath;
-//	}
 
 	/**
 	 *  Get the relativepath.
