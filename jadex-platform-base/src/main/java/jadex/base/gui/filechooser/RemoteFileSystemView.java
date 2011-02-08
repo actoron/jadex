@@ -88,10 +88,10 @@ public class RemoteFileSystemView extends FileSystemView
 	 * @see FileView#isTraversable
 	 * @since 1.4
 	 */
-	public Boolean isTraversable(File f)
-	{
-		return Boolean.valueOf(f.isDirectory());
-	}
+//	public Boolean isTraversable(File f)
+//	{
+//		return Boolean.valueOf(f.isDirectory());
+//	}
 
 //	/**
 //	 * Name of a file, directory, or folder as it would be displayed in a system
@@ -393,7 +393,7 @@ public class RemoteFileSystemView extends FileSystemView
 					children.put("roots", files);
 					chooser.rescanCurrentDirectory();
 					
-					System.out.println("Found roots: "+SUtil.arrayToString(files));
+//					System.out.println("Found roots: "+SUtil.arrayToString(files));
 				}
 			});
 		}
@@ -503,7 +503,7 @@ public class RemoteFileSystemView extends FileSystemView
 						parents.put(files[i].getAbsolutePath(), dir);
 					}
 					chooser.rescanCurrentDirectory();
-					System.out.println("Found children: "+SUtil.arrayToString(files));
+//					System.out.println("Found children: "+SUtil.arrayToString(files));
 				}
 			});
 		}
