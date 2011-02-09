@@ -1,4 +1,4 @@
-package jadex.simulation.analysis.common.workflowTasks;
+package jadex.simulation.analysis.common.workflow.tasks;
 
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
@@ -7,18 +7,18 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.ThreadSuspendable;
 import jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.BasicGeneralAnalysisService;
-import jadex.simulation.analysis.common.dataObjects.IAExperimentJob;
-import jadex.simulation.analysis.common.dataObjects.IAExperimentalFrame;
-import jadex.simulation.analysis.common.dataObjects.IAModel;
-import jadex.simulation.analysis.common.dataObjects.Factories.AExperimentalJobFactory;
+import jadex.simulation.analysis.common.dataObjects.IAExperiment;
+import jadex.simulation.analysis.common.events.ATaskEvent;
+import jadex.simulation.analysis.common.workflow.tasks.general.ABasicTask;
+import jadex.simulation.analysis.common.workflow.tasks.general.IATask;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * Task for setting Experimental frame
+ * Task for creating a Experiment
  */
-public class SetExperimentalFrameTask implements ITask
+public class SetExperimentTask extends ABasicTask implements IATask
 {
 	/**
 	 * Execute the task.
@@ -26,6 +26,8 @@ public class SetExperimentalFrameTask implements ITask
 	public IFuture execute(final ITaskContext context, final BpmnInterpreter instance)
 	{
 		final Future ret = new Future();
+		taskEventOccur(new ATaskEvent(this, context, instance));
+
 		final BasicGeneralAnalysisService expService = (BasicGeneralAnalysisService) instance.getContextVariable("service");
 
 		expService.expFrameStart(); // for view
@@ -37,9 +39,8 @@ public class SetExperimentalFrameTask implements ITask
 			{
 				if (e.getActionCommand().equals("expSet"))
 				{
-					IAExperimentalFrame frame = (IAExperimentalFrame) expService.getFrame().get(new ThreadSuspendable(this));
-					IAExperimentJob expJob = AExperimentalJobFactory.createAExperimentalJob(frame);
-					context.setParameterValue("job", expJob);
+					IAExperiment exp = (IAExperiment) expService.getFrame().get(new ThreadSuspendable(this));
+					context.setParameterValue("job", exp);
 					ret.setResult(null);
 				}
 			}

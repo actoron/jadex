@@ -1,23 +1,22 @@
 package jadex.simulation.analysis.common.dataObjects.parameter;
 
+import jadex.bdi.testcases.misc.GetExternalAccessPlan;
 import jadex.simulation.analysis.common.dataObjects.ABasicDataObject;
+import jadex.simulation.analysis.common.dataObjects.IADataObjectView;
+import jadex.simulation.analysis.common.events.ADataEvent;
+import jadex.simulation.analysis.common.util.AConstants;
 
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 public class AParameterEnsemble extends ABasicDataObject implements IAParameterEnsemble
 {
+
 	private Map<String, IAParameter> parametersMap;
+	private String name = "ParameterEnsemble";
 
 	public AParameterEnsemble()
 	{
@@ -26,9 +25,10 @@ public class AParameterEnsemble extends ABasicDataObject implements IAParameterE
 		{
 			parametersMap = Collections.synchronizedMap(new HashMap<String, IAParameter>());
 		}
-
+//		view = new AParameterEnsembleView(this);
 	}
 
+	// TODO: Add to view
 	@Override
 	public Boolean isFeasable()
 	{
@@ -51,6 +51,7 @@ public class AParameterEnsemble extends ABasicDataObject implements IAParameterE
 		{
 			parametersMap.put(parameter.getName(), parameter);
 		}
+		dataChanged(new ADataEvent(this, AConstants.ENSEMBLE_PARAMETERS));
 	}
 
 	@Override
@@ -60,6 +61,7 @@ public class AParameterEnsemble extends ABasicDataObject implements IAParameterE
 		{
 			parametersMap.remove(name);
 		}
+		dataChanged(new ADataEvent(this, AConstants.ENSEMBLE_PARAMETERS));
 	}
 
 	@Override
@@ -69,6 +71,7 @@ public class AParameterEnsemble extends ABasicDataObject implements IAParameterE
 		{
 			parametersMap.clear();
 		}
+		dataChanged(new ADataEvent(this, AConstants.ENSEMBLE_PARAMETERS));
 	}
 
 	@Override
@@ -117,53 +120,44 @@ public class AParameterEnsemble extends ABasicDataObject implements IAParameterE
 	}
 
 	@Override
-	public JComponent getView()
+	public String getName()
+	{
+		return name;
+	}
+	
+	@Override
+	public void dataChanged(ADataEvent e)
+	{
+		super.dataChanged(e);
+		for (IAParameter parameter : parametersMap.values())
+		{
+			parameter.dataChanged(e);
+		}
+	}
+
+	@Override
+	public void setName(String name)
 	{
 		synchronized (mutex)
 		{
-			final JComponent component = new JPanel(new GridBagLayout());
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					Insets insets = new Insets(2, 2, 2, 2);
-					int x = 0;
-
-					for (IAParameter parameter : getParameters().values())
-					{
-						component.add(parameter.getView(),
-								new GridBagConstraints(0, x, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
-						x++;
-					}
-					component.add(new JPanel(),
-							new GridBagConstraints(0, x, GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
-
-					component.updateUI();
-					component.validate();
-				}
-			});
-
-			return component;
+			this.name = name;
 		}
-		//		
+		dataChanged(new ADataEvent(this, AConstants.ENSEMBLE_NAME));
 	}
 
-	/**
-	 * Test View
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args)
+	@Override
+	public void setEditable(Boolean editable)
 	{
-		AParameterEnsemble ens = new AParameterEnsemble();
-		ens.addParameter(new ABasicParameter("Parameter", Double.class, 5.0));
-		ens.addParameter(new ABasicParameter("Parameter2", Double.class, 5.0));
-		ens.addParameter(new ABasicParameter("Parameter3", Double.class, 5.0));
+		super.setEditable(editable);
+		for (IAParameter parameter : getParameters().values())
+		{
+			parameter.setEditable(editable);
+		}
+	}
 
-		JFrame frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(1024, 786);
-		frame.add(ens.getView());
-		frame.setVisible(true);
+	@Override
+	public String toString()
+	{
+		return "AParamterEnsemble: " + "name=" + getName() + ", " + "parameters=" + getParameters();
 	}
 }

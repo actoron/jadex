@@ -1,5 +1,8 @@
 package jadex.simulation.analysis.common.dataObjects;
 
+import jadex.simulation.analysis.common.events.ADataEvent;
+import jadex.simulation.analysis.common.events.ADataListener;
+
 import java.util.UUID;
 
 import javax.swing.JComponent;
@@ -13,21 +16,14 @@ public interface IADataObject
 	 * @param editable
 	 *            Flag for editable
 	 */
-	public void setEditable(boolean editable);
+	void setEditable(Boolean editable);
 
 	/**
 	 * Returns if this {@link IADataObject} is editable. Default is true.
 	 * 
 	 * @return Flag for editable field
 	 */
-	public boolean isEditable();
-
-	/**
-	 * Returns the view of the dataObject. May be null, if no view is supported
-	 * 
-	 * @return View of the dataObject
-	 */
-	public JComponent getView();
+	public Boolean isEditable();
 
 	/**
 	 * Synchronize Object of the {@link IADataObject}
@@ -43,4 +39,21 @@ public interface IADataObject
 	 */
 	public UUID getID();
 
+	/**
+	 * Adds a Listener, who observe the state of the object
+	 * @param listener the {@link ADataListener} to add
+	 */
+	public void addDataListener(ADataListener listener);
+	
+	/**
+	 * Removes a Listener, who observe the state of the object
+	 * @param listener the {@link ADataListener} to remove
+	 */
+	public void removeDataListener(ADataListener listener);
+	
+	/**
+	 * Indicates a change in data
+	 * @param event of the change
+	 */
+	public void dataChanged(ADataEvent e);
 }

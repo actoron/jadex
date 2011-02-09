@@ -1,10 +1,15 @@
 package jadex.simulation.analysis.common.dataObjects;
 
+import javax.swing.JFrame;
+
+import jadex.simulation.analysis.common.dataObjects.Factories.AExperimentFactory;
 import jadex.simulation.analysis.common.dataObjects.parameter.AParameterEnsemble;
+import jadex.simulation.analysis.common.dataObjects.parameter.AParameterEnsembleView;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameter;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
+import jadex.simulation.analysis.common.events.ADataEvent;
 
-public class AExperimentalFrame extends ABasicDataObject implements IAExperimentalFrame
+public class AExperiment extends ABasicDataObject implements IAExperiment
 {
 
 	private IAModel model;
@@ -12,15 +17,20 @@ public class AExperimentalFrame extends ABasicDataObject implements IAExperiment
 	private IAParameterEnsemble inputParameters = new AParameterEnsemble();
 	private IAParameterEnsemble outputParameters = new AParameterEnsemble();
 
-	public AExperimentalFrame(IAModel model, IAParameterEnsemble expParameters, IAParameterEnsemble inputParameters, IAParameterEnsemble outputParameters)
+	public AExperiment(IAModel model, IAParameterEnsemble expParameters, IAParameterEnsemble inputParameters, IAParameterEnsemble outputParameters)
 	{
+		expParameters.setName("Experimentparameter");
+		inputParameters.setName("Inputparameter");
+		outputParameters.setName("Outputparameter");
+		
 		setModel(model);
 		setExperimentParamters(expParameters);
 		setInputParamters(inputParameters);
 		setOutputParamters(outputParameters);
+//		view = new AExperimentView(this);
 	}
 
-	// ------ IAExperimentalFrame ------
+	// ------ IAExperiment ------
 
 	// model
 
@@ -158,5 +168,16 @@ public class AExperimentalFrame extends ABasicDataObject implements IAExperiment
 		{
 			expParameters = parameters;
 		}
+	}
+	
+	@Override
+	public void dataChanged(ADataEvent e)
+	{
+		super.dataChanged(e);
+		
+		model.dataChanged(e);
+		expParameters.dataChanged(e);
+		inputParameters.dataChanged(e);
+		outputParameters.dataChanged(e);
 	}
 }

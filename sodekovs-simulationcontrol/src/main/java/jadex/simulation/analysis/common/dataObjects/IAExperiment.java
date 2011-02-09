@@ -3,7 +3,7 @@ package jadex.simulation.analysis.common.dataObjects;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameter;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
 
-public interface IAExperimentalFrame extends IADataObject
+public interface IAExperiment extends IADataObject
 {
 	public IAModel getModel();
 

@@ -1,35 +1,20 @@
 package jadex.simulation.analysis.common.dataObjects.parameter;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import jadex.simulation.analysis.common.dataObjects.Factories.ADataViewFactory;
+
 import java.util.Collections;
 import java.util.Set;
 
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 
 public class AConstraintParameter extends ABasicParameter implements IAConstraintParameter
 {
 	protected Set<IAConstraint> constraints;
 
-	public AConstraintParameter(String name, Class type)
-	{
-		super(name, type);
-	}
-
 	public AConstraintParameter(String name, Class type, Object value)
 	{
-		this(name, type);
-		setValue(value);
+		super(name, type, value);
+		// setValue(value);
 	}
 
 	public AConstraintParameter(String name, Class type, Object value, Set<IAConstraint> constraints)
@@ -110,23 +95,6 @@ public class AConstraintParameter extends ABasicParameter implements IAConstrain
 		}
 	}
 
-	@Override
-	public JComponent getView()
-	{
-		synchronized (mutex)
-		{
-			final JComponent component = super.getView();
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-
-				}
-			});
-			return component;
-		}
-	}
-
 	/**
 	 * Test View
 	 * 
@@ -138,7 +106,7 @@ public class AConstraintParameter extends ABasicParameter implements IAConstrain
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(1024, 786);
-		frame.add(para.getView());
+		frame.add(ADataViewFactory.createParameterView(para).getComponent());
 		frame.setVisible(true);
 	}
 }

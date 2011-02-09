@@ -1,19 +1,18 @@
 package jadex.simulation.analysis.buildingBlocks.simulation.dummy;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.swing.JFrame;
-
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.bdi.runtime.ICapability;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.service.BasicService;
 import jadex.simulation.analysis.buildingBlocks.simulation.IExecuteExperimentService;
-import jadex.simulation.analysis.common.dataObjects.IAExperimentJob;
+import jadex.simulation.analysis.common.dataObjects.IAExperiment;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.swing.JFrame;
 
 /**
  * Implementation of a dummy service for (single) experiments.
@@ -41,11 +40,11 @@ public class DummyExperimentService extends BasicService implements IExecuteExpe
 
 
 	@Override
-	public IFuture executeExperiment(IAExperimentJob expJob) {
+	public IFuture executeExperiment(IAExperiment exp) {
 		System.out.println("#Execute Dummy Simulation ...");
 		System.out.println("#... done!");
 		Future res = new Future();
-		res.setResult(expJob);
+		res.setResult(exp);
 		return res;
 	}
 

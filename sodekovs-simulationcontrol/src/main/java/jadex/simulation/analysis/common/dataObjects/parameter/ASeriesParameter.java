@@ -4,9 +4,9 @@ public class ASeriesParameter<E extends Number> extends ABasicParameter implemen
 {
 
 	// TODO
-	public ASeriesParameter(String name, Class type)
+	public ASeriesParameter(String name, Class type, Object value)
 	{
-		super(name, type);
+		super(name, type, value);
 		// TODO Auto-generated constructor stub
 	}
 

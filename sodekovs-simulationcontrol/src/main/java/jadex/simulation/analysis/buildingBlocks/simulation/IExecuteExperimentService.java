@@ -1,12 +1,12 @@
 package jadex.simulation.analysis.buildingBlocks.simulation;
 
+import jadex.commons.IFuture;
+import jadex.commons.service.IService;
+import jadex.simulation.analysis.common.dataObjects.IAExperiment;
+
 import java.util.Set;
 
 import javax.swing.JFrame;
-
-import jadex.commons.IFuture;
-import jadex.commons.service.IService;
-import jadex.simulation.analysis.common.dataObjects.IAExperimentJob;
 
 /**
  *  The simulation execution interface for executing (single) experiments.
@@ -16,9 +16,9 @@ public interface IExecuteExperimentService	extends IService
 
 	/**
 	 *  Execute a experiment
-	 *  @param expJob {@link IAExperimentJob}
+	 *  @param exp {@link IAExperiment}
 	 */
-	public IFuture executeExperiment(IAExperimentJob expJob);
+	public IFuture executeExperiment(IAExperiment exp);
 	
 	/**
 	 * Return the model which the service support

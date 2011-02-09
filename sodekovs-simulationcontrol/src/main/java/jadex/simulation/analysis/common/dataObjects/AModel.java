@@ -1,11 +1,10 @@
 package jadex.simulation.analysis.common.dataObjects;
 
-import com.sun.media.datasink.BasicDataSink;
-
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
 import jadex.simulation.analysis.common.dataObjects.parameter.AParameterEnsemble;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameter;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
+import jadex.simulation.analysis.common.events.ADataEvent;
+import jadex.simulation.analysis.common.util.AConstants;
 
 public class AModel extends ABasicDataObject implements IAModel
 {
@@ -25,6 +24,10 @@ public class AModel extends ABasicDataObject implements IAModel
 			this.inputParameters = inputParameters;
 		if (outputParameters != null)
 			this.outputParameters = outputParameters;
+		
+		this.inputParameters.setName("Inputparameter");
+		this.outputParameters.setName("Outputparameter");
+//		view = new AModelView(this);
 	}
 
 	public AModel(String name, String type)
@@ -48,7 +51,9 @@ public class AModel extends ABasicDataObject implements IAModel
 		synchronized (name)
 		{
 			this.name = name;
+			System.out.println(getName() + ": name=" + name);
 		}
+		dataChanged(new ADataEvent(this, AConstants.MODEL_NAME));
 	}
 
 	// Type
@@ -64,7 +69,9 @@ public class AModel extends ABasicDataObject implements IAModel
 		synchronized (name)
 		{
 			this.type = type;
+			System.out.println(getName() + ": type=" + type);
 		}
+		dataChanged(new ADataEvent(this, AConstants.MODEL_TYPE));
 	}
 
 	// Input
@@ -149,5 +156,14 @@ public class AModel extends ABasicDataObject implements IAModel
 		{
 			outputParameters.addParameter(parameter);
 		}
+	}
+	
+	@Override
+	public void dataChanged(ADataEvent e)
+	{
+		super.dataChanged(e);
+		
+		inputParameters.dataChanged(e);
+		outputParameters.dataChanged(e);
 	}
 }

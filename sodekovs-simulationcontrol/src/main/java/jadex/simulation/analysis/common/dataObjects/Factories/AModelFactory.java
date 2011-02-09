@@ -27,13 +27,13 @@ public class AModelFactory
 			inputParameters.addParameter(new AConstraintParameter("population", Double.class, 100d));
 			inputParameters.addParameter(new AConstraintParameter("diffusion-rate", Double.class, 40d));
 			inputParameters.addParameter(new AConstraintParameter("evaporation-rate", Double.class, 10d));
-			outputParameters.addParameter(new AConstraintParameter("ticks", Double.class));
+			outputParameters.addParameter(new AConstraintParameter("ticks", Double.class, 0d));
 		}
 		else if (type.equals("desmoJ"))
 		{
 			modelName = "VancarrierModel";
 			inputParameters.addParameter(new AConstraintParameter("vcNumber", Integer.class, 2));
-			outputParameters.addParameter(new AConstraintParameter("ticks", String.class));
+			outputParameters.addParameter(new AConstraintParameter("ticks", String.class, ""));
 		}
 		else
 		{

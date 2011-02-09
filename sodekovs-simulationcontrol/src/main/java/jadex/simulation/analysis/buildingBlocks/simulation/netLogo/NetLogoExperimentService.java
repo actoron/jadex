@@ -5,7 +5,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.service.BasicService;
 import jadex.simulation.analysis.buildingBlocks.simulation.IExecuteExperimentService;
-import jadex.simulation.analysis.common.dataObjects.IAExperimentJob;
+import jadex.simulation.analysis.common.dataObjects.IAExperiment;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameter;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
 
@@ -49,9 +49,9 @@ public class NetLogoExperimentService extends BasicService implements IExecuteEx
 	/**
 	 * Simulate an experiment
 	 */
-	public IFuture executeExperiment(final IAExperimentJob expJob) {
+	public IFuture executeExperiment(final IAExperiment exp) {
 		final Future res = new Future();
-		if ((Boolean)expJob.getExperimentalFrame().getExperimentParameter("visualisation").getValue())
+		if ((Boolean)exp.getExperimentParameter("visualisation").getValue())
 		{		
 			try 
 	        {
@@ -60,27 +60,27 @@ public class NetLogoExperimentService extends BasicService implements IExecuteEx
                     { public void run() {
                         try {
                         	String filePre = new File("..").getCanonicalPath() + "/sodekovs-simulationcontrol/src/main/java/jadex/simulation/analysis/models";
-							String fileName = filePre + "/netLogo/" + expJob.getModel().getName();
+							String fileName = filePre + "/netLogo/" + exp.getModel().getName();
                           comp.open(fileName);
                         }
                         catch(Exception ex) {
                           ex.printStackTrace();
                         }
                     } } ) ;
-            IAParameterEnsemble inputPara = expJob.getModel().getInputParameters();
+            IAParameterEnsemble inputPara = exp.getModel().getInputParameters();
             for (IAParameter parameter : inputPara.getParameters().values()) {
 				String comm = "set " + parameter.getName() + " " + parameter.getValue().toString();
 				comp.command(comm);
 			}
 
             Integer rep = 0;
-			Integer replicationen = (Integer) expJob.getExperimentalFrame().getExperimentParameter("wiederholungen").getValue();
+			Integer replicationen = (Integer) exp.getExperimentParameter("wiederholungen").getValue();
 			
 			while(rep < replicationen)
 			{
 				comp.command("setup");
 		        comp.command("go");
-		        expJob.getExperimentalFrame().getOutputParameter("ticks").setValue(comp.report("ticks"));
+		        exp.getOutputParameter("ticks").setValue(comp.report("ticks"));
 				rep++;
 			}
 			}
@@ -93,27 +93,27 @@ public class NetLogoExperimentService extends BasicService implements IExecuteEx
 				HeadlessWorkspace.newInstance();
 		try {
 			String filePre = new File("..").getCanonicalPath() + "/sodekovs-simulationcontrol/src/main/java/jadex/simulation/analysis/model";
-			String FileName = filePre + "/netLogo/" + expJob.getModel().getName();
+			String FileName = filePre + "/netLogo/" + exp.getModel().getName();
 			compLite.append("### netLogo 4.1.2 ###");
 			compLite.append("Open file" + FileName + "\n");
 			
 			workspace.open(FileName);
-			 IAParameterEnsemble inputPara = expJob.getModel().getInputParameters();
+			 IAParameterEnsemble inputPara = exp.getModel().getInputParameters();
 	            for (IAParameter parameter : inputPara.getParameters().values()) {
 					String comm = "set " + parameter.getName() + " " + parameter.getValue().toString();
 					workspace.command(comm);
 				}
 	          
 	            Integer rep = 0;
-				Integer replicationen = (Integer) expJob.getExperimentalFrame().getExperimentParameter("wiederholungen").getValue();
+				Integer replicationen = (Integer) exp.getExperimentParameter("wiederholungen").getValue();
 				
 				while(rep < replicationen)
 				{
-					compLite.append("Start " +  expJob.getModel().getName() + "\n");
+					compLite.append("Start " +  exp.getModel().getName() + "\n");
 					workspace.command("setup");
 					workspace.command("go");
-			        expJob.getExperimentalFrame().getOutputParameter("ticks").setValue(workspace.report("ticks"));
-					compLite.append("End " +  expJob.getModel().getName() + "\n");
+			        exp.getOutputParameter("ticks").setValue(workspace.report("ticks"));
+					compLite.append("End " +  exp.getModel().getName() + "\n");
 					rep++;
 				}
 			
@@ -122,7 +122,7 @@ public class NetLogoExperimentService extends BasicService implements IExecuteEx
 			ex.printStackTrace();
 		}
 		}
-		res.setResult(expJob);
+		res.setResult(exp);
 		return res;
 	}
 

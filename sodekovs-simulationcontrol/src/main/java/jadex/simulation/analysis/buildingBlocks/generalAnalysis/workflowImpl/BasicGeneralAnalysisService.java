@@ -15,8 +15,7 @@ import jadex.simulation.analysis.buildingBlocks.generalAnalysis.IGeneralAnalysis
 import jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.view.BasicGeneralAnalysisServiceView;
 import jadex.simulation.analysis.buildingBlocks.simulation.IModelInspectionService;
 import jadex.simulation.analysis.common.dataObjects.AModel;
-import jadex.simulation.analysis.common.dataObjects.IAExperimentJob;
-import jadex.simulation.analysis.common.dataObjects.IAExperimentalFrame;
+import jadex.simulation.analysis.common.dataObjects.IAExperiment;
 import jadex.simulation.analysis.common.dataObjects.IAModel;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
 
@@ -37,7 +36,7 @@ public class BasicGeneralAnalysisService extends BasicService implements IGenera
 {
 
 	private IAModel model = null;
-	private IAExperimentalFrame expFrame = null;
+	private IAExperiment expFrame = null;
 	private BpmnInterpreter instance;
 
 	private BasicGeneralAnalysisServiceView view;
@@ -119,10 +118,10 @@ public class BasicGeneralAnalysisService extends BasicService implements IGenera
 			if (iModelService.supportedModels().contains(modelType)) service = iModelService;
 		}
 
-		IFuture iParaFut = service.modelParamter(modelName);
+		IFuture iParaFut = service.inputParamter(modelName);
 		IAParameterEnsemble inputParameter = (IAParameterEnsemble) iParaFut.get(susThread);
 
-		IFuture oParaFut = service.resultParamter(modelName);
+		IFuture oParaFut = service.outputParamter(modelName);
 		IAParameterEnsemble outputParameter = (IAParameterEnsemble) oParaFut.get(susThread);
 		IAModel model = new AModel(modelName, modelType, inputParameter, outputParameter);
 
@@ -157,7 +156,7 @@ public class BasicGeneralAnalysisService extends BasicService implements IGenera
 		return new Future(model);
 	}
 
-	public void setExpFrame(IAExperimentalFrame expFrame)
+	public void setExpFrame(IAExperiment expFrame)
 	{
 		this.expFrame = expFrame;
 	}
@@ -177,7 +176,7 @@ public class BasicGeneralAnalysisService extends BasicService implements IGenera
 		view.experimentieren(comp);
 	}
 
-	public void present(IAExperimentJob job)
+	public void present(IAExperiment job)
 	{
 		view.present(job);
 	}

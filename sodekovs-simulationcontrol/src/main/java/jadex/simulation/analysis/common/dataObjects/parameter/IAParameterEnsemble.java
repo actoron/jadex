@@ -1,17 +1,18 @@
 package jadex.simulation.analysis.common.dataObjects.parameter;
 
 import jadex.simulation.analysis.common.dataObjects.IADataObject;
+import jadex.simulation.analysis.common.dataObjects.IADataObjectView;
 
 import java.util.Map;
-
-import javax.swing.JComponent;
 
 public interface IAParameterEnsemble extends IADataObject
 {
 	// TODO: Comment
-	public Boolean isFeasable();
+	public void setName(String name);
 
-	public JComponent getView();
+	public String getName();
+
+	public Boolean isFeasable();
 
 	public void setValue(String name, Object value);
 
@@ -32,4 +33,5 @@ public interface IAParameterEnsemble extends IADataObject
 	public Integer numberOfParameters();
 
 	public boolean hasParameters();
+
 }

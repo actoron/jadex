@@ -1,4 +1,4 @@
-package jadex.simulation.analysis.common.workflowTasks;
+package jadex.simulation.analysis.common.workflow.tasks;
 
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
@@ -6,7 +6,7 @@ import jadex.bpmn.runtime.ITaskContext;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.BasicGeneralAnalysisService;
-import jadex.simulation.analysis.common.dataObjects.IAExperimentJob;
+import jadex.simulation.analysis.common.dataObjects.IAExperiment;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,8 +25,8 @@ public class PresentParameterTask implements ITask
 		final Future ret = new Future();
 
 		final BasicGeneralAnalysisService expService = (BasicGeneralAnalysisService) instance.getContextVariable("service");
-		IAExperimentJob expJob = (IAExperimentJob) context.getParameterValue("job");
-		expService.present(expJob);
+		IAExperiment exp = (IAExperiment) context.getParameterValue("job");
+		expService.present(exp);
 
 		expService.registerListener(new ActionListener()
 		{

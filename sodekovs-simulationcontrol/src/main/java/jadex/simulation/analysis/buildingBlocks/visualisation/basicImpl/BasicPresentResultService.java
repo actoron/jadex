@@ -5,7 +5,7 @@ import jadex.commons.IFuture;
 import jadex.commons.service.BasicService;
 import jadex.simulation.analysis.buildingBlocks.simulation.IExecuteExperimentService;
 import jadex.simulation.analysis.buildingBlocks.visualisation.IPresentResultService;
-import jadex.simulation.analysis.common.dataObjects.IAExperimentalFrame;
+import jadex.simulation.analysis.common.dataObjects.IAExperiment;
 
 public class BasicPresentResultService extends BasicService implements IPresentResultService{
 
@@ -17,7 +17,7 @@ public class BasicPresentResultService extends BasicService implements IPresentR
 	}
 
 	@Override
-	public IFuture presentResult(IAExperimentalFrame result)
+	public IFuture presentResult(IAExperiment result)
 	{
 		// TODO Auto-generated method stub
 		return null;

@@ -5,13 +5,13 @@ import jadex.simulation.analysis.common.dataObjects.IADataObject;
 public interface IAParameter extends IADataObject
 {
 	// TODO: Comment
-	void setName(String name);
+	// void setName(String name);
 
 	public String getName();
 
 	public Class getValueClass();
 
-	void setValueClass(Class type);
+	// void setValueClass(Class type);
 
 	public boolean isFeasable();
 
@@ -19,4 +19,7 @@ public interface IAParameter extends IADataObject
 
 	public Object getValue();
 
+	public Boolean isUsage();
+
+	void setUsage(Boolean usage);
 }

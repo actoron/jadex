@@ -22,7 +22,7 @@ public class NetLogoModelService extends BasicService implements IModelInspectio
 	}
 
 	@Override
-	public IFuture modelParamter(String name) {
+	public IFuture inputParamter(String name) {
 		Future res = new Future();
 		
 		// TODO: Search right Model (globals in netLogo model)
@@ -35,12 +35,12 @@ public class NetLogoModelService extends BasicService implements IModelInspectio
 	}
 	
 	@Override
-	public IFuture resultParamter(String name) {
+	public IFuture outputParamter(String name) {
 		Future res = new Future();
 		
 		// TODO: Search right Model
 		IAParameterEnsemble paramters = new AParameterEnsemble();
-		paramters.addParameter(new ABasicParameter("ticks", Double.class));
+		paramters.addParameter(new ABasicParameter("ticks", Double.class, 0d));
 		res.setResult(paramters);
 		return res;
 	}

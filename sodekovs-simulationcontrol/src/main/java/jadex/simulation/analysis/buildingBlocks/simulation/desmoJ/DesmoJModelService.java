@@ -24,7 +24,7 @@ public class DesmoJModelService extends BasicService implements IModelInspection
 	}
 
 	@Override
-	public IFuture modelParamter(String name) {
+	public IFuture inputParamter(String name) {
 		Future res = new Future();
 		
 		// TODO: Search right Model (DesmoJ Reflect)
@@ -35,12 +35,12 @@ public class DesmoJModelService extends BasicService implements IModelInspection
 	}
 	
 	@Override
-	public IFuture resultParamter(String name) {
+	public IFuture outputParamter(String name) {
 		Future res = new Future();
 		
 		// TODO: Search right Model (DesmoJ Reflect)
 		IAParameterEnsemble paramters = new AParameterEnsemble();
-		paramters.addParameter(new ABasicParameter("zeit", Double.class));
+		paramters.addParameter(new ABasicParameter("zeit", Double.class, 0d));
 		res.setResult(paramters);
 		return res;
 	}

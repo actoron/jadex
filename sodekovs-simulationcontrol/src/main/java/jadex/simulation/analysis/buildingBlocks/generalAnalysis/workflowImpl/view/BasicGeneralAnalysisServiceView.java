@@ -4,10 +4,10 @@ import jadex.commons.IFuture;
 import jadex.commons.ThreadSuspendable;
 import jadex.simulation.analysis.buildingBlocks.generalAnalysis.IGeneralAnalysisService;
 import jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.BasicGeneralAnalysisService;
-import jadex.simulation.analysis.common.dataObjects.IAExperimentJob;
-import jadex.simulation.analysis.common.dataObjects.IAExperimentalFrame;
+import jadex.simulation.analysis.common.dataObjects.IAExperiment;
 import jadex.simulation.analysis.common.dataObjects.IAModel;
-import jadex.simulation.analysis.common.dataObjects.Factories.AExperimentalFrameFactory;
+import jadex.simulation.analysis.common.dataObjects.Factories.AExperimentFactory;
+import jadex.simulation.analysis.common.dataObjects.Factories.ADataViewFactory;
 import jadex.simulation.analysis.common.dataObjects.parameter.ABasicParameter;
 import jadex.simulation.analysis.common.dataObjects.parameter.AParameterEnsemble;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
@@ -30,6 +30,8 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 
 /**
  * The view for the explore service
@@ -53,6 +55,7 @@ public class BasicGeneralAnalysisServiceView extends JTabbedPane // implements I
 	{
 		super();
 		exploreService = (BasicGeneralAnalysisService) service;
+		exploreService.registerView(this);
 	}
 
 	/*
@@ -62,55 +65,15 @@ public class BasicGeneralAnalysisServiceView extends JTabbedPane // implements I
 	public void init()
 	{
 		// TODO: Use Interface
-		exploreService.registerView(this);
+		
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
 				modelcomp = new JPanel(new GridBagLayout());
 
-				JLabel inputLabel = new JLabel("Modell setzen:");
-				inputLabel.setPreferredSize(new Dimension(200, 30));
-				Insets insets = new Insets(2, 2, 2, 2);
-				modelcomp.add(inputLabel, new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 
-				JLabel modelNameLabel = new JLabel("Modellname");
-				modelNameLabel.setPreferredSize(new Dimension(200, 30));
-				final JTextField modelNameField = new JTextField("VancarrierModel");
-				modelNameField.setEditable(true);
-				modelNameField.setPreferredSize(new Dimension(300, 30));
-				modelcomp.add(modelNameLabel, new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
-				modelcomp.add(modelNameField,
-						new GridBagConstraints(1, 1, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
-
-				JLabel modelTypeLabel = new JLabel("Modelltype");
-				modelTypeLabel.setPreferredSize(new Dimension(200, 30));
-				String[] typeString = { "netLogo", "desmoJ" };
-				final JComboBox modelTypeCombo = new JComboBox(typeString);
-				modelTypeCombo.setSelectedIndex(1);
-
-				modelTypeCombo.setPreferredSize(new Dimension(300, 30));
-				modelcomp.add(modelTypeLabel, new GridBagConstraints(0, 2, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
-
-				modelcomp.add(modelTypeCombo,
-						new GridBagConstraints(1, 2, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
-
-				JButton refreshButton = new JButton("Suche Parameter für Modell");
-				refreshButton.setPreferredSize(new Dimension(200, 30));
-				refreshButton.addActionListener(new ActionListener()
-				{
-
-					@Override
-					public void actionPerformed(ActionEvent e)
-					{
-						IFuture modFut = exploreService.getModelParameter(modelNameField.getText(), (String) modelTypeCombo.getSelectedItem());
-						setModel((IAModel) modFut.get(susThread));
-					}
-				});
-				modelcomp.add(refreshButton, new GridBagConstraints(0, 3, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
-
-				freePanel = new JPanel();
-				modelcomp.add(freePanel, new GridBagConstraints(0, 4, GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
+				
 				addTab("Modell", null, modelcomp);
 				setSelectedComponent(modelcomp);
 				modelcomp.validate();
@@ -145,13 +108,14 @@ public class BasicGeneralAnalysisServiceView extends JTabbedPane // implements I
 				// 0, 0));
 				// x++;
 
-				JLabel inputLabel = new JLabel("Inputparameter:");
-				inputLabel.setPreferredSize(new Dimension(100, 30));
-				modelcomp.add(inputLabel, new GridBagConstraints(0, x, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
-				paraSet.add(inputLabel);
-				x++;
+//				JLabel inputLabel = new JLabel("Inputparameter:");
+//				inputLabel.setPreferredSize(new Dimension(100, 30));
+//				modelcomp.add(inputLabel, new GridBagConstraints(0, x, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
+//				paraSet.add(inputLabel);
+//				x++;
 
-				JComponent input = model.getInputParameters().getView();
+				JComponent input = ADataViewFactory.createView(model.getInputParameters()).getComponent();
+				input.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Inputparameter "));
 				paraSet.add(input);
 				modelcomp.add(input, new GridBagConstraints(0, x, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 				x++;
@@ -162,7 +126,7 @@ public class BasicGeneralAnalysisServiceView extends JTabbedPane // implements I
 				paraSet.add(outputLabel);
 				x++;
 
-				JComponent output = model.getOutputParameters().getView();
+				JComponent output = ADataViewFactory.createView(model.getOutputParameters()).getComponent();
 				paraSet.add(output);
 				modelcomp.add(output, new GridBagConstraints(0, x, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 				x++;
@@ -236,18 +200,6 @@ public class BasicGeneralAnalysisServiceView extends JTabbedPane // implements I
 				expcomp.add(modelLabel, new GridBagConstraints(0, x, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 				x++;
 
-				// final IAModel model = (IAModel)exploreService.getModel().get(new ThreadSuspendable(this));
-				// IAParameterEnsemble mPara = model.createExperimentalFrame(new AParameterEnsemble()).getInputParameters();
-				// JComponent output = new JLabel("Keine variablen Modellparameter");
-				// output.setPreferredSize(new Dimension(300, 30));
-				// if(!mPara.isEmpty())
-				// {
-				// output = mPara.getView();
-				// }
-				//				
-				// expcomp.add(output, new GridBagConstraints(0, x, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
-				// x++;
-
 				JButton expButton = new JButton("Setzte Experimenteller Rahmen");
 				expButton.setPreferredSize(new Dimension(200, 30));
 				expButton.addActionListener(new ActionListener()
@@ -259,8 +211,8 @@ public class BasicGeneralAnalysisServiceView extends JTabbedPane // implements I
 						IAParameterEnsemble expParameters = new AParameterEnsemble();
 						expParameters.addParameter(new ABasicParameter("wiederholungen", Integer.class, new Integer(replicationField.getText())));
 						expParameters.addParameter(new ABasicParameter("visualisation", Boolean.class, new Boolean(visBox.isSelected())));
-						IAExperimentalFrame expFrame = AExperimentalFrameFactory.createExperimentalFrame((IAModel) exploreService.getModel().get(susThread), expParameters);
-						exploreService.setExpFrame(expFrame);
+						IAExperiment exp = AExperimentFactory.createExperiment((IAModel) exploreService.getModel().get(susThread), expParameters);
+						exploreService.setExpFrame(exp);
 						exploreService.signal(new ActionEvent(this, 2, "expSet"));
 					}
 				});
@@ -303,7 +255,7 @@ public class BasicGeneralAnalysisServiceView extends JTabbedPane // implements I
 	 * (non-Javadoc)
 	 * @see jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.view.IGeneralAnalysisServiceView#present(jadex.simulation.analysis.common.dataObjects.IAExperimentJob)
 	 */
-	public void present(final IAExperimentJob job)
+	public void present(final IAExperiment job)
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -316,7 +268,7 @@ public class BasicGeneralAnalysisServiceView extends JTabbedPane // implements I
 				inputLabel.setPreferredSize(new Dimension(200, 30));
 				present.add(inputLabel, new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 
-				JComponent output = job.getExperimentalFrame().getOutputParameters().getView();
+				JComponent output = ADataViewFactory.createView(job.getOutputParameters()).getComponent();
 				present.add(output, new GridBagConstraints(0, 1, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 
 				JButton runExperiment = new JButton(" OK ");

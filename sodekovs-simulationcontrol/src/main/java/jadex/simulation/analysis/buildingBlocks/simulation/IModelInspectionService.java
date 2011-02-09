@@ -15,13 +15,13 @@ public interface IModelInspectionService	extends IService
 	 *  get ModelParamter for Model
 	 *  @param name Name of model
 	 */
-	public IFuture modelParamter(String name);
+	public IFuture inputParamter(String name);
 	
 	/**
 	 *  get ResultParamter for Model
 	 *  @param name Name of model
 	 */
-	public IFuture resultParamter(String name);
+	public IFuture outputParamter(String name);
 	
 	/**
 	 * Return the model which the service support

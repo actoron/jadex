@@ -1,53 +1,34 @@
 package jadex.simulation.analysis.common.dataObjects;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.util.UUID;
+import jadex.simulation.analysis.common.events.ADataEvent;
+import jadex.simulation.analysis.common.events.ADataListener;
+import jadex.simulation.analysis.common.util.AConstants;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class ABasicDataObject implements IADataObject
 {
 	private UUID id = UUID.randomUUID();
-	private boolean editable = true;
+	private Boolean editable = Boolean.TRUE;
 	protected Object mutex = new Object();
+	protected Set<ADataListener> listeners = new HashSet<ADataListener>();
 
 	@Override
-	public void setEditable(boolean editable)
+	public void setEditable(Boolean editable)
 	{
 		synchronized (mutex)
 		{
 			this.editable = editable;
 		}
-
+		dataChanged(new ADataEvent(this, AConstants.DATA_EDITABLE));
 	}
 
 	@Override
-	public boolean isEditable()
+	public Boolean isEditable()
 	{
 		return editable;
-	}
-
-	@Override
-	public JComponent getView()
-	{
-		synchronized (mutex)
-		{
-			final JComponent component = new JPanel(new GridBagLayout());
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					JComponent freePanel = new JPanel();
-					component.add(freePanel, new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-				}
-			});
-			return component;
-		}
-
 	}
 
 	public Object getMutex()
@@ -60,4 +41,30 @@ public class ABasicDataObject implements IADataObject
 		return id;
 	}
 
+	public void addDataListener(ADataListener listener)
+	{
+		synchronized (mutex)
+		{
+			listeners.add(listener);
+		}
+	}
+
+	public void removeDataListener(ADataListener listener)
+	{
+		synchronized (mutex)
+		{
+			listeners.remove(listener);
+		}
+	}
+
+	public void dataChanged(ADataEvent e)
+	{
+		synchronized (mutex)
+		{
+			for (ADataListener listener : listeners)
+			{
+				listener.dataEventOccur(e);
+			}
+		}
+	}
 }

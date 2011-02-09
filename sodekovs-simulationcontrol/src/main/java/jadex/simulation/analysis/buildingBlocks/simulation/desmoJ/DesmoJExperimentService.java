@@ -6,7 +6,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.service.BasicService;
 import jadex.simulation.analysis.buildingBlocks.simulation.IExecuteExperimentService;
-import jadex.simulation.analysis.common.dataObjects.IAExperimentJob;
+import jadex.simulation.analysis.common.dataObjects.IAExperiment;
 import jadex.simulation.analysis.models.desmoJ.VancarrierModel.VancarrierModel;
 
 import java.util.HashSet;
@@ -44,32 +44,32 @@ public class DesmoJExperimentService extends BasicService implements IExecuteExp
 	/**
 	 * Simulate an experiment
 	 */
-	public IFuture executeExperiment(IAExperimentJob expJob) {
+	public IFuture executeExperiment(IAExperiment exp) {
 		final Future res = new Future();
 
 		//TODO find Model class
 		comp.append("***** DESMO-J version 2.2.0 ***** " + "\n");
 		VancarrierModel model = new VancarrierModel();
-		Experiment exp = new Experiment(expJob.getModel().getName());
+		Experiment expDesmo = new Experiment(exp.getModel().getName());
 		
-		model.connectToExperiment(exp);
-		exp.setShowProgressBar(false);
-		exp.stop(new SimTime(10000));
+		model.connectToExperiment(expDesmo);
+		expDesmo.setShowProgressBar(false);
+		expDesmo.stop(new SimTime(10000));
 		 Integer rep = 0;
-			Integer replicationen = (Integer) expJob.getExperimentalFrame().getExperimentParameter("wiederholungen").getValue();
+			Integer replicationen = (Integer) exp.getExperimentParameter("wiederholungen").getValue();
 			
 			while(rep < replicationen)
 			{
-				comp.append(expJob.getModel().getName() + " starts at simulation time 0.0000" + "\n");
-				exp.start();
+				comp.append(exp.getModel().getName() + " starts at simulation time 0.0000" + "\n");
+				expDesmo.start();
 				comp.append(" ...please wait... "+ "\n");
-				exp.finish();
-				comp.append(expJob.getModel().getName() + " stopped at simulation time 10000.0000" + "\n");
-				expJob.getExperimentalFrame().getOutputParameter("zeit").setValue(10000);
+				expDesmo.finish();
+				comp.append(exp.getModel().getName() + " stopped at simulation time 10000.0000" + "\n");
+				exp.getOutputParameter("zeit").setValue(10000d);
 				comp.append("\n");
 				rep++;
 			}
-		res.setResult(expJob);
+		res.setResult(expDesmo);
 		return res;
 	}
 
