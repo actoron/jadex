@@ -165,11 +165,11 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 						FileSystemView view = FileSystemView.getFileSystemView();      
 						Icon icon = view.getSystemIcon(file);   
 						ff.setIcon(icon);
-						menu.add(ff);
 					}
 					catch(Exception e)
 					{
 					}
+					menu.add(ff);
 					ff.addActionListener(new ActionListener()
 					{
 						public void actionPerformed(ActionEvent e)

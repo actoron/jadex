@@ -34,9 +34,40 @@ public class DefaultIconCache implements IIconCache
 			RemoteFile rf = ((RemoteFileNode)node).getRemoteFile();
 			file = new MyFile(rf.getFilename(), rf.getPath(), rf.isDirectory());
 		}
-		 
-		ret = FileSystemView.getFileSystemView().getSystemIcon(file);  
 		
+		File tmp = null;
+		try
+		{
+			if(file instanceof JarAsDirectory)
+			{
+				String suffix = file.getName();
+				int idx = suffix.lastIndexOf(".");
+				if(idx!=-1)
+				{
+					suffix = suffix.substring(idx);
+					tmp = File.createTempFile("icon", suffix);  
+				}
+				else
+				{
+					tmp = new MyFile(file.getName(), "", true);
+				}
+				ret = FileSystemView.getFileSystemView().getSystemIcon(tmp);  
+			}
+			else
+			{
+				ret = FileSystemView.getFileSystemView().getSystemIcon(file);  
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			if(tmp!=null)
+				tmp.delete();
+		}
+
 		return ret;
 	}
 }

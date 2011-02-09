@@ -106,8 +106,12 @@ public class FileNode	extends AbstractTreeNode
 	 */
 	public String toString()
 	{
-		return FileSystemView.getFileSystemView().getSystemDisplayName(file);
-//		return file.getName().length()>0? file.getName(): file.getPath();
+		String ret = FileSystemView.getFileSystemView().getSystemDisplayName(file);
+		if(ret==null || ret.length()==0)
+			ret = file.getName();
+		if(ret==null || ret.length()==0)
+			ret = file.getPath();
+		return ret;
 	}
 
 	/**
@@ -160,7 +164,7 @@ public class FileNode	extends AbstractTreeNode
 		String	ret;
 		if(file instanceof JarAsDirectory)
 		{
-			JarAsDirectory	jar	= (JarAsDirectory) file;
+			JarAsDirectory	jar	= (JarAsDirectory)file;
 			if(jar.getZipEntry()!=null)
 				ret	= jar.getZipEntry().getName();
 			else
@@ -168,7 +172,7 @@ public class FileNode	extends AbstractTreeNode
 		}
 		else
 		{
-			ret	= file!=null ? SUtil.convertPathToRelative(file.getAbsolutePath()) : null;
+			ret	= file!=null ? SUtil.convertPathToRelative(file.getAbsolutePath()): null;
 		}
 		return ret;
 	}

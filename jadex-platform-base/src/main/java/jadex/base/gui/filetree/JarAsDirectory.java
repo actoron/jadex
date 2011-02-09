@@ -188,7 +188,8 @@ public class JarAsDirectory	extends File
 		try
 		{
 			JarFile jar;
-			if(jarpath.startsWith("\\jar") || jarpath.startsWith("/jar") || jarpath.startsWith("jar"))
+			if(jarpath.startsWith("\\jar") || jarpath.startsWith("/jar") || jarpath.startsWith("jar")
+				|| jarpath.startsWith("\\zip") || jarpath.startsWith("/zip") || jarpath.startsWith("zip"))
 			{
 				URL url = new URL(jarpath);
 				JarURLConnection conn = (JarURLConnection)url.openConnection();
@@ -198,6 +199,7 @@ public class JarAsDirectory	extends File
 			{
 				jar = new JarFile(jarpath);
 			}
+			
 			Enumeration	e	= jar.entries();
 			while(e.hasMoreElements())
 			{
