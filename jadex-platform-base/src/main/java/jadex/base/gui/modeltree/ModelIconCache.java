@@ -3,9 +3,20 @@ package jadex.base.gui.modeltree;
 import jadex.base.SComponentFactory;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.filetree.DirNode;
+import jadex.base.gui.filetree.FileNode;
+import jadex.base.gui.filetree.IIconCache;
+import jadex.base.gui.filetree.JarNode;
+import jadex.base.gui.filetree.RemoteDirNode;
+import jadex.base.gui.filetree.RemoteFileNode;
+import jadex.base.gui.filetree.RemoteJarNode;
+import jadex.base.gui.filetree.RootNode;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.JTree;
@@ -16,7 +27,7 @@ import javax.swing.tree.TreeModel;
  *  Cache for component icons.
  *  Asynchronously loads icons and updates tree.
  */
-public class ModelIconCache
+public class ModelIconCache implements IIconCache
 {
 	/**
 	 * The image icons.
@@ -32,7 +43,7 @@ public class ModelIconCache
 	//-------- attributes --------
 	
 	/** The icon cache. */
-//	private final Map	icons;
+	protected final Map	myicons;
 	
 	/** The service provider. */
 	protected final IExternalAccess exta;
@@ -47,7 +58,7 @@ public class ModelIconCache
 	 */
 	public ModelIconCache(IExternalAccess exta, JTree tree)
 	{
-//		this.icons	= new HashMap();
+		this.myicons	= new HashMap();
 		this.exta	= exta;
 		this.tree	= tree;
 	}
@@ -65,7 +76,11 @@ public class ModelIconCache
 		{
 			ret	= (Icon)icons.get(node);
 		}
-		else if(node instanceof JarNode)
+		else if(myicons.containsKey(node))
+		{
+			ret	= (Icon)myicons.get(node);
+		}
+		else if(node instanceof JarNode || node instanceof RemoteJarNode)
 		{
 			ret = (Icon)icons.get("src_jar");
 		}
@@ -80,7 +95,7 @@ public class ModelIconCache
 				ret = (Icon)icons.get("package");
 			}
 		}
-		else if((node instanceof FileNode || node instanceof RemoteFileNode)  && exta!=null)
+		else if((node instanceof FileNode || node instanceof RemoteFileNode) && exta!=null)
 		{
 			// Todo: remember ongoing searches for efficiency?
 //			System.out.println("getIcon: "+type);
@@ -106,7 +121,7 @@ public class ModelIconCache
 								{
 									public void customResultAvailable(Object result)
 									{
-										icons.put(node, result);
+										myicons.put(node, result);
 										TreeModel	model	= tree.getModel();
 										if(model instanceof AsyncTreeModel)
 										{

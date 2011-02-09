@@ -1,4 +1,4 @@
-package jadex.base.gui.modeltree;
+package jadex.base.gui.filetree;
 
 /**
  * 
@@ -13,6 +13,9 @@ public class RemoteFile
 	
 	/** The boolean for directory. */
 	protected boolean directory;
+	
+	/** The display name. */
+	protected String displayname;
 
 	/**
 	 * 
@@ -24,11 +27,12 @@ public class RemoteFile
 	/**
 	 * 
 	 */
-	public RemoteFile(String filename, String path, boolean directory)
+	public RemoteFile(String filename, String path, boolean directory, String displayname)
 	{
 		this.filename = filename;
 		this.path = path;
 		this.directory = directory;
+		this.displayname = displayname;
 	}
 	
 	/**
@@ -83,6 +87,24 @@ public class RemoteFile
 	public void setDirectory(boolean directory)
 	{
 		this.directory = directory;
+	}
+
+	/**
+	 *  Get the displayname.
+	 *  @return the displayname.
+	 */
+	public String getDisplayName()
+	{
+		return displayname;
+	}
+
+	/**
+	 *  Set the displayname.
+	 *  @param displayname The displayname to set.
+	 */
+	public void setDisplayName(String displayname)
+	{
+		this.displayname = displayname;
 	}
 	
 }

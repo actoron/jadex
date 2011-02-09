@@ -1,51 +1,43 @@
-package jadex.base.gui.modeltree;
+package jadex.base.gui.filetree;
 
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
-import jadex.commons.SUtil;
+import jadex.base.gui.componenttree.ComponentProperties;
 
-import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 
 /**
- *  Node object representing a service container.
+ * 
  */
-public class FileNode	extends AbstractTreeNode
+public class RootNode extends AbstractTreeNode
 {
 	//-------- attributes --------
 	
-	/** The file. */
-	protected File file;
-	
-	/** The icon cache. */
-	protected final ModelIconCache	iconcache;
-	
-	/** The relative file name. */
-	protected String relative;
+	/** The list of child nodes. */
+	protected List children;
 	
 	/** The properties component (if any). */
-//	protected ComponentProperties	propcomp;
+	protected ComponentProperties	propcomp;
 		
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service container node.
 	 */
-	public FileNode(ITreeNode parent, AsyncTreeModel model, JTree tree, File file, ModelIconCache iconcache)
+	public RootNode(AsyncTreeModel model, JTree tree)
 	{
-		super(parent, model, tree);
-		
-		assert file!=null;
+		super(null, model, tree);
 		
 //		System.out.println("node: "+getClass()+" "+desc.getName());
-		
-		this.iconcache = iconcache;
-		this.file = file;
-		this.relative = convertPathToRelative(file);
+		this.children = new ArrayList();
 		
 		model.registerNode(this);
 	}
@@ -57,7 +49,7 @@ public class FileNode	extends AbstractTreeNode
 	 */
 	public Object	getId()
 	{
-		return file;
+		return "root";
 	}
 
 	/**
@@ -65,7 +57,7 @@ public class FileNode	extends AbstractTreeNode
 	 */
 	public Icon	getIcon()
 	{
-		return iconcache.getIcon(this);
+		return null;
 	}
 	
 	/**
@@ -74,6 +66,8 @@ public class FileNode	extends AbstractTreeNode
 	 */
 	public void refresh(boolean recurse)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
 //		cms.getComponentDescription(desc.getName()).addResultListener(new SwingDefaultResultListener()
 //		{
 //			public void customResultAvailable(Object result)
@@ -96,6 +90,39 @@ public class FileNode	extends AbstractTreeNode
 	 */
 	protected void	searchChildren()
 	{
+		setChildren(children);
+	}
+	
+	/**
+	 * 
+	 */
+	public void addChild(ITreeNode child)
+	{
+		assert SwingUtilities.isEventDispatchThread();
+		
+		children.add(child);
+		setChildren(children);
+	}
+	
+	/**
+	 *  Remove a path entry from the tree.
+	 */
+	public void removeChild(ITreeNode child)
+	{
+		assert SwingUtilities.isEventDispatchThread();
+		
+		children.remove(child);
+		setChildren(children);
+	}
+	
+	/**
+	 *  Remove a path entry from the tree.
+	 */
+	public void removeAll()
+	{
+		assert SwingUtilities.isEventDispatchThread();
+		
+		setChildren(Collections.EMPTY_LIST);
 	}
 	
 	//-------- methods --------
@@ -105,7 +132,7 @@ public class FileNode	extends AbstractTreeNode
 	 */
 	public String toString()
 	{
-		return file.getName();
+		return "root";
 	}
 
 	/**
@@ -131,42 +158,55 @@ public class FileNode	extends AbstractTreeNode
 //		propcomp.setDescription(desc);
 //		return propcomp;
 	}
+	
+	/**
+	 *  Check if the node is a leaf.
+	 */
+	public boolean	isLeaf()
+	{
+		assert SwingUtilities.isEventDispatchThread();
 
-	/**
-	 *  Get the file.
-	 *  @return the file.
-	 */
-	public File getFile()
-	{
-		return file;
+		return false;
 	}
 	
 	/**
-	 *  Get the relative path.
+	 *  Get all children.
 	 */
-	public String	getRelativePath()
+	public ITreeNode[] getChildren()
 	{
-		return this.relative;
+		assert SwingUtilities.isEventDispatchThread();
+		
+		return (ITreeNode[])children.toArray(new ITreeNode[0]);
 	}
 	
 	/**
-	 *  Get the corresponding relative path for a file.
-	 *  Handles jars specially.
+	 *  Returns the index of node in the receivers children. If the receiver
+	 *  does not contain node, -1 will be returned.
+	 *  @param node
+	 *  @return an int.
 	 */
-	protected String convertPathToRelative(File file)
+	public int getIndex(ITreeNode node)
 	{
-		String	ret;
-		if(file instanceof JarAsDirectory)
+		return children!=null ? children.indexOf(node) : -1;
+	}
+	
+	/**
+	 *  Get the path entries.
+	 */
+	public String[]	getPathEntries()
+	{
+		String[]	ret	= new String[getChildCount()];
+		for(int i=0; i<ret.length; i++)
 		{
-			JarAsDirectory	jar	= (JarAsDirectory) file;
-			if(jar.getZipEntry()!=null)
-				ret	= jar.getZipEntry().getName();
+			ITreeNode	node	= getChild(i);
+			if(node instanceof DirNode)
+			{
+				ret[i]	= ((DirNode)node).getFile().getAbsolutePath();
+			}
 			else
-				ret	= SUtil.convertPathToRelative(jar.getJarPath());
-		}
-		else
-		{
-			ret	= file!=null ? SUtil.convertPathToRelative(file.getAbsolutePath()) : null;
+			{
+				ret[i]	= ((RemoteDirNode)node).getRemoteFile().getPath();
+			}
 		}
 		return ret;
 	}

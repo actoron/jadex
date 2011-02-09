@@ -1,10 +1,9 @@
 package jadex.base.gui.filechooser;
 
-import jadex.base.gui.modeltree.RemoteFile;
+import jadex.base.gui.filetree.RemoteFile;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.SUtil;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.xml.annotation.XMLClassname;
 
@@ -15,7 +14,6 @@ import java.util.Map;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileSystemView;
-import javax.swing.filechooser.FileView;
 
 
 /**
@@ -480,7 +478,8 @@ public class RemoteFileSystemView extends FileSystemView
 		
 		if(ret==null)
 		{
-			final RemoteFile mydir = new RemoteFile(dir.getName(), dir.getAbsolutePath(), dir.isDirectory());
+			final RemoteFile mydir = new RemoteFile(dir.getName(), dir.getAbsolutePath(), 
+				dir.isDirectory(), FileSystemView.getFileSystemView().getSystemDisplayName(dir));
 			exta.scheduleStep(new IComponentStep()
 			{
 				@XMLClassname("getFiles")
@@ -533,7 +532,8 @@ public class RemoteFileSystemView extends FileSystemView
 				{
 					FileSystemView view = FileSystemView.getFileSystemView();
 					File parent = view.getParentDirectory(new File(path)); // todo: useFileHandling
-					return new RemoteFile(parent.getName(), parent.getPath(), parent.isDirectory());
+					return new RemoteFile(parent.getName(), parent.getPath(), 
+						parent.isDirectory(), FileSystemView.getFileSystemView().getSystemDisplayName(parent));
 				}
 			}).addResultListener(new SwingDefaultResultListener()
 			{
@@ -596,7 +596,8 @@ public class RemoteFileSystemView extends FileSystemView
 		RemoteFile[] ret = files==null? new RemoteFile[0]: new RemoteFile[files.length];
 		for(int i=0; i<ret.length; i++)
 		{
-			ret[i] = new RemoteFile(files[i].getName(), files[i].getAbsolutePath(), files[i].isDirectory());
+			ret[i] = new RemoteFile(files[i].getName(), files[i].getAbsolutePath(), 
+				files[i].isDirectory(), FileSystemView.getFileSystemView().getSystemDisplayName(files[i]));
 		}
 		return ret;
 	}

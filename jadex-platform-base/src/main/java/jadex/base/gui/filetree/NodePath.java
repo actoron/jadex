@@ -1,4 +1,4 @@
-package jadex.base.gui.modeltree;
+package jadex.base.gui.filetree;
 
 
 import java.util.Arrays;

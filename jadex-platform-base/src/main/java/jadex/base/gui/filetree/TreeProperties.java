@@ -1,10 +1,10 @@
-package jadex.base.gui.modeltree;
+package jadex.base.gui.filetree;
 
 
 /**
  *  Struct for storing Tree properties.
  */
-public class	ModelExplorerProperties
+public class TreeProperties
 {
 	//-------- attributes --------
 	
@@ -15,7 +15,7 @@ public class	ModelExplorerProperties
 	protected NodePath	selected;
 	
 	/** The expanded nodes. */
-	protected NodePath[]	expanded;
+	protected NodePath[] expanded;
 	
 	//-------- methods --------
 	

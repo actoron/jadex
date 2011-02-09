@@ -62,5 +62,23 @@ public class PopupBuilder
 
 		return pop;
 	}
+	
+	/**
+	 *  Add an item.
+	 *  @param item The item (Action or IMenuItemConstructor).
+	 */
+	public void addItem(Object item)
+	{
+		rawmenu.add(item);
+	}
+	
+	/**
+	 *  Remove an item.
+	 *  @param item The item (Action or IMenuItemConstructor).
+	 */
+	public void removeItem(Object item)
+	{
+		rawmenu.remove(item);
+	}
 
 }

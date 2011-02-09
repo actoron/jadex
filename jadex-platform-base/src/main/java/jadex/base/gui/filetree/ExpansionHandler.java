@@ -1,4 +1,4 @@
-package jadex.base.gui.modeltree;
+package jadex.base.gui.filetree;
 
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;

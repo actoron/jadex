@@ -1,4 +1,4 @@
-package jadex.base.gui.modeltree;
+package jadex.base.gui.filetree;
 
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
@@ -23,7 +23,7 @@ public class RemoteFileNode  extends AbstractTreeNode
 	protected IExternalAccess exta;
 	
 	/** The icon cache. */
-	protected final ModelIconCache	iconcache;
+	protected final IIconCache	iconcache;
 	
 	/** The relative file name. */
 //	protected String relative;
@@ -36,7 +36,7 @@ public class RemoteFileNode  extends AbstractTreeNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public RemoteFileNode(ITreeNode parent, AsyncTreeModel model, JTree tree, RemoteFile file, ModelIconCache iconcache, IExternalAccess exta)
+	public RemoteFileNode(ITreeNode parent, AsyncTreeModel model, JTree tree, RemoteFile file, IIconCache iconcache, IExternalAccess exta)
 	{
 		super(parent, model, tree);
 		

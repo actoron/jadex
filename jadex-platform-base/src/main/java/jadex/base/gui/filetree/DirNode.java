@@ -1,4 +1,4 @@
-package jadex.base.gui.modeltree;
+package jadex.base.gui.filetree;
 
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
@@ -6,9 +6,9 @@ import jadex.commons.IRemoteFilter;
 import jadex.commons.collection.SortedList;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 
 import java.io.File;
@@ -29,16 +29,22 @@ public class DirNode extends FileNode
 	/** The filter. */
 	protected IRemoteFilter filter;
 	
+	// hack: should belong to the model
+	/** The factory. */
+	protected INodeFactory factory;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service container node.
 	 */
-	public DirNode(ITreeNode parent, AsyncTreeModel model, JTree tree, File file, ModelIconCache iconcache, IRemoteFilter filter)
+	public DirNode(ITreeNode parent, AsyncTreeModel model, JTree tree, File file, 
+		IIconCache iconcache, IRemoteFilter filter, INodeFactory factory)
 	{
 		super(parent, model, tree, file, iconcache);
 		assert file.isDirectory();
 		this.filter = filter;
+		this.factory = factory;
 //		System.out.println("node: "+getClass()+" "+desc.getName());
 	}
 	
@@ -78,7 +84,7 @@ public class DirNode extends FileNode
 					else
 					{
 //						lis.resultAvailable(ModelTreePanel.createNode(DirNode.this, model, tree, file, iconcache, filter, null));
-						nodes.add(ModelTreePanel.createNode(DirNode.this, model, tree, file, iconcache, filter, null));
+						nodes.add(factory.createNode(DirNode.this, model, tree, file, iconcache, filter, null, factory));
 					}
 				}
 
@@ -92,34 +98,41 @@ public class DirNode extends FileNode
 	 */
 	protected IFuture listFiles()
 	{
-		final IntermediateFuture ret = new IntermediateFuture();
+		final Future ret = new Future();
 		final File[] files = file.listFiles();
-		final CollectionResultListener lis = new CollectionResultListener(files.length, true, new DelegationResultListener(ret));
+		final CollectionResultListener lis = new CollectionResultListener(files==null? 0: files.length, true, new DelegationResultListener(ret));
 		
-		for(int i=0; i<files.length; i++)
+		if(files!=null)
 		{
-			if(filter==null)
+//			System.out.println("name: "+toString()+" files length: "+files.length);
+			for(int i=0; i<files.length; i++)
 			{
-				lis.resultAvailable(files[i]);
-			}
-			else
-			{
-				final File file = files[i];
-				filter.filter(files[i]).addResultListener(new IResultListener()
+				if(filter==null)
 				{
-					public void resultAvailable(Object result)
+					lis.resultAvailable(files[i]);
+				}
+				else
+				{
+					final File file = files[i];
+//					System.out.println("in: "+file);
+					filter.filter(files[i]).addResultListener(new IResultListener()
 					{
-						if(((Boolean)result).booleanValue())
-							lis.resultAvailable(file);
-						else
+						public void resultAvailable(Object result)
+						{
+//							System.out.println("out: "+file);
+							if(((Boolean)result).booleanValue())
+								lis.resultAvailable(file);
+							else
+								lis.exceptionOccurred(null);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+//							System.out.println("out: "+file);
 							lis.exceptionOccurred(null);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						lis.exceptionOccurred(null);
-					}
-				});
+						}
+					});
+				}
 			}
 		}
 		return ret;
@@ -134,8 +147,8 @@ public class DirNode extends FileNode
 		{
 			String	name1	= o1 instanceof FileNode ? ((FileNode)o1).getFile().getName() : ((RemoteFileNode)o1).getRemoteFile().getFilename();
 			String	name2	= o2 instanceof FileNode ? ((FileNode)o2).getFile().getName() : ((RemoteFileNode)o2).getRemoteFile().getFilename();
-			boolean	dir1	= o1 instanceof FileNode ? ((FileNode)o1).getFile().isDirectory() : ((RemoteFileNode)o1).getRemoteFile().isDirectory();
-			boolean	dir2	= o2 instanceof FileNode ? ((FileNode)o2).getFile().isDirectory() : ((RemoteFileNode)o2).getRemoteFile().isDirectory();
+			boolean	dir1	= o1 instanceof FileNode ? ((FileNode)o1).getFile().isDirectory() && !(o1 instanceof JarNode) : ((RemoteFileNode)o1).getRemoteFile().isDirectory() && !(o1 instanceof RemoteJarNode);
+			boolean	dir2	= o2 instanceof FileNode ? ((FileNode)o2).getFile().isDirectory() && !(o2 instanceof JarNode) : ((RemoteFileNode)o2).getRemoteFile().isDirectory() && !(o2 instanceof RemoteJarNode);
 
 			int	ret;
 			if(dir1 && !dir2)

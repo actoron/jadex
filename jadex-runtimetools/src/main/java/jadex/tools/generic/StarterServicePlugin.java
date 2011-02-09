@@ -1,19 +1,9 @@
 package jadex.tools.generic;
 
-import java.io.File;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.Charset;
-import java.util.List;
-
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.Properties;
-import jadex.commons.Property;
-import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.SGUI;
 import jadex.commons.service.IService;
 import jadex.tools.starter.StarterViewerPanel;
@@ -21,7 +11,7 @@ import jadex.tools.starter.StarterViewerPanel;
 import javax.swing.Icon;
 
 /**
- * 
+ *  Plugin for starting components.
  */
 public class StarterServicePlugin extends AbstractServicePlugin
 {
@@ -29,8 +19,8 @@ public class StarterServicePlugin extends AbstractServicePlugin
 
 	static
 	{
-		icons.put("awareness", SGUI.makeIcon(StarterServicePlugin.class, "/jadex/tools/common/images/awareness.png"));
-		icons.put("awareness_sel", SGUI.makeIcon(StarterServicePlugin.class, "/jadex/tools/common/images/awareness_sel.png"));
+		icons.put("starter", SGUI.makeIcon(StarterServicePlugin.class, "/jadex/tools/common/images/new_starter.png"));
+		icons.put("starter_sel", SGUI.makeIcon(StarterServicePlugin.class, "/jadex/tools/common/images/new_starter_sel.png"));
 	}
 
 	//-------- methods --------
@@ -66,7 +56,7 @@ public class StarterServicePlugin extends AbstractServicePlugin
 	 */
 	public Icon getToolIcon(boolean selected)
 	{
-		return selected? icons.getIcon("awareness_sel"): icons.getIcon("awareness");
+		return selected? icons.getIcon("starter_sel"): icons.getIcon("starter");
 	}
 
 }

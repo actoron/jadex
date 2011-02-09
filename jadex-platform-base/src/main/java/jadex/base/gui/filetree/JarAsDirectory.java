@@ -1,4 +1,4 @@
-package jadex.base.gui.modeltree;
+package jadex.base.gui.filetree;
 
 import jadex.commons.collection.MultiCollection;
 
@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.JarURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -185,7 +187,17 @@ public class JarAsDirectory	extends File
 		Set	contained	= new HashSet();
 		try
 		{
-			JarFile	jar = new JarFile(jarpath);
+			JarFile jar;
+			if(jarpath.startsWith("\\jar") || jarpath.startsWith("/jar") || jarpath.startsWith("jar"))
+			{
+				URL url = new URL(jarpath);
+				JarURLConnection conn = (JarURLConnection)url.openConnection();
+				jar = conn.getJarFile();
+			}
+			else
+			{
+				jar = new JarFile(jarpath);
+			}
 			Enumeration	e	= jar.entries();
 			while(e.hasMoreElements())
 			{

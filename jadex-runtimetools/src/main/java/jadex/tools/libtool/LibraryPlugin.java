@@ -17,7 +17,6 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.commons.service.library.ILibraryServiceListener;
-import jadex.tools.starter.StarterPlugin;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -60,7 +59,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"conversation",	SGUI.makeIcon(LibraryPlugin.class, "/jadex/tools/common/images/libcenter.png"),
-		"conversation_sel", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/libcenter_sel.png"),
+		"conversation_sel", SGUI.makeIcon(LibraryPlugin.class, "/jadex/tools/common/images/libcenter_sel.png"),
 		"help",	SGUI.makeIcon(LibraryPlugin.class, "/jadex/tools/common/images/help.gif"),
 	});
 

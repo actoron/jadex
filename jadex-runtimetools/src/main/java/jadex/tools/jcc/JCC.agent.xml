@@ -51,6 +51,7 @@
 						+ " jadex.tools.generic.LibraryServicePlugin"
 						+ " jadex.tools.generic.AwarenessComponentPlugin"
 						+ " jadex.base.gui.componentviewer.ComponentViewerPlugin"
+						+ " jadex.tools.deployer.DeployerPlugin"
 						+ " jadex.tools.generic.StarterServicePlugin")
 					</fact>
 				</initialbelief>

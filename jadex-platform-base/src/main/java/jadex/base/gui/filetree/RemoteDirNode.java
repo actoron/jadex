@@ -1,4 +1,4 @@
-package jadex.base.gui.modeltree;
+package jadex.base.gui.filetree;
 
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JTree;
+import javax.swing.filechooser.FileSystemView;
 
 /**
  * 
@@ -33,16 +34,21 @@ public class RemoteDirNode extends RemoteFileNode
 	/** The filter. */
 	protected IRemoteFilter filter;
 	
+	// hack: should belong to the model
+	/** The factory. */
+	protected INodeFactory factory;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service container node.
 	 */
 	public RemoteDirNode(ITreeNode parent, AsyncTreeModel model, JTree tree, RemoteFile file, 
-		ModelIconCache iconcache, IRemoteFilter filter, IExternalAccess exta)
+		IIconCache iconcache, IRemoteFilter filter, IExternalAccess exta, INodeFactory factory)
 	{
 		super(parent, model, tree, file, iconcache, exta);
 		this.filter = filter;
+		this.factory = factory;
 //		System.out.println("node: "+getClass()+" "+desc.getName());
 	}
 	
@@ -59,7 +65,7 @@ public class RemoteDirNode extends RemoteFileNode
 			public void customResultAvailable(Object result)
 			{
 				Collection files = (Collection)result;
-				CollectionResultListener lis = new CollectionResultListener(files.size(), true, 
+				CollectionResultListener lis = new CollectionResultListener(files==null? 0: files.size(), true, 
 					new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -68,18 +74,21 @@ public class RemoteDirNode extends RemoteFileNode
 					}
 				});
 				
-				for(Iterator it=files.iterator(); it.hasNext();)
+				if(files!=null)
 				{
-					RemoteFile file = (RemoteFile)it.next();
-					ITreeNode node = getModel().getNode(file);
-					if(node!=null)
+					for(Iterator it=files.iterator(); it.hasNext();)
 					{
-						lis.resultAvailable(node);
-					}
-					else
-					{
-						lis.resultAvailable(ModelTreePanel.createNode(RemoteDirNode.this, model, tree, 
-							file, iconcache, filter, exta));
+						RemoteFile file = (RemoteFile)it.next();
+						ITreeNode node = getModel().getNode(file);
+						if(node!=null)
+						{
+							lis.resultAvailable(node);
+						}
+						else
+						{
+							lis.resultAvailable(factory.createNode(RemoteDirNode.this, model, tree, 
+								file, iconcache, filter, exta, factory));
+						}
 					}
 				}
 			}
@@ -154,7 +163,8 @@ public class RemoteDirNode extends RemoteFileNode
 									public void resultAvailable(Object result)
 									{
 										if(((Boolean)result).booleanValue())
-											lis.resultAvailable(new RemoteFile(file.getName(), file.getAbsolutePath(), file.isDirectory()));
+											lis.resultAvailable(new RemoteFile(file.getName(), file.getAbsolutePath(), 
+											file.isDirectory(), FileSystemView.getFileSystemView().getSystemDisplayName(file)));
 										else
 											lis.exceptionOccurred(null);
 									}

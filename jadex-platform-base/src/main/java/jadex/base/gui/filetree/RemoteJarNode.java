@@ -1,4 +1,4 @@
-package jadex.base.gui.modeltree;
+package jadex.base.gui.filetree;
 
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
@@ -14,13 +14,13 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.xml.annotation.XMLClassname;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 
 import javax.swing.JTree;
+import javax.swing.filechooser.FileSystemView;
 
 /**
  *  Node for remote jar file.
@@ -33,9 +33,9 @@ public class RemoteJarNode extends RemoteDirNode
 	 *  Create a new jar node.
 	 */
 	public RemoteJarNode(ITreeNode parent, AsyncTreeModel model, JTree tree, RemoteFile file, 
-		ModelIconCache iconcache, IRemoteFilter filter, IExternalAccess exta)
+		IIconCache iconcache, IRemoteFilter filter, IExternalAccess exta, INodeFactory factory)
 	{
-		super(parent, model, tree, file, iconcache, filter, exta);
+		super(parent, model, tree, file, iconcache, filter, exta, factory);
 //		System.out.println("node: "+getClass()+" "+desc.getName());
 	}
 	
@@ -73,7 +73,7 @@ public class RemoteJarNode extends RemoteDirNode
 							Object[] tmp = (Object[])it.next();
 							rjfentries.put(tmp[0], tmp[1]);
 						}
-						RemoteJarFile rjf = new RemoteJarFile(jad.getName(), jad.getAbsolutePath(), true, rjfentries, "/");
+						RemoteJarFile rjf = new RemoteJarFile(jad.getName(), jad.getAbsolutePath(), true, FileSystemView.getFileSystemView().getSystemDisplayName(jad), rjfentries, "/");
 						Collection files = rjf.listFiles();
 						ret.setResult(files);
 					}
@@ -91,7 +91,7 @@ public class RemoteJarNode extends RemoteDirNode
 						int	slash = ename.lastIndexOf("/", ename.length()-2);
 						ename = ename.substring(slash!=-1? slash+1: 0, ename.endsWith("/")? ename.length()-1: ename.length());
 //						System.out.println("ename: "+ename+" "+entry.getName());
-						final RemoteJarFile tmp = new RemoteJarFile(ename, jad.getAbsolutePath()+"!/"+entry.getName(), entry.isDirectory(), rjfentries, entry.getName());
+						final RemoteJarFile tmp = new RemoteJarFile(ename, jad.getAbsolutePath()+"!/"+entry.getName(), entry.isDirectory(), ename, rjfentries, entry.getName());
 						
 						myfilter.filter(jad.getFile(entry.getName())).addResultListener(new IResultListener()
 						{

@@ -3,9 +3,10 @@ package jadex.tools.starter;
 import jadex.base.SComponentFactory;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
-import jadex.base.gui.modeltree.FileNode;
+import jadex.base.gui.filetree.FileNode;
+import jadex.base.gui.filetree.FileTreePanel;
+import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.modeltree.ModelTreePanel;
-import jadex.base.gui.modeltree.RemoteFileNode;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.ICMSComponentListener;
@@ -81,7 +82,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 	protected StarterPanel spanel;
 
 	/** The panel showing the classpath models. */
-	protected ModelTreePanel mpanel;
+	protected FileTreePanel mpanel;
 	
 	/** The component instances in a tree. */
 	protected ComponentTreePanel comptree;

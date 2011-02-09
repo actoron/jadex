@@ -1,4 +1,4 @@
-package jadex.base.gui.modeltree;
+package jadex.base.gui.filetree;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -25,9 +25,9 @@ public class RemoteJarFile extends RemoteFile
 	/**
 	 * 
 	 */
-	public RemoteJarFile(String filename, String path, boolean directory, Map jarentries, String relativepath)
+	public RemoteJarFile(String filename, String path, boolean directory, String displayname, Map jarentries, String relativepath)
 	{
-		super(filename, path, directory);
+		super(filename, path, directory, displayname);
 		this.jarentries = jarentries;
 		this.relativepath = relativepath;
 	}

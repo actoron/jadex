@@ -1,7 +1,6 @@
 package jadex.base.gui.plugin;
 
-import jadex.commons.Properties;
-import jadex.commons.future.IFuture;
+import jadex.base.gui.IPropertiesProvider;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -11,7 +10,7 @@ import javax.swing.JMenu;
 /**
  *  Interface for control center plugins.
  */
-public interface IControlCenterPlugin
+public interface IControlCenterPlugin extends IPropertiesProvider
 {
 	/**
 	 *  Test if this plugin should be initialized lazily.
@@ -69,15 +68,15 @@ public interface IControlCenterPlugin
 	 */
 	public JComponent[] getToolBar();
 
-	/**
-	 *  Advices the the plugin to restore its properties from the argument
-	 */
-	public IFuture setProperties(Properties ps);
-
-	/**
-	 *  Advices the plugin to store its properties in the argument This is done
-	 *  on project close or save.
-	 */
-	public IFuture getProperties();
+//	/**
+//	 *  Advices the the plugin to restore its properties from the argument
+//	 */
+//	public IFuture setProperties(Properties ps);
+//
+//	/**
+//	 *  Advices the plugin to store its properties in the argument This is done
+//	 *  on project close or save.
+//	 */
+//	public IFuture getProperties();
 
 }
