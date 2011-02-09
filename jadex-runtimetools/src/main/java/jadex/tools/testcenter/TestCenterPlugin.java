@@ -5,7 +5,6 @@ import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.collection.SCollection;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;

@@ -1,25 +1,27 @@
 package jadex.tools.testcenter;
 
-import jadex.base.SComponentFactory;
 import jadex.base.gui.ElementPanel;
+import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IGoalListener;
+import jadex.bridge.CreationInfo;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.IRemotable;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.SwingDefaultResultListener;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.BrowserPane;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.ScrollablePanel;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
-import jadex.tools.jcc.AgentControlCenter;
 import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
@@ -40,9 +42,9 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -113,6 +115,9 @@ public class TestCenterPanel extends JSplitPane
 	/** The testcase concurrency. */
 	protected int	concurrency;
 	
+	/** The testcase timeout. */
+	protected long	timeout;
+	
 	//-------- constructors --------
 
 	/**
@@ -124,27 +129,6 @@ public class TestCenterPanel extends JSplitPane
 		this.concurrency	= 1;
 		this.setResizeWeight(0.5);
 	
-		final JFileChooser addchooser = new JFileChooser(".");
-		addchooser.setAcceptAllFileFilterUsed(true);
-//		final IAgentFactory agentfactory = plugin.getJCC().getAgent().getPlatform().getAgentFactory();
-		final javax.swing.filechooser.FileFilter load_filter = new javax.swing.filechooser.FileFilter()
-		{
-			public String getDescription()
-			{
-				return "ADFs (*.agent.xml)";
-			}
-
-			public boolean accept(File f)
-			{
-				String name = f.getName();
-//				return f.isDirectory() || SXML.isAgentFilename(name);
-				return f.isDirectory() || ((Boolean)SComponentFactory.isStartable(plugin.getJCC()
-					.getExternalAccess(), name).get(new ThreadSuspendable())).booleanValue();
-			}
-		};
-		addchooser.addChoosableFileFilter(load_filter);
-		addchooser.setMultiSelectionEnabled(true);
-
 		final JFileChooser loadsavechooser = new JFileChooser(".");
 		final javax.swing.filechooser.FileFilter save_filter = new javax.swing.filechooser.FileFilter()
 		{
@@ -192,14 +176,14 @@ public class TestCenterPanel extends JSplitPane
 		{
 			public void actionPerformed(ActionEvent ae)
 			{
-				setTimeoutBelief(tfto.getText());
+				setTimeout(tfto.getText());
 			}
 		});
 		tfto.addFocusListener(new FocusAdapter()
 		{
 			public void focusLost(FocusEvent fe)
 			{
-				setTimeoutBelief(tfto.getText());
+				setTimeout(tfto.getText());
 			}
 		});
 		this.tfpar = new JComboBox(new String[]{"1", "5", "10", "all"});
@@ -235,8 +219,6 @@ public class TestCenterPanel extends JSplitPane
 				teststable.setAllowDuplicates(allowduplicates.isSelected());
 			}
 		});
-		JButton add = new JButton("Add");
-		add.setToolTipText("Add testcases to the test suite");
 		JButton load = new JButton("Load");
 		load.setToolTipText("Load a test suite");
 		JButton save = new JButton("Save");
@@ -261,14 +243,11 @@ public class TestCenterPanel extends JSplitPane
 		testcases.add(new JLabel(), new GridBagConstraints(2,1,1,2,1,0,GridBagConstraints.WEST,
 			GridBagConstraints.HORIZONTAL, new Insets(2,2,2,2),0,0));
 
-		
-		testcases.add(add, new GridBagConstraints(3,2,1,2,0,0,GridBagConstraints.SOUTH,
+		testcases.add(load, new GridBagConstraints(3,2,1,2,0,0,GridBagConstraints.SOUTH,
 			GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
-		testcases.add(load, new GridBagConstraints(4,2,1,2,0,0,GridBagConstraints.SOUTH,
+		testcases.add(save, new GridBagConstraints(4,2,1,2,0,0,GridBagConstraints.SOUTH,
 			GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
-		testcases.add(save, new GridBagConstraints(5,2,1,2,0,0,GridBagConstraints.SOUTH,
-			GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
-		testcases.add(clear, new GridBagConstraints(6,2,1,2,0,0,GridBagConstraints.SOUTH,
+		testcases.add(clear, new GridBagConstraints(5,2,1,2,0,0,GridBagConstraints.SOUTH,
 			GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
 		
 		JPanel testperformer = new JPanel(new GridBagLayout());
@@ -294,22 +273,8 @@ public class TestCenterPanel extends JSplitPane
 			GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
 
 		// Calculate button sizes.
-		SGUI.adjustComponentSizes(new JButton[]{add, load, save, clear, startabort, savereport, new JButton("Abort")});
-		progress.setPreferredSize(new Dimension(progress.getPreferredSize().width, add.getPreferredSize().height));
-
-		add.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				if(addchooser.showDialog(SGUI.getWindowParent(TestCenterPanel.this)
-					, "Load")==JFileChooser.APPROVE_OPTION)
-				{
-					File[] files = addchooser.getSelectedFiles();
-					for(int i=0; i<files.length; i++)
-						teststable.addEntry(""+files[i]);
-				}
-			}
-		});
+		SGUI.adjustComponentSizes(new JButton[]{load, save, clear, startabort, savereport, new JButton("Abort")});
+		progress.setPreferredSize(new Dimension(progress.getPreferredSize().width, load.getPreferredSize().height));
 
 		save.addActionListener(new ActionListener()
 		{
@@ -348,8 +313,6 @@ public class TestCenterPanel extends JSplitPane
 			}
 		});
 
-		
-		
 		load.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent ae)
@@ -509,7 +472,7 @@ public class TestCenterPanel extends JSplitPane
 		{
 			timeout	= "20000";
 		}
-		setTimeoutBelief(timeout);
+		setTimeout(timeout);
 		tfto.setText(timeout);
 
 		if(props.getProperty("concurrency")!=null)
@@ -861,7 +824,7 @@ public class TestCenterPanel extends JSplitPane
 		allowduplicates.setSelected(false);
 		
 		tfto.setText("20000");
-		setTimeoutBelief("20000");
+		setTimeout("20000");
 	}
 
 	/**
@@ -876,22 +839,11 @@ public class TestCenterPanel extends JSplitPane
 	/**
 	 *  Extract the timeout value taken from the textfield. 
 	 */
-	protected void setTimeoutBelief(String text)
+	protected void setTimeout(String text)
 	{
 		try
 		{
-			final Integer to = new Integer(text);
-			
-			((AgentControlCenter)plugin.getJCC()).getAgent().scheduleStep(new IComponentStep()
-			{
-				@XMLClassname("setTimeout")
-				public Object execute(IInternalAccess ia)
-				{
-					IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
-					scope.getBeliefbase().getBelief("testcase_timeout").setFact(to);
-					return null;
-				}
-			});
+			this.timeout	= Long.parseLong(text);
 		}
 		catch(Exception e)
 		{
@@ -981,7 +933,7 @@ public class TestCenterPanel extends JSplitPane
 	/**
 	 *  Object for controlling test suite execution.
 	 */
-	public class TestSuite	implements IGoalListener
+	public class TestSuite
 	{
 		//-------- attributes --------
 		
@@ -989,10 +941,10 @@ public class TestCenterPanel extends JSplitPane
 		protected String[]	names;
 		
 		/** The results of the testcases. */
-		protected Testcase[]	testcases;
+		protected Testcase[]	results;
 		
-		/** A set of active goals (to be dropped on abort). */
-		protected Set	goals;
+		/** A set of running testcases to be destroyed on abort (name->cid). */
+		protected Map	testcases;
 		
 		/** Flag indicating that the test suite is running. */
 		protected boolean	running;
@@ -1011,8 +963,8 @@ public class TestCenterPanel extends JSplitPane
 		public TestSuite(String[] names)
 		{
 			this.names	= names;
-			this.testcases	= new Testcase[names.length];
-			this.goals	= new HashSet();
+			this.results	= new Testcase[names.length];
+			this.testcases	= new HashMap();
 			this.running	= false;
 		}
 		
@@ -1049,7 +1001,7 @@ public class TestCenterPanel extends JSplitPane
 		 */
 		public Testcase[]	getTestcases()
 		{
-			return testcases;
+			return results;
 		}
 
 		/**
@@ -1076,14 +1028,16 @@ public class TestCenterPanel extends JSplitPane
 		{
 			this.aborted	= true;
 			
-			for(Iterator it=goals.iterator(); it.hasNext(); )
+			for(Iterator it=testcases.values().iterator(); it.hasNext(); )
 			{
-				IGoal	goal	= (IGoal)it.next(); 
-				goal.removeGoalListener(TestSuite.this);
-				goal.drop();
+				IComponentIdentifier	testcase	= (IComponentIdentifier)it.next(); 
+				if(testcase!=null)
+				{
+					abortTestcase(testcase);
+				}
 			}
 			
-			goals.clear();
+			testcases.clear();
 			updateProgress();
 			updateDetails();			
 		}
@@ -1095,71 +1049,168 @@ public class TestCenterPanel extends JSplitPane
 		 */
 		protected void	startNextTestcases()
 		{
-			((AgentControlCenter)plugin.getJCC()).getAgent().scheduleStep(new IComponentStep()
+			assert SwingUtilities.isEventDispatchThread();
+			
+			// Start next open testcase as long as more testcases allowed.
+			for(int i=0; i<results.length && (concurrency==-1 || testcases.size()<concurrency); i++)
 			{
-				@XMLClassname("startNext")
-				public Object execute(IInternalAccess ia)
+				if(!testcases.containsKey(names[i]) && results[i]==null)
 				{
-					for(int i=0; i<testcases.length && (concurrency==-1 || goals.size()<concurrency); i++)
+					final String	name	= names[i];
+					testcases.put(name, null);
+					
+					final IResultListener	res	= new TestResultListener(name);
+					
+					plugin.getJCC().setStatusText("Performing test "+name);
+					plugin.getJCC().getExternalAccess().scheduleStep(new IComponentStep()
 					{
-						if(testcases[i]==null)
+						@XMLClassname("startNext")
+						public Object execute(final IInternalAccess ia)
 						{
-							// Create testcase and dispatch goal.
-							testcases[i]	= new Testcase(names[i]);
-							IGoal	pt	= ((IBDIInternalAccess)ia).getGoalbase().createGoal("perform_test");
-							pt.getParameter("testcase").setValue(testcases[i]);
-							pt.addGoalListener(TestSuite.this);
-							goals.add(pt);
-							((IBDIInternalAccess)ia).getGoalbase().dispatchTopLevelGoal(pt);
-							plugin.getJCC().setStatusText("Performing test "+names[i]);
+							final Future	ret	= new Future();
+							// Create testcase component.
+							ia.getRequiredService("cms").addResultListener(
+								ia.createResultListener(new DelegationResultListener(ret)
+							{
+								public void customResultAvailable(Object result)
+								{
+									IComponentManagementService	cms	= (IComponentManagementService)result;
+									Map	args	= new HashMap();
+									args.put("timeout", timeout);
+									// Todo: Use remote component for parent if any
+									cms.createComponent(null, name, new CreationInfo(args, ia.getComponentIdentifier()), res)
+										.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
+									
+									// Todo: timeout -> force destroy of component
+								}
+							}));
+							return ret;
 						}
-					}
-
-					running	= !goals.isEmpty();
-					SwingUtilities.invokeLater(new Runnable()
+					}).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
 					{
-						public void run()
+						public void customResultAvailable(Object result)
 						{
+							// Add testcase cid if not aborted in mean time.
+							if(testcases.containsKey(name))
+							{
+								testcases.put(name, (IComponentIdentifier)result);
+							}
+							else
+							{
+								abortTestcase((IComponentIdentifier)result);
+							}
+							
+							running	= !testcases.isEmpty();
 							updateProgress();
 							updateDetails();
+							startNextTestcases();
 						}
 					});
-					return null;
 				}
-			});					
+			}
 		}
 
 		/**
-		 *  Called when a test goal has finished.
+		 *  Abort a testcase.
 		 */
-		public void goalFinished(final AgentEvent ae)
-		{			
-			((IGoal)ae.getSource()).removeGoalListener(this);
-			// Handling of finished goal.
-			final IGoal goal = (IGoal)ae.getSource();
-			
-			// Ignore if goal is leftover from aborted execution.
-			if(goals.remove(goal))
+		protected void	abortTestcase(final IComponentIdentifier testcase)
+		{
+			plugin.getJCC().getExternalAccess().scheduleStep(new IComponentStep()
 			{
-				if(!goal.isSucceeded() && !aborted)
+				@XMLClassname("abortTestcase")
+				public Object execute(final IInternalAccess ia)
 				{
-//					String text = SUtil.wrapText("Testcase error: "+goal.getException().getMessage());
-					String text = SUtil.wrapText("Testcase error: "+goal);
-					JOptionPane.showMessageDialog(SGUI.getWindowParent(TestCenterPanel.this),
-						text, "Testcase problem", JOptionPane.INFORMATION_MESSAGE);
+					final Future	ret	= new Future();
+					ia.getRequiredService("cms").addResultListener(
+						ia.createResultListener(new DelegationResultListener(ret)
+					{
+						public void customResultAvailable(Object result)
+						{
+							IComponentManagementService	cms	= (IComponentManagementService)result;
+							cms.destroyComponent(testcase).addResultListener(
+								ia.createResultListener(new DelegationResultListener(ret)));
+						}
+					}));
+					return ret;
 				}
-				
-				startNextTestcases();
-			}
-//			System.out.println("Goal finished: "+goal);
+			});
+			// Todo: wait for result?
 		}
 		
+		//-------- helper class --------
+	
 		/**
-		 *  Called when a test goal was added.
-		 *  Currently ignored.
+		 *  Callback result listener for (local or remote) test results.
 		 */
-		public void goalAdded(AgentEvent ae)
+		public class TestResultListener		implements IResultListener, IRemotable
 		{
+			//-------- attributes --------
+			
+			/** The testcase name. */
+			protected String	name;
+			
+			//-------- constructors --------
+			
+			/**
+			 *  Create a test result listener
+			 */
+			public TestResultListener(String name)
+			{
+				this.name	= name;
+			}
+			
+			//-------- IResultListener interface --------
+			
+			/**
+			 *  Exception during test execution.
+			 */
+			public void exceptionOccurred(Exception exception)
+			{
+				Testcase	res	= new Testcase(1, new TestReport[]{new TestReport("creation", "Test center report", 
+					false, "Test agent could not be created: "+exception)});
+				testFinished(res);
+			}
+			
+			/**
+			 *  Result of test execution.
+			 */
+			public void resultAvailable(Object result)
+			{
+				Testcase	res	= (Testcase)((Map)result).get("testresults");
+				if(res==null)
+				{
+					res	= new Testcase(1, new TestReport[]{new TestReport("#1", "Test execution",
+						false, "Component did not produce a result.")});
+				}
+				testFinished(res);
+			}
+			
+			/**
+			 *  Cleanup after test is finished.
+			 */
+			protected void	testFinished(final Testcase result)
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						if(testcases.containsKey(name))
+						{
+							for(int i=0; i<names.length; i++)
+							{
+								if(name.equals(names[i]))
+								{
+									results[i]	= result;
+								}
+							}
+							testcases.remove(name);
+							updateProgress();
+							updateDetails();
+							startNextTestcases();
+						}
+					}
+				});
+			}
 		}
 	}
 }

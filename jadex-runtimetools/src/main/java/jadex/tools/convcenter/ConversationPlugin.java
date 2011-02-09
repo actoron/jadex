@@ -20,7 +20,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.service.SServiceProvider;
-import jadex.tools.jcc.AgentControlCenter;
 import jadex.tools.starter.StarterPlugin;
 import jadex.xml.annotation.XMLClassname;
 
@@ -145,7 +144,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		comptree = new ComponentTreePanel(getJCC().getExternalAccess());
 		comptree.setMinimumSize(new Dimension(0, 0));
 		split.add(comptree);
-		convcenter = new FipaConversationPanel(((AgentControlCenter)getJCC()).getAgent(), comptree);
+		convcenter = new FipaConversationPanel(getJCC().getExternalAccess(), comptree);
 		comptree.addNodeHandler(new INodeHandler()
 		{
 			public Action[] getPopupActions(ITreeNode[] nodes)
@@ -218,7 +217,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			}
 		};
 		
-		((AgentControlCenter)getJCC()).getAgent().scheduleStep(new IComponentStep()
+		getJCC().getExternalAccess().scheduleStep(new IComponentStep()
 		{
 			@XMLClassname("fipamsg")
 			public Object execute(IInternalAccess ia)
@@ -242,13 +241,12 @@ public class ConversationPlugin extends AbstractJCCPlugin
 	 */
 	public void processMessage(final IMessageEvent message)
 	{
-		((AgentControlCenter)getJCC()).getAgent().scheduleStep(new IComponentStep()
+		getJCC().getExternalAccess().scheduleStep(new IComponentStep()
 		{
 			@XMLClassname("process")
 			public Object execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
-				Map	msg	= convcenter.createMessageMap(scope, message);
+				Map	msg	= convcenter.createMessageMap(message);
 				String onto	= (String)msg.get(SFipa.ONTOLOGY);
 				if(onto==null || !onto.startsWith("jadex.tools"))
 				{

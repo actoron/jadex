@@ -1,4 +1,4 @@
-package jadex.tools.testcenter;
+package jadex.commons.gui;
 
 import java.awt.Dimension;
 import java.awt.Insets;

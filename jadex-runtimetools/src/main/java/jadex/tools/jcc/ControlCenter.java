@@ -5,17 +5,17 @@ import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.base.gui.plugin.SJCC;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IVersionInfo;
+import jadex.commons.ChangeEvent;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
-import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.SwingDefaultResultListener;
-import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.service.library.ILibraryService;
 import jadex.xml.PropertiesXMLHelper;
@@ -101,6 +101,40 @@ public class ControlCenter implements IControlCenter
 
 		assert Thread.currentThread().getContextClassLoader() != null;
 
+		access.scheduleStep(new IComponentStep()
+		{
+			@XMLClassname("kill")
+			public Object execute(IInternalAccess ia)
+			{
+				ia.addComponentListener(new IComponentListener()
+				{
+					public void componentTerminating(ChangeEvent ae)
+					{
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								if(!killed)
+								{
+									saveProject();
+//									closeProject();
+									closePlugins();
+									killed = true;
+								}
+								window.setVisible(false);
+								window.dispose();
+							}
+						});
+					}
+
+					public void componentTerminated(ChangeEvent ae)
+					{
+					}
+				});
+				return null;
+			}
+		});
+		
 		access.scheduleStep(new IComponentStep()
 		{
 			@XMLClassname("open-window")
@@ -402,14 +436,14 @@ public class ControlCenter implements IControlCenter
 			}
 
 			// Save properties of all plugins.
+			final File	project	= ControlCenter.this.project;
+			final Properties	props	=  ControlCenter.this.props;
 			final IControlCenterPlugin[] plugs = (IControlCenterPlugin[])plugins.keySet().toArray(new IControlCenterPlugin[plugins.keySet().size()]);
 			final CounterResultListener lis = new CounterResultListener(plugs.length, true, 
 				new SwingDefaultResultListener()
 			{
 				public void customResultAvailable(Object result)
 				{
-					final File	project	= ControlCenter.this.project;
-					final Properties	props	=  ControlCenter.this.props;
 					access.scheduleStep(new IComponentStep()
 					{
 						@XMLClassname("save-project")

@@ -11,40 +11,9 @@
 		<import>jadex.commons.service.library.*</import>
 	</imports>
 
-	<capabilities>
-		<capability name="testcentercap" file="jadex.tools.testcenter.TestCenter" />
-	</capabilities>
-
 	<beliefs>
-		<belief name="jcc" class="AgentControlCenter" />
-
-		<beliefsetref name="agents">
-			<concrete ref="cms.agents" />
-		</beliefsetref>
-
-		<beliefref name="testcase_timeout">
-			<concrete ref="testcentercap.timeout" />
-		</beliefref>
+		<belief name="jcc" class="ControlCenter" />
 	</beliefs>
-
-	<goals>
-		<performgoalref name="perform_test">
-			<concrete ref="testcentercap.perform_test" />
-		</performgoalref>
-	</goals>
-
-	<plans>
-		<!-- <plan name="agent_list_update"> <body class="AgentListUpdatePlan" 
-			/> <trigger> <factadded ref="agents"/> <factremoved ref="agents"/> </trigger> 
-			</plan> -->
-
-		<!-- <plan name="agent_list_update"> <body class="AgentListUpdatePlan" 
-			/> <!- - <waitqueue> <factadded ref="agents"/> <factremoved ref="agents"/> 
-			</waitqueue> - -> </plan> -->
-
-		<!-- <plan name="receiver"> <body class="MailPlan" /> <trigger> <messageevent 
-			ref="fipcmsg" /> <messageevent ref="agent_inform"/> </trigger> </plan> -->
-	</plans>
 
 	<events>
 		<messageevent name="fipamsg" type="fipa" />
@@ -105,7 +74,7 @@
 			<beliefs>
 				<initialbelief ref="jcc">
 					<fact>
-						new AgentControlCenter($scope.getExternalAccess(),
+						new ControlCenter($scope.getExternalAccess(),
 						" jadex.tools.starter.StarterPlugin"
 						+ " jadex.tools.generic.DFServicePlugin"
 						+ " jadex.tools.convcenter.ConversationPlugin"

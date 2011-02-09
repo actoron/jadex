@@ -3,12 +3,12 @@ package jadex.tools.convcenter;
 import jadex.base.fipa.FIPAMessageType;
 import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bridge.ContentException;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.MessageType;
 import jadex.bridge.MessageType.ParameterSpecification;
@@ -72,7 +72,7 @@ public class FipaConversationPanel extends JSplitPane
 	//-------- attributes --------
 	
 	/** The agent to dispatch events to. */
-	protected IBDIExternalAccess	agent;
+	protected IExternalAccess	agent;
 	
 	/** The tabbed panel. */
 	protected JTabbedPane	tabs;
@@ -94,7 +94,7 @@ public class FipaConversationPanel extends JSplitPane
 	/**
 	 *  Create the gui.
 	 */
-	public FipaConversationPanel(final IBDIExternalAccess agent, Component comptree)
+	public FipaConversationPanel(final IExternalAccess agent, Component comptree)
 	{
 		super(JSplitPane.HORIZONTAL_SPLIT, true);
 		setOneTouchExpandable(true);
@@ -288,7 +288,7 @@ public class FipaConversationPanel extends JSplitPane
 										IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
 										IMessageEvent	me	= createMessageEvent(scope, msg);
 										IMessageEvent	reply	= scope.getEventbase().createReply(me, "fipamsg");
-										final Map	replymsg	= createMessageMap(scope, reply);
+										final Map	replymsg	= createMessageMap(reply);
 										SwingUtilities.invokeLater(new Runnable()
 										{
 											public void run()
@@ -730,7 +730,7 @@ public class FipaConversationPanel extends JSplitPane
 	 *  @param scope	Used as marker to show that method requires running on component thread.
 	 *  @param message	The message event to convert to a map.
 	 */
-	public Map	createMessageMap(IBDIInternalAccess scope, IMessageEvent message)
+	public Map	createMessageMap(IMessageEvent message)
 	{
 		MessageType	mt	= message.getMessageType();
 		Map	msg	= new HashMap();

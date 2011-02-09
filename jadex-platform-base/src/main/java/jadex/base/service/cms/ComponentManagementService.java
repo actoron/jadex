@@ -195,7 +195,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		}
 
 		// Load the model with fitting factory.
-		getClassLoader(info).addResultListener(new DefaultResultListener()
+		getClassLoader(cinfo).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
