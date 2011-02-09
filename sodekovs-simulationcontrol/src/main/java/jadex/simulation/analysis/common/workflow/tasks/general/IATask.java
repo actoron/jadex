@@ -2,10 +2,11 @@ package jadex.simulation.analysis.common.workflow.tasks.general;
 
 import java.util.UUID;
 
+import jadex.bpmn.runtime.ITask;
 import jadex.simulation.analysis.common.events.ATaskEvent;
 import jadex.simulation.analysis.common.events.ATaskListener;
 
-public interface IATask
+public interface IATask extends ITask
 {
 	public Object getMutex();
 	

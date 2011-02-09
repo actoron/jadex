@@ -4,10 +4,10 @@ import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.ISuspendable;
-import jadex.commons.ThreadSuspendable;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.ISuspendable;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
@@ -184,7 +184,6 @@ public class BasicGeneralAnalysisService extends BasicService implements IGenera
 	@Override
 	public IFuture getView(Frame owner)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return getView();
 	}
 }

@@ -2,8 +2,7 @@ package jadex.simulation.analysis.common.workflow.tasks.general;
 
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.events.ATaskEvent;
 import jadex.simulation.analysis.common.events.ATaskListener;
 

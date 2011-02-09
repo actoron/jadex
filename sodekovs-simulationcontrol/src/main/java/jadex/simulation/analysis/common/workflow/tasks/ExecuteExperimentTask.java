@@ -2,9 +2,9 @@ package jadex.simulation.analysis.common.workflow.tasks;
 
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.ThreadSuspendable;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.BasicGeneralAnalysisService;

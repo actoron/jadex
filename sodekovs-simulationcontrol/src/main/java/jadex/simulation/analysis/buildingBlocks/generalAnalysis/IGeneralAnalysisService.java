@@ -1,6 +1,6 @@
 package jadex.simulation.analysis.buildingBlocks.generalAnalysis;
 
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.IService;
 
 import java.awt.Frame;

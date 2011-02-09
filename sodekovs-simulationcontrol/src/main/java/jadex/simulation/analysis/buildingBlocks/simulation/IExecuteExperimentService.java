@@ -1,6 +1,6 @@
 package jadex.simulation.analysis.buildingBlocks.simulation;
 
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.IService;
 import jadex.simulation.analysis.common.dataObjects.IAExperiment;
 

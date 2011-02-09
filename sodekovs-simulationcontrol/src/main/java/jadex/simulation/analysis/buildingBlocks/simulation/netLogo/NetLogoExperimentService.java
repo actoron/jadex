@@ -1,8 +1,8 @@
 package jadex.simulation.analysis.buildingBlocks.simulation.netLogo;
 
 import jadex.bdi.runtime.ICapability;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.BasicService;
 import jadex.simulation.analysis.buildingBlocks.simulation.IExecuteExperimentService;
 import jadex.simulation.analysis.common.dataObjects.IAExperiment;

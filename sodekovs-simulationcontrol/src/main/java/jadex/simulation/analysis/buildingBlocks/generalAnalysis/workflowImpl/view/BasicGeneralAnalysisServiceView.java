@@ -1,13 +1,12 @@
 package jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.view;
 
-import jadex.commons.IFuture;
-import jadex.commons.ThreadSuspendable;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.simulation.analysis.buildingBlocks.generalAnalysis.IGeneralAnalysisService;
 import jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.BasicGeneralAnalysisService;
 import jadex.simulation.analysis.common.dataObjects.IAExperiment;
 import jadex.simulation.analysis.common.dataObjects.IAModel;
-import jadex.simulation.analysis.common.dataObjects.Factories.AExperimentFactory;
 import jadex.simulation.analysis.common.dataObjects.Factories.ADataViewFactory;
+import jadex.simulation.analysis.common.dataObjects.Factories.AExperimentFactory;
 import jadex.simulation.analysis.common.dataObjects.parameter.ABasicParameter;
 import jadex.simulation.analysis.common.dataObjects.parameter.AParameterEnsemble;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
@@ -23,7 +22,6 @@ import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;

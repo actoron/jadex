@@ -2,9 +2,9 @@ package jadex.simulation.analysis.buildingBlocks.simulation.viewer;
 
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.Properties;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.IService;
 import jadex.simulation.analysis.buildingBlocks.simulation.IExecuteExperimentService;
 
@@ -55,17 +55,17 @@ public class BasicExecuteExperimentServiceView extends JTabbedPane implements IS
 		return executionService.getServiceIdentifier().getServiceName();
 	}
 
-	/**
-	 * Advices the the panel to restore its properties from the argument
-	 */
-	public void setProperties(Properties ps) {
+	@Override
+	public IFuture getProperties()
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	/**
-	 * Advices the panel provide its setting as properties (if any). This is
-	 * done on project close or save.
-	 */
-	public Properties getProperties() {
+	@Override
+	public IFuture setProperties(Properties ps)
+	{
+		// TODO Auto-generated method stub
 		return null;
 	}
 
