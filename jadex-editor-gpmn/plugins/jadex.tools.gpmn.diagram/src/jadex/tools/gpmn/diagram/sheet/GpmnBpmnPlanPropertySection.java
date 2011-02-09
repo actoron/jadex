@@ -45,6 +45,7 @@ public class GpmnBpmnPlanPropertySection extends GpmnCustomPropertySection
 		addNameControl(confGroup);
 		addRefControl(confGroup);
 		addPreconditionControl(confGroup);
+		addContextconditionControl(confGroup);
 	}
 	
 	protected void refreshControls()
@@ -56,6 +57,12 @@ public class GpmnBpmnPlanPropertySection extends GpmnCustomPropertySection
 		
 		setTextControlValue(((Text) controls.get(BPMNPLAN_NAME_DESC)),
 				conv(plan.getName()));
+		setTextControlValue(((Text) controls.get(PLAN_REF_DESC)), conv(plan
+				.getPlanref()));
+		setTextControlValue(((Text) controls.get(PRECONDITION_DESC)), conv(plan
+				.getPrecondition()));
+		setTextControlValue(((Text) controls.get(CONTEXT_CONDITION_DESC)),
+				conv(plan.getContextcondition()));
 	}
 	
 	protected void addNameControl(final Composite parent)

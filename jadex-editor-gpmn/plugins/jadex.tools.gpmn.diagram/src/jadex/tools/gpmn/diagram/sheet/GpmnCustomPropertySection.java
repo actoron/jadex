@@ -1,9 +1,12 @@
 package jadex.tools.gpmn.diagram.sheet;
 
+import jadex.editor.model.common.properties.AbstractCommonPropertySection;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.gmf.runtime.common.core.command.ICommand;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
@@ -15,9 +18,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
-
-import jadex.editor.model.common.properties.AbstractCommonPropertySection;
-import jadex.editor.model.common.properties.ModifyEObjectCommand;
 
 public abstract class GpmnCustomPropertySection extends AbstractCommonPropertySection
 {
@@ -84,7 +84,7 @@ public abstract class GpmnCustomPropertySection extends AbstractCommonPropertySe
 		return text;
 	}
 	
-	protected void dispatchCommand(ModifyEObjectCommand cmd)
+	protected void dispatchCommand(ICommand cmd)
 	{
 		try
 		{

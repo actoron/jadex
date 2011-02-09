@@ -63,7 +63,7 @@ public class VirtualOrderParser implements IParser
 				aEdge = (Edge) edge;
 				break;
 			}
-		ICommand cmd = new ModifyActivationEdgeOrder(diagramEditPart, aeNode, aEdge, value);
+		ICommand cmd = new ModifyActivationEdgeOrder(diagramEditPart, aEdge, value);
 		
 		//SGpmnUtilities.resolveEditPart(diagramEditPart, object)
 		
@@ -102,15 +102,15 @@ public class VirtualOrderParser implements IParser
 		ActivationEdge edge = (ActivationEdge) element.getAdapter(EObject.class);
 		if (edge == null)
 			return "";
-		System.out.println("GetPrintStringEdge: " + edge);
+		//System.out.println("GetPrintStringEdge: " + edge);
 		return String.valueOf(edge.getOrder());
 	}
 
 	@Override
 	public boolean isAffectingEvent(Object event, int flags)
 	{
-		System.out.print("EVENT: ");
-		System.out.println(event);
+		//System.out.print("EVENT: ");
+		//System.out.println(event);
 		return false;
 	}
 

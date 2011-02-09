@@ -30,12 +30,13 @@ public class ModifyActivationEdgeOrder extends AbstractTransactionalCommand
 	private int newOrder;
 	private DiagramEditPart diagramEditPart;
 	
-	public ModifyActivationEdgeOrder(DiagramEditPart diagramEditPart, Node apNode, Edge aEdge, int newOrder)
+	public ModifyActivationEdgeOrder(DiagramEditPart diagramEditPart, Edge aEdge, int newOrder)
 	{
 		super((TransactionalEditingDomain) AdapterFactoryEditingDomain.getEditingDomainFor(diagramEditPart.getDiagramView()),
 				"Modify Edge Order.",
 				Arrays.asList(new Object[] {WorkspaceSynchronizer.getFile(diagramEditPart.getDiagramView().eResource())}));
-		this.apNode = apNode;
+		//this.apNode = apNode;
+		this.apNode = (Node) aEdge.getSource();
 		this.aEdge = (ActivationEdge) aEdge.getElement();
 		this.newOrder = newOrder;
 		this.diagramEditPart = diagramEditPart;

@@ -740,6 +740,28 @@
     </tabs>
     <tabs
         xsi:type="gmfgen:GenCustomPropertyTab"
+        iD="subprocesstab"
+        label="Subprocess"
+        className="GpmnSubProcessPropertySection">
+      <filter
+          xsi:type="gmfgen:TypeTabFilter">
+        <types>jadex.tools.gpmn.diagram.edit.parts.SubProcessEditPart</types>
+        <generatedTypes>abstractNavigatorItem</generatedTypes>
+      </filter>
+    </tabs>
+    <tabs
+        xsi:type="gmfgen:GenCustomPropertyTab"
+        iD="activationedgetab"
+        label="Activation Edge"
+        className="GpmnActivationEdgePropertySection">
+      <filter
+          xsi:type="gmfgen:TypeTabFilter">
+        <types>jadex.tools.gpmn.diagram.edit.parts.ActivationEdgeEditPart</types>
+        <generatedTypes>abstractNavigatorItem</generatedTypes>
+      </filter>
+    </tabs>
+    <tabs
+        xsi:type="gmfgen:GenCustomPropertyTab"
         iD="domain"
         label="Advanced">
       <filter

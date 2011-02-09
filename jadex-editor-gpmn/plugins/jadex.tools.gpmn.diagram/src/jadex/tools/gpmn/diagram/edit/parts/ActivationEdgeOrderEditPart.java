@@ -401,18 +401,20 @@ public class ActivationEdgeOrderEditPart extends LabelEditPart implements
 	}
 	
 	/**
-	 * @generated
+	 * @generated NOT
 	 */
 	public IParser getParser()
 	{
 		if (parser == null)
 		{
-			parser = GpmnParserProvider
+			parser = new ActivationOrderParser((DiagramEditPart) getRoot()
+					.getContents());
+			/*parser = GpmnParserProvider
 					.getParser(
 							GpmnElementTypes.ActivationEdge_4001,
 							getParserElement(),
 							GpmnVisualIDRegistry
-									.getType(jadex.tools.gpmn.diagram.edit.parts.ActivationEdgeOrderEditPart.VISUAL_ID));
+									.getType(jadex.tools.gpmn.diagram.edit.parts.ActivationEdgeOrderEditPart.VISUAL_ID));*/
 		}
 		return parser;
 	}

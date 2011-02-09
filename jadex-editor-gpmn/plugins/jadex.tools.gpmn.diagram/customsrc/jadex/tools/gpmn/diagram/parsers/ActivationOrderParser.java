@@ -45,9 +45,7 @@ public class ActivationOrderParser implements IParser
 		final Edge aEdge = (Edge) vaeLabel.eContainer();
 		final int value = Integer.parseInt(newString);
 		
-		Node aeNode =  (Node) aEdge.getSource();
-		
-		ICommand cmd = new ModifyActivationEdgeOrder(diagramEditPart, aeNode, aEdge, value);
+		ICommand cmd = new ModifyActivationEdgeOrder(diagramEditPart, aEdge, value);
 		return cmd;
 	}
 

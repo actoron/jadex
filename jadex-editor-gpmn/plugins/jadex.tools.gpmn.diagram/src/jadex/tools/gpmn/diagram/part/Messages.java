@@ -20,7 +20,8 @@ public class Messages extends NLS
 	 */
 	static
 	{
-		NLS.initializeMessages("jadex.tools.gpmn.diagram.part.messages", Messages.class); //$NON-NLS-1$
+		NLS.initializeMessages(
+				"jadex.tools.gpmn.diagram.part.messages", Messages.class); //$NON-NLS-1$
 	}
 	
 	/**

@@ -181,9 +181,9 @@ http://www.eclipse.org/legal/epl-v10.html
       <propertyContributor
             contributorId="jadex.tools.gpmn.diagram"
             labelProvider="jadex.tools.gpmn.diagram.sheet.GpmnSheetLabelProvider">
+         <propertyCategory category="extra"/>
          <propertyCategory category="domain"/>
          <propertyCategory category="visual"/>
-         <propertyCategory category="extra"/>
       </propertyContributor>
    </extension>
 
@@ -206,6 +206,14 @@ http://www.eclipse.org/legal/epl-v10.html
              category="extra"
              id="property.tab.bpmntab"
              label="%tab.bpmntab"/>
+          <propertyTab
+             category="extra"
+             id="property.tab.subprocesstab"
+             label="%tab.subprocesstab"/>
+          <propertyTab
+             category="extra"
+             id="property.tab.activationedgetab"
+             label="%tab.activationedgetab"/>
           <propertyTab
              category="domain"
              id="property.tab.domain"
@@ -252,6 +260,20 @@ http://www.eclipse.org/legal/epl-v10.html
             tab="property.tab.bpmntab"
             class="jadex.tools.gpmn.diagram.sheet.GpmnBpmnPlanPropertySection">
             <input type="jadex.tools.gpmn.diagram.edit.parts.BpmnPlanEditPart"/>
+            <input type="jadex.tools.gpmn.diagram.navigator.GpmnAbstractNavigatorItem"/>
+         </propertySection>
+         <propertySection
+            id="property.section.subprocesstab" 
+            tab="property.tab.subprocesstab"
+            class="jadex.tools.gpmn.diagram.sheet.GpmnSubProcessPropertySection">
+            <input type="jadex.tools.gpmn.diagram.edit.parts.SubProcessEditPart"/>
+            <input type="jadex.tools.gpmn.diagram.navigator.GpmnAbstractNavigatorItem"/>
+         </propertySection>
+         <propertySection
+            id="property.section.activationedgetab" 
+            tab="property.tab.activationedgetab"
+            class="jadex.tools.gpmn.diagram.sheet.GpmnActivationEdgePropertySection">
+            <input type="jadex.tools.gpmn.diagram.edit.parts.ActivationEdgeEditPart"/>
             <input type="jadex.tools.gpmn.diagram.navigator.GpmnAbstractNavigatorItem"/>
          </propertySection>
          <propertySection
