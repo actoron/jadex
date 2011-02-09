@@ -1351,22 +1351,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	 */
 	public Map createReply(final Map msg, final MessageType mt)
 	{
-		IMessageService ms = (IMessageService)variables.get("$msgservice");
-		return ms.createReply(msg, mt);
-		
-//		final Future ret = new Future();
-		
-//		SServiceProvider.getService(getServiceProvider(), IMessageService.class)
-//			.addResultListener(createResultListener(new DefaultResultListener()
-//		{
-//			public void resultAvailable(Object source, Object result)
-//			{
-//				IMessageService ms = (IMessageService)result;
-//				ret.setResult(ms.createReply(msg, mt));
-//			}
-//		}));
-				
-//		return ret;
+		return mt.createReply(msg);
 	}
 	
 	/**

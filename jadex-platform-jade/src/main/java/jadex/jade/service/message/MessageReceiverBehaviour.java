@@ -35,6 +35,10 @@ import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IContentCodec;
+import jadex.bridge.IMessageService;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.service.RequiredServiceInfo;
+import jadex.commons.service.SServiceProvider;
 import jadex.jade.JadeComponentAdapter;
 import jadex.jade.JadeMessageAdapter;
 import jadex.jade.SJade;
@@ -82,7 +86,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 		else
 		{
 			// Otherwise dispatch message to agent.
-			JadeMessageAdapter ma = new JadeMessageAdapter(msg);
+			final JadeMessageAdapter ma = new JadeMessageAdapter(msg);
 			
 			
 			// Conversion via platform specific codecs
@@ -232,6 +236,16 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 			}
 			
 			agent.getComponentInstance().messageArrived(ma);
+			
+			SServiceProvider.getService(agent.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object result)
+				{
+					MessageService	ms	= (MessageService)result;
+					ms.messageReceived(ma);
+				}
+			});
 		}
 	}
 }

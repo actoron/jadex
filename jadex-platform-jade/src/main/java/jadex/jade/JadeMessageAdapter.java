@@ -6,10 +6,8 @@ import jadex.base.fipa.SFipa;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.MessageType;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -124,7 +122,7 @@ public class JadeMessageAdapter implements IMessageAdapter
 		}
 		else if(name.equals(SFipa.RECEIVERS))
 		{
-			final Iterator	it	= message.getAllReplyTo();
+			final Iterator	it	= message.getAllReceiver();
 			if(it.hasNext())
 			{
 				ret	= new Iterator()
@@ -155,69 +153,14 @@ public class JadeMessageAdapter implements IMessageAdapter
 	public Map getParameterMap()
 	{
 		Map ret = decvals!=null ? (Map)((HashMap)decvals).clone() : new HashMap();
-		if(!ret.containsKey(SFipa.ENCODING))
+		
+		for(Iterator it=SFipa.MESSAGE_ATTRIBUTES.iterator(); it.hasNext(); )
 		{
-			ret.put(SFipa.ENCODING, message.getEncoding());
-		}
-		if(!ret.containsKey(SFipa.IN_REPLY_TO))
-		{
-			ret.put(SFipa.IN_REPLY_TO, message.getInReplyTo());
-		}
-		if(!ret.containsKey(SFipa.LANGUAGE))
-		{
-			ret.put(SFipa.LANGUAGE, message.getLanguage());
-		}
-		if(!ret.containsKey(SFipa.ONTOLOGY))
-		{
-			ret.put(SFipa.ONTOLOGY, message.getOntology());
-		}
-		if(!ret.containsKey(SFipa.PROTOCOL))
-		{
-			ret.put(SFipa.PROTOCOL, message.getProtocol());
-		}
-		if(!ret.containsKey(SFipa.REPLY_BY))
-		{
-			ret.put(SFipa.REPLY_BY, message.getReplyByDate());
-		}
-		if(!ret.containsKey(SFipa.REPLY_WITH))
-		{
-			ret.put(SFipa.REPLY_WITH, message.getReplyWith());
-		}
-		if(!ret.containsKey(SFipa.CONVERSATION_ID))
-		{
-			ret.put(SFipa.CONVERSATION_ID, message.getConversationId());
-		}
-		if(!ret.containsKey(SFipa.PERFORMATIVE))
-		{
-			ret.put(SFipa.PERFORMATIVE, message.getPerformative());
-		}
-		if(!ret.containsKey(SFipa.CONTENT))
-		{
-			ret.put(SFipa.CONTENT, message.getContent());
-		}
-		if(!ret.containsKey(SFipa.SENDER))
-		{
-			ret.put(SFipa.SENDER, SJade.convertAIDtoFipa(message.getSender()));
-		}
-		if(!ret.containsKey(SFipa.REPLY_TO))
-		{
-			List repto = new ArrayList();
-			Iterator	it	= message.getAllReplyTo();
-			if(it.hasNext())
-				repto.add(SJade.convertAIDtoFipa((AID)it.next()));
-			
-			if(repto.size()>0)
-				ret.put(SFipa.REPLY_TO, repto);
-		}
-		if(!ret.containsKey(SFipa.RECEIVERS))
-		{
-			List recs = new ArrayList();
-			Iterator	it	= message.getAllReceiver();
-			if(it.hasNext())
-				recs.add(SJade.convertAIDtoFipa((AID)it.next()));
-			
-			if(recs.size()>0)
-				ret.put(SFipa.RECEIVERS, recs);
+			String	attr	= (String)it.next();
+			if(!ret.containsKey(attr))
+			{
+				ret.put(attr, getValue(attr));
+			}
 		}
 		
 		return ret;

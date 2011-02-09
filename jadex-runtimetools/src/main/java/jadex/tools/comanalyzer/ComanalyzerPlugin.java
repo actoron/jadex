@@ -13,6 +13,7 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageListener;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
+import jadex.commons.IFilter;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SReflect;
@@ -585,12 +586,13 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		applyAgentFilter(dummy);
 		componentlist.addAgent(dummy);
 		
-		SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), IMessageService.class)
+			.addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				IMessageService ms = (IMessageService)result;
-				ms.addMessageListener(ComanalyzerPlugin.this);
+				ms.addMessageListener(ComanalyzerPlugin.this, IFilter.ALWAYS);
 			}
 		});
 		

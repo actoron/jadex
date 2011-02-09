@@ -1,20 +1,16 @@
 package jadex.tools.convcenter;
 
-import jadex.base.fipa.FIPAMessageType;
-import jadex.base.fipa.SFipa;
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.IMessageEventListener;
-import jadex.bridge.ContentException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IMessageAdapter;
+import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
 import jadex.bridge.MessageType.ParameterSpecification;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
+import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
@@ -54,7 +50,7 @@ import javax.swing.border.TitledBorder;
 /**
  * A panel for sending and receiving messages.
  */
-public class FipaConversationPanel extends JSplitPane
+public class ConversationPanel extends JSplitPane
 {
 	//-------- static part --------
 	
@@ -64,15 +60,21 @@ public class FipaConversationPanel extends JSplitPane
 	protected static UIDefaults icons = new UIDefaults(new Object[]
 	{
 		// Tab icons.
-		"new_message", SGUI.makeIcon(FipaConversationPanel.class, "/jadex/tools/common/images/new_new_message.png"),
-		"sent_message", SGUI.makeIcon(FipaConversationPanel.class, "/jadex/tools/common/images/new_sent_message.png"),
-		"received_message", SGUI.makeIcon(FipaConversationPanel.class, "/jadex/tools/common/images/new_received_message.png")
+		"new_message", SGUI.makeIcon(ConversationPanel.class, "/jadex/tools/common/images/new_new_message.png"),
+		"sent_message", SGUI.makeIcon(ConversationPanel.class, "/jadex/tools/common/images/new_sent_message.png"),
+		"received_message", SGUI.makeIcon(ConversationPanel.class, "/jadex/tools/common/images/new_received_message.png")
 	});
+	
+	/** Id for message type. */
+	protected static final String	MESSAGE_TYPE = "FipaConversationPanel-message-type";
 	
 	//-------- attributes --------
 	
 	/** The agent to dispatch events to. */
 	protected IExternalAccess	agent;
+	
+	/** The default message type. */
+	protected MessageType	defaulttype;
 	
 	/** The tabbed panel. */
 	protected JTabbedPane	tabs;
@@ -85,26 +87,25 @@ public class FipaConversationPanel extends JSplitPane
 
 	/** The list of received messages. */
 	protected JList	receivedmsgs;
-	
-	/** Registered message events. */
-	protected List regmsgs;
+
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create the gui.
 	 */
-	public FipaConversationPanel(final IExternalAccess agent, Component comptree)
+	public ConversationPanel(final IExternalAccess agent, Component comptree, MessageType defaulttype)
 	{
 		super(JSplitPane.HORIZONTAL_SPLIT, true);
 		setOneTouchExpandable(true);
 
 		this.agent	= agent;
-		this.regmsgs = new ArrayList();
+		this.defaulttype	= defaulttype;
 		
 		// Right side starts with initial send panel only.
 		Map	msg	= new HashMap();
-		msg.put(SFipa.SENDER, agent.getComponentIdentifier());
+		msg.put(MESSAGE_TYPE, defaulttype);
+		msg.put(defaulttype.getSenderIdentifier(), agent.getComponentIdentifier());
 		sendpanel = new FipaMessagePanel(msg, agent, comptree);
 
 		JButton send = new JButton("Send");
@@ -117,7 +118,7 @@ public class FipaConversationPanel extends JSplitPane
 				// Hack! For handling conversations.
 				// If no replies are sent sentmessages are 
 				Map	msg	= sendpanel.getMessage();
-				MessageType mt = new FIPAMessageType();	// (MessageType)msg.get(ConversationPlugin.ENCODED_MESSAGE_TYPE);
+				MessageType mt = (MessageType)msg.get(MESSAGE_TYPE);
 				String ri = mt.getReceiverIdentifier();
 				ParameterSpecification ris = mt.getParameter(ri);
 				
@@ -207,7 +208,7 @@ public class FipaConversationPanel extends JSplitPane
 					{
 						public void actionPerformed(ActionEvent ae)
 						{
-							sendpanel.setMessage(cloneMessage(msg));
+							sendpanel.setMessage(new HashMap(msg));
 							tabs.setSelectedComponent(sendtab);
 						}
 					});
@@ -244,7 +245,7 @@ public class FipaConversationPanel extends JSplitPane
 					tabs.addTab(getMessageTitle(msg), icons.getIcon("sent_message"), scroll);
 					tabs.setSelectedComponent(scroll);
 					
-					SGUI.adjustComponentSizes(FipaConversationPanel.this);
+					SGUI.adjustComponentSizes(ConversationPanel.this);
 				}
 			}
 		});
@@ -280,27 +281,12 @@ public class FipaConversationPanel extends JSplitPane
 						{
 							public void actionPerformed(ActionEvent ae)
 							{
-								agent.scheduleStep(new IComponentStep()
-								{
-									@XMLClassname("reply")
-									public Object execute(IInternalAccess ia)
-									{
-										IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
-										IMessageEvent	me	= createMessageEvent(scope, msg);
-										IMessageEvent	reply	= scope.getEventbase().createReply(me, "fipamsg");
-										final Map	replymsg	= createMessageMap(reply);
-										SwingUtilities.invokeLater(new Runnable()
-										{
-											public void run()
-											{
-												replymsg.put(SFipa.SENDER, agent.getComponentIdentifier());
-												sendpanel.setMessage(replymsg);
-												tabs.setSelectedComponent(sendtab);
-											}
-										});
-										return null;
-									}
-								});								
+								MessageType	mt	= (MessageType)msg.get(MESSAGE_TYPE);
+								Map	replymsg	= mt.createReply(msg);
+								replymsg.put(MESSAGE_TYPE, mt);
+								replymsg.put(mt.getSenderIdentifier(), agent.getComponentIdentifier());
+								sendpanel.setMessage(replymsg);
+								tabs.setSelectedComponent(sendtab);
 							}
 						});
 	
@@ -322,7 +308,7 @@ public class FipaConversationPanel extends JSplitPane
 						msgtab.add(BorderLayout.SOUTH, south);
 						tabs.addTab(getMessageTitle(msg), icons.getIcon("received_message"), scroll);
 						tabs.setSelectedComponent(scroll);
-						SGUI.adjustComponentSizes(FipaConversationPanel.this);
+						SGUI.adjustComponentSizes(ConversationPanel.this);
 					}
 				}
 			}
@@ -343,22 +329,6 @@ public class FipaConversationPanel extends JSplitPane
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				final IMessageEvent[]	msgs	= (IMessageEvent[])regmsgs.toArray(new IMessageEvent[regmsgs.size()]);
-				agent.scheduleStep(new IComponentStep()
-				{
-					@XMLClassname("deregister")
-					public Object execute(IInternalAccess ia)
-					{
-						for(int i=0; i<msgs.length; i++)
-						{
-							IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
-							scope.getEventbase().deregisterMessageEvent(msgs[i]);
-						}
-						return null;
-					}
-				});
-				regmsgs.clear();
-				
 				((DefaultListModel)sentmsgs.getModel()).removeAllElements();
 				((DefaultListModel)receivedmsgs.getModel()).removeAllElements();
 				while(tabs.getComponentCount()>1)
@@ -375,7 +345,7 @@ public class FipaConversationPanel extends JSplitPane
 		add(lists);
 		add(tabs);
 		
-		SGUI.adjustComponentSizes(FipaConversationPanel.this);
+		SGUI.adjustComponentSizes(ConversationPanel.this);
 		
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -395,7 +365,7 @@ public class FipaConversationPanel extends JSplitPane
 	protected void	noReceiverSpecified()
 	{
 		String text = SUtil.wrapText("Cannot not send message, no receiver specified.");
-		JOptionPane.showMessageDialog(SGUI.getWindowParent(FipaConversationPanel.this), text,
+		JOptionPane.showMessageDialog(SGUI.getWindowParent(ConversationPanel.this), text,
 			"Message Error", JOptionPane.INFORMATION_MESSAGE);
 	}
 
@@ -405,35 +375,29 @@ public class FipaConversationPanel extends JSplitPane
 	 */
 	protected String getMessageTitle(Map msg)
 	{
-		StringBuffer title = new StringBuffer();
-		if(msg.get(SFipa.PERFORMATIVE)!=null)
-			title.append(msg.get(SFipa.PERFORMATIVE));
-		else
-			title.append("unknown");
+		MessageType	mt	= (MessageType)msg.get(MESSAGE_TYPE);
+		String	ret	= mt.getSimplifiedRepresentation(msg);
 		
-		title.append("(");
-		if(msg.get(SFipa.CONTENT)!=null)
-			title.append(msg.get(SFipa.CONTENT));
-		title.append(")");
-		
-		String res = title.toString();
-		
-		if(res.length()>25)
-			res	= res.substring(0, 21) + "...)";
-
-		return res;
+		if(ret.length()>25)
+		{
+			ret	= ret.substring(0, 21);
+			ret	+= "...)";
+		}
+		return ret;
 	}
 	
 	/**
 	 *  Add a received message.
 	 */
-	public void	addMessage(final Map msg)
+	public void	addMessage(final IMessageAdapter msg)
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void	run()
 			{
-				((DefaultListModel)receivedmsgs.getModel()).addElement(msg);
+				Map	msgmap	= new HashMap(msg.getParameterMap());
+				msgmap.put(MESSAGE_TYPE, msg.getMessageType());
+				((DefaultListModel)receivedmsgs.getModel()).addElement(msgmap);
 			}
 		});
 	}
@@ -468,21 +432,14 @@ public class FipaConversationPanel extends JSplitPane
 			public void run() 
 			{
 				Map	msg	= new HashMap();
-				msg.put(SFipa.SENDER, agent.getComponentIdentifier());
+				msg.put(MESSAGE_TYPE, defaulttype);
+				msg.put(defaulttype.getSenderIdentifier(), agent.getComponentIdentifier());
 				sendpanel.setMessage(msg);
 			}
 		});				
 	}
 	
 	//-------- helper methods --------
-	
-	/**
-	 *  Clone a message event.
-	 */
-	public Map	cloneMessage(Map msg)
-	{	
-		return new HashMap(msg);
-	}
 
 	/**
 	 *  Get the message panel.
@@ -555,7 +512,8 @@ public class FipaConversationPanel extends JSplitPane
 			{
 				final Map	message	= decodeMessage(msg);
 				// Update sender.
-				message.put(SFipa.SENDER, agent.getComponentIdentifier());
+				MessageType	mt	= (MessageType)message.get(MESSAGE_TYPE);
+				message.put(mt.getSenderIdentifier(), agent.getComponentIdentifier());
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
@@ -577,7 +535,8 @@ public class FipaConversationPanel extends JSplitPane
 				final boolean last = i == sents.length-1;
 				Map	message	= decodeMessage(sents[i].getValue());
 				// Update sender.
-				message.put(SFipa.SENDER, agent.getComponentIdentifier());
+				MessageType	mt	= (MessageType)message.get(MESSAGE_TYPE);
+				message.put(mt.getSenderIdentifier(), agent.getComponentIdentifier());
 				sentmsgs.add(0, message);	// Re-revert order
 				
 				if(last)
@@ -591,7 +550,7 @@ public class FipaConversationPanel extends JSplitPane
 			{
 				public void run()
 				{
-					JOptionPane.showMessageDialog(SGUI.getWindowParent(FipaConversationPanel.this), text, "Message problem", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(SGUI.getWindowParent(ConversationPanel.this), text, "Message problem", JOptionPane.INFORMATION_MESSAGE);
 				}
 			});
 		}
@@ -654,137 +613,45 @@ public class FipaConversationPanel extends JSplitPane
 		agent.scheduleStep(new IComponentStep()
 		{
 			@XMLClassname("sendM")
-			public Object execute(IInternalAccess ia)
+			public Object execute(final IInternalAccess ia)
 			{
-				final IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
-				final IMessageEvent	me	= createMessageEvent(scope, msg);
-				scope.getEventbase().sendMessage(me);
-				
-				// Register message for conversations / replies.
-				if(msg.get(SFipa.CONVERSATION_ID)!=null || msg.get(SFipa.REPLY_WITH)!=null)
+				ia.getRequiredService("messageservice").addResultListener(
+					new SwingDefaultResultListener(ConversationPanel.this)
 				{
-					regmsgs.add(me);
-					scope.getEventbase().registerMessageEvent(me);
-					
-					me.addMessageEventListener(new IMessageEventListener()
+					public void customResultAvailable(Object result)
 					{
-						public void messageEventReceived(AgentEvent ae)
+						IMessageService	ms	= (IMessageService)result;
+						final Map	sendmsg	= new HashMap(msg);
+						// Remove message type for sending.
+						final MessageType	mt	= (MessageType)sendmsg.remove(MESSAGE_TYPE);
+						ms.sendMessage(sendmsg, mt, agent.getComponentIdentifier(), ia.getModel().getClassLoader())
+							.addResultListener(new SwingDefaultResultListener(ConversationPanel.this)
 						{
-							scope.getEventbase().deregisterMessageEvent(me);
-							me.removeMessageEventListener(this);
-						}
-						public void messageEventSent(AgentEvent ae)
-						{
-						}
-					});
-				}
-				
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						// Register message for conversations / replies.
-						if(msg.get(SFipa.CONVERSATION_ID)!=null || msg.get(SFipa.REPLY_WITH)!=null)
-						{
-							regmsgs.add(me);
-						}
-						((DefaultListModel)sentmsgs.getModel()).addElement(cloneMessage(msg));
+							public void customResultAvailable(Object result)
+							{
+								// Re-add message type for storing sent msg. 
+								sendmsg.put(MESSAGE_TYPE, mt);
+								((DefaultListModel)sentmsgs.getModel()).addElement(sendmsg);
+							}
+						});
 					}
 				});
 				return null;
 			}
 		});
 	}
-	
-	/**
-	 *  Create a message event from a message map.
-	 */
-	protected IMessageEvent	createMessageEvent(IBDIInternalAccess scope, Map msg)
-	{
-		IMessageEvent	me	= scope.getEventbase().createMessageEvent("fipamsg");
-		MessageType	mt	= new FIPAMessageType();	// (MessageType)msg.get(ConversationPlugin.ENCODED_MESSAGE_TYPE);
-				
-		for(int i=0; i<mt.getParameters().length; i++)
-		{
-			String	name	= mt.getParameters()[i].getName();
-			me.getParameter(name).setValue(msg.get(name));
-		}
-		for(int i=0; i<mt.getParameterSets().length; i++)
-		{
-			String	name	= mt.getParameterSets()[i].getName();
-			if(msg.containsKey(name))
-			{
-				Object[]	values	= (Object[])msg.get(name);
-				for(int j=0; j<values.length; j++)
-				{
-					me.getParameterSet(name).addValue(values[j]);
-				}
-			}
-		}
-		
-		return me;
-	}
-	
-	/**
-	 *  Create a map from a message event.
-	 *  @param scope	Used as marker to show that method requires running on component thread.
-	 *  @param message	The message event to convert to a map.
-	 */
-	public Map	createMessageMap(IMessageEvent message)
-	{
-		MessageType	mt	= message.getMessageType();
-		Map	msg	= new HashMap();
-		
-		for(int i=0; i<mt.getParameters().length; i++)
-		{
-			String name	= mt.getParameters()[i].getName();
-			msg.put(name, message.getParameter(name).getValue());
-		}
-		for(int i=0; i<mt.getParameterSets().length; i++)
-		{
-			String name	= mt.getParameterSets()[i].getName();
-			msg.put(name, message.getParameterSet(name).getValues());
-		}
-		
-		return msg;
-	}
 
 	/**
 	 *  Display messages with performative and content instead of type.
-	 *  This is because the type of messages is always "fipamsg" in the
-	 *  conversation center.
+	 *  This is because the type of messages is usually "fipamsg".
 	 */
 	class MessageListCellRenderer extends DefaultListCellRenderer
 	{
 		public Component getListCellRendererComponent(JList list, Object value, 
 			int index, boolean sel, boolean hasfocus)
 		{		
-			if(value instanceof Map)
-			{
-				Map msg = (Map)value;
-				String perf = "n/a";
-				try
-				{
-					perf = (String)msg.get(SFipa.PERFORMATIVE);
-				}
-				catch(Exception e)
-				{
-				}
-				String cont;
-				try
-				{
-					cont =""+msg.get(SFipa.CONTENT);
-				}
-				catch(ContentException e)
-				{
-					cont = "invalid content";
-				}
-				catch(Exception e)
-				{
-					cont = "n/a";
-				}
-				value = perf + "( "+cont+ " )";  
-			}
+			assert value instanceof Map;
+			value	= getMessageTitle((Map)value);
 			return super.getListCellRendererComponent(list, value, index, sel, hasfocus);
 		}
 	}

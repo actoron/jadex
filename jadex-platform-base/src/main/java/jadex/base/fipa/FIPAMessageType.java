@@ -4,6 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.MessageType;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  *  The FIPA message type.
@@ -100,5 +101,24 @@ public class FIPAMessageType extends MessageType
 //		return SFipa.CONTENT.equals(name)? content_info: empty;
 		return SFipa.CONTENT.equals(name)? content_info: empty;
 	}
-
+	
+	/**
+	 *  Get a simplified human readable representation of the message content.
+	 *  @param The message.
+	 *  @return The simplified representation.
+	 */
+	public String	getSimplifiedRepresentation(Map msg)
+	{
+		StringBuffer	ret	= new StringBuffer();
+		if(msg.containsKey(SFipa.PERFORMATIVE))
+			ret.append(msg.get(SFipa.PERFORMATIVE));
+		else
+			ret.append("unknown");
+		
+		ret.append("(");
+		if(msg.containsKey(SFipa.CONTENT))
+			ret.append(msg.get(SFipa.CONTENT));
+		ret.append(")");
+		return ret.toString();
+	}
 }

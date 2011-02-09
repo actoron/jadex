@@ -491,20 +491,9 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param msgeventtype	The message event type.
 	 *  @return The reply event.
 	 */
-	public IFuture createReply(final Map msg, final MessageType mt)
+	public IFuture createReply(Map msg, MessageType mt)
 	{
-		final Future ret = new Future();
-		SServiceProvider.getService(getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				IMessageService ms = (IMessageService)result;
-				ret.setResult(ms.createReply(msg, mt));
-			}
-		}));
-		
-		return ret;
+		return new Future(mt.createReply(msg));
 	}
 	
 	/**

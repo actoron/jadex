@@ -182,6 +182,13 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 	public abstract String[] getCodecInfos(String name);
 
 	/**
+	 *  Get a simplified human readable representation of the message content.
+	 *  @param The message.
+	 *  @return The simplified representation.
+	 */
+	public abstract String getSimplifiedRepresentation(Map msg);
+
+	/**
 	 *  Find a matching content codec for a given message parameter.
 	 *  @param codecs	The available codecs.
 	 *  @param message	The message.
@@ -195,7 +202,7 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 		
 		for(int i=0; i<infos.length; i++)
 		{
-			if(message.containsKey(infos[i]))
+			if(message.get(infos[i])!=null)
 			{
 				if(props==null)
 					props = new java.util.Properties();
@@ -254,6 +261,48 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 	{
 		return o instanceof MessageType && name.equals(((MessageType)o).getName()); 
 	}
+	
+	/**
+	 *  Create a reply to a message.
+	 *  @param mag	The message.
+	 *  @return The reply.
+	 */
+	public Map createReply(Map msg)
+	{
+		Map reply = new HashMap();
+		
+		MessageType.ParameterSpecification[] params	= getParameters();
+		for(int i=0; i<params.length; i++)
+		{
+			String sourcename = params[i].getSource();
+			if(sourcename!=null)
+			{
+				Object sourceval = msg.get(sourcename);
+				if(sourceval!=null)
+				{
+					reply.put(params[i].getName(), sourceval);
+				}
+			}
+		}
+		
+		MessageType.ParameterSpecification[] paramsets = getParameterSets();
+		for(int i=0; i<paramsets.length; i++)
+		{
+			String sourcename = paramsets[i].getSource();
+			if(sourcename!=null)
+			{
+				Object sourceval = msg.get(sourcename);
+				if(sourceval!=null)
+				{
+					List tmp = new ArrayList();
+					tmp.add(sourceval);
+					reply.put(paramsets[i].getName(), tmp);	
+				}
+			}
+		}
+		
+		return reply;
+	}	
 
 	//-------- inner classes --------
 

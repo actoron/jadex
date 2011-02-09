@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.service.IService;
 
@@ -26,13 +27,6 @@ public interface IMessageService extends IService
 	 */
 	public void deliverMessage(Map message, String msgtype, IComponentIdentifier[] receivers);
 	
-	/**
-	 *  Create a reply to a message.
-	 *  @param msg	The message.
-	 *  @param mt	The message type.
-	 *  @return The reply event.
-	 */
-	public Map createReply(Map msg, MessageType mt);
 
 	/**
 	 *  Get addresses of all transports.
@@ -61,8 +55,9 @@ public interface IMessageService extends IService
 	/**
 	 *  Add a message listener.
 	 *  @param listener The change listener.
+	 *  @param filter An optional filter to only receive notifications for matching messages. 
 	 */
-	public void addMessageListener(IMessageListener listener);
+	public void addMessageListener(IMessageListener listener, IFilter filter);
 	
 	/**
 	 *  Remove a message listener.

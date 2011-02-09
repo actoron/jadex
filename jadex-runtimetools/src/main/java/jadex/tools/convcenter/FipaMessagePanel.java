@@ -16,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -414,7 +415,13 @@ public class FipaMessagePanel extends JPanel
 		// Extract sender / replyto
 		sender	= (IComponentIdentifier)message.get(SFipa.SENDER);	
 		replyto	= (IComponentIdentifier)message.get(SFipa.REPLY_TO);					
-		receivers  = (IComponentIdentifier[])message.get(SFipa.RECEIVERS);
+		Object	recs	= message.get(SFipa.RECEIVERS);
+		if(recs instanceof IComponentIdentifier)
+			receivers	= new IComponentIdentifier[]{(IComponentIdentifier)recs};
+		else if(recs instanceof IComponentIdentifier[])
+			receivers  = (IComponentIdentifier[])recs;
+		else if(recs instanceof Collection)
+			receivers  = (IComponentIdentifier[])((Collection)recs).toArray(new IComponentIdentifier[((Collection)recs).size()]);
 	}
   
 	/**

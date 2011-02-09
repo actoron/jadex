@@ -30,13 +30,16 @@ import jadex.base.fipa.DFSearch;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.SFipa;
 import jadex.bridge.ContentException;
+import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IContentCodec;
+import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageListener;
 import jadex.bridge.IMessageService;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.MessageType;
+import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.DelegationResultListener;
@@ -57,6 +60,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -101,8 +105,8 @@ public class MessageService  extends BasicService implements IMessageService
 	/** The logger. */
 	protected Logger logger;
 
-	/** The listeners. */
-	protected List listeners;
+	/** The listeners (listener->filter). */
+	protected Map listeners;
 	
 	/** The cashed clock service. */
 	protected IClockService	clockservice;
@@ -349,6 +353,45 @@ public class MessageService  extends BasicService implements IMessageService
 				throw new ContentException("No content codec found for: "+name+", "+message);
 			}
 		}
+		
+		IFilter[] fils;
+		IMessageListener[] lis;
+		synchronized(this)
+		{
+			fils = listeners==null? null: (IFilter[])listeners.values().toArray(new IFilter[listeners.size()]);
+			lis = listeners==null? null: (IMessageListener[])listeners.keySet().toArray(new IMessageListener[listeners.size()]);
+		}
+		
+		if(lis!=null)
+		{
+			// Hack?!
+			IMessageAdapter msgadapter = new DefaultMessageAdapter(message, type);
+			for(int i=0; i<lis.length; i++)
+			{
+				IMessageListener li = (IMessageListener)lis[i];
+				boolean	match	= false;
+				try
+				{
+					match	= fils[i]==null || fils[i].filter(msgadapter);
+				}
+				catch(Exception e)
+				{
+					logger.warning("Filter threw exception: "+fils[i]+", "+e);
+				}
+				if(match)
+				{
+					try
+					{
+						li.messageSent(msgadapter);
+					}
+					catch(Exception e)
+					{
+						logger.warning("Listener threw exception: "+li+", "+e);
+					}
+				}
+			}
+		}
+
 
 		// Prepare message for Jade.
 		final ACLMessage msg = SJade.convertMessagetoJade(message, type);
@@ -444,12 +487,13 @@ public class MessageService  extends BasicService implements IMessageService
 	/**
 	 *  Add a message listener.
 	 *  @param listener The change listener.
+	 *  @param filter An optional filter to only receive notifications for matching messages. 
 	 */
-	public synchronized void addMessageListener(IMessageListener listener)
+	public synchronized void addMessageListener(IMessageListener listener, IFilter filter)
 	{
 		if(listeners==null)
-			listeners = new ArrayList();
-		listeners.add(listener);
+			listeners = new LinkedHashMap();
+		listeners.put(listener, filter);
 	}
 	
 	/**
@@ -516,6 +560,52 @@ public class MessageService  extends BasicService implements IMessageService
 	{
 		return new Future(null);
 	}*/
+	
+	//-------- JADE specific methods --------
+	
+	/**
+	 *  Called when an agent receives a message
+	 *  to inform listeners.
+	 *  @param ma The message.
+	 */
+	public void	messageReceived(IMessageAdapter ma)
+	{
+		IFilter[] fils;
+		IMessageListener[] lis;
+		synchronized(this)
+		{
+			fils = listeners==null? null: (IFilter[])listeners.values().toArray(new IFilter[listeners.size()]);
+			lis = listeners==null? null: (IMessageListener[])listeners.keySet().toArray(new IMessageListener[listeners.size()]);
+		}
+		
+		if(lis!=null)
+		{
+			for(int i=0; i<lis.length; i++)
+			{
+				IMessageListener li = (IMessageListener)lis[i];
+				boolean	match	= false;
+				try
+				{
+					match	= fils[i]==null || fils[i].filter(ma);
+				}
+				catch(Exception e)
+				{
+					logger.warning("Filter threw exception: "+fils[i]+", "+e);
+				}
+				if(match)
+				{
+					try
+					{
+						li.messageReceived(ma);
+					}
+					catch(Exception e)
+					{
+						logger.warning("Listener threw exception: "+li+", "+e);
+					}
+				}
+			}
+		}
+	}
 }
 
 

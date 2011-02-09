@@ -6,15 +6,18 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IMessageAdapter;
+import jadex.bridge.IMessageListener;
+import jadex.bridge.IMessageService;
+import jadex.bridge.MessageType;
+import jadex.commons.IFilter;
 import jadex.commons.Properties;
+import jadex.commons.SReflect;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
@@ -27,6 +30,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -71,7 +75,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 	protected ComponentTreePanel comptree;
 
 	/** The conversation center panel. */
-	protected FipaConversationPanel convcenter;
+	protected ConversationPanel convcenter;
 
 	/**
 	 * @return "Conversation Center"
@@ -111,7 +115,8 @@ public class ConversationPlugin extends AbstractJCCPlugin
 							IComponentManagementService cms  = (IComponentManagementService)result;
 							IComponentIdentifier receiver = cms.createComponentIdentifier(rec.getName(), false, rec.getAddresses());
 							Map	message	= convcenter.getMessagePanel().getMessage();
-							IComponentIdentifier[]	recs	= (IComponentIdentifier[])message.get(SFipa.RECEIVERS);
+							MessageType	mt	= (MessageType)message.get(ConversationPanel.MESSAGE_TYPE);
+							IComponentIdentifier[]	recs	= (IComponentIdentifier[])message.get(mt.getReceiverIdentifier());
 							List	lrecs	= recs!=null ? new ArrayList(Arrays.asList(recs)) : new ArrayList();
 							if(lrecs.contains(receiver))
 							{
@@ -121,7 +126,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 							{
 								lrecs.add(receiver);
 							}
-							message.put(SFipa.RECEIVERS, (IComponentIdentifier[])lrecs.toArray(new IComponentIdentifier[lrecs.size()]));					
+							message.put(mt.getReceiverIdentifier(), (IComponentIdentifier[])lrecs.toArray(new IComponentIdentifier[lrecs.size()]));					
 							convcenter.getMessagePanel().setMessage(message);
 							
 							comptree.getModel().fireNodeChanged(node);
@@ -144,7 +149,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		comptree = new ComponentTreePanel(getJCC().getExternalAccess());
 		comptree.setMinimumSize(new Dimension(0, 0));
 		split.add(comptree);
-		convcenter = new FipaConversationPanel(getJCC().getExternalAccess(), comptree);
+		convcenter = new ConversationPanel(getJCC().getExternalAccess(), comptree, SFipa.FIPA_MESSAGE_TYPE);
 		comptree.addNodeHandler(new INodeHandler()
 		{
 			public Action[] getPopupActions(ITreeNode[] nodes)
@@ -203,17 +208,17 @@ public class ConversationPlugin extends AbstractJCCPlugin
 //		SHelp.setupHelp(split, "tools.conversationcenter");
 
 		split.setDividerLocation(150);
+		
+		
 
-		final IMessageEventListener lis = new IMessageEventListener()
+		final IMessageListener listener = new IMessageListener()
 		{
-			public void messageEventSent(AgentEvent ae)
+			public void messageReceived(IMessageAdapter msg)
 			{
-//				System.out.println("messageEventSent");
+				convcenter.addMessage(msg);
 			}
-			
-			public void messageEventReceived(AgentEvent ae)
+			public void messageSent(IMessageAdapter msg)
 			{
-				processMessage((IMessageEvent)ae.getSource());
 			}
 		};
 		
@@ -222,41 +227,42 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			@XMLClassname("fipamsg")
 			public Object execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
-				scope.getEventbase().addMessageEventListener("fipamsg", lis);
-				scope.getEventbase().addMessageEventListener("component_inform", lis);
+				ia.getRequiredService("messageservice").addResultListener(new DefaultResultListener(ia.getLogger())
+				{
+					public void resultAvailable(Object result)
+					{
+						IMessageService	ms	= (IMessageService)result;
+						ms.addMessageListener(listener, new IFilter()
+						{
+							public boolean filter(Object obj)
+							{
+								IMessageAdapter	msg	= (IMessageAdapter)obj;
+								boolean	tojcc	= false;
+								Object	rec	= msg.getValue(msg.getMessageType().getReceiverIdentifier());
+								if(SReflect.isIterable(rec))
+								{
+									for(Iterator it=SReflect.getIterator(rec); !tojcc && it.hasNext(); )
+									{
+										tojcc	= getJCC().getComponentIdentifier().equals(it.next());
+									}
+								}
+								else
+								{
+									tojcc	= getJCC().getComponentIdentifier().equals(rec);
+								}
+								
+								return tojcc;
+							}
+						});
+					}
+				});
 				return null;
 			}
 		});
 		
-		
-//		((AgentControlCenter)jcc).getAgent().getEventbase().addMessageEventListener("component_inform", lis);
-
 		return split;
 	}
 
-	/**
-	 * @param me
-	 * @return true if the message event is not from tool_management ontology
-	 */
-	public void processMessage(final IMessageEvent message)
-	{
-		getJCC().getExternalAccess().scheduleStep(new IComponentStep()
-		{
-			@XMLClassname("process")
-			public Object execute(IInternalAccess ia)
-			{
-				Map	msg	= convcenter.createMessageMap(message);
-				String onto	= (String)msg.get(SFipa.ONTOLOGY);
-				if(onto==null || !onto.startsWith("jadex.tools"))
-				{
-					convcenter.addMessage(msg);										
-				}						
-				return null;
-			}
-		});
-	}
-	
 	/**
 	 *  The actions.
 	 */

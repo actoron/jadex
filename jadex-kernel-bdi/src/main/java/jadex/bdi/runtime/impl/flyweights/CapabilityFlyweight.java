@@ -657,22 +657,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	public IModelInfo getModel()
 	{
 		// todo: return fitting capability model info.
-		
-		if(getInterpreter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					object = getInterpreter().getModel().getModelInfo();
-				}
-			};
-			return (IModelInfo)invoc.object;
-		}
-		else
-		{
-			return getInterpreter().getModel().getModelInfo();
-		}
+		return getInterpreter().getModel().getModelInfo();
 	}
 
 	/**

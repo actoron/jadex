@@ -6,7 +6,6 @@
 	name="JCC" package="jadex.tools.jcc">
 
 	<imports>
-		<import>jadex.base.fipa.*</import>
 		<import>jadex.bridge.*</import>
 		<import>jadex.commons.service.library.*</import>
 	</imports>
@@ -14,47 +13,14 @@
 	<beliefs>
 		<belief name="jcc" class="ControlCenter" />
 	</beliefs>
-
+	
 	<events>
-		<messageevent name="fipamsg" type="fipa" />
-
-		<!-- Message to issue a request to an observed component. -->
-		<messageevent name="tool_request" type="fipa" direction="send">
-			<parameter name="performative" class="String" direction="fixed">
-				<value>"request"</value>
-			</parameter>
-			<parameter name="ontology" class="String" direction="fixed">
-				<value>"jadex.tools"</value>
-			</parameter>
-			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.JADEX_XML</value>
-			</parameter>
-		</messageevent>
-
-		<!-- Message to issue a log request to an component. -->
-		<!-- <messageevent name="logger_tool_request" type="fipa" direction="send"> 
-			<parameter name="performative" class="String" direction="fixed"> <value>"request"</value> 
-			</parameter> <parameter name="ontology" class="String" direction="fixed"> 
-			<value>"jadex.tools.logger"</value> </parameter> <parameter name="language" 
-			class="String" direction="fixed"> <value>SFipa.JADEX_XML</value> </parameter> 
-			</messageevent> -->
-
-		<messageevent name="component_inform" type="fipa"
-			direction="receive">
-			<parameter name="performative" class="String" direction="fixed">
-				<value>"inform"</value>
-			</parameter>
-			<parameter name="ontology" class="String" direction="fixed">
-				<value>"jadex.tools"</value>
-			</parameter>
-			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.JADEX_XML</value>
-			</parameter>
-		</messageevent>
-
+		<!-- Dummy fipa msg to avoid severe logging message. -->
+		<messageevent name="fipamsg" type="fipa"/>
 	</events>
-
+	
 	<services>
+		<requiredservice name="messageservice" class="IMessageService" scope="platform" />
 		<requiredservice name="libservice" class="ILibraryService" scope="platform" />
 		<requiredservice name="cms" class="IComponentManagementService"	scope="platform" />
 		<requiredservice name="rms" class="IRemoteServiceManagementService"	scope="platform" />
@@ -65,8 +31,6 @@
 			messages received by conversation center. -->
 		<property name="logging.level">java.util.logging.Level.SEVERE</property>
 		<!-- <property name="debugging">true</property> -->
-		<!-- <property name="componentviewer.viewerclass">"jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel"</property> -->
-		<!-- <property name="bdiviewerpanel.agentviewerclass">"..."</property> -->
 	</properties>
 
 	<configurations>

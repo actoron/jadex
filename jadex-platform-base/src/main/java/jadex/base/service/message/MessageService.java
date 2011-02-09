@@ -14,6 +14,7 @@ import jadex.bridge.IMessageListener;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
+import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.LRU;
@@ -36,6 +37,7 @@ import jadex.commons.service.execution.IExecutionService;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -85,8 +87,8 @@ public class MessageService extends BasicService implements IMessageService
 	/** The logger. */
 	protected Logger logger;
 	
-	/** The listeners. */
-	protected List listeners;
+	/** The listeners (listener->filter). */
+	protected Map listeners;
 	
 	/** The cashed clock service. */
 	protected IClockService	clockservice;
@@ -235,14 +237,41 @@ public class MessageService extends BasicService implements IMessageService
 			}
 		}
 
-		if(listeners!=null)
+		IFilter[] fils;
+		IMessageListener[] lis;
+		synchronized(this)
+		{
+			fils = listeners==null? null: (IFilter[])listeners.values().toArray(new IFilter[listeners.size()]);
+			lis = listeners==null? null: (IMessageListener[])listeners.keySet().toArray(new IMessageListener[listeners.size()]);
+		}
+		
+		if(lis!=null)
 		{
 			// Hack?!
 			IMessageAdapter msgadapter = new DefaultMessageAdapter(msgcopy, type);
-			for(int i=0; i<listeners.size(); i++)
+			for(int i=0; i<lis.length; i++)
 			{
-				IMessageListener lis = (IMessageListener)listeners.get(i);
-				lis.messageSent(msgadapter);
+				IMessageListener li = (IMessageListener)lis[i];
+				boolean	match	= false;
+				try
+				{
+					match	= fils[i]==null || fils[i].filter(msgadapter);
+				}
+				catch(Exception e)
+				{
+					logger.warning("Filter threw exception: "+fils[i]+", "+e);
+				}
+				if(match)
+				{
+					try
+					{
+						li.messageSent(msgadapter);
+					}
+					catch(Exception e)
+					{
+						logger.warning("Listener threw exception: "+li+", "+e);
+					}
+				}
 			}
 		}
 		
@@ -266,14 +295,14 @@ public class MessageService extends BasicService implements IMessageService
 			managers.put(sm, cid);			
 		}
 		
-		CollectionResultListener lis = new CollectionResultListener(managers.size(), false, new DelegationResultListener(ret));
+		CollectionResultListener crl = new CollectionResultListener(managers.size(), false, new DelegationResultListener(ret));
 		for(Iterator it=managers.keySet().iterator(); it.hasNext();)
 		{
 			SendManager tm = (SendManager)it.next();
 			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.getCollection(tm)
 				.toArray(new IComponentIdentifier[0]);
 			ManagerSendTask task = new ManagerSendTask(msgcopy, type, recs, tm);
-			task.getSendManager().addMessage(task).addResultListener(lis);
+			task.getSendManager().addMessage(task).addResultListener(crl);
 		}
 		
 //		sendmsg.addMessage(msgcopy, type, receivers, ret);
@@ -311,10 +340,12 @@ public class MessageService extends BasicService implements IMessageService
 	 */
 	public void deliverMessage(Map message, String msgtype, IComponentIdentifier[] receivers)
 	{	
+		IFilter[] fils;
 		IMessageListener[] lis;
 		synchronized(this)
 		{
-			lis = listeners==null? null: (IMessageListener[])listeners.toArray(new IMessageListener[listeners.size()]);
+			fils = listeners==null? null: (IFilter[])listeners.values().toArray(new IFilter[listeners.size()]);
+			lis = listeners==null? null: (IMessageListener[])listeners.keySet().toArray(new IMessageListener[listeners.size()]);
 		}
 		
 		if(lis!=null)
@@ -324,55 +355,32 @@ public class MessageService extends BasicService implements IMessageService
 			for(int i=0; i<lis.length; i++)
 			{
 				IMessageListener li = (IMessageListener)lis[i];
-				li.messageReceived(msg);
+				boolean	match	= false;
+				try
+				{
+					match	= fils[i]==null || fils[i].filter(msg);
+				}
+				catch(Exception e)
+				{
+					logger.warning("Filter threw exception: "+fils[i]+", "+e);
+				}
+				if(match)
+				{
+					try
+					{
+						li.messageReceived(msg);
+					}
+					catch(Exception e)
+					{
+						logger.warning("Listener threw exception: "+li+", "+e);
+					}
+				}
 			}
 		}
 		
 		delivermsg.addMessage(message, msgtype, receivers);
 	}
 	
-	/**
-	 *  Create a reply to this message event.
-	 *  @param msgeventtype	The message event type.
-	 *  @return The reply event.
-	 */
-	public Map createReply(Map msg, MessageType mt)
-	{
-		Map reply = new HashMap();
-		
-		MessageType.ParameterSpecification[] params	= mt.getParameters();
-		for(int i=0; i<params.length; i++)
-		{
-			String sourcename = params[i].getSource();
-			if(sourcename!=null)
-			{
-				Object sourceval = msg.get(sourcename);
-				if(sourceval!=null)
-				{
-					reply.put(params[i].getName(), sourceval);
-				}
-			}
-		}
-		
-		MessageType.ParameterSpecification[] paramsets = mt.getParameterSets();
-		for(int i=0; i<paramsets.length; i++)
-		{
-			String sourcename = paramsets[i].getSource();
-			if(sourcename!=null)
-			{
-				Object sourceval = msg.get(sourcename);
-				if(sourceval!=null)
-				{
-					List tmp = new ArrayList();
-					tmp.add(sourceval);
-					reply.put(paramsets[i].getName(), tmp);	
-				}
-			}
-		}
-		
-		return reply;
-	}
-
 	/**
 	 *  Adds a transport for this outbox.
 	 *  @param transport The transport.
@@ -596,12 +604,13 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Add a message listener.
 	 *  @param listener The change listener.
+	 *  @param filter An optional filter to only receive notifications for matching messages. 
 	 */
-	public synchronized void addMessageListener(IMessageListener listener)
+	public synchronized void addMessageListener(IMessageListener listener, IFilter filter)
 	{
 		if(listeners==null)
-			listeners = new ArrayList();
-		listeners.add(listener);
+			listeners = new LinkedHashMap();
+		listeners.put(listener, filter);
 	}
 	
 	/**
