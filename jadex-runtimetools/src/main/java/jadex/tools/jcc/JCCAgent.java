@@ -13,6 +13,7 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.tools.comanalyzer.ComanalyzerPlugin;
 import jadex.tools.convcenter.ConversationPlugin;
 import jadex.tools.debugger.DebuggerPlugin;
+import jadex.tools.deployer.DeployerPlugin;
 import jadex.tools.generic.AwarenessComponentPlugin;
 import jadex.tools.generic.DFServicePlugin;
 import jadex.tools.generic.LibraryServicePlugin;
@@ -52,6 +53,7 @@ public class JCCAgent extends MicroAgent
 			+ " "+LibraryServicePlugin.class.getName()
 			+ " "+AwarenessComponentPlugin.class.getName()
 			+ " "+ComponentViewerPlugin.class.getName()
+			+ " "+DeployerPlugin.class.getName()
 			+ " "+StarterServicePlugin.class.getName()		
 		);
 	}
