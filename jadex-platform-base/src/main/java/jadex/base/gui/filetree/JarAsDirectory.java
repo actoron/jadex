@@ -188,8 +188,15 @@ public class JarAsDirectory	extends File
 		try
 		{
 			JarFile jar;
-			if(jarpath.startsWith("\\jar") || jarpath.startsWith("/jar") || jarpath.startsWith("jar")
-				|| jarpath.startsWith("\\zip") || jarpath.startsWith("/zip") || jarpath.startsWith("zip"))
+			
+			// todo:
+			// JarURLConnection does not support nested jar file access :-(
+			// Workaround is to copy jar in temp dir and extract it
+			// Then treat extracted file as top level jar again.
+			// http://www.javakb.com/Uwe/Forum.aspx/java-programmer/45375/URL-to-nested-Jar-files-looking-for-workaround
+			
+			if(jarpath.startsWith("\\jar:file") || jarpath.startsWith("/jar:file") || jarpath.startsWith("jar:file")
+				|| jarpath.startsWith("\\zip:file") || jarpath.startsWith("/zip:file") || jarpath.startsWith("zip:file"))
 			{
 				URL url = new URL(jarpath);
 				JarURLConnection conn = (JarURLConnection)url.openConnection();
@@ -233,7 +240,14 @@ public class JarAsDirectory	extends File
 		}
 		catch(IOException e)
 		{
-			e.printStackTrace();
+			if(jarpath.indexOf("jar:file")!=jarpath.lastIndexOf("jar:file"))
+			{
+				// todo: nested jar
+			}
+			else
+			{
+				e.printStackTrace();
+			}
 		}
 		
 		return entries;
@@ -307,4 +321,11 @@ public class JarAsDirectory	extends File
 		return entryfiles;
 	}
 	
+	/**
+	 *  Test if this is the real jar (not a contained file).
+	 */
+	public boolean isRoot()
+	{
+		return entry.getName().equals("/");
+	}
 }

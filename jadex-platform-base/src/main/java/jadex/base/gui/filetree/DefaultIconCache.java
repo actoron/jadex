@@ -38,7 +38,7 @@ public class DefaultIconCache implements IIconCache
 		File tmp = null;
 		try
 		{
-			if(file instanceof JarAsDirectory)
+			if(file instanceof JarAsDirectory)// && !((JarAsDirectory)file).isRoot())
 			{
 				String suffix = file.getName();
 				int idx = suffix.lastIndexOf(".");
