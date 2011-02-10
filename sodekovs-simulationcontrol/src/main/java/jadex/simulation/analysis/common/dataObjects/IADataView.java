@@ -1,16 +1,17 @@
 package jadex.simulation.analysis.common.dataObjects;
 
 
-import jadex.simulation.analysis.common.events.ADataListener;
+import jadex.simulation.analysis.common.events.IADataObservable;
+import jadex.simulation.analysis.common.events.IADataListener;
 
 import javax.swing.JComponent;
 
-public interface IADataObjectView extends ADataListener
+public interface IADataView extends IADataListener
 {
 	/**
-	 * Synchronize Object of the {@link IADataObjectView}
+	 * Synchronize Object of the {@link IADataView}
 	 * 
-	 * @return Mutex of the {@link IADataObjectView}
+	 * @return Mutex of the {@link IADataView}
 	 */
 	public Object getMutex();
 	
@@ -18,13 +19,13 @@ public interface IADataObjectView extends ADataListener
 	 * Returns the dataObject which is displayed
 	 * @return a {@link IADataObject}
 	 */
-	public IADataObject getDisplayedObject();
+	public IADataObservable getDisplayedObject();
 	
 	/**
 	 * Sets the dataObject to display
 	 * @param a {@link IADataObject}
 	 */
-	public void setDisplayedObject(IADataObject dataObject);
+	public void setDisplayedObject(IADataObservable dataObject);
 	
 	/**
 	 * Returns the component which displays the dataObject

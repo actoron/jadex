@@ -1,6 +1,7 @@
 package jadex.simulation.analysis.common.dataObjects;
 
 import jadex.simulation.analysis.common.events.ADataEvent;
+import jadex.simulation.analysis.common.events.IADataObservable;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -9,14 +10,14 @@ import java.awt.Insets;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-public class ABasicDataObjectView implements IADataObjectView
+public class ADataObjectView implements IADataView
 {
 
 	protected JComponent component;
-	protected IADataObject displayedDataObject;
+	protected IADataObservable displayedDataObject;
 	protected Object mutex = new Object();
 
-	public ABasicDataObjectView(IADataObject dataObject)
+	public ADataObjectView(IADataObservable dataObject)
 	{
 		synchronized (mutex)
 		{
@@ -35,7 +36,7 @@ public class ABasicDataObjectView implements IADataObjectView
 	}
 
 	@Override
-	public IADataObject getDisplayedObject()
+	public IADataObservable getDisplayedObject()
 	{
 		return displayedDataObject;
 	}
@@ -47,11 +48,13 @@ public class ABasicDataObjectView implements IADataObjectView
 	}
 
 	@Override
-	public void setDisplayedObject(IADataObject dataObject)
+	public void setDisplayedObject(IADataObservable dataObject)
 	{
 		this.displayedDataObject = dataObject;
 
 	}
+	
+	// -------- IADataListener --------
 
 	@Override
 	public void dataEventOccur(ADataEvent event)

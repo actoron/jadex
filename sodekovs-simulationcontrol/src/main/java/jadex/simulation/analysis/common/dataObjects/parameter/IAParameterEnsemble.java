@@ -1,7 +1,7 @@
 package jadex.simulation.analysis.common.dataObjects.parameter;
 
 import jadex.simulation.analysis.common.dataObjects.IADataObject;
-import jadex.simulation.analysis.common.dataObjects.IADataObjectView;
+import jadex.simulation.analysis.common.dataObjects.IADataView;
 
 import java.util.Map;
 

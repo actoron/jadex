@@ -10,7 +10,7 @@ import jadex.tools.generic.AbstractServicePlugin;
 import javax.swing.Icon;
 
 /**
- *  Used to show the exploration service view as JCC plugin
+ *  Used to show the general analysis service view
  */
 public class GeneralAnalysisServicePlugin extends AbstractServicePlugin
 {
@@ -39,7 +39,7 @@ public class GeneralAnalysisServicePlugin extends AbstractServicePlugin
 	{
 		GeneralAnalysisServiceViewerPanel view= new GeneralAnalysisServiceViewerPanel();
 		view.init(getJCC(), service);
-		return new Future(view);
+		return new Future(null);
 	}
 	
 	/**

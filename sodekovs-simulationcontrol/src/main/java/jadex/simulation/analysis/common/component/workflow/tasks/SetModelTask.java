@@ -1,15 +1,16 @@
-package jadex.simulation.analysis.common.workflow.tasks;
+package jadex.simulation.analysis.common.component.workflow.tasks;
 
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
+import jadex.bridge.ModelInfo;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.service.IInternalService;
-import jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.BasicGeneralAnalysisService;
+import jadex.simulation.analysis.buildingBlocks.generalAnalysis.impl.BasicGeneralAnalysisService;
+import jadex.simulation.analysis.common.component.workflow.tasks.general.ATask;
+import jadex.simulation.analysis.common.component.workflow.tasks.general.IATask;
 import jadex.simulation.analysis.common.events.ATaskEvent;
-import jadex.simulation.analysis.common.workflow.tasks.general.ABasicTask;
-import jadex.simulation.analysis.common.workflow.tasks.general.IATask;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,7 +18,7 @@ import java.awt.event.ActionListener;
 /**
  * Task to "create" a model
  */
-public class SetModelTask extends ABasicTask implements IATask
+public class SetModelTask extends ATask implements IATask
 {
 	/**
 	 * Execute the task until Future return
@@ -34,6 +35,8 @@ public class SetModelTask extends ABasicTask implements IATask
 			instance.getServiceContainer().addService(intService);
 			expService = (BasicGeneralAnalysisService) intService;
 			instance.setContextVariable("service", expService);
+			ModelInfo model = (ModelInfo)instance.getModel();
+			System.out.println(model);
 		}
 		expService.registerListener(new ActionListener()
 		{

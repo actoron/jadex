@@ -4,7 +4,7 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.simulation.analysis.common.util.AConstants;
 
-public class ATaskEvent extends ABasicEvent
+public class ATaskEvent extends AEvent
 {
 	ITaskContext context = null;
 	BpmnInterpreter interpreter = null;

@@ -1,8 +1,8 @@
-package jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.view;
+package jadex.simulation.analysis.common.component.workflow.defaultView;
 
 import javax.swing.JComponent;
 
-public interface IBpmnServiceView
+public interface IBpmnComponentView
 {
 
 //	public abstract void init();

@@ -3,8 +3,8 @@ package jadex.simulation.analysis.common.dataObjects.parameter;
 import jadex.commons.gui.JValidatorTextField;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
-import jadex.simulation.analysis.common.dataObjects.ABasicDataObjectView;
-import jadex.simulation.analysis.common.dataObjects.IADataObjectView;
+import jadex.simulation.analysis.common.dataObjects.ADataObjectView;
+import jadex.simulation.analysis.common.dataObjects.IADataView;
 import jadex.simulation.analysis.common.dataObjects.Factories.ADataViewFactory;
 import jadex.simulation.analysis.common.events.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
@@ -29,7 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
-public class ABasicParameterView extends ABasicDataObjectView implements IADataObjectView
+public class ABasicParameterView extends ADataObjectView implements IADataView
 {
 	private ABasicParameter parameter;
 

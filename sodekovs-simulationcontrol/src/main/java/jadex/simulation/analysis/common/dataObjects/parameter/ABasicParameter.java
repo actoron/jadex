@@ -1,10 +1,10 @@
 package jadex.simulation.analysis.common.dataObjects.parameter;
 
-import jadex.simulation.analysis.common.dataObjects.ABasicDataObject;
+import jadex.simulation.analysis.common.dataObjects.ADataObject;
 import jadex.simulation.analysis.common.events.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 
-public class ABasicParameter extends ABasicDataObject implements IAParameter
+public class ABasicParameter extends ADataObject implements IAParameter
 {
 	private String name = "defaultName";
 	private Object value = "";
@@ -88,7 +88,7 @@ public class ABasicParameter extends ABasicDataObject implements IAParameter
 		}
 	}
 
-	// ----- override ABasicDataObject -----
+	// ----- override ADataObject -----
 
 	@Override
 	public boolean equals(Object obj)

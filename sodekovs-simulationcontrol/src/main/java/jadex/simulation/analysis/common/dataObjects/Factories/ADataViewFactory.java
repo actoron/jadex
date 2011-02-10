@@ -1,12 +1,11 @@
 package jadex.simulation.analysis.common.dataObjects.Factories;
 
-import jadex.simulation.analysis.common.dataObjects.ABasicDataObjectView;
+import jadex.simulation.analysis.common.dataObjects.ADataObjectView;
 import jadex.simulation.analysis.common.dataObjects.AExperiment;
 import jadex.simulation.analysis.common.dataObjects.AExperimentView;
 import jadex.simulation.analysis.common.dataObjects.AModel;
 import jadex.simulation.analysis.common.dataObjects.AModelView;
-import jadex.simulation.analysis.common.dataObjects.IADataObject;
-import jadex.simulation.analysis.common.dataObjects.IADataObjectView;
+import jadex.simulation.analysis.common.dataObjects.IADataView;
 import jadex.simulation.analysis.common.dataObjects.IAExperiment;
 import jadex.simulation.analysis.common.dataObjects.IAModel;
 import jadex.simulation.analysis.common.dataObjects.parameter.ABasicParameter;
@@ -14,13 +13,14 @@ import jadex.simulation.analysis.common.dataObjects.parameter.ABasicParameterVie
 import jadex.simulation.analysis.common.dataObjects.parameter.AParameterEnsemble;
 import jadex.simulation.analysis.common.dataObjects.parameter.AParameterEnsembleView;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
+import jadex.simulation.analysis.common.events.IADataObservable;
 
 public class ADataViewFactory
 {
-	
-	public static IADataObjectView createView(IADataObject dataObject)
+	//TODO: MAybe add ViewClass in ADataObject
+	public static IADataView createView(IADataObservable dataObject)
 	{
-		IADataObjectView view;
+		IADataView view;
 		if (dataObject instanceof ABasicParameter)
 		{
 			view = createParameterView((ABasicParameter)dataObject);
@@ -55,9 +55,9 @@ public class ADataViewFactory
 		return new AExperimentView(dataObject);				
 	}
 
-	public static ABasicDataObjectView createDataObjectView(IADataObject dataObject)
+	public static ADataObjectView createDataObjectView(IADataObservable dataObject)
 	{
-		return new ABasicDataObjectView(dataObject);				
+		return new ADataObjectView(dataObject);				
 	}
 
 	public static ABasicParameterView createParameterView(ABasicParameter dataObject)

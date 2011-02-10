@@ -6,7 +6,7 @@ import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsembl
 import jadex.simulation.analysis.common.events.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 
-public class AModel extends ABasicDataObject implements IAModel
+public class AModel extends ADataObject implements IAModel
 {
 
 	private String name;

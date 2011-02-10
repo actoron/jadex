@@ -9,7 +9,7 @@ import jadex.simulation.analysis.common.dataObjects.parameter.IAParameter;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
 import jadex.simulation.analysis.common.events.ADataEvent;
 
-public class AExperiment extends ABasicDataObject implements IAExperiment
+public class AExperiment extends ADataObject implements IAExperiment
 {
 
 	private IAModel model;

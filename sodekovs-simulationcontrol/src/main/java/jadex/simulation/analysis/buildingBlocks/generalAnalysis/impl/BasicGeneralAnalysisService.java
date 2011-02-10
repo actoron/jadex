@@ -1,4 +1,4 @@
-package jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl;
+package jadex.simulation.analysis.buildingBlocks.generalAnalysis.impl;
 
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.bpmn.model.MActivity;
@@ -12,7 +12,7 @@ import jadex.commons.service.BasicService;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.simulation.analysis.buildingBlocks.generalAnalysis.IGeneralAnalysisService;
-import jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.view.BasicGeneralAnalysisServiceView;
+import jadex.simulation.analysis.buildingBlocks.generalAnalysis.impl.view.BasicGeneralAnalysisServiceView;
 import jadex.simulation.analysis.buildingBlocks.simulation.IModelInspectionService;
 import jadex.simulation.analysis.common.dataObjects.AModel;
 import jadex.simulation.analysis.common.dataObjects.IAExperiment;
@@ -45,7 +45,7 @@ public class BasicGeneralAnalysisService extends BasicService implements IGenera
 
 	public BasicGeneralAnalysisService(BpmnInterpreter instance)
 	{
-		// TODO: No Interpreter
+		// TODO: Hack??? No Interpreter?
 		super(instance.getServiceProvider().getId(), IGeneralAnalysisService.class, null);
 		this.instance = instance;
 		Map prop = getPropertyMap();

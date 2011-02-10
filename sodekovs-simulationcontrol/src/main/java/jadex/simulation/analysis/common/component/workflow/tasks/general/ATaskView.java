@@ -1,4 +1,4 @@
-package jadex.simulation.analysis.common.workflow.tasks.general;
+package jadex.simulation.analysis.common.component.workflow.tasks.general;
 
 import jadex.simulation.analysis.common.events.ATaskEvent;
 
@@ -9,13 +9,13 @@ import java.awt.Insets;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-public class ABasicTaskView implements IATaskView
+public class ATaskView implements IATaskView
 {
 	protected JComponent component;
-	protected IATask displayedTask;
+	protected IATaskObservable displayedTask;
 	protected Object mutex = new Object();
 	
-	public ABasicTaskView(IATask task)
+	public ATaskView(IATaskObservable task)
 	{
 		displayedTask = task;
 		task.addTaskListener(this);
@@ -34,6 +34,28 @@ public class ABasicTaskView implements IATaskView
 	public void taskEventOccur(ATaskEvent event)
 	{
 		//omit
+	}
+
+	@Override
+	public IATaskObservable getDisplayedObject()
+	{
+		return displayedTask;
+	}
+
+	@Override
+	public Object getMutex()
+	{
+		return mutex;
+	}
+
+	@Override
+	public void setDisplayedObject(IATaskObservable taskObject)
+	{
+		synchronized (mutex)
+		{
+			this.displayedTask = taskObject;
+		}
+		
 	}
 
 }

@@ -34,9 +34,9 @@ public class DesmoJExperimentService extends BasicService implements IExecuteExp
 	 */
 	public DesmoJExperimentService(ICapability cap) {
 		super(cap.getServiceProvider().getId(), IExecuteExperimentService.class, null);
-		Map prop = getPropertyMap();
-		prop.put(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, "jadex.simulation.analysis.buildingBlocks.execution.ExecutionServiceView");
-		setPropertyMap(prop);
+//		Map prop = getPropertyMap();
+//		prop.put(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, "jadex.simulation.analysis.buildingBlocks.execution.ExecutionServiceView");
+//		setPropertyMap(prop);
 	}
 
 	// -------- methods --------

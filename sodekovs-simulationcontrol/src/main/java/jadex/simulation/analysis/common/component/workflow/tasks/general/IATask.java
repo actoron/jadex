@@ -1,10 +1,10 @@
-package jadex.simulation.analysis.common.workflow.tasks.general;
+package jadex.simulation.analysis.common.component.workflow.tasks.general;
 
 import java.util.UUID;
 
 import jadex.bpmn.runtime.ITask;
 import jadex.simulation.analysis.common.events.ATaskEvent;
-import jadex.simulation.analysis.common.events.ATaskListener;
+import jadex.simulation.analysis.common.events.IATaskListener;
 
 public interface IATask extends ITask
 {
@@ -14,15 +14,15 @@ public interface IATask extends ITask
 
 	/**
 	 * Adds a Listener, who observe the state of the task
-	 * @param listener the {@link ATaskListener} to add
+	 * @param listener the {@link IATaskListener} to add
 	 */
-	public void addTaskListener(ATaskListener listener);
+	public void addTaskListener(IATaskListener listener);
 	
 	/**
 	 * Removes a Listener, who observe the state of the task
-	 * @param listener the {@link ATaskListener} to remove
+	 * @param listener the {@link IATaskListener} to remove
 	 */
-	public void removeTaskListener(ATaskListener listener);
+	public void removeTaskListener(IATaskListener listener);
 	
 	/**
 	 * Indicates a event in the task

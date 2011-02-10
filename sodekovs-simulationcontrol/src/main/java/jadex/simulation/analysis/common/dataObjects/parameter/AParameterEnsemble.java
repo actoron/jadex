@@ -1,8 +1,8 @@
 package jadex.simulation.analysis.common.dataObjects.parameter;
 
 import jadex.bdi.testcases.misc.GetExternalAccessPlan;
-import jadex.simulation.analysis.common.dataObjects.ABasicDataObject;
-import jadex.simulation.analysis.common.dataObjects.IADataObjectView;
+import jadex.simulation.analysis.common.dataObjects.ADataObject;
+import jadex.simulation.analysis.common.dataObjects.IADataView;
 import jadex.simulation.analysis.common.events.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 
@@ -12,7 +12,7 @@ import java.util.Map;
 
 import javax.swing.JFrame;
 
-public class AParameterEnsemble extends ABasicDataObject implements IAParameterEnsemble
+public class AParameterEnsemble extends ADataObject implements IAParameterEnsemble
 {
 
 	private Map<String, IAParameter> parametersMap;

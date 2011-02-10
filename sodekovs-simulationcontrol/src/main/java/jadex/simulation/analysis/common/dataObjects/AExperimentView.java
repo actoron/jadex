@@ -3,6 +3,7 @@ package jadex.simulation.analysis.common.dataObjects;
 import jadex.simulation.analysis.common.dataObjects.Factories.AExperimentFactory;
 import jadex.simulation.analysis.common.dataObjects.Factories.ADataViewFactory;
 import jadex.simulation.analysis.common.events.ADataEvent;
+import jadex.simulation.analysis.common.events.IADataObservable;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -21,7 +22,7 @@ import javax.swing.JRadioButton;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
-public class AExperimentView extends ABasicDataObjectView implements IADataObjectView
+public class AExperimentView extends ADataObjectView implements IADataView
 {
 	private IAExperiment frame;
 
@@ -31,7 +32,7 @@ public class AExperimentView extends ABasicDataObjectView implements IADataObjec
 	private JComponent outputComponent;
 	private int state = 1;
 
-	public AExperimentView(IADataObject dataObject)
+	public AExperimentView(IADataObservable dataObject)
 	{
 		super(dataObject);
 		component = new JPanel(new GridBagLayout());

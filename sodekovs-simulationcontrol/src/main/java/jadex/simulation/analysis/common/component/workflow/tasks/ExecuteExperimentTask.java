@@ -1,4 +1,4 @@
-package jadex.simulation.analysis.common.workflow.tasks;
+package jadex.simulation.analysis.common.component.workflow.tasks;
 
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
@@ -7,12 +7,12 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
-import jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.BasicGeneralAnalysisService;
+import jadex.simulation.analysis.buildingBlocks.generalAnalysis.impl.BasicGeneralAnalysisService;
 import jadex.simulation.analysis.buildingBlocks.simulation.IExecuteExperimentService;
+import jadex.simulation.analysis.common.component.workflow.tasks.general.ATask;
+import jadex.simulation.analysis.common.component.workflow.tasks.general.IATask;
 import jadex.simulation.analysis.common.dataObjects.IAExperiment;
 import jadex.simulation.analysis.common.events.ATaskEvent;
-import jadex.simulation.analysis.common.workflow.tasks.general.ABasicTask;
-import jadex.simulation.analysis.common.workflow.tasks.general.IATask;
 
 import java.util.ArrayList;
 
@@ -23,7 +23,7 @@ import javax.swing.SwingUtilities;
 /**
  * Task for executing Experiment
  */
-public class ExecuteExperimentTask extends ABasicTask implements IATask// extends AbstractTask
+public class ExecuteExperimentTask extends ATask implements IATask// extends AbstractTask
 {
 	/**
 	 * Execute the task.

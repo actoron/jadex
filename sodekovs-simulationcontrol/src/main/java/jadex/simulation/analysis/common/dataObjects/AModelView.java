@@ -3,6 +3,7 @@ package jadex.simulation.analysis.common.dataObjects;
 import jadex.simulation.analysis.common.dataObjects.Factories.AModelFactory;
 import jadex.simulation.analysis.common.dataObjects.Factories.ADataViewFactory;
 import jadex.simulation.analysis.common.events.ADataEvent;
+import jadex.simulation.analysis.common.events.IADataObservable;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -24,7 +25,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
-public class AModelView extends ABasicDataObjectView implements IADataObjectView
+public class AModelView extends ADataObjectView implements IADataView
 {
 	private IAModel model;
 
@@ -37,7 +38,7 @@ public class AModelView extends ABasicDataObjectView implements IADataObjectView
 	private JComponent inputParameter;
 	private JComponent outputParameter;
 
-	public AModelView(IADataObject dataObject)
+	public AModelView(IADataObservable dataObject)
 	{
 		super(dataObject);
 		component = new JPanel(new GridBagLayout());

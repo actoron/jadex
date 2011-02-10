@@ -1,6 +1,6 @@
 package jadex.simulation.analysis.common.events;
 
-public interface ATaskListener
+public interface IATaskListener
 {
 	 /**
      * Invoked when an {@link ATaskEvent} occurs

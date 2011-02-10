@@ -1,7 +1,7 @@
 package jadex.simulation.analysis.common.dataObjects.parameter;
 
-import jadex.simulation.analysis.common.dataObjects.ABasicDataObjectView;
-import jadex.simulation.analysis.common.dataObjects.IADataObjectView;
+import jadex.simulation.analysis.common.dataObjects.ADataObjectView;
+import jadex.simulation.analysis.common.dataObjects.IADataView;
 import jadex.simulation.analysis.common.dataObjects.Factories.ADataViewFactory;
 import jadex.simulation.analysis.common.events.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
@@ -24,7 +24,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-public class AParameterEnsembleView extends ABasicDataObjectView implements IADataObjectView
+public class AParameterEnsembleView extends ADataObjectView implements IADataView
 {
 	private AParameterEnsemble parameterEnsemble;
 

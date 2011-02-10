@@ -1,11 +1,11 @@
-package jadex.simulation.analysis.common.workflow.tasks;
+package jadex.simulation.analysis.common.component.workflow.tasks;
 
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.BasicGeneralAnalysisService;
+import jadex.simulation.analysis.buildingBlocks.generalAnalysis.impl.BasicGeneralAnalysisService;
 import jadex.simulation.analysis.common.dataObjects.IAExperiment;
 
 import java.awt.event.ActionEvent;

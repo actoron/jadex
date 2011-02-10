@@ -1,8 +1,8 @@
-package jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.view;
+package jadex.simulation.analysis.buildingBlocks.generalAnalysis.impl.view;
 
 import jadex.commons.future.ThreadSuspendable;
 import jadex.simulation.analysis.buildingBlocks.generalAnalysis.IGeneralAnalysisService;
-import jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.BasicGeneralAnalysisService;
+import jadex.simulation.analysis.buildingBlocks.generalAnalysis.impl.BasicGeneralAnalysisService;
 import jadex.simulation.analysis.common.dataObjects.IAExperiment;
 import jadex.simulation.analysis.common.dataObjects.IAModel;
 import jadex.simulation.analysis.common.dataObjects.Factories.ADataViewFactory;
@@ -58,7 +58,7 @@ public class BasicGeneralAnalysisServiceView extends JTabbedPane // implements I
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.view.IGeneralAnalysisServiceView#init()
+	 * @see jadex.simulation.analysis.buildingBlocks.generalAnalysis.impl.view.IGeneralAnalysisServiceView#init()
 	 */
 	public void init()
 	{
@@ -82,7 +82,7 @@ public class BasicGeneralAnalysisServiceView extends JTabbedPane // implements I
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.view.IGeneralAnalysisServiceView#setModel(jadex.simulation.analysis.common.dataObjects.IAModel)
+	 * @see jadex.simulation.analysis.buildingBlocks.generalAnalysis.impl.view.IGeneralAnalysisServiceView#setModel(jadex.simulation.analysis.common.dataObjects.IAModel)
 	 */
 	public void setModel(final IAModel model)
 	{
@@ -156,7 +156,7 @@ public class BasicGeneralAnalysisServiceView extends JTabbedPane // implements I
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.view.IGeneralAnalysisServiceView#experiment()
+	 * @see jadex.simulation.analysis.buildingBlocks.generalAnalysis.impl.view.IGeneralAnalysisServiceView#experiment()
 	 */
 	public void experiment()
 	{
@@ -232,7 +232,7 @@ public class BasicGeneralAnalysisServiceView extends JTabbedPane // implements I
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.view.IGeneralAnalysisServiceView#experimentieren(javax.swing.JComponent)
+	 * @see jadex.simulation.analysis.buildingBlocks.generalAnalysis.impl.view.IGeneralAnalysisServiceView#experimentieren(javax.swing.JComponent)
 	 */
 	public void experimentieren(final JComponent comp)
 	{
@@ -251,7 +251,7 @@ public class BasicGeneralAnalysisServiceView extends JTabbedPane // implements I
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.buildingBlocks.generalAnalysis.workflowImpl.view.IGeneralAnalysisServiceView#present(jadex.simulation.analysis.common.dataObjects.IAExperimentJob)
+	 * @see jadex.simulation.analysis.buildingBlocks.generalAnalysis.impl.view.IGeneralAnalysisServiceView#present(jadex.simulation.analysis.common.dataObjects.IAExperimentJob)
 	 */
 	public void present(final IAExperiment job)
 	{

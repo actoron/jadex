@@ -1,9 +1,8 @@
 package jadex.simulation.analysis.common.events;
 
-import jadex.simulation.analysis.common.dataObjects.IADataObject;
 import jadex.simulation.analysis.common.util.AConstants;
 
-public class ADataEvent extends ABasicEvent
+public class ADataEvent extends AEvent
 {
 	@Override
 	public String getEventType()
@@ -11,7 +10,7 @@ public class ADataEvent extends ABasicEvent
 		return AConstants.DATA_EVENT;
 	}
     
-    public ADataEvent(IADataObject source, String eventCommand)
+    public ADataEvent(IADataObservable source, String eventCommand)
     {
     	super(source, eventCommand);
     }

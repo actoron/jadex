@@ -2,7 +2,7 @@ package jadex.simulation.analysis.common.events;
 
 import java.util.EventListener;
 
-public interface ADataListener extends EventListener{
+public interface IADataListener extends EventListener{
 
 	
 	 /**
