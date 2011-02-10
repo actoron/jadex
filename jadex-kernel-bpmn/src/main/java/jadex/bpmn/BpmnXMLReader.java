@@ -1340,6 +1340,24 @@ public class BpmnXMLReader
 						//continue;
 						
 					} // end new arguments handling
+					// new jadex properties handling
+					else if(anno.getSource().toLowerCase().endsWith("_properties_table"))
+					{
+						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno.getDetails());
+						for(int row=0; row<table.dimension[0]; row++)
+						{
+							// normal property has 2 values
+							assert table.data[row].length == 2;
+							String name = table.data[row][0];
+							String value = table.data[row][1];
+
+							if(value!=null && value.length()>0)
+							{
+								IParsedExpression exp = parser.parseExpression(value, model.getAllImports(), null, context.getClassLoader());
+								model.addProperty(name, exp.getValue(null));
+							}
+						}
+					} // end new properties handling
 					else if (!anno.getSource().toLowerCase().endsWith("table"))
 					{
 						// handle other annotation details here
