@@ -165,8 +165,8 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 	 */
 	public void invokeMethod(Object target, final Future ret)
 	{
-//		if("getServices".equals(methodname))
-//			System.out.println("remote getServices");
+		if("addMessageListener".equals(methodname))
+			System.out.println("remote addMessageListener");
 		
 		try
 		{

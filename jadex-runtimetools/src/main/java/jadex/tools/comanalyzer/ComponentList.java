@@ -23,7 +23,7 @@ public class ComponentList implements Serializable
 	private List elements;
 
 	/** The listener for agent events */
-	private List listeners;;
+	private List listeners;
 
 	// -------- constructor --------
 

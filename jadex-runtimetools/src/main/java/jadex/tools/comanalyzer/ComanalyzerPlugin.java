@@ -1,29 +1,37 @@
 package jadex.tools.comanalyzer;
 
 import jadex.base.gui.asynctree.INodeHandler;
+import jadex.base.gui.asynctree.INodeListener;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
-import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageListener;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
 import jadex.commons.IFilter;
+import jadex.commons.IRemotable;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SReflect;
-import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.SGUI;
+import jadex.commons.service.IServiceIdentifier;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.library.ILibraryService;
@@ -31,6 +39,7 @@ import jadex.tools.comanalyzer.chart.ChartPanel;
 import jadex.tools.comanalyzer.diagram.DiagramPanel;
 import jadex.tools.comanalyzer.graph.GraphPanel;
 import jadex.tools.comanalyzer.table.TablePanel;
+import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -43,6 +52,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -73,7 +83,7 @@ import javax.swing.tree.TreePath;
 /**
  * The comanalyzer plugin.
  */
-public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageListener
+public class ComanalyzerPlugin extends AbstractJCCPlugin
 {
 	//-------- constants --------
 
@@ -180,6 +190,12 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	/** The set of registered agent adapters. */
 	protected Set observed;
 	
+	/** The message services (service_id->[service, observed component set]). */
+	protected Map	msgservices;
+	
+	/** The message service listener. */
+	protected IMessageListener	listener;
+	
 	//-------- constructors --------
 
 	/**
@@ -196,6 +212,18 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		this.timer = new Timer(true);
 		this.observed = new HashSet();
 		this.paintmaps = new PaintMaps();
+		this.msgservices	= new HashMap();
+		this.listener	= new IRemoteMessageListener()
+		{
+			public void messageReceived(IMessageAdapter msg)
+			{
+				addMessage(msg);
+			}
+			public void messageSent(IMessageAdapter msg)
+			{
+				addMessage(msg);
+			}
+		};
 	}
 	
 	/** 
@@ -203,14 +231,11 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	 */
 	public void shutdown()
 	{
-		SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
+		for(Iterator it=msgservices.values().iterator(); it.hasNext(); )
 		{
-			public void resultAvailable(Object result)
-			{
-				IMessageService ms = (IMessageService)result;
-				ms.removeMessageListener(ComanalyzerPlugin.this);
-			}
-		});
+			Object[]	entry	= (Object[])it.next();
+			((IMessageService)entry[0]).removeMessageListener(listener);
+		}
 	}
 
 	//-------- IControlCenterPlugin interface --------
@@ -403,6 +428,29 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		comptree.setMinimumSize(new Dimension(0, 0));
 		split.add(comptree);
 		
+		comptree.getModel().addNodeListener(new INodeListener()
+		{
+			public void nodeAdded(ITreeNode node)
+			{
+				if(node instanceof IActiveComponentTreeNode)
+				{
+					IComponentDescription ad = ((IActiveComponentTreeNode)node).getDescription();
+//					System.out.println("born: "+ad.getName());
+					agentBorn(ad);
+				}
+			}
+			
+			public void nodeRemoved(ITreeNode node)
+			{
+				if(node instanceof IActiveComponentTreeNode)
+				{
+					IComponentDescription ad = ((IActiveComponentTreeNode)node).getDescription();
+//					System.out.println("died: "+ad.getName());
+					agentDied(ad);
+				}
+			}
+		});
+		
 		comptree.addNodeHandler(new INodeHandler()
 		{
 			public Icon getOverlay(ITreeNode node)
@@ -531,46 +579,46 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 
 //		jcc.addAgentListListener(this);
 		
-		SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				
-				cms.getComponentDescriptions().addResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						IComponentDescription[] res = (IComponentDescription[])result;
-						for(int i=0; i<res.length; i++)
-							agentBorn(res[i]);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-					}
-				});
-				cms.addComponentListener(null, new ICMSComponentListener()
-				{
-					public IFuture componentRemoved(IComponentDescription desc, Map results)
-					{
-						agentDied(desc);
-						return new Future(null);
-					}
-					
-					public IFuture componentAdded(IComponentDescription desc)
-					{
-						agentBorn(desc);
-						return new Future(null);
-					}
-
-					public IFuture componentChanged(IComponentDescription desc)
-					{
-						return new Future(null);
-					}
-				});
-			}
-		});
+//		SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object result)
+//			{
+//				IComponentManagementService cms = (IComponentManagementService)result;
+//				
+//				cms.getComponentDescriptions().addResultListener(new IResultListener()
+//				{
+//					public void resultAvailable(Object result)
+//					{
+//						IComponentDescription[] res = (IComponentDescription[])result;
+//						for(int i=0; i<res.length; i++)
+//							agentBorn(res[i]);
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//					}
+//				});
+//				cms.addComponentListener(null, new ICMSComponentListener()
+//				{
+//					public IFuture componentRemoved(IComponentDescription desc, Map results)
+//					{
+//						agentDied(desc);
+//						return new Future(null);
+//					}
+//					
+//					public IFuture componentAdded(IComponentDescription desc)
+//					{
+//						agentBorn(desc);
+//						return new Future(null);
+//					}
+//
+//					public IFuture componentChanged(IComponentDescription desc)
+//					{
+//						return new Future(null);
+//					}
+//				});
+//			}
+//		});
 		
 		
 //		SwingUtilities.invokeLater(new Runnable()
@@ -585,17 +633,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		Component dummy = Component.DUMMY_COMPONENT;
 		applyAgentFilter(dummy);
 		componentlist.addAgent(dummy);
-		
-		SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), IMessageService.class)
-			.addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				IMessageService ms = (IMessageService)result;
-				ms.addMessageListener(ComanalyzerPlugin.this, IFilter.ALWAYS);
-			}
-		});
-		
+				
 		return split;
 	}
 
@@ -1006,31 +1044,20 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		{
 			public void run()
 			{
-				final List messages_added = new ArrayList();
-				IComponentIdentifier sid;
-
-				// processing every message map
-				MessageType mt = message.getMessageType();
-
-				sid = (IComponentIdentifier)message.getValue(mt.getSenderIdentifier());
-				Object recs = message.getValue(mt.getReceiverIdentifier());
-				
-				if(recs instanceof IComponentIdentifier)
+				if(isAddMessage(message))
 				{
-					IComponentIdentifier rid = (IComponentIdentifier)recs;
-					if(!isDuplicate(message, rid))
+					final List messages_added = new ArrayList();
+					IComponentIdentifier sid;
+	
+					// processing every message map
+					MessageType mt = message.getMessageType();
+	
+					sid = (IComponentIdentifier)message.getValue(mt.getSenderIdentifier());
+					Object recs = message.getValue(mt.getReceiverIdentifier());
+					
+					if(recs instanceof IComponentIdentifier)
 					{
-						Message msg = createMessage(message, sid, rid);
-//						System.out.println("Added: "+msg);
-						messages_added.add(msg);
-					}
-				}
-				else
-				{
-					Iterator rids = SReflect.getIterator(recs);
-					while(rids.hasNext())
-					{
-						IComponentIdentifier rid = (IComponentIdentifier)rids.next();
+						IComponentIdentifier rid = (IComponentIdentifier)recs;
 						if(!isDuplicate(message, rid))
 						{
 							Message msg = createMessage(message, sid, rid);
@@ -1038,25 +1065,39 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 							messages_added.add(msg);
 						}
 					}
-				}
-				
-				// return if there are no messages to add
-				if(!messages_added.isEmpty())
-				{
-					// delegate to refresh task or just fire the update
-					if(sleep != REFRESHI && refresh_task != null)
-					{
-						if(sleep == REFRESHA)
-						{
-							// experimental auto refresh
-							// the refresh task is initialized inside
-							scheduleAutoRefresh();
-						}
-						refresh_task.fireMessagesAdded((Message[])messages_added.toArray(new Message[messages_added.size()]));
-					}
 					else
 					{
-						messagelist.fireMessagesAdded((Message[])messages_added.toArray(new Message[messages_added.size()]));
+						Iterator rids = SReflect.getIterator(recs);
+						while(rids.hasNext())
+						{
+							IComponentIdentifier rid = (IComponentIdentifier)rids.next();
+							if(!isDuplicate(message, rid))
+							{
+								Message msg = createMessage(message, sid, rid);
+		//						System.out.println("Added: "+msg);
+								messages_added.add(msg);
+							}
+						}
+					}
+					
+					// return if there are no messages to add
+					if(!messages_added.isEmpty())
+					{
+						// delegate to refresh task or just fire the update
+						if(sleep != REFRESHI && refresh_task != null)
+						{
+							if(sleep == REFRESHA)
+							{
+								// experimental auto refresh
+								// the refresh task is initialized inside
+								scheduleAutoRefresh();
+							}
+							refresh_task.fireMessagesAdded((Message[])messages_added.toArray(new Message[messages_added.size()]));
+						}
+						else
+						{
+							messagelist.fireMessagesAdded((Message[])messages_added.toArray(new Message[messages_added.size()]));
+						}
 					}
 				}
 			}
@@ -1260,6 +1301,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 				}
 			}
 
+			removeMessageListener(update);
 			applyAgentFilter();			
 		}
 	};
@@ -1281,6 +1323,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 					comptree.getModel().fireNodeChanged(comptree.getModel().getNode(agents[i].getDescription().getName()));
 				}
 			}
+			addMessageListener(update);
 //			applyAgentFilter((Agent[])update.toArray(new Agent[update.size()]));
 			applyAgentFilter();				
 		}
@@ -1399,6 +1442,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	{
 		public void actionPerformed(ActionEvent e)
 		{
+			List	update	= new ArrayList();
 			TreePath[]	paths	= comptree.getTree().getSelectionPaths();
 			for(int i=0; paths!=null && i<paths.length; i++)
 			{
@@ -1409,10 +1453,12 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 					observed.add(desc.getName());
 					Component agent = componentlist.getAgent(desc.getName());
 					agent.setState(Component.STATE_OBSERVED);
+					update.add(agent);
 					applyAgentFilter(agent);
 					comptree.getModel().fireNodeChanged(comptree.getModel().getNode(desc.getName()));
 				}
 			}
+			addMessageListener(update);
 		}
 	};
 
@@ -1421,6 +1467,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	{
 		public void actionPerformed(ActionEvent e)
 		{
+			List	update	= new ArrayList();
 			TreePath[]	paths	= comptree.getTree().getSelectionPaths();
 			for(int i=0; paths!=null && i<paths.length; i++)
 			{
@@ -1431,10 +1478,12 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 					observed.remove(desc.getName());
 					Component agent = componentlist.getAgent(desc.getName());
 					agent.setState(Component.STATE_IGNORED);
+					update.add(agent);
 					applyAgentFilter(agent);
 					comptree.getModel().fireNodeChanged(comptree.getModel().getNode(desc.getName()));
 				}
 			}
+			removeMessageListener(update);
 		}
 	};
 
@@ -1649,26 +1698,6 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 
 		}
 	};
-
-	/**
-	 *  Invoked when a message event has been received.
-	 *  @param msg The message adapter.
-	 */
-	public void messageReceived(IMessageAdapter msg)
-	{
-		if(isAddMessage(msg))
-			addMessage(msg);
-	}
-	
-	/**
-	 *  Invoked when a message event has been sent.
-	 *  @param msg The message adapter.
-	 */
-	public void messageSent(IMessageAdapter msg)
-	{
-		if(isAddMessage(msg))
-			addMessage(msg);
-	}
 	
 	/**
 	 *  Invoked when a message event has been received.
@@ -1707,6 +1736,184 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		return add;
 	}
 	
+	/**
+	 *  Update message listeners after agents have been added.
+	 */	
+	protected void addMessageListener(final List added)
+	{
+		final Map	services	= new HashMap();
+		final CounterResultListener	crl	= new CounterResultListener(added.size(), true, new SwingDefaultResultListener()
+		{
+			public void customResultAvailable(Object result)
+			{
+				for(Iterator it=services.keySet().iterator(); it.hasNext(); )
+				{
+					IServiceIdentifier	id	= (IServiceIdentifier)it.next();
+					Object[]	newentry	= (Object[])services.get(id);
+					Object[]	oldentry	= (Object[])msgservices.get(id);
+					
+					// Do nothing if both sets are the same (e.g. when updates happen asynchronously)
+					if(oldentry==null || !oldentry[1].equals(newentry[1]))
+					{
+						if(oldentry!=null)
+						{
+							((IMessageService)oldentry[0]).removeMessageListener(listener);
+						}
+						msgservices.put(id, newentry);
+						System.out.println("Listening on "+id+", "+newentry[1]);
+						((IMessageService)newentry[0]).addMessageListener(listener, createMessageFilter((Set)newentry[1]));
+					}
+				}
+			}
+		});
+		
+		getJCC().getExternalAccess().scheduleStep(new IComponentStep()
+		{
+			@XMLClassname("getcms")
+			public Object execute(final IInternalAccess ia)
+			{
+				ia.getRequiredService("cms").addResultListener(ia.createResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+						IComponentManagementService	cms	= (IComponentManagementService)result;
+						for(int i=0; i<added.size(); i++)
+						{
+							final Future	fut	= new Future();
+							fut.addResultListener(crl);
+							Component	comp	= (Component)added.get(i);
+							final IComponentIdentifier	cid	= comp.getDescription().getName();
+							cms.getExternalAccess(cid).addResultListener(
+								ia.createResultListener(new DelegationResultListener(fut)
+							{
+								public void customResultAvailable(Object result)
+								{
+									IExternalAccess	ea	= (IExternalAccess)result;
+									SServiceProvider.getService(ea.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+										.addResultListener(ia.createResultListener(new SwingDelegationResultListener(fut)
+									{
+										public void customResultAvailable(Object result)
+										{
+											IMessageService	ms	= (IMessageService)result;
+											Object[]	newentry;
+											if(!services.containsKey(ms.getServiceIdentifier()))
+											{
+												if(msgservices.containsKey(ms.getServiceIdentifier()))
+												{
+													Object[]	oldentry	= (Object[])msgservices.get(ms.getServiceIdentifier());
+													newentry	= new Object[]{ms, new HashSet((Collection)oldentry[1])};
+												}
+												else
+												{
+													newentry	= new Object[]{ms, new HashSet()};
+												}
+												services.put(ms.getServiceIdentifier(), newentry);
+											}
+											else
+											{
+												newentry	= (Object[])services.get(ms.getServiceIdentifier());
+											}
+											((Set)newentry[1]).add(cid);
+											fut.setResult(null);
+										}
+									}));
+								}	
+							}));
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+					}
+				}));
+				return null;
+			}
+		});	
+	}
+
+	/**
+	 *  Update message listeners after agents have been removed.
+	 */	
+	protected void removeMessageListener(List removed)
+	{
+		Map services	= new HashMap();
+		
+		for(int i=0; i<removed.size(); i++)
+		{
+			IComponentIdentifier	cid	= ((Component)removed.get(i)).getDescription().getName();
+			boolean	found	= false;
+			for(Iterator it=msgservices.values().iterator(); !found && it.hasNext(); )
+			{
+				Object[]	oldentry	= (Object[])it.next();
+				if(((Set)oldentry[1]).contains(cid))
+				{
+					found	= true;
+					IServiceIdentifier	id	= ((IMessageService)oldentry[0]).getServiceIdentifier();
+					Object[]	newentry	= (Object[])services.get(id);
+					if(newentry==null)
+					{
+						newentry	= new Object[]{oldentry[0], new HashSet((Collection)oldentry[1])};
+						services.put(id, newentry);
+					}
+					((Set)newentry[1]).remove(cid);
+				}
+			}
+		}
+
+		for(Iterator it=services.keySet().iterator(); it.hasNext(); )
+		{
+			IServiceIdentifier	id	= (IServiceIdentifier)it.next();
+			Object[]	newentry	= (Object[])services.get(id);
+			Object[]	oldentry	= (Object[])msgservices.get(id);
+			// Check if registration still present (may be removed by asynchronous updates?)
+			if(oldentry!=null)
+			{
+				((IMessageService)oldentry[0]).removeMessageListener(listener);
+				msgservices.remove(id);
+				System.out.println("Listening on "+id+", "+newentry[1]);
+			}
+			if(!((Set)newentry[1]).isEmpty())
+			{
+				msgservices.put(id, newentry);
+				((IMessageService)newentry[0]).addMessageListener(listener, createMessageFilter((Set)newentry[1]));
+			}
+		}
+	}
+
+	/**
+	 *  Create a transferable filter for a remote message listener.
+	 */
+	protected IFilter createMessageFilter(final Set agents)
+	{
+		return new IFilter()
+		{
+			@XMLClassname("msgfilter")
+			public boolean filter(Object obj)
+			{
+				boolean	ret	= true;
+				IMessageAdapter	msg	= (IMessageAdapter)obj;
+				Object	sender	= msg.getValue(msg.getMessageType().getSenderIdentifier());
+				if(!agents.contains(sender))
+				{
+					Object	recs	= msg.getValue(msg.getMessageType().getReceiverIdentifier());
+					if(!agents.contains(recs))
+					{
+						ret	= false;
+						if(SReflect.isIterable(recs))
+						{
+							for(Iterator it=SReflect.getIterator(recs); !ret && it.hasNext(); )
+							{
+								ret	= agents.contains(it.next());
+							}
+						}
+					}
+				}
+				return ret;
+			}
+		};
+	}
+
 	//-------- inner classes --------
 
 	/**
@@ -1722,5 +1929,12 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 			setText(null);
 			setEnabled(true);
 		}
+	}
+	
+	/**
+	 *  Message service listener interface.
+	 */
+	public static interface IRemoteMessageListener	extends IMessageListener, IRemotable
+	{
 	}
 }

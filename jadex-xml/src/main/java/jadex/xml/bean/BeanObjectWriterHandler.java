@@ -175,8 +175,8 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 */
 	public QName getTagName(Object object, IContext context)
 	{
-		try
-		{
+//		try
+//		{
 		String pck;
 		String tag;
 		if(object!=null)
@@ -213,12 +213,12 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		Namespace ns = wc.getNamespace(pck);
 		return new QName(ns.getURI(), tag, ns.getPrefix());
 		
-		}
-		catch(RuntimeException e)
-		{
-			e.printStackTrace();
-			throw e;
-		}
+//		}
+//		catch(RuntimeException e)
+//		{
+//			e.printStackTrace();
+//			throw e;
+//		}
 	}
 	
 	/**
