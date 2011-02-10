@@ -1,7 +1,7 @@
 package jadex.tools.generic;
 
-import jadex.base.gui.componentviewer.IComponentViewerPanel;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import javax.swing.Icon;
+import javax.swing.JComboBox;
 
 /**
  *  Abstract plugin for wrapping service views to plugin view.
@@ -39,75 +40,17 @@ public abstract class AbstractServicePlugin extends AbstractGenericPlugin
 	public abstract Icon getToolIcon(boolean selected);
 	
 	/**
-	 *  Convert object to string for property saving.
+	 *  Create the selector panel.
 	 */
-	public String convertToString(Object element)
+	public AbstractSelectorPanel createSelectorPanel()
 	{
-		return ((IService)element).getServiceIdentifier().toString();
-	}
-	
-	/**
-	 *  Refresh the combo box.
-	 */
-	public void refreshCombo()
-	{
-		SServiceProvider.getServices(getJCC().getExternalAccess().getServiceProvider(), getServiceType(), remotecb.isSelected()? RequiredServiceInfo.SCOPE_GLOBAL: RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDefaultResultListener(getView()) 
+		return new AbstractServiceSelectorPanel(getJCC().getExternalAccess(), getServiceType())
 		{
-			public void customResultAvailable(Object result) 
+			public IFuture createServicePanel(IService service)
 			{
-				Collection newservices = (Collection)result;
-				
-				// Find items to remove
-				for(int i=0; i<selcb.getItemCount(); i++)
-				{
-					Object oldservice = selcb.getItemAt(i);
-					if(!newservices.contains(oldservice))
-					{
-						// remove old cid
-						IComponentViewerPanel panel = (IComponentViewerPanel)panels.remove(oldservice);
-						if(panel!=null)
-							removePanel(panel);
-					}
-				}
-				
-				selcb.removeAllItems();
-				for(Iterator it=newservices.iterator(); it.hasNext(); )
-				{
-					selcb.addItem(it.next());
-				}
+				return AbstractServicePlugin.this.createServicePanel(service);
 			}
-		});
-	}
-	
-	/**
-	 *  Create a panel for a component identifier.
-	 */
-	public IFuture createPanel(final Object element)
-	{
-		final Future ret = new Future();
-		final IService service = (IService)element;
-		
-		createServicePanel(service).addResultListener(new SwingDefaultResultListener(centerp)
-		{
-			public void customResultAvailable(Object result)
-			{
-//				System.out.println("add: "+result+" "+sel);
-				IServiceViewerPanel panel = (IServiceViewerPanel)result;
-//				panels.put(service, panel);
-//				centerp.add(panel.getComponent(), service);
-				if(getPanelProperties()!=null)
-					panel.setProperties(getPanelProperties());
-				ret.setResult(panel);
-			}
-			
-			public void customExceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
-		
-		return ret;
+		};
 	}
 	
 	/**

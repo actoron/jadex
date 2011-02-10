@@ -116,7 +116,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 							for(int i=0; i<panels.size(); i++)
 							{
 								Object[] tmp = (Object[])panels.get(i);
-								tp.addTab((String)tmp[0], ((IServiceViewerPanel)tmp[1]).getComponent());
+								tp.addTab((String)tmp[0], ((IAbstractViewerPanel)tmp[1]).getComponent());
 							}
 							panel.add(tp, BorderLayout.CENTER);
 						}

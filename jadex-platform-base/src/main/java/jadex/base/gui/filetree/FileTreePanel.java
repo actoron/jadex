@@ -424,105 +424,116 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		}
 //		refresh	= false;	// stops crawler task, if any
 		
-		// Load root node.
-		String	treexml	= props.getStringProperty("tree");
-		// todo: hack!
-		ILibraryService ls = (ILibraryService)SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
-		if(treexml!=null)
+		SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new SwingDelegationResultListener(ret)
 		{
-			try
+			public void customResultAvailable(Object result)
 			{
-				// todo: hack!
-				ClassLoader cl = ls.getClassLoader();
-				TreeProperties	mep	= (TreeProperties)JavaReader.objectFromXML(treexml, cl); 	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
-//				ModelExplorerProperties	mep	= (ModelExplorerProperties)Nuggets.objectFromXML(treexml, cl);
-				RootNode root = (RootNode)getTree().getModel().getRoot();
-				root.removeAll();
-				String[] entries = mep.getRootPathEntries();
-				for(int i=0; i<entries.length; i++)
+				ILibraryService ls = (ILibraryService)result;
+				
+				// Load root node.
+				String	treexml	= props.getStringProperty("tree");
+				if(treexml==null)
 				{
-					ITreeNode node = factory.createNode(root, model, tree, new File(entries[i]), iconcache, filefilter, exta, factory);
-					root.addChild(node);
+					ret.setResult(null);
 				}
-
-				ITreeNode[] childs = root.getChildren();
-				for(int i=0; i<childs.length; i++)
+				else
 				{
-					// Todo: support non-file (e.g. url nodes).
-					File file = ((FileNode)childs[i]).getFile();
-					
-					// Hack!!! Build new file object. This strips trailing "/" from jar file nodes.
-					file = new File(file.getParentFile(), file.getName());
 					try
 					{
-						ls.addURL(file.toURI().toURL());
+						// todo: hack!
+						ClassLoader cl = ls.getClassLoader();
+						TreeProperties	mep	= (TreeProperties)JavaReader.objectFromXML(treexml, cl); 	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
+//						ModelExplorerProperties	mep	= (ModelExplorerProperties)Nuggets.objectFromXML(treexml, cl);
+						RootNode root = (RootNode)getTree().getModel().getRoot();
+						root.removeAll();
+						String[] entries = mep.getRootPathEntries();
+						for(int i=0; i<entries.length; i++)
+						{
+							ITreeNode node = factory.createNode(root, model, tree, new File(entries[i]), iconcache, filefilter, exta, factory);
+							root.addChild(node);
+						}
+
+						ITreeNode[] childs = root.getChildren();
+						for(int i=0; i<childs.length; i++)
+						{
+							// Todo: support non-file (e.g. url nodes).
+							File file = ((FileNode)childs[i]).getFile();
+							
+							// Hack!!! Build new file object. This strips trailing "/" from jar file nodes.
+							file = new File(file.getParentFile(), file.getName());
+							try
+							{
+								ls.addURL(file.toURI().toURL());
+							}
+							catch(MalformedURLException ex)
+							{
+								ex.printStackTrace();
+							}
+						}
+						
+						// Select the last selected model in the tree.
+						expansionhandler.setSelectedPath(mep.getSelectedNode());
+
+						// Load the expanded tree nodes.
+						expansionhandler.setExpandedPaths(mep.getExpandedNodes());
+
+						root.refresh(true);
+						
+						// Load last selected model.
+//						String lastpath = props.getStringProperty("lastpath");
+//						if(lastpath!=null)
+//						{
+//							try
+//							{
+//								File mo_file = new File(lastpath);
+//								filechooser.setCurrentDirectory(mo_file.getParentFile());
+//								filechooser.setSelectedFile(mo_file);
+//							}
+//							catch(Exception e)
+//							{
+//							}
+//						}				
+								
+						// Load refresh/checking flag (defaults to true).
+//						refresh	= !"false".equals(props.getStringProperty("refresh"));
+//						if(refreshmenu!=null)
+//							refreshmenu.setState(this.refresh);
+//						resetCrawler();
+						
+						// Load the filter settings
+						Properties	filterprops	= props.getSubproperty("mic");
+						if(mic instanceof IPropertiesProvider)
+							((IPropertiesProvider)mic).setProperties(filterprops)
+							.addResultListener(new SwingDelegationResultListener(ret)
+						{
+							public void customResultAvailable(Object result) 
+							{
+								ret.setResult(null);
+							};
+						});
+						
+//						if(filterprops!=null)
+//						{
+//							Property[] mps = filterprops.getProperties();
+//							Set selected = new HashSet();
+//							for(int i=0; i<mps.length; i++)
+//							{
+//								if(Boolean.parseBoolean(mps[i].getValue())) 
+//									selected.add(mps[i].getType());
+//							}
+//							filtercon.setSelectedComponentTypes(selected);
+//						}
 					}
-					catch(MalformedURLException ex)
+					catch(Exception e)
 					{
-						ex.printStackTrace();
+						ret.setException(e);
+						System.err.println("Cannot load project tree: "+e.getClass().getName());
+//						e.printStackTrace();
 					}
 				}
-				
-				// Select the last selected model in the tree.
-				expansionhandler.setSelectedPath(mep.getSelectedNode());
-
-				// Load the expanded tree nodes.
-				expansionhandler.setExpandedPaths(mep.getExpandedNodes());
-
-				root.refresh(true);
-				
-				// Load last selected model.
-//				String lastpath = props.getStringProperty("lastpath");
-//				if(lastpath!=null)
-//				{
-//					try
-//					{
-//						File mo_file = new File(lastpath);
-//						filechooser.setCurrentDirectory(mo_file.getParentFile());
-//						filechooser.setSelectedFile(mo_file);
-//					}
-//					catch(Exception e)
-//					{
-//					}
-//				}				
-						
-				// Load refresh/checking flag (defaults to true).
-//				refresh	= !"false".equals(props.getStringProperty("refresh"));
-//				if(refreshmenu!=null)
-//					refreshmenu.setState(this.refresh);
-//				resetCrawler();
-				
-				// Load the filter settings
-				Properties	filterprops	= props.getSubproperty("mic");
-				if(mic instanceof IPropertiesProvider)
-					((IPropertiesProvider)mic).setProperties(filterprops)
-					.addResultListener(new SwingDelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result) 
-					{
-						ret.setResult(null);
-					};
-				});
-				
-//				if(filterprops!=null)
-//				{
-//					Property[] mps = filterprops.getProperties();
-//					Set selected = new HashSet();
-//					for(int i=0; i<mps.length; i++)
-//					{
-//						if(Boolean.parseBoolean(mps[i].getValue())) 
-//							selected.add(mps[i].getType());
-//					}
-//					filtercon.setSelectedComponentTypes(selected);
-//				}
-			}
-			catch(Exception e)
-			{
-				ret.setException(e);
-				System.err.println("Cannot load project tree: "+e.getClass().getName());
-//				e.printStackTrace();
-			}
-		}
+			}	
+		});
 		
 		return ret;
 	}

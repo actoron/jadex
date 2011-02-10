@@ -464,7 +464,6 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 		
 //		checkingmenu.setSelected(false);
 //		System.out.println("Starter set props: "+props);
-		
 		Properties	mpanelprops	= props.getSubproperty("mpanel");
 		if(mpanelprops!=null)
 			mpanel.setProperties(mpanelprops);
@@ -474,8 +473,8 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 
 		lsplit.setDividerLocation(props.getIntProperty("leftsplit_location"));
 		csplit.setDividerLocation(props.getIntProperty("mainsplit_location"));
-
-//		checkingmenu.setSelected(props.getBooleanProperty("checking"));
+	
+	//		checkingmenu.setSelected(props.getBooleanProperty("checking"));
 		
 		return new Future(null);
 	}

@@ -693,7 +693,7 @@ public class ControlCenter implements IControlCenter
 			}
 			catch(Exception e)
 			{
-//				e.printStackTrace();
+				e.printStackTrace();
 				final String failed = SUtil.wrapText("Error during init of plugin "+ plugin.getName() + "\n\n" + e);
 				SwingUtilities.invokeLater(new Runnable()
 				{
