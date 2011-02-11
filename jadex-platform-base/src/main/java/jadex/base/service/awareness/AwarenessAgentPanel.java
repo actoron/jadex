@@ -46,6 +46,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -169,7 +171,9 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
 		y++;
 		
-		JButton buapply = new JButton("Apply");
+		final JCheckBox	cbauto	= new JCheckBox("Auto apply settings");
+		cbauto.setToolTipText("Apply changes automatically after edit.");
+		final JButton buapply = new JButton("Apply");
 //		buapply.setMargin(new Insets(0,0,0,0));
 		buapply.setToolTipText("Apply setting changes.");
 //		busetaddr.setBorder(null);
@@ -180,7 +184,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				applySettings();
 			}
 		});
-		JButton bucancel = new JButton("Cancel");
+		final JButton bucancel = new JButton("Cancel");
 		buapply.setToolTipText("Cancel changes and reset original values.");
 		bucancel.addActionListener(new ActionListener()
 		{
@@ -199,11 +203,26 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				refreshSettings();
 			}
 		});
+		cbauto.addChangeListener(new ChangeListener()
+		{
+			public void stateChanged(ChangeEvent e)
+			{
+				buapply.setEnabled(!cbauto.isSelected());
+				bucancel.setEnabled(!cbauto.isSelected());
+				if(cbauto.isSelected())
+				{
+					cbauto.setSelected(false);
+					throw new UnsupportedOperationException("todo: not yet implemented.");
+				}
+			}
+		});
+
 		buapply.setPreferredSize(burefresh.getPreferredSize());
 		buapply.setMinimumSize(burefresh.getMinimumSize());
 		bucancel.setPreferredSize(burefresh.getPreferredSize());
 		bucancel.setMinimumSize(burefresh.getMinimumSize());
 		JPanel pbuts = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		pbuts.add(cbauto);
 		pbuts.add(burefresh);
 		pbuts.add(buapply);
 		pbuts.add(bucancel);
@@ -494,6 +513,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		// Send remote settings.
 		try
 		{
+			final AwarenessSettings	settings	= new AwarenessSettings();	// local variable for XML transfer
 			settings.address	= InetAddress.getByName(tfipaddress.getText());
 			settings.port = Integer.parseInt(tfport.getText());
 			settings.delay = ((Number)spdelay.getValue()).longValue()*1000;
@@ -502,7 +522,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			settings.autodelete = cbautodelete.isSelected();
 			settings.includes	= includes.getEntries();
 			settings.excludes	= excludes.getEntries();
-			final AwarenessSettings	settings	= this.settings;	// local variable for XML transfer
+			this.settings	= settings;	// todo: wait for step before setting?
 			component.scheduleStep(new IComponentStep()
 			{
 				@XMLClassname("applySettings")
@@ -517,6 +537,11 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					agent.setIncludes(settings.includes);
 					agent.setExcludes(settings.excludes);
 					return null;
+				}
+			}).addResultListener(new SwingDefaultResultListener(panel)
+			{
+				public void customResultAvailable(Object result)
+				{
 				}
 			});
 		}
