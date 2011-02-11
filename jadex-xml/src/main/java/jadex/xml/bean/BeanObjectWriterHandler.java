@@ -183,6 +183,10 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		{
 			Class clazz = object.getClass();
 			String clazzname = SReflect.getClassName(clazz);
+//			if(clazzname.indexOf("IRemoteMessageListener")!=-1)
+//			{
+//				System.out.println("sdilfugkl");
+//			}
 			int idx = clazzname.lastIndexOf(".");
 			pck = idx!=-1? SXML.PROTOCOL_TYPEINFO+clazzname.substring(0, idx): SXML.PROTOCOL_TYPEINFO;
 			tag = idx!=-1? clazzname.substring(idx+1): clazzname;

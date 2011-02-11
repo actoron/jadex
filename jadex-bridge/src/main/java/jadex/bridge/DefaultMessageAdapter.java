@@ -21,6 +21,13 @@ public class DefaultMessageAdapter implements IMessageAdapter
 	//-------- constructors --------
 	
 	/**
+	 *  Bean constructor.
+	 */
+	public DefaultMessageAdapter()
+	{
+	}
+	
+	/**
 	 *  Create a new message adapter.
 	 *  @param message The message.
 	 */
@@ -41,6 +48,15 @@ public class DefaultMessageAdapter implements IMessageAdapter
 	public MessageType getMessageType()
 	{
 		return type;
+	}
+	
+	/**
+	 *  Set the message type.
+	 *  @param type The message type. 
+	 */
+	public void	setMessageType(MessageType type)
+	{
+		this.type	= type;
 	}
 	
 	/**
@@ -88,6 +104,15 @@ public class DefaultMessageAdapter implements IMessageAdapter
 	public Map getParameterMap()
 	{
 		return message;
+	}
+	
+	/**
+	 *  Set the parameters as map.
+	 *  @param	parameters A map of parameters.
+	 */
+	public void	setParameterMap(Map parameters)
+	{
+		this.message	= parameters;
 	}
 	
 	/**

@@ -1,7 +1,8 @@
-package jadex.xml.benchmark;
+package jadex.xml.test;
 
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
+import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -14,6 +15,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,10 +23,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import junit.framework.TestCase;
+
 /**
  *  Testcases for writer and reader.
  */
-public class Test //extends TestCase
+public class Test extends TestCase
 {
 	//-------- methods --------
 	
@@ -55,7 +59,7 @@ public class Test //extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
-				t.testMultiCollection();
+//				t.testMultiCollection();
 //				t.testEmptySet();
 //				t.testEmptyList();
 //				t.testEmptyMap();
@@ -79,7 +83,7 @@ public class Test //extends TestCase
 //				t.testInetAddress();
 //				t.testBeanWithPublicFields();
 //				t.testAnonymousInnerClass();
-//				t.testImage();
+				t.testImage();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -98,6 +102,14 @@ public class Test //extends TestCase
 	 */
 	protected void doWriteAndRead(Object wo) throws Exception
 	{
+		doWriteAndRead(wo, null);
+	}
+	
+	/**
+	 *  Method for writing and reading an object.
+	 */
+	protected void doWriteAndRead(Object wo, Comparator comp) throws Exception
+	{
 		String xml = JavaWriter.objectToXML(wo, null);
 		
 //		System.out.println("xml is:"+xml);
@@ -115,9 +127,22 @@ public class Test //extends TestCase
 //		System.out.println("Read: "+ro+" / class="+ro.getClass());
 		
 //		System.out.println("equals: "+wo.equals(ro));
-		if(!wo.equals(ro) && !(wo.getClass().isArray() && Arrays.deepEquals((Object[])wo, (Object[])ro)))
-			System.out.println("Not equal: "+wo+", "+ro+"\n"
-				+wo.getClass()+" \n"+ro.getClass()+" \n"+xml);
+		if(comp!=null)
+		{
+			if(comp.compare(wo, ro)!=0)
+			{
+				throw new RuntimeException("Not equal: "+wo+", "+ro+"\n"
+					+wo.getClass()+" \n"+ro.getClass()+" \n"+xml);
+			}
+		}
+		else
+		{
+			if(!wo.equals(ro) && !(wo.getClass().isArray() && Arrays.deepEquals((Object[])wo, (Object[])ro)))
+			{
+				throw new RuntimeException("Not equal: "+wo+", "+ro+"\n"
+					+wo.getClass()+" \n"+ro.getClass()+" \n"+xml);
+			}
+		}
 		
 //		assertEquals("Written and read objects should be equal:", wo, ro);
 	}
@@ -158,7 +183,23 @@ public class Test //extends TestCase
 //		test.setVisible(true);
 //		System.out.println("buf: "+SUtil.arrayToString(buf));
 
-		doWriteAndRead(bi);
+		doWriteAndRead(bi, new Comparator()
+		{
+			public int compare(Object o1, Object o2)
+			{
+				BufferedImage	b1	= (BufferedImage)o1;
+				BufferedImage	b2	= (BufferedImage)o2;
+				boolean	equal	= b1.getWidth()==b2.getWidth() && b1.getHeight()==b2.getHeight();
+				for(int x=0; equal && x<b1.getWidth(); x++)
+				{
+					for(int y=0; equal && y<b1.getHeight(); y++)
+					{
+						equal	= b1.getRGB(x, y)==b2.getRGB(x, y);
+					}					
+				}
+				return equal ? 0 : 1;
+			}
+		});
 	}
 	
 	/**
@@ -274,7 +315,10 @@ public class Test //extends TestCase
 	public void testClass() throws Exception
 	{
 		doWriteAndRead(boolean.class);
+		doWriteAndRead(InnerTestClass.class);
 	}
+	
+	public static class InnerTestClass{}
 	
 	/**
 	 *  Test if date transfer works.
@@ -414,7 +458,7 @@ public class Test //extends TestCase
 	/**
 	 *  Test if special characters can be transferred.
 	 */
-	protected void testSpecialCharacter() throws Exception
+	public void testSpecialCharacter() throws Exception
 	{
 		String str = "ö\n";
 		
@@ -424,13 +468,14 @@ public class Test //extends TestCase
 	/**
 	 *  Test if anonymous inner classes can be transferred.
 	 */
-	protected void testAnonymousInnerClass() throws Exception
+	public void testAnonymousInnerClass() throws Exception
 	{
 		// Do not use final directly as compiler optimizes field away.
 		String	tmp	= "hugo";
 		final String	name	= tmp;
 		Object	obj	= new Object()
 		{
+			@XMLClassname("test")
 			public boolean equals(Object obj)
 			{
 				String	othername	= null;

@@ -1,4 +1,4 @@
-package jadex.xml.benchmark;
+package jadex.xml.test;
 
 
 public class B

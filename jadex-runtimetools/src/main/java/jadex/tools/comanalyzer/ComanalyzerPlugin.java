@@ -1760,7 +1760,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 							((IMessageService)oldentry[0]).removeMessageListener(listener);
 						}
 						msgservices.put(id, newentry);
-						System.out.println("Listening on "+id+", "+newentry[1]);
+//						System.out.println("Listening on "+id+", "+newentry[1]);
 						((IMessageService)newentry[0]).addMessageListener(listener, createMessageFilter((Set)newentry[1]));
 					}
 				}
@@ -1871,7 +1871,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 			{
 				((IMessageService)oldentry[0]).removeMessageListener(listener);
 				msgservices.remove(id);
-				System.out.println("Listening on "+id+", "+newentry[1]);
+//				System.out.println("Listening on "+id+", "+newentry[1]);
 			}
 			if(!((Set)newentry[1]).isEmpty())
 			{

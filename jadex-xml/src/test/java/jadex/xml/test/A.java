@@ -1,4 +1,4 @@
-package jadex.xml.benchmark;
+package jadex.xml.test;
 
 import java.util.ArrayList;
 import java.util.Arrays;

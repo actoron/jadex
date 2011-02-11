@@ -141,7 +141,7 @@ public class Writer
 		
 //		if(tagname!=null)
 //			System.out.println("tagname: "+tagname);
-		if(object.getClass().getName().indexOf("ComponentFactorySelector")!=-1)
+		if(object.getClass().getName().indexOf("IRemoteMessageListener")!=-1)
 			System.out.println("cfs");
 		
 		TypeInfo typeinfo = handler.getTypeInfo(object, getXMLPath(stack), wc); 

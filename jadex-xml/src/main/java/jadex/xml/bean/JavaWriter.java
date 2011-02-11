@@ -1,6 +1,7 @@
 package jadex.xml.bean;
 
 import jadex.commons.Base64;
+import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.gui.SGUI;
 import jadex.xml.AccessInfo;
@@ -154,7 +155,10 @@ public class JavaWriter extends Writer
 			{
 				public String convertObject(Object val, IContext context)
 				{
-					return ""+((Class)val).getCanonicalName();
+//					String	ret	= ""+((Class)val).getCanonicalName();
+					// Todo: SReflect doesn not work for some case!? (Lars)
+					String	ret	= SReflect.getClassName((Class)val);
+					return ret;
 				}
 			};
 			TypeInfo ti_class = new TypeInfo(null, new ObjectInfo(Class.class), new MappingInfo(null, new AttributeInfo[]{
