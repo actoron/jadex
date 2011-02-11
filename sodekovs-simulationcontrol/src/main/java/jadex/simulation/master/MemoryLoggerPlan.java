@@ -43,7 +43,7 @@ public class MemoryLoggerPlan extends Plan {
 					e.printStackTrace();
 				}
 			}
-			waitFor(2000);
+			waitFor(5000);
 		}
 
 	}

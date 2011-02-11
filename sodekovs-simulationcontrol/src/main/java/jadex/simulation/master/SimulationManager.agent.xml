@@ -18,13 +18,24 @@
 		<import>jadex.base.fipa.*</import>
 		<import>java.util.Map</import>
 		<import>java.util.HashMap</import>
+		<import>java.util.Random</import>
 		<import>jadex.simulation.model.*</import>
 		<import>jadex.simulation.model.result.*	</import>
 		<import>jadex.simulation.controlcenter.*</import>
 		<import>jadex.commons.*</import>
 		<import>jadex.commons.service.*</import>
+		<import>jadex.simulation.helper.*</import>
 	</imports>
 
+
+	<capabilities>
+		<!-- use capability that logs the memory consumption -->
+		<capability name="memoryLoggerCap"
+			file="jadex.simulation.helper.MemoryLogger" />
+	</capabilities>
+	
+	
+	
 	<beliefs>
 
 		<!-- Number of currently running experiments.-->
@@ -72,13 +83,12 @@
 		-->
 		<belief name="simulationDescriptionFile" class="String"/>			
 
-		<!--  Reference to the GUI. -->
-		<!-- <belief name="tmpGUI" class="ControlCenter" /> -->
-
-		<!-- TMP: Counter used for MemoryLogger -->
-		<belief name="memoryLoggerCounter" class="int">
-			<fact>-1</fact>
+		<!-- Reference to the memory Loger Capability --> 
+		<belief name="MemoryLogerID" class="String">
+			<fact> String.valueOf(new java.util.Random().nextInt())</fact>
+			<assignto ref="memoryLoggerCap.MemoryLoggerID" />
 		</belief>
+		
 	</beliefs>
 
 	<goals>
@@ -150,12 +160,6 @@
 				<internalevent ref="triggerExperimentRowEvaluation" />
 			</trigger>
 		</plan>
-
-		<!--  TMP: Plan to log the usage of memory of the application. -->
-		<plan name="memoryLoggerPlan">
-			<body class="MemoryLoggerPlan" />
-		</plan>
-
 	</plans>
 
 	<events>
@@ -210,7 +214,6 @@
 			<plans>
 				<!-- <initialplan ref="start_sim_experiments" />-->
 				<initialplan ref="init_simulation" />
-				<initialplan ref="memoryLoggerPlan" />
 			</plans>
 		</configuration>
 	</configurations>

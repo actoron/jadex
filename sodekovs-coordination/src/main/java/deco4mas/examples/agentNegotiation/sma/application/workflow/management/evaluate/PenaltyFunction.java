@@ -30,7 +30,7 @@ public class PenaltyFunction
 //			result = workflowProfit * Math.pow(overrunTime/workflowTime.doubleValue(), 2);
 			
 //			result = workflowProfit/(workflowTime*2) * overrunTime;
-			result = workflowProfit/(workflowTime) * overrunTime;
+			result = workflowProfit/(workflowTime*4) * overrunTime;
 			
 			
 //			double result25 = workflowProfit/(workflowTime*1.5) * overrunTime;
