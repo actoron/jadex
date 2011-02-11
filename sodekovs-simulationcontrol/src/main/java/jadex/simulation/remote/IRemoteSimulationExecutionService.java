@@ -1,7 +1,7 @@
 package jadex.simulation.remote;
 
 
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.IService;
 import jadex.commons.service.annotation.Timeout;
 

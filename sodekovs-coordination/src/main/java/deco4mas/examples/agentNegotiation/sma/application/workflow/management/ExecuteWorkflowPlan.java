@@ -10,9 +10,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.IFuture;
-import jadex.commons.ThreadSuspendable;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.service.SServiceProvider;
 
 import java.util.HashMap;

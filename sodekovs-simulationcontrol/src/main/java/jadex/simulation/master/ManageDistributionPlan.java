@@ -2,7 +2,7 @@ package jadex.simulation.master;
 
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.simulation.helper.Constants;

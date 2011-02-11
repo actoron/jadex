@@ -28,7 +28,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
-import jadex.commons.ThreadSuspendable;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.service.SServiceProvider;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;

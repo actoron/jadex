@@ -16,6 +16,7 @@
 		<import>jadex.simulation.model.*</import>
 		<import>jadex.commons.*</import>
 		<import>jadex.commons.service.*</import>
+		<import>jadex.commons.future.*</import>
 	</imports>
 
 

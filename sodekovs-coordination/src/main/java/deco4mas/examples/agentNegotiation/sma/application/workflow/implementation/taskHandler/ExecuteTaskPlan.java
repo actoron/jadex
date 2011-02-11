@@ -7,11 +7,12 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ExternalAccess;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 
 import java.util.logging.Logger;
+
 import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceType;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 

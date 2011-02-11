@@ -5,10 +5,10 @@ import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.ThreadSuspendable;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.service.SServiceProvider;
 
 import java.util.HashMap;

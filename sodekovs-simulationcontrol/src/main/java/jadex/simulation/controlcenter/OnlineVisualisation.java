@@ -1,6 +1,7 @@
 package jadex.simulation.controlcenter;
 
 import jadex.application.space.envsupport.evaluation.AbstractChartDataConsumer;
+import jadex.commons.gui.SGUI;
 import jadex.simulation.model.Observer;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.IntermediateResult;
@@ -45,7 +46,7 @@ public class OnlineVisualisation extends JFrame {
 	 */
 	public OnlineVisualisation(List<AbstractChartDataConsumer> consumers) {
 		super("Online Visualisation");
-		// mainPanel = new JPanel(new GridLayout(2, 1));
+		// mainPanel = new JPanel(neow GridLayout(2, 1));
 		// this.consumers = consumers;
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -61,7 +62,7 @@ public class OnlineVisualisation extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		pack();
-		setLocation(jadex.commons.SGUI.calculateMiddlePosition(this));
+		setLocation(SGUI.calculateMiddlePosition(this));
 		// setSize(620, 800);
 		setSize(400, 400);
 		setVisible(true);

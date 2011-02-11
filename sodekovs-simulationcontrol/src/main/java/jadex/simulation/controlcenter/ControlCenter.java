@@ -4,9 +4,8 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.simulation.model.Dataconsumer;
+import jadex.commons.gui.SGUI;
 import jadex.simulation.model.Dataprovider;
-import jadex.simulation.model.Observer;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.IntermediateResult;
 
@@ -30,7 +29,6 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
 
 /**
  * Gui, showing details about the simulation setting and the progress.
@@ -127,7 +125,7 @@ public class ControlCenter extends JFrame {
 		this.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 
 		pack();
-		setLocation(jadex.commons.SGUI.calculateMiddlePosition(this));
+		setLocation(SGUI.calculateMiddlePosition(this));
 		// setSize(620, 800);
 		setSize(400, 400);
 		setVisible(true);

@@ -4,7 +4,6 @@
 package deco4mas.coordinate.interpreter.coordination_information;
 
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IGoal;
@@ -16,11 +15,6 @@ import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
 import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.ThreadSuspendable;
 import jadex.rules.state.IOAVState;
 
 import java.util.HashMap;

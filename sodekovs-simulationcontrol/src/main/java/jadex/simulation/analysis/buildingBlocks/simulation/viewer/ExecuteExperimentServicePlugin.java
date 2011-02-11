@@ -1,14 +1,10 @@
 package jadex.simulation.analysis.buildingBlocks.simulation.viewer;
 
-import jadex.base.gui.componentviewer.AbstractServiceViewerPanel;
-import jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel;
-import jadex.base.gui.componentviewer.libservice.LibServiceBrowser;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.service.IService;
 import jadex.commons.service.library.ILibraryService;
-import jadex.tools.generic.AbstractServicePlugin;
 
 import javax.swing.Icon;
 

@@ -1,7 +1,6 @@
 package deco4mas.examples.agentNegotiation.deco.media;
 
-import jadex.bridge.IComponentManagementService;
-import jadex.commons.ThreadSuspendable;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 

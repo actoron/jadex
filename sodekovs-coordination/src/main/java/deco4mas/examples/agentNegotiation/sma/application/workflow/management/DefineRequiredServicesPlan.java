@@ -9,7 +9,7 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ExternalAccess;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.IFuture;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.javaparser.SimpleValueFetcher;
