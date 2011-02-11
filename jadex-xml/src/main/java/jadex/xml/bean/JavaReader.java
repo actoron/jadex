@@ -390,7 +390,7 @@ public class JavaReader extends Reader
 						}
 						else
 						{
-							ImageIO.read(new ByteArrayInputStream(data));
+							ret = ImageIO.read(new ByteArrayInputStream(data));
 						}
 						return ret;
 					}
