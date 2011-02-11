@@ -22,6 +22,7 @@ import java.util.Map;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -216,6 +217,20 @@ public abstract class AbstractSelectorPanel extends JPanel implements IPropertie
 	public boolean isRemote()
 	{
 		return remotecb.isSelected();
+	}
+	
+	/**
+	 *  Get the currently shown panel.
+	 */
+	public IAbstractViewerPanel getCurrentPanel()
+	{
+		IAbstractViewerPanel ret = null;
+		Object key = ocl.getCurrentKey();
+		if(key!=null)
+		{
+			ret = (IAbstractViewerPanel)panels.get(key);
+		}
+		return ret;
 	}
 
 	/**

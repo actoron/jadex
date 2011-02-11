@@ -2,6 +2,7 @@ package jadex.commons.gui;
 
 import jadex.commons.SUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Action;
@@ -16,6 +17,15 @@ public class PopupBuilder
 	/** The menu-items and actions. */
 	protected List rawmenu;
 
+	/**
+	 *  Create the popup builder.
+	 *  @param rawmenu The raw menu.
+	 */
+	public PopupBuilder()
+	{
+		this.rawmenu = new ArrayList();
+	}
+	
 	/**
 	 *  Create the popup builder.
 	 *  @param rawmenu The raw menu.

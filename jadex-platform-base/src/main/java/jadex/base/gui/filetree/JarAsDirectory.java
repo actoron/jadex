@@ -143,7 +143,8 @@ public class JarAsDirectory	extends File
 		}
 		else
 		{
-			ret	= jarpath;
+//			ret	= jarpath;
+			ret = "jar:file:"+jarpath+"!/";
 		}
 		return ret;
 	}
@@ -184,27 +185,31 @@ public class JarAsDirectory	extends File
 	public MultiCollection createEntries()
 	{
 		MultiCollection	entries	= new MultiCollection();
+		
+//		return entries;
+		
 		Set	contained	= new HashSet();
+		final String mypath = getAbsolutePath();
+		
+		JarFile jar = null;
 		try
 		{
-			JarFile jar;
-			
 			// todo:
 			// JarURLConnection does not support nested jar file access :-(
 			// Workaround is to copy jar in temp dir and extract it
 			// Then treat extracted file as top level jar again.
 			// http://www.javakb.com/Uwe/Forum.aspx/java-programmer/45375/URL-to-nested-Jar-files-looking-for-workaround
 			
-			if(jarpath.startsWith("\\jar:file") || jarpath.startsWith("/jar:file") || jarpath.startsWith("jar:file")
-				|| jarpath.startsWith("\\zip:file") || jarpath.startsWith("/zip:file") || jarpath.startsWith("zip:file"))
+			if(mypath.startsWith("\\jar:file") || mypath.startsWith("/jar:file") || mypath.startsWith("jar:file")
+				|| mypath.startsWith("\\zip:file") || mypath.startsWith("/zip:file") || mypath.startsWith("zip:file"))
 			{
-				URL url = new URL(jarpath);
+				URL url = new URL(mypath);
 				JarURLConnection conn = (JarURLConnection)url.openConnection();
 				jar = conn.getJarFile();
 			}
 			else
 			{
-				jar = new JarFile(jarpath);
+				jar = new JarFile(mypath);
 			}
 			
 			Enumeration	e	= jar.entries();
@@ -240,14 +245,25 @@ public class JarAsDirectory	extends File
 		}
 		catch(IOException e)
 		{
-			if(jarpath.indexOf("jar:file")!=jarpath.lastIndexOf("jar:file"))
-			{
-				// todo: nested jar
-			}
-			else
-			{
-				e.printStackTrace();
-			}
+//			if(mypath.indexOf("jar:file")!=mypath.lastIndexOf("jar:file") || mypath.indexOf("zip:file")!=mypath.lastIndexOf("zip:file"))
+//			{
+//				// todo: nested jar
+//			}
+//			else
+//			{
+//				e.printStackTrace();
+//			}
+		}
+		
+		// Necessary, otherwise file cannot be deleted.
+		// http://bugs.sun.com/view_bug.do?bug_id=4167874
+		try
+		{
+			if(jar!=null)
+				jar.close();
+		}
+		catch(Exception e)
+		{
 		}
 		
 		return entries;

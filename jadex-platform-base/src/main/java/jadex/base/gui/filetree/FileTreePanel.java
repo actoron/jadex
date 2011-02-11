@@ -14,7 +14,6 @@ import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDelegationResultListener;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.IMenuItemConstructor;
 import jadex.commons.gui.PopupBuilder;
 import jadex.commons.gui.SGUI;
@@ -227,8 +226,16 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	{
 		this.pubuilder = pubuilder;
 	}
-	
-	
+
+	/**
+	 *  Get the popup builder.
+	 *  @return the popup builder.
+	 */
+	public PopupBuilder getPopupBuilder()
+	{
+		return pubuilder;
+	}
+
 	/**
 	 *  Set the iconcache.
 	 *  @param iconcache The iconcache to set.
@@ -535,6 +542,40 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 			}	
 		});
 		
+		return ret;
+	}
+	
+	/**
+	 *  Get selected file paths.
+	 */
+	public String[] getSelectionPaths()
+	{
+		String[] ret = null;
+		TreePath[] paths = tree.getSelectionPaths();
+		if(paths!=null)
+		{
+			ret = new String[paths.length];
+			if(remote)
+			{
+				for(int i=0; i<paths.length; i++)
+				{
+					RemoteFile file = ((RemoteFileNode)paths[i].getLastPathComponent()).getRemoteFile();
+					ret[i] = file.getPath();
+				}
+			}
+			else
+			{
+				for(int i=0; i<paths.length; i++)
+				{
+					File file = ((FileNode)paths[i].getLastPathComponent()).getFile();
+					ret[i] = file.getPath();
+				}
+			}
+		}
+		else
+		{
+			ret = new String[0];
+		}
 		return ret;
 	}
 	

@@ -28,6 +28,7 @@
 		<import>jadex.base.service.message.transport.localmtp.*</import>
 		<import>jadex.base.service.message.transport.tcpmtp.*</import>
 		<import>jadex.base.service.message.transport.niotcpmtp.*</import>
+		<import>jadex.base.service.deployment.*</import>
 		<import>jadex.component.*</import>
 		<import>jadex.application.*</import>
 		<import>jadex.application.space.envsupport.*</import>
@@ -129,6 +130,9 @@
 		</providedservice>
 		<providedservice class="IComponentFactory" direct="true">
 			new ComponentComponentFactory($component.getServiceProvider())		
+		</providedservice>
+		<providedservice class="IDeploymentService">
+			new DeploymentService($component.getServiceProvider())		
 		</providedservice>
 		<!-- <providedservice class="IComponentFactory" direct="true">
 			new ApplicationComponentFactory(

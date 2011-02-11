@@ -4,7 +4,6 @@ import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.commons.Properties;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.gui.EditableList;
 import jadex.commons.gui.SGUI;
 
 import javax.swing.Icon;
@@ -62,7 +61,7 @@ public class DeployerPlugin extends AbstractJCCPlugin
 	 */
 	public JComponent createView()
 	{
-		return new DeployerPanel(getJCC().getExternalAccess());
+		return new DeployerPanel(getJCC());
 	}
 
 	/**

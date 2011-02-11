@@ -479,7 +479,7 @@ public class RemoteFileSystemView extends FileSystemView
 		if(ret==null)
 		{
 			final RemoteFile mydir = new RemoteFile(dir.getName(), dir.getAbsolutePath(), 
-				dir.isDirectory(), FileSystemView.getFileSystemView().getSystemDisplayName(dir));
+				dir.isDirectory(), getDisplayName(dir));
 			exta.scheduleStep(new IComponentStep()
 			{
 				@XMLClassname("getFiles")
@@ -533,7 +533,7 @@ public class RemoteFileSystemView extends FileSystemView
 					FileSystemView view = FileSystemView.getFileSystemView();
 					File parent = view.getParentDirectory(new File(path)); // todo: useFileHandling
 					return new RemoteFile(parent.getName(), parent.getPath(), 
-						parent.isDirectory(), FileSystemView.getFileSystemView().getSystemDisplayName(parent));
+						parent.isDirectory(), getDisplayName(parent));
 				}
 			}).addResultListener(new SwingDefaultResultListener()
 			{
@@ -597,8 +597,21 @@ public class RemoteFileSystemView extends FileSystemView
 		for(int i=0; i<ret.length; i++)
 		{
 			ret[i] = new RemoteFile(files[i].getName(), files[i].getAbsolutePath(), 
-				files[i].isDirectory(), FileSystemView.getFileSystemView().getSystemDisplayName(files[i]));
+				files[i].isDirectory(), getDisplayName(files[i]));
 		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public static String getDisplayName(File file)
+	{
+		String ret = FileSystemView.getFileSystemView().getSystemDisplayName(file);
+		if(ret==null || ret.length()==0)
+			ret = file.getName();
+		if(ret==null || ret.length()==0)
+			ret = file.getPath();
 		return ret;
 	}
 }
