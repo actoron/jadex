@@ -153,7 +153,17 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		
 		Class cma = getMicroAgentClass(clname, imports, classloader);
 		
-		return new Future(loadModel(model, cma, classloader));
+		Future	ret	= new Future();
+		try
+		{
+			ret.setResult(loadModel(model, cma, classloader));
+		}
+		catch(RuntimeException e)
+		{
+			ret.setException(new RuntimeException("Error loading model: "+model, e));
+		}
+		
+		return ret;
 	}
 	
 	/**

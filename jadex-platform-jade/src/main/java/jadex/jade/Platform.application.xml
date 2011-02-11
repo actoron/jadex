@@ -26,6 +26,7 @@
 	
 	<arguments>
 		<argument name="rma">true</argument>
+		<argument name="local-port">1099</argument>
 		<!-- Todo: jadex transport for jade - ->
 		<argument name="jadextransport">
 			"new jadex.base.service.message.transport.niotcpmtp.NIOTCPTransport($provider, 0)"

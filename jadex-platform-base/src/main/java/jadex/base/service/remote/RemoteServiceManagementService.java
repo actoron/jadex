@@ -193,17 +193,17 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	}
 	
 	/**
-	 *  Get a service proxy from a remote platform.
+	 *  Get a service proxy from a remote component.
 	 *  (called from arbitrary components)
-	 *  @param platform The component id of the remote platform.
-	 *  @param providerid Optional component id that is used to start the search.
-	 *  @param service The service type.
+	 *  @param cid	The remote provider id.
+	 *  @param service	The service type.
+	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public IFuture getServiceProxy(final IComponentIdentifier cid, final Class service)
+	public IFuture getServiceProxy(final IComponentIdentifier cid, final Class service, String scope)
 	{
 		Future	ret	= new Future();
-		getServiceProxies(cid, SServiceProvider.sequentialmanager, SServiceProvider.getVisitDecider(true), 
+		getServiceProxies(cid, SServiceProvider.getSearchManager(false, scope), SServiceProvider.getVisitDecider(true, scope), 
 			new TypeResultSelector(service, true)).addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -218,16 +218,16 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	}
 	
 	/**
-	 *  Get all service proxies from a remote platform.
+	 *  Get all service proxies from a remote component.
 	 *  (called from arbitrary components)
-	 *  @param platform The component id of the remote platform.
-	 *  @param providerid Optional component id that is used to start the search.
-	 *  @param service The service type.
+	 *  @param cid	The remote provider id.
+	 *  @param service	The service type.
+	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public IFuture getServiceProxies(IComponentIdentifier cid, final Class service)
+	public IFuture getServiceProxies(IComponentIdentifier cid, Class service, String scope)
 	{
-		return getServiceProxies(cid, SServiceProvider.sequentialmanager, SServiceProvider.contdecider, 
+		return getServiceProxies(cid, SServiceProvider.getSearchManager(true, scope), SServiceProvider.getVisitDecider(false, scope), 
 			new TypeResultSelector(service, true));
 	}
 	

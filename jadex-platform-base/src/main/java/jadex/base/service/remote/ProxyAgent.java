@@ -160,7 +160,7 @@ public class ProxyAgent extends MicroAgent
 			{
 				IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 				
-				rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(createResultListener(new IResultListener()
+				rms.getServiceProxy(cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(createResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -252,7 +252,7 @@ public class ProxyAgent extends MicroAgent
 			{
 				IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 				
-				rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(createResultListener(new IResultListener()
+				rms.getServiceProxy(cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(createResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{

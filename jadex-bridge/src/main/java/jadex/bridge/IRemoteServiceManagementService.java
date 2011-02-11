@@ -27,20 +27,22 @@ public interface IRemoteServiceManagementService extends IService
 	/**
 	 *  Get a service proxy from a remote component.
 	 *  (called from arbitrary components)
-	 *  @param cid The remote provider id.
-	 *  @param service The service type.
+	 *  @param cid	The remote provider id.
+	 *  @param service	The service type.
+	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public IFuture getServiceProxy(IComponentIdentifier cid, Class service);
+	public IFuture getServiceProxy(IComponentIdentifier cid, Class service, String scope);
 	
 	/**
 	 *  Get all service proxies from a remote component.
 	 *  (called from arbitrary components)
-	 *  @param cid The remote provider id.
-	 *  @param service The service type.
+	 *  @param cid	The remote provider id.
+	 *  @param service	The service type.
+	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public IFuture getServiceProxies(IComponentIdentifier cid, Class service);
+	public IFuture getServiceProxies(IComponentIdentifier cid, Class service, String scope);
 
 	/**
 	 *  Get all declared service proxies from a remote component.

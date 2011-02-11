@@ -106,7 +106,7 @@ public class VirtualComponentTreeNode extends AbstractTreeNode implements IActiv
 			public void customResultAvailable(Object result)
 			{
 				final IMicroExternalAccess exta = (IMicroExternalAccess)result;
-				// Must be done as static var, otherise desc is not availbel at remote site.
+				// Must be done as static var, otherise desc is not availble at remote site.
 				final IComponentIdentifier cid = desc.getName();
 				exta.scheduleStep(new IComponentStep()
 				{
@@ -130,6 +130,7 @@ public class VirtualComponentTreeNode extends AbstractTreeNode implements IActiv
 					
 					public void customExceptionOccurred(Exception exception)
 					{
+						exception.printStackTrace();
 						AbstractTreeNode parent = (AbstractTreeNode)getParent();
 						parent.removeChild(VirtualComponentTreeNode.this);
 					}

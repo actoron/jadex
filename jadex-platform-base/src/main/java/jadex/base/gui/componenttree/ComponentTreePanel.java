@@ -331,7 +331,7 @@ public class ComponentTreePanel extends JSplitPane
 											{
 												IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 												
-												rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+												rms.getServiceProxy(cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 												{
 													public void customResultAvailable(Object result)
 													{

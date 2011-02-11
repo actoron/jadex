@@ -1,8 +1,6 @@
 package jadex.base.service.awareness;
 
-import jadex.bridge.Argument;
 import jadex.bridge.CreationInfo;
-import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
@@ -16,7 +14,13 @@ import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.threadpool.IThreadPoolService;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.Description;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
 import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
@@ -30,10 +34,31 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
+
 
 /**
  *  Agent that sends multicasts to locate other Jadex awareness agents.
  */
+@Description("This agent looks for other awareness agents in the local net.")
+@Arguments(
+{
+	@Argument(name="address", typename="String", defaultvalue="\"224.0.0.0\"", description="The ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255)."),
+	@Argument(name="port", typename="int", defaultvalue="55667", description="The port used for finding other agents."),
+	@Argument(name="delay", typename="long", defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
+	@Argument(name="autocreate", typename="boolean", defaultvalue="true", description="Set if new proxies should be automatically created when discovering new components."),
+	@Argument(name="autodelete", typename="boolean", defaultvalue="true", description="Set if proxies should be automatically deleted when not discovered any longer."),
+	@Argument(name="proxydelay", typename="long", defaultvalue="15000", description="The delay used by proxies."),
+	@Argument(name="includes", typename="String", defaultvalue="\"\"", description="A list of platforms/IPs/hostnames to include (comma separated). Matches start of platform/IP/hostname."),
+	@Argument(name="excludes", typename="String", defaultvalue="\"\"", description="A list of platforms/IPs/hostnames to exclude (comma separated). Matches start of platform/IP/hostname.")
+})
+@Configurations(
+{
+	@Configuration(name="Frequent updates (10s)", arguments=@NameValue(name="delay", value="10000")),
+	@Configuration(name="Medium updates (20s)", arguments=@NameValue(name="delay", value="20000")),
+	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"))
+})
+@Properties(@NameValue(name="componentviewer.viewerclass", value="jadex.base.service.awareness.AwarenessAgentPanel"))
 public class AwarenessAgent extends MicroAgent
 {
 	//-------- attributes --------
@@ -80,6 +105,12 @@ public class AwarenessAgent extends MicroAgent
 	/** The root component id. */
 	protected IComponentIdentifier root;
 	
+	/** The includes list. */
+	protected List	includes;
+	
+	/** The excludes list. */
+	protected List	excludes;
+	
 	//-------- methods --------
 	
 	/**
@@ -97,6 +128,22 @@ public class AwarenessAgent extends MicroAgent
 			this.autocreate = ((Boolean)getArgument("autocreate")).booleanValue();
 			this.autodelete = ((Boolean)getArgument("autodelete")).booleanValue();
 			this.proxydelay = ((Number)getArgument("proxydelay")).longValue();
+			
+			this.includes	= new ArrayList();
+			StringTokenizer	stok	= new StringTokenizer((String)getArgument("includes"), ",");
+			while(stok.hasMoreTokens())
+			{
+				includes.add(stok.nextToken().trim());
+			}
+			
+			this.excludes	= new ArrayList();
+			stok	= new StringTokenizer((String)getArgument("excludes"), ",");
+			while(stok.hasMoreTokens())
+			{
+				excludes.add(stok.nextToken().trim());
+			}
+			
+			
 //			System.out.println("initial delay: "+delay);
 			
 			this.sendsocket = new MulticastSocket();
@@ -131,7 +178,7 @@ public class AwarenessAgent extends MicroAgent
 					public void resultAvailable(Object result)
 					{
 						root = (IComponentIdentifier)result;
-						discovered.put(root, new DiscoveryInfo(root, false, false, clock.getTime(), delay));
+						discovered.put(root, new DiscoveryInfo(root, false, clock.getTime(), delay));
 						
 						startSendBehaviour();
 						startRemoveBehaviour();
@@ -360,14 +407,39 @@ public class AwarenessAgent extends MicroAgent
 	}
 	
 	/**
-	 *  Set the delay.
-	 *  @param delay The delay to set.
+	 *  Get the includes.
+	 *  @return the includes.
 	 */
-	public synchronized void setExcluded(IComponentIdentifier cid, boolean excluded)
+	public synchronized List getIncludes()
 	{
-		DiscoveryInfo dif = getDiscoveryInfo(cid);
-		if(dif!=null)
-			dif.setExcluded(excluded);
+		return new ArrayList(includes);
+	}
+
+	/**
+	 *  Set the excludes.
+	 *  @param excludes The excludes to set.
+	 */
+	public synchronized void setExcludes(List excludes)
+	{
+		this.excludes	= new ArrayList(excludes);
+	}
+	
+	/**
+	 *  Get the excludes.
+	 *  @return the excludes.
+	 */
+	public synchronized List getExcludes()
+	{
+		return new ArrayList(excludes);
+	}
+
+	/**
+	 *  Set the includes.
+	 *  @param includes The includes to set.
+	 */
+	public synchronized void setIncludes(List includes)
+	{
+		this.includes	= new ArrayList(includes);
 	}
 	
 	/**
@@ -703,7 +775,7 @@ public class AwarenessAgent extends MicroAgent
 //								System.out.println(getComponentIdentifier()+" received: "+info);
 							
 								final IComponentIdentifier sender = info.getSender();
-								boolean createproxy;
+								boolean createproxy	= isIncluded(sender);
 								DiscoveryInfo dif;
 								
 								synchronized(AwarenessAgent.this)
@@ -711,13 +783,13 @@ public class AwarenessAgent extends MicroAgent
 									dif = (DiscoveryInfo)discovered.get(sender);
 									if(dif==null)
 									{
-										createproxy = isAutoCreateProxy();
-										dif = new DiscoveryInfo(sender, createproxy, false, clock.getTime(), getDelay());
+										createproxy = createproxy && isAutoCreateProxy();
+										dif = new DiscoveryInfo(sender, false, clock.getTime(), getDelay());
 										discovered.put(sender, dif);
 									}
 									else
 									{
-										createproxy = isAutoCreateProxy() && !dif.isProxy() && !dif.isExcluded();
+										createproxy = createproxy && isAutoCreateProxy() && !dif.isProxy();
 										dif.setTime(clock.getTime());
 									}
 								}
@@ -762,24 +834,62 @@ public class AwarenessAgent extends MicroAgent
 		}));
 	}
 	
-	//-------- static methods --------
-
 	/**
-	 *  Get the meta information about the agent.
+	 *  Test if a platform is included and/or not excluded.
 	 */
-	public static MicroAgentMetaInfo getMetaInfo()
+	protected synchronized boolean	isIncluded(IComponentIdentifier cid)
 	{
-		String[] configs = new String[]{"Frequent updates (5s)", "Normal updates (10s)", "Seldom updates (60s)"};
-		return new MicroAgentMetaInfo("This agent looks for other awareness agents in the local net.", configs, 
-			new IArgument[]
-			{	
-				new Argument("address", "This parameter is the ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255).", "String", "224.0.0.0"),	
-				new Argument("port", "This parameter is the port used for finding other agents.", "int", new Integer(55667)),	
-				new Argument("delay", "This parameter is the delay between sending awareness infos.", "long", 
-					SUtil.createHashMap(configs, new Object[]{new Long(10000), new Long(20000), new Long(60000)})),	
-				new Argument("autocreate", "This parameter describes if new proxies should be automatically created when discovering new components.", "boolean", Boolean.TRUE),	
-				new Argument("autodelete", "This parameter describes if proxies should be automatically deleted when not discovered any longer.", "boolean", Boolean.TRUE),	
-				new Argument("proxydelay", "This parameter is the delay used by proxies.", "long", new Long(15000)),	
-			}, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.base.service.awareness.AwarenessAgentPanel"}));
+		boolean	included	= includes.isEmpty();
+		String[]	cidnames	= null;
+		
+		// Check if contained in includes.
+		for(int i=0; !included && i<includes.size(); i++)
+		{
+			String	inc	= (String)includes.get(i);
+			if(cidnames==null)
+				cidnames	= extractNames(cid);
+			for(int j=0; !included && j<cidnames.length; j++)
+			{
+				included	= cidnames[j].startsWith(inc);
+			}
+		}
+		
+		// Check if not contained in excludes.
+		for(int i=0; included && i<excludes.size(); i++)
+		{
+			String	exc	= (String)excludes.get(i);
+			if(cidnames==null)
+				cidnames	= extractNames(cid);
+			for(int j=0; included && j<cidnames.length; j++)
+			{
+				included	= !cidnames[j].startsWith(exc);
+			}
+		}
+
+		return included;
+	}
+	
+	/**
+	 *  Extract names for matching to includes/excludes list.
+	 */
+	protected String[]	extractNames(IComponentIdentifier cid)
+	{
+		List	ret	= new ArrayList();
+		ret.add(cid.getName());
+		String[]	addrs	= cid.getAddresses();
+		for(int i=0; i<addrs.length; i++)
+		{
+			int	prot	= addrs[i].indexOf("://");
+			int	port	= addrs[i].indexOf(':', prot+3);
+			if(prot!=-1 && port!=-1)
+			{
+				ret.add(addrs[i].substring(prot+3, port));
+			}
+			else
+			{
+				System.out.println("Warning: Unknown address scheme "+addrs[i]);
+			}
+		}
+		return (String[])ret.toArray(new String[ret.size()]);
 	}
 }

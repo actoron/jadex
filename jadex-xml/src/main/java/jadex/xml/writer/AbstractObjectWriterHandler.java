@@ -9,6 +9,7 @@ import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoTypeManager;
+import jadex.xml.annotation.XMLIncludeFields;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -297,13 +298,18 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 		}
 		else
 		{
+			
 			// Hack!!! todo: must not be Java object (OAV) ?!
 			try
 			{
-				Field field = object.getClass().getField(Writer.XML_INCLUDE_FIELDS);
-				if(SReflect.getWrappedType(field.getType()).equals(Boolean.class))
+				includefields	= object.getClass().isAnnotationPresent(XMLIncludeFields.class);
+				if(!includefields)
 				{
-					includefields = ((Boolean)field.get(object)).booleanValue();
+					Field field = object.getClass().getField(Writer.XML_INCLUDE_FIELDS);
+					if(SReflect.getWrappedType(field.getType()).equals(Boolean.class))
+					{
+						includefields = ((Boolean)field.get(object)).booleanValue();
+					}
 				}
 			}
 			catch(Exception e)

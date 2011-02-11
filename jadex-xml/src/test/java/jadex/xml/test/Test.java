@@ -82,8 +82,9 @@ public class Test extends TestCase
 //				t.testLoggingLevel();
 //				t.testInetAddress();
 //				t.testBeanWithPublicFields();
+				t.testBeanWithIncludedFields();
 //				t.testAnonymousInnerClass();
-				t.testImage();
+//				t.testImage();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -453,6 +454,16 @@ public class Test extends TestCase
 		C c = new C("test\n", 23);
 		
 		doWriteAndRead(c);
+	}
+	
+	/**
+	 *  Test if writer writes public bean fields (when XMLIncludeFields annotation is present).
+	 */
+	public void testBeanWithIncludedFields() throws Exception
+	{
+		D d = new D("test\n", 23);
+		
+		doWriteAndRead(d);
 	}
 	
 	/**

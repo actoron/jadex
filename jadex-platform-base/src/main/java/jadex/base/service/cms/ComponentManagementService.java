@@ -195,9 +195,9 @@ public abstract class ComponentManagementService extends BasicService implements
 		}
 
 		// Load the model with fitting factory.
-		getClassLoader(cinfo).addResultListener(new DefaultResultListener()
+		getClassLoader(cinfo).addResultListener(new DelegationResultListener(inited)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
 				final ClassLoader	cl = (ClassLoader)result;
 				
@@ -746,7 +746,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				{
 					IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 					
-					rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new IResultListener()
+					rms.getServiceProxy(cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -891,7 +891,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				{
 					IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 					
-					rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new IResultListener()
+					rms.getServiceProxy(cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -997,7 +997,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				{
 					IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 					
-					rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new IResultListener()
+					rms.getServiceProxy(cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -1100,7 +1100,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				{
 					IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 					
-					rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new IResultListener()
+					rms.getServiceProxy(cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -1179,7 +1179,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				{
 					IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 					
-					rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new IResultListener()
+					rms.getServiceProxy(cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{

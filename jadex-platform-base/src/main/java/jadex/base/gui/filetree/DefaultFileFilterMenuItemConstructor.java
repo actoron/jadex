@@ -159,15 +159,22 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 				if(!filetypes.containsKey(types[i]))
 				{
 					final JCheckBoxMenuItem ff = new JCheckBoxMenuItem(types[i], true);
+					File file	= null;
 					try
 					{
-						File file = new File("icon"+types[i]);  
+//						File file = new File("icon"+types[i]);	// Produces exception printed on console in JDK1.6
+						file = File.createTempFile("icon", types[i]);
 						FileSystemView view = FileSystemView.getFileSystemView();      
-						Icon icon = view.getSystemIcon(file);   
+						Icon icon = view.getSystemIcon(file);
 						ff.setIcon(icon);
 					}
 					catch(Exception e)
 					{
+					}
+					finally
+					{
+						if(file!=null)
+							file.delete();
 					}
 					menu.add(ff);
 					ff.addActionListener(new ActionListener()

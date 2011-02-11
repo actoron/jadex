@@ -86,6 +86,7 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 			}
 			Object	rma	= args!=null ? args.get("rma") : null;
 			boolean	gui	= rma!=null && rma instanceof Boolean && ((Boolean)rma).booleanValue();
+			Object	port	= args!=null ? args.get("port") : null;
 			Object	jadextransport	= args!=null ? args.get("jadextransport") : null;
 			
 			List	jadeargs	= new ArrayList();
@@ -95,6 +96,11 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 				jadeargs.add(JadexMessageTransportProtocol.class.getName());
 				jadeargs.add("-jadextransport");
 				jadeargs.add(jadextransport);
+			}
+			if(port!=null)
+			{
+				jadeargs.add("-local-port");
+				jadeargs.add(""+port);
 			}
 			if(gui)
 				jadeargs.add("-gui");
