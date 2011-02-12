@@ -19,24 +19,23 @@ import javax.swing.JSplitPane;
 import javax.swing.tree.TreePath;
 
 /**
- *  Panel for showing a file transfer view.
+ *  Panel for showing a file transfer view composed of two
+ *  panels with a file tree.
  */
 public class DeployerPanel extends JPanel
 {
-	/** The local external access. */
-//	protected IExternalAccess exta;
+	//-------- attributes --------
 	
 	/** The control center. */
 	protected IControlCenter jcc;
 	
+	//-------- constructors --------
 	
 	/**
 	 *  Create a new deloyer panel.
 	 */
-//	public DeployerPanel(final IExternalAccess exta)
 	public DeployerPanel(final IControlCenter jcc)
 	{
-//		this.exta = exta;
 		this.jcc = jcc;
 		
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -55,13 +54,21 @@ public class DeployerPanel extends JPanel
 		
 		split.add(p1);
 		split.add(p2);
+		
+		split.setOneTouchExpandable(true);
+		split.setDividerLocation(0.5);
 	}
 	
+	//-------- helper classes --------
+	
 	/**
-	 * 
+	 *  The deployer node handler that combines
+	 *  both file trees via commands.
 	 */
 	class DeployerNodeHandler implements INodeHandler
 	{
+		//-------- attributes --------
+		
 		/** The first panel. */
 		protected DeployerServiceSelectorPanel first;
 		
@@ -137,6 +144,8 @@ public class DeployerPanel extends JPanel
 			}
 		};
 	
+		//-------- methods --------
+
 		/**
 		 *  Get the overlay for a node if any.
 		 */

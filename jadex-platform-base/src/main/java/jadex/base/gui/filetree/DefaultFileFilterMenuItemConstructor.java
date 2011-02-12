@@ -33,7 +33,12 @@ import javax.swing.tree.TreeModel;
  */
 public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructor, IPropertiesProvider
 {
+	//-------- constants --------
+
+	/** Constant for some standard file extensions. */
 	public static final String[] STANDARD_TYPES = new String[]{".zip", ".jar", ".doc", ".xls", ".ppt"};
+	
+	//-------- attributes --------
 	
 	/** Constant for select all menu item. */
 	public static final String SELECT_ALL = "all";
@@ -50,6 +55,8 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 	/** The supported file types to menu items. */
 	protected Map filetypes;
 	
+	//-------- constructors --------
+
 	/**
 	 *  Create a new filter menu item constructor.
 	 */
@@ -91,8 +98,11 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 		getMenuItem();
 	}
 	
+	//-------- methods --------
+
 	/**
-	 * 
+	 *  Test all flag.
+	 *  @return True, if all is true.
 	 */
 	public boolean isAll()
 	{
@@ -100,7 +110,8 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 	}
 	
 	/**
-	 *  Get all selected 
+	 *  Get all selected component types.
+	 *  @return The selected component types.
 	 */
 	public List getSelectedComponentTypes()
 	{

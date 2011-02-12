@@ -16,10 +16,13 @@ import javax.swing.JTree;
 import javax.swing.UIDefaults;
 
 /**
- * 
+ *  The default node handler offers two refresh actions.
+ *  The node handler is responsible for popup menu on nodes.
  */
 public class DefaultNodeHandler implements INodeHandler
 {
+	//-------- constants --------
+
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
@@ -27,15 +30,18 @@ public class DefaultNodeHandler implements INodeHandler
 		"overlay_refreshtree", SGUI.makeIcon(FileTreePanel.class, "/jadex/base/gui/images/overlay_refresh.png"),
 	});
 	
+	//-------- attributes --------
+
 	/** The refresh action. */
 	protected AbstractAction refresh;
 	
 	/** The refresh tree action. */
 	protected AbstractAction refreshtree;
 
-	
+	//-------- constructors --------
+
 	/**
-	 * 
+	 *  Create a new node handler.
 	 */
 	public DefaultNodeHandler(JTree tree)
 	{
@@ -43,6 +49,8 @@ public class DefaultNodeHandler implements INodeHandler
 		this.refreshtree = new RefreshSubtreeAction(tree);
 	}
 	
+	//-------- methods --------
+
 	/**
 	 *  Get the overlay.
 	 * 	@param node The node.

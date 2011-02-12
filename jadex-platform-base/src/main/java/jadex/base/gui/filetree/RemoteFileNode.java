@@ -10,7 +10,7 @@ import javax.swing.JComponent;
 import javax.swing.JTree;
 
 /**
- * 
+ *  The remote file node.
  */
 public class RemoteFileNode  extends AbstractTreeNode
 {

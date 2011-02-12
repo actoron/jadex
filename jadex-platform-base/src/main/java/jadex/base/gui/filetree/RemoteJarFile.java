@@ -5,25 +5,29 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * 
+ *  The remote jar file.
  */
 public class RemoteJarFile extends RemoteFile
 {
+	//-------- attributes --------
+
 	/** The map of jar entries. */
 	protected Map jarentries;
 	
 	/** The relative path inside of the jar file. */
 	protected String relativepath;
 	
+	//-------- constructors --------
+
 	/**
-	 * 
+	 *  Create a remote jar file.
 	 */
 	public RemoteJarFile()
 	{
 	}
 
 	/**
-	 * 
+	 *  Create a remote jar file.
 	 */
 	public RemoteJarFile(String filename, String path, boolean directory, String displayname, Map jarentries, String relativepath)
 	{
@@ -32,8 +36,11 @@ public class RemoteJarFile extends RemoteFile
 		this.relativepath = relativepath;
 	}
 	
+	//-------- methods --------
+	
 	/**
-	 * 
+	 *  List the files.
+	 *  @return The collection of files.
 	 */
 	public Collection listFiles()
 	{

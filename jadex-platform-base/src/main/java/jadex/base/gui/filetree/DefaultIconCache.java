@@ -17,6 +17,8 @@ import javax.swing.filechooser.FileSystemView;
  */
 public class DefaultIconCache implements IIconCache
 {
+	//-------- constants --------
+	
 	/** The icon map. */
 	protected Map icons = new HashMap();
 	

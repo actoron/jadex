@@ -12,21 +12,27 @@ import javax.swing.UIDefaults;
 import javax.swing.tree.TreePath;
 
 /**
- * 
+ *  The refresh subtree action.
  */
 public class RefreshSubtreeAction extends AbstractAction
 {
+	//-------- constants --------
+
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"refresh_tree", SGUI.makeIcon(FileTreePanel.class, "/jadex/base/gui/images/refresh_tree.png"),
 	});
 	
+	//-------- attributes --------
+
 	/** The tree. */
 	protected JTree tree;
 	
+	//-------- constructors --------
+
 	/**
-	 * 
+	 *  Create a new action.
 	 */
 	public RefreshSubtreeAction(JTree tree)
 	{
@@ -34,7 +40,7 @@ public class RefreshSubtreeAction extends AbstractAction
 	}
 	
 	/**
-	 * 
+	 *  Create a new action.
 	 */
 	public RefreshSubtreeAction(String name, Icon icon, JTree tree)
 	{
@@ -42,8 +48,10 @@ public class RefreshSubtreeAction extends AbstractAction
 		this.tree = tree;
 	}
 	
+	//-------- methods --------
+
 	/**
-	 * 
+	 *  Called when the action is performed.
 	 */
 	public void actionPerformed(ActionEvent e)
 	{

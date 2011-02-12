@@ -14,6 +14,9 @@ import jadex.commons.gui.SGUI;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
@@ -90,8 +93,6 @@ public abstract class AbstractSelectorPanel extends JPanel implements IPropertie
 	
 		centerp.add(ObjectCardLayout.DEFAULT_COMPONENT, emptylabel);
 		
-		JPanel northp = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		northp.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Instance Settings "));
 	
 		selcb = new JComboBox(); 
 		selcb.setRenderer(new BasicComboBoxRenderer()
@@ -105,11 +106,23 @@ public abstract class AbstractSelectorPanel extends JPanel implements IPropertie
 		});
 		
 		remotecb = new JCheckBox("Remote");
+
+		JPanel northp = new JPanel(new GridBagLayout());
+		northp.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Instance Settings "));
+		
 		final JButton refreshb = new JButton("Refresh");
-		northp.add(new JLabel("Select instance"));
-		northp.add(selcb);
-		northp.add(remotecb);
-		northp.add(refreshb);
+		int x=0;
+		JLabel instl = new JLabel("Instance");
+		instl.setToolTipText("Use the combo box to select the instance to be presented below.");
+		selcb.setToolTipText("Use the combo box to select the instance to be presented below.");
+		northp.add(instl, new GridBagConstraints(x++, 0, 1, 1, 0, 0, 
+			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0,2,0,2), 0, 0));
+		northp.add(selcb,  new GridBagConstraints(x++, 0, 1, 1, 1, 0, 
+			GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0,2,0,2), 0, 0));
+		northp.add(remotecb,  new GridBagConstraints(x++, 0, 1, 1, 0, 0, 
+			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0,2,0,2), 0, 0));
+		northp.add(refreshb,  new GridBagConstraints(x++, 0, 1, 1, 0, 0, 
+			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0,2,0,2), 0, 0));
 		
 		refreshb.addActionListener(new ActionListener() 
 		{

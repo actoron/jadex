@@ -22,10 +22,13 @@ import javax.swing.JScrollPane;
 import javax.swing.tree.TreeSelectionModel;
 
 /**
- * 
+ *  The deployment service viewer panel displays 
+ *  the file tree in a scroll panel.
  */
 public class DeploymentServiceViewerPanel implements IServiceViewerPanel
 {
+	//-------- attributes --------
+
 	/** The file tree panel. */
 	protected FileTreePanel ftp;
 	
@@ -35,8 +38,10 @@ public class DeploymentServiceViewerPanel implements IServiceViewerPanel
 	/** The scroll pane. */
 	protected JScrollPane scrollpane;
 	
+	//-------- constructors --------
+
 	/**
-	 * 
+	 *  Create a new viewer panel.
 	 */
 	public DeploymentServiceViewerPanel(IExternalAccess exta, boolean remote, 
 		IDeploymentService service, INodeHandler nodehandler)
@@ -81,7 +86,7 @@ public class DeploymentServiceViewerPanel implements IServiceViewerPanel
 	}
 	
 	/**
-	 * 
+	 *  Shutdown the panel.
 	 */ 
 	public IFuture shutdown()
 	{
@@ -89,7 +94,7 @@ public class DeploymentServiceViewerPanel implements IServiceViewerPanel
 	}
 	
 	/**
-	 * 
+	 *  Get the panel id.
 	 */
 	public String getId()
 	{
@@ -97,7 +102,7 @@ public class DeploymentServiceViewerPanel implements IServiceViewerPanel
 	}
 
 	/**
-	 * 
+	 *  Get the component.
 	 */
 	public JComponent getComponent()
 	{
@@ -105,10 +110,7 @@ public class DeploymentServiceViewerPanel implements IServiceViewerPanel
 	}
 
 	/**
-	 * 
-	 * @param jcc
-	 * @param service
-	 * @return
+	 *  Init the panel.
 	 */
 	public IFuture init(IControlCenter jcc, IService service)
 	{
@@ -116,8 +118,8 @@ public class DeploymentServiceViewerPanel implements IServiceViewerPanel
 	}
 	
 	/**
-	 *  Get the ftp.
-	 *  @return the ftp.
+	 *  Get the selected path.
+	 *  @return The selected path as string.
 	 */
 	public String getSelectedPath()
 	{
@@ -135,7 +137,8 @@ public class DeploymentServiceViewerPanel implements IServiceViewerPanel
 	}
 	
 	/**
-	 * 
+	 *  Get the tree panel.
+	 *  @return The panel.
 	 */
 	public FileTreePanel getFileTreePanel()
 	{

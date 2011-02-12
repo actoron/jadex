@@ -5,10 +5,15 @@ import java.io.File;
 import javax.swing.filechooser.FileSystemView;
 
 /**
- * 
+ *  A remote file represents a java.io.File that
+ *  can be transferred to remote address spaces.
+ *  Does only transfer file information, not the
+ *  binary data itself.
  */
 public class RemoteFile
 {
+	//-------- attributes --------
+	
 	/** The file name. */
 	protected String filename;
 	
@@ -21,15 +26,18 @@ public class RemoteFile
 	/** The display name. */
 	protected String displayname;
 
+	//-------- constructors --------
+
 	/**
-	 * 
+	 *  Create a new remote file.
 	 */
 	public RemoteFile()
 	{
+		// Needed for bean creation.
 	}
 
 	/**
-	 * 
+	 *  Create a new remote file.
 	 */
 	public RemoteFile(String filename, String path, boolean directory, String displayname)
 	{
@@ -40,7 +48,7 @@ public class RemoteFile
 	}
 	
 	/**
-	 * 
+	 *  Create a new remote file.
 	 */
 	public RemoteFile(File file)
 	{
@@ -49,6 +57,8 @@ public class RemoteFile
 		this.directory = file.isDirectory();
 		this.displayname = getDisplayName(file);
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Get the filename.
@@ -123,7 +133,7 @@ public class RemoteFile
 	}
 	
 	/**
-	 *  Get the displa name for a file.
+	 *  Get the display name for a file.
 	 */
 	public static String getDisplayName(File file)
 	{

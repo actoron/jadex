@@ -1,10 +1,7 @@
 package jadex.tools.deployer;
 
-import javax.swing.tree.TreePath;
-
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
-import jadex.base.gui.filetree.RefreshSubtreeAction;
 import jadex.base.service.deployment.IDeploymentService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
@@ -16,14 +13,20 @@ import jadex.commons.service.IService;
 import jadex.commons.service.SServiceProvider;
 import jadex.tools.generic.AbstractServiceSelectorPanel;
 
+import javax.swing.tree.TreePath;
+
 /**
  *  Panel for deployment service selection.
  */
 public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 {
+	//-------- attributes --------
+	
 	/** The node handler. */
 	protected INodeHandler nodehandler;
 	
+	//-------- constructors --------
+
 	/**
 	 *  Create a new selector panel.
 	 */
@@ -32,6 +35,8 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 		super(exta, servicetype);
 		this.nodehandler = nodehandler;
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Create the service panel.

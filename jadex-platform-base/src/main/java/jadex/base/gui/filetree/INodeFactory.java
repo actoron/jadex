@@ -8,7 +8,7 @@ import jadex.commons.IRemoteFilter;
 import javax.swing.JTree;
 
 /**
- * 
+ *  The node factory interface.
  */
 public interface INodeFactory
 {

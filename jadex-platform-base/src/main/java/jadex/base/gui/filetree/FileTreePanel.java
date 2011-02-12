@@ -204,7 +204,8 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	}
 
 	/**
-	 * 
+	 *  Set the file filter.
+	 *  @param filefilter The file filter.
 	 */
 	public void setFileFilter(IRemoteFilter filefilter)
 	{
@@ -212,7 +213,8 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	}
 	
 	/**
-	 * 
+	 *  Set the menu item constructor.
+	 *  @param mic The menu item constructor.
 	 */
 	public void setMenuItemConstructor(IMenuItemConstructor mic)
 	{
@@ -220,7 +222,8 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	}
 	
 	/**
-	 * 
+	 *  Set the popup builder.
+	 *  @param pubuilder The popup builder.
 	 */
 	public void setPopupBuilder(PopupBuilder pubuilder)
 	{
@@ -229,7 +232,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 
 	/**
 	 *  Get the popup builder.
-	 *  @return the popup builder.
+	 *  @return The popup builder.
 	 */
 	public PopupBuilder getPopupBuilder()
 	{
@@ -579,7 +582,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	}
 	
 	/**
-	 * 
+	 *  Main for testing.
 	 */
 	public static void main(String[] args)
 	{
@@ -598,12 +601,16 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	}
 	
 	/**
-	 * 
+	 *  Delegation filter class.
 	 */
 	public static class DelegationFilter implements IRemoteFilter
 	{
+		//-------- attributes --------
+		
 		/** The delegation filter. */
 		protected IRemoteFilter filter;
+
+		//-------- methods --------
 
 		/**
 		 *  Test if an object passes the filter.
@@ -634,15 +641,19 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	}
 	
 	/**
-	 * 
+	 *  The delegation icon cache.
 	 */
 	public static class DelegationIconCache implements IIconCache
 	{
+		//-------- attributes --------
+		
 		/** The delegation icon cache. */
 		protected IIconCache iconcache;
 		
+		//-------- methods --------
+
 		/**
-		 * 
+		 *  Create a new delegation cache. 
 		 */
 		public DelegationIconCache()
 		{

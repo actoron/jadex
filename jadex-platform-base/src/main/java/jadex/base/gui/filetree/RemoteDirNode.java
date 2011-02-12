@@ -22,10 +22,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JTree;
-import javax.swing.filechooser.FileSystemView;
 
 /**
- * 
+ *  The remote dir node.
  */
 public class RemoteDirNode extends RemoteFileNode
 {

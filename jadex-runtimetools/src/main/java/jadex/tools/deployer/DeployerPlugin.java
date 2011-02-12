@@ -24,8 +24,6 @@ public class DeployerPlugin extends AbstractJCCPlugin
 		"conversation_sel", SGUI.makeIcon(DeployerPlugin.class, "/jadex/tools/common/images/libcenter_sel.png"),
 	});
 
-	//-------- attributes --------
-	
 	//-------- methods --------
 	
 	/**
