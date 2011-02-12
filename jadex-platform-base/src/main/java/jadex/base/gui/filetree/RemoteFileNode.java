@@ -107,7 +107,7 @@ public class RemoteFileNode  extends AbstractTreeNode
 	 */
 	public String toString()
 	{
-		return file.getFilename();
+		return file.getDisplayName();
 	}
 
 	/**

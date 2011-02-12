@@ -322,8 +322,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	{
 		final RootNode root = (RootNode)getModel().getRoot();
 		ITreeNode node = factory.createNode(root, model, tree, !remote? file: 
-			new RemoteFile(file.getName(), file.getAbsolutePath(), file.isDirectory(), 
-			FileSystemView.getFileSystemView().getSystemDisplayName(file)), iconcache, filefilter, exta, factory);
+			new RemoteFile(file), iconcache, filefilter, exta, factory);
 		root.addChild(node);
 	}
 	

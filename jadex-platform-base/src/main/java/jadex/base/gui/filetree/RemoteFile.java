@@ -1,5 +1,9 @@
 package jadex.base.gui.filetree;
 
+import java.io.File;
+
+import javax.swing.filechooser.FileSystemView;
+
 /**
  * 
  */
@@ -33,6 +37,17 @@ public class RemoteFile
 		this.path = path;
 		this.directory = directory;
 		this.displayname = displayname;
+	}
+	
+	/**
+	 * 
+	 */
+	public RemoteFile(File file)
+	{
+		this.filename = file.getName();
+		this.path = file.getAbsolutePath();
+		this.directory = file.isDirectory();
+		this.displayname = getDisplayName(file);
 	}
 	
 	/**
@@ -107,4 +122,16 @@ public class RemoteFile
 		this.displayname = displayname;
 	}
 	
+	/**
+	 *  Get the displa name for a file.
+	 */
+	public static String getDisplayName(File file)
+	{
+		String ret = FileSystemView.getFileSystemView().getSystemDisplayName(file);
+		if(ret==null || ret.length()==0)
+			ret = file.getName();
+		if(ret==null || ret.length()==0)
+			ret = file.getPath();
+		return ret;
+	}
 }

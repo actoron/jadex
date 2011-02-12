@@ -163,8 +163,7 @@ public class RemoteDirNode extends RemoteFileNode
 									public void resultAvailable(Object result)
 									{
 										if(((Boolean)result).booleanValue())
-											lis.resultAvailable(new RemoteFile(file.getName(), file.getAbsolutePath(), 
-											file.isDirectory(), FileSystemView.getFileSystemView().getSystemDisplayName(file)));
+											lis.resultAvailable(new RemoteFile(file));
 										else
 											lis.exceptionOccurred(null);
 									}

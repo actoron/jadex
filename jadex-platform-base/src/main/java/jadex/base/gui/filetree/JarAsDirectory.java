@@ -342,6 +342,6 @@ public class JarAsDirectory	extends File
 	 */
 	public boolean isRoot()
 	{
-		return entry.getName().equals("/");
+		return entry==null;
 	}
 }

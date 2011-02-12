@@ -2,8 +2,11 @@ package jadex.base.gui.filetree;
 
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filechooser.MyFile;
+import jadex.commons.SUtil;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
@@ -14,6 +17,9 @@ import javax.swing.filechooser.FileSystemView;
  */
 public class DefaultIconCache implements IIconCache
 {
+	/** The icon map. */
+	protected Map icons = new HashMap();
+	
 	//-------- methods --------
 	
 	/**
@@ -38,24 +44,43 @@ public class DefaultIconCache implements IIconCache
 		File tmp = null;
 		try
 		{
-			if(file instanceof JarAsDirectory)// && !((JarAsDirectory)file).isRoot())
+			String suffix = "";
+			if(!file.isDirectory() || (file instanceof JarAsDirectory && ((JarAsDirectory)file).isRoot()))
 			{
-				String suffix = file.getName();
-				int idx = suffix.lastIndexOf(".");
+				String name = file.getName();
+				int idx = name.lastIndexOf(".");
 				if(idx!=-1)
 				{
-					suffix = suffix.substring(idx);
-					tmp = File.createTempFile("icon", suffix);  
+					suffix = name.substring(idx);
+					ret = (Icon)icons.get(suffix);
+				}
+			}
+			
+			if(ret==null)
+			{
+				if(file instanceof JarAsDirectory && suffix.length()==0)// && !((JarAsDirectory)file).isRoot())
+				{
+					tmp = new MyFile(file.getName(), "", true);
+					ret = FileSystemView.getFileSystemView().getSystemIcon(tmp);  
 				}
 				else
 				{
-					tmp = new MyFile(file.getName(), "", true);
+					if((file.exists() && file.canRead()) || SUtil.arrayToSet(file.listRoots()).contains(file))
+					{
+						ret = FileSystemView.getFileSystemView().getSystemIcon(file);  
+					}
+					else
+					{
+//						tmp = new MyFile("icon", suffix, file.isDirectory());
+						tmp = File.createTempFile("icon", suffix);
+						ret = FileSystemView.getFileSystemView().getSystemIcon(tmp);  
+					}
 				}
-				ret = FileSystemView.getFileSystemView().getSystemIcon(tmp);  
 			}
-			else
+			
+			if(ret!=null && suffix.length()>0)
 			{
-				ret = FileSystemView.getFileSystemView().getSystemIcon(file);  
+				icons.put(suffix, ret);
 			}
 		}
 		catch(Exception e)
