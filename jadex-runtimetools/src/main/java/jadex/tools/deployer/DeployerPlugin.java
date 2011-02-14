@@ -2,7 +2,6 @@ package jadex.tools.deployer;
 
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.commons.Properties;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 
@@ -24,6 +23,11 @@ public class DeployerPlugin extends AbstractJCCPlugin
 		"conversation_sel", SGUI.makeIcon(DeployerPlugin.class, "/jadex/tools/common/images/libcenter_sel.png"),
 	});
 
+	//-------- attributes --------
+	
+	/** The panel. */
+	protected DeployerPanel deployerpanel;
+	
 	//-------- methods --------
 	
 	/**
@@ -59,7 +63,8 @@ public class DeployerPlugin extends AbstractJCCPlugin
 	 */
 	public JComponent createView()
 	{
-		return new DeployerPanel(getJCC());
+		deployerpanel = new DeployerPanel(getJCC());
+		return deployerpanel;
 	}
 
 	/**
@@ -67,34 +72,7 @@ public class DeployerPlugin extends AbstractJCCPlugin
 	 */
 	public IFuture setProperties(Properties props)
 	{
-		return new Future(null);
-//		Property[] ps = props.getProperties("cp");
-//		// Hack: todo!?
-//		ILibraryService ls = (ILibraryService)SServiceProvider.getService(getJCC()
-//			.getExternalAccess().getServiceProvider(), ILibraryService.class).get(new ThreadSuspendable());
-//		for(int i=0; i<ps.length; i++)
-//		{
-//			try
-//			{
-//				// todo: make addURL return future
-//				File	file = new File(URLDecoder.decode(ps[i].getValue(), Charset.defaultCharset().name()));
-//				if(file.exists())
-//				{
-//					ls.addURL(file.toURI().toURL());
-//				}
-//				else
-//				{
-//					ls.addURL(new URL(ps[i].getValue()));
-//				}
-//			}
-//			catch(Exception e)
-//			{
-//				e.printStackTrace();
-//				System.out.println("Classpath problem: "+ps[i].getValue());
-//			}
-//		}
-//		
-//		return new Future(null);
+		return deployerpanel.setProperties(props);
 	}
 
 	/**
@@ -102,46 +80,7 @@ public class DeployerPlugin extends AbstractJCCPlugin
 	 */
 	public IFuture getProperties()
 	{
-		return new Future(null);
-//		final Future ret = new Future();
-//		
-//		SServiceProvider.getService(getJCC()
-//			.getExternalAccess().getServiceProvider(), ILibraryService.class)
-//			.addResultListener(new SwingDelegationResultListener(ret)
-//		{
-//			public void customResultAvailable(Object result)
-//			{
-//				ILibraryService ls = (ILibraryService)result;
-//				ls.getURLs().addResultListener(new SwingDelegationResultListener(ret)
-//				{
-//					public void customResultAvailable(Object result)
-//					{
-//						List urls = (List)result;
-//						Properties props = new Properties();
-//						
-//						for(int i=0; i<urls.size(); i++)
-//						{
-//							URL	url	= (URL) urls.get(i);
-//							String	urlstring;
-//							if(url.getProtocol().equals("file"))
-//							{
-//								urlstring	= SUtil.convertPathToRelative(url.getPath());
-//							}
-//							else
-//							{
-//								urlstring	= url.toString();
-//							}
-//							
-//							props.addProperty(new Property("cp", urlstring));
-//						}
-//						
-//						ret.setResult(props);
-//					}
-//				});
-//			}
-//		});
-//		
-//		return ret;
+		return deployerpanel.getProperties();
 	}
 
 	/** 

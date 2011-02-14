@@ -30,7 +30,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -41,7 +40,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.filechooser.FileSystemView;
 import javax.swing.tree.TreePath;
 
 /**
@@ -463,23 +461,23 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 							root.addChild(node);
 						}
 
-						ITreeNode[] childs = root.getChildren();
-						for(int i=0; i<childs.length; i++)
-						{
-							// Todo: support non-file (e.g. url nodes).
-							File file = ((FileNode)childs[i]).getFile();
-							
-							// Hack!!! Build new file object. This strips trailing "/" from jar file nodes.
-							file = new File(file.getParentFile(), file.getName());
-							try
-							{
-								ls.addURL(file.toURI().toURL());
-							}
-							catch(MalformedURLException ex)
-							{
-								ex.printStackTrace();
-							}
-						}
+//						ITreeNode[] childs = root.getChildren();
+//						for(int i=0; i<childs.length; i++)
+//						{
+//							// Todo: support non-file (e.g. url nodes).
+//							File file = ((FileNode)childs[i]).getFile();
+//							
+//							// Hack!!! Build new file object. This strips trailing "/" from jar file nodes.
+//							file = new File(file.getParentFile(), file.getName());
+//							try
+//							{
+//								ls.addURL(file.toURI().toURL());
+//							}
+//							catch(MalformedURLException ex)
+//							{
+//								ex.printStackTrace();
+//							}
+//						}
 						
 						// Select the last selected model in the tree.
 						expansionhandler.setSelectedPath(mep.getSelectedNode());
@@ -521,6 +519,10 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 								ret.setResult(null);
 							};
 						});
+						else
+						{
+							ret.setResult(null);
+						}
 						
 //						if(filterprops!=null)
 //						{

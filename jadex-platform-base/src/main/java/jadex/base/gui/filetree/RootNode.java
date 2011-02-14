@@ -15,7 +15,7 @@ import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 
 /**
- * 
+ *  The root node.
  */
 public class RootNode extends AbstractTreeNode
 {
@@ -122,7 +122,8 @@ public class RootNode extends AbstractTreeNode
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
-		setChildren(Collections.EMPTY_LIST);
+		children.clear();
+		setChildren(children);
 	}
 	
 	//-------- methods --------
@@ -199,13 +200,13 @@ public class RootNode extends AbstractTreeNode
 		for(int i=0; i<ret.length; i++)
 		{
 			ITreeNode	node	= getChild(i);
-			if(node instanceof DirNode)
+			if(node instanceof FileNode)
 			{
-				ret[i]	= ((DirNode)node).getFile().getAbsolutePath();
+				ret[i]	= ((FileNode)node).getFile().getAbsolutePath();
 			}
 			else
 			{
-				ret[i]	= ((RemoteDirNode)node).getRemoteFile().getPath();
+				ret[i]	= ((RemoteFileNode)node).getRemoteFile().getPath();
 			}
 		}
 		return ret;

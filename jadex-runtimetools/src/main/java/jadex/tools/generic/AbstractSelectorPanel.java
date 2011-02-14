@@ -93,7 +93,6 @@ public abstract class AbstractSelectorPanel extends JPanel implements IPropertie
 	
 		centerp.add(ObjectCardLayout.DEFAULT_COMPONENT, emptylabel);
 		
-	
 		selcb = new JComboBox(); 
 		selcb.setRenderer(new BasicComboBoxRenderer()
 		{
@@ -317,6 +316,10 @@ public abstract class AbstractSelectorPanel extends JPanel implements IPropertie
 					});
 				}
 			}
+		}
+		else
+		{
+			ret.setResult(null);
 		}
 		
 //		System.out.println("props: "+props);

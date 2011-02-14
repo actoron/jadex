@@ -1,20 +1,10 @@
 package jadex.tools.generic;
 
-import jadex.base.gui.componentviewer.IServiceViewerPanel;
-import jadex.bridge.IExternalAccess;
 import jadex.commons.SReflect;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.service.IService;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
-
-import java.util.Collection;
-import java.util.Iterator;
 
 import javax.swing.Icon;
-import javax.swing.JComboBox;
 
 /**
  *  Abstract plugin for wrapping service views to plugin view.

@@ -1,11 +1,18 @@
 package jadex.tools.deployer;
 
+import jadex.base.gui.IPropertiesProvider;
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.service.deployment.FileData;
 import jadex.base.service.deployment.IDeploymentService;
+import jadex.commons.Properties;
+import jadex.commons.Property;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.future.SwingDelegationResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -22,12 +29,22 @@ import javax.swing.tree.TreePath;
  *  Panel for showing a file transfer view composed of two
  *  panels with a file tree.
  */
-public class DeployerPanel extends JPanel
+public class DeployerPanel extends JPanel implements IPropertiesProvider
 {
 	//-------- attributes --------
 	
 	/** The control center. */
 	protected IControlCenter jcc;
+	
+	/** The split panel. */
+	protected JSplitPane splitpanel;
+	
+	/** The first panel. */
+	protected DeployerServiceSelectorPanel p1;
+
+	/** The second panel. */
+	protected DeployerServiceSelectorPanel p2;
+
 	
 	//-------- constructors --------
 	
@@ -38,25 +55,73 @@ public class DeployerPanel extends JPanel
 	{
 		this.jcc = jcc;
 		
-		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		splitpanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		setLayout(new BorderLayout());
-		add(split, BorderLayout.CENTER);
+		add(splitpanel, BorderLayout.CENTER);
 
 		// Local view on the left
 		DeployerNodeHandler nh1 = new DeployerNodeHandler();
 		DeployerNodeHandler nh2 = new DeployerNodeHandler();
-		DeployerServiceSelectorPanel p1 = new DeployerServiceSelectorPanel(jcc.getExternalAccess(), IDeploymentService.class, nh1);
-		DeployerServiceSelectorPanel p2 = new DeployerServiceSelectorPanel(jcc.getExternalAccess(), IDeploymentService.class, nh2);
+		p1 = new DeployerServiceSelectorPanel(jcc.getExternalAccess(), IDeploymentService.class, nh1);
+		p2 = new DeployerServiceSelectorPanel(jcc.getExternalAccess(), IDeploymentService.class, nh2);
 		nh1.setFirstPanel(p1);
 		nh1.setSecondPanel(p2);
 		nh2.setFirstPanel(p2);
 		nh2.setSecondPanel(p1);
 		
-		split.add(p1);
-		split.add(p2);
+		splitpanel.add(p1);
+		splitpanel.add(p2);
 		
-		split.setOneTouchExpandable(true);
-		split.setDividerLocation(0.5);
+		splitpanel.setOneTouchExpandable(true);
+	
+//		p1.refreshCombo();
+//		p2.refreshCombo();
+	}
+	
+	/**
+	 *  Get the properties.
+	 */
+	public IFuture getProperties()
+	{
+		final Future ret = new Future();
+
+		final Properties props = new Properties();
+		props.addProperty(new Property("split_location", ""+splitpanel.getDividerLocation()));
+		
+		p1.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				AbstractJCCPlugin.addSubproperties(props, "first", (Properties)result);
+				p2.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						AbstractJCCPlugin.addSubproperties(props, "second", (Properties)result);
+						ret.setResult(props);
+					}
+				});
+			}
+		});
+	
+		return ret;
+	}
+	
+	/**
+	 *  Set the properties.
+	 */
+	public IFuture setProperties(Properties props)
+	{
+		Properties firstprops = props.getSubproperty("first");
+		if(firstprops!=null)
+			p1.setProperties(firstprops);
+		Properties secondprops = props.getSubproperty("second");
+		if(secondprops!=null)
+			p2.setProperties(secondprops);
+
+		splitpanel.setDividerLocation(props.getIntProperty("split_location"));
+	
+		return new Future(null);
 	}
 	
 	//-------- helper classes --------

@@ -1,7 +1,6 @@
 package jadex.tools.generic;
 
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -16,24 +15,30 @@ import java.util.Iterator;
 import javax.swing.JComboBox;
 
 /**
- * 
+ *  The abstract base class for service selector panels.
  */
 public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
 {
+	//-------- attributes --------
+	
 	/** The external access. */
 	protected IExternalAccess exta;
 	
 	/** The service. */
 	protected Class servicetype;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new selector panel.
 	 */
 	public AbstractServiceSelectorPanel(IExternalAccess exta, Class servicetype)
 	{
 		this.exta = exta;
 		this.servicetype = servicetype;
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Refresh the combo box.

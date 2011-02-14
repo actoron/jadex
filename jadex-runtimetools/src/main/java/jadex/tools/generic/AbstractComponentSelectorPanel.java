@@ -18,24 +18,30 @@ import java.util.Set;
 import javax.swing.JComboBox;
 
 /**
- * 
+ *  Abstract base class for selector panels.
  */
 public abstract class AbstractComponentSelectorPanel extends AbstractSelectorPanel
 {
+	//-------- attributes --------
+	
 	/** The external access. */
 	protected IExternalAccess exta;
 	
 	/** The model name. */
 	protected String modelname;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new selector panel.
 	 */
 	public AbstractComponentSelectorPanel(IExternalAccess exta, String modelname)
 	{
 		this.exta = exta;
 		this.modelname = modelname;
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Get the model name.

@@ -14,6 +14,8 @@ import javax.swing.JTree;
  */
 public class DefaultNodeFactory implements INodeFactory
 {
+	//-------- methods --------
+	
 	/**
 	 *  Create a new component node.
 	 */
