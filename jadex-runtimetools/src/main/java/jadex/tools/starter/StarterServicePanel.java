@@ -82,7 +82,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 	protected StarterPanel spanel;
 
 	/** The panel showing the classpath models. */
-	protected FileTreePanel mpanel;
+	protected ModelTreePanel mpanel;
 	
 	/** The component instances in a tree. */
 	protected ComponentTreePanel comptree;
@@ -455,6 +455,15 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 		return ret;
 	}
 	
+	/**
+	 *  Get the mpanel.
+	 *  @return the mpanel.
+	 */
+	public ModelTreePanel getModelTreepanel()
+	{
+		return mpanel;
+	}
+
 	/**
 	 * Load the properties.
 	 */

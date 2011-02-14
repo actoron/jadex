@@ -136,4 +136,28 @@ public class AddPathAction extends ToolTipAction
 			}
 		}
 	}
+	
+	/**
+	 * 
+	 */
+	public static Icon getIcon()
+	{
+		return icons.getIcon("addpath");
+	}
+	
+	/**
+	 * 
+	 */
+	public static String getName()
+	{
+		return "Add Path";
+	}
+	
+	/**
+	 * 
+	 */
+	public static String getTooltipText()
+	{
+		return "Add a new directory path (package root) to the project structure";
+	}
 }

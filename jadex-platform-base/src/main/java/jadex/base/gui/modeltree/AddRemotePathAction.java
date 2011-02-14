@@ -135,4 +135,28 @@ public class AddRemotePathAction extends ToolTipAction
 			}
 		}
 	}
+	
+	/**
+	 * 
+	 */
+	public static Icon getIcon()
+	{
+		return icons.getIcon("addpath");
+	}
+	
+	/**
+	 * 
+	 */
+	public static String getName()
+	{
+		return "Add Remote Path";
+	}
+	
+	/**
+	 * 
+	 */
+	public static String getTooltipText()
+	{
+		return "Add a new remote directory path (package root) to the project structure";
+	}
 }

@@ -82,4 +82,14 @@ public class StarterViewerPanel extends AbstractServiceViewerPanel
 	{
 		return panel.getProperties();
 	}
+
+	/**
+	 *  Get the panel.
+	 *  @return the panel.
+	 */
+	public StarterServicePanel getPanel()
+	{
+		return panel;
+	}
+	
 }

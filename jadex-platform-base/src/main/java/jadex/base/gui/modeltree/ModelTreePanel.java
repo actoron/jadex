@@ -26,8 +26,11 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.swing.Action;
 import javax.swing.tree.TreePath;
 
 /**
@@ -35,12 +38,16 @@ import javax.swing.tree.TreePath;
  */
 public class ModelTreePanel extends FileTreePanel
 {
+	/** The actions. */
+	protected Map actions;
+	
 	/**
 	 * 
 	 */
 	public ModelTreePanel(IExternalAccess exta, boolean remote)
 	{
 		super(exta, remote);
+		actions = new HashMap();
 		
 		ModelFileFilterMenuItemConstructor mic = new ModelFileFilterMenuItemConstructor(getModel(), exta);
 		ModelFileFilter ff = new ModelFileFilter(mic, exta);
@@ -48,9 +55,20 @@ public class ModelTreePanel extends FileTreePanel
 		
 		setFileFilter(ff);
 		setMenuItemConstructor(mic);
-		setPopupBuilder(new PopupBuilder(new Object[]{new AddPathAction(this), new AddRemotePathAction(this), mic}));
+		actions.put(AddPathAction.class, new AddPathAction(this));
+		actions.put(AddRemotePathAction.class, new AddRemotePathAction(this));
+		setPopupBuilder(new PopupBuilder(new Object[]{actions.get(AddPathAction.class), 
+			actions.get(AddRemotePathAction.class), mic}));
 		setIconCache(ic);
 		addNodeHandler(new DefaultNodeHandler(getTree()));
+	}
+	
+	/**
+	 * 
+	 */
+	public Action getAction(Class actionclass)
+	{
+		return (Action)actions.get(actionclass);
 	}
 	
 	/**
