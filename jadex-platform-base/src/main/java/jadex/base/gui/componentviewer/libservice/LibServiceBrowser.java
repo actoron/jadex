@@ -9,7 +9,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.future.SwingDelegationResultListener;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.EditableListEvent;
 import jadex.commons.gui.SGUI;
@@ -333,8 +332,6 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 	 */
 	public IFuture setProperties(Properties props)
 	{
-		Future ret = new Future();
-		
 		Property[] ps = props.getProperties("cp");
 		for(int i=0; i<ps.length; i++)
 		{
@@ -358,7 +355,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 			}
 		}
 		
-		return ret;
+		return new Future(null);
 	}
 
 	/**
@@ -369,7 +366,6 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 	{
 		final Future ret = new Future();
 		
-		// todo: hack remove thread suspendable
 		libservice.getURLs().addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
