@@ -3,6 +3,9 @@ package jadex.tools.deployer;
 import jadex.base.gui.IPropertiesProvider;
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.filetree.FileNode;
+import jadex.base.gui.filetree.JarAsDirectory;
+import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.service.deployment.FileData;
@@ -74,8 +77,8 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 		
 		splitpanel.setOneTouchExpandable(true);
 	
-//		p1.refreshCombo();
-//		p2.refreshCombo();
+		p1.refreshCombo();
+		p2.refreshCombo();
 	}
 	
 	/**
@@ -205,7 +208,21 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 			
 			public boolean isEnabled()
 			{
-				return first!=null && first.getSelectedPath()!=null;
+				boolean ret = false;
+				if(first!=null && first.getSelectedTreePath()!=null)
+				{
+					Object node = first.getSelectedTreePath().getLastPathComponent();
+					if(node instanceof FileNode)
+					{
+						File file = ((FileNode)node).getFile();
+						ret = !file.isDirectory() || (file instanceof JarAsDirectory && ((JarAsDirectory)file).isRoot());
+					}
+					else if(node instanceof RemoteFileNode)
+					{
+						ret = !((RemoteFileNode)node).getRemoteFile().isDirectory();
+					}
+				}
+				return ret;
 			}
 		};
 	

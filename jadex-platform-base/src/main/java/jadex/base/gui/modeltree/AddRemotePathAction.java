@@ -54,22 +54,7 @@ public class AddRemotePathAction extends ToolTipAction
 		super(name, icon, desc);
 		this.treepanel = treepanel;
 		
-		filechooser = new JFileChooser();
-		filechooser.setFileSystemView(new RemoteFileSystemView(treepanel.getExternalAccess(), filechooser));
-		filechooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-		filechooser.addChoosableFileFilter(new FileFilter()
-		{
-			public String getDescription()
-			{
-				return "Paths or .jar files";
-			}
-
-			public boolean accept(File f)
-			{
-				String name = f.getName().toLowerCase();
-				return f.isDirectory() || name.endsWith(".jar");
-			}
-		});
+		
 	}
 	
 	/**
@@ -88,6 +73,27 @@ public class AddRemotePathAction extends ToolTipAction
 	public void actionPerformed(ActionEvent e)
 	{
 		final String filename = JOptionPane.showInputDialog("Enter remote path");
+		
+		// todo: move to constructor, currently produces nullpointer
+		if(filechooser==null)
+		{
+			filechooser = new JFileChooser();
+			filechooser.setFileSystemView(new RemoteFileSystemView(treepanel.getExternalAccess(), filechooser));
+			filechooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			filechooser.addChoosableFileFilter(new FileFilter()
+			{
+				public String getDescription()
+				{
+					return "Paths or .jar files";
+				}
+	
+				public boolean accept(File f)
+				{
+					String name = f.getName().toLowerCase();
+					return f.isDirectory() || name.endsWith(".jar");
+				}
+			});
+		}
 		
 		if(filechooser.showDialog(SGUI.getWindowParent(treepanel), 
 			"Add Path")==JFileChooser.APPROVE_OPTION)

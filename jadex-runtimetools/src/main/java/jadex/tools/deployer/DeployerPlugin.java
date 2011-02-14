@@ -19,8 +19,8 @@ public class DeployerPlugin extends AbstractJCCPlugin
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"conversation",	SGUI.makeIcon(DeployerPlugin.class, "/jadex/tools/common/images/libcenter.png"),
-		"conversation_sel", SGUI.makeIcon(DeployerPlugin.class, "/jadex/tools/common/images/libcenter_sel.png"),
+		"deployer",	SGUI.makeIcon(DeployerPlugin.class, "/jadex/tools/common/images/deployer.png"),
+		"deployer_sel", SGUI.makeIcon(DeployerPlugin.class, "/jadex/tools/common/images/deployer_sel.png"),
 	});
 
 	//-------- attributes --------
@@ -54,7 +54,7 @@ public class DeployerPlugin extends AbstractJCCPlugin
 	 */
 	public Icon getToolIcon(boolean selected)
 	{
-		return selected? icons.getIcon("conversation_sel"): icons.getIcon("conversation");
+		return selected? icons.getIcon("deployer_sel"): icons.getIcon("deployer");
 	}
 
 	/**

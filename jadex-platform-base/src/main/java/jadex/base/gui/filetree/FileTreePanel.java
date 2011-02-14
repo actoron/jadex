@@ -340,10 +340,10 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		// Save tree properties.
 		final TreeProperties	mep	= new TreeProperties();
 		RootNode root = (RootNode)getTree().getModel().getRoot();
-		String[] paths	= root.getPathEntries();
-		for(int i=0; i<paths.length; i++)
-			paths[i]	= SUtil.convertPathToRelative(paths[i]);
-		mep.setRootPathEntries(paths);
+//		String[] paths	= root.getPathEntries();
+//		for(int i=0; i<paths.length; i++)
+//			paths[i]	= SUtil.convertPathToRelative(paths[i]);
+//		mep.setRootPathEntries(paths);
 		mep.setSelectedNode(getTree().getSelectionPath()==null ? null
 			: NodePath.createNodePath((FileNode)getTree().getSelectionPath().getLastPathComponent()));
 		List	expanded	= new ArrayList();
@@ -453,32 +453,14 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 						TreeProperties	mep	= (TreeProperties)JavaReader.objectFromXML(treexml, cl); 	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
 //						ModelExplorerProperties	mep	= (ModelExplorerProperties)Nuggets.objectFromXML(treexml, cl);
 						RootNode root = (RootNode)getTree().getModel().getRoot();
-						root.removeAll();
-						String[] entries = mep.getRootPathEntries();
-						for(int i=0; i<entries.length; i++)
-						{
-							ITreeNode node = factory.createNode(root, model, tree, new File(entries[i]), iconcache, filefilter, exta, factory);
-							root.addChild(node);
-						}
-
-//						ITreeNode[] childs = root.getChildren();
-//						for(int i=0; i<childs.length; i++)
+//						root.removeAll();
+//						String[] entries = mep.getRootPathEntries();
+//						for(int i=0; i<entries.length; i++)
 //						{
-//							// Todo: support non-file (e.g. url nodes).
-//							File file = ((FileNode)childs[i]).getFile();
-//							
-//							// Hack!!! Build new file object. This strips trailing "/" from jar file nodes.
-//							file = new File(file.getParentFile(), file.getName());
-//							try
-//							{
-//								ls.addURL(file.toURI().toURL());
-//							}
-//							catch(MalformedURLException ex)
-//							{
-//								ex.printStackTrace();
-//							}
+//							ITreeNode node = factory.createNode(root, model, tree, new File(entries[i]), iconcache, filefilter, exta, factory);
+//							root.addChild(node);
 //						}
-						
+
 						// Select the last selected model in the tree.
 						expansionhandler.setSelectedPath(mep.getSelectedNode());
 
