@@ -459,9 +459,18 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 	 *  Get the mpanel.
 	 *  @return the mpanel.
 	 */
-	public ModelTreePanel getModelTreepanel()
+	public ModelTreePanel getModelTreePanel()
 	{
 		return mpanel;
+	}
+
+	/**
+	 *  Get the comptree.
+	 *  @return the comptree.
+	 */
+	public ComponentTreePanel getComponentTreePanel()
+	{
+		return comptree;
 	}
 
 	/**

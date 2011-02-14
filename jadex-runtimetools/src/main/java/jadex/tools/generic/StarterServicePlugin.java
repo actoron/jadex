@@ -1,5 +1,6 @@
 package jadex.tools.generic;
 
+import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.filetree.RefreshSubtreeAction;
 import jadex.base.gui.modeltree.AddPathAction;
 import jadex.base.gui.modeltree.AddRemotePathAction;
@@ -82,7 +83,7 @@ public class StarterServicePlugin extends AbstractServicePlugin
 		List	ret	= new ArrayList();
 		JButton b;
 
-		b = new JButton(new DelegationAction(AddPathAction.getName(), 
+		b = new JButton(new ModelDelegationAction(AddPathAction.getName(), 
 			AddPathAction.getIcon(), AddPathAction.getTooltipText(), AddPathAction.class));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
@@ -221,14 +222,14 @@ public class StarterServicePlugin extends AbstractServicePlugin
 	/**
 	 * 
 	 */
-	public class DelegationAction extends ToolTipAction
+	public class ModelDelegationAction extends ToolTipAction
 	{
 		protected Class actionclass;
 		
 		/**
 		 * 
 		 */
-		public DelegationAction(String name, Icon icon, String tooltip, Class actionclass)
+		public ModelDelegationAction(String name, Icon icon, String tooltip, Class actionclass)
 		{
 			super(name, icon, tooltip);
 			this.actionclass = actionclass;
@@ -239,11 +240,38 @@ public class StarterServicePlugin extends AbstractServicePlugin
 			StarterViewerPanel svp = (StarterViewerPanel)getSelectorPanel().getCurrentPanel();
 			if(svp!=null)
 			{
-				 ModelTreePanel mpt = svp.getPanel().getModelTreepanel();
+				 ModelTreePanel mpt = svp.getPanel().getModelTreePanel();
 				 mpt.getAction(actionclass).actionPerformed(e);
 			}
 		}
 	}
+	
+//	/**
+//	 * 
+//	 */
+//	public class InstanceDelegationAction extends ToolTipAction
+//	{
+//		protected Class actionclass;
+//		
+//		/**
+//		 * 
+//		 */
+//		public InstanceDelegationAction(String name, Icon icon, String tooltip, Class actionclass)
+//		{
+//			super(name, icon, tooltip);
+//			this.actionclass = actionclass;
+//		}
+//		
+//		public void actionPerformed(ActionEvent e)
+//		{
+//			StarterViewerPanel svp = (StarterViewerPanel)getSelectorPanel().getCurrentPanel();
+//			if(svp!=null)
+//			{
+//				 ComponentTreePanel ctp = svp.getPanel().getComponentTreePanel();
+//				 ctp.getAction(actionclass).actionPerformed(e);
+//			}
+//		}
+//	}
 }
 
 
