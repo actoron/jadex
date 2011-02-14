@@ -43,7 +43,7 @@ public class AddRemotePathAction extends ToolTipAction
 	 */
 	public AddRemotePathAction(FileTreePanel treepanel)
 	{
-		this("Add Remote Path", icons.getIcon("addpath"), "Add a new remote directory path (package root) to the project structure", treepanel);
+		this(getName(), getIcon(), getTooltipText(), treepanel);
 	}
 	
 	/**
@@ -72,7 +72,7 @@ public class AddRemotePathAction extends ToolTipAction
 	 */
 	public void actionPerformed(ActionEvent e)
 	{
-		final String filename = JOptionPane.showInputDialog("Enter remote path");
+//		final String filename = JOptionPane.showInputDialog("Enter remote path");
 		
 		// todo: move to constructor, currently produces nullpointer
 		if(filechooser==null)

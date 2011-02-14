@@ -34,15 +34,19 @@ import javax.swing.Action;
 import javax.swing.tree.TreePath;
 
 /**
- * 
+ *  Tree for component models.
  */
 public class ModelTreePanel extends FileTreePanel
 {
+	//-------- attributes --------
+	
 	/** The actions. */
 	protected Map actions;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new model tree panel.
 	 */
 	public ModelTreePanel(IExternalAccess exta, boolean remote)
 	{
@@ -55,20 +59,25 @@ public class ModelTreePanel extends FileTreePanel
 		
 		setFileFilter(ff);
 		setMenuItemConstructor(mic);
-		actions.put(AddPathAction.class, new AddPathAction(this));
-		actions.put(AddRemotePathAction.class, new AddRemotePathAction(this));
+		actions.put(AddPathAction.getName(), new AddPathAction(this));
+		actions.put(AddRemotePathAction.getName(), new AddRemotePathAction(this));
+		actions.put(RemovePathAction.getName(), new RemovePathAction(this));
 		setPopupBuilder(new PopupBuilder(new Object[]{actions.get(AddPathAction.class), 
 			actions.get(AddRemotePathAction.class), mic}));
 		setIconCache(ic);
 		addNodeHandler(new DefaultNodeHandler(getTree()));
 	}
 	
+	//-------- methods --------
+	
 	/**
-	 * 
+	 *  Get the action.
+	 *  @param name The action name.
+	 *  @return The action.
 	 */
-	public Action getAction(Class actionclass)
+	public Action getAction(String name)
 	{
-		return (Action)actions.get(actionclass);
+		return (Action)actions.get(name);
 	}
 	
 	/**

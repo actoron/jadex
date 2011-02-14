@@ -875,7 +875,7 @@ public class ControlCenter implements IControlCenter
 			closePlugins();
 			killed = true;
 			
-			SJCC.killPlattform(this, window);
+			SJCC.killPlattform(this.getExternalAccess(), window);
 			
 		}
 		else if(JOptionPane.NO_OPTION == choice)
@@ -889,7 +889,7 @@ public class ControlCenter implements IControlCenter
 			closePlugins();
 			killed = true;
 			
-			SJCC.killPlattform(this, window);
+			SJCC.killPlattform(this.getExternalAccess(), window);
 		}
 		// else CANCEL
 

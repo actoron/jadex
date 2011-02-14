@@ -42,7 +42,7 @@ public class AddPathAction extends ToolTipAction
 	 */
 	public AddPathAction(FileTreePanel treepanel)
 	{
-		this("Add Path", icons.getIcon("addpath"), "Add a new directory path (package root) to the project structure", treepanel);
+		this(getName(), getIcon(), getTooltipText(), treepanel);
 	}
 	
 	/**

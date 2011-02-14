@@ -174,28 +174,28 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 		b.setEnabled(true);
 		ret.add(b);
 		
-		b = new JButton(comptree.getKillAction());
+		b = new JButton(comptree.getAction(comptree.KILL_ACTION));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
 		ret.add(b);
 		
-		b = new JButton(comptree.getSuspendAction());
+		b = new JButton(comptree.getAction(comptree.SUSPEND_ACTION));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
 		ret.add(b);
 		
-		b = new JButton(comptree.getResumeAction());
+		b = new JButton(comptree.getAction(comptree.RESUME_ACTION));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
 		ret.add(b);
 		
-		b = new JButton(comptree.getStepAction());
+		b = new JButton(comptree.getAction(comptree.STEP_ACTION));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
@@ -206,28 +206,28 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 		separator.setOrientation(JSeparator.VERTICAL);
 		ret.add(separator);
 
-		b = new JButton(comptree.getShowPropertiesAction());
+		b = new JButton(comptree.getAction(comptree.SHOWPROPERTIES_ACTION));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
 		ret.add(b);
 		
-		b = new JButton(comptree.getShowObjectDetailsAction());
+		b = new JButton(comptree.getAction(comptree.SHOWDETAILS_ACTION));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
 		ret.add(b);
 
-		b = new JButton(comptree.getRefreshAction());
+		b = new JButton(comptree.getAction(comptree.REFRESH_ACTION));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
 		ret.add(b);
 		
-		b = new JButton(comptree.getRefreshTreeAction());
+		b = new JButton(comptree.getAction(comptree.REFRESHSUBTREE_ACTION));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
@@ -567,7 +567,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			SJCC.killPlattform(getJCC(), comptree);
+			SJCC.killPlattform(getJCC().getExternalAccess(), comptree);
 		}
 	};
 	

@@ -37,7 +37,7 @@ public class RemovePathAction extends ToolTipAction
 	 */
 	public RemovePathAction(FileTreePanel treepanel)
 	{
-		this("Remove Path", icons.getIcon("removepath"), "Remove a directory / jar from the project structure", treepanel);
+		this(getName(), getIcon(), getTooltipText(), treepanel);
 	}
 	
 	/**
@@ -91,5 +91,29 @@ public class RemovePathAction extends ToolTipAction
 				}
 			});
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static String getName()
+	{
+		return "Remove Path";
+	}
+	
+	/**
+	 * 
+	 */
+	public static Icon getIcon()
+	{
+		return icons.getIcon("removepath");
+	}
+	
+	/**
+	 * 
+	 */
+	public static String getTooltipText()
+	{
+		return "Remove a directory / jar from the project structure";
 	}
 }

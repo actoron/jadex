@@ -3,6 +3,7 @@ package jadex.base.gui.plugin;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
@@ -16,9 +17,9 @@ import java.awt.Component;
  */
 public class SJCC
 {
-	public static void	killPlattform(final IControlCenter jcc, final Component ui)
+	public static void	killPlattform(final IExternalAccess exta, final Component ui)
 	{
-		jcc.getExternalAccess().scheduleStep(new IComponentStep()
+		exta.scheduleStep(new IComponentStep()
 		{
 			@XMLClassname("kill-platform")
 			public Object execute(IInternalAccess ia)
@@ -43,7 +44,7 @@ public class SJCC
 								});
 							}
 						});
-						getRootIdentifier(jcc.getComponentIdentifier(), cms, ret);
+						getRootIdentifier(exta.getComponentIdentifier(), cms, ret);
 					}
 				});
 				return null;

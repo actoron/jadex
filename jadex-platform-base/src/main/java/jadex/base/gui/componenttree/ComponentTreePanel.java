@@ -36,6 +36,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +65,7 @@ public class ComponentTreePanel extends JSplitPane
 	/**
 	 * The image icons.
 	 */
-	protected static final UIDefaults icons = new UIDefaults(new Object[]
+	public static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"component_suspended", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/overlay_szzz.png"),
 		"kill_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/new_killagent.png"),
@@ -89,6 +90,37 @@ public class ComponentTreePanel extends JSplitPane
 		"overlay_showobject", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/overlay_bean.png")
 	});
 	
+	/** The kill action constant. */
+	public static final String KILL_ACTION = "Kill component";
+	
+	/** The proxy kill action constant. */
+	public static final String PROXYKILL_ACTION = "Kill also remote component";
+
+	/** The suspend action constant. */
+	public static final String SUSPEND_ACTION = "Suspend component";
+
+	/** The resume action constant. */
+	public static final String RESUME_ACTION = "Resume component";
+
+	/** The step action constant. */
+	public static final String STEP_ACTION = "Step component";
+
+	/** The refresh action constant. */
+	public static final String REFRESH_ACTION = "Refresh";
+
+	/** The refreshtree action constant. */
+	public static final String REFRESHSUBTREE_ACTION = "Refresh subtree";
+
+	/** The show properties action constant. */
+	public static final String SHOWPROPERTIES_ACTION = "Show properties";
+	
+	/** The remove service action constant. */
+	public static final String REMOVESERVICE_ACTION = "Remove service";
+
+	/** The remove service action constant. */
+	public static final String SHOWDETAILS_ACTION = "Show object details";
+
+	
 	//-------- attributes --------
 	
 	/** The external access. */
@@ -102,46 +134,16 @@ public class ComponentTreePanel extends JSplitPane
 	
 	/** The component management service. */
 	protected IComponentManagementService	cms;
-	
-	/** The action for killing selected components. */
-	protected final Action	kill;
-	
-	/** The action for killing selected proxy component. */
-	protected final Action	proxykill;
-	
-	/** The action for suspending selected components. */
-	protected final Action	suspend;
-	
-	/** The action for resuming selected components. */
-	protected final Action	resume;
-	
-	/** The action for stepping selected components. */
-	protected final Action	step;
-	
-	/** The action for refreshing selected components. */
-	protected final Action	refresh;
-	
-	/** The action for recursively refreshing selected components. */
-	protected final Action	refreshtree;
-	
-	/** The action for showing properties of the selected node. */
-	protected final Action	showprops;
-	
-	/** The action for showing object details of the selected node. */
-	protected final Action showobject;
-	
-	/** The action for removing a service. */
-	protected final Action removeservice;
 
+	/** The actions. */
+	protected Map actions;
+	
 	/** The component listener. */
 	protected final ICMSComponentListener listener;
 	
 	/** The properties panel. */
 	protected final JScrollPane	proppanel;
 	
-//	/** The object panel. */
-//	protected final JScrollPane	objectpanel;
-
 	
 	//-------- constructors --------
 	
@@ -161,6 +163,7 @@ public class ComponentTreePanel extends JSplitPane
 		super(orientation);
 		this.setOneTouchExpandable(true);
 		
+		this.actions = new HashMap();
 		this.access	= access;
 		this.model	= new AsyncTreeModel();
 		this.tree	= new JTree(model);
@@ -263,7 +266,7 @@ public class ComponentTreePanel extends JSplitPane
 			}
 		};
 
-		kill = new AbstractAction("Kill component", icons.getIcon("kill_component"))
+		final Action kill = new AbstractAction(KILL_ACTION, icons.getIcon("kill_component"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -300,8 +303,9 @@ public class ComponentTreePanel extends JSplitPane
 				}
 			}
 		};
+		actions.put(kill.getValue(Action.NAME), kill);
 		
-		proxykill = new AbstractAction("Kill also remote component", icons.getIcon("kill_component"))
+		final Action proxykill = new AbstractAction(PROXYKILL_ACTION, icons.getIcon("kill_component"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -366,8 +370,9 @@ public class ComponentTreePanel extends JSplitPane
 				}
 			}
 		};
-		
-		suspend	= new AbstractAction("Suspend component", icons.getIcon("suspend_component"))
+		actions.put(proxykill.getValue(Action.NAME), proxykill);
+
+		final Action suspend	= new AbstractAction(SUSPEND_ACTION, icons.getIcon("suspend_component"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -392,8 +397,10 @@ public class ComponentTreePanel extends JSplitPane
 				}
 			}
 		};
+		actions.put(suspend.getValue(Action.NAME), suspend);
+
 		
-		resume	= new AbstractAction("Resume component", icons.getIcon("resume_component"))
+		final Action resume = new AbstractAction(RESUME_ACTION, icons.getIcon("resume_component"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -418,8 +425,9 @@ public class ComponentTreePanel extends JSplitPane
 				}
 			}
 		};
-		
-		step	= new AbstractAction("Step component", icons.getIcon("step_component"))
+		actions.put(resume.getValue(Action.NAME), resume);
+
+		final Action step	= new AbstractAction(STEP_ACTION, icons.getIcon("step_component"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -445,8 +453,9 @@ public class ComponentTreePanel extends JSplitPane
 				}
 			}
 		};
+		actions.put(step.getValue(Action.NAME), step);
 
-		refresh	= new AbstractAction("Refresh", icons.getIcon("refresh"))
+		final Action refresh = new AbstractAction(REFRESH_ACTION, icons.getIcon("refresh"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -457,8 +466,9 @@ public class ComponentTreePanel extends JSplitPane
 				}
 			}
 		};
+		actions.put(refresh.getValue(Action.NAME), refresh);
 
-		refreshtree	= new AbstractAction("Refresh subtree", icons.getIcon("refresh_tree"))
+		final Action refreshtree	= new AbstractAction(REFRESHSUBTREE_ACTION, icons.getIcon("refresh_tree"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -469,8 +479,9 @@ public class ComponentTreePanel extends JSplitPane
 				}
 			}
 		};
+		actions.put(refreshtree.getValue(Action.NAME), refreshtree);
 
-		showprops	= new AbstractAction("Show properties", icons.getIcon("show_properties"))
+		final Action showprops = new AbstractAction(SHOWPROPERTIES_ACTION, icons.getIcon("show_properties"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -481,8 +492,9 @@ public class ComponentTreePanel extends JSplitPane
 				}
 			}
 		};
-		
-		removeservice = new AbstractAction("Remove service", icons.getIcon("show_properties"))
+		actions.put(showprops.getValue(Action.NAME), showprops);
+
+		final Action removeservice = new AbstractAction(REMOVESERVICE_ACTION, icons.getIcon("show_properties"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -501,8 +513,9 @@ public class ComponentTreePanel extends JSplitPane
 				}
 			}
 		};
-		
-		showobject = new AbstractAction("Show object details", icons.getIcon("show_details"))
+		actions.put(removeservice.getValue(Action.NAME), removeservice);
+
+		final Action showobject = new AbstractAction(SHOWDETAILS_ACTION, icons.getIcon("show_details"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -533,6 +546,7 @@ public class ComponentTreePanel extends JSplitPane
 				}
 			}
 		};
+		actions.put(showobject.getValue(Action.NAME), showobject);
 
 		// Default overlays and popups.
 		model.addNodeHandler(new INodeHandler()
@@ -818,67 +832,13 @@ public class ComponentTreePanel extends JSplitPane
 	//-------- methods --------
 	
 	/**
-	 *  Get the action for killing the components selected in the tree.
+	 *  Get the action.
+	 *  @param name The action name.
+	 *  @return The action.
 	 */
-	public Action	getKillAction()
+	public Action getAction(String name)
 	{
-		return kill;
-	}
-	
-	/**
-	 *  Get the action for suspending the components selected in the tree.
-	 */
-	public Action	getSuspendAction()
-	{
-		return suspend;
-	}
-	
-	/**
-	 *  Get the action for resuming the components selected in the tree.
-	 */
-	public Action	getResumeAction()
-	{
-		return resume;
-	}
-	
-	/**
-	 *  Get the action for stepping the components selected in the tree.
-	 */
-	public Action	getStepAction()
-	{
-		return step;
-	}
-	
-	/**
-	 *  Get the action for refreshing the components selected in the tree.
-	 */
-	public Action	getRefreshAction()
-	{
-		return refresh;
-	}
-	
-	/**
-	 *  Get the action for recursively refreshing the components selected in the tree.
-	 */
-	public Action	getRefreshTreeAction()
-	{
-		return refreshtree;
-	}
-	
-	/**
-	 *  Get the action for showing component properties.
-	 */
-	public Action	getShowPropertiesAction()
-	{
-		return showprops;
-	}
-	
-	/**
-	 *  Get the action for showing component details.
-	 */
-	public Action	getShowObjectDetailsAction()
-	{
-		return showobject;
+		return (Action)actions.get(name);
 	}
 	
 	/**
@@ -905,6 +865,15 @@ public class ComponentTreePanel extends JSplitPane
 		return tree;
 	}
 	
+	/**
+	 *  Get the access.
+	 *  @return the access.
+	 */
+	public IExternalAccess getExternalAccess()
+	{
+		return access;
+	}
+
 	/**
 	 *  Dispose the tree.
 	 *  Should be called to remove listeners etc.
