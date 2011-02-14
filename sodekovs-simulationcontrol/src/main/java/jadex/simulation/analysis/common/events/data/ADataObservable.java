@@ -1,4 +1,4 @@
-package jadex.simulation.analysis.common.events;
+package jadex.simulation.analysis.common.events.data;
 
 
 import java.util.HashSet;
@@ -12,6 +12,11 @@ public class ADataObservable
 	public ADataObservable()
 	{
 		super();
+	}
+	
+	public Object getMutex()
+	{
+		return mutex;
 	}
 
 	public void addDataListener(IADataListener listener)

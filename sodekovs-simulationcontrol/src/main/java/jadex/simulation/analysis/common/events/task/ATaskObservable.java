@@ -1,7 +1,7 @@
-package jadex.simulation.analysis.common.component.workflow.tasks.general;
+package jadex.simulation.analysis.common.events.task;
 
-import jadex.simulation.analysis.common.events.ATaskEvent;
-import jadex.simulation.analysis.common.events.IATaskListener;
+
+import jadex.simulation.analysis.common.component.workflow.tasks.general.IATaskView;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -42,13 +42,25 @@ public class ATaskObservable implements IATaskObservable
 	}
 
 	@Override
-	public void taskEventOccur(ATaskEvent e)
+	public void taskChanged(ATaskEvent e)
 	{
 		synchronized (mutex)
 		{
+			//first the task views
 			for (IATaskListener listener : listeners)
 			{
-				listener.taskEventOccur(e);
+				if (listener instanceof IATaskView)
+				{
+					listener.taskEventOccur(e);
+				}
+				
+			}
+			for (IATaskListener listener : listeners)
+			{
+				if (!(listener instanceof IATaskView))
+				{
+					listener.taskEventOccur(e);
+				}
 			}
 		}
 	}

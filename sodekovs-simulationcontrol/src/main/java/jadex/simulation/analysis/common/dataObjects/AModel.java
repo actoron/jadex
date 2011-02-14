@@ -3,7 +3,7 @@ package jadex.simulation.analysis.common.dataObjects;
 import jadex.simulation.analysis.common.dataObjects.parameter.AParameterEnsemble;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameter;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
-import jadex.simulation.analysis.common.events.ADataEvent;
+import jadex.simulation.analysis.common.events.data.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 
 public class AModel extends ADataObject implements IAModel
@@ -53,7 +53,7 @@ public class AModel extends ADataObject implements IAModel
 			this.name = name;
 			System.out.println(getName() + ": name=" + name);
 		}
-		dataChanged(new ADataEvent(this, AConstants.MODEL_NAME));
+		dataChanged(new ADataEvent(this, AConstants.MODEL_NAME, name));
 	}
 
 	// Type
@@ -71,7 +71,7 @@ public class AModel extends ADataObject implements IAModel
 			this.type = type;
 			System.out.println(getName() + ": type=" + type);
 		}
-		dataChanged(new ADataEvent(this, AConstants.MODEL_TYPE));
+		dataChanged(new ADataEvent(this, AConstants.MODEL_TYPE, type));
 	}
 
 	// Input
@@ -156,6 +156,14 @@ public class AModel extends ADataObject implements IAModel
 		{
 			outputParameters.addParameter(parameter);
 		}
+	}
+	
+	@Override
+	public void setEditable(Boolean editable)
+	{
+		super.setEditable(editable);
+		inputParameters.setEditable(editable);
+		outputParameters.setEditable(editable);
 	}
 	
 	@Override

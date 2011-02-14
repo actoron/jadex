@@ -13,11 +13,10 @@ import jadex.simulation.analysis.common.dataObjects.parameter.ABasicParameterVie
 import jadex.simulation.analysis.common.dataObjects.parameter.AParameterEnsemble;
 import jadex.simulation.analysis.common.dataObjects.parameter.AParameterEnsembleView;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
-import jadex.simulation.analysis.common.events.IADataObservable;
+import jadex.simulation.analysis.common.events.data.IADataObservable;
 
 public class ADataViewFactory
 {
-	//TODO: MAybe add ViewClass in ADataObject
 	public static IADataView createView(IADataObservable dataObject)
 	{
 		IADataView view;
@@ -64,6 +63,4 @@ public class ADataViewFactory
 	{
 		return new ABasicParameterView(dataObject);				
 	}
-
-	
 }

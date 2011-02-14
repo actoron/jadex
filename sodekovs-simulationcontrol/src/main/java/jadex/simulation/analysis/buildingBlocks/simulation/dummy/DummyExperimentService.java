@@ -26,7 +26,7 @@ public class DummyExperimentService extends BasicService implements IExecuteExpe
 	 * Create a new shop service.
 	 * 
 	 * @param comp
-	 *            The active component.
+	 *            The active generalComp.
 	 */
 	public DummyExperimentService(ICapability cap)
 	{

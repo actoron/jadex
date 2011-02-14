@@ -3,7 +3,7 @@ package jadex.simulation.analysis.common.dataObjects.parameter;
 import jadex.bdi.testcases.misc.GetExternalAccessPlan;
 import jadex.simulation.analysis.common.dataObjects.ADataObject;
 import jadex.simulation.analysis.common.dataObjects.IADataView;
-import jadex.simulation.analysis.common.events.ADataEvent;
+import jadex.simulation.analysis.common.events.data.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 
 import java.util.Collections;
@@ -51,7 +51,7 @@ public class AParameterEnsemble extends ADataObject implements IAParameterEnsemb
 		{
 			parametersMap.put(parameter.getName(), parameter);
 		}
-		dataChanged(new ADataEvent(this, AConstants.ENSEMBLE_PARAMETERS));
+		dataChanged(new ADataEvent(this, AConstants.ENSEMBLE_PARAMETERS, parametersMap));
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class AParameterEnsemble extends ADataObject implements IAParameterEnsemb
 		{
 			parametersMap.remove(name);
 		}
-		dataChanged(new ADataEvent(this, AConstants.ENSEMBLE_PARAMETERS));
+		dataChanged(new ADataEvent(this, AConstants.ENSEMBLE_PARAMETERS, parametersMap));
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class AParameterEnsemble extends ADataObject implements IAParameterEnsemb
 		{
 			parametersMap.clear();
 		}
-		dataChanged(new ADataEvent(this, AConstants.ENSEMBLE_PARAMETERS));
+		dataChanged(new ADataEvent(this, AConstants.ENSEMBLE_PARAMETERS, parametersMap));
 	}
 
 	@Override
@@ -142,7 +142,7 @@ public class AParameterEnsemble extends ADataObject implements IAParameterEnsemb
 		{
 			this.name = name;
 		}
-		dataChanged(new ADataEvent(this, AConstants.ENSEMBLE_NAME));
+		dataChanged(new ADataEvent(this, AConstants.ENSEMBLE_NAME, name));
 	}
 
 	@Override

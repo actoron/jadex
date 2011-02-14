@@ -31,7 +31,7 @@ public class NetLogoExperimentService extends BasicService implements IExecuteEx
 	 * Create a new netLogo Simulation Service
 	 * 
 	 * @param comp
-	 *            The active component.
+	 *            The active generalComp.
 	 */
 	public NetLogoExperimentService(ICapability cap) {
 		super(cap.getServiceProvider().getId(), IExecuteExperimentService.class, null);

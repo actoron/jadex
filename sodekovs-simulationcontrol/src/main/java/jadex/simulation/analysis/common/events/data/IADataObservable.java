@@ -1,4 +1,6 @@
-package jadex.simulation.analysis.common.events;
+package jadex.simulation.analysis.common.events.data;
+
+import jadex.simulation.analysis.common.dataObjects.IADataObject;
 
 
 public interface IADataObservable
@@ -21,5 +23,11 @@ public interface IADataObservable
 	 * @param event of the change
 	 */
 	public abstract void dataChanged(ADataEvent e);
+	
+	/**
+	 * Synchronize Object of the {@link IADataObject}
+	 * @return mutex of the dataObject
+	 */
+	public Object getMutex();
 
 }

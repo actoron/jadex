@@ -1,7 +1,7 @@
 package jadex.simulation.analysis.common.dataObjects;
 
-import jadex.simulation.analysis.common.events.ADataEvent;
-import jadex.simulation.analysis.common.events.IADataObservable;
+import jadex.simulation.analysis.common.events.data.ADataEvent;
+import jadex.simulation.analysis.common.events.data.IADataObservable;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -9,6 +9,7 @@ import java.awt.Insets;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 public class ADataObjectView implements IADataView
 {
@@ -23,6 +24,7 @@ public class ADataObjectView implements IADataView
 		{
 			displayedDataObject = dataObject;
 			dataObject.addDataListener(this);
+			//TODO: Swing Thread
 			component = new JPanel(new GridBagLayout());
 			JComponent freePanel = new JPanel();
 			component.add(freePanel, new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
@@ -53,13 +55,13 @@ public class ADataObjectView implements IADataView
 		this.displayedDataObject = dataObject;
 
 	}
-	
+
 	// -------- IADataListener --------
 
 	@Override
 	public void dataEventOccur(ADataEvent event)
 	{
-		//omit
+	// omit
 	}
 
 }

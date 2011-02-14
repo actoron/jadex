@@ -1,8 +1,8 @@
 package jadex.simulation.analysis.common.dataObjects;
 
 
-import jadex.simulation.analysis.common.events.IADataObservable;
-import jadex.simulation.analysis.common.events.IADataListener;
+import jadex.simulation.analysis.common.events.data.IADataListener;
+import jadex.simulation.analysis.common.events.data.IADataObservable;
 
 import javax.swing.JComponent;
 
@@ -28,7 +28,7 @@ public interface IADataView extends IADataListener
 	public void setDisplayedObject(IADataObservable dataObject);
 	
 	/**
-	 * Returns the component which displays the dataObject
+	 * Returns the generalComp which displays the dataObject
 	 * @return the {@link JComponent} to display
 	 */
 	public JComponent getComponent();

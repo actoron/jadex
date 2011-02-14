@@ -42,7 +42,7 @@ public class BasicExecuteExperimentServiceView extends JTabbedPane implements IS
 	}
 
 	/**
-	 * Get the component.
+	 * Get the generalComp.
 	 */
 	public JComponent getComponent() {
 		return this;
@@ -58,15 +58,13 @@ public class BasicExecuteExperimentServiceView extends JTabbedPane implements IS
 	@Override
 	public IFuture getProperties()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return new Future(null);
 	}
 
 	@Override
 	public IFuture setProperties(Properties ps)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return new Future(null);
 	}
 
 }

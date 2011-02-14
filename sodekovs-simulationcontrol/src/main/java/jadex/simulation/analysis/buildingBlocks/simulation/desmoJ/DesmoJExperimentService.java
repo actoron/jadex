@@ -30,7 +30,7 @@ public class DesmoJExperimentService extends BasicService implements IExecuteExp
 	 * Create a new DesmoJ Simulation Service
 	 * 
 	 * @param comp
-	 *            The active component.
+	 *            The active generalComp.
 	 */
 	public DesmoJExperimentService(ICapability cap) {
 		super(cap.getServiceProvider().getId(), IExecuteExperimentService.class, null);

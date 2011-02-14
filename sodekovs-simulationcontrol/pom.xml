@@ -113,5 +113,31 @@
 			<artifactId>jadex-applications-bdi</artifactId>
 			<version>2.0-rc7</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-runtimetools</artifactId>
+			<version>2.0-rc7</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>analyse</groupId>
+			<artifactId>desmoJ</artifactId>
+			<version>2.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>analyse</groupId>
+			<artifactId>netLogo</artifactId>
+			<version>4.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>analyse</groupId>
+			<artifactId>opt4j</artifactId>
+			<version>2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>analyse</groupId>
+			<artifactId>jgraph</artifactId>
+			<version>6</version>
+		</dependency>
 	</dependencies>
 </project>

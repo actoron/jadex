@@ -6,7 +6,7 @@ import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.simulation.analysis.common.dataObjects.ADataObjectView;
 import jadex.simulation.analysis.common.dataObjects.IADataView;
 import jadex.simulation.analysis.common.dataObjects.Factories.ADataViewFactory;
-import jadex.simulation.analysis.common.events.ADataEvent;
+import jadex.simulation.analysis.common.events.data.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 import jadex.simulation.analysis.common.util.ParserClassValidator;
 import jadex.simulation.analysis.common.util.SAnalysisClassLoader;
@@ -33,7 +33,7 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 {
 	private ABasicParameter parameter;
 
-	private JLabel paraNameValue;
+	private JTextField paraNameValue;
 	private JTextField innerTypValue;
 	private JComponent valueComp;
 	private JCheckBox paraVariableBox;
@@ -51,52 +51,58 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 
 	private void init()
 	{
-		Insets insets = new Insets(2, 2, 2, 2);
-		int gridY = 0;
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				Insets insets = new Insets(1, 1, 1, 1);
+				int gridY = 0;
 
-		// Parameter Type
-		JLabel paraType = new JLabel("Parametertyp:");
-		paraType.setPreferredSize(new Dimension(150, 25));
-		component.add(paraType, new GridBagConstraints(0, gridY, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
+				// Parameter Type
+				JLabel paraType = new JLabel("Parametertyp");
+				paraType.setPreferredSize(new Dimension(150,20));
+				component.add(paraType, new GridBagConstraints(0, gridY, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 
-		JLabel paraTypeValue = new JLabel("ABasicParameter");
-		paraTypeValue.setPreferredSize(new Dimension(250, 25));
-		component.add(paraTypeValue, new GridBagConstraints(1, gridY, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
-		gridY++;
-		paraTypeValue.setToolTipText("Typ des Parameters");
+				JTextField paraTypeValue = new JTextField("ABasicParameter");
+				paraTypeValue.setEditable(false);
+				paraTypeValue.setPreferredSize(new Dimension(400, 20));
+				component.add(paraTypeValue, new GridBagConstraints(1, gridY, GridBagConstraints.REMAINDER, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
+				gridY++;
+				paraTypeValue.setToolTipText("Typ des Parameters");
 
-		// Parameter Name
-		JLabel paraName = new JLabel("Parametername:");
-		paraName.setPreferredSize(new Dimension(150, 25));
-		component.add(paraName, new GridBagConstraints(0, gridY, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
+				// Parameter Name
+				JLabel paraName = new JLabel("Parametername");
+				paraName.setPreferredSize(new Dimension(150, 20));
+				component.add(paraName, new GridBagConstraints(0, gridY, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 
-		paraNameValue = new JLabel(parameter.getName());
-		paraNameValue.setPreferredSize(new Dimension(250, 25));
-		component.add(paraNameValue, new GridBagConstraints(1, gridY, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
-		gridY++;
-		paraNameValue.setToolTipText("Name des Parameters");
+				paraNameValue = new JTextField(parameter.getName());
+				paraNameValue.setEditable(false);
+				paraNameValue.setPreferredSize(new Dimension(400, 20));
+				component.add(paraNameValue, new GridBagConstraints(1, gridY, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
+				gridY++;
+				paraNameValue.setToolTipText("Name des Parameters");
 
-		// Parameter Innere Tpye
-		JLabel innereTyp = new JLabel("Klasseausprägung:");
-		innereTyp.setPreferredSize(new Dimension(150, 25));
-		component.add(innereTyp, new GridBagConstraints(0, gridY, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
+				// Parameter Innere Tpye
+				JLabel innereTyp = new JLabel("Klasseausprägung");
+				innereTyp.setPreferredSize(new Dimension(150, 20));
+				component.add(innereTyp, new GridBagConstraints(0, gridY, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 
-		innerTypValue = new JTextField(parameter.getValueClass().toString());
-		innerTypValue.setEditable(false);
-		innerTypValue.setPreferredSize(new Dimension(250, 25));
-		component.add(innerTypValue, new GridBagConstraints(1, gridY, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
-		innerTypValue.setToolTipText("Klasse die der Parameter hält");
-		gridY++;
+				innerTypValue = new JTextField(parameter.getValueClass().toString());
+				innerTypValue.setEditable(false);
+				innerTypValue.setPreferredSize(new Dimension(400, 20));
+				component.add(innerTypValue, new GridBagConstraints(1, gridY, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
+				innerTypValue.setToolTipText("Klasse die der Parameter hält");
+				gridY++;
 
-		JLabel valueLabel = new JLabel("Aktueller Wert:");
-		valueLabel.setPreferredSize(new Dimension(150, 25));
-		component.add(valueLabel, new GridBagConstraints(0, gridY, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
+				JLabel valueLabel = new JLabel("Aktueller Wert");
+				valueLabel.setPreferredSize(new Dimension(150, 20));
+				component.add(valueLabel, new GridBagConstraints(0, gridY, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 
-		if (parameter.getValueClass().equals(Boolean.class))
+				if (parameter.getValueClass().equals(Boolean.class))
 		{
 			valueBoolean = new JCheckBox("");
 			valueBoolean.setSelected((Boolean) parameter.getValue());
-			valueBoolean.setPreferredSize(new Dimension(250, 25));
+			valueBoolean.setPreferredSize(new Dimension(400, 20));
 			valueBoolean.addActionListener(new ActionListener()
 			{
 				@Override
@@ -114,7 +120,7 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 		{
 			valueField = new JValidatorTextField(parameter.getValue().toString());
 			valueField.setValidator(new ParserClassValidator(SAnalysisClassLoader.getClassLoader(), parameter.getValueClass()));
-			valueField.setPreferredSize(new Dimension(250, 25));
+			valueField.setPreferredSize(new Dimension(400, 20));
 			valueField.addFocusListener(new FocusListener()
 			{
 				@Override
@@ -146,48 +152,55 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 		gridY++;
 
 		// Verwendung
-		JLabel value = new JLabel("Verwendung:");
-		value.setPreferredSize(new Dimension(150, 25));
-		component.add(value, new GridBagConstraints(0, gridY, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
+			JLabel value = new JLabel("Verwendung");
+			value.setPreferredSize(new Dimension(150, 20));
+			component.add(value, new GridBagConstraints(0, gridY, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 
-		paraVariableBox = new JCheckBox("");
-		paraVariableBox.setSelected(parameter.isUsage());
-		paraVariableBox.setPreferredSize(new Dimension(250, 25));
-		paraVariableBox.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
+			paraVariableBox = new JCheckBox("");
+			paraVariableBox.setSelected(parameter.isUsage());
+			paraVariableBox.setPreferredSize(new Dimension(350, 20));
+			paraVariableBox.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e)
 			{
 				synchronized (mutex)
 				{
 					parameter.setUsage(paraVariableBox.isSelected());
 				}
 			}
+			});
+			paraVariableBox.setEnabled(parameter.isEditable());
+			component.add(paraVariableBox, new GridBagConstraints(1, gridY, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
+			paraVariableBox.setToolTipText("Gibt an ob der Parameter im weiteren Verlauf der Analyse veränderbar sein soll");
+			gridY++;
+
+			freePanel = new JPanel();
+			component.add(freePanel, new GridBagConstraints(0, gridY, GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
+
+			component.setPreferredSize(new Dimension(550, 300));
+
+			component.updateUI();
+			component.validate();
+		}
 		});
-		paraVariableBox.setEnabled(parameter.isEditable());
-		component.add(paraVariableBox, new GridBagConstraints(1, gridY, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
-		paraVariableBox.setToolTipText("Gibt an ob der Parameter im weiteren Verlauf der Analyse veränderbar sein soll");
-		gridY++;
-
-		freePanel = new JPanel();
-		component.add(freePanel, new GridBagConstraints(0, gridY, GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
-
-		component.setPreferredSize(new Dimension(500, 300));
-		
-		component.updateUI();
-		component.validate();
 	}
 
 	@Override
-	public void dataEventOccur(ADataEvent event)
+	public void dataEventOccur(final ADataEvent event)
 	{
-		synchronized (mutex)
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				synchronized (mutex)
 		{
 			String command = event.getCommand();
 			if (command.equals(AConstants.PARAMETER_VALUE))
 			{
 				if (valueComp instanceof JCheckBox)
 				{
+
 					JCheckBox box = (JCheckBox) valueComp;
 					box.setSelected((Boolean) parameter.getValue());
 				}
@@ -212,6 +225,8 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 			component.revalidate();
 			component.repaint();
 		}
+	}
+		});
 	}
 
 	private void validateField(String text)
@@ -252,7 +267,7 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 			}
 		}
 	}
-	
+
 	/**
 	 * Test View
 	 * 
@@ -267,7 +282,7 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(500, 300);
+		frame.setSize(550, 300);
 		frame.add(ADataViewFactory.createView(para).getComponent());
 		frame.setVisible(true);
 	}

@@ -18,9 +18,9 @@ public class DesmoJModelService extends BasicService implements IModelInspection
 
 	public DesmoJModelService(ICapability cap) {
 		super(cap.getServiceProvider().getId(), IModelInspectionService.class, null);
-//		Map prop = getPropertyMap();
-//		prop.put(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, "jadex.simulation.analysis.buildingBlocks.execution.ExecutionServiceView");
-//		setPropertyMap(prop);
+		Map prop = getPropertyMap();
+		prop.put(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, "jadex.simulation.analysis.buildingBlocks.execution.ExecutionServiceView");
+		setPropertyMap(prop);
 	}
 
 	@Override

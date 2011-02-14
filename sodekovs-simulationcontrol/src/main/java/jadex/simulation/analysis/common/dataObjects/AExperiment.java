@@ -1,13 +1,9 @@
 package jadex.simulation.analysis.common.dataObjects;
 
-import javax.swing.JFrame;
-
-import jadex.simulation.analysis.common.dataObjects.Factories.AExperimentFactory;
 import jadex.simulation.analysis.common.dataObjects.parameter.AParameterEnsemble;
-import jadex.simulation.analysis.common.dataObjects.parameter.AParameterEnsembleView;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameter;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
-import jadex.simulation.analysis.common.events.ADataEvent;
+import jadex.simulation.analysis.common.events.data.ADataEvent;
 
 public class AExperiment extends ADataObject implements IAExperiment
 {
@@ -22,12 +18,12 @@ public class AExperiment extends ADataObject implements IAExperiment
 		expParameters.setName("Experimentparameter");
 		inputParameters.setName("Inputparameter");
 		outputParameters.setName("Outputparameter");
-		
+
 		setModel(model);
 		setExperimentParamters(expParameters);
 		setInputParamters(inputParameters);
 		setOutputParamters(outputParameters);
-//		view = new AExperimentView(this);
+		// view = new AExperimentView(this);
 	}
 
 	// ------ IAExperiment ------
@@ -169,15 +165,26 @@ public class AExperiment extends ADataObject implements IAExperiment
 			expParameters = parameters;
 		}
 	}
-	
+
 	@Override
 	public void dataChanged(ADataEvent e)
 	{
 		super.dataChanged(e);
-		
+
 		model.dataChanged(e);
 		expParameters.dataChanged(e);
 		inputParameters.dataChanged(e);
 		outputParameters.dataChanged(e);
+	}
+
+	@Override
+	public void setEditable(Boolean editable)
+	{
+		super.setEditable(editable);
+
+		model.setEditable(editable);
+		expParameters.setEditable(editable);
+		inputParameters.setEditable(editable);
+		outputParameters.setEditable(editable);
 	}
 }

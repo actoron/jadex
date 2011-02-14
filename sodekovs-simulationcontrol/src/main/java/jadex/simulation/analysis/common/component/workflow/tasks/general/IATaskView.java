@@ -1,9 +1,15 @@
 package jadex.simulation.analysis.common.component.workflow.tasks.general;
 
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import jadex.simulation.analysis.common.component.workflow.tasks.SetModelTaskView;
 import jadex.simulation.analysis.common.dataObjects.IADataObject;
 import jadex.simulation.analysis.common.dataObjects.IADataView;
-import jadex.simulation.analysis.common.events.IADataObservable;
-import jadex.simulation.analysis.common.events.IATaskListener;
+import jadex.simulation.analysis.common.events.data.IADataObservable;
+import jadex.simulation.analysis.common.events.task.IATaskListener;
+import jadex.simulation.analysis.common.events.task.IATaskObservable;
 
 import javax.swing.JComponent;
 
@@ -20,17 +26,21 @@ public interface IATaskView extends IATaskListener
 	 * Returns the taskObject which is displayed
 	 * @return a {@link IATask}
 	 */
-	public IATaskObservable getDisplayedObject();
+	IATask getDisplayedObject();
 	
 	/**
 	 * Sets the taskObject to display
 	 * @param a {@link IATask}
 	 */
-	public void setDisplayedObject(IATaskObservable taskObject);
+	public void setDisplayedObject(IATask taskObject);
 	
 	/**
-	 * Returns the component which displays the taskObject
+	 * Returns the generalComp which displays the taskObject
 	 * @return the {@link JComponent} to display
 	 */
 	public JComponent getComponent();
+
+	public TaskProperties getTaskProperties();
+
+
 }

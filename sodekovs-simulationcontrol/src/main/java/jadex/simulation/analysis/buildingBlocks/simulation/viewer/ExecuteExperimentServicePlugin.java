@@ -5,6 +5,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.service.IService;
 import jadex.commons.service.library.ILibraryService;
+import jadex.tools.generic.AbstractServicePlugin;
 
 import javax.swing.Icon;
 

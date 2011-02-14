@@ -1,4 +1,4 @@
-package jadex.simulation.analysis.common.events;
+package jadex.simulation.analysis.common.events.task;
 
 public interface IATaskListener
 {

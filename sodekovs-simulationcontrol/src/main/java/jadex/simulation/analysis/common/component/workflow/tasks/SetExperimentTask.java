@@ -4,47 +4,66 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
-import jadex.simulation.analysis.buildingBlocks.generalAnalysis.impl.BasicGeneralAnalysisService;
+import jadex.commons.future.IResultListener;
+import jadex.simulation.analysis.buildingBlocks.analysisProcess.lowLevelAnalysis.impl.LowLevelAnalysisService;
+import jadex.simulation.analysis.common.component.workflow.Factory.ATaskViewFactory;
+import jadex.simulation.analysis.common.component.workflow.defaultView.BpmnComponentView;
 import jadex.simulation.analysis.common.component.workflow.tasks.general.ATask;
 import jadex.simulation.analysis.common.component.workflow.tasks.general.IATask;
+import jadex.simulation.analysis.common.component.workflow.tasks.general.IATaskView;
 import jadex.simulation.analysis.common.dataObjects.IAExperiment;
-import jadex.simulation.analysis.common.events.ATaskEvent;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import jadex.simulation.analysis.common.dataObjects.IAModel;
+import jadex.simulation.analysis.common.dataObjects.Factories.AExperimentFactory;
+import jadex.simulation.analysis.common.events.service.AServiceEvent;
+import jadex.simulation.analysis.common.events.service.IAServiceListener;
+import jadex.simulation.analysis.common.events.task.ATaskEvent;
+import jadex.simulation.analysis.common.util.AConstants;
 
 /**
  * Task for creating a Experiment
  */
 public class SetExperimentTask extends ATask implements IATask
 {
+	private final SetExperimentTask task = this;
+
+	private IAExperiment experiment;
+	private final Future ret = new Future();
+
 	/**
 	 * Execute the task.
 	 */
 	public IFuture execute(final ITaskContext context, final BpmnInterpreter instance)
 	{
-		final Future ret = new Future();
-		taskEventOccur(new ATaskEvent(this, context, instance));
+		activity = context.getActivity();
+		IATaskView view = ATaskViewFactory.createView(this);
+		((BpmnComponentView) instance.getContextVariable("view")).registerTask(task, view);
+		IAModel model = (IAModel) context.getParameterValue("model");
+		experiment = AExperimentFactory.createDefaultExperiment(model);
+		taskChanged(new ATaskEvent(this, context, instance, AConstants.TASK_LÄUFT));
 
-		final BasicGeneralAnalysisService expService = (BasicGeneralAnalysisService) instance.getContextVariable("service");
-
-		expService.expFrameStart(); // for view
-		expService.registerListener(new ActionListener()
+		final LowLevelAnalysisService expService = (LowLevelAnalysisService) instance.getContextVariable("service");
+		expService.addServiceListener(new IAServiceListener()
 		{
 
 			@Override
-			public void actionPerformed(ActionEvent e)
+			public void serviceEventOccur(AServiceEvent event)
 			{
-				if (e.getActionCommand().equals("expSet"))
-				{
-					IAExperiment exp = (IAExperiment) expService.getFrame().get(new ThreadSuspendable(this));
-					context.setParameterValue("job", exp);
-					ret.setResult(null);
-				}
+				taskChanged(new ATaskEvent(task, context, instance, AConstants.TASK_BEENDET));
+				context.setParameterValue("experiment", experiment);
+				ret.setResultIfUndone(null);
 			}
 		});
-
+		
 		return ret;
+	}
+
+	public IAExperiment getExperiment()
+	{
+		return experiment;
+	}
+
+	public void resumeTask(Object resume)
+	{
+		ret.setResultIfUndone(resume);
 	}
 }

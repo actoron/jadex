@@ -1,7 +1,7 @@
 package jadex.simulation.analysis.common.dataObjects.parameter;
 
 import jadex.simulation.analysis.common.dataObjects.ADataObject;
-import jadex.simulation.analysis.common.events.ADataEvent;
+import jadex.simulation.analysis.common.events.data.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 
 public class ABasicParameter extends ADataObject implements IAParameter
@@ -84,7 +84,7 @@ public class ABasicParameter extends ADataObject implements IAParameter
 			{
 				throw new RuntimeException("Parametervalue falsch gesetzt " + this);
 			}
-			dataChanged(new ADataEvent(this, AConstants.PARAMETER_VALUE));
+			dataChanged(new ADataEvent(this, AConstants.PARAMETER_VALUE,value));
 		}
 	}
 
@@ -123,7 +123,7 @@ public class ABasicParameter extends ADataObject implements IAParameter
 		{
 			this.usage = usage;
 		}
-		dataChanged(new ADataEvent(this, AConstants.PARAMETER_USAGE));
+		dataChanged(new ADataEvent(this, AConstants.PARAMETER_USAGE, usage));
 	}
 
 	@Override

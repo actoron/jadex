@@ -1,7 +1,7 @@
 package jadex.simulation.analysis.common.dataObjects;
 
 
-import jadex.simulation.analysis.common.events.IADataObservable;
+import jadex.simulation.analysis.common.events.data.IADataObservable;
 
 import java.util.UUID;
 
@@ -24,13 +24,6 @@ public interface IADataObject extends IADataObservable
 	 * @return Flag for editable field
 	 */
 	public Boolean isEditable();
-
-	/**
-	 * Synchronize Object of the {@link IADataObject}
-	 * 
-	 * @return Mutex of the dataObject
-	 */
-	public Object getMutex();
 
 	/**
 	 * Returns a ID for the dataObject
