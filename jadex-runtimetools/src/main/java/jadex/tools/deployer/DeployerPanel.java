@@ -24,6 +24,7 @@ import java.io.File;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.tree.TreePath;
@@ -225,6 +226,41 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 				return ret;
 			}
 		};
+		
+		AbstractAction rename = new AbstractAction("Rename file")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if(first!=null)
+				{
+					final TreePath tp = first.getSelectedTreePath();
+					final String sel = first.getSelectedPath();
+					
+					if(sel!=null)
+					{
+						String name = JOptionPane.showInputDialog("New name: ");
+						IDeploymentService ds = first.getDeploymentService();
+						ds.renameFile(sel, name).addResultListener(new SwingDefaultResultListener()
+						{
+							public void customResultAvailable(Object result)
+							{
+								first.refreshTreePaths(new TreePath[]{tp.getParentPath()});
+								jcc.setStatusText("Renamed: "+sel);
+							}
+							public void customExceptionOccurred(Exception exception) 
+							{
+								jcc.setStatusText("Could not rename: "+sel);
+							}
+						});
+					}
+				}
+			}
+			
+			public boolean isEnabled()
+			{
+				return first!=null && first.getSelectedTreePath()!=null;
+			}
+		};
 	
 		//-------- methods --------
 
@@ -241,7 +277,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 		 */
 		public Action[]	getPopupActions(ITreeNode[] nodes)
 		{
-			return new Action[]{copy, del};
+			return new Action[]{copy, del, rename};
 		}
 
 		/**

@@ -72,8 +72,15 @@ public class DeploymentService extends BasicService implements IDeploymentServic
 		try
 		{
 			File file = new File(path);
-			file.renameTo(new File(name));
-			ret.setResult(name);
+			String newname = file.getParent()+"/"+name;
+			if(file.renameTo(new File(newname)))
+			{
+				ret.setResult(name);
+			}
+			else
+			{
+				ret.setException(new RuntimeException());
+			}
 		}
 		catch(Exception e)
 		{
@@ -90,23 +97,22 @@ public class DeploymentService extends BasicService implements IDeploymentServic
 	public IFuture deleteFile(String path)
 	{
 		Future ret = new Future();
-		File file = new File(path);
-//		System.out.println(file.exists()+" "+file.canRead()+" "+file.canWrite()+" "+file.canExecute());
-//		try
-//		{
-//			file.toPath().delete();
-//		}
-//		catch(Exception e)
-//		{
-//			e.printStackTrace();
-//		}
-		if(file.delete())
+		try
 		{
-			ret.setResult(null);
+			// file.toPath().delete(); since 1.7 throws Exception
+			File file = new File(path);
+			if(file.delete())
+			{
+				ret.setResult(null);
+			}
+			else
+			{
+				ret.setException(new RuntimeException());
+			}
 		}
-		else
+		catch(Exception e)
 		{
-			ret.setException(new RuntimeException());
+			ret.setException(e);
 		}
 		return ret;
 	}
