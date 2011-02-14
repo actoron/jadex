@@ -12,6 +12,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.future.SwingDelegationResultListener;
+import jadex.commons.gui.EditableList;
 import jadex.commons.gui.jtable.DateTimeRenderer;
 import jadex.micro.IMicroExternalAccess;
 import jadex.xml.annotation.XMLClassname;
@@ -46,8 +47,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -88,9 +87,9 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 
 	protected JPanel panel;
 	
-	protected ListPanel	includes;
+	protected EditableList	includes;
 	
-	protected ListPanel	excludes;
+	protected EditableList	excludes;
 	
 	
 	//-------- methods --------
@@ -122,8 +121,8 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		SpinnerNumberModel spmprorefresh = new SpinnerNumberModel(5, 0, 100000, 1);
 		spprorefresh = new JSpinner(spmprorefresh);
 		
-		includes	= new ListPanel("Includes");
-		excludes	= new ListPanel("Excludes");
+		includes	= new EditableList("Includes");
+		excludes	= new EditableList("Excludes");
 		
 		final JPanel pdissettings = new JPanel(new GridBagLayout());
 		pdissettings.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Discovery Settings "));
@@ -171,8 +170,8 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
 		y++;
 		
-		final JCheckBox	cbauto	= new JCheckBox("Auto apply settings");
-		cbauto.setToolTipText("Apply changes automatically after edit.");
+//		final JCheckBox	cbauto	= new JCheckBox("Auto apply settings");
+//		cbauto.setToolTipText("Apply changes automatically after edit.");
 		final JButton buapply = new JButton("Apply");
 //		buapply.setMargin(new Insets(0,0,0,0));
 		buapply.setToolTipText("Apply setting changes.");
@@ -185,7 +184,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			}
 		});
 		final JButton bucancel = new JButton("Cancel");
-		buapply.setToolTipText("Cancel changes and reset original values.");
+		bucancel.setToolTipText("Cancel changes and reset original values.");
 		bucancel.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -203,26 +202,26 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				refreshSettings();
 			}
 		});
-		cbauto.addChangeListener(new ChangeListener()
-		{
-			public void stateChanged(ChangeEvent e)
-			{
-				buapply.setEnabled(!cbauto.isSelected());
-				bucancel.setEnabled(!cbauto.isSelected());
-				if(cbauto.isSelected())
-				{
-					cbauto.setSelected(false);
-					throw new UnsupportedOperationException("todo: not yet implemented.");
-				}
-			}
-		});
+//		cbauto.addChangeListener(new ChangeListener()
+//		{
+//			public void stateChanged(ChangeEvent e)
+//			{
+//				buapply.setEnabled(!cbauto.isSelected());
+//				bucancel.setEnabled(!cbauto.isSelected());
+//				if(cbauto.isSelected())
+//				{
+//					cbauto.setSelected(false);
+//					throw new UnsupportedOperationException("todo: not yet implemented.");
+//				}
+//			}
+//		});
 
 		buapply.setPreferredSize(burefresh.getPreferredSize());
 		buapply.setMinimumSize(burefresh.getMinimumSize());
 		bucancel.setPreferredSize(burefresh.getPreferredSize());
 		bucancel.setMinimumSize(burefresh.getMinimumSize());
 		JPanel pbuts = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		pbuts.add(cbauto);
+//		pbuts.add(cbauto);
 		pbuts.add(burefresh);
 		pbuts.add(buapply);
 		pbuts.add(bucancel);
@@ -350,8 +349,12 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		
 		gbc.gridy	= 1;
 		gbc.weighty	= 0.5;
-		panel.add(includes, gbc);
-		panel.add(excludes, gbc);
+		gbc.insets	= new Insets(2,2,2,2);
+//		panel.add(includes, gbc);
+//		panel.add(excludes, gbc);
+		panel.add(new JScrollPane(includes), gbc);
+		panel.add(new JScrollPane(excludes), gbc);
+		gbc.insets	= new Insets(0,0,0,0);
 		
 		gbc.gridy	= 2;
 		gbc.weighty	= 0;
@@ -861,10 +864,10 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		public boolean autodelete;
 		
 		/** The includes list. */
-		public List	includes;
+		public String[]	includes;
 		
 		/** The excludes list. */
-		public List	excludes;
+		public String[]	excludes;
 	}
 
 }

@@ -29,6 +29,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -410,36 +411,36 @@ public class AwarenessAgent extends MicroAgent
 	 *  Get the includes.
 	 *  @return the includes.
 	 */
-	public synchronized List getIncludes()
+	public synchronized String[] getIncludes()
 	{
-		return new ArrayList(includes);
-	}
-
-	/**
-	 *  Set the excludes.
-	 *  @param excludes The excludes to set.
-	 */
-	public synchronized void setExcludes(List excludes)
-	{
-		this.excludes	= new ArrayList(excludes);
-	}
-	
-	/**
-	 *  Get the excludes.
-	 *  @return the excludes.
-	 */
-	public synchronized List getExcludes()
-	{
-		return new ArrayList(excludes);
+		return (String[])includes.toArray(new String[includes.size()]);
 	}
 
 	/**
 	 *  Set the includes.
 	 *  @param includes The includes to set.
 	 */
-	public synchronized void setIncludes(List includes)
+	public synchronized void setIncludes(String[] includes)
 	{
-		this.includes	= new ArrayList(includes);
+		this.includes	= new ArrayList(Arrays.asList(includes));
+	}
+
+	/**
+	 *  Set the excludes.
+	 *  @param excludes The excludes to set.
+	 */
+	public synchronized void setExcludes(String[] excludes)
+	{
+		this.excludes	= new ArrayList(Arrays.asList(excludes));
+	}
+	
+	/**
+	 *  Get the excludes.
+	 *  @return the excludes.
+	 */
+	public synchronized String[] getExcludes()
+	{
+		return (String[])excludes.toArray(new String[excludes.size()]);
 	}
 	
 	/**
