@@ -6,12 +6,14 @@ import jadex.base.gui.filetree.DefaultFileFilter;
 import jadex.base.gui.filetree.DefaultFileFilterMenuItemConstructor;
 import jadex.base.gui.filetree.DefaultNodeHandler;
 import jadex.base.gui.filetree.FileTreePanel;
+import jadex.base.gui.filetree.RemoteFile;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.service.deployment.IDeploymentService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Properties;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.PopupBuilder;
 import jadex.commons.service.IService;
 
@@ -57,12 +59,29 @@ public class DeploymentServiceViewerPanel implements IServiceViewerPanel
 		if(nodehandler!=null)
 			ftp.addNodeHandler(nodehandler);
 		ftp.getTree().getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-		File[] roots = File.listRoots();
-		for(int i=0; i<roots.length; i++)
-		{
-			ftp.addTopLevelNode(roots[i]);
-		}
 		
+		if(!remote)
+		{
+			File[] roots = File.listRoots();
+			for(int i=0; i<roots.length; i++)
+			{
+				ftp.addTopLevelNode(roots[i]);
+			}
+		}
+		else
+		{
+			service.getRoots().addResultListener(new SwingDefaultResultListener()
+			{
+				public void customResultAvailable(Object result)
+				{
+					RemoteFile[] roots = (RemoteFile[])result;
+					for(int i=0; i<roots.length; i++)
+					{
+						ftp.addTopLevelNode(roots[i]);
+					}
+				}
+			});
+		}
 		this.scrollpane = new JScrollPane(ftp);
 	}
 	

@@ -380,14 +380,14 @@ public class RemoteFileSystemView extends FileSystemView
 				{
 					FileSystemView view = FileSystemView.getFileSystemView();
 					File[] roots = view.getRoots();
-					return convertToRemoteFiles(roots);
+					return RemoteFile.convertToRemoteFiles(roots);
 				}
 			}).addResultListener(new SwingDefaultResultListener()
 			{
 				public void customResultAvailable(Object result)
 				{
 					RemoteFile[] remfiles = (RemoteFile[])result;
-					File[] files = convertToFiles(remfiles);
+					File[] files = RemoteFile.convertToFiles(remfiles);
 					children.put("roots", files);
 					chooser.rescanCurrentDirectory();
 					
@@ -487,14 +487,14 @@ public class RemoteFileSystemView extends FileSystemView
 					File dir = new File(mydir.getPath());
 					FileSystemView view = FileSystemView.getFileSystemView();
 					File[] files = view.getFiles(dir, false); // todo: useFileHandling
-					return convertToRemoteFiles(files);
+					return RemoteFile.convertToRemoteFiles(files);
 				}
 			}).addResultListener(new SwingDefaultResultListener()
 			{
 				public void customResultAvailable(Object result)
 				{
 					RemoteFile[] remfiles = (RemoteFile[])result;
-					File[] files = convertToFiles(remfiles);
+					File[] files = RemoteFile.convertToFiles(remfiles);
 					children.put(dir.getAbsolutePath(), files);
 					for(int i=0; i<files.length; i++)
 					{
@@ -573,29 +573,4 @@ public class RemoteFileSystemView extends FileSystemView
 //		}
 //	}
 	
-	/**
-	 * 
-	 */
-	public static File[] convertToFiles(RemoteFile[] remfiles)
-	{
-		File[] ret = remfiles==null? new File[0]: new File[remfiles.length];
-		for(int i=0; i<ret.length; i++)
-		{
-			ret[i] = new MyFile(remfiles[i].getFilename(), remfiles[i].getPath(), remfiles[i].isDirectory());
-		}
-		return ret;
-	}
-	
-	/**
-	 * 
-	 */
-	public static RemoteFile[] convertToRemoteFiles(File[] files)
-	{
-		RemoteFile[] ret = files==null? new RemoteFile[0]: new RemoteFile[files.length];
-		for(int i=0; i<ret.length; i++)
-		{
-			ret[i] = new RemoteFile(files[i]);
-		}
-		return ret;
-	}
 }

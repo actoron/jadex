@@ -1,5 +1,6 @@
 package jadex.base.service.deployment;
 
+import jadex.base.gui.filetree.RemoteFile;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.service.BasicService;
@@ -115,5 +116,16 @@ public class DeploymentService extends BasicService implements IDeploymentServic
 			ret.setException(e);
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Get the root devices.
+	 *  @return The root device files.
+	 */
+	public IFuture getRoots()
+	{
+		Future ret = new Future();
+		File[] roots = File.listRoots();
+		return new Future(RemoteFile.convertToRemoteFiles(roots));
 	}
 }

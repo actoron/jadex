@@ -36,4 +36,10 @@ public interface IDeploymentService extends IService
 	 *  @return True, if delete was successful.
 	 */
 	public IFuture deleteFile(String path);
+	
+	/**
+	 *  Get the root devices.
+	 *  @return The root device files.
+	 */
+	public IFuture getRoots();
 }

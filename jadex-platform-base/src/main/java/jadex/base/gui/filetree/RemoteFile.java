@@ -1,5 +1,7 @@
 package jadex.base.gui.filetree;
 
+import jadex.base.gui.filechooser.MyFile;
+
 import java.io.File;
 
 import javax.swing.filechooser.FileSystemView;
@@ -142,6 +144,32 @@ public class RemoteFile
 			ret = file.getName();
 		if(ret==null || ret.length()==0)
 			ret = file.getPath();
+		return ret;
+	}
+	
+	/**
+	 *  Convert remote files to files.
+	 */
+	public static File[] convertToFiles(RemoteFile[] remfiles)
+	{
+		File[] ret = remfiles==null? new File[0]: new File[remfiles.length];
+		for(int i=0; i<ret.length; i++)
+		{
+			ret[i] = new MyFile(remfiles[i].getFilename(), remfiles[i].getPath(), remfiles[i].isDirectory());
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Convert files to remote files.
+	 */
+	public static RemoteFile[] convertToRemoteFiles(File[] files)
+	{
+		RemoteFile[] ret = files==null? new RemoteFile[0]: new RemoteFile[files.length];
+		for(int i=0; i<ret.length; i++)
+		{
+			ret[i] = new RemoteFile(files[i]);
+		}
 		return ret;
 	}
 }
