@@ -13,7 +13,6 @@ import jadex.commons.gui.SGUI;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -25,7 +24,6 @@ import java.util.Map;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -100,7 +98,7 @@ public abstract class AbstractSelectorPanel extends JPanel implements IPropertie
 		    	Object value, int index, boolean isSelected, boolean cellHasFocus) 
 		    {
 		    	this.setText(value!=null? convertToString(value): null);
-		    	return this;
+		    	return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 		    }
 		});
 		
