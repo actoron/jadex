@@ -51,7 +51,16 @@
 				</component>
 			</components>
 		</application>
-		<application name="Test Config 1">
+		<application name="Only Calculators">
+			<components>
+				<component type="Calculator" number="10">
+					<arguments>
+						<argument name="delay">0L</argument>
+					</arguments>
+				</component>
+			</components>
+		</application>
+		<!-- <application name="Test Config 1">
 			<arguments>
 				<argument name="delay">1000L</argument>
 			</arguments>
@@ -73,7 +82,7 @@
 				</component>
 				<component type="Display"/>
 			</components>
-		</application>
+		</application> -->
 	</applications>
 	
 </applicationtype>
