@@ -233,9 +233,23 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 							{
 								try
 								{
-								Constructor	c	= clazz.getDeclaredConstructors()[0];
-								c.setAccessible(true);
-								ret	= c.newInstance(new Object[c.getParameterTypes().length]);
+									Constructor	c	= clazz.getDeclaredConstructors()[0];
+									c.setAccessible(true);
+									Class[] paramtypes = c.getParameterTypes();
+									Object[] paramvalues = new Object[paramtypes.length];
+									for(int i=0; i<paramtypes.length; i++)
+									{
+										if(paramtypes[i].equals(boolean.class))
+										{
+											paramvalues[i] = Boolean.FALSE;
+										}
+										else if(SReflect.isBasicType(clazz))
+										{
+											paramvalues[i] = 0;
+										}
+									}
+									
+									ret	= c.newInstance(paramvalues);
 								}
 								catch(Exception e)
 								{

@@ -24,22 +24,22 @@ public class SReflect
 	//-------- attributes --------
 	
 	/** Class lookup cache (classloader(weak)->Map([name, import]->class)). */
-	protected static Map classcache	= Collections.synchronizedMap(new WeakHashMap());
+	protected static final Map classcache	= Collections.synchronizedMap(new WeakHashMap());
 
 	/** Inner class name lookup cache. */
-	protected static Map innerclassnamecache	= Collections.synchronizedMap(new WeakHashMap());
+	protected static final Map innerclassnamecache	= Collections.synchronizedMap(new WeakHashMap());
 
 	/** Method lookup cache (class->(name->method[])). */
-	protected static Map methodcache	= Collections.synchronizedMap(new WeakHashMap());
+	protected static final Map methodcache	= Collections.synchronizedMap(new WeakHashMap());
 
 	/** Field lookup cache (class->(name->field[])). */
-	protected static Map fieldcache = Collections.synchronizedMap(new WeakHashMap());
+	protected static final Map fieldcache = Collections.synchronizedMap(new WeakHashMap());
 
 	/** Mapping from basic class name -> basic type(class). */
-	protected static Map basictypes;
+	protected static final Map basictypes;
 
 	/** Mapping from basic class -> object type(class). */
-	protected static Map wrappedtypes;
+	protected static final Map wrappedtypes;
 
 	static
 	{

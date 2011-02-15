@@ -82,8 +82,9 @@ public class Test extends TestCase
 //				t.testLoggingLevel();
 //				t.testInetAddress();
 //				t.testBeanWithPublicFields();
-				t.testBeanWithIncludedFields();
+//				t.testBeanWithIncludedFields();
 //				t.testAnonymousInnerClass();
+				t.testAnonymousInnerClassWithSimpleTypes();
 //				t.testImage();
 			}
 			long dur = System.currentTimeMillis()-start;
@@ -521,12 +522,15 @@ public class Test extends TestCase
 		// Do not use final directly as compiler optimizes field away.
 		String	tmp	= "hugo";
 		final String	name	= tmp;
+		Boolean tmp2 = true;
+		final boolean booli = tmp2;
 		Object	obj	= new Object()
 		{
 			@XMLClassname("test2")
 			public boolean equals(Object obj)
 			{
 				String	othername	= null;
+				Boolean otherbooli = null;
 				try
 				{
 					Field	field	= SReflect.getField(obj.getClass(), "val$name");
@@ -537,13 +541,23 @@ public class Test extends TestCase
 				{
 					e.printStackTrace();
 				}
+				try
+				{
+					Field	field	= SReflect.getField(obj.getClass(), "val$booli");
+					field.setAccessible(true);
+					otherbooli	= (Boolean)field.get(obj);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 				
-				return name.equals(othername);
+				return name.equals(othername) && otherbooli!=null && otherbooli.booleanValue()==booli;
 			}
 						
 			public String toString()
 			{
-				return getClass().getName()+"("+name+")";
+				return getClass().getName()+"("+name+", "+booli+")";
 			}
 		};
 		
