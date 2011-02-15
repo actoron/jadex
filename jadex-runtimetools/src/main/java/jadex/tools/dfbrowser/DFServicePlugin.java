@@ -1,4 +1,4 @@
-package jadex.tools.generic;
+package jadex.tools.dfbrowser;
 
 import jadex.base.fipa.IDF;
 import jadex.commons.future.DelegationResultListener;
@@ -6,7 +6,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.service.IService;
-import jadex.tools.dfbrowser.DFBrowserPanel;
+import jadex.tools.generic.AbstractServicePlugin;
 
 import javax.swing.Icon;
 
@@ -58,15 +58,5 @@ public class DFServicePlugin extends AbstractServicePlugin
 	public Icon getToolIcon(boolean selected)
 	{
 		return selected? icons.getIcon("df_sel"): icons.getIcon("df");
-	}
-	
-	
-	/**
-	 *  Get the name.
-	 *  @return The name.
-	 */
-	public String getName()
-	{
-		return "Directory Facilitator";
 	}
 }

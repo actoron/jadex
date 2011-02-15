@@ -1,14 +1,16 @@
-package jadex.base.gui.componentviewer.dfservice;
-
-import jadex.base.fipa.IProperty;
+package jadex.tools.dfbrowser;
 
 import java.awt.Component;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
-class PropertyArrayRenderer extends DefaultTableCellRenderer
+class LeaseTimeRenderer extends DefaultTableCellRenderer
 {
+	final static DateFormat date_format = new SimpleDateFormat("HH:mm:ss, dd-MM-yyyy");
 
 	/**
 	 * @param table
@@ -23,26 +25,16 @@ class PropertyArrayRenderer extends DefaultTableCellRenderer
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
 	{
 		super.getTableCellRendererComponent(table, null, isSelected, hasFocus, row, column);
-		IProperty[] sa = (IProperty[])value;
-		String content;
-		String tooltip;
-		if(sa == null || sa.length == 0)
+		Date date = (Date)value;
+		String content = "n/a";
+		try
 		{
-			content = "";
-			setToolTipText(null);
+			content = date_format.format(date);
 		}
-		else
-		{
-			content = sa[0].getName() + "=" + sa[0].getValue();
-			tooltip = content;
-			for(int i = 1; i < sa.length; i++)
-			{
-				content += ", " + sa[i].getName() + "=" + sa[i].getValue();
-				tooltip += "<br>" + sa[i].getName() + "=" + sa[i].getValue();
-			}
-			setToolTipText("<html>" + tooltip + "</html>");
-		}
+		catch(Exception e)
+		{/*NOP*/}
 		setText(content);
+		setToolTipText(content);
 		return this;
 	}
 }

@@ -1,4 +1,4 @@
-package jadex.tools.generic;
+package jadex.tools.libtool;
 
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -6,7 +6,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.service.IService;
 import jadex.commons.service.library.ILibraryService;
-import jadex.tools.libtool.LibServiceBrowser;
+import jadex.tools.generic.AbstractServicePlugin;
 
 import javax.swing.Icon;
 
@@ -57,14 +57,5 @@ public class LibraryServicePlugin extends AbstractServicePlugin
 	public Icon getToolIcon(boolean selected)
 	{
 		return selected? icons.getIcon("library_sel"): icons.getIcon("library");
-	}
-	
-	/**
-	 *  Get the name.
-	 *  @return The name.
-	 */
-	public String getName()
-	{
-		return "Library Service";
 	}
 }

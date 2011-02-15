@@ -18,6 +18,7 @@
 		<import>jadex.commons.service.clock.IClockService</import>
 		<import>jadex.commons.service.SServiceProvider</import>
 		<import>jadex.commons.future.*</import>
+		<import>jadex.commons.service.*</import>
 	</imports>
 	
 	<componenttypes>
@@ -27,7 +28,7 @@
 	
 	<properties>
 		<property name="clock" class="IFuture">
-			SServiceProvider.getService($component.getServiceProvider(), IClockService.class)
+			SServiceProvider.getService($component.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 		</property>
 	</properties>
 	

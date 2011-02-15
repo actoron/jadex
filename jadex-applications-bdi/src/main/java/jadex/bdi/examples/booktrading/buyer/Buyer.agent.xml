@@ -129,8 +129,8 @@
 	</expressions>
 
 	<services>
-		<requiredservice name="dfservice" class="IDF"/>
-		<requiredservice name="clockservice" class="IClockService"/>
+		<requiredservice name="dfservice" class="IDF" scope="platform"/>
+		<requiredservice name="clockservice" class="IClockService" scope="platform"/>
 	</services>
 
 	<properties>

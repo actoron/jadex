@@ -14,11 +14,11 @@ import jadex.tools.comanalyzer.ComanalyzerPlugin;
 import jadex.tools.convcenter.ConversationPlugin;
 import jadex.tools.debugger.DebuggerPlugin;
 import jadex.tools.deployer.DeployerPlugin;
+import jadex.tools.dfbrowser.DFServicePlugin;
 import jadex.tools.generic.AwarenessComponentPlugin;
-import jadex.tools.generic.DFServicePlugin;
-import jadex.tools.generic.LibraryServicePlugin;
-import jadex.tools.generic.StarterServicePlugin;
+import jadex.tools.libtool.LibraryServicePlugin;
 import jadex.tools.simcenter.SimCenterPlugin;
+import jadex.tools.starter.StarterServicePlugin;
 import jadex.tools.testcenter.TestCenterPlugin;
 
 /**

@@ -23,6 +23,7 @@
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
 		<import>jadex.bdi.runtime.*</import>
 		<import>jadex.commons.*</import>
+		<import>jadex.commons.future.*</import>
 		<import>jadex.commons.service.*</import>
 		<import>jadex.commons.service.clock.*</import>
 	</imports>
@@ -146,15 +147,15 @@
 	</expressions>
 
 	<services>
-		<requiredservice name="dfservice" class="IDF"/>
-		<requiredservice name="clockservice" class="IClockService"/>
+		<requiredservice name="dfservice" class="IDF" scope="platform"/>
+		<requiredservice name="clockservice" class="IClockService" scope="platform"/>
 	</services>
 
 	<properties>
 		<!-- Seller generates warning about unhandled (passive) sell_book goals. -->
 		<property name="logging.level">java.util.logging.Level.SEVERE</property>
 		<property name="debugging">false</property>
-	 	<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class)</property>
+	 	<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)</property>
 		<property name="componentviewer.viewerclass">"jadex.bdi.examples.booktrading.common.GuiViewerPanel"</property>
 	</properties>
 

@@ -410,7 +410,7 @@ public class Test extends TestCase
 	 */
 	public void testInnerClass() throws Exception
 	{
-		InnerClass ic = new InnerClass("some string");
+		StaticInnerClass ic = new StaticInnerClass("some string");
 		
 		doWriteAndRead(ic);
 	}
@@ -514,6 +514,43 @@ public class Test extends TestCase
 	}
 	
 	/**
+	 *  Test if anonymous inner classes can be transferred.
+	 */
+	public void testAnonymousInnerClassWithSimpleTypes() throws Exception
+	{
+		// Do not use final directly as compiler optimizes field away.
+		String	tmp	= "hugo";
+		final String	name	= tmp;
+		Object	obj	= new Object()
+		{
+			@XMLClassname("test2")
+			public boolean equals(Object obj)
+			{
+				String	othername	= null;
+				try
+				{
+					Field	field	= SReflect.getField(obj.getClass(), "val$name");
+					field.setAccessible(true);
+					othername	= (String)field.get(obj);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+				
+				return name.equals(othername);
+			}
+						
+			public String toString()
+			{
+				return getClass().getName()+"("+name+")";
+			}
+		};
+		
+		doWriteAndRead(obj);
+	}
+	
+	/**
 	 *  Get some bean.
 	 */
 	protected Object getABean()
@@ -526,15 +563,15 @@ public class Test extends TestCase
 		return a;
 	}
 	
-	public static class InnerClass
+	public static class StaticInnerClass
 	{
 		protected String string;
 		
-		public InnerClass()
+		public StaticInnerClass()
 		{
 		}
 		
-		public InnerClass(String string)
+		public StaticInnerClass(String string)
 		{
 			this.string = string;
 		}
@@ -565,7 +602,7 @@ public class Test extends TestCase
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			InnerClass other = (InnerClass) obj;
+			StaticInnerClass other = (StaticInnerClass) obj;
 			if (string == null) {
 				if (other.string != null)
 					return false;
@@ -574,4 +611,5 @@ public class Test extends TestCase
 			return true;
 		}
 	}
+	
 }

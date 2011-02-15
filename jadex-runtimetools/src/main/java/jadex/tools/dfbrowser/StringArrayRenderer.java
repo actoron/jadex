@@ -1,4 +1,4 @@
-package jadex.base.gui.componentviewer.dfservice;
+package jadex.tools.dfbrowser;
 
 import java.awt.Component;
 

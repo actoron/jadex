@@ -1,14 +1,15 @@
-package jadex.base.gui.componentviewer.dfservice;
+package jadex.tools.dfbrowser;
 
-import jadex.bridge.IComponentIdentifier;
+import jadex.base.fipa.IProperty;
 
 import java.awt.Component;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
-class ComponentIdentifierRenderer extends DefaultTableCellRenderer
+class PropertyArrayRenderer extends DefaultTableCellRenderer
 {
+
 	/**
 	 * @param table
 	 * @param value
@@ -22,15 +23,26 @@ class ComponentIdentifierRenderer extends DefaultTableCellRenderer
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
 	{
 		super.getTableCellRendererComponent(table, null, isSelected, hasFocus, row, column);
-		IComponentIdentifier aid = (IComponentIdentifier)value;
-		setText(aid.getName());
-		String[] addresses = aid.getAddresses();
-		String tooltip = aid.getName();
-		for(int i = 0; i < addresses.length; i++)
+		IProperty[] sa = (IProperty[])value;
+		String content;
+		String tooltip;
+		if(sa == null || sa.length == 0)
 		{
-			tooltip += "<br>" + addresses[i];
+			content = "";
+			setToolTipText(null);
 		}
-		setToolTipText("<html>" + tooltip + "</html>");
+		else
+		{
+			content = sa[0].getName() + "=" + sa[0].getValue();
+			tooltip = content;
+			for(int i = 1; i < sa.length; i++)
+			{
+				content += ", " + sa[i].getName() + "=" + sa[i].getValue();
+				tooltip += "<br>" + sa[i].getName() + "=" + sa[i].getValue();
+			}
+			setToolTipText("<html>" + tooltip + "</html>");
+		}
+		setText(content);
 		return this;
 	}
 }
