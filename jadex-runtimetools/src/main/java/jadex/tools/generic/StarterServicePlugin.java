@@ -100,24 +100,8 @@ public class StarterServicePlugin extends AbstractServicePlugin
 		List	ret	= new ArrayList();
 		JButton b;
 
-		b = new JButton(new DelegationAction(AddPathAction.getName(), 
-			AddPathAction.getIcon(), AddPathAction.getTooltipText(), true));
-		b.setBorder(null);
-		b.setToolTipText(b.getText());
-		b.setText(null);
-		b.setEnabled(true);
-		ret.add(b);
-		
-//		b = new JButton(new DelegationAction(AddRemotePathAction.getName(), 
-//			AddRemotePathAction.getIcon(), AddRemotePathAction.getTooltipText(), true));
-//		b.setBorder(null);
-//		b.setToolTipText(b.getText());
-//		b.setText(null);
-//		b.setEnabled(true);
-//		ret.add(b);
-		
-		b = new JButton(new ToolTipAction(RemovePathAction.getName(), 
-			RemovePathAction.getIcon(), RemovePathAction.getTooltipText())
+		b = new JButton(new ToolTipAction(AddPathAction.getName(), 
+			AddPathAction.getIcon(), AddPathAction.getTooltipText())
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -136,6 +120,14 @@ public class StarterServicePlugin extends AbstractServicePlugin
 				}
 			}
 		});
+		b.setBorder(null);
+		b.setToolTipText(b.getText());
+		b.setText(null);
+		b.setEnabled(true);
+		ret.add(b);
+		
+		b = new JButton(new DelegationAction(RemovePathAction.getName(), 
+			RemovePathAction.getIcon(), RemovePathAction.getTooltipText(), true));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
