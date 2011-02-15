@@ -8,6 +8,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.service.RequiredServiceInfo;
+import jadex.commons.service.SServiceProvider;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Component;
@@ -24,7 +26,8 @@ public class SJCC
 			@XMLClassname("kill-platform")
 			public Object execute(IInternalAccess ia)
 			{
-				ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ui)
+				SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new SwingDefaultResultListener(ui)
 				{
 					public void customResultAvailable(Object result)
 					{

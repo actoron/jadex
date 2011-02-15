@@ -62,10 +62,12 @@ public class ModelTreePanel extends FileTreePanel
 		actions.put(AddPathAction.getName(), new AddPathAction(this));
 		actions.put(AddRemotePathAction.getName(), new AddRemotePathAction(this));
 		actions.put(RemovePathAction.getName(), new RemovePathAction(this));
-		setPopupBuilder(new PopupBuilder(new Object[]{actions.get(AddPathAction.class), 
-			actions.get(AddRemotePathAction.class), mic}));
+		setPopupBuilder(new PopupBuilder(new Object[]{actions.get(AddPathAction.getName()), 
+			actions.get(AddRemotePathAction.getName()), mic}));
 		setIconCache(ic);
-		addNodeHandler(new DefaultNodeHandler(getTree()));
+		DefaultNodeHandler dnh = new DefaultNodeHandler(getTree());
+		dnh.addAction(new RemovePathAction(this), null);
+		addNodeHandler(dnh);
 	}
 	
 	//-------- methods --------

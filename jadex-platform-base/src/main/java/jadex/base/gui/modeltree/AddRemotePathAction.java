@@ -96,7 +96,7 @@ public class AddRemotePathAction extends ToolTipAction
 		}
 		
 		if(filechooser.showDialog(SGUI.getWindowParent(treepanel), 
-			"Add Path")==JFileChooser.APPROVE_OPTION)
+			"Add Remote Path")==JFileChooser.APPROVE_OPTION)
 		{
 			final File file = filechooser.getSelectedFile();
 			if(file!=null)

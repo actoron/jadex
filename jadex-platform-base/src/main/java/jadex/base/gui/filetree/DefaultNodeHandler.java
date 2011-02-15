@@ -26,17 +26,17 @@ public class DefaultNodeHandler implements INodeHandler
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"overlay_refresh", SGUI.makeIcon(FileTreePanel.class, "/jadex/base/gui/images/overlay_refresh.png"),
-		"overlay_refreshtree", SGUI.makeIcon(FileTreePanel.class, "/jadex/base/gui/images/overlay_refresh.png"),
+		RefreshAction.getName(), SGUI.makeIcon(FileTreePanel.class, "/jadex/base/gui/images/overlay_refresh.png"),
+		RefreshSubtreeAction.getName(), SGUI.makeIcon(FileTreePanel.class, "/jadex/base/gui/images/overlay_refresh.png"),
 	});
 	
 	//-------- attributes --------
 
-	/** The refresh action. */
-	protected AbstractAction refresh;
+	/** The actions. */
+	protected List actions;
 	
-	/** The refresh tree action. */
-	protected AbstractAction refreshtree;
+	/** The overlay icons. */
+	protected UIDefaults overlays;
 
 	//-------- constructors --------
 
@@ -45,8 +45,20 @@ public class DefaultNodeHandler implements INodeHandler
 	 */
 	public DefaultNodeHandler(JTree tree)
 	{
-		this.refresh = new RefreshAction(tree);
-		this.refreshtree = new RefreshSubtreeAction(tree);
+		overlays = new UIDefaults();
+		overlays.putAll(icons);
+		actions = new ArrayList();
+		actions.add(new RefreshAction(tree));
+		actions.add(new RefreshSubtreeAction(tree));
+	}
+	
+	/**
+	 *  Create a new node handler.
+	 */
+	public DefaultNodeHandler(JTree tree, List actions, UIDefaults overlays)
+	{
+		this.actions = actions!=null? actions: new ArrayList();
+		this.overlays = overlays!=null? overlays: new UIDefaults();
 	}
 	
 	//-------- methods --------
@@ -71,25 +83,26 @@ public class DefaultNodeHandler implements INodeHandler
 		List ret = new ArrayList();
 		Icon	base	= nodes[0].getIcon();
 		
-		Action	prefresh	= new AbstractAction((String)refresh.getValue(Action.NAME),
-			base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_refresh")}) : (Icon)refresh.getValue(Action.SMALL_ICON))
+		for(int i=0; i<actions.size(); i++)
 		{
-			public void actionPerformed(ActionEvent e)
+			final Action baseaction = (Action)actions.get(i);
+			if(baseaction.isEnabled())
 			{
-				refresh.actionPerformed(e);
+				String name = (String)baseaction.getValue(Action.NAME);
+				Icon overlay = overlays.getIcon(name);
+				Action action = new AbstractAction(name, base!=null && overlay!=null? 
+					new CombiIcon(new Icon[]{base, overlay}) 
+					: (Icon)baseaction.getValue(Action.SMALL_ICON))
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						baseaction.actionPerformed(e);
+					}
+				};
+				ret.add(action);
 			}
-		};
-		ret.add(prefresh);
-		Action	prefreshtree	= new AbstractAction((String)refreshtree.getValue(Action.NAME),
-			base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_refreshtree")}) : (Icon)refreshtree.getValue(Action.SMALL_ICON))
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				refreshtree.actionPerformed(e);
-			}
-		};
-		ret.add(prefreshtree);
-	
+		}
+		
 		return (Action[])ret.toArray(new Action[0]);
 	}
 
@@ -106,5 +119,17 @@ public class DefaultNodeHandler implements INodeHandler
 //			ret	= showprops;
 //		}
 		return ret;
+	}
+	
+	/**
+	 *  Add action.
+	 */
+	public void addAction(Action action, Icon overlay)
+	{
+		if(action==null)
+			throw new IllegalArgumentException("Action must not be null.");
+		actions.add(action);
+		if(overlay!=null)
+			overlays.put(action.getValue(Action.NAME), overlay);
 	}
 }

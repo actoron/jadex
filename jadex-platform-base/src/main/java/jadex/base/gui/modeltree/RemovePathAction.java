@@ -56,7 +56,7 @@ public class RemovePathAction extends ToolTipAction
 	public boolean isEnabled()
 	{
 		ITreeNode rm = (ITreeNode)treepanel.getTree().getLastSelectedPathComponent();
-		return rm==null && !treepanel.isRemote();
+		return rm!=null && rm.getParent().equals(treepanel.getTree().getModel().getRoot());
 	}
 	
 	/**

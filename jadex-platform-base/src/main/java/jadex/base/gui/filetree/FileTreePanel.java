@@ -111,7 +111,6 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		tree.setShowsRootHandles(true);
 		tree.setToggleClickCount(0);
 		tree.setRootVisible(false);
-		tree.setShowsRootHandles(true);
 		tree.setRowHeight(16);
 		
 		this.add(tree, BorderLayout.CENTER);

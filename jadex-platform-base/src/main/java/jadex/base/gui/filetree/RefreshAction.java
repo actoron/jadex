@@ -36,7 +36,7 @@ public class RefreshAction extends AbstractAction
 	 */
 	public RefreshAction(JTree tree)
 	{
-		this("Refresh", icons.getIcon("refresh"), tree);
+		this(getName(), icons.getIcon("refresh"), tree);
 	}
 	
 	/**
@@ -60,5 +60,13 @@ public class RefreshAction extends AbstractAction
 		{
 			((ITreeNode)paths[i].getLastPathComponent()).refresh(false);
 		}
+	}
+	
+	/**
+	 *  Get the action name.
+	 */
+	public static String getName()
+	{
+		return "Refresh";
 	}
 }

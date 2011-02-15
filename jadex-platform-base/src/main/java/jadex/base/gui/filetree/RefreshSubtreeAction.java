@@ -61,4 +61,12 @@ public class RefreshSubtreeAction extends AbstractAction
 			((ITreeNode)paths[i].getLastPathComponent()).refresh(true);
 		}
 	}
+	
+	/**
+	 *  Get the action name.
+	 */
+	public static String getName()
+	{
+		return "Refresh subtree";
+	}
 }

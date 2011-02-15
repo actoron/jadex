@@ -22,6 +22,7 @@ import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
 import jadex.commons.service.IService;
+import jadex.tools.starter.StarterPlugin;
 import jadex.tools.starter.StarterViewerPanel;
 import jadex.xml.annotation.XMLClassname;
 
@@ -50,6 +51,8 @@ public class StarterServicePlugin extends AbstractServicePlugin
 	{
 		icons.put("starter", SGUI.makeIcon(StarterServicePlugin.class, "/jadex/tools/common/images/new_starter.png"));
 		icons.put("starter_sel", SGUI.makeIcon(StarterServicePlugin.class, "/jadex/tools/common/images/new_starter_sel.png"));
+		icons.put("add_remote_component", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/add_remote_component.png"));
+		icons.put("kill_platform", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_killplatform.png"));
 	}
 
 	//-------- methods --------
@@ -105,16 +108,34 @@ public class StarterServicePlugin extends AbstractServicePlugin
 		b.setEnabled(true);
 		ret.add(b);
 		
-		b = new JButton(new DelegationAction(AddRemotePathAction.getName(), 
-			AddRemotePathAction.getIcon(), AddRemotePathAction.getTooltipText(), true));
-		b.setBorder(null);
-		b.setToolTipText(b.getText());
-		b.setText(null);
-		b.setEnabled(true);
-		ret.add(b);
+//		b = new JButton(new DelegationAction(AddRemotePathAction.getName(), 
+//			AddRemotePathAction.getIcon(), AddRemotePathAction.getTooltipText(), true));
+//		b.setBorder(null);
+//		b.setToolTipText(b.getText());
+//		b.setText(null);
+//		b.setEnabled(true);
+//		ret.add(b);
 		
-		b = new JButton(new DelegationAction(RemovePathAction.getName(), 
-			RemovePathAction.getIcon(), RemovePathAction.getTooltipText(), true));
+		b = new JButton(new ToolTipAction(RemovePathAction.getName(), 
+			RemovePathAction.getIcon(), RemovePathAction.getTooltipText())
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				StarterViewerPanel svp = (StarterViewerPanel)getSelectorPanel().getCurrentPanel();
+				if(svp!=null)
+				{
+					ModelTreePanel mpt = svp.getPanel().getModelTreePanel();
+					if(mpt.isRemote())
+					{
+						mpt.getAction(AddRemotePathAction.getName()).actionPerformed(e);
+					}
+					else
+					{
+						mpt.getAction(AddPathAction.getName()).actionPerformed(e);
+					}
+				}
+			}
+		});
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
@@ -143,12 +164,12 @@ public class StarterServicePlugin extends AbstractServicePlugin
 		separator.setOrientation(JSeparator.VERTICAL);
 		bar.add(separator);*/
 		
-//		b = new JButton(ADD_REMOTE_COMPONENT);
-//		b.setBorder(null);
-//		b.setToolTipText(b.getText());
-//		b.setText(null);
-//		b.setEnabled(true);
-//		ret.add(b);
+		b = new JButton(ADD_REMOTE_COMPONENT);
+		b.setBorder(null);
+		b.setToolTipText(b.getText());
+		b.setText(null);
+		b.setEnabled(true);
+		ret.add(b);
 
 		b = new JButton(KILL_PLATFORM);
 		b.setBorder(null);
@@ -273,7 +294,7 @@ public class StarterServicePlugin extends AbstractServicePlugin
 		{
 			Action action = getAction();
 			if(action!=null)
-				actionPerformed(e);
+				action.actionPerformed(e);
 		}
 		
 		/**
@@ -316,102 +337,57 @@ public class StarterServicePlugin extends AbstractServicePlugin
 		}
 	};
 	
-//	/**
-//	 *  Action for adding a remote component.
-//	 */
-//	final AbstractAction ADD_REMOTE_COMPONENT = new AbstractAction("Add remote component", icons.getIcon("add_remote_component"))
-//	{
-//		public void actionPerformed(ActionEvent e)
-//		{
-//			StarterViewerPanel svp = (StarterViewerPanel)getSelectorPanel().getCurrentPanel();
-//			if(svp!=null)
-//			{
-//				ComponentTreePanel ctp = svp.getPanel().getComponentTreePanel();
-//				ctp.getExternalAccess().scheduleStep(new IComponentStep()
-//				{
-//					public Object execute(IInternalAccess ia)
-//					{
-//						ia.getRequiredService("cms").addResultListener(new DefaultResultListener()		
-//						{
-//							public void resultAvailable(Object result)
-//							{
-//								IComponentManagementService cms = (IComponentManagementService)result;
-//								ComponentIdentifierDialog dia = new ComponentIdentifierDialog(spanel, jcc.getExternalAccess().getServiceProvider());
-//								IComponentIdentifier cid = dia.getComponentIdentifier(null);
-//								
-//								if(cid!=null)
-//								{
-//									Map args = new HashMap();
-//									args.put("component", cid);
-//									createComponent("jadex/base/service/remote/ProxyAgent.class", cid.getLocalName(), null, args, false, null, null, null, null);
-//								
-//											
-//									cms.createComponent(cid.getLocalName(), "jadex/base/service/remote/ProxyAgent.class", 
-//										new CreationInfo(configname, arguments, spanel.parent, suspend, master, daemon, autosd), killlistener)
-//										.addResultListener(new IResultListener()
-//									{
-//										public void resultAvailable(Object result)
-//										{
-//											ret.setResult(result);
-//											getJCC().setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
-//										}
-//										
-//										public void exceptionOccurred(Exception exception)
-//										{
-//											ret.setException(exception);
-//											getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
-//										}
-//									});
-//								}
-//							}
-//						});
-//						return null;
-//					}
-//				});
-//			}
-//		}
-//	};
-//	
-//	/**
-//	 *  Create a new component on the platform.
-//	 *  Any errors will be displayed in a dialog to the user.
-//	 */
-//	public IFuture createComponent(final String type, final String name, final String configname, final Map arguments, final Boolean suspend, 
-//		final Boolean master, final Boolean daemon, final Boolean autosd, final IResultListener killlistener)
-//	{
-//		final Future ret = new Future(); 
-//		jcc.getExternalAccess().scheduleStep(new IComponentStep()
-//		{
-//			@XMLClassname("create-component")
-//			public Object execute(IInternalAccess ia)
-//			{
-//				ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(spanel)
-//				{
-//					public void customResultAvailable(Object result)
-//					{
-//						IComponentManagementService cms = (IComponentManagementService)result;
-//						cms.createComponent(name, type, new CreationInfo(configname, arguments, spanel.parent, suspend, master, daemon, autosd), killlistener)
-//							.addResultListener(new IResultListener()
-//						{
-//							public void resultAvailable(Object result)
-//							{
-//								ret.setResult(result);
-//								getJCC().setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
-//							}
-//							
-//							public void exceptionOccurred(Exception exception)
-//							{
-//								ret.setException(exception);
-//								getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
-//							}
-//						});
-//					}
-//				});
-//				return null;
-//			}
-//		});
-//		return ret;
-//	}
+	/**
+	 *  Action for adding a remote component.
+	 */
+	final AbstractAction ADD_REMOTE_COMPONENT = new AbstractAction("Add remote component", icons.getIcon("add_remote_component"))
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			StarterViewerPanel svp = (StarterViewerPanel)getSelectorPanel().getCurrentPanel();
+			if(svp!=null)
+			{
+				ComponentIdentifierDialog dia = new ComponentIdentifierDialog(svp.getComponent(), jcc.getExternalAccess().getServiceProvider());
+				final IComponentIdentifier cid = dia.getComponentIdentifier(null);
+				if(cid!=null)
+				{
+					final Map args = new HashMap();
+					args.put("component", cid);
+					
+					ComponentTreePanel ctp = svp.getPanel().getComponentTreePanel();
+					ctp.getExternalAccess().scheduleStep(new IComponentStep()
+					{
+						public Object execute(IInternalAccess ia)
+						{
+							ia.getRequiredService("cms").addResultListener(new DefaultResultListener()		
+							{
+								public void resultAvailable(Object result)
+								{
+									IComponentManagementService cms = (IComponentManagementService)result;
+	//								createComponent("jadex/base/service/remote/ProxyAgent.class", cid.getLocalName(), null, args, false, null, null, null, null);
+									
+									cms.createComponent(cid.getLocalName(), "jadex/base/service/remote/ProxyAgent.class", 
+										new CreationInfo(args), null).addResultListener(new IResultListener()
+									{
+										public void resultAvailable(Object result)
+										{
+											getJCC().setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
+										}
+									});
+								}
+							});
+							return null;
+						}
+					});
+				}
+			}
+		}
+	};
 }
 
 
