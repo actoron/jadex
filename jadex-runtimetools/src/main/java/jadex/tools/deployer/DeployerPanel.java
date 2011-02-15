@@ -127,6 +127,14 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 	
 		return new Future(null);
 	}
+
+	/**
+	 *  Reset the properties.
+	 */
+	public IFuture resetProperties()
+	{
+		return new Future(null);
+	}
 	
 	//-------- helper classes --------
 	

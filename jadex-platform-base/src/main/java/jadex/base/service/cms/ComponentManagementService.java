@@ -214,279 +214,286 @@ public abstract class ComponentManagementService extends BasicService implements
 							public void customResultAvailable(Object result)
 							{
 								final IModelInfo lmodel = (IModelInfo)result;
-								factory.getComponentType(model, cinfo.getImports(), cl)
-									.addResultListener(new DelegationResultListener(inited)
+								if(lmodel.getReport()!=null)
 								{
-									public void customResultAvailable(Object result)
+									inited.setException(new RuntimeException("Errors loading model: "+model+"\n"+lmodel.getReport().getErrorText()));
+								}
+								else
+								{
+									factory.getComponentType(model, cinfo.getImports(), cl)
+										.addResultListener(new DelegationResultListener(inited)
 									{
-										final String type = (String)result;
-										
-										// Create id and adapter.
-										
-										final ComponentIdentifier cid;
-										synchronized(adapters)
+										public void customResultAvailable(Object result)
 										{
-											synchronized(descs)
-											{
-												if(name==null)
-												{
-													cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName());
-												}
-												else
-												{
-													cid = new ComponentIdentifier(name+"@"+((IComponentIdentifier)
-														exta.getServiceProvider().getId()).getPlatformName()); // Hack?!
-													if(adapters.containsKey(cid) || initinfos.containsKey(cid))
-													{
-														inited.setException(new RuntimeException("Component name already exists on platform: "+cid));
-														return;
-													}
-													// todo: hmm adresses may be set too late? use cached message service?
-													SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-														.addResultListener(new DefaultResultListener()
-													{
-														public void resultAvailable(Object result)
-														{
-															IMessageService	ms	= (IMessageService)result;
-															if(ms!=null)
-																cid.setAddresses(ms.getAddresses());
-														}
-													});
-												}
-//												System.out.println("create start3: "+model+" "+cinfo.getParent());
-											}		
-										}
-										
-										final IComponentAdapter pad = getParentAdapter(cinfo);
-										IExternalAccess parent = getComponentInstance(pad).getExternalAccess();
-										Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
-										Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
-										Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
-										final CMSComponentDescription ad = new CMSComponentDescription(cid, type, 
-											getParentIdentifier(cinfo), master, daemon, autosd, lmodel.getFullName());
-										
-//										System.err.println("Pre-Init: "+cid);
-										
-										Future future = new Future();
-										future.addResultListener(new IResultListener()
-										{
-											public void resultAvailable(Object result)
-											{
-//												System.err.println("Post-Init: "+cid);
-
-												// Create the component instance.
-												final IComponentAdapter adapter;
-												
-												synchronized(adapters)
-												{
-													synchronized(descs)
-													{
-//														System.out.println("created: "+ad);
-														
-														// Init successfully finished. Add description and adapter.
-														adapter = (IComponentAdapter)((Object[])result)[1];
-														
-														// Init finished. Set to suspended until parent registration is finished.
-														ad.setState(IComponentDescription.STATE_SUSPENDED);
-														
-														descs.put(cid, ad);
-//														System.out.println("adding cid: "+cid+" "+ad.getMaster()+" "+ad.getDaemon()+" "+ad.getAutoShutdown());
-														adapters.put(cid, adapter);
-														initinfos.remove(cid);
-														
-														CMSComponentDescription padesc;
-														Object[] painfo = getParentInfo(cinfo);
-														if(painfo!=null)
-														{
-															padesc = (CMSComponentDescription)painfo[0];
-														}
-														else
-														{
-															padesc = (CMSComponentDescription)descs.get(getParentIdentifier(cinfo));
-														}
-														padesc.addChild(cid);
-														
-														Boolean dae = ad.getDaemon();
-//														if(padesc.isAutoShutdown() && !ad.isDaemon())
-//														if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
-														// cannot check parent shutdown state because could be still uninited
-														if(dae==null || !dae.booleanValue())
-														{
-															Integer	childcount	= (Integer)childcounts.get(padesc.getName());
-															int cc = childcount!=null ? childcount.intValue()+1 : 1;
-															childcounts.put(padesc.getName(), new Integer(cc));
-//															System.out.println("childcount+:"+padesc.getName()+" "+cc);
-														}
-													}
-												}
-												
-												// Register component at parent.
-												getComponentInstance(pad).componentCreated(ad, lmodel)
-													.addResultListener(new IResultListener()
-												{
-													public void resultAvailable(Object result)
-													{
-//														System.err.println("Registered at parent: "+cid);
-														
-														// Registration finished -> reactivate component.
-														if(isInitSuspend(cinfo, lmodel))
-														{
-															ad.setState(IComponentDescription.STATE_SUSPENDED);
-														}
-														else
-														{
-															ad.setState(IComponentDescription.STATE_ACTIVE);
-														}
-														
-														// todo: can be called after listener has (concurrently) deregistered
-														// notify listeners without holding locks
-														ICMSComponentListener[] alisteners;
-														synchronized(listeners)
-														{
-															Set	slisteners	= new HashSet(listeners.getCollection(null));
-															slisteners.addAll(listeners.getCollection(cid));
-															alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
-														}
-														for(int i=0; i<alisteners.length; i++)
-														{
-															try
-															{
-																alisteners[i].componentAdded(ad);
-															}
-															catch(Exception e)
-															{
-																e.printStackTrace();
-															}
-														}
-																
-//																System.out.println("created: "+cid.getLocalName()+" "+(parent!=null?parent.getComponentIdentifier().getLocalName():"null"));
-//																System.out.println("added: "+descs.size()+", "+aid);
-														
-														if(killlistener!=null)
-															killresultlisteners.put(cid, killlistener);
-														
-														inited.setResult(cid);
-														
-														// Start regular execution of inited component.
-														if(cinfo.getSuspend()==null || !cinfo.getSuspend().booleanValue())
-														{
-															try
-															{
-//																System.out.println("cid wakeup: "+cid);
-																adapter.wakeup();
-															}
-															catch(Exception e)
-															{
-																e.printStackTrace();
-															}
-														}
-													}
-													
-													public void exceptionOccurred(Exception exception)
-													{
-														exception.printStackTrace();
-													}
-												});								
-											}
+											final String type = (String)result;
 											
-											public void exceptionOccurred(final Exception exception)
+											// Create id and adapter.
+											
+											final ComponentIdentifier cid;
+											synchronized(adapters)
 											{
-												exception.printStackTrace();
-//												System.out.println("Ex: "+cid+" "+exception);
-												final Runnable	cleanup	= new Runnable()
+												synchronized(descs)
 												{
-													public void run()
+													if(name==null)
 													{
-														CleanupCommand	cc	= null;
-														synchronized(adapters)
-														{
-															synchronized(descs)
-															{
-																adapters.remove(cid);
-																descs.remove(cid);
-																initinfos.remove(cid);		
-																if(exceptions!=null)
-																	exceptions.remove(cid);
-																cc	= (CleanupCommand)ccs.remove(cid);										
-															}
-														}
-														
-														IResultListener reslis = (IResultListener)killresultlisteners.remove(cid);
-														if(reslis!=null)
-														{
-															reslis.exceptionOccurred(exception);
-														}
-														
-														if(cc!=null && cc.killfutures!=null)
-														{
-															for(int i=0; i<cc.killfutures.size(); i++)
-															{
-																((Future)cc.killfutures.get(i)).setException(exception);
-															}
-														}
-														
-														inited.setException(exception);
+														cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName());
 													}
-												};
-												
-												IComponentIdentifier[]	children	= ad.getChildren();
-												if(children.length>0)
-												{
-													CounterResultListener	crl	= new CounterResultListener(children.length, true,
-														new IResultListener()
+													else
+													{
+														cid = new ComponentIdentifier(name+"@"+((IComponentIdentifier)
+															exta.getServiceProvider().getId()).getPlatformName()); // Hack?!
+														if(adapters.containsKey(cid) || initinfos.containsKey(cid))
+														{
+															inited.setException(new RuntimeException("Component name already exists on platform: "+cid));
+															return;
+														}
+														// todo: hmm adresses may be set too late? use cached message service?
+														SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+															.addResultListener(new DefaultResultListener()
 														{
 															public void resultAvailable(Object result)
 															{
-																cleanup.run();
+																IMessageService	ms	= (IMessageService)result;
+																if(ms!=null)
+																	cid.setAddresses(ms.getAddresses());
 															}
+														});
+													}
+	//												System.out.println("create start3: "+model+" "+cinfo.getParent());
+												}		
+											}
+											
+											final IComponentAdapter pad = getParentAdapter(cinfo);
+											IExternalAccess parent = getComponentInstance(pad).getExternalAccess();
+											Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
+											Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
+											Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
+											final CMSComponentDescription ad = new CMSComponentDescription(cid, type, 
+												getParentIdentifier(cinfo), master, daemon, autosd, lmodel.getFullName());
+											
+	//										System.err.println("Pre-Init: "+cid);
+											
+											Future future = new Future();
+											future.addResultListener(new IResultListener()
+											{
+												public void resultAvailable(Object result)
+												{
+	//												System.err.println("Post-Init: "+cid);
+	
+													// Create the component instance.
+													final IComponentAdapter adapter;
+													
+													synchronized(adapters)
+													{
+														synchronized(descs)
+														{
+	//														System.out.println("created: "+ad);
 															
-															public void exceptionOccurred(Exception exception)
+															// Init successfully finished. Add description and adapter.
+															adapter = (IComponentAdapter)((Object[])result)[1];
+															
+															// Init finished. Set to suspended until parent registration is finished.
+															ad.setState(IComponentDescription.STATE_SUSPENDED);
+															
+															descs.put(cid, ad);
+	//														System.out.println("adding cid: "+cid+" "+ad.getMaster()+" "+ad.getDaemon()+" "+ad.getAutoShutdown());
+															adapters.put(cid, adapter);
+															initinfos.remove(cid);
+															
+															CMSComponentDescription padesc;
+															Object[] painfo = getParentInfo(cinfo);
+															if(painfo!=null)
 															{
-																cleanup.run();
+																padesc = (CMSComponentDescription)painfo[0];
+															}
+															else
+															{
+																padesc = (CMSComponentDescription)descs.get(getParentIdentifier(cinfo));
+															}
+															padesc.addChild(cid);
+															
+															Boolean dae = ad.getDaemon();
+	//														if(padesc.isAutoShutdown() && !ad.isDaemon())
+	//														if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
+															// cannot check parent shutdown state because could be still uninited
+															if(dae==null || !dae.booleanValue())
+															{
+																Integer	childcount	= (Integer)childcounts.get(padesc.getName());
+																int cc = childcount!=null ? childcount.intValue()+1 : 1;
+																childcounts.put(padesc.getName(), new Integer(cc));
+	//															System.out.println("childcount+:"+padesc.getName()+" "+cc);
 															}
 														}
-													);
+													}
 													
-													for(int i=0; i<children.length; i++)
+													// Register component at parent.
+													getComponentInstance(pad).componentCreated(ad, lmodel)
+														.addResultListener(new IResultListener()
 													{
-														destroyComponent(children[i]).addResultListener(crl);
+														public void resultAvailable(Object result)
+														{
+	//														System.err.println("Registered at parent: "+cid);
+															
+															// Registration finished -> reactivate component.
+															if(isInitSuspend(cinfo, lmodel))
+															{
+																ad.setState(IComponentDescription.STATE_SUSPENDED);
+															}
+															else
+															{
+																ad.setState(IComponentDescription.STATE_ACTIVE);
+															}
+															
+															// todo: can be called after listener has (concurrently) deregistered
+															// notify listeners without holding locks
+															ICMSComponentListener[] alisteners;
+															synchronized(listeners)
+															{
+																Set	slisteners	= new HashSet(listeners.getCollection(null));
+																slisteners.addAll(listeners.getCollection(cid));
+																alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
+															}
+															for(int i=0; i<alisteners.length; i++)
+															{
+																try
+																{
+																	alisteners[i].componentAdded(ad);
+																}
+																catch(Exception e)
+																{
+																	e.printStackTrace();
+																}
+															}
+																	
+	//																System.out.println("created: "+cid.getLocalName()+" "+(parent!=null?parent.getComponentIdentifier().getLocalName():"null"));
+	//																System.out.println("added: "+descs.size()+", "+aid);
+															
+															if(killlistener!=null)
+																killresultlisteners.put(cid, killlistener);
+															
+															inited.setResult(cid);
+															
+															// Start regular execution of inited component.
+															if(cinfo.getSuspend()==null || !cinfo.getSuspend().booleanValue())
+															{
+																try
+																{
+	//																System.out.println("cid wakeup: "+cid);
+																	adapter.wakeup();
+																}
+																catch(Exception e)
+																{
+																	e.printStackTrace();
+																}
+															}
+														}
+														
+														public void exceptionOccurred(Exception exception)
+														{
+															exception.printStackTrace();
+														}
+													});								
+												}
+												
+												public void exceptionOccurred(final Exception exception)
+												{
+													exception.printStackTrace();
+	//												System.out.println("Ex: "+cid+" "+exception);
+													final Runnable	cleanup	= new Runnable()
+													{
+														public void run()
+														{
+															CleanupCommand	cc	= null;
+															synchronized(adapters)
+															{
+																synchronized(descs)
+																{
+																	adapters.remove(cid);
+																	descs.remove(cid);
+																	initinfos.remove(cid);		
+																	if(exceptions!=null)
+																		exceptions.remove(cid);
+																	cc	= (CleanupCommand)ccs.remove(cid);										
+																}
+															}
+															
+															IResultListener reslis = (IResultListener)killresultlisteners.remove(cid);
+															if(reslis!=null)
+															{
+																reslis.exceptionOccurred(exception);
+															}
+															
+															if(cc!=null && cc.killfutures!=null)
+															{
+																for(int i=0; i<cc.killfutures.size(); i++)
+																{
+																	((Future)cc.killfutures.get(i)).setException(exception);
+																}
+															}
+															
+															inited.setException(exception);
+														}
+													};
+													
+													IComponentIdentifier[]	children	= ad.getChildren();
+													if(children.length>0)
+													{
+														CounterResultListener	crl	= new CounterResultListener(children.length, true,
+															new IResultListener()
+															{
+																public void resultAvailable(Object result)
+																{
+																	cleanup.run();
+																}
+																
+																public void exceptionOccurred(Exception exception)
+																{
+																	cleanup.run();
+																}
+															}
+														);
+														
+														for(int i=0; i<children.length; i++)
+														{
+															destroyComponent(children[i]).addResultListener(crl);
+														}
+													}
+													else
+													{
+														cleanup.run();									
 													}
 												}
-												else
+											});
+											
+											// Create component and wakeup for init.
+											// Use first configuration if no config specified.
+											String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
+												: lmodel.getConfigurations().length>0 ? lmodel.getConfigurations()[0] : null;
+											Object[] comp = factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
+												config, cinfo.getArguments(), parent, future);
+											
+											// Store (invalid) desc, adapter and info for children
+											synchronized(adapters)
+											{
+												synchronized(descs)
 												{
-													cleanup.run();									
+													// 0: description, 1: adapter, 2: creation info, 3: model, 4: initfuture
+													initinfos.put(cid, new Object[]{ad, comp[1], cinfo, lmodel, future});
 												}
 											}
-										});
-										
-										// Create component and wakeup for init.
-										// Use first configuration if no config specified.
-										String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
-											: lmodel.getConfigurations().length>0 ? lmodel.getConfigurations()[0] : null;
-										Object[] comp = factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
-											config, cinfo.getArguments(), parent, future);
-										
-										// Store (invalid) desc, adapter and info for children
-										synchronized(adapters)
-										{
-											synchronized(descs)
+											
+											// Start the init procedure by waking up the adapter.
+											try
 											{
-												// 0: description, 1: adapter, 2: creation info, 3: model, 4: initfuture
-												initinfos.put(cid, new Object[]{ad, comp[1], cinfo, lmodel, future});
+												((IComponentAdapter)comp[1]).wakeup();
+											}
+											catch(Exception e)
+											{
+												inited.setException(e);
 											}
 										}
-										
-										// Start the init procedure by waking up the adapter.
-										try
-										{
-											((IComponentAdapter)comp[1]).wakeup();
-										}
-										catch(Exception e)
-										{
-											inited.setException(e);
-										}
-									}
-								});
+									});
+								}
 							}
 						});
 					}

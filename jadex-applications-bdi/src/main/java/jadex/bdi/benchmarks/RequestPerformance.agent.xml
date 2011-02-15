@@ -88,7 +88,7 @@
 
 	<properties>
         <!-- <property name="debugging">true</property> -->
-        <property name="logging.level">Level.INFO</property>
+        <property name="logging.level">Level.SEVERE</property>
     </properties>
 
 	<configurations>

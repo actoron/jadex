@@ -1,6 +1,8 @@
 package jadex.base.gui.filetree;
 
 
+import jadex.commons.SUtil;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -94,6 +96,14 @@ public class NodePath
 			ret	= getEntry()==other.getEntry() && Arrays.equals(getPath(), other.getPath());
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Get a string representation.
+	 */
+	public String	toString()
+	{
+		return "NodePath("+entry+": "+SUtil.arrayToString(path)+")";
 	}
 	
 	//-------- helper methods --------

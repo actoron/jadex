@@ -253,6 +253,14 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 	}
 
 	/**
+	 *  Reset the properties.
+	 */
+	public IFuture resetProperties()
+	{
+		return new Future(null);
+	}
+
+	/**
 	 *  Test if action is available in current context.
 	 *  @return True, if available.
 	 */

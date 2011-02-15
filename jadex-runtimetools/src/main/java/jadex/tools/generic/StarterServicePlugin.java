@@ -92,6 +92,15 @@ public class StarterServicePlugin extends AbstractServicePlugin
 	}
 	
 	/**
+	 *  Get the name.
+	 *  @return The name.
+	 */
+	public String getName()
+	{
+		return "Starter";
+	}
+
+	/**
 	 *  Create tool bar.
 	 *  @return The tool bar.
 	 */

@@ -59,4 +59,14 @@ public class DFServicePlugin extends AbstractServicePlugin
 	{
 		return selected? icons.getIcon("df_sel"): icons.getIcon("df");
 	}
+	
+	
+	/**
+	 *  Get the name.
+	 *  @return The name.
+	 */
+	public String getName()
+	{
+		return "Directory Facilitator";
+	}
 }

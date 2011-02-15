@@ -58,4 +58,13 @@ public class LibraryServicePlugin extends AbstractServicePlugin
 	{
 		return selected? icons.getIcon("library_sel"): icons.getIcon("library");
 	}
+	
+	/**
+	 *  Get the name.
+	 *  @return The name.
+	 */
+	public String getName()
+	{
+		return "Library Service";
+	}
 }

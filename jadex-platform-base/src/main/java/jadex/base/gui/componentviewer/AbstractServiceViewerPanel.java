@@ -74,7 +74,15 @@ public abstract class AbstractServiceViewerPanel implements IServiceViewerPanel
 	{
 		return new Future(0);
 	}
-	
+
+	/**
+	 *  Reset the properties.
+	 */
+	public IFuture resetProperties()
+	{
+		return new Future(null);
+	}
+
 	/**
 	 *  Get the jcc.
 	 *  @return the jcc.

@@ -25,9 +25,11 @@ import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -119,46 +121,53 @@ public class AwarenessAgent extends MicroAgent
 	 */
 	public void agentCreated()
 	{
+		initArguments();
+		
 		try
 		{
-			this.address = InetAddress.getByName((String)getArgument("address"));
-			if(address==null)
-				throw new NullPointerException("Cannot get address: "+getArgument("address"));
-			this.port = ((Number)getArgument("port")).intValue();
-			this.delay = ((Number)getArgument("delay")).longValue();
-			this.autocreate = ((Boolean)getArgument("autocreate")).booleanValue();
-			this.autodelete = ((Boolean)getArgument("autodelete")).booleanValue();
-			this.proxydelay = ((Number)getArgument("proxydelay")).longValue();
-			
-			this.includes	= new ArrayList();
-			StringTokenizer	stok	= new StringTokenizer((String)getArgument("includes"), ",");
-			while(stok.hasMoreTokens())
-			{
-				includes.add(stok.nextToken().trim());
-			}
-			
-			this.excludes	= new ArrayList();
-			stok	= new StringTokenizer((String)getArgument("excludes"), ",");
-			while(stok.hasMoreTokens())
-			{
-				excludes.add(stok.nextToken().trim());
-			}
-			
-			
-//			System.out.println("initial delay: "+delay);
-			
 			this.sendsocket = new MulticastSocket();
-//			System.out.println(socket.getLoopbackMode());
 			this.sendsocket.setLoopbackMode(true);
-			
-			this.discovered = new LinkedHashMap();
-			
-//			System.out.println(socket.getLoopbackMode());
 		}
-		catch(Exception e)
+		catch(IOException e)
 		{
-			e.printStackTrace();
 			throw new RuntimeException(e);
+		}
+		this.discovered = new LinkedHashMap();			
+	}
+	
+	/**
+	 *  Read arguments and set initial values. 
+	 */
+	protected void initArguments()
+	{
+		try
+		{
+			this.address = InetAddress.getByName((String)getArgument("address"));			
+		}
+		catch(UnknownHostException e)
+		{
+			throw new RuntimeException(e);
+		}
+		if(address==null)
+			throw new NullPointerException("Cannot get address: "+getArgument("address"));
+		this.port = ((Number)getArgument("port")).intValue();
+		this.delay = ((Number)getArgument("delay")).longValue();
+		this.autocreate = ((Boolean)getArgument("autocreate")).booleanValue();
+		this.autodelete = ((Boolean)getArgument("autodelete")).booleanValue();
+		this.proxydelay = ((Number)getArgument("proxydelay")).longValue();
+		
+		this.includes	= new ArrayList();
+		StringTokenizer	stok	= new StringTokenizer((String)getArgument("includes"), ",");
+		while(stok.hasMoreTokens())
+		{
+			includes.add(stok.nextToken().trim());
+		}
+		
+		this.excludes	= new ArrayList();
+		stok	= new StringTokenizer((String)getArgument("excludes"), ",");
+		while(stok.hasMoreTokens())
+		{
+			excludes.add(stok.nextToken().trim());
 		}
 	}
 	

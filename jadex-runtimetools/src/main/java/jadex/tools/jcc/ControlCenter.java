@@ -555,7 +555,7 @@ public class ControlCenter implements IControlCenter
 			{
 				try
 				{
-					plugin.reset();
+					plugin.resetProperties();
 				}
 				catch(Exception e)
 				{
@@ -609,7 +609,7 @@ public class ControlCenter implements IControlCenter
 			catch(Exception e)
 			{
 				 e.printStackTrace();
-				plugin.reset();
+				plugin.resetProperties();
 				final String failed = SUtil.wrapText("Error applying settings to plugin "
 					+ plugin.getName() + "\n\n" + e.getMessage());
 				SwingUtilities.invokeLater(new Runnable()
@@ -626,7 +626,7 @@ public class ControlCenter implements IControlCenter
 		{
 //			System.out.println("Plugin has no saved properties: "
 //					+ plugin.getName());
-			plugin.reset();
+			plugin.resetProperties();
 		}
 	}
 

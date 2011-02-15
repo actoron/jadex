@@ -122,8 +122,9 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	/**
 	 *  Reset the plugin.
 	 */
-	public void reset()
+	public IFuture resetProperties()
 	{
+		return new Future(null);
 	}
 	
 	//-------- internal create methods --------

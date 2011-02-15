@@ -8,15 +8,21 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.Properties;
+import jadex.commons.Property;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.jtable.DateTimeRenderer;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.library.ILibraryService;
 import jadex.micro.IMicroExternalAccess;
 import jadex.xml.annotation.XMLClassname;
 import jadex.xml.annotation.XMLIncludeFields;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -54,6 +60,11 @@ import javax.swing.table.AbstractTableModel;
  */
 public class AwarenessAgentPanel implements IComponentViewerPanel
 {
+	//-------- constants --------
+	
+	/** The property key for the settings object. */
+	public static final String	PROPERTY_SETTINGS	= "settings";
+	
 	//-------- attributes --------
 	
 	/** The jcc. */
@@ -71,27 +82,36 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/** The latest settings of the agent. */
 	protected AwarenessSettings	settings;
 	
+	/** The IP address text field. */
 	protected JTextField	tfipaddress;
 
+	/** The port text field. */
 	protected JTextField	tfport;
 
+	/** The delay spinner. */
 	protected JSpinner	spdelay;
 
+	/** The auto create check box. */
 	protected JCheckBox	cbautocreate;
 
+	/** The auto delete check box. */
 	protected JCheckBox	cbautodelete;
 
+	/** The refresh delay spinner. */
 	protected JSpinner	sprefresh;
 	
+	/** The proxy refresh delay spinner. */
 	protected JSpinner	spprorefresh;
 
-	protected JPanel panel;
-	
+	/** The includes list. */
 	protected EditableList	includes;
 	
+	/** The excludes list. */
 	protected EditableList	excludes;
 	
-	
+	/** The complete awareness panel. */
+	protected JPanel panel;
+		
 	//-------- methods --------
 	
 	/**
@@ -170,12 +190,8 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
 		y++;
 		
-//		final JCheckBox	cbauto	= new JCheckBox("Auto apply settings");
-//		cbauto.setToolTipText("Apply changes automatically after edit.");
 		final JButton buapply = new JButton("Apply");
-//		buapply.setMargin(new Insets(0,0,0,0));
 		buapply.setToolTipText("Apply setting changes.");
-//		busetaddr.setBorder(null);
 		buapply.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent ae)
@@ -202,26 +218,12 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				refreshSettings();
 			}
 		});
-//		cbauto.addChangeListener(new ChangeListener()
-//		{
-//			public void stateChanged(ChangeEvent e)
-//			{
-//				buapply.setEnabled(!cbauto.isSelected());
-//				bucancel.setEnabled(!cbauto.isSelected());
-//				if(cbauto.isSelected())
-//				{
-//					cbauto.setSelected(false);
-//					throw new UnsupportedOperationException("todo: not yet implemented.");
-//				}
-//			}
-//		});
 
 		buapply.setPreferredSize(burefresh.getPreferredSize());
 		buapply.setMinimumSize(burefresh.getMinimumSize());
 		bucancel.setPreferredSize(burefresh.getPreferredSize());
 		bucancel.setMinimumSize(burefresh.getMinimumSize());
 		JPanel pbuts = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-//		pbuts.add(cbauto);
 		pbuts.add(burefresh);
 		pbuts.add(buapply);
 		pbuts.add(bucancel);
@@ -243,7 +245,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-//				System.out.println("update: "+this+" "+System.currentTimeMillis());
 				updateDiscoveryInfos(jtdis);
 			}
 		});
@@ -350,8 +351,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		gbc.gridy	= 1;
 		gbc.weighty	= 0.5;
 		gbc.insets	= new Insets(2,2,2,2);
-//		panel.add(includes, gbc);
-//		panel.add(excludes, gbc);
 		panel.add(new JScrollPane(includes), gbc);
 		panel.add(new JScrollPane(excludes), gbc);
 		gbc.insets	= new Insets(0,0,0,0);
@@ -370,24 +369,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		
 		gbc.weighty	= 0;
 		panel.add(pbobuts, gbc);
-		
-//		GridBagConstraints	gbc	= new GridBagConstraints();
-//		gbc.gridy	= 0;
-//		gbc.weightx	= 1;
-//		gbc.weighty	= 0;
-//		gbc.fill	= GridBagConstraints.BOTH;
-//		panel.add(pdissettings, gbc);
-//		panel.add(pprosettings, gbc);
-//		gbc.gridy	= 1;
-//		gbc.gridwidth	= GridBagConstraints.REMAINDER;
-//		panel.add(pbuts, gbc);
-//		gbc.gridy	= 2;
-//		gbc.weighty	= 1;
-//		panel.add(pdisinfos, gbc);
-//		gbc.gridy	= 3;
-//		gbc.weighty	= 0;
-//		panel.add(pbobuts, gbc);
-
 		
 		return refreshSettings();
 	}
@@ -424,7 +405,28 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	public IFuture setProperties(Properties ps)
 	{
-		return new Future(null);
+		final Future	ret	= new Future();
+		final Property	settings	= ps.getProperty(PROPERTY_SETTINGS);
+		if(settings!=null)
+		{
+			SServiceProvider.getService(jcc.getExternalAccess().getServiceProvider(), ILibraryService.class)
+				.addResultListener(new SwingDelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+					ILibraryService	ls	= (ILibraryService)result;
+					updateSettings((AwarenessSettings)JavaReader.objectFromXML(settings.getValue(), ls.getClassLoader()));
+					applySettings();
+					ret.setResult(null);
+				}
+			});
+		}
+		else
+		{
+			resetProperties().addResultListener(new SwingDelegationResultListener(ret));
+		}
+		
+		return ret;
 	}
 
 	/**
@@ -433,7 +435,52 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	public IFuture getProperties()
 	{
-		return new Future(null);
+		final Future	ret	= new Future();
+		if(settings!=null)
+		{
+			SServiceProvider.getService(jcc.getExternalAccess().getServiceProvider(), ILibraryService.class)
+				.addResultListener(new SwingDelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+					ILibraryService	ls	= (ILibraryService)result;
+					Properties	props	= new Properties();
+					props.addProperty(new Property(PROPERTY_SETTINGS, JavaWriter.objectToXML(settings, ls.getClassLoader())));
+					ret.setResult(props);
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(new Properties());
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Reset state to default values.
+	 */
+	public IFuture resetProperties()
+	{
+		final Future	ret	= new Future();
+		component.scheduleStep(new IComponentStep()
+		{
+			@XMLClassname("resetSettings")
+			public Object execute(IInternalAccess ia)
+			{
+				AwarenessAgent agent = (AwarenessAgent)ia;
+				agent.initArguments();
+				return null;
+			}
+		}).addResultListener(new SwingDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				refreshSettings().addResultListener(new DelegationResultListener(ret));
+			}
+		});
+		return ret;
 	}
 	
 	/**

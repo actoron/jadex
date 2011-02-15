@@ -27,12 +27,7 @@ public interface IControlCenterPlugin extends IPropertiesProvider
 	 *  Informs the plugin that it should stop all its computation
 	 */
 	public void shutdown();
-	
-	/**
-	 *  Should reset the plugin to an initial state.
-	 */
-	public void reset();
-	
+		
 	/**
 	 *  Return the unique name of this plugin.
 	 *  This method may be called before init().
@@ -67,16 +62,4 @@ public interface IControlCenterPlugin extends IPropertiesProvider
 	 *  Create a tool bar containing the items that should be added to the JCC tool bar. 
 	 */
 	public JComponent[] getToolBar();
-
-//	/**
-//	 *  Advices the the plugin to restore its properties from the argument
-//	 */
-//	public IFuture setProperties(Properties ps);
-//
-//	/**
-//	 *  Advices the plugin to store its properties in the argument This is done
-//	 *  on project close or save.
-//	 */
-//	public IFuture getProperties();
-
 }

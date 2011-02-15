@@ -103,7 +103,15 @@ public class DeploymentServiceViewerPanel implements IServiceViewerPanel
 	{
 		return ftp.getProperties();
 	}
-	
+
+	/**
+	 *  Reset the properties.
+	 */
+	public IFuture resetProperties()
+	{
+		return new Future(null);
+	}
+
 	/**
 	 *  Shutdown the panel.
 	 */ 

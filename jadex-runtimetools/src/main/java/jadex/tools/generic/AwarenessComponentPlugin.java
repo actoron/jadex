@@ -32,6 +32,16 @@ public class AwarenessComponentPlugin extends AbstractComponentPlugin
 		return "jadex.base.service.awareness.Awareness";
 	}
 	
+	
+	/**
+	 *  Get the name.
+	 *  @return The name.
+	 */
+	public String getName()
+	{
+		return "Awareness Settings";
+	}
+	
 	/**
 	 *  Create the component panel.
 	 */

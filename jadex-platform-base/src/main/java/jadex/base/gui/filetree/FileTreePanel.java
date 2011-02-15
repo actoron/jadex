@@ -430,6 +430,14 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		
 		return ret;
 	}
+	
+	/**
+	 *  Reset the properties.
+	 */
+	public IFuture resetProperties()
+	{
+		return new Future(null);
+	}
 
 	/**
 	 *  Update tool from given properties.

@@ -261,4 +261,12 @@ class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor, IPrope
 		}
 		return new Future();
 	}
+	
+	/**
+	 *  Reset the properties.
+	 */
+	public IFuture resetProperties()
+	{
+		return new Future(null);
+	}
 }

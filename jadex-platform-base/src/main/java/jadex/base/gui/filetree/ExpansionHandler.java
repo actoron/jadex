@@ -4,11 +4,13 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.TreeExpansionHandler;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.JTree;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 /**
@@ -65,7 +67,48 @@ public class ExpansionHandler extends TreeExpansionHandler
 	public void	setExpandedPaths(NodePath[]	paths)
 	{
 		this.expandedpaths	= new HashSet();
-		expandedpaths.addAll(Arrays.asList(paths));
+		
+		// Check if paths can be expanded on the fly
+		// and add remaining paths.
+		TreeModel	model	= tree.getModel();
+		for(int i=0; i<paths.length; i++)
+		{
+			boolean	found	= false;
+			if(model.getChildCount(model.getRoot())>paths[i].entry)
+			{
+				Object	node	= model.getChild(model.getRoot(), paths[i].entry);
+				List	treepath	= new ArrayList();
+				treepath.add(model.getRoot());
+				treepath.add(node);
+				String[]	path	= paths[i].getPath();
+				found	= true;
+				for(int j=0; found && j<path.length; j++)
+				{
+					found	= false;
+					for(int k=0; !found && k<model.getChildCount(node); k++)
+					{
+						Object	child	= model.getChild(node, k);
+						if(child instanceof FileNode
+							&& path[j].equals(((FileNode)child).getFile().getName()))
+						{
+							found	= true;
+							node	= child;
+							treepath.add(child);
+						}
+					}
+				}
+				
+				if(found)
+				{
+					expanded.add(node);
+					handlePath(new TreePath(treepath.toArray()));
+				}
+			}
+			if(!found)
+			{
+				expandedpaths.add(paths[i]);
+			}
+		}
 	}
 
 	/**

@@ -17,4 +17,9 @@ public interface IPropertiesProvider
 	 *  Write current state into properties.
 	 */
 	public IFuture getProperties();
+	
+	/**
+	 *  Reset state to default values.
+	 */
+	public IFuture resetProperties();
 }

@@ -267,6 +267,14 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 		
 		return new Future(null);
 	}
+	
+	/**
+	 *  Reset the properties.
+	 */
+	public IFuture resetProperties()
+	{
+		return new Future(null);
+	}
 
 	/**
 	 *  Advices the panel provide its setting as properties (if any).

@@ -97,7 +97,7 @@ public abstract class AbstractSelectorPanel extends JPanel implements IPropertie
 		    public Component getListCellRendererComponent(JList list, 
 		    	Object value, int index, boolean isSelected, boolean cellHasFocus) 
 		    {
-		    	this.setText(value!=null? convertToString(value): null);
+		    	value	= value!=null? convertToString(value): null;
 		    	return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 		    }
 		});
@@ -147,7 +147,8 @@ public abstract class AbstractSelectorPanel extends JPanel implements IPropertie
 						public void customResultAvailable(Object result)
 						{
 							final IAbstractViewerPanel panel = (IAbstractViewerPanel)result;
-							panel.setProperties(props!=null? props.getSubproperty(PANELPROPERTIES): new Properties())
+							Properties	p	= props!=null? props.getSubproperty(PANELPROPERTIES): null;
+							panel.setProperties(p!=null ? p : new Properties())
 								.addResultListener(new SwingDefaultResultListener()
 							{
 								public void customResultAvailable(Object result)
@@ -323,7 +324,15 @@ public abstract class AbstractSelectorPanel extends JPanel implements IPropertie
 //		System.out.println("props: "+props);
 		return ret;
 	}
-	
+
+	/**
+	 *  Reset the properties.
+	 */
+	public IFuture resetProperties()
+	{
+		return new Future(null);
+	}
+
 	/**
 	 *  Add a subproperties to a properties.
 	 */

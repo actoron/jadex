@@ -63,6 +63,7 @@ public abstract class AbstractComponentViewerPanel implements IComponentViewerPa
 	 */
 	public IFuture setProperties(Properties ps)
 	{
+		System.out.println("Warning: setProperties not implemented "+getClass());
 		return new Future(null);
 	}
 
@@ -72,6 +73,16 @@ public abstract class AbstractComponentViewerPanel implements IComponentViewerPa
 	 */
 	public IFuture getProperties()
 	{
+		System.out.println("Warning: getProperties not implemented "+getClass());
+		return new Future(null);
+	}
+	
+	/**
+	 *  Reset to default state.
+	 */
+	public IFuture resetProperties()
+	{
+		System.out.println("Warning: resetProperties not implemented "+getClass());
 		return new Future(null);
 	}
 	

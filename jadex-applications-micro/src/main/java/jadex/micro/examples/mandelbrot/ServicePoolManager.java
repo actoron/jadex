@@ -1,5 +1,6 @@
 package jadex.micro.examples.mandelbrot;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IIntermediateFuture;
@@ -225,11 +226,11 @@ public class ServicePoolManager
 						timer	= null;
 					}
 					
-					// Shouldn't happen.
-					exception.printStackTrace();
-					
-					// In any case, create new services when there are remaining tasks.
-					createServices();
+					// If component still active, create new services when there are remaining tasks.
+					if(!(exception instanceof ComponentTerminatedException))
+					{
+						createServices();
+					}
 				}
 				
 				public void resultAvailable(Object result)
