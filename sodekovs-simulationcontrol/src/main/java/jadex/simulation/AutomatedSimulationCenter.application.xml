@@ -9,6 +9,11 @@
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="AutomatedSimulationCenter" package="jadex.simulation">
 
+
+	<imports>
+		<import>deco4mas.coordinate.environment.CoordinationSpace</import>
+	</imports>
+	
 	<componenttypes>
 		<componenttype name="SimulationManager"
 			filename="jadex/simulation/master/SimulationManager.agent.xml" />

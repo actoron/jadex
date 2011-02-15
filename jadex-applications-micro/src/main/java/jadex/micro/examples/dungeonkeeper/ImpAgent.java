@@ -10,7 +10,7 @@ import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 
 import java.util.HashMap;
