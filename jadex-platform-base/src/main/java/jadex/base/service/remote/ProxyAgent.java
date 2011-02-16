@@ -63,15 +63,6 @@ public class ProxyAgent extends MicroAgent
 	//-------- methods --------
 	
 	/**
-	 *  Initialize the agent.
-	 */
-	public IFuture	agentCreated()
-	{
-		this.rcid	= (IComponentIdentifier)getArgument("component");
-		return IFuture.DONE;
-	}
-
-	/**
 	 *  Dispose handler to trigger remote listener removal on next update.
 	 */
 	public IFuture	agentKilled()
@@ -94,7 +85,10 @@ public class ProxyAgent extends MicroAgent
 	 */
 	public IServiceContainer createServiceContainer()
 	{
-		return new RemoteServiceContainer(getRemotePlatformIdentifier(), getAgentAdapter());
+		// Hack!!! Can not be done in agentCreated, because service container is created first. 
+		this.rcid	= (IComponentIdentifier)getArgument("component");
+		
+		return new RemoteServiceContainer(rcid, getAgentAdapter());
 	}
 	
 	/**
