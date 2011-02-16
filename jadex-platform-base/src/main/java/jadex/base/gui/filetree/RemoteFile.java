@@ -1,6 +1,7 @@
 package jadex.base.gui.filetree;
 
 import jadex.base.gui.filechooser.MyFile;
+import jadex.commons.SUtil;
 
 import java.io.File;
 
@@ -28,6 +29,9 @@ public class RemoteFile
 	/** The display name. */
 	protected String displayname;
 
+//	/** The flag if is root dir. */
+//	protected boolean root;
+	
 	//-------- constructors --------
 
 	/**
@@ -41,12 +45,13 @@ public class RemoteFile
 	/**
 	 *  Create a new remote file.
 	 */
-	public RemoteFile(String filename, String path, boolean directory, String displayname)
+	public RemoteFile(String filename, String path, boolean directory, String displayname)//, boolean root)
 	{
 		this.filename = filename;
 		this.path = path;
 		this.directory = directory;
 		this.displayname = displayname;
+//		this.root = root;
 	}
 	
 	/**
@@ -58,6 +63,7 @@ public class RemoteFile
 		this.path = file.getAbsolutePath();
 		this.directory = file.isDirectory();
 		this.displayname = getDisplayName(file);
+//		this.root = SUtil.arrayToSet(file.listRoots()).contains(file);
 	}
 	
 	//-------- methods --------
@@ -147,6 +153,24 @@ public class RemoteFile
 		return ret;
 	}
 	
+//	/**
+//	 *  Get the root.
+//	 *  @return the root.
+//	 */
+//	public boolean isRoot()
+//	{
+//		return root;
+//	}
+//
+//	/**
+//	 *  Set the root.
+//	 *  @param root The root to set.
+//	 */
+//	public void setRoot(boolean root)
+//	{
+//		this.root = root;
+//	}
+
 	/**
 	 *  Convert remote files to files.
 	 */

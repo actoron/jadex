@@ -18,6 +18,11 @@ import javax.swing.filechooser.FileSystemView;
 public class DefaultIconCache implements IIconCache
 {
 	//-------- constants --------
+
+	/** The default folder icon name. */
+	public static final String DEFAULT_FOLDER = "default_folder";
+	
+	//-------- attributes --------
 	
 	/** The icon map. */
 	protected Map icons = new HashMap();
@@ -34,6 +39,7 @@ public class DefaultIconCache implements IIconCache
 		if(node instanceof FileNode)
 		{
 			File file = ((FileNode)node).getFile();
+			boolean isroot = SUtil.arrayToSet(file.listRoots()).contains(file);
 			
 			File tmp = null;
 			try
@@ -49,6 +55,11 @@ public class DefaultIconCache implements IIconCache
 						ret = (Icon)icons.get(suffix);
 					}
 				}
+				else if(file.isDirectory() && !isroot)
+				{
+					ret = (Icon)icons.get(DEFAULT_FOLDER);
+				}
+					
 				
 				if(ret==null)
 				{
@@ -60,8 +71,9 @@ public class DefaultIconCache implements IIconCache
 					}
 					else
 					{
-						// Case normal file 
+						// Case normal file or root drive
 						if((file.exists() && file.canRead()) || SUtil.arrayToSet(file.listRoots()).contains(file))
+//						if(suffix.length()>0 || SUtil.arrayToSet(file.listRoots()).contains(file))
 						{
 							ret = FileSystemView.getFileSystemView().getSystemIcon(file);  
 						}
@@ -75,9 +87,12 @@ public class DefaultIconCache implements IIconCache
 					}
 				}
 				
-				if(ret!=null && suffix.length()>0)
+				if(ret!=null)
 				{
-					icons.put(suffix, ret);
+					if(suffix.length()==0 && !isroot)
+						suffix = DEFAULT_FOLDER;
+					if(suffix.length()>0 && !icons.containsKey(suffix))
+						icons.put(suffix, ret);
 				}
 			}
 			catch(Exception e)
@@ -105,6 +120,10 @@ public class DefaultIconCache implements IIconCache
 					ret = (Icon)icons.get(suffix);
 				}
 			}
+			else if(file.isDirectory())
+			{
+				ret = (Icon)icons.get(DEFAULT_FOLDER);
+			}
 			
 			if(ret==null)
 			{
@@ -114,8 +133,12 @@ public class DefaultIconCache implements IIconCache
 					// Case dir and dir in Jar
 					if(suffix.length()==0)// && !((JarAsDirectory)file).isRoot())
 					{
-						tmp = new MyFile(file.getFilename(), "", true);
-						ret = FileSystemView.getFileSystemView().getSystemIcon(tmp);  
+						ret = (Icon)icons.get(DEFAULT_FOLDER);
+						if(ret==null)
+						{
+							tmp = new MyFile(file.getFilename(), "", true);
+							ret = FileSystemView.getFileSystemView().getSystemIcon(tmp); 
+						}
 					}
 					else
 					{
@@ -132,6 +155,14 @@ public class DefaultIconCache implements IIconCache
 				{
 					if(tmp!=null)
 						tmp.delete();
+				}
+				
+				if(ret!=null)
+				{
+					if(suffix.length()==0)
+						suffix = DEFAULT_FOLDER;
+					if(suffix.length()>0 && !icons.containsKey(suffix))
+						icons.put(suffix, ret);
 				}
 			}
 			
