@@ -31,25 +31,73 @@ public class DefaultIconCache implements IIconCache
 	{
 		Icon	ret	= null;
 		
-		File file = null;
-		
 		if(node instanceof FileNode)
 		{
-			file = ((FileNode)node).getFile();
+			File file = ((FileNode)node).getFile();
+			
+			File tmp = null;
+			try
+			{
+				String suffix = "";
+				if(!file.isDirectory() || (file instanceof JarAsDirectory && ((JarAsDirectory)file).isRoot()))
+				{
+					String name = file.getName();
+					int idx = name.lastIndexOf(".");
+					if(idx!=-1)
+					{
+						suffix = name.substring(idx);
+						ret = (Icon)icons.get(suffix);
+					}
+				}
+				
+				if(ret==null)
+				{
+					// Case dir in Jar
+					if(file instanceof JarAsDirectory && suffix.length()==0)// && !((JarAsDirectory)file).isRoot())
+					{
+						tmp = new MyFile(file.getName(), "", true);
+						ret = FileSystemView.getFileSystemView().getSystemIcon(tmp);  
+					}
+					else
+					{
+						// Case normal file 
+						if((file.exists() && file.canRead()) || SUtil.arrayToSet(file.listRoots()).contains(file))
+						{
+							ret = FileSystemView.getFileSystemView().getSystemIcon(file);  
+						}
+						// Case virtual file with suffix
+						else
+						{
+	//						tmp = new MyFile("icon", suffix, file.isDirectory());
+							tmp = File.createTempFile("icon", suffix);
+							ret = FileSystemView.getFileSystemView().getSystemIcon(tmp);  
+						}
+					}
+				}
+				
+				if(ret!=null && suffix.length()>0)
+				{
+					icons.put(suffix, ret);
+				}
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+			finally
+			{
+				if(tmp!=null)
+					tmp.delete();
+			}
 		}
 		else if(node instanceof RemoteFileNode)
 		{
-			RemoteFile rf = ((RemoteFileNode)node).getRemoteFile();
-			file = new MyFile(rf.getFilename(), rf.getPath(), rf.isDirectory());
-		}
-		
-		File tmp = null;
-		try
-		{
+			RemoteFile file = ((RemoteFileNode)node).getRemoteFile();
+
 			String suffix = "";
-			if(!file.isDirectory() || (file instanceof JarAsDirectory && ((JarAsDirectory)file).isRoot()))
+			if(!file.isDirectory())
 			{
-				String name = file.getName();
+				String name = file.getFilename();
 				int idx = name.lastIndexOf(".");
 				if(idx!=-1)
 				{
@@ -60,41 +108,36 @@ public class DefaultIconCache implements IIconCache
 			
 			if(ret==null)
 			{
-				if(file instanceof JarAsDirectory && suffix.length()==0)// && !((JarAsDirectory)file).isRoot())
+				File tmp = null;
+				try
 				{
-					tmp = new MyFile(file.getName(), "", true);
-					ret = FileSystemView.getFileSystemView().getSystemIcon(tmp);  
-				}
-				else
-				{
-					if((file.exists() && file.canRead()) || SUtil.arrayToSet(file.listRoots()).contains(file))
+					// Case dir and dir in Jar
+					if(suffix.length()==0)// && !((JarAsDirectory)file).isRoot())
 					{
-						ret = FileSystemView.getFileSystemView().getSystemIcon(file);  
+						tmp = new MyFile(file.getFilename(), "", true);
+						ret = FileSystemView.getFileSystemView().getSystemIcon(tmp);  
 					}
 					else
 					{
-//						tmp = new MyFile("icon", suffix, file.isDirectory());
+						// Case virtual file with suffix
 						tmp = File.createTempFile("icon", suffix);
 						ret = FileSystemView.getFileSystemView().getSystemIcon(tmp);  
 					}
 				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+				finally
+				{
+					if(tmp!=null)
+						tmp.delete();
+				}
 			}
 			
-			if(ret!=null && suffix.length()>0)
-			{
-				icons.put(suffix, ret);
-			}
+//			file = new MyFile(rf.getFilename(), rf.getPath(), rf.isDirectory());
 		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			if(tmp!=null)
-				tmp.delete();
-		}
-
+		
 		return ret;
 	}
 }

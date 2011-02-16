@@ -38,6 +38,12 @@ public interface IDeploymentService extends IService
 	public IFuture deleteFile(String path);
 	
 	/**
+	 *  Open a file.
+	 *  @param path The filename to open.
+	 */
+	public IFuture openFile(String path);
+	
+	/**
 	 *  Get the root devices.
 	 *  @return The root device files.
 	 */

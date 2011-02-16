@@ -42,7 +42,7 @@ public class DirNode extends FileNode
 		IIconCache iconcache, IRemoteFilter filter, INodeFactory factory)
 	{
 		super(parent, model, tree, file, iconcache);
-		assert file.isDirectory();
+//		assert file.isDirectory(): file;
 		this.filter = filter;
 		this.factory = factory;
 //		System.out.println("node: "+getClass()+" "+desc.getName());
@@ -75,7 +75,7 @@ public class DirNode extends FileNode
 				for(Iterator it=files.iterator(); it.hasNext();)
 				{
 					File file = (File)it.next();
-					ITreeNode node = getModel().getNode(file);
+					ITreeNode node = getModel().getNode(file);//.getAbsolutePath());
 					if(node!=null)
 					{
 //						lis.resultAvailable(node);

@@ -58,7 +58,8 @@ public class FileNode	extends AbstractTreeNode
 	 */
 	public Object	getId()
 	{
-		return file;
+		// cannot use getAbsolutePath() due to JarAsDirectory, which produces file:jar:...
+		return file;//.getAbsolutePath();
 	}
 
 	/**

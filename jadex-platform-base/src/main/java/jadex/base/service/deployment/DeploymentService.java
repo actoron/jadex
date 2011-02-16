@@ -6,6 +6,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
 
+import java.awt.Desktop;
 import java.io.File;
 
 /**
@@ -124,8 +125,45 @@ public class DeploymentService extends BasicService implements IDeploymentServic
 	 */
 	public IFuture getRoots()
 	{
-		Future ret = new Future();
 		File[] roots = File.listRoots();
 		return new Future(RemoteFile.convertToRemoteFiles(roots));
+	}
+	
+	/**
+	 *  Execute a file.
+	 *  @param path The filename to execute.
+	 */
+	public IFuture openFile(String path)
+	{
+		Future ret = new Future();
+		try
+		{
+			File file = new File(path);
+			Desktop.getDesktop().open(file);
+			// exec produces strange exceptions?!
+//			Runtime.getRuntime().exec(path);
+			ret.setResult(null);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			ret.setException(e);
+		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public static void main(String[] args)
+	{
+		try
+		{
+			Runtime.getRuntime().exec("notepad.exe");
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 }

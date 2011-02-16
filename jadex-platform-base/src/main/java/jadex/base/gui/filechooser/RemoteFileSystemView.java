@@ -472,7 +472,7 @@ public class RemoteFileSystemView extends FileSystemView
 	/**
 	 * Gets the list of shown (i.e. not hidden) files.
 	 */
-	public File[] getFiles(final File dir, boolean useFileHiding)
+	public File[] getFiles(final File dir, final boolean useFileHiding)
 	{
 		File[] ret = (File[])children.get(dir.getAbsolutePath());
 		
@@ -486,7 +486,7 @@ public class RemoteFileSystemView extends FileSystemView
 				{
 					File dir = new File(mydir.getPath());
 					FileSystemView view = FileSystemView.getFileSystemView();
-					File[] files = view.getFiles(dir, false); // todo: useFileHandling
+					File[] files = view.getFiles(dir, useFileHiding);
 					return RemoteFile.convertToRemoteFiles(files);
 				}
 			}).addResultListener(new SwingDefaultResultListener()

@@ -247,17 +247,58 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 					if(sel!=null)
 					{
 						String name = JOptionPane.showInputDialog("New name: ");
+						if(name==null || name.length()==0)
+						{
+							jcc.setStatusText("Cannot rename to empty name.");
+						}
+						else
+						{
+							IDeploymentService ds = first.getDeploymentService();
+							ds.renameFile(sel, name).addResultListener(new SwingDefaultResultListener()
+							{
+								public void customResultAvailable(Object result)
+								{
+									first.refreshTreePaths(new TreePath[]{tp.getParentPath()});
+									jcc.setStatusText("Renamed: "+sel);
+								}
+								public void customExceptionOccurred(Exception exception) 
+								{
+									jcc.setStatusText("Could not rename: "+sel+" reason: "+exception.getMessage());
+								}
+							});
+						}
+					}
+				}
+			}
+			
+			public boolean isEnabled()
+			{
+				return first!=null && first.getSelectedTreePath()!=null;
+			}
+		};
+		
+		AbstractAction open = new AbstractAction("Open file")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if(first!=null)
+				{
+					final TreePath tp = first.getSelectedTreePath();
+					final String sel = first.getSelectedPath();
+					
+					if(sel!=null)
+					{
 						IDeploymentService ds = first.getDeploymentService();
-						ds.renameFile(sel, name).addResultListener(new SwingDefaultResultListener()
+						ds.openFile(sel).addResultListener(new SwingDefaultResultListener()
 						{
 							public void customResultAvailable(Object result)
 							{
 								first.refreshTreePaths(new TreePath[]{tp.getParentPath()});
-								jcc.setStatusText("Renamed: "+sel);
+								jcc.setStatusText("Opened: "+sel);
 							}
 							public void customExceptionOccurred(Exception exception) 
 							{
-								jcc.setStatusText("Could not rename: "+sel);
+								jcc.setStatusText("Could not open: "+sel+" reason: "+exception.getMessage());
 							}
 						});
 					}
@@ -285,7 +326,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 		 */
 		public Action[]	getPopupActions(ITreeNode[] nodes)
 		{
-			return new Action[]{copy, del, rename};
+			return new Action[]{copy, del, rename, open};
 		}
 
 		/**
