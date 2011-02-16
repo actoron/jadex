@@ -10,6 +10,7 @@ import java.io.File;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileSystemView;
 
 /**
@@ -178,5 +179,14 @@ public class FileNode	extends AbstractTreeNode
 		return ret;
 	}
 	
+	/**
+	 *  Check if the node is a leaf.
+	 */
+	public boolean	isLeaf()
+	{
+		assert SwingUtilities.isEventDispatchThread();
+
+		return true;
+	}
 	
 }

@@ -1,5 +1,6 @@
 package jadex.base.gui.filetree;
 
+import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.commons.IRemoteFilter;
@@ -18,6 +19,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
+import javax.swing.tree.TreePath;
 
 /**
  *  Node object representing a service container.
@@ -56,6 +59,9 @@ public class DirNode extends FileNode
 	 */
 	protected void	searchChildren()
 	{
+//		if(toString().indexOf("D:")!=-1)
+//			System.out.println("here");
+		
 		listFiles().addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
@@ -136,6 +142,25 @@ public class DirNode extends FileNode
 			}
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Refresh the node.
+	 */
+	public void refresh(boolean recurse)
+	{
+		if(tree.isExpanded(new TreePath(model.buildTreePath(this).toArray())))
+			super.refresh(recurse);
+	}
+	
+	/**
+	 *  Check if the node is a leaf.
+	 */
+	public boolean	isLeaf()
+	{
+		assert SwingUtilities.isEventDispatchThread();
+
+		return false;
 	}
 	
 	/**

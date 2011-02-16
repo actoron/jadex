@@ -4,6 +4,7 @@ import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IRemoteFilter;
+import jadex.commons.SUtil;
 
 import java.io.File;
 
@@ -27,7 +28,7 @@ public class DefaultNodeFactory implements INodeFactory
 		if(value instanceof File)
 		{
 			File file = (File)value;
-			if(file.isDirectory())
+			if(file.isDirectory() || SUtil.arrayToSet(file.listRoots()).contains(file))
 			{
 				ret = new DirNode(parent, model, tree, file, iconcache, filter, factory);
 			}
