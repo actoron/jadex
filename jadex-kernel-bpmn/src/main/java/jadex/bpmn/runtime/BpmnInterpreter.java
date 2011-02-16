@@ -1362,7 +1362,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	 */
 	public IFuture	componentCreated(IComponentDescription desc, IModelInfo model)
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**
@@ -1373,7 +1373,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	 */
 	public IFuture	componentDestroyed(IComponentDescription desc)
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**

@@ -17,7 +17,6 @@ import jadex.commons.service.SServiceProvider;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,7 +31,6 @@ import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.filechooser.FileSystemView;
 import javax.swing.tree.TreeModel;
 
 /**
@@ -267,6 +265,6 @@ class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor, IPrope
 	 */
 	public IFuture resetProperties()
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 }

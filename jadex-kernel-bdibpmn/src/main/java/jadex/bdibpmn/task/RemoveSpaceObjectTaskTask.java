@@ -6,7 +6,6 @@ import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.bpmn.runtime.task.TaskMetaInfo;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
@@ -27,7 +26,7 @@ public class RemoveSpaceObjectTaskTask	implements ITask
 		Object	taskid	= context.getParameterValue("taskid");
 		space.removeObjectTask(taskid, objectid);
 	
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	//-------- static methods --------

@@ -208,7 +208,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 		assert false || checkChildren(oldcs, newcs);
 		
 		searching	= false;
-		if(dirty)
+ 		if(dirty)
 		{
 			// Restart search when nodes have been added/removed in the mean time.
 			dirty	= false;

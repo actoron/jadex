@@ -1,6 +1,5 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.commons.IRemoteFilter;
@@ -59,8 +58,8 @@ public class DirNode extends FileNode
 	 */
 	protected void	searchChildren()
 	{
-//		if(toString().indexOf("D:")!=-1)
-//			System.out.println("here");
+		if(toString().indexOf("A:")!=-1)
+			System.out.println("here");
 		
 		listFiles().addResultListener(new SwingDefaultResultListener()
 		{

@@ -2,7 +2,6 @@ package jadex.jade.service;
 
 import jadex.commons.ICommand;
 import jadex.commons.concurrent.IExecutable;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
@@ -59,7 +58,7 @@ public class ExecutionService extends BasicService implements IExecutionService
 		{
 			// Hack!!! Asynchronously stop agent execution.
 			((JadeComponentAdapter)task).getJadeAgent().cancel();
-			return new Future(null);
+			return IFuture.DONE;
 		}
 		else
 		{

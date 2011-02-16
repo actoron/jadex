@@ -12,6 +12,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.LRU;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -538,14 +540,17 @@ public class RemoteReferenceModule
 	 *  Shutdown the module.
 	 *  Sends notifications to all 
 	 */
-	protected void shutdown()
+	protected IFuture	shutdown()
 	{
+		Future	ret	= new Future();
 		checkThread();
 		RemoteReference[] rrs = (RemoteReference[])proxycount.keySet().toArray(new RemoteReference[0]);
+		CounterResultListener	crl	= new CounterResultListener(rrs.length, true, new DelegationResultListener(ret));
 		for(int i=0; i<rrs.length; i++)
 		{
-			sendRemoveRemoteReference(rrs[i]);
+			sendRemoveRemoteReference(rrs[i]).addResultListener(crl);
 		}
+		return ret;
 	}
 	
 	/**

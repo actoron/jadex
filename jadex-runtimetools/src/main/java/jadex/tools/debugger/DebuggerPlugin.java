@@ -93,7 +93,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 	 */
 	public IFuture setProperties(Properties props)
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**

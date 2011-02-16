@@ -294,7 +294,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 
 		checkingmenu.setSelected(props.getBooleanProperty("checking"));
 		
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**

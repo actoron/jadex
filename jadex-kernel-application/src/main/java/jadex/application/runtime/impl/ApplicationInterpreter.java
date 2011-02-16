@@ -1161,7 +1161,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 			}
 		}
 		
-		return new Future(null);
+		return IFuture.DONE;
 //		return adapter.getServiceContainer().shutdown(); // done in adapter
 	}
 	

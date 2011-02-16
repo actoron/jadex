@@ -294,6 +294,9 @@ public class AsyncTreeModel implements TreeModel
      */
 	public void fireNodeAdded(ITreeNode parent, ITreeNode child, int index)
 	{
+//		if(child.toString().indexOf("A:")!=-1)
+//			System.out.println("here4");
+
 		assert SwingUtilities.isEventDispatchThread();
 		
 		List path = buildTreePath(parent);

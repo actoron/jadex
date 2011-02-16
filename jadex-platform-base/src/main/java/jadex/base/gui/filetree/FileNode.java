@@ -108,7 +108,8 @@ public class FileNode	extends AbstractTreeNode
 	 */
 	public String toString()
 	{
-		String ret = FileSystemView.getFileSystemView().getSystemDisplayName(file);
+		String ret = FileSystemView.getFileSystemView().isFloppyDrive(file) 
+			? null : FileSystemView.getFileSystemView().getSystemDisplayName(file);
 		if(ret==null || ret.length()==0)
 			ret = file.getName();
 		if(ret==null || ret.length()==0)

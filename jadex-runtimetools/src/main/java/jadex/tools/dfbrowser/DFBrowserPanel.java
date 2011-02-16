@@ -217,7 +217,7 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 		
 		refresh();
 		
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -227,7 +227,7 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 	{
 		if(timer.isRunning())
 			timer.stop();
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	
@@ -265,7 +265,7 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 				rb_refresh[i].doClick();
 		}
 		
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -273,7 +273,7 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 	 */
 	public IFuture resetProperties()
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**

@@ -9,7 +9,6 @@ import jadex.bdi.BDIAgentFactory;
 import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
@@ -313,7 +312,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 				}
 			}
 		});
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**
@@ -322,7 +321,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 	 */
 	public IFuture componentAdded(final IComponentDescription ad)
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -331,7 +330,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 	 */
 	public IFuture componentChanged(final IComponentDescription ad)
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	final AbstractAction	START_PROFILER	= new AbstractAction("Profile Agent", icons.getIcon("profile_agent"))

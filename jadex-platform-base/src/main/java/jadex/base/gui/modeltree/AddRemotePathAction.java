@@ -17,7 +17,6 @@ import java.net.URL;
 
 import javax.swing.Icon;
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 import javax.swing.UIDefaults;
 import javax.swing.filechooser.FileFilter;
 

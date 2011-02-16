@@ -103,13 +103,13 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 			public IFuture urlRemoved(URL url)
 			{
 				loader.clearModelCache();
-				return new Future(null);
+				return IFuture.DONE;
 			}
 			
 			public IFuture urlAdded(URL url)
 			{
 				loader.clearModelCache();
-				return new Future(null);
+				return IFuture.DONE;
 			}
 		};
 		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()

@@ -33,7 +33,7 @@ public abstract class AbstractServiceViewerPanel implements IServiceViewerPanel
 	{
 		this.jcc = jcc;
 		this.service = service;
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -41,7 +41,7 @@ public abstract class AbstractServiceViewerPanel implements IServiceViewerPanel
 	 */
 	public IFuture shutdown()
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**
@@ -72,7 +72,7 @@ public abstract class AbstractServiceViewerPanel implements IServiceViewerPanel
 	 */
 	public IFuture getProperties()
 	{
-		return new Future(0);
+		return new Future(null);
 	}
 
 	/**
@@ -80,7 +80,7 @@ public abstract class AbstractServiceViewerPanel implements IServiceViewerPanel
 	 */
 	public IFuture resetProperties()
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**

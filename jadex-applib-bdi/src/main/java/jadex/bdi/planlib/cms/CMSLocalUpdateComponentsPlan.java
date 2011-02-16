@@ -10,7 +10,6 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
 
@@ -52,7 +51,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 				{
 					ces.removeComponentListener(null, this);
 				}
-				return new Future(null);
+				return IFuture.DONE;
 			}
 					
 			public IFuture componentRemoved(final IComponentDescription desc, java.util.Map results)
@@ -73,12 +72,12 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 				{
 					ces.removeComponentListener(null, this);
 				}
-				return new Future(null);
+				return IFuture.DONE;
 			}
 
 			public IFuture componentChanged(IComponentDescription desc)
 			{
-				return new Future(null);
+				return IFuture.DONE;
 			}
 		};
 		

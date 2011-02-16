@@ -330,7 +330,7 @@ public abstract class AbstractSelectorPanel extends JPanel implements IPropertie
 	 */
 	public IFuture resetProperties()
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**

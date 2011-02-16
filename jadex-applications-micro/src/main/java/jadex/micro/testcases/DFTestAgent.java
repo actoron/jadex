@@ -50,7 +50,7 @@ public class DFTestAgent extends MicroAgent
 	/**
 	 *  Called when agent finishes.
 	 */
-	public void agentKilled()
+	public IFuture	agentKilled()
 	{
 		// Store test results.
 		setResultValue("testresults", new Testcase(reports.size(), (TestReport[])reports.toArray(new TestReport[reports.size()])));
@@ -66,6 +66,7 @@ public class DFTestAgent extends MicroAgent
 				df.deregister(ad);
 			}
 		}));
+		return IFuture.DONE;
 	}
 	
 	/**

@@ -174,28 +174,28 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 		b.setEnabled(true);
 		ret.add(b);
 		
-		b = new JButton(comptree.getAction(comptree.KILL_ACTION));
+		b = new JButton(comptree.getAction(ComponentTreePanel.KILL_ACTION));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
 		ret.add(b);
 		
-		b = new JButton(comptree.getAction(comptree.SUSPEND_ACTION));
+		b = new JButton(comptree.getAction(ComponentTreePanel.SUSPEND_ACTION));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
 		ret.add(b);
 		
-		b = new JButton(comptree.getAction(comptree.RESUME_ACTION));
+		b = new JButton(comptree.getAction(ComponentTreePanel.RESUME_ACTION));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
 		ret.add(b);
 		
-		b = new JButton(comptree.getAction(comptree.STEP_ACTION));
+		b = new JButton(comptree.getAction(ComponentTreePanel.STEP_ACTION));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
@@ -206,28 +206,28 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 		separator.setOrientation(JSeparator.VERTICAL);
 		ret.add(separator);
 
-		b = new JButton(comptree.getAction(comptree.SHOWPROPERTIES_ACTION));
+		b = new JButton(comptree.getAction(ComponentTreePanel.SHOWPROPERTIES_ACTION));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
 		ret.add(b);
 		
-		b = new JButton(comptree.getAction(comptree.SHOWDETAILS_ACTION));
+		b = new JButton(comptree.getAction(ComponentTreePanel.SHOWDETAILS_ACTION));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
 		ret.add(b);
 
-		b = new JButton(comptree.getAction(comptree.REFRESH_ACTION));
+		b = new JButton(comptree.getAction(ComponentTreePanel.REFRESH_ACTION));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
 		ret.add(b);
 		
-		b = new JButton(comptree.getAction(comptree.REFRESHSUBTREE_ACTION));
+		b = new JButton(comptree.getAction(ComponentTreePanel.REFRESHSUBTREE_ACTION));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
@@ -440,7 +440,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 
 		checkingmenu.setSelected(props.getBooleanProperty("checking"));
 	
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**
@@ -619,7 +619,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 					spanel.setParent(null);
 			}
 		});
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**
@@ -628,7 +628,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 	 */
 	public IFuture componentAdded(final IComponentDescription ad)
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -637,7 +637,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 	 */
 	public IFuture componentChanged(final IComponentDescription ad)
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/** 
@@ -748,8 +748,8 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 			IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
 			if(node instanceof FileNode)
 			{
-				String type = ((FileNode)node).getFile().getAbsolutePath();
-					ret = true;
+//				String type = ((FileNode)node).getFile().getAbsolutePath();
+				ret = true;
 			}
 			return ret;
 		}

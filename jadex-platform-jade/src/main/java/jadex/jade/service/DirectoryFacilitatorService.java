@@ -666,6 +666,6 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	 */
 	public IFuture startService()
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 }

@@ -33,7 +33,7 @@ public abstract class AbstractComponentViewerPanel implements IComponentViewerPa
 	{
 		this.jcc = jcc;
 		this.component = component;
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -41,7 +41,7 @@ public abstract class AbstractComponentViewerPanel implements IComponentViewerPa
 	 */
 	public IFuture shutdown()
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**
@@ -64,7 +64,7 @@ public abstract class AbstractComponentViewerPanel implements IComponentViewerPa
 	public IFuture setProperties(Properties ps)
 	{
 		System.out.println("Warning: setProperties not implemented "+getClass());
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**
@@ -83,7 +83,7 @@ public abstract class AbstractComponentViewerPanel implements IComponentViewerPa
 	public IFuture resetProperties()
 	{
 		System.out.println("Warning: resetProperties not implemented "+getClass());
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**

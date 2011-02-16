@@ -651,7 +651,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	 */
 	public IFuture	componentCreated(final IComponentDescription desc, final IModelInfo model)
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 //	{
 ////		System.out.println("comp created: "+desc.getName()+" "+Application.this.getComponentIdentifier()+" "+children);
@@ -721,7 +721,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	 */
 	public IFuture	componentDestroyed(final IComponentDescription desc)
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 //	{
 //		return scheduleStep(new IComponentStep()
@@ -1166,7 +1166,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 			}
 		}
 		
-		return new Future(null);
+		return IFuture.DONE;
 //		return adapter.getServiceContainer().shutdown(); // done in adapter
 	}
 	

@@ -1,6 +1,5 @@
 package jadex.micro.examples.mandelbrot;
 
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.service.BasicService;
 
@@ -34,7 +33,7 @@ public class DisplayService extends BasicService implements IDisplayService
 	public IFuture displayResult(AreaData result)
 	{
 		agent.getPanel().setResults(result);
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 
@@ -44,6 +43,6 @@ public class DisplayService extends BasicService implements IDisplayService
 	public IFuture displayIntermediateResult(ProgressData progress)
 	{
 		agent.getPanel().addProgress(progress);
-		return new Future(null);
+		return IFuture.DONE;
 	}
 }

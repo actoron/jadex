@@ -81,7 +81,7 @@ public class RemoteResultCommand implements IRemoteCommand
 			}
 		}
 		
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	//-------- getter/setter methods --------

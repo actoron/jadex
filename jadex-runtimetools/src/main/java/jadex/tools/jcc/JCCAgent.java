@@ -4,6 +4,7 @@ import jadex.base.gui.componentviewer.ComponentViewerPlugin;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IRemoteServiceManagementService;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.library.ILibraryService;
 import jadex.micro.MicroAgent;
@@ -37,7 +38,7 @@ public class JCCAgent extends MicroAgent
 	/**
 	 *  Open the gui on agent startup.
 	 */
-	public void agentCreated()
+	public IFuture	agentCreated()
 	{
 		new ControlCenter(getExternalAccess(),
 //			StarterPlugin.class.getName()
@@ -56,5 +57,6 @@ public class JCCAgent extends MicroAgent
 			+ " "+DeployerPlugin.class.getName()
 //			+ " "+StarterServicePlugin.class.getName()		
 		);
+		return IFuture.DONE;
 	}
 }

@@ -286,7 +286,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		Properties ps = props.getSubproperty("convcenter");
 		if(ps!=null)
 			convcenter.setProperties(ps);
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**

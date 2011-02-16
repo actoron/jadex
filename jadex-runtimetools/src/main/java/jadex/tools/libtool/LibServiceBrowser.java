@@ -277,21 +277,21 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 				// todo: make synchronized
 				if(!classpaths.containsEntry(url.toString()))
 					classpaths.addEntry(url.toString());
-				return new Future(null);
+				return IFuture.DONE;
 			}
 			public IFuture urlRemoved(URL url)
 			{
 				// todo: make synchronized
 				if(classpaths.containsEntry(url.toString()))
 					classpaths.removeEntry(url.toString());
-				return new Future(null);
+				return IFuture.DONE;
 			}
 		};
 		libservice.addLibraryServiceListener(listener);
 		
 		// Todo: remove listener, when tool is closed.
 		
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -307,7 +307,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 		{
 		}
 		
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	
@@ -355,7 +355,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 			}
 		}
 		
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**
@@ -399,6 +399,6 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 	 */
 	public IFuture resetProperties()
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 }

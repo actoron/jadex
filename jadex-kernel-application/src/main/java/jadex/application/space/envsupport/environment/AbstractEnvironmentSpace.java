@@ -28,7 +28,6 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.IPropertyObject;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
@@ -574,17 +573,17 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 							{
 								((IComponentManagementService)result).removeComponentListener(context.getComponentIdentifier(), this);
 								oc.dispose();
-								return new Future(null);
+								return IFuture.DONE;
 							}
 							
 							public IFuture componentChanged(IComponentDescription desc)
 							{
-								return new Future(null);
+								return IFuture.DONE;
 							}
 							
 							public IFuture componentAdded(IComponentDescription desc)
 							{
-								return new Future(null);
+								return IFuture.DONE;
 							}
 						});
 					}

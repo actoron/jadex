@@ -3,6 +3,7 @@ package jadex.micro.examples.helpline;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.annotation.GuiClass;
 import jadex.commons.service.clock.IClockService;
@@ -43,7 +44,7 @@ public class HelplineAgent extends MicroAgent
 	/**
 	 *  Called once after agent creation.
 	 */
-	public void agentCreated()
+	public IFuture	agentCreated()
 	{
 //		this.infos = new MultiCollection(new HashMap(), TreeSet.class);
 		this.infos = new MultiCollection();
@@ -64,6 +65,7 @@ public class HelplineAgent extends MicroAgent
 				HelplinePanel.createHelplineGui((IMicroExternalAccess)getExternalAccess());
 			}
 		});
+		return IFuture.DONE;
 	}
 		
 	/**

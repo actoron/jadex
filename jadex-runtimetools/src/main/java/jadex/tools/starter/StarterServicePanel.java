@@ -4,7 +4,6 @@ import jadex.base.SComponentFactory;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.filetree.FileNode;
-import jadex.base.gui.filetree.FileTreePanel;
 import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.modeltree.ModelTreePanel;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
@@ -290,7 +289,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 					spanel.setParent(null);
 			}
 		});
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**
@@ -299,7 +298,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 	 */
 	public IFuture componentAdded(final IComponentDescription ad)
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -308,7 +307,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 	 */
 	public IFuture componentChanged(final IComponentDescription ad)
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -494,7 +493,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 	
 	//		checkingmenu.setSelected(props.getBooleanProperty("checking"));
 		
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**

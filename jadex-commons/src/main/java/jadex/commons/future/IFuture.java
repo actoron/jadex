@@ -7,6 +7,16 @@ package jadex.commons.future;
  */
 public interface IFuture
 {
+	//-------- constants --------
+	
+	/** A future representing a completed action.
+	 *  Can be used as direct return value of methods that do
+	 *  not perform asynchronous operations and do not
+	 *  return a result value. */
+	public static final IFuture	DONE	= new Future(null);
+	
+	//-------- methods --------
+	
     /**
      *  Test if done, i.e. result is available.
      *  @return True, if done.

@@ -125,7 +125,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 
 		splitpanel.setDividerLocation(props.getIntProperty("split_location"));
 	
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 	 */
 	public IFuture resetProperties()
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	//-------- helper classes --------

@@ -199,7 +199,7 @@ public class ComponentTreePanel extends JSplitPane
 						}
 					});
 				}
-				return new Future(null);
+				return IFuture.DONE;
 			}
 			
 			public IFuture componentChanged(final IComponentDescription desc)
@@ -216,7 +216,7 @@ public class ComponentTreePanel extends JSplitPane
 						}
 					}
 				});
-				return new Future(null);
+				return IFuture.DONE;
 			}
 			
 			public IFuture componentAdded(final IComponentDescription desc)
@@ -230,39 +230,28 @@ public class ComponentTreePanel extends JSplitPane
 						final ComponentTreeNode	parentnode = desc.getParent()==null? null: (ComponentTreeNode)model.getAddedNode(desc.getParent());
 						if(parentnode!=null)
 						{
-							parentnode.createComponentNode(desc).addResultListener(new SwingDefaultResultListener()
-							{
-								public void customResultAvailable(Object result)
-								{
-									ITreeNode	node = (ITreeNode)result;
+							ITreeNode	node = (ITreeNode)parentnode.createComponentNode(desc);
 //									System.out.println("addChild: "+parentnode+", "+node);
-									try
-									{
-										if(parentnode.getIndexOfChild(node)==-1)
-										{
-//											System.err.println(""+model.hashCode()+" Panel->addChild: "+node+", "+parentnode);
-											parentnode.addChild(node);
-										}
-									}
-									catch(Exception e)
-									{
-										System.err.println(""+model.hashCode()+" Broken node: "+node);
-										System.err.println(""+model.hashCode()+" Parent: "+parentnode+", "+parentnode.getCachedChildren());
-										e.printStackTrace();
-//										model.fireNodeAdded(parentnode, node, parentnode.getIndexOfChild(node));
-									}
-								}
-								
-								public void customExceptionOccurred(Exception exception)
+							try
+							{
+								if(parentnode.getIndexOfChild(node)==-1)
 								{
-									// May happen, when component removed in mean time.
-								}										
-							});
+//											System.err.println(""+model.hashCode()+" Panel->addChild: "+node+", "+parentnode);
+									parentnode.addChild(node);
+								}
+							}
+							catch(Exception e)
+							{
+								System.err.println(""+model.hashCode()+" Broken node: "+node);
+								System.err.println(""+model.hashCode()+" Parent: "+parentnode+", "+parentnode.getCachedChildren());
+								e.printStackTrace();
+//										model.fireNodeAdded(parentnode, node, parentnode.getIndexOfChild(node));
+							}
 						}
 					}
 				});
 				
-				return new Future(null);
+				return IFuture.DONE;
 			}
 		};
 
@@ -277,7 +266,7 @@ public class ComponentTreePanel extends JSplitPane
 					{
 						// note: cannot use getComponentIdenfier() due to proxy components return their remote cid
 						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
-						final ITreeNode sel = (ITreeNode)paths[i].getLastPathComponent();
+//						final ITreeNode sel = (ITreeNode)paths[i].getLastPathComponent();
 						cms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -286,10 +275,11 @@ public class ComponentTreePanel extends JSplitPane
 								{
 									public void customResultAvailable(Object result)
 									{
-										if(sel instanceof VirtualComponentTreeNode && sel.getParent()!=null)
-										{
-											((AbstractTreeNode)sel.getParent()).removeChild(sel);
-										}
+										// Done by CMS listener?
+//										if(sel.getParent()!=null)
+//										{
+//											((AbstractTreeNode)sel.getParent()).removeChild(sel);
+//										}
 									}
 									
 									public void customExceptionOccurred(Exception exception)
@@ -387,10 +377,8 @@ public class ComponentTreePanel extends JSplitPane
 						{
 							public void customResultAvailable(Object result)
 							{
-								if(sel instanceof VirtualComponentTreeNode)
-								{
-									sel.refresh(false);
-								}
+								// Required for remote nodes.
+								sel.refresh(false);
 							}
 						});
 					}
@@ -415,10 +403,8 @@ public class ComponentTreePanel extends JSplitPane
 						{
 							public void customResultAvailable(Object result)
 							{
-								if(sel instanceof VirtualComponentTreeNode)
-								{
-									sel.refresh(false);
-								}
+								// Required for remote nodes.
+								sel.refresh(false);
 							}
 						});
 					}
@@ -443,10 +429,8 @@ public class ComponentTreePanel extends JSplitPane
 						{
 							public void customResultAvailable(Object result)
 							{
-								if(sel instanceof VirtualComponentTreeNode)
-								{
-									sel.refresh(false);
-								}
+								// Required for remote nodes.
+								sel.refresh(false);
 							}
 						});
 					}

@@ -1,5 +1,6 @@
 package jadex.micro.examples.remoteservice;
 
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 
 /**
@@ -10,8 +11,9 @@ public class MathAgent extends MicroAgent
 	/**
 	 *  Called once after agent creation.
 	 */
-	public void agentCreated()
+	public IFuture	agentCreated()
 	{
 		addDirectService(new MathService(getServiceProvider()));
+		return IFuture.DONE;
 	}
 }

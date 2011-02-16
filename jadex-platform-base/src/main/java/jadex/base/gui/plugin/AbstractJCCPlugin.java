@@ -108,7 +108,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	 */
 	public IFuture setProperties(Properties ps)
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**
@@ -124,7 +124,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	 */
 	public IFuture resetProperties()
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	//-------- internal create methods --------

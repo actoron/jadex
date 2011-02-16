@@ -70,8 +70,9 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	/**
 	 *  Called once after agent creation.
 	 */
-	public void agentCreated()
+	public IFuture agentCreated()
 	{
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -95,8 +96,9 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  Called just before the agent is removed from the platform.
 	 *  @return The result of the component.
 	 */
-	public void agentKilled()
+	public IFuture agentKilled()
 	{
+		return IFuture.DONE;
 	}
 
 	//-------- methods --------

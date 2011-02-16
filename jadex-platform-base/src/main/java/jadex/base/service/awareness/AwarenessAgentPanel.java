@@ -380,7 +380,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	{
 		if(timer.isRunning())
 			timer.stop();
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**

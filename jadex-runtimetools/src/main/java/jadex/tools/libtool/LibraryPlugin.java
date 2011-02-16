@@ -403,7 +403,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 			}
 		}
 		
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**

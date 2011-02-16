@@ -11,7 +11,6 @@ import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.service.deployment.IDeploymentService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Properties;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.PopupBuilder;
@@ -109,7 +108,7 @@ public class DeploymentServiceViewerPanel implements IServiceViewerPanel
 	 */
 	public IFuture resetProperties()
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**
@@ -117,7 +116,7 @@ public class DeploymentServiceViewerPanel implements IServiceViewerPanel
 	 */ 
 	public IFuture shutdown()
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -141,7 +140,7 @@ public class DeploymentServiceViewerPanel implements IServiceViewerPanel
 	 */
 	public IFuture init(IControlCenter jcc, IService service)
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**

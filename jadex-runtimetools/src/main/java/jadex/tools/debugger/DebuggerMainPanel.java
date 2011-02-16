@@ -8,7 +8,6 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.SReflect;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.SwingDefaultResultListener;
@@ -297,15 +296,15 @@ public class DebuggerMainPanel extends JSplitPane
 					public IFuture componentChanged(IComponentDescription desc)
 					{
 						updatePanel(desc);
-						return new Future(null);
+						return IFuture.DONE;
 					}
 					public IFuture componentRemoved(IComponentDescription desc, Map results)
 					{
-						return new Future(null);
+						return IFuture.DONE;
 					}			
 					public IFuture componentAdded(IComponentDescription desc)
 					{
-						return new Future(null);
+						return IFuture.DONE;
 					}
 				});		
 			}

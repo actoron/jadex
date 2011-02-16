@@ -5,6 +5,9 @@ import jadex.base.service.remote.commands.RemoteResultCommand;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.MessageType;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
@@ -35,26 +38,29 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	/**
 	 *  Called once after agent creation.
 	 */
-	public void agentCreated()
+	public IFuture	agentCreated()
 	{
+		final Future	ret	= new Future();
 		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new DefaultResultListener()
+			.addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
 				final IClockService clock = (IClockService)result;
 				SServiceProvider.getService(getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(createResultListener(new DefaultResultListener()
+					.addResultListener(createResultListener(new DelegationResultListener(ret)
 				{
-					public void resultAvailable(Object result)
+					public void customResultAvailable(Object result)
 					{
 						final ILibraryService libservice = (ILibraryService)result;
 						rms = new RemoteServiceManagementService((IMicroExternalAccess)getExternalAccess(), clock, libservice);
 						addDirectService(rms);
+						ret.setResult(null);
 					}
 				}));
 			}
 		}));
+		return ret;
 	}
 	
 //	/**
@@ -78,10 +84,10 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	 *  Called just before the agent is removed from the platform.
 	 *  @return The result of the component.
 	 */
-	public void agentKilled()
+	public IFuture	agentKilled()
 	{
 		// Send notifications to other processes that remote references are not needed any longer.
-		rms.getRemoteReferenceModule().shutdown();
+		return rms.getRemoteReferenceModule().shutdown();
 	}
 	
 	/**

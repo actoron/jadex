@@ -208,7 +208,7 @@ public class RemoteServiceContainer extends BasicServiceContainer
 	 */
 	public IFuture shutdown()
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**

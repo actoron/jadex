@@ -2,7 +2,6 @@ package jadex.tools.starter;
 
 import jadex.base.gui.ComponentIdentifierDialog;
 import jadex.base.gui.componenttree.ComponentTreePanel;
-import jadex.base.gui.filetree.RefreshSubtreeAction;
 import jadex.base.gui.modeltree.AddPathAction;
 import jadex.base.gui.modeltree.AddRemotePathAction;
 import jadex.base.gui.modeltree.ModelTreePanel;
@@ -18,12 +17,10 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
 import jadex.commons.service.IService;
 import jadex.tools.generic.AbstractServicePlugin;
-import jadex.xml.annotation.XMLClassname;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;

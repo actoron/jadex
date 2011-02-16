@@ -206,7 +206,7 @@ public class Future implements IFuture
     	synchronized(this)
 		{
         	if(resultavailable)
-        		throw new RuntimeException();
+        		throw new RuntimeException("Duplicate result: "+result+", "+this.result);
         	
 //        	System.out.println(this+" setResult: "+result);
         	this.result = result;

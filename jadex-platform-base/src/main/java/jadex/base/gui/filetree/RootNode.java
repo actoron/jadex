@@ -6,7 +6,6 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentProperties;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.Icon;

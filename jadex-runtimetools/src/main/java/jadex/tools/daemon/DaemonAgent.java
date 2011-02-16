@@ -49,7 +49,7 @@ public class DaemonAgent extends MicroAgent
 	/**
 	 *  Called once after agent creation.
 	 */
-	public void agentCreated()
+	public IFuture	agentCreated()
 	{
 		platforms = Collections.synchronizedMap(new HashMap());
 		listeners = Collections.synchronizedList(new ArrayList());
@@ -61,6 +61,7 @@ public class DaemonAgent extends MicroAgent
 				DaemonPanel.createGui((IMicroExternalAccess)getExternalAccess());
 			}
 		});
+		return IFuture.DONE;
 	}
 	
 	/**

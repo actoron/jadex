@@ -15,7 +15,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.Properties;
 import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
@@ -30,7 +29,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.AbstractAction;

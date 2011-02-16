@@ -34,6 +34,8 @@ import jadex.commons.service.clock.ITimer;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -153,73 +155,78 @@ public class MicroAgentInterpreter implements IComponentInstance
 			{
 				public Object execute(IInternalAccess ia)
 				{
-					microagent.agentCreated();
-					// Create provided services
-					ProvidedServiceInfo[] services = model.getProvidedServices();
-//					System.out.println("init sers: "+services);
-					if(services!=null)
+					microagent.agentCreated().addResultListener(new DelegationResultListener(inited)
 					{
-						final SimpleValueFetcher fetcher = new SimpleValueFetcher();
-						fetcher.setValue("$args", getArguments());
-						fetcher.setValue("$properties", model.getProperties());
-						fetcher.setValue("$results", getResults());
-						fetcher.setValue("$component", microagent);
-						fetcher.setValue("$provider", getServiceProvider());
-						for(int i=0; i<services.length; i++)
+						public void customResultAvailable(Object result)
 						{
-							IInternalService service;
-							if(services[i].getExpression()!=null)
+							// Create provided services
+							ProvidedServiceInfo[] services = model.getProvidedServices();
+//							System.out.println("init sers: "+services);
+							if(services!=null)
 							{
-								try
+								final SimpleValueFetcher fetcher = new SimpleValueFetcher();
+								fetcher.setValue("$args", getArguments());
+								fetcher.setValue("$properties", model.getProperties());
+								fetcher.setValue("$results", getResults());
+								fetcher.setValue("$component", microagent);
+								fetcher.setValue("$provider", getServiceProvider());
+								for(int i=0; i<services.length; i++)
 								{
-									// todo: other Class imports, how can be found out?
-									String[] imports = new String[]{microagent.getClass().getPackage().getName()+".*"};
-									service = (IInternalService)SJavaParser.evaluateExpression(services[i].getExpression(), imports, fetcher, model.getClassLoader());
-									if(services[i].isDirect())
+									IInternalService service;
+									if(services[i].getExpression()!=null)
 									{
-										microagent.addDirectService(service);
+										try
+										{
+											// todo: other Class imports, how can be found out?
+											String[] imports = new String[]{microagent.getClass().getPackage().getName()+".*"};
+											service = (IInternalService)SJavaParser.evaluateExpression(services[i].getExpression(), imports, fetcher, model.getClassLoader());
+											if(services[i].isDirect())
+											{
+												microagent.addDirectService(service);
+											}
+											else
+											{
+												microagent.addService(service);
+											}
+//											System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
+										}
+										catch(Exception e)
+										{
+											e.printStackTrace();
+											microagent.getLogger().warning("Service creation error: "+services[i].getExpression());
+										}
 									}
-									else
-									{
-										microagent.addService(service);
-									}
-//									System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
-								}
-								catch(Exception e)
-								{
-									e.printStackTrace();
-									microagent.getLogger().warning("Service creation error: "+services[i].getExpression());
 								}
 							}
-						}
-					}
-					
-					getServiceContainer().start().addResultListener(createResultListener(new IResultListener()
-					{
-						public void resultAvailable(Object result)
-						{
-							// Init is now finished. Notify cms.
-							inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
 							
-							addStep(new Object[]{new IComponentStep()
+							getServiceContainer().start().addResultListener(createResultListener(new IResultListener()
 							{
-								public Object execute(IInternalAccess ia)
+								public void resultAvailable(Object result)
 								{
-									microagent.executeBody();
-									return null;
+									// Init is now finished. Notify cms.
+									inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
+									
+									addStep(new Object[]{new IComponentStep()
+									{
+										public Object execute(IInternalAccess ia)
+										{
+											microagent.executeBody();
+											return null;
+										}
+										public String toString()
+										{
+											return "microagent.executeBody()_#"+this.hashCode();
+										}
+									}, new Future()});
 								}
-								public String toString()
+								
+								public void exceptionOccurred(Exception exception)
 								{
-									return "microagent.executeBody()_#"+this.hashCode();
+									inited.setException(exception);
 								}
-							}, new Future()});
+							}));
 						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							inited.setException(exception);
-						}
-					}));
+					});
 					return null;
 				}
 				public String toString()
@@ -347,23 +354,8 @@ public class MicroAgentInterpreter implements IComponentInstance
 			{
 				public void run()
 				{	
-//					System.out.println("cleanupComponent: "+getAgentAdapter().getComponentIdentifier());
-					nosteps = true;
-					ComponentTerminatedException ex = new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier());
-					while(!steps.isEmpty())
-					{
-						Object[] step = removeStep();
-						Future future = (Future)step[1];
-						future.setException(ex);
-//						System.out.println("Cleaning obsolete step: "+getAgentAdapter().getComponentIdentifier()+", "+step[0]);
-					}
+					exitState();
 					
-					for(int i=0; i<microagent.timers.size(); i++)
-					{
-						ITimer timer = (ITimer)microagent.timers.get(i);
-						timer.cancel();
-					}
-					microagent.timers.clear();
 					if(componentlisteners!=null)
 					{
 						for(int i=0; i<componentlisteners.size(); i++)
@@ -372,17 +364,34 @@ public class MicroAgentInterpreter implements IComponentInstance
 							lis.componentTerminating(new ChangeEvent(adapter.getComponentIdentifier()));
 						}
 					}
-					microagent.agentKilled();
-					if(componentlisteners!=null)
+					
+					microagent.agentKilled().addResultListener(microagent.createResultListener(new IResultListener()
 					{
-						for(int i=0; i<componentlisteners.size(); i++)
+						public void resultAvailable(Object result)
 						{
-							IComponentListener lis = (IComponentListener)componentlisteners.get(i);
-							lis.componentTerminated(new ChangeEvent(adapter.getComponentIdentifier()));
+							nosteps = true;
+							exitState();
+							
+							if(componentlisteners!=null)
+							{
+								for(int i=0; i<componentlisteners.size(); i++)
+								{
+									IComponentListener lis = (IComponentListener)componentlisteners.get(i);
+									lis.componentTerminated(new ChangeEvent(adapter.getComponentIdentifier()));
+								}
+							}
+							IComponentIdentifier cid = adapter.getComponentIdentifier();
+							ret.setResult(cid);							
 						}
-					}
-					IComponentIdentifier cid = adapter.getComponentIdentifier();
-					ret.setResult(cid);
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							StringWriter	sw	= new StringWriter();
+							exception.printStackTrace(new PrintWriter(sw));
+							microagent.getLogger().severe("Exception during cleanup: "+sw);
+							resultAvailable(null);
+						}
+					}));
 				}
 				
 				public String toString()
@@ -489,7 +498,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public IFuture	componentCreated(IComponentDescription desc, IModelInfo model)
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**
@@ -500,7 +509,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public IFuture	componentDestroyed(IComponentDescription desc)
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -962,6 +971,30 @@ public class MicroAgentInterpreter implements IComponentInstance
 			messagehandlers.remove(handler);
 	}
 	
+	/**
+	 *  Exit the running or end state.
+	 *  Cleans up remaining steps and timer entries.
+	 */
+	protected void exitState()
+	{
+//		System.out.println("cleanupComponent: "+getAgentAdapter().getComponentIdentifier());
+		ComponentTerminatedException ex = new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier());
+		while(!steps.isEmpty())
+		{
+			Object[] step = removeStep();
+			Future future = (Future)step[1];
+			future.setException(ex);
+//			System.out.println("Cleaning obsolete step: "+getAgentAdapter().getComponentIdentifier()+", "+step[0]);
+		}
+		
+		for(int i=0; i<microagent.timers.size(); i++)
+		{
+			ITimer timer = (ITimer)microagent.timers.get(i);
+			timer.cancel();
+		}
+		microagent.timers.clear();
+	}
+
 	/**
 	 *  Step to handle a message.
 	 */

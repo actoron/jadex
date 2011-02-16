@@ -294,7 +294,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 			}
 		}
 		
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**

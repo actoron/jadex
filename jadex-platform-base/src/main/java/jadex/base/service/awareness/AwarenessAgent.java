@@ -119,7 +119,7 @@ public class AwarenessAgent extends MicroAgent
 	/**
 	 *  Called once after agent creation.
 	 */
-	public void agentCreated()
+	public IFuture	agentCreated()
 	{
 		initArguments();
 		
@@ -132,7 +132,9 @@ public class AwarenessAgent extends MicroAgent
 		{
 			throw new RuntimeException(e);
 		}
-		this.discovered = new LinkedHashMap();			
+		this.discovered = new LinkedHashMap();
+		
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -213,7 +215,7 @@ public class AwarenessAgent extends MicroAgent
 	 *  Called just before the agent is removed from the platform.
 	 *  @return The result of the component.
 	 */
-	public void agentKilled()
+	public IFuture	agentKilled()
 	{
 //		System.out.println("killed set to true: "+getComponentIdentifier());
 		synchronized(AwarenessAgent.this)
@@ -239,6 +241,7 @@ public class AwarenessAgent extends MicroAgent
 				}
 			}
 		}
+		return IFuture.DONE;
 	}
 	
 	/**

@@ -89,7 +89,7 @@ public interface IComponentManagementService extends IService
 	 *  Search for components matching the given description.
 	 *  @return An array of matching component descriptions.
 	 */
-	public IFuture searchComponents(final IComponentDescription adesc, final ISearchConstraints con, boolean remote);
+	public IFuture searchComponents(IComponentDescription adesc, ISearchConstraints con, boolean remote);
 	
 	//-------- listener methods --------
 	
@@ -188,13 +188,4 @@ public interface IComponentManagementService extends IService
 	* @return The search constraints.
 	*/
 	public ISearchConstraints createSearchConstraints(int maxresults, int maxdepth);
-	
-	//-------- methods for component services --------
-	
-	/**
-	 *  Get a component service of a specific type.
-	 *  @param type The type.
-	 *  @return The service object. 
-	 * /
-	public IFuture getComponentService(Class type);*/
 }

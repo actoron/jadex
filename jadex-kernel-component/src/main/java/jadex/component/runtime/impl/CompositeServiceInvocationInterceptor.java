@@ -256,21 +256,21 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 			{
 				public void execute(ServiceInvocationContext context)
 				{
-					context.setResult(new Future(null));
+					context.setResult(IFuture.DONE);
 				}
 			});
 			ret.put(IInternalService.class.getMethod("startService", new Class[0]), new IServiceInvocationInterceptor()
 			{
 				public void execute(ServiceInvocationContext context)
 				{
-					context.setResult(new Future(null));
+					context.setResult(IFuture.DONE);
 				}
 			});
 			ret.put(IInternalService.class.getMethod("shutdownService", new Class[0]), new IServiceInvocationInterceptor()
 			{
 				public void execute(ServiceInvocationContext context)
 				{
-					context.setResult(new Future(null));
+					context.setResult(IFuture.DONE);
 				}
 			});
 			ret.put(IInternalService.class.getMethod("isValid", new Class[0]), new IServiceInvocationInterceptor()

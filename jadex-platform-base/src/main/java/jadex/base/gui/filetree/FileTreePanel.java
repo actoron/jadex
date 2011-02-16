@@ -10,7 +10,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDelegationResultListener;
@@ -436,7 +435,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	 */
 	public IFuture resetProperties()
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**

@@ -39,25 +39,28 @@ public class DefaultIconCache implements IIconCache
 		if(node instanceof FileNode)
 		{
 			File file = ((FileNode)node).getFile();
-			boolean isroot = SUtil.arrayToSet(file.listRoots()).contains(file);
+			boolean isroot = SUtil.arrayToSet(File.listRoots()).contains(file);
 			
 			File tmp = null;
 			try
 			{
 				String suffix = "";
-				if(!file.isDirectory() || (file instanceof JarAsDirectory && ((JarAsDirectory)file).isRoot()))
+				if(!isroot)
 				{
-					String name = file.getName();
-					int idx = name.lastIndexOf(".");
-					if(idx!=-1)
+					if(!file.isDirectory() || (file instanceof JarAsDirectory && ((JarAsDirectory)file).isRoot()))
 					{
-						suffix = name.substring(idx);
-						ret = (Icon)icons.get(suffix);
+						String name = file.getName();
+						int idx = name.lastIndexOf(".");
+						if(idx!=-1)
+						{
+							suffix = name.substring(idx);
+							ret = (Icon)icons.get(suffix);
+						}
 					}
-				}
-				else if(file.isDirectory() && !isroot)
-				{
-					ret = (Icon)icons.get(DEFAULT_FOLDER);
+					else if(file.isDirectory())
+					{
+						ret = (Icon)icons.get(DEFAULT_FOLDER);
+					}
 				}
 					
 				
@@ -72,7 +75,7 @@ public class DefaultIconCache implements IIconCache
 					else
 					{
 						// Case normal file or root drive
-						if((file.exists() && file.canRead()) || SUtil.arrayToSet(file.listRoots()).contains(file))
+						if(isroot || (file.exists() && file.canRead()) || SUtil.arrayToSet(File.listRoots()).contains(file))
 //						if(suffix.length()>0 || SUtil.arrayToSet(file.listRoots()).contains(file))
 						{
 							ret = FileSystemView.getFileSystemView().getSystemIcon(file);  

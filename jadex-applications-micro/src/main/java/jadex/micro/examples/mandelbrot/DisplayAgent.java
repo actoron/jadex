@@ -6,6 +6,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.micro.MicroAgent;
@@ -49,7 +50,7 @@ public class DisplayAgent extends MicroAgent
 	/**
 	 *  Called once after agent creation.
 	 */
-	public void agentCreated()
+	public IFuture	agentCreated()
 	{
 		// Hack!!! Swing code not on swing thread!?
 		DisplayAgent.this.panel	= new DisplayPanel(getExternalAccess());
@@ -117,6 +118,8 @@ public class DisplayAgent extends MicroAgent
 				});
 			}
 		});
+		
+		return IFuture.DONE;
 	}
 	
 	//-------- methods --------

@@ -54,7 +54,7 @@ public class StarterViewerPanel extends AbstractServiceViewerPanel
 	 */
 	public IFuture shutdown()
 	{
-		return new Future(null);//panel.shutdown();
+		return IFuture.DONE;//panel.shutdown();
 	}
 	
 	/**

@@ -1,13 +1,15 @@
 package jadex.base.service.remote;
 
-import jadex.bridge.Argument;
-import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.IArgument;
+import jadex.bridge.ICMSComponentListener;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IRemoteServiceManagementService;
-import jadex.commons.collection.LRU;
-import jadex.commons.future.CollectionResultListener;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IRemoteChangeListener;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -15,26 +17,76 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.clock.IClockService;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Description;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
+import jadex.xml.annotation.XMLClassname;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 
 /**
- *  A proxy agent is a pseudo component that mirrors services of a remote platform (or component).
+ *  A proxy agent is a pseudo component that mirrors services of a remote platform (or component)
+ *  and allows listening for remote CMS events.
  */
+@Description("This agent represents a proxy for a remote component.")
+@Arguments(@Argument(name="component", typename="jadex.bridge.IComponentIdentifier", defaultvalue="null", description="The component id of the remote component/platform."))
+@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
 public class ProxyAgent extends MicroAgent
 {
+	//-------- constants --------
+	
+	/** The event type for an added component (value is component description). */
+	public static final String	EVENT_COMPONENT_ADDED	= "component-added";
+	
+	/** The event type for a removed component (value is component description). */
+	public static final String	EVENT_COMPONENT_REMOVED	= "component-removed";
+	
+	/** The event type for a removed component (value is collection of change events). */
+	public static final String	EVENT_BULK	= "bulk-event";
+	
 	//-------- attributes --------
 	
-	/** The refresh delay. */
-	protected long delay;
+	/**  The remote component identifier. */
+	protected IComponentIdentifier	rcid;
 	
-	/** The cached children. */
-	protected LRU children;
+	/** The remote change listener (if installed). */
+	protected UpdateHandler	handler;
 	
 	//-------- methods --------
+	
+	/**
+	 *  Initialize the agent.
+	 */
+	public IFuture	agentCreated()
+	{
+		this.rcid	= (IComponentIdentifier)getArgument("component");
+		return IFuture.DONE;
+	}
+
+	/**
+	 *  Dispose handler to trigger remote listener removal on next update.
+	 */
+	public IFuture	agentKilled()
+	{
+		IFuture	ret;
+		if(handler!=null)
+		{
+			ret	= handler.dispose();
+		}
+		else
+		{
+			ret	= IFuture.DONE;
+		}
+		return ret; 
+	}
 	
 	/**
 	 *  Get the service container.
@@ -42,17 +94,6 @@ public class ProxyAgent extends MicroAgent
 	 */
 	public IServiceContainer createServiceContainer()
 	{
-		this.delay = ((Number)getArgument("delay")).longValue();
-		int cachesize = ((Number)getArgument("cachesize")).intValue();
-		this.children = new LRU(cachesize);
-		
-//		System.out.println("proxy delay: "+delay);
-		
-//		System.out.println("Proxy for: "+getRemotePlatformIdentifier()
-//			+", "+SUtil.arrayToString(getRemotePlatformIdentifier().getAddresses())
-//			+", "+delay+", "+cachesize);
-//		return new CacheServiceContainer(new RemoteServiceContainer(
-//			getRemotePlatformIdentifier(), getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
 		return new RemoteServiceContainer(getRemotePlatformIdentifier(), getAgentAdapter());
 	}
 	
@@ -62,259 +103,400 @@ public class ProxyAgent extends MicroAgent
 	 */
 	public IComponentIdentifier getRemotePlatformIdentifier()
 	{
-		return (IComponentIdentifier)getArgument("component");
+		return rcid;
 	}
 	
 	/**
-	 *  Test if the cached children are still valid.
+	 *  Add a CMS listener.
 	 */
-	protected IFuture isInvalid(final IComponentIdentifier cid)
+	public IFuture	addCMSListener(ICMSComponentListener listener)
 	{
-		final Future ret = new Future();
+		if(handler==null)
+			handler	= new UpdateHandler();
 		
-		final Object[] entry = (Object[])children.get(cid);
-		
-		if(delay==0)
-		{
-			ret.setResult(Boolean.FALSE);
-		}
-		else if(entry==null)
-		{
-			ret.setResult(Boolean.TRUE);
-		}
-		else
-		{
-			SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(createResultListener(new IResultListener()
-			{
-				public void resultAvailable(Object result)
-				{
-					IClockService cs = (IClockService)result;
-					long time = cs.getTime();
-					
-					long lastaccess = ((Long)entry[0]).longValue();
-//					System.out.println("here: "+cid+" "+(time>lastaccess+delay)+" "+time+" "+lastaccess+" "+delay);
-					ret.setResult(time>lastaccess+delay? Boolean.TRUE: Boolean.FALSE);
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					ret.setException(exception);
-				}
-			}));
-		}
-		
-		return ret;
+		return handler.addCMSListener(listener);
 	}
 	
 	/**
-	 *  Get the remote, i.e. virtual children of a component. 
+	 *  Remove a CMS listener.
 	 */
-	public IFuture getVirtualChildren(final IComponentIdentifier cid, boolean force)
+	public IFuture	removeCMSListener(ICMSComponentListener listener)
 	{
-		final Future ret = new Future();
+		return handler.removeCMSListener(listener);		
+	}
+	
+	//-------- helper classes --------
+	
+	/**
+	 *  The change handler which receives remote change events and delegates to the registered listeners.
+	 */
+	public class UpdateHandler	implements IRemoteChangeListener
+	{
+		//-------- attributes --------
 		
-		if(force)
+		/** The local listeners for the remote CMS. */
+		protected List	listeners;
+		
+		/** The unique id for remote listener deregistration. */
+		protected String	id	= SUtil.createUniqueId(getAgentName());
+		
+		/** The futures of listeners registered during ongoing installation. */
+		protected List	futures;
+		
+		//-------- IRemoteChangeListener interface --------
+		
+		/**
+		 *  Called when a change occurs.
+		 *  Signature has a return value for understanding when an exception 
+		 *  occurs so that there is a chance to remove the listener:
+		 *  @param event The event.
+		 */
+		public IFuture changeOccurred(final ChangeEvent event)
 		{
-			searchVirtualChildren(cid).addResultListener(createResultListener(new DelegationResultListener(ret)));
-		}
-		else
-		{
-			isInvalid(cid).addResultListener(createResultListener(new IResultListener()
+			final Future	ret	= new Future();
+			scheduleStep(new IComponentStep()
 			{
-				public void resultAvailable(Object result)
+				public Object execute(IInternalAccess ia)
 				{
-					if(((Boolean)result).booleanValue())
+					if(listeners!=null)
 					{
-	//					System.out.println("search children");
-						searchVirtualChildren(cid).addResultListener(createResultListener(new DelegationResultListener(ret)));
+						ICMSComponentListener[]	cls	= (ICMSComponentListener[])listeners.toArray(new ICMSComponentListener[listeners.size()]);
+						informListeners(event, cls);
+						ret.setResult(null);
 					}
 					else
 					{
-	//					System.out.println("cached children");
-						ret.setResult(((Object[])children.get(cid))[1]);
+						// Set exception to trigger listener removal.
+						ret.setException(new RuntimeException("No more listeners."));
 					}
+					return null;
 				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					ret.setException(exception);
-				}
-			}));
+			});
+			return ret;
 		}
 		
-		return ret;
-	}
-	
-	/**
-	 *  Search the virtual children via a remote call.
-	 */
-	protected IFuture searchVirtualChildren(final IComponentIdentifier cid)
-	{
-		final Future ret = new Future();
+		//-------- methods --------
 		
-		SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new IResultListener()
+		/**
+		 *  Dispose the handler for triggering remote listener removal on next update.
+		 */
+		public IFuture	dispose()
 		{
-			public void resultAvailable(Object result)
+			this.listeners	= null;
+			ProxyAgent.this.handler	= null;
+			return deregisterRemoteCMSListener();
+		}
+		
+		/**
+		 *  Add a CMS listener.
+		 */
+		public IFuture	addCMSListener(final ICMSComponentListener listener)
+		{
+			Future	ret	= new Future();
+			if(listeners==null)
 			{
-				IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
-				
-				rms.getServiceProxy(cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(createResultListener(new IResultListener()
+				listeners	= new ArrayList();
+				futures	= new ArrayList();
+				futures.add(ret);
+				installRemoteCMSListener(this).addResultListener(createResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
-//						try
-//						{
-//							IComponentManagementService rcms = (IComponentManagementService)result;
-//						}
-//						catch(Exception e)
-//						{
-//							System.out.println("heer: "+SUtil.arrayToString(result.getClass().getInterfaces()));
-//						}
-						
-						final IComponentManagementService rcms = (IComponentManagementService)result;
-						rcms.getChildren(cid).addResultListener(createResultListener(new IResultListener()
+						for(int i=0; i<futures.size(); i++)
 						{
-							public void resultAvailable(Object result)
-							{
-	//							System.out.println("Found children: "+SUtil.arrayToString(result));
-								IComponentIdentifier[] tmp = (IComponentIdentifier[])result;
-								
-								CollectionResultListener crl = new CollectionResultListener(tmp.length, false, new DelegationResultListener(ret)
-								{
-									public void customResultAvailable(Object result)
-									{
-										final Collection vcs = (Collection)result; 
-										SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-											.addResultListener(createResultListener(new IResultListener()
-										{
-											public void resultAvailable(Object result)
-											{
-												IClockService cs = (IClockService)result;
-												long lastaccess = cs.getTime();
-//												System.out.println("cs of "+cid+" "+vcs);
-												children.put(cid, new Object[]{new Long(lastaccess), vcs});
-												ret.setResult(vcs);
-											}
-											
-											public void exceptionOccurred(Exception exception)
-											{
-												ret.setException(exception);
-											}
-										}));
-									}
-								});
-
-								for(int i=0; i<tmp.length; i++)
-								{
-									rcms.getComponentDescription(tmp[i]).addResultListener(createResultListener(crl));
-								}
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-	//							System.out.println("Children exception: "+getComponentIdentifier());
-								ret.setException(exception);
-							}
-						}));
+							((Future)futures.get(i)).setResult(null);
+						}
+						futures	= null;
 					}
-					
 					public void exceptionOccurred(Exception exception)
 					{
-	//					System.out.println("No remote cms found: "+getComponentIdentifier());
-						ret.setException(exception);
+						for(int i=0; i<futures.size(); i++)
+						{
+							((Future)futures.get(i)).setException(exception);
+						}
+						futures	= null;
 					}
 				}));
 			}
-			
-			public void exceptionOccurred(Exception exception)
+			else if(futures!=null)
 			{
-	//			System.out.println("No rms found: "+getComponentIdentifier());
-				ret.setException(exception);
+				futures.add(ret);
 			}
-		}));
-		
-		return ret;
-	}
-	
-	/**
-	 *  Get the remote component description. 
-	 */
-	public IFuture getRemoteComponentDescription(final IComponentIdentifier cid)
-	{
-		final Future ret = new Future();
-		
-		SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object result)
+			else
 			{
-				IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
-				
-				rms.getServiceProxy(cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(createResultListener(new IResultListener()
+				ret.setResult(null);
+			}
+			listeners.add(listener);
+			return ret;
+		}
+		
+		/**
+		 *  Remove a CMS listener.
+		 */
+		public IFuture	removeCMSListener(ICMSComponentListener listener)
+		{
+			listeners.remove(listener);
+			if(listeners.isEmpty())
+				dispose();
+			return IFuture.DONE;
+		}
+		
+		//-------- helper methods --------
+		
+		/**
+		 *  Inform listeners about an event.
+		 */
+		protected void informListeners(final ChangeEvent event, ICMSComponentListener[] cls)
+		{
+			if(EVENT_COMPONENT_ADDED.equals(event.getType()))
+			{
+				for(int i=0; i<cls.length; i++)
 				{
-					public void resultAvailable(Object result)
-					{
-						final IComponentManagementService rcms = (IComponentManagementService)result;
-						rcms.getComponentDescription(cid).addResultListener(createResultListener(new DelegationResultListener(ret)));
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						ret.setException(exception);
-					}
-				}));
+					cls[i].componentAdded((IComponentDescription)event.getValue());
+				}
 			}
-			
-			public void exceptionOccurred(Exception exception)
+			else if(EVENT_COMPONENT_REMOVED.equals(event.getType()))
 			{
-				ret.setException(exception);
+				for(int i=0; i<cls.length; i++)
+				{
+					// Todo: component results?
+					cls[i].componentRemoved((IComponentDescription)event.getValue(), null);
+				}
 			}
-		}));
+			else if(EVENT_BULK.equals(event.getType()))
+			{
+				Collection	events	= (Collection)event.getValue();
+				for(Iterator it=events.iterator(); it.hasNext(); )
+				{
+					informListeners((ChangeEvent)it.next(), cls);
+				}
+			}
+		}
 		
-		return ret;
-	}
-	
-	/**
-	 *  Get the declared services of a remote component.
-	 */
-	public IFuture getRemoteServices(final IComponentIdentifier cid)
-	{
-		final Future ret = new Future();
-		
-		SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new IResultListener()
+		/**
+		 *  Install the remote listener.
+		 *  @param rcl	The local change listener to be notified by the remote CMS listener.
+		 */
+		protected IFuture	installRemoteCMSListener(final IRemoteChangeListener rcl)
 		{
-			public void resultAvailable(Object result)
+			final Future	ret	= new Future();
+			getRequiredService("cms").addResultListener(createResultListener(new DelegationResultListener(ret)
 			{
-				IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
-				rms.getDeclaredServiceProxies(cid).addResultListener(createResultListener(new DelegationResultListener(ret)));
-			}
-			
-			public void exceptionOccurred(Exception exception)
+				public void customResultAvailable(Object result)
+				{
+					IComponentManagementService	cms	= (IComponentManagementService)result;
+					cms.getExternalAccess(rcid).addResultListener(createResultListener(new DelegationResultListener(ret)
+					{
+						public void customResultAvailable(Object result)
+						{
+							IExternalAccess	exta	= (IExternalAccess)result;
+							final String	id	= UpdateHandler.this.id;
+							exta.scheduleStep(new IComponentStep()
+							{
+								@XMLClassname("installListener")
+								public Object execute(IInternalAccess ia)
+								{
+									final Future	ret	= new Future();
+									SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class)
+										.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+									{
+										public void customResultAvailable(Object result)
+										{
+//											System.out.println("Installing listener: "+id);
+											IComponentManagementService	cms	= (IComponentManagementService)result;
+											cms.addComponentListener(null, new RemoteCMSListener(id, cms, rcl));
+											ret.setResult(null);
+										}
+									}));
+									return ret;
+								}
+							}).addResultListener(new DelegationResultListener(ret));
+						}
+					}));
+				}
+			}));
+			return ret;
+		}
+
+		/**
+		 *  Deregister the remote listener.
+		 */
+		protected IFuture	deregisterRemoteCMSListener()
+		{
+			// Note: cannot use createResultListener as agent will not be executed any more when killed.
+			final Future	ret	= new Future();
+			getRequiredService("cms").addResultListener(createResultListener(new DelegationResultListener(ret)
 			{
-				ret.setException(exception);
-			}
-		}));
-		
-		return ret;
+				public void customResultAvailable(Object result)
+				{
+					IComponentManagementService	cms	= (IComponentManagementService)result;
+					cms.getExternalAccess(rcid).addResultListener(createResultListener(new DelegationResultListener(ret)
+					{
+						public void customResultAvailable(Object result)
+						{
+							IExternalAccess	exta	= (IExternalAccess)result;
+							final String	id	= UpdateHandler.this.id;
+							exta.scheduleStep(new IComponentStep()
+							{
+								@XMLClassname("deregisterListener")
+								public Object execute(IInternalAccess ia)
+								{
+									final Future	ret	= new Future();
+									SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class)
+										.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+									{
+										public void customResultAvailable(Object result)
+										{
+//											System.out.println("Removing listener: "+id);
+											IComponentManagementService	cms	= (IComponentManagementService)result;
+											try
+											{
+												cms.removeComponentListener(null, new RemoteCMSListener(id, cms, null));
+											}
+											catch(RuntimeException e)
+											{
+//												System.out.println("Listener already removed: "+id);
+											}
+											ret.setResult(null);
+										}
+									}));
+									return ret;
+								}
+							}).addResultListener(new DelegationResultListener(ret));
+						}
+					}));
+				}
+			}));
+			return ret;
+		}
 	}
-	
-	//-------- static methods --------
 	
 	/**
-	 *  Get the meta information about the agent.
+	 *  The component listener installed at the remote CMS.
 	 */
-	public static Object getMetaInfo()
+	public static class RemoteCMSListener	implements ICMSComponentListener
 	{
-		return new MicroAgentMetaInfo("This agent represents a proxy for a remote component.", 
-			new String[0], new IArgument[]{
-			new Argument("component", "The component id of the remote component/platform", "jadex.bridge.IComponentIdentifier", 
-				new ComponentIdentifier("remote", new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"})), 
-			new Argument("delay", "The cache delay, determines the time how long a virtual children search is valid", "long", new Long(10000)), 
-			new Argument("cachesize", "The maximum number of entries in the cache.", "int", new Integer(1000))}, 
-			null, null, null);
+		//-------- attributes --------
+		
+		/** The id for remote listener deregistration. */
+		protected String	id;
+		
+		/** The CMS used for automatic removal of listener. */
+		protected IComponentManagementService	cms;
+		
+		/** The change listener (proxy) to be informed about important changes. */
+		protected IRemoteChangeListener	rcl;
+				
+		//-------- constructors --------
+		
+		/**
+		 *  Create a CMS listener sending updates to a remote change listener.
+		 */
+		public RemoteCMSListener(String id, IComponentManagementService cms, IRemoteChangeListener rcl)
+		{
+			this.id	= id;
+			this.cms	= cms;
+			this.rcl	= rcl;
+		}
+		
+		//-------- ICMSComponentListener interface --------
+		
+		/**
+		 *  Called when a new element has been added.
+		 *  @param id The identifier.
+		 */
+		public IFuture componentAdded(final IComponentDescription desc)
+		{
+//			System.out.println("Local added: "+desc);
+			// Todo: collect events and send as bulk
+			ChangeEvent	ce	= new ChangeEvent(null, "component-added", desc);
+			rcl.changeOccurred(ce).addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object result)
+				{
+//					System.out.println("update succeeded: "+desc);
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					if(cms!=null)
+					{
+//						System.out.println("Removing listener due to failed update: "+RemoteCMSListener.this.id);
+						try
+						{
+							cms.removeComponentListener(null, RemoteCMSListener.this);
+						}
+						catch(RuntimeException e)
+						{
+//							System.out.println("Listener already removed: "+id);
+						}
+						RemoteCMSListener.this.cms	= null;	// Set to null to avoid multiple removal due to delayed errors. 
+					}
+				}
+			});
+			return IFuture.DONE;
+		}
+		
+		/**
+		 *  Called when a component has changed its state.
+		 *  @param id The identifier.
+		 */
+		public IFuture componentChanged(IComponentDescription desc)
+		{
+			// ignored
+			return IFuture.DONE;
+		}
+		
+		/**
+		 *  Called when a new element has been removed.
+		 *  @param id The identifier.
+		 */
+		public IFuture componentRemoved(final IComponentDescription desc, Map results)
+		{
+//			System.out.println("Local removed: "+desc);
+			// Todo: collect events and send as bulk
+			ChangeEvent	ce	= new ChangeEvent(null, "component-removed", desc);
+			rcl.changeOccurred(ce).addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object result)
+				{
+//					System.out.println("update succeeded: "+desc);
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					if(cms!=null)
+					{
+//						System.out.println("Removing listener due to failed update: "+RemoteCMSListener.this.id);
+						try
+						{
+							cms.removeComponentListener(null, RemoteCMSListener.this);
+						}
+						catch(RuntimeException e)
+						{
+//							System.out.println("Listener already removed: "+id);
+						}
+						RemoteCMSListener.this.cms	= null;	// Set to null to avoid multiple removal due to delayed errors. 
+					}
+				}
+			});
+			return IFuture.DONE;
+		}
+		
+		//-------- methods --------
+		
+		/**
+		 *  Test if two objects are equal.
+		 */
+		public boolean	equals(Object obj)
+		{
+			return obj instanceof RemoteCMSListener && SUtil.equals(((RemoteCMSListener)obj).id, id);
+		}
+		
+		/**
+		 *  Get the hashcode
+		 */
+		public int	hashCode()
+		{
+			return 31+id.hashCode();
+		}
 	}
-	
 }

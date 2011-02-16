@@ -7,7 +7,6 @@ import jadex.commons.ChangeEvent;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.IChangeListener;
 import jadex.commons.SUtil;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
@@ -92,19 +91,19 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 				{
 					public IFuture componentRemoved(IComponentDescription desc, Map results)
 					{
-						return new Future(null);
+						return IFuture.DONE;
 					}
 					
 					public IFuture componentChanged(IComponentDescription desc)
 					{
 						BreakpointPanel.this.description	= desc;
 						// Todo: update gui?
-						return new Future(null);
+						return IFuture.DONE;
 					}
 					
 					public IFuture componentAdded(IComponentDescription desc)
 					{
-						return new Future(null);
+						return IFuture.DONE;
 					}
 				});
 				
