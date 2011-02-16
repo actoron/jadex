@@ -418,27 +418,28 @@ public class RemoteFileSystemView extends FileSystemView
 	// because most OS file systems will likely be able to use this
 	// code. If a given OS can't, override these methods in its
 	// implementation.
-//	public File getHomeDirectory()
-//	{
-//		return createFileObject(System.getProperty("user.home"));
-//	}
+	public File getHomeDirectory()
+	{
+		return new File(".");//createFileObject(System.getProperty("user.home"));
+	}
 
-//	/**
-//	 * Return the user's default starting directory for the file chooser.
-//	 * 
-//	 * @return a <code>File</code> object representing the default starting
-//	 *         folder
-//	 * @since 1.4
-//	 */
-//	public File getDefaultDirectory()
-//	{
+	/**
+	 * Return the user's default starting directory for the file chooser.
+	 * 
+	 * @return a <code>File</code> object representing the default starting
+	 *         folder
+	 * @since 1.4
+	 */
+	public File getDefaultDirectory()
+	{
+		return new File(".");
 //		File f = (File)ShellFolder.get("fileChooserDefaultFolder");
 //		if(isFileSystemRoot(f))
 //		{
 //			f = createFileSystemRoot(f);
 //		}
 //		return f;
-//	}
+	}
 
 //	/**
 //	 * Returns a File object constructed in dir from the given filename.
@@ -485,8 +486,16 @@ public class RemoteFileSystemView extends FileSystemView
 				public Object execute(IInternalAccess ia)
 				{
 					File dir = new File(mydir.getPath());
-					FileSystemView view = FileSystemView.getFileSystemView();
-					File[] files = view.getFiles(dir, useFileHiding);
+					File[] files;
+					if(dir.exists())
+					{
+						FileSystemView view = FileSystemView.getFileSystemView();
+						files = view.getFiles(dir, useFileHiding);
+					}
+					else
+					{
+						files = new File[0];
+					}
 					return RemoteFile.convertToRemoteFiles(files);
 				}
 			}).addResultListener(new SwingDefaultResultListener()
