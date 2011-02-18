@@ -23,7 +23,7 @@ public class JadexSubProcessFilePropertySection extends AbstractMultiTextfieldPr
 	 */
 	public JadexSubProcessFilePropertySection()
 	{
-		super(JadexBpmnPropertiesUtil.JADEX_SUBPROCESS_ANNOTATION,
+		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
 				textFieldNames);
 	}
 

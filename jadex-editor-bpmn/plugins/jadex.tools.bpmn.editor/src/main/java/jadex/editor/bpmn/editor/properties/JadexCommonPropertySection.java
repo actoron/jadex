@@ -33,7 +33,7 @@ public class JadexCommonPropertySection extends AbstractBpmnPropertySection
 	 */
 	public JadexCommonPropertySection()
 	{
-		super(JadexBpmnPropertiesUtil.JADEX_COMMON_ANNOTATION, null);
+		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, null);
 	}
 
 	// ---- methods ----

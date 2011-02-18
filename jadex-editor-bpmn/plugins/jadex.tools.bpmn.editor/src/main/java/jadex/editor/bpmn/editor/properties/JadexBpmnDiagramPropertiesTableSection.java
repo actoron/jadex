@@ -28,7 +28,8 @@ public class JadexBpmnDiagramPropertiesTableSection extends
 	 */
 	public JadexBpmnDiagramPropertiesTableSection()
 	{
-		super(JadexBpmnPropertiesUtil.JADEX_SUBPROCESS_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_PROPERTIES_LIST_DETAIL,
+		// FIXME: use jadex - TEST
+		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_PROPERTIES_LIST_DETAIL,
 				"Properties", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX);
 		
 	}

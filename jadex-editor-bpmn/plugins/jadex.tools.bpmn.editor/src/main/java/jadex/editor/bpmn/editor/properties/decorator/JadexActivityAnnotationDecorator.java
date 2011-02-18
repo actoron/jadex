@@ -21,7 +21,7 @@ public class JadexActivityAnnotationDecorator extends BpmnEAnnotationDecoratorPr
 
 	public String getAssociatedAnnotationSource() 
 	{
-		return JadexBpmnPropertiesUtil.JADEX_ACTIVITY_ANNOTATION;
+		return JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION;
 	}
 
 	public Direction getDirection(EditPart arg0, EModelElement arg1, EAnnotation arg2) 

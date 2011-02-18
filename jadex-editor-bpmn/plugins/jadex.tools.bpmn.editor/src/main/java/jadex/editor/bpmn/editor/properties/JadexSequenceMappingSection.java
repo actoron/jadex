@@ -28,7 +28,7 @@ public class JadexSequenceMappingSection extends
 	 */
 	public JadexSequenceMappingSection()
 	{
-		super(JadexBpmnPropertiesUtil.JADEX_SEQUENCE_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_MAPPING_LIST_DETAIL,
+		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_MAPPING_LIST_DETAIL,
 				"Mappings", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX);
 		
 	}
