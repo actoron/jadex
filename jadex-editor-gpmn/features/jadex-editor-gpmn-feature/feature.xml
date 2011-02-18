@@ -66,7 +66,7 @@ may contact us for obtaining a closed source license.
       <import plugin="org.eclipse.wst.xml.core" version="1.1.401" match="greaterOrEqual"/>
       <import plugin="org.eclipse.wst.xml.ui" version="1.1.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jface.text"/>
-      <import feature="jadex.editor.bpmn.feature" version="1.0.1.qualifier" match="greaterOrEqual"/>
+      <import feature="jadex.editor.bpmn.feature" version="1.0.1.201011191052" match="greaterOrEqual"/>
    </requires>
 
    <plugin
