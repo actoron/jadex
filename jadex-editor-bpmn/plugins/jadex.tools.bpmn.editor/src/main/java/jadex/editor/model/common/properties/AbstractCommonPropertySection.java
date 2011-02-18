@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gef.EditPart;
+import org.eclipse.gef.GraphicalEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
@@ -42,6 +43,9 @@ public abstract class AbstractCommonPropertySection extends
 
 	/** The composite that holds the section parts */
 	protected Composite sectionComposite;
+	
+	/** The Edit Part, may be null */
+	protected EditPart editPart;
 	
 	/** The modelElement, may be null. */
 	protected EModelElement modelElement;
@@ -209,6 +213,7 @@ public abstract class AbstractCommonPropertySection extends
 					&& (((IGraphicalEditPart) unknownInput)
 							.resolveSemanticElement() != null))
 			{
+				editPart = (IGraphicalEditPart) unknownInput;
 				unknownInput = ((IGraphicalEditPart) unknownInput)
 						.resolveSemanticElement();
 			}
@@ -219,6 +224,8 @@ public abstract class AbstractCommonPropertySection extends
 				
 				return;
 			}
+			if (unknownInput instanceof EditPart)
+				editPart = (EditPart) unknownInput;
 		}
 
 		// fall through
