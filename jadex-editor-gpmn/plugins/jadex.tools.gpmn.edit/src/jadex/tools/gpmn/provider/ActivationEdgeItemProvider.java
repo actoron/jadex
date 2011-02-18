@@ -65,7 +65,8 @@ public class ActivationEdgeItemProvider extends AbstractEdgeItemProvider
 	@Override
 	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object)
 	{
-		if (itemPropertyDescriptors == null) {
+		if (itemPropertyDescriptors == null)
+		{
 			super.getPropertyDescriptors(object);
 
 			addOrderPropertyDescriptor(object);
@@ -135,7 +136,8 @@ public class ActivationEdgeItemProvider extends AbstractEdgeItemProvider
 	{
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(ActivationEdge.class)) {
+		switch (notification.getFeatureID(ActivationEdge.class))
+		{
 			case GpmnPackage.ACTIVATION_EDGE__ORDER:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;

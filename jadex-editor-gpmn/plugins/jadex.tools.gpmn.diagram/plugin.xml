@@ -177,7 +177,7 @@ http://www.eclipse.org/legal/epl-v10.html
    </extension>
 
    <extension point="org.eclipse.ui.views.properties.tabbed.propertyContributor" id="prop-contrib">
-      <?gmfgen generated="true"?>
+      <?gmfgen generated="false"?>
       <propertyContributor
             contributorId="jadex.tools.gpmn.diagram"
             labelProvider="jadex.tools.gpmn.diagram.sheet.GpmnSheetLabelProvider">
@@ -215,6 +215,14 @@ http://www.eclipse.org/legal/epl-v10.html
              id="property.tab.activationedgetab"
              label="%tab.activationedgetab"/>
           <propertyTab
+             category="extra"
+             id="property.tab.virtualactivationedgetab"
+             label="%tab.virtualactivationedgetab"/>
+          <propertyTab
+             category="extra"
+             id="property.tab.activationplantab"
+             label="%tab.activationplantab"/>
+          <propertyTab
              category="domain"
              id="property.tab.domain"
              label="%tab.domain"/>
@@ -222,6 +230,10 @@ http://www.eclipse.org/legal/epl-v10.html
              category="extra"
              id="property.tab.context"
              label="%tab.context"/>
+          <propertyTab
+             category="extra"
+             id="property.tab.viewcontroltab"
+             label="%tab.viewcontroltab"/>
       </propertyTabs>
    </extension>
 
@@ -277,6 +289,20 @@ http://www.eclipse.org/legal/epl-v10.html
             <input type="jadex.tools.gpmn.diagram.navigator.GpmnAbstractNavigatorItem"/>
          </propertySection>
          <propertySection
+            id="property.section.virtualactivationedgetab" 
+            tab="property.tab.virtualactivationedgetab"
+            class="jadex.tools.gpmn.diagram.sheet.GpmnVirtualActivationEdgePropertySection">
+            <input type="jadex.tools.gpmn.diagram.edit.parts.VirtualActivationEdgeEditPart"/>
+            <input type="jadex.tools.gpmn.diagram.navigator.GpmnAbstractNavigatorItem"/>
+         </propertySection>
+         <propertySection
+            id="property.section.activationplantab" 
+            tab="property.tab.activationplantab"
+            class="jadex.tools.gpmn.diagram.sheet.GpmnActivationPlanPropertySection">
+            <input type="jadex.tools.gpmn.diagram.edit.parts.ActivationPlanEditPart"/>
+            <input type="jadex.tools.gpmn.diagram.navigator.GpmnAbstractNavigatorItem"/>
+         </propertySection>
+         <propertySection
             id="property.section.domain" 
             tab="property.tab.domain"
             class="jadex.tools.gpmn.diagram.sheet.GpmnPropertySection">
@@ -288,6 +314,13 @@ http://www.eclipse.org/legal/epl-v10.html
             id="property.section.context" 
             tab="property.tab.context"
             class="jadex.tools.gpmn.diagram.sheet.GpmnContextElementsPropertySection">
+            <input type="jadex.tools.gpmn.diagram.edit.parts.GpmnDiagramEditPart"/>
+            <input type="jadex.tools.gpmn.diagram.navigator.GpmnAbstractNavigatorItem"/>
+         </propertySection>
+         <propertySection
+            id="property.section.viewcontroltab" 
+            tab="property.tab.viewcontroltab"
+            class="jadex.tools.gpmn.diagram.sheet.GpmnViewControlSection">
             <input type="jadex.tools.gpmn.diagram.edit.parts.GpmnDiagramEditPart"/>
             <input type="jadex.tools.gpmn.diagram.navigator.GpmnAbstractNavigatorItem"/>
          </propertySection>

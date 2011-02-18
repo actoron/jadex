@@ -246,7 +246,13 @@ public class VirtualActivationOrderEditPart extends LabelEditPart implements
 				.getNotationView();
 		if (veEdge.getTargetEdges().size() == 0)
 			return null;
-		Node aeNode = (Node) ((Edge) veEdge.getTargetEdges().get(0))
+		
+		Edge aEdge = (Edge) ((Edge) veEdge.getTargetEdges().get(0)).getSource();
+		if (!((ActivationPlan) ((Node) aEdge.getSource()).getElement()).getMode().equals(ModeType.SEQUENTIAL))
+			return null;
+		return aEdge.getElement();
+		
+		/*Node aeNode = (Node) ((Edge) veEdge.getTargetEdges().get(0))
 				.getSource();
 		if (((ActivationPlan) aeNode.getElement()).getMode() != ModeType.SEQUENTIAL)
 			return null;
@@ -254,11 +260,10 @@ public class VirtualActivationOrderEditPart extends LabelEditPart implements
 			if ((edge instanceof Edge)
 					&& (((Edge) edge).getTarget().equals(veEdge.getTarget())))
 			{
-				System.out.println(((Edge) edge).getElement());
 				return ((Edge) edge).getElement();
-			}
+			}*/
 		
-		return null;
+		//return null;
 	}
 	
 	/**

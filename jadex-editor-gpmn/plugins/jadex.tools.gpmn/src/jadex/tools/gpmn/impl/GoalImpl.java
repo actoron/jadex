@@ -837,7 +837,8 @@ public class GoalImpl extends AbstractNodeImpl implements Goal
 	 */
 	public EList<ActivationEdge> getActivationEdges()
 	{
-		if (activationEdges == null) {
+		if (activationEdges == null)
+		{
 			activationEdges = new EObjectWithInverseEList.Unsettable<ActivationEdge>(ActivationEdge.class, this, GpmnPackage.GOAL__ACTIVATION_EDGES, GpmnPackage.ACTIVATION_EDGE__TARGET);
 		}
 		return activationEdges;
@@ -870,7 +871,8 @@ public class GoalImpl extends AbstractNodeImpl implements Goal
 	 */
 	public EList<PlanEdge> getPlanEdges()
 	{
-		if (planEdges == null) {
+		if (planEdges == null)
+		{
 			planEdges = new EObjectEList<PlanEdge>(PlanEdge.class, this, GpmnPackage.GOAL__PLAN_EDGES);
 		}
 		return planEdges;
@@ -883,7 +885,8 @@ public class GoalImpl extends AbstractNodeImpl implements Goal
 	 */
 	public EList<SuppressionEdge> getSuppressionEdge()
 	{
-		if (suppressionEdge == null) {
+		if (suppressionEdge == null)
+		{
 			suppressionEdge = new EObjectEList<SuppressionEdge>(SuppressionEdge.class, this, GpmnPackage.GOAL__SUPPRESSION_EDGE);
 		}
 		return suppressionEdge;
@@ -2124,7 +2127,8 @@ public class GoalImpl extends AbstractNodeImpl implements Goal
 	 */
 	public void setGpmnDiagram(GpmnDiagram newGpmnDiagram)
 	{
-		if (newGpmnDiagram != eInternalContainer() || (eContainerFeatureID() != GpmnPackage.GOAL__GPMN_DIAGRAM && newGpmnDiagram != null)) {
+		if (newGpmnDiagram != eInternalContainer() || (eContainerFeatureID() != GpmnPackage.GOAL__GPMN_DIAGRAM && newGpmnDiagram != null))
+		{
 			if (EcoreUtil.isAncestor(this, newGpmnDiagram))
 				throw new IllegalArgumentException("Recursive containment not allowed for " + toString()); //$NON-NLS-1$
 			NotificationChain msgs = null;
@@ -2149,7 +2153,8 @@ public class GoalImpl extends AbstractNodeImpl implements Goal
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.GOAL__ACTIVATION_EDGES:
 				return ((InternalEList<InternalEObject>)(InternalEList<?>)getActivationEdges()).basicAdd(otherEnd, msgs);
 			case GpmnPackage.GOAL__GPMN_DIAGRAM:
@@ -2169,7 +2174,8 @@ public class GoalImpl extends AbstractNodeImpl implements Goal
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.GOAL__ACTIVATION_EDGES:
 				return ((InternalEList<?>)getActivationEdges()).basicRemove(otherEnd, msgs);
 			case GpmnPackage.GOAL__GPMN_DIAGRAM:
@@ -2187,7 +2193,8 @@ public class GoalImpl extends AbstractNodeImpl implements Goal
 	public NotificationChain eBasicRemoveFromContainerFeature(
 			NotificationChain msgs)
 	{
-		switch (eContainerFeatureID()) {
+		switch (eContainerFeatureID())
+		{
 			case GpmnPackage.GOAL__GPMN_DIAGRAM:
 				return eInternalContainer().eInverseRemove(this, GpmnPackage.GPMN_DIAGRAM__GOALS, GpmnDiagram.class, msgs);
 		}
@@ -2202,7 +2209,8 @@ public class GoalImpl extends AbstractNodeImpl implements Goal
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.GOAL__ACTIVATION_EDGES:
 				return getActivationEdges();
 			case GpmnPackage.GOAL__PLAN_EDGES:
@@ -2272,7 +2280,8 @@ public class GoalImpl extends AbstractNodeImpl implements Goal
 	@Override
 	public void eSet(int featureID, Object newValue)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.GOAL__ACTIVATION_EDGES:
 				getActivationEdges().clear();
 				getActivationEdges().addAll((Collection<? extends ActivationEdge>)newValue);
@@ -2372,7 +2381,8 @@ public class GoalImpl extends AbstractNodeImpl implements Goal
 	@Override
 	public void eUnset(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.GOAL__ACTIVATION_EDGES:
 				unsetActivationEdges();
 				return;
@@ -2469,7 +2479,8 @@ public class GoalImpl extends AbstractNodeImpl implements Goal
 	@Override
 	public boolean eIsSet(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.GOAL__ACTIVATION_EDGES:
 				return isSetActivationEdges();
 			case GpmnPackage.GOAL__PLAN_EDGES:
@@ -2538,8 +2549,10 @@ public class GoalImpl extends AbstractNodeImpl implements Goal
 	@Override
 	public int eBaseStructuralFeatureID(int derivedFeatureID, Class<?> baseClass)
 	{
-		if (baseClass == Activatable.class) {
-			switch (derivedFeatureID) {
+		if (baseClass == Activatable.class)
+		{
+			switch (derivedFeatureID)
+			{
 				case GpmnPackage.GOAL__ACTIVATION_EDGES: return GpmnPackage.ACTIVATABLE__ACTIVATION_EDGES;
 				default: return -1;
 			}
@@ -2555,8 +2568,10 @@ public class GoalImpl extends AbstractNodeImpl implements Goal
 	@Override
 	public int eDerivedStructuralFeatureID(int baseFeatureID, Class<?> baseClass)
 	{
-		if (baseClass == Activatable.class) {
-			switch (baseFeatureID) {
+		if (baseClass == Activatable.class)
+		{
+			switch (baseFeatureID)
+			{
 				case GpmnPackage.ACTIVATABLE__ACTIVATION_EDGES: return GpmnPackage.GOAL__ACTIVATION_EDGES;
 				default: return -1;
 			}

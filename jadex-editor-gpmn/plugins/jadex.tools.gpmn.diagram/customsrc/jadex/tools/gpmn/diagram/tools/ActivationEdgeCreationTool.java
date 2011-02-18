@@ -3,7 +3,6 @@ package jadex.tools.gpmn.diagram.tools;
 import jadex.tools.gpmn.ActivationPlan;
 import jadex.tools.gpmn.diagram.edit.parts.ActivationPlanEditPart;
 import jadex.tools.gpmn.diagram.edit.parts.GoalEditPart;
-import jadex.tools.gpmn.diagram.edit.parts.PlanEdgeEditPart;
 import jadex.tools.gpmn.diagram.edit.parts.SubProcessEditPart;
 import jadex.tools.gpmn.diagram.providers.GpmnElementTypes;
 
@@ -16,15 +15,11 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
-import org.eclipse.emf.edit.ui.provider.UnwrappingSelectionProvider;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.emf.workspace.util.WorkspaceSynchronizer;
 import org.eclipse.gef.EditPart;
-import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.commands.CompoundCommand;
-import org.eclipse.gef.editparts.FreeformGraphicalRootEditPart;
-import org.eclipse.gef.editparts.LayerManager;
 import org.eclipse.gef.requests.CreateConnectionRequest;
 import org.eclipse.gef.tools.ConnectionDragCreationTool;
 import org.eclipse.gmf.runtime.common.core.command.CommandResult;
@@ -171,13 +166,15 @@ public class ActivationEdgeCreationTool extends ConnectionDragCreationTool
 						ActivationPlanEditPart apPart = (ActivationPlanEditPart) SGpmnUtilities.resolveEditPart(diagramEditPart, apNode);
 						CreateConnectionViewRequest req = CreateViewRequestFactory.getCreateConnectionRequest(GpmnElementTypes.ActivationEdge_4001, diagramEditPart.getDiagramPreferencesHint());
 						CreateConnectionViewAndElementRequest.getCreateCommand(req, apPart, target).execute();
+						apPart.refresh();
+						EditPart aePart = SGpmnUtilities.unwrap(req);
 						
 						req = CreateViewRequestFactory.getCreateConnectionRequest(GpmnElementTypes.Link_4003, diagramEditPart.getDiagramPreferencesHint());
 						CreateConnectionViewAndElementRequest.getCreateCommand(req, goalsource, target).execute();
 						goalsource.refresh();
 						EditPart vPart = SGpmnUtilities.unwrap(req);
 						req = CreateViewRequestFactory.getCreateConnectionRequest(DiagramNotationType.NOTE_ATTACHMENT, diagramEditPart.getDiagramPreferencesHint());
-						CreateConnectionViewAndElementRequest.getCreateCommand(req, apPart, vPart).execute();
+						CreateConnectionViewAndElementRequest.getCreateCommand(req, aePart, vPart).execute();
 						vPart.refresh();
 						
 						apNode.setVisible(false);

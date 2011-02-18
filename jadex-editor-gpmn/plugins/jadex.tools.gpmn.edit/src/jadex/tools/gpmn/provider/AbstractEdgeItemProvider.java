@@ -65,7 +65,8 @@ public class AbstractEdgeItemProvider extends IdentifiableItemProvider
 	@Override
 	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object)
 	{
-		if (itemPropertyDescriptors == null) {
+		if (itemPropertyDescriptors == null)
+		{
 			super.getPropertyDescriptors(object);
 
 		}
@@ -84,7 +85,8 @@ public class AbstractEdgeItemProvider extends IdentifiableItemProvider
 	public Collection<? extends EStructuralFeature> getChildrenFeatures(
 			Object object)
 	{
-		if (childrenFeatures == null) {
+		if (childrenFeatures == null)
+		{
 			super.getChildrenFeatures(object);
 			childrenFeatures.add(GpmnPackage.Literals.ABSTRACT_EDGE__PARAMETER_MAPPING);
 		}
@@ -132,7 +134,8 @@ public class AbstractEdgeItemProvider extends IdentifiableItemProvider
 	{
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(AbstractEdge.class)) {
+		switch (notification.getFeatureID(AbstractEdge.class))
+		{
 			case GpmnPackage.ABSTRACT_EDGE__PARAMETER_MAPPING:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;

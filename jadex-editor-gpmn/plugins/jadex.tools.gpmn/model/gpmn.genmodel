@@ -30,6 +30,7 @@
       <genEnumLiterals ecoreEnumLiteral="gpmn.ecore#//GoalType/MaintainGoal"/>
       <genEnumLiterals ecoreEnumLiteral="gpmn.ecore#//GoalType/AchieveGoal"/>
       <genEnumLiterals ecoreEnumLiteral="gpmn.ecore#//GoalType/PerformGoal"/>
+      <genEnumLiterals ecoreEnumLiteral="gpmn.ecore#//GoalType/QueryGoal"/>
     </genEnums>
     <genEnums typeSafeEnumCompatible="false" ecoreEnum="gpmn.ecore#//ModeType">
       <genEnumLiterals ecoreEnumLiteral="gpmn.ecore#//ModeType/Parallel"/>

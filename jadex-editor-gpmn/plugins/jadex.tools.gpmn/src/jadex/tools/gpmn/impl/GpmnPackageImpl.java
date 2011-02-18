@@ -1792,6 +1792,7 @@ public class GpmnPackageImpl extends EPackageImpl implements GpmnPackage
 		addEEnumLiteral(goalTypeEEnum, GoalType.MAINTAIN_GOAL);
 		addEEnumLiteral(goalTypeEEnum, GoalType.ACHIEVE_GOAL);
 		addEEnumLiteral(goalTypeEEnum, GoalType.PERFORM_GOAL);
+		addEEnumLiteral(goalTypeEEnum, GoalType.QUERY_GOAL);
 
 		initEEnum(modeTypeEEnum, ModeType.class, "ModeType"); //$NON-NLS-1$
 		addEEnumLiteral(modeTypeEEnum, ModeType.PARALLEL);
@@ -1824,709 +1825,811 @@ public class GpmnPackageImpl extends EPackageImpl implements GpmnPackage
 		addAnnotation
 		  (abstractEdgeEClass, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "AbstractEdge", //$NON-NLS-1$ //$NON-NLS-2$
 			 "kind", "elementOnly" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getAbstractEdge_ParameterMapping(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "parameterMapping" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (abstractNodeEClass, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "AbstractNode", //$NON-NLS-1$ //$NON-NLS-2$
 			 "kind", "elementOnly" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getAbstractNode_Parameter(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "parameter" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (abstractPlanEClass, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "AbstractPlan", //$NON-NLS-1$ //$NON-NLS-2$
 			 "kind", "elementOnly" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getAbstractPlan_PlanEdges(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "planEdges" //$NON-NLS-1$ //$NON-NLS-2$
 		   });			
 		addAnnotation
 		  (getAbstractPlan_Contextcondition(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "contextcondition" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getAbstractPlan_TargetconditionLanguage(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "targetcondition_language" //$NON-NLS-1$ //$NON-NLS-2$
 		   });			
 		addAnnotation
 		  (getAbstractPlan_Precondition(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "precondition" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getAbstractPlan_PreconditionLanguage(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "precondition_language" //$NON-NLS-1$ //$NON-NLS-2$
 		   });			
 		addAnnotation
 		  (getAbstractPlan_Priority(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "priority" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (activatableEClass, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "Activatable", //$NON-NLS-1$ //$NON-NLS-2$
 			 "kind", "elementOnly" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getActivatable_ActivationEdges(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "activationEdges" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (activationEdgeEClass, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "ActivationEdge", //$NON-NLS-1$ //$NON-NLS-2$
 			 "kind", "elementOnly" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getActivationEdge_Source(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "source" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getActivationEdge_Target(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "target" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getActivationEdge_Order(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "order" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (bpmnPlanEClass, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "BpmnPlan", //$NON-NLS-1$ //$NON-NLS-2$
 			 "kind", "elementOnly" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getBpmnPlan_Planref(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "planref" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (conditionLanguageEEnum, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "ConditionLanguage" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (conditionLanguageObjectEDataType, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "ConditionLanguage:Object", //$NON-NLS-1$ //$NON-NLS-2$
 			 "baseType", "ConditionLanguage" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (contextEClass, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "Context", //$NON-NLS-1$ //$NON-NLS-2$
 			 "kind", "elementOnly" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getContext_Elements(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "element" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (contextElementEClass, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "ContextElement", //$NON-NLS-1$ //$NON-NLS-2$
 			 "kind", "elementOnly" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getContextElement_Value(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "value" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getContextElement_Name(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "name" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getContextElement_Set(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "set" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getContextElement_Type(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "type" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (directionTypeEEnum, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "direction_._type" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (directionTypeObjectEDataType, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "direction_._type:Object", //$NON-NLS-1$ //$NON-NLS-2$
 			 "baseType", "direction_._type" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (excludeTypeEEnum, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "exclude_._type" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (excludeTypeObjectEDataType, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "exclude_._type:Object", //$NON-NLS-1$ //$NON-NLS-2$
 			 "baseType", "exclude_._type" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (goalEClass, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "Goal", //$NON-NLS-1$ //$NON-NLS-2$
 			 "kind", "elementOnly" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGoal_PlanEdges(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "planEdges" //$NON-NLS-1$ //$NON-NLS-2$
 		   });			
 		addAnnotation
 		  (getGoal_Unique(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "unique" //$NON-NLS-1$ //$NON-NLS-2$
 		   });			
 		addAnnotation
 		  (getGoal_Creationcondition(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "creationcondition" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGoal_CreationconditionLanguage(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "creationcondition_language" //$NON-NLS-1$ //$NON-NLS-2$
 		   });			
 		addAnnotation
 		  (getGoal_Contextcondition(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "contextcondition" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGoal_ContextconditionLanguage(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "contextcondition_language" //$NON-NLS-1$ //$NON-NLS-2$
 		   });			
 		addAnnotation
 		  (getGoal_Dropcondition(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "dropcondition" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGoal_DropconditionLanguage(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "dropcondition_language" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGoal_Recurcondition(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "recurcondition" //$NON-NLS-1$ //$NON-NLS-2$
 		   });			
 		addAnnotation
 		  (getGoal_Deliberation(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "deliberation" //$NON-NLS-1$ //$NON-NLS-2$
 		   });			
 		addAnnotation
 		  (getGoal_Targetcondition(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "targetcondition" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGoal_TargetconditionLanguage(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "targetcondition_language" //$NON-NLS-1$ //$NON-NLS-2$
 		   });			
 		addAnnotation
 		  (getGoal_Failurecondition(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "failurecondition" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGoal_FailureconditionLanguage(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "failurecondition_language" //$NON-NLS-1$ //$NON-NLS-2$
 		   });			
 		addAnnotation
 		  (getGoal_Maintaincondition(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "maintaincondition" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGoal_MaintainconditionLanguage(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "maintaincondition_language" //$NON-NLS-1$ //$NON-NLS-2$
 		   });			
 		addAnnotation
 		  (getGoal_Exclude(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "exclude" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGoal_GoalType(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "goalType" //$NON-NLS-1$ //$NON-NLS-2$
 		   });			
 		addAnnotation
 		  (getGoal_Posttoall(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "posttoall" //$NON-NLS-1$ //$NON-NLS-2$
 		   });			
 		addAnnotation
 		  (getGoal_Randomselection(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "randomselection" //$NON-NLS-1$ //$NON-NLS-2$
 		   });			
 		addAnnotation
 		  (getGoal_Recalculate(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "recalculate" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGoal_Recur(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "recur" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGoal_Recurdelay(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "recurdelay" //$NON-NLS-1$ //$NON-NLS-2$
 		   });			
 		addAnnotation
 		  (getGoal_Retry(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "retry" //$NON-NLS-1$ //$NON-NLS-2$
 		   });			
 		addAnnotation
 		  (getGoal_Retrydelay(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "retrydelay" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (goalTypeEEnum, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "GoalType" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (goalTypeObjectEDataType, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "GoalType:Object", //$NON-NLS-1$ //$NON-NLS-2$
 			 "baseType", "GoalType" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (gpmnDiagramEClass, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "GpmnDiagram", //$NON-NLS-1$ //$NON-NLS-2$
 			 "kind", "elementOnly" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGpmnDiagram_Package(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "package" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGpmnDiagram_Imports(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "import" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGpmnDiagram_Context(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "context" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGpmnDiagram_Goals(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "goal" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGpmnDiagram_Plans(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "plan" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGpmnDiagram_SubProcesses(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "subProcess" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGpmnDiagram_ActivationEdges(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "activationEdge" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGpmnDiagram_PlanEdges(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "planEdge" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGpmnDiagram_SuppressionEdges(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "suppressionEdge" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGpmnDiagram_Author(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "author" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGpmnDiagram_Revision(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "revision" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGpmnDiagram_Title(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "title" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getGpmnDiagram_Version(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "version" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (identifiableEClass, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "Identifiable", //$NON-NLS-1$ //$NON-NLS-2$
 			 "kind", "elementOnly" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getIdentifiable_Id(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "id" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (activationPlanEClass, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "ActivationPlan", //$NON-NLS-1$ //$NON-NLS-2$
 			 "kind", "elementOnly" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getActivationPlan_ActivationEdges(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "activationEdges" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getActivationPlan_Mode(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "mode" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (modeTypeEEnum, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "mode_._type" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (modeTypeObjectEDataType, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "mode_._type:Object", //$NON-NLS-1$ //$NON-NLS-2$
 			 "baseType", "mode_._type" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (namedObjectEClass, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "NamedObject", //$NON-NLS-1$ //$NON-NLS-2$
 			 "kind", "elementOnly" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getNamedObject_Description(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "description" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getNamedObject_Name(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "name" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getNamedObject_Ncname(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "ncname" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (parameterEClass, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "Parameter", //$NON-NLS-1$ //$NON-NLS-2$
 			 "kind", "elementOnly" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getParameter_Value(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "value" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getParameter_Direction(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "direction" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getParameter_Name(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "name" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getParameter_Type(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "type" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (parameterMappingEClass, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "ParameterMapping", //$NON-NLS-1$ //$NON-NLS-2$
 			 "kind", "elementOnly" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getParameterMapping_Value(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "element", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "value" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getParameterMapping_Name(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "name" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (planEdgeEClass, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "PlanEdge", //$NON-NLS-1$ //$NON-NLS-2$
 			 "kind", "elementOnly" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getPlanEdge_Source(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "source" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getPlanEdge_Target(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "target" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (subProcessEClass, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "SubProcess", //$NON-NLS-1$ //$NON-NLS-2$
 			 "kind", "elementOnly" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getSubProcess_Processref(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "processref" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getSubProcess_Internal(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "internal" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (suppressionEdgeEClass, 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "name", "SuppressionEdge", //$NON-NLS-1$ //$NON-NLS-2$
 			 "kind", "elementOnly" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getSuppressionEdge_Source(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "source" //$NON-NLS-1$ //$NON-NLS-2$
 		   });		
 		addAnnotation
 		  (getSuppressionEdge_Target(), 
 		   source, 
-		   new String[] {
+		   new String[] 
+		   {
 			 "kind", "attribute", //$NON-NLS-1$ //$NON-NLS-2$
 			 "name", "target" //$NON-NLS-1$ //$NON-NLS-2$
 		   });

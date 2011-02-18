@@ -90,7 +90,8 @@ public enum ConditionLanguage implements Enumerator
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private static final ConditionLanguage[] VALUES_ARRAY = new ConditionLanguage[] {
+	private static final ConditionLanguage[] VALUES_ARRAY = new ConditionLanguage[]
+		{
 			JCL,
 			JAVA,
 		};
@@ -111,9 +112,11 @@ public enum ConditionLanguage implements Enumerator
 	 */
 	public static ConditionLanguage get(String literal)
 	{
-		for (int i = 0; i < VALUES_ARRAY.length; ++i) {
+		for (int i = 0; i < VALUES_ARRAY.length; ++i)
+		{
 			ConditionLanguage result = VALUES_ARRAY[i];
-			if (result.toString().equals(literal)) {
+			if (result.toString().equals(literal))
+			{
 				return result;
 			}
 		}
@@ -128,9 +131,11 @@ public enum ConditionLanguage implements Enumerator
 	 */
 	public static ConditionLanguage getByName(String name)
 	{
-		for (int i = 0; i < VALUES_ARRAY.length; ++i) {
+		for (int i = 0; i < VALUES_ARRAY.length; ++i)
+		{
 			ConditionLanguage result = VALUES_ARRAY[i];
-			if (result.getName().equals(name)) {
+			if (result.getName().equals(name))
+			{
 				return result;
 			}
 		}
@@ -145,7 +150,8 @@ public enum ConditionLanguage implements Enumerator
 	 */
 	public static ConditionLanguage get(int value)
 	{
-		switch (value) {
+		switch (value)
+		{
 			case JCL_VALUE: return JCL;
 			case JAVA_VALUE: return JAVA;
 		}

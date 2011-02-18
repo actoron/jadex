@@ -67,7 +67,8 @@ public class NamedObjectItemProvider extends EModelElementItemProvider
 	@Override
 	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object)
 	{
-		if (itemPropertyDescriptors == null) {
+		if (itemPropertyDescriptors == null)
+		{
 			super.getPropertyDescriptors(object);
 
 			addDescriptionPropertyDescriptor(object);
@@ -149,7 +150,8 @@ public class NamedObjectItemProvider extends EModelElementItemProvider
 	{
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(NamedObject.class)) {
+		switch (notification.getFeatureID(NamedObject.class))
+		{
 			case GpmnPackage.NAMED_OBJECT__DESCRIPTION:
 			case GpmnPackage.NAMED_OBJECT__NAME:
 			case GpmnPackage.NAMED_OBJECT__NCNAME:

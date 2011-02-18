@@ -27,6 +27,7 @@
       <xsd:enumeration value="MaintainGoal"/>
       <xsd:enumeration value="AchieveGoal"/>
       <xsd:enumeration value="PerformGoal"/>
+      <xsd:enumeration value="QueryGoal"/>
     </xsd:restriction>
   </xsd:simpleType>
   <xsd:simpleType name="ModeType">

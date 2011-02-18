@@ -65,7 +65,8 @@ public class BpmnPlanItemProvider extends AbstractPlanItemProvider implements
 	@Override
 	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object)
 	{
-		if (itemPropertyDescriptors == null) {
+		if (itemPropertyDescriptors == null)
+		{
 			super.getPropertyDescriptors(object);
 
 			addPlanrefPropertyDescriptor(object);
@@ -135,7 +136,8 @@ public class BpmnPlanItemProvider extends AbstractPlanItemProvider implements
 	{
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(BpmnPlan.class)) {
+		switch (notification.getFeatureID(BpmnPlan.class))
+		{
 			case GpmnPackage.BPMN_PLAN__PLANREF:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;

@@ -14,6 +14,7 @@ import jadex.tools.gpmn.GoalType;
 import jadex.tools.gpmn.ModeType;
 import jadex.tools.gpmn.PlanEdge;
 import jadex.tools.gpmn.diagram.tools.SGpmnUtilities;
+import jadex.tools.gpmn.diagram.ui.PlanSemanticsChooser;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,9 +45,9 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 public class GpmnGoalPropertySection extends GpmnCustomPropertySection
 {
 	public static final String GOAL_CONFIGURATION_TITLE = "Goal Configuration";
-	public static final String GOAL_TYPE_DESC = "Type:";
-	public static final String GOAL_NAME_DESC = "Name:";
-	public static final String GOAL_DESCRIPTION_DESC = "Description:";
+	public static final String TYPE_DESC = "Type:";
+	public static final String NAME_DESC = "Name:";
+	public static final String DESCRIPTION_DESC = "Description:";
 	public static final String CONTEXT_CONDITION_DESC = "Context Condition:";
 	public static final String MAINTAIN_CONDITION_DESC = "Maintain Condition:";
 	public static final String TARGET_CONDITION_DESC = "Target Condition:";
@@ -62,19 +63,10 @@ public class GpmnGoalPropertySection extends GpmnCustomPropertySection
 		GOAL_TYPE_MAP.put("Achieve Goal", GoalType.ACHIEVE_GOAL);
 		GOAL_TYPE_MAP.put("Maintain Goal", GoalType.MAINTAIN_GOAL);
 		GOAL_TYPE_MAP.put("Perform Goal", GoalType.PERFORM_GOAL);
-		//GOAL_TYPE_MAP.put("Query Goal");
-	}
-	
-	protected static final Map<String, ModeType> PLAN_SEMANTICS_MAP = new HashMap<String, ModeType>();
-	static
-	{
-		PLAN_SEMANTICS_MAP.put("Parallel", ModeType.PARALLEL);
-		PLAN_SEMANTICS_MAP.put("Sequential", ModeType.SEQUENTIAL);
-		PLAN_SEMANTICS_MAP.put("Mixed/None", null);
+		GOAL_TYPE_MAP.put("Query Goal", GoalType.QUERY_GOAL);
 	}
 	
 	protected Map<GoalType, Integer> invGoalTypeMap;
-	protected Map<ModeType, Integer> invPlanSemanticsMap;
 	
 	public void createControls(Composite parent,
 			TabbedPropertySheetPage aTabbedPropertySheetPage)
@@ -116,9 +108,9 @@ public class GpmnGoalPropertySection extends GpmnCustomPropertySection
 		
 		Goal goal = (Goal) modelElement;
 		
-		((Combo) controls.get(GOAL_TYPE_DESC)).select(invGoalTypeMap.get(goal
+		((Combo) controls.get(TYPE_DESC)).select(invGoalTypeMap.get(goal
 				.getGoalType()));
-		setTextControlValue(((Text) controls.get(GOAL_NAME_DESC)), conv(goal
+		setTextControlValue(((Text) controls.get(NAME_DESC)), conv(goal
 				.getName()));
 		setTextControlValue(((Text) controls.get(CONTEXT_CONDITION_DESC)),
 				conv(goal.getContextcondition()));
@@ -159,16 +151,16 @@ public class GpmnGoalPropertySection extends GpmnCustomPropertySection
 				ActivationPlan ap = (ActivationPlan) planEdge.getTarget();
 				if (!(ap.getMode().equals(psMode)) && psMode != null)
 				{
-					System.out.println(ap.getMode() + " " + psMode);
 					psMode = null;
 					break;
 				}
 				psMode = ap.getMode();
 			}
 		}
-		((Combo) controls.get(PLAN_SEMANTICS_DESC)).select(invPlanSemanticsMap
-				.get(psMode));
-		((Combo) controls.get(PLAN_SEMANTICS_DESC)).setEnabled(psMode != null);
+		((PlanSemanticsChooser) controls.get(PLAN_SEMANTICS_DESC))
+				.select(psMode);
+		((PlanSemanticsChooser) controls.get(PLAN_SEMANTICS_DESC))
+				.setEnabled(psMode != null);
 		
 		confGroup.layout();
 		confGroup.update();
@@ -184,15 +176,15 @@ public class GpmnGoalPropertySection extends GpmnCustomPropertySection
 	{
 		Label goalTypeLabel = new Label(parent, SWT.LEFT);
 		addDisposable(goalTypeLabel);
-		labels.put(GOAL_TYPE_DESC, goalTypeLabel);
-		goalTypeLabel.setText(GOAL_TYPE_DESC);
+		labels.put(TYPE_DESC, goalTypeLabel);
+		goalTypeLabel.setText(TYPE_DESC);
 		GridData gd = new GridData();
 		gd.widthHint = 200;
 		goalTypeLabel.setLayoutData(gd);
 		
 		Combo goalTypeCombo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
 		addDisposable(goalTypeCombo);
-		controls.put(GOAL_TYPE_DESC, goalTypeCombo);
+		controls.put(TYPE_DESC, goalTypeCombo);
 		gd = new GridData();
 		gd.widthHint = 300;
 		goalTypeCombo.setLayoutData(gd);
@@ -210,7 +202,7 @@ public class GpmnGoalPropertySection extends GpmnCustomPropertySection
 			public void widgetSelected(SelectionEvent se)
 			{
 				final GoalType gt = GOAL_TYPE_MAP.get(((Combo) controls
-						.get(GOAL_TYPE_DESC)).getText());
+						.get(TYPE_DESC)).getText());
 				if (gt != null && modelElement != null)
 				{
 					dispatchCommand(new ModifyEObjectCommand(modelElement,
@@ -237,7 +229,7 @@ public class GpmnGoalPropertySection extends GpmnCustomPropertySection
 	
 	protected void addNameControl(final Composite parent)
 	{
-		Text nameText = addLabeledTextControl(parent, GOAL_NAME_DESC);
+		Text nameText = addLabeledTextControl(parent, NAME_DESC);
 		nameText.addModifyListener(new ModifyListener()
 		{
 			public void modifyText(ModifyEvent e)
@@ -264,7 +256,7 @@ public class GpmnGoalPropertySection extends GpmnCustomPropertySection
 	
 	protected void addDescriptionControl(final Composite parent)
 	{
-		Text nameText = addLabeledTextControl(parent, GOAL_DESCRIPTION_DESC);
+		Text nameText = addLabeledTextControl(parent, DESCRIPTION_DESC);
 		nameText.addModifyListener(new ModifyListener()
 		{
 			public void modifyText(ModifyEvent e)
@@ -435,29 +427,19 @@ public class GpmnGoalPropertySection extends GpmnCustomPropertySection
 		GridData gd = new GridData();
 		label.setLayoutData(gd);
 		
-		Combo planSemanticsCombo = new Combo(parent, SWT.DROP_DOWN
-				| SWT.READ_ONLY);
-		addDisposable(planSemanticsCombo);
-		controls.put(PLAN_SEMANTICS_DESC, planSemanticsCombo);
+		PlanSemanticsChooser chooser = new PlanSemanticsChooser(parent);
+		addDisposable(chooser);
+		controls.put(PLAN_SEMANTICS_DESC, chooser);
 		gd = new GridData();
 		gd.grabExcessHorizontalSpace = true;
-		planSemanticsCombo.setLayoutData(gd);
+		chooser.setLayoutData(gd);
 		
-		invPlanSemanticsMap = new HashMap<ModeType, Integer>(PLAN_SEMANTICS_MAP
-				.size());
-		int index = 0;
-		for (Map.Entry<String, ModeType> entry : PLAN_SEMANTICS_MAP.entrySet())
-		{
-			planSemanticsCombo.add(entry.getKey());
-			invPlanSemanticsMap.put(entry.getValue(), index++);
-		}
-		
-		planSemanticsCombo.addSelectionListener(new SelectionListener()
+		chooser.addSelectionListener(new SelectionListener()
 		{
 			public void widgetSelected(SelectionEvent se)
 			{
-				final ModeType mt = PLAN_SEMANTICS_MAP.get(((Combo) controls
-						.get(PLAN_SEMANTICS_DESC)).getText());
+				final ModeType mt = ((PlanSemanticsChooser) controls
+						.get(PLAN_SEMANTICS_DESC)).getMode();
 				if (modelElement != null)
 				{
 					if (mt != null)

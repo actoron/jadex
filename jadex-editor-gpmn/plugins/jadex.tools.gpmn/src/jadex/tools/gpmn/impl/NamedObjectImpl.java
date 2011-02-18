@@ -308,7 +308,8 @@ public class NamedObjectImpl extends EModelElementImpl implements NamedObject
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.NAMED_OBJECT__DESCRIPTION:
 				return getDescription();
 			case GpmnPackage.NAMED_OBJECT__NAME:
@@ -327,7 +328,8 @@ public class NamedObjectImpl extends EModelElementImpl implements NamedObject
 	@Override
 	public void eSet(int featureID, Object newValue)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.NAMED_OBJECT__DESCRIPTION:
 				setDescription((String)newValue);
 				return;
@@ -349,7 +351,8 @@ public class NamedObjectImpl extends EModelElementImpl implements NamedObject
 	@Override
 	public void eUnset(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.NAMED_OBJECT__DESCRIPTION:
 				unsetDescription();
 				return;
@@ -371,7 +374,8 @@ public class NamedObjectImpl extends EModelElementImpl implements NamedObject
 	@Override
 	public boolean eIsSet(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.NAMED_OBJECT__DESCRIPTION:
 				return isSetDescription();
 			case GpmnPackage.NAMED_OBJECT__NAME:

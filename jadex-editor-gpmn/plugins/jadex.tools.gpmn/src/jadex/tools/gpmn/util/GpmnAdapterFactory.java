@@ -53,7 +53,8 @@ public class GpmnAdapterFactory extends AdapterFactoryImpl
 	 */
 	public GpmnAdapterFactory()
 	{
-		if (modelPackage == null) {
+		if (modelPackage == null)
+		{
 			modelPackage = GpmnPackage.eINSTANCE;
 		}
 	}
@@ -69,10 +70,12 @@ public class GpmnAdapterFactory extends AdapterFactoryImpl
 	@Override
 	public boolean isFactoryForType(Object object)
 	{
-		if (object == modelPackage) {
+		if (object == modelPackage)
+		{
 			return true;
 		}
-		if (object instanceof EObject) {
+		if (object instanceof EObject)
+		{
 			return ((EObject)object).eClass().getEPackage() == modelPackage;
 		}
 		return false;
@@ -84,85 +87,106 @@ public class GpmnAdapterFactory extends AdapterFactoryImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected GpmnSwitch<Adapter> modelSwitch = new GpmnSwitch<Adapter>() {
+	protected GpmnSwitch<Adapter> modelSwitch = new GpmnSwitch<Adapter>()
+		{
 			@Override
-			public Adapter caseAbstractEdge(AbstractEdge object) {
+			public Adapter caseAbstractEdge(AbstractEdge object)
+			{
 				return createAbstractEdgeAdapter();
 			}
 			@Override
-			public Adapter caseAbstractNode(AbstractNode object) {
+			public Adapter caseAbstractNode(AbstractNode object)
+			{
 				return createAbstractNodeAdapter();
 			}
 			@Override
-			public Adapter caseAbstractPlan(AbstractPlan object) {
+			public Adapter caseAbstractPlan(AbstractPlan object)
+			{
 				return createAbstractPlanAdapter();
 			}
 			@Override
-			public Adapter caseActivatable(Activatable object) {
+			public Adapter caseActivatable(Activatable object)
+			{
 				return createActivatableAdapter();
 			}
 			@Override
-			public Adapter caseActivationEdge(ActivationEdge object) {
+			public Adapter caseActivationEdge(ActivationEdge object)
+			{
 				return createActivationEdgeAdapter();
 			}
 			@Override
-			public Adapter caseBpmnPlan(BpmnPlan object) {
+			public Adapter caseBpmnPlan(BpmnPlan object)
+			{
 				return createBpmnPlanAdapter();
 			}
 			@Override
-			public Adapter caseContext(Context object) {
+			public Adapter caseContext(Context object)
+			{
 				return createContextAdapter();
 			}
 			@Override
-			public Adapter caseContextElement(ContextElement object) {
+			public Adapter caseContextElement(ContextElement object)
+			{
 				return createContextElementAdapter();
 			}
 			@Override
-			public Adapter caseGoal(Goal object) {
+			public Adapter caseGoal(Goal object)
+			{
 				return createGoalAdapter();
 			}
 			@Override
-			public Adapter caseGpmnDiagram(GpmnDiagram object) {
+			public Adapter caseGpmnDiagram(GpmnDiagram object)
+			{
 				return createGpmnDiagramAdapter();
 			}
 			@Override
-			public Adapter caseIdentifiable(Identifiable object) {
+			public Adapter caseIdentifiable(Identifiable object)
+			{
 				return createIdentifiableAdapter();
 			}
 			@Override
-			public Adapter caseActivationPlan(ActivationPlan object) {
+			public Adapter caseActivationPlan(ActivationPlan object)
+			{
 				return createActivationPlanAdapter();
 			}
 			@Override
-			public Adapter caseNamedObject(NamedObject object) {
+			public Adapter caseNamedObject(NamedObject object)
+			{
 				return createNamedObjectAdapter();
 			}
 			@Override
-			public Adapter caseParameter(Parameter object) {
+			public Adapter caseParameter(Parameter object)
+			{
 				return createParameterAdapter();
 			}
 			@Override
-			public Adapter caseParameterMapping(ParameterMapping object) {
+			public Adapter caseParameterMapping(ParameterMapping object)
+			{
 				return createParameterMappingAdapter();
 			}
 			@Override
-			public Adapter casePlanEdge(PlanEdge object) {
+			public Adapter casePlanEdge(PlanEdge object)
+			{
 				return createPlanEdgeAdapter();
 			}
 			@Override
-			public Adapter caseSubProcess(SubProcess object) {
+			public Adapter caseSubProcess(SubProcess object)
+			{
 				return createSubProcessAdapter();
 			}
 			@Override
-			public Adapter caseSuppressionEdge(SuppressionEdge object) {
+			public Adapter caseSuppressionEdge(SuppressionEdge object)
+			{
 				return createSuppressionEdgeAdapter();
 			}
 			@Override
-			public Adapter caseEModelElement(EModelElement object) {
+			public Adapter caseEModelElement(EModelElement object)
+			{
 				return createEModelElementAdapter();
 			}
 			@Override
-			public Adapter defaultCase(EObject object) {
+			public Adapter defaultCase(EObject object)
+			{
 				return createEObjectAdapter();
 			}
 		};

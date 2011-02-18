@@ -78,6 +78,9 @@ public abstract class GoalFigure extends ShadowedOvalFigure /*ShadowedRoundedRec
 				case GoalType.PERFORM_GOAL_VALUE:
 					ts = "P";
 					break;
+				case GoalType.QUERY_GOAL_VALUE:
+					ts = "Q";
+					break;
 				case GoalType.ACHIEVE_GOAL_VALUE:
 				default:
 					ts = "A";

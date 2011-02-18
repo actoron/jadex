@@ -83,7 +83,8 @@ public class AbstractEdgeImpl extends IdentifiableImpl implements AbstractEdge
 	 */
 	public EList<ParameterMapping> getParameterMapping()
 	{
-		if (parameterMapping == null) {
+		if (parameterMapping == null)
+		{
 			parameterMapping = new EObjectContainmentEList.Unsettable<ParameterMapping>(ParameterMapping.class, this, GpmnPackage.ABSTRACT_EDGE__PARAMETER_MAPPING);
 		}
 		return parameterMapping;
@@ -118,7 +119,8 @@ public class AbstractEdgeImpl extends IdentifiableImpl implements AbstractEdge
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ABSTRACT_EDGE__PARAMETER_MAPPING:
 				return ((InternalEList<?>)getParameterMapping()).basicRemove(otherEnd, msgs);
 		}
@@ -133,7 +135,8 @@ public class AbstractEdgeImpl extends IdentifiableImpl implements AbstractEdge
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ABSTRACT_EDGE__PARAMETER_MAPPING:
 				return getParameterMapping();
 		}
@@ -149,7 +152,8 @@ public class AbstractEdgeImpl extends IdentifiableImpl implements AbstractEdge
 	@Override
 	public void eSet(int featureID, Object newValue)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ABSTRACT_EDGE__PARAMETER_MAPPING:
 				getParameterMapping().clear();
 				getParameterMapping().addAll((Collection<? extends ParameterMapping>)newValue);
@@ -166,7 +170,8 @@ public class AbstractEdgeImpl extends IdentifiableImpl implements AbstractEdge
 	@Override
 	public void eUnset(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ABSTRACT_EDGE__PARAMETER_MAPPING:
 				unsetParameterMapping();
 				return;
@@ -182,7 +187,8 @@ public class AbstractEdgeImpl extends IdentifiableImpl implements AbstractEdge
 	@Override
 	public boolean eIsSet(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ABSTRACT_EDGE__PARAMETER_MAPPING:
 				return isSetParameterMapping();
 		}

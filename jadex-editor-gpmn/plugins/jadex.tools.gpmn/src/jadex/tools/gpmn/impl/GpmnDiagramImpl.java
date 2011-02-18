@@ -522,7 +522,8 @@ public class GpmnDiagramImpl extends NamedObjectImpl implements GpmnDiagram
 	{
 		Context oldContext = context;
 		context = newContext;
-		if (eNotificationRequired()) {
+		if (eNotificationRequired())
+		{
 			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, GpmnPackage.GPMN_DIAGRAM__CONTEXT, oldContext, newContext);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
@@ -536,7 +537,8 @@ public class GpmnDiagramImpl extends NamedObjectImpl implements GpmnDiagram
 	 */
 	public void setContext(Context newContext)
 	{
-		if (newContext != context) {
+		if (newContext != context)
+		{
 			NotificationChain msgs = null;
 			if (context != null)
 				msgs = ((InternalEObject)context).eInverseRemove(this, GpmnPackage.CONTEXT__GPMN_DIAGRAM, Context.class, msgs);
@@ -556,7 +558,8 @@ public class GpmnDiagramImpl extends NamedObjectImpl implements GpmnDiagram
 	 */
 	public EList<Goal> getGoals()
 	{
-		if (goals == null) {
+		if (goals == null)
+		{
 			goals = new EObjectContainmentWithInverseEList.Unsettable<Goal>(Goal.class, this, GpmnPackage.GPMN_DIAGRAM__GOALS, GpmnPackage.GOAL__GPMN_DIAGRAM);
 		}
 		return goals;
@@ -589,7 +592,8 @@ public class GpmnDiagramImpl extends NamedObjectImpl implements GpmnDiagram
 	 */
 	public EList<AbstractPlan> getPlans()
 	{
-		if (plans == null) {
+		if (plans == null)
+		{
 			plans = new EObjectContainmentWithInverseEList.Unsettable<AbstractPlan>(AbstractPlan.class, this, GpmnPackage.GPMN_DIAGRAM__PLANS, GpmnPackage.ABSTRACT_PLAN__GPMN_DIAGRAM);
 		}
 		return plans;
@@ -622,7 +626,8 @@ public class GpmnDiagramImpl extends NamedObjectImpl implements GpmnDiagram
 	 */
 	public EList<SubProcess> getSubProcesses()
 	{
-		if (subProcesses == null) {
+		if (subProcesses == null)
+		{
 			subProcesses = new EObjectContainmentWithInverseEList.Unsettable<SubProcess>(SubProcess.class, this, GpmnPackage.GPMN_DIAGRAM__SUB_PROCESSES, GpmnPackage.SUB_PROCESS__GPMN_DIAGRAM);
 		}
 		return subProcesses;
@@ -655,7 +660,8 @@ public class GpmnDiagramImpl extends NamedObjectImpl implements GpmnDiagram
 	 */
 	public EList<ActivationEdge> getActivationEdges()
 	{
-		if (activationEdges == null) {
+		if (activationEdges == null)
+		{
 			activationEdges = new EObjectContainmentWithInverseEList.Unsettable<ActivationEdge>(ActivationEdge.class, this, GpmnPackage.GPMN_DIAGRAM__ACTIVATION_EDGES, GpmnPackage.ACTIVATION_EDGE__GPMN_DIAGRAM);
 		}
 		return activationEdges;
@@ -688,7 +694,8 @@ public class GpmnDiagramImpl extends NamedObjectImpl implements GpmnDiagram
 	 */
 	public EList<PlanEdge> getPlanEdges()
 	{
-		if (planEdges == null) {
+		if (planEdges == null)
+		{
 			planEdges = new EObjectContainmentWithInverseEList.Unsettable<PlanEdge>(PlanEdge.class, this, GpmnPackage.GPMN_DIAGRAM__PLAN_EDGES, GpmnPackage.PLAN_EDGE__GPMN_DIAGRAM);
 		}
 		return planEdges;
@@ -721,7 +728,8 @@ public class GpmnDiagramImpl extends NamedObjectImpl implements GpmnDiagram
 	 */
 	public EList<SuppressionEdge> getSuppressionEdges()
 	{
-		if (suppressionEdges == null) {
+		if (suppressionEdges == null)
+		{
 			suppressionEdges = new EObjectContainmentWithInverseEList.Unsettable<SuppressionEdge>(SuppressionEdge.class, this, GpmnPackage.GPMN_DIAGRAM__SUPPRESSION_EDGES, GpmnPackage.SUPPRESSION_EDGE__GPMN_DIAGRAM);
 		}
 		return suppressionEdges;
@@ -777,7 +785,8 @@ public class GpmnDiagramImpl extends NamedObjectImpl implements GpmnDiagram
 	 */
 	public EList<String> getImports()
 	{
-		if (imports == null) {
+		if (imports == null)
+		{
 			imports = new EDataTypeUniqueEList.Unsettable<String>(String.class, this, GpmnPackage.GPMN_DIAGRAM__IMPORTS);
 		}
 		return imports;
@@ -813,7 +822,8 @@ public class GpmnDiagramImpl extends NamedObjectImpl implements GpmnDiagram
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.GPMN_DIAGRAM__CONTEXT:
 				if (context != null)
 					msgs = ((InternalEObject)context).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - GpmnPackage.GPMN_DIAGRAM__CONTEXT, null, msgs);
@@ -843,7 +853,8 @@ public class GpmnDiagramImpl extends NamedObjectImpl implements GpmnDiagram
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.GPMN_DIAGRAM__CONTEXT:
 				return basicSetContext(null, msgs);
 			case GpmnPackage.GPMN_DIAGRAM__GOALS:
@@ -870,7 +881,8 @@ public class GpmnDiagramImpl extends NamedObjectImpl implements GpmnDiagram
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.GPMN_DIAGRAM__PACKAGE:
 				return getPackage();
 			case GpmnPackage.GPMN_DIAGRAM__IMPORTS:
@@ -910,7 +922,8 @@ public class GpmnDiagramImpl extends NamedObjectImpl implements GpmnDiagram
 	@Override
 	public void eSet(int featureID, Object newValue)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.GPMN_DIAGRAM__PACKAGE:
 				setPackage((String)newValue);
 				return;
@@ -969,7 +982,8 @@ public class GpmnDiagramImpl extends NamedObjectImpl implements GpmnDiagram
 	@Override
 	public void eUnset(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.GPMN_DIAGRAM__PACKAGE:
 				setPackage(PACKAGE_EDEFAULT);
 				return;
@@ -1021,7 +1035,8 @@ public class GpmnDiagramImpl extends NamedObjectImpl implements GpmnDiagram
 	@Override
 	public boolean eIsSet(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.GPMN_DIAGRAM__PACKAGE:
 				return PACKAGE_EDEFAULT == null ? package_ != null : !PACKAGE_EDEFAULT.equals(package_);
 			case GpmnPackage.GPMN_DIAGRAM__IMPORTS:

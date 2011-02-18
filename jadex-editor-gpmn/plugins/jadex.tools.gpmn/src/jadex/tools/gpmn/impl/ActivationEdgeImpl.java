@@ -138,7 +138,8 @@ public class ActivationEdgeImpl extends AbstractEdgeImpl implements
 	{
 		ActivationPlan oldSource = source;
 		source = newSource;
-		if (eNotificationRequired()) {
+		if (eNotificationRequired())
+		{
 			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, GpmnPackage.ACTIVATION_EDGE__SOURCE, oldSource, newSource);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
@@ -152,7 +153,8 @@ public class ActivationEdgeImpl extends AbstractEdgeImpl implements
 	 */
 	public void setSource(ActivationPlan newSource)
 	{
-		if (newSource != source) {
+		if (newSource != source)
+		{
 			NotificationChain msgs = null;
 			if (source != null)
 				msgs = ((InternalEObject)source).eInverseRemove(this, GpmnPackage.ACTIVATION_PLAN__ACTIVATION_EDGES, ActivationPlan.class, msgs);
@@ -185,7 +187,8 @@ public class ActivationEdgeImpl extends AbstractEdgeImpl implements
 	{
 		Activatable oldTarget = target;
 		target = newTarget;
-		if (eNotificationRequired()) {
+		if (eNotificationRequired())
+		{
 			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, GpmnPackage.ACTIVATION_EDGE__TARGET, oldTarget, newTarget);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
@@ -199,7 +202,8 @@ public class ActivationEdgeImpl extends AbstractEdgeImpl implements
 	 */
 	public void setTarget(Activatable newTarget)
 	{
-		if (newTarget != target) {
+		if (newTarget != target)
+		{
 			NotificationChain msgs = null;
 			if (target != null)
 				msgs = ((InternalEObject)target).eInverseRemove(this, GpmnPackage.ACTIVATABLE__ACTIVATION_EDGES, Activatable.class, msgs);
@@ -242,7 +246,8 @@ public class ActivationEdgeImpl extends AbstractEdgeImpl implements
 	 */
 	public void setGpmnDiagram(GpmnDiagram newGpmnDiagram)
 	{
-		if (newGpmnDiagram != eInternalContainer() || (eContainerFeatureID() != GpmnPackage.ACTIVATION_EDGE__GPMN_DIAGRAM && newGpmnDiagram != null)) {
+		if (newGpmnDiagram != eInternalContainer() || (eContainerFeatureID() != GpmnPackage.ACTIVATION_EDGE__GPMN_DIAGRAM && newGpmnDiagram != null))
+		{
 			if (EcoreUtil.isAncestor(this, newGpmnDiagram))
 				throw new IllegalArgumentException("Recursive containment not allowed for " + toString()); //$NON-NLS-1$
 			NotificationChain msgs = null;
@@ -316,7 +321,8 @@ public class ActivationEdgeImpl extends AbstractEdgeImpl implements
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ACTIVATION_EDGE__SOURCE:
 				if (source != null)
 					msgs = ((InternalEObject)source).eInverseRemove(this, GpmnPackage.ACTIVATION_PLAN__ACTIVATION_EDGES, ActivationPlan.class, msgs);
@@ -342,7 +348,8 @@ public class ActivationEdgeImpl extends AbstractEdgeImpl implements
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ACTIVATION_EDGE__SOURCE:
 				return basicSetSource(null, msgs);
 			case GpmnPackage.ACTIVATION_EDGE__TARGET:
@@ -362,7 +369,8 @@ public class ActivationEdgeImpl extends AbstractEdgeImpl implements
 	public NotificationChain eBasicRemoveFromContainerFeature(
 			NotificationChain msgs)
 	{
-		switch (eContainerFeatureID()) {
+		switch (eContainerFeatureID())
+		{
 			case GpmnPackage.ACTIVATION_EDGE__GPMN_DIAGRAM:
 				return eInternalContainer().eInverseRemove(this, GpmnPackage.GPMN_DIAGRAM__ACTIVATION_EDGES, GpmnDiagram.class, msgs);
 		}
@@ -377,7 +385,8 @@ public class ActivationEdgeImpl extends AbstractEdgeImpl implements
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ACTIVATION_EDGE__SOURCE:
 				return getSource();
 			case GpmnPackage.ACTIVATION_EDGE__TARGET:
@@ -398,7 +407,8 @@ public class ActivationEdgeImpl extends AbstractEdgeImpl implements
 	@Override
 	public void eSet(int featureID, Object newValue)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ACTIVATION_EDGE__SOURCE:
 				setSource((ActivationPlan)newValue);
 				return;
@@ -423,7 +433,8 @@ public class ActivationEdgeImpl extends AbstractEdgeImpl implements
 	@Override
 	public void eUnset(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ACTIVATION_EDGE__SOURCE:
 				setSource((ActivationPlan)null);
 				return;
@@ -448,7 +459,8 @@ public class ActivationEdgeImpl extends AbstractEdgeImpl implements
 	@Override
 	public boolean eIsSet(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ACTIVATION_EDGE__SOURCE:
 				return source != null;
 			case GpmnPackage.ACTIVATION_EDGE__TARGET:

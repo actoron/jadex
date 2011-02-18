@@ -41,6 +41,11 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 public class GpmnActivationEdgePropertySection extends
 		GpmnCustomPropertySection
 {
+	public class GpmnVirtualActivationEdgePropertySection
+	{
+		
+	}
+	
 	public static final String ACTEDGE_CONFIGURATION_TITLE = "Activation Edge Configuration";
 	public static final String ORDER_DESC = "Activation Order:";
 	
@@ -59,24 +64,22 @@ public class GpmnActivationEdgePropertySection extends
 	
 	protected void refreshControls()
 	{
-		if (!(modelElement instanceof ActivationEdge))
+		if (!(getEdge() instanceof ActivationEdge))
 			return;
 		
-		ActivationEdge edge = (ActivationEdge) modelElement;
+		ActivationEdge edge = getEdge();
 		ActivationPlan aPlan = edge.getSource();
 		
 		if (ModeType.SEQUENTIAL.equals(aPlan.getMode()))
 		{
 			Spinner oc = (Spinner) controls.get(ORDER_DESC);
-			labels.get(ORDER_DESC).setVisible(true);
-			oc.setVisible(true);
+			oc.setEnabled(true);
 			oc.setMaximum(aPlan.getActivationEdges().size());
 			oc.setSelection(edge.getOrder());
 		}
 		else
 		{
-			labels.get(ORDER_DESC).setVisible(false);
-			((Spinner) controls.get(ORDER_DESC)).setVisible(false);
+			((Spinner) controls.get(ORDER_DESC)).setEnabled(false);
 		}
 	}
 	
@@ -98,22 +101,21 @@ public class GpmnActivationEdgePropertySection extends
 		{
 			public void widgetSelected(SelectionEvent se)
 			{
-				if (editPart != null)
+				if (getEdgeNotationView() != null)
 				{
 					int newOrder = ((Spinner) se.widget).getSelection();
-					DiagramEditPart diagramEditPart = (DiagramEditPart) editPart
-							.getRoot().getContents();
+					;
 					dispatchCommand(new ModifyActivationEdgeOrder(
-							diagramEditPart, (Edge) ((IGraphicalEditPart) editPart).getNotationView(),
+							getDiagramEditPart(), getEdgeNotationView(),
 							newOrder));
 					dispatchCommand(new AbstractTransactionalCommand(
 							(TransactionalEditingDomain) AdapterFactoryEditingDomain
-									.getEditingDomainFor(diagramEditPart
+									.getEditingDomainFor(getDiagramEditPart()
 											.getDiagramView()),
 							"Refresh Controls",
 							Arrays.asList(new Object[] { WorkspaceSynchronizer
-									.getFile(diagramEditPart.getDiagramView()
-											.eResource()) }))
+									.getFile(getDiagramEditPart()
+											.getDiagramView().eResource()) }))
 					{
 						protected CommandResult doExecuteWithResult(
 								IProgressMonitor monitor, IAdaptable info)
@@ -132,5 +134,22 @@ public class GpmnActivationEdgePropertySection extends
 				widgetSelected(se);
 			}
 		});
+	}
+	
+	protected DiagramEditPart getDiagramEditPart()
+	{
+		return (DiagramEditPart) editPart.getRoot().getContents();
+	}
+	
+	protected ActivationEdge getEdge()
+	{
+		return (ActivationEdge) modelElement;
+	}
+	
+	protected Edge getEdgeNotationView()
+	{
+		if (editPart == null)
+			return null;
+		return (Edge) ((IGraphicalEditPart) editPart).getNotationView();
 	}
 }

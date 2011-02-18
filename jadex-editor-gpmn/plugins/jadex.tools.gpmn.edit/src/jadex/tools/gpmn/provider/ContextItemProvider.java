@@ -68,7 +68,8 @@ public class ContextItemProvider extends EModelElementItemProvider implements
 	@Override
 	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object)
 	{
-		if (itemPropertyDescriptors == null) {
+		if (itemPropertyDescriptors == null)
+		{
 			super.getPropertyDescriptors(object);
 
 			addGpmnDiagramPropertyDescriptor(object);
@@ -111,7 +112,8 @@ public class ContextItemProvider extends EModelElementItemProvider implements
 	public Collection<? extends EStructuralFeature> getChildrenFeatures(
 			Object object)
 	{
-		if (childrenFeatures == null) {
+		if (childrenFeatures == null)
+		{
 			super.getChildrenFeatures(object);
 			childrenFeatures.add(GpmnPackage.Literals.CONTEXT__ELEMENTS);
 		}
@@ -168,7 +170,8 @@ public class ContextItemProvider extends EModelElementItemProvider implements
 	{
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(Context.class)) {
+		switch (notification.getFeatureID(Context.class))
+		{
 			case GpmnPackage.CONTEXT__ELEMENTS:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;

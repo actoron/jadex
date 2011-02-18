@@ -326,7 +326,8 @@ public class AbstractNodeImpl extends IdentifiableImpl implements AbstractNode
 	 */
 	public EList<Parameter> getParameter()
 	{
-		if (parameter == null) {
+		if (parameter == null)
+		{
 			parameter = new EObjectContainmentEList.Unsettable<Parameter>(Parameter.class, this, GpmnPackage.ABSTRACT_NODE__PARAMETER);
 		}
 		return parameter;
@@ -361,7 +362,8 @@ public class AbstractNodeImpl extends IdentifiableImpl implements AbstractNode
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ABSTRACT_NODE__PARAMETER:
 				return ((InternalEList<?>)getParameter()).basicRemove(otherEnd, msgs);
 		}
@@ -376,7 +378,8 @@ public class AbstractNodeImpl extends IdentifiableImpl implements AbstractNode
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ABSTRACT_NODE__DESCRIPTION:
 				return getDescription();
 			case GpmnPackage.ABSTRACT_NODE__NAME:
@@ -398,7 +401,8 @@ public class AbstractNodeImpl extends IdentifiableImpl implements AbstractNode
 	@Override
 	public void eSet(int featureID, Object newValue)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ABSTRACT_NODE__DESCRIPTION:
 				setDescription((String)newValue);
 				return;
@@ -424,7 +428,8 @@ public class AbstractNodeImpl extends IdentifiableImpl implements AbstractNode
 	@Override
 	public void eUnset(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ABSTRACT_NODE__DESCRIPTION:
 				unsetDescription();
 				return;
@@ -449,7 +454,8 @@ public class AbstractNodeImpl extends IdentifiableImpl implements AbstractNode
 	@Override
 	public boolean eIsSet(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ABSTRACT_NODE__DESCRIPTION:
 				return isSetDescription();
 			case GpmnPackage.ABSTRACT_NODE__NAME:
@@ -470,8 +476,10 @@ public class AbstractNodeImpl extends IdentifiableImpl implements AbstractNode
 	@Override
 	public int eBaseStructuralFeatureID(int derivedFeatureID, Class<?> baseClass)
 	{
-		if (baseClass == NamedObject.class) {
-			switch (derivedFeatureID) {
+		if (baseClass == NamedObject.class)
+		{
+			switch (derivedFeatureID)
+			{
 				case GpmnPackage.ABSTRACT_NODE__DESCRIPTION: return GpmnPackage.NAMED_OBJECT__DESCRIPTION;
 				case GpmnPackage.ABSTRACT_NODE__NAME: return GpmnPackage.NAMED_OBJECT__NAME;
 				case GpmnPackage.ABSTRACT_NODE__NCNAME: return GpmnPackage.NAMED_OBJECT__NCNAME;
@@ -489,8 +497,10 @@ public class AbstractNodeImpl extends IdentifiableImpl implements AbstractNode
 	@Override
 	public int eDerivedStructuralFeatureID(int baseFeatureID, Class<?> baseClass)
 	{
-		if (baseClass == NamedObject.class) {
-			switch (baseFeatureID) {
+		if (baseClass == NamedObject.class)
+		{
+			switch (baseFeatureID)
+			{
 				case GpmnPackage.NAMED_OBJECT__DESCRIPTION: return GpmnPackage.ABSTRACT_NODE__DESCRIPTION;
 				case GpmnPackage.NAMED_OBJECT__NAME: return GpmnPackage.ABSTRACT_NODE__NAME;
 				case GpmnPackage.NAMED_OBJECT__NCNAME: return GpmnPackage.ABSTRACT_NODE__NCNAME;

@@ -67,7 +67,8 @@ public class ParameterMappingItemProvider extends EModelElementItemProvider
 	@Override
 	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object)
 	{
-		if (itemPropertyDescriptors == null) {
+		if (itemPropertyDescriptors == null)
+		{
 			super.getPropertyDescriptors(object);
 
 			addValuePropertyDescriptor(object);
@@ -161,7 +162,8 @@ public class ParameterMappingItemProvider extends EModelElementItemProvider
 	{
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(ParameterMapping.class)) {
+		switch (notification.getFeatureID(ParameterMapping.class))
+		{
 			case GpmnPackage.PARAMETER_MAPPING__VALUE:
 			case GpmnPackage.PARAMETER_MAPPING__NAME:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));

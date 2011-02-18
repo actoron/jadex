@@ -9,8 +9,10 @@ import jadex.tools.gpmn.diagram.ui.figures.ActivationPlanFigure;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -34,6 +36,7 @@ import org.eclipse.gmf.runtime.diagram.ui.requests.CreateConnectionViewRequest.C
 import org.eclipse.gmf.runtime.diagram.ui.tools.DragEditPartsTrackerEx;
 import org.eclipse.gmf.runtime.diagram.ui.type.DiagramNotationType;
 import org.eclipse.gmf.runtime.emf.commands.core.command.AbstractTransactionalCommand;
+import org.eclipse.gmf.runtime.notation.Edge;
 import org.eclipse.gmf.runtime.notation.View;
 
 public class ActivationPlanSelectToolEx extends DragEditPartsTrackerEx
@@ -125,10 +128,15 @@ public class ActivationPlanSelectToolEx extends DragEditPartsTrackerEx
 				
 				virtSet = null;
 				
+				Map<EditPart, ActivationEdgeEditPart> aEdges = new HashMap<EditPart, ActivationEdgeEditPart>();
+				for (Object oEdge : planPart.getSourceConnections())
+					if (oEdge instanceof ActivationEdgeEditPart)
+						aEdges.put(((ActivationEdgeEditPart) oEdge).getTarget(), (ActivationEdgeEditPart) oEdge);
+				
 				for (VirtualActivationEdgeEditPart vaePart : virtParts)
 				{
 					CreateConnectionViewRequest req = CreateViewRequestFactory.getCreateConnectionRequest(DiagramNotationType.NOTE_ATTACHMENT, diagramEditPart.getDiagramPreferencesHint());
-					CreateConnectionViewAndElementRequest.getCreateCommand(req, planPart, vaePart).execute();
+					CreateConnectionViewAndElementRequest.getCreateCommand(req, aEdges.get(vaePart.getTarget()), vaePart).execute();
 				}
 				
 				planPart.getPrimaryView().setVisible(false);
@@ -153,7 +161,11 @@ public class ActivationPlanSelectToolEx extends DragEditPartsTrackerEx
 					throws ExecutionException
 			{
 				for (VirtualActivationEdgeEditPart vaePart : virtParts)
+				{
+					((Edge) vaePart.getNotationView().getTargetEdges().get(0)).setVisible(false);
+					((EditPart) vaePart.getTargetConnections().get(0)).refresh();
 					((EditPart) vaePart.getChildren().get(0)).refresh();
+				}
 				
 				return CommandResult.newOKCommandResult();
 			}

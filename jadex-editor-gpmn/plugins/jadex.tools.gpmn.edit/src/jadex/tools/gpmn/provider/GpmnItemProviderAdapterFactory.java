@@ -106,7 +106,8 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 	@Override
 	public Adapter createAbstractEdgeAdapter()
 	{
-		if (abstractEdgeItemProvider == null) {
+		if (abstractEdgeItemProvider == null)
+		{
 			abstractEdgeItemProvider = new AbstractEdgeItemProvider(this);
 		}
 
@@ -130,7 +131,8 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 	@Override
 	public Adapter createAbstractNodeAdapter()
 	{
-		if (abstractNodeItemProvider == null) {
+		if (abstractNodeItemProvider == null)
+		{
 			abstractNodeItemProvider = new AbstractNodeItemProvider(this);
 		}
 
@@ -154,7 +156,8 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 	@Override
 	public Adapter createActivatableAdapter()
 	{
-		if (activatableItemProvider == null) {
+		if (activatableItemProvider == null)
+		{
 			activatableItemProvider = new ActivatableItemProvider(this);
 		}
 
@@ -178,7 +181,8 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 	@Override
 	public Adapter createActivationEdgeAdapter()
 	{
-		if (activationEdgeItemProvider == null) {
+		if (activationEdgeItemProvider == null)
+		{
 			activationEdgeItemProvider = new ActivationEdgeItemProvider(this);
 		}
 
@@ -202,7 +206,8 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 	@Override
 	public Adapter createBpmnPlanAdapter()
 	{
-		if (bpmnPlanItemProvider == null) {
+		if (bpmnPlanItemProvider == null)
+		{
 			bpmnPlanItemProvider = new BpmnPlanItemProvider(this);
 		}
 
@@ -226,7 +231,8 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 	@Override
 	public Adapter createContextAdapter()
 	{
-		if (contextItemProvider == null) {
+		if (contextItemProvider == null)
+		{
 			contextItemProvider = new ContextItemProvider(this);
 		}
 
@@ -250,7 +256,8 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 	@Override
 	public Adapter createContextElementAdapter()
 	{
-		if (contextElementItemProvider == null) {
+		if (contextElementItemProvider == null)
+		{
 			contextElementItemProvider = new ContextElementItemProvider(this);
 		}
 
@@ -274,7 +281,8 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 	@Override
 	public Adapter createGoalAdapter()
 	{
-		if (goalItemProvider == null) {
+		if (goalItemProvider == null)
+		{
 			goalItemProvider = new GoalItemProvider(this);
 		}
 
@@ -298,7 +306,8 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 	@Override
 	public Adapter createGpmnDiagramAdapter()
 	{
-		if (gpmnDiagramItemProvider == null) {
+		if (gpmnDiagramItemProvider == null)
+		{
 			gpmnDiagramItemProvider = new GpmnDiagramItemProvider(this);
 		}
 
@@ -322,7 +331,8 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 	@Override
 	public Adapter createIdentifiableAdapter()
 	{
-		if (identifiableItemProvider == null) {
+		if (identifiableItemProvider == null)
+		{
 			identifiableItemProvider = new IdentifiableItemProvider(this);
 		}
 
@@ -346,7 +356,8 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 	@Override
 	public Adapter createActivationPlanAdapter()
 	{
-		if (activationPlanItemProvider == null) {
+		if (activationPlanItemProvider == null)
+		{
 			activationPlanItemProvider = new ActivationPlanItemProvider(this);
 		}
 
@@ -370,7 +381,8 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 	@Override
 	public Adapter createNamedObjectAdapter()
 	{
-		if (namedObjectItemProvider == null) {
+		if (namedObjectItemProvider == null)
+		{
 			namedObjectItemProvider = new NamedObjectItemProvider(this);
 		}
 
@@ -394,7 +406,8 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 	@Override
 	public Adapter createParameterAdapter()
 	{
-		if (parameterItemProvider == null) {
+		if (parameterItemProvider == null)
+		{
 			parameterItemProvider = new ParameterItemProvider(this);
 		}
 
@@ -418,7 +431,8 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 	@Override
 	public Adapter createParameterMappingAdapter()
 	{
-		if (parameterMappingItemProvider == null) {
+		if (parameterMappingItemProvider == null)
+		{
 			parameterMappingItemProvider = new ParameterMappingItemProvider(this);
 		}
 
@@ -442,7 +456,8 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 	@Override
 	public Adapter createPlanEdgeAdapter()
 	{
-		if (planEdgeItemProvider == null) {
+		if (planEdgeItemProvider == null)
+		{
 			planEdgeItemProvider = new PlanEdgeItemProvider(this);
 		}
 
@@ -466,7 +481,8 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 	@Override
 	public Adapter createSubProcessAdapter()
 	{
-		if (subProcessItemProvider == null) {
+		if (subProcessItemProvider == null)
+		{
 			subProcessItemProvider = new SubProcessItemProvider(this);
 		}
 
@@ -490,7 +506,8 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 	@Override
 	public Adapter createSuppressionEdgeAdapter()
 	{
-		if (suppressionEdgeItemProvider == null) {
+		if (suppressionEdgeItemProvider == null)
+		{
 			suppressionEdgeItemProvider = new SuppressionEdgeItemProvider(this);
 		}
 
@@ -551,9 +568,11 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 	@Override
 	public Object adapt(Object object, Object type)
 	{
-		if (isFactoryForType(type)) {
+		if (isFactoryForType(type))
+		{
 			Object adapter = super.adapt(object, type);
-			if (!(type instanceof Class<?>) || (((Class<?>)type).isInstance(adapter))) {
+			if (!(type instanceof Class<?>) || (((Class<?>)type).isInstance(adapter)))
+			{
 				return adapter;
 			}
 		}
@@ -593,7 +612,8 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 	{
 		changeNotifier.fireNotifyChanged(notification);
 
-		if (parentAdapterFactory != null) {
+		if (parentAdapterFactory != null)
+		{
 			parentAdapterFactory.fireNotifyChanged(notification);
 		}
 	}

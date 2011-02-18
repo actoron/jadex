@@ -140,7 +140,8 @@ public enum ExcludeType implements Enumerator
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private static final ExcludeType[] VALUES_ARRAY = new ExcludeType[] {
+	private static final ExcludeType[] VALUES_ARRAY = new ExcludeType[]
+		{
 			NEVER,
 			WHEN_TRIED,
 			WHEN_FAILED,
@@ -163,9 +164,11 @@ public enum ExcludeType implements Enumerator
 	 */
 	public static ExcludeType get(String literal)
 	{
-		for (int i = 0; i < VALUES_ARRAY.length; ++i) {
+		for (int i = 0; i < VALUES_ARRAY.length; ++i)
+		{
 			ExcludeType result = VALUES_ARRAY[i];
-			if (result.toString().equals(literal)) {
+			if (result.toString().equals(literal))
+			{
 				return result;
 			}
 		}
@@ -180,9 +183,11 @@ public enum ExcludeType implements Enumerator
 	 */
 	public static ExcludeType getByName(String name)
 	{
-		for (int i = 0; i < VALUES_ARRAY.length; ++i) {
+		for (int i = 0; i < VALUES_ARRAY.length; ++i)
+		{
 			ExcludeType result = VALUES_ARRAY[i];
-			if (result.getName().equals(name)) {
+			if (result.getName().equals(name))
+			{
 				return result;
 			}
 		}
@@ -197,7 +202,8 @@ public enum ExcludeType implements Enumerator
 	 */
 	public static ExcludeType get(int value)
 	{
-		switch (value) {
+		switch (value)
+		{
 			case NEVER_VALUE: return NEVER;
 			case WHEN_TRIED_VALUE: return WHEN_TRIED;
 			case WHEN_FAILED_VALUE: return WHEN_FAILED;

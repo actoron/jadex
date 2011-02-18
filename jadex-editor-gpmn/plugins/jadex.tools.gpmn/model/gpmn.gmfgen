@@ -762,6 +762,28 @@
     </tabs>
     <tabs
         xsi:type="gmfgen:GenCustomPropertyTab"
+        iD="virtualactivationedgetab"
+        label="Virtual Activation Edge"
+        className="GpmnVirtualActivationEdgePropertySection">
+      <filter
+          xsi:type="gmfgen:TypeTabFilter">
+        <types>jadex.tools.gpmn.diagram.edit.parts.VirtualActivationEdgeEditPart</types>
+        <generatedTypes>abstractNavigatorItem</generatedTypes>
+      </filter>
+    </tabs>
+    <tabs
+        xsi:type="gmfgen:GenCustomPropertyTab"
+        iD="activationplantab"
+        label="Activation Plan"
+        className="GpmnActivationPlanPropertySection">
+      <filter
+          xsi:type="gmfgen:TypeTabFilter">
+        <types>jadex.tools.gpmn.diagram.edit.parts.ActivationPlanEditPart</types>
+        <generatedTypes>abstractNavigatorItem</generatedTypes>
+      </filter>
+    </tabs>
+    <tabs
+        xsi:type="gmfgen:GenCustomPropertyTab"
         iD="domain"
         label="Advanced">
       <filter
@@ -776,6 +798,17 @@
         iD="context"
         label="Context"
         className="GpmnContextElementsPropertySection">
+      <filter
+          xsi:type="gmfgen:TypeTabFilter">
+        <types>jadex.tools.gpmn.diagram.edit.parts.GpmnDiagramEditPart</types>
+        <generatedTypes>abstractNavigatorItem</generatedTypes>
+      </filter>
+    </tabs>
+    <tabs
+        xsi:type="gmfgen:GenCustomPropertyTab"
+        iD="viewcontroltab"
+        label="GPMN View Controls"
+        className="GpmnViewControlSection">
       <filter
           xsi:type="gmfgen:TypeTabFilter">
         <types>jadex.tools.gpmn.diagram.edit.parts.GpmnDiagramEditPart</types>

@@ -131,7 +131,8 @@ public class PlanEdgeImpl extends AbstractEdgeImpl implements PlanEdge
 	{
 		AbstractPlan oldTarget = target;
 		target = newTarget;
-		if (eNotificationRequired()) {
+		if (eNotificationRequired())
+		{
 			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, GpmnPackage.PLAN_EDGE__TARGET, oldTarget, newTarget);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
@@ -145,7 +146,8 @@ public class PlanEdgeImpl extends AbstractEdgeImpl implements PlanEdge
 	 */
 	public void setTarget(AbstractPlan newTarget)
 	{
-		if (newTarget != target) {
+		if (newTarget != target)
+		{
 			NotificationChain msgs = null;
 			if (target != null)
 				msgs = ((InternalEObject)target).eInverseRemove(this, GpmnPackage.ABSTRACT_PLAN__PLAN_EDGES, AbstractPlan.class, msgs);
@@ -188,7 +190,8 @@ public class PlanEdgeImpl extends AbstractEdgeImpl implements PlanEdge
 	 */
 	public void setGpmnDiagram(GpmnDiagram newGpmnDiagram)
 	{
-		if (newGpmnDiagram != eInternalContainer() || (eContainerFeatureID() != GpmnPackage.PLAN_EDGE__GPMN_DIAGRAM && newGpmnDiagram != null)) {
+		if (newGpmnDiagram != eInternalContainer() || (eContainerFeatureID() != GpmnPackage.PLAN_EDGE__GPMN_DIAGRAM && newGpmnDiagram != null))
+		{
 			if (EcoreUtil.isAncestor(this, newGpmnDiagram))
 				throw new IllegalArgumentException("Recursive containment not allowed for " + toString()); //$NON-NLS-1$
 			NotificationChain msgs = null;
@@ -212,7 +215,8 @@ public class PlanEdgeImpl extends AbstractEdgeImpl implements PlanEdge
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.PLAN_EDGE__TARGET:
 				if (target != null)
 					msgs = ((InternalEObject)target).eInverseRemove(this, GpmnPackage.ABSTRACT_PLAN__PLAN_EDGES, AbstractPlan.class, msgs);
@@ -234,7 +238,8 @@ public class PlanEdgeImpl extends AbstractEdgeImpl implements PlanEdge
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.PLAN_EDGE__TARGET:
 				return basicSetTarget(null, msgs);
 			case GpmnPackage.PLAN_EDGE__GPMN_DIAGRAM:
@@ -252,7 +257,8 @@ public class PlanEdgeImpl extends AbstractEdgeImpl implements PlanEdge
 	public NotificationChain eBasicRemoveFromContainerFeature(
 			NotificationChain msgs)
 	{
-		switch (eContainerFeatureID()) {
+		switch (eContainerFeatureID())
+		{
 			case GpmnPackage.PLAN_EDGE__GPMN_DIAGRAM:
 				return eInternalContainer().eInverseRemove(this, GpmnPackage.GPMN_DIAGRAM__PLAN_EDGES, GpmnDiagram.class, msgs);
 		}
@@ -267,7 +273,8 @@ public class PlanEdgeImpl extends AbstractEdgeImpl implements PlanEdge
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.PLAN_EDGE__SOURCE:
 				return getSource();
 			case GpmnPackage.PLAN_EDGE__TARGET:
@@ -286,7 +293,8 @@ public class PlanEdgeImpl extends AbstractEdgeImpl implements PlanEdge
 	@Override
 	public void eSet(int featureID, Object newValue)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.PLAN_EDGE__SOURCE:
 				setSource((Goal)newValue);
 				return;
@@ -308,7 +316,8 @@ public class PlanEdgeImpl extends AbstractEdgeImpl implements PlanEdge
 	@Override
 	public void eUnset(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.PLAN_EDGE__SOURCE:
 				setSource((Goal)null);
 				return;
@@ -330,7 +339,8 @@ public class PlanEdgeImpl extends AbstractEdgeImpl implements PlanEdge
 	@Override
 	public boolean eIsSet(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.PLAN_EDGE__SOURCE:
 				return source != null;
 			case GpmnPackage.PLAN_EDGE__TARGET:

@@ -65,7 +65,8 @@ public class SubProcessItemProvider extends AbstractNodeItemProvider implements
 	@Override
 	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object)
 	{
-		if (itemPropertyDescriptors == null) {
+		if (itemPropertyDescriptors == null)
+		{
 			super.getPropertyDescriptors(object);
 
 			addProcessrefPropertyDescriptor(object);
@@ -158,7 +159,8 @@ public class SubProcessItemProvider extends AbstractNodeItemProvider implements
 	{
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(SubProcess.class)) {
+		switch (notification.getFeatureID(SubProcess.class))
+		{
 			case GpmnPackage.SUB_PROCESS__PROCESSREF:
 			case GpmnPackage.SUB_PROCESS__INTERNAL:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));

@@ -55,7 +55,15 @@ public enum GoalType implements Enumerator
 	 * @generated
 	 * @ordered
 	 */
-	PERFORM_GOAL(2, "PerformGoal", "PerformGoal"); //$NON-NLS-1$ //$NON-NLS-2$
+	PERFORM_GOAL(2, "PerformGoal", "PerformGoal"), /**
+	 * The '<em><b>Query Goal</b></em>' literal object.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #QUERY_GOAL_VALUE
+	 * @generated
+	 * @ordered
+	 */
+	QUERY_GOAL(3, "QueryGoal", "QueryGoal"); //$NON-NLS-1$ //$NON-NLS-2$
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -110,15 +118,32 @@ public enum GoalType implements Enumerator
 	public static final int PERFORM_GOAL_VALUE = 2;
 
 	/**
+	 * The '<em><b>Query Goal</b></em>' literal value.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of '<em><b>Query Goal</b></em>' literal object isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @see #QUERY_GOAL
+	 * @model name="QueryGoal"
+	 * @generated
+	 * @ordered
+	 */
+	public static final int QUERY_GOAL_VALUE = 3;
+
+	/**
 	 * An array of all the '<em><b>Goal Type</b></em>' enumerators.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private static final GoalType[] VALUES_ARRAY = new GoalType[] {
+	private static final GoalType[] VALUES_ARRAY = new GoalType[]
+		{
 			MAINTAIN_GOAL,
 			ACHIEVE_GOAL,
 			PERFORM_GOAL,
+			QUERY_GOAL,
 		};
 
 	/**
@@ -137,9 +162,11 @@ public enum GoalType implements Enumerator
 	 */
 	public static GoalType get(String literal)
 	{
-		for (int i = 0; i < VALUES_ARRAY.length; ++i) {
+		for (int i = 0; i < VALUES_ARRAY.length; ++i)
+		{
 			GoalType result = VALUES_ARRAY[i];
-			if (result.toString().equals(literal)) {
+			if (result.toString().equals(literal))
+			{
 				return result;
 			}
 		}
@@ -154,9 +181,11 @@ public enum GoalType implements Enumerator
 	 */
 	public static GoalType getByName(String name)
 	{
-		for (int i = 0; i < VALUES_ARRAY.length; ++i) {
+		for (int i = 0; i < VALUES_ARRAY.length; ++i)
+		{
 			GoalType result = VALUES_ARRAY[i];
-			if (result.getName().equals(name)) {
+			if (result.getName().equals(name))
+			{
 				return result;
 			}
 		}
@@ -171,10 +200,12 @@ public enum GoalType implements Enumerator
 	 */
 	public static GoalType get(int value)
 	{
-		switch (value) {
+		switch (value)
+		{
 			case MAINTAIN_GOAL_VALUE: return MAINTAIN_GOAL;
 			case ACHIEVE_GOAL_VALUE: return ACHIEVE_GOAL;
 			case PERFORM_GOAL_VALUE: return PERFORM_GOAL;
+			case QUERY_GOAL_VALUE: return QUERY_GOAL;
 		}
 		return null;
 	}

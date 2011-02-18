@@ -114,7 +114,8 @@ public class IdentifiableImpl extends EModelElementImpl implements Identifiable
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.IDENTIFIABLE__ID:
 				return getId();
 		}
@@ -129,7 +130,8 @@ public class IdentifiableImpl extends EModelElementImpl implements Identifiable
 	@Override
 	public void eSet(int featureID, Object newValue)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.IDENTIFIABLE__ID:
 				setId((String)newValue);
 				return;
@@ -145,7 +147,8 @@ public class IdentifiableImpl extends EModelElementImpl implements Identifiable
 	@Override
 	public void eUnset(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.IDENTIFIABLE__ID:
 				setId(ID_EDEFAULT);
 				return;
@@ -161,7 +164,8 @@ public class IdentifiableImpl extends EModelElementImpl implements Identifiable
 	@Override
 	public boolean eIsSet(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.IDENTIFIABLE__ID:
 				return ID_EDEFAULT == null ? id != null : !ID_EDEFAULT.equals(id);
 		}

@@ -348,7 +348,8 @@ public class ContextElementImpl extends EModelElementImpl implements
 	 */
 	public void setContext(Context newContext)
 	{
-		if (newContext != eInternalContainer() || (eContainerFeatureID() != GpmnPackage.CONTEXT_ELEMENT__CONTEXT && newContext != null)) {
+		if (newContext != eInternalContainer() || (eContainerFeatureID() != GpmnPackage.CONTEXT_ELEMENT__CONTEXT && newContext != null))
+		{
 			if (EcoreUtil.isAncestor(this, newContext))
 				throw new IllegalArgumentException("Recursive containment not allowed for " + toString()); //$NON-NLS-1$
 			NotificationChain msgs = null;
@@ -372,7 +373,8 @@ public class ContextElementImpl extends EModelElementImpl implements
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.CONTEXT_ELEMENT__CONTEXT:
 				if (eInternalContainer() != null)
 					msgs = eBasicRemoveFromContainer(msgs);
@@ -390,7 +392,8 @@ public class ContextElementImpl extends EModelElementImpl implements
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.CONTEXT_ELEMENT__CONTEXT:
 				return basicSetContext(null, msgs);
 		}
@@ -406,7 +409,8 @@ public class ContextElementImpl extends EModelElementImpl implements
 	public NotificationChain eBasicRemoveFromContainerFeature(
 			NotificationChain msgs)
 	{
-		switch (eContainerFeatureID()) {
+		switch (eContainerFeatureID())
+		{
 			case GpmnPackage.CONTEXT_ELEMENT__CONTEXT:
 				return eInternalContainer().eInverseRemove(this, GpmnPackage.CONTEXT__ELEMENTS, Context.class, msgs);
 		}
@@ -421,7 +425,8 @@ public class ContextElementImpl extends EModelElementImpl implements
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.CONTEXT_ELEMENT__VALUE:
 				return getValue();
 			case GpmnPackage.CONTEXT_ELEMENT__NAME:
@@ -445,7 +450,8 @@ public class ContextElementImpl extends EModelElementImpl implements
 	@Override
 	public void eSet(int featureID, Object newValue)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.CONTEXT_ELEMENT__VALUE:
 				setValue((String)newValue);
 				return;
@@ -473,7 +479,8 @@ public class ContextElementImpl extends EModelElementImpl implements
 	@Override
 	public void eUnset(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.CONTEXT_ELEMENT__VALUE:
 				unsetValue();
 				return;
@@ -501,7 +508,8 @@ public class ContextElementImpl extends EModelElementImpl implements
 	@Override
 	public boolean eIsSet(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.CONTEXT_ELEMENT__VALUE:
 				return isSetValue();
 			case GpmnPackage.CONTEXT_ELEMENT__NAME:

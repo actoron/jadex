@@ -67,7 +67,8 @@ public class ContextElementItemProvider extends EModelElementItemProvider
 	@Override
 	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object)
 	{
-		if (itemPropertyDescriptors == null) {
+		if (itemPropertyDescriptors == null)
+		{
 			super.getPropertyDescriptors(object);
 
 			addValuePropertyDescriptor(object);
@@ -209,7 +210,8 @@ public class ContextElementItemProvider extends EModelElementItemProvider
 	{
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(ContextElement.class)) {
+		switch (notification.getFeatureID(ContextElement.class))
+		{
 			case GpmnPackage.CONTEXT_ELEMENT__VALUE:
 			case GpmnPackage.CONTEXT_ELEMENT__NAME:
 			case GpmnPackage.CONTEXT_ELEMENT__SET:

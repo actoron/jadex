@@ -44,13 +44,16 @@ public class GpmnFactoryImpl extends EFactoryImpl implements GpmnFactory
 	 */
 	public static GpmnFactory init()
 	{
-		try {
+		try
+		{
 			GpmnFactory theGpmnFactory = (GpmnFactory)EPackage.Registry.INSTANCE.getEFactory("http://jadex.sourceforge.net/gpmn"); //$NON-NLS-1$ 
-			if (theGpmnFactory != null) {
+			if (theGpmnFactory != null)
+			{
 				return theGpmnFactory;
 			}
 		}
-		catch (Exception exception) {
+		catch (Exception exception)
+		{
 			EcorePlugin.INSTANCE.log(exception);
 		}
 		return new GpmnFactoryImpl();
@@ -75,7 +78,8 @@ public class GpmnFactoryImpl extends EFactoryImpl implements GpmnFactory
 	@Override
 	public EObject create(EClass eClass)
 	{
-		switch (eClass.getClassifierID()) {
+		switch (eClass.getClassifierID())
+		{
 			case GpmnPackage.ABSTRACT_EDGE: return createAbstractEdge();
 			case GpmnPackage.ABSTRACT_NODE: return createAbstractNode();
 			case GpmnPackage.ACTIVATABLE: return createActivatable();
@@ -106,7 +110,8 @@ public class GpmnFactoryImpl extends EFactoryImpl implements GpmnFactory
 	@Override
 	public Object createFromString(EDataType eDataType, String initialValue)
 	{
-		switch (eDataType.getClassifierID()) {
+		switch (eDataType.getClassifierID())
+		{
 			case GpmnPackage.CONDITION_LANGUAGE:
 				return createConditionLanguageFromString(eDataType, initialValue);
 			case GpmnPackage.DIRECTION_TYPE:
@@ -140,7 +145,8 @@ public class GpmnFactoryImpl extends EFactoryImpl implements GpmnFactory
 	@Override
 	public String convertToString(EDataType eDataType, Object instanceValue)
 	{
-		switch (eDataType.getClassifierID()) {
+		switch (eDataType.getClassifierID())
+		{
 			case GpmnPackage.CONDITION_LANGUAGE:
 				return convertConditionLanguageToString(eDataType, instanceValue);
 			case GpmnPackage.DIRECTION_TYPE:

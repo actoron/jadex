@@ -67,7 +67,8 @@ public class IdentifiableItemProvider extends EModelElementItemProvider
 	@Override
 	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object)
 	{
-		if (itemPropertyDescriptors == null) {
+		if (itemPropertyDescriptors == null)
+		{
 			super.getPropertyDescriptors(object);
 
 		}
@@ -101,7 +102,8 @@ public class IdentifiableItemProvider extends EModelElementItemProvider
 	{
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(Identifiable.class)) {
+		switch (notification.getFeatureID(Identifiable.class))
+		{
 			case GpmnPackage.IDENTIFIABLE__ID:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;

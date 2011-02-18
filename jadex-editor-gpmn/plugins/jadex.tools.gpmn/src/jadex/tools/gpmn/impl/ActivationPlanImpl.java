@@ -120,7 +120,8 @@ public class ActivationPlanImpl extends AbstractPlanImpl implements ActivationPl
 	 */
 	public EList<ActivationEdge> getActivationEdges()
 	{
-		if (activationEdges == null) {
+		if (activationEdges == null)
+		{
 			activationEdges = new EObjectWithInverseEList.Unsettable<ActivationEdge>(ActivationEdge.class, this, GpmnPackage.ACTIVATION_PLAN__ACTIVATION_EDGES, GpmnPackage.ACTIVATION_EDGE__SOURCE);
 		}
 		return activationEdges;
@@ -205,7 +206,8 @@ public class ActivationPlanImpl extends AbstractPlanImpl implements ActivationPl
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ACTIVATION_PLAN__ACTIVATION_EDGES:
 				return ((InternalEList<InternalEObject>)(InternalEList<?>)getActivationEdges()).basicAdd(otherEnd, msgs);
 		}
@@ -220,7 +222,8 @@ public class ActivationPlanImpl extends AbstractPlanImpl implements ActivationPl
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ACTIVATION_PLAN__ACTIVATION_EDGES:
 				return ((InternalEList<?>)getActivationEdges()).basicRemove(otherEnd, msgs);
 		}
@@ -235,7 +238,8 @@ public class ActivationPlanImpl extends AbstractPlanImpl implements ActivationPl
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ACTIVATION_PLAN__ACTIVATION_EDGES:
 				return getActivationEdges();
 			case GpmnPackage.ACTIVATION_PLAN__MODE:
@@ -253,7 +257,8 @@ public class ActivationPlanImpl extends AbstractPlanImpl implements ActivationPl
 	@Override
 	public void eSet(int featureID, Object newValue)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ACTIVATION_PLAN__ACTIVATION_EDGES:
 				getActivationEdges().clear();
 				getActivationEdges().addAll((Collection<? extends ActivationEdge>)newValue);
@@ -273,7 +278,8 @@ public class ActivationPlanImpl extends AbstractPlanImpl implements ActivationPl
 	@Override
 	public void eUnset(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ACTIVATION_PLAN__ACTIVATION_EDGES:
 				unsetActivationEdges();
 				return;
@@ -292,7 +298,8 @@ public class ActivationPlanImpl extends AbstractPlanImpl implements ActivationPl
 	@Override
 	public boolean eIsSet(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.ACTIVATION_PLAN__ACTIVATION_EDGES:
 				return isSetActivationEdges();
 			case GpmnPackage.ACTIVATION_PLAN__MODE:

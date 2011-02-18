@@ -471,6 +471,7 @@
     <eLiterals name="MaintainGoal"/>
     <eLiterals name="AchieveGoal" value="1"/>
     <eLiterals name="PerformGoal" value="2"/>
+    <eLiterals name="QueryGoal" value="3" literal="QueryGoal"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EDataType" name="GoalTypeObject" instanceClassName="org.eclipse.emf.common.util.Enumerator">
     <eAnnotations source="http:///org/eclipse/emf/ecore/util/ExtendedMetaData">

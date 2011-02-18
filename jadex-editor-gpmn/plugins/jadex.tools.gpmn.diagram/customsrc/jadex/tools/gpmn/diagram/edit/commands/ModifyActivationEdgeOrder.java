@@ -1,6 +1,7 @@
 package jadex.tools.gpmn.diagram.edit.commands;
 
 import jadex.tools.gpmn.ActivationEdge;
+import jadex.tools.gpmn.diagram.edit.parts.ActivationEdgeEditPart;
 import jadex.tools.gpmn.diagram.edit.parts.VirtualActivationEdgeEditPart;
 import jadex.tools.gpmn.diagram.edit.parts.VirtualActivationOrderEditPart;
 import jadex.tools.gpmn.diagram.tools.SGpmnUtilities;
@@ -78,14 +79,18 @@ public class ModifyActivationEdgeOrder extends AbstractTransactionalCommand
 		
 		for (Object edge : apNode.getSourceEdges())
 		{
-			if ((edge instanceof Edge) && (((Edge) edge).getElement()) instanceof ActivationEdge)
+			if (edge instanceof Edge)
 			{
-				EditPart part = SGpmnUtilities.resolveEditPart(diagramEditPart, edge);
-				if (part != null)
-					((EditPart) part.getChildren().get(0)).refresh();
+				if ((((Edge) edge).getElement()) instanceof ActivationEdge)
+				{
+					ActivationEdgeEditPart part = (ActivationEdgeEditPart) SGpmnUtilities.resolveEditPart(diagramEditPart, edge);
+					if (part != null)
+						((EditPart) part.getChildren().get(0)).refresh();
+					
+					if (((Edge) edge).getSourceEdges().size() == 1)
+						((VirtualActivationOrderEditPart) SGpmnUtilities.resolveEditPart(diagramEditPart,((Edge) ((Edge) edge).getSourceEdges().get(0)).getTarget()).getChildren().get(0)).refresh();
+				}
 			}
-			else if ((edge instanceof Edge) && SGpmnUtilities.resolveEditPart(diagramEditPart, ((Edge) edge).getTarget()) instanceof VirtualActivationEdgeEditPart)
-				((VirtualActivationOrderEditPart) SGpmnUtilities.resolveEditPart(diagramEditPart, ((Edge) edge).getTarget()).getChildren().get(0)).refresh();
 		}
 		
 		return CommandResult.newOKCommandResult();

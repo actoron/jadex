@@ -389,7 +389,8 @@ public class ParameterImpl extends EModelElementImpl implements Parameter
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.PARAMETER__VALUE:
 				return getValue();
 			case GpmnPackage.PARAMETER__DIRECTION:
@@ -410,7 +411,8 @@ public class ParameterImpl extends EModelElementImpl implements Parameter
 	@Override
 	public void eSet(int featureID, Object newValue)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.PARAMETER__VALUE:
 				setValue((String)newValue);
 				return;
@@ -435,7 +437,8 @@ public class ParameterImpl extends EModelElementImpl implements Parameter
 	@Override
 	public void eUnset(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.PARAMETER__VALUE:
 				unsetValue();
 				return;
@@ -460,7 +463,8 @@ public class ParameterImpl extends EModelElementImpl implements Parameter
 	@Override
 	public boolean eIsSet(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.PARAMETER__VALUE:
 				return isSetValue();
 			case GpmnPackage.PARAMETER__DIRECTION:

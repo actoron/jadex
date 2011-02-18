@@ -348,4 +348,9 @@ public final class SGpmnUtilities
 		return ret;
 	}
 	
+	public static final Node getPlanFromVirtualEdge(Edge vaeEdge)
+	{
+		return (Node) ((Edge) ((Edge) vaeEdge.getTargetEdges().get(0)).getSource()).getSource();
+		//return (Node) ((Edge) vaeEdge.getTargetEdges().get(0)).getSource();
+	}
 }

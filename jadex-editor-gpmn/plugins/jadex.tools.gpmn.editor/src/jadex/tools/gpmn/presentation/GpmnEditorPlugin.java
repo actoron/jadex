@@ -63,7 +63,8 @@ public final class GpmnEditorPlugin extends EMFPlugin
 	public GpmnEditorPlugin()
 	{
 		super
-			(new ResourceLocator [] {
+			(new ResourceLocator [] 
+			{
 				EcoreEditPlugin.INSTANCE,
 			});
 	}

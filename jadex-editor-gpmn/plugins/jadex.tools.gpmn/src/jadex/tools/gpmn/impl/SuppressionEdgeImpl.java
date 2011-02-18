@@ -165,7 +165,8 @@ public class SuppressionEdgeImpl extends AbstractEdgeImpl implements Suppression
 	 */
 	public void setGpmnDiagram(GpmnDiagram newGpmnDiagram)
 	{
-		if (newGpmnDiagram != eInternalContainer() || (eContainerFeatureID() != GpmnPackage.SUPPRESSION_EDGE__GPMN_DIAGRAM && newGpmnDiagram != null)) {
+		if (newGpmnDiagram != eInternalContainer() || (eContainerFeatureID() != GpmnPackage.SUPPRESSION_EDGE__GPMN_DIAGRAM && newGpmnDiagram != null))
+		{
 			if (EcoreUtil.isAncestor(this, newGpmnDiagram))
 				throw new IllegalArgumentException("Recursive containment not allowed for " + toString()); //$NON-NLS-1$
 			NotificationChain msgs = null;
@@ -188,7 +189,8 @@ public class SuppressionEdgeImpl extends AbstractEdgeImpl implements Suppression
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.SUPPRESSION_EDGE__GPMN_DIAGRAM:
 				if (eInternalContainer() != null)
 					msgs = eBasicRemoveFromContainer(msgs);
@@ -205,7 +207,8 @@ public class SuppressionEdgeImpl extends AbstractEdgeImpl implements Suppression
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.SUPPRESSION_EDGE__GPMN_DIAGRAM:
 				return basicSetGpmnDiagram(null, msgs);
 		}
@@ -220,7 +223,8 @@ public class SuppressionEdgeImpl extends AbstractEdgeImpl implements Suppression
 	@Override
 	public NotificationChain eBasicRemoveFromContainerFeature(NotificationChain msgs)
 	{
-		switch (eContainerFeatureID()) {
+		switch (eContainerFeatureID())
+		{
 			case GpmnPackage.SUPPRESSION_EDGE__GPMN_DIAGRAM:
 				return eInternalContainer().eInverseRemove(this, GpmnPackage.GPMN_DIAGRAM__SUPPRESSION_EDGES, GpmnDiagram.class, msgs);
 		}
@@ -235,7 +239,8 @@ public class SuppressionEdgeImpl extends AbstractEdgeImpl implements Suppression
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.SUPPRESSION_EDGE__SOURCE:
 				return getSource();
 			case GpmnPackage.SUPPRESSION_EDGE__TARGET:
@@ -254,7 +259,8 @@ public class SuppressionEdgeImpl extends AbstractEdgeImpl implements Suppression
 	@Override
 	public void eSet(int featureID, Object newValue)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.SUPPRESSION_EDGE__SOURCE:
 				setSource((Goal)newValue);
 				return;
@@ -276,7 +282,8 @@ public class SuppressionEdgeImpl extends AbstractEdgeImpl implements Suppression
 	@Override
 	public void eUnset(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.SUPPRESSION_EDGE__SOURCE:
 				setSource((Goal)null);
 				return;
@@ -298,7 +305,8 @@ public class SuppressionEdgeImpl extends AbstractEdgeImpl implements Suppression
 	@Override
 	public boolean eIsSet(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.SUPPRESSION_EDGE__SOURCE:
 				return source != null;
 			case GpmnPackage.SUPPRESSION_EDGE__TARGET:

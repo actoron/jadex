@@ -140,7 +140,8 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	 */
 	public EList<ActivationEdge> getActivationEdges()
 	{
-		if (activationEdges == null) {
+		if (activationEdges == null)
+		{
 			activationEdges = new EObjectWithInverseEList.Unsettable<ActivationEdge>(ActivationEdge.class, this, GpmnPackage.SUB_PROCESS__ACTIVATION_EDGES, GpmnPackage.ACTIVATION_EDGE__TARGET);
 		}
 		return activationEdges;
@@ -267,7 +268,8 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	 */
 	public void setGpmnDiagram(GpmnDiagram newGpmnDiagram)
 	{
-		if (newGpmnDiagram != eInternalContainer() || (eContainerFeatureID() != GpmnPackage.SUB_PROCESS__GPMN_DIAGRAM && newGpmnDiagram != null)) {
+		if (newGpmnDiagram != eInternalContainer() || (eContainerFeatureID() != GpmnPackage.SUB_PROCESS__GPMN_DIAGRAM && newGpmnDiagram != null))
+		{
 			if (EcoreUtil.isAncestor(this, newGpmnDiagram))
 				throw new IllegalArgumentException("Recursive containment not allowed for " + toString()); //$NON-NLS-1$
 			NotificationChain msgs = null;
@@ -292,7 +294,8 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.SUB_PROCESS__ACTIVATION_EDGES:
 				return ((InternalEList<InternalEObject>)(InternalEList<?>)getActivationEdges()).basicAdd(otherEnd, msgs);
 			case GpmnPackage.SUB_PROCESS__GPMN_DIAGRAM:
@@ -312,7 +315,8 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.SUB_PROCESS__ACTIVATION_EDGES:
 				return ((InternalEList<?>)getActivationEdges()).basicRemove(otherEnd, msgs);
 			case GpmnPackage.SUB_PROCESS__GPMN_DIAGRAM:
@@ -330,7 +334,8 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	public NotificationChain eBasicRemoveFromContainerFeature(
 			NotificationChain msgs)
 	{
-		switch (eContainerFeatureID()) {
+		switch (eContainerFeatureID())
+		{
 			case GpmnPackage.SUB_PROCESS__GPMN_DIAGRAM:
 				return eInternalContainer().eInverseRemove(this, GpmnPackage.GPMN_DIAGRAM__SUB_PROCESSES, GpmnDiagram.class, msgs);
 		}
@@ -345,7 +350,8 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.SUB_PROCESS__ACTIVATION_EDGES:
 				return getActivationEdges();
 			case GpmnPackage.SUB_PROCESS__PROCESSREF:
@@ -367,7 +373,8 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	@Override
 	public void eSet(int featureID, Object newValue)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.SUB_PROCESS__ACTIVATION_EDGES:
 				getActivationEdges().clear();
 				getActivationEdges().addAll((Collection<? extends ActivationEdge>)newValue);
@@ -393,7 +400,8 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	@Override
 	public void eUnset(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.SUB_PROCESS__ACTIVATION_EDGES:
 				unsetActivationEdges();
 				return;
@@ -418,7 +426,8 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	@Override
 	public boolean eIsSet(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.SUB_PROCESS__ACTIVATION_EDGES:
 				return isSetActivationEdges();
 			case GpmnPackage.SUB_PROCESS__PROCESSREF:
@@ -439,8 +448,10 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	@Override
 	public int eBaseStructuralFeatureID(int derivedFeatureID, Class<?> baseClass)
 	{
-		if (baseClass == Activatable.class) {
-			switch (derivedFeatureID) {
+		if (baseClass == Activatable.class)
+		{
+			switch (derivedFeatureID)
+			{
 				case GpmnPackage.SUB_PROCESS__ACTIVATION_EDGES: return GpmnPackage.ACTIVATABLE__ACTIVATION_EDGES;
 				default: return -1;
 			}
@@ -456,8 +467,10 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	@Override
 	public int eDerivedStructuralFeatureID(int baseFeatureID, Class<?> baseClass)
 	{
-		if (baseClass == Activatable.class) {
-			switch (baseFeatureID) {
+		if (baseClass == Activatable.class)
+		{
+			switch (baseFeatureID)
+			{
 				case GpmnPackage.ACTIVATABLE__ACTIVATION_EDGES: return GpmnPackage.SUB_PROCESS__ACTIVATION_EDGES;
 				default: return -1;
 			}

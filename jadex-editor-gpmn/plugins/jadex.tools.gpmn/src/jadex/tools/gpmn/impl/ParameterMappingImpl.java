@@ -229,7 +229,8 @@ public class ParameterMappingImpl extends EModelElementImpl implements
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.PARAMETER_MAPPING__VALUE:
 				return getValue();
 			case GpmnPackage.PARAMETER_MAPPING__NAME:
@@ -246,7 +247,8 @@ public class ParameterMappingImpl extends EModelElementImpl implements
 	@Override
 	public void eSet(int featureID, Object newValue)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.PARAMETER_MAPPING__VALUE:
 				setValue((String)newValue);
 				return;
@@ -265,7 +267,8 @@ public class ParameterMappingImpl extends EModelElementImpl implements
 	@Override
 	public void eUnset(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.PARAMETER_MAPPING__VALUE:
 				unsetValue();
 				return;
@@ -284,7 +287,8 @@ public class ParameterMappingImpl extends EModelElementImpl implements
 	@Override
 	public boolean eIsSet(int featureID)
 	{
-		switch (featureID) {
+		switch (featureID)
+		{
 			case GpmnPackage.PARAMETER_MAPPING__VALUE:
 				return isSetValue();
 			case GpmnPackage.PARAMETER_MAPPING__NAME:
