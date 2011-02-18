@@ -22,6 +22,7 @@ import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.emf.workspace.util.WorkspaceSynchronizer;
 import org.eclipse.gmf.runtime.common.core.command.CommandResult;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.DiagramEditPart;
+import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
 import org.eclipse.gmf.runtime.emf.commands.core.command.AbstractTransactionalCommand;
 import org.eclipse.gmf.runtime.notation.Edge;
 import org.eclipse.swt.SWT;
@@ -103,7 +104,7 @@ public class GpmnActivationEdgePropertySection extends
 					DiagramEditPart diagramEditPart = (DiagramEditPart) editPart
 							.getRoot().getContents();
 					dispatchCommand(new ModifyActivationEdgeOrder(
-							diagramEditPart, (Edge) editPart.getNotationView(),
+							diagramEditPart, (Edge) ((IGraphicalEditPart) editPart).getNotationView(),
 							newOrder));
 					dispatchCommand(new AbstractTransactionalCommand(
 							(TransactionalEditingDomain) AdapterFactoryEditingDomain
