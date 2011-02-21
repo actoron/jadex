@@ -42,11 +42,22 @@ public class CMSUpdateHandler
 	/** The event type for an added component (value is component description). */
 	protected static final String	EVENT_COMPONENT_ADDED	= "component-added";
 	
+	/** The event type for a changed component (value is component description). */
+	protected static final String	EVENT_COMPONENT_CHANGED	= "component-changed";
+	
 	/** The event type for a removed component (value is component description). */
 	protected static final String	EVENT_COMPONENT_REMOVED	= "component-removed";
 	
 	/** The event type for a removed component (value is collection of change events). */
 	protected static final String	EVENT_BULK	= "bulk-event";
+	
+	/** Update delay. */
+	// todo: make configurable.
+	protected static final long UPDATE_DELAY	= 1000;	
+	
+	/** Maximum number of events per delay period. */
+	// todo: make configurable.
+	protected static final int MAX_EVENTS	= 20;	
 	
 	//-------- attributes --------
 
@@ -133,6 +144,12 @@ public class CMSUpdateHandler
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
+		// For local component use direct listener.
+		if(cid.getPlatformName().equals(access.getComponentIdentifier().getPlatformName()))
+		{
+			return installLocalCMSListener(listener);
+		}
+		
 		Future	ret	= new Future();
 		if(listeners==null)
 		{
@@ -201,8 +218,16 @@ public class CMSUpdateHandler
 	public IFuture	removeCMSListener(IComponentIdentifier cid, ICMSComponentListener listener)
 	{
 		assert SwingUtilities.isEventDispatchThread();
+		
 		IFuture	ret	= IFuture.DONE;
-		if(listeners!=null)
+		
+		// For local component use direct listener.
+		if(cid.getPlatformName().equals(access.getComponentIdentifier().getPlatformName()))
+		{
+			ret	= removeLocalCMSListener(listener);
+		}
+
+		else if(listeners!=null)
 		{
 			listeners.remove(cid, listener);
 			if(!listeners.containsKey(cid))
@@ -229,6 +254,13 @@ public class CMSUpdateHandler
 				cls[i].componentAdded((IComponentDescription)event.getValue());
 			}
 		}
+		else if(EVENT_COMPONENT_CHANGED.equals(event.getType()))
+		{
+			for(int i=0; i<cls.length; i++)
+			{
+				cls[i].componentChanged((IComponentDescription)event.getValue());
+			}
+		}
 		else if(EVENT_COMPONENT_REMOVED.equals(event.getType()))
 		{
 			for(int i=0; i<cls.length; i++)
@@ -248,8 +280,48 @@ public class CMSUpdateHandler
 	}
 	
 	/**
+	 *  Install a local listener.
+	 *  @param listener	The local listener.
+	 */
+	protected IFuture	installLocalCMSListener(final ICMSComponentListener listener)
+	{
+		final Future	ret	= new Future();
+		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(new SwingDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				IComponentManagementService	cms	= (IComponentManagementService)result;
+				cms.addComponentListener(null, listener);
+				ret.setResult(null);
+			}
+		});
+		return ret;
+	}
+	
+	/**
+	 *  Remove a local listener.
+	 *  @param listener	The local listener.
+	 */
+	protected IFuture	removeLocalCMSListener(final ICMSComponentListener listener)
+	{
+		final Future	ret	= new Future();
+		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(new SwingDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				IComponentManagementService	cms	= (IComponentManagementService)result;
+				cms.removeComponentListener(null, listener);
+				ret.setResult(null);
+			}
+		});
+		return ret;
+	}
+
+	/**
 	 *  Install the remote listener.
-	 *  @param rcl	The local change listener to be notified by the remote CMS listener.
+	 *  @param cid	The remote component id.
 	 */
 	protected IFuture	installRemoteCMSListener(final IComponentIdentifier cid)
 	{
@@ -383,6 +455,9 @@ public class CMSUpdateHandler
 		/** The added components, if any (cid->desc). */
 		protected Map	added;
 				
+		/** The changed components, if any (cid->desc). */
+		protected Map	changed;
+				
 		/** The removed components, if any (cid->desc). */
 		protected Map	removed;
 				
@@ -430,7 +505,20 @@ public class CMSUpdateHandler
 		 */
 		public IFuture componentChanged(IComponentDescription desc)
 		{
-			// ignored
+			if(added!=null && added.containsKey(desc.getName()))
+			{
+				added.put(desc.getName(), desc);
+			}
+			else
+			{
+				if(changed==null)
+				{
+					changed	= new LinkedHashMap();
+				}
+				changed.put(desc.getName(), desc);
+			}
+			
+			startTimer();
 			return IFuture.DONE;
 		}
 		
@@ -440,6 +528,11 @@ public class CMSUpdateHandler
 		 */
 		public synchronized IFuture componentRemoved(final IComponentDescription desc, Map results)
 		{
+			if(changed!=null && changed.containsKey(desc.getName()))
+			{
+				changed.remove(desc.getName());
+			}
+			
 			if(added!=null && added.containsKey(desc.getName()))
 			{
 				added.remove(desc.getName());
@@ -472,20 +565,40 @@ public class CMSUpdateHandler
 							timer	= null;
 							if(removed!=null)
 							{
-								for(Iterator it=removed.values().iterator(); it.hasNext(); )
+								for(Iterator it=removed.values().iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
 								{
 									events.add(new ChangeEvent(cid, EVENT_COMPONENT_REMOVED, it.next()));
+									it.remove();
 								}
 							}
 							if(added!=null)
 							{
-								for(Iterator it=added.values().iterator(); it.hasNext(); )
+								for(Iterator it=added.values().iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
 								{
 									events.add(new ChangeEvent(cid, EVENT_COMPONENT_ADDED, it.next()));
+									it.remove();
 								}
 							}
-							removed	= null;
-							added	= null;
+							if(changed!=null)
+							{
+								for(Iterator it=changed.values().iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
+								{
+									events.add(new ChangeEvent(cid, EVENT_COMPONENT_CHANGED, it.next()));
+									it.remove();
+								}
+							}
+							
+							if(removed!=null && removed.isEmpty())
+								removed	= null;
+							if(added!=null && added.isEmpty())
+								added	= null;
+							if(changed!=null && changed.isEmpty())
+								changed	= null;
+							
+							if(removed!=null || added!=null || changed!=null)
+							{
+								startTimer();
+							}
 						}
 						
 						if(!events.isEmpty())
@@ -517,7 +630,7 @@ public class CMSUpdateHandler
 							});
 						}
 					}
-				}, 1000);
+				}, UPDATE_DELAY);
 			}
 		}
 		
