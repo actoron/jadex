@@ -83,7 +83,7 @@ public class FireflyAgent extends MicroAgent
 				    // [ set clock reset-level ]
 				    Set tmp = Collections.EMPTY_SET;
 				    
-				    space.getNearObjects((IVector2)avatar.getProperty(
+				    tmp = space.getNearObjects((IVector2)avatar.getProperty(
 						Space2D.PROPERTY_POSITION), new Vector1Int(1), "firefly", new IFilter()
 						{
 							public boolean filter(Object obj)

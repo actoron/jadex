@@ -118,6 +118,61 @@
 	</componenttypes>
 	
 	<applications>	
+		<application name="15x15 and 500 flies, kd-tree enabled">
+			<arguments>
+				<argument name="number">500</argument>
+				<argument name="flashes_to_reset">6</argument>
+				<argument name="flash_length">3</argument>
+				<argument name="cycle_length">12</argument>
+			</arguments>
+			
+			<spaces>
+				<env:envspace name="mygc2dspace" type="gc2dspace" width="15" height="15">
+					<env:processes>
+						<env:process type="enableKdTree" />
+					</env:processes>
+					
+					<env:dataproviders>
+						<env:dataprovider name="flashes">
+							<env:source name="$flies" objecttype="firefly" aggregate="true">
+								<env:includecondition>$object.flashing</env:includecondition>
+							</env:source>
+							<env:data name="time">$time</env:data>
+							<env:data name="number_flashes">$flies.size()</env:data>
+						</env:dataprovider>
+					</env:dataproviders>
+			
+					<env:dataconsumers>
+						<env:dataconsumer name="flashes_chart" class="XYChartDataConsumer">
+							<env:property name="dataprovider">"flashes"</env:property>
+							<env:property name="title">"Number of flashing flies"</env:property>
+							<env:property name="labelx">"Time"</env:property>
+							<env:property name="labely">"Flashes"</env:property>
+							<env:property name="maxitemcount">500</env:property>
+							<env:property name="legend">false</env:property>
+							
+							<!-- Defines a normal series. -->
+							<env:property name="seriesname">"Flashes"</env:property>
+							<env:property name="valuex">"time"</env:property>
+							<env:property name="valuey">"number_flashes"</env:property>
+						</env:dataconsumer>
+					</env:dataconsumers>
+				
+					<env:observers>
+						<env:observer name="world" dataview="view_all" perspective="main">
+							<env:plugin name="evaluation" class="EvaluationPlugin">
+								<env:property name="component_0">((AbstractChartDataConsumer)$space.getDataConsumer("flashes_chart")).getChartPanel()</env:property>
+							</env:plugin>
+						</env:observer>
+					</env:observers>
+				</env:envspace>
+			</spaces>
+
+			<components>
+				<component type="Firefly" number="$args.number"/>
+			</components>
+		</application>
+		
 		<application name="15x15 and 100 flies">
 			<arguments>
 				<argument name="number">100</argument>
@@ -125,11 +180,6 @@
 			
 			<spaces>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="15" height="15">
-					
-					<env:processes>
-						<env:process type="enableKdTree" />
-					</env:processes>
-					
 					<env:dataproviders>
 						<env:dataprovider name="flashes">
 							<env:source name="$flies" objecttype="firefly" aggregate="true">
