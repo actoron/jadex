@@ -1,19 +1,27 @@
 package jadex.application.space.envsupport.environment.space2d;
 
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.ISpaceProcess;
 import jadex.application.space.envsupport.math.IVector1;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Double;
 import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.application.space.envsupport.math.Vector2Int;
 import jadex.commons.IFilter;
+import jadex.commons.SimplePropertyObject;
+import jadex.commons.service.clock.IClockService;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
+
+import javax.jws.soap.InitParam;
 
 /**
  *  General 2D space.
@@ -39,6 +47,8 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	/** Area size. */
 	protected IVector2 areasize;
 	
+	/** KD-Trees. */
+	protected Map<String, KdTree> kdTrees;	
 	//-------- constructors --------
 	
 	/**
@@ -50,6 +60,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	protected Space2D(IVector2 areasize)
 	{		
 		this.areasize = areasize;
+		this.kdTrees = new HashMap<String, KdTree>();
 	}
 	
 	//-------- methods --------
@@ -104,6 +115,10 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 			ret.setProperty(PROPERTY_POSITION, null);
 			setPosition(ret.getId(), pos);
 		}
+		
+		KdTree kdTree = kdTrees.get(ret.getType());
+		if (kdTree != null)
+			kdTree.addObject(ret);
 	}
 
 	/**
@@ -267,6 +282,47 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	}
 	
 	/**
+	 * Enables kd-tree NN-Search optimization for a specific object type.
+	 * This will increase space overhead but massively decreases restricted
+	 * nearest-neighborsearches in cases of large amounts 
+	 * of (evenly distributed) objects.
+	 * 
+	 * @param String type The type of object being optimized.
+	 */
+	public void enableKdTree(String type)
+	{
+		synchronized(monitor)
+		{
+			KdTree tree = new KdTree();
+			ISpaceObject[] objects = (ISpaceObject[]) getSpaceObjectsByType(type);
+			for (int i = 0; i < objects.length; ++i)
+				tree.addObject(objects[i]);
+			
+			tree.rebuild();
+			
+			kdTrees.put(type, tree);
+			
+			ISpaceProcess process = new KdTreeProcess(tree);
+			process.setProperty(ISpaceProcess.ID, tree);
+			processes.put(tree, process);
+		}
+	}
+	
+	/**
+	 * Disables kd-tree NN-Search optimization for a specific object type.
+	 * 
+	 * @param String type The type of object for which the kd-tree is disabled.
+	 */
+	public void disableKdTree(String type)
+	{
+		synchronized (monitor)
+		{
+			KdTree tree = kdTrees.remove(type);
+			processes.remove(tree);
+		}
+	}
+	
+	/**
 	 * Returns the nearest object to the given position within a
 	 * maximum distance from the position.
 	 * 
@@ -280,6 +336,10 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 		
 		synchronized(monitor)
 		{
+			KdTree kdTree = kdTrees.get(type);
+			if (kdTree != null)
+				return kdTree.getNearestObject(position, maxdist.getAsDouble());
+			
 			ISpaceObject nearest = null;
 			IVector1 distance = null;
 			ISpaceObject[] objects = type!=null ? getSpaceObjectsByType(type) : (ISpaceObject[])getSpaceObjects();
@@ -323,6 +383,10 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 */
 	public Set getNearObjects(IVector2 position, IVector1 maxdist, final String type)
 	{
+		KdTree kdTree = kdTrees.get(type);
+		if (kdTree != null)
+			return new HashSet(kdTree.getNearestObjects(position, maxdist.getAsDouble()));
+		
 		return getNearObjects(position, maxdist, new IFilter()
 		{
 			public boolean filter(Object obj)
@@ -366,7 +430,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 		synchronized(monitor)
 		{
 			Set ret = new HashSet();
-		
+			
 			Set objects = spaceobjects.entrySet();
 			for(Iterator it = objects.iterator(); it.hasNext();)
 			{
@@ -386,6 +450,27 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 		
 			return ret;
 		}
+	}
+	
+	/**
+	 * Retrieve all objects in the distance for a position
+	 * @param position
+	 * @param distance
+	 * @return The near objects. 
+	 */
+	public Set getNearObjects(IVector2 position, IVector1 maxdist, final String type, final IFilter filter)
+	{
+		KdTree kdTree = kdTrees.get(type);
+		if (kdTree != null)
+			return new HashSet(kdTree.getNearestObjects(position, maxdist.getAsDouble(), filter));
+		
+		return getNearObjects(position, maxdist, new IFilter()
+		{
+			public boolean filter(Object obj)
+			{
+				return (((ISpaceObject) obj).getType().equals(type) && filter.filter(obj));
+			}
+		});
 	}
 	
 	/**
@@ -433,6 +518,34 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 		synchronized(monitor)
 		{
 			return spaceobjects.values().toArray();
+		}
+	}
+	
+	protected class KdTreeProcess extends SimplePropertyObject implements ISpaceProcess
+	{
+		/** The kd-tree */
+		protected KdTree kdtree;
+		
+		/** Creates a new update process for a kd-tree.
+		 * 
+		 * @param kdTree The kd-tree.
+		 */
+		public KdTreeProcess(KdTree kdTree)
+		{
+			this.kdtree = kdTree;
+		}
+		
+		public void execute(IClockService clock, IEnvironmentSpace space)
+		{
+			kdtree.rebuild();
+		}
+		
+		public void shutdown(IEnvironmentSpace space)
+		{
+		}
+		
+		public void start(IClockService clock, IEnvironmentSpace space)
+		{
 		}
 	}
 }

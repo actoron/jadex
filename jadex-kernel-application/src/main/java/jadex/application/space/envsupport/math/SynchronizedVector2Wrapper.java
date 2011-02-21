@@ -223,6 +223,15 @@ public class SynchronizedVector2Wrapper implements IVector2
 		return vector_.getLength();
 	}
 	
+	/** Returns the squared length (magnitude) of the vector.
+	 *
+	 *  @return squared vector length
+	 */
+	public synchronized IVector1 getSquaredLength()
+	{
+		return vector_.getSquaredLength();
+	}
+	
 	/** Returns the direction (theta) of the vector.
 	 *
 	 *  @return vector direction

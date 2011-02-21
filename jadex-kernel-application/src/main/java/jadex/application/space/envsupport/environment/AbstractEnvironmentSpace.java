@@ -2012,7 +2012,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/**
 	 *  Synchronized counter class
 	 */
-	private class AtomicCounter
+	protected class AtomicCounter
 	{
 		long count_;
 		

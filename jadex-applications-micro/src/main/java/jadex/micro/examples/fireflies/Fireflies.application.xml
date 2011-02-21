@@ -57,6 +57,10 @@
 				</env:objecttype>
 			</env:objecttypes>
 			
+			<env:processtypes>
+				<env:processtype name="enableKdTree" class="EnableKdTreeProcess" />
+			</env:processtypes>
+			
 			<env:dataviews>
 				<env:dataview name="view_all" class="GeneralDataView2D" />
 			</env:dataviews>
@@ -121,6 +125,11 @@
 			
 			<spaces>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="15" height="15">
+					
+					<env:processes>
+						<env:process type="enableKdTree" />
+					</env:processes>
+					
 					<env:dataproviders>
 						<env:dataprovider name="flashes">
 							<env:source name="$flies" objecttype="firefly" aggregate="true">

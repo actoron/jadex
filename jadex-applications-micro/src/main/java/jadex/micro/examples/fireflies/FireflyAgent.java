@@ -84,7 +84,7 @@ public class FireflyAgent extends MicroAgent
 				    Set tmp = Collections.EMPTY_SET;
 				    
 				    space.getNearObjects((IVector2)avatar.getProperty(
-						Space2D.PROPERTY_POSITION), new Vector1Int(1), new IFilter()
+						Space2D.PROPERTY_POSITION), new Vector1Int(1), "firefly", new IFilter()
 						{
 							public boolean filter(Object obj)
 							{

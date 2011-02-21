@@ -142,6 +142,12 @@ public interface IVector2
 	 */
 	public IVector1 getLength();
 	
+	/** Returns the squared length (magnitude) of the vector.
+	 *
+	 *  @return squared vector length
+	 */
+	public IVector1 getSquaredLength();
+	
 	/** Returns the direction (theta) of the vector.
 	 *
 	 *  @return vector direction

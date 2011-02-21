@@ -206,6 +206,15 @@ public class Vector2Double implements IVector2, Cloneable
 	{
 		return new Vector1Double(Math.sqrt((x_ * x_) + (y_ * y_)));
 	}
+	
+	/** Returns the squared length (magnitude) of the vector.
+	 *
+	 *  @return squared vector length
+	 */
+	public IVector1 getSquaredLength()
+	{
+		return new Vector1Double((x_ * x_) + (y_ * y_));
+	}
 
 	public IVector1 getDirection()
 	{
