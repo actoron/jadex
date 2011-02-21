@@ -383,9 +383,12 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 */
 	public Set getNearObjects(IVector2 position, IVector1 maxdist, final String type)
 	{
-		KdTree kdTree = kdTrees.get(type);
-		if (kdTree != null)
-			return new HashSet(kdTree.getNearestObjects(position, maxdist.getAsDouble()));
+		synchronized(monitor)
+		{
+			KdTree kdTree = kdTrees.get(type);
+			if (kdTree != null)
+				return new HashSet(kdTree.getNearestObjects(position, maxdist.getAsDouble()));
+		}
 		
 		return getNearObjects(position, maxdist, new IFilter()
 		{
@@ -460,9 +463,12 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 */
 	public Set getNearObjects(IVector2 position, IVector1 maxdist, final String type, final IFilter filter)
 	{
-		KdTree kdTree = kdTrees.get(type);
-		if (kdTree != null)
-			return new HashSet(kdTree.getNearestObjects(position, maxdist.getAsDouble(), filter));
+		synchronized(monitor)
+		{
+			KdTree kdTree = kdTrees.get(type);
+			if (kdTree != null)
+				return new HashSet(kdTree.getNearestObjects(position, maxdist.getAsDouble(), filter));
+		}
 		
 		return getNearObjects(position, maxdist, new IFilter()
 		{
