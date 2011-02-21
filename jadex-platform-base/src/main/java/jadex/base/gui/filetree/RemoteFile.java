@@ -1,7 +1,6 @@
 package jadex.base.gui.filetree;
 
 import jadex.base.gui.filechooser.MyFile;
-import jadex.commons.SUtil;
 
 import java.io.File;
 

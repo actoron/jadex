@@ -28,7 +28,7 @@ public class DefaultNodeFactory implements INodeFactory
 		if(value instanceof File)
 		{
 			File file = (File)value;
-			if(SUtil.arrayToSet(file.listRoots()).contains(file) || file.isDirectory())
+			if(SUtil.arrayToSet(File.listRoots()).contains(file) || file.isDirectory())
 			{
 				ret = new DirNode(parent, model, tree, file, iconcache, filter, factory);
 			}

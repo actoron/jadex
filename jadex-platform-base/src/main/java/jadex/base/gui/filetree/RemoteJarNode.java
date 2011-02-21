@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 
 import javax.swing.JTree;
-import javax.swing.filechooser.FileSystemView;
 
 /**
  *  Node for remote jar file.

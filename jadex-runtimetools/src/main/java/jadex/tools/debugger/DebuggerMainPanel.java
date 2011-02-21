@@ -82,22 +82,22 @@ public class DebuggerMainPanel extends JSplitPane
 		{
 			public void customResultAvailable(Object result)
 			{
-				IComponentManagementService	ces	= (IComponentManagementService)result;
+				IComponentManagementService	cms	= (IComponentManagementService)result;
 				// The right panel (step & custom tabs)
 				JPanel	rightpanel	= new JPanel();
 				setRightComponent(rightpanel);
 				rightpanel.setLayout(new GridBagLayout());
 				
 				final JTabbedPane	tabs	= new JTabbedPane();		
-				IFuture ret = ces.getExternalAccess(desc.getName());
-				ret.addResultListener(new IResultListener()
+				cms.getExternalAccess(desc.getName())
+					.addResultListener(new IResultListener()
 				{			
 					public void resultAvailable(final Object result)
 					{
 						// The left panel (breakpoints)
 						final IExternalAccess exta = (IExternalAccess)result;
 						final BreakpointPanel[] leftpanel = new BreakpointPanel[1];
-						final Map props = ((IExternalAccess)result).getModel().getProperties();
+						final Map props = exta.getModel().getProperties();
 						SwingUtilities.invokeLater(new Runnable()
 						{
 							public void run()
@@ -291,7 +291,7 @@ public class DebuggerMainPanel extends JSplitPane
 				
 				updatePanel((IComponentDescription)desc);
 
-				ces.addComponentListener(desc.getName(), new ICMSComponentListener()
+				cms.addComponentListener(desc.getName(), new ICMSComponentListener()
 				{			
 					public IFuture componentChanged(IComponentDescription desc)
 					{

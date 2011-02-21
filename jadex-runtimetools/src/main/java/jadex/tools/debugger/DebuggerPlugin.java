@@ -69,15 +69,6 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 	/** The detail layout. */
 	protected ObjectCardLayout	cards;
 	
-	//-------- constructors --------
-	
-	/**
-	 *  Create a new debugger plugin.
-	 */
-	public DebuggerPlugin()
-	{
-	}
-		
 	//-------- IControlCenterPlugin interface --------
 	
 	/**
@@ -190,12 +181,12 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 					boolean	allob	= true;
 					for(int i=0; allob && i<nodes.length; i++)
 					{
-						allob	= cards.getComponent(((IActiveComponentTreeNode)nodes[i]).getDescription())!=null;
+						allob	= cards.getComponent(((IActiveComponentTreeNode)nodes[i]).getDescription().getName())!=null;
 					}
 					boolean	allig	= true;
 					for(int i=0; allig && i<nodes.length; i++)
 					{
-						allig	= cards.getComponent(((IActiveComponentTreeNode)nodes[i]).getDescription())==null;
+						allig	= cards.getComponent(((IActiveComponentTreeNode)nodes[i]).getDescription().getName())==null;
 					}
 					
 					// Todo: Large icons for popup actions?
@@ -236,7 +227,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 				if(node instanceof IActiveComponentTreeNode)
 				{
 					IComponentDescription ad = ((IActiveComponentTreeNode)node).getDescription();
-					if(cards.getComponent(ad)!=null)
+					if(cards.getComponent(ad.getName())!=null)
 					{
 						ret = DebuggerPlugin.icons.getIcon("component_debugged");
 					}
@@ -269,7 +260,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 				if(node instanceof IActiveComponentTreeNode)
 				{
 					IComponentDescription desc = ((IActiveComponentTreeNode)node).getDescription();
-					if(cards.getComponent(desc)!=null)
+					if(cards.getComponent(desc.getName())!=null)
 					{
 						DebuggerMainPanel panel = (DebuggerMainPanel)cards.getComponent(desc);
 						panel.dispose();
@@ -317,7 +308,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 					IComponentDescription desc = node.getDescription();
 					DebuggerMainPanel	panel = new DebuggerMainPanel(getJCC(), desc);
 //					SHelp.setupHelp(panel, "tools.debugger");
-					detail.add(panel, node.getDescription());
+					detail.add(panel, desc.getName());
 					comptree.getModel().fireNodeChanged(node);
 				}
 			}
@@ -335,7 +326,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 				{
 					IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					IComponentDescription desc = node.getDescription();
-					DebuggerMainPanel panel = (DebuggerMainPanel)cards.getComponent(desc);
+					DebuggerMainPanel panel = (DebuggerMainPanel)cards.getComponent(desc.getName());
 					panel.dispose();
 					detail.remove(panel);
 					comptree.getModel().fireNodeChanged(node);
