@@ -1,10 +1,8 @@
 package jadex.base.gui.componenttree;
 
-import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.service.remote.ProxyAgent;
-import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
@@ -22,11 +20,9 @@ import jadex.xml.annotation.XMLClassname;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 
 /**
@@ -54,8 +50,6 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	/** The connection state. */
 	protected boolean connected;
 //	
-//	/** The auto refresh timer. */
-//	protected Timer timer;
 	
 	//-------- constructors --------
 	
@@ -68,122 +62,20 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		super(parent, model, tree, desc, cms, iconcache);
 		this.connected = false;
 		
-//		System.out.println("proxy: "+desc.getName());
-		
-//		timer = new Timer(10000, new ActionListener()
-//		{
-//			public void actionPerformed(ActionEvent e)
-//			{
-//				// hmm?! with or without subtree?
-//				refresh(true);
-//			}
-//		});
-//		timer.start();
-		
-		cms.getExternalAccess(desc.getName()).addResultListener(new SwingDefaultResultListener()
+		// Add CMS listener for remote proxy node.
+		getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
 			{
-				final IExternalAccess exta = (IExternalAccess)result;
-				exta.scheduleStep(new IComponentStep()
-				{
-					public Object execute(IInternalAccess ia)
-					{
-						ProxyAgent pa = (ProxyAgent)ia;
-						pa.addCMSListener(new ICMSComponentListener()
-						{							
-							public IFuture componentRemoved(final IComponentDescription desc, Map results)
-							{
-								final ITreeNode node = getModel().getNodeOrAddZombie(desc.getName());
-								if(node!=null)
-								{
-									SwingUtilities.invokeLater(new Runnable()
-									{
-										public void run()
-										{
-											if(node.getParent()!=null)
-											{
-												((AbstractTreeNode)node.getParent()).removeChild(node);
-											}
-										}
-									});
-								}
-								return IFuture.DONE;
-							}
-							
-							public IFuture componentChanged(final IComponentDescription desc)
-							{
-								SwingUtilities.invokeLater(new Runnable()
-								{
-									public void run()
-									{
-										ComponentTreeNode	node	= (ComponentTreeNode)getModel().getAddedNode(desc.getName());
-										if(node!=null)
-										{
-											node.setDescription(desc);
-											getModel().fireNodeChanged(node);
-										}
-									}
-								});
-								return IFuture.DONE;
-							}
-							
-							public IFuture componentAdded(final IComponentDescription desc)
-							{
-//								System.err.println(""+model.hashCode()+" Panel->addChild queued: "+desc.getName()+", "+desc.getParent());
-								SwingUtilities.invokeLater(new Runnable()
-								{
-									public void run()
-									{
-//										System.err.println(""+model.hashCode()+" Panel->addChild queued2: "+desc.getName()+", "+desc.getParent());
-										final ComponentTreeNode	parentnode = desc.getParent()==null ? null
-											: desc.getParent().equals(cid) ? ProxyComponentTreeNode.this
-											: (ComponentTreeNode)getModel().getAddedNode(desc.getParent());
-										if(parentnode!=null)
-										{
-											ITreeNode	node = (ITreeNode)parentnode.createComponentNode(desc);
-//											System.out.println("addChild: "+parentnode+", "+node);
-											try
-											{
-												if(parentnode.getIndexOfChild(node)==-1)
-												{
-		//													System.err.println(""+model.hashCode()+" Panel->addChild: "+node+", "+parentnode);
-													parentnode.addChild(node);
-												}
-											}
-											catch(Exception e)
-											{
-												System.err.println(""+getModel().hashCode()+" Broken node: "+node);
-												System.err.println(""+getModel().hashCode()+" Parent: "+parentnode+", "+parentnode.getCachedChildren());
-												e.printStackTrace();
-		//												model.fireNodeAdded(parentnode, node, parentnode.getIndexOfChild(node));
-											}
-										}
-									}
-								});
-								
-								return IFuture.DONE;
-							}
-						});
-						return null;
-					}
-				});
+				addCMSListener((IComponentIdentifier)result);
 			}
 			public void customExceptionOccurred(Exception exception)
 			{
 				connected	= false;
+				getModel().fireNodeChanged(ProxyComponentTreeNode.this);
 			}
 		});
-
 	}
-	
-//	/**
-//	 *  Called when the node is removed or the tree is closed.
-//	 */
-//	public void	dispose()
-//	{
-//		timer.stop();
-//	}
 	
 	/**
 	 *  Get the cid.

@@ -1,5 +1,6 @@
 package jadex.base.gui.plugin;
 
+import jadex.base.gui.CMSUpdateHandler;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 
@@ -87,4 +88,9 @@ public interface IControlCenter
 	 *  @param exception The exception (if any).
 	 */
 	public void displayError(final String errortitle, String errormessage, Exception exception);
+
+	/**
+	 *  Get the cms update handler shared by all tools.
+	 */
+	public CMSUpdateHandler getCMSHandler();
 }

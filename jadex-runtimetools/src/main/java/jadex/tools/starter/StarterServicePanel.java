@@ -222,7 +222,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 		  		};
 		  		mpanel.getTree().addMouseListener(ml);
 		
-				comptree = new ComponentTreePanel(exta, JSplitPane.HORIZONTAL_SPLIT);
+				comptree = new ComponentTreePanel(exta, jcc.getCMSHandler(), JSplitPane.HORIZONTAL_SPLIT);
 				comptree.setMinimumSize(new Dimension(0, 0));
 				
 				lsplit.add(new JScrollPane(mpanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,

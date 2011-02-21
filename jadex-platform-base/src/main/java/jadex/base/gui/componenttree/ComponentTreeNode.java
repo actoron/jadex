@@ -1,12 +1,10 @@
 package jadex.base.gui.componenttree;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
+import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
@@ -19,9 +17,15 @@ import jadex.commons.service.IService;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.SServiceProvider;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 
 /**
  *  Node object representing a service container.
@@ -41,7 +45,13 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 		
 	/** The properties component (if any). */
 	protected ComponentProperties	propcomp;
-		
+	
+	/** The cms listener (if any). */
+	protected ICMSComponentListener	cmslistener;
+	
+	/** The component id for listening (if any). */
+	protected IComponentIdentifier	listenercid;
+	
 	//-------- constructors --------
 	
 	/**
@@ -61,6 +71,12 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 		this.iconcache	= iconcache;
 		
 		model.registerNode(this);
+		
+		// Add CMS listener for platform node.
+		if(parent==null)
+		{
+			addCMSListener(desc.getName());
+		}
 	}
 	
 	//-------- AbstractComponentTreeNode methods --------
@@ -365,5 +381,108 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Add a CMS listener for tree updates of components from the given (platform) id.
+	 */
+	protected void	addCMSListener(IComponentIdentifier cid)
+	{
+		assert cmslistener==null;
+		CMSUpdateHandler	cmshandler	= (CMSUpdateHandler)getTree().getClientProperty(CMSUpdateHandler.class);
+		this.listenercid	= cid;
+		this.cmslistener	= new ICMSComponentListener()
+		{
+			public IFuture componentRemoved(final IComponentDescription desc, Map results)
+			{
+				final ITreeNode node = getModel().getNodeOrAddZombie(desc.getName());
+				if(node!=null)
+				{
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							if(node.getParent()!=null)
+							{
+								((AbstractTreeNode)node.getParent()).removeChild(node);
+							}
+						}
+					});
+				}
+				return IFuture.DONE;
+			}
+			
+			public IFuture componentChanged(final IComponentDescription desc)
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						ComponentTreeNode	node	= (ComponentTreeNode)getModel().getAddedNode(desc.getName());
+						if(node!=null)
+						{
+							node.setDescription(desc);
+							getModel().fireNodeChanged(node);
+						}
+					}
+				});
+				return IFuture.DONE;
+			}
+			
+			public IFuture componentAdded(final IComponentDescription desc)
+			{
+//				System.err.println(""+model.hashCode()+" Panel->addChild queued: "+desc.getName()+", "+desc.getParent());
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+//						System.err.println(""+model.hashCode()+" Panel->addChild queued2: "+desc.getName()+", "+desc.getParent());
+						final ComponentTreeNode	parentnode = desc.getParent()==null ? null
+								: desc.getParent().equals(getComponentIdentifier()) ? ComponentTreeNode.this	// For proxy nodes.
+								: (ComponentTreeNode)getModel().getAddedNode(desc.getParent());
+						if(parentnode!=null)
+						{
+							ITreeNode	node = (ITreeNode)parentnode.createComponentNode(desc);
+//							System.out.println("addChild: "+parentnode+", "+node);
+							try
+							{
+								if(parentnode.getIndexOfChild(node)==-1)
+								{
+//									System.err.println(""+model.hashCode()+" Panel->addChild: "+node+", "+parentnode);
+									parentnode.addChild(node);
+								}
+							}
+							catch(Exception e)
+							{
+								System.err.println(""+getModel().hashCode()+" Broken node: "+node);
+								System.err.println(""+getModel().hashCode()+" Parent: "+parentnode+", "+parentnode.getCachedChildren());
+								e.printStackTrace();
+//								model.fireNodeAdded(parentnode, node, parentnode.getIndexOfChild(node));
+							}
+						}
+//						else
+//						{
+//							System.out.println("no parent, addChild: "+desc.getName()+", "+desc.getParent());
+//						}
+					}
+				});
+				
+				return IFuture.DONE;
+			}
+		};
+		cmshandler.addCMSListener(listenercid, cmslistener);
+//		cms.addComponentListener(null, cmslistener);
+	}
+
+	/**
+	 *  Remove listener, if any.
+	 */
+	public void dispose()
+	{
+		if(cmslistener!=null)
+		{
+			CMSUpdateHandler	cmshandler	= (CMSUpdateHandler)getTree().getClientProperty(CMSUpdateHandler.class);
+			cmshandler.removeCMSListener(listenercid, cmslistener);
+		}
 	}
 }

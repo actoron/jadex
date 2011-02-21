@@ -68,6 +68,9 @@ public class ComponentSelectorDialog
 	/** The service provider. */
 	protected IExternalAccess access;
 	
+	/** The cms handler. */
+	protected CMSUpdateHandler cmshandler;
+	
 	/** The selected agents. */
 	protected DefaultListModel	sels;
 	
@@ -95,10 +98,11 @@ public class ComponentSelectorDialog
 	/**
 	 *  Create a new AgentSelectorDialog.
 	 */
-	public ComponentSelectorDialog(Component parent, IExternalAccess access)
+	public ComponentSelectorDialog(Component parent, IExternalAccess access, CMSUpdateHandler cmshandler)
 	{
 		this.parent	= parent;
 		this.access	= access;
+		this.cmshandler	= cmshandler;
 	}
 
 	//-------- methods --------
@@ -203,7 +207,7 @@ public class ComponentSelectorDialog
 		
 		final JList	list = new JList(sels);
 		
-		this.comptree = new ComponentTreePanel(access);
+		this.comptree = new ComponentTreePanel(access, cmshandler);
 		comptree.setPreferredSize(new Dimension(200, 100));
 		comptree.addNodeHandler(new INodeHandler()
 		{

@@ -455,7 +455,7 @@ public class StarterPanel extends JPanel
 		chooseparent.setToolTipText("Choose parent");
 		componentpanel.add(chooseparent, new GridBagConstraints(3, 1, 1, 1, 0, 0, GridBagConstraints.EAST,
 			GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
-		final ComponentSelectorDialog	agentselector = new ComponentSelectorDialog(this, jcc.getExternalAccess());
+		final ComponentSelectorDialog	agentselector = new ComponentSelectorDialog(this, jcc.getExternalAccess(), jcc.getCMSHandler());
 		chooseparent.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)

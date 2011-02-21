@@ -1,5 +1,6 @@
 package jadex.base.gui.componenttree;
 
+import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.ObjectInspectorPanel;
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
@@ -7,7 +8,6 @@ import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.asynctree.TreePopupListener;
-import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
@@ -19,7 +19,6 @@ import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
@@ -48,7 +47,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
@@ -138,9 +136,6 @@ public class ComponentTreePanel extends JSplitPane
 	/** The actions. */
 	protected Map actions;
 	
-	/** The component listener. */
-	protected final ICMSComponentListener listener;
-	
 	/** The properties panel. */
 	protected final JScrollPane	proppanel;
 	
@@ -150,15 +145,15 @@ public class ComponentTreePanel extends JSplitPane
 	/**
 	 *  Create a new component tree panel.
 	 */
-	public ComponentTreePanel(IExternalAccess access)
+	public ComponentTreePanel(IExternalAccess access, CMSUpdateHandler cmshandler)
 	{
-		this(access, VERTICAL_SPLIT);
+		this(access, cmshandler, VERTICAL_SPLIT);
 	}
 	
 	/**
 	 *  Create a new component tree panel.
 	 */
-	public ComponentTreePanel(final IExternalAccess access, int orientation)
+	public ComponentTreePanel(final IExternalAccess access, CMSUpdateHandler cmshandler, int orientation)
 	{
 		super(orientation);
 		this.setOneTouchExpandable(true);
@@ -171,6 +166,7 @@ public class ComponentTreePanel extends JSplitPane
 		tree.addMouseListener(new TreePopupListener());
 		tree.setShowsRootHandles(true);
 		tree.setToggleClickCount(0);
+		tree.putClientProperty(CMSUpdateHandler.class, cmshandler);
 		final ComponentIconCache	cic	= new ComponentIconCache(access, tree);
 		JScrollPane	scroll	= new JScrollPane(tree);
 		this.add(scroll);
@@ -181,79 +177,6 @@ public class ComponentTreePanel extends JSplitPane
 		this.add(proppanel);
 		this.setResizeWeight(1.0);
 				
-		listener	= new ICMSComponentListener()
-		{
-			public IFuture componentRemoved(final IComponentDescription desc, Map results)
-			{
-				final ITreeNode node = model.getNodeOrAddZombie(desc.getName());
-				if(node!=null)
-				{
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						public void run()
-						{
-							if(node.getParent()!=null)
-							{
-								((AbstractTreeNode)node.getParent()).removeChild(node);
-							}
-						}
-					});
-				}
-				return IFuture.DONE;
-			}
-			
-			public IFuture componentChanged(final IComponentDescription desc)
-			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						ComponentTreeNode	node	= (ComponentTreeNode)model.getAddedNode(desc.getName());
-						if(node!=null)
-						{
-							node.setDescription(desc);
-							model.fireNodeChanged(node);
-						}
-					}
-				});
-				return IFuture.DONE;
-			}
-			
-			public IFuture componentAdded(final IComponentDescription desc)
-			{
-//				System.err.println(""+model.hashCode()+" Panel->addChild queued: "+desc.getName()+", "+desc.getParent());
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-//						System.err.println(""+model.hashCode()+" Panel->addChild queued2: "+desc.getName()+", "+desc.getParent());
-						final ComponentTreeNode	parentnode = desc.getParent()==null? null: (ComponentTreeNode)model.getAddedNode(desc.getParent());
-						if(parentnode!=null)
-						{
-							ITreeNode	node = (ITreeNode)parentnode.createComponentNode(desc);
-//									System.out.println("addChild: "+parentnode+", "+node);
-							try
-							{
-								if(parentnode.getIndexOfChild(node)==-1)
-								{
-//											System.err.println(""+model.hashCode()+" Panel->addChild: "+node+", "+parentnode);
-									parentnode.addChild(node);
-								}
-							}
-							catch(Exception e)
-							{
-								System.err.println(""+model.hashCode()+" Broken node: "+node);
-								System.err.println(""+model.hashCode()+" Parent: "+parentnode+", "+parentnode.getCachedChildren());
-								e.printStackTrace();
-//										model.fireNodeAdded(parentnode, node, parentnode.getIndexOfChild(node));
-							}
-						}
-					}
-				});
-				
-				return IFuture.DONE;
-			}
-		};
 
 		final Action kill = new AbstractAction(KILL_ACTION, icons.getIcon("kill_component"))
 		{
@@ -793,7 +716,6 @@ public class ComponentTreePanel extends JSplitPane
 							// Expand root node.
 							TreeExpansionHandler	teh	= new TreeExpansionHandler(tree);
 							teh.treeExpanded(new TreeExpansionEvent(tree, new TreePath(model.getRoot())));
-							cms.addComponentListener(null, listener);
 						}
 					}
 				});
@@ -864,29 +786,6 @@ public class ComponentTreePanel extends JSplitPane
 	 */
 	public void	dispose()
 	{
-		access.scheduleStep(new IComponentStep()
-		{
-			@XMLClassname("dispose")
-			public Object execute(IInternalAccess ia)
-			{
-				SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//				ia.getRequiredService("cms")
-					.addResultListener(new SwingDefaultResultListener()
-				{
-					public void customResultAvailable(Object result)
-					{
-						cms	= (IComponentManagementService)result;
-						cms.removeComponentListener(null, listener);				
-					}
-					public void customExceptionOccurred(Exception exception)
-					{
-						// ignore
-					}
-				});
-				return null;
-			}
-		});
-		
 		getModel().dispose();
 	}
 	

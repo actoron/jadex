@@ -1,5 +1,6 @@
 package jadex.tools.jcc;
 
+import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.gui.plugin.IControlCenterPlugin;
@@ -89,6 +90,9 @@ public class ControlCenter implements IControlCenter
 	/** Shutdown action on exit (ask (default), keep, shutdown). */
 	protected String				jccexit;
 
+	/** The CMS update handler shared by all tools. */
+	protected CMSUpdateHandler		cmshandler;
+
 	// -------- constructors --------
 
 	/**
@@ -120,6 +124,8 @@ public class ControlCenter implements IControlCenter
 //									closeProject();
 									closePlugins();
 									killed = true;
+									if(cmshandler!=null)
+										cmshandler.dispose();
 								}
 								window.setVisible(false);
 								window.dispose();
@@ -976,4 +982,16 @@ public class ControlCenter implements IControlCenter
 		return access.getComponentIdentifier();
 	}
 
+
+	/**
+	 *  Get the cms update handler shared by all tools.
+	 */
+	public CMSUpdateHandler getCMSHandler()
+	{
+		if(cmshandler==null)
+		{
+			cmshandler	= new CMSUpdateHandler(getExternalAccess());
+		}
+		return cmshandler;
+	}
 }

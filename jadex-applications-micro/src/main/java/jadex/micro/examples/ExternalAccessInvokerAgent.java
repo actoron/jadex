@@ -1,5 +1,6 @@
 package jadex.micro.examples;
 
+import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.ComponentSelectorDialog;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
@@ -29,7 +30,7 @@ public class ExternalAccessInvokerAgent extends MicroAgent
 		{
 			public void run()
 			{
-				final ComponentSelectorDialog agentselector	= new ComponentSelectorDialog(null, getExternalAccess());
+				final ComponentSelectorDialog agentselector	= new ComponentSelectorDialog(null, getExternalAccess(), new CMSUpdateHandler(getExternalAccess()));
 				final IComponentIdentifier cid = agentselector.selectAgent(null);
 				if(cid!=null)
 				{

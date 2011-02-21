@@ -352,7 +352,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
   		};
   		mpanel.addMouseListener(ml);
 
-		comptree = new ComponentTreePanel(getJCC().getExternalAccess(), JSplitPane.HORIZONTAL_SPLIT);
+		comptree = new ComponentTreePanel(getJCC().getExternalAccess(), getJCC().getCMSHandler(), JSplitPane.HORIZONTAL_SPLIT);
 		comptree.setMinimumSize(new Dimension(0, 0));
 		
 		lsplit.add(new JScrollPane(mpanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
