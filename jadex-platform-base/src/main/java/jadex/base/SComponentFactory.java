@@ -154,7 +154,7 @@ public class SComponentFactory
 					{
 						final ILibraryService ls = (ILibraryService)result;
 						
-						SServiceProvider.getServices(ia.getServiceProvider(), IComponentFactory.class)
+						SServiceProvider.getServices(ia.getServiceProvider(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)

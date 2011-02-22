@@ -20,6 +20,7 @@ import jadex.commons.gui.BrowserPane;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ScrollablePanel;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.xml.annotation.XMLClassname;
@@ -284,7 +285,7 @@ public class TestCenterPanel extends JSplitPane
 					, "Save")==JFileChooser.APPROVE_OPTION)
 				{
 					SServiceProvider.getService(plugin.getJCC().getExternalAccess().getServiceProvider(),
-						ILibraryService.class).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
+						ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
 					{
 						public void customResultAvailable(Object result)
 						{

@@ -1112,7 +1112,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	 */
 	protected boolean isDuplicate(IMessageAdapter newmsg, IComponentIdentifier rec)
 	{
-		IClockService cs = (IClockService)SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), IClockService.class).get(new ThreadSuspendable());
+		IClockService cs = (IClockService)SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
 		
 		boolean ret = false;
 		Message[] messages = messagelist.getMessages();
@@ -1166,7 +1166,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		{
 			// add to agent tree table
 			IComponentManagementService ces = (IComponentManagementService)SServiceProvider
-				.getService(jcc.getExternalAccess().getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
+				.getService(jcc.getExternalAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
 			sender = new Component(ces.createComponentDescription(sid, null, null, "unknown-component-type", null, null));
 			sender.setState(Component.STATE_DEAD);
 			sender.addMessage(message);
@@ -1185,7 +1185,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		if(receiver == null)
 		{
 			IComponentManagementService ces = (IComponentManagementService)SServiceProvider
-				.getService(jcc.getExternalAccess().getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
+				.getService(jcc.getExternalAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
 			receiver = new Component(ces.createComponentDescription(rid, null, null, "unknown-component-type", null, null));
 			receiver.setState(Component.STATE_DEAD);
 			receiver.addMessage(message);
@@ -1504,7 +1504,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 //					message_maps.add(messages[i].getParameters());
 //				}
 
-				SServiceProvider.getService(jcc.getExternalAccess().getServiceProvider(), ILibraryService.class).addResultListener(new SwingDefaultResultListener(comptree)
+				SServiceProvider.getService(jcc.getExternalAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(comptree)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -1607,7 +1607,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 //					}
 //				}
 				final String sxml = xml;
-				SServiceProvider.getService(jcc.getExternalAccess().getServiceProvider(), ILibraryService.class).addResultListener(new SwingDefaultResultListener(comptree)
+				SServiceProvider.getService(jcc.getExternalAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(comptree)
 				{
 					public void customResultAvailable(Object result)
 					{

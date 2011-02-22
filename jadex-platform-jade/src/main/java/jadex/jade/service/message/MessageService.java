@@ -48,6 +48,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.jade.ComponentAdapterFactory;
@@ -524,7 +525,7 @@ public class MessageService  extends BasicService implements IMessageService
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(provider, IClockService.class).addResultListener(new IResultListener()
+		SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

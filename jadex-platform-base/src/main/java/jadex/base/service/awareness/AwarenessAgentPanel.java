@@ -16,6 +16,7 @@ import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.jtable.DateTimeRenderer;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.micro.IMicroExternalAccess;
@@ -409,7 +410,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		final Property	settings	= ps.getProperty(PROPERTY_SETTINGS);
 		if(settings!=null)
 		{
-			SServiceProvider.getService(jcc.getExternalAccess().getServiceProvider(), ILibraryService.class)
+			SServiceProvider.getService(jcc.getExternalAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new SwingDelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
@@ -438,7 +439,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		final Future	ret	= new Future();
 		if(settings!=null)
 		{
-			SServiceProvider.getService(jcc.getExternalAccess().getServiceProvider(), ILibraryService.class)
+			SServiceProvider.getService(jcc.getExternalAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new SwingDelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)

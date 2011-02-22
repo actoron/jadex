@@ -10,6 +10,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.service.IService;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.tools.generic.AbstractServiceSelectorPanel;
 
@@ -45,7 +46,7 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)

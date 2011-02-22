@@ -26,6 +26,7 @@ import jadex.commons.service.ISearchManager;
 import jadex.commons.service.IVisitDecider;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.ServiceNotFoundException;
 import jadex.commons.service.TypeResultSelector;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.clock.ITimer;
@@ -51,7 +52,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.management.ServiceNotFoundException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLReporter;

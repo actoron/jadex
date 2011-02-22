@@ -18,6 +18,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.future.SwingDelegationResultListener;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.xml.annotation.XMLClassname;
 
@@ -286,7 +287,7 @@ public class CMSUpdateHandler
 	protected IFuture	installLocalCMSListener(final ICMSComponentListener listener)
 	{
 		final Future	ret	= new Future();
-		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -306,7 +307,7 @@ public class CMSUpdateHandler
 	protected IFuture	removeLocalCMSListener(final ICMSComponentListener listener)
 	{
 		final Future	ret	= new Future();
-		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -326,7 +327,7 @@ public class CMSUpdateHandler
 	protected IFuture	installRemoteCMSListener(final IComponentIdentifier cid)
 	{
 		final Future	ret	= new Future();
-		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -345,7 +346,7 @@ public class CMSUpdateHandler
 							public Object execute(IInternalAccess ia)
 							{
 								final Future	ret	= new Future();
-								SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class)
+								SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 									.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(Object result)
@@ -372,7 +373,7 @@ public class CMSUpdateHandler
 	protected IFuture	deregisterRemoteCMSListener(final IComponentIdentifier cid)
 	{
 		final Future	ret	= new Future();
-		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -390,7 +391,7 @@ public class CMSUpdateHandler
 							public Object execute(IInternalAccess ia)
 							{
 								final Future	ret	= new Future();
-								SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class)
+								SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 									.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(Object result)

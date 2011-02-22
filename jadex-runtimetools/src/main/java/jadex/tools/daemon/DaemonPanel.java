@@ -8,6 +8,7 @@ import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.jtable.ObjectTableModel;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.micro.IMicroExternalAccess;
 
@@ -64,7 +65,7 @@ public class DaemonPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class)
+				SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object result)
@@ -104,7 +105,7 @@ public class DaemonPanel extends JPanel
 		
 		this.listener = new DaemonChangeListener(platformt);
 		
-		SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class)
+		SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
@@ -122,7 +123,7 @@ public class DaemonPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class)
+				SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object result)
@@ -151,7 +152,7 @@ public class DaemonPanel extends JPanel
 	public IFuture shutdown()
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class)
+		SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)

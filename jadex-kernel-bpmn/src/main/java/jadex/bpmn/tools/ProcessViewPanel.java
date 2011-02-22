@@ -15,6 +15,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.jtable.ResizeableTableHeader;
 import jadex.commons.gui.jtable.TableSorter;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.xml.annotation.XMLClassname;
 
@@ -181,7 +182,7 @@ public class ProcessViewPanel extends JPanel
 		});
 		
 		// Hack!!! trigger a step of the component if in step mode.
-		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)

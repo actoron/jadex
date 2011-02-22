@@ -270,6 +270,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 							}
 							public void customExceptionOccurred(Exception exception)
 							{
+								exception.printStackTrace();
 //								if(ComponentTreeNode.this.toString().startsWith("alex"))
 //									System.err.println("searchChildren done4?: "+ComponentTreeNode.this);
 								childcnt[0]++;
@@ -299,6 +300,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 			public void customExceptionOccurred(Exception exception)
 			{
 //				System.out.println("here1: "+exception);
+				exception.printStackTrace();
 				// ignore
 			}
 		});
@@ -350,6 +352,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 								public void customExceptionOccurred(Exception exception)
 								{
 									// Shouldn't happen???
+									exception.printStackTrace();
 								}
 							});
 						}
