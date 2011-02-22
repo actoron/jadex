@@ -99,7 +99,7 @@ public class ExecutionControlPanel extends JPanel
 	{
 		JFrame f = new JFrame(title);
 		f.getContentPane().setLayout(new BorderLayout());
-		ProcessViewPanel vp = new ProcessViewPanel(instance, null);
+		ProcessViewPanel vp = new ProcessViewPanel(instance.getExternalAccess(), null);
 		ExecutionControlPanel ep = new ExecutionControlPanel(steppable);
 		ActivityPanel ap = new ActivityPanel(instance.getModelElement(), steppable);
 		JSplitPane sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);

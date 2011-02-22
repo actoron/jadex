@@ -1,7 +1,6 @@
 package jadex.tools.debugger.bpmn;
 
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.bpmn.runtime.ExternalAccess;
 import jadex.bpmn.tools.ProcessViewPanel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -45,9 +44,7 @@ public class BpmnDebuggerPanel	implements IDebuggerPanel
 	 */
 	public void init(IControlCenter jcc, IBreakpointPanel bpp, IComponentIdentifier name, IExternalAccess access)
 	{
-		// cast possible because of hack that bpmn interpreter currently implement IExternalAccess
-		// todo: develop bpmn external access?!
-		this.processpanel = new ProcessViewPanel(((ExternalAccess)access).getInterpreter(), bpp);
+		this.processpanel = new ProcessViewPanel(access, bpp);
 	}
 
 	/**

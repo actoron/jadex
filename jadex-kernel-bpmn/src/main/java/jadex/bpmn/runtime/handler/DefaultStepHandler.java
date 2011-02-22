@@ -9,6 +9,7 @@ import jadex.bpmn.runtime.IStepHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ThreadContext;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -134,6 +135,11 @@ public class DefaultStepHandler implements IStepHandler
 			thread.setNonWaiting();
 			// Todo: Callbacks for aborted threads (to abort external activities)
 			thread.getThreadContext().removeSubcontext(remove);
+			for(Iterator it=remove.getAllThreads().iterator(); it.hasNext(); )
+			{
+				instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, (ProcessThread)it.next());
+			}
+			instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_CHANGED, thread);
 		}
 
 		if(next!=null)
@@ -163,6 +169,7 @@ public class DefaultStepHandler implements IStepHandler
 		else if(next==null)
 		{
 			thread.getThreadContext().removeThread(thread);
+			instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, thread);
 		} 
 		else
 		{

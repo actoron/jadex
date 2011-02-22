@@ -46,6 +46,7 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 					ProcessThread	newthread	= thread.createCopy();
 					newthread.setLastEdge((MSequenceEdge)outgoing.get(i));
 					thread.getThreadContext().addThread(newthread);
+					instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_ADDED, newthread);
 				}
 			}
 		}
@@ -118,6 +119,7 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 					}
 					
 					thread.getThreadContext().removeThread(pt);
+					instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, pt);
 				}
 			}
 			else

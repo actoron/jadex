@@ -22,7 +22,7 @@
 				},
 				new Object[]
 				{
-					"jadex.tools.debugger.micro.MicroDebuggerPanel, jadex.tools.debugger.common.ObjectInspectorDebuggerPanel"
+					"jadex.tools.debugger.micro.MicroDebuggerPanel"
 				})
 			)
 		</providedservice>

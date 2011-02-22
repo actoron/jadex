@@ -85,21 +85,18 @@ public class ProcessThread	implements ITaskContext
 	/** The wait filter. */
 	protected IFilter waitfilter;
 	
-	/** The static id counter. */
-	protected static int idcnt;
-	
+	/** The id counter for sub processes. */
+	public int	idcnt;
+		
 	//-------- constructors --------
 
 	/**
 	 *  Create a new process instance.
 	 *  @param activity	The current activity.
 	 */
-	public ProcessThread(MActivity activity, ThreadContext context, BpmnInterpreter instance)
+	public ProcessThread(String id, MActivity activity, ThreadContext context, BpmnInterpreter instance)
 	{
-		synchronized(ProcessThread.class)
-		{
-			this.id = "ProcessThread_"+idcnt++;
-		}
+		this.id	= id;
 		this.activity	= activity;
 		this.context	= context;
 		this.instance = instance;
@@ -257,7 +254,7 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public ProcessThread createCopy()
 	{
-		ProcessThread	ret	= new ProcessThread(activity, context, instance);
+		ProcessThread	ret	= new ProcessThread(id+"."+idcnt++, activity, context, instance);
 		ret.edge	= edge;
 		ret.data	= data!=null? new HashMap(data): null;
 		return ret;

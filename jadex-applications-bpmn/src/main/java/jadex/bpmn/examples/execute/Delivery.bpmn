@@ -18,7 +18,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_P3gE1XLtEd-fEqakq96uUw" iD="_P3gE1HLtEd-fEqakq96uUw" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_P3gr4XLtEd-fEqakq96uUw" iD="_P3gr4HLtEd-fEqakq96uUw" outgoingEdges="_jDbHIXLtEd-fEqakq96uUw" incomingEdges="_9tq00XLwEd-fEqakq96uUw _6-6acHLuEd-fEqakq96uUw" name="Ship  Items" activityType="Task"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_jDRWIXLtEd-fEqakq96uUw" iD="_jDRWIHLtEd-fEqakq96uUw" outgoingEdges="_wLM1sXLtEd-fEqakq96uUw" incomingEdges="_jDbHIXLtEd-fEqakq96uUw" name="Send Invoice" activityType="Task"/>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_wLDrwXLtEd-fEqakq96uUw" iD="_wLDrwHLtEd-fEqakq96uUw" outgoingEdges="_xre8sXLtEd-fEqakq96uUw _1t96sXLtEd-fEqakq96uUw _9KYo8XLtEd-fEqakq96uUw" incomingEdges="_wLM1sXLtEd-fEqakq96uUw _YDcm4btMEd-rNtpDP1AqqQ" activityType="EventIntermediateMultiple"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_wLDrwXLtEd-fEqakq96uUw" iD="_wLDrwHLtEd-fEqakq96uUw" outgoingEdges="_xre8sXLtEd-fEqakq96uUw _1t96sXLtEd-fEqakq96uUw _9KYo8XLtEd-fEqakq96uUw" incomingEdges="_wLM1sXLtEd-fEqakq96uUw _YDcm4btMEd-rNtpDP1AqqQ" name="multi" activityType="EventIntermediateMultiple"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_xrVywXLtEd-fEqakq96uUw" iD="_xrVywHLtEd-fEqakq96uUw" outgoingEdges="_QIl_YXLuEd-fEqakq96uUw" incomingEdges="_xre8sXLtEd-fEqakq96uUw" name="Payment arrived" activityType="EventIntermediateMessage">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Oqe7QHLxEd-fEqakq96uUw" source="isThrowing">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OqfiUHLxEd-fEqakq96uUw" key="isThrowing" value="false"/>

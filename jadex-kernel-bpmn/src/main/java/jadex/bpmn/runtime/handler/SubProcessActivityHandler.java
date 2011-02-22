@@ -69,9 +69,10 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						Object	value	= it.next();
 						for(int i=0; i<start.size(); i++)
 						{
-							ProcessThread subthread = new ProcessThread((MActivity)start.get(i), subcontext, instance);
+							ProcessThread subthread = new ProcessThread(thread.getId()+":"+thread.idcnt++, (MActivity)start.get(i), subcontext, instance);
 							subthread.setParameterValue("item", value);	// Hack!!! parameter not declared?
 							subcontext.addThread(subthread);
+							instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_ADDED, subthread);
 						}
 					}
 				}
@@ -86,8 +87,9 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				thread.getThreadContext().addSubcontext(subcontext);
 				for(int i=0; i<start.size(); i++)
 				{
-					ProcessThread subthread = new ProcessThread((MActivity)start.get(i), subcontext, instance);
+					ProcessThread subthread = new ProcessThread(thread.getId()+":"+thread.idcnt++, (MActivity)start.get(i), subcontext, instance);
 					subcontext.addThread(subthread);
+					instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_ADDED, subthread);
 				}
 			}
 			

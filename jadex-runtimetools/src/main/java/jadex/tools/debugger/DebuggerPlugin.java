@@ -181,12 +181,12 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 					boolean	allob	= true;
 					for(int i=0; allob && i<nodes.length; i++)
 					{
-						allob	= cards.getComponent(((IActiveComponentTreeNode)nodes[i]).getDescription().getName())!=null;
+						allob	= cards.getComponent(nodes[i].getId())!=null;
 					}
 					boolean	allig	= true;
 					for(int i=0; allig && i<nodes.length; i++)
 					{
-						allig	= cards.getComponent(((IActiveComponentTreeNode)nodes[i]).getDescription().getName())==null;
+						allig	= cards.getComponent(nodes[i].getId())==null;
 					}
 					
 					// Todo: Large icons for popup actions?
@@ -226,8 +226,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 				Icon ret	= null;
 				if(node instanceof IActiveComponentTreeNode)
 				{
-					IComponentDescription ad = ((IActiveComponentTreeNode)node).getDescription();
-					if(cards.getComponent(ad.getName())!=null)
+					if(cards.getComponent(node.getId())!=null)
 					{
 						ret = DebuggerPlugin.icons.getIcon("component_debugged");
 					}
@@ -240,7 +239,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 				Action	a	= null;
 				if(node instanceof IActiveComponentTreeNode)
 				{
-					if(cards.getComponent(((IActiveComponentTreeNode)node).getDescription())!=null)
+					if(cards.getComponent(node.getId())!=null)
 					{
 						a	= STOP_DEBUGGER;
 					}
@@ -259,10 +258,9 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 			{
 				if(node instanceof IActiveComponentTreeNode)
 				{
-					IComponentDescription desc = ((IActiveComponentTreeNode)node).getDescription();
-					if(cards.getComponent(desc.getName())!=null)
+					if(cards.getComponent(node.getId())!=null)
 					{
-						DebuggerMainPanel panel = (DebuggerMainPanel)cards.getComponent(desc);
+						DebuggerMainPanel panel = (DebuggerMainPanel)cards.getComponent(node.getId());
 						panel.dispose();
 						detail.remove(panel);
 					}
@@ -325,8 +323,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 				if(paths[i].getLastPathComponent() instanceof IActiveComponentTreeNode)
 				{
 					IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
-					IComponentDescription desc = node.getDescription();
-					DebuggerMainPanel panel = (DebuggerMainPanel)cards.getComponent(desc.getName());
+					DebuggerMainPanel panel = (DebuggerMainPanel)cards.getComponent(node.getId());
 					panel.dispose();
 					detail.remove(panel);
 					comptree.getModel().fireNodeChanged(node);

@@ -96,6 +96,22 @@ public class ThreadContext
 	}
 	
 	/**
+	 *  Add an external thread to this context.
+	 *  @param thread	The thread to be added.
+	 */
+	// Hack!!! Make external threads execute before others.
+	public void	addExternalThread(ProcessThread thread)
+	{
+		Map	oldthreads	= threads;
+		threads	= new LinkedHashMap();		
+		threads.put(thread, null);
+		if(oldthreads!=null)
+			threads.putAll(oldthreads);
+		
+//		System.out.println("add: "+thread);
+	}
+	
+	/**
 	 *  Remove a thread from this context.
 	 *  @param thread	The thread to be removed.
 	 */

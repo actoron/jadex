@@ -1,28 +1,35 @@
 package jadex.bpmn.tools;
 
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MLane;
-import jadex.bpmn.model.MPool;
 import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.HistoryEntry;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bpmn.runtime.ThreadContext;
+import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.IChangeListener;
+import jadex.commons.IRemoteChangeListener;
+import jadex.commons.SUtil;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.jtable.ResizeableTableHeader;
 import jadex.commons.gui.jtable.TableSorter;
+import jadex.commons.service.SServiceProvider;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -36,27 +43,21 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
 /**
- *  Panel for showing / manipulating the Rete agenda.
+ *  Panel for showing details about a running BPMN process.
  */
 public class ProcessViewPanel extends JPanel
 {
 	//------- attributes --------
 	
-	/** The agenda. */
-	protected BpmnInterpreter instance;
+	/** The process. */
+	protected IExternalAccess access;
 	
-	/** The change listener. */
-	protected IChangeListener listener;
+	/** The displayed process threads. */
+	protected Set	threadinfos;
 	
-	/** Local copy of activations. */
-	protected ProcessThreadInfo[] threads_clone;
-	
-	/** Local copy of agenda history. */
-	protected Object[] history_clone;
-	
-	/** Local copy of next action. */
-	protected Object next;
-	
+	/** The previous process thread steps. */
+	protected List	historyinfos;
+		
 	/** The list model for the activations. */
 	protected ProcessThreadModel ptmodel;
 
@@ -77,18 +78,14 @@ public class ProcessViewPanel extends JPanel
 	/**
 	 *  Create an agenda panel.
 	 */
-	public ProcessViewPanel(final BpmnInterpreter instance, IBreakpointPanel bpp)
+	public ProcessViewPanel(final IExternalAccess access, IBreakpointPanel bpp)
 	{
-		this.instance = instance;
+		this.access = access;
 		this.bpp	= bpp;
+		this.threadinfos	= new LinkedHashSet();
+		this.historyinfos	= new ArrayList();
 		this.ptmodel = new ProcessThreadModel();
 		this.hmodel	= new HistoryModel();
-
-		// todo: problem should be called on process execution thread!
-		instance.setHistoryEnabled(true);	// Todo: Disable history on close?
-		
-		threads_clone = getThreadInfos();
-		history_clone = instance.getHistory().toArray();
 		
 		TableSorter sorter = new TableSorter(ptmodel);
 		this.threads = new JTable(sorter);
@@ -109,80 +106,103 @@ public class ProcessViewPanel extends JPanel
 		history.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		sorter.setTableHeader(header);
 		history.getColumnModel().setColumnMargin(10);
+		
+		final JCheckBox hon = new JCheckBox("Store History");
+		hon.setSelected(true);
 			
-		this.listener	= new IChangeListener()
+		final IRemoteChangeListener	rcl	= new IRemoteChangeListener()
 		{
-			ProcessThreadInfo[] threads_clone;
-			Object[] history_clone;
-			Object	next;
-			boolean	invoked;
-
-			public void changeOccurred(ChangeEvent event)
+			public IFuture changeOccurred(final ChangeEvent event)
 			{
-				synchronized(ProcessViewPanel.this)
+				SwingUtilities.invokeLater(new Runnable()
 				{
-					List his = instance.getHistory();
-					threads_clone	= getThreadInfos();
-					history_clone	= his!=null? his.toArray(): new Object[0];
-//					next	= instance.getNextActivation();
-				}
-				if(!invoked)
-				{
-					invoked	= true;
-					SwingUtilities.invokeLater(new Runnable()
+					public void run()
 					{
-						public void run()
+						handleEvent(event);
+						updateViews();
+					}
+					
+					public void handleEvent(ChangeEvent event)
+					{
+						if(BpmnInterpreter.EVENT_THREAD_ADDED.equals(event.getType()))
 						{
-							invoked	= false;
-							synchronized(ProcessViewPanel.this)
-							{
-								ProcessViewPanel.this.threads_clone	= threads_clone;
-								ProcessViewPanel.this.history_clone	= history_clone;
-								ProcessViewPanel.this.next	= next;
-							}
-							updateViews();
+							threadinfos.add(event.getValue());
 						}
-					});
-				}
+						else if(BpmnInterpreter.EVENT_THREAD_CHANGED.equals(event.getType())
+							&& threadinfos.contains(event.getValue()))
+						{
+							threadinfos.remove(event.getValue());
+							threadinfos.add(event.getValue());
+						}
+						else if(BpmnInterpreter.EVENT_THREAD_REMOVED.equals(event.getType()))
+						{
+							threadinfos.remove(event.getValue());
+						}
+						else if(BpmnInterpreter.EVENT_HISTORY_ADDED.equals(event.getType())
+							&& hon.isSelected())
+						{
+							historyinfos.add(0, event.getValue());
+						}
+						else if(event.getValue() instanceof Collection)
+						{
+							for(Iterator it=((Collection)event.getValue()).iterator(); it.hasNext(); )
+							{
+								handleEvent((ChangeEvent)it.next());
+							}
+						}
+					}
+				});
+				return IFuture.DONE;
 			}
 		};
-		instance.addChangeListener(listener);
-
-		SwingUtilities.invokeLater(new Runnable()
+		
+		final String	id	= SUtil.createUniqueId("bpmnviewer");
+		access.scheduleStep(new IComponentStep()
 		{
-			public void run()
+			@XMLClassname("installListener")
+			public Object execute(IInternalAccess ia)
 			{
-				updateViews();
+				// Post current state to remote listener
+				final List	events	= new ArrayList();
+				for(Iterator it=((BpmnInterpreter)ia).getThreadContext().getAllThreads().iterator(); it.hasNext(); )
+				{
+					ProcessThread	thread	= (ProcessThread)it.next();
+					events.add(new ChangeEvent(null, BpmnInterpreter.EVENT_THREAD_ADDED,
+						new ProcessThreadInfo(thread.getId(), thread.getActivity().getBreakpointId(),
+							thread.getActivity().getPool()!=null ? thread.getActivity().getPool().getName() : null,
+							thread.getActivity().getLane()!=null ? thread.getActivity().getLane().getName() : null)));
+				}
+				rcl.changeOccurred(new ChangeEvent(null, null, events));
+				
+				// Add listener for updates
+				((BpmnInterpreter)ia).addChangeListener(new BPMNChangeListener(id, (BpmnInterpreter)ia, rcl));
+				return null;
 			}
 		});
 		
+		// Hack!!! trigger a step of the component if in step mode.
+		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				((IComponentManagementService)result).stepComponent(access.getComponentIdentifier());
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				// Ignored.
+			}
+		});
+
 		JButton clear = new JButton("Clear");
 		clear.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				// todo: invoke on agent thread with invoke later
-				// works because history is synchronized.
-				List his = instance.getHistory();
-				if(his!=null)
-				{
-					his.clear();
-					history_clone	= new Object[0];
-					history.repaint();
-				}
+				historyinfos.clear();
+				history.repaint();
 			}
 		});
-		
-		final JCheckBox hon = new JCheckBox("Store History");
-		hon.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				// todo: invoke on agent thread with invoke later
-				instance.setHistoryEnabled(hon.isSelected());
-			}	
-		});
-		hon.setSelected(true);
 		
 		JPanel	procp	= new JPanel(new BorderLayout());
 		procp.add(new JScrollPane(threads));
@@ -235,35 +255,14 @@ public class ProcessViewPanel extends JPanel
 		if(bpp!=null)
 		{
 			List	sel_bps	= new ArrayList();
-			for(int i=0; i<threads_clone.length; i++)
+			for(Iterator it=threadinfos.iterator(); it.hasNext(); )
 			{
-				if(threads_clone[i].getActivity()!=null)
-					sel_bps.add(threads_clone[i].getActivity().getBreakpointId());
+				ProcessThreadInfo	info	= (ProcessThreadInfo)it.next();
+				if(info.getActivity()!=null)
+					sel_bps.add(info.getActivity());
 			}
 			bpp.setSelectedBreakpoints((String[])sel_bps.toArray(new String[sel_bps.size()]));
 		}
-	}
-	
-	/**
-	 *  Must be called on process execution thread!
-	 *  Gets infos about the current threads.
-	 */
-	protected ProcessThreadInfo[] getThreadInfos()
-	{
-		List ret = null;
-		ThreadContext tc = instance.getThreadContext();
-		Set threads = tc.getAllThreads();
-		if(threads!=null)
-		{
-			ret = new ArrayList();
-			for(Iterator it=threads.iterator(); it.hasNext(); )
-			{
-				ProcessThread pt = (ProcessThread)it.next();
-				ret.add(new ProcessThreadInfo(pt.getId(), pt.getActivity(), //pt.getLastEdge(), 
-					pt.getException(), pt.isWaiting(), pt.getData()==null? new HashMap(): new HashMap(pt.getData())));
-			}
-		}
-		return (ProcessThreadInfo[])ret.toArray(new ProcessThreadInfo[ret.size()]);
 	}
 	
 	//-------- helper classes --------
@@ -282,49 +281,46 @@ public class ProcessViewPanel extends JPanel
 
 		public int getColumnCount()
 		{
-			return 7;
+			return colnames.length;
 		}
 		
 		public int getRowCount()
 		{
-			return threads_clone.length;
+			return threadinfos.size();
 		}
 		
 		public Object getValueAt(int row, int column)
 		{
 			Object ret = null;
-			ProcessThreadInfo pti = (ProcessThreadInfo)threads_clone[row];
+			ProcessThreadInfo	info	= (ProcessThreadInfo)threadinfos.toArray()[row];
+			
 			if(column==0)
 			{
-				ret = pti.getId();
+				ret = info.getThreadId();
 			}
 			else if(column==1)
 			{
-				ret = pti.getActivity().getBreakpointId();
+				ret = info.getActivity();
 			}
 			else if(column==2)
 			{
-				MPool pool = pti.getActivity().getPool(); 
-				if(pool!=null)
-					ret = pool.getName();
+				ret = info.getPool(); 
 			}
 			else if(column==3)
 			{
-				MLane lane = pti.getActivity().getLane(); 
-				if(lane!=null)
-					ret = lane.getName();
+				ret = info.getLane(); 
 			}
 			else if(column==4)
 			{
-				ret = pti.getException();
+				ret = info.getException();
 			}
 			else if(column==5)
 			{
-				ret = pti.getData();
+				ret = info.getData();
 			}
 			else if(column==6)
 			{
-				ret = pti.isWaiting()? "waiting": "ready";
+				ret = info.isWaiting() ? "waiting" : "ready";
 			}
 			return ret;
 		}
@@ -335,7 +331,7 @@ public class ProcessViewPanel extends JPanel
 	 */
 	protected class HistoryModel extends AbstractTableModel
 	{
-		protected String[] colnames = new String[]{"Step", "Process-Id", "Activity", "Pool", "Lane"};
+		protected String[] colnames = new String[]{"Process-Id", "Activity", "Pool", "Lane"};
 		
 		public String getColumnName(int column)
 		{
@@ -344,143 +340,241 @@ public class ProcessViewPanel extends JPanel
 
 		public int getColumnCount()
 		{
-			return 5;
+			return colnames.length;
 		}
 		
 		public int getRowCount()
 		{
-			return history_clone.length;
+			return historyinfos.size();
 		}
 		
 		public Object getValueAt(int row, int column)
 		{
 			Object ret = null;
-			HistoryEntry he = (HistoryEntry)history_clone[row];
+			ProcessThreadInfo	info	= (ProcessThreadInfo)historyinfos.get(row);
 			if(column==0)
 			{
-				ret = ""+he.getStepNumber();
+				ret = info.getThreadId();
 			}
 			else if(column==1)
 			{
-				ret = he.getThreadId();
+				ret = info.getActivity();
 			}
 			else if(column==2)
 			{
-				ret = he.getActivity().getBreakpointId();
+				ret = info.getPool(); 
 			}
 			else if(column==3)
 			{
-				MPool pool = he.getActivity().getPool(); 
-				if(pool!=null)
-					ret = pool.getName();
-			}
-			else if(column==4)
-			{
-				MLane lane = he.getActivity().getLane(); 
-				if(lane!=null)
-					ret = lane.getName();
+				ret = info.getLane(); 
 			}
 
 			return ret;
 		}
 	}
 	
-}
-
-/**
- *  Visualization data about a process thread. 
- */
-class ProcessThreadInfo
-{
-	//-------- attributes --------
-	
-	/** The id. */
-	protected String id;
-	
-	/** The next activity. */
-	protected MActivity	activity;
-	
-	/** The exception that has just occurred in the process (if any). */
-	protected Exception	exception;
-	
-	/** Is the process in a waiting state. */
-	protected boolean waiting;
-	
-	/** The data of the process. */
-	protected Map data;
-
-	//-------- constructors --------
-	
 	/**
-	 *  Create a new info.
+	 *  The listener installed remotely in the BPMN process.
 	 */
-	public ProcessThreadInfo(String id, MActivity activity,
-		Exception exception, boolean waiting, Map data)
+	public static class BPMNChangeListener	implements IChangeListener
 	{
-		this.id = id;
-		this.activity = activity;
-		this.exception = exception;
-		this.waiting = waiting;
-		this.data = data;
-	}
+		//-------- constants --------
+		
+		/** Update delay. */
+		// todo: make configurable.
+		protected static final long UPDATE_DELAY	= 100;	
+		
+		/** Maximum number of events per delay period. */
+		// todo: make configurable.
+		protected static final int MAX_EVENTS	= 5;
+		
+		//-------- attributes --------
+		
+		/** The id for remote listener deregistration. */
+		protected String	id;
+		
+		/** The process instance. */
+		protected BpmnInterpreter	instance;
+		
+		/** The change listener (proxy) to be informed about important changes. */
+		protected IRemoteChangeListener	rcl;
+		
+		/** The added threads (if any). */
+		protected Set	added;
+		
+		/** The changed threads (if any). */
+		protected Set	changed;
+		
+		/** The removed threads (if any). */
+		protected Set	removed;
+		
+		/** The history entries (if any). */
+		protected Set	history;
+		
+		/** The update timer (if any). */
+		protected Timer	timer;
+		
+		//-------- constructs --------
+		
+		/**
+		 *  Create a BPMN listener.
+		 */
+		public BPMNChangeListener(String id, BpmnInterpreter instance, IRemoteChangeListener rcl)
+		{
+			this.id	= id;
+			this.instance	= instance;
+			this.rcl	= rcl;
+		}
+		
+		//-------- IChangeListener interface --------
+		
+		/**
+		 *  Called when the process executes.
+		 */
+		public void changeOccurred(ChangeEvent event)
+		{
+			if(BpmnInterpreter.EVENT_THREAD_ADDED.equals(event.getType()))
+			{
+				if(removed==null || !removed.contains(event.getValue()))
+				{
+					if(changed!=null && changed.contains(event.getValue()))
+						changed.remove(event.getValue());
+					
+					if(added==null)
+						added	= new LinkedHashSet();
+					added.add(event.getValue());
+				}
+			}
+			else if(BpmnInterpreter.EVENT_THREAD_REMOVED.equals(event.getType()))
+			{
+				if(added!=null && added.contains(event.getValue()))
+					added.remove(event.getValue());
+				if(changed!=null && changed.contains(event.getValue()))
+					changed.remove(event.getValue());
+				
+				if(removed==null)
+					removed	= new LinkedHashSet();
+				removed.add(event.getValue());
+			}
+			else if(BpmnInterpreter.EVENT_THREAD_CHANGED.equals(event.getType()))
+			{
+				if(removed==null || !removed.contains(event.getValue()))
+				{
+					if(added!=null && added.contains(event.getValue()))
+					{
+						added.add(event.getValue());
+					}
+					else
+					{					
+						if(changed==null)
+							changed	= new LinkedHashSet();
+						changed.add(event.getValue());
+					}
+				}
+			}
+			else if(BpmnInterpreter.EVENT_HISTORY_ADDED.equals(event.getType()))
+			{
+				if(history==null)
+					history	= new LinkedHashSet();
+				history.add(event.getValue());
+			}
+			startTimer();
+		}
 
-	//-------- methods --------
-
-	/**
-	 *  Get the id.
-	 *  @return The id.
-	 */
-	public String getId()
-	{
-		return this.id;
+		protected void startTimer()
+		{
+			if(timer==null)
+			{
+				timer	= new Timer(true);
+				timer.schedule(new TimerTask()
+				{
+					public void run()
+					{
+						List	events	= new ArrayList();
+						synchronized(BPMNChangeListener.this)
+						{
+							timer	= null;
+							if(removed!=null)
+							{
+								for(Iterator it=removed.iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
+								{
+									events.add(new ChangeEvent(null, BpmnInterpreter.EVENT_THREAD_REMOVED, it.next()));
+									it.remove();
+								}
+							}
+							if(added!=null)
+							{
+								for(Iterator it=added.iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
+								{
+									events.add(new ChangeEvent(null, BpmnInterpreter.EVENT_THREAD_ADDED, it.next()));
+									it.remove();
+								}
+							}
+							if(history!=null)
+							{
+								for(Iterator it=history.iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
+								{
+									events.add(new ChangeEvent(null, BpmnInterpreter.EVENT_HISTORY_ADDED, it.next()));
+									it.remove();
+								}
+							}
+							if(changed!=null)
+							{
+								for(Iterator it=changed.iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
+								{
+									events.add(new ChangeEvent(null, BpmnInterpreter.EVENT_THREAD_CHANGED, it.next()));
+									it.remove();
+								}
+							}
+							
+							if(removed!=null && removed.isEmpty())
+								removed	= null;
+							if(added!=null && added.isEmpty())
+								added	= null;
+							if(changed!=null && changed.isEmpty())
+								changed	= null;
+							if(history!=null && history.isEmpty())
+								history	= null;
+							
+							if(removed!=null || added!=null || changed!=null || history!=null)
+							{
+								startTimer();
+							}
+						}
+						
+						if(!events.isEmpty())
+						{
+//							System.out.println("events: "+events.size());
+							rcl.changeOccurred(new ChangeEvent(null, null, events)).addResultListener(new IResultListener()
+							{
+								public void resultAvailable(Object result)
+								{
+//									System.out.println("update succeeded: "+desc);
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+//									exception.printStackTrace();
+									if(instance!=null)
+									{
+//										System.out.println("Removing listener due to failed update: "+RemoteCMSListener.this.id);
+										try
+										{
+											instance.removeChangeListener(BPMNChangeListener.this);
+										}
+										catch(RuntimeException e)
+										{
+//											System.out.println("Listener already removed: "+id);
+										}
+										instance	= null;	// Set to null to avoid multiple removal due to delayed errors. 
+									}
+								}
+							});
+						}
+					}
+				}, UPDATE_DELAY);
+			}
+		}
 	}
-
-	/**
-	 *  Get the activity.
-	 *  @return The activity.
-	 */
-	public MActivity getActivity()
-	{
-		return this.activity;
-	}
-
-	/**
-	 *  Get the exception.
-	 *  @return The exception.
-	 */
-	public Exception getException()
-	{
-		return this.exception;
-	}
-
-	/**
-	 *  Get the waiting.
-	 *  @return The waiting.
-	 */
-	public boolean isWaiting()
-	{
-		return this.waiting;
-	}
-
-	/**
-	 *  Get the data.
-	 *  @return The data.
-	 */
-	public Map getData()
-	{
-		return this.data;
-	}
-
-	/**
-	 *  Get the string representation.
-	 */
-	public String toString()
-	{
-		return "ProcessThreadInfo(activity=" + this.activity + 
-			", exception=" + this.exception + ", waiting="
-			+ this.waiting + ")";
-	}
-	
 }
 
 

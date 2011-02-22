@@ -20,6 +20,7 @@ import jadex.bpmn.runtime.handler.GatewayXORActivityHandler;
 import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
 import jadex.bpmn.runtime.handler.TaskActivityHandler;
 import jadex.bpmn.runtime.task.ExecuteStepTask;
+import jadex.bpmn.tools.ProcessThreadInfo;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.ComponentTerminatedException;
@@ -79,7 +80,19 @@ import java.util.logging.Logger;
 public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 {	
 	//-------- static part --------
-
+	
+	/** The change event denoting a step for the history. */
+	public static final String	EVENT_HISTORY_ADDED	= "history-added";
+	
+	/** The change event denoting a new thread. */
+	public static final String	EVENT_THREAD_ADDED	= "thread-added";
+	
+	/** The change event denoting a changed thread. */
+	public static final String	EVENT_THREAD_CHANGED	= "thread-changed";
+	
+	/** The change event denoting a finished thread. */
+	public static final String	EVENT_THREAD_REMOVED	= "thread-removed";
+	
 	/** The activity execution handlers (activity type -> handler). */
 	public static final Map DEFAULT_ACTIVITY_HANDLERS;
 	
@@ -175,14 +188,8 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	/** The thread context. */
 	protected ThreadContext	context;
 	
-	/** The execution history. */
-	protected List history;
-	
 	/** The change listeners. */
 	protected List listeners;
-	
-	/** The step number. */
-	protected int stepnumber;
 	
 	/** The context variables. */
 	protected Map variables;
@@ -208,10 +215,11 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	/** The component listeners. */
 	protected List componentlisteners;
 
+	/** The thread id counter. */
+	protected int	idcnt;
 	
 	//-------- constructors --------
 	
-	// todo: 
 	/**
 	 *  Create a new bpmn process.
 	 *  @param adapter The adapter.
@@ -237,7 +245,9 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		List	startevents	= model.getStartActivities();
 		for(int i=0; startevents!=null && i<startevents.size(); i++)
 		{
-			context.addThread(new ProcessThread((MActivity)startevents.get(i), context, BpmnInterpreter.this));
+			ProcessThread	thread	= new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
+			context.addThread(thread);
+			notifyListeners(EVENT_THREAD_ADDED, thread);
 		}
 		initedflag = true;	// No further init for BDI plan.
 	}	
@@ -474,7 +484,9 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 				List	startevents	= model.getStartActivities();
 				for(int i=0; startevents!=null && i<startevents.size(); i++)
 				{
-					context.addThread(new ProcessThread((MActivity)startevents.get(i), context, BpmnInterpreter.this));
+					ProcessThread	thread	= new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
+					context.addThread(thread);
+					notifyListeners(EVENT_THREAD_ADDED, thread);
 				}
 				
 				// Notify cms that init is finished.
@@ -970,14 +982,14 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 			IActivityHandler handler = (IActivityHandler)activityhandlers.get(thread.getActivity().getActivityType());
 			if(handler==null)
 				throw new UnsupportedOperationException("No handler for activity: "+thread);
-			if(history!=null)
-				history.add(new HistoryEntry(stepnumber++, thread.getId(), thread.getActivity()));
 
+			notifyListeners(EVENT_HISTORY_ADDED, thread);
+			
 			if(thread.getLastEdge()!=null && thread.getLastEdge().getSource()!=null)
 				fireEndActivity(thread.getId(), thread.getLastEdge().getSource());
 			
 			fireStartActivity(thread.getId(), thread.getActivity());
-
+			
 //			System.out.println("Step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+thread.getActivity()+" "+thread);
 			MActivity act = thread.getActivity();
 			handler.execute(act, this, thread);
@@ -1006,7 +1018,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 				}
 			}
 			
-			notifyListeners(new ChangeEvent(this, "step_executed"));
+			notifyListeners(EVENT_THREAD_CHANGED, thread);
 		}
 	}
 
@@ -1048,7 +1060,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 //						System.out.println("Notify: "+activity+" "+thread+" "+event);
 						getStepHandler(activity).step(activity, BpmnInterpreter.this, thread, event);
 						thread.setNonWaiting();
-						notifyListeners(new ChangeEvent(this, "notify"));
+						notifyListeners(EVENT_THREAD_CHANGED, thread);
 					}
 					else
 					{
@@ -1064,7 +1076,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 //				System.out.println("Notify: "+activity+" "+thread+" "+event);
 				getStepHandler(activity).step(activity, BpmnInterpreter.this, thread, event);
 				thread.setNonWaiting();
-				notifyListeners(new ChangeEvent(this, "notify"));
+				notifyListeners(EVENT_THREAD_CHANGED, thread);
 			}
 			else
 			{
@@ -1151,35 +1163,6 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	}
 	
 	/**
-	 *  Get the history mode.
-	 */
-	public boolean isHistoryEnabled()
-	{
-		return history!=null;
-	}
-	
-	/**
-	 *  Get the history.
-	 *  @return The history.
-	 */
-	public List getHistory()
-	{
-		return this.history;
-	}
-
-	/**
-	 *  Set the history mode.
-	 */
-	public void	setHistoryEnabled(boolean enabled)
-	{
-		// Hack!!! synchronized because of ProcessViewPanel.
-		if(enabled && history==null)
-			history	= Collections.synchronizedList(new ArrayList());
-		else if(!enabled && history!=null)
-			history	= null;
-	}
-	
-	/**
 	 *  Add a change listener.
 	 *  @param listener The listener.
 	 */
@@ -1203,10 +1186,18 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	/**
 	 *  Notify the change listeners.
 	 */
-	public void notifyListeners(ChangeEvent event)
+	public void notifyListeners(String type, ProcessThread thread)
 	{
 		if(listeners!=null)
 		{
+			ProcessThreadInfo	info	= new ProcessThreadInfo(thread.getId(), thread.getActivity().getBreakpointId(),
+				thread.getActivity().getPool()!=null ? thread.getActivity().getPool().getName() : null,
+				thread.getActivity().getLane()!=null ? thread.getActivity().getLane().getName() : null,
+				thread.getException()!=null ? thread.getException().toString() : "",
+				thread.isWaiting(), thread.getData()!=null ? thread.getData().toString() : "");
+			ChangeEvent	event	= new ChangeEvent(null, type, info);
+//			System.out.println("change: "+event);
+			
 			for(int i=0; i<listeners.size(); i++)
 			{
 				((IChangeListener)listeners.get(i)).changeOccurred(event);
@@ -1447,10 +1438,11 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		act.addIncomingSequenceEdge(edge);
 		MPool pl = model.getPool(pool);
 		act.setPool(pl);
-		ProcessThread pt = new ProcessThread(act, context, this);
+		ProcessThread pt = new ProcessThread(""+idcnt++, act, context, this);
 		pt.setLastEdge(edge);
 		pt.setParameterValue("step", new Object[]{step, ret});
-		context.addThread(pt);
+		context.addExternalThread(pt);
+		notifyListeners(EVENT_THREAD_ADDED, pt);
 		return ret;
 	}
 	
