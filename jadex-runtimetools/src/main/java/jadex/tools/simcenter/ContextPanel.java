@@ -1,7 +1,10 @@
 package jadex.tools.simcenter;
 
 import jadex.base.service.simulation.ISimulationService;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
@@ -38,23 +41,8 @@ public class ContextPanel extends AbstractTimePanel
 	
 	//-------- attributes --------
 
-	/** The execution context. */
-	//protected ExecutionContext context;
-
 	/** The sim center panel. */
 	protected SimCenterPanel simp;
-	
-//	/** The run button. */
-//	protected JButton run;
-//	
-//	/** The event step button. */
-//	protected JButton estep;
-//
-//	/** The time step button. */
-//	protected JButton tstep;
-//	
-//	/** The pause button. */
-//	protected JButton pause;
 	
 	//-------- constructors --------
 
@@ -122,6 +110,7 @@ public class ContextPanel extends AbstractTimePanel
 	public final Action START = new ToolTipAction(null, icons.getIcon("start"),
 		"Start the execution of the application")
 	{
+		boolean ena;
 		public void actionPerformed(ActionEvent e)
 		{
 			SServiceProvider.getService(getServiceProvider(),
@@ -143,14 +132,48 @@ public class ContextPanel extends AbstractTimePanel
 
 		public boolean isEnabled()
 		{
+			testEnabled().addResultListener(new SwingDefaultResultListener()
+			{
+				public void customResultAvailable(Object result)
+				{
+					ena = ((Boolean)result).booleanValue();
+				}
+			});
 			// todo: hack!
 			// problem: service must be fetched fresh!
 //			IClockService cs = (IClockService)SServiceProvider.getService(getServiceProvider(), IClockService.class).get(new ThreadSuspendable());
-			ISimulationService sims = (ISimulationService)SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
+//			ISimulationService sims = (ISimulationService)SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
 //			boolean clockok = cs.getNextTimer()!=null 
 //				|| cs.getClockType().equals(IClock.TYPE_CONTINUOUS)
 //				|| cs.getClockType().equals(IClock.TYPE_SYSTEM);
-			return !sims.isExecuting();// && clockok;
+//			return !sims.isExecuting();// && clockok;
+		
+			return ena;
+		}
+		
+		/**
+		 *  Test asynchronously if enabled.
+		 */
+		public IFuture testEnabled()
+		{
+			final Future ret = new Future();
+			SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new SwingDelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+					ISimulationService sims = (ISimulationService)result;
+					sims.isExecuting().addResultListener(new SwingDelegationResultListener(ret)
+					{
+						public void customResultAvailable(Object result)
+						{
+							boolean exe = ((Boolean)result).booleanValue();
+							ret.setResult(!exe);
+						}
+					});
+				}
+			});
+			return ret;
 		}
 	};
 	
@@ -160,6 +183,7 @@ public class ContextPanel extends AbstractTimePanel
 	public final Action STEP_EVENT = new ToolTipAction(null, icons.getIcon("step_event"),
 		"Execute one timer entry.")
 	{
+		boolean ena;
 		public void actionPerformed(ActionEvent e)
 		{
 			SServiceProvider.getService(getServiceProvider(),
@@ -181,14 +205,59 @@ public class ContextPanel extends AbstractTimePanel
 		
 		public boolean isEnabled()
 		{
-			// todo: hack!
-			// problem: clock service must be fetched fresh!
-			IClockService cs = (IClockService)SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
-			ISimulationService sims = (ISimulationService)SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
-			boolean clockok = cs.getNextTimer()!=null; 
-			return !cs.getClockType().equals(IClock.TYPE_CONTINUOUS) 
-				&& !cs.getClockType().equals(IClock.TYPE_SYSTEM) 
-				&& !sims.isExecuting() && clockok;
+			testEnabled().addResultListener(new SwingDefaultResultListener()
+			{
+				public void customResultAvailable(Object result)
+				{
+					ena = ((Boolean)result).booleanValue();
+				}
+			});
+			return ena;
+			
+//			// todo: hack!
+//			// problem: clock service must be fetched fresh!
+//			IClockService cs = (IClockService)SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
+//			ISimulationService sims = (ISimulationService)SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
+//			boolean clockok = cs.getNextTimer()!=null; 
+//			return !cs.getClockType().equals(IClock.TYPE_CONTINUOUS) 
+//				&& !cs.getClockType().equals(IClock.TYPE_SYSTEM) 
+//				&& !sims.isExecuting() && clockok;
+		}
+		
+		/**
+		 *  Test asynchronously if enabled.
+		 */
+		public IFuture testEnabled()
+		{
+			final Future ret = new Future();
+			SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new SwingDelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+					final IClockService cs = (IClockService)result;
+					SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(new SwingDelegationResultListener(ret)
+					{
+						public void customResultAvailable(Object result)
+						{
+							ISimulationService sims = (ISimulationService)result;
+							sims.isExecuting().addResultListener(new SwingDelegationResultListener(ret)
+							{
+								public void customResultAvailable(Object result)
+								{
+									boolean exe = ((Boolean)result).booleanValue();
+									boolean clockok = cs.getNextTimer()!=null;
+									ret.setResult(new Boolean(!cs.getClockType().equals(IClock.TYPE_CONTINUOUS)
+										&& !cs.getClockType().equals(IClock.TYPE_SYSTEM)
+										&& !exe && clockok));
+								}
+							});
+						}
+					});
+				}
+			});
+			return ret;
 		}
 	};
 	
@@ -198,6 +267,17 @@ public class ContextPanel extends AbstractTimePanel
 	public final Action STEP_TIME = new ToolTipAction(null, icons.getIcon("step_time"),
 		"Execute all timer entries belonging to the current time point.")
 	{
+		boolean ena;
+//		{
+//			testEnabled().addResultListener(new SwingDefaultResultListener()
+//			{
+//				public void customResultAvailable(Object result)
+//				{
+//					enabled = ((Boolean)result).booleanValue();
+//				}
+//			});
+//		}
+		
 		public void actionPerformed(ActionEvent e)
 		{
 			SServiceProvider.getService(getServiceProvider(),
@@ -207,7 +287,13 @@ public class ContextPanel extends AbstractTimePanel
 				{
 					try
 					{
-						((ISimulationService)result).stepTime();
+						((ISimulationService)result).stepTime().addResultListener(new SwingDefaultResultListener()
+						{
+							public void customResultAvailable(Object result)
+							{
+								ena = true;
+							}
+						});
 					}
 					catch(Exception ex)
 					{
@@ -219,14 +305,50 @@ public class ContextPanel extends AbstractTimePanel
 		
 		public boolean isEnabled()
 		{
-			// todo: hack!
-			// problem: clock service must be fetched fresh!
-			IClockService cs = (IClockService)SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
-			ISimulationService sims = (ISimulationService)SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
-			boolean clockok = cs.getNextTimer()!=null;
-			return !cs.getClockType().equals(IClock.TYPE_CONTINUOUS)
-				&& !cs.getClockType().equals(IClock.TYPE_SYSTEM)
-				&& !sims.isExecuting() && clockok;
+			testEnabled().addResultListener(new SwingDefaultResultListener()
+			{
+				public void customResultAvailable(Object result)
+				{
+					ena = ((Boolean)result).booleanValue();
+				}
+			});
+			return ena;
+		}
+		
+		/**
+		 *  Test asynchronously if enabled.
+		 */
+		public IFuture testEnabled()
+		{
+			final Future ret = new Future();
+			SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new SwingDelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+					final IClockService cs = (IClockService)result;
+					SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(new SwingDelegationResultListener(ret)
+					{
+						public void customResultAvailable(Object result)
+						{
+							ISimulationService sims = (ISimulationService)result;
+							sims.isExecuting().addResultListener(new SwingDelegationResultListener(ret)
+							{
+								public void customResultAvailable(Object result)
+								{
+									boolean exe = ((Boolean)result).booleanValue();
+									boolean clockok = cs.getNextTimer()!=null;
+									ret.setResult(new Boolean(!cs.getClockType().equals(IClock.TYPE_CONTINUOUS)
+										&& !cs.getClockType().equals(IClock.TYPE_SYSTEM)
+										&& !exe && clockok));
+								}
+							});
+						}
+					});
+				}
+			});
+			return ret;
 		}
 	};
 	
@@ -236,6 +358,17 @@ public class ContextPanel extends AbstractTimePanel
 	public final Action PAUSE = new ToolTipAction(null , icons.getIcon("pause"),
 		"Pause the current execution.")
 	{
+		boolean ena;
+//		{
+//			testEnabled().addResultListener(new SwingDefaultResultListener()
+//			{
+//				public void customResultAvailable(Object result)
+//				{
+//					enabled = ((Boolean)result).booleanValue();
+//				}
+//			});
+//		}
+		
 		public void actionPerformed(ActionEvent e)
 		{
 			SServiceProvider.getService(getServiceProvider(),
@@ -257,10 +390,58 @@ public class ContextPanel extends AbstractTimePanel
 		
 		public boolean isEnabled()
 		{
-			// todo: hack!
-			ISimulationService sims = (ISimulationService)SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
-			return sims.isExecuting() && sims.getMode()
-				.equals(ISimulationService.MODE_NORMAL);
+			testEnabled().addResultListener(new SwingDefaultResultListener()
+			{
+				public void customResultAvailable(Object result)
+				{
+					ena = ((Boolean)result).booleanValue();
+				}
+			});
+			return ena;
+//			// todo: hack!
+//			ISimulationService sims = (ISimulationService)SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
+//			return sims.isExecuting() && sims.getMode()
+//				.equals(ISimulationService.MODE_NORMAL);
+		}
+		
+		/**
+		 *  Test asynchronously if enabled.
+		 */
+		public IFuture testEnabled()
+		{
+			final Future ret = new Future();
+			SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new SwingDelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+					final IClockService cs = (IClockService)result;
+					SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(new SwingDelegationResultListener(ret)
+					{
+						public void customResultAvailable(Object result)
+						{
+							final ISimulationService sims = (ISimulationService)result;
+							sims.isExecuting().addResultListener(new SwingDelegationResultListener(ret)
+							{
+								public void customResultAvailable(Object result)
+								{
+									final boolean exe = ((Boolean)result).booleanValue();
+									sims.getMode().addResultListener(new SwingDelegationResultListener(ret)
+									{
+										public void customResultAvailable(Object result)
+										{
+											String mode = (String)result;
+											ret.setResult(new Boolean(exe && mode.equals(ISimulationService.MODE_NORMAL)));
+										}
+									});
+								}
+							});
+						}
+					});
+				}
+			});
+			return ret;
 		}
 	};
 }

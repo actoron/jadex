@@ -207,100 +207,68 @@ public class ClockPanel extends AbstractTimePanel
 				if("System".equals(emode.getSelectedItem()))
 				{
 					SServiceProvider.getService(getServiceProvider(),
-						IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
+						ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
 					{
 						public void customResultAvailable(Object result)
 						{
-							final IThreadPoolService tp = (IThreadPoolService)result;
-							SServiceProvider.getService(getServiceProvider(),
-								ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
+							ISimulationService sims = (ISimulationService)result;
+							if(!IClock.TYPE_SYSTEM.equals(lastclocktype))
 							{
-								public void customResultAvailable(Object result)
-								{
-									ISimulationService sims = (ISimulationService)result;
-									if(!IClock.TYPE_SYSTEM.equals(lastclocktype))
-									{
-										sims.setClockType(IClock.TYPE_SYSTEM, tp);
-		//								updateView();
-										simp.updateView();
-									}
-								}
-							});
+								sims.setClockType(IClock.TYPE_SYSTEM);
+//								updateView();
+								simp.updateView();
+							}
 						}
 					});
 				}
 				else if("Continuous".equals(emode.getSelectedItem()))
 				{
 					SServiceProvider.getService(getServiceProvider(),
-						IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
+						ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
 					{
 						public void customResultAvailable(Object result)
 						{
-							final IThreadPoolService tp = (IThreadPoolService)result;
-							SServiceProvider.getService(getServiceProvider(),
-								ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
+							ISimulationService sims = (ISimulationService)result;
+							if(!IClock.TYPE_CONTINUOUS.equals(lastclocktype))
 							{
-								public void customResultAvailable(Object result)
-								{
-									ISimulationService sims = (ISimulationService)result;
-									if(!IClock.TYPE_CONTINUOUS.equals(lastclocktype))
-									{
-										sims.setClockType(IClock.TYPE_CONTINUOUS, tp);
-				//						updateView();
-										simp.updateView();
-									}
-								}
-							});
+								sims.setClockType(IClock.TYPE_CONTINUOUS);
+		//						updateView();
+								simp.updateView();
+							}
 						}
 					});
 				}
 				else if("Time Stepped".equals(emode.getSelectedItem()))
 				{
 					SServiceProvider.getService(getServiceProvider(),
-						IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
+						ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
 					{
 						public void customResultAvailable(Object result)
 						{
-							final IThreadPoolService tp = (IThreadPoolService)result;
-							SServiceProvider.getService(getServiceProvider(),
-								ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
+							ISimulationService sims = (ISimulationService)result;
+							if(!IClock.TYPE_TIME_DRIVEN.equals(lastclocktype))
 							{
-								public void customResultAvailable(Object result)
-								{
-									ISimulationService sims = (ISimulationService)result;
-									if(!IClock.TYPE_TIME_DRIVEN.equals(lastclocktype))
-									{
-										sims.setClockType(IClock.TYPE_TIME_DRIVEN, tp);
-				//						updateView();
-										simp.updateView();
-									}
-								}
-							});
+								sims.setClockType(IClock.TYPE_TIME_DRIVEN);
+		//						updateView();
+								simp.updateView();
+							}
 						}
 					});
 				}
 				else if("Event Driven".equals(emode.getSelectedItem()))
 				{
 					SServiceProvider.getService(getServiceProvider(),
-						IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
+						ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
 					{
 						public void customResultAvailable(Object result)
 						{
-							final IThreadPoolService tp = (IThreadPoolService)result;
-							SServiceProvider.getService(getServiceProvider(),
-								ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
+							ISimulationService sims = (ISimulationService)result;
+							if(!IClock.TYPE_EVENT_DRIVEN.equals(lastclocktype))
 							{
-								public void customResultAvailable(Object result)
-								{
-									ISimulationService sims = (ISimulationService)result;
-									if(!IClock.TYPE_EVENT_DRIVEN.equals(lastclocktype))
-									{
-										sims.setClockType(IClock.TYPE_EVENT_DRIVEN, tp);
-				//						updateView();
-										simp.updateView();
-									}
-								}
-							});
+								sims.setClockType(IClock.TYPE_EVENT_DRIVEN);
+		//						updateView();
+								simp.updateView();
+							}
 						}
 					});
 				}
@@ -493,7 +461,15 @@ public class ClockPanel extends AbstractTimePanel
 								((JSpinner.DefaultEditor)dilation.getEditor()).getTextField().setEditable(false);
 							}
 						}
-						emode.setEnabled(!sims.isExecuting());
+						
+						sims.isExecuting().addResultListener(new SwingDefaultResultListener()
+						{
+							public void customResultAvailable(Object result)
+							{
+								Boolean ret = (Boolean)result;
+								emode.setEnabled(ret.booleanValue());
+							}
+						});
 					}
 				});
 			}
