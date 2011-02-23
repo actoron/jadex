@@ -1,6 +1,5 @@
 package jadex.commons.service.execution;
 
-import jadex.commons.ICommand;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;

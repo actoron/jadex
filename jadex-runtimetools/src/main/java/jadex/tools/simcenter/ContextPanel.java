@@ -5,7 +5,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.future.SwingDelegationResultListener;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
 import jadex.commons.service.RequiredServiceInfo;
@@ -394,7 +393,12 @@ public class ContextPanel extends AbstractTimePanel
 			{
 				public void customResultAvailable(Object result)
 				{
+					boolean	oldena	= ena;
 					ena = ((Boolean)result).booleanValue();
+					if(oldena!=ena)
+					{
+						repaint();
+					}
 				}
 			});
 			return ena;
@@ -410,31 +414,23 @@ public class ContextPanel extends AbstractTimePanel
 		public IFuture testEnabled()
 		{
 			final Future ret = new Future();
-			SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new SwingDelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
 				{
-					final IClockService cs = (IClockService)result;
-					SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-						.addResultListener(new SwingDelegationResultListener(ret)
+					final ISimulationService sims = (ISimulationService)result;
+					sims.isExecuting().addResultListener(new SwingDelegationResultListener(ret)
 					{
 						public void customResultAvailable(Object result)
 						{
-							final ISimulationService sims = (ISimulationService)result;
-							sims.isExecuting().addResultListener(new SwingDelegationResultListener(ret)
+							final boolean exe = ((Boolean)result).booleanValue();
+							sims.getMode().addResultListener(new SwingDelegationResultListener(ret)
 							{
 								public void customResultAvailable(Object result)
 								{
-									final boolean exe = ((Boolean)result).booleanValue();
-									sims.getMode().addResultListener(new SwingDelegationResultListener(ret)
-									{
-										public void customResultAvailable(Object result)
-										{
-											String mode = (String)result;
-											ret.setResult(new Boolean(exe && mode.equals(ISimulationService.MODE_NORMAL)));
-										}
-									});
+									String mode = (String)result;
+									ret.setResult(new Boolean(exe && mode.equals(ISimulationService.MODE_NORMAL)));
 								}
 							});
 						}

@@ -184,6 +184,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 		{
 			setMode(MODE_NORMAL);
 			getClockService().start();
+			setExecuting(true);
 			advanceClock();
 			ret	= IFuture.DONE;
 		}
@@ -209,6 +210,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 		{
 			setMode(MODE_ACTION_STEP);
 			getClockService().start();
+			setExecuting(true);
 			assert stepfuture==null;
 			stepfuture	= new Future();
 			ret	= stepfuture;
@@ -241,6 +243,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 				timesteptime	= next.getNotificationTime();
 //				System.out.println("time step: "+timesteptime);
 				getClockService().start();
+				setExecuting(true);
 				assert stepfuture==null;
 				stepfuture	= new Future();
 				ret	= stepfuture;
