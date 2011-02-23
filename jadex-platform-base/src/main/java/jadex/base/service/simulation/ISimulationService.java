@@ -1,8 +1,9 @@
 package jadex.base.service.simulation;
 
 import jadex.commons.IChangeListener;
-import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.IService;
+import jadex.commons.service.annotation.Excluded;
 
 /**
  *  Interface for the time simulation service.
@@ -25,40 +26,40 @@ public interface ISimulationService	extends IService
 	/**
 	 *  Pause the execution (can be resumed via start or step).
 	 */
-	public void pause();
+	public IFuture pause();
 	
 	/**
 	 *  Restart the execution after pause.
 	 */
-	public void start();
+	public IFuture start();
 	
 	/**
 	 *  Perform one event.
 	 */
-	public void stepEvent();
+	public IFuture stepEvent();
 	
 	/**
 	 *  Perform all actions belonging to one time point.
 	 */
-	public void stepTime();
+	public IFuture stepTime();
 	
 	/**
 	 *  Set the clock type.
 	 *  @param type The clock type.
 	 */
 	// todo: remove thread pool
-	public void setClockType(String type, IThreadPool tp);
+	public IFuture setClockType(String type);
 	
 	/**
 	 *  Get the execution mode.
 	 *  @return The mode.
 	 */
-	public String getMode();
+	public IFuture getMode();
 	
 	/**
 	 *  Test if context is executing.
 	 */
-	public boolean isExecuting();
+	public IFuture isExecuting();
 	
 	
 	// todo: hack remove method?!
@@ -66,6 +67,7 @@ public interface ISimulationService	extends IService
 	 *  Add a change listener.
 	 *  @param listener The change listener.
 	 */
+	@Excluded
 	public void addChangeListener(IChangeListener listener);
 	
 	// todo: hack remove method?!
@@ -73,6 +75,7 @@ public interface ISimulationService	extends IService
 	 *  Remove a change listener.
 	 *  @param listener The change listener.
 	 */
+	@Excluded
 	public void removeChangeListener(IChangeListener listener);
 
 }
