@@ -37,7 +37,8 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	protected Map executors;
 		
 	/** The idle commands. */
-	protected Set idlecommands;
+//	protected Set idlecommands;
+	protected Future idlefuture;
 	
 	/** The state. */
 	protected boolean running;
@@ -146,7 +147,8 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 					{
 						super.run();
 						
-						ICommand[]	commands	= null;
+//						ICommand[]	commands	= null;
+						Future idf = null;
 						
 						synchronized(AsyncExecutionService.this)
 						{
@@ -163,10 +165,12 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 //										executorcache.add(this);
 			
 									// When no more executables, inform idle commands.				
-									if(AsyncExecutionService.this.running && idlecommands!=null && executors.isEmpty())
+									if(AsyncExecutionService.this.running && idlefuture!=null && executors.isEmpty())
 									{
 //										System.out.println("idle");
-										commands	= (ICommand[])idlecommands.toArray(new ICommand[idlecommands.size()]);
+//										commands	= (ICommand[])idlecommands.toArray(new ICommand[idlecommands.size()]);
+										idf = idlefuture;
+										idlefuture = null;
 									}
 //									else if(AsyncExecutionService.this.running && idlecommands!=null)
 //									{
@@ -176,10 +180,12 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 							}
 						}
 						
-						for(int i=0; commands!=null && i<commands.length; i++)
-						{
-							commands[i].execute(null);
-						}
+						idf.setResult(null);
+						
+//						for(int i=0; commands!=null && i<commands.length; i++)
+//						{
+//							commands[i].execute(null);
+//						}
 					}					
 				};
 //			}
@@ -307,16 +313,26 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 							for(int i=0; i<keys.length; i++)
 								execute(keys[i]);
 						}
-						else if(idlecommands!=null)
+						else
 						{
-				//			System.out.println("restart: idle");
-							Iterator it	= idlecommands.iterator();
-							while(it.hasNext())
-							{
-								((ICommand)it.next()).execute(null);
-							}
-						}
+//						else if(idlecommands!=null)
+//						{
+//				//			System.out.println("restart: idle");
+//							Iterator it	= idlecommands.iterator();
+//							while(it.hasNext())
+//							{
+//								((ICommand)it.next()).execute(null);
+//							}
+//						}
 						
+							Future idf = null;
+							synchronized(AsyncExecutionService.this)
+							{
+								idf = idlefuture;
+								idlefuture = null;
+							}
+							idf.setResult(null);
+						}
 						ret.setResult(null);
 					}
 					catch(RuntimeException e)
@@ -393,33 +409,52 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	}
 	
 	/**
-	 *  Add a command to be executed whenever the executor
-	 *  is idle (i.e. no executables running).
+	 *  Get the future indicating that executor is idle.
 	 */
-	public void addIdleCommand(ICommand command)
+	public synchronized IFuture getNextIdleFuture()
 	{
-		if(idlecommands==null)
+		Future ret;
+		if(shutdown)
 		{
-			synchronized(this)
-			{
-				if(idlecommands==null)
-				{
-					idlecommands	= SCollection.createLinkedHashSet();
-				}
-			}
+			ret = new Future(new RuntimeException("Shutdown"));
 		}
-		
-		idlecommands.add(command);
+		else
+		{
+			if(idlefuture==null)
+				idlefuture = new Future();
+			ret = idlefuture;
+		}
+		return ret;
 	}
-
-	/**
-	 *  Remove a previously added idle command.
-	 */
-	public synchronized void removeIdleCommand(ICommand command)
-	{
-		if(idlecommands!=null)
-			idlecommands.remove(command);
-	}
+	
+//	/**
+//	 *  Add a command to be executed whenever the executor
+//	 *  is idle (i.e. no executables running).
+//	 */
+//	public void addIdleCommand(ICommand command)
+//	{
+//		if(idlecommands==null)
+//		{
+//			synchronized(this)
+//			{
+//				if(idlecommands==null)
+//				{
+//					idlecommands	= SCollection.createLinkedHashSet();
+//				}
+//			}
+//		}
+//		
+//		idlecommands.add(command);
+//	}
+//
+//	/**
+//	 *  Remove a previously added idle command.
+//	 */
+//	public synchronized void removeIdleCommand(ICommand command)
+//	{
+//		if(idlecommands!=null)
+//			idlecommands.remove(command);
+//	}
 
 }
 

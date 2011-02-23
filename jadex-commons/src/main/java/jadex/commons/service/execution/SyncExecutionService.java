@@ -32,8 +32,9 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	/** The executor. */
 	protected Executor executor;
 	
-	/** The idle commands. */
-	protected Set	idlecommands;
+//	/** The idle commands. */
+//	protected Set	idlecommands;
+	protected Future idlefuture;
 	
 	/** Flag, indicating if executor is running. */
 	protected boolean running;
@@ -238,22 +239,26 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 						
 						
 						// When no more executables, inform idle commands.
-						boolean perform = false;
+//						boolean perform = false;
+						Future ifc = null;
 						synchronized(SyncExecutionService.this)
 						{
 							if(running && queue.isEmpty())
 							{
-								perform = idlecommands!=null;
+								ifc = idlefuture;
+								idlefuture = null;
+//								perform = idlefuture!=null;
 							}
 						}
-						if(perform)
+						if(ifc!=null)
 						{
 //							System.out.println("Idle");
-							Iterator it	= idlecommands.iterator();
-							while(it.hasNext())
-							{
-								((ICommand)it.next()).execute(null);
-							}
+							ifc.setResult(null);
+//							Iterator it	= idlecommands.iterator();
+//							while(it.hasNext())
+//							{
+//								((ICommand)it.next()).execute(null);
+//							}
 						}
 						
 						// Perform next task when queue is not empty and service is running.
@@ -291,20 +296,32 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	/**
 	 *  Shutdown the executor service.
 	 */
-	public synchronized IFuture	shutdownService()
+	public IFuture	shutdownService()
 	{
-		if(!isValid())
-//		if(!running || shutdown)
+		IFuture	ret = null;
+		Future idf = null;
+		
+		synchronized(this)
 		{
-			Future	ret	= new Future();
-			ret.setException(new RuntimeException("Not running."));
-			return ret;
+			if(!isValid())
+//			if(!running || shutdown)
+			{
+				ret = new Future();
+				((Future)ret).setException(new RuntimeException("Not running."));
+			}
+			else
+			{
+				this.running = false;
+				this.shutdown = true;
+				ret	= executor.shutdown();
+				queue = null;
+				idf = idlefuture;
+			}
 		}
 		
-		this.running = false;
-		this.shutdown = true;
-		IFuture	ret	= executor.shutdown();
-		queue = null;
+		if(idf!=null)
+			idf.setException(new RuntimeException("Shutdown"));
+		
 		return ret;
 	}
 
@@ -319,33 +336,52 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		//return running && queue.isEmpty();
 		return queue.isEmpty();
 	}
-
+	
 	/**
-	 *  Add a command to be executed whenever the executor
-	 *  is idle (i.e. no executables running).
+	 *  Get the future indicating that executor is idle.
 	 */
-	public void addIdleCommand(ICommand command)
+	public synchronized IFuture getNextIdleFuture()
 	{
-		if(idlecommands==null)
+		Future ret;
+		if(shutdown)
 		{
-			synchronized(this)
-			{
-				if(idlecommands==null)
-				{
-					idlecommands	= SCollection.createLinkedHashSet();
-				}
-			}
+			ret = new Future(new RuntimeException("Shutdown"));
 		}
-		
-		idlecommands.add(command);
+		else
+		{
+			if(idlefuture==null)
+				idlefuture = new Future();
+			ret = idlefuture;
+		}
+		return ret;
 	}
 
-	/**
-	 *  Remove a previously added idle command.
-	 */
-	public void removeIdleCommand(ICommand command)
-	{
-		if(idlecommands!=null)
-			idlecommands.remove(command);
-	}
+//	/**
+//	 *  Add a command to be executed whenever the executor
+//	 *  is idle (i.e. no executables running).
+//	 */
+//	public void addIdleCommand(ICommand command)
+//	{
+//		if(idlecommands==null)
+//		{
+//			synchronized(this)
+//			{
+//				if(idlecommands==null)
+//				{
+//					idlecommands	= SCollection.createLinkedHashSet();
+//				}
+//			}
+//		}
+//		
+//		idlecommands.add(command);
+//	}
+//
+//	/**
+//	 *  Remove a previously added idle command.
+//	 */
+//	public void removeIdleCommand(ICommand command)
+//	{
+//		if(idlecommands!=null)
+//			idlecommands.remove(command);
+//	}
 }

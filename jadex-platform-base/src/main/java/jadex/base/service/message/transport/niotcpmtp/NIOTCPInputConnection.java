@@ -104,8 +104,7 @@ public class NIOTCPInputConnection
 				throw new BufferUnderflowException();
 		}
 
-		// Read out the buffer if enougth data has been retrieved for the
-		// message.
+		// Read out the buffer if enough data has been retrieved for the message.
 		if(msg_end != -1 && msg_end <= writebuffer.position())
 		{
 			// Prepare reading out the buffer

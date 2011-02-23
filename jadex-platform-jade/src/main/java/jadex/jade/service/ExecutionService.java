@@ -2,6 +2,7 @@ package jadex.jade.service;
 
 import jadex.commons.ICommand;
 import jadex.commons.concurrent.IExecutable;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
@@ -83,19 +84,29 @@ public class ExecutionService extends BasicService implements IExecutionService
 	}
 
 	/**
-	 *  Add a command to be executed whenever the executor
-	 *  is idle (i.e. no executables running).
+	 *  Get the next idle future.
 	 */
-	public void addIdleCommand(ICommand command)
+	public IFuture getNextIdleFuture()
 	{
-		throw new UnsupportedOperationException("Operation unavailable in JADE.");
+		Future ret = new Future();
+		ret.setException(new UnsupportedOperationException("Operation unavailable in JADE."));
+		return ret;
 	}
-
-	/**
-	 *  Remove a previously added idle command.
-	 */
-	public void removeIdleCommand(ICommand command)
-	{
-		throw new UnsupportedOperationException("Operation unavailable in JADE.");
-	}
+	
+//	/**
+//	 *  Add a command to be executed whenever the executor
+//	 *  is idle (i.e. no executables running).
+//	 */
+//	public void addIdleCommand(ICommand command)
+//	{
+//		throw new UnsupportedOperationException("Operation unavailable in JADE.");
+//	}
+//
+//	/**
+//	 *  Remove a previously added idle command.
+//	 */
+//	public void removeIdleCommand(ICommand command)
+//	{
+//		throw new UnsupportedOperationException("Operation unavailable in JADE.");
+//	}
 }

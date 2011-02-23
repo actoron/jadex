@@ -46,13 +46,18 @@ public interface IExecutionService	extends IService
 	public boolean isIdle();
 
 	/**
-	 *  Add a command to be executed whenever the executor
-	 *  is idle (i.e. no executables running).
+	 *  Get the future indicating that executor is idle.
 	 */
-	public void addIdleCommand(ICommand command);
-
-	/**
-	 *  Remove a previously added idle command.
-	 */
-	public void removeIdleCommand(ICommand command);
+	public IFuture getNextIdleFuture();
+	
+//	/**
+//	 *  Add a command to be executed whenever the executor
+//	 *  is idle (i.e. no executables running).
+//	 */
+//	public void addIdleCommand(ICommand command);
+//
+//	/**
+//	 *  Remove a previously added idle command.
+//	 */
+//	public void removeIdleCommand(ICommand command);
 }
