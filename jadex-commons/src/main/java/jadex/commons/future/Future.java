@@ -63,6 +63,15 @@ public class Future implements IFuture
 		setResult(result);
 	}
 	
+	/**
+	 *  Create a future that is already failed.
+	 *  @param exception	The exception.
+	 */
+	public Future(Exception exception)
+	{
+		setException(exception);
+	}
+	
 	//-------- methods --------
 
 	/**

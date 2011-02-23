@@ -47,7 +47,6 @@ public interface ISimulationService	extends IService
 	 *  Set the clock type.
 	 *  @param type The clock type.
 	 */
-	// todo: remove thread pool
 	public IFuture setClockType(String type);
 	
 	/**
@@ -60,7 +59,6 @@ public interface ISimulationService	extends IService
 	 *  Test if context is executing.
 	 */
 	public IFuture isExecuting();
-	
 	
 	// todo: hack remove method?!
 	/**

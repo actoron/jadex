@@ -1,6 +1,5 @@
 package jadex.commons.service.execution;
 
-import jadex.commons.ICommand;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
@@ -15,9 +14,7 @@ import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.threadpool.IThreadPoolService;
 
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *  The asynchronous executor service that executes all tasks in separate executors.
@@ -180,7 +177,8 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 							}
 						}
 						
-						idf.setResult(null);
+						if(idf!=null)
+							idf.setResult(null);
 						
 //						for(int i=0; commands!=null && i<commands.length; i++)
 //						{
@@ -331,7 +329,8 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 								idf = idlefuture;
 								idlefuture = null;
 							}
-							idf.setResult(null);
+							if(idf!=null)
+								idf.setResult(null);
 						}
 						ret.setResult(null);
 					}

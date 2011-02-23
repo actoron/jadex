@@ -125,8 +125,8 @@
 				SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
 				new Object[]{new String[]{"getState", "getTime", "getTick", "getStarttime", "getDelta", "getDilation", "getNextTimer", "getTimers", "getClockType", "advanceEvent"}}))
 		</providedservice>
-		<providedservice class="ISimulationService" direct="true">
-			new SimulationService($component.getServiceProvider(),
+		<providedservice class="ISimulationService">
+			new SimulationService($component,
 				SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
 				new Object[]{new String[]{"getMode", "isExecuting"}}))
 		</providedservice>

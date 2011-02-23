@@ -328,12 +328,17 @@ public class BDIViewerPanel extends JPanel
 			if(instance.getState().getType(id).isSubtype(OAVBDIRuntimeModel.capability_type)
 				&& OAVBDIRuntimeModel.capability_has_goals.equals(attr))
 			{
+				// Goal added.
 				if(oldvalue==null && newvalue!=null)
 				{
 					final GoalInfo	info	= createGoalInfo(instance.getState(), newvalue);
-					if(removed==null || !removed.contains(info))
+					if(removed!=null && removed.contains(info))
 					{
-						if(changed!=null && changed.contains(info))
+						removed.remove(info);
+					}
+					else
+					{
+						if(changed!=null)
 							changed.remove(info);
 						
 						if(added==null)
@@ -341,19 +346,28 @@ public class BDIViewerPanel extends JPanel
 						added.add(info);
 					}
 				}
+				
+				// Goal removed
 				else if(oldvalue!=null && newvalue==null)
 				{
 					final GoalInfo	info	= createGoalInfo(instance.getState(), oldvalue);
 					if(added!=null && added.contains(info))
+					{
 						added.remove(info);
-					if(changed!=null && changed.contains(info))
-						changed.remove(info);
-					
-					if(removed==null)
-						removed	= new LinkedHashSet();
-					removed.add(info);
+					}
+					else
+					{
+						if(changed!=null)
+							changed.remove(info);
+						
+						if(removed==null)
+							removed	= new LinkedHashSet();
+						removed.add(info);
+					}
 				}
 			}
+			
+			// Goal changed.
 			else if(instance.getState().getType(id).isSubtype(OAVBDIRuntimeModel.goal_type)
 				&& (OAVBDIRuntimeModel.goal_has_lifecyclestate.equals(attr)
 					|| OAVBDIRuntimeModel.goal_has_processingstate.equals(attr)))
@@ -363,6 +377,8 @@ public class BDIViewerPanel extends JPanel
 				{
 					if(added!=null && added.contains(info))
 					{
+						// Replace added goal.
+						added.remove(info);
 						added.add(info);
 					}
 					else
@@ -397,76 +413,78 @@ public class BDIViewerPanel extends JPanel
 				{
 					public void run()
 					{
-						List	events	= new ArrayList();
-						synchronized(BDIChangeListener.this)
+						instance.getAgentAdapter().invokeLater(new Runnable()
 						{
-							timer	= null;
-							if(removed!=null)
+							public void run()
 							{
-								for(Iterator it=removed.iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
+								List	events	= new ArrayList();
+								timer	= null;
+								if(removed!=null)
 								{
-									events.add(new ChangeEvent(null, EVENT_GOAL_REMOVED, it.next()));
-									it.remove();
-								}
-							}
-							if(added!=null)
-							{
-								for(Iterator it=added.iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
-								{
-									events.add(new ChangeEvent(null, EVENT_GOAL_ADDED, it.next()));
-									it.remove();
-								}
-							}
-							if(changed!=null)
-							{
-								for(Iterator it=changed.iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
-								{
-									events.add(new ChangeEvent(null, EVENT_GOAL_CHANGED, it.next()));
-									it.remove();
-								}
-							}
-							
-							if(removed!=null && removed.isEmpty())
-								removed	= null;
-							if(added!=null && added.isEmpty())
-								added	= null;
-							if(changed!=null && changed.isEmpty())
-								changed	= null;
-							
-							if(removed!=null || added!=null || changed!=null)
-							{
-								startTimer();
-							}
-						}
-						
-						if(!events.isEmpty())
-						{
-//							System.out.println("events: "+events.size());
-							rcl.changeOccurred(new ChangeEvent(null, null, events)).addResultListener(new IResultListener()
-							{
-								public void resultAvailable(Object result)
-								{
-//									System.out.println("update succeeded: "+desc);
-								}
-								public void exceptionOccurred(Exception exception)
-								{
-//									exception.printStackTrace();
-									if(instance!=null)
+									for(Iterator it=removed.iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
 									{
-//										System.out.println("Removing listener due to failed update: "+RemoteCMSListener.this.id);
-										try
-										{
-											instance.getState().removeStateListener(BDIChangeListener.this);
-										}
-										catch(RuntimeException e)
-										{
-//											System.out.println("Listener already removed: "+id);
-										}
-										instance	= null;	// Set to null to avoid multiple removal due to delayed errors. 
+										events.add(new ChangeEvent(null, EVENT_GOAL_REMOVED, it.next()));
+										it.remove();
 									}
 								}
-							});
-						}
+								if(added!=null)
+								{
+									for(Iterator it=added.iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
+									{
+										events.add(new ChangeEvent(null, EVENT_GOAL_ADDED, it.next()));
+										it.remove();
+									}
+								}
+								if(changed!=null)
+								{
+									for(Iterator it=changed.iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
+									{
+										events.add(new ChangeEvent(null, EVENT_GOAL_CHANGED, it.next()));
+										it.remove();
+									}
+								}
+								
+								if(removed!=null && removed.isEmpty())
+									removed	= null;
+								if(added!=null && added.isEmpty())
+									added	= null;
+								if(changed!=null && changed.isEmpty())
+									changed	= null;
+								
+								if(!events.isEmpty())
+								{
+									rcl.changeOccurred(new ChangeEvent(null, null, events)).addResultListener(new IResultListener()
+									{
+										public void resultAvailable(Object result)
+										{
+//											System.out.println("update succeeded: "+desc);
+										}
+										public void exceptionOccurred(Exception exception)
+										{
+//											exception.printStackTrace();
+											if(instance!=null)
+											{
+//												System.out.println("Removing listener due to failed update: "+RemoteCMSListener.this.id);
+												try
+												{
+													instance.getState().removeStateListener(BDIChangeListener.this);
+												}
+												catch(RuntimeException e)
+												{
+//													System.out.println("Listener already removed: "+id);
+												}
+												instance	= null;	// Set to null to avoid multiple removal due to delayed errors. 
+											}
+										}
+									});
+								}
+								
+								if(removed!=null || added!=null || changed!=null)
+								{
+									startTimer();
+								}
+							}
+						});						
 					}
 				}, UPDATE_DELAY);
 			}

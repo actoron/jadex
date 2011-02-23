@@ -137,29 +137,33 @@ public class DefaultVisitDecider implements IVisitDecider
 		this.abort = abort;
 	}
 	
-	// NOTE! This methods currently must be commented for remote searches
-	// to work. Otherwise, remote=true will lead to ping-pong searches that
+	// Hack!!! Replace global scope with platform scope when deserializing from XML.
+	// Otherwise, scope_global will lead to ping-pong searches that
 	// never terminate. todo: make search information more declarative and
 	// allow to modify the search strategy on the sending or receiving host.
 	
-//	/**
-//	 *  Get the remote.
-//	 *  @return the remote.
-//	 */
-//	public boolean isRemote()
-//	{
-//		return remote;
-//	}
-//
-//	/**
-//	 *  Set the remote.
-//	 *  @param remote The remote to set.
-//	 */
-//	public void setRemote(boolean remote)
-//	{
-//		this.remote = remote;
-//	}
+	/**
+	 *  Set the scope when deserializing from XML.
+	 *  Changes global scope to platform scope to avoid infinite ping-pong searches.
+	 *  @param scope The scope to set.
+	 */
+	public void setXMLScope(String scope)
+	{
+		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+			scope	= RequiredServiceInfo.SCOPE_PLATFORM;
 
+		this.scope = scope;
+	}
+	
+	/**
+	 *  Get the scope.
+	 *  @return The scope.
+	 */
+	public String	getXMLScope()
+	{
+		return scope;
+	}
+	
 	/**
 	 *  Get the cache key.
 	 *  Needs to identify this element with respect to its important features so that
