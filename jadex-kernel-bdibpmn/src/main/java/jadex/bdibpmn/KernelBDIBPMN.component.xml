@@ -40,8 +40,8 @@
 					new Long(10000),
 					Boolean.TRUE,
 					new BpmnPlanExecutor(),
-					//"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
-					"jadex.tools.debugger.bdi.BDIViewerDebuggerPanel"
+					"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
+					//"jadex.tools.debugger.bdi.BDIViewerDebuggerPanel"
 				}
 			), $component.getServiceProvider())
 		</providedservice>

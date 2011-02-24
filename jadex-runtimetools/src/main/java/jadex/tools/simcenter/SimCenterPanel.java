@@ -155,9 +155,9 @@ public class SimCenterPanel extends JPanel
 	 */
 	public void updateView()
 	{
-		clockp.updateView();
-		contextp.updateView();
-		timerp.updateView();
+		clockp.invokeUpdateView();
+		contextp.invokeUpdateView();
+		timerp.invokeUpdateView();
 	}
 	
 	/**

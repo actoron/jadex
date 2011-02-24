@@ -429,30 +429,25 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		{
 			System.out.println("container is null: "+component+", "+getComponentIdentifier());
 		}
-		return SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class);
-//		final Future	ret	= new Future();
-//		if(cms==null)
-//		{
-//			SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
-//				.addResultListener(new IResultListener()
-//			{
-//				public void resultAvailable(Object source, Object result)
-//				{
-//					cms	= (IComponentManagementService)result;
-//					ret.setResult(cms);
-//				}
-//				
-//				public void exceptionOccurred(Object source, Exception exception)
-//				{
-//					ret.setException(exception);
-//				}
-//			});
-//		}
-//		else
-//		{
-//			ret.setResult(cms);
-//		}
-//		return ret;
+//		return SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class);
+		final Future	ret	= new Future();
+		if(cms==null)
+		{
+			SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
+				.addResultListener(new DelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+					cms	= (IComponentManagementService)result;
+					ret.setResult(cms);
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(cms);
+		}
+		return ret;
 	}
 
 	
@@ -715,7 +710,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			{
 				try
 				{
-	//				System.out.println("Executing: "+component);
+//					System.out.println("Executing: "+getComponentIdentifier());
 					again	= component.executeStep();
 				}
 				catch(Exception e)

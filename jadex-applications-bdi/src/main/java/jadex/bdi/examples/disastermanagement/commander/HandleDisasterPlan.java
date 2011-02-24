@@ -63,7 +63,11 @@ public class HandleDisasterPlan extends Plan
 //	
 //	public void failed()
 //	{
-//		System.out.println("failed: "+this);
+//		System.err.println("failed: "+this);
+//		if(getException()!=null)
+//		{
+//			getException().printStackTrace();
+//		}
 //	}
 	
 //	/** The already assigned fire units. */

@@ -3,6 +3,7 @@ package jadex.commons.service.execution;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.IFuture;
 import jadex.commons.service.IService;
+import jadex.commons.service.annotation.Excluded;
 
 /**
  *  Common interface for different execution services.
@@ -37,12 +38,13 @@ public interface IExecutionService	extends IService
 	/**
 	 *  Get the currently running or waiting tasks.
 	 */
+	@Excluded
 	public IExecutable[]	getTasks();
 	
-	/**
-	 *  Test if the executor is currently idle.
-	 */
-	public boolean isIdle();
+//	/**
+//	 *  Test if the executor is currently idle.
+//	 */
+//	public boolean isIdle();
 
 	/**
 	 *  Get the future indicating that executor is idle.

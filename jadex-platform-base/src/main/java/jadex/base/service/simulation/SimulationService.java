@@ -153,10 +153,12 @@ public class SimulationService extends BasicService implements ISimulationServic
 		IFuture	ret;
 		if(!executing)
 		{
+//			System.out.println("Not pausing");
 			ret	= new Future(new IllegalStateException("Simulation not running."));
 		}
 		else
 		{
+//			System.out.println("Pausing");
 			setExecuting(false);
 			getClockService().stop();
 			ret	= IFuture.DONE;
@@ -178,10 +180,12 @@ public class SimulationService extends BasicService implements ISimulationServic
 		IFuture	ret;
 		if(executing)
 		{
+//			System.out.println("Not starting");
 			ret	= new Future(new IllegalStateException("Simulation already running."));
 		}
 		else
 		{
+//			System.out.println("Starting");
 			setMode(MODE_NORMAL);
 			getClockService().start();
 			setExecuting(true);
@@ -199,15 +203,18 @@ public class SimulationService extends BasicService implements ISimulationServic
 		IFuture	ret;
 		if(executing)
 		{
+//			System.out.println("Not stepping");
 			ret	= new Future(new IllegalStateException("Simulation already running."));
 		}
 		else if(IClock.TYPE_CONTINUOUS.equals(getClockService().getClockType())
 				|| IClock.TYPE_SYSTEM.equals(getClockService().getClockType()))
 		{
+//			System.out.println("Not stepping");
 			ret	= new Future(new IllegalStateException("Step only possible in simulation mode."));
 		}
 		else
 		{
+//			System.out.println("Stepping");
 			setMode(MODE_ACTION_STEP);
 			getClockService().start();
 			setExecuting(true);
@@ -227,15 +234,18 @@ public class SimulationService extends BasicService implements ISimulationServic
 		IFuture	ret;
 		if(executing)
 		{
+//			System.out.println("Not stepping");
 			ret	= new Future(new IllegalStateException("Simulation already running."));
 		}
 		else if(IClock.TYPE_CONTINUOUS.equals(getClockService().getClockType())
 				|| IClock.TYPE_SYSTEM.equals(getClockService().getClockType()))
 		{
+//			System.out.println("Not stepping");
 			ret	= new Future(new IllegalStateException("Step only possible in simulation mode."));
 		}
 		else
 		{
+//			System.out.println("Stepping");
 			setMode(MODE_TIME_STEP);
 			ITimer	next	= getClockService().getNextTimer();
 			if(next!=null)
@@ -267,7 +277,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 	}
 	
 	/**
-	 *  Get the execution mode.
+	 *  Set the execution mode.
 	 *  @param mode The mode.
 	 */
 	public void setMode(String mode)
@@ -284,6 +294,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 		IFuture	ret;
 		if(executing)
 		{
+//			System.out.println("Not setting clock");
 			ret	= new Future(new IllegalStateException("Change clock not allowed during execution."));
 		}
 		else
@@ -291,6 +302,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 			String oldtype = clockservice.getClockType();
 			if(!type.equals(oldtype))
 			{
+//				System.out.println("Setting clock");
 				final Future	fut	= new Future();
 				ret	= fut;
 				SServiceProvider.getService(access.getServiceProvider(), IThreadPoolService.class)
@@ -307,6 +319,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 			}
 			else
 			{
+//				System.out.println("Not setting clock");
 				ret	= IFuture.DONE;
 			}
 		}
@@ -344,6 +357,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 	 */
 	public void setExecuting(boolean executing)
 	{
+//		System.out.println("Set executing: "+executing);
 		assert executing!=this.executing;
 		this.executing = executing;
 		notifyListeners(new ChangeEvent(this, "executing", executing? Boolean.TRUE: Boolean.FALSE));
@@ -387,10 +401,14 @@ public class SimulationService extends BasicService implements ISimulationServic
 	 */
 	protected void setIdle()
 	{
+//		System.out.println("Set idle");
 		setExecuting(false);
 		getClockService().stop();
-		stepfuture.setResult(null);
-		stepfuture	= null;
+		if(stepfuture!=null)
+		{
+			stepfuture.setResult(null);
+			stepfuture	= null;
+		}
 	}
 
 	/**
@@ -404,23 +422,30 @@ public class SimulationService extends BasicService implements ISimulationServic
 			ITimer t = getClockService().getNextTimer();
 			if(MODE_TIME_STEP.equals(mode) && (t==null || t.getNotificationTime()>timesteptime))
 			{
+//				System.out.println("Not advancing clock");
 				setIdle();
 			}
 			else
 			{
+//				System.out.println("Advancing clock");
 				if(getClockService().advanceEvent())
 				{
-					if(idlelistener!=null)
+					if(idlelistener==null)
 						idlelistener	= new IdleListener();
 					getExecutorService().getNextIdleFuture().addResultListener(access.createResultListener(idlelistener));
 				}
 				else
 				{
+//					System.out.println("Clock not advanced");
 					setIdle();
 				}
 			}
 		}
 		// else do nothing for continuous clock as it executes itself.
+//		else
+//		{
+//			System.out.println("Not advancing clock");
+//		}
 	}
 	
 	//-------- helper classes --------
@@ -451,13 +476,14 @@ public class SimulationService extends BasicService implements ISimulationServic
 		 */
 		public void resultAvailable(Object result)
 		{
+//			System.out.println("Executor idle");
 			if(executing && !outdated)
 			{
-				if(MODE_NORMAL.equals(getMode()) || MODE_TIME_STEP.equals(getMode()))
+				if(MODE_NORMAL.equals(mode) || MODE_TIME_STEP.equals(mode))
 				{
 					advanceClock();
 				}
-				else if(MODE_ACTION_STEP.equals(getMode()))
+				else if(MODE_ACTION_STEP.equals(mode))
 				{
 					setIdle();
 				}

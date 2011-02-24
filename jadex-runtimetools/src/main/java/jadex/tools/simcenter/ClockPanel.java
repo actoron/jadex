@@ -1,14 +1,14 @@
 package jadex.tools.simcenter;
 
 import jadex.base.service.simulation.ISimulationService;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClock;
 import jadex.commons.service.clock.IClockService;
-import jadex.commons.service.threadpool.IThreadPoolService;
 
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -20,12 +20,10 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 
 import javax.swing.AbstractSpinnerModel;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
@@ -189,12 +187,12 @@ public class ClockPanel extends AbstractTimePanel
 		this.add(systemtime, new GridBagConstraints(++x,y,2,1,1,0,
 			GridBagConstraints.EAST,GridBagConstraints.HORIZONTAL,new Insets(4,2,2,4),0,0));
 		
-		JButton refresh = new JButton("Refresh");
-		JButton apply = new JButton("Apply");
-		
-		JPanel buts = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		buts.add(refresh);
-		buts.add(apply);
+//		JButton refresh = new JButton("Refresh");
+//		JButton apply = new JButton("Apply");
+//		
+//		JPanel buts = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+//		buts.add(refresh);
+//		buts.add(apply);
 		
 		//this.add(buts, new GridBagConstraints(x=0,++y,2,1,1,0,
 		//	GridBagConstraints.EAST,GridBagConstraints.NONE,new Insets(4,2,2,4),0,0));
@@ -215,7 +213,6 @@ public class ClockPanel extends AbstractTimePanel
 							if(!IClock.TYPE_SYSTEM.equals(lastclocktype))
 							{
 								sims.setClockType(IClock.TYPE_SYSTEM);
-//								updateView();
 								simp.updateView();
 							}
 						}
@@ -232,7 +229,6 @@ public class ClockPanel extends AbstractTimePanel
 							if(!IClock.TYPE_CONTINUOUS.equals(lastclocktype))
 							{
 								sims.setClockType(IClock.TYPE_CONTINUOUS);
-		//						updateView();
 								simp.updateView();
 							}
 						}
@@ -249,7 +245,6 @@ public class ClockPanel extends AbstractTimePanel
 							if(!IClock.TYPE_TIME_DRIVEN.equals(lastclocktype))
 							{
 								sims.setClockType(IClock.TYPE_TIME_DRIVEN);
-		//						updateView();
 								simp.updateView();
 							}
 						}
@@ -266,7 +261,6 @@ public class ClockPanel extends AbstractTimePanel
 							if(!IClock.TYPE_EVENT_DRIVEN.equals(lastclocktype))
 							{
 								sims.setClockType(IClock.TYPE_EVENT_DRIVEN);
-		//						updateView();
 								simp.updateView();
 							}
 						}
@@ -319,7 +313,6 @@ public class ClockPanel extends AbstractTimePanel
 						{
 							long tick = Long.parseLong(ticksize.getText());
 							cs.setDelta(tick);
-							//System.out.println("Setting tick size to: "+tick);
 						}
 						catch(NumberFormatException ex)
 						{
@@ -330,13 +323,13 @@ public class ClockPanel extends AbstractTimePanel
 			}
 		});
 		
-		refresh.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				updateView();
-			}
-		});
+//		refresh.addActionListener(new ActionListener()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				invokeUpdateView();
+//			}
+//		});
 
 		/*relative.addActionListener(new ActionListener()
 		{
@@ -358,8 +351,9 @@ public class ClockPanel extends AbstractTimePanel
 	/**
 	 *  Update the view.
 	 */
-	public synchronized void updateView()
+	public IFuture	updateView()
 	{
+		final Future	ret	= new Future();
 //		cnt++;
 //		if(System.currentTimeMillis()-time>1000)
 //		{
@@ -380,100 +374,103 @@ public class ClockPanel extends AbstractTimePanel
 					public void customResultAvailable(Object result)
 					{
 						ISimulationService sims = (ISimulationService)result;
-		
-						String	tsstring	= curticksize.getText();
-						String	tsstring_new	= ""+numberformat.format(cs.getDelta());
-						
-						if(!tsstring.equals(tsstring_new))
-							curticksize.setText(tsstring_new);
-				
-						String	ststring	= starttime.getText();
-						String	ststring_new	= ""+cs.getStarttime();
-						if(!ststring.equals(ststring_new))
-							starttime.setText(ststring_new);
-						
-						//name.setText(""+getContext().getClock());
-						/*if(relative.isSelected())
-							currenttime.setText(""+timeformat.format(getContext().getClock().getTime()));
-						else
-							currenttime.setText(""+dateformat.format(new Date(getContext().getClock().getTime())));
-						*/
-						currenttime.setText(simp.formatTime(cs.getTime()));
-						
-						tickcount.setText(""+cs.getTick());
-						systemtime.setText(simp.formatTime(System.currentTimeMillis()));
-							
-						if(cs.getClockType().equals(IClock.TYPE_CONTINUOUS))
-						{
-							String	dstring	= curdilation.getText();
-							String	dstring_new	= ""+cs.getDilation();
-							if(!dstring.equals(dstring_new))
-							{
-								curdilation.setText(dstring_new);
-							}
-						}
-						
-						// Clock change actions
-						if(lastclocktype==null || !lastclocktype.equals(cs.getClockType()))
-						{
-							lastclocktype	= cs.getClockType();
-							curticksize.setText(""+cs.getDelta());
-							ticksize.setText(""+cs.getDelta());
-							if(lastclocktype.equals(IClock.TYPE_SYSTEM))
-							{
-								emode.setSelectedItem("System");
-								dilation.setValue(new Double(0));
-								curdilation.setText("");
-							}
-							else if(lastclocktype.equals(IClock.TYPE_CONTINUOUS))
-							{
-								emode.setSelectedItem("Continuous");
-								dilation.setValue(new Double(cs.getDilation()));
-								curdilation.setText(""+cs.getDilation());
-							}
-							else if(lastclocktype.equals(IClock.TYPE_TIME_DRIVEN))
-							{
-								emode.setSelectedItem("Time Stepped");
-								dilation.setValue(new Double(0));
-								curdilation.setText("");
-							}
-							else if(lastclocktype.equals(IClock.TYPE_EVENT_DRIVEN))
-							{
-								emode.setSelectedItem("Event Driven");
-								dilation.setValue(new Double(0));
-								curdilation.setText("");
-							}
-						}
-						
-						if(lastclocktype.equals(IClock.TYPE_CONTINUOUS))// && !getContext().isRunning())
-						{
-							if(!dilation.isEnabled())
-							{
-								dilation.setEnabled(true);
-								((JSpinner.DefaultEditor)dilation.getEditor()).getTextField().setEditable(true);
-							}
-						}
-						else
-						{
-							if(dilation.isEnabled())
-							{
-								dilation.setEnabled(false);
-								((JSpinner.DefaultEditor)dilation.getEditor()).getTextField().setEditable(false);
-							}
-						}
-						
 						sims.isExecuting().addResultListener(new SwingDefaultResultListener()
 						{
 							public void customResultAvailable(Object result)
 							{
-								Boolean ret = (Boolean)result;
-								emode.setEnabled(ret.booleanValue());
+								Boolean exec = (Boolean)result;
+								emode.setEnabled(!exec.booleanValue());
+								
+								String	tsstring	= curticksize.getText();
+								String	tsstring_new	= ""+numberformat.format(cs.getDelta());
+								
+								if(!tsstring.equals(tsstring_new))
+									curticksize.setText(tsstring_new);
+						
+								String	ststring	= starttime.getText();
+								String	ststring_new	= ""+cs.getStarttime();
+								if(!ststring.equals(ststring_new))
+									starttime.setText(ststring_new);
+								
+								//name.setText(""+getContext().getClock());
+								/*if(relative.isSelected())
+									currenttime.setText(""+timeformat.format(getContext().getClock().getTime()));
+								else
+									currenttime.setText(""+dateformat.format(new Date(getContext().getClock().getTime())));
+								*/
+								currenttime.setText(simp.formatTime(cs.getTime()));
+								
+								tickcount.setText(""+cs.getTick());
+								systemtime.setText(simp.formatTime(System.currentTimeMillis()));
+									
+								if(cs.getClockType().equals(IClock.TYPE_CONTINUOUS))
+								{
+									String	dstring	= curdilation.getText();
+									String	dstring_new	= ""+cs.getDilation();
+									if(!dstring.equals(dstring_new))
+									{
+										curdilation.setText(dstring_new);
+									}
+								}
+								
+								// Clock change actions
+								if(lastclocktype==null || !lastclocktype.equals(cs.getClockType()))
+								{
+									lastclocktype	= cs.getClockType();
+									curticksize.setText(""+cs.getDelta());
+									ticksize.setText(""+cs.getDelta());
+									if(lastclocktype.equals(IClock.TYPE_SYSTEM))
+									{
+										emode.setSelectedItem("System");
+										dilation.setValue(new Double(0));
+										curdilation.setText("");
+									}
+									else if(lastclocktype.equals(IClock.TYPE_CONTINUOUS))
+									{
+										emode.setSelectedItem("Continuous");
+										dilation.setValue(new Double(cs.getDilation()));
+										curdilation.setText(""+cs.getDilation());
+									}
+									else if(lastclocktype.equals(IClock.TYPE_TIME_DRIVEN))
+									{
+										emode.setSelectedItem("Time Stepped");
+										dilation.setValue(new Double(0));
+										curdilation.setText("");
+									}
+									else if(lastclocktype.equals(IClock.TYPE_EVENT_DRIVEN))
+									{
+										emode.setSelectedItem("Event Driven");
+										dilation.setValue(new Double(0));
+										curdilation.setText("");
+									}
+								}
+								
+								if(lastclocktype.equals(IClock.TYPE_CONTINUOUS))// && !getContext().isRunning())
+								{
+									if(!dilation.isEnabled())
+									{
+										dilation.setEnabled(true);
+										((JSpinner.DefaultEditor)dilation.getEditor()).getTextField().setEditable(true);
+									}
+								}
+								else
+								{
+									if(dilation.isEnabled())
+									{
+										dilation.setEnabled(false);
+										((JSpinner.DefaultEditor)dilation.getEditor()).getTextField().setEditable(false);
+									}
+								}
+								
+								ret.setResult(null);
 							}
 						});
 					}
 				});
 			}
 		});
+		
+		return ret;
 	}
 }
 

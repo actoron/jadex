@@ -24,6 +24,8 @@ public class ComponentResultListener implements IResultListener
 	 */
 	public ComponentResultListener(IResultListener listener, IComponentAdapter adapter)
 	{
+		if(listener==null)
+			throw new NullPointerException("Listener must not null.");
 		this.listener = listener;
 		this.adapter = adapter;
 	}

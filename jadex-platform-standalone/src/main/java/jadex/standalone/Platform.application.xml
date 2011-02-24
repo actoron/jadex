@@ -74,10 +74,8 @@
 		</providedservice>
 		<providedservice class="IExecutionService" direct="true">
 			$args.simulation
-			? new SyncExecutionService($component.getServiceProvider(), SUtil.createHashMap(new Object[]{
-				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{new String[]{"isIdle", "getTasks"}}))
-			: new AsyncExecutionService($component.getServiceProvider(), SUtil.createHashMap(new Object[]{
-				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{new String[]{"isIdle", "getTasks"}}))
+			? new SyncExecutionService($component.getServiceProvider())
+			: new AsyncExecutionService($component.getServiceProvider())
 			//$args.simulation
 			//? new SyncExecutionService($component.getServiceProvider(), SUtil.createHashMap(new Object[]{"componentviewer.viewerclass", 
 			//	RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{"jadex.base.gui.componentviewer.executionservice.ExecutionServiceViewer", 

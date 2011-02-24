@@ -153,6 +153,11 @@ public class DisasterType
 		ret.put("fire", new Integer(DISASTER_TYPES[index].getFire()>0 ? (int)((0.75+random.nextDouble()/2)*DISASTER_TYPES[index].getFire()*size): 0));
 		ret.put("chemicals", new Integer(DISASTER_TYPES[index].getChemicals()>0 ? (int)((0.75+random.nextDouble()/2)*DISASTER_TYPES[index].getChemicals()*size): 0));
 		
+		// Check for disaster without content. 
+		assert !ret.get("victims").equals(new Integer(0))
+			|| !ret.get("fire").equals(new Integer(0))
+			|| !ret.get("chemicals").equals(new Integer(0)) : index;
+		
 		// Find position that fully fits on map.
 		double	mapsize	= size*0.005;	//0.005 = scale of drawsize in application.xml
 		if(mapsize>1)

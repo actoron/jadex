@@ -323,18 +323,17 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		
 		return ret;
 	}
-
 	
-	/**
-	 *  Test if the executor is currently idle.
-	 *  @return True, if idle.
-	 */
-	public synchronized boolean	isIdle()
-	{
-		//System.out.println(running+" "+queue);
-		//return running && queue.isEmpty();
-		return queue.isEmpty();
-	}
+//	/**
+//	 *  Test if the executor is currently idle.
+//	 *  @return True, if idle.
+//	 */
+//	public synchronized boolean	isIdle()
+//	{
+//		//System.out.println(running+" "+queue);
+//		//return running && queue.isEmpty();
+//		return queue.isEmpty();
+//	}
 	
 	/**
 	 *  Get the future indicating that executor is idle.

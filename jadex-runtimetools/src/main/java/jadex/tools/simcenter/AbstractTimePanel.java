@@ -4,14 +4,18 @@ import jadex.base.service.simulation.ISimulationService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 /**
  *	Base panel for displaying/editing clock related data.
@@ -33,8 +37,11 @@ public abstract class AbstractTimePanel extends JPanel
 	/** The active state (active = updates gui on clock changes). */
 	protected boolean active;
 
-	/** Flag indicating that update view was called but not yet executed. */
+	/** Flag indicating that an update is required. */
 	protected boolean	updatecalled;
+	
+	/** Flag indicating that an update is in progress. */
+	protected boolean	updating;
 	
 	//-------- constructors --------
 
@@ -44,57 +51,19 @@ public abstract class AbstractTimePanel extends JPanel
 	public AbstractTimePanel(IServiceProvider container)
 	{
 		this.container = container;
-//		this.simservice = context;
 		
 		// The clock listener updates the gui when the clock changes.
 		clocklistener = new IChangeListener()
 		{
 			public void changeOccurred(ChangeEvent e)
 			{
-//				if(!updatecalled && active)
-				{
-//					updatecalled	= true;
-					invokeUpdateView();
-//					SwingUtilities.invokeLater(new Runnable()
-//					{
-//						public void run()
-//						{
-//							updatecalled	= false;
-//							updateView();
-//						}
-//					});
-				}
+				invokeUpdateView();
 			}
 		};
 		
 		// The simservice listener is used for getting informed when the clock is exchanged 
 		// and when the its execution state changes.
-		contextlistener = new SimChangeListener();
-		
-//		contextlistener = new IChangeListener(IClockService clock)
-//		{
-//			protected IClockService oldclock;
-//			public IChangeListener(IClockService clock)
-//			{
-//				this.oldclock = clock;
-//			}
-//			
-////			IClockService oldclock	= getClockService();
-//			public void changeOccurred(ChangeEvent e)
-//			{
-//				IClockService newclock	= getClockService();
-//				if(oldclock!=newclock)
-//				{
-//					oldclock.removeChangeListener(clocklistener);
-//					newclock.addChangeListener(clocklistener);
-//					
-//					// Inform listener that clock has changed.
-//					clocklistener.changeOccurred(e);
-//				}
-//				
-//				invokeUpdateView();
-//			}
-//		};
+		contextlistener = new SimChangeListener();		
 	}
 	
 	/**
@@ -108,19 +77,19 @@ public abstract class AbstractTimePanel extends JPanel
 			this.active = active;
 			if(active)
 			{
-				SServiceProvider.getService(getServiceProvider(),
-					ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(AbstractTimePanel.this)
+				SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new SwingDefaultResultListener(AbstractTimePanel.this)
 				{
 					public void customResultAvailable(Object result)
 					{
 						((ISimulationService)result).addChangeListener(contextlistener);
-						SServiceProvider.getService(getServiceProvider(),
-							IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(AbstractTimePanel.this)
+						SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(new SwingDefaultResultListener(AbstractTimePanel.this)
 						{
 							public void customResultAvailable(Object result)
 							{
 								((IClockService)result).addChangeListener(clocklistener);
-								updateView();
+								invokeUpdateView();
 							}
 						});
 					}
@@ -128,14 +97,14 @@ public abstract class AbstractTimePanel extends JPanel
 			}
 			else
 			{
-				SServiceProvider.getService(getServiceProvider(),
-					ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(AbstractTimePanel.this)
+				SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new SwingDefaultResultListener(AbstractTimePanel.this)
 				{
 					public void customResultAvailable(Object result)
 					{
 						((ISimulationService)result).removeChangeListener(contextlistener);
-						SServiceProvider.getService(getServiceProvider(),
-								IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(AbstractTimePanel.this)
+						SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(new SwingDefaultResultListener(AbstractTimePanel.this)
 						{
 							public void customResultAvailable(Object result)
 							{
@@ -158,53 +127,66 @@ public abstract class AbstractTimePanel extends JPanel
 	}
 	
 	/**
-	 *  Get the simulation service.
-	 *  @return The simulation service.
-	 * /
-	protected ISimulationService getSimulationService()
-	{
-		return (ISimulationService)getPlatform().getService(ISimulationService.class);
-	}*/
-	
-	/**
-	 *  Get the simulation service.
-	 *  @return The simulation service.
-	 * /
-	protected IClockService getClockService()
-	{
-		return (IClockService)getPlatform().getService(IClockService.class);
-	}*/
-	
-	/**
-	 *  Update the view.
+	 *  Extract data and update the view.
 	 */
-	public abstract void updateView();
+	public abstract IFuture	updateView();
 
-	protected boolean	invoked;	
-	
 	/**
-	 * 
+	 * 	Called to cause a gui update.
 	 */
 	public void invokeUpdateView()
 	{
-		if(SwingUtilities.isEventDispatchThread())
+		boolean	update	= false;
+		synchronized(this)
 		{
-			updateView();
-		}
-		else
-		{
-			if(!invoked)
+			if(updating)
 			{
-				invoked	= true;
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						invoked	= false;
-						updateView();
-					}
-				});
+				updatecalled	= true;
 			}
+			else
+			{
+				update 	= true;
+				updatecalled	= false;
+				updating	= true;
+			}
+		}
+		
+		if(update)
+		{
+			Timer	timer	= new Timer(50, new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					updateView().addResultListener(new SwingDefaultResultListener(AbstractTimePanel.this)
+					{
+						public void customResultAvailable(Object result)
+						{
+							boolean	update	= false;
+							synchronized(AbstractTimePanel.this)
+							{
+								if(updatecalled)
+								{
+									update	= true;
+									updatecalled	= false;
+								}
+								updating	= false;
+							}
+							if(update)
+							{
+								invokeUpdateView();
+							}
+						}
+						
+						public void customExceptionOccurred(Exception exception)
+						{
+							customResultAvailable(null);
+							super.customExceptionOccurred(exception);
+						}
+					});
+				}
+			});
+			timer.setRepeats(false);
+			timer.start();
 		}
 	}
 	
@@ -214,8 +196,8 @@ public abstract class AbstractTimePanel extends JPanel
 		
 		public SimChangeListener()
 		{
-			SServiceProvider.getService(getServiceProvider(),
-					IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+			SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{

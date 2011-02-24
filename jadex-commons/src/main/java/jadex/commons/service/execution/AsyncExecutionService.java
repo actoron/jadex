@@ -171,7 +171,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 									}
 //									else if(AsyncExecutionService.this.running && idlecommands!=null)
 //									{
-//										System.out.println("not idle: "+executors);										
+//										System.out.println("not idle: "+executors+", "+idlefuture+", "+AsyncExecutionService.this.running);										
 //									}
 								}
 							}
@@ -399,13 +399,15 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 		return running && !shutdown;
 	}
 	
-	/**
-	 *  Test if the executor is currently idle.
-	 */
-	public synchronized boolean	isIdle()
-	{
-		return running && !executors.isEmpty();
-	}
+//	/**
+//	 *  Test if the executor is currently idle.
+//	 */
+//	public synchronized boolean	isIdle()
+//	{
+//		return running && !executors.isEmpty();
+//		// todo: should be isEmpty()?
+////		return running && executors.isEmpty();
+//	}
 	
 	/**
 	 *  Get the future indicating that executor is idle.

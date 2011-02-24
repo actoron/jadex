@@ -1,6 +1,5 @@
 package jadex.jade.service;
 
-import jadex.commons.ICommand;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -75,13 +74,13 @@ public class ExecutionService extends BasicService implements IExecutionService
 		throw new UnsupportedOperationException("Operation unavailable in JADE.");
 	}
 	
-	/**
-	 *  Test if the executor is currently idle.
-	 */
-	public boolean isIdle()
-	{
-		throw new UnsupportedOperationException("Operation unavailable in JADE.");
-	}
+//	/**
+//	 *  Test if the executor is currently idle.
+//	 */
+//	public boolean isIdle()
+//	{
+//		throw new UnsupportedOperationException("Operation unavailable in JADE.");
+//	}
 
 	/**
 	 *  Get the next idle future.

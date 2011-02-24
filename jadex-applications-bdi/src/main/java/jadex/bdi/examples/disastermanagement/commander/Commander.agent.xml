@@ -31,7 +31,8 @@
 			<fact>(ContinuousSpace2D)((IApplicationExternalAccess)$scope.getParent()).getSpace("my2dspace")</fact>
 		</belief>
 		
-		<beliefset name="disasters" class="ISpaceObject" updaterate="1000">
+		<!-- Required to have disasters in OAV state. -->
+ 		<beliefset name="disasters" class="ISpaceObject" updaterate="1000">
 			<facts>$beliefbase.environment.getSpaceObjectsByType("disaster")</facts>
 		</beliefset>
 		
@@ -39,14 +40,15 @@
 	</beliefs>
 
 	<goals>
-		<achievegoal name="handle_disaster" exclude="never">
+		<achievegoal name="handle_disaster">
 			<parameter name="disaster" class="ISpaceObject">
 				<value>$disaster</value>
 			</parameter>
 			<unique/>
 			<!-- Create one goal for each known disaster. -->
 			<creationcondition language="jcl">
-				ISpaceObject $disaster &amp;&amp; $disaster.getType().equals("disaster")
+				ISpaceObject $disaster &amp;&amp; $disaster.getType().equals("disaster") &amp;&amp;
+				($disaster.fire!=0 || $disaster.victims!=0 || $disaster.chemicals!=0)
 			</creationcondition>
 			<deliberation>
 				<inhibits ref="handle_disaster">
@@ -54,7 +56,7 @@
 				</inhibits>
 			</deliberation>
 			<targetcondition>
-				!Arrays.asList($beliefbase.disasters).contains($goal.disaster)
+				$goal.disaster.fire==0 &amp;&amp; $goal.disaster.victims==0 &amp;&amp; $goal.disaster.chemicals==0
 			</targetcondition>
 		</achievegoal>
 		
