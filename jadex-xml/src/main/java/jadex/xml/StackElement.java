@@ -23,6 +23,9 @@ public class StackElement
 	/** The collected content. */
 	protected String content;
 	
+	/** Collecting content. */
+	protected StringBuffer cbuf;
+	
 	// todo: remove rest somehow
 	
 	/** The raw attributes. */
@@ -99,7 +102,13 @@ public class StackElement
 	 */
 	public String getContent()
 	{
-		return this.content;
+		if(cbuf!=null)
+		{
+			assert content==null;
+			content	= cbuf.toString();
+			cbuf	= null;
+		}
+		return content;
 	}
 	
 	/**
@@ -135,10 +144,11 @@ public class StackElement
 	 */
 	public void	addContent(String content)
 	{
-		if(this.content==null)
-			this.content	= content;
-		else
-			this.content	+= content;
+		assert content!=null;
+		if(this.cbuf==null)
+			this.cbuf	= new StringBuffer();
+
+		this.cbuf.append(content);
 	}
 
 	/**
