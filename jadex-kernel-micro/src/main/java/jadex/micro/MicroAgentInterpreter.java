@@ -262,7 +262,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 			if(!steps.isEmpty())
 			{
 				Object[] step = removeStep();
-				String steptext = ""+step[0];
+//				String steptext = ""+step[0];
 				Future future = (Future)step[1];
 				
 				// Correct to execute them in try catch?!
@@ -308,7 +308,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 					}
 //				}
 				
-				addHistoryEntry(steptext);
+//				addHistoryEntry(steptext);
 			}
 	
 			return !steps.isEmpty();
@@ -1041,7 +1041,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 
 		public String toString()
 		{
-			return "microagent.messageArrived("+message+")_#"+this.hashCode();
+			return "microagent.messageArrived()_#"+this.hashCode();
 		}
 	}
 }

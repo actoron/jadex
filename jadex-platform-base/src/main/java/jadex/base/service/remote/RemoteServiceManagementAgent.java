@@ -116,7 +116,10 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					
 					if(content instanceof String)
 					{
-						String	orig	= (String)content;
+						String orig = (String)content;
+						
+						if(orig.length()>100000)
+							System.out.println("dicke berta");
 						
 						// Catch decode problems.
 						// Should be ignored or be a warning.
@@ -124,7 +127,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						{	
 //							content = JavaReader.objectFromXML((String)content, ls.getClassLoader());
 							List	errors	= new ArrayList();
-							content = Reader.objectFromByteArray(rms.getReader(), ((String)content).getBytes(), ls.getClassLoader(), errors);
+							content = Reader.objectFromXML(rms.getReader(), (String)content, ls.getClassLoader(), errors);
 							
 							// For corrupt result (e.g. if class not found) set exception to clean up waiting call.
 							if(!errors.isEmpty())

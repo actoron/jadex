@@ -2,6 +2,8 @@ package jadex.xml;
 
 import jadex.commons.SUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -24,7 +26,8 @@ public class StackElement
 	protected String content;
 	
 	/** Collecting content. */
-	protected StringBuffer cbuf;
+//	protected StringBuffer cbuf;
+	protected List parts;
 	
 	// todo: remove rest somehow
 	
@@ -102,11 +105,22 @@ public class StackElement
 	 */
 	public String getContent()
 	{
-		if(cbuf!=null)
+		if(parts!=null)
 		{
 			assert content==null;
-			content	= cbuf.toString();
-			cbuf	= null;
+			int len = 0;
+			for(int i=0; i<parts.size(); i++)
+			{
+				String tmp = (String)parts.get(i);
+				len += tmp.length();
+			}
+			StringBuilder builder = new StringBuilder(len);
+			for(int i=0; i<parts.size(); i++)
+			{
+				builder.append(parts.get(i));
+			}
+			content	= builder.toString();
+			parts = null;
 		}
 		return content;
 	}
@@ -145,10 +159,14 @@ public class StackElement
 	public void	addContent(String content)
 	{
 		assert content!=null;
-		if(this.cbuf==null)
-			this.cbuf	= new StringBuffer();
+		
+		if(content.length()>100000)
+			System.out.println("dicke berta 2");
+			
+		if(parts==null)
+			parts = new ArrayList();
 
-		this.cbuf.append(content);
+		parts.add(content);
 	}
 
 	/**

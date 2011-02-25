@@ -100,7 +100,7 @@ public class NIOTCPInputConnection
 			bytes[2]	= rb.get();
 			bytes[3]	= rb.get();
 			msg_len = SUtil.bytesToInt(bytes)-NIOTCPTransport.PROLOG_SIZE;
-//			System.out.println("len: "+msg_len);
+			System.out.println("len: "+msg_len);
 			msg = new byte[msg_len];
 			
 //			if(msg_end > wb.limit())
@@ -134,6 +134,9 @@ public class NIOTCPInputConnection
 			
 			if(msg_pos==msg_len)
 			{
+				if(msg_len>100000)
+					System.out.println("herere");
+				
 				IDecoder dec = codecfac.getDecoder(codec_id);
 				ret = (MessageEnvelope)dec.decode(msg, classloader);
 				

@@ -11,6 +11,7 @@ import jadex.xml.TypeInfo;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,10 +23,13 @@ import java.util.Set;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
+import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLReporter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
+import org.xml.sax.InputSource;
 
 /**
  *  Stax XML reader.
@@ -110,6 +114,22 @@ public class Reader
 	 *  @param classloader The classloader.
 	 * 	@param context The context.
  	 */
+	public Object read(java.io.Reader input, final ClassLoader classloader, final Object callcontext) throws Exception
+	{
+		XMLStreamReader	parser;
+		synchronized(factory)
+		{
+			parser	= factory.createXMLStreamReader(input);
+		}
+		return read(parser, classloader, callcontext);
+	}
+	
+	/**
+	 *  Read properties from xml.
+	 *  @param input The input stream.
+	 *  @param classloader The classloader.
+	 * 	@param context The context.
+ 	 */
 	public Object read(InputStream input, final ClassLoader classloader, final Object callcontext) throws Exception
 	{
 		XMLStreamReader	parser;
@@ -117,6 +137,17 @@ public class Reader
 		{
 			parser	= factory.createXMLStreamReader(input);
 		}
+		return read(parser, classloader, callcontext);
+	}
+
+	/**
+	 *  Read properties from xml.
+	 *  @param input The input stream.
+	 *  @param classloader The classloader.
+	 * 	@param context The context.
+ 	 */
+	public Object read(XMLStreamReader parser, final ClassLoader classloader, final Object callcontext) throws Exception
+	{
 		XMLReporter	reporter	= factory.getXMLReporter();
 		if(reporter==null)
 		{
@@ -190,7 +221,7 @@ public class Reader
 
 		return readcontext.rootobject;
 	}
-
+	
 	/**
 	 *  Handle the comment.
 	 *  @param readcontext The context for reading with all necessary information.
@@ -647,7 +678,7 @@ public class Reader
 	 */
 	public static Object objectFromXML(Reader reader, String val, ClassLoader classloader)
 	{
-		return objectFromByteArray(reader, val.getBytes(), classloader);
+		return objectFromXML(reader, val, classloader, null);
 	}
 	
 	/**
@@ -656,7 +687,33 @@ public class Reader
 	 */
 	public static Object objectFromXML(Reader reader, String val, ClassLoader classloader, Object context)
 	{
-		return objectFromByteArray(reader, val.getBytes(), classloader, context);
+//		return objectFromByteArray(reader, val.getBytes(), classloader, context);
+		java.io.Reader rd = null;
+		try
+		{
+			rd = new StringReader(val);
+			Object ret = reader.read(rd, classloader, context);
+			return ret;
+		}
+		catch(Throwable t)
+		{
+			t.printStackTrace();
+			System.out.println("problem: "+new String(val));
+			throw new RuntimeException(t);
+		}
+		finally
+		{
+			if(rd!=null)
+			{
+				try
+				{
+					rd.close();
+				}
+				catch(Exception e)
+				{
+				}
+			}
+		}
 	}
 		
 	/**
@@ -674,11 +731,11 @@ public class Reader
 	 */
 	public static Object objectFromByteArray(Reader reader, byte[] val, ClassLoader classloader, Object context)
 	{
+		InputStream bis = null;
 		try
 		{
-			ByteArrayInputStream bis = new ByteArrayInputStream(val);
+			bis = new ByteArrayInputStream(val);
 			Object ret = reader.read(bis, classloader, context);
-			bis.close();
 			return ret;
 		}
 		catch(Throwable t)
@@ -686,6 +743,19 @@ public class Reader
 			t.printStackTrace();
 			System.out.println("problem: "+new String(val));
 			throw new RuntimeException(t);
+		}
+		finally
+		{
+			if(bis!=null)
+			{
+				try
+				{
+					bis.close();
+				}
+				catch(Exception e)
+				{
+				}
+			}
 		}
 	}
 	

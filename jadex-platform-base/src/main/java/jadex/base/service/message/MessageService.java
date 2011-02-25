@@ -663,7 +663,7 @@ public class MessageService extends BasicService implements IMessageService
 							{
 								String name = (String)it.next();
 								Object value = message.get(name);
-								
+																	
 								IContentCodec codec = messagetype.findContentCodec(compcodecs, message, name);
 								if(codec==null)
 									codec = messagetype.findContentCodec(DEFCODECS, message, name);
