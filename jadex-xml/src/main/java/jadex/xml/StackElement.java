@@ -160,9 +160,6 @@ public class StackElement
 	{
 		assert content!=null;
 		
-		if(content.length()>100000)
-			System.out.println("dicke berta 2");
-			
 		if(parts==null)
 			parts = new ArrayList();
 

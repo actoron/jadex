@@ -118,9 +118,6 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					{
 						String orig = (String)content;
 						
-						if(orig.length()>100000)
-							System.out.println("dicke berta");
-						
 						// Catch decode problems.
 						// Should be ignored or be a warning.
 						try
