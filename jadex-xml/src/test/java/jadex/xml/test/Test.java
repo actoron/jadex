@@ -62,7 +62,7 @@ public class Test extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
-//				t.testBigData();
+				t.testBigData();
 				t.testMultiCollection();
 				t.testEmptySet();
 				t.testEmptyList();

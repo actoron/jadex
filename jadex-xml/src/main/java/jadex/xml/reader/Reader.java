@@ -85,6 +85,15 @@ public class Reader
 	 */
 	public Reader(IObjectReaderHandler handler, boolean bulklink, boolean validate, XMLReporter reporter)
 	{
+		this(handler, bulklink, validate, true, reporter);
+	}
+	
+	/**
+	 *  Create a new reader.
+	 *  @param handler The handler.
+	 */
+	public Reader(IObjectReaderHandler handler, boolean bulklink, boolean validate, boolean coalescing, XMLReporter reporter)
+	{
 		this.handler = handler;
 		this.bulklink = bulklink;
 		factory	= XMLInputFactory.newInstance();
@@ -97,6 +106,17 @@ public class Reader
 		{
 			// Validation not supported.
 			System.err.println("Error setting validation to "+validate);
+			e.printStackTrace();
+		}
+		
+		try
+		{
+			factory.setProperty(XMLInputFactory.IS_COALESCING, coalescing ? Boolean.TRUE : Boolean.FALSE);
+		}
+		catch(Exception e)
+		{
+			// Validation not supported.
+			System.err.println("Error setting coalescing to "+coalescing);
 			e.printStackTrace();
 		}
 		

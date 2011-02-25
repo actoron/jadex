@@ -108,18 +108,26 @@ public class StackElement
 		if(parts!=null)
 		{
 			assert content==null;
-			int len = 0;
-			for(int i=0; i<parts.size(); i++)
+			
+			if(parts.size()==1)
 			{
-				String tmp = (String)parts.get(i);
-				len += tmp.length();
+				content = (String)parts.get(0);
 			}
-			StringBuilder builder = new StringBuilder(len);
-			for(int i=0; i<parts.size(); i++)
+			else
 			{
-				builder.append(parts.get(i));
+				int len = 0;
+				for(int i=0; i<parts.size(); i++)
+				{
+					String tmp = (String)parts.get(i);
+					len += tmp.length();
+				}
+				StringBuilder builder = new StringBuilder(len);
+				for(int i=0; i<parts.size(); i++)
+				{
+					builder.append(parts.get(i));
+				}
+				content	= builder.toString();
 			}
-			content	= builder.toString();
 			parts = null;
 		}
 		return content;
