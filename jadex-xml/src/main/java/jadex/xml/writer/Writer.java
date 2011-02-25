@@ -9,6 +9,7 @@ import jadex.xml.TypeInfo;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -141,8 +142,8 @@ public class Writer
 		
 //		if(tagname!=null)
 //			System.out.println("tagname: "+tagname);
-		if(object.getClass().getName().indexOf("IRemoteMessageListener")!=-1)
-			System.out.println("cfs");
+//		if(object.getClass().getName().indexOf("IRemoteMessageListener")!=-1)
+//			System.out.println("cfs");
 		
 		TypeInfo typeinfo = handler.getTypeInfo(object, getXMLPath(stack), wc); 
 		QName[] path = new QName[0];
@@ -489,7 +490,7 @@ public class Writer
 	 */
 	public static String objectToXML(Writer writer, Object val, ClassLoader classloader)
 	{
-		return new String(objectToByteArray(writer, val, classloader));
+		return new String(objectToByteArray(writer, val, classloader), Charset.forName("UTF-8"));
 	}
 	
 	/**
@@ -497,7 +498,7 @@ public class Writer
 	 */
 	public static String objectToXML(Writer writer, Object val, ClassLoader classloader, Object context)
 	{
-		return new String(objectToByteArray(writer, val, classloader, context));
+		return new String(objectToByteArray(writer, val, classloader, context), Charset.forName("UTF-8"));
 	}
 	
 	/**
