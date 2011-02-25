@@ -1,5 +1,6 @@
 package jadex.base.service.simulation;
 
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
@@ -189,7 +190,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 			setMode(MODE_NORMAL);
 			getClockService().start();
 			setExecuting(true);
-			advanceClock();
+			scheduleAdvanceClock();
 			ret	= IFuture.DONE;
 		}
 		return ret;
@@ -221,7 +222,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 			assert stepfuture==null;
 			stepfuture	= new Future();
 			ret	= stepfuture;
-			advanceClock();
+			scheduleAdvanceClock();
 		}
 		return ret;
 	}
@@ -257,7 +258,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 				assert stepfuture==null;
 				stepfuture	= new Future();
 				ret	= stepfuture;
-				advanceClock();
+				scheduleAdvanceClock();
 			}
 			else
 			{
@@ -412,6 +413,17 @@ public class SimulationService extends BasicService implements ISimulationServic
 	}
 
 	/**
+	 *  Start clock execution.
+	 */
+	protected void scheduleAdvanceClock()
+	{
+		if(idlelistener!=null)
+			idlelistener.outdated	= true;
+		idlelistener	= new IdleListener();
+		getExecutorService().getNextIdleFuture().addResultListener(access.createResultListener(idlelistener));
+	}
+	
+	/**
 	 *  Trigger clock execution.
 	 */
 	protected void advanceClock()
@@ -437,7 +449,40 @@ public class SimulationService extends BasicService implements ISimulationServic
 				else
 				{
 //					System.out.println("Clock not advanced");
-					setIdle();
+
+					// Simulation stopped due to no more entries
+					// -> listen on clock until new entries available.
+					if(MODE_NORMAL.equals(mode))
+					{
+						getClockService().addChangeListener(new IChangeListener()
+						{
+							public void changeOccurred(ChangeEvent event)
+							{
+								if(IClock.EVENT_TYPE_TIMER_ADDED.equals(event.getType()))
+								{
+									getClockService().removeChangeListener(this);
+									access.getExternalAccess().scheduleStep(new IComponentStep()
+									{
+										public Object execute(IInternalAccess ia)
+										{
+											// Resume execution if still executing.
+											if(MODE_NORMAL.equals(mode) && executing)
+											{
+												scheduleAdvanceClock();
+											}
+											return null;
+										}
+									});
+								}
+							}
+						});
+					}
+					
+					// Step finished.
+					else
+					{
+						setIdle();
+					}
 				}
 			}
 		}
@@ -461,6 +506,10 @@ public class SimulationService extends BasicService implements ISimulationServic
 		 *  Required, because future does not support remove listener. */
 		protected boolean	outdated;
 		
+		/** Flag indicating an a continued execution.
+		 *  If in action step mode, clock must not be advanced. */
+		protected boolean	continued;
+		
 		//-------- IResultListener interface --------
 		
 		/**
@@ -479,8 +528,9 @@ public class SimulationService extends BasicService implements ISimulationServic
 //			System.out.println("Executor idle");
 			if(executing && !outdated)
 			{
-				if(MODE_NORMAL.equals(mode) || MODE_TIME_STEP.equals(mode))
+				if(MODE_NORMAL.equals(mode) || MODE_TIME_STEP.equals(mode) || !continued)
 				{
+					continued	= true;
 					advanceClock();
 				}
 				else if(MODE_ACTION_STEP.equals(mode))

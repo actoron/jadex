@@ -242,6 +242,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 						Future ifc = null;
 						synchronized(SyncExecutionService.this)
 						{
+//							System.out.println("task finished: "+running+", "+queue.isEmpty());
 							if(running && queue.isEmpty())
 							{
 								ifc = idlefuture;
