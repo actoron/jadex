@@ -213,12 +213,14 @@ public class ConversationPlugin extends AbstractJCCPlugin
 
 		final IMessageListener listener = new IMessageListener()
 		{
-			public void messageReceived(IMessageAdapter msg)
+			public IFuture messageReceived(IMessageAdapter msg)
 			{
 				convcenter.addMessage(msg);
+				return new Future(null);
 			}
-			public void messageSent(IMessageAdapter msg)
+			public IFuture messageSent(IMessageAdapter msg)
 			{
+				return new Future(null);
 			}
 		};
 		

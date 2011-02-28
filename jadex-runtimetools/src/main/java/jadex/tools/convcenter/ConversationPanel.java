@@ -625,7 +625,7 @@ public class ConversationPanel extends JSplitPane
 						final Map	sendmsg	= new HashMap(msg);
 						// Remove message type for sending.
 						final MessageType	mt	= (MessageType)sendmsg.remove(MESSAGE_TYPE);
-						ms.sendMessage(sendmsg, mt, agent.getComponentIdentifier(), ia.getModel().getClassLoader())
+						ms.sendMessage(sendmsg, mt, agent.getComponentIdentifier(), ia.getModel().getClassLoader(), null)
 							.addResultListener(new SwingDefaultResultListener(ConversationPanel.this)
 						{
 							public void customResultAvailable(Object result)

@@ -215,13 +215,15 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		this.msgservices	= new HashMap();
 		this.listener	= new IRemoteMessageListener()
 		{
-			public void messageReceived(IMessageAdapter msg)
+			public IFuture messageReceived(IMessageAdapter msg)
 			{
 				addMessage(msg);
+				return new Future(null);
 			}
-			public void messageSent(IMessageAdapter msg)
+			public IFuture messageSent(IMessageAdapter msg)
 			{
 				addMessage(msg);
+				return new Future(null);
 			}
 		};
 	}

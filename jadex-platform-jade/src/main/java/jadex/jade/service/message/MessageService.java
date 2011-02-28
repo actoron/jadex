@@ -50,6 +50,7 @@ import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.annotation.Excluded;
 import jadex.commons.service.clock.IClockService;
 import jadex.jade.ComponentAdapterFactory;
 import jadex.jade.ComponentAgent;
@@ -138,7 +139,7 @@ public class MessageService  extends BasicService implements IMessageService
 	 *  Send a message.
 	 *  @param message The native message.
 	 */
-	public IFuture sendMessage(Map message, MessageType type, IComponentIdentifier sender, ClassLoader cl)
+	public IFuture sendMessage(Map message, MessageType type, IComponentIdentifier sender, ClassLoader cl, byte[] codecids)
 //	public void sendMessage(Map message, MessageType type, IComponentAdapter adapter, ClassLoader cl)
 	{
 		final Future ret = new Future();
@@ -490,20 +491,63 @@ public class MessageService  extends BasicService implements IMessageService
 	 *  @param listener The change listener.
 	 *  @param filter An optional filter to only receive notifications for matching messages. 
 	 */
-	public synchronized void addMessageListener(IMessageListener listener, IFilter filter)
+	public synchronized IFuture addMessageListener(IMessageListener listener, IFilter filter)
 	{
 		if(listeners==null)
 			listeners = new LinkedHashMap();
 		listeners.put(listener, filter);
+		return new Future(null);
 	}
 	
 	/**
 	 *  Remove a message listener.
 	 *  @param listener The change listener.
 	 */
-	public synchronized void removeMessageListener(IMessageListener listener)
+	public synchronized IFuture removeMessageListener(IMessageListener listener)
 	{
 		listeners.remove(listener);
+		return new Future(null);
+	}
+	
+	/**
+	 *  Add message codec type.
+	 *  @param codec The codec type.
+	 */
+	public IFuture addMessageCodec(Class codec)
+	{
+//		codecfactory.addCodec(codec);
+		return new Future(new UnsupportedOperationException());
+	}
+	
+	/**
+	 *  Remove message codec type.
+	 *  @param codec The codec type.
+	 */
+	public IFuture removeMessageCodec(Class codec)
+	{
+//		codecfactory.removeCodec(codec);
+		return new Future(new UnsupportedOperationException());
+	}
+	
+//	/**
+//	 *  Get a codec.
+//	 *  @param codecid The codec id.
+//	 *  @return The codec.
+//	 */
+//	public IFuture getCodecFactory(byte id)
+//	{
+//		return new Future(codecfactory.getCodec(id));
+//	}
+	
+	/**
+	 *  Get the codec factory
+	 *  @return The codec factory.
+	 */
+	@Excluded
+	public Object getCodecFactory()
+	{
+		throw new UnsupportedOperationException();
+//		return null;//codecfactory;
 	}
 	
 	/**

@@ -11,13 +11,15 @@ import java.lang.reflect.Method;
  *  The Nuggets XML codec. Codec supports parallel
  *  calls of multiple concurrent clients (no method
  *  synchronization necessary).
+ *  
+ *  Converts object -> byte[] and byte[] -> object.
  */
-public class NuggetsCodec implements IEncoder, IDecoder
+public class NuggetsCodec implements ICodec
 {
 	//-------- constants --------
 	
 	/** The nuggets codec id. */
-	public static final byte CODEC_ID = 1;
+	public static final byte CODEC_ID = 2;
 
 	/** ObjectToXML method. */
 	protected static Method otx;
@@ -49,7 +51,8 @@ public class NuggetsCodec implements IEncoder, IDecoder
 	 *  @param obj The object.
 	 *  @throws IOException
 	 */
-	public byte[] encode(Object val, ClassLoader classloader)
+//	public byte[] encode(Object val, ClassLoader classloader)
+	public Object encode(Object val, ClassLoader classloader)
 	{
 		if(otx==null)
 			init(classloader);
@@ -69,14 +72,15 @@ public class NuggetsCodec implements IEncoder, IDecoder
 	 *  @return The decoded object.
 	 *  @throws IOException
 	 */
-	public Object decode(byte[] bytes, ClassLoader classloader)
+//	public Object decode(byte[] bytes, ClassLoader classloader)
+	public Object decode(Object bytes, ClassLoader classloader)
 	{
 		if(otx==null)
 			init(classloader);
 		
 		try
 		{
-			return ofx.invoke(null, new Object[]{new String(bytes), classloader});
+			return ofx.invoke(null, new Object[]{new String((byte[])bytes), classloader});
 		}
 		catch(Exception e)
 		{

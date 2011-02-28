@@ -11,13 +11,15 @@ import java.io.IOException;
  *  The XML codec.
  *  Codec supports parallel calls of multiple concurrent 
  *  clients (no method synchronization necessary).
+ *  
+ *  Converts object -> byte[] and byte[] -> object.
  */
-public class XMLCodec implements IEncoder, IDecoder
+public class XMLCodec implements ICodec
 {
 	//-------- constants --------
 	
 	/** The xml codec id. */
-	public static final byte CODEC_ID = 2;
+	public static final byte CODEC_ID = 3;
 
 	//-------- methods --------
 	
@@ -26,7 +28,8 @@ public class XMLCodec implements IEncoder, IDecoder
 	 *  @param obj The object.
 	 *  @throws IOException
 	 */
-	public byte[] encode(Object val, ClassLoader classloader)
+//	public byte[] encode(Object val, ClassLoader classloader)
+	public Object encode(Object val, ClassLoader classloader)
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	    XMLEncoder enc = new XMLEncoder(baos);
@@ -49,9 +52,10 @@ public class XMLCodec implements IEncoder, IDecoder
 	 *  @return The decoded object.
 	 *  @throws IOException
 	 */
-	public Object decode(byte[] bytes, ClassLoader classloader)
+//	public Object decode(byte[] bytes, ClassLoader classloader)
+	public Object decode(Object bytes, ClassLoader classloader)
 	{
-		final ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+		final ByteArrayInputStream bais = new ByteArrayInputStream((byte[])bytes);
 		
 		XMLDecoder dec = new XMLDecoder(bais, null, new ExceptionListener()
 		{

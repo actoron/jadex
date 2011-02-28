@@ -11,13 +11,15 @@ import java.io.ObjectOutputStream;
  *  objects via the Java serialization mechanism. 
  *  Codec supports parallel calls of multiple concurrent 
  *  clients (no method synchronization necessary).
+ *  
+ *  Converts object -> byte[] and byte[] -> object.
  */
-public class SerialCodec implements IEncoder, IDecoder
+public class SerialCodec implements ICodec
 {
 	//-------- constants --------
 	
 	/** The serial codec id. */
-	public static final byte CODEC_ID = 0;
+	public static final byte CODEC_ID = 1;
 
 	//-------- methods --------
 
@@ -26,7 +28,8 @@ public class SerialCodec implements IEncoder, IDecoder
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-	public byte[] encode(Object object, ClassLoader classloader)
+//	public byte[] encode(Object object, ClassLoader classloader)
+	public Object encode(Object object, ClassLoader classloader)
 	{
 		byte[] ret = null;
 		try
@@ -52,12 +55,13 @@ public class SerialCodec implements IEncoder, IDecoder
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public Object decode(byte[] bytes, ClassLoader classloader)
+//	public Object decode(byte[] bytes, ClassLoader classloader)
+	public Object decode(Object bytes, ClassLoader classloader)
 	{
 		Object ret = null;
 		try
 		{
-			ByteArrayInputStream baos = new ByteArrayInputStream(bytes);
+			ByteArrayInputStream baos = new ByteArrayInputStream((byte[])bytes);
 			ObjectInputStream ois = new ObjectInputStream(baos, classloader);
 			ret = ois.readObject();
 			baos.close();

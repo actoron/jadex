@@ -1,10 +1,10 @@
 package jadex.base.service.message.transport.niotcpmtp;
 
-import jadex.commons.SUtil;
 import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.CodecFactory;
-import jadex.base.service.message.transport.codecs.IEncoder;
+import jadex.base.service.message.transport.codecs.ICodec;
 import jadex.base.service.message.transport.niotcpmtp.NIOTCPTransport.Cleaner;
+import jadex.commons.SUtil;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -96,7 +96,7 @@ class NIOTCPOutputConnection
 	 *  on extra sender thread of transport, only needed
 	 *  if message service is used in synchronous mode.)
 	 */
-	public synchronized void send(MessageEnvelope msg) throws IOException
+	public synchronized void send(MessageEnvelope msg, byte[] codecids) throws IOException
 	{
 		// Code using preallocated buffer
 //		IEncoder enc = codecfac.getDefaultEncoder();
@@ -112,13 +112,25 @@ class NIOTCPOutputConnection
 //		cleaner.refresh();
 		
 		// Code using new buffers
-		IEncoder	enc	= codecfac.getDefaultEncoder();
-		byte	codec_id	= codecfac.getCodecId(enc.getClass());
-		byte[]	enc_msg	= enc.encode(msg, classloader);
-		byte[]	buffer	= new byte[enc_msg.length+NIOTCPTransport.PROLOG_SIZE];
-		System.arraycopy(enc_msg, 0, buffer, NIOTCPTransport.PROLOG_SIZE, enc_msg.length);
-		System.arraycopy(SUtil.intToBytes(buffer.length), 0, buffer, 1, 4);
-		buffer[0]	= codec_id;
+		if(codecids==null || codecids.length==0)
+			codecids = codecfac.getDefaultCodecIds();
+
+		Object enc_msg = msg;
+		for(int i=0; i<codecids.length; i++)
+		{
+			ICodec codec = codecfac.getCodec(codecids[i]);
+			enc_msg	= codec.encode(enc_msg, classloader);
+		}
+		byte[] res = (byte[])enc_msg;
+		
+		int dynlen = NIOTCPTransport.PROLOG_SIZE+codecids.length+1;
+		byte[] buffer = new byte[res.length+dynlen];
+		System.arraycopy(res, 0, buffer, dynlen, res.length);
+		System.arraycopy(SUtil.intToBytes(buffer.length), 0, buffer, codecids.length+1, 4);
+		
+		buffer[0] = (byte)codecids.length;
+		System.arraycopy(codecids, 0, buffer, 1, codecids.length);
+		
 		sc.write(ByteBuffer.wrap(buffer));
 		cleaner.refresh();
 	}

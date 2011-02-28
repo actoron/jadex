@@ -1,5 +1,8 @@
 package jadex.base.service.message.transport.niotcpmtp;
 
+import jadex.base.service.message.transport.ITransport;
+import jadex.base.service.message.transport.MessageEnvelope;
+import jadex.base.service.message.transport.codecs.CodecFactory;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageService;
@@ -9,6 +12,9 @@ import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
@@ -17,9 +23,6 @@ import jadex.commons.service.clock.ITimedObject;
 import jadex.commons.service.clock.ITimer;
 import jadex.commons.service.library.ILibraryService;
 import jadex.commons.service.threadpool.IThreadPoolService;
-import jadex.base.service.message.transport.ITransport;
-import jadex.base.service.message.transport.MessageEnvelope;
-import jadex.base.service.message.transport.codecs.CodecFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -59,7 +62,7 @@ public class NIOTCPTransport implements ITransport
 	protected static final int	MAX_KEEPALIVE	= 300000;
 
 	/** The prolog size. */
-	protected static final int PROLOG_SIZE = 5;
+	protected static final int PROLOG_SIZE = 4;
 	
 	/** Maximum number of outgoing connections */
 	protected static final int MAX_CONNECTIONS	= 20;
@@ -87,14 +90,14 @@ public class NIOTCPTransport implements ITransport
 	/** The opened connections for addresses. (aid address -> connection). */
 	protected Map connections;
 	
-	/** The codec factory. */
-	protected CodecFactory codecfac;
-	
 	/** The logger. */
 	protected Logger logger;
 	
 	/** The library service. */
 	protected ILibraryService libservice;
+	
+	/** The codec factory. */
+	protected CodecFactory codecfac;
 
 	//-------- constructors --------
 	
@@ -106,7 +109,6 @@ public class NIOTCPTransport implements ITransport
 	public NIOTCPTransport(final IServiceProvider container, int port)
 	{
 		this.logger = Logger.getLogger("NIOTCPTransport" + this);
-		this.codecfac = new CodecFactory();
 		this.container = container;
 		this.port = port;
 		
@@ -128,8 +130,9 @@ public class NIOTCPTransport implements ITransport
 	/**
 	 *  Start the transport.
 	 */
-	public void start()
+	public IFuture start()
 	{
+		final Future ret = new Future();
 		try
 		{
 			// Set up receiver side.
@@ -166,73 +169,79 @@ public class NIOTCPTransport implements ITransport
 			
 			// Start receiver thread.
 			
-			SServiceProvider.getService(container, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+			SServiceProvider.getService(container, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new DelegationResultListener(ret)
 			{
-				public void resultAvailable(Object result)
+				public void customResultAvailable(Object result)
 				{
-					libservice = (ILibraryService)result;
-					SServiceProvider.getService(container, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+					final IMessageService ms = (IMessageService)result;
+					codecfac = (CodecFactory)ms.getCodecFactory();
+					SServiceProvider.getService(container, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(new DelegationResultListener(ret)
 					{
-						public void resultAvailable(Object result)
+						public void customResultAvailable(Object result)
 						{
-							IThreadPoolService tp = (IThreadPoolService)result;
-							tp.execute(new Runnable()
+							libservice = (ILibraryService)result;
+							
+							SServiceProvider.getService(container, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+								.addResultListener(new DelegationResultListener(ret)
 							{
-								public void run()
+								public void customResultAvailable(Object result)
 								{
-									while(ssc.isOpen())
+									ret.setResult(null);
+									IThreadPoolService tp = (IThreadPoolService)result;
+									tp.execute(new Runnable()
 									{
-										// This is a blocking call that only returns when traffic occurs.
-										Iterator it = null;
-										try
+										public void run()
 										{
-											selector.select();
-											it = selector.selectedKeys().iterator();
-										}
-										catch(IOException e)
-										{
-//											logger.warning("NIOTCP selector error.");
-											//e.printStackTrace();
-										}
-										
-										while(it!=null && it.hasNext())
-										{
-								            // Get the selection key
-								            final SelectionKey key = (SelectionKey)it.next();
-								    
-								            // Remove it from the list to indicate that it is being processed
-								            it.remove();
-								            
-											if(key.isValid() && key.isAcceptable())
+											while(ssc.isOpen())
 											{
+												// This is a blocking call that only returns when traffic occurs.
+												Iterator it = null;
 												try
 												{
-													// Returns only null if no connection request is available.
-													SocketChannel sc = ssc.accept();
-													if(sc!=null) 
-													{
-														sc.configureBlocking(false);
-//														ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
-														sc.register(selector, SelectionKey.OP_READ, new NIOTCPInputConnection(sc, codecfac, libservice.getClassLoader()));
-													}
+													selector.select();
+													it = selector.selectedKeys().iterator();
 												}
 												catch(IOException e)
 												{
-//													logger.warning("NIOTCP connection error on receiver side.");
+		//											logger.warning("NIOTCP selector error.");
 													//e.printStackTrace();
-													key.cancel();
 												}
-											}
-											else if(key.isValid() && key.isReadable())
-											{
-												final NIOTCPInputConnection con = (NIOTCPInputConnection)key.attachment();
-												SServiceProvider.getService(container, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+												
+												while(it!=null && it.hasNext())
 												{
-													public void resultAvailable(Object result)
+										            // Get the selection key
+										            final SelectionKey key = (SelectionKey)it.next();
+										    
+										            // Remove it from the list to indicate that it is being processed
+										            it.remove();
+										            
+													if(key.isValid() && key.isAcceptable())
 													{
 														try
 														{
-															IMessageService ms = (IMessageService)result;
+															// Returns only null if no connection request is available.
+															SocketChannel sc = ssc.accept();
+															if(sc!=null) 
+															{
+																sc.configureBlocking(false);
+		//														ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
+																sc.register(selector, SelectionKey.OP_READ, new NIOTCPInputConnection(sc, codecfac, libservice.getClassLoader()));
+															}
+														}
+														catch(IOException e)
+														{
+		//													logger.warning("NIOTCP connection error on receiver side.");
+															//e.printStackTrace();
+															key.cancel();
+														}
+													}
+													else if(key.isValid() && key.isReadable())
+													{
+														final NIOTCPInputConnection con = (NIOTCPInputConnection)key.attachment();
+														try
+														{
 															for(MessageEnvelope msg=con.read(); msg!=null; msg=con.read())
 															{
 																ms.deliverMessage(msg.getMessage(), msg.getTypeName(), msg.getReceivers());
@@ -246,37 +255,41 @@ public class NIOTCPTransport implements ITransport
 															key.cancel();
 														}
 													}
-												});
+													else
+													{
+														key.cancel();
+													}
+												}
 											}
-											else
-											{
-												key.cancel();
-											}
+		//									logger.info("TCPNIO receiver closed.");
 										}
-									}
-//									logger.info("TCPNIO receiver closed.");
+									});
 								}
 							});
 						}
-					});
+					});		
 				}
-			});		
+			});
 			//platform.getLogger().info("Local address: "+getServiceSchema()+lhostname+":"+listen_port);
 		}
 		catch(Exception e)
 		{
+			ret.setException(new RuntimeException("Transport initialization error: "+e.getMessage()));
 			//e.printStackTrace();
-			throw new RuntimeException("Transport initialization error: "+e.getMessage());
+//			throw new RuntimeException("Transport initialization error: "+e.getMessage());
 		}
+		
+		return ret;
 	}
 
 	/**
 	 *  Perform cleanup operations (if any).
 	 */
-	public void shutdown()
+	public IFuture shutdown()
 	{
 		try{this.ssc.close();}catch(Exception e){}
 		connections = null; // Help gc
+		return new Future(null);
 	}
 	
 	//-------- methods --------
@@ -286,7 +299,7 @@ public class NIOTCPTransport implements ITransport
 	 *  @param message The message to send.
 	 */
 //	public ComponentIdentifier[] sendMessage(IMessageEnvelope message)
-	public IComponentIdentifier[] sendMessage(Map message, String msgtype, IComponentIdentifier[] receivers)
+	public IComponentIdentifier[] sendMessage(Map message, String msgtype, IComponentIdentifier[] receivers, final byte[] codecids)
 	{
 		// Fetch all receivers 
 		IComponentIdentifier[] recstodel = receivers;
@@ -342,7 +355,7 @@ public class NIOTCPTransport implements ITransport
 					{
 						try
 						{
-							con.send(new MessageEnvelope(message, aidset, msgtype));
+							con.send(new MessageEnvelope(message, aidset, msgtype), codecids);
 							undelivered.removeAll(aidset);
 							break;
 						}

@@ -1,14 +1,16 @@
 package jadex.base.service.message.transport.localmtp;
 
+import jadex.base.service.message.transport.ITransport;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageService;
 import jadex.commons.collection.SCollection;
-import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
-import jadex.base.service.message.transport.ITransport;
 
 import java.util.List;
 import java.util.Map;
@@ -55,22 +57,27 @@ public class LocalTransport implements ITransport
 	/**
 	 *  Start the transport.
 	 */
-	public void start()
+	public IFuture start()
 	{
-		SServiceProvider.getService(container, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		final Future ret = new Future();
+		SServiceProvider.getService(container, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
 				msgservice = (IMessageService)result;
+				ret.setResult(null);
 			}
 		});
+		return ret;
 	}
 	
 	/**
 	 *  Perform cleanup operations (if any).
 	 */
-	public void shutdown()
+	public IFuture shutdown()
 	{
+		return new Future(null);
 		// nothing to do.
 	}
 	
@@ -82,7 +89,7 @@ public class LocalTransport implements ITransport
 	 *  @return The component identifiers of the components 
 	 *  the message could not be sent to.
 	 */
-	public IComponentIdentifier[] sendMessage(Map message, String msgtype, IComponentIdentifier[] recs)
+	public IComponentIdentifier[] sendMessage(Map message, String msgtype, IComponentIdentifier[] recs, byte[] codecids)
 	{
 		List todeliver = SCollection.createArrayList();
 		List undelivered = SCollection.createArrayList();

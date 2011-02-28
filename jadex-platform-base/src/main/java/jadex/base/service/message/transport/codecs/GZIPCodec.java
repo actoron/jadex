@@ -1,38 +1,28 @@
 package jadex.base.service.message.transport.codecs;
 
-import jadex.xml.bean.JavaReader;
-import jadex.xml.bean.JavaWriter;
+import jadex.commons.SUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PipedInputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * 
+ *  Converts byte[] -> byte[] in both directions.
  */
-public class GZIPCodec implements IEncoder, IDecoder
+public class GZIPCodec implements ICodec
 {
 	//-------- constants --------
 	
 	/** The gzip codec id. */
-	public static final byte CODEC_ID = 4;
+	public static final byte CODEC_ID = 5;
 
 	/** The debug flag. */
 	protected boolean DEBUG = false;
 	
 	/** The underlying codec. */
-	protected IEncoder encoder;
-	protected IDecoder decoder;
-	
-	protected ByteArrayOutputStream baos;
-	protected GZIPOutputStream gzos;
-
-	protected ByteArrayInputStream bais;
-	protected GZIPInputStream gzis;
-
+	protected ICodec codec;
 	
 	//-------- methods --------
 	
@@ -41,19 +31,7 @@ public class GZIPCodec implements IEncoder, IDecoder
 	 */
 	protected GZIPCodec()
 	{
-		JadexXMLCodec codec = new JadexXMLCodec();
-		encoder = codec;
-		decoder = codec;
-		try
-		{
-			baos = new ByteArrayOutputStream();
-			gzos = new GZIPOutputStream(baos);
-			bais = new ByteArrayInputStream(new byte[0]);
-			gzis = new GZIPInputStream(bais);
-		}
-		catch(Exception e)
-		{
-		}
+		codec = new JadexXMLCodec();
 	}
 	
 	/**
@@ -61,21 +39,29 @@ public class GZIPCodec implements IEncoder, IDecoder
 	 *  @param obj The object.
 	 *  @throws IOException
 	 */
-	public byte[] encode(Object val, ClassLoader classloader)
+	public Object encode(Object val, ClassLoader classloader)
 	{
-		byte[] ret = encoder.encode(val, classloader);
+		byte[] ret = (byte[])val;
 
 		try
 		{
+			int origlen = ret.length;
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			GZIPOutputStream gzos = new GZIPOutputStream(baos);
 			gzos.write(ret);
-			ret = baos.toByteArray();
+			gzos.close();
+			ret = new byte[baos.size()+4];
+			byte[] tmp = baos.toByteArray();
+			System.arraycopy(tmp, 0, ret, 4, tmp.length);
+			byte[] len = SUtil.intToBytes(origlen);	
+			for(int i=0; i<len.length; i++)
+			{
+				ret[i] = len[i];
+			}
 		}
 		catch (Exception e) 
 		{
-		}
-		finally
-		{
-			baos.reset();
+			e.printStackTrace();
 		}
 		
 		if(DEBUG)
@@ -88,27 +74,34 @@ public class GZIPCodec implements IEncoder, IDecoder
 	 *  @return The decoded object.
 	 *  @throws IOException
 	 */
-	public Object decode(byte[] bytes, ClassLoader classloader)
+	public Object decode(Object bytes, ClassLoader classloader)
 	{
-		byte[] decbytes = new byte[bytes.length];
+		Object ret = null;
+		byte[] decbytes;
 		try
 		{
-			bais = new ByteArrayInputStream(decbytes);
-			gzis = new GZIPInputStream(bais);
-			gzis.read(bytes);
+			byte[] buf = new byte[4];
+			ByteArrayInputStream bais = new ByteArrayInputStream((byte[])bytes);
+			bais.read(buf);
+			int len = SUtil.bytesToInt(buf);
+			decbytes = new byte[len];
+			GZIPInputStream gzis = new GZIPInputStream(bais);
+			// read method only reads up to length of bytes :-(
+			int sum = 0;
+			while((len = gzis.read(decbytes, sum, decbytes.length-sum))>0) 
+			{
+				sum += len;
+			}
+			ret = decbytes;
 		}
 		catch (Exception e) 
 		{
-		}
-		finally
-		{
-			baos.reset();
+			e.printStackTrace();
 		}
 	
-		Object ret = decoder.decode(bytes, classloader);
 		
 		if(DEBUG)
-			System.out.println("decode message: "+(new String(bytes)));
+			System.out.println("decode message: "+(new String((byte[])bytes)));
 		return ret;
 	}
 }

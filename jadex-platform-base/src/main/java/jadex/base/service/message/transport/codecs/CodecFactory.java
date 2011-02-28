@@ -12,8 +12,10 @@ public class CodecFactory
 {
 	//-------- attributes --------
 	
+	// Cannot be static because each platform should
+	// have their own codec factory
 	/** The codec factory instance. */
-	//protected static CodecFactory instance;
+//	protected static CodecFactory instance;
 	
 	/** The mapping (id -> codec class). */
 	protected Map codecclasses;
@@ -22,20 +24,20 @@ public class CodecFactory
 	protected Map codeccache;
 
 	/** The default codec id. */
-	protected byte default_id; 
+	protected byte[] default_ids; 
 	
 	//-------- constructors --------
 
-	/**
-	 *  Get the singleton instance.
-	 *  @return The codec factory.
-	 * /
-	public static CodecFactory getInstance()
-	{
-		if(instance==null)
-			instance = new CodecFactory();
-		return instance;
-	}*/
+//	/**
+//	 *  Get the singleton instance.
+//	 *  @return The codec factory.
+//	 */
+//	public static CodecFactory getInstance()
+//	{
+//		if(instance==null)
+//			instance = new CodecFactory();
+//		return instance;
+//	}
 	
 	/**
 	 *  Create a new codec factory.
@@ -43,43 +45,36 @@ public class CodecFactory
 	public CodecFactory()
 	{
 //		default_id = NuggetsCodec.CODEC_ID;
-		default_id = JadexXMLCodec.CODEC_ID;
+		default_ids = new byte[]{JadexXMLCodec.CODEC_ID, GZIPCodec.CODEC_ID};
+//		default_id = GZIPCodec.CODEC_ID;
 		codecclasses = SCollection.createHashMap();
 		codeccache = SCollection.createHashMap();
 		addCodec(SerialCodec.class);
 		addCodec(NuggetsCodec.class);
 		addCodec(XMLCodec.class);
 		addCodec(JadexXMLCodec.class);
+		addCodec(GZIPCodec.class);
 	}
 	
 	//-------- methods --------
 
-	/**
-	 *  Create a new default encoder.
-	 *  @return The new encoder.
-	 */
-	public IEncoder getDefaultEncoder()
-	{
-		return getEncoder(default_id);
-	}
+//	/**
+//	 *  Create a new default encoder.
+//	 *  @return The new encoder.
+//	 */
+//	public ICodec[] getDefaultCodecs()
+//	{
+//		return getCodec(default_id);
+//	}
 
 	/**
-	 *  Create a new default decoder.
-	 *  @return The new decoder.
-	 */
-	public IDecoder getDefaultDecoder()
-	{
-		return getDecoder(default_id);
-	}
-	
-	/**
 	 *  Create a new default encoder.
 	 *  @return The new encoder.
 	 */
-	public IEncoder getEncoder(byte id)
+	public ICodec getCodec(byte id)
 	{
 		Byte idd = new Byte(id);
-		IEncoder ret = (IEncoder)codeccache.get(idd);
+		ICodec ret = (ICodec)codeccache.get(idd);
 		if(!codecclasses.containsKey(idd))
 			throw new IllegalArgumentException("Unknown codec id: "+id);
 	
@@ -89,7 +84,7 @@ public class CodecFactory
 		
 			try
 			{
-				ret = (IEncoder)cc.newInstance();
+				ret = (ICodec)cc.newInstance();
 				codeccache.put(idd, ret);
 			}
 			catch(Exception e)
@@ -101,51 +96,22 @@ public class CodecFactory
 		return ret;
 	}
 
-	/**
-	 *  Create a new default decoder.
-	 *  @return The new decoder.
-	 */
-	public IDecoder getDecoder(byte id)
-	{
-		Byte idd = new Byte(id);
-		IDecoder ret = (IDecoder)codeccache.get(idd);
-		if(!codecclasses.containsKey(idd))
-			throw new IllegalArgumentException("Unknown codec id: "+id);
-	
-		if(ret==null)
-		{
-			Class cc = (Class)codecclasses.get(idd);
-		
-			try
-			{
-				ret = (IDecoder)cc.newInstance();
-				codeccache.put(idd, ret);
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException("Decoder not found: "+id);
-			}
-		}
-			
-		return ret;
-	}
-	
 	/**
 	 *  Set the default decoder/encoder id. 
 	 *  @param id The id.
 	 */
-	public void setDefaultCodec(Object codec)
+	public void setDefaultCodecIds(byte[] codecids)
 	{
-		default_id = getCodecId(codec.getClass());
+		this.default_ids = codecids;
 	}
 	
 	/**
 	 *  Get the default decoder/encoder id. 
 	 *  @param id The id.
 	 */
-	public byte getDefaultCodecId()
+	public byte[] getDefaultCodecIds()
 	{
-		return default_id;
+		return default_ids;
 	}
 	
 	/**

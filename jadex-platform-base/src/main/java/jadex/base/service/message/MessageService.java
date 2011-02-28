@@ -3,6 +3,7 @@ package jadex.base.service.message;
 import jadex.base.AbstractComponentAdapter;
 import jadex.base.service.cms.ComponentManagementService;
 import jadex.base.service.message.transport.ITransport;
+import jadex.base.service.message.transport.codecs.CodecFactory;
 import jadex.bridge.ContentException;
 import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IComponentIdentifier;
@@ -22,6 +23,7 @@ import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -31,6 +33,7 @@ import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.annotation.Excluded;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.execution.IExecutionService;
 
@@ -99,6 +102,9 @@ public class MessageService extends BasicService implements IMessageService
 	/** The target managers. */
 	protected LRU managers;
 	
+	/** The codec factory. */
+	protected CodecFactory codecfactory;
+	
 	//-------- constructors --------
 
 	/**
@@ -120,6 +126,7 @@ public class MessageService extends BasicService implements IMessageService
 		this.logger = Logger.getLogger("MessageService" + this);
 		
 		this.managers = new LRU(800);
+		this.codecfactory = new CodecFactory();
 	}
 	
 	//-------- interface methods --------
@@ -128,7 +135,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Send a message.
 	 *  @param message The native message.
 	 */
-	public IFuture sendMessage(final Map msg, final MessageType type, IComponentIdentifier sender, final ClassLoader cl)
+	public IFuture sendMessage(final Map msg, final MessageType type, IComponentIdentifier sender, final ClassLoader cl, final byte[] codecids)
 	{
 		final Future ret = new Future();
 		
@@ -172,13 +179,13 @@ public class MessageService extends BasicService implements IMessageService
 							
 							msgcopy.put(sd, ""+clockservice.getTime());
 							
-							doSendMessage(msg, type, exta, cl, msgcopy, ret);
+							doSendMessage(msg, type, exta, cl, msgcopy, ret, codecids);
 //						}
 //					});
 				}
 				else
 				{
-					doSendMessage(msg, type, exta, cl, msgcopy, ret);
+					doSendMessage(msg, type, exta, cl, msgcopy, ret, codecids);
 				}
 			}
 			
@@ -194,7 +201,7 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Extracted method to be callable from listener.
 	 */
-	protected void doSendMessage(Map msg, MessageType type, IExternalAccess comp, ClassLoader cl, Map msgcopy, Future ret)
+	protected void doSendMessage(Map msg, MessageType type, IExternalAccess comp, ClassLoader cl, Map msgcopy, Future ret, byte[] codecids)
 	{
 		Object tmp = msgcopy.get(type.getReceiverIdentifier());
 		if(tmp==null || SReflect.isIterable(tmp) &&	!SReflect.getIterator(tmp).hasNext())
@@ -301,7 +308,7 @@ public class MessageService extends BasicService implements IMessageService
 			SendManager tm = (SendManager)it.next();
 			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.getCollection(tm)
 				.toArray(new IComponentIdentifier[0]);
-			ManagerSendTask task = new ManagerSendTask(msgcopy, type, recs, tm);
+			ManagerSendTask task = new ManagerSendTask(msgcopy, type, recs, codecids, tm);
 			task.getSendManager().addMessage(task).addResultListener(crl);
 		}
 		
@@ -529,36 +536,34 @@ public class MessageService extends BasicService implements IMessageService
 		final Future ret = new Future();
 		
 		ITransport[] tps = (ITransport[])transports.toArray(new ITransport[transports.size()]);
-		for(int i=0; i<tps.length; i++)
-		{
-			try
-			{
-				tps[i].start();
-			}
-			catch(Exception e)
-			{
-				System.out.println("Could not initialize transport: "+tps[i]+" reason: "+e);
-				transports.remove(tps[i]);
-			}
-		}
-		
 		if(transports.size()==0)
 		{
 			ret.setException(new RuntimeException("MessageService has no working transport for sending messages."));
 		}
 		else
 		{
-			SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
+			CounterResultListener lis = new CounterResultListener(tps.length, new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
-					clockservice = (IClockService)result;
-					SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new IResultListener()
+					SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
-							cms = (IComponentManagementService)result;
-							MessageService.super.startService().addResultListener(new DelegationResultListener(ret));
+							clockservice = (IClockService)result;
+							SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new IResultListener()
+							{
+								public void resultAvailable(Object result)
+								{
+									cms = (IComponentManagementService)result;
+									MessageService.super.startService().addResultListener(new DelegationResultListener(ret));
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									ret.setException(exception);
+								}
+							});
 						}
 						
 						public void exceptionOccurred(Exception exception)
@@ -570,9 +575,21 @@ public class MessageService extends BasicService implements IMessageService
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					ret.setException(exception);
 				}
 			});
+			
+			for(int i=0; i<tps.length; i++)
+			{
+				try
+				{
+					tps[i].start().addResultListener(lis);
+				}
+				catch(Exception e)
+				{
+					System.out.println("Could not initialize transport: "+tps[i]+" reason: "+e);
+					transports.remove(tps[i]);
+				}
+			}
 		}
 		
 		return ret;
@@ -606,20 +623,62 @@ public class MessageService extends BasicService implements IMessageService
 	 *  @param listener The change listener.
 	 *  @param filter An optional filter to only receive notifications for matching messages. 
 	 */
-	public synchronized void addMessageListener(IMessageListener listener, IFilter filter)
+	public synchronized IFuture addMessageListener(IMessageListener listener, IFilter filter)
 	{
 		if(listeners==null)
 			listeners = new LinkedHashMap();
 		listeners.put(listener, filter);
+		return new Future(null);
 	}
 	
 	/**
 	 *  Remove a message listener.
 	 *  @param listener The change listener.
 	 */
-	public synchronized void removeMessageListener(IMessageListener listener)
+	public synchronized IFuture removeMessageListener(IMessageListener listener)
 	{
 		listeners.remove(listener);
+		return new Future(null);
+	}
+	
+	/**
+	 *  Add message codec type.
+	 *  @param codec The codec type.
+	 */
+	public IFuture addMessageCodec(Class codec)
+	{
+		codecfactory.addCodec(codec);
+		return new Future(null);
+	}
+	
+	/**
+	 *  Remove message codec type.
+	 *  @param codec The codec type.
+	 */
+	public IFuture removeMessageCodec(Class codec)
+	{
+		codecfactory.removeCodec(codec);
+		return new Future(null);
+	}
+	
+//	/**
+//	 *  Get a codec.
+//	 *  @param codecid The codec id.
+//	 *  @return The codec.
+//	 */
+//	public IFuture getCodecFactory(byte id)
+//	{
+//		return new Future(codecfactory.getCodec(id));
+//	}
+	
+	/**
+	 *  Get the codec factory
+	 *  @return The codec factory.
+	 */
+	@Excluded
+	public Object getCodecFactory()
+	{
+		return codecfactory;
 	}
 	
 	//-------- internal methods --------
@@ -832,11 +891,11 @@ public class MessageService extends BasicService implements IMessageService
 		//				if(con==null)
 						
 //						System.out.println("sending: "+transports[i]+", "+task.getMessage().get(task.getMessageType().getIdIdentifier())+", "+SUtil.arrayToString(receivers));
-						receivers = transports[i].sendMessage(task.getMessage(), task.getMessageType().getName(), receivers);
+						receivers = transports[i].sendMessage(task.getMessage(), task.getMessageType().getName(), receivers, task.getCodecIds());
 					}
 					catch(Exception e)
 					{
-//						e.printStackTrace();
+						e.printStackTrace();
 					}
 				}
 		

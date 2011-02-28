@@ -2,8 +2,9 @@ package jadex.base.service.message.transport.tcpmtp;
 
 import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.CodecFactory;
-import jadex.base.service.message.transport.codecs.IEncoder;
+import jadex.base.service.message.transport.codecs.ICodec;
 import jadex.base.service.message.transport.tcpmtp.TCPTransport.Cleaner;
+import jadex.commons.SUtil;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -79,27 +80,30 @@ class TCPOutputConnection
 	 *  (todo: relax synchronization by performing sends 
 	 *  on extra sender thread of transport)
 	 */
-	public synchronized boolean send(MessageEnvelope msg)
+	public synchronized boolean send(MessageEnvelope msg, byte[] codecids)
 	{
 		boolean ret = false;
 		
 		try
 		{
-			IEncoder enc = codecfac.getDefaultEncoder();
-			byte codec_id = codecfac.getCodecId(enc.getClass());
-			if(codec_id==-1)
-				throw new IOException("Codec id not found: "+enc);
+			if(codecids==null || codecids.length==0)
+				codecids = codecfac.getDefaultCodecIds();
+
+			Object enc_msg = msg;
+			for(int i=0; i<codecids.length; i++)
+			{
+				ICodec codec = codecfac.getCodec(codecids[i]);
+				enc_msg	= codec.encode(enc_msg, classloader);
+			}
+			byte[] res = (byte[])enc_msg;
 			
-			byte[] enc_msg = enc.encode(msg, classloader);
-			
-			int size = enc_msg.length+TCPTransport.PROLOG_SIZE;
-			
-			sos.write(codec_id);
-			sos.write(size >> 24 & 0xFF);
-			sos.write(size >> 16 & 0xFF);
-			sos.write(size >> 8 & 0xFF);
-			sos.write(size & 0xFF);
-			sos.write(enc_msg);
+			int dynlen = TCPTransport.PROLOG_SIZE+1+codecids.length;
+			int size = res.length+dynlen;
+//			System.out.println("len: "+size);
+			sos.write((byte)codecids.length);
+			sos.write(codecids);
+			sos.write(SUtil.intToBytes(size));
+			sos.write(res);
 			sos.flush();
 			ret = true;
 			cleaner.refresh();

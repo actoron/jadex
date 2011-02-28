@@ -354,6 +354,16 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public IFuture sendMessage(final Map me, final MessageType mt)
 	{
+		return sendMessage(me, mt, null);
+	}
+	
+	/**
+	 *  Send a message.
+	 *  @param me	The message content (name value pairs).
+	 *  @param mt	The message type describing the content.
+	 */
+	public IFuture sendMessage(final Map me, final MessageType mt, final byte[] codecids)
+	{
 		final Future ret = new Future();
 		
 		SServiceProvider.getService(getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -363,7 +373,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 			{
 				IMessageService ms = (IMessageService)result;
 				ms.sendMessage(me, mt, interpreter.getAgentAdapter().getComponentIdentifier(),
-					interpreter.getAgentModel().getClassLoader())
+					interpreter.getAgentModel().getClassLoader(), codecids)
 					.addResultListener(createResultListener(new DelegationResultListener(ret)));
 			}
 		}));

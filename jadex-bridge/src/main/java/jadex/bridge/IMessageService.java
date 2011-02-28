@@ -3,6 +3,7 @@ package jadex.bridge;
 import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.service.IService;
+import jadex.commons.service.annotation.Excluded;
 
 import java.util.Map;
 
@@ -20,7 +21,7 @@ public interface IMessageService extends IService
 	 *  @param cl The class loader used by the sending component (i.e. corresponding to classes of objects in the message map).
 	 *  @return Future that indicates an exception when messages could not be delivered to components. 
 	 */
-	public IFuture sendMessage(Map message, MessageType msgtype, IComponentIdentifier sender, ClassLoader cl);
+	public IFuture sendMessage(Map message, MessageType msgtype, IComponentIdentifier sender, ClassLoader cl, byte[] codecids);
 	
 	/**
 	 *  Deliver a message to some components.
@@ -57,12 +58,38 @@ public interface IMessageService extends IService
 	 *  @param listener The change listener.
 	 *  @param filter An optional filter to only receive notifications for matching messages. 
 	 */
-	public void addMessageListener(IMessageListener listener, IFilter filter);
+	public IFuture addMessageListener(IMessageListener listener, IFilter filter);
 	
 	/**
 	 *  Remove a message listener.
 	 *  @param listener The change listener.
 	 */
-	public void removeMessageListener(IMessageListener listener);
+	public IFuture removeMessageListener(IMessageListener listener);
+	
+	/**
+	 *  Add message codec type.
+	 *  @param codec The codec type.
+	 */
+	public IFuture addMessageCodec(Class codec);
+	
+	/**
+	 *  Remove message codec type.
+	 *  @param codec The codec type.
+	 */
+	public IFuture removeMessageCodec(Class codec);
 
+	/**
+	 *  Get the codec factory
+	 *  @return The codec factory.
+	 */
+	@Excluded
+	// Hack should be CodecFactory
+	public Object getCodecFactory();
+	
+//	/**
+//	 *  Get a codec.
+//	 *  @param codecid The codec id.
+//	 *  @return The codec.
+//	 */
+//	public IFuture getCodecFactory(byte id);
 }

@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import jadex.commons.future.IFuture;
+
 
 /**
  *  Interface for listening on message traffic.
@@ -10,11 +12,11 @@ public interface IMessageListener
 	 *  Invoked when a message event has been received.
 	 *  @param msg The message adapter.
 	 */
-	public void messageReceived(IMessageAdapter msg);
+	public IFuture messageReceived(IMessageAdapter msg);
 	
 	/**
 	 *  Invoked when a message event has been sent.
 	 *  @param msg The message adapter.
 	 */
-	public void messageSent(IMessageAdapter msg);
+	public IFuture messageSent(IMessageAdapter msg);
 }

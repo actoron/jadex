@@ -1,6 +1,7 @@
 package jadex.base.service.message.transport;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.future.IFuture;
 
 import java.util.Map;
 
@@ -19,12 +20,12 @@ public interface ITransport
 	/**
 	 *  Start the transport.
 	 */
-	public void start();
+	public IFuture start();
 
 	/**
 	 *  Perform cleanup operations (if any).
 	 */
-	public void shutdown();
+	public IFuture shutdown();
 	
 	/**
 	 *  Send a message.
@@ -32,7 +33,7 @@ public interface ITransport
 	 *  @return The component identifiers to which this 
 	 *  message could not be delivered.
 	 */
-	public IComponentIdentifier[] sendMessage(Map message, String msgtype, IComponentIdentifier[] receivers);
+	public IComponentIdentifier[] sendMessage(Map message, String msgtype, IComponentIdentifier[] receivers, byte[] codecids);
 	
 	/**
 	 *  Returns the prefix of this transport

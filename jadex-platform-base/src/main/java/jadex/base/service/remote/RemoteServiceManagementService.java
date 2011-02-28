@@ -428,7 +428,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //								}
 								
 								IMessageService ms = (IMessageService)result;
-								ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), ls.getClassLoader())
+								ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), ls.getClassLoader(), null)
 									.addResultListener(agent.createResultListener(new IResultListener()
 								{
 									public void resultAvailable(Object result)
