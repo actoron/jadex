@@ -105,7 +105,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 						if(val!=null)
 						{
 							ClassLoader	cl	= agent.getModel().getClassLoader();
-							ma.setDecodedValue(params[i], codec.decode(val, cl));
+							ma.setDecodedValue(params[i], codec.decode(val.getBytes(), cl));
 						}
 					}
 					catch(Exception e)

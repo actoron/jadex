@@ -22,11 +22,6 @@ import nuggets.util.CharStream;
 
 /**
  * Nuggets
- * 
- * @author walczak
- * @since Jan 18, 2006 TODO: ontology from first element, get und put methoden
- *        for primitvie types, as well as for Date, +++ get(attribute, class),
- *        remove Helper class from INugget,
  */
 public class Nuggets
 {
@@ -88,7 +83,7 @@ public class Nuggets
 		{
 			cos.reset();
 			mill.persist(o, classloader);
-			return cos.toString();
+			return cos.toString();			
 		}
 	}
 

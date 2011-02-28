@@ -35,7 +35,7 @@ public class JavaXMLContentCodec implements IContentCodec, Serializable
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-	public synchronized String encode(Object val, ClassLoader classloader)
+	public synchronized byte[] encode(Object val, ClassLoader classloader)
 	{
 		ByteArrayOutputStream bs = new ByteArrayOutputStream();
 		XMLEncoder e = new XMLEncoder(bs);
@@ -51,7 +51,7 @@ public class JavaXMLContentCodec implements IContentCodec, Serializable
 //		System.err.println("encoding with class loader: "+Thread.currentThread()+", "+Thread.currentThread().getContextClassLoader());
 		e.writeObject(val);
 		e.close();
-		return bs.toString();
+		return bs.toByteArray();
 	}
 
 	/**
@@ -59,11 +59,11 @@ public class JavaXMLContentCodec implements IContentCodec, Serializable
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public synchronized Object decode(final String val, ClassLoader classloader)
+	public synchronized Object decode(final byte[] val, ClassLoader classloader)
 	{
 		assert val != null;
 
-		ByteArrayInputStream bs = new ByteArrayInputStream(val.getBytes());
+		ByteArrayInputStream bs = new ByteArrayInputStream(val);
 		XMLDecoder d = new XMLDecoder(bs, null, new ExceptionListener()
 		{
 			public void exceptionThrown(Exception e)

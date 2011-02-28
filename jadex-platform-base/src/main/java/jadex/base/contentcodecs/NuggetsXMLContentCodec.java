@@ -57,14 +57,16 @@ public class NuggetsXMLContentCodec implements IContentCodec, Serializable
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-	public String encode(Object val, ClassLoader classloader)
+	public byte[] encode(Object val, ClassLoader classloader)
 	{
 		if(otx==null)
 			init(classloader);
 
 		try
 		{
-			return ((String)otx.invoke(null, new Object[]{val, classloader}));
+			// todo: native byte[] methods in nuggets
+			String ret = ((String)otx.invoke(null, new Object[]{val, classloader}));
+			return ret.getBytes();
 		}
 		catch(Exception e)
 		{
@@ -77,14 +79,15 @@ public class NuggetsXMLContentCodec implements IContentCodec, Serializable
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public Object decode(String val, ClassLoader classloader)
+	public Object decode(byte[] val, ClassLoader classloader)
 	{
 		if(otx==null)
 			init(classloader);
 
 		try
 		{
-			return ofx.invoke(null, new Object[]{val, classloader});
+			// todo: native byte[] methods in nuggets
+			return ofx.invoke(null, new Object[]{new String(val), classloader});
 		}
 		catch(Exception e)
 		{

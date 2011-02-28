@@ -1,5 +1,6 @@
 package jadex.xml.test;
 
+import jadex.commons.Base64;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.xml.annotation.XMLClassname;
@@ -9,6 +10,8 @@ import jadex.xml.bean.JavaWriter;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.URL;
@@ -59,34 +62,34 @@ public class Test extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
-//				t.testBigData();
-				t.testMultiCollection();
-				t.testEmptySet();
-				t.testEmptyList();
-				t.testEmptyMap();
-				t.testSpecialCharacter();
-				t.testBean();
-				t.testEmptyArray();
-				t.testArrayOrder();
-				t.testMultiArray();
-				t.testMultiArrayAttribute();
-				t.testVectorModel();
-				t.testClass();
-				t.testDate();
-				t.testColor();
-				t.testArray();
-				t.testList();
-				t.testSet();
-				t.testMap();
-				t.testInnerClass();
-				t.testURL();
-				t.testLoggingLevel();
-				t.testInetAddress();
-				t.testBeanWithPublicFields();
-				t.testBeanWithIncludedFields();
-				t.testAnonymousInnerClass();
-				t.testAnonymousInnerClassWithSimpleTypes();
-				t.testImage();
+				t.testBigData();
+//				t.testMultiCollection();
+//				t.testEmptySet();
+//				t.testEmptyList();
+//				t.testEmptyMap();
+//				t.testSpecialCharacter();
+//				t.testBean();
+//				t.testEmptyArray();
+//				t.testArrayOrder();
+//				t.testMultiArray();
+//				t.testMultiArrayAttribute();
+//				t.testVectorModel();
+//				t.testClass();
+//				t.testDate();
+//				t.testColor();
+//				t.testArray();
+//				t.testList();
+//				t.testSet();
+//				t.testMap();
+//				t.testInnerClass();
+//				t.testURL();
+//				t.testLoggingLevel();
+//				t.testInetAddress();
+//				t.testBeanWithPublicFields();
+//				t.testBeanWithIncludedFields();
+//				t.testAnonymousInnerClass();
+//				t.testAnonymousInnerClassWithSimpleTypes();
+//				t.testImage();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -113,11 +116,17 @@ public class Test extends TestCase
 	 */
 	protected void doWriteAndRead(Object wo, Comparator comp) throws Exception
 	{
-		String xml = JavaWriter.objectToXML(wo, null);
+		byte[] xml = JavaWriter.objectToByteArray(wo, null);
 		
 //		System.out.println("xml is:"+xml);
 		
-		Object ro = JavaReader.objectFromXML(xml, null);
+		Object ro = JavaReader.objectFromByteArray(xml, null);
+		
+//		String xml = JavaWriter.objectToXML(wo, null);
+		
+//		System.out.println("xml is:"+xml);
+		
+//		Object ro = JavaReader.objectFromXML(xml, null);
 		
 //		System.out.println("Write: "+wo);
 //		FileOutputStream fos = new FileOutputStream("test.xml");
@@ -150,19 +159,20 @@ public class Test extends TestCase
 //		assertEquals("Written and read objects should be equal:", wo, ro);
 	}
 	
-//	/**
-//	 * 
-//	 */
-//	public void testBigData() throws Exception
-//	{
+	/**
+	 * 
+	 */
+	public void testBigData() throws Exception
+	{
 //		File f = new File("C:\\zips\\cd-ripper\\easy-cd-ripper.exe");
-//		FileInputStream fis = new FileInputStream(f);
-//		byte[] data = new byte[(int)f.length()];
-//		fis.read(data);
-//		String bd = new String(Base64.encode(data));
-//		
-//		doWriteAndRead(bd);
-//	}
+		File f = new File("C:\\zips\\aida32ee_393.zip");
+		FileInputStream fis = new FileInputStream(f);
+		byte[] data = new byte[(int)f.length()];
+		fis.read(data);
+		String bd = new String(Base64.encode(data));
+		
+		doWriteAndRead(bd);
+	}
 	
 	/**
 	 * 

@@ -32,9 +32,9 @@ public class TestCodec implements IContentCodec, Serializable
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-	public String encode(Object val, ClassLoader classloader)
+	public byte[] encode(Object val, ClassLoader classloader)
 	{
-		return "97";
+		return "97".getBytes();
 	}
 
 	/**
@@ -42,7 +42,7 @@ public class TestCodec implements IContentCodec, Serializable
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public Object decode(String val, ClassLoader classloader)
+	public Object decode(byte[] val, ClassLoader classloader)
 	{
 		return "97".equals(val) ? new Integer(98) : new Integer(96);
 //		try

@@ -35,9 +35,9 @@ public class JadexXMLContentCodec implements IContentCodec, Serializable
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-	public String encode(Object val, ClassLoader classloader)
+	public byte[] encode(Object val, ClassLoader classloader)
 	{
-		String ret = JavaWriter.objectToXML(val, classloader);
+		byte[] ret = JavaWriter.objectToByteArray(val, classloader);
 		if(DEBUG)
 			System.out.println("encode content: "+ret);
 		return ret;
@@ -48,9 +48,9 @@ public class JadexXMLContentCodec implements IContentCodec, Serializable
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public Object decode(String val, ClassLoader classloader)
+	public Object decode(byte[] val, ClassLoader classloader)
 	{
-		Object ret = JavaReader.objectFromXML(val, classloader);
+		Object ret = JavaReader.objectFromByteArray(val, classloader);
 		if(DEBUG)
 			System.out.println("decode content: "+ret);
 		return ret;

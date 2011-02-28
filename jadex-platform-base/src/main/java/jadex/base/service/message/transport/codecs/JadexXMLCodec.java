@@ -14,7 +14,7 @@ public class JadexXMLCodec implements IEncoder, IDecoder
 {
 	//-------- constants --------
 	
-	/** The nuggets codec id. */
+	/** The JadexXML codec id. */
 	public static final byte CODEC_ID = 3;
 
 	/** The debug flag. */

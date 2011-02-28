@@ -670,7 +670,12 @@ public class MessageService extends BasicService implements IMessageService
 								
 								if(codec!=null)
 								{
-									message.put(name, codec.decode((String)value, cl));
+//									byte[] val;
+//									if(value instanceof byte[])
+//										val = (byte[])value;
+//									else if(value instanceof String)
+//										val = ((String)value).getBytes();
+									message.put(name, codec.decode((byte[])value, cl));
 								}
 							}
 						}
