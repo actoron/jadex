@@ -44,16 +44,48 @@ public class CodecFactory
 	 */
 	public CodecFactory()
 	{
-//		default_id = NuggetsCodec.CODEC_ID;
-		default_ids = new byte[]{JadexXMLCodec.CODEC_ID, GZIPCodec.CODEC_ID};
-//		default_id = GZIPCodec.CODEC_ID;
+		this(null, null);
+	}
+	
+//	/**
+//	 *  Create a new codec factory.
+//	 */
+//	public CodecFactory(Class[] default_codecs)
+//	{
+//		this(getIds(default_codecs));
+//	}
+//	
+	/**
+	 *  Get the default codec ids.
+	 */
+	protected static byte[] getIds(Class[] default_codecs)
+	{
+		byte[] ret = new byte[default_codecs.length];
+		for(int i=0; i<ret.length; i++)
+		{
+			ret[i] = getCodecId(default_codecs[i]);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Create a new codec factory.
+	 */
+	public CodecFactory(Class[] codecs, Class[] default_codecs)
+	{
 		codecclasses = SCollection.createHashMap();
 		codeccache = SCollection.createHashMap();
-		addCodec(SerialCodec.class);
-		addCodec(NuggetsCodec.class);
-		addCodec(XMLCodec.class);
-		addCodec(JadexXMLCodec.class);
-		addCodec(GZIPCodec.class);
+		if(codecs==null)
+			codecs = new Class[]{SerialCodec.class, NuggetsCodec.class, XMLCodec.class, JadexXMLCodec.class, GZIPCodec.class};
+		for(int i=0; i<codecs.length; i++)
+		{
+			addCodec(codecs[i]);
+		}
+		
+		if(default_codecs!=null && default_codecs.length>0)
+			default_ids = getIds(default_codecs);
+		else
+			default_ids = new byte[]{JadexXMLCodec.CODEC_ID, GZIPCodec.CODEC_ID};
 	}
 	
 	//-------- methods --------
@@ -142,7 +174,7 @@ public class CodecFactory
 	{
 		try
 		{
-			Field f = codec_class.getDeclaredField("CODEC_ID");
+			Field f = codec_class.getDeclaredField(ICodec.CODEC_ID);
 			Byte codec_id = new Byte(f.getByte(null));
 			codecclasses.put(codec_id, codec_class);
 		}
@@ -160,7 +192,7 @@ public class CodecFactory
 	{
 		try
 		{
-			Field f = codec_class.getDeclaredField("CODEC_ID");
+			Field f = codec_class.getDeclaredField(ICodec.CODEC_ID);
 			Byte codec_id = new Byte(f.getByte(null));
 			codecclasses.remove(codec_id);
 			codeccache.remove(codec_id);
@@ -174,12 +206,12 @@ public class CodecFactory
 	/**
 	 *  Get the codec id for a codec class.
 	 */
-	public byte getCodecId(Class codec_class)
+	public static byte getCodecId(Class codec_class)
 	{
 		byte ret = -1;
 		try
 		{
-			Field f = codec_class.getDeclaredField("CODEC_ID");
+			Field f = codec_class.getDeclaredField(ICodec.CODEC_ID);
 			ret = f.getByte(null);
 		}
 		catch(Exception e)

@@ -102,7 +102,10 @@ public class MessageService extends BasicService implements IMessageService
 	/** The target managers. */
 	protected LRU managers;
 	
-	/** The codec factory. */
+	/** The content codecs. */
+	protected List contentcodecs;
+	
+	/** The codec factory for messages. */
 	protected CodecFactory codecfactory;
 	
 	//-------- constructors --------
@@ -111,7 +114,18 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Constructor for Outbox.
 	 *  @param platform
 	 */
-	public MessageService(IServiceProvider provider, ITransport[] transports, MessageType[] messagetypes)
+	public MessageService(IServiceProvider provider, ITransport[] transports, 
+		MessageType[] messagetypes)
+	{
+		this(provider, transports, messagetypes, null, null);
+	}
+	
+	/**
+	 *  Constructor for Outbox.
+	 *  @param platform
+	 */
+	public MessageService(IServiceProvider provider, ITransport[] transports, 
+		MessageType[] messagetypes, IContentCodec[] contentcodecs, CodecFactory codecfactory)
 	{
 		super(provider.getId(), IMessageService.class, null);
 
@@ -126,7 +140,14 @@ public class MessageService extends BasicService implements IMessageService
 		this.logger = Logger.getLogger("MessageService" + this);
 		
 		this.managers = new LRU(800);
-		this.codecfactory = new CodecFactory();
+		if(contentcodecs!=null)
+		{
+			for(int i=0; i<contentcodecs.length; i++)
+			{
+				addContentCodec(contentcodecs[i]);
+			}
+		}
+		this.codecfactory = codecfactory!=null? codecfactory: new CodecFactory();
 	}
 	
 	//-------- interface methods --------
@@ -230,7 +251,7 @@ public class MessageService extends BasicService implements IMessageService
 			
 			IContentCodec codec = type.findContentCodec(compcodecs, msg, name);
 			if(codec==null)
-				codec = type.findContentCodec(DEFCODECS, msg, name);
+				codec = type.findContentCodec(getContentCodecs(), msg, name);
 			
 			if(codec!=null)
 			{
@@ -313,6 +334,15 @@ public class MessageService extends BasicService implements IMessageService
 		}
 		
 //		sendmsg.addMessage(msgcopy, type, receivers, ret);
+	}
+	
+	/**
+	 *  Get content codecs.
+	 *  @return The content codecs.
+	 */
+	public IContentCodec[] getContentCodecs()
+	{
+		return contentcodecs==null? DEFCODECS: (IContentCodec[])contentcodecs.toArray(new IContentCodec[contentcodecs.size()]);
 	}
 	
 	/**
@@ -642,6 +672,29 @@ public class MessageService extends BasicService implements IMessageService
 	}
 	
 	/**
+	 *  Add content codec type.
+	 *  @param codec The codec type.
+	 */
+	public IFuture addContentCodec(IContentCodec codec)
+	{
+		if(contentcodecs==null)
+			contentcodecs = new ArrayList();
+		contentcodecs.add(codec);
+		return new Future(null);
+	}
+	
+	/**
+	 *  Remove content codec type.
+	 *  @param codec The codec type.
+	 */
+	public IFuture removeContentCodec(IContentCodec codec)
+	{
+		if(contentcodecs!=null)
+			contentcodecs.remove(codec);
+		return new Future(null);
+	}
+	
+	/**
 	 *  Add message codec type.
 	 *  @param codec The codec type.
 	 */
@@ -725,7 +778,7 @@ public class MessageService extends BasicService implements IMessageService
 																	
 								IContentCodec codec = messagetype.findContentCodec(compcodecs, message, name);
 								if(codec==null)
-									codec = messagetype.findContentCodec(DEFCODECS, message, name);
+									codec = messagetype.findContentCodec(getContentCodecs(), message, name);
 								
 								if(codec!=null)
 								{

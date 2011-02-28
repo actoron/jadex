@@ -28,6 +28,7 @@
 		<import>jadex.base.service.message.transport.localmtp.*</import>
 		<import>jadex.base.service.message.transport.tcpmtp.*</import>
 		<import>jadex.base.service.message.transport.niotcpmtp.*</import>
+		<import>jadex.base.service.message.transport.codecs.*</import>
 		<import>jadex.base.service.deployment.*</import>
 		<import>jadex.component.*</import>
 		<import>jadex.application.*</import>
@@ -112,7 +113,9 @@
 				new MessageType[]
 				{
 					new FIPAMessageType()
-				})
+				}, null,
+				new CodecFactory(null, new Class[]{JadexXMLCodec.class, GZIPCodec.class})
+				)
 		</providedservice>
 		<providedservice class="IClockService" direct="true">
 			$args.simulation

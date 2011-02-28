@@ -67,6 +67,18 @@ public interface IMessageService extends IService
 	public IFuture removeMessageListener(IMessageListener listener);
 	
 	/**
+	 *  Add content codec type.
+	 *  @param codec The codec type.
+	 */
+	public IFuture addContentCodec(IContentCodec codec);
+	
+	/**
+	 *  Remove content codec type.
+	 *  @param codec The codec type.
+	 */
+	public IFuture removeContentCodec(IContentCodec codec);
+	
+	/**
 	 *  Add message codec type.
 	 *  @param codec The codec type.
 	 */
