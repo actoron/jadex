@@ -328,12 +328,6 @@ public class JavaReader extends Reader
 				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
 			));
 			typeinfos.add(ti_character);
-			
-			
-			
-			
-			
-			
 
 			// java.net.URL
 			TypeInfo ti_url = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.net", "URL")}),
@@ -415,7 +409,6 @@ public class JavaReader extends Reader
 			));
 			typeinfos.add(ti_image);
 			
-			
 			// Shortcut notations for simple array types
 			
 			// boolean/Boolean Array
@@ -482,11 +475,110 @@ public class JavaReader extends Reader
 				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(integerconv, null))));
 			typeinfos.add(ti_integerarray);
 			
-			// java.lang.Double
+			// double/Double array
+			IStringObjectConverter doubleconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					StringTokenizer stok = new StringTokenizer(val, "_");
+					int len = Integer.parseInt(stok.nextToken());
+					double[] ret = new double[len];
+					
+					for(int i=0; stok.hasMoreTokens(); i++)
+						ret[i] = Double.parseDouble(stok.nextToken());
+					return ret;
+				}
+			};
+			TypeInfo ti_doublearray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO, "double__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(doubleconv, null))));
+			typeinfos.add(ti_doublearray);
+			
+			IStringObjectConverter bdoubleconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					StringTokenizer stok = new StringTokenizer(val, "_");
+					int len = Integer.parseInt(stok.nextToken());
+					Double[] ret = new Double[len];
+					
+					for(int i=0; stok.hasMoreTokens(); i++)
+						ret[i] = new Double(stok.nextToken());
+					return ret;
+				}
+			};
+			TypeInfo ti_bdoublerarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Double__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(bdoubleconv, null))));
+			typeinfos.add(ti_bdoublerarray);
 			
 			// java.lang.Float
+			IStringObjectConverter floatconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					StringTokenizer stok = new StringTokenizer(val, "_");
+					int len = Integer.parseInt(stok.nextToken());
+					float[] ret = new float[len];
+					
+					for(int i=0; stok.hasMoreTokens(); i++)
+						ret[i] = Float.parseFloat(stok.nextToken());
+					return ret;
+				}
+			};
+			TypeInfo ti_floatarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO, "float__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(floatconv, null))));
+			typeinfos.add(ti_floatarray);
+			
+			IStringObjectConverter bfloatconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					StringTokenizer stok = new StringTokenizer(val, "_");
+					int len = Integer.parseInt(stok.nextToken());
+					Float[] ret = new Float[len];
+					
+					for(int i=0; stok.hasMoreTokens(); i++)
+						ret[i] = new Float(stok.nextToken());
+					return ret;
+				}
+			};
+			TypeInfo ti_bfloatarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Float__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(bfloatconv, null))));
+			typeinfos.add(ti_bfloatarray);
 			
 			// java.lang.Long
+			IStringObjectConverter longconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					StringTokenizer stok = new StringTokenizer(val, ",");
+					int len = Integer.parseInt(stok.nextToken());
+					long[] ret = new long[len];
+					
+					for(int i=0; stok.hasMoreTokens(); i++)
+						ret[i] = Long.parseLong(stok.nextToken());
+					return ret;
+				}
+			};
+			TypeInfo ti_longarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO, "long__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(longconv, null))));
+			typeinfos.add(ti_longarray);
+			
+			IStringObjectConverter blongconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					StringTokenizer stok = new StringTokenizer(val, ",");
+					int len = Integer.parseInt(stok.nextToken());
+					Long[] ret = new Long[len];
+					
+					for(int i=0; stok.hasMoreTokens(); i++)
+						ret[i] = new Long(stok.nextToken());
+					return ret;
+				}
+			};
+			TypeInfo ti_blongarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Long__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(blongconv, null))));
+			typeinfos.add(ti_blongarray);
 			
 			// short/Short Array
 			IStringObjectConverter shortconv = new IStringObjectConverter()
@@ -551,6 +643,31 @@ public class JavaReader extends Reader
 			typeinfos.add(ti_bbytearray);
 			
 			// java.lang.Character
+			IStringObjectConverter charconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					return val.toCharArray();
+				}
+			};
+			TypeInfo ti_chararray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO, "char__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(charconv, null))));
+			typeinfos.add(ti_chararray);
+			
+			IStringObjectConverter characterconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					char[] chars = val.toCharArray();
+					Character[] bchars = new Character[chars.length];
+					for(int i=0; i<chars.length; i++)
+						bchars[i] = new Character(chars[i]);
+					return bchars;
+				}
+			};
+			TypeInfo ti_characterarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Character__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(characterconv, null))));
+			typeinfos.add(ti_characterarray);
 		}
 		catch(NoSuchMethodException e)
 		{

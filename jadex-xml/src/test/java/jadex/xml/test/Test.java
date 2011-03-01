@@ -62,12 +62,21 @@ public class Test extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
-				t.testBigData();
 				t.testByte();
+				t.testDouble();
+				t.testBigData();
 				t.testByteArray();
 				t.testBByteArray();
 				t.testIntArray();
 				t.testIntegerArray();
+				t.testDoubleArray();
+				t.testBDoubleArray();
+				t.testFloatArray();
+				t.testBFloatArray();
+				t.testLongArray();
+				t.testBLongArray();
+				t.testCharArray();
+				t.testCharacterArray();
 				t.testShortArray();
 				t.testBShortArray();
 				t.testBooleanArray();
@@ -182,6 +191,16 @@ public class Test extends TestCase
 	/**
 	 * 
 	 */
+	public void testDouble() throws Exception
+	{
+		double data = 1E6*1.00001;
+		
+		doWriteAndRead(data);
+	}
+	
+	/**
+	 * 
+	 */
 	public void testByteArray() throws Exception
 	{
 		byte[] data = new String("hello world").getBytes();
@@ -193,6 +212,19 @@ public class Test extends TestCase
 				return Arrays.equals((byte[])o1, (byte[])o2)? 0: -1;
 			}
 		});
+	}
+	
+	/**
+	 * 
+	 */
+	public void testBByteArray() throws Exception
+	{
+		byte[] tmp = new String("hello world").getBytes();
+		Byte[] data = new Byte[tmp.length];
+		for(int i=0; i<tmp.length; i++)
+			data[i] = new Byte(tmp[i]);
+		
+		doWriteAndRead(data);
 	}
 	
 	/**
@@ -224,6 +256,110 @@ public class Test extends TestCase
 	/**
 	 * 
 	 */
+	public void testDoubleArray() throws Exception
+	{
+		double[] data = new double[]{1E6*1.00001,1.0,3.0,4.00001,5.00002,6.99999};
+		
+		doWriteAndRead(data, new Comparator()
+		{
+			public int compare(Object o1, Object o2)
+			{
+				return Arrays.equals((double[])o1, (double[])o2)? 0: -1;
+			}
+		});
+	}
+	
+	/**
+	 * 
+	 */
+	public void testBDoubleArray() throws Exception
+	{
+		Double[] data = new Double[]{new Double(1), new Double(2), new Double(3)};
+		
+		doWriteAndRead(data); 
+	}
+	
+	/**
+	 * 
+	 */
+	public void testFloatArray() throws Exception
+	{
+		float[] data = new float[]{1.01f,1.0f,3.0f,4.00001f,5.00002f,6.99999f};
+		
+		doWriteAndRead(data, new Comparator()
+		{
+			public int compare(Object o1, Object o2)
+			{
+				return Arrays.equals((float[])o1, (float[])o2)? 0: -1;
+			}
+		});
+	}
+	
+	/**
+	 * 
+	 */
+	public void testBFloatArray() throws Exception
+	{
+		Float[] data = new Float[]{new Float(1), new Float(2), new Float(3)};
+		
+		doWriteAndRead(data); 
+	}
+	
+	/**
+	 * 
+	 */
+	public void testLongArray() throws Exception
+	{
+		long[] data = new long[]{1000000000,1,3,4,5,699999};
+		
+		doWriteAndRead(data, new Comparator()
+		{
+			public int compare(Object o1, Object o2)
+			{
+				return Arrays.equals((long[])o1, (long[])o2)? 0: -1;
+			}
+		});
+	}
+	
+	/**
+	 * 
+	 */
+	public void testBLongArray() throws Exception
+	{
+		Long[] data = new Long[]{new Long(1), new Long(2), new Long(3)};
+		
+		doWriteAndRead(data); 
+	}
+	
+	/**
+	 * 
+	 */
+	public void testCharArray() throws Exception
+	{
+		char[] data = new char[]{'a','b','c'};
+		
+		doWriteAndRead(data, new Comparator()
+		{
+			public int compare(Object o1, Object o2)
+			{
+				return Arrays.equals((char[])o1, (char[])o2)? 0: -1;
+			}
+		});
+	}
+	
+	/**
+	 * 
+	 */
+	public void testCharacterArray() throws Exception
+	{
+		Character[] data = new Character[]{new Character('a'), new Character('b'), new Character('c')};
+		
+		doWriteAndRead(data); 
+	}
+	
+	/**
+	 * 
+	 */
 	public void testShortArray() throws Exception
 	{
 		short[] data = new short[]{1,2,3,4,5,6};
@@ -245,20 +381,6 @@ public class Test extends TestCase
 		Short[] data = new Short[]{new Short((short)1), new Short((short)2), new Short((short)3)};
 		
 		doWriteAndRead(data); 
-	}
-
-	
-	/**
-	 * 
-	 */
-	public void testBByteArray() throws Exception
-	{
-		byte[] tmp = new String("hello world").getBytes();
-		Byte[] data = new Byte[tmp.length];
-		for(int i=0; i<tmp.length; i++)
-			data[i] = new Byte(tmp[i]);
-		
-		doWriteAndRead(data);
 	}
 	
 	/**

@@ -356,11 +356,134 @@ public class JavaWriter extends Writer
 				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, integerconv))));
 			typeinfos.add(ti_integerarray);
 			
-			// java.lang.Double
+			// double/Double Array
+			IObjectStringConverter doubleconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					double[] data = (double[])val;
+					StringBuilder bul = new StringBuilder();
+					bul.append(data.length).append("_");
+					for(int i=0; i<data.length; i++)
+					{
+						bul.append(data[i]);
+						if(i+1<data.length)
+							bul.append("_");
+					}
+					return bul.toString();
+				}
+			};
+			TypeInfo ti_doublearray = new TypeInfo(null, new ObjectInfo(double[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, doubleconv))));
+			typeinfos.add(ti_doublearray);
 			
-			// java.lang.Float
+			IObjectStringConverter bdoubleconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					Double[] data = (Double[])val;
+					StringBuilder bul = new StringBuilder();
+					bul.append(data.length).append("_");
+					for(int i=0; i<data.length; i++)
+					{
+						bul.append(data[i]);
+						if(i+1<data.length)
+							bul.append("_");
+					}
+					return bul.toString();
+				}
+			};
+			TypeInfo ti_bdoublearray = new TypeInfo(null, new ObjectInfo(Double[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, bdoubleconv))));
+			typeinfos.add(ti_bdoublearray);
+			
+			// float/Float array
+			IObjectStringConverter floatconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					float[] data = (float[])val;
+					StringBuilder bul = new StringBuilder();
+					bul.append(data.length).append("_");
+					for(int i=0; i<data.length; i++)
+					{
+						bul.append(data[i]);
+						if(i+1<data.length)
+							bul.append("_");
+					}
+					return bul.toString();
+				}
+			};
+			TypeInfo ti_floatarray = new TypeInfo(null, new ObjectInfo(float[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, floatconv))));
+			typeinfos.add(ti_floatarray);
+			
+			IObjectStringConverter bfloatconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					Float[] data = (Float[])val;
+					StringBuilder bul = new StringBuilder();
+					bul.append(data.length).append("_");
+					for(int i=0; i<data.length; i++)
+					{
+						bul.append(data[i]);
+						if(i+1<data.length)
+							bul.append("_");
+					}
+					return bul.toString();
+				}
+			};
+			TypeInfo ti_bfloatarray = new TypeInfo(null, new ObjectInfo(Float[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, bfloatconv))));
+			typeinfos.add(ti_bfloatarray);
 			
 			// java.lang.Long
+			IObjectStringConverter longconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					long[] data = (long[])val;
+					StringBuilder bul = new StringBuilder();
+					bul.append(data.length).append(",");
+					for(int i=0; i<data.length; i++)
+					{
+						bul.append(data[i]);
+						if(i+1<data.length)
+							bul.append(",");
+					}
+					return bul.toString();
+				}
+			};
+			TypeInfo ti_longarray = new TypeInfo(null, new ObjectInfo(long[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, longconv))));
+			typeinfos.add(ti_longarray);
+			
+			IObjectStringConverter blongconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					Long[] data = (Long[])val;
+					StringBuilder bul = new StringBuilder();
+					bul.append(data.length).append(",");
+					for(int i=0; i<data.length; i++)
+					{
+						bul.append(data[i]);
+						if(i+1<data.length)
+							bul.append(",");
+					}
+					return bul.toString();
+				}
+			};
+			TypeInfo ti_blongarray = new TypeInfo(null, new ObjectInfo(Long[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, blongconv))));
+			typeinfos.add(ti_blongarray);
 			
 			// short/Short Array
 			IObjectStringConverter shortconv = new IObjectStringConverter()
@@ -437,7 +560,35 @@ public class JavaWriter extends Writer
 			typeinfos.add(ti_bbytearray);
 			
 			// java.lang.Character
+			IObjectStringConverter charconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					char[] chars = (char[])val;
+					return new String(chars);
+					
+				}
+			};
+			TypeInfo ti_chararray = new TypeInfo(null, new ObjectInfo(char[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, charconv))));
+			typeinfos.add(ti_chararray);
 			
+			IObjectStringConverter characterconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					Character[] bchars = (Character[])val;
+					char[] chars = new char[bchars.length];
+					for(int i=0; i<bchars.length; i++)
+						chars[i] = bchars[i];
+					return new String(chars);
+				}
+			};
+			TypeInfo ti_characterarray = new TypeInfo(null, new ObjectInfo(Character[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, characterconv))));
+			typeinfos.add(ti_characterarray);
 		}
 		catch(Exception e)
 		{
