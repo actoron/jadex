@@ -361,28 +361,45 @@ public class SUtil
 	}
 
 	/**
-	 * Get the dimension of an array.
-	 * 
-	 * @param array
-	 * @return The array dimension.
+	 *  Get the array dimension.
+	 *  @param array The array.
+	 *  @return The number of dimensions.
 	 */
-	public static int[] getArrayLengths(Object array)
+	public static int getArrayDimension(Object array) 
 	{
-		List lens = new ArrayList();
-		Class cls = array.getClass();
-
-		while(cls.isArray())
+		int ret = 0;
+		Class arrayClass = array.getClass();
+		while(arrayClass.isArray()) 
 		{
-			lens.add(new Integer(Array.getLength(array)));
-			cls = cls.getComponentType();
+			ret++;
+			arrayClass = arrayClass.getComponentType();
 		}
-
-		int[] ret = new int[lens.size()];
-		for(int i = 0; i < lens.size(); i++)
-			ret[i] = ((Integer)lens.get(i)).intValue();
-
 		return ret;
 	}
+	
+//	/**
+//	 * Get the dimension of an array.
+//	 * 
+//	 * @param array
+//	 * @return The array dimension.
+//	 */
+//	public static int[] getArrayLengths(Object array)
+//	{
+//		List lens = new ArrayList();
+//		Class cls = array.getClass();
+//
+//		while(cls.isArray())
+//		{
+//			lens.add(new Integer(Array.getLength(array)));
+//			cls = cls.getComponentType();
+//		}
+//
+//		int[] ret = new int[lens.size()];
+//		for(int i = 0; i < lens.size(); i++)
+//			ret[i] = ((Integer)lens.get(i)).intValue();
+//
+//		return ret;
+//	}
 
 	/*
 	 * Test if two values are equal or both null.

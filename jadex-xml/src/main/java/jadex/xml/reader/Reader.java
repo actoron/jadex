@@ -406,7 +406,15 @@ public class Reader
 					}
 				
 					// Handle attributes.
-					if(attrcnt>0 && !(attrcnt==1 && rawattrs.get(SXML.ID)!=null))
+					int atcnt = attrcnt;
+					if(rawattrs!=null)
+					{
+						if(rawattrs.containsKey(SXML.ID))
+							atcnt--;
+						if(rawattrs.containsKey(SXML.ARRAYLEN))
+							atcnt--;
+					}
+					if(atcnt>0)
 					{
 						List	attrpath	= null;
 						// If no type use last element from stack to map attributes.
@@ -433,7 +441,7 @@ public class Reader
 	
 	//							System.out.println("here: "+attrname);
 								
-								if(!SXML.ID.equals(attrname.getLocalPart()))
+								if(!SXML.ID.equals(attrname.getLocalPart()) && !SXML.ARRAYLEN.equals(attrname.getLocalPart()))
 								{	
 									String attrval = parser.getAttributeValue(i);
 									attrs.remove(attrname);

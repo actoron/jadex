@@ -198,26 +198,26 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				
 				// Special case array
 				int idx = clazzname.indexOf("__");
-				int[] lens = null;
+				int dim = 0;
+				int len = 0;
 				if(idx!=-1)
 				{
 					String strlens = clazzname.substring(idx+2);
 					clazzname = clazzname.substring(0, idx);
-					StringTokenizer stok = new StringTokenizer(strlens, "_");
-					lens =  new int[stok.countTokens()];
-					for(int i=0; stok.hasMoreTokens(); i++)
-					{
-						lens[i] = Integer.parseInt(stok.nextToken());
-					}
+					StringTokenizer stok = new StringTokenizer(strlens, "__");
+					dim = Integer.parseInt(stok.nextToken());	
+					for(int i=0; i<dim-1; i++)
+						clazzname+="[]";
+					len = Integer.parseInt((String)rawattributes.get(SXML.ARRAYLEN));
 				}
 				
 				Class clazz = SReflect.classForName0(clazzname, context.getClassLoader());
 				
 				if(clazz!=null)
 				{
-					if(lens!=null)
+					if(dim>0)
 					{
-						ret = Array.newInstance(clazz, lens);
+						ret = Array.newInstance(clazz, len);
 					}
 					else if(!BasicTypeConverter.isBuiltInType(clazz))
 					{

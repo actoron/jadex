@@ -6,11 +6,13 @@ import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
 import jadex.xml.IObjectStringConverter;
 import jadex.xml.ObjectInfo;
+import jadex.xml.SXML;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoTypeManager;
 import jadex.xml.annotation.XMLIncludeFields;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashSet;
@@ -230,6 +232,13 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 						}
 					}
 				}
+			}
+			
+			// Hack! For Java beans, should be in bean handler :-(
+			// Add new special attribute for array length
+			if(object.getClass().isArray())
+			{
+				wi.addAttribute(SXML.ARRAYLEN, ""+Array.getLength(object));
 			}
 			
 			// Subobjects 

@@ -124,6 +124,37 @@ public class JavaWriter extends Writer
 			}));
 			typeinfos.add(ti_array);
 			
+			// byte/Byte Array
+			IObjectStringConverter byteconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					byte[] bytes = (byte[])val;
+					return new String(bytes);
+					
+				}
+			};
+			TypeInfo ti_bytearray = new TypeInfo(null, new ObjectInfo(byte[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, byteconv))));
+			typeinfos.add(ti_bytearray);
+			
+			IObjectStringConverter bbyteconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					Byte[] bbytes = (Byte[])val;
+					byte[] bytes = new byte[bbytes.length];
+					for(int i=0; i<bbytes.length; i++)
+						bytes[i] = bbytes[i].byteValue();
+					return new String(bytes);
+				}
+			};
+			TypeInfo ti_bbytearray = new TypeInfo(null, new ObjectInfo(Byte[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, bbyteconv))));
+			typeinfos.add(ti_bbytearray);
+			
 			// java.util.Color
 			IObjectStringConverter coconv = new IObjectStringConverter()
 			{

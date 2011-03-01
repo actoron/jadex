@@ -17,9 +17,11 @@ import jadex.xml.annotation.XMLClassname;
 import jadex.xml.writer.AbstractObjectWriterHandler;
 import jadex.xml.writer.WriteContext;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -197,14 +199,14 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 			// Special case array, replace [] with __ and length 
 			if(clazz.isArray())
 			{
-				int[] lens = SUtil.getArrayLengths(object);
-				tag = tag.substring(0, tag.indexOf("["))+"__";
-				for(int i=0; i<lens.length; i++)
-				{
-					tag += lens[i];
-					if(i+1<lens.length)
-						tag += "_";
-				}
+				int dim = SUtil.getArrayDimension(object);
+				tag = tag.substring(0, tag.indexOf("["))+"__"+dim;//+"__"+Array.getLength(object);
+//				for(int i=0; i<lens.length; i++)
+//				{
+//					tag += lens[i];
+//					if(i+1<lens.length)
+//						tag += "_";
+//				}
 			}
 		}
 		else

@@ -8,6 +8,7 @@ import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
 import jadex.xml.IObjectObjectConverter;
+import jadex.xml.IObjectStringConverter;
 import jadex.xml.IPostProcessor;
 import jadex.xml.IStringObjectConverter;
 import jadex.xml.MappingInfo;
@@ -219,6 +220,9 @@ public class JavaReader extends Reader
 			);
 			typeinfos.add(ti_string);
 			
+			// Bean creator works only when all info is in attribues (content is not available).
+			// If content is used a attribute converter for content should be used that maps back to THIS
+			
 			// java.lang.Boolean
 			TypeInfo ti_boolean = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Boolean")}),
 				new ObjectInfo(new IBeanObjectCreator()
@@ -323,6 +327,33 @@ public class JavaReader extends Reader
 			));
 			typeinfos.add(ti_character);
 			
+			// byte/Byte Array
+			IStringObjectConverter byteconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					return val.getBytes();
+				}
+			};
+			TypeInfo ti_bytearray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO, "byte__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(byteconv, null))));
+			typeinfos.add(ti_bytearray);
+			
+			IStringObjectConverter bbyteconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					byte[] bytes = val.getBytes();
+					Byte[] bbytes = new Byte[bytes.length];
+					for(int i=0; i<bytes.length; i++)
+						bbytes[i] = new Byte(bytes[i]);
+					return bbytes;
+				}
+			};
+			TypeInfo ti_bbytearray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Byte__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(bbyteconv, null))));
+			typeinfos.add(ti_bbytearray);
+
 			// java.net.URL
 			TypeInfo ti_url = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.net", "URL")}),
 				new ObjectInfo(new IBeanObjectCreator()
@@ -373,6 +404,7 @@ public class JavaReader extends Reader
 			));
 			typeinfos.add(ti_inetaddr);
 			
+			// Image
 			TypeInfo ti_image = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.awt.image", "Image")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{

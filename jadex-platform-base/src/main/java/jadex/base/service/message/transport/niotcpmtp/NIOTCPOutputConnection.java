@@ -131,6 +131,8 @@ class NIOTCPOutputConnection
 		buffer[0] = (byte)codecids.length;
 		System.arraycopy(codecids, 0, buffer, 1, codecids.length);
 		
+//		System.out.println("rawmsg"+new String(res));
+		
 		sc.write(ByteBuffer.wrap(buffer));
 		cleaner.refresh();
 	}

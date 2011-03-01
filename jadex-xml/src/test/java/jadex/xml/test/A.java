@@ -14,7 +14,7 @@ public class A
 	
 	protected List bs;
 	
-	protected Integer[] ints;
+	protected int[] ints;
 	
 	public A()
 	{
@@ -90,7 +90,7 @@ public class A
 	 *  Get the ints.
 	 *  @return the ints.
 	 */
-	public Integer[] getInts()
+	public int[] getInts()
 	{
 		return ints;
 	}
@@ -99,7 +99,7 @@ public class A
 	 *  Set the ints.
 	 *  @param ints The ints to set.
 	 */
-	public void setInts(Integer[] ints)
+	public void setInts(int[] ints)
 	{
 		this.ints = ints;
 	}

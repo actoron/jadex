@@ -23,6 +23,9 @@ public class SXML
 	/** The package protocol constant. */
 	public static final String PROTOCOL_TYPEINFO = "typeinfo:";
 
+	/** The value of this attribute is used as idref. */
+	public static final String ARRAYLEN = "__len";
+	
 	/** The null tag. */
 	public static QName NULL = new QName(SXML.PROTOCOL_TYPEINFO, "null");
 	

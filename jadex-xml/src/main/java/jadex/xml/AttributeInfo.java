@@ -20,7 +20,7 @@ public class AttributeInfo
 
 	/** The value of this attribute is used as idref. */
 	public static final String IDREF = "idref";
-
+	
 	//-------- attributes --------
 	
 	/** The access info. */

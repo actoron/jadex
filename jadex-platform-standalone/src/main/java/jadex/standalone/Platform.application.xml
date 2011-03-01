@@ -106,7 +106,7 @@
 			new MessageService($component.getServiceProvider(),
 				new ITransport[]
 				{
-					new LocalTransport($component.getServiceProvider()),
+					//new LocalTransport($component.getServiceProvider()),
 					new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport)
 					//new TCPTransport($component.getServiceProvider(), $args.tcpport)
 				},
@@ -114,7 +114,7 @@
 				{
 					new FIPAMessageType()
 				}, null,
-				new CodecFactory(null, new Class[]{JadexXMLCodec.class, GZIPCodec.class})
+				new CodecFactory(null, new Class[]{JadexXMLCodec.class})
 				)
 		</providedservice>
 		<providedservice class="IClockService" direct="true">

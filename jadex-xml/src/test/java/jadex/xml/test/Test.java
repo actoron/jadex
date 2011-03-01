@@ -63,33 +63,37 @@ public class Test extends TestCase
 //			while(true)
 			{
 				t.testBigData();
-//				t.testMultiCollection();
-//				t.testEmptySet();
-//				t.testEmptyList();
-//				t.testEmptyMap();
-//				t.testSpecialCharacter();
-//				t.testBean();
-//				t.testEmptyArray();
-//				t.testArrayOrder();
-//				t.testMultiArray();
-//				t.testMultiArrayAttribute();
-//				t.testVectorModel();
-//				t.testClass();
-//				t.testDate();
-//				t.testColor();
-//				t.testArray();
-//				t.testList();
-//				t.testSet();
-//				t.testMap();
-//				t.testInnerClass();
-//				t.testURL();
-//				t.testLoggingLevel();
-//				t.testInetAddress();
-//				t.testBeanWithPublicFields();
-//				t.testBeanWithIncludedFields();
-//				t.testAnonymousInnerClass();
-//				t.testAnonymousInnerClassWithSimpleTypes();
-//				t.testImage();
+				t.testByte();
+				t.testByteArray();
+				t.testBByteArray();
+				t.testMultiCollection();
+				t.testEmptySet();
+				t.testEmptyList();
+				t.testEmptyMap();
+				t.testSpecialCharacter();
+				t.testBean();
+				t.testEmptyArray();
+				t.testArrayOrder();
+				t.testMultiArray();
+				t.testMultiArray2();
+				t.testMultiArrayAttribute();
+				t.testVectorModel();
+				t.testClass();
+				t.testDate();
+				t.testColor();
+				t.testArray();
+				t.testList();
+				t.testSet();
+				t.testMap();
+				t.testInnerClass();
+				t.testURL();
+				t.testLoggingLevel();
+				t.testInetAddress();
+				t.testBeanWithPublicFields();
+				t.testBeanWithIncludedFields();
+				t.testAnonymousInnerClass();
+				t.testAnonymousInnerClassWithSimpleTypes();
+				t.testImage();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -118,7 +122,7 @@ public class Test extends TestCase
 	{
 		byte[] xml = JavaWriter.objectToByteArray(wo, null);
 		
-//		System.out.println("xml is:"+xml);
+//		System.out.println("xml is:"+new String(xml));
 		
 		Object ro = JavaReader.objectFromByteArray(xml, null);
 		
@@ -157,6 +161,45 @@ public class Test extends TestCase
 		}
 		
 //		assertEquals("Written and read objects should be equal:", wo, ro);
+	}
+	
+	/**
+	 * 
+	 */
+	public void testByte() throws Exception
+	{
+		byte data = 55;
+		
+		doWriteAndRead(data);
+	}
+	
+	/**
+	 * 
+	 */
+	public void testByteArray() throws Exception
+	{
+		byte[] data = new String("hello world").getBytes();
+		
+		doWriteAndRead(data, new Comparator()
+		{
+			public int compare(Object o1, Object o2)
+			{
+				return Arrays.equals((byte[])o1, (byte[])o2)? 0: -1;
+			}
+		});
+	}
+	
+	/**
+	 * 
+	 */
+	public void testBByteArray() throws Exception
+	{
+		byte[] tmp = new String("hello world").getBytes();
+		Byte[] data = new Byte[tmp.length];
+		for(int i=0; i<tmp.length; i++)
+			data[i] = new Byte(tmp[i]);
+		
+		doWriteAndRead(data);
 	}
 	
 	/**
@@ -258,7 +301,7 @@ public class Test extends TestCase
 	 */
 	public void testEmptyArray() throws Exception
 	{
-		Integer[] data = new Integer[0];
+		int[] data = new int[0];
 		A a = new A();
 		a.setInts(data);
 		
@@ -305,6 +348,24 @@ public class Test extends TestCase
 		data[0][5] = null;
 		data[0][6] = "";
 		data[0][7] = new Long(2);
+		
+		doWriteAndRead(data);
+	}
+	
+	/**
+	 *  Test if multi array transfer works.
+	 */
+	public void testMultiArray2() throws Exception
+	{
+//		String[][] array = new String[3][2]; 
+//		array[0][0] = "a";
+//		array[1][0] = "b";
+//		array[2][0] = "c";
+		
+		Object[][] data = new Object[2][];
+
+		data[0] = new Object[]{1,2};
+		data[1] = new Object[]{3,4,5};
 		
 		doWriteAndRead(data);
 	}
