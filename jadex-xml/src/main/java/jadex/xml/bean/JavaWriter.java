@@ -124,122 +124,7 @@ public class JavaWriter extends Writer
 			}));
 			typeinfos.add(ti_array);
 			
-			// byte/Byte Array
-			IObjectStringConverter byteconv = new IObjectStringConverter()
-			{
-				public String convertObject(Object val, IContext context)
-				{
-					byte[] bytes = (byte[])val;
-					return new String(bytes);
-					
-				}
-			};
-			TypeInfo ti_bytearray = new TypeInfo(null, new ObjectInfo(byte[].class),
-				new MappingInfo(null, null,
-				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, byteconv))));
-			typeinfos.add(ti_bytearray);
 			
-			IObjectStringConverter bbyteconv = new IObjectStringConverter()
-			{
-				public String convertObject(Object val, IContext context)
-				{
-					Byte[] bbytes = (Byte[])val;
-					byte[] bytes = new byte[bbytes.length];
-					for(int i=0; i<bbytes.length; i++)
-						bytes[i] = bbytes[i].byteValue();
-					return new String(bytes);
-				}
-			};
-			TypeInfo ti_bbytearray = new TypeInfo(null, new ObjectInfo(Byte[].class),
-				new MappingInfo(null, null,
-				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, bbyteconv))));
-			typeinfos.add(ti_bbytearray);
-			
-			// int/Integer Array
-			IObjectStringConverter intconv = new IObjectStringConverter()
-			{
-				public String convertObject(Object val, IContext context)
-				{
-					int[] data = (int[])val;
-					StringBuilder bul = new StringBuilder();
-					bul.append(data.length).append(",");
-					for(int i=0; i<data.length; i++)
-					{
-						bul.append(data[i]);
-						if(i+1<data.length)
-							bul.append(",");
-					}
-					return bul.toString();
-				}
-			};
-			TypeInfo ti_intarray = new TypeInfo(null, new ObjectInfo(int[].class),
-				new MappingInfo(null, null,
-				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, intconv))));
-			typeinfos.add(ti_intarray);
-			
-			IObjectStringConverter integerconv = new IObjectStringConverter()
-			{
-				public String convertObject(Object val, IContext context)
-				{
-					Integer[] data = (Integer[])val;
-					StringBuilder bul = new StringBuilder();
-					bul.append(data.length).append(",");
-					for(int i=0; i<data.length; i++)
-					{
-						bul.append(data[i]);
-						if(i+1<data.length)
-							bul.append(",");
-					}
-					return bul.toString();
-				}
-			};
-			TypeInfo ti_integerarray = new TypeInfo(null, new ObjectInfo(Integer[].class),
-				new MappingInfo(null, null,
-				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, integerconv))));
-			typeinfos.add(ti_integerarray);
-			
-			// short/Short Array
-			IObjectStringConverter shortconv = new IObjectStringConverter()
-			{
-				public String convertObject(Object val, IContext context)
-				{
-					short[] data = (short[])val;
-					StringBuilder bul = new StringBuilder();
-					bul.append(data.length).append(",");
-					for(int i=0; i<data.length; i++)
-					{
-						bul.append(data[i]);
-						if(i+1<data.length)
-							bul.append(",");
-					}
-					return bul.toString();
-				}
-			};
-			TypeInfo ti_shortarray = new TypeInfo(null, new ObjectInfo(short[].class),
-				new MappingInfo(null, null,
-				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, shortconv))));
-			typeinfos.add(ti_shortarray);
-			
-			IObjectStringConverter bshortconv = new IObjectStringConverter()
-			{
-				public String convertObject(Object val, IContext context)
-				{
-					Short[] data = (Short[])val;
-					StringBuilder bul = new StringBuilder();
-					bul.append(data.length).append(",");
-					for(int i=0; i<data.length; i++)
-					{
-						bul.append(data[i]);
-						if(i+1<data.length)
-							bul.append(",");
-					}
-					return bul.toString();
-				}
-			};
-			TypeInfo ti_bshortarray = new TypeInfo(null, new ObjectInfo(Short[].class),
-				new MappingInfo(null, null,
-				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, bshortconv))));
-			typeinfos.add(ti_bshortarray);
 			
 			// java.util.Color
 			IObjectStringConverter coconv = new IObjectStringConverter()
@@ -283,6 +168,64 @@ public class JavaWriter extends Writer
 				null
 			));
 			typeinfos.add(ti_class);
+			
+			// java.net.URL
+			TypeInfo ti_url = new TypeInfo(null, new ObjectInfo(URL.class), 
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("protocol", null)),
+				new AttributeInfo(new AccessInfo("host", null)),
+				new AttributeInfo(new AccessInfo("port", null)),
+				new AttributeInfo(new AccessInfo("file", null))},
+				null
+			));
+			typeinfos.add(ti_url);
+			
+			// java.logging.Level
+			TypeInfo ti_level = new TypeInfo(null, new ObjectInfo(Level.class), 
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("name", null))},
+//				new AttributeInfo(new AccessInfo("value", null, null, null, 
+//					new BeanAccessInfo(null, Level.class.getMethod("intValue", new Class[0])))),
+//				new AttributeInfo(new AccessInfo("resourceBundleName", null))},
+				null
+			));
+			typeinfos.add(ti_level);
+			
+			// java.net.InetAddress
+			// The following hack ensures that all subclasses of InetAdress will be stored using the same tag
+			// todo: make this more easily possible
+			TypeInfo ti_inetaddr = new TypeInfo(new XMLInfo(new QName("typeinfo:java.net", "InetAddress")), new ObjectInfo(InetAddress.class), 
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("hostAddress", null))},
+				null
+			));
+			typeinfos.add(ti_inetaddr);
+			
+			// java.awt.image.RenderedImage
+			IObjectStringConverter imgconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					try
+					{
+						byte[] buf = SGUI.imageToStandardBytes((Image)val, "image/png");
+						return new String(Base64.encode(buf));						
+					}
+					catch(Exception e)
+					{
+						// todo: use context report
+						throw new RuntimeException(e);
+					}
+				}
+			};
+			TypeInfo ti_image = new TypeInfo(new XMLInfo(new QName("typeinfo:java.awt.image", "Image")), 
+				new ObjectInfo(Image.class), new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("imgdata", AccessInfo.THIS), new AttributeConverter(null, imgconv)),
+				new AttributeInfo(new AccessInfo("data", null, AccessInfo.IGNORE_READWRITE)),
+				new AttributeInfo(new AccessInfo("classname", null, null, null, new BeanAccessInfo(null, Object.class.getMethod("getClass", new Class[0]))))},
+				null
+			));
+			typeinfos.add(ti_image);
 			
 			// java.lang.String
 //			TypeInfo ti_string = new TypeInfo(null, new ObjectInfo(String.class), new MappingInfo(null, new AttributeInfo[]{
@@ -331,64 +274,170 @@ public class JavaWriter extends Writer
 				new AttributeInfo(new AccessInfo("content", AccessInfo.THIS))}));
 			typeinfos.add(ti_character);
 			
-			// java.net.URL
-			TypeInfo ti_url = new TypeInfo(null, new ObjectInfo(URL.class), 
-				new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("protocol", null)),
-				new AttributeInfo(new AccessInfo("host", null)),
-				new AttributeInfo(new AccessInfo("port", null)),
-				new AttributeInfo(new AccessInfo("file", null))},
-				null
-			));
-			typeinfos.add(ti_url);
+			// Shortcut notations for simple array types
 			
-			// java.logging.Level
-			TypeInfo ti_level = new TypeInfo(null, new ObjectInfo(Level.class), 
-				new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("name", null))},
-//				new AttributeInfo(new AccessInfo("value", null, null, null, 
-//					new BeanAccessInfo(null, Level.class.getMethod("intValue", new Class[0])))),
-//				new AttributeInfo(new AccessInfo("resourceBundleName", null))},
-				null
-			));
-			typeinfos.add(ti_level);
-			
-			// java.net.InetAddress
-			// The following hack ensures that all subclasses of InetAdress will be stored using the same tag
-			// todo: make this more easily possible
-			TypeInfo ti_inetaddr = new TypeInfo(new XMLInfo(new QName("typeinfo:java.net", "InetAddress")), new ObjectInfo(InetAddress.class), 
-				new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("hostAddress", null))},
-				null
-			));
-			typeinfos.add(ti_inetaddr);
-			
-			
-			// java.awt.image.RenderedImage
-			IObjectStringConverter imgconv = new IObjectStringConverter()
+			// boolean/Boolean Array
+			IObjectStringConverter booleanconv = new IObjectStringConverter()
 			{
 				public String convertObject(Object val, IContext context)
 				{
-					try
+					boolean[] data = (boolean[])val;
+					StringBuilder bul = new StringBuilder();
+					for(int i=0; i<data.length; i++)
 					{
-						byte[] buf = SGUI.imageToStandardBytes((Image)val, "image/png");
-						return new String(Base64.encode(buf));						
+						bul.append(data[i]? 1: 0);
 					}
-					catch(Exception e)
-					{
-						// todo: use context report
-						throw new RuntimeException(e);
-					}
+					return bul.toString();
 				}
 			};
-			TypeInfo ti_image = new TypeInfo(new XMLInfo(new QName("typeinfo:java.awt.image", "Image")), 
-				new ObjectInfo(Image.class), new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("imgdata", AccessInfo.THIS), new AttributeConverter(null, imgconv)),
-				new AttributeInfo(new AccessInfo("data", null, AccessInfo.IGNORE_READWRITE)),
-				new AttributeInfo(new AccessInfo("classname", null, null, null, new BeanAccessInfo(null, Object.class.getMethod("getClass", new Class[0]))))},
-				null
-			));
-			typeinfos.add(ti_image);
+			TypeInfo ti_booleanarray = new TypeInfo(null, new ObjectInfo(boolean[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, booleanconv))));
+			typeinfos.add(ti_booleanarray);
+			
+			IObjectStringConverter bbooleanconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					Boolean[] data = (Boolean[])val;
+					StringBuilder bul = new StringBuilder();
+					for(int i=0; i<data.length; i++)
+					{
+						bul.append(data[i].booleanValue()? 1: 0);
+					}
+					return bul.toString();
+				}
+			};
+			TypeInfo ti_bbooleanarray = new TypeInfo(null, new ObjectInfo(Boolean[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, bbooleanconv))));
+			typeinfos.add(ti_bbooleanarray);
+			
+			// int/Integer Array
+			IObjectStringConverter intconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					int[] data = (int[])val;
+					StringBuilder bul = new StringBuilder();
+					bul.append(data.length).append(",");
+					for(int i=0; i<data.length; i++)
+					{
+						bul.append(data[i]);
+						if(i+1<data.length)
+							bul.append(",");
+					}
+					return bul.toString();
+				}
+			};
+			TypeInfo ti_intarray = new TypeInfo(null, new ObjectInfo(int[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, intconv))));
+			typeinfos.add(ti_intarray);
+			
+			IObjectStringConverter integerconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					Integer[] data = (Integer[])val;
+					StringBuilder bul = new StringBuilder();
+					bul.append(data.length).append(",");
+					for(int i=0; i<data.length; i++)
+					{
+						bul.append(data[i]);
+						if(i+1<data.length)
+							bul.append(",");
+					}
+					return bul.toString();
+				}
+			};
+			TypeInfo ti_integerarray = new TypeInfo(null, new ObjectInfo(Integer[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, integerconv))));
+			typeinfos.add(ti_integerarray);
+			
+			// java.lang.Double
+			
+			// java.lang.Float
+			
+			// java.lang.Long
+			
+			// short/Short Array
+			IObjectStringConverter shortconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					short[] data = (short[])val;
+					StringBuilder bul = new StringBuilder();
+					bul.append(data.length).append(",");
+					for(int i=0; i<data.length; i++)
+					{
+						bul.append(data[i]);
+						if(i+1<data.length)
+							bul.append(",");
+					}
+					return bul.toString();
+				}
+			};
+			TypeInfo ti_shortarray = new TypeInfo(null, new ObjectInfo(short[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, shortconv))));
+			typeinfos.add(ti_shortarray);
+			
+			IObjectStringConverter bshortconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					Short[] data = (Short[])val;
+					StringBuilder bul = new StringBuilder();
+					bul.append(data.length).append(",");
+					for(int i=0; i<data.length; i++)
+					{
+						bul.append(data[i]);
+						if(i+1<data.length)
+							bul.append(",");
+					}
+					return bul.toString();
+				}
+			};
+			TypeInfo ti_bshortarray = new TypeInfo(null, new ObjectInfo(Short[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, bshortconv))));
+			typeinfos.add(ti_bshortarray);
+			
+			// byte/Byte Array
+			IObjectStringConverter byteconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					byte[] bytes = (byte[])val;
+					return new String(bytes);
+					
+				}
+			};
+			TypeInfo ti_bytearray = new TypeInfo(null, new ObjectInfo(byte[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, byteconv))));
+			typeinfos.add(ti_bytearray);
+			
+			IObjectStringConverter bbyteconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					Byte[] bbytes = (Byte[])val;
+					byte[] bytes = new byte[bbytes.length];
+					for(int i=0; i<bbytes.length; i++)
+						bytes[i] = bbytes[i].byteValue();
+					return new String(bytes);
+				}
+			};
+			TypeInfo ti_bbytearray = new TypeInfo(null, new ObjectInfo(Byte[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, bbyteconv))));
+			typeinfos.add(ti_bbytearray);
+			
+			// java.lang.Character
+			
 		}
 		catch(Exception e)
 		{

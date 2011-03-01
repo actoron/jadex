@@ -70,6 +70,8 @@ public class Test extends TestCase
 				t.testIntegerArray();
 				t.testShortArray();
 				t.testBShortArray();
+				t.testBooleanArray();
+				t.testBBooleanArray();
 				t.testMultiCollection();
 				t.testEmptySet();
 				t.testEmptyList();
@@ -244,6 +246,7 @@ public class Test extends TestCase
 		
 		doWriteAndRead(data); 
 	}
+
 	
 	/**
 	 * 
@@ -256,6 +259,32 @@ public class Test extends TestCase
 			data[i] = new Byte(tmp[i]);
 		
 		doWriteAndRead(data);
+	}
+	
+	/**
+	 * 
+	 */
+	public void testBooleanArray() throws Exception
+	{
+		boolean[] data = new boolean[]{true,false,false,true,true,false};
+		
+		doWriteAndRead(data, new Comparator()
+		{
+			public int compare(Object o1, Object o2)
+			{
+				return Arrays.equals((boolean[])o1, (boolean[])o2)? 0: -1;
+			}
+		});
+	}
+	
+	/**
+	 * 
+	 */
+	public void testBBooleanArray() throws Exception
+	{
+		Boolean[] data = new Boolean[]{Boolean.TRUE, Boolean.FALSE, Boolean.TRUE};
+		
+		doWriteAndRead(data); 
 	}
 	
 	/**

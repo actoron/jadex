@@ -8,6 +8,7 @@ import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
 import jadex.xml.IObjectObjectConverter;
+import jadex.xml.IObjectStringConverter;
 import jadex.xml.IPostProcessor;
 import jadex.xml.IStringObjectConverter;
 import jadex.xml.MappingInfo;
@@ -328,102 +329,11 @@ public class JavaReader extends Reader
 			));
 			typeinfos.add(ti_character);
 			
-			// byte/Byte Array
-			IStringObjectConverter byteconv = new IStringObjectConverter()
-			{
-				public Object convertString(String val, IContext context)
-				{
-					return val.getBytes();
-				}
-			};
-			TypeInfo ti_bytearray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO, "byte__1")}), null,
-				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(byteconv, null))));
-			typeinfos.add(ti_bytearray);
 			
-			IStringObjectConverter bbyteconv = new IStringObjectConverter()
-			{
-				public Object convertString(String val, IContext context)
-				{
-					byte[] bytes = val.getBytes();
-					Byte[] bbytes = new Byte[bytes.length];
-					for(int i=0; i<bytes.length; i++)
-						bbytes[i] = new Byte(bytes[i]);
-					return bbytes;
-				}
-			};
-			TypeInfo ti_bbytearray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Byte__1")}), null,
-				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(bbyteconv, null))));
-			typeinfos.add(ti_bbytearray);
 			
-			// int/Integer Array
-			IStringObjectConverter intconv = new IStringObjectConverter()
-			{
-				public Object convertString(String val, IContext context)
-				{
-					StringTokenizer stok = new StringTokenizer(val, ",");
-					int len = Integer.parseInt(stok.nextToken());
-					int[] ret = new int[len];
-					
-					for(int i=0; stok.hasMoreTokens(); i++)
-						ret[i] = Integer.parseInt(stok.nextToken());
-					return ret;
-				}
-			};
-			TypeInfo ti_intarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO, "int__1")}), null,
-				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(intconv, null))));
-			typeinfos.add(ti_intarray);
 			
-			IStringObjectConverter integerconv = new IStringObjectConverter()
-			{
-				public Object convertString(String val, IContext context)
-				{
-					StringTokenizer stok = new StringTokenizer(val, ",");
-					int len = Integer.parseInt(stok.nextToken());
-					Integer[] ret = new Integer[len];
-					
-					for(int i=0; stok.hasMoreTokens(); i++)
-						ret[i] = new Integer(stok.nextToken());
-					return ret;
-				}
-			};
-			TypeInfo ti_integerarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Integer__1")}), null,
-				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(integerconv, null))));
-			typeinfos.add(ti_integerarray);
 			
-			// short/Short Array
-			IStringObjectConverter shortconv = new IStringObjectConverter()
-			{
-				public Object convertString(String val, IContext context)
-				{
-					StringTokenizer stok = new StringTokenizer(val, ",");
-					int len = Integer.parseInt(stok.nextToken());
-					short[] ret = new short[len];
-					
-					for(int i=0; stok.hasMoreTokens(); i++)
-						ret[i] = Short.parseShort(stok.nextToken());
-					return ret;
-				}
-			};
-			TypeInfo ti_shortarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO, "short__1")}), null,
-				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(shortconv, null))));
-			typeinfos.add(ti_shortarray);
 			
-			IStringObjectConverter bshortconv = new IStringObjectConverter()
-			{
-				public Object convertString(String val, IContext context)
-				{
-					StringTokenizer stok = new StringTokenizer(val, ",");
-					int len = Integer.parseInt(stok.nextToken());
-					Short[] ret = new Short[len];
-					
-					for(int i=0; stok.hasMoreTokens(); i++)
-						ret[i] = new Short(stok.nextToken());
-					return ret;
-				}
-			};
-			TypeInfo ti_bshortarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Short__1")}), null,
-				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(bshortconv, null))));
-			typeinfos.add(ti_bshortarray);
 
 			// java.net.URL
 			TypeInfo ti_url = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.net", "URL")}),
@@ -504,6 +414,143 @@ public class JavaReader extends Reader
 				}
 			));
 			typeinfos.add(ti_image);
+			
+			
+			// Shortcut notations for simple array types
+			
+			// boolean/Boolean Array
+			IStringObjectConverter booleanconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					boolean[] ret = new boolean[val.length()];
+					for(int i=0; i<val.length(); i++)
+						ret[i] = val.charAt(i)=='1'? true: false;
+					return ret;
+				}
+			};
+			TypeInfo ti_booleanarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO, "boolean__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(booleanconv, null))));
+			typeinfos.add(ti_booleanarray);
+			
+			IStringObjectConverter bbooleanconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					Boolean[] ret = new Boolean[val.length()];
+					for(int i=0; i<val.length(); i++)
+						ret[i] = val.charAt(i)=='1'? Boolean.TRUE: Boolean.FALSE;
+					return ret;
+				}
+			};
+			TypeInfo ti_bbooleanarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Boolean__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(bbooleanconv, null))));
+			typeinfos.add(ti_bbooleanarray);
+			
+			// int/Integer Array
+			IStringObjectConverter intconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					StringTokenizer stok = new StringTokenizer(val, ",");
+					int len = Integer.parseInt(stok.nextToken());
+					int[] ret = new int[len];
+					
+					for(int i=0; stok.hasMoreTokens(); i++)
+						ret[i] = Integer.parseInt(stok.nextToken());
+					return ret;
+				}
+			};
+			TypeInfo ti_intarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO, "int__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(intconv, null))));
+			typeinfos.add(ti_intarray);
+			
+			IStringObjectConverter integerconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					StringTokenizer stok = new StringTokenizer(val, ",");
+					int len = Integer.parseInt(stok.nextToken());
+					Integer[] ret = new Integer[len];
+					
+					for(int i=0; stok.hasMoreTokens(); i++)
+						ret[i] = new Integer(stok.nextToken());
+					return ret;
+				}
+			};
+			TypeInfo ti_integerarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Integer__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(integerconv, null))));
+			typeinfos.add(ti_integerarray);
+			
+			// java.lang.Double
+			
+			// java.lang.Float
+			
+			// java.lang.Long
+			
+			// short/Short Array
+			IStringObjectConverter shortconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					StringTokenizer stok = new StringTokenizer(val, ",");
+					int len = Integer.parseInt(stok.nextToken());
+					short[] ret = new short[len];
+					
+					for(int i=0; stok.hasMoreTokens(); i++)
+						ret[i] = Short.parseShort(stok.nextToken());
+					return ret;
+				}
+			};
+			TypeInfo ti_shortarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO, "short__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(shortconv, null))));
+			typeinfos.add(ti_shortarray);
+			
+			IStringObjectConverter bshortconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					StringTokenizer stok = new StringTokenizer(val, ",");
+					int len = Integer.parseInt(stok.nextToken());
+					Short[] ret = new Short[len];
+					
+					for(int i=0; stok.hasMoreTokens(); i++)
+						ret[i] = new Short(stok.nextToken());
+					return ret;
+				}
+			};
+			TypeInfo ti_bshortarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Short__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(bshortconv, null))));
+			typeinfos.add(ti_bshortarray);
+			
+			// byte/Byte Array
+			IStringObjectConverter byteconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					return val.getBytes();
+				}
+			};
+			TypeInfo ti_bytearray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO, "byte__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(byteconv, null))));
+			typeinfos.add(ti_bytearray);
+			
+			IStringObjectConverter bbyteconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					byte[] bytes = val.getBytes();
+					Byte[] bbytes = new Byte[bytes.length];
+					for(int i=0; i<bytes.length; i++)
+						bbytes[i] = new Byte(bytes[i]);
+					return bbytes;
+				}
+			};
+			TypeInfo ti_bbytearray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Byte__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(bbyteconv, null))));
+			typeinfos.add(ti_bbytearray);
+			
+			// java.lang.Character
 		}
 		catch(NoSuchMethodException e)
 		{
