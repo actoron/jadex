@@ -559,6 +559,25 @@ public class MessageService  extends BasicService implements IMessageService
 	{
 		return (MessageType)messagetypes.get(type);
 	}
+	
+	/**
+	 *  Add content codec type.
+	 *  @param codec The codec type.
+	 */
+	public IFuture addContentCodec(IContentCodec codec)
+	{
+		return new Future(new UnsupportedOperationException());
+	}
+	
+	/**
+	 *  Remove content codec type.
+	 *  @param codec The codec type.
+	 */
+	public IFuture removeContentCodec(IContentCodec codec)
+	{
+		return new Future(new UnsupportedOperationException());
+	}
+
 
 	//-------- IPlatformService interface --------
 	
