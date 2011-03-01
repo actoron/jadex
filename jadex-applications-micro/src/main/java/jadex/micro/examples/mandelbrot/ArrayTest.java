@@ -1,6 +1,8 @@
 package jadex.micro.examples.mandelbrot;
 
 import jadex.commons.Base64;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 
 import java.util.Random;
 import java.util.StringTokenizer;
@@ -144,7 +146,7 @@ public class ArrayTest
 
 	public static void	main(String[] args)
 	{
-		short[][]	data = new short[1357][1248];
+		short[][]	data = new short[200][200];
 		
 		System.out.println("filling array...");
 		Random	r	= new Random();
@@ -156,6 +158,7 @@ public class ArrayTest
 			}
 		}
 		
+		// Custom string format.
 		System.out.println("encoding array...");
 		long	start	= System.nanoTime();
 		String	str	= shortToString(data);
@@ -179,8 +182,9 @@ public class ArrayTest
 				equal	= data[i][j]==data2[i][j];
 			}
 		}
-		System.out.println("Arrays are "+(equal?"equal":"different!"));
+		System.out.println("Arrays are "+(equal?"equal":"different!")+"\n");
 		
+		// Byte array.
 		System.out.println("encoding array to bytes...");
 		start	= System.nanoTime();
 		byte[]	bytes	= shortToByte(data);
@@ -204,8 +208,9 @@ public class ArrayTest
 				equal	= data[i][j]==data2[i][j];
 			}
 		}
-		System.out.println("Arrays are "+(equal?"equal":"different!"));
+		System.out.println("Arrays are "+(equal?"equal":"different!")+"\n");
 		
+		// Base 64.
 		System.out.println("encoding array to base64...");
 		start	= System.nanoTime();
 		str	= new String(Base64.encode(shortToByte(data)));
@@ -229,7 +234,66 @@ public class ArrayTest
 				equal	= data[i][j]==data2[i][j];
 			}
 		}
-		System.out.println("Arrays are "+(equal?"equal":"different!"));
+		System.out.println("Arrays are "+(equal?"equal":"different!")+"\n");
 
+		// XML
+		System.out.println("encoding array to XML...");
+		start	= System.nanoTime();
+		str	= JavaWriter.objectToXML(data, ArrayTest.class.getClassLoader());
+		time	= System.nanoTime() - start;
+		System.out.println("encoding to XML took "+(time/1000000)+" milliseconds");
+		System.out.println("encoded array is "+str.length()+" bytes");
+		
+		System.out.println("decoding XML...");
+		start	= System.nanoTime();
+		data2	= (short[][])JavaReader.objectFromXML(str, ArrayTest.class.getClassLoader());
+		time	= System.nanoTime() - start;
+		System.out.println("decoding XML took "+(time/1000000)+" milliseconds");
+	
+		System.out.println("Comparing arrays...");
+		equal	= data.length==data2.length;
+		for(short i=0; equal && i<data.length; i++)
+		{
+			equal	= data[i].length==data2[i].length;
+			for(short j=0; j<data[i].length; j++)
+			{
+				equal	= data[i][j]==data2[i][j];
+			}
+		}
+		System.out.println("Arrays are "+(equal?"equal":"different!")+"\n");
 	}
+	
+//	encoding array...
+//	encoding array took 15 milliseconds
+//	encoded array is 177795 bytes
+//	decoding array...
+//	decoding array took 13 milliseconds
+//	Comparing arrays...
+//	Arrays are equal
+//
+//	encoding array to bytes...
+//	encoding to bytes took 3 milliseconds
+//	encoded array is 80004 bytes
+//	decoding bytes...
+//	decoding bytes took 3 milliseconds
+//	Comparing arrays...
+//	Arrays are equal
+//
+//	encoding array to base64...
+//	encoding to base64 took 12 milliseconds
+//	encoded array is 106672 bytes
+//	decoding base64...
+//	decoding base64 took 12 milliseconds
+//	Comparing arrays...
+//	Arrays are equal
+//
+//	encoding array to XML...
+//	encoding to XML took 778 milliseconds
+//	encoded array is 3383020 bytes
+//	decoding XML...
+//	decoding XML took 500 milliseconds
+//	Comparing arrays...
+//	Arrays are equal
+
+
 }
