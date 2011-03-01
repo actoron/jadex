@@ -8,7 +8,6 @@ import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
 import jadex.xml.IObjectObjectConverter;
-import jadex.xml.IObjectStringConverter;
 import jadex.xml.IPostProcessor;
 import jadex.xml.IStringObjectConverter;
 import jadex.xml.MappingInfo;
@@ -26,12 +25,14 @@ import java.awt.Toolkit;
 import java.io.ByteArrayInputStream;
 import java.net.InetAddress;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
@@ -353,6 +354,76 @@ public class JavaReader extends Reader
 			TypeInfo ti_bbytearray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Byte__1")}), null,
 				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(bbyteconv, null))));
 			typeinfos.add(ti_bbytearray);
+			
+			// int/Integer Array
+			IStringObjectConverter intconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					StringTokenizer stok = new StringTokenizer(val, ",");
+					int len = Integer.parseInt(stok.nextToken());
+					int[] ret = new int[len];
+					
+					for(int i=0; stok.hasMoreTokens(); i++)
+						ret[i] = Integer.parseInt(stok.nextToken());
+					return ret;
+				}
+			};
+			TypeInfo ti_intarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO, "int__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(intconv, null))));
+			typeinfos.add(ti_intarray);
+			
+			IStringObjectConverter integerconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					StringTokenizer stok = new StringTokenizer(val, ",");
+					int len = Integer.parseInt(stok.nextToken());
+					Integer[] ret = new Integer[len];
+					
+					for(int i=0; stok.hasMoreTokens(); i++)
+						ret[i] = new Integer(stok.nextToken());
+					return ret;
+				}
+			};
+			TypeInfo ti_integerarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Integer__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(integerconv, null))));
+			typeinfos.add(ti_integerarray);
+			
+			// short/Short Array
+			IStringObjectConverter shortconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					StringTokenizer stok = new StringTokenizer(val, ",");
+					int len = Integer.parseInt(stok.nextToken());
+					short[] ret = new short[len];
+					
+					for(int i=0; stok.hasMoreTokens(); i++)
+						ret[i] = Short.parseShort(stok.nextToken());
+					return ret;
+				}
+			};
+			TypeInfo ti_shortarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO, "short__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(shortconv, null))));
+			typeinfos.add(ti_shortarray);
+			
+			IStringObjectConverter bshortconv = new IStringObjectConverter()
+			{
+				public Object convertString(String val, IContext context)
+				{
+					StringTokenizer stok = new StringTokenizer(val, ",");
+					int len = Integer.parseInt(stok.nextToken());
+					Short[] ret = new Short[len];
+					
+					for(int i=0; stok.hasMoreTokens(); i++)
+						ret[i] = new Short(stok.nextToken());
+					return ret;
+				}
+			};
+			TypeInfo ti_bshortarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Short__1")}), null,
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(bshortconv, null))));
+			typeinfos.add(ti_bshortarray);
 
 			// java.net.URL
 			TypeInfo ti_url = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.net", "URL")}),

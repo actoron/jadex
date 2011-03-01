@@ -155,6 +155,92 @@ public class JavaWriter extends Writer
 				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, bbyteconv))));
 			typeinfos.add(ti_bbytearray);
 			
+			// int/Integer Array
+			IObjectStringConverter intconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					int[] data = (int[])val;
+					StringBuilder bul = new StringBuilder();
+					bul.append(data.length).append(",");
+					for(int i=0; i<data.length; i++)
+					{
+						bul.append(data[i]);
+						if(i+1<data.length)
+							bul.append(",");
+					}
+					return bul.toString();
+				}
+			};
+			TypeInfo ti_intarray = new TypeInfo(null, new ObjectInfo(int[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, intconv))));
+			typeinfos.add(ti_intarray);
+			
+			IObjectStringConverter integerconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					Integer[] data = (Integer[])val;
+					StringBuilder bul = new StringBuilder();
+					bul.append(data.length).append(",");
+					for(int i=0; i<data.length; i++)
+					{
+						bul.append(data[i]);
+						if(i+1<data.length)
+							bul.append(",");
+					}
+					return bul.toString();
+				}
+			};
+			TypeInfo ti_integerarray = new TypeInfo(null, new ObjectInfo(Integer[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, integerconv))));
+			typeinfos.add(ti_integerarray);
+			
+			// short/Short Array
+			IObjectStringConverter shortconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					short[] data = (short[])val;
+					StringBuilder bul = new StringBuilder();
+					bul.append(data.length).append(",");
+					for(int i=0; i<data.length; i++)
+					{
+						bul.append(data[i]);
+						if(i+1<data.length)
+							bul.append(",");
+					}
+					return bul.toString();
+				}
+			};
+			TypeInfo ti_shortarray = new TypeInfo(null, new ObjectInfo(short[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, shortconv))));
+			typeinfos.add(ti_shortarray);
+			
+			IObjectStringConverter bshortconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					Short[] data = (Short[])val;
+					StringBuilder bul = new StringBuilder();
+					bul.append(data.length).append(",");
+					for(int i=0; i<data.length; i++)
+					{
+						bul.append(data[i]);
+						if(i+1<data.length)
+							bul.append(",");
+					}
+					return bul.toString();
+				}
+			};
+			TypeInfo ti_bshortarray = new TypeInfo(null, new ObjectInfo(Short[].class),
+				new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, bshortconv))));
+			typeinfos.add(ti_bshortarray);
+			
 			// java.util.Color
 			IObjectStringConverter coconv = new IObjectStringConverter()
 			{

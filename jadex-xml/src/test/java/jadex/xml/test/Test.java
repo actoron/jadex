@@ -66,6 +66,10 @@ public class Test extends TestCase
 				t.testByte();
 				t.testByteArray();
 				t.testBByteArray();
+				t.testIntArray();
+				t.testIntegerArray();
+				t.testShortArray();
+				t.testBShortArray();
 				t.testMultiCollection();
 				t.testEmptySet();
 				t.testEmptyList();
@@ -187,6 +191,58 @@ public class Test extends TestCase
 				return Arrays.equals((byte[])o1, (byte[])o2)? 0: -1;
 			}
 		});
+	}
+	
+	/**
+	 * 
+	 */
+	public void testIntArray() throws Exception
+	{
+		int[] data = new int[]{1,2,3,4,5,6};
+		
+		doWriteAndRead(data, new Comparator()
+		{
+			public int compare(Object o1, Object o2)
+			{
+				return Arrays.equals((int[])o1, (int[])o2)? 0: -1;
+			}
+		});
+	}
+	
+	/**
+	 * 
+	 */
+	public void testIntegerArray() throws Exception
+	{
+		Integer[] data = new Integer[]{new Integer(1), new Integer(2), new Integer(3)};
+		
+		doWriteAndRead(data); 
+	}
+	
+	/**
+	 * 
+	 */
+	public void testShortArray() throws Exception
+	{
+		short[] data = new short[]{1,2,3,4,5,6};
+		
+		doWriteAndRead(data, new Comparator()
+		{
+			public int compare(Object o1, Object o2)
+			{
+				return Arrays.equals((short[])o1, (short[])o2)? 0: -1;
+			}
+		});
+	}
+	
+	/**
+	 * 
+	 */
+	public void testBShortArray() throws Exception
+	{
+		Short[] data = new Short[]{new Short((short)1), new Short((short)2), new Short((short)3)};
+		
+		doWriteAndRead(data); 
 	}
 	
 	/**
