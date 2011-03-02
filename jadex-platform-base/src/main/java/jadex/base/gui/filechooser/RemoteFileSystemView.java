@@ -4,6 +4,7 @@ import jadex.base.gui.filetree.FileData;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.SUtil;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.xml.annotation.XMLClassname;
 
@@ -36,12 +37,20 @@ public class RemoteFileSystemView extends FileSystemView
 	/**
 	 * 
 	 */
-	public RemoteFileSystemView(IExternalAccess exta, JFileChooser chooser)
+	public RemoteFileSystemView(IExternalAccess exta)
 	{
 		this.exta = exta;
-		this.chooser = chooser;
 		this.children = new HashMap();
 		this.parents = new HashMap();
+	}
+	
+	/**
+	 *  Set the file chooser.
+	 */
+	public void setFileChooser(JFileChooser chooser)
+	{
+		this.chooser = chooser;
+		chooser.rescanCurrentDirectory();
 	}
 
 
@@ -378,8 +387,9 @@ public class RemoteFileSystemView extends FileSystemView
 				@XMLClassname("getFiles")
 				public Object execute(IInternalAccess ia)
 				{
-					FileSystemView view = FileSystemView.getFileSystemView();
-					File[] roots = view.getRoots();
+//					FileSystemView view = FileSystemView.getFileSystemView();
+//					File[] roots = view.getRoots();
+					File[] roots = File.listRoots();
 					return FileData.convertToRemoteFiles(roots);
 				}
 			}).addResultListener(new SwingDefaultResultListener()
@@ -389,7 +399,9 @@ public class RemoteFileSystemView extends FileSystemView
 					FileData[] remfiles = (FileData[])result;
 					File[] files = FileData.convertToFiles(remfiles);
 					children.put("roots", files);
-					chooser.rescanCurrentDirectory();
+					System.out.println("roots: "+SUtil.arrayToString(files));
+//					if(chooser!=null)
+//						chooser.rescanCurrentDirectory();
 					
 //					System.out.println("Found roots: "+SUtil.arrayToString(files));
 				}
@@ -516,12 +528,14 @@ public class RemoteFileSystemView extends FileSystemView
 				{
 					FileData[] remfiles = (FileData[])result;
 					File[] files = FileData.convertToFiles(remfiles);
+					System.out.println("children: "+dir+" "+SUtil.arrayToString(files));
 					children.put(dir.getAbsolutePath(), files);
 					for(int i=0; i<files.length; i++)
 					{
 						parents.put(files[i].getAbsolutePath(), dir);
 					}
-					chooser.rescanCurrentDirectory();
+//					if(chooser!=null)
+//						chooser.rescanCurrentDirectory();
 //					System.out.println("Found children: "+SUtil.arrayToString(files));
 				}
 			});
@@ -552,17 +566,22 @@ public class RemoteFileSystemView extends FileSystemView
 				{
 					FileSystemView view = FileSystemView.getFileSystemView();
 					File parent = view.getParentDirectory(new File(path)); // todo: useFileHandling
-					return new FileData(parent);
+					return parent!=null? new FileData(parent): null;
 				}
 			}).addResultListener(new SwingDefaultResultListener()
 			{
 				public void customResultAvailable(Object result)
 				{
-					FileData remfile = (FileData)result;
-					File parent = new File(remfile.getPath());
-					parents.put(dir.getAbsolutePath(), parent);
-					children.put(parent.getAbsolutePath(), dir);
-					chooser.rescanCurrentDirectory();
+					if(result!=null)
+					{
+						FileData remfile = (FileData)result;
+						File parent = new File(remfile.getPath());
+						parents.put(dir.getAbsolutePath(), parent);
+						children.put(parent.getAbsolutePath(), new File[]{dir});
+					}
+//					if(chooser!=null)
+//						chooser.rescanCurrentDirectory();
+					System.out.println("parent: "+dir+" "+parent);
 				}
 			});
 		}

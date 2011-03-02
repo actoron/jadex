@@ -445,7 +445,7 @@
 
 		<!-- WfMS -->
 
-		<profile>
+		<!-- <profile>
 			<id>jadex-wfms-dist</id>
 			<build>
 				<finalName>jadex-wfms-${project.version}</finalName>
@@ -489,7 +489,7 @@
 				<module>jadex-platform-wfms</module>
 				<module>jadex-wfms-launch</module>
 			</modules>
-		</profile>
+		</profile> -->
 		
 		<!-- eclipse -->
 
@@ -536,7 +536,7 @@
 				<module>jadex-platform-standalone-launch</module>
 
 				<module>jadex-platform-wfms</module>
-				<module>jadex-wfms-launch</module>
+				<!-- <module>jadex-wfms-launch</module> -->
 				<module>jadex-applications-wfms</module>
 
 				<module>jadex-platform-jade</module>

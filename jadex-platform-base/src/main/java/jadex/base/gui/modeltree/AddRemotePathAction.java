@@ -2,6 +2,7 @@ package jadex.base.gui.modeltree;
 
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filechooser.RemoteFileSystemView;
+import jadex.base.gui.filechooser.TestFileSystemView;
 import jadex.base.gui.filetree.FileTreePanel;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.gui.SGUI;
@@ -76,8 +77,9 @@ public class AddRemotePathAction extends ToolTipAction
 		// todo: move to constructor, currently produces nullpointer
 		if(filechooser==null)
 		{
-			filechooser = new JFileChooser();
-			filechooser.setFileSystemView(new RemoteFileSystemView(treepanel.getExternalAccess(), filechooser));
+			RemoteFileSystemView view = new RemoteFileSystemView(treepanel.getExternalAccess());
+			filechooser = new JFileChooser(view);
+			view.setFileChooser(filechooser);
 			filechooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 			filechooser.addChoosableFileFilter(new FileFilter()
 			{
