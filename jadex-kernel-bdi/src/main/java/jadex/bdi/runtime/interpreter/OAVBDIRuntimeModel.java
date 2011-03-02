@@ -659,6 +659,9 @@ public class OAVBDIRuntimeModel
 	/** The message event has a send future (hack???). */
 	public static OAVAttributeType messageevent_has_sendfuture;
 	
+	/** The message event has a send future (hack???). */
+	public static OAVAttributeType messageevent_has_codecids;
+	
 	//-------- internal event --------
 	
 	/** The internal event type. */
@@ -914,6 +917,7 @@ public class OAVBDIRuntimeModel
 		// Hack!!! Add to processable element as required by createBuildRPlanAPLRules.
 		messageevent_has_original = processableelement_type.createAttributeType("messageevent_has_original", messageevent_type);
 		messageevent_has_sendfuture = messageevent_type.createAttributeType("messageevent_has_sendfuture", OAVJavaType.java_object_type);
+		messageevent_has_codecids = messageevent_type.createAttributeType("messageevent_has_codecids", OAVJavaType.java_object_type);
 		
 		// capability reference
 		capabilityreference_has_name = capabilityreference_type.createAttributeType("capabilityreference_has_name", OAVJavaType.java_string_type);

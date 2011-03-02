@@ -61,6 +61,16 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	 */
 	public IFuture	sendMessage(IMessageEvent me)
 	{
+		return sendMessage(me, null);
+	}
+	
+	/**
+	 *  Send a message after some delay.
+	 *  @param me	The message event.
+	 *  @return The filter to wait for an answer.
+	 */
+	public IFuture	sendMessage(IMessageEvent me, final byte[] codecids)
+	{
 		IFuture	ret;
 		if(getInterpreter().isExternalThread())
 		{
@@ -68,14 +78,14 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 			{
 				public void run()
 				{
-					object	= MessageEventRules.sendMessage(getState(), getScope(), ((ElementFlyweight)arg).getHandle());
+					object	= MessageEventRules.sendMessage(getState(), getScope(), ((ElementFlyweight)arg).getHandle(), codecids);
 				}
 			};
 			ret	= (IFuture)invoc.object;
 		}
 		else
 		{
-			ret	= MessageEventRules.sendMessage(getState(), getScope(), ((ElementFlyweight)me).getHandle());
+			ret	= MessageEventRules.sendMessage(getState(), getScope(), ((ElementFlyweight)me).getHandle(), codecids);
 		}
 		return ret;
 	}

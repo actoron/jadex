@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  *  Handler for message events.
@@ -29,16 +30,19 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	//-------- constants --------
 	
 	/** The isThrowing property name (distinguishes send/receive events). */
-	public static final String	PROPERTY_THROWING	= "isThrowing";	
+	public static final String	PROPERTY_THROWING = "isThrowing";	
 	
 	/** The type property message type identifies the meta type (e.g. fipa). */
-	public static final String	PROPERTY_MESSAGETYPE	= "messagetype";
+	public static final String	PROPERTY_MESSAGETYPE = "messagetype";
 	
 	/** The filter property describes the filter for receiving a message. */
 	public static final String	PROPERTY_FILTER	= "filter";
 	
 	/** The property message is the message to be sent. */
 	public static final String	PROPERTY_MESSAGE = "message";
+	
+	/** The property message is the message to be sent. */
+	public static final String	PROPERTY_CODECIDS = "codecids";
 	
 	//-------- methods --------
 	
@@ -149,8 +153,16 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 							}
 						}
 						
+						// todo: implement me on gui layer
+						String tmp = (String)thread.getPropertyValue(PROPERTY_CODECIDS);
+						StringTokenizer stok = new StringTokenizer(tmp, ",");
+						byte[] codecids = new byte[stok.countTokens()];
+						for(int i=0; stok.hasMoreTokens(); i++)
+							codecids[i] = Byte.parseByte(stok.nextToken());
+						
 						thread.setWaiting(true);
-						ms.sendMessage(msg, mt, instance.getComponentAdapter().getComponentIdentifier(), instance.getClassLoader(), null)
+						ms.sendMessage(msg, mt, instance.getComponentAdapter().getComponentIdentifier(), 
+							instance.getClassLoader(), codecids)
 							.addResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object result)

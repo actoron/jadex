@@ -117,11 +117,13 @@ public class MessageEventRules
 	 *  @param me The message event.
 	 *  @return The filter to wait for an answer.
 	 */
-	public static IFuture	sendMessage(IOAVState state, Object rcapa, Object rmessageevent)
+	public static IFuture	sendMessage(IOAVState state, Object rcapa, Object rmessageevent, byte[] codecids)
 	{
 		Future ret = new Future();
 		
 		state.setAttributeValue(rmessageevent, OAVBDIRuntimeModel.messageevent_has_sendfuture, ret);
+		if(codecids!=null)
+			state.setAttributeValue(rmessageevent, OAVBDIRuntimeModel.messageevent_has_codecids, codecids);
 		state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_outbox, rmessageevent);
 		
 		// Hack!!! Only needed for external access!
@@ -649,7 +651,8 @@ public class MessageEventRules
 				Object rcapa = assignments.getVariableValue("?rcapa");
 				Object rme = assignments.getVariableValue("?me");
 				final Future ret = (Future)state.getAttributeValue(rme, OAVBDIRuntimeModel.messageevent_has_sendfuture);
-				
+				final byte[] codecids = (byte[])state.getAttributeValue(rme, OAVBDIRuntimeModel.messageevent_has_codecids);
+						
 				// Transform message event to map.
 				Object mme = state.getAttributeValue(rme, OAVBDIRuntimeModel.element_has_model);
 				MessageType mtype = getMessageEventType(state, mme);
@@ -733,8 +736,8 @@ public class MessageEventRules
 					{
 						public void resultAvailable(Object result)
 						{
-							IFuture	sent	= ((IMessageService)result).sendMessage(msg.getParameterMap(), msg.getMessageType(), 
-								interpreter.getAgentAdapter().getComponentIdentifier(), interpreter.getModel().getState().getTypeModel().getClassLoader(), null);
+							IFuture	sent = ((IMessageService)result).sendMessage(msg.getParameterMap(), msg.getMessageType(), 
+								interpreter.getAgentAdapter().getComponentIdentifier(), interpreter.getModel().getState().getTypeModel().getClassLoader(), codecids);
 							
 							// ret may be null for initial events.
 							if(ret!=null)

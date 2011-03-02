@@ -579,12 +579,21 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 */
 	public IFuture sendMessage(IMessageEvent me)
 	{	
+		return sendMessage(me, null);
+	}
+	
+	/**
+	 *  Send a message after some delay.
+	 *  @param me	The message event.
+	 *  @return The filter to wait for an answer.
+	 */
+	public IFuture sendMessage(IMessageEvent me, byte[] codecids)
+	{	
 		Object revent = ((MessageEventFlyweight)me).getHandle();
 		Object rcapa = ((MessageEventFlyweight)me).getScope();
 		interpreter.startMonitorConsequences();
-		IFuture	ret	= MessageEventRules.sendMessage(state, rcapa, revent);
+		IFuture	ret	= MessageEventRules.sendMessage(state, rcapa, revent, codecids);
 		interpreter.endMonitorConsequences();
-	
 		return ret;
 	}
 

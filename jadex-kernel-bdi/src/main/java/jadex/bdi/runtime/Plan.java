@@ -214,11 +214,23 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	 */
 	public IMessageEvent sendMessageAndWait(IMessageEvent me, long timeout)
 	{
+		return sendMessageAndWait(me, timeout, null);
+	}
+	
+	/**
+	 *  Send a message and wait for the answer.
+	 *  Adds a reply_with entry if not present, for tracking the conversation.
+	 *  @param me The message event.
+	 *  @param timeout The timeout.
+	 *  @return The result event.
+	 */
+	public IMessageEvent sendMessageAndWait(IMessageEvent me, long timeout, byte[] codecids)
+	{
 		// Todo: check thread access.
 		Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
 		SFlyweightFunctionality.addReply(wa, (ElementFlyweight)me, getState(), getRCapability());
 		Object[] ret = PlanRules.initializeWait(wa, timeout, getState(), getRCapability(), getRPlan());
-		sendMessage(me);
+		sendMessage(me, codecids);
 		if(ret[0]==null)
 		{
 			PlanRules.doWait(getState(), getRPlan());
