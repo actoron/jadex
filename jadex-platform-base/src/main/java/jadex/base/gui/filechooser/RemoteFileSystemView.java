@@ -420,7 +420,18 @@ public class RemoteFileSystemView extends FileSystemView
 	// implementation.
 	public File getHomeDirectory()
 	{
-		return new File(".");//createFileObject(System.getProperty("user.home"));
+		File ret = null;
+		File[] roots = (File[])children.get("roots");
+		if(roots!=null)
+		{
+			ret = roots[0];
+		}
+		else
+		{
+			ret = new RemoteFile("unknown", "", true);
+			getRoots();
+		}
+		return ret;//new File(".");//createFileObject(System.getProperty("user.home"));
 	}
 
 	/**
@@ -432,7 +443,8 @@ public class RemoteFileSystemView extends FileSystemView
 	 */
 	public File getDefaultDirectory()
 	{
-		return new File(".");
+		return getHomeDirectory();
+//		return new RemoteFile("test", "test", true);//new File(".");
 //		File f = (File)ShellFolder.get("fileChooserDefaultFolder");
 //		if(isFileSystemRoot(f))
 //		{
