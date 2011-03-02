@@ -1,7 +1,7 @@
 package jadex.base.gui.filetree;
 
 import jadex.base.gui.asynctree.ITreeNode;
-import jadex.base.gui.filechooser.MyFile;
+import jadex.base.gui.filechooser.RemoteFile;
 import jadex.commons.SUtil;
 
 import java.io.File;
@@ -69,7 +69,7 @@ public class DefaultIconCache implements IIconCache
 					// Case dir in Jar
 					if(file instanceof JarAsDirectory && suffix.length()==0)// && !((JarAsDirectory)file).isRoot())
 					{
-						tmp = new MyFile(file.getName(), "", true);
+						tmp = new RemoteFile(file.getName(), "", true);
 						ret = FileSystemView.getFileSystemView().getSystemIcon(tmp);  
 					}
 					else
@@ -110,7 +110,7 @@ public class DefaultIconCache implements IIconCache
 		}
 		else if(node instanceof RemoteFileNode)
 		{
-			RemoteFile file = ((RemoteFileNode)node).getRemoteFile();
+			FileData file = ((RemoteFileNode)node).getRemoteFile();
 
 			String suffix = "";
 			if(!file.isDirectory())
@@ -139,7 +139,7 @@ public class DefaultIconCache implements IIconCache
 						ret = (Icon)icons.get(DEFAULT_FOLDER);
 						if(ret==null)
 						{
-							tmp = new MyFile(file.getFilename(), "", true);
+							tmp = new RemoteFile(file.getFilename(), "", true);
 							ret = FileSystemView.getFileSystemView().getSystemIcon(tmp); 
 						}
 					}

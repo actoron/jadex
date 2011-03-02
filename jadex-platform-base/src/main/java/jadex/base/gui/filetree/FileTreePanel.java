@@ -330,7 +330,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	/**
 	 *  Add a top level node.
 	 */
-	public void addTopLevelNode(RemoteFile file)
+	public void addTopLevelNode(FileData file)
 	{
 		assert remote;
 		
@@ -566,7 +566,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 			{
 				for(int i=0; i<paths.length; i++)
 				{
-					RemoteFile file = ((RemoteFileNode)paths[i].getLastPathComponent()).getRemoteFile();
+					FileData file = ((RemoteFileNode)paths[i].getLastPathComponent()).getRemoteFile();
 					ret[i] = file.getPath();
 				}
 			}

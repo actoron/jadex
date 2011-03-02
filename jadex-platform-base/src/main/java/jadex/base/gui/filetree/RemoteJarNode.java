@@ -31,7 +31,7 @@ public class RemoteJarNode extends RemoteDirNode
 	/**
 	 *  Create a new jar node.
 	 */
-	public RemoteJarNode(ITreeNode parent, AsyncTreeModel model, JTree tree, RemoteFile file, 
+	public RemoteJarNode(ITreeNode parent, AsyncTreeModel model, JTree tree, FileData file, 
 		IIconCache iconcache, IRemoteFilter filter, IExternalAccess exta, INodeFactory factory)
 	{
 		super(parent, model, tree, file, iconcache, filter, exta, factory);
@@ -47,7 +47,7 @@ public class RemoteJarNode extends RemoteDirNode
 	{
 		Future ret = new Future();
 		
-		final RemoteFile myfile = file;
+		final FileData myfile = file;
 		final IRemoteFilter myfilter = filter;
 		exta.scheduleStep(new IComponentStep()
 		{
@@ -73,7 +73,7 @@ public class RemoteJarNode extends RemoteDirNode
 							rjfentries.put(tmp[0], tmp[1]);
 						}
 						RemoteJarFile rjf = new RemoteJarFile(jad.getName(), jad.getAbsolutePath(), true, 
-							RemoteFile.getDisplayName(jad), rjfentries, "/");
+							FileData.getDisplayName(jad), rjfentries, "/");
 						Collection files = rjf.listFiles();
 						ret.setResult(files);
 					}

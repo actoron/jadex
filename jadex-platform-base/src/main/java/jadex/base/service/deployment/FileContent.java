@@ -10,7 +10,7 @@ import jadex.commons.Base64;
  *  A file data is for transferring binary file content as byte[]
  *  via a base64 coded string.
  */
-public class FileData
+public class FileContent
 {
 	/** The file name. */
 	protected String filename;
@@ -21,14 +21,14 @@ public class FileData
 	/**
 	 *  Create a new file data.
 	 */
-	public FileData()
+	public FileContent()
 	{
 	}
 	
 	/**
 	 *  Create new file data with content of a file.
 	 */
-	public FileData(File file)
+	public FileContent(File file)
 	{
 		this.filename = file.getName();
 		FileInputStream fis = null;

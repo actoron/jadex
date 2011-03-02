@@ -6,7 +6,7 @@ import jadex.base.gui.filetree.DefaultFileFilter;
 import jadex.base.gui.filetree.DefaultFileFilterMenuItemConstructor;
 import jadex.base.gui.filetree.DefaultNodeHandler;
 import jadex.base.gui.filetree.FileTreePanel;
-import jadex.base.gui.filetree.RemoteFile;
+import jadex.base.gui.filetree.FileData;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.service.deployment.IDeploymentService;
 import jadex.bridge.IExternalAccess;
@@ -73,7 +73,7 @@ public class DeploymentServiceViewerPanel implements IServiceViewerPanel
 			{
 				public void customResultAvailable(Object result)
 				{
-					RemoteFile[] roots = (RemoteFile[])result;
+					FileData[] roots = (FileData[])result;
 					for(int i=0; i<roots.length; i++)
 					{
 						ftp.addTopLevelNode(roots[i]);

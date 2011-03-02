@@ -8,7 +8,7 @@ import jadex.base.gui.filetree.JarAsDirectory;
 import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.base.service.deployment.FileData;
+import jadex.base.service.deployment.FileContent;
 import jadex.base.service.deployment.IDeploymentService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -164,7 +164,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 					if(sel_1!=null && sel_2!=null)
 					{
 						File source = new File(sel_1);
-						ds.putFile(new FileData(source), sel_2)
+						ds.putFile(new FileContent(source), sel_2)
 							.addResultListener(new SwingDefaultResultListener()
 						{
 							public void customResultAvailable(Object result)

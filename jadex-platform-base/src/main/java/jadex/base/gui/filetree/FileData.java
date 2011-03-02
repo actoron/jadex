@@ -1,18 +1,18 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.gui.filechooser.MyFile;
+import jadex.base.gui.filechooser.RemoteFile;
 
 import java.io.File;
 
 import javax.swing.filechooser.FileSystemView;
 
 /**
- *  A remote file represents a java.io.File that
+ *  A file data represents a java.io.File that
  *  can be transferred to remote address spaces.
  *  Does only transfer file information, not the
  *  binary data itself.
  */
-public class RemoteFile
+public class FileData
 {
 	//-------- attributes --------
 	
@@ -36,7 +36,7 @@ public class RemoteFile
 	/**
 	 *  Create a new remote file.
 	 */
-	public RemoteFile()
+	public FileData()
 	{
 		// Needed for bean creation.
 	}
@@ -44,7 +44,7 @@ public class RemoteFile
 	/**
 	 *  Create a new remote file.
 	 */
-	public RemoteFile(String filename, String path, boolean directory, String displayname)//, boolean root)
+	public FileData(String filename, String path, boolean directory, String displayname)//, boolean root)
 	{
 		this.filename = filename;
 		this.path = path;
@@ -56,7 +56,7 @@ public class RemoteFile
 	/**
 	 *  Create a new remote file.
 	 */
-	public RemoteFile(File file)
+	public FileData(File file)
 	{
 		this.filename = file.getName();
 		this.path = file.getAbsolutePath();
@@ -173,12 +173,12 @@ public class RemoteFile
 	/**
 	 *  Convert remote files to files.
 	 */
-	public static File[] convertToFiles(RemoteFile[] remfiles)
+	public static File[] convertToFiles(FileData[] remfiles)
 	{
 		File[] ret = remfiles==null? new File[0]: new File[remfiles.length];
 		for(int i=0; i<ret.length; i++)
 		{
-			ret[i] = new MyFile(remfiles[i].getFilename(), remfiles[i].getPath(), remfiles[i].isDirectory());
+			ret[i] = new RemoteFile(remfiles[i].getFilename(), remfiles[i].getPath(), remfiles[i].isDirectory());
 		}
 		return ret;
 	}
@@ -186,12 +186,12 @@ public class RemoteFile
 	/**
 	 *  Convert files to remote files.
 	 */
-	public static RemoteFile[] convertToRemoteFiles(File[] files)
+	public static FileData[] convertToRemoteFiles(File[] files)
 	{
-		RemoteFile[] ret = files==null? new RemoteFile[0]: new RemoteFile[files.length];
+		FileData[] ret = files==null? new FileData[0]: new FileData[files.length];
 		for(int i=0; i<ret.length; i++)
 		{
-			ret[i] = new RemoteFile(files[i]);
+			ret[i] = new FileData(files[i]);
 		}
 		return ret;
 	}

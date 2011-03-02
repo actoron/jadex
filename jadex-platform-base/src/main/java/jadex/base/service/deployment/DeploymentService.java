@@ -1,6 +1,6 @@
 package jadex.base.service.deployment;
 
-import jadex.base.gui.filetree.RemoteFile;
+import jadex.base.gui.filetree.FileData;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.service.BasicService;
@@ -31,8 +31,8 @@ public class DeploymentService extends BasicService implements IDeploymentServic
 		Future ret = new Future();
 		try
 		{
-			FileData fd = new FileData(new File(path));
-			ret.setResult(fd);
+			FileContent fc = new FileContent(new File(path));
+			ret.setResult(fc);
 		}
 		catch(Exception e)
 		{
@@ -47,12 +47,12 @@ public class DeploymentService extends BasicService implements IDeploymentServic
 	 *  @param path The target path.
 	 *  @return null when all was ok.
 	 */
-	public IFuture putFile(FileData filedata, String path)
+	public IFuture putFile(FileContent filecontent, String path)
 	{
 		Future ret = new Future();
 		try
 		{
-			filedata.writeFile(new File(path+"/"+filedata.getFilename()));
+			filecontent.writeFile(new File(path+"/"+filecontent.getFilename()));
 			ret.setResult(null);
 		}
 		catch(Exception e)
@@ -126,7 +126,7 @@ public class DeploymentService extends BasicService implements IDeploymentServic
 	public IFuture getRoots()
 	{
 		File[] roots = File.listRoots();
-		return new Future(RemoteFile.convertToRemoteFiles(roots));
+		return new Future(FileData.convertToRemoteFiles(roots));
 	}
 	
 	/**

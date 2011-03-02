@@ -20,7 +20,7 @@ public interface IDeploymentService extends IService
 	 *  @param path The target path.
 	 *  @return True, when the file has been copied.
 	 */
-	public IFuture putFile(FileData filedata, String path);
+	public IFuture putFile(FileContent filedata, String path);
 	
 	/**
 	 *  Rename a file.

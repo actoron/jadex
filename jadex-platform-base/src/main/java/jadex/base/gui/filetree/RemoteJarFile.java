@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  *  The remote jar file.
  */
-public class RemoteJarFile extends RemoteFile
+public class RemoteJarFile extends FileData
 {
 	//-------- attributes --------
 

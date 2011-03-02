@@ -42,7 +42,7 @@ public class RemoteDirNode extends RemoteFileNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public RemoteDirNode(ITreeNode parent, AsyncTreeModel model, JTree tree, RemoteFile file, 
+	public RemoteDirNode(ITreeNode parent, AsyncTreeModel model, JTree tree, FileData file, 
 		IIconCache iconcache, IRemoteFilter filter, IExternalAccess exta, INodeFactory factory)
 	{
 		super(parent, model, tree, file, iconcache, exta);
@@ -77,7 +77,7 @@ public class RemoteDirNode extends RemoteFileNode
 				{
 					for(Iterator it=files.iterator(); it.hasNext();)
 					{
-						RemoteFile file = (RemoteFile)it.next();
+						FileData file = (FileData)it.next();
 						ITreeNode node = getModel().getNode(file);
 						if(node!=null)
 						{
@@ -132,7 +132,7 @@ public class RemoteDirNode extends RemoteFileNode
 		}
 		else
 		{
-			final RemoteFile myfile = file;
+			final FileData myfile = file;
 			final IRemoteFilter myfilter = filter;
 			exta.scheduleStep(new IComponentStep()
 			{
@@ -162,7 +162,7 @@ public class RemoteDirNode extends RemoteFileNode
 									public void resultAvailable(Object result)
 									{
 										if(((Boolean)result).booleanValue())
-											lis.resultAvailable(new RemoteFile(file));
+											lis.resultAvailable(new FileData(file));
 										else
 											lis.exceptionOccurred(null);
 									}

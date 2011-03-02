@@ -17,7 +17,7 @@ public class RemoteFileNode  extends AbstractTreeNode
 	//-------- attributes --------
 	
 	/** The file. */
-	protected RemoteFile file;
+	protected FileData file;
 	
 	/** The external access. */
 	protected IExternalAccess exta;
@@ -36,7 +36,7 @@ public class RemoteFileNode  extends AbstractTreeNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public RemoteFileNode(ITreeNode parent, AsyncTreeModel model, JTree tree, RemoteFile file, IIconCache iconcache, IExternalAccess exta)
+	public RemoteFileNode(ITreeNode parent, AsyncTreeModel model, JTree tree, FileData file, IIconCache iconcache, IExternalAccess exta)
 	{
 		super(parent, model, tree);
 		
@@ -138,7 +138,7 @@ public class RemoteFileNode  extends AbstractTreeNode
 	 *  Get the file.
 	 *  @return the file.
 	 */
-	public RemoteFile getRemoteFile()
+	public FileData getRemoteFile()
 	{
 		return file;
 	}

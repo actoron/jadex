@@ -41,9 +41,9 @@ public class DefaultNodeFactory implements INodeFactory
 				ret = new FileNode(parent, model, tree, file, iconcache);
 			}
 		}
-		else if(value instanceof RemoteFile)
+		else if(value instanceof FileData)
 		{
-			RemoteFile file = (RemoteFile)value;
+			FileData file = (FileData)value;
 			if(file.isDirectory())
 			{
 				ret = new RemoteDirNode(parent, model, tree, file, iconcache, filter, exta, factory);
