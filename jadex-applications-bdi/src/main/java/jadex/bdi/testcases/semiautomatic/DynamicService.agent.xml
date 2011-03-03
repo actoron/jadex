@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Agent that dynamically creates and searches services.</H3>
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="DynamicService"
+	package="jadex.bdi.testcases.semiautomatic">
+
+	<plans>
+		<plan name="create">
+			<body class="ServicesPlan"/>
+		</plan>
+	</plans>
+	
+	<properties>
+		<property name="logging.level">java.util.logging.Level.INFO</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="create"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
