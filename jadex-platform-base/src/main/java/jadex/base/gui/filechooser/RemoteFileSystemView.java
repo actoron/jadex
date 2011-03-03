@@ -34,6 +34,12 @@ public class RemoteFileSystemView extends FileSystemView
 	/** The filechooser. */
 	protected JFileChooser chooser;
 	
+	/** The home directory. */
+	protected RemoteFile homedir;
+	
+	/** The default directory. */
+	protected RemoteFile defaultdir;
+	
 	/**
 	 * 
 	 */
@@ -432,18 +438,34 @@ public class RemoteFileSystemView extends FileSystemView
 	// implementation.
 	public File getHomeDirectory()
 	{
-		File ret = null;
-		File[] roots = (File[])children.get("roots");
-		if(roots!=null)
+		if(homedir==null)
 		{
-			ret = roots[0];
+			exta.scheduleStep(new IComponentStep()
+			{
+				@XMLClassname("getHomeDirectory")
+				public Object execute(IInternalAccess ia)
+				{
+					FileSystemView view = FileSystemView.getFileSystemView();
+					File ret = view.getHomeDirectory();
+					return ret!=null? new FileData(ret): null;
+				}
+			}).addResultListener(new SwingDefaultResultListener()
+			{
+				public void customResultAvailable(Object result)
+				{
+					if(result!=null)
+					{
+						FileData file = (FileData)result;
+						homedir = new RemoteFile(file);
+					}
+					if(chooser!=null)
+						chooser.setCurrentDirectory(defaultdir);
+					System.out.println("home: "+homedir);
+				}
+			});
 		}
-		else
-		{
-			ret = new RemoteFile("unknown", "", true);
-			getRoots();
-		}
-		return ret;//new File(".");//createFileObject(System.getProperty("user.home"));
+		
+		return homedir==null? new RemoteFile("unknown", "unknown", true): homedir;
 	}
 
 	/**
@@ -455,14 +477,34 @@ public class RemoteFileSystemView extends FileSystemView
 	 */
 	public File getDefaultDirectory()
 	{
-		return getHomeDirectory();
-//		return new RemoteFile("test", "test", true);//new File(".");
-//		File f = (File)ShellFolder.get("fileChooserDefaultFolder");
-//		if(isFileSystemRoot(f))
-//		{
-//			f = createFileSystemRoot(f);
-//		}
-//		return f;
+		if(defaultdir==null)
+		{
+			exta.scheduleStep(new IComponentStep()
+			{
+				@XMLClassname("getDefaultDirectory")
+				public Object execute(IInternalAccess ia)
+				{
+					FileSystemView view = FileSystemView.getFileSystemView();
+					File ret = view.getDefaultDirectory();
+					return ret!=null? new FileData(ret): null;
+				}
+			}).addResultListener(new SwingDefaultResultListener()
+			{
+				public void customResultAvailable(Object result)
+				{
+					if(result!=null)
+					{
+						FileData file = (FileData)result;
+						defaultdir = new RemoteFile(file);
+					}
+					if(chooser!=null)
+						chooser.setCurrentDirectory(defaultdir);
+					System.out.println("default: "+defaultdir);
+				}
+			});
+		}
+		
+		return defaultdir==null? new RemoteFile("unknown", "unknown", true): defaultdir;
 	}
 
 //	/**
@@ -499,6 +541,9 @@ public class RemoteFileSystemView extends FileSystemView
 	 */
 	public File[] getFiles(final File dir, final boolean useFileHiding)
 	{
+		if(dir==null)
+			return new File[0];
+		
 		File[] ret = (File[])children.get(dir.getAbsolutePath());
 		
 		if(ret==null)
@@ -536,7 +581,7 @@ public class RemoteFileSystemView extends FileSystemView
 					}
 					if(chooser!=null)
 						chooser.rescanCurrentDirectory();
-//					System.out.println("Found children: "+SUtil.arrayToString(files));
+					System.out.println("Found children: "+SUtil.arrayToString(files));
 				}
 			});
 		}
@@ -554,6 +599,9 @@ public class RemoteFileSystemView extends FileSystemView
 	 */
 	public File getParentDirectory(final File dir)
 	{
+		if(dir==null)
+			return null;
+		
 		File parent = (File)parents.get(dir.getAbsolutePath());
 	
 		if(parent==null)
@@ -575,7 +623,7 @@ public class RemoteFileSystemView extends FileSystemView
 					if(result!=null)
 					{
 						FileData remfile = (FileData)result;
-						File parent = new File(remfile.getPath());
+						RemoteFile parent = new RemoteFile(remfile);
 						parents.put(dir.getAbsolutePath(), parent);
 						children.put(parent.getAbsolutePath(), new File[]{dir});
 					}

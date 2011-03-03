@@ -173,9 +173,9 @@ public class FileData
 	/**
 	 *  Convert remote files to files.
 	 */
-	public static File[] convertToFiles(FileData[] remfiles)
+	public static RemoteFile[] convertToFiles(FileData[] remfiles)
 	{
-		File[] ret = remfiles==null? new File[0]: new File[remfiles.length];
+		RemoteFile[] ret = remfiles==null? new RemoteFile[0]: new RemoteFile[remfiles.length];
 		for(int i=0; i<ret.length; i++)
 		{
 			ret[i] = new RemoteFile(remfiles[i].getFilename(), remfiles[i].getPath(), remfiles[i].isDirectory());

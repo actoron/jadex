@@ -1,5 +1,7 @@
 package jadex.base.gui.filechooser;
 
+import jadex.base.gui.filetree.FileData;
+
 import java.io.File;
 
 
@@ -20,6 +22,26 @@ public class RemoteFile extends File
 	protected boolean dir;
 	
 	//-------- constructors -------- 
+	
+	/**
+	 *  Create a directory representation of a jar file.
+	 */
+	public RemoteFile(FileData file)
+	{
+		super(file.getPath());
+		this.name = file.getFilename();
+		this.dir = file.isDirectory();
+	}
+	
+	/**
+	 *  Create a directory representation of a jar file.
+	 */
+	public RemoteFile(File file)
+	{
+		super(file.getAbsolutePath());
+		this.name = file.getName();
+		this.dir = file.isDirectory();
+	}
 	
 	/**
 	 *  Create a directory representation of a jar file.
