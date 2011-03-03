@@ -130,7 +130,9 @@ public class AddRemotePathAction extends ToolTipAction
 					}
 				});
 				
-				treepanel.addTopLevelNode(new FileData(file));
+				FileData fd = new FileData(file);
+				fd.setDirectory(true); // Hack! JFileChooser does not deliver the RemoteFile :-(
+				treepanel.addTopLevelNode(fd);
 //				final RootNode root = (RootNode)getModel().getRoot();
 //				ITreeNode node = ModelTreePanel.createNode(root, model, tree, new RemoteFile(file.getName(), file.getAbsolutePath(), file.isDirectory()), iconcache, filefilter, exta);
 //				root.addChild(node);
