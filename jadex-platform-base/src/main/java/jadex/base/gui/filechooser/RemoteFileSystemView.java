@@ -59,7 +59,6 @@ public class RemoteFileSystemView extends FileSystemView
 		chooser.rescanCurrentDirectory();
 	}
 
-
 	/**
 	 * Determines if the given file is a root in the navigatable tree(s).
 	 * Examples: Windows 98 has one root, the Desktop folder. DOS has one root
@@ -119,38 +118,14 @@ public class RemoteFileSystemView extends FileSystemView
 	 */
 	public String getSystemDisplayName(File f)
 	{
-		return super.getSystemDisplayName(f);
-//		if(f == null)
-//		{
-//			return null;
-//		}
-
-//		if(f instanceof RemoteFile)
-		
-//		String name = f.getName();
-//
-//		if(!name.equals("..")
-//				&& !name.equals(".")
-//				&& (useSystemExtensionsHiding || !isFileSystem(f) || isFileSystemRoot(f))
-//				&& (f instanceof ShellFolder || f.exists()))
-//		{
-//
-//			try
-//			{
-//				name = getShellFolder(f).getDisplayName();
-//			}
-//			catch(FileNotFoundException e)
-//			{
-//				return null;
-//			}
-//
-//			if(name == null || name.length() == 0)
-//			{
-//				name = f.getPath(); // e.g. "/"
-//			}
-//		}
-
-//		return name;
+		if(f instanceof RemoteFile)
+		{
+			return ((RemoteFile)f).getFiledata().getDisplayName();
+		}
+		else
+		{
+			return super.getSystemDisplayName(f);
+		}
 	}
 
 	/**
@@ -468,7 +443,7 @@ public class RemoteFileSystemView extends FileSystemView
 			});
 		}
 		
-		return homedir==null? new RemoteFile("unknown", "unknown", true): homedir;
+		return homedir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown")): homedir;
 	}
 
 	/**
@@ -507,7 +482,7 @@ public class RemoteFileSystemView extends FileSystemView
 			});
 		}
 		
-		return defaultdir==null? new RemoteFile("unknown", "unknown", true): defaultdir;
+		return defaultdir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown")): defaultdir;
 	}
 
 //	/**

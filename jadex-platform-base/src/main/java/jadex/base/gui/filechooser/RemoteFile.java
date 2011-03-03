@@ -13,50 +13,34 @@ public class RemoteFile extends File
 {
 	//-------- attributes --------
 	
-	/** The name. */
-	protected String name;
-	
-	/** The boolean for directory. */
-	protected boolean dir;
+	/** The file data. */
+	protected FileData filedata;
 	
 	//-------- constructors -------- 
 	
 	/**
 	 *  Create a directory representation of a jar file.
 	 */
-	public RemoteFile(FileData file)
+	public RemoteFile(FileData filedata)
 	{
-		super(file.getPath());
-		this.name = file.getFilename();
-		this.dir = file.isDirectory();
-	}
-	
-	/**
-	 *  Create a directory representation of a jar file.
-	 */
-	public RemoteFile(File file)
-	{
-		super(file.getAbsolutePath());
-		this.name = file.getName();
-		this.dir = file.isDirectory();
-	}
-	
-	/**
-	 *  Create a directory representation of a jar file.
-	 */
-	public RemoteFile(String name, String path, boolean dir)//, IExternalAccess exta)
-	{
-		super(path);
-		this.name = name;
-		this.dir = dir;
-//		System.out.println("file: "+mypath+" / "+name);
+		super(filedata.getPath());
+		this.filedata = filedata;
 	}
 	
 	//-------- File methods --------
 	
+	/**
+	 *  Get the filedata.
+	 *  @return the filedata.
+	 */
+	public FileData getFiledata()
+	{
+		return filedata;
+	}
+
 	public boolean isDirectory()
 	{
-		return dir;
+		return filedata.isDirectory();
 	}
 	
 //	public File[] listFiles(FileFilter filter)
@@ -96,7 +80,7 @@ public class RemoteFile extends File
 	
     public String getName() 
     {
-    	return name;
+    	return filedata.getFilename();
     }
 
     public static String getParent(String oldpath) 
@@ -132,7 +116,7 @@ public class RemoteFile extends File
     		{
     			name = pa.substring(lindex+1);
     		}
-    		ret = new RemoteFile(name, path, true);
+    		ret = new RemoteFile(new FileData(name, path, true, name));
     	}
 //    	System.out.println("getPaF: "+getPath()+" "+pa);
     	return ret;
@@ -178,7 +162,7 @@ public class RemoteFile extends File
 //
     public boolean isFile() 
     {
-    	return !dir;
+    	return !filedata.isDirectory();
     }
 
     public boolean isHidden() 
@@ -272,7 +256,7 @@ public class RemoteFile extends File
     
 	public String toString()
 	{
-		return "RemoteFile(name=" + name + ", dir=" + dir + ", path="+getPath()+")";
+		return "RemoteFile(filedata="+filedata+")";
 	}
 	
 	/**

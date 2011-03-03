@@ -178,7 +178,7 @@ public class FileData
 		RemoteFile[] ret = remfiles==null? new RemoteFile[0]: new RemoteFile[remfiles.length];
 		for(int i=0; i<ret.length; i++)
 		{
-			ret[i] = new RemoteFile(remfiles[i].getFilename(), remfiles[i].getPath(), remfiles[i].isDirectory());
+			ret[i] = new RemoteFile(remfiles[i]);
 		}
 		return ret;
 	}
@@ -195,4 +195,16 @@ public class FileData
 		}
 		return ret;
 	}
+
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 */
+	public String toString()
+	{
+		return "FileData(filename=" + filename + ", path=" + path
+			+ ", directory=" + directory + ", displayname=" + displayname+ ")";
+	}
+	
+	
 }
