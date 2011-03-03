@@ -3,6 +3,7 @@ package jadex.base.gui.filechooser;
 import jadex.base.gui.filetree.FileData;
 
 import java.io.File;
+import java.io.IOException;
 
 
 /**
@@ -11,9 +12,6 @@ import java.io.File;
 public class RemoteFile extends File
 {
 	//-------- attributes --------
-	
-	/** The external access. */
-	//protected IExternalAccess exta;
 	
 	/** The name. */
 	protected String name;
@@ -155,10 +153,11 @@ public class RemoteFile extends File
 //    	return null;
 //    }
 //
-//    public String getCanonicalPath() throws IOException 
-//    {
+    public String getCanonicalPath() throws IOException 
+    {
+    	return "c:\\";
 //    	return getPath();
-//    }
+    }
 //
 //    public File getCanonicalFile() throws IOException 
 //    {
@@ -249,11 +248,6 @@ public class RemoteFile extends File
 //    	return true;
 //    }
 
-    public static File[] listRoots() 
-    {
-    	return new RemoteFile[0];
-    }
-
 //    public long getTotalSpace() 
 //    {
 //    	return 0;
@@ -269,6 +263,11 @@ public class RemoteFile extends File
 //    	return 0;
 //    }
 
+    public String[] list() 
+    {
+    	return null;
+    };
+    
 	public String toString()
 	{
 		return "RemoteFile(name=" + name + ", dir=" + dir + ", path="+getPath()+")";

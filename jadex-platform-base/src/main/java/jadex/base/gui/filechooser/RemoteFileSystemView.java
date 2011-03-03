@@ -572,7 +572,7 @@ public class RemoteFileSystemView extends FileSystemView
 				public void customResultAvailable(Object result)
 				{
 					FileData[] remfiles = (FileData[])result;
-					File[] files = FileData.convertToFiles(remfiles);
+					RemoteFile[] files = FileData.convertToFiles(remfiles);
 					System.out.println("children: "+dir+" "+SUtil.arrayToString(files));
 					children.put(dir.getAbsolutePath(), files);
 					for(int i=0; i<files.length; i++)
