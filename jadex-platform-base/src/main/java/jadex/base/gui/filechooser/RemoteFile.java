@@ -157,14 +157,14 @@ public class RemoteFile extends File
     // http://bugs.sun.com/view_bug.do;jsessionid=34602d7fb6f3f5408b98e914c3b?bug_id=6691325
     public String getCanonicalPath() throws IOException 
     {
-    	return "c:\\";
-//    	return getPath();
+//    	return ".";
+    	return getPath();
     }
-//
-//    public File getCanonicalFile() throws IOException 
-//    {
-//    	return this;
-//    }
+
+    public File getCanonicalFile() throws IOException 
+    {
+    	return this;
+    }
 //
 //    public boolean canRead() 
 //    {

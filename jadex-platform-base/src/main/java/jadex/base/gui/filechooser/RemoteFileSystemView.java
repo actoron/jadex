@@ -101,29 +101,32 @@ public class RemoteFileSystemView extends FileSystemView
 	 * @see FileView#isTraversable
 	 * @since 1.4
 	 */
-//	public Boolean isTraversable(File f)
-//	{
-//		return Boolean.valueOf(f.isDirectory());
-//	}
+	public Boolean isTraversable(File f)
+	{
+		return Boolean.valueOf(f.isDirectory());
+	}
 
-//	/**
-//	 * Name of a file, directory, or folder as it would be displayed in a system
-//	 * file browser. Example from Windows: the "M:\" directory displays as
-//	 * "CD-ROM (M:)" The default implementation gets information from the
-//	 * ShellFolder class.
-//	 * 
-//	 * @param f a <code>File</code> object
-//	 * @return the file name as it would be displayed by a native file chooser
-//	 * @see JFileChooser#getName
-//	 * @since 1.4
-//	 */
-//	public String getSystemDisplayName(File f)
-//	{
+	/**
+	 * Name of a file, directory, or folder as it would be displayed in a system
+	 * file browser. Example from Windows: the "M:\" directory displays as
+	 * "CD-ROM (M:)" The default implementation gets information from the
+	 * ShellFolder class.
+	 * 
+	 * @param f a <code>File</code> object
+	 * @return the file name as it would be displayed by a native file chooser
+	 * @see JFileChooser#getName
+	 * @since 1.4
+	 */
+	public String getSystemDisplayName(File f)
+	{
+		return super.getSystemDisplayName(f);
 //		if(f == null)
 //		{
 //			return null;
 //		}
-//
+
+//		if(f instanceof RemoteFile)
+		
 //		String name = f.getName();
 //
 //		if(!name.equals("..")
@@ -146,9 +149,9 @@ public class RemoteFileSystemView extends FileSystemView
 //				name = f.getPath(); // e.g. "/"
 //			}
 //		}
-//
+
 //		return name;
-//	}
+	}
 
 	/**
 	 * Type description for a file, directory, or folder as it would be
