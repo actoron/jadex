@@ -28,8 +28,8 @@ public class FileData
 	/** The display name. */
 	protected String displayname;
 
-//	/** The flag if is root dir. */
-//	protected boolean root;
+	/** The last modified date. */
+	protected long lastmodified;
 	
 	//-------- constructors --------
 
@@ -44,13 +44,14 @@ public class FileData
 	/**
 	 *  Create a new remote file.
 	 */
-	public FileData(String filename, String path, boolean directory, String displayname)//, boolean root)
+	public FileData(String filename, String path, boolean directory, 
+		String displayname, long lastmodified)
 	{
 		this.filename = filename;
 		this.path = path;
 		this.directory = directory;
 		this.displayname = displayname;
-//		this.root = root;
+		this.lastmodified = lastmodified;
 	}
 	
 	/**
@@ -62,6 +63,7 @@ public class FileData
 		this.path = file.getAbsolutePath();
 		this.directory = file.isDirectory();
 		this.displayname = getDisplayName(file);
+		this.lastmodified = file.lastModified();
 //		this.root = SUtil.arrayToSet(file.listRoots()).contains(file);
 	}
 	
@@ -152,23 +154,23 @@ public class FileData
 		return ret;
 	}
 	
-//	/**
-//	 *  Get the root.
-//	 *  @return the root.
-//	 */
-//	public boolean isRoot()
-//	{
-//		return root;
-//	}
-//
-//	/**
-//	 *  Set the root.
-//	 *  @param root The root to set.
-//	 */
-//	public void setRoot(boolean root)
-//	{
-//		this.root = root;
-//	}
+	/**
+	 *  Get the lastmodified.
+	 *  @return the lastmodified.
+	 */
+	public long getLastModified()
+	{
+		return lastmodified;
+	}
+
+	/**
+	 *  Set the lastmodified.
+	 *  @param lastmodified The lastmodified to set.
+	 */
+	public void setLastModified(long lastmodified)
+	{
+		this.lastmodified = lastmodified;
+	}
 
 	/**
 	 *  Convert remote files to files.

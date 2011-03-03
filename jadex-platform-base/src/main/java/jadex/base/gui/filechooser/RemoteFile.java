@@ -7,7 +7,9 @@ import java.io.IOException;
 
 
 /**
- * 
+ *  File wrapper for remote files.
+ *  Is necessary because JFileChooser works
+ *  with File objects only.
  */
 public class RemoteFile extends File
 {
@@ -38,6 +40,10 @@ public class RemoteFile extends File
 		return filedata;
 	}
 
+	/**
+	 *  Test if is a directory.
+	 *  @return True, if directory.
+	 */
 	public boolean isDirectory()
 	{
 		return filedata.isDirectory();
@@ -63,6 +69,9 @@ public class RemoteFile extends File
 //		return path;
 //	}
 	
+	/**
+	 *  Get the last modified date.
+	 */
 	public long lastModified()
 	{
 		return System.currentTimeMillis();
@@ -78,15 +87,23 @@ public class RemoteFile extends File
 		return true;	// hack???
 	}
 	
+	/**
+	 *  Get the file name.
+	 *  @return The file name.
+	 */
     public String getName() 
     {
     	return filedata.getFilename();
     }
 
-    public static String getParent(String oldpath) 
+    /**
+     *  Get the parent name.
+     *  @return The parent name.
+     */
+    public String getParent() 
     {
-//    	String oldpath = getPath();
     	String ret = null;
+    	String oldpath = getPath();
     	if(oldpath!=null)
     	{
       		int findex = oldpath.indexOf(separatorChar, 1);
@@ -101,6 +118,9 @@ public class RemoteFile extends File
     	return ret;
     }
 
+    /**
+     *  Get the parent file.
+     */
     public File getParentFile() 
     {
     	RemoteFile ret = null;
@@ -116,12 +136,16 @@ public class RemoteFile extends File
     		{
     			name = pa.substring(lindex+1);
     		}
-    		ret = new RemoteFile(new FileData(name, path, true, name));
+    		ret = new RemoteFile(new FileData(name, path, true, name, filedata.getLastModified()));
     	}
 //    	System.out.println("getPaF: "+getPath()+" "+pa);
     	return ret;
     }
 
+    /**
+     *  Test if absolute.
+     *  @return Treu, if absolute.
+     */
     public boolean isAbsolute() 
     {
     	return true;
@@ -145,6 +169,11 @@ public class RemoteFile extends File
     	return getPath();
     }
 
+    /**
+     *  Get the canonical name.
+     *  Needs to return this because JFileCooser uses this method to check isTraverable(),
+     *  i.e. if a dir can be looked into. Hence, the dir property must be kept in returned file.
+     */
     public File getCanonicalFile() throws IOException 
     {
     	return this;
@@ -160,11 +189,19 @@ public class RemoteFile extends File
 //    	return true;
 //    }
 //
+    /**
+     *  Test if is a file.
+     *  @return True, if is a file.
+     */
     public boolean isFile() 
     {
     	return !filedata.isDirectory();
     }
 
+    /**
+     *  Test if file is hidden.
+     *  @return True, if hidden.
+     */
     public boolean isHidden() 
     {
     	return false;
@@ -249,25 +286,33 @@ public class RemoteFile extends File
 //    	return 0;
 //    }
 
+    /**
+     *  List contained filed.
+     *  JFileChooser uses the FileSystemView.
+     */
     public String[] list() 
     {
     	return null;
     };
     
+    /**
+     *  Get the string representation.
+     *  @return The string representation.
+     */
 	public String toString()
 	{
 		return "RemoteFile(filedata="+filedata+")";
 	}
 	
-	/**
-	 *  Main for testing.
-	 */
-	public static void main(String[] args)
-	{
-		System.out.println(getParent("C:\\"));
-		System.out.println(getParent("C:\\\\"));
-		System.out.println(getParent("C:\\projects\\jadex"));
+//	/**
+//	 *  Main for testing.
+//	 */
+//	public static void main(String[] args)
+//	{
+//		System.out.println(getParent("C:\\"));
+//		System.out.println(getParent("C:\\\\"));
+//		System.out.println(getParent("C:\\projects\\jadex"));
 //		File f = new File("C:\\");
 //		System.out.println(SUtil.arrayToString(f.listFiles()));
-	}
+//	}
 }

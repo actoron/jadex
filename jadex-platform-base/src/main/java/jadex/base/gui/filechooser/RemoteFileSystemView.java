@@ -4,7 +4,6 @@ import jadex.base.gui.filetree.FileData;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.SUtil;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.xml.annotation.XMLClassname;
 
@@ -15,13 +14,20 @@ import java.util.Map;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.filechooser.FileView;
 
 
 /**
- * 
+ *  Remote file system view.
+ *  Is programmed asynchronously, i.e. delivers always
+ *  what is has and then initiates a background search for
+ *  retrieving current values. When values arrive a refresh
+ *  operation is used to update the chooser.
  */
 public class RemoteFileSystemView extends FileSystemView
 {
+	//-------- attributes --------
+	
 	/** The external access. */
 	protected IExternalAccess	exta;
 
@@ -40,8 +46,10 @@ public class RemoteFileSystemView extends FileSystemView
 	/** The default directory. */
 	protected RemoteFile defaultdir;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new file system view.
 	 */
 	public RemoteFileSystemView(IExternalAccess exta)
 	{
@@ -49,6 +57,8 @@ public class RemoteFileSystemView extends FileSystemView
 		this.children = new HashMap();
 		this.parents = new HashMap();
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Set the file chooser.
@@ -429,7 +439,7 @@ public class RemoteFileSystemView extends FileSystemView
 			});
 		}
 		
-		return homedir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown")): homedir;
+		return homedir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown", 0)): homedir;
 	}
 
 	/**
@@ -468,7 +478,7 @@ public class RemoteFileSystemView extends FileSystemView
 			});
 		}
 		
-		return defaultdir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown")): defaultdir;
+		return defaultdir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown", 0)): defaultdir;
 	}
 
 //	/**

@@ -344,4 +344,13 @@ public class JarAsDirectory	extends File
 	{
 		return entry==null;
 	}
+
+	/**
+	 *  Get the lastmodified.
+	 *  @return the lastmodified.
+	 */
+	public long getLastModified()
+	{
+		return lastmodified;
+	}
 }
