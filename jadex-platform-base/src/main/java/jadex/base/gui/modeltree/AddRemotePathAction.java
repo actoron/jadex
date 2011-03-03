@@ -1,8 +1,9 @@
 package jadex.base.gui.modeltree;
 
 import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.filechooser.RemoteFile;
 import jadex.base.gui.filechooser.RemoteFileSystemView;
-import jadex.base.gui.filechooser.TestFileSystemView;
+import jadex.base.gui.filetree.FileData;
 import jadex.base.gui.filetree.FileTreePanel;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.gui.SGUI;
@@ -129,7 +130,7 @@ public class AddRemotePathAction extends ToolTipAction
 					}
 				});
 				
-				treepanel.addTopLevelNode(file);
+				treepanel.addTopLevelNode(new FileData(file));
 //				final RootNode root = (RootNode)getModel().getRoot();
 //				ITreeNode node = ModelTreePanel.createNode(root, model, tree, new RemoteFile(file.getName(), file.getAbsolutePath(), file.isDirectory()), iconcache, filefilter, exta);
 //				root.addChild(node);

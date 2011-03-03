@@ -1,7 +1,6 @@
 package jadex.base.gui.filechooser;
 
 import java.io.File;
-import java.io.*;
 
 
 /**
@@ -17,14 +16,8 @@ public class RemoteFile extends File
 	/** The name. */
 	protected String name;
 	
-	/** The path. */
-	protected String path;
-	
 	/** The boolean for directory. */
 	protected boolean dir;
-	
-	/** The prefix length. */
-	protected int prelength;
 	
 	//-------- constructors -------- 
 	
@@ -33,19 +26,10 @@ public class RemoteFile extends File
 	 */
 	public RemoteFile(String name, String path, boolean dir)//, IExternalAccess exta)
 	{
-		this(name, path, dir, 3);
-	}
-	
-	/**
-	 *  Create a directory representation of a jar file.
-	 */
-	public RemoteFile(String name, String path, boolean dir, int prelength)//, IExternalAccess exta)
-	{
-		super(path+separatorChar+name);
+		super(path);
 		this.name = name;
-		this.path = path;
 		this.dir = dir;
-		this.prelength = prelength;
+//		System.out.println("file: "+mypath+" / "+name);
 	}
 	
 	//-------- File methods --------
@@ -95,34 +79,43 @@ public class RemoteFile extends File
     	return name;
     }
 
-    public String getParent() 
+    public static String getParent(String oldpath) 
     {
+//    	String oldpath = getPath();
     	String ret = null;
-    	int index = getPath().lastIndexOf(separatorChar);
-    	if (index<prelength) 
+    	if(oldpath!=null)
     	{
-    	    if((prelength>0) && (getPath().length() > prelength))
-    	    	ret =  getPath().substring(0, prelength);
+      		int findex = oldpath.indexOf(separatorChar, 1);
+      		int lindex = oldpath.lastIndexOf(separatorChar);
+      		if(findex!=-1 && lindex!=0 && lindex!=oldpath.length()-1)
+    		{
+      			boolean last = findex==lindex || findex==lindex+1;
+    			ret = oldpath.substring(0, last? lindex+1: lindex);
+    		}
     	}
-    	else
-    	{
-    		ret = getPath().substring(0, index);
-    	}
-    	System.out.println("getPa: "+name+" "+ret);
+//    	System.out.println("getPa: "+oldpath+" "+ret);
     	return ret;
     }
 
     public File getParentFile() 
     {
-    	String p = getParent();
-    	String name = "unknown";
-    	if(p!=null)
+    	RemoteFile ret = null;
+    	
+    	String pa = getParent();
+    	if(pa!=null)
     	{
-    		int index = p.lastIndexOf(separatorChar);
-    		if(index>0) 
-    			name  =  getPath().substring(0, index);
+    		String name = "";
+    		String path = pa;
+    		int findex = pa.indexOf(separatorChar, 1);
+      		int lindex = pa.lastIndexOf(separatorChar);
+     		if(findex!=-1 && lindex!=0 && lindex!=pa.length())
+    		{
+    			name = pa.substring(lindex+1);
+    		}
+    		ret = new RemoteFile(name, path, true);
     	}
-    	return p==null? null: new RemoteFile(name, p, true, prelength);
+//    	System.out.println("getPaF: "+getPath()+" "+pa);
+    	return ret;
     }
 
     public boolean isAbsolute() 
@@ -236,7 +229,7 @@ public class RemoteFile extends File
 
     public static File[] listRoots() 
     {
-    	return new RemoteFile[]{new RemoteFile("root", "z:", true)};
+    	return new RemoteFile[0];
     }
 
 //    public long getTotalSpace() 
@@ -257,5 +250,17 @@ public class RemoteFile extends File
 	public String toString()
 	{
 		return "RemoteFile(name=" + name + ", dir=" + dir + ", path="+getPath()+")";
+	}
+	
+	/**
+	 *  Main for testing.
+	 */
+	public static void main(String[] args)
+	{
+		System.out.println(getParent("C:\\"));
+		System.out.println(getParent("C:\\\\"));
+		System.out.println(getParent("C:\\projects\\jadex"));
+//		File f = new File("C:\\");
+//		System.out.println(SUtil.arrayToString(f.listFiles()));
 	}
 }

@@ -400,8 +400,8 @@ public class RemoteFileSystemView extends FileSystemView
 					File[] files = FileData.convertToFiles(remfiles);
 					children.put("roots", files);
 					System.out.println("roots: "+SUtil.arrayToString(files));
-//					if(chooser!=null)
-//						chooser.rescanCurrentDirectory();
+					if(chooser!=null)
+						chooser.rescanCurrentDirectory();
 					
 //					System.out.println("Found roots: "+SUtil.arrayToString(files));
 				}
@@ -534,8 +534,8 @@ public class RemoteFileSystemView extends FileSystemView
 					{
 						parents.put(files[i].getAbsolutePath(), dir);
 					}
-//					if(chooser!=null)
-//						chooser.rescanCurrentDirectory();
+					if(chooser!=null)
+						chooser.rescanCurrentDirectory();
 //					System.out.println("Found children: "+SUtil.arrayToString(files));
 				}
 			});
@@ -579,8 +579,8 @@ public class RemoteFileSystemView extends FileSystemView
 						parents.put(dir.getAbsolutePath(), parent);
 						children.put(parent.getAbsolutePath(), new File[]{dir});
 					}
-//					if(chooser!=null)
-//						chooser.rescanCurrentDirectory();
+					if(chooser!=null)
+						chooser.rescanCurrentDirectory();
 					System.out.println("parent: "+dir+" "+parent);
 				}
 			});
