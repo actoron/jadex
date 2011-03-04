@@ -1,13 +1,18 @@
 package jadex.tools.generic;
 
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.service.IService;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
+import jadex.xml.annotation.XMLClassname;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -21,8 +26,8 @@ public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
 {
 	//-------- attributes --------
 	
-	/** The external access. */
-	protected IExternalAccess exta;
+	/** The platform external access. */
+	protected IExternalAccess platform;
 	
 	/** The service. */
 	protected Class servicetype;
@@ -32,9 +37,9 @@ public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
 	/**
 	 *  Create a new selector panel.
 	 */
-	public AbstractServiceSelectorPanel(IExternalAccess exta, Class servicetype)
+	public AbstractServiceSelectorPanel(IExternalAccess platform, Class servicetype)
 	{
-		this.exta = exta;
+		this.platform = platform;
 		this.servicetype = servicetype;
 	}
 	
@@ -45,11 +50,22 @@ public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
 	 */
 	public void refreshCombo()
 	{
-		SServiceProvider.getServices(exta.getServiceProvider(), servicetype,
-			AbstractServiceSelectorPanel.this.isRemote()? RequiredServiceInfo.SCOPE_GLOBAL: RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDefaultResultListener(this) 
+		// Hack!!! Search locally at (potentially remote) platform, as scope global is set to platform when transferring search request.
+		final Class	type	= servicetype;
+		final String	scope	= isRemote() ? RequiredServiceInfo.SCOPE_GLOBAL: RequiredServiceInfo.SCOPE_PLATFORM;
+		platform.scheduleStep(new IComponentStep()
 		{
-			public void customResultAvailable(Object result) 
+			@XMLClassname("search-services")
+			public Object execute(IInternalAccess ia)
+			{
+				final Future	ret	= new Future();
+				SServiceProvider.getServices(ia.getServiceProvider(), type, scope)
+					.addResultListener(new DelegationResultListener(ret));
+				return ret;
+			}
+		}).addResultListener(new SwingDefaultResultListener(this)
+		{
+			public void customResultAvailable(Object result)
 			{
 				Collection newservices = (Collection)result;
 				
@@ -82,18 +98,13 @@ public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
 		final Future ret = new Future();
 		final IService service = (IService)element;
 		
-		createServicePanel(service).addResultListener(new SwingDefaultResultListener(this)
+		createServicePanel(service).addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
 //				System.out.println("add: "+result+" "+sel);
 				IServiceViewerPanel panel = (IServiceViewerPanel)result;
 				ret.setResult(panel);
-			}
-			
-			public void customExceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
 			}
 		});
 		

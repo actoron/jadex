@@ -34,7 +34,7 @@ public abstract class AbstractServicePlugin extends AbstractGenericPlugin
 	 */
 	public AbstractSelectorPanel createSelectorPanel()
 	{
-		return new AbstractServiceSelectorPanel(getJCC().getExternalAccess(), getServiceType())
+		return new AbstractServiceSelectorPanel(getJCC().getPlatformAccess(), getServiceType())
 		{
 			public IFuture createServicePanel(IService service)
 			{

@@ -104,14 +104,6 @@ public class DeploymentServiceViewerPanel implements IServiceViewerPanel
 	}
 
 	/**
-	 *  Reset the properties.
-	 */
-	public IFuture resetProperties()
-	{
-		return IFuture.DONE;
-	}
-
-	/**
 	 *  Shutdown the panel.
 	 */ 
 	public IFuture shutdown()

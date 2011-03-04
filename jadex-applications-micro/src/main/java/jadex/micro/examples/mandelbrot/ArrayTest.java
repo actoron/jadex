@@ -146,7 +146,7 @@ public class ArrayTest
 
 	public static void	main(String[] args)
 	{
-		short[][]	data = new short[200][200];
+		short[][]	data = new short[1234][1357];
 		
 		System.out.println("filling array...");
 		Random	r	= new Random();
@@ -295,5 +295,12 @@ public class ArrayTest
 //	Comparing arrays...
 //	Arrays are equal
 
+//	encoding array to XML...
+//	encoding to XML took 117 milliseconds
+//	encoded array is 188992 bytes
+//	decoding XML...
+//	decoding XML took 121 milliseconds
+//	Comparing arrays...
+//	Arrays are equal
 
 }

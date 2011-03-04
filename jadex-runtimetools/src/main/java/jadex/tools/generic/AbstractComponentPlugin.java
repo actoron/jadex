@@ -26,7 +26,7 @@ public abstract class AbstractComponentPlugin extends AbstractGenericPlugin
 	 */
 	public AbstractSelectorPanel createSelectorPanel()
 	{
-		return new AbstractComponentSelectorPanel(getJCC().getExternalAccess(), getModelName())
+		return new AbstractComponentSelectorPanel(getJCC().getJCCAccess(), getJCC().getPlatformAccess(), getModelName())
 		{
 			public IFuture createComponentPanel(IExternalAccess component)
 			{
@@ -41,6 +41,6 @@ public abstract class AbstractComponentPlugin extends AbstractGenericPlugin
 	 */
 	public String getName()
 	{
-		return getModelName();
+		return getModelName()+ " Viewer";
 	}
 }

@@ -6,8 +6,6 @@ import jadex.base.test.Testcase;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
 import jadex.commons.IRemotable;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -16,6 +14,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.gui.BrowserPane;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.SGUI;
@@ -23,7 +22,6 @@ import jadex.commons.gui.ScrollablePanel;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
-import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -1063,31 +1061,23 @@ public class TestCenterPanel extends JSplitPane
 					final IResultListener	res	= new TestResultListener(name);
 					
 					plugin.getJCC().setStatusText("Performing test "+name);
-					plugin.getJCC().getExternalAccess().scheduleStep(new IComponentStep()
+					final Future	ret	= new Future();
+					SServiceProvider.getService(plugin.getJCC().getPlatformAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(new SwingDelegationResultListener(ret)
 					{
-						@XMLClassname("startNext")
-						public Object execute(final IInternalAccess ia)
+						public void customResultAvailable(Object result)
 						{
-							final Future	ret	= new Future();
-							// Create testcase component.
-							ia.getRequiredService("cms").addResultListener(
-								ia.createResultListener(new DelegationResultListener(ret)
-							{
-								public void customResultAvailable(Object result)
-								{
-									IComponentManagementService	cms	= (IComponentManagementService)result;
-									Map	args	= new HashMap();
-									args.put("timeout", timeout);
-									// Todo: Use remote component for parent if any
-									cms.createComponent(null, name, new CreationInfo(args, ia.getComponentIdentifier()), res)
-										.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
-									
-									// Todo: timeout -> force destroy of component
-								}
-							}));
-							return ret;
+							IComponentManagementService	cms	= (IComponentManagementService)result;
+							Map	args	= new HashMap();
+							args.put("timeout", timeout);
+							// Todo: Use remote component for parent if any
+							cms.createComponent(null, name, new CreationInfo(args, plugin.getJCC().getPlatformAccess().getComponentIdentifier()), res)
+								.addResultListener(new SwingDelegationResultListener(ret));
+							
+							// Todo: timeout -> force destroy of component
 						}
-					}).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
+					});
+					ret.addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
 					{
 						public void customResultAvailable(Object result)
 						{
@@ -1116,23 +1106,19 @@ public class TestCenterPanel extends JSplitPane
 		 */
 		protected void	abortTestcase(final IComponentIdentifier testcase)
 		{
-			plugin.getJCC().getExternalAccess().scheduleStep(new IComponentStep()
+			SServiceProvider.getService(plugin.getJCC().getPlatformAccess().getServiceProvider(),
+				IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
 			{
-				@XMLClassname("abortTestcase")
-				public Object execute(final IInternalAccess ia)
+				public void customResultAvailable(Object result)
 				{
-					final Future	ret	= new Future();
-					ia.getRequiredService("cms").addResultListener(
-						ia.createResultListener(new DelegationResultListener(ret)
+					IComponentManagementService	cms	= (IComponentManagementService)result;
+					cms.destroyComponent(testcase).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
 					{
 						public void customResultAvailable(Object result)
 						{
-							IComponentManagementService	cms	= (IComponentManagementService)result;
-							cms.destroyComponent(testcase).addResultListener(
-								ia.createResultListener(new DelegationResultListener(ret)));
 						}
-					}));
-					return ret;
+					});
 				}
 			});
 			// Todo: wait for result?

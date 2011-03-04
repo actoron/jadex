@@ -17,9 +17,6 @@ public abstract class SwingDefaultResultListener extends DefaultResultListener
 {
 	//-------- attributes --------
 	
-	/** The static instance. */
-	private static IResultListener instance;
-	
 	/** The component. */
 	protected Component parent;
 	
@@ -50,25 +47,6 @@ public abstract class SwingDefaultResultListener extends DefaultResultListener
 		super(logger);
 	}
 	
-	/**
-	 *  Get the listener instance.
-	 *  @return The listener.
-	 */
-	public static IResultListener getInstance()
-	{
-		// Hack! Implement that logger can be passed
-		if(instance==null)
-		{
-			instance = new SwingDefaultResultListener((Component)null)
-			{
-				public void customResultAvailable(Object result)
-				{
-				}
-			};
-		}
-		return instance;
-	}
-	
 	//-------- methods --------
 	
 	/**
@@ -77,13 +55,20 @@ public abstract class SwingDefaultResultListener extends DefaultResultListener
 	 */
 	final public void resultAvailable(final Object result)
 	{
-		SwingUtilities.invokeLater(new Runnable()
+		if(SwingUtilities.isEventDispatchThread())
 		{
-			public void run()
+			customResultAvailable(result);			
+		}
+		else
+		{
+			SwingUtilities.invokeLater(new Runnable()
 			{
-				customResultAvailable(result);
-			}
-		});
+				public void run()
+				{
+					customResultAvailable(result);
+				}
+			});
+		}
 	}
 	
 	/**
@@ -93,13 +78,20 @@ public abstract class SwingDefaultResultListener extends DefaultResultListener
 	final public void exceptionOccurred(final Exception exception)
 	{
 //		exception.printStackTrace();
-		SwingUtilities.invokeLater(new Runnable()
+		if(SwingUtilities.isEventDispatchThread())
 		{
-			public void run()
+			customExceptionOccurred(exception);			
+		}
+		else
+		{
+			SwingUtilities.invokeLater(new Runnable()
 			{
-				customExceptionOccurred(exception);
-			}
-		});
+				public void run()
+				{
+					customExceptionOccurred(exception);
+				}
+			});
+		}
 	}
 	
 	/**

@@ -269,14 +269,6 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 	}
 	
 	/**
-	 *  Reset the properties.
-	 */
-	public IFuture resetProperties()
-	{
-		return IFuture.DONE;
-	}
-
-	/**
 	 *  Advices the panel provide its setting as properties (if any).
 	 *  This is done on project close or save.
 	 */

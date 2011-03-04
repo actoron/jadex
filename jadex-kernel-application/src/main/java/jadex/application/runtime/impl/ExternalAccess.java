@@ -262,6 +262,44 @@ public class ExternalAccess implements IApplicationExternalAccess
 		return ret;
 	}
 	
+	
+	/**
+	 *  Execute some code on the component's thread.
+	 *  Unlike scheduleStep(), the action will also be executed
+	 *  while the component is suspended.
+	 *  @param action	Code to be executed on the component's thread.
+	 *  @return The result of the step.
+	 */
+	public IFuture scheduleImmediate(final IComponentStep step)
+	{
+		final Future ret = new Future();
+		
+		try
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					try
+					{
+						ret.setResult(step.execute(application));
+					}
+					catch(Exception e)
+					{
+						ret.setException(e);
+					}
+				}
+			});
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
+		
+		return ret;
+	}
+
+	
 	/**
 	 *  Get the string representation.
 	 */

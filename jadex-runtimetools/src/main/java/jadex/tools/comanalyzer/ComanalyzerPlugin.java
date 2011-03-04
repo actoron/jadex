@@ -1,5 +1,6 @@
 package jadex.tools.comanalyzer;
 
+import jadex.base.fipa.CMSComponentDescription;
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.INodeListener;
 import jadex.base.gui.asynctree.ITreeNode;
@@ -9,23 +10,19 @@ import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageListener;
 import jadex.bridge.IMessageService;
+import jadex.bridge.IRemoteMessageListener;
 import jadex.bridge.MessageType;
 import jadex.commons.IFilter;
-import jadex.commons.IRemotable;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.future.ThreadSuspendable;
@@ -426,7 +423,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		comptree = new ComponentTreePanel(getJCC().getExternalAccess(), getJCC().getCMSHandler());
+		comptree = new ComponentTreePanel(getJCC().getPlatformAccess(), getJCC().getCMSHandler());
 		comptree.setMinimumSize(new Dimension(0, 0));
 		split.add(comptree);
 		
@@ -452,6 +449,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 				}
 			}
 		});
+		
+		comptree.addNodeHandler(new ShowRemoteControlCenterHandler(getJCC(), getView()));
 		
 		comptree.addNodeHandler(new INodeHandler()
 		{
@@ -1114,7 +1113,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	 */
 	protected boolean isDuplicate(IMessageAdapter newmsg, IComponentIdentifier rec)
 	{
-		IClockService cs = (IClockService)SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
+		// Todo: use remote access for clock !?
+		IClockService cs = (IClockService)SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
 		
 		boolean ret = false;
 		Message[] messages = messagelist.getMessages();
@@ -1167,9 +1167,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		if(sender == null)
 		{
 			// add to agent tree table
-			IComponentManagementService ces = (IComponentManagementService)SServiceProvider
-				.getService(jcc.getExternalAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
-			sender = new Component(ces.createComponentDescription(sid, null, null, "unknown-component-type", null, null));
+			sender = new Component(new CMSComponentDescription(sid, "unknown-component-type", null, null, null, null, null));
 			sender.setState(Component.STATE_DEAD);
 			sender.addMessage(message);
 			sender.applyFilter(agentfilter, true);
@@ -1186,9 +1184,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		Component receiver = componentlist.getAgent(rid);
 		if(receiver == null)
 		{
-			IComponentManagementService ces = (IComponentManagementService)SServiceProvider
-				.getService(jcc.getExternalAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
-			receiver = new Component(ces.createComponentDescription(rid, null, null, "unknown-component-type", null, null));
+			receiver = new Component(new CMSComponentDescription(rid, "unknown-component-type", null, null, null, null, null));
 			receiver.setState(Component.STATE_DEAD);
 			receiver.addMessage(message);
 			receiver.applyFilter(agentfilter, true);
@@ -1506,7 +1502,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 //					message_maps.add(messages[i].getParameters());
 //				}
 
-				SServiceProvider.getService(jcc.getExternalAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(comptree)
+				SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(comptree)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -1609,7 +1605,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 //					}
 //				}
 				final String sxml = xml;
-				SServiceProvider.getService(jcc.getExternalAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(comptree)
+				SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(comptree)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -1769,69 +1765,56 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 			}
 		});
 		
-		getJCC().getExternalAccess().scheduleStep(new IComponentStep()
+		SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new SwingDefaultResultListener()
 		{
-			@XMLClassname("getcms")
-			public Object execute(final IInternalAccess ia)
+			public void customResultAvailable(Object result)
 			{
-				ia.getRequiredService("cms").addResultListener(ia.createResultListener(new IResultListener()
+				IComponentManagementService	cms	= (IComponentManagementService)result;
+				for(int i=0; i<added.size(); i++)
 				{
-					public void resultAvailable(Object result)
+					final Future	fut	= new Future();
+					fut.addResultListener(crl);
+					Component	comp	= (Component)added.get(i);
+					final IComponentIdentifier	cid	= comp.getDescription().getName();
+					cms.getExternalAccess(cid).addResultListener(new SwingDelegationResultListener(fut)
 					{
-						IComponentManagementService	cms	= (IComponentManagementService)result;
-						for(int i=0; i<added.size(); i++)
+						public void customResultAvailable(Object result)
 						{
-							final Future	fut	= new Future();
-							fut.addResultListener(crl);
-							Component	comp	= (Component)added.get(i);
-							final IComponentIdentifier	cid	= comp.getDescription().getName();
-							cms.getExternalAccess(cid).addResultListener(
-								ia.createResultListener(new DelegationResultListener(fut)
+							IExternalAccess	ea	= (IExternalAccess)result;
+							SServiceProvider.getService(ea.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+								.addResultListener(new SwingDelegationResultListener(fut)
 							{
 								public void customResultAvailable(Object result)
 								{
-									IExternalAccess	ea	= (IExternalAccess)result;
-									SServiceProvider.getService(ea.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-										.addResultListener(ia.createResultListener(new SwingDelegationResultListener(fut)
+									IMessageService	ms	= (IMessageService)result;
+									Object[]	newentry;
+									if(!services.containsKey(ms.getServiceIdentifier()))
 									{
-										public void customResultAvailable(Object result)
+										if(msgservices.containsKey(ms.getServiceIdentifier()))
 										{
-											IMessageService	ms	= (IMessageService)result;
-											Object[]	newentry;
-											if(!services.containsKey(ms.getServiceIdentifier()))
-											{
-												if(msgservices.containsKey(ms.getServiceIdentifier()))
-												{
-													Object[]	oldentry	= (Object[])msgservices.get(ms.getServiceIdentifier());
-													newentry	= new Object[]{ms, new HashSet((Collection)oldentry[1])};
-												}
-												else
-												{
-													newentry	= new Object[]{ms, new HashSet()};
-												}
-												services.put(ms.getServiceIdentifier(), newentry);
-											}
-											else
-											{
-												newentry	= (Object[])services.get(ms.getServiceIdentifier());
-											}
-											((Set)newentry[1]).add(cid);
-											fut.setResult(null);
+											Object[]	oldentry	= (Object[])msgservices.get(ms.getServiceIdentifier());
+											newentry	= new Object[]{ms, new HashSet((Collection)oldentry[1])};
 										}
-									}));
-								}	
-							}));
-						}
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						exception.printStackTrace();
-					}
-				}));
-				return null;
+										else
+										{
+											newentry	= new Object[]{ms, new HashSet()};
+										}
+										services.put(ms.getServiceIdentifier(), newentry);
+									}
+									else
+									{
+										newentry	= (Object[])services.get(ms.getServiceIdentifier());
+									}
+									((Set)newentry[1]).add(cid);
+									fut.setResult(null);
+								}
+							});
+						}	
+					});
+				}
 			}
-		});	
+		});
 	}
 
 	/**
@@ -1931,12 +1914,5 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 			setText(null);
 			setEnabled(true);
 		}
-	}
-	
-	/**
-	 *  Message service listener interface.
-	 */
-	public static interface IRemoteMessageListener	extends IMessageListener, IRemotable
-	{
 	}
 }

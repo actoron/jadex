@@ -2,15 +2,13 @@ package jadex.base.gui.plugin;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
-import jadex.commons.future.IResultListener;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
-import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Component;
 
@@ -19,66 +17,67 @@ import java.awt.Component;
  */
 public class SJCC
 {
-	public static void	killPlattform(final IExternalAccess exta, final Component ui)
+	public static void	killPlattform(IExternalAccess exta, Component ui)
 	{
-		exta.scheduleStep(new IComponentStep()
+		getRootAccess(exta).addResultListener(new SwingDefaultResultListener(ui)
 		{
-			@XMLClassname("kill-platform")
-			public Object execute(IInternalAccess ia)
+			public void customResultAvailable(Object result)
 			{
-				SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new SwingDefaultResultListener(ui)
-				{
-					public void customResultAvailable(Object result)
-					{
-						final IComponentManagementService cms = (IComponentManagementService)result;
-						Future ret = new Future();
-						ret.addResultListener(new SwingDefaultResultListener(ui)
-						{
-							public void customResultAvailable(Object result)
-							{
-								final IComponentIdentifier root = (IComponentIdentifier)result;
-								cms.resumeComponent(root).addResultListener(new SwingDefaultResultListener(ui)
-								{
-									public void customResultAvailable(Object result)
-									{
-										cms.destroyComponent(root);
-									}
-								});
-							}
-						});
-						getRootIdentifier(exta.getComponentIdentifier(), cms, ret);
-					}
-				});
-				return null;
+				((IExternalAccess)result).killComponent();
 			}
 		});
 	}
 	
 	/**
+	 *  Method to get an external access for the platform component (i.e. root component).
+	 *  @param access	Any component on the platform.
+	 */
+	public static IFuture	getRootAccess(final IExternalAccess access)
+	{
+		final Future	ret	= new Future();
+		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new SwingDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				final IComponentManagementService	cms	= (IComponentManagementService)result;
+				// Cannot use access getComponentIdentifier only as during JCC init parent can not be accessed from outside.
+				getRootIdentifier(cms, access.getParent()!=null ? access.getParent() : access.getComponentIdentifier())
+					.addResultListener(new SwingDelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result) throws Exception
+					{
+						cms.getExternalAccess((IComponentIdentifier)result)
+							.addResultListener(new SwingDelegationResultListener(ret));
+					}
+				});
+			}
+		});
+		return ret;
+	}
+	
+	/**
 	 *  Internal method to get the root identifier.
 	 */
-	protected static void getRootIdentifier(final IComponentIdentifier cid, final IComponentManagementService cms, final Future future)
+	protected static IFuture	getRootIdentifier(final IComponentManagementService cms, final IComponentIdentifier cid)
 	{
-		cms.getParent(cid).addResultListener(new IResultListener()
+		final Future	ret	= new Future();
+		cms.getParent(cid).addResultListener(new SwingDelegationResultListener(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
 				if(result==null)
 				{
-					future.setResult(cid);
+					ret.setResult(cid);
 				}
 				else
 				{
-					getRootIdentifier((IComponentIdentifier)result, cms, future);
+					getRootIdentifier(cms, (IComponentIdentifier)result)
+						.addResultListener(new SwingDelegationResultListener(ret));
 				}
 			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				future.setException(exception);
-			}
 		});
+		
+		return ret;
 	}
-
 }

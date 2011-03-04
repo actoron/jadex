@@ -78,15 +78,6 @@ public abstract class AbstractComponentViewerPanel implements IComponentViewerPa
 	}
 	
 	/**
-	 *  Reset to default state.
-	 */
-	public IFuture resetProperties()
-	{
-		System.out.println("Warning: resetProperties not implemented "+getClass());
-		return IFuture.DONE;
-	}
-	
-	/**
 	 *  Get the jcc.
 	 *  @return the jcc.
 	 */

@@ -9,6 +9,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -1692,5 +1694,77 @@ public class SUtil
 		}
 		
 		return f.getAbsolutePath();
+	}
+	
+	/**
+	 *  Add a listener to System.out.
+	 */
+	public static synchronized void	addSystemOutListener(IChangeListener listener)
+	{
+		if(!(System.out instanceof AccessiblePrintStream)
+			|| !(((AccessiblePrintStream)System.out).out instanceof ListenableStream))
+		{
+			System.setOut(new AccessiblePrintStream(new ListenableStream(System.out, "out")));
+		}
+		((ListenableStream)((AccessiblePrintStream)System.out).out).addLineListener(listener);
+	}
+	
+	/**
+	 *  Remove a listener from System.out.
+	 */
+	public static synchronized void	removeSystemOutListener(IChangeListener listener)
+	{
+		if(System.out instanceof AccessiblePrintStream
+			&& ((AccessiblePrintStream)System.out).out instanceof ListenableStream)
+		{
+			((ListenableStream)((AccessiblePrintStream)System.out).out).removeLineListener(listener);
+		}
+	}
+	
+	/**
+	 *  Add a listener to System.err.
+	 */
+	public static synchronized void	addSystemErrListener(IChangeListener listener)
+	{
+		if(!(System.err instanceof AccessiblePrintStream)
+			|| !(((AccessiblePrintStream)System.err).out instanceof ListenableStream))
+		{
+			System.setErr(new AccessiblePrintStream(new ListenableStream(System.err, "err")));
+		}
+		((ListenableStream)((AccessiblePrintStream)System.err).out).addLineListener(listener);
+	}
+	
+	/**
+	 *  Remove a listener from System.err.
+	 */
+	public static synchronized void	removeSystemErrListener(IChangeListener listener)
+	{
+		if(System.err instanceof AccessiblePrintStream
+			&& ((AccessiblePrintStream)System.err).out instanceof ListenableStream)
+		{
+			((ListenableStream)((AccessiblePrintStream)System.err).out).removeLineListener(listener);
+		}
+	}
+	
+	/**
+	 *  An subclass of print stream to allow accessing the underlying stream.
+	 */
+	public static class AccessiblePrintStream	extends PrintStream
+	{
+		//-------- attributes --------
+		
+		/** The underlying output stream. */
+		protected OutputStream	out;
+		
+		//-------- constructors --------
+		
+		/**
+		 *  Create an accessible output stream.
+		 */
+		public AccessiblePrintStream(OutputStream out)
+		{
+			super(out);
+			this.out	= out;
+		}
 	}
 }

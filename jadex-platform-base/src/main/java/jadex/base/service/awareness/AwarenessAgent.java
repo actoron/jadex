@@ -79,9 +79,6 @@ public class AwarenessAgent extends MicroAgent
 	/** Flag indicating if proxies should be automatically deleted. */
 	protected boolean autodelete;
 
-	/** The proxy delay. */
-	protected long proxydelay;
-
 	/** The discovered components. */
 	protected Map discovered;
 	
@@ -156,7 +153,6 @@ public class AwarenessAgent extends MicroAgent
 		this.delay = ((Number)getArgument("delay")).longValue();
 		this.autocreate = ((Boolean)getArgument("autocreate")).booleanValue();
 		this.autodelete = ((Boolean)getArgument("autodelete")).booleanValue();
-		this.proxydelay = ((Number)getArgument("proxydelay")).longValue();
 		
 		this.includes	= new ArrayList();
 		StringTokenizer	stok	= new StringTokenizer((String)getArgument("includes"), ",");
@@ -402,24 +398,6 @@ public class AwarenessAgent extends MicroAgent
 	}
 	
 	/**
-	 *  Get the proxy delay.
-	 *  @return the delay.
-	 */
-	public synchronized long getProxyDelay()
-	{
-		return proxydelay;
-	}
-
-	/**
-	 *  Set the proxy delay.
-	 *  @param delay The delay to set.
-	 */
-	public synchronized void setProxyDelay(long proxydelay)
-	{
-		this.proxydelay = proxydelay;
-	}
-	
-	/**
 	 *  Get the includes.
 	 *  @return the includes.
 	 */
@@ -612,7 +590,6 @@ public class AwarenessAgent extends MicroAgent
 	{
 		final Map	args = new HashMap();
 		args.put("component", cid);
-		args.put("delay", new Long(proxydelay));
 		
 		final Future ret = new Future();
 		

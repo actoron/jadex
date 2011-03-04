@@ -4,14 +4,10 @@ import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
-import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -240,25 +236,9 @@ public class ComponentSelectorDialog
 						public void actionPerformed(ActionEvent e)
 						{
 							// Use clone to keep original aid unchanged.
-							access.scheduleStep(new IComponentStep()
-							{
-								@XMLClassname("node-handler")
-								public Object execute(IInternalAccess ia)
-								{
-									ia.getRequiredService("cms")
-										.addResultListener(new SwingDefaultResultListener(parent)
-									{
-										public void customResultAvailable(Object result)
-										{
-											IComponentManagementService cms = (IComponentManagementService)result;
-											IComponentIdentifier id	= ((IActiveComponentTreeNode)node).getDescription().getName();
-											addSelectedAgent(cms.createComponentIdentifier(id.getName(), false, id.getAddresses()), list);
-											comptree.getModel().fireNodeChanged(node);
-										}
-									});
-									return null;
-								}
-							});
+							IComponentIdentifier id	= ((IActiveComponentTreeNode)node).getDescription().getName();
+							addSelectedAgent(new ComponentIdentifier(id.getName(), id.getAddresses()), list);
+							comptree.getModel().fireNodeChanged(node);
 						}
 					};
 				}
@@ -375,23 +355,8 @@ public class ComponentSelectorDialog
 					final Object node = comptree.getTree().getLastSelectedPathComponent();
 					if(node instanceof IActiveComponentTreeNode)
 					{
-						access.scheduleStep(new IComponentStep()
-						{
-							@XMLClassname("select")
-							public Object execute(IInternalAccess ia)
-							{
-								ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(parent)
-								{
-									public void customResultAvailable(Object result)
-									{
-										IComponentManagementService cms = (IComponentManagementService)result;
-										IComponentIdentifier id	= ((IActiveComponentTreeNode)node).getDescription().getName();
-										addSelectedAgent(cms.createComponentIdentifier(id.getName(), false, id.getAddresses()), list);
-									}
-								});
-								return null;
-							}
-						});
+						IComponentIdentifier id	= ((IActiveComponentTreeNode)node).getDescription().getName();
+						addSelectedAgent(new ComponentIdentifier(id.getName(), id.getAddresses()), list);
 					}
 				}
 			}
@@ -400,22 +365,7 @@ public class ComponentSelectorDialog
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				access.scheduleStep(new IComponentStep()
-				{
-					@XMLClassname("new-aid")
-					public Object execute(IInternalAccess ia)
-					{
-						ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(parent)
-						{
-							public void customResultAvailable(Object result)
-							{
-								IComponentManagementService cms = (IComponentManagementService)result;
-								addSelectedAgent(cms.createComponentIdentifier("", true, null), list);
-							}
-						});
-						return null;
-					}
-				});
+				addSelectedAgent(new ComponentIdentifier("@"+access.getComponentIdentifier().getPlatformName(), null), list);
 			}
 		});
 		remove.addActionListener(new ActionListener()

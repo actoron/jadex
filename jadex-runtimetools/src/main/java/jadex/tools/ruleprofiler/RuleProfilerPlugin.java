@@ -130,7 +130,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 		this.split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		comptree = new ComponentTreePanel(getJCC().getExternalAccess(), getJCC().getCMSHandler());
+		comptree = new ComponentTreePanel(getJCC().getPlatformAccess(), getJCC().getCMSHandler());
 		comptree.setMinimumSize(new Dimension(0, 0));
 		split.add(comptree);
 
@@ -150,6 +150,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 			}
 		});
 		
+		comptree.addNodeHandler(new ShowRemoteControlCenterHandler(getJCC(), getView()));
 		comptree.addNodeHandler(new INodeHandler()
 		{
 			public Action[] getPopupActions(ITreeNode[] nodes)
@@ -258,7 +259,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 
 		split.setDividerLocation(150);
 
-		SServiceProvider.getServiceUpwards(jcc.getExternalAccess().getServiceProvider(),
+		SServiceProvider.getServiceUpwards(jcc.getPlatformAccess().getServiceProvider(),
 			IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(comptree)
 		{
 			public void customResultAvailable(Object result)
@@ -345,7 +346,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 				{
 					IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					IComponentDescription desc = node.getDescription();
-					RuleProfilerPanel	panel = new RuleProfilerPanel(getJCC().getExternalAccess().getServiceProvider(), desc.getName());
+					RuleProfilerPanel	panel = new RuleProfilerPanel(getJCC().getPlatformAccess().getServiceProvider(), desc.getName());
 //					SHelp.setupHelp(panel, getHelpID());
 					detail.add(panel, desc);
 					comptree.getModel().fireNodeChanged(node);

@@ -393,12 +393,4 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 		
 		return ret;
 	}
-	
-	/**
-	 *  Reset the properties.
-	 */
-	public IFuture resetProperties()
-	{
-		return IFuture.DONE;
-	}
 }

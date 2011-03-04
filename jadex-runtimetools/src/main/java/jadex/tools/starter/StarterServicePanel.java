@@ -1,25 +1,22 @@
 package jadex.tools.starter;
 
 import jadex.base.SComponentFactory;
+import jadex.base.gui.asynctree.INodeListener;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
+import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.modeltree.ModelTreePanel;
-import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.ICMSComponentListener;
-import jadex.bridge.IComponentDescription;
+import jadex.base.gui.plugin.AbstractJCCPlugin.ShowRemoteControlCenterHandler;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -32,8 +29,6 @@ import jadex.commons.service.IService;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
-import jadex.tools.common.modeltree.IExplorerTreeNode;
-import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -43,14 +38,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Map;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -58,7 +51,7 @@ import javax.swing.event.TreeSelectionListener;
 /**
  * The starter gui allows for starting components platform independently.
  */
-public class StarterServicePanel extends JPanel implements ICMSComponentListener
+public class StarterServicePanel extends JPanel
 {
 	//-------- static part --------
 
@@ -67,12 +60,12 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 	 */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"add_remote_component", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/add_remote_component.png"),
-		"kill_platform", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_killplatform.png"),
-		"starter", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_starter.png"),
-		"starter_sel", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_starter_sel.png"),
-		"start_component",	SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/start.png"),
-		"checking_menu",	SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_broken.png")
+		"add_remote_component", SGUI.makeIcon(StarterServicePanel.class, "/jadex/tools/common/images/add_remote_component.png"),
+		"kill_platform", SGUI.makeIcon(StarterServicePanel.class, "/jadex/tools/common/images/new_killplatform.png"),
+		"starter", SGUI.makeIcon(StarterServicePanel.class, "/jadex/tools/common/images/new_starter.png"),
+		"starter_sel", SGUI.makeIcon(StarterServicePanel.class, "/jadex/tools/common/images/new_starter_sel.png"),
+		"start_component",	SGUI.makeIcon(StarterServicePanel.class, "/jadex/tools/common/images/start.png"),
+		"checking_menu",	SGUI.makeIcon(StarterServicePanel.class, "/jadex/tools/common/images/new_agent_broken.png")
 	});
 
 	//-------- attributes --------
@@ -121,7 +114,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 	{
 		final Future ret = new Future();
 		
-		getComponentForService(jcc.getExternalAccess().getServiceProvider(), cms)
+		getComponentForService(jcc.getPlatformAccess().getServiceProvider(), cms)
 			.addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
@@ -135,7 +128,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 				lsplit.setOneTouchExpandable(true);
 				lsplit.setResizeWeight(0.7);
 		
-				mpanel = new ModelTreePanel(exta, !SUtil.equals(exta.getComponentIdentifier().getPlatformName(), jcc.getComponentIdentifier().getPlatformName()));
+				mpanel = new ModelTreePanel(exta, !SUtil.equals(exta.getComponentIdentifier().getPlatformName(), jcc.getJCCAccess().getComponentIdentifier().getPlatformName()));
 				mpanel.getTree().addTreeSelectionListener(new TreeSelectionListener()
 				{
 					public void valueChanged(TreeSelectionEvent e)
@@ -206,7 +199,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 								if(filename!=null)
 								{
 									final String ftype = filename;
-									SComponentFactory.isStartable(jcc.getExternalAccess(), filename).addResultListener(new SwingDefaultResultListener(spanel)
+									SComponentFactory.isStartable(jcc.getPlatformAccess(), filename).addResultListener(new SwingDefaultResultListener(spanel)
 									{
 										public void customResultAvailable(Object result)
 										{
@@ -224,6 +217,23 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 		
 				comptree = new ComponentTreePanel(exta, jcc.getCMSHandler(), JSplitPane.HORIZONTAL_SPLIT);
 				comptree.setMinimumSize(new Dimension(0, 0));
+				comptree.getModel().addNodeListener(new INodeListener()
+				{
+					public void nodeRemoved(final ITreeNode node)
+					{
+						if(node instanceof IActiveComponentTreeNode)
+						{
+							if(((IActiveComponentTreeNode)node).getDescription().getName().equals(spanel.parent))
+								spanel.setParent(null);
+						}
+					}
+					
+					public void nodeAdded(ITreeNode node)
+					{
+					}
+				});
+				
+				comptree.addNodeHandler(new ShowRemoteControlCenterHandler(jcc, StarterServicePanel.this));
 				
 				lsplit.add(new JScrollPane(mpanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
@@ -236,78 +246,12 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 				csplit.add(spanel);
 				csplit.setDividerLocation(180);
 		            			
-		//		jcc.addComponentListListener(this);
-				
-				// todo: ?! is this ok?
-				
-				jcc.getExternalAccess().scheduleStep(new IComponentStep()
-				{
-					@XMLClassname("add-component-listener")
-					public Object execute(IInternalAccess ia)
-					{
-						ia.getRequiredService("cms").addResultListener(new DefaultResultListener()
-						{
-							public void resultAvailable(Object result)
-							{
-								IComponentManagementService ces = (IComponentManagementService)result;
-								ces.getComponentDescriptions().addResultListener(new DefaultResultListener()
-								{
-									public void resultAvailable(Object result)
-									{
-										IComponentDescription[] res = (IComponentDescription[])result;
-										for(int i=0; i<res.length; i++)
-											componentAdded(res[i]);
-									}
-								});
-								ces.addComponentListener(null, StarterServicePanel.this);
-							}
-						});
-						return null;
-					}
-				});
-				
 				add(csplit, BorderLayout.CENTER);
 				ret.setResult(null);
 			}
 		});
 		
 		return ret;
-	}
-	
-	/**
-	 *  Called when an component has died.
-	 *  @param ad The component description.
-	 */
-	public IFuture componentRemoved(final IComponentDescription ad, Map results)
-	{
-		// Update components on awt thread.
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				if(ad.getName().equals(spanel.parent))
-					spanel.setParent(null);
-			}
-		});
-		return IFuture.DONE;
-	}
-
-	/**
-	 *  Called when an component is born.
-	 *  @param ad the component description.
-	 */
-	public IFuture componentAdded(final IComponentDescription ad)
-	{
-		return IFuture.DONE;
-	}
-	
-	/**
-	 *  Called when an component changed.
-	 *  @param ad the component description.
-	 */
-	public IFuture componentChanged(final IComponentDescription ad)
-	{
-		return IFuture.DONE;
 	}
 	
 	/**
@@ -415,7 +359,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 		public boolean isEnabled()
 		{
 			boolean ret = false;
-			IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getTree().getLastSelectedPathComponent();
+			Object	node	= mpanel.getTree().getLastSelectedPathComponent();
 			if(node instanceof FileNode)
 			{
 				String type = ((FileNode)node).getFile().getAbsolutePath();
@@ -510,8 +454,8 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 			{
 				Properties	props	= new Properties();
 				
-				AbstractJCCPlugin.addSubproperties(props, "mpanel", (Properties)result);
-				AbstractJCCPlugin.addSubproperties(props, "spanel", spanel.getProperties());
+				props.addSubproperties("mpanel", (Properties)result);
+				props.addSubproperties("spanel", spanel.getProperties());
 				
 				props.addProperty(new Property("leftsplit_location", ""+lsplit.getDividerLocation()));
 				props.addProperty(new Property("mainsplit_location", ""+csplit.getDividerLocation()));

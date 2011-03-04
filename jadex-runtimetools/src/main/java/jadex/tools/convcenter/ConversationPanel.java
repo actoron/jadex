@@ -11,8 +11,12 @@ import jadex.bridge.MessageType.ParameterSpecification;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
+import jadex.commons.service.RequiredServiceInfo;
+import jadex.commons.service.SServiceProvider;
 import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
@@ -611,33 +615,35 @@ public class ConversationPanel extends JSplitPane
 	 */
 	protected void sendMessage(final Map msg)
 	{
+		// Remove message type for sending.
+		final Map	sendmsg	= new HashMap(msg);
+		final MessageType	mt	= (MessageType)sendmsg.remove(MESSAGE_TYPE);
+		
 		agent.scheduleStep(new IComponentStep()
 		{
 			@XMLClassname("sendM")
 			public Object execute(final IInternalAccess ia)
 			{
-				ia.getRequiredService("messageservice").addResultListener(
-					new SwingDefaultResultListener(ConversationPanel.this)
+				final Future	ret	= new Future();
+				SServiceProvider.getService(agent.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						IMessageService	ms	= (IMessageService)result;
-						final Map	sendmsg	= new HashMap(msg);
-						// Remove message type for sending.
-						final MessageType	mt	= (MessageType)sendmsg.remove(MESSAGE_TYPE);
-						ms.sendMessage(sendmsg, mt, agent.getComponentIdentifier(), ia.getModel().getClassLoader(), null)
-							.addResultListener(new SwingDefaultResultListener(ConversationPanel.this)
-						{
-							public void customResultAvailable(Object result)
-							{
-								// Re-add message type for storing sent msg. 
-								sendmsg.put(MESSAGE_TYPE, mt);
-								((DefaultListModel)sentmsgs.getModel()).addElement(sendmsg);
-							}
-						});
+						ms.sendMessage(sendmsg, mt, ia.getComponentIdentifier(), ia.getModel().getClassLoader(), null)
+							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 					}
-				});
-				return null;
+				}));
+				return ret;
+			}
+		}).addResultListener(new SwingDefaultResultListener(this)
+		{
+			public void customResultAvailable(Object result)
+			{
+				// Re-add message type for storing sent msg. 
+				sendmsg.put(MESSAGE_TYPE, mt);
+				((DefaultListModel)sentmsgs.getModel()).addElement(sendmsg);
 			}
 		});
 	}

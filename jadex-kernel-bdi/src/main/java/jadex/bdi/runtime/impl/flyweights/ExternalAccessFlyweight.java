@@ -99,6 +99,17 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		return getInterpreter().scheduleStep(step, getHandle());
 	}
 	
+	/**
+	 *  Schedule an immediate step of the agent.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the agent.
+	 *  @return The result of the step.
+	 */
+	public IFuture scheduleImmediate(IComponentStep step)
+	{
+		return getInterpreter().scheduleImmediate(step, getHandle());
+	}
+	
 	//-------- normal --------
 	
 	/**

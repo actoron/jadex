@@ -9,21 +9,15 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.jtable.DateTimeRenderer;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.library.ILibraryService;
 import jadex.micro.IMicroExternalAccess;
 import jadex.xml.annotation.XMLClassname;
 import jadex.xml.annotation.XMLIncludeFields;
-import jadex.xml.bean.JavaReader;
-import jadex.xml.bean.JavaWriter;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -64,7 +58,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	//-------- constants --------
 	
 	/** The property key for the settings object. */
-	public static final String	PROPERTY_SETTINGS	= "settings";
+	public static final String	PROPERTY_GUI_REFRESH	= "gui-refresh";
 	
 	//-------- attributes --------
 	
@@ -101,9 +95,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/** The refresh delay spinner. */
 	protected JSpinner	sprefresh;
 	
-	/** The proxy refresh delay spinner. */
-	protected JSpinner	spprorefresh;
-
 	/** The includes list. */
 	protected EditableList	includes;
 	
@@ -130,20 +121,27 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		
 		this.timerdelay = 5000;
 				
-		tfipaddress = new JTextField(0);
-		tfport = new JTextField(0);
+		tfipaddress = new JTextField(9);
+		tfipaddress.setPreferredSize(tfipaddress.getPreferredSize());
+		tfipaddress.setMinimumSize(tfipaddress.getPreferredSize());
+		tfipaddress.setHorizontalAlignment(JTextField.RIGHT);
+		tfport = new JTextField(4);
+		tfport.setPreferredSize(tfport.getPreferredSize());
+		tfport.setMinimumSize(tfport.getPreferredSize());
+		tfport.setHorizontalAlignment(JTextField.RIGHT);
 		SpinnerNumberModel spmdelay = new SpinnerNumberModel(0, 0, 100000, 1);
 		spdelay = new JSpinner(spmdelay);
-		SpinnerNumberModel spmrefresh = new SpinnerNumberModel(5, 0, 100000, 1);
-		sprefresh = new JSpinner(spmrefresh);
 		
 		cbautocreate = new JCheckBox();
 		cbautodelete = new JCheckBox();
-		SpinnerNumberModel spmprorefresh = new SpinnerNumberModel(5, 0, 100000, 1);
-		spprorefresh = new JSpinner(spmprorefresh);
-		
 		includes	= new EditableList("Includes");
 		excludes	= new EditableList("Excludes");
+		JScrollPane	pincludes	= new JScrollPane(includes);
+		JScrollPane	pexcludes	= new JScrollPane(excludes);
+		pincludes.setMinimumSize(new Dimension(0, 0));
+		pincludes.setPreferredSize(new Dimension(0, 0));
+		pexcludes.setMinimumSize(new Dimension(0, 0));
+		pexcludes.setPreferredSize(new Dimension(0, 0));
 		
 		final JPanel pdissettings = new JPanel(new GridBagLayout());
 		pdissettings.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Discovery Settings "));
@@ -162,12 +160,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		pdissettings.add(spdelay, new GridBagConstraints(1, y, 2, 1, 1, 0, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
 		y++;
-		pdissettings.add(new JLabel("Gui refresh delay (0=off) [s]", JLabel.LEFT), 
-			new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
-			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
-		pdissettings.add(sprefresh, new GridBagConstraints(1, y, 2, 1, 1, 0, GridBagConstraints.NORTHWEST, 
-			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
-		y++;
 		
 		final JPanel pprosettings = new JPanel(new GridBagLayout());
 		pprosettings.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Proxy Settings "));
@@ -183,12 +175,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
 		pprosettings.add(cbautodelete, new GridBagConstraints(1, y, 2, 1, 1, 0, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
-		y++;
-		pprosettings.add(new JLabel("Refresh delay (0=off) [s]", JLabel.LEFT), 
-			new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
-			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
-		pprosettings.add(spprorefresh, new GridBagConstraints(1, y, 2, 1, 1, 0, GridBagConstraints.NORTHWEST, 
-			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
 		y++;
 		
 		final JButton buapply = new JButton("Apply");
@@ -249,7 +235,10 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				updateDiscoveryInfos(jtdis);
 			}
 		});
-				
+		
+		SpinnerNumberModel spmrefresh = new SpinnerNumberModel(5, 0, 100000, 1);
+		sprefresh = new JSpinner(spmrefresh);
+		
 		JButton burefreshdis = new JButton("Refresh");
 		burefreshdis.setToolTipText("Refresh discovery infos.");
 		burefreshdis.addActionListener(new ActionListener()
@@ -281,8 +270,16 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					}
 					else
 					{
-						AwarenessAgentPanel.this.component.scheduleStep(new CreateProxyCommand(dif.getComponentIdentifier()))
-							.addResultListener(new SwingDefaultResultListener(panel)
+						final IComponentIdentifier	cid	= dif.getComponentIdentifier();
+						AwarenessAgentPanel.this.component.scheduleStep(new IComponentStep()
+						{
+							@XMLClassname("createProxy")
+							public Object execute(IInternalAccess ia)
+							{
+								AwarenessAgent agent = (AwarenessAgent)ia;
+								return agent.createProxy(cid);
+							}
+						}).addResultListener(new SwingDefaultResultListener(panel)
 						{
 							public void customResultAvailable(Object result)
 							{
@@ -315,8 +312,16 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					}
 					else
 					{
-						AwarenessAgentPanel.this.component.scheduleStep(new DeleteProxyCommand(dif.getComponentIdentifier()))
-							.addResultListener(new SwingDefaultResultListener(panel)
+						final IComponentIdentifier	cid	= dif.getComponentIdentifier();
+						AwarenessAgentPanel.this.component.scheduleStep(new IComponentStep()
+						{
+							@XMLClassname("deleteProxy")
+							public Object execute(IInternalAccess ia)
+							{
+								AwarenessAgent agent = (AwarenessAgent)ia;
+								return agent.deleteProxy(cid);
+							}
+						}).addResultListener(new SwingDefaultResultListener(panel)
 						{
 							public void customResultAvailable(Object result)
 							{
@@ -343,32 +348,50 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		
 		GridBagConstraints	gbc	= new GridBagConstraints();
 		gbc.fill	= GridBagConstraints.BOTH;
-		gbc.weightx	= 1;
 		
 		gbc.gridy	= 0;
-		panel.add(pdissettings, gbc);
+		gbc.gridwidth	= 2;
 		panel.add(pprosettings, gbc);
-		
-		gbc.gridy	= 1;
-		gbc.weighty	= 0.5;
+		gbc.gridwidth	= 1;
+
+		gbc.weightx	= 1;
+		gbc.gridwidth	= 1;
+		gbc.gridheight	= 2;
 		gbc.insets	= new Insets(2,2,2,2);
-		panel.add(new JScrollPane(includes), gbc);
-		panel.add(new JScrollPane(excludes), gbc);
+		panel.add(pincludes, gbc);
+		panel.add(pexcludes, gbc);
 		gbc.insets	= new Insets(0,0,0,0);
+		gbc.gridheight	= 1;
 		
-		gbc.gridy	= 2;
-		gbc.weighty	= 0;
+		gbc.gridy++;
+		gbc.gridx	= 0;
+		gbc.gridwidth	= 2;
+		gbc.weightx	= 0;
+		panel.add(pdissettings, gbc);
+		gbc.gridx	= GridBagConstraints.RELATIVE;
+		
+		gbc.gridy++;
 		gbc.gridwidth	= GridBagConstraints.REMAINDER;
 		panel.add(pbuts, gbc);
 		
-		
-		gbc.weighty	= 0.6;
-		gbc.gridx	= 0;
-		gbc.gridy	= GridBagConstraints.RELATIVE;
-		gbc.gridwidth	= GridBagConstraints.REMAINDER;
+		gbc.gridy++;
+		gbc.weighty	= 1;
 		panel.add(pdisinfos, gbc);
 		
+		gbc.gridy++;
+		gbc.weightx	= 0;
 		gbc.weighty	= 0;
+		gbc.gridx	= GridBagConstraints.RELATIVE;
+		gbc.gridwidth	= 1;
+		gbc.fill	= GridBagConstraints.NONE;
+		gbc.insets	= new Insets(0, 6, 0, 0);
+		panel.add(new JLabel("Gui refresh delay (0=off) [s]", JLabel.LEFT), gbc);
+		gbc.insets	= new Insets(0, 0, 0, 0);
+		panel.add(sprefresh, gbc);
+		gbc.fill	= GridBagConstraints.BOTH;
+
+		gbc.weightx	= 1;
+		gbc.gridwidth	= GridBagConstraints.REMAINDER;
 		panel.add(pbobuts, gbc);
 		
 		return refreshSettings();
@@ -406,28 +429,13 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	public IFuture setProperties(Properties ps)
 	{
-		final Future	ret	= new Future();
-		final Property	settings	= ps.getProperty(PROPERTY_SETTINGS);
+		Property	settings	= ps.getProperty(PROPERTY_GUI_REFRESH);
 		if(settings!=null)
 		{
-			SServiceProvider.getService(jcc.getExternalAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new SwingDelegationResultListener(ret)
-			{
-				public void customResultAvailable(Object result)
-				{
-					ILibraryService	ls	= (ILibraryService)result;
-					updateSettings((AwarenessSettings)JavaReader.objectFromXML(settings.getValue(), ls.getClassLoader()));
-					applySettings();
-					ret.setResult(null);
-				}
-			});
-		}
-		else
-		{
-			resetProperties().addResultListener(new SwingDelegationResultListener(ret));
+			sprefresh.setValue(new Integer(settings.getValue()));
 		}
 		
-		return ret;
+		return IFuture.DONE;
 	}
 
 	/**
@@ -436,51 +444,9 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	public IFuture getProperties()
 	{
-		final Future	ret	= new Future();
-		if(settings!=null)
-		{
-			SServiceProvider.getService(jcc.getExternalAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new SwingDelegationResultListener(ret)
-			{
-				public void customResultAvailable(Object result)
-				{
-					ILibraryService	ls	= (ILibraryService)result;
-					Properties	props	= new Properties();
-					props.addProperty(new Property(PROPERTY_SETTINGS, JavaWriter.objectToXML(settings, ls.getClassLoader())));
-					ret.setResult(props);
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(new Properties());
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Reset state to default values.
-	 */
-	public IFuture resetProperties()
-	{
-		final Future	ret	= new Future();
-		component.scheduleStep(new IComponentStep()
-		{
-			@XMLClassname("resetSettings")
-			public Object execute(IInternalAccess ia)
-			{
-				AwarenessAgent agent = (AwarenessAgent)ia;
-				agent.initArguments();
-				return null;
-			}
-		}).addResultListener(new SwingDelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				refreshSettings().addResultListener(new DelegationResultListener(ret));
-			}
-		});
+		Properties	props	= new Properties();
+		props.addProperty(new Property(PROPERTY_GUI_REFRESH, sprefresh.getValue().toString()));
+		Future	ret	= new Future(props);
 		return ret;
 	}
 	
@@ -501,7 +467,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				ret.address	= (InetAddress)ai[0];
 				ret.port	= (Integer)ai[1];
 				ret.delay	= agent.getDelay();
-				ret.proxydelay	= agent.getProxyDelay();
 				ret.autocreate	= agent.isAutoCreateProxy();
 				ret.autodelete	= agent.isAutoDeleteProxy();
 				ret.includes	= agent.getIncludes();
@@ -524,8 +489,15 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	protected void updateDiscoveryInfos(final JTable jtdis)
 	{
-		component.scheduleStep(new GetDiscoveryInfosCommand())
-			.addResultListener(new SwingDefaultResultListener(jtdis)
+		component.scheduleStep(new IComponentStep()
+		{
+			@XMLClassname("getDiscoveryInfos")
+			public Object execute(IInternalAccess ia)
+			{
+				AwarenessAgent agent = (AwarenessAgent)ia;
+				return agent.getDiscoveryInfos();
+			}
+		}).addResultListener(new SwingDefaultResultListener(jtdis)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -568,7 +540,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			settings.address	= InetAddress.getByName(tfipaddress.getText());
 			settings.port = Integer.parseInt(tfport.getText());
 			settings.delay = ((Number)spdelay.getValue()).longValue()*1000;
-			settings.proxydelay = ((Number)spprorefresh.getValue()).longValue()*1000;
 			settings.autocreate = cbautocreate.isSelected();
 			settings.autodelete = cbautodelete.isSelected();
 			settings.includes	= includes.getEntries();
@@ -582,7 +553,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					AwarenessAgent	agent	= (AwarenessAgent)ia;
 					agent.setAddressInfo(settings.address, settings.port);
 					agent.setDelay(settings.delay);
-					agent.setProxyDelay(settings.proxydelay);
 					agent.setAutoCreateProxy(settings.autocreate);
 					agent.setAutoDeleteProxy(settings.autodelete);
 					agent.setIncludes(settings.includes);
@@ -629,264 +599,12 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		tfipaddress.setText(settings.address.getHostAddress());
 		tfport.setText(""+settings.port);
 		spdelay.setValue(new Long(settings.delay/1000));
-		spprorefresh.setValue(new Long(settings.proxydelay/1000));
 		cbautocreate.setSelected(settings.autocreate);
 		cbautodelete.setSelected(settings.autodelete);
 		includes.setEntries(settings.includes);
 		excludes.setEntries(settings.excludes);
 	}
 
-	/**
-	 *  Get delay command.
-	 */
-	public static class GetDelayCommand implements IComponentStep
-	{
-		public Object execute(IInternalAccess ia)
-		{
-			AwarenessAgent agent = (AwarenessAgent)ia;
-			final long delay = agent.getDelay();
-			return new Long(delay);
-		}
-	}
-	
-	/**
-	 *  Get proxy delay command.
-	 */
-	public static class GetProxyDelayCommand implements IComponentStep
-	{
-		public Object execute(IInternalAccess ia)
-		{
-			AwarenessAgent agent = (AwarenessAgent)ia;
-			final long delay = agent.getProxyDelay();
-			return new Long(delay);
-		}
-	}
-	
-	/**
-	 *  Set delay command.
-	 */
-	public static class SetDelayCommand implements IComponentStep
-	{
-		public static boolean XML_INCLUDE_FIELDS = true;
-		public long delay;
-		
-		public SetDelayCommand()
-		{
-		}
-
-		public SetDelayCommand(long delay)
-		{
-			this.delay = delay;
-		}
-		
-		public Object execute(IInternalAccess ia)
-		{
-			AwarenessAgent agent = (AwarenessAgent)ia;
-			agent.setDelay(delay);
-			return null;
-		}
-	};
-	
-	/**
-	 *  Set proxy delay command.
-	 */
-	public static class SetProxyDelayCommand implements IComponentStep
-	{
-		public static boolean XML_INCLUDE_FIELDS = true;
-		public long delay;
-		
-		public SetProxyDelayCommand()
-		{
-		}
-
-		public SetProxyDelayCommand(long delay)
-		{
-			this.delay = delay;
-		}
-		
-		public Object execute(IInternalAccess ia)
-		{
-			AwarenessAgent agent = (AwarenessAgent)ia;
-			agent.setProxyDelay(delay);
-			return null;
-		}
-	};
-	
-	/**
-	 *  Get address command.
-	 */
-	public static class GetAddressCommand implements IComponentStep
-	{
-		public Object execute(IInternalAccess ia)
-		{
-			AwarenessAgent agent = (AwarenessAgent)ia;
-			return agent.getAddressInfo();
-		}
-	};
-
-	/**
-	 *  Set address command.
-	 */
-	public static class SetAddressCommand implements IComponentStep
-	{
-		public static boolean XML_INCLUDE_FIELDS = true;
-		public InetAddress address;
-		public int port;
-		
-		public SetAddressCommand()
-		{
-		}
-
-		public SetAddressCommand(InetAddress address, int port)
-		{
-			this.address = address;
-			this.port = port;
-		}
-		
-		public Object execute(IInternalAccess ia)
-		{
-			AwarenessAgent agent = (AwarenessAgent)ia;
-			agent.setAddressInfo(address, port);
-			return null;
-		}
-	};
-	
-	/**
-	 *  Get auto create command.
-	 */
-	public static class GetAutoCreateProxyCommand implements IComponentStep
-	{
-		public Object execute(IInternalAccess ia)
-		{
-			AwarenessAgent agent = (AwarenessAgent)ia;
-			boolean auto = agent.isAutoCreateProxy();
-			return auto? Boolean.TRUE: Boolean.FALSE;
-		}
-	}
-	
-	/**
-	 *  Set auto create command.
-	 */
-	public static class SetAutoCreateProxyCommand implements IComponentStep
-	{
-		public static boolean XML_INCLUDE_FIELDS = true;
-		public boolean autocreate;
-		
-		public SetAutoCreateProxyCommand()
-		{
-		}
-
-		public SetAutoCreateProxyCommand(boolean autocreate)
-		{
-			this.autocreate = autocreate;
-		}
-		
-		public Object execute(IInternalAccess ia)
-		{
-			AwarenessAgent agent = (AwarenessAgent)ia;
-			agent.setAutoCreateProxy(autocreate);
-			return null;
-		}
-	};
-	
-	/**
-	 *  Get auto delete command.
-	 */
-	public static class GetAutoDeleteProxyCommand implements IComponentStep
-	{
-		public Object execute(IInternalAccess ia)
-		{
-			AwarenessAgent agent = (AwarenessAgent)ia;
-			boolean auto = agent.isAutoDeleteProxy();
-			return auto? Boolean.TRUE: Boolean.FALSE;
-		}
-	}
-	
-	/**
-	 *  Set auto delete command.
-	 */
-	public static class SetAutoDeleteProxyCommand implements IComponentStep
-	{
-		public static boolean XML_INCLUDE_FIELDS = true;
-		public boolean autodelete;
-		
-		public SetAutoDeleteProxyCommand()
-		{
-		}
-
-		public SetAutoDeleteProxyCommand(boolean autodelete)
-		{
-			this.autodelete = autodelete;
-		}
-		
-		public Object execute(IInternalAccess ia)
-		{
-			AwarenessAgent agent = (AwarenessAgent)ia;
-			agent.setAutoDeleteProxy(autodelete);
-			return null;
-		}
-	};
-	
-	/**
-	 *  Get discovery info command.
-	 */
-	public static class GetDiscoveryInfosCommand implements IComponentStep
-	{
-		public Object execute(IInternalAccess ia)
-		{
-			AwarenessAgent agent = (AwarenessAgent)ia;
-			return agent.getDiscoveryInfos();
-		}
-	}
-
-	/**
-	 *  Create proxy command.
-	 */
-	public static class CreateProxyCommand implements IComponentStep
-	{
-		public static boolean XML_INCLUDE_FIELDS = true;
-		public IComponentIdentifier cid;
-		
-		public CreateProxyCommand()
-		{
-		}
-
-		public CreateProxyCommand(IComponentIdentifier cid)
-		{
-			this.cid = cid;
-		}
-		
-		public Object execute(IInternalAccess ia)
-		{
-			AwarenessAgent agent = (AwarenessAgent)ia;
-			return agent.createProxy(cid);
-		}
-	};
-	
-	/**
-	 *  Delete proxy command.
-	 */
-	public static class DeleteProxyCommand implements IComponentStep
-	{
-		public static boolean XML_INCLUDE_FIELDS = true;
-		public IComponentIdentifier cid;
-		
-		public DeleteProxyCommand()
-		{
-		}
-
-		public DeleteProxyCommand(IComponentIdentifier cid)
-		{
-			this.cid = cid;
-		}
-		
-		public Object execute(IInternalAccess ia)
-		{
-			AwarenessAgent agent = (AwarenessAgent)ia;
-			return agent.deleteProxy(cid);
-		}
-	};
-	
 	/**
 	 *  The awareness settings transferred between GUI and agent.
 	 */
@@ -901,9 +619,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		
 		/** The delay. */
 		public long delay;
-		
-		/** The proxydelay. */
-		public long proxydelay;
 		
 		/** The autocreate flag. */
 		public boolean autocreate;

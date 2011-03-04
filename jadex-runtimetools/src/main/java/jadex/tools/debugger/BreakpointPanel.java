@@ -1,6 +1,5 @@
 package jadex.tools.debugger;
 
-import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.ChangeEvent;
@@ -11,6 +10,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.rules.tools.common.TableSorter;
 
@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.JCheckBox;
@@ -62,8 +61,8 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 	/** The component description. */
 	protected IComponentDescription	description;
 	
-	/** The service container. */
-	protected IServiceProvider	container;
+	/** The service provider. */
+	protected IServiceProvider	provider;
 	
 	/** The list. */
 	protected JTable list;
@@ -76,106 +75,78 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 	/**
 	 *  Create a new rulebase panel.
 	 */
-	public BreakpointPanel(Collection breakpoints, final IComponentDescription description, IServiceProvider container)
+	public BreakpointPanel(Collection breakpoints, final IComponentDescription description, IServiceProvider provider)
 	{
 		this.breakpoints = new ArrayList(breakpoints);
 		this.description	= description;
-		this.container	= container;
-				
-		SServiceProvider.getServiceUpwards(container, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(BreakpointPanel.this)
+		
+		TableModel lm = new AbstractTableModel()
 		{
-			public void customResultAvailable(Object result)
+			public int getColumnCount()
 			{
-				IComponentManagementService	cms	= (IComponentManagementService)result;
-				cms.addComponentListener(description.getName(), new ICMSComponentListener()
-				{
-					public IFuture componentRemoved(IComponentDescription desc, Map results)
-					{
-						return IFuture.DONE;
-					}
-					
-					public IFuture componentChanged(IComponentDescription desc)
-					{
-						BreakpointPanel.this.description	= desc;
-						// Todo: update gui?
-						return IFuture.DONE;
-					}
-					
-					public IFuture componentAdded(IComponentDescription desc)
-					{
-						return IFuture.DONE;
-					}
-				});
-				
-				TableModel lm = new AbstractTableModel()
-				{
-					public int getColumnCount()
-					{
-						return 2;
-					}
-					public int getRowCount()
-					{
-						return BreakpointPanel.this.breakpoints.size();
-					}
-					public Object getValueAt(int row, int column)
-					{
-						return column==1 ? BreakpointPanel.this.breakpoints.get(row) : null;
-					}
-					public boolean isCellEditable(int row, int column)
-					{
-						return column==0;
-					}
-					public Class getColumnClass(int column)
-					{
-						return column==0 ? JToggleButton.class : String.class;
-					}
-				};
-				
-				list = new JTable(new TableSorter(lm));
-				TableSorter sorter = (TableSorter)list.getModel();
-				sorter.setTableHeader(list.getTableHeader());
+				return 2;
+			}
+			public int getRowCount()
+			{
+				return BreakpointPanel.this.breakpoints.size();
+			}
+			public Object getValueAt(int row, int column)
+			{
+				return column==1 ? BreakpointPanel.this.breakpoints.get(row) : null;
+			}
+			public boolean isCellEditable(int row, int column)
+			{
+				return column==0;
+			}
+			public Class getColumnClass(int column)
+			{
+				return column==0 ? JToggleButton.class : String.class;
+			}
+		};
+		
+		list = new JTable(new TableSorter(lm));
+		TableSorter sorter = (TableSorter)list.getModel();
+		sorter.setTableHeader(list.getTableHeader());
 
-				setLayout(new BorderLayout());
-				JScrollPane sp = new JScrollPane(list);
-				add(sp, BorderLayout.CENTER);
+		setLayout(new BorderLayout());
+		JScrollPane sp = new JScrollPane(list);
+		add(sp, BorderLayout.CENTER);
 //				this.setBorder(BorderFactory.createTitledBorder("Rulebase"));
 
-				// Hack!!! Set header preferred size and afterwards set title text to "" (bug in JDK1.5).
-				list.getTableHeader().setPreferredSize(list.getTableHeader().getPreferredSize());
-				list.getColumnModel().getColumn(0).setHeaderRenderer(new DefaultTableCellRenderer()
-				{
-			        public Component getTableCellRendererComponent(JTable table, 
-			        	Object obj, boolean selected, boolean focus, int row, int column)
-			        {
-			        	setIcon(icons.getIcon("breakpoint"));
-			            setBorder(UIManager.getBorder("TableHeader.cellBorder"));
-			            setHorizontalAlignment(JLabel.CENTER);
-						setToolTipText("Use checkbox to enable/disable breakpoint on a rule.");
-			            return this;
-			        }
-			    });
-				list.getColumnModel().getColumn(1).setHeaderValue("Breakpoints");
+		// Hack!!! Set header preferred size and afterwards set title text to "" (bug in JDK1.5).
+		list.getTableHeader().setPreferredSize(list.getTableHeader().getPreferredSize());
+		list.getColumnModel().getColumn(0).setHeaderRenderer(new DefaultTableCellRenderer()
+		{
+	        public Component getTableCellRendererComponent(JTable table, 
+	        	Object obj, boolean selected, boolean focus, int row, int column)
+	        {
+	        	setIcon(icons.getIcon("breakpoint"));
+	            setBorder(UIManager.getBorder("TableHeader.cellBorder"));
+	            setHorizontalAlignment(JLabel.CENTER);
+				setToolTipText("Use checkbox to enable/disable breakpoint on a rule.");
+	            return this;
+	        }
+	    });
+		list.getColumnModel().getColumn(1).setHeaderValue("Breakpoints");
 
-				list.setDefaultRenderer(JToggleButton.class, new ButtonCellManager(cms));
-				list.setDefaultEditor(JToggleButton.class, new ButtonCellManager(cms));
-				JCheckBox	but	= new JCheckBox();
-				but.setMargin(new Insets(0,0,0,0));
-				list.getColumnModel().getColumn(0).setMaxWidth(but.getPreferredSize().width+4);
-				
-				list.getSelectionModel().addListSelectionListener(new ListSelectionListener()
-				{
-					public void valueChanged(ListSelectionEvent e)
-					{
-						 if(!e.getValueIsAdjusting() && listeners!=null)
-						 {
-							 ChangeEvent	ce	= new ChangeEvent(this, EVENT_TYPE_SELECTED);
-							 for(int i=0; i<listeners.size(); i++)
-							 {
-								 ((IChangeListener)listeners.get(i)).changeOccurred(ce);
-							 }
-						 }
-					}
-				});
+		list.setDefaultRenderer(JToggleButton.class, new ButtonCellManager());
+		list.setDefaultEditor(JToggleButton.class, new ButtonCellManager());
+		JCheckBox	but	= new JCheckBox();
+		but.setMargin(new Insets(0,0,0,0));
+		list.getColumnModel().getColumn(0).setMaxWidth(but.getPreferredSize().width+4);
+		
+		list.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+		{
+			public void valueChanged(ListSelectionEvent e)
+			{
+				 if(!e.getValueIsAdjusting() && listeners!=null)
+				 {
+					 ChangeEvent	ce	= new ChangeEvent(this, EVENT_TYPE_SELECTED);
+					 for(int i=0; i<listeners.size(); i++)
+					 {
+						 ((IChangeListener)listeners.get(i)).changeOccurred(ce);
+					 }
+				 }
 			}
 		});
 	}
@@ -186,8 +157,19 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 	 */
 	public void	dispose()
 	{
+		
 	}
 	
+	/**
+	 *  Called when the component state changes.
+	 */
+	public IFuture componentChanged(IComponentDescription desc)
+	{
+		BreakpointPanel.this.description	= desc;
+		// Todo: update gui?
+		return IFuture.DONE;
+	}
+
 	/**
 	 *  Get the currently selected breakpoints.
 	 */
@@ -244,13 +226,6 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 	 */
 	public class ButtonCellManager	extends AbstractCellEditor	implements TableCellRenderer, TableCellEditor
 	{
-		protected IComponentManagementService cms;
-		
-		public ButtonCellManager(IComponentManagementService cms)
-		{
-			this.cms = cms;
-		}
-		
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int rowIndex, int column)
 		{
 			TableSorter sorter = (TableSorter)list.getModel();
@@ -274,7 +249,7 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
 				{
-					List	bps	= new ArrayList(Arrays.asList(description.getBreakpoints()));
+					final List	bps	= new ArrayList(Arrays.asList(description.getBreakpoints()));
 					if(but.isSelected())
 					{
 						bps.add(breakpoints.get(sorter.modelIndex(rowIndex)));
@@ -283,7 +258,15 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 					{
 						bps.remove(breakpoints.get(sorter.modelIndex(rowIndex)));
 					}
-					cms.setComponentBreakpoints(description.getName(), (String[])bps.toArray(new String[bps.size()]));
+					SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(new SwingDefaultResultListener(BreakpointPanel.this)
+					{
+						public void customResultAvailable(Object result)
+						{
+							((IComponentManagementService)result).setComponentBreakpoints(
+								description.getName(), (String[])bps.toArray(new String[bps.size()]));
+						}
+					});
 				}
 			});
 			return	ret;

@@ -326,14 +326,6 @@ public abstract class AbstractSelectorPanel extends JPanel implements IPropertie
 	}
 
 	/**
-	 *  Reset the properties.
-	 */
-	public IFuture resetProperties()
-	{
-		return IFuture.DONE;
-	}
-
-	/**
 	 *  Add a subproperties to a properties.
 	 */
 	public static void	addSubproperties(Properties props, String type, Properties subproperties)

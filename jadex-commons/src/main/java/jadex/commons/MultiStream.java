@@ -7,7 +7,7 @@ import java.io.OutputStream;
 import java.util.Set;
 
 /**
- *  Dipatch the write calls to a number of
+ *  Dispatch the write calls to a number of
  *  specified output streams.
  */
 public class MultiStream extends OutputStream

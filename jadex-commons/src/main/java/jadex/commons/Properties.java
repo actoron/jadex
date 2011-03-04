@@ -274,6 +274,18 @@ public class Properties
 	}
 	
 	/**
+	 *  Add a subproperties to a properties.
+	 */
+	public void	addSubproperties(String type, Properties subproperties)
+	{
+		if(subproperties.getType()!=null && !subproperties.getType().equals(type))
+			throw new IllegalArgumentException("Incompatible types: "+subproperties.getType()+", "+type);
+		
+		subproperties.setType(type);
+		addSubproperties(subproperties);
+	}
+	
+	/**
 	 *  Remove all subproperties of a given type.
 	 */
 	public void	removeSubproperties(String type)

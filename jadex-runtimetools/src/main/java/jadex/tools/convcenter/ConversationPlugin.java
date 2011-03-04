@@ -6,13 +6,14 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageListener;
 import jadex.bridge.IMessageService;
+import jadex.bridge.IRemoteMessageListener;
 import jadex.bridge.MessageType;
 import jadex.commons.IFilter;
 import jadex.commons.Properties;
@@ -20,10 +21,9 @@ import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
-import jadex.tools.starter.StarterPlugin;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Dimension;
@@ -65,7 +65,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		"conversation",	SGUI.makeIcon(ConversationPlugin.class, "/jadex/tools/common/images/new_conversation.png"),
 		"message",	SGUI.makeIcon(ConversationPlugin.class, "/jadex/tools/common/images/message_small.png"),
 		"message_overlay",	SGUI.makeIcon(ConversationPlugin.class, "/jadex/tools/common/images/overlay_message.png"),
-		"conversation_sel", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_conversation_sel.png"),
+		"conversation_sel", SGUI.makeIcon(ConversationPlugin.class, "/jadex/tools/common/images/new_conversation_sel.png"),
 		"help",	SGUI.makeIcon(ConversationPlugin.class, "/jadex/tools/common/images/help.gif"),
 	});
 
@@ -108,30 +108,23 @@ public class ConversationPlugin extends AbstractJCCPlugin
 					final IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					final IComponentIdentifier rec = node.getDescription().getName();
 					// Use clone, as added component id might be modified by user.
-					SServiceProvider.getServiceUpwards(jcc.getExternalAccess().getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(comptree)
+					IComponentIdentifier receiver = new ComponentIdentifier(rec.getName(), rec.getAddresses());
+					Map	message	= convcenter.getMessagePanel().getMessage();
+					MessageType	mt	= (MessageType)message.get(ConversationPanel.MESSAGE_TYPE);
+					IComponentIdentifier[]	recs	= (IComponentIdentifier[])message.get(mt.getReceiverIdentifier());
+					List	lrecs	= recs!=null ? new ArrayList(Arrays.asList(recs)) : new ArrayList();
+					if(lrecs.contains(receiver))
 					{
-						public void customResultAvailable(Object result)
-						{
-							IComponentManagementService cms  = (IComponentManagementService)result;
-							IComponentIdentifier receiver = cms.createComponentIdentifier(rec.getName(), false, rec.getAddresses());
-							Map	message	= convcenter.getMessagePanel().getMessage();
-							MessageType	mt	= (MessageType)message.get(ConversationPanel.MESSAGE_TYPE);
-							IComponentIdentifier[]	recs	= (IComponentIdentifier[])message.get(mt.getReceiverIdentifier());
-							List	lrecs	= recs!=null ? new ArrayList(Arrays.asList(recs)) : new ArrayList();
-							if(lrecs.contains(receiver))
-							{
-								lrecs.remove(receiver);
-							}
-							else
-							{
-								lrecs.add(receiver);
-							}
-							message.put(mt.getReceiverIdentifier(), (IComponentIdentifier[])lrecs.toArray(new IComponentIdentifier[lrecs.size()]));					
-							convcenter.getMessagePanel().setMessage(message);
-							
-							comptree.getModel().fireNodeChanged(node);
-						}
-					});
+						lrecs.remove(receiver);
+					}
+					else
+					{
+						lrecs.add(receiver);
+					}
+					message.put(mt.getReceiverIdentifier(), (IComponentIdentifier[])lrecs.toArray(new IComponentIdentifier[lrecs.size()]));					
+					convcenter.getMessagePanel().setMessage(message);
+					
+					comptree.getModel().fireNodeChanged(node);
 				}
 			}
 		}
@@ -146,10 +139,11 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		comptree = new ComponentTreePanel(getJCC().getExternalAccess(), getJCC().getCMSHandler());
+		comptree = new ComponentTreePanel(getJCC().getPlatformAccess(), getJCC().getCMSHandler());
 		comptree.setMinimumSize(new Dimension(0, 0));
 		split.add(comptree);
-		convcenter = new ConversationPanel(getJCC().getExternalAccess(), getJCC().getCMSHandler(), comptree, SFipa.FIPA_MESSAGE_TYPE);
+		convcenter = new ConversationPanel(getJCC().getPlatformAccess(), getJCC().getCMSHandler(), comptree, SFipa.FIPA_MESSAGE_TYPE);
+		comptree.addNodeHandler(new ShowRemoteControlCenterHandler(getJCC(), getView()));
 		comptree.addNodeHandler(new INodeHandler()
 		{
 			public Action[] getPopupActions(ITreeNode[] nodes)
@@ -211,7 +205,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		
 		
 
-		final IMessageListener listener = new IMessageListener()
+		final IMessageListener listener = new IRemoteMessageListener()
 		{
 			public IFuture messageReceived(IMessageAdapter msg)
 			{
@@ -224,12 +218,13 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			}
 		};
 		
-		getJCC().getExternalAccess().scheduleStep(new IComponentStep()
+		getJCC().getPlatformAccess().scheduleStep(new IComponentStep()
 		{
-			@XMLClassname("fipamsg")
-			public Object execute(IInternalAccess ia)
+			@XMLClassname("installListener")
+			public Object execute(final IInternalAccess ia)
 			{
-				ia.getRequiredService("messageservice").addResultListener(new DefaultResultListener(ia.getLogger())
+				SServiceProvider.getService(ia.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(ia.createResultListener(new DefaultResultListener(ia.getLogger())
 				{
 					public void resultAvailable(Object result)
 					{
@@ -245,19 +240,19 @@ public class ConversationPlugin extends AbstractJCCPlugin
 								{
 									for(Iterator it=SReflect.getIterator(rec); !tojcc && it.hasNext(); )
 									{
-										tojcc	= getJCC().getComponentIdentifier().equals(it.next());
+										tojcc	= ia.getComponentIdentifier().equals(it.next());
 									}
 								}
 								else
 								{
-									tojcc	= getJCC().getComponentIdentifier().equals(rec);
+									tojcc	= ia.getComponentIdentifier().equals(rec);
 								}
 								
 								return tojcc;
 							}
 						});
 					}
-				});
+				}));
 				return null;
 			}
 		});
@@ -297,7 +292,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 	public IFuture getProperties()
 	{
 		Properties props = new Properties();
-		addSubproperties(props, "convcenter", convcenter.getProperties());
+		props.addSubproperties("convcenter", convcenter.getProperties());
 		return new Future(props);
 	}
 

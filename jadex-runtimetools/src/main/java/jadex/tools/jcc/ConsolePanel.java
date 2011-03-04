@@ -1,7 +1,16 @@
 package jadex.tools.jcc;
 
-import jadex.commons.MultiStream;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.RemoteChangeListenerHandler;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
+import jadex.commons.IRemoteChangeListener;
+import jadex.commons.SUtil;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -10,11 +19,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.PrintStream;
-import java.util.logging.Logger;
+import java.util.Collection;
+import java.util.Iterator;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -32,7 +40,7 @@ import javax.swing.text.StyledDocument;
 
 /**
  *  A console panel for displaying the console out
- *  and err messages.
+ *  and err messages of a local or remote platform.
  */
 public class ConsolePanel extends JPanel
 {
@@ -48,28 +56,17 @@ public class ConsolePanel extends JPanel
 	
 	//-------- attributes --------
 	
+	/** The platform component. */
+	protected IExternalAccess	access;
+	
 	/** The document. */
 	protected StyledDocument doc;
-	
-	/** The old output stream. */
-	protected PrintStream out;
-	
-	/** The old err stream. */
-	protected PrintStream err;
 	
 	/** The new document output stream. */
 	protected StyledDocumentOutputStream sdout;
 	
 	/** The new document err stream. */
 	protected StyledDocumentOutputStream sderr;
-	
-	/** The new output stream. */
-	//protected PrintStream myout;
-	protected MultiStream multiout;
-	
-	/** The new err stream. */
-	//protected PrintStream myerr;
-	protected MultiStream multierr;
 	
 	/** The on/off button. */
 	protected JButton onoff;
@@ -79,19 +76,17 @@ public class ConsolePanel extends JPanel
 	/**
 	 *  Create a new console panel.
 	 */
-	public ConsolePanel()
+	public ConsolePanel(IExternalAccess	access)
 	{
-		this("Console Output");
+		this(access, "Console Output");
 	}
 	
 	/**
 	 *  Create a new console panel.
 	 */
-	public ConsolePanel(String title)
+	public ConsolePanel(IExternalAccess access, String title)
 	{
-		this.out = System.out;
-		this.err = System.err;
-		
+		this.access	= access;
 		JTextPane tp = new JTextPane();
 		this.doc = tp.getStyledDocument();
 	
@@ -104,15 +99,6 @@ public class ConsolePanel extends JPanel
 		this.sdout = new StyledDocumentOutputStream(doc, outstyle);
 		this.sderr = new StyledDocumentOutputStream(doc, errorstyle);
 			
-		multiout = new MultiStream(new PrintStream[]{out, sdout});
-		PrintStream myout = new PrintStream(multiout);
-		
-		multierr = new MultiStream(new PrintStream[]{err, sderr});
-		PrintStream myerr = new PrintStream(multierr);
-	
-		System.setOut(myout);
-		System.setErr(myerr);
-		
 		JButton clear = new JButton(icons.getIcon("clear"));
 		clear.setMargin(new Insets(0,0,0,0));
 		clear.setToolTipText("Clear the console output");
@@ -201,25 +187,56 @@ public class ConsolePanel extends JPanel
 	{
 		if(!enable)
 		{
-			//System.out.println("off1");
-			//System.setOut(out);
-			//System.setErr(err);
-			multiout.setEnabled(sdout, false);
-			multierr.setEnabled(sderr, false);
 			onoff.setIcon(icons.getIcon("on"));
 			onoff.setToolTipText("Turn on the console");
-			//System.out.println("off2");
 		}
 		else
 		{
-			//System.out.println("on1");
-			//System.setOut(myout);
-			//System.setErr(myerr);
-			multiout.setEnabled(sdout, true);
-			multierr.setEnabled(sderr, true);
+			final IRemoteChangeListener	rcl	= new IRemoteChangeListener()
+			{
+				final static String	OUT_OCCURRED	= "out" + RemoteChangeListenerHandler.EVENT_OCCURRED;
+				final static String	ERR_OCCURRED	= "err" + RemoteChangeListenerHandler.EVENT_OCCURRED;
+				
+				public IFuture changeOccurred(ChangeEvent event)
+				{
+					handleEvent(event);
+					return IFuture.DONE;
+				}
+				
+				public void	handleEvent(ChangeEvent event)
+				{
+					if(RemoteChangeListenerHandler.EVENT_BULK.equals(event.getType()))
+					{
+						for(Iterator it=((Collection)event.getValue()).iterator(); it.hasNext(); )
+						{
+							handleEvent((ChangeEvent)it.next());
+						}
+					}
+					else if(OUT_OCCURRED.equals(event.getType()))
+					{
+						sdout.println(event.getValue());
+					}
+					else if(ERR_OCCURRED.equals(event.getType()))
+					{
+						sderr.println(event.getValue());
+					}
+				}
+			};
+			
+			access.scheduleImmediate(new IComponentStep()
+			{
+				@XMLClassname("installListener")
+				public Object execute(IInternalAccess ia)
+				{
+					ConsoleListener	cl	= new ConsoleListener("x", ia, rcl);
+					SUtil.addSystemOutListener(cl);
+					SUtil.addSystemErrListener(cl);
+					return null;
+				}
+			});
+			
 			onoff.setIcon(icons.getIcon("off"));
 			onoff.setToolTipText("Turn off the console");
-			//System.out.println("on2");
 		}
 	}
 	
@@ -237,32 +254,51 @@ public class ConsolePanel extends JPanel
 	 */
 	public void close()
 	{
-		System.setOut(this.out);
-		System.setErr(this.err);
 		sdout.close();
 		sderr.close();
 	}
 	
-	/**
-	 *
-	 */
-	public static void main(String[] args)
+	//-------- helper classes --------
+	
+	public static class	ConsoleListener	extends RemoteChangeListenerHandler	implements IChangeListener
 	{
-		Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).info("aaa");
+		//-------- constructors --------
 		
-		JFrame f = new JFrame();
-		ConsolePanel cp = new ConsolePanel();
-		f.getContentPane().add(cp);
-		f.pack();
-		f.setVisible(true);
-		
-		for(int i=0; i<1000000; i++)
+		/**
+		 *  Create a console listener.
+		 */
+		public ConsoleListener(String id, IInternalAccess instance, IRemoteChangeListener rcl)
 		{
-			System.out.println(i);
-			System.err.println(i);
-			Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).info(""+i);
-			try{Thread.sleep(1000);}
-			catch(InterruptedException e){e.printStackTrace();}
+			super(id, instance, rcl);
+		}
+		
+		//-------- IChangeListener interface --------
+		
+		/**
+		 *  Called when a change occurs.
+		 *  @param event The event.
+		 */
+		public void changeOccurred(final ChangeEvent event)
+		{
+			instance.getExternalAccess().scheduleImmediate(new IComponentStep()
+			{
+				public Object execute(IInternalAccess ia)
+				{
+					occurrenceAppeared(event.getType(), event.getValue());
+					return null;
+				}
+			});
+		}
+		
+		//-------- RemoteChangeListenerHandler methods --------
+		
+		/**
+		 *  Remove local listeners.
+		 */
+		protected void dispose()
+		{
+			SUtil.removeSystemOutListener(this);
+			SUtil.removeSystemErrListener(this);
 		}
 	}
 }

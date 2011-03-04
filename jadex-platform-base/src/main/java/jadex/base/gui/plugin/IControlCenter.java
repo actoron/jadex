@@ -1,7 +1,6 @@
 package jadex.base.gui.plugin;
 
 import jadex.base.gui.CMSUpdateHandler;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 
 import javax.swing.JComponent;
@@ -12,18 +11,37 @@ import javax.swing.JComponent;
  */
 public interface IControlCenter
 {
+	//-------- platform related methods --------
+	
 	/**
-	 *  Get the external access.
+	 *  Get the external access of the administered platform (potentially remote).
 	 *  @return The external access.
 	 */
-	public IExternalAccess	getExternalAccess();
+	public IExternalAccess	getPlatformAccess();
+		
+	//-------- global JCC methods --------
 	
 	/**
-	 *  Get the component id of the component executing the JCC.
-	 *  @return The component id.
+	 *  Get the external access of the JCC component (always local).
+	 *  @return The external access.
 	 */
-	public IComponentIdentifier	getComponentIdentifier();
+	public IExternalAccess	getJCCAccess();
 	
+	/**
+	 *  Get the cms update handler shared by all tools.
+	 */
+	// Only one per JCC as many plugins listen to many remote platforms, too.
+	// So its not useful to have separate handlers for each administered remote platform.
+	public CMSUpdateHandler getCMSHandler();
+	
+	//-------- GUI helper methods --------
+	
+	/**
+	 *  Add a new platform control center
+	 *  or switch to tab if already exists.
+	 */
+	public void	showPlatform(IExternalAccess platformaccess);
+
 	/**
 	 *  Set a text to be displayed in the status bar.
 	 *  The text will be removed automatically after
@@ -45,42 +63,6 @@ public interface IControlCenter
 	public void	removeStatusComponent(Object id);
 	
 	/**
-	 *  Show the console.
-	 *  @param show True, if console should be shown.
-	 */
-	public void showConsole(boolean show);
-	
-	/**
-	 *  Test if console is shown.
-	 *  @return True, if shown.
-	 */
-	public boolean isConsoleShown();
-	
-	/**
-	 *  Set the console height.
-	 *  @param height The console height.
-	 * /
-	public void setConsoleHeight(int height);*/
-	
-	/**
-	 *  Get the console height.
-	 *  @return The console height.
-	 * /
-	public int getConsoleHeight();*/
-	
-	/**
-	 *  Set the console enable state.
-	 *  @param enabled The enabled state.
-	 */
-	public void setConsoleEnabled(boolean enabled);
-	
-	/**
-	 *  Test if the console is enabled.
-	 *  @return True, if enabled.
-	 */
-	public boolean isConsoleEnabled();
-
-	/**
 	 *  Display an error dialog.
 	 * 
 	 *  @param errortitle The title to use for an error dialog (required).
@@ -88,9 +70,4 @@ public interface IControlCenter
 	 *  @param exception The exception (if any).
 	 */
 	public void displayError(final String errortitle, String errormessage, Exception exception);
-
-	/**
-	 *  Get the cms update handler shared by all tools.
-	 */
-	public CMSUpdateHandler getCMSHandler();
 }

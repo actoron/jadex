@@ -5,6 +5,7 @@ import jadex.base.gui.ComponentIdentifierDialog;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.SJCC;
+import jadex.base.gui.plugin.AbstractJCCPlugin.ShowRemoteControlCenterHandler;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
@@ -355,6 +356,8 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 		comptree = new ComponentTreePanel(getJCC().getExternalAccess(), getJCC().getCMSHandler(), JSplitPane.HORIZONTAL_SPLIT);
 		comptree.setMinimumSize(new Dimension(0, 0));
 		
+		comptree.addNodeHandler(new ShowRemoteControlCenterHandler(getJCC(), getView()));
+
 		lsplit.add(new JScrollPane(mpanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 //		lsplit.add(tp);

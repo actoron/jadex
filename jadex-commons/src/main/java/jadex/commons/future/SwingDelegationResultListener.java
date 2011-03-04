@@ -31,22 +31,38 @@ public class SwingDelegationResultListener implements IResultListener
 	 */
 	final public void resultAvailable(final Object result)
 	{
-		SwingUtilities.invokeLater(new Runnable()
+		if(SwingUtilities.isEventDispatchThread())
 		{
-			public void run()
+			try
 			{
-				try
-				{
-					customResultAvailable(result);
-				}
-				catch(Exception e)
-				{
-					// Could happen that overridden customResultAvailable method
-					// first sets result and then throws exception (listener ex are catched).
-					future.setExceptionIfUndone(e);
-				}
+				customResultAvailable(result);
 			}
-		});
+			catch(Exception e)
+			{
+				// Could happen that overridden customResultAvailable method
+				// first sets result and then throws exception (listener ex are catched).
+				future.setExceptionIfUndone(e);
+			}
+		}
+		else
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					try
+					{
+						customResultAvailable(result);
+					}
+					catch(Exception e)
+					{
+						// Could happen that overridden customResultAvailable method
+						// first sets result and then throws exception (listener ex are catched).
+						future.setExceptionIfUndone(e);
+					}
+				}
+			});
+		}
 	}
 	
 	/**
@@ -56,20 +72,27 @@ public class SwingDelegationResultListener implements IResultListener
 	final public void exceptionOccurred(final Exception exception)
 	{
 //		exception.printStackTrace();
-		SwingUtilities.invokeLater(new Runnable()
+		if(SwingUtilities.isEventDispatchThread())
 		{
-			public void run()
+			customExceptionOccurred(exception);			
+		}
+		else
+		{
+			SwingUtilities.invokeLater(new Runnable()
 			{
-				customExceptionOccurred(exception);
-			}
-		});
+				public void run()
+				{
+					customExceptionOccurred(exception);
+				}
+			});
+		}
 	}
 	
 	/**
 	 *  Called when the result is available.
 	 *  @param result The result.
 	 */
-	public void customResultAvailable(Object result)
+	public void customResultAvailable(Object result)	throws Exception
 	{
 		future.setResult(result);
 	}

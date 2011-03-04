@@ -14,6 +14,7 @@ import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
+import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.ComponentTerminatedException;
@@ -22,6 +23,7 @@ import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
@@ -1031,6 +1033,42 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 //				state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, step);
 //			}
 //		});
+	}
+	
+	/**
+	 *  Execute some code on the component's thread.
+	 *  Unlike scheduleStep(), the action will also be executed
+	 *  while the component is suspended.
+	 *  @param action	Code to be executed on the component's thread.
+	 *  @return The result of the step.
+	 */
+	public IFuture scheduleImmediate(final IComponentStep step, final Object scope)
+	{
+		final Future ret = new Future();
+		
+		try
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					try
+					{
+						ret.setResult(step.execute(new CapabilityFlyweight(state, scope)));
+					}
+					catch(Exception e)
+					{
+						ret.setException(e);
+					}
+				}
+			});
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
+		
+		return ret;
 	}
 	
 	/**

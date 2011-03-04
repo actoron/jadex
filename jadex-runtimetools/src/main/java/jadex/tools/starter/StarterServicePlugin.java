@@ -10,8 +10,6 @@ import jadex.base.gui.plugin.SJCC;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -20,6 +18,8 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
 import jadex.commons.service.IService;
+import jadex.commons.service.RequiredServiceInfo;
+import jadex.commons.service.SServiceProvider;
 import jadex.tools.generic.AbstractServicePlugin;
 
 import java.awt.event.ActionEvent;
@@ -47,8 +47,8 @@ public class StarterServicePlugin extends AbstractServicePlugin
 	{
 		icons.put("starter", SGUI.makeIcon(StarterServicePlugin.class, "/jadex/tools/common/images/new_starter.png"));
 		icons.put("starter_sel", SGUI.makeIcon(StarterServicePlugin.class, "/jadex/tools/common/images/new_starter_sel.png"));
-		icons.put("add_remote_component", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/add_remote_component.png"));
-		icons.put("kill_platform", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_killplatform.png"));
+		icons.put("add_remote_component", SGUI.makeIcon(StarterServicePlugin.class, "/jadex/tools/common/images/add_remote_component.png"));
+		icons.put("kill_platform", SGUI.makeIcon(StarterServicePlugin.class, "/jadex/tools/common/images/new_killplatform.png"));
 	}
 
 	//-------- methods --------
@@ -335,7 +335,7 @@ public class StarterServicePlugin extends AbstractServicePlugin
 			StarterViewerPanel svp = (StarterViewerPanel)getSelectorPanel().getCurrentPanel();
 			if(svp!=null)
 			{
-				ComponentIdentifierDialog dia = new ComponentIdentifierDialog(svp.getComponent(), jcc.getExternalAccess().getServiceProvider());
+				ComponentIdentifierDialog dia = new ComponentIdentifierDialog(svp.getComponent(), jcc.getPlatformAccess().getServiceProvider());
 				final IComponentIdentifier cid = dia.getComponentIdentifier(null);
 				if(cid!=null)
 				{
@@ -343,33 +343,27 @@ public class StarterServicePlugin extends AbstractServicePlugin
 					args.put("component", cid);
 					
 					ComponentTreePanel ctp = svp.getPanel().getComponentTreePanel();
-					ctp.getExternalAccess().scheduleStep(new IComponentStep()
+					SServiceProvider.getService(ctp.getExternalAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(new DefaultResultListener()		
 					{
-						public Object execute(IInternalAccess ia)
+						public void resultAvailable(Object result)
 						{
-							ia.getRequiredService("cms").addResultListener(new DefaultResultListener()		
+							IComponentManagementService cms = (IComponentManagementService)result;
+//								createComponent("jadex/base/service/remote/ProxyAgent.class", cid.getLocalName(), null, args, false, null, null, null, null);
+							
+							cms.createComponent(cid.getLocalName(), "jadex/base/service/remote/ProxyAgent.class", 
+								new CreationInfo(args), null).addResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
-									IComponentManagementService cms = (IComponentManagementService)result;
-	//								createComponent("jadex/base/service/remote/ProxyAgent.class", cid.getLocalName(), null, args, false, null, null, null, null);
-									
-									cms.createComponent(cid.getLocalName(), "jadex/base/service/remote/ProxyAgent.class", 
-										new CreationInfo(args), null).addResultListener(new IResultListener()
-									{
-										public void resultAvailable(Object result)
-										{
-											getJCC().setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-											getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
-										}
-									});
+									getJCC().setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
 								}
 							});
-							return null;
 						}
 					});
 				}

@@ -6,7 +6,6 @@ import jadex.commons.service.IServiceProvider;
 
 /**
  *  The interface for accessing components from the outside.
- *  To be specialized for concrete component types.
  */
 public interface IExternalAccess extends IRemotable
 {
@@ -37,12 +36,21 @@ public interface IExternalAccess extends IRemotable
 	public IServiceProvider getServiceProvider();
 	
 	/**
-	 *  Schedule a step of the agent.
+	 *  Schedule a step of the component.
 	 *  May safely be called from external threads.
-	 *  @param step	Code to be executed as a step of the agent.
+	 *  @param step	Code to be executed as a step of the component.
 	 *  @return The result of the step.
 	 */
 	public IFuture scheduleStep(IComponentStep step);
+	
+	/**
+	 *  Execute some code on the component's thread.
+	 *  Unlike scheduleStep(), the action will also be executed
+	 *  while the component is suspended.
+	 *  @param action	Code to be executed on the component's thread.
+	 *  @return The result of the step.
+	 */
+	public IFuture scheduleImmediate(IComponentStep step);
 	
 	//-------- normal --------
 	

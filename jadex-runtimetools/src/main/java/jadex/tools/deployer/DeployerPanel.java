@@ -6,7 +6,6 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.JarAsDirectory;
 import jadex.base.gui.filetree.RemoteFileNode;
-import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.service.deployment.FileContent;
 import jadex.base.service.deployment.IDeploymentService;
@@ -66,8 +65,8 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 		// Local view on the left
 		DeployerNodeHandler nh1 = new DeployerNodeHandler();
 		DeployerNodeHandler nh2 = new DeployerNodeHandler();
-		p1 = new DeployerServiceSelectorPanel(jcc.getExternalAccess(), IDeploymentService.class, nh1);
-		p2 = new DeployerServiceSelectorPanel(jcc.getExternalAccess(), IDeploymentService.class, nh2);
+		p1 = new DeployerServiceSelectorPanel(jcc.getJCCAccess(), IDeploymentService.class, nh1);
+		p2 = new DeployerServiceSelectorPanel(jcc.getPlatformAccess(), IDeploymentService.class, nh2);
 		nh1.setFirstPanel(p1);
 		nh1.setSecondPanel(p2);
 		nh2.setFirstPanel(p2);
@@ -96,12 +95,12 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 		{
 			public void customResultAvailable(Object result)
 			{
-				AbstractJCCPlugin.addSubproperties(props, "first", (Properties)result);
+				props.addSubproperties("first", (Properties)result);
 				p2.getProperties().addResultListener(new SwingDelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						AbstractJCCPlugin.addSubproperties(props, "second", (Properties)result);
+						props.addSubproperties("second", (Properties)result);
 						ret.setResult(props);
 					}
 				});
@@ -125,14 +124,6 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 
 		splitpanel.setDividerLocation(props.getIntProperty("split_location"));
 	
-		return IFuture.DONE;
-	}
-
-	/**
-	 *  Reset the properties.
-	 */
-	public IFuture resetProperties()
-	{
 		return IFuture.DONE;
 	}
 	

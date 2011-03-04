@@ -1,18 +1,27 @@
 package jadex.base.gui.plugin;
 
 
+import jadex.base.gui.asynctree.INodeHandler;
+import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.componenttree.ProxyComponentTreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.commons.Properties;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.service.RequiredServiceInfo;
+import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
-import jadex.xml.annotation.XMLClassname;
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 
@@ -36,15 +45,6 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	private JComponent main_panel;
 	
 	//-------- constructors --------
-	
-	/**
-	 *  Test if this plugin should be initialized lazily.
-	 *  @return True, if lazy.
-	 */
-	public boolean isLazy()
-	{
-		return true;
-	}
 	
 	/** 
 	 *  Initialize the plugin.
@@ -118,14 +118,6 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	{
 		return new Future(null);
 	}
-
-	/**
-	 *  Reset the plugin.
-	 */
-	public IFuture resetProperties()
-	{
-		return IFuture.DONE;
-	}
 	
 	//-------- internal create methods --------
 	
@@ -170,29 +162,22 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 		final Future	ret	= new Future();
 		
 		// Local component when platform name is same as JCC platform name
-		if(cid.getPlatformName().equals(jcc.getComponentIdentifier().getPlatformName()))
+		if(cid.getPlatformName().equals(jcc.getJCCAccess().getComponentIdentifier().getPlatformName()))
 		{
-			jcc.getExternalAccess().scheduleStep(new IComponentStep()
+			SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new DelegationResultListener(ret)
 			{
-				@XMLClassname("get-classloader")
-				public Object execute(IInternalAccess ia)
+				public void customResultAvailable(Object result)
 				{
-					ia.getRequiredService("cms").addResultListener(new DelegationResultListener(ret)
+					IComponentManagementService	cms	= (IComponentManagementService)result;
+					cms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret)
 					{
 						public void customResultAvailable(Object result)
 						{
-							IComponentManagementService	cms	= (IComponentManagementService)result;
-							cms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret)
-							{
-								public void customResultAvailable(Object result)
-								{
-									IExternalAccess	ea	= (IExternalAccess)result;
-									ret.setResult(ea.getModel().getClassLoader());
-								}
-							});
+							IExternalAccess	ea	= (IExternalAccess)result;
+							ret.setResult(ea.getModel().getClassLoader());
 						}
 					});
-					return null;
 				}
 			});
 		}
@@ -200,38 +185,114 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 		// Remote component
 		else
 		{
-			jcc.getExternalAccess().scheduleStep(new IComponentStep()
+			SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new DelegationResultListener(ret)
 			{
-				@XMLClassname("get-libraryservice")
-				public Object execute(IInternalAccess ia)
+				public void customResultAvailable(Object result)
 				{
-					ia.getRequiredService("libservice").addResultListener(new DelegationResultListener(ret)
-					{
-						public void customResultAvailable(Object result)
-						{
-							ILibraryService	ls	= (ILibraryService)result;
-							ret.setResult(ls.getClassLoader());
-						}
-					});
-					return null;
+					ILibraryService	ls	= (ILibraryService)result;
+					ret.setResult(ls.getClassLoader());
 				}
 			});
 		}
 		return ret;
 	}
 	
+	//-------- helper classes --------
+	
 	/**
-	 *  Add a subproperties to a properties.
+	 *  A node handler allowing to spawn new control center views
+	 *  for remote platforms displayed in component tree using proxy nodes.
 	 */
-	public static void	addSubproperties(Properties props, String type, Properties subproperties)
+	public static class ShowRemoteControlCenterHandler	implements INodeHandler
 	{
-		if(subproperties!=null)
+		//-------- attributes --------
+		
+		/** The control center. */
+		protected IControlCenter	jcc;
+		
+		/** The outer panel. */
+		protected Component	panel;
+		
+		//-------- constructors --------
+		
+		/**
+		 *  Create a new handler.
+		 */
+		public ShowRemoteControlCenterHandler(IControlCenter jcc, Component panel)
 		{
-			if(subproperties.getType()!=null && !subproperties.getType().equals(type))
-				throw new RuntimeException("Incompatible types: "+subproperties.getType()+", "+type);
+			this.jcc	= jcc;
+			this.panel	= panel;
+		}
+		
+		//-------- INodeHandler interface --------
+		
+		/**
+		 *  Get the default action to be performed after a double click.
+		 */
+		public Action getDefaultAction(ITreeNode node)
+		{
+			return null;
+		}
+		
+		/**
+		 *  Get the overlay for a node if any.
+		 */
+		public Icon getOverlay(ITreeNode node)
+		{
+			return null;
+		}
+		
+		/**
+		 *  Get the popup actions available for all of the given nodes, if any.
+		 */
+		public Action[] getPopupActions(final ITreeNode[] nodes)
+		{
+			Action[]	ret;
+			boolean	allproxy	= true;
+			for(int i=0; allproxy && i<nodes.length; i++)
+			{
+				allproxy	= nodes[i] instanceof ProxyComponentTreeNode
+					&& ((ProxyComponentTreeNode)nodes[i]).getComponentIdentifier()!=null;
+			}
 			
-			subproperties.setType(type);
-			props.addSubproperties(subproperties);
+			if(allproxy)
+			{
+				ret	= new Action[]
+				{
+					new AbstractAction("Open Control Center")
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							for(int i=0; i<nodes.length; i++)
+							{
+								final IComponentIdentifier	cid	= ((ProxyComponentTreeNode)nodes[i]).getComponentIdentifier();
+								SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+									.addResultListener(new SwingDefaultResultListener(panel)
+								{
+									public void customResultAvailable(Object result)
+									{
+										((IComponentManagementService)result).getExternalAccess(cid)
+											.addResultListener(new SwingDefaultResultListener(panel)
+										{
+											public void customResultAvailable(Object result)
+											{
+												jcc.showPlatform((IExternalAccess)result);
+											}
+										});
+									}
+								});
+							}
+						}
+					}
+				};
+			}
+			else
+			{
+				ret	= new Action[0];
+			}
+			
+			return ret;
 		}
 	}
 }

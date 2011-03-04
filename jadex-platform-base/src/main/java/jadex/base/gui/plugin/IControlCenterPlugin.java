@@ -11,13 +11,7 @@ import javax.swing.JMenu;
  *  Interface for control center plugins.
  */
 public interface IControlCenterPlugin extends IPropertiesProvider
-{
-	/**
-	 *  Test if this plugin should be initialized lazily.
-	 *  @return True, if lazy.
-	 */
-	public boolean isLazy();
-	
+{	
 	/**
 	 *  This initializes a plugin and is done in context of a swing thread.
 	 */

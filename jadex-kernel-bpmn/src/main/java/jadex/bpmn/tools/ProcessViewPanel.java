@@ -2,21 +2,18 @@ package jadex.bpmn.tools;
 
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.RemoteChangeListenerHandler;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.IChangeListener;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.gui.jtable.ResizeableTableHeader;
 import jadex.commons.gui.jtable.TableSorter;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
@@ -29,8 +26,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -125,7 +120,14 @@ public class ProcessViewPanel extends JPanel
 					
 					public void handleEvent(ChangeEvent event)
 					{
-						if(BpmnInterpreter.EVENT_THREAD_ADDED.equals(event.getType()))
+						if(RemoteChangeListenerHandler.EVENT_BULK.equals(event.getType()))
+						{
+							for(Iterator it=((Collection)event.getValue()).iterator(); it.hasNext(); )
+							{
+								handleEvent((ChangeEvent)it.next());
+							}
+						}
+						else if(BpmnInterpreter.EVENT_THREAD_ADDED.equals(event.getType()))
 						{
 							threadinfos.add(event.getValue());
 						}
@@ -144,13 +146,6 @@ public class ProcessViewPanel extends JPanel
 						{
 							historyinfos.add(0, event.getValue());
 						}
-						else if(event.getValue() instanceof Collection)
-						{
-							for(Iterator it=((Collection)event.getValue()).iterator(); it.hasNext(); )
-							{
-								handleEvent((ChangeEvent)it.next());
-							}
-						}
 					}
 				});
 				return IFuture.DONE;
@@ -158,7 +153,7 @@ public class ProcessViewPanel extends JPanel
 		};
 		
 		final String	id	= SUtil.createUniqueId("bpmnviewer");
-		access.scheduleStep(new IComponentStep()
+		access.scheduleImmediate(new IComponentStep()
 		{
 			@XMLClassname("installListener")
 			public Object execute(IInternalAccess ia)
@@ -173,7 +168,7 @@ public class ProcessViewPanel extends JPanel
 							thread.getActivity().getPool()!=null ? thread.getActivity().getPool().getName() : null,
 							thread.getActivity().getLane()!=null ? thread.getActivity().getLane().getName() : null)));
 				}
-				rcl.changeOccurred(new ChangeEvent(null, null, events));
+				rcl.changeOccurred(new ChangeEvent(null, RemoteChangeListenerHandler.EVENT_BULK, events));
 				
 				// Add listener for updates
 				((BpmnInterpreter)ia).addChangeListener(new BPMNChangeListener(id, (BpmnInterpreter)ia, rcl));
@@ -181,20 +176,6 @@ public class ProcessViewPanel extends JPanel
 			}
 		});
 		
-		// Hack!!! trigger a step of the component if in step mode.
-		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				((IComponentManagementService)result).stepComponent(access.getComponentIdentifier());
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				// Ignored.
-			}
-		});
-
 		JButton clear = new JButton("Clear");
 		clear.addActionListener(new ActionListener()
 		{
@@ -377,54 +358,16 @@ public class ProcessViewPanel extends JPanel
 	/**
 	 *  The listener installed remotely in the BPMN process.
 	 */
-	public static class BPMNChangeListener	implements IChangeListener
+	public static class BPMNChangeListener	extends RemoteChangeListenerHandler	implements IChangeListener
 	{
-		//-------- constants --------
-		
-		/** Update delay. */
-		// todo: make configurable.
-		protected static final long UPDATE_DELAY	= 100;	
-		
-		/** Maximum number of events per delay period. */
-		// todo: make configurable.
-		protected static final int MAX_EVENTS	= 5;
-		
-		//-------- attributes --------
-		
-		/** The id for remote listener deregistration. */
-		protected String	id;
-		
-		/** The process instance. */
-		protected BpmnInterpreter	instance;
-		
-		/** The change listener (proxy) to be informed about important changes. */
-		protected IRemoteChangeListener	rcl;
-		
-		/** The added threads (if any). */
-		protected Set	added;
-		
-		/** The changed threads (if any). */
-		protected Set	changed;
-		
-		/** The removed threads (if any). */
-		protected Set	removed;
-		
-		/** The history entries (if any). */
-		protected Set	history;
-		
-		/** The update timer (if any). */
-		protected Timer	timer;
-		
-		//-------- constructs --------
+		//-------- constructors --------
 		
 		/**
 		 *  Create a BPMN listener.
 		 */
 		public BPMNChangeListener(String id, BpmnInterpreter instance, IRemoteChangeListener rcl)
 		{
-			this.id	= id;
-			this.instance	= instance;
-			this.rcl	= rcl;
+			super(id, instance, rcl);
 		}
 		
 		//-------- IChangeListener interface --------
@@ -436,144 +379,28 @@ public class ProcessViewPanel extends JPanel
 		{
 			if(BpmnInterpreter.EVENT_THREAD_ADDED.equals(event.getType()))
 			{
-				if(removed==null || !removed.contains(event.getValue()))
-				{
-					if(changed!=null && changed.contains(event.getValue()))
-						changed.remove(event.getValue());
-					
-					if(added==null)
-						added	= new LinkedHashSet();
-					added.add(event.getValue());
-				}
+				elementAdded(BpmnInterpreter.EVENT_THREAD, event.getValue());
 			}
 			else if(BpmnInterpreter.EVENT_THREAD_REMOVED.equals(event.getType()))
 			{
-				if(added!=null && added.contains(event.getValue()))
-					added.remove(event.getValue());
-				if(changed!=null && changed.contains(event.getValue()))
-					changed.remove(event.getValue());
-				
-				if(removed==null)
-					removed	= new LinkedHashSet();
-				removed.add(event.getValue());
+				elementRemoved(BpmnInterpreter.EVENT_THREAD, event.getValue());
 			}
 			else if(BpmnInterpreter.EVENT_THREAD_CHANGED.equals(event.getType()))
 			{
-				if(removed==null || !removed.contains(event.getValue()))
-				{
-					if(added!=null && added.contains(event.getValue()))
-					{
-						added.add(event.getValue());
-					}
-					else
-					{					
-						if(changed==null)
-							changed	= new LinkedHashSet();
-						changed.add(event.getValue());
-					}
-				}
+				elementChanged(BpmnInterpreter.EVENT_THREAD, event.getValue());
 			}
 			else if(BpmnInterpreter.EVENT_HISTORY_ADDED.equals(event.getType()))
 			{
-				if(history==null)
-					history	= new LinkedHashSet();
-				history.add(event.getValue());
+				occurrenceAppeared(BpmnInterpreter.EVENT_HISTORY, event.getValue());
 			}
-			startTimer();
 		}
 
-		protected void startTimer()
+		/**
+		 *  Remove local listeners.
+		 */
+		protected void dispose()
 		{
-			if(timer==null)
-			{
-				timer	= new Timer(true);
-				timer.schedule(new TimerTask()
-				{
-					public void run()
-					{
-						List	events	= new ArrayList();
-						synchronized(BPMNChangeListener.this)
-						{
-							timer	= null;
-							if(removed!=null)
-							{
-								for(Iterator it=removed.iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
-								{
-									events.add(new ChangeEvent(null, BpmnInterpreter.EVENT_THREAD_REMOVED, it.next()));
-									it.remove();
-								}
-							}
-							if(added!=null)
-							{
-								for(Iterator it=added.iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
-								{
-									events.add(new ChangeEvent(null, BpmnInterpreter.EVENT_THREAD_ADDED, it.next()));
-									it.remove();
-								}
-							}
-							if(history!=null)
-							{
-								for(Iterator it=history.iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
-								{
-									events.add(new ChangeEvent(null, BpmnInterpreter.EVENT_HISTORY_ADDED, it.next()));
-									it.remove();
-								}
-							}
-							if(changed!=null)
-							{
-								for(Iterator it=changed.iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
-								{
-									events.add(new ChangeEvent(null, BpmnInterpreter.EVENT_THREAD_CHANGED, it.next()));
-									it.remove();
-								}
-							}
-							
-							if(removed!=null && removed.isEmpty())
-								removed	= null;
-							if(added!=null && added.isEmpty())
-								added	= null;
-							if(changed!=null && changed.isEmpty())
-								changed	= null;
-							if(history!=null && history.isEmpty())
-								history	= null;
-							
-							if(removed!=null || added!=null || changed!=null || history!=null)
-							{
-								startTimer();
-							}
-						}
-						
-						if(!events.isEmpty())
-						{
-//							System.out.println("events: "+events.size());
-							rcl.changeOccurred(new ChangeEvent(null, null, events)).addResultListener(new IResultListener()
-							{
-								public void resultAvailable(Object result)
-								{
-//									System.out.println("update succeeded: "+desc);
-								}
-								public void exceptionOccurred(Exception exception)
-								{
-//									exception.printStackTrace();
-									if(instance!=null)
-									{
-//										System.out.println("Removing listener due to failed update: "+RemoteCMSListener.this.id);
-										try
-										{
-											instance.removeChangeListener(BPMNChangeListener.this);
-										}
-										catch(RuntimeException e)
-										{
-//											System.out.println("Listener already removed: "+id);
-										}
-										instance	= null;	// Set to null to avoid multiple removal due to delayed errors. 
-									}
-								}
-							});
-						}
-					}
-				}, UPDATE_DELAY);
-			}
+			((BpmnInterpreter)instance).removeChangeListener(BPMNChangeListener.this);
 		}
 	}
 }

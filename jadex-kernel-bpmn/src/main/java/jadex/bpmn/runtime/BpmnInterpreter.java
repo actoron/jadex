@@ -40,6 +40,7 @@ import jadex.bridge.IMessageService;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.MessageType;
+import jadex.bridge.RemoteChangeListenerHandler;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.IFilter;
@@ -81,17 +82,23 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 {	
 	//-------- static part --------
 	
+	/** The change event prefix for the history. */
+	public static final String	EVENT_HISTORY	= "history";
+	
+	/** The change event prefix denoting a thread event. */
+	public static final String	EVENT_THREAD	= "thread";
+	
 	/** The change event denoting a step for the history. */
-	public static final String	EVENT_HISTORY_ADDED	= "history-added";
+	public static final String	EVENT_HISTORY_ADDED	= EVENT_HISTORY + RemoteChangeListenerHandler.EVENT_OCCURRED;
 	
 	/** The change event denoting a new thread. */
-	public static final String	EVENT_THREAD_ADDED	= "thread-added";
+	public static final String	EVENT_THREAD_ADDED	= EVENT_THREAD + RemoteChangeListenerHandler.EVENT_ADDED;
 	
 	/** The change event denoting a changed thread. */
-	public static final String	EVENT_THREAD_CHANGED	= "thread-changed";
+	public static final String	EVENT_THREAD_CHANGED	= EVENT_THREAD + RemoteChangeListenerHandler.EVENT_CHANGED;
 	
 	/** The change event denoting a finished thread. */
-	public static final String	EVENT_THREAD_REMOVED	= "thread-removed";
+	public static final String	EVENT_THREAD_REMOVED	= EVENT_THREAD + RemoteChangeListenerHandler.EVENT_REMOVED;
 	
 	/** The activity execution handlers (activity type -> handler). */
 	public static final Map DEFAULT_ACTIVITY_HANDLERS;

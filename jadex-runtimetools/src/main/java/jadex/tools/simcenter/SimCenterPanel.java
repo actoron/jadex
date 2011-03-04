@@ -102,7 +102,7 @@ public class SimCenterPanel extends JPanel
 	 */
 	public IServiceProvider	getServiceContainer()
 	{
-		return simcenter.getJCC().getExternalAccess().getServiceProvider();
+		return simcenter.getJCC().getPlatformAccess().getServiceProvider();
 	}
 	
 	/**
