@@ -21,15 +21,19 @@ import javax.swing.UIDefaults;
 import javax.swing.filechooser.FileFilter;
 
 /**
- * 
+ *  Action for adding a local path.
  */
 public class AddPathAction extends ToolTipAction
 {
+	//-------- constants --------
+	
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"addpath",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/new_addfolder.png"),
 	});
+	
+	//-------- attributes --------
 	
 	/** The tree. */
 	protected FileTreePanel treepanel;
@@ -37,8 +41,10 @@ public class AddPathAction extends ToolTipAction
 	/** The file chooser. */
 	protected JFileChooser filechooser;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new action
 	 */
 	public AddPathAction(FileTreePanel treepanel)
 	{
@@ -46,7 +52,7 @@ public class AddPathAction extends ToolTipAction
 	}
 	
 	/**
-	 * 
+	 *  Create a new action 
 	 */
 	public AddPathAction(String name, Icon icon, String desc, FileTreePanel treepanel)
 	{
@@ -70,6 +76,8 @@ public class AddPathAction extends ToolTipAction
 		});
 	}
 	
+	//-------- methods --------
+	
 	/**
 	 *  Test if action is available in current context.
 	 *  @return True, if available.
@@ -81,7 +89,7 @@ public class AddPathAction extends ToolTipAction
 	}
 	
 	/**
-	 * 
+	 *  Action performed.
 	 */
 	public void actionPerformed(ActionEvent e)
 	{
@@ -138,7 +146,8 @@ public class AddPathAction extends ToolTipAction
 	}
 	
 	/**
-	 * 
+	 *  Get the icon.
+	 *  @return The icon.
 	 */
 	public static Icon getIcon()
 	{
@@ -146,7 +155,8 @@ public class AddPathAction extends ToolTipAction
 	}
 	
 	/**
-	 * 
+	 *  Get the name.
+	 *  @return The name.
 	 */
 	public static String getName()
 	{
@@ -154,7 +164,8 @@ public class AddPathAction extends ToolTipAction
 	}
 	
 	/**
-	 * 
+	 *  Get the tooltip text.
+	 *  @return The tooltip text.
 	 */
 	public static String getTooltipText()
 	{

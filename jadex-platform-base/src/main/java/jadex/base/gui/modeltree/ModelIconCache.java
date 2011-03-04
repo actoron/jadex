@@ -29,6 +29,8 @@ import javax.swing.tree.TreeModel;
  */
 public class ModelIconCache implements IIconCache
 {
+	//-------- constants --------
+	
 	/**
 	 * The image icons.
 	 */

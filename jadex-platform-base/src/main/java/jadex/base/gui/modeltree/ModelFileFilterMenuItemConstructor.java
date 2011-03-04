@@ -38,6 +38,8 @@ import javax.swing.tree.TreeModel;
  */
 class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor, IPropertiesProvider
 {
+	//-------- attributes --------
+	
 	/** Constant for select all menu item. */
 	public static final String SELECT_ALL = "all";
 	
@@ -52,6 +54,8 @@ class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor, IPrope
 	
 	/** The supported file types to menu items. */
 	protected Map filetypes;
+	
+	//-------- constructors --------
 	
 	/**
 	 *  Create a new filter menu item constructor.
@@ -86,8 +90,11 @@ class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor, IPrope
 		getMenuItem();
 	}
 	
+	//-------- methods --------
+	
 	/**
-	 * 
+	 *  Test if all is selected.
+	 *  @return True, if all.
 	 */
 	public boolean isAll()
 	{
@@ -95,7 +102,8 @@ class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor, IPrope
 	}
 	
 	/**
-	 *  Get all selected 
+	 *  Get all selected component types.
+	 *  @return A list of component types.
 	 */
 	public List getSelectedComponentTypes()
 	{

@@ -1,7 +1,6 @@
 package jadex.base.gui.modeltree;
 
 import jadex.base.gui.asynctree.ITreeNode;
-import jadex.base.gui.filechooser.RemoteFile;
 import jadex.base.gui.filechooser.RemoteFileSystemView;
 import jadex.base.gui.filetree.FileData;
 import jadex.base.gui.filetree.FileTreePanel;
@@ -23,15 +22,19 @@ import javax.swing.UIDefaults;
 import javax.swing.filechooser.FileFilter;
 
 /**
- * 
+ *  Action for adding a remote path. 
  */
 public class AddRemotePathAction extends ToolTipAction
 {
+	//-------- constants --------
+	
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"addpath",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/new_addfolder.png"),
 	});
+	
+	//-------- attributes --------
 	
 	/** The tree. */
 	protected FileTreePanel treepanel;
@@ -39,8 +42,10 @@ public class AddRemotePathAction extends ToolTipAction
 	/** The file chooser. */
 	protected JFileChooser filechooser;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new action.
 	 */
 	public AddRemotePathAction(FileTreePanel treepanel)
 	{
@@ -48,15 +53,15 @@ public class AddRemotePathAction extends ToolTipAction
 	}
 	
 	/**
-	 * 
+	 *  Create a new action. 
 	 */
 	public AddRemotePathAction(String name, Icon icon, String desc, FileTreePanel treepanel)
 	{
 		super(name, icon, desc);
 		this.treepanel = treepanel;
-		
-		
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Test if action is available in current context.
@@ -69,7 +74,7 @@ public class AddRemotePathAction extends ToolTipAction
 	}
 	
 	/**
-	 * 
+	 *  Action performed.
 	 */
 	public void actionPerformed(ActionEvent e)
 	{
@@ -141,7 +146,8 @@ public class AddRemotePathAction extends ToolTipAction
 	}
 	
 	/**
-	 * 
+	 *  Get the icon.
+	 *  @return The icon.
 	 */
 	public static Icon getIcon()
 	{
@@ -149,7 +155,8 @@ public class AddRemotePathAction extends ToolTipAction
 	}
 	
 	/**
-	 * 
+	 *  Get the name.
+	 *  @return The name.
 	 */
 	public static String getName()
 	{
@@ -157,7 +164,8 @@ public class AddRemotePathAction extends ToolTipAction
 	}
 	
 	/**
-	 * 
+	 *  Get the tooltip text.
+	 *  @return The tooltip text.
 	 */
 	public static String getTooltipText()
 	{

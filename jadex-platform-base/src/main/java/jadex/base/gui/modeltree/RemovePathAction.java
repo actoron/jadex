@@ -19,21 +19,27 @@ import javax.swing.Icon;
 import javax.swing.UIDefaults;
 
 /**
- * 
+ *  Action for removing a path. 
  */
 public class RemovePathAction extends ToolTipAction
 {
+	//-------- constants --------
+	
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"removepath",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/new_removefolder.png"),
 	});
-	
+
+	//-------- attributes --------	
+
 	/** The tree. */
 	protected FileTreePanel treepanel;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new action.
 	 */
 	public RemovePathAction(FileTreePanel treepanel)
 	{
@@ -41,13 +47,15 @@ public class RemovePathAction extends ToolTipAction
 	}
 	
 	/**
-	 * 
+	 *  Create a new action. 
 	 */
 	public RemovePathAction(String name, Icon icon, String desc, FileTreePanel treepanel)
 	{
 		super(name, icon, desc);
 		this.treepanel = treepanel;
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Test if action is available in current context.
@@ -60,7 +68,7 @@ public class RemovePathAction extends ToolTipAction
 	}
 	
 	/**
-	 * 
+	 *  Action performed.
 	 */
 	public void actionPerformed(ActionEvent e)
 	{
@@ -94,7 +102,8 @@ public class RemovePathAction extends ToolTipAction
 	}
 	
 	/**
-	 * 
+	 *  Get the name.
+	 *  @reurn The name.
 	 */
 	public static String getName()
 	{
@@ -102,7 +111,8 @@ public class RemovePathAction extends ToolTipAction
 	}
 	
 	/**
-	 * 
+	 *  Get the icon.
+	 *  @return The icon.
 	 */
 	public static Icon getIcon()
 	{
@@ -110,7 +120,8 @@ public class RemovePathAction extends ToolTipAction
 	}
 	
 	/**
-	 * 
+	 *  Get the tooltip text.
+	 *  @return The tooltip text.
 	 */
 	public static String getTooltipText()
 	{
