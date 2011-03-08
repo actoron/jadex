@@ -1,4 +1,4 @@
-package jadex.editor.eclipse.ui;
+package jadex.editor.common.eclipse.ui;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.Util;

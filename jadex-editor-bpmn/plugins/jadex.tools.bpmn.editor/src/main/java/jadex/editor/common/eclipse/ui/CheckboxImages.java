@@ -1,4 +1,4 @@
-package jadex.editor.eclipse.ui;
+package jadex.editor.common.eclipse.ui;
 
 /* 
  * This program is free software. It comes without any warranty, to

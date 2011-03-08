@@ -5,7 +5,7 @@ package jadex.editor.bpmn.editor.properties;
 
 import jadex.editor.bpmn.editor.properties.template.AbstractBpmnMultiColumnTablePropertySection;
 import jadex.editor.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
-import jadex.editor.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
+import jadex.editor.common.model.properties.table.MultiColumnTable.MultiColumnTableRow;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;

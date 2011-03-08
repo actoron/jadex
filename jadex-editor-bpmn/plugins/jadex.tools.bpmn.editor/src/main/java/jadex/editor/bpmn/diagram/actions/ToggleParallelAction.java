@@ -4,7 +4,7 @@
 package jadex.editor.bpmn.diagram.actions;
 
 import jadex.editor.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
-import jadex.editor.model.common.properties.ModifyEObjectCommand;
+import jadex.editor.common.model.properties.ModifyEObjectCommand;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;

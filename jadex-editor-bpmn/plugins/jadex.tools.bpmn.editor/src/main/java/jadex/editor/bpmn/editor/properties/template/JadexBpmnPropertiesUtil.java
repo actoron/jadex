@@ -9,10 +9,10 @@ import jadex.editor.bpmn.editor.properties.JadexBpmnDiagramPropertiesTableSectio
 import jadex.editor.bpmn.editor.properties.JadexCommonParameterSection;
 import jadex.editor.bpmn.editor.properties.JadexIntermediateEventsParameterSection;
 import jadex.editor.bpmn.editor.properties.JadexSequenceMappingSection;
-import jadex.editor.model.common.properties.AbstractCommonPropertySection;
-import jadex.editor.model.common.properties.ModifyEObjectCommand;
-import jadex.editor.model.common.properties.table.MultiColumnTable;
-import jadex.editor.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
+import jadex.editor.common.model.properties.AbstractCommonPropertySection;
+import jadex.editor.common.model.properties.ModifyEObjectCommand;
+import jadex.editor.common.model.properties.table.MultiColumnTable;
+import jadex.editor.common.model.properties.table.MultiColumnTable.MultiColumnTableRow;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package jadex.editor.model.common.properties;
+package jadex.editor.common.model.properties;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;

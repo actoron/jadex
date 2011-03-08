@@ -1,4 +1,4 @@
-package jadex.editor.model.common.properties;
+package jadex.editor.common.model.properties;
 
 import jadex.editor.bpmn.editor.JadexBpmnEditor;
 

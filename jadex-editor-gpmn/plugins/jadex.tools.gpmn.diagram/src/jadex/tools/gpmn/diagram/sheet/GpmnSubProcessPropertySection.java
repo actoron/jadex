@@ -7,7 +7,7 @@
  */
 package jadex.tools.gpmn.diagram.sheet;
 
-import jadex.editor.model.common.properties.ModifyEObjectCommand;
+import jadex.editor.common.model.properties.ModifyEObjectCommand;
 import jadex.tools.gpmn.BpmnPlan;
 import jadex.tools.gpmn.Goal;
 import jadex.tools.gpmn.SubProcess;

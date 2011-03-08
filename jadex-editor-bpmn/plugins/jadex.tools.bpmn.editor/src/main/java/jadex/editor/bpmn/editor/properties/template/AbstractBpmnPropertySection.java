@@ -6,7 +6,7 @@ package jadex.editor.bpmn.editor.properties.template;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchPart;
 
-import jadex.editor.model.common.properties.AbstractCommonPropertySection;
+import jadex.editor.common.model.properties.AbstractCommonPropertySection;
 
 /**
  * @author Claas

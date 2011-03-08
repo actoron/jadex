@@ -10,8 +10,8 @@ import jadex.editor.bpmn.runtime.task.IEditorParameterMetaInfo;
 import jadex.editor.bpmn.runtime.task.IEditorTaskMetaInfo;
 import jadex.editor.bpmn.runtime.task.IEditorTaskProvider;
 import jadex.editor.bpmn.runtime.task.PreferenceTaskProviderProxy;
-import jadex.editor.model.common.properties.table.MultiColumnTable;
-import jadex.editor.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
+import jadex.editor.common.model.properties.table.MultiColumnTable;
+import jadex.editor.common.model.properties.table.MultiColumnTable.MultiColumnTableRow;
 
 import java.util.ArrayList;
 import java.util.List;

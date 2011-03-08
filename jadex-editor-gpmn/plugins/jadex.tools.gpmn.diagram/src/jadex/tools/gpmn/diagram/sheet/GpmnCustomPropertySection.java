@@ -1,6 +1,6 @@
 package jadex.tools.gpmn.diagram.sheet;
 
-import jadex.editor.model.common.properties.AbstractCommonPropertySection;
+import jadex.editor.common.model.properties.AbstractCommonPropertySection;
 
 import java.util.HashMap;
 import java.util.Map;

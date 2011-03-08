@@ -1,13 +1,13 @@
 /**
  * 
  */
-package jadex.editor.model.common.properties.table;
+package jadex.editor.common.model.properties.table;
 
 import jadex.editor.bpmn.editor.JadexBpmnEditor;
-import jadex.editor.eclipse.ui.CheckboxImages;
-import jadex.editor.model.common.properties.AbstractCommonPropertySection;
-import jadex.editor.model.common.properties.ModifyEObjectCommand;
-import jadex.editor.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
+import jadex.editor.common.eclipse.ui.CheckboxImages;
+import jadex.editor.common.model.properties.AbstractCommonPropertySection;
+import jadex.editor.common.model.properties.ModifyEObjectCommand;
+import jadex.editor.common.model.properties.table.MultiColumnTable.MultiColumnTableRow;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IStatus;

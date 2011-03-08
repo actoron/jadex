@@ -4,8 +4,8 @@
 package jadex.editor.bpmn.runtime.task;
 
 import jadex.editor.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
-import jadex.editor.model.common.properties.table.MultiColumnTable;
-import jadex.editor.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
+import jadex.editor.common.model.properties.table.MultiColumnTable;
+import jadex.editor.common.model.properties.table.MultiColumnTable.MultiColumnTableRow;
 
 import java.util.ArrayList;
 import java.util.Collections;

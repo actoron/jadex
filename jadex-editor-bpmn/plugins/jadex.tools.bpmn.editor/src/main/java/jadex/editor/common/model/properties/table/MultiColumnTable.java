@@ -1,7 +1,7 @@
 /**
  * 
  */
-package jadex.editor.model.common.properties.table;
+package jadex.editor.common.model.properties.table;
 
 import java.util.ArrayList;
 import java.util.Collections;

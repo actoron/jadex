@@ -7,7 +7,7 @@
  */
 package jadex.tools.gpmn.diagram.sheet;
 
-import jadex.editor.model.common.properties.ModifyEObjectCommand;
+import jadex.editor.common.model.properties.ModifyEObjectCommand;
 import jadex.tools.gpmn.ActivationPlan;
 import jadex.tools.gpmn.ModeType;
 import jadex.tools.gpmn.diagram.ui.PlanSemanticsChooser;

@@ -3,7 +3,7 @@
  */
 package jadex.editor.bpmn.editor.properties.template;
 
-import jadex.editor.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
+import jadex.editor.common.model.properties.table.MultiColumnTable.MultiColumnTableRow;
 
 import java.util.HashMap;
 import java.util.Map;

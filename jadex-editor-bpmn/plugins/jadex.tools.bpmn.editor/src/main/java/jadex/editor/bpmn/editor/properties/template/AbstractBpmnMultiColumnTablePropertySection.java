@@ -1,9 +1,9 @@
 package jadex.editor.bpmn.editor.properties.template;
 
-import jadex.editor.model.common.properties.ModifyEObjectCommand;
-import jadex.editor.model.common.properties.table.AbstractCommonTablePropertySection;
-import jadex.editor.model.common.properties.table.MultiColumnTable;
-import jadex.editor.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
+import jadex.editor.common.model.properties.ModifyEObjectCommand;
+import jadex.editor.common.model.properties.table.AbstractCommonTablePropertySection;
+import jadex.editor.common.model.properties.table.MultiColumnTable;
+import jadex.editor.common.model.properties.table.MultiColumnTable.MultiColumnTableRow;
 
 import java.util.HashMap;
 import java.util.HashSet;
