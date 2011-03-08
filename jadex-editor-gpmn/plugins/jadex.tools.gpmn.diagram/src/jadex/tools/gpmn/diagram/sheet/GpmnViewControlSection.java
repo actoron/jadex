@@ -1,11 +1,21 @@
 package jadex.tools.gpmn.diagram.sheet;
 
+import jadex.tools.gpmn.BpmnPlan;
+import jadex.tools.gpmn.SubProcess;
+import jadex.tools.gpmn.diagram.edit.commands.ChangeBpmnPlanVisibilityCommand;
+import jadex.tools.gpmn.diagram.edit.parts.ActivationPlanEditPart;
+import jadex.tools.gpmn.diagram.edit.parts.BpmnPlanEditPart;
 import jadex.tools.gpmn.diagram.edit.parts.GpmnDiagramEditPart;
+import jadex.tools.gpmn.diagram.edit.parts.VirtualActivationEdgeEditPart;
+import jadex.tools.gpmn.diagram.tools.ActivationPlanSelectToolEx;
+import jadex.tools.gpmn.diagram.tools.SGpmnUtilities;
+import jadex.tools.gpmn.diagram.tools.VirtualActivationEdgeSelectToolEx;
 
+import org.eclipse.gef.ConnectionEditPart;
+import org.eclipse.gef.EditPart;
+import org.eclipse.gmf.runtime.notation.Edge;
+import org.eclipse.gmf.runtime.notation.Node;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -23,6 +33,9 @@ public class GpmnViewControlSection extends GpmnCustomPropertySection
 	public static final String VIEW_CONTROLS_TITLE = "View Controls";
 	public static final String DETAIL_DESC = "Detail Level:";
 	
+	protected static final int HIGH_DETAIL_MODE = 0;
+	protected static final int MEDIUM_DETAIL_MODE = 1;
+	protected static final int LOW_DETAIL_MODE = 2;
 	
 	@Override
 	public void createControls(Composite parent,
@@ -59,12 +72,20 @@ public class GpmnViewControlSection extends GpmnCustomPropertySection
 				if (prevSelect != null && slider.getSelection() == prevSelect.intValue())
 					return;
 				
-				System.out.println(slider.getSelection());
-				
-				GpmnDiagramEditPart diagramPart = (GpmnDiagramEditPart) editPart;
-				
-				for (Object part : diagramPart.getChildren())
-					System.out.println(part);
+				switch(slider.getSelection())
+				{
+					case HIGH_DETAIL_MODE:
+						selectHighDetailMode();
+						break;
+					case MEDIUM_DETAIL_MODE:
+						selectMediumDetailMode();
+						break;
+					case LOW_DETAIL_MODE:
+						selectLowDetailMode();
+						break;
+						
+					default:
+				}
 				
 				prevSelect = new Integer(slider.getSelection());
 			}
@@ -86,4 +107,58 @@ public class GpmnViewControlSection extends GpmnCustomPropertySection
 	{
 	}
 	
+	protected void selectHighDetailMode()
+	{
+		GpmnDiagramEditPart diagramPart = (GpmnDiagramEditPart) editPart;
+		
+		ConnectionEditPart[] connections = (ConnectionEditPart[]) diagramPart.getConnections().toArray(new ConnectionEditPart[0]);
+		for (int i = 0; i < connections.length; ++i)
+		{
+			if (connections[i] instanceof VirtualActivationEdgeEditPart)
+			{
+				VirtualActivationEdgeSelectToolEx.getExpandCommand(diagramPart, SGpmnUtilities.getPlanFromVirtualEdge((Edge) ((VirtualActivationEdgeEditPart) connections[i]).getNotationView())).execute();
+				diagramPart.refresh();
+				connections = (ConnectionEditPart[]) diagramPart.getConnections().toArray(new ConnectionEditPart[0]);
+				i = 0;
+			}
+		}
+	}
+	
+	protected void selectMediumDetailMode()
+	{
+		GpmnDiagramEditPart diagramPart = (GpmnDiagramEditPart) editPart;
+		
+		EditPart[] parts = (EditPart[]) diagramPart.getPrimaryEditParts().toArray(new EditPart[0]);
+		for (int i = 0; i < parts.length; ++i)
+		{
+			if (parts[i] instanceof ActivationPlanEditPart)
+			{
+				ActivationPlanSelectToolEx.getHideCommand((ActivationPlanEditPart) parts[i]).execute();
+				diagramPart.refresh();
+			}
+		}
+		
+		Node[] nodes = (Node[]) diagramPart.getNotationView().getChildren().toArray(new Node[0]);
+		for (int i = 0; i < nodes.length; ++i)
+		{
+			if ((nodes[i].getElement() instanceof BpmnPlan || nodes[i].getElement() instanceof SubProcess) && nodes[i].isVisible() == false)
+			{
+				dispatchCommand(new ChangeBpmnPlanVisibilityCommand(diagramPart, nodes[i], true));
+			}
+		}
+	}
+	
+	protected void selectLowDetailMode()
+	{
+		GpmnDiagramEditPart diagramPart = (GpmnDiagramEditPart) editPart;
+		
+		Node[] nodes = (Node[]) diagramPart.getNotationView().getChildren().toArray(new Node[0]);
+		for (int i = 0; i < nodes.length; ++i)
+		{
+			if ((nodes[i].getElement() instanceof BpmnPlan || nodes[i].getElement() instanceof SubProcess) && nodes[i].isVisible() == true)
+			{
+				dispatchCommand(new ChangeBpmnPlanVisibilityCommand(diagramPart, nodes[i], false));
+			}
+		}
+	}
 }

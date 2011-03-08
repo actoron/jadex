@@ -5,7 +5,6 @@ import jadex.tools.gpmn.diagram.edit.parts.VirtualActivationEdgeEditPart;
 import jadex.tools.gpmn.diagram.ui.figures.VirtualActivationEdgeFigure;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -75,7 +74,6 @@ public class VirtualActivationEdgeSelectToolEx extends SelectConnectionEditPartT
 	public static Command getExpandCommand(final DiagramEditPart diagramEditPart, final Node activationPlanNode)
 	{
 		//final DiagramEditPart diagramEditPart = (DiagramEditPart) vaePart.getRoot().getContents();
-		System.out.println("GetExpandCommand");
 		Command cmd = new ICommandProxy(new AbstractTransactionalCommand((TransactionalEditingDomain) AdapterFactoryEditingDomain.getEditingDomainFor(diagramEditPart.resolveSemanticElement()),
 				"Remove Virtual Edges and unhide Activation Plan.",
 				Arrays.asList(new Object[] {WorkspaceSynchronizer.getFile(diagramEditPart.resolveSemanticElement().eResource())}))
@@ -89,7 +87,6 @@ public class VirtualActivationEdgeSelectToolEx extends SelectConnectionEditPartT
 				Edge[] sourceEdges =  (Edge[]) activationPlanNode.getSourceEdges().toArray(new Edge[0]);
 				for (int i = 0; i < sourceEdges.length; ++i)
 				{
-					System.out.println(i + " " + sourceEdges[i]);
 					//if (sourceEdges[i].getType().equals(DiagramNotationType.NOTE_ATTACHMENT.getSemanticHint()))
 					if (sourceEdges[i].getElement() instanceof ActivationEdge)
 					{
@@ -98,7 +95,6 @@ public class VirtualActivationEdgeSelectToolEx extends SelectConnectionEditPartT
 						{
 							if (aeSrcEdges[j].getType().equals(DiagramNotationType.NOTE_ATTACHMENT.getSemanticHint()))
 							{
-								System.out.println(aeSrcEdges[j]);
 								ViewUtil.destroy(aeSrcEdges[j].getTarget());
 								ViewUtil.destroy(aeSrcEdges[j]);
 							}

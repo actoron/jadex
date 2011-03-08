@@ -598,7 +598,6 @@ public class GoalEditPart extends ShapeNodeEditPart
 	 */
 	protected void removeSourceConnection(ConnectionEditPart connection)
 	{
-		System.out.println("Removed " + connection.getTarget());
 		super.removeSourceConnection(connection);
 		EditPart target = connection.getTarget();
 		if (target == null)
