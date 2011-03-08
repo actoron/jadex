@@ -9,7 +9,7 @@ import org.osgi.framework.BundleContext;
 public class CommonsActivator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "jadex-editor-commons-plugin"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "jadex.editor.commons.plugin"; //$NON-NLS-1$
 
 	// The shared instance
 	private static CommonsActivator plugin;

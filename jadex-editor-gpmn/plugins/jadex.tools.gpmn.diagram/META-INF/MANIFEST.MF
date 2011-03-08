@@ -31,10 +31,9 @@ Require-Bundle: org.eclipse.emf.ecore,
  org.eclipse.emf.ecore.edit;visibility:=reexport,
  org.eclipse.emf.validation;visibility:=reexport,
  org.eclipse.gef;visibility:=reexport,
- org.eclipse.stp.bpmn.diagram;bundle-version="1.0.0",
  org.eclipse.jdt.core;bundle-version="3.5.0",
  org.eclipse.ocl.ecore;visibility:=reexport,
- jadex.editor.bpmn.JadexBpmnEditor;bundle-version="0.0.2"
+ jadex.editor.commons.plugin;bundle-version="1.0.0"
 Bundle-ClassPath: .
 Bundle-Activator: jadex.tools.gpmn.diagram.part.GpmnDiagramEditorPlugin
 Bundle-Vendor: %providerName

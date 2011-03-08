@@ -13,14 +13,13 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.PointList;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.IPolygonAnchorableFigure;
-import org.eclipse.stp.bpmn.figures.connectionanchors.DefaultSizeNodeFigureEx;
-import org.eclipse.stp.bpmn.figures.connectionanchors.IConnectionAnchorFactory;
+import org.eclipse.gmf.runtime.gef.ui.figures.DefaultSizeNodeFigure;
 
 /**
  * Manages connection anchors.
  * 
  */
-public class GPMNNodeFigure extends DefaultSizeNodeFigureEx implements
+public class GPMNNodeFigure extends DefaultSizeNodeFigure /*DefaultSizeNodeFigureEx*/ implements
 		IPolygonAnchorableFigure
 {
 
@@ -30,24 +29,24 @@ public class GPMNNodeFigure extends DefaultSizeNodeFigureEx implements
 	 * @param connectionAnchorFactory
 	 * @param defSize
 	 */
-	public GPMNNodeFigure(IConnectionAnchorFactory connectionAnchorFactory,
+	public GPMNNodeFigure(/*IConnectionAnchorFactory connectionAnchorFactory,*/
 			Dimension defSize)
 	{
-		super(defSize, connectionAnchorFactory);
+		super(defSize /*, connectionAnchorFactory*/);
 	}
 
-	/**
-	 * Currently calls super only
-	 * 
-	 * @param result
-	 *            The rectangle on which the bounds will be set.
-	 */
-	public void computeAbsoluteHandleBounds(Rectangle result)
-	{
-		// only compute super bounds, see BPMN ActivityNodeFigure for
-		// alternative HandleBounds dependent on LayoutManager
-		super.computeAbsoluteHandleBounds(result);
-	}
+//	/**
+//	 * Currently calls super only
+//	 * 
+//	 * @param result
+//	 *            The rectangle on which the bounds will be set.
+//	 */
+//	public void computeAbsoluteHandleBounds(Rectangle result)
+//	{
+//		// only compute super bounds, see BPMN ActivityNodeFigure for
+//		// alternative HandleBounds dependent on LayoutManager
+//		super.computeHandleBounds(result);
+//	}
 
 	/**
 	 * Currently only calls super

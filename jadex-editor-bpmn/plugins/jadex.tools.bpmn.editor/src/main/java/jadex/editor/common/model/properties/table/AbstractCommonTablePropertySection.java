@@ -3,8 +3,8 @@
  */
 package jadex.editor.common.model.properties.table;
 
-import jadex.editor.bpmn.editor.JadexBpmnEditor;
 import jadex.editor.common.eclipse.ui.CheckboxImages;
+import jadex.editor.common.internal.CommonsActivator;
 import jadex.editor.common.model.properties.AbstractCommonPropertySection;
 import jadex.editor.common.model.properties.ModifyEObjectCommand;
 import jadex.editor.common.model.properties.table.MultiColumnTable.MultiColumnTableRow;
@@ -30,7 +30,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TextCellEditor;
-import org.eclipse.stp.bpmn.diagram.part.BpmnDiagramEditorPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -654,13 +653,13 @@ public abstract class AbstractCommonTablePropertySection extends
 			}
 			catch (ExecutionException e)
 			{
-				BpmnDiagramEditorPlugin
-						.getInstance()
+				CommonsActivator
+						.getDefault()
 						.getLog()
 						.log(
 								new Status(
 										IStatus.ERROR,
-										JadexBpmnEditor.ID,
+										CommonsActivator.PLUGIN_ID,
 										IStatus.ERROR, e
 												.getMessage(),
 										e));
@@ -701,8 +700,8 @@ public abstract class AbstractCommonTablePropertySection extends
 				}
 				catch (ExecutionException ex)
 				{
-					BpmnDiagramEditorPlugin.getInstance().getLog().log(
-							new Status(IStatus.ERROR, JadexBpmnEditor.ID,
+					CommonsActivator.getDefault().getLog().log(
+							new Status(IStatus.ERROR, CommonsActivator.PLUGIN_ID,
 									IStatus.ERROR, ex.getMessage(), ex));
 				}
 			}
