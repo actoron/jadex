@@ -11,6 +11,7 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.5.0,3.7.0)",
  org.eclipse.ui.views.log;bundle-version="1.0.100",
  org.eclipse.jdt.core;bundle-version="[3.5.0,3.7.0]",
  org.eclipse.jdt.ui;bundle-version="[3.5.0,3.7.0]",
+ jadex.editor.commons.plugin;bundle-version="1.0.0",
  org.eclipse.stp.bpmn;bundle-version="[1.1.0,2.0.0)",
  org.eclipse.stp.bpmn.diagram;bundle-version="[1.1.0,2.0.0)";visibility:=reexport
 Bundle-ActivationPolicy: lazy
@@ -25,22 +26,4 @@ Export-Package: jadex.editor.bpmn.diagram,
  jadex.editor.bpmn.editor.properties,
  jadex.editor.bpmn.editor.properties.decorator,
  jadex.editor.bpmn.editor.properties.template,
- jadex.editor.bpmn.runtime.task,
- jadex.editor.common.eclipse.ui,
- jadex.editor.common.model.properties;
-  uses:="org.eclipse.ui.views.properties.tabbed,
-   org.eclipse.emf.ecore,
-   org.eclipse.gmf.runtime.emf.commands.core.command,
-   org.eclipse.ui,
-   org.eclipse.jface.viewers,
-   org.eclipse.swt.widgets",
- jadex.editor.common.model.properties.table;
-  uses:="org.eclipse.ui.views.properties.tabbed,
-   org.eclipse.swt.events,
-   org.eclipse.ui,
-   org.eclipse.swt.graphics,
-   org.eclipse.jface.viewers,
-   jadex.tools.model.common.properties,
-   jadex.tools.eclipse.ui,
-   org.eclipse.swt.widgets,
-   org.eclipse.swt.layout"
+ jadex.editor.bpmn.runtime.task
