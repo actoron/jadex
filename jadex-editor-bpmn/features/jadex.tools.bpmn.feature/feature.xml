@@ -45,4 +45,11 @@ This means the LGPL does not allow you to develop closed source software product
          version="0.0.0"
          unpack="false"/>
 
+   <plugin
+         id="jadex.editor.commons.plugin"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
 </feature>
