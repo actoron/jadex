@@ -74,7 +74,7 @@ public abstract class AbstractComboPropertySection extends AbstractBpmnPropertyS
 	
 	/** 
 	 * Provide predefined items for CCombo 
-	 * TODO: create ComboItemsProvider for tooltips?
+	 * TO DO: create Class ComboItemsProvider for Tooltips?
 	 */
 	protected abstract String[] getComboItems();
 
@@ -242,7 +242,7 @@ public abstract class AbstractComboPropertySection extends AbstractBpmnPropertyS
 			}
 		});
 		
-		// XXX: change to focus listener?
+		
 		combo.addModifyListener(new ModifyListener()
 		{
 			public void modifyText(ModifyEvent e)

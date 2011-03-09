@@ -256,8 +256,8 @@ public class GpmnDiagramEditorUtil
 	private static GpmnDiagram createInitialModel()
 	{
 		GpmnDiagram diagram = GpmnFactory.eINSTANCE.createGpmnDiagram();
-		// FIXME: Use gmfmap model abilities when available! 
-		// TODO: Use preference page value
+		// TODO: Use gmfmap model abilities when available! 
+		// Maybe use preference page value
 		diagram.setVersion("2.0");
 		return diagram;
 	}

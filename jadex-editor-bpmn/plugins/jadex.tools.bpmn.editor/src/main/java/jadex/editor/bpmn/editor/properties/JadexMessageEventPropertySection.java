@@ -74,7 +74,6 @@ public class JadexMessageEventPropertySection extends AbstractBpmnPropertySectio
 		textGridData.minimumWidth = 500;
 		textGridData.widthHint = 500;
 
-		// FIXME: !!! 
 //		combo.addSelectionListener(new SelectionListener()
 //		{
 //			@Override

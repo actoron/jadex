@@ -470,8 +470,9 @@ public class JadexBpmnPropertiesUtil
 		{
 			Object detail = annotation.getDetails().get(annotationDetail);
 			if (detail == null)
+			// try the lower case identifier
 			{
-				// try the lower case identifier
+				
 				detail = annotation.getDetails().get(annotationDetail.toLowerCase());
 			}
 			
@@ -481,7 +482,6 @@ public class JadexBpmnPropertiesUtil
 			}
 			
 			// fall through, return empty string as detail
-			// TODO: check if this should be removed / return null instead
 			return "";
 			
 		}

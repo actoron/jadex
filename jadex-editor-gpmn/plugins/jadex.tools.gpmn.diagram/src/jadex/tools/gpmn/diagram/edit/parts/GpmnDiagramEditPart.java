@@ -35,10 +35,7 @@ public class GpmnDiagramEditPart extends DiagramEditPart
 	public static final int VISUAL_ID = 1000;
 	
 	/**
-	 * @generated NOT, HACK! Set default version to 2.0 
-	 * 
-	 * FIXME: Use create command / model feature initializer if available in future version
-	 * 
+	 * @generated NOT , ??
 	 */
 	public GpmnDiagramEditPart(View view)
 	{

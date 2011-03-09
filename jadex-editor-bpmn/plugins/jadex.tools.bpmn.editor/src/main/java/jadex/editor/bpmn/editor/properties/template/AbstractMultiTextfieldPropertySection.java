@@ -86,7 +86,7 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 		textFields = new Text[textFieldNames.length];
 		for (int i = 0; i < textFieldNames.length; i++)
 		{
-			// TODO: use group?
+			// TO DO: use group?
 			Composite cComposite = getWidgetFactory().createComposite(sectionComposite);
 			addDisposable(cComposite);
 			cComposite.setLayout(new GridLayout(2, false));

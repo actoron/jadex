@@ -27,7 +27,6 @@ public class JadexIntermediateEventsParameterSection extends
 	 */
 	public JadexIntermediateEventsParameterSection()
 	{
-		// FIXME: use jadex !!
 		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_PARAMETER_LIST_DETAIL,
 				"Parameter", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX);
 		
