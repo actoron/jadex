@@ -14,8 +14,9 @@
 		<import>jadex.base.fipa.*</import>
 		<import>jadex.wfms.bdi.*</import>
 		<import>jadex.wfms.bdi.ontology.*</import>
-		<import>jadex.commons.ThreadSuspendable</import>
+		<import>jadex.commons.future.ThreadSuspendable</import>
 		<import>jadex.commons.service.SServiceProvider</import>
+		<import>jadex.commons.service.RequiredServiceInfo</import>
 	</imports>
 
 	<capabilities>
@@ -342,8 +343,8 @@
 				<initialgoal ref="dfcap.df_keep_registered">
 					<parameter ref="description">
 						<value>
-							((IDF)SServiceProvider.getService($scope.getServiceProvider(), IDF.class).get(new ThreadSuspendable()))
-							.createDFComponentDescription(null, ((IDF)SServiceProvider.getService($scope.getServiceProvider(), IDF.class).get(new ThreadSuspendable()))
+							((IDF)SServiceProvider.getService($scope.getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable()))
+							.createDFComponentDescription(null, ((IDF)SServiceProvider.getService($scope.getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable()))
 							.createDFServiceDescription(SWfms.SERVICE_NAME_CLIENT_INTERFACE, SWfms.SERVICE_TYPE_EXTERNAL, ""))	
 						</value>
 					</parameter>

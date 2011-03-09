@@ -1,11 +1,16 @@
 package jadex.wfms.service.impl;
 
+import jadex.commons.IFilter;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
+import jadex.commons.service.BasicResultSelector;
 import jadex.commons.service.BasicService;
+import jadex.commons.service.IResultSelector;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.commons.service.library.ILibraryServiceListener;
@@ -77,7 +82,7 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 				addModel(path);
 			}
 			
-			((ILibraryService)SServiceProvider.getService(provider, ILibraryService.class)
+			((ILibraryService)SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.get(new ThreadSuspendable())).addLibraryServiceListener(new ILibraryServiceListener()
 			{
 				public IFuture urlRemoved(URL url)
@@ -156,7 +161,7 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 		{
 			//Set knownPaths = new HashSet(modelPaths.values());
 			Set modelSet = new HashSet();
-			List urls = (List) ((ILibraryService) SServiceProvider.getService(provider, ILibraryService.class).get(new ThreadSuspendable())).getURLs().get(new ThreadSuspendable());
+			List urls = (List) ((ILibraryService) SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable())).getURLs().get(new ThreadSuspendable());
 			for (Iterator it = urls.iterator(); it.hasNext(); )
 			{
 				URL url = (URL) it.next();

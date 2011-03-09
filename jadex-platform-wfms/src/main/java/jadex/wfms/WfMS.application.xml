@@ -32,7 +32,7 @@
 			jadex.wfms.service.impl.BasicAAAService.getTestService($component.getServiceProvider())
 		</providedservice>
 		<providedservice class="IExecutionService">
-			new ExecutionService($component.getComponentIdentifier(), $component.getServiceProvider())
+			new ExecutionService($component.getComponentIdentifier(), $component.getExternalAccess())
 		</providedservice>
 		<providedservice class="IAdministrationService">
 			new AdministrationService($component.getServiceProvider())

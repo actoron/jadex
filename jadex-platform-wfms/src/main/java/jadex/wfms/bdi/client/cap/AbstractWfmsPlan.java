@@ -5,6 +5,7 @@ import jadex.base.fipa.IDFComponentDescription;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.wfms.bdi.ontology.SWfms;
 
@@ -12,7 +13,7 @@ public abstract class AbstractWfmsPlan extends Plan
 {
 	protected IComponentIdentifier getClientInterface()
 	{
-		IDF df = (IDF) SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);
+		IDF df = (IDF) SServiceProvider.getService(getScope().getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 		IDFComponentDescription adesc = df.createDFComponentDescription(null, df.createDFServiceDescription(SWfms.SERVICE_NAME_CLIENT_INTERFACE, SWfms.SERVICE_TYPE_EXTERNAL, null));
 		
 		return getWfmsService(adesc);
@@ -20,7 +21,7 @@ public abstract class AbstractWfmsPlan extends Plan
 	
 	protected IComponentIdentifier getPdInterface()
 	{
-		IDF df = (IDF) SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);
+		IDF df = (IDF) SServiceProvider.getService(getScope().getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 		IDFComponentDescription adesc = df.createDFComponentDescription(null, df.createDFServiceDescription(SWfms.SERVICE_NAME_PD_INTERFACE, SWfms.SERVICE_TYPE_EXTERNAL, null));
 		
 		return getWfmsService(adesc);
@@ -28,7 +29,7 @@ public abstract class AbstractWfmsPlan extends Plan
 	
 	protected IComponentIdentifier getAdminInterface()
 	{
-		IDF df = (IDF) SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);
+		IDF df = (IDF) SServiceProvider.getService(getScope().getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 		IDFComponentDescription adesc = df.createDFComponentDescription(null, df.createDFServiceDescription(SWfms.SERVICE_NAME_ADMIN_INTERFACE, SWfms.SERVICE_TYPE_EXTERNAL, null));
 		
 		return getWfmsService(adesc);

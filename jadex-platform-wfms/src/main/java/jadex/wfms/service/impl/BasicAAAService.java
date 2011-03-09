@@ -40,7 +40,7 @@ public class BasicAAAService extends BasicService implements IAAAService
 	
 	public static IAAAService getTestService(final IServiceContainer provider)
 	{
-		SServiceProvider.getService(provider, new BasicResultSelector(new IRemoteFilter()
+		/*SServiceProvider.getService(provider, new BasicResultSelector(new IRemoteFilter()
 		{
 			public IFuture filter(Object obj)
 			{
@@ -66,7 +66,7 @@ public class BasicAAAService extends BasicService implements IAAAService
 						}
 					});
 			}
-		});
+		});*/
 		
 		Map secRoles = new HashMap();
 		Set userNoStartCaps = new HashSet();
