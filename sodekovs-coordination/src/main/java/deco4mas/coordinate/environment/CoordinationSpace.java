@@ -2,32 +2,36 @@ package deco4mas.coordinate.environment;
 
 import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
-import jadex.application.space.envsupport.MEnvSpaceInstance;
-import jadex.application.space.envsupport.MEnvSpaceType;
 import jadex.application.space.envsupport.MObjectType;
-import jadex.application.space.envsupport.environment.AvatarMapping;
 import jadex.application.space.envsupport.environment.EnvironmentEvent;
 import jadex.application.space.envsupport.environment.IPerceptGenerator;
 import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.application.space.envsupport.environment.space2d.Grid2D;
-import jadex.application.space.envsupport.math.IVector2;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IExternalAccess;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.ThreadSuspendable;
+import jadex.commons.service.SServiceProvider;
 import jadex.javaparser.IValueFetcher;
-import jadex.javaparser.SimpleValueFetcher;
+import jadex.micro.IMicroExternalAccess;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import test.GetPropertyThread;
+
 import deco.lang.dynamics.MASDynamics;
 import deco4mas.helper.Constants;
 import deco4mas.mechanism.CoordinationInformation;
 import deco4mas.mechanism.ICoordinationMechanism;
 
-public class CoordinationSpace extends Grid2D
-{
+public class CoordinationSpace extends Grid2D {
 
 	/** The list of currently supported / active coordination mechanisms. */
 	// TODO: HACK! Change to private!
@@ -51,23 +55,21 @@ public class CoordinationSpace extends Grid2D
 	 * @param areaSize
 	 *            the size of the 2D area
 	 */
-	public CoordinationSpace()
-	{
+	public CoordinationSpace() {
 		super(CoordinationSpace.class.getName(), null);
 
 	}
-	
+
 	@Override
-	public void initSpace(IApplication context, MSpaceInstance config, IValueFetcher fetcher) throws Exception
-	{
+	public void initSpace(IApplication context, MSpaceInstance config, IValueFetcher fetcher) throws Exception {
 		super.initSpace(context, config, new IValueFetcher() {
-			
+
 			@Override
 			public Object fetchValue(String name, Object object) {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			public Object fetchValue(String name) {
 				// TODO Auto-generated method stub
@@ -77,8 +79,7 @@ public class CoordinationSpace extends Grid2D
 
 		initSpaces();
 		initDeco4mas();
-		for (ICoordinationMechanism icord : activeCoordinationMechanisms)
-		{
+		for (ICoordinationMechanism icord : activeCoordinationMechanisms) {
 			icord.start();
 		}
 
@@ -127,15 +128,11 @@ public class CoordinationSpace extends Grid2D
 	 * 
 	 * @param obj
 	 */
-	public void perceiveCoordinationEvent(Object obj)
-	{
-		if (obj instanceof CoordinationInformation)
-		{
+	public void perceiveCoordinationEvent(Object obj) {
+		if (obj instanceof CoordinationInformation) {
 			CoordinationInformation ci = (CoordinationInformation) obj;
-			for (ICoordinationMechanism mechanism : activeCoordinationMechanisms)
-			{
-				if (mechanism.getRealisationName().equals(ci.getValueByName(Constants.DML_REALIZATION_NAME)))
-				{
+			for (ICoordinationMechanism mechanism : activeCoordinationMechanisms) {
+				if (mechanism.getRealisationName().equals(ci.getValueByName(Constants.DML_REALIZATION_NAME))) {
 					mechanism.perceiveCoordinationEvent(obj);
 				}
 			}
@@ -152,21 +149,20 @@ public class CoordinationSpace extends Grid2D
 	 * 
 	 * @param objFperce
 	 */
-	public void publishCoordinationEvent(Object obj)
-	{
+	public void publishCoordinationEvent(Object obj) {
 		// pass event the currently used coordination medium
 		// System.out.println("#CoordinationSpace# EnvironentEvent fired...");
-		ISpaceObject newObj = this.createSpaceObject("CoordinationSpaceObject", ((CoordinationInformation) obj).getValues(), null);
+		ISpaceObject newObj = this.createSpaceObject("CoordinationSpaceObject",
+				((CoordinationInformation) obj).getValues(), null);
 		newObj.setProperty(Constants.ROLE_DEFINITIONS_FOR_PERCEIVE, agentData);
 		this.fireEnvironmentEvent(new EnvironmentEvent(CoordinationEvent.COORDINATE_START, this, newObj, new String(
-			"Coordinate Event Nr...."), null));
+				"Coordinate Event Nr...."), null));
 	}
 
 	/**
 	 * Responsible to initialize the space itself.
 	 */
-	private void initSpaces()
-	{
+	private void initSpaces() {
 		// this object type is used within the deco4mas coordination.
 		MObjectType mobject = new MObjectType();
 		mobject.setName("CoordinationSpaceObject");
@@ -176,22 +172,21 @@ public class CoordinationSpace extends Grid2D
 	/**
 	 * Responsible to initialize all aspects related to deco4MAS.
 	 */
-	private void initDeco4mas()
-	{
+	private void initDeco4mas() {
 		// TODO: Start a Thread for every Coordination-Mechanism!
 		// System.out.println("#CoordinationSpace# Called initDecom4masParticipants Media..");
 
 		// GetPropertyThread th = new GetPropertyThread(this);
 		// th.run();
-		//	
-		//			
-		//		
+		//
+		//
+		//
 		// try {
 		// th.join();
 		// } catch (InterruptedException e) {
 		// // TODO Auto-generated catch block
 		// e.printStackTrace();
-		//		
+		//
 		// }
 		// System.out.println(" - Thread finished!!!");
 
@@ -206,19 +201,39 @@ public class CoordinationSpace extends Grid2D
 	 * initializes the "Agent-State-Interpreter"
 	 * /"Agent Behaviour Observation Component".
 	 */
+	private void initParticipatingAgent(final IComponentIdentifier ai) {
+		// get the IComponentManagementService
+		IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getServiceUpwards(
+				this.getContext().getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
 
-	// public void initParticipatingAgents(MASDynamics masDyn ,ArrayList<String>
-	// fromAgents, ArrayList<String> toAgents){
-	private void initParticipatingAgent(IComponentIdentifier ai)
-	{
-		//		
-		// Map<String, Object[]> res = new
-		// InitBDIAgentForCoordination().startInits(ai, this.getContext(), this,
-		// masDnyModel);
-		// agentData.put(getAgentType(ai, this.getContext()), res);
-		new InitBDIAgentForCoordination().startInits(ai, this.getContext(), this, masDnyModel);
-		// agentData.put(getAgentType(ai, this.getContext()), res);
+		// get the external access for the agent
+		IFuture fut = cms.getExternalAccess(ai);
+		fut.addResultListener(new IResultListener() {
 
+			@Override
+			public void resultAvailable(Object result) {
+				IExternalAccess externalAccess = (IExternalAccess) result;
+
+				// check if an external access for an BDI or Micro agent is
+				// needed
+				if (externalAccess instanceof IBDIExternalAccess) {
+					IBDIExternalAccess exta = (IBDIExternalAccess) externalAccess;
+
+					new InitBDIAgentForCoordination().startInits(ai, exta, CoordinationSpace.this.getContext(),
+							CoordinationSpace.this, masDnyModel);
+				} else if (externalAccess instanceof IMicroExternalAccess) {
+					IMicroExternalAccess exta = (IMicroExternalAccess) externalAccess;
+
+					new InitMicroAgentForCoordination().startInits(ai, exta, CoordinationSpace.this.getContext(),
+							CoordinationSpace.this, masDnyModel);
+				}
+			}
+
+			@Override
+			public void exceptionOccurred(Exception exception) {
+				exception.printStackTrace();
+			}
+		});
 	}
 
 	// /**
@@ -270,47 +285,37 @@ public class CoordinationSpace extends Grid2D
 	/**
 	 * Called when an component was added.
 	 */
-	public void componentAdded(IComponentIdentifier aid)
-	{
-		synchronized(monitor)
-		{
+	public void componentAdded(IComponentIdentifier aid) {
+		synchronized (monitor) {
 			// Possibly add or create avatar(s) if any.
-			List ownedobjs = (List)spaceobjectsbyowner.get(aid);
-			if(ownedobjs==null)
-			{
+			List ownedobjs = (List) spaceobjectsbyowner.get(aid);
+			if (ownedobjs == null) {
 				createAvatar(aid, null, false);
-			}
-			else
-			{
+			} else {
 				// Init zombie avatars.
-				for(Iterator it=ownedobjs.iterator(); it.hasNext(); )
-				{
-					ISpaceObject	obj	= (ISpaceObject)it.next();
-					if(!spaceobjects.containsKey(obj.getId()))
-					{
+				for (Iterator it = ownedobjs.iterator(); it.hasNext();) {
+					ISpaceObject obj = (ISpaceObject) it.next();
+					if (!spaceobjects.containsKey(obj.getId())) {
 						initSpaceObject(obj);
 					}
 				}
 			}
-			
-			if(perceptgenerators!=null)
-			{
-				for(Iterator it=perceptgenerators.keySet().iterator(); it.hasNext(); )
-				{
-					IPerceptGenerator gen = (IPerceptGenerator)perceptgenerators.get(it.next());
+
+			if (perceptgenerators != null) {
+				for (Iterator it = perceptgenerators.keySet().iterator(); it.hasNext();) {
+					IPerceptGenerator gen = (IPerceptGenerator) perceptgenerators.get(it.next());
 					gen.componentAdded(aid, this);
 				}
 			}
 			// init Agent for deco4MAS participation
 			initParticipatingAgent(aid);
-		}	
+		}
 	}
 
 	/**
 	 * @return the agentData
 	 */
-	public Map<String, Map<String, Set<Object[]>>> getAgentData()
-	{
+	public Map<String, Map<String, Set<Object[]>>> getAgentData() {
 		return agentData;
 	}
 }

@@ -52,7 +52,7 @@ public class BDIBehaviorObservationComponent
 
 	/** The external access to the observed agent. */
 	private IBDIExternalAccess exta;
-	private BDICoordinationEventPublication eventPublication;
+	private CoordinationEventPublication eventPublication;
 	/**
 	 * Contains the mapping from an event inside an agent, i.e. a goal is
 	 * dispatched, a beliefset has changed , and maps these events to those DCM
@@ -89,7 +89,7 @@ public class BDIBehaviorObservationComponent
 	public BDIBehaviorObservationComponent(IBDIExternalAccess exta)
 	{
 		this.exta = exta;
-		eventPublication = new BDICoordinationEventPublication();
+		eventPublication = new CoordinationEventPublication();
 		// initListeners();
 	}
 

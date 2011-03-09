@@ -1,15 +1,16 @@
 package deco4mas.coordinate;
 
-import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IExternalAccess;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+
 import javax.xml.bind.JAXBException;
+
 import deco.lang.dynamics.MASDynamics;
 import deco.lang.dynamics.causalities.DecentralMechanismLink;
 import deco.lang.dynamics.causalities.DirectLink;
 import deco.lang.dynamics.mechanism.AgentElement;
-import deco.lang.dynamics.mechanism.DecentralizedCausality;
 import deco.lang.dynamics.properties.AgentReference;
 import deco.lang.dynamics.properties.ElementReference;
 import deco.lang.dynamics.properties.GroupMembership;
@@ -18,11 +19,10 @@ import deco.lang.dynamics.properties.RoleOccupation;
 import deco.lang.dynamics.properties.SystemProperty;
 import deco4mas.annotation.agent.AgentCoordinationConfiguration;
 import deco4mas.annotation.agent.CoordinationAnnotation;
+import deco4mas.annotation.agent.CoordinationAnnotation.DirectionType;
 import deco4mas.annotation.agent.CoordinationInhibition;
 import deco4mas.annotation.agent.DataMapping;
 import deco4mas.annotation.agent.ParameterMapping;
-import deco4mas.annotation.agent.CoordinationAnnotation.DirectionType;
-import deco4mas.coordinate.environment.CoordinationSpaceObject;
 import deco4mas.mechanism.CoordinationInfo;
 
 /**
@@ -35,8 +35,7 @@ import deco4mas.mechanism.CoordinationInfo;
  * @author Ante Vilenica & Jan Sudeikat
  */
 @SuppressWarnings("serial")
-public class ProcessMASDynamics
-{
+public class ProcessMASDynamics {
 
 	// /**
 	// * A reference to the file that should be processed.
@@ -52,8 +51,7 @@ public class ProcessMASDynamics
 	 * 
 	 * @param fileName
 	 */
-	public ProcessMASDynamics(IBDIExternalAccess exta, MASDynamics masDynamics)
-	{
+	public ProcessMASDynamics(IExternalAccess exta, MASDynamics masDynamics) {
 		this.exta = exta;
 		this.dyn = masDynamics;
 	}
@@ -70,7 +68,7 @@ public class ProcessMASDynamics
 	// private AgentFlyweight rbdia;
 
 	/** External access to the agent. */
-	private IBDIExternalAccess exta;
+	private IExternalAccess exta;
 
 	/** The id of the surrounding agent (unique). */
 	private String agent_model_id;
@@ -106,19 +104,15 @@ public class ProcessMASDynamics
 	/**
 	 * Returns the MASDynamics Model for the specified file name.
 	 */
-	public static MASDynamics getMASDynamicsModell(String fileName)
-	{
+	public static MASDynamics getMASDynamicsModell(String fileName) {
 		if (fileName.length() > 0)
-			try
-			{
+			try {
 				return (MASDynamics) deco4mas.util.xml.XmlUtil.retrieveFromXML(MASDynamics.class, fileName);
-			} catch (FileNotFoundException e)
-			{
+			} catch (FileNotFoundException e) {
 				System.out.println("#ProcessMASDynamics#" + ":");
 				System.out.println("\t file: " + fileName + " could not be found...");
 				e.printStackTrace();
-			} catch (JAXBException e)
-			{
+			} catch (JAXBException e) {
 				System.out.println("#ProcessMASDynamics#" + ":");
 				System.out.println("\t file: " + fileName + " could not be processed...");
 				e.printStackTrace();
@@ -126,15 +120,13 @@ public class ProcessMASDynamics
 		return null;
 	}
 
-	public void process()
-	{
+	public void process() {
 
 		// System.out.println("#ProcessMASDynamicsPlan# Started processDynamics initialization for : "
 		// + exta.getAgentName());
 		ArrayList<CoordinationInfo> res = new ArrayList<CoordinationInfo>();
 
-		if (exta != null)
-		{
+		if (exta != null) {
 			// agent_model_id =
 			// exta.getApplicationContext().getAgentType(exta.getAgentIdentifier());
 			agent_model_id = exta.getModel().getName();
@@ -204,31 +196,29 @@ public class ProcessMASDynamics
 		// participating (as sender/receiver):
 
 		// 2.a handle decentralized links:
-		for (DecentralMechanismLink dml : dyn.getCausalities().getDml())
-		{
+		for (DecentralMechanismLink dml : dyn.getCausalities().getDml()) {
 
-			if (dml.getRealization().length() > 0)
-			{
+			if (dml.getRealization().length() > 0) {
 
-				System.out.println("#ProccssMASDynamics#" +
-				// this.getCapability().getName() + ") in agent: " +
-					// this.getAgentName() +
-					" Processes decentralized interdependency: " + dml.getName() + " at AgentType: " + this.agent_model_id);
+				System.out.println("#ProccssMASDynamics#"
+						+
+						// this.getCapability().getName() + ") in agent: " +
+						// this.getAgentName() +
+						" Processes decentralized interdependency: " + dml.getName() + " at AgentType: "
+						+ this.agent_model_id);
 				// TODO: use logging framework to control the output of debug
 				// information
 
-				for (String s : dml.getFrom())
-				{
+				for (String s : dml.getFrom()) {
 					// System.out.println("Yes: " +
 					// this.dyn.getProperties().getProperty(s));
 					extractDecentralCoordinationInformation(publications, dml, this.dyn.getProperties().getProperty(s),
-						DirectionType.PUBLICATION);
+							DirectionType.PUBLICATION);
 				}
 
-				for (String s : dml.getTo())
-				{
+				for (String s : dml.getTo()) {
 					extractDecentralCoordinationInformation(perceptions, dml, this.dyn.getProperties().getProperty(s),
-						DirectionType.PERCEPTION);
+							DirectionType.PERCEPTION);
 				}
 			}
 		}
@@ -247,24 +237,20 @@ public class ProcessMASDynamics
 		// }
 
 		// 2.b handle direct links:
-		for (DirectLink dl : dyn.getCausalities().getDirectLinks())
-		{
-			if (dl.getRealization() != null)
-			{
+		for (DirectLink dl : dyn.getCausalities().getDirectLinks()) {
+			if (dl.getRealization() != null) {
 				// System.out.println(this.getCapability().getName() + ":");
-				System.out.println("#ProccssMASDynamics#" + " Processes decentralized interdependency: " + dl.getName() + " at AgentType: "
-					+ this.agent_model_id);
-				for (String s : dl.getFrom())
-				{
+				System.out.println("#ProccssMASDynamics#" + " Processes decentralized interdependency: " + dl.getName()
+						+ " at AgentType: " + this.agent_model_id);
+				for (String s : dl.getFrom()) {
 
-					extractDirectCoordinationInformation(direct_publications, dl, this.dyn.getProperties().getProperty(s),
-						DirectionType.PUBLICATION);
+					extractDirectCoordinationInformation(direct_publications, dl,
+							this.dyn.getProperties().getProperty(s), DirectionType.PUBLICATION);
 				}
 
-				for (String s : dl.getTo())
-				{
-					extractDirectCoordinationInformation(direct_perceptions, dl, this.dyn.getProperties().getProperty(s),
-						DirectionType.PERCEPTION);
+				for (String s : dl.getTo()) {
+					extractDirectCoordinationInformation(direct_perceptions, dl, this.dyn.getProperties()
+							.getProperty(s), DirectionType.PERCEPTION);
 				}
 			}
 		}
@@ -300,7 +286,7 @@ public class ProcessMASDynamics
 		// CoordinationAnnotation) {
 		// CoordinationAnnotation ca = (CoordinationAnnotation)
 		// rbdia.getPropertybase().getProperty(s);
-		//			
+		//
 		// if (ca.getDirection().equals(DirectionType.PERCEPTION)){ // book
 		// // keeping for complete coordination model
 		// this.acc.addPerception(ca);
@@ -345,13 +331,13 @@ public class ProcessMASDynamics
 	// */
 	// private void
 	// loadDirectCoordinationCapability(DirectCoordinationInformation ci) {
-	//	
+	//
 	// // fetch link configuration:
 	// String direct_link_configuration_id =
 	// ci.getDirectLink().getRealization();
 	// DirectCausality direct_link_configuration =
 	// dyn.getCausalities().getDirectLinkRealizationByName(direct_link_configuration_id);
-	//			
+	//
 	// // store in the right list:
 	// if (ci.getDirection().equals(DirectionType.PERCEPTION)){
 	// for (AgentElement ae : direct_link_configuration.getTo_agents()){
@@ -373,17 +359,17 @@ public class ProcessMASDynamics
 	// }
 	// }
 	// }
-	//			
+	//
 	// // load an configure the mechanism-specific coordination end-point
 	// implementation:
 	// if (!
 	// this.loaded_coordination_realizations.contains(direct_link_configuration_id))
 	// { // this is done only once for the specific end-point implementation
-	//				
+	//
 	// // fetch configuration:
 	// DirectLinkConfiguration mc_model =
 	// direct_link_configuration.getConfiguration();
-	//	
+	//
 	// // store configuration in surrounding agent:
 	// IMBeliefbase b_base =
 	// (IMBeliefbase)rbdia.getBeliefbase().getModelElement();
@@ -392,7 +378,7 @@ public class ProcessMASDynamics
 	// rbdia.getBeliefbase().registerBelief(b_type);
 	// rbdia.getCapability(direct_link_configuration_id).getBeliefbase().getBelief(direct_link_configuration_id+
 	// "::mech_conf").setFact(mc_model);
-	//	
+	//
 	// // load capability [includes automated initialization]:
 	// String direct_coord_model =
 	// "deco4mas.mechanism.direct.messagebased.Direct"; // fully qualified
@@ -401,23 +387,23 @@ public class ProcessMASDynamics
 	// IMCapabilityReference subcap =
 	// cap.createCapabilityReference(direct_link_configuration_id,direct_coord_model);
 	// rbdia.getScope().registerSubcapability(subcap);
-	//			
+	//
 	// }
-	//			
+	//
 	// if (ci.getDirection().equals(DirectionType.PUBLICATION)){ // register:
 	// the goals for publication:
-	//				
+	//
 	// IMGoalbase g_base = (IMGoalbase) rbdia.getGoalbase().getModelElement();
 	// IMAchieveGoalReference g_ref =
 	// g_base.createAchieveGoalReference("publish", "true",
 	// direct_link_configuration_id + ".publish");
 	// rbdia.getGoalbase().registerGoalReference(g_ref);
 	// }
-	//			
+	//
 	// // finally, remember that his model link/mechanism has already been
 	// configured:
 	// this.loaded_coordination_realizations.add(direct_link_configuration_id);
-	//			
+	//
 	// }
 
 	// /**
@@ -428,10 +414,10 @@ public class ProcessMASDynamics
 	// */
 	// private void loadAndConfigureCapability(DecentralCoordinationInformation
 	// ci) {
-	//		
+	//
 	// // fetch the model data for the utilized coordination mechanism:
 	// String mech_id = ci.getDml().getRealization();
-	//		
+	//
 	// DecentralizedCausality dcm_realization =
 	// dyn.getCausalities().getDCMRealizationByName(mech_id);
 	// if (dcm_realization == null) { // check if realization is available
@@ -439,10 +425,10 @@ public class ProcessMASDynamics
 	// IllegalArgumentException("No mechanism realization with the name: " +
 	// mech_id + " is available");
 	// }
-	//		
+	//
 	// String mech_model =
 	// dcm_realization.getMechanismConfiguration().getMechanism_id();
-	//		
+	//
 	// // here, Jadex-based implementation -> check agent type:
 	// if
 	// (dcm_realization.getMechanismConfiguration().getAgent_type().equals(AgentModelType.JADEX)){
@@ -466,12 +452,12 @@ public class ProcessMASDynamics
 	// }
 	// }
 	// }
-	//			
+	//
 	// // load an configure the mechanism-specific coordination end-point
 	// implementation:
 	// if (! this.loaded_coordination_realizations.contains(mech_id)) { // this
 	// is done only once for the specific end-point implementation
-	//			
+	//
 	// // create the mechanism configuration:
 	// deco.lang.dynamics.mechanism.MechanismConfiguration mc_model =
 	// dcm_realization.getMechanismConfiguration();
@@ -490,9 +476,9 @@ public class ProcessMASDynamics
 	// IMCapabilityReference subcap =
 	// cap.createCapabilityReference(mech_id,mech_model);
 	// rbdia.getScope().registerSubcapability(subcap);
-	//			
+	//
 	// }
-	//						
+	//
 	// if (ci.getDirection().equals(DirectionType.PUBLICATION)){ // register:
 	// the goals for publication:
 	// IMGoalbase g_base = (IMGoalbase) rbdia.getGoalbase().getModelElement();
@@ -501,11 +487,11 @@ public class ProcessMASDynamics
 	// ".publish");
 	// rbdia.getGoalbase().registerGoalReference(g_ref);
 	// }
-	//			
+	//
 	// // finally, remember that his model link/mechanism has already been
 	// configured:
 	// this.loaded_coordination_realizations.add(mech_id);
-	//			
+	//
 	// }
 	// }
 	//
@@ -557,9 +543,9 @@ public class ProcessMASDynamics
 	// rbdia.getBeliefbase().getBeliefSet(ca.getMechID() +
 	// "::agent_annotations").addFact(ca);
 	// }
-	//	
+	//
 	// }
-	//	
+	//
 	/**
 	 * Create annotation to the agent model:
 	 * 
@@ -567,8 +553,7 @@ public class ProcessMASDynamics
 	 * @param ae
 	 * @return
 	 */
-	private CoordinationAnnotation createCoordinationAnnotation(DecentralCoordinationInformation ci, AgentElement ae)
-	{
+	private CoordinationAnnotation createCoordinationAnnotation(DecentralCoordinationInformation ci, AgentElement ae) {
 
 		CoordinationAnnotation ca = new CoordinationAnnotation();
 
@@ -578,23 +563,19 @@ public class ProcessMASDynamics
 		ca.setDirection(ci.getDirection().toString());
 		ca.setCoordinationType(ci.getCoordinationType());
 
-		if (ci.getRef().getContraints() != null)
-		{ // constraints exist
-			if (ci.getRef().getContraints().getCondition() != null)
-			{
+		if (ci.getRef().getContraints() != null) { // constraints exist
+			if (ci.getRef().getContraints().getCondition() != null) {
 				PropertyCondition pc = ci.getRef().getContraints().getCondition();
 				ca.setConditionName(pc.getName());
 				ca.setConditionExpression(pc.getExpression());
 			}
 
-			if (ci.getRef().getContraints() != null)
-			{
-				if (ci.getRef().getContraints().getInhibitions() != null)
-				{ //
-					// inhibitions exist
+			if (ci.getRef().getContraints() != null) {
+				if (ci.getRef().getContraints().getInhibitions() != null) { //
+																			// inhibitions
+																			// exist
 					ArrayList<ElementReference> inhibitions = ci.getRef().getContraints().getInhibitions();
-					for (ElementReference e : inhibitions)
-					{
+					for (ElementReference e : inhibitions) {
 						CoordinationInhibition coordinationInhibition = new CoordinationInhibition();
 						coordinationInhibition.setElement_name(e.getElement_id());
 						coordinationInhibition.setElement_type(e.getAgent_element_type().toString());
@@ -605,22 +586,18 @@ public class ProcessMASDynamics
 			}
 		}
 
-		for (ParameterMapping pm : ae.getParameter_mappings())
-		{
+		for (ParameterMapping pm : ae.getParameter_mappings()) {
 			ca.addParameter_mapping(pm);
 		}
 
-		for (DataMapping dm : ae.getData_mappings())
-		{
+		for (DataMapping dm : ae.getData_mappings()) {
 			ca.addDataMapping(dm);
 		}
 
-		if (ci.getDirection().equals(DirectionType.PERCEPTION))
-		{
+		if (ci.getDirection().equals(DirectionType.PERCEPTION)) {
 			ca.setDirection(DirectionType.PERCEPTION.toString());
 		}
-		if (ci.getDirection().equals(DirectionType.PUBLICATION))
-		{
+		if (ci.getDirection().equals(DirectionType.PUBLICATION)) {
 			ca.setDirection(DirectionType.PUBLICATION.toString());
 		}
 
@@ -634,8 +611,7 @@ public class ProcessMASDynamics
 	 * @param ae
 	 * @return
 	 */
-	private CoordinationAnnotation createCoordinationAnnotation(DirectCoordinationInformation ci, AgentElement ae)
-	{
+	private CoordinationAnnotation createCoordinationAnnotation(DirectCoordinationInformation ci, AgentElement ae) {
 
 		CoordinationAnnotation ca = new CoordinationAnnotation();
 
@@ -645,23 +621,19 @@ public class ProcessMASDynamics
 		ca.setDirection(ci.getDirection().toString());
 		ca.setCoordinationType(ci.getCoordinationType());
 
-		if (ci.getRef().getContraints() != null)
-		{ // constraints exist
-			if (ci.getRef().getContraints().getCondition() != null)
-			{
+		if (ci.getRef().getContraints() != null) { // constraints exist
+			if (ci.getRef().getContraints().getCondition() != null) {
 				PropertyCondition pc = ci.getRef().getContraints().getCondition();
 				ca.setConditionName(pc.getName());
 				ca.setConditionExpression(pc.getExpression());
 			}
 
-			if (ci.getRef().getContraints() != null)
-			{
-				if (ci.getRef().getContraints().getInhibitions() != null)
-				{ //
-					// inhibitions exist
+			if (ci.getRef().getContraints() != null) {
+				if (ci.getRef().getContraints().getInhibitions() != null) { //
+																			// inhibitions
+																			// exist
 					ArrayList<ElementReference> inhibitions = ci.getRef().getContraints().getInhibitions();
-					for (ElementReference e : inhibitions)
-					{
+					for (ElementReference e : inhibitions) {
 						CoordinationInhibition coordinationInhibition = new CoordinationInhibition();
 						coordinationInhibition.setElement_name(e.getElement_id());
 						coordinationInhibition.setElement_type(e.getAgent_element_type().toString());
@@ -672,22 +644,18 @@ public class ProcessMASDynamics
 			}
 		}
 
-		for (ParameterMapping pm : ae.getParameter_mappings())
-		{
+		for (ParameterMapping pm : ae.getParameter_mappings()) {
 			ca.addParameter_mapping(pm);
 		}
 
-		for (DataMapping dm : ae.getData_mappings())
-		{
+		for (DataMapping dm : ae.getData_mappings()) {
 			ca.addDataMapping(dm);
 		}
 
-		if (ci.getDirection().equals(DirectionType.PERCEPTION))
-		{
+		if (ci.getDirection().equals(DirectionType.PERCEPTION)) {
 			ca.setDirection(DirectionType.PERCEPTION.toString());
 		}
-		if (ci.getDirection().equals(DirectionType.PUBLICATION))
-		{
+		if (ci.getDirection().equals(DirectionType.PUBLICATION)) {
 			ca.setDirection(DirectionType.PUBLICATION.toString());
 		}
 
@@ -705,37 +673,35 @@ public class ProcessMASDynamics
 	 * @param sp
 	 */
 	private void extractDecentralCoordinationInformation(ArrayList<DecentralCoordinationInformation> co_inf_list,
-		DecentralMechanismLink dml, SystemProperty sp, DirectionType direction)
-	{
+			DecentralMechanismLink dml, SystemProperty sp, DirectionType direction) {
 
-		if (sp != null)
-		{ // exists:
-			if (sp instanceof RoleOccupation)
-			{
+		if (sp != null) { // exists:
+			if (sp instanceof RoleOccupation) {
 				RoleOccupation ro = (RoleOccupation) sp;
-				for (AgentReference ar : ro.getAgentReferences())
-				{
-					if (ar.getAgent_id().equals(agent_model_id))
-					{// filter for elements of the surrounding agent store
-						// perception:
+				for (AgentReference ar : ro.getAgentReferences()) {
+					if (ar.getAgent_id().equals(agent_model_id)) {// filter for
+																	// elements
+																	// of the
+																	// surrounding
+																	// agent
+																	// store
+																	// perception:
 						co_inf_list.add(new DecentralCoordinationInformation(direction, ar, dml));
 					}
 				}
 			}
-			if (sp instanceof GroupMembership)
-			{ // "Group" are GroupMembership
-				// as well
+			if (sp instanceof GroupMembership) { // "Group" are GroupMembership
+													// as well
 				GroupMembership gm = (GroupMembership) sp;
-				for (AgentReference ar : gm.getAgent_elements())
-				{
-					if (ar.getAgent_id().equalsIgnoreCase(agent_model_id))
-					{ // filter
-						// for
-						// elements
-						// of
-						// this
-						// agent
-						// store perception:
+				for (AgentReference ar : gm.getAgent_elements()) {
+					if (ar.getAgent_id().equalsIgnoreCase(agent_model_id)) { // filter
+																				// for
+																				// elements
+																				// of
+																				// this
+																				// agent
+																				// store
+																				// perception:
 						co_inf_list.add(new DecentralCoordinationInformation(direction, ar, dml));
 					}
 				}
@@ -754,45 +720,40 @@ public class ProcessMASDynamics
 	 * @param sp
 	 * @param direction
 	 */
-	private void extractDirectCoordinationInformation(ArrayList<DirectCoordinationInformation> direct_coord_informations, DirectLink dl,
-		SystemProperty sp, DirectionType direction)
-	{
+	private void extractDirectCoordinationInformation(
+			ArrayList<DirectCoordinationInformation> direct_coord_informations, DirectLink dl, SystemProperty sp,
+			DirectionType direction) {
 
-		if (sp != null)
-		{ // exists:
-			if (sp instanceof RoleOccupation)
-			{
+		if (sp != null) { // exists:
+			if (sp instanceof RoleOccupation) {
 
 				RoleOccupation ro = (RoleOccupation) sp;
-				for (AgentReference ar : ro.getAgentReferences())
-				{
-					if (ar.getAgent_id().equals(agent_model_id))
-					{ // filter for
-						// elements
-						// of the
-						// surrounding
-						// agent
-						// store perception:
+				for (AgentReference ar : ro.getAgentReferences()) {
+					if (ar.getAgent_id().equals(agent_model_id)) { // filter for
+																	// elements
+																	// of the
+																	// surrounding
+																	// agent
+																	// store
+																	// perception:
 						direct_coord_informations.add(new DirectCoordinationInformation(direction, ar, dl));
 					}
 				}
 
 			}
-			if (sp instanceof GroupMembership)
-			{ // "Group" are
-				// GroupMembership as
-				// well
+			if (sp instanceof GroupMembership) { // "Group" are
+													// GroupMembership as
+													// well
 				GroupMembership gm = (GroupMembership) sp;
-				for (AgentReference ar : gm.getAgent_elements())
-				{
-					if (ar.getAgent_id().equalsIgnoreCase(agent_model_id))
-					{ // filter
-						// for
-						// elements
-						// of
-						// this
-						// agent
-						// store perception:
+				for (AgentReference ar : gm.getAgent_elements()) {
+					if (ar.getAgent_id().equalsIgnoreCase(agent_model_id)) { // filter
+																				// for
+																				// elements
+																				// of
+																				// this
+																				// agent
+																				// store
+																				// perception:
 						direct_coord_informations.add(new DirectCoordinationInformation(direction, ar, dl));
 					}
 				}
@@ -836,32 +797,28 @@ public class ProcessMASDynamics
 	/**
 	 * @return the direct perceptions
 	 */
-	public ArrayList<DirectCoordinationInformation> getDirectPerceptions()
-	{
+	public ArrayList<DirectCoordinationInformation> getDirectPerceptions() {
 		return direct_perceptions;
 	}
 
 	/**
 	 * @return the direct publications
 	 */
-	public ArrayList<DirectCoordinationInformation> getDirectPublications()
-	{
+	public ArrayList<DirectCoordinationInformation> getDirectPublications() {
 		return direct_publications;
 	}
 
 	/**
 	 * @return the perceptions
 	 */
-	public ArrayList<DecentralCoordinationInformation> getPerceptions()
-	{
+	public ArrayList<DecentralCoordinationInformation> getPerceptions() {
 		return perceptions;
 	}
 
 	/**
 	 * @return the publications
 	 */
-	public ArrayList<DecentralCoordinationInformation> getPublications()
-	{
+	public ArrayList<DecentralCoordinationInformation> getPublications() {
 		return publications;
 	}
 
