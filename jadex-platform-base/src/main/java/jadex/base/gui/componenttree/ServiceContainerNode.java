@@ -20,6 +20,9 @@ public class ServiceContainerNode	extends AbstractTreeNode
 {
 	//-------- constants --------
 	
+	/** The node name (used as id suffix and displayed in the tree). */
+	public static final String	NAME	= "Services";
+	
 	/** The service container icon. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
@@ -55,7 +58,7 @@ public class ServiceContainerNode	extends AbstractTreeNode
 	public Object	getId()
 	{
 //		return ((ComponentTreeNode)getParent()).getDescription().getName().getName()+toString();
-		return getParent().getId()+toString();
+		return getParent().getId()+NAME;
 	}
 	
 	/**
@@ -95,7 +98,7 @@ public class ServiceContainerNode	extends AbstractTreeNode
 	 */
 	public String toString()
 	{
-		return "ServiceContainer";
+		return NAME;
 	}
 
 	/**

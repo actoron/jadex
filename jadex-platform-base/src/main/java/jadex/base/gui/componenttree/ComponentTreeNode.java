@@ -326,7 +326,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 						List	services	= (List)result;
 						if(services!=null && !services.isEmpty())
 						{
-							ServiceContainerNode	scn	= (ServiceContainerNode)getModel().getNode(getId()+"ServiceContainer");
+							ServiceContainerNode	scn	= (ServiceContainerNode)getModel().getNode(getId()+ServiceContainerNode.NAME);
 							if(scn==null)
 								scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel(), getTree(), (IServiceContainer)ea.getServiceProvider());
 //							System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+scn);
