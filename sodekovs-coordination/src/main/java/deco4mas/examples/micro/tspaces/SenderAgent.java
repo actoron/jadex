@@ -44,7 +44,8 @@ public class SenderAgent extends MicroAgent {
 	/**
 	 * Whenever this step is started the coordination framework observes this
 	 * event and propagates the {@link SenderAgent#counter} attribute to the
-	 * {@link ReceiverAgent}.
+	 * {@link ReceiverAgent}. The step is referenced in the DeCoMAS
+	 * configuration file by it simple class name (not full qualified).
 	 * 
 	 * @author Thomas Preisler
 	 */
@@ -70,19 +71,6 @@ public class SenderAgent extends MicroAgent {
 			}
 
 			return null;
-		}
-
-		/**
-		 * Overrides the toString-method and returns the name of the class, this
-		 * name is used as an identification of the step in the coordination
-		 * framework, so it is important that the returned {@link String}
-		 * matches the steps class name.
-		 * 
-		 * @return the steps class name
-		 */
-		@Override
-		public String toString() {
-			return "CounterIncrementStep";
 		}
 	}
 }

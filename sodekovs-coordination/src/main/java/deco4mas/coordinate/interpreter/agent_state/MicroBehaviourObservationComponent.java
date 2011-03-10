@@ -104,7 +104,7 @@ public class MicroBehaviourObservationComponent {
 					if (step instanceof MicroAgent.ExecuteWaitForStep) {
 						MicroAgent.ExecuteWaitForStep waitForStep = (MicroAgent.ExecuteWaitForStep) step;
 						IComponentStep runStep = waitForStep.getRun();
-						String nameOfElement = runStep.toString();
+						String nameOfElement = runStep.getClass().getSimpleName();
 
 						if (agentElement.getAgentElementType().equals(AgentElementType.MICRO_STEP.toString())
 								&& agentElement.getElement_id().equals(nameOfElement)) {
