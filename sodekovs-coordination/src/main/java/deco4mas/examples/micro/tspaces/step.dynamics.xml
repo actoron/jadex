@@ -2,16 +2,15 @@
 <MASDynamic name="belief_set">
 	<!--
 		Tuple Space Example: 2D Environment-Interaction Exemplifies how
-		publications of Coordination Information can be triggered by changes
-		of agent-goals. Activities in the Sender agent "Sender.agent.xml"
-		modify the currently active goals of the agent. These modifications
-		are observed by a Coordination Endpoint that publishes the changes of
-		the agent state on a Coordination Medium. Here, a tuple-space is used
-		to resemble interactions in a two-dimensional environment. An agent
-		type (Sender.agent.xml) is publishing adoptions of goals. Agents on
-		the same (virtual) position (ReceiverSameLocation.agent.xml) is
-		receiving these publications while other agents
-		(ReceiverDifferentLocation.agent.xml) are not affected.
+		publications of Coordination Information can be triggered by micro 
+		agent steps. Activities in the Sender agent "SenderAgent.java"
+		are starting IComponentSteps. These modifications are observed by
+		a Coordination Endpoint that publishes the changes of the agent 
+		state on a Coordination Medium. Here, a tuple-space is used to
+		resemble interactions in a two-dimensional environment. An agent
+		type (SenderAgent.java) is publishing initializations of steps.
+		Other agents (ReceiverAgent.java) are receiving these publications 
+		which results in the starting of specified steps in the receiving agent.
 	-->
 
 	<!--
@@ -22,18 +21,10 @@
 	<system_properties>
 		<role_occupations>
 			<role_occupation name="sender" multiple="false">
-				<agent id="Sender">
-					<elements>
-						<element id="CounterIncrementStep" type="MICRO_STEP" />
-					</elements>
-				</agent>
+				<agent id="Sender" />
 			</role_occupation>
 			<role_occupation name="receiver" multiple="false">
-				<agent id="Receiver">
-					<elements>
-						<element id="InformCounterIncrementStep" type="MICRO_STEP" />
-					</elements>
-				</agent>
+				<agent id="Receiver" />
 			</role_occupation>
 		</role_occupations>
 	</system_properties>

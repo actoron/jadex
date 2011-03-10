@@ -1,7 +1,16 @@
 <!--
 	<H3>Test application for V2 MicroAgents and Deco4MAS</H3>
 	
-	Work in progress...
+	Tuple Space Example: 2D Environment-Interaction Exemplifies how
+	publications of Coordination Information can be triggered by micro 
+	agent steps. Activities in the Sender agent "SenderAgent.java"
+	are starting IComponentSteps. These modifications are observed by
+	a Coordination Endpoint that publishes the changes of the agent 
+	state on a Coordination Medium. Here, a tuple-space is used to
+	resemble interactions in a two-dimensional environment. An agent
+	type (SenderAgent.java) is publishing initializations of steps.
+	Other agents (ReceiverAgent.java) are receiving these publications 
+	which results in the starting of specified steps in the receiving agent.
 -->
 
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
