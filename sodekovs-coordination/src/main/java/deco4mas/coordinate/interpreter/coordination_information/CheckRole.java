@@ -15,7 +15,7 @@ import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
 import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
-import jadex.commons.ChangeEvent;
+import jadex.bridge.IComponentStep;
 import jadex.micro.MicroAgent;
 import jadex.rules.state.IOAVState;
 
@@ -500,12 +500,12 @@ public class CheckRole {
 	 * 
 	 * @param agentReference
 	 * @param agentElement
-	 * @param ce
+	 * @param runStep
 	 * @param ma
 	 * @return
 	 */
 	public static HashMap<String, Object> checkForPublishMicro(AgentReference agentReference,
-			AgentElement agentElement, ChangeEvent ce, MicroAgent ma) {
+			AgentElement agentElement, IComponentStep runStep, MicroAgent ma) {
 
 		HashMap<String, Object> parameters = null;
 
@@ -513,10 +513,10 @@ public class CheckRole {
 			parameters = new HashMap<String, Object>();
 
 			for (ParameterMapping pm : agentElement.getParameter_mappings()) {
-				Class<? extends MicroAgent> clazz = ma.getClass();
+				Class<? extends IComponentStep> clazz = runStep.getClass();
 				try {
 					Field field = clazz.getDeclaredField(pm.getLocalName());
-					Object value = field.get(ma);
+					Object value = field.get(runStep);
 
 					parameters.put(pm.getRef(), value);
 

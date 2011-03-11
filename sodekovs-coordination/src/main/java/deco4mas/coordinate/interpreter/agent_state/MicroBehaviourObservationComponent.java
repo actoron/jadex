@@ -108,7 +108,7 @@ public class MicroBehaviourObservationComponent {
 
 						if (agentElement.getAgentElementType().equals(AgentElementType.MICRO_STEP.toString())
 								&& agentElement.getElement_id().equals(nameOfElement)) {
-							checkAndPublishIfApplicable(event, AgentElementType.MICRO_STEP, nameOfElement);
+							checkAndPublishIfApplicable(runStep, AgentElementType.MICRO_STEP, nameOfElement);
 						}
 					}
 				}
@@ -121,11 +121,11 @@ public class MicroBehaviourObservationComponent {
 	 * ALL DCM that are interested in this event (i.e. that have registered an
 	 * listener) and dispatch event to medium if role definition is satisfied.
 	 * 
-	 * @param ce
+	 * @param runStep
 	 * @param agentElementType
 	 * @param nameOfElement
 	 */
-	private void checkAndPublishIfApplicable(final ChangeEvent ce, final AgentElementType agentElementType,
+	private void checkAndPublishIfApplicable(final IComponentStep runStep, final AgentElementType agentElementType,
 			final String nameOfElement) {
 		extAccess.scheduleStep(new IComponentStep() {
 
@@ -140,7 +140,7 @@ public class MicroBehaviourObservationComponent {
 				for (String dmlRealizationName : realizationNames) {
 					// Check whether role is active.
 					HashMap<String, Object> parameterDataMappings = publishWhenApplicable(dmlRealizationName + "::"
-							+ nameOfElement, ce, agentElementType, ma);
+							+ nameOfElement, runStep, agentElementType, ma);
 
 					if (parameterDataMappings != null) {
 						publishEvent(nameOfElement, parameterDataMappings, nameOfElement, agentElementType,
@@ -161,19 +161,19 @@ public class MicroBehaviourObservationComponent {
 	 * role than publish the event to the coordination medium.
 	 * 
 	 * @param key
-	 * @param ce
+	 * @param runStep
 	 * @param agentElementType
 	 * @param ma
 	 *            partial key name
 	 * @return if !=null then applicable. contains then a map of the parameter
 	 *         and data mappings
 	 */
-	private HashMap<String, Object> publishWhenApplicable(String key, ChangeEvent ce,
+	private HashMap<String, Object> publishWhenApplicable(String key, IComponentStep runStep,
 			AgentElementType agentElementType, MicroAgent ma) {
 		return CheckRole.checkForPublishMicro(
 				roleDefinitionsForPublish.get(Constants.PUBLISH + "::" + key + "::" + agentElementType.toString()),
-				parameterAndDataMappings.get(Constants.PUBLISH + "::" + key + "::" + agentElementType.toString()), ce,
-				ma);
+				parameterAndDataMappings.get(Constants.PUBLISH + "::" + key + "::" + agentElementType.toString()),
+				runStep, ma);
 	}
 
 	/**

@@ -16,15 +16,6 @@ import deco4mas.coordinate.annotation.CoordinationParameter;
  */
 public class SenderAgent extends MicroAgent {
 
-	/**
-	 * This attribute is propagated through the coordination framework. It has
-	 * to be public so it could be read using reflection in the coordination
-	 * framework. The annotation is currently optional and only helps to
-	 * understand the code better.
-	 */
-	@CoordinationParameter(steps = { "CounterIncrementStep" })
-	public Integer counter = 0;
-
 	@Override
 	public IFuture agentCreated() {
 		return super.agentCreated();
@@ -33,7 +24,7 @@ public class SenderAgent extends MicroAgent {
 	@Override
 	public void executeBody() {
 		// wait 7s then start the first step
-		waitFor(7000, new CounterIncrementStep());
+		waitFor(7000, new CounterIncrementStep(0));
 	}
 
 	@Override
@@ -51,6 +42,19 @@ public class SenderAgent extends MicroAgent {
 	 */
 	public class CounterIncrementStep implements IComponentStep {
 
+		/**
+		 * This attribute is propagated through the coordination framework. It
+		 * has to be public so it could be read using reflection in the
+		 * coordination framework. The annotation is currently optional and only
+		 * helps to understand the code better.
+		 */
+		@CoordinationParameter
+		public int counter = -1;
+
+		public CounterIncrementStep(int counter) {
+			this.counter = counter;
+		}
+
 		/*
 		 * (non-Javadoc)
 		 * 
@@ -66,7 +70,7 @@ public class SenderAgent extends MicroAgent {
 
 				if (counter < 5) {
 					// wait for 2,5s then start the next step
-					waitFor(2500, new CounterIncrementStep());
+					waitFor(2500, new CounterIncrementStep(counter));
 				}
 			}
 
