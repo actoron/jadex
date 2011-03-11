@@ -770,12 +770,23 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 
 		private final IComponentStep	run;
 
+		/**
+		 * This class is constructed with an array of {@link ITimer}s and the {@link IComponentStep}
+		 * which is scheduled for execution.
+		 * 
+		 * @param ts an array of {@link ITimer}s
+		 * @param run the {@link IComponentStep} which is scheduled for execution
+		 */
 		public ExecuteWaitForStep(ITimer[] ts, IComponentStep run)
 		{
 			this.ts = ts;
 			this.run = run;
 		}
 
+		/**
+		 * Removes the first entry from the {@link ITimer} array from the micro agents
+		 * {@link MicroAgent#timers} {@link List} and executes the {@link IComponentStep}.
+		 */
 		public Object execute(IInternalAccess ia)
 		{
 			((MicroAgent)ia).timers.remove(ts[0]);
@@ -783,9 +794,22 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 			return null;
 		}
 
+		/**
+		 * @return "microagent.waitFor_#" plus the hash code of this class
+		 */
 		public String toString()
 		{
 			return "microagent.waitFor_#"+this.hashCode();
+		}
+		
+		/**
+		 * Returns the {@link IComponentStep} that is scheduled for execution.
+		 * 
+		 * @return the {@link IComponentStep} that is scheduled for execution
+		 */
+		public IComponentStep getComponentStep()
+		{
+			return run;
 		}
 	}
 }
