@@ -17,37 +17,43 @@ import deco4mas.annotation.agent.CoordinationAnnotation.CoordinationType;
  * - decentralized: realized by a decentralized coordination mechanism.
  * 
  * @author Jan Sudeikat
- *
+ * 
  */
 @XmlRootElement
 public class CausalLink {
-	
-	//----------attributes----------
+
+	// ----------attributes----------
 
 	/** The link identifier. */
 	private String name;
-	
+
 	/** The origination node (identifiers). */
 	private ArrayList<String> from = new ArrayList<String>();
-	
+
 	/** The destination node (identifiers). */
 	private ArrayList<String> to = new ArrayList<String>();
-	
+
 	/** The type of link (positive/negative). */
 	private CoordinationType type;
-	
+
 	/** The interaction rate. */
 	private Double rate;
-	
+
 	/** A identifier of the configuration of the causality enactment. */
 	private String realization;
-	
-	/** Whether the link represents a causal dependency or a flow (source to sink). */
+
+	/**
+	 * Whether the link represents a causal dependency or a flow (source to
+	 * sink).
+	 */
 	private Boolean flow;
-	
-	//----------methods-------------
-	
-	@XmlAttribute(name="name")
+
+	/** The name of the coordination space */
+	private ArrayList<String> spaces;
+
+	// ----------methods-------------
+
+	@XmlAttribute(name = "name")
 	public String getName() {
 		return name;
 	}
@@ -56,8 +62,8 @@ public class CausalLink {
 		this.name = name;
 	}
 
-	@XmlElementWrapper(name="froms")
-	@XmlElement(name="from")
+	@XmlElementWrapper(name = "froms")
+	@XmlElement(name = "from")
 	public ArrayList<String> getFrom() {
 		return from;
 	}
@@ -65,13 +71,13 @@ public class CausalLink {
 	public void setFrom(ArrayList<String> from) {
 		this.from = from;
 	}
-	
-	public void addFrom(SystemProperty prop1){
+
+	public void addFrom(SystemProperty prop1) {
 		this.from.add(prop1.getName());
 	}
 
-	@XmlElementWrapper(name="tos")
-	@XmlElement(name="to")
+	@XmlElementWrapper(name = "tos")
+	@XmlElement(name = "to")
 	public ArrayList<String> getTo() {
 		return to;
 	}
@@ -79,16 +85,16 @@ public class CausalLink {
 	public void setTo(ArrayList<String> to) {
 		this.to = to;
 	}
-	
-	public void addTo(String p){
+
+	public void addTo(String p) {
 		this.to.add(p);
 	}
-	
-	public void addTo(SystemProperty prop){
+
+	public void addTo(SystemProperty prop) {
 		this.to.add(prop.getName());
 	}
 
-	@XmlAttribute(name="type")
+	@XmlAttribute(name = "type")
 	public CoordinationType getType() {
 		return type;
 	}
@@ -96,8 +102,8 @@ public class CausalLink {
 	public void setType(CoordinationType type) {
 		this.type = type;
 	}
-	
-	@XmlAttribute(name="rate")
+
+	@XmlAttribute(name = "rate")
 	public Double getRate() {
 		return rate;
 	}
@@ -105,17 +111,17 @@ public class CausalLink {
 	public void setRate(Double rate) {
 		this.rate = rate;
 	}
-	
-	@XmlAttribute(name="realization")
-	public String getRealization(){
+
+	@XmlAttribute(name = "realization")
+	public String getRealization() {
 		return realization;
 	}
-	
-	public void setRealization(String realization){
+
+	public void setRealization(String realization) {
 		this.realization = realization;
 	}
 
-	@XmlAttribute(name="flow")
+	@XmlAttribute(name = "flow")
 	public Boolean getFlow() {
 		return flow;
 	}
@@ -123,5 +129,13 @@ public class CausalLink {
 	public void setFlow(Boolean flow) {
 		this.flow = flow;
 	}
-	
+
+	@XmlAttribute(name = "spaces", required = false)
+	public ArrayList<String> getSpaces() {
+		return spaces;
+	}
+
+	public void setSpaces(ArrayList<String> spaces) {
+		this.spaces = spaces;
+	}
 }

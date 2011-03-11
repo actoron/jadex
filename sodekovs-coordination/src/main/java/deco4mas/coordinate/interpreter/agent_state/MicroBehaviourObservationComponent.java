@@ -68,13 +68,19 @@ public class MicroBehaviourObservationComponent {
 	private Map<String, ArrayList<String>> agentEventDCMRealizationMappings = new HashMap<String, ArrayList<String>>();
 
 	/**
+	 * An {@link ArrayList} containing the names of the coordination spaces.
+	 */
+	private ArrayList<String> spaces;
+
+	/**
 	 * Constructor.
 	 * 
 	 * @param extAccess
 	 */
-	public MicroBehaviourObservationComponent(IMicroExternalAccess extAccess) {
+	public MicroBehaviourObservationComponent(IMicroExternalAccess extAccess, ArrayList<String> spaces) {
 		this.extAccess = extAccess;
 		this.eventPublication = new CoordinationEventPublication();
+		this.spaces = spaces;
 	}
 
 	/**
@@ -245,9 +251,9 @@ public class MicroBehaviourObservationComponent {
 		coordInfo.addValue(Constants.DML_REALIZATION_NAME, dmlRealizationName);
 
 		IApplicationExternalAccess app = (IApplicationExternalAccess) ma.getParent();
-		// TODO: Hack! CoordinationSpace name is hard coded.
-		CoordinationSpace space = (CoordinationSpace) app.getSpace("mycoordspace");
-		eventPublication.publishEvent(coordInfo, space);
-
+		for (String spaceName : spaces) {
+			CoordinationSpace space = (CoordinationSpace) app.getSpace(spaceName);
+			eventPublication.publishEvent(coordInfo, space);
+		}
 	}
 }

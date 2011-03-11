@@ -8,13 +8,17 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.micro.IMicroExternalAccess;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import deco.lang.dynamics.AgentElementType;
+import deco.lang.dynamics.Causalities;
 import deco.lang.dynamics.MASDynamics;
+import deco.lang.dynamics.causalities.DecentralMechanismLink;
 import deco.lang.dynamics.mechanism.AgentElement;
 import deco.lang.dynamics.mechanism.DecentralizedCausality;
 import deco.lang.dynamics.mechanism.DirectCausality;
@@ -106,12 +110,31 @@ public class InitMicroAgentForCoordination {
 		extAccess.scheduleStep(new IComponentStep() {
 			@Override
 			public Object execute(IInternalAccess ia) {
-				behaviourObserver = new MicroBehaviourObservationComponent(extAccess);
+				ArrayList<String> spaces = getSpaces();
+				behaviourObserver = new MicroBehaviourObservationComponent(extAccess, spaces);
 				agentType = context.getComponentType(ai);
 				initPublishAndPercept();
 				return null;
 			}
 		});
+	}
+
+	/**
+	 * Returns all the names of the used coordination spaces in this
+	 * application.
+	 * 
+	 * @return the names of the used coordination spaces
+	 */
+	private ArrayList<String> getSpaces() {
+		ArrayList<String> spaces = new ArrayList<String>();
+
+		Causalities causalities = masDyn.getCausalities();
+		List<DecentralMechanismLink> dml = causalities.getDml();
+		for (DecentralMechanismLink decentralMechanismLink : dml) {
+			spaces.addAll(decentralMechanismLink.getSpaces());
+		}
+
+		return spaces;
 	}
 
 	/**

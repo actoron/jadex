@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<MASDynamic name="belief_set">
+<MASDynamic name="micro_example">
 	<!--
 		Tuple Space Example: 2D Environment-Interaction Exemplifies how
 		publications of Coordination Information can be triggered by micro 
@@ -37,7 +37,7 @@
 	<causalities>
 		<deco_links>
 			<!-- The encated interdependency: -->
-			<deco_link realization="by_tuple" type="POSITIVE" name="send-receive">
+			<deco_link realization="by_tuple" type="POSITIVE" name="send-receive" spaces="mycoordspace">
 				<froms>
 					<from>sender</from>
 				</froms>
