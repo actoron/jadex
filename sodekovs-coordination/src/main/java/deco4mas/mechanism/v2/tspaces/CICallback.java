@@ -56,6 +56,10 @@ public class CICallback implements Callback {
 //			System.out.println("Result of EventHandler: " + coordInfo.getName());
 //			System.out.println("#CICallback# Firing event percept....");
 			((CoordinationSpace) env_space).publishCoordinationEvent(coordInfo);
+			
+//			coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_TYPE, AgentElementType.BDI_GOAL.toString());
+			
+			
 //			IInternalEvent ie = agent_access.createInternalEvent("trigger_tuple_lookup");
 //			agent_access.dispatchInternalEvent(ie);
 			
