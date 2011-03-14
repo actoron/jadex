@@ -110,9 +110,12 @@ public class BDIBehaviorObservationComponent
 		coordInfo.addValue(CoordinationSpaceObject.AGENT_ARCHITECTURE, "BDI");
 		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_NAME, agentElementName);
 		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_TYPE, agentElementType.toString());
+		//TODO: Transformation of from-event to to-event.
+		//		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_TYPE, AgentElementType.BDI_GOAL.toString());
 		coordInfo.addValue(Constants.VALUE, value);
 		coordInfo.addValue(Constants.PARAMETER_DATA_MAPPING, parameterDataMappings);
-		coordInfo.addValue(Constants.DML_REALIZATION_NAME, dmlRealizationName);
+		coordInfo.addValue(Constants.DML_REALIZATION_NAME, dmlRealizationName);		
+		
 
 		IEnvironmentSpace space = (IEnvironmentSpace) bia.getBeliefbase().getBelief("env").getFact();
 		eventPublication.publishEvent(coordInfo, space);
