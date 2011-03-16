@@ -85,7 +85,7 @@ public class Reader
 	 */
 	public Reader(IObjectReaderHandler handler, boolean bulklink, boolean validate, XMLReporter reporter)
 	{
-		this(handler, bulklink, validate, true, reporter);
+		this(handler, bulklink, validate, false, reporter);
 	}
 	
 	/**
