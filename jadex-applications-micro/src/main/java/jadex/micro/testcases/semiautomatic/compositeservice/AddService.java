@@ -1,4 +1,4 @@
-package jadex.micro.examples.compositeservice;
+package jadex.micro.testcases.semiautomatic.compositeservice;
 
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;

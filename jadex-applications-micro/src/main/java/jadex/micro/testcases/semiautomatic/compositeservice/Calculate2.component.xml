@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3></H3>
+-->
+<componenttype xmlns="http://jadex.sourceforge.net/jadex-component"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-component
+						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
+	name="Calculate2" package="jadex.micro.testcases.semiautomatic.compositeservice">
+	
+	<imports>
+		<import>jadex.commons.service.clock.IClockService</import>
+		<import>jadex.commons.service.SServiceProvider</import>
+		<import>jadex.commons.future.*</import>
+	</imports>
+	
+	<componenttypes>
+		<componenttype name="Calculator" filename="jadex/micro/examples/compositeservice/CalculatorAgent2.class" master="true"/>
+		<componenttype name="Adder" filename="jadex/micro/examples/compositeservice/Adder.component.xml"/>
+		<componenttype name="Subtractor" filename="jadex/micro/examples/compositeservice/Subtractor.component.xml"/>
+	</componenttypes>
+	
+	<applications>
+		<application name="User Agent">
+			<components>
+				<component type="Calculator" name="EmptyCalculator">
+					<!-- <requiredservices>
+						<requiredservice name="addservice" componentname="Adder"/>			
+						<requiredservice name="subservice" componentname="Subtractor"/>			
+					</requiredservices> -->
+				</component>
+				<component type="Adder" name="Adder"/>
+				<component type="Subtractor" name="Subtractor"/>
+			</components>
+		</application>
+	</applications>
+	
+</componenttype>

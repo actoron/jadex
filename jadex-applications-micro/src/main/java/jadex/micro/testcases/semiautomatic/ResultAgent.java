@@ -1,4 +1,4 @@
-package jadex.micro.examples;
+package jadex.micro.testcases.semiautomatic;
 
 import jadex.bridge.Argument;
 import jadex.bridge.CreationInfo;

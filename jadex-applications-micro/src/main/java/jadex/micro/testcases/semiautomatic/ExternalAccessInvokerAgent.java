@@ -1,4 +1,4 @@
-package jadex.micro.examples;
+package jadex.micro.testcases.semiautomatic;
 
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.ComponentSelectorDialog;

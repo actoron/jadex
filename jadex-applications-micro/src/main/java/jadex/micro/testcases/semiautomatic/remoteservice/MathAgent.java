@@ -1,4 +1,4 @@
-package jadex.micro.examples.remoteservice;
+package jadex.micro.testcases.semiautomatic.remoteservice;
 
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;

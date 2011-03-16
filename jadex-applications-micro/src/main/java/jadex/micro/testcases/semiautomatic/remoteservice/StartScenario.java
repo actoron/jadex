@@ -1,4 +1,4 @@
-package jadex.micro.examples.remoteservice;
+package jadex.micro.testcases.semiautomatic.remoteservice;
 
 import jadex.base.Starter;
 import jadex.bridge.ComponentIdentifier;
@@ -67,7 +67,7 @@ public class StartScenario
 									{
 										IComponentManagementService rcms = (IComponentManagementService)result;
 										
-										rcms.createComponent("math", "jadex.micro.examples.remoteservice.MathAgent.class", null, null)
+										rcms.createComponent("math", "jadex.micro.testcases.semiautomatic.remoteservice.MathAgent.class", null, null)
 											.addResultListener(new DefaultResultListener()
 										{
 											public void resultAvailable(Object result)
@@ -83,7 +83,7 @@ public class StartScenario
 												{
 													public void resultAvailable(Object result)
 													{
-														lcms.createComponent("user", "jadex.micro.examples.remoteservice.UserAgent.class", null, new DefaultResultListener()
+														lcms.createComponent("user", "jadex.micro.testcases.semiautomatic.remoteservice.UserAgent.class", null, new DefaultResultListener()
 														{
 															public void resultAvailable(Object result)
 															{

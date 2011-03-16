@@ -1,4 +1,4 @@
-package jadex.micro.examples.remoteservice;
+package jadex.micro.testcases.semiautomatic.remoteservice;
 
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.DefaultResultListener;
@@ -29,7 +29,8 @@ public class ScenarioAgent extends MicroAgent
 					public void resultAvailable(Object result)
 					{
 						String[] libpaths = (String[])((List)result).toArray(new String[0]);
-						StartScenario.startScenario(libpaths).addResultListener(createResultListener(new DefaultResultListener()
+						StartScenario.startScenario(libpaths).addResultListener(
+							createResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object result)
 							{

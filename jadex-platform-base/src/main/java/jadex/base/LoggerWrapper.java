@@ -16,23 +16,31 @@ import java.util.logging.Logger;
  *  The logger wrapper is used to encapsulate
  *  a logger and redirect messages to the logger with
  *  the correct time (according to a clock service).
+ *  
+ *  Overrides the log methods and always sets the log
+ *  record time to the value of the clock service.
+ *  Then delegates the calls to the original logger.
  */
 public class LoggerWrapper extends Logger
 {
+	//-------- attributes --------
+	
+	/** The original logger. */
 	protected Logger logger;
 	
+	/** The clock service. */
 	protected IClockService clock;
-	
-	protected static final int offValue = Level.OFF.intValue();
-	
+
 	// Need to be declared again because they are private in Logger :-((
+	protected static final int offValue = Level.OFF.intValue();
 	protected ResourceBundle catalog;	// Cached resource bundle
 	protected String catalogName;    	// name associated with catalog
-	protected Locale catalogLocale;   // locale associated with catalog
+	protected Locale catalogLocale;   	// locale associated with catalog
 
+	//-------- constructors --------
 	
 	/**
-	 * 
+	 *  Create a new logger wrapper.
 	 */
 	public LoggerWrapper(Logger logger, IClockService clock)
 	{
@@ -41,6 +49,8 @@ public class LoggerWrapper extends Logger
 		this.clock = clock;
 	}
 
+	//-------- methods --------
+	
 	/**
 	 * Retrieve the localization resource bundle for this logger for the current
 	 * default locale. Note that if the result is null, then the Logger will use

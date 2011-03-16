@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3></H3>
+-->
+<componenttype xmlns="http://jadex.sourceforge.net/jadex-component"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-component
+						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
+	name="Adder" package="jadex.micro.testcases.semiautomatic.compositeservice">
+	
+	<services>
+		<providedservice class="ISubService">new SubService($component)</providedservice>
+	</services>
+</componenttype>
