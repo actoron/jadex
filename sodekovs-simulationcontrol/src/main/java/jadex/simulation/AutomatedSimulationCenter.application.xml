@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="UTF-8"?>
 	<!--
 		<H3>This application shows how the automated simulation management
 		works.</H3>
@@ -9,10 +9,6 @@
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="AutomatedSimulationCenter" package="jadex.simulation">
 
-
-	<imports>
-		<import>deco4mas.coordinate.environment.CoordinationSpace</import>
-	</imports>
 	
 	<componenttypes>
 		<componenttype name="SimulationManager"

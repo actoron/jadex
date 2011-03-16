@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- <H3>Responsible for executing a single simulation experiment.</H3> -->
 
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -7,12 +7,8 @@
 	name="RemoteClientSimulator" package="jadex.simulation.remote">
 
 	<imports>
-		<import>jadex.base.fipa.*</import>
 		<import>java.util.*</import>
-		<import>java.util.logging.*</import>
-		<import>jadex.simulation.model.Observer</import>
 		<import>jadex.simulation.client.*</import>
-		<import>jadex.application.space.envsupport.environment.*</import>
 	</imports>
 
 

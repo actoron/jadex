@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- <H3>The mars world application descriptor</H3> Can be used to launch 
 	the mars world example.<br> It consists of three different kinds of agents:<br> 
 	- <b>Sentry agents</b> are responsible for examining ore locations<br> A 
