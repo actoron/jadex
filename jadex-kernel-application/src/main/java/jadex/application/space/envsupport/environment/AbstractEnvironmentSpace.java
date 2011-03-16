@@ -392,6 +392,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				if(owner==null)
 					throw new RuntimeException("Attribute 'owner' required for avatar: "+mobj);
 				IComponentIdentifier	ownerid	= null;
+				
+				// HACK!!! Do not use ThreadSuspendable
 				IComponentManagementService ces = ((IComponentManagementService)SServiceProvider.getServiceUpwards
 					(context.getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable()));
 				if(owner.indexOf("@")!=-1)

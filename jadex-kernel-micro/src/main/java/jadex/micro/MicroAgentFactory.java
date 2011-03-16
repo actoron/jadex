@@ -33,6 +33,7 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
 import java.io.BufferedInputStream;
@@ -245,13 +246,13 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			if(metainfo==null)
 				metainfo = new MicroAgentMetaInfo();
 			Results val = (Results)cma.getAnnotation(Results.class);
-			Argument[] vals = val.value();
+			Result[] vals = val.value();
 			IArgument[] tmpresults = new IArgument[vals.length];
 			for(int i=0; i<vals.length; i++)
 			{
-				Object res = SJavaParser.evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
+//				Object res = SJavaParser.evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
 				tmpresults[i] = new jadex.bridge.Argument(vals[i].name(), 
-					vals[i].description(), vals[i].typename(), res);
+					vals[i].description(), vals[i].typename(), null);
 				resmap.put(tmpresults[i].getName(), tmpresults[i]);
 			}
 			metainfo.setResults(tmpresults);

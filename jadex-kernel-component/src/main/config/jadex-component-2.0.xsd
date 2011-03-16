@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-application" xmlns="http://jadex.sourceforge.net/jadex-application" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
-	<xs:element name="componenttype" type="subcomponenttype">
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-application" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://jadex.sourceforge.net/jadex-application" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+	<xs:element name="componenttype" type="componenttype">
 		<xs:annotation>
 			<xs:documentation>An application type specifies the structure and content of a agent application.</xs:documentation>
 		</xs:annotation>
@@ -10,131 +10,129 @@
 		<xs:annotation>
 			<xs:documentation>An application type specifies the structure and content of a agent application.</xs:documentation>
 		</xs:annotation>
-		<xs:complexContent>
-			<xs:extension base="startabletype">
-				<xs:sequence>
-					<xs:element name="imports" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>
+		<xs:sequence>
+			<xs:element name="imports" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
 						Imports allow to add packages (e.g. java.util.*)
 						and classes (e.g. java.util.Map) to the class
 						lookup mechanism.
 					</xs:documentation>
-						</xs:annotation>
-						<xs:complexType>
-							<xs:sequence>
-								<xs:element name="import" type="import" minOccurs="0" maxOccurs="unbounded">
-									<xs:annotation>
-										<xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="import" type="import" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>
 									An import allows to add a package
 									(e.g. java.util.*) or a class (e.g.
 									java.util.Map) to the class lookup
 									mechanism.
 								</xs:documentation>
-									</xs:annotation>
-								</xs:element>
-							</xs:sequence>
-						</xs:complexType>
-					</xs:element>
-					<xs:element name="arguments" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="arguments" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
 						Container for argument and result
 						specifications.
 					</xs:documentation>
-						</xs:annotation>
-						<xs:complexType>
-							<xs:sequence>
-								<xs:element name="argument" type="argumenttype" minOccurs="0" maxOccurs="unbounded">
-									<xs:annotation>
-										<xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="argument" type="argumenttype" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>
 									An argument represents an
 									in-parameter for the component.
 								</xs:documentation>
-									</xs:annotation>
-								</xs:element>
-								<xs:element name="result" type="argumenttype" minOccurs="0" maxOccurs="unbounded">
-									<xs:annotation>
-										<xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="result" type="argumenttype" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>
 									An argument represents an
 									out-parameter for the component.
 								</xs:documentation>
-									</xs:annotation>
-								</xs:element>
-							</xs:sequence>
-						</xs:complexType>
-					</xs:element>
-					<xs:element name="componenttypes" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="componenttypes" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
 						Container for the used component types.
 					</xs:documentation>
-						</xs:annotation>
-						<xs:complexType>
-							<xs:sequence>
-								<xs:element name="componenttype" type="componenttype" minOccurs="0" maxOccurs="unbounded">
-									<xs:annotation>
-										<xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="componenttype" type="subcomponenttype" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>
 									A component type is defined by a
 									logical name and an implementation
 									file.
 								</xs:documentation>
-									</xs:annotation>
-								</xs:element>
-							</xs:sequence>
-						</xs:complexType>
-					</xs:element>
-					<xs:element name="services" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>Service declarations of the application type.</xs:documentation>
-						</xs:annotation>
-						<xs:complexType>
-							<xs:sequence>
-								<xs:element name="providedservice" type="providedservicetype" minOccurs="0" maxOccurs="unbounded"/>
-								<xs:element name="requiredservice" type="requiredservicetype" minOccurs="0" maxOccurs="unbounded"/>
-							</xs:sequence>
-						</xs:complexType>
-					</xs:element>
-					<xs:element name="properties" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>Properties for specifiying settings of the application type.</xs:documentation>
-						</xs:annotation>
-						<xs:complexType>
-							<xs:sequence>
-								<xs:element name="property" type="propertytype" minOccurs="0" maxOccurs="unbounded"/>
-							</xs:sequence>
-						</xs:complexType>
-					</xs:element>
-					<xs:element name="configurations" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="services" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Service declarations of the application type.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="providedservice" type="providedservicetype" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="requiredservice" type="requiredservicetype" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="properties" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Properties for specifiying settings of the application type.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="property" type="propertytype" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="configurations" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
 						In the applications section, predefined
 						application configurations (i.e. application
 						instances) can be defined.
 					</xs:documentation>
-						</xs:annotation>
-						<xs:complexType>
-							<xs:sequence>
-								<xs:element name="configuration" type="configuration" minOccurs="0" maxOccurs="unbounded">
-									<xs:annotation>
-										<xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="configuration" type="configuration" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>
 									A predefined application
 									configuration.
 								</xs:documentation>
-									</xs:annotation>
-								</xs:element>
-							</xs:sequence>
-						</xs:complexType>
-					</xs:element>
-				</xs:sequence>
-				<xs:attribute name="name" type="xs:string" use="required"/>
-				<xs:attribute name="package" type="xs:string" use="optional"/>
-			</xs:extension>
-		</xs:complexContent>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="name" type="xs:string" use="required"/>
+					<xs:attribute name="package" type="xs:string" use="optional"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="package" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<xs:complexType name="subcomponenttype">
 		<xs:annotation>
-			<xs:documentation>Defines an agent type.</xs:documentation>
+			<xs:documentation>Defines a component type.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="startabletype">
@@ -272,12 +270,12 @@
 		<xs:attribute name="scope" use="optional" default="application">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="local"></xs:enumeration>
-					<xs:enumeration value="component"></xs:enumeration>
-					<xs:enumeration value="application"></xs:enumeration>
-					<xs:enumeration value="platform"></xs:enumeration>
-					<xs:enumeration value="global"></xs:enumeration>
-					<xs:enumeration value="upwards"></xs:enumeration>
+					<xs:enumeration value="local"/>
+					<xs:enumeration value="component"/>
+					<xs:enumeration value="application"/>
+					<xs:enumeration value="platform"/>
+					<xs:enumeration value="global"/>
+					<xs:enumeration value="upwards"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>

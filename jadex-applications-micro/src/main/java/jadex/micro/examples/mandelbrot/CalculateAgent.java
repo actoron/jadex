@@ -33,19 +33,6 @@ public class CalculateAgent extends MicroAgent
 	
 	//-------- methods --------
 	
-//	/**
-//	 *  Called once after agent creation.
-//	 */
-//	public void agentCreated()
-//	{
-//		// Calculation service runs on component thread.
-//		addService(new CalculateService(this));
-//		
-//		// Progress service runs on separate thread to provide
-//		// progress information about running calculations.
-//		addDirectService(new ProgressService(this));
-//	}
-	
 	/**
 	 *  Execute the body.
 	 */

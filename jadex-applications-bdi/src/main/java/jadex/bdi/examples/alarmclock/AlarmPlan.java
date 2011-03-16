@@ -1,5 +1,8 @@
 package jadex.bdi.examples.alarmclock;
 
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;

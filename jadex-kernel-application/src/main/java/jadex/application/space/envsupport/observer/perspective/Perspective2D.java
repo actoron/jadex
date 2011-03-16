@@ -347,8 +347,7 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 			try
 			{
 				if (!Class.forName("jadex.application.space.envsupport.observer.graphics.opengl.ViewportJOGL",
-						true,
-						Thread.currentThread().getContextClassLoader()).isInstance(viewport))
+					true, Thread.currentThread().getContextClassLoader()).isInstance(viewport))
 					return false;
 			}
 			catch (ClassNotFoundException e)
@@ -710,9 +709,8 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 			try
 			{
 				Constructor con = Class.forName("jadex.application.space.envsupport.observer.graphics.opengl.ViewportJOGL",
-												true,
-												Thread.currentThread().getContextClassLoader())
-													.getConstructor(new Class[] {IPerspective.class, ClassLoader.class});
+					true,Thread.currentThread().getContextClassLoader())
+						.getConstructor(new Class[] {IPerspective.class, ClassLoader.class});
 				viewport = (IViewport) con.newInstance(new Object[] {persp, cl});
 			}
 			catch (Exception e0)

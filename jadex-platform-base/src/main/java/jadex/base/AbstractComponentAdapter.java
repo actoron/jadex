@@ -22,8 +22,11 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.service.IServiceContainer;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.ServiceNotFoundException;
+import jadex.commons.service.clock.IClockService;
+import jadex.commons.service.execution.IExecutionService;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -102,6 +105,13 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	/** Does the instance want to be executed again. */
 	protected boolean	again;
 	
+	
+	/** The cached cms. */
+	protected IComponentManagementService	cms;
+
+	/** The cached clock service. */
+	protected IClockService clock;
+	
 	//-------- constructors --------
 
 	/**
@@ -135,32 +145,46 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	{
 //		System.err.println("wakeup: "+getComponentIdentifier());		
 		
-		wokenup	= true;
-
-		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
-			throw new ComponentTerminatedException(cid);
-		
-		// Set processing state to ready if not running.
-		if(IComponentDescription.PROCESSINGSTATE_IDLE.equals(desc.getProcessingState()))
+		if(clock==null)
 		{
-			getCMS().addResultListener(new DefaultResultListener()
+			SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
-					((ComponentManagementService)result).setProcessingState(cid, IComponentDescription.PROCESSINGSTATE_READY);
+					clock = (IClockService)result;
+					wakeup();
 				}
-				public void exceptionOccurred(Exception exception)
-				{
-					// Might happen during platform init -> ignore
-				}
-			});				
+			});
 		}
-		
-		// Resume execution of the component.
-		if(IComponentDescription.STATE_ACTIVE.equals(desc.getState())
-			|| IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))	// Hack!!! external entries must also be executed in suspended state.
+		else
 		{
-			doWakeup();
+			wokenup	= true;
+			if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
+				throw new ComponentTerminatedException(cid);
+			
+			// Set processing state to ready if not running.
+			if(IComponentDescription.PROCESSINGSTATE_IDLE.equals(desc.getProcessingState()))
+			{
+				getCMS().addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+						((ComponentManagementService)result).setProcessingState(cid, IComponentDescription.PROCESSINGSTATE_READY);
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						// Might happen during platform init -> ignore
+					}
+				});				
+			}
+			
+			// Resume execution of the component.
+			if(IComponentDescription.STATE_ACTIVE.equals(desc.getState())
+				|| IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))	// Hack!!! external entries must also be executed in suspended state.
+			{
+				doWakeup();
+			}
 		}
 	}
 
@@ -179,28 +203,33 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public Logger getLogger()
 	{
-		// todo: problem: loggers can cause memory leaks
-		// http://bugs.sun.com/view_bug.do;jsessionid=bbdb212815ddc52fcd1384b468b?bug_id=4811930
-		
-		// Todo: include parent name for nested loggers.
-		String name = getComponentIdentifier().getLocalName();
-		logger = LogManager.getLogManager().getLogger(name);
-		
-		// if logger does not already exists, create it
 		if(logger==null)
 		{
-			// Hack!!! Might throw exception in applet / webstart.
-			try
+			// todo: problem: loggers can cause memory leaks
+			// http://bugs.sun.com/view_bug.do;jsessionid=bbdb212815ddc52fcd1384b468b?bug_id=4811930
+			
+			// Todo: include parent name for nested loggers.
+			String name = getComponentIdentifier().getLocalName();
+			logger = LogManager.getLogManager().getLogger(name);
+			
+			// if logger does not already exists, create it
+			if(logger==null)
 			{
-				logger = Logger.getLogger(name);
-				initLogger(logger);
-				//System.out.println(logger.getParent().getLevel());
-			}
-			catch(SecurityException e)
-			{
-				// Hack!!! For applets / webstart use anonymous logger.
-				logger = Logger.getAnonymousLogger();
-				initLogger(logger);
+				// Hack!!! Might throw exception in applet / webstart.
+				try
+				{
+					logger = Logger.getLogger(name);
+					initLogger(logger);
+					logger = new LoggerWrapper(logger, clock);
+					//System.out.println(logger.getParent().getLevel());
+				}
+				catch(SecurityException e)
+				{
+					// Hack!!! For applets / webstart use anonymous logger.
+					logger = Logger.getAnonymousLogger();
+					initLogger(logger);
+					logger = new LoggerWrapper(logger, clock);
+				}
 			}
 		}
 		
@@ -415,9 +444,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	{
 		return component.getServiceContainer();
 	}
-
-	/** The cached cms. */
-	protected IComponentManagementService	cms;
 	
 	/**
 	 *  Get the (cached) cms.
@@ -449,7 +475,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		}
 		return ret;
 	}
-
 	
 	//-------- methods called by the standalone platform --------
 	

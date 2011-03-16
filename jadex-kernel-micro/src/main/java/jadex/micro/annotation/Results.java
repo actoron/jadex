@@ -15,5 +15,5 @@ public @interface Results
 	/**
 	 *  The results.
 	 */
-	public Argument[] value() default {};
+	public Result[] value() default {};
 }
