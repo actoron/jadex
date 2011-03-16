@@ -122,9 +122,7 @@ public class CoordinationSpace extends Grid2D {
 	// initCoordinationMechanisms();
 	// }
 	/**
-	 * Used to CONSUME!!! Coordination Events, that are produced by the Agent
-	 * State Interpreter, and to pass them to the Coordination Medium
-	 * (Endpoint).
+	 * Used to CONSUME!!! Coordination Events, that are produced by the Agent State Interpreter, and to pass them to the Coordination Medium (Endpoint).
 	 * 
 	 * @param obj
 	 */
@@ -142,21 +140,17 @@ public class CoordinationSpace extends Grid2D {
 	// setter and getter for coordinationMedium
 
 	/**
-	 * Used to publish Coordination Events that are produced by the Coordination
-	 * Mechanism, i.e. those coordination information that have been produced by
-	 * the medium and that can be perceived by the agents via their Coordination
-	 * Information Interpreter.
+	 * Used to publish Coordination Events that are produced by the Coordination Mechanism, i.e. those coordination information that have been produced by the medium and that can be perceived by the
+	 * agents via their Coordination Information Interpreter.
 	 * 
 	 * @param objFperce
 	 */
 	public void publishCoordinationEvent(Object obj) {
 		// pass event the currently used coordination medium
 		// System.out.println("#CoordinationSpace# EnvironentEvent fired...");
-		ISpaceObject newObj = this.createSpaceObject("CoordinationSpaceObject",
-				((CoordinationInformation) obj).getValues(), null);
+		ISpaceObject newObj = this.createSpaceObject("CoordinationSpaceObject", ((CoordinationInformation) obj).getValues(), null);
 		newObj.setProperty(Constants.ROLE_DEFINITIONS_FOR_PERCEIVE, agentData);
-		this.fireEnvironmentEvent(new EnvironmentEvent(CoordinationEvent.COORDINATE_START, this, newObj, new String(
-				"Coordinate Event Nr...."), null));
+		this.fireEnvironmentEvent(new EnvironmentEvent(CoordinationEvent.COORDINATE_START, this, newObj, new String("Coordinate Event Nr...."), null));
 	}
 
 	/**
@@ -194,17 +188,13 @@ public class CoordinationSpace extends Grid2D {
 	}
 
 	/**
-	 * This methods causes the creation of the
-	 * INIT_Deco4MAS_Coordination-Percept. This percept is perceived by those
-	 * Agent which participate as "active parts/members", means those agents
-	 * that create percepts. The percept triggers a plan within the agents and
-	 * initializes the "Agent-State-Interpreter"
-	 * /"Agent Behaviour Observation Component".
+	 * This methods causes the creation of the INIT_Deco4MAS_Coordination-Percept. This percept is perceived by those Agent which participate as "active parts/members", means those agents that create
+	 * percepts. The percept triggers a plan within the agents and initializes the "Agent-State-Interpreter" /"Agent Behaviour Observation Component".
 	 */
 	private void initParticipatingAgent(final IComponentIdentifier ai) {
 		// get the IComponentManagementService
-		IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getServiceUpwards(
-				this.getContext().getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
+		IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getServiceUpwards(this.getContext().getServiceProvider(), IComponentManagementService.class).get(
+				new ThreadSuspendable());
 
 		// get the external access for the agent
 		IFuture fut = cms.getExternalAccess(ai);
@@ -219,13 +209,11 @@ public class CoordinationSpace extends Grid2D {
 				if (externalAccess instanceof IBDIExternalAccess) {
 					IBDIExternalAccess exta = (IBDIExternalAccess) externalAccess;
 
-					new InitBDIAgentForCoordination().startInits(ai, exta, CoordinationSpace.this.getContext(),
-							CoordinationSpace.this, masDnyModel);
+					new InitBDIAgentForCoordination().startInits(ai, exta, CoordinationSpace.this.getContext(), CoordinationSpace.this, masDnyModel);
 				} else if (externalAccess instanceof IMicroExternalAccess) {
 					IMicroExternalAccess exta = (IMicroExternalAccess) externalAccess;
 
-					new InitMicroAgentForCoordination().startInits(ai, exta, CoordinationSpace.this.getContext(),
-							CoordinationSpace.this, masDnyModel);
+					new InitMicroAgentForCoordination().startInits(ai, exta, CoordinationSpace.this.getContext(), CoordinationSpace.this, masDnyModel);
 				}
 			}
 

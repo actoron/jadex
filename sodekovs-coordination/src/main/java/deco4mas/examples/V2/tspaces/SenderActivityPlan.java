@@ -17,7 +17,7 @@ public class SenderActivityPlan extends Plan {
 
 	public void body() {
 
-		waitFor(7000);		
+		waitFor(3500);		
 		
 
 		

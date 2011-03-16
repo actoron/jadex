@@ -32,8 +32,7 @@ import deco4mas.helper.Constants;
 import deco4mas.helper.SJavaParser;
 
 /**
- * Checks, whether the agent is within the role, which is necessary to
- * publish/perceive the specified element(i.e. goal, belief, beliefset)
+ * Checks, whether the agent is within the role, which is necessary to publish/perceive the specified element(i.e. goal, belief, beliefset)
  * 
  * @author Ante Vilenica & Thomas Preisler
  * 
@@ -103,11 +102,9 @@ public class CheckRole {
 	// }
 
 	/**
-	 * Used to check the role when coordination events should be "PUBLISHED"
-	 * (PUBLICATION).
+	 * Used to check the role when coordination events should be "PUBLISHED" (PUBLICATION).
 	 * 
-	 * Check, whether the role is active for the specified element. Maps the
-	 * parameter and data associated with this role, if role is active.
+	 * Check, whether the role is active for the specified element. Maps the parameter and data associated with this role, if role is active.
 	 * 
 	 * @param agentReference
 	 * @param bia
@@ -115,8 +112,7 @@ public class CheckRole {
 	 * @param ae
 	 * @return if return=null, then check_false, i.e. the role is not active.
 	 */
-	public static HashMap<String, Object> checkForPublish(AgentReference agentReference, AgentElement ae,
-			AgentEvent agentEvent, IBDIInternalAccess bia) {
+	public static HashMap<String, Object> checkForPublish(AgentReference agentReference, AgentElement ae, AgentEvent agentEvent, IBDIInternalAccess bia) {
 
 		HashMap<String, Object> parameters = null;
 
@@ -272,8 +268,7 @@ public class CheckRole {
 			// }
 
 			// TODO: HACK! Implement the ExpressionChecker
-			if (agentReference.getContraints().getCondition().getExpression() != null
-					&& agentReference.getContraints().getCondition().getExpression().length() > 0) {
+			if (agentReference.getContraints().getCondition().getExpression() != null && agentReference.getContraints().getCondition().getExpression().length() > 0) {
 
 				// Map<String, Object> decom4MasMap = (Map<String, Object>)
 				// exta.getBeliefbase().getBelief(Constants.DECO4MAS_BELIEF_NAME).getFact();
@@ -339,8 +334,7 @@ public class CheckRole {
 					}
 
 					if (inhib.getAgent_element_type().toString().equalsIgnoreCase(AgentElementType.BDI_PLAN.toString())) {
-						IPlan[] pl = bia.getPlanbase().getPlans(); // fetch
-																	// plans:
+						IPlan[] pl = bia.getPlanbase().getPlans(); // fetch plans:
 						for (IPlan p : pl) {
 							if (p.getType().equals(inhib.getElement_id())) {
 								result = false;
@@ -348,10 +342,8 @@ public class CheckRole {
 						}
 					}
 
-					if (inhib.getAgent_element_type().toString()
-							.equalsIgnoreCase(AgentElementType.BDI_BELIEF.toString())) {
-						String[] bs = bia.getBeliefbase().getBeliefNames(); // fetch
-																			// beliefs:
+					if (inhib.getAgent_element_type().toString().equalsIgnoreCase(AgentElementType.BDI_BELIEF.toString())) {
+						String[] bs = bia.getBeliefbase().getBeliefNames(); // fetch beliefs:
 						for (String b : bs) {
 							if (b.equals(inhib.getElement_id())) {
 								if (bia.getBeliefbase().getBelief(b) != null) {
@@ -361,10 +353,8 @@ public class CheckRole {
 						}
 					}
 
-					if (inhib.getAgent_element_type().toString()
-							.equalsIgnoreCase(AgentElementType.BDI_BELIEFSET.toString())) {
-						String[] bs = bia.getBeliefbase().getBeliefSetNames(); // fetch
-																				// beliefSets:
+					if (inhib.getAgent_element_type().toString().equalsIgnoreCase(AgentElementType.BDI_BELIEFSET.toString())) {
+						String[] bs = bia.getBeliefbase().getBeliefSetNames(); // fetch beliefSets:
 						for (String b : bs) {
 							if (b.equals(inhib.getElement_id())) {
 								if ((Integer) bia.getBeliefbase().getBeliefSetNames().length < 0) {
@@ -446,26 +436,14 @@ public class CheckRole {
 	private static Object getMappedAgentData(final DataMapping dm, final IBDIInternalAccess bia) {
 		Object result = new Object();
 
-		if (dm.getElementType().equals(AgentElementType.BDI_BELIEF.toString())) { // handle
-																					// belief
-																					// mapping
-			if (dm.getData_type().equalsIgnoreCase(Constants.BELIEF_UPDATE_IDENTIFIER)) { // when
-																							// the
-																							// right
-																							// content
-																							// type
-																							// ("content")
-																							// has
-																							// been
-																							// specified
+		if (dm.getElementType().equals(AgentElementType.BDI_BELIEF.toString())) { // handle belief mapping
+			if (dm.getData_type().equalsIgnoreCase(Constants.BELIEF_UPDATE_IDENTIFIER)) { // when the right content type ("content") has been specified
 				IBelief b = bia.getBeliefbase().getBelief(dm.getElement_name());
 				result = b.getFact();
 			} // else ignore as beliefs have not parameters.
 		}
 
-		if (dm.getElementType().equals(AgentElementType.BDI_GOAL.toString())) { // handle
-																				// goal
-																				// mapping
+		if (dm.getElementType().equals(AgentElementType.BDI_GOAL.toString())) { // handle goal mapping																				
 			IGoal[] goals = bia.getGoalbase().getGoals();
 			for (IGoal g : goals) {
 				if (g.getType().equalsIgnoreCase(dm.getElement_name())) {
@@ -476,9 +454,7 @@ public class CheckRole {
 			} // else ignore as beliefs have not parameters.
 		}
 
-		if (dm.getElementType().equals(AgentElementType.BDI_PLAN.toString())) { // handle
-																				// plan
-																				// mapping
+		if (dm.getElementType().equals(AgentElementType.BDI_PLAN.toString())) { // handle plan mapping
 			IPlan[] plans = bia.getPlanbase().getPlans();
 			for (IPlan p : plans) {
 				if (p.getType().equalsIgnoreCase(dm.getElement_name())) {
@@ -492,11 +468,9 @@ public class CheckRole {
 	}
 
 	/**
-	 * Used to check the role when coordination events should be "PUBLISHED"
-	 * (PUBLICATION).
+	 * Used to check the role when coordination events should be "PUBLISHED" (PUBLICATION).
 	 * 
-	 * Check, whether the role is active for the specified element. Maps the
-	 * parameter and data associated with this role, if role is active. *
+	 * Check, whether the role is active for the specified element. Maps the parameter and data associated with this role, if role is active. *
 	 * 
 	 * @param agentReference
 	 * @param agentElement
@@ -504,8 +478,7 @@ public class CheckRole {
 	 * @param ma
 	 * @return
 	 */
-	public static HashMap<String, Object> checkForPublishMicro(AgentReference agentReference,
-			AgentElement agentElement, IComponentStep runStep, MicroAgent ma) {
+	public static HashMap<String, Object> checkForPublishMicro(AgentReference agentReference, AgentElement agentElement, IComponentStep runStep, MicroAgent ma) {
 
 		HashMap<String, Object> parameters = null;
 
@@ -517,9 +490,7 @@ public class CheckRole {
 				try {
 					Field field = clazz.getDeclaredField(pm.getLocalName());
 					Object value = field.get(runStep);
-
 					parameters.put(pm.getRef(), value);
-
 				} catch (SecurityException e) {
 					e.printStackTrace();
 				} catch (NoSuchFieldException e) {
@@ -536,14 +507,11 @@ public class CheckRole {
 	}
 
 	/**
-	 * Used to check constraints for given {@link AgentReference} and
-	 * {@link MicroAgent}.
+	 * Used to check constraints for given {@link AgentReference} and {@link MicroAgent}.
 	 * 
 	 * @param agentReference
 	 * @param ma
-	 * @return Currently this method only returns <code>true</code> because the
-	 *         constraint support for the micro agents still needs to be
-	 *         implemented
+	 * @return Currently this method only returns <code>true</code> because the constraint support for the micro agents still needs to be implemented
 	 */
 	private static boolean checkCondition(AgentReference agentReference, MicroAgent ma) {
 		// TODO Implement constraint support for micro agents

@@ -27,9 +27,7 @@ import deco4mas.helper.Constants;
 import deco4mas.mechanism.CoordinationInfo;
 
 /**
- * This component is called on agent init and observes the agent. If an event
- * occurs that is relevant for the coordination this event is dispatched to the
- * "Coordination Event Publication".
+ * This component is called on agent init and observes the agent. If an event occurs that is relevant for the coordination this event is dispatched to the "Coordination Event Publication".
  * 
  * @author Thomas Preisler
  */
@@ -45,25 +43,18 @@ public class MicroBehaviourObservationComponent {
 	private Map<String, AgentReference> roleDefinitionsForPublish = new HashMap<String, AgentReference>();
 
 	/**
-	 * Maps the roles that are used within "PERCEIVE". The String is the name of
-	 * the DCM. The array holds the corresponding
-	 * DecentralCoordinationInformation (position 0) and AgentElement (position
-	 * 1).
+	 * Maps the roles that are used within "PERCEIVE". The String is the name of the DCM. The array holds the corresponding DecentralCoordinationInformation (position 0) and AgentElement (position 1).
 	 */
 	private Map<String, Set<Object[]>> roleDefinitionsForPerceive = new HashMap<String, Set<Object[]>>();
 
 	/**
-	 * This mapping contains the parameter and data mappings of the
-	 * deco-link-realization.
+	 * This mapping contains the parameter and data mappings of the deco-link-realization.
 	 */
 	private Map<String, AgentElement> parameterAndDataMappings = new HashMap<String, AgentElement>();
 
 	/**
-	 * Contains the mapping from an event inside an agent, i.e. a goal is
-	 * dispatched, a beliefset has changed , and maps these events to those DCM
-	 * Realizations, that should trigger a publish, when these event has
-	 * appeared using their specific medium. Other explanation: which agentEvent
-	 * is references within which DCM-Realization!
+	 * Contains the mapping from an event inside an agent, i.e. a goal is dispatched, a beliefset has changed , and maps these events to those DCM Realizations, that should trigger a publish, when
+	 * these event has appeared using their specific medium. Other explanation: which agentEvent is references within which DCM-Realization!
 	 */
 	private Map<String, ArrayList<String>> agentEventDCMRealizationMappings = new HashMap<String, ArrayList<String>>();
 
@@ -84,18 +75,14 @@ public class MicroBehaviourObservationComponent {
 	}
 
 	/**
-	 * This method initializes the {@link IComponentStep}-Listener for the
-	 * agent. When ever an {@link IComponentStep} is scheduled in the agent (
-	 * {@link IChangeListener} on "addStep"-Events in the according
-	 * {@link MicroAgentInterpreter}) the {@link IChangeListener} is called and
-	 * checks whether the {@link IComponentStep} is mapped in the Decomas-File.
+	 * This method initializes the {@link IComponentStep}-Listener for the agent. When ever an {@link IComponentStep} is scheduled in the agent ( {@link IChangeListener} on "addStep"-Events in the
+	 * according {@link MicroAgentInterpreter}) the {@link IChangeListener} is called and checks whether the {@link IComponentStep} is mapped in the Decomas-File.
 	 * 
 	 * @param agentElement
 	 * @param mechanismRealizationId
 	 */
 	public void initMicroStepListener(final AgentElement agentElement, String mechanismRealizationId) {
-		addValueToMap(agentEventDCMRealizationMappings,
-				AgentElementType.MICRO_STEP + "::" + agentElement.getElement_id(), mechanismRealizationId);
+		addValueToMap(agentEventDCMRealizationMappings, AgentElementType.MICRO_STEP + "::" + agentElement.getElement_id(), mechanismRealizationId);
 
 		ExternalAccess externalAccess = (ExternalAccess) extAccess;
 		MicroAgentInterpreter interpreter = externalAccess.getInterpreter();
@@ -112,8 +99,7 @@ public class MicroBehaviourObservationComponent {
 						IComponentStep runStep = waitForStep.getComponentStep();
 						String nameOfElement = runStep.getClass().getSimpleName();
 
-						if (agentElement.getAgentElementType().equals(AgentElementType.MICRO_STEP.toString())
-								&& agentElement.getElement_id().equals(nameOfElement)) {
+						if (agentElement.getAgentElementType().equals(AgentElementType.MICRO_STEP.toString()) && agentElement.getElement_id().equals(nameOfElement)) {
 							checkAndPublishIfApplicable(runStep, AgentElementType.MICRO_STEP, nameOfElement);
 						}
 					}
@@ -123,16 +109,14 @@ public class MicroBehaviourObservationComponent {
 	}
 
 	/**
-	 * Check for each received event whether the role definition is active for
-	 * ALL DCM that are interested in this event (i.e. that have registered an
-	 * listener) and dispatch event to medium if role definition is satisfied.
+	 * Check for each received event whether the role definition is active for ALL DCM that are interested in this event (i.e. that have registered an listener) and dispatch event to medium if role
+	 * definition is satisfied.
 	 * 
 	 * @param runStep
 	 * @param agentElementType
 	 * @param nameOfElement
 	 */
-	private void checkAndPublishIfApplicable(final IComponentStep runStep, final AgentElementType agentElementType,
-			final String nameOfElement) {
+	private void checkAndPublishIfApplicable(final IComponentStep runStep, final AgentElementType agentElementType, final String nameOfElement) {
 		extAccess.scheduleStep(new IComponentStep() {
 
 			@Override
@@ -141,19 +125,15 @@ public class MicroBehaviourObservationComponent {
 
 				// get all the DCM Realizations that have the current AgentEvent
 				// as initiator for a PUBLISH-Event
-				List<String> realizationNames = agentEventDCMRealizationMappings.get(agentElementType.toString() + "::"
-						+ nameOfElement);
+				List<String> realizationNames = agentEventDCMRealizationMappings.get(agentElementType.toString() + "::" + nameOfElement);
 				for (String dmlRealizationName : realizationNames) {
 					// Check whether role is active.
-					HashMap<String, Object> parameterDataMappings = publishWhenApplicable(dmlRealizationName + "::"
-							+ nameOfElement, runStep, agentElementType, ma);
+					HashMap<String, Object> parameterDataMappings = publishWhenApplicable(dmlRealizationName + "::" + nameOfElement, runStep, agentElementType, ma);
 
 					if (parameterDataMappings != null) {
-						publishEvent(nameOfElement, parameterDataMappings, nameOfElement, agentElementType,
-								dmlRealizationName, ma);
+						publishEvent(nameOfElement, parameterDataMappings, nameOfElement, agentElementType, dmlRealizationName, ma);
 					} else {
-						System.out
-								.println("#MicroBehaviorObservationComponent# Role inactive. Event not published to medium or direct publish.");
+						System.out.println("#MicroBehaviorObservationComponent# Role inactive. Event not published to medium or direct publish.");
 					}
 				}
 
@@ -163,23 +143,18 @@ public class MicroBehaviourObservationComponent {
 	}
 
 	/**
-	 * Check the role condition for this Event. If the Agent has the specified
-	 * role than publish the event to the coordination medium.
+	 * Check the role condition for this Event. If the Agent has the specified role than publish the event to the coordination medium.
 	 * 
 	 * @param key
 	 * @param runStep
 	 * @param agentElementType
 	 * @param ma
 	 *            partial key name
-	 * @return if !=null then applicable. contains then a map of the parameter
-	 *         and data mappings
+	 * @return if !=null then applicable. contains then a map of the parameter and data mappings
 	 */
-	private HashMap<String, Object> publishWhenApplicable(String key, IComponentStep runStep,
-			AgentElementType agentElementType, MicroAgent ma) {
-		return CheckRole.checkForPublishMicro(
-				roleDefinitionsForPublish.get(Constants.PUBLISH + "::" + key + "::" + agentElementType.toString()),
-				parameterAndDataMappings.get(Constants.PUBLISH + "::" + key + "::" + agentElementType.toString()),
-				runStep, ma);
+	private HashMap<String, Object> publishWhenApplicable(String key, IComponentStep runStep, AgentElementType agentElementType, MicroAgent ma) {
+		return CheckRole.checkForPublishMicro(roleDefinitionsForPublish.get(Constants.PUBLISH + "::" + key + "::" + agentElementType.toString()),
+				parameterAndDataMappings.get(Constants.PUBLISH + "::" + key + "::" + agentElementType.toString()), runStep, ma);
 	}
 
 	/**
@@ -209,10 +184,8 @@ public class MicroBehaviourObservationComponent {
 	}
 
 	/**
-	 * Get the role definitions that are used within the "PERCEIVE". The String
-	 * is the name of the DCM. The array holds the corresponding
-	 * DecentralCoordinationInformation (position 0) and AgentElement (position
-	 * 1).
+	 * Get the role definitions that are used within the "PERCEIVE". The String is the name of the DCM. The array holds the corresponding DecentralCoordinationInformation (position 0) and AgentElement
+	 * (position 1).
 	 * 
 	 * @return the roleDefinitions
 	 */
@@ -228,8 +201,7 @@ public class MicroBehaviourObservationComponent {
 	}
 
 	/**
-	 * Publish/Dispatch the occurred event to the
-	 * "Coordination Event Publication".
+	 * Publish/Dispatch the occurred event to the "Coordination Event Publication".
 	 * 
 	 * @param value
 	 * @param parameterDataMappings
@@ -238,8 +210,7 @@ public class MicroBehaviourObservationComponent {
 	 * @param dmlRealizationName
 	 * @param ma
 	 */
-	private void publishEvent(Object value, HashMap<String, Object> parameterDataMappings, String agentElementName,
-			AgentElementType agentElementType, String dmlRealizationName, MicroAgent ma) {
+	private void publishEvent(Object value, HashMap<String, Object> parameterDataMappings, String agentElementName, AgentElementType agentElementType, String dmlRealizationName, MicroAgent ma) {
 		final CoordinationInfo coordInfo = new CoordinationInfo();
 		coordInfo.setName("MediumCoordInfo-" + new Date().getTime());
 		coordInfo.setType(CoordinationSpaceObject.COORDINATION_INFORMATION_TYPE);

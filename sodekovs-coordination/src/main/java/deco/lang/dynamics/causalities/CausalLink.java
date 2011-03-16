@@ -43,8 +43,7 @@ public class CausalLink {
 	private String realization;
 
 	/**
-	 * Whether the link represents a causal dependency or a flow (source to
-	 * sink).
+	 * Whether the link represents a causal dependency or a flow (source to sink).
 	 */
 	private Boolean flow;
 

@@ -29,8 +29,7 @@ import deco4mas.coordinate.interpreter.agent_state.MicroBehaviourObservationComp
 import deco4mas.helper.Constants;
 
 /**
- * This Class is used to init the observer for the micro agents in order to do
- * the publications and perceptions.
+ * This Class is used to init the observer for the micro agents in order to do the publications and perceptions.
  * 
  * @author Thomas Preisler
  */
@@ -63,8 +62,7 @@ public class InitMicroAgentForCoordination {
 	 * @param space
 	 * @param masDyn
 	 */
-	public void startInits(IComponentIdentifier ai, IMicroExternalAccess exta, IApplication context,
-			AbstractEnvironmentSpace space, MASDynamics masDyn) {
+	public void startInits(IComponentIdentifier ai, IMicroExternalAccess exta, IApplication context, AbstractEnvironmentSpace space, MASDynamics masDyn) {
 		this.ai = ai;
 		this.extAccess = exta;
 		this.context = context;
@@ -79,8 +77,7 @@ public class InitMicroAgentForCoordination {
 	/**
 	 * Initiates the avatar for the space.
 	 * 
-	 * @return <code>false</code> if no errors occurs during the initiation else
-	 *         <code>true</code>
+	 * @return <code>false</code> if no errors occurs during the initiation else <code>true</code>
 	 */
 	private boolean initAvatar() {
 		boolean exeption = false;
@@ -120,8 +117,7 @@ public class InitMicroAgentForCoordination {
 	}
 
 	/**
-	 * Returns all the names of the used coordination spaces in this
-	 * application.
+	 * Returns all the names of the used coordination spaces in this application.
 	 * 
 	 * @return the names of the used coordination spaces
 	 */
@@ -149,8 +145,7 @@ public class InitMicroAgentForCoordination {
 		// init the publications
 		for (DecentralCoordinationInformation dci : processMASDynamics.getPublications()) {
 
-			DecentralizedCausality causality = masDyn.getCausalities().getDCMRealizationByName(
-					dci.getDml().getRealization());
+			DecentralizedCausality causality = masDyn.getCausalities().getDCMRealizationByName(dci.getDml().getRealization());
 			for (AgentElement ae : causality.getFrom_agents()) {
 				if (ae.getAgent_id().equals(agentType)) {
 					initListener(ae, dci.getDml().getRealization());
@@ -163,8 +158,7 @@ public class InitMicroAgentForCoordination {
 
 		// init perceptions.....
 		for (DecentralCoordinationInformation dci : processMASDynamics.getPerceptions()) {
-			DecentralizedCausality causality = masDyn.getCausalities().getDCMRealizationByName(
-					dci.getDml().getRealization());
+			DecentralizedCausality causality = masDyn.getCausalities().getDCMRealizationByName(dci.getDml().getRealization());
 			for (AgentElement ae : causality.getTo_agents()) {
 				if (ae.getAgent_id().equals(agentType)) {
 					updateMappingsDecentral(ae, dci, Constants.PERCEIVE);
@@ -175,8 +169,7 @@ public class InitMicroAgentForCoordination {
 
 		// init the direct publications
 		for (DirectCoordinationInformation dci : processMASDynamics.getDirectPublications()) {
-			DirectCausality causality = masDyn.getCausalities().getDirectLinkRealizationByName(
-					dci.getDirectLink().getRealization());
+			DirectCausality causality = masDyn.getCausalities().getDirectLinkRealizationByName(dci.getDirectLink().getRealization());
 			for (AgentElement ae : causality.getFrom_agents()) {
 				if (ae.getAgent_id().equals(agentType)) {
 					initListener(ae, dci.getDirectLink().getRealization());
@@ -189,8 +182,7 @@ public class InitMicroAgentForCoordination {
 
 		// init perceptions.....
 		for (DirectCoordinationInformation dci : processMASDynamics.getDirectPerceptions()) {
-			DirectCausality causality = masDyn.getCausalities().getDirectLinkRealizationByName(
-					dci.getDirectLink().getRealization());
+			DirectCausality causality = masDyn.getCausalities().getDirectLinkRealizationByName(dci.getDirectLink().getRealization());
 			for (AgentElement ae : causality.getTo_agents()) {
 				if (ae.getAgent_id().equals(agentType)) {
 					updateMappingsDirect(ae, dci, Constants.PERCEIVE);
@@ -199,12 +191,10 @@ public class InitMicroAgentForCoordination {
 			}
 		}
 
-		System.out.println("#InitMicroAgentCoordinationPlan-" + extAccess.getComponentIdentifier().getName()
-				+ "# Completed initialization: " + numberOfPublishPercepts + " PublishPercepts and "
+		System.out.println("#InitMicroAgentCoordinationPlan-" + extAccess.getComponentIdentifier().getName() + "# Completed initialization: " + numberOfPublishPercepts + " PublishPercepts and "
 				+ numberOfPerceivePercepts + " PerceivePercepts");
 
-		((CoordinationSpace) space).getAgentData().put(((IApplication) context).getComponentType(ai),
-				behaviourObserver.getRoleDefinitionsForPerceive());
+		((CoordinationSpace) space).getAgentData().put(((IApplication) context).getComponentType(ai), behaviourObserver.getRoleDefinitionsForPerceive());
 	}
 
 	/**
@@ -219,9 +209,7 @@ public class InitMicroAgentForCoordination {
 	}
 
 	/**
-	 * Updates all the necessary mappings for "PUBLISH" or "PERCEIVE": 1) the
-	 * Role Mappings for this Agent. Means: Which event belongs to which role 2)
-	 * the parameter and data mappings Decentral
+	 * Updates all the necessary mappings for "PUBLISH" or "PERCEIVE": 1) the Role Mappings for this Agent. Means: Which event belongs to which role 2) the parameter and data mappings Decentral
 	 * 
 	 * @param ae
 	 * @param dci
@@ -229,16 +217,11 @@ public class InitMicroAgentForCoordination {
 	 */
 	private void updateMappingsDecentral(AgentElement ae, DecentralCoordinationInformation dci, String perceptType) {
 		if (perceptType.equals(Constants.PUBLISH)) {
-			behaviourObserver.getRoleDefinitionsForPublish().put(
-					perceptType + "::" + dci.getDml().getRealization() + "::" + ae.getElement_id() + "::"
-							+ ae.getAgentElementType(), dci.getRef());
-			behaviourObserver.getParameterAndDataMappings().put(
-					perceptType + "::" + dci.getDml().getRealization() + "::" + ae.getElement_id() + "::"
-							+ ae.getAgentElementType(), ae);
+			behaviourObserver.getRoleDefinitionsForPublish().put(perceptType + "::" + dci.getDml().getRealization() + "::" + ae.getElement_id() + "::" + ae.getAgentElementType(), dci.getRef());
+			behaviourObserver.getParameterAndDataMappings().put(perceptType + "::" + dci.getDml().getRealization() + "::" + ae.getElement_id() + "::" + ae.getAgentElementType(), ae);
 		} else {
 			if (!behaviourObserver.getRoleDefinitionsForPerceive().containsKey(dci.getDml().getRealization())) {
-				behaviourObserver.getRoleDefinitionsForPerceive().put(dci.getDml().getRealization(),
-						new HashSet<Object[]>());
+				behaviourObserver.getRoleDefinitionsForPerceive().put(dci.getDml().getRealization(), new HashSet<Object[]>());
 			}
 			Set<Object[]> dciSet = behaviourObserver.getRoleDefinitionsForPerceive().get(dci.getDml().getRealization());
 			dciSet.add((Object[]) new Object[] { dci, ae });
@@ -246,9 +229,7 @@ public class InitMicroAgentForCoordination {
 	}
 
 	/**
-	 * Updates all the necessary mappings for "PUBLISH" or "PERCEIVE": 1) the
-	 * Role Mappings for this Agent. Means: Which event belongs to which role 2)
-	 * the parameter and data mappings Direct
+	 * Updates all the necessary mappings for "PUBLISH" or "PERCEIVE": 1) the Role Mappings for this Agent. Means: Which event belongs to which role 2) the parameter and data mappings Direct
 	 * 
 	 * @param ae
 	 * @param dci
@@ -256,19 +237,13 @@ public class InitMicroAgentForCoordination {
 	 */
 	private void updateMappingsDirect(AgentElement ae, DirectCoordinationInformation dci, String perceptType) {
 		if (perceptType.equals(Constants.PUBLISH)) {
-			behaviourObserver.getRoleDefinitionsForPublish().put(
-					perceptType + "::" + dci.getDirectLink().getRealization() + "::" + ae.getElement_id() + "::"
-							+ ae.getAgentElementType(), dci.getRef());
-			behaviourObserver.getParameterAndDataMappings().put(
-					perceptType + "::" + dci.getDirectLink().getRealization() + "::" + ae.getElement_id() + "::"
-							+ ae.getAgentElementType(), ae);
+			behaviourObserver.getRoleDefinitionsForPublish().put(perceptType + "::" + dci.getDirectLink().getRealization() + "::" + ae.getElement_id() + "::" + ae.getAgentElementType(), dci.getRef());
+			behaviourObserver.getParameterAndDataMappings().put(perceptType + "::" + dci.getDirectLink().getRealization() + "::" + ae.getElement_id() + "::" + ae.getAgentElementType(), ae);
 		} else {
 			if (!behaviourObserver.getRoleDefinitionsForPerceive().containsKey(dci.getDirectLink().getRealization())) {
-				behaviourObserver.getRoleDefinitionsForPerceive().put(dci.getDirectLink().getRealization(),
-						new HashSet<Object[]>());
+				behaviourObserver.getRoleDefinitionsForPerceive().put(dci.getDirectLink().getRealization(), new HashSet<Object[]>());
 			}
-			Set<Object[]> dciSet = behaviourObserver.getRoleDefinitionsForPerceive().get(
-					dci.getDirectLink().getRealization());
+			Set<Object[]> dciSet = behaviourObserver.getRoleDefinitionsForPerceive().get(dci.getDirectLink().getRealization());
 			dciSet.add((Object[]) new Object[] { dci, ae });
 		}
 	}
