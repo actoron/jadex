@@ -23,7 +23,6 @@ import deco.lang.dynamics.causalities.DirectLink;
 import deco.lang.dynamics.mechanism.AgentElement;
 import deco.lang.dynamics.mechanism.DecentralizedCausality;
 import deco4mas.coordinate.interpreter.coordination_information.DefaultCoordinationEventGenerator;
-import deco4mas.coordinate.interpreter.coordination_information.DefaultCoordinationInformationInterpreter;
 import deco4mas.examples.agentNegotiation.deco.media.DirectInternalEventMechanism;
 import deco4mas.examples.agentNegotiation.deco.media.NegotiationMechanism;
 import deco4mas.examples.agentNegotiation.deco.media.TrustSpaceMechanism;
@@ -105,9 +104,7 @@ public class InitDeco4mas {
 		// System.out.println(new File(""));
 
 		try {
-			masFileName = new File("..").getCanonicalPath()
-					+ new File("/sodekovs-coordination/src/main/java/"
-							+ (String) space.getProperty("dynamics_configuration")).getPath();
+			masFileName = new File("..").getCanonicalPath() + new File("/sodekovs-coordination/src/main/java/" + (String) space.getProperty("dynamics_configuration")).getPath();
 		} catch (IOException e1) {
 			System.out.println("#ProcessMASDynamics#" + ":");
 			System.out.println("\t canonical path of jadex home directory could not be created ...");
@@ -254,8 +251,7 @@ public class InitDeco4mas {
 		// String[] { "coordinate_init:participants",
 		// "coordination_init_participants" },
 		// new String[] { "coordination_event", "coordinate_percept" } });
-		perceptGenerator.setProperty("percepttypes", new Object[] { new String[] { "coordination_event",
-				"coordinate_percept" } });
+		perceptGenerator.setProperty("percepttypes", new Object[] { new String[] { "coordination_event", "coordinate_percept" } });
 
 		space.addPerceptGenerator(new String("generator"), perceptGenerator);
 		// TODO: Check which perceptProcessors fits which AgentType?
@@ -265,8 +261,7 @@ public class InitDeco4mas {
 		// "coordinate:Init_Participants", "init_deco4mas_coordination" },
 		// new String[] { "coordination_event", "coordinate", "anything..." }
 		// });
-		perceptProcessor.setProperty("percepttypes", new Object[] { new String[] { "coordination_event", "coordinate",
-				"anything..." } });
+		perceptProcessor.setProperty("percepttypes", new Object[] { new String[] { "coordination_event", "coordinate", "anything..." } });
 
 		// Add Percept Processor to all Agents
 		for (String agentType : allReferencedAgentTypesList) {
@@ -358,13 +353,11 @@ public class InitDeco4mas {
 	// }
 
 	/**
-	 * Takes the current MAS-Model and returns a list which contains each
-	 * referenced agent only one time.
+	 * Takes the current MAS-Model and returns a list which contains each referenced agent only one time.
 	 * 
 	 * @return
 	 */
-	private void getAgentLists(MASDynamics dyn, ArrayList<String> allAgentNames, ArrayList<String> fromAgents,
-			ArrayList<String> toAgents) {
+	private void getAgentLists(MASDynamics dyn, ArrayList<String> allAgentNames, ArrayList<String> fromAgents, ArrayList<String> toAgents) {
 		ArrayList<DecentralizedCausality> decentralCausalities = dyn.getCausalities().getRealizations();
 		HashMap<String, Object> tmpAll = new HashMap<String, Object>();
 		HashMap<String, Object> tmpFrom = new HashMap<String, Object>();
