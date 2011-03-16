@@ -53,12 +53,11 @@ import deco4mas.helper.Constants;
 import deco4mas.mechanism.CoordinationInfo;
 
 /**
- * HACK: add "1==1 || " in line 197 and 203 for TSpace example.
+ * HACK: add "1==1 || " in line 187 and 189 for TSpace example.
  * 
  * @author Ante Vilenica & Jan Sudeikat
  */
-public class DefaultCoordinationInformationInterpreter extends SimplePropertyObject implements
-		ICoordinationInformationInterpreter {
+public class DefaultCoordinationInformationInterpreter extends SimplePropertyObject implements ICoordinationInformationInterpreter {
 
 	// -------- constants --------
 
@@ -72,8 +71,7 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 	public static String REMOVE = "remove";
 
 	/**
-	 * The remove_outdated action (checks all entries in the belief set, if they
-	 * should be seen, but are no longer there).
+	 * The remove_outdated action (checks all entries in the belief set, if they should be seen, but are no longer there).
 	 */
 	public static String REMOVE_OUTDATED = "remove_outdated";
 
@@ -84,8 +82,7 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 	public static String UNSET = "unset";
 
 	/**
-	 * The start coordination action or usual coordination event(sets a belief
-	 * fact to null).
+	 * The start coordination action or usual coordination event(sets a belief fact to null).
 	 */
 	public static String COORDINATE_INFO = "coordinate";
 
@@ -108,10 +105,7 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @seedeco4mas.coordinate.interpreter.coordination_information.
-	 * ICoordinationInformationInterpreter
-	 * #dispatchWhenApplicable(java.lang.String, java.lang.Object,
-	 * jadex.bridge.IAgentIdentifier,
+	 * @seedeco4mas.coordinate.interpreter.coordination_information. ICoordinationInformationInterpreter #dispatchWhenApplicable(java.lang.String, java.lang.Object, jadex.bridge.IAgentIdentifier,
 	 * jadex.adapter.base.envsupport.environment.ISpaceObject)
 	 */
 	// @Override
@@ -122,29 +116,23 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @seedeco4mas.coordinate.interpreter.coordination_information.
-	 * ICoordinationInformationInterpreter#processPercept(jadex.bridge.ISpace,
-	 * java.lang.String, java.lang.Object, jadex.bridge.IAgentIdentifier,
-	 * jadex.adapter.base.envsupport.environment.ISpaceObject)
+	 * @seedeco4mas.coordinate.interpreter.coordination_information. ICoordinationInformationInterpreter#processPercept(jadex.bridge.ISpace, java.lang.String, java.lang.Object,
+	 * jadex.bridge.IAgentIdentifier, jadex.adapter.base.envsupport.environment.ISpaceObject)
 	 */
 	// @Override
 
-	public void processPercept(final IEnvironmentSpace space, final String type, final Object percept,
-			final IComponentIdentifier agent, final ISpaceObject avatar) {
+	public void processPercept(final IEnvironmentSpace space, final String type, final Object percept, final IComponentIdentifier agent, final ISpaceObject avatar) {
 		boolean invoke = false;
 		final String[][] metainfos = getMetaInfos(type);
 		for (int i = 0; !invoke && metainfos != null && i < metainfos.length; i++) {
-			invoke = ADD.equals(metainfos[i][0]) || REMOVE.equals(metainfos[i][0]) || SET.equals(metainfos[i][0])
-					|| UNSET.equals(metainfos[i][0]) || REMOVE_OUTDATED.equals(metainfos[i][0])
-					&& percept.equals(avatar) || COORDINATE_INFO.equals(metainfos[i][0])
-					|| COORDINATE_INIT_PARTICIPANTS.equals(metainfos[i][0]);
+			invoke = ADD.equals(metainfos[i][0]) || REMOVE.equals(metainfos[i][0]) || SET.equals(metainfos[i][0]) || UNSET.equals(metainfos[i][0]) || REMOVE_OUTDATED.equals(metainfos[i][0])
+					&& percept.equals(avatar) || COORDINATE_INFO.equals(metainfos[i][0]) || COORDINATE_INIT_PARTICIPANTS.equals(metainfos[i][0]);
 		}
 
 		if (invoke) {
 			// IAMS ams = (IAMS) ((IApplicationContext)
 			// space.getContext()).getPlatform().getService(IComponentManagementService.class);
-			IComponentManagementService ams = (IComponentManagementService) SServiceProvider.getServiceUpwards(
-					space.getContext().getServiceProvider(), IComponentManagementService.class).get(
+			IComponentManagementService ams = (IComponentManagementService) SServiceProvider.getServiceUpwards(space.getContext().getServiceProvider(), IComponentManagementService.class).get(
 					new ThreadSuspendable());
 			final IExternalAccess exta = (IExternalAccess) ams.getExternalAccess(agent).get(new ThreadSuspendable());
 			exta.scheduleStep(new IComponentStep() {
@@ -158,8 +146,7 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 						}
 
 						for (int i = 0; i < metainfos.length; i++) {
-							IParsedExpression cond = metainfos[i].length == 2 ? null
-									: (IParsedExpression) getProperty(metainfos[i][2]);
+							IParsedExpression cond = metainfos[i].length == 2 ? null : (IParsedExpression) getProperty(metainfos[i][2]);
 							SimpleValueFetcher fetcher = null;
 							if (cond != null) {
 								fetcher = new SimpleValueFetcher();
@@ -185,10 +172,8 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 								Map<String, Map<String, Set<Object[]>>> applicableAgentTypes = (Map<String, Map<String, Set<Object[]>>>) coordinationSpaceObj
 										.getProperty(Constants.ROLE_DEFINITIONS_FOR_PERCEIVE);
 								if (applicableAgentTypes.get(getAgentType(exta)) != null) {
-									Map<String, Set<Object[]>> applicablePerceiveRoles = applicableAgentTypes
-											.get(getAgentType(exta));
-									String dcmName = (String) coordinationSpaceObj
-											.getProperty(Constants.DML_REALIZATION_NAME);
+									Map<String, Set<Object[]>> applicablePerceiveRoles = applicableAgentTypes.get(getAgentType(exta));
+									String dcmName = (String) coordinationSpaceObj.getProperty(Constants.DML_REALIZATION_NAME);
 									if (applicablePerceiveRoles.get(dcmName) != null) {
 										Set<Object[]> agentDataSet = applicablePerceiveRoles.get(dcmName);
 										Iterator<Object[]> agentDataIterator = agentDataSet.iterator();
@@ -199,65 +184,37 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 											if (CheckRole.checkForPerceive(dci.getRef(), bia)) {
 												String elementType = ae.getAgentElementType();
 												final String elementId = ae.getElement_id();
-												if (1 == 1
-														|| (coordinationSpaceObj
-																.getProperty(CoordinationInfo.AGENT_ELEMENT_TYPE))
-																.equals(elementType)
-														|| coordinationSpaceObj
-																.getProperty(CoordinationInfo.AGENT_ELEMENT_TYPE) == null) { // when
-													if (1 == 1
-															|| ((String) coordinationSpaceObj
-																	.getProperty(CoordinationInfo.AGENT_ELEMENT_NAME))
-																	.equals(elementId)
-															|| coordinationSpaceObj
-																	.getProperty(CoordinationInfo.AGENT_ELEMENT_NAME) == null) {
+												if ((coordinationSpaceObj.getProperty(CoordinationInfo.AGENT_ELEMENT_TYPE)).equals(elementType)
+														|| coordinationSpaceObj.getProperty(CoordinationInfo.AGENT_ELEMENT_TYPE) == null) { // when
+													if (((String) coordinationSpaceObj.getProperty(CoordinationInfo.AGENT_ELEMENT_NAME)).equals(elementId)
+															|| coordinationSpaceObj.getProperty(CoordinationInfo.AGENT_ELEMENT_NAME) == null) {
 														final HashMap<String, Object> receivedParamDataMappings = (HashMap<String, Object>) coordinationSpaceObj
 																.getProperty(Constants.PARAMETER_DATA_MAPPING);
-														if (elementType.equals(AgentElementType.BDI_BELIEFSET
-																.toString())) {
-															if (dci.getCoordinationType().equals(
-																	CoordinationType.NEGATIVE)) {
+														if (elementType.equals(AgentElementType.BDI_BELIEFSET.toString())) {
+															if (dci.getCoordinationType().equals(CoordinationType.NEGATIVE)) {
 
-																IBeliefSet belset = bia.getBeliefbase().getBeliefSet(
-																		elementId);
+																IBeliefSet belset = bia.getBeliefbase().getBeliefSet(elementId);
 																Object[] facts = belset.getFacts();
 																belset.removeFact(facts[facts.length - 1]); // remove
-																System.out
-																		.println("#BDICoordInfInterpreter# Removed last fact from BELIEF_SET: "
-																				+ elementId
-																				+ " for "
-																				+ exta.getComponentIdentifier()
-																						.getName());
+																System.out.println("#BDICoordInfInterpreter# Removed last fact from BELIEF_SET: " + elementId + " for "
+																		+ exta.getComponentIdentifier().getName());
 															} else {
 																ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) exta;
 																IOAVState state = extaFly.getState();
-																Object[] scope = AgentRules.resolveCapability(
-																		elementId, OAVBDIMetaModel.internalevent_type,
-																		extaFly.getScope(), state);
-																Object mscope = state.getAttributeValue(scope[1],
-																		OAVBDIRuntimeModel.element_has_model);
-																if (state.containsKey(mscope,
-																		OAVBDIMetaModel.capability_has_beliefsets,
-																		scope[0])) {
-																	IBeliefbase base = BeliefbaseFlyweight
-																			.getBeliefbaseFlyweight(state, scope[1]);
+																Object[] scope = AgentRules.resolveCapability(elementId, OAVBDIMetaModel.internalevent_type, extaFly.getScope(), state);
+																Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+																if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_beliefsets, scope[0])) {
+																	IBeliefbase base = BeliefbaseFlyweight.getBeliefbaseFlyweight(state, scope[1]);
 																	IBeliefSet belset = base.getBeliefSet(elementId);
-																	belset.addFact(coordinationSpaceObj.getProperty(
-																			Constants.VALUE).toString());
+																	belset.addFact(coordinationSpaceObj.getProperty(Constants.VALUE).toString());
 																} else {
-																	throw new RuntimeException("No such belief: "
-																			+ scope[0] + " in " + scope[1]);
+																	throw new RuntimeException("No such belief: " + scope[0] + " in " + scope[1]);
 																}
-																System.out.println("#BDICoordInfInterpreter# Added "
-																		+ coordinationSpaceObj.getProperty(
-																				Constants.VALUE).toString()
-																		+ " to BELIEF_SET: " + elementId + " for "
-																		+ exta.getComponentIdentifier().getName());
+																System.out.println("#BDICoordInfInterpreter# Added " + coordinationSpaceObj.getProperty(Constants.VALUE).toString()
+																		+ " to BELIEF_SET: " + elementId + " for " + exta.getComponentIdentifier().getName());
 															}
-														} else if (elementType.equals(AgentElementType.BDI_BELIEF
-																.toString())) {
-															if (dci.getCoordinationType().equals(
-																	CoordinationType.NEGATIVE)) {
+														} else if (elementType.equals(AgentElementType.BDI_BELIEF.toString())) {
+															if (dci.getCoordinationType().equals(CoordinationType.NEGATIVE)) {
 																// IBelief
 																// bel =
 																// exta.getBeliefbase().getBelief(metainfos[i][1]);
@@ -266,92 +223,55 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 																// better
 																// default
 																// value...
-																System.out
-																		.println("#BDICoordInfInterpreter# Removed fact from BELIEF : "
-																				+ elementId);
+																System.out.println("#BDICoordInfInterpreter# Removed fact from BELIEF : " + elementId);
 															} else {
 																ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) exta;
 																IOAVState state = extaFly.getState();
-																Object[] scope = AgentRules.resolveCapability(
-																		elementId, OAVBDIMetaModel.internalevent_type,
-																		extaFly.getScope(), state);
-																Object mscope = state.getAttributeValue(scope[1],
-																		OAVBDIRuntimeModel.element_has_model);
-																if (state.containsKey(mscope,
-																		OAVBDIMetaModel.capability_has_beliefs,
-																		scope[0])) {
-																	IBeliefbase base = BeliefbaseFlyweight
-																			.getBeliefbaseFlyweight(state, scope[1]);
+																Object[] scope = AgentRules.resolveCapability(elementId, OAVBDIMetaModel.internalevent_type, extaFly.getScope(), state);
+																Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+																if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_beliefs, scope[0])) {
+																	IBeliefbase base = BeliefbaseFlyweight.getBeliefbaseFlyweight(state, scope[1]);
 																	IBelief bel = base.getBelief(elementId);
-																	bel.setFact(coordinationSpaceObj.getProperty(
-																			Constants.VALUE).toString());
+																	bel.setFact(coordinationSpaceObj.getProperty(Constants.VALUE).toString());
 																} else {
-																	throw new RuntimeException("No such belief: "
-																			+ scope[0] + " in " + scope[1]);
+																	throw new RuntimeException("No such belief: " + scope[0] + " in " + scope[1]);
 																}
-																System.out.println("#BDICoordInfInterpreter# Added "
-																		+ coordinationSpaceObj.getProperty(
-																				Constants.VALUE).toString()
-																		+ " to BELIEF : " + elementId + " for "
-																		+ exta.getComponentIdentifier().getName());
+																System.out.println("#BDICoordInfInterpreter# Added " + coordinationSpaceObj.getProperty(Constants.VALUE).toString() + " to BELIEF : "
+																		+ elementId + " for " + exta.getComponentIdentifier().getName());
 															}
-														} else if (elementType.equals(AgentElementType.BDI_GOAL
-																.toString())) {
-															if (dci.getCoordinationType().equals(
-																	CoordinationType.NEGATIVE)) {
+														} else if (elementType.equals(AgentElementType.BDI_GOAL.toString())) {
+															if (dci.getCoordinationType().equals(CoordinationType.NEGATIVE)) {
 																IGoal[] goals = bia.getGoalbase().getGoals(elementId);
 																goals[goals.length - 1].drop(); // TODO:
 																// heuristic
 																// for
 																// selection
-																System.out
-																		.println("#BDICoordInfInterpreter# Removed GOAL from GOALBASE : "
-																				+ elementId
-																				+ " for "
-																				+ exta.getComponentIdentifier()
-																						.getName());
+																System.out.println("#BDICoordInfInterpreter# Removed GOAL from GOALBASE : " + elementId + " for "
+																		+ exta.getComponentIdentifier().getName());
 															} else {
 																ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) exta;
 																IOAVState state = extaFly.getState();
-																Object[] scope = AgentRules.resolveCapability(
-																		elementId, OAVBDIMetaModel.internalevent_type,
-																		extaFly.getScope(), state);
-																Object mscope = state.getAttributeValue(scope[1],
-																		OAVBDIRuntimeModel.element_has_model);
-																if (state.containsKey(mscope,
-																		OAVBDIMetaModel.capability_has_goals, scope[0])) {
-																	IGoalbase base = GoalbaseFlyweight
-																			.getGoalbaseFlyweight(state, scope[1]);
+																Object[] scope = AgentRules.resolveCapability(elementId, OAVBDIMetaModel.internalevent_type, extaFly.getScope(), state);
+																Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+																if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_goals, scope[0])) {
+																	IGoalbase base = GoalbaseFlyweight.getGoalbaseFlyweight(state, scope[1]);
 																	IGoal g = base.createGoal(elementId);
-																	for (ParameterMapping pm : ae
-																			.getParameter_mappings()) {
-																		g.getParameter(pm.getLocalName()).setValue(
-																				receivedParamDataMappings.get(pm
-																						.getRef()));
+																	for (ParameterMapping pm : ae.getParameter_mappings()) {
+																		g.getParameter(pm.getLocalName()).setValue(receivedParamDataMappings.get(pm.getRef()));
 																	}
 																	base.dispatchTopLevelGoal(g);
 
 																} else {
-																	throw new RuntimeException("No such belief: "
-																			+ scope[0] + " in " + scope[1]);
+																	throw new RuntimeException("No such belief: " + scope[0] + " in " + scope[1]);
 																}
 															}
-														} else if (elementType.equals(AgentElementType.BDI_PLAN
-																.toString())) {
-															System.out
-																	.println("#BDICoordInfInterpreter# Error!!! RECEIVED PLAN TO MANIPULATE:  "
-																			+ elementId
-																			+ " for "
-																			+ exta.getComponentIdentifier().getName()
-																			+ " Currently unable to process IPlan due limits of used jadex-version");
-														} else if (elementType.equals(AgentElementType.INTERNAL_EVENT
-																.toString())) {
-															if (dci.getCoordinationType().equals(
-																	CoordinationType.NEGATIVE)) {
-																System.out.println(exta.getComponentIdentifier()
-																		.getName() + ":");
-																System.out
-																		.println("\t ERROR: can not remove internal events from execution context.");
+														} else if (elementType.equals(AgentElementType.BDI_PLAN.toString())) {
+															System.out.println("#BDICoordInfInterpreter# Error!!! RECEIVED PLAN TO MANIPULATE:  " + elementId + " for "
+																	+ exta.getComponentIdentifier().getName() + " Currently unable to process IPlan due limits of used jadex-version");
+														} else if (elementType.equals(AgentElementType.INTERNAL_EVENT.toString())) {
+															if (dci.getCoordinationType().equals(CoordinationType.NEGATIVE)) {
+																System.out.println(exta.getComponentIdentifier().getName() + ":");
+																System.out.println("\t ERROR: can not remove internal events from execution context.");
 																// TODO make
 																// exception for
 																// this
@@ -359,34 +279,21 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 															} else {
 																ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) exta;
 																IOAVState state = extaFly.getState();
-																Object[] scope = AgentRules.resolveCapability(
-																		elementId, OAVBDIMetaModel.internalevent_type,
-																		extaFly.getScope(), state);
-																Object mscope = state.getAttributeValue(scope[1],
-																		OAVBDIRuntimeModel.element_has_model);
-																if (state.containsKey(mscope,
-																		OAVBDIMetaModel.capability_has_internalevents,
-																		scope[0])) {
-																	IEventbase base = EventbaseFlyweight
-																			.getEventbaseFlyweight(state, scope[1]);
-																	IInternalEvent ie = base
-																			.createInternalEvent(elementId);
-																	for (ParameterMapping pm : ae
-																			.getParameter_mappings()) {
-																		ie.getParameter(pm.getLocalName()).setValue(
-																				receivedParamDataMappings.get(pm
-																						.getRef()));
+																Object[] scope = AgentRules.resolveCapability(elementId, OAVBDIMetaModel.internalevent_type, extaFly.getScope(), state);
+																Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+																if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_internalevents, scope[0])) {
+																	IEventbase base = EventbaseFlyweight.getEventbaseFlyweight(state, scope[1]);
+																	IInternalEvent ie = base.createInternalEvent(elementId);
+																	for (ParameterMapping pm : ae.getParameter_mappings()) {
+																		ie.getParameter(pm.getLocalName()).setValue(receivedParamDataMappings.get(pm.getRef()));
 																	}
 																	base.dispatchInternalEvent(ie);
 																} else {
-																	throw new RuntimeException("No such belief: "
-																			+ scope[0] + " in " + scope[1]);
+																	throw new RuntimeException("No such belief: " + scope[0] + " in " + scope[1]);
 																}
 															}
-														} else if (elementType.equals(AgentElementType.MICRO_STEP
-																.toString())) {
-															processPerceptMicro(dci, exta, elementId, ae,
-																	receivedParamDataMappings);
+														} else if (elementType.equals(AgentElementType.MICRO_STEP.toString())) {
+															processPerceptMicro(dci, exta, elementId, ae, receivedParamDataMappings);
 														}
 													}
 												}
@@ -414,8 +321,7 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 	 * @param ae
 	 * @param receivedParamDataMappings
 	 */
-	private void processPerceptMicro(CoordinationInformation dci, IExternalAccess exta, final String elementId,
-			final AgentElement ae, final HashMap<String, Object> receivedParamDataMappings) {
+	private void processPerceptMicro(CoordinationInformation dci, IExternalAccess exta, final String elementId, final AgentElement ae, final HashMap<String, Object> receivedParamDataMappings) {
 		if (dci.getCoordinationType().equals(CoordinationType.NEGATIVE)) {
 			System.out.println(exta.getComponentIdentifier().getName() + ":");
 			System.out.println("\t ERROR: can not remove micro agent steps from execution context.");
@@ -441,8 +347,7 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 									parameter.put(pm.getLocalName(), receivedParamDataMappings.get(pm.getRef()));
 								}
 
-								CoordinateComponentStep step = (CoordinateComponentStep) constructor.newInstance(ma,
-										parameter);
+								CoordinateComponentStep step = (CoordinateComponentStep) constructor.newInstance(ma, parameter);
 								microExtAcc.scheduleStep(step);
 							}
 						}
@@ -472,8 +377,7 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 			Object[] percepttypes = getPerceptTypes();
 			for (int i = 0; i < percepttypes.length; i++) {
 				String[] per = (String[]) percepttypes[i];
-				String[][] newmis = per.length == 3 ? new String[][] { { per[1], per[2] } } : new String[][] { {
-						per[1], per[2], per[3] } };
+				String[][] newmis = per.length == 3 ? new String[][] { { per[1], per[2] } } : new String[][] { { per[1], per[2], per[3] } };
 				String[][] oldmis = this.percepttypes.get(per[0]);
 				if (oldmis != null)
 					newmis = (String[][]) SUtil.joinArrays(oldmis, newmis);
