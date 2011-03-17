@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : newXMLDocument2.xml
+    Created on : 17. März 2011, 18:28
+    Author     : vilenica
+    Description:
+        Purpose of the document follows.
+-->
+
+<ns0:Schedule  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+   xmlns:ns0='null'
+   xsi:schemaLocation='null newXMLDocument.xml' type="Workload">
+    <ns0:Sequence starttime="1500">
+        <ns0:Action componentname="Cleaner" componenttype="BDIAgent" componentreference="/cleaner.agent.xml">
+            <ns0:Property name="speed" value="3"></ns0:Property>
+            <ns0:Property name="color" value="blue"></ns0:Property>
+        </ns0:Action>
+        <ns0:Action componentname="Carrier" componenttype="MircoAgent" componentreference="/../MicroAgent.xml">
+            <ns0:Property name="Lenght" value="24"></ns0:Property>
+        </ns0:Action>        
+    </ns0:Sequence>
+    <ns0:Sequence starttime="125">
+        <ns0:Action componentname="Orebase" componenttype="ISpaceObject" componentreference="">
+            <ns0:Property name="ore" value=""></ns0:Property>
+            <ns0:Property name="capacity" value="46"></ns0:Property>
+            <ns0:Property name="maxCap" value="50"></ns0:Property>
+        </ns0:Action>       
+    </ns0:Sequence>
+</ns0:Schedule>
