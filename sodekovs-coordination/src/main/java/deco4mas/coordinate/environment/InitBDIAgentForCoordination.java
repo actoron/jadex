@@ -271,7 +271,7 @@ public class InitBDIAgentForCoordination {
 		exta.scheduleStep(new IComponentStep() {
 			@Override
 			public Object execute(IInternalAccess ia) {
-				behObserver = new BDIBehaviorObservationComponent(exta);
+				behObserver = new BDIBehaviorObservationComponent(exta, masDyn);
 				// agentType =
 				// exta.getApplicationContext().getAgentType(ai);
 				agentType = context.getComponentType(ai);

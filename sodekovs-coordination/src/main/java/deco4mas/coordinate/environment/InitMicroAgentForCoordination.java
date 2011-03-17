@@ -108,7 +108,7 @@ public class InitMicroAgentForCoordination {
 			@Override
 			public Object execute(IInternalAccess ia) {
 				ArrayList<String> spaces = getSpaces();
-				behaviourObserver = new MicroBehaviourObservationComponent(extAccess, spaces);
+				behaviourObserver = new MicroBehaviourObservationComponent(extAccess, masDyn, spaces);
 				agentType = context.getComponentType(ai);
 				initPublishAndPercept();
 				return null;

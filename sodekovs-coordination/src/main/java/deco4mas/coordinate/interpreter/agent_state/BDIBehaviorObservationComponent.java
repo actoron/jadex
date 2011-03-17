@@ -28,390 +28,327 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.rules.state.IOAVState;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 import deco.lang.dynamics.AgentElementType;
+import deco.lang.dynamics.MASDynamics;
 import deco.lang.dynamics.mechanism.AgentElement;
-import deco.lang.dynamics.properties.AgentReference;
 import deco4mas.coordinate.environment.CoordinationSpaceObject;
 import deco4mas.coordinate.interpreter.coordination_information.CheckRole;
 import deco4mas.helper.Constants;
 import deco4mas.mechanism.CoordinationInfo;
 
 /**
- * @author Ante Vilenica This component is called on Agent init and observes the
- *         agent. If an event occurs that is relevant for the coordination this
- *         event is dispatched to the "Coordination Event Publication".
+ * @author Ante Vilenica This component is called on Agent init and observes the agent. If an event occurs that is relevant for the coordination this event is dispatched to the
+ *         "Coordination Event Publication".
  */
-public class BDIBehaviorObservationComponent
-{
-
-	/** The external access to the observed agent. */
-	private IBDIExternalAccess exta;
-	private CoordinationEventPublication eventPublication;
-	/**
-	 * Contains the mapping from an event inside an agent, i.e. a goal is
-	 * dispatched, a beliefset has changed , and maps these events to those DCM
-	 * Realizations, that should trigger a publish, when these event has
-	 * appeared using their specific medium. Other explanation: which agentEvent
-	 * is references within which DCM-Realization!
-	 */
-
-	private Map<String, ArrayList<String>> agentEventDCMRealizationMappings = new HashMap<String, ArrayList<String>>();
-	/** Maps the roles that are used within "PUBLISH". */
-	private Map<String, AgentReference> roleDefinitionsForPublish = new HashMap<String, AgentReference>();
-
-	/**
-	 * Maps the roles that are used within "PERCEIVE". The String is the name of
-	 * the DCM. The array holds the corresponding
-	 * DecentralCoordinationInformation (position 0) and AgentElement (position
-	 * 1).
-	 */
-	private Map<String, Set<Object[]>> roleDefinitionsForPerceive = new HashMap<String, Set<Object[]>>();
-
-	/**
-	 * This mapping contains the parameter and data mappings of the
-	 * deco-link-realization.
-	 */
-	private Map<String, AgentElement> parameterAndDataMappings = new HashMap<String, AgentElement>();
-
-	// /** Maps the AgentType to its DecentralCoordinationInformation */
-	// private DecentralCoordinationInformation decentralCoordInfoMapping;
+public class BDIBehaviorObservationComponent extends BehaviorObservationComponent {
 
 	/**
 	 * @param exta
 	 *            The external access to the observed agent.
+	 * @param masDynamics
+	 *            the representation of the MASDynamics language
 	 */
-	public BDIBehaviorObservationComponent(IBDIExternalAccess exta)
-	{
-		this.exta = exta;
-		eventPublication = new CoordinationEventPublication();
-		// initListeners();
+	public BDIBehaviorObservationComponent(IBDIExternalAccess exta, MASDynamics masDynamics) {
+		super(exta, masDynamics);
 	}
 
 	/**
-	 * Publish/Dispatch the occurred event to the
-	 * "Coordination Event Publication".
-	 * @param dmlRealizationName2 
-	 * @param agentElementType 
+	 * Publish/Dispatch the occurred event to the "Coordination Event Publication".
+	 * 
+	 * @param dmlRealizationName2
+	 * @param agentElementType
 	 */
-	// private void publishEvent(AgentEvent ae, AgentElementType
-	// agentElementType, String agentElementName, Collection toAgents,
-	// HashMap<String, Object> parameterDataMappings) {
-	private void publishEvent(Object value, HashMap<String, Object> parameterDataMappings, String agentElementName, AgentElementType agentElementType, String dmlRealizationName, IBDIInternalAccess bia)
-	{
-		final CoordinationInfo coordInfo = new CoordinationInfo();
-		coordInfo.setName("MediumCoordInfo-" + new Date().getTime());
-		coordInfo.setType(CoordinationSpaceObject.COORDINATION_INFORMATION_TYPE);
+	private void publishEvent(Object value, HashMap<String, Object> parameterDataMappings, String agentElementName, AgentElementType agentElementType, String dmlRealizationName, IBDIInternalAccess bia) {
+		CoordinationInfo coordInfo = createCoordinationInfo(value, parameterDataMappings, agentElementName, agentElementType, dmlRealizationName);
 		coordInfo.addValue(CoordinationSpaceObject.AGENT_ARCHITECTURE, "BDI");
-		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_NAME, agentElementName);
-		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_TYPE, agentElementType.toString());
-		//TODO: Transformation of from-event to to-event.
-		//		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_TYPE, AgentElementType.BDI_GOAL.toString());
-		coordInfo.addValue(Constants.VALUE, value);
-		coordInfo.addValue(Constants.PARAMETER_DATA_MAPPING, parameterDataMappings);
-		coordInfo.addValue(Constants.DML_REALIZATION_NAME, dmlRealizationName);		
-		
 
 		IEnvironmentSpace space = (IEnvironmentSpace) bia.getBeliefbase().getBelief("env").getFact();
 		eventPublication.publishEvent(coordInfo, space);
-		
+
 	}
 
-	public void initBeliefListener(AgentElement agentElement, String mechanismRealizationId)
-	{
+	public void initBeliefListener(AgentElement agentElement, String mechanismRealizationId) {
 		// System.out.println("#BDIBehaviorObservationComponent# init listener for belief: "
 		// + agentElement.getElement_id());
-		addValueToMap(agentEventDCMRealizationMappings, AgentElementType.BDI_BELIEF.toString() + "::" + agentElement.getElement_id(),
-			mechanismRealizationId);
-		
-		ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) exta;
+		addValueToMap(agentEventDCMRealizationMappings, AgentElementType.BDI_BELIEF.toString() + "::" + agentElement.getElement_id(), mechanismRealizationId);
+
+		ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) extAccess;
 		IOAVState state = extaFly.getState();
 		Object[] scope = AgentRules.resolveCapability(agentElement.getElement_id(), OAVBDIMetaModel.belief_type, extaFly.getScope(), state);
 		Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
-		if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_beliefs, scope[0]))
-		{
+		if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_beliefs, scope[0])) {
 			IBeliefbase base = BeliefbaseFlyweight.getBeliefbaseFlyweight(state, scope[1]);
-			base.getBelief(agentElement.getElement_id()).addBeliefListener(new IBeliefListener()
-			{
-				public void beliefChanged(AgentEvent ae)
-				{
+			base.getBelief(agentElement.getElement_id()).addBeliefListener(new IBeliefListener() {
+				public void beliefChanged(AgentEvent ae) {
 					checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEF);
 				}
 			});
-		} else
-		{
+		} else {
 			throw new RuntimeException("No such belief: " + scope[0] + " in " + scope[1]);
 		}
-		
-		
-		
-//		exta.getBeliefbase().getBelief(agentElement.getElement_id()).addBeliefListener(new IBeliefListener()
-//		{
-//			public void beliefChanged(AgentEvent ae)
-//			{
-//				// getExternalAccess().getLogger().info("belief changed: "+ae);
-//				// System.out.println("#BDIBehaviorObservationComponent#belief changed: "
-//				// + ae.getValue() + " - " + ae.getSource());
-//				// getExternalAccess().getBeliefbase().getBelief("bel").removeBeliefListener(this);
-//
-//				// ------------------------- OLD
-//				// ----------------------------------
-//				//				
-//				// String nameOfElement = getNameOfAgentElement(ae,
-//				// AgentElementType.BDI_BELIEF);
-//				// //get all the DCM Realizations that have the current
-//				// AgentEvent as initiator for a PUBLISH-Event
-//				// for(String dmlRealizationName:
-//				// agentEventDCMRealizationMappings.get(AgentElementType.BDI_BELIEF.toString()
-//				// + "::" + nameOfElement)){
-//				// //Check whether role is active.
-//				// HashMap<String, Object> parameterDataMappings =
-//				// publishWhenApplicable(dmlRealizationName + "::" +
-//				// nameOfElement , ae, AgentElementType.BDI_BELIEF);
-//				// if (parameterDataMappings != null) {
-//				// // publishEvent(ae, AgentElementType.BDI_BELIEF,
-//				// CoordinationInfo.AGENT_ELEMENT_NAME,
-//				// getToAgents(ae.getSource().toString(),
-//				// AgentElementType.BDI_BELIEF), parameterDataMappings);
-//				// publishEvent(ae.getValue(), parameterDataMappings,
-//				// dmlRealizationName);
-//				// } else {
-//				// System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not not published to medium.");
-//				// }
-//				//					
-//				// // behObserver.getRoleDefinitions().put(perceptType + "::" +
-//				// dci.getDml().getRealization() + "::" + ae.getElement_id() +
-//				// "::" + ae.getAgentElementType(), dci.getRef());
-//				// }
-//				//
-//				// // HashMap<String, Object> parameterDataMappings =
-//				// publishWhenApplicable(ae, AgentElementType.BDI_BELIEF);
-//				// // if (parameterDataMappings != null) {
-//				// // publishEvent(ae, AgentElementType.BDI_BELIEF,
-//				// CoordinationInfo.AGENT_ELEMENT_NAME,
-//				// getToAgents(ae.getSource().toString(),
-//				// AgentElementType.BDI_BELIEF), parameterDataMappings);
-//				// // } else {
-//				// //
-//				// System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not not published to medium.");
-//				// // }
-//				//				
-//				//				
-//				// ------------------------- OLD
-//				// ----------------------------------
-//
-//				checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEF);
-//			}
-//		});
+
+		// exta.getBeliefbase().getBelief(agentElement.getElement_id()).addBeliefListener(new
+		// IBeliefListener()
+		// {
+		// public void beliefChanged(AgentEvent ae)
+		// {
+		// // getExternalAccess().getLogger().info("belief changed: "+ae);
+		// //
+		// System.out.println("#BDIBehaviorObservationComponent#belief changed: "
+		// // + ae.getValue() + " - " + ae.getSource());
+		// //
+		// getExternalAccess().getBeliefbase().getBelief("bel").removeBeliefListener(this);
+		//
+		// // ------------------------- OLD
+		// // ----------------------------------
+		// //
+		// // String nameOfElement = getNameOfAgentElement(ae,
+		// // AgentElementType.BDI_BELIEF);
+		// // //get all the DCM Realizations that have the current
+		// // AgentEvent as initiator for a PUBLISH-Event
+		// // for(String dmlRealizationName:
+		// //
+		// agentEventDCMRealizationMappings.get(AgentElementType.BDI_BELIEF.toString()
+		// // + "::" + nameOfElement)){
+		// // //Check whether role is active.
+		// // HashMap<String, Object> parameterDataMappings =
+		// // publishWhenApplicable(dmlRealizationName + "::" +
+		// // nameOfElement , ae, AgentElementType.BDI_BELIEF);
+		// // if (parameterDataMappings != null) {
+		// // // publishEvent(ae, AgentElementType.BDI_BELIEF,
+		// // CoordinationInfo.AGENT_ELEMENT_NAME,
+		// // getToAgents(ae.getSource().toString(),
+		// // AgentElementType.BDI_BELIEF), parameterDataMappings);
+		// // publishEvent(ae.getValue(), parameterDataMappings,
+		// // dmlRealizationName);
+		// // } else {
+		// //
+		// System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not not published to medium.");
+		// // }
+		// //
+		// // // behObserver.getRoleDefinitions().put(perceptType + "::" +
+		// // dci.getDml().getRealization() + "::" + ae.getElement_id() +
+		// // "::" + ae.getAgentElementType(), dci.getRef());
+		// // }
+		// //
+		// // // HashMap<String, Object> parameterDataMappings =
+		// // publishWhenApplicable(ae, AgentElementType.BDI_BELIEF);
+		// // // if (parameterDataMappings != null) {
+		// // // publishEvent(ae, AgentElementType.BDI_BELIEF,
+		// // CoordinationInfo.AGENT_ELEMENT_NAME,
+		// // getToAgents(ae.getSource().toString(),
+		// // AgentElementType.BDI_BELIEF), parameterDataMappings);
+		// // // } else {
+		// // //
+		// //
+		// System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not not published to medium.");
+		// // // }
+		// //
+		// //
+		// // ------------------------- OLD
+		// // ----------------------------------
+		//
+		// checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEF);
+		// }
+		// });
 	}
 
-	public void initBeliefSetListener(AgentElement agentElement, String mechanismRealizationId)
-	{
+	public void initBeliefSetListener(AgentElement agentElement, String mechanismRealizationId) {
 		// System.out.println("#BDIBehaviorObservationComponent# init listener for beliefSet: "
 		// + agentElement.getElement_id());
-		addValueToMap(agentEventDCMRealizationMappings, AgentElementType.BDI_BELIEFSET.toString() + "::" + agentElement.getElement_id(),
-			mechanismRealizationId);
-		
-		ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) exta;
+		addValueToMap(agentEventDCMRealizationMappings, AgentElementType.BDI_BELIEFSET.toString() + "::" + agentElement.getElement_id(), mechanismRealizationId);
+
+		ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) extAccess;
 		IOAVState state = extaFly.getState();
 		Object[] scope = AgentRules.resolveCapability(agentElement.getElement_id(), OAVBDIMetaModel.beliefset_type, extaFly.getScope(), state);
 		Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
-		if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_beliefsets, scope[0]))
-		{
+		if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_beliefsets, scope[0])) {
 			IBeliefbase base = BeliefbaseFlyweight.getBeliefbaseFlyweight(state, scope[1]);
-			base.getBeliefSet(agentElement.getElement_id()).addBeliefSetListener(new IBeliefSetListener()
-			{
-				public void factAdded(AgentEvent ae)
-				{
+			base.getBeliefSet(agentElement.getElement_id()).addBeliefSetListener(new IBeliefSetListener() {
+				public void factAdded(AgentEvent ae) {
 					checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEFSET);
 				}
 
-				public void factRemoved(AgentEvent ae)
-				{
+				public void factRemoved(AgentEvent ae) {
 					checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEFSET);
 				}
 
-				public void factChanged(AgentEvent ae)
-				{
+				public void factChanged(AgentEvent ae) {
 					checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEFSET);
 				}
 			});
-		} else
-		{
+		} else {
 			throw new RuntimeException("No such beliefset: " + scope[0] + " in " + scope[1]);
 		}
 		// try {
-//		exta.getBeliefbase().getBeliefSet(agentElement.getElement_id()).addBeliefSetListener(new IBeliefSetListener()
-//		{
-//			public void factAdded(AgentEvent ae)
-//			{
-//				// System.out.println("#BDIBehaviorObservationComponent#beliefSet fact added: "
-//				// + ae.getValue() + " - " + ae.getSource());
-//
-//				// String nameOfElement = getNameOfAgentElement(ae,
-//				// AgentElementType.BDI_BELIEFSET);
-//				// //get all the DCM Realizations that have the current
-//				// AgentEvent as initiator for a PUBLISH-Event
-//				// for(String dmlRealizationName:
-//				// agentEventDCMRealizationMappings.get(AgentElementType.BDI_BELIEFSET.toString()
-//				// + "::" + nameOfElement)){
-//				// //Check whether role is active.
-//				// HashMap<String, Object> parameterDataMappings =
-//				// publishWhenApplicable(dmlRealizationName + "::" +
-//				// nameOfElement , ae, AgentElementType.BDI_BELIEFSET);
-//				// if (parameterDataMappings != null) {
-//				// // publishEvent(ae, AgentElementType.BDI_BELIEF,
-//				// CoordinationInfo.AGENT_ELEMENT_NAME,
-//				// getToAgents(ae.getSource().toString(),
-//				// AgentElementType.BDI_BELIEF), parameterDataMappings);
-//				// publishEvent(ae.getValue(), parameterDataMappings,
-//				// dmlRealizationName);
-//				// } else {
-//				// System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not not published to medium.");
-//				// }
-//				// // behObserver.getRoleDefinitions().put(perceptType + "::" +
-//				// dci.getDml().getRealization() + "::" + ae.getElement_id() +
-//				// "::" + ae.getAgentElementType(), dci.getRef());
-//				// }
-//				checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEFSET);
-//			}
-//
-//			public void factRemoved(AgentEvent ae)
-//			{
-//				// System.out.println("#BDIBehaviorObservationComponent#beliefSet fact removed: "
-//				// + ae.getValue() + " - " + ae.getSource());
-//				// HashMap<String, Object> parameterDataMappings =
-//				// publishWhenApplicable(ae, AgentElementType.BDI_BELIEFSET);
-//				// if (parameterDataMappings != null) {
-//				// publishEvent(ae, AgentElementType.BDI_BELIEFSET,
-//				// CoordinationInfo.AGENT_ELEMENT_NAME,
-//				// getToAgents(ae.getSource().toString(),
-//				// AgentElementType.BDI_BELIEFSET),parameterDataMappings);
-//				// } else {
-//				// System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not not published to medium.");
-//				// }
-//				checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEFSET);
-//			}
-//
-//			public void factChanged(AgentEvent ae)
-//			{
-//				// System.out.println("#BDIBehaviorObservationComponent#beliefSet fact changed: "
-//				// + ae.getValue() + " - " + ae.getSource());
-//				// HashMap<String, Object> parameterDataMappings =
-//				// publishWhenApplicable(ae, AgentElementType.BDI_BELIEFSET);
-//				// if (parameterDataMappings != null) {
-//				// publishEvent(ae, AgentElementType.BDI_BELIEFSET,
-//				// CoordinationInfo.AGENT_ELEMENT_NAME,
-//				// getToAgents(ae.getSource().toString(),
-//				// AgentElementType.BDI_BELIEFSET), parameterDataMappings);
-//				// } else {
-//				// System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not not published to medium.");
-//				// }
-//				checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEFSET);
-//			}
-//		});
+		// exta.getBeliefbase().getBeliefSet(agentElement.getElement_id()).addBeliefSetListener(new
+		// IBeliefSetListener()
+		// {
+		// public void factAdded(AgentEvent ae)
+		// {
+		// //
+		// System.out.println("#BDIBehaviorObservationComponent#beliefSet fact added: "
+		// // + ae.getValue() + " - " + ae.getSource());
+		//
+		// // String nameOfElement = getNameOfAgentElement(ae,
+		// // AgentElementType.BDI_BELIEFSET);
+		// // //get all the DCM Realizations that have the current
+		// // AgentEvent as initiator for a PUBLISH-Event
+		// // for(String dmlRealizationName:
+		// //
+		// agentEventDCMRealizationMappings.get(AgentElementType.BDI_BELIEFSET.toString()
+		// // + "::" + nameOfElement)){
+		// // //Check whether role is active.
+		// // HashMap<String, Object> parameterDataMappings =
+		// // publishWhenApplicable(dmlRealizationName + "::" +
+		// // nameOfElement , ae, AgentElementType.BDI_BELIEFSET);
+		// // if (parameterDataMappings != null) {
+		// // // publishEvent(ae, AgentElementType.BDI_BELIEF,
+		// // CoordinationInfo.AGENT_ELEMENT_NAME,
+		// // getToAgents(ae.getSource().toString(),
+		// // AgentElementType.BDI_BELIEF), parameterDataMappings);
+		// // publishEvent(ae.getValue(), parameterDataMappings,
+		// // dmlRealizationName);
+		// // } else {
+		// //
+		// System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not not published to medium.");
+		// // }
+		// // // behObserver.getRoleDefinitions().put(perceptType + "::" +
+		// // dci.getDml().getRealization() + "::" + ae.getElement_id() +
+		// // "::" + ae.getAgentElementType(), dci.getRef());
+		// // }
+		// checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEFSET);
+		// }
+		//
+		// public void factRemoved(AgentEvent ae)
+		// {
+		// //
+		// System.out.println("#BDIBehaviorObservationComponent#beliefSet fact removed: "
+		// // + ae.getValue() + " - " + ae.getSource());
+		// // HashMap<String, Object> parameterDataMappings =
+		// // publishWhenApplicable(ae, AgentElementType.BDI_BELIEFSET);
+		// // if (parameterDataMappings != null) {
+		// // publishEvent(ae, AgentElementType.BDI_BELIEFSET,
+		// // CoordinationInfo.AGENT_ELEMENT_NAME,
+		// // getToAgents(ae.getSource().toString(),
+		// // AgentElementType.BDI_BELIEFSET),parameterDataMappings);
+		// // } else {
+		// //
+		// System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not not published to medium.");
+		// // }
+		// checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEFSET);
+		// }
+		//
+		// public void factChanged(AgentEvent ae)
+		// {
+		// //
+		// System.out.println("#BDIBehaviorObservationComponent#beliefSet fact changed: "
+		// // + ae.getValue() + " - " + ae.getSource());
+		// // HashMap<String, Object> parameterDataMappings =
+		// // publishWhenApplicable(ae, AgentElementType.BDI_BELIEFSET);
+		// // if (parameterDataMappings != null) {
+		// // publishEvent(ae, AgentElementType.BDI_BELIEFSET,
+		// // CoordinationInfo.AGENT_ELEMENT_NAME,
+		// // getToAgents(ae.getSource().toString(),
+		// // AgentElementType.BDI_BELIEFSET), parameterDataMappings);
+		// // } else {
+		// //
+		// System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not not published to medium.");
+		// // }
+		// checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEFSET);
+		// }
+		// });
 		// } catch (Exception e) {
 		// System.out.println("#BDIBehObser#" + e);
 		// }
 	}
 
-	public void initGoalListener(AgentElement agentElement, String mechanismRealizationId)
-	{
+	public void initGoalListener(AgentElement agentElement, String mechanismRealizationId) {
 		// System.out.println("#BDIBehaviorObservationComponent# init listener for goal: "
 		// + agentElement.getElement_id());
 		// agentEventDCMRealizationMappings.put(AgentElementType.BDI_GOAL.toString()
 		// + "::" + agentElement.getElement_id(), toAgents);
-		addValueToMap(agentEventDCMRealizationMappings, AgentElementType.BDI_GOAL.toString() + "::" + agentElement.getElement_id(),
-			mechanismRealizationId);
-		
-		ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) exta;
+		addValueToMap(agentEventDCMRealizationMappings, AgentElementType.BDI_GOAL.toString() + "::" + agentElement.getElement_id(), mechanismRealizationId);
+
+		ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) extAccess;
 		IOAVState state = extaFly.getState();
 		Object[] scope = AgentRules.resolveCapability(agentElement.getElement_id(), OAVBDIMetaModel.goal_type, extaFly.getScope(), state);
 		Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
-		if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_goals, scope[0]))
-		{
+		if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_goals, scope[0])) {
 			IGoalbase base = GoalbaseFlyweight.getGoalbaseFlyweight(state, scope[1]);
-			base.addGoalListener(agentElement.getElement_id(), new IGoalListener()
-			{
-				public void goalAdded(AgentEvent ae)
-				{
+			base.addGoalListener(agentElement.getElement_id(), new IGoalListener() {
+				public void goalAdded(AgentEvent ae) {
 					checkAndPublishIfApplicable(ae, AgentElementType.BDI_GOAL);
 				}
 
-				public void goalFinished(AgentEvent ae)
-				{
+				public void goalFinished(AgentEvent ae) {
 					checkAndPublishIfApplicable(ae, AgentElementType.BDI_GOAL);
 				}
 			});
-		} else
-		{
+		} else {
 			throw new RuntimeException("No such goal event: " + scope[0] + " in " + scope[1]);
 		}
-		
-//		exta.getGoalbase().addGoalListener(agentElement.getElement_id(), new IGoalListener()
-//		{
-//			public void goalAdded(AgentEvent ae)
-//			{
-//				// System.out.println("#BDIBehaviorObservationComponent#goal added: "
-//				// + ae.getValue() + " - " + ae.getSource());
-//				// HashMap<String, Object> parameterDataMappings =
-//				// publishWhenApplicable(ae, AgentElementType.BDI_GOAL);
-//				// if (parameterDataMappings != null) {
-//				// publishEvent(ae, AgentElementType.BDI_GOAL,
-//				// CoordinationInfo.AGENT_ELEMENT_NAME,
-//				// getToAgents(ae.getSource().toString(),
-//				// AgentElementType.BDI_GOAL), parameterDataMappings);
-//				// } else {
-//				// System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not not published to medium.");
-//				// }
-//				checkAndPublishIfApplicable(ae, AgentElementType.BDI_GOAL);
-//			}
-//
-//			public void goalFinished(AgentEvent ae)
-//			{
-//				// System.out.println("#BDIBehaviorObservationComponent#goal finished: "
-//				// + ae.getValue() + " - " + ae.getSource());
-//				// HashMap<String, Object> parameterDataMappings =
-//				// publishWhenApplicable(ae, AgentElementType.BDI_GOAL);
-//				// if (parameterDataMappings != null) {
-//				// publishEvent(ae, AgentElementType.BDI_GOAL,
-//				// CoordinationInfo.AGENT_ELEMENT_NAME,
-//				// getToAgents(ae.getSource().toString(),
-//				// AgentElementType.BDI_GOAL), parameterDataMappings);
-//				// } else {
-//				// System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not not published to medium.");
-//				// }
-//				checkAndPublishIfApplicable(ae, AgentElementType.BDI_GOAL);
-//			}
-//		});
+
+		// exta.getGoalbase().addGoalListener(agentElement.getElement_id(), new
+		// IGoalListener()
+		// {
+		// public void goalAdded(AgentEvent ae)
+		// {
+		// // System.out.println("#BDIBehaviorObservationComponent#goal added: "
+		// // + ae.getValue() + " - " + ae.getSource());
+		// // HashMap<String, Object> parameterDataMappings =
+		// // publishWhenApplicable(ae, AgentElementType.BDI_GOAL);
+		// // if (parameterDataMappings != null) {
+		// // publishEvent(ae, AgentElementType.BDI_GOAL,
+		// // CoordinationInfo.AGENT_ELEMENT_NAME,
+		// // getToAgents(ae.getSource().toString(),
+		// // AgentElementType.BDI_GOAL), parameterDataMappings);
+		// // } else {
+		// //
+		// System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not not published to medium.");
+		// // }
+		// checkAndPublishIfApplicable(ae, AgentElementType.BDI_GOAL);
+		// }
+		//
+		// public void goalFinished(AgentEvent ae)
+		// {
+		// //
+		// System.out.println("#BDIBehaviorObservationComponent#goal finished: "
+		// // + ae.getValue() + " - " + ae.getSource());
+		// // HashMap<String, Object> parameterDataMappings =
+		// // publishWhenApplicable(ae, AgentElementType.BDI_GOAL);
+		// // if (parameterDataMappings != null) {
+		// // publishEvent(ae, AgentElementType.BDI_GOAL,
+		// // CoordinationInfo.AGENT_ELEMENT_NAME,
+		// // getToAgents(ae.getSource().toString(),
+		// // AgentElementType.BDI_GOAL), parameterDataMappings);
+		// // } else {
+		// //
+		// System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not not published to medium.");
+		// // }
+		// checkAndPublishIfApplicable(ae, AgentElementType.BDI_GOAL);
+		// }
+		// });
 	}
 
-	public void initPlanListener(AgentElement agentElement, String mechanismRealizationId)
-	{
+	public void initPlanListener(AgentElement agentElement, String mechanismRealizationId) {
 		// System.out.println("#BDIBehaviorObservationComponent# init listener for plan: "
 		// + agentElement.getElement_id());
 		// agentEventDCMRealizationMappings.put(AgentElementType.BDI_PLAN.toString()
 		// + "::" + agentElement.getElement_id(), toAgents);
-		addValueToMap(agentEventDCMRealizationMappings, AgentElementType.BDI_PLAN.toString() + "::" + agentElement.getElement_id(),
-			mechanismRealizationId);
-		
-		ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) exta;
+		addValueToMap(agentEventDCMRealizationMappings, AgentElementType.BDI_PLAN.toString() + "::" + agentElement.getElement_id(), mechanismRealizationId);
+
+		ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) extAccess;
 		IOAVState state = extaFly.getState();
 		Object[] scope = AgentRules.resolveCapability(agentElement.getElement_id(), OAVBDIMetaModel.plan_type, extaFly.getScope(), state);
 		Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
-		if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_plans, scope[0]))
-		{
+		if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_plans, scope[0])) {
 			IPlanbase base = PlanbaseFlyweight.getPlanbaseFlyweight(state, scope[1]);
-			base.addPlanListener(agentElement.getElement_id(), new IPlanListener()
-			{
+			base.addPlanListener(agentElement.getElement_id(), new IPlanListener() {
 
-				public void planAdded(AgentEvent ae)
-				{
+				public void planAdded(AgentEvent ae) {
 					checkAndPublishIfApplicable(ae, AgentElementType.BDI_PLAN);
 				}
 
@@ -421,91 +358,85 @@ public class BDIBehaviorObservationComponent
 					checkAndPublishIfApplicable(ae, AgentElementType.BDI_PLAN);
 				}
 			});
-		} else
-		{
+		} else {
 			throw new RuntimeException("No such Plan event: " + scope[0] + " in " + scope[1]);
 		}
-		
-//		exta.getPlanbase().addPlanListener(agentElement.getElement_id(), new IPlanListener()
-//		{
-//
-//			public void planAdded(AgentEvent ae)
-//			{
-//				// System.out.println("#BDIBehaviorObservationComponent#plan added: "
-//				// + ae.getValue() + " - " + ae.getSource());
-//				// HashMap<String, Object> parameterDataMappings =
-//				// publishWhenApplicable(ae, AgentElementType.BDI_PLAN);
-//				// if (parameterDataMappings != null) {
-//				// publishEvent(ae, AgentElementType.BDI_PLAN,
-//				// CoordinationInfo.AGENT_ELEMENT_NAME,
-//				// getToAgents(ae.getSource().toString(),
-//				// AgentElementType.BDI_PLAN), parameterDataMappings);
-//				// } else {
-//				// System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not not published to medium.");
-//				// }
-//				checkAndPublishIfApplicable(ae, AgentElementType.BDI_PLAN);
-//			}
-//
-//			public void planFinished(AgentEvent ae)
-//
-//			{
-//				// System.out.println("#BDIBehaviorObservationComponent#plan finished: "
-//				// + ae.getValue() + " - " + ae.getSource());
-//				// HashMap<String, Object> parameterDataMappings =
-//				// publishWhenApplicable(ae, AgentElementType.BDI_PLAN);
-//				// if (parameterDataMappings != null) {
-//				// publishEvent(ae, AgentElementType.BDI_PLAN,
-//				// CoordinationInfo.AGENT_ELEMENT_NAME,
-//				// getToAgents(ae.getSource().toString(),
-//				// AgentElementType.BDI_PLAN), parameterDataMappings);
-//				// } else {
-//				// System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not not published to medium.");
-//				// }
-//				checkAndPublishIfApplicable(ae, AgentElementType.BDI_PLAN);
-//			}
-//		});
+
+		// exta.getPlanbase().addPlanListener(agentElement.getElement_id(), new
+		// IPlanListener()
+		// {
+		//
+		// public void planAdded(AgentEvent ae)
+		// {
+		// // System.out.println("#BDIBehaviorObservationComponent#plan added: "
+		// // + ae.getValue() + " - " + ae.getSource());
+		// // HashMap<String, Object> parameterDataMappings =
+		// // publishWhenApplicable(ae, AgentElementType.BDI_PLAN);
+		// // if (parameterDataMappings != null) {
+		// // publishEvent(ae, AgentElementType.BDI_PLAN,
+		// // CoordinationInfo.AGENT_ELEMENT_NAME,
+		// // getToAgents(ae.getSource().toString(),
+		// // AgentElementType.BDI_PLAN), parameterDataMappings);
+		// // } else {
+		// //
+		// System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not not published to medium.");
+		// // }
+		// checkAndPublishIfApplicable(ae, AgentElementType.BDI_PLAN);
+		// }
+		//
+		// public void planFinished(AgentEvent ae)
+		//
+		// {
+		// //
+		// System.out.println("#BDIBehaviorObservationComponent#plan finished: "
+		// // + ae.getValue() + " - " + ae.getSource());
+		// // HashMap<String, Object> parameterDataMappings =
+		// // publishWhenApplicable(ae, AgentElementType.BDI_PLAN);
+		// // if (parameterDataMappings != null) {
+		// // publishEvent(ae, AgentElementType.BDI_PLAN,
+		// // CoordinationInfo.AGENT_ELEMENT_NAME,
+		// // getToAgents(ae.getSource().toString(),
+		// // AgentElementType.BDI_PLAN), parameterDataMappings);
+		// // } else {
+		// //
+		// System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not not published to medium.");
+		// // }
+		// checkAndPublishIfApplicable(ae, AgentElementType.BDI_PLAN);
+		// }
+		// });
 	}
 
-	public void initInternalEventListener(final AgentElement agentElement, String mechanismRealizationId)
-	{
+	public void initInternalEventListener(final AgentElement agentElement, String mechanismRealizationId) {
 
-		addValueToMap(agentEventDCMRealizationMappings, AgentElementType.INTERNAL_EVENT.toString() + "::" + agentElement.getElement_id(),
-			mechanismRealizationId);
-		
-		ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) exta;
+		addValueToMap(agentEventDCMRealizationMappings, AgentElementType.INTERNAL_EVENT.toString() + "::" + agentElement.getElement_id(), mechanismRealizationId);
+
+		ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) extAccess;
 		IOAVState state = extaFly.getState();
 		Object[] scope = AgentRules.resolveCapability(agentElement.getElement_id(), OAVBDIMetaModel.internalevent_type, extaFly.getScope(), state);
 		Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
-		if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_internalevents, scope[0]))
-		{
+		if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_internalevents, scope[0])) {
 			IEventbase base = EventbaseFlyweight.getEventbaseFlyweight(state, scope[1]);
-			base.addInternalEventListener(agentElement.getElement_id(), new IInternalEventListener()
-			{
+			base.addInternalEventListener(agentElement.getElement_id(), new IInternalEventListener() {
 
-				public void internalEventOccurred(AgentEvent ae)
-				{
+				public void internalEventOccurred(AgentEvent ae) {
 					checkAndPublishIfApplicable(ae, AgentElementType.INTERNAL_EVENT);
 				}
 			});
-		} else
-		{
+		} else {
 			throw new RuntimeException("No such internal event: " + scope[0] + " in " + scope[1]);
 		}
 	}
 
 	/**
-	 * Check the role condition for this Event. If the Agent has the specified
-	 * role than publish the event to the coordination medium.
+	 * Check the role condition for this Event. If the Agent has the specified role than publish the event to the coordination medium.
 	 * 
 	 * @param ae
 	 * @param agentElementType
 	 * @param key
 	 *            partial key name
-	 * @return if !=null then applicable. contains then a map of the parameter
-	 *         and data mappings
+	 * @return if !=null then applicable. contains then a map of the parameter and data mappings
 	 */
-	private HashMap<String, Object> publishWhenApplicable(String key, AgentEvent ae, AgentElementType agentElementType, IBDIInternalAccess bia)
-	{
+	private HashMap<String, Object> publishWhenApplicable(String key, AgentEvent ae, AgentElementType agentElementType, IBDIInternalAccess bia) {
 
 		// behObserver.getRoleDefinitions().put(ae.getElement_id() + "::" +
 		// ae.getAgentElementType(), erList);
@@ -529,9 +460,8 @@ public class BDIBehaviorObservationComponent
 		// + 5, ae.getSource().toString().indexOf("-plan_"));
 		// }
 
-		return CheckRole.checkForPublish(
-			roleDefinitionsForPublish.get(Constants.PUBLISH + "::" + key + "::" + agentElementType.toString()), parameterAndDataMappings
-				.get(Constants.PUBLISH + "::" + key + "::" + agentElementType.toString()), ae, bia);
+		return CheckRole.checkForPublish(roleDefinitionsForPublish.get(Constants.PUBLISH + "::" + key + "::" + agentElementType.toString()),
+				parameterAndDataMappings.get(Constants.PUBLISH + "::" + key + "::" + agentElementType.toString()), ae, bia);
 	}
 
 	// /**
@@ -580,38 +510,45 @@ public class BDIBehaviorObservationComponent
 	// }
 
 	/**
-	 * Retrieves the name of the agentElement which is part of the "ae" String.
-	 * The name is used as a key for the agentEventDCMRealizationMappings.
+	 * Retrieves the name of the agentElement which is part of the "ae" String. The name is used as a key for the agentEventDCMRealizationMappings.
 	 * 
 	 * @return the name of the AgentElement
 	 */
-	private String getNameOfAgentElement(AgentEvent ae, AgentElementType agentElementType)
-	{
+	private String getNameOfAgentElement(AgentEvent ae, AgentElementType agentElementType) {
 
-//		if (agentElementType.equals(AgentElementType.BDI_BELIEFSET))
-//		{
-//			return ae.getSource().toString().substring(ae.getSource().toString().indexOf("BeliefSet(") + 10,
-//				ae.getSource().toString().indexOf("-beliefset_"));
-//		} else if (agentElementType.equals(AgentElementType.BDI_BELIEF))
-//		{
-//			return ae.getSource().toString().substring(ae.getSource().toString().indexOf("Belief(") + 7,
-//				ae.getSource().toString().indexOf("-belief_"));
-//		} else if (agentElementType.equals(AgentElementType.BDI_GOAL))
-//		{
-//			return ae.getSource().toString().substring(ae.getSource().toString().indexOf("Goal(") + 5,
-//				ae.getSource().toString().indexOf("-goal_"));
-//		} else if (agentElementType.equals(AgentElementType.BDI_PLAN))
-//		{
-//			return ae.getSource().toString().substring(ae.getSource().toString().indexOf("Plan(") + 5,
-//				ae.getSource().toString().indexOf("-plan_"));
-//		} else if (agentElementType.equals(AgentElementType.INTERNAL_EVENT))
-//		{
-//			return ae.getSource().toString().substring(ae.getSource().toString().indexOf("InternalEvent(") + 14,
-//				ae.getSource().toString().indexOf("-internalevent_"));
-//		}
+		// if (agentElementType.equals(AgentElementType.BDI_BELIEFSET))
+		// {
+		// return
+		// ae.getSource().toString().substring(ae.getSource().toString().indexOf("BeliefSet(")
+		// + 10,
+		// ae.getSource().toString().indexOf("-beliefset_"));
+		// } else if (agentElementType.equals(AgentElementType.BDI_BELIEF))
+		// {
+		// return
+		// ae.getSource().toString().substring(ae.getSource().toString().indexOf("Belief(")
+		// + 7,
+		// ae.getSource().toString().indexOf("-belief_"));
+		// } else if (agentElementType.equals(AgentElementType.BDI_GOAL))
+		// {
+		// return
+		// ae.getSource().toString().substring(ae.getSource().toString().indexOf("Goal(")
+		// + 5,
+		// ae.getSource().toString().indexOf("-goal_"));
+		// } else if (agentElementType.equals(AgentElementType.BDI_PLAN))
+		// {
+		// return
+		// ae.getSource().toString().substring(ae.getSource().toString().indexOf("Plan(")
+		// + 5,
+		// ae.getSource().toString().indexOf("-plan_"));
+		// } else if (agentElementType.equals(AgentElementType.INTERNAL_EVENT))
+		// {
+		// return
+		// ae.getSource().toString().substring(ae.getSource().toString().indexOf("InternalEvent(")
+		// + 14,
+		// ae.getSource().toString().indexOf("-internalevent_"));
+		// }
 
-		if  (agentElementType != null)
-		{
+		if (agentElementType != null) {
 			return ae.getSource().getModelElement().getName();
 		}
 		return null;
@@ -649,29 +586,6 @@ public class BDIBehaviorObservationComponent
 	// return res;
 	// }
 
-	/**
-	 * Get the role definitions that are used within the "PUBLICATION"
-	 * 
-	 * @return the roleDefinitions
-	 */
-	public Map<String, AgentReference> getRoleDefinitionsForPublish()
-	{
-		return roleDefinitionsForPublish;
-	}
-
-	/**
-	 * Get the role definitions that are used within the "PERCEIVE". The String
-	 * is the name of the DCM. The array holds the corresponding
-	 * DecentralCoordinationInformation (position 0) and AgentElement (position
-	 * 1).
-	 * 
-	 * @return the roleDefinitions
-	 */
-	public Map<String, Set<Object[]>> getRoleDefinitionsForPerceive()
-	{
-		return roleDefinitionsForPerceive;
-	}
-
 	// /**
 	// * @param roleDefinitions
 	// * the roleDefinitions to set
@@ -698,63 +612,30 @@ public class BDIBehaviorObservationComponent
 	// }
 
 	/**
-	 * Check for each received event whether the role definition is active for
-	 * ALL DCM that are interested in this event (i.e. that have registered an
-	 * listener) and dispatch event to medium if role definition is satisfied.
+	 * Check for each received event whether the role definition is active for ALL DCM that are interested in this event (i.e. that have registered an listener) and dispatch event to medium if role
+	 * definition is satisfied.
 	 */
-	private void checkAndPublishIfApplicable(final AgentEvent ae, final AgentElementType agentElementType)
-	{
-		exta.scheduleStep(new IComponentStep() {
-			
+	private void checkAndPublishIfApplicable(final AgentEvent ae, final AgentElementType agentElementType) {
+		extAccess.scheduleStep(new IComponentStep() {
+
 			@Override
 			public Object execute(IInternalAccess ia) {
 				IBDIInternalAccess bia = (IBDIInternalAccess) ia;
 				String nameOfElement = getNameOfAgentElement(ae, agentElementType);
-				// get all the DCM Realizations that have the current AgentEvent as
+				// get all the DCM Realizations that have the current AgentEvent
+				// as
 				// initiator for a PUBLISH-Event
-				for (String dmlRealizationName : agentEventDCMRealizationMappings.get(agentElementType.toString() + "::" + nameOfElement))
-				{
+				for (String dmlRealizationName : agentEventDCMRealizationMappings.get(agentElementType.toString() + "::" + nameOfElement)) {
 					// Check whether role is active.
-					HashMap<String, Object> parameterDataMappings = publishWhenApplicable(dmlRealizationName + "::" + nameOfElement, ae,
-						agentElementType,bia);
-					if (parameterDataMappings != null)
-					{
-						publishEvent(ae.getValue(), parameterDataMappings, nameOfElement, agentElementType, dmlRealizationName,bia);
-					} else
-					{
+					HashMap<String, Object> parameterDataMappings = publishWhenApplicable(dmlRealizationName + "::" + nameOfElement, ae, agentElementType, bia);
+					if (parameterDataMappings != null) {
+						publishEvent(ae.getValue(), parameterDataMappings, nameOfElement, agentElementType, dmlRealizationName, bia);
+					} else {
 						System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not published to medium or direct publish.");
 					}
 				}
 				return null;
 			}
 		});
-	}
-
-	/**
-	 * @return the parameterAndDataMappings
-	 */
-	public Map<String, AgentElement> getParameterAndDataMappings()
-	{
-		return parameterAndDataMappings;
-	}
-
-	/**
-	 * Helper method, in order to add values to an ArrayList inside a HashMap
-	 * 
-	 * @param hashMap
-	 * @param key
-	 * @param value
-	 */
-	private void addValueToMap(Map<String, ArrayList<String>> hashMap, String key, String value)
-	{
-		if (hashMap.get(key) == null)
-		{
-			ArrayList<String> newList = new ArrayList<String>();
-			newList.add(value);
-			hashMap.put(key, newList);
-		} else
-		{
-			hashMap.get(key).add(value);
-		}
 	}
 }

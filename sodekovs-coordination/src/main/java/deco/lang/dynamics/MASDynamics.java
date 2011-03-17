@@ -31,33 +31,33 @@ import deco4mas.annotation.agent.CoordinationAnnotation.CoordinationType;
  * <br>
  * This language describes analysis pattern of decentralized agent coordination in terms of structures of agent-behavior interdependencies.<br>
  * <br>
- * The system behavior is described by a set of system variables (Properties) that denote the numbers of agents that exhibit specific behaviors.
- * These variables are linked by direct (i.e. based on "inter-agent communication") and decentralized (i.e. based on "decentralized coordination mechanisms") interdependencies.
- * Both types of interdependencies can be configured to allow their automated enforcement (cf. dec4mas.*).
+ * The system behavior is described by a set of system variables (Properties) that denote the numbers of agents that exhibit specific behaviors. These variables are linked by direct (i.e. based on
+ * "inter-agent communication") and decentralized (i.e. based on "decentralized coordination mechanisms") interdependencies. Both types of interdependencies can be configured to allow their automated
+ * enforcement (cf. dec4mas.*).
  * 
  * @author Jan Sudeikat
  * 
  */
-@XmlRootElement(name="MASDynamic")
+@XmlRootElement(name = "MASDynamic")
 public class MASDynamics {
 
-	//----------attributes----------
-	
+	// ----------attributes----------
+
 	/** The name of the model. */
 	private String name;
-	
+
 	/** The define statements. */
 	Define define;
-	
+
 	/** The system properties (nodes). */
 	private Properties properties = new Properties();
-	
+
 	/** The causal relations between system properties (edges). */
 	private Causalities causalities = new Causalities();
-	
-	//----------methods-------------
 
-	@XmlAttribute(name="name")
+	// ----------methods-------------
+
+	@XmlAttribute(name = "name")
 	public String getName() {
 		return name;
 	}
@@ -65,8 +65,8 @@ public class MASDynamics {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	@XmlElement(name="defines")
+
+	@XmlElement(name = "defines")
 	public Define getDefine() {
 		return define;
 	}
@@ -75,31 +75,31 @@ public class MASDynamics {
 		this.define = define;
 	}
 
-	@XmlElement(name="causalities")
+	@XmlElement(name = "causalities")
 	public Causalities getCausalities() {
 		return causalities;
 	}
-	
+
 	private void addGroupMembership(GroupMembership gm) {
 		this.properties.addGroupMembership(gm);
-		
+
 	}
 
 	private void addGroupProperty(Group g) {
 		this.properties.addGroupProperty(g);
-		
+
 	}
 
 	private void addRoleOccupation(RoleOccupation ro) {
 		this.properties.addRoleOccupation(ro);
-		
+
 	}
 
 	private void addEnvironmentProperty(EnvrionmentProperty ep) {
 		this.properties.addEnvironmentProperty(ep);
 	}
 
-	@XmlElement(name="system_properties")
+	@XmlElement(name = "system_properties")
 	public Properties getProperties() {
 		return properties;
 	}
@@ -111,44 +111,44 @@ public class MASDynamics {
 	public void setCausalities(Causalities causalities) {
 		this.causalities = causalities;
 	}
-	
-	public void addDirectLink(DirectLink dl){
+
+	public void addDirectLink(DirectLink dl) {
 		this.causalities.addDirectLink(dl);
 	}
-	
-	public void addDecentralmechanismLink(DecentralMechanismLink dml){
+
+	public void addDecentralmechanismLink(DecentralMechanismLink dml) {
 		this.causalities.addDml(dml);
 	}
-	
-	//----------main--------------
-	
+
+	// ----------main--------------
+
 	/**
 	 * Exemplifying the basic functionality of the model and the xml-utilities.
 	 */
 	public static void main(String[] args) throws Exception {
-		
+
 		// create instance:
 		MASDynamics mas_dyn = new MASDynamics();
 		mas_dyn.setName("test-model");
-		
+
 		Define d = new Define();
-		AgentModel am = new AgentModel("Test-Agent","path/TestAgent.agent.xml",AgentModelType.JADEX);
-		MechanismModel mm = new MechanismModel("Test-Mechanism","path/mech.conf");
+		AgentModel am = new AgentModel("Test-Agent", "path/TestAgent.agent.xml", AgentModelType.JADEX);
+		MechanismModel mm = new MechanismModel("Test-Mechanism", "path/mech.conf");
 		d.addAgentModel(am);
 		d.addMechanismModel(mm);
-		
+
 		mas_dyn.setDefine(d);
-		
+
 		// creating nodes:
 		ArrayList<SystemProperty> sys_prop = new ArrayList<SystemProperty>();
-		
+
 		EnvrionmentProperty prop1 = new EnvrionmentProperty();
 		prop1.setMultiple(true);
 		prop1.setName("environment-element");
 		prop1.setValue(0);
-		
+
 		mas_dyn.addEnvironmentProperty(prop1);
-		
+
 		RoleOccupation prop2 = new RoleOccupation();
 		AgentReference ar = new AgentReference("agent_1");
 		ar.addElement(new ElementReference("element-name", deco.lang.dynamics.AgentElementType.BDI_GOAL));
@@ -156,40 +156,40 @@ public class MASDynamics {
 		prop2.addAgentReference(ar);
 		prop2.setMultiple(false);
 		prop2.setName("example-role");
-		
+
 		mas_dyn.addRoleOccupation(prop2);
-		
+
 		Group g = new Group();
 		g.setName("g");
 		AgentReference member = new AgentReference();
 		member.setAgent_id("agent-id");
 		member.addElement(new ElementReference("element-name", deco.lang.dynamics.AgentElementType.BDI_GOAL));
 		g.addAgentElement(member);
-		
+
 		AgentReference member2 = new AgentReference();
 		member2.setAgent_id("agent2-id");
 		member2.addElement(new ElementReference("element-name", deco.lang.dynamics.AgentElementType.BDI_GOAL));
 		g.addAgentElement(member2);
-		
+
 		mas_dyn.addGroupProperty(g);
-		
+
 		GroupMembership gm = new GroupMembership();
 		gm.setName("gm");
 		AgentReference member3 = new AgentReference();
 		member3.setAgent_id("agent3-id");
 		member3.addElement(new ElementReference("element-name", deco.lang.dynamics.AgentElementType.BDI_GOAL));
 		gm.addAgentElement(member3);
-		
+
 		AgentReference member4 = new AgentReference();
 		member4.setAgent_id("agent4-id");
 		member4.addElement(new ElementReference("element-name", deco.lang.dynamics.AgentElementType.BDI_GOAL));
 		gm.addAgentElement(member4);
-		
+
 		sys_prop.add(gm);
 		mas_dyn.addGroupMembership(gm);
-		
+
 		// creating links:
-		
+
 		DirectLink dl = new DirectLink();
 		dl.addFrom(prop1);
 		dl.addTo(prop2);
@@ -197,44 +197,44 @@ public class MASDynamics {
 		dl.setRate(1.5);
 		dl.setType(CoordinationType.POSITIVE);
 		mas_dyn.addDirectLink(dl);
-		
+
 		DecentralMechanismLink dml = new DecentralMechanismLink();
 		dml.setName("decentral-mechanism-link");
 		dml.setType(CoordinationType.NEGATIVE);
 		dml.addFrom(gm);
 		dml.addTo(g);
-		
+
 		DecentralizedCausality c = new DecentralizedCausality();
-		AgentElement ae = new AgentElement("id","element_id",deco.lang.dynamics.AgentElementType.INTERNAL_EVENT.toString());
-		ae.addParameterMapping(new ParameterMapping("local_name","ref","clazz"));
+		AgentElement ae = new AgentElement("id", "element_id", deco.lang.dynamics.AgentElementType.INTERNAL_EVENT.toString());
+		ae.addParameterMapping(new ParameterMapping("local_name", "ref", "clazz"));
 		c.addFrom_agents(ae);
-		c.addTo_agents(new AgentElement("id","element_id",deco.lang.dynamics.AgentElementType.INTERNAL_EVENT.toString()));
+		c.addTo_agents(new AgentElement("id", "element_id", deco.lang.dynamics.AgentElementType.INTERNAL_EVENT.toString()));
 		c.setId("id");
 		MechanismConfiguration mc = new MechanismConfiguration();
-		mc.addParameterMapping(new MechanismParameterMapping("from_name","to_id","class","agent_id"));
+		mc.addParameterMapping(new MechanismParameterMapping("from_name", "to_id", "class", "agent_id"));
 		mc.setMechanism_id("mechanism_id");
 		mc.addProperty("key", "value");
 		c.setMechanismConfiguration(mc);
-		
-		dml.setRealization(c.getId());	// this is the concrete mechanism configuration (cf. SSCC08 paper);
+
+		dml.setRealization(c.getId()); // this is the concrete mechanism configuration (cf. SSCC08 paper);
 		mas_dyn.getCausalities().addRealization(c);
 		mas_dyn.addDecentralmechanismLink(dml);
-		
+
 		// write XML:
-	    deco4mas.util.xml.XmlUtil.saveAsXML(mas_dyn, "example.xml");
-	    System.out.println("saved...");
-	    
-	    // read from XML:
-	    MASDynamics mas_dyn2 = (MASDynamics) deco4mas.util.xml.XmlUtil.retrieveFromXML(MASDynamics.class, "foraging.dynamics.xml");
-	    System.out.println("Read conf file: " + mas_dyn2);
-	    
-	    // write XML:
-	    deco4mas.util.xml.XmlUtil.saveAsXML(mas_dyn2, "example2.xml");
-	    System.out.println("saved...");
-		
-	    // generate the XML-Schema (.xsd) that represents the language meta-model.
-	    deco4mas.util.xml.XmlUtil.generateSchema(MASDynamics.class);
-	    
+		deco4mas.util.xml.XmlUtil.saveAsXML(mas_dyn, "example.xml");
+		System.out.println("saved...");
+
+		// read from XML:
+		MASDynamics mas_dyn2 = (MASDynamics) deco4mas.util.xml.XmlUtil.retrieveFromXML(MASDynamics.class, "foraging.dynamics.xml");
+		System.out.println("Read conf file: " + mas_dyn2);
+
+		// write XML:
+		deco4mas.util.xml.XmlUtil.saveAsXML(mas_dyn2, "example2.xml");
+		System.out.println("saved...");
+
+		// generate the XML-Schema (.xsd) that represents the language meta-model.
+		deco4mas.util.xml.XmlUtil.generateSchema(MASDynamics.class);
+
 	}
-	
+
 }

@@ -256,7 +256,7 @@ public class InitDeco4mas {
 
 		space.addPerceptGenerator(new String("generator"), perceptGenerator);
 		// TODO: Check which perceptProcessors fits which AgentType?
-		IPerceptProcessor perceptProcessor = new DefaultCoordinationInformationInterpreter();
+		IPerceptProcessor perceptProcessor = new DefaultCoordinationInformationInterpreter(masDyn);
 		// perceptProcessor.setProperty("percepttypes", new Object[] { new
 		// String[] { "coordinate_init:participants",
 		// "coordinate:Init_Participants", "init_deco4mas_coordination" },
