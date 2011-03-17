@@ -544,10 +544,14 @@
 
 				<module>sodekovs-simulationcontrol</module>
 				<module>sodekovs-coordination</module>
+				<module>sodekovs-benchmarking</module>
 				<module>jadex-distributed</module>
 			</modules>
 		</profile>
 	</profiles>
+	<modules>
+		<module>sodekovs-benchmarking</module>
+	</modules>
 
 	<!-- <url>http://jadex.sourceforge.net</url> -->
 
