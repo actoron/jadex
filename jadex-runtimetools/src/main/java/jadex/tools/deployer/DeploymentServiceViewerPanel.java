@@ -10,11 +10,11 @@ import jadex.base.gui.filetree.FileData;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.service.deployment.IDeploymentService;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.IService;
 import jadex.commons.Properties;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.PopupBuilder;
-import jadex.commons.service.IService;
 
 import java.io.File;
 

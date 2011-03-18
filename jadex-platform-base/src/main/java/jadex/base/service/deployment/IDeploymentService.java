@@ -1,7 +1,7 @@
 package jadex.base.service.deployment;
 
+import jadex.bridge.service.IService;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IService;
 
 /**
  *  Interface for the deployment service.

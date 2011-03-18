@@ -1,19 +1,19 @@
 package jadex.wfms.service.impl;
 
+import jadex.bridge.service.BasicResultSelector;
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IResultSelector;
+import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.library.ILibraryService;
+import jadex.bridge.service.library.ILibraryServiceListener;
 import jadex.commons.IFilter;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
-import jadex.commons.service.BasicResultSelector;
-import jadex.commons.service.BasicService;
-import jadex.commons.service.IResultSelector;
-import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.library.ILibraryService;
-import jadex.commons.service.library.ILibraryServiceListener;
 import jadex.wfms.listeners.IProcessRepositoryListener;
 import jadex.wfms.listeners.ProcessRepositoryEvent;
 import jadex.wfms.service.IExecutionService;

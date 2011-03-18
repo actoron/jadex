@@ -1,9 +1,9 @@
 package jadex.bridge;
 
+import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.Excluded;
 import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IService;
-import jadex.commons.service.annotation.Excluded;
 
 import java.util.Map;
 

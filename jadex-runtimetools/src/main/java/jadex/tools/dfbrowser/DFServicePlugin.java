@@ -1,11 +1,11 @@
 package jadex.tools.dfbrowser;
 
 import jadex.base.fipa.IDF;
+import jadex.bridge.service.IService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.commons.service.IService;
 import jadex.tools.generic.AbstractServicePlugin;
 
 import javax.swing.Icon;

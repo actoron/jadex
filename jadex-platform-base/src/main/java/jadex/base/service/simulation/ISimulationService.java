@@ -1,9 +1,9 @@
 package jadex.base.service.simulation;
 
+import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.Excluded;
 import jadex.commons.IChangeListener;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IService;
-import jadex.commons.service.annotation.Excluded;
 
 /**
  *  Interface for the time simulation service.

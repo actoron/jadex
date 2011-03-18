@@ -1,7 +1,7 @@
 package jadex.tools.simcenter;
 
+import jadex.bridge.service.IServiceProvider;
 import jadex.commons.TimeFormat;
-import jadex.commons.service.IServiceProvider;
 
 import java.awt.BorderLayout;
 import java.text.DateFormat;

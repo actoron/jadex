@@ -1,7 +1,7 @@
 package jadex.micro.testcases.semiautomatic.remoteservice;
 
+import jadex.bridge.service.IService;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IService;
 
 /**
  *  Simple interface for a component service.

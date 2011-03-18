@@ -6,7 +6,7 @@ import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bdi.runtime.Plan;
-import jadex.commons.service.IService;
+import jadex.bridge.service.IService;
 
 import java.util.ArrayList;
 import java.util.Collection;

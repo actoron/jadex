@@ -10,17 +10,18 @@ import jadex.bridge.IModelInfo;
 import jadex.bridge.IModelValueProvider;
 import jadex.bridge.ModelInfo;
 import jadex.bridge.ModelValueProvider;
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.GuiClass;
+import jadex.bridge.service.annotation.GuiClassName;
 import jadex.commons.ByteClassLoader;
 import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.commons.service.BasicService;
-import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.ProvidedServiceInfo;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.annotation.GuiClass;
-import jadex.commons.service.annotation.GuiClassName;
 import jadex.javaparser.SJavaParser;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -206,7 +207,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			for(int i=0; i<vals.length; i++)
 			{
 				rsis[i] = new RequiredServiceInfo(vals[i].name(), vals[i].type(), 
-					vals[i].dynamic(), vals[i].multiple(), vals[i].scope());
+					vals[i].multiple(), new RequiredServiceBinding(vals[i].name(), vals[i].scope(), vals[i].dynamic()));
 			}
 			metainfo.setRequiredServices(rsis);
 		}
@@ -435,10 +436,10 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 * @return An instance of a component.
 	 */
 	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo model, 
-		String config, Map arguments, IExternalAccess parent, Future ret)
+		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] binding, Future ret)
 	{
 		MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, model, getMicroAgentClass(model.getFullName()+"Agent", 
-			null, model.getClassLoader()), arguments, config, parent, ret);
+			null, model.getClassLoader()), arguments, config, parent, binding, ret);
 		return new Object[]{mai, mai.getAgentAdapter()};
 	}
 	

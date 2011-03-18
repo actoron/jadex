@@ -5,7 +5,7 @@ import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.service.SServiceProvider;
+import jadex.bridge.service.SServiceProvider;
 
 public class SimulationEndPlan extends Plan {
 

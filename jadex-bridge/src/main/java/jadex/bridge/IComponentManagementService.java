@@ -1,8 +1,8 @@
 package jadex.bridge;
 
+import jadex.bridge.service.IService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.service.IService;
 
 /**
  *  General interface for components that the container can execute.
@@ -61,7 +61,6 @@ public interface IComponentManagementService extends IService
 	/**
 	 *  Get the component identifiers.
 	 *  @return The component identifiers.
-	 *  
 	 *  This method should be used with caution when the agent population is large.
 	 */
 	public IFuture getComponentIdentifiers();

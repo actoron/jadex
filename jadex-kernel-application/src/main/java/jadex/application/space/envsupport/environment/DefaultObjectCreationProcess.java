@@ -1,7 +1,7 @@
 package jadex.application.space.envsupport.environment;
 
+import jadex.bridge.service.clock.IClockService;
 import jadex.commons.SimplePropertyObject;
-import jadex.commons.service.clock.IClockService;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 

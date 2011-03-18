@@ -1,5 +1,6 @@
 package jadex.component.model;
 
+import jadex.bridge.service.RequiredServiceBinding;
 import jadex.javaparser.IParsedExpression;
 
 import java.util.ArrayList;
@@ -30,6 +31,9 @@ public class MComponentInstance extends MStartable
 	/** The list of contained arguments. */
 	protected List arguments;
 	
+	/** The list of required service binding infos. */
+	protected List bindings;
+	
 	//-------- constructors --------
 	
 	/**
@@ -38,6 +42,7 @@ public class MComponentInstance extends MStartable
 	public MComponentInstance()
 	{
 		this.arguments = new ArrayList();
+		this.bindings = new ArrayList();
 		this.start = true;
 	}
 	
@@ -157,7 +162,7 @@ public class MComponentInstance extends MStartable
 	 */
 	public void addArgument(MExpressionType arg)
 	{
-		this.arguments.add(arg);
+		arguments.add(arg);
 	}
 
 	/**
@@ -168,7 +173,25 @@ public class MComponentInstance extends MStartable
 	{
 		return this.arguments;
 	}
-	
+		
+	/**
+	 *  Add a required service binding.
+	 *  @param .
+	 */
+	public void addRequiredServiceBinding(RequiredServiceBinding binding)
+	{
+		bindings.add(binding);
+	}
+
+	/**
+	 *  Get the bindings.
+	 *  @return the bindings.
+	 */
+	public List getRequiredServiceBindings()
+	{
+		return bindings;
+	}
+
 	/**
 	 *  Get the model of the component instance.
 	 *  @param apptype The application type this component is used in.

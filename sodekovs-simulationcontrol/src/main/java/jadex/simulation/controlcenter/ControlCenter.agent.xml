@@ -15,7 +15,7 @@
 		<import>java.util.HashMap</import>
 		<import>jadex.simulation.model.*</import>
 		<import>jadex.commons.*</import>
-		<import>jadex.commons.service.*</import>
+		<import>jadex.bridge.service.*</import>
 		<import>jadex.commons.future.*</import>
 	</imports>
 

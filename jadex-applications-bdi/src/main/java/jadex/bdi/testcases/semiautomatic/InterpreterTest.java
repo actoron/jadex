@@ -10,18 +10,18 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
+import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.clock.ClockCreationInfo;
+import jadex.bridge.service.clock.ClockService;
+import jadex.bridge.service.clock.IClock;
+import jadex.bridge.service.component.ComponentServiceContainer;
+import jadex.bridge.service.threadpool.ThreadPoolService;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.ThreadPoolFactory;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.service.BasicServiceContainer;
-import jadex.commons.service.IServiceContainer;
-import jadex.commons.service.clock.ClockCreationInfo;
-import jadex.commons.service.clock.ClockService;
-import jadex.commons.service.clock.IClock;
-import jadex.commons.service.threadpool.ThreadPoolService;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -75,7 +75,7 @@ public class InterpreterTest
 				{
 				}
 			});
-			BDIInterpreter interpreter = new BDIInterpreter(null, new ComponentAdapterFactory(), loaded.getState(), loaded, null, null, null, config, ret);
+			BDIInterpreter interpreter = new BDIInterpreter(null, new ComponentAdapterFactory(), loaded.getState(), loaded, null, null, null, null, config, ret);
 			interpreter.getAgentAdapter().wakeup();
 			
 	//		System.out.println("Agent execution finished.");
@@ -115,7 +115,7 @@ class ComponentAdapter implements IComponentAdapter
 	
 	public ComponentAdapter(final IComponentInstance interpreter)
 	{
-		container = new BasicServiceContainer("platform");
+		container = new ComponentServiceContainer(this, "platform");
 		ThreadPoolService tps = new ThreadPoolService(ThreadPoolFactory.createThreadPool(), container);
 		container.addService(tps);
 		ClockService clock = new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "system"), container);

@@ -3,17 +3,17 @@ package jadex.component.runtime.impl;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
+import jadex.bridge.service.IServiceProvider;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IServiceProvider;
-import jadex.component.runtime.IComponentExternalAccess;
 
 /**
  *  External access for applications.
  */
-public class ExternalAccess implements IComponentExternalAccess
+public class ExternalAccess implements IExternalAccess
 {
 	//-------- attributes --------
 

@@ -1,8 +1,8 @@
 package jadex.bridge;
 
+import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SUtil;
-import jadex.commons.service.ProvidedServiceInfo;
-import jadex.commons.service.RequiredServiceInfo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,6 +68,9 @@ public class ModelInfo implements IModelInfo
 	/** The autoshutdown flag. */
 	protected IModelValueProvider autoshutdown;
 	
+//	/** The components. */
+//	protected IModelValueProvider components;
+	
 	//-------- constructors --------
 	
 	/**
@@ -87,7 +90,8 @@ public class ModelInfo implements IModelInfo
 		IArgument[] arguments, IArgument[] results, boolean startable,
 		String filename, Map properties, ClassLoader classloader, 
 		RequiredServiceInfo[] requiredservices, ProvidedServiceInfo[] providedservices, 
-		IModelValueProvider master, IModelValueProvider daemon, IModelValueProvider autoshutdown)
+		IModelValueProvider master, IModelValueProvider daemon, 
+		IModelValueProvider autoshutdown)//, IModelValueProvider components)
 	{
 		this.name = name;
 		this.packagename = packagename;
@@ -104,6 +108,7 @@ public class ModelInfo implements IModelInfo
 		this.master = master;
 		this.daemon = daemon;
 		this.autoshutdown = autoshutdown;
+//		this.components = components;
 		setRequiredServices(requiredservices);
 	}
 
@@ -425,6 +430,22 @@ public class ModelInfo implements IModelInfo
 	}
 	
 	/**
+	 *  Set the required service bindings.
+	 *  @param required services The required services to set.
+	 */
+	public void setRequiredServiceB(RequiredServiceInfo[] requiredservices)
+	{
+		if(requiredservices!=null && requiredservices.length>0)
+		{
+			this.requiredservices = new HashMap();
+			for(int i=0; i<requiredservices.length; i++)
+			{
+				this.requiredservices.put(requiredservices[i].getName(), requiredservices[i]);
+			}
+		}
+	}
+	
+	/**
 	 *  Get the required service.
 	 *  @return The required service.
 	 */
@@ -526,4 +547,23 @@ public class ModelInfo implements IModelInfo
 	{
 		this.suspend = suspend;
 	}
+	
+//	/**
+//	 *  Get the component instances. 
+//	 *  @param configname The configname.
+//	 *  @return The component instances.
+//	 */
+//	public List getComponentInstances(String configname)
+//	{
+//		return components==null? null: (List)components.getValue(configname);
+//	}
+//	
+//	/**
+//	 *  Set the components. 
+//	 *  @param components The components.
+//	 */
+//	public void setComponentInstances(IModelValueProvider components)
+//	{
+//		this.components = components;
+//	}
 }

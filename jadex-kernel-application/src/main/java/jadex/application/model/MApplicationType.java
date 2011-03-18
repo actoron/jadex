@@ -4,14 +4,15 @@ import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.Argument;
 import jadex.bridge.ModelInfo;
 import jadex.bridge.ModelValueProvider;
+import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.ProvidedServiceInfo;
-import jadex.commons.service.RequiredServiceInfo;
 import jadex.javaparser.IParsedExpression;
 import jadex.xml.StackElement;
 
@@ -221,8 +222,8 @@ public class MApplicationType extends MStartable implements ICacheableModel
 			for(int i=0; i<reqs.size(); i++)
 			{
 				MRequiredServiceType ser = (MRequiredServiceType)reqs.get(i);
-				tmp[i] = new RequiredServiceInfo(ser.getName(), ser.getClazz(), ser.isDynamic(), 
-					ser.isMultiple(), ser.getScope());
+				tmp[i] = new RequiredServiceInfo(ser.getName(), ser.getClazz(),
+					ser.isMultiple(), new RequiredServiceBinding(ser.getName(), ser.getScope(), ser.isDynamic()));
 			}
 			
 			modelinfo.setRequiredServices(tmp);

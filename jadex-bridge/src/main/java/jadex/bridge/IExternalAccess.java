@@ -1,8 +1,8 @@
 package jadex.bridge;
 
+import jadex.bridge.service.IServiceProvider;
 import jadex.commons.IRemotable;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IServiceProvider;
 
 /**
  *  The interface for accessing components from the outside.
@@ -64,6 +64,19 @@ public interface IExternalAccess extends IRemotable
 	 *  Kill the component.
 	 */
 	public IFuture killComponent();
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren(String type);
+	
+	/**
+	 *  Get the model name of a component type.
+	 *  @param ctype The component type.
+	 *  @return The model name of this component type.
+	 */
+	public IFuture getFileName(String ctype);
 	
 	//-------- exclude --------
 	

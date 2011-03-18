@@ -3,7 +3,7 @@ package jadex.wfms.bdi.interfaces.client;
 import jadex.base.fipa.Done;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.service.SServiceProvider;
+import jadex.bridge.service.SServiceProvider;
 import jadex.wfms.bdi.ontology.ComponentClientProxy;
 import jadex.wfms.bdi.ontology.RequestAuth;
 import jadex.wfms.service.IClientService;

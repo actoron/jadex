@@ -7,7 +7,7 @@ import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.simulation.examples.marsworld.producer.ProduceOreTask;
 import jadex.simulation.examples.marsworld.sentry.AnalyzeTargetTask;
-import jadex.commons.service.clock.IClockService;
+import jadex.bridge.service.clock.IClockService;
 
 /**
  *  Move an object towards a destination.

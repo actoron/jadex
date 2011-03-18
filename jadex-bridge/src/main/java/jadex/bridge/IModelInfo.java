@@ -1,7 +1,7 @@
 package jadex.bridge;
 
-import jadex.commons.service.ProvidedServiceInfo;
-import jadex.commons.service.RequiredServiceInfo;
+import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 
 import java.util.Map;
 
@@ -142,4 +142,10 @@ public interface IModelInfo
 	 */
 	public Boolean getAutoShutdown(String configname);
 
+//	/**
+//	 *  Get the component instances. 
+//	 *  @param configname The configname.
+//	 *  @return The component instances.
+//	 */
+//	public List getComponentInstances(String configname);
 }

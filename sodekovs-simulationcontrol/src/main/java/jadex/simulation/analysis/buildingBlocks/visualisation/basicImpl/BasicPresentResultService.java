@@ -2,7 +2,7 @@ package jadex.simulation.analysis.buildingBlocks.visualisation.basicImpl;
 
 import jadex.bdi.runtime.ICapability;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.BasicService;
+import jadex.bridge.service.BasicService;
 import jadex.simulation.analysis.buildingBlocks.simulation.IExecuteExperimentService;
 import jadex.simulation.analysis.buildingBlocks.visualisation.IPresentResultService;
 import jadex.simulation.analysis.common.dataObjects.IAExperiment;

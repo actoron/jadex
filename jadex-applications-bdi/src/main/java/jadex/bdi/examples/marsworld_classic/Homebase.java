@@ -1,7 +1,7 @@
 package jadex.bdi.examples.marsworld_classic;
 
+import jadex.bridge.service.clock.IClockService;
 import jadex.commons.SReflect;
-import jadex.commons.service.clock.IClockService;
 
 /**
  *  The agents homebase.

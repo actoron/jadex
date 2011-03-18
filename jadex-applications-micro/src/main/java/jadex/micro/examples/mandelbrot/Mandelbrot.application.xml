@@ -9,8 +9,8 @@
 	name="Mandelbrot" package="jadex.micro.examples.mandelbrot" autoshutdown="true">
 	
 	<imports>
-		<import>jadex.commons.service.clock.IClockService</import>
-		<import>jadex.commons.service.SServiceProvider</import>
+		<import>jadex.bridge.serviceclock.IClockService</import>
+		<import>jjadex.bridge.serviceServiceProvider</import>
 		<import>jadex.commons.IFuture</import>
 	</imports>
 	

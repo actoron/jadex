@@ -1,7 +1,7 @@
 package jadex.micro.examples.mandelbrot;
 
+import jadex.bridge.service.IService;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IService;
 
 /**
  *  Service for displaying the result of a calculation. 

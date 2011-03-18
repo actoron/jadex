@@ -10,8 +10,8 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.service.SServiceProvider;
 import jadex.commons.collection.SCollection;
-import jadex.commons.service.SServiceProvider;
 
 import java.util.List;
 import java.util.Map;

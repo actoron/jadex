@@ -2,8 +2,8 @@ package jadex.bdi.testcases.service;
 
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.Plan;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
 
 import java.util.Collection;
 import java.util.Iterator;

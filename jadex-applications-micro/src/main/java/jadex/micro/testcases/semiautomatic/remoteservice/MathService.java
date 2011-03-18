@@ -1,9 +1,9 @@
 package jadex.micro.testcases.semiautomatic.remoteservice;
 
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.BasicService;
-import jadex.commons.service.IServiceProvider;
 
 /**
  *  Simple implementation of the math interface.

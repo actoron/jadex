@@ -1,7 +1,7 @@
 package jadex.wfms.bdi.interfaces.client;
 
 import jadex.base.fipa.Done;
-import jadex.commons.service.SServiceProvider;
+import jadex.bridge.service.SServiceProvider;
 import jadex.wfms.bdi.client.cap.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.RequestCapabilities;
 import jadex.wfms.client.IClient;

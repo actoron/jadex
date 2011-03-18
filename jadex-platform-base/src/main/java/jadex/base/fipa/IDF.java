@@ -2,9 +2,9 @@ package jadex.base.fipa;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.GuiClassName;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IService;
-import jadex.commons.service.annotation.GuiClassName;
 
 import java.util.Date;
 

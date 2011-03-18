@@ -4,9 +4,9 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.jtable.ObjectTableModel;
-import jadex.commons.service.clock.IClockService;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Color;

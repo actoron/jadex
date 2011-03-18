@@ -28,7 +28,7 @@
 		<import>jadex.application.space.envsupport.environment.space2d.*</import>
 		<import>jadex.application.space.envsupport.environment.DeltaTimeExecutor</import>
 		<import>jadex.application.space.envsupport.math.*</import>
-		<import>jadex.commons.service.clock.IClockService</import>
+		<import>jadex.bridge.serviceclock.IClockService</import>
 		<import>jadex.application.space.envsupport.dataview.*</import>
 		<import>java.text.SimpleDateFormat</import>
 		<import>java.util.Date</import>
@@ -38,7 +38,7 @@
 		<import>jadex.bdi.examples.marsworld.producer.*</import>
 		<import>jadex.bdi.examples.marsworld.sentry.*</import>
 		<import>jadex.bdi.examples.marsworld.movement.*</import>
-		<import>jadex.commons.service.SServiceProvider</import>
+		<import>jjadex.bridge.serviceServiceProvider</import>
 		<import>jadex.commons.IFuture</import>
 	</imports>
 	

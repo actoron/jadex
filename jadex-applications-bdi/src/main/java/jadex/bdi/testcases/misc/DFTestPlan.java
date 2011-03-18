@@ -10,8 +10,8 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.SServiceProvider;
 import jadex.commons.SUtil;
-import jadex.commons.service.SServiceProvider;
 
 import java.util.Date;
 

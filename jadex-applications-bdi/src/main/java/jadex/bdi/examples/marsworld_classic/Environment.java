@@ -1,6 +1,6 @@
 package jadex.bdi.examples.marsworld_classic;
 
-import jadex.commons.service.clock.IClockService;
+import jadex.bridge.service.clock.IClockService;
 
 import java.util.ArrayList;
 

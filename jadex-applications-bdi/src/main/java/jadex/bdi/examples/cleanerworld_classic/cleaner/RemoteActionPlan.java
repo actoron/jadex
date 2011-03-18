@@ -9,7 +9,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.PlanFailureException;
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.service.SServiceProvider;
+import jadex.bridge.service.SServiceProvider;
 
 
 /**

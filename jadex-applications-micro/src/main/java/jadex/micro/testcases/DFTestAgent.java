@@ -13,10 +13,10 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.MessageType;
+import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.service.SServiceProvider;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 

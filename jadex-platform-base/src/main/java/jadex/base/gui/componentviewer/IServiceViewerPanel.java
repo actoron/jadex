@@ -1,8 +1,8 @@
 package jadex.base.gui.componentviewer;
 
 import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.service.IService;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IService;
 
 /**
  *  An inner panel of the service viewer.

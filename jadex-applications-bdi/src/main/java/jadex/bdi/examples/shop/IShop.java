@@ -1,7 +1,7 @@
 package jadex.bdi.examples.shop;
 
+import jadex.bridge.service.IService;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IService;
 
 /**
  *  The shop interface for buying goods at the shop.

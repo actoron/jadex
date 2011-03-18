@@ -83,7 +83,7 @@ public class AboutDialog extends JAutoPositionDialog
 	 */
 	public String generateText()
 	{
-		infotext = "<head/><body>(c) 2002-2010<br>"
+		infotext = "<head/><body>(c) 2002-2011<br>"
 			+ "Alexander Pokahr, Lars Braubach<br>"
 //			+ "Artwork by Dirk Bade<br>"
 			+ "All rights reserved<br>";

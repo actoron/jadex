@@ -23,7 +23,7 @@
 		<import>jadex.bdi.planlib.protocols.*</import>
 		<import>jadex.bdi.runtime.*</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
-		<import>jadex.commons.service.clock.*</import>
+		<import>jadex.bridge.serviceclock.*</import>
 	</imports>
 
 	<capabilities>

@@ -16,7 +16,6 @@ import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bridge.ComponentResultListener;
-import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
@@ -29,6 +28,13 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.IntermediateComponentResultListener;
+import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.ISynchronizator;
@@ -38,11 +44,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.service.IServiceContainer;
-import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.clock.IClockService;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.rulesystem.Activation;
@@ -205,7 +206,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 */
 	public BDIInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, final IOAVState state, final OAVAgentModel model, 
-		final String config, final Map arguments, final IExternalAccess parent, final Map kernelprops, Future inited)
+		final String config, final Map arguments, final IExternalAccess parent, RequiredServiceBinding[] bindings, final Map kernelprops, Future inited)
 	{	
 		this.initthread = Thread.currentThread();
 		

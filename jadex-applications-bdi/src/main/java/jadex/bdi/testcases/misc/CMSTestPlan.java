@@ -9,7 +9,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.ISearchConstraints;
-import jadex.commons.service.SServiceProvider;
+import jadex.bridge.service.SServiceProvider;
 
 /**
  *  Test the CMS plans.

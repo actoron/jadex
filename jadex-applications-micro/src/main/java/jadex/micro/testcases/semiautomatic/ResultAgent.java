@@ -4,9 +4,9 @@ import jadex.bridge.Argument;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.service.SServiceProvider;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 

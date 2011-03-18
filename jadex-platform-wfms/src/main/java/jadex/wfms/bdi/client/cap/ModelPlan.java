@@ -3,8 +3,8 @@ package jadex.wfms.bdi.client.cap;
 import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.bpmn.BpmnModelLoader;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.library.ILibraryService;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.library.ILibraryService;
 import jadex.gpmn.GpmnModelLoader;
 import jadex.wfms.bdi.ontology.RequestModel;
 

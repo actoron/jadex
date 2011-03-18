@@ -23,13 +23,10 @@ import java.util.Set;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
-import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLReporter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-
-import org.xml.sax.InputSource;
 
 /**
  *  Stax XML reader.
@@ -85,6 +82,7 @@ public class Reader
 	 */
 	public Reader(IObjectReaderHandler handler, boolean bulklink, boolean validate, XMLReporter reporter)
 	{
+		// Xerces has a stackoverflow bug when coalescing is set to true :-(
 		this(handler, bulklink, validate, false, reporter);
 	}
 	

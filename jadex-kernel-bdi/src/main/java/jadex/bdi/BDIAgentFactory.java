@@ -12,16 +12,17 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.library.ILibraryService;
+import jadex.bridge.service.library.ILibraryServiceListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.commons.service.BasicService;
-import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.library.ILibraryService;
-import jadex.commons.service.library.ILibraryServiceListener;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;
@@ -168,7 +169,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	 * @return An instance of a component.
 	 */
 	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo modelinfo, 
-		String config, Map arguments, IExternalAccess parent, Future ret)
+		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, Future ret)
 	{
 		try
 		{
@@ -183,7 +184,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 			IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 			state.addSubstate(amodel.getState());
 			
-			BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, props, ret);
+			BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, props, ret);
 			return new Object[]{bdii, bdii.getAgentAdapter()};
 		}
 		catch(Exception e)
@@ -203,7 +204,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	 * @return An instance of a component.
 	 */
 	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, OAVAgentModel amodel, 
-		String config, Map arguments, IExternalAccess parent, Future ret)
+		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, Future ret)
 	{
 		// Create type model for agent instance (e.g. holding dynamically loaded java classes).
 		OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
@@ -213,7 +214,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 		IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 		state.addSubstate(amodel.getState());
 		
-		BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, props, ret);
+		BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, props, ret);
 		return new Object[]{bdii, bdii.getAgentAdapter()};
 	}
 	

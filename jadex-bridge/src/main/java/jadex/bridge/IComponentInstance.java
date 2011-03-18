@@ -1,7 +1,7 @@
 package jadex.bridge;
 
+import jadex.bridge.service.IServiceContainer;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IServiceContainer;
 
 import java.util.Map;
 

@@ -27,6 +27,12 @@ public @interface Configuration
 	 *  The results.
 	 */
 	public NameValue[] results() default {};
+
+// todo:
+//	/**
+//	 *  The required service bindings.
+//	 */
+//	public Binding[] bindings() default {};
 	
 	/**
 	 *  The master flag.

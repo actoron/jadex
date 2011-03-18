@@ -2,21 +2,22 @@ package jadex.gpmn;
 
 import jadex.bdi.BDIAgentFactory;
 import jadex.bdi.model.OAVAgentModel;
-import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.commons.service.BasicService;
-import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.SServiceProvider;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -199,7 +200,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 * @return An instance of a component.
 	 */
 	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
-		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, Future inited)
+		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, Future inited)
 	{
 //		ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 		
@@ -223,7 +224,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 			else
 				ret = legacyconverter.convertGpmnModelToBDIAgents((jadex.gpmn.model.MGpmnModel)ret, modelinfo.getClassLoader());
 	
-			return this.factory.createComponentInstance(desc, factory, (OAVAgentModel)ret, config, arguments, parent, inited);
+			return this.factory.createComponentInstance(desc, factory, (OAVAgentModel)ret, config, arguments, parent, bindings, inited);
 		}
 		catch(Exception e)
 		{

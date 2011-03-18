@@ -6,11 +6,12 @@ import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,6 +63,7 @@ public class CreateComponentTask implements ITask
 				Boolean master = context.getParameterValue("master")!=null? (Boolean)context.getParameterValue("master"): null;
 				Boolean daemon = context.getParameterValue("daemon")!=null? (Boolean)context.getParameterValue("daemon"): null;
 				Boolean autoshutdown = context.getParameterValue("autoshutdown")!=null? (Boolean)context.getParameterValue("autoshutdown"): null;
+				RequiredServiceBinding[] bindings = context.getParameterValue("bindings")!=null? (RequiredServiceBinding[])context.getParameterValue("bindings"): null;
 				
 				Map args = (Map)context.getParameterValue("arguments");
 				if(args==null)
@@ -115,7 +117,7 @@ public class CreateComponentTask implements ITask
 				
 				cms.createComponent(name, model,
 					new CreationInfo(config, args, sub ? instance.getComponentAdapter().getComponentIdentifier() : null, 
-						suspend, master, daemon, autoshutdown, instance.getModelElement().getAllImports()), lis);
+						suspend, master, daemon, autoshutdown, instance.getModelElement().getAllImports(), bindings), lis);
 
 				if(!wait)
 				{

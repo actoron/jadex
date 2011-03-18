@@ -4,9 +4,9 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.ICapability;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
+import jadex.bridge.service.BasicService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.BasicService;
 
 /**
  *  The shop for buying goods at the shop.

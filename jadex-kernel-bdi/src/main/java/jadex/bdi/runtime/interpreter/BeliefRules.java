@@ -2,8 +2,8 @@ package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bridge.CheckedAction;
+import jadex.bridge.service.clock.ITimedObject;
 import jadex.commons.SReflect;
-import jadex.commons.service.clock.ITimedObject;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;

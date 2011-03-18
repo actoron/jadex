@@ -1,10 +1,10 @@
 package jadex.bridge;
 
+import jadex.bridge.service.IResultSelector;
+import jadex.bridge.service.ISearchManager;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.IVisitDecider;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IResultSelector;
-import jadex.commons.service.ISearchManager;
-import jadex.commons.service.IService;
-import jadex.commons.service.IVisitDecider;
 
 
 /**

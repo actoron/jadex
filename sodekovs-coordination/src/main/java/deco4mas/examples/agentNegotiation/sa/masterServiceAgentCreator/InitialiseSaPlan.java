@@ -3,8 +3,8 @@ package deco4mas.examples.agentNegotiation.sa.masterServiceAgentCreator;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
 
 import java.util.HashMap;
 import java.util.Map;

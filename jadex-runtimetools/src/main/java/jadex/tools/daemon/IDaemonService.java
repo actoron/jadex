@@ -1,9 +1,9 @@
 package jadex.tools.daemon;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.IService;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IService;
 
 /**
  * 

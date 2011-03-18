@@ -5,6 +5,8 @@ import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.SServiceProvider;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -12,8 +14,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.service.IService;
-import jadex.commons.service.SServiceProvider;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;

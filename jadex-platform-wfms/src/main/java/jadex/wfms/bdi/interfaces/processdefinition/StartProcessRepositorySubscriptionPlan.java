@@ -4,7 +4,7 @@ import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.service.SServiceProvider;
+import jadex.bridge.service.SServiceProvider;
 import jadex.wfms.UpdateSubscriptionStep;
 import jadex.wfms.bdi.client.cap.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.InformProcessModelAdded;

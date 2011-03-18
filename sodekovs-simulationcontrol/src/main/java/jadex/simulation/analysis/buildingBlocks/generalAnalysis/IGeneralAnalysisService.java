@@ -1,7 +1,7 @@
 package jadex.simulation.analysis.buildingBlocks.generalAnalysis;
 
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IService;
+import jadex.bridge.service.IService;
 
 import java.awt.Frame;
 import java.awt.event.ActionEvent;

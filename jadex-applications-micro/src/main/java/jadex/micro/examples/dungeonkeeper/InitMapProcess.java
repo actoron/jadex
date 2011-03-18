@@ -7,7 +7,7 @@ import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.application.space.envsupport.math.Vector2Int;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
-import jadex.commons.service.clock.IClockService;
+import jadex.bridge.serviceclock.IClockService;
 
 import java.io.BufferedReader;
 import java.io.InputStream;

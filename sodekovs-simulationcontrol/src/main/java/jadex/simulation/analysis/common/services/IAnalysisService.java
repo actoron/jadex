@@ -3,7 +3,7 @@ package jadex.simulation.analysis.common.services;
 import java.util.UUID;
 
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IService;
+import jadex.bridge.service.IService;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
 import jadex.simulation.analysis.common.events.service.IAServiceObservable;
 

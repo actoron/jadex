@@ -1,11 +1,8 @@
 package jadex.component.runtime.impl;
 
-import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.ComponentResultListener;
-import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.CreationInfo;
-import jadex.bridge.DecouplingServiceInvocationInterceptor;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
@@ -21,6 +18,17 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.IntermediateComponentResultListener;
+import jadex.bridge.service.IInternalService;
+import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.ServiceNotFoundException;
+import jadex.bridge.service.component.ComponentFactorySelector;
+import jadex.bridge.service.component.ComponentServiceContainer;
+import jadex.bridge.service.component.DecouplingServiceInvocationInterceptor;
 import jadex.commons.ChangeEvent;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
@@ -34,13 +42,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
-import jadex.commons.service.IInternalService;
-import jadex.commons.service.IServiceContainer;
-import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.ProvidedServiceInfo;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.ServiceNotFoundException;
 import jadex.component.ComponentComponentFactory;
 import jadex.component.model.MComponentInstance;
 import jadex.component.model.MComponentType;
@@ -49,7 +50,6 @@ import jadex.component.model.MExpressionType;
 import jadex.component.model.MProvidedServiceType;
 import jadex.component.model.MSubcomponentType;
 import jadex.component.runtime.IComponent;
-import jadex.component.runtime.IComponentExternalAccess;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.xml.annotation.XMLClassname;
@@ -134,13 +134,17 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	/** The component listeners. */
 	protected List componentlisteners;
 	
+	/** The required service binding information. */
+	protected Map bindings;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new context.
 	 */
 	public ComponentInterpreter(final IComponentDescription desc, final MComponentType model, final MConfiguration config, 
-		final IComponentAdapterFactory factory, final IExternalAccess parent, final Map arguments, final Future inited)
+		final IComponentAdapterFactory factory, final IExternalAccess parent, final Map arguments, 
+		final RequiredServiceBinding[] bindings, final Future inited)
 	{
 		this.config	= config;
 		this.model = model;
@@ -152,6 +156,15 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 		this.instances = new MultiCollection(); 
 		this.steps	= new ArrayList();
 		this.willdostep	= true;
+		
+		if(bindings!=null)
+		{
+			this.bindings = new HashMap();
+			for(int i=0; i<bindings.length; i++)
+			{
+				this.bindings.put(bindings[i].getName(), bindings[i]);
+			}
+		}
 	
 		// Init the arguments with default values.
 		String[] configs = model.getModelInfo().getConfigurations();
@@ -237,7 +250,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 										final IComponentManagementService cms = (IComponentManagementService)result;
 										IComponentIdentifier cid = cms.createComponentIdentifier(st.getComponentName(), st.getComponentName().indexOf("@")==-1);
 										IInternalService service = CompositeServiceInvocationInterceptor.createServiceProxy(st.getClazz(), null, 
-											(IComponentExternalAccess)getExternalAccess(), getModel().getClassLoader(), cid);
+											getExternalAccess(), getModel().getClassLoader(), cid);
 										getServiceContainer().addService(service);
 										futu.setResult(null);
 									}
@@ -254,7 +267,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 //								service = (IInternalService)Proxy.newProxyInstance(getClassLoader(), new Class[]{IInternalService.class, st.getClazz()}, 
 //									new CompositeServiceInvocationInterceptor((IApplicationExternalAccess)getExternalAccess(), componenttype, st.getClazz()));
 								service = CompositeServiceInvocationInterceptor.createServiceProxy(st.getClazz(), st.getComponentType(), 
-									(IComponentExternalAccess)getExternalAccess(), getModel().getClassLoader(), null);
+									getExternalAccess(), getModel().getClassLoader(), null);
 								getServiceContainer().addService(service);
 							}
 						}
@@ -353,7 +366,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 										// might depend on each other (e.g. bdi factory must be there for jcc)).
 										
 										final IComponentManagementService ces = (IComponentManagementService)result;
-										createComponent(components, ces, 0, inited);
+										createComponent(components, ces, 0, inited, new ArrayList());
 									}
 								}));
 							}
@@ -427,7 +440,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 							if(sers.contains(servicetype))
 							{
 								IInternalService service = CompositeServiceInvocationInterceptor.createServiceProxy(servicetype, ct.getName(), 
-									(IComponentExternalAccess)getExternalAccess(), getModel().getClassLoader(), null);
+									getExternalAccess(), getModel().getClassLoader(), null);
 								getServiceContainer().addService(service);
 								ret.setResult(result);
 							}
@@ -1271,7 +1284,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	 */
 	public String	getComponentFilename(String type)
 	{
-		return model.getMComponentType(type).getFilename();
+		return model.getMSubcomponentType(type).getFilename();
 	}
 	
 	/**
@@ -1308,14 +1321,14 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	 *  because they need the external access of the parent, which is available only
 	 *  after init is finished (otherwise there is a cyclic init dependency between parent and subcomps). 
 	 */
-	protected void createComponent(final List components, final IComponentManagementService ces, final int i, final Future inited)
+	protected void createComponent(final List components, final IComponentManagementService cms, final int i, final Future inited, final List tostart)
 	{
 		if(i<components.size())
 		{
 			final MComponentInstance component = (MComponentInstance)components.get(i);
 //			System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
 			int num = getNumber(component);
-			IResultListener	crl	= new CollectionResultListener(num, false, new IResultListener()
+			final IResultListener crl = new CollectionResultListener(num, false, new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -1337,7 +1350,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 							@XMLClassname("createChild")
 							public Object execute(IInternalAccess ia)
 							{
-								createComponent(components, ces, i+1, inited);
+								createComponent(components, cms, i+1, inited, tostart);
 								return null;
 							}
 						});
@@ -1354,14 +1367,29 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 				MSubcomponentType	type	= component.getType(model);
 				if(type!=null)
 				{
-					Boolean	suspend	= component.getSuspend()!=null ? component.getSuspend() : type.getSuspend();
-					Boolean	master	= component.getMaster()!=null ? component.getMaster() : type.getMaster();
-					Boolean	daemon	= component.getDaemon()!=null ? component.getDaemon() : type.getDaemon();
-					Boolean	autoshutdown	= component.getAutoShutdown()!=null ? component.getAutoShutdown() : type.getAutoShutdown();
-					IFuture ret = ces.createComponent(component.getName(), component.getType(model).getFilename(),
+					final Boolean suspend	= component.getSuspend()!=null ? component.getSuspend() : type.getSuspend();
+					Boolean	master = component.getMaster()!=null ? component.getMaster() : type.getMaster();
+					Boolean	daemon = component.getDaemon()!=null ? component.getDaemon() : type.getDaemon();
+					Boolean	autoshutdown = component.getAutoShutdown()!=null ? component.getAutoShutdown() : type.getAutoShutdown();
+					List bindings = component.getRequiredServiceBindings();
+					IFuture ret = cms.createComponent(component.getName(), component.getType(model).getFilename(),
 						new CreationInfo(component.getConfiguration(), getArguments(component), adapter.getComponentIdentifier(),
-						suspend, master, daemon, autoshutdown, model.getAllImports()), null);
-					ret.addResultListener(crl);
+							true, master, daemon, autoshutdown, model.getAllImports(), 
+							bindings!=null? (RequiredServiceBinding[])bindings.toArray(new RequiredServiceBinding[bindings.size()]): null), null);
+					ret.addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object result)
+						{
+							if(suspend==null || !suspend.booleanValue())
+								tostart.add(result);
+							crl.resultAvailable(result);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							crl.exceptionOccurred(exception);
+						}
+					});
 				}
 				else
 				{
@@ -1377,6 +1405,12 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 			// master, daemon, autoshutdown
 //			Boolean[] bools = new Boolean[3];
 //			bools[2] = model.getAutoShutdown();
+			
+			for(int j=0; j<tostart.size(); j++)
+			{
+				IComponentIdentifier cid = (IComponentIdentifier)tostart.get(j);
+				cms.resumeComponent(cid);
+			}
 			
 			inited.setResult(new Object[]{ComponentInterpreter.this, adapter});
 		}
@@ -1561,6 +1595,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	public IFuture getRequiredService(String name, boolean rebind)
 	{
 		RequiredServiceInfo info = getModel().getRequiredService(name);
+		RequiredServiceBinding binding = getRequiredServiceBinding(name);
 		if(info==null)
 		{
 			Future ret = new Future();
@@ -1569,7 +1604,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 		}
 		else
 		{
-			return getServiceContainer().getRequiredService(info, rebind);
+			return getServiceContainer().getRequiredService(info, binding, rebind);
 		}
 	}
 	
@@ -1580,6 +1615,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
 	{
 		RequiredServiceInfo info = getModel().getRequiredService(name);
+		RequiredServiceBinding binding = getRequiredServiceBinding(name);
 		if(info==null)
 		{
 			IntermediateFuture ret = new IntermediateFuture();
@@ -1588,8 +1624,18 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 		}
 		else
 		{
-			return getServiceContainer().getRequiredServices(info, rebind);
+			return getServiceContainer().getRequiredServices(info, binding, rebind);
 		}
+	}
+	
+	/**
+	 *  Get the binding info of a service.
+	 *  @param name The required service name.
+	 *  @return The binding info of a service.
+	 */
+	protected RequiredServiceBinding getRequiredServiceBinding(String name)
+	{
+		return bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
 	}
 	
 }

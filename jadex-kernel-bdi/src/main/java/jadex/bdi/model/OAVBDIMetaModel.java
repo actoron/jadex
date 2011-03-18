@@ -1,7 +1,7 @@
 package jadex.bdi.model;
 
 import jadex.bridge.MessageType;
-import jadex.commons.service.RequiredServiceInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.javaparser.IParsedExpression;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;

@@ -7,7 +7,7 @@ import jadex.bpmn.runtime.ITaskContext;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.service.IInternalService;
+import jadex.bridge.service.IInternalService;
 import jadex.simulation.analysis.buildingBlocks.analysisProcess.lowLevelAnalysis.impl.LowLevelAnalysisService;
 import jadex.simulation.analysis.common.component.workflow.Factory.ATaskViewFactory;
 import jadex.simulation.analysis.common.component.workflow.defaultView.BpmnComponentView;

@@ -2,8 +2,8 @@ package jadex.component.runtime;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.service.IServiceProvider;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IServiceProvider;
 import jadex.component.model.MComponentType;
 
 import java.util.Map;

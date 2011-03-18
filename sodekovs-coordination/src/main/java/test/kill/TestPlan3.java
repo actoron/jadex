@@ -5,7 +5,7 @@ import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.service.SServiceProvider;
+import jadex.bridge.service.SServiceProvider;
 
 
 /**

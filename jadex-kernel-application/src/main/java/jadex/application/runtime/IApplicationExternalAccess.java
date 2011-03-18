@@ -9,18 +9,18 @@ import jadex.commons.future.IFuture;
  */
 public interface IApplicationExternalAccess	extends IExternalAccess
 {
-	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 */
-	public IFuture getChildren(String type);
-	
-	/**
-	 *  Get the model name of a component type.
-	 *  @param ctype The component type.
-	 *  @return The model name of this component type.
-	 */
-	public IFuture getFileName(String ctype);
+//	/**
+//	 *  Get the children (if any).
+//	 *  @return The children.
+//	 */
+//	public IFuture getChildren(String type);
+//	
+//	/**
+//	 *  Get the model name of a component type.
+//	 *  @param ctype The component type.
+//	 *  @return The model name of this component type.
+//	 */
+//	public IFuture getFileName(String ctype);
 	
 	// toto: use futrue
 	/**

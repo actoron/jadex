@@ -9,7 +9,7 @@
 	name="chat" package="jadex.micro.examples.chat">
 	
 	<imports>
-		<import>jadex.commons.service.*</import>
+		<import>jadex.bridge.service*</import>
 	</imports>
 	
 	<services>

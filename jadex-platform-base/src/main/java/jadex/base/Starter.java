@@ -216,7 +216,8 @@ public class Starter
 									}
 								});
 								
-								Object[] root = cfac.createComponentInstance(desc, afac, model, (String)cmdargs.get(CONFIGURATION_NAME), compargs, null, future);
+								Object[] root = cfac.createComponentInstance(desc, afac, model, (String)cmdargs.get(CONFIGURATION_NAME),
+									compargs, null, null, future);
 								IComponentAdapter adapter = (IComponentAdapter)root[1];
 								
 								// Execute init steps of root component on main thread (i.e. platform).

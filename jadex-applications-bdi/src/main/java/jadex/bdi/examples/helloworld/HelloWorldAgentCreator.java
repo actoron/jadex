@@ -6,11 +6,11 @@ import jadex.bdi.model.editable.IMEBelief;
 import jadex.bdi.model.editable.IMECapability;
 import jadex.bdi.model.editable.IMEConfiguration;
 import jadex.bdi.model.editable.IMEPlan;
-import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.service.SServiceProvider;
 
 /**
  *  Example that shows how an agent model can be created via the editable model api.

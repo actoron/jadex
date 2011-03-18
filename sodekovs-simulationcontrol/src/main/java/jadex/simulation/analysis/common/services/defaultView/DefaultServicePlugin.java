@@ -3,7 +3,7 @@ package jadex.simulation.analysis.common.services.defaultView;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.commons.service.IService;
+import jadex.bridge.service.IService;
 import jadex.simulation.analysis.buildingBlocks.analysisProcess.lowLevelAnalysis.view.LowLevelAnalysisServicePlugin;
 import jadex.simulation.analysis.common.services.IAnalysisService;
 import jadex.tools.generic.AbstractServicePlugin;

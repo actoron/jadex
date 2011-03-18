@@ -6,11 +6,11 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.execution.IExecutionService;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.execution.IExecutionService;
 
 import java.io.Serializable;
 

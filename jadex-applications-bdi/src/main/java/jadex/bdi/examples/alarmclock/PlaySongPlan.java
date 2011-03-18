@@ -1,8 +1,8 @@
 package jadex.bdi.examples.alarmclock;
 
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.service.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
-import jadex.commons.service.threadpool.IThreadPoolService;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;

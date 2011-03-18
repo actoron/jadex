@@ -1,10 +1,10 @@
 package jadex.base.service.deployment;
 
 import jadex.base.gui.filetree.FileData;
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.BasicService;
-import jadex.commons.service.IServiceProvider;
 
 import java.awt.Desktop;
 import java.io.File;

@@ -1,10 +1,10 @@
 package jadex.wfms.service;
 
+import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.SServiceProvider;
 import jadex.commons.ICommand;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.service.IServiceContainer;
-import jadex.commons.service.SServiceProvider;
 import jadex.wfms.client.IClient;
 
 import java.security.AccessControlException;

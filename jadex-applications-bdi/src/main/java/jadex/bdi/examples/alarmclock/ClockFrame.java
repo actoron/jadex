@@ -5,10 +5,10 @@ import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.clock.IClockService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
-import jadex.commons.service.clock.IClockService;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.AWTException;

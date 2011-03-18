@@ -5,7 +5,7 @@ import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceProcess;
 import jadex.application.space.envsupport.environment.space2d.Grid2D;
 import jadex.commons.SimplePropertyObject;
-import jadex.commons.service.clock.IClockService;
+import jadex.bridge.service.clock.IClockService;
 import deco.lang.dynamics.AgentElementType;
 import deco4mas.annotation.agent.CoordinationAnnotation.CoordinationType;
 import deco4mas.coordinate.environment.CoordinationSpaceObject;

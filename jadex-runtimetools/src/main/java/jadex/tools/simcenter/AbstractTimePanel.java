@@ -1,15 +1,15 @@
 package jadex.tools.simcenter;
 
 import jadex.base.service.simulation.ISimulationService;
+import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.clock.IClockService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
-import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.clock.IClockService;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

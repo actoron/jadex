@@ -1,7 +1,7 @@
 package jadex.micro.examples.chat;
 
+import jadex.bridge.service.IService;
 import jadex.commons.IRemoteChangeListener;
-import jadex.commons.service.IService;
 
 
 /**

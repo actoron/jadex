@@ -1,10 +1,10 @@
 package jadex.wfms.service.impl;
 
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
-import jadex.commons.service.BasicService;
-import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.SServiceProvider;
 import jadex.wfms.client.IClient;
 import jadex.wfms.listeners.IProcessRepositoryListener;
 import jadex.wfms.service.IAAAService;

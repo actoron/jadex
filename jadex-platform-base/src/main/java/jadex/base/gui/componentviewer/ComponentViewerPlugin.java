@@ -10,6 +10,8 @@ import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.SServiceProvider;
 import jadex.commons.Properties;
 import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;
@@ -20,8 +22,6 @@ import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.gui.SGUI;
-import jadex.commons.service.IService;
-import jadex.commons.service.SServiceProvider;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;

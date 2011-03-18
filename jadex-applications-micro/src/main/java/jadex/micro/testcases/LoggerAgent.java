@@ -2,10 +2,10 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.clock.IClock;
+import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.clock.IClock;
-import jadex.commons.service.clock.IClockService;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;

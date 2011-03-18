@@ -6,7 +6,7 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.service.SServiceProvider;
+import jadex.bridge.service.SServiceProvider;
 
 /**
  *  Test start/termination flags work. 

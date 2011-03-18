@@ -1,8 +1,8 @@
 package jadex.micro.examples.helpline;
 
+import jadex.bridge.service.BasicService;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
-import jadex.commons.service.BasicService;
 
 /**
  *  Helpline service implementation.

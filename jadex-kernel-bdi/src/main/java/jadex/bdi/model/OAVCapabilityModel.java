@@ -5,6 +5,9 @@ import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.Argument;
 import jadex.bridge.IArgument;
 import jadex.bridge.ModelInfo;
+import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -13,8 +16,6 @@ import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.ProvidedServiceInfo;
-import jadex.commons.service.RequiredServiceInfo;
 import jadex.javaparser.IParsedExpression;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.Rulebase;
@@ -697,7 +698,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 //				boolean declared = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_declared));
 //				boolean upwards = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_upwards));
 				String scope = ((String)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_scope));
-				ret.add(new RequiredServiceInfo(name, clazz, dynamic, multiple, scope));
+				ret.add(new RequiredServiceInfo(name, clazz, multiple, new RequiredServiceBinding(name, scope, dynamic)));
 //				ret.add(state.getAttributeValue(it.next(), OAVBDIMetaModel.expression_has_class));
 			}
 		}

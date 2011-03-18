@@ -1,7 +1,7 @@
 package jadex.simulation.analysis.buildingBlocks.simulation;
 
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IService;
+import jadex.bridge.service.IService;
 
 import java.util.Set;
 

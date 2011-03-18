@@ -14,12 +14,12 @@ import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.clock.IClockService;
-import jadex.commons.service.clock.ITimedObject;
-import jadex.commons.service.clock.ITimer;
+import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.clock.ITimedObject;
+import jadex.bridge.service.clock.ITimer;
 import jadex.simulation.model.ObservedEvent;
 
 import java.util.ArrayList;

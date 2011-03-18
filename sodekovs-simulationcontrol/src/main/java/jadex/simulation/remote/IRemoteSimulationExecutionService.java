@@ -2,8 +2,8 @@ package jadex.simulation.remote;
 
 
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IService;
-import jadex.commons.service.annotation.Timeout;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.Timeout;
 
 import java.util.HashMap;
 import java.util.Map;

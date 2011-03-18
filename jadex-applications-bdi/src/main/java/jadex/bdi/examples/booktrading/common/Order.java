@@ -1,8 +1,8 @@
 package jadex.bdi.examples.booktrading.common;
 
+import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.clock.ITimedObject;
 import jadex.commons.SimplePropertyChangeSupport;
-import jadex.commons.service.clock.IClockService;
-import jadex.commons.service.clock.ITimedObject;
 
 import java.beans.PropertyChangeListener;
 import java.util.Date;

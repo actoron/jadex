@@ -1,10 +1,10 @@
 package jadex.bridge;
 
+import jadex.bridge.service.IServiceProvider;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.service.IServiceProvider;
 
 import java.util.logging.Logger;
 

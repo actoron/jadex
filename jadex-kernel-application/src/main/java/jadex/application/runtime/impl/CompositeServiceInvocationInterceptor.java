@@ -1,25 +1,25 @@
 package jadex.application.runtime.impl;
 
 import jadex.application.runtime.IApplicationExternalAccess;
-import jadex.bridge.BasicServiceInvocationHandler;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IServiceInvocationInterceptor;
-import jadex.bridge.ServiceInvocationContext;
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IInternalService;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.IServiceInvocationInterceptor;
+import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.service.BasicService;
-import jadex.commons.service.IInternalService;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
 import jadex.xml.annotation.XMLClassname;
 
 import java.lang.reflect.InvocationHandler;

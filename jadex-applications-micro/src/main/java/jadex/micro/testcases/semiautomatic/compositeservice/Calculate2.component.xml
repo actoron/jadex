@@ -9,30 +9,40 @@
 	name="Calculate2" package="jadex.micro.testcases.semiautomatic.compositeservice">
 	
 	<imports>
-		<import>jadex.commons.service.clock.IClockService</import>
-		<import>jadex.commons.service.SServiceProvider</import>
+		<import>jadex.bridge.serviceclock.IClockService</import>
+		<import>jjadex.bridge.serviceServiceProvider</import>
 		<import>jadex.commons.future.*</import>
 	</imports>
 	
 	<componenttypes>
-		<componenttype name="Calculator" filename="jadex/micro/examples/compositeservice/CalculatorAgent2.class" master="true"/>
-		<componenttype name="Adder" filename="jadex/micro/examples/compositeservice/Adder.component.xml"/>
-		<componenttype name="Subtractor" filename="jadex/micro/examples/compositeservice/Subtractor.component.xml"/>
+		<componenttype name="Calculator" filename="jadex/micro/testcases/semiautomatic/compositeservice/CompositeCalculatorAgent.class" master="true"/>
+		<componenttype name="Adder" filename="jadex/micro/testcases/semiautomatic/compositeservice/Adder.component.xml"/>
+		<componenttype name="Subtractor" filename="jadex/micro/testcases/semiautomatic/compositeservice/Subtractor.component.xml"/>
 	</componenttypes>
 	
-	<applications>
-		<application name="User Agent">
+	<configurations>
+		<configuration name="Component Creation">
 			<components>
-				<component type="Calculator" name="EmptyCalculator">
-					<!-- <requiredservices>
+				<component type="Calculator" name="Calculator">
+					<requiredservices>
+						<requiredservice name="addservice" componenttype="Adder" create="true" scope="parent"/>			
+						<requiredservice name="subservice" componenttype="Subtractor" create="true" scope="parent"/>			
+					</requiredservices>
+				</component>
+			</components>
+		</configuration>
+		<configuration name="All components available">
+			<components>
+				<component type="Calculator" name="Calculator">
+					<requiredservices>
 						<requiredservice name="addservice" componentname="Adder"/>			
 						<requiredservice name="subservice" componentname="Subtractor"/>			
-					</requiredservices> -->
+					</requiredservices>
 				</component>
 				<component type="Adder" name="Adder"/>
 				<component type="Subtractor" name="Subtractor"/>
 			</components>
-		</application>
-	</applications>
+		</configuration>
+	</configurations>
 	
 </componenttype>

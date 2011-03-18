@@ -1,7 +1,7 @@
 package jadex.bdi.testcases.semiautomatic;
 
-import jadex.commons.service.BasicService;
-import jadex.commons.service.IServiceProvider;
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IServiceProvider;
 
 /**
  *  Simple print hello service.

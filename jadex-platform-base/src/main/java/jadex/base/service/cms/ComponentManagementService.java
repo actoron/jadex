@@ -18,6 +18,11 @@ import jadex.bridge.IMessageService;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.IRemoteServiceManagementService;
 import jadex.bridge.ISearchConstraints;
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.execution.IExecutionService;
+import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.IRemotable;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
@@ -29,11 +34,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.RemoteDelegationResultListener;
-import jadex.commons.service.BasicService;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.execution.IExecutionService;
-import jadex.commons.service.library.ILibraryService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -497,7 +497,7 @@ public abstract class ComponentManagementService extends BasicService implements
 												String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
 													: lmodel.getConfigurations().length>0 ? lmodel.getConfigurations()[0] : null;
 												Object[] comp = factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
-													config, cinfo.getArguments(), parent, future);
+													config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), future);
 												
 												// Store (invalid) desc, adapter and info for children
 												synchronized(adapters)

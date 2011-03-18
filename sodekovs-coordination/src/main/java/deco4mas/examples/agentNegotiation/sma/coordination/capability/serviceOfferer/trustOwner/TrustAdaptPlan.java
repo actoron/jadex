@@ -4,8 +4,8 @@ import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.clock.IClockService;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.clock.IClockService;
 
 import java.util.Iterator;
 import java.util.logging.Logger;

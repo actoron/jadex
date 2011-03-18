@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import jadex.bridge.service.RequiredServiceBinding;
+
 import java.util.Map;
 
 /**
@@ -35,6 +37,9 @@ public class CreationInfo
 	
 	/** The imports. */
 	protected String[]	imports;
+	
+	/** The bindings. */
+	protected RequiredServiceBinding[] bindings;
 	
 	//-------- constructors --------
 	
@@ -120,7 +125,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map args, IComponentIdentifier parent, Boolean suspend, String[] imports)
 	{
-		this(config, args, parent, null, null, null, null, imports);
+		this(config, args, parent, null, null, null, null, imports, null);
 	}
 	
 	/**
@@ -160,7 +165,7 @@ public class CreationInfo
 	public CreationInfo(String config, Map args, IComponentIdentifier parent, Boolean suspend, 
 		Boolean master, Boolean daemon, Boolean autoshutdown)
 	{
-		this(config, args, parent, suspend, master, daemon, autoshutdown, null);
+		this(config, args, parent, suspend, master, daemon, autoshutdown, null, null);
 	}
 	
 	/**
@@ -173,7 +178,8 @@ public class CreationInfo
 	 *  @param imports	The imports.
 	 */
 	public CreationInfo(String config, Map args, IComponentIdentifier parent, 
-		Boolean suspend, Boolean master, Boolean daemon, Boolean autoshutdown, String[] imports)
+		Boolean suspend, Boolean master, Boolean daemon, Boolean autoshutdown, 
+		String[] imports, RequiredServiceBinding[] bindings)
 	{
 		this.config	= config;
 		this.args	= args;
@@ -183,6 +189,7 @@ public class CreationInfo
 		this.daemon = daemon;
 		this.autoshutdown = autoshutdown;
 		this.imports	= imports;
+		this.bindings = bindings;
 	}
 	
 	//-------- methods --------
@@ -329,5 +336,23 @@ public class CreationInfo
 	public void setImports(String[] imports)
 	{
 		this.imports = imports;
+	}
+
+	/**
+	 *  Get the bindings.
+	 *  @return The bindings.
+	 */
+	public RequiredServiceBinding[] getRequiredServiceBindings()
+	{
+		return bindings;
+	}
+
+	/**
+	 *  Set the bindings.
+	 *  @param bindings The bindings to set.
+	 */
+	public void setRequiredServiceBindings(RequiredServiceBinding[] bindings)
+	{
+		this.bindings = bindings;
 	}
 }

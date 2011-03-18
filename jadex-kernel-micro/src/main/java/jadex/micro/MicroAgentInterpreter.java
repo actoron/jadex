@@ -16,6 +16,14 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.IntermediateComponentResultListener;
+import jadex.bridge.service.IInternalService;
+import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.clock.ITimer;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.future.DefaultResultListener;
@@ -24,13 +32,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.service.IInternalService;
-import jadex.commons.service.IServiceContainer;
-import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.ProvidedServiceInfo;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.clock.ITimer;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 
@@ -95,6 +96,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 	/** The list of message handlers. */
 	protected List messagehandlers;
 
+	/** The service bindings. */
+	protected Map bindings;
+	
 	//-------- constructors --------
 	
 	/**
@@ -104,7 +108,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public MicroAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
 		final IModelInfo model, Class microclass, final Map arguments, String config, 
-		final IExternalAccess parent, final Future inited)
+		final IExternalAccess parent, RequiredServiceBinding[] bindings, final Future inited)
 	{
 		this.model = model;
 		this.config = config;
@@ -112,6 +116,15 @@ public class MicroAgentInterpreter implements IComponentInstance
 		this.parent = parent;
 		// synchronized because of MicroAgentViewPanel, todo
 		this.steps	= Collections.synchronizedList(new ArrayList());
+		
+		if(bindings!=null)
+		{
+			this.bindings = new HashMap();
+			for(int i=0; i<bindings.length; i++)
+			{
+				this.bindings.put(bindings[i].getName(), bindings[i]);
+			}
+		}
 		
 		// Init the arguments with default values.
 		IArgument[] args = model.getArguments();
@@ -995,6 +1008,16 @@ public class MicroAgentInterpreter implements IComponentInstance
 		microagent.timers.clear();
 	}
 
+	/**
+	 *  Get the binding info of a service.
+	 *  @param name The required service name.
+	 *  @return The binding info of a service.
+	 */
+	protected RequiredServiceBinding getRequiredServiceBinding(String name)
+	{
+		return bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
+	}
+	
 	/**
 	 *  Step to handle a message.
 	 */

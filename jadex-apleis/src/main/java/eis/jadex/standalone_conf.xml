@@ -32,13 +32,13 @@
 		<!-- Platform services. -->
 		<properties type="services">
 			<!-- Library service. -->
-			<property type="jadex.commons.service.library.ILibraryService" name="library_service">
-				new jadex.commons.service.library.LibraryService()
+			<property type="jadex.bridge.service.library.ILibraryService" name="library_service">
+				new jadex.bridge.service.library.LibraryService()
 			</property>
 			
 			<!-- Threadpool service. -->
-			<property type="jadex.commons.service.threadpool.ThreadPoolService" name="threadpool_service">
-				new jadex.commons.service.threadpool.ThreadPoolService(
+			<property type="jadex.bridge.service.threadpool.ThreadPoolService" name="threadpool_service">
+				new jadex.bridge.service.threadpool.ThreadPoolService(
 					//new jadex.commons.concurrent.java5.JavaThreadPool()
 					new jadex.commons.concurrent.ThreadPool(
 						new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000)))
@@ -67,10 +67,10 @@
 			</property>
 			
 			<!-- Clock service. -->
-			<property type="jadex.commons.service.clock.IClockService" name="clock_service">
-				new jadex.commons.service.clock.ClockService(
-					new jadex.commons.service.clock.SystemClock("system_clock", 100,
-					$platform.getService(jadex.commons.service.threadpool.ThreadPoolService.class)))
+			<property type="jadex.bridge.service.clock.IClockService" name="clock_service">
+				new jadex.bridge.service.clock.ClockService(
+					new jadex.bridge.service.clock.SystemClock("system_clock", 100,
+					$platform.getService(jadex.bridge.service.threadpool.ThreadPoolService.class)))
 //				new jadex.base.clock.SimulationEventClock("simulation_clock",
 //					System.currentTimeMillis(), 200))
 			</property>
@@ -81,9 +81,9 @@
 			</property>
 		
 			<!-- Execution service. -->
-			<property type="jadex.commons.service.execution.IExecutionService" name="execution_service">
-				new jadex.commons.service.execution.SyncExecutionService(
-					$platform.getService(jadex.commons.service.threadpool.ThreadPoolService.class))
+			<property type="jadex.bridge.service.execution.IExecutionService" name="execution_service">
+				new jadex.bridge.service.execution.SyncExecutionService(
+					$platform.getService(jadex.bridge.service.threadpool.ThreadPoolService.class))
 			</property>
 
 			<!-- Context service. -->
@@ -124,7 +124,7 @@
 					new Object[]
 					{
 						new jadex.base.fipa.FIPAMessageType(), 
-						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.commons.service.threadpool.ThreadPoolService.class)),
+						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.bridge.service.threadpool.ThreadPoolService.class)),
 						new java.lang.Long(10000),
 						jadex.tools.introspector.IntrospectorAdapter.class,
 						Boolean.TRUE //,

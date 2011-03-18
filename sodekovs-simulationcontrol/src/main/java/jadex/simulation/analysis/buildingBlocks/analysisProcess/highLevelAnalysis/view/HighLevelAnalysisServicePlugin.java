@@ -2,7 +2,7 @@ package jadex.simulation.analysis.buildingBlocks.analysisProcess.highLevelAnalys
 
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IService;
+import jadex.bridge.service.IService;
 import jadex.simulation.analysis.buildingBlocks.analysisProcess.lowLevelAnalysis.ILowLevelAnalysisService;
 import jadex.simulation.analysis.common.services.defaultView.DefaultServicePlugin;
 

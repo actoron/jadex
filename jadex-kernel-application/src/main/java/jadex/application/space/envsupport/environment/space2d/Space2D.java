@@ -9,9 +9,9 @@ import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Double;
 import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.application.space.envsupport.math.Vector2Int;
+import jadex.bridge.service.clock.IClockService;
 import jadex.commons.IFilter;
 import jadex.commons.SimplePropertyObject;
-import jadex.commons.service.clock.IClockService;
 
 import java.util.HashMap;
 import java.util.HashSet;

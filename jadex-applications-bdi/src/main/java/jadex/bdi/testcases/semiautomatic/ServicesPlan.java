@@ -1,9 +1,9 @@
 package jadex.bdi.testcases.semiautomatic;
 
 import jadex.bdi.runtime.Plan;
-import jadex.commons.service.IServiceContainer;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
+import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
 
 /**
  *  Plan that creates and searches services. 

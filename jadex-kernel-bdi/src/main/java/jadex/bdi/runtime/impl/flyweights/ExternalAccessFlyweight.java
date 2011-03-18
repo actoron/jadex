@@ -7,11 +7,11 @@ import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IModelInfo;
+import jadex.bridge.service.IServiceProvider;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IServiceProvider;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -291,6 +291,25 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 			Object me = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
 			return new MCapabilityFlyweight(getState(), me);
 		}
+	}
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren(String type)
+	{
+		return new Future(null);
+	}
+	
+	/**
+	 *  Get the model name of a component type.
+	 *  @param ctype The component type.
+	 *  @return The model name of this component type.
+	 */
+	public IFuture getFileName(String ctype)
+	{
+		return new Future(null);
 	}
 
 }

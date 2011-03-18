@@ -15,24 +15,4 @@ import jadex.micro.annotation.ProvidedServices;
 )
 public class CalculatorAgent extends MicroAgent
 {
-//	/**
-//	 *  Called once after agent creation.
-//	 */
-//	public void agentCreated()
-//	{
-//		addDirectService(new AddService(this));
-//		addDirectService(new SubService(this));
-//	}
-	
-	//-------- static methods --------
-
-//	/**
-//	 *  Get the meta information about the agent.
-//	 */
-//	public static MicroAgentMetaInfo getMetaInfo()
-//	{
-//		return new MicroAgentMetaInfo("This agent is a minimal calculator.", null, null,
-//			null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.micro.examples.helpline.HelplineViewerPanel"}),
-//			null, new ProvidedServiceInfo[]{new ProvidedServiceInfo(IAddService.class), new ProvidedServiceInfo(ISubService.class)});
-//	}
 }

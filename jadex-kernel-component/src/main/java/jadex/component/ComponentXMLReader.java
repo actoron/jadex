@@ -1,6 +1,7 @@
 package jadex.component;
 
 import jadex.bridge.Argument;
+import jadex.bridge.service.RequiredServiceBinding;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
@@ -210,7 +211,6 @@ public class ComponentXMLReader
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "result")}), new AccessInfo(new QName(uri, "result"), "result")),
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "container")}), new AccessInfo(new QName(uri, "container"), "container"))
 			})));
-//		types.add(new TypeInfo(new XMLInfo(new QName(uri, "spacetype")), new ObjectInfo(MSpaceType.class)));
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "configuration")), new ObjectInfo(MConfiguration.class, new IPostProcessor()
 		{
 			public Object postProcess(IContext context, Object object)
@@ -297,6 +297,13 @@ public class ComponentXMLReader
 				new AttributeInfo(new AccessInfo("class", "className"))
 			}, null)));
 					
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "requiredservices"), new QName(uri, "requiredservice")}), new ObjectInfo(RequiredServiceBinding.class), 
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("componentname", "componentName")),
+			new AttributeInfo(new AccessInfo("componenttype", "componentType")),
+			})));
+		
 		for(int i=0; mappings!=null && i<mappings.length; i++)
 		{
 			types.addAll(mappings[i]);

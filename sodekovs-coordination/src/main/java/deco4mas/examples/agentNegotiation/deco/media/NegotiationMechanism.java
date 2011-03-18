@@ -1,8 +1,8 @@
 package deco4mas.examples.agentNegotiation.deco.media;
 
 import jadex.commons.future.ThreadSuspendable;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.clock.IClockService;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.clock.IClockService;
 
 import java.util.Collections;
 import java.util.HashMap;

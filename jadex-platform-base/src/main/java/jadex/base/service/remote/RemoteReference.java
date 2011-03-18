@@ -1,8 +1,8 @@
 package jadex.base.service.remote;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.commons.SUtil;
-import jadex.commons.service.IServiceIdentifier;
 
 /**
  *  Remote reference for locating a specific target object in another platform.

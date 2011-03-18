@@ -3,17 +3,18 @@ package jadex.base.service.remote;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IRemoteServiceManagementService;
+import jadex.bridge.service.BasicServiceContainer;
+import jadex.bridge.service.IRequiredServiceFetcher;
+import jadex.bridge.service.IResultSelector;
+import jadex.bridge.service.ISearchManager;
+import jadex.bridge.service.IVisitDecider;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
-import jadex.commons.service.BasicServiceContainer;
-import jadex.commons.service.IResultSelector;
-import jadex.commons.service.ISearchManager;
-import jadex.commons.service.IVisitDecider;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -67,7 +68,7 @@ public class RemoteServiceContainer extends BasicServiceContainer
 				// Problem that the container calls itself the decider, could already
 				// be done in search manager when this call is part of a search
 				// But could also be called directly :-(
-				if(!decider.searchNode(null, RemoteServiceContainer.this, false, (Collection)result)
+				if(!decider.searchNode(RemoteServiceContainer.this, null, RemoteServiceContainer.this, false, (Collection)result)
 					|| rms==null || componentid==null)// || selector instanceof ComponentFactorySelector)
 				{
 					ret.setResult(result);
@@ -164,6 +165,14 @@ public class RemoteServiceContainer extends BasicServiceContainer
 //		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Create a service fetcher.
+	 */
+	public IRequiredServiceFetcher createServiceFetcher(String name)
+	{
+		throw new UnsupportedOperationException();
 	}
 	
 	/**

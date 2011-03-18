@@ -5,7 +5,7 @@ import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
-import jadex.commons.service.clock.IClockService;
+import jadex.bridge.service.clock.IClockService;
 
 /**
  *  Clear chemicals at a disaster.

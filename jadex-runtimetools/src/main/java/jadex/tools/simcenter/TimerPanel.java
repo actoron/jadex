@@ -1,15 +1,15 @@
 package jadex.tools.simcenter;
 
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.clock.ITimer;
+import jadex.bridge.service.clock.Timer;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.jtable.ObjectTableModel;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.clock.IClockService;
-import jadex.commons.service.clock.ITimer;
-import jadex.commons.service.clock.Timer;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

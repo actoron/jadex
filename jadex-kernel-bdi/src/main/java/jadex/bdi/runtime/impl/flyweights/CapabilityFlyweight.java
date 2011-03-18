@@ -18,6 +18,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
+import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -25,8 +28,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
-import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.RequiredServiceInfo;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -796,6 +797,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 				public void run()
 				{
 					RequiredServiceInfo info = getInterpreter().getModel().getModelInfo().getRequiredService(name);
+					RequiredServiceBinding binding = getRequiredServiceBinding(name);
 					if(info==null)
 					{
 						Future ret = new Future();
@@ -804,7 +806,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 					}
 					else
 					{
-						object = getInterpreter().getServiceContainer().getRequiredService(info, rebind);
+						object = getInterpreter().getServiceContainer().getRequiredService(info, binding, rebind);
 					}
 				}
 			};
@@ -814,6 +816,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		{
 			IFuture ret;
 			RequiredServiceInfo info = getInterpreter().getModel().getModelInfo().getRequiredService(name);
+			RequiredServiceBinding binding = getRequiredServiceBinding(name);
 			if(info==null)
 			{
 				Future fut = new Future();
@@ -822,7 +825,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			}
 			else
 			{
-				ret = getInterpreter().getServiceContainer().getRequiredService(info, rebind);
+				ret = getInterpreter().getServiceContainer().getRequiredService(info, binding, rebind);
 			}
 			return ret;
 		}
@@ -841,6 +844,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 				public void run()
 				{
 					RequiredServiceInfo info = getInterpreter().getModel().getModelInfo().getRequiredService(name);
+					RequiredServiceBinding binding = getRequiredServiceBinding(name);
 					if(info==null)
 					{
 						IntermediateFuture ret = new IntermediateFuture();
@@ -849,7 +853,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 					}
 					else
 					{
-						object = getInterpreter().getServiceContainer().getRequiredServices(info, rebind);
+						object = getInterpreter().getServiceContainer().getRequiredServices(info, binding, rebind);
 					}
 				}
 			};
@@ -859,6 +863,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		{
 			IIntermediateFuture ret;
 			RequiredServiceInfo info = getInterpreter().getModel().getModelInfo().getRequiredService(name);
+			RequiredServiceBinding binding = getRequiredServiceBinding(name);
 			if(info==null)
 			{
 				IntermediateFuture fut = new IntermediateFuture();
@@ -867,9 +872,19 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			}
 			else
 			{
-				ret = getInterpreter().getServiceContainer().getRequiredServices(info, rebind);
+				ret = getInterpreter().getServiceContainer().getRequiredServices(info, binding, rebind);
 			}
 			return ret;
 		}
+	}
+	
+	/**
+	 *  Get the binding info of a service.
+	 *  @param name The required service name.
+	 *  @return The binding info of a service.
+	 */
+	protected RequiredServiceBinding getRequiredServiceBinding(String name)
+	{
+		return null;//bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
 	}
 }

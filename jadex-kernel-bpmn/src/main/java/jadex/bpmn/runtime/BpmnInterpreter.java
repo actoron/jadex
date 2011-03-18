@@ -22,7 +22,6 @@ import jadex.bpmn.runtime.handler.TaskActivityHandler;
 import jadex.bpmn.runtime.task.ExecuteStepTask;
 import jadex.bpmn.tools.ProcessThreadInfo;
 import jadex.bridge.ComponentResultListener;
-import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
@@ -41,6 +40,14 @@ import jadex.bridge.IModelInfo;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.MessageType;
 import jadex.bridge.RemoteChangeListenerHandler;
+import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.ServiceNotFoundException;
+import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.IFilter;
@@ -52,12 +59,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
-import jadex.commons.service.IServiceContainer;
-import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.ServiceNotFoundException;
-import jadex.commons.service.clock.IClockService;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SJavaParser;
@@ -225,6 +226,9 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	/** The thread id counter. */
 	protected int	idcnt;
 	
+	/** The required service binding information. */
+	protected Map bindings;
+	
 	//-------- constructors --------
 	
 	/**
@@ -238,7 +242,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		IServiceContainer container)
 	{
 		this.adapter = adapter;
-		construct(model, arguments, config, parent, activityhandlers, stephandlers, fetcher);
+		construct(model, arguments, config, parent, activityhandlers, stephandlers, fetcher, null);
 		variables.put("$cms", cms);
 		variables.put("$clock", cs);
 		variables.put("$msgservice", ms);
@@ -266,11 +270,11 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	// Constructor for self-contained bpmn components
 	public BpmnInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, MBpmnModel model, Map arguments, 
 		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
-		IValueFetcher fetcher, Future inited)
+		IValueFetcher fetcher, RequiredServiceBinding[] bindings, Future inited)
 	{
 		this.inited = inited;
 		this.variables	= new HashMap();
-		construct(model, arguments, config, parent, activityhandlers, stephandlers, fetcher);
+		construct(model, arguments, config, parent, activityhandlers, stephandlers, fetcher, bindings);
 		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
 	}
 	
@@ -279,10 +283,19 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	 */
 	protected void construct(final MBpmnModel model, Map arguments, String config, 
 		final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
-		IValueFetcher fetcher)
+		IValueFetcher fetcher, RequiredServiceBinding[] bindings)
 	{
 		this.model = model;
 		this.config = config;
+		
+		if(bindings!=null)
+		{
+			this.bindings = new HashMap();
+			for(int i=0; i<bindings.length; i++)
+			{
+				this.bindings.put(bindings[i].getName(), bindings[i]);
+			}
+		}
 		
 		// Extract pool/lane from config.
 		if(config==null || ALL.equals(config))
@@ -1532,6 +1545,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	public IFuture getRequiredService(String name, boolean rebind)
 	{
 		RequiredServiceInfo info = getModel().getRequiredService(name);
+		RequiredServiceBinding binding = getRequiredServiceBinding(name);
 		if(info==null)
 		{
 			Future ret = new Future();
@@ -1540,7 +1554,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		}
 		else
 		{
-			return getServiceContainer().getRequiredService(info, rebind);
+			return getServiceContainer().getRequiredService(info, binding, rebind);
 		}
 	}
 	
@@ -1551,6 +1565,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
 	{
 		RequiredServiceInfo info = getModel().getRequiredService(name);
+		RequiredServiceBinding binding = getRequiredServiceBinding(name);
 		if(info==null)
 		{
 			IntermediateFuture ret = new IntermediateFuture();
@@ -1559,8 +1574,18 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		}
 		else
 		{
-			return getServiceContainer().getRequiredServices(info, rebind);
+			return getServiceContainer().getRequiredServices(info, binding, rebind);
 		}
+	}
+	
+	/**
+	 *  Get the binding info of a service.
+	 *  @param name The required service name.
+	 *  @return The binding info of a service.
+	 */
+	protected RequiredServiceBinding getRequiredServiceBinding(String name)
+	{
+		return bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
 	}
 	
 }

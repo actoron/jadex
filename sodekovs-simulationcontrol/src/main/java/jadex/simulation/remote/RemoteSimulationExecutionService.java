@@ -6,7 +6,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.BasicService;
+import jadex.bridge.service.BasicService;
 
 import java.util.HashMap;
 import java.util.Map;

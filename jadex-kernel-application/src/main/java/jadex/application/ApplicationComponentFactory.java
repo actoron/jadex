@@ -10,16 +10,17 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.library.ILibraryService;
+import jadex.bridge.service.library.ILibraryServiceListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.commons.service.BasicService;
-import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.library.ILibraryService;
-import jadex.commons.service.library.ILibraryServiceListener;
 
 import java.net.URL;
 import java.util.Collections;
@@ -183,7 +184,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 * @return An instance of a component.
 	 */
 	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
-		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, Future ret)
+		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, Future ret)
 	{
 		try
 		{
@@ -210,7 +211,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 				app = new MApplicationInstance("default");
 	
 			// Create context for application.
-			ApplicationInterpreter interpreter = new ApplicationInterpreter(desc, apptype, app, factory, parent, arguments, ret);
+			ApplicationInterpreter interpreter = new ApplicationInterpreter(desc, apptype, app, factory, parent, arguments, bindings, ret);
 			
 			// todo: result listener?
 			// todo: create application context as return value?!

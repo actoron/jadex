@@ -10,9 +10,8 @@
 	autoshutdown="true">
 	
 	<imports>
-		<import>jadex.commons.service.*</import>
-		<import>jadex.commons.service.clock.IClockService</import>
-		<import>jadex.commons.service.SServiceProvider</import>
+		<import>jadex.bridge.service*</import>
+		<import>jadex.bridge.service.clock.IClockService</import>
 		<import>jadex.commons.future.*</import>
 	</imports>
 	

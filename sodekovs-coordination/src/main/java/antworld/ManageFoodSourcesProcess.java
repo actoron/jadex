@@ -5,7 +5,7 @@ import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.ISpaceProcess;
 import jadex.application.space.envsupport.environment.space2d.Grid2D;
 import jadex.commons.SimplePropertyObject;
-import jadex.commons.service.clock.IClockService;
+import jadex.bridge.service.clock.IClockService;
 
 /**
  * Process is responsible for the life cycle of the food source objects.

@@ -12,13 +12,13 @@ import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.clock.IClockService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.clock.IClockService;
 import jadex.xml.annotation.XMLClassname;
 
 import java.util.HashMap;
@@ -93,7 +93,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 					{
 						final IComponentManagementService cms	= (IComponentManagementService)result;
 						IFuture ret = cms.createComponent(null, app.getComponentFilename("Truck"),
-							new CreationInfo(null, params, app.getComponentIdentifier(), null, null, null, null, app.getAllImports()), null);
+							new CreationInfo(null, params, app.getComponentIdentifier(), null, null, null, null, app.getAllImports(), null), null);
 						
 						IResultListener lis = new IResultListener()
 						{

@@ -2,6 +2,9 @@ package jadex.tools.libtool;
 
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.library.ILibraryService;
+import jadex.bridge.service.library.ILibraryServiceListener;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
@@ -12,9 +15,6 @@ import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.EditableListEvent;
 import jadex.commons.gui.SGUI;
-import jadex.commons.service.IService;
-import jadex.commons.service.library.ILibraryService;
-import jadex.commons.service.library.ILibraryServiceListener;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

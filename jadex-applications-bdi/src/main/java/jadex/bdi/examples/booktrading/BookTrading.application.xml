@@ -15,10 +15,10 @@
 	<imports>
   		<import>jadex.bdi.examples.booktrading.common.*</import>
 		<import>java.util.*</import>
-		<import>jadex.commons.service.clock.IClockService</import>
-		<import>jadex.commons.service.SServiceProvider</import>
+		<import>jadex.bridge.service.clock.IClockService</import>
+		<import>jadex.bridge.service.ServiceProvider</import>
 		<import>jadex.commons.future.*</import>
-		<import>jadex.commons.service.*</import>
+		<import>jadex.bridge.service.*</import>
 	</imports>
 	
 	<componenttypes>

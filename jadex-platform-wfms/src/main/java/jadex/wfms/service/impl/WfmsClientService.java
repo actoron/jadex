@@ -1,12 +1,12 @@
 package jadex.wfms.service.impl;
 
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.service.BasicService;
-import jadex.commons.service.IServiceContainer;
-import jadex.commons.service.SServiceProvider;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.listeners.IActivityListener;

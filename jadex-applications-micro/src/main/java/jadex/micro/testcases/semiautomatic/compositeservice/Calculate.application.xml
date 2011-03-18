@@ -9,8 +9,8 @@
 	name="Calculate" package="jadex.micro.testcases.semiautomatic.compositeservice">
 	
 	<imports>
-		<import>jadex.commons.service.clock.IClockService</import>
-		<import>jadex.commons.service.SServiceProvider</import>
+		<import>jadex.bridge.serviceclock.IClockService</import>
+		<import>jjadex.bridge.serviceServiceProvider</import>
 		<import>jadex.commons.future.*</import>
 	</imports>
 	

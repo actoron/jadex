@@ -1,10 +1,12 @@
 package jadex.bridge;
 
+import jadex.bridge.service.IService;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.annotation.Excluded;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IService;
-import jadex.commons.service.annotation.Excluded;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -80,7 +82,7 @@ public interface IComponentFactory extends IService
 	 */
 	@Excluded
 	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo model, 
-		String config, Map arguments, IExternalAccess parent, Future ret);
+		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, Future ret);
 
 }
 

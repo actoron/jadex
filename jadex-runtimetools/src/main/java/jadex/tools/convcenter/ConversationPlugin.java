@@ -15,6 +15,8 @@ import jadex.bridge.IMessageListener;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IRemoteMessageListener;
 import jadex.bridge.MessageType;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
 import jadex.commons.IFilter;
 import jadex.commons.Properties;
 import jadex.commons.SReflect;
@@ -22,8 +24,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Dimension;

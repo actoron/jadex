@@ -8,7 +8,7 @@ import jadex.bridge.IApplicationContext;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.collection.MultiCollection;
-import jadex.commons.service.IServiceContainer;
+import jadex.bridge.service.IServiceContainer;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,11 +1,11 @@
 package jadex.base.gui.componenttree;
 
+import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.jtable.ResizeableTableHeader;
-import jadex.commons.service.IService;
-import jadex.commons.service.IServiceIdentifier;
 
 import java.awt.BorderLayout;
 import java.lang.reflect.Method;

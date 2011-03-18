@@ -2,6 +2,9 @@ package jadex.tools.debugger;
 
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.IChangeListener;
@@ -9,9 +12,6 @@ import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
-import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
 import jadex.rules.tools.common.TableSorter;
 
 import java.awt.BorderLayout;

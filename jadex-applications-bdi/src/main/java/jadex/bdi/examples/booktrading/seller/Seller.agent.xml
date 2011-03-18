@@ -24,8 +24,8 @@
 		<import>jadex.bdi.runtime.*</import>
 		<import>jadex.commons.*</import>
 		<import>jadex.commons.future.*</import>
-		<import>jadex.commons.service.*</import>
-		<import>jadex.commons.service.clock.*</import>
+		<import>jadex.bridge.service*</import>
+		<import>jjadex.bridge.servicelock.*</import>
 	</imports>
 		
 	<capabilities>

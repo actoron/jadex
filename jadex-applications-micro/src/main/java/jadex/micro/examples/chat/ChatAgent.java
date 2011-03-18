@@ -1,7 +1,7 @@
 package jadex.micro.examples.chat;
 
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.annotation.GuiClass;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.GuiClass;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.ProvidedService;

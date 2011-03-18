@@ -1,7 +1,5 @@
 package jadex.micro;
 
-import jadex.bridge.ComponentServiceContainer;
-import jadex.bridge.DecouplingServiceInvocationInterceptor;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
@@ -13,6 +11,19 @@ import jadex.bridge.IMessageService;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.MessageType;
 import jadex.bridge.MessageType.ParameterSpecification;
+import jadex.bridge.service.IInternalService;
+import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.ServiceNotFoundException;
+import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.clock.ITimedObject;
+import jadex.bridge.service.clock.ITimer;
+import jadex.bridge.service.component.ComponentServiceContainer;
+import jadex.bridge.service.component.DecouplingServiceInvocationInterceptor;
 import jadex.commons.ComposedFilter;
 import jadex.commons.IFilter;
 import jadex.commons.future.DefaultResultListener;
@@ -23,16 +34,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
-import jadex.commons.service.IInternalService;
-import jadex.commons.service.IServiceContainer;
-import jadex.commons.service.IServiceIdentifier;
-import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.ServiceNotFoundException;
-import jadex.commons.service.clock.IClockService;
-import jadex.commons.service.clock.ITimedObject;
-import jadex.commons.service.clock.ITimer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -669,6 +670,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	public IFuture getRequiredService(String name, boolean rebind)
 	{
 		RequiredServiceInfo info = getModel().getRequiredService(name);
+		RequiredServiceBinding binding = interpreter.getRequiredServiceBinding(name);
 		if(info==null)
 		{
 			Future ret = new Future();
@@ -677,7 +679,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		}
 		else
 		{
-			return interpreter.getServiceContainer().getRequiredService(info, rebind);
+			return interpreter.getServiceContainer().getRequiredService(info, binding, rebind);
 		}
 	}
 	
@@ -688,6 +690,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
 	{
 		RequiredServiceInfo info = getModel().getRequiredService(name);
+		RequiredServiceBinding binding = interpreter.getRequiredServiceBinding(name);
 		if(info==null)
 		{
 			IntermediateFuture ret = new IntermediateFuture();
@@ -696,7 +699,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		}
 		else
 		{
-			return interpreter.getServiceContainer().getRequiredServices(info, rebind);
+			return interpreter.getServiceContainer().getRequiredServices(info, binding, rebind);
 		}
 	}
 
@@ -766,14 +769,19 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public static class ExecuteWaitForStep implements IComponentStep
 	{
-		private final ITimer[]			ts;
+		//-------- attributes --------
 
-		private final IComponentStep	run;
+		/** The timer. */
+		private final ITimer[] ts;
+
+		/** The component step. */
+		private final IComponentStep run;
+
+		//-------- constructors--------
 
 		/**
 		 * This class is constructed with an array of {@link ITimer}s and the {@link IComponentStep}
 		 * which is scheduled for execution.
-		 * 
 		 * @param ts an array of {@link ITimer}s
 		 * @param run the {@link IComponentStep} which is scheduled for execution
 		 */
@@ -782,6 +790,8 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 			this.ts = ts;
 			this.run = run;
 		}
+
+		//-------- methods --------
 
 		/**
 		 * Removes the first entry from the {@link ITimer} array from the micro agents
@@ -804,8 +814,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		
 		/**
 		 * Returns the {@link IComponentStep} that is scheduled for execution.
-		 * 
-		 * @return the {@link IComponentStep} that is scheduled for execution
+		 * @return The {@link IComponentStep} that is scheduled for execution
 		 */
 		public IComponentStep getComponentStep()
 		{

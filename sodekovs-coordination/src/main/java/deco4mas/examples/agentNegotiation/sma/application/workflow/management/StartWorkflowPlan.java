@@ -3,8 +3,8 @@ package deco4mas.examples.agentNegotiation.sma.application.workflow.management;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
 
 import java.util.logging.Logger;
 import deco4mas.examples.agentNegotiation.common.dataObjects.WorkflowData;

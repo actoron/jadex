@@ -23,11 +23,11 @@ import jadex.base.fipa.IProperty;
 import jadex.base.fipa.SearchConstraints;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IServiceProvider;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.BasicService;
-import jadex.commons.service.IServiceProvider;
 import jadex.jade.ComponentAdapterFactory;
 import jadex.jade.SJade;
 

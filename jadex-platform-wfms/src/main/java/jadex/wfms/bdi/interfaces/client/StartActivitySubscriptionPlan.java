@@ -2,7 +2,7 @@ package jadex.wfms.bdi.interfaces.client;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.Plan;
-import jadex.commons.service.SServiceProvider;
+import jadex.bridge.service.SServiceProvider;
 import jadex.wfms.UpdateSubscriptionStep;
 import jadex.wfms.bdi.ontology.ComponentClientProxy;
 import jadex.wfms.bdi.ontology.InformActivityAdded;

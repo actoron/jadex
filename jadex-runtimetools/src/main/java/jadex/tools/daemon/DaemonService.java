@@ -4,11 +4,11 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.BasicService;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.BasicService;
 import jadex.micro.IMicroExternalAccess;
 import jadex.xml.annotation.XMLClassname;
 

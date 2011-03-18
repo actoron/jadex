@@ -13,8 +13,8 @@
 		<import>jadex.commons.future.*</import>
 		<import>jadex.bridge.*</import>
 		<import>jadex.base.fipa.*</import>
-		<import>jadex.commons.service.*</import>
-		<import>jadex.commons.service.threadpool.*</import>
+		<import>jadex.bridge.service*</import>
+		<import>jjadex.bridge.servicehreadpool.*</import>
 		<import>jadex.bdi.runtime.impl.*</import>
 	</imports>
 	

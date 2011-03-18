@@ -10,11 +10,11 @@ import jadex.application.space.envsupport.observer.gui.plugin.VisualsPlugin;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
 import jadex.application.space.envsupport.observer.perspective.Perspective2D;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.clock.IClockService;
 import jadex.commons.IChangeListener;
 import jadex.commons.future.SwingDefaultResultListener;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.clock.IClockService;
 
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;

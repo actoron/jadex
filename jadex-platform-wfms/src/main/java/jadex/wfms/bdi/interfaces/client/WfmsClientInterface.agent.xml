@@ -15,8 +15,8 @@
 		<import>jadex.wfms.bdi.*</import>
 		<import>jadex.wfms.bdi.ontology.*</import>
 		<import>jadex.commons.future.ThreadSuspendable</import>
-		<import>jadex.commons.service.SServiceProvider</import>
-		<import>jadex.commons.service.RequiredServiceInfo</import>
+		<import>jadex.bridge.serviceSServiceProvider</import>
+		<import>jjadex.bridge.serviceequiredServiceInfo</import>
 	</imports>
 
 	<capabilities>

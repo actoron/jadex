@@ -2,15 +2,15 @@ package jadex.base.gui.componenttree;
 
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
-import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.SwingDefaultResultListener;
-import jadex.commons.service.SServiceProvider;
 import jadex.xml.annotation.XMLClassname;
 
 import java.util.HashMap;

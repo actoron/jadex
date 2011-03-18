@@ -7,7 +7,7 @@
 
 	<imports>
 		<import>jadex.bridge.*</import>
-		<import>jadex.commons.service.library.*</import>
+		<import>jadex.bridge.servicelibrary.*</import>
 	</imports>
 
 	<beliefs>

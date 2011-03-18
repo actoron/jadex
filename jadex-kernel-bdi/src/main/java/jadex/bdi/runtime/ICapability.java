@@ -4,8 +4,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
+import jadex.bridge.service.IServiceProvider;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IServiceProvider;
 import java.util.logging.Logger;
 
 

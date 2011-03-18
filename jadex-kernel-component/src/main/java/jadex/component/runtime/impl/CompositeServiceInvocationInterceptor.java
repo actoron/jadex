@@ -1,25 +1,24 @@
 package jadex.component.runtime.impl;
 
-import jadex.bridge.BasicServiceInvocationHandler;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IServiceInvocationInterceptor;
-import jadex.bridge.ServiceInvocationContext;
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IInternalService;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.IServiceInvocationInterceptor;
+import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.service.BasicService;
-import jadex.commons.service.IInternalService;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
-import jadex.component.runtime.IComponentExternalAccess;
 import jadex.xml.annotation.XMLClassname;
 
 import java.lang.reflect.InvocationHandler;
@@ -37,7 +36,7 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 	//-------- attributes --------
 	
 	/** The external access. */
-	protected IComponentExternalAccess ea;
+	protected IExternalAccess ea;
 	
 	/** The component type. */
 	protected String componenttype;
@@ -53,7 +52,7 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public CompositeServiceInvocationInterceptor(IComponentExternalAccess ea, 
+	public CompositeServiceInvocationInterceptor(IExternalAccess ea, 
 		String componenttype, Class servicetype, IComponentIdentifier cid)
 	{
 		this.ea = ea;
@@ -213,7 +212,7 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 	 *  Get the ea.
 	 *  @return the ea.
 	 */
-	public IComponentExternalAccess getExternalAccess()
+	public IExternalAccess getExternalAccess()
 	{
 		return ea;
 	}
@@ -323,7 +322,7 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 	/**
 	 *  Create a new composite (application) service proxy.
 	 */
-	public static IInternalService createServiceProxy(Class servicetype, String componenttype, IComponentExternalAccess ea, ClassLoader classloader, IComponentIdentifier cid)
+	public static IInternalService createServiceProxy(Class servicetype, String componenttype, IExternalAccess ea, ClassLoader classloader, IComponentIdentifier cid)
 	{
 		return (IInternalService)Proxy.newProxyInstance(classloader, new Class[]{IInternalService.class, servicetype}, 
 			new BasicServiceInvocationHandler(BasicService.createServiceIdentifier(ea.getServiceProvider().getId(), servicetype, BasicServiceInvocationHandler.class), 

@@ -1,7 +1,7 @@
 package jadex.wfms.bdi.interfaces.client;
 
 import jadex.bdi.runtime.Plan;
-import jadex.commons.service.SServiceProvider;
+import jadex.bridge.service.SServiceProvider;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IClientService;
 

@@ -1,9 +1,9 @@
 package jadex.micro.testcases.semiautomatic.remoteservice;
 
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.library.ILibraryService;
 import jadex.micro.MicroAgent;
 
 import java.util.List;

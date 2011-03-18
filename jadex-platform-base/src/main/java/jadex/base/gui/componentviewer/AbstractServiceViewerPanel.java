@@ -1,10 +1,10 @@
 package jadex.base.gui.componentviewer;
 
 import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.service.IService;
 import jadex.commons.Properties;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IService;
 
 import javax.swing.JComponent;
 

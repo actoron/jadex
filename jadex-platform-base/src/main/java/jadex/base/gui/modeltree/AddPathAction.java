@@ -2,13 +2,13 @@ package jadex.base.gui.modeltree;
 
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.FileTreePanel;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.library.ILibraryService;
 
 import java.awt.event.ActionEvent;
 import java.io.File;

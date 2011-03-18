@@ -1,9 +1,10 @@
 package jadex.micro.testcases.semiautomatic.compositeservice;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.RequiredServiceBinding;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.BasicService;
 
 /**
  * 

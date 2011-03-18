@@ -5,14 +5,15 @@ import jadex.bridge.Argument;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.ModelInfo;
 import jadex.bridge.ModelValueProvider;
+import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.ProvidedServiceInfo;
-import jadex.commons.service.RequiredServiceInfo;
 import jadex.javaparser.IParsedExpression;
 import jadex.xml.StackElement;
 
@@ -113,6 +114,8 @@ public class MComponentType extends MStartable implements ICacheableModel
 			daemon.setValue(getDaemon());
 		if(getAutoShutdown()!=null)
 			autoshutdown.setValue(getAutoShutdown());
+//		ModelValueProvider components = new ModelValueProvider();
+//		modelinfo.setComponentInstances(components);
 		
 		for(int i=0; i<apps.size(); i++)
 		{
@@ -131,14 +134,20 @@ public class MComponentType extends MStartable implements ICacheableModel
 				catch(Exception e)
 				{
 					Tuple	se	= new Tuple(new Object[]{
-						new StackElement(new QName("applicationtype"), this, null),
-						new StackElement(new QName("applications"), null, null),
-						new StackElement(new QName("application"), mapp, null),
+						new StackElement(new QName("componenttype"), this, null),
+						new StackElement(new QName("configurations"), null, null),
+						new StackElement(new QName("configuration"), mapp, null),
 						new StackElement(new QName("arguments"), null, null),
 						new StackElement(new QName("argument"), arg, null)});
 					entries.put(se, e.toString()+": "+arg.getValue());
 				}
 			}
+			
+//			List comps = mapp.getComponents();
+//			if(comps!=null)
+//			{
+//				components.setValue(mapp.getName(), comps);
+//			}
 			
 			Object val = mapp.getSuspend();
 			if(val!=null)
@@ -202,8 +211,8 @@ public class MComponentType extends MStartable implements ICacheableModel
 			for(int i=0; i<reqs.size(); i++)
 			{
 				MRequiredServiceType ser = (MRequiredServiceType)reqs.get(i);
-				tmp[i] = new RequiredServiceInfo(ser.getName(), ser.getClazz(), ser.isDynamic(), 
-					ser.isMultiple(), ser.getScope());
+				tmp[i] = new RequiredServiceInfo(ser.getName(), ser.getClazz(),
+					ser.isMultiple(), new RequiredServiceBinding(ser.getName(), ser.getScope(), ser.isDynamic()));
 			}
 			
 			modelinfo.setRequiredServices(tmp);
@@ -232,6 +241,7 @@ public class MComponentType extends MStartable implements ICacheableModel
 			
 			modelinfo.setProvidedServices(tmp);
 		}
+		
 				
 		// Build error report.
 		modelinfo.setReport(buildReport(modelinfo.getName(), modelinfo.getFilename(),
@@ -410,7 +420,7 @@ public class MComponentType extends MStartable implements ICacheableModel
 	 *  Add an component type.
 	 *  @param componenttype The component type.
 	 */
-	public void addMComponentType(MSubcomponentType componenttype)
+	public void addMSubcomponentType(MSubcomponentType componenttype)
 	{
 		this.componenttypes.add(componenttype);
 	}
@@ -538,7 +548,7 @@ public class MComponentType extends MStartable implements ICacheableModel
 	 *  @param name The component type name.
 	 *  @return The componenttype (if any).
 	 */
-	public MSubcomponentType getMComponentType(String name)
+	public MSubcomponentType getMSubcomponentType(String name)
 	{
 		MSubcomponentType	ret	= null;
 		for(int i=0; ret==null && i<componenttypes.size(); i++)

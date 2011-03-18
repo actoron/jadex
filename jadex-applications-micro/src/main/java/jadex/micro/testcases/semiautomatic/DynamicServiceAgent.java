@@ -2,8 +2,8 @@ package jadex.micro.testcases.semiautomatic;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.service.BasicService;
-import jadex.commons.service.IServiceProvider;
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IServiceProvider;
 import jadex.micro.MicroAgent;
 
 /**

@@ -1,7 +1,7 @@
 package jadex.base.service.remote;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.service.IServiceContainer;
+import jadex.bridge.service.IServiceContainer;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;

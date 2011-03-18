@@ -1,7 +1,7 @@
 package jadex.micro.examples.mandelbrot;
 
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.service.RequiredServiceInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;

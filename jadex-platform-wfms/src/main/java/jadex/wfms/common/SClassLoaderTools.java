@@ -1,9 +1,9 @@
 package jadex.wfms.common;
 
+import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.library.ILibraryService;
 
 import java.io.File;
 import java.io.FileFilter;

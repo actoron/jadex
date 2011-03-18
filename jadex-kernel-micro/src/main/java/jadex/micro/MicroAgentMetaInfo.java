@@ -2,9 +2,9 @@ package jadex.micro;
 
 import jadex.bridge.IArgument;
 import jadex.bridge.IModelValueProvider;
+import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SUtil;
-import jadex.commons.service.ProvidedServiceInfo;
-import jadex.commons.service.RequiredServiceInfo;
 
 import java.util.Collections;
 import java.util.HashMap;

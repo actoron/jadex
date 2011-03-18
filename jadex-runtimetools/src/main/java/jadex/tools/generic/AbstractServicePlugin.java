@@ -1,8 +1,8 @@
 package jadex.tools.generic;
 
+import jadex.bridge.service.IService;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
-import jadex.commons.service.IService;
 
 import javax.swing.Icon;
 
