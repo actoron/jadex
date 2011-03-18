@@ -20,7 +20,17 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * 
+ *  The default service fetcher realizes the default 
+ *  strategy for fetching a service.
+ *  Allows for:
+ *  
+ *  - binding by searching service(s)
+ *  - binding by name
+ *  - binding by type
+ *  
+ *  - dynamic or static binding
+ *  - creation of components
+ *  - recovery of failed services
  */
 public class DefaultServiceFetcher implements IRequiredServiceFetcher
 {
@@ -174,7 +184,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	}
 	
 	/**
-	 * 
+	 *  Get the external access of a component by its name.
 	 */
 	protected IFuture getExternalAccessByName(final IServiceProvider provider, final RequiredServiceInfo info, 
 		final RequiredServiceBinding binding)
@@ -192,7 +202,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	}
 	
 	/**
-	 * 
+	 *  Get the external access of a component by type.
 	 */
 	protected IFuture getExternalAccessByType(final IServiceProvider provider, final RequiredServiceInfo info, 
 		final RequiredServiceBinding binding)
@@ -231,7 +241,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	}
 	
 	/**
-	 * 
+	 *  Get a fitting (of given type) child component.
 	 */
 	public IFuture getChildExternalAccess(final IComponentIdentifier cid, final IServiceProvider provider, 
 		final RequiredServiceInfo info, final RequiredServiceBinding binding)
@@ -387,17 +397,16 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		return ret;
 	}
 	
-	
-	
 	/**
-	 * 
+	 *  Simple listener that can store the result in a member variable.
 	 */
 	public class StoreDelegationResultListener extends DelegationResultListener
 	{
+		/** Flag if binding is dynamic. */
 		protected boolean dynamic;
 		
 		/**
-		 * 
+		 *  Create a new listener.
 		 */
 		public StoreDelegationResultListener(Future ret, boolean dynamic)
 		{
@@ -406,7 +415,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		}
 		
 		/**
-		 * 
+		 *  Called when result is available.
 		 */
 		public void customResultAvailable(Object result)
 		{
