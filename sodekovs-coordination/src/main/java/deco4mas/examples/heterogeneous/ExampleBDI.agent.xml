@@ -1,0 +1,75 @@
+<!-- <H3>Example BDI agent.</H3> Example BDI agent for the heterogeneous agents example application. -->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="ExampleBDI" package="deco4mas.examples.heterogeneous">
+	
+	<imports>
+		<import>jadex.adapter.base.contextservice.*</import>
+		<import>jadex.adapter.base.appdescriptor.*</import>
+		<import>jadex.application.space.envsupport.environment.space2d.*</import>
+		<import>jadex.application.space.envsupport.environment.*</import>
+		<import>jadex.application.space.envsupport.math.*</import>
+		<import>jadex.application.runtime.*</import>
+		<import>java.util.*</import>
+		<import>deco4mas.coordinate.environment.*</import>
+		<import>deco4mas.coordinate.*</import>
+		<import>jadex.application.space.envsupport.environment.ISpaceObject</import>
+	</imports>
+	
+	<beliefs>
+		<!-- Environment. -->
+		<belief name="env" class="CoordinationSpace">
+			<fact>(CoordinationSpace)((IApplicationExternalAccess)$scope.getParent()).getSpace("mycoordspace")</fact>
+		</belief>
+	</beliefs>
+	
+	<goals>
+		<!-- This goal is observed by the coordination framework -->
+		<achievegoal name="sayhello">
+			<parameter name="message" class="String" />
+		</achievegoal>
+	</goals>
+	
+	<events>
+		<!-- This internal event is called by the coordination framework -->
+		<internalevent name="receivehello">
+			<parameter name="message" class="String" />
+		</internalevent>
+	</events>
+	
+	<plans>
+		<!-- The initial plan -->
+		<plan name="initplan">
+			<body class="InitialPlan" />
+		</plan>
+		
+		<!-- Dummy plan consumes the sayhello goal event -->
+		<plan name="dummyplan">
+			<body class="DummyPlan" />
+			<trigger>
+				<goal ref="sayhello" />
+			</trigger>
+		</plan>
+		
+		<!-- This plan is triggered by the 'receivehello' internal event -->
+		<plan name="receivemessage">
+			<body class="ReceiveHelloPlan"/>
+			<trigger>
+				<internalevent ref="receivehello" />
+			</trigger>
+			<parameter name="message" class="String">
+				<internaleventmapping ref="receivehello.message"/>
+			</parameter>
+		</plan>
+	</plans>
+	
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="initplan" />
+			</plans>
+		</configuration>
+	</configurations>
+</agent>		

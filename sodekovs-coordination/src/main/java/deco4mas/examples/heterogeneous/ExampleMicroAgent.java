@@ -1,0 +1,68 @@
+package deco4mas.examples.heterogeneous;
+
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
+import jadex.micro.MicroAgent;
+import deco4mas.coordinate.annotation.CoordinationParameter;
+import deco4mas.coordinate.annotation.CoordinationStep;
+
+/**
+ * The example micro agent. After creation the agents waits for 10s before the {@link SayHelloStep} is started. This {@link IComponentStep} is observed by the coordination framework and the parameter
+ * {@link SayHelloStep#message} is passed over the coordination medium to the receiving agents. The {@link ReceiveHelloStep} is called by the coordination framework if an according event occurs. The
+ * parameter {@link ReceiveHelloStep#message} is received over the coordination framework.
+ * 
+ * @author Thomas Preisler
+ */
+public class ExampleMicroAgent extends MicroAgent {
+
+	@Override
+	public IFuture agentCreated() {
+		System.out.println("ExampleMicroAgent created.");
+
+		return super.agentCreated();
+	}
+
+	@Override
+	public void executeBody() {
+		System.out.println("ExampleMicroAgent executeBody() called.");
+		waitFor(10000, new SayHelloStep("Hello, I'm the example micro agent and it is nice to chat with you!"));
+	}
+
+	@Override
+	public IFuture agentKilled() {
+		return super.agentKilled();
+	}
+
+	@CoordinationStep
+	public class SayHelloStep implements IComponentStep {
+
+		@CoordinationParameter
+		public String message = null;
+
+		public SayHelloStep(String message) {
+			this.message = message;
+		}
+
+		@Override
+		public Object execute(IInternalAccess ia) {
+			System.out.println("ExampleMicroAgent execute() in SayHelloStep called with message:");
+			System.out.println("\t" + message);
+			return null;
+		}
+	}
+
+	@CoordinationParameter
+	public class ReceiveHelloStep implements IComponentStep {
+
+		@CoordinationParameter
+		public String message = null;
+
+		@Override
+		public Object execute(IInternalAccess ia) {
+			System.out.println("ExampleMicroAgent execute() in ReceiveHelloStep called with message:");
+			System.out.println("\t" + message);
+			return null;
+		}
+	}
+}

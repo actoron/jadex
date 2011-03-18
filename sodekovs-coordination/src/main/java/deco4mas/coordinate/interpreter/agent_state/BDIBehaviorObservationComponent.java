@@ -278,6 +278,7 @@ public class BDIBehaviorObservationComponent extends BehaviorObservationComponen
 		Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
 		if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_goals, scope[0])) {
 			IGoalbase base = GoalbaseFlyweight.getGoalbaseFlyweight(state, scope[1]);
+			// TODO: Macht es Sinn dass eine Nachricht in beiden Fällen gesendet wird (goal added und goal finished)?
 			base.addGoalListener(agentElement.getElement_id(), new IGoalListener() {
 				public void goalAdded(AgentEvent ae) {
 					checkAndPublishIfApplicable(ae, AgentElementType.BDI_GOAL);
