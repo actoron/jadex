@@ -39,7 +39,7 @@ public class MPropertybaseFlyweight extends MElementFlyweight implements IMPrope
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_properties);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_properties);
 					IMExpression[] ret = new IMExpression[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -56,7 +56,7 @@ public class MPropertybaseFlyweight extends MElementFlyweight implements IMPrope
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_properties);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_properties);
 			IMExpression[] ret = new IMExpression[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{

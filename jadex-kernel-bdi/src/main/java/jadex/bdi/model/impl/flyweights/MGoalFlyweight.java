@@ -318,7 +318,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 			{
 				public void run()
 				{
-					Collection params = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.goal_has_excludedparameter);
+					Collection params = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.goal_has_excludedparameter);
 					object = params!=null ? params.toArray(new String[params.size()]) : SUtil.EMPTY_STRING_ARRAY;
 				}
 			};
@@ -326,7 +326,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 		}
 		else
 		{
-			Collection params = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.goal_has_excludedparameter);
+			Collection params = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.goal_has_excludedparameter);
 			return params!=null ? (String[])params.toArray(new String[params.size()]) : SUtil.EMPTY_STRING_ARRAY;
 		}
 	}
@@ -343,7 +343,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 			{
 				public void run()
 				{
-					Collection params = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.goal_has_inhibits);
+					Collection params = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.goal_has_inhibits);
 					IMInhibited[] ret = new IMInhibited[params==null? 0: params.size()];
 					if(params!=null)
 					{
@@ -360,7 +360,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 		}
 		else
 		{
-			Collection params = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.goal_has_inhibits);
+			Collection params = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.goal_has_inhibits);
 			IMInhibited[] ret = new IMInhibited[params==null? 0: params.size()];
 			if(params!=null)
 			{

@@ -68,12 +68,12 @@ public class MPlanbaseFlyweight extends MElementFlyweight implements IMPlanbase,
  			{
  				public void run()
  				{
- 					Collection bels = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_plans);
- 					IMPlan[] ret = new IMPlan[bels==null? 0: bels.size()];
- 					if(bels!=null)
+ 					Collection plans = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_plans);
+ 					IMPlan[] ret = new IMPlan[plans==null? 0: plans.size()];
+ 					if(plans!=null)
  					{
  						int i=0;
- 						for(Iterator it=bels.iterator(); it.hasNext(); )
+ 						for(Iterator it=plans.iterator(); it.hasNext(); )
  						{
  							ret[i++] = new MPlanFlyweight(getState(), getScope(), it.next());
  						}
@@ -85,12 +85,12 @@ public class MPlanbaseFlyweight extends MElementFlyweight implements IMPlanbase,
  		}
  		else
  		{
- 			Collection bels = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_plans);
- 			IMPlan[] ret = new IMPlan[bels==null? 0: bels.size()];
- 			if(bels!=null)
+ 			Collection plans = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_plans);
+ 			IMPlan[] ret = new IMPlan[plans==null? 0: plans.size()];
+ 			if(plans!=null)
  			{
  				int i=0;
- 				for(Iterator it=bels.iterator(); it.hasNext(); )
+ 				for(Iterator it=plans.iterator(); it.hasNext(); )
  				{
  					ret[i++] = new MPlanFlyweight(getState(), getScope(), it.next());
  				}

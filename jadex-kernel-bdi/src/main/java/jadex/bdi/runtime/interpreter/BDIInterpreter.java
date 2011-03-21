@@ -268,12 +268,24 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			}
 		}
 		
+		Map binds = null;
+		if(bindings!=null)
+		{
+			binds = new HashMap();
+			for(int i=0; i<bindings.length; i++)
+			{
+				binds.put(bindings[i].getName(), bindings[i]);
+			}
+		}
+		
 		// Set up initial state of agent
 		ragent = state.createRootObject(OAVBDIRuntimeModel.agent_type);
 		state.setAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model, model.getHandle());
 		state.setAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_configuration, config);
 		if(arguments!=null && !arguments.isEmpty())
 			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, arguments);
+		if(binds!=null && !binds.isEmpty())
+			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_bindings, bindings);
 
 		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING0);
 		

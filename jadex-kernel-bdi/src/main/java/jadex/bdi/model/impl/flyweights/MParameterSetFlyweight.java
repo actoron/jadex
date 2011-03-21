@@ -39,7 +39,7 @@ public class MParameterSetFlyweight extends MTypedElementFlyweight implements IM
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.beliefset_has_facts);
+					Collection elems = (Collection)getState().getAttributeValues(getHandle(), OAVBDIMetaModel.beliefset_has_facts);
 					IMExpression[] ret = new IMExpression[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -56,7 +56,7 @@ public class MParameterSetFlyweight extends MTypedElementFlyweight implements IM
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.beliefset_has_facts);
+			Collection elems = (Collection)getState().getAttributeValues(getHandle(), OAVBDIMetaModel.beliefset_has_facts);
 			IMExpression[] ret = new IMExpression[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{

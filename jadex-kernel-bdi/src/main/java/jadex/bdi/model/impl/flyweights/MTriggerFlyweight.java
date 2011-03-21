@@ -38,7 +38,7 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger, I
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.trigger_has_internalevents);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.trigger_has_internalevents);
 					IMTriggerReference[] ret = new IMTriggerReference[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -55,7 +55,7 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger, I
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.trigger_has_internalevents);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.trigger_has_internalevents);
 			IMTriggerReference[] ret = new IMTriggerReference[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -80,7 +80,7 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger, I
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.trigger_has_messageevents);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.trigger_has_messageevents);
 					IMTriggerReference[] ret = new IMTriggerReference[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -97,7 +97,7 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger, I
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.trigger_has_messageevents);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.trigger_has_messageevents);
 			IMTriggerReference[] ret = new IMTriggerReference[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -122,7 +122,7 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger, I
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.trigger_has_goalfinisheds);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.trigger_has_goalfinisheds);
 					IMTriggerReference[] ret = new IMTriggerReference[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -139,7 +139,7 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger, I
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.trigger_has_goalfinisheds);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.trigger_has_goalfinisheds);
 			IMTriggerReference[] ret = new IMTriggerReference[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -164,14 +164,14 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger, I
 			{
 				public void run()
 				{
-					object = ((Collection)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.trigger_has_factaddeds)).toArray(new String[0]);
+					object = ((Collection)getState().getAttributeValues(getHandle(), OAVBDIMetaModel.trigger_has_factaddeds)).toArray(new String[0]);
 				}
 			};
 			return (String[])invoc.object;
 		}
 		else
 		{
-			return (String[])((Collection)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.trigger_has_factaddeds)).toArray(new String[0]);
+			return (String[])((Collection)getState().getAttributeValues(getHandle(), OAVBDIMetaModel.trigger_has_factaddeds)).toArray(new String[0]);
 		}
 	}
 	
@@ -186,14 +186,14 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger, I
 			{
 				public void run()
 				{
-					object = ((Collection)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.trigger_has_factremoveds)).toArray(new String[0]);
+					object = ((Collection)getState().getAttributeValues(getHandle(), OAVBDIMetaModel.trigger_has_factremoveds)).toArray(new String[0]);
 				}
 			};
 			return (String[])invoc.object;
 		}
 		else
 		{
-			return (String[])((Collection)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.trigger_has_factremoveds)).toArray(new String[0]);
+			return (String[])((Collection)getState().getAttributeValues(getHandle(), OAVBDIMetaModel.trigger_has_factremoveds)).toArray(new String[0]);
 		}
 	}
 	
@@ -208,14 +208,14 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger, I
 			{
 				public void run()
 				{
-					object = ((Collection)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.trigger_has_factchangeds)).toArray(new String[0]);
+					object = ((Collection)getState().getAttributeValues(getHandle(), OAVBDIMetaModel.trigger_has_factchangeds)).toArray(new String[0]);
 				}
 			};
 			return (String[])invoc.object;
 		}
 		else
 		{
-			return (String[])((Collection)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.trigger_has_factchangeds)).toArray(new String[0]);
+			return (String[])((Collection)getState().getAttributeValues(getHandle(), OAVBDIMetaModel.trigger_has_factchangeds)).toArray(new String[0]);
 		}
 	}
 

@@ -238,6 +238,9 @@ public class OAVBDIRuntimeModel
 	/** The agent results. */
 	public static OAVAttributeType agent_has_results;
 	
+	/** The agent has service bindings. */
+	public static OAVAttributeType agent_has_bindings;
+	
 	/** The agent has init parents (only available during start agent action). */
 	// Hack!!! remove???
 	public static OAVAttributeType agent_has_initparents;
@@ -966,6 +969,7 @@ public class OAVBDIRuntimeModel
 		agent_has_timer = agent_type.createAttributeType("agent_has_timer", java_timer_type);
 		agent_has_killlisteners = agent_type.createAttributeType("agent_has_killlisteners", java_resultlistener_type, OAVAttributeType.SET);
 		agent_has_changeevents = agent_type.createAttributeType("agent_has_changeevents", changeevent_type, OAVAttributeType.LIST);
+		agent_has_bindings = agent_type.createAttributeType("agent_has_bindings", java_map_type);
 //		agent_has_eventprocessing = agent_type.createAttributeType("agent_has_eventprocessing", processableelement_type);
 
 		// changeevents

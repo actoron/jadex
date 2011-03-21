@@ -41,7 +41,7 @@ public class MConfigParameterElementFlyweight extends MElementFlyweight implemen
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configparameterelement_has_parameters);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configparameterelement_has_parameters);
 					IMConfigParameter[] ret = new IMConfigParameter[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -58,7 +58,7 @@ public class MConfigParameterElementFlyweight extends MElementFlyweight implemen
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configparameterelement_has_parameters);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configparameterelement_has_parameters);
 			IMConfigParameter[] ret = new IMConfigParameter[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -84,7 +84,7 @@ public class MConfigParameterElementFlyweight extends MElementFlyweight implemen
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configparameterelement_has_parameters);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configparameterelement_has_parameters);
 					IMConfigParameterSet[] ret = new IMConfigParameterSet[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -101,7 +101,7 @@ public class MConfigParameterElementFlyweight extends MElementFlyweight implemen
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configparameterelement_has_parameters);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configparameterelement_has_parameters);
 			IMConfigParameterSet[] ret = new IMConfigParameterSet[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{

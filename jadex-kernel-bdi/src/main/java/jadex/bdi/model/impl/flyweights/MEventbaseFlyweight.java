@@ -105,7 +105,7 @@ public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbas
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_internalevents);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_internalevents);
 					IMInternalEvent[] ret = new IMInternalEvent[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -122,7 +122,7 @@ public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbas
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_internalevents);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_internalevents);
 			IMInternalEvent[] ret = new IMInternalEvent[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -148,7 +148,7 @@ public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbas
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_messageevents);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_messageevents);
 					IMMessageEvent[] ret = new IMMessageEvent[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -165,7 +165,7 @@ public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbas
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_messageevents);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_messageevents);
 			IMMessageEvent[] ret = new IMMessageEvent[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -220,7 +220,7 @@ public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbas
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_internaleventrefs);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_internaleventrefs);
 					IMInternalEventReference[] ret = new IMInternalEventReference[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -237,7 +237,7 @@ public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbas
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_internaleventrefs);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_internaleventrefs);
 			IMInternalEventReference[] ret = new IMInternalEventReference[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -292,7 +292,7 @@ public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbas
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_messageeventrefs);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_messageeventrefs);
 					IMMessageEventReference[] ret = new IMMessageEventReference[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -309,7 +309,7 @@ public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbas
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_messageeventrefs);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_messageeventrefs);
 			IMMessageEventReference[] ret = new IMMessageEventReference[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{

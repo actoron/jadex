@@ -32,6 +32,7 @@ import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
@@ -885,6 +886,8 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	protected RequiredServiceBinding getRequiredServiceBinding(String name)
 	{
-		return null;//bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
+		Object agent = BDIInterpreter.getInterpreter(getState()).getAgent();
+		Map bindings = (Map)getState().getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_bindings);
+		return bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
 	}
 }

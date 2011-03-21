@@ -20,6 +20,7 @@ import jadex.bdi.model.editable.IMEExpressionbase;
 import jadex.bdi.model.editable.IMEGoalbase;
 import jadex.bdi.model.editable.IMEPlanbase;
 import jadex.bdi.model.editable.IMEPropertybase;
+import jadex.commons.SUtil;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -77,14 +78,16 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 			{
 				public void run()
 				{
-					sarray = (String[])getState().getAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_imports);
+					Collection elems = (Collection)getState().getAttributeValues(getHandle(), OAVBDIMetaModel.capability_has_imports);
+					sarray = elems!=null? (String[])elems.toArray(new String[elems.size()]): SUtil.EMPTY_STRING_ARRAY;
 				}
 			};
 			return invoc.sarray;
 		}
 		else
 		{
-			return (String[])getState().getAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_imports);
+			Collection elems = (Collection)getState().getAttributeValues(getHandle(), OAVBDIMetaModel.capability_has_imports);
+			return elems!=null? (String[])elems.toArray(new String[elems.size()]): SUtil.EMPTY_STRING_ARRAY;
 		}
 	}
 	
@@ -123,7 +126,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_capabilityrefs);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_capabilityrefs);
 					IMCapabilityReference[] ret = new IMCapabilityReference[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -140,7 +143,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_capabilityrefs);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_capabilityrefs);
 			IMCapabilityReference[] ret = new IMCapabilityReference[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -304,7 +307,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_providedservices);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_providedservices);
 					IMExpression[] ret = new IMExpression[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -321,7 +324,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_providedservices);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_providedservices);
 			IMExpression[] ret = new IMExpression[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -349,7 +352,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_capabilityrefs);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_capabilityrefs);
 					IMConfiguration[] ret = new IMConfiguration[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -366,7 +369,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_capabilityrefs);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_capabilityrefs);
 			MConfigurationFlyweight[] ret = new MConfigurationFlyweight[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{

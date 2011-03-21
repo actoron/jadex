@@ -38,7 +38,7 @@ public class MMetaGoalTriggerFlyweight extends MTriggerFlyweight implements IMMe
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.metagoaltrigger_has_goals);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.metagoaltrigger_has_goals);
 					IMTriggerReference[] ret = new IMTriggerReference[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -55,7 +55,7 @@ public class MMetaGoalTriggerFlyweight extends MTriggerFlyweight implements IMMe
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.metagoaltrigger_has_goals);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.metagoaltrigger_has_goals);
 			IMTriggerReference[] ret = new IMTriggerReference[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{

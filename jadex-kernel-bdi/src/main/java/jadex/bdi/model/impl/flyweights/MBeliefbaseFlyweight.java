@@ -105,7 +105,7 @@ public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefb
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_beliefs);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_beliefs);
 					IMBelief[] ret = new IMBelief[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -122,7 +122,7 @@ public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefb
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_beliefs);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_beliefs);
 			IMBelief[] ret = new IMBelief[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -148,7 +148,7 @@ public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefb
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_beliefsets);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_beliefsets);
 					IMBeliefSet[] ret = new IMBeliefSet[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -165,7 +165,7 @@ public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefb
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_beliefsets);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_beliefsets);
 			IMBeliefSet[] ret = new IMBeliefSet[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -220,7 +220,7 @@ public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefb
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_beliefrefs);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_beliefrefs);
 					IMBeliefReference[] ret = new IMBeliefReference[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -237,7 +237,7 @@ public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefb
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_beliefrefs);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_beliefrefs);
 			IMBeliefReference[] ret = new IMBeliefReference[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -292,7 +292,7 @@ public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefb
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_beliefsetrefs);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_beliefsetrefs);
 					IMBeliefSetReference[] ret = new IMBeliefSetReference[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -309,7 +309,7 @@ public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefb
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_beliefsetrefs);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_beliefsetrefs);
 			IMBeliefSetReference[] ret = new IMBeliefSetReference[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{

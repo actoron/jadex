@@ -74,7 +74,7 @@ public class MExpressionbaseFlyweight  extends MElementFlyweight implements IMEx
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_expressions);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_expressions);
 					IMExpression[] ret = new IMExpression[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -91,7 +91,7 @@ public class MExpressionbaseFlyweight  extends MElementFlyweight implements IMEx
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_expressions);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_expressions);
 			IMExpression[] ret = new IMExpression[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -146,7 +146,7 @@ public class MExpressionbaseFlyweight  extends MElementFlyweight implements IMEx
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_expressionrefs);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_expressionrefs);
 					IMExpressionReference[] ret = new IMExpressionReference[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -163,7 +163,7 @@ public class MExpressionbaseFlyweight  extends MElementFlyweight implements IMEx
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_expressionrefs);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_expressionrefs);
 			IMExpressionReference[] ret = new IMExpressionReference[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{

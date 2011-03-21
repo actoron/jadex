@@ -40,7 +40,7 @@ public class MPlanTriggerFlyweight extends MTriggerFlyweight implements IMPlanTr
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.plantrigger_has_goals);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.plantrigger_has_goals);
 					IMTriggerReference[] ret = new IMTriggerReference[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -57,7 +57,7 @@ public class MPlanTriggerFlyweight extends MTriggerFlyweight implements IMPlanTr
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.plantrigger_has_goals);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.plantrigger_has_goals);
 			IMTriggerReference[] ret = new IMTriggerReference[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{

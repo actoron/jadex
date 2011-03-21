@@ -44,7 +44,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_initialcapabilities);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_initialcapabilities);
 					IMInitialCapability[] ret = new IMInitialCapability[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -61,7 +61,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_initialcapabilities);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_initialcapabilities);
 			IMInitialCapability[] ret = new IMInitialCapability[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -87,7 +87,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_initialbeliefs);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_initialbeliefs);
 					IMConfigBelief[] ret = new IMConfigBelief[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -104,7 +104,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_initialbeliefs);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_initialbeliefs);
 			IMConfigBelief[] ret = new IMConfigBelief[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -130,7 +130,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_initialbeliefsets);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_initialbeliefsets);
 					IMConfigBeliefSet[] ret = new IMConfigBeliefSet[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -147,7 +147,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_initialbeliefsets);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_initialbeliefsets);
 			IMConfigBeliefSet[] ret = new IMConfigBeliefSet[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -173,7 +173,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_initialgoals);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_initialgoals);
 					IMConfigElement[] ret = new IMConfigElement[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -190,7 +190,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_initialgoals);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_initialgoals);
 			IMConfigElement[] ret = new IMConfigElement[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -216,7 +216,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_endgoals);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_endgoals);
 					IMConfigElement[] ret = new IMConfigElement[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -233,7 +233,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_endgoals);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_endgoals);
 			IMConfigElement[] ret = new IMConfigElement[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -259,7 +259,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_initialplans);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_initialplans);
 					IMConfigElement[] ret = new IMConfigElement[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -276,7 +276,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_initialplans);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_initialplans);
 			IMConfigElement[] ret = new IMConfigElement[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -302,7 +302,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_endplans);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_endplans);
 					IMConfigElement[] ret = new IMConfigElement[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -319,7 +319,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_endplans);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_endplans);
 			IMConfigElement[] ret = new IMConfigElement[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -345,7 +345,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_initialinternalevents);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_initialinternalevents);
 					IMConfigElement[] ret = new IMConfigElement[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -362,7 +362,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_initialinternalevents);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_initialinternalevents);
 			IMConfigElement[] ret = new IMConfigElement[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -388,7 +388,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_endinternalevents);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_endinternalevents);
 					IMConfigElement[] ret = new IMConfigElement[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -405,7 +405,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_endinternalevents);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_endinternalevents);
 			IMConfigElement[] ret = new IMConfigElement[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -431,7 +431,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_initialmessageevents);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_initialmessageevents);
 					IMConfigElement[] ret = new IMConfigElement[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -448,7 +448,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_initialmessageevents);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_initialmessageevents);
 			IMConfigElement[] ret = new IMConfigElement[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -474,7 +474,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_endmessageevents);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_endmessageevents);
 					IMConfigElement[] ret = new IMConfigElement[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -491,7 +491,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.configuration_has_endmessageevents);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.configuration_has_endmessageevents);
 			IMConfigElement[] ret = new IMConfigElement[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
