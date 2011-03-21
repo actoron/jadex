@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">	
+	<xs:element name="Schedule">
+		<xs:complexType>
+			<xs:sequence>
+			<!-- Needs to be specified if the System under Test (SuT) has to be started by the benchmark, i.e. it is not running.-->
+				<xs:element name="SytemUnderTest">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="Properties" maxOccurs="1"/>							
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Sequences">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="Sequence" maxOccurs="unbounded"/>							
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>				
+			</xs:sequence>
+			<xs:attribute name="type" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="Workload"/>
+						<xs:enumeration value="Faultload"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="name" type="xs:string" use="required"/>			
+			<xs:attribute name="warmUpTime" type="xs:long" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Sequence">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Actions">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="Action" maxOccurs="unbounded"/>							
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>				
+			</xs:sequence>			
+			<xs:attribute name="starttime" type="xs:long" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Action">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Properties" maxOccurs="1"/>										
+			</xs:sequence>
+		<xs:attribute name="componentname" type="xs:string" use="required"/>
+		<xs:attribute name="componenttype" type="xs:string" use="required"/>
+		<xs:attribute name="componentmodel" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="Properties">
+		<xs:complexType>			
+			<xs:sequence>
+				<xs:element ref="Property" maxOccurs="unbounded"/>							
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="Property">
+		<xs:complexType>
+			<xs:attribute name="name" type="xs:string"/>
+			<xs:attribute name="value" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
