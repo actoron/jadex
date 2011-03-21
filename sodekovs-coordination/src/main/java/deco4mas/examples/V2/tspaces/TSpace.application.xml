@@ -19,7 +19,7 @@
 		<import>jadex.application.space.envsupport.environment.DeltaTimeExecutor</import>	
 		<import>jadex.adapter.base.envsupport.environment.*</import>
 		<import>jadex.application.space.envsupport.math.*</import>
-		<import>jadex.service.clock.IClockService</import>
+		<import>jadex.bridge.service.clock.IClockService</import>
 		<import>jadex.adapter.base.envsupport.dataview.GeneralDataView2D</import>
 		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
 		<import>jadex.bdi.planlib.*</import>

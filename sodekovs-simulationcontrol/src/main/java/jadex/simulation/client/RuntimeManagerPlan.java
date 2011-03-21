@@ -16,12 +16,12 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.SReflect;
-import jadex.commons.future.IFuture;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.library.ILibraryService;
+import jadex.commons.SReflect;
+import jadex.commons.future.IFuture;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -66,7 +66,7 @@ public class RuntimeManagerPlan extends Plan {
 	 */
 	private IApplicationExternalAccess exta = null;
 	private IClockService clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceProvider(), IClockService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this);
-	IComponentManagementService cms = null;
+	private IComponentManagementService cms = null;
 	private OnlineVisualisation vis = null;
 	private String appFilePath = null;
 

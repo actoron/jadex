@@ -12,10 +12,10 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
-import jadex.commons.service.SServiceProvider;
 import jadex.javaparser.IValueFetcher;
 import jadex.micro.IMicroExternalAccess;
 
