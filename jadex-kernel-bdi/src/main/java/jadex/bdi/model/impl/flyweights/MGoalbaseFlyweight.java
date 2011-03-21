@@ -74,7 +74,7 @@ public class MGoalbaseFlyweight extends MElementFlyweight implements IMGoalbase,
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_goals);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_goals);
 					IMGoal[] ret = new IMGoal[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -91,7 +91,7 @@ public class MGoalbaseFlyweight extends MElementFlyweight implements IMGoalbase,
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_goals);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_goals);
 			IMGoal[] ret = new IMGoal[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -146,7 +146,7 @@ public class MGoalbaseFlyweight extends MElementFlyweight implements IMGoalbase,
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_goalrefs);
+					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_goalrefs);
 					IMGoalReference[] ret = new IMGoalReference[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -163,7 +163,7 @@ public class MGoalbaseFlyweight extends MElementFlyweight implements IMGoalbase,
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_goalrefs);
+			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_goalrefs);
 			IMGoalReference[] ret = new IMGoalReference[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{

@@ -29,7 +29,6 @@
 		<import>jadex.application.space.envsupport.environment.space2d.*</import>
 		<import>jadex.application.space.envsupport.environment.DeltaTimeExecutor</import>
 		<import>jadex.application.space.envsupport.math.*</import>
-		<import>jadex.bridge.serviceclock.IClockService</import>
 		<import>jadex.application.space.envsupport.dataview.*</import>
 		<import>java.text.SimpleDateFormat</import>
 		<import>java.util.Date</import>
@@ -40,7 +39,7 @@
 		<import>jadex.bdi.examples.marsworld.movement.*</import>
 		<import>jadex.application.space.envsupport.evaluation.*</import>
 		<import>jadex.application.space.envsupport.observer.gui.plugin.*</import>
-		<import>jadex.bridge.servicelock.IClockService</import>
+		<import>jadex.bridge.service.clock.IClockService</import>
 		<import>jadex.commons.future.*</import>
 		<import>jadex.bridge.service.*</import>
 	</imports>

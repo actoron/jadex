@@ -368,7 +368,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 										// might depend on each other (e.g. bdi factory must be there for jcc)).
 										
 										final IComponentManagementService ces = (IComponentManagementService)result;
-										createComponent(components, ces, 0, inited);
+										createComponent(components, ces, 0, inited, new ArrayList());
 									}
 								}));
 							}
@@ -1317,14 +1317,14 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	 *  because they need the external access of the parent, which is available only
 	 *  after init is finished (otherwise there is a cyclic init dependency between parent and subcomps). 
 	 */
-	protected void createComponent(final List components, final IComponentManagementService ces, final int i, final Future inited)
+	protected void createComponent(final List components, final IComponentManagementService cms, final int i, final Future inited, final List tostart)
 	{
 		if(i<components.size())
 		{
 			final MComponentInstance component = (MComponentInstance)components.get(i);
 //			System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
 			int num = getNumber(component);
-			IResultListener	crl	= new CollectionResultListener(num, false, new IResultListener()
+			final IResultListener crl = new CollectionResultListener(num, false, new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -1346,7 +1346,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 							@XMLClassname("createChild")
 							public Object execute(IInternalAccess ia)
 							{
-								createComponent(components, ces, i+1, inited);
+								createComponent(components, cms, i+1, inited, tostart);
 								return null;
 							}
 						});
@@ -1363,16 +1363,29 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 				MComponentType	type	= component.getType(model);
 				if(type!=null)
 				{
-					Boolean	suspend	= component.getSuspend()!=null ? component.getSuspend() : type.getSuspend();
+					final Boolean suspend = component.getSuspend()!=null ? component.getSuspend() : type.getSuspend();
 					Boolean	master	= component.getMaster()!=null ? component.getMaster() : type.getMaster();
 					Boolean	daemon	= component.getDaemon()!=null ? component.getDaemon() : type.getDaemon();
 					Boolean	autoshutdown	= component.getAutoShutdown()!=null ? component.getAutoShutdown() : type.getAutoShutdown();
-					RequiredServiceBinding[] bindings = component.getRequiredServiceBindings()!=null? 
-						(RequiredServiceBinding[])component.getRequiredServiceBindings().toArray(new RequiredServiceBinding[0]): null;
-					IFuture ret = ces.createComponent(component.getName(), component.getType(model).getFilename(),
+					List bindings = component.getRequiredServiceBindings();
+					IFuture ret = cms.createComponent(component.getName(), component.getType(model).getFilename(),
 						new CreationInfo(component.getConfiguration(), getArguments(component), adapter.getComponentIdentifier(),
-						suspend, master, daemon, autoshutdown, model.getAllImports(), bindings), null);
-					ret.addResultListener(crl);
+						suspend, master, daemon, autoshutdown, model.getAllImports(), 
+						bindings!=null? (RequiredServiceBinding[])bindings.toArray(new RequiredServiceBinding[bindings.size()]): null), null);
+					ret.addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object result)
+						{
+							if(suspend==null || !suspend.booleanValue())
+								tostart.add(result);
+							crl.resultAvailable(result);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							crl.exceptionOccurred(exception);
+						}
+					});
 				}
 				else
 				{
@@ -1388,6 +1401,12 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 			// master, daemon, autoshutdown
 //			Boolean[] bools = new Boolean[3];
 //			bools[2] = model.getAutoShutdown();
+			
+			for(int j=0; j<tostart.size(); j++)
+			{
+				IComponentIdentifier cid = (IComponentIdentifier)tostart.get(j);
+				cms.resumeComponent(cid);
+			}
 			
 			inited.setResult(new Object[]{ApplicationInterpreter.this, adapter});
 		}

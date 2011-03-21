@@ -18,7 +18,7 @@
 		<import>java.util.*</import>
 		<import>jadex.commons.*</import>
 		<import>jadex.commons.future.*</import>
-		<import>jadex.bridge.service*</import>
+		<import>jadex.bridge.service.*</import>
 		<import>jadex.base.fipa.*</import>
 		<import>java.util.logging.*</import>
 		<import>java.util.*</import>
@@ -398,7 +398,7 @@
 	 		+new java.text.SimpleDateFormat("yyyy.MM.dd_HH.mm.ss")
 	 		.format(new java.util.Date())+".log"</property>
 	 	<property name="logging.useParentHandlers">false</property> -->
-	 	<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class)</property>
+	 	<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)</property>
 	</properties>
 
 	<configurations>

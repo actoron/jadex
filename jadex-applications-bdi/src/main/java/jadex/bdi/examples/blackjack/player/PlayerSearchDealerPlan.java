@@ -7,6 +7,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 
 import java.util.Random;
@@ -26,7 +27,7 @@ public class PlayerSearchDealerPlan extends Plan
 	{
 		//System.out.println("Searching dealer...");
 		// Create a service description to search for.
-		IDF df = (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);
+		IDF df = (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "blackjack", null);
 		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 		ISearchConstraints sc = df.createSearchConstraints(-1, 0);

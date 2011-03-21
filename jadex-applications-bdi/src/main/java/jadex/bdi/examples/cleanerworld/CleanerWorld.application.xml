@@ -22,7 +22,7 @@
 		<import>jadex.application.space.envsupport.observer.perspective.*</import>
 		<import>jadex.bdi.planlib.*</import>
 		<import>jadex.bdi.examples.cleanerworld.cleaner.*</import>
-		<import>jadex.bridge.servicelock.IClockService</import>
+		<import>jadex.bridge.service.clock.IClockService</import>
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.commons.future.*</import>
 	</imports>

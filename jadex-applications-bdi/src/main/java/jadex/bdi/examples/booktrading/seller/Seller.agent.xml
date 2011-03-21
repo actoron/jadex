@@ -19,13 +19,12 @@
 		<import>jadex.base.fipa.*</import>
 		<import>java.util.*</import>
 		<import>jadex.base.fipa.*</import>
-		<import>jadex.bridge.IClockService</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
 		<import>jadex.bdi.runtime.*</import>
 		<import>jadex.commons.*</import>
 		<import>jadex.commons.future.*</import>
-		<import>jadex.bridge.service*</import>
-		<import>jjadex.bridge.servicelock.*</import>
+		<import>jadex.bridge.service.*</import>
+		<import>jadex.bridge.service.clock.*</import>
 	</imports>
 		
 	<capabilities>
