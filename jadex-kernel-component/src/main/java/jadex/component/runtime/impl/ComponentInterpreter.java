@@ -28,6 +28,7 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.ServiceNotFoundException;
 import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.bridge.service.component.ComponentServiceContainer;
+import jadex.bridge.service.component.CompositeServiceInvocationInterceptor;
 import jadex.bridge.service.component.DecouplingServiceInvocationInterceptor;
 import jadex.commons.ChangeEvent;
 import jadex.commons.SReflect;
