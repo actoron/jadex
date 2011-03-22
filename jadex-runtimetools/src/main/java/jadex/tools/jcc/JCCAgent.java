@@ -20,13 +20,6 @@ import jadex.tools.starter.StarterServicePlugin;
  *  Micro component for opening the JCC gui.
  */
 @Description("Micro component for opening the JCC gui.")
-//@RequiredServices(
-//{
-//	@RequiredService(name="cms", type=IComponentManagementService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
-//	@RequiredService(name="rms", type=IRemoteServiceManagementService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
-//	@RequiredService(name="libservice", type=ILibraryService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
-//	@RequiredService(name="messageservice", type=IMessageService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM)
-//})
 public class JCCAgent extends MicroAgent
 {
 	/**

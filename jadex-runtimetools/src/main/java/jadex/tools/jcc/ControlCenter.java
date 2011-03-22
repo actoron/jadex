@@ -146,6 +146,7 @@ public class ControlCenter
 				{
 					public void customResultAvailable(Object result)
 					{
+						// Add PCC to window.
 						window.showPlatformPanel(pcc);
 						window.setVisible(true);
 						ret.setResult(null);
@@ -217,7 +218,7 @@ public class ControlCenter
 					window.setSize(windim);
 					window.setLocation(SGUI.calculateMiddlePosition(window));
 				}
-					
+				
 				pcc.setProperties(props).addResultListener(new SwingDelegationResultListener(ret));
 			}
 		});

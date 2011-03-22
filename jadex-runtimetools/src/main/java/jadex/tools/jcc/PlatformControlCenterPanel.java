@@ -337,7 +337,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 	public void setConsoleHeight(final int height)
 	{
 		// Delay setting when not yet displayed.
-		if(sp.getMaximumDividerLocation()<height)
+//		if(sp.getMaximumDividerLocation()<height)
 		{
 			SwingUtilities.invokeLater(new Runnable()
 			{
@@ -347,10 +347,10 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 				}
 			});
 		}
-		else
-		{
-			sp.setDividerLocation(sp.getMaximumDividerLocation() - height);
-		}
+//		else
+//		{
+//			sp.setDividerLocation(sp.getMaximumDividerLocation() - height);
+//		}
 	}
 	
 	/**

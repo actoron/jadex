@@ -13,6 +13,8 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -44,9 +46,11 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.border.LineBorder;
 import javax.swing.event.CellEditorListener;
@@ -533,5 +537,39 @@ public class SGUI
 				+ renderedImage + " to " + mimeType);
 		}
 		throw ioe;
+	}
+
+	/**
+	 *  Set a split location.
+	 *  Delays the call until the component is visible.
+	 */
+	public static void setDividerLocation(final JSplitPane split, final int loc)
+	{
+		if(split.isVisible())
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					split.setDividerLocation(loc);
+				}
+			});
+		}
+		else
+		{
+			split.addComponentListener(new ComponentAdapter()
+			{
+				public void componentShown(ComponentEvent e)
+				{
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							split.setDividerLocation(loc);
+						}
+					});
+				}
+			});
+		}
 	}
 }

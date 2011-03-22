@@ -239,12 +239,14 @@ public class StarterServicePanel extends JPanel
 					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 		//		lsplit.add(tp);
 				lsplit.add(comptree);
-				lsplit.setDividerLocation(300);
+//				lsplit.setDividerLocation(300);
+				SGUI.setDividerLocation(lsplit, 300);
 		
 				csplit.add(lsplit);
 				spanel = new StarterPanel(exta, jcc);
 				csplit.add(spanel);
-				csplit.setDividerLocation(180);
+//				csplit.setDividerLocation(180);
+				SGUI.setDividerLocation(csplit, 180);
 		            			
 				add(csplit, BorderLayout.CENTER);
 				ret.setResult(null);
