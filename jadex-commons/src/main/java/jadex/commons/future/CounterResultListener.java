@@ -143,7 +143,7 @@ public class CounterResultListener implements IResultListener
 	/**
 	 *  Method that can be overridden to do sth. on each
 	 *  exception that occurs. 
-	 *  @retrun True, for retry the task (cnt is not increased);
+	 *  @return True, for retry the task (cnt is not increased);
 	 */
 	public boolean intermediateExceptionOccurred(Exception exception)
 	{

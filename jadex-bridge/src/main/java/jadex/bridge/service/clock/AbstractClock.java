@@ -342,8 +342,8 @@ public abstract class AbstractClock implements IClock
 	{
 		synchronized(this)
 		{
-//			System.err.println("Added timer: "+timer);
 			timers.add(timer);
+//			System.err.println("Added timer: "+timers);
 		}
 		
 		notifyListeners(new ChangeEvent(this, EVENT_TYPE_TIMER_ADDED));
@@ -357,8 +357,8 @@ public abstract class AbstractClock implements IClock
 	{
 		synchronized(this)
 		{
-//		System.out.println("Removed timer: "+timer);
 			timers.remove(timer);
+//			System.err.println("Removed timer: "+timers);
 		}
 		
 		notifyListeners(new ChangeEvent(this, EVENT_TYPE_TIMER_REMOVED));

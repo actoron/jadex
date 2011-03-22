@@ -98,6 +98,9 @@ public class NIOTCPTransport implements ITransport
 	
 	/** The codec factory. */
 	protected CodecFactory codecfac;
+	
+	/** Flag indicating that the transport was shut down. */
+	protected boolean	shutdown;
 
 	//-------- constructors --------
 	
@@ -289,6 +292,7 @@ public class NIOTCPTransport implements ITransport
 	{
 		try{this.ssc.close();}catch(Exception e){}
 		connections = null; // Help gc
+		this.shutdown	= true;
 		return new Future(null);
 	}
 	
@@ -326,7 +330,7 @@ public class NIOTCPTransport implements ITransport
 //		if(addrs.length>1)
 //			System.out.println("here: "+SUtil.arrayToString(addrs));
 		
-		for(int i=0; i<addrs.length && undelivered.size()>0; i++)
+		for(int i=0; !shutdown && i<addrs.length && undelivered.size()>0; i++)
 		{
 			try
 			{
@@ -499,9 +503,12 @@ public class NIOTCPTransport implements ITransport
 			}
 			catch(Exception e)
 			{ 
-				connections.put(address, new NIOTCPDeadConnection());
-//				logger.warning("Could not establish connection to: "+address);
-				//e.printStackTrace();
+				if(!shutdown)
+				{
+					connections.put(address, new NIOTCPDeadConnection());
+//					logger.warning("Could not establish connection to: "+address);
+					//e.printStackTrace();
+				}
 			}
 		}
 		

@@ -111,6 +111,11 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 	public void dispose()
 	{
 		executor.shutdown();
+		// Wake up timer thread, if currently waiting.
+		synchronized(this)
+		{
+			this.notify();
+		}
 //		notificator.shutdown(null);
 	}
 

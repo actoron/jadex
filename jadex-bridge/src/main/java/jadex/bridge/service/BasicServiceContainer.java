@@ -10,7 +10,6 @@ import jadex.commons.future.IntermediateFuture;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -236,16 +235,29 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		// Stop the services.
 		if(services!=null && services.size()>0)
 		{
-			List allservices = new ArrayList();
+			final List allservices = new ArrayList();
 			for(Iterator it=services.values().iterator(); it.hasNext(); )
 			{
 				allservices.addAll((Collection)it.next());
 			}
-			CounterResultListener	crl	= new CounterResultListener(allservices.size(), new DelegationResultListener(ret));
-			for(Iterator it=allservices.iterator(); it.hasNext(); )
+			
+			// Shutdown services in reverse order as later services might depend on earlier ones.
+			IInternalService	service	= (IInternalService)allservices.remove(allservices.size()-1);
+			service.shutdownService().addResultListener(new DelegationResultListener(ret)
 			{
-				((IInternalService)it.next()).shutdownService().addResultListener(crl);
-			}
+				public void customResultAvailable(Object result)
+				{
+					if(!allservices.isEmpty())
+					{
+						IInternalService	service	= (IInternalService)allservices.remove(allservices.size()-1);
+						service.shutdownService().addResultListener(this);						
+					}
+					else
+					{
+						super.customResultAvailable(result);
+					}
+				}
+			});
 		}
 		else
 		{

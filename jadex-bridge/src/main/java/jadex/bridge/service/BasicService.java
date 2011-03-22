@@ -195,7 +195,7 @@ public class BasicService implements IInternalService
 		}
 		else
 		{
-			shutdowned = false;
+			shutdowned = true;
 			ret.setResult(null);
 		}
 		return ret;

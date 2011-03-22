@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.JOptionPane;
@@ -335,9 +336,9 @@ public class ControlCenter
 		// todo: make save on exit configurable.
 		saveSettings();
 		
-		for(int i=0; i<pccs.size(); i++)
+		for(Iterator it=pccs.keySet().iterator(); it.hasNext(); )
 		{
-			((PlatformControlCenter)pccs.get(i)).dispose();
+			((PlatformControlCenter)pccs.get(it.next())).dispose();
 		}
 		killed = true;
 		if(cmshandler!=null)
