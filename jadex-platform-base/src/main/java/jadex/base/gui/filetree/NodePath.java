@@ -34,6 +34,11 @@ public class NodePath
 	 */
 	public NodePath(int entry, String[] path)
 	{
+		if(entry==-1)
+		{
+			Thread.dumpStack();
+			throw new IllegalArgumentException();
+		}
 		this.entry	= entry;
 		this.path	= path;
 	}
@@ -53,6 +58,11 @@ public class NodePath
 	 */
 	public void setEntry(int entry)
 	{
+		if(entry==-1)
+		{
+			Thread.dumpStack();
+			throw new IllegalArgumentException();
+		}
 		this.entry = entry;
 	}
 
