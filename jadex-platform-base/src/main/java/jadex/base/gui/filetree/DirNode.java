@@ -14,8 +14,10 @@ import jadex.commons.future.SwingDefaultResultListener;
 import java.io.File;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -44,6 +46,7 @@ public class DirNode extends FileNode
 		IIconCache iconcache, IRemoteFilter filter, INodeFactory factory)
 	{
 		super(parent, model, tree, file, iconcache);
+		
 //		assert file.isDirectory(): file;
 		this.filter = filter;
 		this.factory = factory;
@@ -58,9 +61,6 @@ public class DirNode extends FileNode
 	 */
 	protected void	searchChildren()
 	{
-		if(toString().indexOf("A:")!=-1)
-			System.out.println("here");
-		
 		listFiles().addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
