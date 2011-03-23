@@ -23,4 +23,9 @@ public interface IComponentAdapterFactory
 	 */
 	public boolean executeStep(IComponentAdapter adapter);
 
+	/**
+	 *  Perform the initial wake up of a component.
+	 *  @param adapter	The component adapter.
+	 */
+	public void	initialWakeup(IComponentAdapter adapter);
 }

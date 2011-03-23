@@ -1,6 +1,5 @@
 package jadex.base.gui.modeltree;
 
-import jadex.base.gui.IPropertiesProvider;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.DefaultNodeHandler;
 import jadex.base.gui.filetree.FileNode;
@@ -12,6 +11,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
+import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;

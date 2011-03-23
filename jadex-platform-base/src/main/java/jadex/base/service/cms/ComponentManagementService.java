@@ -512,7 +512,7 @@ public abstract class ComponentManagementService extends BasicService implements
 												// Start the init procedure by waking up the adapter.
 												try
 												{
-													((IComponentAdapter)comp[1]).wakeup();
+													getComponentAdapterFactory().initialWakeup((IComponentAdapter)comp[1]);
 												}
 												catch(Exception e)
 												{

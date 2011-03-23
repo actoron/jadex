@@ -1,7 +1,7 @@
 package jadex.tools.generic;
 
-import jadex.base.gui.IPropertiesProvider;
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
+import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;

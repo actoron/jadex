@@ -230,7 +230,7 @@ public class Starter
 			//					System.out.println("starting component execution");
 								
 								// Start normal execution of root component (i.e. platform).
-								adapter.wakeup();
+								afac.initialWakeup(adapter);
 							}
 							catch(Exception e)
 							{

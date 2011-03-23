@@ -101,6 +101,12 @@ class ComponentAdapterFactory implements IComponentAdapterFactory
 		return false;
 	}
 	
+	public void	initialWakeup(IComponentAdapter adapter)
+	{
+		((ComponentAdapter)adapter).wakeup();
+	}
+
+	
 	public IComponentAdapter createComponentAdapter(IComponentDescription desc,
 		IModelInfo model, IComponentInstance instance, IExternalAccess parent)
 	{

@@ -1,6 +1,5 @@
-package jadex.base.gui;
+package jadex.commons;
 
-import jadex.commons.Properties;
 import jadex.commons.future.IFuture;
 
 /**

@@ -5,11 +5,13 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ISettingsService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.threadpool.IThreadPoolService;
+import jadex.commons.IPropertiesProvider;
+import jadex.commons.Property;
 import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -21,6 +23,8 @@ import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
@@ -38,6 +42,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 /**
@@ -62,7 +68,14 @@ import java.util.StringTokenizer;
 	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"))
 })
 @Properties(@NameValue(name="componentviewer.viewerclass", value="jadex.base.service.awareness.AwarenessAgentPanel"))
-public class AwarenessAgent extends MicroAgent
+@RequiredServices(
+{
+	@RequiredService(name="cms", type=IComponentManagementService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
+	@RequiredService(name="threadpool", type=IThreadPoolService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
+//	@RequiredService(name="clock", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
+	@RequiredService(name="settings", type=ISettingsService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM)
+})
+public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 {
 	//-------- attributes --------
 	
@@ -99,8 +112,11 @@ public class AwarenessAgent extends MicroAgent
 	/** Flag indicating agent killed. */
 	protected boolean killed;
 	
-	/** The clock service. */
-	protected IClockService clock;
+//	/** The clock service. */
+//	protected IClockService clock;
+	
+	/** The timer. */
+	protected Timer	timer;
 	
 	/** The root component id. */
 	protected IComponentIdentifier root;
@@ -131,7 +147,24 @@ public class AwarenessAgent extends MicroAgent
 		}
 		this.discovered = new LinkedHashMap();
 		
-		return IFuture.DONE;
+		final Future	ret	= new Future();
+		getRequiredService("settings").addResultListener(createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				ISettingsService	settings	= (ISettingsService)result;
+				settings.registerPropertiesProvider(getAgentName(), AwarenessAgent.this)
+					.addResultListener(new DelegationResultListener(ret));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// No settings service: ignore.
+				ret.setResult(null);
+			}
+		}));
+		
+		return ret;
 	}
 	
 	/**
@@ -175,29 +208,16 @@ public class AwarenessAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(createResultListener(new IResultListener()
+		getRootIdentifier().addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
-				clock = (IClockService)result;
+				root = (IComponentIdentifier)result;
+				discovered.put(root, new DiscoveryInfo(root, false, getClockTime(), delay));
 				
-				getRootIdentifier().addResultListener(createResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						root = (IComponentIdentifier)result;
-						discovered.put(root, new DiscoveryInfo(root, false, clock.getTime(), delay));
-						
-						startSendBehaviour();
-						startRemoveBehaviour();
-						startReceiving();
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						throw new RuntimeException(exception);
-					}
-				}));
+				startSendBehaviour();
+				startRemoveBehaviour();
+				startReceiving();
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -237,7 +257,26 @@ public class AwarenessAgent extends MicroAgent
 				}
 			}
 		}
-		return IFuture.DONE;
+		
+		final Future	ret	= new Future();
+		getRequiredService("settings").addResultListener(createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				ISettingsService	settings	= (ISettingsService)result;
+				settings.deregisterPropertiesProvider(getAgentName())
+					.addResultListener(new DelegationResultListener(ret));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// No settings service: ignore.
+				ret.setResult(null);
+			}
+		}));
+		
+		return ret;
+
 	}
 	
 	/**
@@ -266,8 +305,7 @@ public class AwarenessAgent extends MicroAgent
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new IResultListener()
+		getRequiredService("cms").addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -473,7 +511,7 @@ public class AwarenessAgent extends MicroAgent
 				List todel = autodelete? new ArrayList(): null;
 				synchronized(AwarenessAgent.this)
 				{
-					long time = clock.getTime();
+					long time = getClockTime();
 					for(Iterator it=discovered.values().iterator(); it.hasNext(); )
 					{
 						DiscoveryInfo dif = (DiscoveryInfo)it.next();
@@ -511,7 +549,7 @@ public class AwarenessAgent extends MicroAgent
 					}
 				}
 				
-				waitFor(5000, this);
+				doWaitFor(5000, this);
 				return null;
 			}
 		});
@@ -522,8 +560,7 @@ public class AwarenessAgent extends MicroAgent
 	 */
 	public void checkProxy(final DiscoveryInfo dif)
 	{
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-		.addResultListener(createResultListener(new IResultListener()
+		getRequiredService("cms").addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -565,10 +602,10 @@ public class AwarenessAgent extends MicroAgent
 			{
 				if(sendid.equals(getSendId()))
 				{
-					send(new AwarenessInfo(root, clock.getTime(), delay));
+					send(new AwarenessInfo(root, getClockTime(), delay));
 					
 					if(delay>0)
-						waitFor(delay, this);
+						doWaitFor(delay, this);
 				}
 				return null;
 			}
@@ -593,8 +630,7 @@ public class AwarenessAgent extends MicroAgent
 		
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new IResultListener()
+		getRequiredService("cms").addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -659,8 +695,7 @@ public class AwarenessAgent extends MicroAgent
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new IResultListener()
+		getRequiredService("cms").addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -702,8 +737,7 @@ public class AwarenessAgent extends MicroAgent
 	public void startReceiving()
 	{
 		// Start the receiver thread.
-		SServiceProvider.getService(getServiceProvider(), IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new IResultListener()
+		getRequiredService("threadpool").addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -774,13 +808,13 @@ public class AwarenessAgent extends MicroAgent
 									if(dif==null)
 									{
 										createproxy = createproxy && isAutoCreateProxy();
-										dif = new DiscoveryInfo(sender, false, clock.getTime(), getDelay());
+										dif = new DiscoveryInfo(sender, false, getClockTime(), getDelay());
 										discovered.put(sender, dif);
 									}
 									else
 									{
 										createproxy = createproxy && isAutoCreateProxy() && !dif.isProxy();
-										dif.setTime(clock.getTime());
+										dif.setTime(getClockTime());
 									}
 								}
 								
@@ -881,5 +915,94 @@ public class AwarenessAgent extends MicroAgent
 			}
 		}
 		return (String[])ret.toArray(new String[ret.size()]);
+	}
+	
+	/**
+	 *  Get the current time.
+	 */
+	protected long getClockTime()
+	{
+//		return clock.getTime();
+		return System.currentTimeMillis();
+	}
+	
+	protected void	doWaitFor(long delay, final IComponentStep step)
+	{
+//		waitFor(delay, step);
+		
+		if(timer==null)
+			timer	= new Timer(true);
+		
+		timer.schedule(new TimerTask()
+		{
+			public void run()
+			{
+				scheduleStep(step);
+			}
+		}, delay);
+	}
+	
+	//-------- IPropertiesProvider interface --------
+	
+	/**
+	 *  Update from given properties.
+	 */
+	public IFuture setProperties(final jadex.commons.Properties props)
+	{
+		return scheduleStep(new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+				try
+				{
+					setAddressInfo(InetAddress.getByName(props.getStringProperty("address")), props.getIntProperty("port"));
+					setDelay(props.getLongProperty("delay"));
+					setAutoCreateProxy(props.getBooleanProperty("autocreate"));
+					setAutoDeleteProxy(props.getBooleanProperty("autodelete"));
+					
+					Property[]	pincs	= props.getProperties("include");
+					String[]	incs	= new String[pincs.length];
+					for(int i=0; i<pincs.length; i++)
+						incs[i]	= pincs[i].getValue();
+					setIncludes(incs);
+	
+					Property[]	pexcs	= props.getProperties("exclude");
+					String[]	excs	= new String[pexcs.length];
+					for(int i=0; i<pexcs.length; i++)
+						excs[i]	= pexcs[i].getValue();
+					setExcludes(excs);
+					
+					return null;
+				}
+				catch(Exception e)
+				{
+					throw new RuntimeException(e);
+				}
+			}
+		});
+	}
+	
+	/**
+	 *  Write current state into properties.
+	 */
+	public IFuture getProperties()
+	{
+		return scheduleStep(new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+				jadex.commons.Properties	props	= new jadex.commons.Properties();
+				props.addProperty(new Property("address", address.getHostAddress()));
+				props.addProperty(new Property("port", ""+port));
+				props.addProperty(new Property("delay", ""+delay));
+				props.addProperty(new Property("autocreate", ""+autocreate));
+				props.addProperty(new Property("autodelete", ""+autodelete));
+				for(int i=0; i<includes.size(); i++)
+					props.addProperty(new Property("include", includes.get(i).toString()));
+				for(int i=0; i<excludes.size(); i++)
+					props.addProperty(new Property("exclude", excludes.get(i).toString()));
+				return props;
+			}
+		});		
 	}
 }

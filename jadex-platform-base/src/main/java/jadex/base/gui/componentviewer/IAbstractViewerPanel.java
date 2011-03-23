@@ -1,6 +1,6 @@
 package jadex.base.gui.componentviewer;
 
-import jadex.base.gui.IPropertiesProvider;
+import jadex.commons.IPropertiesProvider;
 import jadex.commons.future.IFuture;
 
 import javax.swing.JComponent;

@@ -632,7 +632,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		/** The excludes list. */
 		public String[]	excludes;
 	}
-
 }
 
 class DiscoveryTableModel extends AbstractTableModel

@@ -1,12 +1,12 @@
 package jadex.base.gui.modeltree;
 
-import jadex.base.gui.IPropertiesProvider;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.future.DefaultResultListener;

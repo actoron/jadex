@@ -71,6 +71,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	/** Flag to indicate a fatal error (component termination will not be passed to instance) */
 	protected boolean fatalerror;
 	
+	/** Flag to indicate that the initial step was performed. */
+	protected boolean	inited;
+	
 	//-------- steppable attributes --------
 	
 	/** The flag for a scheduled step (true when a step is allowed in stepwise execution). */
@@ -142,7 +145,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public void wakeup()
 	{
-//		System.err.println("wakeup: "+getComponentIdentifier());		
+		if(!inited)
+			return;
+//		System.err.println("wakeup: "+getComponentIdentifier());
+//		Thread.dumpStack();
 		
 		if(clock==null)
 		{
@@ -170,10 +176,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 					public void resultAvailable(Object result)
 					{
 						((ComponentManagementService)result).setProcessingState(cid, IComponentDescription.PROCESSINGSTATE_READY);
-					}
-					public void exceptionOccurred(Exception exception)
-					{
-						// Might happen during platform init -> ignore
 					}
 				});				
 			}
@@ -478,6 +480,14 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	//-------- methods called by the standalone platform --------
 	
 	/**
+	 *  Set the inited flag to allow external component wake ups.
+	 */
+	public void	setInited(boolean inited)
+	{
+		this.inited	= inited;
+	}
+	
+	/**
 	 *  Get description.
 	 */
 	public IComponentDescription getDescription()
@@ -568,7 +578,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			{
 				getLogger().warning("Exception during service container shutdown: "+exception);
 //				listener.resultAvailable(this, getComponentIdentifier());
-				ret.setResult(getComponentIdentifier());
+				ret.setResult(getComponentIdentifier());	// Exception should be propagated?
+//				ret.setException(exception);
 			}
 		});
 		
@@ -618,11 +629,11 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //			List	debug	= (List)AsyncExecutionService.DEBUG.getCollection(this);
 //			for(int i=0; i<debug.size(); i++)
 //				System.err.println(getComponentIdentifier()+": "+debug.get(i));
-//			rte.printStackTrace();
+			rte.printStackTrace();
 			new RuntimeException("executing: "+getComponentIdentifier()).printStackTrace();
 		}
-//		rte	= new RuntimeException("executing: "+getComponentIdentifier());
-//		rte.fillInStackTrace();
+		rte	= new RuntimeException("executing: "+getComponentIdentifier());
+		rte.fillInStackTrace();
 		executing	= true;
 		wokenup	= false;	
 		

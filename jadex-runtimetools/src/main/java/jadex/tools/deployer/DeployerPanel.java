@@ -1,6 +1,5 @@
 package jadex.tools.deployer;
 
-import jadex.base.gui.IPropertiesProvider;
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.FileNode;
@@ -9,6 +8,7 @@ import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.service.deployment.FileContent;
 import jadex.base.service.deployment.IDeploymentService;
+import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.future.Future;

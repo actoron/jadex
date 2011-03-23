@@ -1,13 +1,13 @@
 package jadex.tools.jcc;
 
 import jadex.base.gui.CMSUpdateHandler;
-import jadex.base.gui.IPropertiesProvider;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
+import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;

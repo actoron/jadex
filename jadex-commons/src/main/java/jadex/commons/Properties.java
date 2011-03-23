@@ -346,6 +346,17 @@ public class Properties
 	}
 	
 	/**
+	 *  Get a double  property.
+	 *  @param type The type.
+	 *  @returns Returns the parsed double value, 0 if not set.
+	 */
+	public double getDoubleProperty(String type)
+	{
+		Property	prop	= getLatestProperty(type);
+		return prop==null? 0: Double.parseDouble(prop.getValue());
+	}
+
+	/**
 	 *  Get a string  property.
 	 *  @param type The type.
 	 *  @returns Returns the string value or null if not set.

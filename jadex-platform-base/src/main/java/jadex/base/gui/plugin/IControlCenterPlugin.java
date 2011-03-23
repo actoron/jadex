@@ -1,6 +1,6 @@
 package jadex.base.gui.plugin;
 
-import jadex.base.gui.IPropertiesProvider;
+import jadex.commons.IPropertiesProvider;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;

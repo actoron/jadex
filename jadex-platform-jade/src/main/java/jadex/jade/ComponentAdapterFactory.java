@@ -144,6 +144,17 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 		return false;
 	}
 	
+	/**
+	 *  Perform the initial wake up of a component.
+	 *  @param adapter	The component adapter.
+	 */
+	public void	initialWakeup(IComponentAdapter adapter)
+	{
+		// Automatically executed by JADE agent.
+		adapter.wakeup();
+	}
+
+	
 	//-------- methods --------
 	
 	/**

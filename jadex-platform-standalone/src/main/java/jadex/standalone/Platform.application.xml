@@ -30,6 +30,7 @@
 		<import>jadex.base.service.message.transport.niotcpmtp.*</import>
 		<import>jadex.base.service.message.transport.codecs.*</import>
 		<import>jadex.base.service.deployment.*</import>
+		<import>jadex.base.service.settings.*</import>
 		<import>jadex.component.*</import>
 		<import>jadex.application.*</import>
 		<import>jadex.application.space.envsupport.*</import>
@@ -70,6 +71,9 @@
 	</componenttypes>
 	
 	<services>
+		<providedservice class="ISettingsService" direct="true">
+			new SettingsService($args.platformname, $component.getServiceProvider())
+		</providedservice>
 		<providedservice class="IThreadPool" direct="true">
 			new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
 		</providedservice>
@@ -247,6 +251,9 @@
 		
 		<!-- Configuration used by jadex.base.test.ComponentTestSuite -->
 		<application name="testcases">
+			<arguments>
+				<argument name="platformname">"testcases"</argument>
+			</arguments>
 			<components>
 				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro"/>

@@ -2,6 +2,7 @@ package jadex.base.service.simulation;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ISettingsService;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
@@ -13,6 +14,9 @@ import jadex.bridge.service.execution.IExecutionService;
 import jadex.bridge.service.threadpool.IThreadPoolService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
+import jadex.commons.IPropertiesProvider;
+import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -27,7 +31,7 @@ import java.util.Map;
  *  execution of one application. It provides basic features for
  *  starting, stopping and stepwise execution.
  */
-public class SimulationService extends BasicService implements ISimulationService
+public class SimulationService extends BasicService implements ISimulationService, IPropertiesProvider
 {		
 	//-------- attributes --------
 
@@ -87,12 +91,44 @@ public class SimulationService extends BasicService implements ISimulationServic
 	public IFuture	shutdownService()
 	{
 		final Future	ret	= new Future();
-		pause().addResultListener(access.createResultListener(new DelegationResultListener(ret)
+		
+		IFuture	stopped;
+		if(executing)
+		{
+			stopped	= pause();
+		}
+		else
+		{
+			stopped	= IFuture.DONE;
+		}
+		
+		stopped.addResultListener(access.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
 				SimulationService.super.shutdownService().addResultListener(
-					access.createResultListener(new DelegationResultListener(ret)));
+					access.createResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						SServiceProvider.getService(access.getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object result)
+							{
+								ISettingsService	settings	= (ISettingsService)result;
+								settings.deregisterPropertiesProvider("simulationservice")
+									.addResultListener(new DelegationResultListener(ret));
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								// No settings service: ignore.
+								ret.setResult(null);
+							}
+						});
+					}
+				}));
 			}
 		}));
 		return ret;
@@ -111,35 +147,61 @@ public class SimulationService extends BasicService implements ISimulationServic
 		{
 			public void customResultAvailable(Object result)
 			{
-				final boolean[]	services	= new boolean[2];
+				SServiceProvider.getService(access.getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+						ISettingsService	settings	= (ISettingsService)result;
+						settings.registerPropertiesProvider("simulationservice", SimulationService.this)
+							.addResultListener(new DelegationResultListener(ret)
+						{
+							public void customResultAvailable(Object result)
+							{
+								proceed();
+							}
+						});
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						// No settings service: ignore.
+						proceed();
+					}
+					
+					public void proceed()
+					{
+						final boolean[]	services	= new boolean[2];
 
-				SServiceProvider.getService(access.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(access.createResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						exeservice = (IExecutionService)result;
-						services[0]	= true;
-						if(services[0] && services[1])
+						SServiceProvider.getService(access.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(access.createResultListener(new DelegationResultListener(ret)
 						{
-							start().addResultListener(access.createResultListener(new DelegationResultListener(ret)));
-						}
-					}
-				}));
-						
-				SServiceProvider.getService(access.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(access.createResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						clockservice = (IClockService)result;
-						services[1]	= true;
-						if(services[0] && services[1])
+							public void customResultAvailable(Object result)
+							{
+								exeservice = (IExecutionService)result;
+								services[0]	= true;
+								if(services[0] && services[1])
+								{
+									start().addResultListener(access.createResultListener(new DelegationResultListener(ret)));
+								}
+							}
+						}));
+								
+						SServiceProvider.getService(access.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(access.createResultListener(new DelegationResultListener(ret)
 						{
-							start().addResultListener(access.createResultListener(new DelegationResultListener(ret)));
-						}
+							public void customResultAvailable(Object result)
+							{
+								clockservice = (IClockService)result;
+								services[1]	= true;
+								if(services[0] && services[1])
+								{
+									start().addResultListener(access.createResultListener(new DelegationResultListener(ret)));
+								}
+							}
+						}));						
 					}
-				}));
+				});				
 			}
 		}));
 
@@ -541,4 +603,36 @@ public class SimulationService extends BasicService implements ISimulationServic
 		}
 	}
 
+	//-------- IPropertiesProvider interface --------
+	
+	/**
+	 *  Update from given properties.
+	 */
+	public IFuture setProperties(Properties props)
+	{
+		final boolean	exe	= props.getBooleanProperty("executing");
+		return access.getExternalAccess().scheduleImmediate(new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+				if(exe && !executing)
+					start();
+				else if(!exe && executing)
+					pause();
+				
+				return null;
+			}
+		});
+	}
+	
+	/**
+	 *  Write current state into properties.
+	 */
+	public IFuture getProperties()
+	{
+		Properties	props	= new Properties();
+		// Only save as executing when in normal mode.
+		props.addProperty(new Property("executing", ""+(executing && MODE_NORMAL.equals(mode))));
+		return new Future(props);
+	}
 }

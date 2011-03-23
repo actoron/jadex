@@ -34,4 +34,15 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 	{
 		return ((StandaloneComponentAdapter)adapter).execute();
 	}
+
+	
+	/**
+	 *  Perform the initial wake up of a component.
+	 *  @param adapter	The component adapter.
+	 */
+	public void	initialWakeup(IComponentAdapter adapter)
+	{
+		((StandaloneComponentAdapter)adapter).setInited(true);
+		adapter.wakeup();
+	}
 }

@@ -1,11 +1,17 @@
 package jadex.bridge.service.clock;
 
+import jadex.bridge.ISettingsService;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.threadpool.IThreadPoolService;
 import jadex.commons.IChangeListener;
+import jadex.commons.IPropertiesProvider;
+import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -19,7 +25,7 @@ import java.util.Map;
  *  A clock service abstracts away from clock implementations.
  *  The clock service is meant to be kept constant during runtime.
  */
-public class ClockService extends BasicService implements IClockService
+public class ClockService extends BasicService implements IClockService, IPropertiesProvider
 {
 	//-------- attributes --------
 	
@@ -245,30 +251,35 @@ public class ClockService extends BasicService implements IClockService
 		final Future ret = new Future();
 		
 		SServiceProvider.getServiceUpwards(provider, IThreadPoolService.class)
-			.addResultListener(new IResultListener()
+			.addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
 				threadpool = (IThreadPoolService)result;
 				clock = createClock(cinfo, threadpool);
 				clock.start();
-				ClockService.super.startService().addResultListener(new IResultListener()
+				ClockService.super.startService().addResultListener(new DelegationResultListener(ret)
 				{
-					public void resultAvailable(Object result)
+					public void customResultAvailable(Object result)
 					{
-						ret.setResult(ClockService.this);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						ret.setException(exception);
+						SServiceProvider.getService(provider, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object result)
+							{
+								ISettingsService	settings	= (ISettingsService)result;
+								settings.registerPropertiesProvider("clockservice", ClockService.this)
+									.addResultListener(new DelegationResultListener(ret));
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								// No settings service: ignore.
+								ret.setResult(null);
+							}
+						});
 					}
 				});
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
 			}
 		});
 	
@@ -282,7 +293,31 @@ public class ClockService extends BasicService implements IClockService
 	public IFuture shutdownService()
 	{
 		clock.dispose();
-		return super.shutdownService();
+		final Future	ret	= new Future();
+		super.shutdownService().addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				SServiceProvider.getService(provider, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+						ISettingsService	settings	= (ISettingsService)result;
+						settings.deregisterPropertiesProvider("clockservice")
+							.addResultListener(new DelegationResultListener(ret));
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						// No settings service: ignore.
+						ret.setResult(null);
+					}
+				});
+			}
+		});
+		
+		return ret;
 	}
 	
 	//--------- methods --------
@@ -355,4 +390,36 @@ public class ClockService extends BasicService implements IClockService
 		return ret;
 	}
 
+	//-------- IPropertiesProvider interface --------
+	
+	/**
+	 *  Update from given properties.
+	 */
+	public IFuture setProperties(Properties props)
+	{
+		String	type	= props.getStringProperty("type");
+		long	delta	= props.getLongProperty("delta");
+		double	dilation	= props.getDoubleProperty("dilation");
+		
+		setClock(type, threadpool);
+		clock.setDelta(delta);
+		if(clock instanceof ContinuousClock)
+			((ContinuousClock)clock).setDilation(dilation);
+		
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Write current state into properties.
+	 */
+	public IFuture getProperties()
+	{
+		Properties	props	= new Properties();
+		props.addProperty(new Property("type", clock.getType()));
+		props.addProperty(new Property("delta", ""+clock.getDelta()));
+		if(clock instanceof ContinuousClock)
+			props.addProperty(new Property("dilation", ""+((ContinuousClock)clock).getDilation()));
+		
+		return new Future(props);
+	}
 }
