@@ -434,8 +434,8 @@ public class StarterServicePanel extends JPanel
 		if(spanelprops!=null)
 			spanel.setProperties(spanelprops);
 
-		lsplit.setDividerLocation(props.getIntProperty("leftsplit_location"));
-		csplit.setDividerLocation(props.getIntProperty("mainsplit_location"));
+		SGUI.setDividerLocation(lsplit, props.getIntProperty("leftsplit_location"));
+		SGUI.setDividerLocation(csplit, props.getIntProperty("mainsplit_location"));
 	
 	//		checkingmenu.setSelected(props.getBooleanProperty("checking"));
 		
