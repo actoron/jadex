@@ -46,7 +46,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 */
 	public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable
 	{
-		ServiceInvocationContext sic = new ServiceInvocationContext(proxy, method, args);
+		ServiceInvocationContext sic = new ServiceInvocationContext(proxy, method, args, null);
 		Collection icps = interceptors==null? null: (Collection)interceptors.getCollection(method);
 		if(icps!=null && icps.size()>0)
 		{

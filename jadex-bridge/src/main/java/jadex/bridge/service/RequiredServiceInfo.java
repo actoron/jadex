@@ -70,7 +70,7 @@ public class RequiredServiceInfo
 	 */
 	public RequiredServiceInfo(String name, Class type)
 	{
-		this(name, type, false, null);
+		this(name, type, RequiredServiceInfo.SCOPE_APPLICATION);
 	}
 	
 	/**

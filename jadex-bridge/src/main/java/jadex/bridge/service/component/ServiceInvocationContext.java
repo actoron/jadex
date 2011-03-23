@@ -1,5 +1,8 @@
 package jadex.bridge.service.component;
 
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+
 import java.lang.reflect.Method;
 
 /**
@@ -11,27 +14,34 @@ public class ServiceInvocationContext
 	//-------- attributes --------
 	
 	/** The proxy object. */
-	public Object proxy;
+	protected Object proxy;
 	
 	/** The method to be called. */
-	public Method method;
+	protected Method method;
 	
 	/** The invocation arguments. */
-	public Object[] args;
+	protected Object[] args;
 	
 	/** The call result. */
-	public Object result;
+	protected Object result;
 
+	/** The service interceptors. */
+	protected IServiceInvocationInterceptor[] interceptors;
+
+	/** The interceptor number to call. */
+	protected int cnt;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new context.
 	 */
-	public ServiceInvocationContext(Object proxy, Method method, Object[] args)
+	public ServiceInvocationContext(Object proxy, Method method, Object[] args, IServiceInvocationInterceptor[] interceptors)
 	{
 		this.proxy = proxy;
 		this.method = method;
 		this.args = args;
+		this.interceptors = interceptors;
 	}
 
 	//-------- methods --------
@@ -79,5 +89,22 @@ public class ServiceInvocationContext
 	public void setResult(Object result)
 	{
 		this.result = result;
+	}
+	
+	/**
+	 *  Invoke the next interceptor.
+	 */
+	public IFuture invoke()
+	{
+		final Future ret = new Future();
+		if(cnt<interceptors.length)
+		{
+			interceptors[cnt++].execute(this);
+		}
+		else
+		{
+			
+		}
+		return ret;
 	}
 }
