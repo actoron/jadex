@@ -27,6 +27,11 @@ public class RequiredServiceBinding
 	
 	/** The create flag. */
 	protected boolean create;
+	
+	// todo:
+	/** The recover flag. */
+
+	//-------- constructors --------
 
 	/**
 	 *  Create a new binding. 

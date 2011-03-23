@@ -33,8 +33,8 @@ public class MComponentType extends MStartable implements ICacheableModel
 	/** The imports. */
 	protected List imports;
 	
-	/** The list of contained space types. */
-	protected List spacetypes;
+//	/** The list of contained space types. */
+//	protected List spacetypes;
 	
 	/** The list of contained component types. */
 	protected List componenttypes;
@@ -72,7 +72,7 @@ public class MComponentType extends MStartable implements ICacheableModel
 	public MComponentType()
 	{
 		this.imports = new ArrayList();
-		this.spacetypes = new ArrayList();
+//		this.spacetypes = new ArrayList();
 		this.componenttypes = new ArrayList();
 		this.configurations = new ArrayList();
 		this.providedservices = new ArrayList();
@@ -205,21 +205,21 @@ public class MComponentType extends MStartable implements ICacheableModel
 		modelinfo.setStartable(true);
 		
 		List reqs = getRequiredServices();
-		if(reqs!=null)
+		if(reqs!=null && reqs.size()>0)
 		{
 			RequiredServiceInfo[] tmp = new RequiredServiceInfo[reqs.size()];
 			for(int i=0; i<reqs.size(); i++)
 			{
 				MRequiredServiceType ser = (MRequiredServiceType)reqs.get(i);
 				tmp[i] = new RequiredServiceInfo(ser.getName(), ser.getClazz(),
-					ser.isMultiple(), new RequiredServiceBinding(ser.getName(), ser.getScope(), ser.isDynamic()));
+					ser.isMultiple(), ser.getBinding());
 			}
 			
 			modelinfo.setRequiredServices(tmp);
 		}
 		
 		List provs = getProvidedServices();
-		if(provs!=null)
+		if(provs!=null && provs.size()>0)
 		{
 			ProvidedServiceInfo[] tmp = new ProvidedServiceInfo[provs.size()];
 			for(int i=0; i<provs.size(); i++)
@@ -228,21 +228,12 @@ public class MComponentType extends MStartable implements ICacheableModel
 				Class type = ser.getClazz()!=null? ser.getClazz(): 
 					tmp[i]==null && ser.getParsedValue()!=null? 
 					ser.getParsedValue().getStaticType(): null;
-					
-				try
-				{
-				tmp[i] = new ProvidedServiceInfo(type, ser.getParsedValue().getExpressionText(), ser.isDirect());
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
+				tmp[i] = new ProvidedServiceInfo(type, ser.getValue(), ser.isDirect());
 			}
 			
 			modelinfo.setProvidedServices(tmp);
 		}
 		
-				
 		// Build error report.
 		modelinfo.setReport(buildReport(modelinfo.getName(), modelinfo.getFilename(),
 			new String[]{"Component", "Configuration"}, entries, null));
@@ -534,14 +525,14 @@ public class MComponentType extends MStartable implements ICacheableModel
 		return this.componenttypes;
 	}
 	
-	/**
-	 *  Get the space types.
-	 *  @return The spacetypes.
-	 */
-	public List getMSpaceTypes()
-	{
-		return this.spacetypes;
-	}
+//	/**
+//	 *  Get the space types.
+//	 *  @return The spacetypes.
+//	 */
+//	public List getMSpaceTypes()
+//	{
+//		return this.spacetypes;
+//	}
 
 	/**
 	 *  Get a named componenttype.

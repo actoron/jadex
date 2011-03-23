@@ -6,7 +6,7 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
 /**
- * 
+ *  Calculator component that provides all services by itself.  
  */
 @Description("This agent is a minimal calculator.")
 @ProvidedServices({

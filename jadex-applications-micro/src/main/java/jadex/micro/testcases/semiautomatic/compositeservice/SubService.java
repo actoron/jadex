@@ -6,20 +6,27 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
- * 
+ *  Simple subtract service.
  */
 public class SubService extends BasicService implements ISubService
 {
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new service.
 	 */
 	public SubService(IInternalAccess comp)
 	{
 		super(comp.getServiceProvider().getId(), ISubService.class, null);
 	}
 	
+	//-------- methods --------
+	
 	/**
-	 * 
+	 *  Subtract two numbers.
+	 *  @param a Number one.
+	 *  @param b Number two.
+	 *  @return The result of a minus b.
 	 */
 	public IFuture sub(double a, double b)
 	{

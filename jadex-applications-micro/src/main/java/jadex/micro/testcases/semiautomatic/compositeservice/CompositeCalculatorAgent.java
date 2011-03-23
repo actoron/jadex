@@ -1,6 +1,9 @@
 package jadex.micro.testcases.semiautomatic.compositeservice;
 
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
@@ -26,20 +29,38 @@ public class CompositeCalculatorAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
+		add(1,1).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				System.out.println("Result is: "+result);
+			}
+		});
+		
+		add(1,2).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				System.out.println("Result is: "+result);
+			}
+		});
+	}
+	
+	/**
+	 *  Add two numbers by calling the add service.
+	 */
+	protected IFuture add(final double a, final double b)
+	{
+		final Future ret = new Future();
 		getRequiredService("addservice").addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				IAddService add = (IAddService)result;
-				add.add(1, 1).addResultListener(createResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						System.out.println("Result is: "+result);
-					}	
-				}));
+				add.add(a, b).addResultListener(createResultListener(new DelegationResultListener(ret)));
 			}
 		}));
+		return ret;
 	}
 }
 

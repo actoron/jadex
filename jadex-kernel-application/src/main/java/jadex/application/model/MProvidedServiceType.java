@@ -1,5 +1,7 @@
 package jadex.application.model;
 
+import jadex.bridge.service.RequiredServiceBinding;
+
 
 /**
  *  Provided service type.
@@ -8,14 +10,11 @@ public class MProvidedServiceType extends MExpressionType
 {
 	//-------- attributes --------
 
-	/** The component name. */
-	protected String componentname;
-
-	/** The component type. */
-	protected String componenttype;
-	
 	/** The direct attribute. */
 	protected boolean direct;
+	
+	/** The binding. */
+	protected RequiredServiceBinding binding;
 	
 	//-------- constructors --------
 
@@ -29,48 +28,30 @@ public class MProvidedServiceType extends MExpressionType
 	//-------- methods --------
 	
 	/**
-	 *  Get the componentname.
-	 *  @return the componentname.
-	 */
-	public String getComponentName()
-	{
-		return componentname;
-	}
-
-	/**
-	 *  Set the componentname.
-	 *  @param componentname The componentname to set.
-	 */
-	public void setComponentName(String componentname)
-	{
-		this.componentname = componentname;
-	}
-	
-	/**
-	 *  Get the component type.
-	 *  @return the component type.
-	 */
-	public String getComponentType()
-	{
-		return componenttype;
-	}
-
-	/**
-	 *  Set the component type.
-	 *  @param componenttype The component type to set.
-	 */
-	public void setComponentType(String componenttype)
-	{
-		this.componenttype = componenttype;
-	}
-
-	/**
 	 *  Get the direct flag.
 	 *  @return the direct.
 	 */
 	public boolean isDirect()
 	{
 		return direct;
+	}
+
+	/**
+	 *  Get the binding.
+	 *  @return the binding.
+	 */
+	public RequiredServiceBinding getBinding()
+	{
+		return binding;
+	}
+
+	/**
+	 *  Set the binding.
+	 *  @param binding The binding to set.
+	 */
+	public void setBinding(RequiredServiceBinding binding)
+	{
+		this.binding = binding;
 	}
 
 	/**

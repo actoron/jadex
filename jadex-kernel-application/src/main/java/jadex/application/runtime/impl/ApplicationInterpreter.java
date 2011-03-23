@@ -9,7 +9,6 @@ import jadex.application.model.MExpressionType;
 import jadex.application.model.MProvidedServiceType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
-import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.runtime.ISpace;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentTerminatedException;
@@ -18,7 +17,6 @@ import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentListener;
@@ -32,15 +30,13 @@ import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.ServiceNotFoundException;
-import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.bridge.service.component.ComponentServiceContainer;
-import jadex.bridge.service.component.CompositeServiceInvocationInterceptor;
 import jadex.bridge.service.component.DecouplingServiceInvocationInterceptor;
+import jadex.bridge.service.component.DelegationServiceInvocationInterceptor;
 import jadex.commons.ChangeEvent;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
@@ -61,11 +57,9 @@ import jadex.xml.annotation.XMLClassname;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -241,38 +235,10 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 						}
 						else 
 						{
-							if(st.getComponentName()!=null)
-							{
-								final Future futu = new Future();
-								futures.add(futu);
-								SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(ia.createResultListener(new DelegationResultListener(futu)
-								{
-									public void customResultAvailable(Object result)
-									{
-										final IComponentManagementService cms = (IComponentManagementService)result;
-										IComponentIdentifier cid = cms.createComponentIdentifier(st.getComponentName(), st.getComponentName().indexOf("@")==-1);
-										IInternalService service = CompositeServiceInvocationInterceptor.createServiceProxy(st.getClazz(), null, 
-											(IApplicationExternalAccess)getExternalAccess(), getModel().getClassLoader(), cid);
-										getServiceContainer().addService(service);
-										futu.setResult(null);
-									}
-								}));
-							}
-							else if(st.getComponentType()==null)
-							{	
-								final Future futu = new Future();
-								futures.add(futu);
-								findComponentType(0, model.getMComponentTypes(), st.getClazz(), futu);
-							}
-							else
-							{
-//								service = (IInternalService)Proxy.newProxyInstance(getClassLoader(), new Class[]{IInternalService.class, st.getClazz()}, 
-//									new CompositeServiceInvocationInterceptor((IApplicationExternalAccess)getExternalAccess(), componenttype, st.getClazz()));
-								service = CompositeServiceInvocationInterceptor.createServiceProxy(st.getClazz(), st.getComponentType(), 
-									(IApplicationExternalAccess)getExternalAccess(), getModel().getClassLoader(), null);
-								getServiceContainer().addService(service);
-							}
+							RequiredServiceInfo info = new RequiredServiceInfo("virtual", st.getClazz());
+							service = DelegationServiceInvocationInterceptor.createServiceProxy(
+								getExternalAccess(), info, st.getBinding(), getModel().getClassLoader());
+							getServiceContainer().addService(service);
 						}
 						
 //						System.out.println("added: "+service+" "+getComponentIdentifier());
@@ -404,75 +370,75 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 		});
 	}
 	
-	/**
-	 *  Find component type that provided a specific service.
-	 */
-	protected void findComponentType(final int i, final List componenttypes, final Class servicetype, final Future ret)
-	{
-		if(componenttypes==null || componenttypes.size()==0)
-		{
-			ret.setException(new RuntimeException("No component types found for service: "+servicetype));
-			return;
-		}
-		
-		final MComponentType ct = (MComponentType)componenttypes.get(i);
-	
-		SServiceProvider.getService(getServiceProvider(), new ComponentFactorySelector(ct.getFilename(), 
-			model.getAllImports(), model.getModelInfo().getClassLoader())).addResultListener(createResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-//				System.out.println("create start2: "+ct.getFilename());
-				
-				final IComponentFactory factory = (IComponentFactory)result;
-				if(factory!=null)
-				{
-					factory.loadModel(ct.getFilename(), model.getAllImports(), model.getModelInfo().getClassLoader())
-						.addResultListener(createResultListener(new DelegationResultListener(ret)
-					{
-						public void customResultAvailable(Object result)
-						{
-							IModelInfo lmodel = (IModelInfo)result;
-							ProvidedServiceInfo[] services = lmodel.getProvidedServices();
-							Set sers = new HashSet();
-							for(int i=0; i<services.length; i++)
-							{
-								sers.add(services[i].getType());
-							}
-							if(sers.contains(servicetype))
-							{
-								IInternalService service = CompositeServiceInvocationInterceptor.createServiceProxy(servicetype, ct.getName(), 
-									(IApplicationExternalAccess)getExternalAccess(), getModel().getClassLoader(), null);
-								getServiceContainer().addService(service);
-								ret.setResult(result);
-							}
-							else if(i+1<componenttypes.size())
-							{
-								findComponentType(i+1, componenttypes, servicetype, ret);
-							}
-							else
-							{
-								ret.setException(new RuntimeException("No component type offers service type: "+servicetype));
-							}
-						}
-					}));
-				}
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				System.out.println("No factory found for: "+ct);
-				if(i+1<componenttypes.size())
-				{
-					findComponentType(i+1, componenttypes, servicetype, ret);
-				}
-				else
-				{
-					ret.setException(new RuntimeException("No component type offers service type: "+servicetype));
-				}
-			}
-		}));
-	}
+//	/**
+//	 *  Find component type that provided a specific service.
+//	 */
+//	protected void findComponentType(final int i, final List componenttypes, final Class servicetype, final Future ret)
+//	{
+//		if(componenttypes==null || componenttypes.size()==0)
+//		{
+//			ret.setException(new RuntimeException("No component types found for service: "+servicetype));
+//			return;
+//		}
+//		
+//		final MComponentType ct = (MComponentType)componenttypes.get(i);
+//	
+//		SServiceProvider.getService(getServiceProvider(), new ComponentFactorySelector(ct.getFilename(), 
+//			model.getAllImports(), model.getModelInfo().getClassLoader())).addResultListener(createResultListener(new IResultListener()
+//		{
+//			public void resultAvailable(Object result)
+//			{
+////				System.out.println("create start2: "+ct.getFilename());
+//				
+//				final IComponentFactory factory = (IComponentFactory)result;
+//				if(factory!=null)
+//				{
+//					factory.loadModel(ct.getFilename(), model.getAllImports(), model.getModelInfo().getClassLoader())
+//						.addResultListener(createResultListener(new DelegationResultListener(ret)
+//					{
+//						public void customResultAvailable(Object result)
+//						{
+//							IModelInfo lmodel = (IModelInfo)result;
+//							ProvidedServiceInfo[] services = lmodel.getProvidedServices();
+//							Set sers = new HashSet();
+//							for(int i=0; i<services.length; i++)
+//							{
+//								sers.add(services[i].getType());
+//							}
+//							if(sers.contains(servicetype))
+//							{
+//								IInternalService service = CompositeServiceInvocationInterceptor.createServiceProxy(servicetype, ct.getName(), 
+//									(IApplicationExternalAccess)getExternalAccess(), getModel().getClassLoader(), null);
+//								getServiceContainer().addService(service);
+//								ret.setResult(result);
+//							}
+//							else if(i+1<componenttypes.size())
+//							{
+//								findComponentType(i+1, componenttypes, servicetype, ret);
+//							}
+//							else
+//							{
+//								ret.setException(new RuntimeException("No component type offers service type: "+servicetype));
+//							}
+//						}
+//					}));
+//				}
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("No factory found for: "+ct);
+//				if(i+1<componenttypes.size())
+//				{
+//					findComponentType(i+1, componenttypes, servicetype, ret);
+//				}
+//				else
+//				{
+//					ret.setException(new RuntimeException("No component type offers service type: "+servicetype));
+//				}
+//			}
+//		}));
+//	}
 	
 	/**
 	 *  Schedule a step of the component.

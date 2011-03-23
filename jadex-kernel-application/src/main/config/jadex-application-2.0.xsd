@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-application" xmlns="http://jadex.sourceforge.net/jadex-application" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-application" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://jadex.sourceforge.net/jadex-application" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 	<xs:element name="applicationtype">
 		<xs:annotation>
 			<xs:documentation>An application type specifies the structure and content of a agent application.</xs:documentation>
@@ -243,6 +243,13 @@
 							</xs:sequence>
 						</xs:complexType>
 					</xs:element>
+					<xs:element name="requiredservices" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="binding" type="binding" minOccurs="0" maxOccurs="unbounded"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
 				</xs:sequence>
 				<xs:attribute name="name" type="xs:string" use="optional"/>
 				<xs:attribute name="type" type="xs:string" use="required"/>
@@ -286,34 +293,28 @@
 		<xs:annotation>
 			<xs:documentation>Defines a provided service type.</xs:documentation>
 		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="binding" type="binding" minOccurs="0"/>
+		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required"/>
 		<xs:attribute name="language" type="xs:string" use="optional"/>
 		<xs:attribute name="direct" type="xs:boolean" use="optional" default="false"/>
-		<xs:attribute name="componenttype" type="xs:string" use="optional"/>
-		<xs:attribute name="componentname" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<xs:complexType name="requiredservicetype" mixed="true">
 		<xs:annotation>
 			<xs:documentation>Defines a required service type.</xs:documentation>
 		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="binding" type="binding" minOccurs="0"/>
+		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="required"/>
 		<xs:attribute name="class" type="xs:string" use="required"/>
-		<xs:attribute name="dynamic" type="xs:boolean" use="optional" default="false"/>
 		<xs:attribute name="multiple" type="xs:boolean" use="optional" default="false"/>
-		<xs:attribute name="scope" use="optional" default="application">
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="local"></xs:enumeration>
-					<xs:enumeration value="component"></xs:enumeration>
-					<xs:enumeration value="application"></xs:enumeration>
-					<xs:enumeration value="platform"></xs:enumeration>
-					<xs:enumeration value="global"></xs:enumeration>
-					<xs:enumeration value="upwards"></xs:enumeration>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="startabletype">
+		<xs:annotation>
+			<xs:documentation>Abstract super type for startable elements.</xs:documentation>
+		</xs:annotation>
 		<xs:attribute name="suspend" type="xs:boolean" use="optional" default="false"/>
 		<xs:attribute name="master" type="xs:boolean" use="optional" default="false">
 			<xs:annotation>
@@ -322,5 +323,28 @@
 		</xs:attribute>
 		<xs:attribute name="daemon" type="xs:boolean" use="optional" default="false"/>
 		<xs:attribute name="autoshutdown" type="xs:boolean" use="optional" default="false"/>
+	</xs:complexType>
+	<xs:complexType name="binding">
+		<xs:annotation>
+			<xs:documentation>A binding contains information about service fetching.</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="name" type="xs:string" use="optional"/>
+		<xs:attribute name="scope" use="optional" default="application">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="local"/>
+					<xs:enumeration value="component"/>
+					<xs:enumeration value="application"/>
+					<xs:enumeration value="platform"/>
+					<xs:enumeration value="global"/>
+					<xs:enumeration value="upwards"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="componentname" type="xs:string" use="optional"/>
+		<xs:attribute name="componenttype" type="xs:string" use="optional"/>
+		<xs:attribute name="dynamic" type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="create" type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="recover" type="xs:boolean" use="optional" default="false"/>
 	</xs:complexType>
 </xs:schema>

@@ -7,7 +7,6 @@ import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentListener;
@@ -21,15 +20,13 @@ import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.ServiceNotFoundException;
-import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.bridge.service.component.ComponentServiceContainer;
-import jadex.bridge.service.component.CompositeServiceInvocationInterceptor;
 import jadex.bridge.service.component.DecouplingServiceInvocationInterceptor;
+import jadex.bridge.service.component.DelegationServiceInvocationInterceptor;
 import jadex.commons.ChangeEvent;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
@@ -58,10 +55,8 @@ import jadex.xml.annotation.XMLClassname;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -239,38 +234,10 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 						}
 						else 
 						{
-							if(st.getComponentName()!=null)
-							{
-								final Future futu = new Future();
-								futures.add(futu);
-								SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(ia.createResultListener(new DelegationResultListener(futu)
-								{
-									public void customResultAvailable(Object result)
-									{
-										final IComponentManagementService cms = (IComponentManagementService)result;
-										IComponentIdentifier cid = cms.createComponentIdentifier(st.getComponentName(), st.getComponentName().indexOf("@")==-1);
-										IInternalService service = CompositeServiceInvocationInterceptor.createServiceProxy(st.getClazz(), null, 
-											getExternalAccess(), getModel().getClassLoader(), cid);
-										getServiceContainer().addService(service);
-										futu.setResult(null);
-									}
-								}));
-							}
-							else if(st.getComponentType()==null)
-							{	
-								final Future futu = new Future();
-								futures.add(futu);
-								findComponentType(0, model.getMComponentTypes(), st.getClazz(), futu);
-							}
-							else
-							{
-//								service = (IInternalService)Proxy.newProxyInstance(getClassLoader(), new Class[]{IInternalService.class, st.getClazz()}, 
-//									new CompositeServiceInvocationInterceptor((IApplicationExternalAccess)getExternalAccess(), componenttype, st.getClazz()));
-								service = CompositeServiceInvocationInterceptor.createServiceProxy(st.getClazz(), st.getComponentType(), 
-									getExternalAccess(), getModel().getClassLoader(), null);
-								getServiceContainer().addService(service);
-							}
+							RequiredServiceInfo info = new RequiredServiceInfo("virtual", st.getClazz());
+							service = DelegationServiceInvocationInterceptor.createServiceProxy(
+								getExternalAccess(), info, st.getBinding(), getModel().getClassLoader());
+							getServiceContainer().addService(service);
 						}
 						
 //						System.out.println("added: "+service+" "+getComponentIdentifier());
@@ -402,76 +369,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 			}	
 		});
 	}
-	
-	/**
-	 *  Find component type that provided a specific service.
-	 */
-	protected void findComponentType(final int i, final List componenttypes, final Class servicetype, final Future ret)
-	{
-		if(componenttypes==null || componenttypes.size()==0)
-		{
-			ret.setException(new RuntimeException("No component types found for service: "+servicetype));
-			return;
-		}
-		
-		final MSubcomponentType ct = (MSubcomponentType)componenttypes.get(i);
-	
-		SServiceProvider.getService(getServiceProvider(), new ComponentFactorySelector(ct.getFilename(), 
-			model.getAllImports(), model.getModelInfo().getClassLoader())).addResultListener(createResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-//				System.out.println("create start2: "+ct.getFilename());
-				
-				final IComponentFactory factory = (IComponentFactory)result;
-				if(factory!=null)
-				{
-					factory.loadModel(ct.getFilename(), model.getAllImports(), model.getModelInfo().getClassLoader())
-						.addResultListener(createResultListener(new DelegationResultListener(ret)
-					{
-						public void customResultAvailable(Object result)
-						{
-							IModelInfo lmodel = (IModelInfo)result;
-							ProvidedServiceInfo[] services = lmodel.getProvidedServices();
-							Set sers = new HashSet();
-							for(int i=0; i<services.length; i++)
-							{
-								sers.add(services[i].getType());
-							}
-							if(sers.contains(servicetype))
-							{
-								IInternalService service = CompositeServiceInvocationInterceptor.createServiceProxy(servicetype, ct.getName(), 
-									getExternalAccess(), getModel().getClassLoader(), null);
-								getServiceContainer().addService(service);
-								ret.setResult(result);
-							}
-							else if(i+1<componenttypes.size())
-							{
-								findComponentType(i+1, componenttypes, servicetype, ret);
-							}
-							else
-							{
-								ret.setException(new RuntimeException("No component type offers service type: "+servicetype));
-							}
-						}
-					}));
-				}
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				System.out.println("No factory found for: "+ct);
-				if(i+1<componenttypes.size())
-				{
-					findComponentType(i+1, componenttypes, servicetype, ret);
-				}
-				else
-				{
-					ret.setException(new RuntimeException("No component type offers service type: "+servicetype));
-				}
-			}
-		}));
-	}
+
 	
 	/**
 	 *  Schedule a step of the component.
@@ -498,78 +396,6 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 		return ret;
 	}
 	
-//	/**
-//	 * Load an component model.
-//	 * @param model The model.
-//	 * @return The loaded model.
-//	 */
-//	public static IFuture loadModel(final IServiceProvider provider, final String model)
-//	{
-//		final Future ret = new Future();
-//		
-//		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
-//		{
-//			public void resultAvailable(Object source, Object result)
-//			{
-//				final ILibraryService ls = (ILibraryService)result;
-//				
-//				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DefaultResultListener()
-//				{
-//					public void resultAvailable(Object source, Object result)
-//					{
-//						IComponentFactory fac = (IComponentFactory)result;
-//						ret.setResult(fac!=null ? fac.loadModel(model, null, ls.getClassLoader()) : null);
-//					}
-//				});
-//			}
-//		});
-//		return ret;
-//	}
-
-	//-------- space handling --------
-		
-//	/**
-//	 *  Add a space to the context.
-//	 *  @param space The space.
-//	 */
-//	public synchronized void addSpace(String name, ISpace space)
-//	{
-//		if(spaces==null)
-//			spaces = new HashMap();
-//		
-//		spaces.put(name, space);
-//		
-//		// Todo: Add spaces dynamically (i.e. add existing components to space).
-//	}
-//	
-//	/**
-//	 *  Add a space to the context.
-//	 *  @param name The space name.
-//	 */
-//	public synchronized void removeSpace(String name)
-//	{
-//		if(spaces!=null)
-//		{
-//			spaces.remove(name);
-//			if(spaces.isEmpty())
-//			{
-//				spaces = null;
-//			}
-//		}
-//
-////		System.out.println("Removed space: "+name);
-//	}
-	
-//	/**
-//	 *  Get a space by name.
-//	 *  @param name The name.
-//	 *  @return The space.
-//	 */
-//	public synchronized ISpace getSpace(String name)
-//	{
-//		return spaces==null? null: (ISpace)spaces.get(name);
-//	}
-	
 	/**
 	 *  Get the logger.
 	 *  @return The logger.
@@ -579,84 +405,6 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 		return adapter.getLogger();
 	}
 	
-	//-------- template methods --------
-
-//	/**
-//	 *  Delete a context. Called from context service before a context is
-//	 *  removed from the platform. Default context behavior is to do nothing.
-//	 *  @param application	The context to be deleted.
-//	 *  @param listener	The listener to be notified when deletion is finished (if any).
-//	 */
-//	public void deleteContext()
-//	{
-//		this.setTerminating(true);
-////		final IComponentIdentifier[]	components	= getComponents();
-////		if(components!=null && components.length>0)
-////		{
-////			// Create AMS result listener (l2), when listener is used.
-////			// -> notifies listener, when last component is killed.
-////			IResultListener	l2	= listener!=null ? new IResultListener()
-////			{
-////				int tokill	= components.length;
-////				Exception	exception;
-////				
-////				public void resultAvailable(Object result)
-////				{
-////					result();
-////				}
-////				
-////				public void exceptionOccurred(Exception exception)
-////				{
-////					if(this.exception==null)	// Only return first exception.
-////						this.exception	= exception;
-////					result();
-////				}
-////				
-////				/**
-////				 *  Called for each killed component.
-////				 *  Decrease counter and notify listener, when last component is killed.
-////				 */
-////				protected void	result()
-////				{
-////					tokill--;
-////					if(tokill==0)
-////					{
-////						for(Iterator it=spaces.values().iterator(); it.hasNext(); )
-////						{
-////							ISpace space = (ISpace)it.next();
-////							space.terminate();
-////						}
-////						
-////						if(exception!=null)
-////							listener.exceptionOccurred(exception);
-////						else
-////							listener.resultAvailable(Application.this);
-////					}
-////				}
-////			} : null;
-////			
-////			// Kill all components in the context. 
-//////			IAMS ams = (IAMS) platform.getService(IAMS.class);
-////			for(int i=0; i<components.length; i++)
-////			{
-////				IComponentManagementService ces = (IComponentManagementService)container.getService(IComponentManagementService.class);
-////				ces.destroyComponent(components[i], l2);
-//////				ams.destroyComponent(components[i], l2);
-////			}
-////		}
-////		else
-//		{
-//			if(spaces!=null && spaces.values()!=null)
-//			{
-//				for(Iterator it=spaces.values().iterator(); it.hasNext(); )
-//				{
-//					ISpace space = (ISpace)it.next();
-//					space.terminate();
-//				}
-//			}
-//		}
-//	}
-
 	/**
 	 *  Called when a component has been created as a subcomponent of this component.
 	 *  This event may be ignored, if no special reaction to new or destroyed components is required.
@@ -667,65 +415,6 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	{
 		return IFuture.DONE;
 	}
-//	{
-////		System.out.println("comp created: "+desc.getName()+" "+Application.this.getComponentIdentifier()+" "+children);
-//
-//		// Checks if loaded model is defined in the application component types
-//		return scheduleStep(new IComponentStep()
-//		{
-//			public static final String XML_CLASSNAME = "created"; 
-//			public Object execute(IInternalAccess ia)
-//			{
-//				IComponentIdentifier cid = desc.getName();
-//				
-//				String modelname = model.getFullName();
-//				String appctype = (String)ctypes.get(modelname);
-//				if(appctype==null)
-//				{
-//					List atypes	= ComponentInterpreter.this.model.getMComponentTypes();
-//					for(int i=0; i<atypes.size(); i++)
-//					{
-//						final MComponentType atype = (MComponentType)atypes.get(i);
-//						String tmp = atype.getFilename().replace('/', '.');
-//						if(tmp.indexOf(modelname)!=-1)
-//						{
-//							ctypes.put(modelname, atype.getName());
-//							appctype = atype.getName();
-//							break;
-//						}
-//					}
-//				}
-//				if(appctype!=null)
-//				{
-//					ctypes.put(cid, appctype);
-//					instances.put(appctype, cid);
-//				}
-//				/* TODO: Check removed because WfMS requires adding arbitrary subcomponents (processes).
-//				else if(parent!=null)
-//				{
-//					throw new RuntimeException("Unknown/undefined component type: "+model);
-//				}*/
-//				
-//				ISpace[]	aspaces	= null;
-//				synchronized(this)
-//				{
-//					if(spaces!=null)
-//					{
-//						aspaces	= (ISpace[])spaces.values().toArray(new ISpace[spaces.size()]);
-//					}
-//				}
-//
-//				if(aspaces!=null)
-//				{
-//					for(int i=0; i<aspaces.length; i++)
-//					{
-//						aspaces[i].componentAdded(cid);
-//					}
-//				}
-//				return null;
-//			}
-//		});
-//	}
 	
 	/**
 	 *  Called when a subcomponent of this component has been destroyed.
@@ -737,89 +426,6 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	{
 		return IFuture.DONE;
 	}
-//	{
-//		return scheduleStep(new IComponentStep()
-//		{
-//			public static final String XML_CLASSNAME = "destroyed"; 
-//			public Object execute(IInternalAccess ia)
-//			{
-//		//		System.out.println("comp removed: "+desc.getName()+" "+this.getComponentIdentifier());
-//				IComponentIdentifier cid = desc.getName();
-//				ISpace[]	aspaces	= null;
-//				synchronized(this)
-//				{
-//					if(spaces!=null)
-//					{
-//						aspaces	= (ISpace[])spaces.values().toArray(new ISpace[spaces.size()]);
-//					}
-//				}
-//		
-//				if(aspaces!=null)
-//				{
-//					for(int i=0; i<aspaces.length; i++)
-//					{
-//						aspaces[i].componentRemoved(cid);
-//					}
-//				}
-//				
-//				if(ctypes!=null)
-//				{
-//					try
-//					{
-//						String appctype = (String)ctypes.remove(cid);
-//						if(appctype!=null)
-//							instances.remove(appctype, cid);
-//					}
-//					catch(Exception e)
-//					{
-//						e.printStackTrace();
-//					}
-//				}
-//				return null;
-//			}
-//		});
-//	}
-	
-	/**
-	 *  Add an component property. 
-	 *  @param component The component.
-	 *  @param key The key.
-	 *  @param prop The property.
-	 * /
-	public synchronized void addProperty(IComponentIdentifier component, String key, Object prop)
-	{
-		if(!containsComponent(component))
-			throw new RuntimeException("Component not contained in context: "+component+" "+this);
-			
-		Map componentprops = (Map)properties.get(component);
-		if(componentprops==null)
-		{
-			componentprops = new HashMap();
-			properties.put(component, componentprops);
-		}
-		
-		componentprops.put(key, prop);
-	}
-	
-	/**
-	 *  Get component property. 
-	 *  @param component The component.
-	 *  @param key The key.
-	 *  @return The property. 
-	 * /
-	public synchronized Object getProperty(IComponentIdentifier component, String key)
-	{
-		Object ret = null;
-		
-		if(!containsComponent(component))
-			throw new RuntimeException("Component not contained in context: "+component+" "+this);
-			
-		Map componentprops = (Map)properties.get(component);
-		if(componentprops!=null)
-			ret = componentprops.get(key);
-		
-		return ret;
-	}*/
 	
 	//-------- methods --------
 
@@ -896,81 +502,6 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	}
 	
 	/**
-	 *  Create an component in the context.
-	 *  @param name	The name of the newly created component.
-	 *  @param type	The component type as defined in the application type.
-	 *  @param configuration	The component configuration.
-	 *  @param arguments	Arguments for the new component.
-	 *  @param start	Should the new component be started?
-	 *  
-	 *  @param istener	A listener to be notified, when the component is created (if any).
-	 *  @param creator	The component that wants to create a new component (if any).	
-	 * /
-	public void createComponent(String name, final String type, String configuration,
-			Map arguments, final boolean start, final boolean master, 
-			final IResultListener listener)
-	{
-		MComponentType	at	= model.getApplicationType().getMComponentType(type);
-		if(at==null)
-			throw new RuntimeException("Unknown component type '"+type+"' in application: "+model);
-//		final IAMS	ams	= (IAMS) platform.getService(IAMS.class);
-		IComponentManagementService ces = (IComponentManagementService)container.getService(IComponentManagementService.class);
-
-		
-		ces.createComponent(name, at.getFilename(), configuration, arguments, true, new IResultListener()
-		{
-			public void exceptionOccurred(Exception exception)
-			{
-				if(listener!=null)
-					listener.exceptionOccurred(exception);
-			}
-			public void resultAvailable(Object result)
-			{
-				IComponentIdentifier aid = (IComponentIdentifier)result;
-				synchronized(Application.this)
-				{
-					if(componenttypes==null)
-						componenttypes	= new HashMap();
-					componenttypes.put(aid, type);
-				}
-				
-				if(!containsComponent(aid))
-					addComponent(aid);	// Hack??? componentCreated() may be called from AMS.
-				
-				if(master)
-				{
-					addProperty(aid, PROPERTY_COMPONENT_MASTER, master? Boolean.TRUE: Boolean.FALSE);
-				}
-				
-				if(start)
-				{
-					IComponentManagementService ces = (IComponentManagementService)container.getService(IComponentManagementService.class);
-					ces.resumeComponent(aid, listener);
-				}
-				else
-				{
-					if(listener!=null)
-						listener.resultAvailable(result);
-				}
-			}
-		}, creator);
-	}*/
-	
-	/**
-	 *  Remove an component from a context.
-	 * /
-	// Cannot be synchronized due to deadlock with space (uses context.getComponentType()).
-	public void	removeComponent(IComponentIdentifier component)
-	{
-		boolean master = isComponentMaster(component);
-			
-		super.removeComponent(component);
-		
-		if(master)
-			((IContextService)container.getService(IContextService.class)).deleteContext(this, null);
-	}*/
-
-	/**
 	 *  Get the flag indicating if the context is about to be deleted
 	 *  (no more components can be added).
 	 */
@@ -991,76 +522,6 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 		this.terminating	= terminating;
 	}
 
-	/**
-	 *  Set an component as master (causes context to be terminated on its deletion).
-	 *  @param component The component.
-	 *  @param master The master.
-	 * /
-	public void setComponentMaster(IComponentIdentifier component, boolean master)
-	{
-		addProperty(component, PROPERTY_COMPONENT_MASTER, master? Boolean.TRUE: Boolean.FALSE);
-	}
-	
-	/**
-	 *  Set an component as master (causes context to be terminated on its deletion).
-	 *  @param component The component.
-	 *  @return True, if component is master.
-	 * /
-	public boolean isComponentMaster(IComponentIdentifier component)
-	{
-		Boolean ret = (Boolean)getProperty(component, PROPERTY_COMPONENT_MASTER);
-		return ret==null? false: ret.booleanValue();
-	}*/
-	
-	/**
-	 *  Get the component type for an component id.
-	 *  @param aid	The component id.
-	 *  @return The component type name.
-	 * /
-	public synchronized String	getComponentType(IComponentIdentifier aid)
-	{
-		return componenttypes!=null ? (String)componenttypes.get(aid) : null;
-	}*/
-	
-	/**
-	 *  Get the component types.
-	 *  @return The component types.
-	 * /
-	public String[] getComponentTypes()
-	{
-		List atypes = model.getApplicationType().getMComponentTypes();
-		String[] ret = atypes!=null? new String[atypes.size()]: SUtil.EMPTY_STRING_ARRAY;
-		
-		for(int i=0; i<ret.length; i++)
-		{
-			MComponentType at = (MComponentType)atypes.get(i);
-			ret[i] = at.getName();
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Get the component type for an component filename.
-	 *  @param aid	The component filename.
-	 *  @return The component type name.
-	 * /
-	public String getComponentType(String filename)
-	{
-		String ret = null;
-		filename = filename.replace('\\', '/');
-		
-		List componenttypes = model.getApplicationType().getMComponentTypes();
-		for(Iterator it=componenttypes.iterator(); it.hasNext(); )
-		{
-			MComponentType componenttype = (MComponentType)it.next();
-			if(filename.endsWith(componenttype.getFilename()))
-				ret = componenttype.getName();
-		}
-		
-		return ret;
-	}*/
-	
 	/**
 	 *  Get the imports.
 	 *  @return The imports.

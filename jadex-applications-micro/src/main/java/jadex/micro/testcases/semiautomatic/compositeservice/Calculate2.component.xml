@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	<H3></H3>
+	<H3>Calculator Application</H3>
+	
+	Uses a composite calculator and connects it to
+	adder and subtractor peer components in this composite.
 -->
 <componenttype xmlns="http://jadex.sourceforge.net/jadex-component"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -8,39 +11,47 @@
 						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
 	name="Calculate2" package="jadex.micro.testcases.semiautomatic.compositeservice">
 	
-	<imports>
-		<import>jadex.bridge.serviceclock.IClockService</import>
-		<import>jjadex.bridge.serviceServiceProvider</import>
-		<import>jadex.commons.future.*</import>
-	</imports>
-	
 	<componenttypes>
 		<componenttype name="Calculator" filename="jadex/micro/testcases/semiautomatic/compositeservice/CompositeCalculatorAgent.class" master="true"/>
+		<componenttype name="CorruptAdder" filename="jadex/micro/testcases/semiautomatic/compositeservice/CorruptAdderAgent.class"/>
 		<componenttype name="Adder" filename="jadex/micro/testcases/semiautomatic/compositeservice/Adder.component.xml"/>
 		<componenttype name="Subtractor" filename="jadex/micro/testcases/semiautomatic/compositeservice/Subtractor.component.xml"/>
 	</componenttypes>
 	
 	<configurations>
-		<configuration name="Component Creation">
+		<configuration name="Component creation">
 			<components>
-				<component type="Calculator" name="Calculator">
+				<component name="calculator" type="Calculator">
 					<requiredservices>
-						<requiredservice name="addservice" componenttype="Adder" create="true" scope="parent"/>			
-						<requiredservice name="subservice" componenttype="Subtractor" create="true" scope="parent"/>			
+						<!-- <requiredservice name="addservice">
+							<binding componenttype="Adder" create="true" scope="parent"
+						</requiredservice>	-->		
+						<binding name="addservice" componenttype="Adder" create="true" scope="parent"/>			
+						<binding name="subservice" componenttype="Subtractor" create="true" scope="parent"/>			
+					</requiredservices>
+				</component>
+			</components>
+		</configuration>
+		<configuration name="Component creation and recovery">
+			<components>
+				<component name="calculator" type="Calculator">
+					<requiredservices>
+						<binding name="addservice" componenttype="CorruptAdder" create="true" scope="parent"/>			
+						<binding name="subservice" componenttype="Subtractor" create="true" scope="parent"/>			
 					</requiredservices>
 				</component>
 			</components>
 		</configuration>
 		<configuration name="All components available">
 			<components>
-				<component type="Calculator" name="Calculator">
+				<component name="calculator" type="Calculator">
 					<requiredservices>
-						<requiredservice name="addservice" componentname="Adder"/>			
-						<requiredservice name="subservice" componentname="Subtractor"/>			
+						<binding name="addservice" componentname="adder"/>			
+						<binding name="subservice" componentname="subtractor"/>			
 					</requiredservices>
 				</component>
-				<component type="Adder" name="Adder"/>
-				<component type="Subtractor" name="Subtractor"/>
+				<component name="adder" type="Adder"/>
+				<component name="subtractor" type="Subtractor"/>
 			</components>
 		</configuration>
 	</configurations>

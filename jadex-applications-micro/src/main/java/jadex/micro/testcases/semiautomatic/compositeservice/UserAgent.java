@@ -8,7 +8,7 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 /**
- *  The user agent uses services.
+ *  The user agent uses services for testing them.
  */
 @Description("This agent uses an add service.")
 @RequiredServices(@RequiredService(name="addservice", type=IAddService.class))

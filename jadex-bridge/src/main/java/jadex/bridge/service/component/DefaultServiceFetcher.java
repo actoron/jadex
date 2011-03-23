@@ -9,6 +9,7 @@ import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -16,8 +17,11 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  *  The default service fetcher realizes the default 
@@ -30,7 +34,7 @@ import java.util.Iterator;
  *  
  *  - dynamic or static binding
  *  - creation of components
- *  - recovery of failed services
+ *  - todo: recovery of failed services
  */
 public class DefaultServiceFetcher implements IRequiredServiceFetcher
 {
@@ -71,13 +75,21 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 			else if(binding.getComponentType()!=null)
 			{
 				// Search service by component type.
-				getExternalAccessByType(provider, info, binding).addResultListener(new DelegationResultListener(ret)
+				getExternalAccessesByType(provider, info, binding).addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						IExternalAccess ea = (IExternalAccess)result;
-						SServiceProvider.getService(ea.getServiceProvider(), info.getType(), RequiredServiceInfo.SCOPE_LOCAL)
-							.addResultListener(new StoreDelegationResultListener(ret, binding.isDynamic()));
+						Collection coll = (Collection)result;
+						if(coll!=null && coll.size()>0)
+						{
+							IExternalAccess ea = (IExternalAccess)coll.iterator().next();
+							SServiceProvider.getService(ea.getServiceProvider(), info.getType(), RequiredServiceInfo.SCOPE_LOCAL)
+								.addResultListener(new StoreDelegationResultListener(ret, binding.isDynamic()));
+						}
+						else
+						{
+							ret.setException(new RuntimeException("No component found."));
+						}
 					}
 				});
 			}
@@ -142,15 +154,42 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 			{
 				// Search service by component type.
 				
-				// todo: getExternalAccessesByType
-				
-				getExternalAccessByType(provider, info, binding).addResultListener(new DelegationResultListener(ret)
+				getExternalAccessesByType(provider, info, binding).addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						IExternalAccess ea = (IExternalAccess)result;
-						SServiceProvider.getServices(ea.getServiceProvider(), info.getType(), RequiredServiceInfo.SCOPE_LOCAL)
-							.addResultListener(new StoreDelegationResultListener(ret, binding.isDynamic()));
+						Collection coll = (Collection)result;
+						if(coll!=null && coll.size()>0)
+						{
+							CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new DelegationResultListener(ret)
+							{
+								public void customResultAvailable(Object result)
+								{
+									Collection coll = (Collection)result;
+									Collection ret = Collections.EMPTY_LIST;
+									if(coll!=null && coll.size()>0)
+									{
+										Iterator it = coll.iterator();
+										ret = (Collection)it.next();
+										while(it.hasNext())
+										{
+											ret.addAll((Collection)it.next());
+										}
+									}
+									super.customResultAvailable(ret);
+								}
+							});
+							for(Iterator it=coll.iterator(); it.hasNext(); )
+							{
+								IExternalAccess ea = (IExternalAccess)it.next();
+								SServiceProvider.getService(ea.getServiceProvider(), info.getType(), RequiredServiceInfo.SCOPE_LOCAL)
+									.addResultListener(lis);
+							}
+						}
+						else
+						{
+							ret.setException(new RuntimeException("No component found."));
+						}
 					}
 				});
 			}
@@ -204,7 +243,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Get the external access of a component by type.
 	 */
-	protected IFuture getExternalAccessByType(final IServiceProvider provider, final RequiredServiceInfo info, 
+	protected IFuture getExternalAccessesByType(final IServiceProvider provider, final RequiredServiceInfo info, 
 		final RequiredServiceBinding binding)
 	{
 		final Future ret = new Future();
@@ -222,7 +261,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 						public void customResultAvailable(Object result)
 						{
 							final IComponentIdentifier cid = (IComponentIdentifier)result;
-							getChildExternalAccess(cid, provider, info, binding).addResultListener(new StoreDelegationResultListener(ret, binding.isDynamic()));
+							getChildExternalAccesses(cid, provider, info, binding).addResultListener(new StoreDelegationResultListener(ret, binding.isDynamic()));
 						}
 					});
 				}
@@ -230,7 +269,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		}
 		else if(RequiredServiceInfo.SCOPE_LOCAL.equals(binding.getScope()))
 		{
-			getChildExternalAccess((IComponentIdentifier)provider.getId(), provider, info, binding).addResultListener(new StoreDelegationResultListener(ret, binding.isDynamic()));
+			getChildExternalAccesses((IComponentIdentifier)provider.getId(), provider, info, binding).addResultListener(new StoreDelegationResultListener(ret, binding.isDynamic()));
 		}
 		else
 		{
@@ -243,7 +282,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Get a fitting (of given type) child component.
 	 */
-	public IFuture getChildExternalAccess(final IComponentIdentifier cid, final IServiceProvider provider, 
+	public IFuture getChildExternalAccesses(final IComponentIdentifier cid, final IServiceProvider provider, 
 		final RequiredServiceInfo info, final RequiredServiceBinding binding)
 	{
 		final Future ret = new Future();
@@ -265,19 +304,35 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 								Collection coll = (Collection)result;
 								if(coll!=null && coll.size()>0)
 								{
-									Iterator it = coll.iterator();
-									IExternalAccess child = (IExternalAccess)it.next();
-									ret.setResult(child);
+//									Iterator it = coll.iterator();
+//									IExternalAccess child = (IExternalAccess)it.next();
+									ret.setResult(coll);
 								}
 								else
 								{
-									createComponent(provider, info, binding, cid).addResultListener(new DelegationResultListener(ret));
+									createComponent(provider, info, binding, cid).addResultListener(new DelegationResultListener(ret)
+									{
+										public void customResultAvailable(Object result)
+										{
+											List ret = new ArrayList();
+											ret.add(result);
+											super.customResultAvailable(ret);
+										}
+									});
 								}
 							}
 							
 							public void exceptionOccurred(Exception exception)
 							{
-								createComponent(provider, info, binding, cid).addResultListener(new DelegationResultListener(ret));
+								createComponent(provider, info, binding, cid).addResultListener(new DelegationResultListener(ret)
+								{
+									public void customResultAvailable(Object result)
+									{
+										List ret = new ArrayList();
+										ret.add(result);
+										super.customResultAvailable(ret);
+									}
+								});
 							}
 						});
 					}
@@ -352,9 +407,10 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	 *  Create component and get external access for component.
 	 */
 	protected IFuture createComponent(final IServiceProvider provider, final RequiredServiceInfo info, 
-		final RequiredServiceBinding binding, final IComponentIdentifier parent)
+		final RequiredServiceBinding binding, final IComponentIdentifier pa)
 	{
 		final Future ret = new Future();
+		final IComponentIdentifier parent = pa!=null? pa: (IComponentIdentifier)provider.getId();
 		if(binding.isCreate() && binding.getComponentType()!=null)
 		{
 			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
@@ -373,7 +429,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 								public void customResultAvailable(Object result)
 								{
 									final String filename = (String)result;
-									CreationInfo ci = new CreationInfo(parent!=null? parent: (IComponentIdentifier)provider.getId());
+									CreationInfo ci = new CreationInfo(parent);
 									cms.createComponent(binding.getComponentName(), filename, ci, null)
 										.addResultListener(new DelegationResultListener(ret)
 									{
@@ -381,6 +437,11 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 										{
 											IComponentIdentifier cid = (IComponentIdentifier)result;
 											getExternalAccess(provider, cid).addResultListener(new DelegationResultListener(ret));
+										}
+										public void exceptionOccurred(Exception exception)
+										{
+											exception.printStackTrace();
+											super.exceptionOccurred(exception);
 										}
 									});
 								}

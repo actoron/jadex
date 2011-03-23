@@ -10,6 +10,7 @@ import jadex.application.model.MRequiredServiceType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.model.MSpaceType;
 import jadex.bridge.Argument;
+import jadex.bridge.service.RequiredServiceBinding;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
@@ -301,6 +302,12 @@ public class ApplicationXMLReader
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "className"))
 			}, null)));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "binding")), new ObjectInfo(RequiredServiceBinding.class), 
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("componentname", "componentName")),
+			new AttributeInfo(new AccessInfo("componenttype", "componentType")),
+			})));
 					
 		for(int i=0; mappings!=null && i<mappings.length; i++)
 		{
