@@ -288,8 +288,11 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 						{
 							public void customResultAvailable(Object result)	throws Exception
 							{
-								props.removeSubproperties(plugin.getName());
-								props.addSubproperties(plugin.getName(), (Properties)result);
+								if(result!=null)
+								{
+									props.removeSubproperties(plugin.getName());
+									props.addSubproperties(plugin.getName(), (Properties)result);
+								}
 								crl.resultAvailable(null);
 							}
 						});

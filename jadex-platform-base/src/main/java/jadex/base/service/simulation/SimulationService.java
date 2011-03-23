@@ -61,7 +61,10 @@ public class SimulationService extends BasicService implements ISimulationServic
 	
 	/** The idle future listener. */
 	protected IdleListener	idlelistener;
-		
+	
+	/** Flag to indicate that simulation should be started after service is inited. */
+	protected boolean	startoninit;
+	
 	//-------- constructors --------
 
 	/**
@@ -81,6 +84,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 
 		this.access = access;
 		this.mode = MODE_NORMAL;
+		this.startoninit	= true;
 		this.listeners = SCollection.createArrayList();
 	}
 	
@@ -148,19 +152,19 @@ public class SimulationService extends BasicService implements ISimulationServic
 			public void customResultAvailable(Object result)
 			{
 				SServiceProvider.getService(access.getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new IResultListener()
+					.addResultListener(access.createResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
 						ISettingsService	settings	= (ISettingsService)result;
 						settings.registerPropertiesProvider("simulationservice", SimulationService.this)
-							.addResultListener(new DelegationResultListener(ret)
+							.addResultListener(access.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
 							{
 								proceed();
 							}
-						});
+						}));
 					}
 					
 					public void exceptionOccurred(Exception exception)
@@ -182,7 +186,14 @@ public class SimulationService extends BasicService implements ISimulationServic
 								services[0]	= true;
 								if(services[0] && services[1])
 								{
-									start().addResultListener(access.createResultListener(new DelegationResultListener(ret)));
+									if(startoninit)
+									{
+										start().addResultListener(access.createResultListener(new DelegationResultListener(ret)));
+									}
+									else
+									{
+										ret.setResult(null);
+									}
 								}
 							}
 						}));
@@ -196,12 +207,19 @@ public class SimulationService extends BasicService implements ISimulationServic
 								services[1]	= true;
 								if(services[0] && services[1])
 								{
-									start().addResultListener(access.createResultListener(new DelegationResultListener(ret)));
+									if(startoninit)
+									{
+										start().addResultListener(access.createResultListener(new DelegationResultListener(ret)));
+									}
+									else
+									{
+										ret.setResult(null);
+									}
 								}
 							}
 						}));						
 					}
-				});				
+				}));				
 			}
 		}));
 
@@ -616,9 +634,17 @@ public class SimulationService extends BasicService implements ISimulationServic
 			public Object execute(IInternalAccess ia)
 			{
 				if(exe && !executing)
+				{
 					start();
+				}
 				else if(!exe && executing)
+				{
 					pause();
+				}
+				else if(!exe)
+				{
+					startoninit	= false;
+				}
 				
 				return null;
 			}
