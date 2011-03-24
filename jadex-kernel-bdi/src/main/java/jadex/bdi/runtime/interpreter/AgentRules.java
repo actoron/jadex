@@ -17,6 +17,7 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.clock.ITimedObject;
 import jadex.bridge.service.clock.ITimer;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.DecouplingServiceInvocationInterceptor;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -46,6 +47,7 @@ import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -1204,26 +1206,48 @@ public class AgentRules
 			for(Iterator it=mservices.iterator(); it.hasNext(); )
 			{
 				Object mexp = it.next();
+				
 				try
 				{
-//					String name = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name);
-					IInternalService val = (IInternalService)evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
-//					Class type = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
-					// cast hack?!
+					IInternalService service = (IInternalService)evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
+					service = BasicServiceInvocationHandler.createServiceProxy(BDIInterpreter.getInterpreter(state).getExternalAccess(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), service);
 					Boolean direct = (Boolean)state.getAttributeValue(mexp, OAVBDIMetaModel.providedservice_has_direct);
 					if(!direct.booleanValue())
 					{
-						val = DecouplingServiceInvocationInterceptor.createServiceProxy(BDIInterpreter.getInterpreter(state).getExternalAccess(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), val);
-//						System.out.println("Created decoupled service: "+val);
+						BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+						handler.addFirstServiceInterceptor(new DecouplingServiceInvocationInterceptor(BDIInterpreter.getInterpreter(state).getExternalAccess(), BDIInterpreter.getInterpreter(state).getAgentAdapter()));
+						
+//						System.out.println("creating decoupled service: "+st.getClassName());
+//						service = DecouplingServiceInvocationInterceptor.createServiceProxy(getExternalAccess(), getComponentAdapter(), service);
 					}
-					((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(val);
-//					System.out.println("Service: "+name+" "+val+" "+type);
+					((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(service);
 				}
 				catch(Exception e)
 				{
 //					e.printStackTrace();
 					BDIInterpreter.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_text));
 				}
+				
+//				try
+//				{
+////					String name = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name);
+//					IInternalService val = (IInternalService)evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
+////					Class type = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
+//					// cast hack?!
+//					Boolean direct = (Boolean)state.getAttributeValue(mexp, OAVBDIMetaModel.providedservice_has_direct);
+//					if(!direct.booleanValue())
+//					{
+//						val = DecouplingServiceInvocationInterceptor.createServiceProxy(BDIInterpreter.getInterpreter(state).getExternalAccess(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), val);
+////						System.out.println("Created decoupled service: "+val);
+//					}
+//					((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(val);
+////					System.out.println("Service: "+name+" "+val+" "+type);
+//				}
+//				catch(Exception e)
+//				{
+////					e.printStackTrace();
+//					BDIInterpreter.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_text));
+//				}
 			}
 		}
 		

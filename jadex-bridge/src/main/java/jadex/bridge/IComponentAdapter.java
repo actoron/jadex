@@ -70,6 +70,12 @@ public interface IComponentAdapter
 	 *  @return The children.
 	 */
 	public IFuture getChildrenAccesses();
+	
+	/**
+	 *  Get the exception.
+	 *  @return The exception.
+	 */
+	public Exception getException();
 
 }
 

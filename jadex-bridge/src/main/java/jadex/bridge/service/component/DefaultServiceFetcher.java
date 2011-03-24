@@ -55,9 +55,6 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		
 		final RequiredServiceBinding binding = bd!=null? bd: info.getDefaultBinding();
 		
-		if(binding==null)
-			System.out.println("here");
-		
 		// Test if already bound.
 		if(result==null || rebind)
 		{

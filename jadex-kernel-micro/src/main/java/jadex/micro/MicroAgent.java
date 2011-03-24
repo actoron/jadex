@@ -22,6 +22,7 @@ import jadex.bridge.service.ServiceNotFoundException;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.clock.ITimedObject;
 import jadex.bridge.service.clock.ITimer;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.bridge.service.component.DecouplingServiceInvocationInterceptor;
 import jadex.commons.ComposedFilter;
@@ -35,6 +36,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -555,7 +557,8 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public void addDirectService(IInternalService service)
 	{
-		((IServiceContainer)interpreter.getServiceProvider()).addService(service);
+		IInternalService proxyser = BasicServiceInvocationHandler.createServiceProxy(getExternalAccess(), getAgentAdapter(), service);
+		((IServiceContainer)interpreter.getServiceProvider()).addService(proxyser);
 	}
 	
 	/**
@@ -566,8 +569,11 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public void addService(IInternalService service)
 	{
-		IInternalService proxyser = DecouplingServiceInvocationInterceptor
-			.createServiceProxy(getExternalAccess(), getAgentAdapter(), service);
+		IInternalService proxyser = BasicServiceInvocationHandler.createServiceProxy(getExternalAccess(), getAgentAdapter(), service);
+		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(proxyser);
+		handler.addFirstServiceInterceptor(new DecouplingServiceInvocationInterceptor(getExternalAccess(), getAgentAdapter()));
+//		IInternalService proxyser = DecouplingServiceInvocationInterceptor
+//			.createServiceProxy(getExternalAccess(), getAgentAdapter(), service);
 		((IServiceContainer)interpreter.getServiceProvider()).addService(proxyser);
 	}
 

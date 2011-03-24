@@ -82,8 +82,8 @@ public abstract class ComponentManagementService extends BasicService implements
 	/** The result (kill listeners). */
 	protected Map killresultlisteners;
 	
-	/** The exception of a component during execution (if any). */
-	protected Map exceptions;
+//	/** The exception of a component during execution (if any). */
+//	protected Map exceptions;
 	
 	/** The execution service (cached to avoid using futures). */
 	protected IExecutionService	exeservice;
@@ -438,8 +438,8 @@ public abstract class ComponentManagementService extends BasicService implements
 																		adapters.remove(cid);
 																		descs.remove(cid);
 																		initinfos.remove(cid);		
-																		if(exceptions!=null)
-																			exceptions.remove(cid);
+//																		if(exceptions!=null)
+//																			exceptions.remove(cid);
 																		cc	= (CleanupCommand)ccs.remove(cid);										
 																	}
 																}
@@ -789,6 +789,13 @@ public abstract class ComponentManagementService extends BasicService implements
 			{
 				synchronized(descs)
 				{
+					Object[] infos = (Object[])initinfos.get(cid);
+					if(infos!=null)
+					{
+						IComponentAdapter adap = (IComponentAdapter)infos[1];
+						((Future)infos[4]).setException(adap.getException());
+					}
+					
 					// Kill subcomponents
 					final CMSComponentDescription	desc = (CMSComponentDescription)descs.get(cid);
 					if(desc==null)
@@ -1313,12 +1320,12 @@ public abstract class ComponentManagementService extends BasicService implements
 				}
 			}
 			
-			Exception	ex	= null;
-			if(exceptions!=null && exceptions.containsKey(cid))
-			{
-				ex	= (Exception)exceptions.get(cid);
-				exceptions.remove(cid);
-			}
+			Exception	ex	= adapter.getException();
+//			if(exceptions!=null && exceptions.containsKey(cid))
+//			{
+//				ex	= (Exception)exceptions.get(cid);
+//				exceptions.remove(cid);
+//			}
 			IResultListener reslis = (IResultListener)killresultlisteners.remove(cid);
 			if(reslis!=null)
 			{
@@ -1913,7 +1920,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  Currently only switching between suspended/waiting is allowed.
 	 */
 	// hack???
-	public void	setProcessingState(IComponentIdentifier comp, String state)
+	/*public void	setProcessingState(IComponentIdentifier comp, String state)
 	{
 		CMSComponentDescription	desc	= null;
 		synchronized(descs)
@@ -1947,7 +1954,7 @@ public abstract class ComponentManagementService extends BasicService implements
 //				}
 //			}
 		}
-	}
+	}*/
 	
 	/**
 	 *  Set the state of a component (i.e. update the component description).
@@ -1987,27 +1994,27 @@ public abstract class ComponentManagementService extends BasicService implements
 //		}
 	}
 
-	/**
-	 *  Set the exception of a component.
-	 *  @param comp	The component.
-	 *  @param e	The exception.
-	 */
-	public void setComponentException(IComponentIdentifier comp, Exception e)
-	{
-		synchronized(descs)
-		{
-			if(exceptions==null)
-				exceptions	= new HashMap();
-			
-			exceptions.put(comp, e);
-
-			Object[]	infos = (Object[])initinfos.get(comp);
-			if(infos!=null)
-			{
-				((Future)infos[4]).setException(e);
-			}
-		}
-	}
+//	/**
+//	 *  Set the exception of a component.
+//	 *  @param comp	The component.
+//	 *  @param e	The exception.
+//	 */
+//	public void setComponentException(IComponentIdentifier comp, Exception e)
+//	{
+//		synchronized(descs)
+//		{
+//			if(exceptions==null)
+//				exceptions	= new HashMap();
+//			
+//			exceptions.put(comp, e);
+//
+//			Object[] infos = (Object[])initinfos.get(comp);
+//			if(infos!=null)
+//			{
+//				((Future)infos[4]).setException(e);
+//			}
+//		}
+//	}
 	
 	//-------- IService interface --------
 	

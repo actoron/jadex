@@ -69,7 +69,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	protected Logger logger;
 	
 	/** Flag to indicate a fatal error (component termination will not be passed to instance) */
-	protected boolean fatalerror;
+//	protected boolean fatalerror;
+	protected Exception exception;
 	
 	/** Flag to indicate that the initial step was performed. */
 	protected boolean	inited;
@@ -169,16 +170,30 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				throw new ComponentTerminatedException(cid);
 			
 			// Set processing state to ready if not running.
-			if(IComponentDescription.PROCESSINGSTATE_IDLE.equals(desc.getProcessingState()))
-			{
-				getCMS().addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						((ComponentManagementService)result).setProcessingState(cid, IComponentDescription.PROCESSINGSTATE_READY);
-					}
-				});				
-			}
+//			if(IComponentDescription.PROCESSINGSTATE_IDLE.equals(desc.getProcessingState()))
+//			{
+//				getCMS().addResultListener(new DefaultResultListener()
+//				{
+//					public void resultAvailable(Object result)
+//					{
+//						((ComponentManagementService)result).setProcessingState(cid, IComponentDescription.PROCESSINGSTATE_READY);
+//					}
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						// Might happen during platform init -> ignore
+//					}
+//				});				
+//			}
+//			if(IComponentDescription.PROCESSINGSTATE_IDLE.equals(desc.getProcessingState()))
+//			{
+//				getCMS().addResultListener(new DefaultResultListener()
+//				{
+//					public void resultAvailable(Object result)
+//					{
+//						((ComponentManagementService)result).setProcessingState(cid, IComponentDescription.PROCESSINGSTATE_READY);
+//					}
+//				});				
+//			}
 			
 			// Resume execution of the component.
 			if(IComponentDescription.STATE_ACTIVE.equals(desc.getState())
@@ -512,7 +527,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		}
 		else
 		{
-			if(!fatalerror)
+			if(exception==null)
 			{
 				component.cleanupComponent().addResultListener(new IResultListener()
 				{
@@ -593,7 +608,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public void	receiveMessage(Map message, MessageType type)
 	{
-		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || exception!=null)
 			throw new ComponentTerminatedException(cid);
 
 		// Add optional receival time.
@@ -608,6 +623,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	
 	//-------- IExecutable interface --------
 	
+	// for testing double execution.
 	boolean executing;
 	Exception	rte;
 
@@ -644,7 +660,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		boolean	ret;
 		if(!IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 		{
-			if(fatalerror)
+			if(exception!=null)
 				return false;	// Component already failed: tell executor not to call again. (can happen during failed init)
 	
 			// Remember execution thread.
@@ -653,20 +669,20 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			ClassLoader	cl	= componentthread.getContextClassLoader();
 			componentthread.setContextClassLoader(model.getClassLoader());
 	
-			getCMS().addResultListener(new DefaultResultListener()
-			{
-				public void resultAvailable(Object result)
-				{
-					((ComponentManagementService)result).setProcessingState(cid, IComponentDescription.PROCESSINGSTATE_RUNNING);
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					// CMS may be null during platform init
-					if(!(exception instanceof ServiceNotFoundException))
-						super.exceptionOccurred(exception);
-				}
-			});
+//			getCMS().addResultListener(new DefaultResultListener()
+//			{
+//				public void resultAvailable(Object result)
+//				{
+//					((ComponentManagementService)result).setProcessingState(cid, IComponentDescription.PROCESSINGSTATE_RUNNING);
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					// CMS may be null during platform init
+//					if(!(exception instanceof ServiceNotFoundException))
+//						super.exceptionOccurred(exception);
+//				}
+//			});
 			
 			// Copy actions from external threads into the state.
 			// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
@@ -779,14 +795,14 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			}
 			
 			final boolean	ready	= again && !breakpoint_triggered || extexecuted || wokenup;
-			getCMS().addResultListener(new DefaultResultListener()
-			{
-				public void resultAvailable(Object result)
-				{
-					((ComponentManagementService)result).setProcessingState(cid, ready
-						? IComponentDescription.PROCESSINGSTATE_READY : IComponentDescription.PROCESSINGSTATE_IDLE);
-				}
-			});
+//			getCMS().addResultListener(new DefaultResultListener()
+//			{
+//				public void resultAvailable(Object result)
+//				{
+//					((ComponentManagementService)result).setProcessingState(cid, ready
+//						? IComponentDescription.PROCESSINGSTATE_READY : IComponentDescription.PROCESSINGSTATE_IDLE);
+//				}
+//			});
 
 			// Reset execution thread.
 			componentthread.setContextClassLoader(cl);
@@ -818,7 +834,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //		e.printStackTrace();
 		
 		// Fatal error!
-		fatalerror	= true;
+		exception = e;
 		
 		// Remove component from platform.
 		getCMS().addResultListener(new DefaultResultListener()
@@ -826,10 +842,19 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			public void resultAvailable(Object result)
 			{
 				ComponentManagementService	cms	= (ComponentManagementService)result;
-				cms.setComponentException(cid, e);
+//				cms.setComponentException(cid, e);
 				cms.destroyComponent(cid);
 			}
 		});
+	}
+	
+	/**
+	 *  Get the exception.
+	 *  @return The exception.
+	 */
+	public Exception getException()
+	{
+		return exception;
 	}
 	
 	/**
@@ -853,7 +878,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public void invokeLater(Runnable action)
 	{
-		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || exception!=null)
 			throw new ComponentTerminatedException(cid);
 
 		synchronized(ext_entries)
@@ -889,7 +914,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	public IFuture doStep()
 	{
 		Future ret = new Future();
-		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || exception!=null)
 			ret.setException(new ComponentTerminatedException(cid));
 		else if(dostep)
 			ret.setException(new RuntimeException("Only one step allowed at a time."));
