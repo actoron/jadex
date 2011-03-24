@@ -265,6 +265,6 @@ class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor, IPrope
 			}
 			setSelectedComponentTypes(selected);
 		}
-		return new Future();
+		return IFuture.DONE;
 	}
 }

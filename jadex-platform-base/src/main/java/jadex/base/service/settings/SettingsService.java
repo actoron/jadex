@@ -174,4 +174,40 @@ public class SettingsService extends BasicService implements ISettingsService
 		}
 		return ret;
 	}
+	
+	
+	/**
+	 *  Set the properties for a given id.
+	 *  Overwrites existing settings (if any).
+	 *  @param id 	A unique id to identify the properties (e.g. component or service name).
+	 *  @param properties 	The properties to set.
+	 *  @return A future indicating when properties have been set.
+	 */
+	public IFuture	setProperties(String id, Properties props)
+	{
+		Future	ret	= new Future();
+		this.props.removeSubproperties(id);
+		this.props.addSubproperties(id, props);
+		
+		if(providers.containsKey(id))
+		{
+			((IPropertiesProvider)providers.get(id)).setProperties(props)
+				.addResultListener(new DelegationResultListener(ret));
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the properties for a given id.
+	 *  @param id 	A unique id to identify the properties (e.g. component or service name).
+	 *  @return A future containing the properties (if any).
+	 */
+	public IFuture	getProperties(String id)
+	{
+		return new Future(props.getSubproperty(id));
+	}
 }

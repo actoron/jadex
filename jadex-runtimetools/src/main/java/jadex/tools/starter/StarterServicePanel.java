@@ -14,6 +14,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
+import jadex.bridge.ISettingsService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -249,11 +250,21 @@ public class StarterServicePanel extends JPanel
 				SGUI.setDividerLocation(csplit, 180);
 		            			
 				add(csplit, BorderLayout.CENTER);
-				ret.setResult(null);
+				
+				loadPlatformProperties().addResultListener(new SwingDelegationResultListener(ret));
 			}
 		});
 		
 		return ret;
+	}
+	
+	
+	/**
+	 *  Informs the panel that it should stop all its computation
+	 */
+	public IFuture shutdown()
+	{
+		return savePlatformProperties();
 	}
 	
 	/**
@@ -419,26 +430,95 @@ public class StarterServicePanel extends JPanel
 	}
 
 	/**
-	 * Load the properties.
+	 *  Load and apply the platform properties.
+	 */
+	public IFuture loadPlatformProperties()
+	{
+		final Future	ret	= new Future();
+		SServiceProvider.getService(exta.getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new SwingDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result) throws Exception
+			{
+				ISettingsService	settings	= (ISettingsService)result;
+				settings.getProperties("StarterServicePanel")
+					.addResultListener(new SwingDelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result) throws Exception
+					{
+						if(result!=null)
+						{
+							final Properties	props	= (Properties)result;
+							mpanel.setProperties(props.getSubproperty("mpanel"))
+								.addResultListener(new SwingDelegationResultListener(ret)
+							{
+								public void customResultAvailable(Object result) throws Exception
+								{
+									spanel.setProperties(props.getSubproperty("spanel"));
+									ret.setResult(null);
+								}
+							});
+						}
+						else
+						{
+							ret.setResult(null);
+						}
+					}
+				});
+			}
+			
+			public void customExceptionOccurred(Exception exception)
+			{
+				// No settings service: ignore.
+				ret.setResult(null);
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Save the platform properties.
+	 */
+	public IFuture	savePlatformProperties()
+	{
+		final Future	ret	= new Future();
+		SServiceProvider.getService(exta.getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new SwingDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result) throws Exception
+			{
+				final ISettingsService	settings	= (ISettingsService)result;
+				mpanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						Properties	props	= new Properties();
+						props.addSubproperties("mpanel", (Properties)result);
+						props.addSubproperties("spanel", spanel.getProperties());
+						settings.setProperties("StarterServicePanel", props)
+							.addResultListener(new SwingDelegationResultListener(ret));
+					}
+				});
+			}
+			
+			public void customExceptionOccurred(Exception exception)
+			{
+				// No settings service: ignore.
+				ret.setResult(null);
+			}
+		});
+		
+		return ret;
+	}
+
+	/**
+	 *  Load the properties.
 	 */
 	public IFuture setProperties(Properties props)
 	{
-		// todo: checking
-		
-//		checkingmenu.setSelected(false);
-//		System.out.println("Starter set props: "+props);
-		Properties	mpanelprops	= props.getSubproperty("mpanel");
-		if(mpanelprops!=null)
-			mpanel.setProperties(mpanelprops);
-		Properties	spanelprops	= props.getSubproperty("spanel");
-		if(spanelprops!=null)
-			spanel.setProperties(spanelprops);
-
 		SGUI.setDividerLocation(lsplit, props.getIntProperty("leftsplit_location"));
 		SGUI.setDividerLocation(csplit, props.getIntProperty("mainsplit_location"));
-	
-	//		checkingmenu.setSelected(props.getBooleanProperty("checking"));
-		
 		return IFuture.DONE;
 	}
 
@@ -448,26 +528,9 @@ public class StarterServicePanel extends JPanel
 	 */
 	public IFuture getProperties()
 	{
-		final Future ret = new Future();
-		
-		mpanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				Properties	props	= new Properties();
-				
-				props.addSubproperties("mpanel", (Properties)result);
-				props.addSubproperties("spanel", spanel.getProperties());
-				
-				props.addProperty(new Property("leftsplit_location", ""+lsplit.getDividerLocation()));
-				props.addProperty(new Property("mainsplit_location", ""+csplit.getDividerLocation()));
-			
-				ret.setResult(props);
-			}
-		});
-		
-//		props.addProperty(new Property("checking", ""+checkingmenu.isSelected()));
-		
-		return ret;
+		Properties	props	= new Properties();
+		props.addProperty(new Property("leftsplit_location", ""+lsplit.getDividerLocation()));
+		props.addProperty(new Property("mainsplit_location", ""+csplit.getDividerLocation()));
+		return new Future(props);
 	}
 }

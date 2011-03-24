@@ -1,6 +1,5 @@
 package jadex.tools.generic;
 
-import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -98,15 +97,7 @@ public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
 		final Future ret = new Future();
 		final IService service = (IService)element;
 		
-		createServicePanel(service).addResultListener(new SwingDelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-//				System.out.println("add: "+result+" "+sel);
-				IServiceViewerPanel panel = (IServiceViewerPanel)result;
-				ret.setResult(panel);
-			}
-		});
+		createServicePanel(service).addResultListener(new SwingDelegationResultListener(ret));
 		
 		return ret;
 	}

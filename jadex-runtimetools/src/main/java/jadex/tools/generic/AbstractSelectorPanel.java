@@ -19,6 +19,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.JButton;
@@ -323,6 +324,18 @@ public abstract class AbstractSelectorPanel extends JPanel implements IPropertie
 		
 //		System.out.println("props: "+props);
 		return ret;
+	}
+	
+	/** 
+	 *  Shutdown the panel.
+	 */
+	public void shutdown()
+	{
+		for(Iterator it=panels.values().iterator(); it.hasNext(); )
+		{
+			// Todo: should wait for shutdown!!!
+			((IAbstractViewerPanel)it.next()).shutdown();
+		}
 	}
 
 	/**

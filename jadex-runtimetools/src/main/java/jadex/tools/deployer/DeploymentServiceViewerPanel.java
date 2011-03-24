@@ -1,16 +1,14 @@
 package jadex.tools.deployer;
 
 import jadex.base.gui.asynctree.INodeHandler;
-import jadex.base.gui.componentviewer.IServiceViewerPanel;
+import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.base.gui.filetree.DefaultFileFilter;
 import jadex.base.gui.filetree.DefaultFileFilterMenuItemConstructor;
 import jadex.base.gui.filetree.DefaultNodeHandler;
-import jadex.base.gui.filetree.FileTreePanel;
 import jadex.base.gui.filetree.FileData;
-import jadex.base.gui.plugin.IControlCenter;
+import jadex.base.gui.filetree.FileTreePanel;
 import jadex.base.service.deployment.IDeploymentService;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.IService;
 import jadex.commons.Properties;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
@@ -26,7 +24,7 @@ import javax.swing.tree.TreeSelectionModel;
  *  The deployment service viewer panel displays 
  *  the file tree in a scroll panel.
  */
-public class DeploymentServiceViewerPanel implements IServiceViewerPanel
+public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 {
 	//-------- attributes --------
 
@@ -125,14 +123,6 @@ public class DeploymentServiceViewerPanel implements IServiceViewerPanel
 	public JComponent getComponent()
 	{
 		return scrollpane;
-	}
-
-	/**
-	 *  Init the panel.
-	 */
-	public IFuture init(IControlCenter jcc, IService service)
-	{
-		return IFuture.DONE;
 	}
 	
 	/**

@@ -5,14 +5,14 @@ import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.asynctree.TreePopupListener;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.library.ILibraryService;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDelegationResultListener;
@@ -20,6 +20,7 @@ import jadex.commons.gui.IMenuItemConstructor;
 import jadex.commons.gui.PopupBuilder;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.TreeExpansionHandler;
+import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -92,7 +93,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	/**
 	 *  Create a new component tree panel.
 	 */
-	public FileTreePanel(final IExternalAccess exta, boolean remote)
+	public FileTreePanel(IExternalAccess exta, boolean remote)
 	{
 		this.setLayout(new BorderLayout());
 		
@@ -133,9 +134,6 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 					showPopUp(e.getX(), e.getY());
 			}
 		});
-		
-//		RootNode r = (RootNode)getModel().getRoot();
-//		((RootNode)getModel().getRoot()).addChild(new DirNode(r, getModel(), tree, new File("c:"), iconcache, null));
 		
 		addKeyListener(new KeyListener()
 		{
@@ -268,29 +266,6 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	 */
 	public void	dispose()
 	{
-//		access.scheduleStep(new IComponentStep()
-//		{
-//			@XMLClassname("dispose")
-//			public Object execute(IInternalAccess ia)
-//			{
-//				SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-////				ia.getRequiredService("cms")
-//					.addResultListener(new SwingDefaultResultListener()
-//				{
-//					public void customResultAvailable(Object result)
-//					{
-//						cms	= (IComponentManagementService)result;
-//						cms.removeComponentListener(null, listener);				
-//					}
-//					public void customExceptionOccurred(Exception exception)
-//					{
-//						// ignore
-//					}
-//				});
-//				return null;
-//			}
-//		});
-		
 		getModel().dispose();
 	}
 	
@@ -347,54 +322,49 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	{
 		final Future ret = new Future();
 		final Properties props = new Properties();
-		if(remote)
-			return new Future(props);
 		
 		// Save tree properties.
 		final TreeProperties	mep	= new TreeProperties();
-		RootNode root = (RootNode)getTree().getModel().getRoot();
-//		String[] paths	= root.getPathEntries();
-//		for(int i=0; i<paths.length; i++)
-//			paths[i]	= SUtil.convertPathToRelative(paths[i]);
-//		mep.setRootPathEntries(paths);
-		mep.setSelectedNode(getTree().getSelectionPath()==null ? null
-			: NodePath.createNodePath((FileNode)getTree().getSelectionPath().getLastPathComponent()));
-		List	expanded	= new ArrayList();
-		Enumeration exp = getTree().getExpandedDescendants(new TreePath(root));
-		if(exp!=null)
+		final RootNode root = (RootNode)getTree().getModel().getRoot();
+		final String[] paths	= root.getPathEntries();
+		
+		// Convert path to relative must be done on target platform.
+		exta.scheduleStep(new IComponentStep()
 		{
-			while(exp.hasMoreElements())
+			@XMLClassname("convertPathToRelative")
+			public Object execute(IInternalAccess ia)
 			{
-				TreePath	path	= (TreePath)exp.nextElement();
-				if(path.getLastPathComponent() instanceof FileNode)
-				{
-					expanded.add(NodePath.createNodePath((FileNode)path.getLastPathComponent()));
-				}
+				for(int i=0; i<paths.length; i++)
+					paths[i]	= SUtil.convertPathToRelative(paths[i]);
+				return paths;
 			}
-		}
-		mep.setExpandedNodes((NodePath[])expanded.toArray(new NodePath[expanded.size()]));
-		// todo: remove ThreadSuspendable()
-		SServiceProvider.getService(exta.getServiceProvider(), 
-			ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDelegationResultListener(ret)
+		}).addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				ClassLoader cl = ((ILibraryService)result).getClassLoader();
-				String	treesave	= JavaWriter.objectToXML(mep, cl);	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
+				String[]	paths	= (String[])result;
+				mep.setRootPathEntries(paths);
+				mep.setSelectedNode(getTree().getSelectionPath()==null ? null
+					: NodePath.createNodePath((FileNode)getTree().getSelectionPath().getLastPathComponent()));
+				List	expanded	= new ArrayList();
+				Enumeration exp = getTree().getExpandedDescendants(new TreePath(root));
+				if(exp!=null)
+				{
+					while(exp.hasMoreElements())
+					{
+						TreePath	path	= (TreePath)exp.nextElement();
+						if(path.getLastPathComponent() instanceof FileNode)
+						{
+							expanded.add(NodePath.createNodePath((FileNode)path.getLastPathComponent()));
+						}
+					}
+				}
+				mep.setExpandedNodes((NodePath[])expanded.toArray(new NodePath[expanded.size()]));
+				
+				// Hack!!! cannot use (local) platform class loader, because has only access to (remote?) target platform.
+				String	treesave	= JavaWriter.objectToXML(mep, getClass().getClassLoader());	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
 				props.addProperty(new Property("tree", treesave));
 						
-				// Save the last loaded file.
-//				File sf = filechooser.getSelectedFile();
-//				if(sf!=null)
-//				{
-//					String	lastpath	= SUtil.convertPathToRelative(sf.getAbsolutePath());
-//					props.addProperty(new Property("lastpath", lastpath));
-//				}
-
-				// Save refresh/checking flags.
-//				props.addProperty(new Property("refresh", Boolean.toString(refresh)));
-				
 				// Save the state of file filters
 				if(mic instanceof IPropertiesProvider)
 				{
@@ -413,17 +383,6 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 				{
 					ret.setResult(props);
 				}
-//				Properties	filterprops	= new Properties(null, "filter", null);
-////				filtercon.isAll();
-////				filterprops.addProperty(new Property("all", ""+filtercon.isAll()));
-//				List ctypes = filtercon.getSelectedComponentTypes();
-//				for(int i=0; i<ctypes.size(); i++)
-//				{
-//					String ctype = (String)ctypes.get(i);
-//					filterprops.addProperty(new Property(ctype, "true"));
-//				}
-//				props.addSubproperties(filterprops);
-//				ret.setResult(props);
 			}
 		});
 		
@@ -437,43 +396,73 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	{
 		final Future ret = new Future();
 		
-		if(remote)
+		// Load root node.
+		String	treexml	= props.getStringProperty("tree");
+		if(treexml==null)
 		{
 			ret.setResult(null);
-			return ret;
 		}
-//		refresh	= false;	// stops crawler task, if any
-		
-		SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDelegationResultListener(ret)
+		else
 		{
-			public void customResultAvailable(Object result)
+			try
 			{
-				ILibraryService ls = (ILibraryService)result;
+				// Hack!!! cannot use (local) platform class loader, because has only access to (remote?) target platform.
+				ClassLoader cl = getClass().getClassLoader();
+				final TreeProperties	mep	= (TreeProperties)JavaReader.objectFromXML(treexml, cl); 	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
+				final RootNode root = (RootNode)getTree().getModel().getRoot();
 				
-				// Load root node.
-				String	treexml	= props.getStringProperty("tree");
-				if(treexml==null)
+				final Future	rootdone	= new Future();
+				final String[] entries = mep.getRootPathEntries();
+				if(entries!=null)
 				{
-					ret.setResult(null);
+					root.removeAll();
+					if(!remote)
+					{
+						for(int i=0; i<entries.length; i++)
+						{
+							ITreeNode node = factory.createNode(root, model, tree, new File(entries[i]), iconcache, filefilter, exta, factory);
+							root.addChild(node);
+						}
+						rootdone.setResult(null);
+					}
+					else
+					{
+						exta.scheduleStep(new IComponentStep()
+						{
+							@XMLClassname("createRootEntries")
+							public Object execute(IInternalAccess ia)
+							{
+								FileData[]	ret	= new FileData[entries.length];
+								for(int i=0; i<entries.length; i++)
+								{
+									ret[i]	= new FileData(new File(entries[i]));
+								}
+								return ret;
+							}
+						}).addResultListener(new SwingDelegationResultListener(rootdone)
+						{
+							public void customResultAvailable(Object result) throws Exception
+							{
+								FileData[]	entries	= (FileData[])result;
+								for(int i=0; i<entries.length; i++)
+								{
+									ITreeNode node = factory.createNode(root, model, tree, entries[i], iconcache, filefilter, exta, factory);
+									root.addChild(node);
+								}
+								rootdone.setResult(null);
+}
+						});
+					}
 				}
 				else
 				{
-					try
-					{
-						// todo: hack!
-						ClassLoader cl = ls.getClassLoader();
-						TreeProperties	mep	= (TreeProperties)JavaReader.objectFromXML(treexml, cl); 	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
-//						ModelExplorerProperties	mep	= (ModelExplorerProperties)Nuggets.objectFromXML(treexml, cl);
-						RootNode root = (RootNode)getTree().getModel().getRoot();
-//						root.removeAll();
-//						String[] entries = mep.getRootPathEntries();
-//						for(int i=0; i<entries.length; i++)
-//						{
-//							ITreeNode node = factory.createNode(root, model, tree, new File(entries[i]), iconcache, filefilter, exta, factory);
-//							root.addChild(node);
-//						}
+					rootdone.setResult(null);
+				}
 
+				rootdone.addResultListener(new SwingDelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result) throws Exception
+					{
 						// Select the last selected model in the tree.
 						expansionhandler.setSelectedPath(mep.getSelectedNode());
 
@@ -482,64 +471,32 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 
 						root.refresh(true);
 						
-						// Load last selected model.
-//						String lastpath = props.getStringProperty("lastpath");
-//						if(lastpath!=null)
-//						{
-//							try
-//							{
-//								File mo_file = new File(lastpath);
-//								filechooser.setCurrentDirectory(mo_file.getParentFile());
-//								filechooser.setSelectedFile(mo_file);
-//							}
-//							catch(Exception e)
-//							{
-//							}
-//						}				
-								
-						// Load refresh/checking flag (defaults to true).
-//						refresh	= !"false".equals(props.getStringProperty("refresh"));
-//						if(refreshmenu!=null)
-//							refreshmenu.setState(this.refresh);
-//						resetCrawler();
-						
 						// Load the filter settings
 						Properties	filterprops	= props.getSubproperty("mic");
 						if(mic instanceof IPropertiesProvider)
-							((IPropertiesProvider)mic).setProperties(filterprops)
-							.addResultListener(new SwingDelegationResultListener(ret)
 						{
-							public void customResultAvailable(Object result) 
+							((IPropertiesProvider)mic).setProperties(filterprops)
+								.addResultListener(new SwingDelegationResultListener(ret)
 							{
-								ret.setResult(null);
-							};
-						});
+								public void customResultAvailable(Object result) 
+								{
+									ret.setResult(null);
+								};
+							});
+						}
 						else
 						{
 							ret.setResult(null);
 						}
-						
-//						if(filterprops!=null)
-//						{
-//							Property[] mps = filterprops.getProperties();
-//							Set selected = new HashSet();
-//							for(int i=0; i<mps.length; i++)
-//							{
-//								if(Boolean.parseBoolean(mps[i].getValue())) 
-//									selected.add(mps[i].getType());
-//							}
-//							filtercon.setSelectedComponentTypes(selected);
-//						}
 					}
-					catch(Exception e)
-					{
-						ret.setException(e);
-						System.err.println("Cannot load project tree: "+e.getClass().getName());
-//						e.printStackTrace();
-					}
-				}
-			}	
-		});
+				});				
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+				System.err.println("Cannot load project tree: "+e.getClass().getName());
+			}
+		}
 		
 		return ret;
 	}

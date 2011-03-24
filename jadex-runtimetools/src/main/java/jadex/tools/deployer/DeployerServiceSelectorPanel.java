@@ -26,14 +26,18 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 	/** The node handler. */
 	protected INodeHandler nodehandler;
 	
+	/** The jcc access (local). */
+	protected IExternalAccess jccaccess;
+	
 	//-------- constructors --------
 
 	/**
 	 *  Create a new selector panel.
 	 */
-	public DeployerServiceSelectorPanel(IExternalAccess exta, Class servicetype, INodeHandler nodehandler)
+	public DeployerServiceSelectorPanel(IExternalAccess jccaccess, IExternalAccess platformaccess, INodeHandler nodehandler)
 	{
-		super(exta, servicetype);
+		super(platformaccess, IDeploymentService.class);
+		this.jccaccess = jccaccess;
 		this.nodehandler = nodehandler;
 	}
 	
@@ -46,7 +50,7 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(platform.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(jccaccess.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
@@ -58,7 +62,7 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 					public void customResultAvailable(Object result) 
 					{
 						IExternalAccess component = (IExternalAccess)result; 
-						boolean remote = !platform.getComponentIdentifier().getPlatformName().equals(component.getComponentIdentifier().getPlatformName());
+						boolean remote = !jccaccess.getComponentIdentifier().getPlatformName().equals(component.getComponentIdentifier().getPlatformName());
 						DeploymentServiceViewerPanel dp = new DeploymentServiceViewerPanel(component, remote, (IDeploymentService)service, nodehandler);
 						ret.setResult(dp);
 					};

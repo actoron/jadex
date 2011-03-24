@@ -80,6 +80,14 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 		return selectorpanel;
 	}
 	
+	/** 
+	 *  Shutdown the plugin.
+	 */
+	public void shutdown()
+	{
+		selectorpanel.shutdown();
+	}
+	
 	/**
 	 *  Get the help id.
 	 */

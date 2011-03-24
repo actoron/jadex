@@ -94,47 +94,50 @@ public class SimulationService extends BasicService implements ISimulationServic
 	 */
 	public IFuture	shutdownService()
 	{
+		final Future	deregistered	= new Future();
+		SServiceProvider.getService(access.getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(access.createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				ISettingsService	settings	= (ISettingsService)result;
+				settings.deregisterPropertiesProvider("simulationservice")
+					.addResultListener(access.createResultListener(new DelegationResultListener(deregistered)));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// No settings service: ignore.
+				deregistered.setResult(null);
+			}
+		}));
+			
 		final Future	ret	= new Future();
-		
-		IFuture	stopped;
-		if(executing)
-		{
-			stopped	= pause();
-		}
-		else
-		{
-			stopped	= IFuture.DONE;
-		}
-		
-		stopped.addResultListener(access.createResultListener(new DelegationResultListener(ret)
+		deregistered.addResultListener(access.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				SimulationService.super.shutdownService().addResultListener(
-					access.createResultListener(new DelegationResultListener(ret)
+				IFuture	stopped;
+				if(executing)
+				{
+					stopped	= pause();
+				}
+				else
+				{
+					stopped	= IFuture.DONE;
+				}
+				
+				stopped.addResultListener(access.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						SServiceProvider.getService(access.getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new IResultListener()
-						{
-							public void resultAvailable(Object result)
-							{
-								ISettingsService	settings	= (ISettingsService)result;
-								settings.deregisterPropertiesProvider("simulationservice")
-									.addResultListener(new DelegationResultListener(ret));
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								// No settings service: ignore.
-								ret.setResult(null);
-							}
-						});
+						SimulationService.super.shutdownService().addResultListener(
+							access.createResultListener(new DelegationResultListener(ret)));
 					}
 				}));
 			}
 		}));
+		
 		return ret;
 	}
 	
@@ -188,6 +191,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 								{
 									if(startoninit)
 									{
+										startoninit	= false;
 										start().addResultListener(access.createResultListener(new DelegationResultListener(ret)));
 									}
 									else
@@ -209,6 +213,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 								{
 									if(startoninit)
 									{
+										startoninit	= false;
 										start().addResultListener(access.createResultListener(new DelegationResultListener(ret)));
 									}
 									else
@@ -633,7 +638,8 @@ public class SimulationService extends BasicService implements ISimulationServic
 		{
 			public Object execute(IInternalAccess ia)
 			{
-				if(exe && !executing)
+				// startoninit==false means service already running
+				if(exe && !executing && !startoninit)
 				{
 					start();
 				}

@@ -62,6 +62,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	 */
 	public void shutdown()
 	{
+		
 	}
 	
 	//-------- methods --------

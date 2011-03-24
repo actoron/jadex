@@ -27,6 +27,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
@@ -539,6 +540,18 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 			}
 		}
 		return ret;
+	}
+	
+	/** 
+	 *  Shutdown the plugin.
+	 */
+	public void shutdown()
+	{
+		for(Iterator it=panels.values().iterator(); it.hasNext(); )
+		{
+			// Todo: should wait for shutdown!!!
+			((IAbstractViewerPanel)it.next()).shutdown();
+		}
 	}
 	
 	//-------- loading / saving --------

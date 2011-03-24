@@ -1,9 +1,16 @@
 package jadex.bridge.service.library;
 
+import jadex.bridge.ISettingsService;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.commons.IPropertiesProvider;
+import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -25,7 +32,7 @@ import java.util.Set;
 /**
  *  Library service for loading classpath elements.
  */
-public class LibraryService extends BasicService implements ILibraryService
+public class LibraryService extends BasicService implements ILibraryService, IPropertiesProvider
 {
 	//-------- attributes --------
 	
@@ -73,7 +80,6 @@ public class LibraryService extends BasicService implements ILibraryService
 	 */ 
 	public LibraryService(Object[] urls, IServiceProvider provider, Map properties)
 	{
-		// Hack!!! Should not reference gui???
 		super(provider.getId(), ILibraryService.class, properties);
 		
 		this.provider = provider;
@@ -224,24 +230,71 @@ public class LibraryService extends BasicService implements ILibraryService
 
 	/**
 	 *  Start the service.
-	 * /
-	public synchronized IFuture	startService()
+	 */
+	public IFuture	startService()
 	{
-		return super.startService();
-	}*/
+		final Future	ret	= new Future();
+		super.startService().addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				SServiceProvider.getService(provider,ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						ISettingsService	settings	= (ISettingsService)result;
+						settings.registerPropertiesProvider(LIBRARY_SERVICE, LibraryService.this)
+							.addResultListener(new DelegationResultListener(ret));
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						// No settings service: ignore
+						ret.setResult(null);
+					}
+				});
+			}
+		});
+		return ret;
+	}
 
 	/** 
 	 *  Shutdown the service.
 	 *  Releases all cached resources and shuts down the library service.
 	 *  @param listener The listener.
 	 */
-	public synchronized IFuture	shutdownService()
+	public IFuture	shutdownService()
 	{
-		basecl = null;
-		libcl = null;
-		listeners.clear();
+		synchronized(this)
+		{
+			basecl = null;
+			libcl = null;
+			listeners.clear();
+		}
 
-		return super.shutdownService();
+		final Future	ret	= new Future();
+		super.shutdownService().addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				SServiceProvider.getService(provider,ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						ISettingsService	settings	= (ISettingsService)result;
+						settings.deregisterPropertiesProvider(LIBRARY_SERVICE)
+							.addResultListener(new DelegationResultListener(ret));
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						// No settings service: ignore
+						ret.setResult(null);
+					}
+				});
+			}
+		});
+		return ret;
 	}
 
 	/**
@@ -521,6 +574,83 @@ public class LibraryService extends BasicService implements ILibraryService
 		}
 		
 		return ret;
+	}
+	
+	//-------- IPropertiesProvider interface --------
+	
+	/**
+	 *  Update from given properties.
+	 */
+	public IFuture setProperties(Properties props)
+	{
+		// Remove existing urls
+		boolean	done	= false;
+		while(!done)
+		{
+			URL	url;
+			synchronized(this)
+			{
+				if(!urls.isEmpty())
+				{
+					url	= (URL)urls.get(0);
+				}
+				else
+				{
+					url	= null;
+					done	= true;
+				}
+			}
+			if(url!=null)
+			{
+				try
+				{
+					removeURL(url);
+				}
+				catch(Exception e)
+				{
+				}
+			}
+		}
+		
+		// Add new urls.
+		Property[]	entries	= props.getProperties("entry");
+		for(int i=0; i<entries.length; i++)
+		{
+			addPath(entries[i].getValue());
+		}
+		
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Write current state into properties.
+	 */
+	public IFuture getProperties()
+	{
+		String[]	entries;
+		synchronized(this)
+		{
+			entries	= new String[urls.size()];
+			for(int i=0; i<entries.length; i++)
+			{
+				URL	url	= (URL)urls.get(i);
+				if(url.getProtocol().equals("file"))
+				{
+					entries[i]	= SUtil.convertPathToRelative(url.getFile());
+				}
+				else
+				{
+					entries[i]	= url.toString();					
+				}
+			}
+		}
+		
+		Properties props	= new Properties();
+		for(int i=0; i<entries.length; i++)
+		{
+			props.addProperty(new Property("entry", entries[i]));
+		}
+		return new Future(props);		
 	}
 }
 
