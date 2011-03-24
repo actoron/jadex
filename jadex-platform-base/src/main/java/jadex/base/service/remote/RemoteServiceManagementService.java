@@ -387,10 +387,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		component.scheduleStep(new IComponentStep()
 		{
 			@XMLClassname("sendMessage")
-			public Object execute(IInternalAccess ia)
+			public Object execute(final IInternalAccess ia)
 			{
-				final RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)ia;
-				
 				final long timeout = to<=0? DEFAULT_TIMEOUT: to;
 				
 				putWaitingCall(callid, future);
@@ -403,14 +401,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //				msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
 				
 				SServiceProvider.getService(component.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(agent.createResultListener(new IResultListener()
+					.addResultListener(ia.createResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
 						final ILibraryService ls = (ILibraryService)result;
 						
 						SServiceProvider.getService(component.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(agent.createResultListener(new IResultListener()
+							.addResultListener(ia.createResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
@@ -429,7 +427,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 								
 								IMessageService ms = (IMessageService)result;
 								ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), ls.getClassLoader(), null)
-									.addResultListener(agent.createResultListener(new IResultListener()
+									.addResultListener(ia.createResultListener(new IResultListener()
 								{
 									public void resultAvailable(Object result)
 									{
@@ -437,7 +435,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 										component.scheduleStep(new IComponentStep()
 										{
 											@XMLClassname("oksent")
-											public Object execute(IInternalAccess ia)
+											public Object execute(final IInternalAccess ia)
 											{
 //												System.out.println("waitfor");
 												MicroAgent pa = (MicroAgent)ia;
@@ -452,13 +450,13 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 														future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+callid));
 														return null;
 													}
-												}).addResultListener(agent.createResultListener(new DefaultResultListener()
+												}).addResultListener(ia.createResultListener(new DefaultResultListener()
 												{
 													public void resultAvailable(Object result)
 													{
 														// cancel timer when future is finished before. 
 														final ITimer timer = (ITimer)result;
-														future.addResultListener(agent.createResultListener(new IResultListener()
+														future.addResultListener(ia.createResultListener(new IResultListener()
 														{
 															public void resultAvailable(Object result)
 															{

@@ -208,4 +208,10 @@ class ComponentAdapter implements IComponentAdapter
 	{
 		return Logger.getAnonymousLogger();
 	}
+
+	public Exception getException()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
