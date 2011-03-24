@@ -35,9 +35,10 @@ public interface ISettingsService extends IService
 	 *  Overwrites existing settings (if any).
 	 *  @param id 	A unique id to identify the properties (e.g. component or service name).
 	 *  @param properties 	The properties to set.
+	 *  @param save 	Save platform properties after setting.
 	 *  @return A future indicating when properties have been set.
 	 */
-	public IFuture	setProperties(String id, Properties props);
+	public IFuture	setProperties(String id, Properties props, boolean save);
 	
 	/**
 	 *  Get the properties for a given id.
@@ -45,4 +46,16 @@ public interface ISettingsService extends IService
 	 *  @return A future containing the properties (if any).
 	 */
 	public IFuture	getProperties(String id);
+	
+	/**
+	 *  Load the default platform properties.
+	 *  @return A future indicating when properties have been loaded.
+	 */
+	public IFuture	loadProperties();
+	
+	/**
+	 *  Save the platform properties to the default location.
+	 *  @return A future indicating when properties have been saved.
+	 */
+	public IFuture	saveProperties();
 }

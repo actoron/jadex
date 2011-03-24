@@ -496,7 +496,7 @@ public class StarterServicePanel extends JPanel
 						Properties	props	= new Properties();
 						props.addSubproperties("mpanel", (Properties)result);
 						props.addSubproperties("spanel", spanel.getProperties());
-						settings.setProperties("StarterServicePanel", props)
+						settings.setProperties("StarterServicePanel", props, true)
 							.addResultListener(new SwingDelegationResultListener(ret));
 					}
 				});

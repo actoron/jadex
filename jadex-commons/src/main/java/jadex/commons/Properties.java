@@ -1,6 +1,7 @@
 package jadex.commons;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -183,9 +184,9 @@ public class Properties
 	 *  Set the properties.
 	 *  @param properties The properties.
 	 */
-	public void setProperties(List properties)
+	public void setProperties(Property[] properties)
 	{
-		this.properties = properties;
+		this.properties = new ArrayList(Arrays.asList(properties));
 	}
 
 	/**
@@ -221,9 +222,9 @@ public class Properties
 	 *  Set the subproperties.
 	 *  @param subproperties The subproperties to set.
 	 */
-	public void setSubproperties(List subproperties)
+	public void setSubproperties(Properties[] subproperties)
 	{
-		this.subproperties = subproperties;
+		this.subproperties = new ArrayList(Arrays.asList(subproperties));
 	}
 
 	/**

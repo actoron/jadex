@@ -75,20 +75,15 @@ public class SettingsService extends BasicService implements ISettingsService
 	 */
 	public IFuture	startService()
 	{
-		// Read settings properties
-		try
+		final Future	ret	= new Future();
+		super.startService().addResultListener(new DelegationResultListener(ret)
 		{
-			// Todo: Which class loader to use? library service unavailable, because it depends on settings service?
-			FileInputStream fis = new FileInputStream(file);
-			props	= (Properties)PropertiesXMLHelper.getPropertyReader().read(fis, getClass().getClassLoader(), null);
-			fis.close();
-		}
-		catch(Exception e)
-		{
-			props	= new Properties();
-		}
-		
-		return super.startService();
+			public void customResultAvailable(Object result)
+			{
+				loadProperties().addResultListener(new DelegationResultListener(ret));
+			}
+		});
+		return ret;
 	}
 	
 	/**
@@ -97,21 +92,15 @@ public class SettingsService extends BasicService implements ISettingsService
 	 */
 	public IFuture	shutdownService()
 	{
-		// Save settings properties
-		try
+		final Future	ret	= new Future();
+		saveProperties().addResultListener(new DelegationResultListener(ret)
 		{
-			// Todo: Which class loader to use? library service unavailable, because it depends on settings service?
-			FileOutputStream os = new FileOutputStream(file);
-			PropertiesXMLHelper.getPropertyWriter().write(props, os, getClass().getClassLoader(), null);
-			os.close();
-		}
-		catch(Exception e)
-		{
-			System.out.println("Warning: Could not save settings: "+e);
-		}
-		
-		return super.shutdownService();
-
+			public void customResultAvailable(Object result)
+			{
+				SettingsService.super.shutdownService().addResultListener(new DelegationResultListener(ret));
+			}
+		});
+		return ret;
 	}
 	
 	//-------- ISettingsService interface --------
@@ -181,23 +170,36 @@ public class SettingsService extends BasicService implements ISettingsService
 	 *  Overwrites existing settings (if any).
 	 *  @param id 	A unique id to identify the properties (e.g. component or service name).
 	 *  @param properties 	The properties to set.
+	 *  @param save 	Save platform properties after setting.
 	 *  @return A future indicating when properties have been set.
 	 */
-	public IFuture	setProperties(String id, Properties props)
+	public IFuture	setProperties(final String id, final Properties props, boolean save)
 	{
-		Future	ret	= new Future();
+		final Future	ret	= new Future();
 		this.props.removeSubproperties(id);
 		this.props.addSubproperties(id, props);
 		
-		if(providers.containsKey(id))
-		{
-			((IPropertiesProvider)providers.get(id)).setProperties(props)
-				.addResultListener(new DelegationResultListener(ret));
-		}
+		IFuture	saved;
+		if(save)
+			saved	= saveProperties();
 		else
+			saved	= IFuture.DONE;
+		
+		saved.addResultListener(new DelegationResultListener(ret)
 		{
-			ret.setResult(null);
-		}
+			public void customResultAvailable(Object result)
+			{
+				if(providers.containsKey(id))
+				{
+					((IPropertiesProvider)providers.get(id)).setProperties(props)
+						.addResultListener(new DelegationResultListener(ret));
+				}
+				else
+				{
+					ret.setResult(null);
+				}
+			}
+		});
 		return ret;
 	}
 	
@@ -209,5 +211,47 @@ public class SettingsService extends BasicService implements ISettingsService
 	public IFuture	getProperties(String id)
 	{
 		return new Future(props.getSubproperty(id));
+	}
+	
+	
+	/**
+	 *  Load the default platform properties.
+	 *  @return A future indicating when properties have been loaded.
+	 */
+	public IFuture	loadProperties()
+	{
+		try
+		{
+			// Todo: Which class loader to use? library service unavailable, because it depends on settings service?
+			FileInputStream fis = new FileInputStream(file);
+			props	= (Properties)PropertiesXMLHelper.getPropertyReader().read(fis, getClass().getClassLoader(), null);
+			fis.close();
+		}
+		catch(Exception e)
+		{
+			props	= new Properties();
+		}
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Save the platform properties to the default location.
+	 *  @return A future indicating when properties have been saved.
+	 */
+	public IFuture	saveProperties()
+	{
+		try
+		{
+			// Todo: Which class loader to use? library service unavailable, because it depends on settings service?
+			FileOutputStream os = new FileOutputStream(file);
+			PropertiesXMLHelper.getPropertyWriter().write(props, os, getClass().getClassLoader(), null);
+			os.close();
+		}
+		catch(Exception e)
+		{
+			System.out.println("Warning: Could not save settings: "+e);
+		}
+		
+		return IFuture.DONE;
 	}
 }
