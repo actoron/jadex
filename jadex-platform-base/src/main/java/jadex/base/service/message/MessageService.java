@@ -800,7 +800,7 @@ public class MessageService extends BasicService implements IMessageService
 				for(int i = 0; i < receivers.length; i++)
 				{
 //					final int cnt = i; 
-					AbstractComponentAdapter component = (AbstractComponentAdapter)((ComponentManagementService)cms).getComponentAdapter(receivers[i]);
+					AbstractComponentAdapter component = (AbstractComponentAdapter)cms.getComponentAdapter(receivers[i]);
 					if(component != null)
 					{
 						ClassLoader cl = component.getComponentInstance().getClassLoader();

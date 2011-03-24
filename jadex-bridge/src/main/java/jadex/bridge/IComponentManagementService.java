@@ -187,4 +187,12 @@ public interface IComponentManagementService extends IService
 	* @return The search constraints.
 	*/
 	public ISearchConstraints createSearchConstraints(int maxresults, int maxdepth);
+	
+	/**
+	 *  Get the component adapter for a component identifier.
+	 *  @param aid The component identifier.
+	 *  @param listener The result listener.
+	 */
+    // Todo: Hack!!! remove
+	public IComponentAdapter getComponentAdapter(IComponentIdentifier cid);
 }

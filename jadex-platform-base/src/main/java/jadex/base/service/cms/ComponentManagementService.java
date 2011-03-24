@@ -1493,9 +1493,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param listener The result listener.
 	 */
     // Todo: Hack!!! remove?
-	public AbstractComponentAdapter getComponentAdapter(IComponentIdentifier cid)
+	public IComponentAdapter getComponentAdapter(IComponentIdentifier cid)
 	{
-		return (AbstractComponentAdapter)adapters.get(cid);
+		return (IComponentAdapter)adapters.get(cid);
 	}
 
 	//-------- parent/child component accessors --------
