@@ -11,12 +11,12 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
-import jadex.commons.IRemotable;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IRemoteResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.future.SwingDelegationResultListener;
@@ -1155,7 +1155,7 @@ public class TestCenterPanel extends JSplitPane
 		/**
 		 *  Callback result listener for (local or remote) test results.
 		 */
-		public class TestResultListener		implements IResultListener, IRemotable
+		public class TestResultListener		implements IRemoteResultListener
 		{
 			//-------- attributes --------
 			
