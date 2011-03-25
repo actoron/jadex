@@ -13,8 +13,6 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -27,8 +25,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.EventObject;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageTypeSpecifier;
@@ -538,41 +538,67 @@ public class SGUI
 		}
 		throw ioe;
 	}
+	
+	/** Lookup table for divider locations (split->Integer).*/
+	protected static Map	locations;
 
 	/**
 	 *  Set a split location.
-	 *  Delays the call until the component is visible.
+	 *  Delays the call until the component is valid.
 	 */
-	public static void setDividerLocation(final JSplitPane split, final int loc)
+	public static void setDividerLocation(final JSplitPane split, int loc)
 	{
-		System.out.println("setDividerLocation queued: "+loc+", @"+split.hashCode());
-		if(split.isVisible())
+		assert SwingUtilities.isEventDispatchThread();
+		
+		// Set direct.
+		if(split.isValid())
 		{
-			SwingUtilities.invokeLater(new Runnable()
+//			System.out.println("setDividerLocation: "+loc+", @"+split.hashCode());
+			split.setDividerLocation(loc);
+			if(locations!=null)
 			{
-				public void run()
+				locations.remove(split);
+				if(locations.isEmpty())
 				{
-					System.out.println("setDividerLocation: "+loc+", @"+split.hashCode());
-					split.setDividerLocation(loc);
+					locations	= null;
 				}
-			});
+			}
 		}
+		
+		// Wait until valid.
 		else
 		{
-			split.addComponentListener(new ComponentAdapter()
+			// Already queued
+			if(locations!=null && locations.containsKey(split))
 			{
-				public void componentShown(ComponentEvent e)
+//				System.out.println("setDividerLocation updated: "+loc+", @"+split.hashCode());
+				locations.put(split, new Integer(loc));
+			}
+			
+			// First time call.
+			else
+			{
+				split.validate();
+//				System.out.println("setDividerLocation queued: "+loc+", @"+split.hashCode());
+				if(locations==null)
+					locations	= new HashMap();
+				locations.put(split, new Integer(loc));
+				SwingUtilities.invokeLater(new Runnable()
 				{
-					SwingUtilities.invokeLater(new Runnable()
+					public void run()
 					{
-						public void run()
+						if(locations!=null && locations.containsKey(split))
 						{
-							System.out.println("setDividerLocation: "+loc+", @"+split.hashCode());
-							split.setDividerLocation(loc);
+							int	loc	= ((Integer)locations.remove(split)).intValue();
+							if(locations.isEmpty())
+							{
+								locations	= null;
+							}
+							setDividerLocation(split, loc);
 						}
-					});
-				}
-			});
+					}
+				});
+			}
 		}
 	}
 }
