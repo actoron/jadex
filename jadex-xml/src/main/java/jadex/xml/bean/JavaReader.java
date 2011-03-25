@@ -167,15 +167,28 @@ public class JavaReader extends Reader
 			typeinfos.add(ti_emptymap);
 			
 			// java.util.UnmodifyableSet
-			TypeInfo ti_unset = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Collections-UnmodifyableSet")}), new ObjectInfo(HashSet.class));
+			TypeInfo ti_unset = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Collections-UnmodifyableSet")}),
+				new ObjectInfo(HashSet.class), new MappingInfo(null, new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo("entries", null, null, null,
+				new BeanAccessInfo(Set.class.getMethod("add", new Class[]{Object.class}), null)))
+			}));
 			typeinfos.add(ti_unset);
-			
+				
 			// java.util.UnmodifyableList
-			TypeInfo ti_unlist = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Collections-UnmodifyableList")}), new ObjectInfo(ArrayList.class));
+			TypeInfo ti_unlist = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Collections-UnmodifyableList")}),
+				new ObjectInfo(ArrayList.class), new MappingInfo(null, new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo("entries", null, null, null, 
+				new BeanAccessInfo(List.class.getMethod("add", new Class[]{Object.class}), null)))
+			}));
 			typeinfos.add(ti_unlist);
 			
 			// java.util.UnmodifyableMap
-			TypeInfo ti_unmap = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Collections-UnmodifyableMap")}), new ObjectInfo(HashMap.class));
+			TypeInfo ti_unmap = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Collections-UnmodifyableMap")}),
+				new ObjectInfo(HashMap.class), new MappingInfo(null, new SubobjectInfo[]{
+				new SubobjectInfo(new XMLInfo("entry"), new AccessInfo("entry", null, null, null,  
+					new BeanAccessInfo(Map.class.getMethod("put", new Class[]{Object.class, Object.class}), null, "", MapEntry.class.getMethod("getKey", new Class[0]))), 
+				new SubObjectConverter(entryconv, null), true, null)
+			}));
 			typeinfos.add(ti_unmap);
 			
 			// java.util.Color

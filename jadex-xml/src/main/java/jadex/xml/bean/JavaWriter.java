@@ -20,6 +20,7 @@ import java.awt.Color;
 import java.awt.Image;
 import java.net.InetAddress;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -124,6 +125,14 @@ public class JavaWriter extends Writer
 			}));
 			typeinfos.add(ti_array);
 			
+			// java.util.UnmodifyableSet
+			// java.util.UnmodifyableList
+//			TypeInfo ti_unlist = new TypeInfo(null, new ObjectInfo(Collections.UnmodifiableList.class), new MappingInfo(null,
+//				new SubobjectInfo[]{
+//				new SubobjectInfo(new AccessInfo("entries", AccessInfo.THIS), null, true)
+//			}));
+//			typeinfos.add(ti_unlist);
+			// java.util.UnmodifyableMap
 			
 			
 			// java.util.Color
