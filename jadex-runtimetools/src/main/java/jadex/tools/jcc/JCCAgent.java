@@ -15,6 +15,7 @@ import jadex.tools.dfbrowser.DFServicePlugin;
 import jadex.tools.libtool.LibraryServicePlugin;
 import jadex.tools.simcenter.SimCenterPlugin;
 import jadex.tools.starter.StarterServicePlugin;
+import jadex.tools.testcenter.TestCenterPlugin;
 
 /**
  *  Micro component for opening the JCC gui.
@@ -36,7 +37,7 @@ public class JCCAgent extends MicroAgent
 				DFServicePlugin.class.getName(),
 				ConversationPlugin.class.getName(),
 				ComanalyzerPlugin.class.getName(),
-//				TestCenterPlugin.class.getName(),
+				TestCenterPlugin.class.getName(),
 //				JadexdocPlugin.class.getName(),
 				SimCenterPlugin.class.getName(),
 				DebuggerPlugin.class.getName(),

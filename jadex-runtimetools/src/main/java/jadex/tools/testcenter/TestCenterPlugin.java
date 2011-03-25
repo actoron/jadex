@@ -1,7 +1,16 @@
 package jadex.tools.testcenter;
 
-import jadex.base.SComponentFactory;
+import jadex.base.gui.filetree.FileNode;
+import jadex.base.gui.filetree.IFileNode;
+import jadex.base.gui.filetree.RefreshAction;
+import jadex.base.gui.modeltree.AddPathAction;
+import jadex.base.gui.modeltree.AddRemotePathAction;
+import jadex.base.gui.modeltree.ModelTreePanel;
+import jadex.base.gui.modeltree.RemovePathAction;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
+import jadex.bridge.ISettingsService;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.collection.SCollection;
@@ -9,27 +18,17 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.future.SwingDelegationResultListener;
-import jadex.commons.gui.PopupBuilder;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
-import jadex.tools.common.modeltree.DirNode;
-import jadex.tools.common.modeltree.FileNode;
-import jadex.tools.common.modeltree.IExplorerTreeNode;
-import jadex.tools.common.modeltree.ModelExplorer;
-import jadex.tools.common.modeltree.ModelExplorerTreeModel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.List;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
-import javax.swing.JMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
@@ -62,26 +61,15 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	//-------- attributes --------
 
 	/** The node functionality. */
-	protected TestCenterNodeFunctionality	nof;
+	protected STestCenter	nof;
 
 	/** The panel showing the classpath models. */
-	protected ModelExplorer mpanel;
+	protected ModelTreePanel	mpanel;
 
-	/** The menu item for enabling/disabling agent model checking. */
-	private JCheckBoxMenuItem	checkingmenu;
-	
 	/** The test center panel. */
 	protected TestCenterPanel tcpanel;
 
 	//-------- methods --------
-
-	/**
-	 * Return the model explorer.
-	 */
-	protected ModelExplorer	getModelExplorer()
-	{
-		return mpanel;
-	}
 
 	/**
 	 * Return the unique name of this plugin. Used e.g. to store properties of
@@ -117,26 +105,47 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		JComponent[] ret = new JComponent[6];
 		JButton b;
 
-		b = new JButton(mpanel.ADD_PATH);
+		b = new JButton(new ToolTipAction(AddPathAction.getName(), 
+			AddPathAction.getIcon(), AddPathAction.getTooltipText())
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if(mpanel.isRemote())
+				{
+					mpanel.getAction(AddRemotePathAction.getName()).actionPerformed(e);
+				}
+				else
+				{
+					mpanel.getAction(AddPathAction.getName()).actionPerformed(e);
+				}
+			}
+		});
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
 		ret[0] = b;
 
-		b = new JButton(mpanel.REMOVE_PATH);
+		b = new JButton(new RemovePathAction(mpanel));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
 		ret[1] = b;
 
-		b = new JButton(mpanel.REFRESH);
+		b = new JButton(new RefreshAction(mpanel.getTree()));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
 		ret[2] = b;
+//		
+//		b = new JButton(new RefreshSubtreeAction(mpanel.getTree()));
+//		b.setBorder(null);
+//		b.setToolTipText(b.getText());
+//		b.setText(null);
+//		b.setEnabled(true);
+//		ret[3] = b;
 		
 		JSeparator	separator	= new JToolBar.Separator();
 		separator.setOrientation(JSeparator.VERTICAL);
@@ -159,26 +168,26 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		return ret;
 	}
 	
-	/**
-	 *  Create menu bar.
-	 *  @return The menu bar.
-	 */
-	public JMenu[] createMenuBar()
-	{
-		JMenu[]	menu	= mpanel.createMenuBar();
-		this.checkingmenu = new JCheckBoxMenuItem(TOGGLE_CHECKING);
-		this.checkingmenu.setSelected(true);	// Default: on
-		menu[0].insert(checkingmenu, 1);	// Hack??? Should not assume position.
-		return menu;
-	}
+//	/**
+//	 *  Create menu bar.
+//	 *  @return The menu bar.
+//	 */
+//	public JMenu[] createMenuBar()
+//	{
+//		JMenu[]	menu	= mpanel.createMenuBar();
+//		this.checkingmenu = new JCheckBoxMenuItem(TOGGLE_CHECKING);
+//		this.checkingmenu.setSelected(true);	// Default: on
+//		menu[0].insert(checkingmenu, 1);	// Hack??? Should not assume position.
+//		return menu;
+//	}
 	
-	/**
-	 *  Get the checking menu.
-	 */
-	protected JCheckBoxMenuItem getCheckingMenu()
-	{
-		return checkingmenu;
-	}
+//	/**
+//	 *  Get the checking menu.
+//	 */
+//	protected JCheckBoxMenuItem getCheckingMenu()
+//	{
+//		return checkingmenu;
+//	}
 	
 	/**
 	 *  Create main panel.
@@ -205,10 +214,10 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 //			}
 //		});
 
-		nof	= new TestCenterNodeFunctionality(this);
-		mpanel = new ModelExplorer(getJCC().getExternalAccess(), nof);
-		mpanel.setPopupBuilder(new PopupBuilder(new Object[]{mpanel.ADD_PATH, mpanel.REMOVE_PATH, mpanel.REFRESH,
-			ADD_TESTCASE, ADD_TESTCASES, REMOVE_TESTCASE, REMOVE_TESTCASES}));
+		mpanel = new ModelTreePanel(getJCC().getPlatformAccess(), !getJCC().getJCCAccess().getComponentIdentifier().getPlatformName()
+			.equals(getJCC().getPlatformAccess().getComponentIdentifier().getPlatformName()));
+//		mpanel.setPopupBuilder(new PopupBuilder(new Object[]{mpanel.ADD_PATH, mpanel.REMOVE_PATH, mpanel.REFRESH,
+//			ADD_TESTCASE, ADD_TESTCASES, REMOVE_TESTCASE, REMOVE_TESTCASES}));
 
 //		mpanel.addTreeSelectionListener(new TreeSelectionListener()
 //		{
@@ -232,12 +241,12 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 				if(e.getClickCount()==2)
 				{
 					//TreePath	path	= mpanel.getPathForLocation(e.getX(), e.getY());
-					Object	node = mpanel.getLastSelectedPathComponent();
+					Object	node = mpanel.getTree().getLastSelectedPathComponent();
 					if(node instanceof FileNode)
 					{
 						final String model = ((FileNode)node).getRelativePath();
-//						if(SXML.isAgentFilename(model))
-						SComponentFactory.isStartable(getJCC().getExternalAccess(), model).addResultListener(new SwingDefaultResultListener(mpanel)
+						STestCenter.isTestcase(model, getJCC().getPlatformAccess())
+							.addResultListener(new SwingDefaultResultListener(mpanel)
 						{
 							public void customResultAvailable(Object result)
 							{
@@ -275,25 +284,105 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	}
 	
 	/**
+	 *  Load and apply the platform properties.
+	 */
+	public IFuture loadPlatformProperties()
+	{
+		final Future	ret	= new Future();
+		SServiceProvider.getService(getJCC().getPlatformAccess().getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new SwingDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result) throws Exception
+			{
+				ISettingsService	settings	= (ISettingsService)result;
+				settings.getProperties("TestCenterPlugin")
+					.addResultListener(new SwingDelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result) throws Exception
+					{
+						if(result!=null)
+						{
+							final Properties	props	= (Properties)result;
+							mpanel.setProperties(props.getSubproperty("mpanel"))
+								.addResultListener(new SwingDelegationResultListener(ret)
+							{
+								public void customResultAvailable(Object result) throws Exception
+								{
+									tcpanel.setProperties(props.getSubproperty("tcpanel"))
+										.addResultListener(new SwingDelegationResultListener(ret));
+								}
+							});
+						}
+						else
+						{
+							ret.setResult(null);
+						}
+					}
+				});
+			}
+			
+			public void customExceptionOccurred(Exception exception)
+			{
+				// No settings service: ignore.
+				ret.setResult(null);
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Save the platform properties.
+	 */
+	public IFuture	savePlatformProperties()
+	{
+		final Future	ret	= new Future();
+		SServiceProvider.getService(getJCC().getPlatformAccess().getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new SwingDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result) throws Exception
+			{
+				final ISettingsService	settings	= (ISettingsService)result;
+				mpanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						final Properties	props	= new Properties();
+						props.addSubproperties("mpanel", (Properties)result);
+						tcpanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+						{
+							public void customResultAvailable(Object result)
+							{
+								props.addSubproperties("tcpanel", (Properties)result);
+								settings.setProperties("TestCenterPlugin", props, true)
+									.addResultListener(new SwingDelegationResultListener(ret));
+							}
+						});
+					}
+				});
+			}
+			
+			public void customExceptionOccurred(Exception exception)
+			{
+				// No settings service: ignore.
+				ret.setResult(null);
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
 	 * Load the properties.
 	 * @param props
 	 */
 	public IFuture setProperties(Properties props)
 	{
-		Properties	mpanelprops	= props.getSubproperty("modelpanel");
-		if(mpanelprops!=null)
-			mpanel.setProperties(mpanelprops);
-		Properties	tcpanelprops = props.getSubproperty("testspanel");
-		if(tcpanelprops!=null)
-			tcpanel.setProperties(tcpanelprops);
-
 		if(props.getProperty("mainsplit_location")!=null);
 			((JSplitPane)getView()).setDividerLocation(props.getIntProperty("mainsplit_location"));
 		if(props.getProperty("tcsplit_location")!=null);
 			tcpanel.setDividerLocation(props.getIntProperty("tcsplit_location"));
 
-		checkingmenu.setSelected(props.getBooleanProperty("checking"));
-		
 		return IFuture.DONE;
 	}
 
@@ -303,87 +392,44 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	 */
 	public IFuture getProperties()
 	{
-		final Future ret = new Future();
-		
-		mpanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				Properties	props	= new Properties();
-				addSubproperties(props, "modelpanel", (Properties)result);
-				addSubproperties(props, "testspanel", tcpanel.getProperties());
-
-				props.addProperty(new Property("mainsplit_location", Integer.toString(((JSplitPane)getView()).getDividerLocation())));
-				props.addProperty(new Property("tcsplit_location", Integer.toString(tcpanel.getDividerLocation())));
-				
-				props.addProperty(new Property("checking", ""+checkingmenu.isSelected()));
-				
-				ret.setResult(props);
-			}
-		});
-	
-		return ret;
-	}
-
-	/**
-	 * @see jadex.base.gui.plugin.IControlCenterPlugin#reset()
-	 */
-	public void reset()
-	{
-		mpanel.reset();
-		tcpanel.reset();
-		this.checkingmenu.setSelected(true);	// Default: on
+		Properties	props	= new Properties();
+		props.addProperty(new Property("mainsplit_location", Integer.toString(((JSplitPane)getView()).getDividerLocation())));
+		props.addProperty(new Property("tcsplit_location", Integer.toString(tcpanel.getDividerLocation())));
+		return new Future(props);
 	}
 	
 	/**
 	 *  Add testcases for a file or directory recusively.
 	 *  @param node The file/dir node to start.
 	 */
-	protected void addTestcases(final IExplorerTreeNode node)
+	protected void addTestcases(IFileNode node)
 	{
-		if(node instanceof DirNode)
+		java.util.List nodes = SCollection.createArrayList();
+		nodes.add(node);
+		while(nodes.size()>0)
 		{
-			java.util.List nodes = SCollection.createArrayList();
-			nodes.add(node);
-			while(nodes.size()>0)
+			node	= (IFileNode)nodes.remove(0);
+			if(node.isDirectory())
 			{
-				final IExplorerTreeNode n = (IExplorerTreeNode)nodes.remove(0);
-				List	lchildren	= nof.getChildren((FileNode)n);
-				for(int j=0; lchildren!=null && j<lchildren.size(); j++)
-					nodes.add(lchildren.get(j));
-					
-				if(n instanceof FileNode && !(n instanceof DirNode))
+				for(int i=0; i<node.getChildCount(); i++)
 				{
-					final String model = ((FileNode)n).getRelativePath();
-					SComponentFactory.isStartable(getJCC().getExternalAccess(), model).addResultListener(new SwingDefaultResultListener(mpanel)
-					{
-						public void customResultAvailable(Object result)
-						{
-							if(((Boolean)result).booleanValue()
-								&& nof.isTestcase((IExplorerTreeNode) n))
-							{
-								tcpanel.getTestList().addEntry(model);
-							}
-						}
-					});
+					nodes.add(node.getChild(i));
 				}
 			}
-		}
-		else
-		{
-			final String model = ((FileNode)node).getRelativePath();
-//			if(SXML.isAgentFilename(model) && ((FileNode)node).isValid())
-			SComponentFactory.isStartable(getJCC().getExternalAccess(), model).addResultListener(new SwingDefaultResultListener(mpanel)
+			else
 			{
-				public void customResultAvailable(Object result)
+				final String model = node.getFileName();
+				STestCenter.isTestcase(model, getJCC().getPlatformAccess()).addResultListener(new SwingDefaultResultListener(mpanel)
 				{
-					if(((Boolean)result).booleanValue()
-						&& nof.isTestcase((IExplorerTreeNode)node))
+					public void customResultAvailable(Object result)
 					{
-						tcpanel.getTestList().addEntry(model);
+						if(((Boolean)result).booleanValue())
+						{
+							tcpanel.getTestList().addEntry(model);
+						}
 					}
-				}
-			});
+				});
+			}
 		}
 	}
 	
@@ -391,29 +437,24 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	 *  Remove testcases for a file or directory recusively.
 	 *  @param node The file/dir node to start.
 	 */
-	protected void removeTestcases(IExplorerTreeNode node)
+	protected void removeTestcases(IFileNode node)
 	{
-		if(node instanceof FileNode)
+		java.util.List nodes = SCollection.createArrayList();
+		nodes.add(node);
+		while(nodes.size()>0)
 		{
-			String model = ((FileNode)node).getRelativePath();
-			tcpanel.getTestList().removeEntry(model);
-		}
-		else
-		{
-			java.util.List nodes = SCollection.createArrayList();
-			nodes.add(node);
-			while(nodes.size()>0)
+			node	= (IFileNode)nodes.remove(0);
+			if(node.isDirectory())
 			{
-				IExplorerTreeNode n = (IExplorerTreeNode)nodes.remove(0);
-				List	lchildren	= nof.getChildren((FileNode)n);
-				for(int j=0; lchildren!=null && j<lchildren.size(); j++)
-					nodes.add(lchildren.get(j));
-					
-				if(n instanceof FileNode)
+				for(int i=0; i<node.getChildCount(); i++)
 				{
-					String model = ((FileNode)n).getRelativePath();
-					tcpanel.getTestList().removeEntry(model);
+					nodes.add(node.getChild(i));
 				}
+			}
+			else
+			{
+				String model = node.getFileName();
+				tcpanel.getTestList().removeEntry(model);
 			}
 		}
 	}
@@ -425,7 +466,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
+			IFileNode node = (IFileNode)mpanel.getTree().getLastSelectedPathComponent();
 			addTestcases(node);
 		}
 
@@ -435,8 +476,8 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		 */
 		public boolean isEnabled()
 		{
-			IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
-			return node!=null && !(node instanceof DirNode) /*&& ((FileNode)node).isValid()*/;
+			IFileNode node = (IFileNode)mpanel.getTree().getLastSelectedPathComponent();
+			return node!=null && !node.isDirectory();
 		}
 	};
 	
@@ -447,7 +488,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
+			IFileNode node = (IFileNode)mpanel.getTree().getLastSelectedPathComponent();
 			if(node!=null)
 				addTestcases(node);
 		}
@@ -458,7 +499,8 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		 */
 		public boolean isEnabled()
 		{
-			return mpanel.getLastSelectedPathComponent() instanceof DirNode;
+			IFileNode node = (IFileNode)mpanel.getTree().getLastSelectedPathComponent();
+			return node!=null && node.isDirectory();
 		}
 	};
 	
@@ -469,7 +511,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
+			IFileNode node = (IFileNode)mpanel.getTree().getLastSelectedPathComponent();
 			removeTestcases(node);
 		}
 
@@ -479,8 +521,8 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		 */
 		public boolean isEnabled()
 		{
-			IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
-			return node!=null && !(node instanceof DirNode) /*&& ((FileNode)node).isValid() */;
+			IFileNode node = (IFileNode)mpanel.getTree().getLastSelectedPathComponent();
+			return node!=null && !node.isDirectory();
 		}
 	};
 	
@@ -491,7 +533,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
+			IFileNode node = (IFileNode)mpanel.getTree().getLastSelectedPathComponent();
 			if(node!=null)
 				removeTestcases(node);
 		}
@@ -502,20 +544,8 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		 */
 		public boolean isEnabled()
 		{
-			return mpanel.getLastSelectedPathComponent() instanceof DirNode;
-		}
-	};
-
-	
-	/**
-	 *  The action for changing integrity checking settings.
-	 */
-	public final AbstractAction TOGGLE_CHECKING = new AbstractAction("Auto find tests", (Icon) icons.get("test_small"))
-	{
-		public void actionPerformed(ActionEvent e)
-		{
-			((ModelExplorerTreeModel)getModelExplorer().getModel())
-				.fireTreeStructureChanged(getModelExplorer().getRootNode());
+			IFileNode node = (IFileNode)mpanel.getTree().getLastSelectedPathComponent();
+			return node!=null && node.isDirectory();
 		}
 	};
 }

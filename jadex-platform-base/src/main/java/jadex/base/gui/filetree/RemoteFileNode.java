@@ -12,7 +12,7 @@ import javax.swing.JTree;
 /**
  *  The remote file node.
  */
-public class RemoteFileNode  extends AbstractTreeNode
+public class RemoteFileNode  extends AbstractTreeNode	implements IFileNode
 {
 	//-------- attributes --------
 	
@@ -98,6 +98,22 @@ public class RemoteFileNode  extends AbstractTreeNode
 	 */
 	protected void	searchChildren()
 	{
+	}
+	
+	/**
+	 *  Get the file name.
+	 */
+	public String	getFileName()
+	{
+		return file.getFilename();
+	}
+	
+	/**
+	 *  Check if the file is a directory. 
+	 */
+	public boolean	isDirectory()
+	{
+		return file.isDirectory();
 	}
 	
 	//-------- methods --------

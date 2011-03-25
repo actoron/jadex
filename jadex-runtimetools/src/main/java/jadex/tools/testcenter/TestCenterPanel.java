@@ -6,6 +6,8 @@ import jadex.base.test.Testcase;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
@@ -13,8 +15,8 @@ import jadex.commons.IRemotable;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.future.SwingDelegationResultListener;
@@ -22,6 +24,7 @@ import jadex.commons.gui.BrowserPane;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ScrollablePanel;
+import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -282,7 +285,7 @@ public class TestCenterPanel extends JSplitPane
 				if(loadsavechooser.showDialog(SGUI.getWindowParent(TestCenterPanel.this)
 					, "Save")==JFileChooser.APPROVE_OPTION)
 				{
-					SServiceProvider.getService(plugin.getJCC().getExternalAccess().getServiceProvider(),
+					SServiceProvider.getService(plugin.getJCC().getJCCAccess().getServiceProvider(),
 						ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
 					{
 						public void customResultAvailable(Object result)
@@ -319,7 +322,7 @@ public class TestCenterPanel extends JSplitPane
 				if(loadsavechooser.showDialog(SGUI.getWindowParent(TestCenterPanel.this)
 					, "Load")==JFileChooser.APPROVE_OPTION)
 				{
-					SServiceProvider.getServiceUpwards(plugin.getJCC().getExternalAccess().getServiceProvider(),
+					SServiceProvider.getServiceUpwards(plugin.getJCC().getJCCAccess().getServiceProvider(),
 						ILibraryService.class).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
 					{
 						public void customResultAvailable(Object result) 
@@ -450,7 +453,7 @@ public class TestCenterPanel extends JSplitPane
 	/**
 	 * Load the properties.
 	 */
-	public void setProperties(Properties props)
+	public IFuture	setProperties(Properties props)
 	{
 		// Load settings into fresh state.
 		reset();
@@ -482,26 +485,47 @@ public class TestCenterPanel extends JSplitPane
 			else
 				tfpar.getModel().setSelectedItem(""+concurrency);
 		}
+		
+		return IFuture.DONE;
 	}
 
 	/**
 	 * Save the properties.
 	 */
-	public Properties getProperties()
+	public IFuture	getProperties()
 	{
-		Properties	props	= new Properties();
-		String[]	entries	= teststable.getEntries();
-		for(int i=0; i<entries.length; i++)
-		{
-			String	entry	= SUtil.convertPathToRelative(entries[i]);
-			props.addProperty(new Property("entry", entry));
-		}
-
-		props.addProperty(new Property("timeout", tfto.getText()));
-		props.addProperty(new Property("concurrency", ""+concurrency));
-		props.addProperty(new Property("allowduplicates", ""+allowduplicates.isSelected()));
+		final Future ret	= new Future();
 		
-		return props;
+		final String[]	entries	= teststable.getEntries();
+		plugin.getJCC().getPlatformAccess().scheduleStep(new IComponentStep()
+		{
+			@XMLClassname("convertPathToRelative")
+			public Object execute(IInternalAccess ia)
+			{
+				for(int i=0; i<entries.length; i++)
+				{
+					entries[i]	= SUtil.convertPathToRelative(entries[i]);
+				}
+				return entries;
+			}
+		}).addResultListener(new SwingDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result) throws Exception
+			{
+				String[]	entries	= (String[])result;
+				for(int i=0; i<entries.length; i++)
+				{
+					Properties	props	= new Properties();
+					props.addProperty(new Property("entry", entries[i]));
+					props.addProperty(new Property("timeout", tfto.getText()));
+					props.addProperty(new Property("concurrency", ""+concurrency));
+					props.addProperty(new Property("allowduplicates", ""+allowduplicates.isSelected()));
+					ret.setResult(props);
+				}
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**

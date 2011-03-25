@@ -14,10 +14,8 @@ import jadex.commons.future.SwingDefaultResultListener;
 import java.io.File;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;

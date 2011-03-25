@@ -553,7 +553,7 @@ public class SGUI
 		// Set direct.
 		if(split.isValid())
 		{
-//			System.out.println("setDividerLocation: "+loc+", @"+split.hashCode());
+			System.out.println("setDividerLocation: "+loc+", @"+split.hashCode());
 			split.setDividerLocation(loc);
 			if(locations!=null)
 			{
@@ -571,7 +571,7 @@ public class SGUI
 			// Already queued
 			if(locations!=null && locations.containsKey(split))
 			{
-//				System.out.println("setDividerLocation updated: "+loc+", @"+split.hashCode());
+				System.out.println("setDividerLocation updated: "+loc+", @"+split.hashCode());
 				locations.put(split, new Integer(loc));
 			}
 			
@@ -579,7 +579,7 @@ public class SGUI
 			else
 			{
 				split.validate();
-//				System.out.println("setDividerLocation queued: "+loc+", @"+split.hashCode());
+				System.out.println("setDividerLocation queued: "+loc+", @"+split.hashCode());
 				if(locations==null)
 					locations	= new HashMap();
 				locations.put(split, new Integer(loc));

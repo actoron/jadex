@@ -16,7 +16,7 @@ import javax.swing.filechooser.FileSystemView;
 /**
  *  Node object representing a service container.
  */
-public class FileNode	extends AbstractTreeNode
+public class FileNode	extends AbstractTreeNode	implements IFileNode
 {
 	//-------- attributes --------
 	
@@ -190,4 +190,20 @@ public class FileNode	extends AbstractTreeNode
 		return true;
 	}
 	
+	
+	/**
+	 *  Get the file name.
+	 */
+	public String	getFileName()
+	{
+		return file.getAbsolutePath();
+	}
+	
+	/**
+	 *  Check if the file is a directory. 
+	 */
+	public boolean	isDirectory()
+	{
+		return file.isDirectory();
+	}
 }
