@@ -11,36 +11,22 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *  Delegates a service call to another service provider.
+ *  
+ *  Used e.g. for provided services with binding i.e. delegation. 
  */
-public class DelegationServiceInvocationInterceptor implements IServiceInvocationInterceptor
+public class DelegationServiceInvocationInterceptor extends AbstractMultiInterceptor
 {
-	protected static Set DEFAULT_NA;
+	//-------- constants --------
 	
-	static
-	{
-		try
-		{
-			DEFAULT_NA = new HashSet();
-			DEFAULT_NA.add(IInternalService.class.getMethod("getServiceIdentifier", new Class[0]));
-			DEFAULT_NA.add(IInternalService.class.getMethod("getPropertyMap", new Class[0]));
-			DEFAULT_NA.add(IInternalService.class.getMethod("signalStarted", new Class[0]));
-			DEFAULT_NA.add(IInternalService.class.getMethod("startService", new Class[0]));
-			DEFAULT_NA.add(IInternalService.class.getMethod("shutdownService", new Class[0]));
-			DEFAULT_NA.add(IInternalService.class.getMethod("isValid", new Class[0]));
-			DEFAULT_NA.add(Object.class.getMethod("toString", new Class[0]));
-			DEFAULT_NA.add(Object.class.getMethod("equals", new Class[]{Object.class}));
-			DEFAULT_NA.add(Object.class.getMethod("hashCode", new Class[0]));
-		}
-		catch(Exception e)
-		{
-			// cannot happen
-		}
-	}
+	/** The static map of subinterceptors (method -> interceptor). */
+	protected static Map SUBINTERCEPTORS = getInterceptors();
 	
 	//-------- attributes --------
 	
@@ -56,9 +42,6 @@ public class DelegationServiceInvocationInterceptor implements IServiceInvocatio
 	/** The service fetcher. */
 	protected IRequiredServiceFetcher fetcher;
 
-	/** The set of non-applicable methods. */
-	protected Set na;
-	
 	//-------- constructors --------
 	
 	/**
@@ -79,7 +62,7 @@ public class DelegationServiceInvocationInterceptor implements IServiceInvocatio
 	 *  @param args The argument(s) for the call.
 	 *  @return The result of the command.
 	 */
-	public IFuture execute(final ServiceInvocationContext sic) 	
+	public IFuture doExecute(final ServiceInvocationContext sic) 	
 	{
 		Future ret = new Future(); 
 //		System.out.println("Invoked: "+method.getName());
@@ -125,18 +108,8 @@ public class DelegationServiceInvocationInterceptor implements IServiceInvocatio
 		}).addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
-//		sic.setResult(ret);
 	}
 
-	/**
-	 *  Test if the interceptor is applicable.
-	 *  @return True, if applicable.
-	 */
-	public boolean isApplicable(ServiceInvocationContext context)
-	{
-		return !na.contains(context.getMethod());
-	}
-	
 	/**
 	 *  Get the ea.
 	 *  @return the ea.
@@ -145,117 +118,116 @@ public class DelegationServiceInvocationInterceptor implements IServiceInvocatio
 	{
 		return ea;
 	}
-
-//	/**
-//	 *  Get the standard interceptors for composite service proxies.
-//	 */
-//	public static MultiCollection getInterceptors()
-//	{
-//		MultiCollection ret = new MultiCollection();
-//		try
-//		{
-//			ret.put(IInternalService.class.getMethod("getServiceIdentifier", new Class[0]), new IServiceInvocationInterceptor()
-//			{
-//				public IFuture execute(ServiceInvocationContext context)
-//				{
-//					Object proxy = context.getObject();
-//					BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(proxy);
-//					context.setResult(handler.getServiceIdentifier());
-//					return IFuture.DONE;
-//				}
-//			});
-//			
-//			// todo: implement methods?!
-//			ret.put(IInternalService.class.getMethod("getPropertyMap", new Class[0]), new IServiceInvocationInterceptor()
-//			{
-//				public IFuture execute(ServiceInvocationContext context)
-//				{
-//					return IFuture.DONE;
-//				}
-//			});
-//			ret.put(IInternalService.class.getMethod("signalStarted", new Class[0]), new IServiceInvocationInterceptor()
-//			{
-//				public IFuture execute(ServiceInvocationContext context)
-//				{
-//					context.setResult(IFuture.DONE);
-//					return IFuture.DONE;
-//				}
-//			});
-//			ret.put(IInternalService.class.getMethod("startService", new Class[0]), new IServiceInvocationInterceptor()
-//			{
-//				public IFuture execute(ServiceInvocationContext context)
-//				{
-//					context.setResult(IFuture.DONE);
-//					return IFuture.DONE;
-//				}
-//			});
-//			ret.put(IInternalService.class.getMethod("shutdownService", new Class[0]), new IServiceInvocationInterceptor()
-//			{
-//				public IFuture execute(ServiceInvocationContext context)
-//				{
-//					context.setResult(IFuture.DONE);
-//					return IFuture.DONE;
-//				}
-//			});
-//			ret.put(IInternalService.class.getMethod("isValid", new Class[0]), new IServiceInvocationInterceptor()
-//			{
-//				public IFuture execute(ServiceInvocationContext context)
-//				{
-//					context.setResult(true);
-//					return IFuture.DONE;
-//				}
-//			});
-//			
-//			ret.put(Object.class.getMethod("toString", new Class[0]), new IServiceInvocationInterceptor()
-//			{
-//				public IFuture execute(ServiceInvocationContext context)
-//				{
-//					Object proxy = context.getObject();
-//					InvocationHandler handler = (InvocationHandler)Proxy.getInvocationHandler(proxy);
-//					context.setResult(handler.toString());
-//					return IFuture.DONE;
-//				}
-//			});
-//			ret.put(Object.class.getMethod("equals", new Class[]{Object.class}), new IServiceInvocationInterceptor()
-//			{
-//				public IFuture execute(ServiceInvocationContext context)
-//				{
-//					Object proxy = context.getObject();
-//					InvocationHandler handler = (InvocationHandler)Proxy.getInvocationHandler(proxy);
-//					Object[] args = (Object[])context.getArguments().toArray();
-//					context.setResult(new Boolean(args[0]!=null && Proxy.isProxyClass(args[0].getClass())
-//						&& handler.equals(Proxy.getInvocationHandler(args[0]))));
-//					return IFuture.DONE;
-//				}
-//			});
-//			ret.put(Object.class.getMethod("hashCode", new Class[0]), new IServiceInvocationInterceptor()
-//			{
-//				public IFuture execute(ServiceInvocationContext context)
-//				{
-//					Object proxy = context.getObject();
-//					InvocationHandler handler = Proxy.getInvocationHandler(proxy);
-//					context.setResult(new Integer(handler.hashCode()));
-//					return IFuture.DONE;
-//				}
-//			});
-//			// todo: other object methods?!
-//		}
-//		catch(Exception e)
-//		{
-//			e.printStackTrace();
-//		}
-//		
-//		return ret;
-//	}
 	
-//	/**
-//	 *  Create a new composite (application) service proxy.
-//	 */
-//	public static IInternalService createServiceProxy(IExternalAccess ea, RequiredServiceInfo info, RequiredServiceBinding binding, ClassLoader classloader)
-//	{
-//		return (IInternalService)Proxy.newProxyInstance(classloader, new Class[]{IInternalService.class, info.getType()}, 
-//			new BasicServiceInvocationHandler(BasicService.createServiceIdentifier(ea.getServiceProvider().getId(), info.getType(), BasicServiceInvocationHandler.class), 
-//			DelegationServiceInvocationInterceptor.getInterceptors(), 
-//			new DelegationServiceInvocationInterceptor(ea, info, binding)));
-//	}
+	/**
+	 *  Get a sub interceptor for special cases.
+	 *  @param sic The context.
+	 *  @return The interceptor (if any).
+	 */
+	public IServiceInvocationInterceptor getInterceptor(ServiceInvocationContext sic)
+	{
+		return (IServiceInvocationInterceptor)SUBINTERCEPTORS.get(sic.getMethod());
+	}
+
+	/**
+	 *  Get the standard interceptors for composite service proxies.
+	 */
+	public static Map getInterceptors()
+	{
+		Map ret = new HashMap();
+		try
+		{
+			ret.put(IInternalService.class.getMethod("getServiceIdentifier", new Class[0]), new AbstractApplicableInterceptor()
+			{
+				public IFuture execute(ServiceInvocationContext context)
+				{
+					Object proxy = context.getObject();
+					BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(proxy);
+					context.setResult(handler.getServiceIdentifier());
+					return IFuture.DONE;
+				}
+			});
+			
+			// todo: implement methods?!
+			ret.put(IInternalService.class.getMethod("getPropertyMap", new Class[0]), new AbstractApplicableInterceptor()
+			{
+				public IFuture execute(ServiceInvocationContext context)
+				{
+					return IFuture.DONE;
+				}
+			});
+			ret.put(IInternalService.class.getMethod("signalStarted", new Class[0]), new AbstractApplicableInterceptor()
+			{
+				public IFuture execute(ServiceInvocationContext context)
+				{
+					context.setResult(IFuture.DONE);
+					return IFuture.DONE;
+				}
+			});
+			ret.put(IInternalService.class.getMethod("startService", new Class[0]), new AbstractApplicableInterceptor()
+			{
+				public IFuture execute(ServiceInvocationContext context)
+				{
+					context.setResult(IFuture.DONE);
+					return IFuture.DONE;
+				}
+			});
+			ret.put(IInternalService.class.getMethod("shutdownService", new Class[0]), new AbstractApplicableInterceptor()
+			{
+				public IFuture execute(ServiceInvocationContext context)
+				{
+					context.setResult(IFuture.DONE);
+					return IFuture.DONE;
+				}
+			});
+			ret.put(IInternalService.class.getMethod("isValid", new Class[0]), new AbstractApplicableInterceptor()
+			{
+				public IFuture execute(ServiceInvocationContext context)
+				{
+					context.setResult(true);
+					return IFuture.DONE;
+				}
+			});
+			
+			ret.put(Object.class.getMethod("toString", new Class[0]), new AbstractApplicableInterceptor()
+			{
+				public IFuture execute(ServiceInvocationContext context)
+				{
+					Object proxy = context.getObject();
+					InvocationHandler handler = (InvocationHandler)Proxy.getInvocationHandler(proxy);
+					context.setResult(handler.toString());
+					return IFuture.DONE;
+				}
+			});
+			ret.put(Object.class.getMethod("equals", new Class[]{Object.class}), new AbstractApplicableInterceptor()
+			{
+				public IFuture execute(ServiceInvocationContext context)
+				{
+					Object proxy = context.getObject();
+					InvocationHandler handler = (InvocationHandler)Proxy.getInvocationHandler(proxy);
+					Object[] args = (Object[])context.getArguments().toArray();
+					context.setResult(new Boolean(args[0]!=null && Proxy.isProxyClass(args[0].getClass())
+						&& handler.equals(Proxy.getInvocationHandler(args[0]))));
+					return IFuture.DONE;
+				}
+			});
+			ret.put(Object.class.getMethod("hashCode", new Class[0]), new AbstractApplicableInterceptor()
+			{
+				public IFuture execute(ServiceInvocationContext context)
+				{
+					Object proxy = context.getObject();
+					InvocationHandler handler = Proxy.getInvocationHandler(proxy);
+					context.setResult(new Integer(handler.hashCode()));
+					return IFuture.DONE;
+				}
+			});
+			// todo: other object methods?!
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ret;
+	}
 }

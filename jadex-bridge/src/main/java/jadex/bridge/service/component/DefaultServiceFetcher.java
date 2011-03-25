@@ -133,7 +133,6 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		final RequiredServiceBinding binding = bd!=null? bd: info.getDefaultBinding();
 		
 		// Test if already bound.
-		// Test if already bound.
 		if(result==null || rebind)
 		{
 			// Search component.

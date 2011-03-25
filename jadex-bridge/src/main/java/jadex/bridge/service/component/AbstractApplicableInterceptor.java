@@ -1,7 +1,7 @@
 package jadex.bridge.service.component;
 
 /**
- * 
+ *  Simple abstract base class that implements isApplicable with true.
  */
 public abstract class AbstractApplicableInterceptor implements IServiceInvocationInterceptor
 {

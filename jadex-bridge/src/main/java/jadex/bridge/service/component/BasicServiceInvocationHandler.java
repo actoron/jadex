@@ -34,16 +34,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	/** The service. */
 	protected IService service;
 
-	
-//	/** The map of own methods. */
-//	protected MultiCollection interceptors;
-	
 	/** The list of interceptors. */
 	protected List interceptors;
 	
-//	/** The fallback invocation interceptor. */
-//	protected IServiceInvocationInterceptor fallback;
-
 	//-------- constructors --------
 	
 	/**
@@ -63,16 +56,6 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		this.sid = service.getServiceIdentifier();
 	}
 	
-//	/**
-//	 *  Create a new invocation handler.
-//	 */
-//	public BasicServiceInvocationHandler(IServiceIdentifier sid, List interceptors)//, IServiceInvocationInterceptor fallback)
-//	{
-//		this.sid = sid;
-//		this.interceptors = interceptors;
-////		this.fallback = fallback;
-//	}
-	
 	//-------- methods --------
 	
 	/**
@@ -86,11 +69,13 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		
 		List myargs = args!=null? SUtil.arrayToList(args): null;
 		
+		Object object = service!=null? service: proxy;
+		
 		if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
 		{
 			final Future fut = new Future();
 			ret = fut;
-			sic.invoke(service, method, myargs)
+			sic.invoke(object, method, myargs)
 				.addResultListener(new DelegationResultListener(fut)
 			{
 				public void customResultAvailable(Object result)
@@ -108,11 +93,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		}
 		else if(method.getReturnType().equals(void.class))
 		{
-			sic.invoke(service, method, myargs);
+			sic.invoke(object, method, myargs);
 		}
 		else
 		{
-			IFuture fut = sic.invoke(service, method, myargs);
+			IFuture fut = sic.invoke(object, method, myargs);
 			if(fut.isDone())
 			{
 				ret = sic.getResult();
@@ -187,7 +172,6 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 */
 	public static IInternalService createServiceProxy(IExternalAccess ea, IComponentAdapter adapter, IInternalService service)
 	{
-//		IServiceIdentifier sid = service.getServiceIdentifier();
 		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(service);
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 //		System.out.println("create: "+service.getServiceIdentifier().getServiceType());

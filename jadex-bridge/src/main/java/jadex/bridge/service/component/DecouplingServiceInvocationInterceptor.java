@@ -11,34 +11,18 @@ import jadex.commons.future.IFuture;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *  Invocation interceptor for executing a call on 
  *  the underlying component thread. 
  */
-public class DecouplingServiceInvocationInterceptor implements IServiceInvocationInterceptor
+public class DecouplingServiceInvocationInterceptor extends AbstractMultiInterceptor
 {
+	//-------- constants --------
+	
+	/** The static map of subinterceptors (method -> interceptor). */
 	protected static Map SUBINTERCEPTORS = getInterceptors();
-	
-	protected static Set DEFAULT_NA;
-	
-	static
-	{
-		try
-		{
-			DEFAULT_NA = new HashSet();
-			DEFAULT_NA.add(Object.class.getMethod("toString", new Class[0]));
-			DEFAULT_NA.add(Object.class.getMethod("equals", new Class[]{Object.class}));
-			DEFAULT_NA.add(Object.class.getMethod("hashCode", new Class[0]));
-		}
-		catch(Exception e)
-		{
-			// cannot happen
-		}
-	}
 	
 	//-------- attributes --------
 	
@@ -48,12 +32,6 @@ public class DecouplingServiceInvocationInterceptor implements IServiceInvocatio
 	/** The component adapter. */
 	protected IComponentAdapter adapter;
 	
-	/** The service. */
-	protected Object service;
-	
-	/** The set of non-applicable methods. */
-	protected Set na;
-	
 	//-------- constructors --------
 	
 	/**
@@ -61,26 +39,8 @@ public class DecouplingServiceInvocationInterceptor implements IServiceInvocatio
 	 */
 	public DecouplingServiceInvocationInterceptor(IExternalAccess ea, IComponentAdapter adapter)
 	{
-		this(ea, adapter, null);
-	}
-	
-	/**
-	 *  Create a new invocation handler.
-	 */
-	public DecouplingServiceInvocationInterceptor(IExternalAccess ea, IComponentAdapter adapter, Object service)
-	{
-		this(ea, adapter, service, null);
-	}
-	
-	/**
-	 *  Create a new invocation handler.
-	 */
-	public DecouplingServiceInvocationInterceptor(IExternalAccess ea, IComponentAdapter adapter, Object service, Set na)
-	{
 		this.ea = ea;
 		this.adapter = adapter;
-		this.service = service;
-		this.na = na!=null? na: DEFAULT_NA;
 	}
 	
 	//-------- methods --------
@@ -90,44 +50,34 @@ public class DecouplingServiceInvocationInterceptor implements IServiceInvocatio
 	 *  @param args The argument(s) for the call.
 	 *  @return The result of the command.
 	 */
-	public IFuture execute(final ServiceInvocationContext sic) 	
+	public IFuture doExecute(ServiceInvocationContext sic)
 	{
-		IServiceInvocationInterceptor subic = (IServiceInvocationInterceptor)SUBINTERCEPTORS.get(sic.getMethod());
-		if(subic!=null)
+		Future ret = new Future();
+		
+		Class returntype = sic.getMethod().getReturnType();
+		boolean scheduleable = returntype.equals(IFuture.class) || returntype.equals(void.class);
+		boolean directcall = true;
+		
+		if(!adapter.isExternalThread() || (!scheduleable && directcall))
 		{
-			return subic.execute(sic);
+			sic.invoke().addResultListener(new DelegationResultListener(ret));
 		}
 		else
 		{
-			Future done = new Future();
-			
-			Class returntype = sic.getMethod().getReturnType();
-			boolean scheduleable = returntype.equals(IFuture.class) || returntype.equals(void.class);
-			boolean directcall = true;
-			
-			if(service!=null)
-				sic.setObject(service);
-	
-			if(!adapter.isExternalThread() || (!scheduleable && directcall))
-			{
-				sic.invoke().addResultListener(new DelegationResultListener(done));
-			}
-			else
-			{
-				ea.scheduleStep(new InvokeMethodStep(sic)).addResultListener(new DelegationResultListener(done));
-			}
-			
-			return done;
+			ea.scheduleStep(new InvokeMethodStep(sic)).addResultListener(new DelegationResultListener(ret));
 		}
+		
+		return ret;
 	}
 	
 	/**
-	 *  Test if the interceptor is applicable.
-	 *  @return True, if applicable.
+	 *  Get a sub interceptor for special cases.
+	 *  @param sic The context.
+	 *  @return The interceptor (if any).
 	 */
-	public boolean isApplicable(ServiceInvocationContext context)
+	public IServiceInvocationInterceptor getInterceptor(ServiceInvocationContext sic)
 	{
-		return true;//!na.contains(context.getMethod());
+		return (IServiceInvocationInterceptor)SUBINTERCEPTORS.get(sic.getMethod());
 	}
 	
 	/**
@@ -180,16 +130,6 @@ public class DecouplingServiceInvocationInterceptor implements IServiceInvocatio
 		return ret;
 	}
 	
-//	/**
-//	 *  Static method for creating a service proxy.
-//	 */
-//	public static IInternalService createServiceProxy(IExternalAccess ea, IComponentAdapter adapter, IInternalService service)
-//	{
-//		IServiceIdentifier sid = service.getServiceIdentifier();
-//		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, sid.getServiceType()}, 
-//			new BasicServiceInvocationHandler(sid, getInterceptors(), new DecouplingServiceInvocationInterceptor(ea, adapter, service)));
-//	}
-	
 	//-------- helper classes --------
 	
 	/**
@@ -199,12 +139,10 @@ public class DecouplingServiceInvocationInterceptor implements IServiceInvocatio
 	public static class InvokeMethodStep implements IComponentStep
 	{
 		protected ServiceInvocationContext sic;
-//		protected Object service;
 
-		public InvokeMethodStep(ServiceInvocationContext sic)//, Object service)
+		public InvokeMethodStep(ServiceInvocationContext sic)
 		{
 			this.sic = sic;
-//			this.service = service;
 		}
 
 		public Object execute(IInternalAccess ia)
@@ -215,26 +153,6 @@ public class DecouplingServiceInvocationInterceptor implements IServiceInvocatio
 			{
 //				sic.setObject(service);
 				sic.invoke().addResultListener(new DelegationResultListener(fut));
-				
-//				Object res = sic.getMethod().invoke(service, sic.getArgumentArray());
-//				
-//				if(res instanceof IFuture)
-//				{
-//					((IFuture)res).addResultListener(new DelegationResultListener(fut)
-//					{
-//						public void customResultAvailable(Object result)
-//						{
-//							sic.setResult(result);
-//							super.customResultAvailable(result);
-//						}
-//					});
-//				}
-//				else
-//				{
-//					// Not correct when not null but some other value.
-//					fut.setResult(res);
-//					sic.setResult(res);
-//				}
 			}
 			catch(Exception e)
 			{

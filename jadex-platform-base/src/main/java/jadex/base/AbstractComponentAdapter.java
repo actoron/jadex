@@ -841,7 +841,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		{
 			public void resultAvailable(Object result)
 			{
-				ComponentManagementService	cms	= (ComponentManagementService)result;
+				IComponentManagementService	cms	= (IComponentManagementService)result;
 //				cms.setComponentException(cid, e);
 				cms.destroyComponent(cid);
 			}
