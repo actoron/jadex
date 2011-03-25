@@ -47,12 +47,13 @@ public class DelegationServiceInvocationInterceptor extends AbstractMultiInterce
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public DelegationServiceInvocationInterceptor(IExternalAccess ea, RequiredServiceInfo info, RequiredServiceBinding binding)
+	public DelegationServiceInvocationInterceptor(IExternalAccess ea, RequiredServiceInfo info, 
+		RequiredServiceBinding binding, IRequiredServiceFetcher fetcher)
 	{
 		this.ea = ea;
 		this.info = info;
 		this.binding = binding;
-		this.fetcher = new DefaultServiceFetcher();
+		this.fetcher = fetcher!=null? fetcher: new DefaultServiceFetcher();
 	}
 	
 	//-------- methods --------
@@ -83,17 +84,7 @@ public class DelegationServiceInvocationInterceptor extends AbstractMultiInterce
 					{
 						// Note: this will not be executed remotely but on the component 
 						sic.setObject(result);
-						sic.invoke().addResultListener(new DelegationResultListener(ret)
-						{
-							public void exceptionOccurred(Exception exception)
-							{
-//								if(binding.isRecover())
-								{
-									System.out.println("recover");
-									super.exceptionOccurred(exception);
-								}
-							}
-						});
+						sic.invoke().addResultListener(new DelegationResultListener(ret));
 					}
 				}));
 				return ret;

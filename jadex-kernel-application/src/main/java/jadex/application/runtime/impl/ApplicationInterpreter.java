@@ -248,7 +248,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 							service = BasicServiceInvocationHandler.createServiceProxy(getExternalAccess(), getComponentAdapter(), 
 								BasicService.createServiceIdentifier(getExternalAccess().getServiceProvider().getId(), info.getType(), BasicServiceInvocationHandler.class));
 							BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
-							handler.addFirstServiceInterceptor(new DelegationServiceInvocationInterceptor(getExternalAccess(), info, st.getBinding()));
+							handler.addFirstServiceInterceptor(new DelegationServiceInvocationInterceptor(getExternalAccess(), info, st.getBinding(), null));
 //							service = DelegationServiceInvocationInterceptor.createServiceProxy(
 //								getExternalAccess(), info, st.getBinding(), getModel().getClassLoader());
 							getServiceContainer().addService(service);
