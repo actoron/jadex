@@ -254,31 +254,26 @@ public abstract class AbstractSelectorPanel extends JPanel implements IPropertie
 		
 		this.props = props;
 		
-//		System.out.println("set props: "+props);
-		int sel = selcb.getSelectedIndex();
-		if(sel!=-1)
+		System.out.println("set props: "+props);
+		if(selcb.getSelectedItem()!=null && panels.containsKey(selcb.getSelectedItem()))
 		{
-			final Object element =  selcb.getItemAt(sel);
-			if(panels.containsKey(element))
-			{
-				IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.get(element);
-				panel.setProperties(props.getSubproperty(PANELPROPERTIES))
-					.addResultListener(new DelegationResultListener(ret));
-			}
-			else
-			{
-				createPanel(element).addResultListener(new SwingDefaultResultListener(centerp)
-				{
-					public void customResultAvailable(Object result)
-					{
-						IAbstractViewerPanel panel = (IAbstractViewerPanel)result;
-						panels.put(element, panel);
-						centerp.add(panel.getComponent(), element);
-						panel.setProperties(props)
-							.addResultListener(new DelegationResultListener(ret));
-					}
-				});
-			}
+			IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.get(selcb.getSelectedItem());
+			panel.setProperties(props.getSubproperty(PANELPROPERTIES))
+				.addResultListener(new DelegationResultListener(ret));
+//			else
+//			{
+//				createPanel(element).addResultListener(new SwingDefaultResultListener(centerp)
+//				{
+//					public void customResultAvailable(Object result)
+//					{
+//						IAbstractViewerPanel panel = (IAbstractViewerPanel)result;
+//						panels.put(element, panel);
+//						centerp.add(panel.getComponent(), element);
+//						panel.setProperties(props)
+//							.addResultListener(new DelegationResultListener(ret));
+//					}
+//				});
+//			}
 		}
 		else
 		{

@@ -65,17 +65,15 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	{
 		Object ret = null;
 
-		final ServiceInvocationContext sic = new ServiceInvocationContext(getInterceptors());
+		final ServiceInvocationContext sic = new ServiceInvocationContext(proxy, getInterceptors());
 		
 		List myargs = args!=null? SUtil.arrayToList(args): null;
-		
-		Object object = service!=null? service: proxy;
 		
 		if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
 		{
 			final Future fut = new Future();
 			ret = fut;
-			sic.invoke(object, method, myargs)
+			sic.invoke(service, method, myargs)
 				.addResultListener(new DelegationResultListener(fut)
 			{
 				public void customResultAvailable(Object result)
@@ -93,11 +91,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		}
 		else if(method.getReturnType().equals(void.class))
 		{
-			sic.invoke(object, method, myargs);
+			sic.invoke(service, method, myargs);
 		}
 		else
 		{
-			IFuture fut = sic.invoke(object, method, myargs);
+			IFuture fut = sic.invoke(service, method, myargs);
 			if(fut.isDone())
 			{
 				ret = sic.getResult();
@@ -154,6 +152,17 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	{
 		if(interceptors!=null)
 			interceptors.remove(pos);
+	}
+	
+	/**
+	 *  Remove an interceptor.
+	 *  
+	 *  Must be synchronized as invoke() is called from arbitrary threads.
+	 */
+	public synchronized void removeServiceInterceptor(IServiceInvocationInterceptor interceptor)
+	{
+		if(interceptors!=null)
+			interceptors.remove(interceptor);
 	}
 	
 	/**

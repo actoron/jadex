@@ -168,53 +168,53 @@ public class MicroAgentInterpreter implements IComponentInstance
 			{
 				public Object execute(IInternalAccess ia)
 				{
-					microagent.agentCreated().addResultListener(new DelegationResultListener(inited)
+					// Create provided services
+					ProvidedServiceInfo[] services = model.getProvidedServices();
+//					System.out.println("init sers: "+services);
+					if(services!=null)
 					{
-						public void customResultAvailable(Object result)
+						final SimpleValueFetcher fetcher = new SimpleValueFetcher();
+						fetcher.setValue("$args", getArguments());
+						fetcher.setValue("$properties", model.getProperties());
+						fetcher.setValue("$results", getResults());
+						fetcher.setValue("$component", microagent);
+						fetcher.setValue("$provider", getServiceProvider());
+						for(int i=0; i<services.length; i++)
 						{
-							// Create provided services
-							ProvidedServiceInfo[] services = model.getProvidedServices();
-//							System.out.println("init sers: "+services);
-							if(services!=null)
+							IInternalService service;
+							if(services[i].getExpression()!=null)
 							{
-								final SimpleValueFetcher fetcher = new SimpleValueFetcher();
-								fetcher.setValue("$args", getArguments());
-								fetcher.setValue("$properties", model.getProperties());
-								fetcher.setValue("$results", getResults());
-								fetcher.setValue("$component", microagent);
-								fetcher.setValue("$provider", getServiceProvider());
-								for(int i=0; i<services.length; i++)
+								try
 								{
-									IInternalService service;
-									if(services[i].getExpression()!=null)
+									// todo: other Class imports, how can be found out?
+									String[] imports = new String[]{microagent.getClass().getPackage().getName()+".*"};
+									service = (IInternalService)SJavaParser.evaluateExpression(services[i].getExpression(), imports, fetcher, model.getClassLoader());
+									if(services[i].isDirect())
 									{
-										try
-										{
-											// todo: other Class imports, how can be found out?
-											String[] imports = new String[]{microagent.getClass().getPackage().getName()+".*"};
-											service = (IInternalService)SJavaParser.evaluateExpression(services[i].getExpression(), imports, fetcher, model.getClassLoader());
-											if(services[i].isDirect())
-											{
-												microagent.addDirectService(service);
-											}
-											else
-											{
-												microagent.addService(service);
-											}
-//											System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
-										}
-										catch(Exception e)
-										{
-											e.printStackTrace();
-											microagent.getLogger().warning("Service creation error: "+services[i].getExpression());
-										}
+										microagent.addDirectService(service);
 									}
+									else
+									{
+										microagent.addService(service);
+									}
+//											System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
+								}
+								catch(Exception e)
+								{
+									e.printStackTrace();
+									microagent.getLogger().warning("Service creation error: "+services[i].getExpression());
 								}
 							}
-							
-							getServiceContainer().start().addResultListener(createResultListener(new IResultListener()
+						}
+					}
+					
+					getServiceContainer().start().addResultListener(createResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object result)
+						{
+							microagent.agentCreated().addResultListener(new DelegationResultListener(inited)
 							{
-								public void resultAvailable(Object result)
+								public void customResultAvailable(Object result)
 								{
 									// Init is now finished. Notify cms.
 									inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
@@ -232,14 +232,15 @@ public class MicroAgentInterpreter implements IComponentInstance
 										}
 									}, new Future()});
 								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									inited.setException(exception);
-								}
-							}));
+							});
 						}
-					});
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							inited.setException(exception);
+						}
+					}));
+				
 					return null;
 				}
 				public String toString()

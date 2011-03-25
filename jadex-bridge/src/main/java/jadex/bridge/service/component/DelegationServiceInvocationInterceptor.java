@@ -141,7 +141,7 @@ public class DelegationServiceInvocationInterceptor extends AbstractMultiInterce
 			{
 				public IFuture execute(ServiceInvocationContext context)
 				{
-					Object proxy = context.getObject();
+					Object proxy = context.getProxy();
 					BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(proxy);
 					context.setResult(handler.getServiceIdentifier());
 					return IFuture.DONE;
@@ -193,7 +193,7 @@ public class DelegationServiceInvocationInterceptor extends AbstractMultiInterce
 			{
 				public IFuture execute(ServiceInvocationContext context)
 				{
-					Object proxy = context.getObject();
+					Object proxy = context.getProxy();
 					InvocationHandler handler = (InvocationHandler)Proxy.getInvocationHandler(proxy);
 					context.setResult(handler.toString());
 					return IFuture.DONE;
@@ -203,7 +203,7 @@ public class DelegationServiceInvocationInterceptor extends AbstractMultiInterce
 			{
 				public IFuture execute(ServiceInvocationContext context)
 				{
-					Object proxy = context.getObject();
+					Object proxy = context.getProxy();
 					InvocationHandler handler = (InvocationHandler)Proxy.getInvocationHandler(proxy);
 					Object[] args = (Object[])context.getArguments().toArray();
 					context.setResult(new Boolean(args[0]!=null && Proxy.isProxyClass(args[0].getClass())
@@ -215,7 +215,7 @@ public class DelegationServiceInvocationInterceptor extends AbstractMultiInterce
 			{
 				public IFuture execute(ServiceInvocationContext context)
 				{
-					Object proxy = context.getObject();
+					Object proxy = context.getProxy();
 					InvocationHandler handler = Proxy.getInvocationHandler(proxy);
 					context.setResult(new Integer(handler.hashCode()));
 					return IFuture.DONE;

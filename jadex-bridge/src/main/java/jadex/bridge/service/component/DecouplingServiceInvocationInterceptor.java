@@ -50,6 +50,26 @@ public class DecouplingServiceInvocationInterceptor extends AbstractMultiInterce
 	 *  @param args The argument(s) for the call.
 	 *  @return The result of the command.
 	 */
+	public IFuture execute(ServiceInvocationContext sic) 	
+	{
+		IFuture ret;
+		IServiceInvocationInterceptor subic = getInterceptor(sic);
+		if(subic!=null)
+		{
+			ret = subic.execute(sic);
+		}
+		else
+		{
+			ret = doExecute(sic);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Execute the command.
+	 *  @param args The argument(s) for the call.
+	 *  @return The result of the command.
+	 */
 	public IFuture doExecute(ServiceInvocationContext sic)
 	{
 		Future ret = new Future();
@@ -92,7 +112,7 @@ public class DecouplingServiceInvocationInterceptor extends AbstractMultiInterce
 			{
 				public IFuture execute(ServiceInvocationContext context)
 				{
-					Object proxy = context.getObject();
+					Object proxy = context.getProxy();
 					InvocationHandler handler = (InvocationHandler)Proxy.getInvocationHandler(proxy);
 					context.setResult(handler.toString());
 					return IFuture.DONE;
@@ -102,7 +122,7 @@ public class DecouplingServiceInvocationInterceptor extends AbstractMultiInterce
 			{
 				public IFuture execute(ServiceInvocationContext context)
 				{
-					Object proxy = context.getObject();
+					Object proxy = context.getProxy();
 					InvocationHandler handler = (InvocationHandler)Proxy.getInvocationHandler(proxy);
 					Object[] args = (Object[])context.getArguments().toArray();
 					context.setResult(new Boolean(args[0]!=null && Proxy.isProxyClass(args[0].getClass())
@@ -114,7 +134,7 @@ public class DecouplingServiceInvocationInterceptor extends AbstractMultiInterce
 			{
 				public IFuture execute(ServiceInvocationContext context)
 				{
-					Object proxy = context.getObject();
+					Object proxy = context.getProxy();
 					InvocationHandler handler = Proxy.getInvocationHandler(proxy);
 					context.setResult(new Integer(handler.hashCode()));
 					return IFuture.DONE;

@@ -20,6 +20,10 @@ public class ServiceInvocationContext
 	
 	//-------- attributes --------
 	
+	/** The origin (proxy object. */
+	protected Object proxy;
+	
+	
 	/** The object. */
 	protected List object;
 	
@@ -47,8 +51,9 @@ public class ServiceInvocationContext
 	/**
 	 *  Create a new context.
 	 */
-	public ServiceInvocationContext(IServiceInvocationInterceptor[] interceptors)
+	public ServiceInvocationContext(Object proxy, IServiceInvocationInterceptor[] interceptors)
 	{
+		this.proxy = proxy;
 		this.object = new ArrayList();
 		this.method = new ArrayList();
 		this.arguments = new ArrayList();
@@ -61,6 +66,24 @@ public class ServiceInvocationContext
 	//-------- methods --------
 	
 	/**
+	 *  Get the proxy.
+	 *  @return The proxy.
+	 */
+	public Object getProxy()
+	{
+		return proxy;
+	}
+
+	/**
+	 *  Set the proxy.
+	 *  @param proxy The proxy to set.
+	 */
+	public void setProxy(Object proxy)
+	{
+		this.proxy = proxy;
+	}
+	
+	/**
 	 *  Get the object.
 	 *  @return the object.
 	 */
@@ -68,7 +91,7 @@ public class ServiceInvocationContext
 	{
 		return object.get(cnt-1);
 	}
-	
+
 	/**
 	 *  Set the object.
 	 *  @param object The object to set.
@@ -286,6 +309,7 @@ public class ServiceInvocationContext
 				{
 					ret = interceptors[i];
 					last = i;
+					break;
 				}
 			}
 		}

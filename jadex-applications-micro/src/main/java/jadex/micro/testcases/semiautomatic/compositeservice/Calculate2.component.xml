@@ -32,16 +32,6 @@
 				</component>
 			</components>
 		</configuration>
-		<configuration name="Component creation and recovery">
-			<components>
-				<component name="calculator" type="Calculator">
-					<requiredservices>
-						<binding name="addservice" componenttype="CorruptAdder" create="true" scope="parent"/>			
-						<binding name="subservice" componenttype="Subtractor" create="true" scope="parent"/>			
-					</requiredservices>
-				</component>
-			</components>
-		</configuration>
 		<configuration name="All components available">
 			<components>
 				<component name="calculator" type="Calculator">
@@ -52,6 +42,18 @@
 				</component>
 				<component name="adder" type="Adder"/>
 				<component name="subtractor" type="Subtractor"/>
+			</components>
+		</configuration>
+		<configuration name="Component creation and recovery">
+			<components>
+				<component name="calculator" type="Calculator">
+					<requiredservices>
+						<binding name="addservice" componentname="adder" scope="parent"/>			
+						<!-- <binding name="addservice" componenttype="CorruptAdder" create="true" scope="parent"/>	 -->		
+						<binding name="subservice" componenttype="Subtractor" create="true" scope="parent"/>			
+					</requiredservices>
+				</component>
+				<component name="adder" type="CorruptAdder"/>
 			</components>
 		</configuration>
 	</configurations>

@@ -159,6 +159,8 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	 */
 	public IFuture	activatePlugin(IControlCenterPlugin plugin)
 	{
+		System.out.println("activate plugin: "+plugin);
+		
 		assert SwingUtilities.isEventDispatchThread();
 		
 		Future	ret	= new Future();

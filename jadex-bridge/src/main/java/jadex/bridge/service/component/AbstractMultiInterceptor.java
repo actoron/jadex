@@ -15,7 +15,7 @@ public abstract class AbstractMultiInterceptor implements IServiceInvocationInte
 	 *  @param args The argument(s) for the call.
 	 *  @return The result of the command.
 	 */
-	public final IFuture execute(ServiceInvocationContext sic) 	
+	public IFuture execute(ServiceInvocationContext sic) 	
 	{
 		IFuture ret;
 		IServiceInvocationInterceptor subic = getInterceptor(sic);

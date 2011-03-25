@@ -25,6 +25,7 @@ import jadex.bridge.service.clock.ITimer;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.bridge.service.component.DecouplingServiceInvocationInterceptor;
+import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.commons.ComposedFilter;
 import jadex.commons.IFilter;
 import jadex.commons.future.DefaultResultListener;
@@ -707,6 +708,52 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		{
 			return interpreter.getServiceContainer().getRequiredServices(info, binding, rebind);
 		}
+	}
+	
+	/**
+	 *  Add a provided service interceptor (at first position in the chain).
+	 *  @param clazz The interface of the provided service.
+	 *  @param interceptor The interceptor.
+	 *  @return Null using future when done.
+	 */
+	public IFuture addProvidedServiceInterceptor(Class clazz, final IServiceInvocationInterceptor interceptor)
+	{
+		final Future ret = new Future();
+		SServiceProvider.getService(getServiceProvider(), clazz, RequiredServiceInfo.SCOPE_LOCAL)
+			.addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(result);
+				handler.addFirstServiceInterceptor(interceptor);
+				ret.setResult(null);
+			}	
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Add a provided service interceptor (at first position in the chain).
+	 *  @param clazz The interface of the provided service.
+	 *  @param interceptor The interceptor.
+	 *  @return Null using future when done.
+	 */
+	public IFuture removeProvidedServiceInterceptor(Class clazz, final IServiceInvocationInterceptor interceptor)
+	{
+		final Future ret = new Future();
+		SServiceProvider.getService(getServiceProvider(), clazz, RequiredServiceInfo.SCOPE_LOCAL)
+			.addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(result);
+				handler.removeServiceInterceptor(interceptor);
+				ret.setResult(null);
+			}	
+		});
+		
+		return ret;
 	}
 
 	//-------- helper classes --------
