@@ -289,33 +289,24 @@ public abstract class AbstractSelectorPanel extends JPanel implements IPropertie
 	}
 
 	/**
-	 *  Return properties to be saved in project.
+	 *  Return properties to be saved in JCC settings.
 	 */
 	public IFuture getProperties()
 	{
 		final Future ret = new Future();
 		final Properties props = new Properties(null, getName(), null);
-		if(panels.size()>0)
+		if(selcb.getSelectedItem()!=null && panels.containsKey(selcb.getSelectedItem()))
 		{
-			int sel = selcb.getSelectedIndex();
-			if(sel!=-1)
+			IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.get(selcb.getSelectedItem());
+			panel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
 			{
-				Object element =  selcb.getItemAt(sel);
-			
-				if(panels.containsKey(element))
+				public void customResultAvailable(Object result) 
 				{
-					IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.get(element);
-					panel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
-					{
-						public void customResultAvailable(Object result) 
-						{
-							Properties subprops = (Properties)result;
-							addSubproperties(props, PANELPROPERTIES, subprops);
-							ret.setResult(props);
-						};
-					});
-				}
-			}
+					Properties subprops = (Properties)result;
+					addSubproperties(props, PANELPROPERTIES, subprops);
+					ret.setResult(props);
+				};
+			});
 		}
 		else
 		{
