@@ -448,6 +448,8 @@ public class TestCenterPanel extends JSplitPane
 		setDividerLocation(300);
 		setTopComponent(top);
 		setBottomComponent(bottom);
+		
+		reset();
 	}
 
 	/**
@@ -513,15 +515,15 @@ public class TestCenterPanel extends JSplitPane
 			public void customResultAvailable(Object result) throws Exception
 			{
 				String[]	entries	= (String[])result;
+				Properties	props	= new Properties();
 				for(int i=0; i<entries.length; i++)
 				{
-					Properties	props	= new Properties();
 					props.addProperty(new Property("entry", entries[i]));
-					props.addProperty(new Property("timeout", tfto.getText()));
-					props.addProperty(new Property("concurrency", ""+concurrency));
-					props.addProperty(new Property("allowduplicates", ""+allowduplicates.isSelected()));
-					ret.setResult(props);
 				}
+				props.addProperty(new Property("timeout", tfto.getText()));
+				props.addProperty(new Property("concurrency", ""+concurrency));
+				props.addProperty(new Property("allowduplicates", ""+allowduplicates.isSelected()));
+				ret.setResult(props);
 			}
 		});
 		

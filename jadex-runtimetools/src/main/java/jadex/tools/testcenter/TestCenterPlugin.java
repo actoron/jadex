@@ -2,7 +2,6 @@ package jadex.tools.testcenter;
 
 import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.IFileNode;
-import jadex.base.gui.filetree.RefreshAction;
 import jadex.base.gui.modeltree.AddPathAction;
 import jadex.base.gui.modeltree.AddRemotePathAction;
 import jadex.base.gui.modeltree.ModelTreePanel;
@@ -102,7 +101,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	 */
 	public JComponent[] createToolBar()
 	{
-		JComponent[] ret = new JComponent[6];
+		JComponent[] ret = new JComponent[5];
 		JButton b;
 
 		b = new JButton(new ToolTipAction(AddPathAction.getName(), 
@@ -133,12 +132,12 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		b.setEnabled(true);
 		ret[1] = b;
 
-		b = new JButton(new RefreshAction(mpanel.getTree()));
-		b.setBorder(null);
-		b.setToolTipText(b.getText());
-		b.setText(null);
-		b.setEnabled(true);
-		ret[2] = b;
+//		b = new JButton(new RefreshAction(mpanel.getTree()));
+//		b.setBorder(null);
+//		b.setToolTipText(b.getText());
+//		b.setText(null);
+//		b.setEnabled(true);
+//		ret[2] = b;
 //		
 //		b = new JButton(new RefreshSubtreeAction(mpanel.getTree()));
 //		b.setBorder(null);
@@ -149,21 +148,21 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		
 		JSeparator	separator	= new JToolBar.Separator();
 		separator.setOrientation(JSeparator.VERTICAL);
-		ret[3] = separator;
+		ret[2] = separator;
 
 		b = new JButton(ADD_TESTCASES);
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
-		ret[4] = b;
+		ret[3] = b;
 
 		b = new JButton(REMOVE_TESTCASES);
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
-		ret[5] = b;
+		ret[4] = b;
 
 		return ret;
 	}
@@ -279,8 +278,18 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 //		mainpanel.add(tp);
 		mainpanel.add(new JScrollPane(mpanel));
 		mainpanel.add(tcpanel);
+		
+		loadPlatformProperties();	// Todo: wait for platform properties to be loaded?
 
 		return mainpanel;
+	}
+	
+	/**
+	 *  Shutdown the plugin.
+	 */
+	public void shutdown()
+	{
+		savePlatformProperties();	// Todo: wait for platform properties to be saved?
 	}
 	
 	/**
