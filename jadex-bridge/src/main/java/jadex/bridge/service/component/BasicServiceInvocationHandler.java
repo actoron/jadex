@@ -119,6 +119,15 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	}
 	
 	/**
+	 *  Get the service.
+	 *  @return The service.
+	 */
+	public IService getService()
+	{
+		return service;
+	}
+
+	/**
 	 *  Add an interceptor.
 	 *  
 	 *  Must be synchronized as invoke() is called from arbitrary threads.
