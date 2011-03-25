@@ -248,8 +248,8 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 					}
 					
 					clayout.show(content, plugin.getName());
-					validate();
-					repaint();
+					controlcenter.getControlCenter().getWindow().validate();
+					controlcenter.getControlCenter().getWindow().repaint();
 				}
 				catch(RuntimeException e)
 				{
@@ -269,8 +269,8 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 								controlcenter.getControlCenter().getWindow().createMenuBar(null));
 						changeToolBar(null, plugin);
 						clayout.show(content, plugin.getName());
-						validate();
-						repaint();
+						controlcenter.getControlCenter().getWindow().validate();
+						controlcenter.getControlCenter().getWindow().repaint();
 					}
 				}
 				

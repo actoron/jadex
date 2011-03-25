@@ -60,7 +60,7 @@ public class SettingsService extends BasicService implements ISettingsService
 			// Strip auto-generated platform suffix (hack???).
 			if(prefix.indexOf('_')!=-1)
 			{
-				prefix	= prefix.substring(0, prefix.indexOf('_'));
+				prefix	= prefix.substring(0, prefix.lastIndexOf('_'));
 			}
 		}
 		
@@ -121,6 +121,7 @@ public class SettingsService extends BasicService implements ISettingsService
 		}
 		else
 		{
+//			System.out.println("Added provider: "+id+", "+provider);
 			providers.put(id, provider);
 			Properties	sub	= props.getSubproperty(id);
 			if(sub!=null)
@@ -151,6 +152,7 @@ public class SettingsService extends BasicService implements ISettingsService
 		else
 		{
 			IPropertiesProvider	provider	= (IPropertiesProvider)providers.remove(id);
+//			System.out.println("Removed provider: "+id+", "+provider);
 			provider.getProperties().addResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)

@@ -64,7 +64,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -471,7 +470,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	public Map getResults()
 	{
 		Map	res	= (Map)state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_results);
-		return res!=null ? new LinkedHashMap(res) : Collections.EMPTY_MAP;
+		return res!=null ? Collections.unmodifiableMap(res) : Collections.EMPTY_MAP;
 	}
 
 	/**

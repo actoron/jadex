@@ -148,9 +148,17 @@ public abstract class AbstractSelectorPanel extends JPanel implements IPropertie
 						public void customResultAvailable(Object result)
 						{
 							final IAbstractViewerPanel panel = (IAbstractViewerPanel)result;
-							Properties	p	= props!=null? props.getSubproperty(PANELPROPERTIES): null;
-							panel.setProperties(p!=null ? p : new Properties())
-								.addResultListener(new SwingDefaultResultListener()
+							IFuture	propsdone;
+							if(props!=null && props.getSubproperty(PANELPROPERTIES)!=null)
+							{
+								propsdone	= panel.setProperties(props.getSubproperty(PANELPROPERTIES));
+							}
+							else
+							{
+								propsdone	= IFuture.DONE;
+							}
+							
+							propsdone.addResultListener(new SwingDefaultResultListener()
 							{
 								public void customResultAvailable(Object result)
 								{

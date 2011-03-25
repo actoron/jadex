@@ -120,62 +120,62 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		return ret;
 	}
 	
-	/**
-	 *  Get a required service.
-	 *  @return The service.
-	 */
-	public IFuture getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
-	{
-		final Future ret = new Future();
-		super.getRequiredService(info, binding, rebind).addResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				final IInternalService service = (IInternalService)result;
-				getExternalAccess().addResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						ret.setResult(BasicServiceInvocationHandler.createServiceProxy((IExternalAccess)result, adapter, service));
-					}
-				});
-			}
-		});
-		return ret;
-	}
-	
-	/**
-	 *  Get required services.
-	 *  @return The services.
-	 */
-	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
-	{
-		final IntermediateFuture ret = new IntermediateFuture();
-		super.getRequiredServices(info, binding, rebind).addResultListener(new IntermediateDelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				final Collection coll = (Collection)result;
-				getExternalAccess().addResultListener(new IntermediateDelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						IExternalAccess ea = (IExternalAccess)result;
-						List res = new ArrayList();
-						if(coll!=null && coll.size()>0)
-						{
-							for(Iterator it=coll.iterator(); it.hasNext(); )
-							{
-								ret.addIntermediateResult(BasicServiceInvocationHandler.createServiceProxy(ea, adapter, (IInternalService)it.next()));
-							}
-						}
-						ret.setFinished();
-					}
-				});
-			}
-		});
-		return ret;
-	}
+//	/**
+//	 *  Get a required service.
+//	 *  @return The service.
+//	 */
+//	public IFuture getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+//	{
+//		final Future ret = new Future();
+//		super.getRequiredService(info, binding, rebind).addResultListener(new DelegationResultListener(ret)
+//		{
+//			public void customResultAvailable(Object result)
+//			{
+//				final IInternalService service = (IInternalService)result;
+//				getExternalAccess().addResultListener(new DelegationResultListener(ret)
+//				{
+//					public void customResultAvailable(Object result)
+//					{
+//						ret.setResult(BasicServiceInvocationHandler.createServiceProxy((IExternalAccess)result, adapter, service));
+//					}
+//				});
+//			}
+//		});
+//		return ret;
+//	}
+//	
+//	/**
+//	 *  Get required services.
+//	 *  @return The services.
+//	 */
+//	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+//	{
+//		final IntermediateFuture ret = new IntermediateFuture();
+//		super.getRequiredServices(info, binding, rebind).addResultListener(new IntermediateDelegationResultListener(ret)
+//		{
+//			public void customResultAvailable(Object result)
+//			{
+//				final Collection coll = (Collection)result;
+//				getExternalAccess().addResultListener(new IntermediateDelegationResultListener(ret)
+//				{
+//					public void customResultAvailable(Object result)
+//					{
+//						IExternalAccess ea = (IExternalAccess)result;
+//						List res = new ArrayList();
+//						if(coll!=null && coll.size()>0)
+//						{
+//							for(Iterator it=coll.iterator(); it.hasNext(); )
+//							{
+//								ret.addIntermediateResult(BasicServiceInvocationHandler.createServiceProxy(ea, adapter, (IInternalService)it.next()));
+//							}
+//						}
+//						ret.setFinished();
+//					}
+//				});
+//			}
+//		});
+//		return ret;
+//	}
 	
 	/**
 	 *  Get the external access.

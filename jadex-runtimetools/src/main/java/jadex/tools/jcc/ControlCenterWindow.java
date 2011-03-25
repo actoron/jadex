@@ -26,6 +26,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 
 /**
@@ -150,12 +152,21 @@ public class ControlCenterWindow extends JFrame
 	 */
 	public JMenuBar	createMenuBar(JMenu[] pluginbar)
 	{
-		// Create the menu-bar if nec essary.
+		// Create the menu-bar if necessary.
 		JMenuBar menubar	= new JMenuBar();
 
+		final JCheckBoxMenuItem	soe	= new JCheckBoxMenuItem("Save Settings on Exit", controlcenter.isSaveOnExit());
+		soe.addChangeListener(new ChangeListener()
+		{
+			public void stateChanged(ChangeEvent e)
+			{
+				controlcenter.setSaveOnExit(soe.isSelected());
+			}
+		});
+		
 		// File menu.
-		JMenu file = new JMenu("File");
-		file.add(new JCheckBoxMenuItem("Save Settings on Exit", true));
+		JMenu file = new JMenu("File");		
+		file.add(soe);
 		file.add(new JMenuItem(SAVE_SETTINGS));
         file.addSeparator();
 		file.add(new JMenuItem(LOAD_SETTINGS));

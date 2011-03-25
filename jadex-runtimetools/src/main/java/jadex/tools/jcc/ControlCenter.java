@@ -6,6 +6,7 @@ import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ISettingsService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
@@ -76,6 +77,9 @@ public class ControlCenter
 
 	/** The CMS update handler shared by all tools. */
 	protected CMSUpdateHandler	cmshandler;
+	
+	/** The save on exit flag. */
+	protected boolean	saveonexit;
 
 	//-------- constructors --------
 
@@ -89,6 +93,7 @@ public class ControlCenter
 		this.jccaccess = jccaccess;
 		this.plugin_classes	= plugin_classes;
 		this.pccs	= new HashMap();
+		this.saveonexit	= true;
 		
 		jccaccess.scheduleStep(new IComponentStep()
 		{
@@ -165,6 +170,7 @@ public class ControlCenter
 	 */
 	public IFuture	loadSettings()
 	{
+		// Only load GUI settings as platform settings are loaded on platform startup and every tool init as required.
 		return loadSettings(new File(jccaccess.getComponentIdentifier().getLocalName() + SETTINGS_EXTENSION));
 	}
 	
@@ -203,6 +209,7 @@ public class ControlCenter
 						window.setExtendedState(es);
 			
 						jccexit = windowprops.getStringProperty("jccexit");
+						saveonexit = windowprops.getBooleanProperty("saveonexit");
 					}
 				}
 				catch(Exception e)
@@ -231,9 +238,44 @@ public class ControlCenter
 	 */
 	public IFuture	saveSettings()
 	{
-		return saveSettings(new File(jccaccess.getComponentIdentifier().getLocalName() + SETTINGS_EXTENSION));
+		final Future	ret	= new Future();
+		// Save settings of GUI and currently selected platform (todo: all platforms?)
+		saveSettings(new File(jccaccess.getComponentIdentifier().getLocalName() + SETTINGS_EXTENSION))
+			.addResultListener(new SwingDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result) throws Exception
+			{
+				savePlatformProperties().addResultListener(new SwingDelegationResultListener(ret));
+			}
+		});
+		
+		return ret;
 	}
-	
+
+	/**
+	 *  Save the platform properties.
+	 */
+	public IFuture	savePlatformProperties()
+	{
+		final Future	ret	= new Future();
+		SServiceProvider.getService(pcc.getPlatformAccess().getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new SwingDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result) throws Exception
+			{
+				ISettingsService	settings	= (ISettingsService)result;
+				settings.saveProperties().addResultListener(new SwingDelegationResultListener(ret));
+			}
+			
+			public void customExceptionOccurred(Exception exception)
+			{
+				// No settings service: ignore.
+				ret.setResult(null);
+			}
+		});
+		
+		return ret;
+	}
 	/**
 	 * Save settings of JCC and all plugins in current project.
 	 */
@@ -256,6 +298,7 @@ public class ControlCenter
 				windowprops.addProperty(new Property("y", Integer.toString(window.getY())));
 				windowprops.addProperty(new Property("extendedState", Integer.toString(window.getExtendedState())));
 				windowprops.addProperty(new Property("jccexit", jccexit != null? jccexit : JCC_EXIT_ASK));
+				windowprops.addProperty(new Property("saveonexit", Boolean.toString(saveonexit)));
 				props.removeSubproperties("window");
 				props.addSubproperties("window", windowprops);
 				
@@ -334,8 +377,8 @@ public class ControlCenter
 	 */
 	public void shutdown()
 	{
-		// todo: make save on exit configurable.
-		saveSettings();
+		if(saveonexit)
+			saveSettings();
 		
 		for(Iterator it=pccs.keySet().iterator(); it.hasNext(); )
 		{
@@ -345,7 +388,22 @@ public class ControlCenter
 		if(cmshandler!=null)
 			cmshandler.dispose();
 	}
-
+	
+	/**
+	 *  Get the save on exit flag.
+	 */
+	public boolean isSaveOnExit()
+	{
+		return saveonexit;
+	}
+	
+	/**
+	 *  Set the save on exit flag.
+	 */
+	public void setSaveOnExit(boolean saveonexit)
+	{
+		this.saveonexit	= saveonexit;
+	}
 	
 	//-------- methods used by platform control centers --------
 	
@@ -429,5 +487,4 @@ public class ControlCenter
 			}
 		});
 	}
-
 }

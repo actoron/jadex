@@ -159,6 +159,8 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				// Keep print stack trace until getRequiredService() of ComponentServiceContainer is fixed.
+				exception.printStackTrace();
 				// No settings service: ignore.
 				ret.setResult(null);
 			}
