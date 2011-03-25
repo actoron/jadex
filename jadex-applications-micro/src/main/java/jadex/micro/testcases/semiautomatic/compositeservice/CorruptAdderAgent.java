@@ -1,5 +1,7 @@
 package jadex.micro.testcases.semiautomatic.compositeservice;
 
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.component.AbstractApplicableInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.DelegationResultListener;
@@ -32,9 +34,21 @@ public class CorruptAdderAgent extends MicroAgent
 		{
 			public IFuture execute(ServiceInvocationContext context)
 			{
-				System.out.println("hello interceptor");
-				if(calls++>0)
-					killAgent();
+				try
+				{
+					if(context.getMethod().equals(IAddService.class.getMethod("add", new Class[]{double.class, double.class})))
+					{
+						System.out.println("hello interceptor");
+						if(calls++>0)
+						{
+							killAgent();
+						}
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 				return context.invoke();
 			}
 		}).addResultListener(new DelegationResultListener(ret));

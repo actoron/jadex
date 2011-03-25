@@ -81,26 +81,19 @@ public class DelegationServiceInvocationInterceptor extends AbstractMultiInterce
 				{
 					public void customResultAvailable(Object result) 
 					{
-						// todo? allow remote execution of the interceptor chain?
-//						sic.invoke();
-						
-						try
+						// Note: this will not be executed remotely but on the component 
+						sic.setObject(result);
+						sic.invoke().addResultListener(new DelegationResultListener(ret)
 						{
-							Object res = sic.getMethod().invoke(result, sic.getArgumentArray());
-							sic.setResult(res);
-							if(res instanceof IFuture)
+							public void exceptionOccurred(Exception exception)
 							{
-								((IFuture)res).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
+//								if(binding.isRecover())
+								{
+									System.out.println("recover");
+									super.exceptionOccurred(exception);
+								}
 							}
-							else
-							{
-								ret.setResult(res);
-							}
-						}
-						catch(Exception e)
-						{
-							ret.setException(e);
-						}
+						});
 					}
 				}));
 				return ret;

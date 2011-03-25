@@ -43,6 +43,11 @@ public class CompositeCalculatorAgent extends MicroAgent
 			{
 				System.out.println("Result is: "+result);
 			}
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("exe ");
+				super.exceptionOccurred(exception);
+			}
 		});
 	}
 	

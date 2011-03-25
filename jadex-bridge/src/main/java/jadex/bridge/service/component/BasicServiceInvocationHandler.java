@@ -73,8 +73,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		{
 			final Future fut = new Future();
 			ret = fut;
-			sic.invoke(service, method, myargs)
-				.addResultListener(new DelegationResultListener(fut)
+			sic.invoke(service, method, myargs).addResultListener(new DelegationResultListener(fut)
 			{
 				public void customResultAvailable(Object result)
 				{
@@ -193,6 +192,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	public static IInternalService createServiceProxy(IExternalAccess ea, IComponentAdapter adapter, IServiceIdentifier sid)
 	{
 		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(sid);
+		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, sid.getServiceType()}, handler); 
 	}
 

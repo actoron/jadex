@@ -5,16 +5,25 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.BasicServiceContainer;
+import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  *  Service container for active components.
@@ -25,6 +34,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	
 	/** The component adapter. */
 	protected IComponentAdapter adapter;
+	
+	/** The external access. */
+	protected IExternalAccess exta;
 	
 	/** The cms. */
 	protected IComponentManagementService cms;
@@ -109,20 +121,94 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	}
 	
 	/**
+	 *  Get a required service.
+	 *  @return The service.
+	 */
+	public IFuture getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+	{
+		final Future ret = new Future();
+		super.getRequiredService(info, binding, rebind).addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				final IInternalService service = (IInternalService)result;
+				getExternalAccess().addResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						ret.setResult(BasicServiceInvocationHandler.createServiceProxy((IExternalAccess)result, adapter, service));
+					}
+				});
+			}
+		});
+		return ret;
+	}
+	
+	/**
+	 *  Get required services.
+	 *  @return The services.
+	 */
+	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+	{
+		final IntermediateFuture ret = new IntermediateFuture();
+		super.getRequiredServices(info, binding, rebind).addResultListener(new IntermediateDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				final Collection coll = (Collection)result;
+				getExternalAccess().addResultListener(new IntermediateDelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						IExternalAccess ea = (IExternalAccess)result;
+						List res = new ArrayList();
+						if(coll!=null && coll.size()>0)
+						{
+							for(Iterator it=coll.iterator(); it.hasNext(); )
+							{
+								ret.addIntermediateResult(BasicServiceInvocationHandler.createServiceProxy(ea, adapter, (IInternalService)it.next()));
+							}
+						}
+						ret.setFinished();
+					}
+				});
+			}
+		});
+		return ret;
+	}
+	
+	/**
+	 *  Get the external access.
+	 */
+	public IFuture getExternalAccess()
+	{
+		final Future ret = new Future();
+		if(exta==null)
+		{
+			cms.getExternalAccess(adapter.getComponentIdentifier())
+				.addResultListener(new DelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+	//				System.out.println("exta: "+result);
+					exta = (IExternalAccess)result;
+					ret.setResult(exta);
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(exta);
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Create a service fetcher.
 	 */
 	public IRequiredServiceFetcher createServiceFetcher(String name)
 	{
-		IRequiredServiceFetcher ret;
-		
-		if(reqservicefetchers==null)
-			reqservicefetchers = new HashMap();
-
-		// todo: how to find alternate fetcher?!
-		ret = new DefaultServiceFetcher();
-		reqservicefetchers.put(name, ret);
-		
-		return ret;
+		return new DefaultServiceFetcher();
 	}
 	
 	/**

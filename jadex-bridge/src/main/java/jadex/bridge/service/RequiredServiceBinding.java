@@ -28,8 +28,8 @@ public class RequiredServiceBinding
 	/** The create flag. */
 	protected boolean create;
 	
-	// todo:
 	/** The recover flag. */
+	protected boolean recover;
 
 	//-------- constructors --------
 
@@ -45,7 +45,7 @@ public class RequiredServiceBinding
 	 */
 	public RequiredServiceBinding(String name, String scope)
 	{
-		this(name, null, null, false, scope, false);
+		this(name, scope, false);
 	}
 	
 	/**
@@ -53,14 +53,14 @@ public class RequiredServiceBinding
 	 */
 	public RequiredServiceBinding(String name, String scope, boolean dynamic)
 	{
-		this(name, null, null, dynamic, scope, false);
+		this(name, null, null, dynamic, scope, false, false);
 	}
 
 	/**
 	 *  Create a new binding.
 	 */
 	public RequiredServiceBinding(String name, String componentname,
-			String componenttype, boolean dynamic, String scope, boolean create)//, String componentfilename)
+			String componenttype, boolean dynamic, String scope, boolean create, boolean recover)
 	{
 		this.name = name;
 		this.componentname = componentname;
@@ -68,6 +68,7 @@ public class RequiredServiceBinding
 		this.dynamic = dynamic;
 		this.scope = scope;
 		this.create = create;
+		this.recover = recover;
 //		this.componentfilename = componentfilename;
 	}
 
@@ -179,6 +180,24 @@ public class RequiredServiceBinding
 	public void setCreate(boolean create)
 	{
 		this.create = create;
+	}
+
+	/**
+	 *  Get the recover.
+	 *  @return The recover.
+	 */
+	public boolean isRecover()
+	{
+		return recover;
+	}
+
+	/**
+	 *  Set the recover.
+	 *  @param recover The recover to set.
+	 */
+	public void setRecover(boolean recover)
+	{
+		this.recover = recover;
 	}
 
 //	/**

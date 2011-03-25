@@ -8,7 +8,6 @@ import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
 import jadex.xml.IObjectObjectConverter;
-import jadex.xml.IObjectStringConverter;
 import jadex.xml.IPostProcessor;
 import jadex.xml.IStringObjectConverter;
 import jadex.xml.MappingInfo;
@@ -29,6 +28,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -165,6 +165,18 @@ public class JavaReader extends Reader
 				}
 			));
 			typeinfos.add(ti_emptymap);
+			
+			// java.util.UnmodifyableSet
+			TypeInfo ti_unset = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Collections-UnmodifyableSet")}), new ObjectInfo(HashSet.class));
+			typeinfos.add(ti_unset);
+			
+			// java.util.UnmodifyableList
+			TypeInfo ti_unlist = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Collections-UnmodifyableList")}), new ObjectInfo(ArrayList.class));
+			typeinfos.add(ti_unlist);
+			
+			// java.util.UnmodifyableMap
+			TypeInfo ti_unmap = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Collections-UnmodifyableMap")}), new ObjectInfo(HashMap.class));
+			typeinfos.add(ti_unmap);
 			
 			// java.util.Color
 			IStringObjectConverter coconv = new IStringObjectConverter()

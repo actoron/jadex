@@ -10,6 +10,7 @@ import jadex.commons.future.IntermediateFuture;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -329,7 +330,12 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		IRequiredServiceFetcher ret = reqservicefetchers!=null? 
 			(IRequiredServiceFetcher)reqservicefetchers.get(name): null;
 		if(ret==null)
+		{
 			ret = createServiceFetcher(name);
+			if(reqservicefetchers==null)
+				reqservicefetchers = new HashMap();
+			reqservicefetchers.put(name, ret);
+		}
 		return ret;
 	}
 		
@@ -337,18 +343,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Create a service fetcher.
 	 */
 	public abstract IRequiredServiceFetcher createServiceFetcher(String name);
-//	{
-//		IRequiredServiceFetcher ret;
-//		
-//		if(reqservicefetchers==null)
-//			reqservicefetchers = new HashMap();
-//
-//		// todo: how to find alternate fetcher?!
-//		ret = new DefaultServiceFetcher();
-//		reqservicefetchers.put(name, ret);
-//		
-//		return ret;
-//	}
 	
 	/**
 	 *  Get the string representation.
