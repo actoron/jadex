@@ -545,12 +545,14 @@ public class SGUI
 	 */
 	public static void setDividerLocation(final JSplitPane split, final int loc)
 	{
+		System.out.println("setDividerLocation queued: "+loc+", @"+split.hashCode());
 		if(split.isVisible())
 		{
 			SwingUtilities.invokeLater(new Runnable()
 			{
 				public void run()
 				{
+					System.out.println("setDividerLocation: "+loc+", @"+split.hashCode());
 					split.setDividerLocation(loc);
 				}
 			});
@@ -565,6 +567,7 @@ public class SGUI
 					{
 						public void run()
 						{
+							System.out.println("setDividerLocation: "+loc+", @"+split.hashCode());
 							split.setDividerLocation(loc);
 						}
 					});
