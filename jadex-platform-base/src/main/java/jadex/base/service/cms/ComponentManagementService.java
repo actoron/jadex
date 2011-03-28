@@ -1415,6 +1415,13 @@ public abstract class ComponentManagementService extends BasicService implements
 			IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
 			if(adapter==null)
 			{
+				Object[] ii = (Object[])initinfos.get(cid);
+				if(ii!=null)
+					adapter = (IComponentAdapter)ii[1];
+			}
+			
+			if(adapter==null)
+			{
 				ret.setException(new RuntimeException("No local component found for component identifier: "+cid));
 			}
 			else
