@@ -362,14 +362,16 @@ public abstract class ComponentManagementService extends BasicService implements
 		//														System.err.println("Registered at parent: "+cid);
 																
 																// Registration finished -> reactivate component.
-																if(isInitSuspend(cinfo, lmodel))
-																{
+//																// Note: Must be set to suspended because otherwise
+																// any call to wakeup would immediately start executing the component.
+//																if(isInitSuspend(cinfo, lmodel))
+//																{
 																	ad.setState(CMSComponentDescription.STATE_SUSPENDED);
-																}
-																else
-																{
-																	ad.setState(CMSComponentDescription.STATE_ACTIVE);
-																}
+//																}
+//																else
+//																{
+//																	ad.setState(CMSComponentDescription.STATE_ACTIVE);
+//																}
 																
 																// todo: can be called after listener has (concurrently) deregistered
 																// notify listeners without holding locks
@@ -404,7 +406,10 @@ public abstract class ComponentManagementService extends BasicService implements
 																// when this component is the outermost component, i.e. with no parent
 																// or the parent is already running
 																if(cinfo.getParent()==null || initinfos.get(cinfo.getParent())==null)
+																{
+																	System.err.println("start: "+cid);
 																	resumeComponent(cid);
+																}
 															}
 															
 															public void exceptionOccurred(Exception exception)
