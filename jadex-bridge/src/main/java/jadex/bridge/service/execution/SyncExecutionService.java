@@ -170,7 +170,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	
 		if(shutdown)
 		{
-			ret.setResult(null);
+			ret.setResult(getServiceIdentifier());
 			return ret;
 		}
 		
@@ -276,7 +276,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 					}
 				});
 				
-				ret.setResult(SyncExecutionService.this);
+				ret.setResult(getServiceIdentifier());
 			}
 			
 			public void exceptionOccurred(Exception exception)

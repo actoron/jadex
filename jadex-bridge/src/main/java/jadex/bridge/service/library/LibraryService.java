@@ -245,12 +245,18 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 					{
 						ISettingsService	settings	= (ISettingsService)result;
 						settings.registerPropertiesProvider(LIBRARY_SERVICE, LibraryService.this)
-							.addResultListener(new DelegationResultListener(ret));
+							.addResultListener(new DelegationResultListener(ret)
+						{
+							public void customResultAvailable(Object result)
+							{
+								super.customResultAvailable(getServiceIdentifier());
+							}
+						});
 					}
 					public void exceptionOccurred(Exception exception)
 					{
 						// No settings service: ignore
-						ret.setResult(null);
+						ret.setResult(getServiceIdentifier());
 					}
 				});
 			}

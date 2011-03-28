@@ -211,7 +211,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			{
 				public void resultAvailable(Object result)
 				{
-					System.out.println("started: "+result);
+//					System.out.println("started: "+result);
 					super.resultAvailable(result);
 				}
 			};

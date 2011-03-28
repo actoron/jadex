@@ -192,11 +192,17 @@ public class SimulationService extends BasicService implements ISimulationServic
 									if(startoninit)
 									{
 										startoninit	= false;
-										start().addResultListener(access.createResultListener(new DelegationResultListener(ret)));
+										start().addResultListener(access.createResultListener(new DelegationResultListener(ret)
+										{
+											public void customResultAvailable(Object result)
+											{
+												super.customResultAvailable(getServiceIdentifier());
+											}
+										}));
 									}
 									else
 									{
-										ret.setResult(null);
+										ret.setResult(getServiceIdentifier());
 									}
 								}
 							}
@@ -214,11 +220,17 @@ public class SimulationService extends BasicService implements ISimulationServic
 									if(startoninit)
 									{
 										startoninit	= false;
-										start().addResultListener(access.createResultListener(new DelegationResultListener(ret)));
+										start().addResultListener(access.createResultListener(new DelegationResultListener(ret)
+										{
+											public void customResultAvailable(Object result)
+											{
+												super.customResultAvailable(getServiceIdentifier());
+											}
+										}));
 									}
 									else
 									{
-										ret.setResult(null);
+										ret.setResult(getServiceIdentifier());
 									}
 								}
 							}
