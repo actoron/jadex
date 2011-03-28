@@ -2083,7 +2083,7 @@ public abstract class ComponentManagementService extends BasicService implements
 											{
 												// Hack?! Need to set transport addresses on root id.
 												((ComponentIdentifier)root.getComponentIdentifier()).setAddresses(msgservice.getAddresses());
-												System.out.println("root: "+SUtil.arrayToString(msgservice.getAddresses())+" "+root.getComponentIdentifier().hashCode());
+//												System.out.println("root: "+SUtil.arrayToString(msgservice.getAddresses())+" "+root.getComponentIdentifier().hashCode());
 												adapters.put(root.getComponentIdentifier(), root);
 												
 												IComponentDescription desc = getDescription(root);

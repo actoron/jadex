@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.nio.channels.CancelledKeyException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -220,9 +221,9 @@ public class NIOTCPTransport implements ITransport
 										            // Remove it from the list to indicate that it is being processed
 										            it.remove();
 										            
-													if(key.isValid() && key.isAcceptable())
+										            try
 													{
-														try
+														if(key.isValid() && key.isAcceptable())
 														{
 															// Returns only null if no connection request is available.
 															SocketChannel sc = ssc.accept();
@@ -233,35 +234,38 @@ public class NIOTCPTransport implements ITransport
 																sc.register(selector, SelectionKey.OP_READ, new NIOTCPInputConnection(sc, codecfac, libservice.getClassLoader()));
 															}
 														}
-														catch(IOException e)
+														else if(key.isValid() && key.isReadable())
 														{
-		//													logger.warning("NIOTCP connection error on receiver side.");
-															//e.printStackTrace();
-															key.cancel();
-														}
-													}
-													else if(key.isValid() && key.isReadable())
-													{
-														final NIOTCPInputConnection con = (NIOTCPInputConnection)key.attachment();
-														try
-														{
-															for(MessageEnvelope msg=con.read(); msg!=null; msg=con.read())
+															final NIOTCPInputConnection con = (NIOTCPInputConnection)key.attachment();
+															try
 															{
-																ms.deliverMessage(msg.getMessage(), msg.getTypeName(), msg.getReceivers());
+																for(MessageEnvelope msg=con.read(); msg!=null; msg=con.read())
+																{
+																	ms.deliverMessage(msg.getMessage(), msg.getTypeName(), msg.getReceivers());
+																}
+															}
+															catch(IOException e)
+															{ 
+//																logger.warning("NIOTCP receiving error while reading data.");
+//																e.printStackTrace();
+																con.close();
+																key.cancel();
 															}
 														}
-														catch(IOException e)
-														{ 
-//															logger.warning("NIOTCP receiving error while reading data.");
-//															e.printStackTrace();
-															con.close();
+														else
+														{
 															key.cancel();
 														}
 													}
-													else
+										            catch(IOException e)
 													{
+	//													logger.warning("NIOTCP connection error on receiver side.");
+														//e.printStackTrace();
 														key.cancel();
 													}
+										            catch(CancelledKeyException e)
+										            {
+										            }
 												}
 											}
 		//									logger.info("TCPNIO receiver closed.");
