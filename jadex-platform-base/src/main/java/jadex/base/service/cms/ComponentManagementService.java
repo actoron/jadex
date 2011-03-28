@@ -2073,10 +2073,10 @@ public abstract class ComponentManagementService extends BasicService implements
 						{
 							if(msgservice!=null)
 							{
-								msgservice.signalStarted().addResultListener(new IResultListener()
-								{
-									public void resultAvailable(Object result)
-									{
+//								msgservice.signalStarted().addResultListener(new IResultListener()
+//								{
+//									public void resultAvailable(Object result)
+//									{
 										synchronized(adapters)
 										{
 											synchronized(descs)
@@ -2091,12 +2091,12 @@ public abstract class ComponentManagementService extends BasicService implements
 												descs.put(root.getComponentIdentifier(), desc);
 											}
 										}
-									}
+//									}
 									
-									public void exceptionOccurred(Exception exception)
-									{
-									}
-								});
+//									public void exceptionOccurred(Exception exception)
+//									{
+//									}
+//								});
 							}
 							else
 							{

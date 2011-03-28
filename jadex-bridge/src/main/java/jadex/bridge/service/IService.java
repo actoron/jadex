@@ -28,7 +28,7 @@ public interface IService extends IRemotable
 	 *  Test if the service is valid.
 	 *  @return True, if service can be used.
 	 */
-	public boolean isValid();
+	public IFuture isValid();
 	
 	/**
 	 *  Get the map of properties (considered as constant).
@@ -36,9 +36,9 @@ public interface IService extends IRemotable
 	 */
 	public Map getPropertyMap();
 	
-	/**
-	 *  Get a future that signals when the service is started.
-	 *  @return A future that signals when the service has been started.
-	 */
-	public IFuture signalStarted();
+//	/**
+//	 *  Get a future that signals when the service is started.
+//	 *  @return A future that signals when the service has been started.
+//	 */
+//	public IFuture signalStarted();
 }

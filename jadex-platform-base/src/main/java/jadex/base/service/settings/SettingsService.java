@@ -5,6 +5,7 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -132,7 +133,12 @@ public class SettingsService extends BasicService implements ISettingsService
 			Properties	sub	= props.getSubproperty(id);
 			if(sub!=null)
 			{
-				provider.setProperties(sub).addResultListener(new DelegationResultListener(ret));
+				provider.setProperties(sub).addResultListener(new DelegationResultListener(ret));//new DefaultResultListener()
+//				{
+//					public void resultAvailable(Object result)
+//					{
+//					}
+//				});//new DelegationResultListener(ret));
 			}
 			else
 			{

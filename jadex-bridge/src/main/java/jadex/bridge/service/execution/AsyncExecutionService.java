@@ -100,7 +100,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 //			DEBUG.put(task, "execute called");
 //		}
 		//System.out.println("execute called: "+task);
-		if(!isValid())
+		if(!customIsValid())
 			throw new RuntimeException("Not running: "+task);
 		
 		if(shutdown)
@@ -216,7 +216,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 		// todo: repair me: problem is that method can interfere with execute?!
 		final Future ret = new Future();
 		
-		if(!isValid())
+		if(!customIsValid())
 		{
 			ret.setException(new RuntimeException("Shutting down."));
 		}
@@ -286,66 +286,72 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	{
 		final  Future ret = new Future();
 		
-		if(shutdown)
+		super.startService().addResultListener(new DelegationResultListener(ret)
 		{
-			ret.setException(new RuntimeException("Cannot start: shutdowning service."));
-		}
-		else
-		{
-			SServiceProvider.getService(provider, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
+			public void customResultAvailable(Object result)
 			{
-				public void resultAvailable(Object result)
+				if(shutdown)
 				{
-					try
+					ret.setException(new RuntimeException("Cannot start: shutdowning service."));
+				}
+				else
+				{
+					SServiceProvider.getService(provider, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
 					{
-						threadpool = (IThreadPoolService)result;
-						
-						running	= true;
-//						new RuntimeException("AsyncExecustionService.start()").printStackTrace();
-						
-						if(!executors.isEmpty())
+						public void resultAvailable(Object result)
 						{
-							// Resume all suspended tasks.
-							IExecutable[] keys = (IExecutable[])executors.keySet()
-								.toArray(new IExecutable[executors.size()]);
-							for(int i=0; i<keys.length; i++)
-								execute(keys[i]);
-						}
-						else
-						{
-//						else if(idlecommands!=null)
-//						{
-//				//			System.out.println("restart: idle");
-//							Iterator it	= idlecommands.iterator();
-//							while(it.hasNext())
-//							{
-//								((ICommand)it.next()).execute(null);
-//							}
-//						}
-						
-							Future idf = null;
-							synchronized(AsyncExecutionService.this)
+							try
 							{
-								idf = idlefuture;
-								idlefuture = null;
+								threadpool = (IThreadPoolService)result;
+								
+								running	= true;
+//								new RuntimeException("AsyncExecustionService.start()").printStackTrace();
+								
+								if(!executors.isEmpty())
+								{
+									// Resume all suspended tasks.
+									IExecutable[] keys = (IExecutable[])executors.keySet()
+										.toArray(new IExecutable[executors.size()]);
+									for(int i=0; i<keys.length; i++)
+										execute(keys[i]);
+								}
+								else
+								{
+//								else if(idlecommands!=null)
+//								{
+//						//			System.out.println("restart: idle");
+//									Iterator it	= idlecommands.iterator();
+//									while(it.hasNext())
+//									{
+//										((ICommand)it.next()).execute(null);
+//									}
+//								}
+								
+									Future idf = null;
+									synchronized(AsyncExecutionService.this)
+									{
+										idf = idlefuture;
+										idlefuture = null;
+									}
+									if(idf!=null)
+										idf.setResult(null);
+								}
+								ret.setResult(getServiceIdentifier());
 							}
-							if(idf!=null)
-								idf.setResult(null);
+							catch(RuntimeException e)
+							{
+								ret.setException(e);
+							}
 						}
-						ret.setResult(getServiceIdentifier());
-					}
-					catch(RuntimeException e)
-					{
-						ret.setException(e);
-					}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
 				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					ret.setException(exception);
-				}
-			});
-		}
+			}
+		});
 		
 		return ret;
 	}
@@ -358,33 +364,39 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	{
 		final Future ret	= new Future();
 		
-		if(shutdown)
+		super.shutdownService().addResultListener(new DelegationResultListener(ret)
 		{
-			ret.setException((new RuntimeException("Already shutdowned.")));
-		}
-		else
-		{
-			shutdown = true;
-			
-			IExecutable[] keys = (IExecutable[])executors.keySet()
-				.toArray(new IExecutable[executors.size()]);
-			
-			if(keys.length>0)
+			public void customResultAvailable(Object result)
 			{
-				// One listener counts until all executors have shutdowned.
-				IResultListener lis = new CounterResultListener(keys.length, new DelegationResultListener(ret));
-				for(int i=0; i<keys.length; i++)
+				if(shutdown)
 				{
-					Executor exe = (Executor)executors.get(keys[i]);
-					if(exe!=null)
-						exe.shutdown().addResultListener(lis);
+					ret.setException((new RuntimeException("Already shutdowned.")));
+				}
+				else
+				{
+					shutdown = true;
+					
+					IExecutable[] keys = (IExecutable[])executors.keySet()
+						.toArray(new IExecutable[executors.size()]);
+					
+					if(keys.length>0)
+					{
+						// One listener counts until all executors have shutdowned.
+						IResultListener lis = new CounterResultListener(keys.length, new DelegationResultListener(ret));
+						for(int i=0; i<keys.length; i++)
+						{
+							Executor exe = (Executor)executors.get(keys[i]);
+							if(exe!=null)
+								exe.shutdown().addResultListener(lis);
+						}
+					}
+					else
+					{
+						ret.setResult(null);
+					}
 				}
 			}
-			else
-			{
-				ret.setResult(null);
-			}
-		}
+		});
 		
 		executors = null;
 		return ret;
@@ -394,7 +406,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	 *  Test if the service is valid.
 	 *  @return True, if service can be used.
 	 */
-	public synchronized boolean isValid()
+	public synchronized boolean customIsValid()
 	{
 		return running && !shutdown;
 	}

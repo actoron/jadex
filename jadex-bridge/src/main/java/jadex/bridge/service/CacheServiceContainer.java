@@ -3,6 +3,8 @@ package jadex.bridge.service;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.Tuple;
 import jadex.commons.collection.Cache;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -68,144 +70,182 @@ public class CacheServiceContainer	implements IServiceContainer
 		final Tuple key = decider.getCacheKey()!=null && selector.getCacheKey()!=null
 			? new Tuple(decider.getCacheKey(), selector.getCacheKey()) : null;
 			
-		Object data = null;
-		// Todo: cast hack??? While no clock service found (during init) search without cache.
-		final long now = clock!=null && ((IInternalService)clock).isValid()? clock.getTime(): -1;
 		
-		if(cacheon && !manager.isForcedSearch())
+		// Todo: cast hack??? While no clock service found (during init) search without cache.
+//		final long now = clock!=null && clock.isValid()? clock.getTime(): -1;
+		
+		getTime().addResultListener(new DelegationResultListener(ret)
 		{
-			synchronized(cache)
+			public void customResultAvailable(Object result)
 			{
-				// todo: currently services of unfinished containers can be searched
-				// should be strict and a container should exposed only when running.
+				Object data = null;
+				final long now = ((Long)result).longValue();
 				
-				// In case the clock if not available caching will not be used
-				// till it is available.
-				if(key!=null && cache.containsKey(key))
-				{	
-					data = cache.get(key, now);
-					if(data!=null)
+				if(cacheon && !manager.isForcedSearch())
+				{
+					synchronized(cache)
 					{
-						// Replace non-expireable entry
-						if(!cache.canExpire(key))
-						{
-							cache.put(key, data, now);
-						}
-					}
-					
-//					if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Clock")!=-1)
-//					{	
-//						System.out.println("hit: "+selector+" "+getId());
-//					}
-					
-//					if(data!=null && data.getClass().getName().indexOf("ComponentManagement")!=-1)
-//					{
-//						System.out.println("hit: "+data+" "+getId());
-//					}
-					
-					if(data instanceof IInternalService)
-					{
-						if(!((IInternalService)data).isValid())
-						{
-							cache.remove(key);
-							data = null;
+						// todo: currently services of unfinished containers can be searched
+						// should be strict and a container should exposed only when running.
+						
+						// In case the clock if not available caching will not be used
+						// till it is available.
+						if(key!=null && cache.containsKey(key))
+						{	
+							data = cache.get(key, now);
+							if(data!=null)
+							{
+								// Replace non-expireable entry
+								if(!cache.canExpire(key))
+								{
+									cache.put(key, data, now);
+								}
+							}
+							
+//							if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Clock")!=-1)
+//							{	
+//								System.out.println("hit: "+selector+" "+getId());
+//							}
+							
+//							if(data!=null && data.getClass().getName().indexOf("ComponentManagement")!=-1)
+//							{
+//								System.out.println("hit: "+data+" "+getId());
+//							}
+							
+							if(data instanceof IService)
+							{
+								addResult(ret, (IService)data, key).addResultListener(new DelegationResultListener(ret)
+								{
+									public void customResultAvailable(Object result)
+									{
+										ret.setFinished();
+									}
+								});
+							}
+							else if(data instanceof Collection)
+							{
+								Collection coll = (Collection)data;
+								// Check if all results are still ok.
+								CounterResultListener lis = new CounterResultListener(coll.size(), true, new DefaultResultListener()
+								{
+									public void resultAvailable(Object result)
+									{
+										ret.setFinished();
+									}
+								});
+								for(Iterator it=coll.iterator(); it.hasNext(); )
+								{
+									Object	next	= it.next();
+									addResult(ret, (IService)next, key).addResultListener(lis);
+								}
+							}
 						}
 						else
 						{
-							if(!ret.getIntermediateResults().contains(data))
-							{
-//								if(data.getClass().getName().indexOf("Shop")!=-1)
-//									System.out.println("cache add: "+data+" to: "+results);
-
-								ret.addIntermediateResult(data);
-							}
+//							if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Clock")!=-1)
+//							{
+//								System.out.println("no hit: "+selector+" "+getId()+" "+now);
+//							}
 						}
-						ret.setFinished();
 					}
-					else if(data instanceof Collection)
-					{
-						Collection coll = (Collection)data;
-						// Check if all results are still ok.
-						for(Iterator it=coll.iterator(); it.hasNext(); )
-						{
-							Object	next	= it.next();
-							if(next instanceof IInternalService)
-							{
-								if(!((IInternalService)next).isValid())
-								{
-									// if one is invalid whole result is invalid
-									cache.remove(key);
-									data = null;
-								}
-							}
-						}
-						if(data!=null)
-						{
-							for(Iterator it=coll.iterator(); it.hasNext(); )
-							{
-								Object	next	= it.next();
-								if(!ret.getIntermediateResults().contains(next))
-								{
-//									if(data.getClass().getName().indexOf("Shop")!=-1)
-//										System.out.println("cache add: "+data+" to: "+results);
-
-									ret.addIntermediateResult(next);
-								}
-							}
-						}
-						ret.setFinished();
-					}
-					else if(data!=null)
-					{
-						ret.setException(new RuntimeException("Unknown service type: "+data));
-						return ret;
-					}
+				}
+				
+				if(data!=null)
+				{
+					ret.setResult(data);			
 				}
 				else
 				{
-//					if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Clock")!=-1)
-//					{
-//						System.out.println("no hit: "+selector+" "+getId()+" "+now);
-//					}
+					container.getServices(manager, decider, selector).addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object result)
+						{	
+							if(key!=null && result!=null)
+							{
+								synchronized(cache)
+								{
+//									if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Clock")!=-1)
+//									{
+//										System.out.println("putting: "+getId()+" "+result);
+//									}
+									// Put result in cache, even if service may not (yet) be valid.
+									// May lead to cache hit and still service put in cache again.
+									cache.put(key, result, now);
+								}
+							}
+//							if(result==null)
+//								System.out.println("found null: "+key);
+							ret.setResult(result);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
 				}
 			}
-		}
+		});
 		
-		if(data!=null)
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture addResult(final IntermediateFuture res, final IService service, final Object key)
+	{
+		final Future ret = new Future();
+		((IInternalService)service).isValid().addResultListener(new DelegationResultListener(ret)
 		{
-			ret.setResult(data);			
-		}
-		else
+			public void customResultAvailable(Object result)
+			{
+				if(!((Boolean)result).booleanValue())
+				{
+					cache.remove(key);
+//					data = null;
+				}
+				else
+				{
+					if(!res.getIntermediateResults().contains(service))
+					{
+//						if(data.getClass().getName().indexOf("Shop")!=-1)
+//							System.out.println("cache add: "+data+" to: "+results);
+
+						res.addIntermediateResult(service);
+					}
+				}
+				ret.setResult(null);
+			}
+		});
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture getTime()
+	{
+		final Future ret = new Future();
+		if(clock!=null)
 		{
-			container.getServices(manager, decider, selector).addResultListener(new IResultListener()
+			clock.isValid().addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
-				{	
-					if(key!=null && result!=null)
-					{
-						synchronized(cache)
-						{
-//							if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Clock")!=-1)
-//							{
-//								System.out.println("putting: "+getId()+" "+result);
-//							}
-							// Put result in cache, even if service may not (yet) be valid.
-							// May lead to cache hit and still service put in cache again.
-							cache.put(key, result, now);
-						}
-					}
-//					if(result==null)
-//						System.out.println("found null: "+key);
-					ret.setResult(result);
+				{
+					ret.setResult(new Long(clock.getTime()));
 				}
-				
 				public void exceptionOccurred(Exception exception)
 				{
-					ret.setException(exception);
+					ret.setResult(new Long(-1));
 				}
 			});
 		}
-
+		else
+		{
+			ret.setResult(new Long(-1));
+		}
+		
 		return ret;
 	}
 	

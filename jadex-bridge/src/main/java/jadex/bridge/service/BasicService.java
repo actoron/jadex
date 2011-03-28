@@ -3,8 +3,10 @@ package jadex.bridge.service;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.commons.SReflect;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,9 +95,9 @@ public class BasicService implements IInternalService
 	 *  Test if the service is valid.
 	 *  @return True, if service can be used.
 	 */
-	public synchronized boolean isValid()
+	public synchronized IFuture isValid()
 	{
-		return started && !shutdowned;
+		return new Future(started && !shutdowned? Boolean.TRUE: Boolean.FALSE);
 	}
 	
 	/**
@@ -188,16 +190,22 @@ public class BasicService implements IInternalService
 	 */
 	public IFuture	shutdownService()
 	{
-		Future ret = new Future();
-		if(!isValid())
+		final Future ret = new Future();
+		isValid().addResultListener(new DelegationResultListener(ret)
 		{
-			ret.setException(new RuntimeException("Not running."));
-		}
-		else
-		{
-			shutdowned = true;
-			ret.setResult(null);
-		}
+			public void customResultAvailable(Object result)
+			{
+				if(((Boolean)result).booleanValue())
+				{
+					ret.setException(new RuntimeException("Not running."));
+				}
+				else
+				{
+					shutdowned = true;
+					ret.setResult(getServiceIdentifier());
+				}
+			}
+		});
 		return ret;
 	}
 	

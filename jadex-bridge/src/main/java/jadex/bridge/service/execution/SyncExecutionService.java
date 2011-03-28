@@ -8,6 +8,7 @@ import jadex.bridge.service.threadpool.IThreadPoolService;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -117,7 +118,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	{
 		Future ret = new Future();
 		
-		if(!isValid())
+		if(!customIsValid())
 		{
 			ret.setException(new RuntimeException("Shutting down."));
 		}
@@ -155,7 +156,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	 *  Test if the service is valid.
 	 *  @return True, if service can be used.
 	 */
-	public boolean isValid()
+	public boolean customIsValid()
 	{
 		return running && !shutdown;
 	}
@@ -174,114 +175,120 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 			return ret;
 		}
 		
-		SServiceProvider.getService(provider, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
+		super.startService().addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
-				executor = new Executor((IThreadPoolService)result, new IExecutable()
+				SServiceProvider.getService(provider, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
 				{
-					public boolean execute()
+					public void resultAvailable(Object result)
 					{
-						// Perform one task a time.
-						
-						// assert task==null;
-						synchronized(SyncExecutionService.this)
+						executor = new Executor((IThreadPoolService)result, new IExecutable()
 						{
-							if(running && !queue.isEmpty())
+							public boolean execute()
 							{
-								// Hack!!! Is there a better way to get first element from queue without creating iterator?
-								Iterator iterator = queue.iterator();
-								task = (IExecutable)iterator.next();
-								iterator.remove();
-							}
-						}
-						
-						if(task!=null)
-						{
-							boolean again = false;
-							try
-							{
-								again = task.execute();
-							}
-							catch(Exception e)
-							{
-								System.out.println("Exception during executing task: "+task);
-								e.printStackTrace();
-							}
-							
-							synchronized(SyncExecutionService.this)
-							{
-								// assert task!=null;
+								// Perform one task a time.
 								
-								if(removedtask==null)
+								// assert task==null;
+								synchronized(SyncExecutionService.this)
 								{
-									if(again && running)
+									if(running && !queue.isEmpty())
 									{
-										queue.add(task);
+										// Hack!!! Is there a better way to get first element from queue without creating iterator?
+										Iterator iterator = queue.iterator();
+										task = (IExecutable)iterator.next();
+										iterator.remove();
 									}
 								}
-								else if(removedtask==task)
+								
+								if(task!=null)
 								{
-									removedtask = null;
-									for(int i=0; i<removedfut.size(); i++)
-										((Future)removedfut.get(i)).setResult(null);
-									removedfut.clear();
-								}
-								else
-								{
-									throw new RuntimeException("Removedtask!=task: "+task+" "+removedtask);
+									boolean again = false;
+									try
+									{
+										again = task.execute();
+									}
+									catch(Exception e)
+									{
+										System.out.println("Exception during executing task: "+task);
+										e.printStackTrace();
+									}
+									
+									synchronized(SyncExecutionService.this)
+									{
+										// assert task!=null;
+										
+										if(removedtask==null)
+										{
+											if(again && running)
+											{
+												queue.add(task);
+											}
+										}
+										else if(removedtask==task)
+										{
+											removedtask = null;
+											for(int i=0; i<removedfut.size(); i++)
+												((Future)removedfut.get(i)).setResult(null);
+											removedfut.clear();
+										}
+										else
+										{
+											throw new RuntimeException("Removedtask!=task: "+task+" "+removedtask);
+										}
+										
+										task = null;
+									}
 								}
 								
-								task = null;
+								
+								// When no more executables, inform idle commands.
+		//						boolean perform = false;
+								Future ifc = null;
+								synchronized(SyncExecutionService.this)
+								{
+		//							System.out.println("task finished: "+running+", "+queue.isEmpty());
+									if(running && queue.isEmpty())
+									{
+										ifc = idlefuture;
+										idlefuture = null;
+		//								perform = idlefuture!=null;
+									}
+								}
+								if(ifc!=null)
+								{
+		//							System.out.println("Idle");
+									ifc.setResult(null);
+		//							Iterator it	= idlecommands.iterator();
+		//							while(it.hasNext())
+		//							{
+		//								((ICommand)it.next()).execute(null);
+		//							}
+								}
+								
+								// Perform next task when queue is not empty and service is running.
+								synchronized(SyncExecutionService.this)
+								{
+									// todo: extract call from synchronized block
+									if(stoplistener!=null)
+									{
+										stoplistener.resultAvailable(null);
+										stoplistener = null;
+									}
+									
+									return running && !queue.isEmpty();
+								}
 							}
-						}
+						});
 						
-						
-						// When no more executables, inform idle commands.
-//						boolean perform = false;
-						Future ifc = null;
-						synchronized(SyncExecutionService.this)
-						{
-//							System.out.println("task finished: "+running+", "+queue.isEmpty());
-							if(running && queue.isEmpty())
-							{
-								ifc = idlefuture;
-								idlefuture = null;
-//								perform = idlefuture!=null;
-							}
-						}
-						if(ifc!=null)
-						{
-//							System.out.println("Idle");
-							ifc.setResult(null);
-//							Iterator it	= idlecommands.iterator();
-//							while(it.hasNext())
-//							{
-//								((ICommand)it.next()).execute(null);
-//							}
-						}
-						
-						// Perform next task when queue is not empty and service is running.
-						synchronized(SyncExecutionService.this)
-						{
-							// todo: extract call from synchronized block
-							if(stoplistener!=null)
-							{
-								stoplistener.resultAvailable(null);
-								stoplistener = null;
-							}
-							
-							return running && !queue.isEmpty();
-						}
+						ret.setResult(getServiceIdentifier());
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setException(exception);
 					}
 				});
-				
-				ret.setResult(getServiceIdentifier());
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
 			}
 		});
 		
@@ -298,29 +305,35 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	 */
 	public IFuture	shutdownService()
 	{
-		IFuture	ret = null;
-		Future idf = null;
+		final Future ret = new Future();
 		
-		synchronized(this)
+		super.startService().addResultListener(new DelegationResultListener(ret)
 		{
-			if(!isValid())
-//			if(!running || shutdown)
+			public void customResultAvailable(Object result)
 			{
-				ret = new Future();
-				((Future)ret).setException(new RuntimeException("Not running."));
+				Future idf = null;
+				
+				synchronized(this)
+				{
+					if(!customIsValid())
+		//			if(!running || shutdown)
+					{
+						((Future)ret).setException(new RuntimeException("Not running."));
+					}
+					else
+					{
+						running = false;
+						shutdown = true;
+						executor.shutdown().addResultListener(new DelegationResultListener(ret));
+						queue = null;
+						idf = idlefuture;
+					}
+				}
+				
+				if(idf!=null)
+					idf.setException(new RuntimeException("Shutdown"));
 			}
-			else
-			{
-				this.running = false;
-				this.shutdown = true;
-				ret	= executor.shutdown();
-				queue = null;
-				idf = idlefuture;
-			}
-		}
-		
-		if(idf!=null)
-			idf.setException(new RuntimeException("Shutdown"));
+		});
 		
 		return ret;
 	}

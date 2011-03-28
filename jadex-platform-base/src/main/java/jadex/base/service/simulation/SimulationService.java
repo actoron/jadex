@@ -167,6 +167,10 @@ public class SimulationService extends BasicService implements ISimulationServic
 							{
 								proceed();
 							}
+							public void exceptionOccurred(Exception exception)
+							{
+								super.exceptionOccurred(exception);
+							}
 						}));
 					}
 					

@@ -31,7 +31,6 @@ public class ValidationServiceInterceptor extends AbstractApplicableInterceptor
 			ALWAYSOK.add(Object.class.getMethod("hashCode", new Class[0]));
 			ALWAYSOK.add(IService.class.getMethod("getServiceIdentifier", new Class[0]));
 			ALWAYSOK.add(IInternalService.class.getMethod("startService", new Class[0]));
-			ALWAYSOK.add(IInternalService.class.getMethod("signalStarted", new Class[0]));
 		}
 		catch(Exception e)
 		{
@@ -48,14 +47,21 @@ public class ValidationServiceInterceptor extends AbstractApplicableInterceptor
 		final Future ret = new Future();
 		IService ser = (IService)sic.getObject();
 		
-		if(!ser.isValid() && !ALWAYSOK.contains(sic.getMethod()))
+		ser.isValid().addResultListener(new DelegationResultListener(ret)
 		{
-			ret.setException(new ServiceInvalidException(sic.getMethod().getName()));
-		}
-		else
-		{
-			sic.invoke().addResultListener(new DelegationResultListener(ret));
-		}
+			public void customResultAvailable(Object result)
+			{
+				if(!((Boolean)result).booleanValue() && !ALWAYSOK.contains(sic.getMethod()))
+				{
+					ret.setException(new ServiceInvalidException(sic.getMethod().getName()));
+				}
+				else
+				{
+					sic.invoke().addResultListener(new DelegationResultListener(ret));
+				}
+			}
+		});
+		
 		return ret;
 	}
 }

@@ -1065,58 +1065,73 @@ public class MessageService extends BasicService implements IMessageService
 					tmp = (Object[])messages.remove(0);
 				isempty = messages.isEmpty();
 			}
+			final Object[] ftmp = tmp;
 			
-			if(isValid())
+			isValid().addResultListener(new IResultListener()
 			{
-//				System.err.println("MessageService SendManager.execute");
-				if(tmp!=null)
+				public void resultAvailable(Object result)
 				{
-					ManagerSendTask task = (ManagerSendTask)tmp[0];
-					Future ret = (Future)tmp[1];
-					
-					IComponentIdentifier[] receivers = task.getReceivers();
-	//				System.out.println("recs: "+SUtil.arrayToString(receivers)+" "+this);
-					
-					ITransport[] transports = getTransports();
-					for(int i = 0; i < transports.length && receivers.length>0; i++)
+					if(((Boolean)result).booleanValue())
 					{
-						try
+//						System.err.println("MessageService SendManager.execute");
+						if(ftmp!=null)
 						{
-							// Method returns component identifiers of undelivered components
-			//				IConnection con = transports[i].getConnection(addresses[i]);
-			//				if(con==null)
+							ManagerSendTask task = (ManagerSendTask)ftmp[0];
+							Future ret = (Future)ftmp[1];
 							
-	//						System.out.println("sending: "+transports[i]+", "+task.getMessage().get(task.getMessageType().getIdIdentifier())+", "+SUtil.arrayToString(receivers));
-//							System.err.println("MessageService SendManager.execute 1");
-							receivers = transports[i].sendMessage(task.getMessage(), task.getMessageType().getName(), receivers, task.getCodecIds());
-//							System.err.println("MessageService SendManager.execute 2");
-						}
-						catch(Exception e)
-						{
-//							System.err.println("MessageService SendManager.execute 2b");
-							e.printStackTrace();
+							IComponentIdentifier[] receivers = task.getReceivers();
+			//				System.out.println("recs: "+SUtil.arrayToString(receivers)+" "+this);
+							
+							ITransport[] transports = getTransports();
+							for(int i = 0; i < transports.length && receivers.length>0; i++)
+							{
+								try
+								{
+									// Method returns component identifiers of undelivered components
+					//				IConnection con = transports[i].getConnection(addresses[i]);
+					//				if(con==null)
+									
+			//						System.out.println("sending: "+transports[i]+", "+task.getMessage().get(task.getMessageType().getIdIdentifier())+", "+SUtil.arrayToString(receivers));
+//									System.err.println("MessageService SendManager.execute 1");
+									receivers = transports[i].sendMessage(task.getMessage(), task.getMessageType().getName(), receivers, task.getCodecIds());
+//									System.err.println("MessageService SendManager.execute 2");
+								}
+								catch(Exception e)
+								{
+//									System.err.println("MessageService SendManager.execute 2b");
+									e.printStackTrace();
+								}
+							}
+					
+							if(receivers.length > 0)
+							{
+					//			logger.warning("Message could not be delivered to (all) receivers: " + SUtil.arrayToString(receivers));
+								ret.setException(new MessageFailureException(task.getMessage(), task.getMessageType(), receivers, 
+									"Message could not be delivered to (all) receivers: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())));
+							}
+							else
+							{
+								ret.setResult(null);
+							}
 						}
 					}
-			
-					if(receivers.length > 0)
-					{
-			//			logger.warning("Message could not be delivered to (all) receivers: " + SUtil.arrayToString(receivers));
-						ret.setException(new MessageFailureException(task.getMessage(), task.getMessageType(), receivers, 
-							"Message could not be delivered to (all) receivers: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())));
-					}
+					
+					// Quit when service was terminated.
 					else
 					{
-						ret.setResult(null);
+						System.out.println("send message not executed");
+//						isempty	= true;
+						messages.clear();
 					}
 				}
-			}
-			
-			// Quit when service was terminated.
-			else
-			{
-				System.out.println("send message not executed");
-				isempty	= true;
-			}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					System.out.println("send message not executed");
+//					isempty	= true;
+					messages.clear();
+				}
+			});
 			
 			return !isempty;
 		}
@@ -1125,39 +1140,44 @@ public class MessageService extends BasicService implements IMessageService
 		 *  Add a message to be sent.
 		 *  @param message The message.
 		 */
-		public IFuture addMessage(ManagerSendTask task)
+		public IFuture addMessage(final ManagerSendTask task)
 		{
-			Future ret	= new Future();
+			final Future ret = new Future();
 			
-			if(isValid())
+			isValid().addResultListener(new DelegationResultListener(ret)
 			{
-				synchronized(this)
+				public void customResultAvailable(Object result)
 				{
-					messages.add(new Object[]{task, ret});
-				}
-				
-				SServiceProvider.getService(provider, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object result)
+					if(((Boolean)result).booleanValue())
 					{
-						try
+						synchronized(SendManager.this)
 						{
-							((IExecutionService)result).execute(SendManager.this);
+							messages.add(new Object[]{task, ret});
 						}
-						catch(RuntimeException e)
+						
+						SServiceProvider.getService(provider, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 						{
-							// ignore if execution service is shutting down.
-						}						
+							public void resultAvailable(Object result)
+							{
+								try
+								{
+									((IExecutionService)result).execute(SendManager.this);
+								}
+								catch(RuntimeException e)
+								{
+									// ignore if execution service is shutting down.
+								}						
+							}
+						});
 					}
-				});
-			}
-			
-			// Fail when service was shut down. 
-			else
-			{
-				System.out.println("message not added");
-				ret.setException(new ServiceTerminatedException(getServiceIdentifier()));
-			}
+					// Fail when service was shut down. 
+					else
+					{
+						System.out.println("message not added");
+						ret.setException(new ServiceTerminatedException(getServiceIdentifier()));
+					}
+				}
+			});
 			
 			return ret;
 		}
