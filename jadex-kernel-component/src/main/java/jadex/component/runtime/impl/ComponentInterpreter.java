@@ -20,6 +20,7 @@ import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -222,15 +223,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 							try
 							{
 								service = (IInternalService)st.getParsedValue().getValue(fetcher);
-								service = BasicServiceInvocationHandler.createServiceProxy(getExternalAccess(), getComponentAdapter(), service);
-								if(!st.isDirect())
-								{
-									BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
-									handler.addFirstServiceInterceptor(new DecouplingServiceInvocationInterceptor(getExternalAccess(), adapter));
-									
-//									System.out.println("creating decoupled service: "+st.getClassName());
-//									service = DecouplingServiceInvocationInterceptor.createServiceProxy(getExternalAccess(), getComponentAdapter(), service);
-								}
+								service = BasicServiceInvocationHandler.createProvidedServiceProxy(getExternalAccess(), getComponentAdapter(), service, st.isDirect());
 								getServiceContainer().addService(service);
 							}
 							catch(Exception e)
@@ -242,12 +235,9 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 						else 
 						{
 							RequiredServiceInfo info = new RequiredServiceInfo("virtual", st.getClazz());
-							service = BasicServiceInvocationHandler.createServiceProxy(getExternalAccess(), getComponentAdapter(), 
-								BasicService.createServiceIdentifier(getExternalAccess().getServiceProvider().getId(), info.getType(), BasicServiceInvocationHandler.class));
-							BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
-							handler.addFirstServiceInterceptor(new DelegationServiceInvocationInterceptor(getExternalAccess(), info, st.getBinding(), null));
-//							service = DelegationServiceInvocationInterceptor.createServiceProxy(
-//								getExternalAccess(), info, st.getBinding(), getModel().getClassLoader());
+							IServiceIdentifier sid = BasicService.createServiceIdentifier(getExternalAccess().getServiceProvider().getId(), 
+								info.getType(), BasicServiceInvocationHandler.class);
+							service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(getExternalAccess(), getComponentAdapter(), sid, info, st.getBinding());
 							getServiceContainer().addService(service);
 						}
 						

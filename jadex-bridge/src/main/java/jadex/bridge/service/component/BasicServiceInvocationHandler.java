@@ -3,8 +3,11 @@ package jadex.bridge.service.component;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IInternalService;
+import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -52,6 +55,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 */
 	public BasicServiceInvocationHandler(IService service)
 	{
+//		if(Proxy.isProxyClass(service.getClass()))
+//			System.out.println("tach: "+service.getServiceIdentifier());
 		this.service = service;
 		this.sid = service.getServiceIdentifier();
 	}
@@ -185,24 +190,42 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	}
 	
 	/**
-	 *  Static method for creating a service proxy.
+	 *  Static method for creating a standard service proxy for a provided service.
 	 */
-	public static IInternalService createServiceProxy(IExternalAccess ea, IComponentAdapter adapter, IInternalService service)
+	public static IInternalService createProvidedServiceProxy(IExternalAccess ea, IComponentAdapter adapter, IInternalService service, boolean direct)
 	{
+//		System.out.println("create: "+service.getServiceIdentifier().getServiceType());
 		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(service);
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
-//		System.out.println("create: "+service.getServiceIdentifier().getServiceType());
+		handler.addFirstServiceInterceptor(new ValidationServiceInterceptor());
+		if(!direct)
+			handler.addFirstServiceInterceptor(new DecouplingServiceInvocationInterceptor(ea, adapter));
 		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, service.getServiceIdentifier().getServiceType()}, handler); 
 	}
 	
 	/**
-	 *  Static method for creating a service proxy.
+	 *  Static method for creating a delegation service proxy for 
+	 *  provided service that is not offered by the component itself.
 	 */
-	public static IInternalService createServiceProxy(IExternalAccess ea, IComponentAdapter adapter, IServiceIdentifier sid)
+	public static IInternalService createDelegationProvidedServiceProxy(IExternalAccess ea, IComponentAdapter adapter, IServiceIdentifier sid, 
+		RequiredServiceInfo info, RequiredServiceBinding binding)
 	{
 		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(sid);
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
+		handler.addFirstServiceInterceptor(new DelegationServiceInvocationInterceptor(ea, info, binding, null));
 		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, sid.getServiceType()}, handler); 
 	}
 
+	/**
+	 *  Static method for creating a standard service proxy for a provided service.
+	 */
+	public static IInternalService createRequiredServiceProxy(IExternalAccess ea, IComponentAdapter adapter, IInternalService service, 
+		IRequiredServiceFetcher fetcher, RequiredServiceInfo info, RequiredServiceBinding binding)
+	{
+//		System.out.println("create: "+service.getServiceIdentifier().getServiceType());
+		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(service);
+		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
+		handler.addFirstServiceInterceptor(new RecoverServiceInterceptor(ea, info, binding, fetcher));
+		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, service.getServiceIdentifier().getServiceType()}, handler); 
+	}
 }

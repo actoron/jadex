@@ -559,35 +559,113 @@ public class MessageService extends BasicService implements IMessageService
 
 	//-------- IPlatformService interface --------
 	
+//	/**
+//	 *  Start the service.
+//	 */
+//	public IFuture startService()
+//	{
+//		final Future ret = new Future();
+//		
+//		ITransport[] tps = (ITransport[])transports.toArray(new ITransport[transports.size()]);
+//		if(transports.size()==0)
+//		{
+//			ret.setException(new RuntimeException("MessageService has no working transport for sending messages."));
+//		}
+//		else
+//		{
+//			CounterResultListener lis = new CounterResultListener(tps.length, new IResultListener()
+//			{
+//				public void resultAvailable(Object result)
+//				{
+//					SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
+//					{
+//						public void resultAvailable(Object result)
+//						{
+//							clockservice = (IClockService)result;
+//							SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new IResultListener()
+//							{
+//								public void resultAvailable(Object result)
+//								{
+//									cms = (IComponentManagementService)result;
+//									MessageService.super.startService().addResultListener(new DelegationResultListener(ret));
+//								}
+//								
+//								public void exceptionOccurred(Exception exception)
+//								{
+//									ret.setException(exception);
+//								}
+//							});
+//						}
+//						
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							ret.setException(exception);
+//						}
+//					});
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//				}
+//			});
+//			
+//			for(int i=0; i<tps.length; i++)
+//			{
+//				try
+//				{
+//					tps[i].start().addResultListener(lis);
+//				}
+//				catch(Exception e)
+//				{
+//					System.out.println("Could not initialize transport: "+tps[i]+" reason: "+e);
+//					transports.remove(tps[i]);
+//				}
+//			}
+//		}
+//		
+//		return ret;
+//	}
+	
 	/**
 	 *  Start the service.
 	 */
 	public IFuture startService()
 	{
 		final Future ret = new Future();
-		
-		ITransport[] tps = (ITransport[])transports.toArray(new ITransport[transports.size()]);
-		if(transports.size()==0)
+
+		super.startService().addResultListener(new DelegationResultListener(ret)
 		{
-			ret.setException(new RuntimeException("MessageService has no working transport for sending messages."));
-		}
-		else
-		{
-			CounterResultListener lis = new CounterResultListener(tps.length, new IResultListener()
+			public void customResultAvailable(Object result)
 			{
-				public void resultAvailable(Object result)
+				ITransport[] tps = (ITransport[])transports.toArray(new ITransport[transports.size()]);
+				if(transports.size()==0)
 				{
-					SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
+					ret.setException(new RuntimeException("MessageService has no working transport for sending messages."));
+				}
+				else
+				{
+					CounterResultListener lis = new CounterResultListener(tps.length, new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
-							clockservice = (IClockService)result;
-							SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new IResultListener()
+							SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
-									cms = (IComponentManagementService)result;
-									MessageService.super.startService().addResultListener(new DelegationResultListener(ret));
+									clockservice = (IClockService)result;
+									SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new IResultListener()
+									{
+										public void resultAvailable(Object result)
+										{
+											cms = (IComponentManagementService)result;
+											ret.setResult(null);
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											ret.setException(exception);
+										}
+									});
 								}
 								
 								public void exceptionOccurred(Exception exception)
@@ -599,30 +677,24 @@ public class MessageService extends BasicService implements IMessageService
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							ret.setException(exception);
 						}
 					});
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-			});
-			
-			for(int i=0; i<tps.length; i++)
-			{
-				try
-				{
-					tps[i].start().addResultListener(lis);
-				}
-				catch(Exception e)
-				{
-					System.out.println("Could not initialize transport: "+tps[i]+" reason: "+e);
-					transports.remove(tps[i]);
+					
+					for(int i=0; i<tps.length; i++)
+					{
+						try
+						{
+							tps[i].start().addResultListener(lis);
+						}
+						catch(Exception e)
+						{
+							System.out.println("Could not initialize transport: "+tps[i]+" reason: "+e);
+							transports.remove(tps[i]);
+						}
+					}
 				}
 			}
-		}
-		
+		});
 		return ret;
 	}
 	

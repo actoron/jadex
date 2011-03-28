@@ -13,6 +13,7 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
@@ -113,23 +114,27 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 				return IFuture.DONE;
 			}
 		};
-		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				ILibraryService libService = (ILibraryService)result;
-				libService.addLibraryServiceListener(libservicelistener);
-			}
-		});
+		
 	}
 	
 	/**
 	 *  Start the service.
-	 * /
-	public synchronized IFuture	startService()
+	 */
+	public IFuture startService()
 	{
-		return super.startService();
-	}*/
+		final Future ret = new Future();
+		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				ILibraryService libservice = (ILibraryService)result;
+				libservice.addLibraryServiceListener(libservicelistener);
+				ComponentComponentFactory.super.startService().addResultListener(new DelegationResultListener(ret));
+			}
+		});
+		return ret;
+	}
 	
 	/**
 	 *  Shutdown the service.
@@ -230,6 +235,8 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 */
 	public IFuture isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
+		if(model==null)
+			System.out.println("her");
 		return new Future(model.endsWith(ComponentModelLoader.FILE_EXTENSION_COMPONENT));
 	}
 	

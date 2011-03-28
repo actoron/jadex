@@ -48,7 +48,7 @@
 			<components>
 				<component name="calculator" type="Calculator">
 					<requiredservices>
-						<binding name="addservice" componentname="adder" scope="parent"/>			
+						<binding name="addservice" componentname="adder" componenttype="Adder" create="true" scope="parent"/>			
 						<!-- <binding name="addservice" componenttype="CorruptAdder" create="true" scope="parent"/>	 -->		
 						<binding name="subservice" componenttype="Subtractor" create="true" scope="parent"/>			
 					</requiredservices>

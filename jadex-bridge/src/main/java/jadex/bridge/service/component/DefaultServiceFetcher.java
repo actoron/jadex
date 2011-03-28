@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  *  The default service fetcher realizes the default 
- *  strategy for fetching a service.
+ *  strategy for fetching a required service.
  *  Allows for:
  *  
  *  - binding by searching service(s)
@@ -105,7 +105,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 				{
 					public void exceptionOccurred(Exception exception)
 					{
-						createComponent(provider, info, binding, null).addResultListener(new DelegationResultListener(ret)
+						createComponent(provider, info, binding).addResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
 							{
@@ -204,7 +204,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 				{
 					public void exceptionOccurred(Exception exception)
 					{
-						createComponent(provider, info, binding, null).addResultListener(new DelegationResultListener(ret)
+						createComponent(provider, info, binding).addResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
 							{
@@ -237,7 +237,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 			public void exceptionOccurred(Exception exception)
 			{
 				// No component found with cid -> create.
-				createComponent(provider, info, binding, null).addResultListener(new DelegationResultListener(ret));
+				createComponent(provider, info, binding).addResultListener(new DelegationResultListener(ret));
 			}
 		});
 		return ret;
@@ -265,21 +265,21 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 						{
 							final IComponentIdentifier cid = (IComponentIdentifier)result;
 							getChildExternalAccesses(cid, provider, info, binding)
-								.addResultListener(new StoreDelegationResultListener(ret, provider, info, binding));
+								.addResultListener(new DelegationResultListener(ret));
 						}
 					});
 				}
 			});
 		}
-		else if(RequiredServiceInfo.SCOPE_LOCAL.equals(binding.getScope()))
+		else //if(RequiredServiceInfo.SCOPE_LOCAL.equals(binding.getScope()))
 		{
 			getChildExternalAccesses((IComponentIdentifier)provider.getId(), provider, info, binding)
-				.addResultListener(new StoreDelegationResultListener(ret, provider, info, binding));
+				.addResultListener(new DelegationResultListener(ret));
 		}
-		else
-		{
-			ret.setException(new RuntimeException("Only parent or local scopes allowed."));
-		}
+//		else
+//		{
+//			ret.setException(new RuntimeException("Only parent or local scopes allowed."));
+//		}
 		
 		return ret;
 	}
@@ -315,7 +315,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 								}
 								else
 								{
-									createComponent(provider, info, binding, cid).addResultListener(new DelegationResultListener(ret)
+									createComponent(provider, info, binding).addResultListener(new DelegationResultListener(ret)
 									{
 										public void customResultAvailable(Object result)
 										{
@@ -329,7 +329,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 							
 							public void exceptionOccurred(Exception exception)
 							{
-								createComponent(provider, info, binding, cid).addResultListener(new DelegationResultListener(ret)
+								createComponent(provider, info, binding).addResultListener(new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(Object result)
 									{
@@ -412,29 +412,31 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	 *  Create component and get external access for component.
 	 */
 	protected IFuture createComponent(final IServiceProvider provider, final RequiredServiceInfo info, 
-		final RequiredServiceBinding binding, final IComponentIdentifier pa)
+		final RequiredServiceBinding binding)
 	{
 		final Future ret = new Future();
-		final IComponentIdentifier parent = pa!=null? pa: (IComponentIdentifier)provider.getId();
-		if(binding.isCreate() && binding.getComponentType()!=null)
+//		final IComponentIdentifier parent = pa!=null? pa: (IComponentIdentifier)provider.getId();
+		
+		getParentAccess(provider, info, binding).addResultListener(new DelegationResultListener(ret)
 		{
-			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-				.addResultListener(new DelegationResultListener(ret)
+			public void customResultAvailable(Object result)
 			{
-				public void customResultAvailable(Object result)
+				final IExternalAccess exta = (IExternalAccess)result;
+				if(binding.isCreate() && binding.getComponentType()!=null)
 				{
-					final IComponentManagementService cms = (IComponentManagementService)result;
-					cms.getExternalAccess(parent).addResultListener(new DelegationResultListener(ret)
+					SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+						.addResultListener(new DelegationResultListener(ret)
 					{
 						public void customResultAvailable(Object result)
 						{
-							IExternalAccess exta = (IExternalAccess)result;
+							final IComponentManagementService cms = (IComponentManagementService)result;
 							exta.getFileName(binding.getComponentType()).addResultListener(new DelegationResultListener(ret)
 							{
 								public void customResultAvailable(Object result)
 								{
 									final String filename = (String)result;
-									CreationInfo ci = new CreationInfo(parent);
+									System.out.println("file: "+filename+" "+binding.getComponentType());
+									CreationInfo ci = new CreationInfo(exta.getComponentIdentifier());
 									cms.createComponent(binding.getComponentName(), filename, ci, null)
 										.addResultListener(new DelegationResultListener(ret)
 									{
@@ -454,12 +456,53 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 						}
 					});
 				}
+				else
+				{
+					ret.setException(new RuntimeException("No creation possible"));
+				}
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public IFuture getParentAccess(final IServiceProvider provider, final RequiredServiceInfo info, final RequiredServiceBinding binding)
+	{
+		final Future ret = new Future();
+		
+		if(RequiredServiceInfo.SCOPE_PARENT.equals(binding.getScope()))
+		{
+			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+				.addResultListener(new DelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+					final IComponentManagementService cms = (IComponentManagementService)result;
+					cms.getParent((IComponentIdentifier)provider.getId()).addResultListener(new DelegationResultListener(ret)
+					{
+						public void customResultAvailable(Object result)
+						{
+							final IComponentIdentifier cid = (IComponentIdentifier)result;
+							getExternalAccess(provider, cid)
+								.addResultListener(new DelegationResultListener(ret));
+						}
+					});
+				}
 			});
 		}
-		else
+		else //if(RequiredServiceInfo.SCOPE_LOCAL.equals(binding.getScope()))
 		{
-			ret.setException(new RuntimeException("No creation possible"));
+			getExternalAccess(provider, (IComponentIdentifier)provider.getId())
+				.addResultListener(new DelegationResultListener(ret));
 		}
+//		else
+//		{
+//			ret.setException(new RuntimeException("Only parent or local scopes allowed."));
+//		}
+		
 		return ret;
 	}
 	
@@ -533,11 +576,11 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		 */
 		protected Object createProxy(IExternalAccess ea, IComponentAdapter adapter, IInternalService service)
 		{
-			return service;
-//			Object proxy = BasicServiceInvocationHandler.createServiceProxy(ea, adapter, service);
-//			BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(proxy);
-//			handler.addFirstServiceInterceptor(new DelegationServiceInvocationInterceptor(ea, info, binding, DefaultServiceFetcher.this));
-//			return proxy;
+//			return service;
+			Object proxy = service;
+//			if(!service.getServiceIdentifier().getProviderId().equals(ea.getServiceProvider().getId()) || !Proxy.isProxyClass(service.getClass()))
+			proxy = BasicServiceInvocationHandler.createRequiredServiceProxy(ea, adapter, service, DefaultServiceFetcher.this, info, binding);
+			return proxy;
 		}
 	}
 }

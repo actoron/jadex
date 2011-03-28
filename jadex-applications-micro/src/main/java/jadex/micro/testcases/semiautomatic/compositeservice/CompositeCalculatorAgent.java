@@ -37,18 +37,18 @@ public class CompositeCalculatorAgent extends MicroAgent
 			}
 		});
 		
-		add(1,2).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				System.out.println("Result is: "+result);
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				System.out.println("exe ");
-				super.exceptionOccurred(exception);
-			}
-		});
+//		add(1,2).addResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object result)
+//			{
+//				System.out.println("Result is: "+result);
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("exe ");
+//				super.exceptionOccurred(exception);
+//			}
+//		});
 	}
 	
 	/**

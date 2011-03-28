@@ -25,6 +25,12 @@ public interface IService extends IRemotable
 	public IServiceIdentifier getServiceIdentifier();
 	
 	/**
+	 *  Test if the service is valid.
+	 *  @return True, if service can be used.
+	 */
+	public boolean isValid();
+	
+	/**
 	 *  Get the map of properties (considered as constant).
 	 *  @return The service property map (if any).
 	 */

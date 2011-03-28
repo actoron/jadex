@@ -18,10 +18,4 @@ public interface IInternalService extends IService
 	 *  @return A future that is done when the service has completed its shutdown.  
 	 */
 	public IFuture	shutdownService();
-	
-	/**
-	 *  Test if the service is valid.
-	 *  @return True, if service can be used.
-	 */
-	public boolean isValid();
 }

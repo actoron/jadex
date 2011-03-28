@@ -210,7 +210,15 @@ public class ExternalAccess implements IApplicationExternalAccess
 				{
 					public void run() 
 					{
-						ret.setResult(application.getFileName(ctype));
+						String fn = application.getFileName(ctype);
+						if(fn!=null)
+						{
+							ret.setResult(fn);
+						}
+						else
+						{
+							ret.setException(new RuntimeException("Unknown component type: "+ctype));
+						}
 					}
 				});
 			}
@@ -221,7 +229,15 @@ public class ExternalAccess implements IApplicationExternalAccess
 		}
 		else
 		{
-			ret.setResult(application.getFileName(ctype));
+			String fn = application.getFileName(ctype);
+			if(fn!=null)
+			{
+				ret.setResult(fn);
+			}
+			else
+			{
+				ret.setException(new RuntimeException("Unknown component type: "+ctype));
+			}
 		}
 		
 		return ret;

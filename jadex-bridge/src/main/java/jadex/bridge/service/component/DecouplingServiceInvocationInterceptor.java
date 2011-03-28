@@ -50,26 +50,6 @@ public class DecouplingServiceInvocationInterceptor extends AbstractMultiInterce
 	 *  @param args The argument(s) for the call.
 	 *  @return The result of the command.
 	 */
-	public IFuture execute(ServiceInvocationContext sic) 	
-	{
-		IFuture ret;
-		IServiceInvocationInterceptor subic = getInterceptor(sic);
-		if(subic!=null)
-		{
-			ret = subic.execute(sic);
-		}
-		else
-		{
-			ret = doExecute(sic);
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Execute the command.
-	 *  @param args The argument(s) for the call.
-	 *  @return The result of the command.
-	 */
 	public IFuture doExecute(ServiceInvocationContext sic)
 	{
 		Future ret = new Future();
@@ -80,10 +60,14 @@ public class DecouplingServiceInvocationInterceptor extends AbstractMultiInterce
 		
 		if(!adapter.isExternalThread() || (!scheduleable && directcall))
 		{
+//			if(sic.getMethod().getName().equals("add"))
+//				System.out.println("direct: "+Thread.currentThread());
 			sic.invoke().addResultListener(new DelegationResultListener(ret));
 		}
 		else
 		{
+//			if(sic.getMethod().getName().equals("add"))
+//				System.out.println("decouple: "+Thread.currentThread());
 			ea.scheduleStep(new InvokeMethodStep(sic)).addResultListener(new DelegationResultListener(ret));
 		}
 		

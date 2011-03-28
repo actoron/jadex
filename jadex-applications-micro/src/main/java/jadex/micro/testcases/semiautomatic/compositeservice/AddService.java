@@ -30,6 +30,7 @@ public class AddService extends BasicService implements IAddService
 	 */
 	public IFuture add(double a, double b)
 	{
+		System.out.println("add service called on: "+getServiceIdentifier().getProviderId());
 		return new Future(new Double(a+b));
 	}
 }

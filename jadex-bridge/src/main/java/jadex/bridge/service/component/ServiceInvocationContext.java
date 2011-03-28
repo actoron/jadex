@@ -40,11 +40,8 @@ public class ServiceInvocationContext
 	/** The service interceptors. */
 	protected IServiceInvocationInterceptor[] interceptors;
 
-	/** The number of interceptors called. */
-	protected int cnt;
-	
-	/** The last interceptor number. */
-	protected int last;
+	/** The stack of used interceptos. */
+	protected List used;
 	
 	//-------- constructors --------
 	
@@ -59,7 +56,7 @@ public class ServiceInvocationContext
 		this.arguments = new ArrayList();
 		this.result = new ArrayList();
 		
-		this.last = -1;
+		this.used = new ArrayList();
 		this.interceptors = interceptors;
 	}
 
@@ -89,7 +86,7 @@ public class ServiceInvocationContext
 	 */
 	public Object getObject()
 	{
-		return object.get(cnt-1);
+		return object.get(used.size()-1);
 	}
 
 	/**
@@ -98,7 +95,7 @@ public class ServiceInvocationContext
 	 */
 	public void setObject(Object object)
 	{
-		this.object.set(cnt-1, object);
+		this.object.set(used.size()-1, object);
 	}
 
 	/**
@@ -107,7 +104,7 @@ public class ServiceInvocationContext
 	 */
 	public Method getMethod()
 	{
-		return (Method)method.get(cnt-1);
+		return (Method)method.get(used.size()-1);
 	}
 
 	/**
@@ -116,7 +113,7 @@ public class ServiceInvocationContext
 	 */
 	public void setMethod(Method method)
 	{
-		this.method.set(cnt-1, method);
+		this.method.set(used.size()-1, method);
 	}
 
 	/**
@@ -125,7 +122,7 @@ public class ServiceInvocationContext
 	 */
 	public List getArguments()
 	{
-		return (List)arguments.get(cnt-1);
+		return (List)arguments.get(used.size()-1);
 	}
 	
 	/**
@@ -134,7 +131,7 @@ public class ServiceInvocationContext
 	 */
 	public Object[] getArgumentArray()
 	{
-		List args = (List)arguments.get(cnt-1);
+		List args = (List)arguments.get(used.size()-1);
 		return args!=null? args.toArray(): new Object[0];
 	}
 	
@@ -144,7 +141,7 @@ public class ServiceInvocationContext
 	 */
 	public void setArguments(List args)
 	{
-		this.arguments.set(cnt-1, args);
+		this.arguments.set(used.size()-1, args);
 	}
 
 	/**
@@ -153,7 +150,7 @@ public class ServiceInvocationContext
 	 */
 	public Object getResult()
 	{
-		return result.get(cnt-1);
+		return result.get(used.size()-1);
 	}
 
 	/**
@@ -162,7 +159,7 @@ public class ServiceInvocationContext
 	 */
 	public void setResult(Object result)
 	{
-		this.result.set(cnt-1, result);
+		this.result.set(used.size()-1, result);
 	}
 
 	
@@ -264,9 +261,15 @@ public class ServiceInvocationContext
 	{
 		final Future ret = new Future();
 		
+//		if(method.getName().equals("add"))
+//			System.out.println("invoke: "+Thread.currentThread());
+		
 		push(object, method, args, null);
 		
 		IServiceInvocationInterceptor interceptor = getNextInterceptor();
+
+		if(method.getName().equals("add"))
+			System.out.println("add: "+used.get(used.size()-1)+" "+interceptor+" "+Thread.currentThread());
 		
 		if(interceptor!=null)
 		{
@@ -303,12 +306,13 @@ public class ServiceInvocationContext
 		
 		if(interceptors!=null)
 		{
-			for(int i=last+1; i<interceptors.length; i++)
+			int start = used.size()==0? -1: (Integer)used.get(used.size()-1);
+			for(int i=start+1; i<interceptors.length; i++)
 			{
 				if(interceptors[i].isApplicable(this))
 				{
 					ret = interceptors[i];
-					last = i;
+					used.add(new Integer(i));
 					break;
 				}
 			}
@@ -334,7 +338,6 @@ public class ServiceInvocationContext
 		method.add(m);
 		arguments.add(args);
 		result.add(res);
-		cnt++;
 	}
 	
 	/**
@@ -343,9 +346,9 @@ public class ServiceInvocationContext
 	protected void pop()
 	{
 		// Keep last results
-		if(cnt>1)
+		if(used.size()>1)
 		{
-			cnt--;
+			used.remove(used.size()-1);
 			object.remove(object.size()-1);
 			method.remove(method.size()-1);
 			arguments.remove(arguments.size()-1);

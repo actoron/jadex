@@ -1209,17 +1209,9 @@ public class AgentRules
 				
 				try
 				{
-					IInternalService service = (IInternalService)evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
-					service = BasicServiceInvocationHandler.createServiceProxy(BDIInterpreter.getInterpreter(state).getExternalAccess(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), service);
 					Boolean direct = (Boolean)state.getAttributeValue(mexp, OAVBDIMetaModel.providedservice_has_direct);
-					if(!direct.booleanValue())
-					{
-						BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
-						handler.addFirstServiceInterceptor(new DecouplingServiceInvocationInterceptor(BDIInterpreter.getInterpreter(state).getExternalAccess(), BDIInterpreter.getInterpreter(state).getAgentAdapter()));
-						
-//						System.out.println("creating decoupled service: "+st.getClassName());
-//						service = DecouplingServiceInvocationInterceptor.createServiceProxy(getExternalAccess(), getComponentAdapter(), service);
-					}
+					IInternalService service = (IInternalService)evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
+					service = BasicServiceInvocationHandler.createProvidedServiceProxy(BDIInterpreter.getInterpreter(state).getExternalAccess(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), service, direct.booleanValue());
 					((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(service);
 				}
 				catch(Exception e)

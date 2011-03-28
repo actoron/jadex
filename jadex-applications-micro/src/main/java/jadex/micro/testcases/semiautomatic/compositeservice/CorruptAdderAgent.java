@@ -39,7 +39,7 @@ public class CorruptAdderAgent extends MicroAgent
 					if(context.getMethod().equals(IAddService.class.getMethod("add", new Class[]{double.class, double.class})))
 					{
 						System.out.println("hello interceptor");
-						if(calls++>0)
+//						if(calls++>0)
 						{
 							killAgent();
 						}

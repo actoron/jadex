@@ -2,8 +2,10 @@ package jadex.bridge.service.component;
 
 import java.lang.reflect.Proxy;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IRequiredServiceFetcher;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.future.DelegationResultListener;
@@ -62,7 +64,15 @@ public class RecoverServiceInterceptor extends AbstractApplicableInterceptor
 					{
 						public void exceptionOccurred(Exception exception)
 						{
-							rebind(sic).addResultListener(new DelegationResultListener(ret));
+							if(exception instanceof ComponentTerminatedException)
+							{
+								System.out.println("exception: "+((IService)sic.getObject()).getServiceIdentifier());
+								rebind(sic).addResultListener(new DelegationResultListener(ret));
+							}
+							else
+							{
+								super.exceptionOccurred(exception);
+							}
 						}
 					});
 				}
@@ -85,12 +95,14 @@ public class RecoverServiceInterceptor extends AbstractApplicableInterceptor
 	 */
 	public IFuture rebind(final ServiceInvocationContext sic)
 	{
+		System.out.println("rebind1: "+Thread.currentThread());
 		final Future ret = new Future();
 		fetcher.getService(info, binding, ea.getServiceProvider(), false)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result) 
 			{
+				System.out.println("rebind: "+((IService)result).getServiceIdentifier()+Thread.currentThread());
 				BasicServiceInvocationHandler handler =  (BasicServiceInvocationHandler)Proxy.getInvocationHandler(result);
 				Object rawservice = handler.getService();
 				sic.setObject(rawservice);
