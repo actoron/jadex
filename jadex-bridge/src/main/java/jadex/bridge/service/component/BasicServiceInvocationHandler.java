@@ -225,7 +225,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 //		System.out.println("create: "+service.getServiceIdentifier().getServiceType());
 		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(service);
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
-		handler.addFirstServiceInterceptor(new RecoverServiceInterceptor(ea, info, binding, fetcher));
+		if(binding.isRecover())
+			handler.addFirstServiceInterceptor(new RecoverServiceInterceptor(ea, info, binding, fetcher));
 		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, service.getServiceIdentifier().getServiceType()}, handler); 
 	}
 }

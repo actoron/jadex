@@ -67,7 +67,7 @@ public interface IExternalAccess extends IRemotable
 	
 	/**
 	 *  Get the children (if any).
-	 *  @return The children.
+	 *  @return The children component identifiers.
 	 */
 	public IFuture getChildren(String type);
 	

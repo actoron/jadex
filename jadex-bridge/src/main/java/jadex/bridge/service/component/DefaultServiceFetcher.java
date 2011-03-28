@@ -12,6 +12,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -19,7 +20,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -309,9 +309,19 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 								Collection coll = (Collection)result;
 								if(coll!=null && coll.size()>0)
 								{
-//									Iterator it = coll.iterator();
-//									IExternalAccess child = (IExternalAccess)it.next();
-									ret.setResult(coll);
+									ArrayList res = new ArrayList();
+									CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new DefaultResultListener()
+									{
+										public void resultAvailable(Object result)
+										{
+											ret.setResult(result);
+										}
+									});
+									for(Iterator it=coll.iterator(); it.hasNext(); )
+									{
+										IComponentIdentifier cid = (IComponentIdentifier)it.next();
+										cms.getExternalAccess(cid).addResultListener(lis);
+									}
 								}
 								else
 								{
