@@ -1415,6 +1415,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
 			if(adapter==null)
 			{
+				// Hack? Allows components to getExternalAccess in init phase
 				Object[] ii = (Object[])initinfos.get(cid);
 				if(ii!=null)
 					adapter = (IComponentAdapter)ii[1];

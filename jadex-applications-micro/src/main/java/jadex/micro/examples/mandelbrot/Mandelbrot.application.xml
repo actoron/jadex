@@ -10,7 +10,7 @@
 	
 	<imports>
 		<import>jadex.bridge.serviceclock.IClockService</import>
-		<import>jjadex.bridge.serviceServiceProvider</import>
+		<import>jadex.bridge.service.SServiceProvider</import>
 		<import>jadex.commons.IFuture</import>
 	</imports>
 	
@@ -25,9 +25,15 @@
 	</componenttypes>
 	
 	<services>
-		<providedservice class="IGenerateService" componenttype="Generator"/>
-		<!-- <providedservice class="ICalculateService" componenttype="Calculator"/> -->
-		<providedservice class="IDisplayService" componenttype="Display"/>
+		<providedservice class="IGenerateService">
+			<binding componenttype="Generator"/>
+		</providedservice>
+		<!-- <providedservice class="ICalculateService">
+			<binding componenttype="Calculator"/>
+		</providedservice> -->
+		<providedservice class="IDisplayService">
+			<binding componenttype="Display"/>
+		</providedservice>
 	</services>
 	
 	<applications>
