@@ -336,8 +336,8 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 										// (NOTE2: subcomponents must be created one by one as they
 										// might depend on each other (e.g. bdi factory must be there for jcc)).
 										
-										final IComponentManagementService ces = (IComponentManagementService)result;
-										createComponent(components, ces, 0, inited, new ArrayList());
+										final IComponentManagementService cms = (IComponentManagementService)result;
+										createComponent(components, cms, 0, inited);
 									}
 								}));
 							}
@@ -1286,7 +1286,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	 *  because they need the external access of the parent, which is available only
 	 *  after init is finished (otherwise there is a cyclic init dependency between parent and subcomps). 
 	 */
-	protected void createComponent(final List components, final IComponentManagementService cms, final int i, final Future inited, final List tostart)
+	protected void createComponent(final List components, final IComponentManagementService cms, final int i, final Future inited)
 	{
 		if(i<components.size())
 		{
@@ -1315,7 +1315,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 							@XMLClassname("createChild")
 							public Object execute(IInternalAccess ia)
 							{
-								createComponent(components, cms, i+1, inited, tostart);
+								createComponent(components, cms, i+1, inited);
 								return null;
 							}
 						});
@@ -1341,20 +1341,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 						new CreationInfo(component.getConfiguration(), getArguments(component), adapter.getComponentIdentifier(),
 						suspend, master, daemon, autoshutdown, model.getAllImports(), 
 						bindings!=null? (RequiredServiceBinding[])bindings.toArray(new RequiredServiceBinding[bindings.size()]): null), null);
-					ret.addResultListener(new IResultListener()
-					{
-						public void resultAvailable(Object result)
-						{
-							if(suspend==null || !suspend.booleanValue())
-								tostart.add(result);
-							crl.resultAvailable(result);
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							crl.exceptionOccurred(exception);
-						}
-					});
+					ret.addResultListener(crl);
 				}
 				else
 				{
@@ -1371,11 +1358,11 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 //			Boolean[] bools = new Boolean[3];
 //			bools[2] = model.getAutoShutdown();
 			
-			for(int j=0; j<tostart.size(); j++)
-			{
-				IComponentIdentifier cid = (IComponentIdentifier)tostart.get(j);
-				cms.resumeComponent(cid);
-			}
+//			for(int j=0; j<tostart.size(); j++)
+//			{
+//				IComponentIdentifier cid = (IComponentIdentifier)tostart.get(j);
+//				cms.resumeComponent(cid);
+//			}
 			
 			inited.setResult(new Object[]{ApplicationInterpreter.this, adapter});
 		}

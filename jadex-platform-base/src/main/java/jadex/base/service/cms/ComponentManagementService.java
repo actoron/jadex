@@ -324,7 +324,8 @@ public abstract class ComponentManagementService extends BasicService implements
 																descs.put(cid, ad);
 		//														System.out.println("adding cid: "+cid+" "+ad.getMaster()+" "+ad.getDaemon()+" "+ad.getAutoShutdown());
 																adapters.put(cid, adapter);
-																initinfos.remove(cid);
+																// Removed in resumeComponent()
+//																initinfos.remove(cid);
 																
 																CMSComponentDescription padesc;
 																Object[] painfo = getParentInfo(cinfo);
@@ -363,11 +364,11 @@ public abstract class ComponentManagementService extends BasicService implements
 																// Registration finished -> reactivate component.
 																if(isInitSuspend(cinfo, lmodel))
 																{
-																	ad.setState(IComponentDescription.STATE_SUSPENDED);
+																	ad.setState(CMSComponentDescription.STATE_SUSPENDED);
 																}
 																else
 																{
-																	ad.setState(IComponentDescription.STATE_ACTIVE);
+																	ad.setState(CMSComponentDescription.STATE_ACTIVE);
 																}
 																
 																// todo: can be called after listener has (concurrently) deregistered
@@ -399,19 +400,11 @@ public abstract class ComponentManagementService extends BasicService implements
 																
 																inited.setResult(cid);
 																
-																// Start regular execution of inited component.
-																if(cinfo.getSuspend()==null || !cinfo.getSuspend().booleanValue())
-																{
-																	try
-																	{
-		//																System.out.println("cid wakeup: "+cid);
-																		adapter.wakeup();
-																	}
-																	catch(Exception e)
-																	{
-																		e.printStackTrace();
-																	}
-																}
+																// Start regular execution of inited component
+																// when this component is the outermost component, i.e. with no parent
+																// or the parent is already running
+																if(cinfo.getParent()==null || initinfos.get(cinfo.getParent())==null)
+																	resumeComponent(cid);
 															}
 															
 															public void exceptionOccurred(Exception exception)
@@ -1004,8 +997,6 @@ public abstract class ComponentManagementService extends BasicService implements
 		}
 		else
 		{
-			CMSComponentDescription ad;
-			boolean	changed	= false;
 			synchronized(adapters)
 			{
 				synchronized(descs)
@@ -1015,52 +1006,54 @@ public abstract class ComponentManagementService extends BasicService implements
 					if(desc!=null)
 					{
 						IComponentIdentifier[] achildren = desc.getChildren();
-		//				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
+						CounterResultListener lis = new CounterResultListener(achildren.length, true, new DefaultResultListener()
+						{
+							public void resultAvailable(Object result)
+							{
+								IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
+								CMSComponentDescription ad = (CMSComponentDescription)descs.get(cid);
+								boolean	changed	= false;
+								if(adapter==null || ad==null)
+								{
+									ret.setException(new RuntimeException("Component identifier not registered: "+cid));
+									return;
+								}
+
+								// Hack for startup.
+								boolean suspend = false;
+								Object[] ii = (Object[])initinfos.remove(cid);
+								if(ii!=null)
+								{
+									CreationInfo cinfo = (CreationInfo)ii[2];
+									IModelInfo lmodel = (IModelInfo)ii[3];
+									suspend = isInitSuspend(cinfo, lmodel);
+								}
+//								System.out.println("resume: "+cid+" suspend:"+suspend);
+								if(!suspend && IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
+								{
+									ad.setState(IComponentDescription.STATE_ACTIVE);						
+									adapter.wakeup();
+									changed	= true;
+								}
+								
+								if(changed)
+									notifyListeners(cid, ad);
+							
+								ret.setResult(ad);
+							}
+						});
+						
 						for(int i=0; i<achildren.length; i++)
 						{
-		//					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
-	//						if(IComponentDescription.STATE_SUSPENDED.equals(((IComponentDescription)descs.get(achildren[i])).getState()))
-	//						{
-								resumeComponent(achildren[i]);	// todo: cascading resume with wait.
-	//						}
+							resumeComponent(achildren[i]).addResultListener(lis);
 						}
 					}
-	
-					IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
-					ad = (CMSComponentDescription)descs.get(cid);
-					if(adapter==null || ad==null)
+					else
 					{
-						ret.setException(new RuntimeException("Component identifier not registered: "+cid));
-						return ret;
-					}
-
-					if(IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
-					{
-						ad.setState(IComponentDescription.STATE_ACTIVE);						
-						adapter.wakeup();
-						changed	= true;
+						ret.setResult(null);
 					}
 				}
 			}
-			
-			if(changed)
-			{
-				notifyListeners(cid, ad);
-//				ICMSComponentListener[]	alisteners;
-//				synchronized(listeners)
-//				{
-//					Set	slisteners	= new HashSet(listeners.getCollection(null));
-//					slisteners.addAll(listeners.getCollection(cid));
-//					alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
-//				}
-//				// todo: can be called after listener has (concurrently) deregistered
-//				for(int i=0; i<alisteners.length; i++)
-//				{
-//					alisteners[i].componentChanged(ad);
-//				}
-			}
-		
-			ret.setResult(ad);
 		}
 		
 		return ret;
@@ -1701,6 +1694,14 @@ public abstract class ComponentManagementService extends BasicService implements
 			synchronized(descs)
 			{
 				desc = (IComponentDescription)descs.get(cid);
+
+				// Hack, to retrieve description from component itself in init phase
+				if(desc==null)
+				{
+					Object[] ii= (Object[])initinfos.get(cid);
+					if(ii!=null)
+						desc = (IComponentDescription)ii[0];
+				}
 				
 				// Todo: addresses required for communication across platforms.
 		//		ret.setName(refreshComponentIdentifier(aid));

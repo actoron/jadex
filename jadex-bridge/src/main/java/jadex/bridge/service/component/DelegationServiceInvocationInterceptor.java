@@ -140,14 +140,6 @@ public class DelegationServiceInvocationInterceptor extends AbstractMultiInterce
 					return IFuture.DONE;
 				}
 			});
-			ret.put(IInternalService.class.getMethod("signalStarted", new Class[0]), new AbstractApplicableInterceptor()
-			{
-				public IFuture execute(ServiceInvocationContext context)
-				{
-					context.setResult(IFuture.DONE);
-					return IFuture.DONE;
-				}
-			});
 			ret.put(IInternalService.class.getMethod("startService", new Class[0]), new AbstractApplicableInterceptor()
 			{
 				public IFuture execute(ServiceInvocationContext context)
