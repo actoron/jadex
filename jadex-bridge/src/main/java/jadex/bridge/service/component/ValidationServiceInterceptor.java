@@ -31,6 +31,7 @@ public class ValidationServiceInterceptor extends AbstractApplicableInterceptor
 			ALWAYSOK.add(Object.class.getMethod("hashCode", new Class[0]));
 			ALWAYSOK.add(IService.class.getMethod("getServiceIdentifier", new Class[0]));
 			ALWAYSOK.add(IInternalService.class.getMethod("startService", new Class[0]));
+			ALWAYSOK.add(IInternalService.class.getMethod("shutdownService", new Class[0]));
 		}
 		catch(Exception e)
 		{

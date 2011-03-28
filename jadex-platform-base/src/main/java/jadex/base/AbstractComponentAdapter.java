@@ -591,6 +591,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				exception.printStackTrace();
 				getLogger().warning("Exception during service container shutdown: "+exception);
 //				listener.resultAvailable(this, getComponentIdentifier());
 				ret.setResult(getComponentIdentifier());	// Exception should be propagated?

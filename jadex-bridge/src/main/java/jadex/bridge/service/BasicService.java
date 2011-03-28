@@ -195,7 +195,7 @@ public class BasicService implements IInternalService
 		{
 			public void customResultAvailable(Object result)
 			{
-				if(((Boolean)result).booleanValue())
+				if(!((Boolean)result).booleanValue())
 				{
 					ret.setException(new RuntimeException("Not running."));
 				}
