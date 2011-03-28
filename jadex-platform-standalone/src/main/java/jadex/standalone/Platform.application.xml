@@ -88,17 +88,6 @@
 				new Object[]{"jadex.base.gui.componentviewer.libservice.LibServiceBrowser", new String[]{"getClassLoader"}})
 				)
 		</providedservice>
-		<providedservice class="IComponentManagementService" direct="true">
-			new ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter())
-		</providedservice>
-		<!-- <providedservice class="IDF" direct="true">
-			new DirectoryFacilitatorService($component.getServiceProvider(), SUtil.createHashMap(
-				new Object[]{"componentviewer.viewerclass"}, 
-				new Object[]{"jadex.base.gui.componentviewer.dfservice.DFBrowserPanel"}))
-		</providedservice> -->
-		<providedservice class="IDF" direct="true">
-			new DirectoryFacilitatorService($component.getServiceProvider())
-		</providedservice>
 		<providedservice class="IMessageService" direct="true">
 			new MessageService($component.getServiceProvider(),
 				new ITransport[]
@@ -113,6 +102,17 @@
 				}, null,
 				new CodecFactory(null, new Class[]{JadexXMLCodec.class})
 				)
+		</providedservice>
+		<providedservice class="IComponentManagementService" direct="true">
+			new ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter())
+		</providedservice>
+		<!-- <providedservice class="IDF" direct="true">
+			new DirectoryFacilitatorService($component.getServiceProvider(), SUtil.createHashMap(
+				new Object[]{"componentviewer.viewerclass"}, 
+				new Object[]{"jadex.base.gui.componentviewer.dfservice.DFBrowserPanel"}))
+		</providedservice> -->
+		<providedservice class="IDF" direct="true">
+			new DirectoryFacilitatorService($component.getServiceProvider())
 		</providedservice>
 		<providedservice class="IClockService" direct="true">
 			$args.simulation

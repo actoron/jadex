@@ -1,6 +1,5 @@
 package jadex.base.service.cms;
 
-import jadex.base.AbstractComponentAdapter;
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.base.fipa.SearchConstraints;
 import jadex.bridge.ComponentIdentifier;
@@ -24,6 +23,7 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.execution.IExecutionService;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.IRemotable;
+import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.CollectionResultListener;
@@ -38,7 +38,6 @@ import jadex.commons.future.RemoteDelegationResultListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -392,8 +391,8 @@ public abstract class ComponentManagementService extends BasicService implements
 																	}
 																}
 																		
-		//																System.out.println("created: "+cid.getLocalName()+" "+(parent!=null?parent.getComponentIdentifier().getLocalName():"null"));
-		//																System.out.println("added: "+descs.size()+", "+aid);
+		//														System.out.println("created: "+cid.getLocalName()+" "+(parent!=null?parent.getComponentIdentifier().getLocalName():"null"));
+		//														System.out.println("added: "+descs.size()+", "+aid);
 																
 																if(killlistener!=null)
 																	killresultlisteners.put(cid, killlistener);
@@ -2034,9 +2033,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	{
 		final Future	ret	= new Future();
 		
-		super.startService().addResultListener(new IResultListener()
+		super.startService().addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
 				final boolean[]	services = new boolean[2];
 				
@@ -2052,13 +2051,13 @@ public abstract class ComponentManagementService extends BasicService implements
 							setresult	= services[0] && services[1];
 						}
 						if(setresult)
-							ret.setResult(ComponentManagementService.this);
+							ret.setResult(getServiceIdentifier());
 					}
 				});
 				
-				SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
 				{
-					public void resultAvailable(Object result)
+					public void customResultAvailable(Object result)
 					{
 						msgservice	= (IMessageService)result;
 						
@@ -2084,7 +2083,7 @@ public abstract class ComponentManagementService extends BasicService implements
 											{
 												// Hack?! Need to set transport addresses on root id.
 												((ComponentIdentifier)root.getComponentIdentifier()).setAddresses(msgservice.getAddresses());
-	//											System.out.println("root: "+SUtil.arrayToString(msgservice.getAddresses())+" "+root.getComponentIdentifier().hashCode());
+												System.out.println("root: "+SUtil.arrayToString(msgservice.getAddresses())+" "+root.getComponentIdentifier().hashCode());
 												adapters.put(root.getComponentIdentifier(), root);
 												
 												IComponentDescription desc = getDescription(root);
@@ -2114,14 +2113,9 @@ public abstract class ComponentManagementService extends BasicService implements
 						}
 						
 						if(setresult)
-							ret.setResult(ComponentManagementService.this);
+							ret.setResult(getServiceIdentifier());
 					}
 				});
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
 			}
 		});
 		

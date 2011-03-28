@@ -18,6 +18,7 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -429,14 +430,15 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	{
 		final Future ret = new Future();
 		
-		super.startService().addResultListener(new IResultListener()
+		super.startService().addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
 				final boolean[]	services	= new boolean[2];
-				SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new IResultListener()
+				SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class)
+					.addResultListener(new DelegationResultListener(ret)
 				{
-					public void resultAvailable(Object result)
+					public void customResultAvailable(Object result)
 					{
 						cms	= (IComponentManagementService)result;
 						boolean	setresult;
@@ -446,17 +448,14 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 							setresult	= services[0] && services[1];
 						}
 						if(setresult)
-							ret.setResult(DirectoryFacilitatorService.this);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						ret.setException(exception);
+							ret.setResult(getServiceIdentifier());
 					}
 				});
-				SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
+				
+				SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new DelegationResultListener(ret)
 				{
-					public void resultAvailable(Object result)
+					public void customResultAvailable(Object result)
 					{
 						clockservice	= (IClockService)result;
 						boolean	setresult;
@@ -466,20 +465,10 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 							setresult	= services[0] && services[1];
 						}
 						if(setresult)
-							ret.setResult(DirectoryFacilitatorService.this);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						ret.setException(exception);
+							ret.setResult(getServiceIdentifier());
 					}
 				});
 				
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
 			}
 		});
 		

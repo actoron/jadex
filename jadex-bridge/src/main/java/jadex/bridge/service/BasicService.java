@@ -176,7 +176,7 @@ public class BasicService implements IInternalService
 				}
 			}
 			
-			ret.setResult(this);
+			ret.setResult(getServiceIdentifier());
 		}
 		
 		return ret;

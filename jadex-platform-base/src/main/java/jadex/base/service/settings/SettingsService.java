@@ -80,7 +80,13 @@ public class SettingsService extends BasicService implements ISettingsService
 		{
 			public void customResultAvailable(Object result)
 			{
-				loadProperties().addResultListener(new DelegationResultListener(ret));
+				loadProperties().addResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						super.customResultAvailable(getServiceIdentifier());
+					}
+				});
 			}
 		});
 		return ret;

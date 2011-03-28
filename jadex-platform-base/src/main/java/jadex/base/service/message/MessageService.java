@@ -1,7 +1,6 @@
 package jadex.base.service.message;
 
 import jadex.base.AbstractComponentAdapter;
-import jadex.base.service.cms.ComponentManagementService;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.codecs.CodecFactory;
 import jadex.bridge.ContentException;
@@ -97,8 +96,8 @@ public class MessageService extends BasicService implements IMessageService
 	/** The cashed clock service. */
 	protected IClockService	clockservice;
 	
-	/** The cashed clock service. */
-	protected IComponentManagementService cms;
+//	/** The cashed clock service. */
+//	protected IComponentManagementService cms;
 	
 	/** The target managers. */
 	protected LRU managers;
@@ -157,7 +156,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Send a message.
 	 *  @param message The native message.
 	 */
-	public IFuture sendMessage(final Map msg, final MessageType type, IComponentIdentifier sender, final ClassLoader cl, final byte[] codecids)
+	public IFuture sendMessage(final Map msg, final MessageType type, final IComponentIdentifier sender, final ClassLoader cl, final byte[] codecids)
 	{
 		final Future ret = new Future();
 		
@@ -185,37 +184,46 @@ public class MessageService extends BasicService implements IMessageService
 		final Object senddate = msgcopy.get(sd);
 		
 		// External access of sender required for content encoding etc.
-		cms.getExternalAccess(sender).addResultListener(new IResultListener()
+		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class)
+			.addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
-				IExternalAccess exta = (IExternalAccess)result;
-				if(senddate==null)
+				IComponentManagementService cms = (IComponentManagementService)result;
+				cms.getExternalAccess(sender).addResultListener(new DelegationResultListener(ret)
 				{
-//					SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
-//					{
-//						public void resultAvailable(Object source, Object result)
-//						{
-//							if(result!=null)
-//								msgcopy.put(sd, ""+((IClockService)result).getTime());
-							
-							msgcopy.put(sd, ""+clockservice.getTime());
-							
+					public void customResultAvailable(Object result)
+					{
+						IExternalAccess exta = (IExternalAccess)result;
+						if(senddate==null)
+						{
+//							SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
+//							{
+//								public void resultAvailable(Object source, Object result)
+//								{
+//									if(result!=null)
+//										msgcopy.put(sd, ""+((IClockService)result).getTime());
+									
+									msgcopy.put(sd, ""+clockservice.getTime());
+									
+									doSendMessage(msg, type, exta, cl, msgcopy, ret, codecids);
+//								}
+//							});
+						}
+						else
+						{
 							doSendMessage(msg, type, exta, cl, msgcopy, ret, codecids);
-//						}
-//					});
-				}
-				else
-				{
-					doSendMessage(msg, type, exta, cl, msgcopy, ret, codecids);
-				}
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
 			}
 		});
+		
 		
 		return ret;
 	}
@@ -653,19 +661,20 @@ public class MessageService extends BasicService implements IMessageService
 								public void resultAvailable(Object result)
 								{
 									clockservice = (IClockService)result;
-									SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new IResultListener()
-									{
-										public void resultAvailable(Object result)
-										{
-											cms = (IComponentManagementService)result;
-											ret.setResult(null);
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-											ret.setException(exception);
-										}
-									});
+									ret.setResult(getServiceIdentifier());
+//									SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new IResultListener()
+//									{
+//										public void resultAvailable(Object result)
+//										{
+//											cms = (IComponentManagementService)result;
+//											ret.setResult(null);
+//										}
+//										
+//										public void exceptionOccurred(Exception exception)
+//										{
+//											ret.setException(exception);
+//										}
+//									});
 								}
 								
 								public void exceptionOccurred(Exception exception)
@@ -865,10 +874,12 @@ public class MessageService extends BasicService implements IMessageService
 		final MessageType	messagetype	= getMessageType(type);
 		final Map	decoded	= new HashMap();	// Decoded messages cached by class loader to avoid decoding the same message more than once, when the same class loader is used.
 		
-		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class)
+			.addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
+				IComponentManagementService cms = (IComponentManagementService)result;
 				for(int i = 0; i < receivers.length; i++)
 				{
 //					final int cnt = i; 
@@ -938,6 +949,14 @@ public class MessageService extends BasicService implements IMessageService
 			}	
 		});
 	}
+	
+//	/**
+//	 * 
+//	 */
+//	protected IFuture getCMS()
+//	{
+//		return SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class);
+//	}
 	
 //	/**
 //	 *  Send message(s) executable.

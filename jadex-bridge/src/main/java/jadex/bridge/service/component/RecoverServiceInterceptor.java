@@ -8,6 +8,7 @@ import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceInvalidException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -64,9 +65,10 @@ public class RecoverServiceInterceptor extends AbstractApplicableInterceptor
 					{
 						public void exceptionOccurred(Exception exception)
 						{
-							if(exception instanceof ComponentTerminatedException)
+							if(exception instanceof ComponentTerminatedException 
+								|| exception instanceof ServiceInvalidException)
 							{
-								System.out.println("exception: "+((IService)sic.getObject()).getServiceIdentifier());
+//								System.out.println("exception: "+((IService)sic.getObject()).getServiceIdentifier());
 								rebind(sic).addResultListener(new DelegationResultListener(ret));
 							}
 							else
@@ -95,14 +97,17 @@ public class RecoverServiceInterceptor extends AbstractApplicableInterceptor
 	 */
 	public IFuture rebind(final ServiceInvocationContext sic)
 	{
-		System.out.println("rebind1: "+Thread.currentThread());
+//		System.out.println("rebind1: "+Thread.currentThread());
 		final Future ret = new Future();
+		
+		// todo: problem, search delivers failed service as result again
+		
 		fetcher.getService(info, binding, ea.getServiceProvider(), false)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result) 
 			{
-				System.out.println("rebind: "+((IService)result).getServiceIdentifier()+Thread.currentThread());
+//				System.out.println("rebind: "+((IService)result).getServiceIdentifier()+Thread.currentThread());
 				BasicServiceInvocationHandler handler =  (BasicServiceInvocationHandler)Proxy.getInvocationHandler(result);
 				Object rawservice = handler.getService();
 				sic.setObject(rawservice);

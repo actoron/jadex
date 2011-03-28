@@ -207,7 +207,14 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			{
 				allservices.addAll((Collection)it.next());
 			}
-			CounterResultListener	crl	= new CounterResultListener(allservices.size(), new DelegationResultListener(ret));
+			CounterResultListener	crl	= new CounterResultListener(allservices.size(), new DelegationResultListener(ret))
+			{
+				public void resultAvailable(Object result)
+				{
+					System.out.println("started: "+result);
+					super.resultAvailable(result);
+				}
+			};
 			for(Iterator it=allservices.iterator(); it.hasNext(); )
 			{
 				((IInternalService)it.next()).startService().addResultListener(crl);

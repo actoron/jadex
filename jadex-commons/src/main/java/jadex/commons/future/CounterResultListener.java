@@ -59,7 +59,7 @@ public class CounterResultListener implements IResultListener
 	 *  Called when the result is available.
 	 * @param result The result.
 	 */
-	public final void resultAvailable(Object result)
+	public void resultAvailable(Object result)
 	{
 //		System.out.println("here: "+cnt+" "+num);
 		boolean	notify	= false;

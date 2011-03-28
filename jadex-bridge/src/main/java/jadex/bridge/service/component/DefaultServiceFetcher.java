@@ -586,11 +586,11 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		 */
 		protected Object createProxy(IExternalAccess ea, IComponentAdapter adapter, IInternalService service)
 		{
-//			return service;
-			Object proxy = service;
+			return service;
+//			Object proxy = service;
 //			if(!service.getServiceIdentifier().getProviderId().equals(ea.getServiceProvider().getId()) || !Proxy.isProxyClass(service.getClass()))
-			proxy = BasicServiceInvocationHandler.createRequiredServiceProxy(ea, adapter, service, DefaultServiceFetcher.this, info, binding);
-			return proxy;
+//			proxy = BasicServiceInvocationHandler.createRequiredServiceProxy(ea, adapter, service, DefaultServiceFetcher.this, info, binding);
+//			return proxy;
 		}
 	}
 }
