@@ -181,14 +181,14 @@ public class MicroAgentInterpreter implements IComponentInstance
 						fetcher.setValue("$provider", getServiceProvider());
 						for(int i=0; i<services.length; i++)
 						{
-							IInternalService service;
+							Object service;
 							if(services[i].getExpression()!=null)
 							{
 								try
 								{
 									// todo: other Class imports, how can be found out?
 									String[] imports = new String[]{microagent.getClass().getPackage().getName()+".*"};
-									service = (IInternalService)SJavaParser.evaluateExpression(services[i].getExpression(), imports, fetcher, model.getClassLoader());
+									service = SJavaParser.evaluateExpression(services[i].getExpression(), imports, fetcher, model.getClassLoader());
 									if(services[i].isDirect())
 									{
 										microagent.addDirectService(service);

@@ -556,7 +556,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  the old one is removed and shutdowned.
 	 *  @param service The service.
 	 */
-	public void addDirectService(IInternalService service)
+	public void addDirectService(Object service)
 	{
 		IInternalService proxyser = BasicServiceInvocationHandler.createProvidedServiceProxy(getExternalAccess(), getAgentAdapter(), service, true);
 		((IServiceContainer)interpreter.getServiceProvider()).addService(proxyser);
@@ -568,7 +568,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  the old one is removed and shutdowned.
 	 *  @param service The service.
 	 */
-	public void addService(IInternalService service)
+	public void addService(Object service)
 	{
 		IInternalService proxyser = BasicServiceInvocationHandler.createProvidedServiceProxy(getExternalAccess(), getAgentAdapter(), service, false);
 		((IServiceContainer)interpreter.getServiceProvider()).addService(proxyser);

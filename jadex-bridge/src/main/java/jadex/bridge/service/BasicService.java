@@ -62,8 +62,8 @@ public class BasicService implements IInternalService
 	 */
 	public BasicService(Object providerid, Class type, Map properties)
 	{
-		if(!SReflect.isSupertype(type, getClass()))
-			throw new RuntimeException("Service must implement provided interface: "+getClass().getName()+", "+type.getName());
+//		if(!SReflect.isSupertype(type, getClass()))
+//			throw new RuntimeException("Service must implement provided interface: "+getClass().getName()+", "+type.getName());
 		this.sid = createServiceIdentifier(providerid, type, getClass());
 		this.properties	= properties;
 		
@@ -94,6 +94,8 @@ public class BasicService implements IInternalService
 	/**
 	 *  Test if the service is valid.
 	 *  @return True, if service can be used.
+	 *  
+	 *  todo: why is method synchronized?
 	 */
 	public synchronized IFuture isValid()
 	{

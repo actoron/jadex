@@ -2,6 +2,7 @@ package jadex.bridge.service.component;
 
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.IService;
@@ -35,7 +36,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	protected IServiceIdentifier sid;
 	
 	/** The service. */
-	protected IService service;
+	protected Object service;
 
 	/** The list of interceptors. */
 	protected List interceptors;
@@ -55,10 +56,17 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 */
 	public BasicServiceInvocationHandler(IService service)
 	{
-//		if(Proxy.isProxyClass(service.getClass()))
-//			System.out.println("tach: "+service.getServiceIdentifier());
 		this.service = service;
 		this.sid = service.getServiceIdentifier();
+	}
+	
+	/**
+	 *  Create a new invocation handler.
+	 */
+	public BasicServiceInvocationHandler(ServiceInfo service)
+	{
+		this.service = service;
+		this.sid = service.getManagementService().getServiceIdentifier();
 	}
 	
 	//-------- methods --------
@@ -127,7 +135,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  Get the service.
 	 *  @return The service.
 	 */
-	public IService getService()
+	public Object getService()
 	{
 		return service;
 	}
@@ -192,15 +200,35 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	/**
 	 *  Static method for creating a standard service proxy for a provided service.
 	 */
-	public static IInternalService createProvidedServiceProxy(IExternalAccess ea, IComponentAdapter adapter, IInternalService service, boolean direct)
+	public static IInternalService createProvidedServiceProxy(IExternalAccess ea, IComponentAdapter adapter, Object service, boolean direct)
 	{
 //		System.out.println("create: "+service.getServiceIdentifier().getServiceType());
-		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(service);
+		BasicServiceInvocationHandler handler;
+		Class type;
+		if(service instanceof IService)
+		{
+			IService ser = (IService)service;
+			handler = new BasicServiceInvocationHandler(ser);
+			type = ser.getServiceIdentifier().getServiceType();
+		}
+		else
+		{
+			Class[] types = service.getClass().getInterfaces();
+			if(types.length!=1)
+				throw new RuntimeException("Unknown service interface: "+SUtil.arrayToString(types));
+			
+			type = types[0];
+			BasicService mgmntservice = new BasicService(ea.getServiceProvider().getId(), type, null);
+			ServiceInfo si = new ServiceInfo(service, mgmntservice);
+			handler = new BasicServiceInvocationHandler(si);
+			
+		}
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
+		handler.addFirstServiceInterceptor(new ServiceSelectorInterceptor());
 		handler.addFirstServiceInterceptor(new ValidationServiceInterceptor());
 		if(!direct)
 			handler.addFirstServiceInterceptor(new DecouplingServiceInvocationInterceptor(ea, adapter));
-		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, service.getServiceIdentifier().getServiceType()}, handler); 
+		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler); 
 	}
 	
 	/**
@@ -228,5 +256,44 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		if(binding.isRecover())
 			handler.addFirstServiceInterceptor(new RecoverServiceInterceptor(ea, info, binding, fetcher));
 		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, service.getServiceIdentifier().getServiceType()}, handler); 
+	}
+}
+
+/**
+ * 
+ */
+class ServiceInfo
+{
+	/** The service domain object. */
+	protected Object domainservice;
+	
+	/** The management object. */
+	protected BasicService mgmntservice; 
+	
+	/**
+	 * 
+	 */
+	public ServiceInfo(Object domainservice, BasicService mgmntservice)
+	{
+		this.domainservice = domainservice;
+		this.mgmntservice = mgmntservice;
+	}
+
+	/**
+	 *  Get the domainservice.
+	 *  @return The domainservice.
+	 */
+	public Object getDomainService()
+	{
+		return domainservice;
+	}
+
+	/**
+	 *  Get the mgmntservice.
+	 *  @return The mgmntservice.
+	 */
+	public BasicService getManagementService()
+	{
+		return mgmntservice;
 	}
 }

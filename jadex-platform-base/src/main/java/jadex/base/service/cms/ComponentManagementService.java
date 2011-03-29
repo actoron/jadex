@@ -407,7 +407,7 @@ public abstract class ComponentManagementService extends BasicService implements
 																// or the parent is already running
 																if(cinfo.getParent()==null || initinfos.get(cinfo.getParent())==null)
 																{
-																	System.err.println("start: "+cid);
+//																	System.err.println("start: "+cid);
 																	resumeComponent(cid);
 																}
 															}

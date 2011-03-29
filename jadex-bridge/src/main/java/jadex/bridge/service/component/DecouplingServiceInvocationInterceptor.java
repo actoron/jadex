@@ -54,11 +54,10 @@ public class DecouplingServiceInvocationInterceptor extends AbstractMultiInterce
 	{
 		Future ret = new Future();
 		
-		Class returntype = sic.getMethod().getReturnType();
-		boolean scheduleable = returntype.equals(IFuture.class) || returntype.equals(void.class);
-		boolean directcall = true;
+		boolean scheduleable = sic.getMethod().getReturnType().equals(IFuture.class) 
+			|| sic.getMethod().getReturnType().equals(void.class);
 		
-		if(!adapter.isExternalThread() || (!scheduleable && directcall))
+		if(!adapter.isExternalThread() || !scheduleable)
 		{
 //			if(sic.getMethod().getName().equals("add"))
 //				System.out.println("direct: "+Thread.currentThread());

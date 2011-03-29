@@ -3,6 +3,7 @@ package jadex.bridge.service.component;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceInvalidException;
+import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -32,6 +33,7 @@ public class ValidationServiceInterceptor extends AbstractApplicableInterceptor
 			ALWAYSOK.add(IService.class.getMethod("getServiceIdentifier", new Class[0]));
 			ALWAYSOK.add(IInternalService.class.getMethod("startService", new Class[0]));
 			ALWAYSOK.add(IInternalService.class.getMethod("shutdownService", new Class[0]));
+			ALWAYSOK.add(IService.class.getMethod("isValid", new Class[0]));
 		}
 		catch(Exception e)
 		{
@@ -46,22 +48,33 @@ public class ValidationServiceInterceptor extends AbstractApplicableInterceptor
 	public IFuture execute(final ServiceInvocationContext sic)
 	{
 		final Future ret = new Future();
-		IService ser = (IService)sic.getObject();
 		
-		ser.isValid().addResultListener(new DelegationResultListener(ret)
+		boolean scheduleable = sic.getMethod().getReturnType().equals(IFuture.class) 
+		|| sic.getMethod().getReturnType().equals(void.class);
+
+		if(ALWAYSOK.contains(sic.getMethod()) || !scheduleable)
 		{
-			public void customResultAvailable(Object result)
+			sic.invoke().addResultListener(new DelegationResultListener(ret));
+		}
+		else
+		{
+			// Call isValid() on proxy.
+			IService ser = (IService)sic.getProxy();
+			ser.isValid().addResultListener(new DelegationResultListener(ret)
 			{
-				if(!((Boolean)result).booleanValue() && !ALWAYSOK.contains(sic.getMethod()))
+				public void customResultAvailable(Object result)
 				{
-					ret.setException(new ServiceInvalidException(sic.getMethod().getName()));
+					if(((Boolean)result).booleanValue())
+					{
+						sic.invoke().addResultListener(new DelegationResultListener(ret));
+					}
+					else
+					{
+						ret.setException(new ServiceInvalidException(sic.getMethod().getName()));
+					}
 				}
-				else
-				{
-					sic.invoke().addResultListener(new DelegationResultListener(ret));
-				}
-			}
-		});
+			});
+		}
 		
 		return ret;
 	}
