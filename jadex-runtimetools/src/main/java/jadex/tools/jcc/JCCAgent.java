@@ -14,7 +14,7 @@ import jadex.tools.deployer.DeployerPlugin;
 import jadex.tools.dfbrowser.DFServicePlugin;
 import jadex.tools.libtool.LibraryServicePlugin;
 import jadex.tools.simcenter.SimCenterPlugin;
-import jadex.tools.starter.StarterServicePlugin;
+import jadex.tools.starter.StarterPlugin;
 import jadex.tools.testcenter.TestCenterPlugin;
 
 /**
@@ -32,8 +32,8 @@ public class JCCAgent extends MicroAgent
 		ControlCenter	cc	= new ControlCenter();
 		cc.init(getExternalAccess(),
 			new String[]{
-//				StarterPlugin.class.getName(),
-				StarterServicePlugin.class.getName(),
+				StarterPlugin.class.getName(),
+//				StarterServicePlugin.class.getName(),
 				DFServicePlugin.class.getName(),
 				ConversationPlugin.class.getName(),
 				ComanalyzerPlugin.class.getName(),

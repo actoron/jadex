@@ -36,12 +36,6 @@ public interface IControlCenterPlugin extends IPropertiesProvider
 	public Icon getToolIcon(boolean selected);
 
 	/**
-	 *  Return the id for the help system
-	 *  This method may be called before init().
-	 */
-	public String getHelpID();
-
-	/**
 	 *  Return the panel that is shown in the center of the JCC design.
 	 *  This is called in swing thread context.
 	 */

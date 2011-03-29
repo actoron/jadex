@@ -471,15 +471,6 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	};
 
 	/**
-	 * @return the help id of the perspective
-	 * @see jadex.tools.common.plugin.AbstractJCCPlugin#getHelpID()
-	 */
-	public String getHelpID()
-	{
-		return "tools.componentviewer";
-	}
-	
-	/**
 	 *  Test if a node is viewable.
 	 *  @param node	The node.
 	 *  @return True, if the node is viewable.

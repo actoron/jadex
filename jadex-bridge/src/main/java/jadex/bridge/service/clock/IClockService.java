@@ -1,7 +1,9 @@
 package jadex.bridge.service.clock;
 
 import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.Excluded;
 import jadex.commons.IChangeListener;
+import jadex.commons.concurrent.IThreadPool;
 
 
 /**
@@ -133,5 +135,13 @@ public interface IClockService extends IService
 	 *  @return True, if clock could be advanced.
 	 */
 	public boolean advanceEvent();
+
+	/**
+	 *  Set the clock.
+	 *  @param clock The new clock.
+	 */
+	// Hack!!! Remove?
+	@Excluded
+	public void setClock(String type, IThreadPool tp);
 	
 }

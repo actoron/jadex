@@ -312,6 +312,7 @@ public class ControlCenter
 						PropertiesXMLHelper.getPropertyWriter().write(props, os, ((ILibraryService)result).getClassLoader(), null);
 						os.close();
 						window.getStatusBar().setText("Settings saved successfully: "+ file.getAbsolutePath());
+						ret.setResult(null);
 					}
 				});
 			}

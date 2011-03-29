@@ -3,7 +3,6 @@ package jadex.tools.testcenter;
 import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.modeltree.AddPathAction;
-import jadex.base.gui.modeltree.AddRemotePathAction;
 import jadex.base.gui.modeltree.ModelTreePanel;
 import jadex.base.gui.modeltree.RemovePathAction;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
@@ -59,9 +58,6 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 
 	//-------- attributes --------
 
-	/** The node functionality. */
-	protected STestCenter	nof;
-
 	/** The panel showing the classpath models. */
 	protected ModelTreePanel	mpanel;
 
@@ -104,28 +100,14 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		JComponent[] ret = new JComponent[5];
 		JButton b;
 
-		b = new JButton(new ToolTipAction(AddPathAction.getName(), 
-			AddPathAction.getIcon(), AddPathAction.getTooltipText())
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				if(mpanel.isRemote())
-				{
-					mpanel.getAction(AddRemotePathAction.getName()).actionPerformed(e);
-				}
-				else
-				{
-					mpanel.getAction(AddPathAction.getName()).actionPerformed(e);
-				}
-			}
-		});
+		b = new JButton(mpanel.getAction(AddPathAction.getName()));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
 		ret[0] = b;
 
-		b = new JButton(new RemovePathAction(mpanel));
+		b = new JButton(mpanel.getAction(RemovePathAction.getName()));
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);

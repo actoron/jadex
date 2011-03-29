@@ -8,23 +8,18 @@ import jadex.commons.future.IFuture;
 /**
  * 
  */
+//@ServiceInterface(IAddService.class)
 public class PojoAddService implements IAddService
 {
 	// todo: make injectable these attribues
 	
 	/** The service identifier. */
+//	@ServiceIdentifier
 	protected IServiceIdentifier sid;
 	
 	/** The service provider. */
+//	@ServiceComponent
 	protected IInternalAccess comp;
-	
-	/**
-	 *  Create the service.
-	 */
-	public PojoAddService(IInternalAccess comp)
-	{
-		this.comp = comp;
-	}
 	
 	//-------- methods --------
 
@@ -36,7 +31,7 @@ public class PojoAddService implements IAddService
 	 */
 	public IFuture add(double a, double b)
 	{
-		System.out.println("add service called on: "+sid);
+		System.out.println("add service called on: "+sid+", comp="+(comp!=null?comp.getComponentIdentifier():null));
 		return new Future(new Double(a+b));
 	}
 }

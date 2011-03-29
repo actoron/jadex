@@ -315,15 +315,6 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	}
 
 	/**
-	 * @return The help id of the perspective.
-	 * @see jadex.base.gui.plugin.AbstractJCCPlugin#getHelpID()
-	 */
-	public String getHelpID()
-	{
-		return "tools.comanalyzer";
-	}
-
-	/**
 	 * Create tool bar.
 	 * 
 	 * @return The tool bar.

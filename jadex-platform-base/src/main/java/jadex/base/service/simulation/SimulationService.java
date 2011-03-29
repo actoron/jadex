@@ -6,7 +6,6 @@ import jadex.bridge.ISettingsService;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.clock.ClockService;
 import jadex.bridge.service.clock.IClock;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.clock.ITimer;
@@ -413,7 +412,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 					public void customResultAvailable(Object result)
 					{
 						IThreadPoolService	tps	= (IThreadPoolService)result;
-						((ClockService)clockservice).setClock(type, tps);
+						clockservice.setClock(type, tps);
 						notifyListeners(new ChangeEvent(this, "clock_type", type));
 						fut.setResult(null);
 					}
@@ -482,10 +481,9 @@ public class SimulationService extends BasicService implements ISimulationServic
 	 *  Get the platform clock.
 	 *  @return The clock.
 	 */
-	protected IClockService getClockService()
+	public IClockService getClockService()
 	{
 		return clockservice;
-//		return (IClockService)container.getService(IClockService.class);
 	}
 	
 	/**
@@ -495,7 +493,6 @@ public class SimulationService extends BasicService implements ISimulationServic
 	public IExecutionService getExecutorService()
 	{
 		return exeservice;
-//		return (IExecutionService)container.getService(IExecutionService.class);
 	}
 
 	/**

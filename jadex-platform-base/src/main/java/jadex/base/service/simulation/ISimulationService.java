@@ -2,6 +2,8 @@ package jadex.base.service.simulation;
 
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Excluded;
+import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.execution.IExecutionService;
 import jadex.commons.IChangeListener;
 import jadex.commons.future.IFuture;
 
@@ -59,6 +61,18 @@ public interface ISimulationService	extends IService
 	 *  Test if context is executing.
 	 */
 	public IFuture isExecuting();
+	
+	/**
+	 *  Get the platform clock.
+	 *  @return The clock.
+	 */
+	public IClockService getClockService();
+	
+	/**
+	 *  Get the executor service.
+	 *  @return The executor service.
+	 */
+	public IExecutionService getExecutorService();
 	
 	// todo: hack remove method?!
 	/**

@@ -31,16 +31,7 @@ public class DeployerPlugin extends AbstractJCCPlugin
 	//-------- methods --------
 	
 	/**
-	 *  Test if this plugin should be initialized lazily.
-	 *  @return True, if lazy.
-	 */
-	public boolean isLazy()
-	{
-		return false;
-	}
-	
-	/**
-	 * @return "Library Tool"
+	 * @return "Deployer Tool"
 	 * @see jadex.base.gui.plugin.IControlCenterPlugin#getName()
 	 */
 	public String getName()
@@ -81,21 +72,5 @@ public class DeployerPlugin extends AbstractJCCPlugin
 	public IFuture getProperties()
 	{
 		return deployerpanel.getProperties();
-	}
-
-	/** 
-	 * @return the help id of the perspective
-	 * @see jadex.base.gui.plugin.AbstractJCCPlugin#getHelpID()
-	 */
-	public String getHelpID()
-	{
-		return "tools.deployertool";
-	}
-	
-	/**
-	 *  Reset the conversation center to an initial state
-	 */
-	public void	reset()
-	{
 	}
 }

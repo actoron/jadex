@@ -36,8 +36,7 @@ public class ModelTreePanel extends FileTreePanel
 		
 		setFileFilter(ff);
 		setMenuItemConstructor(mic);
-		actions.put(AddPathAction.getName(), new AddPathAction(this));
-		actions.put(AddRemotePathAction.getName(), new AddRemotePathAction(this));
+		actions.put(AddPathAction.getName(), remote ? new AddRemotePathAction(this) : new AddPathAction(this));
 		actions.put(RemovePathAction.getName(), new RemovePathAction(this));
 		setPopupBuilder(new PopupBuilder(new Object[]{actions.get(AddPathAction.getName()), 
 			actions.get(AddRemotePathAction.getName()), mic}));

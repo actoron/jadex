@@ -333,13 +333,4 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 			}
 		}
 	};
-
-	/**
-	 * @return the help id of the perspective
-	 * @see jadex.base.gui.plugin.AbstractJCCPlugin#getHelpID()
-	 */
-	public String getHelpID()
-	{
-		return "tools.debugger";
-	}
 }

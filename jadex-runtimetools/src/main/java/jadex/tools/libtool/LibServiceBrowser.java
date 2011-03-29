@@ -6,12 +6,9 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
 import jadex.commons.Properties;
-import jadex.commons.Property;
-import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
-import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.EditableListEvent;
 import jadex.commons.gui.SGUI;
@@ -26,8 +23,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.Charset;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
@@ -332,29 +327,6 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 	 */
 	public IFuture setProperties(Properties props)
 	{
-		Property[] ps = props.getProperties("cp");
-		for(int i=0; i<ps.length; i++)
-		{
-			try
-			{
-				// todo: make addURL return IFuture
-				File	file = new File(URLDecoder.decode(ps[i].getValue(), Charset.defaultCharset().name()));
-				if(file.exists())
-				{
-					libservice.addURL(file.toURI().toURL());
-				}
-				else
-				{
-					libservice.addURL(new URL(ps[i].getValue()));
-				}
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-				System.out.println("Classpath problem: "+ps[i].getValue());
-			}
-		}
-		
 		return IFuture.DONE;
 	}
 
@@ -364,33 +336,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 	 */
 	public IFuture getProperties()
 	{
-		final Future ret = new Future();
-		
-		libservice.getURLs().addResultListener(new SwingDelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				Properties	props	= new Properties();
-				List urls = (List)result;
-				for(int i=0; i<urls.size(); i++)
-				{
-					URL	url	= (URL) urls.get(i);
-					String	urlstring;
-					if(url.getProtocol().equals("file"))
-					{
-						urlstring	= SUtil.convertPathToRelative(url.getPath());
-					}
-					else
-					{
-						urlstring	= url.toString();
-					}
-					
-					props.addProperty(new Property("cp", urlstring));
-				}
-				ret.setResult(props);
-			}
-		});
-		
+		Future ret = new Future();
 		return ret;
 	}
 }

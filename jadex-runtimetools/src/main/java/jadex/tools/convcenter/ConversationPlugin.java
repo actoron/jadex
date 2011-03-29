@@ -295,31 +295,4 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		props.addSubproperties("convcenter", convcenter.getProperties());
 		return new Future(props);
 	}
-
-	/** 
-	 * @return the help id of the perspective
-	 * @see jadex.base.gui.plugin.AbstractJCCPlugin#getHelpID()
-	 */
-	public String getHelpID()
-	{
-		return "tools.conversationcenter";
-	}
-	
-	/**
-	 *  Reset the conversation center to an initial state
-	 */
-	public void	reset()
-	{
-		convcenter.reset();
-	}
-	
-	/**
-	 *  Test if this plugin should be initialized lazily.
-	 *  @return True, if lazy.
-	 */
-	public boolean isLazy()
-	{
-		return false;
-	}
-
 }
