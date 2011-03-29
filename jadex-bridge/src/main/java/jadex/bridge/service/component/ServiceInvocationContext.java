@@ -1,7 +1,6 @@
 package jadex.bridge.service.component;
 
-import jadex.commons.IResultCommand;
-import jadex.commons.future.DelegationResultListener;
+import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -16,8 +15,6 @@ import java.util.List;
  */
 public class ServiceInvocationContext
 {
-	protected static final IServiceInvocationInterceptor DEFAULT_COMMAND = new MethodInvocationInterceptor();
-	
 	//-------- attributes --------
 	
 	/** The origin (proxy object. */
@@ -298,7 +295,7 @@ public class ServiceInvocationContext
 	}
 	
 	/**
-	 * 
+	 *  Get the next interceptor.
 	 */
 	public IServiceInvocationInterceptor getNextInterceptor()
 	{
@@ -330,7 +327,7 @@ public class ServiceInvocationContext
 	}
 
 	/**
-	 * 
+	 *  Push saves and copies the current set of values.
 	 */
 	protected void push(Object o, Method m, List args, Object res)
 	{
@@ -341,7 +338,7 @@ public class ServiceInvocationContext
 	}
 	
 	/**
-	 * 
+	 *  Pop delete the top most set of values.
 	 */
 	protected void pop()
 	{

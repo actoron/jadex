@@ -1,13 +1,26 @@
-package jadex.bridge.service.component;
+package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.component.ServiceInfo;
+import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.IFuture;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class ServiceSelectorInterceptor extends AbstractApplicableInterceptor
+/**
+ *  The resolve interceptor is responsible for determining
+ *  the object on which the method invocation is finally performed.
+ * 
+ *  Checks whether the object is a ServiceInfo. In this case
+ *  it delegates method calls of I(Internal)Service to 
+ *  the automatically created BasicService instance and all
+ *  other calls to the domain object.
+ *  
+ *  // todo: much annotation stuff and injection of objects to the pojo.
+ */
+public class ResolveInterceptor extends AbstractApplicableInterceptor
 {
 	//-------- constants --------
 	

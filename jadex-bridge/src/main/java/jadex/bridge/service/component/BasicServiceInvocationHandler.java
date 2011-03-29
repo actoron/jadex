@@ -9,6 +9,12 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.interceptors.DecouplingInterceptor;
+import jadex.bridge.service.component.interceptors.DelegationInterceptor;
+import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
+import jadex.bridge.service.component.interceptors.RecoveryInterceptor;
+import jadex.bridge.service.component.interceptors.ResolveInterceptor;
+import jadex.bridge.service.component.interceptors.ValidationInterceptor;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -224,10 +230,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			
 		}
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
-		handler.addFirstServiceInterceptor(new ServiceSelectorInterceptor());
-		handler.addFirstServiceInterceptor(new ValidationServiceInterceptor());
+		if(!(service instanceof IService))
+			handler.addFirstServiceInterceptor(new ResolveInterceptor());
+		handler.addFirstServiceInterceptor(new ValidationInterceptor());
 		if(!direct)
-			handler.addFirstServiceInterceptor(new DecouplingServiceInvocationInterceptor(ea, adapter));
+			handler.addFirstServiceInterceptor(new DecouplingInterceptor(ea, adapter));
 		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler); 
 	}
 	
@@ -240,7 +247,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	{
 		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(sid);
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
-		handler.addFirstServiceInterceptor(new DelegationServiceInvocationInterceptor(ea, info, binding, null));
+		handler.addFirstServiceInterceptor(new DelegationInterceptor(ea, info, binding, null));
 		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, sid.getServiceType()}, handler); 
 	}
 
@@ -254,46 +261,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(service);
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 		if(binding.isRecover())
-			handler.addFirstServiceInterceptor(new RecoverServiceInterceptor(ea, info, binding, fetcher));
+			handler.addFirstServiceInterceptor(new RecoveryInterceptor(ea, info, binding, fetcher));
 		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, service.getServiceIdentifier().getServiceType()}, handler); 
 	}
 }
 
-/**
- * 
- */
-class ServiceInfo
-{
-	/** The service domain object. */
-	protected Object domainservice;
-	
-	/** The management object. */
-	protected BasicService mgmntservice; 
-	
-	/**
-	 * 
-	 */
-	public ServiceInfo(Object domainservice, BasicService mgmntservice)
-	{
-		this.domainservice = domainservice;
-		this.mgmntservice = mgmntservice;
-	}
 
-	/**
-	 *  Get the domainservice.
-	 *  @return The domainservice.
-	 */
-	public Object getDomainService()
-	{
-		return domainservice;
-	}
-
-	/**
-	 *  Get the mgmntservice.
-	 *  @return The mgmntservice.
-	 */
-	public BasicService getManagementService()
-	{
-		return mgmntservice;
-	}
-}

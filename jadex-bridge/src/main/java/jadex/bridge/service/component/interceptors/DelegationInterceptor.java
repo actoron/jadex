@@ -1,4 +1,4 @@
-package jadex.bridge.service.component;
+package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -7,6 +7,10 @@ import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.DefaultServiceFetcher;
+import jadex.bridge.service.component.IServiceInvocationInterceptor;
+import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -21,7 +25,7 @@ import java.util.Map;
  *  
  *  Used e.g. for provided services with binding i.e. delegation. 
  */
-public class DelegationServiceInvocationInterceptor extends AbstractMultiInterceptor
+public class DelegationInterceptor extends AbstractMultiInterceptor
 {
 	//-------- constants --------
 	
@@ -47,7 +51,7 @@ public class DelegationServiceInvocationInterceptor extends AbstractMultiInterce
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public DelegationServiceInvocationInterceptor(IExternalAccess ea, RequiredServiceInfo info, 
+	public DelegationInterceptor(IExternalAccess ea, RequiredServiceInfo info, 
 		RequiredServiceBinding binding, IRequiredServiceFetcher fetcher)
 	{
 		this.ea = ea;

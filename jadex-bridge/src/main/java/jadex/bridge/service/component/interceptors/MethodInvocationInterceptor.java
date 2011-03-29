@@ -1,12 +1,13 @@
-package jadex.bridge.service.component;
+package jadex.bridge.service.component.interceptors;
 
+import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
- * 
+ *  Calls a methods on an object and returns the result.
  */
-class MethodInvocationInterceptor extends AbstractApplicableInterceptor
+public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 {
 	/**
 	 *  Execute the interceptor.

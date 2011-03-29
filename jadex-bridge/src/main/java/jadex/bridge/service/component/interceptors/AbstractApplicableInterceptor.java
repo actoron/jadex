@@ -1,4 +1,7 @@
-package jadex.bridge.service.component;
+package jadex.bridge.service.component.interceptors;
+
+import jadex.bridge.service.component.IServiceInvocationInterceptor;
+import jadex.bridge.service.component.ServiceInvocationContext;
 
 /**
  *  Simple abstract base class that implements isApplicable with true.

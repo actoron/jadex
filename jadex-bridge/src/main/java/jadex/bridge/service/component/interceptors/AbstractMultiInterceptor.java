@@ -1,8 +1,8 @@
-package jadex.bridge.service.component;
+package jadex.bridge.service.component.interceptors;
 
+import jadex.bridge.service.component.IServiceInvocationInterceptor;
+import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.IFuture;
-
-import java.util.Map;
 
 /**
  *  Abstract interceptor that supports sub interceptors for special cases.

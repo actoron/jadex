@@ -20,6 +20,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -521,9 +522,18 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	 */
 	public class StoreDelegationResultListener extends DelegationResultListener
 	{
+		//-------- attributes --------
+		
+		/** The provider. */
 		protected IServiceProvider provider;
+		
+		/** The required service info. */
 		protected RequiredServiceInfo info;
+		
+		/** The required service binding. */
 		protected RequiredServiceBinding binding;
+		
+		//-------- constructors --------
 		
 		/**
 		 *  Create a new listener.
@@ -535,6 +545,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 			this.info = info;
 			this.binding = binding;
 		}
+		
+		//-------- methods --------
 		
 		/**
 		 *  Called when result is available.
@@ -586,11 +598,11 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		 */
 		protected Object createProxy(IExternalAccess ea, IComponentAdapter adapter, IInternalService service)
 		{
-			return service;
-//			Object proxy = service;
+//			return service;
 //			if(!service.getServiceIdentifier().getProviderId().equals(ea.getServiceProvider().getId()) || !Proxy.isProxyClass(service.getClass()))
-//			proxy = BasicServiceInvocationHandler.createRequiredServiceProxy(ea, adapter, service, DefaultServiceFetcher.this, info, binding);
-//			return proxy;
+			Object proxy = service;
+			proxy = BasicServiceInvocationHandler.createRequiredServiceProxy(ea, adapter, service, DefaultServiceFetcher.this, info, binding);
+			return proxy;
 		}
 	}
 }

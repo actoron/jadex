@@ -1,21 +1,22 @@
-package jadex.bridge.service.component;
+package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceInvalidException;
-import jadex.commons.SReflect;
+import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
-import java.lang.reflect.Proxy;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 
+ *  The validation interceptor tests whether a service call is valid.
+ *  
+ *  Calls isValid() on IService to check if service call is allowed.
  */
-public class ValidationServiceInterceptor extends AbstractApplicableInterceptor
+public class ValidationInterceptor extends AbstractApplicableInterceptor
 {
 	//-------- constants --------
 	
@@ -52,7 +53,7 @@ public class ValidationServiceInterceptor extends AbstractApplicableInterceptor
 		boolean scheduleable = sic.getMethod().getReturnType().equals(IFuture.class) 
 		|| sic.getMethod().getReturnType().equals(void.class);
 
-		if(ALWAYSOK.contains(sic.getMethod()) || !scheduleable)
+		if(!scheduleable || ALWAYSOK.contains(sic.getMethod()))
 		{
 			sic.invoke().addResultListener(new DelegationResultListener(ret));
 		}

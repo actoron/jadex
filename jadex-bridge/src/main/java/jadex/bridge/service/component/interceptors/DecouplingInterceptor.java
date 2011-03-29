@@ -1,9 +1,11 @@
-package jadex.bridge.service.component;
+package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IServiceInvocationInterceptor;
+import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -16,8 +18,14 @@ import java.util.Map;
 /**
  *  Invocation interceptor for executing a call on 
  *  the underlying component thread. 
+ *  
+ *  It checks whether the call can be decoupled (has void or IFuture return type)
+ *  and the invoking thread is not already the component thread.
+ *  
+ *  todo: what about synchronous calls that change the object state.
+ *  These calls could 
  */
-public class DecouplingServiceInvocationInterceptor extends AbstractMultiInterceptor
+public class DecouplingInterceptor extends AbstractMultiInterceptor
 {
 	//-------- constants --------
 	
@@ -37,7 +45,7 @@ public class DecouplingServiceInvocationInterceptor extends AbstractMultiInterce
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public DecouplingServiceInvocationInterceptor(IExternalAccess ea, IComponentAdapter adapter)
+	public DecouplingInterceptor(IExternalAccess ea, IComponentAdapter adapter)
 	{
 		this.ea = ea;
 		this.adapter = adapter;
