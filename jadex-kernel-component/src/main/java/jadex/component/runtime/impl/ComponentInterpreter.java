@@ -28,8 +28,6 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.ServiceNotFoundException;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.ComponentServiceContainer;
-import jadex.bridge.service.component.interceptors.DecouplingInterceptor;
-import jadex.bridge.service.component.interceptors.DelegationInterceptor;
 import jadex.commons.ChangeEvent;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
@@ -55,7 +53,6 @@ import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.xml.annotation.XMLClassname;
 
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -136,6 +133,9 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	
 	/** The required service binding information. */
 	protected Map bindings;
+	
+	/** The external access (cached). */
+	protected IExternalAccess	access;
 	
 	//-------- constructors --------
 	
@@ -675,8 +675,20 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	 */
 	public IExternalAccess getExternalAccess()
 	{
-		return new ExternalAccess(this);
+		if(access==null)
+		{
+			synchronized(this)
+			{
+				if(access==null)
+				{
+					access	= new ExternalAccess(this);
+				}
+			}
+		}
+		
+		return access;
 	}
+
 
 	/**
 	 *  Get the class loader of the component.

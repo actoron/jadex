@@ -229,6 +229,9 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	/** The required service binding information. */
 	protected Map bindings;
 	
+	/** The external access (cached). */
+	protected IExternalAccess	access;
+	
 	//-------- constructors --------
 	
 	/**
@@ -659,26 +662,25 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	/**
 	 *  Can be called concurrently (also during executeAction()).
 	 * 
-	 *  Get the external access for this agent.
+	 *  Get the external access for this component.
 	 *  The specific external access interface is kernel specific
 	 *  and has to be casted to its corresponding incarnation.
 	 *  @param listener	External access is delivered via result listener.
 	 */
 	public IExternalAccess getExternalAccess()
 	{
-		return new ExternalAccess(BpmnInterpreter.this);
+		if(access==null)
+		{
+			synchronized(this)
+			{
+				if(access==null)
+				{
+					access	= new ExternalAccess(this);
+				}
+			}
+		}
 		
-//		final Future ret = new Future();
-//		
-//		adapter.invokeLater(new Runnable()
-//		{
-//			public void run()
-//			{
-//				ret.setResult(new ExternalAccess(BpmnInterpreter.this));
-//			}
-//		});
-//		
-//		return ret;
+		return access;
 	}
 	
 	/**

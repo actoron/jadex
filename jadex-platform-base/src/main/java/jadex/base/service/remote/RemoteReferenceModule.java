@@ -22,6 +22,7 @@ import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.LRU;
+import jadex.commons.collection.WeakValueMap;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -36,6 +37,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.WeakHashMap;
 
 /**
  *  This class implements the rmi handling. It mainly supports:
@@ -66,6 +68,9 @@ public class RemoteReferenceModule
 	
 	/** The map of target objects (rr  -> target object). */
 	protected Map targetobjects;
+	
+	/** The map of target components and services (rr  -> target comp). */
+	protected Map targetcomps;
 	
 	/** The inverse map of target object to remote references (target objects -> rr). */
 	protected Map remoterefs;
@@ -106,7 +111,8 @@ public class RemoteReferenceModule
 		
 		this.proxyinfos = new LRU(200);
 		this.targetobjects = new HashMap();
-		this.remoterefs = new HashMap();
+		this.targetcomps = new WeakValueMap();
+		this.remoterefs = new WeakHashMap();
 		
 		this.proxycount = new HashMap();
 		this.proxydates = new TreeMap();
@@ -273,11 +279,12 @@ public class RemoteReferenceModule
 				deftimeout	= new Long(ta.value());
 			}
 			
+			boolean	allex	= remoteinterfaces[i].isAnnotationPresent(Excluded.class);
 			Method[]	methods	= remoteinterfaces[i].getDeclaredMethods();
 			for(int j=0; j<methods.length; j++)
 			{
 				// Excluded
-				if(methods[j].isAnnotationPresent(Excluded.class))
+				if(allex || methods[j].isAnnotationPresent(Excluded.class))
 				{
 					ret.addExcludedMethod(new MethodInfo(methods[j]));
 				}
@@ -308,7 +315,7 @@ public class RemoteReferenceModule
 				{
 					if(!void.class.equals(methods[j].getReturnType()))
 					{
-						System.err.println("Warning: Uncached property is only applicable to void methods: "+methods[j]);						
+						System.err.println("Warning: Synchronous property is only applicable to void methods: "+methods[j]);						
 					}
 					else
 					{
@@ -504,13 +511,24 @@ public class RemoteReferenceModule
 		// Create a remote reference if not yet available.
 		if(ret==null)
 		{
-			if(target instanceof IExternalAccess)
+			if(Proxy.isProxyClass(target.getClass()) && Proxy.getInvocationHandler(target) instanceof RemoteMethodInvocationHandler)
+			{
+				RemoteMethodInvocationHandler	rmih	= (RemoteMethodInvocationHandler)Proxy.getInvocationHandler(target);
+				ret	= rmih.pr.getRemoteReference();
+			}
+			else if(target instanceof IExternalAccess)
 			{
 				ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((IExternalAccess)target).getComponentIdentifier());
+				remoterefs.put(target, ret);
+				targetcomps.put(ret, target);
+				System.out.println("component ref: "+ret);
 			}
 			else if(target instanceof IService)
 			{
 				ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((IService)target).getServiceIdentifier());
+				remoterefs.put(target, ret);
+				targetcomps.put(ret, target);
+				System.out.println("service ref: "+ret);
 			}
 			else
 			{
@@ -669,7 +687,11 @@ public class RemoteReferenceModule
 		// Is is local return local target object.
 		if(pr.getRemoteReference().getRemoteManagementServiceIdentifier().equals(rsms.getRMSComponentIdentifier()))
 		{
-			ret = targetobjects.get(pr.getRemoteReference());
+			ret = targetobjects.containsKey(pr.getRemoteReference())
+				? targetobjects.get(pr.getRemoteReference())
+				: targetcomps.get(pr.getRemoteReference());
+			if(ret==null)
+				System.out.println("No object for reference: "+pr.getRemoteReference());
 		}
 		// Else return new or old proxy.
 		else

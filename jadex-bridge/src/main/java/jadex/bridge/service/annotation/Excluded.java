@@ -9,9 +9,9 @@ import java.lang.annotation.Target;
  *  Excluded methods throw UnsupportedOperationException
  *  when called from remote.
  *  
- *  Applicable to all methods.
+ *  Applicable to all methods or classes as a whole.
  */
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Excluded
 {

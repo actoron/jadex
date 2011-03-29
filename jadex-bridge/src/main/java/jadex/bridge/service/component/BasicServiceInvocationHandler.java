@@ -203,6 +203,34 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			(IServiceInvocationInterceptor[])interceptors.toArray(new IServiceInvocationInterceptor[interceptors.size()]);
 	}
 	
+	//-------- replacement methods for service proxies --------
+	
+	/**
+	 *  Return the hash code.
+	 */
+	public int hashCode()
+	{
+		return 31+sid.hashCode();
+	}
+	
+	/**
+	 *  Test if two objects are equal.
+	 */
+	public boolean equals(Object obj)
+	{
+		return obj instanceof BasicServiceInvocationHandler && ((BasicServiceInvocationHandler)obj).getServiceIdentifier().equals(sid);
+	}
+	
+	/**
+	 *  Get a string representation.
+	 */
+	public String toString()
+	{
+		return sid.toString();
+	}
+	
+	//-------- static methods --------
+	
 	/**
 	 *  Static method for creating a standard service proxy for a provided service.
 	 */

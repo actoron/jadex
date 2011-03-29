@@ -9,6 +9,7 @@ import jadex.commons.concurrent.IThreadPool;
 /**
  *  The clock service.
  */
+@Excluded
 public interface IClockService extends IService
 {
 	//-------- constants --------
@@ -141,7 +142,6 @@ public interface IClockService extends IService
 	 *  @param clock The new clock.
 	 */
 	// Hack!!! Remove?
-	@Excluded
 	public void setClock(String type, IThreadPool tp);
 	
 }

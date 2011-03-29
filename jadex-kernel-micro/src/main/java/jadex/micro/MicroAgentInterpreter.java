@@ -16,7 +16,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.IntermediateComponentResultListener;
-import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.ProvidedServiceInfo;
@@ -462,25 +461,6 @@ public class MicroAgentInterpreter implements IComponentInstance
 			}
 		}
 		return access;
-		
-//		return microagent.getExternalAccess();
-//		final Future ret = new Future();
-//		
-//		getAgentAdapter().invokeLater(new Runnable()
-//		{
-//			public void run()
-//			{
-//				Object exta = microagent.getExternalAccess();
-//				ret.setResult(exta);
-//			}
-//			
-//			public String toString()
-//			{
-//				return "microagent.getExternalAccess()_#"+this.hashCode();
-//			}
-//		});
-//		
-//		return ret;
 	}
 	
 	/**

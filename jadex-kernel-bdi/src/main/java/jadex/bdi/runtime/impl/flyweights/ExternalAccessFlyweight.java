@@ -311,5 +311,4 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	{
 		return new Future(null);
 	}
-
 }
