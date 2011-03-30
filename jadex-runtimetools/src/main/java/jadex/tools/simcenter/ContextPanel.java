@@ -1,21 +1,30 @@
 package jadex.tools.simcenter;
 
 import jadex.base.service.simulation.ISimulationService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.RemoteChangeListenerHandler;
 import jadex.bridge.service.clock.IClock;
-import jadex.bridge.service.clock.IClockService;
-import jadex.commons.future.Future;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
+import jadex.commons.IRemoteChangeListener;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.SwingDefaultResultListener;
-import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
+import jadex.tools.simcenter.ClockPanel.ClockState;
+import jadex.xml.annotation.XMLClassname;
+import jadex.xml.annotation.XMLIncludeFields;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.util.Collection;
+import java.util.Iterator;
 
 import javax.swing.Action;
+import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
@@ -24,7 +33,7 @@ import javax.swing.border.TitledBorder;
 /**
  *	The context panel shows the settings for an execution context.
  */
-public class ContextPanel extends AbstractTimePanel
+public class ContextPanel extends JPanel
 {
 	//-------- static part --------
 
@@ -51,20 +60,10 @@ public class ContextPanel extends AbstractTimePanel
 	 */
 	public ContextPanel(SimCenterPanel simp)
 	{
-		super(simp.getServiceContainer());
 		this.setLayout(new FlowLayout());
 		this.simp = simp;
 		
 		this.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Execution Control "));
-		
-//		this.run = new JButton(START);
-//		this.estep = new JButton(STEP_EVENT);
-//		this.tstep = new JButton(STEP_TIME);
-//		this.pause= new JButton(PAUSE);
-//		run.setMargin(new Insets(0,0,0,0));
-//		estep.setMargin(new Insets(0,0,0,0));
-//		tstep.setMargin(new Insets(0,0,0,0));
-//		pause.setMargin(new Insets(0,0,0,0));
 		
 		JToolBar	toolbar	= new JToolBar("Simulation Control");
 		toolbar.add(START);
@@ -73,65 +72,24 @@ public class ContextPanel extends AbstractTimePanel
 		toolbar.add(PAUSE);
 		this.add(toolbar);
 		
-//		int x=0;
-//		int y=0;
-//		this.add(run, new GridBagConstraints(x++,y,1,1,1,0,
-//			GridBagConstraints.NORTHEAST,GridBagConstraints.NONE,new Insets(4,2,2,4),0,0));
-//		this.add(estep, new GridBagConstraints(x++,y,1,1,0,0,
-//			GridBagConstraints.NORTH,GridBagConstraints.NONE,new Insets(4,2,2,4),0,0));
-//		this.add(tstep, new GridBagConstraints(x++,y,1,1,0,0,
-//			GridBagConstraints.NORTH,GridBagConstraints.NONE,new Insets(4,2,2,4),0,0));
-//		this.add(pause, new GridBagConstraints(x++,y,1,1,1,0,
-//			GridBagConstraints.NORTHWEST,GridBagConstraints.NONE,new Insets(4,2,2,4),0,0));
-
 		setActive(true);
 	}
 	
 	/**
 	 *  Update the view.
 	 */
-	public IFuture	updateView()
+	public void	updateView(SimulationState state)
 	{
-		final Future ret = new Future();
-		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-		.addResultListener(new SwingDelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				final IClockService cs = (IClockService)result;
-				SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new SwingDelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						ISimulationService sims = (ISimulationService)result;
-						sims.isExecuting().addResultListener(new SwingDelegationResultListener(ret)
-						{
-							public void customResultAvailable(Object result)
-							{
-								boolean executing = ((Boolean)result).booleanValue();
-								boolean clockok = cs.getNextTimer()!=null;
-								String	type	= cs.getClockType();
-								
-								boolean	startenabled	= !executing;
-								boolean	pauseenabled	= executing;
-								boolean	stepenabled	= !executing && clockok
-									&& !IClock.TYPE_CONTINUOUS.equals(type)
-									&& !IClock.TYPE_SYSTEM.equals(type);
-								
-								START.setEnabled(startenabled);
-								STEP_EVENT.setEnabled(stepenabled);
-								STEP_TIME.setEnabled(stepenabled);
-								PAUSE.setEnabled(pauseenabled);
-								
-								ret.setResult(null);
-							}
-						});
-					}
-				});
-			}
-		});
-		return ret;
+		boolean	startenabled	= !state.executing;
+		boolean	pauseenabled	= state.executing;
+		boolean	stepenabled	= !state.executing && state.clockok
+			&& !IClock.TYPE_CONTINUOUS.equals(state.clocktype)
+			&& !IClock.TYPE_SYSTEM.equals(state.clocktype);
+		
+		START.setEnabled(startenabled);
+		STEP_EVENT.setEnabled(stepenabled);
+		STEP_TIME.setEnabled(stepenabled);
+		PAUSE.setEnabled(pauseenabled);
 	}
 	
 	/**
@@ -142,73 +100,8 @@ public class ContextPanel extends AbstractTimePanel
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			SServiceProvider.getService(getServiceProvider(),
-				ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ContextPanel.this)
-			{
-				public void customResultAvailable(Object result)
-				{
-					try
-					{
-						((ISimulationService)result).start();
-					}
-					catch(Exception ex)
-					{
-						ex.printStackTrace();
-					}
-				}
-			});
+			simp.getSimulationService().start();
 		}
-
-//		public boolean isEnabled()
-//		{
-//			testEnabled().addResultListener(new SwingDefaultResultListener()
-//			{
-//				public void customResultAvailable(Object result)
-//				{
-//					boolean	oldena	= ena;
-//					ena = ((Boolean)result).booleanValue();
-//					if(oldena!=ena)
-//					{
-//						updateView();
-//					}
-//				}
-//			});
-//			// todo: hack!
-//			// problem: service must be fetched fresh!
-////			IClockService cs = (IClockService)SServiceProvider.getService(getServiceProvider(), IClockService.class).get(new ThreadSuspendable());
-////			ISimulationService sims = (ISimulationService)SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
-////			boolean clockok = cs.getNextTimer()!=null 
-////				|| cs.getClockType().equals(IClock.TYPE_CONTINUOUS)
-////				|| cs.getClockType().equals(IClock.TYPE_SYSTEM);
-////			return !sims.isExecuting();// && clockok;
-//		
-//			return ena;
-//		}
-//		
-//		/**
-//		 *  Test asynchronously if enabled.
-//		 */
-//		public IFuture testEnabled()
-//		{
-//			final Future ret = new Future();
-//			SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//				.addResultListener(new SwingDelegationResultListener(ret)
-//			{
-//				public void customResultAvailable(Object result)
-//				{
-//					ISimulationService sims = (ISimulationService)result;
-//					sims.isExecuting().addResultListener(new SwingDelegationResultListener(ret)
-//					{
-//						public void customResultAvailable(Object result)
-//						{
-//							boolean exe = ((Boolean)result).booleanValue();
-//							ret.setResult(!exe);
-//						}
-//					});
-//				}
-//			});
-//			return ret;
-//		}
 	};
 	
 	/**
@@ -217,87 +110,10 @@ public class ContextPanel extends AbstractTimePanel
 	public final Action STEP_EVENT = new ToolTipAction(null, icons.getIcon("step_event"),
 		"Execute one timer entry.")
 	{
-//		boolean ena;
 		public void actionPerformed(ActionEvent e)
 		{
-			SServiceProvider.getService(getServiceProvider(),
-				ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ContextPanel.this)
-			{
-				public void customResultAvailable(Object result)
-				{
-					try
-					{
-						((ISimulationService)result).stepEvent();
-					}
-					catch(Exception ex)
-					{
-						ex.printStackTrace();
-					}
-				}
-			});
+			simp.getSimulationService().stepEvent();
 		}
-		
-//		public boolean isEnabled()
-//		{
-//			testEnabled().addResultListener(new SwingDefaultResultListener()
-//			{
-//				public void customResultAvailable(Object result)
-//				{
-//					boolean	oldena	= ena;
-//					ena = ((Boolean)result).booleanValue();
-//					if(oldena!=ena)
-//					{
-//						updateView();
-//					}
-//				}
-//			});
-//			return ena;
-//			
-////			// todo: hack!
-////			// problem: clock service must be fetched fresh!
-////			IClockService cs = (IClockService)SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
-////			ISimulationService sims = (ISimulationService)SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
-////			boolean clockok = cs.getNextTimer()!=null; 
-////			return !cs.getClockType().equals(IClock.TYPE_CONTINUOUS) 
-////				&& !cs.getClockType().equals(IClock.TYPE_SYSTEM) 
-////				&& !sims.isExecuting() && clockok;
-//		}
-//		
-//		/**
-//		 *  Test asynchronously if enabled.
-//		 */
-//		public IFuture testEnabled()
-//		{
-//			final Future ret = new Future();
-//			SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//				.addResultListener(new SwingDelegationResultListener(ret)
-//			{
-//				public void customResultAvailable(Object result)
-//				{
-//					final IClockService cs = (IClockService)result;
-//					SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//						.addResultListener(new SwingDelegationResultListener(ret)
-//					{
-//						public void customResultAvailable(Object result)
-//						{
-//							ISimulationService sims = (ISimulationService)result;
-//							sims.isExecuting().addResultListener(new SwingDelegationResultListener(ret)
-//							{
-//								public void customResultAvailable(Object result)
-//								{
-//									boolean exe = ((Boolean)result).booleanValue();
-//									boolean clockok = cs.getNextTimer()!=null;
-//									ret.setResult(new Boolean(!cs.getClockType().equals(IClock.TYPE_CONTINUOUS)
-//										&& !cs.getClockType().equals(IClock.TYPE_SYSTEM)
-//										&& !exe && clockok));
-//								}
-//							});
-//						}
-//					});
-//				}
-//			});
-//			return ret;
-//		}
 	};
 	
 	/**
@@ -306,95 +122,10 @@ public class ContextPanel extends AbstractTimePanel
 	public final Action STEP_TIME = new ToolTipAction(null, icons.getIcon("step_time"),
 		"Execute all timer entries belonging to the current time point.")
 	{
-//		boolean ena;
-//		{
-//			testEnabled().addResultListener(new SwingDefaultResultListener()
-//			{
-//				public void customResultAvailable(Object result)
-//				{
-//					enabled = ((Boolean)result).booleanValue();
-//				}
-//			});
-//		}
-		
 		public void actionPerformed(ActionEvent e)
 		{
-			SServiceProvider.getService(getServiceProvider(),
-				ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ContextPanel.this)
-			{
-				public void customResultAvailable(Object result)
-				{
-					try
-					{
-						((ISimulationService)result).stepTime();
-//							.addResultListener(new SwingDefaultResultListener()
-//						{
-//							public void customResultAvailable(Object result)
-//							{
-//								ena = true;
-//							}
-//						});
-					}
-					catch(Exception ex)
-					{
-						ex.printStackTrace();
-					}
-				}
-			});
+			simp.getSimulationService().stepTime();
 		}
-		
-//		public boolean isEnabled()
-//		{
-//			testEnabled().addResultListener(new SwingDefaultResultListener()
-//			{
-//				public void customResultAvailable(Object result)
-//				{
-//					boolean	oldena	= ena;
-//					ena = ((Boolean)result).booleanValue();
-//					if(oldena!=ena)
-//					{
-//						updateView();
-//					}
-//				}
-//			});
-//			return ena;
-//		}
-//		
-//		/**
-//		 *  Test asynchronously if enabled.
-//		 */
-//		public IFuture testEnabled()
-//		{
-//			final Future ret = new Future();
-//			SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//				.addResultListener(new SwingDelegationResultListener(ret)
-//			{
-//				public void customResultAvailable(Object result)
-//				{
-//					final IClockService cs = (IClockService)result;
-//					SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//						.addResultListener(new SwingDelegationResultListener(ret)
-//					{
-//						public void customResultAvailable(Object result)
-//						{
-//							ISimulationService sims = (ISimulationService)result;
-//							sims.isExecuting().addResultListener(new SwingDelegationResultListener(ret)
-//							{
-//								public void customResultAvailable(Object result)
-//								{
-//									boolean exe = ((Boolean)result).booleanValue();
-//									boolean clockok = cs.getNextTimer()!=null;
-//									ret.setResult(new Boolean(!cs.getClockType().equals(IClock.TYPE_CONTINUOUS)
-//										&& !cs.getClockType().equals(IClock.TYPE_SYSTEM)
-//										&& !exe && clockok));
-//								}
-//							});
-//						}
-//					});
-//				}
-//			});
-//			return ret;
-//		}
 	};
 	
 	/**
@@ -403,87 +134,199 @@ public class ContextPanel extends AbstractTimePanel
 	public final Action PAUSE = new ToolTipAction(null , icons.getIcon("pause"),
 		"Pause the current execution.")
 	{
-//		boolean ena;
-//		{
-//			testEnabled().addResultListener(new SwingDefaultResultListener()
-//			{
-//				public void customResultAvailable(Object result)
-//				{
-//					enabled = ((Boolean)result).booleanValue();
-//				}
-//			});
-//		}
-		
 		public void actionPerformed(ActionEvent e)
 		{
-			SServiceProvider.getService(getServiceProvider(),
-				ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ContextPanel.this)
+			simp.getSimulationService().pause();
+		}
+	};
+
+	/**
+	 *  Activate / deactivate updates.
+	 */
+	public void	setActive(final boolean active)
+	{
+		final IRemoteChangeListener	rcl	= new IRemoteChangeListener()
+		{
+			public IFuture changeOccurred(ChangeEvent event)
 			{
-				public void customResultAvailable(Object result)
+				handleEvent(event);
+				return IFuture.DONE;
+			}
+			
+			public void	handleEvent(ChangeEvent event)
+			{
+				if(RemoteChangeListenerHandler.EVENT_BULK.equals(event.getType()))
 				{
-					try
+					Collection	events	= (Collection)event.getValue();
+					for(Iterator it=events.iterator(); it.hasNext(); )
 					{
-						((ISimulationService)result).pause();
-					}
-					catch(Exception ex)
-					{
-						ex.printStackTrace();
+						handleEvent((ChangeEvent)it.next());
 					}
 				}
-			});
+				else
+				{
+					updateView((SimulationState)event.getValue());
+				}
+			}
+		};
+		
+		simp.getComponentForService().addResultListener(new SwingDefaultResultListener(ContextPanel.this)
+		{
+			public void customResultAvailable(Object result)
+			{
+				IExternalAccess	access	= (IExternalAccess)result;
+				final String	id	= "ContextPanel"+ContextPanel.this.hashCode()+"@"+simp.jcc.getJCCAccess().getComponentIdentifier();
+				final ISimulationService	simservice	= simp.getSimulationService();
+				access.scheduleStep(new IComponentStep()
+				{
+					@XMLClassname("addListener")
+					public Object execute(IInternalAccess ia)
+					{
+						RemoteSimServiceChangeListener	rccl	= new RemoteSimServiceChangeListener(id, ia, rcl, simservice);
+						if(active)
+						{
+//							System.out.println("register listener: "+id);
+							simservice.addChangeListener(rccl);
+							simservice.getClockService().addChangeListener(rccl);
+							
+							// Initial event.
+							rccl.changeOccurred(null);
+						}
+						else
+						{
+							simservice.addChangeListener(rccl);
+							simservice.getClockService().addChangeListener(rccl);
+//							System.out.println("deregister listener: "+id);
+						}
+						return null;
+					}
+				});
+			}
+		});
+	}
+	
+	//--------- helper classes --------
+	
+	/**
+	 *  Information about the simulation to be transferred.
+	 */
+	@XMLIncludeFields
+	public static class SimulationState
+	{
+		//-------- attributes --------
+		
+		/** The execution state. */
+		public boolean	executing;
+		
+		/** The clock type. */
+		public String	clocktype;
+		
+		/** The clock ok flag. */
+		public boolean	clockok;
+		
+		//-------- constructors --------
+		
+		/**
+		 *  Bean constructor.
+		 */
+		public SimulationState()
+		{
 		}
 		
-//		public boolean isEnabled()
-//		{
-//			testEnabled().addResultListener(new SwingDefaultResultListener()
-//			{
-//				public void customResultAvailable(Object result)
-//				{
-//					boolean	oldena	= ena;
-//					ena = ((Boolean)result).booleanValue();
-//					if(oldena!=ena)
-//					{
-//						updateView();
-//					}
-//				}
-//			});
-//			return ena;
-////			// todo: hack!
-////			ISimulationService sims = (ISimulationService)SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
-////			return sims.isExecuting() && sims.getMode()
-////				.equals(ISimulationService.MODE_NORMAL);
-//		}
-//		
-//		/**
-//		 *  Test asynchronously if enabled.
-//		 */
-//		public IFuture testEnabled()
-//		{
-//			final Future ret = new Future();
-//			SServiceProvider.getService(getServiceProvider(), ISimulationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//				.addResultListener(new SwingDelegationResultListener(ret)
-//			{
-//				public void customResultAvailable(Object result)
-//				{
-//					final ISimulationService sims = (ISimulationService)result;
-//					sims.isExecuting().addResultListener(new SwingDelegationResultListener(ret)
-//					{
-//						public void customResultAvailable(Object result)
-//						{
-//							final boolean exe = ((Boolean)result).booleanValue();
-//							sims.getMode().addResultListener(new SwingDelegationResultListener(ret)
-//							{
-//								public void customResultAvailable(Object result)
-//								{
-//									String mode = (String)result;
-//									ret.setResult(new Boolean(exe && mode.equals(ISimulationService.MODE_NORMAL)));
-//								}
-//							});
-//						}
-//					});
-//				}
-//			});
-//			return ret;
-//		}
-	};
+		/**
+		 *  Create a clock state object.
+		 */
+		public SimulationState(boolean executing, String clocktype, boolean clockok)
+		{
+			this.executing	= executing;
+			this.clocktype	= clocktype;
+			this.clockok	= clockok;
+		}
+		
+		//-------- methods --------
+		
+		/**
+		 *  The hash code.
+		 *  Overridden to have only one clock state per update.
+		 */
+		public int hashCode()
+		{
+			return 123;
+		}
+		
+		/**
+		 *  Test if two objects are equal.
+		 *  Overridden to have only one clock state per update.
+		 */
+		public boolean equals(Object obj)
+		{
+			return obj instanceof ClockState;
+		}
+	}
+	
+	/**
+	 *  The remote clock change listener.
+	 */
+	public static class RemoteSimServiceChangeListener	extends RemoteChangeListenerHandler	implements IChangeListener
+	{
+		//-------- attributes --------
+		
+		/** The simulation service. */
+		protected ISimulationService	simservice;
+		
+		/** The last state. */
+		protected SimulationState	laststate;
+		
+		//-------- constructors --------
+		
+		/**
+		 *  Create a BPMN listener.
+		 */
+		public RemoteSimServiceChangeListener(String id, IInternalAccess instance, IRemoteChangeListener rcl, ISimulationService simservice)
+		{
+			super(id, instance, rcl);
+			this.simservice	= simservice;
+		}
+		
+		//-------- IChangeListener interface --------
+		
+		/**
+		 *  Called when the process executes.
+		 */
+		public void changeOccurred(ChangeEvent event)
+		{
+			// Code in component result listener as clock runs on its own thread. 
+			simservice.isExecuting().addResultListener(instance.createResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object result)
+				{
+					boolean	executing	= ((Boolean)result).booleanValue();
+					String	clocktype	= simservice.getClockService().getClockType();
+					boolean	clockok	= simservice.getClockService().getNextTimer()!=null;
+					
+					if(laststate==null || executing!=laststate.executing || clockok!=laststate.clockok
+						|| !clocktype.equals(laststate.clocktype))
+					{
+						laststate	= new SimulationState(executing, clocktype, clockok);
+						elementChanged("simulation", laststate);
+					}
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					dispose();
+				}
+			}));
+		}
+
+		/**
+		 *  Remove local listeners.
+		 */
+		protected void dispose()
+		{
+			simservice.removeChangeListener(this);
+			simservice.getClockService().removeChangeListener(this);
+//			System.out.println("dispose: "+id);
+		}
+	}
 }

@@ -1,7 +1,17 @@
 package jadex.tools.simcenter;
 
-import jadex.bridge.service.IServiceProvider;
+import jadex.base.gui.plugin.IControlCenter;
+import jadex.base.service.simulation.ISimulationService;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.TimeFormat;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 import java.awt.BorderLayout;
 import java.text.DateFormat;
@@ -27,9 +37,12 @@ public class SimCenterPanel extends JPanel
 
 	//-------- attributes --------
 
-	/** The sim center plugin. */
-	protected SimCenterPlugin simcenter;
-
+	/** The jcc. */
+	protected IControlCenter	jcc;
+	
+	/** The simulation service. */
+	protected ISimulationService	simservice;
+	
 	/** The clock panel. */
 	protected ClockPanel clockp;
 	
@@ -51,10 +64,11 @@ public class SimCenterPanel extends JPanel
 	 *  The sim center gui.
 	 *  @param simcenter The sim center.
 	 */
-	public SimCenterPanel(final SimCenterPlugin simcenter)
+	public SimCenterPanel(IControlCenter jcc, ISimulationService simservice)
 	{
 		super(new BorderLayout());
-		this.simcenter = simcenter;
+		this.simservice	= simservice;
+		this.jcc	= jcc;
 		this.timemode = 2;
 		
 		dateformat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss S");
@@ -74,35 +88,6 @@ public class SimCenterPanel extends JPanel
 		sp.add(timerp);
 		
 		add(sp, "Center");
-		
-//		SServiceProvider.getService(simcenter.getJCC().getExternalAccess().getServiceProvider(),
-//			ISimulationService.class).addResultListener(new SwingDefaultResultListener(SimCenterPanel.this)
-//		{
-//			public void customResultAvailable(Object source, Object result)
-//			{
-//				if(result==null)
-//					throw new RuntimeException("Could not find simulation service.");
-//			}
-//		});
-		
-		
-		/*Timer t = new Timer(100, new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				updateView();
-			}
-		});
-		t.start();*/
-	}
-	
-	/**
-	 *  Get the service container.
-	 *  @return The service container.
-	 */
-	public IServiceProvider	getServiceContainer()
-	{
-		return simcenter.getJCC().getPlatformAccess().getServiceProvider();
 	}
 	
 	/**
@@ -114,6 +99,42 @@ public class SimCenterPanel extends JPanel
 		return contextp;
 	}
 	
+	/**
+	 *  Get the simulation service
+	 *  @return The simulation service.
+	 */
+	public ISimulationService	getSimulationService()
+	{
+		return simservice;
+	}
+	
+	/**
+	 *  Get the host component of a service. 
+	 */
+	public IFuture getComponentForService()
+	{
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				IComponentManagementService	cms	= (IComponentManagementService)result;
+				cms.getExternalAccess((IComponentIdentifier)simservice.getServiceIdentifier().getProviderId())
+					.addResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						ret.setResult(result);
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
+
 	/**
 	 *  Format a time.
 	 *  @return The formatted time string.
@@ -155,42 +176,39 @@ public class SimCenterPanel extends JPanel
 	 */
 	public void updateView()
 	{
-		clockp.invokeUpdateView();
-		contextp.invokeUpdateView();
-		timerp.invokeUpdateView();
+		clockp.updateView();
+		timerp.updateView();
 	}
 	
 	/**
-	 *  Main for testing. 
-	 * /
-	public static void main(String[] args)
+	 *  Set properties loaded from project.
+	 */
+	public IFuture setProperties(Properties ps)
 	{
-		final SimCenterPanel p = new SimCenterPanel(null);
-		final IClockService clock = (IClockService)p.getPlatform().getService(IClockService.class);
-		for(int i=0; i<30; i++)
-		{
-			clock.createTimer(2000*i, new ITimedObject()
-			{
-				public void timeEventOccurred(long currenttime)
-				{
-					System.out.println("Event: "+clock.getTime());
-				}
-			});
-		}
-		
-		JFrame f = new JFrame();
-		f.add(p, "Center");
-		f.pack();
-		f.setVisible(true);
-		
-		/*Timer t = new Timer(50, new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				p.updateView();
-			}
-		});
-		t.start();* /
-		clock.start();
-	}*/
+		int	timemode	= ps.getProperty("timemode")!=null
+			? ps.getIntProperty("timemode") : 2;
+		setTimemode(timemode);
+		updateView();
+		return IFuture.DONE;
+	}
+
+	/**
+	 *  Return properties to be saved in project.
+	 */
+	public IFuture getProperties()
+	{
+		Properties	props	= new Properties();
+		props.addProperty(new Property("timemode", Integer.toString(getTimeMode())));
+		return new Future(props);
+	}
+
+	/**
+	 *  Informs the panel that it should stop all its computation
+	 */
+	public IFuture shutdown()
+	{
+		clockp.setActive(false);
+		timerp.setActive(false);
+		return IFuture.DONE;
+	}
 }

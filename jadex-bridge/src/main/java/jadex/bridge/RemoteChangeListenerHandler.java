@@ -139,7 +139,9 @@ public abstract class RemoteChangeListenerHandler
 				added.put(type, value);
 			}
 			else
-			{					
+			{
+				// Hack!!! Remove before add, because set does not replace.
+				changed.getCollection(type).remove(value);
 				changed.put(type, value);
 			}
 		}
