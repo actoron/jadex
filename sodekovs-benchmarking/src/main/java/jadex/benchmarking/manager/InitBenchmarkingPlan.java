@@ -57,7 +57,7 @@ public class InitBenchmarkingPlan extends Plan {
 		}
 		
 		// resume system under test
-		cms.resumeComponent(sutCID);
+//		cms.resumeComponent(sutCID).get(this);
 
 		// Warm up phase
 		if (benchConf.getWarmUpTime() != null) {
@@ -78,7 +78,7 @@ public class InitBenchmarkingPlan extends Plan {
 
 		// create SuT in suspended modus
 		IFuture fut = cms.createComponent(schedule.getName() + GetRandom.getRandom(100000), sutProperties.get(Constants.APPLICATION_FILE_PATH),
-				new CreationInfo(sutProperties.get(Constants.APPLICATION_COONFIGURATION), new HashMap(), null, true, false), null);
+				new CreationInfo(sutProperties.get(Constants.APPLICATION_COONFIGURATION), new HashMap(), null, false, false), null);
 		sutCID = (IComponentIdentifier) fut.get(this);
 		sutExta = (IApplicationExternalAccess) cms.getExternalAccess(sutCID).get(this);
 
@@ -95,22 +95,23 @@ public class InitBenchmarkingPlan extends Plan {
 	private void startComponent(Action action) {
 			
 		// create component
-//		IFuture fut = cms.createComponent(action.getComponentname(), action.getComponentmodel(),
-//				new CreationInfo("", new HashMap(), null, false, false), null);
-//		sutCID = (IComponentIdentifier) fut.get(this);
-//		sutExta = (IApplicationExternalAccess) cms.getExternalAccess(sutCID).get(this);
+		IFuture fut = cms.createComponent(action.getComponentname(), action.getComponentmodel(),
+				new CreationInfo("", new HashMap(), null, false, false), null);
+		sutCID = (IComponentIdentifier) fut.get(this);
+		sutExta = (IApplicationExternalAccess) cms.getExternalAccess(sutCID).get(this);
 		
 //		space.createSpaceObject(typename, properties, tasks)
+
 		//Schedule step??
-		Map props = new HashMap();
-		Vector2Double pos = new Vector2Double(0.8, 0.8);
-		props.put("position", pos);		
-		sutSpace.createSpaceObject("homebase", props, null);
-		
-		props = new HashMap();
-		pos = new Vector2Double(0.6, 0.6);
-		props.put("position", pos);		
-		sutSpace.createSpaceObject("sentry", props, null);
+//		Map props = new HashMap();
+//		Vector2Double pos = new Vector2Double(0.8, 0.8);
+//		props.put("position", pos);		
+//		sutSpace.createSpaceObject("homebase", props, null);
+//		
+//		props = new HashMap();
+//		pos = new Vector2Double(0.6, 0.6);
+//		props.put("position", pos);		
+//		sutSpace.createSpaceObject("sentry", props, null);
 		
 		
 

@@ -28,6 +28,7 @@
         </Sequence>
         <Sequence starttime="10000">
             <Actions>
+            <!-- <Action componentname="SentryW1" componenttype="BDIAgent" componentmodel="../sodekovs-simulationcontrol/src/main/java/jadex/simulation/remote/RemoteClientSimulator.agent.xml">-->
                 <Action componentname="SentryW1" componenttype="BDIAgent" componentmodel="../sodekovs-simulationcontrol/src/main/java/jadex/simulation/examples/marsworld/sentry/Sentry.agent.xml">
                     <Properties>
                         <Property name="speed" value="42"></Property>
