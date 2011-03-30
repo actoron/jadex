@@ -446,7 +446,8 @@ public class TestCenterPanel extends JSplitPanel
 
 		setOrientation(JSplitPane.VERTICAL_SPLIT);
 		setOneTouchExpandable(true);
-		setDividerLocation(300);
+		setDividerLocation(0.7);
+		setResizeWeight(0.7);
 		setTopComponent(top);
 		setBottomComponent(bottom);
 		

@@ -214,16 +214,16 @@ public class StarterPluginPanel extends JPanel
 //		lsplit.add(tp);
 		lsplit.add(comptree);
 //				lsplit.setDividerLocation(300);
-		lsplit.setResizeWeight(0);
-//		lsplit.setDividerLocation(0.3);
+		lsplit.setResizeWeight(0.7);
+		lsplit.setDividerLocation(0.7);
 //		SGUI.setDividerLocation(lsplit, 300);
 
 		csplit.add(lsplit);
 		spanel = new StarterPanel(jcc.getPlatformAccess(), jcc);
 		csplit.add(spanel);
 //				csplit.setDividerLocation(180);
-		csplit.setResizeWeight(0);
-//		csplit.setDividerLocation(0.3);
+		csplit.setResizeWeight(0.3);
+		csplit.setDividerLocation(0.3);
 //		SGUI.setDividerLocation(csplit, 180);
             			
 		add(csplit, BorderLayout.CENTER);

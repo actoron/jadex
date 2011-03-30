@@ -256,7 +256,8 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		tcpanel = new TestCenterPanel(this);
 		JSplitPanel mainpanel = new JSplitPanel(JSplitPane.HORIZONTAL_SPLIT);
 		mainpanel.setOneTouchExpandable(true);
-		mainpanel.setDividerLocation(200);
+		mainpanel.setResizeWeight(0.3);
+		mainpanel.setDividerLocation(0.3);
 
 //		mainpanel.add(tp);
 		mainpanel.add(new JScrollPane(mpanel));
