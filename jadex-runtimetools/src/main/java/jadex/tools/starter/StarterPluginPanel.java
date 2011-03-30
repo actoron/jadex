@@ -23,6 +23,7 @@ import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.IMenuItemConstructor;
+import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
 
 import java.awt.BorderLayout;
@@ -75,10 +76,10 @@ public class StarterPluginPanel extends JPanel
 	protected ComponentTreePanel comptree;
 	
 	/** A split panel. */
-	protected JSplitPane lsplit;
+	protected JSplitPanel lsplit;
 
 	/** A split panel. */
-    protected JSplitPane csplit;
+    protected JSplitPanel csplit;
 	
     /** The jcc. */
     protected IControlCenter jcc;
@@ -94,10 +95,10 @@ public class StarterPluginPanel extends JPanel
 		super(new BorderLayout());
 		this.jcc = jcc;
 				
-		csplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
+		csplit = new JSplitPanel(JSplitPane.HORIZONTAL_SPLIT, true);
 		csplit.setOneTouchExpandable(true);
 
-		lsplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
+		lsplit = new JSplitPanel(JSplitPane.VERTICAL_SPLIT, true);
 		lsplit.setOneTouchExpandable(true);
 		lsplit.setResizeWeight(0.7);
 
@@ -213,13 +214,17 @@ public class StarterPluginPanel extends JPanel
 //		lsplit.add(tp);
 		lsplit.add(comptree);
 //				lsplit.setDividerLocation(300);
-		SGUI.setDividerLocation(lsplit, 300);
+		lsplit.setResizeWeight(0);
+//		lsplit.setDividerLocation(0.3);
+//		SGUI.setDividerLocation(lsplit, 300);
 
 		csplit.add(lsplit);
 		spanel = new StarterPanel(jcc.getPlatformAccess(), jcc);
 		csplit.add(spanel);
 //				csplit.setDividerLocation(180);
-		SGUI.setDividerLocation(csplit, 180);
+		csplit.setResizeWeight(0);
+//		csplit.setDividerLocation(0.3);
+//		SGUI.setDividerLocation(csplit, 180);
             			
 		add(csplit, BorderLayout.CENTER);
 		
@@ -457,8 +462,12 @@ public class StarterPluginPanel extends JPanel
 	 */
 	public IFuture setProperties(Properties props)
 	{
-		SGUI.setDividerLocation(lsplit, props.getIntProperty("leftsplit_location"));
-		SGUI.setDividerLocation(csplit, props.getIntProperty("mainsplit_location"));
+		lsplit.setDividerLocation(props.getDoubleProperty("leftsplit_location"));
+		lsplit.setResizeWeight(props.getDoubleProperty("leftsplit_location"));
+		csplit.setDividerLocation(props.getDoubleProperty("mainsplit_location"));
+		csplit.setDividerLocation(props.getDoubleProperty("mainsplit_location"));
+//		SGUI.setDividerLocation(lsplit, props.getIntProperty("leftsplit_location"));
+//		SGUI.setDividerLocation(csplit, props.getIntProperty("mainsplit_location"));
 		return IFuture.DONE;
 	}
 
@@ -469,8 +478,11 @@ public class StarterPluginPanel extends JPanel
 	public IFuture getProperties()
 	{
 		Properties	props	= new Properties();
-		props.addProperty(new Property("leftsplit_location", ""+lsplit.getDividerLocation()));
-		props.addProperty(new Property("mainsplit_location", ""+csplit.getDividerLocation()));
+		
+		props.addProperty(new Property("leftsplit_location", ""+lsplit.getProportionalDividerLocation()));
+		props.addProperty(new Property("mainsplit_location", ""+csplit.getProportionalDividerLocation()));
+//		props.addProperty(new Property("leftsplit_location", ""+lsplit.getDividerLocation()));
+//		props.addProperty(new Property("mainsplit_location", ""+csplit.getDividerLocation()));
 		return new Future(props);
 	}
 }

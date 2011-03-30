@@ -539,66 +539,76 @@ public class SGUI
 		throw ioe;
 	}
 	
-	/** Lookup table for divider locations (split->Integer).*/
-	protected static Map	locations;
-
 	/**
-	 *  Set a split location.
-	 *  Delays the call until the component is valid.
+	 *  Get the proportional split location.
 	 */
-	public static void setDividerLocation(final JSplitPane split, int loc)
+	public static double getProportionalDividerLocation(JSplitPane pane)
 	{
-		assert SwingUtilities.isEventDispatchThread();
-		
-		// Set direct.
-		if(split.isValid())
-		{
-			System.out.println("setDividerLocation: "+loc+", @"+split.hashCode());
-			split.setDividerLocation(loc);
-			if(locations!=null)
-			{
-				locations.remove(split);
-				if(locations.isEmpty())
-				{
-					locations	= null;
-				}
-			}
-		}
-		
-		// Wait until valid.
-		else
-		{
-			// Already queued
-			if(locations!=null && locations.containsKey(split))
-			{
-//				System.out.println("setDividerLocation updated: "+loc+", @"+split.hashCode());
-				locations.put(split, new Integer(loc));
-			}
-			
-			// First time call.
-			else
-			{
-				split.validate();
-//				System.out.println("setDividerLocation queued: "+loc+", @"+split.hashCode());
-				if(locations==null)
-					locations	= new HashMap();
-				locations.put(split, new Integer(loc));
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						if(locations!=null && locations.containsKey(split))
-						{
-							int	loc	= ((Integer)locations.remove(split)).intValue();
-							if(locations.isEmpty())
-							{
-								locations	= null;
-							}
-							setDividerLocation(split, loc);
-						}
-					}
-				});
-			}
-		}
+		double full = pane.getOrientation() == JSplitPane.HORIZONTAL_SPLIT? pane.getSize().getWidth(): pane.getSize().getHeight();
+		double ret = ((double)pane.getDividerLocation())/full;
+		return ret;
 	}
+	
+//	/** Lookup table for divider locations (split->Integer).*/
+//	protected static Map	locations;
+//
+//	/**
+//	 *  Set a split location.
+//	 *  Delays the call until the component is valid.
+//	 */
+//	public static void setDividerLocation(final JSplitPane split, int loc)
+//	{
+//		assert SwingUtilities.isEventDispatchThread();
+//		
+//		// Set direct.
+//		if(split.isValid())
+//		{
+//			System.out.println("setDividerLocation: "+loc+", @"+split.hashCode());
+//			split.setDividerLocation(loc);
+//			if(locations!=null)
+//			{
+//				locations.remove(split);
+//				if(locations.isEmpty())
+//				{
+//					locations	= null;
+//				}
+//			}
+//		}
+//		
+//		// Wait until valid.
+//		else
+//		{
+//			// Already queued
+//			if(locations!=null && locations.containsKey(split))
+//			{
+////				System.out.println("setDividerLocation updated: "+loc+", @"+split.hashCode());
+//				locations.put(split, new Integer(loc));
+//			}
+//			
+//			// First time call.
+//			else
+//			{
+//				split.validate();
+////				System.out.println("setDividerLocation queued: "+loc+", @"+split.hashCode());
+//				if(locations==null)
+//					locations	= new HashMap();
+//				locations.put(split, new Integer(loc));
+//				SwingUtilities.invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+//						if(locations!=null && locations.containsKey(split))
+//						{
+//							int	loc	= ((Integer)locations.remove(split)).intValue();
+//							if(locations.isEmpty())
+//							{
+//								locations	= null;
+//							}
+//							setDividerLocation(split, loc);
+//						}
+//					}
+//				});
+//			}
+//		}
+//	}
 }

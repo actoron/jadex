@@ -5,9 +5,11 @@ import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.future.SwingDelegationResultListener;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -245,6 +247,17 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 					if(!Arrays.asList(content.getComponents()).contains(plugin.getView()))
 					{
 						content.add(plugin.getView(), plugin.getName());
+//						if(controlcenter.props.getSubproperty(plugin.getName())!=null)
+//						{
+//							System.out.println("here: "+controlcenter.props.getSubproperty(plugin.getName()));
+//							plugin.setProperties(controlcenter.props.getSubproperty(plugin.getName()))
+//								.addResultListener(new DefaultResultListener()
+//								{
+//									public void resultAvailable(Object result)
+//									{
+//									}
+//								});
+//						}
 					}
 					
 					clayout.show(content, plugin.getName());

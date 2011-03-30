@@ -684,7 +684,7 @@ public class RemoteReferenceModule
 		
 //		RemoteReference rr = pi.getRemoteReference();
 		
-		// Is is local return local target object.
+		// If is local return local target object.
 		if(pr.getRemoteReference().getRemoteManagementServiceIdentifier().equals(rsms.getRMSComponentIdentifier()))
 		{
 			ret = targetobjects.containsKey(pr.getRemoteReference())

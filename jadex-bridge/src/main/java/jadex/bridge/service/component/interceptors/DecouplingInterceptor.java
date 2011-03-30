@@ -23,7 +23,7 @@ import java.util.Map;
  *  and the invoking thread is not already the component thread.
  *  
  *  todo: what about synchronous calls that change the object state.
- *  These calls could 
+ *  These calls could damage the service state.
  */
 public class DecouplingInterceptor extends AbstractMultiInterceptor
 {
