@@ -462,10 +462,18 @@ public class StarterPluginPanel extends JPanel
 	 */
 	public IFuture setProperties(Properties props)
 	{
-		lsplit.setDividerLocation(props.getDoubleProperty("leftsplit_location"));
-		lsplit.setResizeWeight(props.getDoubleProperty("leftsplit_location"));
-		csplit.setDividerLocation(props.getDoubleProperty("mainsplit_location"));
-		csplit.setDividerLocation(props.getDoubleProperty("mainsplit_location"));
+		double dl = props.getDoubleProperty("leftsplit_location");
+		if(dl!=0)
+		{
+			lsplit.setDividerLocation(dl);
+			lsplit.setResizeWeight(dl);
+		}
+		dl = props.getDoubleProperty("mainsplit_location");
+		if(dl!=0)
+		{
+			csplit.setDividerLocation(dl);
+			csplit.setResizeWeight(dl);
+		}
 //		SGUI.setDividerLocation(lsplit, props.getIntProperty("leftsplit_location"));
 //		SGUI.setDividerLocation(csplit, props.getIntProperty("mainsplit_location"));
 		return IFuture.DONE;

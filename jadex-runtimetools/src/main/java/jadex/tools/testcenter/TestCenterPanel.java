@@ -22,6 +22,7 @@ import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.gui.BrowserPane;
 import jadex.commons.gui.EditableList;
+import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ScrollablePanel;
 import jadex.xml.annotation.XMLClassname;
@@ -69,7 +70,7 @@ import javax.swing.border.TitledBorder;
 /**
  *  The test center panel for running tests and viewing the results.
  */
-public class TestCenterPanel extends JSplitPane
+public class TestCenterPanel extends JSplitPanel
 {
 	//-------- constants --------
 	

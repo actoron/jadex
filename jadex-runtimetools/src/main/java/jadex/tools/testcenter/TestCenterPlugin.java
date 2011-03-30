@@ -16,6 +16,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.future.SwingDelegationResultListener;
+import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
 
@@ -253,7 +254,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 //			0,1,GridBagConstraints.CENTER,GridBagConstraints.VERTICAL,new Insets(0,0,0,0),0,0));
 
 		tcpanel = new TestCenterPanel(this);
-		JSplitPane mainpanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		JSplitPanel mainpanel = new JSplitPanel(JSplitPane.HORIZONTAL_SPLIT);
 		mainpanel.setOneTouchExpandable(true);
 		mainpanel.setDividerLocation(200);
 
@@ -369,11 +370,19 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	 */
 	public IFuture setProperties(Properties props)
 	{
-		if(props.getProperty("mainsplit_location")!=null);
-			((JSplitPane)getView()).setDividerLocation(props.getIntProperty("mainsplit_location"));
-		if(props.getProperty("tcsplit_location")!=null);
-			tcpanel.setDividerLocation(props.getIntProperty("tcsplit_location"));
-
+		double dl = props.getDoubleProperty("tcsplit_location");
+		if(dl!=0)
+		{
+			tcpanel.setDividerLocation(dl);
+			tcpanel.setResizeWeight(dl);
+		}
+		dl = props.getDoubleProperty("mainsplit_location");
+		if(dl!=0)
+		{
+			((JSplitPane)getView()).setDividerLocation(dl);
+			((JSplitPane)getView()).setResizeWeight(dl);
+		}
+		
 		return IFuture.DONE;
 	}
 
@@ -384,8 +393,8 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	public IFuture getProperties()
 	{
 		Properties	props	= new Properties();
-		props.addProperty(new Property("mainsplit_location", Integer.toString(((JSplitPane)getView()).getDividerLocation())));
-		props.addProperty(new Property("tcsplit_location", Integer.toString(tcpanel.getDividerLocation())));
+		props.addProperty(new Property("mainsplit_location", Double.toString(((JSplitPanel)getView()).getProportionalDividerLocation())));
+		props.addProperty(new Property("tcsplit_location", Double.toString(tcpanel.getProportionalDividerLocation())));
 		return new Future(props);
 	}
 	
