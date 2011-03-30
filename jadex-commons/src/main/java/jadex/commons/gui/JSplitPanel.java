@@ -7,7 +7,10 @@ import javax.swing.JSplitPane;
 
 
 /**
- * 
+ *  Workaround for JSplitPane bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4101306
+ *  
+ *  setDividerLocation() can only be called after component is visible.
+ *  Provides means for storing/fetching proportional divider location.
  */
 public class JSplitPanel extends JSplitPane
 {
