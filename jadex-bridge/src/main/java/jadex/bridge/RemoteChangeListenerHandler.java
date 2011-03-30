@@ -255,8 +255,8 @@ public abstract class RemoteChangeListenerHandler
 										}
 										public void exceptionOccurred(Exception exception)
 										{
-	//										System.out.println("update not succeeded: "+exception);
-	//										exception.printStackTrace();
+//											System.err.println("update not succeeded: "+exception);
+//											exception.printStackTrace();
 											if(instance!=null)
 											{
 	//											System.out.println("Removing listener due to failed update: "+RemoteCMSListener.this.id);
@@ -286,6 +286,22 @@ public abstract class RemoteChangeListenerHandler
 				}
 			}, UPDATE_DELAY);
 		}
+	}
+	
+	/**
+	 *  Test equality based on id.
+	 */
+	public boolean equals(Object obj)
+	{
+		return obj instanceof RemoteChangeListenerHandler && ((RemoteChangeListenerHandler)obj).id.equals(id);
+	}
+	
+	/**
+	 *  Hash code based on id.
+	 */
+	public int hashCode()
+	{
+		return 31 + id.hashCode();
 	}
 	
 	//-------- template methods --------

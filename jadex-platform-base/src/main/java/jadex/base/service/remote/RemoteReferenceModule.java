@@ -521,14 +521,14 @@ public class RemoteReferenceModule
 				ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((IExternalAccess)target).getComponentIdentifier());
 				remoterefs.put(target, ret);
 				targetcomps.put(ret, target);
-				System.out.println("component ref: "+ret);
+//				System.out.println("component ref: "+ret);
 			}
 			else if(target instanceof IService)
 			{
 				ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((IService)target).getServiceIdentifier());
 				remoterefs.put(target, ret);
 				targetcomps.put(ret, target);
-				System.out.println("service ref: "+ret);
+//				System.out.println("service ref: "+ret);
 			}
 			else
 			{

@@ -13,7 +13,7 @@ import jadex.tools.debugger.DebuggerPlugin;
 import jadex.tools.deployer.DeployerPlugin;
 import jadex.tools.dfbrowser.DFServicePlugin;
 import jadex.tools.libtool.LibraryServicePlugin;
-import jadex.tools.simcenter.SimulationServicePlugin;
+import jadex.tools.simcenter.SimCenterPlugin;
 import jadex.tools.starter.StarterPlugin;
 import jadex.tools.testcenter.TestCenterPlugin;
 
@@ -39,7 +39,7 @@ public class JCCAgent extends MicroAgent
 				ComanalyzerPlugin.class.getName(),
 				TestCenterPlugin.class.getName(),
 //				JadexdocPlugin.class.getName(),
-				SimulationServicePlugin.class.getName(),
+				SimCenterPlugin.class.getName(),
 				DebuggerPlugin.class.getName(),
 //				RuleProfilerPlugin.class.getName(),
 				LibraryServicePlugin.class.getName(),

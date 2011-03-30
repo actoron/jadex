@@ -8,6 +8,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.IMicroExternalAccess;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -203,6 +204,11 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 		}
 		catch(Exception exception)
 		{
+			if(exception instanceof InvocationTargetException
+				&& ((InvocationTargetException)exception).getTargetException() instanceof Exception)
+			{
+				exception	= (Exception)((InvocationTargetException)exception).getTargetException();
+			}
 			ret.setResult(new RemoteResultCommand(null, exception, callid));
 		}
 	}
