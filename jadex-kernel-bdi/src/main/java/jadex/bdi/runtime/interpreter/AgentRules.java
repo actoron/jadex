@@ -1211,7 +1211,7 @@ public class AgentRules
 				{
 					Boolean direct = (Boolean)state.getAttributeValue(mexp, OAVBDIMetaModel.providedservice_has_direct);
 					IInternalService service = (IInternalService)evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
-					service = BasicServiceInvocationHandler.createProvidedServiceProxy(BDIInterpreter.getInterpreter(state).getExternalAccess(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), service, direct.booleanValue());
+					service = BasicServiceInvocationHandler.createProvidedServiceProxy(new CapabilityFlyweight(state, rcapa), BDIInterpreter.getInterpreter(state).getAgentAdapter(), service, direct.booleanValue());
 					((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(service);
 				}
 				catch(Exception e)

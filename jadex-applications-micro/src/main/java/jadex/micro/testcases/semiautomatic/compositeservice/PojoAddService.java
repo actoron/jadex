@@ -2,23 +2,24 @@ package jadex.micro.testcases.semiautomatic.compositeservice;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceIdentifier;
+import jadex.bridge.service.annotation.ServiceInterface;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
  * 
  */
-//@ServiceInterface(IAddService.class)
+@ServiceInterface(IAddService.class)
 public class PojoAddService implements IAddService
 {
-	// todo: make injectable these attribues
-	
 	/** The service identifier. */
-//	@ServiceIdentifier
+	@ServiceIdentifier
 	protected IServiceIdentifier sid;
 	
 	/** The service provider. */
-//	@ServiceComponent
+	@ServiceComponent
 	protected IInternalAccess comp;
 	
 	//-------- methods --------

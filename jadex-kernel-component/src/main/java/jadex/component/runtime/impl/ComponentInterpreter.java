@@ -223,7 +223,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 							try
 							{
 								service = (IInternalService)st.getParsedValue().getValue(fetcher);
-								service = BasicServiceInvocationHandler.createProvidedServiceProxy(getExternalAccess(), getComponentAdapter(), service, st.isDirect());
+								service = BasicServiceInvocationHandler.createProvidedServiceProxy(ia, getComponentAdapter(), service, st.isDirect());
 								getServiceContainer().addService(service);
 							}
 							catch(Exception e)
