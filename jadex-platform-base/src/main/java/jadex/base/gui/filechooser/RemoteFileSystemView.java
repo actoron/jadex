@@ -690,10 +690,9 @@ public class RemoteFileSystemView extends FileSystemView
 						FileData remfile = (FileData)result;
 						RemoteFile parent = new RemoteFile(remfile);
 						parents.put(dir.getAbsolutePath(), parent);
-						children.put(parent.getAbsolutePath(), new File[]{dir});
+						if(chooser!=null)
+							chooser.setCurrentDirectory(parent);
 					}
-					if(chooser!=null)
-						chooser.rescanCurrentDirectory();
 //					System.out.println("parent: "+dir+" "+parent);
 //					javax.swing.plaf.basic.BasicDirectoryModel
 				}

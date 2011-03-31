@@ -163,7 +163,7 @@ public class RemoteFile extends File
     // http://bugs.sun.com/view_bug.do?bug_id=6691325
     public String getCanonicalPath() throws IOException 
     {
-    	return ".";	// Hack!!! Give JFileChooser something that exists.
+    	return new File(".").getCanonicalPath();	// Hack!!! Give JFileChooser something that exists.
 //    	return getPath();	// Does not work because, JFileChooser tests if path exists locally. GRRR!
     }
 
