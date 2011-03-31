@@ -1,6 +1,5 @@
 package jadex.xml.test;
 
-import jadex.commons.Base64;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.xml.annotation.XMLClassname;
@@ -10,8 +9,6 @@ import jadex.xml.bean.JavaWriter;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.URL;
@@ -64,7 +61,7 @@ public class Test extends TestCase
 			{
 				t.testByte();
 				t.testDouble();
-				t.testBigData();
+//				t.testBigData();
 				t.testByteArray();
 				t.testBByteArray();
 				t.testIntArray();
@@ -409,20 +406,20 @@ public class Test extends TestCase
 		doWriteAndRead(data); 
 	}
 	
-	/**
-	 * 
-	 */
-	public void testBigData() throws Exception
-	{
-//		File f = new File("C:\\zips\\cd-ripper\\easy-cd-ripper.exe");
-		File f = new File("C:\\zips\\aida32ee_393.zip");
-		FileInputStream fis = new FileInputStream(f);
-		byte[] data = new byte[(int)f.length()];
-		fis.read(data);
-		String bd = new String(Base64.encode(data));
-		
-		doWriteAndRead(bd);
-	}
+//	/**
+//	 * 
+//	 */
+//	public void testBigData() throws Exception
+//	{
+////		File f = new File("C:\\zips\\cd-ripper\\easy-cd-ripper.exe");
+//		File f = new File("C:\\zips\\aida32ee_393.zip");
+//		FileInputStream fis = new FileInputStream(f);
+//		byte[] data = new byte[(int)f.length()];
+//		fis.read(data);
+//		String bd = new String(Base64.encode(data));
+//		
+//		doWriteAndRead(bd);
+//	}
 	
 	/**
 	 * 
