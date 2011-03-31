@@ -149,10 +149,10 @@ public class RemoteFile extends File
     	return true;
     }
 
-    public String getAbsolutePath() 
-    {
-    	return "."; // filedata.getPath();
-    }
+//    public String getAbsolutePath() 
+//    {
+//    	return "."; // filedata.getPath();
+//    }
 
 //    public File getAbsoluteFile() 
 //    {
