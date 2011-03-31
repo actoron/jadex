@@ -11,7 +11,6 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
-import javax.swing.filechooser.FileSystemView;
 
 /**
  *  Node object representing a service container.
@@ -108,13 +107,7 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 	 */
 	public String toString()
 	{
-		String ret = FileSystemView.getFileSystemView().isFloppyDrive(file) 
-			? null : FileSystemView.getFileSystemView().getSystemDisplayName(file);
-		if(ret==null || ret.length()==0)
-			ret = file.getName();
-		if(ret==null || ret.length()==0)
-			ret = file.getPath();
-		return ret;
+		return FileData.getDisplayName(file);
 	}
 
 	/**

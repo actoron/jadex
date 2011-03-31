@@ -5,7 +5,6 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

@@ -1,6 +1,7 @@
 package jadex.base.gui.filetree;
 
 import jadex.base.gui.filechooser.RemoteFile;
+import jadex.commons.SUtil;
 
 import java.io.File;
 
@@ -61,7 +62,7 @@ public class FileData
 	{
 		this.filename = file.getName();
 		this.path = file.getAbsolutePath();
-		this.directory = file.isDirectory();
+		this.directory = SUtil.arrayToSet(File.listRoots()).contains(file) || file.isDirectory();	// Hack to avoid access to floppy disk.
 		this.displayname = getDisplayName(file);
 		this.lastmodified = file.lastModified();
 //		this.root = SUtil.arrayToSet(file.listRoots()).contains(file);
@@ -146,7 +147,8 @@ public class FileData
 	 */
 	public static String getDisplayName(File file)
 	{
-		String ret = FileSystemView.getFileSystemView().getSystemDisplayName(file);
+		String ret = FileSystemView.getFileSystemView().isFloppyDrive(file) 
+			? null : FileSystemView.getFileSystemView().getSystemDisplayName(file);
 		if(ret==null || ret.length()==0)
 			ret = file.getName();
 		if(ret==null || ret.length()==0)

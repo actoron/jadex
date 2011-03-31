@@ -4,7 +4,10 @@ import jadex.base.gui.filetree.FileData;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.future.SwingDelegationResultListener;
 import jadex.xml.annotation.XMLClassname;
 
 import java.io.File;
@@ -46,6 +49,9 @@ public class RemoteFileSystemView extends FileSystemView
 	/** The default directory. */
 	protected RemoteFile defaultdir;
 	
+	/** The current directory. */
+	protected RemoteFile currentdir;
+	
 	//-------- constructors --------
 	
 	/**
@@ -56,6 +62,54 @@ public class RemoteFileSystemView extends FileSystemView
 		this.exta = exta;
 		this.children = new HashMap();
 		this.parents = new HashMap();
+	}
+	
+	/**
+	 *  Initialize the remote file system view such that
+	 *  home, default and current directorty as well as roots
+	 *  are available.
+	 */
+	public IFuture	init()
+	{
+		final Future	ret	= new Future();
+		
+		exta.scheduleStep(new IComponentStep()
+		{
+			@XMLClassname("init")
+			public Object execute(IInternalAccess ia)
+			{
+				Object[]	ret	= new Object[4];
+				FileSystemView view = FileSystemView.getFileSystemView();
+				ret[0]	= FileData.convertToRemoteFiles(File.listRoots());
+				ret[1]	= new FileData(view.getHomeDirectory());
+				ret[2]	= new FileData(view.getDefaultDirectory());
+				
+				String	path	= new File(".").getAbsolutePath();
+				if(path.endsWith("."))
+				{
+					path	= path.substring(0, path.length()-1);
+				}
+				ret[3]	= new FileData(new File(path));					
+				
+				return ret;
+			}
+		}).addResultListener(new SwingDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				Object[]	res	= (Object[])result;
+				FileData[] remfiles = (FileData[])res[0];
+				File[] files = FileData.convertToFiles(remfiles);
+				children.put("roots", files);
+				homedir = new RemoteFile((FileData)res[1]);
+				defaultdir = new RemoteFile((FileData)res[2]);
+				currentdir = new RemoteFile((FileData)res[3]);
+
+				ret.setResult(null);
+			}
+		});
+		
+		return ret;
 	}
 	
 	//-------- methods --------
@@ -432,8 +486,6 @@ public class RemoteFileSystemView extends FileSystemView
 						FileData file = (FileData)result;
 						homedir = new RemoteFile(file);
 					}
-					if(chooser!=null)
-						chooser.setCurrentDirectory(defaultdir);
 //					System.out.println("home: "+homedir);
 				}
 			});
@@ -442,6 +494,14 @@ public class RemoteFileSystemView extends FileSystemView
 		return homedir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown", 0)): homedir;
 	}
 
+	/**
+	 *  Get the current directory of the remote VM.
+	 */
+	public File getCurrentDirectory()
+	{
+		return currentdir;
+	}
+	
 	/**
 	 * Return the user's default starting directory for the file chooser.
 	 * 
