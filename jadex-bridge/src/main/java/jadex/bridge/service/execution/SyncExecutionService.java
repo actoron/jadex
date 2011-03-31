@@ -206,6 +206,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 									boolean again = false;
 									try
 									{
+//										System.out.println("Executing task: "+task);
 										again = task.execute();
 									}
 									catch(Exception e)

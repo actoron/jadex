@@ -3,6 +3,7 @@ package jadex.bdi.testcases.misc;
 import jadex.bridge.IContentCodec;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.Properties;
 
 /**
@@ -44,7 +45,7 @@ public class TestCodec implements IContentCodec, Serializable
 	 */
 	public Object decode(byte[] val, ClassLoader classloader)
 	{
-		return "97".equals(val) ? new Integer(98) : new Integer(96);
+		return "97".equals(new String(val, Charset.forName("UTF-8"))) ? new Integer(98) : new Integer(96);
 //		try
 //		{
 //			return new Integer(val);

@@ -154,11 +154,19 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 						}
 						
 						// todo: implement me on gui layer
+						byte[] codecids;
 						String tmp = (String)thread.getPropertyValue(PROPERTY_CODECIDS);
-						StringTokenizer stok = new StringTokenizer(tmp, ",");
-						byte[] codecids = new byte[stok.countTokens()];
-						for(int i=0; stok.hasMoreTokens(); i++)
-							codecids[i] = Byte.parseByte(stok.nextToken());
+						if(tmp!=null)
+						{
+							StringTokenizer stok = new StringTokenizer(tmp, ",");
+							codecids = new byte[stok.countTokens()];
+							for(int i=0; stok.hasMoreTokens(); i++)
+								codecids[i] = Byte.parseByte(stok.nextToken());
+						}
+						else
+						{
+							codecids	= null;
+						}
 						
 						thread.setWaiting(true);
 						ms.sendMessage(msg, mt, instance.getComponentAdapter().getComponentIdentifier(), 
