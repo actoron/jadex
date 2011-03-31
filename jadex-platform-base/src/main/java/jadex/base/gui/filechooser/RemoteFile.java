@@ -3,6 +3,8 @@ package jadex.base.gui.filechooser;
 import jadex.base.gui.filetree.FileData;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 
 
@@ -49,25 +51,21 @@ public class RemoteFile extends File
 		return filedata.isDirectory();
 	}
 	
-//	public File[] listFiles(FileFilter filter)
-//	{
-//		
-//	}
-//	
-//	public File[] listFiles(FilenameFilter filter)
-//	{
-//		
-//	}
-//	
-//	public File[] listFiles()
-//	{
-//		
-//	}
+	// These methods are based on list(). No need to overwrite.
+	public File[] listFiles(FileFilter filter)
+	{
+		return super.listFiles(filter);
+	}
 	
-//	public String getAbsolutePath()
-//	{
-//		return path;
-//	}
+	public File[] listFiles(FilenameFilter filter)
+	{
+		return super.listFiles(filter);		
+	}
+	
+	public File[] listFiles()
+	{
+		return super.listFiles();		
+	}
 	
 	/**
 	 *  Get the last modified date.
@@ -151,16 +149,16 @@ public class RemoteFile extends File
     	return true;
     }
 
-//    public String getAbsolutePath() 
-//    {
-//    	return getPath();
-//    }
+    public String getAbsolutePath() 
+    {
+    	return "."; // filedata.getPath();
+    }
 
 //    public File getAbsoluteFile() 
 //    {
-//    	return null;
+//    	return super.getAbsoluteFile();
 //    }
-//
+
     // Java bug
     // http://bugs.sun.com/view_bug.do?bug_id=6691325
     public String getCanonicalPath() throws IOException 
@@ -178,17 +176,17 @@ public class RemoteFile extends File
     {
     	return this;
     }
-//
+    
 //    public boolean canRead() 
 //    {
-//    	return true;
+//    	return super.canRead();
 //    }
 //
 //    public boolean canWrite() 
 //    {
-//    	return true;
+//    	return super.canRead();
 //    }
-//
+
     /**
      *  Test if is a file.
      *  @return True, if is a file.

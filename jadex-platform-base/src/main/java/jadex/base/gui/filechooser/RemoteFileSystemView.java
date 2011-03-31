@@ -486,6 +486,8 @@ public class RemoteFileSystemView extends FileSystemView
 						FileData file = (FileData)result;
 						homedir = new RemoteFile(file);
 					}
+					if(chooser!=null)
+						chooser.setCurrentDirectory(homedir);
 //					System.out.println("home: "+homedir);
 				}
 			});
@@ -499,7 +501,37 @@ public class RemoteFileSystemView extends FileSystemView
 	 */
 	public File getCurrentDirectory()
 	{
-		return currentdir;
+		if(currentdir==null)
+		{
+			exta.scheduleStep(new IComponentStep()
+			{
+				@XMLClassname("getCurrentDirectory")
+				public Object execute(IInternalAccess ia)
+				{
+					String	path	= new File(".").getAbsolutePath();
+					if(path.endsWith("."))
+					{
+						path	= path.substring(0, path.length()-1);
+					}
+					return new FileData(new File(path));					
+				}
+			}).addResultListener(new SwingDefaultResultListener()
+			{
+				public void customResultAvailable(Object result)
+				{
+					if(result!=null)
+					{
+						FileData file = (FileData)result;
+						currentdir = new RemoteFile(file);
+					}
+					if(chooser!=null)
+						chooser.setCurrentDirectory(currentdir);
+//					System.out.println("currentdir: "+currentdir);
+				}
+			});
+		}
+		
+		return currentdir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown", 0)): currentdir;
 	}
 	
 	/**
