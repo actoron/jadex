@@ -10,6 +10,7 @@ import jadex.application.space.envsupport.environment.PerceptType;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,13 +23,10 @@ import deco.lang.dynamics.causalities.DecentralMechanismLink;
 import deco.lang.dynamics.causalities.DirectLink;
 import deco.lang.dynamics.mechanism.AgentElement;
 import deco.lang.dynamics.mechanism.DecentralizedCausality;
+import deco.lang.dynamics.mechanism.MechanismConfiguration;
 import deco4mas.coordinate.interpreter.coordination_information.DefaultCoordinationEventGenerator;
 import deco4mas.coordinate.interpreter.coordination_information.DefaultCoordinationInformationInterpreter;
-import deco4mas.examples.agentNegotiation.deco.media.DirectInternalEventMechanism;
-import deco4mas.examples.agentNegotiation.deco.media.NegotiationMechanism;
-import deco4mas.examples.agentNegotiation.deco.media.TrustSpaceMechanism;
 import deco4mas.mechanism.ICoordinationMechanism;
-import deco4mas.mechanism.v2.tspaces.TSpacesMechanism;
 
 /**
  * Responsible for starting all things necessary for deco4mas
@@ -151,12 +149,22 @@ public class InitDeco4mas {
 		// TSpacesMechanism((CoordinationSpace) space);
 		// coordMechanism.start();
 		for (DecentralMechanismLink dml : masDyn.getCausalities().getDml()) {
-			((CoordinationSpace) space).activeCoordinationMechanisms.add(getMechanism(dml.getRealization()));
+			DecentralizedCausality dc = masDyn.getCausalities().getRealizationByName(dml.getRealization());
+			if (dc != null) {
+				MechanismConfiguration mechanismConfiguration = dc.getMechanismConfiguration();
+				ICoordinationMechanism mechanism = getMechanism(mechanismConfiguration.getMechanism_id(), (CoordinationSpace) space);
+				mechanism.setMechanismConfiguration(mechanismConfiguration);
+				mechanism.setRealisationName(dml.getRealization());
+
+				((CoordinationSpace) space).getActiveCoordinationMechanisms().add(mechanism);
+			}
 		}
 
+		// TODO do the same as above for the direct links, right now the did not seem to be supported...
 		for (DirectLink dml : masDyn.getCausalities().getDirectLinks()) {
-			((CoordinationSpace) space).activeCoordinationMechanisms.add(getMechanism(dml.getRealization()));
+			((CoordinationSpace) space).getActiveCoordinationMechanisms().add(getMechanism(dml.getRealization(), (CoordinationSpace) space));
 		}
+
 		// NegSpaceMechanism coordMechanism = new
 		// NegSpaceMechanism((CoordinationSpace) space);
 		// ((CoordinationSpace)
@@ -218,7 +226,7 @@ public class InitDeco4mas {
 		// -------------- INIT Space Percepts! ------------//
 
 		// Percept Type for usual coordination events: coordination_event
-		Set agenttypes = new HashSet();
+		Set<String> agenttypes = new HashSet<String>();
 		for (int i = 0; i < toReferencedAgentTypesList.size(); i++) {
 			// add the "toAgents"
 			agenttypes.add(toReferencedAgentTypesList.get(i));
@@ -231,7 +239,7 @@ public class InitDeco4mas {
 		space.addPerceptType(perceptType);
 
 		// Percept Type needed to initialize participating agents
-		agenttypes = new HashSet();
+		agenttypes = new HashSet<String>();
 		for (int i = 0; i < allReferencedAgentTypesList.size(); i++) {
 			// add all Agents
 			agenttypes.add(allReferencedAgentTypesList.get(i));
@@ -359,11 +367,9 @@ public class InitDeco4mas {
 	 * @return
 	 */
 	private void getAgentLists(MASDynamics dyn, ArrayList<String> allAgentNames, ArrayList<String> fromAgents, ArrayList<String> toAgents) {
-		ArrayList<DecentralizedCausality> decentralCausalities = dyn.getCausalities().getRealizations();
 		HashMap<String, Object> tmpAll = new HashMap<String, Object>();
 		HashMap<String, Object> tmpFrom = new HashMap<String, Object>();
 		HashMap<String, Object> tmpTo = new HashMap<String, Object>();
-		ArrayList<String> res = new ArrayList<String>();
 
 		for (DecentralizedCausality decCause : dyn.getCausalities().getRealizations()) {
 
@@ -395,18 +401,51 @@ public class InitDeco4mas {
 		}
 	}
 
-	// TODO make it better
-	private ICoordinationMechanism getMechanism(String realisation) {
-		ICoordinationMechanism result = null;
-		if (realisation.equals("by_tuple"))
-			return new TSpacesMechanism((CoordinationSpace) space);
-		else if (realisation.equals("by_neg"))
-			return new NegotiationMechanism((CoordinationSpace) space);
-		else if (realisation.equals("by_trust"))
-			return new TrustSpaceMechanism((CoordinationSpace) space);
-		else if (realisation.equals("by_directInternalEvent"))
-			return new DirectInternalEventMechanism((CoordinationSpace) space);
-		return result;
-	}
+	// // TODO make it better
+	// private ICoordinationMechanism getMechanism(String realisation) {
+	// ICoordinationMechanism result = null;
+	// if (realisation.equals("by_tuple"))
+	// return new TSpacesMechanism((CoordinationSpace) space);
+	// else if (realisation.equals("by_neg"))
+	// return new NegotiationMechanism((CoordinationSpace) space);
+	// else if (realisation.equals("by_trust"))
+	// return new TrustSpaceMechanism((CoordinationSpace) space);
+	// else if (realisation.equals("by_directInternalEvent"))
+	// return new DirectInternalEventMechanism((CoordinationSpace) space);
+	// return result;
+	// }
 
+	/**
+	 * Tries to load the {@link ICoordinationMechanism} specified by the given full qualifies class name.
+	 * 
+	 * @param mechanismId
+	 *            the full qualified class name of the coordination mechanism
+	 * @param space
+	 *            the coordination space
+	 * @return the load {@link ICoordinationMechanism} or <code>null</code> if no coordination mechanism could be loaded
+	 */
+	private ICoordinationMechanism getMechanism(String mechanismId, CoordinationSpace space) {
+		try {
+			@SuppressWarnings("unchecked")
+			Class<ICoordinationMechanism> mechanismClass = (Class<ICoordinationMechanism>) Class.forName(mechanismId);
+			ICoordinationMechanism mechanism = mechanismClass.getConstructor(CoordinationSpace.class).newInstance(space);
+			return mechanism;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
 }

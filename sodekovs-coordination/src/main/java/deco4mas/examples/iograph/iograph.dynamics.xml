@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<MASDynamic name="micro_example">
+<MASDynamic name="iograph_example">
 	<!--
-		Tuple Space Example: 2D Environment-Interaction Exemplifies how
-		publications of Coordination Information can be triggered by micro 
-		agent steps. Activities in the Sender agent "SenderAgent.java"
-		are starting IComponentSteps. These modifications are observed by
-		a Coordination Endpoint that publishes the changes of the agent 
-		state on a Coordination Medium. Here, a tuple-space is used to
-		resemble interactions in a two-dimensional environment. An agent
-		type (SenderAgent.java) is publishing initializations of steps.
-		Other agents (ReceiverAgent.java) are receiving these publications 
-		which results in the starting of specified steps in the receiving agent.
+		IOGraph Example: 2D Environment-Interaction exemplifies how
+		publications of Coordination Information can be specified by
+		a given IOGraph so that these information are not passed via
+		broadcast to all receiver agent but only to the ones specified 
+		in the given IOGraph.
 	-->
 
 	<!--
@@ -21,10 +16,10 @@
 	<system_properties>
 		<role_occupations>
 			<role_occupation name="sender" multiple="false">
-				<agent id="Sender" />
+				<agent id="Graph" />
 			</role_occupation>
 			<role_occupation name="receiver" multiple="false">
-				<agent id="Receiver" />
+				<agent id="Graph" />
 			</role_occupation>
 		</role_occupations>
 	</system_properties>
@@ -37,7 +32,7 @@
 	<causalities>
 		<deco_links>
 			<!-- The encated interdependency: -->
-			<deco_link realization="by_tuple" type="POSITIVE" name="send-receive" spaces="mycoordspace">
+			<deco_link realization="by_graph" type="POSITIVE" name="send-receive" spaces="mycoordspace">
 				<froms>
 					<from>sender</from>
 				</froms>
@@ -49,23 +44,29 @@
 
 		<!-- The detailed configuration of interdependency enactment. -->
 		<deco-link-realizations>
-			<realization id="by_tuple">
+			<realization id="by_graph">
 				<from>		<!-- Published behaviors / events: -->
-					<agent_element element="CounterIncrementStep" agent_id="Sender" type="MICRO_STEP">
+					<agent_element element="SendStep" agent_id="Graph" type="MICRO_STEP">
 						<parameter_mappings>
-							<mapping ref="counter" name="counter"/>
+							<mapping ref="id" name="id"/>
 						</parameter_mappings>
 					</agent_element>
 				</from>
 				<!-- Coordination Medium configuration: -->
 				<mechanism_configuration
-					mechanism_id="deco4mas.mechanism.v2.tspaces.TSpacesMechanism"
+					mechanism_id="deco4mas.mechanism.graph.IOGraphMechanism"
 					agent_type="JADEX">
+					<properties>
+						<entry>
+							<key>graph_file</key>
+							<value>deco4mas/examples/iograph/iograph.xml</value>
+						</entry>
+					</properties>
 				</mechanism_configuration>
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->
-					<agent_element element="InformCounterIncrementStep" agent_id="Receiver" type="MICRO_STEP">
+					<agent_element element="ReceiveStep" agent_id="Graph" type="MICRO_STEP">
 						<parameter_mappings>
-							<mapping ref="counter" name="counter"/>
+							<mapping ref="id" name="receivedId"/>
 						</parameter_mappings>
 					</agent_element>
 				</to>

@@ -100,6 +100,7 @@ public abstract class BehaviorObservationComponent {
 		coordInfo.addValue(Constants.VALUE, value);
 		coordInfo.addValue(Constants.PARAMETER_DATA_MAPPING, parameterDataMappings);
 		coordInfo.addValue(Constants.DML_REALIZATION_NAME, dmlRealizationName);
+		coordInfo.addValue(Constants.SENDER_AGENT, extAccess.getComponentIdentifier());
 
 		return coordInfo;
 	}

@@ -34,14 +34,14 @@ import deco4mas.mechanism.ICoordinationMechanism;
 public class CoordinationSpace extends Grid2D {
 
 	/** The list of currently supported / active coordination mechanisms. */
-	// TODO: HACK! Change to private!
-	public ArrayList<ICoordinationMechanism> activeCoordinationMechanisms = new ArrayList<ICoordinationMechanism>();
+	private ArrayList<ICoordinationMechanism> activeCoordinationMechanisms = new ArrayList<ICoordinationMechanism>();
+
 	private MASDynamics masDnyModel = null;
 	// Contains the "RoleDefinitionsForPerceive" for each agent type.
 	private Map<String, Map<String, Set<Object[]>>> agentData = new HashMap<String, Map<String, Set<Object[]>>>();
 
-	// private ArrayList<IAgentIdentifier> agentIdentifierList = new
-	// ArrayList<IAgentIdentifier>();
+	/** Contains the receivers for the direct addressing */
+	private Map<String, List<IComponentIdentifier>> receiverData = new HashMap<String, List<IComponentIdentifier>>();
 
 	// -------- constructors --------
 
@@ -86,42 +86,6 @@ public class CoordinationSpace extends Grid2D {
 	}
 
 	/**
-	 * Creates a new {@link ContinuousSpace2D} with the default name.
-	 * 
-	 * @param actionexecutor
-	 *            executor for agent actions
-	 * @param areasize
-	 *            the size of the 2D area
-	 */
-	// public CoordinationSpace(IVector2 areasize, String neighborhood) {
-	// super(DEFAULT_NAME, areasize, BORDER_TORUS, neighborhood);
-	// initSpace();
-	// initDeco4mas();
-	// }
-
-	/**
-	 * Creates a new {@link ContinuousSpace2D} with a special ID.
-	 * 
-	 * @param name
-	 *            the name of this space
-	 * @param areasize
-	 *            the size of the 2D area
-	 * @param actionexecutor
-	 *            executor for agent actions
-	 */
-	// public CoordinationSpace(Object name, IVector2 areasize, String
-	// bordermode, String neighborhood)
-	// {
-	// super(areasize==null? null: new Vector2Int(areasize.getXAsInteger(),
-	// areasize.getYAsInteger()), bordermode);
-	// this.setProperty("name", name);
-	// super.setNeighborhood(neighborhood==null?
-	// Grid2D.NEIGHBORHOOD_VON_NEUMANN: neighborhood);
-	// this.objectsygridpos = new MultiCollection();
-	// System.out.println("Called 33");
-	// initCoordinationMechanisms();
-	// }
-	/**
 	 * Used to CONSUME!!! Coordination Events, that are produced by the Agent State Interpreter, and to pass them to the Coordination Medium (Endpoint).
 	 * 
 	 * @param obj
@@ -137,20 +101,69 @@ public class CoordinationSpace extends Grid2D {
 		}
 	}
 
-	// setter and getter for coordinationMedium
-
 	/**
 	 * Used to publish Coordination Events that are produced by the Coordination Mechanism, i.e. those coordination information that have been produced by the medium and that can be perceived by the
 	 * agents via their Coordination Information Interpreter.
 	 * 
-	 * @param objFperce
+	 * @param obj
 	 */
 	public void publishCoordinationEvent(Object obj) {
 		// pass event the currently used coordination medium
 		// System.out.println("#CoordinationSpace# EnvironentEvent fired...");
 		ISpaceObject newObj = this.createSpaceObject("CoordinationSpaceObject", ((CoordinationInformation) obj).getValues(), null);
 		newObj.setProperty(Constants.ROLE_DEFINITIONS_FOR_PERCEIVE, agentData);
-		this.fireEnvironmentEvent(new EnvironmentEvent(CoordinationEvent.COORDINATE_START, this, newObj, new String("Coordinate Event Nr...."), null));
+		this.fireEnvironmentEvent(new EnvironmentEvent(CoordinationEvent.COORDINATE_BROADCAST, this, newObj, new String("Coordinate Event Nr...."), null));
+	}
+
+	/**
+	 * Used to publish Coordination Events that are produced by the Coordination Mechanism, i.e. those coordination information that have been produced by the medium and that can be perceived by the
+	 * agents via their Coordination Information Interpreter. This method is to be used if the coordination information should only be passed to a given list of receiving agents.
+	 * 
+	 * @param obj
+	 * @param receiver
+	 *            a {@link List} of receiving agents
+	 * @param realizationName
+	 *            the name of the realization
+	 * @param mechanismEventNumber
+	 *            the number of the event in the used mechanism
+	 */
+	public void publishCoordinationEvent(Object obj, List<String> receiver, String realizationName, Integer mechanismEventNumber) {
+		ISpaceObject newObj = this.createSpaceObject("CoordinationSpaceObject", ((CoordinationInformation) obj).getValues(), null);
+		newObj.setProperty(Constants.ROLE_DEFINITIONS_FOR_PERCEIVE, agentData);
+
+		String key = CoordinationEvent.COORDINATE_DIRECT;
+		if (realizationName != null) {
+			key += "::" + realizationName;
+		}
+		if (mechanismEventNumber != null) {
+			key += "::" + mechanismEventNumber;
+		}
+
+		receiverData.put(key, getIdentifier(receiver));
+		this.fireEnvironmentEvent(new EnvironmentEvent(key, this, newObj, "Coordinate Event Nr. " + mechanismEventNumber, null));
+	}
+
+	private List<IComponentIdentifier> getIdentifier(List<String> agentNames) {
+		List<IComponentIdentifier> componentIdentifiers = new ArrayList<IComponentIdentifier>();
+
+		IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getServiceUpwards(this.getContext().getServiceProvider(), IComponentManagementService.class).get(
+				new ThreadSuspendable());
+		IComponentIdentifier[] identifiers = (IComponentIdentifier[]) cms.getComponentIdentifiers().get(new ThreadSuspendable());
+		for (IComponentIdentifier identifier : identifiers) {
+			if (agentNames.contains(identifier.getLocalName())) {
+				agentNames.remove(identifier.getLocalName());
+				componentIdentifiers.add(identifier);
+			}
+		}
+
+		return componentIdentifiers;
+	}
+
+	/**
+	 * @return the receiverData
+	 */
+	public Map<String, List<IComponentIdentifier>> getReceiverData() {
+		return receiverData;
 	}
 
 	/**
@@ -224,52 +237,6 @@ public class CoordinationSpace extends Grid2D {
 		});
 	}
 
-	// /**
-	// * Called when an agent was added.
-	// */
-	// public void agentAdded(IComponentIdentifier aid) {
-	// synchronized (monitor) {
-	// // Possibly add or create avatar(s) if any.
-	// if (initialavatars != null && initialavatars.containsKey(aid)) {
-	// Object[] ia = (Object[]) initialavatars.get(aid);
-	// String objecttype = (String) ia[0];
-	// Map props = (Map) ia[1];
-	// if (props == null)
-	// props = new HashMap();
-	// props.put(ISpaceObject.PROPERTY_OWNER, aid);
-	// createSpaceObject(objecttype, props, null);
-	// } else {
-	// // String agenttype = ((ApplicationContext)
-	// getContext()).getAgentType(aid);
-	// String agenttype = ((IApplication) getContext()).getComponentType(aid);
-	// if (agenttype != null && avatarmappings.getCollection(agenttype) != null)
-	// {
-	// for (Iterator it = avatarmappings.getCollection(agenttype).iterator();
-	// it.hasNext();) {
-	// AvatarMapping mapping = (AvatarMapping) it.next();
-	// if (mapping.isCreateAvatar()) {
-	// Map props = new HashMap();
-	// props.put(ISpaceObject.PROPERTY_OWNER, aid);
-	// // createSpaceObject(mapping.getAvatarType(), props, null);
-	// createSpaceObject(mapping.getObjectType(), props, null);
-	// }
-	// }
-	// }
-	// }
-	//
-	// if (perceptgenerators != null) {
-	// for (Iterator it = perceptgenerators.keySet().iterator(); it.hasNext();)
-	// {
-	// IPerceptGenerator gen = (IPerceptGenerator)
-	// perceptgenerators.get(it.next());
-	// gen.componentAdded(aid, this);
-	// }
-	// }
-	// // init Agent for deco4MAS participation
-	// initParticipatingAgent(aid);
-	// }
-	// }
-
 	/**
 	 * Called when an component was added.
 	 */
@@ -305,5 +272,12 @@ public class CoordinationSpace extends Grid2D {
 	 */
 	public Map<String, Map<String, Set<Object[]>>> getAgentData() {
 		return agentData;
+	}
+
+	/**
+	 * @return the activeCoordinationMechanisms
+	 */
+	public ArrayList<ICoordinationMechanism> getActiveCoordinationMechanisms() {
+		return activeCoordinationMechanisms;
 	}
 }

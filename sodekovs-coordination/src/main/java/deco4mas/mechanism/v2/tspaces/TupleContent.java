@@ -9,23 +9,23 @@ import deco4mas.mechanism.CoordinationInformation;
  * The Content object that allows to store coordination information in TSpaces tuples.
  * 
  * @author Jan Sudeikat
- *
+ * 
  */
-@SuppressWarnings({ "serial", "unchecked" })
-public class TupleContent implements CoordinationInformation, Serializable, Comparable{
+@SuppressWarnings({ "serial", "rawtypes" })
+public class TupleContent implements CoordinationInformation, Serializable, Comparable {
 
-	//-------- attributes ----------
+	// -------- attributes ----------
 
 	/** The type of subject to be transmitted. */
 	private String type;
-	
+
 	/** The name of the subject. */
 	private String name;
-	
+
 	/** The value of the subject. */
 	private HashMap<String, Object> parameters;
-	
-	//-------- constructors --------
+
+	// -------- constructors --------
 
 	public TupleContent() {
 		super();
@@ -35,18 +35,18 @@ public class TupleContent implements CoordinationInformation, Serializable, Comp
 	public TupleContent(String type, String name) {
 		super();
 		this.type = type;
-		this.name = name;		// TODO name equals subject...
+		this.name = name; // TODO name equals subject...
 		this.parameters = new HashMap<String, Object>();
 	}
-	
+
 	public TupleContent(CoordinationInformation ci) {
 		this.type = ci.getType();
 		this.name = ci.getName();
 		this.parameters = ci.getValues();
 	}
 
-	//-------- methods -------------
-	
+	// -------- methods -------------
+
 	public String getType() {
 		return type;
 	}
@@ -74,7 +74,7 @@ public class TupleContent implements CoordinationInformation, Serializable, Comp
 	@Override
 	public void addValue(String key, Object value) {
 		this.parameters.put(key, value);
-		
+
 	}
 
 	@Override
@@ -87,8 +87,8 @@ public class TupleContent implements CoordinationInformation, Serializable, Comp
 		return parameters;
 	}
 
-	//-------- Comparable interface  -------------
-	
+	// -------- Comparable interface -------------
+
 	/**
 	 * Compare objects by the type attribute.
 	 * 
@@ -96,22 +96,22 @@ public class TupleContent implements CoordinationInformation, Serializable, Comp
 	 */
 	@Override
 	public int compareTo(Object other) {
-		if ( (other == null) || ! (other instanceof TupleContent) ) 
-		      return +1;    
-		    if ( type == null )
-		    	return ( -1);
-		    return type.compareTo(((TupleContent)other).getType());
+		if ((other == null) || !(other instanceof TupleContent))
+			return +1;
+		if (type == null)
+			return (-1);
+		return type.compareTo(((TupleContent) other).getType());
 	}
-	
+
 	/**
 	 * Compare objects by the type attribute.
 	 */
-	public boolean equals( Object other ) {      
-	    if ( (other == null) || ! (other instanceof TupleContent) ) 
-	      return false;    
-	    if ( type == null )
-	    	return ( ((TupleContent)other).getType() == null);
-	    return type.equals(((TupleContent)other).getType());
-	  }
+	public boolean equals(Object other) {
+		if ((other == null) || !(other instanceof TupleContent))
+			return false;
+		if (type == null)
+			return (((TupleContent) other).getType() == null);
+		return type.equals(((TupleContent) other).getType());
+	}
 
 }

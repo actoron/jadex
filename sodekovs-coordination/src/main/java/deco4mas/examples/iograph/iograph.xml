@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<iograph>
+	<entries>
+		<entry id="Graph0">
+			<inputs>
+			</inputs>
+			<outputs>
+				<output>Graph1</output>
+			</outputs>
+		</entry>
+		<entry id="Graph1">
+			<inputs>
+				<input>Graph0</input>
+			</inputs>
+			<outputs>
+				<output>Graph2</output>
+			</outputs>
+		</entry>
+		<entry id="Graph2">
+			<inputs>
+				<input>Graph1</input>
+			</inputs>
+			<outputs>
+				<output>Graph3</output>
+			</outputs>
+		</entry>
+		<entry id="Graph3">
+			<inputs>
+				<input>Graph2</input>
+			</inputs>
+			<outputs>
+			</outputs>
+		</entry>
+	</entries>
+</iograph>

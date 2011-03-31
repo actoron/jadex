@@ -61,43 +61,8 @@
 				</from>
 				<!-- Coordination Medium configuration: -->
 				<mechanism_configuration
-					mechanism_id="deco4mas.mechanism.mediated.tspaces.Mediated(TSpaces)"
+					mechanism_id="deco4mas.mechanism.v2.tspaces.TSpacesMechanism"
 					agent_type="JADEX">
-					<properties>
-						<entry>
-							<key>delay</key>
-							<value>10</value>
-						</entry>
-						<entry>
-							<key>polling</key>
-							<value>1000</value>
-						</entry>
-						<entry>
-							<key>positioner</key>
-							<value>deco4mas.examples.mediated.tspaces.ExamplePositioner
-							</value>
-						</entry>
-						<entry>
-							<key>size:Y</key>
-							<value>4</value>
-						</entry>
-						<entry>
-							<key>size:X</key>
-							<value>4</value>
-						</entry>
-						<entry>
-							<key>expiration</key>
-							<value>10000</value>
-						</entry>
-						<entry>
-							<key>propagation</key>
-							<value>3000</value>
-						</entry>
-						<entry>
-							<key>TTL</key>
-							<value>2</value>
-						</entry>
-					</properties>
 				</mechanism_configuration>
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->
 					<agent_element element="receivehello" agent_id="ExampleBDI" type="INTERNAL_EVENT">

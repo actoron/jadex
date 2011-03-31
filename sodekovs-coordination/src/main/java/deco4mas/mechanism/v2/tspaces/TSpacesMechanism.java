@@ -6,7 +6,6 @@ import deco4mas.mechanism.CoordinationInformation;
 import deco4mas.mechanism.ICoordinationMechanism;
 
 /**
- * 
  * Implements the "TSpaces" coordination mechanism.
  * 
  * @author Ante Vilenica
@@ -15,7 +14,6 @@ import deco4mas.mechanism.ICoordinationMechanism;
 public class TSpacesMechanism extends ICoordinationMechanism {
 
 	private TSpacesClient tsClient;
-	private String realisationName = "by_tuple";
 
 	public TSpacesMechanism(CoordinationSpace space) {
 		super(space);
@@ -23,7 +21,7 @@ public class TSpacesMechanism extends ICoordinationMechanism {
 
 	public void start() {
 		// Init TSpacesServer
-		// ToDo: The server is started, but without a tuple space with that name.  
+		// ToDo: The server is started, but without a tuple space with that name.
 		StartTSpacesServer.startServer("cooordination_tspace");
 
 		tsClient = new TSpacesClient(space);
@@ -52,11 +50,5 @@ public class TSpacesMechanism extends ICoordinationMechanism {
 		} else {
 			tsClient.publish((ISpaceObject) obj);
 		}
-	}
-	
-	@Override
-	public String getRealisationName()
-	{
-		return realisationName ;
 	}
 }
