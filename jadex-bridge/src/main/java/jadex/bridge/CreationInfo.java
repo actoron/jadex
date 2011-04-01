@@ -35,6 +35,9 @@ public class CreationInfo
 	/** The auto shutdown flag (default: false). */
 	protected Boolean autoshutdown;
 	
+	/** The platform classloader flag (default: false). */
+	protected Boolean platformloader;
+	
 	/** The imports. */
 	protected String[]	imports;
 	
@@ -318,6 +321,16 @@ public class CreationInfo
 	public void setAutoshutdown(Boolean autoshutdown)
 	{
 		this.autoshutdown = autoshutdown;
+	}
+	
+	public Boolean getPlatformloader()
+	{
+		return platformloader;
+	}
+	
+	public void setPlatformloader(Boolean platformloader)
+	{
+		this.platformloader = platformloader;
 	}
 
 	/**

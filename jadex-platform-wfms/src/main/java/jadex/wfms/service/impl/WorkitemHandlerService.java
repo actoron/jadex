@@ -525,7 +525,7 @@ public class WorkitemHandlerService extends BasicService implements IWorkitemHan
 				
 				for (Iterator it = globalActivityListeners.values().iterator(); it.hasNext(); )
 					for (Iterator it2 = ((Set) it.next()).iterator(); it2.hasNext(); )
-						((IActivityListener) it.next()).activityRemoved(new ActivityEvent(userName, activity));
+						((IActivityListener) it2.next()).activityRemoved(new ActivityEvent(userName, activity));
 			}
 		});
 	}

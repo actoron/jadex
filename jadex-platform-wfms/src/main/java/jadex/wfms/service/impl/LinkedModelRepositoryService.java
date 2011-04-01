@@ -74,34 +74,6 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 		//this.imports = Collections.synchronizedSet(new HashSet());
 		this.urlEntries = Collections.synchronizedMap(new HashMap());
 		this.modelRefCount = Collections.synchronizedMap(new HashMap());
-		
-		resourceDir = new File(System.getProperty("user.home") + File.separator + ".jadexwfms");
-		if (!resourceDir.exists())
-			resourceDir.mkdir();
-		if (!resourceDir.isDirectory())
-			throw new RuntimeException("Resource directory blocked " + resourceDir);
-		
-		File[] files = resourceDir.listFiles();
-		for (int i = 0; i < files.length; ++i)
-			if (files[i].isFile() && files[i].getName().endsWith(".jar"))
-			{
-				final File file = files[i];
-				SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-				{
-					
-					public void resultAvailable(Object result)
-					{
-						try
-						{
-							((ILibraryService) result).addURL(file.toURI().toURL());
-						}	
-						catch (MalformedURLException e)
-						{
-							e.printStackTrace();
-						}
-					}
-				});
-			}
 	}
 	
 	/**
@@ -156,6 +128,35 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 				}
 			});
 		}
+		
+		resourceDir = new File(System.getProperty("user.home") + File.separator + ".jadexwfms");
+		if (!resourceDir.exists())
+			resourceDir.mkdir();
+		if (!resourceDir.isDirectory())
+			throw new RuntimeException("Resource directory blocked " + resourceDir);
+		
+		File[] files = resourceDir.listFiles();
+		for (int i = 0; i < files.length; ++i)
+			if (files[i].isFile() && files[i].getName().endsWith(".jar"))
+			{
+				final File file = files[i];
+				SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+				{
+					
+					public void resultAvailable(Object result)
+					{
+						try
+						{
+							((ILibraryService) result).addURL(file.toURI().toURL());
+						}	
+						catch (MalformedURLException e)
+						{
+							e.printStackTrace();
+						}
+					}
+				});
+			}
+		
 		return super.startService();
 	}
 	

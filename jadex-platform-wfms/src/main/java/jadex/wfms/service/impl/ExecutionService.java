@@ -10,6 +10,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -112,15 +113,18 @@ public class ExecutionService extends BasicService implements IExecutionService
 	public IFuture startProcess(String modelname, Object id, Map arguments)
 	{
 		final Future ret = new Future();
-		IComponentManagementService ces = (IComponentManagementService) SServiceProvider.getService(exta.getServiceProvider(), (Class) IComponentManagementService.class).get(new ThreadSuspendable());
-		ces.createComponent(null, modelname, new CreationInfo(null, arguments, wfms, true), null).addResultListener(new DefaultResultListener()
+		IComponentManagementService ces = (IComponentManagementService) SServiceProvider.getService(exta.getServiceProvider(), (Class) IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
+		CreationInfo ci = new CreationInfo(null, arguments, wfms, true);
+		ci.setPlatformloader(true);
+		ces.createComponent(null, modelname, ci, null).addResultListener(new DefaultResultListener()
+		//ces.createComponent(null, modelname, new CreationInfo(null, arguments, null, true), null).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				final IComponentIdentifier id = ((IComponentIdentifier) result);
-				SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 				{
-					public void customResultAvailable(Object result)
+					public void resultAvailable(Object result)
 					{
 						final IComponentManagementService cms = (IComponentManagementService) result;
 						cms.addComponentListener(id, new ICMSComponentListener()

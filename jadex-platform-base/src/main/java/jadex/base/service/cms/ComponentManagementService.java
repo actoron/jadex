@@ -1452,7 +1452,8 @@ public abstract class ComponentManagementService extends BasicService implements
 		if(ci!=null && ci.getParent()!=null
 			&& !ci.getParent().equals(root.getComponentIdentifier())
 			&& !isRemoteComponent(ci.getParent())
-			&& !initinfos.containsKey(ci.getParent()))
+			&& !initinfos.containsKey(ci.getParent())
+			&& !Boolean.TRUE.equals(ci.getPlatformloader()))
 		{
 			SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new DelegationResultListener(ret)

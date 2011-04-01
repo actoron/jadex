@@ -8,6 +8,6 @@ public class StartProcessPlan extends Plan
 	public void body()
 	{
 		IExternalWfmsService wfms = (IExternalWfmsService) getBeliefbase().getBelief("wfms").getFact();
-		wfms.startProcess(getComponentIdentifier(), (String) getParameter("process_name").getValue());
+		wfms.startProcess(getComponentIdentifier(), (String) getParameter("process_name").getValue()).get(this);
 	}
 }
