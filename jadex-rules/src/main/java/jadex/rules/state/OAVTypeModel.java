@@ -183,6 +183,86 @@ public class OAVTypeModel
 	/**
 	 *  Get a type per name.
 	 *  Creates implicit java types on the fly.
+	 *  TODO: Unify with getObjectType(String typename)
+	 *  
+	 *  @param typename The type name.
+	 *  @return The type if contained.
+	 *  @throws RuntimeException when the type is not found.
+	 */
+	public OAVObjectType getObjectType(Class clazz)
+	{
+		String typename = SReflect.getClassName(clazz);
+		// Find type if existent.
+		OAVObjectType ret = getDeepType(typename);
+		
+		// #ifndef MIDP		
+		// Hack??? If not found, create implicit java type. 
+		if(ret==null)
+		{
+			if(clazz!=null)
+			{
+				// Find super types to determine kind.
+				List	superclasses	= new ArrayList();
+				List	superoavtypes	= new ArrayList();
+				superclasses.add(clazz);
+				for(int i=0; i<superclasses.size(); i++)
+				{
+					// Search for corresponding oav type.
+					Class	clz	= (Class)superclasses.get(i);
+					OAVObjectType	oavtype	= getDeepType(SReflect.getClassName(clz));
+					
+					// Remember type if found.
+					if(oavtype!=null)
+					{
+						superoavtypes.add(oavtype);
+					}
+					
+					// Otherwise look further up in the hierarchy.
+					else
+					{
+						Class	sup	= clz.getSuperclass();
+						if(sup!=null)
+							superclasses.add(sup);
+						Class[]	ifs	= clz.getInterfaces();
+						for(int j=0; j<ifs.length; j++)
+							superclasses.add(ifs[j]);
+					}
+				}
+				
+				String	kind	= null;
+				for(int i=0; i<superoavtypes.size(); i++)
+				{
+					String	superkind	= ((OAVJavaType)superoavtypes.get(i)).getKind();
+					if(kind==null || kind.equals(OAVJavaType.KIND_OBJECT))
+						kind	= superkind;
+					else if(!kind.equals(superkind) && !superkind.equals(OAVJavaType.KIND_OBJECT))
+						throw new RuntimeException("Incompatible kinds for type '"+typename+"': "+superoavtypes);
+				}
+				if(kind==null)
+					kind	= OAVJavaType.KIND_OBJECT;
+				
+				if(OAVJavaType.KIND_OBJECT.equals(kind))
+				{
+					if(SReflect.getMethod(clazz, "addPropertyChangeListener", PCL)!=null)
+						kind	= OAVJavaType.KIND_BEAN;
+				}
+				
+//				ret	= createJavaType(clazz, kind);
+				ret = new OAVJavaType(clazz, kind, this);
+			}
+		}
+		// #endif
+			
+		if(ret==null)
+			throw new RuntimeException("Type not found in type model: "+typename);
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get a type per name.
+	 *  Creates implicit java types on the fly.
+	 *  TODO: Unify with getObjectType(Class clazz)
 	 *  
 	 *  @param typename The type name.
 	 *  @return The type if contained.
@@ -318,7 +398,8 @@ public class OAVTypeModel
 	 */
 	public OAVJavaType getJavaType(Class clazz)
 	{
-		return (OAVJavaType)getObjectType(SReflect.getClassName(clazz));
+		return (OAVJavaType)getObjectType(clazz);
+		//return (OAVJavaType)getObjectType(SReflect.getClassName(clazz));
 	}
 
 
