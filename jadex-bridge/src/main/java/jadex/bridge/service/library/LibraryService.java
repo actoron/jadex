@@ -592,23 +592,28 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	public IFuture getProperties()
 	{
 		String[]	entries;
-		synchronized(this)
+		if (libcl != null)
 		{
-			List<URL> urls = new ArrayList<URL>(libcl.getDelegates().keySet());
-			entries	= new String[urls.size()];
-			for(int i=0; i<entries.length; i++)
+			synchronized(this)
 			{
-				URL	url	= (URL)urls.get(i);
-				if(url.getProtocol().equals("file"))
+				List<URL> urls = new ArrayList<URL>(libcl.getDelegates().keySet());
+				entries	= new String[urls.size()];
+				for(int i=0; i<entries.length; i++)
 				{
-					entries[i]	= SUtil.convertPathToRelative(url.getFile());
-				}
-				else
-				{
-					entries[i]	= url.toString();					
+					URL	url	= (URL)urls.get(i);
+					if(url.getProtocol().equals("file"))
+					{
+						entries[i]	= SUtil.convertPathToRelative(url.getFile());
+					}
+					else
+					{
+						entries[i]	= url.toString();					
+					}
 				}
 			}
 		}
+		else
+			entries = new String[0];
 		
 		Properties props	= new Properties();
 		for(int i=0; i<entries.length; i++)
