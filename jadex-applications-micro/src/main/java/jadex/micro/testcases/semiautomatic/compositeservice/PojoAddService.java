@@ -5,6 +5,8 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceInterface;
+import jadex.bridge.service.annotation.ServiceShutdown;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -35,4 +37,34 @@ public class PojoAddService implements IAddService
 		System.out.println("add service called on: "+sid+", comp="+(comp!=null?comp.getComponentIdentifier():null));
 		return new Future(new Double(a+b));
 	}
+	
+	/**
+	 * 
+	 */
+	@ServiceStart
+	public IFuture start()
+	{
+		System.out.println("start");
+		return IFuture.DONE;
+	}
+	
+	/**
+	 * 
+	 */
+	@ServiceShutdown
+	public IFuture shutdown()
+	{
+		System.out.println("shutdown");
+		return IFuture.DONE;
+	}
+	
+//	/**
+//	 * 
+//	 */
+//	@ServiceProperties
+//	public Map getPropertyMap()
+//	{
+//		System.out.println("properties");
+//		return IFuture.DONE;
+//	}
 }

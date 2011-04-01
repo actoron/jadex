@@ -6,15 +6,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *  Annotation for pojo service which
- *  the service interface contains.
+ *  Annotation for pojo service start method.
  */
-@Target(ElementType.TYPE)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ServiceInterface
+public @interface ServiceStart
 {
-	/**
-	 *  Supply the interface.
-	 */
-	public Class value();
+//	/**
+//	 *  Setup order.
+//	 */
+//	public boolean value() default false;
 }

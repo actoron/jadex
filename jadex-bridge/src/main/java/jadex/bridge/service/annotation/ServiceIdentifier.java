@@ -6,7 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
+ *  Annotation for field of pojo service in which
+ *  the service identifier should be injected.
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)

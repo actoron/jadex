@@ -6,11 +6,9 @@ import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,8 +34,8 @@ public class BasicService implements IInternalService
 	/** The service properties. */
 	protected Map properties;
 	
-	/** The list of start futures. */
-	protected List startfutures;
+//	/** The list of start futures. */
+//	protected List startfutures;
 	
 	//-------- constructors --------
 
@@ -126,7 +124,7 @@ public class BasicService implements IInternalService
 	 */
 	public Map getPropertyMap()
 	{
-		return properties!=null? properties: new HashMap();//Collections.EMPTY_MAP; 
+		return properties!=null? properties: Collections.EMPTY_MAP; 
 	}
 	
 	/**
@@ -158,11 +156,11 @@ public class BasicService implements IInternalService
 			else
 			{
 				started = true;
-				if(startfutures!=null)
-				{
-					tosignal = (Future[])startfutures.toArray(new Future[startfutures.size()]);
-					startfutures = null;
-				}
+//				if(startfutures!=null)
+//				{
+//					tosignal = (Future[])startfutures.toArray(new Future[startfutures.size()]);
+//					startfutures = null;
+//				}
 			}
 		}
 		
@@ -234,40 +232,40 @@ public class BasicService implements IInternalService
 		return new ServiceIdentifier(providerid, servicetype, generateServiceName(serviceimpl));
 	}
 	
-	/**
-	 *  Get a future that signals when the service is started.
-	 *  @return A future that signals when the service has been started.
-	 */
-	public IFuture signalStarted()
-	{
-		final Future ret = new Future();
-		
-		int alt = 2;
-		synchronized(this)
-		{
-			if(shutdowned)
-				alt = 0;
-			else if(started)
-				alt = 1;
-			else
-			{
-				if(startfutures==null)
-					startfutures = new ArrayList();
-				startfutures.add(ret);
-			}
-		}
-		
-		if(alt==0)
-		{
-			ret.setException(new RuntimeException("Service already shutdowned: "+getServiceIdentifier()));
-		}
-		else if(alt==1)
-		{
-			ret.setResult(null);
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Get a future that signals when the service is started.
+//	 *  @return A future that signals when the service has been started.
+//	 */
+//	public IFuture signalStarted()
+//	{
+//		final Future ret = new Future();
+//		
+//		int alt = 2;
+//		synchronized(this)
+//		{
+//			if(shutdowned)
+//				alt = 0;
+//			else if(started)
+//				alt = 1;
+//			else
+//			{
+//				if(startfutures==null)
+//					startfutures = new ArrayList();
+//				startfutures.add(ret);
+//			}
+//		}
+//		
+//		if(alt==0)
+//		{
+//			ret.setException(new RuntimeException("Service already shutdowned: "+getServiceIdentifier()));
+//		}
+//		else if(alt==1)
+//		{
+//			ret.setResult(null);
+//		}
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Check if the service is valid.

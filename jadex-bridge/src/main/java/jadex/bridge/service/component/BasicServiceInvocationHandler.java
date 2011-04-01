@@ -294,21 +294,30 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 				
 				if(fields[i].isAnnotationPresent(ServiceComponent.class))
 				{
+					Object val = null;
 					if(SReflect.isSupertype(IInternalAccess.class, fields[i].getType()))
+					{
+						val = ia;
+					}
+					else if(SReflect.isSupertype(IExternalAccess.class, fields[i].getType()))
+					{
+						val = ia.getExternalAccess();
+					}
+					else
+					{
+						System.out.println("Field cannot store component: "+fields[i]);
+					}
+					if(val!=null)
 					{
 						try
 						{
 							fields[i].setAccessible(true);
-							fields[i].set(service, ia);
+							fields[i].set(service, val);
 						}
 						catch(Exception e)
 						{
 							e.printStackTrace();
 						}
-					}
-					else
-					{
-						System.out.println("Field cannot store IInternalAccess: "+fields[i]);
 					}
 				}
 			}
