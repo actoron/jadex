@@ -43,13 +43,13 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	protected Set listeners;
 
 	/** The initial parent ClassLoader. */
-	protected ClassLoader basecl;
+	//protected ClassLoader basecl;
 	
 	/** The urls. */
-	protected List urls;
+	//protected List urls;
 
 	/** Current ClassLoader. */
-	protected ClassLoader	libcl;
+	protected DelegationClassLoader	libcl;
 
 	//-------- constructors --------
 	
@@ -83,21 +83,9 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		super(provider.getId(), ILibraryService.class, properties);
 		
 		this.provider = provider;
-		this.basecl = Thread.currentThread().getContextClassLoader();
-		this.libcl = basecl;
+		this.libcl = new DelegationClassLoader(ClassLoader.getSystemClassLoader(), urls);
 		
 		listeners	= Collections.synchronizedSet(new HashSet());
-		synchronized(this)
-		{
-			this.urls	= new ArrayList();
-			if(urls!=null)
-			{
-				for(int i=0; i<urls.length; i++)
-				{
-					addURL(toURL(urls[i]));
-				}
-			}
-		}
 	}
 	
 	/**
@@ -122,9 +110,9 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		ILibraryServiceListener[] lis;
 		synchronized(this)
 		{
-			urls.add(url);
-			libcl = new URLClassLoader((URL[])urls.toArray(new URL[urls.size()]), basecl);
-//			libcl = new LibraryClassLoader((URL[])urls.toArray(new URL[urls.size()]), basecl, provider);
+			Map<URL, ClassLoader> delegates = libcl.getDelegates();
+			delegates.put(url, new URLClassLoader(new URL[] {url}));
+			libcl = new DelegationClassLoader(ClassLoader.getSystemClassLoader(), delegates);
 			lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
 		}
 		
@@ -158,11 +146,10 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		ILibraryServiceListener[] lis;
 		synchronized(this)
 		{
-			if(!urls.remove(url))
-				throw new RuntimeException("Unknown URL: "+url);
-			
-			libcl = new URLClassLoader((URL[])urls.toArray(new URL[urls.size()]), basecl);
-//			libcl = new LibraryClassLoader((URL[])urls.toArray(new URL[urls.size()]), basecl, provider);
+			Map<URL, ClassLoader> delegates = libcl.getDelegates();
+			if (delegates.remove(url) == null)
+					throw new RuntimeException("Unknown URL: "+url);
+			libcl = new DelegationClassLoader(ClassLoader.getSystemClassLoader(), delegates);
 			lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
 		}
 		
@@ -193,9 +180,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 */
 	public synchronized IFuture getURLs()
 	{
-		List ret = new ArrayList();
-		ret.addAll(urls);
-		return new Future(ret);
+		return new Future(new ArrayList(libcl.getDelegates().keySet()));
 	}
 
 	/**
@@ -214,7 +199,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	public IFuture getAllURLs()
 	{
 		List ret = new ArrayList();
-		ret.addAll(urls);
+		ret.addAll(libcl.getDelegates().keySet());
 		ret.addAll(SUtil.getClasspathURLs(libcl));
 		return new Future(ret);
 	}
@@ -273,7 +258,6 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	{
 		synchronized(this)
 		{
-			basecl = null;
 			libcl = null;
 			listeners.clear();
 		}
@@ -590,33 +574,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	public IFuture setProperties(Properties props)
 	{
 		// Remove existing urls
-		boolean	done	= false;
-		while(!done)
-		{
-			URL	url;
-			synchronized(this)
-			{
-				if(!urls.isEmpty())
-				{
-					url	= (URL)urls.get(0);
-				}
-				else
-				{
-					url	= null;
-					done	= true;
-				}
-			}
-			if(url!=null)
-			{
-				try
-				{
-					removeURL(url);
-				}
-				catch(Exception e)
-				{
-				}
-			}
-		}
+		libcl = new DelegationClassLoader(ClassLoader.getSystemClassLoader());
 		
 		// Add new urls.
 		Property[]	entries	= props.getProperties("entry");
@@ -636,6 +594,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		String[]	entries;
 		synchronized(this)
 		{
+			List<URL> urls = new ArrayList<URL>(libcl.getDelegates().keySet());
 			entries	= new String[urls.size()];
 			for(int i=0; i<entries.length; i++)
 			{
