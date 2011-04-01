@@ -1,21 +1,15 @@
 package jadex.wfms.bdi.client.cap;
 
-import jadex.bdi.runtime.IGoal;
-import jadex.wfms.bdi.ontology.RequestBeginActivity;
+import jadex.bdi.runtime.Plan;
 import jadex.wfms.client.IWorkitem;
+import jadex.wfms.service.IExternalWfmsService;
 
-public class BeginActivityPlan extends AbstractWfmsPlan
+public class BeginActivityPlan extends Plan
 {
 	public void body()
 	{
-		RequestBeginActivity rba = new RequestBeginActivity();
-		rba.setWorkitem((IWorkitem) getParameter("workitem").getValue());
-		
-		IGoal baRequestGoal = createGoal("reqcap.rp_initiate");
-		baRequestGoal.getParameter("action").setValue(rba);
-		baRequestGoal.getParameter("receiver").setValue(getClientInterface());
-		
-		dispatchSubgoalAndWait(baRequestGoal);
+		IExternalWfmsService wfms = (IExternalWfmsService) getBeliefbase().getBelief("wfms").getFact();
+		wfms.beginActivity(getComponentIdentifier(), (IWorkitem) getParameter("workitem").getValue());
 	}
 
 }

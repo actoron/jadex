@@ -22,9 +22,6 @@
 	</imports>
 
 	<componenttypes>
-		<componenttype name="processdefinitioninterface" filename="jadex/wfms/bdi/interfaces/processdefinition/WfmsPdInterface.agent.xml"/>
-		<componenttype name="clientapplicationinterface" filename="jadex/wfms/bdi/interfaces/client/WfmsClientInterface.agent.xml"/>
-		<componenttype name="administrationinterface" filename="jadex/wfms/bdi/interfaces/admin/WfmsAdminInterface.agent.xml"/>
 	</componenttypes>
 	
 	<services>
@@ -34,20 +31,11 @@
 		<providedservice class="IExecutionService">
 			new ExecutionService($component.getComponentIdentifier(), $component.getExternalAccess())
 		</providedservice>
-		<providedservice class="IAdministrationService">
-			new AdministrationService($component.getServiceProvider())
+		<providedservice class="IExternalWfmsService">
+			new ExternalWfmsService($component.getServiceProvider())
 		</providedservice>
-		<providedservice class="IProcessDefinitionService">
-			new ProcessDefinitionConnector($component.getServiceProvider())
-		</providedservice>
-		<providedservice class="ClientConnector">
-			new ClientConnector($component.getServiceProvider())
-		</providedservice>
-		<providedservice class="IClientService">
-			new ClientService($component.getServiceProvider())
-		</providedservice>
-		<providedservice class="IWfmsClientService">
-			new WfmsClientService($component.getServiceProvider())
+		<providedservice class="IWorkitemHandlerService">
+			new WorkitemHandlerService($component.getServiceProvider())
 		</providedservice>
 		<providedservice class="IModelRepositoryService">
 			new LinkedModelRepositoryService($component.getServiceProvider())
@@ -56,11 +44,6 @@
 
 	<applications>
 		<application name="Workflow Management System">
-			<components>
-				<component type="clientapplicationinterface" name="ClientApplicationInterface"/>
-				<component type="processdefinitioninterface" name="ProcessDefinitionInterface"/>
-				<component type="administrationinterface" name="AdministrationInterface"/>
-			</components>
  		</application>
 	</applications>
 

@@ -1,21 +1,15 @@
 package jadex.wfms.bdi.client.cap;
 
-import jadex.bdi.runtime.IGoal;
-import jadex.wfms.bdi.ontology.RequestFinishActivity;
+import jadex.bdi.runtime.Plan;
 import jadex.wfms.client.IClientActivity;
+import jadex.wfms.service.IExternalWfmsService;
 
-public class FinishActivityPlan extends AbstractWfmsPlan
+public class FinishActivityPlan extends Plan
 {
 	public void body()
 	{
-		RequestFinishActivity rfa = new RequestFinishActivity();
-		rfa.setActivity((IClientActivity) getParameter("activity").getValue());
-		
-		IGoal faRequestGoal = createGoal("reqcap.rp_initiate");
-		faRequestGoal.getParameter("action").setValue(rfa);
-		faRequestGoal.getParameter("receiver").setValue(getClientInterface());
-		
-		dispatchSubgoalAndWait(faRequestGoal);
+		IExternalWfmsService wfms = (IExternalWfmsService) getBeliefbase().getBelief("wfms").getFact();
+		wfms.finishActivity(getComponentIdentifier(), (IClientActivity) getParameter("activity").getValue());
 	}
 
 }

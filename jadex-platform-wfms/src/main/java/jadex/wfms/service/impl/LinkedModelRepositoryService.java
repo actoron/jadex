@@ -1,27 +1,33 @@
 package jadex.wfms.service.impl;
 
-import jadex.bridge.service.BasicResultSelector;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IResultSelector;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
-import jadex.commons.IFilter;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
-import jadex.wfms.listeners.IProcessRepositoryListener;
-import jadex.wfms.listeners.ProcessRepositoryEvent;
+import jadex.wfms.client.ClientInfo;
+import jadex.wfms.client.ProcessResource;
+import jadex.wfms.service.IAAAService;
 import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IModelRepositoryService;
+import jadex.wfms.service.listeners.IAuthenticationListener;
+import jadex.wfms.service.listeners.IProcessRepositoryListener;
+import jadex.wfms.service.listeners.ProcessRepositoryEvent;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -47,13 +53,16 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 	//private Set imports;
 	
 	/** The process repository listeners */
-	private Set listeners;
+	private Map<IComponentIdentifier, Set<IProcessRepositoryListener>> pListeners;
 	
 	/** URL entries */
 	private Map urlEntries;
 	
 	/** Model reference counter */
 	private Map modelRefCount;
+	
+	/** Resource directory */
+	protected File resourceDir;
 	
 	public LinkedModelRepositoryService(IServiceProvider provider)
 	{
@@ -63,9 +72,36 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 		this.provider = provider;
 		// TODO: Hack! Needs proper imports...
 		//this.imports = Collections.synchronizedSet(new HashSet());
-		this.listeners = Collections.synchronizedSet(new HashSet());
 		this.urlEntries = Collections.synchronizedMap(new HashMap());
 		this.modelRefCount = Collections.synchronizedMap(new HashMap());
+		
+		resourceDir = new File(System.getProperty("user.home") + File.separator + ".jadexwfms");
+		if (!resourceDir.exists())
+			resourceDir.mkdir();
+		if (!resourceDir.isDirectory())
+			throw new RuntimeException("Resource directory blocked " + resourceDir);
+		
+		File[] files = resourceDir.listFiles();
+		for (int i = 0; i < files.length; ++i)
+			if (files[i].isFile() && files[i].getName().endsWith(".jar"))
+			{
+				final File file = files[i];
+				SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+				{
+					
+					public void resultAvailable(Object result)
+					{
+						try
+						{
+							((ILibraryService) result).addURL(file.toURI().toURL());
+						}	
+						catch (MalformedURLException e)
+						{
+							e.printStackTrace();
+						}
+					}
+				});
+			}
 	}
 	
 	/**
@@ -90,10 +126,13 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 					synchronized (modelRefCount)
 					{
 						Set modelSet = (Set) urlEntries.remove(url);
-						for (Iterator it = modelSet.iterator(); it.hasNext(); )
+						if (modelSet != null)
 						{
-							String path = (String) it.next();
-							removeModel(path);
+							for (Iterator it = modelSet.iterator(); it.hasNext(); )
+							{
+								String path = (String) it.next();
+								removeModel(path);
+							}
 						}
 					}
 					return new Future(null);
@@ -134,20 +173,70 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 	 *  Add a process model resource.
 	 *  @param url The URL of the model resource.
 	 */
-	public void addProcessResource(URL url)
+	public synchronized void addProcessResource(final ProcessResource resource)
 	{
-		ILibraryService ls = (ILibraryService) SServiceProvider.getService(provider, ILibraryService.class).get(new ThreadSuspendable());
-		ls.addURL(url);
+		final File file = new File(resourceDir + File.separator + resource.getFileName());
+		if (file.exists())
+			return;
+		try
+		{
+			file.createNewFile();
+			RandomAccessFile raFile = new RandomAccessFile(file, "rw");
+			MappedByteBuffer mbb = raFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, resource.getContent().length);
+			mbb.put(resource.getContent());
+			raFile.close();
+			SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+			{
+				
+				public void resultAvailable(Object result)
+				{
+					ILibraryService ls = (ILibraryService) result;
+					try
+					{
+						ls.addURL(file.toURI().toURL());
+					}	
+					catch (MalformedURLException e)
+					{
+						e.printStackTrace();
+					}
+				}
+			});
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	/**
 	 *  Remove a process model resource.
 	 *  @param url The URL of the model resource.
 	 */
-	public void removeProcessResource(URL url)
+	public synchronized void removeProcessResource(final String resourceName)
 	{
-		ILibraryService ls = (ILibraryService) SServiceProvider.getService(provider, ILibraryService.class).get(new ThreadSuspendable());
-		ls.removeURL(url);
+		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				ILibraryService ls = (ILibraryService) result;
+				synchronized (LinkedModelRepositoryService.this)
+				{
+					File file = new File(resourceDir + File.separator + resourceName);
+					if (file.exists())
+					{
+						try
+						{
+							ls.removeURL(file.toURI().toURL());
+						}
+						catch (MalformedURLException e)
+						{
+							e.printStackTrace();
+						}
+						file.delete();
+					}
+				}
+			}
+		});
 	}
 	
 	/**
@@ -271,11 +360,18 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 	 * 
 	 * @param listener the listener
 	 */
-	public void addProcessRepositoryListener(IProcessRepositoryListener listener)
+	public void addProcessRepositoryListener(IComponentIdentifier client, IProcessRepositoryListener listener)
 	{
-		synchronized (listeners)
+		Map<IComponentIdentifier, Set<IProcessRepositoryListener>> listeners = getListeners();
+		synchronized (getListeners())
 		{
-			listeners.add(listener);
+			Set<IProcessRepositoryListener> lisSet = listeners.get(client);
+			if (lisSet == null)
+			{
+				lisSet = new HashSet<IProcessRepositoryListener>();
+				listeners.put(client, lisSet);
+			}
+			lisSet.add(listener);
 			
 			synchronized(modelRefCount)
 			{
@@ -290,32 +386,68 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 	 * 
 	 * @param listener the listener
 	 */
-	public void removeProcessRepositoryListener(IProcessRepositoryListener listener)
+	public void removeProcessRepositoryListener(IComponentIdentifier client, IProcessRepositoryListener listener)
 	{
-		listeners.remove(listener);
+		Set<IProcessRepositoryListener> lisSet = getListeners().get(client);
+		if (lisSet != null)
+			lisSet.remove(listener);
+	}
+	
+	protected Map<IComponentIdentifier, Set<IProcessRepositoryListener>> getListeners()
+	{
+		synchronized(this)
+		{
+			if (pListeners == null)
+			{
+				pListeners = Collections.synchronizedMap(new HashMap<IComponentIdentifier, Set<IProcessRepositoryListener>>());
+				SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+						IAAAService as = (IAAAService) result;
+						as.addAuthenticationListener(new IAuthenticationListener()
+						{
+							public void deauthenticated(IComponentIdentifier client, ClientInfo info)
+							{
+								pListeners.remove(client);
+							}
+							
+							public void authenticated(IComponentIdentifier client, ClientInfo info)
+							{
+							}
+						});
+					}
+				});
+			}
+		}
+		return pListeners;
 	}
 	
 	private void fireModelAddedEvent(String modelName)
 	{
+		Map<IComponentIdentifier, Set<IProcessRepositoryListener>> listeners = getListeners();
 		synchronized (listeners)
 		{
-			for (Iterator it = listeners.iterator(); it.hasNext(); )
-			{
-				IProcessRepositoryListener listener = (IProcessRepositoryListener) it.next();
-				listener.processModelAdded(new ProcessRepositoryEvent(modelName));
-			}
+			for (Iterator<Set<IProcessRepositoryListener>> it = listeners.values().iterator(); it.hasNext(); )
+				for (Iterator<IProcessRepositoryListener> it2 = it.next().iterator(); it2.hasNext(); )
+				{
+					IProcessRepositoryListener listener = (IProcessRepositoryListener) it2.next();
+					listener.processModelAdded(new ProcessRepositoryEvent(modelName));
+				}
 		}
 	}
 	
 	private void fireModelRemovedEvent(String modelName)
 	{
+		Map<IComponentIdentifier, Set<IProcessRepositoryListener>> listeners = getListeners();
 		synchronized (listeners)
 		{
-			for (Iterator it = listeners.iterator(); it.hasNext(); )
-			{
-				IProcessRepositoryListener listener = (IProcessRepositoryListener) it.next();
-				listener.processModelRemoved(new ProcessRepositoryEvent(modelName));
-			}
+			for (Iterator<Set<IProcessRepositoryListener>> it = listeners.values().iterator(); it.hasNext(); )
+				for (Iterator<IProcessRepositoryListener> it2 = it.next().iterator(); it2.hasNext(); )
+				{
+					IProcessRepositoryListener listener = (IProcessRepositoryListener) it2.next();
+					listener.processModelRemoved(new ProcessRepositoryEvent(modelName));
+				}
 		}
 	}
 	

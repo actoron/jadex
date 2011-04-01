@@ -15,19 +15,8 @@
 		<import>jadex.wfms.client.*</import>
 	</imports>
 	
-	<capabilities>
-		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
-		<capability name="reqcap" file="jadex.bdi.planlib.protocols.request.Request"/>
-		<capability name="subcap" file="jadex.bdi.planlib.protocols.subscribe.Subscribe"/>
-	</capabilities>
-	
 	<beliefs>
-		<beliefref name="rp_filter">
-			<concrete ref="reqcap.rp_filter"/>
-		</beliefref>
-		<beliefref name="rp_timeout">
-			<concrete ref="reqcap.timeout"/>
-		</beliefref>
+		<belief name="wfms" class="jadex.wfms.service.IExternalWfmsService"/>
 		<belief name="add_workitem_controller" class="javax.swing.Action" />
 		<belief name="remove_workitem_controller" class="javax.swing.Action" />
 		<belief name="add_activity_controller" class="javax.swing.Action" />
@@ -120,7 +109,7 @@
 		</achievegoal>
 		
 		<achievegoal name="remove_model_resource" exported="true">
-			<parameter name="resource_url" class="java.net.URL" />
+			<parameter name="resource_name" class="String" />
 		</achievegoal>
 		
 		<achievegoal name="start_model_repository_subscription" exported="true" />
@@ -162,12 +151,6 @@
 		<achievegoal name="handle_process_finished" exported="true">
 			<parameter name="instance_id" class="String" exported="true" />
 		</achievegoal>
-		
-		
-		<!-- ================= Heartbeat/Keepalive goals ==================== -->
-		<achievegoal name="recover_lost_connection" exported="true" />
-		
-		<performgoal name="keep_sending_heartbeats" retry="true" retrydelay="2000" exclude="never"/>
 	</goals>
 	
 	<plans>
@@ -477,36 +460,6 @@
 				<goal ref="handle_process_finished" />
 			</trigger>
 		</plan>
-		
-		
-		<!-- Misc -->
-		
-		<plan name="keep_sending_heartbeats_plan">
-			<body class="SendHeartbeatPlan"/>
-			<trigger>
-				<goal ref="keep_sending_heartbeats"/>
-			</trigger>
-		</plan>
-		
-		<plan name="subscription_update_plan">
-			<parameter name="update" class="Object">
-				<goalmapping ref="subcap.sp_handle_update.update"/>
-			</parameter>
-			<parameter name="subscription_id" class="Object">
-				<goalmapping ref="subcap.sp_handle_update.subscription_id"/>
-			</parameter>
-			<body class="SubscriptionUpdatePlan" />
-			<trigger>
-				<goal ref="subcap.sp_handle_update" />
-			</trigger>
-		</plan>
-		
-		<plan name="lost_connection_plan" priority="-1">
-			<body class="LostConnectionPlan" />
-			<trigger>
-				<goal ref="recover_lost_connection" />
-			</trigger>
-		</plan>
 	</plans>
 	
 	<events>
@@ -514,14 +467,6 @@
 	
 	<configurations>
 		<configuration name="default">
-			<beliefs>
-				<initialbelief ref="rp_filter">
-					<fact>jadex.commons.IFilter.ALWAYS</fact>
-				</initialbelief>
-				<initialbelief ref="rp_timeout">
-					<fact>2000L</fact>
-				</initialbelief>
-			</beliefs>
 		</configuration>
 	</configurations>
 	

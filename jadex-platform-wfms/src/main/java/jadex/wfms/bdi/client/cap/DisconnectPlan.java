@@ -1,24 +1,14 @@
 package jadex.wfms.bdi.client.cap;
 
-import jadex.bdi.runtime.IGoal;
-import jadex.wfms.bdi.ontology.RequestDeAuth;
+import jadex.bdi.runtime.Plan;
+import jadex.wfms.service.IExternalWfmsService;
 
-public class DisconnectPlan extends AbstractWfmsPlan
+public class DisconnectPlan extends Plan
 {
 	public void body()
 	{
-		RequestDeAuth reqDeAuth = new RequestDeAuth((String) getParameter("user_name").getValue()); 
-		
-		while (getGoalbase().getGoals("keep_sending_heartbeats").length != 0)
-		{
-			IGoal goal = getGoalbase().getGoals("keep_sending_heartbeats")[0];
-			goal.drop();
-			waitForGoal(goal);
-		}
-		
-		IGoal deAuthGoal = createGoal("reqcap.rp_initiate");
-		deAuthGoal.getParameter("action").setValue(reqDeAuth);
-		deAuthGoal.getParameter("receiver").setValue(getClientInterface());
-		dispatchSubgoalAndWait(deAuthGoal);
+		IExternalWfmsService wfms = (IExternalWfmsService) getBeliefbase().getBelief("wfms").getFact();
+		wfms.deauthenticate(getComponentIdentifier());
+		getBeliefbase().getBelief("wfms").setFact(null);
 	}
 }

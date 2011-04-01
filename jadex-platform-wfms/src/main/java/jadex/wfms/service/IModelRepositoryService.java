@@ -1,7 +1,9 @@
 package jadex.wfms.service;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.future.IFuture;
-import jadex.wfms.listeners.IProcessRepositoryListener;
+import jadex.wfms.client.ProcessResource;
+import jadex.wfms.service.listeners.IProcessRepositoryListener;
 
 import java.net.URL;
 import java.util.Collection;
@@ -15,13 +17,13 @@ public interface IModelRepositoryService
 	 *  Add a process model resource.
 	 *  @param url The URL of the model resource.
 	 */
-	public void addProcessResource(URL url);
+	public void addProcessResource(ProcessResource resource);
 	
 	/**
 	 *  Remove a process model resource.
 	 *  @param url The URL of the model resource.
 	 */
-	public void removeProcessResource(URL url);
+	public void removeProcessResource(String resourceName);
 	
 	/**
 	 * Gets all available models.
@@ -60,12 +62,12 @@ public interface IModelRepositoryService
 	 * 
 	 * @param listener the listener
 	 */
-	public void addProcessRepositoryListener(IProcessRepositoryListener listener);
+	public void addProcessRepositoryListener(IComponentIdentifier client, IProcessRepositoryListener listener);
 	
 	/**
 	 * Removes a process repository listener.
 	 * 
 	 * @param listener the listener
 	 */
-	public void removeProcessRepositoryListener(IProcessRepositoryListener listener);
+	public void removeProcessRepositoryListener(IComponentIdentifier client, IProcessRepositoryListener listener);
 }

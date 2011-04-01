@@ -4,13 +4,12 @@ import jadex.base.SComponentFactory;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.CreationInfo;
+import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -18,15 +17,22 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.wfms.IProcess;
-import jadex.wfms.service.IAdministrationService;
+import jadex.wfms.client.ClientInfo;
+import jadex.wfms.service.IAAAService;
 import jadex.wfms.service.IExecutionService;
+import jadex.wfms.service.listeners.IAuthenticationListener;
+import jadex.wfms.service.listeners.IProcessListener;
+import jadex.wfms.service.listeners.ProcessEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,6 +53,9 @@ public class ExecutionService extends BasicService implements IExecutionService
 	
 	/** Counter for instances of processes (ILoadableComponentModel -> num)*/
 	protected Map instancecnt;
+	
+	/** The process listeners */
+	private Map<IComponentIdentifier, Set<IProcessListener>> procListeners;
 	
 	//-------- constructors --------
 	
@@ -103,7 +112,7 @@ public class ExecutionService extends BasicService implements IExecutionService
 	public IFuture startProcess(String modelname, Object id, Map arguments)
 	{
 		final Future ret = new Future();
-		IComponentManagementService ces = (IComponentManagementService) SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
+		IComponentManagementService ces = (IComponentManagementService) SServiceProvider.getService(exta.getServiceProvider(), (Class) IComponentManagementService.class).get(new ThreadSuspendable());
 		ces.createComponent(null, modelname, new CreationInfo(null, arguments, wfms, true), null).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -124,7 +133,7 @@ public class ExecutionService extends BasicService implements IExecutionService
 							{
 								Logger.getLogger("Wfms").log(Level.INFO, "Finished process " + id.toString());
 								Logger.getLogger("Wfms").log(Level.INFO, "History: " + Arrays.toString(activityHistory.toArray()));
-								((AdministrationService) SServiceProvider.getService(exta.getServiceProvider(),IAdministrationService.class).get(new ThreadSuspendable())).fireProcessFinished(id);
+								fireProcessFinished(id);
 								return new Future(null);
 							}
 							
@@ -241,25 +250,92 @@ public class ExecutionService extends BasicService implements IExecutionService
 	}
 	
 	/**
-	 *  Generate a process id.
+	 * Adds a process listener to the workflow management system.
+	 * 
+	 * @param client the client
+	 * @param listener the listener
 	 */
-	/*protected Object generateId(String modelname)
+	public IFuture addProcessListener(IComponentIdentifier client, IProcessListener listener)
 	{
-		modelname = modelname.substring(modelname.lastIndexOf('/') + 1);
-		Integer ret = new Integer(0);
-		if(instancecnt==null)
+		Map<IComponentIdentifier, Set<IProcessListener>> processListeners =  getListeners();
+		Future ret = new Future();
+		synchronized(processListeners)
 		{
-			instancecnt = new HashMap();
+			Set<IProcessListener> listeners = processListeners.get(client);
+			if (listeners == null)
+			{
+				listeners = new HashSet<IProcessListener>();
+				processListeners.put(client, listeners);
+			}
+			listeners.add(listener);
 		}
-		else
+		ret.setResult(null);
+		return ret;
+	}
+	
+	/**
+	 * Removes a process listener from the workflow management system.
+	 * 
+	 * @param client the client
+	 * @param listener the listener
+	 */
+	public IFuture removeProcessListener(IComponentIdentifier client, IProcessListener listener)
+	{
+		Map<IComponentIdentifier, Set<IProcessListener>> processListeners =  getListeners();
+		Future ret = new Future();
+		synchronized(processListeners)
 		{
-			Integer modInt = (Integer) instancecnt.get(modelname);
-			if (modInt != null)
-				ret = new Integer(modInt.intValue()+1);
+			Set<IProcessListener> listeners = processListeners.get(client);
+			if (listeners != null)
+				listeners.remove(listener);
 		}
-		
-		instancecnt.put(modelname, ret);
-		
-		return modelname+"_"+ret;
-	}*/
+		ret.setResult(null);
+		return ret;
+	}
+	
+	protected Map<IComponentIdentifier, Set<IProcessListener>> getListeners()
+	{
+		synchronized (this)
+		{
+			if (procListeners == null)
+			{
+				procListeners = Collections.synchronizedMap(new HashMap<IComponentIdentifier, Set<IProcessListener>>());
+				SServiceProvider.getService(exta.getServiceProvider(), IAAAService.class).addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+						IAAAService as = (IAAAService) result;
+						as.addAuthenticationListener(new IAuthenticationListener()
+						{
+							public void deauthenticated(IComponentIdentifier client, ClientInfo info)
+							{
+								procListeners.remove(client);
+							}
+							
+							public void authenticated(IComponentIdentifier client, ClientInfo info)
+							{
+							}
+						});
+					}
+				});
+			}
+		}
+		return procListeners;
+	}
+	
+	protected void fireProcessFinished(Object id)
+	{
+		Map<IComponentIdentifier, Set<IProcessListener>> processListeners =  getListeners();
+		synchronized(processListeners)
+		{
+			for (Iterator it = processListeners.entrySet().iterator(); it.hasNext(); )
+			{
+				Map.Entry entry = (Map.Entry) it.next();
+				Set<IProcessListener> listeners = (Set<IProcessListener>) entry.getValue();
+				ProcessEvent evt = new ProcessEvent(String.valueOf(id));
+				for (Iterator<IProcessListener> it2 = listeners.iterator(); it2.hasNext(); )
+					it2.next().processFinished(evt);
+			}
+		}
+	}
 }

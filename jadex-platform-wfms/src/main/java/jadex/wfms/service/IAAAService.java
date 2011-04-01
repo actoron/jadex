@@ -1,6 +1,8 @@
 package jadex.wfms.service;
 
-import jadex.wfms.client.IClient;
+import jadex.bridge.IComponentIdentifier;
+import jadex.wfms.client.ClientInfo;
+import jadex.wfms.service.listeners.IAuthenticationListener;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -93,13 +95,13 @@ public interface IAAAService
 	 * @param client the new client
 	 * @return true, if the client has been successfully authenticated.
 	 */
-	public boolean authenticate(IClient client);
+	public boolean authenticate(IComponentIdentifier client, ClientInfo info);
 	
 	/**
 	 * Deauthenticate a client.
 	 * @param client the client
 	 */
-	public void deauthenticate(IClient client);
+	public void deauthenticate(IComponentIdentifier client);
 	
 	/**
 	 * Returns the authenticated clients for a specific user name
@@ -114,7 +116,7 @@ public interface IAAAService
 	 * @param action the action the client is requesting
 	 * @return true, if the client is authorized to perform the action, false otherwise
 	 */
-	public boolean accessAction(IClient client, Integer action);
+	public boolean accessAction(IComponentIdentifier client, Integer action);
 	
 	/**
 	 * Checks if a client can access an event
@@ -123,6 +125,12 @@ public interface IAAAService
 	 * @return true, if the client is authorized to perform the action, false otherwise
 	 */
 	//public boolean accessEvent(IClient client, Object event);
+	
+	/** Returns the user name of a client.
+	 *  @param client the client
+	 *  @return user name
+	 */
+	public String getUserName(IComponentIdentifier client);
 	
 	/**
 	 * Returns the roles of a particular user

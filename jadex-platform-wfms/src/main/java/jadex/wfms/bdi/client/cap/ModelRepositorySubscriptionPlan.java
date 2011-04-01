@@ -1,15 +1,58 @@
 package jadex.wfms.bdi.client.cap;
 
+import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
-import jadex.wfms.bdi.ontology.SubscribeModelRepositoryEvents;
+import jadex.bdi.runtime.Plan;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.wfms.service.IExternalWfmsService;
+import jadex.wfms.service.listeners.IProcessRepositoryListener;
+import jadex.wfms.service.listeners.ProcessRepositoryEvent;
 
-public class ModelRepositorySubscriptionPlan extends AbstractWfmsPlan
+public class ModelRepositorySubscriptionPlan extends Plan
 {
 	public void body()
 	{
-		IGoal acSub = createGoal("subcap.sp_initiate");
-		acSub.getParameter("receiver").setValue(getPdInterface());
-		acSub.getParameter("subscription").setValue(new SubscribeModelRepositoryEvents());
-		dispatchSubgoalAndWait(acSub);
+		IExternalWfmsService wfms = (IExternalWfmsService) getBeliefbase().getBelief("wfms").getFact();
+		final IBDIExternalAccess ea = getScope().getExternalAccess();
+		wfms.addProcessRepositoryListener(getComponentIdentifier(), new IProcessRepositoryListener()
+		{
+			public IFuture processModelRemoved(final ProcessRepositoryEvent event)
+			{
+				return ea.scheduleStep(new IComponentStep()
+				{
+					public Object execute(IInternalAccess ia)
+					{
+						Future ret = new Future();
+						IBDIInternalAccess bia = (IBDIInternalAccess) ia;
+						IGoal pmAddedGoal = bia.getGoalbase().createGoal("add_process_model");
+						pmAddedGoal.getParameter("model_name").setValue(event.getModelName());
+						bia.getGoalbase().dispatchTopLevelGoal(pmAddedGoal);
+						ret.setResult(null);
+						return ret;
+					}
+				});
+			}
+			
+			public IFuture processModelAdded(final ProcessRepositoryEvent event)
+			{
+				return ea.scheduleStep(new IComponentStep()
+				{
+					public Object execute(IInternalAccess ia)
+					{
+						Future ret = new Future();
+						IBDIInternalAccess bia = (IBDIInternalAccess) ia;
+						IGoal pmRemovedGoal = bia.getGoalbase().createGoal("remove_process_model");
+						pmRemovedGoal.getParameter("model_name").setValue(event.getModelName());
+						bia.getGoalbase().dispatchTopLevelGoal(pmRemovedGoal);
+						ret.setResult(null);
+						return ret;
+					}
+				});
+			}
+		});
 	}
 }

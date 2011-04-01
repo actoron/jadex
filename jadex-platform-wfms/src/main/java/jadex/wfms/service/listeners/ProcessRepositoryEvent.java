@@ -1,4 +1,4 @@
-package jadex.wfms.listeners;
+package jadex.wfms.service.listeners;
 
 /**
  * Event triggered on addition and removal of process model in the repository.

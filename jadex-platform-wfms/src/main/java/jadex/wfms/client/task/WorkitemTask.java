@@ -6,6 +6,7 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
@@ -14,7 +15,7 @@ import jadex.commons.future.IResultListener;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.client.Workitem;
 import jadex.wfms.service.IAAAService;
-import jadex.wfms.service.IWfmsClientService;
+import jadex.wfms.service.IWorkitemHandlerService;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,13 +36,13 @@ public class WorkitemTask implements ITask
 	{
 		final Future ret = new Future();
 		IServiceContainer wfms = process.getServiceContainer();
-		SServiceProvider.getService(wfms, IWfmsClientService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(wfms, IWorkitemHandlerService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
 			
 			public void resultAvailable(Object result)
 			{
-				IWfmsClientService wiq = (IWfmsClientService) result;
-				wiq.queueWorkitem(createWorkitem(Workitem.GENERIC_WORKITEM_TYPE, context), createListener(context, ret));
+				IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
+				wh.queueWorkitem(createWorkitem(Workitem.GENERIC_WORKITEM_TYPE, context), createListener(context, ret));
 			}
 		});
 		return ret;

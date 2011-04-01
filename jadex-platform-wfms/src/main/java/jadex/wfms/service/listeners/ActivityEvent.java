@@ -1,4 +1,4 @@
-package jadex.wfms.listeners;
+package jadex.wfms.service.listeners;
 
 import jadex.wfms.client.IClientActivity;
 

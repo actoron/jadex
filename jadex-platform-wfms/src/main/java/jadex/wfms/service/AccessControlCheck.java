@@ -1,26 +1,26 @@
 package jadex.wfms.service;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.ICommand;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.wfms.client.IClient;
 
 import java.security.AccessControlException;
 
 public class AccessControlCheck
 {
 	private Integer[] actions;
-	private IClient client;
+	private IComponentIdentifier client;
 	
-	public AccessControlCheck(IClient client, Integer[] actions)
+	public AccessControlCheck(IComponentIdentifier client, Integer[] actions)
 	{
 		this.actions = actions;
 		this.client = client;
 	}
 	
-	public AccessControlCheck(IClient client, Integer action)
+	public AccessControlCheck(IComponentIdentifier client, Integer action)
 	{
 		this(client, new Integer[] { action });
 	}

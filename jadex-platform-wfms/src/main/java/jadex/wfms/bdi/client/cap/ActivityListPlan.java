@@ -1,25 +1,17 @@
 package jadex.wfms.bdi.client.cap;
 
-import jadex.base.fipa.Done;
-import jadex.bdi.runtime.IGoal;
-import jadex.wfms.bdi.ontology.RequestActivityList;
+import jadex.bdi.runtime.Plan;
+import jadex.wfms.service.IExternalWfmsService;
 
 import java.util.Set;
 
-public class ActivityListPlan extends AbstractWfmsPlan
+public class ActivityListPlan extends Plan
 {
 	public void body()
 	{
-		RequestActivityList ral = new RequestActivityList();
+		IExternalWfmsService wfms = (IExternalWfmsService) getBeliefbase().getBelief("wfms").getFact();
 		
-		IGoal wlRequestGoal = createGoal("reqcap.rp_initiate");
-		wlRequestGoal.getParameter("action").setValue(ral);
-		wlRequestGoal.getParameter("receiver").setValue(getClientInterface());
-		
-		dispatchSubgoalAndWait(wlRequestGoal);
-		
-		Done done = (Done) wlRequestGoal.getParameter("result").getValue();
-		Set activityList = ((RequestActivityList) done.getAction()).getActivities();
+		Set activityList = (Set) wfms.getAvailableActivities(getComponentIdentifier()).get(this);
 		getParameter("activity_list").setValue(activityList);
 	}
 

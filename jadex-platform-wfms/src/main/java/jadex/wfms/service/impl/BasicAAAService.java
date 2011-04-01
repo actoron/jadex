@@ -1,23 +1,16 @@
 package jadex.wfms.service.impl;
 
-import jadex.bridge.CreationInfo;
-import jadex.bridge.IComponentManagementService;
-import jadex.bridge.service.BasicResultSelector;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.SServiceProvider;
-import jadex.commons.IRemoteFilter;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.gpmn.GpmnFactory;
 import jadex.wfms.bdi.client.standard.SCapReqs;
-import jadex.wfms.client.IClient;
+import jadex.wfms.client.ClientInfo;
 import jadex.wfms.service.IAAAService;
-import jadex.wfms.service.IAuthenticationListener;
+import jadex.wfms.service.listeners.IAuthenticationListener;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,9 +23,11 @@ import java.util.Set;
  */
 public class BasicAAAService extends BasicService implements IAAAService
 {
-	private Map userClients;
+	private Map<IComponentIdentifier, ClientInfo> clientInfos;
 	
-	private Map users;
+	//private Map<String, Set<IComponentIdentifier>> userClients;
+	
+	private Map<String, UserAAAEntry> users;
 	
 	private Map secRoleCaps;
 	
@@ -89,7 +84,7 @@ public class BasicAAAService extends BasicService implements IAAAService
 		//super(BasicService.createServiceIdentifier(provider.getId(), BasicAAAService.class));
 
 		this.authenticationListeners = new HashSet();
-		this.users = new HashMap();
+		this.users = new HashMap<String, UserAAAEntry>();
 		for (int i = 0; i < users.length; ++i)
 			this.users.put(users[i].getUserName(), users[i]);
 		
@@ -97,7 +92,8 @@ public class BasicAAAService extends BasicService implements IAAAService
 		secRoleCaps.put(IAAAService.SEC_ROLE_NONE, new HashSet());
 		secRoleCaps.put(IAAAService.SEC_ROLE_ADMIN, new HashSet(IAAAService.CAPABILITIES));
 		
-		userClients = new HashMap();
+		//userClients = new HashMap<String, Set<IComponentIdentifier>>();
+		clientInfos = new HashMap<IComponentIdentifier, ClientInfo>();
 	}
 	
 	/**
@@ -105,14 +101,15 @@ public class BasicAAAService extends BasicService implements IAAAService
 	 * @param client the new client
 	 * @return true, if the client has been successfully authenticated.
 	 */
-	public synchronized boolean authenticate(IClient client)
+	public synchronized boolean authenticate(IComponentIdentifier client, ClientInfo info)
 	{
-		if (!users.containsKey(client.getUserName()))
+		if (!users.containsKey(info.getUserName()))
 			return false;
-		if (!userClients.containsKey(client.getUserName()))
-			userClients.put(client.getUserName(), Collections.synchronizedSet(new HashSet()));
-		((Set) userClients.get(client.getUserName())).add(client);
-		fireAuthenticationEvent(client);
+		//if (!userClients.containsKey(info.getUserName()))
+			//userClients.put(info.getUserName(), new HashSet());
+		//((Set) userClients.get(info.getUserName())).add(client);
+		clientInfos.put(client, info);
+		fireAuthenticationEvent(client, info);
 		return true;
 	}
 	
@@ -120,10 +117,14 @@ public class BasicAAAService extends BasicService implements IAAAService
 	 * Deauthenticate a client.
 	 * @param client the client
 	 */
-	public synchronized void deauthenticate(IClient client)
+	public synchronized void deauthenticate(IComponentIdentifier client)
 	{
-		((Set) userClients.get(client.getUserName())).remove(client);
-		fireDeauthenticationEvent(client);
+		ClientInfo info = clientInfos.remove(client);
+		if (info != null)
+		{
+			//((Set) userClients.get(info.getUserName())).remove(client);
+			fireDeauthenticationEvent(client, info);
+		}
 	}
 	
 	/**
@@ -133,12 +134,15 @@ public class BasicAAAService extends BasicService implements IAAAService
 	 */
 	public synchronized Set getAuthenticatedClients(String userName)
 	{
-		Set clients = (Set) userClients.get(userName);
-		synchronized(clients)
+		HashSet ret = new HashSet();
+		for (Iterator<Map.Entry<IComponentIdentifier, ClientInfo>> it = clientInfos.entrySet().iterator();
+			 it.hasNext(); )
 		{
-			clients = new HashSet(clients);
+			Map.Entry<IComponentIdentifier, ClientInfo> entry = it.next();
+			if (entry.getValue().getUserName().equals(userName))
+				ret.add(entry.getKey());
 		}
-		return clients;
+		return ret;
 	}
 	
 	/**
@@ -147,11 +151,12 @@ public class BasicAAAService extends BasicService implements IAAAService
 	 * @param action the action the client is requesting
 	 * @return true, if the client is authorized to perform the action, false otherwise
 	 */
-	public synchronized boolean accessAction(IClient client, Integer action)
+	public synchronized boolean accessAction(IComponentIdentifier client, Integer action)
 	{
-		if (((Set) userClients.get(client.getUserName())).contains(client))
+		ClientInfo info = clientInfos.get(client);
+		if (info != null)
 		{
-			if (getCapabilities(((UserAAAEntry) users.get(client.getUserName())).getSecRoles()).contains(action))
+			if (getCapabilities(((UserAAAEntry) users.get(info.getUserName())).getSecRoles()).contains(action))
 				return true;
 		}
 		return false;
@@ -163,7 +168,7 @@ public class BasicAAAService extends BasicService implements IAAAService
 	 * @param event the event
 	 * @return true, if the client is authorized to perform the action, false otherwise
 	 */
-	public synchronized boolean accessEvent(IClient client, Object event)
+	public synchronized boolean accessEvent(IComponentIdentifier client, Object event)
 	{
 		return true;
 		//TODO: FIXME
@@ -195,6 +200,18 @@ public class BasicAAAService extends BasicService implements IAAAService
 	public synchronized void removeUser(String userName)
 	{
 		users.remove(userName);
+	}
+	
+	/** Returns the user name of a client.
+	 *  @param client the client
+	 *  @return user name
+	 */
+	public String getUserName(IComponentIdentifier client)
+	{
+		ClientInfo info = clientInfos.get(client);
+		if (info != null)
+			return info.getUserName();
+		return null;
 	}
 	
 	/**
@@ -263,15 +280,27 @@ public class BasicAAAService extends BasicService implements IAAAService
 		authenticationListeners.remove(listener);
 	}
 	
-	private void fireAuthenticationEvent(IClient client)
+	private void fireAuthenticationEvent(IComponentIdentifier client, ClientInfo info)
 	{
 		for (Iterator it = authenticationListeners.iterator(); it.hasNext(); )
-			((IAuthenticationListener) it.next()).authenticated(client);
+			((IAuthenticationListener) it.next()).authenticated(client, info);
 	}
 	
-	private void fireDeauthenticationEvent(IClient client)
+	private void fireDeauthenticationEvent(IComponentIdentifier client, ClientInfo info)
 	{
 		for (Iterator it = authenticationListeners.iterator(); it.hasNext(); )
-			((IAuthenticationListener) it.next()).deauthenticated(client);
+			((IAuthenticationListener) it.next()).deauthenticated(client, info);
+	}
+	
+	protected static void kickClient(IServiceProvider provider, final IComponentIdentifier client)
+	{
+		SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				IAAAService as = (IAAAService) result;
+				as.deauthenticate(client);
+			}
+		});
 	}
 }

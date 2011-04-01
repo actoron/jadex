@@ -1,6 +1,8 @@
 package jadex.wfms.service;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.future.IFuture;
+import jadex.wfms.service.listeners.IProcessListener;
 
 import java.util.Map;
 
@@ -43,4 +45,20 @@ public interface IExecutionService
 	 *  @return True, if model can be loaded.
 	 */
 	public IFuture isLoadable(String modelname);
+	
+	/**
+	 * Adds a process listener to the workflow management system.
+	 * 
+	 * @param client the client
+	 * @param listener the listener
+	 */
+	public IFuture addProcessListener(IComponentIdentifier client, IProcessListener listener);
+	
+	/**
+	 * Removes a process listener from the workflow management system.
+	 * 
+	 * @param client the client
+	 * @param listener the listener
+	 */
+	public IFuture removeProcessListener(IComponentIdentifier client, IProcessListener listener);
 }

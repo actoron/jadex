@@ -1,18 +1,14 @@
 package jadex.wfms.bdi.client.cap;
 
-import jadex.base.fipa.Done;
-import jadex.bdi.runtime.IGoal;
-import jadex.bpmn.BpmnModelLoader;
-import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.library.ILibraryService;
-import jadex.gpmn.GpmnModelLoader;
-import jadex.wfms.bdi.ontology.RequestModel;
+import jadex.bdi.runtime.Plan;
 
-public class ModelPlan extends AbstractWfmsPlan
+
+public class ModelPlan extends Plan
 {
 	public void body()
 	{
-		RequestModel reqM = new RequestModel();
+		//TODO:FIXME
+		/*RequestModel reqM = new RequestModel();
 		reqM.setModelName((String) getParameter("model_name").getValue());
 		if (hasParameter("model_name_path"))
 			reqM.setModelNamePath(((Boolean) getParameter("model_name_path").getValue()).booleanValue());
@@ -49,6 +45,6 @@ public class ModelPlan extends AbstractWfmsPlan
 			fail(e);
 		}
 		
-		getParameter("model").setValue(model);
+		getParameter("model").setValue(model);*/
 	}
 }

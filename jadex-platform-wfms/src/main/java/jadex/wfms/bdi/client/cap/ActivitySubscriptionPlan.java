@@ -1,15 +1,58 @@
 package jadex.wfms.bdi.client.cap;
 
+import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
-import jadex.wfms.bdi.ontology.SubscribeActivityEvents;
+import jadex.bdi.runtime.Plan;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.wfms.service.IExternalWfmsService;
+import jadex.wfms.service.listeners.ActivityEvent;
+import jadex.wfms.service.listeners.IActivityListener;
 
-public class ActivitySubscriptionPlan extends AbstractWfmsPlan
+public class ActivitySubscriptionPlan extends Plan
 {
 	public void body()
 	{
-		IGoal acSub = createGoal("subcap.sp_initiate");
-		acSub.getParameter("receiver").setValue(getClientInterface());
-		acSub.getParameter("subscription").setValue(new SubscribeActivityEvents());
-		dispatchSubgoalAndWait(acSub);
+		IExternalWfmsService wfms = (IExternalWfmsService) getBeliefbase().getBelief("wfms").getFact();
+		final IBDIExternalAccess ea = getScope().getExternalAccess();
+		wfms.addActivityListener(getComponentIdentifier(), new IActivityListener()
+		{
+			public IFuture activityRemoved(final ActivityEvent event)
+			{
+				return ea.scheduleStep(new IComponentStep()
+				{
+					public Object execute(IInternalAccess ia)
+					{
+						final Future ret = new Future();
+						IBDIInternalAccess bia = (IBDIInternalAccess) ia;
+						IGoal acRemovedGoal = bia.getGoalbase().createGoal("remove_activity");
+						acRemovedGoal.getParameter("activity").setValue(event.getActivity());
+						bia.getGoalbase().dispatchTopLevelGoal(acRemovedGoal);
+						ret.setResult(null);
+						return ret;
+					}
+				});
+			}
+			
+			public IFuture activityAdded(final ActivityEvent event)
+			{
+				return ea.scheduleStep(new IComponentStep()
+				{
+					public Object execute(IInternalAccess ia)
+					{
+						Future ret = new Future();
+						IBDIInternalAccess bia = (IBDIInternalAccess) ia;
+						IGoal acAddedGoal = bia.getGoalbase().createGoal("add_activity");
+						acAddedGoal.getParameter("activity").setValue(event.getActivity());
+						bia.getGoalbase().dispatchTopLevelGoal(acAddedGoal);
+						ret.setResult(null);
+						return ret;
+					}
+				});
+			}
+		});
 	}
 }

@@ -1,4 +1,4 @@
-package jadex.wfms.listeners;
+package jadex.wfms.service.listeners;
 
 public class ProcessEvent
 {
