@@ -24,6 +24,9 @@ import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.ThreadSuspendable;
 
 import java.lang.reflect.Field;
@@ -93,7 +96,26 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		
 		List myargs = args!=null? SUtil.arrayToList(args): null;
 		
-		if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
+		if(SReflect.isSupertype(IIntermediateFuture.class, method.getReturnType()))
+		{
+			final IntermediateFuture fut = new IntermediateFuture();
+			ret = fut;
+			sic.invoke(service, method, myargs).addResultListener(new IntermediateDelegationResultListener(fut)
+			{
+				public void customResultAvailable(Object result)
+				{
+					if(sic.getResult() instanceof IFuture)
+					{
+						((IFuture)sic.getResult()).addResultListener(new DelegationResultListener(fut));
+					}
+					else
+					{
+						fut.setResult(sic.getResult());
+					}
+				}
+			});
+		}
+		else if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
 		{
 			final Future fut = new Future();
 			ret = fut;

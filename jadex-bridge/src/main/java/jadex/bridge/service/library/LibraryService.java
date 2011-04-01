@@ -256,34 +256,37 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 */
 	public IFuture	shutdownService()
 	{
-		synchronized(this)
-		{
-			libcl = null;
-			listeners.clear();
-		}
-
-		final Future	ret	= new Future();
-		super.shutdownService().addResultListener(new DelegationResultListener(ret)
+		final Future	saved	= new Future();
+		SServiceProvider.getService(provider,ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new DelegationResultListener(saved)
 		{
 			public void customResultAvailable(Object result)
 			{
-				SServiceProvider.getService(provider,ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						ISettingsService	settings	= (ISettingsService)result;
-						settings.deregisterPropertiesProvider(LIBRARY_SERVICE)
-							.addResultListener(new DelegationResultListener(ret));
-					}
-					public void exceptionOccurred(Exception exception)
-					{
-						// No settings service: ignore
-						ret.setResult(null);
-					}
-				});
+				ISettingsService	settings	= (ISettingsService)result;
+				settings.deregisterPropertiesProvider(LIBRARY_SERVICE)
+					.addResultListener(new DelegationResultListener(saved));
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				// No settings service: ignore
+				saved.setResult(null);
 			}
 		});
+		
+		final Future	ret	= new Future();
+		saved.addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				synchronized(this)
+				{
+					libcl = null;
+					listeners.clear();
+					LibraryService.super.shutdownService().addResultListener(new DelegationResultListener(ret));
+				}
+			}
+		});
+			
 		return ret;
 	}
 
