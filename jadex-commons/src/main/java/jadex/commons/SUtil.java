@@ -17,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
@@ -1587,9 +1588,12 @@ public class SUtil
 		{
 			index++;
 		}
-
+		
+		
+		
 		String ret;
-		if(index > 0)
+		// Relative if common directory on drive exists.
+		if(index>1)
 		{
 			StringBuffer buf = new StringBuffer();
 			for(int i = index; i < basedirs.size(); i++)
@@ -1680,13 +1684,20 @@ public class SUtil
 	 */
 	public static String convertURLToString(URL url)
 	{
-		String file = url.getFile();
-		File f = new File(file);
+		File f;
+		try
+		{
+			f	= new File(url.toURI());
+		}
+		catch(URISyntaxException e)
+		{
+			f	= new File(url.getPath());
+		}
 		
 		// Hack!!! Above code doesnt handle relative url paths. 
 		if(!f.exists())
 		{
-			File newfile = new File(new File("."), file);
+			File newfile = new File(new File("."), url.getPath());
 			if(newfile.exists())
 			{
 				f = newfile;

@@ -606,11 +606,11 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 					URL	url	= (URL)urls.get(i);
 					if(url.getProtocol().equals("file"))
 					{
-						entries[i]	= SUtil.convertPathToRelative(url.getFile());
+						entries[i]	= SUtil.convertPathToRelative(SUtil.convertURLToString(url));
 					}
 					else
 					{
-						entries[i]	= url.toString();					
+						entries[i]	= url.toString();
 					}
 				}
 			}
