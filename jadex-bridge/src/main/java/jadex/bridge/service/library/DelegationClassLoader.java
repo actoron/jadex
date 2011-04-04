@@ -39,21 +39,8 @@ public class DelegationClassLoader extends ClassLoader
 		{
 			for (int i = 0; i < urls.length; ++i)
 			{
-				URL url = null;
-				try
-				{
-					if (urls[i] instanceof URL)
-						url = (URL) urls[i];
-					else if (urls[i] instanceof File)
-						url = ((File) urls[i]).toURI().toURL();
-					else if (urls[i] instanceof String)
-						url = ((new File((String) urls[i])).toURI().toURL());
-					delegates.put(url, new URLClassLoader(new URL[] {url}));
-				}
-				catch (MalformedURLException e)
-				{
-					e.printStackTrace();
-				}
+				URL url = LibraryService.toURL(urls[i]);
+				delegates.put(url, new URLClassLoader(new URL[] {url}));
 			}
 		}
 	}

@@ -599,7 +599,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		{
 			synchronized(this)
 			{
-				List<URL> urls = new ArrayList<URL>(libcl.getDelegates().keySet());
+				List urls = new ArrayList(libcl.getDelegates().keySet());
 				entries	= new String[urls.size()];
 				for(int i=0; i<entries.length; i++)
 				{
