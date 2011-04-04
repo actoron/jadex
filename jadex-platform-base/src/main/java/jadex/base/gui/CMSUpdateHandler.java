@@ -351,7 +351,6 @@ public class CMSUpdateHandler
 								{
 									public void customResultAvailable(Object result)
 									{
-//										System.out.println("Installing listener: "+id);
 										IComponentManagementService	cms	= (IComponentManagementService)result;
 										cms.addComponentListener(null, new CMSUpdateHandler.RemoteCMSListener(cid, id, cms, rcl));
 										ret.setResult(null);

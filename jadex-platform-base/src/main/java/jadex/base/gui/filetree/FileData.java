@@ -64,7 +64,8 @@ public class FileData
 		this.path = file.getAbsolutePath();
 		this.directory = SUtil.arrayToSet(File.listRoots()).contains(file) || file.isDirectory();	// Hack to avoid access to floppy disk.
 		this.displayname = getDisplayName(file);
-		this.lastmodified = file.lastModified();
+		this.lastmodified = FileSystemView.getFileSystemView().isFloppyDrive(file)
+			? 0 : file.lastModified();
 //		this.root = SUtil.arrayToSet(file.listRoots()).contains(file);
 	}
 	
