@@ -7,8 +7,10 @@ import jadex.bridge.ContentException;
 import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IContentCodec;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageListener;
 import jadex.bridge.IMessageService;
@@ -16,7 +18,6 @@ import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
 import jadex.bridge.ServiceTerminatedException;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.Excluded;
@@ -38,6 +39,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -72,8 +74,8 @@ public class MessageService extends BasicService implements IMessageService
     
 	//-------- attributes --------
 
-	/** The provider. */
-    protected IServiceProvider provider;
+	/** The component. */
+    protected IExternalAccess component;
 
 	/** The transports. */
 	protected List transports;
@@ -114,22 +116,22 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Constructor for Outbox.
 	 *  @param platform
 	 */
-	public MessageService(IServiceProvider provider, ITransport[] transports, 
+	public MessageService(IExternalAccess component, ITransport[] transports, 
 		MessageType[] messagetypes)
 	{
-		this(provider, transports, messagetypes, null, null);
+		this(component, transports, messagetypes, null, null);
 	}
 	
 	/**
 	 *  Constructor for Outbox.
 	 *  @param platform
 	 */
-	public MessageService(IServiceProvider provider, ITransport[] transports, 
+	public MessageService(IExternalAccess component, ITransport[] transports, 
 		MessageType[] messagetypes, IContentCodec[] contentcodecs, CodecFactory codecfactory)
 	{
-		super(provider.getId(), IMessageService.class, null);
+		super(component.getServiceProvider().getId(), IMessageService.class, null);
 
-		this.provider = provider;
+		this.component = component;
 		this.transports = SCollection.createArrayList();
 		for(int i=0; i<transports.length; i++)
 			this.transports.add(transports[i]);
@@ -184,7 +186,7 @@ public class MessageService extends BasicService implements IMessageService
 		final Object senddate = msgcopy.get(sd);
 		
 		// External access of sender required for content encoding etc.
-		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class)
+		SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -652,54 +654,52 @@ public class MessageService extends BasicService implements IMessageService
 				}
 				else
 				{
-					CounterResultListener lis = new CounterResultListener(tps.length, new IResultListener()
+					CollectionResultListener lis = new CollectionResultListener(tps.length, true, new DelegationResultListener(ret)
 					{
-						public void resultAvailable(Object result)
+						public void customResultAvailable(Object result)
 						{
-							SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
+							if(((Collection)result).isEmpty())
 							{
-								public void resultAvailable(Object result)
+								ret.setException(new RuntimeException("MessageService has no working transport for sending messages."));
+							}
+							else
+							{
+								SServiceProvider.getService(component.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
 								{
-									clockservice = (IClockService)result;
-									ret.setResult(getServiceIdentifier());
-//									SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new IResultListener()
-//									{
-//										public void resultAvailable(Object result)
-//										{
-//											cms = (IComponentManagementService)result;
-//											ret.setResult(null);
-//										}
-//										
-//										public void exceptionOccurred(Exception exception)
-//										{
-//											ret.setException(exception);
-//										}
-//									});
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									ret.setException(exception);
-								}
-							});
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
+									public void customResultAvailable(Object result)
+									{
+										clockservice = (IClockService)result;
+										ret.setResult(getServiceIdentifier());
+									}
+								});
+							}
 						}
 					});
 					
 					for(int i=0; i<tps.length; i++)
 					{
-						try
+						final ITransport	transport	= tps[i];
+						IFuture	fut	= transport.start();
+						fut.addResultListener(lis);
+						fut.addResultListener(new IResultListener()
 						{
-							tps[i].start().addResultListener(lis);
-						}
-						catch(Exception e)
-						{
-							System.out.println("Could not initialize transport: "+tps[i]+" reason: "+e);
-							transports.remove(tps[i]);
-						}
+							public void resultAvailable(Object result)
+							{
+							}
+							
+							public void exceptionOccurred(final Exception exception)
+							{
+								transports.remove(transport);
+								component.scheduleStep(new IComponentStep()
+								{
+									public Object execute(IInternalAccess ia)
+									{
+										ia.getLogger().warning("Could not initialize transport: "+transport+" reason: "+exception);
+										return null;
+									}
+								});
+							}
+						});
 					}
 				}
 			}
@@ -744,7 +744,7 @@ public class MessageService extends BasicService implements IMessageService
 //		};
 		super.shutdownService().addResultListener(crl);
 
-		SServiceProvider.getService(provider, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(component.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -874,7 +874,7 @@ public class MessageService extends BasicService implements IMessageService
 		final MessageType	messagetype	= getMessageType(type);
 		final Map	decoded	= new HashMap();	// Decoded messages cached by class loader to avoid decoding the same message more than once, when the same class loader is used.
 		
-		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class)
+		SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -1155,7 +1155,7 @@ public class MessageService extends BasicService implements IMessageService
 							messages.add(new Object[]{task, ret});
 						}
 						
-						SServiceProvider.getService(provider, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+						SServiceProvider.getService(component.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
@@ -1236,7 +1236,7 @@ public class MessageService extends BasicService implements IMessageService
 				messages.add(new Object[]{message, type, receivers});
 			}
 			
-			SServiceProvider.getService(provider, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+			SServiceProvider.getService(component.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{

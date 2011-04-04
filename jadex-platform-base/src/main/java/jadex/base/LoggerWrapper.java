@@ -129,7 +129,7 @@ public class LoggerWrapper extends Logger
 		if(level.intValue() < logger.getLevel().intValue() || logger.getLevel().intValue() == offValue) 
 		    return;
 		LogRecord lr = new LogRecord(level, msg);
-		lr.setMillis(clock.getTime());
+		lr.setMillis(getTime());
 		log(lr);
 	}
 
@@ -152,7 +152,7 @@ public class LoggerWrapper extends Logger
 		LogRecord lr = new LogRecord(level, msg);
 		Object params[] = {param1};
 		lr.setParameters(params);
-		lr.setMillis(clock.getTime());
+		lr.setMillis(getTime());
 		log(lr);
 	}
 
@@ -174,7 +174,7 @@ public class LoggerWrapper extends Logger
 		    return;
 		LogRecord lr = new LogRecord(level, msg);
 		lr.setParameters(params);
-		lr.setMillis(clock.getTime());
+		lr.setMillis(getTime());
 		log(lr);
 	}
 
@@ -201,7 +201,7 @@ public class LoggerWrapper extends Logger
 		    return;
 		LogRecord lr = new LogRecord(level, msg);
 		lr.setThrown(thrown);
-		lr.setMillis(clock.getTime());
+		lr.setMillis(getTime());
 		log(lr);
 	}
 
@@ -224,7 +224,7 @@ public class LoggerWrapper extends Logger
 		LogRecord lr = new LogRecord(level, msg);
 		lr.setSourceClassName(sourceClass);
 		lr.setSourceMethodName(sourceMethod);
-		lr.setMillis(clock.getTime());
+		lr.setMillis(getTime());
 		log(lr);
 	}
 
@@ -253,7 +253,7 @@ public class LoggerWrapper extends Logger
 		lr.setSourceMethodName(sourceMethod);
 		Object params[] = {param1};
 		lr.setParameters(params);
-		lr.setMillis(clock.getTime());
+		lr.setMillis(getTime());
 		log(lr);
 	}
 
@@ -281,7 +281,7 @@ public class LoggerWrapper extends Logger
 		lr.setSourceClassName(sourceClass);
 		lr.setSourceMethodName(sourceMethod);
 		lr.setParameters(params);
-		lr.setMillis(clock.getTime());
+		lr.setMillis(getTime());
 		log(lr);
 	}
 
@@ -314,7 +314,7 @@ public class LoggerWrapper extends Logger
 		lr.setSourceClassName(sourceClass);
 		lr.setSourceMethodName(sourceMethod);
 		lr.setThrown(thrown);
-		lr.setMillis(clock.getTime());
+		lr.setMillis(getTime());
 		log(lr);
 	}
 
@@ -364,7 +364,7 @@ public class LoggerWrapper extends Logger
 		LogRecord lr = new LogRecord(level, msg);
 		lr.setSourceClassName(sourceClass);
 		lr.setSourceMethodName(sourceMethod);
-		lr.setMillis(clock.getTime());
+		lr.setMillis(getTime());
 		doLog(lr, bundleName);
 	}
 
@@ -398,7 +398,7 @@ public class LoggerWrapper extends Logger
 		lr.setSourceMethodName(sourceMethod);
 		Object params[] = {param1};
 		lr.setParameters(params);
-		lr.setMillis(clock.getTime());
+		lr.setMillis(getTime());
 		doLog(lr, bundleName);
 	}
 
@@ -431,7 +431,7 @@ public class LoggerWrapper extends Logger
 		lr.setSourceClassName(sourceClass);
 		lr.setSourceMethodName(sourceMethod);
 		lr.setParameters(params);
-		lr.setMillis(clock.getTime());
+		lr.setMillis(getTime());
 		doLog(lr, bundleName);
 	}
 
@@ -469,7 +469,7 @@ public class LoggerWrapper extends Logger
 		lr.setSourceClassName(sourceClass);
 		lr.setSourceMethodName(sourceMethod);
 		lr.setThrown(thrown);
-		lr.setMillis(clock.getTime());
+		lr.setMillis(getTime());
 		doLog(lr, bundleName);
 	}
 
@@ -1139,4 +1139,11 @@ public class LoggerWrapper extends Logger
 //		return null;
 //	}
 
+	/**
+	 *  Get the time.
+	 */
+	protected long	getTime()
+	{
+		return clock!=null ? clock.getTime() : System.currentTimeMillis();
+	}
 }

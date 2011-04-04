@@ -88,8 +88,17 @@
 				new Object[]{"jadex.base.gui.componentviewer.libservice.LibServiceBrowser", new String[]{"getClassLoader"}})
 				)
 		</providedservice>
+		<providedservice class="IClockService" direct="true">
+			$args.simulation
+			? new ClockService(new ClockCreationInfo(IClock.TYPE_EVENT_DRIVEN, "simulation_clock", System.currentTimeMillis(), 100), $component.getServiceProvider(),
+				SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
+				new Object[]{new String[]{"getState", "getTime", "getTick", "getStarttime", "getDelta", "getDilation", "getNextTimer", "getTimers", "getClockType", "advanceEvent"}}))
+			: new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "simulation_clock", System.currentTimeMillis(), 100), $component.getServiceProvider(),
+				SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
+				new Object[]{new String[]{"getState", "getTime", "getTick", "getStarttime", "getDelta", "getDilation", "getNextTimer", "getTimers", "getClockType", "advanceEvent"}}))
+		</providedservice>
 		<providedservice class="IMessageService" direct="true">
-			new MessageService($component.getServiceProvider(),
+			new MessageService($component.getExternalAccess(),
 				new ITransport[]
 				{
 					new LocalTransport($component.getServiceProvider()),
@@ -113,15 +122,6 @@
 		</providedservice> -->
 		<providedservice class="IDF" direct="true">
 			new DirectoryFacilitatorService($component.getServiceProvider())
-		</providedservice>
-		<providedservice class="IClockService" direct="true">
-			$args.simulation
-			? new ClockService(new ClockCreationInfo(IClock.TYPE_EVENT_DRIVEN, "simulation_clock", System.currentTimeMillis(), 100), $component.getServiceProvider(),
-				SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
-				new Object[]{new String[]{"getState", "getTime", "getTick", "getStarttime", "getDelta", "getDilation", "getNextTimer", "getTimers", "getClockType", "advanceEvent"}}))
-			: new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "simulation_clock", System.currentTimeMillis(), 100), $component.getServiceProvider(),
-				SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
-				new Object[]{new String[]{"getState", "getTime", "getTick", "getStarttime", "getDelta", "getDilation", "getNextTimer", "getTimers", "getClockType", "advanceEvent"}}))
 		</providedservice>
 		<providedservice class="ISimulationService">
 			new SimulationService($component,
