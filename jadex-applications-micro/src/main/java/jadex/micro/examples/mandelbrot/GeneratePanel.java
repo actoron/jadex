@@ -18,6 +18,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -41,6 +42,8 @@ public class GeneratePanel extends JPanel
 		this.setLayout(new BorderLayout());
 		this.pp	= new PropertiesPanel("Generate Options");
 		
+		pp.addComponent("algorithm", new JComboBox(GenerateService.ALGORITHMS), 0);
+		
 		pp.createTextField("xmin", "-2", true, 0);
 		pp.createTextField("xmax", "1", true, 0);
 		pp.createTextField("ymin", "-1.5", true, 0);
@@ -59,6 +62,7 @@ public class GeneratePanel extends JPanel
 			{
 				try
 				{
+					final IFractalAlgorithm	algorithm	= (IFractalAlgorithm)((JComboBox)pp.getComponent("algorithm")).getSelectedItem();
 					final double x1 = Double.parseDouble(pp.getTextField("xmin").getText());
 					final double x2 = Double.parseDouble(pp.getTextField("xmax").getText());
 					final double y1 = Double.parseDouble(pp.getTextField("ymin").getText());
@@ -81,7 +85,7 @@ public class GeneratePanel extends JPanel
 								{
 									IGenerateService gs = (IGenerateService)result;
 									
-									AreaData ad = new AreaData(x1, x2, y1, y2, sizex, sizey, max, par, tasksize);
+									AreaData ad = new AreaData(x1, x2, y1, y2, sizex, sizey, max, par, tasksize, algorithm);
 									gs.generateArea(ad).addResultListener(ia.createResultListener(new DefaultResultListener()
 									{
 										public void resultAvailable(Object result)
@@ -140,6 +144,7 @@ public class GeneratePanel extends JPanel
 	 */
 	public void	updateProperties(AreaData data)
 	{
+		((JComboBox)pp.getComponent("algorithm")).setSelectedItem(data.getAlgorithm());
 		pp.getTextField("xmin").setText(Double.toString(data.getXStart()));
 		pp.getTextField("xmax").setText(Double.toString(data.getXEnd()));
 		pp.getTextField("ymin").setText(Double.toString(data.getYStart()));

@@ -10,6 +10,8 @@ public interface ICalculateService	extends IService
 {
 	/**
 	 *  Calculate colors for an area of points.
+	 *  @param data	The area to be calculated.
+	 *  @return	A future containing the calculated area.
 	 */
 	public IFuture calculateArea(AreaData data);
 }

@@ -29,6 +29,8 @@ public class CalculateService extends BasicService implements ICalculateService
 	
 	/**
 	 *  Calculate colors for an area of points.
+	 *  @param data	The area to be calculated.
+	 *  @return	A future containing the calculated area.
 	 */
 	public IFuture calculateArea(AreaData data)
 	{
@@ -70,7 +72,7 @@ public class CalculateService extends BasicService implements ICalculateService
 				break;
 			for(int xi=xstart; xi<=xend; xi++)
 			{
-				res[xi][ystart] = justfill? fillcol: determineColor(data.getXStart()+xi*stepx, data.getYStart()+ystart*stepy, data.getMax());
+				res[xi][ystart] = justfill? fillcol: data.getAlgorithm().determineColor(data.getXStart()+xi*stepx, data.getYStart()+ystart*stepy, data.getMax());
 				if(!justfill && xi==xstart)
 					fillcol = res[xi][ystart];
 				if(allin && res[xi][ystart]!=fillcol)
@@ -83,7 +85,7 @@ public class CalculateService extends BasicService implements ICalculateService
 				break;
 			for(int yi=ystart; yi<=yend; yi++)
 			{
-				res[xend][yi] = justfill? fillcol: determineColor(data.getXStart()+xend*stepx, data.getYStart()+yi*stepy, data.getMax());
+				res[xend][yi] = justfill? fillcol: data.getAlgorithm().determineColor(data.getXStart()+xend*stepx, data.getYStart()+yi*stepy, data.getMax());
 				if(allin && res[xend][yi]!=fillcol)
 					allin = false;
 				cnt++;
@@ -94,7 +96,7 @@ public class CalculateService extends BasicService implements ICalculateService
 				break;
 			for(int xi=xend; xi>=xstart; xi--)
 			{
-				res[xi][yend] = justfill? fillcol: determineColor(data.getXStart()+xi*stepx, data.getYStart()+yend*stepy, data.getMax());
+				res[xi][yend] = justfill? fillcol: data.getAlgorithm().determineColor(data.getXStart()+xi*stepx, data.getYStart()+yend*stepy, data.getMax());
 				if(allin && res[xi][yend]!=fillcol)
 					allin = false;
 				cnt++;
@@ -105,7 +107,7 @@ public class CalculateService extends BasicService implements ICalculateService
 				break;
 			for(int yi=yend; yi>=ystart; yi--)
 			{
-				res[xstart][yi] = justfill? fillcol: determineColor(data.getXStart()+xstart*stepx, data.getYStart()+yi*stepy, data.getMax());
+				res[xstart][yi] = justfill? fillcol: data.getAlgorithm().determineColor(data.getXStart()+xstart*stepx, data.getYStart()+yi*stepy, data.getMax());
 				if(allin && res[xstart][yi]!=fillcol)
 					allin = false;
 				cnt++;
@@ -161,28 +163,6 @@ public class CalculateService extends BasicService implements ICalculateService
 //		return ret;
 //	}
 
-	/**
-	 *  Determine the color of a point.
-	 */
-	protected short determineColor(double xn, double yn, short max)
-	{
-		double x0 = xn;
-		double y0 = yn;
-		short i = 0;
-		double c =  Math.sqrt(xn*xn + yn*yn);
-		
-		for(i=0; c<2 && i<max; i++)
-		{
-			double xn1 = xn*xn - yn*yn + x0;
-			double yn1 = 2*xn*yn + y0;
-			xn = xn1;
-			yn = yn1;
-			c =  Math.sqrt(xn*xn + yn*yn);
-		}
-		
-		return i==max? -1: i;
-	}
-	
 //	/**
 //	 * 
 //	 */

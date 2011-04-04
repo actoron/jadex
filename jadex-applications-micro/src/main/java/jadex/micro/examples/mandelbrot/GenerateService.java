@@ -27,6 +27,14 @@ import javax.swing.SwingUtilities;
  */
 public class GenerateService extends BasicService implements IGenerateService
 {
+	//-------- constants --------
+	
+	/** The available algorithms. */
+	public static IFractalAlgorithm[]	ALGORITHMS	= new IFractalAlgorithm[] {
+		new MandelbrotAlgorithm(),
+		new SchimmelbrotAlgorithm()
+	};
+	
 	//-------- attributes --------
 	
 	/** The agent. */
@@ -228,7 +236,7 @@ public class GenerateService extends BasicService implements IGenerateService
 				areas.add(new AreaData(x1, xi==numx-1 && restx>0 ? x1+(xdiff*restx/sizex): x1+xdiff,
 					y1, yi==numy-1 && resty>0 ? y1+(ydiff*resty/sizey) : y1+ydiff,
 					xi*sizex, yi*sizey, xi==numx-1 && restx>0 ? restx : sizex, yi==numy-1 && resty>0 ? resty : sizey,
-					data.getMax(), 0, 0, null, null));
+					data.getMax(), 0, 0, data.getAlgorithm(), null, null));
 //				System.out.println("x:y: "+xi+" "+yi+" "+ad);
 				x1 += xdiff;
 			}

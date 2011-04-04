@@ -888,7 +888,8 @@ public class DisplayPanel extends JComponent
 	protected void calcArea(double x1, double x2, double y1, double y2, int sizex, int sizey)
 	{
 		final AreaData ad	= new AreaData(x1, x2, y1, y2, sizex, sizey,
-			data!=null?data.getMax():256, data!=null?data.getParallel():10, data!=null?data.getTaskSize():300);
+			data!=null?data.getMax():256, data!=null?data.getParallel():10, data!=null?data.getTaskSize():300,
+			data!=null?data.getAlgorithm():GenerateService.ALGORITHMS[0]);
 		
 		DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		calculating	= true;

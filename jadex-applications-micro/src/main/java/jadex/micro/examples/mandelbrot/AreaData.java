@@ -44,6 +44,9 @@ public class AreaData
 
 	/** The tasksize of a task (in pixel/points). */
 	protected int					tasksize;
+	
+	/** The algorithm used to calculate the data. */
+	protected IFractalAlgorithm	algorithm;
 
 	/** The result data. */
 	protected short[][]				data;
@@ -60,16 +63,16 @@ public class AreaData
 	 * Create a new area data.
 	 */
 	public AreaData(double xstart, double xend, double ystart, double yend,
-			int sizex, int sizey, short max, int par, int tasksize)
+			int sizex, int sizey, short max, int par, int tasksize, IFractalAlgorithm algorithm)
 	{
-		this(xstart, xend, ystart, yend, 0, 0, sizex, sizey, max, par, tasksize, null, null);
+		this(xstart, xend, ystart, yend, 0, 0, sizex, sizey, max, par, tasksize, algorithm, null, null);
 	}
 
 	/**
 	 * Create a new area data.
 	 */
 	public AreaData(double xstart, double xend, double ystart, double yend,
-			int xoff, int yoff, int sizex, int sizey, short max, int par, int tasksize,
+			int xoff, int yoff, int sizex, int sizey, short max, int par, int tasksize, IFractalAlgorithm algorithm,
 			IComponentIdentifier cid, short[][] data)
 	{
 		this.xstart = xstart;
@@ -83,6 +86,7 @@ public class AreaData
 		this.max = max;
 		this.par = par;
 		this.tasksize = tasksize;
+		this.algorithm = algorithm;
 		this.cid = cid;
 		this.data = data;
 	}
@@ -372,6 +376,24 @@ public class AreaData
 	public void setTaskSize(int tasksize)
 	{
 		this.tasksize = tasksize;
+	}
+
+	/**
+	 *  Get the algorithm.
+	 *  @return the algorithm.
+	 */
+	public IFractalAlgorithm	getAlgorithm()
+	{
+		return algorithm;
+	}
+
+	/**
+	 *  Set the algorithm.
+	 *  @param algorithm	The algorithm to set.
+	 */
+	public void setAlgorithm(IFractalAlgorithm algorithm)
+	{
+		this.algorithm	= algorithm;
 	}
 
 	public String toString()
