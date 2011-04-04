@@ -253,6 +253,8 @@
 		<application name="testcases">
 			<arguments>
 				<argument name="platformname">"testcases"</argument>
+				<argument name="tcpport">0</argument>
+				<argument name="niotcpport">0</argument>
 			</arguments>
 			<components>
 				<component name="kernel_application" type="kernel_application" daemon="true"/>
