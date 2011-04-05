@@ -21,25 +21,37 @@ public class LyapunovAlgorithm implements IFractalAlgorithm
 	 */
 	public short	determineColor(double a, double b, short max)
 	{
+		// Calculates population: x'=rx(1-x)
+		// x: population relative to max. possible population (0-1)
+		// Start population can be chosen arbitrarily, because convergence does not depend on initial value if max is large enough.
+		// r: growth rate (also "fecundity factor")
+		
 		double	sum	= 0;
-		double	x[]	= new double[max];
-		x[0]	= 0.5;
-		double	r0	= a;//???
-		x[1]	= r0*x[0]*(1-x[0]);
-		for(int n=1; n<max; n++)
+		double	x	= 0.5; // Start population.
+		for(int i=1; i<max; i++)
 		{
-			double	rn	= GENERATOR.charAt((n-1)%GENERATOR.length())=='A' ? a : b;
-			if(n<max-1)
-				x[n+1]	= rn*x[n]*(1-x[n]);
-			double	val	= rn*(1-2*x[n]);
+			double	r	= GENERATOR.charAt(i%GENERATOR.length())=='A' ? a : b;
+			x	= r*x*(1-x);
+			double	val	= r*(1-2*x);
 			sum	+= Math.log(Math.abs(val));
 		}
-		double	lambda	= sum / max;	// assume -1 to 1 ???
-//		System.out.println("lambda = "+lambda);
 		
-		return lambda<-1 ? 0 : (short)Math.abs(max-1-(lambda+1)*max/2);
+		double	lambda	= sum / max;	// Lyapunov exponent: >0 means chaos, <0 means convergence. From -infinity to +1(?)
+		short	val	= sum>0 ? -1 : (short)(-Math.tanh(lambda)*(max-1));
+//		System.out.println("lambda = "+lambda);
+//		System.out.println("sum = "+sum);
+//		System.out.println("val = "+val);
+		return val;
 	}
 	
+	/**
+	 *  Get default settings for rendering the fractal. 
+	 */
+	public AreaData	getDefaultSettings()
+	{
+		return new AreaData(2, 4, 2, 4, 100, 100, (short)16, 10, 300, this);
+	}
+
 	//-------- singleton semantics --------
 	
 	/**

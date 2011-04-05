@@ -93,7 +93,7 @@ public class DisplayPanel extends JComponent
 	public DisplayPanel(final IExternalAccess agent)
 	{
 		this.agent	= agent;
-		setColorScheme(new Color[]{new Color(50, 100, 0), Color.red});
+		setColorScheme(new Color[]{new Color(50, 100, 0), Color.red}, true);
 		calcDefaultImage();
 		
 		// Dragging with right mouse button.
@@ -282,6 +282,7 @@ public class DisplayPanel extends JComponent
 							c	= colors[results[x][y]%colors.length];
 						}
 						g.setColor(c);
+//						g.drawLine(x, results[x].length-y-1, x, results[x].length-y-1);	// Todo: use euclidean coordinates
 						g.drawLine(x, y, x, y);
 					}
 				}
@@ -719,7 +720,7 @@ public class DisplayPanel extends JComponent
 	/**
 	 *  Set the color scheme.
 	 */
-	public void	setColorScheme(Color[] scheme)
+	public void	setColorScheme(Color[] scheme, boolean cycle)
 	{
 		if(scheme==null || scheme.length==0)
 		{
@@ -729,7 +730,7 @@ public class DisplayPanel extends JComponent
 		{
 			colors	= scheme;
 		}
-		else
+		else if(cycle)
 		{
 			colors	= new Color[scheme.length*16];
 			for(int i=0; i<colors.length; i++)
@@ -741,6 +742,22 @@ public class DisplayPanel extends JComponent
 					(int)(start.getRed()+(double)(i%16)/16*(end.getRed()-start.getRed())),
 					(int)(start.getGreen()+(double)(i%16)/16*(end.getGreen()-start.getGreen())),
 					(int)(start.getBlue()+(double)(i%16)/16*(end.getBlue()-start.getBlue())));
+			}
+		}
+		else
+		{
+			short	max	= data!=null ? data.getMax() : GenerateService.ALGORITHMS[0].getDefaultSettings().getMax();
+			colors	= new Color[max];
+			for(int i=0; i<colors.length; i++)
+			{
+				int index	= i*(scheme.length-1)/max;
+				double	diff	= (double)i*(scheme.length-1)/max - index;
+				Color	start	= scheme[index];
+				Color	end	= scheme[index+1];
+				colors[i]	= new Color(
+					(int)(start.getRed()+(double)diff*(end.getRed()-start.getRed())),
+					(int)(start.getGreen()+(double)diff*(end.getGreen()-start.getGreen())),
+					(int)(start.getBlue()+(double)diff*(end.getBlue()-start.getBlue())));
 			}
 		}
 		
@@ -820,6 +837,16 @@ public class DisplayPanel extends JComponent
 	 */
 	protected void calcDefaultImage()
 	{
+		AreaData	settings;
+		if(data!=null)
+		{
+			settings	= data.getAlgorithm().getDefaultSettings();
+		}
+		else
+		{
+			settings	= GenerateService.ALGORITHMS[0].getDefaultSettings();
+		}
+		
 		final Rectangle	bounds	= getInnerBounds(false);
 		double	rratio	= 1;
 		double	bratio	= (double)bounds.width/bounds.height;
@@ -836,14 +863,14 @@ public class DisplayPanel extends JComponent
 		}
 		else if(bounds.width==0 || bounds.height==0)
 		{
-			bounds.width	= 100;
-			bounds.height	= 100;
+			bounds.width	= settings.getSizeX();
+			bounds.height	= settings.getSizeY();
 		}
 		
 		// Clear image for painting only background.
 		DisplayPanel.this.image	= createImage(bounds.width, bounds.height);
 		
-		calcArea(-2, 1, -1.5, 1.5, bounds.width, bounds.height);
+		calcArea(settings.getXStart(), settings.getXEnd(), settings.getYStart(), settings.getYEnd(), bounds.width, bounds.height);
 	}
 	
 	/**
@@ -887,9 +914,14 @@ public class DisplayPanel extends JComponent
 	 */
 	protected void calcArea(double x1, double x2, double y1, double y2, int sizex, int sizey)
 	{
+		AreaData	settings;
+		if(data==null)
+			settings	= GenerateService.ALGORITHMS[0].getDefaultSettings();
+		else
+			settings	= data;
+		
 		final AreaData ad	= new AreaData(x1, x2, y1, y2, sizex, sizey,
-			data!=null?data.getMax():256, data!=null?data.getParallel():10, data!=null?data.getTaskSize():300,
-			data!=null?data.getAlgorithm():GenerateService.ALGORITHMS[0]);
+			settings.getMax(), settings.getParallel(), settings.getTaskSize(), settings.getAlgorithm());
 		
 		DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		calculating	= true;

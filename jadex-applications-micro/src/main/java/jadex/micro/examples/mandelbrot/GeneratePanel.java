@@ -14,6 +14,8 @@ import jadex.xml.annotation.XMLClassname;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -42,17 +44,27 @@ public class GeneratePanel extends JPanel
 		this.setLayout(new BorderLayout());
 		this.pp	= new PropertiesPanel("Generate Options");
 		
-		pp.addComponent("algorithm", new JComboBox(GenerateService.ALGORITHMS), 0);
+		final JComboBox	alg	= new JComboBox(GenerateService.ALGORITHMS);
+		alg.addItemListener(new ItemListener()
+		{
+			public void itemStateChanged(ItemEvent e)
+			{
+				updateProperties(((IFractalAlgorithm)alg.getSelectedItem()).getDefaultSettings());
+			}
+		});
 		
-		pp.createTextField("xmin", "-2", true, 0);
-		pp.createTextField("xmax", "1", true, 0);
-		pp.createTextField("ymin", "-1.5", true, 0);
-		pp.createTextField("ymax", "1.5", true, 0);
-		pp.createTextField("sizex", "100", true, 0);
-		pp.createTextField("sizey", "100", true, 0);
-		pp.createTextField("max", "256", true, 0);
-		pp.createTextField("parallel", "10", true, 0);
-		pp.createTextField("task size", "300", true, 0);
+		pp.addComponent("algorithm", alg, 0);
+		AreaData	data	= GenerateService.ALGORITHMS[0].getDefaultSettings();
+		
+		pp.createTextField("xmin", ""+data.getXStart(), true, 0);
+		pp.createTextField("xmax", ""+data.getXEnd(), true, 0);
+		pp.createTextField("ymin", ""+data.getYStart(), true, 0);
+		pp.createTextField("ymax", ""+data.getYEnd(), true, 0);
+		pp.createTextField("sizex", ""+data.getSizeX(), true, 0);
+		pp.createTextField("sizey", ""+data.getSizeY(), true, 0);
+		pp.createTextField("max", ""+data.getMax(), true, 0);
+		pp.createTextField("parallel", ""+data.getParallel(), true, 0);
+		pp.createTextField("task size", ""+data.getTaskSize(), true, 0);
 		
 		final JButton[] buts = pp.createButtons("buts", new String[]{"Go"}, 0);
 		
@@ -144,7 +156,8 @@ public class GeneratePanel extends JPanel
 	 */
 	public void	updateProperties(AreaData data)
 	{
-		((JComboBox)pp.getComponent("algorithm")).setSelectedItem(data.getAlgorithm());
+		if(!((JComboBox)pp.getComponent("algorithm")).getSelectedItem().equals(data.getAlgorithm()))
+			((JComboBox)pp.getComponent("algorithm")).setSelectedItem(data.getAlgorithm());
 		pp.getTextField("xmin").setText(Double.toString(data.getXStart()));
 		pp.getTextField("xmax").setText(Double.toString(data.getXEnd()));
 		pp.getTextField("ymin").setText(Double.toString(data.getYStart()));

@@ -31,8 +31,8 @@ public class GenerateService extends BasicService implements IGenerateService
 	
 	/** The available algorithms. */
 	public static IFractalAlgorithm[]	ALGORITHMS	= new IFractalAlgorithm[] {
-		new MandelbrotAlgorithm(),
-		new LyapunovAlgorithm()
+		new LyapunovAlgorithm(),
+		new MandelbrotAlgorithm()
 	};
 	
 	//-------- attributes --------

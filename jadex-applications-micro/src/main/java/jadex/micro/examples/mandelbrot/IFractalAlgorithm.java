@@ -14,4 +14,9 @@ public interface IFractalAlgorithm
 	 *    or -1 if the value is at the maximum.
 	 */
 	public short	determineColor(double x, double y, short max);
+
+	/**
+	 *  Get default settings for rendering the fractal. 
+	 */
+	public AreaData	getDefaultSettings();
 }

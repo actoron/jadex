@@ -183,7 +183,7 @@ public class ServicePoolManager
 				}
 			}));
 			
-			System.out.println("wurksn0");
+//			System.out.println("wurksn0");
 			component.getRequiredServices(name).addResultListener(
 				component.createResultListener(new IIntermediateResultListener()
 			{
@@ -192,7 +192,7 @@ public class ServicePoolManager
 				 */
 				public void intermediateResultAvailable(Object result)
 				{
-					System.out.println("wurksn3");
+//					System.out.println("wurksn3");
 					IService	service	= (IService)result;
 					if(!busy.contains(service) && !free.contains(service) && handler.selectService(service))
 					{
@@ -205,7 +205,7 @@ public class ServicePoolManager
 				 */
 				public void finished()
 				{
-					System.out.println("wurksn2");
+//					System.out.println("wurksn2");
 					searching	= false;					
 					if(timer!=null)
 					{
@@ -222,7 +222,7 @@ public class ServicePoolManager
 				 */
 				public void exceptionOccurred(Exception exception)
 				{
-					System.out.println("wurksn1");
+//					System.out.println("wurksn1");
 					searching	= false;					
 					if(timer!=null)
 					{
@@ -240,7 +240,7 @@ public class ServicePoolManager
 				public void resultAvailable(Object result)
 				{
 					// ignored
-					System.out.println("wurksn");
+//					System.out.println("wurksn");
 				}
 			}));
 		}

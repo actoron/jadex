@@ -85,7 +85,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	public static String REMOTE_TIMEOUT = "remote_timeout";
 
 	/** The default timeout. */
-	public static long DEFAULT_TIMEOUT = 1000000;
+	public static long DEFAULT_TIMEOUT = 10000;
 		
 	//-------- attributes --------
 	

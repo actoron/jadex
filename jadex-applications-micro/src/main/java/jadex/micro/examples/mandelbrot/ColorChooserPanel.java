@@ -10,10 +10,13 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JList;
@@ -42,12 +45,15 @@ public class ColorChooserPanel	extends JPanel
 		gbc.weighty	= 1;
 		gbc.insets	= new Insets(1, 1, 1, 1);
 		
+		final JCheckBox	cycle	= new JCheckBox("Cycle", true);
+		
 		final DefaultListModel	lm	= new DefaultListModel();
 		lm.addElement(new Color(204, 204, 255));
 		lm.addElement(new Color(0, 0, 255));
 		lm.addElement(new Color(0, 0, 51));
 		lm.addElement(new Color(0, 0, 255));
-		setColorScheme(panel, lm);
+		setColorScheme(panel, lm, cycle.isSelected());
+
 		
 		final JList	colors	= new JList(lm);
 		this.add(new JScrollPane(colors), gbc);
@@ -111,7 +117,7 @@ public class ColorChooserPanel	extends JPanel
 				if(c!=null)
 				{
 					lm.addElement(c);
-					setColorScheme(panel, lm);
+					setColorScheme(panel, lm, cycle.isSelected());
 				}
 			}
 		});
@@ -138,12 +144,23 @@ public class ColorChooserPanel	extends JPanel
 				{
 					lm.removeElement(cs[i]);
 				}
-				setColorScheme(panel, lm);
+				setColorScheme(panel, lm, cycle.isSelected());
 			}
 		});
 		gbc.weightx	= 0;
 		gbc.gridx	= 1;
 		this.add(remove, gbc);
+		
+		cycle.addItemListener(new ItemListener()
+		{
+			public void itemStateChanged(ItemEvent e)
+			{
+				setColorScheme(panel, lm, cycle.isSelected());
+			}
+		});
+		gbc.gridy	= 2;
+		gbc.gridwidth	= GridBagConstraints.REMAINDER;
+		this.add(cycle, gbc);
 
 		add.setMinimumSize(remove.getMinimumSize());
 		add.setPreferredSize(remove.getPreferredSize());
@@ -152,11 +169,11 @@ public class ColorChooserPanel	extends JPanel
 	/**
 	 *  Set the current color scheme on the panel.
 	 */
-	protected void setColorScheme(DisplayPanel panel, DefaultListModel lm)
+	protected void setColorScheme(DisplayPanel panel, DefaultListModel lm, boolean cycle)
 	{
 		Color[]	scheme	= new Color[lm.getSize()];
 		lm.copyInto(scheme);
-		panel.setColorScheme(scheme);
+		panel.setColorScheme(scheme, cycle);
 	}
 }
 

@@ -1,6 +1,7 @@
 package jadex.micro.examples.mandelbrot;
 
 import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.IFuture;
 
 /**
@@ -13,5 +14,6 @@ public interface ICalculateService	extends IService
 	 *  @param data	The area to be calculated.
 	 *  @return	A future containing the calculated area.
 	 */
+	@Timeout(30000)
 	public IFuture calculateArea(AreaData data);
 }
