@@ -157,7 +157,9 @@ public class GeneratePanel extends JPanel
 	public void	updateProperties(AreaData data)
 	{
 		if(!((JComboBox)pp.getComponent("algorithm")).getSelectedItem().equals(data.getAlgorithm()))
+		{
 			((JComboBox)pp.getComponent("algorithm")).setSelectedItem(data.getAlgorithm());
+		}
 		pp.getTextField("xmin").setText(Double.toString(data.getXStart()));
 		pp.getTextField("xmax").setText(Double.toString(data.getXEnd()));
 		pp.getTextField("ymin").setText(Double.toString(data.getYStart()));

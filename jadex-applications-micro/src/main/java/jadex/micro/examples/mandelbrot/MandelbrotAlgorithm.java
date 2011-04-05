@@ -33,12 +33,30 @@ public class MandelbrotAlgorithm implements IFractalAlgorithm
 		return i==max? -1: i;
 	}
 	
+
+	/**
+	 *  Can areas be filled?
+	 */
+	public boolean	isOptimizationAllowed()
+	{
+		return true;
+	}
+
+	
 	/**
 	 *  Get default settings for rendering the fractal. 
 	 */
 	public AreaData	getDefaultSettings()
 	{
 		return new AreaData(-2, 1, -1.5, 1.5, 100, 100, (short)256, 10, 300, this);
+	}
+	
+	/**
+	 *  Should a cyclic color scheme be used?
+	 */
+	public boolean	useColorCycle()
+	{
+		return true;
 	}
 	
 	//-------- singleton semantics --------

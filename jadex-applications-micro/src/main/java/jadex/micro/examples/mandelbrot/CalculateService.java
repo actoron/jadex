@@ -58,10 +58,11 @@ public class CalculateService extends BasicService implements ICalculateService
 		boolean allin = true;
 		boolean justfill = false;
 		short fillcol = -2;
-		boolean	usejustfill	= data.getXStart()<2 && data.getXStart()>-2
+		boolean	usejustfill	= data.getAlgorithm().isOptimizationAllowed()
+			&& (data.getXStart()<2 && data.getXStart()>-2
 			|| data.getYStart()<2 && data.getYStart()>-2
 			|| data.getXEnd()<2 && data.getXEnd()>-2
-			|| data.getYEnd()<2 && data.getYEnd()>-2;
+			|| data.getYEnd()<2 && data.getYEnd()>-2);
 			
 		int	size	= data.getSizeX()*data.getSizeY();
 		int	cnt	= 0;

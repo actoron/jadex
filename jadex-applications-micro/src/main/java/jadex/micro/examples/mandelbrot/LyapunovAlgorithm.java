@@ -8,7 +8,7 @@ public class LyapunovAlgorithm implements IFractalAlgorithm
 	//-------- constants --------
 	
 	/** Generator string (any combination of As and Bs). */
-	public static String	GENERATOR	= "AB";
+	public static String	GENERATOR	= "AAAAABBBBB";
 	
 	//-------- IFractalAlgorithm interface --------
 	
@@ -49,7 +49,23 @@ public class LyapunovAlgorithm implements IFractalAlgorithm
 	 */
 	public AreaData	getDefaultSettings()
 	{
-		return new AreaData(2, 4, 2, 4, 100, 100, (short)16, 10, 300, this);
+		return new AreaData(1.7, 4, 2.7, 4.2, 230, 150, (short)160, 10, 300, this);
+	}
+
+	/**
+	 *  Should a cyclic color scheme be used?
+	 */
+	public boolean	useColorCycle()
+	{
+		return false;
+	}
+
+	/**
+	 *  Can areas be filled?
+	 */
+	public boolean	isOptimizationAllowed()
+	{
+		return false;
 	}
 
 	//-------- singleton semantics --------

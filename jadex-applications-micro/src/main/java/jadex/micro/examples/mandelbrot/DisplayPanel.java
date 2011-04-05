@@ -345,9 +345,10 @@ public class DisplayPanel extends JComponent
 												IComponentManagementService	cms	= (IComponentManagementService)result;
 												if(progressdata!=null)
 												{
-													for(Iterator it=progressdata.keySet().iterator(); it.hasNext(); )
+													Object[]	pds	= progressdata.keySet().toArray();
+													for(int i=0; i<pds.length; i++)
 													{
-														final ProgressData	progress	= (ProgressData)it.next();
+														final ProgressData	progress	= (ProgressData)pds[i];
 														if(!progress.isFinished())
 														{
 															cms.getExternalAccess(progress.getProviderId())
@@ -848,7 +849,7 @@ public class DisplayPanel extends JComponent
 		}
 		
 		final Rectangle	bounds	= getInnerBounds(false);
-		double	rratio	= 1;
+		double	rratio	= (double)settings.getSizeX()/settings.getSizeY();
 		double	bratio	= (double)bounds.width/bounds.height;
 		// Calculate pixel width/height of area.
 		if(rratio<bratio)
