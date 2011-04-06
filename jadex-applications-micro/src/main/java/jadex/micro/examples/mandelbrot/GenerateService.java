@@ -199,6 +199,7 @@ public class GenerateService extends BasicService implements IGenerateService
 		final Set	areas	= new HashSet();	// {AreaData}
 		int numx = Math.max((int)Math.sqrt((double)data.getSizeX()*data.getSizeY()*data.getMax()/(data.getTaskSize()*data.getTaskSize()*256)), 1);
 		int numy = numx;
+		final long	time	= System.nanoTime();	
 //		System.out.println("Number of tasks: "+numx+", "+numy+", max="+data.getMax()+" tasksize="+data.getTaskSize());
 		
 		final int sizex = data.getSizeX()/numx;
@@ -300,6 +301,8 @@ public class GenerateService extends BasicService implements IGenerateService
 			
 			public void finished()
 			{
+				double	millis	= ((System.nanoTime() - time)/100000)/10.0;
+				System.out.println("took: "+millis+" millis.");
 				ret.setResult(data);
 			}
 		}));

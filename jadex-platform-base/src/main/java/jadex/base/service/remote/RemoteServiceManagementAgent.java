@@ -139,7 +139,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								{
 //									content	= null;
 									content = new RemoteResultCommand(null, new RuntimeException("Errors during XML decoding: "+errors), callid);
-									getLogger().warning("Remote service management service could not decode message."+orig);
+									getLogger().warning("Remote service management service could not decode message."+orig+"\n"+errors);
 								}
 							}
 						}
@@ -148,6 +148,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 //							content	= null;
 							content = new RemoteResultCommand(null, e, callid);
 							getLogger().warning("Remote service management service could not decode message."+orig);
+							e.printStackTrace();
 						}
 					}
 					
