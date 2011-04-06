@@ -197,52 +197,39 @@ public class GenerateService extends BasicService implements IGenerateService
 
 		// Split area into work units.
 		final Set	areas	= new HashSet();	// {AreaData}
-		int numx = Math.max((int)Math.sqrt((double)data.getSizeX()*data.getSizeY()*data.getMax()/(data.getTaskSize()*data.getTaskSize()*256)), 1);
-		int numy = numx;
+		long	task	= data.getTaskSize()*data.getTaskSize()*256;
+		long	pic	= data.getSizeX()*data.getSizeY()*data.getMax();
+		int numx = (int)Math.max(Math.round(Math.sqrt((double)pic/task)), 1);
+		int numy = (int)Math.max(Math.round((double)pic/(task*numx)), 1);
 		final long	time	= System.nanoTime();	
 //		System.out.println("Number of tasks: "+numx+", "+numy+", max="+data.getMax()+" tasksize="+data.getTaskSize());
 		
-		final int sizex = data.getSizeX()/numx;
-		final int sizey = data.getSizeY()/numy;
-		int restx = data.getSizeX()-numx*sizex;
-		int resty = data.getSizeY()-numy*sizey;
+		double	areawidth	= data.getXEnd() - data.getXStart();
+		double	areaheight	= data.getYEnd() - data.getYStart();
+		int	numx0	=numx;
 		
-		// If rest if too large add more chunks
-		numx += restx/sizex;
-		numy += resty/sizey;
-		restx = restx%sizex;
-		resty = resty%sizey;
-		
-		double xdiv = restx==0? numx: ((double)restx)/sizex+numx;
-		double ydiv = resty==0? numy: ((double)resty)/sizey+numy;
-		
-		double xdiff = (data.getXEnd()-data.getXStart())/xdiv;
-		double ydiff = (data.getYEnd()-data.getYStart())/ydiv;
-		
-		if(restx>0)
-			numx++;
-		if(resty>0)
-			numy++;
-		
-//		System.out.println("ad: "+data+" "+numx+" "+restx+" "+xdiff);
-		
-		double x1 = data.getXStart();
-		double y1 = data.getYStart();
-				
-		for(int yi=0; yi<numy; yi++)
+		int	resty	= data.getSizeY();
+		for(; numy>0; numy--)
 		{
-			for(int xi=0; xi<numx; xi++)
+			int	sizey	= (int)Math.round((double)resty/numy);
+			double	ystart	= data.getYStart() + areaheight*(((double)data.getSizeY()-resty)/data.getSizeY());
+			double	yend	= data.getYStart() + areaheight*(((double)data.getSizeY()-(resty-sizey))/data.getSizeY()); 
+
+			int	restx	= data.getSizeX();
+			for(numx=numx0; numx>0; numx--)
 			{
+				int	sizex	= (int)Math.round((double)restx/numx);
+				double	xstart	= data.getXStart() + areawidth*(((double)data.getSizeX()-restx)/data.getSizeX()); 
+				double	xend	= data.getXStart() + areawidth*(((double)data.getSizeX()-(restx-sizex))/data.getSizeX()); 
+				
 //				System.out.println("x:y: start "+x1+" "+(x1+xdiff)+" "+y1+" "+(y1+ydiff)+" "+xdiff);
-				areas.add(new AreaData(x1, xi==numx-1 && restx>0 ? x1+(xdiff*restx/sizex): x1+xdiff,
-					y1, yi==numy-1 && resty>0 ? y1+(ydiff*resty/sizey) : y1+ydiff,
-					xi*sizex, yi*sizey, xi==numx-1 && restx>0 ? restx : sizex, yi==numy-1 && resty>0 ? resty : sizey,
+				areas.add(new AreaData(xstart, xend, ystart, yend,
+					data.getSizeX()-restx, data.getSizeY()-resty, sizex, sizey,
 					data.getMax(), 0, 0, data.getAlgorithm(), null, null));
 //				System.out.println("x:y: "+xi+" "+yi+" "+ad);
-				x1 += xdiff;
+				restx	-= sizex;
 			}
-			x1 = data.getXStart();
-			y1 += ydiff;
+			resty	-= sizey;
 		}
 
 		// Create array for holding results.
