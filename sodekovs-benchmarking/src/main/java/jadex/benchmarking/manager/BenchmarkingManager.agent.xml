@@ -48,46 +48,10 @@
 		<belief name="MemoryLogerID" class="String">
 			<fact> String.valueOf(new java.util.Random().nextInt())</fact>
 			<assignto ref="memoryLoggerCap.MemoryLoggerID" />
-		</belief>
-
-		<!-- Can be used to force the terminatin of the benchmark, e.g., may happen, 
-			if the termination condition of the benchmark is reached before all sequences 
-			have been run. -->
-		<belief name="terminateBenchmark" class="boolean">
-			<fact>false</fact>
-		</belief>
+		</belief>		
 
 	</beliefs>
 
-	<goals>
-		<!-- Responsible for managing the start of the sequences of a benchmark 
-			at the right time -->
-		<achievegoal name="ScheduleSequencesGoal" retry="false"
-			exclude="never">
-			<!-- Contains references of the SuT. -->
-			<parameter name="args" class="SuTinfo" />
-			<!-- Happens, if the termination condition of the benchmark is reached 
-				before all sequences have been run. -->
-			<dropcondition>
-				$beliefbase.terminateBenchmark
-			</dropcondition>
-		</achievegoal>
-
-		<!-- Contains a sequence of the schedule that has to be executed many times 
-			/ repeatedly. -->
-		<achievegoal name="SequenceRepeaterGoal" retry="false"
-			exclude="never">
-			<!-- Contains references of the SuT. -->
-			<parameter name="args" class="SuTinfo" />
-			<!-- Sequence to be executed repeatedly. -->
-			<parameter name="sequence" class="Sequence" />
-			<!-- Happens, if the termination condition of the benchmark is reached 
-				before all sequences have been run. -->
-			<dropcondition>
-				$beliefbase.terminateBenchmark
-			</dropcondition>
-		</achievegoal>
-	</goals>
 
 	<plans>
 		<!-- Init the benchmark. -->
@@ -95,31 +59,6 @@
 			<body class="InitBenchmarkingPlan" />
 		</plan>
 
-		<!-- Start Sequence Scheduler. -->
-		<plan name="start_sequences_scheduler">
-			<body class="ScheduleSequencesPlan" />
-			<parameter name="args" class="SuTinfo">
-				<goalmapping ref="ScheduleSequencesGoal.args" />
-			</parameter>
-			<trigger>
-				<goal ref="ScheduleSequencesGoal" />
-			</trigger>
-		</plan>
-
-		<!-- Start sequence of the schedule that has to be executed many times 
-			/ repeatedly. -->
-		<plan name="start_sequence_repeater">
-			<body class="SequenceRepeaterPlan" />
-			<parameter name="args" class="SuTinfo">
-				<goalmapping ref="SequenceRepeaterGoal.args" />
-			</parameter>
-			<parameter name="sequence" class="Sequence">
-				<goalmapping ref="SequenceRepeaterGoal.sequence" />
-			</parameter>
-			<trigger>
-				<goal ref="SequenceRepeaterGoal" />
-			</trigger>
-		</plan>
 	</plans>
 
 

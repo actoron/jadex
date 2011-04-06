@@ -5,10 +5,10 @@
 
 <Schedule type="Workload" name="W1" warmUpTime="1000">
 	<TerminateCondition>
-		<TerminationTime value="7000" />
-		<!-- <SemanticCondition condition="$object.getProperty(&quot;ore&quot;) >= 55">
+		<!-- <TerminationTime value="7000" /> -->
+		<SemanticCondition condition="$object.getProperty(&quot;ore&quot;) >= 55">
 			<ObjectSource type="ISpaceObject" name="homebase" />
-		</SemanticCondition> -->
+		</SemanticCondition>
 
 		<!-- <TargetFunction function="$beliefbase.tmpCounter>= 13"> <ObjectSource 
 			type="BDI_AGENT" name="Sentry" /> </TargetFunction> -->

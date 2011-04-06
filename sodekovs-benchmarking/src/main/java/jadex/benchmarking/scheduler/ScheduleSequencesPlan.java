@@ -44,7 +44,7 @@ public class ScheduleSequencesPlan extends Plan {
 
 	public void body() {
 
-		init((SuTinfo) getParameter("args").getValue());
+		init((SuTinfo) getBeliefbase().getBelief(Constants.SUT_INFO).getFact());
 
 		// responsible to start the components
 		startScheduler();
@@ -65,18 +65,7 @@ public class ScheduleSequencesPlan extends Plan {
 				// Dispatch separate goal to handle sequence 
 				IGoal eval = (IGoal) getGoalbase().createGoal("SequenceRepeaterGoal");
 				eval.getParameter("args").setValue(new SuTinfo(sortedSequenceList, sutCID, sutExta, sutSpace));		
-				eval.getParameter("sequence").setValue(nextSequence);
-				eval.addGoalListener(new IGoalListener()
-				{
-					public void goalFinished(AgentEvent ae)
-					{
-						System.out.println("------SequenceRepeaterGoal---------");
-					}
-					
-					public void goalAdded(AgentEvent ae)
-					{
-					}
-				});
+				eval.getParameter("sequence").setValue(nextSequence);				
 				getGoalbase().dispatchTopLevelGoal(eval);		
 			} else {
 				for (Action nextAction : nextSequence.getActions().getAction()) {

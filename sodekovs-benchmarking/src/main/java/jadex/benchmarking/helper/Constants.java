@@ -23,6 +23,7 @@ public class Constants {
 	public static final String DELETE = "delete";
 	public static final String SPACE = "space";
 	public static final String LIST = "list";
-	
+	public static final String PATH_OF_SCHEDULER = "../sodekovs-benchmarking/src/main/java/jadex/benchmarking/scheduler/Scheduler.agent.xml";
+	public static final String SUT_INFO = "SuTinfo";
 
 }

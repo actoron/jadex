@@ -44,6 +44,8 @@ public class InitBenchmarkingPlan extends Plan {
 	private IApplicationExternalAccess sutExta = null;
 	// Space of System Under Test
 	private AbstractEnvironmentSpace sutSpace = null;
+	// Component Identifier of scheduler
+	private IComponentIdentifier schedulerCID = null;
 
 	public void body() {
 
@@ -64,39 +66,20 @@ public class InitBenchmarkingPlan extends Plan {
 			startSuT(benchConf);
 		}
 
-		// resume system under test
-		cms.resumeComponent(sutCID).get(this);
+		// Start scheduler, that handles the execution of the sequences of the conducted benchmark.
+		// Scheduler is started in suspend mode.
+		startScheduler();
 
-		// Warm up phase
-		if (benchConf.getWarmUpTime() != null) {
-			System.out.println("#InitBench# Started warm up phase of : " + benchConf.getWarmUpTime() + " msec.");
-			waitFor(benchConf.getWarmUpTime());
-		}
-		
+		// Resume SuT and scheduler
+		cms.resumeComponent(sutCID);
+		cms.resumeComponent(schedulerCID);
+
 		// TODO: Hack: Synchronize start time!
 		long startTime = clockservice.getTime();
 		sutSpace.setProperty("BENCHMARK_REAL_START_TIME_OF_SIMULATION", startTime);
-		
-		// Dispatch separate goal to start scheduler 
-		IGoal eval = (IGoal) getGoalbase().createGoal("ScheduleSequencesGoal");
-		eval.getParameter("args").setValue(new SuTinfo(sortedSequenceList, sutCID, sutExta, sutSpace));
-		eval.addGoalListener(new IGoalListener()
-		{
-			public void goalFinished(AgentEvent ae)
-			{
-				System.out.println("------ScheduleSequencesGoal---------");
-			}
-			
-			public void goalAdded(AgentEvent ae)
-			{
-			}
-		});
-		
-		getGoalbase().dispatchTopLevelGoal(eval);
-		
+
 		// Handle termination of benchmark
 		terminateBenchmark(benchConf);
-			
 	}
 
 	/*
@@ -113,18 +96,30 @@ public class InitBenchmarkingPlan extends Plan {
 		sutExta = (IApplicationExternalAccess) cms.getExternalAccess(sutCID).get(this);
 		sutSpace = ((AbstractEnvironmentSpace) (sutExta).getSpace(sutProperties.get(Constants.SPACE_NAME)));
 	}
-	
+
+	/*
+	 * Start scheduler in suspended mode.
+	 */
+	private void startScheduler(){
+		HashMap args = new HashMap();
+		args.put(Constants.SUT_INFO, new SuTinfo(sortedSequenceList, sutCID, sutExta, sutSpace));
+		
+		IFuture fut = cms.createComponent("Scheduler" + GetRandom.getRandom(100000), Constants.PATH_OF_SCHEDULER, new CreationInfo(null, args, null, true, false), null);
+		schedulerCID = (IComponentIdentifier) fut.get(this);
+	}
+
 	/*
 	 * Handle termination of benchmark
+	 * 
 	 * @param benchConf
 	 */
-	private void terminateBenchmark(Schedule benchConf){
-		if(benchConf.getTerminateCondition() != null){
-			if(benchConf.getTerminateCondition().getTerminationTime() != null){
+	private void terminateBenchmark(Schedule benchConf) {
+		if (benchConf.getTerminateCondition() != null) {
+			if (benchConf.getTerminateCondition().getTerminationTime() != null) {
 				waitFor(benchConf.getTerminateCondition().getTerminationTime().getValue());
 				System.out.println("#InitBenchmarkingPlan# Benchmark terminated according to specified termination time.");
 				destroySuT();
-			} else if(benchConf.getTerminateCondition().getSemanticCondition() != null){
+			} else if (benchConf.getTerminateCondition().getSemanticCondition() != null) {
 				SemanticCondition semCond = benchConf.getTerminateCondition().getSemanticCondition();
 				boolean terminate = false;
 				// HACK: Need a observer / listener instead evaluating expression every 1000ms
@@ -147,40 +142,40 @@ public class InitBenchmarkingPlan extends Plan {
 						OAVBDIFetcher fetcher = new OAVBDIFetcher(state, rCapability);
 						terminate = EvaluateExpression.evaluateExpression(fetcher, semCond.getCondition());
 					}
-					
+
 					// Experiment has reached Target Function. Terminate
 					if (terminate) {
 						System.out.println("#InitBenchmarkingPlan# Terminate experiment: Semantic termination condition has been evaluated being true.");
 						break;
 					}
 				}
-				//destroy sytem under test
+				// destroy sytem under test
 				destroySuT();
-			}else{
+			} else {
 				System.out.println("#InitBenchmarkingPlan# Error: NO termination condition specified. Benchmark will not be automatically terminated by BenchmarkingAgent.");
 			}
-		}else{
+		} else {
 			System.out.println("#InitBenchmarkingPlan# NO termination condition specified. Benchmark will not be automatically terminated by BenchmarkingAgent.");
 		}
 	}
-	
+
 	/*
 	 * Destroy SuT
 	 */
-	private void destroySuT(){
-		//force the two goals: "SequenceRepeaterGoal" and "ScheduleSequencesGoal" to terminate
-		getBeliefbase().getBelief("terminateBenchmark").setFact(false);
+	private void destroySuT() {
 		
-		cms.destroyComponent(sutExta.getComponentIdentifier());
+		cms.destroyComponent(schedulerCID).get(this);
+		cms.destroyComponent(sutExta.getComponentIdentifier()).get(this);
 	}
-	
+
 	/*
 	 * Get time stamp relative to start of benchmark (without warm up phase)
+	 * 
 	 * @return
 	 */
-	private long getTimestamp(){
+	private long getTimestamp() {
 		long starttime = ((Long) sutSpace.getProperty("BENCHMARK_REAL_START_TIME_OF_SIMULATION")).longValue();
-		return clockservice.getTime() - starttime; 
+		return clockservice.getTime() - starttime;
 	}
 
 	/*
