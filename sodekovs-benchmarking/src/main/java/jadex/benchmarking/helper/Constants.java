@@ -15,5 +15,14 @@ public class Constants {
 	public static final String COMPONENT_NAME = "componentname";
 	public static final String COMPONENT_TYPE = "componenttype";
 	public static final String COMPONENT_MODEL = "componentmodel";
+	public static final String BDI_AGENT = "BDIAgent";
+	public static final String ISPACE_OBJECT = "ISpaceObject";
+	public static final String CREATE = "create";
+	public static final String READ = "read";
+	public static final String UPDATE = "update";
+	public static final String DELETE = "delete";
+	public static final String SPACE = "space";
+	public static final String LIST = "list";
+	
 
 }

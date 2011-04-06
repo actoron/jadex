@@ -3,6 +3,14 @@
 	<xs:element name="Schedule">
 		<xs:complexType>
 			<xs:sequence>
+				<xs:element name="TerminateCondition">
+					<xs:complexType>
+						<xs:choice>
+							<xs:element ref="TerminationTime"/>
+							<xs:element ref="SemanticCondition"/>
+						</xs:choice>
+					</xs:complexType>
+				</xs:element>
 			<!-- Needs to be specified if the System under Test (SuT) has to be started by the benchmark, i.e. it is not running.-->
 				<xs:element name="SytemUnderTest">
 					<xs:complexType>
@@ -34,6 +42,22 @@
 	<xs:element name="Sequence">
 		<xs:complexType>
 			<xs:sequence>
+			<!-- RepeatConf: Specifies how this sequences can be repeated, if required. -->
+				<xs:element name="RepeatConfiguration">
+					<xs:complexType>								
+						<xs:attribute name="type" use="required">
+							<xs:simpleType>
+								<xs:restriction base="xs:NMTOKEN">
+									<xs:enumeration value="list"/>
+									<xs:enumeration value="space"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>									
+						<xs:attribute name="end" type="xs:string"/>
+						<xs:attribute name="step" type="xs:string"/>
+						<xs:attribute name="values" type="xs:string"/>
+					</xs:complexType>
+				</xs:element>
 				<xs:element name="Actions">
 					<xs:complexType>
 						<xs:sequence>
@@ -43,6 +67,16 @@
 				</xs:element>				
 			</xs:sequence>			
 			<xs:attribute name="starttime" type="xs:long" use="required"/>
+			<xs:attribute name="actiontype" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="create"/>								
+						<xs:enumeration value="read"/>
+						<xs:enumeration value="update"/>
+						<xs:enumeration value="delete"/>									
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="Action">
@@ -53,6 +87,7 @@
 		<xs:attribute name="componentname" type="xs:string" use="required"/>
 		<xs:attribute name="componenttype" type="xs:string" use="required"/>
 		<xs:attribute name="componentmodel" type="xs:string" use="required"/>
+		<xs:attribute name="numberOfComponents" type="xs:int" default="1"/>
 		</xs:complexType>
 	</xs:element>
 	
@@ -68,6 +103,35 @@
 		<xs:complexType>
 			<xs:attribute name="name" type="xs:string"/>
 			<xs:attribute name="value" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="TerminationTime">
+		<xs:complexType>
+			<xs:attribute name="value" type="xs:long" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="SemanticCondition">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ObjectSource"/>
+			</xs:sequence>
+			<xs:attribute name="condition" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="ObjectSource">
+		<xs:complexType>
+			<xs:attribute name="type" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="BDIAgent"/>
+						<xs:enumeration value="ISpaceObject"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="name" type="xs:string" use="required"/>
 		</xs:complexType>
 	</xs:element>
 </xs:schema>

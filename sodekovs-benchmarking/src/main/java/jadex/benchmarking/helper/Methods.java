@@ -5,6 +5,7 @@ package jadex.benchmarking.helper;
 
 import jadex.benchmarking.model.Property;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,4 +28,20 @@ public class Methods {
 		}		
 		return map;
 	}
+	
+	 /**
+	  * Return the values, initially "only" a string of values, as an ArrayList of separated values.
+	  * @param values
+	  * @return
+	  */
+   	public static ArrayList<String> getValuesAsList(String values) {   		
+   			ArrayList<String> valuesAsList = new ArrayList<String>();   			
+   			
+   			while(values.indexOf(";") != -1){
+   				valuesAsList.add(values.substring(0, values.indexOf(";")));
+   				values = values.substring(values.indexOf(";")+1);
+   			}		
+   		
+   		return valuesAsList;	
+   	}
 }

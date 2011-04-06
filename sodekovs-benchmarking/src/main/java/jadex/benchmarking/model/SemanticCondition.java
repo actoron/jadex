@@ -11,6 +11,7 @@ package jadex.benchmarking.model;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -24,8 +25,10 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="name" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="value" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;sequence>
+ *         &lt;element ref="{}ObjectSource"/>
+ *       &lt;/sequence>
+ *       &lt;attribute name="condition" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -34,61 +37,63 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "")
-@XmlRootElement(name = "Property")
-public class Property {
+@XmlType(name = "", propOrder = {
+    "objectSource"
+})
+@XmlRootElement(name = "SemanticCondition")
+public class SemanticCondition {
 
-    @XmlAttribute
-    protected String name;
-    @XmlAttribute
-    protected String value;
+    @XmlElement(name = "ObjectSource", required = true)
+    protected ObjectSource objectSource;
+    @XmlAttribute(required = true)
+    protected String condition;
 
     /**
-     * Gets the value of the name property.
+     * Gets the value of the objectSource property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link ObjectSource }
+     *     
+     */
+    public ObjectSource getObjectSource() {
+        return objectSource;
+    }
+
+    /**
+     * Sets the value of the objectSource property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link ObjectSource }
+     *     
+     */
+    public void setObjectSource(ObjectSource value) {
+        this.objectSource = value;
+    }
+
+    /**
+     * Gets the value of the condition property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getName() {
-        return name;
+    public String getCondition() {
+        return condition;
     }
 
     /**
-     * Sets the value of the name property.
+     * Sets the value of the condition property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setName(String value) {
-        this.name = value;
-    }
-
-    /**
-     * Gets the value of the value property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getValue() {
-        return value;
-    }
-
-    /**
-     * Sets the value of the value property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setValue(String value) {
-        this.value = value;
+    public void setCondition(String value) {
+        this.condition = value;
     }
 
 }
