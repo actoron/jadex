@@ -390,9 +390,8 @@ public class DisplayPanel extends JComponent
 																						{
 																							progressdata.remove(progress);
 																						}
-																						else
+																						else if(progressupdate!=null)
 																						{
-	//																						exception.printStackTrace();
 																							progressupdate.stop();
 																							progressupdate	= null;
 																						}
@@ -408,9 +407,8 @@ public class DisplayPanel extends JComponent
 																			{
 																				progressdata.remove(progress);
 																			}
-																			else
+																			else if(progressupdate!=null)
 																			{
-	//																			exception.printStackTrace();
 																				progressupdate.stop();
 																				progressupdate	= null;
 																			}
@@ -425,9 +423,8 @@ public class DisplayPanel extends JComponent
 																	{
 																		progressdata.remove(progress);
 																	}
-																	else
+																	else if(progressupdate!=null)
 																	{
-	//																	exception.printStackTrace();
 																		progressupdate.stop();
 																		progressupdate	= null;
 																	}
@@ -448,7 +445,7 @@ public class DisplayPanel extends JComponent
 									}
 								});
 							}
-							else
+							else if(progressupdate!=null)
 							{
 								progressupdate.stop();
 								progressupdate	= null;
