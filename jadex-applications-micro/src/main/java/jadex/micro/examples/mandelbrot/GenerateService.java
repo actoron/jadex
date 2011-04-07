@@ -197,8 +197,8 @@ public class GenerateService extends BasicService implements IGenerateService
 
 		// Split area into work units.
 		final Set	areas	= new HashSet();	// {AreaData}
-		long	task	= data.getTaskSize()*data.getTaskSize()*256;
-		long	pic	= data.getSizeX()*data.getSizeY()*data.getMax();
+		long	task	= (long)data.getTaskSize()*data.getTaskSize()*256;
+		long	pic	= (long)data.getSizeX()*data.getSizeY()*data.getMax();
 		int numx = (int)Math.max(Math.round(Math.sqrt((double)pic/task)), 1);
 		int numy = (int)Math.max(Math.round((double)pic/(task*numx)), 1);
 		final long	time	= System.nanoTime();	
