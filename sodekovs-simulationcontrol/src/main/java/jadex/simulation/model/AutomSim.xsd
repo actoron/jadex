@@ -138,13 +138,13 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:attribute>
-			<xs:attribute name="name" use="required">
-				<xs:simpleType>
+			<xs:attribute name="name" type="xs:string" use="required">
+				<!--<xs:simpleType>
 					<xs:restriction base="xs:NMTOKEN">
 						<xs:enumeration value="Sentry"/>
 						<xs:enumeration value="homebase"/>
 					</xs:restriction>
-				</xs:simpleType>
+				</xs:simpleType>-->
 			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
