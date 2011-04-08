@@ -15,7 +15,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -39,11 +38,11 @@ public class ServicePoolManager
 	/** The maximum number of services (-1 for unlimited). */
 	protected int	max;
 	
-	/** The collection of free services. */
-	protected Set	free;
+	/** The collection of free services (id->service). */
+	protected Map	free;
 	
-	/** The collection of busy services. */
-	protected Set	busy;
+	/** The collection of busy services (id->service). */
+	protected Map	busy;
 	
 	/** The open tasks with their corresponding allocation data. */
 	protected Map	tasks;
@@ -70,8 +69,8 @@ public class ServicePoolManager
 		this.name	= name;
 		this.handler	= handler;
 		this.max	= max;
-		this.free	= new HashSet();
-		this.busy	= new HashSet();
+		this.free	= new HashMap();
+		this.busy	= new HashMap();
 		this.tasks	= new HashMap();
 	}
 	
@@ -87,6 +86,7 @@ public class ServicePoolManager
 	public IIntermediateFuture	performTasks(Set tasks, boolean retry, Object user)
 	{
 //		System.out.println("Peforming "+tasks.size()+" tasks");
+//		System.out.println("Performing tasks: busy="+busy.size()+", free="+free.size());
 		
 		// Allocation data binds tasks together to a single result future.
 		AllocationData	ad	= new AllocationData(tasks.size(), retry, user);
@@ -99,7 +99,7 @@ public class ServicePoolManager
 		}
 		
 		// Search for new services if not all tasks could be assigned.
-		if(!allassigned)
+		if(!allassigned && busy.size()+free.size()<max)
 			searchServices();
 	
 		return ad.getResult();
@@ -130,7 +130,7 @@ public class ServicePoolManager
 		// Assign task to an available service, if any.
 		if(!free.isEmpty())
 		{
-			Iterator	it	= free.iterator();
+			Iterator	it	= free.values().iterator();
 			IService	service	= (IService)it.next();
 			it.remove();
 			// Re-adding services makes them look for new tasks.
@@ -194,7 +194,7 @@ public class ServicePoolManager
 				{
 //					System.out.println("wurksn3");
 					IService	service	= (IService)result;
-					if(!busy.contains(service) && !free.contains(service) && handler.selectService(service))
+					if(!busy.containsKey(service.getServiceIdentifier()) && !free.containsKey(service.getServiceIdentifier()) && handler.selectService(service))
 					{
 						addService(service);
 					}
@@ -205,6 +205,7 @@ public class ServicePoolManager
 				 */
 				public void finished()
 				{
+//					System.out.println("Search finished: busy="+busy.size()+", free="+free.size());
 //					System.out.println("wurksn2");
 					searching	= false;					
 					if(timer!=null)
@@ -252,16 +253,16 @@ public class ServicePoolManager
 	 */
 	protected void addService(final IService service)
 	{
-		assert !busy.contains(service) && !free.contains(service); 
+		assert !busy.containsKey(service.getServiceIdentifier()) && !free.containsKey(service.getServiceIdentifier()); 
 		
 		if(tasks.isEmpty())
 		{
 //			System.out.println("service free: "+service.getServiceIdentifier());
-			free.add(service);
+			free.put(service.getServiceIdentifier(), service);
 		}
 		else
 		{
-			busy.add(service);
+			busy.put(service.getServiceIdentifier(), service);
 			final Object task	=	this.tasks.keySet().iterator().next();
 			final AllocationData	ad	= (AllocationData)this.tasks.remove(task);
 //			System.out.println("started service: "+service.getServiceIdentifier()+", "+task);
@@ -277,7 +278,7 @@ public class ServicePoolManager
 					ad.taskFinished(result);
 					
 					// Invoke service again, if there are more tasks.
-					busy.remove(service);
+					busy.remove(service.getServiceIdentifier());
 					addService(service);
 				}
 				
@@ -298,7 +299,7 @@ public class ServicePoolManager
 					}
 					
 					// Remove service on failure and do not continue working on tasks with it.
-					busy.remove(service);
+					busy.remove(service.getServiceIdentifier());
 				}
 			}));
 		}
@@ -321,7 +322,8 @@ public class ServicePoolManager
 //					System.out.println("created service: "+((IService)result).getServiceIdentifier());
 					
 					// Add if not already found by concurrent search.
-					if(!busy.contains(result) && !free.contains(result))
+					IService	service	= (IService)result;
+					if(!busy.containsKey(service.getServiceIdentifier()) && !free.containsKey(service.getServiceIdentifier()))
 						addService((IService)result);
 					
 					// Create more services, if needed.

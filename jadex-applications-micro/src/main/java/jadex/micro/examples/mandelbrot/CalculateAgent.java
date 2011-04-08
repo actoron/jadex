@@ -106,17 +106,4 @@ public class CalculateAgent extends MicroAgent
 	{
 		this.progress	= progress;
 	}
-	
-	//-------- static methods --------
-
-//	/**
-//	 *  Get the meta information about the agent.
-//	 */
-//	public static MicroAgentMetaInfo getMetaInfo()
-//	{
-//		return new MicroAgentMetaInfo("Agent offering a calculate service.", null, 
-//			new IArgument[]{new Argument("delay", "Agent kills itself when no job arrives in the delay interval.", "Long", new Long(1000))},
-//			null, null, null,
-//			null, new ProvidedServiceInfo[]{new ProvidedServiceInfo(ICalculateService.class)});
-//	}
 }

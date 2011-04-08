@@ -90,7 +90,7 @@ public class GeneratePanel extends JPanel
 						public Object execute(final IInternalAccess ia)
 						{
 //							SServiceProvider.getDeclaredService(agent.getServiceProvider(), IGenerateService.class)
-							ia.getRequiredService("generateservice")	
+							ia.getRequiredService("generateservice")
 								.addResultListener(ia.createResultListener(new DefaultResultListener()
 							{
 								public void resultAvailable(Object result)

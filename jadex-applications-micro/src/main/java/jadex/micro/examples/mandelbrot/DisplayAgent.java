@@ -131,21 +131,4 @@ public class DisplayAgent extends MicroAgent
 	{
 		return this.panel;
 	}
-	
-	//-------- static methods --------
-
-//	/**
-//	 *  Get the meta information about the agent.
-//	 */
-//	public static MicroAgentMetaInfo getMetaInfo()
-//	{
-//		return new MicroAgentMetaInfo("Agent offering a display service.", null, null,
-//			null, null, null,
-//			new RequiredServiceInfo[]{
-//				new RequiredServiceInfo("generateservice", IGenerateService.class), 
-//				new RequiredServiceInfo("cmsservice", IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM),
-//				new RequiredServiceInfo("progressservice", IProgressService.class), // not used
-//						},
-//			new ProvidedServiceInfo[]{new ProvidedServiceInfo(IDisplayService.class)});
-//	}
 }

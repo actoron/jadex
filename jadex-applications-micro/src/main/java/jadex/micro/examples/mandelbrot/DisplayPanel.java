@@ -327,7 +327,7 @@ public class DisplayPanel extends JComponent
 				
 				if(progressupdate==null)
 				{
-					progressupdate	= new Timer(200, new ActionListener()
+					progressupdate	= new Timer(1000, new ActionListener()
 					{
 						public void actionPerformed(ActionEvent e)
 						{

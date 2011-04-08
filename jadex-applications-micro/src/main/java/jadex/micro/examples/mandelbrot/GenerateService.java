@@ -85,6 +85,7 @@ public class GenerateService extends BasicService implements IGenerateService
 						{
 							public void resultAvailable(Object result)
 							{
+//								System.out.println("service request: "+service);
 								((ICalculateService)service).calculateArea(ad).addResultListener(
 									agent.createResultListener(new DelegationResultListener(ret)
 								{
