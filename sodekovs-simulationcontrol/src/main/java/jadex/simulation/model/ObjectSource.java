@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;attribute name="type" use="required">
  *         &lt;simpleType>
  *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}NMTOKEN">
- *             &lt;enumeration value="BDI_Agent"/>
+ *             &lt;enumeration value="BDIAgent"/>
  *             &lt;enumeration value="ISpaceObject"/>
  *           &lt;/restriction>
  *         &lt;/simpleType>

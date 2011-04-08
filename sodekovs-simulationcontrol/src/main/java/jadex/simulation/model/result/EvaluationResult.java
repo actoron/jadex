@@ -1,6 +1,5 @@
 package jadex.simulation.model.result;
 
-import jadex.simulation.helper.TimeConverter;
 import jadex.simulation.model.ObservedEvent;
 
 import java.util.ArrayList;
@@ -9,6 +8,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 
 import javax.xml.bind.annotation.XmlRootElement;
+
+import sodekovs.util.misc.TimeConverter;
 
 /**
  * Contains only selected aspects of the simulation, e.g. the most important facts and results

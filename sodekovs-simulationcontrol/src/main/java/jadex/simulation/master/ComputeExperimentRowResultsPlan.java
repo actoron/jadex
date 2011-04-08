@@ -3,7 +3,6 @@ package jadex.simulation.master;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.simulation.helper.Constants;
-import jadex.simulation.helper.XMLHandler;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.EvaluationResult;
 import jadex.simulation.model.result.IntermediateResult;
@@ -18,6 +17,8 @@ import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import sodekovs.util.misc.XMLHandler;
 
 /**
  * Compute the results of one row of simulation experiments, e.g. experiments with the same setting but still different cause of non-determinism.

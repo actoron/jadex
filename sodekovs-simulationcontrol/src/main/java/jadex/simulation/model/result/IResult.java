@@ -6,7 +6,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import jadex.simulation.helper.XMLHandler;
+import sodekovs.util.misc.XMLHandler;
+
 import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.Observer;
 

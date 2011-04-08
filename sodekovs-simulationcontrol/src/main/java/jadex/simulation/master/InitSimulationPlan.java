@@ -7,14 +7,15 @@ import jadex.commons.collection.SCollection;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.simulation.helper.Constants;
-import jadex.simulation.helper.TimeConverter;
-import jadex.simulation.helper.XMLHandler;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.StartTime;
 import jadex.simulation.model.result.IntermediateResult;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import sodekovs.util.misc.TimeConverter;
+import sodekovs.util.misc.XMLHandler;
 
 public class InitSimulationPlan extends Plan{
 

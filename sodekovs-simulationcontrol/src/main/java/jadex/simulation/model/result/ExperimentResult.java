@@ -1,6 +1,5 @@
 package jadex.simulation.model.result;
 
-import jadex.simulation.helper.TimeConverter;
 import jadex.simulation.model.ObservedEvent;
 
 import java.util.ArrayList;
@@ -11,6 +10,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import sodekovs.util.misc.TimeConverter;
 
 /**
  * Class contains the results of one experiment

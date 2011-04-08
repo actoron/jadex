@@ -22,7 +22,7 @@
 
 	<Observers>
 		<!--
-			<Observer> <Data name="StepLogger"> <ObjectSource type="BDI_Agent"
+			<Observer> <Data name="StepLogger"> <ObjectSource type="BDIAgent"
 			name="Sentry" /> <ElementSource type="BDI_BELIEF" name="myPos"
 			class="String" /> </Data> <Evaluation mode="periodical" value="1000"
 			/> <Filter mode="all" /> </Observer>
@@ -167,7 +167,7 @@
 		--><!-- Add type of element: String, long, int etc.? -->
 		<!--</Data>-->
 		<Data name="NumberOfSentries"> <!-- Referenz to $args.value in application.xml -->
-			<ObjectSource type="BDI_Agent" name="Sentry" />
+			<ObjectSource type="BDIAgent" name="Sentry" />
 			<ElementSource type="AgentNumber" name="AgentNumber"
 				class="Int" /><!-- Add type of element: String, long, int etc.? -->
 		</Data>
@@ -205,7 +205,7 @@
 				
 				<!--
 					<TargetFunction function="$beliefbase.tmpCounter>= 13">
-					<ObjectSource type="BDI_AGENT" name="Sentry" /> </TargetFunction>
+					<ObjectSource type="BDIAGENT" name="Sentry" /> </TargetFunction>
 				-->
 			</TerminateCondition>
 		</Rows>

@@ -135,7 +135,7 @@
 				
 				<!--
 					<TargetFunction function="$beliefbase.tmpCounter>= 13">
-					<ObjectSource type="BDI_AGENT" name="Sentry" /> </TargetFunction>
+					<ObjectSource type="BDIAGENT" name="Sentry" /> </TargetFunction>
 				-->
 			</TerminateCondition>
 		</Rows>

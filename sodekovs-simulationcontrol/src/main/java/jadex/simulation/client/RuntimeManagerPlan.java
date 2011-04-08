@@ -28,12 +28,7 @@ import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.state.IOAVState;
 import jadex.simulation.controlcenter.OnlineVisualisation;
 import jadex.simulation.evaluation.SimulationDataConsumer;
-import jadex.simulation.helper.AgentMethods;
 import jadex.simulation.helper.Constants;
-import jadex.simulation.helper.EvaluateExpression;
-import jadex.simulation.helper.FileHandler;
-import jadex.simulation.helper.TimeConverter;
-import jadex.simulation.helper.XMLHandler;
 import jadex.simulation.model.Data;
 import jadex.simulation.model.Dataconsumer;
 import jadex.simulation.model.Dataprovider;
@@ -51,6 +46,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import sodekovs.util.misc.AgentMethods;
+import sodekovs.util.misc.EvaluateExpression;
+import sodekovs.util.misc.FileHandler;
+import sodekovs.util.misc.GlobalConstants;
+import sodekovs.util.misc.TimeConverter;
+import sodekovs.util.misc.XMLHandler;
 
 public class RuntimeManagerPlan extends Plan {
 
@@ -118,7 +120,7 @@ public class RuntimeManagerPlan extends Plan {
 				// of that type...
 				// Additionally: only one part of the equation can be an
 				// object...
-				if (targetFunct.getObjectSource().getType().equalsIgnoreCase(Constants.ISPACE_OBJECT)) {
+				if (targetFunct.getObjectSource().getType().equalsIgnoreCase(GlobalConstants.ISPACE_OBJECT)) {
 
 					// // String expression =
 					// "$object.getProperty(\"ore\") >= 10";

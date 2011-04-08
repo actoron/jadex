@@ -3,7 +3,6 @@ package jadex.simulation.master;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.simulation.helper.Constants;
-import jadex.simulation.helper.FileHandler;
 import jadex.simulation.model.Configuration;
 import jadex.simulation.model.Data;
 import jadex.simulation.model.Optimization;
@@ -18,6 +17,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import sodekovs.util.misc.FileHandler;
 
 public class StartSimulationExperimentsPlan extends Plan {
 

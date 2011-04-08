@@ -133,7 +133,7 @@
 			<xs:attribute name="type" use="required">
 				<xs:simpleType>
 					<xs:restriction base="xs:NMTOKEN">
-						<xs:enumeration value="BDI_Agent"/>
+						<xs:enumeration value="BDIAgent"/>
 						<xs:enumeration value="ISpaceObject"/>
 					</xs:restriction>
 				</xs:simpleType>

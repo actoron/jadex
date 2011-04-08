@@ -1,16 +1,12 @@
 package jadex.simulation.analysis.common.dataObjects.parameter;
 
-import jadex.bdi.testcases.misc.GetExternalAccessPlan;
 import jadex.simulation.analysis.common.dataObjects.ADataObject;
-import jadex.simulation.analysis.common.dataObjects.IADataView;
 import jadex.simulation.analysis.common.events.data.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.swing.JFrame;
 
 public class AParameterEnsemble extends ADataObject implements IAParameterEnsemble
 {

@@ -108,7 +108,7 @@
 		--><!-- Add type of element: String, long, int etc.? -->
 		<!--</Data>-->
 		<Data name="NumberOfSentries"> <!-- Referenz to $args.value in application.xml -->
-			<ObjectSource type="BDI_Agent" name="Sentry" />
+			<ObjectSource type="BDIAgent" name="Sentry" />
 			<ElementSource type="AgentNumber" name="AgentNumber"
 				class="Int" /><!-- Add type of element: String, long, int etc.? -->
 		</Data>
@@ -145,7 +145,7 @@
 														-->					
 				<!--
 					<TargetFunction function="$beliefbase.tmpCounter>= 13">
-					<ObjectSource type="BDI_AGENT" name="Sentry" /> </TargetFunction>
+					<ObjectSource type="BDIAGENT" name="Sentry" /> </TargetFunction>
 				-->
 			</TerminateCondition>
 		</Rows>

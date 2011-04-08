@@ -27,7 +27,7 @@
 	<capabilities>
 		<!-- use capability that logs the memory consumption -->
 		<capability name="memoryLoggerCap"
-			file="jadex.simulation.helper.MemoryLogger" />
+			file="sodekovs.util.logger.MemoryLogger" />
 	</capabilities>
 	
 	

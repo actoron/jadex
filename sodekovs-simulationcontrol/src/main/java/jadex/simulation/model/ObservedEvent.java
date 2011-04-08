@@ -1,10 +1,10 @@
 package jadex.simulation.model;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import jadex.simulation.helper.TimeConverter;
+import sodekovs.util.misc.TimeConverter;
+
 
 /**
  * Denotes an event that has been observed at experiment runtime

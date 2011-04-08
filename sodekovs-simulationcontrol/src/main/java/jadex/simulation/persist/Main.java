@@ -1,6 +1,5 @@
 package jadex.simulation.persist;
 
-import jadex.simulation.helper.XMLHandler;
 import jadex.simulation.model.Data;
 import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.SimulationConfiguration;
@@ -20,6 +19,8 @@ import java.util.TimeZone;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
+import sodekovs.util.misc.XMLHandler;
 
 public class Main {
 

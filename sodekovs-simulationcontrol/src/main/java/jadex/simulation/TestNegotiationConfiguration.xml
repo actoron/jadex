@@ -108,17 +108,17 @@
 		--><!-- Add type of element: String, long, int etc.? -->
 		<!--</Data>-->
 		<Data name="TrustWeight"> <!-- Referenz to $args.value in application.xml -->
-			<ObjectSource type="BDI_Agent" name="SMA" />
+			<ObjectSource type="BDIAgent" name="SMA" />
 			<ElementSource type="AgentNumber" name="AgentNumber"
 				class="Double" /><!-- Add type of element: String, long, int etc.? -->
 		</Data>
 		<Data name="CostWeight"> <!-- Referenz to $args.value in application.xml -->
-			<ObjectSource type="BDI_Agent" name="SMA" />
+			<ObjectSource type="BDIAgent" name="SMA" />
 			<ElementSource type="AgentNumber" name="AgentNumber"
 				class="Double" /><!-- Add type of element: String, long, int etc.? -->
 		</Data>
 		<Data name="DurationWeight"> <!-- Referenz to $args.value in application.xml -->
-			<ObjectSource type="BDI_Agent" name="SMA" />
+			<ObjectSource type="BDIAgent" name="SMA" />
 			<ElementSource type="AgentNumber" name="AgentNumber"
 				class="Double" /><!-- Add type of element: String, long, int etc.? -->
 		</Data>
@@ -156,7 +156,7 @@
 														-->					
 				<!--
 					<TargetFunction function="$beliefbase.tmpCounter>= 13">
-					<ObjectSource type="BDI_AGENT" name="Sentry" /> </TargetFunction>
+					<ObjectSource type="BDIAGENT" name="Sentry" /> </TargetFunction>
 				-->
 			</TerminateCondition>
 		</Rows>
