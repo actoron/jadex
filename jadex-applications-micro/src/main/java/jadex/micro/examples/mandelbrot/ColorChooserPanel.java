@@ -158,6 +158,7 @@ public class ColorChooserPanel	extends JPanel
 				setColorScheme(panel, lm, cycle.isSelected());
 			}
 		});
+		gbc.gridx	= 0;
 		gbc.gridy	= 2;
 		gbc.gridwidth	= GridBagConstraints.REMAINDER;
 		this.add(cycle, gbc);
