@@ -545,15 +545,11 @@
 				<module>sodekovs-simulationcontrol</module>
 				<module>sodekovs-coordination</module>
 				<module>sodekovs-benchmarking</module>
-				<module>sodekovs-util</module>
+				<!-- <module>sodekovs-util</module>-->
 				<module>jadex-distributed</module>
 			</modules>
 		</profile>
 	</profiles>
-	<modules>
-		<module>sodekovs-benchmarking2</module>
-		<module>sodekovs-util</module>
-	</modules>
 
 	<!-- <url>http://jadex.sourceforge.net</url> -->
 
