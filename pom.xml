@@ -545,7 +545,7 @@
 				<module>sodekovs-simulationcontrol</module>
 				<module>sodekovs-coordination</module>
 				<module>sodekovs-benchmarking</module>
-				<!-- <module>sodekovs-util</module>-->
+				<module>sodekovs-util</module>
 				<module>jadex-distributed</module>
 			</modules>
 		</profile>
