@@ -40,6 +40,9 @@
 		<providedservice class="IModelRepositoryService">
 			new LinkedModelRepositoryService($component.getServiceProvider())
 		</providedservice>
+		<providedservice class="ILogService">
+			new LogService($component.getServiceProvider())
+		</providedservice>
 	</services>
 
 	<applications>

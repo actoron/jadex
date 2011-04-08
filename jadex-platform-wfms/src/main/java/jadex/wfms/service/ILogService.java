@@ -1,0 +1,26 @@
+package jadex.wfms.service;
+
+import jadex.bridge.IComponentIdentifier;
+import jadex.commons.future.IFuture;
+import jadex.wfms.service.listeners.ILogListener;
+
+public interface ILogService
+{
+	/**
+	 *  Adds a log listener.
+	 *  @param client The client adding the listener or null for none.
+	 *  @param listener The listener.
+	 *  @param pastEvents True, if past events should be passed to the listener.
+	 *  @return Indication of success.
+	 */
+	public IFuture addLogListener(IComponentIdentifier client, ILogListener listener, boolean pastEvents);
+	
+	/**
+	 *  Removes a log listener.
+	 *  
+	 *  @param client The client adding the listener or null for none.
+	 *  @param listener The listener.
+	 *  @return Indication of success.
+	 */
+	public IFuture removeLogListener(IComponentIdentifier client, ILogListener listener);
+}

@@ -7,6 +7,7 @@ import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.client.ProcessResource;
 import jadex.wfms.service.listeners.IActivityListener;
+import jadex.wfms.service.listeners.ILogListener;
 import jadex.wfms.service.listeners.IProcessListener;
 import jadex.wfms.service.listeners.IProcessRepositoryListener;
 import jadex.wfms.service.listeners.IWorkitemListener;
@@ -212,8 +213,9 @@ public interface IExternalWfmsService
 	 * 
 	 * @param client the client
 	 * @param listener the listener
+	 * @param pastEvents True, if the listener wishes to receive past events.
 	 */
-	//public IFuture addLogListener(IComponentIdentifier client, ILogListener listener);
+	public IFuture addLogListener(IComponentIdentifier client, ILogListener listener, boolean pastEvents);
 	
 	/**
 	 * Removes a log listener from the workflow management system.
@@ -221,7 +223,7 @@ public interface IExternalWfmsService
 	 * @param client the client
 	 * @param listener the listener
 	 */
-	//public IFuture removeLogListener(IComponentIdentifier client, ILogListener listener);
+	public IFuture removeLogListener(IComponentIdentifier client, ILogListener listener);
 	
 	/**
 	 * Adds a process listener to the workflow management system.

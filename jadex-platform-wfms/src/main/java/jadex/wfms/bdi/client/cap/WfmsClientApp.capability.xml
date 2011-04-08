@@ -13,6 +13,7 @@
 		<import>jadex.wfms.bdi.*</import>
 		<import>jadex.wfms.bdi.ontology.*</import>
 		<import>jadex.wfms.client.*</import>
+		<import>jadex.wfms.service.listeners.LogEvent</import>
 	</imports>
 	
 	<beliefs>
@@ -26,6 +27,7 @@
 		<belief name="add_user_activity_controller" class="javax.swing.Action" />
 		<belief name="remove_user_activity_controller" class="javax.swing.Action" />
 		<belief name="process_finished_controller" class="javax.swing.Action" />
+		<belief name="log_controller" class="javax.swing.Action" />
 		<belief name="lost_connection_controller" class="javax.swing.Action" />
 	</beliefs>
 	
@@ -137,6 +139,10 @@
 		
 		<achievegoal name="start_process_event_subscription" exported="true" />
 		
+		<achievegoal name="start_log_event_subscription" exported="true">
+			<parameter name="past_events" class="boolean" />
+		</achievegoal>
+		
 			<!-- Subscription Events (optional: use controllers) -->
 		<achievegoal name="add_user_activity" exported="true">
 			<parameter name="user_name" class="String" exported="true" />
@@ -150,6 +156,10 @@
 		
 		<achievegoal name="handle_process_finished" exported="true">
 			<parameter name="instance_id" class="String" exported="true" />
+		</achievegoal>
+		
+		<achievegoal name="handle_log_event" exported="true">
+			<parameter name="event" class="LogEvent" exported="true" />
 		</achievegoal>
 	</goals>
 	
@@ -421,6 +431,16 @@
 			</trigger>
 		</plan>
 		
+		<plan name="start_log_event_subscription_plan">
+			<parameter name="past_events" class="boolean">
+				<goalmapping ref="start_log_event_subscription.past_events"/>
+			</parameter>
+			<body class="LogEventSubscriptionPlan" />
+			<trigger>
+				<goal ref="start_log_event_subscription" />
+			</trigger>
+		</plan>
+		
 			<!-- Subscription controller plans -->
 		<plan name="add_user_activity_plan" priority="-1">
 			<parameter name="user_name" class="String">
@@ -458,6 +478,16 @@
 			<body class="ProcessFinishedPlan" />
 			<trigger>
 				<goal ref="handle_process_finished" />
+			</trigger>
+		</plan>
+		
+		<plan name="handle_log_event_plan" priority="-1">
+			<parameter name="event" class="LogEvent">
+				<goalmapping ref="handle_log_event.event"/>
+			</parameter>
+			<body class="LogEventPlan" />
+			<trigger>
+				<goal ref="handle_log_event" />
 			</trigger>
 		</plan>
 	</plans>

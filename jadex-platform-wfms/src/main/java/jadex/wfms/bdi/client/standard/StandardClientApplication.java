@@ -557,6 +557,17 @@ public class StandardClientApplication
 		agent.scheduleStep(new SetBeliefStep("clientcap.remove_user_activity_controller", uacRemoved));
 		
 		agent.scheduleStep(new DispatchGoalStep("clientcap.start_user_activities_subscription"));
+		
+		Action lEvent = new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				System.out.println(e.getSource());
+			}
+		};
+		agent.scheduleStep(new SetBeliefStep("clientcap.log_controller", lEvent));
+		
+		agent.scheduleStep(new DispatchGoalStep("clientcap.start_log_event_subscription"));
 	}
 	
 	private void setupActivityHandling()

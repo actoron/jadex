@@ -17,9 +17,11 @@ import jadex.wfms.service.AccessControlCheck;
 import jadex.wfms.service.IAAAService;
 import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IExternalWfmsService;
+import jadex.wfms.service.ILogService;
 import jadex.wfms.service.IModelRepositoryService;
 import jadex.wfms.service.IWorkitemHandlerService;
 import jadex.wfms.service.listeners.IActivityListener;
+import jadex.wfms.service.listeners.ILogListener;
 import jadex.wfms.service.listeners.IProcessListener;
 import jadex.wfms.service.listeners.IProcessRepositoryListener;
 import jadex.wfms.service.listeners.IWorkitemListener;
@@ -759,11 +761,28 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	 * 
 	 * @param client the client
 	 * @param listener the listener
+	 * @param pastEvents True, if the listener wishes to receive past events.
 	 */
-	//public IFuture addLogListener(IClient client, ILogListener listener)
-	//{
+	public IFuture addLogListener(final IComponentIdentifier client, final ILogListener listener, final boolean pastEvents)
+	{
+		final Future ret = new Future();
+		(new AccessControlCheck(client, IAAAService.ADMIN_ADD_LOG_LISTENER)).checkAccess(ret, provider, new ICommand()
+		{
+			public void execute(Object args)
+			{
+				SServiceProvider.getService(provider, ILogService.class).addResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						ILogService ls = ((ILogService) result);
+						ls.addLogListener(client, listener, pastEvents);
+					}
+				});
+			}
+		});
 		
-	//}
+		return ret;
+	}
 	
 	/**
 	 * Removes a log listener from the workflow management system.
@@ -771,7 +790,26 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	 * @param client the client
 	 * @param listener the listener
 	 */
-	//public IFuture removeLogListener(IClient client, ILogListener listener);
+	public IFuture removeLogListener(final IComponentIdentifier client, final ILogListener listener)
+	{
+		final Future ret = new Future();
+		(new AccessControlCheck(client, IAAAService.ADMIN_REMOVE_LOG_LISTENER)).checkAccess(ret, provider, new ICommand()
+		{
+			public void execute(Object args)
+			{
+				SServiceProvider.getService(provider, ILogService.class).addResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						ILogService ls = ((ILogService) result);
+						ls.removeLogListener(client, listener);
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
 	
 	/**
 	 * Adds a process listener to the workflow management system.
