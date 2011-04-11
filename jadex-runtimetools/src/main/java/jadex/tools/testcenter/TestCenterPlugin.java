@@ -269,14 +269,6 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	}
 	
 	/**
-	 *  Shutdown the plugin.
-	 */
-	public void shutdown()
-	{
-		savePlatformProperties();	// Todo: wait for platform properties to be saved?
-	}
-	
-	/**
 	 *  Load and apply the platform properties.
 	 */
 	public IFuture loadPlatformProperties()
@@ -327,7 +319,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	/**
 	 *  Save the platform properties.
 	 */
-	public IFuture	savePlatformProperties()
+	public IFuture	pushPlatformProperties()
 	{
 		final Future	ret	= new Future();
 		SServiceProvider.getService(getJCC().getPlatformAccess().getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -347,7 +339,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 							public void customResultAvailable(Object result)
 							{
 								props.addSubproperties("tcpanel", (Properties)result);
-								settings.setProperties("TestCenterPlugin", props, true)
+								settings.setProperties("TestCenterPlugin", props)
 									.addResultListener(new SwingDelegationResultListener(ret));
 							}
 						});

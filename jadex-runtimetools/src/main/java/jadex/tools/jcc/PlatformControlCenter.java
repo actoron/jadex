@@ -4,6 +4,7 @@ import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ISettingsService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
@@ -113,6 +114,51 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	public JComponent	getPanel()
 	{
 		return pccpanel;
+	}
+	
+	/**
+	 *  Push plugin settings to platform and save platform properties.
+	 */
+	public IFuture	savePlatformProperties()
+	{
+		final Future	ret	= new Future();
+		
+		IControlCenterPlugin[]	aplugins	= getPlugins();
+		CounterResultListener	crl	= new CounterResultListener(aplugins.length, new SwingDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result) throws Exception
+			{
+				SServiceProvider.getService(getPlatformAccess().getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new SwingDelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result) throws Exception
+					{
+						ISettingsService	settings	= (ISettingsService)result;
+						settings.saveProperties().addResultListener(new SwingDelegationResultListener(ret));
+					}
+					
+					public void customExceptionOccurred(Exception exception)
+					{
+						// No settings service: ignore.
+						ret.setResult(null);
+					}
+				});
+			}
+		});
+		
+		for(int i=0; i<aplugins.length; i++)
+		{
+			if(plugins.get(aplugins[i])!=null)
+			{
+				aplugins[i].pushPlatformSettings().addResultListener(crl);
+			}
+			else
+			{
+				crl.resultAvailable(null);
+			}
+		}
+		
+		return ret;
 	}
 	
 	//-------- methods called by platform control center panel --------

@@ -779,8 +779,6 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 								System.arraycopy(buf, 0, target, 0, pack.getLength());
 								
 								AwarenessInfo info = (AwarenessInfo)Reader.objectFromByteArray(reader, target, getModel().getClassLoader());
-								if(AwarenessInfo.STATE_OFFLINE.equals(info.getState()))
-									System.out.println("info: "+info);
 								if(info.getSender()!=null)
 								{
 									// Fix broken awareness infos for backwards compatibility.

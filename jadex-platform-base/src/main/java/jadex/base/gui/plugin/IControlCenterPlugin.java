@@ -1,6 +1,7 @@
 package jadex.base.gui.plugin;
 
 import jadex.commons.IPropertiesProvider;
+import jadex.commons.future.IFuture;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -50,4 +51,9 @@ public interface IControlCenterPlugin extends IPropertiesProvider
 	 *  Create a tool bar containing the items that should be added to the JCC tool bar. 
 	 */
 	public JComponent[] getToolBar();
+
+	/**
+	 *  Store settings if any in platform settings service.
+	 */
+	public IFuture pushPlatformSettings();
 }

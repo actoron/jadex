@@ -76,14 +76,13 @@ public class StarterPlugin extends AbstractJCCPlugin
 	{
 		return ((StarterPluginPanel)getView()).getProperties();
 	}
-
+	
 	/**
-	 *  Informs the panel that it should stop all its computation
+	 *  Store settings if any in platform settings service.
 	 */
-	public void shutdown()
+	public IFuture pushPlatformSettings()
 	{
-		// Todo wait for properties saved.
-		((StarterPluginPanel)getView()).savePlatformProperties();
+		return ((StarterPluginPanel)getView()).pushPlatformProperties();
 	}
 
 	/**

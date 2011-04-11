@@ -6,7 +6,6 @@ import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ISettingsService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
@@ -245,37 +244,13 @@ public class ControlCenter
 		{
 			public void customResultAvailable(Object result) throws Exception
 			{
-				savePlatformProperties().addResultListener(new SwingDelegationResultListener(ret));
+				pcc.savePlatformProperties().addResultListener(new SwingDelegationResultListener(ret));
 			}
 		});
 		
 		return ret;
 	}
 
-	/**
-	 *  Save the platform properties.
-	 */
-	public IFuture	savePlatformProperties()
-	{
-		final Future	ret	= new Future();
-		SServiceProvider.getService(pcc.getPlatformAccess().getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result) throws Exception
-			{
-				ISettingsService	settings	= (ISettingsService)result;
-				settings.saveProperties().addResultListener(new SwingDelegationResultListener(ret));
-			}
-			
-			public void customExceptionOccurred(Exception exception)
-			{
-				// No settings service: ignore.
-				ret.setResult(null);
-			}
-		});
-		
-		return ret;
-	}
 	/**
 	 * Save settings of JCC and all plugins in current project.
 	 */

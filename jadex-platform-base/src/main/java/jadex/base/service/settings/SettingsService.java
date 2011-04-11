@@ -1,18 +1,21 @@
 package jadex.base.service.settings;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.ISettingsService;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.xml.PropertiesXMLHelper;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -29,7 +32,7 @@ public class SettingsService extends BasicService implements ISettingsService
 	//-------- attributes --------
 	
 	/** The service provider. */
-	protected IServiceProvider	provider;
+	protected IInternalAccess	access;
 	
 	/** The properties file. */
 	protected File	file;
@@ -47,15 +50,15 @@ public class SettingsService extends BasicService implements ISettingsService
 	 *  @param prefix The settings file prefix to be used (if any).
 	 *    Uses name from service provider, if no prefix is given.
 	 */
-	public SettingsService(String prefix, IServiceProvider provider)
+	public SettingsService(String prefix, IInternalAccess access)
 	{
-		super(provider.getId(), ISettingsService.class, null);
-		this.provider	= provider;
+		super(access.getServiceProvider().getId(), ISettingsService.class, null);
+		this.access	= access;
 		this.providers	= new LinkedHashMap();
 		
 		if(prefix==null)
 		{
-			prefix	= provider.getId().toString();
+			prefix	= access.getComponentIdentifier().getPlatformName();
 			
 			// Strip auto-generated platform suffix (hack???).
 			if(prefix.indexOf('_')!=-1)
@@ -76,19 +79,19 @@ public class SettingsService extends BasicService implements ISettingsService
 	public IFuture	startService()
 	{
 		final Future	ret	= new Future();
-		super.startService().addResultListener(new DelegationResultListener(ret)
+		super.startService().addResultListener(access.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				loadProperties().addResultListener(new DelegationResultListener(ret)
+				loadProperties().addResultListener(access.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						super.customResultAvailable(getServiceIdentifier());
 					}
-				});
+				}));
 			}
-		});
+		}));
 		return ret;
 	}
 	
@@ -99,7 +102,8 @@ public class SettingsService extends BasicService implements ISettingsService
 	public IFuture	shutdownService()
 	{
 		final Future	ret	= new Future();
-		saveProperties().addResultListener(new DelegationResultListener(ret)
+		// Cannot use access.createResultListener() as component is already terminated.
+		saveProperties(true).addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -132,12 +136,7 @@ public class SettingsService extends BasicService implements ISettingsService
 			Properties	sub	= props.getSubproperty(id);
 			if(sub!=null)
 			{
-				provider.setProperties(sub).addResultListener(new DelegationResultListener(ret));//new DefaultResultListener()
-//				{
-//					public void resultAvailable(Object result)
-//					{
-//					}
-//				});//new DelegationResultListener(ret));
+				provider.setProperties(sub).addResultListener(access.createResultListener(new DelegationResultListener(ret)));
 			}
 			else
 			{
@@ -164,7 +163,7 @@ public class SettingsService extends BasicService implements ISettingsService
 		{
 			IPropertiesProvider	provider	= (IPropertiesProvider)providers.remove(id);
 //			System.out.println("Removed provider: "+id+", "+provider);
-			provider.getProperties().addResultListener(new DelegationResultListener(ret)
+			provider.getProperties().addResultListener(access.createResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
 				{
@@ -172,7 +171,7 @@ public class SettingsService extends BasicService implements ISettingsService
 					props.addSubproperties(id, (Properties)result);
 					ret.setResult(null);
 				}
-			});
+			}));
 		}
 		return ret;
 	}
@@ -186,33 +185,22 @@ public class SettingsService extends BasicService implements ISettingsService
 	 *  @param save 	Save platform properties after setting.
 	 *  @return A future indicating when properties have been set.
 	 */
-	public IFuture	setProperties(final String id, final Properties props, boolean save)
+	public IFuture	setProperties(String id, Properties props)
 	{
 		final Future	ret	= new Future();
 		this.props.removeSubproperties(id);
 		this.props.addSubproperties(id, props);
 		
-		IFuture	saved;
-		if(save)
-			saved	= saveProperties();
-		else
-			saved	= IFuture.DONE;
-		
-		saved.addResultListener(new DelegationResultListener(ret)
+		if(providers.containsKey(id))
 		{
-			public void customResultAvailable(Object result)
-			{
-				if(providers.containsKey(id))
-				{
-					((IPropertiesProvider)providers.get(id)).setProperties(props)
-						.addResultListener(new DelegationResultListener(ret));
-				}
-				else
-				{
-					ret.setResult(null);
-				}
-			}
-		});
+			((IPropertiesProvider)providers.get(id)).setProperties(props)
+				.addResultListener(access.createResultListener(new DelegationResultListener(ret)));
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
 		return ret;
 	}
 	
@@ -233,6 +221,8 @@ public class SettingsService extends BasicService implements ISettingsService
 	 */
 	public IFuture	loadProperties()
 	{
+		final Future	ret	= new Future();
+		
 		try
 		{
 			// Todo: Which class loader to use? library service unavailable, because it depends on settings service?
@@ -244,7 +234,26 @@ public class SettingsService extends BasicService implements ISettingsService
 		{
 			props	= new Properties();
 		}
-		return IFuture.DONE;
+		
+		final CounterResultListener	crl	= new CounterResultListener(providers.size(),
+			access.createResultListener(new DelegationResultListener(ret)));
+		for(Iterator it=providers.keySet().iterator(); it.hasNext(); )
+		{
+			final String	id	= (String)it.next();
+			IPropertiesProvider	provider	= (IPropertiesProvider)providers.get(id);
+			
+			Properties	sub	= props.getSubproperty(id);
+			if(sub!=null)
+			{
+				provider.setProperties(sub).addResultListener(access.createResultListener(crl));
+			}
+			else
+			{
+				crl.resultAvailable(null);
+			}
+		}
+
+		return ret;
 	}
 	
 	/**
@@ -253,18 +262,56 @@ public class SettingsService extends BasicService implements ISettingsService
 	 */
 	public IFuture	saveProperties()
 	{
-		try
+		return saveProperties(false);
+	}
+	
+	/**
+	 *  Save the platform properties to the default location.
+	 *  @param shutdown	Flag indicating if called during shutdown.
+	 *  @return A future indicating when properties have been saved.
+	 */
+	public IFuture	saveProperties(boolean shutdown)
+	{
+		final Future	ret	= new Future();
+		
+		IResultListener	rl	= new DelegationResultListener(ret)
 		{
-			// Todo: Which class loader to use? library service unavailable, because it depends on settings service?
-			FileOutputStream os = new FileOutputStream(file);
-			PropertiesXMLHelper.getPropertyWriter().write(props, os, getClass().getClassLoader(), null);
-			os.close();
-		}
-		catch(Exception e)
+			public void customResultAvailable(Object result)
+			{
+				try
+				{
+					// Todo: Which class loader to use? library service unavailable, because it depends on settings service?
+					FileOutputStream os = new FileOutputStream(file);
+					PropertiesXMLHelper.getPropertyWriter().write(props, os, getClass().getClassLoader(), null);
+					os.close();
+				}
+				catch(Exception e)
+				{
+					System.out.println("Warning: Could not save settings: "+e);
+				}
+				ret.setResult(null);
+			}
+		};
+		rl	= shutdown ? rl : access.createResultListener(rl); 
+		final CounterResultListener	crl	= new CounterResultListener(providers.size(), rl);
+		
+		for(Iterator it=providers.keySet().iterator(); it.hasNext(); )
 		{
-			System.out.println("Warning: Could not save settings: "+e);
+			final String	id	= (String)it.next();
+			IPropertiesProvider	provider	= (IPropertiesProvider)providers.get(id);
+			rl	= new DelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+					props.removeSubproperties(id);
+					props.addSubproperties(id, (Properties)result);
+					crl.resultAvailable(null);
+				}
+			};
+			rl	= shutdown ? rl : access.createResultListener(rl); 
+			provider.getProperties().addResultListener(rl);
 		}
 		
-		return IFuture.DONE;
+		return ret;
 	}
 }

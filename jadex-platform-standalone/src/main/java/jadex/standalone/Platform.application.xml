@@ -72,7 +72,7 @@
 	
 	<services>
 		<providedservice class="ISettingsService" direct="true">
-			new SettingsService($args.platformname, $component.getServiceProvider())
+			new SettingsService($args.platformname, $component)
 		</providedservice>
 		<providedservice class="IThreadPool" direct="true">
 			new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())

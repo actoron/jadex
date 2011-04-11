@@ -2,12 +2,14 @@ package jadex.base;
 
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -16,6 +18,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.javaparser.SJavaParser;
 
 import java.net.InetAddress;
@@ -84,6 +87,21 @@ public class Starter
 		{
 			public void resultAvailable(Object result)
 			{
+				final IExternalAccess	access	= (IExternalAccess)result;
+				Runtime.getRuntime().addShutdownHook(new Thread()
+				{
+					public void run()
+					{
+						try
+						{
+							access.killComponent().get(new ThreadSuspendable());
+						}
+						catch(ComponentTerminatedException cte)
+						{
+							// Already killed.
+						}
+					}
+				});
 			}
 		});
 	}

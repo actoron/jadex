@@ -233,14 +233,6 @@ public class StarterPluginPanel extends JPanel
 	
 	
 	/**
-	 *  Informs the panel that it should stop all its computation
-	 */
-	public IFuture shutdown()
-	{
-		return savePlatformProperties();
-	}
-	
-	/**
 	 *  Load a model.
 	 *  @param model The model name.
 	 */
@@ -425,7 +417,7 @@ public class StarterPluginPanel extends JPanel
 	/**
 	 *  Save the platform properties.
 	 */
-	public IFuture	savePlatformProperties()
+	public IFuture	pushPlatformProperties()
 	{
 		final Future	ret	= new Future();
 		SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -441,7 +433,7 @@ public class StarterPluginPanel extends JPanel
 						Properties	props	= new Properties();
 						props.addSubproperties("mpanel", (Properties)result);
 						props.addSubproperties("spanel", spanel.getProperties());
-						settings.setProperties("StarterServicePanel", props, true)
+						settings.setProperties("StarterServicePanel", props)
 							.addResultListener(new SwingDelegationResultListener(ret));
 					}
 				});

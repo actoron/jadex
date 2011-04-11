@@ -120,6 +120,14 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 		return new Future(null);
 	}
 	
+	/**
+	 *  Store settings if any in platform settings service.
+	 */
+	public IFuture pushPlatformSettings()
+	{
+		return IFuture.DONE;
+	}
+	
 	//-------- internal create methods --------
 	
 	/**
