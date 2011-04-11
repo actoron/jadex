@@ -163,17 +163,17 @@ public class Future implements IFuture
     {
     	synchronized(this)
 		{
-    		// Ignore exception when already continued?!
         	if(resultavailable)
         	{
         		if(this.exception!=null)
+        		{
         			this.exception.printStackTrace();
-//        		if(resultex!=null)
-//        		{
-//        			System.err.println("Result: "+result);
-//        			resultex.printStackTrace();
-//        		}
-        		throw new RuntimeException(this.exception);
+            		throw new RuntimeException("Duplicate exception: "+this.exception, exception);
+        		}
+        		else
+        		{
+            		throw new RuntimeException("Duplicate result/exception: "+this.result, exception);        			
+        		}
         	}	
         	
 //        	System.out.println(this+" setResult: "+result);

@@ -352,7 +352,7 @@ public class CMSUpdateHandler
 								}));
 								return ret;
 							}
-						}).addResultListener(new DelegationResultListener(ret));
+						}).addResultListener(new SwingDelegationResultListener(ret));
 					}
 				});
 			}

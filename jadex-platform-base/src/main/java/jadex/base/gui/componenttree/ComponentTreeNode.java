@@ -297,11 +297,13 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 					}
 				}
 			}
+			
 			public void customExceptionOccurred(Exception exception)
 			{
-//				System.out.println("here1: "+exception);
-				exception.printStackTrace();
-				// ignore
+				if(!ret.isDone())
+				{
+					ret.setException(exception);
+				}
 			}
 		});
 		
@@ -375,11 +377,13 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 					}
 				});
 			}
-
+			
 			public void customExceptionOccurred(Exception exception)
 			{
-//				System.out.println("here2: "+exception);
-				// May happen, when components already removed.
+				if(!ret.isDone())
+				{
+					ret.setException(exception);
+				}
 			}
 		});
 		

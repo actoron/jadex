@@ -1110,7 +1110,13 @@ public class MessageService extends BasicService implements IMessageService
 							{
 					//			logger.warning("Message could not be delivered to (all) receivers: " + SUtil.arrayToString(receivers));
 								ret.setException(new MessageFailureException(task.getMessage(), task.getMessageType(), receivers, 
-									"Message could not be delivered to (all) receivers: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())));
+									"Message could not be delivered to (all) receivers: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses()))
+								{
+									public void printStackTrace()
+									{
+										Thread.dumpStack();
+									}
+								});
 							}
 							else
 							{
