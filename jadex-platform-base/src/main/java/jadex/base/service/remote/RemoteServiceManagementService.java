@@ -85,7 +85,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	public static String REMOTE_TIMEOUT = "remote_timeout";
 
 	/** The default timeout. */
-	public static long DEFAULT_TIMEOUT = 10000;
+	public static long DEFAULT_TIMEOUT = 60000;
 		
 	//-------- attributes --------
 	
@@ -489,12 +489,12 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 									public void exceptionOccurred(Exception exception)
 									{
 										// message could not be sent -> fail immediately.
-//										System.out.println("Callee could not be reached: "+exception);
+										System.out.println("Callee could not be reached: "+exception);
 //										errors.put(callid, new Object[]{"Callee could not be reached", exception});
+										future.setException(exception);
 										removeWaitingCall(callid);
 //										waitingcalls.remove(callid);
-//										System.out.println("Waitingcalls: "+waitingcalls.size());
-										future.setException(exception);
+										System.out.println("Waitingcalls: "+waitingcalls.size());
 									}
 								}));
 							}

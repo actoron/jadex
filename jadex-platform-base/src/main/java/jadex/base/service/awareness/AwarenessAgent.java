@@ -160,7 +160,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 			public void report(String message, String type, Object related, Location location) throws XMLStreamException
 			{
 				// Ignore XML exceptions.
-				getLogger().warning(message);
+//				getLogger().warning(message);
 			}
 		});
 		

@@ -1003,7 +1003,7 @@ public class RemoteReferenceModule
 	 *  Send removeRef to the origin process of the remote reference.
 	 *  @param rr The remote reference.
 	 */
-	public Future sendRemoveRemoteReference(RemoteReference rr)
+	public Future sendRemoveRemoteReference(final RemoteReference rr)
 	{
 		checkThread();
 		// DGC: notify rr origin that a new proxy of target object exists
@@ -1012,6 +1012,19 @@ public class RemoteReferenceModule
 //		System.out.println("send rem: "+rr);
 		final String callid = SUtil.createUniqueId(rsms.getRMSComponentIdentifier().getLocalName());
 		RemoteDGCRemoveReferenceCommand com = new RemoteDGCRemoveReferenceCommand(rr, rsms.getRMSComponentIdentifier(), callid);
+		System.out.println("send start: "+rr);
+		future.addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				System.out.println("send end: "+rr);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("send ex: "+rr);
+			}
+		});
 		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), com, callid, -1, future);
 		return future;
 	}

@@ -340,7 +340,10 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 								ContinuousClock.this.wait(diff);
 //								System.out.println("timer awake");
 							}
-							catch(InterruptedException e){}
+							catch(InterruptedException e)
+							{
+//								System.out.println("timer awake");								
+							}
 						}
 					}
 				}

@@ -270,7 +270,7 @@ public class TCPTransport implements ITransport
 											TCPInputConnection[] incons = (TCPInputConnection[])openincons.toArray(new TCPInputConnection[0]);
 											for(int i=0; i<incons.length; i++)
 											{
-												System.out.println("close: "+incons[i]);
+//												System.out.println("close: "+incons[i]);
 												incons[i].close();
 											}
 											logger.warning("TCPTransport serversocket closed.");

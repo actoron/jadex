@@ -93,9 +93,9 @@ public class CounterResultListener implements IResultListener
 	{
 		boolean	notify	= false;
 		
-		boolean inc = true;
+		boolean retry = false;
 		if(!notified)
-			inc = intermediateExceptionOccurred(exception);
+			retry = intermediateExceptionOccurred(exception);
 		
 		synchronized(this)
 		{
@@ -103,8 +103,8 @@ public class CounterResultListener implements IResultListener
 			{
 				if(ignorefailures)
 				{
-					notify	= inc? ++cnt==num: cnt==num;
-					notified	= notify;
+					notify	= retry? cnt==num: ++cnt==num;
+					notified = notify;
 				}
 				else 
 				{
