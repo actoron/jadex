@@ -38,6 +38,7 @@ import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLReporter;
 
 /**
  *  Java specific reader that supports collection classes and arrays.
@@ -50,6 +51,15 @@ public class JavaReader extends Reader
 	protected static Reader reader;
 
 	//-------- constructors --------
+
+	/**
+	 *  Create a new reader.
+	 *  @param reporter The error reporter.
+	 */
+	public JavaReader(XMLReporter reporter)
+	{
+		super(new BeanObjectReaderHandler(getTypeInfos()), false, false, reporter);
+	}
 
 	/**
 	 *  Create a new reader.
@@ -747,6 +757,6 @@ public class JavaReader extends Reader
 	protected static synchronized void createReader()
 	{
 		if(reader==null)
-			reader = new JavaReader(null);
+			reader = new JavaReader((Set)null);
 	}
 }

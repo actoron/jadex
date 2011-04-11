@@ -34,9 +34,6 @@ public class BasicService implements IInternalService
 	/** The service properties. */
 	protected Map properties;
 	
-//	/** The list of start futures. */
-//	protected List startfutures;
-	
 	//-------- constructors --------
 
 	/**
@@ -145,7 +142,6 @@ public class BasicService implements IInternalService
 //		System.out.println("start: "+this);
 		Future ret = new Future();
 		
-		Future[] tosignal = null;
 		boolean ex = false;
 		synchronized(this)
 		{
@@ -156,11 +152,6 @@ public class BasicService implements IInternalService
 			else
 			{
 				started = true;
-//				if(startfutures!=null)
-//				{
-//					tosignal = (Future[])startfutures.toArray(new Future[startfutures.size()]);
-//					startfutures = null;
-//				}
 			}
 		}
 		
@@ -170,14 +161,6 @@ public class BasicService implements IInternalService
 		}
 		else 
 		{
-			if(tosignal!=null)
-			{
-				for(int i=0; i<tosignal.length; i++)
-				{
-					tosignal[i].setResult(null);
-				}
-			}
-			
 			ret.setResult(getServiceIdentifier());
 		}
 		
@@ -231,41 +214,6 @@ public class BasicService implements IInternalService
 	{
 		return new ServiceIdentifier(providerid, servicetype, generateServiceName(serviceimpl));
 	}
-	
-//	/**
-//	 *  Get a future that signals when the service is started.
-//	 *  @return A future that signals when the service has been started.
-//	 */
-//	public IFuture signalStarted()
-//	{
-//		final Future ret = new Future();
-//		
-//		int alt = 2;
-//		synchronized(this)
-//		{
-//			if(shutdowned)
-//				alt = 0;
-//			else if(started)
-//				alt = 1;
-//			else
-//			{
-//				if(startfutures==null)
-//					startfutures = new ArrayList();
-//				startfutures.add(ret);
-//			}
-//		}
-//		
-//		if(alt==0)
-//		{
-//			ret.setException(new RuntimeException("Service already shutdowned: "+getServiceIdentifier()));
-//		}
-//		else if(alt==1)
-//		{
-//			ret.setResult(null);
-//		}
-//		
-//		return ret;
-//	}
 	
 	/**
 	 *  Check if the service is valid.

@@ -17,11 +17,9 @@ import jadex.xml.annotation.XMLClassname;
 import jadex.xml.writer.AbstractObjectWriterHandler;
 import jadex.xml.writer.WriteContext;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;

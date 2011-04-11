@@ -1,6 +1,5 @@
 package jadex.bdi.examples.helloworld;
 
-import jadex.bdi.model.IMPlanbase;
 import jadex.bdi.runtime.Plan;
 
 

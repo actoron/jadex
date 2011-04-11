@@ -11,6 +11,7 @@ import jadex.bridge.service.threadpool.IThreadPoolService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -28,6 +29,7 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
+import jadex.xml.reader.Reader;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -44,6 +46,10 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import javax.xml.stream.Location;
+import javax.xml.stream.XMLReporter;
+import javax.xml.stream.XMLStreamException;
 
 
 /**
@@ -127,6 +133,9 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	/** The excludes list. */
 	protected List	excludes;
 	
+	/** The java reader for parsing received awareness infos. */
+	protected JavaReader	reader;
+	
 	//-------- methods --------
 	
 	/**
@@ -146,6 +155,14 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 			throw new RuntimeException(e);
 		}
 		this.discovered = new LinkedHashMap();
+		this.reader	= new JavaReader(new XMLReporter()
+		{
+			public void report(String message, String type, Object related, Location location) throws XMLStreamException
+			{
+				// Ignore XML exceptions.
+				getLogger().warning(message);
+			}
+		});
 		
 		final Future	ret	= new Future();
 		getRequiredService("settings").addResultListener(createResultListener(new IResultListener()
@@ -215,7 +232,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 			public void resultAvailable(Object result)
 			{
 				root = (IComponentIdentifier)result;
-				discovered.put(root, new DiscoveryInfo(root, false, getClockTime(), delay));
+				discovered.put(root, new DiscoveryInfo(root, null, getClockTime(), delay));
 				
 				startSendBehaviour();
 				startRemoveBehaviour();
@@ -235,6 +252,11 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	 */
 	public IFuture	agentKilled()
 	{
+		if(sendsocket!=null)
+		{
+			send(new AwarenessInfo(root, AwarenessInfo.STATE_OFFLINE, delay));
+		}
+		
 //		System.out.println("killed set to true: "+getComponentIdentifier());
 		synchronized(AwarenessAgent.this)
 		{
@@ -524,7 +546,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 							it.remove();
 							if(autodelete)
 							{
-								todel.add(dif.getComponentIdentifier());
+								todel.add(dif);
 							}
 						}
 						
@@ -537,17 +559,9 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 				{
 					for(int i=0; i<todel.size(); i++)
 					{
-						IComponentIdentifier cid = (IComponentIdentifier)todel.get(i);
+						DiscoveryInfo dif = (DiscoveryInfo)todel.get(i);
 						// Ignore deletion failures
-						deleteProxy(cid).addResultListener(new IResultListener()
-						{
-							public void resultAvailable(Object result)
-							{
-							}
-							public void exceptionOccurred(Exception exception)
-							{
-							}
-						});
+						deleteProxy(dif);
 					}
 				}
 				
@@ -577,7 +591,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						dif.setProxy(false);
+						dif.setProxy(null);
 					}
 				});
 			}
@@ -604,7 +618,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 			{
 				if(sendid.equals(getSendId()))
 				{
-					send(new AwarenessInfo(root, getClockTime(), delay));
+					send(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay));
 					
 					if(delay>0)
 						doWaitFor(delay, this);
@@ -632,9 +646,9 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 		
 		final Future ret = new Future();
 		
-		getRequiredService("cms").addResultListener(createResultListener(new IResultListener()
+		getRequiredService("cms").addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
 				final IComponentManagementService cms = (IComponentManagementService)result;
 				
@@ -646,44 +660,25 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 				{
 					CreationInfo ci = new CreationInfo(args);
 					cms.createComponent(cid.getLocalName(), "jadex/base/service/remote/ProxyAgent.class", ci, 
-						createResultListener(new IResultListener()
+						createResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
-							// todo: do not use source for cid?!
-			//				System.out.println("Proxy killed: "+source);
+//							System.out.println("Proxy killed: "+source);
 							DiscoveryInfo dif = getDiscoveryInfo(cid);
 							if(dif!=null)
-								dif.setProxy(false);
+								dif.setProxy(null);
 						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-//							getLogger().warning("Proxy was killed: "+exception);
-//							exception.printStackTrace();
-						}
-					})).addResultListener(createResultListener(new IResultListener()
+					})).addResultListener(createResultListener(new DelegationResultListener(ret)
 					{
-						
-						public void resultAvailable(Object result)
+						public void customResultAvailable(Object result)
 						{
 							DiscoveryInfo dif = getDiscoveryInfo(cid);
-							dif.setProxy(true);
+							dif.setProxy((IComponentIdentifier)result);
 							ret.setResult(result);
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-	//						getLogger().warning("Exception during proxy creation: "+exception);
-							ret.setException(exception);
 						}
 					}));
 				}
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
 			}
 		}));
 		
@@ -693,40 +688,24 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	/**
 	 *  Delete a proxy.
 	 */
-	public IFuture deleteProxy(final IComponentIdentifier cid)
+	public IFuture deleteProxy(final DiscoveryInfo dif)
 	{
 		final Future ret = new Future();
 		
-		getRequiredService("cms").addResultListener(createResultListener(new IResultListener()
+		getRequiredService("cms").addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
 				final IComponentManagementService cms = (IComponentManagementService)result;
 				
-				IComponentIdentifier pcid = cms.createComponentIdentifier(cid.getLocalName(), true);
-//				System.out.println("dela: "+pcid);
-				
-				cms.destroyComponent(pcid).addResultListener(createResultListener(new IResultListener()
+				cms.destroyComponent(dif.getProxy()).addResultListener(createResultListener(new DelegationResultListener(ret)
 				{
-					public void resultAvailable(Object result)
+					public void customResultAvailable(Object result)
 					{
-						DiscoveryInfo dif = getDiscoveryInfo(cid);
-						if(dif!=null)
-							dif.setProxy(false);
+						dif.setProxy(null);
 						ret.setResult(result);
 					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-//						getLogger().warning("Exception during proxy creation: "+exception);
-						ret.setException(exception);
-					}
 				}));
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
 			}
 		}));
 		
@@ -797,33 +776,55 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 								byte[] target = new byte[pack.getLength()];
 								System.arraycopy(buf, 0, target, 0, pack.getLength());
 								
-								AwarenessInfo info = (AwarenessInfo)JavaReader.objectFromByteArray(target, getModel().getClassLoader());
-//								System.out.println(getComponentIdentifier()+" received: "+info);
+								AwarenessInfo info = (AwarenessInfo)Reader.objectFromByteArray(reader, target, getModel().getClassLoader());
+								if(info.getSender()!=null)
+								{
+									// Fix broken awareness infos for backwards compatibility.
+									if(info.getDelay()==0)
+										info.setDelay(delay);
+									if(info.getState()==null)
+										info.setState(AwarenessInfo.STATE_ONLINE);
+//									System.out.println(getComponentIdentifier()+" received: "+info);
 							
-								final IComponentIdentifier sender = info.getSender();
-								boolean createproxy	= isIncluded(sender);
-								DiscoveryInfo dif;
-								
-								synchronized(AwarenessAgent.this)
-								{
-									dif = (DiscoveryInfo)discovered.get(sender);
-									if(dif==null)
+									IComponentIdentifier sender = info.getSender();
+									boolean	online	= AwarenessInfo.STATE_ONLINE.equals(info.getState());
+									boolean createproxy	= isIncluded(sender);
+									boolean deleteproxy	= false;
+									DiscoveryInfo dif;
+									
+									synchronized(AwarenessAgent.this)
 									{
-										createproxy = createproxy && isAutoCreateProxy();
-										dif = new DiscoveryInfo(sender, false, getClockTime(), getDelay());
-										discovered.put(sender, dif);
+										dif = (DiscoveryInfo)discovered.get(sender);
+										if(online)
+										{
+											if(dif==null)
+											{
+												createproxy = createproxy && isAutoCreateProxy();
+												dif = new DiscoveryInfo(sender, null, getClockTime(), getDelay());
+												discovered.put(sender, dif);
+											}
+											else
+											{
+												createproxy = createproxy && isAutoCreateProxy() && dif.getProxy()==null;
+												dif.setTime(getClockTime());
+											}
+										}
+										else
+										{
+											deleteproxy	= dif!=null && dif.getProxy()!=null;
+										}
 									}
-									else
+										
+									if(createproxy)
 									{
-										createproxy = createproxy && isAutoCreateProxy() && !dif.isProxy();
-										dif.setTime(getClockTime());
+//										System.out.println("Creating new proxy for: "+sender+" "+getComponentIdentifier());
+										createProxy(sender);
 									}
-								}
-								
-								if(createproxy)
-								{
-//									System.out.println("Creating new proxy for: "+sender+" "+getComponentIdentifier());
-									createProxy(sender);
+									else if(deleteproxy)
+									{
+										deleteProxy(dif);
+										
+									}
 								}
 							}
 							catch(Exception e)

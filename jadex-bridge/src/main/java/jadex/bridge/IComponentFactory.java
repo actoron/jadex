@@ -6,7 +6,6 @@ import jadex.bridge.service.annotation.Excluded;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
-import java.util.List;
 import java.util.Map;
 
 

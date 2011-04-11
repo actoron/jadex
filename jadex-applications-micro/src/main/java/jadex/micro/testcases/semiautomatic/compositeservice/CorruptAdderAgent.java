@@ -1,7 +1,5 @@
 package jadex.micro.testcases.semiautomatic.compositeservice;
 
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.component.interceptors.AbstractApplicableInterceptor;
 import jadex.commons.future.DelegationResultListener;

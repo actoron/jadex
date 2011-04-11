@@ -18,8 +18,8 @@ public class DiscoveryInfo
 	/** The component identifier of the remote component. */
 	public IComponentIdentifier cid;
 	
-	/** Flag if a proxy exists. */
-	public boolean proxy;
+	/** Component id of local proxy (if any). */
+	public IComponentIdentifier proxy;
 	
 	/** Time when last awareness info was received. */
 	public long time;
@@ -39,7 +39,7 @@ public class DiscoveryInfo
 	/**
 	 *  Create a new discovery info.
 	 */
-	public DiscoveryInfo(IComponentIdentifier cid, boolean proxy, long time, long delay)
+	public DiscoveryInfo(IComponentIdentifier cid, IComponentIdentifier proxy, long time, long delay)
 	{
 		this.cid = cid;
 		this.proxy = proxy;
@@ -71,7 +71,7 @@ public class DiscoveryInfo
 	 *  Get the proxy.
 	 *  @return the proxy.
 	 */
-	public boolean isProxy()
+	public IComponentIdentifier getProxy()
 	{
 		return proxy;
 	}
@@ -80,7 +80,7 @@ public class DiscoveryInfo
 	 *  Set the proxy.
 	 *  @param proxy The proxy to set.
 	 */
-	public void setProxy(boolean proxy)
+	public void setProxy(IComponentIdentifier proxy)
 	{
 		this.proxy = proxy;
 	}
@@ -129,9 +129,9 @@ public class DiscoveryInfo
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((cid == null) ? 0 : cid.hashCode());
-		result = prime * result + (int)(delay ^ (delay >>> 32));
-		result = prime * result + (proxy ? 1231 : 1237);
-		result = prime * result + (int)(time ^ (time >>> 32));
+//		result = prime * result + (int)(delay ^ (delay >>> 32));
+//		result = prime * result + ((proxy == null) ? 0 : proxy.hashCode());
+//		result = prime * result + (int)(time ^ (time >>> 32));
 		return result;
 	}
 
@@ -144,8 +144,8 @@ public class DiscoveryInfo
 		if(obj instanceof DiscoveryInfo)
 		{
 			DiscoveryInfo other = (DiscoveryInfo)obj;
-			ret = SUtil.equals(cid, other.cid) && delay==other.delay
-				&& proxy==other.proxy && time==other.time;
+			ret = SUtil.equals(cid, other.cid);
+//				&& delay==other.delay && SUtil.equals(proxy, other.proxy) && time==other.time;
 		}
 		return ret;
 	}

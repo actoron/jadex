@@ -1,6 +1,5 @@
 package jadex.base;
 
-import jadex.base.service.cms.ComponentManagementService;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
@@ -16,7 +15,6 @@ import jadex.bridge.MessageType;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.ServiceNotFoundException;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.ICommand;
 import jadex.commons.concurrent.IExecutable;
@@ -795,7 +793,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				}
 			}
 			
-			final boolean	ready	= again && !breakpoint_triggered || extexecuted || wokenup;
+//			final boolean	ready	= again && !breakpoint_triggered || extexecuted || wokenup;
 //			getCMS().addResultListener(new DefaultResultListener()
 //			{
 //				public void resultAvailable(Object result)

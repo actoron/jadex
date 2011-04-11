@@ -7,16 +7,24 @@ import jadex.bridge.IComponentIdentifier;
  */
 public class AwarenessInfo
 {
+	//-------- constants --------
+	
+	/** State indicating that a component is currently online. */
+	public static final String	STATE_ONLINE	= "online";
+	
+	/** State indicating that a component is going offline. */
+	public static final String	STATE_OFFLINE	= "offline";
+	
 	//-------- attributes --------
 	
 	/** The sending component's identifier. */
-	protected IComponentIdentifier sender;
+	protected IComponentIdentifier	sender;
 
-//	/** Time sending timestamp. */
-//	protected long sendtime;
+	/** The component state. */
+	protected String	state;
 	
 	/** The current send time delay (interval). */
-	protected long delay;
+	protected long	delay;
 	
 	//-------- constructors --------
 	
@@ -30,10 +38,10 @@ public class AwarenessInfo
 	/**
 	 *  Create a new awareness info.
 	 */
-	public AwarenessInfo(IComponentIdentifier sender, long sendtime, long delay)
+	public AwarenessInfo(IComponentIdentifier sender, String state, long delay)
 	{
 		this.sender = sender;
-//		this.sendtime = sendtime;
+		this.state = state;
 		this.delay = delay;
 	}
 	
@@ -57,23 +65,23 @@ public class AwarenessInfo
 		this.sender = sender;
 	}
 	
-//	/**
-//	 *  Get the sendtime.
-//	 *  @return the sendtime.
-//	 */
-//	public long getSendTime()
-//	{
-//		return sendtime;
-//	}
-//
-//	/**
-//	 *  Set the sendtime.
-//	 *  @param sendtime The sendtime to set.
-//	 */
-//	public void setSendTime(long sendtime)
-//	{
-//		this.sendtime = sendtime;
-//	}
+	/**
+	 *  Get the state.
+	 *  @return the state.
+	 */
+	public String	getState()
+	{
+		return state;
+	}
+
+	/**
+	 *  Set the state.
+	 *  @param state The state to set.
+	 */
+	public void setState(String state)
+	{
+		this.state = state;
+	}
 
 	/**
 	 *  Get the delay.
@@ -98,16 +106,6 @@ public class AwarenessInfo
 	 */
 	public String toString()
 	{
-		return "AwarenessInfo(sender=" + sender + ", delay=" + delay + ")";
+		return "AwarenessInfo(sender="+sender+", state="+state+", delay="+delay+")";
 	}
-
-//	/**
-//	 *  Get the string representation.
-//	 */
-//	public String toString()
-//	{
-//		return "AwarenessInfo(sender="+sender+", sendtime="+sendtime+", delay="+delay+")";
-//	}
-	
-	
 }

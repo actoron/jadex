@@ -20,7 +20,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -310,7 +309,6 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 								Collection coll = (Collection)result;
 								if(coll!=null && coll.size()>0)
 								{
-									ArrayList res = new ArrayList();
 									CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new DefaultResultListener()
 									{
 										public void resultAvailable(Object result)

@@ -264,7 +264,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				{
 					// todo: hack, could be wrong due to sorting (visual!=data order)
 					DiscoveryInfo dif = (DiscoveryInfo)dismodel.getList().get(sel);
-					if(dif.isProxy())
+					if(dif.getProxy()!=null)
 					{
 						jcc.displayError("Creation Error", "Component already has proxy.", null);
 					}
@@ -305,21 +305,20 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				else
 				{
 					// todo: hack, could be wrong due to sorting (visual!=data order)
-					DiscoveryInfo dif = (DiscoveryInfo)dismodel.getList().get(sel);
-					if(!dif.isProxy())
+					final DiscoveryInfo dif = (DiscoveryInfo)dismodel.getList().get(sel);
+					if(dif.getProxy()==null)
 					{
 						jcc.displayError("Deletion Error", "Component has no proxy.", null);
 					}
 					else
 					{
-						final IComponentIdentifier	cid	= dif.getComponentIdentifier();
 						AwarenessAgentPanel.this.component.scheduleStep(new IComponentStep()
 						{
 							@XMLClassname("deleteProxy")
 							public Object execute(IInternalAccess ia)
 							{
 								AwarenessAgent agent = (AwarenessAgent)ia;
-								return agent.deleteProxy(cid);
+								return agent.deleteProxy(dif);
 							}
 						}).addResultListener(new SwingDefaultResultListener(panel)
 						{
@@ -703,7 +702,7 @@ class DiscoveryTableModel extends AbstractTableModel
 		}
 		else if(column == 3)
 		{
-			value = dif.isProxy()? Boolean.TRUE: Boolean.FALSE;
+			value = dif.getProxy()!=null ? Boolean.TRUE : Boolean.FALSE;
 		}
 		return value;
 	}

@@ -5,7 +5,6 @@ import jadex.bridge.Argument;
 import jadex.bridge.ModelInfo;
 import jadex.bridge.ModelValueProvider;
 import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;

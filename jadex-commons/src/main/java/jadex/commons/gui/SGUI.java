@@ -25,10 +25,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.EventObject;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageTypeSpecifier;
@@ -50,7 +48,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
-import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.border.LineBorder;
 import javax.swing.event.CellEditorListener;

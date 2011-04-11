@@ -679,7 +679,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 		return (IExpression)SFlyweightFunctionality.createExpression(state, scope[1], (String)scope[0]);
 	}
 
-	/**
+	/* *
 	 *  Get a condition predefined in the ADF.
 	 *  Note that a new condition instance is returned each time this method is called.
 	 *  @param name	The name of a condition defined in the ADF.
@@ -690,7 +690,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 		return capability.getExpressionbase().getCondition(name);
 	}*/
 
-	/**
+	/* *
 	 *  Create a precompiled query.
 	 *  @param query	The query string.
 	 *  @return The precompiled query.
