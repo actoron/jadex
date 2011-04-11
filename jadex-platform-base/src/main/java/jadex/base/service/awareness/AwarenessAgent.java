@@ -232,7 +232,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 			public void resultAvailable(Object result)
 			{
 				root = (IComponentIdentifier)result;
-				discovered.put(root, new DiscoveryInfo(root, null, getClockTime(), delay));
+				discovered.put(root, new DiscoveryInfo(root, null, getClockTime(), delay, false));
 				
 				startSendBehaviour();
 				startRemoveBehaviour();
@@ -803,15 +803,15 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 										dif = (DiscoveryInfo)discovered.get(sender);
 										if(online)
 										{
+											boolean	remoteexcluded	= !isIncluded(root, info.getIncludes(), info.getExcludes());
 											if(dif==null)
 											{
-												dif = new DiscoveryInfo(sender, null, getClockTime(), getDelay());
+												dif = new DiscoveryInfo(sender, null, getClockTime(), getDelay(), remoteexcluded);
 												discovered.put(sender, dif);
 											}
 											
 											createproxy = isIncluded(sender, getIncludes(), getExcludes())
-												&& isIncluded(root, info.getIncludes(), info.getExcludes())
-												&& isAutoCreateProxy() && dif.getProxy()==null;
+												&& !remoteexcluded && isAutoCreateProxy() && dif.getProxy()==null;
 											dif.setTime(getClockTime());
 										}
 										else

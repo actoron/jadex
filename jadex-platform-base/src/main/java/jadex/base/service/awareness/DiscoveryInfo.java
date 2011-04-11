@@ -27,6 +27,9 @@ public class DiscoveryInfo
 	/** The current send delay time. */
 	public long delay;
 
+	/** Flag indicating that the remote component has excluded our local component. */
+	public boolean	remoteexcluded;
+
 	//-------- constructors --------
 	
 	/**
@@ -39,12 +42,13 @@ public class DiscoveryInfo
 	/**
 	 *  Create a new discovery info.
 	 */
-	public DiscoveryInfo(IComponentIdentifier cid, IComponentIdentifier proxy, long time, long delay)
+	public DiscoveryInfo(IComponentIdentifier cid, IComponentIdentifier proxy, long time, long delay, boolean remoteexcluded)
 	{
 		this.cid = cid;
 		this.proxy = proxy;
 		this.time = time;
 		this.delay = delay;
+		this.remoteexcluded = remoteexcluded;
 	}
 	
 	//-------- methods --------
@@ -119,6 +123,24 @@ public class DiscoveryInfo
 	public void setDelay(long delay)
 	{
 		this.delay = delay;
+	}
+
+	/**
+	 *  Is the local platform excluded by the remote platform?
+	 *  @return The remote excluded flag.
+	 */
+	public boolean	isRemoteExcluded()
+	{
+		return remoteexcluded;
+	}
+
+	/**
+	 *  Set the remote excluded flag.
+	 *  @param remoteexcluded Is the local platform excluded by the remote platform?
+	 */
+	public void setRemoteExcluded(boolean remoteexcluded)
+	{
+		this.remoteexcluded = remoteexcluded;
 	}
 
 	/**

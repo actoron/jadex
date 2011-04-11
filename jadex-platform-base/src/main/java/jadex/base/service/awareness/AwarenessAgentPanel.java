@@ -659,7 +659,7 @@ class DiscoveryTableModel extends AbstractTableModel
 
 	public int getColumnCount()
 	{
-		return 4;
+		return 5;
 	}
 
 	public String getColumnName(int column)
@@ -674,6 +674,8 @@ class DiscoveryTableModel extends AbstractTableModel
 				return "Time of Last Info";
 			case 3:
 				return "Has a Proxy";
+			case 4:
+				return "Remote Excluded";
 			default:
 				return "";
 		}
@@ -704,6 +706,10 @@ class DiscoveryTableModel extends AbstractTableModel
 		{
 			value = dif.getProxy()!=null ? Boolean.TRUE : Boolean.FALSE;
 		}
+		else if(column == 4)
+		{
+			value = dif.isRemoteExcluded() ? Boolean.TRUE : Boolean.FALSE;
+		}
 		return value;
 	}
 	
@@ -723,6 +729,10 @@ class DiscoveryTableModel extends AbstractTableModel
 			ret = Date.class;
 		}
 		else if(column == 3)
+		{
+			ret = Boolean.class;
+		}
+		else if(column == 4)
 		{
 			ret = Boolean.class;
 		}
