@@ -619,7 +619,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 			{
 				if(sendid.equals(getSendId()))
 				{
-					send(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay));
+					send(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes));
 					
 					if(delay>0)
 						doWaitFor(delay, this);
@@ -805,15 +805,14 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 										{
 											if(dif==null)
 											{
-												createproxy = isIncluded(sender) && isAutoCreateProxy();
 												dif = new DiscoveryInfo(sender, null, getClockTime(), getDelay());
 												discovered.put(sender, dif);
 											}
-											else
-											{
-												createproxy = isIncluded(sender) && isAutoCreateProxy() && dif.getProxy()==null;
-												dif.setTime(getClockTime());
-											}
+											
+											createproxy = isIncluded(sender, getIncludes(), getExcludes())
+												&& isIncluded(root, info.getIncludes(), info.getExcludes())
+												&& isAutoCreateProxy() && dif.getProxy()==null;
+											dif.setTime(getClockTime());
 										}
 										else
 										{
@@ -870,32 +869,30 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	/**
 	 *  Test if a platform is included and/or not excluded.
 	 */
-	protected synchronized boolean	isIncluded(IComponentIdentifier cid)
+	protected synchronized boolean	isIncluded(IComponentIdentifier cid, String[] includes, String[] excludes)
 	{
-		boolean	included	= includes.isEmpty();
+		boolean	included	= includes.length==0;
 		String[]	cidnames	= null;
 		
 		// Check if contained in includes.
-		for(int i=0; !included && i<includes.size(); i++)
+		for(int i=0; !included && i<includes.length; i++)
 		{
-			String	inc	= (String)includes.get(i);
 			if(cidnames==null)
 				cidnames	= extractNames(cid);
 			for(int j=0; !included && j<cidnames.length; j++)
 			{
-				included	= cidnames[j].startsWith(inc);
+				included	= cidnames[j].startsWith(includes[i]);
 			}
 		}
 		
 		// Check if not contained in excludes.
-		for(int i=0; included && i<excludes.size(); i++)
+		for(int i=0; included && i<excludes.length; i++)
 		{
-			String	exc	= (String)excludes.get(i);
 			if(cidnames==null)
 				cidnames	= extractNames(cid);
 			for(int j=0; included && j<cidnames.length; j++)
 			{
-				included	= !cidnames[j].startsWith(exc);
+				included	= !cidnames[j].startsWith(excludes[i]);
 			}
 		}
 
@@ -916,7 +913,8 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 			int	port	= addrs[i].indexOf(':', prot+3);
 			if(prot!=-1 && port!=-1)
 			{
-				ret.add(addrs[i].substring(prot+3, port));
+//				ret.add(addrs[i].substring(prot+3, port));
+				ret.add(addrs[i].substring(0, port));
 			}
 			else
 			{
