@@ -580,20 +580,21 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 		{
 			public void resultAvailable(Object result)
 			{
-				final IComponentManagementService cms = (IComponentManagementService)result;
-				
-				IComponentIdentifier lcid = cms.createComponentIdentifier(dif.getComponentIdentifier().getLocalName(), true);
-				cms.getComponentDescription(lcid).addResultListener(new IResultListener()
+				if(dif.getProxy()!=null)
 				{
-					public void resultAvailable(Object result)
+					IComponentManagementService cms = (IComponentManagementService)result;
+					cms.getComponentDescription(dif.getProxy()).addResultListener(new IResultListener()
 					{
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						dif.setProxy(null);
-					}
-				});
+						public void resultAvailable(Object result)
+						{
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							dif.setProxy(null);
+						}
+					});
+				}
 			}
 			public void exceptionOccurred(Exception exception) 
 			{
@@ -674,7 +675,8 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 						public void customResultAvailable(Object result)
 						{
 							DiscoveryInfo dif = getDiscoveryInfo(cid);
-							dif.setProxy((IComponentIdentifier)result);
+							if(dif!=null)
+								dif.setProxy((IComponentIdentifier)result);
 							ret.setResult(result);
 						}
 					}));
@@ -777,6 +779,8 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 								System.arraycopy(buf, 0, target, 0, pack.getLength());
 								
 								AwarenessInfo info = (AwarenessInfo)Reader.objectFromByteArray(reader, target, getModel().getClassLoader());
+								if(AwarenessInfo.STATE_OFFLINE.equals(info.getState()))
+									System.out.println("info: "+info);
 								if(info.getSender()!=null)
 								{
 									// Fix broken awareness infos for backwards compatibility.
@@ -788,8 +792,8 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 							
 									IComponentIdentifier sender = info.getSender();
 									boolean	online	= AwarenessInfo.STATE_ONLINE.equals(info.getState());
-									boolean createproxy	= isIncluded(sender);
 									boolean deleteproxy	= false;
+									boolean createproxy	= false;
 									DiscoveryInfo dif;
 									
 									synchronized(AwarenessAgent.this)
@@ -799,13 +803,13 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 										{
 											if(dif==null)
 											{
-												createproxy = createproxy && isAutoCreateProxy();
+												createproxy = isIncluded(sender) && isAutoCreateProxy();
 												dif = new DiscoveryInfo(sender, null, getClockTime(), getDelay());
 												discovered.put(sender, dif);
 											}
 											else
 											{
-												createproxy = createproxy && isAutoCreateProxy() && dif.getProxy()==null;
+												createproxy = isIncluded(sender) && isAutoCreateProxy() && dif.getProxy()==null;
 												dif.setTime(getClockTime());
 											}
 										}
