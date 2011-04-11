@@ -1082,7 +1082,7 @@ public class MessageService extends BasicService implements IMessageService
 							Future ret = (Future)ftmp[1];
 							
 							IComponentIdentifier[] receivers = task.getReceivers();
-							System.out.println("recs: "+SUtil.arrayToString(receivers)+" "+task.hashCode());
+//							System.out.println("recs: "+SUtil.arrayToString(receivers)+" "+task.hashCode());
 							
 							ITransport[] transports = getTransports();
 							for(int i = 0; i < transports.length && receivers.length>0; i++)
@@ -1108,7 +1108,7 @@ public class MessageService extends BasicService implements IMessageService
 							if(receivers.length > 0)
 							{
 //								logger.warning("Message could not be delivered to (all) receivers: " + SUtil.arrayToString(receivers)+" "+task.hashCode());
-								System.out.println("Message could not be delivered to (all) receivers: " + SUtil.arrayToString(receivers)+" "+task.hashCode());
+//								System.out.println("Message could not be delivered to (all) receivers: " + SUtil.arrayToString(receivers)+" "+task.hashCode());
 								ret.setException(new MessageFailureException(task.getMessage(), task.getMessageType(), receivers, 
 									"Message could not be delivered to (all) receivers: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses()))
 								{

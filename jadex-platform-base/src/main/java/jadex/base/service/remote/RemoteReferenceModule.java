@@ -563,15 +563,15 @@ public class RemoteReferenceModule
 		Future	ret	= new Future();
 		checkThread();
 		RemoteReference[] rrs = (RemoteReference[])proxycount.keySet().toArray(new RemoteReference[0]);
-		CounterResultListener crl = new CounterResultListener(rrs.length, true, new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				System.out.println("shutti");
-				super.customResultAvailable(result);
-			}
-		});
-		System.out.println("shut: "+SUtil.arrayToString(rrs));
+		CounterResultListener crl = new CounterResultListener(rrs.length, true, new DelegationResultListener(ret));
+//		{
+//			public void customResultAvailable(Object result)
+//			{
+//				System.out.println("shutti");
+//				super.customResultAvailable(result);
+//			}
+//		});
+//		System.out.println("shut: "+SUtil.arrayToString(rrs));
 		for(int i=0; i<rrs.length; i++)
 		{
 			sendRemoveRemoteReference(rrs[i]).addResultListener(crl);
@@ -1012,19 +1012,19 @@ public class RemoteReferenceModule
 //		System.out.println("send rem: "+rr);
 		final String callid = SUtil.createUniqueId(rsms.getRMSComponentIdentifier().getLocalName());
 		RemoteDGCRemoveReferenceCommand com = new RemoteDGCRemoveReferenceCommand(rr, rsms.getRMSComponentIdentifier(), callid);
-		System.out.println("send start: "+rr);
-		future.addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				System.out.println("send end: "+rr);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				System.out.println("send ex: "+rr);
-			}
-		});
+//		System.out.println("send start: "+rr);
+//		future.addResultListener(new IResultListener()
+//		{
+//			public void resultAvailable(Object result)
+//			{
+//				System.out.println("send end: "+rr);
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("send ex: "+rr);
+//			}
+//		});
 		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), com, callid, -1, future);
 		return future;
 	}
