@@ -700,14 +700,18 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 			{
 				final IComponentManagementService cms = (IComponentManagementService)result;
 				
-				cms.destroyComponent(dif.getProxy()).addResultListener(createResultListener(new DelegationResultListener(ret)
+				IComponentIdentifier cid = dif.getProxy();
+				if(cid!=null)
 				{
-					public void customResultAvailable(Object result)
+					cms.destroyComponent(cid).addResultListener(createResultListener(new DelegationResultListener(ret)
 					{
-						dif.setProxy(null);
-						ret.setResult(result);
-					}
-				}));
+						public void customResultAvailable(Object result)
+						{
+							dif.setProxy(null);
+							ret.setResult(result);
+						}
+					}));
+				}
 			}
 		}));
 		

@@ -250,14 +250,17 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			}
 			
 			// Shutdown services in reverse order as later services might depend on earlier ones.
-			IInternalService	service	= (IInternalService)allservices.remove(allservices.size()-1);
+			final IInternalService	service	= (IInternalService)allservices.remove(allservices.size()-1);
+			System.out.println("shutdown start: "+service.getServiceIdentifier());
 			service.shutdownService().addResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
 				{
+					System.out.println("shutdown end: "+result);
 					if(!allservices.isEmpty())
 					{
-						IInternalService	service	= (IInternalService)allservices.remove(allservices.size()-1);
+						IInternalService service = (IInternalService)allservices.remove(allservices.size()-1);
+						System.out.println("shutdown start: "+service.getServiceIdentifier());
 						service.shutdownService().addResultListener(this);						
 					}
 					else

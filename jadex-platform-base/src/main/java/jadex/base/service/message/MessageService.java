@@ -45,6 +45,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -217,11 +218,6 @@ public class MessageService extends BasicService implements IMessageService
 							doSendMessage(msg, type, exta, cl, msgcopy, ret, codecids);
 						}
 					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						ret.setException(exception);
-					}
 				});
 			}
 		});
@@ -331,7 +327,7 @@ public class MessageService extends BasicService implements IMessageService
 		{
 			IComponentIdentifier cid = (IComponentIdentifier)tmp;
 			SendManager sm = getSendManager(cid); 
-			managers.put(sm, cid);			
+			managers.put(sm, cid);
 		}
 		
 		CollectionResultListener crl = new CollectionResultListener(managers.size(), false, new DelegationResultListener(ret));
@@ -726,11 +722,18 @@ public class MessageService extends BasicService implements IMessageService
 //				exception.printStackTrace();
 //			}
 //		});
-		final SendManager[]	sms	= (SendManager[])managers.values().toArray(new SendManager[managers.size()]);
+		SendManager[] tmp = (SendManager[])managers.values().toArray(new SendManager[managers.size()]);
+		final SendManager[] sms = (SendManager[])SUtil.arrayToSet(tmp).toArray(new SendManager[0]);
 //		System.err.println("MessageService shutdown start: "+(transports.size()+sms.length+1));
-		final CounterResultListener	crl	= new CounterResultListener(transports.size()+sms.length+1,
-			new DelegationResultListener(ret));
-//		{
+		final CounterResultListener	crl	= new CounterResultListener(transports.size()+sms.length+1, true,
+			new DelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+					super.customResultAvailable(getServiceIdentifier());
+				}
+			})
+		{
 //			public void intermediateResultAvailable(Object result)
 //			{
 //				System.err.println("MessageService shutdown intermediate result: "+result+", "+cnt);
@@ -741,7 +744,7 @@ public class MessageService extends BasicService implements IMessageService
 //				System.err.println("MessageService shutdown intermediate error: "+exception+", "+cnt);
 //				return super.intermediateExceptionOccurred(exception);
 //			}
-//		};
+		};
 		super.shutdownService().addResultListener(crl);
 
 		SServiceProvider.getService(component.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -759,7 +762,7 @@ public class MessageService extends BasicService implements IMessageService
 				
 				for(int i=0; i<transports.size(); i++)
 				{
-//					System.err.println("MessageService transport shutdown: "+transports.get(i));
+					System.err.println("MessageService transport shutdown: "+transports.get(i));
 					((ITransport)transports.get(i)).shutdown().addResultListener(crl);
 				}
 			}

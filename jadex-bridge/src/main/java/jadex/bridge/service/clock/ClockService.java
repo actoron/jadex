@@ -311,13 +311,19 @@ public class ClockService extends BasicService implements IClockService, IProper
 					{
 						ISettingsService	settings	= (ISettingsService)result;
 						settings.deregisterPropertiesProvider("clockservice")
-							.addResultListener(new DelegationResultListener(ret));
+							.addResultListener(new DelegationResultListener(ret)
+						{
+							public void customResultAvailable(Object result)
+							{
+								super.customResultAvailable(getServiceIdentifier());
+							}
+						});
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
 						// No settings service: ignore.
-						ret.setResult(null);
+						ret.setResult(getServiceIdentifier());
 					}
 				});
 			}

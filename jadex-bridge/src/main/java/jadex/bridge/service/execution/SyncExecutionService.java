@@ -308,7 +308,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	{
 		final Future ret = new Future();
 		
-		super.startService().addResultListener(new DelegationResultListener(ret)
+		super.shutdownService().addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -325,7 +325,13 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 					{
 						running = false;
 						shutdown = true;
-						executor.shutdown().addResultListener(new DelegationResultListener(ret));
+						executor.shutdown().addResultListener(new DelegationResultListener(ret)
+						{
+							public void customResultAvailable(Object result)
+							{
+								super.customResultAvailable(getServiceIdentifier());
+							}
+						});
 						queue = null;
 						idf = idlefuture;
 					}

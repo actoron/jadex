@@ -23,10 +23,12 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -207,6 +209,7 @@ public class TCPTransport implements ITransport
 									final IThreadPoolService tp = (IThreadPoolService)result;
 									tp.execute(new Runnable()
 									{
+										List openincons = Collections.synchronizedList(new ArrayList());
 										public void run()
 										{
 											//try{serversocket.setSoTimeout(10000);} catch(SocketException e) {}
@@ -217,10 +220,21 @@ public class TCPTransport implements ITransport
 		//											ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
 		//											System.out.println("accepting");
 													final TCPInputConnection con = new TCPInputConnection(serversocket.accept(), codecfac, libservice.getClassLoader());
-		//											System.out.println("busy");
+													openincons.add(con);
 													if(!async)
 													{
-														TCPTransport.this.deliverMessages(con);
+														TCPTransport.this.deliverMessages(con).addResultListener(new IResultListener()
+														{
+															public void resultAvailable(Object result)
+															{
+																openincons.remove(con);
+															}
+															
+															public void exceptionOccurred(Exception exception)
+															{
+																openincons.remove(con);
+															}
+														});
 													}
 													else
 													{
@@ -230,7 +244,18 @@ public class TCPTransport implements ITransport
 														{
 															public void run()
 															{
-																TCPTransport.this.deliverMessages(con);
+																TCPTransport.this.deliverMessages(con).addResultListener(new IResultListener()
+																{
+																	public void resultAvailable(Object result)
+																	{
+																		openincons.remove(con);
+																	}
+																	
+																	public void exceptionOccurred(Exception exception)
+																	{
+																		openincons.remove(con);
+																	}
+																});
 															}
 														});
 													}
@@ -240,6 +265,13 @@ public class TCPTransport implements ITransport
 													//logger.warning("TCPTransport receiver connect error: "+e);
 													//e.printStackTrace();
 												}
+											}
+											
+											TCPInputConnection[] incons = (TCPInputConnection[])openincons.toArray(new TCPInputConnection[0]);
+											for(int i=0; i<incons.length; i++)
+											{
+												System.out.println("close: "+incons[i]);
+												incons[i].close();
 											}
 											logger.warning("TCPTransport serversocket closed.");
 										}
@@ -447,8 +479,9 @@ public class TCPTransport implements ITransport
 	 *  for disptaching to the components.
 	 *  @param con The connection.
 	 */
-	protected void deliverMessages(final TCPInputConnection con)
+	protected IFuture deliverMessages(final TCPInputConnection con)
 	{
+		final Future ret = new Future();
 		SServiceProvider.getService(container, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -460,15 +493,20 @@ public class TCPTransport implements ITransport
 					{
 						ms.deliverMessage(msg.getMessage(), msg.getTypeName(), msg.getReceivers());
 					}
+					con.close();
+					ret.setResult(null);
 				}
 				catch(Exception e)
 				{
 //					logger.warning("TCPTransport receiving error: "+e);
 //					e.printStackTrace();
 					con.close();
+					ret.setException(e);
 				}
 			}
 		});
+		
+		return ret;
 	}
 	
 	/**

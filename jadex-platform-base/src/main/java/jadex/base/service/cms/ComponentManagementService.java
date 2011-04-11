@@ -813,7 +813,7 @@ public abstract class ComponentManagementService extends BasicService implements
 									// Component may be already killed (e.g. when autoshutdown).
 									if(component!=null)
 									{
-				//						System.out.println("killing: "+cid+" "+component.getParent().getComponentIdentifier().getLocalName());
+										System.out.println("destroy: "+cid);//+" "+component.getParent().getComponentIdentifier().getLocalName());
 										
 										// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
 										// todo: killcomponent should only be called once for each component?
@@ -1229,7 +1229,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			{
 				synchronized(descs)
 				{
-//					System.out.println("CleanupCommand: "+result);
+					System.out.println("CleanupCommand: "+cid);
 		//			boolean shutdown = false;
 		
 //					System.out.println("CleanupCommand remove called for: "+cid);

@@ -382,7 +382,13 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 					if(keys.length>0)
 					{
 						// One listener counts until all executors have shutdowned.
-						IResultListener lis = new CounterResultListener(keys.length, new DelegationResultListener(ret));
+						IResultListener lis = new CounterResultListener(keys.length, new DelegationResultListener(ret)
+						{
+							public void customResultAvailable(Object result)
+							{
+								super.customResultAvailable(getServiceIdentifier());
+							}
+						});
 						for(int i=0; i<keys.length; i++)
 						{
 							Executor exe = (Executor)executors.get(keys[i]);
@@ -392,7 +398,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 					}
 					else
 					{
-						ret.setResult(null);
+						ret.setResult(getServiceIdentifier());
 					}
 				}
 			}
