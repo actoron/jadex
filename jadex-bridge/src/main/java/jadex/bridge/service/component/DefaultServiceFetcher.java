@@ -12,12 +12,14 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 
 import java.util.ArrayList;
@@ -149,7 +151,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 					{
 						IExternalAccess ea = (IExternalAccess)result;
 						SServiceProvider.getServices(ea.getServiceProvider(), info.getType(), RequiredServiceInfo.SCOPE_LOCAL)
-							.addResultListener(new StoreDelegationResultListener(ret, provider, info, binding));
+							.addResultListener(new StoreIntermediateDelegationResultListener(ret, provider, info, binding));
 					}
 				});
 			}
@@ -161,33 +163,54 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 				{
 					public void customResultAvailable(Object result)
 					{
-						Collection coll = (Collection)result;
+						final Collection coll = (Collection)result;
 						if(coll!=null && coll.size()>0)
 						{
-							CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new DelegationResultListener(ret)
+							final CounterResultListener lis = new CounterResultListener(coll.size(), true, new IResultListener()
+							{
+								public void resultAvailable(Object result)
+								{
+									if(!binding.isDynamic())
+										DefaultServiceFetcher.this.result = ret.getIntermediateResults();
+									ret.setFinished();
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									if(!binding.isDynamic())
+										DefaultServiceFetcher.this.result = ret.getIntermediateResults();
+									ret.setFinished();
+								}
+							});
+							
+							SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+								.addResultListener(new DelegationResultListener(future)
 							{
 								public void customResultAvailable(Object result)
 								{
-									Collection coll = (Collection)result;
-									Collection ret = Collections.EMPTY_LIST;
-									if(coll!=null && coll.size()>0)
+									final IComponentManagementService cms = (IComponentManagementService)result;
+
+									for(Iterator it=coll.iterator(); it.hasNext(); )
 									{
-										Iterator it = coll.iterator();
-										ret = (Collection)it.next();
-										while(it.hasNext())
+										final IExternalAccess ea = (IExternalAccess)it.next();
+										final IComponentAdapter adapter = cms.getComponentAdapter((IComponentIdentifier)provider.getId());
+
+										SServiceProvider.getService(ea.getServiceProvider(), info.getType(), RequiredServiceInfo.SCOPE_LOCAL)
+											.addResultListener(new IResultListener()
 										{
-											ret.addAll((Collection)it.next());
-										}
+											public void resultAvailable(Object result)
+											{
+												lis.intermediateResultAvailable(createProxy(ea, adapter, (IInternalService)result, info, binding));
+											}
+											
+											public void exceptionOccurred(Exception exception)
+											{
+												lis.intermediateExceptionOccurred(exception);
+											}
+										});
 									}
-									super.customResultAvailable(ret);
 								}
 							});
-							for(Iterator it=coll.iterator(); it.hasNext(); )
-							{
-								IExternalAccess ea = (IExternalAccess)it.next();
-								SServiceProvider.getService(ea.getServiceProvider(), info.getType(), RequiredServiceInfo.SCOPE_LOCAL)
-									.addResultListener(lis);
-							}
 						}
 						else
 						{
@@ -200,7 +223,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 			{
 				// Search service using search specification.
 				SServiceProvider.getServices(provider, info.getType(), binding.getScope())
-					.addResultListener(new StoreDelegationResultListener(ret, provider, info, binding)
+					.addResultListener(new StoreIntermediateDelegationResultListener(ret, provider, info, binding)
 				{
 					public void exceptionOccurred(Exception exception)
 					{
@@ -210,7 +233,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 							{
 								IExternalAccess ea = (IExternalAccess)result;
 								SServiceProvider.getServices(ea.getServiceProvider(), info.getType(), RequiredServiceInfo.SCOPE_LOCAL)
-									.addResultListener(new StoreDelegationResultListener(ret, provider, info, binding));
+									.addResultListener(new StoreIntermediateDelegationResultListener(ret, provider, info, binding));
 							}
 						});
 					}
@@ -516,6 +539,18 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	}
 	
 	/**
+	 *  Create a proxy.
+	 */
+	public Object createProxy(IExternalAccess ea, IComponentAdapter adapter, IInternalService service, RequiredServiceInfo info, RequiredServiceBinding binding)
+	{
+//		return service;
+//		if(!service.getServiceIdentifier().getProviderId().equals(ea.getServiceProvider().getId()) || !Proxy.isProxyClass(service.getClass()))
+		Object proxy = service;
+		proxy = BasicServiceInvocationHandler.createRequiredServiceProxy(ea, adapter, service, this, info, binding);
+		return proxy;
+	}
+	
+	/**
 	 *  Simple listener that can store the result in a member variable.
 	 */
 	public class StoreDelegationResultListener extends DelegationResultListener
@@ -564,6 +599,103 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 						{
 							final IExternalAccess ea = (IExternalAccess)result;
 							IComponentAdapter adapter = cms.getComponentAdapter((IComponentIdentifier)provider.getId());
+							Object newres = createProxy(ea, adapter, (IInternalService)res, info, binding);
+							if(!binding.isDynamic())
+								DefaultServiceFetcher.this.result = newres;
+							super.customResultAvailable(newres);
+						}
+					});
+				}
+			});
+		}	
+	}
+	
+	/**
+	 *  Simple listener that can store the result in a member variable.
+	 */
+	public class StoreIntermediateDelegationResultListener extends IntermediateDelegationResultListener
+	{
+		//-------- attributes --------
+		
+		/** The provider. */
+		protected IServiceProvider provider;
+		
+		/** The required service info. */
+		protected RequiredServiceInfo info;
+		
+		/** The required service binding. */
+		protected RequiredServiceBinding binding;
+		
+		//-------- constructors --------
+		
+		/**
+		 *  Create a new listener.
+		 */
+		public StoreIntermediateDelegationResultListener(IntermediateFuture ret, IServiceProvider provider, RequiredServiceInfo info, RequiredServiceBinding binding)
+		{
+			super(ret);
+			this.provider = provider;
+			this.info = info;
+			this.binding = binding;
+		}
+		
+		//-------- methods --------
+		
+		/**
+		 *  Called when an intermediate result is available.
+		 * @param result The result.
+		 */
+		public void customIntermediateResultAvailable(Object result)
+		{
+			final Object res = result;
+			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+				.addResultListener(new DelegationResultListener(future)
+			{
+				public void customResultAvailable(Object result)
+				{
+					final IComponentManagementService cms = (IComponentManagementService)result;
+					cms.getExternalAccess((IComponentIdentifier)provider.getId()).addResultListener(new DelegationResultListener(future)
+					{
+						public void customResultAvailable(Object result)
+						{
+							final IExternalAccess ea = (IExternalAccess)result;
+							IComponentAdapter adapter = cms.getComponentAdapter((IComponentIdentifier)provider.getId());
+							
+							StoreIntermediateDelegationResultListener.super.customIntermediateResultAvailable(createProxy(ea, adapter, (IInternalService)res, info, binding));
+						}
+					});
+				}
+			});
+		}
+		
+		/**
+	     *  Declare that the future is finished.
+	     */
+		public void finished()
+		{
+			if(!binding.isDynamic())
+				DefaultServiceFetcher.this.result = future.getIntermediateResults();
+			super.finished();
+		}
+		
+		/**
+		 *  Called when result is available.
+		 */
+		public void customResultAvailable(Object result)
+		{
+			final Object res = result;
+			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+				.addResultListener(new DelegationResultListener(future)
+			{
+				public void customResultAvailable(Object result)
+				{
+					final IComponentManagementService cms = (IComponentManagementService)result;
+					cms.getExternalAccess((IComponentIdentifier)provider.getId()).addResultListener(new DelegationResultListener(future)
+					{
+						public void customResultAvailable(Object result)
+						{
+							final IExternalAccess ea = (IExternalAccess)result;
+							IComponentAdapter adapter = cms.getComponentAdapter((IComponentIdentifier)provider.getId());
 							Object newres;
 							
 							if(res instanceof Collection)
@@ -571,37 +703,24 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 								List tmp = new ArrayList();
 								for(Iterator it=((Collection)res).iterator(); it.hasNext(); )
 								{
-									tmp.add(createProxy(ea, adapter, (IInternalService)it.next()));
+									tmp.add(createProxy(ea, adapter, (IInternalService)it.next(), info, binding));
 								}
 								newres = tmp;
 							}
 							else
 							{
-								newres = createProxy(ea, adapter, (IInternalService)res);
+								newres = createProxy(ea, adapter, (IInternalService)res, info, binding);
 							}
-							
 							
 							if(binding.isDynamic())
 								DefaultServiceFetcher.this.result = newres;
 							
-							super.customResultAvailable(newres);
+							StoreIntermediateDelegationResultListener.super.resultAvailable(newres);
 						}
 					});
 				}
 			});
 		}	
-		
-		/**
-		 *  Create a proxy.
-		 */
-		protected Object createProxy(IExternalAccess ea, IComponentAdapter adapter, IInternalService service)
-		{
-//			return service;
-//			if(!service.getServiceIdentifier().getProviderId().equals(ea.getServiceProvider().getId()) || !Proxy.isProxyClass(service.getClass()))
-			Object proxy = service;
-			proxy = BasicServiceInvocationHandler.createRequiredServiceProxy(ea, adapter, service, DefaultServiceFetcher.this, info, binding);
-			return proxy;
-		}
 	}
 }
 

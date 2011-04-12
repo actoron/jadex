@@ -72,7 +72,7 @@ public class IntermediateDelegationResultListener implements IIntermediateResult
 	
 	/**
 	 *  Called when the result is available.
-	 * @param result The result.
+	 *  @param result The result.
 	 */
 	public void customResultAvailable(Object result)
 	{

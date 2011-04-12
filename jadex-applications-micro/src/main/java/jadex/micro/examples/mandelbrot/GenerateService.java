@@ -289,8 +289,8 @@ public class GenerateService extends BasicService implements IGenerateService
 			
 			public void finished()
 			{
-				double	millis	= ((System.nanoTime() - time)/100000)/10.0;
-				System.out.println("took: "+millis+" millis.");
+//				double	millis	= ((System.nanoTime() - time)/100000)/10.0;
+//				System.out.println("took: "+millis+" millis.");
 				ret.setResult(data);
 			}
 		}));

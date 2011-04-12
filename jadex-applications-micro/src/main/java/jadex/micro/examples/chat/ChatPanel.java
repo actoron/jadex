@@ -184,7 +184,7 @@ public class ChatPanel extends JPanel
 				{
 					public void resultAvailable(Object result)
 					{
-//						System.out.println("bulk");
+						System.out.println("bulk");
 						if(result!=null)
 						{
 							for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
@@ -197,19 +197,19 @@ public class ChatPanel extends JPanel
 					
 					public void exceptionOccurred(Exception exception)
 					{
-//						System.out.println("Chat service exception.");
+						System.out.println("Chat service exception.");
 						exception.printStackTrace();
 					}
 					
 					public void intermediateResultAvailable(Object result)
 					{
-//						System.out.println("intermediate");
+						System.out.println("intermediate");
 						((IChatService)result).hear(name, text);
 					}
 					
 					public void finished()
 					{
-//						System.out.println("end");
+						System.out.println("end");
 					}
 				});
 				return null;
