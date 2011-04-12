@@ -1,10 +1,12 @@
 package jadex.micro.testcases.semiautomatic.compositeservice;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.component.interceptors.AbstractApplicableInterceptor;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.ProvidedService;
@@ -32,22 +34,39 @@ public class CorruptAdderAgent extends MicroAgent
 		{
 			public IFuture execute(ServiceInvocationContext context)
 			{
+				final Future ret = new Future();
 				try
 				{
 					if(context.getMethod().equals(IAddService.class.getMethod("add", new Class[]{double.class, double.class})))
 					{
+						context.setResult(new Future(new ComponentTerminatedException(getComponentIdentifier())));
 						System.out.println("hello interceptor");
 //						if(calls++>0)
 						{
-							killAgent();
+							killAgent().addResultListener(new IResultListener()
+							{
+								public void resultAvailable(Object result)
+								{
+									ret.setResult(null);
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+									System.out.println("cannot terminate, already terminated");
+								}
+							});
 						}
+					}
+					else
+					{
+						context.invoke().addResultListener(new DelegationResultListener(ret));
 					}
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+//					e.printStackTrace();
 				}
-				return context.invoke();
+				
+				return ret;
 			}
 		}).addResultListener(new DelegationResultListener(ret));
 		return ret;

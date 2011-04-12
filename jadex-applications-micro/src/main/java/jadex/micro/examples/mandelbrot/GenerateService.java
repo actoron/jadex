@@ -91,18 +91,21 @@ public class GenerateService extends BasicService implements IGenerateService
 								{
 									public void customResultAvailable(final Object calcresult)
 									{
+//										System.out.println("here");
 										pd.setFinished(true);
 										ds.displayIntermediateResult(pd).addResultListener(
 											agent.createResultListener(new IResultListener()
 										{
 											public void resultAvailable(Object result)
 											{
+//												System.out.println("da");
 												// Use result from calculation service instead of result from display service.
 												ret.setResult(calcresult);
 											}
 											
 											public void exceptionOccurred(Exception exception)
 											{
+//												System.out.println("da2");
 												// Use result from calculation service instead of exception from display service.
 												ret.setResult(calcresult);
 											}
@@ -138,6 +141,8 @@ public class GenerateService extends BasicService implements IGenerateService
 					{
 						final IComponentManagementService cms = (IComponentManagementService)result;
 						Object delay = agent.getArgument("delay");
+						if(delay==null)
+							delay = new Long(5000);
 						cms.createComponent(null, "jadex/micro/examples/mandelbrot/CalculateAgent.class", 
 							new CreationInfo(SUtil.createHashMap(new String[]{"delay"}, new Object[]{delay}), 
 							agent.getParent().getComponentIdentifier()), null)

@@ -5,7 +5,10 @@ import jadex.bridge.IInternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -18,6 +21,10 @@ import jadex.micro.annotation.ProvidedServices;
 	@ProvidedService(type=IProgressService.class, expression="new ProgressService($component)", direct=true)
 	})
 @Arguments(@Argument(name="delay", description="Agent kills itself when no job arrives in the delay interval.", typename="Long", defaultvalue="new Long(1000)"))
+@Configurations({
+	@Configuration(name="default"),
+	@Configuration(name="long lived", arguments={@NameValue(name="delay", value="1000000")}),
+})
 public class CalculateAgent extends MicroAgent
 {
 	//-------- attributes --------

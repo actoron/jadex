@@ -119,8 +119,9 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
     		}
     		else
     		{
-    			this.results = (Collection)result;
-    			super.setResult(result);
+    			if(result!=null)
+    				this.results = (Collection)result;
+    			super.setResult(results);
     		}
     	}
     }
@@ -238,7 +239,7 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 					Object[] inter = null;
 					synchronized(this)
 					{
-						if(!intermediate)
+						if(!intermediate && results!=null)
 						{
 							inter = results.toArray();
 						}

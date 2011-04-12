@@ -241,7 +241,7 @@ public class ServicePoolManager
 				public void resultAvailable(Object result)
 				{
 					// ignored
-//					System.out.println("wurksn");
+//					System.out.println("wurksnrr");
 				}
 			}));
 		}

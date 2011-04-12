@@ -275,6 +275,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		}
 		if(configs!=null)
 		{
+			if(metainfo==null)
+				metainfo = new MicroAgentMetaInfo();
+			
 			String[] confignames = new String[configs.length];
 			Map master = new HashMap();
 			Map daemon = new HashMap();
@@ -290,18 +293,21 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 				for(int j=0; j<argvals.length; j++)
 				{
 					jadex.bridge.Argument arg = (jadex.bridge.Argument)argsmap.get(argvals[j].name());
-					arg.setDefaultValue(confignames[i], argvals[j].value());
+					Object val = SJavaParser.evaluateExpression(argvals[j].value(), imports, null, classloader);
+					arg.setDefaultValue(confignames[i], val);
 				}
 				NameValue[] resvals = configs[i].results();
 				for(int j=0; j<resvals.length; j++)
 				{
 					jadex.bridge.Argument arg = (jadex.bridge.Argument)resmap.get(resvals[j].name());
-					arg.setDefaultValue(confignames[i], resvals[j].value());
+					Object val = SJavaParser.evaluateExpression(resvals[j].value(), imports, null, classloader);
+					arg.setDefaultValue(confignames[i], val);
 				}
 			}
 			metainfo.setMaster(new ModelValueProvider(master));
 			metainfo.setDaemon(new ModelValueProvider(daemon));
 			metainfo.setAutoShutdown(new ModelValueProvider(autosd));
+			metainfo.setConfigs(confignames);
 		}
 		
 		// todo: move to be able to use the constant

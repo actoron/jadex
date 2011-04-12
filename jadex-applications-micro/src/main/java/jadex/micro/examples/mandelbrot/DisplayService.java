@@ -32,6 +32,7 @@ public class DisplayService extends BasicService implements IDisplayService
 	 */
 	public IFuture displayResult(AreaData result)
 	{
+//		System.out.println("displayRes");
 		agent.getPanel().setResults(result);
 		return IFuture.DONE;
 	}
@@ -42,6 +43,7 @@ public class DisplayService extends BasicService implements IDisplayService
 	 */
 	public IFuture displayIntermediateResult(ProgressData progress)
 	{
+//		System.out.println("displayInRes");
 		agent.getPanel().addProgress(progress);
 		return IFuture.DONE;
 	}

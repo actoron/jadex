@@ -4,6 +4,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
@@ -29,11 +30,16 @@ public class CompositeCalculatorAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		add(1,1).addResultListener(new DefaultResultListener()
+		add(1,1).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				System.out.println("Result is: "+result);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("Service invocation failed: "+exception);
 			}
 		});
 		
@@ -57,12 +63,17 @@ public class CompositeCalculatorAgent extends MicroAgent
 	protected IFuture add(final double a, final double b)
 	{
 		final Future ret = new Future();
-		getRequiredService("addservice").addResultListener(createResultListener(new DefaultResultListener()
+		getRequiredService("addservice").addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				IAddService add = (IAddService)result;
 				add.add(a, b).addResultListener(createResultListener(new DelegationResultListener(ret)));
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+				System.out.println("Could not get required add service: "+exception);
 			}
 		}));
 		return ret;

@@ -269,7 +269,13 @@ public abstract class ComponentManagementService extends BasicService implements
 																exta.getServiceProvider().getId()).getPlatformName()); // Hack?!
 															if(adapters.containsKey(cid) || initinfos.containsKey(cid))
 															{
-																inited.setException(new RuntimeException("Component name already exists on platform: "+cid));
+																inited.setException(new RuntimeException("Component name already exists on platform: "+cid)
+																{
+																	public void printStackTrace()
+																	{
+																		Thread.dumpStack();
+																	}
+																});
 																return;
 															}
 															// todo: hmm adresses may be set too late? use cached message service?
