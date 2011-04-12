@@ -59,7 +59,7 @@ public class ValidationInterceptor extends AbstractApplicableInterceptor
 		}
 		else
 		{
-			// Call isValid() on proxy.
+			// Call isValid() on proxy to execute full interceptor chain.
 			IService ser = (IService)sic.getProxy();
 			ser.isValid().addResultListener(new DelegationResultListener(ret)
 			{

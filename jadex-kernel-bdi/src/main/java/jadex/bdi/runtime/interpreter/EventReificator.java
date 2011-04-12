@@ -15,7 +15,6 @@ import java.util.Map;
  *  This object is responsible for inserting changeevent
  *  objects into the state that represent (i.e. reify)
  *  state changes (such as new fact value of belief).
- *
  */
 public class EventReificator implements IOAVStateListener
 {

@@ -66,10 +66,12 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			
 			if(START_METHOD.equals(sic.getMethod()))
 			{
+				// invoke 1) basic service start 2) domain service start
 				invokeDoubleMethod(sic, si, START_METHOD, ServiceStart.class, true).addResultListener(new DelegationResultListener(ret));
 			}
 			else if(SHUTDOWN_METHOD.equals(sic.getMethod()))
 			{
+				// invoke 1) domain service shutdown 2) basic service shutdown
 				invokeDoubleMethod(sic, si, SHUTDOWN_METHOD, ServiceShutdown.class, false).addResultListener(new DelegationResultListener(ret));
 			}
 			else if(SERVICEMETHODS.contains(sic.getMethod()))

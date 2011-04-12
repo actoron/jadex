@@ -592,7 +592,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		}	
 		
 		/**
-		 * 
+		 *  Create a proxy.
 		 */
 		protected Object createProxy(IExternalAccess ea, IComponentAdapter adapter, IInternalService service)
 		{
