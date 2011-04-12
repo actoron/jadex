@@ -761,7 +761,7 @@ public class MessageService extends BasicService implements IMessageService
 				
 				for(int i=0; i<transports.size(); i++)
 				{
-					System.err.println("MessageService transport shutdown: "+transports.get(i));
+//					System.err.println("MessageService transport shutdown: "+transports.get(i));
 					((ITransport)transports.get(i)).shutdown().addResultListener(crl);
 				}
 			}
@@ -1128,7 +1128,7 @@ public class MessageService extends BasicService implements IMessageService
 					// Quit when service was terminated.
 					else
 					{
-						System.out.println("send message not executed");
+//						System.out.println("send message not executed");
 						if(ftmp!=null)
 						{
 							ManagerSendTask task = (ManagerSendTask)ftmp[0];
@@ -1142,7 +1142,7 @@ public class MessageService extends BasicService implements IMessageService
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					System.out.println("send message not executed");
+//					System.out.println("send message not executed");
 					if(ftmp!=null)
 					{
 						ManagerSendTask task = (ManagerSendTask)ftmp[0];

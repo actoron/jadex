@@ -273,7 +273,7 @@ public class TCPTransport implements ITransport
 //												System.out.println("close: "+incons[i]);
 												incons[i].close();
 											}
-											logger.warning("TCPTransport serversocket closed.");
+//											logger.warning("TCPTransport serversocket closed.");
 										}
 									});
 								}

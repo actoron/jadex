@@ -66,11 +66,11 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			
 			if(START_METHOD.equals(sic.getMethod()))
 			{
-				invokeDoubleMethod(sic, si, START_METHOD, ServiceStart.class).addResultListener(new DelegationResultListener(ret));
+				invokeDoubleMethod(sic, si, START_METHOD, ServiceStart.class, true).addResultListener(new DelegationResultListener(ret));
 			}
 			else if(SHUTDOWN_METHOD.equals(sic.getMethod()))
 			{
-				invokeDoubleMethod(sic, si, SHUTDOWN_METHOD, ServiceShutdown.class).addResultListener(new DelegationResultListener(ret));
+				invokeDoubleMethod(sic, si, SHUTDOWN_METHOD, ServiceShutdown.class, false).addResultListener(new DelegationResultListener(ret));
 			}
 			else if(SERVICEMETHODS.contains(sic.getMethod()))
 			{
@@ -93,11 +93,10 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	
 	/**
 	 *  Invoke double methods.
+	 *  The boolean 'firstorig' determines if basicservice method is called first.
 	 */
-	protected IFuture invokeDoubleMethod(final ServiceInvocationContext sic, final ServiceInfo si, Method m, Class annotation)
+	protected IFuture invokeDoubleMethod(final ServiceInvocationContext sic, final ServiceInfo si, Method m, Class annotation, boolean firstorig)
 	{
-		// todo: call in which order?
-		
 		final Future ret = new Future();
 		
 		final Method origmethod = sic.getMethod();
@@ -108,17 +107,35 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 		{
 			if(methods[i].isAnnotationPresent(annotation))
 			{
-				sic.setMethod(methods[i]);
-				sic.setObject(si.getDomainService());
-				sic.invoke().addResultListener(new DelegationResultListener(ret)
+				if(firstorig)
 				{
-					public void customResultAvailable(Object result)
+					final Method domainmethod = methods[i];
+					sic.setObject(si.getManagementService());
+					sic.invoke().addResultListener(new DelegationResultListener(ret)
 					{
-						sic.setMethod(origmethod);
-						sic.setObject(si.getManagementService());
-						sic.invoke().addResultListener(new DelegationResultListener(ret));
-					}
-				});
+						public void customResultAvailable(Object result)
+						{
+							sic.setMethod(domainmethod);
+							sic.setObject(si.getDomainService());
+							sic.invoke().addResultListener(new DelegationResultListener(ret));
+						}
+					});
+				}
+				else
+				{
+					sic.setMethod(methods[i]);
+					sic.setObject(si.getDomainService());
+					sic.invoke().addResultListener(new DelegationResultListener(ret)
+					{
+						public void customResultAvailable(Object result)
+						{
+							sic.setMethod(origmethod);
+							sic.setObject(si.getManagementService());
+							sic.invoke().addResultListener(new DelegationResultListener(ret));
+						}
+					});
+				}
+				
 				found = true;
 			}
 		}
