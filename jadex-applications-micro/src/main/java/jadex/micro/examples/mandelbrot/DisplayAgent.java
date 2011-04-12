@@ -103,7 +103,7 @@ public class DisplayAgent extends MicroAgent
 								{
 									public void run()
 									{
-										frame.setVisible(false);
+										frame.dispose();
 									}
 								});
 							}

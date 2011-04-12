@@ -4,21 +4,23 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filechooser.RemoteFileSystemView;
 import jadex.base.gui.filetree.FileData;
 import jadex.base.gui.filetree.FileTreePanel;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
-import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
 
 import javax.swing.Icon;
 import javax.swing.JFileChooser;
@@ -127,42 +129,55 @@ public class AddRemotePathAction extends ToolTipAction
 				if(filechooser.showDialog(SGUI.getWindowParent(treepanel), 
 					"Add Remote Path")==JFileChooser.APPROVE_OPTION)
 				{
-					final File file = filechooser.getSelectedFile();
+					File file = filechooser.getSelectedFile();
 					if(file!=null)
 					{
-						SServiceProvider.getService(treepanel.getExternalAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new DefaultResultListener()
+						final String	path	= file.getAbsolutePath();
+						treepanel.getExternalAccess().scheduleStep(new IComponentStep()
 						{
-							public void resultAvailable(Object result)
+							@XMLClassname("getRemoteFile")
+							public Object execute(IInternalAccess ia)
 							{
-								ILibraryService ls = (ILibraryService)result;
-								File f = new File(file.getParentFile(), file.getName());
-								try
+								final Future	ret	= new Future();
+								SServiceProvider.getService(ia.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+									.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 								{
-									URL url = f.toURI().toURL();
-									String filename = file.getAbsolutePath();
-									if((filename.endsWith("\\") || filename.endsWith("/")) && 
-										(!url.toString().endsWith("\\") || url.toString().endsWith("/")))
+									public void customResultAvailable(Object result)
 									{
-										// Hack! f.toURI().toURL() does not append when file is not local
-										// and it cannot be determined if it is a directory
-										url = new URL(url.toString()+"/");
+										ILibraryService ls = (ILibraryService)result;
+										File	file	= new File(path);
+//										File	f = new File(file.getParentFile(), file.getName());
+//										URL url = f.toURI().toURL();
+//										String filename = file.getAbsolutePath();
+//										if((filename.endsWith("\\") || filename.endsWith("/")) && 
+//											(!url.toString().endsWith("\\") || url.toString().endsWith("/")))
+//										{
+//											// Hack! f.toURI().toURL() does not append when file is not local
+//											// and it cannot be determined if it is a directory
+//											url = new URL(url.toString()+"/");
+//										}
+//										ls.addURL(url);
+										try
+										{
+											ls.addURL(file.toURI().toURL());
+											ret.setResult(new FileData(file));
+										}
+										catch(MalformedURLException mue)
+										{
+											ret.setException(mue);
+										}
 									}
-									ls.addURL(url);
-								}
-								catch(MalformedURLException ex)
-								{
-									ex.printStackTrace();
-								}
+								}));
+
+								return ret;
+							}
+						}).addResultListener(new SwingDefaultResultListener()
+						{
+							public void customResultAvailable(Object result)
+							{
+								treepanel.addTopLevelNode((FileData)result);
 							}
 						});
-						
-						FileData fd = new FileData(file);
-						fd.setDirectory(true); // Hack! JFileChooser does not deliver the RemoteFile :-(
-						treepanel.addTopLevelNode(fd);
-	//					final RootNode root = (RootNode)getModel().getRoot();
-	//					ITreeNode node = ModelTreePanel.createNode(root, model, tree, new RemoteFile(file.getName(), file.getAbsolutePath(), file.isDirectory()), iconcache, filefilter, exta);
-	//					root.addChild(node);
 					}
 				}
 			}

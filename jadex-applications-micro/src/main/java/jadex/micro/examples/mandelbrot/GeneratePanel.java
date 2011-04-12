@@ -203,7 +203,7 @@ public class GeneratePanel extends JPanel
 						{
 							public void run()
 							{
-								f.setVisible(false);
+								f.dispose();
 							}
 						});
 					}

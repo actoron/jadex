@@ -4,6 +4,7 @@ import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.DelegationResultListener;
@@ -13,7 +14,9 @@ import jadex.commons.future.IFuture;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Invocation interceptor for executing a call on 
@@ -31,7 +34,23 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	
 	/** The static map of subinterceptors (method -> interceptor). */
 	protected static Map SUBINTERCEPTORS = getInterceptors();
+
+	/** The static set of no decoupling methods. */
+	protected static Set NO_DECOUPLING;
 	
+	static
+	{
+		try
+		{
+			NO_DECOUPLING = new HashSet();
+			NO_DECOUPLING.add(IInternalService.class.getMethod("shutdownService", new Class[0]));
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
 	//-------- attributes --------
 	
 	/** The external access. */
@@ -65,7 +84,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		boolean scheduleable = sic.getMethod().getReturnType().equals(IFuture.class) 
 			|| sic.getMethod().getReturnType().equals(void.class);
 		
-		if(!adapter.isExternalThread() || !scheduleable)
+		if(!adapter.isExternalThread() || !scheduleable || NO_DECOUPLING.contains(sic.getMethod()))
 		{
 //			if(sic.getMethod().getName().equals("add"))
 //				System.out.println("direct: "+Thread.currentThread());

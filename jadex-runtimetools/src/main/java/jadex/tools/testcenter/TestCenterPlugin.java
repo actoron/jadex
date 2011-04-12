@@ -317,9 +317,9 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	}
 	
 	/**
-	 *  Save the platform properties.
+	 *  Store settings if any in platform settings service.
 	 */
-	public IFuture	pushPlatformProperties()
+	public IFuture pushPlatformSettings()
 	{
 		final Future	ret	= new Future();
 		SServiceProvider.getService(getJCC().getPlatformAccess().getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)

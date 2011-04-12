@@ -2,14 +2,10 @@ package jadex.tools.jcc;
 
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.plugin.SJCC;
-import jadex.bridge.IComponentListener;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
-import jadex.commons.ChangeEvent;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.future.Future;
@@ -93,37 +89,6 @@ public class ControlCenter
 		this.plugin_classes	= plugin_classes;
 		this.pccs	= new HashMap();
 		this.saveonexit	= true;
-		
-		jccaccess.scheduleStep(new IComponentStep()
-		{
-			public Object execute(IInternalAccess ia)
-			{
-				ia.addComponentListener(new IComponentListener()
-				{
-					public void componentTerminating(ChangeEvent ae)
-					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								if(!killed)
-								{
-									shutdown();
-								}
-								window.setVisible(false);
-								window.dispose();
-							}
-						});
-					}
-
-					public void componentTerminated(ChangeEvent ae)
-					{
-					}
-				});
-				return null;
-			}
-		});
-		
 		this.window = new ControlCenterWindow(this);
 		
 		// Default platform control center for local platform.
@@ -300,7 +265,7 @@ public class ControlCenter
 	 * Informs the window if it should dispose its resources.
 	 * @return true if the agent has been killed.
 	 */
-	public boolean	exit()
+	public void	exit()
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
@@ -330,7 +295,6 @@ public class ControlCenter
 				if(msg!=null && msg.isRemember())
 					jccexit = JCC_EXIT_SHUTDOWN;
 	
-				shutdown();
 				SJCC.killPlattform(jccaccess, window);
 			}
 			else if(JOptionPane.NO_OPTION == choice)
@@ -339,30 +303,63 @@ public class ControlCenter
 				if(msg != null && msg.isRemember())
 					jccexit = JCC_EXIT_KEEP;
 	
-				shutdown();
 				jccaccess.killComponent();
 			}
 			// else CANCEL
 		}
-		
-		return killed;
 	}
 	
 	/**
 	 *  Do any required cleanup on exit.
 	 */
-	public void shutdown()
+	public IFuture	shutdown()
 	{
-		if(saveonexit)
-			saveSettings();
+		final Future	ret	= new Future();
 		
-		for(Iterator it=pccs.keySet().iterator(); it.hasNext(); )
+		SwingUtilities.invokeLater(new Runnable()
 		{
-			((PlatformControlCenter)pccs.get(it.next())).dispose();
-		}
-		killed = true;
-		if(cmshandler!=null)
-			cmshandler.dispose();
+			public void run()
+			{
+				assert !killed;
+				killed = true;
+				
+				IFuture	saved;
+				if(saveonexit)
+					saved	= saveSettings();
+				else
+					saved	= IFuture.DONE;
+				
+				saved.addResultListener(new SwingDelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result) throws Exception
+					{
+						// Todo: pcc dispose with future?
+						for(Iterator it=pccs.keySet().iterator(); it.hasNext(); )
+						{
+							((PlatformControlCenter)pccs.get(it.next())).dispose();
+						}
+						
+						IFuture	handlerdisposed;
+						if(cmshandler!=null)
+							handlerdisposed	= cmshandler.dispose();
+						else
+							handlerdisposed	= IFuture.DONE;
+
+						handlerdisposed.addResultListener(new SwingDelegationResultListener(ret)
+						{
+							public void customResultAvailable(Object result) throws Exception
+							{
+								window.setVisible(false);
+								window.dispose();
+								ret.setResult(null);
+							}
+						});
+					}
+				});
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**

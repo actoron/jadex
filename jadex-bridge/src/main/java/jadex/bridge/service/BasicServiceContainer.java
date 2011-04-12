@@ -261,7 +261,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 					{
 						IInternalService service = (IInternalService)allservices.remove(allservices.size()-1);
 //						System.out.println("shutdown start: "+service.getServiceIdentifier());
-						service.shutdownService().addResultListener(this);						
+						service.shutdownService().addResultListener(this);
 					}
 					else
 					{

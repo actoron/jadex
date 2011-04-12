@@ -71,7 +71,7 @@
 	</componenttypes>
 	
 	<services>
-		<providedservice class="ISettingsService" direct="true">
+		<providedservice class="ISettingsService">
 			new SettingsService($args.platformname, $component)
 		</providedservice>
 		<providedservice class="IThreadPool" direct="true">

@@ -201,11 +201,25 @@ public class RootNode extends AbstractTreeNode
 			ITreeNode	node	= getChild(i);
 			if(node instanceof FileNode)
 			{
-				ret[i]	= ((FileNode)node).getFile().getAbsolutePath();
+				if(node instanceof JarNode)
+				{
+					ret[i]	= ((JarAsDirectory)((FileNode)node).getFile()).getJarPath();
+				}
+				else
+				{
+					ret[i]	= ((FileNode)node).getFile().getAbsolutePath();
+				}
 			}
 			else
 			{
-				ret[i]	= ((RemoteFileNode)node).getRemoteFile().getPath();
+				if(node instanceof RemoteJarNode)
+				{
+					ret[i]	= (((RemoteFileNode)node).getRemoteFile()).getPath();
+				}
+				else
+				{
+					ret[i]	= ((RemoteFileNode)node).getRemoteFile().getPath();
+				}
 			}
 		}
 		return ret;

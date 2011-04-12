@@ -90,11 +90,7 @@ public class ControlCenterWindow extends JFrame
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				if(controlcenter.exit())
-				{
-					dispose();
-					setVisible(false);
-				}
+				controlcenter.exit();
 			}
 		});
 	}

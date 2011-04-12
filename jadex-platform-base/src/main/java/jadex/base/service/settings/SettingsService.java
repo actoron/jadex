@@ -187,6 +187,7 @@ public class SettingsService extends BasicService implements ISettingsService
 	 */
 	public IFuture	setProperties(String id, Properties props)
 	{
+//		System.out.println("Set properties: "+id);
 		final Future	ret	= new Future();
 		this.props.removeSubproperties(id);
 		this.props.addSubproperties(id, props);
@@ -272,6 +273,7 @@ public class SettingsService extends BasicService implements ISettingsService
 	 */
 	public IFuture	saveProperties(boolean shutdown)
 	{
+//		System.out.println("Save properties"+(shutdown?" (shutdown)":""));
 		final Future	ret	= new Future();
 		
 		IResultListener	rl	= new DelegationResultListener(ret)

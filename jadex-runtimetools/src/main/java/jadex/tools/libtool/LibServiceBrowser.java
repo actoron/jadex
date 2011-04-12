@@ -336,7 +336,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 	 */
 	public IFuture getProperties()
 	{
-		Future ret = new Future();
+		Future ret = new Future(null);
 		return ret;
 	}
 }

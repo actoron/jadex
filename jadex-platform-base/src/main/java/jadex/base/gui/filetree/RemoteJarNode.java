@@ -91,7 +91,7 @@ public class RemoteJarNode extends RemoteDirNode
 						int	slash = ename.lastIndexOf("/", ename.length()-2);
 						ename = ename.substring(slash!=-1? slash+1: 0, ename.endsWith("/")? ename.length()-1: ename.length());
 //						System.out.println("ename: "+ename+" "+entry.getName());
-						final RemoteJarFile tmp = new RemoteJarFile(ename, jad.getAbsolutePath()+"!/"+entry.getName(), 
+						final RemoteJarFile tmp = new RemoteJarFile(ename, "jar:file:"+jad.getJarPath()+"!/"+entry.getName(), 
 							entry.isDirectory(), ename, rjfentries, entry.getName(), entry.getTime());
 						
 						myfilter.filter(jad.getFile(entry.getName())).addResultListener(new IResultListener()

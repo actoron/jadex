@@ -97,7 +97,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 		clayout = new CardLayout();
 		content = new JPanel(clayout);
 	
-		this.console = new ConsolePanel(controlcenter.getPlatformAccess());
+		this.console = new ConsolePanel(controlcenter.getPlatformAccess(), controlcenter.getJCCAccess());
 		console.setConsoleEnabled(false);
 		this.sp = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		sp.setOneTouchExpandable(true);

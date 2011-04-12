@@ -57,7 +57,10 @@ public class ConsolePanel extends JPanel
 	//-------- attributes --------
 	
 	/** The platform component. */
-	protected IExternalAccess	access;
+	protected IExternalAccess	platformaccess;
+	
+	/** The jcc component. */
+	protected IExternalAccess	jccaccess;
 	
 	/** The document. */
 	protected StyledDocument doc;
@@ -71,24 +74,32 @@ public class ConsolePanel extends JPanel
 	/** The on/off button. */
 	protected JButton onoff;
 	
+	/** The console text pane. */
+	protected JTextPane	console;
+	
+	/** The console title. */
+	protected JLabel	label;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new console panel.
 	 */
-	public ConsolePanel(IExternalAccess	access)
+	public ConsolePanel(IExternalAccess platformaccess, IExternalAccess jccaccess)
 	{
-		this(access, "Console Output");
+		this(platformaccess, jccaccess, "Console Output");
 	}
 	
 	/**
 	 *  Create a new console panel.
 	 */
-	public ConsolePanel(IExternalAccess access, String title)
+	public ConsolePanel(IExternalAccess platformaccess, IExternalAccess jccaccess, String title)
 	{
-		this.access	= access;
-		JTextPane tp = new JTextPane();
-		this.doc = tp.getStyledDocument();
+		this.platformaccess	= platformaccess;
+		this.jccaccess	= jccaccess;
+		this.console = new JTextPane();
+		this.doc = console.getStyledDocument();
+		this.label	= new JLabel(title);
 	
 		Style def = StyleContext.getDefaultStyleContext().
 	    	getStyle(StyleContext.DEFAULT_STYLE);
@@ -120,7 +131,7 @@ public class ConsolePanel extends JPanel
 			}
 		});
 			
-		final JScrollPane center = new JScrollPane(tp);
+		final JScrollPane center = new JScrollPane(console);
 		
 		doc.addDocumentListener(new DocumentListener()
 		{
@@ -147,7 +158,7 @@ public class ConsolePanel extends JPanel
 		});
 		
 		JPanel north = new JPanel(new GridBagLayout());
-		north.add(new JLabel(title), new GridBagConstraints(0, 0, 1, 1, 1, 0, GridBagConstraints.WEST,
+		north.add(label, new GridBagConstraints(0, 0, 1, 1, 1, 0, GridBagConstraints.WEST,
 			GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
 		north.add(onoff, new GridBagConstraints(1, 0, 1, 1, 0, 0, GridBagConstraints.EAST,
 			GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
@@ -185,10 +196,25 @@ public class ConsolePanel extends JPanel
 	 */
 	public void setConsoleEnabled(boolean enable)
 	{
+		final String	id	= jccaccess.getComponentIdentifier().getPlatformName()+"#console@"+hashCode();
 		if(!enable)
 		{
 			onoff.setIcon(icons.getIcon("on"));
 			onoff.setToolTipText("Turn on the console");
+			if(!label.getText().endsWith(" (off)"))
+				label.setText(label.getText()+" (off)");
+			
+			platformaccess.scheduleImmediate(new IComponentStep()
+			{
+				@XMLClassname("removeListener")
+				public Object execute(IInternalAccess ia)
+				{
+					ConsoleListener	cl	= new ConsoleListener(id, ia, null);
+					SUtil.removeSystemOutListener(cl);
+					SUtil.removeSystemErrListener(cl);
+					return null;
+				}
+			});
 		}
 		else
 		{
@@ -223,12 +249,12 @@ public class ConsolePanel extends JPanel
 				}
 			};
 			
-			access.scheduleImmediate(new IComponentStep()
+			platformaccess.scheduleImmediate(new IComponentStep()
 			{
 				@XMLClassname("installListener")
 				public Object execute(IInternalAccess ia)
 				{
-					ConsoleListener	cl	= new ConsoleListener("x", ia, rcl);
+					ConsoleListener	cl	= new ConsoleListener(id, ia, rcl);
 					SUtil.addSystemOutListener(cl);
 					SUtil.addSystemErrListener(cl);
 					return null;
@@ -237,6 +263,8 @@ public class ConsolePanel extends JPanel
 			
 			onoff.setIcon(icons.getIcon("off"));
 			onoff.setToolTipText("Turn off the console");
+			if(label.getText().endsWith(" (off)"))
+				label.setText(label.getText().substring(0, label.getText().length()-6));
 		}
 	}
 	
@@ -254,6 +282,8 @@ public class ConsolePanel extends JPanel
 	 */
 	public void close()
 	{
+		if(isConsoleEnabled())
+			setConsoleEnabled(false);
 		sdout.close();
 		sderr.close();
 	}

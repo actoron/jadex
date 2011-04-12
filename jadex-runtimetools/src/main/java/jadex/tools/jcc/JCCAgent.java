@@ -23,13 +23,20 @@ import jadex.tools.testcenter.TestCenterPlugin;
 @Description("Micro component for opening the JCC gui.")
 public class JCCAgent extends MicroAgent
 {
+	//-------- attributes --------
+	
+	/** The control center. */
+	protected ControlCenter	cc;
+	
+	//-------- micro agent methods --------
+	
 	/**
 	 *  Open the gui on agent startup.
 	 */
 	public IFuture	agentCreated()
 	{
 		Future	ret	= new Future();
-		ControlCenter	cc	= new ControlCenter();
+		this.cc	= new ControlCenter();
 		cc.init(getExternalAccess(),
 			new String[]{
 				StarterPlugin.class.getName(),
@@ -48,6 +55,16 @@ public class JCCAgent extends MicroAgent
 				DeployerPlugin.class.getName()
 			}
 		).addResultListener(createResultListener(new DelegationResultListener(ret)));
+		return ret;
+	}
+	
+	/**
+	 *  Close the gui on agent shutdown.
+	 */
+	public IFuture	agentKilled()
+	{
+		Future	ret	= new Future();
+		cc.shutdown().addResultListener(createResultListener(new DelegationResultListener(ret)));
 		return ret;
 	}
 }

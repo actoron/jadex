@@ -1041,6 +1041,7 @@ public class SUtil
 		}
 		catch(SecurityException e)
 		{
+			e.printStackTrace();
 		}
 
 		// Classpath...

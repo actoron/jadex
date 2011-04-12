@@ -89,7 +89,7 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 		final CollectionResultListener lis = new CollectionResultListener(
 			subcapnames.length+1, true, new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object result) 
+			public void customResultAvailable(Object result)
 			{
 //				if(subpanels.size()==1)
 //				{
