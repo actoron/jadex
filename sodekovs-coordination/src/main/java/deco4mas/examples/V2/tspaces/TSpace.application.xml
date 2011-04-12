@@ -34,10 +34,8 @@
 			
 	<spacetypes>
 		<env:envspacetype name="coordspace" width="11" height="11" class="CoordinationSpace">		
-<env:property name="dynamics_configuration">"deco4mas/examples/V2/tspaces/belief_set.dynamics.xml"</env:property>
-
-				
-			
+			<env:property name="dynamics_configuration">"sodekovs-coordination/src/main/java/deco4mas/examples/V2/tspaces/belief_set.dynamics.xml"</env:property>
+		
 			<env:processtypes>
 				<env:processtype name="createEvents" class="CreateEventsProcess">
 					<env:property name="rate">2</env:property>
@@ -85,9 +83,10 @@
 
 
 <application name="Test">
-			<spaces>	
-				<env:envspace name="mycoordspace" type="coordspace" width="2" height ="2">					
-	 			</env:envspace>
+			<spaces>
+	<env:envspace name="mycoordspace" type="coordspace" width="2"
+		height="2">
+	</env:envspace>
 			</spaces>
 			<components>
 				<component type="Sender" number="1"/>

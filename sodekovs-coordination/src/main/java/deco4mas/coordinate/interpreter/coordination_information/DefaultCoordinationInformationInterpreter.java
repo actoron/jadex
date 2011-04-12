@@ -392,31 +392,37 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 				public void resultAvailable(Object result) {
 					try {
 						MicroAgent ma = (MicroAgent) result;
-						Class<? extends MicroAgent> clazz = ma.getClass();
-						Class<?>[] classes = clazz.getDeclaredClasses();
+						Class<?> clazz = ma.getClass();
 						boolean found = false;
-						for (Class<?> c : classes) {
-							if (c.getSimpleName().equals(elementId)) {
-								found = true;
-								Constructor<?> constructor = c.getConstructor(ma.getClass());
 
-								IComponentStep step = (IComponentStep) constructor.newInstance(ma);
+						while (!found && clazz != null) {
+							Class<?>[] classes = clazz.getDeclaredClasses();
 
-								for (ParameterMapping pm : ae.getParameter_mappings()) {
-									try {
-										Field field = c.getField(pm.getLocalName());
-										field.set(step, receivedParamDataMappings.get(pm.getRef()));
-									} catch (Exception e) {
-										throw new RuntimeException("No such field: " + pm.getLocalName() + " in " + c);
+							for (Class<?> c : classes) {
+								if (c.getSimpleName().equals(elementId)) {
+									found = true;
+									Constructor<?> constructor = c.getConstructor(clazz);
+
+									IComponentStep step = (IComponentStep) constructor.newInstance(ma);
+
+									for (ParameterMapping pm : ae.getParameter_mappings()) {
+										try {
+											Field field = c.getField(pm.getLocalName());
+											field.set(step, receivedParamDataMappings.get(pm.getRef()));
+										} catch (Exception e) {
+											throw new RuntimeException("No such field: " + pm.getLocalName() + " in " + c);
+										}
 									}
-								}
 
-								microExtAcc.scheduleStep(step);
+									microExtAcc.scheduleStep(step);
+								}
 							}
+
+							clazz = clazz.getSuperclass();
 						}
 
 						if (!found) {
-							throw new RuntimeException("No such step: " + elementId + " in" + clazz);
+							throw new RuntimeException("No such step: " + elementId + " in " + clazz);
 						}
 					} catch (Exception e) {
 						e.printStackTrace();

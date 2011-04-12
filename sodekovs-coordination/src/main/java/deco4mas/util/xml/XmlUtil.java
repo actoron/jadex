@@ -1,6 +1,7 @@
 package deco4mas.util.xml;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -16,134 +17,172 @@ import javax.xml.bind.Unmarshaller;
  * Utility functions to facilitate the processing of XML files via the JAXB framework.
  * 
  * @author Jan Sudeikat
- *
+ * 
  */
 public class XmlUtil {
 
-	//----------methods----------
-	
+	// ----------methods----------
+
 	/**
-	 * Save an Object as an XML file. 
-	 * In-line (JAXB) annotations will be considered...
+	 * Save an Object as an XML file. In-line (JAXB) annotations will be considered...
 	 * 
-	 * @param obj						what to save
-	 * @param outpout_name				where to save
-	 * @throws JAXBException			may happen
-	 * @throws FileNotFoundException	may happen
+	 * @param obj
+	 *            what to save
+	 * @param outpout_name
+	 *            where to save
+	 * @throws JAXBException
+	 *             may happen
+	 * @throws FileNotFoundException
+	 *             may happen
 	 */
-	public static void saveAsXML(Object obj, String outpout_name) throws JAXBException, FileNotFoundException{
-		
+	public static void saveAsXML(Object obj, String outpout_name) throws JAXBException, FileNotFoundException {
+
 		// setup the context of the classes to serialize:
 		JAXBContext ctx = JAXBContext.newInstance(obj.getClass());
-	    
-		// configure the output: 
-	    Marshaller m = ctx.createMarshaller();
-	    m.setProperty("jaxb.formatted.output", true);
-	    
-	    // output:
-	    m.marshal(obj, new FileOutputStream(outpout_name));
+
+		// configure the output:
+		Marshaller m = ctx.createMarshaller();
+		m.setProperty("jaxb.formatted.output", true);
+
+		// output:
+		m.marshal(obj, new FileOutputStream(outpout_name));
 	}
-	
+
 	/**
-	 * Fetch the XML description (String) of an Object. 
-	 * In-line (JAXB) annotations will be considered...
+	 * Fetch the XML description (String) of an Object. In-line (JAXB) annotations will be considered...
 	 * 
-	 * @param obj						what to save
-	 * @param outpout_name				where to save
-	 * @throws JAXBException			may happen
-	 * @throws FileNotFoundException	may happen
+	 * @param obj
+	 *            what to save
+	 * @param outpout_name
+	 *            where to save
+	 * @throws JAXBException
+	 *             may happen
+	 * @throws FileNotFoundException
+	 *             may happen
 	 */
-	public static String retrieveXML(Object obj) throws JAXBException{
-		
+	public static String retrieveXML(Object obj) throws JAXBException {
+
 		// setup the context of the classes to serialize:
 		JAXBContext ctx = JAXBContext.newInstance(obj.getClass());
-	    
-		// configure the output: 
-	    Marshaller m = ctx.createMarshaller();
-	    m.setProperty("jaxb.formatted.output", true);
-	    
-	    // output:
-	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	    m.marshal(obj, baos);
-	    return baos.toString();
+
+		// configure the output:
+		Marshaller m = ctx.createMarshaller();
+		m.setProperty("jaxb.formatted.output", true);
+
+		// output:
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		m.marshal(obj, baos);
+		return baos.toString();
 	}
-	
+
 	/**
-	 * Read objects from XML files. 
-	 * Requires the contained class and the file to read from.
+	 * Read objects from XML files. Requires the contained class and the file to read from.
 	 * 
-	 * @param cl						The class to be extracted from the file
-	 * @param file_name					The file name.
-	 * @return							An instance of cl
-	 * @throws JAXBException			may happen
-	 * @throws FileNotFoundException	may happen
+	 * @param cl
+	 *            The class to be extracted from the file
+	 * @param file_name
+	 *            The file name.
+	 * @return An instance of cl
+	 * @throws JAXBException
+	 *             may happen
+	 * @throws FileNotFoundException
+	 *             may happen
 	 */
-	@SuppressWarnings("unchecked")
-	public static Object retrieveFromXML(Class cl, String file_name) throws JAXBException, FileNotFoundException{
-		
+	public static Object retrieveFromXML(Class<?> cl, File file) throws JAXBException, FileNotFoundException {
+
 		// configure input:
 		JAXBContext ctx = JAXBContext.newInstance(cl);
 		Unmarshaller u = ctx.createUnmarshaller();
-	    
+
+		// read and return:
+		return u.unmarshal(new FileInputStream(file));
+	}
+
+	/**
+	 * Read objects from XML files. Requires the contained class and the file to read from.
+	 * 
+	 * @param cl
+	 *            The class to be extracted from the file
+	 * @param file_name
+	 *            The file name.
+	 * @return An instance of cl
+	 * @throws JAXBException
+	 *             may happen
+	 * @throws FileNotFoundException
+	 *             may happen
+	 */
+	public static Object retrieveFromXML(Class<?> cl, String file_name) throws JAXBException, FileNotFoundException {
+
+		// configure input:
+		JAXBContext ctx = JAXBContext.newInstance(cl);
+		Unmarshaller u = ctx.createUnmarshaller();
+
 		// read and return:
 		return u.unmarshal(new FileInputStream(file_name));
 	}
-	
+
 	/**
-	 * Read objects from XML files. 
-	 * Requires the contained class and the file to read from.
+	 * Read objects from XML files. Requires the contained class and the file to read from.
 	 * 
-	 * @param cl						The class to be extracted from the file
-	 * @param file_name					The file name.
-	 * @return							An instance of cl
-	 * @throws JAXBException			may happen
-	 * @throws FileNotFoundException	may happen
+	 * @param cl
+	 *            The class to be extracted from the file
+	 * @param file_name
+	 *            The file name.
+	 * @return An instance of cl
+	 * @throws JAXBException
+	 *             may happen
+	 * @throws FileNotFoundException
+	 *             may happen
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T retrieveFromXML(String file_name, T cl) throws JAXBException, FileNotFoundException{
-		
+	public static <T> T retrieveFromXML(String file_name, T cl) throws JAXBException, FileNotFoundException {
+
 		// configure input:
 		JAXBContext ctx = JAXBContext.newInstance(cl.getClass());
 		Unmarshaller u = ctx.createUnmarshaller();
-	    
+
 		// read and return:
 		return (T) u.unmarshal(new FileInputStream(file_name));
 	}
-	
+
 	/**
-	 * Read objects from XML string. 
-	 * Requires the the contained class and the xml content.
+	 * Read objects from XML string. Requires the the contained class and the xml content.
 	 * 
-	 * @param cl						The class to be extracted from the string
-	 * @param file_name					The string content (in xml format)
-	 * @return							An instance of cl
-	 * @throws JAXBException			May happen
-	 * @throws FileNotFoundException	May happen
+	 * @param cl
+	 *            The class to be extracted from the string
+	 * @param file_name
+	 *            The string content (in xml format)
+	 * @return An instance of cl
+	 * @throws JAXBException
+	 *             May happen
+	 * @throws FileNotFoundException
+	 *             May happen
 	 */
-	@SuppressWarnings("unchecked")
-	public static Object retrieveFromXMLContent(Class cl, String content) throws JAXBException{
-		
+	public static Object retrieveFromXMLContent(Class<?> cl, String content) throws JAXBException {
+
 		// configure input:
 		JAXBContext ctx = JAXBContext.newInstance(cl);
 		Unmarshaller u = ctx.createUnmarshaller();
-	    
+
 		// read and return:
 		return u.unmarshal(new StringReader(content));
 	}
-	
+
 	/**
 	 * Generate a XML-Schema definition for a (possibly) JAXB-annotated Java class.
 	 * 
-	 * @param  cl				The type to be "schematized"
-	 * @throws JAXBException	may happen
-	 * @throws IOException		may happen
+	 * @param cl
+	 *            The type to be "schematized"
+	 * @throws JAXBException
+	 *             may happen
+	 * @throws IOException
+	 *             may happen
 	 */
-	@SuppressWarnings("unchecked")
-	public static void generateSchema(Class cl) throws JAXBException, IOException{
-		
+	public static void generateSchema(Class<?> cl) throws JAXBException, IOException {
+
 		// configure input:
 		JAXBContext context = JAXBContext.newInstance(cl);
-	    
+
 		// use delegate the file generation:
 		context.generateSchema(new MySchemaOutputResolver());
 	}

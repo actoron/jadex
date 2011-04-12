@@ -9,7 +9,6 @@ import jadex.application.space.envsupport.environment.PerceptType;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +38,7 @@ public class InitDeco4mas {
 	private IEnvironmentSpace space = null;
 
 	/** Reference to the used MAS-File. */
-	private String masFileName;
+	private File masFile;
 
 	/**
 	 * 
@@ -102,11 +101,10 @@ public class InitDeco4mas {
 		// System.out.println(new File("test.txt").getAbsolutePath());
 		// System.out.println(new File(""));
 
-		try {
-			masFileName = new File("..").getCanonicalPath() + new File("/sodekovs-coordination/src/main/java/" + (String) space.getProperty("dynamics_configuration")).getPath();
-		} catch (IOException e1) {
-			System.out.println("#ProcessMASDynamics#" + ":");
-			System.out.println("\t canonical path of jadex home directory could not be created ...");
+		masFile = new File("../" + space.getProperty("dynamics_configuration"));
+		// new File("..").getCanonicalPath() + new File("/sodekovs-coordination/src/main/java/" + (String) space.getProperty("dynamics_configuration")).getPath();
+		if (!masFile.exists()) {
+			masFile = new File("./" + space.getProperty("dynamics_configuration"));
 		}
 
 		// ToDo: HACK!!!!
@@ -117,7 +115,7 @@ public class InitDeco4mas {
 
 		// masFileName = jadexCoordinationPath +
 		// "deco4mas//examples//agentNegotiation//deco//negotiation.dynamics.xml";
-		System.out.println("#InitCoordinationSpace-Thread# Started processing deco4mas-file: " + masFileName);
+		System.out.println("#InitCoordinationSpace-Thread# Started processing deco4mas-file: " + masFile.getPath());
 
 		// ------ INIT COORDINATION MEDIA! -----------//
 
@@ -130,17 +128,17 @@ public class InitDeco4mas {
 
 		// Process deco4MAS-File:
 		try {
-			if (masFileName.length() > 0) { // 1: fetch conf.:
-				masDyn = (MASDynamics) deco4mas.util.xml.XmlUtil.retrieveFromXML(MASDynamics.class, masFileName);
+			if (masFile.exists()) { // 1: fetch conf.:
+				masDyn = (MASDynamics) deco4mas.util.xml.XmlUtil.retrieveFromXML(MASDynamics.class, masFile);
 			}
 
 		} catch (FileNotFoundException e) {
 			System.out.println("#ProcessMASDynamics#" + ":");
-			System.out.println("\t file: " + masFileName + " could not be found...");
+			System.out.println("\t file: " + masFile.getPath() + " could not be found...");
 			e.printStackTrace();
 		} catch (JAXBException e) {
 			System.out.println("#ProcessMASDynamics#" + ":");
-			System.out.println("\t file: " + masFileName + " could not be processed...");
+			System.out.println("\t file: " + masFile.getPath() + " could not be processed...");
 			e.printStackTrace();
 		}
 
