@@ -202,7 +202,7 @@ public class GenerateService extends BasicService implements IGenerateService
 		long	pic	= (long)data.getSizeX()*data.getSizeY()*data.getMax();
 		int numx = (int)Math.max(Math.round(Math.sqrt((double)pic/task)), 1);
 		int numy = (int)Math.max(Math.round((double)pic/(task*numx)), 1);
-		final long	time	= System.nanoTime();	
+//		final long	time	= System.nanoTime();	
 //		System.out.println("Number of tasks: "+numx+", "+numy+", max="+data.getMax()+" tasksize="+data.getTaskSize());
 		
 		double	areawidth	= data.getXEnd() - data.getXStart();
