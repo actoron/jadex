@@ -270,7 +270,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 							}
 							public void customExceptionOccurred(Exception exception)
 							{
-								exception.printStackTrace();
+//								exception.printStackTrace();
 //								if(ComponentTreeNode.this.toString().startsWith("alex"))
 //									System.err.println("searchChildren done4?: "+ComponentTreeNode.this);
 								childcnt[0]++;

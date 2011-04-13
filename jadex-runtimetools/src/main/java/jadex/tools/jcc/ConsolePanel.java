@@ -19,6 +19,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -292,6 +293,11 @@ public class ConsolePanel extends JPanel
 	
 	public static class	ConsoleListener	extends RemoteChangeListenerHandler	implements IChangeListener
 	{
+		//-------- constants --------
+		
+		/** The limit of characters sent in one event. */
+		public static final int LIMIT	= 4096;
+		
 		//-------- constructors --------
 		
 		/**
@@ -314,7 +320,23 @@ public class ConsolePanel extends JPanel
 			{
 				public Object execute(IInternalAccess ia)
 				{
-					occurrenceAppeared(event.getType(), event.getValue());
+					// Merge new output with last output, if not yet sent.
+					boolean	merged	= false;
+					ArrayList	list	= (ArrayList)occurred.get(event.getType()); 
+					if(list!=null && !list.isEmpty())
+					{
+						String	val	= (String)list.get(list.size()-1);
+						if(val.length()<LIMIT)
+						{
+							val	+= "\n"+event.getValue();
+							list.set(list.size()-1, val);
+							merged	= true;
+						}
+					}
+					
+					if(!merged)
+						occurrenceAppeared(event.getType(), event.getValue());
+					
 					return null;
 				}
 			});

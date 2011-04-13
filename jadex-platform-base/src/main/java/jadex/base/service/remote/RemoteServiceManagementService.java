@@ -447,7 +447,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 														removeWaitingCall(callid);
 //														waitingcalls.remove(callid);
 //														System.out.println("Waitingcalls: "+waitingcalls.size());
-														future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+callid));
+														future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+callid)
+														{
+															public void printStackTrace()
+															{
+																Thread.dumpStack();
+																super.printStackTrace();
+															}
+														});
 														return null;
 													}
 												}).addResultListener(ia.createResultListener(new DefaultResultListener()

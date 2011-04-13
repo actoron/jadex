@@ -287,6 +287,7 @@ public class AgentCreationAgent extends MicroAgent
 			new String[0],
 			new IArgument[]{new IArgument()
 		{
+			@XMLClassname("argument")
 			public Object getDefaultValue(String configname)
 			{
 				return new Integer(5000);	// Todo: support 10000 with gui.

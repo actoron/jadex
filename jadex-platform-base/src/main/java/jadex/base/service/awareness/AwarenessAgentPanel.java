@@ -86,6 +86,9 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/** The delay spinner. */
 	protected JSpinner	spdelay;
 
+	/** The fast awareness check box. */
+	protected JCheckBox	cbfast;
+
 	/** The auto create check box. */
 	protected JCheckBox	cbautocreate;
 
@@ -131,6 +134,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		tfport.setHorizontalAlignment(JTextField.RIGHT);
 		SpinnerNumberModel spmdelay = new SpinnerNumberModel(0, 0, 100000, 1);
 		spdelay = new JSpinner(spmdelay);
+		cbfast = new JCheckBox();
 		
 		cbautocreate = new JCheckBox();
 		cbautodelete = new JCheckBox();
@@ -155,9 +159,15 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
 		y++;
 		pdissettings.add(new JLabel("Info send delay (0=off) [s]", JLabel.LEFT), 
-			new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
-			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 1));
+				new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
+				GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 1));
 		pdissettings.add(spdelay, new GridBagConstraints(1, y, 2, 1, 1, 0, GridBagConstraints.NORTHWEST, 
+			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
+		y++;
+		pdissettings.add(new JLabel("Fast startup awareness", JLabel.LEFT), 
+				new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
+				GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 1));
+		pdissettings.add(cbfast, new GridBagConstraints(1, y, 2, 1, 1, 0, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
 		y++;
 		
@@ -466,6 +476,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				ret.address	= (InetAddress)ai[0];
 				ret.port	= (Integer)ai[1];
 				ret.delay	= agent.getDelay();
+				ret.fast	= agent.isFastAwareness();
 				ret.autocreate	= agent.isAutoCreateProxy();
 				ret.autodelete	= agent.isAutoDeleteProxy();
 				ret.includes	= agent.getIncludes();
@@ -539,6 +550,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			settings.address	= InetAddress.getByName(tfipaddress.getText());
 			settings.port = Integer.parseInt(tfport.getText());
 			settings.delay = ((Number)spdelay.getValue()).longValue()*1000;
+			settings.fast = cbfast.isSelected();
 			settings.autocreate = cbautocreate.isSelected();
 			settings.autodelete = cbautodelete.isSelected();
 			settings.includes	= includes.getEntries();
@@ -552,6 +564,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					AwarenessAgent	agent	= (AwarenessAgent)ia;
 					agent.setAddressInfo(settings.address, settings.port);
 					agent.setDelay(settings.delay);
+					agent.setFastAwareness(settings.fast);
 					agent.setAutoCreateProxy(settings.autocreate);
 					agent.setAutoDeleteProxy(settings.autodelete);
 					agent.setIncludes(settings.includes);
@@ -598,6 +611,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		tfipaddress.setText(settings.address.getHostAddress());
 		tfport.setText(""+settings.port);
 		spdelay.setValue(new Long(settings.delay/1000));
+		cbfast.setSelected(settings.fast);
 		cbautocreate.setSelected(settings.autocreate);
 		cbautodelete.setSelected(settings.autodelete);
 		includes.setEntries(settings.includes);
@@ -618,6 +632,9 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		
 		/** The delay. */
 		public long delay;
+		
+		/** The fast awareness flag. */
+		public boolean fast;
 		
 		/** The autocreate flag. */
 		public boolean autocreate;

@@ -61,6 +61,7 @@ import javax.xml.stream.XMLStreamException;
 	@Argument(name="address", typename="String", defaultvalue="\"224.0.0.0\"", description="The ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255)."),
 	@Argument(name="port", typename="int", defaultvalue="55667", description="The port used for finding other agents."),
 	@Argument(name="delay", typename="long", defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
+	@Argument(name="fast", typename="boolean", defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
 	@Argument(name="autocreate", typename="boolean", defaultvalue="true", description="Set if new proxies should be automatically created when discovering new components."),
 	@Argument(name="autodelete", typename="boolean", defaultvalue="true", description="Set if proxies should be automatically deleted when not discovered any longer."),
 	@Argument(name="proxydelay", typename="long", defaultvalue="15000", description="The delay used by proxies."),
@@ -90,6 +91,9 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	
 	/** The receiver port. */
 	protected int port;
+	
+	/** Flag for enabling fast startup awareness (pingpong send behavior). */
+	protected boolean	fast;
 	
 	
 	/** Flag indicating if proxies should be automatically created. */
@@ -135,6 +139,12 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	
 	/** The java reader for parsing received awareness infos. */
 	protected JavaReader	reader;
+	
+	/** Flag indicating that the agent is started and the send behavior may be activated. */
+	protected boolean	started;
+	
+	/** Flag indicating that the agent has received its own discovery info. */
+	protected boolean	received_self;
 	
 	//-------- methods --------
 	
@@ -203,6 +213,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 			throw new NullPointerException("Cannot get address: "+getArgument("address"));
 		this.port = ((Number)getArgument("port")).intValue();
 		this.delay = ((Number)getArgument("delay")).longValue();
+		this.fast = ((Boolean)getArgument("fast")).booleanValue();
 		this.autocreate = ((Boolean)getArgument("autocreate")).booleanValue();
 		this.autodelete = ((Boolean)getArgument("autodelete")).booleanValue();
 		
@@ -234,9 +245,24 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 				root = (IComponentIdentifier)result;
 				discovered.put(root, new DiscoveryInfo(root, null, getClockTime(), delay, false));
 				
-				startSendBehaviour();
 				startRemoveBehaviour();
-				startReceiving();
+				// Wait before starting send behavior to not miss fast awareness pingpong replies,
+				// because receiver thread is not yet running. (hack???)
+				startReceiving().addResultListener(createResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+						started	= true;
+						startSendBehaviour();
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						// Send also when receiving does not work?
+						started	= true;
+						startSendBehaviour();
+					}
+				}));
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -252,6 +278,8 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	 */
 	public IFuture	agentKilled()
 	{
+		killed = true;
+		
 		if(sendsocket!=null)
 		{
 			send(new AwarenessInfo(root, AwarenessInfo.STATE_OFFLINE, delay));
@@ -260,8 +288,6 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 //		System.out.println("killed set to true: "+getComponentIdentifier());
 		synchronized(AwarenessAgent.this)
 		{
-			killed = true;
-	
 			if(sendsocket!=null)
 			{
 				sendsocket.close();
@@ -313,7 +339,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 			byte[] data = JavaWriter.objectToByteArray(info, getModel().getClassLoader());
 			DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
 			sendsocket.send(packet);
-//			System.out.println(getComponentIdentifier()+" sent '"+info+"' to "+receiver+":"+port);
+//			System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");
 		}
 		catch(Exception e)
 		{
@@ -457,6 +483,22 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 			this.delay = delay;
 			startSendBehaviour();
 		}
+	}
+	
+	/**
+	 *  Set the fast startup awareness flag
+	 */
+	public synchronized void	setFastAwareness(boolean fast)
+	{
+		this.fast	= fast;
+	}
+	
+	/**
+	 *  Get the fast startup awareness flag
+	 */
+	public synchronized boolean	isFastAwareness()
+	{
+		return this.fast;
 	}
 	
 	/**
@@ -609,24 +651,29 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	 */
 	protected void startSendBehaviour()
 	{
-		final String sendid = SUtil.createUniqueId(getAgentName());
-		this.sendid = sendid;	
-		
-		scheduleStep(new IComponentStep()
+		if(started)
 		{
-			@XMLClassname("send")
-			public Object execute(IInternalAccess ia)
+			final String sendid = SUtil.createUniqueId(getAgentName());
+			this.sendid = sendid;	
+			
+			scheduleStep(new IComponentStep()
 			{
-				if(sendid.equals(getSendId()))
+				@XMLClassname("send")
+				public Object execute(IInternalAccess ia)
 				{
-					send(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes));
-					
-					if(delay>0)
-						doWaitFor(delay, this);
+					assert !killed;
+					if(sendid.equals(getSendId()))
+					{
+//						System.out.println(System.currentTimeMillis()+" sending: "+getComponentIdentifier());
+						send(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes));
+						
+						if(delay>0)
+							doWaitFor(delay, this);
+					}
+					return null;
 				}
-				return null;
-			}
-		});
+			});
+		}
 	}
 	
 	/**
@@ -720,9 +767,12 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	
 	/**
 	 *  Start receiving awareness infos.
+	 *  @return A future indicating when the receiver thread is ready.
 	 */
-	public void startReceiving()
+	public IFuture	startReceiving()
 	{
+		final Future	ret	= new Future();
+		
 		// Start the receiver thread.
 		getRequiredService("threadpool").addResultListener(createResultListener(new IResultListener()
 		{
@@ -770,6 +820,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 											{
 												receivesocket	= null;
 												getLogger().warning("Awareness error when joining mutlicast group: "+e);
+												ret.setExceptionIfUndone(e);
 												break;
 											}
 										}
@@ -777,7 +828,11 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 								}
 								
 								DatagramPacket pack = new DatagramPacket(buf, buf.length);
+//								if(!ret.isDone())
+//									System.out.println(System.currentTimeMillis()+" receiving: "+getComponentIdentifier());
+								ret.setResultIfUndone(null);
 								receivesocket.receive(pack);
+//								System.out.println("received: "+getComponentIdentifier());
 								
 								byte[] target = new byte[pack.getLength()];
 								System.arraycopy(buf, 0, target, 0, pack.getLength());
@@ -785,17 +840,21 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 								AwarenessInfo info = (AwarenessInfo)Reader.objectFromByteArray(reader, target, getModel().getClassLoader());
 								if(info.getSender()!=null)
 								{
+									if(info.getSender().equals(root))
+										received_self	= true;
+									
 									// Fix broken awareness infos for backwards compatibility.
 									if(info.getDelay()==0)
 										info.setDelay(delay);
 									if(info.getState()==null)
 										info.setState(AwarenessInfo.STATE_ONLINE);
-//									System.out.println(getComponentIdentifier()+" received: "+info);
+//									System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
 							
 									IComponentIdentifier sender = info.getSender();
 									boolean	online	= AwarenessInfo.STATE_ONLINE.equals(info.getState());
 									boolean deleteproxy	= false;
 									boolean createproxy	= false;
+									boolean	initial	= false;	// Initial discovery of component.
 									DiscoveryInfo dif;
 									
 									synchronized(AwarenessAgent.this)
@@ -808,6 +867,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 											{
 												dif = new DiscoveryInfo(sender, null, getClockTime(), getDelay(), remoteexcluded);
 												discovered.put(sender, dif);
+												initial	= true;
 											}
 											
 											createproxy = isIncluded(sender, getIncludes(), getExcludes())
@@ -824,6 +884,26 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 									{
 //										System.out.println("Creating new proxy for: "+sender+" "+getComponentIdentifier());
 										createProxy(sender);
+										if(initial && fast && started && !killed)
+										{
+//											System.out.println(System.currentTimeMillis()+" fast discovery: "+getComponentIdentifier()+", "+sender);
+											received_self	= false;
+											waitFor((long)(Math.random()*500), new IComponentStep()
+											{
+												int	cnt;
+												public Object execute(IInternalAccess ia)
+												{
+													if(!received_self)
+													{
+														cnt++;
+//														System.out.println("CSMACD try #"+(++cnt));
+														send(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes));
+														waitFor((long)(Math.random()*500*cnt), this);
+													}
+													return null;
+												}
+											});
+										}
 									}
 									else if(deleteproxy)
 									{
@@ -835,6 +915,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 							catch(Exception e)
 							{
 //								getLogger().warning("Receiving awareness info error: "+e);
+								ret.setExceptionIfUndone(e);
 							}
 						}
 						
@@ -862,8 +943,11 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 			{
 				getLogger().warning("Awareness agent problem, could not get threadpool service: "+exception);
 //				exception.printStackTrace();
+				ret.setExceptionIfUndone(exception);
 			}
 		}));
+		
+		return ret;
 	}
 	
 	/**
@@ -964,8 +1048,9 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 				{
 					setAddressInfo(InetAddress.getByName(props.getStringProperty("address")), props.getIntProperty("port"));
 					setDelay(props.getLongProperty("delay"));
-					setAutoCreateProxy(props.getBooleanProperty("autocreate"));
-					setAutoDeleteProxy(props.getBooleanProperty("autodelete"));
+					setFastAwareness(props.getProperty("fast")!=null ? props.getBooleanProperty("fast") : true);
+					setAutoCreateProxy(props.getProperty("autocreate")!=null ? props.getBooleanProperty("autocreate") : true);
+					setAutoDeleteProxy(props.getProperty("autodelete")!=null ? props.getBooleanProperty("autodelete") : true);
 					
 					Property[]	pincs	= props.getProperties("include");
 					String[]	incs	= new String[pincs.length];
@@ -1002,6 +1087,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 				props.addProperty(new Property("address", address.getHostAddress()));
 				props.addProperty(new Property("port", ""+port));
 				props.addProperty(new Property("delay", ""+delay));
+				props.addProperty(new Property("fast", ""+fast));
 				props.addProperty(new Property("autocreate", ""+autocreate));
 				props.addProperty(new Property("autodelete", ""+autodelete));
 				for(int i=0; i<includes.size(); i++)

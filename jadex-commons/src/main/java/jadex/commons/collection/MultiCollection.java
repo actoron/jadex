@@ -450,11 +450,11 @@ public class MultiCollection implements Map, Serializable, Cloneable
 	public void	remove(Object key, Object value)
 	{
 		Collection coll	= (Collection)map.get(key);
-		if(coll==null)
-			throw new RuntimeException("Key does not exist!"+key);
-		if(!coll.remove(value))
-			throw new RuntimeException("Value does not exist!"+value);			
-		if(coll.isEmpty())
+//		if(coll==null)
+//			throw new RuntimeException("Key does not exist!"+key);
+//		if(!coll.remove(value))
+//			throw new RuntimeException("Value does not exist!"+value);			
+		if(coll!=null && coll.isEmpty())
 		{
 			map.remove(key);
 		}

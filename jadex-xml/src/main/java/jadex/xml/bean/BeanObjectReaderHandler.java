@@ -193,7 +193,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				String clazzname = pck.length()>0? pck+"."+tag.getLocalPart().replace("-", "$"): tag.getLocalPart().replace("-", "$");
 //				System.out.println("Clazzname: "+clazzname);
 	
-//				if(clazzname.indexOf("ProxyComponentTreeNode")!=-1)
+//				if(clazzname.indexOf("AgentCreationAgent")!=-1)
 //					System.out.println("hererer");
 				
 				// Special case array
