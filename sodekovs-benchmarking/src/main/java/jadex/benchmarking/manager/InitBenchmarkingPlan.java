@@ -2,9 +2,6 @@ package jadex.benchmarking.manager;
 
 import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IGoalListener;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
@@ -23,15 +20,17 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.rules.state.IOAVState;
-import jadex.simulation.helper.AgentMethods;
-import jadex.simulation.helper.EvaluateExpression;
-import jadex.simulation.helper.GetRandom;
-import jadex.simulation.helper.XMLHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+
+import sodekovs.util.math.GetRandom;
+import sodekovs.util.misc.AgentMethods;
+import sodekovs.util.misc.EvaluateExpression;
+import sodekovs.util.misc.GlobalConstants;
+import sodekovs.util.misc.XMLHandler;
 
 public class InitBenchmarkingPlan extends Plan {
 
@@ -128,7 +127,7 @@ public class InitBenchmarkingPlan extends Plan {
 
 					// Hack/Limitations: Works right now only for single objects but not for all of that type...
 					// Additionally: only one part of the equation can be an object...
-					if (semCond.getObjectSource().getType().equalsIgnoreCase(Constants.ISPACE_OBJECT)) {
+					if (semCond.getObjectSource().getType().equalsIgnoreCase(GlobalConstants.ISPACE_OBJECT)) {
 						terminate = EvaluateExpression.evaluate(sutSpace, semCond.getCondition(), semCond.getObjectSource().getName(), semCond.getObjectSource().getType());
 					} else {
 						IComponentIdentifier agentIdentifier = AgentMethods.getIComponentIdentifier(sutSpace, semCond.getObjectSource().getName());

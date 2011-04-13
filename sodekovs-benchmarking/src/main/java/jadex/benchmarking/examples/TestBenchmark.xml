@@ -11,7 +11,7 @@
 		</SemanticCondition>
 
 		<!-- <TargetFunction function="$beliefbase.tmpCounter>= 13"> <ObjectSource 
-			type="BDI_AGENT" name="Sentry" /> </TargetFunction> -->
+			type="BDIAgent" name="Sentry" /> </TargetFunction> -->
 	</TerminateCondition>
 	<SytemUnderTest>
 		<Properties>

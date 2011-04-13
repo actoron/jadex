@@ -15,10 +15,12 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
-import jadex.simulation.helper.GetRandom;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import sodekovs.util.math.GetRandom;
+import sodekovs.util.misc.GlobalConstants;
 
 public class SequenceRepeaterPlan extends Plan {
 
@@ -107,7 +109,7 @@ public class SequenceRepeaterPlan extends Plan {
 
 		if (action.getComponenttype() == null) {
 			System.out.println("Error: ComponentType not set!");
-		} else if (action.getComponenttype().equalsIgnoreCase(Constants.BDI_AGENT)) {
+		} else if (action.getComponenttype().equalsIgnoreCase(GlobalConstants.BDI_AGENT)) {
 			for (int i = 0; i < action.getNumberOfComponents(); i++) {
 				cms.createComponent(action.getComponentname() + "-" + GetRandom.getRandom(100000) + i, action.getComponentmodel(), new CreationInfo("", componentProperties, sutCID, false, false),
 						null).addResultListener(new DefaultResultListener() {
@@ -117,7 +119,7 @@ public class SequenceRepeaterPlan extends Plan {
 				});
 			}
 
-		} else if (action.getComponenttype().equalsIgnoreCase(Constants.ISPACE_OBJECT)) {
+		} else if (action.getComponenttype().equalsIgnoreCase(GlobalConstants.ISPACE_OBJECT)) {
 
 			for (int i = 0; i < action.getNumberOfComponents(); i++) {
 				sutSpace.createSpaceObject(action.getComponentmodel(), componentProperties, null);

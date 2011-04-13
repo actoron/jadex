@@ -2,15 +2,11 @@ package jadex.benchmarking.scheduler;
 
 import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IGoalListener;
-import jadex.bdi.runtime.IPlan;
 import jadex.bdi.runtime.Plan;
 import jadex.benchmarking.helper.Constants;
 import jadex.benchmarking.helper.Methods;
 import jadex.benchmarking.model.Action;
-import jadex.benchmarking.model.Schedule;
 import jadex.benchmarking.model.Sequence;
 import jadex.benchmarking.model.SuTinfo;
 import jadex.bridge.CreationInfo;
@@ -20,15 +16,12 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.IFuture;
-import jadex.simulation.helper.GetRandom;
-import jadex.simulation.helper.XMLHandler;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Map;
+
+import sodekovs.util.math.GetRandom;
+import sodekovs.util.misc.GlobalConstants;
 
 public class ScheduleSequencesPlan extends Plan {
 
@@ -88,7 +81,7 @@ public class ScheduleSequencesPlan extends Plan {
 
 		if (action.getComponenttype() == null) {
 			System.out.println("Error: ComponentType not set!");
-		} else if (action.getComponenttype().equalsIgnoreCase(Constants.BDI_AGENT)) {
+		} else if (action.getComponenttype().equalsIgnoreCase(GlobalConstants.BDI_AGENT)) {
 			for (int i = 0; i < action.getNumberOfComponents(); i++) {
 				//Get random required in order to avoid creating components with the same name/id.
 				cms.createComponent(action.getComponentname() + "-" + GetRandom.getRandom(100000), action.getComponentmodel(), new CreationInfo("", componentProperties, sutCID, false, false), null).addResultListener(
@@ -100,7 +93,7 @@ public class ScheduleSequencesPlan extends Plan {
 			}
 			// IComponentIdentifier cid = (IComponentIdentifier) fut.get(this);
 			// IBDIExternalAccess ie = (IBDIExternalAccess) cms.getExternalAccess(cid).get(this);
-		} else if (action.getComponenttype().equalsIgnoreCase(Constants.ISPACE_OBJECT)) {
+		} else if (action.getComponenttype().equalsIgnoreCase(GlobalConstants.ISPACE_OBJECT)) {
 			// Schedule step??
 			// Map props = new HashMap();
 			// Vector2Double pos = new Vector2Double(0.8, 0.8);
