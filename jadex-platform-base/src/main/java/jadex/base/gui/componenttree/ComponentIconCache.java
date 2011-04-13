@@ -73,7 +73,7 @@ public class ComponentIconCache
 				public Object execute(IInternalAccess ia)
 				{
 					final Future ret = new Future();
-					SServiceProvider.getService(ia.getServiceProvider(), new ComponentFactorySelector(type))
+					SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(type))
 						.addResultListener(new DelegationResultListener(ret));
 					return ret;
 				}

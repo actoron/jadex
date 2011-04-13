@@ -52,7 +52,7 @@ public class SettingsService extends BasicService implements ISettingsService
 	 */
 	public SettingsService(String prefix, IInternalAccess access)
 	{
-		super(access.getServiceProvider().getId(), ISettingsService.class, null);
+		super(access.getServiceContainer().getId(), ISettingsService.class, null);
 		this.access	= access;
 		this.providers	= new LinkedHashMap();
 		

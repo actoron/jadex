@@ -223,7 +223,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			@XMLClassname("installListener")
 			public Object execute(final IInternalAccess ia)
 			{
-				SServiceProvider.getService(ia.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(ia.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(ia.createResultListener(new DefaultResultListener(ia.getLogger())
 				{
 					public void resultAvailable(Object result)

@@ -86,7 +86,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	public void start()
 	{
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
-		final IServiceProvider provider	= space.getContext().getServiceProvider();
+		final IServiceProvider provider	= space.getContext().getServiceContainer();
 
 		SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{

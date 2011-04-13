@@ -430,22 +430,6 @@ public class ModelInfo implements IModelInfo
 	}
 	
 	/**
-	 *  Set the required service bindings.
-	 *  @param required services The required services to set.
-	 */
-	public void setRequiredServiceB(RequiredServiceInfo[] requiredservices)
-	{
-		if(requiredservices!=null && requiredservices.length>0)
-		{
-			this.requiredservices = new HashMap();
-			for(int i=0; i<requiredservices.length; i++)
-			{
-				this.requiredservices.put(requiredservices[i].getName(), requiredservices[i]);
-			}
-		}
-	}
-	
-	/**
 	 *  Get the required service.
 	 *  @return The required service.
 	 */

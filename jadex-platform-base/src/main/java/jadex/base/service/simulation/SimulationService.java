@@ -79,7 +79,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 	 */
 	public SimulationService(IInternalAccess access, Map properties)
 	{
-		super(access.getServiceProvider().getId(), ISimulationService.class, properties);
+		super(access.getServiceContainer().getId(), ISimulationService.class, properties);
 
 		this.access = access;
 		this.mode = MODE_NORMAL;
@@ -94,7 +94,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 	public IFuture	shutdownService()
 	{
 		final Future	deregistered	= new Future();
-		SServiceProvider.getService(access.getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(access.getServiceContainer(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(access.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -153,7 +153,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 		{
 			public void customResultAvailable(Object result)
 			{
-				SServiceProvider.getService(access.getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(access.getServiceContainer(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(access.createResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -183,7 +183,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 					{
 						final boolean[]	services	= new boolean[2];
 
-						SServiceProvider.getService(access.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						SServiceProvider.getService(access.getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(access.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
@@ -211,7 +211,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 							}
 						}));
 								
-						SServiceProvider.getService(access.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						SServiceProvider.getService(access.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(access.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
@@ -406,7 +406,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 //				System.out.println("Setting clock");
 				final Future	fut	= new Future();
 				ret	= fut;
-				SServiceProvider.getService(access.getServiceProvider(), IThreadPoolService.class)
+				SServiceProvider.getService(access.getServiceContainer(), IThreadPoolService.class)
 					.addResultListener(access.createResultListener(new DelegationResultListener(fut)
 				{
 					public void customResultAvailable(Object result)

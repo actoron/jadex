@@ -53,7 +53,7 @@ public class GenerateService extends BasicService implements IGenerateService
 	 */
 	public GenerateService(final GenerateAgent agent, GeneratePanel panel)
 	{
-		super(agent.getServiceProvider().getId(), IGenerateService.class, null);
+		super(agent.getServiceContainer().getId(), IGenerateService.class, null);
 		this.agent = agent;
 		this.panel = panel;
 		this.manager	= new ServicePoolManager(agent, "calculateservices", new IServicePoolHandler()
@@ -85,13 +85,13 @@ public class GenerateService extends BasicService implements IGenerateService
 						{
 							public void resultAvailable(Object result)
 							{
-//								System.out.println("service request: "+service);
+//								System.out.println("calc start: "+service);
 								((ICalculateService)service).calculateArea(ad).addResultListener(
 									agent.createResultListener(new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(final Object calcresult)
 									{
-//										System.out.println("here");
+//										System.out.println("calc end");
 										pd.setFinished(true);
 										ds.displayIntermediateResult(pd).addResultListener(
 											agent.createResultListener(new IResultListener()
@@ -110,6 +110,10 @@ public class GenerateService extends BasicService implements IGenerateService
 												ret.setResult(calcresult);
 											}
 										}));
+									}
+									public void exceptionOccurred(Exception exception)
+									{
+										super.exceptionOccurred(exception);
 									}
 								}));
 							}

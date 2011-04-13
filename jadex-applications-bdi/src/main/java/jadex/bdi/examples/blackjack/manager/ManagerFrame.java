@@ -129,7 +129,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			@XMLClassname("dealerpan")
 			public Object execute(IInternalAccess ia)
 			{
-				ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
+				ia.getServiceContainer().getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -152,7 +152,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					@XMLClassname("dealertf")
 					public Object execute(IInternalAccess ia)
 					{
-						ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
+						ia.getServiceContainer().getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 						{
 							public void customResultAvailable(Object result)
 							{
@@ -392,7 +392,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					@XMLClassname("close")
 					public Object execute(IInternalAccess ia)
 					{
-						ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
+						ia.getServiceContainer().getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 						{
 							public void customResultAvailable(Object result)
 							{

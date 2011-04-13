@@ -23,7 +23,7 @@ import jadex.micro.annotation.ProvidedServices;
 @Arguments(@Argument(name="delay", description="Agent kills itself when no job arrives in the delay interval.", typename="Long", defaultvalue="new Long(1000)"))
 @Configurations({
 	@Configuration(name="default"),
-	@Configuration(name="long lived", arguments={@NameValue(name="delay", value="1000000")}),
+	@Configuration(name="long lived", arguments={@NameValue(name="delay", value="5000")}),
 })
 public class CalculateAgent extends MicroAgent
 {

@@ -240,7 +240,7 @@ public class ComponentTreePanel extends JSplitPane
 									@XMLClassname("proxykill")
 									public Object	execute(IInternalAccess ia)
 									{
-										SServiceProvider.getService(ia.getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+										SServiceProvider.getService(ia.getServiceContainer(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //										ia.getRequiredService("rms")
 											.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 										{
@@ -683,7 +683,7 @@ public class ComponentTreePanel extends JSplitPane
 			public Object execute(IInternalAccess ia)
 			{
 				final Future ret = new Future();
-				SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //				ia.getRequiredService("cms")
 					.addResultListener(new DelegationResultListener(ret));
 				return ret;

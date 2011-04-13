@@ -369,7 +369,7 @@ public class GuiPanel extends JPanel
 					public Object execute(IInternalAccess ia)
 					{
 //						SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
-						ia.getRequiredService("clockservice")
+						ia.getServiceContainer().getRequiredService("clockservice")
 							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -508,7 +508,7 @@ public class GuiPanel extends JPanel
 					public Object execute(IInternalAccess ia)
 					{
 //						SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
-						ia.getRequiredService("clockservice")
+						ia.getServiceContainer().getRequiredService("clockservice")
 							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -775,7 +775,7 @@ public class GuiPanel extends JPanel
 				public Object execute(IInternalAccess ia)
 				{
 //					SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
-					ia.getRequiredService("clockservice")
+					ia.getServiceContainer().getRequiredService("clockservice")
 						.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 					{
 						

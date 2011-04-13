@@ -139,7 +139,7 @@ public class AddRemotePathAction extends ToolTipAction
 							public Object execute(IInternalAccess ia)
 							{
 								final Future	ret	= new Future();
-								SServiceProvider.getService(ia.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+								SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 									.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(Object result)

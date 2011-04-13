@@ -84,7 +84,7 @@ public class ConnectPlan extends Plan
 			}
 		}).get(this);
 		System.out.println(o instanceof IExternalWfmsService);*/
-		IExternalWfmsService wfms = (IExternalWfmsService) SServiceProvider.getService(getScope().getServiceProvider(), IExternalWfmsService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(this);
+		IExternalWfmsService wfms = (IExternalWfmsService) SServiceProvider.getService(getScope().getServiceContainer(), IExternalWfmsService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(this);
 		ClientInfo info = new ClientInfo((String) getParameter("user_name").getValue());
 		
 		if (Boolean.FALSE.equals(wfms.authenticate(getComponentIdentifier(), info).get(this)))

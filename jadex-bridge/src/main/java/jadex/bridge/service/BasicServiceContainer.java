@@ -1,5 +1,7 @@
 package jadex.bridge.service;
 
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -7,6 +9,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,19 +36,18 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	
 	/** True, if the container is started. */
 	protected boolean started;
-
-	
-	/** The service fetch method table (name -> fetcher). */
-	protected Map reqservicefetchers;
 	
 	//-------- constructors --------
 
 	/**
 	 *  Create a new service container.
 	 */
-	public BasicServiceContainer(Object id)
+	public BasicServiceContainer(Object id, RequiredServiceInfo[] infos, RequiredServiceBinding[] bindings)
 	{
 		this.id = id;
+		
+		setRequiredServiceInfos(infos);
+		setRequiredServiceBindings(bindings);
 	}
 	
 	//-------- interface methods --------
@@ -278,6 +280,93 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		return ret;
 	}
 	
+	//-------- provided and required service management --------
+	
+	/** The service fetch method table (name -> fetcher). */
+	protected Map reqservicefetchers;
+
+	/** The required service infos. */
+	protected Map requiredserviceinfos;
+
+	/** The service bindings. */
+	protected Map bindings;
+
+	
+	/**
+	 *  Get provided (declared) service.
+	 *  @param class The interface.
+	 *  @return The service.
+	 */
+	public IService getProvidedService(Class clazz)
+	{
+		IService ret = null;
+		Collection coll = (Collection)services.get(clazz);
+		if(coll!=null && coll.size()>0)
+			ret = (IService)coll.iterator().next();
+		return ret;
+	}
+	
+	/**
+	 *  Get the required services.
+	 *  @return The required services.
+	 */
+	public RequiredServiceInfo[] getRequiredServiceInfos()
+	{
+		return requiredserviceinfos==null? new RequiredServiceInfo[0]: 
+			(RequiredServiceInfo[])requiredserviceinfos.values().toArray(new RequiredServiceInfo[requiredserviceinfos.size()]);
+	}
+
+	/**
+	 *  Set the required services.
+	 *  @param required services The required services to set.
+	 */
+	public void setRequiredServiceInfos(RequiredServiceInfo[] requiredservices)
+	{
+		if(requiredservices!=null && requiredservices.length>0)
+		{
+			this.requiredserviceinfos = new HashMap();
+			for(int i=0; i<requiredservices.length; i++)
+			{
+				this.requiredserviceinfos.put(requiredservices[i].getName(), requiredservices[i]);
+			}
+		}
+	}
+	
+	/**
+	 *  Get a required service info.
+	 *  @return The required service info.
+	 */
+	public RequiredServiceInfo getRequiredServiceInfo(String name)
+	{
+		return requiredserviceinfos==null? null: (RequiredServiceInfo)requiredserviceinfos.get(name);
+	}
+	
+	/**
+	 *  Set the required service bindings.
+	 *  @param bindings The bindings.
+	 */
+	public void setRequiredServiceBindings(RequiredServiceBinding[] bindings)
+	{
+		if(bindings!=null && bindings.length>0)
+		{
+			this.bindings = new HashMap();
+			for(int i=0; i<bindings.length; i++)
+			{
+				this.bindings.put(bindings[i].getName(), bindings[i]);
+			}
+		}
+	}
+	
+	/**
+	 *  Get the binding info of a service.
+	 *  @param name The required service name.
+	 *  @return The binding info of a service.
+	 */
+	public RequiredServiceBinding getRequiredServiceBinding(String name)
+	{
+		return bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
+	}
+	
 	/**
 	 *  Get a required service.
 	 *  @return The service.
@@ -294,6 +383,66 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding)
 	{
 		return getRequiredServices(info, binding, false);
+	}
+	
+	/**
+	 *  Get a required service of a given name.
+	 *  @param name The service name.
+	 *  @return The service.
+	 */
+	public IFuture getRequiredService(String name)
+	{
+		return getRequiredService(name, false);
+	}
+	
+	/**
+	 *  Get a required services of a given name.
+	 *  @param name The services name.
+	 *  @return The service.
+	 */
+	public IIntermediateFuture getRequiredServices(String name)
+	{
+		return getRequiredServices(name, false);
+	}
+	
+	/**
+	 *  Get a required service.
+	 *  @return The service.
+	 */
+	public IFuture getRequiredService(String name, boolean rebind)
+	{
+		RequiredServiceInfo info = getRequiredServiceInfo(name);
+		RequiredServiceBinding binding = getRequiredServiceBinding(name);
+		if(info==null)
+		{
+			Future ret = new Future();
+			ret.setException(new ServiceNotFoundException(name));
+			return ret;
+		}
+		else
+		{
+			return getRequiredService(info, binding, rebind);
+		}
+	}
+	
+	/**
+	 *  Get a required services.
+	 *  @return The services.
+	 */
+	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
+	{
+		RequiredServiceInfo info = getRequiredServiceInfo(name);
+		RequiredServiceBinding binding = getRequiredServiceBinding(name);
+		if(info==null)
+		{
+			IntermediateFuture ret = new IntermediateFuture();
+			ret.setException(new ServiceNotFoundException(name));
+			return ret;
+		}
+		else
+		{
+			return getRequiredServices(info, binding, rebind);
+		}
 	}
 	
 	/**
@@ -353,6 +502,109 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Create a service fetcher.
 	 */
 	public abstract IRequiredServiceFetcher createServiceFetcher(String name);
+	
+	/**
+	 *  Add a service interceptor.
+	 *  @param interceptor The interceptor.
+	 *  @param service The service.
+	 *  @param pos The position (0=first).
+	 */
+	public void addInterceptor(IServiceInvocationInterceptor interceptor, IService service, int pos)
+	{
+		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+		handler.addServiceInterceptor(interceptor, pos);
+	}
+	
+	/**
+	 *  Remove a service interceptor.
+	 *  @param interceptor The interceptor.
+	 *  @param service The service.
+	 */
+	public void removeInterceptor(IServiceInvocationInterceptor interceptor, IService service)
+	{
+		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+		handler.removeServiceInterceptor(interceptor);
+	}
+	
+//	/**
+//	 *  Add a provided service interceptor (at first position in the chain).
+//	 *  @param clazz The interface of the provided service.
+//	 *  @param pos The position in the chain (0=first).
+//	 *  @param interceptor The interceptor.
+//	 *  @return Null using future when done.
+//	 */
+//	public IFuture addProvidedServiceInterceptor(Class clazz, final IServiceInvocationInterceptor interceptor, int pos)
+//	{
+//		final Future ret = new Future();
+//		SServiceProvider.getService(this, clazz, RequiredServiceInfo.SCOPE_LOCAL)
+//			.addResultListener(new DelegationResultListener(ret)
+//		{
+//			public void customResultAvailable(Object result)
+//			{
+//				BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(result);
+//				handler.addServiceInterceptor(interceptor, 0);
+//				ret.setResult(null);
+//			}	
+//		});
+//		
+//		return ret;
+//	}
+//	
+//	/**
+//	 *  Remove a provided service interceptor.
+//	 *  @param clazz The interface of the provided service.
+//	 *  @param interceptor The interceptor.
+//	 *  @return Null using future when done.
+//	 */
+//	public IFuture removeProvidedServiceInterceptor(Class clazz, final IServiceInvocationInterceptor interceptor)
+//	{
+//		final Future ret = new Future();
+//		SServiceProvider.getService(this, clazz, RequiredServiceInfo.SCOPE_LOCAL)
+//			.addResultListener(new DelegationResultListener(ret)
+//		{
+//			public void customResultAvailable(Object result)
+//			{
+//				BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(result);
+//				handler.removeServiceInterceptor(interceptor);
+//				ret.setResult(null);
+//			}	
+//		});
+//		
+//		return ret;
+//	}
+//
+//	/**
+//	 *  Add a required service interceptor (at first position in the chain).
+//	 *  @param name The name of the required service.
+//	 *  @param pos The position in the chain (0=first).
+//	 *  @param interceptor The interceptor.
+//	 *  @return Null using future when done.
+//	 */
+//	public IFuture addRequiredServiceInterceptor(String name, IServiceInvocationInterceptor interceptor, int pos)
+//	{
+//		final Future ret = new Future();
+//		SServiceProvider.getService(this, clazz, RequiredServiceInfo.SCOPE_LOCAL)
+//			.addResultListener(new DelegationResultListener(ret)
+//		{
+//			public void customResultAvailable(Object result)
+//			{
+//				BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(result);
+//				handler.addServiceInterceptor(interceptor, 0);
+//				ret.setResult(null);
+//			}	
+//		});
+//		
+//		return ret;
+//	}
+//	
+//	/**
+//	 *  Remove a required service interceptor.
+//	 *  @param clazz The interface of the provided service.
+//	 *  @param interceptor The interceptor.
+//	 *  @return Null using future when done.
+//	 */
+//	public IFuture removeRequiredServiceInterceptor(String name, IServiceInvocationInterceptor interceptor);
+
 	
 	/**
 	 *  Get the string representation.

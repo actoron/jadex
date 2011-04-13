@@ -149,8 +149,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		if(rebind)
 			result = null;
 		
-		if(info.getName().indexOf("calc")!=-1)
-			System.out.println("here calc");
+//		if(info.getName().indexOf("calc")!=-1)
+//			System.out.println("here calc");
 		
 		checkResults((List)result).addResultListener(new IntermediateDelegationResultListener(ret)
 		{
@@ -586,7 +586,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		}
 		else
 		{
-			ret.setException(new ServiceNotFoundException("No component creation possible"));
+			ret.setException(new ServiceNotFoundException("name="+info.getName()+", interface="+info.getType()+", no component creation possible"));
 		}
 		
 		return ret;

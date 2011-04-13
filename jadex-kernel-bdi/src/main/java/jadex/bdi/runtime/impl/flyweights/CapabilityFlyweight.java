@@ -18,6 +18,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
+import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -383,8 +384,8 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	}
 
 	/**
-	 *  Get the agent platform
-	 *  @return The agent platform.
+	 *  Get the service provider
+	 *  @return The service provider.
 	 */
 	public IServiceProvider getServiceProvider()
 	{
@@ -402,6 +403,29 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		else
 		{
 			return getInterpreter().getServiceProvider();
+		}
+	}
+	
+	/**
+	 *  Get the service container.
+	 *  @return The service container.
+	 */
+	public IServiceContainer getServiceContainer()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					object = getInterpreter().getServiceContainer();
+				}
+			};
+			return (IServiceContainer)invoc.object;
+		}
+		else
+		{
+			return getInterpreter().getServiceContainer();
 		}
 	}
 	
@@ -767,127 +791,127 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		}
 	}
 	
-	/**
-	 *  Get a required service.
-	 *  @return The service.
-	 */
-	public IFuture getRequiredService(String name)
-	{
-		return getRequiredService(name, false);
-	}
-	
-	/**
-	 *  Get a required services.
-	 *  @return The services.
-	 */
-	public IIntermediateFuture getRequiredServices(String name)
-	{
-		return getRequiredServices(name, false);
-	}
-	
-	/**
-	 *  Get a required service.
-	 *  @return The service.
-	 */
-	public IFuture getRequiredService(final String name, final boolean rebind)
-	{
-		if(getInterpreter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					RequiredServiceInfo info = getInterpreter().getModel().getModelInfo().getRequiredService(name);
-					RequiredServiceBinding binding = getRequiredServiceBinding(name);
-					if(info==null)
-					{
-						Future ret = new Future();
-						ret.setException(new IllegalArgumentException("Info must not null."));
-						object = ret;
-					}
-					else
-					{
-						object = getInterpreter().getServiceContainer().getRequiredService(info, binding, rebind);
-					}
-				}
-			};
-			return (IFuture)invoc.object;
-		}
-		else
-		{
-			IFuture ret;
-			RequiredServiceInfo info = getInterpreter().getModel().getModelInfo().getRequiredService(name);
-			RequiredServiceBinding binding = getRequiredServiceBinding(name);
-			if(info==null)
-			{
-				Future fut = new Future();
-				fut.setException(new IllegalArgumentException("Info must not null."));
-				ret = fut;
-			}
-			else
-			{
-				ret = getInterpreter().getServiceContainer().getRequiredService(info, binding, rebind);
-			}
-			return ret;
-		}
-	}
-	
-	/**
-	 *  Get a required services.
-	 *  @return The services.
-	 */
-	public IIntermediateFuture getRequiredServices(final String name, final boolean rebind)
-	{
-		if(getInterpreter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					RequiredServiceInfo info = getInterpreter().getModel().getModelInfo().getRequiredService(name);
-					RequiredServiceBinding binding = getRequiredServiceBinding(name);
-					if(info==null)
-					{
-						IntermediateFuture ret = new IntermediateFuture();
-						ret.setException(new IllegalArgumentException("Info must not null."));
-						object = ret;
-					}
-					else
-					{
-						object = getInterpreter().getServiceContainer().getRequiredServices(info, binding, rebind);
-					}
-				}
-			};
-			return (IIntermediateFuture)invoc.object;
-		}
-		else
-		{
-			IIntermediateFuture ret;
-			RequiredServiceInfo info = getInterpreter().getModel().getModelInfo().getRequiredService(name);
-			RequiredServiceBinding binding = getRequiredServiceBinding(name);
-			if(info==null)
-			{
-				IntermediateFuture fut = new IntermediateFuture();
-				fut.setException(new IllegalArgumentException("Info must not null."));
-				ret = fut;
-			}
-			else
-			{
-				ret = getInterpreter().getServiceContainer().getRequiredServices(info, binding, rebind);
-			}
-			return ret;
-		}
-	}
-	
-	/**
-	 *  Get the binding info of a service.
-	 *  @param name The required service name.
-	 *  @return The binding info of a service.
-	 */
-	protected RequiredServiceBinding getRequiredServiceBinding(String name)
-	{
-		Object agent = BDIInterpreter.getInterpreter(getState()).getAgent();
-		Map bindings = (Map)getState().getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_bindings);
-		return bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
-	}
+//	/**
+//	 *  Get a required service.
+//	 *  @return The service.
+//	 */
+//	public IFuture getRequiredService(String name)
+//	{
+//		return getRequiredService(name, false);
+//	}
+//	
+//	/**
+//	 *  Get a required services.
+//	 *  @return The services.
+//	 */
+//	public IIntermediateFuture getRequiredServices(String name)
+//	{
+//		return getRequiredServices(name, false);
+//	}
+//	
+//	/**
+//	 *  Get a required service.
+//	 *  @return The service.
+//	 */
+//	public IFuture getRequiredService(final String name, final boolean rebind)
+//	{
+//		if(getInterpreter().isExternalThread())
+//		{
+//			AgentInvocation invoc = new AgentInvocation()
+//			{
+//				public void run()
+//				{
+//					RequiredServiceInfo info = getInterpreter().getModel().getModelInfo().getRequiredService(name);
+//					RequiredServiceBinding binding = getRequiredServiceBinding(name);
+//					if(info==null)
+//					{
+//						Future ret = new Future();
+//						ret.setException(new IllegalArgumentException("Info must not null."));
+//						object = ret;
+//					}
+//					else
+//					{
+//						object = getInterpreter().getServiceContainer().getRequiredService(info, binding, rebind);
+//					}
+//				}
+//			};
+//			return (IFuture)invoc.object;
+//		}
+//		else
+//		{
+//			IFuture ret;
+//			RequiredServiceInfo info = getInterpreter().getModel().getModelInfo().getRequiredService(name);
+//			RequiredServiceBinding binding = getRequiredServiceBinding(name);
+//			if(info==null)
+//			{
+//				Future fut = new Future();
+//				fut.setException(new IllegalArgumentException("Info must not null."));
+//				ret = fut;
+//			}
+//			else
+//			{
+//				ret = getInterpreter().getServiceContainer().getRequiredService(info, binding, rebind);
+//			}
+//			return ret;
+//		}
+//	}
+//	
+//	/**
+//	 *  Get a required services.
+//	 *  @return The services.
+//	 */
+//	public IIntermediateFuture getRequiredServices(final String name, final boolean rebind)
+//	{
+//		if(getInterpreter().isExternalThread())
+//		{
+//			AgentInvocation invoc = new AgentInvocation()
+//			{
+//				public void run()
+//				{
+//					RequiredServiceInfo info = getInterpreter().getModel().getModelInfo().getRequiredService(name);
+//					RequiredServiceBinding binding = getRequiredServiceBinding(name);
+//					if(info==null)
+//					{
+//						IntermediateFuture ret = new IntermediateFuture();
+//						ret.setException(new IllegalArgumentException("Info must not null."));
+//						object = ret;
+//					}
+//					else
+//					{
+//						object = getInterpreter().getServiceContainer().getRequiredServices(info, binding, rebind);
+//					}
+//				}
+//			};
+//			return (IIntermediateFuture)invoc.object;
+//		}
+//		else
+//		{
+//			IIntermediateFuture ret;
+//			RequiredServiceInfo info = getInterpreter().getModel().getModelInfo().getRequiredService(name);
+//			RequiredServiceBinding binding = getRequiredServiceBinding(name);
+//			if(info==null)
+//			{
+//				IntermediateFuture fut = new IntermediateFuture();
+//				fut.setException(new IllegalArgumentException("Info must not null."));
+//				ret = fut;
+//			}
+//			else
+//			{
+//				ret = getInterpreter().getServiceContainer().getRequiredServices(info, binding, rebind);
+//			}
+//			return ret;
+//		}
+//	}
+//	
+//	/**
+//	 *  Get the binding info of a service.
+//	 *  @param name The required service name.
+//	 *  @return The binding info of a service.
+//	 */
+//	protected RequiredServiceBinding getRequiredServiceBinding(String name)
+//	{
+//		Object agent = BDIInterpreter.getInterpreter(getState()).getAgent();
+//		Map bindings = (Map)getState().getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_bindings);
+//		return bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
+//	}
 }

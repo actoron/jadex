@@ -264,8 +264,8 @@ public class ServiceInvocationContext
 		
 		IServiceInvocationInterceptor interceptor = getNextInterceptor();
 
-		if(method.getName().equals("add"))
-			System.out.println("add: "+used.get(used.size()-1)+" "+interceptor+" "+Thread.currentThread());
+//		if(method.getName().equals("add"))
+//			System.out.println("add: "+used.get(used.size()-1)+" "+interceptor+" "+Thread.currentThread());
 		
 		if(interceptor!=null)
 		{

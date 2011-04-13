@@ -22,7 +22,7 @@ public class HelplineService extends BasicService implements IHelpline
 	 */
 	public HelplineService(HelplineAgent agent)
 	{
-		super(agent.getServiceProvider().getId(), IHelpline.class, null);
+		super(agent.getServiceContainer().getId(), IHelpline.class, null);
 		this.agent = agent;
 	}
 	

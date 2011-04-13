@@ -113,7 +113,8 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	public IServiceContainer createServiceContainer()
 	{
 //		return new CacheServiceContainer(new ComponentServiceContainer(getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
-		return new ComponentServiceContainer(getAgentAdapter(), MicroAgentFactory.FILETYPE_MICROAGENT);
+		return new ComponentServiceContainer(getAgentAdapter(), MicroAgentFactory.FILETYPE_MICROAGENT,
+			interpreter.getAgentModel().getRequiredServices(), interpreter.getRequiredServiceBindings());
 	}
 	
 	/**
@@ -123,6 +124,16 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	public IServiceProvider getServiceProvider()
 	{
 		return interpreter.getServiceProvider();
+	}
+	
+	/**
+	 *  Get the service container.
+	 *  Internal method for accessing the service container.
+	 *  @return The service container.
+	 */
+	public IServiceContainer getServiceContainer()
+	{
+		return interpreter.getServiceContainer();
 	}
 	
 	/**
@@ -230,7 +241,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -256,7 +267,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		longtime	= Math.max(longtime, time);
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -296,7 +307,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -338,7 +349,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	public IFuture killAgent()
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -369,7 +380,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -488,7 +499,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -652,7 +663,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public IFuture getRequiredService(String name)
 	{
-		return getRequiredService(name, false);
+		return getServiceContainer().getRequiredService(name);
 	}
 	
 	/**
@@ -662,95 +673,9 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public IIntermediateFuture getRequiredServices(String name)
 	{
-		return getRequiredServices(name, false);
+		return getServiceContainer().getRequiredServices(name);
 	}
-	
-	/**
-	 *  Get a required service.
-	 *  @return The service.
-	 */
-	public IFuture getRequiredService(String name, boolean rebind)
-	{
-		RequiredServiceInfo info = getModel().getRequiredService(name);
-		RequiredServiceBinding binding = interpreter.getRequiredServiceBinding(name);
-		if(info==null)
-		{
-			Future ret = new Future();
-			ret.setException(new ServiceNotFoundException(name));
-			return ret;
-		}
-		else
-		{
-			return interpreter.getServiceContainer().getRequiredService(info, binding, rebind);
-		}
-	}
-	
-	/**
-	 *  Get a required services.
-	 *  @return The services.
-	 */
-	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
-	{
-		RequiredServiceInfo info = getModel().getRequiredService(name);
-		RequiredServiceBinding binding = interpreter.getRequiredServiceBinding(name);
-		if(info==null)
-		{
-			IntermediateFuture ret = new IntermediateFuture();
-			ret.setException(new ServiceNotFoundException(name));
-			return ret;
-		}
-		else
-		{
-			return interpreter.getServiceContainer().getRequiredServices(info, binding, rebind);
-		}
-	}
-	
-	/**
-	 *  Add a provided service interceptor (at first position in the chain).
-	 *  @param clazz The interface of the provided service.
-	 *  @param interceptor The interceptor.
-	 *  @return Null using future when done.
-	 */
-	public IFuture addProvidedServiceInterceptor(Class clazz, final IServiceInvocationInterceptor interceptor)
-	{
-		final Future ret = new Future();
-		SServiceProvider.getService(getServiceProvider(), clazz, RequiredServiceInfo.SCOPE_LOCAL)
-			.addResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(result);
-				handler.addFirstServiceInterceptor(interceptor);
-				ret.setResult(null);
-			}	
-		});
 		
-		return ret;
-	}
-	
-	/**
-	 *  Add a provided service interceptor (at first position in the chain).
-	 *  @param clazz The interface of the provided service.
-	 *  @param interceptor The interceptor.
-	 *  @return Null using future when done.
-	 */
-	public IFuture removeProvidedServiceInterceptor(Class clazz, final IServiceInvocationInterceptor interceptor)
-	{
-		final Future ret = new Future();
-		SServiceProvider.getService(getServiceProvider(), clazz, RequiredServiceInfo.SCOPE_LOCAL)
-			.addResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(result);
-				handler.removeServiceInterceptor(interceptor);
-				ret.setResult(null);
-			}	
-		});
-		
-		return ret;
-	}
-
 	//-------- helper classes --------
 	
 	/**

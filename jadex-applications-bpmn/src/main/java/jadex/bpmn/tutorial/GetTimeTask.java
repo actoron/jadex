@@ -20,7 +20,7 @@ public class GetTimeTask	 implements ITask
 	public IFuture execute(final ITaskContext context, final BpmnInterpreter process)
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(process.getServiceProvider(), IClockService.class)
+		SServiceProvider.getService(process.getServiceContainer(), IClockService.class)
 			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)

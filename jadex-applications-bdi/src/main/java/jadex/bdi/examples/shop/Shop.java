@@ -29,7 +29,7 @@ public class Shop extends BasicService implements IShop
 	 */
 	public Shop(ICapability comp, String name)
 	{
-		super(comp.getServiceProvider().getId(), IShop.class, null);
+		super(comp.getServiceContainer().getId(), IShop.class, null);
 
 //		System.out.println("created: "+name);
 		this.comp = comp;

@@ -24,7 +24,7 @@ public class DestroyComponentTask implements ITask
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(instance.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)

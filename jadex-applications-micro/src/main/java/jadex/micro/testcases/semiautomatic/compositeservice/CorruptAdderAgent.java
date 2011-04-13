@@ -1,6 +1,7 @@
 package jadex.micro.testcases.semiautomatic.compositeservice;
 
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.component.interceptors.AbstractApplicableInterceptor;
 import jadex.commons.future.DelegationResultListener;
@@ -29,8 +30,9 @@ public class CorruptAdderAgent extends MicroAgent
 	 */
 	public IFuture agentCreated()
 	{
-		final Future ret = new Future();
-		addProvidedServiceInterceptor(IAddService.class, new AbstractApplicableInterceptor()
+		IService addser = getServiceContainer().getProvidedService(IAddService.class);
+		
+		getServiceContainer().addInterceptor(new AbstractApplicableInterceptor()
 		{
 			public IFuture execute(ServiceInvocationContext context)
 			{
@@ -43,6 +45,8 @@ public class CorruptAdderAgent extends MicroAgent
 						System.out.println("hello interceptor");
 //						if(calls++>0)
 						{
+							// Wait till agent has terminated to ensure that its
+							// service is not found as result again.
 							killAgent().addResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object result)
@@ -68,8 +72,9 @@ public class CorruptAdderAgent extends MicroAgent
 				
 				return ret;
 			}
-		}).addResultListener(new DelegationResultListener(ret));
-		return ret;
+		}, addser, 0);
+		
+		return IFuture.DONE;
 	}
 }
 

@@ -56,7 +56,7 @@ public class DFTestAgent extends MicroAgent
 		setResultValue("testresults", new Testcase(reports.size(), (TestReport[])reports.toArray(new TestReport[reports.size()])));
 
 		// Deregister agent.
-		SServiceProvider.getService(getServiceProvider(), IDF.class).addResultListener(
+		SServiceProvider.getService(getServiceContainer(), IDF.class).addResultListener(
 			createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -77,7 +77,7 @@ public class DFTestAgent extends MicroAgent
 		final TestReport tr	= new TestReport("#1", "Test DF registration.");
 		reports.add(tr);
 
-		SServiceProvider.getService(getServiceProvider(), IDF.class).addResultListener(
+		SServiceProvider.getService(getServiceContainer(), IDF.class).addResultListener(
 			createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -116,7 +116,7 @@ public class DFTestAgent extends MicroAgent
 		reports.add(tr);
 
 		// Create a service description to search for.
-		SServiceProvider.getService(getServiceProvider(), IDF.class).addResultListener(
+		SServiceProvider.getService(getServiceContainer(), IDF.class).addResultListener(
 			createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)

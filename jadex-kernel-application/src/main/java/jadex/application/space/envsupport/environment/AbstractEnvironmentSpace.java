@@ -395,7 +395,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				
 				// HACK!!! Do not use ThreadSuspendable
 				IComponentManagementService ces = ((IComponentManagementService)SServiceProvider.getServiceUpwards
-					(context.getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable()));
+					(context.getServiceContainer(), IComponentManagementService.class).get(new ThreadSuspendable()));
 				if(owner.indexOf("@")!=-1)
 					ownerid	= ces.createComponentIdentifier((String)owner, false);
 				else
@@ -565,7 +565,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					getContext().getApplicationType().getModelInfo().getClassLoader(), plugins,
 					killonexit!=null ? killonexit.booleanValue() : true);
 								
-				SServiceProvider.getServiceUpwards(context.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getServiceUpwards(context.getServiceContainer(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(final Object result)
 					{
@@ -1051,7 +1051,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					}
 					
 					final String compotype = componenttype;
-					SServiceProvider.getServiceUpwards(application.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+					SServiceProvider.getServiceUpwards(application.getServiceContainer(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -1178,7 +1178,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				AvatarMapping mapping = getAvatarMapping(componenttype, objecttype);
 				if(mapping.isKillComponent())
 				{
-					SServiceProvider.getServiceUpwards(getContext().getServiceProvider(), IComponentManagementService.class)
+					SServiceProvider.getServiceUpwards(getContext().getServiceContainer(), IComponentManagementService.class)
 						.addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)

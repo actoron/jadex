@@ -96,7 +96,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	protected List messagehandlers;
 
 	/** The service bindings. */
-	protected Map bindings;
+	protected RequiredServiceBinding[] bindings;
 	
 	//-------- constructors --------
 	
@@ -115,15 +115,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 		this.parent = parent;
 		// synchronized because of MicroAgentViewPanel, todo
 		this.steps	= Collections.synchronizedList(new ArrayList());
-		
-		if(bindings!=null)
-		{
-			this.bindings = new HashMap();
-			for(int i=0; i<bindings.length; i++)
-			{
-				this.bindings.put(bindings[i].getName(), bindings[i]);
-			}
-		}
+		this.bindings = bindings;
 		
 		// Init the arguments with default values.
 		IArgument[] args = model.getArguments();
@@ -989,16 +981,27 @@ public class MicroAgentInterpreter implements IComponentInstance
 		microagent.timers.clear();
 	}
 
-	/**
-	 *  Get the binding info of a service.
-	 *  @param name The required service name.
-	 *  @return The binding info of a service.
-	 */
-	protected RequiredServiceBinding getRequiredServiceBinding(String name)
-	{
-		return bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
-	}
 	
+	
+//	/**
+//	 *  Get the binding info of a service.
+//	 *  @param name The required service name.
+//	 *  @return The binding info of a service.
+//	 */
+//	protected RequiredServiceBinding getRequiredServiceBinding(String name)
+//	{
+//		return bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
+//	}
+	
+	/**
+	 *  Get the bindings.
+	 *  @return the bindings.
+	 */
+	public RequiredServiceBinding[] getRequiredServiceBindings()
+	{
+		return bindings;
+	}
+
 	/**
 	 *  Step to handle a message.
 	 */

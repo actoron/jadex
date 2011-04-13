@@ -86,7 +86,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 				final Map params = new HashMap();
 				params.put("wastebins", todo.toArray());
 				ongoing.addAll(todo);
-				SServiceProvider.getServiceUpwards(app.getServiceProvider(), IComponentManagementService.class)
+				SServiceProvider.getServiceUpwards(app.getServiceContainer(), IComponentManagementService.class)
 					.addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)

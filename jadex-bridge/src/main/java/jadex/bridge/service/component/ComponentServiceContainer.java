@@ -6,6 +6,8 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IRequiredServiceFetcher;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -14,6 +16,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.util.Collections;
+import java.util.HashMap;
 
 /**
  *  Service container for active components.
@@ -40,9 +43,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	/**
 	 *  Create a new service container.
 	 */
-	public ComponentServiceContainer(IComponentAdapter adapter, String type)
+	public ComponentServiceContainer(IComponentAdapter adapter, String type, RequiredServiceInfo[] infos, RequiredServiceBinding[] bindings)
 	{
-		super(adapter.getComponentIdentifier());
+		super(adapter.getComponentIdentifier(), infos, bindings);
 		this.adapter = adapter;
 		this.type	= type;
 	}

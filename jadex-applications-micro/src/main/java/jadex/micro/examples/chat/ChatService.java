@@ -32,7 +32,7 @@ public class ChatService extends BasicService implements IChatService
 	 */
 	public ChatService(IInternalAccess agent)
 	{
-		super(agent.getServiceProvider().getId(), IChatService.class, null);
+		super(agent.getServiceContainer().getId(), IChatService.class, null);
 		this.agent = agent;
 		this.listeners = new ArrayList();
 		this.chatpanel = ChatPanel.createGui(agent.getExternalAccess());

@@ -21,7 +21,7 @@ public class NoServiceAgent extends MicroAgent
 	{
 		final TestReport	tr	= new TestReport("#1", "Searching for services.");
 		
-		SServiceProvider.getServices(getServiceProvider(), INoService.class).addResultListener(
+		SServiceProvider.getServices(getServiceContainer(), INoService.class).addResultListener(
 			createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)

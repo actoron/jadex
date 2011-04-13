@@ -30,7 +30,7 @@ public class CMSLocalCreateComponentPlan extends Plan
 		try
 		{
 			// todo: support parent/master etc.
-			IFuture ret = ((IComponentManagementService)getScope().getRequiredService("cms").get(this))
+			IFuture ret = ((IComponentManagementService)getServiceContainer().getRequiredService("cms").get(this))
 				.createComponent(name, type, new CreationInfo(config, args, parent, suspend, master), null);
 			IComponentIdentifier aid = (IComponentIdentifier)ret.get(this);
 			getParameter("componentidentifier").setValue(aid);

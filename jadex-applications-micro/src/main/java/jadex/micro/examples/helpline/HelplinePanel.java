@@ -219,7 +219,7 @@ public class HelplinePanel extends JPanel
 		{
 			public Object execute(IInternalAccess ia)
 			{
-				ia.getRequiredServices("localhelplineservices").addResultListener(new SwingDefaultResultListener(HelplinePanel.this) 
+				ia.getServiceContainer().getRequiredServices("localhelplineservices").addResultListener(new SwingDefaultResultListener(HelplinePanel.this) 
 				{
 					public void customResultAvailable(Object result) 
 					{
@@ -257,12 +257,12 @@ public class HelplinePanel extends JPanel
 				Future ret = new Future();
 				if(remote)
 				{
-					ia.getRequiredServices("remotehelplineservices")
+					ia.getServiceContainer().getRequiredServices("remotehelplineservices")
 						.addResultListener(new DelegationResultListener(ret));
 				}
 				else
 				{
-					ia.getRequiredServices("localhelplineservices")
+					ia.getServiceContainer().getRequiredServices("localhelplineservices")
 						.addResultListener(new DelegationResultListener(ret));
 				}
 				return ret;

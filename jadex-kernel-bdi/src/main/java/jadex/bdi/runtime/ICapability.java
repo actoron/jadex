@@ -4,8 +4,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.IServiceContainer;
 import jadex.commons.future.IFuture;
+
 import java.util.logging.Logger;
 
 
@@ -116,7 +117,7 @@ public interface ICapability	extends IElement
 	 *  Get the container
 	 *  @return The container.
 	 */
-	public IServiceProvider getServiceProvider();
+	public IServiceContainer getServiceContainer();
 	
 	/**
 	 *  Get the current time.
@@ -171,15 +172,15 @@ public interface ICapability	extends IElement
 	 */
 	public ICapability	getSubcapability(String name);
 	
-	/**
-	 *  Get a required service.
-	 *  @return The service.
-	 */
-	public IFuture getRequiredService(final String name);
-	
-	/**
-	 *  Get a required services.
-	 *  @return The services.
-	 */
-	public IFuture getRequiredServices(final String name);
+//	/**
+//	 *  Get a required service.
+//	 *  @return The service.
+//	 */
+//	public IFuture getRequiredService(final String name);
+//	
+//	/**
+//	 *  Get a required services.
+//	 *  @return The services.
+//	 */
+//	public IFuture getRequiredServices(final String name);
 }

@@ -19,7 +19,7 @@ public class FlagPlan extends Plan
 	public void body()
 	{
 		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getService(
-			getScope().getServiceProvider(), IComponentManagementService.class).get(this);
+			getServiceContainer(), IComponentManagementService.class).get(this);
 		
 		TestReport tr = new TestReport("#1", "Start agent as suspended.");
 		CreationInfo ci =  new CreationInfo("donothing", null, getComponentIdentifier());

@@ -64,7 +64,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 			public Object execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
-				SServiceProvider.getDeclaredServices(ia.getServiceProvider())
+				SServiceProvider.getDeclaredServices(ia.getServiceContainer())
 					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 				return ret;
 			}

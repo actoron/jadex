@@ -1,6 +1,7 @@
 package jadex.bridge.service;
 
 import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.commons.Tuple;
 import jadex.commons.collection.Cache;
 import jadex.commons.future.CounterResultListener;
@@ -346,23 +347,23 @@ public class CacheServiceContainer	implements IServiceContainer
 		return container.removeService(sid);
 	}
 
-	/**
-	 *  Get a required service.
-	 *  @return The service.
-	 */
-	public IFuture getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
-	{
-		return container.getRequiredService(info, binding, rebind);
-	}
-	
-	/**
-	 *  Get a required service.
-	 *  @return The service.
-	 */
-	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
-	{
-		return container.getRequiredServices(info, binding, rebind);
-	}
+//	/**
+//	 *  Get a required service.
+//	 *  @return The service.
+//	 */
+//	public IFuture getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+//	{
+//		return container.getRequiredService(info, binding, rebind);
+//	}
+//	
+//	/**
+//	 *  Get a required service.
+//	 *  @return The service.
+//	 */
+//	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+//	{
+//		return container.getRequiredServices(info, binding, rebind);
+//	}
 	
 	/**
 	 *  Get the string representation.
@@ -371,5 +372,40 @@ public class CacheServiceContainer	implements IServiceContainer
 	public String toString()
 	{
 		return "CacheServiceContainer(name="+getId()+", container="+container+")";
+	}
+
+	// todo: factor out this part of service management?!
+	
+	public IService getProvidedService(Class clazz)
+	{
+		return null;
+	}
+
+	public IFuture getRequiredService(String name)
+	{
+		return null;
+	}
+
+	public IIntermediateFuture getRequiredServices(String name)
+	{
+		return null;
+	}
+
+	public IFuture getRequiredService(String name, boolean rebind)
+	{
+		return null;
+	}
+
+	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
+	{
+		return null;
+	}
+
+	public void addInterceptor(IServiceInvocationInterceptor interceptor, IService service, int pos)
+	{
+	}
+
+	public void removeInterceptor(IServiceInvocationInterceptor interceptor, IService service)
+	{
 	}
 }

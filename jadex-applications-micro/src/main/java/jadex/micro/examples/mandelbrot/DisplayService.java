@@ -21,7 +21,7 @@ public class DisplayService extends BasicService implements IDisplayService
 	 */
 	public DisplayService(DisplayAgent agent)
 	{
-		super(agent.getServiceProvider().getId(), IDisplayService.class, null);
+		super(agent.getServiceContainer().getId(), IDisplayService.class, null);
 		this.agent	= agent;
 	}
 	

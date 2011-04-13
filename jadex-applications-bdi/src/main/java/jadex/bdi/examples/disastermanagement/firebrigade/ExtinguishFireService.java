@@ -27,7 +27,7 @@ public class ExtinguishFireService extends BasicService implements IExtinguishFi
 	 */
 	public ExtinguishFireService(ICapability agent)
 	{
-		super(agent.getServiceProvider().getId(), IExtinguishFireService.class, null);
+		super(agent.getServiceContainer().getId(), IExtinguishFireService.class, null);
 		this.agent = agent;
 	}
 	

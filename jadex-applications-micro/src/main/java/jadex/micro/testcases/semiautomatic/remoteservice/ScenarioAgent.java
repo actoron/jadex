@@ -18,7 +18,7 @@ public class ScenarioAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		SServiceProvider.getService(getServiceProvider(), ILibraryService.class)
+		SServiceProvider.getService(getServiceContainer(), ILibraryService.class)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)

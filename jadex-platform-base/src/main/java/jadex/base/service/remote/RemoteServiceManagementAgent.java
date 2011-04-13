@@ -41,13 +41,13 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	public IFuture	agentCreated()
 	{
 		final Future	ret	= new Future();
-		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
 				final IClockService clock = (IClockService)result;
-				SServiceProvider.getService(getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
@@ -99,7 +99,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	{
 		if(SFipa.MESSAGE_TYPE_NAME_FIPA.equals(mt.getName()))
 		{
-			SServiceProvider.getService(getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)

@@ -39,7 +39,7 @@ public class ExternalAccess implements IExternalAccess
 		this.application = application;
 		this.adapter = application.getComponentAdapter();
 		this.tostring = application.getComponentIdentifier().getLocalName();
-		this.provider = application.getServiceProvider();
+		this.provider = application.getServiceContainer();
 	}
 
 	//-------- methods --------

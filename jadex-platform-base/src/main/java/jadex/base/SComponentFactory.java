@@ -40,14 +40,14 @@ public class SComponentFactory
 			{
 				final Future ret = new Future();
 				
-				SServiceProvider.getService(ia.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						final ILibraryService ls = (ILibraryService)result;
 						
-						SServiceProvider.getService(ia.getServiceProvider(), new ComponentFactorySelector(model, null, ls.getClassLoader()))
+						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, ls.getClassLoader()))
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
@@ -94,14 +94,14 @@ public class SComponentFactory
 			public Object execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
-				SServiceProvider.getService(ia.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						final ILibraryService ls = (ILibraryService)result;
 						
-						SServiceProvider.getService(ia.getServiceProvider(), new ComponentFactorySelector(model, null, ls.getClassLoader()))
+						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, ls.getClassLoader()))
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
@@ -147,14 +147,14 @@ public class SComponentFactory
 			public Object execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
-				SServiceProvider.getService(ia.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						final ILibraryService ls = (ILibraryService)result;
 						
-						SServiceProvider.getServices(ia.getServiceProvider(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						SServiceProvider.getServices(ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
@@ -240,14 +240,14 @@ public class SComponentFactory
 			public Object execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
-				SServiceProvider.getService(ia.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						final ILibraryService ls = (ILibraryService)result;
 						
-						SServiceProvider.getService(ia.getServiceProvider(), new ComponentFactorySelector(model, null, ls.getClassLoader()))
+						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, ls.getClassLoader()))
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
@@ -291,7 +291,7 @@ public class SComponentFactory
 			public Object execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
-				SServiceProvider.getService(ia.getServiceProvider(), new ComponentFactorySelector(type))
+				SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(type))
 					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
@@ -364,14 +364,14 @@ public class SComponentFactory
 			public Object execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
-				SServiceProvider.getService(ia.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						final ILibraryService ls = (ILibraryService)result;
 						
-						SServiceProvider.getService(ia.getServiceProvider(), new ComponentFactorySelector(model, null, ls.getClassLoader()))
+						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, ls.getClassLoader()))
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)

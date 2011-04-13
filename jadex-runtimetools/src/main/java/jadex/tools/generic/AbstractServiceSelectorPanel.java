@@ -58,7 +58,7 @@ public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
 			public Object execute(IInternalAccess ia)
 			{
 				final Future	ret	= new Future();
-				SServiceProvider.getServices(ia.getServiceProvider(), type, scope)
+				SServiceProvider.getServices(ia.getServiceContainer(), type, scope)
 					.addResultListener(new DelegationResultListener(ret));
 				return ret;
 			}

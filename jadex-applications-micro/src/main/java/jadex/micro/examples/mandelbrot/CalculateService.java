@@ -21,7 +21,7 @@ public class CalculateService extends BasicService implements ICalculateService
 	 */
 	public CalculateService(CalculateAgent agent)
 	{
-		super(agent.getServiceProvider().getId(), ICalculateService.class, null);
+		super(agent.getServiceContainer().getId(), ICalculateService.class, null);
 		this.agent = agent;
 	}
 	

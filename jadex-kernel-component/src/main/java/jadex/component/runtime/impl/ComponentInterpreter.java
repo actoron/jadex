@@ -131,12 +131,12 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	/** The component listeners. */
 	protected List componentlisteners;
 	
-	/** The required service binding information. */
-	protected Map bindings;
-	
 	/** The external access (cached). */
 	protected IExternalAccess	access;
 	
+	/** The required service binding information. */
+	protected RequiredServiceBinding[] bindings;
+
 	//-------- constructors --------
 	
 	/**
@@ -156,15 +156,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 		this.instances = new MultiCollection(); 
 		this.steps	= new ArrayList();
 		this.willdostep	= true;
-		
-		if(bindings!=null)
-		{
-			this.bindings = new HashMap();
-			for(int i=0; i<bindings.length; i++)
-			{
-				this.bindings.put(bindings[i].getName(), bindings[i]);
-			}
-		}
+		this.bindings = bindings;
 	
 		// Init the arguments with default values.
 		String[] configs = model.getModelInfo().getConfigurations();
@@ -198,7 +190,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 		fetcher.setValue("$component", ComponentInterpreter.this);
 		this.fetcher = fetcher;		
 		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
-		fetcher.setValue("$provider", getServiceProvider());
+		fetcher.setValue("$provider", getServiceContainer());
 		
 		// Schedule the futures (first) init step.
 		scheduleStep(new IComponentStep()
@@ -318,7 +310,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 //								}
 
 								final List components = config.getMComponentInstances();
-								SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
+								SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
 									.addResultListener(createResultListener(new DefaultResultListener()
 								{
 									public void resultAvailable(Object result)
@@ -653,7 +645,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -985,7 +977,8 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 			else
 			{
 //				container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
-				container = new ComponentServiceContainer(getComponentAdapter(), ComponentComponentFactory.FILETYPE_COMPONENT);
+				container = new ComponentServiceContainer(getComponentAdapter(), 
+					ComponentComponentFactory.FILETYPE_COMPONENT, getModel().getRequiredServices(), bindings);
 			}			
 		}
 		return container;
@@ -1030,74 +1023,74 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 			componentlisteners.remove(listener);
 	}
 	
-	/**
-	 *  Get a required service of a given name.
-	 *  @param name The service name.
-	 *  @return The service.
-	 */
-	public IFuture getRequiredService(String name)
-	{
-		return getRequiredService(name, false);
-	}
-	
-	/**
-	 *  Get a required services of a given name.
-	 *  @param name The services name.
-	 *  @return The service.
-	 */
-	public IIntermediateFuture getRequiredServices(String name)
-	{
-		return getRequiredServices(name, false);
-	}
-	
-	/**
-	 *  Get a required service.
-	 *  @return The service.
-	 */
-	public IFuture getRequiredService(String name, boolean rebind)
-	{
-		RequiredServiceInfo info = getModel().getRequiredService(name);
-		RequiredServiceBinding binding = getRequiredServiceBinding(name);
-		if(info==null)
-		{
-			Future ret = new Future();
-			ret.setException(new ServiceNotFoundException(name));
-			return ret;
-		}
-		else
-		{
-			return getServiceContainer().getRequiredService(info, binding, rebind);
-		}
-	}
-	
-	/**
-	 *  Get a required services.
-	 *  @return The services.
-	 */
-	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
-	{
-		RequiredServiceInfo info = getModel().getRequiredService(name);
-		RequiredServiceBinding binding = getRequiredServiceBinding(name);
-		if(info==null)
-		{
-			IntermediateFuture ret = new IntermediateFuture();
-			ret.setException(new ServiceNotFoundException(name));
-			return ret;
-		}
-		else
-		{
-			return getServiceContainer().getRequiredServices(info, binding, rebind);
-		}
-	}
-	
-	/**
-	 *  Get the binding info of a service.
-	 *  @param name The required service name.
-	 *  @return The binding info of a service.
-	 */
-	protected RequiredServiceBinding getRequiredServiceBinding(String name)
-	{
-		return bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
-	}
+//	/**
+//	 *  Get a required service of a given name.
+//	 *  @param name The service name.
+//	 *  @return The service.
+//	 */
+//	public IFuture getRequiredService(String name)
+//	{
+//		return getRequiredService(name, false);
+//	}
+//	
+//	/**
+//	 *  Get a required services of a given name.
+//	 *  @param name The services name.
+//	 *  @return The service.
+//	 */
+//	public IIntermediateFuture getRequiredServices(String name)
+//	{
+//		return getRequiredServices(name, false);
+//	}
+//	
+//	/**
+//	 *  Get a required service.
+//	 *  @return The service.
+//	 */
+//	public IFuture getRequiredService(String name, boolean rebind)
+//	{
+//		RequiredServiceInfo info = getModel().getRequiredService(name);
+//		RequiredServiceBinding binding = getRequiredServiceBinding(name);
+//		if(info==null)
+//		{
+//			Future ret = new Future();
+//			ret.setException(new ServiceNotFoundException(name));
+//			return ret;
+//		}
+//		else
+//		{
+//			return getServiceContainer().getRequiredService(info, binding, rebind);
+//		}
+//	}
+//	
+//	/**
+//	 *  Get a required services.
+//	 *  @return The services.
+//	 */
+//	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
+//	{
+//		RequiredServiceInfo info = getModel().getRequiredService(name);
+//		RequiredServiceBinding binding = getRequiredServiceBinding(name);
+//		if(info==null)
+//		{
+//			IntermediateFuture ret = new IntermediateFuture();
+//			ret.setException(new ServiceNotFoundException(name));
+//			return ret;
+//		}
+//		else
+//		{
+//			return getServiceContainer().getRequiredServices(info, binding, rebind);
+//		}
+//	}
+//	
+//	/**
+//	 *  Get the binding info of a service.
+//	 *  @param name The required service name.
+//	 *  @return The binding info of a service.
+//	 */
+//	protected RequiredServiceBinding getRequiredServiceBinding(String name)
+//	{
+//		return bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
+//	}
 	
 }

@@ -1,6 +1,6 @@
 package jadex.bridge;
 
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.IServiceContainer;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -43,7 +43,7 @@ public interface IInternalAccess
 	 *  Get the service provider.
 	 *  @return The service provider.
 	 */
-	public IServiceProvider getServiceProvider();
+	public IServiceContainer getServiceContainer();
 	
 	/**
 	 *  Kill the component.
@@ -74,29 +74,29 @@ public interface IInternalAccess
 	 */
 	public Logger getLogger();
 	
-	/**
-	 *  Get a required service.
-	 *  @return The service.
-	 */
-	public IFuture getRequiredService(String name);
-	
-	/**
-	 *  Get a required services.
-	 *  @return The services.
-	 */
-	public IIntermediateFuture getRequiredServices(String name);
-
-	/**
-	 *  Get a required service.
-	 *  @return The service.
-	 */
-	public IFuture getRequiredService(String name, boolean rebind);
-	
-	/**
-	 *  Get a required services.
-	 *  @return The services.
-	 */
-	public IIntermediateFuture getRequiredServices(String name, boolean rebind);
+//	/**
+//	 *  Get a required service.
+//	 *  @return The service.
+//	 */
+//	public IFuture getRequiredService(String name);
+//	
+//	/**
+//	 *  Get a required services.
+//	 *  @return The services.
+//	 */
+//	public IIntermediateFuture getRequiredServices(String name);
+//
+//	/**
+//	 *  Get a required service.
+//	 *  @return The service.
+//	 */
+//	public IFuture getRequiredService(String name, boolean rebind);
+//	
+//	/**
+//	 *  Get a required services.
+//	 *  @return The services.
+//	 */
+//	public IIntermediateFuture getRequiredServices(String name, boolean rebind);
 
 	
 	/**

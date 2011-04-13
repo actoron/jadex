@@ -152,7 +152,7 @@ public class ServicePoolManager
 			searching	= true;
 			
 			// Start timer to be triggered when search is not finished after 1 second.
-			SServiceProvider.getService(component.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(component.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(component.createResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -184,7 +184,7 @@ public class ServicePoolManager
 			}));
 			
 //			System.out.println("wurksn0");
-			component.getRequiredServices(name).addResultListener(
+			component.getServiceContainer().getRequiredServices(name).addResultListener(
 				component.createResultListener(new IIntermediateResultListener()
 			{
 				/**
@@ -232,9 +232,15 @@ public class ServicePoolManager
 					}
 					
 					// If component still active, create new services when there are remaining tasks.
-					if(!(exception instanceof ComponentTerminatedException))
+					// Has to ensure that ComponentTerminatedException does not belong to underlying component.
+					if(!(exception instanceof ComponentTerminatedException && 
+						((ComponentTerminatedException)exception).getComponentIdentifier().equals(component.getComponentIdentifier())))
 					{
 						createServices();
+					}
+					else
+					{
+						component.getLogger().warning("Service error and cannot create new one: "+exception);
 					}
 				}
 				

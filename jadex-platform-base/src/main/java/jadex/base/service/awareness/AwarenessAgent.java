@@ -175,7 +175,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 		});
 		
 		final Future	ret	= new Future();
-		getRequiredService("settings").addResultListener(createResultListener(new IResultListener()
+		getServiceContainer().getRequiredService("settings").addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -309,7 +309,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 		}
 		
 		final Future	ret	= new Future();
-		getRequiredService("settings").addResultListener(createResultListener(new IResultListener()
+		getServiceContainer().getRequiredService("settings").addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -355,7 +355,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	{
 		final Future ret = new Future();
 		
-		getRequiredService("cms").addResultListener(createResultListener(new IResultListener()
+		getServiceContainer().getRequiredService("cms").addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -618,7 +618,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	 */
 	public void checkProxy(final DiscoveryInfo dif)
 	{
-		getRequiredService("cms").addResultListener(createResultListener(new IResultListener()
+		getServiceContainer().getRequiredService("cms").addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -694,7 +694,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 		
 		final Future ret = new Future();
 		
-		getRequiredService("cms").addResultListener(createResultListener(new DelegationResultListener(ret)
+		getServiceContainer().getRequiredService("cms").addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -741,7 +741,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	{
 		final Future ret = new Future();
 		
-		getRequiredService("cms").addResultListener(createResultListener(new DelegationResultListener(ret)
+		getServiceContainer().getRequiredService("cms").addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -774,7 +774,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 		final Future	ret	= new Future();
 		
 		// Start the receiver thread.
-		getRequiredService("threadpool").addResultListener(createResultListener(new IResultListener()
+		getServiceContainer().getRequiredService("threadpool").addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

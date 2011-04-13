@@ -28,7 +28,7 @@ public class TreatVictimsService extends BasicService implements ITreatVictimsSe
 	 */
 	public TreatVictimsService(ICapability agent)
 	{
-		super(agent.getServiceProvider().getId(), ITreatVictimsService.class, null);
+		super(agent.getServiceContainer().getId(), ITreatVictimsService.class, null);
 		this.agent = agent;
 	}
 	

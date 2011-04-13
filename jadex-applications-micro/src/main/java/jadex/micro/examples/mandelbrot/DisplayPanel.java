@@ -337,7 +337,7 @@ public class DisplayPanel extends JComponent
 								{
 									public Object execute(IInternalAccess ia)
 									{
-										ia.getRequiredService("cmsservice")
+										ia.getServiceContainer().getRequiredService("cmsservice")
 											.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 										{
 											public void customResultAvailable(Object result)
@@ -929,7 +929,7 @@ public class DisplayPanel extends JComponent
 		{
 			public Object execute(IInternalAccess ia)
 			{
-				ia.getRequiredService("generateservice")
+				ia.getServiceContainer().getRequiredService("generateservice")
 					.addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object result)

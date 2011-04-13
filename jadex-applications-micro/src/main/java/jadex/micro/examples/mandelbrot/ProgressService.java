@@ -21,7 +21,7 @@ public class ProgressService extends BasicService implements IProgressService
 	 */
 	public ProgressService(CalculateAgent agent)
 	{
-		super(agent.getServiceProvider().getId(), IProgressService.class, null);
+		super(agent.getServiceContainer().getId(), IProgressService.class, null);
 		this.agent = agent;
 	}
 	

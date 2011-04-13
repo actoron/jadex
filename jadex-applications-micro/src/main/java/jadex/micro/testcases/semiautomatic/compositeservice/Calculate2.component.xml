@@ -26,7 +26,7 @@
 						<!-- <requiredservice name="addservice">
 							<binding componenttype="Adder" create="true" scope="parent"
 						</requiredservice>	-->		
-						<binding name="addservice" componenttype="Adder" create="create" scope="parent"/>			
+						<binding name="addservice" componenttype="Adder" create="true" scope="parent"/>			
 						<binding name="subservice" componenttype="Subtractor" create="true" scope="parent"/>			
 					</requiredservices>
 				</component>

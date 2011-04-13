@@ -112,12 +112,12 @@ public class CustomerPanel extends JPanel
 						Future ret = new Future();
 						if(remote.isSelected())
 						{
-							ia.getRequiredServices("remoteshopservices")
+							ia.getServiceContainer().getRequiredServices("remoteshopservices")
 								.addResultListener(new DelegationResultListener(ret));
 						}
 						else
 						{
-							ia.getRequiredServices("localshopservices")
+							ia.getServiceContainer().getRequiredServices("localshopservices")
 								.addResultListener(new DelegationResultListener(ret));
 						}
 						return ret;

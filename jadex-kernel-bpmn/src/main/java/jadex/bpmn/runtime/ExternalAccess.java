@@ -35,7 +35,7 @@ public class ExternalAccess implements IExternalAccess
 	{
 		this.interpreter = interpreter;
 		this.adapter = interpreter.getComponentAdapter();
-		this.provider = interpreter.getServiceProvider();
+		this.provider = interpreter.getServiceContainer();
 	}
 
 	//-------- methods --------

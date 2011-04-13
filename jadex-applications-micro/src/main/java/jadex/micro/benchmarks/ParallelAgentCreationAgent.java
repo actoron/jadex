@@ -34,12 +34,12 @@ public class ParallelAgentCreationAgent extends MicroAgent
 		final int num	= ((Integer)arguments.get("num")).intValue();
 		if(num>0)
 		{
-			SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
+			SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
 					final IComponentManagementService	cms	= (IComponentManagementService)result;
-					SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(createResultListener(new DefaultResultListener()
+					SServiceProvider.getService(getServiceContainer(), IClockService.class).addResultListener(createResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)
 						{

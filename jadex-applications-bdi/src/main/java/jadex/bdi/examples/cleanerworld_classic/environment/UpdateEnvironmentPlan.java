@@ -93,7 +93,7 @@ public class UpdateEnvironmentPlan extends Plan
 	 */
 	protected void searchEnvironmentAgent()
 	{
-		IDF df = (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class);
+		IDF df = (IDF)SServiceProvider.getService(getServiceContainer(), IDF.class);
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "dispatch vision", null);
 		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 

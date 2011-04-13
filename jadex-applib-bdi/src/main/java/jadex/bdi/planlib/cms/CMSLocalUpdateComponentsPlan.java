@@ -30,7 +30,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 	 */
 	public void body()
 	{
-		final IComponentManagementService	ces	= (IComponentManagementService)getScope().getRequiredService("cms").get(this);
+		final IComponentManagementService	ces	= (IComponentManagementService)getServiceContainer().getRequiredService("cms").get(this);
 		this.listener	= new ICMSComponentListener()
 		{
 			public IFuture componentAdded(final IComponentDescription desc)

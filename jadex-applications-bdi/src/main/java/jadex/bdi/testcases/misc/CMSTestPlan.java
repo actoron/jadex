@@ -54,7 +54,7 @@ public class CMSTestPlan extends Plan
 		TestReport tr = new TestReport("#"+num++, "Searching for all agents");
 		getLogger().info("\nSearching for all agents.");
 		IComponentManagementService amsservice = (IComponentManagementService)SServiceProvider.getServiceUpwards(
-			getScope().getServiceProvider(), IComponentManagementService.class).get(this);
+			getServiceContainer(), IComponentManagementService.class).get(this);
 		IComponentDescription desc = amsservice.createComponentDescription(null, null, null, null, null, null);
 		ISearchConstraints constraints = amsservice.createSearchConstraints(-1, 0);
 		

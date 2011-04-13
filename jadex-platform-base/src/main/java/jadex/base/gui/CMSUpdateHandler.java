@@ -339,7 +339,7 @@ public class CMSUpdateHandler
 							public Object execute(IInternalAccess ia)
 							{
 								final Future	ret	= new Future();
-								SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+								SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 									.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(Object result)
@@ -384,7 +384,7 @@ public class CMSUpdateHandler
 							public Object execute(IInternalAccess ia)
 							{
 								final Future	ret	= new Future();
-								SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+								SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 									.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(Object result)

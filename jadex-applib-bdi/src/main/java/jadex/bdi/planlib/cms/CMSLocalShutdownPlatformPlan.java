@@ -15,7 +15,7 @@ public class CMSLocalShutdownPlatformPlan extends Plan
 	 */
 	public void body()
 	{
-		IComponentManagementService	cms	= (IComponentManagementService)getScope().getRequiredService("cms").get(this);
+		IComponentManagementService	cms	= (IComponentManagementService)getServiceContainer().getRequiredService("cms").get(this);
 		IComponentIdentifier	root	= getScope().getComponentIdentifier();
 		boolean	foundroot	= false;
 		while(!foundroot)

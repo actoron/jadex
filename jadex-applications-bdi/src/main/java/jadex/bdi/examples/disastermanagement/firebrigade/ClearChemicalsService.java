@@ -27,7 +27,7 @@ public class ClearChemicalsService extends BasicService implements IClearChemica
 	 */
 	public ClearChemicalsService(ICapability agent)
 	{
-		super(agent.getServiceProvider().getId(), IClearChemicalsService.class, null);
+		super(agent.getServiceContainer().getId(), IClearChemicalsService.class, null);
 		this.agent = agent;
 	}
 	

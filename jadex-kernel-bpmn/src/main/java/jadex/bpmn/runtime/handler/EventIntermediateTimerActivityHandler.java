@@ -30,7 +30,7 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 	public void	doWait(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread, final long duration)
 	{
 		final Future	wifuture	= new Future(); 
-		SServiceProvider.getService(instance.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(instance.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(instance.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)

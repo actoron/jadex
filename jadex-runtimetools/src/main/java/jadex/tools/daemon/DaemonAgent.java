@@ -81,7 +81,7 @@ public class DaemonAgent extends MicroAgent
 		
 		if(options.getClassPath()==null || options.getClassPath().length()==0)
 		{
-			SServiceProvider.getService(getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(createResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)

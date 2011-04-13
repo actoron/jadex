@@ -301,7 +301,7 @@ public class StarterPanel extends JPanel
 						public Object execute(IInternalAccess ia)
 						{
 							final Future ret = new Future();
-							SServiceProvider.getService(ia.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //							ia.getRequiredService("libservice")
 								.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 							{
@@ -1020,7 +1020,7 @@ public class StarterPanel extends JPanel
 			public Object execute(IInternalAccess ia)
 			{
 				Future ret = new Future();
-				SServiceProvider.getService(ia.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //				ia.getRequiredService("libservice")
 					.addResultListener(new DelegationResultListener(ret));
 				return ret;
@@ -1488,7 +1488,7 @@ public class StarterPanel extends JPanel
 			public Object execute(IInternalAccess ia)
 			{
 				Future ret = new Future();
-				SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //				ia.getRequiredService("cms")
 					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 				

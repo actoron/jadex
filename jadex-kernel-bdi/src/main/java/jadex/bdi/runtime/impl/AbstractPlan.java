@@ -35,6 +35,7 @@ import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PropertybaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.WaitqueueFlyweight;
+import jadex.bdi.runtime.impl.flyweights.ElementFlyweight.AgentInvocation;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
@@ -42,6 +43,7 @@ import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
@@ -525,6 +527,15 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	public long getTime()
 	{
 		return getClock().getTime();
+	}
+	
+	/**
+	 *  Get the service container.
+	 *  @return The service container.
+	 */
+	public IServiceContainer getServiceContainer()
+	{
+		return getInterpreter().getServiceContainer();
 	}
 
 	//-------- goalbase shortcut methods --------

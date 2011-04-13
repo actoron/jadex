@@ -25,7 +25,7 @@ public interface IComponent
 	 *  Get the service container.
 	 *  @return The service container.
 	 */
-	public IServiceProvider	getServiceProvider();
+	public IServiceProvider	getServiceContainer();
 
 	/**
 	 *  Get the logical component type for a given component id.

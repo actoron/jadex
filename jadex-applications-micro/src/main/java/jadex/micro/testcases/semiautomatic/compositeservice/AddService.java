@@ -17,7 +17,7 @@ public class AddService extends BasicService implements IAddService
 	 */
 	public AddService(IInternalAccess comp)
 	{
-		super(comp.getServiceProvider().getId(), IAddService.class, null);
+		super(comp.getServiceContainer().getId(), IAddService.class, null);
 	}
 	
 	//-------- methods --------

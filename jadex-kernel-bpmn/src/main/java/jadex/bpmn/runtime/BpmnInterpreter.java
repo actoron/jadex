@@ -227,7 +227,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	protected int	idcnt;
 	
 	/** The required service binding information. */
-	protected Map bindings;
+	protected RequiredServiceBinding[] bindings;
 	
 	/** The external access (cached). */
 	protected IExternalAccess	access;
@@ -290,15 +290,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	{
 		this.model = model;
 		this.config = config;
-		
-		if(bindings!=null)
-		{
-			this.bindings = new HashMap();
-			for(int i=0; i<bindings.length; i++)
-			{
-				this.bindings.put(bindings[i].getName(), bindings[i]);
-			}
-		}
+		this.bindings = bindings;
 		
 		// Extract pool/lane from config.
 		if(config==null || ALL.equals(config))
@@ -415,7 +407,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		
 		// todo: remove this hack of caching services
 		final boolean services[] = new boolean[3];
-		SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -437,7 +429,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 				inited.setException(exception);
 			}
 		}));
-		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -459,7 +451,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 				inited.setException(exception);
 			}
 		}));
-		SServiceProvider.getService(getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -646,7 +638,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -934,7 +926,8 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		{
 			// todo: support container customization via bpmn file
 //			container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
-			container = new ComponentServiceContainer(getComponentAdapter(), BpmnFactory.FILETYPE_BPMNPROCESS);
+			container = new ComponentServiceContainer(getComponentAdapter(), BpmnFactory.FILETYPE_BPMNPROCESS,
+				getModel().getRequiredServices(), bindings);
 		}
 		return container;
 	}
@@ -1520,74 +1513,74 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 			componentlisteners.remove(listener);
 	}
 	
-	/**
-	 *  Get a required service of a given name.
-	 *  @param name The service name.
-	 *  @return The service.
-	 */
-	public IFuture getRequiredService(String name)
-	{
-		return getRequiredService(name, false);
-	}
-	
-	/**
-	 *  Get a required services of a given name.
-	 *  @param name The services name.
-	 *  @return The service.
-	 */
-	public IIntermediateFuture getRequiredServices(String name)
-	{
-		return getRequiredServices(name, false);
-	}
-	
-	/**
-	 *  Get a required service.
-	 *  @return The service.
-	 */
-	public IFuture getRequiredService(String name, boolean rebind)
-	{
-		RequiredServiceInfo info = getModel().getRequiredService(name);
-		RequiredServiceBinding binding = getRequiredServiceBinding(name);
-		if(info==null)
-		{
-			Future ret = new Future();
-			ret.setException(new ServiceNotFoundException(name));
-			return ret;
-		}
-		else
-		{
-			return getServiceContainer().getRequiredService(info, binding, rebind);
-		}
-	}
-	
-	/**
-	 *  Get a required services.
-	 *  @return The services.
-	 */
-	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
-	{
-		RequiredServiceInfo info = getModel().getRequiredService(name);
-		RequiredServiceBinding binding = getRequiredServiceBinding(name);
-		if(info==null)
-		{
-			IntermediateFuture ret = new IntermediateFuture();
-			ret.setException(new ServiceNotFoundException(name));
-			return ret;
-		}
-		else
-		{
-			return getServiceContainer().getRequiredServices(info, binding, rebind);
-		}
-	}
-	
-	/**
-	 *  Get the binding info of a service.
-	 *  @param name The required service name.
-	 *  @return The binding info of a service.
-	 */
-	protected RequiredServiceBinding getRequiredServiceBinding(String name)
-	{
-		return bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
-	}
+//	/**
+//	 *  Get a required service of a given name.
+//	 *  @param name The service name.
+//	 *  @return The service.
+//	 */
+//	public IFuture getRequiredService(String name)
+//	{
+//		return getRequiredService(name, false);
+//	}
+//	
+//	/**
+//	 *  Get a required services of a given name.
+//	 *  @param name The services name.
+//	 *  @return The service.
+//	 */
+//	public IIntermediateFuture getRequiredServices(String name)
+//	{
+//		return getRequiredServices(name, false);
+//	}
+//	
+//	/**
+//	 *  Get a required service.
+//	 *  @return The service.
+//	 */
+//	public IFuture getRequiredService(String name, boolean rebind)
+//	{
+//		RequiredServiceInfo info = getModel().getRequiredService(name);
+//		RequiredServiceBinding binding = getRequiredServiceBinding(name);
+//		if(info==null)
+//		{
+//			Future ret = new Future();
+//			ret.setException(new ServiceNotFoundException(name));
+//			return ret;
+//		}
+//		else
+//		{
+//			return getServiceContainer().getRequiredService(info, binding, rebind);
+//		}
+//	}
+//	
+//	/**
+//	 *  Get a required services.
+//	 *  @return The services.
+//	 */
+//	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
+//	{
+//		RequiredServiceInfo info = getModel().getRequiredService(name);
+//		RequiredServiceBinding binding = getRequiredServiceBinding(name);
+//		if(info==null)
+//		{
+//			IntermediateFuture ret = new IntermediateFuture();
+//			ret.setException(new ServiceNotFoundException(name));
+//			return ret;
+//		}
+//		else
+//		{
+//			return getServiceContainer().getRequiredServices(info, binding, rebind);
+//		}
+//	}
+//	
+//	/**
+//	 *  Get the binding info of a service.
+//	 *  @param name The required service name.
+//	 *  @return The binding info of a service.
+//	 */
+//	protected RequiredServiceBinding getRequiredServiceBinding(String name)
+//	{
+//		return bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
+//	}
 	
 }

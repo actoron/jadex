@@ -77,7 +77,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
 		final boolean tick = getProperty("tick")!=null && ((Boolean)getProperty("tick")).booleanValue();
-		this.container	= space.getContext().getServiceProvider();
+		this.container	= space.getContext().getServiceContainer();
 		
 		SServiceProvider.getService(container, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{

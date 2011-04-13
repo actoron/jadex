@@ -85,7 +85,7 @@ public class AlarmsGui extends JFrame
 			public Object execute(IInternalAccess ia)
 			{
 //				SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
-				ia.getRequiredService("clockservice")
+				ia.getServiceContainer().getRequiredService("clockservice")
 					.addResultListener(new SwingDefaultResultListener(AlarmsGui.this)
 				{
 					public void customResultAvailable(Object result)

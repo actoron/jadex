@@ -37,7 +37,7 @@ public class UserAgent extends MicroAgent
 		});
 		
 		// get remote management service 
-		SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
 			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -45,7 +45,7 @@ public class UserAgent extends MicroAgent
 				final IComponentManagementService cms = (IComponentManagementService)result;
 				
 				// get remote management service and fetch service via rms.getProxy()
-				SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class)
+				SServiceProvider.getService(getServiceContainer(), IRemoteServiceManagementService.class)
 					.addResultListener(createResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -83,7 +83,7 @@ public class UserAgent extends MicroAgent
 		}));
 		
 		// search on local platform and find service via ProxyAgent to other platform
-		SServiceProvider.getService(getServiceProvider(), IMathService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+		SServiceProvider.getService(getServiceContainer(), IMathService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)

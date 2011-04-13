@@ -47,7 +47,7 @@ public class CreateComponentTask implements ITask
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(instance.createResultListener(new IResultListener()
+		SServiceProvider.getService(instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(instance.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

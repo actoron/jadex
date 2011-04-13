@@ -13,7 +13,7 @@ public class MathAgent extends MicroAgent
 	 */
 	public IFuture	agentCreated()
 	{
-		addDirectService(new MathService(getServiceProvider()));
+		addDirectService(new MathService(getServiceContainer()));
 		return IFuture.DONE;
 	}
 }

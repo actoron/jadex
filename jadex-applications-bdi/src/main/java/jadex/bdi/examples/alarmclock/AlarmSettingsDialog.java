@@ -407,7 +407,7 @@ public class AlarmSettingsDialog extends JDialog
 				public Object execute(IInternalAccess ia)
 				{
 //					SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
-					ia.getRequiredService("clockservice")
+					ia.getServiceContainer().getRequiredService("clockservice")
 						.addResultListener(new SwingDefaultResultListener(AlarmSettingsDialog.this)
 					{
 						public void customResultAvailable(Object result)

@@ -81,7 +81,7 @@ public class DelegationInterceptor extends AbstractMultiInterceptor
 			public Object execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
-				fetcher.getService(info, binding, ia.getServiceProvider(), false)
+				fetcher.getService(info, binding, ia.getServiceContainer(), false)
 					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result) 
