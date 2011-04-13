@@ -309,6 +309,10 @@ public class MessageService extends BasicService implements IMessageService
 			}
 		}
 		
+		// Sending a message is delegated to SendManagers
+		// Each SendManager is responsible for a specific destination
+		// in order to decouple sending to different destinations.
+		
 		// Determine manager tasks
 		MultiCollection managers = new MultiCollection();
 		String recid = type.getReceiverIdentifier();

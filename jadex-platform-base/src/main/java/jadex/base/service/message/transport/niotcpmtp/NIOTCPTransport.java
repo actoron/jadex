@@ -33,6 +33,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -129,6 +130,7 @@ public class NIOTCPTransport implements ITransport
 				}
 			}
 		});
+		this.connections = Collections.synchronizedMap(this.connections);
 	}
 	
 	/**
@@ -305,8 +307,10 @@ public class NIOTCPTransport implements ITransport
 	/**
 	 *  Send a message.
 	 *  @param message The message to send.
+	 *  
+	 *  Can be called concurrently by SendManagers of message service.
+	 *  Cannot be synchronized due to synchronized call to con.send() (deadlocks).
 	 */
-//	public ComponentIdentifier[] sendMessage(IMessageEnvelope message)
 	public IComponentIdentifier[] sendMessage(Map message, String msgtype, IComponentIdentifier[] receivers, final byte[] codecids)
 	{
 		// Fetch all receivers 
