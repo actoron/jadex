@@ -1,6 +1,7 @@
 package jadex.base.gui.filetree;
 
 
+import jadex.base.gui.asynctree.ITreeNode;
 import jadex.commons.SUtil;
 
 import java.util.Arrays;
@@ -121,20 +122,20 @@ public class NodePath
 	/**
 	 *  Create a node path for a given node.
 	 */
-	public static NodePath	createNodePath(FileNode node)
+	public static NodePath	createNodePath(ITreeNode node)
 	{
 		RootNode	root	= null;
 		List	path	= new LinkedList();
 		while(root==null)
 		{
-			if(node.getParent() instanceof FileNode)
+			if(node.getParent() instanceof RootNode)
 			{
-				path.add(0, ((FileNode)node).getFile().getName());
-				node	= (FileNode)node.getParent();
+				root	= (RootNode)node.getParent();
 			}
 			else
 			{
-				root	= (RootNode)node.getParent();
+				path.add(0, node instanceof FileNode ? ((FileNode)node).getFile().getName() : ((RemoteFileNode)node).getFileName());
+				node	= node.getParent();
 			}
 		}
 		return new NodePath(root.getIndex(node), (String[])path.toArray(new String[path.size()]));

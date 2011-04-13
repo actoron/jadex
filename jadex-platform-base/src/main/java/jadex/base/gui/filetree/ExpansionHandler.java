@@ -1,5 +1,6 @@
 package jadex.base.gui.filetree;
 
+import jadex.base.gui.asynctree.ITreeNode;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.TreeExpansionHandler;
@@ -100,12 +101,14 @@ public class ExpansionHandler extends TreeExpansionHandler
 				
 				if(found)
 				{
+//					System.out.println("expanded: "+node);
 					expanded.add(node);
 					handlePath(new TreePath(treepath.toArray()));
 				}
 			}
 			if(!found)
 			{
+//				System.out.println("not expanded: "+paths[i]);
 				expandedpaths.add(paths[i]);
 			}
 		}
@@ -116,8 +119,11 @@ public class ExpansionHandler extends TreeExpansionHandler
 	 */
 	protected IFuture handlePath(final TreePath path)
 	{
+//		if(path.toString().indexOf("jadex")!=-1)
+//			System.out.println("handle path: "+path);
+		
 		// Move from paths (loaded) to expanded nodes (created dynamically).
-		if(path.getLastPathComponent() instanceof FileNode && expandedpaths!=null && expandedpaths.remove(NodePath.createNodePath((FileNode)path.getLastPathComponent())))
+		if(expandedpaths!=null && expandedpaths.remove(NodePath.createNodePath((ITreeNode)path.getLastPathComponent())))
 		{
 //			System.out.println("loaded: "+path.getLastPathComponent());
 			expanded.add(path.getLastPathComponent());
@@ -139,7 +145,7 @@ public class ExpansionHandler extends TreeExpansionHandler
 					tree.setSelectionPath(path);
 					tree.scrollPathToVisible(path);
 				}
-				else if(path.getLastPathComponent() instanceof FileNode && lastselectedpath!=null && lastselectedpath.equals(NodePath.createNodePath((FileNode)path.getLastPathComponent())))
+				else if(path.getLastPathComponent() instanceof FileNode && lastselectedpath!=null && lastselectedpath.equals(NodePath.createNodePath((ITreeNode)path.getLastPathComponent())))
 				{
 //					System.out.println("selected: "+path.getLastPathComponent());
 					lastselected	= null;

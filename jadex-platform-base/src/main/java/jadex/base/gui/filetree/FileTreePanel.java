@@ -345,7 +345,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 				String[]	paths	= (String[])result;
 				mep.setRootPathEntries(paths);
 				mep.setSelectedNode(getTree().getSelectionPath()==null ? null
-					: NodePath.createNodePath((FileNode)getTree().getSelectionPath().getLastPathComponent()));
+					: NodePath.createNodePath((ITreeNode)getTree().getSelectionPath().getLastPathComponent()));
 				List	expanded	= new ArrayList();
 				Enumeration exp = getTree().getExpandedDescendants(new TreePath(root));
 				if(exp!=null)
@@ -355,7 +355,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 						TreePath	path	= (TreePath)exp.nextElement();
 						if(path.getLastPathComponent() instanceof FileNode)
 						{
-							expanded.add(NodePath.createNodePath((FileNode)path.getLastPathComponent()));
+							expanded.add(NodePath.createNodePath((ITreeNode)path.getLastPathComponent()));
 						}
 					}
 				}
