@@ -74,6 +74,10 @@ public class SFlyweightFunctionality
 			
 			ret = BeliefFlyweight.getBeliefFlyweight(state, rscope[1], rbel);
 		}
+		else
+		{
+			throw new RuntimeException("No such belief: "+rscope[0]+" in "+rscope[1]);
+		}
 		
 		return ret;
 	}
