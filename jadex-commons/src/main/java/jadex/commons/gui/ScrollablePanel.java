@@ -38,8 +38,6 @@ public class ScrollablePanel extends JPanel implements Scrollable
 		this.trackwidth	= trackwidth;
 		this.trackheight	= trackheigth;
 	}
-	
-	//-------- --------
 
 	//-------- Scrollable interface --------
 	
