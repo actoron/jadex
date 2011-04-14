@@ -18,7 +18,7 @@ public class NIOTCPInputConnection
 {
 	// -------- constants ---------
 
-	/** 2MB as message buffer */
+	/** 10 kB as message buffer */
 	static final int BUFFER_SIZE	= 1024 * 10;
 
 	// -------- attributes ---------
