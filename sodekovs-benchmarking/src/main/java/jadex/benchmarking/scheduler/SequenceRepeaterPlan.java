@@ -160,8 +160,8 @@ public class SequenceRepeaterPlan extends Plan {
 	 * 
 	 */
 	private void init(SuTinfo sut, Sequence sequence) {
-		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
-		clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+		clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 		sortedSequenceList = sut.getSortedSequenceList();
 		sutCID = sut.getSutCID();
 		sutExta = sut.getSutExta();

@@ -15,7 +15,7 @@ import java.util.Set;
 public class NetLogoModelService extends BasicService implements IModelInspectionService {
 
 	public NetLogoModelService(ICapability cap) {
-		super(cap.getServiceProvider().getId(), IModelInspectionService.class, null);
+		super(cap.getServiceContainer().getId(), IModelInspectionService.class, null);
 //		Map prop = getPropertyMap();
 //		prop.put(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, "jadex.simulation.analysis.buildingBlocks.execution.ExecutionServiceView");
 //		setPropertyMap(prop);

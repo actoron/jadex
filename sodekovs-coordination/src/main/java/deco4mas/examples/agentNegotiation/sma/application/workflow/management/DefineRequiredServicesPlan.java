@@ -41,7 +41,7 @@ public class DefineRequiredServicesPlan extends Plan
 
 			// get Cms
 			IComponentManagementService cms = ((IComponentManagementService)SServiceProvider.getService(
-					getScope().getServiceProvider(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this));
+					getScope().getServiceContainer(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this));
 
 			// workflow Access
 			IFuture workflowFuture = cms.getExternalAccess((IComponentIdentifier) ((IGoal) getReason()).getParameter("workflow").getValue());

@@ -46,7 +46,7 @@ public class TrustAdaptPlan extends Plan
 			AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace("mycoordspace"));
 			HistorytimeTrustFunction trustFunction = (HistorytimeTrustFunction) getBeliefbase().getBelief("trustFunction").getFact();
 			Iterator<String> it = trustFunction.getHistory().getSas().iterator();
-			IClockService clock = (IClockService)SServiceProvider.getServiceUpwards(space.getContext().getServiceProvider(), IClockService.class).get(this);
+			IClockService clock = (IClockService)SServiceProvider.getServiceUpwards(space.getContext().getServiceContainer(), IClockService.class).get(this);
 			while (it.hasNext()) {				
 				String saId = it.next();
 				double trust = trustFunction.getTrust(saId, clock.getTime());				

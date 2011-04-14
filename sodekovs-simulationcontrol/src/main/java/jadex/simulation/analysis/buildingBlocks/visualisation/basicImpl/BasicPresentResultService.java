@@ -10,7 +10,7 @@ import jadex.simulation.analysis.common.dataObjects.IAExperiment;
 public class BasicPresentResultService extends BasicService implements IPresentResultService{
 
 	public BasicPresentResultService(ICapability cap) {
-		super(cap.getServiceProvider().getId(), IExecuteExperimentService.class, null);
+		super(cap.getServiceContainer().getId(), IExecuteExperimentService.class, null);
 //		Map prop = getPropertyMap();
 //		prop.put(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, "jadex.simulation.analysis.buildingBlocks.execution.ExecutionServiceView");
 //		setPropertyMap(prop);

@@ -335,7 +335,7 @@ public class NegotiationMechanism extends ICoordinationMechanism
 	{
 		System.out.println("#StartMechanismNegotiation");
 		clock = (IClockService)SServiceProvider.getServiceUpwards(
-				space.getContext().getServiceProvider(), IClockService.class).get(new ThreadSuspendable());	
+				space.getContext().getServiceContainer(), IClockService.class).get(new ThreadSuspendable());	
 	
 		// clock.reset();
 	}

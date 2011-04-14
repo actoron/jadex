@@ -36,6 +36,9 @@
 
 		<!-- The parsed schedule xml file. -->
 		<belief name="schedule" class="Schedule" />
+		
+		<!-- Information about the SuT. -->
+		<belief name="suTinfo" class="SuTinfo" />
 
 		<!-- Reference to the XML file that contains the schedule description. 
 			This file is parsed on agent start. The reference to the file is passes by 

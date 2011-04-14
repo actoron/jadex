@@ -3,7 +3,7 @@
 <!-- Document : TestBenchmark: Workload 1 Created on : 18. März 2011, 16:23 
 	Author : vilenica Description: Purpose of the document follows. -->
 
-<Schedule type="Workload" name="W1" warmUpTime="1000">
+<Schedule type="Workload" name="W1" warmUpTime="1000000">
 	<TerminateCondition>
 		<!-- <TerminationTime value="7000" /> -->
 		<SemanticCondition condition="$object.getProperty(&quot;ore&quot;) >= 55">

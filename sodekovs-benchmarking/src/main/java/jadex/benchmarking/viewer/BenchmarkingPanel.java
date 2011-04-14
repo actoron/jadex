@@ -67,7 +67,7 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel
 //	protected DFComponentTable component_table;
 
 	/** The service table. */
-//	protected DFServiceTable service_table;
+	protected BenchmarkingServiceTable service_table;
 
 	/** The service panel. */
 //	protected ServiceDescriptionPanel service_panel;
@@ -131,9 +131,9 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel
 		add(button, BorderLayout.SOUTH);
 		
 //		service_panel = new ServiceDescriptionPanel();
-//		service_table = new DFServiceTable();
-//		JScrollPane stscroll = new JScrollPane(service_table);
-//		stscroll.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Registered Services"));
+		service_table = new BenchmarkingServiceTable();
+		JScrollPane stscroll = new JScrollPane(service_table);
+		stscroll.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Found Benchmarks"));
 //		
 //		component_table = new DFComponentTable(this);
 //		JScrollPane atscroll = new JScrollPane(component_table);
@@ -158,18 +158,18 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel
 //	
 //		setLayout(new BorderLayout());
 //		
-//		split3 = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-//		split3.setDividerLocation(130);
-//		split3.setOneTouchExpandable(true);
-//		split3.add(stscroll);
-////		split3.add(service_panel);
+		split3 = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		split3.setDividerLocation(130);
+		split3.setOneTouchExpandable(true);
+		split3.add(stscroll);
+//		split3.add(service_panel);
 //		split3.setResizeWeight(1.0);
-//		split2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-//		split2.setDividerLocation(130);
+		split2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		split2.setDividerLocation(130);
 //		split2.add(atscroll);
-//		split2.add(split3);
-//		split2.setResizeWeight(0.5);
-//		add(split2, BorderLayout.CENTER);
+		split2.add(split3);
+		split2.setResizeWeight(0.5);
+		add(split2, BorderLayout.CENTER);
 //		
 //		timer = new Timer(defrefresh, new ActionListener()
 //		{

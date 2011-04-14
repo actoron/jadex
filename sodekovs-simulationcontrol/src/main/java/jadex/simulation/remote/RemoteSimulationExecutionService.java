@@ -29,7 +29,7 @@ public class RemoteSimulationExecutionService extends BasicService implements IR
 	 *            The active component.
 	 */
 	public RemoteSimulationExecutionService(ICapability comp) {
-		super(comp.getServiceProvider().getId(), IRemoteSimulationExecutionService.class, null);
+		super(comp.getServiceContainer().getId(), IRemoteSimulationExecutionService.class, null);
 
 		// System.out.println("created: "+name);
 		this.comp = comp;

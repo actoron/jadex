@@ -26,7 +26,7 @@ public class InitSimulationPlan extends Plan{
 		
 		
 		//Start Simulation Control Center
-		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 		Map args = SCollection.createHashMap();
 		args.put("simulationConf", simConf);		
 //		IFuture ret = ces.createComponent(null, "/jadex/simulation/controlcenter/ControlCenter.agent.xml", new CreationInfo(args), null);

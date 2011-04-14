@@ -34,7 +34,7 @@ public class ExecuteTaskPlan extends Plan
 //					getScope().getServiceProvider(), IComponentManagementService.class).get(this)).getExternalAccess(aid);
 						
 			IComponentManagementService cms = ((IComponentManagementService)SServiceProvider.getService(
-					getScope().getServiceProvider(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this));
+					getScope().getServiceContainer(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this));
 						
 			IFuture fut = cms.getExternalAccess((IComponentIdentifier) getBeliefbase().getBelief("workflow").getFact());
 			ExternalAccess exta = (ExternalAccess) fut.get(this);

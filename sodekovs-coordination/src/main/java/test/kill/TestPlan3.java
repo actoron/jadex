@@ -29,7 +29,7 @@ public class TestPlan3 extends Plan {
 //		System.out.println("Killed appl ...");
 		
 		
-		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
+		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class).get(this);
 		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace("mycoordspace");		
 		ces.destroyComponent(space.getContext().getComponentIdentifier()).get(this);
 	}

@@ -47,9 +47,11 @@ public class InitBenchmarkingPlan extends Plan {
 	private IComponentIdentifier schedulerCID = null;
 
 	public void body() {
+		
+		waitFor(250000);
 
-		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
-		clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+		clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 
 		String benchmarkDescription = (String) getBeliefbase().getBelief("scheduleDescriptionFile").getFact();
 		System.out.println("#InitBench# Init Benchmark Agent with configuration file: " + benchmarkDescription);
@@ -65,6 +67,9 @@ public class InitBenchmarkingPlan extends Plan {
 			startSuT(benchConf);
 		}
 
+		//
+		getBeliefbase().getBelief("suTinfo").setFact(new SuTinfo(sortedSequenceList, sutCID, sutExta, sutSpace));
+		
 		// Start scheduler, that handles the execution of the sequences of the conducted benchmark.
 		// Scheduler is started in suspend mode.
 		startScheduler();

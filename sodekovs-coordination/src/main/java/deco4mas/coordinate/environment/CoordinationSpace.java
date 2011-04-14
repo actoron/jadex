@@ -146,7 +146,7 @@ public class CoordinationSpace extends Grid2D {
 	private List<IComponentIdentifier> getIdentifier(List<String> agentNames) {
 		List<IComponentIdentifier> componentIdentifiers = new ArrayList<IComponentIdentifier>();
 
-		IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getServiceUpwards(this.getContext().getServiceProvider(), IComponentManagementService.class).get(
+		IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getServiceUpwards(this.getContext().getServiceContainer(), IComponentManagementService.class).get(
 				new ThreadSuspendable());
 		IComponentIdentifier[] identifiers = (IComponentIdentifier[]) cms.getComponentIdentifiers().get(new ThreadSuspendable());
 		for (IComponentIdentifier identifier : identifiers) {
@@ -206,7 +206,7 @@ public class CoordinationSpace extends Grid2D {
 	 */
 	private void initParticipatingAgent(final IComponentIdentifier ai) {
 		// get the IComponentManagementService
-		IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getServiceUpwards(this.getContext().getServiceProvider(), IComponentManagementService.class).get(
+		IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getServiceUpwards(this.getContext().getServiceContainer(), IComponentManagementService.class).get(
 				new ThreadSuspendable());
 
 		// get the external access for the agent

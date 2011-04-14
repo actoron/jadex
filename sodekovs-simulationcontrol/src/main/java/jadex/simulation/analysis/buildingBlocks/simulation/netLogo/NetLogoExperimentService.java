@@ -34,7 +34,7 @@ public class NetLogoExperimentService extends BasicService implements IExecuteEx
 	 *            The active generalComp.
 	 */
 	public NetLogoExperimentService(ICapability cap) {
-		super(cap.getServiceProvider().getId(), IExecuteExperimentService.class, null);
+		super(cap.getServiceContainer().getId(), IExecuteExperimentService.class, null);
 //		Map prop = getPropertyMap();
 //		prop.put(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, "jadex.simulation.analysis.buildingBlocks.execution.ExecutionServiceView");
 //		setPropertyMap(prop);

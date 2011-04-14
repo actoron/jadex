@@ -130,7 +130,7 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 		if (invoke) {
 			// IAMS ams = (IAMS) ((IApplicationContext)
 			// space.getContext()).getPlatform().getService(IComponentManagementService.class);
-			IComponentManagementService ams = (IComponentManagementService) SServiceProvider.getServiceUpwards(space.getContext().getServiceProvider(), IComponentManagementService.class).get(
+			IComponentManagementService ams = (IComponentManagementService) SServiceProvider.getServiceUpwards(space.getContext().getServiceContainer(), IComponentManagementService.class).get(
 					new ThreadSuspendable());
 			final IExternalAccess exta = (IExternalAccess) ams.getExternalAccess(agent).get(new ThreadSuspendable());
 			exta.scheduleStep(new IComponentStep() {
