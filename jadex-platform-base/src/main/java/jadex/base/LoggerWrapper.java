@@ -52,6 +52,16 @@ public class LoggerWrapper extends Logger
 	//-------- methods --------
 	
 	/**
+	 * 
+	 */
+	public LogRecord createLogRecord(Level level, String msg, long time)
+	{
+		LogRecord lr = new CustomLogRecord(level, msg);
+		lr.setMillis(time);
+		return lr;
+	}
+	
+	/**
 	 * Retrieve the localization resource bundle for this logger for the current
 	 * default locale. Note that if the result is null, then the Logger will use
 	 * a resource bundle inherited from its parent.
@@ -128,8 +138,7 @@ public class LoggerWrapper extends Logger
 	{
 		if(level.intValue() < logger.getLevel().intValue() || logger.getLevel().intValue() == offValue) 
 		    return;
-		LogRecord lr = new LogRecord(level, msg);
-		lr.setMillis(getTime());
+		LogRecord lr = createLogRecord(level, msg, getTime());
 		log(lr);
 	}
 
@@ -149,10 +158,9 @@ public class LoggerWrapper extends Logger
 	{
 		if(level.intValue() < logger.getLevel().intValue() || logger.getLevel().intValue() == offValue) 
 		    return;
-		LogRecord lr = new LogRecord(level, msg);
+		LogRecord lr = createLogRecord(level, msg, getTime());
 		Object params[] = {param1};
 		lr.setParameters(params);
-		lr.setMillis(getTime());
 		log(lr);
 	}
 
@@ -172,9 +180,8 @@ public class LoggerWrapper extends Logger
 	{
 		if(level.intValue() < logger.getLevel().intValue() || logger.getLevel().intValue() == offValue) 
 		    return;
-		LogRecord lr = new LogRecord(level, msg);
+		LogRecord lr = createLogRecord(level, msg, getTime());
 		lr.setParameters(params);
-		lr.setMillis(getTime());
 		log(lr);
 	}
 
@@ -199,9 +206,8 @@ public class LoggerWrapper extends Logger
 	{
 		if(level.intValue() < logger.getLevel().intValue() || logger.getLevel().intValue() == offValue) 
 		    return;
-		LogRecord lr = new LogRecord(level, msg);
+		LogRecord lr = createLogRecord(level, msg, getTime());
 		lr.setThrown(thrown);
-		lr.setMillis(getTime());
 		log(lr);
 	}
 
@@ -221,10 +227,9 @@ public class LoggerWrapper extends Logger
 	{
 		if(level.intValue() < logger.getLevel().intValue() || logger.getLevel().intValue() == offValue) 
 		    return;
-		LogRecord lr = new LogRecord(level, msg);
+		LogRecord lr = createLogRecord(level, msg, getTime());
 		lr.setSourceClassName(sourceClass);
 		lr.setSourceMethodName(sourceMethod);
-		lr.setMillis(getTime());
 		log(lr);
 	}
 
@@ -248,12 +253,11 @@ public class LoggerWrapper extends Logger
 	{
 		if(level.intValue() < logger.getLevel().intValue() || logger.getLevel().intValue() == offValue) 
 		    return;
-		LogRecord lr = new LogRecord(level, msg);
+		LogRecord lr = createLogRecord(level, msg, getTime());
 		lr.setSourceClassName(sourceClass);
 		lr.setSourceMethodName(sourceMethod);
 		Object params[] = {param1};
 		lr.setParameters(params);
-		lr.setMillis(getTime());
 		log(lr);
 	}
 
@@ -277,11 +281,10 @@ public class LoggerWrapper extends Logger
 	{
 		if(level.intValue() < logger.getLevel().intValue() || logger.getLevel().intValue() == offValue) 
 		    return;
-		LogRecord lr = new LogRecord(level, msg);
+		LogRecord lr = createLogRecord(level, msg, getTime());
 		lr.setSourceClassName(sourceClass);
 		lr.setSourceMethodName(sourceMethod);
 		lr.setParameters(params);
-		lr.setMillis(getTime());
 		log(lr);
 	}
 
@@ -310,11 +313,10 @@ public class LoggerWrapper extends Logger
 	{
 		if(level.intValue() < logger.getLevel().intValue() || logger.getLevel().intValue() == offValue) 
 		    return;
-		LogRecord lr = new LogRecord(level, msg);
+		LogRecord lr = createLogRecord(level, msg, getTime());
 		lr.setSourceClassName(sourceClass);
 		lr.setSourceMethodName(sourceMethod);
 		lr.setThrown(thrown);
-		lr.setMillis(getTime());
 		log(lr);
 	}
 
@@ -361,10 +363,9 @@ public class LoggerWrapper extends Logger
 	{
 		if(level.intValue() < logger.getLevel().intValue() || logger.getLevel().intValue() == offValue) 
 		    return;
-		LogRecord lr = new LogRecord(level, msg);
+		LogRecord lr = createLogRecord(level, msg, getTime());
 		lr.setSourceClassName(sourceClass);
 		lr.setSourceMethodName(sourceMethod);
-		lr.setMillis(getTime());
 		doLog(lr, bundleName);
 	}
 
@@ -393,12 +394,11 @@ public class LoggerWrapper extends Logger
 	{
 		if(level.intValue() < logger.getLevel().intValue() || logger.getLevel().intValue() == offValue) 
 		    return;
-		LogRecord lr = new LogRecord(level, msg);
+		LogRecord lr = createLogRecord(level, msg, getTime());
 		lr.setSourceClassName(sourceClass);
 		lr.setSourceMethodName(sourceMethod);
 		Object params[] = {param1};
 		lr.setParameters(params);
-		lr.setMillis(getTime());
 		doLog(lr, bundleName);
 	}
 
@@ -427,11 +427,10 @@ public class LoggerWrapper extends Logger
 	{
 		if(level.intValue() < logger.getLevel().intValue() || logger.getLevel().intValue() == offValue) 
 		    return;
-		LogRecord lr = new LogRecord(level, msg);
+		LogRecord lr = createLogRecord(level, msg, getTime());
 		lr.setSourceClassName(sourceClass);
 		lr.setSourceMethodName(sourceMethod);
 		lr.setParameters(params);
-		lr.setMillis(getTime());
 		doLog(lr, bundleName);
 	}
 
@@ -465,11 +464,10 @@ public class LoggerWrapper extends Logger
 	{
 		if(level.intValue() < logger.getLevel().intValue() || logger.getLevel().intValue() == offValue) 
 		    return;
-		LogRecord lr = new LogRecord(level, msg);
+		LogRecord lr = createLogRecord(level, msg, getTime());
 		lr.setSourceClassName(sourceClass);
 		lr.setSourceMethodName(sourceMethod);
 		lr.setThrown(thrown);
-		lr.setMillis(getTime());
 		doLog(lr, bundleName);
 	}
 
@@ -596,39 +594,37 @@ public class LoggerWrapper extends Logger
 //		logp(Level.FINER, sourceClass, sourceMethod, "RETURN {0}", result);
 //	}
 
-//	/**
-//	 * Log throwing an exception.
-//	 * <p>
-//	 * This is a convenience method to log that a method is terminating by
-//	 * throwing an exception. The logging is done using the FINER level.
-//	 * <p>
-//	 * If the logger is currently enabled for the given message level then the
-//	 * given arguments are stored in a LogRecord which is forwarded to all
-//	 * registered output handlers. The LogRecord's message is set to "THROW".
-//	 * <p>
-//	 * Note that the thrown argument is stored in the LogRecord thrown property,
-//	 * rather than the LogRecord parameters property. Thus is it processed
-//	 * specially by output Formatters and is not treated as a formatting
-//	 * parameter to the LogRecord message property.
-//	 * <p>
-//	 * 
-//	 * @param sourceClass name of class that issued the logging request
-//	 * @param sourceMethod name of the method.
-//	 * @param thrown The Throwable that is being thrown.
-//	 */
-//	public void throwing(String sourceClass, String sourceMethod,
-//			Throwable thrown)
-//	{
-//		if(Level.FINER.intValue() < levelValue || levelValue == offValue)
-//		{
-//			return;
-//		}
-//		LogRecord lr = new LogRecord(Level.FINER, "THROW");
-//		lr.setSourceClassName(sourceClass);
-//		lr.setSourceMethodName(sourceMethod);
-//		lr.setThrown(thrown);
-//		doLog(lr);
-//	}
+	/**
+	 * Log throwing an exception.
+	 * <p>
+	 * This is a convenience method to log that a method is terminating by
+	 * throwing an exception. The logging is done using the FINER level.
+	 * <p>
+	 * If the logger is currently enabled for the given message level then the
+	 * given arguments are stored in a LogRecord which is forwarded to all
+	 * registered output handlers. The LogRecord's message is set to "THROW".
+	 * <p>
+	 * Note that the thrown argument is stored in the LogRecord thrown property,
+	 * rather than the LogRecord parameters property. Thus is it processed
+	 * specially by output Formatters and is not treated as a formatting
+	 * parameter to the LogRecord message property.
+	 * <p>
+	 * 
+	 * @param sourceClass name of class that issued the logging request
+	 * @param sourceMethod name of the method.
+	 * @param thrown The Throwable that is being thrown.
+	 */
+	public void throwing(String sourceClass, String sourceMethod,
+			Throwable thrown)
+	{
+		if(Level.FINER.intValue() < logger.getLevel().intValue() || logger.getLevel().intValue() == offValue) 
+		    return;
+		LogRecord lr = createLogRecord(Level.FINER, "THROW", getTime());
+		lr.setSourceClassName(sourceClass);
+		lr.setSourceMethodName(sourceMethod);
+		lr.setThrown(thrown);
+		doLog(lr, null); // todo: was doLog(lr);
+	}
 
 	// =======================================================================
 	// Start of simple convenience methods using level names as method names
