@@ -8,6 +8,7 @@ import jadex.commons.Property;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.gui.JSplitPanel;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -71,7 +72,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 	protected int	toolcnt;
 	
 	/** A split pane for the main panel and the console. */
-	protected JSplitPane sp;
+	protected JSplitPanel sp;
 	
 	/** The console. */
 	protected ConsolePanel console;
@@ -99,9 +100,10 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 	
 		this.console = new ConsolePanel(controlcenter.getPlatformAccess(), controlcenter.getJCCAccess());
 		console.setConsoleEnabled(false);
-		this.sp = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		this.sp = new JSplitPanel(JSplitPane.VERTICAL_SPLIT);
 		sp.setOneTouchExpandable(true);
-		sp.setDividerLocation(200);
+		sp.setDividerLocation(0.0);
+//		sp.setDividerLocation(200);
 		content.setMinimumSize(new Dimension(0,0));
 		console.setMinimumSize(new Dimension(0,0));
 		sp.add(content);
@@ -223,14 +225,14 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 
 	            // Save console height of old perspective
 	    		if(oldperspective!=plugin)
-	    			consoleheights.put(oldperspective.getName()+".console.height", new Integer(getConsoleHeight()));
+	    			consoleheights.put(oldperspective.getName()+".console.height", new Double(getConsoleHeight()));
 	    		// Set console height of new perspective
-	    		Integer ch = (Integer)consoleheights.get(currentperspective.getName()+".console.height");
+	    		Double ch = (Double)consoleheights.get(currentperspective.getName()+".console.height");
 	    		//System.out.println("Found: "+ch);
 	            if(ch!=null)
-	            	setConsoleHeight(ch.intValue());
+	            	setConsoleHeight(ch.doubleValue());
 	            else
-	            	setConsoleHeight(0);
+	            	setConsoleHeight(1.0);
 	            //System.out.println(consoleheights+" "+ch);
 	            
 	            try
@@ -345,7 +347,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 	 *  Set the console height.
 	 *  @param height The console height.
 	 */
-	public void setConsoleHeight(final int height)
+	public void setConsoleHeight(final double height)
 	{
 		// Delay setting when not yet displayed.
 //		if(sp.getMaximumDividerLocation()<height)
@@ -354,7 +356,8 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 			{
 				public void run()
 				{
-					sp.setDividerLocation(sp.getMaximumDividerLocation() - height);
+					sp.setDividerLocation(height);
+//					sp.setDividerLocation(sp.getMaximumDividerLocation() - height);
 				}
 			});
 		}
@@ -368,9 +371,9 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 	 *  Get the console height.
 	 *  @return The console height.
 	 */
-	public int getConsoleHeight()
+	public double getConsoleHeight()
 	{
-		return sp.getMaximumDividerLocation() - sp.getDividerLocation();
+		return sp.getProportionalDividerLocation();//sp.getMaximumDividerLocation() - sp.getDividerLocation();
 	}
 	
 	/**
@@ -392,7 +395,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 		if(currentperspective!=null)
 			props.addProperty(new Property("perspective", currentperspective.getName()));
 		props.addProperty(new Property("consoleenabled", consoleenabled ? "true" : "false"));
-		consoleheights.put(currentperspective.getName()+".console.height", new Integer(getConsoleHeight()));
+		consoleheights.put(currentperspective.getName()+".console.height", new Double(getConsoleHeight()));
 		props.addProperty(new Property("consoleheights", JavaWriter.objectToXML(consoleheights, getClass().getClassLoader())));
 		return new Future(props);
 	}
