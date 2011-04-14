@@ -7,7 +7,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Interface for treat victim service.
  */
-public interface ITreatVictimsService  extends IService
+public interface ITreatVictimsService
 {
 	/**
 	 *  Treat victims.

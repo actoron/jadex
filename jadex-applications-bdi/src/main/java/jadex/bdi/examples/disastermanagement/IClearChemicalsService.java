@@ -7,7 +7,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Clear chemicals service interface.
  */
-public interface IClearChemicalsService extends IService
+public interface IClearChemicalsService
 {	
 	/**
 	 *  Clear chemicals.

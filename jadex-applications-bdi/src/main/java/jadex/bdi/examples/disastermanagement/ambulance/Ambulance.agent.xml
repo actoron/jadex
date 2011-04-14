@@ -100,7 +100,7 @@
 	</plans>
 	
 	<services>
-		<providedservice class="ITreatVictimsService">new TreatVictimsService($scope)</providedservice>
+		<providedservice class="ITreatVictimsService" implementation="TreatVictimsService" />
 	</services>
 	
 	<configurations>

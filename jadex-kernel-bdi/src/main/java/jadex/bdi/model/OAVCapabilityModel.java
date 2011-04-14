@@ -694,12 +694,12 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 				boolean multiple = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_multiple));
 				
 				Object binding = state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_binding);
-				String scope = (String)state.getAttributeValue(binding, OAVBDIMetaModel.binding_has_scope);
-				String cname = (String)state.getAttributeValue(binding, OAVBDIMetaModel.binding_has_componentname);
-				String ctype = (String)state.getAttributeValue(binding, OAVBDIMetaModel.binding_has_componenttype);
-				boolean dynamic = ((Boolean)state.getAttributeValue(binding, OAVBDIMetaModel.binding_has_dynamic)).booleanValue();
-				boolean create = ((Boolean)state.getAttributeValue(binding, OAVBDIMetaModel.binding_has_create)).booleanValue();
-				boolean recover = ((Boolean)state.getAttributeValue(binding, OAVBDIMetaModel.binding_has_recover)).booleanValue();
+				String scope = binding==null? RequiredServiceInfo.SCOPE_APPLICATION: (String)state.getAttributeValue(binding, OAVBDIMetaModel.binding_has_scope);
+				String cname = binding==null? null: (String)state.getAttributeValue(binding, OAVBDIMetaModel.binding_has_componentname);
+				String ctype = binding==null? null: (String)state.getAttributeValue(binding, OAVBDIMetaModel.binding_has_componenttype);
+				boolean dynamic = binding==null? false: ((Boolean)state.getAttributeValue(binding, OAVBDIMetaModel.binding_has_dynamic)).booleanValue();
+				boolean create = binding==null? false: ((Boolean)state.getAttributeValue(binding, OAVBDIMetaModel.binding_has_create)).booleanValue();
+				boolean recover = binding==null? false: ((Boolean)state.getAttributeValue(binding, OAVBDIMetaModel.binding_has_recover)).booleanValue();
 				RequiredServiceBinding bd = new RequiredServiceBinding(name, cname, ctype, dynamic, scope, create, recover);
 				ret.add(new RequiredServiceInfo(name, clazz, multiple, bd));
 //				ret.add(state.getAttributeValue(it.next(), OAVBDIMetaModel.expression_has_class));

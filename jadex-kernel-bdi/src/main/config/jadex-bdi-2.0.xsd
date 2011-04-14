@@ -2005,6 +2005,7 @@
 		<xs:complexContent>
 			<xs:extension base="MInternalExpression">
 				<xs:attribute name="direct" type="xs:boolean" use="optional" default="false"/>
+				<xs:attribute name="implementation" type="xs:string" use="optional"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

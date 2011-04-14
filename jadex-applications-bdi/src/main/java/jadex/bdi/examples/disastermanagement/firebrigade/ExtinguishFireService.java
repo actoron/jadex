@@ -3,34 +3,26 @@ package jadex.bdi.examples.disastermanagement.firebrigade;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.examples.disastermanagement.IExtinguishFireService;
 import jadex.bdi.runtime.AgentEvent;
+import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.ICapability;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
  *  Fire extinguish service.
  */
-public class ExtinguishFireService extends BasicService implements IExtinguishFireService
+public class ExtinguishFireService implements IExtinguishFireService
 {
 	//-------- attributes --------
 	
 	/** The agent. */
-	protected ICapability agent;
-	
-	//-------- constructors --------
-	
-	/**
-	 *  Create a new service.
-	 */
-	public ExtinguishFireService(ICapability agent)
-	{
-		super(agent.getServiceContainer().getId(), IExtinguishFireService.class, null);
-		this.agent = agent;
-	}
-	
+	@ServiceComponent
+	protected IBDIInternalAccess agent;
+
 	//-------- methods --------
 	
 	/**

@@ -4,33 +4,23 @@ import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.examples.disastermanagement.DeliverPatientTask;
 import jadex.bdi.examples.disastermanagement.ITreatVictimsService;
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.ICapability;
+import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
-import jadex.bridge.service.BasicService;
+import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
  *   Treat victims service.
  */
-public class TreatVictimsService extends BasicService implements ITreatVictimsService
+public class TreatVictimsService implements ITreatVictimsService
 {
 	//-------- attributes --------
 	
 	/** The agent. */
-	protected ICapability agent;
-	
-	//-------- constructors --------
-	
-	/**
-	 *  Create a new service.
-	 */
-	public TreatVictimsService(ICapability agent)
-	{
-		super(agent.getServiceContainer().getId(), ITreatVictimsService.class, null);
-		this.agent = agent;
-	}
+	@ServiceComponent
+	protected IBDIInternalAccess agent;
 	
 	//-------- methods --------
 	

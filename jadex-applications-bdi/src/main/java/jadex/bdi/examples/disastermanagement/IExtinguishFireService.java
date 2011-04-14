@@ -1,13 +1,12 @@
 package jadex.bdi.examples.disastermanagement;
 
 import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.bridge.service.IService;
 import jadex.commons.future.IFuture;
 
 /**
  *  Extinguish fire service interface.
  */
-public interface IExtinguishFireService	extends	IService
+public interface IExtinguishFireService
 {
 	/**
 	 *  Extinguish a fire.

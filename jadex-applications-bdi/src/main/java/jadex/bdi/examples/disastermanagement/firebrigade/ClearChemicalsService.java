@@ -3,33 +3,23 @@ package jadex.bdi.examples.disastermanagement.firebrigade;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.examples.disastermanagement.IClearChemicalsService;
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.ICapability;
+import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
-import jadex.bridge.service.BasicService;
+import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
  *   Clear chemicals service.
  */
-public class ClearChemicalsService extends BasicService implements IClearChemicalsService
+public class ClearChemicalsService implements IClearChemicalsService
 {
 	//-------- attributes --------
 	
 	/** The agent. */
-	protected ICapability agent;
-	
-	//-------- constructors --------
-	
-	/**
-	 *  Create a new service.
-	 */
-	public ClearChemicalsService(ICapability agent)
-	{
-		super(agent.getServiceContainer().getId(), IClearChemicalsService.class, null);
-		this.agent = agent;
-	}
+	@ServiceComponent
+	protected IBDIInternalAccess agent;
 	
 	//-------- methods --------
 	
