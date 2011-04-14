@@ -236,9 +236,9 @@ public class StarterPanel extends JPanel
 		// The generate flag for the componentname;
 		genname = new JCheckBox("Auto generate", false);
 		genname.setToolTipText("Auto generate the component instance name");
-		genname.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+		genname.addItemListener(new ItemListener()
+		{			
+			public void itemStateChanged(ItemEvent e)
 			{
 				componentname.setEditable(!genname.isSelected());
 				numcomponents.setEnabled(genname.isSelected());
@@ -782,6 +782,9 @@ public class StarterPanel extends JPanel
 			componentnamel.setPreferredSize(confdummy.getPreferredSize());
 			
 			componentname.setText(loadname!=null ? loadname	: model.getName());
+			if(genname.isSelected())
+				genname.setSelected(false);
+			
 			loadname	= null;
 		}
 		else
@@ -814,31 +817,31 @@ public class StarterPanel extends JPanel
 			icon	= icon!=null ? new CombiIcon(new Icon[]{icon, icons.getIcon("overlay_check")}) : icons.getIcon("overlay_check");
 			try
 			{
-				modeldesc.addHTMLContent(model.getName(), icon, report.getErrorHTML(), adf, report.getDocuments());
+				modeldesc.addHTMLContent(model.getName(), icon, report.getErrorHTML(), model.getFullName(), report.getDocuments());
 			}
 			catch(final Exception e)
 			{
 				String text = SUtil.wrapText("Could not display HTML content: "+e.getMessage());
 				JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), text, "Display Problem", JOptionPane.INFORMATION_MESSAGE);
-				modeldesc.addTextContent(model.getName(), icon, report.toString(), adf);
+				modeldesc.addTextContent(model.getName(), icon, report.toString(), model.getFullName());
 			}
 		}
 		else if(model!=null)
 		{
 			try
 			{
-				modeldesc.addHTMLContent(model.getName(), icon, model.getDescription(), adf, null);
+				modeldesc.addHTMLContent(model.getName(), icon, model.getDescription(), model.getFullName(), null);
 			}
 			catch(final Exception e)
 			{
 				String text = SUtil.wrapText("Could not display HTML content: "+e.getMessage());
 				JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), text, "Display Problem", JOptionPane.INFORMATION_MESSAGE);
-				modeldesc.addTextContent(model.getName(), icon, model.getDescription(), adf);
+				modeldesc.addTextContent(model.getName(), icon, model.getDescription(), model.getFullName());
 			}
 		}
 		else if(error!=null)
 		{
-			modeldesc.addTextContent("Error", null, error, adf);
+			modeldesc.addTextContent("Error", null, error, "error");
 		}
 
 		// Adjust state of start button depending on model checking state.
