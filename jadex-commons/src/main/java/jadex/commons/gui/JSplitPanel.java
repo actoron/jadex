@@ -104,8 +104,8 @@ public class JSplitPanel extends JSplitPane
 				newRightComponent);
 	}
 
-
-	boolean	isPainted				= false;
+	// Mega HACK!!! Does not work if just set once :-(((
+	int	isPainted = 3;
 
 	boolean	hasProportionalLocation	= false;
 	double	proportionalLocation;
@@ -128,7 +128,7 @@ public class JSplitPanel extends JSplitPane
 	
 	public void setDividerLocation(double proportionalLocation)
 	{
-		if(!isPainted)
+		if(isPainted>0)
 		{
 			hasProportionalLocation = true;
 			this.proportionalLocation = proportionalLocation;
@@ -141,7 +141,7 @@ public class JSplitPanel extends JSplitPane
 
 	public void paint(Graphics g)
 	{
-		if(!isPainted && isValid())
+		if(isPainted>0 && isValid() && isVisible())
 		{
 //			if(hasLocation)
 //			{
@@ -153,7 +153,7 @@ public class JSplitPanel extends JSplitPane
 //				System.out.println("proploc: "+proportionalLocation);
 				super.setDividerLocation(proportionalLocation);
 			}
-			isPainted = true;
+			isPainted--;
 		}
 		super.paint(g);
 	}
