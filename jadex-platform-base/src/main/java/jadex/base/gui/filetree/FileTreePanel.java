@@ -113,7 +113,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		tree.setRootVisible(false);
 		tree.setRowHeight(16);
 		
-		this.add(tree, BorderLayout.CENTER);
+		this.add(new JScrollPane(tree), BorderLayout.CENTER);
 		
 		new TreeExpansionHandler(tree);
 		RootNode root = new RootNode(model, tree);

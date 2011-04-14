@@ -17,7 +17,6 @@ import jadex.commons.gui.PopupBuilder;
 import java.io.File;
 
 import javax.swing.JComponent;
-import javax.swing.JScrollPane;
 import javax.swing.tree.TreeSelectionModel;
 
 /**
@@ -33,9 +32,6 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	
 	/** The service. */
 	protected IDeploymentService service;
-	
-	/** The scroll pane. */
-	protected JScrollPane scrollpane;
 	
 	//-------- constructors --------
 
@@ -79,7 +75,6 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 				}
 			});
 		}
-		this.scrollpane = new JScrollPane(ftp);
 	}
 	
 	/**
@@ -122,7 +117,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	 */
 	public JComponent getComponent()
 	{
-		return scrollpane;
+		return ftp;
 	}
 	
 	/**

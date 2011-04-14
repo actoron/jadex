@@ -38,7 +38,6 @@ import java.awt.event.MouseListener;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.UIDefaults;
 import javax.swing.event.TreeSelectionEvent;
@@ -209,8 +208,7 @@ public class StarterPluginPanel extends JPanel
 		
 		comptree.addNodeHandler(new ShowRemoteControlCenterHandler(jcc, StarterPluginPanel.this));
 		
-		lsplit.add(new JScrollPane(mpanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+		lsplit.add(mpanel);
 //		lsplit.add(tp);
 		lsplit.add(comptree);
 //				lsplit.setDividerLocation(300);

@@ -28,7 +28,6 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
@@ -260,7 +259,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		mainpanel.setDividerLocation(0.3);
 
 //		mainpanel.add(tp);
-		mainpanel.add(new JScrollPane(mpanel));
+		mainpanel.add(mpanel);
 		mainpanel.add(tcpanel);
 		
 		loadPlatformProperties();	// Todo: wait for platform properties to be loaded?
