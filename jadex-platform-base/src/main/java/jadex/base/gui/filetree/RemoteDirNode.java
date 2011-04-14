@@ -78,7 +78,7 @@ public class RemoteDirNode extends RemoteFileNode
 					for(Iterator it=files.iterator(); it.hasNext();)
 					{
 						FileData file = (FileData)it.next();
-						ITreeNode node = getModel().getNode(file);
+						ITreeNode node = getModel().getNode(file.toString());
 						if(node!=null)
 						{
 							lis.resultAvailable(node);
