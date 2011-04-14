@@ -5,8 +5,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import jadex.bridge.service.RequiredServiceInfo;
-
 /**
  *  Required service data.
  */
@@ -23,19 +21,14 @@ public @interface RequiredService
 	 *  The service interface type. 
 	 */
 	public Class type();
-	
-	/** 
-	 *  Flag if binding is dynamic. 
-	 */
-	public boolean dynamic() default false;
 
 	/** 
 	 *  Flag if multiple services should be returned. 
 	 */
 	public boolean multiple() default false;
 
-	/** 
-	 * The search scope. 
+	/**
+	 *  The binding.
 	 */
-	public String scope() default RequiredServiceInfo.SCOPE_APPLICATION;
+	public Binding binding() default @Binding();
 }

@@ -309,9 +309,8 @@ public class NIOTCPTransport implements ITransport
 	 *  @param message The message to send.
 	 *  
 	 *  Can be called concurrently by SendManagers of message service.
-	 *  Cannot be synchronized due to synchronized call to con.send() (deadlocks).
 	 */
-	public IComponentIdentifier[] sendMessage(Map message, String msgtype, IComponentIdentifier[] receivers, final byte[] codecids)
+	public synchronized IComponentIdentifier[] sendMessage(Map message, String msgtype, IComponentIdentifier[] receivers, final byte[] codecids)
 	{
 		// Fetch all receivers 
 		IComponentIdentifier[] recstodel = receivers;

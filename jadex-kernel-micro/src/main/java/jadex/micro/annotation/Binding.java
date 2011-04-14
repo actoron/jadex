@@ -17,7 +17,7 @@ public @interface Binding
 	/**
 	 *  The argument name.
 	 */
-	public String name();
+	public String name() default "";
 	
 	/**
 	 *  The component name.
@@ -35,7 +35,7 @@ public @interface Binding
 	public String componentfilename() default "";
 	
 	/**
-	 *  The component filename.
+	 *  The search scope.
 	 */
 	public String scope() default RequiredServiceInfo.SCOPE_APPLICATION;
 
@@ -48,4 +48,9 @@ public @interface Binding
 	 *  The create component flag.
 	 */
 	public boolean create() default false;
+	
+	/**
+	 *  The error recover flag.
+	 */
+	public boolean recover() default false;
 }

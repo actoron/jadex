@@ -25,6 +25,7 @@ import jadex.commons.gui.SGUI;
 import jadex.javaparser.SJavaParser;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
@@ -206,8 +207,12 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			RequiredServiceInfo[] rsis = new RequiredServiceInfo[vals.length];
 			for(int i=0; i<vals.length; i++)
 			{
+				Binding bd = vals[i].binding();
+				RequiredServiceBinding binding = new RequiredServiceBinding(vals[i].name(), 
+					bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
+					bd.dynamic(), bd.scope(), bd.create(), bd.recover());
 				rsis[i] = new RequiredServiceInfo(vals[i].name(), vals[i].type(), 
-					vals[i].multiple(), new RequiredServiceBinding(vals[i].name(), vals[i].scope(), vals[i].dynamic()));
+					vals[i].multiple(), binding);
 			}
 			metainfo.setRequiredServices(rsis);
 		}

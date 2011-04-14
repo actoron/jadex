@@ -7,6 +7,7 @@ import jadex.bridge.service.clock.IClock;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -22,7 +23,8 @@ import java.util.logging.LogRecord;
  */
 @Description("Tests the logger.")
 @Results(@Result(name="testresults", description= "The test results.", typename="Testcase"))
-@RequiredServices({@RequiredService(name="clockservice", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL)})
+@RequiredServices({@RequiredService(name="clockservice", type=IClockService.class, 
+	binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))})
 public class LoggerAgent extends MicroAgent
 {
 	/**

@@ -19,6 +19,7 @@ import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
@@ -77,10 +78,10 @@ import javax.xml.stream.XMLStreamException;
 @Properties(@NameValue(name="componentviewer.viewerclass", value="jadex.base.service.awareness.AwarenessAgentPanel"))
 @RequiredServices(
 {
-	@RequiredService(name="cms", type=IComponentManagementService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
-	@RequiredService(name="threadpool", type=IThreadPoolService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
+	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+	@RequiredService(name="threadpool", type=IThreadPoolService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 //	@RequiredService(name="clock", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
-	@RequiredService(name="settings", type=ISettingsService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM)
+	@RequiredService(name="settings", type=ISettingsService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
 public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 {

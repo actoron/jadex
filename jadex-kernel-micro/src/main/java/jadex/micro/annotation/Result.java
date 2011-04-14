@@ -20,7 +20,7 @@ public @interface Result
 	/**
 	 *  The description.
 	 */
-	public String description();
+	public String description() default "";
 	
 	/**
 	 *  The type name.

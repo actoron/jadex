@@ -10,6 +10,7 @@ import jadex.commons.ChangeEvent;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -36,7 +37,7 @@ import javax.swing.SwingUtilities;
 @RequiredServices({
 	@RequiredService(name="generateservice", type=IGenerateService.class),
 	@RequiredService(name="progressservice", type=IProgressService.class),
-	@RequiredService(name="cmsservice", type=IComponentManagementService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM)
+	@RequiredService(name="cmsservice", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
 public class DisplayAgent extends MicroAgent
 {
