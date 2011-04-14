@@ -9,6 +9,8 @@ import jadex.commons.gui.SGUI;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -401,20 +403,8 @@ public class ControlCenterWindow extends JFrame
 		{
 			this.pcc	= pcc;
 			this.setOpaque(false);
-			JLabel	label	= new JLabel(pcc.getPanel().getName())
-			{
-				public Insets getInsets()
-				{
-					return new Insets(0,0,0,0);
-				}
-			};
-			final JLabel	close	= new JLabel(icons.getIcon("close_0"))
-			{
-				public Insets getInsets()
-				{
-					return new Insets(0,0,0,0);
-				}
-			};
+			JLabel	label	= new JLabel(pcc.getPanel().getName());
+			final JLabel	close	= new JLabel(icons.getIcon("close_0"));
 			close.addMouseListener(new MouseAdapter()
 			{
 				boolean	in;
@@ -451,9 +441,13 @@ public class ControlCenterWindow extends JFrame
 					close.repaint();
 				}
 			});
-			this.setLayout(new BorderLayout());
-			this.add(label, BorderLayout.CENTER);
-			this.add(close, BorderLayout.EAST);
+			this.setLayout(new GridBagLayout());
+			GridBagConstraints	gbc	= new GridBagConstraints();
+			gbc.fill	= GridBagConstraints.NONE;
+			gbc.anchor	= GridBagConstraints.CENTER;
+			this.add(label, gbc);
+			gbc.insets	= new Insets(2, 2, 0, 0);
+			this.add(close, gbc);
 		}
 		
 		//-------- methods --------

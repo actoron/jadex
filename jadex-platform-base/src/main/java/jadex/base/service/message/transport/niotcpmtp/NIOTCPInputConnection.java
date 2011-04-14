@@ -110,7 +110,7 @@ public class NIOTCPInputConnection
 				prolog_len = 1+codec_ids.length+NIOTCPTransport.PROLOG_SIZE;
 			}
 		
-			if(prolog_len>0 && wb.position()-rb.position()>=prolog_len)
+			if(prolog_len>0 && wb.position()-rb.position()>=NIOTCPTransport.PROLOG_SIZE)
 			{
 				byte[]	bytes	= new byte[4];
 				bytes[0]	= rb.get();
@@ -131,9 +131,8 @@ public class NIOTCPInputConnection
 		// Read out the buffer if enough data has been retrieved for the message.
 		if(msg_len != -1)
 		{
-			boolean first = msg_pos==0;
 			// Read till end of message
-			if(msg_len <= msg_pos+wb.position()-(first? prolog_len: 0))
+			if(msg_len <= msg_pos+wb.position()-rb.position())
 			{
 				int len = msg_len-msg_pos;
 //				rb.limit(len+(first? NIOTCPTransport.PROLOG_SIZE: 0));
@@ -163,8 +162,8 @@ public class NIOTCPInputConnection
 				
 				// Reset the readbuffer and compact (i.e. copy rest) the writebuffer
 				wb.limit(wb.position());
-				int pos = msg_len%wb.capacity()+prolog_len;
-				wb.position(pos);
+//				int pos = (msg_len+prolog_len)%wb.capacity();
+				wb.position(rb.position());
 				wb.compact();
 				rb.clear();
 				codec_ids = null;
