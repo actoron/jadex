@@ -223,7 +223,10 @@ public class ServicePoolManager
 				 */
 				public void exceptionOccurred(Exception exception)
 				{
-//					System.out.println("wurksn1");
+//					if(!(exception instanceof ServiceNotFoundException))
+//						System.out.println("!snfe: "+exception);
+//					
+//					System.out.println("wurksn1: "+exception);
 					searching	= false;					
 					if(timer!=null)
 					{
@@ -238,10 +241,10 @@ public class ServicePoolManager
 					{
 						createServices();
 					}
-					else
-					{
-						component.getLogger().warning("Service error and cannot create new one: "+exception);
-					}
+//					else
+//					{
+//						component.getLogger().warning("Service error and cannot create new one: "+exception);
+//					}
 				}
 				
 				public void resultAvailable(Object result)

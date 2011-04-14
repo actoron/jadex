@@ -282,11 +282,11 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		
 		if(results==null || results.size()==0)
 		{
-			ret.setResult(null);
+			ret.setFinished();
 		}
 		else
 		{
-			CounterResultListener lis = new CounterResultListener(results.size(), new IResultListener()
+			CounterResultListener lis = new CounterResultListener(results.size(), true, new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -301,7 +301,10 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 			{
 				public void intermediateResultAvailable(Object result)
 				{
-					ret.addIntermediateResult(result);
+					// only post result, if valid.
+					if(result!=null)
+						ret.addIntermediateResult(result);
+					
 					super.intermediateResultAvailable(result);
 				}
 			};

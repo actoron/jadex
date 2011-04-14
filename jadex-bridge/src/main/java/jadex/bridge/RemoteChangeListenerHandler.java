@@ -163,7 +163,8 @@ public abstract class RemoteChangeListenerHandler
 	
 	protected void startTimer()
 	{
-		if(timer==null && (!removed.isEmpty() || !added.isEmpty() || !changed.isEmpty() || !occurred.isEmpty()))
+		if(timer==null && instance!=null &&
+			(!removed.isEmpty() || !added.isEmpty() || !changed.isEmpty() || !occurred.isEmpty()))
 		{
 			final IExternalAccess	access	= instance.getExternalAccess();
 			timer	= new Timer(true);
@@ -254,6 +255,7 @@ public abstract class RemoteChangeListenerHandler
 										public void resultAvailable(Object result)
 										{
 	//										System.out.println("update succeeded: "+desc);
+											startTimer();
 										}
 										public void exceptionOccurred(Exception exception)
 										{
@@ -275,8 +277,6 @@ public abstract class RemoteChangeListenerHandler
 										}
 									});
 								}
-								
-								startTimer();
 							}
 							catch(Exception e)
 							{
