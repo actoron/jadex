@@ -31,7 +31,7 @@ import javax.swing.SwingUtilities;
 	@RequiredService(name="remotehelplineservices", type=IHelpline.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL)),
 	@RequiredService(name="localhelplineservices", type=IHelpline.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
-@ProvidedServices(@ProvidedService(type=IHelpline.class, expression="new HelplineService($component)"))
+@ProvidedServices(@ProvidedService(type=IHelpline.class, implementation=HelplineService.class))
 @GuiClass(HelplineViewerPanel.class)
 public class HelplineAgent extends MicroAgent
 {
@@ -58,7 +58,7 @@ public class HelplineAgent extends MicroAgent
 				infos.put(ie.getName(), ie);
 			}
 		}
-		addService(new HelplineService(this));
+//		addService(new HelplineService(this));
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()

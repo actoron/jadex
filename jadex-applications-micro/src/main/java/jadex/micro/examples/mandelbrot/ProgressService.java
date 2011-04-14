@@ -1,29 +1,19 @@
 package jadex.micro.examples.mandelbrot;
 
-import jadex.bridge.service.BasicService;
+import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
  *  Progress service implementation.
  */
-public class ProgressService extends BasicService implements IProgressService
+public class ProgressService implements IProgressService
 {
 	//-------- attributes --------
 	
 	/** The agent. */
+	@ServiceComponent
 	protected CalculateAgent agent;
-	
-	//-------- constructors --------
-	
-	/**
-	 *  Create a new service.
-	 */
-	public ProgressService(CalculateAgent agent)
-	{
-		super(agent.getServiceContainer().getId(), IProgressService.class, null);
-		this.agent = agent;
-	}
 	
 	//-------- methods --------
 	

@@ -25,6 +25,7 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.ITimer;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
+import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -172,14 +173,25 @@ public class MicroAgentInterpreter implements IComponentInstance
 						fetcher.setValue("$provider", getServiceProvider());
 						for(int i=0; i<services.length; i++)
 						{
-							Object service;
-							if(services[i].getExpression()!=null)
+							Object service = null;
+							
+							try
 							{
-								try
+								if(services[i].getExpression()!=null)
 								{
 									// todo: other Class imports, how can be found out?
 									String[] imports = new String[]{microagent.getClass().getPackage().getName()+".*"};
 									service = SJavaParser.evaluateExpression(services[i].getExpression(), imports, fetcher, model.getClassLoader());
+									
+//									System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
+								}
+								else if(services[i].getImplementation()!=null)
+								{
+									service = services[i].getImplementation().newInstance();
+								}
+								
+								if(service!=null)
+								{
 									if(services[i].isDirect())
 									{
 										microagent.addDirectService(service);
@@ -188,13 +200,16 @@ public class MicroAgentInterpreter implements IComponentInstance
 									{
 										microagent.addService(service);
 									}
-//											System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
 								}
-								catch(Exception e)
+								else
 								{
-									e.printStackTrace();
 									microagent.getLogger().warning("Service creation error: "+services[i].getExpression());
 								}
+							}
+							catch(Exception e)
+							{
+								e.printStackTrace();
+								microagent.getLogger().warning("Service creation error: "+services[i].getExpression());
 							}
 						}
 					}

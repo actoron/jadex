@@ -2,6 +2,7 @@ package jadex.base.service.remote.xml;
 
 import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.IService;
 import jadex.commons.IRemotable;
 import jadex.commons.SReflect;
 import jadex.xml.IContext;
@@ -71,6 +72,13 @@ public class RMIPreProcessor implements IPreProcessor
 						ret.add(interfaces[i]);
 				}
 				clazz = clazz.getSuperclass();
+			}
+			
+			if(object instanceof IService)
+			{
+				Class serviceinterface = ((IService)object).getServiceIdentifier().getServiceType();
+				if(!ret.contains(serviceinterface))
+					ret.add(serviceinterface);
 			}
 		}
 		

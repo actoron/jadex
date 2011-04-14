@@ -1,13 +1,12 @@
 package jadex.micro.examples.chat;
 
-import jadex.bridge.service.IService;
 import jadex.commons.IRemoteChangeListener;
 
 
 /**
  *  Service can receive chat messages.
  */
-public interface IChatService extends IService
+public interface IChatService
 {
 	/**
 	 *  Hear a new message.

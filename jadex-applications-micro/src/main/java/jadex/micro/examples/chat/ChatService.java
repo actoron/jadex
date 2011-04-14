@@ -2,6 +2,8 @@ package jadex.micro.examples.chat;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.future.IResultListener;
@@ -12,11 +14,12 @@ import java.util.List;
 /**
  *  Chat service implementation.
  */
-public class ChatService extends BasicService implements IChatService
+public class ChatService implements IChatService
 {
 	//-------- attributes --------
 	
 	/** The agent. */
+	@ServiceComponent
 	protected IInternalAccess agent;
 	
 	/** The listeners. */
@@ -25,20 +28,17 @@ public class ChatService extends BasicService implements IChatService
 	/** The chat gui. */
 	protected ChatPanel chatpanel;
 	
-	//-------- constructors --------
+	//-------- methods --------
 	
 	/**
-	 *  Create a new helpline service.
+	 *  Called on startup.
 	 */
-	public ChatService(IInternalAccess agent)
+	@ServiceStart
+	public void start()
 	{
-		super(agent.getServiceContainer().getId(), IChatService.class, null);
-		this.agent = agent;
 		this.listeners = new ArrayList();
 		this.chatpanel = ChatPanel.createGui(agent.getExternalAccess());
 	}
-	
-	//-------- methods --------
 	
 	/**
 	 *  Hear something.

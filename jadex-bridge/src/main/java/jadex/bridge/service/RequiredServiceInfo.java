@@ -46,15 +46,6 @@ public class RequiredServiceInfo
 	/** The default binding. */
 	protected RequiredServiceBinding binding;
 	
-//	/** Flag if binding is dynamic. */
-//	protected boolean dynamic;
-//
-//	/** The search scope. */
-//	protected String scope;
-//	
-//	/** The component name. */
-//	protected String componentname;
-	
 	//-------- constructors --------
 	
 	/**
@@ -81,14 +72,6 @@ public class RequiredServiceInfo
 		this(name, type, false, new RequiredServiceBinding(name, scope));
 	}
 	
-//	/**
-//	 *  Create a new service info.
-//	 */
-//	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple)
-//	{
-//		this(name, type, dynamic, multiple, SCOPE_APPLICATION);
-//	}
-	
 	/**
 	 *  Create a new service info.
 	 */
@@ -98,9 +81,6 @@ public class RequiredServiceInfo
 		this.type = type;
 		this.multiple = multiple;
 		this.binding = binding;
-//		this.dynamic = dynamic;
-//		this.scope = scope;
-//		this.componentname = componentname;
 	}
 
 	//-------- methods --------
@@ -141,27 +121,6 @@ public class RequiredServiceInfo
 		this.type = type;
 	}
 
-//	/**
-//	 *  Get the dynamic.
-//	 *  @return the dynamic.
-//	 */
-//	public boolean isDynamic()
-//	{
-//		return dynamic;
-//	}
-//
-	/**
-	 *  Set the dynamic.
-	 *  @param dynamic The dynamic to set.
-	 */
-	public void setDynamic(boolean dynamic)
-	{
-		if(binding==null)
-			binding = new RequiredServiceBinding();
-		binding.setDynamic(dynamic);
-//		this.dynamic = dynamic;
-	}
-
 	/**
 	 *  Get the multiple.
 	 *  @return the multiple.
@@ -180,48 +139,6 @@ public class RequiredServiceInfo
 		this.multiple = multiple;
 	}
 	
-//	/**
-//	 *  Get the scope.
-//	 *  @return the scope.
-//	 */
-//	public String getScope()
-//	{
-//		return scope;
-//	}
-//
-	/**
-	 *  Set the scope.
-	 *  @param scope The scope to set.
-	 */
-	public void setScope(String scope)
-	{
-		if(binding==null)
-			binding = new RequiredServiceBinding();
-		binding.setScope(scope);
-//		this.scope = scope;
-	}
-
-//	/**
-//	 *  Get the componentname.
-//	 *  @return the componentname.
-//	 */
-//	public String getComponentName()
-//	{
-//		return componentname;
-//	}
-//
-	/**
-	 *  Set the componentname.
-	 *  @param componentname The componentname to set.
-	 */
-	public void setComponentName(String componentname)
-	{
-		if(binding==null)
-			binding = new RequiredServiceBinding();
-		binding.setComponentName(componentname);
-//		this.componentname = componentname;
-	}
-
 	/**
 	 *  Get the binding.
 	 *  @return the binding.

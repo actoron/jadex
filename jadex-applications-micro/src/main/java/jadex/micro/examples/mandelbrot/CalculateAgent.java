@@ -17,8 +17,8 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Description("Agent offering a calculate service.")
 @ProvidedServices({
-	@ProvidedService(type=ICalculateService.class, expression="new CalculateService($component)"),
-	@ProvidedService(type=IProgressService.class, expression="new ProgressService($component)", direct=true)
+	@ProvidedService(type=ICalculateService.class, implementation=CalculateService.class),
+	@ProvidedService(type=IProgressService.class, implementation=ProgressService.class, direct=true)
 	})
 @Arguments(@Argument(name="delay", description="Agent kills itself when no job arrives in the delay interval.", typename="Long", defaultvalue="new Long(1000)"))
 @Configurations({

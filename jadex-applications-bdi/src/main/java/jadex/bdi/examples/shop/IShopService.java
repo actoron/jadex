@@ -1,12 +1,11 @@
 package jadex.bdi.examples.shop;
 
-import jadex.bridge.service.IService;
 import jadex.commons.future.IFuture;
 
 /**
  *  The shop interface for buying goods at the shop.
  */
-public interface IShop	extends IService
+public interface IShopService
 {
 	/**
 	 *  Get the shop name. 

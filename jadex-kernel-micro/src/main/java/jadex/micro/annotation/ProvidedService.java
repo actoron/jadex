@@ -20,7 +20,12 @@ public @interface ProvidedService
 	/**
 	 *  The creation expression.
 	 */
-	public String expression();
+	public Class implementation() default Object.class;
+
+	/**
+	 *  The creation expression.
+	 */
+	public String expression() default "";
 
 	/**
 	 *  The direct flag.

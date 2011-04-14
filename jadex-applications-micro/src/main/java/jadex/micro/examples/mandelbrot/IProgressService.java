@@ -1,12 +1,11 @@
 package jadex.micro.examples.mandelbrot;
 
-import jadex.bridge.service.IService;
 import jadex.commons.future.IFuture;
 
 /**
  *  Interface for getting information about the progress of a task.
  */
-public interface IProgressService	extends IService
+public interface IProgressService
 {
 	/**
 	 *  Get the progress (percentage as integer) of a given task.

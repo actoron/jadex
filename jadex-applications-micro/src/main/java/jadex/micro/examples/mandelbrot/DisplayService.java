@@ -1,29 +1,19 @@
 package jadex.micro.examples.mandelbrot;
 
-import jadex.bridge.service.BasicService;
+import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.IFuture;
 
 /**
  *  The service allows displaying results in the frame
  *  managed by the service providing agent.
  */
-public class DisplayService extends BasicService implements IDisplayService
+public class DisplayService implements IDisplayService
 {
 	//-------- attributes --------
 	
 	/** The agent. */
+	@ServiceComponent
 	protected DisplayAgent agent;
-	
-	//-------- constructors --------
-
-	/**
-	 *  Create a new display service.
-	 */
-	public DisplayService(DisplayAgent agent)
-	{
-		super(agent.getServiceContainer().getId(), IDisplayService.class, null);
-		this.agent	= agent;
-	}
 	
 	//-------- IDisplayService interface --------
 

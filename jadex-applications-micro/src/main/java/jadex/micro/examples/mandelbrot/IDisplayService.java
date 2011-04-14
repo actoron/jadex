@@ -1,12 +1,11 @@
 package jadex.micro.examples.mandelbrot;
 
-import jadex.bridge.service.IService;
 import jadex.commons.future.IFuture;
 
 /**
  *  Service for displaying the result of a calculation. 
  */
-public interface IDisplayService	extends IService
+public interface IDisplayService
 {
 	/**
 	 *  Display the result of a calculation.

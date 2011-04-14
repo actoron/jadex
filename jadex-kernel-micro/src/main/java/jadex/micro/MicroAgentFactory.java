@@ -225,7 +225,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			ProvidedServiceInfo[] psis = new ProvidedServiceInfo[vals.length];
 			for(int i=0; i<vals.length; i++)
 			{
-				psis[i] = new ProvidedServiceInfo(vals[i].type(), vals[i].expression(), vals[i].direct());
+				psis[i] = new ProvidedServiceInfo(vals[i].type(), vals[i].expression().length()==0? null: vals[i].expression(), 
+					vals[i].direct(), vals[i].implementation().equals(Object.class)? null: vals[i].implementation());
 			}
 			metainfo.setProvidedServices(psis);
 		}

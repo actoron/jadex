@@ -206,17 +206,34 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 				{
 					for(int i=0; i<services.size(); i++)
 					{
-						IInternalService service;
 						final MProvidedServiceType st = (MProvidedServiceType)services.get(i);
-						if(st.getValue()!=null)
+						
+						IInternalService service;
+						
+						if(st.getValue()!=null || st.getImplementation()!=null)
 						{
-							if(st.getParsedValue()==null)
-								throw new RuntimeException("Could not parse: "+st.getValue());
 							try
 							{
-								service = (IInternalService)st.getParsedValue().getValue(fetcher);
-								service = BasicServiceInvocationHandler.createProvidedServiceProxy(ia, getComponentAdapter(), service, st.isDirect());
-								getServiceContainer().addService(service);
+								Object ser = null;
+								
+								if(st.getImplementation()!=null)
+								{
+									ser = st.getImplementation().newInstance();
+								}
+								else if(st.getParsedValue()!=null)
+								{
+									ser = (IInternalService)st.getParsedValue().getValue(fetcher);
+								}
+								else
+								{
+									getLogger().warning("Could not parse: "+st.getValue());
+								}
+								
+								if(ser!=null)
+								{
+									service = BasicServiceInvocationHandler.createProvidedServiceProxy(ia, getComponentAdapter(), ser, st.isDirect());
+									getServiceContainer().addService(service);
+								}
 							}
 							catch(Exception e)
 							{

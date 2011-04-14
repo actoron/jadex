@@ -13,6 +13,9 @@ public class ProvidedServiceInfo
 	/** The creation expression. */
 	protected String expression;
 	
+	/** The implementation class. */
+	protected Class implementation;
+	
 	/** The direct flag. */
 	protected boolean direct;
 	
@@ -39,17 +42,18 @@ public class ProvidedServiceInfo
 	 */
 	public ProvidedServiceInfo(Class type, String expression)
 	{
-		this(type, expression, false);
+		this(type, expression, false, null);
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
-	public ProvidedServiceInfo(Class type, String expression, boolean direct)
+	public ProvidedServiceInfo(Class type, String expression, boolean direct, Class implementation)
 	{
 		this.type = type;
 		this.expression = expression;
 		this.direct = direct;
+		this.implementation = implementation;
 	}
 
 	//-------- methods --------
@@ -106,5 +110,23 @@ public class ProvidedServiceInfo
 	public void setDirect(boolean direct)
 	{
 		this.direct = direct;
+	}
+
+	/**
+	 *  Get the implementation.
+	 *  @return The implementation.
+	 */
+	public Class getImplementation()
+	{
+		return implementation;
+	}
+
+	/**
+	 *  Set the implementation.
+	 *  @param implementation The implementation to set.
+	 */
+	public void setImplementation(Class implementation)
+	{
+		this.implementation = implementation;
 	}
 }

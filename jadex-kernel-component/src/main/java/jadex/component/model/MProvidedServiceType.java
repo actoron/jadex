@@ -16,6 +16,9 @@ public class MProvidedServiceType extends MExpressionType
 	/** The binding. */
 	protected RequiredServiceBinding binding;
 	
+	/** The implementation class. */
+	protected Class implementation;
+	
 	//-------- constructors --------
 
 	/**
@@ -62,4 +65,24 @@ public class MProvidedServiceType extends MExpressionType
 	{
 		this.direct = direct;
 	}
+
+	/**
+	 *  Get the implementation.
+	 *  @return the implementation.
+	 */
+	public Class getImplementation()
+	{
+		return implementation;
+	}
+
+	/**
+	 *  Set the implementation.
+	 *  @param implementation The implementation to set.
+	 */
+	public void setImplementation(Class implementation)
+	{
+		this.implementation = implementation;
+	}
+	
+	
 }

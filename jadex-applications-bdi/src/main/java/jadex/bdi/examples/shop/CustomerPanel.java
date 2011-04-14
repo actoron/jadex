@@ -88,9 +88,9 @@ public class CustomerPanel extends JPanel
 		{
 			public void itemStateChanged(ItemEvent e)
 			{
-				if(shops.get(shopscombo.getSelectedItem()) instanceof IShop)
+				if(shops.get(shopscombo.getSelectedItem()) instanceof IShopService)
 				{
-					refresh((IShop)shops.get(shopscombo.getSelectedItem()));
+					refresh((IShopService)shops.get(shopscombo.getSelectedItem()));
 				}
 			}
 		});
@@ -137,7 +137,7 @@ public class CustomerPanel extends JPanel
 						{
 							for(Iterator it=coll.iterator(); it.hasNext(); )
 							{
-								IShop	shop	= (IShop)it.next();
+								IShopService	shop	= (IShopService)it.next();
 								shops.put(shop.getName(), shop);
 								((DefaultComboBoxModel)shopscombo.getModel()).addElement(shop.getName());
 							}
@@ -306,7 +306,7 @@ public class CustomerPanel extends JPanel
 				{
 					final String name = (String)shopmodel.getValueAt(sel, 0);
 					final Double price = (Double)shopmodel.getValueAt(sel, 1);
-					final IShop shop = (IShop)shops.get(shopscombo.getSelectedItem());
+					final IShopService shop = (IShopService)shops.get(shopscombo.getSelectedItem());
 					agent.scheduleStep(new IComponentStep()
 					{
 						@XMLClassname("buy")
@@ -409,7 +409,7 @@ public class CustomerPanel extends JPanel
 	/**
 	 * Method to be called when goals may have changed.
 	 */
-	public void refresh(IShop shop)
+	public void refresh(IShopService shop)
 	{
 		if(shop!=null)
 		{

@@ -28,7 +28,7 @@
 
 	<goals>
 		<achievegoal name="buy">
-			<parameter name="shop" class="IShop"/>
+			<parameter name="shop" class="IShopService"/>
 			<parameter name="name" class="String"/>
 			<parameter name="price" class="double"/>
 			<parameter name="result" class="Object" direction="out"/>
@@ -37,7 +37,7 @@
 	
 	<plans>
 		<plan name="buyplan">
-			<parameter name="shop" class="IShop">
+			<parameter name="shop" class="IShopService">
 				<goalmapping ref="sell.shop"/>
 			</parameter>
 			<parameter name="name" class="String">
@@ -57,8 +57,12 @@
 	</plans>
 	
 	<services>
-		<requiredservice name="localshopservices" class="IShop" dynamic="true" scope="global"/>
-		<requiredservice name="remoteshopservices" class="IShop" dynamic="true" scope="global"/>
+		<requiredservice name="localshopservices" class="IShopService">
+			<binding dynamic="true" scope="global"/>
+		</requiredservice>
+		<requiredservice name="remoteshopservices" class="IShopService">
+			<binding dynamic="true" scope="global"/>
+		</requiredservice>
 	</services>
 	
 	<properties>

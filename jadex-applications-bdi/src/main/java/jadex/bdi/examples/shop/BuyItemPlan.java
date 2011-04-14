@@ -14,7 +14,7 @@ public class BuyItemPlan extends Plan
 	public void body()
 	{
 		// Fetch shop and item data
-		IShop shop = (IShop)getParameter("shop").getValue();
+		IShopService shop = (IShopService)getParameter("shop").getValue();
 		String name	= (String)getParameter("name").getValue();
 		double price = ((Double)getParameter("price").getValue()).doubleValue();
 		double money = ((Double)getBeliefbase().getBelief("money").getFact()).doubleValue();

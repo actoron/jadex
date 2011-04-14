@@ -1,22 +1,23 @@
 package jadex.bdi.examples.shop;
 
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.ICapability;
+import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
-import jadex.bridge.service.BasicService;
+import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
  *  The shop for buying goods at the shop.
  */
-public class Shop extends BasicService implements IShop 
+public class ShopService implements IShopService 
 {
 	//-------- attributes --------
 	
 	/** The component. */
-	protected ICapability comp;
+	@ServiceComponent
+	protected IBDIInternalAccess comp;
 	
 	/** The shop name. */
 	protected String name;
@@ -25,14 +26,17 @@ public class Shop extends BasicService implements IShop
 	
 	/**
 	 *  Create a new shop service.
-	 *  @param comp The active component.
 	 */
-	public Shop(ICapability comp, String name)
+	public ShopService()
 	{
-		super(comp.getServiceContainer().getId(), IShop.class, null);
-
-//		System.out.println("created: "+name);
-		this.comp = comp;
+		this.name = "noname-";
+	}
+	
+	/**
+	 *  Create a new shop service.
+	 */
+	public ShopService(String name)
+	{
 		this.name = name;
 	}
 

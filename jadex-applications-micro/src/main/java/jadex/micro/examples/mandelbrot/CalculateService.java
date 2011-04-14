@@ -1,29 +1,19 @@
 package jadex.micro.examples.mandelbrot;
 
-import jadex.bridge.service.BasicService;
+import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
  *  Calculate service implementation.
  */
-public class CalculateService extends BasicService implements ICalculateService
+public class CalculateService implements ICalculateService
 {
 	//-------- attributes --------
 	
 	/** The agent. */
+	@ServiceComponent
 	protected CalculateAgent agent;
-	
-	//-------- constructors --------
-	
-	/**
-	 *  Create a new service.
-	 */
-	public CalculateService(CalculateAgent agent)
-	{
-		super(agent.getServiceContainer().getId(), ICalculateService.class, null);
-		this.agent = agent;
-	}
 	
 	//-------- methods --------
 	

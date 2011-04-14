@@ -1,13 +1,12 @@
 package jadex.micro.examples.mandelbrot;
 
-import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.IFuture;
 
 /**
  *  Interface for calculating an area of points.
  */
-public interface ICalculateService	extends IService
+public interface ICalculateService
 {
 	/**
 	 *  Calculate colors for an area of points.

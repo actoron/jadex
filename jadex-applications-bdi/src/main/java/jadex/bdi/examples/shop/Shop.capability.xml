@@ -48,7 +48,8 @@
 	</plans>
 	
 	<services>
-		<providedservice class="IShop">new Shop($scope, $beliefbase.shopname)</providedservice>
+		<providedservice class="IShopService">new ShopService($beliefbase.shopname)</providedservice>
+		<!-- <providedservice class="IShopService" implementation="ShopService"/> -->
 	</services>
 	
 	<properties>

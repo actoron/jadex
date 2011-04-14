@@ -211,15 +211,31 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 					{
 						IInternalService service;
 						final MProvidedServiceType st = (MProvidedServiceType)services.get(i);
-						if(st.getValue()!=null)
+						
+						if(st.getValue()!=null || st.getImplementation()!=null)
 						{
-							if(st.getParsedValue()==null)
-								throw new RuntimeException("Could not parse: "+st.getValue());
 							try
 							{
-								service = (IInternalService)st.getParsedValue().getValue(fetcher);
-								service = BasicServiceInvocationHandler.createProvidedServiceProxy(ia, getComponentAdapter(), service, st.isDirect());
-								getServiceContainer().addService(service);
+								Object ser = null;
+								
+								if(st.getImplementation()!=null)
+								{
+									ser = st.getImplementation().newInstance();
+								}
+								else if(st.getParsedValue()!=null)
+								{
+									ser = (IInternalService)st.getParsedValue().getValue(fetcher);
+								}
+								else
+								{
+									getLogger().warning("Could not parse: "+st.getValue());
+								}
+								
+								if(ser!=null)
+								{
+									service = BasicServiceInvocationHandler.createProvidedServiceProxy(ia, getComponentAdapter(), ser, st.isDirect());
+									getServiceContainer().addService(service);
+								}
 							}
 							catch(Exception e)
 							{
@@ -271,7 +287,8 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 							}
 							else if(val!=null)
 							{
-								throw new RuntimeException("Future property must be instance of jadex.commons.IFuture: "+mexp.getName()+", "+mexp.getValue());
+								getLogger().warning("Future property must be instance of jadex.commons.IFuture: "+mexp.getName()+", "+mexp.getValue());
+//								throw new RuntimeException("Future property must be instance of jadex.commons.IFuture: "+mexp.getName()+", "+mexp.getValue());
 							}
 						}
 						else

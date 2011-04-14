@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-bdi" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://jadex.sourceforge.net/jadex-bdi" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-bdi" xmlns="http://jadex.sourceforge.net/jadex-bdi" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 	<xs:element name="agent">
 		<xs:annotation>
 			<xs:documentation>Defines a new agent type.</xs:documentation>
@@ -2014,25 +2014,41 @@
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="MElement">
+				<xs:sequence>
+					<xs:element name="binding" type="MBinding" minOccurs="0"/>
+				</xs:sequence>
 				<xs:attribute name="class" type="xs:string" use="required"/>
-				<xs:attribute name="dynamic" type="xs:boolean" use="optional" default="false"/>
 				<xs:attribute name="multiple" type="xs:boolean" use="optional" default="false"/>
-				<xs:attribute name="scope" use="optional" default="application">
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:enumeration value="local"></xs:enumeration>
-							<xs:enumeration value="component"></xs:enumeration>
-							<xs:enumeration value="application"></xs:enumeration>
-							<xs:enumeration value="platform"></xs:enumeration>
-							<xs:enumeration value="global"></xs:enumeration>
-							<xs:enumeration value="upwards"></xs:enumeration>
-						</xs:restriction>
-					</xs:simpleType>
-				</xs:attribute>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="MElementNoName" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Base element without name.</xs:documentation>
+		</xs:annotation>
 		<xs:attribute name="description" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="MBinding">
+		<xs:annotation>
+			<xs:documentation>Required service binding specification.</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="name" type="xs:string" use="optional"/>
+		<xs:attribute name="scope" use="optional" default="application">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="local"/>
+					<xs:enumeration value="component"/>
+					<xs:enumeration value="application"/>
+					<xs:enumeration value="platform"/>
+					<xs:enumeration value="global"/>
+					<xs:enumeration value="upwards"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="componentname" type="xs:string" use="optional"/>
+		<xs:attribute name="componenttype" type="xs:string" use="optional"/>
+		<xs:attribute name="dynamic" type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="create" type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="recover" type="xs:boolean" use="optional" default="false"/>
 	</xs:complexType>
 </xs:schema>

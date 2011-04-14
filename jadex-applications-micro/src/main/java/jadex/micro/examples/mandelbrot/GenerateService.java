@@ -4,10 +4,11 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -25,7 +26,7 @@ import javax.swing.SwingUtilities;
 /**
  *  Generate service implementation. 
  */
-public class GenerateService extends BasicService implements IGenerateService
+public class GenerateService implements IGenerateService
 {
 	//-------- constants --------
 	
@@ -38,6 +39,7 @@ public class GenerateService extends BasicService implements IGenerateService
 	//-------- attributes --------
 	
 	/** The agent. */
+	@ServiceComponent
 	protected GenerateAgent agent;
 	
 	/** The generate panel. */
@@ -51,11 +53,11 @@ public class GenerateService extends BasicService implements IGenerateService
 	/**
 	 *  Create a new service.
 	 */
-	public GenerateService(final GenerateAgent agent, GeneratePanel panel)
+	@ServiceStart
+	public void start()
 	{
-		super(agent.getServiceContainer().getId(), IGenerateService.class, null);
-		this.agent = agent;
-		this.panel = panel;
+		this.panel = (GeneratePanel)GeneratePanel.createGui(agent.getExternalAccess())[1];
+		
 		this.manager	= new ServicePoolManager(agent, "calculateservices", new IServicePoolHandler()
 		{
 			public boolean selectService(IService service)

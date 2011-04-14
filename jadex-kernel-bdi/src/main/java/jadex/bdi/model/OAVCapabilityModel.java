@@ -691,14 +691,17 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 				Object req = it.next();
 				String name = (String)state.getAttributeValue(req, OAVBDIMetaModel.modelelement_has_name);
 				Class clazz = (Class)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_class);
-				boolean dynamic = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_dynamic));
 				boolean multiple = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_multiple));
-//				boolean forced = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_forced));
-//				boolean remote = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_remote));
-//				boolean declared = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_declared));
-//				boolean upwards = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_upwards));
-				String scope = ((String)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_scope));
-				ret.add(new RequiredServiceInfo(name, clazz, multiple, new RequiredServiceBinding(name, scope, dynamic)));
+				
+				Object binding = state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_binding);
+				String scope = (String)state.getAttributeValue(binding, OAVBDIMetaModel.binding_has_scope);
+				String cname = (String)state.getAttributeValue(binding, OAVBDIMetaModel.binding_has_componentname);
+				String ctype = (String)state.getAttributeValue(binding, OAVBDIMetaModel.binding_has_componenttype);
+				boolean dynamic = ((Boolean)state.getAttributeValue(binding, OAVBDIMetaModel.binding_has_dynamic)).booleanValue();
+				boolean create = ((Boolean)state.getAttributeValue(binding, OAVBDIMetaModel.binding_has_create)).booleanValue();
+				boolean recover = ((Boolean)state.getAttributeValue(binding, OAVBDIMetaModel.binding_has_recover)).booleanValue();
+				RequiredServiceBinding bd = new RequiredServiceBinding(name, cname, ctype, dynamic, scope, create, recover);
+				ret.add(new RequiredServiceInfo(name, clazz, multiple, bd));
 //				ret.add(state.getAttributeValue(it.next(), OAVBDIMetaModel.expression_has_class));
 			}
 		}
@@ -740,7 +743,8 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 				Class clazz = (Class)state.getAttributeValue(ob, OAVBDIMetaModel.expression_has_class);
 				String text = (String)state.getAttributeValue(ob, OAVBDIMetaModel.expression_has_text);
 				Boolean direct = (Boolean)state.getAttributeValue(ob, OAVBDIMetaModel.providedservice_has_direct);
-				ProvidedServiceInfo psi = new ProvidedServiceInfo(clazz, text, direct!=null? direct.booleanValue(): false); 
+				Class impl = (Class)state.getAttributeValue(ob, OAVBDIMetaModel.providedservice_has_implementation);
+				ProvidedServiceInfo psi = new ProvidedServiceInfo(clazz, text, direct!=null? direct.booleanValue(): false, impl); 
 				ret.add(psi);
 			}
 		}

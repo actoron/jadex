@@ -14,7 +14,7 @@ import jadex.micro.annotation.RequiredServices;
  *  Agent that can process generate requests.
  */
 @Description("Agent offering a generate service.")
-@ProvidedServices(@ProvidedService(type=IGenerateService.class, expression="new GenerateService($component, (GeneratePanel)GeneratePanel.createGui($component.getExternalAccess())[1])"))
+@ProvidedServices(@ProvidedService(type=IGenerateService.class, implementation=GenerateService.class))
 @RequiredServices({
 	@RequiredService(name="displayservice", type=IDisplayService.class),
 	@RequiredService(name="calculateservices", type=ICalculateService.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL)),

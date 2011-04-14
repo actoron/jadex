@@ -1209,9 +1209,28 @@ public class AgentRules
 				try
 				{
 					Boolean direct = (Boolean)state.getAttributeValue(mexp, OAVBDIMetaModel.providedservice_has_direct);
-					IInternalService service = (IInternalService)evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
-					service = BasicServiceInvocationHandler.createProvidedServiceProxy(new CapabilityFlyweight(state, rcapa), BDIInterpreter.getInterpreter(state).getAgentAdapter(), service, direct.booleanValue());
-					((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(service);
+					IParsedExpression pex = (IParsedExpression)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_parsed);
+					Class impl = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.providedservice_has_implementation);
+					Object ser = null;
+					if(pex!=null)
+					{
+						ser = evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
+					}
+					// object.class is set als deafult of expression attribute class in OAVBDIMetamodel 
+					else if(impl!=null && !Object.class.equals(impl))
+					{
+						ser = impl.newInstance();
+					}
+					
+					if(ser!=null)
+					{
+						IInternalService service = BasicServiceInvocationHandler.createProvidedServiceProxy(new CapabilityFlyweight(state, rcapa), BDIInterpreter.getInterpreter(state).getAgentAdapter(), ser, direct.booleanValue());
+						((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(service);
+					}
+					else
+					{
+						BDIInterpreter.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_text));
+					}
 				}
 				catch(Exception e)
 				{

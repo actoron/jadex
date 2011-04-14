@@ -59,6 +59,11 @@ public class OAVBDIXMLReader
 	{
 		// Post processors.
 		IPostProcessor expost = new ExpressionProcessor();
+		IPostProcessor pspost = new MultiPostProcessor(new IPostProcessor[]{
+			expost,
+			new ClassPostProcessor(OAVBDIMetaModel.providedservice_has_implementationname, OAVBDIMetaModel.providedservice_has_implementation)
+		});
+
 		IPostProcessor tepost = new ClassPostProcessor(OAVBDIMetaModel.typedelement_has_classname, OAVBDIMetaModel.typedelement_has_class); 
 		IPostProcessor rspost = new ClassPostProcessor(OAVBDIMetaModel.requiredservice_has_classname, OAVBDIMetaModel.requiredservice_has_class); 
 //		IPostProcessor bopost = new ClassPostProcessor(OAVBDIMetaModel.body_has_classname, OAVBDIMetaModel.body_has_class); 
@@ -268,11 +273,13 @@ public class OAVBDIXMLReader
 				new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.requiredservice_has_class, AccessInfo.IGNORE_WRITE))
 			})));
 		
-		TypeInfo ti_service = new TypeInfo(new XMLInfo(new QName(uri, "providedservice")), new ObjectInfo(OAVBDIMetaModel.providedservice_type, expost), 
-			new MappingInfo(ti_expression) 
-//			new AttributeInfo[]{
-//			new AttributeInfo(new AccessInfo("direct", OAVBDIMetaModel.providedservice_has_direct)),
-			);
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "binding")), new ObjectInfo(OAVBDIMetaModel.binding_type)));
+		
+		TypeInfo ti_service = new TypeInfo(new XMLInfo(new QName(uri, "providedservice")), new ObjectInfo(OAVBDIMetaModel.providedservice_type, pspost), 
+			new MappingInfo(ti_expression, 
+			new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("implementation", OAVBDIMetaModel.providedservice_has_implementationname)),
+			}));
 		typeinfos.add(ti_service);
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
@@ -422,7 +429,7 @@ public class OAVBDIXMLReader
 		protected static IExpressionParser	exp_parser	= new JavaCCExpressionParser();
 
 		protected ClassPostProcessor clpost = new ClassPostProcessor(OAVBDIMetaModel.expression_has_classname, OAVBDIMetaModel.expression_has_class);
-		
+				
 		/**
 		 *  Parse expression text.
 		 */
@@ -537,6 +544,43 @@ public class OAVBDIXMLReader
 		public int getPass()
 		{
 			return 0;
+		}
+	}
+	
+	/**
+	 *  Perform several post processors..
+	 */
+	public static class MultiPostProcessor	implements IPostProcessor
+	{
+		/** The post processors. */
+		protected IPostProcessor[] postprocessors;
+		
+		/**
+		 *  Create a new processor.
+		 */
+		public MultiPostProcessor(IPostProcessor[] postprocessors)
+		{
+			this.postprocessors = postprocessors;
+		}
+		
+		/**
+		 *  Post process.
+		 */
+		public Object postProcess(IContext context, Object object)
+		{
+			for(int i=0; i<postprocessors.length; i++)
+			{
+				postprocessors[i].postProcess(context, object);
+			}
+			return null;
+		}
+		
+		/**
+		 *  Get the pass.
+		 */
+		public int getPass()
+		{
+			return postprocessors[0].getPass();
 		}
 	}
 	

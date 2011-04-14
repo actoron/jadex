@@ -328,6 +328,13 @@ public class OAVBDIMetaModel
 	/** Provided service has direct attribute. */
 	public static OAVAttributeType providedservice_has_direct;
 
+	/** Provided service has implementation attribute. */
+	public static OAVAttributeType providedservice_has_implementationname;
+	
+	/** Provided service has implementation attribute. */
+	public static OAVAttributeType providedservice_has_implementation;
+
+	
 	/** The required service type. */
 	public static OAVObjectType requiredservice_type;
 
@@ -337,28 +344,34 @@ public class OAVBDIMetaModel
 	/** Required service has class. */
 	public static OAVAttributeType requiredservice_has_class;
 	
-	/** Required service has dynamic flag. */
-	public static OAVAttributeType requiredservice_has_dynamic;
-
 	/** Required service has multiple flag. */
 	public static OAVAttributeType requiredservice_has_multiple;
 
-//	/** Required service has forced flag. */
-//	public static OAVAttributeType requiredservice_has_forced;
-//
-//	/** Required service has remote flag. */
-//	public static OAVAttributeType requiredservice_has_remote;
-//
-//	/** Required service has declared flag. */
-//	public static OAVAttributeType requiredservice_has_declared;
-//	
-//	/** Required service has multiple flag. */
-//	public static OAVAttributeType requiredservice_has_upwards;
-	
-	/** Required service has scope. */
-	public static OAVAttributeType requiredservice_has_scope;
+	/** Required service has binding. */
+	public static OAVAttributeType requiredservice_has_binding;
 
 	
+	/** The binding type. */
+	public static OAVObjectType binding_type;
+
+	/** Binding has component name. */
+	public static OAVAttributeType binding_has_componentname;
+
+	/** Binding has component type. */
+	public static OAVAttributeType binding_has_componenttype;
+
+	/** Binding has dynamic flag. */
+	public static OAVAttributeType binding_has_dynamic;
+
+	/** Binding has scope. */
+	public static OAVAttributeType binding_has_scope;
+
+	/** Binding has create flag. */
+	public static OAVAttributeType binding_has_create;
+
+	/** Binding has recover flag. */
+	public static OAVAttributeType binding_has_recover;
+
 	
 //	/** Expression has parameters attribute. */
 //	public static OAVAttributeType expression_has_parameters;
@@ -935,6 +948,7 @@ public class OAVBDIMetaModel
 		condition_type = bdimm_type_model.createType("mcondition", expression_type);
 		providedservice_type = bdimm_type_model.createType("mprovidedservice", expression_type);
 		requiredservice_type = bdimm_type_model.createType("mrequiredservice", modelelement_type);
+		binding_type = bdimm_type_model.createType("mbinding", modelelement_type);
 //		relevantbelief_type = bdimm_type_model.createType("mrelevantbelief", expressionrelevant_type);
 //		relevantbeliefset_type = bdimm_type_model.createType("mrelevantbeliefset", expressionrelevant_type);
 //		relevantgoal_type = bdimm_type_model.createType("mrelevantgoal", expressionrelevant_type);
@@ -1023,16 +1037,20 @@ public class OAVBDIMetaModel
 		expression_has_class = expression_type.createAttributeType("mexpression_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE, Object.class);
 
 		providedservice_has_direct = providedservice_type.createAttributeType("mprovidedservice_has_direct", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		providedservice_has_implementationname = providedservice_type.createAttributeType("mprovidedservice_has_implementationname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
+		providedservice_has_implementation = providedservice_type.createAttributeType("mprovidedservice_has_implementation", OAVJavaType.java_class_type, OAVAttributeType.NONE, Object.class);
 
 		requiredservice_has_classname = requiredservice_type.createAttributeType("mrequiredservice_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
 		requiredservice_has_class = requiredservice_type.createAttributeType("mrequiredservice_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE);
-		requiredservice_has_dynamic = requiredservice_type.createAttributeType("mrequiredservice_has_dynamic", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
 		requiredservice_has_multiple = requiredservice_type.createAttributeType("mrequiredservice_has_multiple", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-//		requiredservice_has_forced = requiredservice_type.createAttributeType("mrequiredservice_has_forced", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-//		requiredservice_has_remote = requiredservice_type.createAttributeType("mrequiredservice_has_remote", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-//		requiredservice_has_declared = requiredservice_type.createAttributeType("mrequiredservice_has_declared", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-//		requiredservice_has_upwards = requiredservice_type.createAttributeType("mrequiredservice_has_upwards", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-		requiredservice_has_scope = requiredservice_type.createAttributeType("mrequiredservice_has_scope", OAVJavaType.java_string_type, OAVAttributeType.NONE, RequiredServiceInfo.SCOPE_APPLICATION);
+		requiredservice_has_binding = requiredservice_type.createAttributeType("mrequiredservice_has_binding", binding_type, OAVAttributeType.NONE);
+		
+		binding_has_scope = binding_type.createAttributeType("mbinding_has_scope", OAVJavaType.java_string_type, OAVAttributeType.NONE, RequiredServiceInfo.SCOPE_APPLICATION);
+		binding_has_componentname = binding_type.createAttributeType("mbinding_has_componentname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
+		binding_has_componenttype = binding_type.createAttributeType("mbinding_has_componenttype", OAVJavaType.java_string_type, OAVAttributeType.NONE);
+		binding_has_create = binding_type.createAttributeType("mbinding_has_create", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		binding_has_dynamic = binding_type.createAttributeType("mbinding_has_dynamic", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		binding_has_recover = binding_type.createAttributeType("mbinding_has_recover", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
 		
 //		expression_has_class = expression_type.createAttributeType("mexpression_has_class", OAVJavaType.java_class_type);
 //		expression_has_parameters = expression_type.createAttributeType("mexpression_has_parameters",  expressionparameter_type, OAVAttributeType.LIST);
