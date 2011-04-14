@@ -133,7 +133,11 @@ class NIOTCPOutputConnection
 		
 //		System.out.println("rawmsg"+new String(res));
 		
-		sc.write(ByteBuffer.wrap(buffer));
+		ByteBuffer	buf	= ByteBuffer.wrap(buffer);
+		while(buf.remaining()>0)
+		{
+			sc.write(buf);
+		}
 		cleaner.refresh();
 	}
 	
