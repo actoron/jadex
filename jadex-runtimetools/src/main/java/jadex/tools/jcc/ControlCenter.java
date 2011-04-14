@@ -460,4 +460,25 @@ public class ControlCenter
 			}
 		});
 	}
+
+	/**
+	 *  Close a platform control center.
+	 */
+	public void closePlatform(final PlatformControlCenter pcc)
+	{
+		IFuture	saved	= isSaveOnExit() ? pcc.savePlatformProperties() : IFuture.DONE;
+		saved.addResultListener(new SwingDefaultResultListener()
+		{
+			public void customResultAvailable(Object result)
+			{
+				window.closePlatformPanel(pcc);
+				pcc.dispose();
+			}
+			public void customExceptionOccurred(Exception exception)
+			{
+				// Continue anyways.
+				customResultAvailable(null);
+			}
+		});
+	}
 }

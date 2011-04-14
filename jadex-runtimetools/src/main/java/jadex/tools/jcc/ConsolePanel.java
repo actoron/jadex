@@ -8,6 +8,7 @@ import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.SUtil;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
@@ -226,8 +227,18 @@ public class ConsolePanel extends JPanel
 				
 				public IFuture changeOccurred(ChangeEvent event)
 				{
-					handleEvent(event);
-					return IFuture.DONE;
+					IFuture	ret;
+					if(isConsoleEnabled())
+					{
+						handleEvent(event);
+						ret	= IFuture.DONE;
+					}
+					else
+					{
+						// Reply with exception to trigger deregistration.
+						ret	= new Future(new RuntimeException("console off"));
+					}
+					return ret;
 				}
 				
 				public void	handleEvent(ChangeEvent event)
@@ -296,7 +307,7 @@ public class ConsolePanel extends JPanel
 		//-------- constants --------
 		
 		/** The limit of characters sent in one event. */
-		public static final int LIMIT	= 4096;
+		public static final int LIMIT	= 1;//4096;
 		
 		//-------- constructors --------
 		

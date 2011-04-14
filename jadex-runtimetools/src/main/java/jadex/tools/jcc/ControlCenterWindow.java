@@ -5,11 +5,14 @@ import jadex.base.gui.StatusBar;
 import jadex.bridge.IVersionInfo;
 import jadex.commons.BrowserLauncher;
 import jadex.commons.SUtil;
+import jadex.commons.gui.SGUI;
 
 import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -20,12 +23,15 @@ import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import javax.swing.UIDefaults;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
@@ -40,6 +46,14 @@ public class ControlCenterWindow extends JFrame
 	/**	The dimension for toolbar buttons. */
 	protected static final Dimension BUTTON_DIM = new Dimension(32, 32);
 
+	/** The image icons. */
+	protected static UIDefaults	icons	= new UIDefaults(new Object[]
+	{
+		"close_0", SGUI.makeIcon(ControlCenterWindow.class, "/jadex/tools/common/images/close_0.png"),
+		"close_1", SGUI.makeIcon(ControlCenterWindow.class, "/jadex/tools/common/images/close_1.png"),
+		"close_2", SGUI.makeIcon(ControlCenterWindow.class, "/jadex/tools/common/images/close_2.png")
+	});
+
 	//-------- attributes --------
 	
 	/** The control center. */
@@ -53,6 +67,9 @@ public class ControlCenterWindow extends JFrame
 	
     /** The tabs for the single platform panels. */
 	protected JTabbedPane	tabs;
+	
+    /** The first platform control center (when there are still no tabs). */
+	protected PlatformControlCenter	first;
 	
 	//-------- constructors --------
 	
@@ -245,27 +262,24 @@ public class ControlCenterWindow extends JFrame
 	{
 		if(tabs==null)
 		{
-			Container	con	= getContentPane();
-			PlatformControlCenterPanel	old	= null;
-			for(int i=0; old==null && i<con.getComponentCount(); i++)
-			{
-				if(con.getComponent(i) instanceof PlatformControlCenterPanel)
-					old	= (PlatformControlCenterPanel)con.getComponent(i);
-			}
 			// Put first panel directly in window.
-			if(old==null)
+			if(first==null)
 			{
+				first	= pcc;
 				getContentPane().add(pcc.getPanel(), BorderLayout.CENTER);
 				repaint();
 			}
 			
 			// Use tab when second panel is added. 
-			else if(old!=pcc.getPanel())
+			else if(first!=pcc)
 			{
-				con.remove(old);
+				getContentPane().remove(first.getPanel());
 				tabs	= new JTabbedPane();
-				tabs.addTab(old.getName(), old);
+				tabs.addTab(first.getPanel().getName(), first.getPanel());
+				tabs.setTabComponentAt(tabs.indexOfComponent(first.getPanel()), new TabHeader(first));
+				first	= null;
 				tabs.addTab(pcc.getPanel().getName(), pcc.getPanel());
+				tabs.setTabComponentAt(tabs.indexOfComponent(pcc.getPanel()), new TabHeader(pcc));
 				tabs.setSelectedComponent(pcc.getPanel());
 				getContentPane().add(tabs, BorderLayout.CENTER);
 				repaint();
@@ -281,7 +295,28 @@ public class ControlCenterWindow extends JFrame
 			else
 			{
 				tabs.addTab(pcc.getPanel().getName(), pcc.getPanel());
+				tabs.setTabComponentAt(tabs.indexOfComponent(pcc.getPanel()), new TabHeader(pcc));
 				tabs.setSelectedComponent(pcc.getPanel());
+			}
+			repaint();
+		}
+	}
+	
+	/**
+	 *  Close a platform panel.
+	 */
+	public void closePlatformPanel(PlatformControlCenter pcc)
+	{
+		if(tabs.indexOfComponent(pcc.getPanel())!=-1)
+		{
+			tabs.removeTabAt(tabs.indexOfComponent(pcc.getPanel()));
+			if(tabs.getTabCount()==1)
+			{
+				TabHeader	header	= (TabHeader)tabs.getTabComponentAt(0);
+				first	= header.getPlatformControlCenter();
+				getContentPane().remove(tabs);
+				tabs	= null;
+				getContentPane().add(first.getPanel(), BorderLayout.CENTER);
 			}
 			repaint();
 		}
@@ -344,4 +379,91 @@ public class ControlCenterWindow extends JFrame
 			}
 		}
 	};
+	
+	//-------- tab component --------
+	
+	/**
+	 *  A component for the tab headers.
+	 */
+	public class TabHeader	extends JPanel
+	{
+		//-------- attributes --------
+		
+		/** The platform control center . */
+		protected PlatformControlCenter	pcc;
+		
+		//-------- constructors --------
+		
+		/**
+		 *  Create a new tab header component
+		 */
+		public TabHeader(final PlatformControlCenter pcc)
+		{
+			this.pcc	= pcc;
+			this.setOpaque(false);
+			JLabel	label	= new JLabel(pcc.getPanel().getName())
+			{
+				public Insets getInsets()
+				{
+					return new Insets(0,0,0,0);
+				}
+			};
+			final JLabel	close	= new JLabel(icons.getIcon("close_0"))
+			{
+				public Insets getInsets()
+				{
+					return new Insets(0,0,0,0);
+				}
+			};
+			close.addMouseListener(new MouseAdapter()
+			{
+				boolean	in;
+				boolean	down;
+				public void mouseEntered(MouseEvent e)
+				{
+					in=true;
+					updateIcon(e);
+				}
+				public void mouseExited(MouseEvent e)
+				{
+					in=false;
+					updateIcon(e);
+				}
+				public void mousePressed(MouseEvent e)
+				{
+					down=in;
+					updateIcon(e);
+				}
+				public void mouseReleased(MouseEvent e)
+				{
+					if(down && in)
+					{
+						controlcenter.closePlatform(pcc);
+					}
+					
+					down=false;
+					updateIcon(e);
+				}
+				protected void	updateIcon(MouseEvent e)
+				{
+					close.setIcon(down ? in ? icons.getIcon("close_2") : icons.getIcon("close_1")
+						: (e.getModifiers()&MouseEvent.BUTTON1_MASK)==0 && in ? icons.getIcon("close_1") : icons.getIcon("close_0"));
+					close.repaint();
+				}
+			});
+			this.setLayout(new BorderLayout());
+			this.add(label, BorderLayout.CENTER);
+			this.add(close, BorderLayout.EAST);
+		}
+		
+		//-------- methods --------
+
+		/**
+		 *  Get the platform control center.
+		 */
+		public PlatformControlCenter getPlatformControlCenter()
+		{
+			return pcc;
+		}
+	}
 }
