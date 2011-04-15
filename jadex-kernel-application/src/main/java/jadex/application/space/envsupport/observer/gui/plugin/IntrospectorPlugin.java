@@ -392,12 +392,12 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 			int i = 0;
 			for(Iterator it = propNames.iterator(); it.hasNext(); )
 			{
-				String name = (String) it.next();
+				String name = (String)it.next();
 				dataSet[i][0] = name;
 				dataSet[i][1] = String.valueOf(SObjectInspector.getProperty(propHolder, name));
 				++i;
 			}
-			DefaultTableModel model = (DefaultTableModel) table.getModel();
+			DefaultTableModel model = (DefaultTableModel)table.getModel();
 			model.setRowCount(dataSet.length);
 			for (i = 0; i < dataSet.length; ++i)
 			{

@@ -255,47 +255,54 @@ public abstract class ComponentManagementService extends BasicService implements
 												// Create id and adapter.
 												
 												final ComponentIdentifier cid;
+												
+												final IComponentAdapter pad = getParentAdapter(cinfo);
+												IExternalAccess parent = getComponentInstance(pad).getExternalAccess();
+
 												synchronized(adapters)
 												{
 													synchronized(descs)
 													{
-														if(name==null)
-														{
-															cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName());
-														}
-														else
-														{
-															cid = new ComponentIdentifier(name+"@"+((IComponentIdentifier)
-																exta.getServiceProvider().getId()).getPlatformName()); // Hack?!
-															if(adapters.containsKey(cid) || initinfos.containsKey(cid))
-															{
-																inited.setException(new RuntimeException("Component name already exists on platform: "+cid)
-																{
-																	public void printStackTrace()
-																	{
-																		Thread.dumpStack();
-																	}
-																});
-																return;
-															}
-															// todo: hmm adresses may be set too late? use cached message service?
-															SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-																.addResultListener(new DefaultResultListener()
-															{
-																public void resultAvailable(Object result)
-																{
-																	IMessageService	ms	= (IMessageService)result;
-																	if(ms!=null)
-																		cid.setAddresses(ms.getAddresses());
-																}
-															});
-														}
+														IComponentIdentifier pacid = parent.getComponentIdentifier();
+														String paname = pacid.getName().replace('@', '.');
+														cid = (ComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname);
+														
+														
+//														if(name==null)
+//														{
+//															cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName(), paname);
+//														}
+//														else
+//														{
+////															String paname = (IComponentIdentifier)exta.getServiceProvider().getId()).getPlatformName();
+//															cid = new ComponentIdentifier(name+"@"+paname); // Hack?!
+//															if(adapters.containsKey(cid) || initinfos.containsKey(cid))
+//															{
+//																inited.setException(new RuntimeException("Component name already exists on platform: "+cid));
+////																{
+////																	public void printStackTrace()
+////																	{
+////																		Thread.dumpStack();
+////																	}
+////																});
+//																return;
+//															}
+//															// todo: hmm adresses may be set too late? use cached message service?
+//															SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//																.addResultListener(new DefaultResultListener()
+//															{
+//																public void resultAvailable(Object result)
+//																{
+//																	IMessageService	ms	= (IMessageService)result;
+//																	if(ms!=null)
+//																		cid.setAddresses(ms.getAddresses());
+//																}
+//															});
+//														}
 		//												System.out.println("create start3: "+model+" "+cinfo.getParent());
 													}		
 												}
 												
-												final IComponentAdapter pad = getParentAdapter(cinfo);
-												IExternalAccess parent = getComponentInstance(pad).getExternalAccess();
 												Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
 												Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
 												Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
@@ -1914,22 +1921,42 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param name The base name.
 	 *  @return The component identifier.
 	 */
-	public IComponentIdentifier generateComponentIdentifier(String name)
+	public IComponentIdentifier generateComponentIdentifier(String localname, String platformname)
 	{
 		ComponentIdentifier ret = null;
 
+		if(platformname==null)
+			platformname = ((IComponentIdentifier)exta.getServiceProvider().getId()).getName();
 		synchronized(adapters)
 		{
-			do
+			ret = new ComponentIdentifier(localname+"@"+platformname);
+			if(adapters.containsKey(ret) || initinfos.containsKey(ret))
 			{
-				ret = new ComponentIdentifier(name+(compcnt++)+"@"+(
-					(IComponentIdentifier)exta.getServiceProvider().getId()).getPlatformName()); // Hack?!
+				do
+				{
+					ret = new ComponentIdentifier(localname+(compcnt++)+"@"+platformname); // Hack?!
+				}
+				while(adapters.containsKey(ret));
 			}
-			while(adapters.containsKey(ret));
 		}
 		
 		if(msgservice!=null)
+		{
 			ret.setAddresses(msgservice.getAddresses());
+		}
+//		else
+//		{
+//			SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				.addResultListener(new DefaultResultListener()
+//			{
+//				public void resultAvailable(Object result)
+//				{
+//					IMessageService	ms	= (IMessageService)result;
+//					if(ms!=null)
+//						ret.setAddresses(ms.getAddresses());
+//				}
+//			});
+//		}
 
 		return ret;
 	}

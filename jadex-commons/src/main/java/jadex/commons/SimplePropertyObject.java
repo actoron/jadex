@@ -115,4 +115,14 @@ public class SimplePropertyObject implements IPropertyObject
     	if(pcs!=null)
     		pcs.removePropertyChangeListener(listener);
     }
+
+    /**
+     *  Get the string representation.  
+     */
+	public String toString()
+	{
+		return SReflect.getInnerClassName(this.getClass());
+	}
+    
+    
 }

@@ -53,7 +53,7 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 							@XMLClassname("food")
 							public Object execute(IInternalAccess ia)
 							{
-								MicroPreyAgent	mp	= (MicroPreyAgent)agent;
+								MicroPreyAgent	mp	= (MicroPreyAgent)ia;
 								ISpaceObject	nearfood	= mp.getNearestFood();
 								
 								// Remember new food only if nearer than other known food (if any).

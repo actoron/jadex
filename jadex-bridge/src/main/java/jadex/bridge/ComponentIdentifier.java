@@ -63,6 +63,8 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	{
 		this.name = name;
 
+//		System.out.println("created: "+name);
+		
 		for(int i = 0; addresses != null && i < addresses.length; i++)
 			addAddress(addresses[i]);
 		for(int i = 0; resolvers != null && i < resolvers.length; i++)
@@ -300,6 +302,8 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 		String ret = getName();
 		int idx;
 		if((idx = ret.indexOf('@')) != -1)
+			ret = ret.substring(idx + 1);
+		if((idx = ret.lastIndexOf('.')) != -1)
 			ret = ret.substring(idx + 1);
 		return ret;
 	}

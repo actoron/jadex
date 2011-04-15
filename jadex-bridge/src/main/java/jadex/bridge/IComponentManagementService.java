@@ -166,7 +166,7 @@ public interface IComponentManagementService extends IService
 	 *  @param name The base name.
 	 *  @return The component identifier.
 	 */
-	public IComponentIdentifier generateComponentIdentifier(String name);
+	public IComponentIdentifier generateComponentIdentifier(String name, String platformname);
 	
 	/**
 	 * Create a component description.

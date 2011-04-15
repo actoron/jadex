@@ -20,6 +20,7 @@ import jadex.application.space.envsupport.evaluation.SpaceObjectSource;
 import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.application.space.envsupport.observer.gui.ObserverCenter;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
@@ -27,6 +28,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.IPropertyObject;
+import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
@@ -1056,7 +1058,10 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 						public void resultAvailable(Object result)
 						{
 							IComponentManagementService cms = (IComponentManagementService)result;
-							IComponentIdentifier cid = cms.generateComponentIdentifier(ret.getType());
+							// cannot be dummy cid because agent calls getAvatar(cid) in init and needs its avatar
+							// the cid must be the final cid of the component hence it creates unique ids
+							IComponentIdentifier cid = cms.generateComponentIdentifier(SUtil.createUniqueId(compotype, 3), getContext().getComponentIdentifier().getName().replace("@", "."));
+//							IComponentIdentifier cid = new ComponentIdentifier("dummy@hummy");				
 							setOwner(ret.getId(), cid);
 							IFuture	future	= cms.createComponent(cid.getLocalName(), getContext().getComponentFilename(compotype),
 								new CreationInfo(null, null, getContext().getComponentIdentifier(), false, getContext().getAllImports()), null);
@@ -1064,6 +1069,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 							{
 								public void resultAvailable(Object result)
 								{
+//									setOwner(ret.getId(), (IComponentIdentifier)result);
 								}
 								
 								public void exceptionOccurred(Exception exception)

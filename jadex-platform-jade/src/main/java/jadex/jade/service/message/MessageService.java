@@ -235,7 +235,7 @@ public class MessageService  extends BasicService implements IMessageService
 					{
 //						ComponentManagementService	ams	= (ComponentManagementService)platform.getService(IComponentManagementService.class);
 //						aca.setName(ams.generateAgentName(ams.getShortName(aca.getType())));
-						aca.setName(cms.generateComponentIdentifier(aca.getType()).getLocalName());
+						aca.setName(cms.generateComponentIdentifier(aca.getType(), null).getLocalName());
 					}
 					CreateAgent	create	= new CreateAgent();
 					create.setAgentName(aca.getName());
