@@ -5,6 +5,7 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
+import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -60,7 +61,7 @@ public class UserInteractionTask implements ITask
 	{
 		final Future ret = new Future();
 		
-		final IComponentListener	lis	= new IComponentListener()
+		final IComponentListener	lis	= new ComponentAdapter()
 		{
 			public void componentTerminating(ChangeEvent ce)
 			{

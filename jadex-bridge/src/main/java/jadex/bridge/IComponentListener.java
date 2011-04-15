@@ -25,4 +25,10 @@ public interface IComponentListener
 	 *  @param ae The component event.
 	 */
 	public void componentTerminated(ChangeEvent ce);
+	
+	/**
+	 *  Invoked when a change occurs with the component.
+	 *  The changes depend on the underlying component type.
+	 */
+	public void eventOccured(IComponentChangeEvent cce);
 }

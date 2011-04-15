@@ -4,7 +4,7 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IInternalEventListener;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.ComponentAdapter;
 import jadex.commons.ChangeEvent;
 
 import javax.swing.SwingUtilities;
@@ -51,7 +51,7 @@ public class GUIPlanF1 extends Plan
 			}
 		});
 		
-		getScope().addComponentListener(new IComponentListener()
+		getScope().addComponentListener(new ComponentAdapter()
 		{
 			public void componentTerminating(ChangeEvent ae)
 			{

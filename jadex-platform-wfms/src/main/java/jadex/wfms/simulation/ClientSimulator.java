@@ -6,7 +6,7 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.SServiceProvider;
@@ -128,7 +128,7 @@ public class ClientSimulator
 									public static final String XML_CLASSNAME = "dispose"; 
 									public Object execute(IInternalAccess ia)
 									{
-										ia.addComponentListener(new IComponentListener()
+										ia.addComponentListener(new ComponentAdapter()
 										{
 											
 											public void componentTerminating(jadex.commons.ChangeEvent ce)

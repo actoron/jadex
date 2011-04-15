@@ -8,7 +8,6 @@ import jadex.bdi.examples.cleanerworld_classic.Waste;
 import jadex.bdi.examples.cleanerworld_classic.Wastebin;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.gui.SGUI;
@@ -90,7 +89,7 @@ public class EnvironmentGui	extends JFrame
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				
-				bia.addComponentListener(new IComponentListener()
+				bia.addComponentListener(new jadex.bridge.ComponentAdapter()
 				{
 					public void componentTerminating(jadex.commons.ChangeEvent ae)
 					{

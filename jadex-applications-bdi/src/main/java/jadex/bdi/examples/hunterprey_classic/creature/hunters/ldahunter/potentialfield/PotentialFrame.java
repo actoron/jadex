@@ -9,7 +9,7 @@ package jadex.bdi.examples.hunterprey_classic.creature.hunters.ldahunter.potenti
 import jadex.bdi.examples.hunterprey_classic.Location;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
@@ -58,7 +58,7 @@ public class PotentialFrame extends JFrame
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.addComponentListener(new IComponentListener()
+				bia.addComponentListener(new ComponentAdapter()
 				{
 					public void componentTerminating(ChangeEvent ae)
 					{

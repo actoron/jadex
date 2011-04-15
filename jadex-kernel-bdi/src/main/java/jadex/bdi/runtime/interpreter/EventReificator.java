@@ -1,5 +1,8 @@
 package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.runtime.BDIComponentChangeEvent;
+import jadex.bridge.IComponentListener;
+import jadex.commons.ChangeEvent;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;
@@ -251,6 +254,28 @@ public class EventReificator implements IOAVStateListener
 	protected void	createChangeEvent(Object element, Object scope, String type, Object value)
 	{
 		assert element!=null;
+		
+		Collection listeners = state.getAttributeValues(agent, OAVBDIRuntimeModel.agent_has_componentlisteners);
+		if (listeners != null)
+		{
+			long time = BDIInterpreter.getInterpreter(state).getClockService().getTime();
+			for (Iterator it = listeners.iterator(); it.hasNext(); )
+			{
+				IComponentListener l = (IComponentListener) it.next();
+				if (OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATING.equals(type))
+				{
+					ChangeEvent ce = new ChangeEvent(BDIInterpreter.getInterpreter(state).getAgentAdapter().getChildrenIdentifiers(), null, null); //Needs event object?
+					l.componentTerminating(ce);
+				}
+				else if (OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATED.equals(type))
+				{
+					ChangeEvent ce = new ChangeEvent(BDIInterpreter.getInterpreter(state).getAgentAdapter().getChildrenIdentifiers(), null, null); //Needs event object?
+					l.componentTerminated(ce);
+				}
+				
+				l.eventOccured(new BDIComponentChangeEvent(state, element, scope, type, value, time));
+			}
+		}
 		
 		boolean	create;
 		// Hack! Special case for message events.

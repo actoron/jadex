@@ -50,7 +50,8 @@ public class ListenerRules
 	/**
 	 *  Create a rule to notify agent listeners, when an agent is terminating.
 	 */
-	protected static Rule createAgentTerminationListenerRule()
+	// Removed: Listeners called by direct invocation.
+	/*protected static Rule createAgentTerminationListenerRule()
 	{
 		Variable ragent = new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		Variable listenerentry = new Variable("?listenerentry", OAVBDIRuntimeModel.listenerentry_type);
@@ -91,7 +92,7 @@ public class ListenerRules
 		Rule listener_termination = new Rule("listener_termination", new AndCondition(new ICondition[]{cecon, liscon}),
 			action, IPriorityEvaluator.PRIORITY_1);
 		return listener_termination;
-	}
+	}*/
 	
 	/**
 	 *  Create a rule to notify belief listeners, when a belief has changed.

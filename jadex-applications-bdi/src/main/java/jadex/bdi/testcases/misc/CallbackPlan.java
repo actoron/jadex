@@ -14,7 +14,7 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bdi.runtime.IPlanListener;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.ComponentAdapter;
 import jadex.commons.ChangeEvent;
 
 import java.util.logging.Logger;
@@ -379,7 +379,7 @@ public class CallbackPlan extends Plan
 		});
 			
 		final TestReport tr16 = new TestReport("#16", "Test if agent killed can be observed in a listener.");
-		getScope().addComponentListener(new IComponentListener()
+		getScope().addComponentListener(new ComponentAdapter()
 		{
 			public void componentTerminating(ChangeEvent ae)
 			{

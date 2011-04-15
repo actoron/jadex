@@ -6,9 +6,9 @@ import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.ISpaceProcess;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.ComponentAdapter;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -117,7 +117,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 											public Object execute(IInternalAccess ia)
 											{
 												IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-												bia.addComponentListener(new IComponentListener()
+												bia.addComponentListener(new ComponentAdapter()
 												{
 													public void componentTerminated(ChangeEvent ae)
 													{

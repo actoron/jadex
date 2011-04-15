@@ -531,17 +531,18 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				public void run()
 				{
-					addEventListener(arg, agent);
+					getState().addAttributeValue(getScope(), OAVBDIRuntimeModel.agent_has_componentlisteners, (IComponentListener) arg);
 				}
 			};
 		}
 		else
 		{
-			addEventListener(listener, agent);
+			getState().addAttributeValue(getScope(), OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
 		}
 	}
+	
 	/**
-	 *  Add an agent listener
+	 *  Remove an agent listener
 	 *  @param listener The listener.
 	 */
 	public void removeComponentListener(IComponentListener listener)
@@ -552,14 +553,22 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				public void run()
 				{
-					removeEventListener(arg, agent, false);
+					removeComponentListener((IComponentListener) arg, agent, getState(), getScope());
 				}
 			};
 		}
 		else
 		{
-			removeEventListener(listener, agent, false);
+			removeComponentListener(listener, agent, getState(), getScope());
 		}
+	}
+	
+	protected static void removeComponentListener(IComponentListener listener, Object agent, IOAVState state, Object scope)
+	{
+		Object le = state.getAttributeValue(scope, OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
+		if (le == null)
+			throw new RuntimeException("Listener not found: "+listener);
+		state.removeAttributeValue(scope, OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
 	}
 	
 	/**

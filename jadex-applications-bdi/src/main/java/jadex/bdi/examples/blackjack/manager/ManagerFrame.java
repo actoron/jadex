@@ -10,8 +10,8 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
+import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -205,7 +205,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.addComponentListener(new IComponentListener()
+				bia.addComponentListener(new ComponentAdapter()
 				{
 					public void componentTerminating(ChangeEvent ae)
 					{

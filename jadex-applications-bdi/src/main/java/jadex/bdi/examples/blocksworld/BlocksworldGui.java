@@ -4,7 +4,7 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IInternalEvent;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.gui.SGUI;
@@ -484,7 +484,7 @@ public class BlocksworldGui	extends JFrame
 							public Object execute(IInternalAccess ia)
 							{
 								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-								bia.addComponentListener(new IComponentListener()
+								bia.addComponentListener(new ComponentAdapter()
 								{
 									public void componentTerminating(jadex.commons.ChangeEvent ce)
 									{

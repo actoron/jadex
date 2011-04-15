@@ -4,7 +4,7 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBeliefListener;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
@@ -51,7 +51,7 @@ public class MessageGui extends JFrame
 						rec.setText("Received: ["+ae.getValue()+"]");
 					}
 				});
-				bia.addComponentListener(new IComponentListener()
+				bia.addComponentListener(new ComponentAdapter()
 				{
 					public void componentTerminating(ChangeEvent ae)
 					{

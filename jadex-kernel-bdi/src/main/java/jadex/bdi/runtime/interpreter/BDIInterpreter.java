@@ -1391,7 +1391,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		RULEBASE.addRule(ListenerRules.createBeliefSetListenerRule());
 		RULEBASE.addRule(ListenerRules.createGoalListenerRule());
 		RULEBASE.addRule(ListenerRules.createPlanListenerRule());
-		RULEBASE.addRule(ListenerRules.createAgentTerminationListenerRule());
+		//RULEBASE.addRule(ListenerRules.createAgentTerminationListenerRule());
 		
 		// Message event rules.
 		RULEBASE.addRule(MessageEventRules.createMessageMatchingRule());

@@ -6,7 +6,7 @@ import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.gui.GameStateFrame;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
@@ -76,7 +76,7 @@ public class DealerFrame extends GameStateFrame
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.addComponentListener(new IComponentListener()
+				bia.addComponentListener(new ComponentAdapter()
 				{
 					public void componentTerminating(ChangeEvent ae)
 					{

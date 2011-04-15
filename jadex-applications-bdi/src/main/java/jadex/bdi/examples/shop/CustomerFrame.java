@@ -2,7 +2,7 @@ package jadex.bdi.examples.shop;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
@@ -44,7 +44,7 @@ public class CustomerFrame extends JFrame
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.addComponentListener(new IComponentListener() 
+				bia.addComponentListener(new ComponentAdapter() 
 				{
 					public void componentTerminating(ChangeEvent ae) 
 					{

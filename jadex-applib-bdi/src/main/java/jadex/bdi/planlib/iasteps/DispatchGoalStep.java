@@ -1,11 +1,16 @@
 package jadex.bdi.planlib.iasteps;
 
 import jadex.bdi.model.IMParameter;
+import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.IGoalListener;
 import jadex.bdi.runtime.IParameter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.ThreadSuspendable;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -51,7 +56,7 @@ public class DispatchGoalStep implements IComponentStep
 	
 	public Object execute(IInternalAccess ia)
 	{
-		IGoal goal = ((IBDIInternalAccess) ia).getGoalbase().createGoal(goaltype);
+		final IGoal goal = ((IBDIInternalAccess) ia).getGoalbase().createGoal(goaltype);
 		if (parameters != null)
 		{
 			for (Iterator it = parameters.entrySet().iterator(); it.hasNext(); )
@@ -61,22 +66,39 @@ public class DispatchGoalStep implements IComponentStep
 			}
 		}
 		
-		
-		((IBDIInternalAccess) ia).getGoalbase().dispatchTopLevelGoal(goal);
-		//TODO: Fixme, futurize?
-		
-		Map results = new HashMap();
-		
-		IParameter[] params = goal.getParameters();
-		for (int i = 0; i < params.length; ++i)
+		final Future goalFuture = new Future();
+		goal.addGoalListener(new IGoalListener()
 		{
-			String dir = ((IMParameter) params[i].getModelElement()).getDirection();
-			System.out.println(params[i].getName() + " " + params[i].getValue() + " " + dir);
-			//if (OAVBDIMetaModel.PARAMETER_DIRECTION_INOUT.equals(dir) ||
-				//OAVBDIMetaModel.PARAMETER_DIRECTION_OUT.equals(dir))
-				results.put(params[i].getName(), params[i].getValue());
-		}
+			public void goalFinished(AgentEvent ae)
+			{
+				goalFuture.setResult(goal.getParameters());
+			}
+			
+			public void goalAdded(AgentEvent ae)
+			{
+			}
+		});
+		((IBDIInternalAccess) ia).getGoalbase().dispatchTopLevelGoal(goal);
 		
-		return results;
+		final Future ret = new Future();
+		goalFuture.addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				Map results = new HashMap();
+				IParameter[] params = (IParameter[]) result;
+				for (int i = 0; i < params.length; ++i)
+				{
+					String dir = ((IMParameter) params[i].getModelElement()).getDirection();
+					System.out.println(params[i].getName() + " " + params[i].getValue() + " " + dir);
+					//if (OAVBDIMetaModel.PARAMETER_DIRECTION_INOUT.equals(dir) ||
+						//OAVBDIMetaModel.PARAMETER_DIRECTION_OUT.equals(dir))
+						results.put(params[i].getName(), params[i].getValue());
+				}
+				ret.setResult(results);
+			}
+		});
+		
+		return ret;
 	}
 }

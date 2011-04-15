@@ -2,10 +2,10 @@ package jadex.bdi.planlib.cms;
 
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.ComponentAdapter;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -87,7 +87,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 		IComponentDescription[] descs = (IComponentDescription[])fut.get(this);
 		getBeliefbase().getBeliefSet("components").addFacts(descs);
 		
-		getScope().addComponentListener(new IComponentListener()
+		getScope().addComponentListener(new ComponentAdapter()
 		{	
 			public void componentTerminating(ChangeEvent ae)
 			{

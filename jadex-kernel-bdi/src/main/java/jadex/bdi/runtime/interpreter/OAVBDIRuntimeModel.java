@@ -2,6 +2,7 @@ package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IExternalCondition;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.clock.ITimer;
@@ -201,6 +202,9 @@ public class OAVBDIRuntimeModel
 	
 	/** The result command type. */
 	public static OAVJavaType java_resultcommand_type;
+	
+	/** The component listener type. */
+	public static OAVJavaType java_componentlistener_type;
 
 	
 	//-------- element --------
@@ -250,6 +254,9 @@ public class OAVBDIRuntimeModel
 	
 	/** The agent has kill listeners (waiting to be notified after termination). */
 	public static OAVAttributeType agent_has_killlisteners;
+	
+	/** The agent has component listeners (waiting to be notified about component events */
+	public static OAVAttributeType agent_has_componentlisteners;
 	
 	/** The agent has change events. */
 	public static OAVAttributeType agent_has_changeevents;
@@ -766,6 +773,7 @@ public class OAVBDIRuntimeModel
 		java_propertychangelistener_type	= createJavaType(PropertyChangeListener.class, OAVJavaType.KIND_VALUE);
 		java_timer_type	= createJavaType(ITimer.class, OAVJavaType.KIND_VALUE);
 		java_resultlistener_type	= createJavaType(IResultListener.class, OAVJavaType.KIND_OBJECT);
+		java_componentlistener_type = createJavaType(IComponentListener.class, OAVJavaType.KIND_OBJECT);
 		java_externalcondition_type	= createJavaType(IExternalCondition.class, OAVJavaType.KIND_BEAN);
 		java_serviceprovider_type	= createJavaType(IServiceProvider.class, OAVJavaType.KIND_OBJECT);
 		//java_planexecutor_type = createJavaType(IPlanExecutor.class);
@@ -968,6 +976,7 @@ public class OAVBDIRuntimeModel
 		agent_has_initparents = agent_type.createAttributeType("agent_has_initparents", java_map_type);
 		agent_has_timer = agent_type.createAttributeType("agent_has_timer", java_timer_type);
 		agent_has_killlisteners = agent_type.createAttributeType("agent_has_killlisteners", java_resultlistener_type, OAVAttributeType.SET);
+		agent_has_componentlisteners = agent_type.createAttributeType("agent_has_componentlisteners", java_componentlistener_type, OAVAttributeType.LIST);
 		agent_has_changeevents = agent_type.createAttributeType("agent_has_changeevents", changeevent_type, OAVAttributeType.LIST);
 		agent_has_bindings = agent_type.createAttributeType("agent_has_bindings", OAVJavaType.java_object_type);
 //		agent_has_eventprocessing = agent_type.createAttributeType("agent_has_eventprocessing", processableelement_type);

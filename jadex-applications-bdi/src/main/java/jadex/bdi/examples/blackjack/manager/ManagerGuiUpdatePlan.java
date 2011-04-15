@@ -4,7 +4,7 @@ import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
@@ -42,7 +42,7 @@ public class ManagerGuiUpdatePlan extends Plan
 			}
 		});
 
-		getScope().addComponentListener(new IComponentListener()
+		getScope().addComponentListener(new ComponentAdapter()
 		{
 			public void componentTerminated(ChangeEvent ae)
 			{

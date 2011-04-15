@@ -4,7 +4,7 @@ import jadex.bdi.planlib.iasteps.DispatchGoalStep;
 import jadex.bdi.planlib.iasteps.SetBeliefStep;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -85,7 +85,7 @@ public class StandardClientApplication
 			public static final String XML_CLASSNAME = "dispose"; 
 			public Object execute(IInternalAccess ia)
 			{
-				ia.addComponentListener(new IComponentListener()
+				ia.addComponentListener(new ComponentAdapter()
 				{
 					public void componentTerminating(ChangeEvent ce)
 					{
