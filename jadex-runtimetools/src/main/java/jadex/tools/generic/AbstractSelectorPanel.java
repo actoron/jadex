@@ -8,10 +8,10 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.future.SwingDelegationResultListener;
+import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.gui.SGUI;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -38,7 +38,7 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
  *  Panel that allows user choosing among different viewable objects (e.g. services or components).
  *  Uses a combobox for 
  */
-public abstract class AbstractSelectorPanel extends JPanel implements IPropertiesProvider
+public abstract class AbstractSelectorPanel extends JSplitPanel implements IPropertiesProvider
 {
 	//-------- constants --------
 
@@ -78,8 +78,12 @@ public abstract class AbstractSelectorPanel extends JPanel implements IPropertie
 	 */
 	public AbstractSelectorPanel()
 	{
+		this.setOrientation(VERTICAL_SPLIT);
+		this.setOneTouchExpandable(true);
+		this.setDividerLocation(0);
+		this.setDividerLocation(0.0);
+
 		panels = new HashMap();
-		final JPanel mainp = new JPanel(new BorderLayout());
 		ocl = new ObjectCardLayout();
 		centerp = new JPanel(ocl);
 		
@@ -172,14 +176,9 @@ public abstract class AbstractSelectorPanel extends JPanel implements IPropertie
 				}
 			}
 		});
-		
-		mainp.add(northp, BorderLayout.NORTH);
-		mainp.add(centerp, BorderLayout.CENTER);
-		
-//		refreshCombo();
-		
-		setLayout(new BorderLayout());
-		add(mainp, BorderLayout.CENTER);
+
+		this.setTopComponent(northp);
+		this.setBottomComponent(centerp);
 	}
 	
 	/**

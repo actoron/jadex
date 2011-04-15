@@ -29,16 +29,20 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 	/** The jcc access (local). */
 	protected IExternalAccess jccaccess;
 	
+	/** The panel title. */
+	protected String	title;
+	
 	//-------- constructors --------
 
 	/**
 	 *  Create a new selector panel.
 	 */
-	public DeployerServiceSelectorPanel(IExternalAccess jccaccess, IExternalAccess platformaccess, INodeHandler nodehandler)
+	public DeployerServiceSelectorPanel(IExternalAccess jccaccess, IExternalAccess platformaccess, INodeHandler nodehandler, String title)
 	{
 		super(platformaccess, IDeploymentService.class);
 		this.jccaccess = jccaccess;
 		this.nodehandler = nodehandler;
+		this.title	= title;
 	}
 	
 	//-------- methods --------
@@ -63,7 +67,7 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 					{
 						IExternalAccess component = (IExternalAccess)result; 
 						boolean remote = !jccaccess.getComponentIdentifier().getPlatformName().equals(component.getComponentIdentifier().getPlatformName());
-						DeploymentServiceViewerPanel dp = new DeploymentServiceViewerPanel(component, remote, (IDeploymentService)service, nodehandler);
+						DeploymentServiceViewerPanel dp = new DeploymentServiceViewerPanel(component, remote, (IDeploymentService)service, nodehandler, title);
 						ret.setResult(dp);
 					};
 				});

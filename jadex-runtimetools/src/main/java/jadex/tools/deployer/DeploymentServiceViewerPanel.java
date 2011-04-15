@@ -14,9 +14,12 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.PopupBuilder;
 
+import java.awt.BorderLayout;
 import java.io.File;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.tree.TreeSelectionModel;
 
 /**
@@ -27,6 +30,9 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 {
 	//-------- attributes --------
 
+	/** The outer panel. */
+	protected JPanel	panel;
+	
 	/** The file tree panel. */
 	protected FileTreePanel ftp;
 	
@@ -39,7 +45,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	 *  Create a new viewer panel.
 	 */
 	public DeploymentServiceViewerPanel(IExternalAccess exta, boolean remote, 
-		IDeploymentService service, INodeHandler nodehandler)
+		IDeploymentService service, INodeHandler nodehandler, String title)
 	{
 		this.service = service;
 		
@@ -76,6 +82,10 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 				}
 			});
 		}
+		
+		panel	= new JPanel(new BorderLayout());
+		panel.add(ftp, BorderLayout.CENTER);
+		panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), title+" ("+exta.getComponentIdentifier().getPlatformName()+")"));
 	}
 	
 	/**
@@ -118,7 +128,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	 */
 	public JComponent getComponent()
 	{
-		return ftp;
+		return panel;
 	}
 	
 	/**

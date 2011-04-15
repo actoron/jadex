@@ -67,8 +67,8 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 		// Local view on the left
 		DeployerNodeHandler nh1 = new DeployerNodeHandler();
 		DeployerNodeHandler nh2 = new DeployerNodeHandler();
-		p1 = new DeployerServiceSelectorPanel(jcc.getJCCAccess(), jcc.getJCCAccess(), nh1);
-		p2 = new DeployerServiceSelectorPanel(jcc.getJCCAccess(), jcc.getPlatformAccess(), nh2);
+		p1 = new DeployerServiceSelectorPanel(jcc.getJCCAccess(), jcc.getJCCAccess(), nh1, "Local Platform");
+		p2 = new DeployerServiceSelectorPanel(jcc.getJCCAccess(), jcc.getPlatformAccess(), nh2, "Remote Platform");
 		nh1.setFirstPanel(p1);
 		nh1.setSecondPanel(p2);
 		nh2.setFirstPanel(p2);
