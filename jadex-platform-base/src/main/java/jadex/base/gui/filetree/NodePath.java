@@ -124,6 +124,8 @@ public class NodePath
 	 */
 	public static NodePath	createNodePath(ITreeNode node)
 	{
+		if(node instanceof RootNode)
+			System.out.println("wurksn");
 		RootNode	root	= null;
 		List	path	= new LinkedList();
 		while(root==null)

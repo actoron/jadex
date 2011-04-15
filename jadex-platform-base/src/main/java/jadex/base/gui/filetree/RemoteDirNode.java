@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 
 /**
  *  The remote dir node.
@@ -92,6 +93,16 @@ public class RemoteDirNode extends RemoteFileNode
 				}
 			}
 		});
+	}
+	
+	/**
+	 *  Check if the node is a leaf.
+	 */
+	public boolean	isLeaf()
+	{
+		assert SwingUtilities.isEventDispatchThread();
+
+		return false;
 	}
 	
 	/**

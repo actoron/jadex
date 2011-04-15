@@ -97,7 +97,7 @@ public class ExpansionHandler extends TreeExpansionHandler
 //			System.out.println("handle path: "+path);
 		
 		// Move from paths (loaded) to expanded nodes (created dynamically).
-		if(expandedpaths!=null && expandedpaths.remove(NodePath.createNodePath((ITreeNode)path.getLastPathComponent())))
+		if(expandedpaths!=null && path.getPathCount()>1 && expandedpaths.remove(NodePath.createNodePath((ITreeNode)path.getLastPathComponent())))
 		{
 //			System.out.println("loaded: "+path.getLastPathComponent());
 			expanded.add(path.getLastPathComponent());

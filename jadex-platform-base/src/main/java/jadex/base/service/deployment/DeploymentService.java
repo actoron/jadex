@@ -5,7 +5,6 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
-import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -13,7 +12,6 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.util.Collection;
 import java.util.Map.Entry;
 
 /**
