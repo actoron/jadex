@@ -194,7 +194,7 @@ public class RootNode extends AbstractTreeNode
 	}
 	
 	/**
-	 *  Get the path entries.
+	 *  Get the path entries {path, display name}.
 	 */
 	public String[]	getPathEntries()
 	{

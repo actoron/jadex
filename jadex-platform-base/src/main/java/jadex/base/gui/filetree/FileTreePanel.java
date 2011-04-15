@@ -32,10 +32,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.JFrame;
@@ -333,24 +330,40 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		// Save tree properties.
 		final TreeProperties	mep	= new TreeProperties();
 		final RootNode root = (RootNode)getTree().getModel().getRoot();
-		final String[] paths	= root.getPathEntries();
 		
-		// Convert path to relative must be done on target platform.
-		exta.scheduleStep(new IComponentStep()
+		final Future	rootdone	= new Future();
+		if(!keeproots)
 		{
-			@XMLClassname("convertPathToRelative")
-			public Object execute(IInternalAccess ia)
+			// Convert path to relative must be done on target platform.
+			final String[] paths	= root.getPathEntries();
+			exta.scheduleStep(new IComponentStep()
 			{
-				for(int i=0; i<paths.length; i++)
-					paths[i]	= SUtil.convertPathToRelative(paths[i]);
-				return paths;
-			}
-		}).addResultListener(new SwingDelegationResultListener(ret)
+				@XMLClassname("convertPathToRelative")
+				public Object execute(IInternalAccess ia)
+				{
+					for(int i=0; i<paths.length; i++)
+						paths[i]	= SUtil.convertPathToRelative(paths[i]);
+					return paths;
+				}
+			}).addResultListener(new SwingDelegationResultListener(rootdone)
+			{
+				public void customResultAvailable(Object result)
+				{
+					String[]	paths	= (String[])result;
+					mep.setRootPathEntries(paths);
+					rootdone.setResult(null);
+				}
+			});
+		}
+		else
 		{
-			public void customResultAvailable(Object result)
+			rootdone.setResult(null);
+		}
+		
+		rootdone.addResultListener(new SwingDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result) throws Exception
 			{
-				String[]	paths	= (String[])result;
-				mep.setRootPathEntries(paths);
 				mep.setSelectedNode(getTree().getSelectionPath()==null ? null
 					: NodePath.createNodePath((ITreeNode)getTree().getSelectionPath().getLastPathComponent()));
 				List	expanded	= new ArrayList();
@@ -419,45 +432,53 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 				final RootNode root = (RootNode)getTree().getModel().getRoot();
 				
 				final Future	rootdone	= new Future();
-				final String[] entries = mep.getRootPathEntries();
-				final Map	topnodes	= new LinkedHashMap(); // id->value (file or file data)
-				if(entries!=null)
+				if(!keeproots)
 				{
-					if(!remote)
+					final String[]	entries	= mep.getRootPathEntries();
+					if(entries!=null)
 					{
-						for(int i=0; i<entries.length; i++)
+						if(!remote)
 						{
-							File	file	= new File(entries[i]);
-							topnodes.put(file, file);
+							for(int i=0; i<entries.length; i++)
+							{
+								ITreeNode node = factory.createNode(root, model, tree, new File(entries[i]), iconcache, filefilter, exta, factory);
+								root.addChild(node);
+							}
+							rootdone.setResult(null);
 						}
-						rootdone.setResult(null);
+						else
+						{
+							exta.scheduleStep(new IComponentStep()
+							{
+								@XMLClassname("createRootEntries")
+								public Object execute(IInternalAccess ia)
+								{
+									FileData[]	ret	= new FileData[entries.length];
+									for(int i=0; i<entries.length; i++)
+									{
+										ret[i]	= new FileData(new File(entries[i]));
+									}
+									return ret;
+								}
+							}).addResultListener(new SwingDelegationResultListener(rootdone)
+							{
+								public void customResultAvailable(Object result) throws Exception
+								{
+									FileData[]	entries	= (FileData[])result;
+									for(int i=0; i<entries.length; i++)
+									{
+										ITreeNode node = factory.createNode(root, model, tree, entries[i], iconcache, filefilter, exta, factory);
+										root.addChild(node);
+									}
+									rootdone.setResult(null);
+								}
+							});
+						}
 					}
 					else
 					{
-						exta.scheduleStep(new IComponentStep()
-						{
-							@XMLClassname("createRootEntries")
-							public Object execute(IInternalAccess ia)
-							{
-								FileData[]	ret	= new FileData[entries.length];
-								for(int i=0; i<entries.length; i++)
-								{
-									ret[i]	= new FileData(new File(entries[i]));
-								}
-								return ret;
-							}
-						}).addResultListener(new SwingDelegationResultListener(rootdone)
-						{
-							public void customResultAvailable(Object result) throws Exception
-							{
-								FileData[]	entries	= (FileData[])result;
-								for(int i=0; i<entries.length; i++)
-								{
-									topnodes.put(entries[i].toString(), entries[i]);
-								}
-								rootdone.setResult(null);
-							}
-						});
+						root.removeAll();
+						rootdone.setResult(null);
 					}
 				}
 				else
@@ -469,19 +490,6 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 				{
 					public void customResultAvailable(Object result) throws Exception
 					{
-						if(keeproots)
-						{
-						}
-						else
-						{
-							root.removeAll();
-							for(Iterator it=topnodes.values().iterator(); it.hasNext(); )
-							{
-								ITreeNode node = factory.createNode(root, model, tree, it.next(), iconcache, filefilter, exta, factory);
-								root.addChild(node);
-							}							
-						}
-						
 						// Select the last selected model in the tree.
 						if(mep.getSelectedNode()!=null)
 							expansionhandler.setSelectedPath(mep.getSelectedNode());
