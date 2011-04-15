@@ -118,6 +118,7 @@ public class DefaultFileFilter implements IRemoteFilter
 				{
 					ext = file.getName().substring(pos);
 				}
+//				System.out.println("filter: "+file+", "+getSelectedComponents().contains(ext));
 				ret.setResult(getSelectedComponents().contains(ext));
 			}
 		}

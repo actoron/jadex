@@ -32,7 +32,10 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.JFrame;
@@ -51,6 +54,9 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	
 	/** The remote flag. */
 	protected final boolean remote;
+	
+	/** The keep roots flag (if added top-level nodes should be used instead of nodes from loaded properties). */
+	protected final boolean keeproots;
 	
 	/** The external access. */
 	protected final IExternalAccess	exta;
@@ -87,18 +93,19 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	 */
 	public FileTreePanel(IExternalAccess exta)
 	{
-		this(exta, false);
+		this(exta, false, false);
 	}
 	
 	/**
 	 *  Create a new component tree panel.
 	 */
-	public FileTreePanel(IExternalAccess exta, boolean remote)
+	public FileTreePanel(IExternalAccess exta, boolean remote, boolean keeproots)
 	{
 		this.setLayout(new BorderLayout());
 		
 		this.exta	= exta;
 		this.remote = remote;
+		this.keeproots	= keeproots;
 		this.model	= new AsyncTreeModel();
 		this.tree	= new JTree(model);
 		this.expansionhandler = new ExpansionHandler(tree);
@@ -374,7 +381,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 						public void customResultAvailable(Object result)
 						{
 							Properties	filterprops	= (Properties)result;
-							props.addSubproperties(filterprops);
+							props.addSubproperties("mic", filterprops);
 							ret.setResult(props);
 						}
 					});
@@ -413,15 +420,15 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 				
 				final Future	rootdone	= new Future();
 				final String[] entries = mep.getRootPathEntries();
+				final Map	topnodes	= new LinkedHashMap(); // id->value (file or file data)
 				if(entries!=null)
 				{
-					root.removeAll();
 					if(!remote)
 					{
 						for(int i=0; i<entries.length; i++)
 						{
-							ITreeNode node = factory.createNode(root, model, tree, new File(entries[i]), iconcache, filefilter, exta, factory);
-							root.addChild(node);
+							File	file	= new File(entries[i]);
+							topnodes.put(file, file);
 						}
 						rootdone.setResult(null);
 					}
@@ -446,11 +453,10 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 								FileData[]	entries	= (FileData[])result;
 								for(int i=0; i<entries.length; i++)
 								{
-									ITreeNode node = factory.createNode(root, model, tree, entries[i], iconcache, filefilter, exta, factory);
-									root.addChild(node);
+									topnodes.put(entries[i].toString(), entries[i]);
 								}
 								rootdone.setResult(null);
-}
+							}
 						});
 					}
 				}
@@ -463,11 +469,26 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 				{
 					public void customResultAvailable(Object result) throws Exception
 					{
+						if(keeproots)
+						{
+						}
+						else
+						{
+							root.removeAll();
+							for(Iterator it=topnodes.values().iterator(); it.hasNext(); )
+							{
+								ITreeNode node = factory.createNode(root, model, tree, it.next(), iconcache, filefilter, exta, factory);
+								root.addChild(node);
+							}							
+						}
+						
 						// Select the last selected model in the tree.
-						expansionhandler.setSelectedPath(mep.getSelectedNode());
+						if(mep.getSelectedNode()!=null)
+							expansionhandler.setSelectedPath(mep.getSelectedNode());
 
 						// Load the expanded tree nodes.
-						expansionhandler.setExpandedPaths(mep.getExpandedNodes());
+						if(mep.getExpandedNodes()!=null)
+							expansionhandler.setExpandedPaths(mep.getExpandedNodes());
 
 						root.refresh(true);
 						

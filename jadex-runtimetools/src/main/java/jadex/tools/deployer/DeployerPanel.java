@@ -94,22 +94,32 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 		final Properties props = new Properties();
 		props.addProperty(new Property("split_location", ""+splitpanel.getDividerLocation()));
 		
-		p1.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+		// Only save properties of local panels.
+		DeploymentServiceViewerPanel	dsvp1	= (DeploymentServiceViewerPanel)p1.getCurrentPanel();
+		DeploymentServiceViewerPanel	dsvp2	= (DeploymentServiceViewerPanel)p2.getCurrentPanel();
+		IFuture	p1props	= dsvp1!=null && !dsvp1.getFileTreePanel().isRemote()
+			? p1.getProperties() : IFuture.DONE;		
+		final IFuture	p2props	= dsvp2!=null && !dsvp2.getFileTreePanel().isRemote()
+			? p2.getProperties() : IFuture.DONE;
+		
+		p1props.addResultListener(new SwingDelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Object result) throws Exception
 			{
-				props.addSubproperties("first", (Properties)result);
-				p2.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+				if(result!=null)
+					props.addSubproperties("first", (Properties)result);
+				p2props.addResultListener(new SwingDelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(Object result) throws Exception
 					{
-						props.addSubproperties("second", (Properties)result);
+						if(result!=null)
+							props.addSubproperties("second", (Properties)result);
 						ret.setResult(props);
 					}
 				});
 			}
 		});
-	
+		
 		return ret;
 	}
 	

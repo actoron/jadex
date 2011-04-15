@@ -43,9 +43,10 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	{
 		this.service = service;
 		
-		ftp = new FileTreePanel(exta, remote);
+		ftp = new FileTreePanel(exta, remote, true);
 		DefaultFileFilterMenuItemConstructor mic = new DefaultFileFilterMenuItemConstructor(ftp.getModel());
 		ftp.setPopupBuilder(new PopupBuilder(new Object[]{mic}));
+		ftp.setMenuItemConstructor(mic);
 		DefaultFileFilter ff = new DefaultFileFilter(mic);
 		ftp.setFileFilter(ff);
 		ftp.addNodeHandler(new DefaultNodeHandler(ftp.getTree()));

@@ -292,7 +292,7 @@ public abstract class AbstractSelectorPanel extends JPanel implements IPropertie
 				public void customResultAvailable(Object result) 
 				{
 					Properties subprops = (Properties)result;
-					addSubproperties(props, PANELPROPERTIES, subprops);
+					props.addSubproperties(PANELPROPERTIES, subprops);
 					ret.setResult(props);
 				};
 			});
@@ -315,21 +315,6 @@ public abstract class AbstractSelectorPanel extends JPanel implements IPropertie
 		{
 			// Todo: should wait for shutdown!!!
 			((IAbstractViewerPanel)it.next()).shutdown();
-		}
-	}
-
-	/**
-	 *  Add a subproperties to a properties.
-	 */
-	public static void	addSubproperties(Properties props, String type, Properties subproperties)
-	{
-		if(subproperties!=null)
-		{
-			if(subproperties.getType()!=null && !subproperties.getType().equals(type))
-				throw new RuntimeException("Incompatible types: "+subproperties.getType()+", "+type);
-			
-			subproperties.setType(type);
-			props.addSubproperties(subproperties);
 		}
 	}
 }

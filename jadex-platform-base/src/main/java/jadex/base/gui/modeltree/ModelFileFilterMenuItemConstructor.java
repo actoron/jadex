@@ -237,7 +237,7 @@ class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor, IPrope
 	public IFuture getProperties()
 	{
 		final Future ret = new Future();
-		Properties	filterprops	= new Properties(null, "filter", null);
+		Properties	filterprops	= new Properties();
 		List ctypes = getSelectedComponentTypes();
 		for(int i=0; i<ctypes.size(); i++)
 		{

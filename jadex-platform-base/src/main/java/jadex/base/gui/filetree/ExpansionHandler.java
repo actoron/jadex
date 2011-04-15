@@ -76,7 +76,7 @@ public class ExpansionHandler extends TreeExpansionHandler
 				
 			if(resolved!=null)
 			{
-//				System.out.println("expanded: "+node);
+//				System.out.println("expanded: "+resolved[0]);
 				expanded.add(resolved[0]);
 				handlePath((TreePath)resolved[1]);
 			}

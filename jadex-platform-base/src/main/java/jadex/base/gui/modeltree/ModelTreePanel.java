@@ -27,7 +27,7 @@ public class ModelTreePanel extends FileTreePanel
 	 */
 	public ModelTreePanel(IExternalAccess exta, boolean remote)
 	{
-		super(exta, remote);
+		super(exta, remote, false);
 		actions = new HashMap();
 		
 		ModelFileFilterMenuItemConstructor mic = new ModelFileFilterMenuItemConstructor(getModel(), exta);
@@ -40,6 +40,7 @@ public class ModelTreePanel extends FileTreePanel
 		actions.put(RemovePathAction.getName(), new RemovePathAction(this));
 		setPopupBuilder(new PopupBuilder(new Object[]{actions.get(AddPathAction.getName()), 
 			actions.get(AddRemotePathAction.getName()), mic}));
+		setMenuItemConstructor(mic);
 		setIconCache(ic);
 		DefaultNodeHandler dnh = new DefaultNodeHandler(getTree());
 		dnh.addAction(new RemovePathAction(this), null);

@@ -109,7 +109,7 @@ public class RootNode extends AbstractTreeNode
 	public void removeChild(ITreeNode child)
 	{
 		assert SwingUtilities.isEventDispatchThread();
-		
+//		super.removeChild(child);
 		children.remove(child);
 		setChildren(children);
 	}
@@ -120,6 +120,9 @@ public class RootNode extends AbstractTreeNode
 	public void removeAll()
 	{
 		assert SwingUtilities.isEventDispatchThread();
+		
+//		for(int i=0; i<children.size(); i++)
+//			super.removeChild((ITreeNode)children.get(i));
 		
 		children.clear();
 		setChildren(children);

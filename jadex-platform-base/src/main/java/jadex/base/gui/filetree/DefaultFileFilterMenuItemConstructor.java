@@ -10,7 +10,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.gui.IMenuItemConstructor;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.tree.TreeModel;
 
@@ -76,6 +78,22 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 		menu = new JMenu("File Filter");
 		filetypes = new HashMap();
 		JCheckBoxMenuItem all = new JCheckBoxMenuItem();
+		all.addItemListener(new ItemListener()
+		{
+			public void itemStateChanged(ItemEvent e)
+			{
+//				System.out.println("refresh: all="+((AbstractButton)e.getSource()).isSelected());
+				// invokeLater() required as tree expansion handler also uses invokeLater
+				// and refresh stops at unexpanded nodes.
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						((ITreeNode)treemodel.getRoot()).refresh(true);
+					}
+				});
+			}
+		});
 		menu.add(all);
 		menu.addSeparator();
 		filetypes.put(SELECT_ALL, all);
@@ -188,9 +206,9 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 							file.delete();
 					}
 					menu.add(ff);
-					ff.addActionListener(new ActionListener()
+					ff.addItemListener(new ItemListener()
 					{
-						public void actionPerformed(ActionEvent e)
+						public void itemStateChanged(ItemEvent e)
 						{
 							((ITreeNode)treemodel.getRoot()).refresh(true);
 						}
@@ -221,7 +239,7 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 	public IFuture getProperties()
 	{
 		final Future ret = new Future();
-		Properties	filterprops	= new Properties(null, "filter", null);
+		Properties	filterprops	= new Properties();
 		List ctypes = getSelectedComponentTypes();
 		for(int i=0; i<ctypes.size(); i++)
 		{
@@ -249,7 +267,7 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 			}
 			setSelectedComponentTypes(selected);
 		}
-		return new Future();
+		return IFuture.DONE;
 	}
 
 	/**

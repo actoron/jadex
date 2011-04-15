@@ -16,7 +16,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.util.Collections;
-import java.util.HashMap;
 
 /**
  *  Service container for active components.
