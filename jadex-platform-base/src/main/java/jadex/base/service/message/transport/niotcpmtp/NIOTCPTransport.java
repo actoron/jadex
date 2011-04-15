@@ -270,6 +270,7 @@ public class NIOTCPTransport implements ITransport
 										            }
 												}
 											}
+//											System.out.println("nio receiver closed");
 		//									logger.info("TCPNIO receiver closed.");
 										}
 									});
