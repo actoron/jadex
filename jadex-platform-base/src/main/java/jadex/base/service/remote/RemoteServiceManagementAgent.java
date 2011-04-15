@@ -116,7 +116,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					
 					if(content instanceof String)
 					{
-						String orig = (String)content;
+						// For debugging.
+//						String orig = (String)content;
 						
 						// Catch decode problems.
 						// Should be ignored or be a warning.
@@ -139,7 +140,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								{
 //									content	= null;
 									content = new RemoteResultCommand(null, new RuntimeException("Errors during XML decoding: "+errors), callid);
-									getLogger().warning("Remote service management service could not decode message."+orig+"\n"+errors);
+									getLogger().warning("Remote service management service could not decode message from: "+msg.get(SFipa.SENDER));
+//									getLogger().warning("Remote service management service could not decode message."+orig+"\n"+errors);
 								}
 							}
 						}
@@ -147,8 +149,9 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						{
 //							content	= null;
 							content = new RemoteResultCommand(null, e, callid);
-							getLogger().warning("Remote service management service could not decode message."+orig);
-							e.printStackTrace();
+							getLogger().warning("Remote service management service could not decode message from: "+msg.get(SFipa.SENDER));
+//							getLogger().warning("Remote service management service could not decode message."+orig);
+//							e.printStackTrace();
 						}
 					}
 					

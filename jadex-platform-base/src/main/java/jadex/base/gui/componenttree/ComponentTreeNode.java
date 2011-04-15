@@ -16,6 +16,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.gui.CombiIcon;
+import jadex.commons.gui.SGUI;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,12 +28,23 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+import javax.swing.UIDefaults;
 
 /**
  *  Node object representing a service container.
  */
 public class ComponentTreeNode	extends AbstractTreeNode implements IActiveComponentTreeNode
 {
+	//-------- constants --------
+
+	/**
+	 * The image icons.
+	 */
+	public static final UIDefaults icons = new UIDefaults(new Object[]
+	{
+		"overlay_check", SGUI.makeIcon(ComponentTreeNode.class, "/jadex/base/gui/images/overlay_check.png")
+	});
+	
 	//-------- attributes --------
 	
 	/** The component description. */
@@ -51,6 +64,9 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	
 	/** The component id for listening (if any). */
 	protected IComponentIdentifier	listenercid;
+	
+	/** Flag indicating a broken node (e.g. children could not be searched due to network problems). */
+	protected boolean	broken;
 	
 	//-------- constructors --------
 	
@@ -94,29 +110,36 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	 */
 	public Icon	getIcon()
 	{
-		return iconcache.getIcon(this, desc.getType());
+		Icon	icon	= iconcache.getIcon(this, desc.getType());
+		if(broken)
+		{
+			icon	= icon!=null ? new CombiIcon(new Icon[]{icon, icons.getIcon("overlay_check")}) : icons.getIcon("overlay_check");
+		}
+		return icon;
 	}
 	
 	/**
 	 *  Refresh the node.
 	 *  @param recurse	Recursively refresh subnodes, if true.
 	 */
-	public void refresh(boolean recurse)
+	public void refresh(final boolean recurse)
 	{
 		cms.getComponentDescription(desc.getName()).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
 			{
 				ComponentTreeNode.this.desc	= (IComponentDescription)result;
+				broken	= false;
 				getModel().fireNodeChanged(ComponentTreeNode.this);
+				
+				ComponentTreeNode.super.refresh(recurse);
 			}
 			public void customExceptionOccurred(Exception exception)
 			{
-				// ignore
+				broken	= true;
+				getModel().fireNodeChanged(ComponentTreeNode.this);
 			}
 		});
-
-		super.refresh(recurse);
 	}
 	
 	/**
@@ -125,15 +148,21 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	 */
 	protected void	searchChildren()
 	{
+//		if(getComponentIdentifier().getName().indexOf("Hunter")!=-1)
+//			System.out.println("hunterpey: "+this);
 		searchChildren(cms, getComponentIdentifier())
 			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
+				broken	= false;
+				getModel().fireNodeChanged(ComponentTreeNode.this);
 				setChildren((List)result);
 			}
 			public void exceptionOccurred(Exception exception)
 			{
+				broken	= true;
+				getModel().fireNodeChanged(ComponentTreeNode.this);
 				setChildren(Collections.EMPTY_LIST);
 			}
 		});
@@ -233,13 +262,13 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 		final List	children	= new ArrayList();
 		final boolean	ready[]	= new boolean[2];	// 0: children, 1: services;
 
-//		if(ComponentTreeNode.this.toString().startsWith("alex"))
+//		if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
 //			System.err.println("searchChildren queued: "+this);
 		cms.getChildren(cid).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
 			{
-//				if(ComponentTreeNode.this.toString().startsWith("alex"))
+//				if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
 //					System.err.println("searchChildren queued2: "+ComponentTreeNode.this);
 				final IComponentIdentifier[] achildren = (IComponentIdentifier[])result;
 				final int[]	childcnt	= new int[]{0};
@@ -251,7 +280,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 						{
 							public void customResultAvailable(Object result)
 							{
-//								if(ComponentTreeNode.this.toString().startsWith("alex"))
+//								if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
 //									System.err.println("searchChildren queued3: "+ComponentTreeNode.this);
 								IComponentDescription	desc	= (IComponentDescription)result;
 								ITreeNode	node	= createComponentNode(desc);
@@ -271,18 +300,11 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 							public void customExceptionOccurred(Exception exception)
 							{
 //								exception.printStackTrace();
-//								if(ComponentTreeNode.this.toString().startsWith("alex"))
+//								if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
 //									System.err.println("searchChildren done4?: "+ComponentTreeNode.this);
-								childcnt[0]++;
-								
-								// Last child? -> inform listeners
-								if(childcnt[0] == achildren.length)
+								if(!ret.isDone())
 								{
-									ready[0]	= true;
-									if(ready[0] &&  ready[1])
-									{
-										ret.setResult(children);
-									}
+									ret.setException(exception);
 								}
 							}
 						});
@@ -290,6 +312,8 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 				}
 				else
 				{
+//					if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
+//						System.err.println("searchChildren done3a: "+ComponentTreeNode.this);
 					ready[0]	= true;
 					if(ready[0] &&  ready[1])
 					{
@@ -300,6 +324,8 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 			
 			public void customExceptionOccurred(Exception exception)
 			{
+//				if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
+//					System.err.println("searchChildren done2e: "+ComponentTreeNode.this);
 				if(!ret.isDone())
 				{
 					ret.setException(exception);
@@ -314,7 +340,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 		{
 			public void customResultAvailable(Object result)
 			{
-//				if(ComponentTreeNode.this.toString().startsWith("alex"))
+//				if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
 //					System.err.println("searchChildren queued4: "+ComponentTreeNode.this);
 				final IExternalAccess	ea	= (IExternalAccess)result;
 				
@@ -323,7 +349,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 				{
 					public void customResultAvailable(Object result)
 					{
-//						if(ComponentTreeNode.this.toString().startsWith("alex"))
+//						if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
 //							System.err.println("searchChildren done6?: "+ComponentTreeNode.this);
 						List	services	= (List)result;
 						if(services!=null && !services.isEmpty())
@@ -367,12 +393,11 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 					}
 					public void customExceptionOccurred(Exception exception)
 					{
-//						if(ComponentTreeNode.this.toString().startsWith("alex"))
+//						if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
 //							System.err.println("searchChildren done7: "+ComponentTreeNode.this);
-						ready[1]	= true;
-						if(ready[0] &&  ready[1])
+						if(!ret.isDone())
 						{
-							ret.setResult(children);
+							ret.setException(exception);
 						}
 					}
 				});
