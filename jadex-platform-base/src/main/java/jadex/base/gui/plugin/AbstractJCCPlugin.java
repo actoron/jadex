@@ -15,21 +15,31 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.ToolTipAction;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
+import javax.swing.UIDefaults;
 
 /**
  *  Template class for control center plugins.
  */
 public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 {
+	//-------- constants --------
+
+	/** The image icons. */
+	protected static final UIDefaults icons = new UIDefaults(new Object[]
+	{
+		"openjcc",	SGUI.makeIcon(AbstractJCCPlugin.class, "/jadex/base/gui/images/openjcc.png")
+	});
+	
 	//-------- attributes --------
 	
 	/** The jcc. */
@@ -269,7 +279,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 			{
 				ret	= new Action[]
 				{
-					new AbstractAction("Open Control Center")
+					new ToolTipAction("Open Control Center", (Icon)icons.get("openjcc"), "Click to open new Control Center tab for platform")
 					{
 						public void actionPerformed(ActionEvent e)
 						{
