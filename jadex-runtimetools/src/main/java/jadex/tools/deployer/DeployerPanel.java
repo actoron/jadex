@@ -6,19 +6,23 @@ import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.JarAsDirectory;
 import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.plugin.IControlCenter;
+import jadex.base.service.deployment.DeploymentService;
 import jadex.base.service.deployment.FileContent;
 import jadex.base.service.deployment.IDeploymentService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.future.SwingDelegationResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.FileInputStream;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -48,7 +52,6 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 	/** The second panel. */
 	protected DeployerServiceSelectorPanel p2;
 
-	
 	//-------- constructors --------
 	
 	/**
@@ -151,24 +154,71 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 				{
 					final String sel_1 = first.getSelectedPath();
 					final String sel_2 = second.getSelectedPath();
-					IDeploymentService ds = second.getDeploymentService();
+					final IDeploymentService ds = second.getDeploymentService();
+					
 					if(sel_1!=null && sel_2!=null)
 					{
-						File source = new File(sel_1);
-						ds.putFile(new FileContent(source), sel_2)
-							.addResultListener(new SwingDefaultResultListener()
+						final File source = new File(sel_1);
+						
+						final int fragmentsize = DeploymentService.FRAGMENT_SIZE;
+						final int len = (int)source.length();
+						int num = (int)(len/fragmentsize);
+						final int last = (int)(len%fragmentsize);
+						final int fragments = num + (last>0? 1: 0);
+						
+						try
 						{
-							public void customResultAvailable(Object result)
-							{
-								second.refreshTreePaths(null);
-								jcc.setStatusText("Copied: "+sel_1+" to: "+sel_2);
-							}
+							final FileInputStream fis = new FileInputStream(source);
 							
-							public void customExceptionOccurred(Exception exception)
+							CounterResultListener lis = new CounterResultListener(fragments, new SwingDefaultResultListener()
 							{
-								jcc.setStatusText("Copy error: "+sel_1+" to: "+sel_2+" exception: "+exception);
-							}
-						});
+								public void customResultAvailable(Object result)
+								{
+									second.refreshTreePaths(null);
+									jcc.setStatusText("Copied: "+sel_1+" to: "+sel_2);
+								}
+								
+								public void customExceptionOccurred(Exception exception)
+								{
+									jcc.setStatusText("Copy error: "+sel_1+" to: "+sel_2+" exception: "+exception);
+								}
+							})
+							{
+								public void intermediateResultAvailable(Object result)
+								{
+									if(getCnt()<fragments)
+									{
+										int percent = (int)(((double)getCnt())/fragments*100);
+										jcc.setStatusText("Copy "+percent+"% done");
+//										System.out.println("Copy "+percent+"% done");
+										FileContent frag = FileContent.createFragment(fis, source.getName(), getCnt()==fragments-1? last: fragmentsize, len);
+										ds.putFile(frag, sel_2, (String)result).addResultListener(this);
+									}
+								}
+							};
+							
+							FileContent frag = FileContent.createFragment(fis, source.getName(), 0==fragments-1? last: fragmentsize, len);
+							ds.putFile(frag, sel_2, null).addResultListener(lis);
+						}
+						catch(Exception ex)
+						{
+							jcc.setStatusText("Copy error: "+sel_1);
+						}
+						
+//						ds.putFile(new FileContent(source), sel_2)
+//							.addResultListener(new SwingDefaultResultListener()
+//						{
+//							public void customResultAvailable(Object result)
+//							{
+//								second.refreshTreePaths(null);
+//								jcc.setStatusText("Copied: "+sel_1+" to: "+sel_2);
+//							}
+//							
+//							public void customExceptionOccurred(Exception exception)
+//							{
+//								jcc.setStatusText("Copy error: "+sel_1+" to: "+sel_2+" exception: "+exception);
+//							}
+//						});
 					}
 				}
 			}

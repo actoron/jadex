@@ -8,11 +8,11 @@ import jadex.commons.future.IFuture;
  */
 public interface IDeploymentService extends IService
 {
-	/**
-	 *  Get a file.
-	 *  @return The file data.
-	 */
-	public IFuture getFile(String path);
+//	/**
+//	 *  Get a file.
+//	 *  @return The file data.
+//	 */
+//	public IFuture getFile(String path, int fragment, int fileid);
 
 	/**
 	 *  Put a file.
@@ -20,7 +20,7 @@ public interface IDeploymentService extends IService
 	 *  @param path The target path.
 	 *  @return True, when the file has been copied.
 	 */
-	public IFuture putFile(FileContent filedata, String path);
+	public IFuture putFile(FileContent filedata, String path, String fileid);
 	
 	/**
 	 *  Rename a file.
