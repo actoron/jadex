@@ -163,6 +163,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 							}
 							catch(Exception e)
 							{
+								System.out.println("err: "+clid+" "+clazz);
 								e.printStackTrace();
 								lis.exceptionOccurred(e);
 							}

@@ -1,6 +1,7 @@
 package jadex.bridge.service.library;
 
 import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.GuiClassName;
 import jadex.commons.future.IFuture;
 
 import java.net.URL;
@@ -9,6 +10,7 @@ import java.net.URL;
  *  Interface for the Library Service. It provides a platform service
  *  for dynamic loading and unloading of classes, libraries and resources.
  */
+@GuiClassName("jadex.tools.libtool.LibServiceBrowser")
 public interface ILibraryService extends IService
 {
 	//-------- constants --------
