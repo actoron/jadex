@@ -288,7 +288,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 			if(pubuilder!=null)
 			{
 				JPopupMenu pop = pubuilder.buildPopupMenu();
-				pop.show(this, x, y);
+				pop.show(tree, x, y);
 			}
 		}
 	}

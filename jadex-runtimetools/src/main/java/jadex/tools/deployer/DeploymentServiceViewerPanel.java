@@ -5,17 +5,14 @@ import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.base.gui.filetree.DefaultFileFilter;
 import jadex.base.gui.filetree.DefaultFileFilterMenuItemConstructor;
 import jadex.base.gui.filetree.DefaultNodeHandler;
-import jadex.base.gui.filetree.FileData;
 import jadex.base.gui.filetree.FileTreePanel;
 import jadex.base.service.deployment.IDeploymentService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Properties;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.PopupBuilder;
 
 import java.awt.BorderLayout;
-import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -50,8 +47,9 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		this.service = service;
 		
 		ftp = new FileTreePanel(exta, remote, true);
+		RefreshAllAction	ra	= new RefreshAllAction(ftp, service);
 		DefaultFileFilterMenuItemConstructor mic = new DefaultFileFilterMenuItemConstructor(ftp.getModel());
-		ftp.setPopupBuilder(new PopupBuilder(new Object[]{mic}));
+		ftp.setPopupBuilder(new PopupBuilder(new Object[]{ra, mic}));
 		ftp.setMenuItemConstructor(mic);
 		DefaultFileFilter ff = new DefaultFileFilter(mic);
 		ftp.setFileFilter(ff);
@@ -60,28 +58,8 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 			ftp.addNodeHandler(nodehandler);
 		ftp.getTree().getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		
-		if(!remote)
-		{
-			File[] roots = File.listRoots();
-			for(int i=0; i<roots.length; i++)
-			{
-				ftp.addTopLevelNode(roots[i]);
-			}
-		}
-		else
-		{
-			service.getRoots().addResultListener(new SwingDefaultResultListener()
-			{
-				public void customResultAvailable(Object result)
-				{
-					FileData[] roots = (FileData[])result;
-					for(int i=0; i<roots.length; i++)
-					{
-						ftp.addTopLevelNode(roots[i]);
-					}
-				}
-			});
-		}
+		// Initial state using refresh action to avoid duplicated code.
+		ra.actionPerformed(null);
 		
 		panel	= new JPanel(new BorderLayout());
 		panel.add(ftp, BorderLayout.CENTER);

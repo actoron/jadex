@@ -44,6 +44,16 @@ public class RootNode extends AbstractTreeNode
 	//-------- AbstractComponentTreeNode methods --------
 	
 	/**
+	 *  Set the children.
+	 */
+	// Made public to support external refresh in deployer.
+	public void setChildren(List newchildren)
+	{
+		this.children	= newchildren;
+		super.setChildren(newchildren);
+	}
+	
+	/**
 	 *  Get the id used for lookup.
 	 */
 	public Object	getId()
