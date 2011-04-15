@@ -1,6 +1,6 @@
 package jadex.micro.examples.mandelbrot;
 
-import jadex.bridge.IComponentListener;
+import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -96,7 +96,7 @@ public class DisplayAgent extends MicroAgent
 					@XMLClassname("dispose")
 					public Object execute(IInternalAccess ia)
 					{
-						ia.addComponentListener(new IComponentListener()
+						ia.addComponentListener(new ComponentAdapter()
 						{
 							public void componentTerminating(ChangeEvent ce)
 							{
@@ -107,10 +107,6 @@ public class DisplayAgent extends MicroAgent
 										frame.dispose();
 									}
 								});
-							}
-							
-							public void componentTerminated(ChangeEvent ce)
-							{
 							}
 						});
 						

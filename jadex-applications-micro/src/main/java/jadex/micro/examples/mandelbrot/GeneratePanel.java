@@ -1,7 +1,7 @@
 package jadex.micro.examples.mandelbrot;
 
 import jadex.base.gui.StatusBar;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -195,7 +195,7 @@ public class GeneratePanel extends JPanel
 			@XMLClassname("dispose")
 			public Object execute(IInternalAccess ia)
 			{
-				ia.addComponentListener(new IComponentListener()
+				ia.addComponentListener(new ComponentAdapter()
 				{
 					public void componentTerminating(ChangeEvent ce)
 					{
@@ -206,10 +206,6 @@ public class GeneratePanel extends JPanel
 								f.dispose();
 							}
 						});
-					}
-					
-					public void componentTerminated(ChangeEvent ce)
-					{
 					}
 				});
 				
