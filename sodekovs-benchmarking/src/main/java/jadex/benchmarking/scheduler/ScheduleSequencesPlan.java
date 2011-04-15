@@ -23,17 +23,17 @@ import java.util.HashMap;
 import sodekovs.util.math.GetRandom;
 import sodekovs.util.misc.GlobalConstants;
 
-public class ScheduleSequencesPlan extends Plan {
+public class ScheduleSequencesPlan extends AbstractSchedulerPlan {
 
-	private IComponentManagementService cms = null;
-	private IClockService clockservice = null;
-	private ArrayList<Sequence> sortedSequenceList = null;
-	// Component Identifier of System Under Test
-	private IComponentIdentifier sutCID = null;
-	// Exta of System Under Test
-	private IApplicationExternalAccess sutExta = null;
-	// Space of System Under Test
-	private AbstractEnvironmentSpace sutSpace = null;
+//	private IComponentManagementService cms = null;
+//	private IClockService clockservice = null;
+//	private ArrayList<Sequence> sortedSequenceList = null;
+//	// Component Identifier of System Under Test
+//	private IComponentIdentifier sutCID = null;
+//	// Exta of System Under Test
+//	private IApplicationExternalAccess sutExta = null;
+//	// Space of System Under Test
+//	private AbstractEnvironmentSpace sutSpace = null;
 
 	public void body() {
 
@@ -66,88 +66,81 @@ public class ScheduleSequencesPlan extends Plan {
 					if (nextSequence.getActiontype().equalsIgnoreCase(Constants.CREATE)) {
 						createComponent(nextAction);
 					} else if (nextSequence.getActiontype().equalsIgnoreCase(Constants.DELETE)) {
-						// TODO:
+						deleteComponent(nextAction);
 					}
 				}
 			}
 		}
 	}
 
-	/*
-	 * Create and start a component.
-	 */
-	private void createComponent(Action action) {
-		HashMap<String, String> componentProperties = Methods.propertyListToHashMap(action.getProperties().getProperty());
+//	/*
+//	 * Create and start a component.
+//	 */
+//	private void createComponent(Action action) {
+//		HashMap<String, String> componentProperties = Methods.propertyListToHashMap(action.getProperties().getProperty());
+//
+//		if (action.getComponenttype() == null) {
+//			System.out.println("Error: ComponentType not set!");
+//		} else if (action.getComponenttype().equalsIgnoreCase(GlobalConstants.BDI_AGENT)) {
+//			for (int i = 0; i < action.getNumberOfComponents(); i++) {
+//				//Get random required in order to avoid creating components with the same name/id.
+//				cms.createComponent(action.getComponentname() + "-" + GetRandom.getRandom(100000), action.getComponentmodel(), new CreationInfo("", componentProperties, sutCID, false, false), null).addResultListener(
+//						new DefaultResultListener() {
+//							public void resultAvailable(Object result) {
+//								System.out.println("Created Component : " + " -> " + getTimestamp());
+//							}
+//						});
+//			}
+//			// IComponentIdentifier cid = (IComponentIdentifier) fut.get(this);
+//			// IBDIExternalAccess ie = (IBDIExternalAccess) cms.getExternalAccess(cid).get(this);
+//		} else if (action.getComponenttype().equalsIgnoreCase(GlobalConstants.ISPACE_OBJECT)) {
+//			// Schedule step??
+//			// Map props = new HashMap();
+//			// Vector2Double pos = new Vector2Double(0.8, 0.8);
+//			// props.put("position", pos);
+//			for (int i = 0; i < action.getNumberOfComponents(); i++) {
+//				sutSpace.createSpaceObject(action.getComponentmodel(), componentProperties, null);
+//				System.out.println("Created Component : " + action.getComponentmodel() + " -> " + getTimestamp());
+//			}
+//
+//		} else {
+//			System.out.println("Error: ComponentType not supported! : " + action.getComponenttype());
+//		}
+//	}
 
-		if (action.getComponenttype() == null) {
-			System.out.println("Error: ComponentType not set!");
-		} else if (action.getComponenttype().equalsIgnoreCase(GlobalConstants.BDI_AGENT)) {
-			for (int i = 0; i < action.getNumberOfComponents(); i++) {
-				//Get random required in order to avoid creating components with the same name/id.
-				cms.createComponent(action.getComponentname() + "-" + GetRandom.getRandom(100000), action.getComponentmodel(), new CreationInfo("", componentProperties, sutCID, false, false), null).addResultListener(
-						new DefaultResultListener() {
-							public void resultAvailable(Object result) {
-								System.out.println("Created Component : " + " -> " + getTimestamp());
-							}
-						});
-			}
-			// IComponentIdentifier cid = (IComponentIdentifier) fut.get(this);
-			// IBDIExternalAccess ie = (IBDIExternalAccess) cms.getExternalAccess(cid).get(this);
-		} else if (action.getComponenttype().equalsIgnoreCase(GlobalConstants.ISPACE_OBJECT)) {
-			// Schedule step??
-			// Map props = new HashMap();
-			// Vector2Double pos = new Vector2Double(0.8, 0.8);
-			// props.put("position", pos);
-			for (int i = 0; i < action.getNumberOfComponents(); i++) {
-				sutSpace.createSpaceObject(action.getComponentmodel(), componentProperties, null);
-				System.out.println("Created Component : " + action.getComponentmodel() + " -> " + getTimestamp());
-			}
+//	/**
+//	 * Compute start time of a component: relative to start time of benchmark
+//	 * 
+//	 * @param sequenceCounter
+//	 * @return
+//	 */
+//	private long computeStartTime(int sequenceCounter) {
+//		if (sequenceCounter == 0) {
+//			return sortedSequenceList.get(sequenceCounter).getStarttime();
+//		} else {
+//			return (sortedSequenceList.get(sequenceCounter).getStarttime() - sortedSequenceList.get(sequenceCounter - 1).getStarttime());
+//		}
+//	}
+//
+//	/**
+//	 * Get time stamp relative to start of benchmark (without warm up phase)
+//	 * 
+//	 * @return
+//	 */
+//	private long getTimestamp() {
+//		long starttime = ((Long) sutSpace.getProperty("BENCHMARK_REAL_START_TIME_OF_SIMULATION")).longValue();
+//		return clockservice.getTime() - starttime;
+//	}
 
-			//
-			// waitFor(3000);
-			//
-			// props = new HashMap();
-			// pos = new Vector2Double(0.6, 0.6);
-			// props.put("position", pos);
-			// ISpaceObject objI = sutSpace.createSpaceObject("sentry", props, null);
-		} else {
-			System.out.println("Error: ComponentType not supported! : " + action.getComponenttype());
-		}
-	}
-
-	/**
-	 * Compute start time of a component: relative to start time of benchmark
-	 * 
-	 * @param sequenceCounter
-	 * @return
-	 */
-	private long computeStartTime(int sequenceCounter) {
-		if (sequenceCounter == 0) {
-			return sortedSequenceList.get(sequenceCounter).getStarttime();
-		} else {
-			return (sortedSequenceList.get(sequenceCounter).getStarttime() - sortedSequenceList.get(sequenceCounter - 1).getStarttime());
-		}
-	}
-
-	/**
-	 * Get time stamp relative to start of benchmark (without warm up phase)
-	 * 
-	 * @return
-	 */
-	private long getTimestamp() {
-		long starttime = ((Long) sutSpace.getProperty("BENCHMARK_REAL_START_TIME_OF_SIMULATION")).longValue();
-		return clockservice.getTime() - starttime;
-	}
-
-	/**
-	 * 
-	 */
-	private void init(SuTinfo sut) {
-		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
-		clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
-		sortedSequenceList = sut.getSortedSequenceList();
-		sutCID = sut.getSutCID();
-		sutExta = sut.getSutExta();
-		sutSpace = sut.getSutSpace();
-	}
+//	/**
+//	 * 
+//	 */
+//	private void init(SuTinfo sut) {
+//		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+//		clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+//		sortedSequenceList = sut.getSortedSequenceList();
+//		sutCID = sut.getSutCID();
+//		sutExta = sut.getSutExta();
+//		sutSpace = sut.getSutSpace();
+//	}
 }

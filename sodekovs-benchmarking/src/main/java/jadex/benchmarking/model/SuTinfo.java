@@ -62,4 +62,7 @@ public class SuTinfo {
 	public void setSutSpace(AbstractEnvironmentSpace sutSpace) {
 		this.sutSpace = sutSpace;
 	}
+	public String toString(){
+		return "SuTinfo:  " + sutCID + " - " + sutExta + " - " + sutSpace; 
+	}
 }

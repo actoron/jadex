@@ -47,8 +47,6 @@ public class InitBenchmarkingPlan extends Plan {
 	private IComponentIdentifier schedulerCID = null;
 
 	public void body() {
-		
-		waitFor(250000);
 
 		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 		clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
@@ -56,6 +54,7 @@ public class InitBenchmarkingPlan extends Plan {
 		String benchmarkDescription = (String) getBeliefbase().getBelief("scheduleDescriptionFile").getFact();
 		System.out.println("#InitBench# Init Benchmark Agent with configuration file: " + benchmarkDescription);
 		Schedule benchConf = (Schedule) XMLHandler.parseXMLFromXMLFile(benchmarkDescription, Schedule.class);
+		getBeliefbase().getBelief("schedule").setFact(benchConf);
 
 		// Create list of sequences, ordered by their start time
 		sortedSequenceList = (ArrayList<Sequence>) benchConf.getSequences().getSequence();
@@ -67,16 +66,23 @@ public class InitBenchmarkingPlan extends Plan {
 			startSuT(benchConf);
 		}
 
-		//
 		getBeliefbase().getBelief("suTinfo").setFact(new SuTinfo(sortedSequenceList, sutCID, sutExta, sutSpace));
-		
+
 		// Start scheduler, that handles the execution of the sequences of the conducted benchmark.
 		// Scheduler is started in suspend mode.
 		startScheduler();
 
-		// Resume SuT and scheduler
-		cms.resumeComponent(sutCID);
-		cms.resumeComponent(schedulerCID);
+		// Resume SuT
+		cms.resumeComponent(sutCID).get(this);
+		
+		// start warm up phase, if defined. Schedule starts after this phase its execution
+		if (benchConf.getWarmUpTime() != null) {
+			waitFor(benchConf.getWarmUpTime());
+		}
+		
+		// Resume scheduler
+		cms.resumeComponent(schedulerCID).get(this);
+		getBeliefbase().getBelief("benchmarkStatus").setFact(Constants.RUNNING);
 
 		// TODO: Hack: Synchronize start time!
 		long startTime = clockservice.getTime();
@@ -84,6 +90,7 @@ public class InitBenchmarkingPlan extends Plan {
 
 		// Handle termination of benchmark
 		terminateBenchmark(benchConf);
+		getBeliefbase().getBelief("benchmarkStatus").setFact(Constants.TERMINATED);
 	}
 
 	/*
@@ -104,10 +111,10 @@ public class InitBenchmarkingPlan extends Plan {
 	/*
 	 * Start scheduler in suspended mode.
 	 */
-	private void startScheduler(){
+	private void startScheduler() {
 		HashMap args = new HashMap();
 		args.put(Constants.SUT_INFO, new SuTinfo(sortedSequenceList, sutCID, sutExta, sutSpace));
-		
+
 		IFuture fut = cms.createComponent("Scheduler" + GetRandom.getRandom(100000), Constants.PATH_OF_SCHEDULER, new CreationInfo(null, args, null, true, false), null);
 		schedulerCID = (IComponentIdentifier) fut.get(this);
 	}
@@ -167,7 +174,7 @@ public class InitBenchmarkingPlan extends Plan {
 	 * Destroy SuT
 	 */
 	private void destroySuT() {
-		
+
 		cms.destroyComponent(schedulerCID).get(this);
 		cms.destroyComponent(sutExta.getComponentIdentifier()).get(this);
 	}

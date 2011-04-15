@@ -6,6 +6,7 @@ import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.IDFServiceDescription;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
+import jadex.benchmarking.model.description.IBenchmarkingDescription;
 import jadex.benchmarking.services.IBenchmarkingManagementService;
 import jadex.bridge.service.IService;
 import jadex.commons.Properties;
@@ -19,6 +20,7 @@ import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.SGUI;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -58,7 +60,7 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel
 	//-------- attributes --------
 	
 	/** The df service. */
-	protected IDF df;
+//	protected IDF df;
 	
 	/** Benchmarking Management service */
 	protected IBenchmarkingManagementService benchServ;
@@ -114,26 +116,31 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel
 	public IFuture init(IControlCenter jcc, IService service)
 	{
 //		this.df	= (IDF)service;
+		this.setLayout(new BorderLayout());
+		
 		this.benchServ = (IBenchmarkingManagementService) service;
-		
-		add(new JLabel("Once"), BorderLayout.NORTH);
-		
-		JButton	button	= new JButton("List of Benchmarks", icons.getIcon("refresh"));
-		button.setMargin(new Insets(2,2,2,2));
-		button.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				System.out.println("HHHELO");
-				searchBenchmarks();
-			}
-		});
-		add(button, BorderLayout.SOUTH);
 		
 //		service_panel = new ServiceDescriptionPanel();
 		service_table = new BenchmarkingServiceTable();
 		JScrollPane stscroll = new JScrollPane(service_table);
 		stscroll.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Found Benchmarks"));
+		
+		JButton	refreshBtn	= new JButton("List of Benchmarks", icons.getIcon("refresh"));
+		refreshBtn.setMargin(new Insets(2,2,2,2));
+		refreshBtn.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+//				System.out.println("HHHELO");
+				searchBenchmarks();
+			}
+		});
+		
+		JPanel buttonPnl = new JPanel(new FlowLayout());
+		buttonPnl.add(new JLabel());//Hack to place in button in the center
+		buttonPnl.add(refreshBtn);
+		buttonPnl.add(new JLabel());//Hack to place in button in the center
+		add(buttonPnl, BorderLayout.NORTH);
 //		
 //		component_table = new DFComponentTable(this);
 //		JScrollPane atscroll = new JScrollPane(component_table);
@@ -368,23 +375,37 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel
 //	}
 	
 	protected void searchBenchmarks(){
-		IFuture fut = this.benchServ.getStatusOfRunningBenchmarkExperiments();
-		fut.addResultListener(new IResultListener() {
-			
-			@Override
-			public void resultAvailable(Object result)
+//		IFuture fut = this.benchServ.getStatusOfRunningBenchmarkExperiments();
+//		fut.addResultListener(new IResultListener() {
+//			
+//			@Override
+//			public void resultAvailable(Object result)
+//			{
+//				String st = (String) result;
+//				System.out.println(" -> res: " + st);
+//			}
+//			
+//			@Override
+//			public void exceptionOccurred(Exception exception) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//		});
+		this.benchServ.getStatusOfRunningBenchmarkExperiments().addResultListener(new SwingDefaultResultListener(this)
+		{
+			public void customResultAvailable(Object result) 
 			{
-				String st = (String) result;
-				System.out.println(" -> res: " + st);
-			}
-			
-			@Override
-			public void exceptionOccurred(Exception exception) {
-				// TODO Auto-generated method stub
+				IBenchmarkingDescription[] benchmarks = (IBenchmarkingDescription[])result;
+				System.out.println("Found: Benchmarks"+ benchmarks.length);
 				
-			}
+//				if(old_ads == null || !Arrays.equals(old_ads, benchmarks))
+//				{
+					service_table.setComponentDescriptions(benchmarks);
+//					updateServices(benchmarks);
+//					updateDetailedService();
+//					old_ads = benchmarks;
+//				}
+			}	
 		});
-//		String res = (String) fut.get(new ThreadSuspendable());
-//		System.out.println(" -> res: " + res);
 	}
 }

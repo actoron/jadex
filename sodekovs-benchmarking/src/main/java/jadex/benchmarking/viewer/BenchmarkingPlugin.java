@@ -1,6 +1,5 @@
 package jadex.benchmarking.viewer;
 
-import jadex.base.fipa.IDF;
 import jadex.benchmarking.services.IBenchmarkingManagementService;
 import jadex.bridge.service.IService;
 import jadex.commons.future.DelegationResultListener;
@@ -13,7 +12,7 @@ import javax.swing.Icon;
 
 
 /**
- *  The df service plugin is used to wrap the df panel as JCC plugin.
+ *  The benchmarking service plugin is used to wrap the benchmarking panel as JCC plugin.
  */
 public class BenchmarkingPlugin extends AbstractServicePlugin
 {

@@ -13,6 +13,7 @@ import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ThreadSuspendable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,89 +65,77 @@ public class BenchmarkingManagementService extends BasicService implements IBenc
 		final Future fut = new Future();
 		final ArrayList<IBenchmarkingDescription> benchmarks = new ArrayList<IBenchmarkingDescription>();
 
-		SServiceProvider.getServices(provider, IBenchmarkingExecutionService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(new IResultListener() 
-			{
-				public void resultAvailable(Object result)
-				{
-					Collection coll = (Collection)result;
-					System.out.println("Coll length: "+coll.size());
-					// Ignore search failures of remote dfs
-					CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new IResultListener()
-					{
-						public void resultAvailable(Object result)
-						{
-							System.out.println("Part 2: "+ result.getClass());
-							// Add all services of all remote dfs
-							for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
-							{
-								IBenchmarkingDescription[] res = (IBenchmarkingDescription[])it.next();
-								if(res!=null)
-								{
-									for(int i=0; i<res.length; i++)
-									{
-										benchmarks.add(res[i]);
-									}
-								}
-							}
-//							open.remove(fut);
-//							System.out.println("Federated search: "+ret);//+" "+open);
-							fut.setResult(benchmarks.toArray(new BenchmarkingDescription[benchmarks.size()]));
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-//							open.remove(fut);
-							fut.setException(exception);
-//								fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
-						}
-					});
-					for(Iterator it=coll.iterator(); it.hasNext(); )
-					{
-						IBenchmarkingExecutionService benchServ = (IBenchmarkingExecutionService)it.next();
-//						if(remotedf!=DirectoryFacilitatorService.this)
-//						{
-						benchServ.getBenchmarkStatus().addResultListener(lis);
-//						}
-//						else
-//						{
-//							lis.resultAvailable(null);
-//						}
-					}
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-//					open.remove(fut);
-					fut.setResult(benchmarks.toArray(new BenchmarkingExecutionService[benchmarks.size()]));
-				}
-			});
-//			public void resultAvailable(Object result) {
-//				Collection coll = (Collection) result;
-//				 System.out.println("dfs: "+coll.size());
-//				 ret.setResult(benchmarks);
+		SServiceProvider.getServices(provider, IBenchmarkingExecutionService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(new IResultListener() {
+			public void resultAvailable(Object result) {
+				Collection coll = (Collection) result;
+				System.out.println("Coll length: " + coll.size());
 				// Ignore search failures of remote dfs
-//				CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new IResultListener() {
-//					public void resultAvailable(Object result) {
-//						// Add all services of all remote dfs
-//						for (Iterator it = ((Collection) result).iterator(); it.hasNext();) {
-//							benchmarks.add((String) it.next());
-//						}
-//						ret.setResult(benchmarks);
-//					}
-//
-//					public void exceptionOccurred(Exception exception) {
-//						// open.remove(fut);
-//						ret.setException(exception);
-//						// fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
-//					}
-//				});				
-//			}
-//
-//			public void exceptionOccurred(Exception exception) {
-//				// open.remove(fut);
-//				ret.setResult(exception);
-//			}
-//		});
+				CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new IResultListener() {
+					public void resultAvailable(Object res) {
+						// System.out.println("Part 2 length: "+ ((Collection)result).size());
+						// Add all services of all remote dfs
+						for (Iterator it = ((Collection) res).iterator(); it.hasNext();) {
+							IBenchmarkingDescription benchDesc = (IBenchmarkingDescription) it.next();
+							if (benchDesc != null) {
+								benchmarks.add(benchDesc);
+							}
+						}
+						// open.remove(fut);
+						// System.out.println("Federated search: "+ret);//+" "+open);
+						fut.setResult(benchmarks.toArray(new BenchmarkingDescription[benchmarks.size()]));
+					}
+
+					public void exceptionOccurred(Exception exception) {
+						// open.remove(fut);
+						fut.setException(exception);
+						// fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
+					}
+				});
+				for (Iterator it = coll.iterator(); it.hasNext();) {
+					IBenchmarkingExecutionService benchServ = (IBenchmarkingExecutionService) it.next();
+					// if(remotedf!=DirectoryFacilitatorService.this)
+					// {
+					benchServ.getBenchmarkStatus().addResultListener(lis);
+					// }
+					// else
+					// {
+					// lis.resultAvailable(null);
+					// }
+				}
+			}
+
+			public void exceptionOccurred(Exception exception) {
+				// open.remove(fut);
+				fut.setResult(benchmarks.toArray(new BenchmarkingExecutionService[benchmarks.size()]));
+			}
+		});
+		// public void resultAvailable(Object result) {
+		// Collection coll = (Collection) result;
+		// System.out.println("dfs: "+coll.size());
+		// ret.setResult(benchmarks);
+		// Ignore search failures of remote dfs
+		// CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new IResultListener() {
+		// public void resultAvailable(Object result) {
+		// // Add all services of all remote dfs
+		// for (Iterator it = ((Collection) result).iterator(); it.hasNext();) {
+		// benchmarks.add((String) it.next());
+		// }
+		// ret.setResult(benchmarks);
+		// }
+		//
+		// public void exceptionOccurred(Exception exception) {
+		// // open.remove(fut);
+		// ret.setException(exception);
+		// // fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
+		// }
+		// });
+		// }
+		//
+		// public void exceptionOccurred(Exception exception) {
+		// // open.remove(fut);
+		// ret.setResult(exception);
+		// }
+		// });
 
 		return fut;
 	}

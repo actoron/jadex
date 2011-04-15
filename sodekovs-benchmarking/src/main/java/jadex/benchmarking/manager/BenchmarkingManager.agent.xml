@@ -36,7 +36,7 @@
 
 		<!-- The parsed schedule xml file. -->
 		<belief name="schedule" class="Schedule" />
-		
+
 		<!-- Information about the SuT. -->
 		<belief name="suTinfo" class="SuTinfo" />
 
@@ -48,11 +48,17 @@
 			</fact>
 		</belief>
 
+		<!-- Store information about the status of the executed benchmark: preparing_start, 
+			running, terminated. -->
+		<belief name="benchmarkStatus" class="String">
+			<fact>preparing_start</fact>
+		</belief>
+
 		<!-- Reference to the memory Loger Capability -->
 		<belief name="MemoryLogerID" class="String">
 			<fact> String.valueOf(new java.util.Random().nextInt())</fact>
 			<assignto ref="memoryLoggerCap.MemoryLoggerID" />
-		</belief>		
+		</belief>
 
 	</beliefs>
 
@@ -83,9 +89,10 @@
 			</plans>
 		</configuration>
 	</configurations>
-	
+
 	<services>
-		<providedservice class="IBenchmarkingExecutionService">new BenchmarkingExecutionService($scope)</providedservice>
-	</services>	
+		<providedservice class="IBenchmarkingExecutionService">new
+			BenchmarkingExecutionService($scope)</providedservice>
+	</services>
 
 </agent>

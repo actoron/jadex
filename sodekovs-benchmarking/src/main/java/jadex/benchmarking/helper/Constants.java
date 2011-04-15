@@ -23,5 +23,9 @@ public class Constants {
 	public static final String LIST = "list";
 	public static final String PATH_OF_SCHEDULER = "../sodekovs-benchmarking/src/main/java/jadex/benchmarking/scheduler/Scheduler.agent.xml";
 	public static final String SUT_INFO = "SuTinfo";
+	public static final String TERMINATED = "terminated";
+	public static final String RUNNING = "running";
+	public static final String PREPARING_START = "preparing_start";
+	
 
 }

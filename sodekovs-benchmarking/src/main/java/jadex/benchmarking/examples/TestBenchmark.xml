@@ -3,7 +3,7 @@
 <!-- Document : TestBenchmark: Workload 1 Created on : 18. März 2011, 16:23 
 	Author : vilenica Description: Purpose of the document follows. -->
 
-<Schedule type="Workload" name="W1" warmUpTime="1000000">
+<Schedule type="Workload" name="W1" warmUpTime="1000">
 	<TerminateCondition>
 		<!-- <TerminationTime value="7000" /> -->
 		<SemanticCondition condition="$object.getProperty(&quot;ore&quot;) >= 55">
@@ -22,7 +22,7 @@
 		</Properties>
 	</SytemUnderTest>
 	<Sequences>
-		<Sequence starttime="2500" actiontype="create">
+		<Sequence starttime="22500" actiontype="create">
 			<RepeatConfiguration type="list" values="3500;5000;7000;23000;" />
 			<Actions>
 				<Action componentname="CarryW1" componenttype="BDIAgent"
@@ -52,6 +52,38 @@
 					componentmodel="homebase">
 					<Properties>
 						<Property name="speed" value="42"></Property>
+					</Properties>
+				</Action>
+			</Actions>
+		</Sequence>
+		<Sequence starttime="3000" actiontype="delete">
+			<Actions>
+				<Action componentname="Homebase" componenttype="ISpaceObject"
+					componentmodel="homebase">
+					<Properties>
+						<Property name="speed" value="42"></Property>
+					</Properties>
+				</Action>
+			</Actions>
+		</Sequence>
+		<Sequence starttime="6500" actiontype="create">
+			<!-- <RepeatConfiguration type="list" values="3500;5000;7000;23000;" /> -->
+			<Actions>
+				<Action componentname="CarryW1" componenttype="BDIAgent"
+					componentmodel="../sodekovs-simulationcontrol/src/main/java/jadex/simulation/examples/marsworld/carry/Carry.agent.xml" numberOfComponents="3">
+					<Properties>
+						<Property name="sspeed" value="22"></Property>
+					</Properties>
+				</Action>
+			</Actions>
+		</Sequence>
+		<Sequence starttime="10000" actiontype="delete">
+			<!-- <RepeatConfiguration type="list" values="3500;5000;7000;23000;" /> -->
+			<Actions>
+				<Action componentname="CarryW1" componenttype="BDIAgent"
+					componentmodel="jadex.simulation.examples.marsworld.carry.carry" numberOfComponents="3"> 
+					<Properties>
+						<Property name="sspeed" value="22"></Property>
 					</Properties>
 				</Action>
 			</Actions>
