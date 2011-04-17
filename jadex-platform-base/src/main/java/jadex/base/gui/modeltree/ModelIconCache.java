@@ -5,6 +5,7 @@ import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.DirNode;
 import jadex.base.gui.filetree.FileNode;
+import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.filetree.IIconCache;
 import jadex.base.gui.filetree.JarNode;
 import jadex.base.gui.filetree.RemoteDirNode;
@@ -74,74 +75,88 @@ public class ModelIconCache implements IIconCache
 	{
 		Icon	ret	= null;
 		
-		if(icons.containsKey(node))
+		ret	= (Icon)myicons.get(node);
+		
+		if(ret==null)
 		{
-			ret	= (Icon)icons.get(node);
-		}
-		else if(myicons.containsKey(node))
-		{
-			ret	= (Icon)myicons.get(node);
-		}
-		else if(node instanceof JarNode || node instanceof RemoteJarNode)
-		{
-			ret = (Icon)icons.get("src_jar");
-		}
-		else if(node instanceof DirNode || node instanceof RemoteDirNode)
-		{
-			if(node.getParent() instanceof RootNode)
+			String type = null;
+			if(node instanceof JarNode || node instanceof RemoteJarNode)
 			{
-				ret = (Icon)icons.get("src_folder");
+				type = "src_jar";
 			}
-			else
+			else if(node instanceof DirNode || node instanceof RemoteDirNode)
 			{
-				ret = (Icon)icons.get("package");
-			}
-		}
-		else if((node instanceof FileNode || node instanceof RemoteFileNode) && exta!=null)
-		{
-			// Todo: remember ongoing searches for efficiency?
-//			System.out.println("getIcon: "+type);
-			final String file = node instanceof FileNode? 
-				((FileNode)node).getFile().getAbsolutePath():
-				((RemoteFileNode)node).getRemoteFile().getPath();
-			
-			SComponentFactory.getFileType(exta, file)
-				.addResultListener(new SwingDefaultResultListener(tree)
-			{
-				public void customResultAvailable(Object result)
+				if(node.getParent() instanceof RootNode)
 				{
-					SComponentFactory.getFileType(exta, file)
-						.addResultListener(new SwingDefaultResultListener(tree)
+					type = "src_folder";
+				}
+				else
+				{
+					type = "package";
+				}
+			}
+			if(type!=null)
+				ret = (Icon)icons.get(type);
+		}
+		
+		if(ret==null)
+		{
+			if(node instanceof IFileNode && exta!=null)
+			{
+				// Todo: remember ongoing searches for efficiency?
+	//			System.out.println("getIcon: "+type);
+				final String file = ((IFileNode)node).getFileName(); 
+				
+				SComponentFactory.getFileType(exta, file)
+					.addResultListener(new SwingDefaultResultListener(tree)
+				{
+					public void customResultAvailable(Object result)
 					{
-						public void customResultAvailable(Object result)
+						final String type = (String)result;
+						if(type!=null)
 						{
-							final String type = (String)result;
-							if(type!=null)
+							Icon icon = (Icon)myicons.get(type);
+							if(icon==null)
 							{
+//								System.out.println("deep: "+type+" "+file);
 								SComponentFactory.getFileTypeIcon(exta, type)
 									.addResultListener(new SwingDefaultResultListener(tree)
 								{
 									public void customResultAvailable(Object result)
 									{
-										myicons.put(node, result);
-										TreeModel	model	= tree.getModel();
-										if(model instanceof AsyncTreeModel)
-										{
-											((AsyncTreeModel)model).fireNodeChanged(node);
-										}
-										else
-										{
-											tree.repaint();
-										}
+										myicons.put(node, (Icon)result);
+										myicons.put(type, (Icon)result);
+										refresh(node);
 									}
 								});
-							}					
-						}
-					});
-				}
-			});
+							}
+							else
+							{
+								myicons.put(node, icon);
+								refresh(node);
+							}
+						}					
+					}
+				});
+			}
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void refresh(ITreeNode node)
+	{
+		TreeModel model	= tree.getModel();
+		if(model instanceof AsyncTreeModel)
+		{
+			((AsyncTreeModel)model).fireNodeChanged(node);
+		}
+		else
+		{
+			tree.repaint();
+		}
 	}
 }
