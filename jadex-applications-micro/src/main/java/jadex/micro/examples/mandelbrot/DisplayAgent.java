@@ -98,7 +98,7 @@ public class DisplayAgent extends MicroAgent
 					{
 						ia.addComponentListener(new ComponentAdapter()
 						{
-							public void componentTerminating(ChangeEvent ce)
+							public IFuture componentTerminating(ChangeEvent ce)
 							{
 								SwingUtilities.invokeLater(new Runnable()
 								{
@@ -107,6 +107,7 @@ public class DisplayAgent extends MicroAgent
 										frame.dispose();
 									}
 								});
+								return IFuture.DONE;
 							}
 						});
 						

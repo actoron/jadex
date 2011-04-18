@@ -142,9 +142,10 @@ public class ChatPanel extends JPanel
 			{
 				ia.addComponentListener(new ComponentAdapter()
 				{
-					public void componentTerminated(ChangeEvent ce)
+					public IFuture componentTerminated(ChangeEvent ce)
 					{
 						f.setVisible(false);
+						return IFuture.DONE;
 					}
 				});
 				return null;

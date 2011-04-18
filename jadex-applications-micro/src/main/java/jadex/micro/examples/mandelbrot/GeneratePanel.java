@@ -7,6 +7,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
@@ -197,7 +198,7 @@ public class GeneratePanel extends JPanel
 			{
 				ia.addComponentListener(new ComponentAdapter()
 				{
-					public void componentTerminating(ChangeEvent ce)
+					public IFuture componentTerminating(ChangeEvent ce)
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
@@ -206,6 +207,7 @@ public class GeneratePanel extends JPanel
 								f.dispose();
 							}
 						});
+						return IFuture.DONE;
 					}
 				});
 				
