@@ -183,16 +183,6 @@ public class RootNode extends AbstractTreeNode
 	}
 	
 	/**
-	 *  Get all children.
-	 */
-	public ITreeNode[] getChildren()
-	{
-		assert SwingUtilities.isEventDispatchThread();
-		
-		return (ITreeNode[])children.toArray(new ITreeNode[0]);
-	}
-	
-	/**
 	 *  Returns the index of node in the receivers children. If the receiver
 	 *  does not contain node, -1 will be returned.
 	 *  @param node

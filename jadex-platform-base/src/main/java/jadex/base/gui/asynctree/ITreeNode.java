@@ -1,5 +1,7 @@
 package jadex.base.gui.asynctree;
 
+import jadex.commons.future.IFuture;
+
 import java.util.List;
 
 import javax.swing.Icon;
@@ -60,6 +62,11 @@ public interface ITreeNode
 	 *  Get the cached children, i.e. do not start any background processes for updating the children.
 	 */
 	public List	getCachedChildren();
+	
+	/**
+	 *  Get the current children, i.e. start a new update process and provide the result as a future.
+	 */
+	public IFuture	getChildren();
 	
 	/**
 	 *  True, if the node has properties that can be displayed.

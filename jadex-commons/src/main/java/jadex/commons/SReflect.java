@@ -106,7 +106,6 @@ public class SReflect
 		return classForName0(name, true, classloader);
 	}
 
-
 	/**
 	 *  Extension for Class.forName(), because primitive
 	 *  types are not supported.
@@ -129,45 +128,61 @@ public class SReflect
 			if(classloader==null)
 				classloader = SReflect.class.getClassLoader();
 
-			// For arrays get plain name and count occurrences of '['.
-			String	clname	= name;
-			if(clname.indexOf('[')!=-1)
+			Map	cache	= (Map)classcache.get(classloader);
+			if(cache==null)
 			{
-				int	dimension	= 0;
-				for(int i=clname.indexOf('['); i!=-1; i=clname.indexOf('[', i+1))
-				{
-					dimension++;
-				}
-				clname	= clname.substring(0, clname.indexOf('['));
-				Class	clazz	= classForName0(clname, initialize, classloader);
-				if(clazz!=null)
-				{
-					// Create array class object. Hack!!! Is there a better way?
-					ret	= Array.newInstance(clazz, new int[dimension]).getClass();
-				}
+				cache	= Collections.synchronizedMap(new HashMap());
+				classcache.put(classloader, cache);
 			}
-			else
+			ret	= cache.get(name);
+			
+			if(ret==null)
 			{
+				// For arrays get plain name and count occurrences of '['.
+				String	clname	= name;
+				if(clname.indexOf('[')!=-1)
+				{
+					int	dimension	= 0;
+					for(int i=clname.indexOf('['); i!=-1; i=clname.indexOf('[', i+1))
+					{
+						dimension++;
+					}
+					clname	= clname.substring(0, clname.indexOf('['));
+					Class	clazz	= classForName0(clname, initialize, classloader);
+					if(clazz!=null)
+					{
+						// Create array class object. Hack!!! Is there a better way?
+						ret	= Array.newInstance(clazz, new int[dimension]).getClass();
+					}
+				}
+				else
+				{
+					
+					try
+					{
+						// Do not use ClassLoader.loadClass() due to Java bug #6434149
+						ret = Class.forName(name, initialize, classloader);
+	//					System.out.println("cFN0: loaded "+clazz);
+					}
+					catch(ClassNotFoundException e)
+					{
+	//					e.printStackTrace();
+					}
+					// Also handled by dynamic url class loader, but not in applets/webstart.
+					catch(LinkageError e)
+					{
+	//					e.printStackTrace();
+					}
+				}
 				
-				try
-				{
-					// Do not use ClassLoader.loadClass() due to Java bug #6434149
-					ret = Class.forName(name, initialize, classloader);
-//					System.out.println("cFN0: loaded "+clazz);
-				}
-				catch(ClassNotFoundException e)
-				{
-//					e.printStackTrace();
-				}
-				// Also handled by dynamic url class loader, but not in applets/webstart.
-				catch(LinkageError e)
-				{
-//					e.printStackTrace();
-				}
+				if(ret==null)
+					ret	= "notfound";
+				
+				cache.put(name, ret);
 			}
 		}
 		
-		return (Class)ret;
+		return ret instanceof Class ? (Class)ret : null;
 	}
 	
 	/**

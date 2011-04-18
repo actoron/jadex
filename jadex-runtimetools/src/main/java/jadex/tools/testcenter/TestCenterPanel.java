@@ -14,6 +14,7 @@ import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IRemoteResultListener;
@@ -1045,6 +1046,7 @@ public class TestCenterPanel extends JSplitPanel
 		public void	start()
 		{
 			this.starttime	= System.currentTimeMillis();
+			this.aborted	= false;
 			startNextTestcases();
 		}
 
@@ -1055,18 +1057,27 @@ public class TestCenterPanel extends JSplitPanel
 		{
 			this.aborted	= true;
 			
+			CounterResultListener	crl	= new CounterResultListener(testcases.size(), new SwingDefaultResultListener(TestCenterPanel.this)
+			{
+				public void customResultAvailable(Object result)
+				{
+					testcases.clear();
+					updateProgress();
+					updateDetails();			
+				}
+			});
 			for(Iterator it=testcases.values().iterator(); it.hasNext(); )
 			{
 				IComponentIdentifier	testcase	= (IComponentIdentifier)it.next(); 
 				if(testcase!=null)
 				{
-					abortTestcase(testcase);
+					abortTestcase(testcase).addResultListener(crl);
+				}
+				else
+				{
+					crl.resultAvailable(null);
 				}
 			}
-			
-			testcases.clear();
-			updateProgress();
-			updateDetails();			
 		}
 		
 		//-------- helper methods --------
@@ -1079,7 +1090,7 @@ public class TestCenterPanel extends JSplitPanel
 			assert SwingUtilities.isEventDispatchThread();
 			
 			// Start next open testcase as long as more testcases allowed.
-			for(int i=0; i<results.length && (concurrency==-1 || testcases.size()<concurrency); i++)
+			for(int i=0; !aborted && i<results.length && (concurrency==-1 || testcases.size()<concurrency); i++)
 			{
 				if(!testcases.containsKey(names[i]) && results[i]==null)
 				{
@@ -1132,24 +1143,22 @@ public class TestCenterPanel extends JSplitPanel
 		/**
 		 *  Abort a testcase.
 		 */
-		protected void	abortTestcase(final IComponentIdentifier testcase)
+		protected IFuture	abortTestcase(final IComponentIdentifier testcase)
 		{
-			SServiceProvider.getService(plugin.getJCC().getPlatformAccess().getServiceProvider(),
+			final Future	ret	= new Future();
+			
+			SServiceProvider.getService(plugin.getJCC().getJCCAccess().getServiceProvider(),
 				IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
+				.addResultListener(new SwingDelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
 				{
 					IComponentManagementService	cms	= (IComponentManagementService)result;
-					cms.destroyComponent(testcase).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
-					{
-						public void customResultAvailable(Object result)
-						{
-						}
-					});
+					cms.destroyComponent(testcase).addResultListener(new SwingDelegationResultListener(ret));
 				}
 			});
-			// Todo: wait for result?
+			
+			return ret;
 		}
 		
 		//-------- helper class --------
@@ -1219,6 +1228,7 @@ public class TestCenterPanel extends JSplitPanel
 								}
 							}
 							testcases.remove(name);
+							running	= !testcases.isEmpty();
 							updateProgress();
 							updateDetails();
 							startNextTestcases();

@@ -1,6 +1,8 @@
 package jadex.base.gui.asynctree;
 
 import jadex.commons.SUtil;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,7 +32,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	// Hack!!! Model should not have access to ui, required for refresh only on expanded nodes.
 	protected final JTree	tree;
 	
-	/** The component description. */
+	/** The cached children. */
 	private List	children;
 	
 	/** Flag to indicate search in progress. */
@@ -41,6 +43,9 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	
 	/** Flag to indicate that children were added / removed during ongoing search (->restart search). */
 	protected boolean	dirty;
+	
+	/** The children future (result of next search). */
+	protected Future	childrenfuture;
 	
 	//-------- constructors --------
 	
@@ -158,6 +163,25 @@ public abstract class AbstractTreeNode	implements ITreeNode
 
 		return children!=null ? children : Collections.EMPTY_LIST;
 	}
+	
+	/**
+	 *  Get the current children, i.e. start a new update process and provide the result as a future.
+	 */
+	public IFuture	getChildren()
+	{
+		assert SwingUtilities.isEventDispatchThread();
+
+		if(childrenfuture==null)
+		{
+			childrenfuture	= new Future();
+		}
+		
+		IFuture	ret	= childrenfuture;
+		
+		searchChildren();	// might reset childrenfuture.
+		
+		return ret;
+	}
 
 	/**
 	 *  True, if the node has properties that can be displayed.
@@ -196,7 +220,6 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	 *  Set the children.
 	 *  No children should be represented as empty list to avoid
 	 *  ongoing search for children.
-	 *  Method may be called from any thread.
 	 */
 	protected void	setChildren(List newchildren)
 	{
@@ -309,6 +332,12 @@ public abstract class AbstractTreeNode	implements ITreeNode
 			assert SUtil.equals(children, newcs) : "Node inconsistency:\noldcs="+oldcs+"\nnewcs="+newcs
 //				+"\nadded="+added+"\nremoved="+removed
 				+"\nresult="+children;
+			
+			if(childrenfuture!=null)
+			{
+				childrenfuture.setResult(new ArrayList(children));
+				childrenfuture	= null;
+			}
 			
 			if(dorecurse && tree.isExpanded(new TreePath(model.buildTreePath(AbstractTreeNode.this).toArray())))
 			{

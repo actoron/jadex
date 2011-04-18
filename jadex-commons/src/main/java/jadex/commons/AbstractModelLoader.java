@@ -30,7 +30,7 @@ public abstract class AbstractModelLoader
 	 */
 	public AbstractModelLoader(String[] extensions)
 	{
-		this(extensions, 200);
+		this(extensions, 450);
 	}
 	
 	/**

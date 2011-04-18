@@ -4,9 +4,9 @@ import jadex.base.SComponentFactory;
 import jadex.bridge.IArgument;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDelegationResultListener;
 
 /**
  *  Helper class to identify test cases.
@@ -20,13 +20,13 @@ public class STestCenter
 	{
 		final Future	ret	= new Future();
 		
-		SComponentFactory.isLoadable(access, model).addResultListener(new SwingDelegationResultListener(ret)
+		SComponentFactory.isLoadable(access, model).addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
 				if(((Boolean)result).booleanValue())
 				{
-					SComponentFactory.loadModel(access, model).addResultListener(new SwingDelegationResultListener(ret)
+					SComponentFactory.loadModel(access, model).addResultListener(new DelegationResultListener(ret)
 					{
 						public void customResultAvailable(Object result)
 						{

@@ -12,6 +12,7 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.collection.SCollection;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
@@ -23,6 +24,10 @@ import jadex.commons.gui.ToolTipAction;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -391,39 +396,81 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	}
 	
 	/**
-	 *  Add testcases for a file or directory recusively.
+	 *  Recursively get all leaf (sub)children of a node.
+	 */
+	protected IFuture	getLeafChildren(IFileNode node)
+	{
+		final Future	fut	= new Future();
+		
+		if(node.isDirectory())
+		{
+			node.getChildren().addResultListener(new SwingDelegationResultListener(fut)
+			{
+				public void customResultAvailable(Object result)
+				{
+					List	children	= (List)result;
+					final	List	list	= new ArrayList();
+					CounterResultListener	crl	= new CounterResultListener(children.size(), new SwingDelegationResultListener(fut)
+					{
+						public void customResultAvailable(Object result) throws Exception
+						{
+							fut.setResult(list);
+						}
+					})
+					{
+						public void intermediateResultAvailable(Object result)
+						{
+							list.addAll((Collection)result);
+						}
+					};
+					for(int i=0; i<children.size(); i++)
+					{
+						getLeafChildren((IFileNode)children.get(i)).addResultListener(crl);
+					}
+				}
+			});
+		}
+		else
+		{
+			fut.setResult(Collections.singletonList(node));
+		}
+		
+		return fut;
+	}
+	
+	/**
+	 *  Add testcases for a file or directory recursively.
 	 *  @param node The file/dir node to start.
 	 */
 	protected void addTestcases(IFileNode node)
 	{
-		java.util.List nodes = SCollection.createArrayList();
-		nodes.add(node);
-		while(nodes.size()>0)
+		getLeafChildren(node).addResultListener(new SwingDefaultResultListener(mpanel)
 		{
-			node	= (IFileNode)nodes.remove(0);
-			if(node.isDirectory())
+			public void customResultAvailable(Object result)
 			{
-				for(int i=0; i<node.getChildCount(); i++)
+				final List	leafs	= (List)result;
+				final int[]	cnt	= new int[1];	
+				for(int i=0; i<leafs.size(); i++)
 				{
-					nodes.add(node.getChild(i));
+					final String	model	= ((IFileNode)leafs.get(i)).getFileName();
+					STestCenter.isTestcase(model, getJCC().getPlatformAccess()).addResultListener(new SwingDefaultResultListener(mpanel)
+					{
+						public void customResultAvailable(Object result)
+						{
+							cnt[0]++;
+							String	text	= "Scanned file "+cnt[0]+" of "+leafs.size()+" ("+(cnt[0]*100/leafs.size())+"%): "+model;
+							getJCC().setStatusText(text);
+							if(((Boolean)result).booleanValue())
+							{
+								tcpanel.getTestList().addEntry(model);
+							}
+						}
+					});
 				}
 			}
-			else
-			{
-				final String model = node.getFileName();
-				STestCenter.isTestcase(model, getJCC().getPlatformAccess()).addResultListener(new SwingDefaultResultListener(mpanel)
-				{
-					public void customResultAvailable(Object result)
-					{
-						if(((Boolean)result).booleanValue())
-						{
-							tcpanel.getTestList().addEntry(model);
-						}
-					}
-				});
-			}
-		}
+		});
 	}
+
 	
 	/**
 	 *  Remove testcases for a file or directory recusively.
