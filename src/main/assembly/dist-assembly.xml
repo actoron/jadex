@@ -82,11 +82,11 @@
 			<filtered>true</filtered>
 		</file>
 		<file>
-			<source>docs/jcc.project</source>
+			<source>docs/jcc.settings.xml</source>
 			<outputDirectory>/lib</outputDirectory>
 		</file>
 		<file>
-			<source>docs/applications.jccproject.xml</source>
+			<source>docs/default.settings.xml</source>
 			<outputDirectory>/lib</outputDirectory>
 		</file>
 		<file>

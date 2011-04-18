@@ -227,7 +227,7 @@ public class SettingsService extends BasicService implements ISettingsService
 		try
 		{
 			// Todo: Which class loader to use? library service unavailable, because it depends on settings service?
-			FileInputStream fis = new FileInputStream(file);
+			FileInputStream fis = new FileInputStream(file.exists() ? file : new File("default"+SETTINGS_EXTENSION));
 			props	= (Properties)PropertiesXMLHelper.getPropertyReader().read(fis, getClass().getClassLoader(), null);
 			fis.close();
 		}
