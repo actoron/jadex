@@ -131,11 +131,7 @@ public class ClientSimulator
 										ia.addComponentListener(new ComponentAdapter()
 										{
 											
-											public void componentTerminating(jadex.commons.ChangeEvent ce)
-											{	
-											}
-											
-											public void componentTerminated(jadex.commons.ChangeEvent ce)
+											public IFuture componentTerminating(jadex.commons.ChangeEvent ce)
 											{
 												EventQueue.invokeLater(new Runnable()
 												{
@@ -144,6 +140,7 @@ public class ClientSimulator
 														simWindow.dispose();
 													}
 												});
+												return IFuture.DONE;
 											}
 										});
 										return null;

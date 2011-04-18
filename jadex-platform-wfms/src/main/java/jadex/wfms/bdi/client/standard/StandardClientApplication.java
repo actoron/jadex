@@ -9,6 +9,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.wfms.bdi.client.standard.parametergui.ActivityComponent;
@@ -87,11 +88,7 @@ public class StandardClientApplication
 			{
 				ia.addComponentListener(new ComponentAdapter()
 				{
-					public void componentTerminating(ChangeEvent ce)
-					{
-					}
-					
-					public void componentTerminated(ChangeEvent ce)
+					public IFuture componentTerminating(ChangeEvent ce)
 					{
 						EventQueue.invokeLater(new Runnable()
 						{
@@ -101,6 +98,7 @@ public class StandardClientApplication
 								mainFrame.dispose();
 							}
 						});
+						return IFuture.DONE;
 					}
 				});
 				

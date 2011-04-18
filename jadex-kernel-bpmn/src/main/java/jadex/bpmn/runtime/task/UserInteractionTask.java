@@ -63,11 +63,7 @@ public class UserInteractionTask implements ITask
 		
 		final IComponentListener	lis	= new ComponentAdapter()
 		{
-			public void componentTerminating(ChangeEvent ce)
-			{
-			}
-			
-			public void componentTerminated(ChangeEvent ce)
+			public IFuture componentTerminated(ChangeEvent ce)
 			{
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -79,6 +75,7 @@ public class UserInteractionTask implements ITask
 						}
 					}
 				});
+				return IFuture.DONE;
 			}
 		};
 		instance.addComponentListener(lis);

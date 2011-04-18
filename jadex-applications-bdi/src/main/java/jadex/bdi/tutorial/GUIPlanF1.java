@@ -6,6 +6,7 @@ import jadex.bdi.runtime.IInternalEventListener;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ComponentAdapter;
 import jadex.commons.ChangeEvent;
+import jadex.commons.future.IFuture;
 
 import javax.swing.SwingUtilities;
 
@@ -53,7 +54,7 @@ public class GUIPlanF1 extends Plan
 		
 		getScope().addComponentListener(new ComponentAdapter()
 		{
-			public void componentTerminating(ChangeEvent ae)
+			public IFuture componentTerminating(ChangeEvent ae)
 			{
 //				System.out.println("terminating");
 				SwingUtilities.invokeLater(new Runnable()
@@ -63,10 +64,7 @@ public class GUIPlanF1 extends Plan
 						gui.dispose();
 					}
 				});
-			}
-			
-			public void componentTerminated(ChangeEvent ae)
-			{
+				return IFuture.DONE;
 			}
 		});
 		

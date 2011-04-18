@@ -10,6 +10,7 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -91,7 +92,7 @@ public class EnvironmentGui	extends JFrame
 				
 				bia.addComponentListener(new jadex.bridge.ComponentAdapter()
 				{
-					public void componentTerminating(jadex.commons.ChangeEvent ae)
+					public IFuture componentTerminating(jadex.commons.ChangeEvent ae)
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
@@ -100,10 +101,7 @@ public class EnvironmentGui	extends JFrame
 								EnvironmentGui.this.dispose();
 							}
 						});
-					}
-					
-					public void componentTerminated(jadex.commons.ChangeEvent ae)
-					{
+						return IFuture.DONE;
 					}
 				});
 				

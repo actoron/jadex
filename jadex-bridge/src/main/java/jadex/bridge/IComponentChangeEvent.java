@@ -2,10 +2,10 @@ package jadex.bridge;
 
 public interface IComponentChangeEvent
 {
-	public static final String EVENT_TYPE_CREATION		= "Created";
-	public static final String EVENT_TYPE_DISPOSAL		= "Disposed";
-	public static final String EVENT_TYPE_MODIFICATION 	= "Modified";
-	public static final String EVENT_TYPE_OCCURRENCE	= "Occured";
+	public static final String EVENT_TYPE_CREATION		= "created";
+	public static final String EVENT_TYPE_DISPOSAL		= "disposed";
+	public static final String EVENT_TYPE_MODIFICATION 	= "modified";
+	public static final String EVENT_TYPE_OCCURRENCE	= "noticed";
 	
 	/**
 	 *  Returns the type of the event.
@@ -36,6 +36,18 @@ public interface IComponentChangeEvent
 	 *  @return Type of the source.
 	 */
 	public String getSourceCategory();
+	
+	/**
+	 *  Returns the component that generated the event.
+	 *  @return Component ID.
+	 */
+	public IComponentIdentifier getComponent();
+	
+	/**
+	 *  Returns the parent component of the component that generated the event, if any.
+	 *  @return Component ID.
+	 */
+	public IComponentIdentifier getParent();
 	
 	/**
 	 *  Returns a reason why the event occured.

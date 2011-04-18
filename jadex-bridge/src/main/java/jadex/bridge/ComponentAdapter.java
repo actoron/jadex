@@ -1,6 +1,9 @@
 package jadex.bridge;
 
+import com.sun.corba.se.impl.orbutil.closure.Future;
+
 import jadex.commons.ChangeEvent;
+import jadex.commons.future.IFuture;
 
 /**
  *  Adapter for the IComponentListener interface.
@@ -16,8 +19,9 @@ public abstract class ComponentAdapter implements IComponentListener
 	 *  goals/plans as well as send/receive messages.
 	 *  @param ae The component event.
 	 */
-	public void componentTerminating(ChangeEvent ce)
+	public IFuture componentTerminating(ChangeEvent ce)
 	{
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -26,15 +30,17 @@ public abstract class ComponentAdapter implements IComponentListener
 	 *  can be executed.
 	 *  @param ae The component event.
 	 */
-	public void componentTerminated(ChangeEvent ce)
+	public IFuture componentTerminated(ChangeEvent ce)
 	{
+		return IFuture.DONE;
 	}
 	
 	/**
 	 *  Invoked when a change occurs with the component.
 	 *  The changes depend on the underlying component type.
 	 */
-	public void eventOccured(IComponentChangeEvent cce)
+	public IFuture eventOccured(IComponentChangeEvent cce)
 	{
+		return IFuture.DONE;
 	}
 }

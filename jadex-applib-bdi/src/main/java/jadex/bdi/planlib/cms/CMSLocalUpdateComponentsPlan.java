@@ -89,13 +89,10 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 		
 		getScope().addComponentListener(new ComponentAdapter()
 		{	
-			public void componentTerminating(ChangeEvent ae)
+			public IFuture componentTerminating(ChangeEvent ae)
 			{
 				ces.removeComponentListener(null, listener);
-			}
-			
-			public void componentTerminated(ChangeEvent ae)
-			{
+				return IFuture.DONE;
 			}
 		});
 	}

@@ -13,6 +13,7 @@ import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -60,7 +61,7 @@ public class PotentialFrame extends JFrame
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				bia.addComponentListener(new ComponentAdapter()
 				{
-					public void componentTerminating(ChangeEvent ae)
+					public IFuture componentTerminating(ChangeEvent ae)
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
@@ -69,9 +70,7 @@ public class PotentialFrame extends JFrame
 								PotentialFrame.this.dispose();
 							}
 						});
-					}
-					public void componentTerminated(ChangeEvent ae)
-					{
+						return IFuture.DONE;
 					}
 				});
 				return null;

@@ -12,6 +12,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.SimplePropertyChangeSupport;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -80,7 +81,7 @@ public class HumanPlayerInterface extends GameStateFrame
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				bia.addComponentListener(new ComponentAdapter()
 				{
-					public void componentTerminating(ChangeEvent e)
+					public IFuture componentTerminating(ChangeEvent e)
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
@@ -89,9 +90,7 @@ public class HumanPlayerInterface extends GameStateFrame
 								HumanPlayerInterface.this.dispose();
 							}
 						});
-					}
-					public void componentTerminated(ChangeEvent ae)
-					{
+						return IFuture.DONE;
 					}
 				});
 				return null;

@@ -7,6 +7,7 @@ import jadex.bdi.runtime.IInternalEvent;
 import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -486,7 +487,7 @@ public class BlocksworldGui	extends JFrame
 								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 								bia.addComponentListener(new ComponentAdapter()
 								{
-									public void componentTerminating(jadex.commons.ChangeEvent ce)
+									public IFuture componentTerminating(jadex.commons.ChangeEvent ce)
 									{
 										SwingUtilities.invokeLater(new Runnable()
 										{
@@ -495,10 +496,7 @@ public class BlocksworldGui	extends JFrame
 												BlocksworldGui.this.dispose();
 											}
 										});
-									}
-									
-									public void componentTerminated(jadex.commons.ChangeEvent ce)
-									{
+										return IFuture.DONE;
 									}
 								});
 								return null;

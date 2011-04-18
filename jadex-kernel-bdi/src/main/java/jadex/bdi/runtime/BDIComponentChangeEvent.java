@@ -24,8 +24,10 @@ public class BDIComponentChangeEvent extends ComponentChangeEvent
 	
 	public BDIComponentChangeEvent(IOAVState state, Object element, Object scope, String type, Object value, long time)
 	{
+		BDIInterpreter bdiint = BDIInterpreter.getInterpreter(state);
+		setComponent(bdiint.getAgentAdapter().getComponentIdentifier());
 		if (scope == null)
-			scope = BDIInterpreter.getInterpreter(state).getAgent();
+			scope = bdiint.getAgent();
 		
 		setTime(time);
 		

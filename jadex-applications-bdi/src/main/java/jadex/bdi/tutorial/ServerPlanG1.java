@@ -8,6 +8,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
+import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
 
 import java.io.IOException;
@@ -82,13 +83,10 @@ public class ServerPlanG1 extends Plan	implements Runnable
 		// When the agent dies the listener will shut down the server.
 		getScope().addComponentListener(new ComponentAdapter()
 		{
-			public void componentTerminating(ChangeEvent ae)
+			public IFuture componentTerminating(ChangeEvent ae)
 			{
 				close();
-			}
-			
-			public void componentTerminated(ChangeEvent ae)
-			{
+				return IFuture.DONE;
 			}
 		});
 	}

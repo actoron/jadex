@@ -1,8 +1,5 @@
 package jadex.bridge;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 public abstract class ComponentChangeEvent implements IComponentChangeEvent
 {
@@ -20,6 +17,12 @@ public abstract class ComponentChangeEvent implements IComponentChangeEvent
 	
 	/** The category of the source */
 	protected String sourcecategory;
+	
+	/** Component which generated the event. */
+	protected IComponentIdentifier component;
+	
+	/** Parent of the component which generated the event. */
+	protected IComponentIdentifier parent;
 	
 	/** Reason for the event, if any. */
 	protected String reason;
@@ -67,6 +70,24 @@ public abstract class ComponentChangeEvent implements IComponentChangeEvent
 	public String getSourceCategory()
 	{
 		return sourcecategory;
+	}
+	
+	/**
+	 *  Returns the component that generated the event.
+	 *  @return Component ID.
+	 */
+	public IComponentIdentifier getComponent()
+	{
+		return component;
+	}
+	
+	/**
+	 *  Returns the parent component of the component that generated the event, if any.
+	 *  @return Component ID.
+	 */
+	public IComponentIdentifier getParent()
+	{
+		return parent;
 	}
 	
 	/**
@@ -126,6 +147,24 @@ public abstract class ComponentChangeEvent implements IComponentChangeEvent
 	}
 	
 	/**
+	 *  Sets the component that generated the event.
+	 *  @param id Component ID.
+	 */
+	public void setComponent(IComponentIdentifier id)
+	{
+		component = id;
+	}
+	
+	/**
+	 *  Sets the parent of the component that generated the event.
+	 *  @param id Component ID.
+	 */
+	public void setParent(IComponentIdentifier id)
+	{
+		parent = id;
+	}
+	
+	/**
 	 *  Sets a reason why the event occured.
 	 *  @param reason Reason why the event occured, may be null.
 	 */
@@ -136,7 +175,8 @@ public abstract class ComponentChangeEvent implements IComponentChangeEvent
 	
 	public String toString()
 	{
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder(getComponent().getName());
+		sb.append(" ");
 		if (getEventType() != null)
 		{
 			sb.append(getEventType());

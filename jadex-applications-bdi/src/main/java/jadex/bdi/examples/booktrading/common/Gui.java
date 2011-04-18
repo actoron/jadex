@@ -6,6 +6,7 @@ import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -40,7 +41,7 @@ public class Gui extends JFrame
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				bia.addComponentListener(new ComponentAdapter()
 				{
-					public void componentTerminating(ChangeEvent ae)
+					public IFuture componentTerminating(ChangeEvent ae)
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
@@ -49,10 +50,7 @@ public class Gui extends JFrame
 								dispose();
 							}
 						});
-					}
-					
-					public void componentTerminated(ChangeEvent ae)
-					{
+						return IFuture.DONE;
 					}
 				});
 				return null;

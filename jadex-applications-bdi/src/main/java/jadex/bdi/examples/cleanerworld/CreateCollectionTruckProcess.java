@@ -119,12 +119,10 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 												IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 												bia.addComponentListener(new ComponentAdapter()
 												{
-													public void componentTerminated(ChangeEvent ae)
+													public IFuture componentTerminated(ChangeEvent ae)
 													{
 														ongoing.removeAll(todo);
-													}
-													public void componentTerminating(ChangeEvent ae)
-													{
+														return IFuture.DONE;
 													}
 												});
 												return null;

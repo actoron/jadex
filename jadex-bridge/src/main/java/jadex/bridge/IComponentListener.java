@@ -1,12 +1,14 @@
 package jadex.bridge;
 
 import jadex.commons.ChangeEvent;
+import jadex.commons.IRemotable;
+import jadex.commons.future.IFuture;
 
 /**
  *  Interface for entities that want to be 
  *  notified on certain component lifecycle events.
  */
-public interface IComponentListener
+public interface IComponentListener extends IRemotable
 {
 	/**
 	 *  Called when the component is closing down
@@ -16,7 +18,7 @@ public interface IComponentListener
 	 *  goals/plans as well as send/receive messages.
 	 *  @param ae The component event.
 	 */
-	public void componentTerminating(ChangeEvent ce);
+	public IFuture componentTerminating(ChangeEvent ce);
 	
 	/**
 	 *  Invoked when the component was finally terminated.
@@ -24,11 +26,11 @@ public interface IComponentListener
 	 *  can be executed.
 	 *  @param ae The component event.
 	 */
-	public void componentTerminated(ChangeEvent ce);
+	public IFuture componentTerminated(ChangeEvent ce);
 	
 	/**
 	 *  Invoked when a change occurs with the component.
 	 *  The changes depend on the underlying component type.
 	 */
-	public void eventOccured(IComponentChangeEvent cce);
+	public IFuture eventOccured(IComponentChangeEvent cce);
 }

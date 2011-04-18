@@ -8,6 +8,7 @@ import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
+import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.EventQueue;
@@ -44,13 +45,10 @@ public class ManagerGuiUpdatePlan extends Plan
 
 		getScope().addComponentListener(new ComponentAdapter()
 		{
-			public void componentTerminated(ChangeEvent ae)
-			{
-			}
-			
-			public void componentTerminating(ChangeEvent ae)
+			public IFuture componentTerminating(ChangeEvent ae)
 			{
 				closeGui();
+				return IFuture.DONE;
 			}
 		}
 		);
