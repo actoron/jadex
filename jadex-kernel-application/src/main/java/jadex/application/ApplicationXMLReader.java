@@ -23,7 +23,9 @@ import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
+import jadex.xml.IAttributeConverter;
 import jadex.xml.IContext;
+import jadex.xml.IObjectStringConverter;
 import jadex.xml.IPostProcessor;
 import jadex.xml.IStringObjectConverter;
 import jadex.xml.MappingInfo;
@@ -195,6 +197,45 @@ public class ApplicationXMLReader
 			}
 		};
 		
+		IStringObjectConverter classconv = new IStringObjectConverter()
+		{
+			public Object convertString(String val, IContext context) throws Exception
+			{
+				Object ret = val;
+				if(val instanceof String)
+				{
+					ret = SReflect.findClass0((String)val, ((MApplicationType)
+						context.getRootObject()).getAllImports(), context.getClassLoader());
+					if(ret==null)
+					{
+						Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+						MultiCollection	report	= (MultiCollection)context.getUserContext();
+						report.put(se, "Class not found: "+val);
+					}
+				}
+				return ret;
+			}
+		};
+		
+		IObjectStringConverter reclassconv = new IObjectStringConverter()
+		{
+			public String convertObject(Object val, IContext context)
+			{
+				String ret = null;
+				if(val instanceof Class)
+				{
+					ret = SReflect.getClassName((Class)val);
+					if(ret==null)
+					{
+						Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+						MultiCollection	report	= (MultiCollection)context.getUserContext();
+						report.put(se, "Class not found: "+val);
+					}
+				}
+				return ret;
+			}
+		};
+		
 		String uri = "http://jadex.sourceforge.net/jadex-application";
 		
 //		TypeInfo satype = new TypeInfo(null, new ObjectInfo(MStartable.class),
@@ -285,7 +326,8 @@ public class ApplicationXMLReader
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "className")),
 				new AttributeInfo(new AccessInfo("componentname", "componentName")),
-				new AttributeInfo(new AccessInfo("componenttype", "componentType"))
+				new AttributeInfo(new AccessInfo("componenttype", "componentType")),
+				new AttributeInfo(new AccessInfo("implementation", "implementation"), new AttributeConverter(classconv, reclassconv))
 			}, null)));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "requiredservice")), new ObjectInfo(MRequiredServiceType.class, new ExpressionProcessor()), 

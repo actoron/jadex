@@ -44,8 +44,7 @@ public class MicroDebuggerPanel	implements IDebuggerPanel
 	 */
 	public void init(IControlCenter jcc, IBreakpointPanel bpp, IComponentIdentifier name, IExternalAccess access)
 	{
-		// Hack!!! Do not cast to ExternalAccess
-		this.micropanel	= new MicroAgentViewPanel(((ExternalAccess)access).getInterpreter(), bpp);
+		this.micropanel	= new MicroAgentViewPanel(access, bpp);
 	}
 
 	/**

@@ -1228,7 +1228,7 @@ public class MEnvSpaceType	extends MSpaceType
 	/**
 	 *  Parse class names.
 	 */
-	static class ClassConverter	implements IStringObjectConverter
+	public static class ClassConverter	implements IStringObjectConverter
 	{
 		/**
 		 *  Convert a string value to a type.

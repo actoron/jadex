@@ -1,22 +1,22 @@
 package jadex.bridge;
 
 
-public abstract class ComponentChangeEvent implements IComponentChangeEvent
+public class ComponentChangeEvent implements IComponentChangeEvent
 {
-	/** Type of event. */
-	protected String eventtype;
-	
 	/** The time of the event. */
 	protected long time;
-	
-	/** The name of the source. */
-	protected String sourcename;
-	
-	/** The type of the source. */
+
+	/** Type of event (e.g. creation, disposal). */
+	protected String eventtype;
+
+	/** The category of the source (e.g. goal, step, component) */
+	protected String sourcecategory;
+
+	/** The type of the source, i.e. model element name (moveto goal) */
 	protected String sourcetype;
 	
-	/** The category of the source */
-	protected String sourcecategory;
+	/** The name of the source, i.e. instance name (e.g. goal13). */
+	protected String sourcename;
 	
 	/** Component which generated the event. */
 	protected IComponentIdentifier component;
@@ -24,9 +24,38 @@ public abstract class ComponentChangeEvent implements IComponentChangeEvent
 	/** Parent of the component which generated the event. */
 	protected IComponentIdentifier parent;
 	
-	/** Reason for the event, if any. */
+	/** Reason for the event, if any (e.g. goal succeeded). */
 	protected String reason;
 	
+	/**
+	 *  Create a new event.
+	 */
+	public ComponentChangeEvent()
+	{
+	}
+	
+	/**
+	 *  Create a new event.
+	 */
+	public ComponentChangeEvent(String eventtype, String sourcecategory, IComponentIdentifier cid)
+	{
+		this(null, 0, null, null, null, null, cid);
+	}
+
+	/**
+	 *  Create a new event.
+	 */
+	public ComponentChangeEvent(String eventtype, long time, String sourcename,
+		String sourcetype, String sourcecategory, String reason, IComponentIdentifier cid)
+	{
+		this.eventtype = eventtype;
+		this.time = time;
+		this.sourcename = sourcename;
+		this.sourcetype = sourcetype;
+		this.sourcecategory = sourcecategory;
+		this.reason = reason;
+	}
+
 	/**
 	 *  Returns the type of the event.
 	 *  @return The type of the event.
@@ -100,7 +129,7 @@ public abstract class ComponentChangeEvent implements IComponentChangeEvent
 	}
 	
 	//================== Setters ===================
-	
+
 	/**
 	 *  Sets the type of the event.
 	 *  @param type The type of the event.
