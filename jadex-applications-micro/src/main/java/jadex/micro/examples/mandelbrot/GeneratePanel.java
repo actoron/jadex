@@ -1,13 +1,11 @@
 package jadex.micro.examples.mandelbrot;
 
 import jadex.base.gui.StatusBar;
-import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.ChangeEvent;
+import jadex.bridge.TerminationAdapter;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.IFuture;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
@@ -196,9 +194,9 @@ public class GeneratePanel extends JPanel
 			@XMLClassname("dispose")
 			public Object execute(IInternalAccess ia)
 			{
-				ia.addComponentListener(new ComponentAdapter()
+				ia.addComponentListener(new TerminationAdapter()
 				{
-					public IFuture componentTerminating(ChangeEvent ce)
+					public void componentTerminated()
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
@@ -207,7 +205,6 @@ public class GeneratePanel extends JPanel
 								f.dispose();
 							}
 						});
-						return IFuture.DONE;
 					}
 				});
 				

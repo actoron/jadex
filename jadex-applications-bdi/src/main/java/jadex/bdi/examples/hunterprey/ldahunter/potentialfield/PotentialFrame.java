@@ -11,10 +11,9 @@ import jadex.application.space.envsupport.math.Vector1Int;
 import jadex.application.space.envsupport.math.Vector2Int;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.ChangeEvent;
+import jadex.bridge.TerminationAdapter;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
@@ -61,9 +60,9 @@ public class PotentialFrame extends JFrame
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.addComponentListener(new ComponentAdapter()
+				bia.addComponentListener(new TerminationAdapter()
 				{
-					public IFuture componentTerminating(ChangeEvent ae)
+					public void componentTerminated()
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
@@ -72,7 +71,6 @@ public class PotentialFrame extends JFrame
 								PotentialFrame.this.dispose();
 							}
 						});
-						return IFuture.DONE;
 					}
 				});
 				return null;

@@ -21,11 +21,13 @@ import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
 import jadex.bpmn.runtime.handler.TaskActivityHandler;
 import jadex.bpmn.runtime.task.ExecuteStepTask;
 import jadex.bpmn.tools.ProcessThreadInfo;
+import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
+import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
@@ -45,7 +47,6 @@ import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.ServiceNotFoundException;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.commons.ChangeEvent;
@@ -55,10 +56,8 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.IntermediateFuture;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SJavaParser;
@@ -595,14 +594,14 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		final Future ret = new Future();
 		// Todo: cleanup required???
 		
-		if(componentlisteners!=null)
+		/*if(componentlisteners!=null)
 		{
 			for(int i=0; i<componentlisteners.size(); i++)
 			{
 				IComponentListener lis = (IComponentListener)componentlisteners.get(i);
 				lis.componentTerminating(new ChangeEvent(adapter.getComponentIdentifier()));
 			}
-		}
+		}*/
 		
 		adapter.invokeLater(new Runnable()
 		{
@@ -615,16 +614,33 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 					getActivityHandler(pt.getActivity()).cancel(pt.getActivity(), BpmnInterpreter.this, pt);
 //					System.out.println("Cancelling: "+pt.getActivity()+" "+pt.getId());
 				}
-				ret.setResult(adapter.getComponentIdentifier());
 				
 				if(componentlisteners!=null)
 				{
-					for(int i=0; i<componentlisteners.size(); i++)
+					SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
 					{
-						IComponentListener lis = (IComponentListener)componentlisteners.get(i);
-						lis.componentTerminated(new ChangeEvent(adapter.getComponentIdentifier()));
-					}
+						@Override
+						public void customResultAvailable(Object result)
+						{
+							ComponentChangeEvent event = new ComponentChangeEvent();
+							event.setTime(((IClockService)result).getTime());
+							event.setEventType(IComponentChangeEvent.EVENT_TYPE_DISPOSAL);
+							event.setSourceCategory(IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT);
+							event.setSourceType(getModel().getName());
+							event.setSourceName(adapter.getComponentIdentifier().getName());
+							event.setComponent(adapter.getComponentIdentifier());
+							for(int i=0; i<componentlisteners.size(); i++)
+							{
+								IComponentListener lis = (IComponentListener)componentlisteners.get(i);
+								//lis.componentTerminated(new ChangeEvent(adapter.getComponentIdentifier()));
+								lis.eventOccured(event);
+							}
+							ret.setResult(adapter.getComponentIdentifier());
+						}
+					});
 				}
+				else
+					ret.setResult(adapter.getComponentIdentifier());
 			}
 		});
 		

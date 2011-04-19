@@ -1,9 +1,9 @@
 package jadex.micro.examples.chat;
 
-import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.TerminationAdapter;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.future.DefaultResultListener;
@@ -140,12 +140,11 @@ public class ChatPanel extends JPanel
 			@XMLClassname("dispose")
 			public Object execute(IInternalAccess ia)
 			{
-				ia.addComponentListener(new ComponentAdapter()
+				ia.addComponentListener(new TerminationAdapter()
 				{
-					public IFuture componentTerminated(ChangeEvent ce)
+					public void componentTerminated()
 					{
 						f.setVisible(false);
-						return IFuture.DONE;
 					}
 				});
 				return null;

@@ -10,12 +10,14 @@ import jadex.application.model.MProvidedServiceType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
 import jadex.application.runtime.ISpace;
+import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
+import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
@@ -35,6 +37,7 @@ import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.commons.ChangeEvent;
@@ -1129,30 +1132,49 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	 */
 	public IFuture cleanupComponent()
 	{
-		if(componentlisteners!=null)
+		/*if(componentlisteners!=null)
 		{
 			for(int i=0; i<componentlisteners.size(); i++)
 			{
 				IComponentListener lis = (IComponentListener)componentlisteners.get(i);
 				lis.componentTerminating(new ChangeEvent(getComponentIdentifier()));
 			}
-		}
+		}*/
 		
 		// todo: call some application functionality for terminating?!
 		deleteContext();
 		
+		final Future ret = new Future();
 		if(componentlisteners!=null)
 		{
-			for(int i=0; i<componentlisteners.size(); i++)
+			SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 			{
-				IComponentListener lis = (IComponentListener)componentlisteners.get(i);
-				lis.componentTerminated(new ChangeEvent(getComponentIdentifier()));
-			}
+				public void resultAvailable(Object result)
+				{
+					ComponentChangeEvent event = new ComponentChangeEvent();
+					event.setTime(((IClockService)result).getTime());
+					event.setEventType(IComponentChangeEvent.EVENT_TYPE_DISPOSAL);
+					event.setSourceCategory(IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT);
+					event.setSourceType(getModel().getName());
+					event.setSourceName(adapter.getComponentIdentifier().getName());
+					event.setComponent(adapter.getComponentIdentifier());
+					for(int i=0; i<componentlisteners.size(); i++)
+					{
+						IComponentListener lis = (IComponentListener)componentlisteners.get(i);
+						if (lis.getFilter().filter(event))
+							lis.eventOccured(event);
+						//lis.componentTerminated(new ChangeEvent(getComponentIdentifier()));
+						ret.setResult(adapter.getComponentIdentifier());
+					}
+				}
+			});
 		}
+		else
+			ret.setResult(adapter.getComponentIdentifier());
 		
-		return IFuture.DONE;
+		return ret;
 //		return adapter.getServiceContainer().shutdown(); // done in adapter
-	}
+	} 
 	
 	/**
 	 *  Kill the component.

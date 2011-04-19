@@ -2,11 +2,10 @@ package jadex.bdi.examples.alarmclock;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.TerminationAdapter;
 import jadex.bridge.service.clock.IClockService;
-import jadex.commons.ChangeEvent;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
@@ -329,9 +328,9 @@ public class ClockFrame extends JFrame
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.addComponentListener(new ComponentAdapter()
+				bia.addComponentListener(new TerminationAdapter()
 				{
-					public IFuture componentTerminating(ChangeEvent ae)
+					public void componentTerminated()
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
@@ -343,7 +342,6 @@ public class ClockFrame extends JFrame
 								dispose();
 							}
 						});
-						return IFuture.DONE;
 					}
 				});
 				return null;

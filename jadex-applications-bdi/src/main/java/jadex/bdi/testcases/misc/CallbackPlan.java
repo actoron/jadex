@@ -14,9 +14,7 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bdi.runtime.IPlanListener;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.ComponentAdapter;
-import jadex.commons.ChangeEvent;
-import jadex.commons.future.IFuture;
+import jadex.bridge.TerminationAdapter;
 
 import java.util.logging.Logger;
 
@@ -380,16 +378,15 @@ public class CallbackPlan extends Plan
 		});
 			
 		final TestReport tr16 = new TestReport("#16", "Test if agent killed can be observed in a listener.");
-		getScope().addComponentListener(new ComponentAdapter()
+		getScope().addComponentListener(new TerminationAdapter()
 		{
-			public IFuture componentTerminating(ChangeEvent ae)
+			public void componentTerminated()
 			{
 				logger.info("Agent terminating invoked");
 //				getExternalAccess().removeAgentListener(this);
 				logger.info("Agent died invoked");
 				tr16.setSucceeded(true);
 				getBeliefbase().getBeliefSet("testcap.reports").addFact(tr16);
-				return IFuture.DONE;
 			}
 		});
 		

@@ -2,11 +2,9 @@ package jadex.bdibpmn.examples.puzzle;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.ChangeEvent;
-import jadex.commons.future.IFuture;
+import jadex.bridge.TerminationAdapter;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -79,9 +77,9 @@ public class BoardGui extends JFrame
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				
-				bia.addComponentListener(new ComponentAdapter()
+				bia.addComponentListener(new TerminationAdapter()
 				{
-					public IFuture componentTerminating(ChangeEvent ae)
+					public void componentTerminated()
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
@@ -90,7 +88,6 @@ public class BoardGui extends JFrame
 								BoardGui.this.dispose();
 							}
 						});
-						return IFuture.DONE;
 					}
 				});
 				return null;

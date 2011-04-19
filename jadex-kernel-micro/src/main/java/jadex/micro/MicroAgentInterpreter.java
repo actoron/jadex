@@ -24,6 +24,7 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.clock.ITimer;
 import jadex.commons.ChangeEvent;
 import jadex.commons.future.DefaultResultListener;
@@ -927,13 +928,14 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public void notifyTerminatingListeners()
 	{
-		if(componentlisteners!=null)
+	//TODO: FIXME!
+		/*if(componentlisteners!=null)
 		{
 			for(int i=0; i<componentlisteners.size(); i++)
 			{
 				((IComponentListener)componentlisteners.get(i)).componentTerminating(new ChangeEvent(microagent.getComponentIdentifier()));
 			}
-		}
+		}*/
 	}
 	
 	/**
@@ -943,10 +945,26 @@ public class MicroAgentInterpreter implements IComponentInstance
 	{
 		if(componentlisteners!=null)
 		{
-			for(int i=0; i<componentlisteners.size(); i++)
+			SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 			{
-				((IComponentListener)componentlisteners.get(i)).componentTerminated(new ChangeEvent(microagent.getComponentIdentifier()));
-			}
+				public void resultAvailable(Object result)
+				{
+					ComponentChangeEvent event = new ComponentChangeEvent();
+					event.setTime(((IClockService)result).getTime());
+					event.setEventType(IComponentChangeEvent.EVENT_TYPE_DISPOSAL);
+					event.setSourceCategory(IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT);
+					event.setSourceType(getAgentModel().getName());
+					event.setSourceName(adapter.getComponentIdentifier().getName());
+					event.setComponent(adapter.getComponentIdentifier());
+					for(int i=0; i<componentlisteners.size(); i++)
+					{
+						IComponentListener lis = (IComponentListener)componentlisteners.get(i);
+						if (lis.getFilter().filter(event))
+							lis.eventOccured(event);
+						//lis.componentTerminated(new ChangeEvent(getComponentIdentifier()));
+					}
+				}
+			});
 		}
 	}
 	

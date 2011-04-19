@@ -1,8 +1,8 @@
 package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.runtime.BDIComponentChangeEvent;
+import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentListener;
-import jadex.commons.ChangeEvent;
 import jadex.commons.future.IResultListener;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
@@ -261,21 +261,13 @@ public class EventReificator implements IOAVStateListener
 		{
 			long time = BDIInterpreter.getInterpreter(state).getClockService().getTime();
 			IComponentListener[] lstnrs = (IComponentListener[]) listeners.toArray(new IComponentListener[listeners.size()]);
+			IComponentChangeEvent event = new BDIComponentChangeEvent(state, element, scope, type, value, time);
 			for (int i = 0; i < lstnrs.length; ++i )
 			{
 				final IComponentListener l = lstnrs[i];
-				if (OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATING.equals(type))
-				{
-					ChangeEvent ce = new ChangeEvent(BDIInterpreter.getInterpreter(state).getAgentAdapter().getChildrenIdentifiers(), null, null); //Needs event object?
-					l.componentTerminating(ce);
-				}
-				else if (OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATED.equals(type))
-				{
-					ChangeEvent ce = new ChangeEvent(BDIInterpreter.getInterpreter(state).getAgentAdapter().getChildrenIdentifiers(), null, null); //Needs event object?
-					l.componentTerminated(ce);
-				}
 				
-				l.eventOccured(new BDIComponentChangeEvent(state, element, scope, type, value, time)).addResultListener(new IResultListener()
+				if (l.getFilter().filter(event))
+					l.eventOccured(event).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{

@@ -4,11 +4,9 @@ import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.ChangeEvent;
-import jadex.commons.future.IFuture;
+import jadex.bridge.TerminationAdapter;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.EventQueue;
@@ -43,12 +41,11 @@ public class ManagerGuiUpdatePlan extends Plan
 			}
 		});
 
-		getScope().addComponentListener(new ComponentAdapter()
+		getScope().addComponentListener(new TerminationAdapter()
 		{
-			public IFuture componentTerminating(ChangeEvent ae)
+			public void componentTerminated()
 			{
 				closeGui();
-				return IFuture.DONE;
 			}
 		}
 		);

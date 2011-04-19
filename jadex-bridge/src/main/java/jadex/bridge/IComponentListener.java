@@ -1,6 +1,6 @@
 package jadex.bridge;
 
-import jadex.commons.ChangeEvent;
+import jadex.commons.IFilter;
 import jadex.commons.IRemotable;
 import jadex.commons.future.IFuture;
 
@@ -11,22 +11,11 @@ import jadex.commons.future.IFuture;
 public interface IComponentListener extends IRemotable
 {
 	/**
-	 *  Called when the component is closing down
-	 *  (i.e. moving to the end state).
-	 *  In this state the component should perform cleanup operations
-	 *  and is still able to execute
-	 *  goals/plans as well as send/receive messages.
-	 *  @param ae The component event.
+	 *  Returns an event filter, indicating which events
+	 *  get passed to the eventOccured() method.
+	 *  @return The event filter.
 	 */
-	public IFuture componentTerminating(ChangeEvent ce);
-	
-	/**
-	 *  Invoked when the component was finally terminated.
-	 *  No more component related functionality (e.g. goals plans)
-	 *  can be executed.
-	 *  @param ae The component event.
-	 */
-	public IFuture componentTerminated(ChangeEvent ce);
+	public IFilter getFilter();
 	
 	/**
 	 *  Invoked when a change occurs with the component.

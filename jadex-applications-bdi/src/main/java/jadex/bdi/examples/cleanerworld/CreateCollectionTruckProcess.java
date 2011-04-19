@@ -6,15 +6,14 @@ import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.ISpaceProcess;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bridge.ComponentAdapter;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.TerminationAdapter;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
-import jadex.commons.ChangeEvent;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
@@ -117,12 +116,11 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 											public Object execute(IInternalAccess ia)
 											{
 												IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-												bia.addComponentListener(new ComponentAdapter()
+												bia.addComponentListener(new TerminationAdapter()
 												{
-													public IFuture componentTerminated(ChangeEvent ae)
+													public void componentTerminated()
 													{
 														ongoing.removeAll(todo);
-														return IFuture.DONE;
 													}
 												});
 												return null;

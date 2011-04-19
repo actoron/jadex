@@ -4,9 +4,7 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IInternalEventListener;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.ComponentAdapter;
-import jadex.commons.ChangeEvent;
-import jadex.commons.future.IFuture;
+import jadex.bridge.TerminationAdapter;
 
 import javax.swing.SwingUtilities;
 
@@ -52,9 +50,9 @@ public class GUIPlanF1 extends Plan
 			}
 		});
 		
-		getScope().addComponentListener(new ComponentAdapter()
+		getScope().addComponentListener(new TerminationAdapter()
 		{
-			public IFuture componentTerminating(ChangeEvent ae)
+			public void componentTerminated()
 			{
 //				System.out.println("terminating");
 				SwingUtilities.invokeLater(new Runnable()
@@ -64,7 +62,6 @@ public class GUIPlanF1 extends Plan
 						gui.dispose();
 					}
 				});
-				return IFuture.DONE;
 			}
 		});
 		

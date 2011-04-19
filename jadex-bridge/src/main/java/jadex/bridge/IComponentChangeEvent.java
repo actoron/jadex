@@ -7,6 +7,8 @@ public interface IComponentChangeEvent
 	public static final String EVENT_TYPE_MODIFICATION 	= "modified";
 	public static final String EVENT_TYPE_OCCURRENCE	= "noticed";
 	
+	public static final String SOURCE_CATEGORY_COMPONENT = "Component";
+	
 	/**
 	 *  Returns the type of the event.
 	 *  @return The type of the event.

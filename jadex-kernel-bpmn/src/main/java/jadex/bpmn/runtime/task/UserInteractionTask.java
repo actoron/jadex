@@ -5,11 +5,10 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
-import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.ChangeEvent;
+import jadex.bridge.TerminationAdapter;
 import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -61,9 +60,9 @@ public class UserInteractionTask implements ITask
 	{
 		final Future ret = new Future();
 		
-		final IComponentListener	lis	= new ComponentAdapter()
+		final IComponentListener	lis	= new TerminationAdapter()
 		{
-			public IFuture componentTerminated(ChangeEvent ce)
+			public void componentTerminated()
 			{
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -75,7 +74,6 @@ public class UserInteractionTask implements ITask
 						}
 					}
 				});
-				return IFuture.DONE;
 			}
 		};
 		instance.addComponentListener(lis);
