@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Document : TestBenchmark: Workload 1 Created on : 18. März 2011, 16:23 
+	Author : vilenica Description: Purpose of the document follows. -->
+
+<Schedule type="Workload" name="W1" warmUpTime="1000">
+	<TerminateCondition>
+		 <TerminationTime value="20000" />
+		<!-- <SemanticCondition condition="$object.getProperty(&quot;ore&quot;) >= 55">
+			<ObjectSource type="ISpaceObject" name="homebase" />
+		</SemanticCondition> -->
+
+		<!-- <TargetFunction function="$beliefbase.tmpCounter>= 13"> <ObjectSource 
+			type="BDIAgent" name="Sentry" /> </TargetFunction> -->
+	</TerminateCondition>
+	<SytemUnderTest>
+		<Properties>
+			<Property name="appFilePath"
+				value="../sodekovs-simulationcontrol/src/main/java/jadex/simulation/examples/marsworld/MarsWorld4Benchmarking.application.xml"></Property>
+			<Property name="appConfiguration" value="TestRemote"></Property>
+			<Property name="spaceName" value="my2dspace"></Property>
+		</Properties>
+	</SytemUnderTest>
+	<Sequences>
+	<Sequence starttime="5000" actiontype="create">
+			<!-- <RepeatConfiguration type="list" values="3500;5000;7000;23000;" /> -->
+			<RepeatConfiguration type="list" values="9000;" />
+			<Actions>
+				<Action componentname="SentryW1" componenttype="BDIAgent"
+					componentmodel="../sodekovs-simulationcontrol/src/main/java/jadex/simulation/examples/marsworld/sentry/Sentry.agent.xml" numberOfComponents="1"> 
+					<Properties>
+						<Property name="sspeed" value="22"></Property>
+					</Properties>
+				</Action>
+			</Actions>
+		</Sequence>
+		<Sequence starttime="12000" actiontype="delete">
+			<!-- <RepeatConfiguration type="list" values="3500;5000;7000;23000;" /> -->
+			<RepeatConfiguration type="space" step="3000" end="20000" />
+			<Actions>
+				<Action componentname="SentryW1" componenttype="BDIAgent"
+					componentmodel="jadex.simulation.examples.marsworld.sentry.sentry" numberOfComponents="2"> 
+					<Properties>
+						<Property name="sspeed" value="22"></Property>
+					</Properties>
+				</Action>
+			</Actions>
+		</Sequence>
+	</Sequences>
+</Schedule>
