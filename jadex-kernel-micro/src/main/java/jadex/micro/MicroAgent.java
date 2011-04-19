@@ -278,12 +278,12 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 				{
 					public void timeEventOccurred(long currenttime)
 					{
-						interpreter.scheduleStep(new ExecuteWaitForStep(ts, run));
+						interpreter.scheduleStep(new ExecuteWaitForStep(ts[0], run));
 					}
 					
 					public String toString()
 					{
-						return getComponentIdentifier().getLocalName()+".waitForDue("+time+")_#"+this.hashCode();
+						return getComponentIdentifier().getLocalName()+".waitFor("+time+")_#"+this.hashCode();
 					}
 				});
 				timers.add(ts[0]);
@@ -318,7 +318,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 				{
 					public void timeEventOccurred(final long currenttime)
 					{
-						interpreter.scheduleStep(new ExecuteWaitForStep(ts, run));
+						interpreter.scheduleStep(new ExecuteWaitForStep(ts[0], run));
 					}
 				});
 				timers.add(ts[0]);
@@ -745,7 +745,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		//-------- attributes --------
 
 		/** The timer. */
-		private final ITimer[] ts;
+		private final ITimer ts;
 
 		/** The component step. */
 		private final IComponentStep run;
@@ -758,7 +758,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		 * @param ts an array of {@link ITimer}s
 		 * @param run the {@link IComponentStep} which is scheduled for execution
 		 */
-		public ExecuteWaitForStep(ITimer[] ts, IComponentStep run)
+		public ExecuteWaitForStep(ITimer ts, IComponentStep run)
 		{
 			this.ts = ts;
 			this.run = run;
@@ -772,7 +772,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		 */
 		public Object execute(IInternalAccess ia)
 		{
-			((MicroAgent)ia).timers.remove(ts[0]);
+//			((MicroAgent)ia).timers.remove(ts[0]);
 			run.execute(ia);
 			return null;
 		}
@@ -782,7 +782,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		 */
 		public String toString()
 		{
-			return "microagent.waitFor_#"+this.hashCode();
+			return ts.getTimedObject().toString();
 		}
 		
 		/**

@@ -132,9 +132,8 @@ public class MicroAgentViewPanel extends JPanel
 					{
 						synchronized(MicroAgentViewPanel.this)
 						{
-//							System.out.println(event);
-							
 							ComponentChangeEvent cce = (ComponentChangeEvent)event.getSource();
+//							System.out.println(cce);
 							
 							if("initialState".equals(event.getType()))
 							{

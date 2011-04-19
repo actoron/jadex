@@ -284,52 +284,26 @@ public class MicroAgentInterpreter implements IComponentInstance
 			if(!steps.isEmpty())
 			{
 				Object[] step = removeStep();
-//				String steptext = ""+step[0];
 				Future future = (Future)step[1];
 				
 				// Correct to execute them in try catch?!
-				
-//				if(step[0] instanceof ICommand)
-//				{
-//					if(future!=null)
-//					{
-//						try
-//						{
-//							((ICommand)step[0]).execute(microagent);
-//							future.setResult(null);
-//						}
-//						catch(RuntimeException e)
-//						{
-//							future.setException(e);
-//							throw e;
-//						}
-//					}
-//					else
-//					{
-//						((ICommand)step[0]).execute(microagent);
-//					}
-//				}
-//				else //if(step[0] instanceof IResultCommand)
-//				{
-					try
+				try
+				{
+					Object res = ((IComponentStep)step[0]).execute(microagent);
+					if(res instanceof IFuture)
 					{
-						Object res = ((IComponentStep)step[0]).execute(microagent);
-						if(res instanceof IFuture)
-						{
-							((IFuture)res).addResultListener(new DelegationResultListener(future));
-						}
-						else
-						{
-							future.setResult(res);
-						}
+						((IFuture)res).addResultListener(new DelegationResultListener(future));
 					}
-					catch(RuntimeException e)
+					else
 					{
-						future.setException(e);
-						throw e;
+						future.setResult(res);
 					}
-//				}
-				
+				}
+				catch(RuntimeException e)
+				{
+					future.setException(e);
+					throw e;
+				}
 			}
 	
 			return !steps.isEmpty();
@@ -594,18 +568,25 @@ public class MicroAgentInterpreter implements IComponentInstance
 //		System.out.println("ss: "+getAgentAdapter().getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
 		try
 		{
-			adapter.invokeLater(new Runnable()
-			{			
-				public void run()
-				{
-					addStep(new Object[]{step, ret});
-				}
-				
-				public String toString()
-				{
-					return "invokeLater("+step+")";
-				}
-			});
+			if(isExternalThread())
+			{
+				adapter.invokeLater(new Runnable()
+				{			
+					public void run()
+					{
+						addStep(new Object[]{step, ret});
+					}
+					
+					public String toString()
+					{
+						return "invokeLater("+step+")";
+					}
+				});
+			}
+			else
+			{
+				addStep(new Object[]{step, ret});
+			}
 		}
 		catch(Exception e)
 		{

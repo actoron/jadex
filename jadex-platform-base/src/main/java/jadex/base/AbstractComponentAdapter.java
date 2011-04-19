@@ -740,6 +740,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			}
 	
 			// Suspend when breakpoint is triggered.
+			// Necessary because component wakeup could be called anytime even if is at breakpoint..
 			boolean	breakpoint_triggered	= false;
 			if(!dostep && !IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
 			{

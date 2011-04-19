@@ -44,12 +44,14 @@ public class CountingAgent extends MicroAgent
 					}
 				});
 				
+//				scheduleStep(step);
+				
 				return null;
 			}
 			
 			public String toString()
 			{
-				return "couter.inc("+cnt+")";
+				return "counter.inc("+cnt+")";
 			}			
 		};
 		
