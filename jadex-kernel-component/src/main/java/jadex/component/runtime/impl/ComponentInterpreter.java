@@ -653,7 +653,6 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 		final Future ret = new Future();
 		if(componentlisteners!=null)
 		{
-			
 			SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -668,7 +667,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 					for(int i=0; i<componentlisteners.size(); i++)
 					{
 						IComponentListener lis = (IComponentListener)componentlisteners.get(i);
-						if (lis.getFilter().filter(event))
+						if(lis.getFilter().filter(event))
 							lis.eventOccured(event);
 						//lis.componentTerminated(new ChangeEvent(getComponentIdentifier()));
 						ret.setResult(adapter.getComponentIdentifier());

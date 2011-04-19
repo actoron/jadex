@@ -26,7 +26,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.clock.ITimer;
-import jadex.commons.ChangeEvent;
+import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -38,6 +38,7 @@ import jadex.javaparser.SimpleValueFetcher;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -77,12 +78,6 @@ public class MicroAgentInterpreter implements IComponentInstance
 	
 	/** The scheduled steps of the agent. */
 	protected List steps;
-	
-//	/** The change listeners. */
-//	protected List changelisteners;
-
-//	/** The execution history. */
-//	protected List history;
 	
 	/** The service container. */
 	protected IServiceContainer container;
@@ -494,70 +489,6 @@ public class MicroAgentInterpreter implements IComponentInstance
 	
 	//-------- helpers --------
 	
-//	/**
-//	 *  Get the history mode.
-//	 */
-//	public boolean isHistoryEnabled()
-//	{
-//		return history!=null;
-//	}
-	
-	/**
-	 *  Get the history.
-	 *  @return The history.
-	 * /
-	public List getSteps()
-	{
-		return this.steps;
-	}*/
-	
-//	/**
-//	 *  Get the history.
-//	 *  @return The history.
-//	 */
-//	public List getHistory()
-//	{
-//		return this.history;
-//	}
-
-//	/**
-//	 *  Set the history mode.
-//	 */
-//	public void	setHistoryEnabled(boolean enabled)
-//	{
-//		// Hack!!! synchronized because of MicroAgentViewPanel.
-//		if(enabled && history==null)
-//			history	= Collections.synchronizedList(new ArrayList());
-//		else if(!enabled && history!=null)
-//			history	= null;
-//	}
-	
-//	/**
-//	 *  Schedule a step of the agent.
-//	 *  May safely be called from external threads.
-//	 *  @param step	Code to be executed as a step of the agent.
-//	 */
-//	public IFuture scheduleStep(final ICommand step)
-//	{
-//		final Future ret = new Future();
-////		System.out.println("ss: "+getAgentAdapter().getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
-//		try
-//		{
-//			adapter.invokeLater(new Runnable()
-//			{			
-//				public void run()
-//				{
-//					addStep(new Object[]{step, ret});
-//				}
-//			});
-//		}
-//		catch(Exception e)
-//		{
-//			ret.setException(e);
-//		}
-//		return ret;
-//	}
-	
 	/**
 	 *  Schedule a step of the agent.
 	 *  May safely be called from external threads.
@@ -608,7 +539,8 @@ public class MicroAgentInterpreter implements IComponentInstance
 		else
 		{
 			steps.add(step);
-			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, step[0].getClass().getName(), step[0].toString(), microagent.getComponentIdentifier()));
+			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, step[0].getClass().getName(), 
+				step[0].toString(), microagent.getComponentIdentifier(), getStepDetails((IComponentStep)step[0])));
 		}
 	}
 	
@@ -618,32 +550,11 @@ public class MicroAgentInterpreter implements IComponentInstance
 	protected Object[] removeStep()
 	{
 		Object[] ret = (Object[])steps.remove(0);
-		notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_STEP, ret[0].getClass().getName(), ret[0].toString(), microagent.getComponentIdentifier()));
+		notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_STEP, 
+			ret[0].getClass().getName(), ret[0].toString(), microagent.getComponentIdentifier(), getStepDetails((IComponentStep)ret[0])));
 //		notifyListeners(new ChangeEvent(this, "removeStep", new Integer(0)));
 		return ret;
 	}
-	
-//	/**
-//	 *  Add a new step.
-//	 */
-//	protected void addHistoryEntry(String steptext)
-//	{
-//		if(history!=null)
-//		{
-//			history.add(steptext);
-////			notifyListeners(new ChangeEvent(this, "addHistoryEntry", steptext));
-////			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, "historyentry", microagent.getComponentIdentifier()));
-//		}
-//	}
-	
-	/**
-	 *  Clear the history.
-	 * /
-	public void clearHistory()
-	{
-		if(history!=null)
-			history.clear();
-	}*/
 	
 	/**
 	 *  Add an action from external thread.
@@ -848,46 +759,6 @@ public class MicroAgentInterpreter implements IComponentInstance
 		return new IntermediateComponentResultListener(listener, adapter);
 	}
 	
-//	/**
-//	 *  Add a change listener.
-//	 *  @param listener The listener.
-//	 */
-//	public void addChangeListener(IChangeListener listener)
-//	{
-//		if(changelisteners==null)
-//			changelisteners = new ArrayList();
-//		changelisteners.add(listener);
-//		
-//		// Inform new listener of current state.
-//		listener.changeOccurred(new ChangeEvent(this, "initialState", new Object[]{
-//			steps.toArray(), history.toArray()
-//		}));
-//	}
-//	
-//	/**
-//	 *  Remove a change listener.
-//	 *  @param listener The listener.
-//	 */
-//	public void removeChangeListener(IChangeListener listener)
-//	{
-//		if(changelisteners!=null)
-//			changelisteners.remove(listener);
-//	}
-	
-//	/**
-//	 *  Notify the change listeners.
-//	 */
-//	public void notifyListeners(ChangeEvent event)
-//	{
-//		if(changelisteners!=null)
-//		{
-//			for(int i=0; i<changelisteners.size(); i++)
-//			{
-//				((IChangeListener)changelisteners.get(i)).changeOccurred(event);
-//			}
-//		}
-//	}
-	
 	/**
 	 *  Add an component listener.
 	 *  @param listener The listener.
@@ -926,21 +797,6 @@ public class MicroAgentInterpreter implements IComponentInstance
 	/**
 	 *  Notify the component listeners.
 	 */
-	public void notifyTerminatingListeners()
-	{
-	//TODO: FIXME!
-		/*if(componentlisteners!=null)
-		{
-			for(int i=0; i<componentlisteners.size(); i++)
-			{
-				((IComponentListener)componentlisteners.get(i)).componentTerminating(new ChangeEvent(microagent.getComponentIdentifier()));
-			}
-		}*/
-	}
-	
-	/**
-	 *  Notify the component listeners.
-	 */
 	public void notifyTerminatedListeners()
 	{
 		if(componentlisteners!=null)
@@ -953,6 +809,38 @@ public class MicroAgentInterpreter implements IComponentInstance
 					event.setTime(((IClockService)result).getTime());
 					event.setEventType(IComponentChangeEvent.EVENT_TYPE_DISPOSAL);
 					event.setSourceCategory(IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT);
+					event.setSourceType(getAgentModel().getName());
+					event.setSourceName(adapter.getComponentIdentifier().getName());
+					event.setComponent(adapter.getComponentIdentifier());
+					for(int i=0; i<componentlisteners.size(); i++)
+					{
+						IComponentListener lis = (IComponentListener)componentlisteners.get(i);
+						if (lis.getFilter().filter(event))
+							lis.eventOccured(event);
+						//lis.componentTerminated(new ChangeEvent(getComponentIdentifier()));
+					}
+				}
+			});
+		}
+	}
+	
+	/**
+	 *  Notify the component listeners.
+	 */
+	public void notifyTerminatingListeners()
+	{
+		if(componentlisteners!=null)
+		{
+			SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object result)
+				{
+					ComponentChangeEvent event = new ComponentChangeEvent();
+					event.setTime(((IClockService)result).getTime());
+					event.setEventType(IComponentChangeEvent.EVENT_TYPE_DISPOSAL);
+					event.setSourceCategory(IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT);
+					// todo: fixme
+					event.setSourceName("terminating"); 
 					event.setSourceType(getAgentModel().getName());
 					event.setSourceName(adapter.getComponentIdentifier().getName());
 					event.setComponent(adapter.getComponentIdentifier());
@@ -1100,5 +988,39 @@ public class MicroAgentInterpreter implements IComponentInstance
 		{
 			return "microagent.messageArrived()_#"+this.hashCode();
 		}
+	}
+	
+	/**
+	 *  Get the details of a step.
+	 */
+	public String getStepDetails(IComponentStep step)
+	{
+		StringBuffer buf = new StringBuffer();
+		
+		buf.append("Class = ").append(SReflect.getClassName(step.getClass()));
+		
+		Field[] fields = step.getClass().getDeclaredFields();
+		for(int i=0; i<fields.length; i++)
+		{
+			String valtext = null;
+			try
+			{
+				fields[i].setAccessible(true);
+				Object val = fields[i].get(step);
+				valtext = val==null? "null": val.toString();
+			}
+			catch(Exception e)
+			{
+				valtext = e.getMessage();
+			}
+			
+			if(valtext!=null)
+			{
+				buf.append("\n");
+				buf.append(fields[i].getName()).append(" = ").append(valtext);
+			}
+		}
+		
+		return buf.toString();
 	}
 }

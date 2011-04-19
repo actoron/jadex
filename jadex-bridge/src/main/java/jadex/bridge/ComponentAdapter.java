@@ -7,7 +7,7 @@ import jadex.commons.future.IFuture;
  *  Adapter for the IComponentListener interface.
  *
  */
-public class ComponentAdapter// implements IComponentListener
+public class ComponentAdapter implements IComponentListener
 {
 	/**
 	 *  Returns an event filter, indicating which events

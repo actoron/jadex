@@ -27,6 +27,9 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	/** Reason for the event, if any (e.g. goal succeeded). */
 	protected String reason;
 	
+	/** Event details (e.g. step details of micro agents). */
+	protected String details;
+	
 	/**
 	 *  Create a new event.
 	 */
@@ -38,16 +41,16 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	 *  Create a new event.
 	 */
 	public ComponentChangeEvent(String eventtype, String sourcecategory, String sourcetype, 
-		String sourcename, IComponentIdentifier cid)
+		String sourcename, IComponentIdentifier cid, String details)
 	{
-		this(eventtype, sourcecategory, sourcetype, sourcename, cid, null, 0);
+		this(eventtype, sourcecategory, sourcetype, sourcename, cid, null, details, 0);
 	}
 	
 	/**
 	 *  Create a new event.
 	 */
 	public ComponentChangeEvent(String eventtype, String sourcecategory, String sourcetype, 
-		String sourcename, IComponentIdentifier cid, String reason, long time)
+		String sourcename, IComponentIdentifier cid, String reason, String details, long time)
 	{
 		this.eventtype = eventtype;
 		this.time = time;
@@ -56,6 +59,7 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 		this.sourcecategory = sourcecategory;
 		this.component = cid;
 		this.reason = reason;
+		this.details = details;
 	}
 
 	/**
@@ -128,6 +132,15 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	public String getReason()
 	{
 		return reason;
+	}
+	
+	/**
+	 *  Get the details.
+	 *  @return The details.
+	 */
+	public String getDetails()
+	{
+		return details;
 	}
 	
 	//================== Setters ===================
@@ -203,7 +216,16 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	{
 		this.reason = reason;
 	}
-	
+
+	/**
+	 *  Set the details.
+	 *  @param details The details to set.
+	 */
+	public void setDetails(String details)
+	{
+		this.details = details;
+	}
+
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder(getComponent()!=null? getComponent().getName(): "unknown");
