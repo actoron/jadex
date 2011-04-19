@@ -5,6 +5,7 @@ import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.tools.ProcessThreadInfo;
 import jadex.bpmn.tools.ProcessViewPanel.BPMNChangeListener;
 import jadex.bridge.ComponentAdapter;
+import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -131,35 +132,40 @@ public class MicroAgentViewPanel extends JPanel
 					{
 						synchronized(MicroAgentViewPanel.this)
 						{
-							System.out.println(event);
-//							if("initialState".equals(event.getType()))
-//							{
-//								Object[] scpy = (Object[])((Object[])event.getValue())[0];
-//								Object[] hcpy = (Object[])((Object[])event.getValue())[1];
-//							
-//								steps.removeAllElements();
-//								for(int i=0; i<scpy.length; i++)
-//									steps.addElement(scpy[i]);
-//								
-//								history.removeAllElements();
-//								for(int i=0; i<hcpy.length; i++)
-//									history.addElement(hcpy[i]);
-//								
-//								if(steps.size()>0)
-//									sl.setSelectedIndex(0);
-//							}
-//							else if("addStep".equals(event.getType()))
-//							{
-//								steps.addElement(event.getValue());
-//								if(steps.size()==1)
-//									sl.setSelectedIndex(0);
-//							}
-//							else if("removeStep".equals(event.getType()))
-//							{
+//							System.out.println(event);
+							
+							ComponentChangeEvent cce = (ComponentChangeEvent)event.getSource();
+							
+							if("initialState".equals(event.getType()))
+							{
+								Object[] scpy = (Object[])((Object[])event.getValue())[0];
+								Object[] hcpy = (Object[])((Object[])event.getValue())[1];
+							
+								steps.removeAllElements();
+								for(int i=0; i<scpy.length; i++)
+									steps.addElement(scpy[i]);
+								
+								history.removeAllElements();
+								for(int i=0; i<hcpy.length; i++)
+									history.addElement(hcpy[i]);
+								
+								if(steps.size()>0)
+									sl.setSelectedIndex(0);
+							}
+							else if(ComponentChangeEvent.EVENT_TYPE_CREATION.equals(cce.getEventType()) && MicroAgentInterpreter.TYPE_STEP.equals(cce.getSourceCategory()))
+							{
+								steps.addElement(cce.getSourceName());
+								if(steps.size()==1)
+									sl.setSelectedIndex(0);
+								history.addElement(cce.getSourceName());
+							}
+							else if(ComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()) && MicroAgentInterpreter.TYPE_STEP.equals(cce.getSourceCategory()))
+							{
 //								steps.removeElementAt(((Integer)event.getValue()).intValue());
-//								if(steps.size()>0)
-//									sl.setSelectedIndex(0);
-//							}
+								steps.removeElement(cce.getSourceName());
+								if(steps.size()>0)
+									sl.setSelectedIndex(0);
+							}
 //							else if("addHistoryEntry".equals(event.getType()))
 //							{
 //								history.addElement(""+event.getValue());

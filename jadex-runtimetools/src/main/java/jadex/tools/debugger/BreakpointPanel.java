@@ -2,6 +2,7 @@ package jadex.tools.debugger;
 
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
@@ -61,8 +62,8 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 	/** The component description. */
 	protected IComponentDescription	description;
 	
-	/** The service provider. */
-	protected IServiceProvider	provider;
+	/** The external access. */
+	protected IExternalAccess access;
 	
 	/** The list. */
 	protected JTable list;
@@ -75,10 +76,11 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 	/**
 	 *  Create a new rulebase panel.
 	 */
-	public BreakpointPanel(Collection breakpoints, final IComponentDescription description, IServiceProvider provider)
+	public BreakpointPanel(Collection breakpoints, final IComponentDescription description, IExternalAccess access)
 	{
 		this.breakpoints = new ArrayList(breakpoints);
 		this.description	= description;
+		this.access = access;
 		
 		TableModel lm = new AbstractTableModel()
 		{
@@ -258,7 +260,7 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 					{
 						bps.remove(breakpoints.get(sorter.modelIndex(rowIndex)));
 					}
-					SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new SwingDefaultResultListener(BreakpointPanel.this)
 					{
 						public void customResultAvailable(Object result)

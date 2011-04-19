@@ -37,22 +37,24 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	/**
 	 *  Create a new event.
 	 */
-	public ComponentChangeEvent(String eventtype, String sourcecategory, IComponentIdentifier cid)
+	public ComponentChangeEvent(String eventtype, String sourcecategory, String sourcetype, 
+		String sourcename, IComponentIdentifier cid)
 	{
-		this(null, 0, null, null, null, null, cid);
+		this(eventtype, sourcecategory, sourcetype, sourcename, cid, null, 0);
 	}
-
+	
 	/**
 	 *  Create a new event.
 	 */
-	public ComponentChangeEvent(String eventtype, long time, String sourcename,
-		String sourcetype, String sourcecategory, String reason, IComponentIdentifier cid)
+	public ComponentChangeEvent(String eventtype, String sourcecategory, String sourcetype, 
+		String sourcename, IComponentIdentifier cid, String reason, long time)
 	{
 		this.eventtype = eventtype;
 		this.time = time;
 		this.sourcename = sourcename;
 		this.sourcetype = sourcetype;
 		this.sourcecategory = sourcecategory;
+		this.component = cid;
 		this.reason = reason;
 	}
 
@@ -204,14 +206,14 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	
 	public String toString()
 	{
-		StringBuilder sb = new StringBuilder(getComponent().getName());
+		StringBuilder sb = new StringBuilder(getComponent()!=null? getComponent().getName(): "unknown");
 		sb.append(" ");
-		if (getEventType() != null)
+		if(getEventType() != null)
 		{
 			sb.append(getEventType());
 			sb.append(" ");
 		}
-		if (getSourceCategory() != null)
+		if(getSourceCategory() != null)
 		{
 			sb.append(getSourceCategory());
 			sb.append(" ");
@@ -219,7 +221,7 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 		sb.append("(");
 		sb.append(getTime());
 		sb.append("): ");
-		if (getSourceName() != null)
+		if(getSourceName() != null)
 		{
 			sb.append("Instance: ");
 			sb.append(getSourceName());
@@ -229,7 +231,7 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 		sb.append("Type: ");
 		sb.append(getSourceType());
 		
-		if (getReason() != null)
+		if(getReason() != null)
 		{
 			sb.append(", Reason: ");
 			sb.append(getReason());

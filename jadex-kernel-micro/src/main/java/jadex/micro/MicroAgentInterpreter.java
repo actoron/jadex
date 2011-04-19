@@ -26,8 +26,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.ITimer;
 import jadex.commons.ChangeEvent;
-import jadex.commons.IChangeListener;
-import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -37,7 +35,6 @@ import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 
-import java.awt.event.ComponentEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -83,8 +80,8 @@ public class MicroAgentInterpreter implements IComponentInstance
 //	/** The change listeners. */
 //	protected List changelisteners;
 
-	/** The execution history. */
-	protected List history;
+//	/** The execution history. */
+//	protected List history;
 	
 	/** The service container. */
 	protected IServiceContainer container;
@@ -333,7 +330,6 @@ public class MicroAgentInterpreter implements IComponentInstance
 					}
 //				}
 				
-//				addHistoryEntry(steptext);
 			}
 	
 			return !steps.isEmpty();
@@ -523,13 +519,13 @@ public class MicroAgentInterpreter implements IComponentInstance
 	
 	//-------- helpers --------
 	
-	/**
-	 *  Get the history mode.
-	 */
-	public boolean isHistoryEnabled()
-	{
-		return history!=null;
-	}
+//	/**
+//	 *  Get the history mode.
+//	 */
+//	public boolean isHistoryEnabled()
+//	{
+//		return history!=null;
+//	}
 	
 	/**
 	 *  Get the history.
@@ -540,26 +536,26 @@ public class MicroAgentInterpreter implements IComponentInstance
 		return this.steps;
 	}*/
 	
-	/**
-	 *  Get the history.
-	 *  @return The history.
-	 */
-	public List getHistory()
-	{
-		return this.history;
-	}
+//	/**
+//	 *  Get the history.
+//	 *  @return The history.
+//	 */
+//	public List getHistory()
+//	{
+//		return this.history;
+//	}
 
-	/**
-	 *  Set the history mode.
-	 */
-	public void	setHistoryEnabled(boolean enabled)
-	{
-		// Hack!!! synchronized because of MicroAgentViewPanel.
-		if(enabled && history==null)
-			history	= Collections.synchronizedList(new ArrayList());
-		else if(!enabled && history!=null)
-			history	= null;
-	}
+//	/**
+//	 *  Set the history mode.
+//	 */
+//	public void	setHistoryEnabled(boolean enabled)
+//	{
+//		// Hack!!! synchronized because of MicroAgentViewPanel.
+//		if(enabled && history==null)
+//			history	= Collections.synchronizedList(new ArrayList());
+//		else if(!enabled && history!=null)
+//			history	= null;
+//	}
 	
 //	/**
 //	 *  Schedule a step of the agent.
@@ -630,7 +626,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 		else
 		{
 			steps.add(step);
-			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, microagent.getComponentIdentifier()));
+			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, step[0].getClass().getName(), step[0].toString(), microagent.getComponentIdentifier()));
 		}
 	}
 	
@@ -640,23 +636,23 @@ public class MicroAgentInterpreter implements IComponentInstance
 	protected Object[] removeStep()
 	{
 		Object[] ret = (Object[])steps.remove(0);
-		notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, microagent.getComponentIdentifier()));
+		notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_STEP, ret[0].getClass().getName(), ret[0].toString(), microagent.getComponentIdentifier()));
 //		notifyListeners(new ChangeEvent(this, "removeStep", new Integer(0)));
 		return ret;
 	}
 	
-	/**
-	 *  Add a new step.
-	 */
-	protected void addHistoryEntry(String steptext)
-	{
-		if(history!=null)
-		{
-			history.add(steptext);
-//			notifyListeners(new ChangeEvent(this, "addHistoryEntry", steptext));
-			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, "historyentry", microagent.getComponentIdentifier()));
-		}
-	}
+//	/**
+//	 *  Add a new step.
+//	 */
+//	protected void addHistoryEntry(String steptext)
+//	{
+//		if(history!=null)
+//		{
+//			history.add(steptext);
+////			notifyListeners(new ChangeEvent(this, "addHistoryEntry", steptext));
+////			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, "historyentry", microagent.getComponentIdentifier()));
+//		}
+//	}
 	
 	/**
 	 *  Clear the history.

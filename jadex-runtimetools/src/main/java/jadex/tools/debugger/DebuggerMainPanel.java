@@ -107,7 +107,7 @@ public class DebuggerMainPanel extends JSplitPane
 								if(props!=null && props.containsKey(KEY_DEBUGGER_BREAKPOINTS))
 								{
 									Collection	breakpoints	= (Collection)props.get(KEY_DEBUGGER_BREAKPOINTS);
-									leftpanel[0] = new BreakpointPanel(breakpoints, desc, jcc.getPlatformAccess().getServiceProvider());
+									leftpanel[0] = new BreakpointPanel(breakpoints, desc, jcc.getPlatformAccess());
 									DebuggerMainPanel.this.setLeftComponent(leftpanel[0]);
 									DebuggerMainPanel.this.setDividerLocation(150);	// Hack???
 								}
