@@ -26,6 +26,7 @@ public class Constants {
 	public static final String TERMINATED = "terminated";
 	public static final String RUNNING = "running";
 	public static final String PREPARING_START = "preparing_start";
-	
-
+	public static final String SCHEDULE_LOGGER = "schedule_logger";
+	public static final String PREPARE_GNUPLOT_PREFIX = "prepare_gnuplot_prefix";
+	public static final String PREPARE_GNUPLOT_SUFFIX = "prepare_gnuplot_suffix";
 }

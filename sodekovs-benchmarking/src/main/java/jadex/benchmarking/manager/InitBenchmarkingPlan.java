@@ -7,6 +7,7 @@ import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.benchmarking.helper.Constants;
 import jadex.benchmarking.helper.Methods;
+import jadex.benchmarking.logger.ScheduleLogger;
 import jadex.benchmarking.model.Schedule;
 import jadex.benchmarking.model.SemanticCondition;
 import jadex.benchmarking.model.Sequence;
@@ -45,9 +46,11 @@ public class InitBenchmarkingPlan extends Plan {
 	private AbstractEnvironmentSpace sutSpace = null;
 	// Component Identifier of scheduler
 	private IComponentIdentifier schedulerCID = null;
+	//private Log events
+	private ScheduleLogger scheduleLogger = null;
 
 	public void body() {
-
+	
 		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 		clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 
@@ -68,21 +71,29 @@ public class InitBenchmarkingPlan extends Plan {
 
 		getBeliefbase().getBelief("suTinfo").setFact(new SuTinfo(sortedSequenceList, sutCID, sutExta, sutSpace));
 
+		//initLogger
+		//Attention: Logger has still to be initialized! (starttime and clockservice)
+		scheduleLogger = new ScheduleLogger();		
+
+		
 		// Start scheduler, that handles the execution of the sequences of the conducted benchmark.
 		// Scheduler is started in suspend mode.
 		startScheduler();
-
+	
 		// Resume SuT
 		cms.resumeComponent(sutCID).get(this);
 		
 		// start warm up phase, if defined. Schedule starts after this phase its execution
 		if (benchConf.getWarmUpTime() != null) {
 			waitFor(benchConf.getWarmUpTime());
+//			myLogger.log("Warm-up finished");
 		}
 		
+	
 		// Resume scheduler
 		cms.resumeComponent(schedulerCID).get(this);
 		getBeliefbase().getBelief("benchmarkStatus").setFact(Constants.RUNNING);
+//		myLogger.log("Resumed Scheduler");
 
 		// TODO: Hack: Synchronize start time!
 		long startTime = clockservice.getTime();
@@ -91,6 +102,7 @@ public class InitBenchmarkingPlan extends Plan {
 		// Handle termination of benchmark
 		terminateBenchmark(benchConf);
 		getBeliefbase().getBelief("benchmarkStatus").setFact(Constants.TERMINATED);
+		scheduleLogger.log(Constants.PREPARE_GNUPLOT_SUFFIX);
 	}
 
 	/*
@@ -114,6 +126,7 @@ public class InitBenchmarkingPlan extends Plan {
 	private void startScheduler() {
 		HashMap args = new HashMap();
 		args.put(Constants.SUT_INFO, new SuTinfo(sortedSequenceList, sutCID, sutExta, sutSpace));
+		args.put(Constants.SCHEDULE_LOGGER, scheduleLogger);
 
 		IFuture fut = cms.createComponent("Scheduler" + GetRandom.getRandom(100000), Constants.PATH_OF_SCHEDULER, new CreationInfo(null, args, null, true, false), null);
 		schedulerCID = (IComponentIdentifier) fut.get(this);

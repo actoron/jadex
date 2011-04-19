@@ -5,6 +5,7 @@ import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.runtime.Plan;
 import jadex.benchmarking.helper.Methods;
+import jadex.benchmarking.logger.ScheduleLogger;
 import jadex.benchmarking.model.Action;
 import jadex.benchmarking.model.Sequence;
 import jadex.benchmarking.model.SuTinfo;
@@ -38,13 +39,14 @@ public abstract class AbstractSchedulerPlan extends Plan {
 	protected IApplicationExternalAccess sutExta = null;
 	// List of sequences to be executed, ordered by starttime
 	protected ArrayList<Sequence> sortedSequenceList = null;
-
+	//Logs events of the schedule
+	protected ScheduleLogger scheduleLogger = null;
 	// -------- methods --------
 
 	/*
 	 * Create and start a component.
 	 */
-	protected void createComponent(Action action) {
+	protected void createComponent(final Action action) {
 		HashMap<String, String> componentProperties = Methods.propertyListToHashMap(action.getProperties().getProperty());
 
 		if (action.getComponenttype() == null) {
@@ -56,6 +58,7 @@ public abstract class AbstractSchedulerPlan extends Plan {
 						.addResultListener(new DefaultResultListener() {
 							public void resultAvailable(Object result) {
 								System.out.println("Created Component : " + " -> " + getTimestamp());
+								scheduleLogger.log("C: "+ action.getComponentname() );
 							}
 						});
 			}
@@ -69,6 +72,7 @@ public abstract class AbstractSchedulerPlan extends Plan {
 			for (int i = 0; i < action.getNumberOfComponents(); i++) {
 				sutSpace.createSpaceObject(action.getComponentmodel(), componentProperties, null);
 				System.out.println("Created Component : " + action.getComponentmodel() + " -> " + getTimestamp());
+				scheduleLogger.log("C: "+ action.getComponentname() );
 			}
 		} else {
 			System.out.println("Error: ComponentType not supported! : " + action.getComponenttype());
@@ -84,7 +88,6 @@ public abstract class AbstractSchedulerPlan extends Plan {
 		if (action.getComponenttype() == null) {
 			System.out.println("Error: ComponentType not set!");
 		} else if (action.getComponenttype().equalsIgnoreCase(GlobalConstants.BDI_AGENT)) {
-			for (int i = 0; i < action.getNumberOfComponents(); i++) {
 				// Search for component type
 				cms.getComponentDescriptions().addResultListener(new DefaultResultListener() {
 					public void resultAvailable(Object result) {
@@ -97,6 +100,7 @@ public abstract class AbstractSchedulerPlan extends Plan {
 									cms.destroyComponent(descriptions[i].getName()).addResultListener(new DefaultResultListener() {
 										public void resultAvailable(Object result) {
 											System.out.println("Destroyed Component : " + action.getComponentmodel() + " -> " + getTimestamp());
+											scheduleLogger.log("D: "+ action.getComponentname() );
 										}
 									});
 									destroyConunter++;
@@ -109,7 +113,7 @@ public abstract class AbstractSchedulerPlan extends Plan {
 						}
 					}
 				});
-			}
+//			}
 			// IComponentIdentifier cid = (IComponentIdentifier) fut.get(this);
 			// IBDIExternalAccess ie = (IBDIExternalAccess) cms.getExternalAccess(cid).get(this);
 		} else if (action.getComponenttype().equalsIgnoreCase(GlobalConstants.ISPACE_OBJECT)) {
@@ -121,10 +125,10 @@ public abstract class AbstractSchedulerPlan extends Plan {
 			int destroyConunter = 0;
 
 			for (int i = 0; i < objects.length; i++) {
-				System.out.println(objects[i].getType()  + " 1-1 " + action.getComponentmodel());
 				if (objects[i].getType().equalsIgnoreCase(action.getComponentmodel())) {
 					sutSpace.destroySpaceObject(objects[i].getId());
 					System.out.println("Destroyed Component : " + action.getComponentmodel() + " -> " + getTimestamp());
+					scheduleLogger.log("D: "+ action.getComponentname() );
 
 					destroyConunter++;
 					// check whether all components have been destroyed

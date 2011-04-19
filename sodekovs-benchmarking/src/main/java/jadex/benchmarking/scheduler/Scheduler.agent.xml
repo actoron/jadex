@@ -21,6 +21,7 @@
 		<import>jadex.simulation.helper.*</import>
 		<import>jadex.benchmarking.model.*</import>
 		<import>jadex.benchmarking.scheduler.*</import>
+		<import>jadex.benchmarking.logger.*</import>
 	</imports>
 
 
@@ -41,6 +42,9 @@
 
 		<!-- Contains all information required to execute the schedule.-->
 		<belief name="SuTinfo" class="SuTinfo"/>
+		
+		<!-- Contains the schedule logger.-->
+		<belief name="schedule_logger" class="ScheduleLogger"/>
 
 	</beliefs>
 
@@ -61,6 +65,7 @@
 			<parameter name="args" class="SuTinfo" />
 			<!-- Sequence to be executed repeatedly. -->
 			<parameter name="sequence" class="Sequence" />
+			<parameter name="scheduleLogger" class="ScheduleLogger" />
 		</achievegoal>
 	</goals>
 
@@ -90,6 +95,9 @@
 			</parameter>
 			<parameter name="sequence" class="Sequence">
 				<goalmapping ref="SequenceRepeaterGoal.sequence" />
+			</parameter>
+			<parameter name="scheduleLogger" class="ScheduleLogger">
+				<goalmapping ref="SequenceRepeaterGoal.scheduleLogger" />
 			</parameter>
 			<trigger>
 				<goal ref="SequenceRepeaterGoal" />
