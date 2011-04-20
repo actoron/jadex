@@ -1,6 +1,5 @@
 package jadex.tools.debugger.micro;
 
-import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
@@ -30,7 +29,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
-import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -79,7 +77,7 @@ public class MicroAgentViewPanel extends JPanel
 			public Component getListCellRendererComponent(JList list, Object value,
 				int index, boolean isSelected, boolean cellHasFocus)
 			{
-				value = ((ComponentChangeEvent)value).getSourceName();
+				value = ((IComponentChangeEvent)value).getSourceName();
 				return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			}
 		});
@@ -117,7 +115,7 @@ public class MicroAgentViewPanel extends JPanel
 //				System.out.println("sel: "+idx);
 				if(idx!=-1)
 				{
-					ComponentChangeEvent cce = (ComponentChangeEvent)steps.get(idx);
+					IComponentChangeEvent cce = (IComponentChangeEvent)steps.get(idx);
 					if(cce!=null && cce!=laststep)
 					{
 //						if(laststep!=null)
@@ -143,7 +141,7 @@ public class MicroAgentViewPanel extends JPanel
 			{
 				public boolean filter(Object obj)
 				{
-					ComponentChangeEvent cce = (ComponentChangeEvent)obj;
+					IComponentChangeEvent cce = (IComponentChangeEvent)obj;
 					return cce.getSourceCategory().equals(MicroAgentInterpreter.TYPE_STEP);
 				}
 			};
@@ -155,60 +153,68 @@ public class MicroAgentViewPanel extends JPanel
 			
 			public IFuture eventOccured(final IComponentChangeEvent cce)
 			{
+				// todo: hide decomposing bulk events
+				if(cce.getBulkEvents().length>0)
+				{
+					IComponentChangeEvent[] events = cce.getBulkEvents();
+					for(int i=0; i<events.length; i++)
+					{
+						eventOccured(events[i]);
+					}
+					return IFuture.DONE;
+				}
+				
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
 					{
-						synchronized(MicroAgentViewPanel.this)
-						{
-//							System.out.println(cce);
-							
-//							if("initialState".equals(event.getType()))
-//							{
-//								Object[] scpy = (Object[])((Object[])event.getValue())[0];
-//								Object[] hcpy = (Object[])((Object[])event.getValue())[1];
+//						System.out.println(cce);
+					
+//						if("initialState".equals(event.getType()))
+//						{
+//							Object[] scpy = (Object[])((Object[])event.getValue())[0];
+//							Object[] hcpy = (Object[])((Object[])event.getValue())[1];
+//						
+//							steps.removeAllElements();
+//							for(int i=0; i<scpy.length; i++)
+//								steps.addElement(scpy[i]);
 //							
-//								steps.removeAllElements();
-//								for(int i=0; i<scpy.length; i++)
-//									steps.addElement(scpy[i]);
-//								
-//								history.removeAllElements();
-//								for(int i=0; i<hcpy.length; i++)
-//									history.addElement(hcpy[i]);
-//								
-//								if(steps.size()>0)
-//									sl.setSelectedIndex(0);
-//							}
-							if(ComponentChangeEvent.EVENT_TYPE_CREATION.equals(cce.getEventType()) && MicroAgentInterpreter.TYPE_STEP.equals(cce.getSourceCategory()))
+//							history.removeAllElements();
+//							for(int i=0; i<hcpy.length; i++)
+//								history.addElement(hcpy[i]);
+//							
+//							if(steps.size()>0)
+//								sl.setSelectedIndex(0);
+//						}
+						if(IComponentChangeEvent.EVENT_TYPE_CREATION.equals(cce.getEventType()) && MicroAgentInterpreter.TYPE_STEP.equals(cce.getSourceCategory()))
+						{
+							steps.addElement(cce);
+							if(steps.size()==1)
 							{
-								steps.addElement(cce);
-								if(steps.size()==1)
+								sl.setSelectedIndex(0);
+							}
+							if(hon.isSelected())
+							{
+								history.addElement(cce.getSourceName());
+								hl.ensureIndexIsVisible(history.size()-1);
+								hl.invalidate();
+								hl.repaint();
+							}
+						}
+						else if(IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()) && MicroAgentInterpreter.TYPE_STEP.equals(cce.getSourceCategory()))
+						{
+//							steps.removeElementAt(((Integer)event.getValue()).intValue());
+							for(int i=0; i<steps.size(); i++)
+							{
+								IComponentChangeEvent tmp = (IComponentChangeEvent)steps.get(i);
+								if(cce.getSourceName().equals(tmp.getSourceName()))
+								{
+									steps.removeElementAt(i);
+									break;
+								}
+								if(steps.size()>0)
 								{
 									sl.setSelectedIndex(0);
-								}
-								if(hon.isSelected())
-								{
-									history.addElement(cce.getSourceName());
-									hl.ensureIndexIsVisible(history.size()-1);
-									hl.invalidate();
-									hl.repaint();
-								}
-							}
-							else if(ComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()) && MicroAgentInterpreter.TYPE_STEP.equals(cce.getSourceCategory()))
-							{
-//								steps.removeElementAt(((Integer)event.getValue()).intValue());
-								for(int i=0; i<steps.size(); i++)
-								{
-									ComponentChangeEvent tmp = (ComponentChangeEvent)steps.get(i);
-									if(cce.getSourceName().equals(tmp.getSourceName()))
-									{
-										steps.removeElementAt(i);
-										break;
-									}
-									if(steps.size()>0)
-									{
-										sl.setSelectedIndex(0);
-									}
 								}
 							}
 						}

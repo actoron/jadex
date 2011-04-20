@@ -1507,17 +1507,19 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 *  Add an component listener.
 	 *  @param listener The listener.
 	 */
-	public void addComponentListener(IComponentListener listener)
+	public IFuture addComponentListener(IComponentListener listener)
 	{
 		ElementFlyweight.addEventListener(listener, interpreter.getAgent(), getState(), interpreter.getAgent());
+		return IFuture.DONE;
 	}
 	
 	/**
 	 *  Remove a component listener.
 	 *  @param listener The listener.
 	 */
-	public void removeComponentListener(IComponentListener listener)
+	public IFuture removeComponentListener(IComponentListener listener)
 	{
 		ElementFlyweight.removeEventListener(listener, interpreter.getAgent(), false, getState(), interpreter.getAgent());
+		return IFuture.DONE;
 	}
 }

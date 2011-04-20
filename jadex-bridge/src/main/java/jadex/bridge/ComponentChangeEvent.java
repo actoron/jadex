@@ -225,7 +225,19 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	{
 		this.details = details;
 	}
+	
+	/**
+	 *  Get the bulk events.
+	 *  @return The bulk events.
+	 */
+	public IComponentChangeEvent[] getBulkEvents()
+	{
+		return new IComponentChangeEvent[0];
+	}
 
+	/**
+	 *  Get the string representation.
+	 */
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder(getComponent()!=null? getComponent().getName(): "unknown");

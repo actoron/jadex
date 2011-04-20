@@ -34,19 +34,27 @@ public class BDIComponentChangeEvent extends ComponentChangeEvent
 		if (OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED.equals(type) ||
 			OAVBDIRuntimeModel.CHANGEEVENT_GOALADDED.equals(type) ||
 			OAVBDIRuntimeModel.CHANGEEVENT_PLANADDED.equals(type))
-				setEventType(EVENT_TYPE_CREATION);
+		{
+			setEventType(EVENT_TYPE_CREATION);
+		}
 		else if (OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATED.equals(type) ||
 				 OAVBDIRuntimeModel.CHANGEEVENT_FACTREMOVED.equals(type) ||
 				 OAVBDIRuntimeModel.CHANGEEVENT_GOALDROPPED.equals(type) ||
 				 OAVBDIRuntimeModel.CHANGEEVENT_PLANREMOVED.equals(type))
-					setEventType(EVENT_TYPE_DISPOSAL);
+		{
+			setEventType(EVENT_TYPE_DISPOSAL);
+		}
 		else if (OAVBDIRuntimeModel.CHANGEEVENT_FACTCHANGED.equals(type))
-					setEventType(EVENT_TYPE_MODIFICATION);
+		{
+			setEventType(EVENT_TYPE_MODIFICATION);
+		}
 		else if (OAVBDIRuntimeModel.CHANGEEVENT_INTERNALEVENTOCCURRED.equals(type) ||
 				 OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTRECEIVED.equals(type) ||
 				 OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTSENT.equals(type) ||
 				 OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATING.equals(type))
-					setEventType(EVENT_TYPE_OCCURRENCE);
+		{		
+			setEventType(EVENT_TYPE_OCCURRENCE);
+		}
 		
 		// Default reason
 		setReason("Unknown");

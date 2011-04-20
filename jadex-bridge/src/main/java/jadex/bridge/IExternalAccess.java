@@ -52,6 +52,25 @@ public interface IExternalAccess extends IRemotable
 	 */
 	public IFuture scheduleImmediate(IComponentStep step);
 	
+	/**
+	 *  Schedule a step of the component.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the component.
+	 *  @param delay The delay to wait before step should be done.
+	 *  @return The result of the step.
+	 */
+	public IFuture scheduleStep(IComponentStep step, long delay);
+	
+	/**
+	 *  Execute some code on the component's thread.
+	 *  Unlike scheduleStep(), the action will also be executed
+	 *  while the component is suspended.
+	 *  @param action	Code to be executed on the component's thread.
+	 *  @param delay The delay to wait before step should be done.
+	 *  @return The result of the step.
+	 */
+	public IFuture scheduleImmediate(IComponentStep step, long delay);
+	
 	//-------- normal --------
 	
 	/**

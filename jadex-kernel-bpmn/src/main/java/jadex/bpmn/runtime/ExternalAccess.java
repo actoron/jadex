@@ -6,6 +6,10 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.clock.ITimedObject;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -194,6 +198,67 @@ public class ExternalAccess implements IExternalAccess
 		{
 			ret.setException(e);
 		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Schedule a step of the component.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the component.
+	 *  @param delay The delay to wait before step should be done.
+	 *  @return The result of the step.
+	 */
+	public IFuture scheduleStep(final IComponentStep step, final long delay)
+	{
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(interpreter.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(interpreter.createResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				IClockService cs = (IClockService)result;
+				cs.createTimer(delay, new ITimedObject()
+				{
+					public void timeEventOccurred(long currenttime)
+					{
+						scheduleStep(step).addResultListener(new DelegationResultListener(ret));
+					}
+				});
+			}
+		}));
+		
+		return ret;
+	}
+	
+	/**
+	 *  Execute some code on the component's thread.
+	 *  Unlike scheduleStep(), the action will also be executed
+	 *  while the component is suspended.
+	 *  @param action	Code to be executed on the component's thread.
+	 *  @param delay The delay to wait before step should be done.
+	 *  @return The result of the step.
+	 */
+	public IFuture scheduleImmediate(final IComponentStep step, final long delay)
+	{
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(interpreter.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(interpreter.createResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				IClockService cs = (IClockService)result;
+				cs.createTimer(delay, new ITimedObject()
+				{
+					public void timeEventOccurred(long currenttime)
+					{
+						scheduleImmediate(step).addResultListener(new DelegationResultListener(ret));
+					}
+				});
+			}
+		}));
 		
 		return ret;
 	}

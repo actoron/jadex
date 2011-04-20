@@ -38,6 +38,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.clock.ITimedObject;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.commons.ChangeEvent;
@@ -563,7 +564,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	/**
 	 *  Delete a context. Called from context service before a context is
 	 *  removed from the platform. Default context behavior is to do nothing.
-	 *  @param application	The context to be deleted.
+	 *  @param interpreter	The context to be deleted.
 	 *  @param listener	The listener to be notified when deletion is finished (if any).
 	 */
 	public void deleteContext()
@@ -1543,21 +1544,51 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	 *  Add an component listener.
 	 *  @param listener The listener.
 	 */
-	public void addComponentListener(IComponentListener listener)
+	public IFuture addComponentListener(IComponentListener listener)
 	{
 		if(componentlisteners==null)
 			componentlisteners = new ArrayList();
 		componentlisteners.add(listener);
+		return IFuture.DONE;
 	}
 	
 	/**
 	 *  Remove a component listener.
 	 *  @param listener The listener.
 	 */
-	public void removeComponentListener(IComponentListener listener)
+	public IFuture removeComponentListener(IComponentListener listener)
 	{
 		if(componentlisteners!=null)
 			componentlisteners.remove(listener);
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Wait for some time and execute a component step afterwards.
+	 */
+	public IFuture waitFor(final long delay, final IComponentStep step)
+	{
+		// todo: remember and cleanup timers in case of component removal.
+		
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(createResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				IClockService cs = (IClockService)result;
+				cs.createTimer(delay, new ITimedObject()
+				{
+					public void timeEventOccurred(long currenttime)
+					{
+						scheduleStep(step).addResultListener(new DelegationResultListener(ret));
+					}
+				});
+			}
+		}));
+		
+		return ret;
 	}
 	
 //	/**

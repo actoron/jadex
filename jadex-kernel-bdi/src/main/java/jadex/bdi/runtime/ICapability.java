@@ -151,13 +151,13 @@ public interface ICapability	extends IElement
 	 *  Add an agent listener
 	 *  @param listener The listener.
 	 */
-	public void addComponentListener(IComponentListener listener);
+	public IFuture addComponentListener(IComponentListener listener);
 	
 	/**
 	 *  Add an agent listener
 	 *  @param listener The listener.
 	 */
-	public void removeComponentListener(IComponentListener listener);
+	public IFuture removeComponentListener(IComponentListener listener);
 	
 	/**
 	 *  Get subcapability names.

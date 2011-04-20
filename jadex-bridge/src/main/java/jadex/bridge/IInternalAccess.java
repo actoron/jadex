@@ -2,7 +2,6 @@ package jadex.bridge;
 
 import jadex.bridge.service.IServiceContainer;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 
@@ -74,40 +73,26 @@ public interface IInternalAccess
 	 */
 	public Logger getLogger();
 	
-//	/**
-//	 *  Get a required service.
-//	 *  @return The service.
-//	 */
-//	public IFuture getRequiredService(String name);
-//	
-//	/**
-//	 *  Get a required services.
-//	 *  @return The services.
-//	 */
-//	public IIntermediateFuture getRequiredServices(String name);
-//
-//	/**
-//	 *  Get a required service.
-//	 *  @return The service.
-//	 */
-//	public IFuture getRequiredService(String name, boolean rebind);
-//	
-//	/**
-//	 *  Get a required services.
-//	 *  @return The services.
-//	 */
-//	public IIntermediateFuture getRequiredServices(String name, boolean rebind);
-
-	
 	/**
 	 *  Add an component listener.
 	 *  @param listener The listener.
 	 */
-	public void addComponentListener(IComponentListener listener);
+	public IFuture addComponentListener(IComponentListener listener);
 	
 	/**
 	 *  Remove a component listener.
 	 *  @param listener The listener.
 	 */
-	public void removeComponentListener(IComponentListener listener);
+	public IFuture removeComponentListener(IComponentListener listener);
+	
+	/**
+	 *  Wait for some time and execute a component step afterwards.
+	 */
+	public IFuture waitFor(long delay, IComponentStep step);
+	
+	// todo:?
+//	/**
+//	 *  Wait for some time and execute a component step afterwards.
+//	 */
+//	public IFuture waitForImmediate(long delay, IComponentStep step);
 }

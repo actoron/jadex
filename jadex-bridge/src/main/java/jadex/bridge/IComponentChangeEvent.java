@@ -6,6 +6,7 @@ public interface IComponentChangeEvent
 	public static final String EVENT_TYPE_DISPOSAL		= "disposed";
 	public static final String EVENT_TYPE_MODIFICATION 	= "modified";
 	public static final String EVENT_TYPE_OCCURRENCE	= "noticed";
+	public static final String EVENT_TYPE_BULK = "bulk";
 	
 	public static final String SOURCE_CATEGORY_COMPONENT = "Component";
 	
@@ -56,4 +57,16 @@ public interface IComponentChangeEvent
 	 *  @return Reason why the event occured, may be null.
 	 */
 	public String getReason();
+	
+	/**
+	 *  Get the details.
+	 *  @return The details.
+	 */
+	public String getDetails();
+	
+	/**
+	 *  Get the bulk events.
+	 *  @return The bulk events.
+	 */
+	public IComponentChangeEvent[] getBulkEvents();
 }

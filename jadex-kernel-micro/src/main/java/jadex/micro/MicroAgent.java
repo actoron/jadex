@@ -642,18 +642,18 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  Add an component listener.
 	 *  @param listener The listener.
 	 */
-	public void addComponentListener(IComponentListener listener)
+	public IFuture addComponentListener(IComponentListener listener)
 	{
-		interpreter.addComponentListener(listener);
+		return interpreter.addComponentListener(listener);
 	}
 	
 	/**
 	 *  Remove a component listener.
 	 *  @param listener The listener.
 	 */
-	public void removeComponentListener(IComponentListener listener)
+	public IFuture removeComponentListener(IComponentListener listener)
 	{
-		interpreter.removeComponentListener(listener);
+		return interpreter.removeComponentListener(listener);
 	}
 	
 	/**

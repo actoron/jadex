@@ -322,31 +322,40 @@ public class SComponentFactory
 	/**
 	 * Get a default icon for a file type.
 	 */
-	public static IFuture getProperties(IServiceProvider provider, final String type)
+	public static IFuture getProperties(IExternalAccess exta, final String type)
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(provider, new ComponentFactorySelector(type))
-			.addResultListener(new DelegationResultListener(ret)
+		exta.scheduleStep(new IComponentStep()
 		{
-			public void customResultAvailable(Object result)
+			@XMLClassname("getProperties")
+			public Object execute(final IInternalAccess ia)
 			{
-				IComponentFactory fac = (IComponentFactory)result;
-				ret.setResult(fac.getProperties(type));
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				if(exception instanceof ServiceNotFoundException)
+				final Future ret = new Future();
+				SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(type))
+					.addResultListener(new DelegationResultListener(ret)
 				{
-					ret.setResult(null);
-				}
-				else
-				{
-					super.exceptionOccurred(exception);
-				}
+					public void customResultAvailable(Object result)
+					{
+						IComponentFactory fac = (IComponentFactory)result;
+						ret.setResult(fac.getProperties(type));
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						if(exception instanceof ServiceNotFoundException)
+						{
+							ret.setResult(null);
+						}
+						else
+						{
+							super.exceptionOccurred(exception);
+						}
+					}
+				});
+				return ret;
 			}
-		});
+		}).addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
 	}

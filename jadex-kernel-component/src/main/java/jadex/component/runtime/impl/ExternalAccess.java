@@ -6,6 +6,10 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.clock.ITimedObject;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -18,7 +22,7 @@ public class ExternalAccess implements IExternalAccess
 	//-------- attributes --------
 
 	/** The application component. */
-	protected ComponentInterpreter application;
+	protected ComponentInterpreter interpreter;
 
 	/** The component adapter. */
 	protected IComponentAdapter adapter;
@@ -36,7 +40,7 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public ExternalAccess(ComponentInterpreter application)
 	{
-		this.application = application;
+		this.interpreter = application;
 		this.adapter = application.getComponentAdapter();
 		this.tostring = application.getComponentIdentifier().getLocalName();
 		this.provider = application.getServiceContainer();
@@ -50,7 +54,7 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public IModelInfo getModel()
 	{
-		return application.getModel();
+		return interpreter.getModel();
 	}
 	
 	/**
@@ -96,7 +100,7 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public IComponentIdentifier getParent()
 	{
-		return application.getParent()!=null ? application.getParent().getComponentIdentifier() : null;
+		return interpreter.getParent()!=null ? interpreter.getParent().getComponentIdentifier() : null;
 	}
 	
 	/**
@@ -131,7 +135,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						application.killComponent().addResultListener(new DelegationResultListener(ret));
+						interpreter.killComponent().addResultListener(new DelegationResultListener(ret));
 					}
 				});
 			}
@@ -142,7 +146,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			application.killComponent().addResultListener(new DelegationResultListener(ret));
+			interpreter.killComponent().addResultListener(new DelegationResultListener(ret));
 		}
 		
 		return ret;
@@ -175,7 +179,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						ret.setResult(application.getChildren(type));
+						ret.setResult(interpreter.getChildren(type));
 					}
 				});
 			}
@@ -186,7 +190,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ret.setResult(application.getChildren(type));
+			ret.setResult(interpreter.getChildren(type));
 		}
 		
 		return ret;
@@ -209,7 +213,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						String fn = application.getFileName(ctype);
+						String fn = interpreter.getFileName(ctype);
 						if(fn!=null)
 						{
 							ret.setResult(fn);
@@ -228,7 +232,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			String fn = application.getFileName(ctype);
+			String fn = interpreter.getFileName(ctype);
 			if(fn!=null)
 			{
 				ret.setResult(fn);
@@ -260,7 +264,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						application.scheduleStep(step).addResultListener(new DelegationResultListener(ret));
+						interpreter.scheduleStep(step).addResultListener(new DelegationResultListener(ret));
 					}
 				});
 			}
@@ -271,7 +275,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			application.scheduleStep(step).addResultListener(new DelegationResultListener(ret));
+			interpreter.scheduleStep(step).addResultListener(new DelegationResultListener(ret));
 		}
 		
 		return ret;
@@ -296,7 +300,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					try
 					{
-						ret.setResult(step.execute(application));
+						ret.setResult(step.execute(interpreter));
 					}
 					catch(Exception e)
 					{
@@ -309,6 +313,67 @@ public class ExternalAccess implements IExternalAccess
 		{
 			ret.setException(e);
 		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Schedule a step of the component.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the component.
+	 *  @param delay The delay to wait before step should be done.
+	 *  @return The result of the step.
+	 */
+	public IFuture scheduleStep(final IComponentStep step, final long delay)
+	{
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(interpreter.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(interpreter.createResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				IClockService cs = (IClockService)result;
+				cs.createTimer(delay, new ITimedObject()
+				{
+					public void timeEventOccurred(long currenttime)
+					{
+						scheduleStep(step).addResultListener(new DelegationResultListener(ret));
+					}
+				});
+			}
+		}));
+		
+		return ret;
+	}
+	
+	/**
+	 *  Execute some code on the component's thread.
+	 *  Unlike scheduleStep(), the action will also be executed
+	 *  while the component is suspended.
+	 *  @param action	Code to be executed on the component's thread.
+	 *  @param delay The delay to wait before step should be done.
+	 *  @return The result of the step.
+	 */
+	public IFuture scheduleImmediate(final IComponentStep step, final long delay)
+	{
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(interpreter.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(interpreter.createResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				IClockService cs = (IClockService)result;
+				cs.createTimer(delay, new ITimedObject()
+				{
+					public void timeEventOccurred(long currenttime)
+					{
+						scheduleImmediate(step).addResultListener(new DelegationResultListener(ret));
+					}
+				});
+			}
+		}));
 		
 		return ret;
 	}

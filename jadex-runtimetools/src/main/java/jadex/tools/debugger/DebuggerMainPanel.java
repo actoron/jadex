@@ -120,7 +120,7 @@ public class DebuggerMainPanel extends JSplitPane
 								}
 								
 								// Sub panels of right panel.
-								SComponentFactory.getProperties(DebuggerMainPanel.this.jcc.getPlatformAccess().getServiceProvider(), DebuggerMainPanel.this.desc.getType())
+								SComponentFactory.getProperties(DebuggerMainPanel.this.jcc.getPlatformAccess(), DebuggerMainPanel.this.desc.getType())
 									.addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
 								{
 									public void customResultAvailable(Object result)

@@ -16,24 +16,25 @@ import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.clock.ITimedObject;
 import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.IntermediateFuture;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
@@ -523,8 +524,9 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 *  Add an component listener
 	 *  @param listener The listener.
 	 */
-	public void addComponentListener(IComponentListener listener)
+	public IFuture addComponentListener(IComponentListener listener)
 	{
+		final Future ret = new Future();
 		if(getInterpreter().isExternalThread())
 		{
 			new AgentInvocation(listener)
@@ -532,21 +534,25 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 				public void run()
 				{
 					getState().addAttributeValue(getScope(), OAVBDIRuntimeModel.agent_has_componentlisteners, (IComponentListener) arg);
+					ret.setResult(null);
 				}
 			};
 		}
 		else
 		{
 			getState().addAttributeValue(getScope(), OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
+			ret.setResult(null);
 		}
+		return ret;
 	}
 	
 	/**
 	 *  Remove an agent listener
 	 *  @param listener The listener.
 	 */
-	public void removeComponentListener(IComponentListener listener)
+	public IFuture removeComponentListener(IComponentListener listener)
 	{
+		final Future ret = new Future();
 		if(getInterpreter().isExternalThread())
 		{
 			new AgentInvocation(listener)
@@ -554,13 +560,16 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 				public void run()
 				{
 					removeComponentListener((IComponentListener) arg, agent, getState(), getScope());
+					ret.setResult(null);
 				}
 			};
 		}
 		else
 		{
 			removeComponentListener(listener, agent, getState(), getScope());
+			ret.setResult(null);
 		}
+		return ret;
 	}
 	
 	protected static void removeComponentListener(IComponentListener listener, Object agent, IOAVState state, Object scope)
@@ -798,6 +807,34 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			}
 			return new CapabilityFlyweight(getState(), handle);
 		}
+	}
+	
+	/**
+	 *  Wait for some time and execute a component step afterwards.
+	 */
+	public IFuture waitFor(final long delay, final IComponentStep step)
+	{
+		// todo: remember and cleanup timers in case of component removal.
+		
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(createResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				IClockService cs = (IClockService)result;
+				cs.createTimer(delay, new ITimedObject()
+				{
+					public void timeEventOccurred(long currenttime)
+					{
+						getInterpreter().scheduleStep(step, getHandle()).addResultListener(new DelegationResultListener(ret));
+					}
+				});
+			}
+		}));
+		
+		return ret;
 	}
 	
 //	/**

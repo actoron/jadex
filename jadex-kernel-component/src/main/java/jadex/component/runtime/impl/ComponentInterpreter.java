@@ -28,6 +28,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.clock.ITimedObject;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.commons.SReflect;
@@ -1050,23 +1051,54 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	 *  Add an component listener.
 	 *  @param listener The listener.
 	 */
-	public void addComponentListener(IComponentListener listener)
+	public IFuture addComponentListener(IComponentListener listener)
 	{
 		if(componentlisteners==null)
 			componentlisteners = new ArrayList();
 		componentlisteners.add(listener);
+		return IFuture.DONE;
 	}
 	
 	/**
 	 *  Remove a component listener.
 	 *  @param listener The listener.
 	 */
-	public void removeComponentListener(IComponentListener listener)
+	public IFuture removeComponentListener(IComponentListener listener)
 	{
 		if(componentlisteners!=null)
 			componentlisteners.remove(listener);
+		return IFuture.DONE;
 	}
 	
+	/**
+	 *  Wait for some time and execute a component step afterwards.
+	 */
+	public IFuture waitFor(final long delay, final IComponentStep step)
+	{
+		// todo: remember and cleanup timers in case of component removal.
+		
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(createResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				IClockService cs = (IClockService)result;
+				cs.createTimer(delay, new ITimedObject()
+				{
+					public void timeEventOccurred(long currenttime)
+					{
+						scheduleStep(step).addResultListener(new DelegationResultListener(ret));
+					}
+				});
+			}
+		}));
+		
+		return ret;
+	}
+	
+
 //	/**
 //	 *  Get a required service of a given name.
 //	 *  @param name The service name.

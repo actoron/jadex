@@ -18,6 +18,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.IntermediateComponentResultListener;
+import jadex.bridge.RemoteComponentListener;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.ProvidedServiceInfo;
@@ -39,6 +40,7 @@ import jadex.javaparser.SimpleValueFetcher;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -112,8 +114,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 		this.config = config;
 		this.arguments = arguments;
 		this.parent = parent;
-		// synchronized because of MicroAgentViewPanel, todo
-		this.steps	= Collections.synchronizedList(new ArrayList());
+		this.steps	= new ArrayList();
 		this.bindings = bindings;
 		
 		// Init the arguments with default values.
@@ -763,21 +764,27 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  Add an component listener.
 	 *  @param listener The listener.
 	 */
-	public void addComponentListener(IComponentListener listener)
+	public IFuture addComponentListener(IComponentListener listener)
 	{
 		if(componentlisteners==null)
 			componentlisteners = new ArrayList();
+		
+		// Hack! How to find out if remote listener?
+		if(Proxy.isProxyClass(listener.getClass()))
+			listener = new RemoteComponentListener(access, listener);
 		componentlisteners.add(listener);
+		return IFuture.DONE;
 	}
 	
 	/**
 	 *  Remove a component listener.
 	 *  @param listener The listener.
 	 */
-	public void removeComponentListener(IComponentListener listener)
+	public IFuture removeComponentListener(IComponentListener listener)
 	{
 		if(componentlisteners!=null)
 			componentlisteners.remove(listener);
+		return IFuture.DONE;
 	}
 	
 	/**
