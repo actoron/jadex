@@ -1,5 +1,6 @@
 package jadex.base.gui.filetree;
 
+import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.INodeHandler;
@@ -15,7 +16,6 @@ import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.gui.IMenuItemConstructor;
 import jadex.commons.gui.PopupBuilder;
 import jadex.commons.gui.SGUI;

@@ -1,4 +1,8 @@
-package jadex.commons.future;
+package jadex.base.gui;
+
+import jadex.base.Starter;
+import jadex.commons.future.Future;
+import jadex.commons.future.IResultListener;
 
 import javax.swing.SwingUtilities;
 
@@ -31,7 +35,10 @@ public class SwingDelegationResultListener implements IResultListener
 	 */
 	final public void resultAvailable(final Object result)
 	{
-		if(SwingUtilities.isEventDispatchThread())
+		// Hack!!! When triggered from shutdown hook, swing might be terminated
+		// and invokeLater has no effect (grrr).
+		if(SwingUtilities.isEventDispatchThread() || Starter.isShutdown())
+//		if(SwingUtilities.isEventDispatchThread())
 		{
 			try
 			{
@@ -72,7 +79,10 @@ public class SwingDelegationResultListener implements IResultListener
 	final public void exceptionOccurred(final Exception exception)
 	{
 //		exception.printStackTrace();
-		if(SwingUtilities.isEventDispatchThread())
+		// Hack!!! When triggered from shutdown hook, swing might be terminated
+		// and invokeLater has no effect (grrr).
+		if(SwingUtilities.isEventDispatchThread() || Starter.isShutdown())
+//		if(SwingUtilities.isEventDispatchThread())
 		{
 			customExceptionOccurred(exception);			
 		}

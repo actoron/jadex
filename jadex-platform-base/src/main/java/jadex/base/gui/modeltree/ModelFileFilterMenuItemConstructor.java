@@ -1,5 +1,6 @@
 package jadex.base.gui.modeltree;
 
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentFactory;
@@ -12,7 +13,6 @@ import jadex.commons.Property;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.IMenuItemConstructor;
 
 import java.awt.event.ActionEvent;

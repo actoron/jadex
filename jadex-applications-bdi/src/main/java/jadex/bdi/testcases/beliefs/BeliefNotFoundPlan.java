@@ -1,8 +1,6 @@
 package jadex.bdi.testcases.beliefs;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.IBelief;
-import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.Plan;
 
 /**
@@ -18,7 +16,7 @@ public class BeliefNotFoundPlan extends Plan
 		TestReport tr = new TestReport("#1", "Test belief access.");
 		try
 		{
-			IBelief bel = getBeliefbase().getBelief("belx");
+			getBeliefbase().getBelief("belx");
 			tr.setReason("No exception occurred");
 		}
 		catch(Exception e)
@@ -30,7 +28,7 @@ public class BeliefNotFoundPlan extends Plan
 		tr = new TestReport("#1", "Test beliefset access.");
 		try
 		{
-			IBeliefSet belset = getBeliefbase().getBeliefSet("belsetx");
+			getBeliefbase().getBeliefSet("belsetx");
 		}
 		catch(Exception e)
 		{

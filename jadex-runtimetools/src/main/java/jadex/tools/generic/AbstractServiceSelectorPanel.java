@@ -1,5 +1,7 @@
 package jadex.tools.generic;
 
+import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.SwingDelegationResultListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -9,8 +11,6 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDefaultResultListener;
-import jadex.commons.future.SwingDelegationResultListener;
 import jadex.xml.annotation.XMLClassname;
 
 import java.util.Collection;

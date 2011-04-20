@@ -1,5 +1,7 @@
 package jadex.base.service.awareness;
 
+import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.componentviewer.IComponentViewerPanel;
 import jadex.base.gui.jtable.ComponentIdentifierRenderer;
 import jadex.base.gui.plugin.IControlCenter;
@@ -11,8 +13,6 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDefaultResultListener;
-import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.jtable.DateTimeRenderer;
 import jadex.micro.IMicroExternalAccess;

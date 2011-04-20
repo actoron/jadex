@@ -7,7 +7,6 @@ import jadex.bridge.IMessageService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
-import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.EditableList;
 
 import java.awt.BorderLayout;

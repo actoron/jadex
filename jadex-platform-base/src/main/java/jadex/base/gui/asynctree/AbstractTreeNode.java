@@ -1,5 +1,6 @@
 package jadex.base.gui.asynctree;
 
+import jadex.base.Starter;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -81,7 +82,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	 */
 	public int	getChildCount()
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		if(children==null && !searching)
 		{
@@ -96,7 +97,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	 */
 	public ITreeNode	getChild(int index)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		if(children==null && !searching)
 		{
@@ -111,7 +112,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	 */
 	public int	getIndexOfChild(ITreeNode child)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		if(children==null && !searching)
 		{
@@ -126,7 +127,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	 */
 	public boolean	isLeaf()
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		return getChildCount()==0;
 	}
@@ -137,7 +138,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	 */
 	public void	refresh(boolean recurse)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 //		System.out.println("refresh: "+getId());
 		
@@ -159,7 +160,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	 */
 	public List	getCachedChildren()
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		return children!=null ? children : Collections.EMPTY_LIST;
 	}
@@ -169,7 +170,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	 */
 	public IFuture	getChildren()
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		if(childrenfuture==null)
 		{
@@ -223,7 +224,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	 */
 	protected void	setChildren(List newchildren)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		List	oldcs	= children!=null ? new ArrayList(children) : null;
 		List	newcs	= newchildren!=null ? new ArrayList(newchildren) : null;
@@ -415,7 +416,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	 */
 	public void addChild(int index, ITreeNode node)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		// Ignore when node already removed.
 		if(!model.isZombieNode(node.getId()))
@@ -442,7 +443,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	 */
 	public void addChild(ITreeNode node)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		addChild(getCachedChildren().size(), node);
 	}
@@ -453,7 +454,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	 */
 	public void removeChild(ITreeNode node)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		int index	= getIndexOfChild(node);
 		if(index!=-1)

@@ -1,5 +1,6 @@
 package jadex.tools.jcc;
 
+import jadex.base.Starter;
 import jadex.base.gui.AboutDialog;
 import jadex.base.gui.StatusBar;
 import jadex.bridge.IVersionInfo;
@@ -17,6 +18,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import java.io.File;
 import java.io.IOException;
 
@@ -73,6 +75,9 @@ public class ControlCenterWindow extends JFrame
     /** The first platform control center (when there are still no tabs). */
 	protected PlatformControlCenter	first;
 	
+	/** The cached window state. */
+	protected int	cachedstate;
+	
 	//-------- constructors --------
 	
 	/**
@@ -109,7 +114,16 @@ public class ControlCenterWindow extends JFrame
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				controlcenter.exit();
+				if(!Starter.isShutdown())
+					controlcenter.exit();
+			}
+		});
+		
+		addWindowStateListener(new WindowStateListener()
+		{			
+			public void windowStateChanged(WindowEvent e)
+			{
+				cachedstate	= e.getNewState();
 			}
 		});
 	}
@@ -203,6 +217,15 @@ public class ControlCenterWindow extends JFrame
 	}
 
 	//-------- other methods --------
+	
+	/**
+	 *  Get the cached window state.
+	 *  getExtendedState() deadlocks when called during shutdown hook.
+	 */
+	public int	getCachedState()
+	{
+		return cachedstate;
+	}
 
 	/**
 	 *  Save the current project settings.

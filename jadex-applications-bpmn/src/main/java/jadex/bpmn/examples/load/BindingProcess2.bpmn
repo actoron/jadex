@@ -25,16 +25,16 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_uT-YUUvIEeCXurNjCey__Q" iD="_uT-YUEvIEeCXurNjCey__Q" outgoingEdges="_u4dlcUvIEeCXurNjCey__Q" incomingEdges="_vlmYQUvIEeCXurNjCey__Q _kSwqsUvLEeCXurNjCey__Q" activityType="GatewayDataBasedExclusive"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_LWe3ikvEEeCk5oxudy8pew" iD="_LWe3iUvEEeCk5oxudy8pew"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Pim5ukvEEeCk5oxudy8pew" iD="_Pim5uUvEEeCk5oxudy8pew" name="yes"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_TNP_ekvEEeCk5oxudy8pew" iD="_TNP_eUvEEeCk5oxudy8pew" name="no" conditionType="None" isDefault="false"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_TNP_ekvEEeCk5oxudy8pew" iD="_TNP_eUvEEeCk5oxudy8pew" name="no" conditionType="Default" isDefault="true"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_UtJr-kvEEeCk5oxudy8pew" iD="_UtJr-UvEEeCk5oxudy8pew"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_q7WMcUvEEeCk5oxudy8pew" iD="_q7WMcEvEEeCk5oxudy8pew" name="yes" conditionType="None" isDefault="false"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_rnlnYUvEEeCk5oxudy8pew" iD="_rnlnYEvEEeCk5oxudy8pew"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_hubUcUvFEeCk5oxudy8pew" iD="_hubUcEvFEeCk5oxudy8pew" name="yes"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_kxeOsUvFEeCk5oxudy8pew" iD="_kxeOsEvFEeCk5oxudy8pew" name="no" conditionType="None" isDefault="false"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_kxeOsUvFEeCk5oxudy8pew" iD="_kxeOsEvFEeCk5oxudy8pew" name="no" conditionType="Default" isDefault="true"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_u4dlcUvIEeCXurNjCey__Q" iD="_u4dlcEvIEeCXurNjCey__Q"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_vlmYQUvIEeCXurNjCey__Q" iD="_vlmYQEvIEeCXurNjCey__Q"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_kSwqsUvLEeCXurNjCey__Q" iD="_kSwqsEvLEeCXurNjCey__Q" name="yes"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_lCRcEUvLEeCXurNjCey__Q" iD="_lCRcEEvLEeCXurNjCey__Q" name="no"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_mKqngUvLEeCXurNjCey__Q" iD="_mKqngEvLEeCXurNjCey__Q" name="no"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_lCRcEUvLEeCXurNjCey__Q" iD="_lCRcEEvLEeCXurNjCey__Q" name="no" conditionType="Default" isDefault="true"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_mKqngUvLEeCXurNjCey__Q" iD="_mKqngEvLEeCXurNjCey__Q" name="no" conditionType="Default" isDefault="true"/>
   </pools>
 </bpmn:BpmnDiagram>

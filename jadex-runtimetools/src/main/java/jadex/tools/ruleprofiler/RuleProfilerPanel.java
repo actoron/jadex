@@ -1,12 +1,12 @@
 package jadex.tools.ruleprofiler;
 
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.SServiceProvider;
-import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.TreeExpansionHandler;
 import jadex.commons.gui.jtable.ResizeableTableHeader;

@@ -63,6 +63,7 @@ public class JCCAgent extends MicroAgent
 	 */
 	public IFuture	agentKilled()
 	{
+//		System.out.println("JCC agent killed");
 		Future	ret	= new Future();
 		cc.shutdown().addResultListener(createResultListener(new DelegationResultListener(ret)));
 		return ret;

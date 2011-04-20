@@ -1,19 +1,17 @@
 package jadex.base.gui.modeltree;
 
 import jadex.base.SComponentFactory;
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.DirNode;
-import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.filetree.IIconCache;
 import jadex.base.gui.filetree.JarNode;
 import jadex.base.gui.filetree.RemoteDirNode;
-import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.filetree.RemoteJarNode;
 import jadex.base.gui.filetree.RootNode;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
 
 import java.util.HashMap;

@@ -1,7 +1,6 @@
 package jadex.bdi.examples.disastermanagement;
 
 import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.bridge.service.IService;
 import jadex.commons.future.IFuture;
 
 /**

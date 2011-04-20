@@ -1,6 +1,8 @@
 package jadex.tools.convcenter;
 
+import jadex.base.Starter;
 import jadex.base.gui.CMSUpdateHandler;
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -15,7 +17,6 @@ import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
@@ -575,7 +576,7 @@ public class ConversationPanel extends JSplitPane
 	 */
 	public Properties	getProperties()
 	{
-		if(!SwingUtilities.isEventDispatchThread())
+		if(!(SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown()))
 			throw new RuntimeException("Can only save properties from swing thread");
 			
 		Properties	props	= new Properties();

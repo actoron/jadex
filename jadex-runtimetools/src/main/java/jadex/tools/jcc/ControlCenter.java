@@ -1,6 +1,9 @@
 package jadex.tools.jcc;
 
+import jadex.base.Starter;
 import jadex.base.gui.CMSUpdateHandler;
+import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.plugin.SJCC;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -10,8 +13,6 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDefaultResultListener;
-import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.xml.PropertiesXMLHelper;
 
@@ -203,12 +204,14 @@ public class ControlCenter
 	public IFuture	saveSettings()
 	{
 		final Future	ret	= new Future();
+//		System.out.println("Saving JCC settings");
 		// Save settings of GUI and currently selected platform (todo: all platforms?)
 		saveSettings(new File(jccaccess.getComponentIdentifier().getLocalName() + SETTINGS_EXTENSION))
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result) throws Exception
 			{
+//				System.out.println("Saving platform settings");
 				pcc.savePlatformProperties().addResultListener(new SwingDelegationResultListener(ret));
 			}
 		});
@@ -222,37 +225,50 @@ public class ControlCenter
 	public IFuture	saveSettings(final File file)
 	{
 		final Future	ret	= new Future();
+//		System.out.println("Fetching JCC properties.");
 		
 		// Get properties of latest platform panel.
 		pcc.getProperties().addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result) throws Exception
 			{
+//				System.out.println("Fetched JCC properties.");
 				final Properties	props	= (Properties)result;
-				
+			
 				// Store window appearance
 				Properties windowprops = new Properties();
 				windowprops.addProperty(new Property("width", Integer.toString(window.getWidth())));
 				windowprops.addProperty(new Property("height", Integer.toString(window.getHeight())));
 				windowprops.addProperty(new Property("x", Integer.toString(window.getX())));
 				windowprops.addProperty(new Property("y", Integer.toString(window.getY())));
-				windowprops.addProperty(new Property("extendedState", Integer.toString(window.getExtendedState())));
+				// getExtendedState() deadlocks when shutdown hook is triggered.
+				windowprops.addProperty(new Property("extendedState", Integer.toString(window.getCachedState())));
 				windowprops.addProperty(new Property("jccexit", jccexit != null? jccexit : JCC_EXIT_ASK));
 				windowprops.addProperty(new Property("saveonexit", Boolean.toString(saveonexit)));
 				props.removeSubproperties("window");
 				props.addSubproperties("window", windowprops);
 				
+//				System.out.println("Fetching library service.");
 				// Save properties to file.
 				SServiceProvider.getService(jccaccess.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingDelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result) throws Exception
 					{
-						FileOutputStream os = new FileOutputStream(file);
-						PropertiesXMLHelper.getPropertyWriter().write(props, os, ((ILibraryService)result).getClassLoader(), null);
-						os.close();
-						window.getStatusBar().setText("Settings saved successfully: "+ file.getAbsolutePath());
-						ret.setResult(null);
+						try
+						{
+//							System.out.println("Writing properties.");
+							FileOutputStream os = new FileOutputStream(file);
+							PropertiesXMLHelper.getPropertyWriter().write(props, os, ((ILibraryService)result).getClassLoader(), null);
+							os.close();
+							window.getStatusBar().setText("Settings saved successfully: "+ file.getAbsolutePath());
+							ret.setResult(null);
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+							throw e;
+						}
 					}
 				});
 			}
@@ -267,7 +283,7 @@ public class ControlCenter
 	 */
 	public void	exit()
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
 		if(!killed)
 		{
@@ -314,12 +330,14 @@ public class ControlCenter
 	 */
 	public IFuture	shutdown()
 	{
+//		System.out.println("Control Center shutdown A.");
 		final Future	ret	= new Future();
 		
-		SwingUtilities.invokeLater(new Runnable()
+		Runnable	runnable	= new Runnable()
 		{
 			public void run()
 			{
+//				System.out.println("Control Center shutdown B.");
 				assert !killed;
 				killed = true;
 				
@@ -333,6 +351,8 @@ public class ControlCenter
 				{
 					public void customResultAvailable(Object result) throws Exception
 					{
+//						System.out.println("JCC settings saved.");
+						
 						// Todo: pcc dispose with future?
 						for(Iterator it=pccs.keySet().iterator(); it.hasNext(); )
 						{
@@ -349,15 +369,31 @@ public class ControlCenter
 						{
 							public void customResultAvailable(Object result) throws Exception
 							{
-								window.setVisible(false);
-								window.dispose();
+//								System.out.println("CMS handlers disposed.");
+								if(!Starter.isShutdown())
+								{
+									window.setVisible(false);
+									window.dispose();
+								}
 								ret.setResult(null);
 							}
 						});
 					}
 				});
 			}
-		});
+		};
+		
+		// Hack!!! When triggered from shutdown hook, swing might be terminated
+		// and invokeLater has no effect (grrr).
+		if(Starter.isShutdown())
+		{
+			runnable.run();
+		}
+		else
+		{
+			SwingUtilities.invokeLater(runnable);
+		}
+			
 		
 		return ret;
 	}
@@ -385,7 +421,7 @@ public class ControlCenter
 	 */
 	public CMSUpdateHandler getCMSHandler()
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
 		if(cmshandler==null)
 		{
@@ -466,17 +502,21 @@ public class ControlCenter
 	 */
 	public void closePlatform(final PlatformControlCenter pcc)
 	{
+		window.getStatusBar().setText("Saving platform settings for: "+pcc.getPlatformAccess().getComponentIdentifier().getPlatformName());
+		
 		IFuture	saved	= isSaveOnExit() ? pcc.savePlatformProperties() : IFuture.DONE;
 		saved.addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
 			{
+				window.getStatusBar().setText("Saved platform settings for: "+pcc.getPlatformAccess().getComponentIdentifier().getPlatformName());
 				window.closePlatformPanel(pcc);
 				pcc.dispose();
 			}
 			public void customExceptionOccurred(Exception exception)
 			{
 				// Continue anyways.
+				window.getStatusBar().setText("Could not save platform settings: "+exception);
 				customResultAvailable(null);
 			}
 		});

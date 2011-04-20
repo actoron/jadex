@@ -2,6 +2,7 @@ package jadex.base.gui.componenttree;
 
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.ObjectInspectorPanel;
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
 import jadex.base.gui.asynctree.AsyncTreeModel;
@@ -21,7 +22,6 @@ import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.TreeExpansionHandler;

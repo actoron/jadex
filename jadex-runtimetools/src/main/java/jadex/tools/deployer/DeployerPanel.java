@@ -1,5 +1,7 @@
 package jadex.tools.deployer;
 
+import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.FileNode;
@@ -15,8 +17,6 @@ import jadex.commons.Property;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDefaultResultListener;
-import jadex.commons.future.SwingDelegationResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;

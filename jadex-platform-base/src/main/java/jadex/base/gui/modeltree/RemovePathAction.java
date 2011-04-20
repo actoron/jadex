@@ -1,5 +1,6 @@
 package jadex.base.gui.modeltree;
 
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.FileTreePanel;
@@ -7,7 +8,6 @@ import jadex.base.gui.filetree.RootNode;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
-import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
 

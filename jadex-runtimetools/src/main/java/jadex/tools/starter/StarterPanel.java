@@ -1,9 +1,11 @@
 package jadex.tools.starter;
 
 import jadex.base.SComponentFactory;
+import jadex.base.Starter;
 import jadex.base.gui.ComponentSelectorDialog;
 import jadex.base.gui.ElementPanel;
 import jadex.base.gui.ParserValidator;
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
@@ -28,7 +30,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.JValidatorTextField;
 import jadex.commons.gui.SGUI;
@@ -891,7 +892,8 @@ public class StarterPanel extends JPanel
 		props.addProperty(new Property("autogenerate", ""+genname.isSelected()));
 		
 		props.addProperty(new Property("name", componentname.getText()));
-		for(int i=0; argelems!=null && i<argelems.size(); i++)
+		// Cannot get components during shutdown as awt blocks tree lock.
+		for(int i=0; argelems!=null && i<argelems.size() && !Starter.isShutdown(); i++)
 		{
 			JTextField valt = (JTextField)arguments.getComponent(i*4+3);
 			props.addProperty(new Property("argument", valt.getText()));

@@ -70,6 +70,9 @@ public abstract class RemoteChangeListenerHandler
 	/** The update timer (if any). */
 	protected Timer	timer;
 	
+	/** The flag that the timer has been started. */
+	protected boolean	started;
+	
 	//-------- constructs --------
 	
 	/**
@@ -163,11 +166,14 @@ public abstract class RemoteChangeListenerHandler
 	
 	protected void startTimer()
 	{
-		if(timer==null && instance!=null &&
+		if(!started && instance!=null &&
 			(!removed.isEmpty() || !added.isEmpty() || !changed.isEmpty() || !occurred.isEmpty()))
 		{
 			final IExternalAccess	access	= instance.getExternalAccess();
-			timer	= new Timer(true);
+			if(timer==null)
+				timer	= new Timer(true);
+			
+			started	= true;
 			timer.schedule(new TimerTask()
 			{
 				public void run()
@@ -180,7 +186,7 @@ public abstract class RemoteChangeListenerHandler
 							try
 							{
 								List	events	= new ArrayList();
-								timer	= null;
+								started	= false;
 								if(!removed.isEmpty())
 								{
 									for(Iterator it=removed.keySet().iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
@@ -311,5 +317,9 @@ public abstract class RemoteChangeListenerHandler
 	/**
 	 *  Remove local listeners.
 	 */
-	protected abstract void	dispose();
+	protected void	dispose()
+	{
+		if(timer!=null)
+			timer.cancel();		
+	}
 }

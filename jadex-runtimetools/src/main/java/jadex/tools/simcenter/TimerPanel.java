@@ -1,5 +1,6 @@
 package jadex.tools.simcenter;
 
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.service.simulation.ISimulationService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -12,7 +13,6 @@ import jadex.commons.IChangeListener;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.jtable.ObjectTableModel;
 import jadex.xml.annotation.XMLClassname;
 import jadex.xml.annotation.XMLIncludeFields;
@@ -393,6 +393,8 @@ public class TimerPanel	extends JPanel
 		 */
 		protected void dispose()
 		{
+			super.dispose();
+			
 			cs.removeChangeListener(this);
 //			System.out.println("dispose: "+id);
 		}

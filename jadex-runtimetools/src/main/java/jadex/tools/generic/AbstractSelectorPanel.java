@@ -1,13 +1,13 @@
 package jadex.tools.generic;
 
+import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDefaultResultListener;
-import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.gui.SGUI;
@@ -291,7 +291,7 @@ public abstract class AbstractSelectorPanel extends JSplitPanel implements IProp
 				public void customResultAvailable(Object result) 
 				{
 					Properties subprops = (Properties)result;
-					props.addSubproperties(PANELPROPERTIES, subprops);
+					props.addSubproperties(PANELPROPERTIES, subprops!=null ? subprops : new Properties());
 					ret.setResult(props);
 				};
 			});

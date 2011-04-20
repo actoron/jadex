@@ -1,6 +1,7 @@
 package jadex.base.gui.componenttree;
 
 import jadex.base.gui.CMSUpdateHandler;
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
@@ -15,7 +16,6 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 
@@ -379,8 +379,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 								}
 								public void customExceptionOccurred(Exception exception)
 								{
-									// Shouldn't happen???
-									exception.printStackTrace();
+									// Children not found -> don't add services.
 								}
 							});
 						}

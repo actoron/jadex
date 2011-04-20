@@ -400,6 +400,8 @@ public class ProcessViewPanel extends JPanel
 		 */
 		protected void dispose()
 		{
+			super.dispose();
+			
 			((BpmnInterpreter)instance).removeChangeListener(BPMNChangeListener.this);
 		}
 	}

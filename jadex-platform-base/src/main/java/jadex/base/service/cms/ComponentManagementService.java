@@ -777,7 +777,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	public IFuture destroyComponent(final IComponentIdentifier cid)
 	{
-//		System.out.println("destroy: "+cid.getName());
+//		System.out.println("destroy0: "+cid.getName());
 		
 		final Future ret = new Future();
 		
@@ -826,7 +826,7 @@ public abstract class ComponentManagementService extends BasicService implements
 									// Component may be already killed (e.g. when autoshutdown).
 									if(component!=null)
 									{
-//										System.out.println("destroy: "+cid);//+" "+component.getParent().getComponentIdentifier().getLocalName());
+//										System.out.println("destroy1: "+cid);//+" "+component.getParent().getComponentIdentifier().getLocalName());
 										
 										// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
 										// todo: killcomponent should only be called once for each component?
@@ -842,7 +842,7 @@ public abstract class ComponentManagementService extends BasicService implements
 										}
 										else
 										{
-				//								System.out.println("killing b: "+cid);
+//											System.out.println("killing b: "+cid);
 											
 											CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
 											if(cc==null)

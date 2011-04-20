@@ -1,15 +1,9 @@
 package jadex.bridge.service;
 
-import java.lang.reflect.Proxy;
-import java.util.HashMap;
 
-import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IntermediateFuture;
 
 /**
  *  Internal interface for a service container. Allows

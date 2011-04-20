@@ -1,5 +1,6 @@
 package jadex.bdi.examples.booktrading.common;
 
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
@@ -10,7 +11,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.clock.IClockService;
-import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 

@@ -1,6 +1,8 @@
 package jadex.tools.testcenter;
 
 import jadex.base.gui.ElementPanel;
+import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.CreationInfo;
@@ -19,8 +21,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IRemoteResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.SwingDefaultResultListener;
-import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.gui.BrowserPane;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.JSplitPanel;

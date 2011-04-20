@@ -363,6 +363,8 @@ public class NIOTCPTransport implements ITransport
 					// as there is no possibility to check if the cached connection
 					// is still connected to the other end. This can only be
 					// checked by the write operation.
+//					Object	content	= message.get("content");
+//					System.out.println("sending to: "+aidset);//+", "+(content!=null?SReflect.getClassName(content.getClass()):null));
 					while(true)
 					{
 						try
@@ -388,6 +390,8 @@ public class NIOTCPTransport implements ITransport
 							}
 						}
 					}
+//					System.out.println("sent to: "+aidset);
+
 				}
 			}
 			catch(IOException e)

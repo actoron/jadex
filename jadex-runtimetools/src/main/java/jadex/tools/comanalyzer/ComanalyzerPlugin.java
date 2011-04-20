@@ -1,6 +1,8 @@
 package jadex.tools.comanalyzer;
 
 import jadex.base.fipa.CMSComponentDescription;
+import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.INodeListener;
 import jadex.base.gui.asynctree.ITreeNode;
@@ -28,8 +30,6 @@ import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDefaultResultListener;
-import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.SGUI;
 import jadex.tools.comanalyzer.chart.ChartPanel;

@@ -10,7 +10,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.ThreadSuspendable;
 
 import java.util.HashMap;
 import java.util.Iterator;

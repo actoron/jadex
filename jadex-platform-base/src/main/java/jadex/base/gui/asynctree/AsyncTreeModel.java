@@ -1,5 +1,6 @@
 package jadex.base.gui.asynctree;
 
+import jadex.base.Starter;
 import jadex.commons.collection.MultiCollection;
 
 import java.util.ArrayList;
@@ -70,7 +71,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public Object getRoot()
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		return root;
 	}
@@ -80,7 +81,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public Object getChild(Object parent, int index)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		return ((ITreeNode)parent).getChild(index);
 	}
@@ -90,7 +91,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public int getChildCount(Object parent)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		return ((ITreeNode)parent).getChildCount();
 	}
@@ -100,7 +101,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public int getIndexOfChild(Object parent, Object child)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		return ((ITreeNode)parent).getIndexOfChild((ITreeNode)child);
 	}
@@ -110,7 +111,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public boolean isLeaf(Object node)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		return ((ITreeNode)node).isLeaf();
 	}
@@ -120,7 +121,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public void valueForPathChanged(TreePath path, Object newValue)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		throw new UnsupportedOperationException("Component Tree is not editable.");
 	}
@@ -130,7 +131,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public void addTreeModelListener(TreeModelListener l)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
 		this.listeners.add(l);
 	}
@@ -140,7 +141,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public void removeTreeModelListener(TreeModelListener l)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
 		this.listeners.remove(l);
 	}
@@ -152,7 +153,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public void	setRoot(ITreeNode root)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		if(this.root!=null)
 			deregisterNode(this.root);
@@ -169,7 +170,7 @@ public class AsyncTreeModel implements TreeModel
      */
 	public void fireTreeChanged(ITreeNode node)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
 		List path = buildTreePath(node);
 
@@ -186,7 +187,7 @@ public class AsyncTreeModel implements TreeModel
      */
 	public void fireNodeChanged(ITreeNode node)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		if(changed==null)
 		{
@@ -277,7 +278,7 @@ public class AsyncTreeModel implements TreeModel
      */
 	public void fireNodeRemoved(ITreeNode parent, ITreeNode child, int index)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
 		List path = buildTreePath(parent);
 		
@@ -297,7 +298,7 @@ public class AsyncTreeModel implements TreeModel
 //		if(child.toString().indexOf("A:")!=-1)
 //			System.out.println("here4");
 
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
 		List path = buildTreePath(parent);
 		
@@ -316,7 +317,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public List buildTreePath(ITreeNode node)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		List	path	= new LinkedList();
 		ITreeNode	pnode	= node;
@@ -334,7 +335,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public void	registerNode(ITreeNode node)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		synchronized(nodes)
 		{
@@ -351,7 +352,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public void	addNode(ITreeNode node)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		added.put(node.getId(), node);
 		
@@ -372,7 +373,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public ITreeNode	getNode(Object id)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		ITreeNode	ret;
 		synchronized(nodes)
@@ -387,7 +388,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public ITreeNode	getAddedNode(Object id)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		return (ITreeNode)added.get(id);
 	}
@@ -397,7 +398,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public void	deregisterNode(ITreeNode node)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
 		node.dispose();
 		boolean	notify	= false;
@@ -437,7 +438,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public void	addNodeHandler(INodeHandler overlay)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		this.overlays.add(overlay);
 	}
@@ -447,7 +448,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public INodeHandler[]	getNodeHandlers()
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		return (INodeHandler[])overlays.toArray(new INodeHandler[overlays.size()]);
 	}
@@ -457,7 +458,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public void	addNodeListener(INodeListener listener)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		nodelisteners.add(listener);
 	}
@@ -467,7 +468,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public void	removeNodeListener(INodeListener listener)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		nodelisteners.remove(listener);
 	}
@@ -477,7 +478,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public void addZombieNode(Object id)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		synchronized(nodes)
 		{
@@ -491,7 +492,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public boolean	isZombieNode(Object id)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
 		boolean ret;
 		synchronized(nodes)
@@ -506,7 +507,7 @@ public class AsyncTreeModel implements TreeModel
 	 */
 	public void dispose()
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		ITreeNode[]	anodes;
 		synchronized(nodes)

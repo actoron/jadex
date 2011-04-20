@@ -1,6 +1,8 @@
 package jadex.tools.jcc;
 
+import jadex.base.Starter;
 import jadex.base.gui.CMSUpdateHandler;
+import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.bridge.IExternalAccess;
@@ -14,7 +16,6 @@ import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDelegationResultListener;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -87,7 +88,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	 */
 	public void	dispose()
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
 		// Close all plugins, which have a panel associated.
 		for(Iterator it=plugins.keySet().iterator(); it.hasNext();)
@@ -124,15 +125,18 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		final Future	ret	= new Future();
 		
 		IControlCenterPlugin[]	aplugins	= getPlugins();
+//		System.out.println("Pushing platform settings: "+aplugins.length);
 		CounterResultListener	crl	= new CounterResultListener(aplugins.length, new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result) throws Exception
 			{
+//				System.out.println("Pushed platform settings");
 				SServiceProvider.getService(getPlatformAccess().getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingDelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result) throws Exception
 					{
+//						System.out.println("Fetched settings service");
 						ISettingsService	settings	= (ISettingsService)result;
 						settings.saveProperties().addResultListener(new SwingDelegationResultListener(ret));
 					}
@@ -146,16 +150,25 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 			}
 		});
 		
-		for(int i=0; i<aplugins.length; i++)
+		try
 		{
-			if(plugins.get(aplugins[i])!=null)
+			for(int i=0; i<aplugins.length; i++)
 			{
-				aplugins[i].pushPlatformSettings().addResultListener(crl);
+				if(plugins.get(aplugins[i])!=null)
+				{
+//					System.out.println("Pushing platform settings: "+aplugins[i].getName());
+					aplugins[i].pushPlatformSettings().addResultListener(crl);
+				}
+				else
+				{
+//					System.out.println("Not pushing platform settings: "+aplugins[i].getName());
+					crl.resultAvailable(null);
+				}
 			}
-			else
-			{
-				crl.resultAvailable(null);
-			}
+		}
+		catch (Throwable t)
+		{
+			t.printStackTrace();
 		}
 		
 		return ret;
@@ -176,7 +189,8 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	 */
 	public IControlCenterPlugin[]	getPlugins()
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
+
 		
 		return (IControlCenterPlugin[])plugins.keySet().toArray(new IControlCenterPlugin[plugins.size()]);
 	}
@@ -188,7 +202,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	 */
 	public IControlCenterPlugin getPluginForName(String name)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
 		for(Iterator it=plugins.keySet().iterator(); it.hasNext();)
 		{
@@ -207,7 +221,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	{
 //		System.out.println("activate plugin: "+plugin);
 		
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
 		Future	ret	= new Future();
 		
@@ -248,7 +262,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	 */
 	public IFuture setProperties(final Properties props)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
 		final Future	ret	= new Future();
 		
@@ -293,7 +307,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	 */
 	public IFuture getProperties()
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
 		final Future	ret	= new Future();
 		
@@ -303,6 +317,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		}
 		else
 		{
+//			System.out.println("Fetching panel properties.");
 			pccpanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result) throws Exception
@@ -321,17 +336,20 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 						}
 					}
 					
+//					System.out.println("Waiting for "+plugs.size()+" plugin properties.");
 					final CounterResultListener	crl	= new CounterResultListener(plugs.size(),
 						new SwingDelegationResultListener(ret)
 					{
 						public void customResultAvailable(Object result) throws Exception
 						{
+//							System.out.println("Fetched all plugin properties.");
 							ret.setResult(props);
 						}
 					});
 					for(int i=0; i<plugs.size(); i++)
 					{
 						final IControlCenterPlugin	plugin	= (IControlCenterPlugin)plugs.get(i);
+//						System.out.println("Fetching plugin properties: "+plugin.getName());
 						plugin.getProperties().addResultListener(new SwingDelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)	throws Exception
@@ -341,6 +359,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 									props.removeSubproperties(plugin.getName());
 									props.addSubproperties(plugin.getName(), (Properties)result);
 								}
+//								System.out.println("Fetched plugin properties: "+plugin.getName());
 								crl.resultAvailable(null);
 							}
 						});

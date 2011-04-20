@@ -360,6 +360,8 @@ public class ConsolePanel extends JPanel
 		 */
 		protected void dispose()
 		{
+			super.dispose();
+			
 			SUtil.removeSystemOutListener(this);
 			SUtil.removeSystemErrListener(this);
 		}

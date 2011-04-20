@@ -1,5 +1,6 @@
 package jadex.base.gui;
 
+import jadex.base.Starter;
 import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
@@ -16,8 +17,6 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDefaultResultListener;
-import jadex.commons.future.SwingDelegationResultListener;
 import jadex.xml.annotation.XMLClassname;
 
 import java.util.Collection;
@@ -108,7 +107,7 @@ public class CMSUpdateHandler
 	 */
 	public IFuture	dispose()
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
 		IFuture	ret;
 		if(listeners!=null)
@@ -118,7 +117,11 @@ public class CMSUpdateHandler
 			for(Iterator it=listeners.keySet().iterator(); it.hasNext(); )
 			{
 				IComponentIdentifier	cid	= (IComponentIdentifier)it.next();
-				deregisterRemoteCMSListener(cid).addResultListener(crl);
+				// Deregister if not registration in progress.
+				if(futures==null || !futures.containsKey(cid))
+					deregisterRemoteCMSListener(cid).addResultListener(crl);
+				else
+					crl.resultAvailable(null);
 			}
 			listeners	= null;
 			ret	= fut;
@@ -133,7 +136,7 @@ public class CMSUpdateHandler
 	/**
 	 *  Add a CMS listener.
 	 */
-	public IFuture	addCMSListener(final IComponentIdentifier cid, ICMSComponentListener listener)
+	public IFuture	addCMSListener(final IComponentIdentifier cid, final ICMSComponentListener listener)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
@@ -172,6 +175,7 @@ public class CMSUpdateHandler
 				this.futures	= new MultiCollection();
 			}
 			futures.put(cid, ret);
+			listeners.put(cid, listener);
 
 			installRemoteCMSListener(cid).addResultListener(new SwingDefaultResultListener()
 			{
@@ -188,6 +192,9 @@ public class CMSUpdateHandler
 				}
 				public void customExceptionOccurred(Exception exception)
 				{
+					if(listeners!=null)
+						listeners.remove(cid, listener);
+					
 					Collection coll	= futures.getCollection(cid);
 					for(Iterator it=coll.iterator(); it.hasNext(); )
 					{
@@ -200,8 +207,6 @@ public class CMSUpdateHandler
 			});
 		}
 		
-		listeners.put(cid, listener);
-		
 		return ret;
 	}
 	
@@ -210,7 +215,7 @@ public class CMSUpdateHandler
 	 */
 	public IFuture	removeCMSListener(IComponentIdentifier cid, ICMSComponentListener listener)
 	{
-		assert SwingUtilities.isEventDispatchThread();
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
 		IFuture	ret	= IFuture.DONE;
 		

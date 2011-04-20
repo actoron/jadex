@@ -104,7 +104,7 @@ public class Reader
 		{
 			// Validation not supported.
 			System.err.println("Error setting validation to "+validate);
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 		
 		try
@@ -115,7 +115,7 @@ public class Reader
 		{
 			// Validation not supported.
 			System.err.println("Error setting coalescing to "+coalescing);
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 		
 		if(reporter!=null)
@@ -227,7 +227,7 @@ public class Reader
 		}
 		catch(RuntimeException e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			Location	loc	= readcontext.getStack().size()>0 ? readcontext.getTopStackElement().getLocation() : parser.getLocation();
 			reporter.report(e.toString(), "XML error", readcontext, loc);
 		}
@@ -376,7 +376,7 @@ public class Reader
 					}
 					catch(Exception e)
 					{
-						e.printStackTrace();
+//						e.printStackTrace();
 						readcontext.getReporter().report(e.toString(), "creation error", readcontext, parser.getLocation());
 					}
 					
@@ -721,11 +721,11 @@ public class Reader
 			Object ret = reader.read(rd, classloader, context);
 			return ret;
 		}
-		catch(Throwable t)
+		catch(Exception e)
 		{
-			t.printStackTrace();
-			System.out.println("problem: "+new String(val));
-			throw new RuntimeException(t);
+//			t.printStackTrace();
+//			System.out.println("problem: "+new String(val));
+			throw new RuntimeException(e);
 		}
 		finally
 		{
@@ -764,11 +764,11 @@ public class Reader
 			Object ret = reader.read(bis, classloader, context);
 			return ret;
 		}
-		catch(Throwable t)
+		catch(Exception e)
 		{
-			t.printStackTrace();
-			System.out.println("problem: "+new String(val));
-			throw new RuntimeException(t);
+//			t.printStackTrace();
+//			System.out.println("problem: "+new String(val));
+			throw new RuntimeException(e);
 		}
 		finally
 		{

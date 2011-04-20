@@ -589,7 +589,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				exception.printStackTrace();
+//				exception.printStackTrace();
 				getLogger().warning("Exception during service container shutdown: "+exception);
 //				listener.resultAvailable(this, getComponentIdentifier());
 				ret.setResult(getComponentIdentifier());	// Exception should be propagated?
@@ -886,7 +886,14 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //			System.out.println("Adding to ext entries: "+cid);
 			if(ext_forbidden)
 			{
-				throw new ComponentTerminatedException(cid);
+				throw new ComponentTerminatedException(cid)
+				{
+					public void printStackTrace()
+					{
+						Thread.dumpStack();
+						super.printStackTrace();
+					}
+				};
 			}
 			else
 			{

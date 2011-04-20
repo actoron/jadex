@@ -1,6 +1,7 @@
 package jadex.bdi.examples.cleanerworld_classic.cleaner;
 
 
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bdi.examples.cleanerworld_classic.Chargingstation;
 import jadex.bdi.examples.cleanerworld_classic.Cleaner;
 import jadex.bdi.examples.cleanerworld_classic.Location;
@@ -15,7 +16,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDefaultResultListener;
 
 import java.awt.Color;
 import java.awt.Graphics;

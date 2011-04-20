@@ -23,7 +23,6 @@ import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
-import jadex.xml.IAttributeConverter;
 import jadex.xml.IContext;
 import jadex.xml.IObjectStringConverter;
 import jadex.xml.IPostProcessor;

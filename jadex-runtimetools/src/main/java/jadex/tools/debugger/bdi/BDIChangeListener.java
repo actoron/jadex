@@ -78,6 +78,8 @@ public class BDIChangeListener	extends RemoteChangeListenerHandler	implements IO
 	 */
 	protected void dispose()
 	{
+		super.dispose();
+		
 		((ElementFlyweight)instance).getState().removeStateListener(BDIChangeListener.this);
 	}
 }

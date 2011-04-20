@@ -1,6 +1,8 @@
 package jadex.tools.starter;
 
 import jadex.base.SComponentFactory;
+import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.asynctree.INodeListener;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
@@ -19,8 +21,6 @@ import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDefaultResultListener;
-import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.IMenuItemConstructor;
 import jadex.commons.gui.JSplitPanel;
@@ -418,16 +418,19 @@ public class StarterPluginPanel extends JPanel
 	public IFuture	pushPlatformProperties()
 	{
 		final Future	ret	= new Future();
+//		System.out.println("fetching settings service");
 		SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result) throws Exception
 			{
+//				System.out.println("fetching mpanel properties");
 				final ISettingsService	settings	= (ISettingsService)result;
 				mpanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
+//						System.out.println("fetched mpanel properties");
 						Properties	props	= new Properties();
 						props.addSubproperties("mpanel", (Properties)result);
 						props.addSubproperties("spanel", spanel.getProperties());

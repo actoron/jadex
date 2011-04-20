@@ -416,6 +416,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //								msg.put(SFipa.CONTENT, JavaWriter.objectToXML(content, ls.getClassLoader()));
 								
 //								System.out.println("sent: "+callid);
+//								System.out.println("RMS sending to: "+receiver+", "+(content!=null?SReflect.getClassName(content.getClass()):null));
 								
 								String cont = Writer.objectToXML(getWriter(), content, ls.getClassLoader(), receiver);
 								msg.put(SFipa.CONTENT, cont);

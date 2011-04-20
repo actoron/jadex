@@ -3,7 +3,6 @@ package jadex.bdi.runtime;
 import jadex.bdi.runtime.impl.flyweights.BeliefFlyweight;
 import jadex.bdi.runtime.impl.flyweights.BeliefSetFlyweight;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
-import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
 import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.MessageEventFlyweight;

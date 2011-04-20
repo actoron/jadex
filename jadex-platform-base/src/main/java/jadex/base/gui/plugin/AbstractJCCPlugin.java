@@ -1,6 +1,7 @@
 package jadex.base.gui.plugin;
 
 
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ProxyComponentTreeNode;
@@ -14,7 +15,6 @@ import jadex.commons.Properties;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
 

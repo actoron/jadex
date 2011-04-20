@@ -1,5 +1,7 @@
 package jadex.base.gui.modeltree;
 
+import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filechooser.RemoteFileSystemView;
 import jadex.base.gui.filetree.FileData;
@@ -12,8 +14,6 @@ import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDefaultResultListener;
-import jadex.commons.future.SwingDelegationResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
 import jadex.xml.annotation.XMLClassname;

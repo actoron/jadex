@@ -1,6 +1,8 @@
 package jadex.tools.generic;
 
 import jadex.base.fipa.CMSComponentDescription;
+import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.componentviewer.IComponentViewerPanel;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
@@ -10,8 +12,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDefaultResultListener;
-import jadex.commons.future.SwingDelegationResultListener;
 
 import java.util.HashSet;
 import java.util.Set;

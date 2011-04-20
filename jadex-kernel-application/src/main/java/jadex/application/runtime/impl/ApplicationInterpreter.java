@@ -41,7 +41,6 @@ import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.clock.ITimedObject;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.ComponentServiceContainer;
-import jadex.commons.ChangeEvent;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.CollectionResultListener;

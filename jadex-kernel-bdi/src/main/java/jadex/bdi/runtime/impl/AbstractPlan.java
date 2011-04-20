@@ -35,7 +35,6 @@ import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PropertybaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.WaitqueueFlyweight;
-import jadex.bdi.runtime.impl.flyweights.ElementFlyweight.AgentInvocation;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.GoalLifecycleRules;

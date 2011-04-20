@@ -74,7 +74,18 @@ public class Starter
 		RESERVED.add(ADAPTER_FACTORY);
 	}
 	
+	/** The shutdown in progress flag. */
+	protected static boolean	shutdown;
+	
 	//-------- static methods --------
+	
+	/**
+	 *  Test if shutdown is in progress.
+	 */
+	public static boolean	isShutdown()
+	{
+		return shutdown;
+	}
 	
 	/**
 	 *  Main for starting the platform (with meaningful fallbacks)
@@ -94,14 +105,32 @@ public class Starter
 					{
 						try
 						{
+//							System.out.println("killing: "+access.getComponentIdentifier().getPlatformName());
+							shutdown	= true;
 							access.killComponent().get(new ThreadSuspendable());
+//							System.out.println("killed: "+access.getComponentIdentifier().getPlatformName());
 						}
 						catch(ComponentTerminatedException cte)
 						{
 							// Already killed.
 						}
+						catch(Throwable t)
+						{
+							t.printStackTrace();
+						}
 					}
 				});
+				
+				
+				// Test CTRL-C shutdown behavior.
+//				Timer	timer	= new Timer();
+//				timer.schedule(new TimerTask()
+//				{
+//					public void run()
+//					{
+//						System.exit(0);
+//					}
+//				}, 5000);
 			}
 		});
 	}

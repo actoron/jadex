@@ -1,5 +1,6 @@
 package jadex.bdi.examples.shop;
 
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
@@ -13,7 +14,6 @@ import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 

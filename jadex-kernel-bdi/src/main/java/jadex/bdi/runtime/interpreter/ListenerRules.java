@@ -14,8 +14,6 @@ import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
 import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.MessageEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
-import jadex.bridge.IComponentListener;
-import jadex.commons.ChangeEvent;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;
