@@ -306,7 +306,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 				{
 					IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					IComponentDescription desc = node.getDescription();
-					DebuggerMainPanel	panel = new DebuggerMainPanel(getJCC(), desc);
+					DebuggerMainPanel panel = new DebuggerMainPanel(getJCC(), desc);
 //					SHelp.setupHelp(panel, "tools.debugger");
 					detail.add(panel, desc.getName());
 					comptree.getModel().fireNodeChanged(node);

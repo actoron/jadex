@@ -772,6 +772,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 		// Hack! How to find out if remote listener?
 		if(Proxy.isProxyClass(listener.getClass()))
 			listener = new RemoteComponentListener(access, listener);
+		
 		componentlisteners.add(listener);
 		return IFuture.DONE;
 	}
@@ -782,9 +783,14 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public IFuture removeComponentListener(IComponentListener listener)
 	{
+		// Hack! How to find out if remote listener?
+		if(Proxy.isProxyClass(listener.getClass()))
+			listener = new RemoteComponentListener(access, listener);
+		
 		if(componentlisteners!=null)
 			componentlisteners.remove(listener);
-		System.out.println("cl: "+componentlisteners);
+		
+//		System.out.println("cl: "+componentlisteners);
 		return IFuture.DONE;
 	}
 	

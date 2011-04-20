@@ -33,7 +33,7 @@ public class ObjectInspectorDebuggerPanel	implements IDebuggerPanel
 	//-------- attributes --------
 	
 	/** The gui component. */
-	protected JComponent	oavpanel;
+	protected OAVPanel oavpanel;
 
 	//-------- IDebuggerPanel methods --------
 
@@ -87,5 +87,15 @@ public class ObjectInspectorDebuggerPanel	implements IDebuggerPanel
 	{
 		return "Show the object contents";
 	}
-
+	
+	/**
+	 *  Dispose the component.
+	 */
+	public void dispose()
+	{
+		if(oavpanel!=null)
+		{
+			oavpanel.dispose();
+		}
+	}
 }

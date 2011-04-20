@@ -20,7 +20,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -31,6 +33,8 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  *  Show details of a debugged agent.
@@ -64,6 +68,9 @@ public class DebuggerMainPanel extends JSplitPane
 	/** The stepmode checkbox. */
 	protected JCheckBox	stepmode;
 	
+	/** The tabs. */
+	protected List debuggerpanels;
+	
 	//-------- constructors --------
 	
 	/**
@@ -76,9 +83,10 @@ public class DebuggerMainPanel extends JSplitPane
 		super(JSplitPane.HORIZONTAL_SPLIT, new JPanel(), new JPanel());
 		this.jcc	= jcc;
 		this.desc	= desc;
+		this.debuggerpanels = new ArrayList();
 		this.setOneTouchExpandable(true);
-		setDividerLocation(150);
-		
+		setDividerLocation(0.3);
+				
 		SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
 		{
@@ -90,7 +98,8 @@ public class DebuggerMainPanel extends JSplitPane
 				setRightComponent(rightpanel);
 				rightpanel.setLayout(new GridBagLayout());
 				
-				final JTabbedPane	tabs	= new JTabbedPane();		
+				final JTabbedPane tabs = new JTabbedPane();	
+				
 				cms.getExternalAccess(desc.getName())
 					.addResultListener(new IResultListener()
 				{			
@@ -143,6 +152,7 @@ public class DebuggerMainPanel extends JSplitPane
 															Class clazz	= SReflect.classForName(classname, cl);
 															IDebuggerPanel	panel	= (IDebuggerPanel)clazz.newInstance();
 															panel.init(DebuggerMainPanel.this.jcc, leftpanel[0], DebuggerMainPanel.this.desc.getName(), exta);
+															debuggerpanels.add(panel);
 															tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());
 														}
 														catch(Exception e)
@@ -158,6 +168,7 @@ public class DebuggerMainPanel extends JSplitPane
 										{
 											ObjectInspectorDebuggerPanel panel = new ObjectInspectorDebuggerPanel();
 											panel.init(DebuggerMainPanel.this.jcc, leftpanel[0], DebuggerMainPanel.this.desc.getName(), exta);
+											debuggerpanels.add(panel);
 											tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());
 										}
 									}
@@ -280,15 +291,15 @@ public class DebuggerMainPanel extends JSplitPane
 				int row	= 0;
 				int	col	= 0;
 				rightpanel.add(tabs, new GridBagConstraints(col++, row, GridBagConstraints.REMAINDER, 1,
-						1,1, GridBagConstraints.LINE_END, GridBagConstraints.BOTH, new Insets(1,1,1,1), 0,0));
+					1,1, GridBagConstraints.LINE_END, GridBagConstraints.BOTH, new Insets(1,1,1,1), 0,0));
 				row++;
 				col	= 0;
 				rightpanel.add(stepmode, new GridBagConstraints(col++, row, 1, 1,
 					1,0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
 				rightpanel.add(step, new GridBagConstraints(col++, row, 1, 1,
-						0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
+					0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
 				rightpanel.add(run, new GridBagConstraints(col, row++, GridBagConstraints.REMAINDER, 1,
-						0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
+					0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
 
 				
 				updatePanel((IComponentDescription)desc);
@@ -319,6 +330,17 @@ public class DebuggerMainPanel extends JSplitPane
 	 */
 	public void dispose()
 	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				for(int i=0; i<debuggerpanels.size(); i++)
+				{
+					IDebuggerPanel panel = (IDebuggerPanel)debuggerpanels.get(i);
+					panel.dispose();
+				}
+			}
+		});
 	}
 
 	protected void updatePanel(final IComponentDescription desc)
@@ -327,8 +349,6 @@ public class DebuggerMainPanel extends JSplitPane
 		{
 			public void run()
 			{
-				
-				
 				stepmode.setSelected(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()));
 				step.setEnabled(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()));
 //					&& IComponentDescription.PROCESSINGSTATE_READY.equals(desc.getProcessingState()));

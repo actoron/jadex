@@ -8,6 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.gui.SGUI;
 import jadex.rules.tools.reteviewer.RetePanel;
+import jadex.rules.tools.stateviewer.OAVPanel;
 import jadex.tools.debugger.IDebuggerPanel;
 
 import javax.swing.Icon;
@@ -31,7 +32,7 @@ public class BDIAgentRuleEngineDebuggerPanel	implements IDebuggerPanel
 	//-------- IDebuggerPanel methods --------
 	
 	/** The gui component. */
-	protected JComponent	retepanel;
+	protected RetePanel retepanel;
 
 	//-------- IDebuggerPanel methods --------
 
@@ -85,4 +86,14 @@ public class BDIAgentRuleEngineDebuggerPanel	implements IDebuggerPanel
 		return "Show the rule engine.";
 	}
 
+	/**
+	 *  Dispose the component.
+	 */
+	public void dispose()
+	{
+		if(retepanel!=null)
+		{
+			retepanel.dispose();
+		}
+	}
 }

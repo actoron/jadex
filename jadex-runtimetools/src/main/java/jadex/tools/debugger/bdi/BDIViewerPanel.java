@@ -248,4 +248,6 @@ public class BDIViewerPanel extends JPanel
 			}
 		}
 	}
+	
+	
 }

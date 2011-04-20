@@ -7,6 +7,7 @@ import jadex.commons.IBreakpointPanel;
 import jadex.commons.gui.SGUI;
 import jadex.tools.debugger.IDebuggerPanel;
 
+import javax.help.UnsupportedOperationException;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.UIDefaults;
@@ -28,7 +29,7 @@ public class BDIViewerDebuggerPanel implements IDebuggerPanel
 	//-------- attributes --------
 	
 	/** The gui component. */
-	protected JComponent	panel;
+	protected BDIViewerPanel panel;
 
 	//-------- IDebuggerPanel methods --------
 
@@ -79,5 +80,18 @@ public class BDIViewerDebuggerPanel implements IDebuggerPanel
 	public String getTooltipText()
 	{
 		return "Show the BDI agent's internal state.";
+	}
+	
+	/**
+	 *  Dispose the component.
+	 */
+	public void dispose()
+	{
+		// todo:
+		throw new UnsupportedOperationException();
+//		if(panel!=null)
+//		{
+//			panel.dispose();
+//		}
 	}
 }

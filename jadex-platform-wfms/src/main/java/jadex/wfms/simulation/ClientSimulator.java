@@ -1,5 +1,6 @@
 package jadex.wfms.simulation;
 
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bdi.planlib.iasteps.DispatchGoalStep;
 import jadex.bdi.planlib.iasteps.SetBeliefStep;
 import jadex.bdi.runtime.IBDIExternalAccess;
@@ -16,7 +17,6 @@ import jadex.commons.collection.TreeNode;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.SGUI;
 import jadex.gpmn.model2.MGpmnModel;

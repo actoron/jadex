@@ -4,6 +4,7 @@ import jadex.base.service.remote.commands.RemoteMethodInvocationCommand;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.RemoteComponentListener;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -162,6 +163,37 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		}
 	
 		return ret;
+	}
+	
+	/**
+	 *  Get the pr.
+	 *  @return the pr.
+	 */
+	public ProxyReference getProxyReference()
+	{
+		return pr;
+	}
+
+	/**
+	 *  Test equality.
+	 */
+	public boolean equals(Object obj)
+	{
+		boolean ret = obj instanceof RemoteMethodInvocationHandler;
+		if(ret)
+		{
+			ret = pr.getRemoteReference().equals(((RemoteMethodInvocationHandler)obj)
+				.getProxyReference().getRemoteReference());
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Hash code.
+	 */
+	public int hashCode()
+	{
+		return 31 + pr.getRemoteReference().hashCode();
 	}
 }
 

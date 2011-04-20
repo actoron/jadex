@@ -1,6 +1,6 @@
 package jadex.wfms.simulation.gui;
 
-import jadex.commons.future.SwingDefaultResultListener;
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.wfms.common.SClassLoaderTools;
 import jadex.wfms.simulation.stateset.gui.IStatePanel;
 

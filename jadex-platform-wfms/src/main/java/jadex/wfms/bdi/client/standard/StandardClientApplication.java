@@ -1,5 +1,6 @@
 package jadex.wfms.bdi.client.standard;
 
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bdi.planlib.iasteps.DispatchGoalStep;
 import jadex.bdi.planlib.iasteps.SetBeliefStep;
 import jadex.bdi.runtime.GoalFailureException;
@@ -10,7 +11,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.SwingDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.wfms.bdi.client.standard.parametergui.ActivityComponent;
 import jadex.wfms.client.IClientActivity;

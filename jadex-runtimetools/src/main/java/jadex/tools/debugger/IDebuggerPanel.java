@@ -49,5 +49,10 @@ public interface IDebuggerPanel
 	 *  @return The tooltip text, or null.
 	 */
 	public String getTooltipText();
+	
+	/**
+	 *  Dispose the panel.
+	 */
+	public void dispose();
 
 }

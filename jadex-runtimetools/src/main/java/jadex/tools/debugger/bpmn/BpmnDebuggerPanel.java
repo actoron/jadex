@@ -30,7 +30,7 @@ public class BpmnDebuggerPanel	implements IDebuggerPanel
 	//-------- IDebuggerPanel methods --------
 	
 	/** The gui component. */
-	protected JComponent	processpanel;
+	protected ProcessViewPanel processpanel;
 
 	//-------- IDebuggerPanel methods --------
 
@@ -81,6 +81,17 @@ public class BpmnDebuggerPanel	implements IDebuggerPanel
 	public String getTooltipText()
 	{
 		return "Show the process state and history.";
+	}
+	
+	/**
+	 *  Dispose the component.
+	 */
+	public void dispose()
+	{
+		if(processpanel!=null)
+		{
+			processpanel.dispose();
+		}
 	}
 
 }

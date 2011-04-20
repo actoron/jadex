@@ -29,7 +29,7 @@ public class MicroDebuggerPanel	implements IDebuggerPanel
 	//-------- IDebuggerPanel methods --------
 	
 	/** The gui component. */
-	protected JComponent micropanel;
+	protected MicroAgentViewPanel micropanel;
 
 	//-------- IDebuggerPanel methods --------
 
@@ -80,6 +80,17 @@ public class MicroDebuggerPanel	implements IDebuggerPanel
 	public String getTooltipText()
 	{
 		return "Show the micro agent state and history.";
+	}
+	
+	/**
+	 *  Dispose the component.
+	 */
+	public void dispose()
+	{
+		if(micropanel!=null)
+		{
+			micropanel.dispose();
+		}
 	}
 
 }

@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.bridge.service.annotation.Replacement;
 import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -85,6 +86,15 @@ public class RemoteComponentListener implements IComponentListener
 		return IFuture.DONE;
 	}
 	
+	/**
+	 *  Get the listener.
+	 *  @return The listener.
+	 */
+	public IComponentListener getListener()
+	{
+		return listener;
+	}
+
 	/**
 	 *  An element was added.
 	 */
@@ -236,19 +246,24 @@ public class RemoteComponentListener implements IComponentListener
 	}
 	
 	/**
-	 *  Test equality based on id.
+	 *  Test equality.
 	 */
 	public boolean equals(Object obj)
 	{
-		return listener.equals(obj);
+		boolean ret = obj instanceof RemoteComponentListener;
+		if(ret)
+		{
+			ret = ((RemoteComponentListener)obj).getListener().equals(listener);
+		}
+		return ret;
 	}
 	
 	/**
-	 *  Hash code based on id.
+	 *  Hash code.
 	 */
 	public int hashCode()
 	{
-		return listener.hashCode();
+		return 31 + listener.hashCode();
 	}
 	
 	/**

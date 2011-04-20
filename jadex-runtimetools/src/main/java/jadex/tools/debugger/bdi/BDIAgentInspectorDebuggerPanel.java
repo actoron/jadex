@@ -12,6 +12,7 @@ import jadex.tools.debugger.IDebuggerPanel;
 
 import java.awt.BorderLayout;
 
+import javax.help.UnsupportedOperationException;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -107,6 +108,17 @@ public class BDIAgentInspectorDebuggerPanel	implements IDebuggerPanel
 	public String getTooltipText()
 	{
 		return "Show the agent state.";
+	}
+	
+	/**
+	 *  Dispose the component.
+	 */
+	public void dispose()
+	{
+		if(oavpanel!=null && oavpanel.getComponentCount()>0)
+		{
+			((OAVPanel)oavpanel.getComponent(0)).dispose();
+		}
 	}
 
 }

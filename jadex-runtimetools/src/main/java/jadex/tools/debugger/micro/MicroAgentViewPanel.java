@@ -138,6 +138,7 @@ public class MicroAgentViewPanel extends JPanel
 		{
 			protected IFilter filter = new IFilter()
 			{
+				@XMLClassname("filter")
 				public boolean filter(Object obj)
 				{
 					IComponentChangeEvent cce = (IComponentChangeEvent)obj;
@@ -223,6 +224,7 @@ public class MicroAgentViewPanel extends JPanel
 			}
 		};
 
+		final IComponentListener lis = listener;
 		agent.scheduleImmediate(new IComponentStep()
 		{
 			@XMLClassname("installListener")
@@ -240,7 +242,7 @@ public class MicroAgentViewPanel extends JPanel
 //				}
 //				rcl.changeOccurred(new ChangeEvent(null, RemoteChangeListenerHandler.EVENT_BULK, events));
 				
-				ia.addComponentListener(listener);
+				ia.addComponentListener(lis);
 				return null;
 			}
 		});
@@ -279,11 +281,13 @@ public class MicroAgentViewPanel extends JPanel
 	 */
 	public void	dispose()
 	{
+		final IComponentListener lis = listener;
 		agent.scheduleImmediate(new IComponentStep()
 		{
+			@XMLClassname("dispose")
 			public Object execute(IInternalAccess ia)
 			{
-				ia.removeComponentListener(listener);
+				ia.removeComponentListener(lis);
 				return null;
 			}
 		});
