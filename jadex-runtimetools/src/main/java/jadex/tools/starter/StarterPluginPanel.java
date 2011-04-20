@@ -431,11 +431,18 @@ public class StarterPluginPanel extends JPanel
 					public void customResultAvailable(Object result)
 					{
 //						System.out.println("fetched mpanel properties");
-						Properties	props	= new Properties();
+						final Properties	props	= new Properties();
 						props.addSubproperties("mpanel", (Properties)result);
-						props.addSubproperties("spanel", spanel.getProperties());
-						settings.setProperties("StarterServicePanel", props)
-							.addResultListener(new SwingDelegationResultListener(ret));
+						spanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+						{
+							public void customResultAvailable(Object result)
+							{
+//								System.out.println("fetched spanel properties");
+								props.addSubproperties("spanel", (Properties)result);
+								settings.setProperties("StarterServicePanel", props)
+									.addResultListener(new SwingDelegationResultListener(ret));
+							}
+						});
 					}
 				});
 			}

@@ -1,11 +1,12 @@
 package jadex.tools.comanalyzer;
 
-import jadex.base.gui.ElementPanel;
+import jadex.commons.gui.BrowserPane;
 
 import java.awt.BorderLayout;
 import java.util.Map;
 
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
@@ -26,7 +27,7 @@ public class ToolPanel extends JPanel
 	protected JSplitPane content;
 
 	/** The details panel. */
-	protected ElementPanel details;
+	protected BrowserPane details;
 
 	/** The tab panel. */
 	protected JTabbedPane tabs;
@@ -43,7 +44,7 @@ public class ToolPanel extends JPanel
 	 */
 	public ToolPanel(ToolTab[] tools)
 	{
-		this.details = new ElementPanel("Details", NOTHING);
+		this.details = new BrowserPane();
 		this.tabs = new JTabbedPane();
 		this.tools = tools;
 
@@ -55,7 +56,7 @@ public class ToolPanel extends JPanel
 		// add the change listener to the tab
 		tabs.addChangeListener(new PaneChangeListener());
 
-		this.content = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tabs, details);
+		this.content = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tabs, new JScrollPane(details));
 		content.setOneTouchExpandable(true);
 		content.setResizeWeight(1.0);
 		content.setDividerLocation(65535); // Proportional (1.0) doesn't work.
@@ -72,7 +73,8 @@ public class ToolPanel extends JPanel
 	 */
 	public void showElementDetails(Map element)
 	{
-		this.details.addElement(element, null);
+		// Todo: better layout
+		this.details.setText(element.toString());
 		// Hack? to show detail panel.
 		if(content.getDividerLocation() > content.getMaximumDividerLocation())
 			content.setDividerLocation(content.getLastDividerLocation());

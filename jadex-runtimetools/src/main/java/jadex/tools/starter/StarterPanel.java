@@ -3,9 +3,9 @@ package jadex.tools.starter;
 import jadex.base.SComponentFactory;
 import jadex.base.Starter;
 import jadex.base.gui.ComponentSelectorDialog;
-import jadex.base.gui.ElementPanel;
 import jadex.base.gui.ParserValidator;
 import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
@@ -30,7 +30,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.gui.CombiIcon;
+import jadex.commons.gui.BrowserPane;
 import jadex.commons.gui.JValidatorTextField;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.jtable.ClassRenderer;
@@ -56,15 +56,14 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -72,8 +71,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -164,9 +161,6 @@ public class StarterPanel extends JPanel
 	/** The start button. */
 	protected JButton start;
 
-	/** The description panel. */
-	protected ElementPanel modeldesc;
-
 	/** The component specific panel. */
 	protected JPanel componentpanel;
 	
@@ -187,6 +181,9 @@ public class StarterPanel extends JPanel
 	
 	/** The provided services. */
 	protected JPanel providedservices;
+	
+	/** The model details. */
+	protected BrowserPane	details;
 	
 	//-------- constructors --------
 
@@ -408,24 +405,6 @@ public class StarterPanel extends JPanel
 		reset.setMinimumSize(new Dimension(mw, mh));
 		reset.setPreferredSize(new Dimension(pw, ph));
 
-		// The description panel.
-		modeldesc = new ElementPanel("Description", null);
-		ChangeListener desclistener = new ChangeListener()
-		{
-			public void stateChanged(ChangeEvent ce)
-			{
-				Object id = modeldesc.getId(modeldesc.getSelectedComponent());
-				if(id instanceof String)
-				{
-					//System.out.println("SystemEvent: "+id);
-					loadModel((String)id);
-				}
-			}
-		};
-		modeldesc.addChangeListener(desclistener);
-		modeldesc.setMinimumSize(new Dimension(200, 150));
-		modeldesc.setPreferredSize(new Dimension(400, 150));
-
 		// Avoid panel being not resizeable when long filename is displayed
 		filename.setMinimumSize(filename.getMinimumSize());
 
@@ -631,7 +610,8 @@ public class StarterPanel extends JPanel
 			new Insets(2, 2, 2, 2), 0, 0));
 
 		y++;
-		content.add(modeldesc, new GridBagConstraints(0, y, 5, 1, 1, 1, GridBagConstraints.CENTER,
+		details	= new BrowserPane();
+		content.add(new JScrollPane(details), new GridBagConstraints(0, y, 5, 1, 1, 1, GridBagConstraints.CENTER,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 
 		this.add("Center", content);
@@ -679,30 +659,7 @@ public class StarterPanel extends JPanel
 							public void customResultAvailable(Object result)
 							{
 								model = (IModelInfo)result;
-								SComponentFactory.getFileType(exta, adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
-								{
-									public void customResultAvailable(Object result)
-									{
-										SComponentFactory.getFileTypeIcon(exta, (String)result)
-											.addResultListener(new SwingDefaultResultListener(StarterPanel.this)
-										{
-											public void customResultAvailable(Object result)
-											{
-												updateGuiForNewModel(adf, (Icon)result);
-											}
-											
-											public void customExceptionOccurred(Exception exception)
-											{
-												updateGuiForNewModel(adf, null);
-											}
-										});								
-									}
-									
-									public void customExceptionOccurred(Exception exception)
-									{
-										updateGuiForNewModel(adf, null);
-									}
-								});								
+								updateGuiForNewModel(adf);
 							}
 							
 							public void customExceptionOccurred(Exception exception)
@@ -711,14 +668,14 @@ public class StarterPanel extends JPanel
 								StringWriter sw = new StringWriter();
 								exception.printStackTrace(new PrintWriter(sw));
 								error = sw.toString();
-								updateGuiForNewModel(adf, null);
+								updateGuiForNewModel(adf);
 							}
 						});
 					}
 					else
 					{
 						model = null;
-						updateGuiForNewModel(adf, null);
+						updateGuiForNewModel(adf);
 					}
 				}
 			});
@@ -727,7 +684,7 @@ public class StarterPanel extends JPanel
 		{
 			model = null;
 			error = null;
-			updateGuiForNewModel(adf, null);
+			updateGuiForNewModel(adf);
 		}
 	}
 
@@ -737,7 +694,7 @@ public class StarterPanel extends JPanel
 	 *  @param adf The adf.
 	 *  @param icon The component icon (if available).
 	 */
-	void updateGuiForNewModel(String adf, Icon icon)
+	void updateGuiForNewModel(String adf)
 	{
 //		System.out.println("updategui "+adf);
 		
@@ -815,34 +772,18 @@ public class StarterPanel extends JPanel
 		final IErrorReport report = model!=null? model.getReport(): null;
 		if(report!=null)
 		{
-			icon	= icon!=null ? new CombiIcon(new Icon[]{icon, icons.getIcon("overlay_check")}) : icons.getIcon("overlay_check");
-			try
-			{
-				modeldesc.addHTMLContent(model.getName(), icon, report.getErrorHTML(), model.getFullName(), report.getDocuments());
-			}
-			catch(final Exception e)
-			{
-				String text = SUtil.wrapText("Could not display HTML content: "+e.getMessage());
-				JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), text, "Display Problem", JOptionPane.INFORMATION_MESSAGE);
-				modeldesc.addTextContent(model.getName(), icon, report.toString(), model.getFullName());
-			}
+			details.setExternals(report.getDocuments());
+			details.setText(report.getErrorHTML());
 		}
 		else if(model!=null)
 		{
-			try
-			{
-				modeldesc.addHTMLContent(model.getName(), icon, model.getDescription(), model.getFullName(), null);
-			}
-			catch(final Exception e)
-			{
-				String text = SUtil.wrapText("Could not display HTML content: "+e.getMessage());
-				JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), text, "Display Problem", JOptionPane.INFORMATION_MESSAGE);
-				modeldesc.addTextContent(model.getName(), icon, model.getDescription(), model.getFullName());
-			}
+			details.setExternals(null);
+			details.setText(model.getDescription());
 		}
 		else if(error!=null)
 		{
-			modeldesc.addTextContent("Error", null, error, "error");
+			details.setExternals(null);
+			details.setText(error);
 		}
 
 		// Adjust state of start button depending on model checking state.
@@ -877,29 +818,59 @@ public class StarterPanel extends JPanel
 	 *  Get the properties.
 	 *  @param props The properties.
 	 */
-	public Properties	getProperties()
+	public IFuture	getProperties()
 	{
-		Properties	props	= new Properties();
+		final Future	ret	= new Future();
 		
-		String m = SUtil.convertPathToRelative(filename.getText());
-		if(m!=null) props.addProperty(new Property("model", m));
-
-		String c = (String)config.getSelectedItem();
-		if(c!=null) props.addProperty(new Property("config", c));
-
-		props.addProperty(new Property("startsuspended", ""+suspend.isSelected()));
-
-		props.addProperty(new Property("autogenerate", ""+genname.isSelected()));
-		
-		props.addProperty(new Property("name", componentname.getText()));
-		// Cannot get components during shutdown as awt blocks tree lock.
-		for(int i=0; argelems!=null && i<argelems.size() && !Starter.isShutdown(); i++)
+		final String	name	= filename.getText();
+		exta.scheduleStep(new IComponentStep()
 		{
-			JTextField valt = (JTextField)arguments.getComponent(i*4+3);
-			props.addProperty(new Property("argument", valt.getText()));
-		}
+			@XMLClassname("convertPath")
+			public Object execute(IInternalAccess ia)
+			{
+				Future	ret	= new Future();
+				SComponentFactory.loadModel(ia.getExternalAccess(), name)
+					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						super.customResultAvailable(SUtil.convertPathToRelative(name));
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						super.customResultAvailable(null);
+					}
+				}));
+				return ret;
+			}
+		}).addResultListener(new SwingDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result) throws Exception
+			{
+				Properties	props	= new Properties();
+				
+				if(result!=null) props.addProperty(new Property("model", (String)result));
+
+				String c = (String)config.getSelectedItem();
+				if(c!=null) props.addProperty(new Property("config", c));
+
+				props.addProperty(new Property("startsuspended", ""+suspend.isSelected()));
+
+				props.addProperty(new Property("autogenerate", ""+genname.isSelected()));
+				
+				props.addProperty(new Property("name", componentname.getText()));
+				// Cannot get components during shutdown as awt blocks tree lock.
+				for(int i=0; argelems!=null && i<argelems.size() && !Starter.isShutdown(); i++)
+				{
+					JTextField valt = (JTextField)arguments.getComponent(i*4+3);
+					props.addProperty(new Property("argument", valt.getText()));
+				}
+				
+				ret.setResult(props);
+			}
+		});
 		
-		return props;
+		return ret;
 	}
 
 	/**
@@ -939,7 +910,6 @@ public class StarterPanel extends JPanel
 	{
 		loadargs	= null;
 		filename.setText("");
-		modeldesc.removeAll();
 		loadModel(null);
 		config.removeAllItems();
 		clearArguments();

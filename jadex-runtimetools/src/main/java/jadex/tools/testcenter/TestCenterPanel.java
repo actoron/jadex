@@ -1,6 +1,5 @@
 package jadex.tools.testcenter;
 
-import jadex.base.gui.ElementPanel;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.test.TestReport;
@@ -441,7 +440,6 @@ public class TestCenterPanel extends JSplitPanel
 		this.details = new BrowserPane();
 		details.setMinimumSize(new Dimension(400,100));
 		details.setPreferredSize(new Dimension(400,100));
-		new ElementPanel("","").setStylesheet(details);	// Hack!!!
 		JScrollPane	scroll2	= new JScrollPane(details);
 		bottom.add(BorderLayout.CENTER, scroll2);
 
