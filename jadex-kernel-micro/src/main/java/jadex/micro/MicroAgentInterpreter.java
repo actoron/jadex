@@ -784,6 +784,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	{
 		if(componentlisteners!=null)
 			componentlisteners.remove(listener);
+		System.out.println("cl: "+componentlisteners);
 		return IFuture.DONE;
 	}
 	

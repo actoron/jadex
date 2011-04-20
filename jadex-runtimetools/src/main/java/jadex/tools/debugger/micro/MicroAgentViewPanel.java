@@ -6,7 +6,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IBreakpointPanel;
-import jadex.commons.IChangeListener;
 import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.JSplitPanel;
@@ -46,7 +45,7 @@ public class MicroAgentViewPanel extends JPanel
 	protected IExternalAccess agent;
 	
 	/** The change listener. */
-	protected IChangeListener listener;
+	protected IComponentListener listener;
 	
 	/** The list for the history. */
 //	protected IOAVState step;
@@ -135,7 +134,7 @@ public class MicroAgentViewPanel extends JPanel
 		final JCheckBox hon = new JCheckBox("Store History");
 		hon.setSelected(true);
 
-		final IComponentListener cl	= new IComponentListener()
+		listener = new IComponentListener()
 		{
 			protected IFilter filter = new IFilter()
 			{
@@ -241,10 +240,7 @@ public class MicroAgentViewPanel extends JPanel
 //				}
 //				rcl.changeOccurred(new ChangeEvent(null, RemoteChangeListenerHandler.EVENT_BULK, events));
 				
-				ia.addComponentListener(cl);
-
-				// Add listener for updates
-//				((MicroAgentInterpreter)ia).addChangeListener(new BPMNChangeListener(id, (BpmnInterpreter)ia, rcl));
+				ia.addComponentListener(listener);
 				return null;
 			}
 		});
@@ -283,7 +279,14 @@ public class MicroAgentViewPanel extends JPanel
 	 */
 	public void	dispose()
 	{
-//		instance.removeChangeListener(listener);
+		agent.scheduleImmediate(new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+				ia.removeComponentListener(listener);
+				return null;
+			}
+		});
 	}
 }
 
