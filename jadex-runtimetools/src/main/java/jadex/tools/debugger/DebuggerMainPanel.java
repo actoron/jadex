@@ -15,6 +15,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.tools.debugger.common.ObjectInspectorDebuggerPanel;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -65,8 +66,8 @@ public class DebuggerMainPanel extends JSplitPane
 	/** The step button. */
 	protected JButton	run;
 
-	/** The stepmode checkbox. */
-	protected JCheckBox	stepmode;
+	/** The pause buuton. */
+	protected JButton	pause;
 	
 	/** The tabs. */
 	protected List debuggerpanels;
@@ -182,6 +183,23 @@ public class DebuggerMainPanel extends JSplitPane
 					}
 				});
 				
+				pause = new JButton("Pause");
+				pause.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						pause.setEnabled(false);
+						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getPlatformAccess().getServiceProvider(), IComponentManagementService.class)
+							.addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
+						{
+							public void customResultAvailable(Object result)
+							{
+								IComponentManagementService	ces	= (IComponentManagementService)result;
+								ces.suspendComponent(DebuggerMainPanel.this.desc.getName());
+							}
+						});
+					}
+				});
 				
 				step = new JButton("Step");
 				step.addActionListener(new ActionListener()
@@ -223,7 +241,7 @@ public class DebuggerMainPanel extends JSplitPane
 					{
 						step.setEnabled(false);
 						run.setEnabled(false);
-						stepmode.setSelected(false);
+						pause.setEnabled(true);
 						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getPlatformAccess().getServiceProvider(), IComponentManagementService.class)
 							.addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
 						{
@@ -247,7 +265,7 @@ public class DebuggerMainPanel extends JSplitPane
 											{
 												step.setEnabled(true);
 												run.setEnabled(true);
-												stepmode.setSelected(true);
+												pause.setEnabled(false);
 											}
 										});
 									}
@@ -256,7 +274,7 @@ public class DebuggerMainPanel extends JSplitPane
 									{
 										step.setEnabled(true);
 										run.setEnabled(true);
-										stepmode.setSelected(true);
+										pause.setEnabled(false);
 									}
 								});
 							}
@@ -264,29 +282,36 @@ public class DebuggerMainPanel extends JSplitPane
 					}
 				});
 				
-				stepmode = new JCheckBox("Step Mode");
-				stepmode.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getPlatformAccess().getServiceProvider(), IComponentManagementService.class)
-							.addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
-						{
-							public void customResultAvailable(Object result)
-							{
-								IComponentManagementService	ces	= (IComponentManagementService)result;
-								if(stepmode.isSelected())
-								{
-									ces.suspendComponent(DebuggerMainPanel.this.desc.getName());
-								}
-								else
-								{
-									ces.resumeComponent(DebuggerMainPanel.this.desc.getName());
-								}
-							}
-						});
-					}
-				});
+				Dimension msize = pause.getMinimumSize();
+				Dimension psize = pause.getPreferredSize();
+				run.setMinimumSize(msize);
+				run.setPreferredSize(psize);
+				step.setMinimumSize(msize);
+				step.setPreferredSize(psize);
+				
+//				stepmode = new JCheckBox("Step Mode");
+//				stepmode.addActionListener(new ActionListener()
+//				{
+//					public void actionPerformed(ActionEvent e)
+//					{
+//						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getPlatformAccess().getServiceProvider(), IComponentManagementService.class)
+//							.addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
+//						{
+//							public void customResultAvailable(Object result)
+//							{
+//								IComponentManagementService	ces	= (IComponentManagementService)result;
+//								if(stepmode.isSelected())
+//								{
+//									ces.suspendComponent(DebuggerMainPanel.this.desc.getName());
+//								}
+//								else
+//								{
+//									ces.resumeComponent(DebuggerMainPanel.this.desc.getName());
+//								}
+//							}
+//						});
+//					}
+//				});
 						
 				int row	= 0;
 				int	col	= 0;
@@ -294,7 +319,7 @@ public class DebuggerMainPanel extends JSplitPane
 					1,1, GridBagConstraints.LINE_END, GridBagConstraints.BOTH, new Insets(1,1,1,1), 0,0));
 				row++;
 				col	= 0;
-				rightpanel.add(stepmode, new GridBagConstraints(col++, row, 1, 1,
+				rightpanel.add(pause, new GridBagConstraints(col++, row, 1, 1,
 					1,0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
 				rightpanel.add(step, new GridBagConstraints(col++, row, 1, 1,
 					0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
@@ -349,7 +374,8 @@ public class DebuggerMainPanel extends JSplitPane
 		{
 			public void run()
 			{
-				stepmode.setSelected(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()));
+				System.out.println("update: "+desc);
+				pause.setEnabled(!IComponentDescription.STATE_SUSPENDED.equals(desc.getState()));
 				step.setEnabled(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()));
 //					&& IComponentDescription.PROCESSINGSTATE_READY.equals(desc.getProcessingState()));
 				run.setEnabled(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()));
