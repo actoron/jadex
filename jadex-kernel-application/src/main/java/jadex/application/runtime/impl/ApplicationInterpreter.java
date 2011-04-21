@@ -1170,7 +1170,9 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 			});
 		}
 		else
+		{
 			ret.setResult(adapter.getComponentIdentifier());
+		}
 		
 		return ret;
 //		return adapter.getServiceContainer().shutdown(); // done in adapter

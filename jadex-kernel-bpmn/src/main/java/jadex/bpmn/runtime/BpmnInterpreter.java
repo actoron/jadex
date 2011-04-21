@@ -620,7 +620,6 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 				{
 					SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
 					{
-						@Override
 						public void customResultAvailable(Object result)
 						{
 							ComponentChangeEvent event = new ComponentChangeEvent();
@@ -633,15 +632,19 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 							for(int i=0; i<componentlisteners.size(); i++)
 							{
 								IComponentListener lis = (IComponentListener)componentlisteners.get(i);
-								//lis.componentTerminated(new ChangeEvent(adapter.getComponentIdentifier()));
-								lis.eventOccured(event);
+								if(lis.getFilter().filter(event))
+								{
+									lis.eventOccured(event);
+								}
 							}
 							ret.setResult(adapter.getComponentIdentifier());
 						}
 					});
 				}
 				else
+				{
 					ret.setResult(adapter.getComponentIdentifier());
+				}
 			}
 		});
 		

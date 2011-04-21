@@ -801,9 +801,26 @@ public class MicroAgentInterpreter implements IComponentInstance
 	{
 		if(componentlisteners!=null)
 		{
-			for(int i=0; i<componentlisteners.size(); i++)
+			IComponentListener[] lstnrs = (IComponentListener[])componentlisteners.toArray(new IComponentListener[componentlisteners.size()]);
+			for(int i=0; i<lstnrs.length; i++)
 			{
-				((IComponentListener)componentlisteners.get(i)).eventOccured(event);
+				final IComponentListener l = lstnrs[i];
+				
+				if(l.getFilter().filter(event))
+				{
+					l.eventOccured(event).addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object result)
+						{
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							//Print exception?
+							componentlisteners.remove(l);
+						}
+					});
+				}
 			}
 		}
 	}
@@ -854,7 +871,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 					event.setEventType(IComponentChangeEvent.EVENT_TYPE_DISPOSAL);
 					event.setSourceCategory(IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT);
 					// todo: fixme
-					event.setSourceName("terminating"); 
+					event.setDetails("terminating"); 
 					event.setSourceType(getAgentModel().getName());
 					event.setSourceName(adapter.getComponentIdentifier().getName());
 					event.setComponent(adapter.getComponentIdentifier());
@@ -863,7 +880,6 @@ public class MicroAgentInterpreter implements IComponentInstance
 						IComponentListener lis = (IComponentListener)componentlisteners.get(i);
 						if (lis.getFilter().filter(event))
 							lis.eventOccured(event);
-						//lis.componentTerminated(new ChangeEvent(getComponentIdentifier()));
 					}
 				}
 			});

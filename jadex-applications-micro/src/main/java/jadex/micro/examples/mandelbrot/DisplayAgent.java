@@ -6,6 +6,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.micro.MicroAgent;
@@ -52,6 +53,8 @@ public class DisplayAgent extends MicroAgent
 	 */
 	public IFuture	agentCreated()
 	{
+		final Future	ret	= new Future();
+		
 		// Hack!!! Swing code not on swing thread!?
 		DisplayAgent.this.panel	= new DisplayPanel(getExternalAccess());
 
@@ -72,7 +75,6 @@ public class DisplayAgent extends MicroAgent
 				right.add(new ColorChooserPanel(panel), BorderLayout.CENTER);
 				right.add(helptext, BorderLayout.NORTH);
 
-				
 				JSplitPane	split	= new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scroll, right);
 				split.setResizeWeight(1);
 				split.setOneTouchExpandable(true);
@@ -112,10 +114,12 @@ public class DisplayAgent extends MicroAgent
 						return null;
 					}
 				});
+				
+				ret.setResult(null);
 			}
 		});
 		
-		return IFuture.DONE;
+		return ret;
 	}
 	
 	//-------- methods --------
