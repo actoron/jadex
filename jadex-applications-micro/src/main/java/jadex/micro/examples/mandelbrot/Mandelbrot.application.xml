@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	<H3></H3>
+	<H3>Mandelbrot Application</H3>
 -->
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
