@@ -62,14 +62,23 @@ public class FileHandler {
 		return bufferedInput;
 	}
 
-	public static void writeToFile(String filename, String input) {
+	public static void writeToFile(String directory, String filename, String input) {
+
+		// check whether directory exists
+		try {
+			File f = new File(directory);
+			if (!f.isDirectory())
+				f.mkdir();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		BufferedOutputStream bufferedOutput = null;
 
 		try {
 
 			// Construct the BufferedOutputStream object
-			bufferedOutput = new BufferedOutputStream(new FileOutputStream(filename));
+			bufferedOutput = new BufferedOutputStream(new FileOutputStream(directory  + "\\" + filename));
 
 			// Start writing to the output stream
 			bufferedOutput.write(input.getBytes());

@@ -234,7 +234,7 @@ public class RuntimeManagerPlan extends Plan {
 		
 		//store file application.xml
 		appFilePath = System.getProperty("user.dir") + "\\"+ simConf.getName()+ (String) clientConf.get(Constants.EXPERIMENT_ID)+ ".application.xml";
-		FileHandler.writeToFile(appFilePath, (String) clientConf.get(Constants.APPLICATION_FILE_AS_XML_STRING));
+		FileHandler.writeToFile(System.getProperty("user.dir"), simConf.getName()+ (String) clientConf.get(Constants.EXPERIMENT_ID)+ ".application.xml", (String) clientConf.get(Constants.APPLICATION_FILE_AS_XML_STRING));
 		
 		// create application in suspended modus
 		IFuture fut = cms.createComponent(simConf.getName() + (String) clientConf.get(Constants.EXPERIMENT_ID), appFilePath, new CreationInfo(simConf.getApplicationConfiguration(), appConf, null, true, false), null);

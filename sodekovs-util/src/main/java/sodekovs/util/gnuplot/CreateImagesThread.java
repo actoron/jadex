@@ -19,11 +19,11 @@ public class CreateImagesThread implements Runnable{
 		
 		for(IHistoricDataDescription data : desc){			
 			
-			// split file by separator "\t" : get the seperate line of the main file
+			// split file by separator "\n" : get the separate line of the main file
 			String[] mainFile = data.getGnuPlotMainFileContent().split("\n");
 			
 			//Write content of data log file to hard disk. this file is needed in order to create the png-file in the next step.
-			FileHandler.writeToFile(GlobalConstants.LOGGING_DIRECTORY + "\\" + data.getTimestamp()+ ".dat", data.getLogEntries());
+			FileHandler.writeToFile(GlobalConstants.LOGGING_DIRECTORY, data.getTimestamp()+ ".dat", data.getLogEntries());
 			GnuPlotHandler.exec(mainFile);			
 		}
 		
