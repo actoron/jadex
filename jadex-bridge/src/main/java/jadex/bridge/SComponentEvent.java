@@ -13,6 +13,11 @@ import java.util.Collection;
 
 public class SComponentEvent
 {
+	/**
+	 *  Retrieves a timestamp from the clock service which can be used in events.
+	 * 	@param provider Service provider of the component.
+	 *  @return Time stamp.
+	 */
 	public static final IFuture getTimeStamp(IServiceProvider provider)
 	{
 		final Future ret = new Future();
@@ -27,11 +32,22 @@ public class SComponentEvent
 		return ret;
 	}
 	
+	/**
+	 *  Dispatches a component change event.
+	 *  @param event The event.
+	 *  @param componentlisteners Event listeners.
+	 */
 	public static final void dispatchComponentChangeEvent(IComponentChangeEvent event, Collection componentlisteners)
 	{
 		dispatchComponentChangeEvent(event, componentlisteners, null);
 	}
 	
+	/**
+	 *  Dispatches a component change event.
+	 *  @param event The event.
+	 *  @param componentlisteners Event listeners.
+	 *  @param finished Future, called when the event has been dispatched.
+	 */
 	public static final void dispatchComponentChangeEvent(IComponentChangeEvent event, final Collection componentlisteners, Future finished)
 	{
 		if(componentlisteners!=null)
@@ -58,6 +74,14 @@ public class SComponentEvent
 			finished.setResult(null);
 	}
 	
+	/**
+	 *  Dispatch a "component terminated" event.
+	 *  @param adapter Component adapter.
+	 *  @param model Component model.
+	 *  @param provider Component service provider.
+	 *  @param componentlisteners Listeners of the component.
+	 *  @param finished Future, called when the event has been dispatched.
+	 */
 	public static final void dispatchTerminatedEvent(final IComponentAdapter adapter, final IModelInfo model,
 			IServiceProvider provider, final Collection componentlisteners, final Future finished)
 	{
@@ -77,6 +101,14 @@ public class SComponentEvent
 		});
 	}
 	
+	/**
+	 *  Dispatch a "component terminating" event.
+	 *  @param adapter Component adapter.
+	 *  @param model Component model.
+	 *  @param provider Component service provider.
+	 *  @param componentlisteners Listeners of the component.
+	 *  @param finished Future, called when the event has been dispatched.
+	 */
 	public static final void dispatchTerminatingEvent(final IComponentAdapter adapter, final IModelInfo model,
 			IServiceProvider provider, final Collection componentlisteners, final Future finished)
 	{
