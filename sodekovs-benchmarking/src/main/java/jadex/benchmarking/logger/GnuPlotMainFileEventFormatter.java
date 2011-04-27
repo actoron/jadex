@@ -77,11 +77,14 @@ public class GnuPlotMainFileEventFormatter extends Formatter {
 
 		buffer.append("set term png transparent");
 		buffer.append("\n");
-		buffer.append("set output '" + GlobalConstants.LOGGING_DIRECTORY + "\\" + fileTimestamp + ".png'");
-		buffer.append("\n");
-		buffer.append("plot '" + GlobalConstants.LOGGING_DIRECTORY + "\\" + fileTimestamp + ".dat' u 1:2 w impulse title \"Observed Events\"");
-		buffer.append("\n");
-		buffer.append("pause -1");
+		
+		//This has to be done when reading file from db, in order to have appropriate filenames for the system where is should be plotted.
+		
+//		buffer.append("set output '" + GlobalConstants.LOGGING_DIRECTORY + "\\" + fileTimestamp + ".png'");
+//		buffer.append("\n");
+//		buffer.append("plot '" + GlobalConstants.LOGGING_DIRECTORY + "\\" + fileTimestamp + ".dat' u 1:2 w impulse title \"Observed Events\"");
+//		buffer.append("\n");
+//		buffer.append("pause -1");
 
 		return buffer.toString();
 	}
