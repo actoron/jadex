@@ -3,9 +3,9 @@
 <!-- Document : TestBenchmark: Workload 1 Created on : 18. März 2011, 16:23 
 	Author : vilenica Description: Purpose of the document follows. -->
 
-<Schedule type="Workload" name="W1" warmUpTime="1000">
+<Schedule type="Workload" name="W2" warmUpTime="1000">
 	<TerminateCondition>
-		 <TerminationTime value="20000" />
+		 <TerminationTime value="40000" />
 		<!-- <SemanticCondition condition="$object.getProperty(&quot;ore&quot;) >= 55">
 			<ObjectSource type="ISpaceObject" name="homebase" />
 		</SemanticCondition> -->
@@ -22,9 +22,9 @@
 		</Properties>
 	</SytemUnderTest>
 	<Sequences>
-	<Sequence starttime="5000" actiontype="create">
+	<Sequence starttime="2000" actiontype="create">
 			<!-- <RepeatConfiguration type="list" values="3500;5000;7000;23000;" /> -->
-			<RepeatConfiguration type="list" values="9000;" />
+			<RepeatConfiguration type="list" values="9000;12000;24000;35000" />
 			<Actions>
 				<Action componentname="SentryW1" componenttype="BDIAgent"
 					componentmodel="../sodekovs-simulationcontrol/src/main/java/jadex/simulation/examples/marsworld/sentry/Sentry.agent.xml" numberOfComponents="1"> 
@@ -42,6 +42,17 @@
 					componentmodel="jadex.simulation.examples.marsworld.sentry.sentry" numberOfComponents="2"> 
 					<Properties>
 						<Property name="sspeed" value="22"></Property>
+					</Properties>
+				</Action>
+			</Actions>
+		</Sequence>
+		<Sequence starttime="4000" actiontype="create">
+		<RepeatConfiguration type="space" step="3000"/>
+			<Actions>
+				<Action componentname="Homebase" componenttype="ISpaceObject"
+					componentmodel="homebase">
+					<Properties>
+						<Property name="speed" value="42"></Property>
 					</Properties>
 				</Action>
 			</Actions>
