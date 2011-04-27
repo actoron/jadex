@@ -324,18 +324,18 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel
 	 */
 	public IFuture setProperties(Properties ps)
 	{
-		int	refresh	= 5000;
-		if(ps!=null)
-		{
-			refresh	= ps.getIntProperty("defrefresh");
-			remotecb.setSelected(ps.getBooleanProperty("benchmarkingremote"));
-		}
-		
-		for(int i=0; i<rb_refresh.length; i++)
-		{
-			if(((Integer)rb_refresh[i].getClientProperty("refresh")).intValue()==refresh)
-				rb_refresh[i].doClick();
-		}
+//		int	refresh	= 5000;
+//		if(ps!=null)
+//		{
+//			refresh	= ps.getIntProperty("defrefresh");
+//			remotecb.setSelected(ps.getBooleanProperty("benchmarkingremote"));
+//		}
+//		
+//		for(int i=0; i<rb_refresh.length; i++)
+//		{
+//			if(((Integer)rb_refresh[i].getClientProperty("refresh")).intValue()==refresh)
+//				rb_refresh[i].doClick();
+//		}
 		
 		return IFuture.DONE;
 	}
