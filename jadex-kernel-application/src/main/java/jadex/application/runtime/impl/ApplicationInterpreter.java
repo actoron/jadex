@@ -29,6 +29,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.IntermediateComponentResultListener;
+import jadex.bridge.SComponentEvent;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
@@ -1132,47 +1133,20 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	 */
 	public IFuture cleanupComponent()
 	{
-		/*if(componentlisteners!=null)
-		{
-			for(int i=0; i<componentlisteners.size(); i++)
-			{
-				IComponentListener lis = (IComponentListener)componentlisteners.get(i);
-				lis.componentTerminating(new ChangeEvent(getComponentIdentifier()));
-			}
-		}*/
+		SComponentEvent.dispatchTerminatingEvent(adapter, getModel(), getServiceProvider(), componentlisteners, null);
 		
 		// todo: call some application functionality for terminating?!
 		deleteContext();
 		
 		final Future ret = new Future();
-		if(componentlisteners!=null)
+		
+		adapter.invokeLater(new Runnable()
 		{
-			SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+			public void run()
 			{
-				public void resultAvailable(Object result)
-				{
-					ComponentChangeEvent event = new ComponentChangeEvent();
-					event.setTime(((IClockService)result).getTime());
-					event.setEventType(IComponentChangeEvent.EVENT_TYPE_DISPOSAL);
-					event.setSourceCategory(IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT);
-					event.setSourceType(getModel().getName());
-					event.setSourceName(adapter.getComponentIdentifier().getName());
-					event.setComponent(adapter.getComponentIdentifier());
-					for(int i=0; i<componentlisteners.size(); i++)
-					{
-						IComponentListener lis = (IComponentListener)componentlisteners.get(i);
-						if (lis.getFilter().filter(event))
-							lis.eventOccured(event);
-						//lis.componentTerminated(new ChangeEvent(getComponentIdentifier()));
-						ret.setResult(adapter.getComponentIdentifier());
-					}
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(adapter.getComponentIdentifier());
-		}
+				SComponentEvent.dispatchTerminatedEvent(adapter, getModel(), getServiceProvider(), componentlisteners, ret);
+			}
+		});
 		
 		return ret;
 //		return adapter.getServiceContainer().shutdown(); // done in adapter

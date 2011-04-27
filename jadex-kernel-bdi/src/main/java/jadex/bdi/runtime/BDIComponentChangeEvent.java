@@ -120,9 +120,7 @@ public class BDIComponentChangeEvent extends ComponentChangeEvent
 			setSourceName(cf.getComponentIdentifier().getName());
 			setSourceType(cf.getAgentModel().getName());
 			if (OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATING.equals(type))
-				setReason("Terminating");
-			else
-				setReason("Terminated");
+				setDetails("Terminating");
 		}
 	}
 }

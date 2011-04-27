@@ -19,6 +19,7 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.RemoteComponentListener;
+import jadex.bridge.SComponentEvent;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.ProvidedServiceInfo;
@@ -830,29 +831,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public void notifyTerminatedListeners()
 	{
-		if(componentlisteners!=null)
-		{
-			SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-			{
-				public void resultAvailable(Object result)
-				{
-					ComponentChangeEvent event = new ComponentChangeEvent();
-					event.setTime(((IClockService)result).getTime());
-					event.setEventType(IComponentChangeEvent.EVENT_TYPE_DISPOSAL);
-					event.setSourceCategory(IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT);
-					event.setSourceType(getAgentModel().getName());
-					event.setSourceName(adapter.getComponentIdentifier().getName());
-					event.setComponent(adapter.getComponentIdentifier());
-					for(int i=0; i<componentlisteners.size(); i++)
-					{
-						IComponentListener lis = (IComponentListener)componentlisteners.get(i);
-						if (lis.getFilter().filter(event))
-							lis.eventOccured(event);
-						//lis.componentTerminated(new ChangeEvent(getComponentIdentifier()));
-					}
-				}
-			});
-		}
+		SComponentEvent.dispatchTerminatedEvent(adapter, getAgentModel(), getServiceProvider(), componentlisteners, null);
 	}
 	
 	/**
@@ -860,30 +839,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public void notifyTerminatingListeners()
 	{
-		if(componentlisteners!=null)
-		{
-			SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-			{
-				public void resultAvailable(Object result)
-				{
-					ComponentChangeEvent event = new ComponentChangeEvent();
-					event.setTime(((IClockService)result).getTime());
-					event.setEventType(IComponentChangeEvent.EVENT_TYPE_DISPOSAL);
-					event.setSourceCategory(IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT);
-					// todo: fixme
-					event.setDetails("terminating"); 
-					event.setSourceType(getAgentModel().getName());
-					event.setSourceName(adapter.getComponentIdentifier().getName());
-					event.setComponent(adapter.getComponentIdentifier());
-					for(int i=0; i<componentlisteners.size(); i++)
-					{
-						IComponentListener lis = (IComponentListener)componentlisteners.get(i);
-						if (lis.getFilter().filter(event))
-							lis.eventOccured(event);
-					}
-				}
-			});
-		}
+		SComponentEvent.dispatchTerminatingEvent(adapter, getAgentModel(), getServiceProvider(), componentlisteners, null);
 	}
 	
 	/**
