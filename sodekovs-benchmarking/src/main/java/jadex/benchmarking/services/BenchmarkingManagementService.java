@@ -1,7 +1,5 @@
 package jadex.benchmarking.services;
 
-import jadex.benchmarking.model.description.BenchmarkingDescription;
-import jadex.benchmarking.model.description.IBenchmarkingDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
@@ -19,6 +17,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+
+import sodekovs.util.model.benchmarking.description.BenchmarkingDescription;
+import sodekovs.util.model.benchmarking.description.HistoricDataDescription;
+import sodekovs.util.model.benchmarking.description.IBenchmarkingDescription;
+import sodekovs.util.model.benchmarking.description.IHistoricDataDescription;
+import sodekovs.util.persistence.ConnectionManager;
 
 /**
  * Implementation of the related interface.
@@ -136,6 +140,73 @@ public class BenchmarkingManagementService extends BasicService implements IBenc
 		// ret.setResult(exception);
 		// }
 		// });
+
+		return fut;
+	}
+
+	/**
+	 * Retrieve results from database about results of performed benchmarks
+	 */
+	public IFuture getHistoryOfBenchmarkExperiments() {
+		
+			//Hack: using search of this service class
+//			Future ret = new Future();
+//			ConnectionManager conMgr = new ConnectionManager();
+//			ret.setResult(conMgr.getLog());
+//			
+//			return ret;
+					
+			
+//		Using local service of agents				
+		final Future fut = new Future();
+		final ArrayList<IHistoricDataDescription> historicData = new ArrayList<IHistoricDataDescription>();
+
+		SServiceProvider.getServices(provider, IBenchmarkingExecutionService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(new IResultListener() {
+			public void resultAvailable(Object result) {
+				Collection coll = (Collection) result;
+				System.out.println("Coll length: " + coll.size());
+				// Ignore search failures of remote dfs
+				CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new IResultListener() {
+					public void resultAvailable(Object res) {
+						// System.out.println("Part 2 length: "+ ((Collection)result).size());
+						// Add all services of all remote dfs
+						for (Iterator it = ((Collection) res).iterator(); it.hasNext();) {
+							IHistoricDataDescription[] histDataDesc = (IHistoricDataDescription[]) it.next();
+							if (histDataDesc != null) {
+								for (IHistoricDataDescription desc : histDataDesc) {
+									historicData.add(desc);
+								}
+							}
+						}
+						// open.remove(fut);
+						// System.out.println("Federated search: "+ret);//+" "+open);
+						fut.setResult(historicData.toArray(new HistoricDataDescription[historicData.size()]));
+					}
+
+					public void exceptionOccurred(Exception exception) {
+						// open.remove(fut);
+						fut.setException(exception);
+						// fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
+					}
+				});
+				for (Iterator it = coll.iterator(); it.hasNext();) {
+					IBenchmarkingExecutionService benchServ = (IBenchmarkingExecutionService) it.next();
+					// if(remotedf!=DirectoryFacilitatorService.this)
+					// {
+					benchServ.getResultsFromDB().addResultListener(lis);
+					// }
+					// else
+					// {
+					// lis.resultAvailable(null);
+					// }
+				}
+			}
+
+			public void exceptionOccurred(Exception exception) {
+				// open.remove(fut);
+				fut.setResult(historicData.toArray(new BenchmarkingExecutionService[historicData.size()]));
+			}
+		});
 
 		return fut;
 	}

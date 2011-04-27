@@ -1,10 +1,11 @@
 package jadex.benchmarking.services;
 
+import sodekovs.util.model.benchmarking.description.BenchmarkingDescription;
+import sodekovs.util.persistence.ConnectionManager;
 import jadex.bdi.runtime.ICapability;
 import jadex.benchmarking.helper.Constants;
 import jadex.benchmarking.model.Schedule;
 import jadex.benchmarking.model.SuTinfo;
-import jadex.benchmarking.model.description.BenchmarkingDescription;
 import jadex.bridge.service.BasicService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -54,4 +55,15 @@ public class BenchmarkingExecutionService extends BasicService implements IBench
 		return ret;
 	}
 
+	/**
+	 *  Get information about results of performed benchmarks from database.
+	 */
+	public IFuture getResultsFromDB() {
+		final Future ret = new Future();
+		
+		ConnectionManager conMgr = new ConnectionManager();
+		ret.setResult(conMgr.getLog());
+		
+		return ret;
+	}
 }

@@ -10,6 +10,8 @@ import java.util.GregorianCalendar;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
+import sodekovs.util.misc.GlobalConstants;
+
 /**
  * Prepare content of "*.plt" file for gnuplot. Plot can be created directly from log file. It requires corresponding ".dat" file with the single event.
  * 
@@ -73,9 +75,13 @@ public class GnuPlotMainFileEventFormatter extends Formatter {
 	private String createGnuPlotSuffix() {
 		StringBuffer buffer = new StringBuffer(1000);
 
+		buffer.append("set term png transparent");
 		buffer.append("\n");
-		buffer.append("plot '" + fileTimestamp + ".dat' u 1:2 w impulse title \"Observed Events\"");
+		buffer.append("set output '" + GlobalConstants.LOGGING_DIRECTORY + "\\" + fileTimestamp + ".png'");
 		buffer.append("\n");
+		buffer.append("plot '" + GlobalConstants.LOGGING_DIRECTORY + "\\" + fileTimestamp + ".dat' u 1:2 w impulse title \"Observed Events\"");
+		buffer.append("\n");
+		buffer.append("pause -1");
 
 		return buffer.toString();
 	}

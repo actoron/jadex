@@ -44,7 +44,7 @@
 			This file is parsed on agent start. The reference to the file is passes by 
 			the surrounding application file description. -->
 		<belief name="scheduleDescriptionFile" class="String">
-			<fact>"../sodekovs-benchmarking/src/main/java/jadex/benchmarking/examples/TestBenchmark.xml"
+			<fact>"../sodekovs-benchmarking/src/main/java/jadex/benchmarking/examples/TestBenchmark2.xml"
 			</fact>
 		</belief>
 

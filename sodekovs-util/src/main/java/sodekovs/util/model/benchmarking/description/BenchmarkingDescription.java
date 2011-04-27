@@ -1,13 +1,8 @@
-package jadex.benchmarking.model.description;
+package sodekovs.util.model.benchmarking.description;
 
-import jadex.base.fipa.IDFComponentDescription;
-import jadex.base.fipa.IDFServiceDescription;
 import jadex.bridge.IComponentIdentifier;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * An benchmark description.

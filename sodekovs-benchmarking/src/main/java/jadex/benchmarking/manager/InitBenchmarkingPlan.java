@@ -22,6 +22,10 @@ import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.rules.state.IOAVState;
 
+import java.io.FileNotFoundException;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,6 +36,7 @@ import sodekovs.util.misc.AgentMethods;
 import sodekovs.util.misc.EvaluateExpression;
 import sodekovs.util.misc.GlobalConstants;
 import sodekovs.util.misc.XMLHandler;
+import sodekovs.util.persistence.ConnectionManager;
 
 public class InitBenchmarkingPlan extends Plan {
 
@@ -50,7 +55,6 @@ public class InitBenchmarkingPlan extends Plan {
 	private ScheduleLogger scheduleLogger = null;
 
 	public void body() {
-	
 		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 		clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 
@@ -102,7 +106,9 @@ public class InitBenchmarkingPlan extends Plan {
 		// Handle termination of benchmark
 		terminateBenchmark(benchConf);
 		getBeliefbase().getBelief("benchmarkStatus").setFact(Constants.TERMINATED);
-		scheduleLogger.log(Constants.PREPARE_GNUPLOT_SUFFIX);
+		scheduleLogger.log(Constants.PREPARE_GNUPLOT_SUFFIX);		
+		persistLogs(scheduleLogger.getFileName(), benchConf);
+//		ConnectionManager.getInstance().executeStatement("Over and out");
 	}
 
 	/*
@@ -200,6 +206,12 @@ public class InitBenchmarkingPlan extends Plan {
 	private long getTimestamp() {
 		long starttime = ((Long) sutSpace.getProperty("BENCHMARK_REAL_START_TIME_OF_SIMULATION")).longValue();
 		return clockservice.getTime() - starttime;
+	}
+	
+	private void persistLogs(String fileName, Schedule benchConf){
+		ConnectionManager conMgr = new ConnectionManager();
+		conMgr.storeGnuPlotLogs(fileName,benchConf.getType(),benchConf.getName(), scheduleLogger.getTimestamp());
+		
 	}
 
 	/*

@@ -21,4 +21,9 @@ public interface IBenchmarkingExecutionService	extends IService
 	 */
 	public IFuture getBenchmarkStatus();
 	
+	/**
+	 *  Get information about results of performed benchmarks from database.
+	 */
+	public IFuture getResultsFromDB();
+	
 }

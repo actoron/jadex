@@ -1,38 +1,31 @@
 package jadex.benchmarking.viewer;
 
-import jadex.base.fipa.IDFComponentDescription;
-import jadex.base.fipa.IDFServiceDescription;
-import jadex.base.fipa.IProperty;
-import jadex.bridge.IComponentIdentifier;
-
-import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
-import sodekovs.util.model.benchmarking.description.IBenchmarkingDescription;
+import sodekovs.util.model.benchmarking.description.IHistoricDataDescription;
 
 /**
  *
  */
-class BenchmarkingTableModel extends AbstractTableModel
+class HistoricDataTableModel extends AbstractTableModel
 {
-//	IDFComponentDescription[] ad;
 
-	IBenchmarkingDescription[] bechnDesc;
+	IHistoricDataDescription[] histDataDesc;
 
 	/**
-	 * @return 4
+	 * @return 3
 	 * @see javax.swing.table.TableModel#getColumnCount()
 	 */
 	public int getColumnCount()
 	{
-		return 4;
+		return 3;
 	}
 
 	/**
 	 * @param ads
 	 */
-	public void setBenchmarkingDescriptions(IBenchmarkingDescription[] bechnDesc)
+	public void setHistoricDataDescriptions(IHistoricDataDescription[] histDataDesc)
 	{
 //		ArrayList ad_list = new ArrayList();
 //		ArrayList svd_list = new ArrayList();
@@ -48,7 +41,7 @@ class BenchmarkingTableModel extends AbstractTableModel
 //			}
 //		}
 //		this.ad = (IDFComponentDescription[])ad_list.toArray(new IDFComponentDescription[ad_list.size()]);
-		this.bechnDesc = bechnDesc;
+		this.histDataDesc = histDataDesc;
 
 		fireTableDataChanged();
 	}
@@ -76,7 +69,7 @@ class BenchmarkingTableModel extends AbstractTableModel
 	 */
 	public int getRowCount()
 	{
-		return bechnDesc != null ? bechnDesc.length : 0;
+		return histDataDesc != null ? histDataDesc.length : 0;
 	}
 
 	/**
@@ -87,20 +80,20 @@ class BenchmarkingTableModel extends AbstractTableModel
 	 */
 	public Object getValueAt(int rowIndex, int columnIndex)
 	{
-		if(bechnDesc == null || rowIndex < 0 || rowIndex >= bechnDesc.length)
+		if(histDataDesc == null || rowIndex < 0 || rowIndex >= histDataDesc.length)
 		{
 			return null;
 		}
 		switch(columnIndex)
 		{
 			case 0:
-				return bechnDesc[rowIndex].getName();
+				return histDataDesc[rowIndex].getName();
 			case 1:
-				return bechnDesc[rowIndex].getType();
+				return histDataDesc[rowIndex].getType();
 			case 2:
-				return bechnDesc[rowIndex].getSuTIdentifiertType();
-			case 3:
-				return bechnDesc[rowIndex].getStatus();
+				return histDataDesc[rowIndex].getTimestamp();
+//			case 3:
+//				return histDataDesc[rowIndex].getStatus();
 //			case 4:
 //				return bechnDesc[rowIndex].getOntologies();
 //			case 5:
@@ -128,9 +121,9 @@ class BenchmarkingTableModel extends AbstractTableModel
 			case 1:
 				return "Type";
 			case 2:
-				return "Component";
-			case 3:
-				return "Status";
+				return "Timestamp";
+//			case 3:
+//				return "Status";
 //			case 4:
 //				return "Ontologies";
 //			case 5:
@@ -157,9 +150,9 @@ class BenchmarkingTableModel extends AbstractTableModel
 			case 1:
 				return String.class;
 			case 2:
-				return IComponentIdentifier.class;
-			case 3:
 				return String.class;
+//			case 3:
+//				return String.class;
 //			case 4:
 //				return String[].class;
 //			case 5:
@@ -176,9 +169,9 @@ class BenchmarkingTableModel extends AbstractTableModel
 	 * @param i
 	 * @return the service description at row i
 	 */
-	public IBenchmarkingDescription getServiceDescription(int i)
+	public IHistoricDataDescription getHistoricDataDescription(int i)
 	{
-		return bechnDesc == null || i < 0 || i >= bechnDesc.length ? null : bechnDesc[i];
+		return histDataDesc == null || i < 0 || i >= histDataDesc.length ? null : histDataDesc[i];
 	}
 
 //	/**

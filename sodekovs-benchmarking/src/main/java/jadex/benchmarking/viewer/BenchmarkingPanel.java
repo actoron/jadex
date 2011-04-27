@@ -1,34 +1,25 @@
 package jadex.benchmarking.viewer;
 
-import jadex.base.fipa.DFComponentDescription;
-import jadex.base.fipa.IDF;
 import jadex.base.fipa.IDFComponentDescription;
-import jadex.base.fipa.IDFServiceDescription;
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.benchmarking.model.description.IBenchmarkingDescription;
 import jadex.benchmarking.services.IBenchmarkingManagementService;
 import jadex.bridge.service.IService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.future.ISuspendable;
-import jadex.commons.future.SwingDefaultResultListener;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.SGUI;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
 
-import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -37,12 +28,17 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.Timer;
 import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import sodekovs.util.misc.GlobalConstants;
+import sodekovs.util.model.benchmarking.description.IBenchmarkingDescription;
+import sodekovs.util.model.benchmarking.description.IHistoricDataDescription;
 
 /**
  *  DFBrowserPlugin
@@ -54,14 +50,12 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"refresh", SGUI.makeIcon(BenchmarkingPanel.class, "/jadex/base/gui/images/new_refresh_anim00.png")
+		"refresh", SGUI.makeIcon(BenchmarkingPanel.class, "/jadex/base/gui/images/new_refresh_anim00.png"),
+		"png_not_found", SGUI.makeIcon(BenchmarkingPanel.class, "/jadex/benchmarking/viewer/images/PNGFileNotFound.png")
 	});
 	
 	//-------- attributes --------
-	
-	/** The df service. */
-//	protected IDF df;
-	
+		
 	/** Benchmarking Management service */
 	protected IBenchmarkingManagementService benchServ;
 
@@ -70,6 +64,12 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel
 
 	/** The service table. */
 	protected BenchmarkingServiceTable service_table;
+	
+	/** The historic data table. */
+	protected HistoricDataTable historic_data_table;
+	
+	/** The panel for depicting benchmark historiy as PNG.*/
+	protected JPanel historyPNGPnl;
 
 	/** The service panel. */
 //	protected ServiceDescriptionPanel service_panel;
@@ -80,6 +80,9 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel
 	/** The third split pane. */
 	protected JSplitPane split3;
 	
+	/** The fourth split pane. */
+	protected JSplitPane split4;
+		
 	/** The old component descriptions. */
 	protected IDFComponentDescription[] old_ads;
 
@@ -115,15 +118,34 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel
 	 */
 	public IFuture init(IControlCenter jcc, IService service)
 	{
-//		this.df	= (IDF)service;
-		this.setLayout(new BorderLayout());
-		
+		this.setLayout(new BorderLayout());	
 		this.benchServ = (IBenchmarkingManagementService) service;
 		
-//		service_panel = new ServiceDescriptionPanel();
+		//panel depicting status of currently running benchmarks
 		service_table = new BenchmarkingServiceTable();
 		JScrollPane stscroll = new JScrollPane(service_table);
 		stscroll.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Found Benchmarks"));
+		
+		//panel with historic data from database
+		historic_data_table = new HistoricDataTable();
+		JScrollPane hiscroll = new JScrollPane(historic_data_table);
+		hiscroll.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Found Historic Datasets"));
+		
+		//panel showing history (as png) of selected benchmark from a database 
+		historyPNGPnl = new JPanel(new BorderLayout());
+		JScrollPane hisPNGcroll = new JScrollPane(historyPNGPnl);
+		hisPNGcroll.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Benchmark History"));
+		hisPNGcroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		hisPNGcroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+		historic_data_table.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+		{
+			public void valueChanged(ListSelectionEvent e)
+			{
+				IHistoricDataDescription selDataDesc = historic_data_table.getSelectedHistoricDataDescription();
+				updateHistoryPNG(selDataDesc);
+			}
+		});
 		
 		JButton	refreshBtn	= new JButton("List of Benchmarks", icons.getIcon("refresh"));
 		refreshBtn.setMargin(new Insets(2,2,2,2));
@@ -131,8 +153,18 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-//				System.out.println("HHHELO");
 				searchBenchmarks();
+			}
+		});
+		
+		JButton	refreshHistoricDataBtn	= new JButton("List of Historic Data", icons.getIcon("refresh"));
+		refreshHistoricDataBtn.setMargin(new Insets(2,2,2,2));
+		refreshHistoricDataBtn.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+//				System.out.println("HHHELO");
+				findHistoricData();
 			}
 		});
 		
@@ -140,6 +172,7 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel
 		buttonPnl.add(new JLabel());//Hack to place in button in the center
 		buttonPnl.add(refreshBtn);
 		buttonPnl.add(new JLabel());//Hack to place in button in the center
+		buttonPnl.add(refreshHistoricDataBtn);
 		add(buttonPnl, BorderLayout.NORTH);
 //		
 //		component_table = new DFComponentTable(this);
@@ -169,14 +202,22 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel
 		split3.setDividerLocation(130);
 		split3.setOneTouchExpandable(true);
 		split3.add(stscroll);
+		split3.add(hiscroll);
 //		split3.add(service_panel);
 //		split3.setResizeWeight(1.0);
 		split2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		split2.setDividerLocation(130);
+		split2.setDividerLocation(280);
 //		split2.add(atscroll);
 		split2.add(split3);
+		split2.add(hisPNGcroll);
 		split2.setResizeWeight(0.5);
 		add(split2, BorderLayout.CENTER);
+		
+//		split4 = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+//		split4.setDividerLocation(130);
+//		split4.setOneTouchExpandable(true);
+//		split4.add(hisPNGcroll);
+//		add(split4, BorderLayout.SOUTH);
 //		
 //		timer = new Timer(defrefresh, new ActionListener()
 //		{
@@ -307,8 +348,8 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel
 	{
 		final Future ret = new Future();
 		Properties	props	= new Properties();
-		props.addProperty(new Property("defrefresh", Integer.toString(defrefresh)));
-		props.addProperty(new Property("benchmarkingrefreshremote", Boolean.toString(remotecb.isSelected())));
+//		props.addProperty(new Property("defrefresh", Integer.toString(defrefresh)));
+//		props.addProperty(new Property("benchmarkingrefreshremote", Boolean.toString(remotecb.isSelected())));
 		ret.setResult(props);
 		return ret;
 	}
@@ -375,22 +416,6 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel
 //	}
 	
 	protected void searchBenchmarks(){
-//		IFuture fut = this.benchServ.getStatusOfRunningBenchmarkExperiments();
-//		fut.addResultListener(new IResultListener() {
-//			
-//			@Override
-//			public void resultAvailable(Object result)
-//			{
-//				String st = (String) result;
-//				System.out.println(" -> res: " + st);
-//			}
-//			
-//			@Override
-//			public void exceptionOccurred(Exception exception) {
-//				// TODO Auto-generated method stub
-//				
-//			}
-//		});
 		this.benchServ.getStatusOfRunningBenchmarkExperiments().addResultListener(new SwingDefaultResultListener(this)
 		{
 			public void customResultAvailable(Object result) 
@@ -407,5 +432,41 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel
 //				}
 			}	
 		});
+	}
+	
+	protected void findHistoricData(){
+		this.benchServ.getHistoryOfBenchmarkExperiments().addResultListener(new SwingDefaultResultListener(this)
+		{
+			public void customResultAvailable(Object result) 
+			{
+				IHistoricDataDescription[] histData = (IHistoricDataDescription[])result;
+				System.out.println("Found: Historic Data"+ histData.length);
+				
+//				if(old_ads == null || !Arrays.equals(old_ads, benchmarks))
+//				{
+				historic_data_table.setComponentDescriptions(histData);				
+//					updateServices(benchmarks);
+//					updateDetailedService();
+//					old_ads = benchmarks;
+//				}
+				if(histData.length > 0){
+					updateHistoryPNG(histData[0]);
+				}
+			}	
+		});
+	}
+	
+	protected void updateHistoryPNG(IHistoricDataDescription dataDesc){
+		historyPNGPnl.removeAll();
+		ImageIcon icon1 = new ImageIcon(dataDesc.getLogAsPNG());
+		if(icon1.getImageLoadStatus() == MediaTracker.COMPLETE){
+			historyPNGPnl.add(new JLabel("History of: " + dataDesc.getName() + " - " + dataDesc.getTimestamp()), BorderLayout.NORTH);
+			historyPNGPnl.add(new JLabel(icon1), BorderLayout.CENTER);	
+		}else{
+			historyPNGPnl.add(new JLabel("Error: No history found of : " + dataDesc.getName() + " - " + dataDesc.getTimestamp()), BorderLayout.NORTH);
+			historyPNGPnl.add(new JLabel(icons.getIcon("png_not_found")), BorderLayout.CENTER);			
+		}		 		 
+		 this.revalidate();
+		 this.repaint();	 			
 	}
 }

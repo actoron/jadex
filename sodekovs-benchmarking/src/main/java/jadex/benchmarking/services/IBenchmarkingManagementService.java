@@ -22,4 +22,9 @@ public interface IBenchmarkingManagementService	extends IService
 	 */
 	public IFuture getStatusOfRunningBenchmarkExperiments();
 	
+	/**
+	 *  Load information about successfully executed and persisted benchmarks -> called historic data
+	 */
+	public IFuture getHistoryOfBenchmarkExperiments();
+	
 }

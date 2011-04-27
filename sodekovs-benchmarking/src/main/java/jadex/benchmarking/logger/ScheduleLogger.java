@@ -10,6 +10,8 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import sodekovs.util.misc.GlobalConstants;
+
 /**
  * Logs events of the schedule. 
  * @author vilenica
@@ -23,31 +25,32 @@ public class ScheduleLogger
 	//to compute various runs of a benchmark.
 	private long starttime = -1;
 	private IClockService clockService = null;
+	//Not identical with starttime: this time denotes the time used for the name of the file 
+	private String timestamp = null;
 	
 	public ScheduleLogger(){
 	}
 	
 	public ScheduleLogger(long starttime, IClockService clockService){
 		this.starttime = starttime;
-		this.clockService = clockService;
+		this.clockService = clockService;		
 		init();
 	}
 	
 	public void log(String log){
-		scheduleLogger.info(log);
+		scheduleLogger.info(log);		
 	}
 	
 
 	public void init(){
 		
-		//Not identical with starttime: this time denotes the time used for the name of the file 
-		String timestamp = getTimestamp();
+		timestamp = calculateTimestamp();
 		
 		// Create file handler for plt-file
 		FileHandler fh = null;		
 		try
 		{
-			String dir = System.getProperty("user.dir") + "\\Benchmarking-Schedule-Logs";
+			String dir = GlobalConstants.LOGGING_DIRECTORY;
 			File f = new File(dir);
 			if (!f.isDirectory())
 				f.mkdir();
@@ -66,7 +69,7 @@ public class ScheduleLogger
 		fh = null;		
 		try
 		{
-			String dir = System.getProperty("user.dir") + "\\Benchmarking-Schedule-Logs";
+			String dir = GlobalConstants.LOGGING_DIRECTORY;
 			File f = new File(dir);
 			if (!f.isDirectory())
 				f.mkdir();
@@ -82,11 +85,18 @@ public class ScheduleLogger
 
 	}
 	
-	private String getTimestamp(){
+	private String calculateTimestamp(){
 		GregorianCalendar cal = (GregorianCalendar) GregorianCalendar.getInstance();
 		return String.valueOf(cal.get(Calendar.HOUR_OF_DAY)) + "-" + String.valueOf(cal.get(Calendar.MINUTE)) + "-" + String.valueOf(cal.get(Calendar.SECOND));
 	}
 
+	/**
+	 * Get the time when the logger file is created. it serves as kind of id.
+	 * @return
+	 */
+	public String getTimestamp(){
+		return this.timestamp;
+	}
 	public long getStarttime() {
 		return starttime;
 	}
@@ -103,5 +113,12 @@ public class ScheduleLogger
 		this.clockService = clockService;
 	}
 
+	/**
+	 * Return the name of the file where the gnuPlot log is stored. 
+	 * @return
+	 */
+	public String getFileName(){
+		return GlobalConstants.LOGGING_DIRECTORY + "\\" + timestamp + ".";		
+	}
 
 }

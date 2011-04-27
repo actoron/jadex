@@ -12,18 +12,19 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import sodekovs.util.model.benchmarking.description.IBenchmarkingDescription;
+import sodekovs.util.model.benchmarking.description.IHistoricDataDescription;
 
 /**
- *  Table showing the df component services.
+ *  Table showing historic data found in a db.
  */
-public class BenchmarkingServiceTable extends JTable//JScrollPane
+public class HistoricDataTable extends JTable//JScrollPane
 {
 	/**
 	 * Constructor.
 	 */
-	public BenchmarkingServiceTable()
+	public HistoricDataTable()
 	{
-		super(new TableSorter(new BenchmarkingTableModel()));
+		super(new TableSorter(new HistoricDataTableModel()));
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		TableSorter sorter = (TableSorter)getModel();
 		sorter.setTableHeader(getTableHeader());
@@ -33,19 +34,20 @@ public class BenchmarkingServiceTable extends JTable//JScrollPane
 	}
 
 	/**
-	 *  Get the selected component/service description.
-	 *  @return The currently selected service/component description.
+	 *  Get the selected history description.
+	 *  @return The currently selected history description.
 	 */
-	public Object[] getSelectedServices()
+	public IHistoricDataDescription getSelectedHistoricDataDescription()
 	{
-		Object[] ret = new Object[]{null, null};
+//		Object[] ret = new Object[]{null, null};
+		IHistoricDataDescription ret = null;
 		int sel = getSelectedRow();
 		if(sel>=0)
 		{
 			TableSorter sorter = (TableSorter)getModel();
-			BenchmarkingTableModel model = (BenchmarkingTableModel)sorter.getTableModel();
-			sel = sorter.modelIndex(sel);
-			ret = new Object[]{model.getServiceDescription(sel)};
+			HistoricDataTableModel model = (HistoricDataTableModel)sorter.getTableModel();
+			sel = sorter.modelIndex(sel);			
+			ret = model.getHistoricDataDescription(sel);
 		}
 		return ret;
 	}
@@ -54,12 +56,12 @@ public class BenchmarkingServiceTable extends JTable//JScrollPane
 	 * Sets descriptions for this element
 	 * @param ad
 	 */
-	public void setComponentDescriptions(IBenchmarkingDescription[] benchDesc)
+	public void setComponentDescriptions(IHistoricDataDescription[] histDataDesc)
 	{
 		TableSorter sorter = (TableSorter)getModel();
-		BenchmarkingTableModel model = (BenchmarkingTableModel)sorter.getTableModel();
+		HistoricDataTableModel model = (HistoricDataTableModel)sorter.getTableModel();
 //		model.setComponentDescriptions(ad);
-		model.setBenchmarkingDescriptions(benchDesc);
+		model.setHistoricDataDescriptions(histDataDesc);
 	}
 
 //	/**

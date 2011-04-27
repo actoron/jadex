@@ -1,4 +1,4 @@
-package jadex.benchmarking.model.description;
+package sodekovs.util.model.benchmarking.description;
 
 import jadex.bridge.IComponentIdentifier;
 
