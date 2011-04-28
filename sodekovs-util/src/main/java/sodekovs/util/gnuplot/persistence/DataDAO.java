@@ -149,8 +149,6 @@ public class DataDAO {
 				e.printStackTrace();
 			}
 		}
-		// Create the PNG image of the history
-		new CreateImagesThread(resArray).run();
 		return resArray;
 	}
 
