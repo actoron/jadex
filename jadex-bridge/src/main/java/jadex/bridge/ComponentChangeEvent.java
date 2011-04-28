@@ -360,7 +360,11 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 			IServiceProvider provider, final Collection componentlisteners, final Future finished)
 	{
 		if (componentlisteners == null || componentlisteners.isEmpty())
+		{
+			if (finished != null && !finished.isDone())
+				finished.setResult(null);
 			return;
+		}
 		getTimeStamp(provider).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -387,7 +391,11 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 			IServiceProvider provider, final Collection componentlisteners, final Future finished)
 	{
 		if (componentlisteners == null || componentlisteners.isEmpty())
+		{
+			if (finished != null && !finished.isDone())
+				finished.setResult(null);
 			return;
+		}
 		getTimeStamp(provider).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
