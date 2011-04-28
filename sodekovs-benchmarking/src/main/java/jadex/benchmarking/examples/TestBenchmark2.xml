@@ -5,7 +5,7 @@
 
 <Schedule type="Workload" name="W2" warmUpTime="1000">
 	<TerminateCondition>
-		 <TerminationTime value="40000" />
+		 <TerminationTime value="9000" />
 		<!-- <SemanticCondition condition="$object.getProperty(&quot;ore&quot;) >= 55">
 			<ObjectSource type="ISpaceObject" name="homebase" />
 		</SemanticCondition> -->

@@ -11,7 +11,6 @@ import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ThreadSuspendable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +21,6 @@ import sodekovs.util.model.benchmarking.description.BenchmarkingDescription;
 import sodekovs.util.model.benchmarking.description.HistoricDataDescription;
 import sodekovs.util.model.benchmarking.description.IBenchmarkingDescription;
 import sodekovs.util.model.benchmarking.description.IHistoricDataDescription;
-import sodekovs.util.persistence.ConnectionManager;
 
 /**
  * Implementation of the related interface.

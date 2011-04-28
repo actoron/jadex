@@ -56,7 +56,7 @@
 				</Action>
 			</Actions>
 		</Sequence>
-		<Sequence starttime="3000" actiontype="delete">
+		<Sequence starttime="3000" actiontype="create">
 			<Actions>
 				<Action componentname="Homebase" componenttype="ISpaceObject"
 					componentmodel="homebase">

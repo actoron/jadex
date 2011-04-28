@@ -1,7 +1,5 @@
 package jadex.benchmarking.services;
 
-import sodekovs.util.model.benchmarking.description.BenchmarkingDescription;
-import sodekovs.util.persistence.ConnectionManager;
 import jadex.bdi.runtime.ICapability;
 import jadex.benchmarking.helper.Constants;
 import jadex.benchmarking.model.Schedule;
@@ -9,6 +7,8 @@ import jadex.benchmarking.model.SuTinfo;
 import jadex.bridge.service.BasicService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import sodekovs.util.gnuplot.persistence.DataDAO;
+import sodekovs.util.model.benchmarking.description.BenchmarkingDescription;
 
 /**
  * Implementation of the related interface.
@@ -61,8 +61,9 @@ public class BenchmarkingExecutionService extends BasicService implements IBench
 	public IFuture getResultsFromDB() {
 		final Future ret = new Future();
 		
-		ConnectionManager conMgr = new ConnectionManager();
-		ret.setResult(conMgr.getLog());
+//		ConnectionManager conMgr = new ConnectionManager();
+//		ret.setResult(conMgr.loadAllLogs());
+		ret.setResult(DataDAO.getInstance().loadAllLogs());
 		
 		return ret;
 	}
