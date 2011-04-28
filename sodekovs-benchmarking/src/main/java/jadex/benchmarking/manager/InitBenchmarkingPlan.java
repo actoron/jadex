@@ -22,10 +22,6 @@ import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.rules.state.IOAVState;
 
-import java.io.FileNotFoundException;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -212,7 +208,6 @@ public class InitBenchmarkingPlan extends Plan {
 //		ConnectionManager conMgr = new ConnectionManager();
 //		conMgr.storeGnuPlotLogs(fileName,benchConf.getType(),benchConf.getName(), scheduleLogger.getTimestamp());
 		DataDAO.getInstance().insertNewGnuPlotLog(fileName,benchConf.getType(),benchConf.getName(), scheduleLogger.getTimestamp());
-
 		
 	}
 
