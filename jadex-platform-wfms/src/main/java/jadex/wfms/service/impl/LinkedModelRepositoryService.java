@@ -44,6 +44,7 @@ import java.util.jar.JarFile;
  * Basic Model Repository Service implementation
  *
  */
+@SuppressWarnings("unchecked")
 public class LinkedModelRepositoryService extends BasicService implements IModelRepositoryService
 {
 	/** The wfms. */

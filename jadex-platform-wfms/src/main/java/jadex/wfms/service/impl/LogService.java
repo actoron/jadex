@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+@SuppressWarnings("unchecked")
 public class LogService extends BasicService implements ILogService
 {
 	protected IServiceContainer provider;
@@ -208,7 +209,7 @@ public class LogService extends BasicService implements ILogService
 		Future ret = new Future();
 		synchronized (listeners)
 		{
-			Set lSet = listeners.get(client);
+			Set<ILogListener> lSet = listeners.get(client);
 			if (lSet != null)
 			{
 				if (lSet.remove(listener))

@@ -19,14 +19,12 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.RemoteComponentListener;
-import jadex.bridge.SComponentEvent;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.clock.ITimer;
 import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
@@ -831,7 +829,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public void notifyTerminatedListeners()
 	{
-		SComponentEvent.dispatchTerminatedEvent(adapter, getAgentModel(), getServiceProvider(), componentlisteners, null);
+		ComponentChangeEvent.dispatchTerminatedEvent(adapter, getAgentModel(), getServiceProvider(), componentlisteners, null);
 	}
 	
 	/**
@@ -839,7 +837,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public void notifyTerminatingListeners()
 	{
-		SComponentEvent.dispatchTerminatingEvent(adapter, getAgentModel(), getServiceProvider(), componentlisteners, null);
+		ComponentChangeEvent.dispatchTerminatingEvent(adapter, getAgentModel(), getServiceProvider(), componentlisteners, null);
 	}
 	
 	/**

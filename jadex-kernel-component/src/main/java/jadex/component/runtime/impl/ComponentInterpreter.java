@@ -7,7 +7,6 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
-import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
@@ -19,7 +18,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.IntermediateComponentResultListener;
-import jadex.bridge.SComponentEvent;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
@@ -631,7 +629,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	 */
 	public IFuture cleanupComponent()
 	{
-		SComponentEvent.dispatchTerminatingEvent(adapter, getModel(), getServiceProvider(), componentlisteners, null);
+		ComponentChangeEvent.dispatchTerminatingEvent(adapter, getModel(), getServiceProvider(), componentlisteners, null);
 		
 		// todo: call some application functionality for terminating?!
 //		deleteContext();
@@ -642,7 +640,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 		{
 			public void run()
 			{
-				SComponentEvent.dispatchTerminatedEvent(adapter, getModel(), getServiceProvider(), componentlisteners, ret);
+				ComponentChangeEvent.dispatchTerminatedEvent(adapter, getModel(), getServiceProvider(), componentlisteners, ret);
 			}
 		});
 		

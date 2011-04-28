@@ -27,7 +27,6 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
-import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
@@ -42,7 +41,6 @@ import jadex.bridge.IModelInfo;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.MessageType;
 import jadex.bridge.RemoteChangeListenerHandler;
-import jadex.bridge.SComponentEvent;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
@@ -605,7 +603,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 			}
 		}*/
 		
-		SComponentEvent.dispatchTerminatingEvent(adapter, getModel(), getServiceProvider(), componentlisteners, null);
+		ComponentChangeEvent.dispatchTerminatingEvent(adapter, getModel(), getServiceProvider(), componentlisteners, null);
 		
 		adapter.invokeLater(new Runnable()
 		{
@@ -619,7 +617,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 //					System.out.println("Cancelling: "+pt.getActivity()+" "+pt.getId());
 				}
 				
-				SComponentEvent.dispatchTerminatedEvent(adapter, getModel(), getServiceProvider(), componentlisteners, ret);
+				ComponentChangeEvent.dispatchTerminatedEvent(adapter, getModel(), getServiceProvider(), componentlisteners, ret);
 			}
 		});
 		
