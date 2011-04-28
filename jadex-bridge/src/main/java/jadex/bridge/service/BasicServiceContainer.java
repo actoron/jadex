@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  *  A service container is a simple infrastructure for a collection of
@@ -31,8 +32,11 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	/** The map of platform services. */
 	protected Map services;
 	
-	/** The platform name. */
+	/** The container name. */
 	protected Object id;
+	
+	/** The logger. */
+	protected Logger logger;
 	
 	/** True, if the container is started. */
 	protected boolean started;
@@ -42,9 +46,10 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	/**
 	 *  Create a new service container.
 	 */
-	public BasicServiceContainer(Object id, RequiredServiceInfo[] infos, RequiredServiceBinding[] bindings)
+	public BasicServiceContainer(Object id, Logger logger, RequiredServiceInfo[] infos, RequiredServiceBinding[] bindings)
 	{
 		this.id = id;
+		this.logger	= logger;
 		
 		setRequiredServiceInfos(infos);
 		setRequiredServiceBindings(bindings);
@@ -211,15 +216,16 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			}
 			CounterResultListener	crl	= new CounterResultListener(allservices.size(), new DelegationResultListener(ret))
 			{
-				public void resultAvailable(Object result)
+				public void intermediateResultAvailable(Object result)
 				{
-//					System.out.println("started: "+result);
-					super.resultAvailable(result);
+					logger.info("Started service: "+result);
 				}
 			};
 			for(Iterator it=allservices.iterator(); it.hasNext(); )
 			{
-				((IInternalService)it.next()).startService().addResultListener(crl);
+				IInternalService	is	= (IInternalService)it.next();
+				logger.info("Starting service: "+is.getServiceIdentifier());
+				is.startService().addResultListener(crl);
 			}
 		}
 		else
@@ -253,11 +259,13 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			
 			// Shutdown services in reverse order as later services might depend on earlier ones.
 			final IInternalService	service	= (IInternalService)allservices.remove(allservices.size()-1);
+			logger.info("Terminating service: "+service.getServiceIdentifier());
 //			System.out.println("shutdown start: "+service.getServiceIdentifier());
 			service.shutdownService().addResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
 				{
+					logger.info("Terminated service: "+service.getServiceIdentifier());
 //					System.out.println("shutdown end: "+result);
 					if(!allservices.isEmpty())
 					{

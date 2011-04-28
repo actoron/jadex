@@ -68,6 +68,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	/** The cleanup commands for the components (component id -> cleanup command). */
 	protected Map ccs;
 	
+	/** The cleanup futures for the components (component id -> cleanup future). */
+	protected Map cfs;
+	
 	/** The children of a component (component id -> children ids). */
 //	protected MultiCollection	children;
 	
@@ -128,6 +131,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		this.adapters = Collections.synchronizedMap(SCollection.createHashMap());
 		this.descs = Collections.synchronizedMap(SCollection.createLinkedHashMap());
 		this.ccs = SCollection.createLinkedHashMap();
+		this.cfs = SCollection.createLinkedHashMap();
 //		this.children	= SCollection.createMultiCollection();
 		this.logger = Logger.getLogger(exta.getServiceProvider().getId()+".cms");
 		this.listeners = SCollection.createMultiCollection();
@@ -266,40 +270,6 @@ public abstract class ComponentManagementService extends BasicService implements
 														IComponentIdentifier pacid = parent.getComponentIdentifier();
 														String paname = pacid.getName().replace('@', '.');
 														cid = (ComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname);
-														
-														
-//														if(name==null)
-//														{
-//															cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName(), paname);
-//														}
-//														else
-//														{
-////															String paname = (IComponentIdentifier)exta.getServiceProvider().getId()).getPlatformName();
-//															cid = new ComponentIdentifier(name+"@"+paname); // Hack?!
-//															if(adapters.containsKey(cid) || initinfos.containsKey(cid))
-//															{
-//																inited.setException(new RuntimeException("Component name already exists on platform: "+cid));
-////																{
-////																	public void printStackTrace()
-////																	{
-////																		Thread.dumpStack();
-////																	}
-////																});
-//																return;
-//															}
-//															// todo: hmm adresses may be set too late? use cached message service?
-//															SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//																.addResultListener(new DefaultResultListener()
-//															{
-//																public void resultAvailable(Object result)
-//																{
-//																	IMessageService	ms	= (IMessageService)result;
-//																	if(ms!=null)
-//																		cid.setAddresses(ms.getAddresses());
-//																}
-//															});
-//														}
-		//												System.out.println("create start3: "+model+" "+cinfo.getParent());
 													}		
 												}
 												
@@ -309,6 +279,7 @@ public abstract class ComponentManagementService extends BasicService implements
 												final CMSComponentDescription ad = new CMSComponentDescription(cid, type, 
 													getParentIdentifier(cinfo), master, daemon, autosd, lmodel.getFullName());
 												
+												logger.info("Starting component: "+cid.getName());
 		//										System.err.println("Pre-Init: "+cid);
 												
 												Future future = new Future();
@@ -316,6 +287,7 @@ public abstract class ComponentManagementService extends BasicService implements
 												{
 													public void resultAvailable(Object result)
 													{
+														logger.info("Started component: "+cid.getName());
 		//												System.err.println("Post-Init: "+cid);
 		
 														// Create the component instance.
@@ -777,91 +749,95 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	public IFuture destroyComponent(final IComponentIdentifier cid)
 	{
-//		System.out.println("destroy0: "+cid.getName());
+		final Future ret = cfs.containsKey(cid) ? (Future)cfs.get(cid) : new Future();
 		
-		final Future ret = new Future();
-		
-		if(isRemoteComponent(cid))
+		if(!cfs.containsKey(cid))
 		{
-			getRemoteCMS(cid).addResultListener(new DelegationResultListener(ret)
+			cfs.put(cid, ret);
+			if(isRemoteComponent(cid))
 			{
-				public void customResultAvailable(Object result)
+				getRemoteCMS(cid).addResultListener(new DelegationResultListener(ret)
 				{
-					final IComponentManagementService rcms = (IComponentManagementService)result;
-					rcms.destroyComponent(cid).addResultListener(new DelegationResultListener(ret));
-				}
-			});
-		}
-		else
-		{
-			synchronized(adapters)
+					public void customResultAvailable(Object result)
+					{
+						final IComponentManagementService rcms = (IComponentManagementService)result;
+						rcms.destroyComponent(cid).addResultListener(new DelegationResultListener(ret));
+					}
+				});
+			}
+			else
 			{
-				synchronized(descs)
+				logger.info("Terminating component structure: "+cid.getName());
+				synchronized(adapters)
 				{
-					Object[] infos = (Object[])initinfos.get(cid);
-					if(infos!=null)
+					synchronized(descs)
 					{
-						IComponentAdapter adap = (IComponentAdapter)infos[1];
-						((Future)infos[4]).setException(adap.getException());
-					}
-					
-					// Kill subcomponents
-					final CMSComponentDescription	desc = (CMSComponentDescription)descs.get(cid);
-					if(desc==null)
-					{
-						ret.setException(new RuntimeException("Component "+cid+" does not exist."));
-						return ret;
-					}
-					IComponentIdentifier[] achildren = desc.getChildren();
-					
-					destroyComponentLoop(cid, achildren, achildren.length-1).addResultListener(new IResultListener()
-					{
-						public void resultAvailable(Object result)
+						Object[] infos = (Object[])initinfos.get(cid);
+						if(infos!=null)
 						{
-							synchronized(adapters)
+							IComponentAdapter adap = (IComponentAdapter)infos[1];
+							((Future)infos[4]).setException(adap.getException());
+						}
+						
+						// Kill subcomponents
+						final CMSComponentDescription	desc = (CMSComponentDescription)descs.get(cid);
+						if(desc==null)
+						{
+							ret.setException(new RuntimeException("Component "+cid+" does not exist."));
+							return ret;
+						}
+						IComponentIdentifier[] achildren = desc.getChildren();
+						
+						destroyComponentLoop(cid, achildren, achildren.length-1).addResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object result)
 							{
-								synchronized(descs)
+								synchronized(adapters)
 								{
-									IComponentAdapter component = (IComponentAdapter)adapters.get(cid);
-									// Component may be already killed (e.g. when autoshutdown).
-									if(component!=null)
+									synchronized(descs)
 									{
-//										System.out.println("destroy1: "+cid);//+" "+component.getParent().getComponentIdentifier().getLocalName());
-										
-										// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
-										// todo: killcomponent should only be called once for each component?
-										if(!ccs.containsKey(cid))
+										IComponentAdapter component = (IComponentAdapter)adapters.get(cid);
+										// Component may be already killed (e.g. when autoshutdown).
+										if(component!=null)
 										{
-//											System.out.println("killing a: "+cid);
+	//										System.out.println("destroy1: "+cid);//+" "+component.getParent().getComponentIdentifier().getLocalName());
 											
-											CleanupCommand	cc	= new CleanupCommand(cid);
-											ccs.put(cid, cc);
-											cc.addKillFuture(ret);
-											killComponent(component).addResultListener(cc);
-		//									component.killComponent(cc);	
-										}
-										else
-										{
-//											System.out.println("killing b: "+cid);
-											
-											CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
-											if(cc==null)
-												ret.setException(new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
-											cc.addKillFuture(ret);
+											// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
+											// todo: killcomponent should only be called once for each component?
+											if(!ccs.containsKey(cid))
+											{
+	//											System.out.println("killing a: "+cid);
+												
+												CleanupCommand	cc	= new CleanupCommand(cid);
+												ccs.put(cid, cc);
+												cc.addKillFuture(ret);
+												logger.info("Terminating component: "+cid.getName());
+												killComponent(component).addResultListener(cc);
+			//									component.killComponent(cc);	
+											}
+											else
+											{
+	//											System.out.println("killing b: "+cid);
+												
+												CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
+												if(cc==null)
+													ret.setException(new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
+												cc.addKillFuture(ret);
+											}
 										}
 									}
 								}
+								
+								// Resume component to be killed.
+								resumeComponent(cid);
 							}
 							
-							// Resume component to be killed.
-							resumeComponent(cid);
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							ret.setException(exception);
-						}
-					});
+							public void exceptionOccurred(Exception exception)
+							{
+								ret.setException(exception);
+							}
+						});
+					}
 				}
 			}
 		}
@@ -1242,6 +1218,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			{
 				synchronized(descs)
 				{
+					logger.info("Terminating component finished: "+cid.getName());
 //					System.out.println("CleanupCommand: "+cid);
 		//			boolean shutdown = false;
 		
@@ -1257,6 +1234,7 @@ public abstract class ComponentManagementService extends BasicService implements
 					desc.setState(IComponentDescription.STATE_TERMINATED);
 					
 					ccs.remove(cid);
+					cfs.remove(cid);
 					
 					// Deregister destroyed component at parent.
 					if(desc.getParent()!=null)

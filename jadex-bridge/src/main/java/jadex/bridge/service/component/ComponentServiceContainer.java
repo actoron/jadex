@@ -44,7 +44,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public ComponentServiceContainer(IComponentAdapter adapter, String type, RequiredServiceInfo[] infos, RequiredServiceBinding[] bindings)
 	{
-		super(adapter.getComponentIdentifier(), infos, bindings);
+		super(adapter.getComponentIdentifier(), adapter.getLogger(), infos, bindings);
 		this.adapter = adapter;
 		this.type	= type;
 	}

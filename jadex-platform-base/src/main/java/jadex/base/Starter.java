@@ -44,6 +44,10 @@ public class Starter
 	/** The component factory to be used for platform adapter. */
 	public static final String FALLBACK_ADAPTER_FACTORY = "jadex.standalone.ComponentAdapterFactory";
 
+	/** The termination timeout. */
+	// Todo: use configuration/argument value if present.
+	public static final long	TERMINATION_TIMEOUT	= 20000;
+
 	
 	/** The configuration file. */
 	public static final String CONFIGURATION_FILE = "conf";
@@ -107,7 +111,7 @@ public class Starter
 						{
 //							System.out.println("killing: "+access.getComponentIdentifier().getPlatformName());
 							shutdown	= true;
-							access.killComponent().get(new ThreadSuspendable());
+							access.killComponent().get(new ThreadSuspendable(), TERMINATION_TIMEOUT);
 //							System.out.println("killed: "+access.getComponentIdentifier().getPlatformName());
 						}
 						catch(ComponentTerminatedException cte)
