@@ -9,6 +9,11 @@ public interface IComponentChangeEvent
 	public static final String EVENT_TYPE_BULK = "bulk";
 	
 	public static final String SOURCE_CATEGORY_COMPONENT = "Component";
+	public static final String SOURCE_CATEGORY_PLAN	   = "Plan";
+	public static final String SOURCE_CATEGORY_GOAL	   = "Goal";
+	public static final String SOURCE_CATEGORY_FACT	   = "Fact";
+	public static final String SOURCE_CATEGORY_MESSAGE   = "Message";
+	public static final String SOURCE_CATEGORY_IEVENT	   = "Internal Event";
 	
 	/**
 	 *  Returns the type of the event.
