@@ -85,7 +85,7 @@ public class SComponentEvent
 	public static final void dispatchTerminatedEvent(final IComponentAdapter adapter, final IModelInfo model,
 			IServiceProvider provider, final Collection componentlisteners, final Future finished)
 	{
-		if (componentlisteners.isEmpty())
+		if (componentlisteners == null || componentlisteners.isEmpty())
 			return;
 		getTimeStamp(provider).addResultListener(new DefaultResultListener()
 		{
@@ -112,7 +112,7 @@ public class SComponentEvent
 	public static final void dispatchTerminatingEvent(final IComponentAdapter adapter, final IModelInfo model,
 			IServiceProvider provider, final Collection componentlisteners, final Future finished)
 	{
-		if (componentlisteners.isEmpty())
+		if (componentlisteners == null || componentlisteners.isEmpty())
 			return;
 		getTimeStamp(provider).addResultListener(new DefaultResultListener()
 		{
