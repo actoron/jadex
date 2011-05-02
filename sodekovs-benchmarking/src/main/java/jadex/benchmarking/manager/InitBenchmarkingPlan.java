@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 
-import sodekovs.util.gnuplot.persistence.DataDAO;
+import sodekovs.util.gnuplot.persistence.LogDAO;
 import sodekovs.util.math.GetRandom;
 import sodekovs.util.misc.AgentMethods;
 import sodekovs.util.misc.EvaluateExpression;
@@ -207,7 +207,7 @@ public class InitBenchmarkingPlan extends Plan {
 	private void persistLogs(String fileName, Schedule benchConf){
 //		ConnectionManager conMgr = new ConnectionManager();
 //		conMgr.storeGnuPlotLogs(fileName,benchConf.getType(),benchConf.getName(), scheduleLogger.getTimestamp());
-		DataDAO.getInstance().insertNewGnuPlotLog(fileName,benchConf.getType(),benchConf.getName(), scheduleLogger.getTimestamp());
+		LogDAO.getInstance().insertNewGnuPlotLog(fileName,benchConf.getType(),benchConf.getName(), scheduleLogger.getTimestamp());
 		
 	}
 

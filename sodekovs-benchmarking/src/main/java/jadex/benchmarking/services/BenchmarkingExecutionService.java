@@ -8,7 +8,7 @@ import jadex.bridge.service.BasicService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import sodekovs.util.gnuplot.CreateImagesThread;
-import sodekovs.util.gnuplot.persistence.DataDAO;
+import sodekovs.util.gnuplot.persistence.LogDAO;
 import sodekovs.util.model.benchmarking.description.BenchmarkingDescription;
 import sodekovs.util.model.benchmarking.description.IHistoricDataDescription;
 
@@ -65,10 +65,10 @@ public class BenchmarkingExecutionService extends BasicService implements IBench
 		
 //		ConnectionManager conMgr = new ConnectionManager();
 //		ret.setResult(conMgr.loadAllLogs());
-		IHistoricDataDescription[] dataDesc = DataDAO.getInstance().loadAllLogs(); 
+		IHistoricDataDescription[] dataDesc = LogDAO.getInstance().loadAllLogs(); 
 	
 		// Create the PNG image of the history
-		new CreateImagesThread(dataDesc).run();
+//		new CreateImagesThread(dataDesc).run();
 		
 		ret.setResult(dataDesc);
 		

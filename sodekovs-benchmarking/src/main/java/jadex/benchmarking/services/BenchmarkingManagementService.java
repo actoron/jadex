@@ -17,6 +17,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
+import sodekovs.util.gnuplot.CreateImagesThread;
+import sodekovs.util.gnuplot.persistence.LogDAO;
 import sodekovs.util.model.benchmarking.description.BenchmarkingDescription;
 import sodekovs.util.model.benchmarking.description.HistoricDataDescription;
 import sodekovs.util.model.benchmarking.description.IBenchmarkingDescription;
@@ -69,8 +71,8 @@ public class BenchmarkingManagementService extends BasicService implements IBenc
 
 		SServiceProvider.getServices(provider, IBenchmarkingExecutionService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(new IResultListener() {
 			public void resultAvailable(Object result) {
-				Collection coll = (Collection) result;
-				System.out.println("Coll length: " + coll.size());
+				Collection coll = (Collection) result;				
+				System.out.println("#BenchmarkingManagementService# Number of found IBenchmarkingExecutionService(s) : " + coll.size());
 				// Ignore search failures of remote dfs
 				CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new IResultListener() {
 					public void resultAvailable(Object res) {
@@ -110,35 +112,7 @@ public class BenchmarkingManagementService extends BasicService implements IBenc
 				// open.remove(fut);
 				fut.setResult(benchmarks.toArray(new BenchmarkingExecutionService[benchmarks.size()]));
 			}
-		});
-		// public void resultAvailable(Object result) {
-		// Collection coll = (Collection) result;
-		// System.out.println("dfs: "+coll.size());
-		// ret.setResult(benchmarks);
-		// Ignore search failures of remote dfs
-		// CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new IResultListener() {
-		// public void resultAvailable(Object result) {
-		// // Add all services of all remote dfs
-		// for (Iterator it = ((Collection) result).iterator(); it.hasNext();) {
-		// benchmarks.add((String) it.next());
-		// }
-		// ret.setResult(benchmarks);
-		// }
-		//
-		// public void exceptionOccurred(Exception exception) {
-		// // open.remove(fut);
-		// ret.setException(exception);
-		// // fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
-		// }
-		// });
-		// }
-		//
-		// public void exceptionOccurred(Exception exception) {
-		// // open.remove(fut);
-		// ret.setResult(exception);
-		// }
-		// });
-
+		});		
 		return fut;
 	}
 
@@ -147,22 +121,26 @@ public class BenchmarkingManagementService extends BasicService implements IBenc
 	 */
 	public IFuture getHistoryOfBenchmarkExperiments() {
 		
-			//Hack: using search of this service class
-//			Future ret = new Future();
-//			ConnectionManager conMgr = new ConnectionManager();
-//			ret.setResult(conMgr.getLog());
+		/*******************************************************************
+			//Hack: LOCAL SEARCH: using search of this service class
+		/*******************************************************************/ 
+		//			Future ret = new Future();
+//			IHistoricDataDescription[] tmp = LogDAO.getInstance().loadAllLogs();
+////			new CreateImagesThread(tmp).run();
+//			ret.setResult(tmp);
 //			
 //			return ret;
-					
+
+		/*************************GLOBAL SEARCH*****************************************/					
 			
-//		Using local service of agents				
+//		Using local service of each found agent				
 		final Future fut = new Future();
 		final ArrayList<IHistoricDataDescription> historicData = new ArrayList<IHistoricDataDescription>();
 
 		SServiceProvider.getServices(provider, IBenchmarkingExecutionService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(new IResultListener() {
 			public void resultAvailable(Object result) {
 				Collection coll = (Collection) result;
-				System.out.println("Coll length: " + coll.size());
+				System.out.println("#BenchmarkingManagementService# Number of found IBenchmarkingExecutionService(s) : " + coll.size());
 				// Ignore search failures of remote dfs
 				CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new IResultListener() {
 					public void resultAvailable(Object res) {

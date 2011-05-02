@@ -190,4 +190,14 @@ public class FileHandler {
 			return "";
 		}
 	}
+	
+	/**
+	 * Check whether file exists.
+	 * @param path
+	 * @return
+	 */
+	public static boolean fileExists(String path){
+		 File file = new File(path);
+		 return file.exists();
+	}
 }

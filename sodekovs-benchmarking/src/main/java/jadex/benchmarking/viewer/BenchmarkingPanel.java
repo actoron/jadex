@@ -4,21 +4,26 @@ import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
+import jadex.benchmarking.helper.CheckFileThread;
 import jadex.benchmarking.services.IBenchmarkingManagementService;
 import jadex.bridge.service.IService;
 import jadex.commons.Properties;
-import jadex.commons.Property;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.Hashtable;
+import java.util.Timer;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -29,14 +34,14 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.Timer;
 import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import sodekovs.util.misc.GlobalConstants;
+import sodekovs.util.gnuplot.CreateImage;
+import sodekovs.util.misc.FileHandler;
 import sodekovs.util.model.benchmarking.description.IBenchmarkingDescription;
 import sodekovs.util.model.benchmarking.description.IHistoricDataDescription;
 
@@ -94,6 +99,9 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 	/** The remote checkbox. */
 	protected JCheckBox remotecb;
 
+	/** Contains all png files that were already created. */
+	private Hashtable<String, Boolean> pngFiles = new Hashtable<String, Boolean>();
+
 	// -------- constructors --------
 
 	/**
@@ -136,7 +144,8 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 
 		historic_data_table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
-				IHistoricDataDescription selDataDesc = historic_data_table.getSelectedHistoricDataDescription();
+				System.out.println("Selection changed.");
+				IHistoricDataDescription selDataDesc = historic_data_table.getSelectedHistoricDataDescription();				
 				updateHistoryPNG(selDataDesc);
 			}
 		});
@@ -421,6 +430,7 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 				IHistoricDataDescription[] histData = (IHistoricDataDescription[]) result;
 				System.out.println("Found: Historic Data" + histData.length);
 
+				// create PNG, if required (--> necessary, if result comes from remote platform)
 				// if(old_ads == null || !Arrays.equals(old_ads, benchmarks))
 				// {
 				historic_data_table.setComponentDescriptions(histData);
@@ -435,24 +445,63 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 		});
 	}
 
-	protected void updateHistoryPNG(IHistoricDataDescription dataDesc) {
+	public void updateHistoryPNG(IHistoricDataDescription dataDesc) {
 		historyPNGPnl.removeAll();
-		ImageIcon icon1 = null;
 
+		// HACK: And dieser Stelle gibt es das Problem, dass die PNG-Datei teilweise später erstellt wird, als die Gui fertig wird.
+		//Behoben durch einen Timer, der das Bild nachläd, sobald es zur Verfügung steht.
+		checkAndCreatePNGFile(dataDesc);
+
+		Image img = null;
+		ImageIcon icon1 = null;
 		try {
-			icon1 = new ImageIcon(dataDesc.getLogAsPNG());
-		} catch (Exception e) {
-			System.out.println("#BenchmarkingPanel# PNG not found: " + dataDesc.getLogAsPNG());
+			img = ImageIO.read(new File(dataDesc.getLogAsPNG()));
+			icon1 = new ImageIcon(img);
+			System.out.println("#BenchmarkingPanel#Status of history-png : " + icon1.getImageLoadStatus());
+		} catch (Exception e1) {
+			System.out.println("#BenchmarkingPanel# PNG not found: " + dataDesc.getLogAsPNG() + "\n" + e1);
 		}
 
 		if (icon1 != null && icon1.getImageLoadStatus() == MediaTracker.COMPLETE) {
 			historyPNGPnl.add(new JLabel("History of: " + dataDesc.getName() + " - " + dataDesc.getTimestamp()), BorderLayout.NORTH);
 			historyPNGPnl.add(new JLabel(icon1), BorderLayout.CENTER);
 		} else {
-			historyPNGPnl.add(new JLabel("Error: No history found of : " + dataDesc.getName() + " - " + dataDesc.getTimestamp()), BorderLayout.NORTH);
+			historyPNGPnl.add(new JLabel("No history-png found of : " + dataDesc.getName() + " - " + dataDesc.getTimestamp() + "\n Please reload..."), BorderLayout.NORTH);
 			historyPNGPnl.add(new JLabel(icons.getIcon("png_not_found")), BorderLayout.CENTER);
+			
+			//Timer is used to check when png is created and to re-load png to panel.
+			long TIME_TO_START = 500;
+			long DELAY_BETWEEN_POLLS = 250;
+			Timer timer = new Timer();
+			timer.schedule(new CheckFileThread(dataDesc.getLogAsPNG(),this, dataDesc), TIME_TO_START, DELAY_BETWEEN_POLLS);			
+			
 		}
-		this.revalidate();
-		this.repaint();
+		historyPNGPnl.revalidate();
+		// this.revalidate();
+		// this.paint();
+	}
+
+	/**
+	 * Check whether PNG file exists and create one if it does not exist yet.
+	 * 
+	 * @param dataDesc
+	 */
+	protected void checkAndCreatePNGFile(IHistoricDataDescription dataDesc) {
+
+			if (pngFiles.containsKey(dataDesc.getLogAsPNG())) {
+				// Do nothing. file exists already
+			} else {
+				// check wether file exists but has not been put into hashtable
+				if (FileHandler.fileExists(dataDesc.getLogAsPNG())) {
+					// add png file to hashtable
+					pngFiles.put(dataDesc.getLogAsPNG(), true);
+				} else {
+					// create file and add to hashtable
+					CreateImage.createImage(dataDesc);
+//					System.out.println("1111111111111111111111111");
+					pngFiles.put(dataDesc.getLogAsPNG(), true);
+			}
+		}
+
 	}
 }

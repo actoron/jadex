@@ -42,13 +42,26 @@ public class HistoricDataTable extends JTable//JScrollPane
 //		Object[] ret = new Object[]{null, null};
 		IHistoricDataDescription ret = null;
 		int sel = getSelectedRow();
-		if(sel>=0)
-		{
+		
+		//Hack: somehow sel is sometimes -1 : avoid nullpointer-exception with this hack.
+		if(sel < 0){
+			sel = 0;
+		}
+		
+//		if(sel>=0)
+//		{
 			TableSorter sorter = (TableSorter)getModel();
 			HistoricDataTableModel model = (HistoricDataTableModel)sorter.getTableModel();
 			sel = sorter.modelIndex(sel);			
 			ret = model.getHistoricDataDescription(sel);
-		}
+//		}else if(sel == -1){
+//			sel=0;
+//			System.out.println("YYYYYYYYYYYYYYES");
+//			TableSorter sorter = (TableSorter)getModel();
+//			HistoricDataTableModel model = (HistoricDataTableModel)sorter.getTableModel();
+//			sel = sorter.modelIndex(sel);			
+//			ret = model.getHistoricDataDescription(sel);
+//		}
 		return ret;
 	}
 	

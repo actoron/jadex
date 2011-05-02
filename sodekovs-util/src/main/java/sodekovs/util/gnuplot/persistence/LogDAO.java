@@ -16,9 +16,9 @@ import sodekovs.util.misc.GlobalConstants;
 import sodekovs.util.model.benchmarking.description.HistoricDataDescription;
 import sodekovs.util.model.benchmarking.description.IHistoricDataDescription;
 
-public class DataDAO {
+public class LogDAO {
 
-	private static DataDAO dataDAO = null;
+	private static LogDAO dataDAO = null;
 
 	private PreparedStatement insertNewLog;
 
@@ -44,7 +44,7 @@ public class DataDAO {
 
 	private static final String LOGTIMESTAMP = "Logtimestamp";
 
-	private DataDAO() {
+	private LogDAO() {
 		try {
 			createLogTable = conn.prepareStatement("create table " + GlobalConstants.DB_GNUPLOT_SCHEMA + "." + GlobalConstants.DB_GNUPLOT_LOGTABLE + " (" + ID
 					+ " integer not null primary key generated always as identity (start with 1, increment by 1), " + DATE + " timestamp, " + TYPE + " varchar(64), " + NAME + " varchar(64), "
@@ -60,9 +60,9 @@ public class DataDAO {
 		}
 	}
 
-	public static DataDAO getInstance() {
+	public static LogDAO getInstance() {
 		if (dataDAO == null) {
-			dataDAO = new DataDAO();
+			dataDAO = new LogDAO();
 		}
 		return dataDAO;
 	}
