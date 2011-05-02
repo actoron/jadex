@@ -1,5 +1,7 @@
 package jadex.wfms.client;
 
+import jadex.bridge.IComponentIdentifier;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -9,9 +11,11 @@ import java.util.Set;
  */
 public interface IWorkitem
 {
-	public static final int GENERIC_WORKITEM_TYPE = 0;
-	public static final int TEXT_INFO_WORKITEM_TYPE = 1;
-	public static final int DATA_FETCH_WORKITEM_TYPE = 2;
+	/**
+	 *  Gets the identifier of the process which issued the workitem
+	 *  @return Identifier of the process which issued the workitem.
+	 */
+	public IComponentIdentifier getProcess();
 	
 	/**
 	 * Gets the name of the workitem.
@@ -19,13 +23,6 @@ public interface IWorkitem
 	 * @return name of the workitem
 	 */
 	public String getName();
-	
-	/**
-	 * Gets the type of the workitem.
-	 * 
-	 * @return type of the workitem.
-	 */
-	public int getType();
 	
 	/**
 	 * Gets the role responsible for handling this workitem.

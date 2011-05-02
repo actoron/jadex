@@ -1,7 +1,7 @@
 package jadex.wfms.bdi.client.cap;
 
 import jadex.bdi.runtime.Plan;
-import jadex.wfms.service.listeners.LogEvent;
+import jadex.bridge.IComponentChangeEvent;
 
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -15,7 +15,7 @@ public class LogEventPlan extends Plan
 		final Action procFin = (Action) getBeliefbase().getBelief("log_controller").getFact();
 		if (procFin == null)
 			return;
-		final LogEvent event = (LogEvent) getParameter("event").getValue();
+		final IComponentChangeEvent event = (IComponentChangeEvent) getParameter("event").getValue();
 		EventQueue.invokeLater(new Runnable()
 		{
 			public void run()

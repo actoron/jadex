@@ -5,6 +5,7 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
@@ -36,13 +37,13 @@ public class WorkitemTask implements ITask
 	{
 		final Future ret = new Future();
 		IServiceContainer wfms = process.getServiceContainer();
-		SServiceProvider.getService(wfms, IWorkitemHandlerService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(wfms, IWorkitemHandlerService.class, RequiredServiceInfo.SCOPE_APPLICATION).addResultListener(new DefaultResultListener()
 		{
 			
 			public void resultAvailable(Object result)
 			{
 				IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
-				wh.queueWorkitem(createWorkitem(Workitem.GENERIC_WORKITEM_TYPE, context), createListener(context, ret));
+				wh.queueWorkitem(createWorkitem(process.getComponentIdentifier(), context), createListener(context, ret));
 			}
 		});
 		return ret;
@@ -50,12 +51,11 @@ public class WorkitemTask implements ITask
 	
 	/**
 	 * Creates a workitem.
-	 * @param type type of the workitem
 	 * @param context The task context
 	 * @param listener The result listener
 	 * @return a new workitem
 	 */
-	private static IWorkitem createWorkitem(int type, ITaskContext context)
+	private static IWorkitem createWorkitem(IComponentIdentifier process, ITaskContext context)
 	{
 		Map parameterTypes = new LinkedHashMap();
 		Map parameterValues = new HashMap();
@@ -137,7 +137,7 @@ public class WorkitemTask implements ITask
 		if (role == null)
 			role = IAAAService.ANY_ROLE;
 		
-		Workitem wi = new Workitem(name, type, role, parameterTypes, parameterValues, metaProperties, readOnlyParameters);
+		Workitem wi = new Workitem(process, name, role, parameterTypes, parameterValues, metaProperties, readOnlyParameters);
 		wi.setId(context.getModelElement().getName() + "_" + String.valueOf(Integer.toHexString(System.identityHashCode(wi))));
 		return wi;
 	}
@@ -160,7 +160,6 @@ public class WorkitemTask implements ITask
 						context.setParameterValue((String) paramEntry.getKey(), paramEntry.getValue());
 					}
 				}
-				//System.out.println(listener.getClass().getName());
 				future.setResult(result);
 				//listener.resultAvailable(source, result);
 			}

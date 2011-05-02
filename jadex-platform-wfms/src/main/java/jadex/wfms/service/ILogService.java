@@ -1,5 +1,6 @@
 package jadex.wfms.service;
 
+import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.future.IFuture;
 import jadex.wfms.service.listeners.ILogListener;
@@ -23,4 +24,11 @@ public interface ILogService
 	 *  @return Indication of success.
 	 */
 	public IFuture removeLogListener(IComponentIdentifier client, ILogListener listener);
+	
+	/**
+	 *  Writes an event into the WfMS log.
+	 *  @param event The event.
+	 *  @return Null, when done.
+	 */
+	public IFuture logEvent(IComponentChangeEvent event);
 }

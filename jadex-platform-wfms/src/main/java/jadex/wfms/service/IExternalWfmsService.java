@@ -12,10 +12,14 @@ import jadex.wfms.service.listeners.IProcessListener;
 import jadex.wfms.service.listeners.IProcessRepositoryListener;
 import jadex.wfms.service.listeners.IWorkitemListener;
 
-import java.net.URL;
-
 public interface IExternalWfmsService
 {
+	/**
+	 *  Returns the name of the Workflow Management System.
+	 *  @return Name of the Workflow Management System.
+	 */
+	public IFuture getName();
+	
 	/**
 	 * Authenticate a new client.
 	 * @param client the new client

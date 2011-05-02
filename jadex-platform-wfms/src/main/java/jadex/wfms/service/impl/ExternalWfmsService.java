@@ -41,6 +41,33 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	}
 	
 	/**
+	 *  Returns the name of the Workflow Management System.
+	 *  @return Name of the Workflow Management System.
+	 */
+	public IFuture getName()
+	{
+		final Future ret = new Future(provider.getId());
+		
+		/*provider.getParent().addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				System.out.println((((IServiceContainer) result).getId()));
+				ret.setResult(((IServiceContainer) result).getId());
+				((IServiceContainer) result).getParent().addResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						System.out.println((((IServiceContainer) result).getId()));
+						ret.setResult(((IServiceContainer) result).getId());
+					}
+				});
+			}
+		});*/
+		return ret;
+	}
+	
+	/**
 	 * Authenticate a new client.
 	 * @param client the new client
 	 * @return true, if the client has been successfully authenticated.
@@ -579,7 +606,7 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 					public void customResultAvailable(Object result)
 					{
 						IModelRepositoryService mr = (IModelRepositoryService) result;
-						ret.setResult(new HashSet(mr.getLoadableModels()));
+						mr.getLoadableModels().addResultListener(new DelegationResultListener(ret));
 					};
 				});
 			}

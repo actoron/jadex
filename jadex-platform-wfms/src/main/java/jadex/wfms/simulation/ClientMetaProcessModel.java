@@ -7,7 +7,10 @@ import jadex.bridge.IModelInfo;
 import jadex.commons.ICacheableModel;
 import jadex.commons.collection.Tree;
 import jadex.commons.collection.TreeNode;
-import jadex.commons.future.ThreadSuspendable;
+import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.gpmn.model2.MBpmnPlan;
 import jadex.gpmn.model2.MGpmnModel;
 import jadex.gpmn.model2.MSubprocess;
@@ -41,61 +44,92 @@ public class ClientMetaProcessModel extends Tree implements TreeModel
 	{
 	}
 	
-	public void setRootModel(ClientSimulator sim, String processName, ICacheableModel model) throws Exception
+	public IFuture setRootModel(int i,ClientSimulator sim, String processName, ICacheableModel model)
 	{
 		mainProcessName = processName;
 		processes = new HashMap();
 		tasks = new ArrayList();
 		root = new ModelTreeNode();
 		processes.put(resolveProcessName(model), root);
-		TreeNode tmpRoot = buildTree(sim, model);
-		root.setChildren(tmpRoot.getChildren());
-		root.setData(tmpRoot.getData());
+		
+		final Future ret = new Future();
+		buildTree(sim, model).addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				TreeNode tmpRoot = (TreeNode) result;
+				root.setChildren(tmpRoot.getChildren());
+				root.setData(tmpRoot.getData());
+				
+				ret.setResult(null);
+			} 
+		});
+		
+		return ret;
 	}
 	
-	public TreeNode buildTree(ClientSimulator sim, ICacheableModel processModel) throws Exception
+	public IFuture buildTree(final ClientSimulator sim, final ICacheableModel processModel)
 	{
-		TreeNode node = new ModelTreeNode();
+		final Future ret = new Future();
+		final TreeNode node = new ModelTreeNode();
 		node.setData(processModel);
-		List subProcesses = getSubProcessModels(sim, processModel);
-		
-		// Remove subprocesses that are already known
-		for (Iterator it = subProcesses.iterator(); it.hasNext(); )
+		getSubProcessModels(sim, processModel).addResultListener(new DelegationResultListener(ret)
 		{
-			ICacheableModel subModel = (ICacheableModel) it.next();
-			if (processes.containsKey(resolveProcessName(subModel)))
+			public void customResultAvailable(Object result)
 			{
-				it.remove();
-				ModelTreeNode linkNode = new ModelTreeNode();
-				linkNode.setData(processes.get(resolveProcessName(subModel)));
-				System.out.println("LinkNode: " + resolveProcessName(subModel) + " top model:" + resolveProcessName(processModel));
-				node.addChild(linkNode);
+				List subProcesses = (List) result;
+				// Remove subprocesses that are already known
+				for (Iterator it = subProcesses.iterator(); it.hasNext(); )
+				{
+					ICacheableModel subModel = (ICacheableModel) it.next();
+					if (processes.containsKey(resolveProcessName(subModel)))
+					{
+						it.remove();
+						ModelTreeNode linkNode = new ModelTreeNode();
+						linkNode.setData(processes.get(resolveProcessName(subModel)));
+						System.out.println("LinkNode: " + resolveProcessName(subModel) + " top model:" + resolveProcessName(processModel));
+						node.addChild(linkNode);
+					}
+				}
+				
+				// Add tasks
+				Set tasks = getDataTasks(processModel);
+				for (Iterator it = tasks.iterator(); it.hasNext(); )
+				{
+					MActivity task = (MActivity) it.next();
+					TreeNode taskNode = getTaskNode(task);
+					node.addChild(taskNode);
+					ClientMetaProcessModel.this.tasks.add(taskNode);
+				}
+				
+				// Add subprocesses
+				CollectionResultListener spCollector = new CollectionResultListener(subProcesses.size(), false, new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						Collection coll = (Collection) result;
+						for (Iterator it = coll.iterator(); it.hasNext(); )
+						{
+							TreeNode subTree = (TreeNode) it.next();
+							ModelTreeNode tmpNode = new ModelTreeNode();
+							processes.put(resolveProcessName((ICacheableModel)subTree.getData()), tmpNode);
+							tmpNode.setChildren(subTree.getChildren());
+							tmpNode.setData(subTree.getData());
+							node.addChild(tmpNode);
+						}
+						
+						ret.setResult(node);
+					}
+				});
+				
+				for (Iterator it = subProcesses.iterator(); it.hasNext(); )
+				{
+					ICacheableModel subModel = (ICacheableModel) it.next();
+					buildTree(sim, subModel).addResultListener(spCollector);
+				}
 			}
-		}
-		
-		// Add subprocesses
-		for (Iterator it = subProcesses.iterator(); it.hasNext(); )
-		{
-			ICacheableModel subModel = (ICacheableModel) it.next();
-			ModelTreeNode tmpNode = new ModelTreeNode();
-			processes.put(resolveProcessName(subModel), tmpNode);
-			TreeNode subTree = buildTree(sim, subModel);
-			tmpNode.setChildren(subTree.getChildren());
-			tmpNode.setData(subTree.getData());
-			node.addChild(tmpNode);
-		}
-		
-		// Add tasks
-		Set tasks = getDataTasks(processModel);
-		for (Iterator it = tasks.iterator(); it.hasNext(); )
-		{
-			MActivity task = (MActivity) it.next();
-			TreeNode taskNode = getTaskNode(task);
-			node.addChild(taskNode);
-			this.tasks.add(taskNode);
-		}
-		
-		return node;
+		});
+		return ret;
 	}
 	
 	public Scenario createScenario(String name)
@@ -177,31 +211,57 @@ public class ClientMetaProcessModel extends Tree implements TreeModel
 		return node;
 	}
 	
-	private List getSubProcessModels(ClientSimulator sim, ICacheableModel processModel) throws Exception
+	private IFuture getSubProcessModels(final ClientSimulator sim, ICacheableModel processModel)
 	{
-		List ret = new LinkedList();
-		//ret.add(processModel);
+		final Future ret = new Future();
 		if (processModel instanceof MGpmnModel)
 		{
 			
-			MGpmnModel gpmnModel = (MGpmnModel) processModel;
+			final MGpmnModel gpmnModel = (MGpmnModel) processModel;
+			CollectionResultListener planCollector = new CollectionResultListener(gpmnModel.getBpmnPlans().size(), false, new DelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+					final List models = new LinkedList();
+					Collection coll = (Collection) result;
+					for (Iterator it = coll.iterator(); it.hasNext(); )
+					{
+						MBpmnModel bpmnModel = (MBpmnModel) it.next();
+						if (bpmnModel != null)
+							models.add(bpmnModel);
+					}
+					
+					List<MSubprocess> bpmnsp = new ArrayList<MSubprocess>();
+					for (Iterator it = gpmnModel.getSubprocesses().values().iterator(); it.hasNext(); )
+					{
+						MSubprocess process = (MSubprocess) it.next();
+						if (process.getProcessReference().endsWith(".bpmn"))
+							bpmnsp.add(process);
+					}
+					CollectionResultListener spCollector = new CollectionResultListener(bpmnsp.size(), false, new DelegationResultListener(ret)
+					{
+						public void customResultAvailable(Object result)
+						{
+							Collection coll = (Collection) result;
+							for (Iterator it = coll.iterator(); it.hasNext(); )
+							{
+								MBpmnModel bpmnModel = (MBpmnModel) it.next();
+								if (bpmnModel != null)
+									models.add(bpmnModel);
+							}
+							
+							ret.setResult(models);
+						}
+					});
+					
+					for (Iterator<MSubprocess> it = bpmnsp.iterator(); it.hasNext(); )
+						sim.loadModelFromPath(it.next().getProcessReference()).addResultListener(spCollector);
+				}
+			});
 			for (Iterator it = gpmnModel.getBpmnPlans().values().iterator(); it.hasNext(); )
 			{
 				MBpmnPlan plan = (MBpmnPlan) it.next();
-				MBpmnModel bpmnModel = (MBpmnModel) sim.loadModelFromPath(plan.getPlanref());
-				if (bpmnModel != null)
-					ret.add(bpmnModel);
-			}
-			
-			for (Iterator it = gpmnModel.getSubprocesses().values().iterator(); it.hasNext(); )
-			{
-				String processref = ((MSubprocess) it.next()).getProcessReference();
-				if (processref.endsWith(".bpmn"))
-				{
-					MBpmnModel bpmnModel = (MBpmnModel) sim.loadModelFromPath(processref);
-					if (bpmnModel != null)
-						ret.add(bpmnModel);
-				}
+				sim.loadModelFromPath(plan.getPlanref()).addResultListener(planCollector);
 			}
 		}
 		else if (processModel instanceof MBpmnModel)

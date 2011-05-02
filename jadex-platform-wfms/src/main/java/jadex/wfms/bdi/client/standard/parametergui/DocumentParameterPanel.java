@@ -1,5 +1,6 @@
 package jadex.wfms.bdi.client.standard.parametergui;
 
+import jadex.wfms.gui.images.SImage;
 import jadex.wfms.guicomponents.SGuiHelper;
 import jadex.wfms.parametertypes.Document;
 
@@ -120,7 +121,7 @@ public class DocumentParameterPanel extends AbstractParameterPanel
 				}
 			};
 			saveButton.setAction(saveAction);
-			saveButton.setIcon(new ImageIcon(getClass().getClassLoader().getResource(getClass().getPackage().getName().replaceFirst("parametergui", "images").replaceAll("\\.", "/") + "/disk_small.png")));
+			saveButton.setIcon(SImage.createImageIcon("disk_small.png"));
 			saveButton.setToolTipText(SAVE_BUTTON_TIP);
 			saveButton.setMargin(new Insets(1,1,1,1));
 			g = new GridBagConstraints();
@@ -156,7 +157,7 @@ public class DocumentParameterPanel extends AbstractParameterPanel
 					}
 				}
 			});
-			attachButton.setIcon(new ImageIcon(getClass().getClassLoader().getResource(getClass().getPackage().getName().replaceFirst("parametergui", "images").replaceAll("\\.", "/") + "/paperclip_small.png")));
+			attachButton.setIcon(SImage.createImageIcon("paperclip_small.png"));
 			attachButton.setMargin(new Insets(1,1,1,1));
 			attachButton.setToolTipText(ATTACH_BUTTON_TIP);
 			g = new GridBagConstraints();

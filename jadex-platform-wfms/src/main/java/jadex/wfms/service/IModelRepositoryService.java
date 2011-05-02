@@ -5,9 +5,7 @@ import jadex.commons.future.IFuture;
 import jadex.wfms.client.ProcessResource;
 import jadex.wfms.service.listeners.IProcessRepositoryListener;
 
-import java.net.URL;
 import java.util.Collection;
-import java.util.Set;
 /**
  * Repository service for accessing process models.
  */
@@ -36,7 +34,7 @@ public interface IModelRepositoryService
 	 * 
 	 * @return set of model paths
 	 */
-	public Set getLoadableModels();
+	public IFuture getLoadableModels();
 	
 	/**
 	 *  Get a process model of a specific name.

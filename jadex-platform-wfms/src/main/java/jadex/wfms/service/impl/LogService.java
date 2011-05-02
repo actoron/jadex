@@ -12,6 +12,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
@@ -32,7 +33,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-@SuppressWarnings("unchecked")
 public class LogService extends BasicService implements ILogService
 {
 	protected IServiceContainer provider;
@@ -51,6 +51,7 @@ public class LogService extends BasicService implements ILogService
 	
 	public IFuture startService()
 	{
+		super.startService();
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
@@ -77,8 +78,8 @@ public class LogService extends BasicService implements ILogService
 							
 							public IFuture componentAdded(final IComponentDescription desc)
 							{
-								Future ret = new Future();
-								
+								if(!sid.getProviderId().equals(desc.getParent()))
+									return IFuture.DONE;
 								IComponentChangeEvent ce = new ComponentChangeEvent()
 								{
 									{
@@ -91,8 +92,6 @@ public class LogService extends BasicService implements ILogService
 									}
 								};
 								logEvent(ce);
-								
-								System.out.println(desc.getModelName());
 								
 								cms.getExternalAccess(desc.getName()).addResultListener(new DefaultResultListener()
 								{
@@ -117,12 +116,11 @@ public class LogService extends BasicService implements ILogService
 									}
 								});
 								
-								ret.setResult(null);
-								return ret;
+								return IFuture.DONE;
 							}
 						});
 						
-						
+						ret.setResult(null);
 					}
 				});
 			}
@@ -221,7 +219,12 @@ public class LogService extends BasicService implements ILogService
 		return ret;
 	}
 	
-	protected void logEvent(IComponentChangeEvent event)
+	/**
+	 *  Writes an event into the WfMS log.
+	 *  @param event The event.
+	 *  @return Null, when done.
+	 */
+	public IFuture logEvent(IComponentChangeEvent event)
 	{
 		synchronized (listeners)
 		{
@@ -230,5 +233,17 @@ public class LogService extends BasicService implements ILogService
 				for (Iterator<ILogListener> it2 = it.next().iterator(); it2.hasNext(); )
 					it2.next().logMessage(event);
 		}
+		return Future.DONE;
+	}
+	
+	protected static final void dispatchLogServiceEvent(IServiceProvider provider, final IComponentChangeEvent cce)
+	{
+		SServiceProvider.getService(provider, ILogService.class, RequiredServiceInfo.SCOPE_APPLICATION).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				((ILogService)result).logEvent(cce);
+			}
+		});
 	}
 }

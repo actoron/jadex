@@ -328,6 +328,7 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 		{
 			IComponentListener[] listeners = (IComponentListener[]) componentlisteners.toArray(new IComponentListener[componentlisteners.size()]);
 			for(int i=0; i<listeners.length; i++)
+			{
 				if (listeners[i].getFilter().filter(event))
 				{
 					final IComponentListener lis = listeners[i];
@@ -343,6 +344,7 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 						}
 					});
 				}
+			}
 		}
 		if (finished != null)
 			finished.setResult(null);

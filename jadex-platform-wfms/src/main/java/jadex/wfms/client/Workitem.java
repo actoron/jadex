@@ -1,5 +1,7 @@
 package jadex.wfms.client;
 
+import jadex.bridge.IComponentIdentifier;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,11 +14,11 @@ import java.util.Set;
  */
 public class Workitem implements IWorkitem, IClientActivity
 {
+	/** Identifier of the process which issued the workitem */
+	private IComponentIdentifier process;
+	
 	/** Name of the workitem */
 	private String name;
-	
-	/** Type of the workitem */
-	private int type;
 	
 	/** Unique ID */
 	private String id;
@@ -40,11 +42,11 @@ public class Workitem implements IWorkitem, IClientActivity
 	{
 	}
 	
-	public Workitem(String name, int type, String role, Map parameterTypes, Map parameterValues, Map guiProperties, Set readOnlyParameters)
+	public Workitem(IComponentIdentifier process, String name, String role, Map parameterTypes, Map parameterValues, Map guiProperties, Set readOnlyParameters)
 	{
+		this.process = process;
 		this.id = String.valueOf(System.identityHashCode(this));
 		this.name = name;
-		this.type = type;
 		this.role = role;
 		/*this.parameterTypes = new HashMap();
 		for (Iterator it = parameterTypes.entrySet().iterator(); it.hasNext(); )
@@ -59,6 +61,16 @@ public class Workitem implements IWorkitem, IClientActivity
 		this.readOnlyParameters = readOnlyParameters;
 	}
 	
+	
+	/**
+	 *  Gets the identifier of the process which issued the workitem
+	 *  @return Identifier of the process which issued the workitem.
+	 */
+	public IComponentIdentifier getProcess()
+	{
+		return process;
+	}
+
 	/**
 	 * Gets the name of the workitem.
 	 * 
@@ -67,16 +79,6 @@ public class Workitem implements IWorkitem, IClientActivity
 	public String getName()
 	{
 		return name;
-	}
-	
-	/**
-	 * Gets the type of the workitem.
-	 * 
-	 * @return type of the workitem.
-	 */
-	public int getType()
-	{
-		return type;
 	}
 	
 	/**
@@ -201,6 +203,15 @@ public class Workitem implements IWorkitem, IClientActivity
 		return readOnlyParameters;
 	}
 	
+	/**
+	 *  Sets the identifier of the process which issued the workitem
+	 *  @param process Identifier of the process which issued the workitem.
+	 */
+	public void setProcess(IComponentIdentifier process)
+	{
+		this.process = process;
+	}
+	
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -224,10 +235,6 @@ public class Workitem implements IWorkitem, IClientActivity
 	
 	public void setReadOnlyParameters(Set readOnlyParameters) {
 		this.readOnlyParameters = readOnlyParameters;
-	}
-	
-	public void setType(int type) {
-		this.type = type;
 	}
 	
 	public void setId(String id) {

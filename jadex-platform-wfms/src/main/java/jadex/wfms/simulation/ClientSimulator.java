@@ -7,9 +7,9 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
-import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.TerminationAdapter;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.ICacheableModel;
@@ -17,13 +17,13 @@ import jadex.commons.collection.TreeNode;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.SGUI;
 import jadex.gpmn.model2.MGpmnModel;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.guicomponents.LoginDialog;
 import jadex.wfms.guicomponents.SGuiHelper;
+import jadex.wfms.service.IExternalWfmsService;
 import jadex.wfms.simulation.gui.SimulationWindow;
 import jadex.wfms.simulation.stateset.AbstractNumericStateSet;
 import jadex.wfms.simulation.stateset.BooleanStateSet;
@@ -35,6 +35,7 @@ import jadex.wfms.simulation.stateset.ResolvableListChoiceStateSet;
 import jadex.wfms.simulation.stateset.ResolvableMultiListChoiceStateSet;
 import jadex.wfms.simulation.stateset.StringArrayStateSet;
 import jadex.wfms.simulation.stateset.StringStateSet;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -125,13 +126,12 @@ public class ClientSimulator
 								
 								agent.scheduleStep(new IComponentStep()
 								{
-									public static final String XML_CLASSNAME = "dispose"; 
+									@XMLClassname("dispose") 
 									public Object execute(IInternalAccess ia)
 									{
-										ia.addComponentListener(new ComponentAdapter()
+										ia.addComponentListener(new TerminationAdapter()
 										{
-											
-											public IFuture componentTerminating(jadex.commons.ChangeEvent ce)
+											public void componentTerminated()
 											{
 												EventQueue.invokeLater(new Runnable()
 												{
@@ -140,8 +140,7 @@ public class ClientSimulator
 														simWindow.dispose();
 													}
 												});
-												return IFuture.DONE;
-											}
+											};
 										});
 										return null;
 									}
@@ -266,7 +265,7 @@ public class ClientSimulator
 					});
 				}
 			}
-		})).get(new ThreadSuspendable());
+		})); //TODO: Needed? .get(new ThreadSuspendable());
 		
 		agent.scheduleStep(new DispatchGoalStep("clientcap.start_process_event_subscription"));
 		
@@ -330,7 +329,7 @@ public class ClientSimulator
 		updateGui();
 	}
 	
-	protected Object loadModelFromPath(final String path)
+	protected IFuture loadModelFromPath(final String path)
 	{
 		final Future ret = new Future();
 		agent.scheduleStep(new DispatchGoalStep("clientcap.request_model", new HashMap() {{
@@ -345,9 +344,7 @@ public class ClientSimulator
 			}
 		});
 		
-		//TODO Futurize!
-		
-		return ret.get(new ThreadSuspendable());
+		return ret;
 	}
 	
 	private void updateGui()
@@ -369,7 +366,7 @@ public class ClientSimulator
 	
 	private LoginDialog showLoginDialog()
 	{
-		LoginDialog loginDialog = new LoginDialog(simWindow);
+		LoginDialog loginDialog = new LoginDialog(agent, simWindow);
 		loginDialog.setLocation(SGUI.calculateMiddlePosition(loginDialog));
 		loginDialog.setVisible(true);
 		return loginDialog;
@@ -380,7 +377,9 @@ public class ClientSimulator
 		final Future ret = new Future();
 		final String username = loginDialog.getUserName();
 		final String password = loginDialog.getPassword();
+		final IExternalWfmsService wfms = loginDialog.getWfms();
 		agent.scheduleStep(new DispatchGoalStep("clientcap.connect", new HashMap() {{
+			put("wfms", wfms);
 			put("user_name", username);
 			put("auth_token", password);
 		}})).addResultListener(new DefaultResultListener()
@@ -422,25 +421,24 @@ public class ClientSimulator
 							public void customResultAvailable(Object result)
 							{
 								Map parameters = (Map) result;
-								try
+								model.setRootModel(0,ClientSimulator.this, modelName, (ICacheableModel) parameters.get("model")).addResultListener(new SwingDefaultResultListener()
 								{
-									model.setRootModel(ClientSimulator.this, modelName, (ICacheableModel) parameters.get("model"));
-								}
-								catch (Exception e)
-								{
-									customExceptionOccurred(e);
-								}
-								simWindow.setProcessTreeModel(model);
-								clientMetaProcessModel = model;
-								while (scenarios.getRowCount() > 0)
-									scenarios.removeRow(0);
-								updateGui();
-							}
-							
-							public void customExceptionOccurred(Exception exception)
-							{
-								exception.printStackTrace();
-								simWindow.showMessage(JOptionPane.ERROR_MESSAGE, "Cannot open the process", "Opening the process failed.");
+									
+									public void customResultAvailable(Object result)
+									{
+										simWindow.setProcessTreeModel(model);
+										clientMetaProcessModel = model;
+										while (scenarios.getRowCount() > 0)
+											scenarios.removeRow(0);
+										updateGui();
+									}
+									
+									public void customExceptionOccurred(Exception exception)
+									{
+										exception.printStackTrace();
+										simWindow.showMessage(JOptionPane.ERROR_MESSAGE, "Cannot open the process", "Opening the process failed.");
+									}
+								});
 							}
 						});
 					}

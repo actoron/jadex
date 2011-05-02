@@ -11,7 +11,6 @@ public class AddProcessModelPlan extends Plan
 {
 	public void body()
 	{
-		System.out.println("Add Process Model");
 		final Action pmAdded = (Action) getBeliefbase().getBelief("add_process_model_controller").getFact();
 		final String modelName = (String) getParameter("model_name").getValue();
 		EventQueue.invokeLater(new Runnable()

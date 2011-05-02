@@ -12,6 +12,9 @@ import java.util.Map;
 
 public interface IWorkitemHandlerService
 {
+	public static final String SOURCE_CATEGORY_WORKITEM = "Workitem";
+	public static final String SOURCE_CATEGORY_ACTIVITY = "Activity";
+	
 	/**
 	 * Returns the current activities for all users
 	 * 

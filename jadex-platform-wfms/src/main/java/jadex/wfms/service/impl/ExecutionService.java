@@ -1,8 +1,6 @@
 package jadex.wfms.service.impl;
 
 import jadex.base.SComponentFactory;
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
@@ -16,7 +14,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.wfms.IProcess;
 import jadex.wfms.client.ClientInfo;
 import jadex.wfms.service.IAAAService;
@@ -25,17 +22,12 @@ import jadex.wfms.service.listeners.IAuthenticationListener;
 import jadex.wfms.service.listeners.IProcessListener;
 import jadex.wfms.service.listeners.ProcessEvent;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *  The meta execution service wraps all specific process execution services.
@@ -71,15 +63,6 @@ public class ExecutionService extends BasicService implements IExecutionService
 		this.processes = new HashMap();
 		this.wfms = wfms;
 		this.exta = exta;
-		
-		//TODO: hack!
-		/*this.exeservices = new ArrayList();
-		this.exeservices.add(wfms.getService(IBpmnProcessService.class));
-		this.exeservices.add(wfms.getService(IGpmnProcessService.class));*/
-		
-		//if(exeservices==null || exeservices.size()==0)
-			//throw new RuntimeException("Meta execution service needs at least one sub service.");
-		//this.exeservices = exeservices;
 	}
 	
 	//-------- methods --------
@@ -110,114 +93,114 @@ public class ExecutionService extends BasicService implements IExecutionService
 	/**
 	 *  Start a process instance.
 	 */
-	public IFuture startProcess(String modelname, Object id, Map arguments)
+	public IFuture startProcess(final String modelname, Object id, final Map arguments)
 	{
 		final Future ret = new Future();
-		IComponentManagementService ces = (IComponentManagementService) SServiceProvider.getService(exta.getServiceProvider(), (Class) IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
-		CreationInfo ci = new CreationInfo(null, arguments, wfms, true);
-		ci.setPlatformloader(true);
-		ces.createComponent(null, modelname, ci, null).addResultListener(new DefaultResultListener()
-		//ces.createComponent(null, modelname, new CreationInfo(null, arguments, null, true), null).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(exta.getServiceProvider(), (Class) IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
-				final IComponentIdentifier id = ((IComponentIdentifier) result);
-				SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+				IComponentManagementService ces = (IComponentManagementService) result;
+				
+				CreationInfo ci = new CreationInfo(null, arguments, wfms, true);
+				ci.setPlatformloader(true);
+				ces.createComponent(null, modelname, ci, null).addResultListener(new DelegationResultListener(ret)
 				{
-					public void resultAvailable(Object result)
+					public void customResultAvailable(Object result)
 					{
-						final IComponentManagementService cms = (IComponentManagementService) result;
-						cms.addComponentListener(id, new ICMSComponentListener()
+						final IComponentIdentifier id = ((IComponentIdentifier) result);
+						SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
 						{
-							private List currentActivities = new ArrayList();
-							
-							private List activityHistory = new ArrayList();
-							
-							public IFuture componentRemoved(IComponentDescription desc, Map results)
+							public void customResultAvailable(Object result)
 							{
-								Logger.getLogger("Wfms").log(Level.INFO, "Finished process " + id.toString());
-								Logger.getLogger("Wfms").log(Level.INFO, "History: " + Arrays.toString(activityHistory.toArray()));
-								fireProcessFinished(id);
-								return new Future(null);
-							}
-							
-							public IFuture componentChanged(IComponentDescription desc)
-							{
-								//System.out.println(desc.getName() + " " + desc.getState() + desc.getProcessingState() + " " + desc.getType());
-								if ("BPMN Process".equals(desc.getType()))
+								final IComponentManagementService cms = (IComponentManagementService) result;
+								cms.addComponentListener(id, new ICMSComponentListener()
 								{
-									cms.getExternalAccess(id).addResultListener(new DefaultResultListener()
+									//private List currentActivities = new ArrayList();
+									
+									//private List activityHistory = new ArrayList();
+									
+									public IFuture componentRemoved(IComponentDescription desc, Map results)
 									{
-										public void resultAvailable(Object result)
-										{
-											final jadex.bpmn.runtime.ExternalAccess ea = (jadex.bpmn.runtime.ExternalAccess) result;
-											List newStates = new ArrayList();
-											for (Iterator it = ea.getInterpreter().getThreadContext().getAllThreads().iterator(); it.hasNext(); )
-											{
-												ProcessThread p = (ProcessThread) it.next();
-												newStates.add(p.getModelElement());
-												//System.out.print(p.getModelElement().get + ", ");
-											}
-											if (!currentActivities.containsAll(newStates))
-											{
-												List diff = new ArrayList(newStates);
-												diff.removeAll(currentActivities);
-												//System.out.println(Arrays.toString(diff.toArray()));
-												activityHistory.add(((MActivity) diff.get(0)).getActivityType() + ": " + ((MActivity) diff.get(0)).getName());
-												currentActivities = newStates;
-											}
-											//System.out.println();
-										}
-									});
-								}
-								/*else if ("GPMN Process".equals(desc.getType()))
-								{
-									cms.getExternalAccess(id).addResultListener(new DefaultResultListener()
+										//Logger.getLogger("Wfms").log(Level.INFO, "Finished process " + id.toString());
+										//Logger.getLogger("Wfms").log(Level.INFO, "History: " + Arrays.toString(activityHistory.toArray()));
+										fireProcessFinished(id);
+										return IFuture.DONE;
+									}
+									
+									public IFuture componentChanged(IComponentDescription desc)
 									{
-										public void resultAvailable(Object source, Object result)
+										//System.out.println(desc.getName() + " " + desc.getState() + desc.getProcessingState() + " " + desc.getType());
+										/*if ("BPMN Process".equals(desc.getType()))
 										{
-											final IBDIExternalAccess ea = (IBDIExternalAccess) result;
-											List newStates = new ArrayList();
-											for (Iterator it = ea.getInterpreter().getThreadContext().getAllThreads().iterator(); it.hasNext(); )
+											cms.getExternalAccess(id).addResultListener(new DefaultResultListener()
 											{
-												ProcessThread p = (ProcessThread) it.next();
-												newStates.add(p.getModelElement());
-												//System.out.print(p.getModelElement().get + ", ");
-											}
-											if (!currentActivities.containsAll(newStates))
-											{
-												List diff = new ArrayList(newStates);
-												diff.removeAll(currentActivities);
-												//System.out.println(Arrays.toString(diff.toArray()));
-												activityHistory.add(((MActivity) diff.get(0)).getActivityType() + ": " + ((MActivity) diff.get(0)).getName());
-												currentActivities = newStates;
-											}
-											//System.out.println();
+												public void resultAvailable(Object result)
+												{
+													final jadex.bpmn.runtime.ExternalAccess ea = (jadex.bpmn.runtime.ExternalAccess) result;
+													List newStates = new ArrayList();
+													for (Iterator it = ea.getInterpreter().getThreadContext().getAllThreads().iterator(); it.hasNext(); )
+													{
+														ProcessThread p = (ProcessThread) it.next();
+														newStates.add(p.getModelElement());
+														//System.out.print(p.getModelElement().get + ", ");
+													}
+													if (!currentActivities.containsAll(newStates))
+													{
+														List diff = new ArrayList(newStates);
+														diff.removeAll(currentActivities);
+														//System.out.println(Arrays.toString(diff.toArray()));
+														activityHistory.add(((MActivity) diff.get(0)).getActivityType() + ": " + ((MActivity) diff.get(0)).getName());
+														currentActivities = newStates;
+													}
+													//System.out.println();
+												}
+											});
 										}
-									});
-								}*/
-								return new Future(null);
-							}
-							
-							public IFuture componentAdded(IComponentDescription desc)
-							{
-								return new Future(null);
+										else if ("GPMN Process".equals(desc.getType()))
+										{
+											cms.getExternalAccess(id).addResultListener(new DefaultResultListener()
+											{
+												public void resultAvailable(Object source, Object result)
+												{
+													final IBDIExternalAccess ea = (IBDIExternalAccess) result;
+													List newStates = new ArrayList();
+													for (Iterator it = ea.getInterpreter().getThreadContext().getAllThreads().iterator(); it.hasNext(); )
+													{
+														ProcessThread p = (ProcessThread) it.next();
+														newStates.add(p.getModelElement());
+														//System.out.print(p.getModelElement().get + ", ");
+													}
+													if (!currentActivities.containsAll(newStates))
+													{
+														List diff = new ArrayList(newStates);
+														diff.removeAll(currentActivities);
+														//System.out.println(Arrays.toString(diff.toArray()));
+														activityHistory.add(((MActivity) diff.get(0)).getActivityType() + ": " + ((MActivity) diff.get(0)).getName());
+														currentActivities = newStates;
+													}
+													//System.out.println();
+												}
+											});
+										}*/
+										return IFuture.DONE;
+									}
+									
+									public IFuture componentAdded(IComponentDescription desc)
+									{
+										return IFuture.DONE;
+									}
+								});
+								
+								ret.setResult(id);
+								cms.resumeComponent(id);
 							}
 						});
-						
-						cms.resumeComponent(id);
 					}
 				});
-						
-				
-				ret.setResult(id);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
 			}
 		});
+		
 		return ret;
 	}
 

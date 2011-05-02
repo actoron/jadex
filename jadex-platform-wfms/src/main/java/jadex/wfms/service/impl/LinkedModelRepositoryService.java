@@ -7,11 +7,11 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
+import jadex.bridge.service.library.LibraryService;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.wfms.client.ClientInfo;
 import jadex.wfms.client.ProcessResource;
 import jadex.wfms.service.IAAAService;
@@ -44,7 +44,6 @@ import java.util.jar.JarFile;
  * Basic Model Repository Service implementation
  *
  */
-@SuppressWarnings("unchecked")
 public class LinkedModelRepositoryService extends BasicService implements IModelRepositoryService
 {
 	/** The wfms. */
@@ -82,93 +81,96 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 	 */
 	public IFuture startService()
 	{
-		synchronized (modelRefCount)
-		{
-			Set loadableModels = getLoadableModels();
-			for (Iterator it = loadableModels.iterator(); it.hasNext(); )
-			{
-				String path = (String) it.next();
-				addModel(path);
-			}
+		final IFuture sFut = super.startService();
+		final Future ret = new Future();
 			
-			((ILibraryService)SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.get(new ThreadSuspendable())).addLibraryServiceListener(new ILibraryServiceListener()
+		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
 			{
-				public IFuture urlRemoved(URL url)
+				((ILibraryService)result).addLibraryServiceListener(new ILibraryServiceListener()
 				{
-					synchronized (modelRefCount)
+					public IFuture urlRemoved(URL url)
 					{
-						Set modelSet = (Set) urlEntries.remove(url);
-						if (modelSet != null)
+						synchronized (modelRefCount)
 						{
-							for (Iterator it = modelSet.iterator(); it.hasNext(); )
+							Set modelSet = (Set) urlEntries.remove(url);
+							if (modelSet != null)
 							{
-								String path = (String) it.next();
-								removeModel(path);
+								for (Iterator it = modelSet.iterator(); it.hasNext(); )
+								{
+									String path = (String) it.next();
+									removeModel(path);
+								}
 							}
 						}
+						return IFuture.DONE;
 					}
-					return new Future(null);
-				}
-				
-				public IFuture urlAdded(URL url)
-				{
-					synchronized (modelRefCount)
-					{
-						File dir = new File(url.getFile());
-						Set modelSet = new HashSet();
-						if (dir.isDirectory())
-							modelSet = searchDirectory(dir, false);
-						else if (dir.getName().endsWith(".jar"))
-							modelSet = searchJar(dir);
-						for (Iterator it = modelSet.iterator(); it.hasNext(); )
-							addModel((String) it.next());
-						urlEntries.put(url, modelSet);
-					}
-					return new Future(null);
-				}
-			});
-		}
-		
-		resourceDir = new File(System.getProperty("user.home") + File.separator + ".jadexwfms");
-		if (!resourceDir.exists())
-			resourceDir.mkdir();
-		if (!resourceDir.isDirectory())
-			throw new RuntimeException("Resource directory blocked " + resourceDir);
-		
-		File[] files = resourceDir.listFiles();
-		for (int i = 0; i < files.length; ++i)
-			if (files[i].isFile() && files[i].getName().endsWith(".jar"))
-			{
-				final File file = files[i];
-				SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-				{
 					
-					public void resultAvailable(Object result)
+					public IFuture urlAdded(URL url)
 					{
-						try
+						synchronized (modelRefCount)
 						{
-							((ILibraryService) result).addURL(file.toURI().toURL());
-						}	
-						catch (MalformedURLException e)
-						{
-							e.printStackTrace();
+							File dir = new File(url.getFile());
+							Set modelSet = new HashSet();
+							if (dir.isDirectory())
+								modelSet = searchDirectory(dir, false);
+							else if (dir.getName().endsWith(".jar"))
+								modelSet = searchJar(dir);
+							for (Iterator it = modelSet.iterator(); it.hasNext(); )
+								addModel((String) it.next());
+							urlEntries.put(url, modelSet);
 						}
+						return IFuture.DONE;
 					}
 				});
+				
+				
+				getLoadableModels().addResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						Set loadableModels = (Set) result;
+						synchronized (modelRefCount)
+						{
+							for (Iterator it = loadableModels.iterator(); it.hasNext(); )
+							{
+								String path = (String) it.next();
+								addModel(path);
+							}
+						}
+						
+						resourceDir = new File(System.getProperty("user.home") + File.separator + ".jadexwfms");
+						if (!resourceDir.exists())
+							resourceDir.mkdir();
+						if (!resourceDir.isDirectory())
+						{
+							ret.setException(new RuntimeException("Resource directory blocked " + resourceDir));
+							return;
+						}
+						
+						File[] files = resourceDir.listFiles();
+						for (int i = 0; i < files.length; ++i)
+							if (files[i].isFile() && files[i].getName().endsWith(".jar"))
+							{
+								final File file = files[i];
+								SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+								{
+									
+									public void resultAvailable(Object result)
+									{
+										((ILibraryService) result).addURL(LibraryService.toURL(file));
+									}
+								});
+							}
+						
+						sFut.addResultListener(new DelegationResultListener(ret));
+					};
+				});
 			}
+		});
 		
-		return super.startService();
-	}
-	
-	/**
-	 *  Shutdown the service.
-	 *  @param listener The listener.
-	 */
-	public void shutdownService(IResultListener listener)
-	{
-		if(listener!=null)
-			listener.resultAvailable(null);
+		return ret;
 	}
 	
 	/**
@@ -246,24 +248,39 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 	 * 
 	 * @return set of model paths
 	 */
-	public Set getLoadableModels()
+	public IFuture getLoadableModels()
 	{
-		synchronized (modelRefCount)
+		final Future ret = new Future();
+		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
 		{
-			//Set knownPaths = new HashSet(modelPaths.values());
-			Set modelSet = new HashSet();
-			List urls = (List) ((ILibraryService) SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable())).getURLs().get(new ThreadSuspendable());
-			for (Iterator it = urls.iterator(); it.hasNext(); )
+			public void customResultAvailable(Object result)
 			{
-				URL url = (URL) it.next();
-				File dir = new File(url.getFile());
-				if (dir.isDirectory())
-					modelSet.addAll(searchDirectory(dir, false));
-			}
-			//modelSet.removeAll(knownPaths);
-			return modelSet;
-		}
-		//return new HashSet();
+				((ILibraryService) result).getURLs().addResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						List urls = (List) result;
+						Set modelSet = new HashSet();
+						synchronized (modelRefCount)
+						{
+							//Set knownPaths = new HashSet(modelPaths.values());
+							for (Iterator it = urls.iterator(); it.hasNext(); )
+							{
+								URL url = (URL) it.next();
+								File dir = new File(url.getFile());
+								if (dir.isDirectory())
+									modelSet.addAll(searchDirectory(dir, false));
+							}
+							//modelSet.removeAll(knownPaths);
+							ret.setResult(modelSet);
+						}
+					}
+				});
+			};
+		});
+		
+		
+		return ret;
 	}
 	
 	private Set searchDirectory(File dir, boolean prependDir)
@@ -453,10 +470,18 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 		}
 	}
 	
-	private IFuture loadProcessModel(String filename)
+	private IFuture loadProcessModel(final String filename)
 	{
-		IExecutionService ex = (IExecutionService) SServiceProvider.getService(provider, IExecutionService.class).get(new ThreadSuspendable());
-		return ex.loadModel(filename, getImports());
+		final Future ret = new Future();
+		SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				IExecutionService ex = (IExecutionService) result;
+				ex.loadModel(filename, getImports()).addResultListener(new DelegationResultListener(ret));
+			}
+		});
+		return ret;
 	}
 	
 	

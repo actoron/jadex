@@ -39,7 +39,6 @@ public class ModelRepositorySubscriptionPlan extends Plan
 			
 			public IFuture processModelAdded(final ProcessRepositoryEvent event)
 			{
-				System.out.println(event);
 				return ea.scheduleStep(new IComponentStep()
 				{
 					public Object execute(IInternalAccess ia)

@@ -13,6 +13,7 @@
 		<import>jadex.wfms.bdi.*</import>
 		<import>jadex.wfms.bdi.ontology.*</import>
 		<import>jadex.wfms.client.*</import>
+		<import>jadex.wfms.service.IExternalWfmsService</import>
 		<import>jadex.wfms.service.listeners.LogEvent</import>
 	</imports>
 	
@@ -32,9 +33,19 @@
 	</beliefs>
 	
 	<goals>
+		<achievegoal name="discover_wfms" exported="true">
+			<parameter name="wfms" class="Collection" direction="out" />
+		</achievegoal>
+		
+		<achievegoal name="request_wfms_name" exported="true">
+			<parameter name="wfms" class="IExternalWfmsService" direction="in" />
+			<parameter name="name" class="Object" direction="out" />
+		</achievegoal>
+	
 		<achievegoal name="connect" exported="true">
-			<parameter name="user_name" class="String" />
-			<parameter name="auth_token" class="Object" />
+			<parameter name="wfms" class="IExternalWfmsService" direction="in" />
+			<parameter name="user_name" class="String" direction="in" />
+			<parameter name="auth_token" class="Object" direction="in" />
 			<parameter name="capabilities" class="Set" direction="out" />
 		</achievegoal>
 		
@@ -164,11 +175,37 @@
 	</goals>
 	
 	<plans>
+		<plan name="discover_wfms_plan">
+			<parameter name="wfms" class="Collection" direction ="out">
+				<goalmapping ref="discover_wfms.wfms"/>
+			</parameter>
+			<body class="DiscoverWfmsPlan" />
+			<trigger>
+				<goal ref="discover_wfms" />
+			</trigger>
+		</plan>
+		
+		<plan name="request_wfms_name_plan">
+			<parameter name="wfms" class="IExternalWfmsService" direction ="in">
+				<goalmapping ref="request_wfms_name.wfms"/>
+			</parameter>
+			<parameter name="name" class="Collection" direction ="out">
+				<goalmapping ref="request_wfms_name.name"/>
+			</parameter>
+			<body class="RequestWfmsNamePlan" />
+			<trigger>
+				<goal ref="request_wfms_name" />
+			</trigger>
+		</plan>
+		
 		<plan name="connect_plan">
-			<parameter name="user_name" class="String">
+			<parameter name="wfms" class="IExternalWfmsService" direction ="in">
+				<goalmapping ref="connect.wfms"/>
+			</parameter>
+			<parameter name="user_name" class="String" direction="in">
 				<goalmapping ref="connect.user_name"/>
 			</parameter>
-			<parameter name="auth_token" class="Object">
+			<parameter name="auth_token" class="Object" direction="in">
 				<goalmapping ref="connect.auth_token"/>
 			</parameter>
 			<parameter name="capabilities" class="Set" direction="out">

@@ -5,24 +5,27 @@ import jadex.bdi.planlib.iasteps.DispatchGoalStep;
 import jadex.bdi.planlib.iasteps.SetBeliefStep;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bridge.ComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.ChangeEvent;
-import jadex.commons.future.IFuture;
+import jadex.bridge.TerminationAdapter;
 import jadex.commons.gui.SGUI;
 import jadex.wfms.bdi.client.standard.parametergui.ActivityComponent;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
+import jadex.wfms.gui.images.SImage;
 import jadex.wfms.guicomponents.LoginDialog;
 import jadex.wfms.guicomponents.SGuiHelper;
+import jadex.wfms.service.IExternalWfmsService;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -53,8 +56,8 @@ public class StandardClientApplication
 	private static final JPanel EMPTY_PANEL = new JPanel();
 	
 	private static final String CONNECT_ICON_NAME = "Connection";
-	private static final String CONNECT_OFF_ICON_PATH = StandardClientApplication.class.getPackage().getName().replaceAll("\\.", "/").concat("/images/connection_off_small.png");
-	private static final String CONNECT_ON_ICON_PATH = StandardClientApplication.class.getPackage().getName().replaceAll("\\.", "/").concat("/images/connection_on_small.png");
+	private static final String CONNECT_OFF_ICON_PATH = SImage.IMAGE_PATH.concat("connection_off_small.png");
+	private static final String CONNECT_ON_ICON_PATH = SImage.IMAGE_PATH.concat("connection_on_small.png");
 	
 	private IBDIExternalAccess agent;
 	
@@ -83,12 +86,12 @@ public class StandardClientApplication
 		
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "dispose"; 
+			@XMLClassname("dispose") 
 			public Object execute(IInternalAccess ia)
 			{
-				ia.addComponentListener(new ComponentAdapter()
+				ia.addComponentListener(new TerminationAdapter()
 				{
-					public IFuture componentTerminating(ChangeEvent ce)
+					public void componentTerminated()
 					{
 						EventQueue.invokeLater(new Runnable()
 						{
@@ -98,7 +101,6 @@ public class StandardClientApplication
 								mainFrame.dispose();
 							}
 						});
-						return IFuture.DONE;
 					}
 				});
 				
@@ -120,7 +122,7 @@ public class StandardClientApplication
 							disconnect();
 						agent.scheduleStep(new IComponentStep()
 						{
-							public static final String XML_CLASSNAME = "kill"; 
+							@XMLClassname("kill") 
 							public Object execute(IInternalAccess ia)
 							{
 								ia.killComponent();
@@ -201,29 +203,39 @@ public class StandardClientApplication
 	
 	private void showConnectDialog()
 	{
-		while (!connected)
+		mainFrame.setEnabled(false);
+		final LoginDialog loginDialog = new LoginDialog(agent, mainFrame);
+		loginDialog.setModal(false);
+		loginDialog.setLocation(SGUI.calculateMiddlePosition(loginDialog));
+		loginDialog.setVisible(true);
+		loginDialog.addComponentListener(new ComponentAdapter()
 		{
-			LoginDialog loginDialog = new LoginDialog(mainFrame);
-			loginDialog.setLocation(SGUI.calculateMiddlePosition(loginDialog));
-			loginDialog.setVisible(true);
-			try
+			public void componentHidden(ComponentEvent e)
 			{
-				connect(loginDialog.getUserName(), loginDialog.getPassword());
-				connected = true;
-				statusBar.replaceIcon(CONNECT_ICON_NAME, CONNECT_ON_ICON_PATH);
-				statusBar.setText("Connected.");
+				mainFrame.setEnabled(true);
+				if (loginDialog.isConnect())
+				{
+					try
+					{
+						connect(loginDialog.getWfms(), loginDialog.getUserName(), loginDialog.getPassword());
+						connected = true;
+						statusBar.replaceIcon(CONNECT_ICON_NAME, CONNECT_ON_ICON_PATH);
+						statusBar.setText("Connected.");
+					}
+					catch (GoalFailureException e1)
+					{
+						e1.printStackTrace();
+						cleanUp();
+					}
+				}
 			}
-			catch (GoalFailureException e)
-			{
-				e.printStackTrace();
-				cleanUp();
-			}
-		}
+		});
 	}
 	
-	private void connect(final String userName, final Object authToken)
+	private void connect(final IExternalWfmsService wfms, final String userName, final Object authToken)
 	{
 		agent.scheduleStep(new DispatchGoalStep("clientcap.connect", new HashMap() {{
+			   put("wfms", wfms);
 			   put("user_name", userName);
 			   put("auth_token", authToken);
 			}})).addResultListener(new SwingDefaultResultListener()
@@ -560,7 +572,7 @@ public class StandardClientApplication
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				System.out.println(e.getSource());
+				System.out.println("Client-side input: " + e.getSource());
 			}
 		};
 		agent.scheduleStep(new SetBeliefStep("clientcap.log_controller", lEvent));
@@ -665,6 +677,7 @@ public class StandardClientApplication
 			put("clientcap.remove_user_activity_controller", null);
 			put("clientcap.add_process_model_controller", null);
 			put("clientcap.remove_process_model_controller", null);
+			put("clientcap.log_controller", null);
 		}}));
 		
 		/*agent.getBeliefbase().setBeliefFact("clientcap.add_workitem_controller", null);

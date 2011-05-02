@@ -5,6 +5,7 @@ import jadex.bpmn.model.MParameter;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.collection.TreeNode;
 import jadex.commons.gui.SGUI;
+import jadex.wfms.gui.images.SImage;
 import jadex.wfms.simulation.ModelTreeNode;
 import jadex.wfms.simulation.Scenario;
 import jadex.wfms.simulation.stateset.gui.IStatePanel;
@@ -72,11 +73,10 @@ public class SimulationWindow extends JFrame
 	public static final String REMOVE_SCENARIO_ITEM_NAME = "Remove Scenario";
 	public static final String AUTO_FILL_MENU_ITEM_NAME = "Autofill States";
 	
-	private static final String IMAGE_PATH = "/" + SimulationWindow.class.getPackage().getName().replaceAll("\\.", "/") + "/images/";
-	public static final ImageIcon GPMN_ICON = createImageIcon(IMAGE_PATH + "gpmnicon.png");
-	public static final ImageIcon BPMN_ICON = createImageIcon(IMAGE_PATH + "bpmnicon.png");
-	public static final ImageIcon TASK_ICON = createImageIcon(IMAGE_PATH + "taskicon.png");
-	public static final ImageIcon PARAM_ICON = createImageIcon(IMAGE_PATH + "paramicon.png");
+	public static final ImageIcon GPMN_ICON = createImageIcon("/" + SImage.IMAGE_PATH + "gpmnicon.png");
+	public static final ImageIcon BPMN_ICON = createImageIcon("/" + SImage.IMAGE_PATH + "bpmnicon.png");
+	public static final ImageIcon TASK_ICON = createImageIcon("/" + SImage.IMAGE_PATH + "taskicon.png");
+	public static final ImageIcon PARAM_ICON = createImageIcon("/" + SImage.IMAGE_PATH + "paramicon.png");
 	
 	//new ImageIcon(SimulationWindow.class.getPackage().getName().replaceAll("\\.", "/") + "/images/gpmnicon.png");
 	
