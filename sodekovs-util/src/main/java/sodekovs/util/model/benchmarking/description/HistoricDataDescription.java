@@ -3,11 +3,16 @@ package sodekovs.util.model.benchmarking.description;
 import java.io.Serializable;
 
 /**
- * An benchmark description.
+ * A historic data description.
  */
 public class HistoricDataDescription implements IHistoricDataDescription, Serializable {
 	// -------- attributes ----------
 
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6576374622465419808L;
 
 	/** Attribute for slot name. */
 	protected String name;

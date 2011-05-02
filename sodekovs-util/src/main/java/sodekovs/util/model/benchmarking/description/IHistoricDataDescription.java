@@ -1,6 +1,5 @@
 package sodekovs.util.model.benchmarking.description;
 
-import jadex.bridge.IComponentIdentifier;
 
 /**
  *  Interface for historic data descriptions.
