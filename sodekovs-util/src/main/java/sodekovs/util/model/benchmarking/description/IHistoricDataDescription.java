@@ -37,9 +37,14 @@ public interface IHistoricDataDescription
 	public String getLogAsPNG();
 	
 	/**
+	 *  Set the path of the file that contains a visualization of the log entries of this historic data.
+	 *  @return type The type.
+	 */
+	public void setLogAsPNG(String path);
+	
+	/**
 	 *  Get the content of the main file responsible for creating the png of the history.
 	 *  @return type The type.
 	 */
 	public String getGnuPlotMainFileContent();
-	
 }

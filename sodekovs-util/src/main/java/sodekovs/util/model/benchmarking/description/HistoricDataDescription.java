@@ -36,12 +36,12 @@ public class HistoricDataDescription implements IHistoricDataDescription, Serial
 	
 	// -------- constructor --------
 
-//	/**
-//	 * Create a new historic data description.
-//	 */
-//	public HistoricDataDescription() {
-//		this(null);
-//	}
+	/**
+	 * Create a new historic data description.
+	 */
+	public HistoricDataDescription() {
+		this(null, null, null,null, null,null );
+	}
 
 
 	/**
@@ -110,7 +110,7 @@ public class HistoricDataDescription implements IHistoricDataDescription, Serial
 	public String getGnuPlotMainFileContent() {
 		return gnuPlotMainFileContent;
 	}
-
+	
 	public void setGnuPlotMainFileContent(String gnuPlotMainFileContent) {
 		this.gnuPlotMainFileContent = gnuPlotMainFileContent;
 	}

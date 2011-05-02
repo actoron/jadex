@@ -87,7 +87,8 @@ public class ScheduleLogger
 	
 	private String calculateTimestamp(){
 		GregorianCalendar cal = (GregorianCalendar) GregorianCalendar.getInstance();
-		return String.valueOf(cal.get(Calendar.HOUR_OF_DAY)) + "-" + String.valueOf(cal.get(Calendar.MINUTE)) + "-" + String.valueOf(cal.get(Calendar.SECOND));
+		String month = String.valueOf(cal.get(Calendar.MONTH)+1);
+		return String.valueOf(cal.get(Calendar.HOUR_OF_DAY)) + "-" + String.valueOf(cal.get(Calendar.MINUTE)) + "-" + String.valueOf(cal.get(Calendar.SECOND) + " -- " + cal.get(Calendar.DAY_OF_MONTH)+ "-" + month + "-" + cal.get(Calendar.YEAR));
 	}
 
 	/**

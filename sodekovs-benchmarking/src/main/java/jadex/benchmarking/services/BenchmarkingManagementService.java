@@ -19,6 +19,7 @@ import java.util.Map;
 
 import sodekovs.util.gnuplot.CreateImagesThread;
 import sodekovs.util.gnuplot.persistence.LogDAO;
+import sodekovs.util.misc.GlobalConstants;
 import sodekovs.util.model.benchmarking.description.BenchmarkingDescription;
 import sodekovs.util.model.benchmarking.description.HistoricDataDescription;
 import sodekovs.util.model.benchmarking.description.IBenchmarkingDescription;
@@ -144,12 +145,13 @@ public class BenchmarkingManagementService extends BasicService implements IBenc
 				// Ignore search failures of remote dfs
 				CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new IResultListener() {
 					public void resultAvailable(Object res) {
-						// System.out.println("Part 2 length: "+ ((Collection)result).size());
+						 System.out.println("Part 2 length: "+ ((Collection)res).size());
 						// Add all services of all remote dfs
 						for (Iterator it = ((Collection) res).iterator(); it.hasNext();) {
 							IHistoricDataDescription[] histDataDesc = (IHistoricDataDescription[]) it.next();
 							if (histDataDesc != null) {
-								for (IHistoricDataDescription desc : histDataDesc) {
+								for (IHistoricDataDescription desc : histDataDesc) {									
+									checkLocalPaths(desc);
 									historicData.add(desc);
 								}
 							}
@@ -185,5 +187,16 @@ public class BenchmarkingManagementService extends BasicService implements IBenc
 		});
 
 		return fut;
+	}
+	
+	/**
+	 * Check if path to PNG points to local directory and change if not
+	 * May happen, if data is received from remote benchmark experiments.
+	 * @param desc
+	 */
+	private void checkLocalPaths(IHistoricDataDescription desc){
+		if(!desc.getLogAsPNG().startsWith(GlobalConstants.LOGGING_DIRECTORY)){
+			desc.setLogAsPNG(GlobalConstants.LOGGING_DIRECTORY + "\\" + desc.getTimestamp() + ".png");
+		}
 	}
 }

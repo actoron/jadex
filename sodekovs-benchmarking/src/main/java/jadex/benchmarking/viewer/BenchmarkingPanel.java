@@ -428,7 +428,7 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 		this.benchServ.getHistoryOfBenchmarkExperiments().addResultListener(new SwingDefaultResultListener(this) {
 			public void customResultAvailable(Object result) {
 				IHistoricDataDescription[] histData = (IHistoricDataDescription[]) result;
-				System.out.println("Found: Historic Data" + histData.length);
+				System.out.println("Found: Historic Data: " + histData.length);
 
 				// create PNG, if required (--> necessary, if result comes from remote platform)
 				// if(old_ads == null || !Arrays.equals(old_ads, benchmarks))
