@@ -19,7 +19,7 @@ public class CreateImage {
 
 		// Edit main file in order to add current user directory to output file
 		newMainFile[newMainFile.length - 3] = "set output '" + GlobalConstants.LOGGING_DIRECTORY + "\\" + data.getTimestamp() + ".png'";
-		newMainFile[newMainFile.length - 2] = "plot '" + GlobalConstants.LOGGING_DIRECTORY + "\\" + data.getTimestamp() + ".dat' u 1:2 w impulse title \"Observed Events\"";
+		newMainFile[newMainFile.length - 2] = "plot '" + GlobalConstants.LOGGING_DIRECTORY + "\\" + data.getTimestamp() + ".dat' u 1:2 w impulse lt -1 title \"Observed Events\"";
 		newMainFile[newMainFile.length - 1] = "pause -1";
 
 		// Write content of data log file to hard disk. this file is needed in order to create the png-file in the next step.

@@ -41,8 +41,17 @@ public class GnuPlotMainFileEventFormatter extends Formatter {
 		} else if (rec.getMessage().startsWith(Constants.PREPARE_GNUPLOT_SUFFIX)) {
 			buf.append(createGnuPlotSuffix());
 		} else {			
+			//blue color for create action
+			String textcolor = "textcolor lt 3";
+			if(rec.getMessage().startsWith("D")){
+				//red color for create action
+				textcolor = "textcolor lt 1";
+			}
 			//500: to align label a little bit left of the value on the graph
-			buf.append("set label '"+ rec.getMessage() +"' at " + String.valueOf((clockService.getTime() - starttime)-500) +",1.25");
+//			buf.append("set label '"+ rec.getMessage() +"' at " + String.valueOf((clockService.getTime() - starttime)-500) +",1.25 " + textcolor);
+			buf.append("set label '"+ rec.getMessage().substring(0, 2) +"' at " + String.valueOf((clockService.getTime() - starttime)) +",1.4 " + textcolor);
+			buf.append('\n');
+			buf.append("set label '"+ rec.getMessage().substring(3) +"' at " + String.valueOf((clockService.getTime() - starttime)-500) +",1.25 " + textcolor);
 			buf.append('\n');
 		}
 		return buf.toString();
@@ -55,7 +64,7 @@ public class GnuPlotMainFileEventFormatter extends Formatter {
 	 */
 	private String createGnuPlotPrefix() {
 		StringBuffer buffer = new StringBuffer(1000);
-		buffer.append("set title \"History of CRUD events of the benchmark.\"");
+		buffer.append("set title \"History of CRUD events of the benchmark: " + fileTimestamp + "\"");
 		buffer.append("\n");
 		buffer.append("set xlab \"Relative time\"");
 		buffer.append("\n");
