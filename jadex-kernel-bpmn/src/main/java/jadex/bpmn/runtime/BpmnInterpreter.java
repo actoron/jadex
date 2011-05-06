@@ -27,6 +27,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
+import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
@@ -41,6 +42,7 @@ import jadex.bridge.IModelInfo;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.MessageType;
 import jadex.bridge.RemoteChangeListenerHandler;
+import jadex.bridge.RemoteComponentListener;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
@@ -63,6 +65,7 @@ import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SJavaParser;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -82,23 +85,23 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 {	
 	//-------- static part --------
 	
-	/** The change event prefix for the history. */
-	public static final String	EVENT_HISTORY	= "history";
+//	/** The change event prefix for the history. */
+//	public static final String	EVENT_HISTORY	= "history";
 	
 	/** The change event prefix denoting a thread event. */
-	public static final String	EVENT_THREAD	= "thread";
+	public static final String	TYPE_THREAD	= "thread";
 	
-	/** The change event denoting a step for the history. */
-	public static final String	EVENT_HISTORY_ADDED	= EVENT_HISTORY + RemoteChangeListenerHandler.EVENT_OCCURRED;
-	
-	/** The change event denoting a new thread. */
-	public static final String	EVENT_THREAD_ADDED	= EVENT_THREAD + RemoteChangeListenerHandler.EVENT_ADDED;
-	
-	/** The change event denoting a changed thread. */
-	public static final String	EVENT_THREAD_CHANGED	= EVENT_THREAD + RemoteChangeListenerHandler.EVENT_CHANGED;
-	
-	/** The change event denoting a finished thread. */
-	public static final String	EVENT_THREAD_REMOVED	= EVENT_THREAD + RemoteChangeListenerHandler.EVENT_REMOVED;
+//	/** The change event denoting a step for the history. */
+//	public static final String	EVENT_HISTORY_ADDED	= EVENT_HISTORY + RemoteChangeListenerHandler.EVENT_OCCURRED;
+//	
+//	/** The change event denoting a new thread. */
+//	public static final String	EVENT_THREAD_ADDED	= EVENT_THREAD + RemoteChangeListenerHandler.EVENT_ADDED;
+//	
+//	/** The change event denoting a changed thread. */
+//	public static final String	EVENT_THREAD_CHANGED	= EVENT_THREAD + RemoteChangeListenerHandler.EVENT_CHANGED;
+//	
+//	/** The change event denoting a finished thread. */
+//	public static final String	EVENT_THREAD_REMOVED	= EVENT_THREAD + RemoteChangeListenerHandler.EVENT_REMOVED;
 	
 	/** The activity execution handlers (activity type -> handler). */
 	public static final Map DEFAULT_ACTIVITY_HANDLERS;
@@ -195,8 +198,8 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	/** The thread context. */
 	protected ThreadContext	context;
 	
-	/** The change listeners. */
-	protected List listeners;
+//	/** The change listeners. */
+//	protected List listeners;
 	
 	/** The context variables. */
 	protected Map variables;
@@ -260,7 +263,10 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		{
 			ProcessThread	thread	= new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
 			context.addThread(thread);
-			notifyListeners(EVENT_THREAD_ADDED, thread);
+//			notifyListeners(EVENT_THREAD_ADDED, thread);
+			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_THREAD, thread.getClass().getName(), 
+				thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread)));
+
 		}
 		initedflag = true;	// No further init for BDI plan.
 	}	
@@ -500,7 +506,10 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 				{
 					ProcessThread	thread	= new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
 					context.addThread(thread);
-					notifyListeners(EVENT_THREAD_ADDED, thread);
+//					notifyListeners(EVENT_THREAD_ADDED, thread);
+					notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_THREAD, thread.getClass().getName(), 
+						thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread)));
+
 				}
 				
 				// Notify cms that init is finished.
@@ -991,7 +1000,9 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 			if(handler==null)
 				throw new UnsupportedOperationException("No handler for activity: "+thread);
 
-			notifyListeners(EVENT_HISTORY_ADDED, thread);
+//			notifyListeners(EVENT_HISTORY_ADDED, thread);
+			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_THREAD, thread.getClass().getName(), 
+				thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread)));
 			
 			if(thread.getLastEdge()!=null && thread.getLastEdge().getSource()!=null)
 				fireEndActivity(thread.getId(), thread.getLastEdge().getSource());
@@ -1026,7 +1037,9 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 				}
 			}
 			
-			notifyListeners(EVENT_THREAD_CHANGED, thread);
+//			notifyListeners(EVENT_THREAD_CHANGED, thread);
+			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, TYPE_THREAD, thread.getClass().getName(), 
+				thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread)));
 		}
 	}
 
@@ -1068,7 +1081,10 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 //						System.out.println("Notify: "+activity+" "+thread+" "+event);
 						getStepHandler(activity).step(activity, BpmnInterpreter.this, thread, event);
 						thread.setNonWaiting();
-						notifyListeners(EVENT_THREAD_CHANGED, thread);
+//						notifyListeners(EVENT_THREAD_CHANGED, thread);
+						notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, TYPE_THREAD, thread.getClass().getName(), 
+							thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread)));
+
 					}
 					else
 					{
@@ -1084,7 +1100,9 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 //				System.out.println("Notify: "+activity+" "+thread+" "+event);
 				getStepHandler(activity).step(activity, BpmnInterpreter.this, thread, event);
 				thread.setNonWaiting();
-				notifyListeners(EVENT_THREAD_CHANGED, thread);
+//				notifyListeners(EVENT_THREAD_CHANGED, thread);
+				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, TYPE_THREAD, thread.getClass().getName(), 
+					thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread)));
 			}
 			else
 			{
@@ -1170,48 +1188,48 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		return this.fetcher;
 	}
 	
-	/**
-	 *  Add a change listener.
-	 *  @param listener The listener.
-	 */
-	public void addChangeListener(IChangeListener listener)
-	{
-		if(listeners==null)
-			listeners = new ArrayList();
-		listeners.add(listener);
-	}
+//	/**
+//	 *  Add a change listener.
+//	 *  @param listener The listener.
+//	 */
+//	public void addChangeListener(IChangeListener listener)
+//	{
+//		if(listeners==null)
+//			listeners = new ArrayList();
+//		listeners.add(listener);
+//	}
+//	
+//	/**
+//	 *  Remove a change listener.
+//	 *  @param listener The listener.
+//	 */
+//	public void removeChangeListener(IChangeListener listener)
+//	{
+//		if(listeners!=null)
+//			listeners.remove(listener);
+//	}
 	
-	/**
-	 *  Remove a change listener.
-	 *  @param listener The listener.
-	 */
-	public void removeChangeListener(IChangeListener listener)
-	{
-		if(listeners!=null)
-			listeners.remove(listener);
-	}
-	
-	/**
-	 *  Notify the change listeners.
-	 */
-	public void notifyListeners(String type, ProcessThread thread)
-	{
-		if(listeners!=null)
-		{
-			ProcessThreadInfo	info	= new ProcessThreadInfo(thread.getId(), thread.getActivity().getBreakpointId(),
-				thread.getActivity().getPool()!=null ? thread.getActivity().getPool().getName() : null,
-				thread.getActivity().getLane()!=null ? thread.getActivity().getLane().getName() : null,
-				thread.getException()!=null ? thread.getException().toString() : "",
-				thread.isWaiting(), thread.getData()!=null ? thread.getData().toString() : "");
-			ChangeEvent	event	= new ChangeEvent(null, type, info);
-//			System.out.println("change: "+event);
-			
-			for(int i=0; i<listeners.size(); i++)
-			{
-				((IChangeListener)listeners.get(i)).changeOccurred(event);
-			}
-		}
-	}
+//	/**
+//	 *  Notify the change listeners.
+//	 */
+//	public void notifyListeners(String type, ProcessThread thread)
+//	{
+//		if(listeners!=null)
+//		{
+//			ProcessThreadInfo	info	= new ProcessThreadInfo(thread.getId(), thread.getActivity().getBreakpointId(),
+//				thread.getActivity().getPool()!=null ? thread.getActivity().getPool().getName() : null,
+//				thread.getActivity().getLane()!=null ? thread.getActivity().getLane().getName() : null,
+//				thread.getException()!=null ? thread.getException().toString() : "",
+//				thread.isWaiting(), thread.getData()!=null ? thread.getData().toString() : "");
+//			ChangeEvent	event	= new ChangeEvent(null, type, info);
+////			System.out.println("change: "+event);
+//			
+//			for(int i=0; i<listeners.size(); i++)
+//			{
+//				((IChangeListener)listeners.get(i)).changeOccurred(event);
+//			}
+//		}
+//	}
 	
 	/**
 	 *  Test if the given context variable is declared.
@@ -1446,11 +1464,13 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		act.addIncomingSequenceEdge(edge);
 		MPool pl = model.getPool(pool);
 		act.setPool(pl);
-		ProcessThread pt = new ProcessThread(""+idcnt++, act, context, this);
-		pt.setLastEdge(edge);
-		pt.setParameterValue("step", new Object[]{step, ret});
-		context.addExternalThread(pt);
-		notifyListeners(EVENT_THREAD_ADDED, pt);
+		ProcessThread thread = new ProcessThread(""+idcnt++, act, context, this);
+		thread.setLastEdge(edge);
+		thread.setParameterValue("step", new Object[]{step, ret});
+		context.addExternalThread(thread);
+//		notifyListeners(EVENT_THREAD_ADDED, pt);
+		notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_THREAD, thread.getClass().getName(), 
+			thread.getId(), getComponentIdentifier(), new ProcessThreadInfo(thread.getId(), act.getName(), pool, lane)));
 		return ret;
 	}
 	
@@ -1521,6 +1541,11 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	{
 		if(componentlisteners==null)
 			componentlisteners = new ArrayList();
+		
+		// Hack! How to find out if remote listener?
+		if(Proxy.isProxyClass(listener.getClass()))
+			listener = new RemoteComponentListener(access, listener);
+		
 		componentlisteners.add(listener);
 		return IFuture.DONE;
 	}
@@ -1531,9 +1556,59 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	 */
 	public IFuture removeComponentListener(IComponentListener listener)
 	{
+		// Hack! How to find out if remote listener?
+		if(Proxy.isProxyClass(listener.getClass()))
+			listener = new RemoteComponentListener(access, listener);
+		
 		if(componentlisteners!=null)
 			componentlisteners.remove(listener);
+		
+//		System.out.println("cl: "+componentlisteners);
 		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Notify the component listeners.
+	 */
+	public void notifyListeners(IComponentChangeEvent event)
+	{
+		if(componentlisteners!=null)
+		{
+			IComponentListener[] lstnrs = (IComponentListener[])componentlisteners.toArray(new IComponentListener[componentlisteners.size()]);
+			for(int i=0; i<lstnrs.length; i++)
+			{
+				final IComponentListener lis = lstnrs[i];
+				
+				if(lis.getFilter().filter(event))
+				{
+					lis.eventOccured(event).addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object result)
+						{
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							//Print exception?
+							componentlisteners.remove(lis);
+						}
+					});
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public ProcessThreadInfo createProcessThreadInfo(ProcessThread thread)
+	{
+		 ProcessThreadInfo info = new ProcessThreadInfo(thread.getId(), thread.getActivity().getBreakpointId(),
+            thread.getActivity().getPool()!=null ? thread.getActivity().getPool().getName() : null,
+            thread.getActivity().getLane()!=null ? thread.getActivity().getLane().getName() : null,
+            thread.getException()!=null ? thread.getException().toString() : "",
+            thread.isWaiting(), thread.getData()!=null ? thread.getData().toString() : "");
+		 return info;
 	}
 	
 //	/**

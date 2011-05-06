@@ -78,7 +78,7 @@ public class LogService extends BasicService implements ILogService
 							
 							public IFuture componentAdded(final IComponentDescription desc)
 							{
-								if(!sid.getProviderId().equals(desc.getParent()))
+								if(!sid.getProviderId().equals(desc.getName().getParent()))
 									return IFuture.DONE;
 								IComponentChangeEvent ce = new ComponentChangeEvent()
 								{

@@ -119,7 +119,7 @@ public class MicroAgentViewPanel extends JPanel
 					{
 //						if(laststep!=null)
 //							step.removeJavaRootObject(laststep);
-						step.setText(cce.getDetails());
+						step.setText((String)cce.getDetails());
 						laststep = step;
 					}
 				}

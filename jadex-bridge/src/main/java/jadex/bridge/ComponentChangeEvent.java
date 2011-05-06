@@ -11,7 +11,9 @@ import jadex.commons.future.IResultListener;
 
 import java.util.Collection;
 
-
+/**
+ *  The component change event. 
+ */
 public class ComponentChangeEvent implements IComponentChangeEvent
 {
 	/** The time of the event. */
@@ -39,7 +41,7 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	protected String reason;
 	
 	/** Event details (e.g. step details of micro agents). */
-	protected String details;
+	protected Object details;
 	
 	/**
 	 *  Create a new event.
@@ -52,7 +54,7 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	 *  Create a new event.
 	 */
 	public ComponentChangeEvent(String eventtype, String sourcecategory, String sourcetype, 
-		String sourcename, IComponentIdentifier cid, String details)
+		String sourcename, IComponentIdentifier cid, Object details)
 	{
 		this(eventtype, sourcecategory, sourcetype, sourcename, cid, null, details, 0);
 	}
@@ -61,7 +63,7 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	 *  Create a new event.
 	 */
 	public ComponentChangeEvent(String eventtype, String sourcecategory, String sourcetype, 
-		String sourcename, IComponentIdentifier cid, String reason, String details, long time)
+		String sourcename, IComponentIdentifier cid, String reason, Object details, long time)
 	{
 		this.eventtype = eventtype;
 		this.time = time;
@@ -149,7 +151,7 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	 *  Get the details.
 	 *  @return The details.
 	 */
-	public String getDetails()
+	public Object getDetails()
 	{
 		return details;
 	}
@@ -232,7 +234,7 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	 *  Set the details.
 	 *  @param details The details to set.
 	 */
-	public void setDetails(String details)
+	public void setDetails(Object details)
 	{
 		this.details = details;
 	}

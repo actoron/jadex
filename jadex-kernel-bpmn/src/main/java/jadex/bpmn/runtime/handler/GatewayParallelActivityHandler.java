@@ -5,6 +5,8 @@ import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.ComponentChangeEvent;
+import jadex.bridge.IComponentChangeEvent;
 import jadex.commons.SUtil;
 
 import java.util.HashSet;
@@ -46,7 +48,10 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 					ProcessThread	newthread	= thread.createCopy();
 					newthread.setLastEdge((MSequenceEdge)outgoing.get(i));
 					thread.getThreadContext().addThread(newthread);
-					instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_ADDED, newthread);
+//					instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_ADDED, newthread);
+					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, instance.TYPE_THREAD, thread.getClass().getName(), 
+						thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(thread));
+					instance.notifyListeners(cce);
 				}
 			}
 		}
@@ -119,7 +124,10 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 					}
 					
 					thread.getThreadContext().removeThread(pt);
-					instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, pt);
+//					instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, pt);
+					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, instance.TYPE_THREAD, thread.getClass().getName(), 
+						thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(thread));
+					instance.notifyListeners(cce);
 				}
 			}
 			else

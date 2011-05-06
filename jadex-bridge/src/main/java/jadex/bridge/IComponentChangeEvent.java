@@ -67,7 +67,7 @@ public interface IComponentChangeEvent
 	 *  Get the details.
 	 *  @return The details.
 	 */
-	public String getDetails();
+	public Object getDetails();
 	
 	/**
 	 *  Get the bulk events.

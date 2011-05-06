@@ -8,6 +8,8 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IStepHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ThreadContext;
+import jadex.bridge.ComponentChangeEvent;
+import jadex.bridge.IComponentChangeEvent;
 
 import java.util.Iterator;
 import java.util.List;
@@ -135,11 +137,19 @@ public class DefaultStepHandler implements IStepHandler
 			thread.setNonWaiting();
 			// Todo: Callbacks for aborted threads (to abort external activities)
 			thread.getThreadContext().removeSubcontext(remove);
+			
+			
 			for(Iterator it=remove.getAllThreads().iterator(); it.hasNext(); )
 			{
-				instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, (ProcessThread)it.next());
+				ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, instance.TYPE_THREAD, thread.getClass().getName(), 
+					thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(thread));
+				instance.notifyListeners(cce);
+//				instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, (ProcessThread)it.next());
 			}
-			instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_CHANGED, thread);
+			ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, instance.TYPE_THREAD, thread.getClass().getName(), 
+				thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(thread));
+			instance.notifyListeners(cce);
+//			instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_CHANGED, thread);
 		}
 
 		if(next!=null)
@@ -169,7 +179,10 @@ public class DefaultStepHandler implements IStepHandler
 		else if(next==null)
 		{
 			thread.getThreadContext().removeThread(thread);
-			instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, thread);
+//			instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, thread);
+			ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, instance.TYPE_THREAD, thread.getClass().getName(), 
+				thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(thread));
+			instance.notifyListeners(cce);
 		} 
 		else
 		{

@@ -1,5 +1,6 @@
 package jadex.bpmn.tools;
 
+import jadex.bpmn.runtime.ProcessThread;
 import jadex.commons.SUtil;
 
 
@@ -65,7 +66,7 @@ public class ProcessThreadInfo
 		this.waiting = waiting;
 		this.data = data;
 	}
-
+	
 	//-------- methods --------
 
 	/**

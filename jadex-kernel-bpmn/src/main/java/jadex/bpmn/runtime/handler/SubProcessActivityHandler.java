@@ -7,7 +7,9 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ProcessThreadValueFetcher;
 import jadex.bpmn.runtime.ThreadContext;
+import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.CreationInfo;
+import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
@@ -72,7 +74,10 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 							ProcessThread subthread = new ProcessThread(thread.getId()+":"+thread.idcnt++, (MActivity)start.get(i), subcontext, instance);
 							subthread.setParameterValue("item", value);	// Hack!!! parameter not declared?
 							subcontext.addThread(subthread);
-							instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_ADDED, subthread);
+//							instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_ADDED, subthread);
+							ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, instance.TYPE_THREAD, subthread.getClass().getName(), 
+								subthread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(subthread));
+							instance.notifyListeners(cce);
 						}
 					}
 				}
@@ -89,7 +94,10 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				{
 					ProcessThread subthread = new ProcessThread(thread.getId()+":"+thread.idcnt++, (MActivity)start.get(i), subcontext, instance);
 					subcontext.addThread(subthread);
-					instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_ADDED, subthread);
+//					instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_ADDED, subthread);
+					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, instance.TYPE_THREAD, subthread.getClass().getName(), 
+						subthread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(subthread));
+					instance.notifyListeners(cce);
 				}
 			}
 			

@@ -52,6 +52,7 @@ import java.util.Map;
  */
 public class MicroAgentInterpreter implements IComponentInstance
 {
+	/** Constant for step event. */
 	public static final String TYPE_STEP = "step";
 	
 	//-------- attributes --------
@@ -347,9 +348,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 				{	
 					exitState();
 					
-					// todo:
-//					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, null,  microagent.getComponentIdentifier());
-					notifyTerminatingListeners();
+					ComponentChangeEvent.dispatchTerminatingEvent(adapter, getAgentModel(), getServiceProvider(), componentlisteners, null);
 					
 					microagent.agentKilled().addResultListener(microagent.createResultListener(new IResultListener()
 					{
@@ -358,9 +357,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 							nosteps = true;
 							exitState();
 							
-							// todo:
-//							ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, null,  microagent.getComponentIdentifier());
-							notifyTerminatedListeners();
+							ComponentChangeEvent.dispatchTerminatedEvent(adapter, getAgentModel(), getServiceProvider(), componentlisteners, null);
 							
 							IComponentIdentifier cid = adapter.getComponentIdentifier();
 							ret.setResult(cid);							
@@ -803,11 +800,11 @@ public class MicroAgentInterpreter implements IComponentInstance
 			IComponentListener[] lstnrs = (IComponentListener[])componentlisteners.toArray(new IComponentListener[componentlisteners.size()]);
 			for(int i=0; i<lstnrs.length; i++)
 			{
-				final IComponentListener l = lstnrs[i];
+				final IComponentListener lis = lstnrs[i];
 				
-				if(l.getFilter().filter(event))
+				if(lis.getFilter().filter(event))
 				{
-					l.eventOccured(event).addResultListener(new IResultListener()
+					lis.eventOccured(event).addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -816,28 +813,12 @@ public class MicroAgentInterpreter implements IComponentInstance
 						public void exceptionOccurred(Exception exception)
 						{
 							//Print exception?
-							componentlisteners.remove(l);
+							componentlisteners.remove(lis);
 						}
 					});
 				}
 			}
 		}
-	}
-	
-	/**
-	 *  Notify the component listeners.
-	 */
-	public void notifyTerminatedListeners()
-	{
-		ComponentChangeEvent.dispatchTerminatedEvent(adapter, getAgentModel(), getServiceProvider(), componentlisteners, null);
-	}
-	
-	/**
-	 *  Notify the component listeners.
-	 */
-	public void notifyTerminatingListeners()
-	{
-		ComponentChangeEvent.dispatchTerminatingEvent(adapter, getAgentModel(), getServiceProvider(), componentlisteners, null);
 	}
 	
 	/**
