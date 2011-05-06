@@ -337,7 +337,7 @@ public class DebuggerMainPanel extends JSplitPane
 				{			
 					public IFuture componentChanged(IComponentDescription desc)
 					{
-						System.out.println("changed: "+desc.getName());
+//						System.out.println("changed: "+desc.getName());
 						if(desc.getName().equals(DebuggerMainPanel.this.desc.getName()))
 							updatePanel(desc);
 						return IFuture.DONE;
@@ -385,7 +385,7 @@ public class DebuggerMainPanel extends JSplitPane
 		{
 			public void run()
 			{
-				System.out.println("update: "+desc);
+//				System.out.println("update: "+desc);
 				pause.setEnabled(!IComponentDescription.STATE_SUSPENDED.equals(desc.getState()));
 				step.setEnabled(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()));
 //					&& IComponentDescription.PROCESSINGSTATE_READY.equals(desc.getProcessingState()));
