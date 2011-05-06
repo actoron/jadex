@@ -76,7 +76,7 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 		{
 			inited	= true;
 			this.root	= instance;
-			assert	desc.getParent()==null : "First component must be root component.";
+			assert	desc.getName().getParent()==null : "First component must be root component.";
 			
 			
 			Map	args	= null;

@@ -705,7 +705,7 @@ public class ComponentTreePanel extends JSplitPane
 							IComponentDescription	root	= null;
 							for(int i=0; root==null && i<descriptions.length; i++)
 							{
-								if(descriptions[i].getParent()==null)
+								if(descriptions[i].getName().getParent()==null)
 								{
 									root	= descriptions[i];
 								}

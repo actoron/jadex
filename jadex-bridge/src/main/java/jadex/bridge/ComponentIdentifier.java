@@ -248,6 +248,40 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 		else
 			return false;
 	}
+	
+	/**
+	 *  Get the parent identifier.
+	 *  @return The parent identifier (if any).
+	 */
+	public IComponentIdentifier getParent()
+	{
+		IComponentIdentifier ret = null;
+		int idx = name.lastIndexOf(".");
+		if(idx!=-1)
+		{
+			String paname = name.substring(0, idx);
+			ret = new ComponentIdentifier(paname+"@"+getPlatformName(), getAddresses(), getResolvers());
+		}
+		else
+		{
+			idx = name.indexOf("@");
+			if(idx!=-1)
+			{
+				String paname = name.substring(idx+1);
+				ret = new ComponentIdentifier(paname, getAddresses(), getResolvers());
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the root identifier.
+	 *  @return The root identifier.
+	 */
+	public IComponentIdentifier getRoot()
+	{
+		return new ComponentIdentifier(getPlatformName(), getAddresses(), getResolvers());
+	}
 
 	//--------- methods --------
 

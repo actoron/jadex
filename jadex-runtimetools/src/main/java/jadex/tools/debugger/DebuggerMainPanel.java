@@ -6,6 +6,7 @@ import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -71,6 +72,9 @@ public class DebuggerMainPanel extends JSplitPane
 	
 	/** The tabs. */
 	protected List debuggerpanels;
+	
+	/** The cms listener. */
+	protected ICMSComponentListener listener;
 	
 	//-------- constructors --------
 	
@@ -329,10 +333,11 @@ public class DebuggerMainPanel extends JSplitPane
 				
 				updatePanel((IComponentDescription)desc);
 
-				jcc.getCMSHandler().addCMSListener(jcc.getPlatformAccess().getComponentIdentifier(), new ICMSComponentListener()
+				listener = new ICMSComponentListener()
 				{			
 					public IFuture componentChanged(IComponentDescription desc)
 					{
+						System.out.println("changed: "+desc.getName());
 						if(desc.getName().equals(DebuggerMainPanel.this.desc.getName()))
 							updatePanel(desc);
 						return IFuture.DONE;
@@ -345,7 +350,9 @@ public class DebuggerMainPanel extends JSplitPane
 					{
 						return IFuture.DONE;
 					}
-				});		
+				};		
+//				jcc.getPlatformAccess().getComponentIdentifier()
+				jcc.getCMSHandler().addCMSListener(desc.getName().getRoot(), listener);
 			}
 		});
 	}
@@ -363,6 +370,10 @@ public class DebuggerMainPanel extends JSplitPane
 				{
 					IDebuggerPanel panel = (IDebuggerPanel)debuggerpanels.get(i);
 					panel.dispose();
+				}
+				if(listener!=null)
+				{
+					jcc.getCMSHandler().removeCMSListener(desc.getName().getRoot(), listener);
 				}
 			}
 		});

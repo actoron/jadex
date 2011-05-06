@@ -276,8 +276,7 @@ public abstract class ComponentManagementService extends BasicService implements
 												Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
 												Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
 												Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
-												final CMSComponentDescription ad = new CMSComponentDescription(cid, type, 
-													getParentIdentifier(cinfo), master, daemon, autosd, lmodel.getFullName());
+												final CMSComponentDescription ad = new CMSComponentDescription(cid, type, master, daemon, autosd, lmodel.getFullName());
 												
 												logger.info("Starting component: "+cid.getName());
 		//										System.err.println("Pre-Init: "+cid);
@@ -1237,14 +1236,14 @@ public abstract class ComponentManagementService extends BasicService implements
 					cfs.remove(cid);
 					
 					// Deregister destroyed component at parent.
-					if(desc.getParent()!=null)
+					if(desc.getName().getParent()!=null)
 					{
 						// Stop execution of component. When root component services are already shutdowned.
 						cancel(adapter);
 //						exeservice.cancel(adapter);
 						
 						killparent = desc.getMaster()!=null && desc.getMaster().booleanValue();
-						CMSComponentDescription padesc = (CMSComponentDescription)descs.get(desc.getParent());
+						CMSComponentDescription padesc = (CMSComponentDescription)descs.get(desc.getName().getParent());
 						if(padesc!=null)
 						{
 							padesc.removeChild(desc.getName());
@@ -1271,7 +1270,7 @@ public abstract class ComponentManagementService extends BasicService implements
 									&& (childcount==null || childcount.intValue()<=1));
 							}
 						}
-						pad	= (IComponentAdapter)adapters.get(desc.getParent());
+						pad	= (IComponentAdapter)adapters.get(desc.getName().getParent());
 					}
 				}
 			}
@@ -1532,7 +1531,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		else
 		{
 			CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
-			ret.setResult(desc!=null? desc.getParent(): null);
+			ret.setResult(desc!=null? desc.getName().getParent(): null);
 		}
 		return ret;
 	}
@@ -1654,9 +1653,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	 * @param parent The parent.
 	 * @return The component description.
 	 */
-	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type, IComponentIdentifier parent, String modelname)
+	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type, String modelname)
 	{
-		CMSComponentDescription	ret	= new CMSComponentDescription(id, type, parent, null, null, null, modelname);
+		CMSComponentDescription	ret	= new CMSComponentDescription(id, type, null, null, null, modelname);
 		ret.setState(state);
 		ret.setOwnership(ownership);
 		return ret;
@@ -1810,7 +1809,7 @@ public abstract class ComponentManagementService extends BasicService implements
 					CMSComponentDescription	test	= (CMSComponentDescription)it.next();
 					if(adesc==null ||
 						(adesc.getOwnership()==null || adesc.getOwnership().equals(test.getOwnership()))
-						&& (adesc.getParent()==null || adesc.getParent().equals(test.getParent()))
+//						&& (adesc.getName().getParent()==null || adesc.getName().getParent().equals(test.getParent()))
 						&& (adesc.getType()==null || adesc.getType().equals(test.getType()))
 						&& (adesc.getState()==null || adesc.getState().equals(test.getState()))
 						&& (adesc.getProcessingState()==null || adesc.getProcessingState().equals(test.getProcessingState()))

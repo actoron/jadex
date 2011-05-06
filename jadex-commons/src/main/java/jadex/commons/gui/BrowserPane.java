@@ -3,6 +3,8 @@ package jadex.commons.gui;
 import jadex.commons.BrowserLauncher2;
 import jadex.commons.SUtil;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -19,6 +21,7 @@ import javax.swing.JTextPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.Element;
+import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import javax.swing.text.View;
@@ -70,7 +73,7 @@ public class BrowserPane extends JTextPane
 		setContentType("text/html");
 		setEditable(false);
 		setEditorKit(new ClasspathHTMLEditorKit());
-
+		
 		// Listen for hyperlink events, to remember current url.
 		// todo: Problem: does only work when setEditable(false) was called!!!
 		this.addHyperlinkListener(new HyperlinkListener()
@@ -243,6 +246,10 @@ System.out.println("setDocument");
 			((HTMLDocument)getDocument()).setBase(null);
 			//System.out.println("Base is now: "+((HTMLDocument)getDocument()).getBase());
 		}
+		
+		Font font = new Font("Arial", Font.ITALIC, 10);
+		setJTextPaneFont(this, font, Color.GREEN);
+//		setFont(font);
 	}
 
 	/**
@@ -335,6 +342,40 @@ System.out.println("setDocument");
 			BrowserPane.this.setText("Could not start browser: "+e);
 		}
 	}
+	
+	/**
+     * Utility method for setting the font and color of a JTextPane. The
+     * result is roughly equivalent to calling setFont(...) and
+     * setForeground(...) on an AWT TextArea.
+     */
+    public static void setJTextPaneFont(JTextPane jtp, Font font, Color c) 
+    {
+        // Start with the current input attributes for the JTextPane. This
+        // should ensure that we do not wipe out any existing attributes
+        // (such as alignment or other paragraph attributes) currently
+        // set on the text area.
+        MutableAttributeSet attrs = jtp.getInputAttributes();
+
+        // Set the font family, size, and style, based on properties of
+        // the Font object. Note that JTextPane supports a number of
+        // character attributes beyond those supported by the Font class.
+        // For example, underline, strike-through, super- and sub-script.
+        StyleConstants.setFontFamily(attrs, font.getFamily());
+//        StyleConstants.setFontSize(attrs, font.getSize());
+//        StyleConstants.setItalic(attrs, (font.getStyle() & Font.ITALIC) != 0);
+//        StyleConstants.setBold(attrs, (font.getStyle() & Font.BOLD) != 0);
+
+        // Set the font color
+//        StyleConstants.setForeground(attrs, c);
+
+        // Retrieve the pane's document object
+        StyledDocument doc = jtp.getStyledDocument();
+
+        // Replace the style for the entire document. We exceed the length
+        // of the document by 1 so that text entered at the end of the
+        // document uses the attributes.
+        doc.setCharacterAttributes(0, doc.getLength() + 1, attrs, false);
+    }
 	
 	//-------- helper classes --------
 	

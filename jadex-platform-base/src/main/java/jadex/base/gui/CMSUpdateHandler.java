@@ -85,6 +85,7 @@ public class CMSUpdateHandler
 						if(listeners!=null && listeners.containsKey(event.getSource()))
 						{
 							Collection	clis	= listeners.getCollection(event.getSource());
+							System.out.println("cmshandler: "+CMSUpdateHandler.this+" "+event+" "+clis);
 							informListeners(event, (ICMSComponentListener[])clis.toArray(new ICMSComponentListener[clis.size()]));
 							ret.setResult(null);
 						}
@@ -140,6 +141,9 @@ public class CMSUpdateHandler
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
+		System.out.println("added: "+cid+" "+listener+" "+this);
+
+		
 		// For local component use direct listener.
 		if(cid.getPlatformName().equals(access.getComponentIdentifier().getPlatformName()))
 		{
@@ -155,6 +159,7 @@ public class CMSUpdateHandler
 		// Already registered
 		if(listeners.containsKey(cid))
 		{
+			listeners.put(cid, listener);
 			// Ongoing registration.
 			if(futures!=null && futures.containsKey(cid))
 			{
@@ -192,6 +197,7 @@ public class CMSUpdateHandler
 				}
 				public void customExceptionOccurred(Exception exception)
 				{
+					System.out.println("remove: "+listener);
 					if(listeners!=null)
 						listeners.remove(cid, listener);
 					
@@ -217,6 +223,8 @@ public class CMSUpdateHandler
 	{
 		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
+		System.out.println("removed: "+cid+" "+listener+" "+this);
+		
 		IFuture	ret	= IFuture.DONE;
 		
 		// For local component use direct listener.
@@ -227,6 +235,7 @@ public class CMSUpdateHandler
 
 		else if(listeners!=null)
 		{
+			System.out.println("remove: "+listener);
 			listeners.remove(cid, listener);
 			if(!listeners.containsKey(cid))
 			{

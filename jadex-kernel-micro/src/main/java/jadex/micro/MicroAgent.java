@@ -777,7 +777,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		 */
 		public String toString()
 		{
-			return ts.getTimedObject().toString();
+			return ts==null? super.toString(): ts.getTimedObject()!=null? ts.getTimedObject().toString(): ts.toString();
 		}
 		
 		/**

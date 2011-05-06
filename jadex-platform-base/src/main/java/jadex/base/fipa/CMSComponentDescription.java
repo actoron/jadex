@@ -26,8 +26,8 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	/** Attribute for slot component identifier. */
 	protected IComponentIdentifier name;
 
-	/** Attribute for slot parent. */
-	protected IComponentIdentifier parent;
+//	/** Attribute for slot parent. */
+//	protected IComponentIdentifier parent;
 	
 	/** Attribute for children. */
 	protected Set children;
@@ -65,13 +65,13 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	/**
 	 *  Create a new CESComponentDescription.
 	 */
-	public CMSComponentDescription(IComponentIdentifier cid, String type, IComponentIdentifier parent, 
+	public CMSComponentDescription(IComponentIdentifier cid, String type, //IComponentIdentifier parent, 
 		Boolean master, Boolean daemon, Boolean autoshutdown, String modelname)
 	{
 		this();
 		setName(cid);
 		setType(type);
-		setParent(parent);
+//		setParent(parent);
 		setState(IComponentDescription.STATE_ACTIVE);
 		setProcessingState(IComponentDescription.PROCESSINGSTATE_IDLE);
 		setMaster(master);
@@ -137,23 +137,23 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		this.name = name;
 	}
 
-	/**
-	 *  Get the identifier of the parent component (if any).
-	 *  @return The parent component identifier.
-	 */
-	public IComponentIdentifier getParent()
-	{
-		return this.parent;
-	}
-	
-	/**
-	 *  Set the parent of this component description.
-	 * @param parent the value to be set
-	 */
-	public void setParent(IComponentIdentifier parent)
-	{
-		this.parent = parent;
-	}
+//	/**
+//	 *  Get the identifier of the parent component (if any).
+//	 *  @return The parent component identifier.
+//	 */
+//	public IComponentIdentifier getParent()
+//	{
+//		return this.parent;
+//	}
+//	
+//	/**
+//	 *  Set the parent of this component description.
+//	 * @param parent the value to be set
+//	 */
+//	public void setParent(IComponentIdentifier parent)
+//	{
+//		this.parent = parent;
+//	}
 	
 	// CMS / external access / component may access description concurrently?!
 	Object childmon = new Object();
@@ -345,7 +345,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 */
 	public String toString()
 	{
-		return "CMSComponentDescription(name=" + getName() + ", state=" + getState() + ", ownership=" + getOwnership() + ", parent=" + getParent() + ")";
+		return "CMSComponentDescription(name=" + getName() + ", state=" + getState() + ", ownership=" + getOwnership() + ")";
 	}
 
 	/**

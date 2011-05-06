@@ -30,4 +30,16 @@ public interface IComponentIdentifier
 	 *  @return The addresses.
 	 */
 	public String[] getAddresses();
+	
+	/**
+	 *  Get the parent identifier.
+	 *  @return The parent identifier (if any).
+	 */
+	public IComponentIdentifier getParent();
+	
+	/**
+	 *  Get the root identifier.
+	 *  @return The root identifier.
+	 */
+	public IComponentIdentifier getRoot();
 }

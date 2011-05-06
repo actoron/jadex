@@ -196,7 +196,7 @@ public class RemoteCMSListener	implements ICMSComponentListener
 						{
 							public void resultAvailable(Object result)
 							{
-//								System.out.println("update succeeded: "+desc);
+//								System.out.println("update succeeded: "+cid);
 							}
 							public void exceptionOccurred(Exception exception)
 							{

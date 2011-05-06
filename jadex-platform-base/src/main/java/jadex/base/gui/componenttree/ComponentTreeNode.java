@@ -468,9 +468,9 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 					public void run()
 					{
 //						System.err.println(""+model.hashCode()+" Panel->addChild queued2: "+desc.getName()+", "+desc.getParent());
-						final ComponentTreeNode	parentnode = desc.getParent()==null ? null
-								: desc.getParent().equals(getComponentIdentifier()) ? ComponentTreeNode.this	// For proxy nodes.
-								: (ComponentTreeNode)getModel().getAddedNode(desc.getParent());
+						final ComponentTreeNode	parentnode = desc.getName().getParent()==null ? null
+								: desc.getName().getParent().equals(getComponentIdentifier()) ? ComponentTreeNode.this	// For proxy nodes.
+								: (ComponentTreeNode)getModel().getAddedNode(desc.getName().getParent());
 						if(parentnode!=null)
 						{
 							ITreeNode	node = (ITreeNode)parentnode.createComponentNode(desc);

@@ -178,7 +178,7 @@ public interface IComponentManagementService extends IService
 	 * @return The component description.
 	 */
 	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, 
-		String ownership, String type, IComponentIdentifier parent, String modelname);
+		String ownership, String type, String modelname);
 	
 	/**
 	* Create a search constraints object.
