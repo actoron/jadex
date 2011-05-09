@@ -28,12 +28,11 @@ public interface ITransport
 	public IFuture shutdown();
 	
 	/**
-	 *  Send a message.
+	 *  Send a message to receivers on the same platform.
 	 *  @param message The message to send.
-	 *  @return The component identifiers to which this 
-	 *  message could not be delivered.
+	 *  @return A future indicating if sending was successful.
 	 */
-	public IComponentIdentifier[] sendMessage(Map message, String msgtype, IComponentIdentifier[] receivers, byte[] codecids);
+	public IFuture	sendMessage(Map message, String msgtype, IComponentIdentifier[] receivers, byte[] codecids);
 	
 	/**
 	 *  Returns the prefix of this transport
@@ -42,7 +41,7 @@ public interface ITransport
 	public String getServiceSchema();
 	
 	/**
-	 *  Get the adresses of this transport.
+	 *  Get the addresses of this transport.
 	 *  @return An array of strings representing the addresses 
 	 *  of this message transport mechanism.
 	 */

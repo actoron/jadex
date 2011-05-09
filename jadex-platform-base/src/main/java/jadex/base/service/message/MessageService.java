@@ -339,7 +339,7 @@ public class MessageService extends BasicService implements IMessageService
 			SendManager tm = (SendManager)it.next();
 			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.getCollection(tm)
 				.toArray(new IComponentIdentifier[0]);
-			ManagerSendTask task = new ManagerSendTask(msgcopy, type, recs, codecids, tm);
+			ManagerSendTask task = new ManagerSendTask(msgcopy, type, recs, getTransports(), codecids, tm);
 			task.getSendManager().addMessage(task).addResultListener(crl);
 		}
 		
@@ -1082,49 +1082,30 @@ public class MessageService extends BasicService implements IMessageService
 //						System.err.println("MessageService SendManager.execute");
 						if(ftmp!=null)
 						{
-							ManagerSendTask task = (ManagerSendTask)ftmp[0];
-							Future ret = (Future)ftmp[1];
+							final ManagerSendTask task = (ManagerSendTask)ftmp[0];
+							final Future ret = (Future)ftmp[1];
 							
 							IComponentIdentifier[] receivers = task.getReceivers();
 //							System.out.println("recs: "+SUtil.arrayToString(receivers)+" "+task.hashCode());
 							
-							ITransport[] transports = getTransports();
-							for(int i = 0; i < transports.length && receivers.length>0; i++)
+							if(task.getTransports().isEmpty())
 							{
-								try
-								{
-									// Method returns component identifiers of undelivered components
-					//				IConnection con = transports[i].getConnection(addresses[i]);
-					//				if(con==null)
-									
-			//						System.out.println("sending: "+transports[i]+", "+task.getMessage().get(task.getMessageType().getIdIdentifier())+", "+SUtil.arrayToString(receivers));
-//									System.err.println("MessageService SendManager.execute 1");
-									receivers = transports[i].sendMessage(task.getMessage(), task.getMessageType().getName(), receivers, task.getCodecIds());
-//									System.err.println("MessageService SendManager.execute 2");
-								}
-								catch(Exception e)
-								{
-//									System.err.println("MessageService SendManager.execute 2b");
-									e.printStackTrace();
-								}
-							}
-					
-							if(receivers.length > 0)
-							{
-//								logger.warning("Message could not be delivered to (all) receivers: " + SUtil.arrayToString(receivers)+" "+task.hashCode());
-//								System.out.println("Message could not be delivered to (all) receivers: " + SUtil.arrayToString(receivers)+" "+task.hashCode());
 								ret.setException(new MessageFailureException(task.getMessage(), task.getMessageType(), receivers, 
-									"Message could not be delivered to (all) receivers: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses()))
-								{
-//									public void printStackTrace()
-//									{
-//										Thread.dumpStack();
-//									}
-								});
+									"Message could not be delivered to (all) receivers: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())));								
 							}
 							else
 							{
-								ret.setResult(null);
+								// Try next transport.
+								ITransport transport = (ITransport)task.getTransports().remove(0);
+								transport.sendMessage(task.getMessage(), task.getMessageType().getName(), receivers, task.getCodecIds())
+									.addResultListener(new DelegationResultListener(ret)
+								{
+									public void exceptionOccurred(Exception exception)
+									{
+										// On success re-add message with original receivers. 
+										addMessage(task).addResultListener(new DelegationResultListener(ret));
+									}
+								});
 							}
 						}
 					}

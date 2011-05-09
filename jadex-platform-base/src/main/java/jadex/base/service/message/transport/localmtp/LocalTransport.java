@@ -1,18 +1,15 @@
 package jadex.base.service.message.transport.localmtp;
 
 import jadex.base.service.message.transport.ITransport;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
-import jadex.commons.collection.SCollection;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -86,32 +83,20 @@ public class LocalTransport implements ITransport
 	/**
 	 *  Send a message.
 	 *  @param message The message to send.
-	 *  @return The component identifiers of the components 
-	 *  the message could not be sent to.
 	 */
-	public IComponentIdentifier[] sendMessage(Map message, String msgtype, IComponentIdentifier[] recs, byte[] codecids)
+	public IFuture	sendMessage(Map message, String msgtype, IComponentIdentifier[] recs, byte[] codecids)
 	{
-		List todeliver = SCollection.createArrayList();
-		List undelivered = SCollection.createArrayList();
-		
-//		IComponentIdentifier[] recs = message.getReceivers();
-//		String hap = Configuration.getConfiguration().getProperty(Configuration.PLATFORMNAME);
-		
-		for(int i=0; i<recs.length; i++)
+		IFuture	ret;
+		if(recs[0].getPlatformName().equals(((IComponentIdentifier)container.getId()).getPlatformName()))
 		{
-			// Hack!!! Shouldn't assume component identifier?
-			if(recs[i].getPlatformName().equals(((IComponentIdentifier)container.getId()).getPlatformName()))
-				todeliver.add(recs[i]);
-			else
-				undelivered.add(recs[i]);
+			msgservice.deliverMessage(message, msgtype, recs);
+			ret	= IFuture.DONE;
 		}
-		if(todeliver.size()>0)
+		else
 		{
-			msgservice.deliverMessage(message, msgtype, (IComponentIdentifier[])todeliver
-				.toArray(new IComponentIdentifier[todeliver.size()]));
+			ret	= new Future(new RuntimeException("Can only deliver to local agents"));
 		}
-		
-		return (ComponentIdentifier[])undelivered.toArray(new ComponentIdentifier[undelivered.size()]);
+		return ret;
 	}
 	
 	/**

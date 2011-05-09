@@ -3,6 +3,7 @@ package jadex.base.service.message.transport.niotcpmtp;
 import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.CodecFactory;
 import jadex.base.service.message.transport.codecs.ICodec;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 import java.io.IOException;
@@ -62,8 +63,7 @@ public class NIOTCPInputConnection
 	 * @param dec
 	 * @throws IOException
 	 */
-	public NIOTCPInputConnection(SocketChannel sc, CodecFactory codecfac,
-		ClassLoader classloader)
+	public NIOTCPInputConnection(SocketChannel sc, CodecFactory codecfac, ClassLoader classloader)
 	{
 		// System.out.println("Creating input con: "+sc);
 		this.sc = sc;
@@ -191,5 +191,13 @@ public class NIOTCPInputConnection
 		{
 			// e.printStackTrace();
 		}
+	}
+
+	/**
+	 *  A string representation.
+	 */
+	public String toString()
+	{
+		return SReflect.getUnqualifiedClassName(getClass())+"("+sc.socket()+")";
 	}
 }

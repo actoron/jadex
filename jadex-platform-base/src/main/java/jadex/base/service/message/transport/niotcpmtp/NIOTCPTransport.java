@@ -3,42 +3,27 @@ package jadex.base.service.message.transport.niotcpmtp;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.CodecFactory;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.clock.IClockService;
-import jadex.bridge.service.clock.ITimedObject;
-import jadex.bridge.service.clock.ITimer;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.threadpool.IThreadPoolService;
-import jadex.commons.SUtil;
-import jadex.commons.collection.ILRUEntryCleaner;
-import jadex.commons.collection.LRU;
-import jadex.commons.collection.MultiCollection;
-import jadex.commons.collection.SCollection;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.nio.channels.CancelledKeyException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -66,9 +51,6 @@ public class NIOTCPTransport implements ITransport
 	/** The prolog size. */
 	protected static final int PROLOG_SIZE = 4;
 	
-	/** Maximum number of outgoing connections */
-	protected static final int MAX_CONNECTIONS	= 20;
-	
 	/** Default port. */
 	protected static final int DEFAULT_PORT	= 8765;
 	
@@ -86,12 +68,6 @@ public class NIOTCPTransport implements ITransport
 	/** The server socket for receiving messages. */
 	protected ServerSocketChannel ssc;
 	
-	/** The selector for fetching new incoming requests. */
-	protected Selector selector;
-	
-	/** The opened connections for addresses. (aid address -> connection). */
-	protected Map connections;
-	
 	/** The logger. */
 	protected Logger logger;
 	
@@ -101,9 +77,12 @@ public class NIOTCPTransport implements ITransport
 	/** The codec factory. */
 	protected CodecFactory codecfac;
 	
+	/** The selector thread. */
+	protected SelectorThread	selectorthread;
+	
 	/** Flag indicating that the transport was shut down. */
 	protected boolean	shutdown;
-
+	
 	//-------- constructors --------
 	
 	/**
@@ -115,22 +94,7 @@ public class NIOTCPTransport implements ITransport
 	{
 		this.logger = Logger.getLogger("NIOTCPTransport" + this);
 		this.container = container;
-		this.port = port;
-		
-		// Set up sending side.
-		this.connections = SCollection.createLRU(MAX_CONNECTIONS);
-		((LRU)this.connections).setCleaner(new ILRUEntryCleaner()
-		{
-			public void cleanupEldestEntry(Entry eldest)
-			{
-				Object con = eldest.getValue();
-				if(con instanceof NIOTCPOutputConnection)
-				{
-					((NIOTCPOutputConnection)con).close();
-				}
-			}
-		});
-		this.connections = Collections.synchronizedMap(this.connections);
+		this.port = port;		
 	}
 	
 	/**
@@ -148,7 +112,7 @@ public class NIOTCPTransport implements ITransport
 			ServerSocket serversocket = ssc.socket();
 			serversocket.bind(new InetSocketAddress(port));
 			this.port = serversocket.getLocalPort();
-			this.selector = Selector.open();
+			final Selector	selector = Selector.open();
 			ssc.register(selector, SelectionKey.OP_ACCEPT);
 			
 			// Determine all transport addresses.
@@ -174,7 +138,6 @@ public class NIOTCPTransport implements ITransport
 			addresses = (String[])addrs.toArray(new String[addrs.size()]);
 			
 			// Start receiver thread.
-			
 			SServiceProvider.getService(container, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new DelegationResultListener(ret)
 			{
@@ -194,86 +157,10 @@ public class NIOTCPTransport implements ITransport
 							{
 								public void customResultAvailable(Object result)
 								{
-									ret.setResult(null);
+									selectorthread	= new SelectorThread(selector, ms, codecfac, libservice, logger, container);
 									IThreadPoolService tp = (IThreadPoolService)result;
-									tp.execute(new Runnable()
-									{
-										public void run()
-										{
-											while(ssc.isOpen())
-											{
-												// This is a blocking call that only returns when traffic occurs.
-												Iterator it = null;
-												try
-												{
-													selector.select();
-													it = selector.selectedKeys().iterator();
-												}
-												catch(IOException e)
-												{
-		//											logger.warning("NIOTCP selector error.");
-													//e.printStackTrace();
-												}
-												
-												while(it!=null && it.hasNext())
-												{
-										            // Get the selection key
-										            final SelectionKey key = (SelectionKey)it.next();
-										    
-										            // Remove it from the list to indicate that it is being processed
-										            it.remove();
-										            
-										            try
-													{
-														if(key.isValid() && key.isAcceptable())
-														{
-															// Returns only null if no connection request is available.
-															SocketChannel sc = ssc.accept();
-															if(sc!=null) 
-															{
-																sc.configureBlocking(false);
-		//														ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
-																sc.register(selector, SelectionKey.OP_READ, new NIOTCPInputConnection(sc, codecfac, libservice.getClassLoader()));
-															}
-														}
-														else if(key.isValid() && key.isReadable())
-														{
-															final NIOTCPInputConnection con = (NIOTCPInputConnection)key.attachment();
-															try
-															{
-																for(MessageEnvelope msg=con.read(); msg!=null; msg=con.read())
-																{
-																	ms.deliverMessage(msg.getMessage(), msg.getTypeName(), msg.getReceivers());
-																}
-															}
-															catch(IOException e)
-															{ 
-//																logger.warning("NIOTCP receiving error while reading data.");
-//																e.printStackTrace();
-																con.close();
-																key.cancel();
-															}
-														}
-														else
-														{
-															key.cancel();
-														}
-													}
-										            catch(IOException e)
-													{
-	//													logger.warning("NIOTCP connection error on receiver side.");
-														//e.printStackTrace();
-														key.cancel();
-													}
-										            catch(CancelledKeyException e)
-										            {
-										            }
-												}
-											}
-//											System.out.println("nio receiver closed");
-		//									logger.info("TCPNIO receiver closed.");
-										}
-									});
+									tp.execute(selectorthread);
+									ret.setResult(null);
 								}
 							});
 						}
@@ -298,7 +185,7 @@ public class NIOTCPTransport implements ITransport
 	public IFuture shutdown()
 	{
 		try{this.ssc.close();}catch(Exception e){}
-		connections = null; // Help gc
+		selectorthread.setRunning(false);
 		this.shutdown	= true;
 		return new Future(null);
 	}
@@ -306,101 +193,46 @@ public class NIOTCPTransport implements ITransport
 	//-------- methods --------
 	
 	/**
-	 *  Send a message.
+	 *  Send a message to receivers, which are all on the same platform.
 	 *  @param message The message to send.
+	 *  @param msgtype The message type.
+	 *  @param receivers	The intended receivers.
+	 *  @param codecids	codecs to be used (if any).
 	 *  
 	 *  Can be called concurrently by SendManagers of message service.
 	 */
-	public synchronized IComponentIdentifier[] sendMessage(Map message, String msgtype, IComponentIdentifier[] receivers, final byte[] codecids)
+	public synchronized IFuture sendMessage(final Map message, final String msgtype, final IComponentIdentifier[] receivers, final byte[] codecids)
 	{
-		// Fetch all receivers 
-		IComponentIdentifier[] recstodel = receivers;
-//		IComponentIdentifier[] recstodel = message.getReceivers();
-		List undelivered = SUtil.arrayToList(recstodel);
+		final Future	ret	= new Future();
 		
-		// Find receivers with same address and send only once for 
-		// them as message is delivered to all
-		// address -> (aid1, aid2, ...)
-		MultiCollection adrsets = new MultiCollection(SCollection.createHashMap(), HashSet.class);
-		for(int i=0; i<recstodel.length; i++)
+		// Fetch all addresses
+		Set	addrs	= new LinkedHashSet();
+		for(int i=0; i<receivers.length; i++)
 		{
-			String[] addrs = recstodel[i].getAddresses();
-			for(int j=0; j<addrs.length; j++)
+			String[]	raddrs	= receivers[i].getAddresses();
+			for(int j=0; j<raddrs.length; j++)
 			{
-				adrsets.put(addrs[j], recstodel[i]);
-			}
-		}
-
-		// Iterate over all different addresses and try to send
-		// to missing and appropriate receivers
-		String[] addrs = (String[])adrsets.getKeys(String.class);
-		
-//		if(addrs.length>1)
-//			System.out.println("here: "+SUtil.arrayToString(addrs));
-		
-		for(int i=0; !shutdown && i<addrs.length && undelivered.size()>0; i++)
-		{
-			try
-			{
-				boolean fresh = false;
-				// Is the cached connection is dead the call will
-				// cause a IOException been thrown
-				NIOTCPOutputConnection con = getConnection(addrs[i]);
-				if(con==null)
+				InetSocketAddress	address	= parseAddress(raddrs[j]);
+				if(address!=null)
 				{
-					fresh = true;
-					con = createConnection(addrs[i]);
-				}
-						
-				if(con!=null)
-				{
-					Set aidset = (Set)adrsets.get(addrs[i]);
-					aidset.retainAll(undelivered);
-//					ComponentIdentifier[] aids = (ComponentIdentifier[])aidset.toArray(new ComponentIdentifier[aidset.size()]);
-//					message.setReceivers(aids);
-					
-					// The send process must be performed once or twice
-					// as there is no possibility to check if the cached connection
-					// is still connected to the other end. This can only be
-					// checked by the write operation.
-//					Object	content	= message.get("content");
-//					System.out.println("sending to: "+aidset);//+", "+(content!=null?SReflect.getClassName(content.getClass()):null));
-					while(true)
-					{
-						try
-						{
-							con.send(new MessageEnvelope(message, aidset, msgtype), codecids);
-							undelivered.removeAll(aidset);
-							break;
-						}
-						catch(IOException e)
-						{
-							removeConnection(addrs[i]);
-							if(!fresh)
-							{
-								fresh = true;
-								con = createConnection(addrs[i]);
-								if(con==null)
-									break;
-							}
-							else
-							{
-//								logger.warning("Send connection closed: "+addrs[i]);
-								break;
-							}
-						}
-					}
-//					System.out.println("sent to: "+aidset);
-
+					addrs.add(address);
 				}
 			}
-			catch(IOException e)
-			{
-//				logger.warning("Address unreachable: "+addrs[i]);
-			}
+			
 		}
+		InetSocketAddress[]	addresses	= (InetSocketAddress[])addrs.toArray(new InetSocketAddress[addrs.size()]);
 		
-		return (ComponentIdentifier[])undelivered.toArray(new ComponentIdentifier[undelivered.size()]);
+		selectorthread.getConnection(addresses).addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				NIOTCPOutputConnection	con	= (NIOTCPOutputConnection)result;
+				selectorthread.sendMessage(con, new MessageEnvelope(message, Arrays.asList(receivers), msgtype), codecids)
+					.addResultListener(new DelegationResultListener(ret));
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**
@@ -436,164 +268,40 @@ public class NIOTCPTransport implements ITransport
 	}
 	
 	/**
-	 *  Get the cached connection.
-	 *  @param address The address.
-	 *  @return The cached connection.
+	 *  Parse an address.
+	 *  @param address The address string.
+	 *  @return The parsed address.
 	 */
-	protected NIOTCPOutputConnection getConnection(String address) throws IOException
+	protected static InetSocketAddress	parseAddress(String address)
 	{
+		InetSocketAddress	ret	= null;
 		address = address.toLowerCase();
 		
-		Object ret = connections.get(address);
-		if(ret instanceof NIOTCPDeadConnection)
-		{
-			NIOTCPDeadConnection dead = (NIOTCPDeadConnection)ret;
-			// Reset connection if connection should be retried.
-			if(dead.shouldRetry())
-			{
-				connections.remove(address);
-				ret = null; 
-			}
-			else
-			{
-				throw new IOException("Dead connection.");
-			}
-		}
-		return (NIOTCPOutputConnection)ret;
-	}
-	
-	/**
-	 *  Remove a cached connection.
-	 *  @param address The address.
-	 */
-	protected void removeConnection(String address)
-	{
-		if(connections!=null)
-		{
-			address = address.toLowerCase();
-			
-			Object	con	= connections.remove(address);
-			if(con instanceof NIOTCPOutputConnection)
-				((NIOTCPOutputConnection)con).close();
-		}
-	}
-	
-	/**
-	 *  Create a outgoing connection.
-	 *  @param address The connection address.
-	 *  @return the connection to this address
-	 */
-	protected NIOTCPOutputConnection createConnection(String address)
-	{
-		address = address.toLowerCase();
-		
-		NIOTCPOutputConnection ret = null;
-		
-		if(address.startsWith(getServiceSchema()))
-		{
-			// Parse the address
+		if(address.startsWith(SCHEMA))
+		{		
 			try
 			{
-				int schemalen = getServiceSchema().length();
-				int div = address.indexOf(':', schemalen);
+				int schemalen = SCHEMA.length();
+				int div = address.lastIndexOf(':');
 				String hostname;
-				int iport;
-				if(div>0)
+				int port;
+				if(div>schemalen)
 				{
 					hostname = address.substring(schemalen, div);
-					iport = Integer.parseInt(address.substring(div+1));
+					port = Integer.parseInt(address.substring(div+1));
 				}
 				else
 				{
 					hostname = address.substring(schemalen);
-					iport = DEFAULT_PORT;
+					port = DEFAULT_PORT;
 				}
-			
-//				ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader()
-				ret = new NIOTCPOutputConnection(InetAddress.getByName(hostname), iport, codecfac, new Cleaner(address), libservice.getClassLoader());
-				connections.put(address, ret);
+				ret	= new InetSocketAddress(hostname, port);
 			}
 			catch(Exception e)
 			{ 
-				if(!shutdown)
-				{
-					connections.put(address, new NIOTCPDeadConnection());
-//					logger.warning("Could not establish connection to: "+address);
-					//e.printStackTrace();
-				}
 			}
 		}
 		
 		return ret;
-	}
-	
-	/**
-	 *  Class for cleaning output connections after 
-	 *  max keep alive time has been reached.
-	 */
-	protected class Cleaner implements ITimedObject
-	{
-		//-------- attributes --------
-		
-		/** The address of the connection. */
-		protected String address;
-		
-		/** The timer. */
-		protected ITimer timer;
-		
-		//-------- constructors --------
-		
-		/**
-		 *  Cleaner for a specified output connection.
-		 *  @param address The address.
-		 */
-		public Cleaner(String address)
-		{
-			this.address = address;
-		}
-		
-		//-------- methods --------
-		
-		/**
-		 *  Called when timepoint was reached.
-		 */
-		public void timeEventOccurred(long currenttime)
-		{
-			//System.out.println("Timeout reached for: "+address);
-			removeConnection(address);
-		}
-		
-		/**
-		 *  Refresh the timeout.
-		 */
-		public void refresh()
-		{
-			//platform.getTimerService().addEntry(this, System.currentTimeMillis()+MAX_KEEPALIVE);
-			/*if(timer!=null)
-				timer.cancel();
-			timer = platform.getClock().createTimer(System.currentTimeMillis()+MAX_KEEPALIVE, this);*/
-			SServiceProvider.getService(container, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-			{
-				public void resultAvailable(Object result)
-				{
-					IClockService clock = (IClockService)result;
-					long time = clock.getTime()+MAX_KEEPALIVE;
-					if(timer==null)
-						timer = clock.createTimer(time, Cleaner.this);
-					else
-						timer.setNotificationTime(time);
-				}
-			});
-		}
-		
-		/**
-		 *  Remove this cleaner.
-		 */
-		public void remove()
-		{
-			//platform.getTimerService().removeEntry(this);
-			if(timer!=null)
-				timer.cancel();
-		}
-	}
+	}	
 }

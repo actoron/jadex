@@ -141,12 +141,13 @@ public class DefaultStepHandler implements IStepHandler
 			
 			for(Iterator it=remove.getAllThreads().iterator(); it.hasNext(); )
 			{
-				ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, instance.TYPE_THREAD, thread.getClass().getName(), 
-					thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(thread));
+				ProcessThread	pt	= (ProcessThread)it.next();
+				ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, BpmnInterpreter.TYPE_THREAD, pt.getClass().getName(), 
+						pt.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(pt));
 				instance.notifyListeners(cce);
 //				instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, (ProcessThread)it.next());
 			}
-			ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, instance.TYPE_THREAD, thread.getClass().getName(), 
+			ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
 				thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(thread));
 			instance.notifyListeners(cce);
 //			instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_CHANGED, thread);
@@ -180,7 +181,7 @@ public class DefaultStepHandler implements IStepHandler
 		{
 			thread.getThreadContext().removeThread(thread);
 //			instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, thread);
-			ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, instance.TYPE_THREAD, thread.getClass().getName(), 
+			ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
 				thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(thread));
 			instance.notifyListeners(cce);
 		} 

@@ -1,9 +1,13 @@
 package jadex.base.service.message;
 
 import jadex.base.service.message.MessageService.SendManager;
+import jadex.base.service.message.transport.ITransport;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.MessageType;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,17 +27,21 @@ public class ManagerSendTask
 	/** The managed receivers. */
 	protected IComponentIdentifier[] receivers;
 
+	/** The transports to be tried. */
+	protected List transports;
+
 	/** The target manager. */
 	protected SendManager manager;
 	
 	/**
 	 *  Create a new manager send task.
 	 */
-	public ManagerSendTask(Map message, MessageType messagetype, IComponentIdentifier[] receivers, byte[] codecids, SendManager manager)
+	public ManagerSendTask(Map message, MessageType messagetype, IComponentIdentifier[] receivers, ITransport[] transports, byte[] codecids, SendManager manager)
 	{
 		this.message = message;
 		this.messagetype = messagetype;
 		this.receivers = receivers;
+		this.transports = new ArrayList(Arrays.asList(transports));
 		this.codecids = codecids;
 		this.manager = manager;
 	}
@@ -64,6 +72,23 @@ public class ManagerSendTask
 	public IComponentIdentifier[] getReceivers()
 	{
 		return receivers;
+	}
+	
+	/**
+	 *  Get the transports.
+	 *  @return the transports.
+	 */
+	public List getTransports()
+	{
+		return transports;
+	}
+	
+	/**
+	 *  Set the receivers.
+	 */
+	public void	setReceivers(IComponentIdentifier[] receivers)
+	{
+		this.receivers	= receivers;
 	}
 
 	/**

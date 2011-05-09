@@ -3,7 +3,6 @@ package jadex.base.service.message.transport.tcpmtp;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.CodecFactory;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageService;
 import jadex.bridge.service.IServiceProvider;
@@ -14,10 +13,8 @@ import jadex.bridge.service.clock.ITimedObject;
 import jadex.bridge.service.clock.ITimer;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.threadpool.IThreadPoolService;
-import jadex.commons.SUtil;
 import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
-import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -29,8 +26,10 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -309,42 +308,33 @@ public class TCPTransport implements ITransport
 	 *  @param message The message to send.
 	 *  (todo: On which thread this should be done?)
 	 */
-	public IComponentIdentifier[] sendMessage(Map msg, String type, IComponentIdentifier[] receivers, byte[] codecids)
+	public IFuture sendMessage(Map msg, String type, IComponentIdentifier[] receivers, byte[] codecids)
 	{
-		// Fetch all receivers 
-//		IComponentIdentifier[] recstodel = message.getReceivers();
-		IComponentIdentifier[] recstodel = receivers;
-		List undelivered = SUtil.arrayToList(recstodel);
-		
-		// Find receivers with same address and send only once for 
-		// them as message is delivered to all
-		// address -> (aid1, aid2, ...)
-		MultiCollection adrsets = new MultiCollection(SCollection.createHashMap(), HashSet.class);
-		for(int i=0; i<recstodel.length; i++)
+		// Fetch all addresses
+		Set	addresses	= new LinkedHashSet();
+		for(int i=0; i<receivers.length; i++)
 		{
-			String[] addrs = recstodel[i].getAddresses();
-			for(int j=0; j<addrs.length; j++)
+			String[]	raddrs	= receivers[i].getAddresses();
+			for(int j=0; j<raddrs.length; j++)
 			{
-				adrsets.put(addrs[j], recstodel[i]);
-			}
+				addresses.add(raddrs[j]);
+			}			
 		}
 
 		// Iterate over all different addresses and try to send
 		// to missing and appropriate receivers
-		String[] addrs = (String[])adrsets.getKeys(String.class);
-		for(int i=0; i<addrs.length && undelivered.size()>0; i++)
+		String[] addrs = (String[])addresses.toArray(new String[addresses.size()]);
+		boolean	delivered	= false;
+		for(int i=0; !delivered && i<addrs.length; i++)
 		{
 			TCPOutputConnection con = getConnection(addrs[i]);
 			if(con!=null)
 			{
-				Set aidset = (Set)adrsets.get(addrs[i]);
-				aidset.retainAll(undelivered);
-				if(con.send(new MessageEnvelope(msg, aidset, type), codecids))
-					undelivered.removeAll(aidset);
+				delivered	= con.send(new MessageEnvelope(msg, Arrays.asList(receivers), type), codecids);
 			}
 		}
 		
-		return (ComponentIdentifier[])undelivered.toArray(new ComponentIdentifier[undelivered.size()]);
+		return delivered ? IFuture.DONE : new Future(new RuntimeException("Could not deliver message"));
 	}
 	
 	/**
