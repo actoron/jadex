@@ -78,10 +78,10 @@ public class BulkComponentChangeEvent implements IComponentChangeEvent
 	}
 	
 	/**
-	 *  Returns the parent component of the component that generated the event, if any.
-	 *  @return Component ID.
+	 *  Returns the parent of the source that generated the event, if any.
+	 *  @return Parent ID.
 	 */
-	public IComponentIdentifier getParent()
+	public String getParent()
 	{
 		return null;
 	}

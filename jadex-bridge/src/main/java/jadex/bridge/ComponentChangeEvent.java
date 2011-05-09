@@ -34,8 +34,8 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	/** Component which generated the event. */
 	protected IComponentIdentifier component;
 	
-	/** Parent of the component which generated the event. */
-	protected IComponentIdentifier parent;
+	/** Parent of the source which generated the event. */
+	protected String parent;
 	
 	/** Reason for the event, if any (e.g. goal succeeded). */
 	protected String reason;
@@ -130,10 +130,10 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	}
 	
 	/**
-	 *  Returns the parent component of the component that generated the event, if any.
-	 *  @return Component ID.
+	 *  Returns the parent of the source that generated the event, if any.
+	 *  @return Parent ID.
 	 */
-	public IComponentIdentifier getParent()
+	public String getParent()
 	{
 		return parent;
 	}
@@ -213,10 +213,10 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	}
 	
 	/**
-	 *  Sets the parent of the component that generated the event.
-	 *  @param id Component ID.
+	 *  Sets the parent of the source that generated the event, if any.
+	 *  @param id Parent ID.
 	 */
-	public void setParent(IComponentIdentifier id)
+	public void setParent(String id)
 	{
 		parent = id;
 	}
