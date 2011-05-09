@@ -4,7 +4,6 @@ import jadex.base.service.remote.commands.RemoteMethodInvocationCommand;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.RemoteComponentListener;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

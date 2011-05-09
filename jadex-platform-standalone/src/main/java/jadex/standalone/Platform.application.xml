@@ -41,6 +41,8 @@
 	
 	<arguments>
 		<argument name="platformname">"jadex"</argument>
+		<!-- Save platform settings on shutdown? -->
+		<argument name="saveonexit">true</argument>
 		<argument name="simulation">false</argument>
 		<argument name="libpath"></argument>
 		<argument name="tcpport">9876</argument>
@@ -72,7 +74,7 @@
 	
 	<services>
 		<providedservice class="ISettingsService">
-			new SettingsService($args.platformname, $component)
+			new SettingsService($args.platformname, $component, $args.saveonexit)
 		</providedservice>
 		<providedservice class="IThreadPool" direct="true">
 			new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
@@ -102,8 +104,8 @@
 				new ITransport[]
 				{
 					new LocalTransport($component.getServiceProvider()),
-					new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport)
-					//new TCPTransport($component.getServiceProvider(), $args.tcpport)
+					//new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport)
+					new TCPTransport($component.getServiceProvider(), $args.tcpport)
 				},
 				new MessageType[]
 				{
@@ -151,7 +153,7 @@
 	<properties>
 		<property name="componentviewer.viewerclass">"jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel"</property>
 		<!-- <property name="viewerpanel.componentviewerclass">""</property> -->
-		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+		<property name="logging.level">java.util.logging.Level.INFO</property>
 	</properties>
 	
 	<applications>
@@ -254,6 +256,7 @@
 		<application name="testcases">
 			<arguments>
 				<argument name="platformname">"testcases"</argument>
+				<argument name="saveonexit">false</argument>
 				<argument name="tcpport">0</argument>
 				<argument name="niotcpport">0</argument>
 			</arguments>
@@ -267,6 +270,10 @@
 		
 		<application name="creation_test_bdi">
 			<arguments>
+				<argument name="platformname">"testcases"</argument>
+				<argument name="saveonexit">false</argument>
+				<argument name="tcpport">0</argument>
+				<argument name="niotcpport">0</argument>
 				<argument name="libpath">new Object[]{"../jadex-applications-bdi/target/classes"}</argument>
 			</arguments>
 			<components>
@@ -277,6 +284,10 @@
 		
 		<application name="creation_test_micro">
 			<arguments>
+				<argument name="platformname">"testcases"</argument>
+				<argument name="saveonexit">false</argument>
+				<argument name="tcpport">0</argument>
+				<argument name="niotcpport">0</argument>
 				<argument name="libpath">new Object[]{"../jadex-applications-micro/target/classes"}</argument>
 			</arguments>
 			<components>
@@ -291,6 +302,10 @@
 
 		<application name="creation_test_bpmn">
 			<arguments>
+				<argument name="platformname">"testcases"</argument>
+				<argument name="saveonexit">false</argument>
+				<argument name="tcpport">0</argument>
+				<argument name="niotcpport">0</argument>
 				<argument name="libpath">new Object[]{"../jadex-applications-bpmn/target/classes"}</argument>
 			</arguments>
 			<components>

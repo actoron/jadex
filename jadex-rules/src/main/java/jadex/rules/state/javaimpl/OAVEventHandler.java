@@ -9,7 +9,6 @@ import jadex.rules.state.OAVObjectType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -96,23 +95,22 @@ public class OAVEventHandler
 		this.notifying	= true;
 		if(!beanevents.isEmpty())
 		{
-			// Set bean events is locked during event processing
-			// This avoids copy to array (but with shorter lock)
+			Object[]	abeanevents;
 			synchronized(beanevents)
 			{
-				for(Iterator it=beanevents.iterator(); it.hasNext(); )
-				{
-					notifyOneEvent(it.next());
-//					it.remove();
-				}
+				abeanevents	= beanevents.toArray();
 				beanevents.clear();
+			}
+			for(int i=0; i<abeanevents.length; i++)
+			{
+				notifyOneEvent(abeanevents[i]);
 			}
 		}
 		
-		for(Iterator it=oavevents.iterator(); it.hasNext(); )
+		Object[]	aoavevents	= oavevents.toArray();
+		for(int i=0; i<aoavevents.length; i++)
 		{
-			notifyOneEvent(it.next());
-//			it.remove();
+			notifyOneEvent(aoavevents[i]);
 		}
 		oavevents.clear();
 		

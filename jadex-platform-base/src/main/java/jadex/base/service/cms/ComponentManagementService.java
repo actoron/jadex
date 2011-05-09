@@ -222,7 +222,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				inited.setException(new RuntimeException("No '@' allowed in component name."));
 				return inited;
 			}
-	
+			
 			// Load the model with fitting factory.
 			getClassLoader(cinfo).addResultListener(new DelegationResultListener(inited)
 			{
@@ -269,7 +269,22 @@ public abstract class ComponentManagementService extends BasicService implements
 													{
 														IComponentIdentifier pacid = parent.getComponentIdentifier();
 														String paname = pacid.getName().replace('@', '.');
-														cid = (ComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname);
+														if(name!=null)
+														{
+															cid = new ComponentIdentifier(name+"@"+paname);
+															if(adapters.containsKey(cid) || initinfos.containsKey(cid))
+															{
+																throw new RuntimeException("Component "+cid+" already exists.");
+															}
+															if(msgservice!=null)
+															{
+																cid.setAddresses(msgservice.getAddresses());
+															}
+														}
+														else
+														{
+															cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName(), paname);
+														}
 													}		
 												}
 												
@@ -766,6 +781,8 @@ public abstract class ComponentManagementService extends BasicService implements
 			}
 			else
 			{
+				if(cid.getName().indexOf("SubWorkflowTest")!=-1)
+					System.out.println("Terminating component structure: "+cid.getName());
 				logger.info("Terminating component structure: "+cid.getName());
 				synchronized(adapters)
 				{
@@ -1554,6 +1571,10 @@ public abstract class ComponentManagementService extends BasicService implements
 					final IComponentManagementService rcms = (IComponentManagementService)result;
 					rcms.getChildren(cid).addResultListener(new DelegationResultListener(ret));
 				}
+				public void exceptionOccurred(Exception exception)
+				{
+					super.exceptionOccurred(exception);
+				}
 			});
 		}
 		else
@@ -1913,7 +1934,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				{
 					ret = new ComponentIdentifier(localname+(compcnt++)+"@"+platformname); // Hack?!
 				}
-				while(adapters.containsKey(ret));
+				while(adapters.containsKey(ret) || initinfos.containsKey(ret));
 			}
 		}
 		

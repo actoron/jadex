@@ -55,7 +55,7 @@
  		<!-- The default parent handler prints out log messages on the console. -->
 		<property name="logging.useParentHandlers">true</property>
 		<!--<property name="debugging">true</property>-->
-	 	<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class)</property>
+	 	<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)</property>
     </properties>
 
 	<configurations>

@@ -237,36 +237,25 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	 */
 	public void executeBody()
 	{
-		getRootIdentifier().addResultListener(createResultListener(new IResultListener()
+		root = getComponentIdentifier().getRoot();
+		discovered.put(root, new DiscoveryInfo(root, null, getClockTime(), delay, false));
+		
+		startRemoveBehaviour();
+		// Wait before starting send behavior to not miss fast awareness pingpong replies,
+		// because receiver thread is not yet running. (hack???)
+		startReceiving().addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
-				root = (IComponentIdentifier)result;
-				discovered.put(root, new DiscoveryInfo(root, null, getClockTime(), delay, false));
-				
-				startRemoveBehaviour();
-				// Wait before starting send behavior to not miss fast awareness pingpong replies,
-				// because receiver thread is not yet running. (hack???)
-				startReceiving().addResultListener(createResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						started	= true;
-						startSendBehaviour();
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						// Send also when receiving does not work?
-						started	= true;
-						startSendBehaviour();
-					}
-				}));
+				started	= true;
+				startSendBehaviour();
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				throw new RuntimeException(exception);
+				// Send also when receiving does not work?
+				started	= true;
+				startSendBehaviour();
 			}
 		}));
 	}
@@ -345,62 +334,6 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 			getLogger().warning("Could not send awareness message: "+e);
 //			e.printStackTrace();
 		}	
-	}
-	
-	/**
-	 *  Get the root component identifier.
-	 */
-	public IFuture getRootIdentifier()
-	{
-		final Future ret = new Future();
-		
-		getServiceContainer().getRequiredService("cms").addResultListener(createResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				getRootIdentifier(getComponentIdentifier(), (IComponentManagementService)result, ret);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
-			}
-		}));
-		
-		return ret;
-		
-//		IExternalAccess root = getParent();
-//		while(root.getParent()!=null)
-//			root = root.getParent();
-//		IComponentIdentifier ret = root.getComponentIdentifier();
-////		System.out.println("root: "+root.getComponentIdentifier().hashCode()+SUtil.arrayToString(root.getComponentIdentifier().getAddresses()));
-//		return ret;
-	}
-	
-	/**
-	 *  Internal method to get the root identifier.
-	 */
-	public void getRootIdentifier(final IComponentIdentifier cid, final IComponentManagementService cms, final Future future)
-	{
-		cms.getParent(cid).addResultListener(createResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				if(result==null)
-				{
-					future.setResult(cid);
-				}
-				else
-				{
-					getRootIdentifier((IComponentIdentifier)result, cms, future);
-				}
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				future.setException(exception);
-			}
-		}));
 	}
 	
 	/**

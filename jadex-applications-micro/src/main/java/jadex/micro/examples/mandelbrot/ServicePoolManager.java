@@ -172,6 +172,11 @@ public class ServicePoolManager
 									createServices();
 									return null;
 								}
+								
+								public String toString()
+								{
+									return "Search timeout for: "+name;
+								}
 							});
 						}
 					});

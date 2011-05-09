@@ -256,21 +256,20 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	public IComponentIdentifier getParent()
 	{
 		IComponentIdentifier ret = null;
-		int idx = name.lastIndexOf(".");
+		int	at = name.indexOf("@");
+		int idx = name.indexOf(".", at);
 		if(idx!=-1)
 		{
-			String paname = name.substring(0, idx);
-			ret = new ComponentIdentifier(paname+"@"+getPlatformName(), getAddresses(), getResolvers());
+			String paname = name.substring(at+1, idx);
+			String pfname = name.substring(idx+1);
+			ret = new ComponentIdentifier(paname+"@"+pfname, getAddresses(), getResolvers());
 		}
-		else
+		else if(at!=-1)
 		{
-			idx = name.indexOf("@");
-			if(idx!=-1)
-			{
-				String paname = name.substring(idx+1);
-				ret = new ComponentIdentifier(paname, getAddresses(), getResolvers());
-			}
+			String paname = name.substring(at+1);
+			ret = new ComponentIdentifier(paname, getAddresses(), getResolvers());
 		}
+		// else at root.
 		return ret;
 	}
 	

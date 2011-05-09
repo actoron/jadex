@@ -274,7 +274,9 @@
 	</plans>
 	
 	<services>
-		<requiredservice name="df" class="IDF" scope="platform"/>
+		<requiredservice name="df" class="IDF">
+			<binding scope="platform"/>
+		</requiredservice>
 	</services>
 
 	<configurations>

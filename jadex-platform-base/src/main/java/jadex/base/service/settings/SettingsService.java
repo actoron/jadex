@@ -43,6 +43,9 @@ public class SettingsService extends BasicService implements ISettingsService
 	/** The registered properties provider (id->provider). */
 	protected Map	providers;
 	
+	/** Save settings on exit?. */
+	protected boolean	saveonexit;
+	
 	//-------- constructors --------
 	
 	/**
@@ -50,11 +53,12 @@ public class SettingsService extends BasicService implements ISettingsService
 	 *  @param prefix The settings file prefix to be used (if any).
 	 *    Uses name from service provider, if no prefix is given.
 	 */
-	public SettingsService(String prefix, IInternalAccess access)
+	public SettingsService(String prefix, IInternalAccess access, boolean saveonexit)
 	{
 		super(access.getServiceContainer().getId(), ISettingsService.class, null);
 		this.access	= access;
 		this.providers	= new LinkedHashMap();
+		this.saveonexit	= saveonexit;
 		
 		if(prefix==null)
 		{
@@ -102,14 +106,21 @@ public class SettingsService extends BasicService implements ISettingsService
 	public IFuture	shutdownService()
 	{
 		final Future	ret	= new Future();
-		// Cannot use access.createResultListener() as component is already terminated.
-		saveProperties(true).addResultListener(new DelegationResultListener(ret)
+		if(saveonexit)
 		{
-			public void customResultAvailable(Object result)
+			// Cannot use access.createResultListener() as component is already terminated.
+			saveProperties(true).addResultListener(new DelegationResultListener(ret)
 			{
-				SettingsService.super.shutdownService().addResultListener(new DelegationResultListener(ret));
-			}
-		});
+				public void customResultAvailable(Object result)
+				{
+					SettingsService.super.shutdownService().addResultListener(new DelegationResultListener(ret));
+				}
+			});
+		}
+		else
+		{
+			super.shutdownService().addResultListener(new DelegationResultListener(ret));
+		}
 		return ret;
 	}
 	
