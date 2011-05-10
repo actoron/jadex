@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  *  Starter class for  
@@ -46,7 +48,7 @@ public class Starter
 
 	/** The termination timeout. */
 	// Todo: use configuration/argument value if present.
-	public static final long	TERMINATION_TIMEOUT	= 20000;
+	public static final long	TERMINATION_TIMEOUT	= 2000000;
 
 	
 	/** The configuration file. */
@@ -143,6 +145,7 @@ public class Starter
 //				{
 //					public void run()
 //					{
+//						System.out.println(getClass().getName()+": Calling System.exit() for testing.");
 //						System.exit(0);
 //					}
 //				}, 5000);

@@ -136,10 +136,11 @@ public class LoggerWrapper extends Logger
 	 */
 	public void log(Level level, String msg)
 	{
-		if(level.intValue() < logger.getLevel().intValue() || logger.getLevel().intValue() == offValue) 
-		    return;
-		LogRecord lr = createLogRecord(level, msg, getTime());
-		log(lr);
+		if(logger.getLevel()!=null && level.intValue()>=logger.getLevel().intValue() && logger.getLevel().intValue()!=offValue) 
+		{
+			LogRecord lr = createLogRecord(level, msg, getTime());
+			log(lr);
+		}
 	}
 
 	/**

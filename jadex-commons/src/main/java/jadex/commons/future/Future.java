@@ -133,7 +133,7 @@ public class Future implements IFuture
     		    		// Nest exception to have both calling and manually set exception stack trace.
 //     		    		exception	= new RuntimeException("Exception when evaluating future", exception);
      		    		exception	= new RuntimeException(exception.getMessage(), exception);
-     		    	    		    	}
+     		    	}
 //    				System.out.println(this+" caller awoke: "+caller+" "+mon);
     			}
     			// else already resumed.
@@ -148,9 +148,13 @@ public class Future implements IFuture
     		throw exception instanceof RuntimeException ?(RuntimeException)exception 
     			:new RuntimeException(exception);
     	}
-    	else
+    	else if(resultavailable)
     	{
     	   	return result;
+    	}
+    	else
+    	{
+    		throw new RuntimeException("Timeout while waiting for future.");
     	}
     }
     
