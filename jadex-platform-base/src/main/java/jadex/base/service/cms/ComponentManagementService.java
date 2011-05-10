@@ -781,8 +781,8 @@ public abstract class ComponentManagementService extends BasicService implements
 			}
 			else
 			{
-				if(cid.getName().indexOf("SubWorkflowTest")!=-1)
-					System.out.println("Terminating component structure: "+cid.getName());
+//				if(cid.getName().indexOf("SubWorkflowTest")!=-1)
+//					System.out.println("Terminating component structure: "+cid.getName());
 				logger.info("Terminating component structure: "+cid.getName());
 				synchronized(adapters)
 				{
