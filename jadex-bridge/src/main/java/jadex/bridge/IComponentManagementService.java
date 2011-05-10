@@ -132,6 +132,13 @@ public interface IComponentManagementService extends IService
 	 */
 	public IFuture getChildren(IComponentIdentifier cid);
 	
+	/**
+	 *  Get the children components of a component.
+	 *  @param cid The component identifier.
+	 *  @return The children component descriptions.
+	 */
+	public IFuture getChildrenDescriptions(IComponentIdentifier cid);
+	
 	//-------- create methods for cms objects --------
 	
 	// todo: remove all following methods 

@@ -362,7 +362,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	/**
 	 *  Get the children (if any).
 	 *  @return The children.
-	 */
+	 * /
 	public IFuture getChildren()
 	{
 		final Future ret = new Future();
@@ -382,7 +382,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		});
 		
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Get the children (if any).

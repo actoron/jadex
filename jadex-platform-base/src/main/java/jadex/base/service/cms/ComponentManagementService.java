@@ -1613,6 +1613,54 @@ public abstract class ComponentManagementService extends BasicService implements
 		return ret;
 	}
 
+	
+	/**
+	 *  Get the children components of a component.
+	 *  @param cid The component identifier.
+	 *  @return The children component descriptions.
+	 */
+	public IFuture getChildrenDescriptions(final IComponentIdentifier cid)
+	{
+		final Future	ret	= new Future();
+		
+		if(isRemoteComponent(cid))
+		{
+			getRemoteCMS(cid).addResultListener(new DelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+					final IComponentManagementService rcms = (IComponentManagementService)result;
+					rcms.getChildrenDescriptions(cid).addResultListener(new DelegationResultListener(ret));
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					super.exceptionOccurred(exception);
+				}
+			});
+		}
+		else
+		{
+			synchronized(adapters)
+			{
+				synchronized(descs)
+				{
+					CMSComponentDescription desc = (CMSComponentDescription)this.descs.get(cid);
+					IComponentIdentifier[] tmp = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
+						IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS: IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS;
+					IComponentDescription[]	descs	= new IComponentDescription[tmp.length];
+					for(int i=0; i<descs.length; i++)
+					{
+						descs[i]	= (IComponentDescription)this.descs.get(tmp[i]);
+						assert descs[i]!=null;
+					}
+					ret.setResult(descs);
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
 	/**
 	 *  Create component identifier.
 	 *  @param name The name.
