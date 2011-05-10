@@ -28,11 +28,21 @@ public @interface Configuration
 	 */
 	public NameValue[] results() default {};
 
+	/**
+	 *  The components.
+	 */
+	public Component[] components() default {};
+	
 // todo:
+//	/**
+//	 *  The provided service implementations.
+//	 */
+//	public NameValue[] serviceimplementations() default {};
+//	
 //	/**
 //	 *  The required service bindings.
 //	 */
-//	public Binding[] bindings() default {};
+//	public Binding[] servicebindings() default {};
 	
 	/**
 	 *  The master flag.

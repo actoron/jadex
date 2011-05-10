@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;

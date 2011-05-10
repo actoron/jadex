@@ -3,7 +3,7 @@ package jadex.wfms.simulation;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
-import jadex.bridge.IModelInfo;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.ICacheableModel;
 import jadex.commons.collection.Tree;
 import jadex.commons.collection.TreeNode;

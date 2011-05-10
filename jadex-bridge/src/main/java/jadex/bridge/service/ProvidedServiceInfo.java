@@ -6,18 +6,17 @@ package jadex.bridge.service;
 public class ProvidedServiceInfo
 {
 	//-------- attributes --------
+
+	// todo:
+	
+//	/** The name (used for referencing). */
+//	protected String name;
 	
 	/** The service interface type. */
 	protected Class type;
 	
-	/** The creation expression. */
-	protected String expression;
-	
-	/** The implementation class. */
-	protected Class implementation;
-	
-	/** The direct flag. */
-	protected boolean direct;
+	/** The service implementation. */
+	protected ProvidedServiceImplementation implementation;
 	
 	//-------- constructors --------
 	
@@ -34,7 +33,7 @@ public class ProvidedServiceInfo
 	 */
 	public ProvidedServiceInfo(Class type)
 	{
-		this(type, null);
+		this(type, (ProvidedServiceImplementation)null);
 	}
 	
 	/**
@@ -42,20 +41,18 @@ public class ProvidedServiceInfo
 	 */
 	public ProvidedServiceInfo(Class type, String expression)
 	{
-		this(type, expression, false, null);
+		this(type, new ProvidedServiceImplementation(null, expression, false, null));
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
-	public ProvidedServiceInfo(Class type, String expression, boolean direct, Class implementation)
+	public ProvidedServiceInfo(Class type, ProvidedServiceImplementation implementation)
 	{
 		this.type = type;
-		this.expression = expression;
-		this.direct = direct;
 		this.implementation = implementation;
 	}
-
+	
 	//-------- methods --------
 
 	/**
@@ -77,46 +74,10 @@ public class ProvidedServiceInfo
 	}
 
 	/**
-	 *  Get the expression.
-	 *  @return The expression.
-	 */
-	public String getExpression()
-	{
-		return expression;
-	}
-
-	/**
-	 *  Set the expression.
-	 *  @param expression The expression to set.
-	 */
-	public void setExpression(String expression)
-	{
-		this.expression = expression;
-	}
-
-	/**
-	 *  Get the direct.
-	 *  @return the direct.
-	 */
-	public boolean isDirect()
-	{
-		return direct;
-	}
-
-	/**
-	 *  Set the direct.
-	 *  @param direct The direct to set.
-	 */
-	public void setDirect(boolean direct)
-	{
-		this.direct = direct;
-	}
-
-	/**
 	 *  Get the implementation.
 	 *  @return The implementation.
 	 */
-	public Class getImplementation()
+	public ProvidedServiceImplementation getImplementation()
 	{
 		return implementation;
 	}
@@ -125,8 +86,19 @@ public class ProvidedServiceInfo
 	 *  Set the implementation.
 	 *  @param implementation The implementation to set.
 	 */
-	public void setImplementation(Class implementation)
+	public void setImplementation(ProvidedServiceImplementation implementation)
 	{
 		this.implementation = implementation;
 	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "ProvidedServiceInfo(type=" + type + ", implementation="
+			+ implementation + ")";
+	}
+	
+	
 }

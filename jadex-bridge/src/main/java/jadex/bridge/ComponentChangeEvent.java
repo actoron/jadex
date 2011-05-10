@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;

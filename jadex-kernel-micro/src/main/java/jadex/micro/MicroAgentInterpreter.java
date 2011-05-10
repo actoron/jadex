@@ -1,45 +1,33 @@
 package jadex.micro;
 
 import jadex.bridge.ComponentChangeEvent;
-import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentListener;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
-import jadex.bridge.IModelInfo;
-import jadex.bridge.IntermediateComponentResultListener;
-import jadex.bridge.RemoteComponentListener;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
-import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.ITimer;
 import jadex.commons.SReflect;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.javaparser.SJavaParser;
+import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
+import jadex.kernelbase.runtime.impl.AbstractInterpreter;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,7 +38,7 @@ import java.util.Map;
  *  The micro agent interpreter is the connection between the agent platform 
  *  and a user-written micro agent. 
  */
-public class MicroAgentInterpreter implements IComponentInstance
+public class MicroAgentInterpreter extends AbstractInterpreter
 {
 	/** Constant for step event. */
 	public static final String TYPE_STEP = "step";
@@ -99,6 +87,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 	/** The service bindings. */
 	protected RequiredServiceBinding[] bindings;
 	
+	/** The service fetcher. */
+	protected IValueFetcher fetcher;
+	
 	//-------- constructors --------
 	
 	/**
@@ -107,156 +98,60 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  @param microagent The microagent.
 	 */
 	public MicroAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
-		final IModelInfo model, Class microclass, final Map arguments, String config, 
+		final IModelInfo model, Class microclass, final Map args, final String config, 
 		final IExternalAccess parent, RequiredServiceBinding[] bindings, final Future inited)
 	{
 		this.model = model;
 		this.config = config;
-		this.arguments = arguments;
+		this.arguments = args!=null? args: new HashMap();
 		this.parent = parent;
 		this.steps	= new ArrayList();
 		this.bindings = bindings;
-		
-		// Init the arguments with default values.
-		IArgument[] args = model.getArguments();
-		for(int i=0; i<args.length; i++)
-		{
-			if(args[i].getDefaultValue(this.config)!=null)
-			{
-				if(this.arguments==null)
-					this.arguments = new HashMap();
-			
-				if(!this.arguments.containsKey(args[i].getName()))
-				{
-					this.arguments.put(args[i].getName(), args[i].getDefaultValue(this.config));
-				}
-			}
-		}
-		
-		// Init the results with default values.
-		IArgument[] res = model.getResults();
-		for(int i=0; i<res.length; i++)
-		{
-			if(res[i].getDefaultValue(this.config)!=null)
-			{
-				if(MicroAgentInterpreter.this.results==null)
-					MicroAgentInterpreter.this.results = new HashMap();
-			
-				MicroAgentInterpreter.this.results.put(res[i].getName(), res[i].getDefaultValue(this.config));
-			}
-		}
+		this.arguments = new HashMap();
+		this.results = new HashMap();
 		
 		try
 		{
-//			microagent = (MicroAgent)model.getMicroAgentClass().newInstance();
-			microagent = (MicroAgent)microclass.newInstance();
-			microagent.init(MicroAgentInterpreter.this);
-
+			this.microagent = (MicroAgent)microclass.newInstance();
+			this.microagent.init(MicroAgentInterpreter.this);
 			this.adapter = factory.createComponentAdapter(desc, model, this, parent);
-			
-			// Schedule initial step.
-			addStep(new Object[]{new IComponentStep()
+			addStep((new Object[]{new IComponentStep()
 			{
 				public Object execute(IInternalAccess ia)
 				{
-					// Create provided services
-					ProvidedServiceInfo[] services = model.getProvidedServices();
-//					System.out.println("init sers: "+services);
-					if(services!=null)
-					{
-						final SimpleValueFetcher fetcher = new SimpleValueFetcher();
-						fetcher.setValue("$args", getArguments());
-						fetcher.setValue("$properties", model.getProperties());
-						fetcher.setValue("$results", getResults());
-						fetcher.setValue("$component", microagent);
-						fetcher.setValue("$provider", getServiceProvider());
-						for(int i=0; i<services.length; i++)
-						{
-							Object service = null;
-							
-							try
-							{
-								if(services[i].getExpression()!=null)
-								{
-									// todo: other Class imports, how can be found out?
-									String[] imports = new String[]{microagent.getClass().getPackage().getName()+".*"};
-									service = SJavaParser.evaluateExpression(services[i].getExpression(), imports, fetcher, model.getClassLoader());
-									
-//									System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
-								}
-								else if(services[i].getImplementation()!=null)
-								{
-									service = services[i].getImplementation().newInstance();
-								}
-								
-								if(service!=null)
-								{
-									if(services[i].isDirect())
-									{
-										microagent.addDirectService(service);
-									}
-									else
-									{
-										microagent.addService(service);
-									}
-								}
-								else
-								{
-									microagent.getLogger().warning("Service creation error: "+services[i].getExpression());
-								}
-							}
-							catch(Exception e)
-							{
-								e.printStackTrace();
-								microagent.getLogger().warning("Service creation error: "+services[i].getExpression());
-							}
-						}
-					}
+					init(model, config, null, arguments, results, null)
+						.addResultListener(createResultListener(new DelegationResultListener(inited)));
 					
-					getServiceContainer().start().addResultListener(createResultListener(new IResultListener()
+					// Call user code init.
+					microagent.agentCreated().addResultListener(new DelegationResultListener(inited)
 					{
-						public void resultAvailable(Object result)
+						public void customResultAvailable(Object result)
 						{
-							microagent.agentCreated().addResultListener(new DelegationResultListener(inited)
+							addStep(new Object[]{new IComponentStep()
 							{
-								public void customResultAvailable(Object result)
+								public Object execute(IInternalAccess ia)
 								{
-									// Init is now finished. Notify cms.
-									inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
-									
-									addStep(new Object[]{new IComponentStep()
-									{
-										public Object execute(IInternalAccess ia)
-										{
-											microagent.executeBody();
-											return null;
-										}
-										public String toString()
-										{
-											return "microagent.executeBody()_#"+this.hashCode();
-										}
-									}, new Future()});
+									microagent.executeBody();
+									return null;
 								}
-							});
+								public String toString()
+								{
+									return "microagent.executeBody()_#"+this.hashCode();
+								}
+							}, new Future()});
+							
+							// Init is now finished. Notify cms.
+							inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
 						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							inited.setException(exception);
-						}
-					}));
-				
+					});
+					
 					return null;
 				}
-				public String toString()
-				{
-					return "microagent.init()_#"+this.hashCode();
-				}
-			}, new Future()});
+			}, new Future()}));
 		}
 		catch(Exception e)
 		{
-			throw new RuntimeException(e);
+			inited.setException(e);
 		}
 	}
 	
@@ -387,24 +282,24 @@ public class MicroAgentInterpreter implements IComponentInstance
 		return ret;
 	}
 	
-	/**
-	 *  Kill the component.
-	 */
-	public IFuture killComponent()
-	{
-		final Future ret = new Future();
-		
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier())
-					.addResultListener(new DelegationResultListener(ret));
-			}
-		});
-		
-		return ret;
-	}
+//	/**
+//	 *  Kill the component.
+//	 */
+//	public IFuture killComponent()
+//	{
+//		final Future ret = new Future();
+//		
+//		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object result)
+//			{
+//				((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier())
+//					.addResultListener(new DelegationResultListener(ret));
+//			}
+//		});
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Can be called concurrently (also during executeAction()).
@@ -429,17 +324,17 @@ public class MicroAgentInterpreter implements IComponentInstance
 		return access;
 	}
 	
-	/**
-	 *  Get the class loader of the agent.
-	 *  The agent class loader is required to avoid incompatible class issues,
-	 *  when changing the platform class loader while agents are running. 
-	 *  This may occur e.g. when decoding messages and instantiating parameter values.
-	 *  @return	The agent class loader. 
-	 */
-	public ClassLoader getClassLoader()
-	{
-		return model.getClassLoader();
-	}
+//	/**
+//	 *  Get the class loader of the agent.
+//	 *  The agent class loader is required to avoid incompatible class issues,
+//	 *  when changing the platform class loader while agents are running. 
+//	 *  This may occur e.g. when decoding messages and instantiating parameter values.
+//	 *  @return	The agent class loader. 
+//	 */
+//	public ClassLoader getClassLoader()
+//	{
+//		return model.getClassLoader();
+//	}
 	
 	/**
 	 *  Get the results.
@@ -450,27 +345,27 @@ public class MicroAgentInterpreter implements IComponentInstance
 		return results!=null? Collections.unmodifiableMap(results): Collections.EMPTY_MAP;
 	}
 	
-	/**
-	 *  Called when a component has been created as a subcomponent of this component.
-	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
-	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
-	 *  @param comp	The newly created component.
-	 */
-	public IFuture	componentCreated(IComponentDescription desc, IModelInfo model)
-	{
-		return IFuture.DONE;
-	}
-
-	/**
-	 *  Called when a subcomponent of this component has been destroyed.
-	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
-	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
-	 *  @param comp	The destroyed component.
-	 */
-	public IFuture	componentDestroyed(IComponentDescription desc)
-	{
-		return IFuture.DONE;
-	}
+//	/**
+//	 *  Called when a component has been created as a subcomponent of this component.
+//	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
+//	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
+//	 *  @param comp	The newly created component.
+//	 */
+//	public IFuture	componentCreated(IComponentDescription desc, IModelInfo model)
+//	{
+//		return IFuture.DONE;
+//	}
+//
+//	/**
+//	 *  Called when a subcomponent of this component has been destroyed.
+//	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
+//	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
+//	 *  @param comp	The destroyed component.
+//	 */
+//	public IFuture	componentDestroyed(IComponentDescription desc)
+//	{
+//		return IFuture.DONE;
+//	}
 	
 	/**
 	 *  Test if the component's execution is currently at one of the
@@ -715,13 +610,13 @@ public class MicroAgentInterpreter implements IComponentInstance
 		return this.config;
 	}
 	
-	/**
-	 *  Get the service provider.
-	 */
-	public IServiceProvider getServiceProvider()
-	{
-		return getServiceContainer();
-	}
+//	/**
+//	 *  Get the service provider.
+//	 */
+//	public IServiceProvider getServiceProvider()
+//	{
+//		return getServiceContainer();
+//	}
 	
 	/**
 	 *  Create the service container.
@@ -736,25 +631,25 @@ public class MicroAgentInterpreter implements IComponentInstance
 		return container;
 	}
 
-	/**
-	 *  Create a result listener which is executed as an agent step.
-	 *  @param The original listener to be called.
-	 *  @return The listener.
-	 */
-	public IResultListener createResultListener(IResultListener listener)
-	{
-		return new ComponentResultListener(listener, adapter);
-	}
-
-	/**
-	 *  Create a result listener which is executed as an agent step.
-	 *  @param The original listener to be called.
-	 *  @return The listener.
-	 */
-	public IIntermediateResultListener createResultListener(IIntermediateResultListener listener)
-	{
-		return new IntermediateComponentResultListener(listener, adapter);
-	}
+//	/**
+//	 *  Create a result listener which is executed as an agent step.
+//	 *  @param The original listener to be called.
+//	 *  @return The listener.
+//	 */
+//	public IResultListener createResultListener(IResultListener listener)
+//	{
+//		return new ComponentResultListener(listener, adapter);
+//	}
+//
+//	/**
+//	 *  Create a result listener which is executed as an agent step.
+//	 *  @param The original listener to be called.
+//	 *  @return The listener.
+//	 */
+//	public IIntermediateResultListener createResultListener(IIntermediateResultListener listener)
+//	{
+//		return new IntermediateComponentResultListener(listener, adapter);
+//	}
 	
 	/**
 	 *  Add an component listener.
@@ -764,13 +659,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	{
 		if(componentlisteners==null)
 			componentlisteners = new ArrayList();
-		
-		// Hack! How to find out if remote listener?
-		if(Proxy.isProxyClass(listener.getClass()))
-			listener = new RemoteComponentListener(access, listener);
-		
-		componentlisteners.add(listener);
-		return IFuture.DONE;
+		return addComponentListener(componentlisteners, listener);
 	}
 	
 	/**
@@ -779,15 +668,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public IFuture removeComponentListener(IComponentListener listener)
 	{
-		// Hack! How to find out if remote listener?
-		if(Proxy.isProxyClass(listener.getClass()))
-			listener = new RemoteComponentListener(access, listener);
-		
-		if(componentlisteners!=null)
-			componentlisteners.remove(listener);
-		
-//		System.out.println("cl: "+componentlisteners);
-		return IFuture.DONE;
+		return removeComponentListener(componentlisteners, listener);
 	}
 	
 	/**
@@ -987,5 +868,67 @@ public class MicroAgentInterpreter implements IComponentInstance
 		}
 		
 		return buf.toString();
+	}
+	
+	//-------- internal methods --------
+	
+	/**
+	 *  Get the component adapter.
+	 *  @return The component adapter.
+	 */
+	public IComponentAdapter getComponentAdapter()
+	{
+		return adapter;
+	}
+
+	/**
+	 *  Get the model.
+	 */
+	public IModelInfo getModel()
+	{
+		return model;
+	}
+	
+	/**
+	 *  Get the imports.
+	 *  @return The imports.
+	 */
+	public String[] getAllImports()
+	{
+		return new String[]{microagent.getClass().getPackage().getName()+".*"};
+	}
+	
+	/**
+	 *  Get the service bindings.
+	 */
+	public RequiredServiceBinding[] getServiceBindings()
+	{
+		return bindings;
+	}
+	
+	/**
+	 *  Get the value fetcher.
+	 */
+	public IValueFetcher getFetcher()
+	{
+		if(fetcher==null)
+		{
+			SimpleValueFetcher sfetcher = new SimpleValueFetcher();
+			sfetcher.setValue("$args", getArguments());
+			sfetcher.setValue("$properties", model.getProperties());
+			sfetcher.setValue("$results", getResults());
+			sfetcher.setValue("$component", microagent);
+			sfetcher.setValue("$provider", getServiceProvider());
+			fetcher = sfetcher;
+		}
+		return fetcher;
+	}
+
+	/**
+	 *  Get the internal access.
+	 */
+	public IInternalAccess getInternalAccess()
+	{
+		return microagent;
 	}
 }

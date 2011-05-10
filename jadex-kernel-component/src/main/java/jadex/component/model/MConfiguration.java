@@ -16,7 +16,7 @@ public class MConfiguration extends MStartable
 	/** The list of contained components. */
 	protected List components;
 	
-	/** The map of argument default values. */
+	/** The list of argument default values. */
 	protected List arguments;
 	
 	//-------- constructors --------

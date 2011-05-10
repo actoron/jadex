@@ -2,10 +2,10 @@ package jadex.micro.benchmarks;
 
 import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IArgument;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.MessageType;
+import jadex.bridge.modelinfo.IArgument;
 import jadex.commons.future.DefaultResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;

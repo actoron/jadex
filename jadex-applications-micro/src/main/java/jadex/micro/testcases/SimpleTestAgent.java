@@ -2,14 +2,16 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bridge.Argument;
-import jadex.bridge.IArgument;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Description;
+import jadex.micro.annotation.Result;
+import jadex.micro.annotation.Results;
 
 /**
  *  A minimal test case agent serving as a demonstrator.
  */
+@Description("A simple test showing how the test center works with micro agents.")
+@Results(@Result(name="testresults", typename="Testcase"))
 public class SimpleTestAgent extends MicroAgent
 {
 	/**
@@ -23,12 +25,12 @@ public class SimpleTestAgent extends MicroAgent
 		killAgent();
 	}
 	
-	/**
-	 *  Add the 'testresults' marking this agent as a testcase. 
-	 */
-	public static Object getMetaInfo()
-	{
-		return new MicroAgentMetaInfo("A simple test showing how the test center works with micro agents.", 
-			null, null, new IArgument[]{new Argument("testresults", null, "Testcase")});
-	}
+//	/**
+//	 *  Add the 'testresults' marking this agent as a testcase. 
+//	 */
+//	public static Object getMetaInfo()
+//	{
+//		return new MicroAgentMetaInfo("A simple test showing how the test center works with micro agents.", 
+//			null, null, new IArgument[]{new Argument("testresults", null, "Testcase")});
+//	}
 }

@@ -7,7 +7,7 @@ import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IModelInfo;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;

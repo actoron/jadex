@@ -1,6 +1,6 @@
 package jadex.gpmn.model;
 
-import jadex.bridge.ModelInfo;
+import jadex.bridge.modelinfo.ModelInfo;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
 

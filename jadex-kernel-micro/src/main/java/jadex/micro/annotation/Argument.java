@@ -20,7 +20,7 @@ public @interface Argument
 	/**
 	 *  The description.
 	 */
-	public String description();
+	public String description() default "";
 	
 	/**
 	 *  The type name.
@@ -30,6 +30,6 @@ public @interface Argument
 	/**
 	 *  The default value as expression string, i.e. will be parsed.
 	 */
-	public String defaultvalue();
+	public String defaultvalue() default "";
 }
 

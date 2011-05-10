@@ -8,14 +8,14 @@ import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.CreationInfo;
-import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IModelInfo;
+import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
@@ -705,7 +705,7 @@ public class StarterPanel extends JPanel
 		
 		// Add all known component configuration names to the config chooser.
 		
-		String[] confignames = model!=null? model.getConfigurations(): SUtil.EMPTY_STRING_ARRAY;
+		String[] confignames = model!=null? model.getConfigurationNames(): SUtil.EMPTY_STRING_ARRAY;
 		for(int i = 0; i<confignames.length; i++)
 		{
 			((DefaultComboBoxModel)config.getModel()).addElement(confignames[i]);
@@ -1307,7 +1307,7 @@ public class StarterPanel extends JPanel
 				{
 					((DefaultTableModel)providedt.getModel()).addRow(new Object[]{
 						provided[i]!=null? provided[i].getType(): "unknown service type (class definition missing)",
-						provided[i]!=null? provided[i].getExpression(): ""});
+						provided[i]!=null? provided[i].getImplementation(): ""});
 				}
 				providedt.getColumn("Interface").setCellRenderer(new ClassRenderer());
 			}

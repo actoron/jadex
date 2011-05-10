@@ -1,8 +1,8 @@
 package jadex.tools.daemon;
 
 import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;

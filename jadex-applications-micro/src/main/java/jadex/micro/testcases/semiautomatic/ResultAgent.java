@@ -1,9 +1,9 @@
 package jadex.micro.testcases.semiautomatic;
 
-import jadex.bridge.Argument;
 import jadex.bridge.CreationInfo;
-import jadex.bridge.IArgument;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IResultListener;

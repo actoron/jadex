@@ -36,7 +36,7 @@ import javax.swing.tree.TreeModel;
 /**
  *  Dynamically create a new menu item structure for starting components.
  */
-class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor, IPropertiesProvider
+public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor, IPropertiesProvider
 {
 	//-------- attributes --------
 	

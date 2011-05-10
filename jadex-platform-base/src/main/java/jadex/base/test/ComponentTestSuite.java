@@ -2,10 +2,10 @@ package jadex.base.test;
 
 import jadex.base.SComponentFactory;
 import jadex.base.Starter;
-import jadex.bridge.IArgument;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IModelInfo;
+import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;

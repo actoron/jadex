@@ -1,12 +1,12 @@
 package jadex.micro.examples.ping;
 
 import jadex.base.fipa.SFipa;
-import jadex.bridge.Argument;
-import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.MessageType;
+import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.IArgument;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.micro.MicroAgent;

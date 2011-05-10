@@ -1,7 +1,7 @@
 package jadex.micro;
 
-import jadex.bridge.IArgument;
-import jadex.bridge.IModelValueProvider;
+import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.IModelValueProvider;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SUtil;

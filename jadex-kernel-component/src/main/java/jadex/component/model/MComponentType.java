@@ -1,10 +1,11 @@
 package jadex.component.model;
 
 import jadex.bridge.AbstractErrorReportBuilder;
-import jadex.bridge.Argument;
 import jadex.bridge.IErrorReport;
-import jadex.bridge.ModelInfo;
-import jadex.bridge.ModelValueProvider;
+import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.modelinfo.ModelValueProvider;
+import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.ICacheableModel;
@@ -227,7 +228,7 @@ public class MComponentType extends MStartable implements ICacheableModel
 				Class type = ser.getClazz()!=null? ser.getClazz(): 
 					tmp[i]==null && ser.getParsedValue()!=null? 
 					ser.getParsedValue().getStaticType(): null;
-				tmp[i] = new ProvidedServiceInfo(type, ser.getValue(), ser.isDirect(), ser.getClazz());
+				tmp[i] = new ProvidedServiceInfo(type, new ProvidedServiceImplementation(ser.getClazz(), ser.getValue(), ser.isDirect(), null));
 			}
 			
 			modelinfo.setProvidedServices(tmp);

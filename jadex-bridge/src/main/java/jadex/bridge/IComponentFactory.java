@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.annotation.Excluded;

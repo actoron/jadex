@@ -1,12 +1,12 @@
 package jadex.micro.benchmarks;
 
-import jadex.bridge.Argument;
 import jadex.bridge.CreationInfo;
-import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;

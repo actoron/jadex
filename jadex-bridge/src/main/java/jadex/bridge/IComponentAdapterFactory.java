@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import jadex.bridge.modelinfo.IModelInfo;
+
 
 /**
  *  Interface for platform specific component adapter factories.

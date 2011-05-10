@@ -4,8 +4,8 @@ import java.util.Collections;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bridge.Argument;
-import jadex.bridge.IArgument;
+import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.IResultListener;

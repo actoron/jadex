@@ -18,7 +18,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IModelInfo;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;

@@ -18,17 +18,7 @@ public @interface ProvidedService
 	public Class type();
 	
 	/**
-	 *  The creation expression.
+	 *  The service implementation.
 	 */
-	public Class implementation() default Object.class;
-
-	/**
-	 *  The creation expression.
-	 */
-	public String expression() default "";
-
-	/**
-	 *  The direct flag.
-	 */
-	public boolean direct() default false;
+	public Implementation implementation();
 }

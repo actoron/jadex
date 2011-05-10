@@ -1,9 +1,9 @@
 package jadex.tools.testcenter;
 
 import jadex.base.SComponentFactory;
-import jadex.bridge.IArgument;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IModelInfo;
+import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

@@ -13,7 +13,7 @@ import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IModelInfo;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.jade.service.message.JadexMessageTransportProtocol;
 
 import java.util.ArrayList;

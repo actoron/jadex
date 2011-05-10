@@ -2,9 +2,10 @@ package jadex.bdi.model;
 
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bridge.AbstractErrorReportBuilder;
-import jadex.bridge.Argument;
-import jadex.bridge.IArgument;
-import jadex.bridge.ModelInfo;
+import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -98,7 +99,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		boolean startable = !this.getClass().equals(OAVCapabilityModel.class);
 		this.modelinfo = new ModelInfo(getName(), getPackage(), getDescription(), null, getConfigurations(), getArguments(), 
 			getResults(), startable, filename, getProperties(), getClassLoader(), getRequiredServices(), getProvidedServices(),
-			null, null, null);
+			null, null, null, null, null);
 		
 		// Build error report.
 		getModelInfo().setReport(new AbstractErrorReportBuilder(getModelInfo().getName(), getModelInfo().getFilename(),
@@ -744,7 +745,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 				String text = (String)state.getAttributeValue(ob, OAVBDIMetaModel.expression_has_text);
 				Boolean direct = (Boolean)state.getAttributeValue(ob, OAVBDIMetaModel.providedservice_has_direct);
 				Class impl = (Class)state.getAttributeValue(ob, OAVBDIMetaModel.providedservice_has_implementation);
-				ProvidedServiceInfo psi = new ProvidedServiceInfo(clazz, text, direct!=null? direct.booleanValue(): false, impl); 
+				ProvidedServiceInfo psi = new ProvidedServiceInfo(clazz, new ProvidedServiceImplementation(impl, text, direct!=null? direct.booleanValue(): false, null)); 
 				ret.add(psi);
 			}
 		}

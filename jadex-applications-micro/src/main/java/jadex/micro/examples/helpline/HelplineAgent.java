@@ -11,6 +11,7 @@ import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -31,7 +32,7 @@ import javax.swing.SwingUtilities;
 	@RequiredService(name="remotehelplineservices", type=IHelpline.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL)),
 	@RequiredService(name="localhelplineservices", type=IHelpline.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
-@ProvidedServices(@ProvidedService(type=IHelpline.class, implementation=HelplineService.class))
+@ProvidedServices(@ProvidedService(type=IHelpline.class, implementation=@Implementation(HelplineService.class)))
 @GuiClass(HelplineViewerPanel.class)
 public class HelplineAgent extends MicroAgent
 {

@@ -10,7 +10,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IModelInfo;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.clock.ClockCreationInfo;
 import jadex.bridge.service.clock.ClockService;

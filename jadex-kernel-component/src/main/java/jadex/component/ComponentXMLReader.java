@@ -1,6 +1,6 @@
 package jadex.component;
 
-import jadex.bridge.Argument;
+import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;

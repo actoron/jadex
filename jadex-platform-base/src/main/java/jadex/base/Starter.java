@@ -3,14 +3,14 @@ package jadex.base;
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IModelInfo;
+import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
@@ -210,7 +210,7 @@ public class Starter
 					
 					// Create an instance of the component.
 					String configname = (String)cmdargs.get("configname")!=null? (String)cmdargs.get("configname"): 
-						model.getConfigurations().length>0?  model.getConfigurations()[0]: null;
+						model.getConfigurationNames().length>0?  model.getConfigurationNames()[0]: null;
 					
 					String platformname = (String)cmdargs.get(PLATFORM_NAME);
 					if(platformname==null)

@@ -1,6 +1,6 @@
 package jadex.wfms;
 
-import jadex.bridge.IModelInfo;
+import jadex.bridge.modelinfo.IModelInfo;
 
 /**
  *  Interface for process instances.

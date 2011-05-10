@@ -12,8 +12,8 @@ import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.modeltree.ModelTreePanel;
 import jadex.base.gui.plugin.AbstractJCCPlugin.ShowRemoteControlCenterHandler;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.IModelInfo;
 import jadex.bridge.ISettingsService;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.Properties;
@@ -267,7 +267,7 @@ public class StarterPluginPanel extends JPanel
 						{
 //							IComponentFactory componentfactory = getJCC().getComponent().getPlatform().getComponentFactory();
 							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(jcc.getPlatformAccess(), type).get(new ThreadSuspendable());
-							String[] inistates = model.getConfigurations();
+							String[] inistates = model.getConfigurationNames();
 //							IMBDIComponent model = SXML.loadComponentModel(type, null);
 //							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();
 							

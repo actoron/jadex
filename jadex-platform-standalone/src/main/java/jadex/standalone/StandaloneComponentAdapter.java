@@ -5,7 +5,7 @@ import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IModelInfo;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.execution.IExecutionService;

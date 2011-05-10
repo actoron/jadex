@@ -14,9 +14,9 @@ import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IMessageService;
-import jadex.bridge.IModelInfo;
 import jadex.bridge.IRemoteServiceManagementService;
 import jadex.bridge.ISearchConstraints;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
@@ -490,7 +490,7 @@ public abstract class ComponentManagementService extends BasicService implements
 												// Create component and wakeup for init.
 												// Use first configuration if no config specified.
 												String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
-													: lmodel.getConfigurations().length>0 ? lmodel.getConfigurations()[0] : null;
+													: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
 												Object[] comp = factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
 													config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), future);
 												
@@ -1234,6 +1234,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			{
 				synchronized(descs)
 				{
+//					System.out.println("Terminating component finished: "+cid.getName());
 					logger.info("Terminating component finished: "+cid.getName());
 //					System.out.println("CleanupCommand: "+cid);
 		//			boolean shutdown = false;

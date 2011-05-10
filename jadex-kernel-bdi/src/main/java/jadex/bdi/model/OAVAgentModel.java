@@ -1,8 +1,8 @@
 package jadex.bdi.model;
 
-import jadex.bridge.Argument;
-import jadex.bridge.IArgument;
-import jadex.bridge.ModelValueProvider;
+import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.ModelValueProvider;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.rules.rulesystem.IPatternMatcherFunctionality;

@@ -10,6 +10,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -18,8 +19,8 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Description("This agent is a minimal calculator.")
 @ProvidedServices({
-	@ProvidedService(type=IAddService.class, expression="new AddService($component)"),
-	@ProvidedService(type=ISubService.class, expression="new SubService($component)")}
+	@ProvidedService(type=IAddService.class, implementation=@Implementation(expression="new AddService($component)")),
+	@ProvidedService(type=ISubService.class, implementation=@Implementation(expression="new SubService($component)"))}
 )
 public class CorruptAdderAgent extends MicroAgent
 {

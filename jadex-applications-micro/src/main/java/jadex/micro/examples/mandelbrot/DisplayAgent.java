@@ -12,6 +12,7 @@ import jadex.commons.gui.SGUI;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -33,7 +34,7 @@ import javax.swing.SwingUtilities;
  *  Agent offering a display service.
  */
 @Description("Agent offering a display service.")
-@ProvidedServices(@ProvidedService(type=IDisplayService.class, implementation=DisplayService.class))
+@ProvidedServices(@ProvidedService(type=IDisplayService.class, implementation=@Implementation(DisplayService.class)))
 @RequiredServices({
 	@RequiredService(name="generateservice", type=IGenerateService.class),
 	@RequiredService(name="progressservice", type=IProgressService.class),

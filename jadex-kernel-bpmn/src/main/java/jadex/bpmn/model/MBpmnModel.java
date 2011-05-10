@@ -1,8 +1,8 @@
 package jadex.bpmn.model;
 
-import jadex.bridge.IArgument;
-import jadex.bridge.IModelInfo;
-import jadex.bridge.ModelInfo;
+import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.ModelInfo;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;

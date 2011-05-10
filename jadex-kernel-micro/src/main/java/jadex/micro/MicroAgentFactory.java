@@ -1,17 +1,22 @@
 package jadex.micro;
 
-import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IModelInfo;
-import jadex.bridge.IModelValueProvider;
-import jadex.bridge.ModelInfo;
-import jadex.bridge.ModelValueProvider;
+import jadex.bridge.modelinfo.ComponentInstanceInfo;
+import jadex.bridge.modelinfo.ConfigurationInfo;
+import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.IModelValueProvider;
+import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.modelinfo.ModelValueProvider;
+import jadex.bridge.modelinfo.SubcomponentTypeInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -22,13 +27,18 @@ import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
+import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SJavaParser;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
+import jadex.micro.annotation.ComponentType;
+import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
@@ -225,8 +235,14 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			ProvidedServiceInfo[] psis = new ProvidedServiceInfo[vals.length];
 			for(int i=0; i<vals.length; i++)
 			{
-				psis[i] = new ProvidedServiceInfo(vals[i].type(), vals[i].expression().length()==0? null: vals[i].expression(), 
-					vals[i].direct(), vals[i].implementation().equals(Object.class)? null: vals[i].implementation());
+				Implementation im = vals[i].implementation();
+				Binding bd = im.binding();
+				RequiredServiceBinding bind = bd==null? null: new RequiredServiceBinding(bd.name(), 
+					bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
+					bd.dynamic(), bd.scope(), bd.create(), bd.recover());
+				ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
+					im.expression().length()>0? im.expression(): null, im.direct(), bind);
+				psis[i] = new ProvidedServiceInfo(vals[i].type(), impl);
 			}
 			metainfo.setProvidedServices(psis);
 		}
@@ -240,8 +256,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			IArgument[] tmpargs = new IArgument[vals.length];
 			for(int i=0; i<vals.length; i++)
 			{
-				Object arg = SJavaParser.evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
-				tmpargs[i] = new jadex.bridge.Argument(vals[i].name(), 
+//				Object arg = SJavaParser.evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
+				Object arg = evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
+				tmpargs[i] = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
 					vals[i].description(), vals[i].typename(), arg);
 				argsmap.put(tmpargs[i].getName(), tmpargs[i]);
 			}
@@ -257,8 +274,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			IArgument[] tmpresults = new IArgument[vals.length];
 			for(int i=0; i<vals.length; i++)
 			{
-//				Object res = SJavaParser.evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
-				tmpresults[i] = new jadex.bridge.Argument(vals[i].name(), 
+//				Object res = evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
+				tmpresults[i] = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
 					vals[i].description(), vals[i].typename(), null);
 				resmap.put(tmpresults[i].getName(), tmpresults[i]);
 			}
@@ -279,10 +296,14 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			Configuration val = (Configuration)cma.getAnnotation(Configuration.class);
 			configs = new Configuration[]{val};
 		}
+		
+		ConfigurationInfo[] cinfos = null;
 		if(configs!=null)
 		{
 			if(metainfo==null)
 				metainfo = new MicroAgentMetaInfo();
+			
+			List configinfos = new ArrayList();
 			
 			String[] confignames = new String[configs.length];
 			Map master = new HashMap();
@@ -298,22 +319,90 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 				NameValue[] argvals = configs[i].arguments();
 				for(int j=0; j<argvals.length; j++)
 				{
-					jadex.bridge.Argument arg = (jadex.bridge.Argument)argsmap.get(argvals[j].name());
-					Object val = SJavaParser.evaluateExpression(argvals[j].value(), imports, null, classloader);
+					jadex.bridge.modelinfo.Argument arg = (jadex.bridge.modelinfo.Argument)argsmap.get(argvals[j].name());
+//					Object val = SJavaParser.evaluateExpression(argvals[j].value(), imports, null, classloader);
+					Object val = evaluateExpression(argvals[j].value(), imports, null, classloader);
 					arg.setDefaultValue(confignames[i], val);
 				}
 				NameValue[] resvals = configs[i].results();
 				for(int j=0; j<resvals.length; j++)
 				{
-					jadex.bridge.Argument arg = (jadex.bridge.Argument)resmap.get(resvals[j].name());
-					Object val = SJavaParser.evaluateExpression(resvals[j].value(), imports, null, classloader);
+					jadex.bridge.modelinfo.Argument arg = (jadex.bridge.modelinfo.Argument)resmap.get(resvals[j].name());
+//					Object val = SJavaParser.evaluateExpression(resvals[j].value(), imports, null, classloader);
+					Object val = evaluateExpression(resvals[j].value(), imports, null, classloader);
 					arg.setDefaultValue(confignames[i], val);
 				}
+				
+				// todo: store arguments in config not in valueprovider
+				
+				ConfigurationInfo configinfo = new ConfigurationInfo(confignames[i]);
+				configinfos.add(configinfo);
+				Component[] comps = configs[i].components();
+				for(int j=0; j<comps.length; j++)
+				{
+					ComponentInstanceInfo comp = new ComponentInstanceInfo();
+					
+					comp.setSuspend(comps[j].suspend());
+					comp.setMaster(comps[j].master());
+					comp.setDaemon(comps[j].daemon());
+					comp.setAutoShutdown(comps[j].autoshutdown());
+					
+					if(comps[j].name().length()>0)
+						comp.setName(comps[j].name());
+					if(comps[j].type().length()>0)
+						comp.setTypename(comps[j].type());
+					if(comps[j].configuration().length()>0)
+						comp.setConfiguration(comps[j].configuration());
+					if(comps[j].number().length()>0)
+						comp.setNumber(comps[j].number());
+					
+					NameValue[] args = comps[j].arguments();
+					if(args.length>0)
+					{
+						UnparsedExpression[] exps = new UnparsedExpression[args.length];
+						for(int k=0; k<args.length; k++)
+						{
+							exps[k] = new UnparsedExpression(args[k].name(), null, args[i].value(), null);
+						}
+						comp.setArguments(exps);
+					}
+					
+					Binding[] binds = comps[j].bindings();
+					if(binds.length>0)
+					{
+						RequiredServiceBinding[] bds = new RequiredServiceBinding[binds.length];
+						for(int k=0; k<binds.length; k++)
+						{
+							bds[k] = new RequiredServiceBinding(binds[k].name(), 
+								binds[k].componentname().length()==0? null: binds[k].componentname(), binds[k].componenttype().length()==0? null: binds[k].componenttype(), 
+								binds[k].dynamic(), binds[k].scope(), binds[k].create(), binds[k].recover());
+						}
+						comp.setBindings(bds);
+					}
+					
+					configinfo.addComponentInstance(comp);
+				}
 			}
+			
 			metainfo.setMaster(new ModelValueProvider(master));
 			metainfo.setDaemon(new ModelValueProvider(daemon));
 			metainfo.setAutoShutdown(new ModelValueProvider(autosd));
 			metainfo.setConfigs(confignames);
+			
+			cinfos = (ConfigurationInfo[])configinfos.toArray(new ConfigurationInfo[configinfos.size()]);
+		}
+		
+		// Determine subcomponent types
+		SubcomponentTypeInfo[] subinfos = null;
+		if(cma.isAnnotationPresent(ComponentTypes.class))
+		{
+			ComponentTypes tmp = (ComponentTypes)cma.getAnnotation(ComponentTypes.class);
+			ComponentType[] ctypes = tmp.value();
+			subinfos = new SubcomponentTypeInfo[ctypes.length];
+			for(int i=0; i<ctypes.length; i++)
+			{
+				subinfos[i] = new SubcomponentTypeInfo(ctypes[i].name(), ctypes[i].filename());
+			}
 		}
 		
 		// todo: move to be able to use the constant
@@ -371,14 +460,20 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			names.add(metainfo.getBreakpoints()[i]);
 		properties.put("debugger.breakpoints", names);
 		
-		// Exclude getServiceProvider() from remote external access interface
-//		addExcludedMethods(properties, new String[]{"getServiceProvider"});
-		
 		IModelInfo ret = new ModelInfo(name, packagename, description, report, 
 			configurations, arguments, results, true, model, properties, classloader, required, provided,
-			master, daemon, autosd);
+			master, daemon, autosd, cinfos, subinfos);
 		
 		return ret;
+	}
+	
+	/**
+	 *  Evaluate an expression string (using "" -> null mapping) as annotations
+	 *  do not support null values.
+	 */
+	protected Object evaluateExpression(String exp, String[] imports, IValueFetcher fetcher, ClassLoader classloader)
+	{
+		return exp.length()==0? null: SJavaParser.evaluateExpression(exp, imports, null, classloader);
 	}
 	
 	/**

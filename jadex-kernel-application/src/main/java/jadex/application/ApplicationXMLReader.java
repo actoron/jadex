@@ -9,7 +9,7 @@ import jadex.application.model.MProvidedServiceType;
 import jadex.application.model.MRequiredServiceType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.model.MSpaceType;
-import jadex.bridge.Argument;
+import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;

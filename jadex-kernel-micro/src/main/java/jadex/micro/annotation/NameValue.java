@@ -20,5 +20,10 @@ public @interface NameValue
 	/**
 	 *  The value as string, will be parsed.
 	 */
-	public String value();
+	public String value() default "";
+	
+	/**
+	 *  The value as a class.
+	 */
+	public Class clazz() default Object.class;
 }

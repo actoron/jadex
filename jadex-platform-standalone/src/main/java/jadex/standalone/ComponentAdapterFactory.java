@@ -5,7 +5,7 @@ import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IModelInfo;
+import jadex.bridge.modelinfo.IModelInfo;
 
 /**
  *  Standalone version of the adapter factory.

@@ -4,7 +4,6 @@ import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.CreationInfo;
-import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
@@ -16,8 +15,9 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
-import jadex.bridge.IModelInfo;
 import jadex.bridge.IntermediateComponentResultListener;
+import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
@@ -83,9 +83,6 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	
 	/** The application configuration. */
 	protected MConfiguration	config;
-	
-	/** The contained spaces. */
-	protected Map spaces;
 	
 	/** The properties. */
 	protected Map properties;
@@ -158,7 +155,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 		this.bindings = bindings;
 	
 		// Init the arguments with default values.
-		String[] configs = model.getModelInfo().getConfigurations();
+		String[] configs = model.getModelInfo().getConfigurationNames();
 		String configname = config!=null? config.getName(): configs.length>0? configs[0]: null;
 		IArgument[] args = model.getModelInfo().getArguments();
 		for(int i=0; i<args.length; i++)
