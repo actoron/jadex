@@ -112,7 +112,7 @@
 				{
 					new FIPAMessageType()
 				}, null,
-				new CodecFactory(null, new Class[]{JadexXMLCodec.class})
+				new CodecFactory(null, new Class[]{GZIPCodec.class, JadexXMLCodec.class})
 				)
 		</providedservice>
 		<providedservice class="IComponentManagementService" direct="true">

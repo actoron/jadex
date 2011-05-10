@@ -90,6 +90,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	/** The service fetcher. */
 	protected IValueFetcher fetcher;
 	
+	/** The imports. */
+	protected String[] imports;
+	
 	//-------- constructors --------
 	
 	/**
@@ -895,7 +898,16 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 */
 	public String[] getAllImports()
 	{
-		return new String[]{microagent.getClass().getPackage().getName()+".*"};
+		if(imports==null)
+		{
+			List imp = new ArrayList();
+			imp.add(microagent.getClass().getPackage().getName()+".*");
+			
+			// todo: http://stackoverflow.com/questions/3734825/find-out-which-classes-of-a-given-api-are-used
+			
+			imports = (String[])imp.toArray(new String[imp.size()]);
+		}
+		return imports;
 	}
 	
 	/**
