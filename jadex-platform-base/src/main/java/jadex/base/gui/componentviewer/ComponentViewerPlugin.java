@@ -538,6 +538,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	 */
 	public void shutdown()
 	{
+		comptree.dispose();
 		for(Iterator it=panels.values().iterator(); it.hasNext(); )
 		{
 			// Todo: should wait for shutdown!!!

@@ -334,6 +334,14 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 		return IFuture.DONE;
 	}
 	
+	/**
+	 *  Shutdown the plugin.
+	 */
+	public void shutdown()
+	{
+		comptree.dispose();
+	}
+	
 	final AbstractAction	START_PROFILER	= new AbstractAction("Profile Agent", icons.getIcon("profile_agent"))
 	{
 		public void actionPerformed(ActionEvent e)

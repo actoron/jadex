@@ -454,7 +454,6 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 			}
 		};
 		cmshandler.addCMSListener(listenercid, cmslistener);
-//		cms.addComponentListener(null, cmslistener);
 	}
 
 	/**

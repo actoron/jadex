@@ -230,6 +230,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	 */
 	public void shutdown()
 	{
+		comptree.dispose();
 		for(Iterator it=msgservices.values().iterator(); it.hasNext(); )
 		{
 			Object[]	entry	= (Object[])it.next();

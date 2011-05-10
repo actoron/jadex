@@ -1369,18 +1369,6 @@ public class StarterPanel extends JPanel
 	}
 
 	/**
-	 *  Main for testing only.
-	 *  @param args The arguments.
-	 */
-	public static void main(String[] args)
-	{
-		JFrame f = new JFrame();
-		f.getContentPane().add(new StarterPanel(null, null));
-		f.pack();
-		f.setVisible(true);
-	}
-
-	/**
 	 *  Set the current parent.
 	 *  @param parent	The component id.
 	 */

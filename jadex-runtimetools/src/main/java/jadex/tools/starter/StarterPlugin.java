@@ -203,6 +203,15 @@ public class StarterPlugin extends AbstractJCCPlugin
 	}
 	
 	/**
+	 *  Shutdown the plugin.
+	 */
+	public void shutdown()
+	{
+		((StarterPluginPanel)getView()).dispose();
+	}
+
+	
+	/**
 	 *  Action for killing the platform.
 	 */
 	final AbstractAction KILL_PLATFORM = new AbstractAction("Kill platform", icons.getIcon("kill_platform"))

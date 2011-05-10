@@ -295,6 +295,14 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 		return split;
 	}
 	
+	/**
+	 *  Shutdown the plugin.
+	 */
+	public void shutdown()
+	{
+		comptree.dispose();
+	}
+	
 	final AbstractAction START_DEBUGGER	= new AbstractAction("Debug Component", icons.getIcon("debug_component"))
 	{
 		public void actionPerformed(ActionEvent e)

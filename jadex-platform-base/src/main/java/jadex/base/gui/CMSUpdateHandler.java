@@ -142,7 +142,6 @@ public class CMSUpdateHandler
 		assert SwingUtilities.isEventDispatchThread();
 		
 //		System.out.println("added: "+cid+" "+listener+" "+this);
-
 		
 		// For local component use direct listener.
 		if(cid.getPlatformName().equals(access.getComponentIdentifier().getPlatformName()))
@@ -197,7 +196,7 @@ public class CMSUpdateHandler
 				}
 				public void customExceptionOccurred(Exception exception)
 				{
-//					System.out.println("remove: "+listener);
+					System.out.println("remove: "+cid+", "+listener+", "+this);
 					if(listeners!=null)
 						listeners.remove(cid, listener);
 					
@@ -235,7 +234,7 @@ public class CMSUpdateHandler
 
 		else if(listeners!=null)
 		{
-//			System.out.println("remove: "+listener);
+//			System.out.println("remove: "+cid+", "+listener+", "+this);
 			listeners.remove(cid, listener);
 			if(!listeners.containsKey(cid))
 			{

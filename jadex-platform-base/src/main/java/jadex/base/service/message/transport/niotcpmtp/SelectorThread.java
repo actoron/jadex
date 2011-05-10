@@ -222,7 +222,7 @@ public class SelectorThread implements Runnable
 									sc.configureBlocking(false);
 									sc.register(selector, SelectionKey.OP_CONNECT, new Tuple(address, fut));
 									sc.connect(address);
-									System.out.println("Attempting connection to: "+address);
+									logger.info("Attempting connection to: "+address);
 								}
 								catch(IOException e)
 								{
@@ -406,7 +406,7 @@ public class SelectorThread implements Runnable
 			// we'd like to be notified when there's data waiting to be read
 			sc.register(this.selector, SelectionKey.OP_READ, new NIOTCPInputConnection(sc, codecfac, libservice.getClassLoader()));
 			
-			System.out.println("Accepted connection from: "+sc.socket().getRemoteSocketAddress());
+			logger.fine("Accepted connection from: "+sc.socket().getRemoteSocketAddress());
 		}
 		catch(IOException e)
 		{
@@ -433,7 +433,7 @@ public class SelectorThread implements Runnable
 		}
 		catch(IOException e)
 		{ 
-			logger.warning("NIOTCP receiving error while reading data: "+con+", "+e);
+			logger.info("NIOTCP receiving error while reading data: "+con+", "+e);
 //			e.printStackTrace();
 			con.close();
 			key.cancel();
@@ -463,7 +463,7 @@ public class SelectorThread implements Runnable
 			}
 			// Keep channel on hold until we are ready to write.
 		    key.interestOps(0);
-			System.out.println("Connected to : "+address);
+			logger.fine("Connected to : "+address);
 			ret.setResult(con);
 		}
 		catch(IOException e)
@@ -473,7 +473,7 @@ public class SelectorThread implements Runnable
 				connections.put(address, new NIOTCPDeadConnection());
 			}
 			ret.setException(e);
-			logger.warning("NIOTCP receiving error while opening connection: "+address+", "+e);
+			logger.info("NIOTCP receiving error while opening connection: "+address+", "+e);
 //			e.printStackTrace();
 			key.cancel();
 		}
@@ -488,24 +488,24 @@ public class SelectorThread implements Runnable
 		NIOTCPOutputConnection	con	= (NIOTCPOutputConnection)key.attachment();
 		List	queue	= (List)this.writetasks.get(sc);
 
-		boolean	more	= true;
-		while(more)
+		try
 		{
-			if(queue.isEmpty())
+			boolean	more	= true;
+			while(more)
 			{
-				more	= false;
-				// We wrote away all data, so we're no longer interested in
-				// writing on this socket.
-				key.interestOps(0);
-			}
-			else
-			{
-				Tuple	task	= (Tuple)queue.get(0);
-				List	buffers	= (List)task.get(0);	
-				Future	fut	= (Future)task.get(1);	
-				ByteBuffer buf = (ByteBuffer)buffers.get(0);
-				try
+				if(queue.isEmpty())
 				{
+					more	= false;
+					// We wrote away all data, so we're no longer interested in
+					// writing on this socket.
+					key.interestOps(0);
+				}
+				else
+				{
+					Tuple	task	= (Tuple)queue.get(0);
+					List	buffers	= (List)task.get(0);	
+					Future	fut	= (Future)task.get(1);	
+					ByteBuffer buf = (ByteBuffer)buffers.get(0);
 					sc.write(buf);
 					if(buf.remaining()>0)
 					{
@@ -526,26 +526,28 @@ public class SelectorThread implements Runnable
 					con.getCleaner().refresh();
 //					System.out.println("Wrote data to: "+sc.socket().getRemoteSocketAddress());
 				}
-				catch(Exception e)
-				{
-					synchronized(connections)
-					{
-						connections.put(con.getAddress(), new NIOTCPDeadConnection());
-					}
-					
-					// Connection failure: notify all open tasks.
-					for(Iterator it=queue.iterator(); it.hasNext(); )
-					{
-						task	= (Tuple)it.next();
-						fut	= (Future)task.get(1);	
-						fut.setException(e);
-						it.remove();
-					}
-					logger.warning("NIOTCP receiving error while writing to connection: "+sc.socket().getRemoteSocketAddress()+", "+e);
-//					e.printStackTrace();
-					key.cancel();
-				}
 			}
+		}
+		catch(Exception e)
+		{
+			synchronized(connections)
+			{
+				connections.put(con.getAddress(), new NIOTCPDeadConnection());
+			}
+			
+			// Connection failure: notify all open tasks.
+			for(Iterator it=queue.iterator(); it.hasNext(); )
+			{
+				Tuple	task	= (Tuple)it.next();
+				Future	fut	= (Future)task.get(1);	
+				fut.setException(e);
+				it.remove();
+			}
+			writetasks.remove(sc);
+			
+			logger.info("NIOTCP receiving error while writing to connection: "+sc.socket().getRemoteSocketAddress()+", "+e);
+//			e.printStackTrace();
+			key.cancel();
 		}
 	}
 	
@@ -598,7 +600,7 @@ public class SelectorThread implements Runnable
 				{
 					
 				}
-				System.out.println("Removed connection to : "+address);
+				logger.fine("Removed connection to : "+address);
 			}
 		}
 		

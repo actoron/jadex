@@ -295,4 +295,12 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		props.addSubproperties("convcenter", convcenter.getProperties());
 		return new Future(props);
 	}
+	
+	/**
+	 *  Shutdown the plugin.
+	 */
+	public void shutdown()
+	{
+		comptree.dispose();
+	}
 }

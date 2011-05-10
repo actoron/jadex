@@ -90,9 +90,9 @@ public class NIOTCPTransport implements ITransport
 	 *  @param platform The platform.
 	 *  @param settings The settings.
 	 */
-	public NIOTCPTransport(final IServiceProvider container, int port)
+	public NIOTCPTransport(final IServiceProvider container, int port, Logger logger)
 	{
-		this.logger = Logger.getLogger("NIOTCPTransport" + this);
+		this.logger = logger;
 		this.container = container;
 		this.port = port;		
 	}

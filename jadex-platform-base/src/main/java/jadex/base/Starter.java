@@ -125,6 +125,17 @@ public class Starter
 					}
 				});
 				
+//				// Continuously run garbage collector and finalizers.
+//				Timer	gctimer	= new Timer();
+//				gctimer.scheduleAtFixedRate(new TimerTask()
+//				{
+//					public void run()
+//					{
+//						System.gc();
+//						System.runFinalization();
+//					}
+//				}, 1000, 1000);
+				
 				
 				// Test CTRL-C shutdown behavior.
 //				Timer	timer	= new Timer();

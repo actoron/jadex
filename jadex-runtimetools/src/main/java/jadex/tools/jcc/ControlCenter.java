@@ -502,6 +502,7 @@ public class ControlCenter
 	 */
 	public void closePlatform(final PlatformControlCenter pcc)
 	{
+		pccs.remove(pcc.getPlatformAccess().getComponentIdentifier());
 		window.getStatusBar().setText("Saving platform settings for: "+pcc.getPlatformAccess().getComponentIdentifier().getPlatformName());
 		
 		IFuture	saved	= isSaveOnExit() ? pcc.savePlatformProperties() : IFuture.DONE;
@@ -517,7 +518,8 @@ public class ControlCenter
 			{
 				// Continue anyways.
 				window.getStatusBar().setText("Could not save platform settings: "+exception);
-				customResultAvailable(null);
+				window.closePlatformPanel(pcc);
+				pcc.dispose();
 			}
 		});
 	}

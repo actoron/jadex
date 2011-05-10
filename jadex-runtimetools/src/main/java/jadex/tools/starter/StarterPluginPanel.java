@@ -493,4 +493,12 @@ public class StarterPluginPanel extends JPanel
 //		props.addProperty(new Property("mainsplit_location", ""+csplit.getDividerLocation()));
 		return new Future(props);
 	}
+	
+	/**
+	 *  Dispose the panel.
+	 */
+	public void dispose()
+	{
+		comptree.dispose();
+	}
 }
