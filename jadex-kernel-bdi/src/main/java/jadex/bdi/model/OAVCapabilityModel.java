@@ -99,10 +99,9 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	{
 		boolean startable = !this.getClass().equals(OAVCapabilityModel.class);
 		
-		Object mcapa = state.getAttributeValue(handle, OAVBDIRuntimeModel.element_has_model);
-		Collection tmp = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_imports);
+		Collection tmp = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_imports);
 		List imp = new ArrayList(tmp);
-		imp.add(state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_package)+".*");
+		imp.add(state.getAttributeValue(handle, OAVBDIMetaModel.capability_has_package)+".*");
 		String[] imports = (String[])imp.toArray(new String[0]);
 		this.modelinfo = new ModelInfo(getName(), getPackage(), getDescription(), null, getConfigurations(), getArguments(), 
 			getResults(), startable, filename, getProperties(), getClassLoader(), getRequiredServices(), getProvidedServices(),

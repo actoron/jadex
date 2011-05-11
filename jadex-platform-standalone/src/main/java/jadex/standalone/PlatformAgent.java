@@ -62,11 +62,13 @@ import jadex.micro.annotation.RequiredServices;
 })
 
 @ComponentTypes({
-//	@ComponentType(name="kernel_application", filename="jadex/application/KernelApplication.component.xml"),
+	@ComponentType(name="kernel_component", filename="jadex/component/KernelComponentAgent.class"),
+//	@ComponentType(name="kernel_component", filename="jadex/component/KernelComponent.component.xml"),
+	@ComponentType(name="kernel_application", filename="jadex/application/KernelApplication.component.xml"),
 //	@ComponentType(name="kernel_micro", filename="jadex/micro/KernelMicro.component.xml"),
-//	@ComponentType(name="kernel_bdi", filename="jadex/bdi/KernelBDI.component.xml"),
-//	@ComponentType(name="kernel_bdibpmn", filename="jadex/bdibpmn/KernelBDIBPMN.component.xml"),
-//	@ComponentType(name="kernel_bpmn", filename="jadex/bpmn/KernelBPMN.component.xml"),
+	@ComponentType(name="kernel_bdi", filename="jadex/bdi/KernelBDI.component.xml"),
+	@ComponentType(name="kernel_bdibpmn", filename="jadex/bdibpmn/KernelBDIBPMN.component.xml"),
+	@ComponentType(name="kernel_bpmn", filename="jadex/bpmn/KernelBPMN.component.xml"),
 	@ComponentType(name="rms", filename="jadex/base/service/remote/RemoteServiceManagementAgent.class"),
 	@ComponentType(name="awa", filename="jadex/base/service/awareness/AwarenessAgent.class"),
 	@ComponentType(name="jcc", filename="jadex/tools/jcc/JCCAgent.class"),
@@ -95,21 +97,33 @@ import jadex.micro.annotation.RequiredServices;
 })
 
 @Configurations({
-	@Configuration(name="all_kernels auto (rms, awa, jcc)", arguments={
+	@Configuration(name="micro_kernel auto (rms, awa, jcc)", arguments={
 		@NameValue(name="tcpport", value="0"),
 		@NameValue(name="niotcpport", value="0"),
 		@NameValue(name="platformname", value="null"),
-	},components={
-//		@Component(name="kernel_application", type="kernel_component", daemon=true),
-//		@Component(name="kernel_micro", type="kernel_micro", daemon=true),
-//		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=true),
-//		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=true),
+	}, components={
 		@Component(name="rms", type="rms", daemon=true),
 		@Component(name="awa", type="awa", daemon=true, 
 			arguments={@NameValue(name="includes", value="$args.awaincludes"),
 				@NameValue(name="excludes", value="$args.awaexcludes")}),
 		@Component(name="jcc", type="jcc", daemon=true)
-	})
+	}),
+	@Configuration(name="all_kernels auto (rms, awa, jcc)", arguments={
+		@NameValue(name="tcpport", value="0"),
+		@NameValue(name="niotcpport", value="0"),
+		@NameValue(name="platformname", value="null"),
+	}, components={
+		@Component(name="kernel_component", type="kernel_component", daemon=true),
+		@Component(name="kernel_application", type="kernel_application", daemon=true),
+//		@Component(name="kernel_micro", type="kernel_micro", daemon=true),
+		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=true),
+		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=true),
+		@Component(name="rms", type="rms", daemon=true),
+		@Component(name="awa", type="awa", daemon=true, 
+			arguments={@NameValue(name="includes", value="$args.awaincludes"),
+				@NameValue(name="excludes", value="$args.awaexcludes")}),
+		@Component(name="jcc", type="jcc", daemon=true)
+	}),
 })
 public class PlatformAgent extends MicroAgent
 {
