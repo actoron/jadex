@@ -365,9 +365,18 @@ public class ModelInfo implements IModelInfo
 	 *  Set the configurations.
 	 *  @param configurations The configurations to set.
 	 */
-	public void setConfigurations(String[] configurations)
+	public void setConfigurationNames(String[] configurationnames)
 	{
-		this.configurationnames = configurations;
+		this.configurationnames = configurationnames;
+	}
+	
+	/**
+	 *  Set the configurations.
+	 *  @param configurations The configurations to set.
+	 */
+	public void setConfigurations(ConfigurationInfo[] configurations)
+	{
+		this.configurations = configurations;
 	}
 
 	/**

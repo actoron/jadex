@@ -264,7 +264,7 @@ public class ExternalAccess implements IMicroExternalAccess
 	 */
 	public IComponentIdentifier	getParent()
 	{
-		return interpreter.getParent().getComponentIdentifier();
+		return interpreter.getParent()!=null? interpreter.getParent().getComponentIdentifier(): null;
 	}
 	
 	/**

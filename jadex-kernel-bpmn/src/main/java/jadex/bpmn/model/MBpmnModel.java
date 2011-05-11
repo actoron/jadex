@@ -192,7 +192,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		}
 		addProperty("debugger.breakpoints", names);
 		
-		modelinfo.setConfigurations(getConfigurations());
+		modelinfo.setConfigurationNames(getConfigurations());
 		modelinfo.setStartable(true);
 	}
 	

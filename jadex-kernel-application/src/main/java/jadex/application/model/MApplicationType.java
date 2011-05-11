@@ -114,7 +114,7 @@ public class MApplicationType extends MStartable implements ICacheableModel
 		{
 			configs[i] = ((MApplicationInstance)apps.get(i)).getName();
 		}
-		modelinfo.setConfigurations(configs);
+		modelinfo.setConfigurationNames(configs);
 
 		// Init flags.
 		ModelValueProvider suspend = new ModelValueProvider();

@@ -95,7 +95,7 @@ public class MComponentType extends MStartable implements ICacheableModel
 		{
 			configs[i] = ((MConfiguration)apps.get(i)).getName();
 		}
-		modelinfo.setConfigurations(configs);
+		modelinfo.setConfigurationNames(configs);
 
 		// Init flags.
 		ModelValueProvider suspend = new ModelValueProvider();

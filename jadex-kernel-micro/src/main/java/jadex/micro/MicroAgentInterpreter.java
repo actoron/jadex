@@ -122,30 +122,36 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				public Object execute(IInternalAccess ia)
 				{
 					init(model, MicroAgentInterpreter.this.config, null, arguments, results, null)
-						.addResultListener(createResultListener(new DelegationResultListener(inited)));
-					
-					// Call user code init.
-					microagent.agentCreated().addResultListener(new DelegationResultListener(inited)
+						.addResultListener(createResultListener(new DelegationResultListener(inited)
 					{
 						public void customResultAvailable(Object result)
 						{
-							addStep(new Object[]{new IComponentStep()
+							// Call user code init.
+							microagent.agentCreated().addResultListener(new DelegationResultListener(inited)
 							{
-								public Object execute(IInternalAccess ia)
+								public void customResultAvailable(Object result)
 								{
-									microagent.executeBody();
-									return null;
+//									System.out.println("initend: "+getComponentAdapter().getComponentIdentifier());
+									// Init is now finished. Notify cms.
+									inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
+								
+									addStep(new Object[]{new IComponentStep()
+									{
+										public Object execute(IInternalAccess ia)
+										{
+//											System.out.println("body: "+getComponentAdapter().getComponentIdentifier());
+											microagent.executeBody();
+											return null;
+										}
+										public String toString()
+										{
+											return "microagent.executeBody()_#"+this.hashCode();
+										}
+									}, new Future()});
 								}
-								public String toString()
-								{
-									return "microagent.executeBody()_#"+this.hashCode();
-								}
-							}, new Future()});
-							
-							// Init is now finished. Notify cms.
-							inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
+							});
 						}
-					});
+					}));
 					
 					return null;
 				}

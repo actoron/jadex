@@ -57,8 +57,8 @@ import jadex.micro.annotation.RequiredServices;
 	@Argument(name="libpath", typename="String[]"),
 	@Argument(name="tcpport", typename="int", defaultvalue="9876"),
 	@Argument(name="niotcpport", typename="int", defaultvalue="8765"),
-	@Argument(name="awaincludes", typename="String"),
-	@Argument(name="awaexcludes", typename="String"),
+	@Argument(name="awaincludes", typename="String", defaultvalue="\"\""),
+	@Argument(name="awaexcludes", typename="String", defaultvalue="\"\""),
 })
 
 @ComponentTypes({
@@ -95,7 +95,11 @@ import jadex.micro.annotation.RequiredServices;
 })
 
 @Configurations({
-	@Configuration(name="all_kernels auto (rms, awa, jcc)", components={
+	@Configuration(name="all_kernels auto (rms, awa, jcc)", arguments={
+		@NameValue(name="tcpport", value="0"),
+		@NameValue(name="niotcpport", value="0"),
+		@NameValue(name="platformname", value="null"),
+	},components={
 //		@Component(name="kernel_application", type="kernel_component", daemon=true),
 //		@Component(name="kernel_micro", type="kernel_micro", daemon=true),
 //		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=true),
