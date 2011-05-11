@@ -51,7 +51,7 @@ public abstract class AbstractModelLoader
 	 *  @param name	The original name (i.e. not filename).
 	 *  @param info	The resource info.
 	 */
-	protected abstract ICacheableModel	doLoadModel(String name, ResourceInfo info, ClassLoader classloader) throws Exception;
+	protected abstract ICacheableModel	doLoadModel(String name, String[] imports, ResourceInfo info, ClassLoader classloader) throws Exception;
 	
 	/**
 	 *  Find the file for a given name using any supported extension.
@@ -227,6 +227,7 @@ public abstract class AbstractModelLoader
 		//		synchronized(modelcache)
 //		{
 			cached	= getCachedModel(keytuple);
+//			System.out.println("hit: "+name+" "+cached);
 			// If model is in cache, check at most every second if file on disc is newer.
 			if(cached!=null && cached.getLastChecked()+1000<System.currentTimeMillis())
 			{
@@ -272,7 +273,7 @@ public abstract class AbstractModelLoader
 		{
 			try
 			{
-				cached	= doLoadModel(name, info, classloader);
+				cached	= doLoadModel(name, imports, info, classloader);
 	
 				// Store by filename also, to avoid reloading with different imports.
 				modelcache.put(info.getFilename(), cached);

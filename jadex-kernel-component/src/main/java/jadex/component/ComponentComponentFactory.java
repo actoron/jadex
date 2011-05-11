@@ -114,7 +114,6 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 				return IFuture.DONE;
 			}
 		};
-		
 	}
 	
 	/**

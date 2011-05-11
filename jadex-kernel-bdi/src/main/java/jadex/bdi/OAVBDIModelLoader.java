@@ -121,7 +121,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	 *  @param name	The original name (i.e. not filename).
 	 *  @param info	The resource info.
 	 */
-	protected ICacheableModel	doLoadModel(String name, ResourceInfo info, ClassLoader classloader)
+	protected ICacheableModel	doLoadModel(String name, String[] imports, ResourceInfo info, ClassLoader classloader)
 	{
 		OAVCapabilityModel	ret;
 
