@@ -31,6 +31,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.BrowserPane;
+import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.JValidatorTextField;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.jtable.ClassRenderer;
@@ -68,6 +69,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
@@ -185,6 +187,16 @@ public class StarterPanel extends JPanel
 	/** The model details. */
 	protected BrowserPane	details;
 	
+	/** The split pane. */
+	protected JSplitPanel splitpanel;
+	
+	/** The library service. */
+	protected ILibraryService libservice;
+	
+	/** The last divider location. */
+	protected double lastdivloc;
+	protected boolean closed;
+	
 	//-------- constructors --------
 
 	/**
@@ -193,11 +205,40 @@ public class StarterPanel extends JPanel
 	 */
 	public StarterPanel(final IExternalAccess exta, IControlCenter jcc)
 	{
-		super(new BorderLayout());
+		super(new BorderLayout());		
 		this.exta = exta;
 		this.jcc = jcc;
 		this.resultsets = new MultiCollection();
 		
+		this.closed = true;
+		this.lastdivloc = 0.5;
+		
+		exta.scheduleStep(new IComponentStep()
+		{
+			@XMLClassname("create-arguments")
+			public Object execute(IInternalAccess ia)
+			{
+				Future ret = new Future();
+				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				ia.getRequiredService("libservice")
+					.addResultListener(new DelegationResultListener(ret));
+				return ret;
+			}
+		}).addResultListener(new SwingDefaultResultListener()
+		{
+			public void customResultAvailable(Object result)
+			{
+				libservice = (ILibraryService)result;
+				init();
+			}
+		});
+	}
+	
+	/**
+	 *  Init the panel.
+	 */
+	public void init()
+	{
 		JPanel content = new JPanel(new GridBagLayout());
 
 		// Create the filename combo box.
@@ -529,25 +570,50 @@ public class StarterPanel extends JPanel
 		y++;
 		upper.add(componentpanel, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-		y++;
+//		y++;
 //		upper.add(apppanel, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
 //			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 
+		JPanel middle = new JPanel(new GridBagLayout());
+		
+		y = 0;
+		y++;
+		middle.add(arguments, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
+			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+		y++;
+		middle.add(results, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
+			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+		y++;
+		middle.add(requiredservices, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
+			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+		y++;
+		middle.add(providedservices, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
+			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+		
+		JPanel buts = new JPanel(new GridBagLayout());
+		buts.add(start, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE,
+				new Insets(2, 2, 2, 2), 0, 0));
+		buts.add(reload, new GridBagConstraints(1, 0, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE,
+				new Insets(2, 2, 2, 2), 0, 0));
+		buts.add(reset, new GridBagConstraints(2, 0, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE,
+				new Insets(2, 2, 2, 2), 0, 0));
+		
+		y++;
+		upper.add(buts, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.EAST,
+			GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+
+		
+//		JSplitPanel sp = new JSplitPanel(JSplitPanel.VERTICAL_SPLIT);
+//		sp.add(upper);
+//		sp.add(new JScrollPane(middle));
+//		sp.setOneTouchExpandable(true);
+		
 		y = 0;
 		content.add(upper, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
-		y++;
-		content.add(arguments, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
-			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
-		y++;
-		content.add(results, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
-			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
-		y++;
-		content.add(requiredservices, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
-			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
-		y++;
-		content.add(providedservices, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
-			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+//		y++;
+//		content.add(new JScrollPane(middle), new GridBagConstraints(0, y, 5, 1, 1, 1, GridBagConstraints.WEST,
+//			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
 		componentnamel.setMinimumSize(confl.getMinimumSize());
 		componentnamel.setPreferredSize(confl.getPreferredSize());
@@ -583,13 +649,6 @@ public class StarterPanel extends JPanel
 		content.add(new JButton("5"), new GridBagConstraints(4, y, 1, 1, 0, 0, GridBagConstraints.WEST,
 				GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 */
-		JPanel buts = new JPanel(new GridBagLayout());
-		buts.add(start, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE,
-				new Insets(2, 2, 2, 2), 0, 0));
-		buts.add(reload, new GridBagConstraints(1, 0, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE,
-				new Insets(2, 2, 2, 2), 0, 0));
-		buts.add(reset, new GridBagConstraints(2, 0, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE,
-				new Insets(2, 2, 2, 2), 0, 0));
 
 //		HelpBroker hb = SHelp.setupHelp(this, "tools.starter");
 //		if(hb!=null)
@@ -605,13 +664,30 @@ public class StarterPanel extends JPanel
 
 		//content.add(prodmode, new GridBagConstraints(3, 4, 1, 1, 1, 0,
 		//	GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
-		y++;
-		content.add(buts, new GridBagConstraints(0, y, 5, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE,
-			new Insets(2, 2, 2, 2), 0, 0));
+		
+		details	= new BrowserPane();
+		
+//		JPanel bottom = new JPanel(new BorderLayout());
+//		bottom.add(buts, BorderLayout.NORTH);
+//		bottom.add(new JScrollPane(details), BorderLayout.CENTER);
+		
+		splitpanel = new JSplitPanel(JSplitPanel.VERTICAL_SPLIT);
+		splitpanel.add(new JScrollPane(middle));
+		splitpanel.add(new JScrollPane(details));
+		splitpanel.setOneTouchExpandable(true);
+		splitpanel.setDividerLocation(0.3);
+		
+//		y++;
+//		content.add(buts, new GridBagConstraints(0, y, 5, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE,
+//			new Insets(2, 2, 2, 2), 0, 0));
+
+//		y++;
+//		details	= new BrowserPane();
+//		content.add(new JScrollPane(details), new GridBagConstraints(0, y, 5, 1, 1, 1, GridBagConstraints.CENTER,
+//			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 
 		y++;
-		details	= new BrowserPane();
-		content.add(new JScrollPane(details), new GridBagConstraints(0, y, 5, 1, 1, 1, GridBagConstraints.CENTER,
+		content.add(splitpanel, new GridBagConstraints(0, y, 5, 1, 1, 1, GridBagConstraints.CENTER,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 
 		this.add("Center", content);
@@ -696,6 +772,8 @@ public class StarterPanel extends JPanel
 	 */
 	void updateGuiForNewModel(String adf)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 //		System.out.println("updategui "+adf);
 		
 		ItemListener[] lis = config.getItemListeners();
@@ -791,6 +869,23 @@ public class StarterPanel extends JPanel
 	
 		for(int i=0; i<lis.length; i++)
 			config.addItemListener(lis[i]);
+	
+		if(arguments.getComponentCount()==0 && results.getComponentCount()==0 
+			&& providedservices.getComponentCount()==0 && requiredservices.getComponentCount()==0)
+		{
+			if(!closed)
+			{
+				lastdivloc = splitpanel.getProportionalDividerLocation();
+//				System.out.println("last: "+lastdivloc);
+				closed = true;
+			}
+			splitpanel.setDividerLocation(0);
+		}
+		else if(closed)
+		{
+			splitpanel.setDividerLocation(lastdivloc);
+			closed = false;
+		}
 	}
 	
 	/**
@@ -989,22 +1084,22 @@ public class StarterPanel extends JPanel
 	 */
 	protected void createArguments()
 	{
-		exta.scheduleStep(new IComponentStep()
-		{
-			@XMLClassname("create-arguments")
-			public Object execute(IInternalAccess ia)
-			{
-				Future ret = new Future();
-				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//				ia.getRequiredService("libservice")
-					.addResultListener(new DelegationResultListener(ret));
-				return ret;
-			}
-		}).addResultListener(new SwingDefaultResultListener()
-		{
-			public void customResultAvailable(Object result)
-			{
-				ILibraryService ls = (ILibraryService)result;
+//		exta.scheduleStep(new IComponentStep()
+//		{
+//			@XMLClassname("create-arguments")
+//			public Object execute(IInternalAccess ia)
+//			{
+//				Future ret = new Future();
+//				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+////				ia.getRequiredService("libservice")
+//					.addResultListener(new DelegationResultListener(ret));
+//				return ret;
+//			}
+//		}).addResultListener(new SwingDelegationResultListener(ret)
+//		{
+//			public void customResultAvailable(Object result)
+//			{
+//				ILibraryService ls = (ILibraryService)result;
 				argelems = SCollection.createArrayList();
 				arguments.removeAll();
 				arguments.setBorder(null);
@@ -1016,15 +1111,15 @@ public class StarterPanel extends JPanel
 					for(int i=0; i<args.length; i++)
 					{
 						argelems.add(args[i]);
-						createArgumentGui(args[i], i, ls);
+						createArgumentGui(args[i], i, libservice);
 					}
 					loadargs	= null;
 					
 					if(args.length>0)
 						arguments.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Arguments "));
 				}
-			}
-		});
+//			}
+//		});
 	}
 	
 	/**
