@@ -47,27 +47,6 @@ public class CodecFactory
 		this(null, null);
 	}
 	
-//	/**
-//	 *  Create a new codec factory.
-//	 */
-//	public CodecFactory(Class[] default_codecs)
-//	{
-//		this(getIds(default_codecs));
-//	}
-//	
-	/**
-	 *  Get the default codec ids.
-	 */
-	protected static byte[] getIds(Class[] default_codecs)
-	{
-		byte[] ret = new byte[default_codecs.length];
-		for(int i=0; i<ret.length; i++)
-		{
-			ret[i] = getCodecId(default_codecs[i]);
-		}
-		return ret;
-	}
-	
 	/**
 	 *  Create a new codec factory.
 	 */
@@ -86,6 +65,19 @@ public class CodecFactory
 			default_ids = getIds(default_codecs);
 		else
 			default_ids = new byte[]{JadexXMLCodec.CODEC_ID, GZIPCodec.CODEC_ID};
+	}
+	
+	/**
+	 *  Get the default codec ids.
+	 */
+	protected static byte[] getIds(Class[] default_codecs)
+	{
+		byte[] ret = new byte[default_codecs.length];
+		for(int i=0; i<ret.length; i++)
+		{
+			ret[i] = getCodecId(default_codecs[i]);
+		}
+		return ret;
 	}
 	
 	//-------- methods --------

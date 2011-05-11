@@ -166,8 +166,18 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	/**
 	 *  Get the agent adapter.
 	 *  @return The agent adapter.
+	 *  // todo: deprecated, all kernels should have getComponentAdapter?
 	 */
 	public IComponentAdapter getAgentAdapter()
+	{
+		return interpreter.getAgentAdapter();
+	}
+	
+	/**
+	 *  Get the agent adapter.
+	 *  @return The agent adapter.
+	 */
+	public IComponentAdapter getComponentAdapter()
 	{
 		return interpreter.getAgentAdapter();
 	}

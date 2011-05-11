@@ -42,6 +42,12 @@ public interface IModelInfo
 	public String getDescription();
 	
 	/**
+	 *  Get the imports.
+	 *  @return The imports.
+	 */
+	public String[] getImports();
+	
+	/**
 	 *  Get the report.
 	 *  @return The report.
 	 */

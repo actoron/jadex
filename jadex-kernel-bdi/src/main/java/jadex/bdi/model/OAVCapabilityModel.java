@@ -1,6 +1,7 @@
 package jadex.bdi.model;
 
 import jadex.bdi.runtime.interpreter.AgentRules;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IArgument;
@@ -97,9 +98,15 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	public void initModelInfo()
 	{
 		boolean startable = !this.getClass().equals(OAVCapabilityModel.class);
+		
+		Object mcapa = state.getAttributeValue(handle, OAVBDIRuntimeModel.element_has_model);
+		Collection tmp = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_imports);
+		List imp = new ArrayList(tmp);
+		imp.add(state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_package)+".*");
+		String[] imports = (String[])imp.toArray(new String[0]);
 		this.modelinfo = new ModelInfo(getName(), getPackage(), getDescription(), null, getConfigurations(), getArguments(), 
 			getResults(), startable, filename, getProperties(), getClassLoader(), getRequiredServices(), getProvidedServices(),
-			null, null, null, null, null);
+			null, null, null, null, null, imports);
 		
 		// Build error report.
 		getModelInfo().setReport(new AbstractErrorReportBuilder(getModelInfo().getName(), getModelInfo().getFilename(),

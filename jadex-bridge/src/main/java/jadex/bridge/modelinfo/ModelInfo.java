@@ -27,6 +27,9 @@ public class ModelInfo implements IModelInfo
 	/** The description. */
 	protected String description;
 	
+	/** The imports. */
+	protected String[] imports;
+	
 	/** The report. */
 	protected IErrorReport report;
 	
@@ -88,7 +91,7 @@ public class ModelInfo implements IModelInfo
 	public ModelInfo()
 	{
 		this(null, null, null, null, null, null, null, 
-			false, null, null, null, null, null, null, null, null, null, null);
+			false, null, null, null, null, null, null, null, null, null, null, null);
 	}
 	
 	/**
@@ -101,7 +104,7 @@ public class ModelInfo implements IModelInfo
 		RequiredServiceInfo[] requiredservices, ProvidedServiceInfo[] providedservices, 
 		IModelValueProvider master, IModelValueProvider daemon, 
 		IModelValueProvider autoshutdown, ConfigurationInfo[] configurations,
-		SubcomponentTypeInfo[] subcomponents)
+		SubcomponentTypeInfo[] subcomponents, String[] imports)
 	{
 		this.name = name;
 		this.packagename = packagename;
@@ -120,6 +123,7 @@ public class ModelInfo implements IModelInfo
 		this.autoshutdown = autoshutdown;
 		this.configurations = configurations;
 		this.subcomponents = subcomponents;
+		this.imports = imports;
 //		this.components = components;
 		setRequiredServices(requiredservices);
 	}
@@ -152,6 +156,15 @@ public class ModelInfo implements IModelInfo
 	{
 		String pkg = getPackage();
 		return pkg!=null && pkg.length()>0? pkg+"."+getName(): getName();
+	}
+	
+	/**
+	 *  Get the imports.
+	 *  @return The imports.
+	 */
+	public String[] getImports()
+	{
+		return imports;
 	}
 	
 	/**

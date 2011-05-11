@@ -105,12 +105,11 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		final IExternalAccess parent, RequiredServiceBinding[] bindings, final Future inited)
 	{
 		this.model = model;
-		this.config = config;
+		this.config = config!=null? config: model.getConfigurationNames().length>0? model.getConfigurationNames()[0]: null;
 		this.arguments = args!=null? args: new HashMap();
 		this.parent = parent;
 		this.steps	= new ArrayList();
 		this.bindings = bindings;
-		this.arguments = new HashMap();
 		this.results = new HashMap();
 		
 		try
@@ -122,7 +121,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			{
 				public Object execute(IInternalAccess ia)
 				{
-					init(model, config, null, arguments, results, null)
+					init(model, MicroAgentInterpreter.this.config, null, arguments, results, null)
 						.addResultListener(createResultListener(new DelegationResultListener(inited)));
 					
 					// Call user code init.
@@ -898,16 +897,17 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 */
 	public String[] getAllImports()
 	{
-		if(imports==null)
-		{
-			List imp = new ArrayList();
-			imp.add(microagent.getClass().getPackage().getName()+".*");
-			
-			// todo: http://stackoverflow.com/questions/3734825/find-out-which-classes-of-a-given-api-are-used
-			
-			imports = (String[])imp.toArray(new String[imp.size()]);
-		}
-		return imports;
+//		if(imports==null)
+//		{
+//			List imp = new ArrayList();
+//			imp.add(microagent.getClass().getPackage().getName()+".*");
+//			
+//			// todo: http://stackoverflow.com/questions/3734825/find-out-which-classes-of-a-given-api-are-used
+//			
+//			imports = (String[])imp.toArray(new String[imp.size()]);
+//		}
+//		return imports;
+		return model.getImports();
 	}
 	
 	/**

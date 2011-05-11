@@ -39,6 +39,7 @@ import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
@@ -80,7 +81,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	//-------- attributes --------
 	
 	/** The platform. */
-	protected IServiceProvider provider;
+//	protected IServiceProvider provider;
 	
 	/** The properties. */
 	protected Map properties;
@@ -94,8 +95,18 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	{
 		super(provider.getId(), IComponentFactory.class, null);
 
-		this.provider = provider;
+//		this.provider = provider;
 		this.properties = properties;
+	}
+	
+	/**
+	 *  Create a new agent factory for startup.
+	 *  @param platform	The platform.
+	 */
+	// This constructor is used by the Starter class and the ADFChecker plugin. 
+	public MicroAgentFactory(String providerid)
+	{
+		super(providerid, IComponentFactory.class, null);
 	}
 	
 	//-------- IAgentFactory interface --------
@@ -188,6 +199,14 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		MicroAgentMetaInfo metainfo = null;
 		String[] imports = new String[]{cma.getClass().getPackage().getName()+".*"};
 		
+		if(cma.isAnnotationPresent(Imports.class))
+		{
+			String[] tmp = ((Imports)cma.getAnnotation(Imports.class)).value();
+			String[] imp = new String[tmp.length+1];
+			imp[0] = imports[0];
+			System.arraycopy(tmp, 0, imp, 1, tmp.length);
+			imports = imp;
+		}
 		if(cma.isAnnotationPresent(Description.class))
 		{
 			if(metainfo==null)
@@ -462,7 +481,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		
 		IModelInfo ret = new ModelInfo(name, packagename, description, report, 
 			configurations, arguments, results, true, model, properties, classloader, required, provided,
-			master, daemon, autosd, cinfos, subinfos);
+			master, daemon, autosd, cinfos, subinfos, imports);
 		
 		return ret;
 	}
