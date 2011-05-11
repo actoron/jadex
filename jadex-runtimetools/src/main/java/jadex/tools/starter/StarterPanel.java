@@ -587,7 +587,7 @@ public class StarterPanel extends JPanel
 		middle.add(requiredservices, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		y++;
-		middle.add(providedservices, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
+		middle.add(providedservices, new GridBagConstraints(0, y, 5, 1, 1, 1, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		
 		JPanel buts = new JPanel(new GridBagLayout());
