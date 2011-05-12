@@ -94,6 +94,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	public MicroAgentFactory(String providerid)
 	{
 		super(providerid, IComponentFactory.class, null);
+		this.loader = new MicroModelLoader();
 	}
 	
 	/**
