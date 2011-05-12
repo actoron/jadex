@@ -61,7 +61,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -1452,15 +1451,6 @@ public class StarterPanel extends JPanel
 	protected void setStartSuspended(final boolean startsuspended)
 	{
 		suspend.setSelected(startsuspended);
-	}
-	
-	/**
-	 *  Get the last loaded filename.
-	 *  @return The filename.
-	 */
-	public String getFilename()
-	{
-		return lastfile;
 	}
 
 	/**

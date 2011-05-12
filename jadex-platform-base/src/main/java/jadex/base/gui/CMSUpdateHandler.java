@@ -201,7 +201,8 @@ public class CMSUpdateHandler
 					if(futures==null)
 						System.out.println("result futures: "+futures);
 					Collection coll	= futures.getCollection(cid);
-					System.out.println("result coll: "+coll);
+					if(coll==null)
+						System.out.println("result coll: "+coll);
 					for(Iterator it=coll.iterator(); it.hasNext(); )
 					{
 						((Future)it.next()).setResult(null);

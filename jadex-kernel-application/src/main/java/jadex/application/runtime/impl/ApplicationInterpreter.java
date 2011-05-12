@@ -57,6 +57,7 @@ import jadex.xml.annotation.XMLClassname;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -154,7 +155,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 		this.results = new HashMap();
 		this.properties = new HashMap();
 		this.ctypes = new HashMap(); 
-		this.instances = new MultiCollection(); 
+		this.instances = new MultiCollection(new HashMap(), HashSet.class); 
 		this.steps	= new ArrayList();
 		this.willdostep	= true;
 		this.bindings = bindings;

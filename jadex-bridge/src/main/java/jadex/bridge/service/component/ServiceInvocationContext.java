@@ -36,7 +36,7 @@ public class ServiceInvocationContext
 	/** The service interceptors. */
 	protected IServiceInvocationInterceptor[] interceptors;
 
-	/** The stack of used interceptos. */
+	/** The stack of used interceptors. */
 	protected List used;
 	
 	//-------- constructors --------
