@@ -1,23 +1,20 @@
 package jadex.component;
 
 import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.ComponentInstanceInfo;
+import jadex.bridge.modelinfo.ConfigurationInfo;
+import jadex.bridge.modelinfo.SubcomponentTypeInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.ProvidedServiceImplementation;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
-import jadex.component.model.MComponentInstance;
-import jadex.component.model.MComponentType;
-import jadex.component.model.MConfiguration;
-import jadex.component.model.MExpressionType;
-import jadex.component.model.MProvidedServiceType;
-import jadex.component.model.MRequiredServiceType;
-import jadex.component.model.MSubcomponentType;
-import jadex.javaparser.IExpressionParser;
-import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -99,27 +96,30 @@ public class ComponentXMLReader
 	 *  @param info	The resource info.
 	 *  @param classloader The classloader.
  	 */
-	public MComponentType read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
+	public ComponentModel read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
 	{
 		MultiCollection	report	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
-		MComponentType ret = (MComponentType)reader.read(rinfo.getInputStream(), classloader, report);
+		ComponentModel ret = (ComponentModel)reader.read(rinfo.getInputStream(), classloader, report);
 		
 		if(ret!=null)
 		{
 			ret.setFilename(rinfo.getFilename());
 			ret.setLastModified(rinfo.getLastModified());
-			ret.setClassloader(classloader);
-			ret.initModelInfo(report);
+			ret.setClassLoader(classloader);
+//			ret.initModelInfo(report);
 			
 			rinfo.getInputStream().close();
 		}
 		else
 		{
-//			System.out.println("Error loading model: "+rinfo.getFilename()+" "+report);
-			String errtext = MComponentType.buildReport(rinfo.getFilename(), rinfo.getFilename(),
+			String errtext = ComponentModel.buildReport(rinfo.getFilename(), rinfo.getFilename(),
 				new String[]{"Component", "Configuration"}, report, null).getErrorText();
 			throw new RuntimeException("Model error: "+errtext);
 		}
+		
+		if(report.size()>0)
+			System.out.println("Error loading model: "+rinfo.getFilename()+" "+report);
+		
 		return ret;
 	}
 	
@@ -162,7 +162,7 @@ public class ComponentXMLReader
 				Object	ret	= null;
 				try
 				{
-					ret	= SJavaParser.evaluateExpression((String)val, ((MComponentType)context.getRootObject()).getAllImports(), null, context.getClassLoader());
+					ret	= SJavaParser.evaluateExpression((String)val, ((ComponentModel)context.getRootObject()).getAllImports(), null, context.getClassLoader());
 				}
 				catch(RuntimeException e)
 				{
@@ -182,7 +182,7 @@ public class ComponentXMLReader
 				Object	ret	= null;
 				try
 				{
-					ret	= SJavaParser.parseExpression((String)val, ((MComponentType)context.getRootObject()).getAllImports(), context.getClassLoader());
+					ret	= SJavaParser.parseExpression((String)val, ((ComponentModel)context.getRootObject()).getAllImports(), context.getClassLoader());
 				}
 				catch(RuntimeException e)
 				{
@@ -201,8 +201,7 @@ public class ComponentXMLReader
 				Object ret = val;
 				if(val instanceof String)
 				{
-					ret = SReflect.findClass0((String)val, ((MComponentType)
-						context.getRootObject()).getAllImports(), context.getClassLoader());
+					ret = SReflect.findClass0((String)val, ((ComponentModel)context.getRootObject()).getAllImports(), context.getClassLoader());
 					if(ret==null)
 					{
 						Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
@@ -240,7 +239,7 @@ public class ComponentXMLReader
 //				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
 //			}, null));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "componenttype")), new ObjectInfo(MComponentType.class), 
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "componenttype")), new ObjectInfo(ComponentModel.class), 
 			new MappingInfo(null, "description", null,
 			new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
@@ -249,36 +248,38 @@ public class ComponentXMLReader
 			new SubobjectInfo[]{
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "argument")}), new AccessInfo(new QName(uri, "argument"), "argument")),
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "result")}), new AccessInfo(new QName(uri, "result"), "result")),
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "container")}), new AccessInfo(new QName(uri, "container"), "container"))
-			})));
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "container")}), new AccessInfo(new QName(uri, "container"), "container")),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "providedservice")}), new AccessInfo(new QName(uri, "providedservice"), "providedService")),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype")}), new AccessInfo(new QName(uri, "componenttype"), "subcomponentType")),
+		})));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "configuration")), new ObjectInfo(MConfiguration.class, new IPostProcessor()
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "configuration")), new ObjectInfo(ConfigurationInfo.class, new IPostProcessor()
 		{
 			public Object postProcess(IContext context, Object object)
 			{
-				MConfiguration app = (MConfiguration)object;
-				MComponentType mapp = (MComponentType)context.getRootObject();
-				
-				List margs = app.getArguments();
-				for(int i=0; i<margs.size(); i++)
-				{
-					try
-					{
-						MExpressionType overridenarg = (MExpressionType)margs.get(i);
-						Argument arg = (Argument)mapp.getModelInfo().getArgument(overridenarg.getName());
-						if(arg==null)
-							throw new RuntimeException("Overridden argument not declared in component type: "+overridenarg.getName());
-						
-						Object val = overridenarg.getParsedValue().getValue(null);
-						arg.setDefaultValue(app.getName(), val);
-					}
-					catch(RuntimeException e)
-					{
-						Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
-						MultiCollection	report	= (MultiCollection)context.getUserContext();
-						report.put(se, e.toString());
-					}
-				}
+//				ConfigurationInfo app = (ConfigurationInfo)object;
+//				ComponentModel mapp = (ComponentModel)context.getRootObject();
+//				
+//				List margs = app.getArguments();
+//				for(int i=0; i<margs.size(); i++)
+//				{
+//					try
+//					{
+//						MExpressionType overridenarg = (MExpressionType)margs.get(i);
+//						Argument arg = (Argument)mapp.getModelInfo().getArgument(overridenarg.getName());
+//						if(arg==null)
+//							throw new RuntimeException("Overridden argument not declared in component type: "+overridenarg.getName());
+//						
+//						Object val = overridenarg.getParsedValue().getValue(null);
+//						arg.setDefaultValue(app.getName(), val);
+//					}
+//					catch(RuntimeException e)
+//					{
+//						Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+//						MultiCollection	report	= (MultiCollection)context.getUserContext();
+//						report.put(se, e.toString());
+//					}
+//				}
 				
 				return null;
 			}
@@ -290,60 +291,71 @@ public class ComponentXMLReader
 		}), 
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("type", "typeName")),
-				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
+				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown"))},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "component")}), new AccessInfo(new QName(uri, "component"), "componentInstance")),
 			})));
+		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(Argument.class), 
 			new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)))));
+		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "import")), new ObjectInfo(String.class)));
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "configuration"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "configuration"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "className"))
 			}, null)));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttypes"), new QName(uri, "componenttype")}), new ObjectInfo(MSubcomponentType.class),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttypes"), new QName(uri, "componenttype")}), new ObjectInfo(SubcomponentTypeInfo.class),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
 			}, null)));		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "component")), new ObjectInfo(MComponentInstance.class),
+		
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "component")), new ObjectInfo(ComponentInstanceInfo.class),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("type", "typeName")),
 				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
 				new AttributeInfo(new AccessInfo("number"), new AttributeConverter(pexconv, null))
 			}, null)));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "component"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "component"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "className"))
 			}, null)));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "providedservice")), new ObjectInfo(MProvidedServiceType.class, new ExpressionProcessor()), 
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "providedservice")), new ObjectInfo(ProvidedServiceInfo.class),// new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "className")),
+//				new AttributeInfo(new AccessInfo("class", "className")),
+				new AttributeInfo(new AccessInfo("class", "type"), new AttributeConverter(classconv, reclassconv)),
+//				new AttributeInfo(new AccessInfo("implementation", "implementation"))
+			}, null)));
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "implementation")), new ObjectInfo(ProvidedServiceImplementation.class),
+			new MappingInfo(null, null, "expression", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "implementation"), new AttributeConverter(classconv, reclassconv)),
+			}, null)));
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "requiredservice")), new ObjectInfo(RequiredServiceInfo.class), // new ExpressionProcessor()), 
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "className"))
+			}, null)));
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "binding")), new ObjectInfo(RequiredServiceBinding.class), 
+				new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("componentname", "componentName")),
 				new AttributeInfo(new AccessInfo("componenttype", "componentType")),
-				new AttributeInfo(new AccessInfo("implementation", "implementation"), new AttributeConverter(classconv, reclassconv))
-			}, null)));
-		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "requiredservice")), new ObjectInfo(MRequiredServiceType.class, new ExpressionProcessor()), 
-			new MappingInfo(null, null, "value", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "className"))
-			}, null)));
-		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "container")), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
-			new MappingInfo(null, null, "value", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "className"))
-			}, null)));
-					
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
-			new MappingInfo(null, null, "value", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "className"))
-			}, null)));
-					
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "binding")), new ObjectInfo(RequiredServiceBinding.class), 
-			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("componentname", "componentName")),
-			new AttributeInfo(new AccessInfo("componenttype", "componentType")),
 			})));
+		
+		
+		
+//		types.add(new TypeInfo(new XMLInfo(new QName(uri, "container")), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
+//			new MappingInfo(null, null, "value", new AttributeInfo[]{
+//				new AttributeInfo(new AccessInfo("class", "className"))
+//			}, null)));
+					
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "className"))
+			}, null)));
+					
+		
 		
 		for(int i=0; mappings!=null && i<mappings.length; i++)
 		{
@@ -355,74 +367,74 @@ public class ComponentXMLReader
 
 	//-------- helper classes --------
 	
-	/**
-	 *  Parse expression text.
-	 */
-	public static class ExpressionProcessor	implements IPostProcessor
-	{
-		// Hack!!! Should be configurable.
-		protected static IExpressionParser	exp_parser	= new JavaCCExpressionParser();
-		
-		/**
-		 *  Parse expression text.
-		 */
-		public Object postProcess(IContext context, Object object)
-		{
-			MComponentType app = (MComponentType)context.getRootObject();
-			MExpressionType exp = (MExpressionType)object;
-			
-			String classname = exp.getClassName();
-			if(classname!=null)
-			{
-				try
-				{
-					Class clazz = SReflect.findClass(classname, app.getAllImports(), context.getClassLoader());
-					exp.setClazz(clazz);
-				}
-				catch(Exception e)
-				{
-					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
-					MultiCollection	report	= (MultiCollection)context.getUserContext();
-					report.put(se, e.toString());
-				}
-			}
-			
-			String lang = exp.getLanguage();
-			String value = exp.getValue(); 
-			if(value!=null)
-			{
-				if(lang==null || "java".equals(lang))
-				{
-					try
-					{
-						IParsedExpression pexp = exp_parser.parseExpression(value, app.getAllImports(), null, context.getClassLoader());
-						exp.setParsedValue(pexp);
-					}
-					catch(RuntimeException e)
-					{
-						Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
-						MultiCollection	report	= (MultiCollection)context.getUserContext();
-						report.put(se, e.toString());
-					}
-				}	
-				else
-				{
-					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
-					MultiCollection	report	= (MultiCollection)context.getUserContext();
-					report.put(se, "Unknown condition language: "+lang);
-				}
-			}
-			
-			return null;
-		}
-		
-		/**
-		 *  Get the pass number.
-		 *  @return The pass number.
-		 */
-		public int getPass()
-		{
-			return 0;
-		}
-	}
+//	/**
+//	 *  Parse expression text.
+//	 */
+//	public static class ExpressionProcessor	implements IPostProcessor
+//	{
+//		// Hack!!! Should be configurable.
+//		protected static IExpressionParser	exp_parser	= new JavaCCExpressionParser();
+//		
+//		/**
+//		 *  Parse expression text.
+//		 */
+//		public Object postProcess(IContext context, Object object)
+//		{
+//			MComponentType app = (MComponentType)context.getRootObject();
+//			MExpressionType exp = (MExpressionType)object;
+//			
+//			String classname = exp.getClassName();
+//			if(classname!=null)
+//			{
+//				try
+//				{
+//					Class clazz = SReflect.findClass(classname, app.getAllImports(), context.getClassLoader());
+//					exp.setClazz(clazz);
+//				}
+//				catch(Exception e)
+//				{
+//					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+//					MultiCollection	report	= (MultiCollection)context.getUserContext();
+//					report.put(se, e.toString());
+//				}
+//			}
+//			
+//			String lang = exp.getLanguage();
+//			String value = exp.getValue(); 
+//			if(value!=null)
+//			{
+//				if(lang==null || "java".equals(lang))
+//				{
+//					try
+//					{
+//						IParsedExpression pexp = exp_parser.parseExpression(value, app.getAllImports(), null, context.getClassLoader());
+//						exp.setParsedValue(pexp);
+//					}
+//					catch(RuntimeException e)
+//					{
+//						Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+//						MultiCollection	report	= (MultiCollection)context.getUserContext();
+//						report.put(se, e.toString());
+//					}
+//				}	
+//				else
+//				{
+//					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+//					MultiCollection	report	= (MultiCollection)context.getUserContext();
+//					report.put(se, "Unknown condition language: "+lang);
+//				}
+//			}
+//			
+//			return null;
+//		}
+//		
+//		/**
+//		 *  Get the pass number.
+//		 *  @return The pass number.
+//		 */
+//		public int getPass()
+//		{
+//			return 0;
+//		}
+//	}
 }

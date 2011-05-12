@@ -1,6 +1,10 @@
 package jadex.bridge.modelinfo;
 
 import jadex.bridge.service.RequiredServiceBinding;
+import jadex.commons.SUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -22,10 +26,10 @@ public class ComponentInstanceInfo extends Startable
 	protected String number;
 	
 	/** The list of contained arguments. */
-	protected UnparsedExpression[] arguments;
+	protected List arguments;
 	
 	/** The list of required service binding infos. */
-	protected RequiredServiceBinding[] bindings;
+	protected List bindings;
 	
 	//-------- constructors --------
 	
@@ -69,7 +73,7 @@ public class ComponentInstanceInfo extends Startable
 	 *  Set the typename.
 	 *  @param typename The typename to set.
 	 */
-	public void setTypename(String typename)
+	public void setTypeName(String typename)
 	{
 		this.typename = typename;
 	}
@@ -116,7 +120,7 @@ public class ComponentInstanceInfo extends Startable
 	 */
 	public UnparsedExpression[] getArguments()
 	{
-		return arguments!=null? arguments: new UnparsedExpression[0];
+		return arguments!=null? (UnparsedExpression[])arguments.toArray(new UnparsedExpression[arguments.size()]): new UnparsedExpression[0];
 	}
 	
 	/**
@@ -125,7 +129,7 @@ public class ComponentInstanceInfo extends Startable
 	 */
 	public void setArguments(UnparsedExpression[] arguments)
 	{
-		this.arguments = arguments;
+		this.arguments = SUtil.arrayToList(arguments);
 	}
 
 	/**
@@ -134,7 +138,7 @@ public class ComponentInstanceInfo extends Startable
 	 */
 	public RequiredServiceBinding[] getBindings()
 	{
-		return bindings!=null? bindings: new RequiredServiceBinding[0];
+		return bindings!=null? (RequiredServiceBinding[])bindings.toArray(new RequiredServiceBinding[bindings.size()]): new RequiredServiceBinding[0];
 	}
 	
 	/**
@@ -143,7 +147,18 @@ public class ComponentInstanceInfo extends Startable
 	 */
 	public void setBindings(RequiredServiceBinding[] bindings)
 	{
-		this.bindings = bindings;
+		this.bindings = SUtil.arrayToList(bindings);
+	}
+	
+	/**
+	 *  Add a binding.
+	 *  @param binding The binding.
+	 */
+	public void addBinding(RequiredServiceBinding binding)
+	{
+		if(bindings==null)
+			bindings = new ArrayList();
+		bindings.add(binding);
 	}
 	
 	/**

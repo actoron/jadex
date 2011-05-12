@@ -15,7 +15,7 @@
 	
 	<services>
 		<providedservice class="IComponentFactory">
-			new ComponentComponentFactory($component.getServiceProvider())
+			<implementation>new ComponentComponentFactory($component.getServiceProvider())</implementation>
 		</providedservice>
 	</services>
 </applicationtype>

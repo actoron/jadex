@@ -27,8 +27,8 @@ public class ModelInfo implements IModelInfo
 	/** The description. */
 	protected String description;
 	
-	/** The imports. */
-	protected String[] imports;
+//	/** The imports. */
+//	protected String[] imports;
 	
 	/** The report. */
 	protected IErrorReport report;
@@ -37,7 +37,7 @@ public class ModelInfo implements IModelInfo
 	protected String[] configurationnames;
 	
 	/** The configurations. */
-	protected ConfigurationInfo[] configurations;
+	protected List configurations;
 	
 	/** The arguments. */
 	protected List arguments;
@@ -61,7 +61,8 @@ public class ModelInfo implements IModelInfo
 	protected Map requiredservices;
 	
 	/** The provided services. */
-	protected ProvidedServiceInfo[] providedservices;
+//	protected ProvidedServiceInfo[] providedservices;
+	protected List providedservices;
 	
 	/** The suspend flag. */
 	protected IModelValueProvider suspend;
@@ -75,13 +76,8 @@ public class ModelInfo implements IModelInfo
 	/** The autoshutdown flag. */
 	protected IModelValueProvider autoshutdown;
 	
-//	/** The components. */
-//	protected IModelValueProvider components;
-	
-	/** The configurations. */
-
 	/** The subcomponent types. */
-	protected SubcomponentTypeInfo[] subcomponents;
+	protected List subcomponents;
 		
 	//-------- constructors --------
 	
@@ -91,7 +87,7 @@ public class ModelInfo implements IModelInfo
 	public ModelInfo()
 	{
 		this(null, null, null, null, null, null, null, 
-			false, null, null, null, null, null, null, null, null, null, null, null);
+			false, null, null, null, null, null, null, null, null, null, null);
 	}
 	
 	/**
@@ -104,12 +100,13 @@ public class ModelInfo implements IModelInfo
 		RequiredServiceInfo[] requiredservices, ProvidedServiceInfo[] providedservices, 
 		IModelValueProvider master, IModelValueProvider daemon, 
 		IModelValueProvider autoshutdown, ConfigurationInfo[] configurations,
-		SubcomponentTypeInfo[] subcomponents, String[] imports)
+		SubcomponentTypeInfo[] subcomponents)
 	{
 		this.name = name;
 		this.packagename = packagename;
 		this.description = description;
 		this.report = report;//!=null? report: new ErrorReport();
+		// todo: remove
 		this.configurationnames = configurationnames;
 		this.arguments = arguments!=null? SUtil.arrayToList(arguments): null;
 		this.results = results!=null? SUtil.arrayToList(results): null;
@@ -117,13 +114,13 @@ public class ModelInfo implements IModelInfo
 		this.filename = filename;
 		this.properties = properties!=null? properties: new HashMap();
 		this.classloader = classloader;
-		this.providedservices = providedservices;
+		this.providedservices = providedservices!=null? SUtil.arrayToList(providedservices): null;
 		this.master = master;
 		this.daemon = daemon;
 		this.autoshutdown = autoshutdown;
-		this.configurations = configurations;
-		this.subcomponents = subcomponents;
-		this.imports = imports;
+		this.configurations = configurations!=null? SUtil.arrayToList(configurations): null;
+		this.subcomponents = subcomponents!=null? SUtil.arrayToList(subcomponents): null;
+//		this.imports = imports;
 //		this.components = components;
 		setRequiredServices(requiredservices);
 	}
@@ -158,14 +155,14 @@ public class ModelInfo implements IModelInfo
 		return pkg!=null && pkg.length()>0? pkg+"."+getName(): getName();
 	}
 	
-	/**
-	 *  Get the imports.
-	 *  @return The imports.
-	 */
-	public String[] getImports()
-	{
-		return imports;
-	}
+//	/**
+//	 *  Get the imports.
+//	 *  @return The imports.
+//	 */
+//	public String[] getImports()
+//	{
+//		return imports;
+//	}
 	
 	/**
 	 *  Get the model description.
@@ -191,7 +188,18 @@ public class ModelInfo implements IModelInfo
 	 */
 	public String[] getConfigurationNames()
 	{
-		return configurationnames!=null? configurationnames: SUtil.EMPTY_STRING_ARRAY;
+		String[] ret = configurationnames!=null? configurationnames: SUtil.EMPTY_STRING_ARRAY;
+
+		// todo: remove configurationnames in constructor
+		if(ret.length==0 && configurations!=null && configurations.size()>0)
+		{
+			ret = new String[configurations.size()];
+			for(int i=0; i<configurations.size(); i++)
+			{
+				ret[i] = ((ConfigurationInfo)configurations.get(i)).getName();
+			}
+		}
+		return ret;
 	}
 	
 	/**
@@ -200,7 +208,7 @@ public class ModelInfo implements IModelInfo
 	 */
 	public ConfigurationInfo[] getConfigurations()
 	{
-		return configurations!=null? configurations: new ConfigurationInfo[0];
+		return configurations!=null? (ConfigurationInfo[])configurations.toArray(new ConfigurationInfo[configurations.size()]): new ConfigurationInfo[0];
 	}
 	
 	/**
@@ -211,11 +219,12 @@ public class ModelInfo implements IModelInfo
 		ConfigurationInfo ret = null;
 		if(configurations!=null)
 		{
-			for(int i=0; i<configurations.length; i++)
+			for(int i=0; i<configurations.size(); i++)
 			{
-				if(name.equals(configurations[i].getName()))
+				ConfigurationInfo ci = (ConfigurationInfo)configurations.get(i);
+				if(name.equals(ci.getName()))
 				{
-					ret = configurations[i];
+					ret = ci;
 					break;
 				}
 			}
@@ -376,7 +385,18 @@ public class ModelInfo implements IModelInfo
 	 */
 	public void setConfigurations(ConfigurationInfo[] configurations)
 	{
-		this.configurations = configurations;
+		this.configurations = SUtil.arrayToList(configurations);
+	}
+	
+	/**
+	 *  Add a configuration.
+	 *  @param configuration The configuration.
+	 */
+	public void addConfiguration(ConfigurationInfo configuration)
+	{
+		if(configurations==null)
+			configurations = new ArrayList();
+		configurations.add(configuration);
 	}
 
 	/**
@@ -507,7 +527,8 @@ public class ModelInfo implements IModelInfo
 	 */
 	public ProvidedServiceInfo[] getProvidedServices()
 	{
-		return providedservices==null? new ProvidedServiceInfo[0]: providedservices;
+		return providedservices==null? new ProvidedServiceInfo[0]: 
+			(ProvidedServiceInfo[])providedservices.toArray(new ProvidedServiceInfo[providedservices.size()]);
 	}
 
 	/**
@@ -516,7 +537,18 @@ public class ModelInfo implements IModelInfo
 	 */
 	public void setProvidedServices(ProvidedServiceInfo[] providedservices)
 	{
-		this.providedservices = providedservices;
+		this.providedservices = SUtil.arrayToList(providedservices);
+	}
+	
+	/**
+	 *  Add a provided service.
+	 *  @param providedservice The provided service.
+	 */
+	public void addProvidedService(ProvidedServiceInfo providedservice)
+	{
+		if(providedservices==null)
+			providedservices = new ArrayList();
+		providedservices.add(providedservice);
 	}
 	
 	/**
@@ -600,7 +632,26 @@ public class ModelInfo implements IModelInfo
 	 */
 	public SubcomponentTypeInfo[] getSubcomponentTypes()
 	{
-		return subcomponents!=null? subcomponents: new SubcomponentTypeInfo[0];
+		return subcomponents!=null? (SubcomponentTypeInfo[])subcomponents.toArray(new SubcomponentTypeInfo[subcomponents.size()]): new SubcomponentTypeInfo[0];
+	}
+	
+	/**
+	 *  Set the subcomponent types.
+	 */
+	public void setSubcomponentTypes(SubcomponentTypeInfo[] subcomponents)
+	{
+		this.subcomponents = SUtil.arrayToList(subcomponents);
+	}
+	
+	/**
+	 *  Add a subcomponent type.
+	 *  @param subcomponent The subcomponent type.
+	 */
+	public void addSubcomponentType(SubcomponentTypeInfo subcomponent)
+	{
+		if(subcomponents==null)
+			subcomponents = new ArrayList();
+		subcomponents.add(subcomponent);
 	}
 	
 //	/**

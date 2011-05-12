@@ -244,9 +244,9 @@ public class ExternalAccess implements IMicroExternalAccess
 	/**
 	 *  Get the model of the component.
 	 */
-	public IModelInfo	getModel()
+	public IModelInfo getModel()
 	{
-		return interpreter.getAgentModel();
+		return interpreter.getModel();
 	}
 	
 	/**

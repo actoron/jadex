@@ -145,7 +145,7 @@ public interface IComponentManagementService extends IService
 	// (they are synchronous and not necessary, direct constructor creation)
 	
 	/**
-	 *  Create component identifier.
+	 *  Create component identifier (name assumed being local).
 	 *  @param name The name.
 	 *  @return The new component identifier.
 	 */

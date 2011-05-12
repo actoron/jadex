@@ -15,16 +15,18 @@
 	
 	<services>
 		<providedservice class="IComponentFactory">
-			new MicroAgentFactory($component.getServiceProvider(), SUtil.createHashMap(
-				new String[]
-				{
-					"debugger.panels"
-				},
-				new Object[]
-				{
-					"jadex.tools.debugger.micro.MicroDebuggerPanel"
-				})
-			)
+			<implementation>
+				new MicroAgentFactory($component.getServiceProvider(), SUtil.createHashMap(
+					new String[]
+					{
+						"debugger.panels"
+					},
+					new Object[]
+					{
+						"jadex.tools.debugger.micro.MicroDebuggerPanel"
+					})
+				)
+			</implementation>
 		</providedservice>
 	</services>
 </componenttype>

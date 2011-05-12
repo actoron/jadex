@@ -273,9 +273,18 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo model, 
 		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] binding, Future ret)
 	{
-		MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, model, getMicroAgentClass(model.getFullName()+"Agent", 
-			null, model.getClassLoader()), arguments, config, parent, binding, ret);
-		return new Object[]{mai, mai.getAgentAdapter()};
+		try
+		{
+			MicroModel mm = loader.loadComponentModel(model.getFilename(), null, model.getClassLoader());
+	
+			MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+"Agent", 
+				null, model.getClassLoader()), arguments, config, parent, binding, ret);
+			return new Object[]{mai, mai.getAgentAdapter()};
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/**

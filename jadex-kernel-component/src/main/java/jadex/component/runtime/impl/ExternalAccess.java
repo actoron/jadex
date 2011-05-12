@@ -213,7 +213,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						String fn = interpreter.getFileName(ctype);
+						String fn = interpreter.getComponentFilename(ctype);
 						if(fn!=null)
 						{
 							ret.setResult(fn);
@@ -232,7 +232,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			String fn = interpreter.getFileName(ctype);
+			String fn = interpreter.getComponentFilename(ctype);
 			if(fn!=null)
 			{
 				ret.setResult(fn);

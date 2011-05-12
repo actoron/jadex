@@ -490,7 +490,15 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 			public void customResultAvailable(Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
-				ret.setResult(cms.createComponentIdentifier(name, name.indexOf("@")==-1));
+				if(name.indexOf("@")==-1)
+				{
+					// local todo:
+					ret.setResult(cms.createComponentIdentifier(name, true));
+				}
+				else
+				{
+					ret.setResult(cms.createComponentIdentifier(name, false));
+				}
 			}
 		});
 			

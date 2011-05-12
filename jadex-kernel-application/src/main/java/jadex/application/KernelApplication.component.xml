@@ -18,14 +18,16 @@
 	
 	<services>
 		<providedservice class="IComponentFactory">
-			new ApplicationComponentFactory(
-				new Set[]
-				{
-					MEnvSpaceType.getXMLMapping(),
-					MAGRSpaceType.getXMLMapping()
-				}, 
-				$component.getServiceProvider()
-			)	
+			<implementation>
+				new ApplicationComponentFactory(
+					new Set[]
+					{
+						MEnvSpaceType.getXMLMapping(),
+						MAGRSpaceType.getXMLMapping()
+					}, 
+					$component.getServiceProvider()
+				)	
+			</implementation>
 		</providedservice>
 	</services>
 </componenttype>

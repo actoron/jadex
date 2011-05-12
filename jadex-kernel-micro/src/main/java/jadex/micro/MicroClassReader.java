@@ -251,7 +251,7 @@ public class MicroClassReader
 					if(comps[j].name().length()>0)
 						comp.setName(comps[j].name());
 					if(comps[j].type().length()>0)
-						comp.setTypename(comps[j].type());
+						comp.setTypeName(comps[j].type());
 					if(comps[j].configuration().length()>0)
 						comp.setConfiguration(comps[j].configuration());
 					if(comps[j].number().length()>0)
@@ -363,7 +363,7 @@ public class MicroClassReader
 		
 		IModelInfo ret = new ModelInfo(name, packagename, description, report, 
 			configurations, arguments, results, true, model, properties, classloader, required, provided,
-			master, daemon, autosd, cinfos, subinfos, imports);
+			master, daemon, autosd, cinfos, subinfos);
 		
 		MicroModel mm = new MicroModel(ret);
 		mm.setImports(imports);

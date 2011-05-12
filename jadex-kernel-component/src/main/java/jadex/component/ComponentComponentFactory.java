@@ -17,13 +17,10 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.component.model.MConfiguration;
-import jadex.component.model.MComponentType;
 import jadex.component.runtime.impl.ComponentInterpreter;
 
 import java.net.URL;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -190,30 +187,29 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	{
 		try
 		{
-			MComponentType apptype = loader.loadComponentModel(modelinfo.getFilename(), null, modelinfo.getClassLoader());
-			List apps = apptype.getConfigurations();
+			ComponentModel apptype = loader.loadComponentModel(modelinfo.getFilename(), null, modelinfo.getClassLoader());
+//			List apps = apptype.getConfigurations();
 					
-			// Select application instance according to configuration.
-			MConfiguration app = null;
-				
-			if(config!=null)
-			{
-				for(int i=0; app==null && i<apps.size(); i++)
-				{
-					MConfiguration tmp = (MConfiguration)apps.get(i);
-					if(config.equals(tmp.getName()))
-						app = tmp;
-				}
-			}
-			if(app==null && apps.size()>0)
-			{
-				app = (MConfiguration)apps.get(0);
-			}
-			if(app==null)
-				app = new MConfiguration("default");
+//			// Select application instance according to configuration.
+//			MConfiguration app = null;
+//			if(config!=null)
+//			{
+//				for(int i=0; app==null && i<apps.size(); i++)
+//				{
+//					MConfiguration tmp = (MConfiguration)apps.get(i);
+//					if(config.equals(tmp.getName()))
+//						app = tmp;
+//				}
+//			}
+//			if(app==null && apps.size()>0)
+//			{
+//				app = (MConfiguration)apps.get(0);
+//			}
+//			if(app==null)
+//				app = new MConfiguration("default");
 	
 			// Create context for application.
-			ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype, app, factory, parent, arguments, bindings, ret);
+			ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype, config, factory, parent, arguments, bindings, ret);
 			
 			// todo: result listener?
 			// todo: create application context as return value?!

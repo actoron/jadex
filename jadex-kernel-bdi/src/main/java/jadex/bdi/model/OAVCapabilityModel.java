@@ -105,7 +105,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		String[] imports = (String[])imp.toArray(new String[0]);
 		this.modelinfo = new ModelInfo(getName(), getPackage(), getDescription(), null, getConfigurations(), getArguments(), 
 			getResults(), startable, filename, getProperties(), getClassLoader(), getRequiredServices(), getProvidedServices(),
-			null, null, null, null, null, imports);
+			null, null, null, null, null);
 		
 		// Build error report.
 		getModelInfo().setReport(new AbstractErrorReportBuilder(getModelInfo().getName(), getModelInfo().getFilename(),

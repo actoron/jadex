@@ -1143,7 +1143,7 @@ public class RemoteReferenceModule
 	{
 		if(DEBUG)
 		{
-			if(((ExternalAccess)rsms.getComponent()).getInterpreter().isExternalThread())
+			if(((ExternalAccess)rsms.getComponent()).getInterpreter().getComponentAdapter().isExternalThread())
 			{
 				System.out.println("wrong thread: "+Thread.currentThread());
 				Thread.dumpStack();

@@ -49,7 +49,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	protected IComponentAdapter	adapter;
 	
 	/** The micro agent model. */
-	protected IModelInfo model;
+	protected MicroModel model;
 	
 	/** The micro agent. */
 	protected MicroAgent microagent;
@@ -101,11 +101,11 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 *  @param microagent The microagent.
 	 */
 	public MicroAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
-		final IModelInfo model, Class microclass, final Map args, final String config, 
+		final MicroModel model, Class microclass, final Map args, final String config, 
 		final IExternalAccess parent, RequiredServiceBinding[] bindings, final Future inited)
 	{
 		this.model = model;
-		this.config = config!=null? config: model.getConfigurationNames().length>0? model.getConfigurationNames()[0]: null;
+		this.config = config!=null? config: getModel().getConfigurationNames().length>0? getModel().getConfigurationNames()[0]: null;
 		this.arguments = args!=null? args: new HashMap();
 		this.parent = parent;
 		this.steps	= new ArrayList();
@@ -116,12 +116,12 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		{
 			this.microagent = (MicroAgent)microclass.newInstance();
 			this.microagent.init(MicroAgentInterpreter.this);
-			this.adapter = factory.createComponentAdapter(desc, model, this, parent);
+			this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
 			addStep((new Object[]{new IComponentStep()
 			{
 				public Object execute(IInternalAccess ia)
 				{
-					init(model, MicroAgentInterpreter.this.config, null, arguments, results, null)
+					init(model.getModelInfo(), MicroAgentInterpreter.this.config, null, arguments, results, null)
 						.addResultListener(createResultListener(new DelegationResultListener(inited)
 					{
 						public void customResultAvailable(Object result)
@@ -251,7 +251,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				{	
 					exitState();
 					
-					ComponentChangeEvent.dispatchTerminatingEvent(adapter, getAgentModel(), getServiceProvider(), componentlisteners, null);
+					ComponentChangeEvent.dispatchTerminatingEvent(adapter, getModel(), getServiceProvider(), componentlisteners, null);
 					
 					microagent.agentKilled().addResultListener(microagent.createResultListener(new IResultListener()
 					{
@@ -260,7 +260,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 							nosteps = true;
 							exitState();
 							
-							ComponentChangeEvent.dispatchTerminatedEvent(adapter, getAgentModel(), getServiceProvider(), componentlisteners, null);
+							ComponentChangeEvent.dispatchTerminatedEvent(adapter, getModel(), getServiceProvider(), componentlisteners, null);
 							
 							IComponentIdentifier cid = adapter.getComponentIdentifier();
 							ret.setResult(cid);							
@@ -290,25 +290,6 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		return ret;
 	}
 	
-//	/**
-//	 *  Kill the component.
-//	 */
-//	public IFuture killComponent()
-//	{
-//		final Future ret = new Future();
-//		
-//		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-//		{
-//			public void resultAvailable(Object result)
-//			{
-//				((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier())
-//					.addResultListener(new DelegationResultListener(ret));
-//			}
-//		});
-//		
-//		return ret;
-//	}
-	
 	/**
 	 *  Can be called concurrently (also during executeAction()).
 	 * 
@@ -332,18 +313,6 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		return access;
 	}
 	
-//	/**
-//	 *  Get the class loader of the agent.
-//	 *  The agent class loader is required to avoid incompatible class issues,
-//	 *  when changing the platform class loader while agents are running. 
-//	 *  This may occur e.g. when decoding messages and instantiating parameter values.
-//	 *  @return	The agent class loader. 
-//	 */
-//	public ClassLoader getClassLoader()
-//	{
-//		return model.getClassLoader();
-//	}
-	
 	/**
 	 *  Get the results.
 	 *  @return The results map.
@@ -352,28 +321,6 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	{
 		return results!=null? Collections.unmodifiableMap(results): Collections.EMPTY_MAP;
 	}
-	
-//	/**
-//	 *  Called when a component has been created as a subcomponent of this component.
-//	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
-//	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
-//	 *  @param comp	The newly created component.
-//	 */
-//	public IFuture	componentCreated(IComponentDescription desc, IModelInfo model)
-//	{
-//		return IFuture.DONE;
-//	}
-//
-//	/**
-//	 *  Called when a subcomponent of this component has been destroyed.
-//	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
-//	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
-//	 *  @param comp	The destroyed component.
-//	 */
-//	public IFuture	componentDestroyed(IComponentDescription desc)
-//	{
-//		return IFuture.DONE;
-//	}
 	
 	/**
 	 *  Test if the component's execution is currently at one of the
@@ -400,7 +347,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 //		System.out.println("ss: "+getAgentAdapter().getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
 		try
 		{
-			if(isExternalThread())
+			if(adapter.isExternalThread())
 			{
 				adapter.invokeLater(new Runnable()
 				{			
@@ -553,15 +500,6 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	}*/
 	
 	/**
-	 *  Check if the external thread is accessing.
-	 *  @return True, if access is ok.
-	 */ 
-	public boolean isExternalThread()
-	{
-		return adapter.isExternalThread();
-	}
-	
-	/**
 	 *  Get the agent adapter.
 	 *  @return The agent adapter.
 	 */
@@ -570,15 +508,6 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		return adapter;
 	}
 
-	/**
-	 *  Get the agent model.
-	 *  @return The model.
-	 */
-	public IModelInfo getAgentModel()
-	{
-		return model;
-	}
-	
 	/**
 	 *  Get the arguments.
 	 *  @return The arguments.
@@ -618,14 +547,6 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		return this.config;
 	}
 	
-//	/**
-//	 *  Get the service provider.
-//	 */
-//	public IServiceProvider getServiceProvider()
-//	{
-//		return getServiceContainer();
-//	}
-	
 	/**
 	 *  Create the service container.
 	 *  @return The service container.
@@ -639,26 +560,6 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		return container;
 	}
 
-//	/**
-//	 *  Create a result listener which is executed as an agent step.
-//	 *  @param The original listener to be called.
-//	 *  @return The listener.
-//	 */
-//	public IResultListener createResultListener(IResultListener listener)
-//	{
-//		return new ComponentResultListener(listener, adapter);
-//	}
-//
-//	/**
-//	 *  Create a result listener which is executed as an agent step.
-//	 *  @param The original listener to be called.
-//	 *  @return The listener.
-//	 */
-//	public IIntermediateResultListener createResultListener(IIntermediateResultListener listener)
-//	{
-//		return new IntermediateComponentResultListener(listener, adapter);
-//	}
-	
 	/**
 	 *  Add an component listener.
 	 *  @param listener The listener.
@@ -773,8 +674,6 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		microagent.timers.clear();
 	}
 
-	
-	
 //	/**
 //	 *  Get the binding info of a service.
 //	 *  @param name The required service name.
@@ -878,7 +777,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		return buf.toString();
 	}
 	
-	//-------- internal methods --------
+	//-------- abstract interpreter methods --------
 	
 	/**
 	 *  Get the component adapter.
@@ -894,7 +793,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 */
 	public IModelInfo getModel()
 	{
-		return model;
+		return model.getModelInfo();
 	}
 	
 	/**
@@ -933,7 +832,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		{
 			SimpleValueFetcher sfetcher = new SimpleValueFetcher();
 			sfetcher.setValue("$args", getArguments());
-			sfetcher.setValue("$properties", model.getProperties());
+			sfetcher.setValue("$properties", getModel().getProperties());
 			sfetcher.setValue("$results", getResults());
 			sfetcher.setValue("$component", microagent);
 			sfetcher.setValue("$provider", getServiceProvider());

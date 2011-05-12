@@ -11,6 +11,8 @@
 	name="Adder" package="jadex.micro.testcases.semiautomatic.compositeservice">
 	
 	<services>
-		<providedservice class="IAddService">new AddService($component)</providedservice>
+		<providedservice class="IAddService">
+			<implementation>new AddService($component)</implementation>
+		</providedservice>
 	</services>
 </componenttype>

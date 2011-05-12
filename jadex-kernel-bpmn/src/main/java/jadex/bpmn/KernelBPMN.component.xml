@@ -15,16 +15,18 @@
 	
 	<services>
 		<providedservice class="IComponentFactory">
-			new BpmnFactory($component.getServiceProvider(), SUtil.createHashMap(
-				new String[]
-				{
-					"debugger.panels"
-				},
-				new Object[]
-				{
-					"jadex.tools.debugger.bpmn.BpmnDebuggerPanel"
-				})
-			)
+			<implementation>
+				new BpmnFactory($component.getServiceProvider(), SUtil.createHashMap(
+					new String[]
+					{
+						"debugger.panels"
+					},
+					new Object[]
+					{
+						"jadex.tools.debugger.bpmn.BpmnDebuggerPanel"
+					})
+				)
+			</implementation>
 		</providedservice>
 	</services>
 </componenttype>

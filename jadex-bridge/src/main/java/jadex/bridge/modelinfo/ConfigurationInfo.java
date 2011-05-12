@@ -36,8 +36,6 @@ public class ConfigurationInfo
 	public ConfigurationInfo(String name)
 	{
 		this.name = name;
-		this.components = new ArrayList();
-		this.arguments = new ArrayList();
 	}
 	
 	//-------- methods --------
@@ -66,6 +64,8 @@ public class ConfigurationInfo
 	 */
 	public void addComponentInstance(ComponentInstanceInfo component)
 	{
+		if(components==null)
+			components = new ArrayList();
 		this.components.add(component);
 	}
 	
@@ -77,23 +77,25 @@ public class ConfigurationInfo
 	{
 		return components!=null? (ComponentInstanceInfo[])components.toArray(new ComponentInstanceInfo[components.size()]): new ComponentInstanceInfo[0];
 	}
-
+	
 	/**
 	 *  Add an argument.
 	 *  @param argument The argument.
 	 */
 	public void addArgument(String argument)
 	{
+		if(arguments==null)
+			arguments = new ArrayList();
 		this.arguments.add(argument);
 	}
 
-	/**
-	 *  Get the arguments.
-	 *  @return The arguments.
-	 */
-	public List getArguments()
-	{
-		return this.arguments;
-	}
+//	/**
+//	 *  Get the arguments.
+//	 *  @return The arguments.
+//	 */
+//	public List getArguments()
+//	{
+//		return this.arguments;
+//	}
 	
 }

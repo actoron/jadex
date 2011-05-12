@@ -41,11 +41,11 @@ public interface IModelInfo
 	 */
 	public String getDescription();
 	
-	/**
-	 *  Get the imports.
-	 *  @return The imports.
-	 */
-	public String[] getImports();
+//	/**
+//	 *  Get the imports.
+//	 *  @return The imports.
+//	 */
+//	public String[] getImports();
 	
 	/**
 	 *  Get the report.
@@ -165,11 +165,4 @@ public interface IModelInfo
 	 *  Get the subcomponent names. 
 	 */
 	public SubcomponentTypeInfo[] getSubcomponentTypes();
-	
-//	/**
-//	 *  Get the component instances. 
-//	 *  @param configname The configname.
-//	 *  @return The component instances.
-//	 */
-//	public List getComponentInstances(String configname);
 }
