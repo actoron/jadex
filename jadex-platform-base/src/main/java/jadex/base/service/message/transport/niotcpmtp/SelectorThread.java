@@ -18,7 +18,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -220,11 +219,11 @@ public class SelectorThread implements Runnable
 								{
 									SocketChannel	sc	= SocketChannel.open();
 									sc.configureBlocking(false);
-									sc.register(selector, SelectionKey.OP_CONNECT, new Tuple(address, fut));
 									sc.connect(address);
+									sc.register(selector, SelectionKey.OP_CONNECT, new Tuple(address, fut));
 									logger.info("Attempting connection to: "+address);
 								}
-								catch(IOException e)
+								catch(Exception e)
 								{
 									fut.setException(e);
 								}
@@ -408,7 +407,7 @@ public class SelectorThread implements Runnable
 			
 			logger.fine("Accepted connection from: "+sc.socket().getRemoteSocketAddress());
 		}
-		catch(IOException e)
+		catch(Exception e)
 		{
 			this.logger.info("Failed connection attempt: "+ssc+", "+e);
 //			e.printStackTrace();
@@ -431,7 +430,7 @@ public class SelectorThread implements Runnable
 				msgservice.deliverMessage(msg.getMessage(), msg.getTypeName(), msg.getReceivers());
 			}
 		}
-		catch(IOException e)
+		catch(Exception e)
 		{ 
 			logger.info("NIOTCP receiving error while reading data: "+con+", "+e);
 //			e.printStackTrace();
@@ -466,7 +465,7 @@ public class SelectorThread implements Runnable
 			logger.fine("Connected to : "+address);
 			ret.setResult(con);
 		}
-		catch(IOException e)
+		catch(Exception e)
 		{ 
 			synchronized(connections)
 			{
@@ -596,9 +595,8 @@ public class SelectorThread implements Runnable
 				{
 					((NIOTCPOutputConnection)con).getSocketChannel().close();
 				}
-				catch(IOException e)
+				catch(Exception e)
 				{
-					
 				}
 				logger.fine("Removed connection to : "+address);
 			}

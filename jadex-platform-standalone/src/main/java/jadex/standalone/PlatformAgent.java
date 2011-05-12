@@ -58,7 +58,7 @@ import jadex.micro.annotation.RequiredServices;
 	@Argument(name="tcpport", typename="int", defaultvalue="9876"),
 	@Argument(name="niotcpport", typename="int", defaultvalue="8765"),
 	@Argument(name="awaincludes", typename="String", defaultvalue="\"\""),
-	@Argument(name="awaexcludes", typename="String", defaultvalue="\"\""),
+	@Argument(name="awaexcludes", typename="String", defaultvalue="\"\"")
 })
 
 @ComponentTypes({
@@ -89,7 +89,7 @@ import jadex.micro.annotation.RequiredServices;
 	@ProvidedService(type=ISimulationService.class, implementation=@Implementation(expression="new SimulationService($component, SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{new String[]{\"getMode\", \"isExecuting\"}}))")),
 //	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new ComponentComponentFactory($component.getServiceProvider())", direct=true)),
 	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new MicroAgentFactory($component.getServiceProvider(), null)")),
-	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(expression="new DeploymentService($component.getServiceProvider())")),
+	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(expression="new DeploymentService($component.getServiceProvider())"))
 })
 
 @RequiredServices({
@@ -100,7 +100,7 @@ import jadex.micro.annotation.RequiredServices;
 	@Configuration(name="micro_kernel auto (rms, awa, jcc)", arguments={
 		@NameValue(name="tcpport", value="0"),
 		@NameValue(name="niotcpport", value="0"),
-		@NameValue(name="platformname", value="null"),
+		@NameValue(name="platformname", value="null")
 	}, components={
 		@Component(name="rms", type="rms", daemon=true),
 		@Component(name="awa", type="awa", daemon=true, 
@@ -111,7 +111,7 @@ import jadex.micro.annotation.RequiredServices;
 	@Configuration(name="all_kernels auto (rms, awa, jcc)", arguments={
 		@NameValue(name="tcpport", value="0"),
 		@NameValue(name="niotcpport", value="0"),
-		@NameValue(name="platformname", value="null"),
+		@NameValue(name="platformname", value="null")
 	}, components={
 		@Component(name="kernel_component", type="kernel_component", daemon=true),
 		@Component(name="kernel_application", type="kernel_application", daemon=true),
@@ -123,7 +123,7 @@ import jadex.micro.annotation.RequiredServices;
 			arguments={@NameValue(name="includes", value="$args.awaincludes"),
 				@NameValue(name="excludes", value="$args.awaexcludes")}),
 		@Component(name="jcc", type="jcc", daemon=true)
-	}),
+	})
 })
 public class PlatformAgent extends MicroAgent
 {
