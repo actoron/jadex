@@ -281,6 +281,7 @@
 		<configuration name="testcases">
 			<arguments>
 				<argument name="platformname">"testcases"</argument>
+				<argument name="saveonexit">false</argument>
 				<argument name="tcpport">0</argument>
 				<argument name="niotcpport">0</argument>
 			</arguments>
@@ -294,6 +295,8 @@
 		
 		<configuration name="creation_test_bdi">
 			<arguments>
+				<argument name="platformname">"testcases"</argument>
+				<argument name="saveonexit">false</argument>
 				<argument name="libpath">new Object[]{"../jadex-applications-bdi/target/classes"}</argument>
 			</arguments>
 			<components>
@@ -304,6 +307,8 @@
 		
 		<configuration name="creation_test_micro">
 			<arguments>
+				<argument name="platformname">"testcases"</argument>
+				<argument name="saveonexit">false</argument>
 				<argument name="libpath">new Object[]{"../jadex-applications-micro/target/classes"}</argument>
 			</arguments>
 			<components>
@@ -318,6 +323,8 @@
 
 		<configuration name="creation_test_bpmn">
 			<arguments>
+				<argument name="platformname">"testcases"</argument>
+				<argument name="saveonexit">false</argument>
 				<argument name="libpath">new Object[]{"../jadex-applications-bpmn/target/classes"}</argument>
 			</arguments>
 			<components>
