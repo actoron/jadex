@@ -624,7 +624,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	
 	// for testing double execution.
 	boolean executing;
-	Exception	rte;
+//	Exception	rte;
 
 	/**
 	 *  Executable code for running the component
@@ -644,11 +644,11 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //			List	debug	= (List)AsyncExecutionService.DEBUG.getCollection(this);
 //			for(int i=0; i<debug.size(); i++)
 //				System.err.println(getComponentIdentifier()+": "+debug.get(i));
-			rte.printStackTrace();
+//			rte.printStackTrace();
 			new RuntimeException("executing: "+getComponentIdentifier()).printStackTrace();
 		}
-		rte	= new RuntimeException("executing: "+getComponentIdentifier());
-		rte.fillInStackTrace();
+//		rte	= new RuntimeException("executing: "+getComponentIdentifier());
+//		rte.fillInStackTrace();
 		executing	= true;
 		wokenup	= false;	
 		

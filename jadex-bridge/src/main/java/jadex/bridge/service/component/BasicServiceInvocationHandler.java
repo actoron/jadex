@@ -44,6 +44,17 @@ import java.util.List;
  */
 public class BasicServiceInvocationHandler implements InvocationHandler
 {
+	//-------- constants --------
+	
+	/** The raw proxy type (i.e. no proxy). */
+	public static final String	PROXYTYPE_RAW	= "raw";
+	
+	/** The direct proxy type (supports custom interceptors, but uses caller thread). */
+	public static final String	PROXYTYPE_DIRECT	= "direct";
+	
+	/** The (default) decoupled proxy type (decouples from caller thread to component thread). */
+	public static final String	PROXYTYPE_DECOUPLED	= "decoupled";
+	
 	//-------- attributes --------
 
 	/** The service identifier. */
@@ -261,100 +272,121 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	/**
 	 *  Static method for creating a standard service proxy for a provided service.
 	 */
-	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, Object service, boolean direct)
+	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, Object service, String proxytype)
 	{
-//		System.out.println("create: "+service.getServiceIdentifier().getServiceType());
-		BasicServiceInvocationHandler handler;
-		Class type;
-		if(service instanceof IService)
+		IInternalService	ret;
+		
+		if(PROXYTYPE_RAW.equals(proxytype))
 		{
-			IService ser = (IService)service;
-			handler = new BasicServiceInvocationHandler(ser);
-			type = ser.getServiceIdentifier().getServiceType();
+			if(service instanceof IInternalService)
+			{
+				ret	= (IInternalService)service;
+			}
+			else
+			{
+				throw new RuntimeException("Raw services must implement IInternalService (e.g. by extending BasicService).");
+			}
 		}
 		else
 		{
-			// Try to find service interface via annotation
-			if(service.getClass().isAnnotationPresent(ServiceInterface.class))
+//			System.out.println("create: "+service.getServiceIdentifier().getServiceType());
+			BasicServiceInvocationHandler handler;
+			Class type;
+			if(service instanceof IService)
 			{
-				ServiceInterface si = (ServiceInterface)service.getClass().getAnnotation(ServiceInterface.class);
-				type = si.value();
+				IService ser = (IService)service;
+				handler = new BasicServiceInvocationHandler(ser);
+				type = ser.getServiceIdentifier().getServiceType();
 			}
-			// Otherwise take interface if there is only one
 			else
 			{
-				Class[] types = service.getClass().getInterfaces();
-				if(types.length!=1)
-					throw new RuntimeException("Unknown service interface: "+SUtil.arrayToString(types));
-				type = types[0];
-			}
-			
-			BasicService mgmntservice = new BasicService(ia.getExternalAccess().getServiceProvider().getId(), type, null);
-
-			Field fields[] = service.getClass().getDeclaredFields();
-			for(int i=0; i<fields.length; i++)
-			{
-				if(fields[i].isAnnotationPresent(ServiceIdentifier.class))
+				// Try to find service interface via annotation
+				if(service.getClass().isAnnotationPresent(ServiceInterface.class))
 				{
-					if(SReflect.isSupertype(IServiceIdentifier.class, fields[i].getType()))
+					ServiceInterface si = (ServiceInterface)service.getClass().getAnnotation(ServiceInterface.class);
+					type = si.value();
+				}
+				// Otherwise take interface if there is only one
+				else
+				{
+					Class[] types = service.getClass().getInterfaces();
+					if(types.length!=1)
+						throw new RuntimeException("Unknown service interface: "+SUtil.arrayToString(types));
+					type = types[0];
+				}
+				
+				BasicService mgmntservice = new BasicService(ia.getExternalAccess().getServiceProvider().getId(), type, null);
+	
+				Field fields[] = service.getClass().getDeclaredFields();
+				for(int i=0; i<fields.length; i++)
+				{
+					if(fields[i].isAnnotationPresent(ServiceIdentifier.class))
 					{
-						try
+						if(SReflect.isSupertype(IServiceIdentifier.class, fields[i].getType()))
 						{
-							fields[i].setAccessible(true);
-							fields[i].set(service, mgmntservice.getServiceIdentifier());
+							try
+							{
+								fields[i].setAccessible(true);
+								fields[i].set(service, mgmntservice.getServiceIdentifier());
+							}
+							catch(Exception e)
+							{
+								e.printStackTrace();
+							}
 						}
-						catch(Exception e)
+						else
 						{
-							e.printStackTrace();
+							System.out.println("Field cannot store IServiceIdentifer: "+fields[i]);
 						}
 					}
-					else
+					
+					if(fields[i].isAnnotationPresent(ServiceComponent.class))
 					{
-						System.out.println("Field cannot store IServiceIdentifer: "+fields[i]);
+						Object val = null;
+						if(SReflect.isSupertype(IInternalAccess.class, fields[i].getType()))
+						{
+							val = ia;
+						}
+						else if(SReflect.isSupertype(IExternalAccess.class, fields[i].getType()))
+						{
+							val = ia.getExternalAccess();
+						}
+						else
+						{
+							System.out.println("Field cannot store component: "+fields[i]);
+						}
+						if(val!=null)
+						{
+							try
+							{
+								fields[i].setAccessible(true);
+								fields[i].set(service, val);
+							}
+							catch(Exception e)
+							{
+								e.printStackTrace();
+							}
+						}
 					}
 				}
 				
-				if(fields[i].isAnnotationPresent(ServiceComponent.class))
-				{
-					Object val = null;
-					if(SReflect.isSupertype(IInternalAccess.class, fields[i].getType()))
-					{
-						val = ia;
-					}
-					else if(SReflect.isSupertype(IExternalAccess.class, fields[i].getType()))
-					{
-						val = ia.getExternalAccess();
-					}
-					else
-					{
-						System.out.println("Field cannot store component: "+fields[i]);
-					}
-					if(val!=null)
-					{
-						try
-						{
-							fields[i].setAccessible(true);
-							fields[i].set(service, val);
-						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
-						}
-					}
-				}
+				ServiceInfo si = new ServiceInfo(service, mgmntservice);
+				handler = new BasicServiceInvocationHandler(si);
+				
 			}
-			
-			ServiceInfo si = new ServiceInfo(service, mgmntservice);
-			handler = new BasicServiceInvocationHandler(si);
-			
+			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
+			if(!(service instanceof IService))
+			{
+				handler.addFirstServiceInterceptor(new ResolveInterceptor());
+			}
+			handler.addFirstServiceInterceptor(new ValidationInterceptor());
+			if(!PROXYTYPE_DIRECT.equals(proxytype))
+			{
+				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia.getExternalAccess(), adapter));
+			}
+			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess().getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 		}
-		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
-		if(!(service instanceof IService))
-			handler.addFirstServiceInterceptor(new ResolveInterceptor());
-		handler.addFirstServiceInterceptor(new ValidationInterceptor());
-		if(!direct)
-			handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia.getExternalAccess(), adapter));
-		return (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess().getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler); 
+		return ret;
 	}
 	
 	/**

@@ -30,7 +30,6 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
-import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
@@ -301,8 +300,7 @@ public abstract class AbstractInterpreter implements IComponentInstance
 						
 						if(ser!=null)
 						{
-							IInternalService service = BasicServiceInvocationHandler.createProvidedServiceProxy(getInternalAccess(), getComponentAdapter(), ser, impl.isDirect());
-							getServiceContainer().addService(service);
+							addService(ser, impl.getProxytype());
 						}
 						else
 						{
@@ -496,6 +494,19 @@ public abstract class AbstractInterpreter implements IComponentInstance
 	public IComponentIdentifier getComponentIdentifier()
 	{
 		return getComponentAdapter().getComponentIdentifier();
+	}
+	
+	//-------- methods to be called by kernel --------
+	
+	/**
+	 *  Add a service to the component. 
+	 *  @param service The service.
+	 *  @param proxytype	The proxy type (@see{BasicServiceInvocationHandler}).
+	 */
+	public void addService(Object service, String proxytype)
+	{
+		IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(getInternalAccess(), getComponentAdapter(), service, proxytype);
+		getServiceContainer().addService(proxy);
 	}
 	
 	//-------- methods to be called by adapter --------

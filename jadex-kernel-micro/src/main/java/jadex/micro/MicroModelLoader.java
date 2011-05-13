@@ -4,8 +4,6 @@ import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
 
-import java.io.IOException;
-
 /**
  * 
  */
@@ -82,8 +80,8 @@ public class MicroModelLoader extends AbstractModelLoader
 //			if(clazz!=null)
 				ret = new ResourceInfo(name, null, 0L);
 	
-			if(ret==null)
-				throw new IOException("File "+name+" not found in imports");//: "+SUtil.arrayToString(imports));
+//			if(ret==null)
+//				throw new IOException("File "+name+" not found in imports");//: "+SUtil.arrayToString(imports));
 		}
 		return ret;
 	}

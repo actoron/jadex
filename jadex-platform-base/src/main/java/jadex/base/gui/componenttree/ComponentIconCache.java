@@ -100,12 +100,22 @@ public class ComponentIconCache
 									tree.repaint();
 								}
 							}
+							
+							public void customExceptionOccurred(Exception exception)
+							{
+								// Todo: remember failed searches for efficiency?
+							}
 						});
 					}
 					catch(Exception e)
 					{
 						// could be UnsupportedOpEx in case of remote factory
 					}
+				}
+				
+				public void customExceptionOccurred(Exception exception)
+				{
+					// Todo: remember failed searches for efficiency?
 				}
 			});
 		}

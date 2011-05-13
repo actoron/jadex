@@ -10,8 +10,8 @@ public class MProvidedServiceType extends MExpressionType
 {
 	//-------- attributes --------
 
-	/** The direct attribute. */
-	protected boolean direct;
+	/** The proxtype attribute. */
+	protected String proxytype;
 	
 	/** The binding. */
 	protected RequiredServiceBinding binding;
@@ -29,15 +29,6 @@ public class MProvidedServiceType extends MExpressionType
 	}
 
 	//-------- methods --------
-	
-	/**
-	 *  Get the direct flag.
-	 *  @return the direct.
-	 */
-	public boolean isDirect()
-	{
-		return direct;
-	}
 
 	/**
 	 *  Get the binding.
@@ -58,15 +49,6 @@ public class MProvidedServiceType extends MExpressionType
 	}
 
 	/**
-	 *  Set the direct flag.
-	 *  @param direct The direct to set.
-	 */
-	public void setDirect(boolean direct)
-	{
-		this.direct = direct;
-	}
-
-	/**
 	 *  Get the implementation.
 	 *  @return the implementation.
 	 */
@@ -82,6 +64,17 @@ public class MProvidedServiceType extends MExpressionType
 	public void setImplementation(Class implementation)
 	{
 		this.implementation = implementation;
+	}
+
+	public String getProxytype()
+	{
+		return proxytype;
+	}
+	
+
+	public void setProxytype(String proxytype)
+	{
+		this.proxytype	= proxytype;
 	}
 	
 }

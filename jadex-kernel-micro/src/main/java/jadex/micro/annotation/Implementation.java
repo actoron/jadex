@@ -1,14 +1,29 @@
 package jadex.micro.annotation;
 
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
+
 /**
  * 
  */
 public @interface Implementation
 {
+	//-------- constants --------
+	
+	/** The raw proxy type (i.e. no proxy). */
+	public static final String	PROXYTYPE_RAW	= BasicServiceInvocationHandler.PROXYTYPE_RAW;
+	
+	/** The direct proxy type (supports custom interceptors, but uses caller thread). */
+	public static final String	PROXYTYPE_DIRECT	= BasicServiceInvocationHandler.PROXYTYPE_DIRECT;
+	
+	/** The (default) decoupled proxy type (decouples from caller thread to component thread). */
+	public static final String	PROXYTYPE_DECOUPLED	= BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED;
+	
+	//-------- properties --------
+	
 	/**
-	 *  The direct flag.
+	 *  The proxy type.
 	 */
-	public boolean direct() default false;
+	public String proxytype() default PROXYTYPE_DECOUPLED;
 	
 	/**
 	 *  The creation class.

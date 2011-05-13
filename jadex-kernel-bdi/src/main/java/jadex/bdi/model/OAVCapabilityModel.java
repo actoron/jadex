@@ -1,7 +1,6 @@
 package jadex.bdi.model;
 
 import jadex.bdi.runtime.interpreter.AgentRules;
-import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.modelinfo.Argument;
@@ -105,7 +104,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		Collection tmp = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_imports);
 		List imp = new ArrayList(tmp!=null? tmp: new ArrayList());
 		imp.add(state.getAttributeValue(handle, OAVBDIMetaModel.capability_has_package)+".*");
-		String[] imports = (String[])imp.toArray(new String[0]);
+//		String[] imports = (String[])imp.toArray(new String[0]);
 		
 		String[] confignames = getConfigurations();
 		ConfigurationInfo[] cinfos = null;
@@ -764,9 +763,9 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 				Object ob = it.next();
 				Class clazz = (Class)state.getAttributeValue(ob, OAVBDIMetaModel.expression_has_class);
 				String text = (String)state.getAttributeValue(ob, OAVBDIMetaModel.expression_has_text);
-				Boolean direct = (Boolean)state.getAttributeValue(ob, OAVBDIMetaModel.providedservice_has_direct);
+				String proxytype = (String)state.getAttributeValue(ob, OAVBDIMetaModel.providedservice_has_proxytype);
 				Class impl = (Class)state.getAttributeValue(ob, OAVBDIMetaModel.providedservice_has_implementation);
-				ProvidedServiceInfo psi = new ProvidedServiceInfo(clazz, new ProvidedServiceImplementation(impl, text, direct!=null? direct.booleanValue(): false, null)); 
+				ProvidedServiceInfo psi = new ProvidedServiceInfo(clazz, new ProvidedServiceImplementation(impl, text, proxytype, null)); 
 				ret.add(psi);
 			}
 		}

@@ -24,7 +24,7 @@
 	
 	<services>
 		<providedservice class="IComponentFactory">
-			<implementation>
+			<implementation proxytype="raw">
 				new ApplicationComponentFactory(
 					new Set[]
 					{

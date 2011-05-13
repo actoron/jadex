@@ -233,8 +233,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 								
 								if(ser!=null)
 								{
-									service = BasicServiceInvocationHandler.createProvidedServiceProxy(ia, getComponentAdapter(), ser, st.isDirect());
-									getServiceContainer().addService(service);
+									addService(ser, st.getProxytype());
 								}
 							}
 							catch(Exception e)
@@ -1563,6 +1562,17 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 		}));
 		
 		return ret;
+	}
+	
+	/**
+	 *  Add a service to the component. 
+	 *  @param service The service.
+	 *  @param proxytype	The proxy type (@see{BasicServiceInvocationHandler}).
+	 */
+	public void addService(Object service, String proxytype)
+	{
+		IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(this, getComponentAdapter(), service, proxytype);
+		getServiceContainer().addService(proxy);
 	}
 	
 //	/**

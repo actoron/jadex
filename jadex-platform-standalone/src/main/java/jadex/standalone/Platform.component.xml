@@ -80,19 +80,19 @@
 			</implementation>
 		</providedservice>
 		<providedservice class="IThreadPool">
-			<implementation direct="true">
+			<implementation proxytype="raw">
 				new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
 			</implementation>
 		</providedservice>
 		<providedservice class="IExecutionService">
-			<implementation direct="true">
+			<implementation proxytype="raw">
 				$args.simulation
 				? new SyncExecutionService($component.getServiceProvider())
 				: new AsyncExecutionService($component.getServiceProvider())
 			</implementation>
 		</providedservice>
 		<providedservice class="ILibraryService">
-			<implementation direct="true">
+			<implementation proxytype="raw">
 				new LibraryService($args.libpath, $component.getServiceProvider(), 
 					SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_EXCLUDED}, 
 					new Object[]{new String[]{"getClassLoader"}})
@@ -100,7 +100,7 @@
 			</implementation>
 		</providedservice>
 		<providedservice class="IClockService">
-			<implementation direct="true">
+			<implementation proxytype="raw">
 				$args.simulation
 				? new ClockService(new ClockCreationInfo(IClock.TYPE_EVENT_DRIVEN, "simulation_clock", System.currentTimeMillis(), 100), $component.getServiceProvider(),
 					SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
@@ -111,7 +111,7 @@
 			</implementation>
 		</providedservice>
 		<providedservice class="IMessageService">
-			<implementation direct="true">
+			<implementation proxytype="raw">
 				new MessageService($component.getExternalAccess(),
 				new ITransport[]
 				{
@@ -129,7 +129,7 @@
 			</implementation>
 		</providedservice>
 		<providedservice class="IComponentManagementService">
-			<implementation direct="true">
+			<implementation proxytype="raw">
 				new ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter())
 			</implementation>
 		</providedservice>
@@ -139,7 +139,7 @@
 				new Object[]{"jadex.base.gui.componentviewer.dfservice.DFBrowserPanel"}))
 		</providedservice> -->
 		<providedservice class="IDF">
-			<implementation direct="true">
+			<implementation proxytype="raw">
 				new DirectoryFacilitatorService($component.getServiceProvider())
 			</implementation>
 		</providedservice>
@@ -151,7 +151,7 @@
 			</implementation>
 		</providedservice>
 		<providedservice class="IComponentFactory">
-			<implementation direct="true">
+			<implementation proxytype="raw">
 				new ComponentComponentFactory($component.getServiceProvider())
 			</implementation>		
 		</providedservice>

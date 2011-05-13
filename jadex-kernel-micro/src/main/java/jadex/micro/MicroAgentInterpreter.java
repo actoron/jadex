@@ -386,8 +386,11 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		else
 		{
 			steps.add(step);
-			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, step[0].getClass().getName(), 
-				step[0].toString(), microagent.getComponentIdentifier(), getStepDetails((IComponentStep)step[0])));
+			if(componentlisteners!=null)
+			{
+				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, step[0].getClass().getName(), 
+					step[0].toString(), microagent.getComponentIdentifier(), getStepDetails((IComponentStep)step[0])));
+			}
 		}
 	}
 	
@@ -397,8 +400,11 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	protected Object[] removeStep()
 	{
 		Object[] ret = (Object[])steps.remove(0);
-		notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_STEP, 
-			ret[0].getClass().getName(), ret[0].toString(), microagent.getComponentIdentifier(), getStepDetails((IComponentStep)ret[0])));
+		if(componentlisteners!=null)
+		{
+			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_STEP, 
+				ret[0].getClass().getName(), ret[0].toString(), microagent.getComponentIdentifier(), getStepDetails((IComponentStep)ret[0])));
+		}
 //		notifyListeners(new ChangeEvent(this, "removeStep", new Integer(0)));
 		return ret;
 	}

@@ -229,7 +229,7 @@ public class MicroClassReader
 					bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
 					bd.dynamic(), bd.scope(), bd.create(), bd.recover());
 				ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
-					im.expression().length()>0? im.expression(): null, im.direct(), bind);
+					im.expression().length()>0? im.expression(): null, im.proxytype(), bind);
 				psis[i] = new ProvidedServiceInfo(vals[i].type(), impl);
 			}
 			modelinfo.setProvidedServices(psis);

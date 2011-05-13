@@ -18,8 +18,8 @@ public class ProvidedServiceImplementation
 	/** The binding for forwarding service calls. */
 	protected RequiredServiceBinding binding;
 
-	/** The direct flag. */
-	protected boolean direct;
+	/** The proxy type. */
+	protected String	proxytype;
 	
 	/**
 	 * 
@@ -32,11 +32,11 @@ public class ProvidedServiceImplementation
 	 * 
 	 */
 	public ProvidedServiceImplementation(Class implementation,
-		String expression, boolean direct, RequiredServiceBinding binding)
+		String expression, String proxytype, RequiredServiceBinding binding)
 	{
 		this.implementation = implementation;
 		this.expression = expression;
-		this.direct = direct;
+		this.proxytype = proxytype;
 		this.binding = binding;
 	}
 
@@ -77,21 +77,21 @@ public class ProvidedServiceImplementation
 	}
 
 	/**
-	 *  Get the direct.
-	 *  @return The direct.
+	 *  Get the proxy type.
+	 *  @return The proxy type.
 	 */
-	public boolean isDirect()
+	public String getProxytype()
 	{
-		return direct;
+		return proxytype;
 	}
 
 	/**
-	 *  Set the direct.
-	 *  @param direct The direct to set.
+	 *  Set the proxy type.
+	 *  @param proxytype The proxy type to set.
 	 */
-	public void setDirect(boolean direct)
+	public void	setProxytype(String proxytype)
 	{
-		this.direct = direct;
+		this.proxytype	= proxytype;
 	}
 
 	/**

@@ -251,7 +251,7 @@ public class MApplicationType extends MStartable implements ICacheableModel
 				Class type = ser.getClazz()!=null? ser.getClazz(): 
 					tmp[i]==null && ser.getParsedValue()!=null? 
 					ser.getParsedValue().getStaticType(): null;
-				tmp[i] = new ProvidedServiceInfo(type, new ProvidedServiceImplementation(ser.getImplementation(), ser.getValue(), ser.isDirect(), null));
+				tmp[i] = new ProvidedServiceInfo(type, new ProvidedServiceImplementation(ser.getImplementation(), ser.getValue(), ser.getProxytype(), null));
 			}
 			
 			modelinfo.setProvidedServices(tmp);

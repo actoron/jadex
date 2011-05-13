@@ -1,5 +1,7 @@
 package jadex.bridge.service;
 
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
+
 /**
  *  Info for provided services.
  */
@@ -41,7 +43,7 @@ public class ProvidedServiceInfo
 	 */
 	public ProvidedServiceInfo(Class type, String expression)
 	{
-		this(type, new ProvidedServiceImplementation(null, expression, false, null));
+		this(type, new ProvidedServiceImplementation(null, expression, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null));
 	}
 	
 	/**

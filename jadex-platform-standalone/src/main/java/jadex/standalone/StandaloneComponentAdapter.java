@@ -11,6 +11,7 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.execution.IExecutionService;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 
 import java.io.Serializable;
 
@@ -22,6 +23,11 @@ import java.io.Serializable;
  */
 public class StandaloneComponentAdapter	extends AbstractComponentAdapter	implements IComponentAdapter, IExecutable, Serializable
 {
+	//-------- attributes --------
+	
+	/** The execution service (cached for speed). */
+	protected IFuture	exeservice;
+	
 	//-------- constructors --------
 
 	/**
@@ -40,25 +46,37 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	 */
 	protected void	doWakeup()
 	{
-		SServiceProvider.getService(getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		getExecutionService().addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				try
 				{
-					if(getComponentIdentifier().toString().indexOf("@")==-1)
-					{
+//					if(getComponentIdentifier().toString().indexOf("@")==-1)
+//					{
 //						System.err.println("doWakeup: "+getComponentIdentifier());
 //						Thread.dumpStack();
-					}
+//					}
 					((IExecutionService)result).execute(StandaloneComponentAdapter.this);
 				}
 				catch(RuntimeException e)
 				{
 					// ignore if service is shutting down.
-					e.printStackTrace();
+//					e.printStackTrace();
 				}
 			}
 		});
+	}
+	
+	/**
+	 *  Get the execution service for waking the agent.
+	 */
+	protected IFuture	getExecutionService()
+	{
+		if(exeservice==null)
+		{
+			exeservice	= SServiceProvider.getService(getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		}
+		return exeservice;
 	}
 }

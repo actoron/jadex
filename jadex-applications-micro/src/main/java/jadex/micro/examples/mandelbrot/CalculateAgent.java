@@ -19,7 +19,7 @@ import jadex.micro.annotation.ProvidedServices;
 @Description("Agent offering a calculate service.")
 @ProvidedServices({
 	@ProvidedService(type=ICalculateService.class, implementation=@Implementation(CalculateService.class)),
-	@ProvidedService(type=IProgressService.class, implementation=@Implementation(value=ProgressService.class, direct=true))
+	@ProvidedService(type=IProgressService.class, implementation=@Implementation(value=ProgressService.class, proxytype=Implementation.PROXYTYPE_DIRECT))
 	})
 @Arguments(@Argument(name="delay", description="Agent kills itself when no job arrives in the delay interval.", typename="Long", defaultvalue="new Long(1000)"))
 @Configurations({

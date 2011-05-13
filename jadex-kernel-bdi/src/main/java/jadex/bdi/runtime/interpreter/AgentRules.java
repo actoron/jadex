@@ -10,14 +10,11 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IMessageService;
 import jadex.bridge.modelinfo.IArgument;
-import jadex.bridge.service.IInternalService;
-import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.clock.ITimedObject;
 import jadex.bridge.service.clock.ITimer;
-import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
@@ -1207,7 +1204,7 @@ public class AgentRules
 				
 				try
 				{
-					Boolean direct = (Boolean)state.getAttributeValue(mexp, OAVBDIMetaModel.providedservice_has_direct);
+					String proxytype = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.providedservice_has_proxytype);
 					IParsedExpression pex = (IParsedExpression)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_parsed);
 					Class impl = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.providedservice_has_implementation);
 					Object ser = null;
@@ -1223,8 +1220,7 @@ public class AgentRules
 					
 					if(ser!=null)
 					{
-						IInternalService service = BasicServiceInvocationHandler.createProvidedServiceProxy(new CapabilityFlyweight(state, rcapa), BDIInterpreter.getInterpreter(state).getAgentAdapter(), ser, direct.booleanValue());
-						((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(service);
+						BDIInterpreter.getInterpreter(state).addService(ser, proxytype);
 					}
 					else
 					{

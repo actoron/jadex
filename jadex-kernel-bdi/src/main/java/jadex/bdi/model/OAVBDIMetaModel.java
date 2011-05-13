@@ -2,6 +2,7 @@ package jadex.bdi.model;
 
 import jadex.bridge.MessageType;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.javaparser.IParsedExpression;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
@@ -326,7 +327,7 @@ public class OAVBDIMetaModel
 	public static OAVObjectType providedservice_type;
 	
 	/** Provided service has direct attribute. */
-	public static OAVAttributeType providedservice_has_direct;
+	public static OAVAttributeType providedservice_has_proxytype;
 
 	/** Provided service has implementation attribute. */
 	public static OAVAttributeType providedservice_has_implementationname;
@@ -1036,7 +1037,7 @@ public class OAVBDIMetaModel
 		expression_has_classname = expression_type.createAttributeType("mexpression_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
 		expression_has_class = expression_type.createAttributeType("mexpression_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE, Object.class);
 
-		providedservice_has_direct = providedservice_type.createAttributeType("mprovidedservice_has_direct", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		providedservice_has_proxytype = providedservice_type.createAttributeType("providedservice_has_proxytype", OAVJavaType.java_string_type, OAVAttributeType.NONE, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED);
 		providedservice_has_implementationname = providedservice_type.createAttributeType("mprovidedservice_has_implementationname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
 		providedservice_has_implementation = providedservice_type.createAttributeType("mprovidedservice_has_implementation", OAVJavaType.java_class_type, OAVAttributeType.NONE, Object.class);
 

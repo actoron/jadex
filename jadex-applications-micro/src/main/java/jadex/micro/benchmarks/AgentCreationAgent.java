@@ -8,6 +8,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
@@ -25,6 +26,14 @@ import java.util.Map;
  */
 public class AgentCreationAgent extends MicroAgent
 {
+	//-------- attributes --------
+	
+	/** The cms (cached for speed). */
+	protected IFuture	cms;
+	
+	/** The clock service (cached for speed). */
+	protected IFuture	clock;
+	
 	//-------- methods --------
 	
 	/**
@@ -39,9 +48,7 @@ public class AgentCreationAgent extends MicroAgent
 		
 		if(args.get("num")==null)
 		{
-//			SServiceProvider.getService(getServiceProvider(), IClockService.class)
-			getRequiredService("clockservice")
-				.addResultListener(createResultListener(new DefaultResultListener()
+			getClock().addResultListener(createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -77,9 +84,7 @@ public class AgentCreationAgent extends MicroAgent
 			args.put("num", new Integer(num+1));
 //			System.out.println("Args: "+num+" "+args);
 
-//			SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
-			getRequiredService("cmsservice")
-				.addResultListener(createResultListener(new DefaultResultListener()
+			getCMS().addResultListener(createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -116,9 +121,7 @@ public class AgentCreationAgent extends MicroAgent
 					// If nested, use initial component to kill others
 					else
 					{
-//						SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
-						getRequiredService("cmsservice")
-							.addResultListener(createResultListener(new DefaultResultListener()
+						getCMS().addResultListener(createResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
@@ -168,9 +171,7 @@ public class AgentCreationAgent extends MicroAgent
 	{
 		final String name = createPeerName(cnt, exta.getComponentIdentifier());
 //		System.out.println("Destroying peer: "+name);
-//		SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class)
-		getRequiredService("cmsservice")	
-			.addResultListener(new DefaultResultListener()
+		getCMS().addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(final Object result)
 			{
@@ -226,9 +227,7 @@ public class AgentCreationAgent extends MicroAgent
 	protected void killLastPeer(final int max, final long killstarttime, final double dur, final double pera, 
 		final long omem, final double upera, final IMicroExternalAccess exta)
 	{
-//		SServiceProvider.getService(exta.getServiceProvider(), IClockService.class)
-		getRequiredService("clockservice")
-			.addResultListener(new DefaultResultListener()
+		getClock().addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(final Object result)
 			{
@@ -252,9 +251,7 @@ public class AgentCreationAgent extends MicroAgent
 						System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 						System.out.println("Still used memory: "+stillused+"kB.");
 				
-//						SServiceProvider.getServiceUpwards(exta.getServiceProvider(), IComponentManagementService.class)
-						getRequiredService("cmsservice")
-							.addResultListener(createResultListener(new DefaultResultListener()
+						getCMS().addResultListener(createResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(final Object result)
 							{
@@ -276,6 +273,27 @@ public class AgentCreationAgent extends MicroAgent
 				});
 			}
 		});
+	}
+	
+	protected IFuture	getCMS()
+	{
+		if(cms==null)
+		{
+			cms	= SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class); // Raw service
+//			cms	= getRequiredService("cmsservice");	// Required service proxy
+		}
+		return cms;
+	}
+	
+	
+	protected IFuture	getClock()
+	{
+		if(clock==null)
+		{
+			clock	= SServiceProvider.getServiceUpwards(getServiceProvider(), IClockService.class); // Raw service
+//			clock	= getRequiredService("clockservice");	// Required service proxy
+		}
+		return clock;
 	}
 	
 	/**

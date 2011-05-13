@@ -28,12 +28,14 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
@@ -1358,6 +1360,18 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	
 	//-------- helper methods --------
 	
+	
+	/**
+	 *  Add a service to the component. 
+	 *  @param service The service.
+	 *  @param proxytype	The proxy type (@see{BasicServiceInvocationHandler}).
+	 */
+	public void addService(Object service, String proxytype)
+	{
+		IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(new CapabilityFlyweight(state, ragent), adapter, service, proxytype);
+		getServiceContainer().addService(proxy);
+	}
+
 	/**
 	 *  Get the interpreter for an agent object.
 	 */

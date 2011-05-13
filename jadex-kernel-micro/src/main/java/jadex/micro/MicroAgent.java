@@ -11,7 +11,6 @@ import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
 import jadex.bridge.MessageType.ParameterSpecification;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
@@ -571,10 +570,20 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  the old one is removed and shutdowned.
 	 *  @param service The service.
 	 */
+	public void addRawService(Object service)
+	{
+		interpreter.addService(service, BasicServiceInvocationHandler.PROXYTYPE_RAW);
+	}
+	
+	/**
+	 *  Add a service to the platform.
+	 *  If under the same name and type a service was contained,
+	 *  the old one is removed and shutdowned.
+	 *  @param service The service.
+	 */
 	public void addDirectService(Object service)
 	{
-		IInternalService proxyser = BasicServiceInvocationHandler.createProvidedServiceProxy(this, getAgentAdapter(), service, true);
-		((IServiceContainer)interpreter.getServiceProvider()).addService(proxyser);
+		interpreter.addService(service, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
 	}
 	
 	/**
@@ -585,8 +594,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public void addService(Object service)
 	{
-		IInternalService proxyser = BasicServiceInvocationHandler.createProvidedServiceProxy(this, getAgentAdapter(), service, false);
-		((IServiceContainer)interpreter.getServiceProvider()).addService(proxyser);
+		interpreter.addService(service, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED);
 	}
 
 	/**
@@ -777,7 +785,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		 */
 		public Object execute(IInternalAccess ia)
 		{
-//			((MicroAgent)ia).timers.remove(ts[0]);
+			((MicroAgent)ia).timers.remove(ts);
 			run.execute(ia);
 			return null;
 		}
