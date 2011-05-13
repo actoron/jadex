@@ -1,4 +1,4 @@
-package jadex.component.runtime.impl;
+package jadex.component;
 
 import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.ComponentTerminatedException;
@@ -26,7 +26,7 @@ import jadex.component.ComponentComponentFactory;
 import jadex.component.ComponentModel;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
-import jadex.kernelbase.runtime.impl.AbstractInterpreter;
+import jadex.kernelbase.AbstractInterpreter;
 
 import java.util.ArrayList;
 import java.util.Collection;

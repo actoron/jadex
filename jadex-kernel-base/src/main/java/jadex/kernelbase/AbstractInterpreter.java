@@ -1,4 +1,4 @@
-package jadex.kernelbase.runtime.impl;
+package jadex.kernelbase;
 
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.CreationInfo;

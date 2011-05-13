@@ -1,4 +1,4 @@
-package jadex.component.runtime.impl;
+package jadex.component;
 
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;

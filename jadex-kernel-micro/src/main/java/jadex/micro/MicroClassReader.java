@@ -1,13 +1,10 @@
 package jadex.micro;
 
-import jadex.bridge.IErrorReport;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
-import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IModelValueProvider;
 import jadex.bridge.modelinfo.ModelInfo;
-import jadex.bridge.modelinfo.ModelValueProvider;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
@@ -121,7 +118,6 @@ public class MicroClassReader
 				metainfo = (MicroAgentMetaInfo)m.invoke(null, new Object[0]);
 			
 			String description = metainfo!=null && metainfo.getDescription()!=null? metainfo.getDescription(): null;
-			IErrorReport report = null;
 			String[] configurations = metainfo!=null? metainfo.getConfigurations(): null;
 			IArgument[] arguments = metainfo!=null? metainfo.getArguments(): null;
 			IArgument[] results = metainfo!=null? metainfo.getResults(): null;
@@ -277,7 +273,6 @@ public class MicroClassReader
 			configs = new Configuration[]{val};
 		}
 		
-		ConfigurationInfo[] cinfos = null;
 		if(configs!=null)
 		{
 			List configinfos = new ArrayList();
@@ -369,13 +364,13 @@ public class MicroClassReader
 //			metainfo.setAutoShutdown(new ModelValueProvider(autosd));
 //			metainfo.setConfigs(confignames);
 			
-			cinfos = (ConfigurationInfo[])configinfos.toArray(new ConfigurationInfo[configinfos.size()]);
+			modelinfo.setConfigurations((ConfigurationInfo[])configinfos.toArray(new ConfigurationInfo[configinfos.size()]));
 		}
 		
 		// Determine subcomponent types
-		SubcomponentTypeInfo[] subinfos = null;
 		if(cma.isAnnotationPresent(ComponentTypes.class))
 		{
+			SubcomponentTypeInfo[] subinfos = null;
 			ComponentTypes tmp = (ComponentTypes)cma.getAnnotation(ComponentTypes.class);
 			ComponentType[] ctypes = tmp.value();
 			subinfos = new SubcomponentTypeInfo[ctypes.length];
@@ -383,6 +378,7 @@ public class MicroClassReader
 			{
 				subinfos[i] = new SubcomponentTypeInfo(ctypes[i].name(), ctypes[i].filename());
 			}
+			modelinfo.setSubcomponentTypes(subinfos);
 		}
 		
 		// todo: move to be able to use the constant

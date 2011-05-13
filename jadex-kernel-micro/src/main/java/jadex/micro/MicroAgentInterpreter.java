@@ -23,7 +23,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
-import jadex.kernelbase.runtime.impl.AbstractInterpreter;
+import jadex.kernelbase.AbstractInterpreter;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
