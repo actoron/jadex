@@ -270,7 +270,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo model, 
+	public IFuture createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo model, 
 		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] binding, Future ret)
 	{
 		try
@@ -279,7 +279,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	
 			MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+"Agent", 
 				null, model.getClassLoader()), arguments, config, parent, binding, ret);
-			return new Object[]{mai, mai.getAgentAdapter()};
+			return new Future(new Object[]{mai, mai.getAgentAdapter()});
 		}
 		catch(Exception e)
 		{

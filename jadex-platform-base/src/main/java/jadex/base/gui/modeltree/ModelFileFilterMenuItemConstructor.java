@@ -1,6 +1,7 @@
 package jadex.base.gui.modeltree;
 
 import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentFactory;
@@ -148,6 +149,76 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 				cb.setSelected(selected.contains(key));
 			}
 		}
+	}
+	
+	/**
+	 *  Returns the supported component types.
+	 *  @return The supported component types.
+	 */
+	public IFuture getSupportedComponentTypes()
+	{
+		final Future ret = new Future();
+		SServiceProvider.getServices(exta.getServiceProvider(), 
+			IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				Collection facts = (Collection)result;
+				
+				Set supported = new HashSet();
+				supported.add(SELECT_ALL);
+				if(facts!=null)
+				{
+					for(Iterator it=facts.iterator(); it.hasNext(); )
+					{
+						IComponentFactory fac = (IComponentFactory)it.next();
+						
+						String[] fts = fac.getComponentTypes();
+						
+						// add new file types
+						for(int i=0; i<fts.length; i++)
+						{
+							supported.add(fts[i]);
+							if(!filetypes.containsKey(fts[i]))
+							{
+								final JCheckBoxMenuItem ff = new JCheckBoxMenuItem(fts[i], true);
+								fac.getComponentTypeIcon(fts[i]).addResultListener(new DefaultResultListener()
+								{
+									public void resultAvailable(Object result)
+									{
+										ff.setIcon((Icon)result);
+									}
+								});
+								
+								menu.add(ff);
+								ff.addActionListener(new ActionListener()
+								{
+									public void actionPerformed(ActionEvent e)
+									{
+										((ITreeNode)treemodel.getRoot()).refresh(true);
+									}
+								});
+								filetypes.put(fts[i], ff);
+							}
+						}
+					}
+				}
+				
+				// remove obsolete filetypes
+				for(Iterator it=filetypes.keySet().iterator(); it.hasNext(); )
+				{
+					Object next = it.next();
+					if(!supported.contains(next))
+					{
+						JMenuItem rem = (JMenuItem)filetypes.get(next);
+						menu.remove(rem);
+						it.remove();
+					}
+				}
+				ret.setResult(filetypes.keySet());
+			}
+		});
+		return ret;
 	}
 	
 	/**

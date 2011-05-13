@@ -183,7 +183,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
+	public IFuture createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
 		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, Future ret)
 	{
 		try
@@ -216,7 +216,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 			// todo: result listener?
 			// todo: create application context as return value?!
 					
-			return new Object[]{interpreter, interpreter.getComponentAdapter()};
+			return new Future(new Object[]{interpreter, interpreter.getComponentAdapter()});
 		}
 		catch(Exception e)
 		{

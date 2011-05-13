@@ -5,7 +5,6 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
@@ -43,7 +42,7 @@ public class WorkitemTask implements ITask
 			public void resultAvailable(Object result)
 			{
 				IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
-				wh.queueWorkitem(createWorkitem(process.getComponentIdentifier(), context), createListener(context, ret));
+				wh.queueWorkitem(createWorkitem(process, context), createListener(context, ret));
 			}
 		});
 		return ret;
@@ -55,7 +54,7 @@ public class WorkitemTask implements ITask
 	 * @param listener The result listener
 	 * @return a new workitem
 	 */
-	private static IWorkitem createWorkitem(IComponentIdentifier process, ITaskContext context)
+	private static IWorkitem createWorkitem(BpmnInterpreter process, ITaskContext context)
 	{
 		Map parameterTypes = new LinkedHashMap();
 		Map parameterValues = new HashMap();
@@ -137,7 +136,8 @@ public class WorkitemTask implements ITask
 		if (role == null)
 			role = IAAAService.ANY_ROLE;
 		
-		Workitem wi = new Workitem(process, name, role, parameterTypes, parameterValues, metaProperties, readOnlyParameters);
+		//TODO: Set correct parent
+		Workitem wi = new Workitem(process.getComponentIdentifier(), process.getParent().getModel().getName(), name, role, parameterTypes, parameterValues, metaProperties, readOnlyParameters);
 		wi.setId(context.getModelElement().getName() + "_" + String.valueOf(Integer.toHexString(System.identityHashCode(wi))));
 		return wi;
 	}

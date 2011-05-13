@@ -296,7 +296,7 @@ public abstract class ComponentManagementService extends BasicService implements
 												logger.info("Starting component: "+cid.getName());
 		//										System.err.println("Pre-Init: "+cid);
 												
-												Future future = new Future();
+												final Future future = new Future();
 												future.addResultListener(new IResultListener()
 												{
 													public void resultAvailable(Object result)
@@ -491,28 +491,33 @@ public abstract class ComponentManagementService extends BasicService implements
 												// Use first configuration if no config specified.
 												String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
 													: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
-												Object[] comp = factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
-													config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), future);
-												
-												// Store (invalid) desc, adapter and info for children
-												synchronized(adapters)
+												factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
+													config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), future).addResultListener(new DefaultResultListener()
 												{
-													synchronized(descs)
+													public void resultAvailable(Object result)
 													{
-														// 0: description, 1: adapter, 2: creation info, 3: model, 4: initfuture
-														initinfos.put(cid, new Object[]{ad, comp[1], cinfo, lmodel, future});
+														Object[] comp = (Object[]) result;
+														// Store (invalid) desc, adapter and info for children
+														synchronized(adapters)
+														{
+															synchronized(descs)
+															{
+																// 0: description, 1: adapter, 2: creation info, 3: model, 4: initfuture
+																initinfos.put(cid, new Object[]{ad, comp[1], cinfo, lmodel, future});
+															}
+														}
+														
+														// Start the init procedure by waking up the adapter.
+														try
+														{
+															getComponentAdapterFactory().initialWakeup((IComponentAdapter)comp[1]);
+														}
+														catch(Exception e)
+														{
+															inited.setException(e);
+														}
 													}
-												}
-												
-												// Start the init procedure by waking up the adapter.
-												try
-												{
-													getComponentAdapterFactory().initialWakeup((IComponentAdapter)comp[1]);
-												}
-												catch(Exception e)
-												{
-													inited.setException(e);
-												}
+												});
 											}
 										});
 									}

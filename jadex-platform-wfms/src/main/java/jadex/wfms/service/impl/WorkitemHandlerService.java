@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.SServiceProvider;
+import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -110,7 +111,7 @@ public class WorkitemHandlerService extends BasicService implements IWorkitemHan
 		{
 			public void resultAvailable(Object result)
 			{
-				LogService.dispatchLogServiceEvent(provider, new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_CREATION, SOURCE_CATEGORY_WORKITEM, workitem.getName(), workitem.toString(), workitem.getProcess(), null, null, (Long) result));
+				LogService.dispatchLogServiceEvent(provider, new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_CREATION, SOURCE_CATEGORY_WORKITEM, workitem.getName(), workitem.getId(), workitem.getProcess(), null, null, (Long) result));
 			}
 		});
 		
@@ -154,7 +155,7 @@ public class WorkitemHandlerService extends BasicService implements IWorkitemHan
 	 * 
 	 * @param activity the activity
 	 */
-	public synchronized void terminateActivity(IClientActivity activity)
+	public synchronized void terminateActivity(final IClientActivity activity)
 	{
 		String userName = null;
 		for (Iterator it = userActivities.entrySet().iterator(); it.hasNext(); )
@@ -169,6 +170,16 @@ public class WorkitemHandlerService extends BasicService implements IWorkitemHan
 		}
 		if (userName != null)
 		{
+			final String id = activity.getActivityId();
+			final String user = userName;
+			activity.setActivityId(null);
+			ComponentChangeEvent.getTimeStamp(provider).addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object result)
+				{
+					LogService.dispatchLogServiceEvent(provider, new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_ACTIVITY, activity.getName(), id, activity.getProcess(), "Finished", user, (Long) result));
+				}
+			});
 			((Set) userActivities.get(userName)).remove(activity);
 			fireActivityRemovedEvent(userName, activity);
 			requeueWorkitem((IWorkitem) activity, null);
@@ -183,11 +194,13 @@ public class WorkitemHandlerService extends BasicService implements IWorkitemHan
 	public synchronized void finishActivity(final String userName, IClientActivity activity)
 	{
 		final IWorkitem workitem = (IWorkitem) activity;
+		final String id = activity.getActivityId();
+		activity.setActivityId(null);
 		ComponentChangeEvent.getTimeStamp(provider).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
-				LogService.dispatchLogServiceEvent(provider, new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_ACTIVITY, workitem.getName(), workitem.toString(), workitem.getProcess(), "Finished", userName, (Long) result));
+				LogService.dispatchLogServiceEvent(provider, new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_ACTIVITY, workitem.getName(), id, workitem.getProcess(), "Finished", userName, (Long) result));
 				LogService.dispatchLogServiceEvent(provider, new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_WORKITEM, workitem.getName(), workitem.toString(), workitem.getProcess(), "Finished", null, (Long) result));
 			}
 		});
@@ -204,11 +217,15 @@ public class WorkitemHandlerService extends BasicService implements IWorkitemHan
 	 */
 	public synchronized void beginActivity(final String userName, final IWorkitem workitem)
 	{
+		final IClientActivity activity = (IClientActivity) workitem;
+		activity.setActivityId(SUtil.createUniqueId("Activity"));
 		ComponentChangeEvent.getTimeStamp(provider).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
-				LogService.dispatchLogServiceEvent(provider, new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_CREATION, SOURCE_CATEGORY_ACTIVITY, workitem.getName(), workitem.toString(), workitem.getProcess(), "Requested", userName, (Long) result));
+				ComponentChangeEvent event = new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_CREATION, SOURCE_CATEGORY_ACTIVITY, activity.getName(), activity.getActivityId(), activity.getProcess(), "Requested", userName, (Long) result);
+				event.setParent(activity.getId());
+				LogService.dispatchLogServiceEvent(provider, event);
 			}
 		});
 		Set workitems = (Set) workitemQueues.get(workitem.getRole());
@@ -221,8 +238,8 @@ public class WorkitemHandlerService extends BasicService implements IWorkitemHan
 				activities = new HashSet();
 				userActivities.put(userName, activities);
 			}
-			activities.add(workitem);
-			fireActivityAddedEvent(userName, (IClientActivity) workitem);
+			activities.add(activity);
+			fireActivityAddedEvent(userName, activity);
 		}
 	}
 	
@@ -233,11 +250,13 @@ public class WorkitemHandlerService extends BasicService implements IWorkitemHan
 	 */
 	public void cancelActivity(final String userName, final IClientActivity activity)
 	{
+		final String id = activity.getActivityId();
+		activity.setActivityId(null);
 		ComponentChangeEvent.getTimeStamp(provider).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
-				LogService.dispatchLogServiceEvent(provider, new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_ACTIVITY, activity.getName(), activity.toString(), activity.getProcess(), "Canceled", userName, (Long) result));
+				LogService.dispatchLogServiceEvent(provider, new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_ACTIVITY, activity.getName(), id, activity.getProcess(), "Canceled", userName, (Long) result));
 			}
 		});
 		((HashSet) userActivities.get(userName)).remove(activity);

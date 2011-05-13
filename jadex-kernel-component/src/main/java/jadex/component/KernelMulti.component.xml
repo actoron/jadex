@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Multi kernel component.
+-->
+<componenttype xmlns="http://jadex.sourceforge.net/jadex-component"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-component
+						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
+	name="kernel_multi" package="jadex.component">
+	
+	<imports>
+		<import>jadex.bridge.*</import>
+	</imports>
+	
+	<arguments>
+		<argument name="defaultkernels">new String[] {"jadex/micro/KernelMicro.component.xml"}</argument>
+		<argument name="ignorekernels">new String[] {"jadex/bdi/KernelBDI.component.xml"}</argument>
+		<argument name="ignoreextensions">null</argument>
+	</arguments>
+	
+	<services>
+		<providedservice class="IMultiKernelNotifierService">
+			new jadex.base.MultiKernelNotifierService($component)
+		</providedservice>
+		<providedservice class="IComponentFactory">
+			new jadex.base.MultiFactory($component, $args.defaultkernels, $args.ignorekernels, $args.ignoreextensions)
+		</providedservice>
+	</services>
+</componenttype>

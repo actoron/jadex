@@ -12,9 +12,16 @@
 		<import>jadex.commons.*</import>
 	</imports>
 	
+	<properties>
+		<property name="kernel_type_extensions" class="String[]">
+			new String[] {"gpmn"}
+		</property>
+	</properties>
+	
 	<services>
 		<service name="gpmn_factory" class="jadex.bridge.IComponentFactory">
 			new GpmnFactory($component.getServiceProvider(), new java.util.HashMap())
 		</service>
 	</services>
+	
 </componenttype>

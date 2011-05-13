@@ -568,6 +568,11 @@ public class StandardClientApplication
 		
 		agent.scheduleStep(new DispatchGoalStep("clientcap.start_user_activities_subscription"));
 		
+		setupMonitoringComponent();
+	}
+	
+	protected void setupMonitoringComponent()
+	{
 		Action lEvent = new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)

@@ -25,6 +25,12 @@ public interface IWorkitem
 	public String getName();
 	
 	/**
+	 *  Returns the ID of the Workitem.
+	 *  @return The ID.
+	 */
+	public String getId();
+	
+	/**
 	 * Gets the role responsible for handling this workitem.
 	 * 
 	 * @return role responsible for handling this workitem.

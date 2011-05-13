@@ -16,6 +16,12 @@
 		<import>java.util.*</import>
 	</imports>
 	
+	<properties>
+		<property name="kernel_type_extensions" class="String[]">
+			new String[] {"application.xml"}
+		</property>
+	</properties>
+	
 	<services>
 		<providedservice class="IComponentFactory">
 			<implementation>

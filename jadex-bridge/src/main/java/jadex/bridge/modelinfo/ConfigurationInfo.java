@@ -82,11 +82,20 @@ public class ConfigurationInfo
 	 *  Add an argument.
 	 *  @param argument The argument.
 	 */
-	public void addArgument(String argument)
+	public void addArgument(UnparsedExpression argument)
 	{
 		if(arguments==null)
 			arguments = new ArrayList();
 		this.arguments.add(argument);
+	}
+	
+	/**
+	 *  Get all arguments.
+	 *  @return The arguments.
+	 */
+	public UnparsedExpression[] getArguments()
+	{
+		return arguments!=null? (UnparsedExpression[])arguments.toArray(new UnparsedExpression[arguments.size()]): new UnparsedExpression[0];
 	}
 
 //	/**

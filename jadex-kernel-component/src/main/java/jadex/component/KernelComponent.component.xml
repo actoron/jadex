@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Micro kernel component.
+  Component kernel.
 -->
 <componenttype xmlns="http://jadex.sourceforge.net/jadex-component"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-component
 						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
-	name="kernel_micro" package="jadex.micro">
+	name="kernel_component" package="jadex.component">
 	
 	<imports>
 		<import>jadex.commons.*</import>
@@ -14,25 +14,14 @@
 	</imports>
 	
 	<properties>
-		<property name="kernel_type_extensions" class="String[]">
-			new String[] {"Agent.class"}
+		<property name="kernel_types" class="String[]">
+			new String[] {"component.xml"}
 		</property>
 	</properties>
 	
 	<services>
 		<providedservice class="IComponentFactory">
-			<implementation>
-				new MicroAgentFactory($component.getServiceProvider(), SUtil.createHashMap(
-					new String[]
-					{
-						"debugger.panels"
-					},
-					new Object[]
-					{
-						"jadex.tools.debugger.micro.MicroDebuggerPanel"
-					})
-				)
-			</implementation>
+			new ComponentComponentFactory($component.getServiceProvider())
 		</providedservice>
 	</services>
 </componenttype>

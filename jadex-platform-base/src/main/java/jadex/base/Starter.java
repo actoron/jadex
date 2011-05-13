@@ -1,6 +1,7 @@
 package jadex.base;
 
 import jadex.base.fipa.CMSComponentDescription;
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
@@ -281,21 +282,28 @@ public class Starter
 									}
 								});
 								
-								Object[] root = cfac.createComponentInstance(desc, afac, model, (String)cmdargs.get(CONFIGURATION_NAME),
-									compargs, null, null, future);
-								IComponentAdapter adapter = (IComponentAdapter)root[1];
-								
-								// Execute init steps of root component on main thread (i.e. platform).
-								boolean again = true;
-								while(again)
+								cfac.createComponentInstance(desc, afac, model, (String)cmdargs.get(CONFIGURATION_NAME),
+									compargs, null, null, future).addResultListener(new SwingDefaultResultListener()
 								{
-			//						System.out.println("Execute step: "+cid);
-									again = afac.executeStep(adapter);
-								}
-			//					System.out.println("starting component execution");
-								
-								// Start normal execution of root component (i.e. platform).
-								afac.initialWakeup(adapter);
+									public void customResultAvailable(Object result)
+									{
+										Object[] root = (Object[]) result;
+										
+										IComponentAdapter adapter = (IComponentAdapter)root[1];
+										
+										// Execute init steps of root component on main thread (i.e. platform).
+										boolean again = true;
+										while(again)
+										{
+					//						System.out.println("Execute step: "+cid);
+											again = afac.executeStep(adapter);
+										}
+					//					System.out.println("starting component execution");
+										
+										// Start normal execution of root component (i.e. platform).
+										afac.initialWakeup(adapter);
+									}
+								});
 							}
 							catch(Exception e)
 							{

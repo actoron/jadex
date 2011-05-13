@@ -22,12 +22,16 @@ import jadex.wfms.service.listeners.IAuthenticationListener;
 import jadex.wfms.service.listeners.IProcessListener;
 import jadex.wfms.service.listeners.ProcessEvent;
 
+import java.nio.ByteBuffer;
+import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import org.jivesoftware.smack.util.Base64;
 
 /**
  *  The meta execution service wraps all specific process execution services.
@@ -49,6 +53,8 @@ public class ExecutionService extends BasicService implements IExecutionService
 	
 	/** The process listeners */
 	private Map<IComponentIdentifier, Set<IProcessListener>> procListeners;
+	
+	private SecureRandom random = new SecureRandom();
 	
 	//-------- constructors --------
 	
@@ -93,7 +99,7 @@ public class ExecutionService extends BasicService implements IExecutionService
 	/**
 	 *  Start a process instance.
 	 */
-	public IFuture startProcess(final String modelname, Object id, final Map arguments)
+	public IFuture startProcess(final String modelname, final Object id, final Map arguments)
 	{
 		final Future ret = new Future();
 		SServiceProvider.getService(exta.getServiceProvider(), (Class) IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
@@ -104,7 +110,11 @@ public class ExecutionService extends BasicService implements IExecutionService
 				
 				CreationInfo ci = new CreationInfo(null, arguments, wfms, true);
 				ci.setPlatformloader(true);
-				ces.createComponent(null, modelname, ci, null).addResultListener(new DelegationResultListener(ret)
+				String prefix = modelname.substring(Math.max(modelname.lastIndexOf("/"), 0) + 1);
+				prefix = prefix.substring(0, Math.min(prefix.lastIndexOf("."), prefix.length()));
+				ByteBuffer b = ByteBuffer.allocate(8);
+				b.putLong(random.nextLong());
+				ces.createComponent(prefix + "_" + Base64.encodeBytes(b.array()), modelname, ci, null).addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{

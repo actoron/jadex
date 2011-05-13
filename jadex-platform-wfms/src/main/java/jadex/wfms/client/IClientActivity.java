@@ -14,6 +14,18 @@ public interface IClientActivity extends IWorkitem
 	public String getName();
 	
 	/**
+	 *  Returns the ID of the activity.
+	 *  @return The activity ID.
+	 */
+	public String getActivityId();
+	
+	/**
+	 *  Sets the ID of the activity.
+	 *  @param id The activity ID.
+	 */
+	public void setActivityId(String id);
+	
+	/**
 	 * Sets the value of a parameter.
 	 * 
 	 * @param parameterName name of the parameter

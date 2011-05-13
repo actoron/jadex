@@ -1155,6 +1155,15 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	}
 	
 	/**
+	 *  Get the event parent.
+	 *  @return The event parent.
+	 */
+	public String getEventParent()
+	{
+		return getRPlan().toString();
+	}
+	
+	/**
 	 *  Get the plan instance info.
 	 *  @return The plan instance info.
 	 */

@@ -227,4 +227,19 @@ public class BasicService implements IInternalService
 			ret.setResult(null);
 		return ret;
 	}*/
+	
+	/**
+	 *  Check if the service is equal. The service is considered equal if the service identifiers match.
+	 *  
+	 *  @param obj Object of comparison.
+	 *  @return True, if the object is a service with a matching service identifier.
+	 */
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof IService)
+		{
+			return getServiceIdentifier().equals(((IService) obj).getServiceIdentifier());
+		}
+		return false;
+	}
 }

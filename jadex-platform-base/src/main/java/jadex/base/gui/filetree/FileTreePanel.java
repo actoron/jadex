@@ -220,14 +220,14 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	}
 	
 	/**
-	 *  Get the mic.
-	 *  @return the mic.
+	 *  Get the menu item constructor.
+	 *  @return The menu item constructor.
 	 */
 	public IMenuItemConstructor getMenuItemConstructor()
 	{
 		return mic;
 	}
-
+	
 	/**
 	 *  Set the popup builder.
 	 *  @param pubuilder The popup builder.

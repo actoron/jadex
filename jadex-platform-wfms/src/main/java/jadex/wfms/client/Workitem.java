@@ -1,6 +1,7 @@
 package jadex.wfms.client;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.SUtil;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,11 +18,17 @@ public class Workitem implements IWorkitem, IClientActivity
 	/** Identifier of the process which issued the workitem */
 	private IComponentIdentifier process;
 	
+	/** Identifier of element which issued the workitem */
+	private String parent;
+	
 	/** Name of the workitem */
 	private String name;
 	
 	/** Unique ID */
 	private String id;
+	
+	/** Unique ID as activity*/
+	private String activityId;
 	
 	/** Role that is handling this workitem. */
 	private String role;
@@ -42,10 +49,11 @@ public class Workitem implements IWorkitem, IClientActivity
 	{
 	}
 	
-	public Workitem(IComponentIdentifier process, String name, String role, Map parameterTypes, Map parameterValues, Map guiProperties, Set readOnlyParameters)
+	public Workitem(IComponentIdentifier process, String parent, String name, String role, Map parameterTypes, Map parameterValues, Map guiProperties, Set readOnlyParameters)
 	{
 		this.process = process;
-		this.id = String.valueOf(System.identityHashCode(this));
+		this.parent = parent;
+		this.id = SUtil.createUniqueId("Workitem");
 		this.name = name;
 		this.role = role;
 		/*this.parameterTypes = new HashMap();
@@ -70,6 +78,15 @@ public class Workitem implements IWorkitem, IClientActivity
 	{
 		return process;
 	}
+	
+	/**
+	 *  Gets the identifier of the element which issued the workitem
+	 *  @return Identifier of the element which issued the workitem.
+	 */
+	public String getParent()
+	{
+		return parent;
+	}
 
 	/**
 	 * Gets the name of the workitem.
@@ -79,6 +96,33 @@ public class Workitem implements IWorkitem, IClientActivity
 	public String getName()
 	{
 		return name;
+	}
+	
+	/**
+	 *  Returns the ID of the Workitem.
+	 *  @return The ID.
+	 */
+	public String getId()
+	{
+		return id;
+	}
+	
+	/**
+	 *  Returns the ID of the activity.
+	 *  @return The activity ID.
+	 */
+	public String getActivityId()
+	{
+		return activityId;
+	}
+	
+	/**
+	 *  Sets the ID of the activity.
+	 *  @param id The activity ID.
+	 */
+	public void setActivityId(String id)
+	{
+		activityId = id;
 	}
 	
 	/**
@@ -212,16 +256,21 @@ public class Workitem implements IWorkitem, IClientActivity
 		this.process = process;
 	}
 	
+	/**
+	 *  Sets the identifier of the element which issued the workitem
+	 *  @param process Identifier of the element which issued the workitem.
+	 */
+	public void setParent(String parent)
+	{
+		this.parent = parent;
+	}
+	
 	public void setName(String name) {
 		this.name = name;
 	}
 	
 	public void setRole(String role) {
 		this.role = role;
-	}
-	
-	public String getId() {
-		return id;
 	}
 	
 	public void setParameterTypes(Map parameterTypes) {

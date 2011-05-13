@@ -168,7 +168,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo modelinfo, 
+	public IFuture createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo modelinfo, 
 		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, Future ret)
 	{
 		try
@@ -185,7 +185,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 			state.addSubstate(amodel.getState());
 			
 			BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, props, ret);
-			return new Object[]{bdii, bdii.getAgentAdapter()};
+			return new Future(new Object[]{bdii, bdii.getAgentAdapter()});
 		}
 		catch(Exception e)
 		{

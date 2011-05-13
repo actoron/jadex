@@ -199,7 +199,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
+	public IFuture createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
 		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, Future inited)
 	{
 //		ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
@@ -224,7 +224,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 			else
 				ret = legacyconverter.convertGpmnModelToBDIAgents((jadex.gpmn.model.MGpmnModel)ret, modelinfo.getClassLoader());
 	
-			return this.factory.createComponentInstance(desc, factory, (OAVAgentModel)ret, config, arguments, parent, bindings, inited);
+			return new Future(this.factory.createComponentInstance(desc, factory, (OAVAgentModel)ret, config, arguments, parent, bindings, inited));
 		}
 		catch(Exception e)
 		{

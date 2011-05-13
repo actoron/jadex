@@ -13,6 +13,12 @@
 		<import>jadex.bridge.*</import>
 	</imports>
 	
+	<properties>
+		<property name="kernel_type_extensions" class="String[]">
+			new String[] {"bpmn"}
+		</property>
+	</properties>
+	
 	<services>
 		<providedservice class="IComponentFactory">
 			<implementation>

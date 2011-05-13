@@ -1,14 +1,23 @@
 package jadex.base.gui.modeltree;
 
+import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.DefaultNodeHandler;
 import jadex.base.gui.filetree.FileTreePanel;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IMultiKernelListener;
+import jadex.bridge.IMultiKernelNotifierService;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.PopupBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.Action;
+import javax.swing.SwingUtilities;
 
 /**
  *  Tree for component models.
@@ -45,6 +54,46 @@ public class ModelTreePanel extends FileTreePanel
 		DefaultNodeHandler dnh = new DefaultNodeHandler(getTree());
 		dnh.addAction(new RemovePathAction(this), null);
 		addNodeHandler(dnh);
+		
+		SServiceProvider.getService(exta.getServiceProvider(), IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				((IMultiKernelNotifierService) result).addKernelListener(new IMultiKernelListener()
+				{
+					protected Runnable refresh = new Runnable()
+					{
+						public void run()
+						{
+							((ModelFileFilterMenuItemConstructor)getMenuItemConstructor()).getSupportedComponentTypes().addResultListener(new SwingDefaultResultListener()
+							{
+								public void customResultAvailable(Object result)
+								{
+									((ITreeNode) getTree().getModel().getRoot()).refresh(true);
+								}
+							});
+						}
+					};
+					
+					public IFuture componentTypesRemoved(String[] types)
+					{
+						SwingUtilities.invokeLater(refresh);
+						return IFuture.DONE;
+					}
+					
+					public IFuture componentTypesAdded(String[] types)
+					{
+						SwingUtilities.invokeLater(refresh);
+						return IFuture.DONE;
+					}
+				});
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// Ignore, no multi-kernel
+			}
+		});
 	}
 	
 	//-------- methods --------

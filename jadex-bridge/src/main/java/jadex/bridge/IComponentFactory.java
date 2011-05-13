@@ -81,7 +81,7 @@ public interface IComponentFactory extends IService
 	 * @return An instance of a component and the corresponding adapter.
 	 */
 	@Excluded
-	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo model, 
+	public IFuture createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo model, 
 		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, Future ret);
 
 }

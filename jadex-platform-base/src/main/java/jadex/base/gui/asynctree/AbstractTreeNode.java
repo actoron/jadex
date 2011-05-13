@@ -152,7 +152,9 @@ public abstract class AbstractTreeNode	implements ITreeNode
 		{
 			// If search in progress upgrade to recursive, but do not downgrade.
 			this.recurse	= this.recurse || recurse;
+			dirty=true;
 		}
+		tree.repaint();
 	}
 	
 	/**

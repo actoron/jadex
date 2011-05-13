@@ -520,6 +520,17 @@ public class ModelInfo implements IModelInfo
 	{
 		return requiredservices!=null? (RequiredServiceInfo)requiredservices.get(name): null;
 	}
+	
+	/**
+	 *  Add a required service.
+	 *  @param requiredservice The required service.
+	 */
+	public void addRequiredService(RequiredServiceInfo requiredservice)
+	{
+		if(requiredservices==null)
+			requiredservices = new HashMap();
+		requiredservices.put(requiredservice.getName(), requiredservice);
+	}
 
 	/**
 	 *  Get the provided services.
