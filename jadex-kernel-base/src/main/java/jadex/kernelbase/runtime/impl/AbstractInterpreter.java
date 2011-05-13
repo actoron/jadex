@@ -376,7 +376,7 @@ public abstract class AbstractInterpreter implements IComponentInstance
 					else
 					{
 						// Todo: handle specific properties (logging etc.)
-						properties.put(name, value);
+						properties.put(name, val);
 					}
 				}
 			}
