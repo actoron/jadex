@@ -4,6 +4,7 @@ import jadex.bridge.ComponentResultListener;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentListener;
