@@ -171,14 +171,14 @@
 			)		
 		</providedservice> -->
 		
-		<!-- <requiredservice name="factoryservices" class="IComponentFactory" multiple="true"/> -->
+		<requiredservice name="factoryservices" class="IComponentFactory" multiple="true"/>
 	</services>
 
-	<!--<properties>
+	<properties>
 		<property name="componentviewer.viewerclass">"jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel"</property>
-		<!- - <property name="viewerpanel.componentviewerclass">""</property> - ->
-		<!- - <property name="logging.level">java.util.logging.Level.INFO</property> - ->
-	</properties>-->
+		<!-- <property name="viewerpanel.componentviewerclass">""</property> -->
+		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+	</properties>
 	
 	<configurations>
 		<configuration name="all_kernels auto (rms, awa, jcc)">

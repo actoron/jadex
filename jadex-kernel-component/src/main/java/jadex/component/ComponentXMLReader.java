@@ -354,15 +354,13 @@ public class ComponentXMLReader
 			}, null)));
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "requiredservice")), new ObjectInfo(RequiredServiceInfo.class), // new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "className"))
+				new AttributeInfo(new AccessInfo("class", "type"), new AttributeConverter(classconv, reclassconv))
 			}, null)));
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "binding")), new ObjectInfo(RequiredServiceBinding.class), 
 				new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("componentname", "componentName")),
 				new AttributeInfo(new AccessInfo("componenttype", "componentType")),
 			})));
-		
-		
 		
 //		types.add(new TypeInfo(new XMLInfo(new QName(uri, "container")), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
 //			new MappingInfo(null, null, "value", new AttributeInfo[]{

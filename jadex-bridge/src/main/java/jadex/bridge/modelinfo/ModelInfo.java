@@ -196,14 +196,9 @@ public class ModelInfo extends Startable implements IModelInfo
 		if(configurations!=null)
 		{
 			ret = new String[configurations.size()];
-			// todo: remove configurationnames in constructor
-			if(ret.length==0 && configurations!=null && configurations.size()>0)
+			for(int i=0; i<configurations.size(); i++)
 			{
-				ret = new String[configurations.size()];
-				for(int i=0; i<configurations.size(); i++)
-				{
-					ret[i] = ((ConfigurationInfo)configurations.get(i)).getName();
-				}
+				ret[i] = ((ConfigurationInfo)configurations.get(i)).getName();
 			}
 			return ret;
 		}
