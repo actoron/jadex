@@ -59,7 +59,6 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	{
 //		System.out.println("Init: "+interpreter);
 		this.interpreter = interpreter;
-		this.timers = new ArrayList();
 	}
 	
 	//-------- interface methods --------
@@ -290,6 +289,8 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 						return getComponentIdentifier().getLocalName()+".waitFor("+time+")_#"+this.hashCode();
 					}
 				});
+				if(timers==null)
+					timers	= new ArrayList();
 				timers.add(ts[0]);
 				ret.setResult(new TimerWrapper(ts[0]));
 			}
@@ -325,6 +326,8 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 						interpreter.scheduleStep(new ExecuteWaitForStep(ts[0], run));
 					}
 				});
+				if(timers==null)
+					timers	= new ArrayList();
 				timers.add(ts[0]);
 				ret.setResult(new TimerWrapper(ts[0]));
 			}
@@ -715,6 +718,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		
 		public void cancel()
 		{
+			assert timers!=null;
 			timers.remove(timer);
 			timer.cancel();
 		}
@@ -785,6 +789,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		 */
 		public Object execute(IInternalAccess ia)
 		{
+			assert ((MicroAgent)ia).timers!=null;
 			((MicroAgent)ia).timers.remove(ts);
 			run.execute(ia);
 			return null;

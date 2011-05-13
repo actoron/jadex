@@ -68,7 +68,6 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	public CMSComponentDescription(IComponentIdentifier cid, String type, //IComponentIdentifier parent, 
 		Boolean master, Boolean daemon, Boolean autoshutdown, String modelname)
 	{
-		this();
 		setName(cid);
 		setType(type);
 //		setParent(parent);
@@ -155,15 +154,14 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 //		this.parent = parent;
 //	}
 	
-	// CMS / external access / component may access description concurrently?!
-	Object childmon = new Object();
 	/**
 	 *  Add a child component.
 	 *  @param child The child component.
 	 */
 	public void addChild(IComponentIdentifier child)
 	{
-		synchronized(childmon)
+		// CMS / external access / component may access description concurrently?!
+		synchronized(this)
 		{
 			if(children==null)
 				children = new LinkedHashSet();
@@ -177,7 +175,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 */
 	public void removeChild(IComponentIdentifier child)
 	{
-		synchronized(childmon)
+		synchronized(this)
 		{
 			if(children!=null)
 				children.remove(child);
@@ -190,7 +188,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 */
 	public IComponentIdentifier[] getChildren()
 	{
-		synchronized(childmon)
+		synchronized(this)
 		{
 			return children==null? new IComponentIdentifier[0]: (IComponentIdentifier[])children.toArray(new IComponentIdentifier[children.size()]);
 		}

@@ -16,6 +16,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.util.Collections;
+import java.util.logging.Logger;
 
 /**
  *  Service container for active components.
@@ -44,7 +45,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public ComponentServiceContainer(IComponentAdapter adapter, String type, RequiredServiceInfo[] infos, RequiredServiceBinding[] bindings)
 	{
-		super(adapter.getComponentIdentifier(), adapter.getLogger(), infos, bindings);
+		super(adapter.getComponentIdentifier(), infos, bindings);
 		this.adapter = adapter;
 		this.type	= type;
 	}
@@ -187,5 +188,13 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	public String toString()
 	{
 		return "ComponentServiceContainer(name="+getId()+")";
+	}
+	
+	/**
+	 *  Get the logger.
+	 */
+	protected Logger getLogger()
+	{
+		return adapter.getLogger();
 	}
 }

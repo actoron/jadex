@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.security.auth.login.Configuration;
 
 /**
  *  Public model information that is provided as result from 
@@ -52,6 +51,9 @@ public class ModelInfo extends Startable implements IModelInfo
 	
 	/** The filename. */
 	protected String filename;
+	
+	/** The full name (cached for speed). */
+	protected String fullname;
 	
 	/** The properties. */
 	protected Map properties;
@@ -153,8 +155,12 @@ public class ModelInfo extends Startable implements IModelInfo
 	 */
 	public String getFullName()
 	{
-		String pkg = getPackage();
-		return pkg!=null && pkg.length()>0? pkg+"."+getName(): getName();
+		if(fullname==null)
+		{
+			String pkg = getPackage();
+			fullname	= pkg!=null && pkg.length()>0? pkg+"."+getName(): getName();
+		}
+		return fullname;
 	}
 	
 //	/**

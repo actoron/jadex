@@ -18,6 +18,7 @@ import jadex.commons.future.IntermediateFuture;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 /**
  *  Remote service container for searching at a remote platform
@@ -43,7 +44,7 @@ public class RemoteServiceContainer extends BasicServiceContainer
 	 */
 	public RemoteServiceContainer(IComponentIdentifier componentid, IComponentAdapter adapter)
 	{
-		super(adapter.getComponentIdentifier(), adapter.getLogger(), null, null);
+		super(adapter.getComponentIdentifier(), null, null);
 		this.adapter = adapter;
 		this.componentid = componentid;
 	}
@@ -249,6 +250,14 @@ public class RemoteServiceContainer extends BasicServiceContainer
 	public String toString()
 	{
 		return "RemoteServiceProvider(id="+getId()+")";
+	}
+	
+	/**
+	 *  Get the logger.
+	 */
+	protected Logger getLogger()
+	{
+		return adapter.getLogger();
 	}
 }
 

@@ -7,7 +7,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IArgument;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
@@ -336,8 +335,11 @@ public class AgentCreationAgent extends MicroAgent
 				return ret;
 			}
 		}, new Argument("nested", "If true, each agent is created as a subcomponent of the previous agent.", "boolean", Boolean.FALSE)}, 
-		null, null, null, new RequiredServiceInfo[]{
-			new RequiredServiceInfo("clockservice", IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM),
-			new RequiredServiceInfo("cmsservice", IComponentManagementService.class, RequiredServiceInfo.SCOPE_UPWARDS)}, null);
+		null, null, null,
+		null,	// Uncomment this when using required services below.
+//		new RequiredServiceInfo[]{
+//			new RequiredServiceInfo("clockservice", IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM),
+//			new RequiredServiceInfo("cmsservice", IComponentManagementService.class, RequiredServiceInfo.SCOPE_UPWARDS)},
+		null);
 	}
 }

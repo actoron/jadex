@@ -106,8 +106,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 			model.getModelInfo().getConfigurationNames()[0]: null;
 		this.model = model;
 		this.parent = parent;
-		this.arguments = arguments==null ? new HashMap() : arguments;
-		this.results = new HashMap();
+		this.arguments = arguments;
 		this.properties = new HashMap();
 		this.ctypes = new HashMap(); 
 		this.instances = new MultiCollection(); 
@@ -122,7 +121,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 			{
 				public Object execute(IInternalAccess ia)
 				{
-					init(model.getModelInfo(), ComponentInterpreter.this.config, model.getProperties(), ComponentInterpreter.this.arguments, results, ComponentInterpreter.this.properties)
+					init(model.getModelInfo(), ComponentInterpreter.this.config, model.getProperties(), ComponentInterpreter.this.properties)
 						.addResultListener(createResultListener(new DelegationResultListener(inited)
 					{
 						public void customResultAvailable(Object result)
@@ -817,6 +816,39 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 		return fetcher;
 	}
 
+	/**
+	 *  Add a default value for an argument (if not already present).
+	 *  Called once for each argument during init.
+	 *  @param name	The argument name.
+	 *  @param value	The argument value.
+	 */
+	public void	addDefaultArgument(String name, Object value)
+	{
+		if(arguments==null)
+		{
+			arguments	= new HashMap();
+		}
+		if(!arguments.containsKey(name))
+		{
+			arguments.put(name, value);
+		}
+	}
+
+	/**
+	 *  Add a default value for a result (if not already present).
+	 *  Called once for each result during init.
+	 *  @param name	The result name.
+	 *  @param value	The result value.
+	 */
+	public void	addDefaultResult(String name, Object value)
+	{
+		if(results==null)
+		{
+			results	= new HashMap();
+		}
+		results.put(name, value);
+	}
+	
 	/**
 	 *  Get the internal access.
 	 */

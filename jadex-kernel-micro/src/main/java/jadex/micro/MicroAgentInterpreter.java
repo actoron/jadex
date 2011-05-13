@@ -106,11 +106,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	{
 		this.model = model;
 		this.config = config!=null? config: getModel().getConfigurationNames().length>0? getModel().getConfigurationNames()[0]: null;
-		this.arguments = args!=null? args: new HashMap();
+		this.arguments = args;
 		this.parent = parent;
-		this.steps	= new ArrayList();
 		this.bindings = bindings;
-		this.results = new HashMap();
 		
 		try
 		{
@@ -121,7 +119,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			{
 				public Object execute(IInternalAccess ia)
 				{
-					init(model.getModelInfo(), MicroAgentInterpreter.this.config, null, arguments, results, null)
+					init(model.getModelInfo(), MicroAgentInterpreter.this.config, null, null)
 						.addResultListener(createResultListener(new DelegationResultListener(inited)
 					{
 						public void customResultAvailable(Object result)
@@ -181,7 +179,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	{
 		try
 		{
-			if(!steps.isEmpty())
+			if(steps!=null && !steps.isEmpty())
 			{
 				Object[] step = removeStep();
 				Future future = (Future)step[1];
@@ -206,7 +204,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				}
 			}
 	
-			return !steps.isEmpty();
+			return steps!=null && !steps.isEmpty();
 		}
 		catch(ComponentTerminatedException ate)
 		{
@@ -385,6 +383,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		}
 		else
 		{
+			if(steps==null)
+				steps	= new ArrayList();
 			steps.add(step);
 			if(componentlisteners!=null)
 			{
@@ -399,7 +399,10 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 */
 	protected Object[] removeStep()
 	{
+		assert steps!=null && !steps.isEmpty();
 		Object[] ret = (Object[])steps.remove(0);
+		if(steps.isEmpty())
+			steps	= null;
 		if(componentlisteners!=null)
 		{
 			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_STEP, 
@@ -520,7 +523,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 */
 	public Map getArguments()
 	{
-		return arguments;
+		return arguments!=null ? arguments : Collections.EMPTY_MAP;
 	}
 	
 	/**
@@ -664,7 +667,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	{
 //		System.out.println("cleanupComponent: "+getAgentAdapter().getComponentIdentifier());
 		ComponentTerminatedException ex = new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier());
-		while(!steps.isEmpty())
+		while(steps!=null && !steps.isEmpty())
 		{
 			Object[] step = removeStep();
 			Future future = (Future)step[1];
@@ -672,12 +675,15 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 //			System.out.println("Cleaning obsolete step: "+getAgentAdapter().getComponentIdentifier()+", "+step[0]);
 		}
 		
-		for(int i=0; i<microagent.timers.size(); i++)
+		if(microagent.timers!=null)
 		{
-			ITimer timer = (ITimer)microagent.timers.get(i);
-			timer.cancel();
+			for(int i=0; i<microagent.timers.size(); i++)
+			{
+				ITimer timer = (ITimer)microagent.timers.get(i);
+				timer.cancel();
+			}
+			microagent.timers.clear();
 		}
-		microagent.timers.clear();
 	}
 
 //	/**
@@ -846,6 +852,40 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		}
 		return fetcher;
 	}
+	
+	/**
+	 *  Add a default value for an argument (if not already present).
+	 *  Called once for each argument during init.
+	 *  @param name	The argument name.
+	 *  @param value	The argument value.
+	 */
+	public void	addDefaultArgument(String name, Object value)
+	{
+		if(arguments==null)
+		{
+			arguments	= new HashMap();
+		}
+		if(!arguments.containsKey(name))
+		{
+			arguments.put(name, value);
+		}
+	}
+
+	/**
+	 *  Add a default value for a result (if not already present).
+	 *  Called once for each result during init.
+	 *  @param name	The result name.
+	 *  @param value	The result value.
+	 */
+	public void	addDefaultResult(String name, Object value)
+	{
+		if(results==null)
+		{
+			results	= new HashMap();
+		}
+		results.put(name, value);
+	}
+
 
 	/**
 	 *  Get the internal access.

@@ -28,7 +28,6 @@ import jadex.commons.future.IResultListener;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -106,9 +105,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	/** Does the instance want to be executed again. */
 	protected boolean	again;
 	
-	
 	/** The cached cms. */
-	protected IComponentManagementService	cms;
+	protected IFuture	cms;
 
 	/** The cached clock service. */
 	protected IClockService clock;
@@ -126,7 +124,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		this.model = model;
 		this.component = component;
 		this.parent	= parent;
-		this.ext_entries = Collections.synchronizedList(new ArrayList());
 	}
 	
 	//-------- IComponentAdapter methods --------
@@ -470,24 +467,11 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			System.out.println("container is null: "+component+", "+getComponentIdentifier());
 		}
 //		return SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class);
-		final Future	ret	= new Future();
 		if(cms==null)
 		{
-			SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
-				.addResultListener(new DelegationResultListener(ret)
-			{
-				public void customResultAvailable(Object result)
-				{
-					cms	= (IComponentManagementService)result;
-					ret.setResult(cms);
-				}
-			});
+			cms	= SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class);
 		}
-		else
-		{
-			ret.setResult(cms);
-		}
-		return ret;
+		return cms;
 	}
 	
 	//-------- methods called by the standalone platform --------
@@ -531,7 +515,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				{
 					public void resultAvailable(Object result)
 					{
-						synchronized(ext_entries)
+						synchronized(AbstractComponentAdapter.this)
 						{
 							// Do final cleanup step as (last) ext_entry
 							// for allowing previously added entries still be executed.
@@ -542,7 +526,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 									shutdownContainer().addResultListener(new DelegationResultListener(ret));
 									
 //									System.out.println("Checking ext entries after cleanup: "+cid);
-									assert ext_entries.isEmpty() : "Ext entries after cleanup: "+cid+", "+ext_entries;
+									assert ext_entries==null || ext_entries.isEmpty() : "Ext entries after cleanup: "+cid+", "+ext_entries;
 								}
 							});
 							
@@ -687,9 +671,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
 			boolean	extexecuted	= false;
 			Runnable[]	entries	= null;
-			synchronized(ext_entries)
+			synchronized(this)
 			{
-				if(!(ext_entries.isEmpty()))
+				if(ext_entries!=null && !(ext_entries.isEmpty()))
 				{
 					entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
 					ext_entries.clear();
@@ -881,7 +865,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || exception!=null)
 			throw new ComponentTerminatedException(cid);
 
-		synchronized(ext_entries)
+		synchronized(this)
 		{
 //			System.out.println("Adding to ext entries: "+cid);
 			if(ext_forbidden)
@@ -897,6 +881,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			}
 			else
 			{
+				if(ext_entries==null)
+					ext_entries	= new ArrayList();
 				ext_entries.add(action);
 			}
 		}

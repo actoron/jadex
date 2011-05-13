@@ -180,6 +180,22 @@ public abstract class AbstractInterpreter implements IComponentInstance
 	 *  @return The value fetcher.
 	 */
 	public abstract IValueFetcher getFetcher();
+	
+	/**
+	 *  Add a default value for an argument (if not already present).
+	 *  Called once for each argument during init.
+	 *  @param name	The argument name.
+	 *  @param value	The argument value.
+	 */
+	public abstract void	addDefaultArgument(String name, Object value);
+
+	/**
+	 *  Add a default value for a result (if not already present).
+	 *  Called once for each result during init.
+	 *  @param name	The result name.
+	 *  @param value	The result value.
+	 */
+	public abstract void	addDefaultResult(String name, Object value);
 
 	/**
 	 *  Get the internal access.
@@ -194,12 +210,11 @@ public abstract class AbstractInterpreter implements IComponentInstance
 	 *  - init required and provided services
 	 *  - init subcomponents
 	 */
-	public IFuture init(final IModelInfo model, final String config, final Map props,
-		Map arguments, Map results, final Map properties)
+	public IFuture init(final IModelInfo model, final String config, final Map props, final Map properties)
 	{
 		final Future ret = new Future();
 		
-		initArguments(model, config, arguments, results).addResultListener(
+		initArguments(model, config).addResultListener(
 			createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -235,7 +250,7 @@ public abstract class AbstractInterpreter implements IComponentInstance
 	/**
 	 *  Init the arguments and results.
 	 */
-	public IFuture initArguments(IModelInfo model, final String config, Map arguments, Map results)
+	public IFuture initArguments(IModelInfo model, final String config)
 	{
 		// Init the arguments with default values.
 		IArgument[] args = model.getArguments();
@@ -243,13 +258,7 @@ public abstract class AbstractInterpreter implements IComponentInstance
 		{
 			if(args[i].getDefaultValue(config)!=null)
 			{
-//				if(this.arguments==null)
-//					this.arguments = new HashMap();
-			
-				if(!arguments.containsKey(args[i].getName()))
-				{
-					arguments.put(args[i].getName(), args[i].getDefaultValue(config));
-				}
+				addDefaultArgument(args[i].getName(), args[i].getDefaultValue(config));
 			}
 		}
 		
@@ -259,10 +268,7 @@ public abstract class AbstractInterpreter implements IComponentInstance
 		{
 			if(res[i].getDefaultValue(config)!=null)
 			{
-//				if(this.results==null)
-//					this.results = new HashMap();
-			
-				results.put(res[i].getName(), res[i].getDefaultValue(config));
+				addDefaultResult(res[i].getName(), res[i].getDefaultValue(config));
 			}
 		}
 

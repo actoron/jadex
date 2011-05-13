@@ -35,9 +35,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	/** The container name. */
 	protected Object id;
 	
-	/** The logger. */
-	protected Logger logger;
-	
 	/** True, if the container is started. */
 	protected boolean started;
 	
@@ -46,10 +43,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	/**
 	 *  Create a new service container.
 	 */
-	public BasicServiceContainer(Object id, Logger logger, RequiredServiceInfo[] infos, RequiredServiceBinding[] bindings)
+	public BasicServiceContainer(Object id, RequiredServiceInfo[] infos, RequiredServiceBinding[] bindings)
 	{
 		this.id = id;
-		this.logger	= logger;
 		
 		setRequiredServiceInfos(infos);
 		setRequiredServiceBindings(bindings);
@@ -218,13 +214,13 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			{
 				public void intermediateResultAvailable(Object result)
 				{
-					logger.info("Started service: "+result);
+					getLogger().info("Started service: "+result);
 				}
 			};
 			for(Iterator it=allservices.iterator(); it.hasNext(); )
 			{
 				IInternalService	is	= (IInternalService)it.next();
-				logger.info("Starting service: "+is.getServiceIdentifier());
+				getLogger().info("Starting service: "+is.getServiceIdentifier());
 				is.startService().addResultListener(crl);
 			}
 		}
@@ -259,13 +255,13 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			
 			// Shutdown services in reverse order as later services might depend on earlier ones.
 			final IInternalService	service	= (IInternalService)allservices.remove(allservices.size()-1);
-			logger.info("Terminating service: "+service.getServiceIdentifier());
+			getLogger().info("Terminating service: "+service.getServiceIdentifier());
 //			System.out.println("shutdown start: "+service.getServiceIdentifier());
 			service.shutdownService().addResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
 				{
-					logger.info("Terminated service: "+service.getServiceIdentifier());
+					getLogger().info("Terminated service: "+service.getServiceIdentifier());
 //					System.out.println("shutdown end: "+result);
 					if(!allservices.isEmpty())
 					{
@@ -613,6 +609,11 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 //	 */
 //	public IFuture removeRequiredServiceInterceptor(String name, IServiceInvocationInterceptor interceptor);
 
+	/**
+	 *  Get the logger.
+	 *  To be overridden by subclasses.
+	 */
+	protected abstract Logger	getLogger();
 	
 	/**
 	 *  Get the string representation.
