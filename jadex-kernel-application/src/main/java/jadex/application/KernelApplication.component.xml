@@ -18,7 +18,7 @@
 	
 	<properties>
 		<property name="kernel_type_extensions" class="String[]">
-			new String[] {"application.xml"}
+			new String[]{"application.xml"}
 		</property>
 	</properties>
 	

@@ -58,6 +58,11 @@ public @interface Configuration
 	 *  The autoshutdown flag.
 	 */
 	public boolean autoshutdown() default false;
+	
+	/**
+	 *  The suspend flag.
+	 */
+	public boolean suspend() default false;
 }
 
 

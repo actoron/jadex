@@ -14,7 +14,10 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
+import jadex.javaparser.IExpressionParser;
+import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -28,10 +31,12 @@ import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
+import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.Reader;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -239,6 +244,18 @@ public class ComponentXMLReader
 //				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
 //			}, null));
 		
+		Method getname = null; 
+		Method putprop = null;
+		try
+		{
+			getname = UnparsedExpression.class.getMethod("getName", null);
+			putprop = ComponentModel.class.getMethod("addProperty", new Class[]{String.class, Object.class});
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "componenttype")), new ObjectInfo(ComponentModel.class), 
 			new MappingInfo(null, "description", null,
 			new AttributeInfo[]{
@@ -252,6 +269,7 @@ public class ComponentXMLReader
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "providedservice")}), new AccessInfo(new QName(uri, "providedservice"), "providedService")),
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "requiredservice")}), new AccessInfo(new QName(uri, "requiredservice"), "requiredService")),
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype")}), new AccessInfo(new QName(uri, "componenttype"), "subcomponentType")),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "property")}), new AccessInfo(new QName(uri, "property"), "property", null, null, new BeanAccessInfo(putprop, null, "map", getname))),
 		})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "configuration")), new ObjectInfo(ConfigurationInfo.class, new IPostProcessor()
@@ -368,22 +386,24 @@ public class ComponentXMLReader
 
 	//-------- helper classes --------
 	
-//	/**
-//	 *  Parse expression text.
-//	 */
-//	public static class ExpressionProcessor	implements IPostProcessor
-//	{
-//		// Hack!!! Should be configurable.
-//		protected static IExpressionParser	exp_parser	= new JavaCCExpressionParser();
-//		
-//		/**
-//		 *  Parse expression text.
-//		 */
-//		public Object postProcess(IContext context, Object object)
-//		{
-//			MComponentType app = (MComponentType)context.getRootObject();
-//			MExpressionType exp = (MExpressionType)object;
-//			
+	/**
+	 *  Parse expression text.
+	 */
+	public static class ExpressionProcessor	implements IPostProcessor
+	{
+		// Hack!!! Should be configurable.
+		protected static IExpressionParser	exp_parser	= new JavaCCExpressionParser();
+		
+		/**
+		 *  Parse expression text.
+		 */
+		public Object postProcess(IContext context, Object object)
+		{
+			Object ret = null;
+			
+			ComponentModel cm = (ComponentModel)context.getRootObject();
+			UnparsedExpression exp = (UnparsedExpression)object;
+			
 //			String classname = exp.getClassName();
 //			if(classname!=null)
 //			{
@@ -399,43 +419,44 @@ public class ComponentXMLReader
 //					report.put(se, e.toString());
 //				}
 //			}
-//			
-//			String lang = exp.getLanguage();
-//			String value = exp.getValue(); 
-//			if(value!=null)
-//			{
-//				if(lang==null || "java".equals(lang))
-//				{
-//					try
-//					{
-//						IParsedExpression pexp = exp_parser.parseExpression(value, app.getAllImports(), null, context.getClassLoader());
+			
+			String lang = exp.getLanguage();
+			String value = exp.getValue(); 
+			if(value!=null)
+			{
+				if(lang==null || "java".equals(lang))
+				{
+					try
+					{
+						IParsedExpression pexp = exp_parser.parseExpression(value, cm.getAllImports(), null, context.getClassLoader());
+						ret = pexp.getValue(null);
 //						exp.setParsedValue(pexp);
-//					}
-//					catch(RuntimeException e)
-//					{
-//						Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
-//						MultiCollection	report	= (MultiCollection)context.getUserContext();
-//						report.put(se, e.toString());
-//					}
-//				}	
-//				else
-//				{
-//					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
-//					MultiCollection	report	= (MultiCollection)context.getUserContext();
-//					report.put(se, "Unknown condition language: "+lang);
-//				}
-//			}
-//			
-//			return null;
-//		}
-//		
-//		/**
-//		 *  Get the pass number.
-//		 *  @return The pass number.
-//		 */
-//		public int getPass()
-//		{
-//			return 0;
-//		}
-//	}
+					}
+					catch(RuntimeException e)
+					{
+						Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+						MultiCollection	report	= (MultiCollection)context.getUserContext();
+						report.put(se, e.toString());
+					}
+				}	
+				else
+				{
+					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+					MultiCollection	report	= (MultiCollection)context.getUserContext();
+					report.put(se, "Unknown expression language: "+lang);
+				}
+			}
+			
+			return ret;
+		}
+		
+		/**
+		 *  Get the pass number.
+		 *  @return The pass number.
+		 */
+		public int getPass()
+		{
+			return 0;
+		}
+	}
 }

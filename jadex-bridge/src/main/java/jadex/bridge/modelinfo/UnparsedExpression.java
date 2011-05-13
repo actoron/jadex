@@ -11,8 +11,8 @@ public class UnparsedExpression
 	/** The name. */
 	protected String name;
 
-//	/** The class name. */
-//	protected String classname;
+	/** The class name. */
+	protected String classname;
 	
 	/** The class. */
 	protected Class clazz;
@@ -63,23 +63,23 @@ public class UnparsedExpression
 		this.name = name;
 	}
 
-//	/**
-//	 *  Get the clazz name.
-//	 *  @return The clazz name.
-//	 */
-//	public String getClassName()
-//	{
-//		return classname;
-//	}
-//
-//	/**
-//	 *  Set the clazz name.
-//	 *  @param clazz The clazz name.
-//	 */
-//	public void setClassName(String classname)
-//	{
-//		this.classname = classname;
-//	}
+	/**
+	 *  Get the clazz name.
+	 *  @return The clazz name.
+	 */
+	public String getClassName()
+	{
+		return classname;
+	}
+
+	/**
+	 *  Set the clazz name.
+	 *  @param clazz The clazz name.
+	 */
+	public void setClassName(String classname)
+	{
+		this.classname = classname;
+	}
 
 	/**
 	 *  Get the clazz.

@@ -106,27 +106,27 @@ public class Starter
 			public void resultAvailable(Object result)
 			{
 				final IExternalAccess	access	= (IExternalAccess)result;
-				Runtime.getRuntime().addShutdownHook(new Thread()
-				{
-					public void run()
-					{
-						try
-						{
-//							System.out.println("killing: "+access.getComponentIdentifier().getPlatformName());
-							shutdown	= true;
-							access.killComponent().get(new ThreadSuspendable(), TERMINATION_TIMEOUT);
-//							System.out.println("killed: "+access.getComponentIdentifier().getPlatformName());
-						}
-						catch(ComponentTerminatedException cte)
-						{
-							// Already killed.
-						}
-						catch(Throwable t)
-						{
-							t.printStackTrace();
-						}
-					}
-				});
+//				Runtime.getRuntime().addShutdownHook(new Thread()
+//				{
+//					public void run()
+//					{
+//						try
+//						{
+////							System.out.println("killing: "+access.getComponentIdentifier().getPlatformName());
+//							shutdown	= true;
+//							access.killComponent().get(new ThreadSuspendable(), TERMINATION_TIMEOUT);
+////							System.out.println("killed: "+access.getComponentIdentifier().getPlatformName());
+//						}
+//						catch(ComponentTerminatedException cte)
+//						{
+//							// Already killed.
+//						}
+//						catch(Throwable t)
+//						{
+//							t.printStackTrace();
+//						}
+//					}
+//				});
 				
 //				// Continuously run garbage collector and finalizers.
 //				Timer	gctimer	= new Timer();

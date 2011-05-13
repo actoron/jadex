@@ -3,9 +3,12 @@ package jadex.bdi.model;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.AbstractErrorReportBuilder;
+import jadex.bridge.IErrorReport;
 import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
@@ -103,9 +106,21 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		List imp = new ArrayList(tmp!=null? tmp: new ArrayList());
 		imp.add(state.getAttributeValue(handle, OAVBDIMetaModel.capability_has_package)+".*");
 		String[] imports = (String[])imp.toArray(new String[0]);
-		this.modelinfo = new ModelInfo(getName(), getPackage(), getDescription(), null, getConfigurations(), getArguments(), 
-			getResults(), startable, filename, getProperties(), getClassLoader(), getRequiredServices(), getProvidedServices(),
-			null, null, null, null, null);
+		
+		String[] confignames = getConfigurations();
+		ConfigurationInfo[] cinfos = null;
+		if(confignames.length>0)
+		{
+			cinfos = new ConfigurationInfo[confignames.length];
+			for(int i=0; i<confignames.length; i++)
+			{
+				cinfos[i] = new ConfigurationInfo(confignames[i]);
+			}
+		}
+		
+		this.modelinfo = new ModelInfo(getName(), getPackage(), getDescription(), null, getArguments(), 
+			getResults(), startable, filename, getProperties(), getClassLoader(), getRequiredServices(), 
+			getProvidedServices(), cinfos, null);
 		
 		// Build error report.
 		getModelInfo().setReport(new AbstractErrorReportBuilder(getModelInfo().getName(), getModelInfo().getFilename(),

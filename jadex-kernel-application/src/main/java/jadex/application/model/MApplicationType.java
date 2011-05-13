@@ -2,6 +2,7 @@ package jadex.application.model;
 
 import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.ModelValueProvider;
 import jadex.bridge.service.ProvidedServiceImplementation;
@@ -109,30 +110,40 @@ public class MApplicationType extends MStartable implements ICacheableModel
 //		modelinfo.addProperty("debugger.breakpoints", names);
 
 		List apps = getMApplicationInstances();
-		String[] configs = new String[apps.size()];
+		ConfigurationInfo[] configs = new ConfigurationInfo[apps.size()];
 		for(int i=0; i<configs.length; i++)
 		{
-			configs[i] = ((MApplicationInstance)apps.get(i)).getName();
+			configs[i] = new ConfigurationInfo(((MApplicationInstance)apps.get(i)).getName());
 		}
-		modelinfo.setConfigurationNames(configs);
+		modelinfo.setConfigurations(configs);
 
+		
 		// Init flags.
-		ModelValueProvider suspend = new ModelValueProvider();
-		ModelValueProvider master = new ModelValueProvider();
-		ModelValueProvider daemon = new ModelValueProvider();
-		ModelValueProvider autoshutdown = new ModelValueProvider();
-		modelinfo.setSuspend(suspend);
-		modelinfo.setMaster(master);
-		modelinfo.setDaemon(daemon);
-		modelinfo.setAutoShutdown(autoshutdown);
+//		ModelValueProvider suspend = new ModelValueProvider();
+//		ModelValueProvider master = new ModelValueProvider();
+//		ModelValueProvider daemon = new ModelValueProvider();
+//		ModelValueProvider autoshutdown = new ModelValueProvider();
+//		modelinfo.setSuspend(suspend);
+//		modelinfo.setMaster(master);
+//		modelinfo.setDaemon(daemon);
+//		modelinfo.setAutoShutdown(autoshutdown);
+//		if(getSuspend()!=null)
+//			suspend.setValue(getSuspend());
+//		if(getMaster()!=null)
+//			master.setValue(getMaster());
+//		if(getDaemon()!=null)
+//			daemon.setValue(getDaemon());
+//		if(getAutoShutdown()!=null)
+//			autoshutdown.setValue(getAutoShutdown());
+		
 		if(getSuspend()!=null)
-			suspend.setValue(getSuspend());
+			modelinfo.setSuspend(getSuspend());
 		if(getMaster()!=null)
-			master.setValue(getMaster());
+			modelinfo.setMaster(getMaster());
 		if(getDaemon()!=null)
-			daemon.setValue(getDaemon());
+			modelinfo.setDaemon(getDaemon());
 		if(getAutoShutdown()!=null)
-			autoshutdown.setValue(getAutoShutdown());
+			modelinfo.setAutoShutdown(getAutoShutdown());
 		
 		for(int i=0; i<apps.size(); i++)
 		{
@@ -160,28 +171,29 @@ public class MApplicationType extends MStartable implements ICacheableModel
 				}
 			}
 			
-			Object val = mapp.getSuspend();
+			ConfigurationInfo cinfo = modelinfo.getConfiguration(mapp.getName());
+			Boolean val = mapp.getSuspend();
 			if(val!=null)
 			{
-				suspend.setValue(mapp.getName(), val);
+				cinfo.setSuspend(val);
 //				System.out.println("suspend: "+val+" "+mapp.getName());
 			}
 			val = mapp.getMaster();
 			if(val!=null)
 			{
-				master.setValue(mapp.getName(), val);
+				cinfo.setMaster(val);
 //				System.out.println("master: "+val+" "+mapp.getName());
 			}
 			val = mapp.getDaemon();
 			if(val!=null)
 			{
-				daemon.setValue(mapp.getName(), val);
+				cinfo.setDaemon(val);
 //				System.out.println("daemon: "+val+" "+mapp.getName());
 			}
 			val = mapp.getAutoShutdown();
 			if(val!=null)
 			{
-				autoshutdown.setValue(mapp.getName(), val);
+				cinfo.setAutoShutdown(val);
 //				System.out.println("autoshutdown: "+val+" "+mapp.getName());
 			}
 		}

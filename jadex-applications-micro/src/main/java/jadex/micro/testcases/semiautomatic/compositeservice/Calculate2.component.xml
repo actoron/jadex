@@ -11,6 +11,10 @@
 						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
 	name="Calculate2" package="jadex.micro.testcases.semiautomatic.compositeservice">
 	
+	<arguments>
+		<argument name="arg" class="String">"default"</argument>
+	</arguments>
+	
 	<componenttypes>
 		<componenttype name="Calculator" filename="jadex/micro/testcases/semiautomatic/compositeservice/CompositeCalculatorAgent.class" master="true"/>
 		<componenttype name="CorruptAdder" filename="jadex/micro/testcases/semiautomatic/compositeservice/CorruptAdderAgent.class"/>
@@ -33,6 +37,9 @@
 			</components>
 		</configuration>
 		<configuration name="All components available">
+			<arguments>
+				<argument name="arg">"new value"</argument>
+			</arguments>
 			<components>
 				<component name="calculator" type="Calculator">
 					<requiredservices>

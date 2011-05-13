@@ -1,5 +1,6 @@
 package jadex.bpmn.model;
 
+import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+
+import javax.security.auth.login.Configuration;
 
 /**
  *  Java representation of a bpmn model for xml description.
@@ -192,7 +195,20 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		}
 		addProperty("debugger.breakpoints", names);
 		
-		modelinfo.setConfigurationNames(getConfigurations());
+//		modelinfo.setConfigurationNames(getConfigurations());
+		
+		String[] confignames = getConfigurations();
+		if(confignames.length>0)
+		{
+			ConfigurationInfo[] cinfo = new ConfigurationInfo[confignames.length];
+			for(int i=0; i<confignames.length; i++)
+			{
+				cinfo[i] = new ConfigurationInfo(confignames[i]);
+			}
+			modelinfo.setConfigurations(cinfo);
+		}
+		
+		
 		modelinfo.setStartable(true);
 	}
 	

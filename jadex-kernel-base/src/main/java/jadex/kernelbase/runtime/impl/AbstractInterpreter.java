@@ -46,6 +46,7 @@ import jadex.javaparser.SJavaParser;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -193,7 +194,7 @@ public abstract class AbstractInterpreter implements IComponentInstance
 	 *  - init required and provided services
 	 *  - init subcomponents
 	 */
-	public IFuture init(final IModelInfo model, final String config, final UnparsedExpression[] props,
+	public IFuture init(final IModelInfo model, final String config, final Map props,
 		Map arguments, Map results, final Map properties)
 	{
 		final Future ret = new Future();
@@ -330,7 +331,7 @@ public abstract class AbstractInterpreter implements IComponentInstance
 	/**
 	 *  Init the future properties.
 	 */
-	public IFuture initFutureProperties(final UnparsedExpression[] props, final Map properties)
+	public IFuture initFutureProperties(final Map props, final Map properties)
 	{
 		Future ret = new Future();
 		
@@ -338,40 +339,45 @@ public abstract class AbstractInterpreter implements IComponentInstance
 		final List futures = new ArrayList();
 		if(props!=null)
 		{
-			for(int i=0; i<props.length; i++)
+			for(Iterator it=props.keySet().iterator(); it.hasNext(); )
 			{
-				final UnparsedExpression expt = props[i];
-				final Object val = SJavaParser.evaluateExpression(expt.getValue(), getAllImports(), getFetcher(), getClassLoader());
-				if(expt.getClazz()!=null && SReflect.isSupertype(IFuture.class, expt.getClazz()))
+				final String name = (String)it.next();
+				final Object value = props.get(name);
+				if(value instanceof UnparsedExpression)
 				{
-//					System.out.println("Future property: "+mexp.getName()+", "+val);
-					if(val instanceof IFuture)
+					final UnparsedExpression unexp = (UnparsedExpression)value;
+					final Object val = SJavaParser.evaluateExpression(unexp.getValue(), getAllImports(), getFetcher(), getClassLoader());
+					if(unexp.getClazz()!=null && SReflect.isSupertype(IFuture.class, unexp.getClazz()))
 					{
-						// Use second future to start component only when value has already been set.
-						final Future retu = new Future();
-						((IFuture)val).addResultListener(createResultListener(new DefaultResultListener()
+//						System.out.println("Future property: "+mexp.getName()+", "+val);
+						if(val instanceof IFuture)
 						{
-							public void resultAvailable(Object result)
+							// Use second future to start component only when value has already been set.
+							final Future retu = new Future();
+							((IFuture)val).addResultListener(createResultListener(new DefaultResultListener()
 							{
-								synchronized(properties)
+								public void resultAvailable(Object result)
 								{
-//									System.out.println("Setting future property: "+mexp.getName()+" "+result);
-									properties.put(expt.getName(), result);
+									synchronized(properties)
+									{
+//										System.out.println("Setting future property: "+mexp.getName()+" "+result);
+										properties.put(unexp.getName(), result);
+									}
+									retu.setResult(result);
 								}
-								retu.setResult(result);
-							}
-						}));
-						futures.add(retu);
+							}));
+							futures.add(retu);
+						}
+						else if(val!=null)
+						{
+							throw new RuntimeException("Future property must be instance of jadex.commons.IFuture: "+name+", "+unexp.getValue());
+						}
 					}
-					else if(val!=null)
+					else
 					{
-						throw new RuntimeException("Future property must be instance of jadex.commons.IFuture: "+props[i].getName()+", "+props[i].getValue());
+						// Todo: handle specific properties (logging etc.)
+						properties.put(name, value);
 					}
-				}
-				else
-				{
-					// Todo: handle specific properties (logging etc.)
-					properties.put(expt.getName(), val);
 				}
 			}
 			

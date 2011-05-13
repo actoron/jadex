@@ -10,11 +10,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.security.auth.login.Configuration;
+
 /**
  *  Public model information that is provided as result from 
  *  component factories when a model is loaded.
  */
-public class ModelInfo implements IModelInfo
+public class ModelInfo extends Startable implements IModelInfo
 {
 	//-------- attributes --------
 	
@@ -33,8 +35,8 @@ public class ModelInfo implements IModelInfo
 	/** The report. */
 	protected IErrorReport report;
 	
-	/** The configurations. */
-	protected String[] configurationnames;
+//	/** The configurations. */
+//	protected String[] configurationnames;
 	
 	/** The configurations. */
 	protected List configurations;
@@ -64,17 +66,17 @@ public class ModelInfo implements IModelInfo
 //	protected ProvidedServiceInfo[] providedservices;
 	protected List providedservices;
 	
-	/** The suspend flag. */
-	protected IModelValueProvider suspend;
-	
-	/** The master flag. */
-	protected IModelValueProvider master;
-	
-	/** The daemon flag. */
-	protected IModelValueProvider daemon;
-
-	/** The autoshutdown flag. */
-	protected IModelValueProvider autoshutdown;
+//	/** The suspend flag. */
+//	protected IModelValueProvider suspend;
+//	
+//	/** The master flag. */
+//	protected IModelValueProvider master;
+//	
+//	/** The daemon flag. */
+//	protected IModelValueProvider daemon;
+//
+//	/** The autoshutdown flag. */
+//	protected IModelValueProvider autoshutdown;
 	
 	/** The subcomponent types. */
 	protected List subcomponents;
@@ -86,28 +88,28 @@ public class ModelInfo implements IModelInfo
 	 */
 	public ModelInfo()
 	{
-		this(null, null, null, null, null, null, null, 
-			false, null, null, null, null, null, null, null, null, null, null);
+		this(null, null, null, null, null, null, 
+			false, null, null, null, null, null, null, null);
 	}
 	
 	/**
 	 *  Create a new model info.
 	 */
 	public ModelInfo(String name, String packagename,
-		String description, IErrorReport report, String[] configurationnames,
+		String description, IErrorReport report,
 		IArgument[] arguments, IArgument[] results, boolean startable,
 		String filename, Map properties, ClassLoader classloader, 
 		RequiredServiceInfo[] requiredservices, ProvidedServiceInfo[] providedservices, 
-		IModelValueProvider master, IModelValueProvider daemon, 
-		IModelValueProvider autoshutdown, ConfigurationInfo[] configurations,
+//		IModelValueProvider master, IModelValueProvider daemon, 
+//		IModelValueProvider autoshutdown, 
+		ConfigurationInfo[] configurations,
 		SubcomponentTypeInfo[] subcomponents)
 	{
 		this.name = name;
 		this.packagename = packagename;
 		this.description = description;
 		this.report = report;//!=null? report: new ErrorReport();
-		// todo: remove
-		this.configurationnames = configurationnames;
+//		this.configurationnames = configurationnames;
 		this.arguments = arguments!=null? SUtil.arrayToList(arguments): null;
 		this.results = results!=null? SUtil.arrayToList(results): null;
 		this.startable = startable;
@@ -115,9 +117,9 @@ public class ModelInfo implements IModelInfo
 		this.properties = properties!=null? properties: new HashMap();
 		this.classloader = classloader;
 		this.providedservices = providedservices!=null? SUtil.arrayToList(providedservices): null;
-		this.master = master;
-		this.daemon = daemon;
-		this.autoshutdown = autoshutdown;
+//		this.master = master;
+//		this.daemon = daemon;
+//		this.autoshutdown = autoshutdown;
 		this.configurations = configurations!=null? SUtil.arrayToList(configurations): null;
 		this.subcomponents = subcomponents!=null? SUtil.arrayToList(subcomponents): null;
 //		this.imports = imports;
@@ -188,17 +190,24 @@ public class ModelInfo implements IModelInfo
 	 */
 	public String[] getConfigurationNames()
 	{
-		String[] ret = configurationnames!=null? configurationnames: SUtil.EMPTY_STRING_ARRAY;
-
-		// todo: remove configurationnames in constructor
-		if(ret.length==0 && configurations!=null && configurations.size()>0)
+//		String[] ret = configurationnames!=null? configurationnames: SUtil.EMPTY_STRING_ARRAY;
+		String[] ret = SUtil.EMPTY_STRING_ARRAY;
+		
+		if(configurations!=null)
 		{
 			ret = new String[configurations.size()];
-			for(int i=0; i<configurations.size(); i++)
+			// todo: remove configurationnames in constructor
+			if(ret.length==0 && configurations!=null && configurations.size()>0)
 			{
-				ret[i] = ((ConfigurationInfo)configurations.get(i)).getName();
+				ret = new String[configurations.size()];
+				for(int i=0; i<configurations.size(); i++)
+				{
+					ret[i] = ((ConfigurationInfo)configurations.get(i)).getName();
+				}
 			}
+			return ret;
 		}
+		
 		return ret;
 	}
 	
@@ -217,15 +226,18 @@ public class ModelInfo implements IModelInfo
 	public ConfigurationInfo getConfiguration(String name)
 	{
 		ConfigurationInfo ret = null;
-		if(configurations!=null)
+		if(name!=null)
 		{
-			for(int i=0; i<configurations.size(); i++)
+			if(configurations!=null)
 			{
-				ConfigurationInfo ci = (ConfigurationInfo)configurations.get(i);
-				if(name.equals(ci.getName()))
+				for(int i=0; i<configurations.size(); i++)
 				{
-					ret = ci;
-					break;
+					ConfigurationInfo ci = (ConfigurationInfo)configurations.get(i);
+					if(name.equals(ci.getName()))
+					{
+						ret = ci;
+						break;
+					}
 				}
 			}
 		}
@@ -370,14 +382,14 @@ public class ModelInfo implements IModelInfo
 		this.report = report;
 	}
 
-	/**
-	 *  Set the configurations.
-	 *  @param configurations The configurations to set.
-	 */
-	public void setConfigurationNames(String[] configurationnames)
-	{
-		this.configurationnames = configurationnames;
-	}
+//	/**
+//	 *  Set the configurations.
+//	 *  @param configurations The configurations to set.
+//	 */
+//	public void setConfigurationNames(String[] configurationnames)
+//	{
+//		this.configurationnames = configurationnames;
+//	}
 	
 	/**
 	 *  Set the configurations.
@@ -475,7 +487,7 @@ public class ModelInfo implements IModelInfo
 			properties = new HashMap();
 		properties.put(name, value);
 	}
-
+	
 	// Exclude from transfer?!
 	/**
 	 *  Set the classloader.
@@ -569,7 +581,15 @@ public class ModelInfo implements IModelInfo
 	 */
 	public Boolean getMaster(String configname)
 	{
-		return master==null? null: (Boolean)master.getValue(configname);
+		Boolean ret = null;
+		ConfigurationInfo config = getConfiguration(configname);
+		if(config!=null)
+			ret = config.getMaster();
+		if(ret==null)
+			ret = super.getMaster();
+		return ret;
+		
+//		return master==null? null: (Boolean)master.getValue(configname);
 	}
 	
 	/**
@@ -579,7 +599,15 @@ public class ModelInfo implements IModelInfo
 	 */
 	public Boolean getDaemon(String configname)
 	{
-		return daemon==null? null: (Boolean)daemon.getValue(configname);
+		Boolean ret = null;
+		ConfigurationInfo config = getConfiguration(configname);
+		if(config!=null)
+			ret = config.getDaemon();
+		if(ret==null)
+			ret = super.getDaemon();
+		return ret;
+		
+//		return daemon==null? null: (Boolean)daemon.getValue(configname);
 	}
 	
 	/**
@@ -589,7 +617,15 @@ public class ModelInfo implements IModelInfo
 	 */
 	public Boolean getAutoShutdown(String configname)
 	{
-		return autoshutdown==null? null: (Boolean)autoshutdown.getValue(configname);
+		Boolean ret = null;
+		ConfigurationInfo config = getConfiguration(configname);
+		if(config!=null)
+			ret = config.getAutoShutdown();
+		if(ret==null)
+			ret = super.getAutoShutdown();
+		return ret;
+		
+//		return autoshutdown==null? null: (Boolean)autoshutdown.getValue(configname);
 	}
 
 	/**
@@ -599,44 +635,52 @@ public class ModelInfo implements IModelInfo
 	 */
 	public Boolean getSuspend(String configname)
 	{
-		return suspend==null? null: (Boolean)suspend.getValue(configname);
+		Boolean ret = null;
+		ConfigurationInfo config = getConfiguration(configname);
+		if(config!=null)
+			ret = config.getSuspend();
+		if(ret==null)
+			ret = super.getSuspend();
+		return ret;
+		
+//		return suspend==null? null: (Boolean)suspend.getValue(configname);
 	}
 	
-	/**
-	 *  Set the master.
-	 *  @param master The master to set.
-	 */
-	public void setMaster(IModelValueProvider master)
-	{
-		this.master = master;
-	}
-
-	/**
-	 *  Set the daemon.
-	 *  @param daemon The daemon to set.
-	 */
-	public void setDaemon(IModelValueProvider daemon)
-	{
-		this.daemon = daemon;
-	}
-
-	/**
-	 *  Set the autoshutdown.
-	 *  @param autoshutdown The autoshutdown to set.
-	 */
-	public void setAutoShutdown(IModelValueProvider autoshutdown)
-	{
-		this.autoshutdown = autoshutdown;
-	}
-
-	/**
-	 *  Set the suspend flag.
-	 *  @param suspend The suspend to set.
-	 */
-	public void setSuspend(IModelValueProvider suspend)
-	{
-		this.suspend = suspend;
-	}
+//	/**
+//	 *  Set the master.
+//	 *  @param master The master to set.
+//	 */
+//	public void setMaster(IModelValueProvider master)
+//	{
+//		this.master = master;
+//	}
+//
+//	/**
+//	 *  Set the daemon.
+//	 *  @param daemon The daemon to set.
+//	 */
+//	public void setDaemon(IModelValueProvider daemon)
+//	{
+//		this.daemon = daemon;
+//	}
+//
+//	/**
+//	 *  Set the autoshutdown.
+//	 *  @param autoshutdown The autoshutdown to set.
+//	 */
+//	public void setAutoShutdown(IModelValueProvider autoshutdown)
+//	{
+//		this.autoshutdown = autoshutdown;
+//	}
+//
+//	/**
+//	 *  Set the suspend flag.
+//	 *  @param suspend The suspend to set.
+//	 */
+//	public void setSuspend(IModelValueProvider suspend)
+//	{
+//		this.suspend = suspend;
+//	}
 	
 	/**
 	 *  Get the subcomponent names. 
@@ -664,23 +708,4 @@ public class ModelInfo implements IModelInfo
 			subcomponents = new ArrayList();
 		subcomponents.add(subcomponent);
 	}
-	
-//	/**
-//	 *  Get the component instances. 
-//	 *  @param configname The configname.
-//	 *  @return The component instances.
-//	 */
-//	public List getComponentInstances(String configname)
-//	{
-//		return components==null? null: (List)components.getValue(configname);
-//	}
-//	
-//	/**
-//	 *  Set the components. 
-//	 *  @param components The components.
-//	 */
-//	public void setComponentInstances(IModelValueProvider components)
-//	{
-//		this.components = components;
-//	}
 }

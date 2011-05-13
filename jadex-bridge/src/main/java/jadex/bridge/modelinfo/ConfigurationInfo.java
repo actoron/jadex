@@ -1,13 +1,15 @@
 package jadex.bridge.modelinfo;
 
 
+import jadex.commons.SUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 
  */
-public class ConfigurationInfo
+public class ConfigurationInfo extends Startable
 {
 	//-------- attributes --------
 	
@@ -79,32 +81,31 @@ public class ConfigurationInfo
 	}
 	
 	/**
-	 *  Add an argument.
-	 *  @param argument The argument.
-	 */
-	public void addArgument(UnparsedExpression argument)
-	{
-		if(arguments==null)
-			arguments = new ArrayList();
-		this.arguments.add(argument);
-	}
-	
-	/**
-	 *  Get all arguments.
+	 *  Get the list of arguments.
 	 *  @return The arguments.
 	 */
 	public UnparsedExpression[] getArguments()
 	{
 		return arguments!=null? (UnparsedExpression[])arguments.toArray(new UnparsedExpression[arguments.size()]): new UnparsedExpression[0];
 	}
-
-//	/**
-//	 *  Get the arguments.
-//	 *  @return The arguments.
-//	 */
-//	public List getArguments()
-//	{
-//		return this.arguments;
-//	}
 	
+	/**
+	 *  Set the arguments.
+	 *  @param arguments The arguments to set.
+	 */
+	public void setArguments(UnparsedExpression[] arguments)
+	{
+		this.arguments = SUtil.arrayToList(arguments);
+	}
+
+	/**
+	 *  Add an argument.
+	 *  @param arg The argument.
+	 */
+	public void addArgument(UnparsedExpression argument)
+	{
+		if(arguments==null)
+			arguments = new ArrayList();
+		arguments.add(argument);
+	}
 }

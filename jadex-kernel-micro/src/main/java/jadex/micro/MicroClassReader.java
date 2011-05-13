@@ -77,8 +77,102 @@ public class MicroClassReader
 	 */
 	protected MicroModel read(String model, Class cma, ClassLoader classloader)
 	{
-		// Try to read meta information from class.
-		MicroAgentMetaInfo metainfo = null;
+		ModelInfo modelinfo = new ModelInfo();
+		MicroModel ret = new MicroModel(modelinfo);
+		
+		String name = SReflect.getUnqualifiedClassName(cma);
+		if(name.endsWith("Agent"))
+			name = name.substring(0, name.lastIndexOf("Agent"));
+		String packagename = cma.getPackage()!=null? cma.getPackage().getName(): null;
+		modelinfo.setName(name);
+		modelinfo.setPackage(packagename);
+		modelinfo.setFilename(model);
+		modelinfo.setClassloader(classloader);
+		modelinfo.setStartable(true);
+		
+		try
+		{
+			Method m = cma.getMethod("getMetaInfo", new Class[0]);
+			if(m!=null)
+			{
+				MicroAgentMetaInfo metainfo = (MicroAgentMetaInfo)m.invoke(null, new Object[0]);
+				fillMicroModelFromMetaInfo(ret, model, cma, classloader, metainfo);
+			}
+		}
+		catch(Exception e)
+		{
+		}
+		
+		fillMicroModelFromAnnotations(ret, model, cma, classloader);
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void fillMicroModelFromMetaInfo(MicroModel micromodel, String model, Class cma, ClassLoader classloader, MicroAgentMetaInfo metainfo)
+	{
+		try
+		{
+			ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
+			Method m = cma.getMethod("getMetaInfo", new Class[0]);
+			if(m!=null)
+				metainfo = (MicroAgentMetaInfo)m.invoke(null, new Object[0]);
+			
+			String description = metainfo!=null && metainfo.getDescription()!=null? metainfo.getDescription(): null;
+			IErrorReport report = null;
+			String[] configurations = metainfo!=null? metainfo.getConfigurations(): null;
+			IArgument[] arguments = metainfo!=null? metainfo.getArguments(): null;
+			IArgument[] results = metainfo!=null? metainfo.getResults(): null;
+			Map properties = metainfo!=null && metainfo.getProperties()!=null? new HashMap(metainfo.getProperties()): new HashMap();
+			RequiredServiceInfo[] required = metainfo!=null? metainfo.getRequiredServices(): null;
+			ProvidedServiceInfo[] provided = metainfo!=null? metainfo.getProvidedServices(): null;
+			IModelValueProvider master = metainfo!=null? metainfo.getMaster(): null;
+			IModelValueProvider daemon= metainfo!=null? metainfo.getDaemon(): null;
+			IModelValueProvider autosd = metainfo!=null? metainfo.getAutoShutdown(): null;
+			
+			// Add debugger breakpoints
+			List names = new ArrayList();
+			for(int i=0; metainfo!=null && i<metainfo.getBreakpoints().length; i++)
+				names.add(metainfo.getBreakpoints()[i]);
+			properties.put("debugger.breakpoints", names);
+			
+			ConfigurationInfo[] cinfo = null;
+			if(configurations!=null)
+			{
+				cinfo = new ConfigurationInfo[configurations.length];
+				for(int i=0; i<configurations.length; i++)
+				{
+					cinfo[i] = new ConfigurationInfo(configurations[i]);
+					cinfo[i].setMaster((Boolean)master.getValue(configurations[i]));
+					cinfo[i].setDaemon((Boolean)daemon.getValue(configurations[i]));
+					cinfo[i].setAutoShutdown((Boolean)autosd.getValue(configurations[i]));
+					// suspend?
+					// todo
+//					cinfo[i].addArgument(argument)
+				}
+			}
+			modelinfo.setDescription(description);
+			modelinfo.setArguments(arguments);
+			modelinfo.setResults(results);
+			modelinfo.setProperties(properties);
+			modelinfo.setRequiredServices(required);
+			modelinfo.setProvidedServices(provided);
+			modelinfo.setConfigurations(cinfo);
+		}
+		catch(Exception e)
+		{
+//			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void fillMicroModelFromAnnotations(MicroModel micromodel, String model, Class cma, ClassLoader classloader)
+	{
+		ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
 		String[] imports = new String[]{cma.getClass().getPackage().getName()+".*"};
 		
 		if(cma.isAnnotationPresent(Imports.class))
@@ -88,18 +182,15 @@ public class MicroClassReader
 			imp[0] = imports[0];
 			System.arraycopy(tmp, 0, imp, 1, tmp.length);
 			imports = imp;
+			micromodel.setImports(imports);
 		}
 		if(cma.isAnnotationPresent(Description.class))
 		{
-			if(metainfo==null)
-				metainfo = new MicroAgentMetaInfo();
 			Description val = (Description)cma.getAnnotation(Description.class);
-			metainfo.setDescription(val.value());
+			modelinfo.setDescription(val.value());
 		}
 		if(cma.isAnnotationPresent(Properties.class))
 		{
-			if(metainfo==null)
-				metainfo = new MicroAgentMetaInfo();
 			Properties val = (Properties)cma.getAnnotation(Properties.class);
 			NameValue[] vals = val.value();
 			Map props = new HashMap();
@@ -107,12 +198,10 @@ public class MicroClassReader
 			{
 				props.put(vals[i].name(), vals[i].value());
 			}
-			metainfo.setProperties(props);
+			modelinfo.setProperties(props);
 		}
 		if(cma.isAnnotationPresent(RequiredServices.class))
 		{
-			if(metainfo==null)
-				metainfo = new MicroAgentMetaInfo();
 			RequiredServices val = (RequiredServices)cma.getAnnotation(RequiredServices.class);
 			RequiredService[] vals = val.value();
 			RequiredServiceInfo[] rsis = new RequiredServiceInfo[vals.length];
@@ -125,12 +214,10 @@ public class MicroClassReader
 				rsis[i] = new RequiredServiceInfo(vals[i].name(), vals[i].type(), 
 					vals[i].multiple(), binding);
 			}
-			metainfo.setRequiredServices(rsis);
+			modelinfo.setRequiredServices(rsis);
 		}
 		if(cma.isAnnotationPresent(ProvidedServices.class))
 		{
-			if(metainfo==null)
-				metainfo = new MicroAgentMetaInfo();
 			ProvidedServices val = (ProvidedServices)cma.getAnnotation(ProvidedServices.class);
 			ProvidedService[] vals = val.value();
 			ProvidedServiceInfo[] psis = new ProvidedServiceInfo[vals.length];
@@ -145,31 +232,27 @@ public class MicroClassReader
 					im.expression().length()>0? im.expression(): null, im.direct(), bind);
 				psis[i] = new ProvidedServiceInfo(vals[i].type(), impl);
 			}
-			metainfo.setProvidedServices(psis);
+			modelinfo.setProvidedServices(psis);
 		}
 		Map argsmap = new HashMap();
 		if(cma.isAnnotationPresent(Arguments.class))
 		{
-			if(metainfo==null)
-				metainfo = new MicroAgentMetaInfo();
 			Arguments val = (Arguments)cma.getAnnotation(Arguments.class);
 			Argument[] vals = val.value();
 			IArgument[] tmpargs = new IArgument[vals.length];
 			for(int i=0; i<vals.length; i++)
 			{
 //				Object arg = SJavaParser.evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
-				Object arg = evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
+				Object defval = evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
 				tmpargs[i] = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
-					vals[i].description(), vals[i].typename(), arg);
+					vals[i].description(), vals[i].typename(), defval);
 				argsmap.put(tmpargs[i].getName(), tmpargs[i]);
 			}
-			metainfo.setArguments(tmpargs);
+			modelinfo.setArguments(tmpargs);
 		}
 		Map resmap = new HashMap();
 		if(cma.isAnnotationPresent(Results.class))
 		{
-			if(metainfo==null)
-				metainfo = new MicroAgentMetaInfo();
 			Results val = (Results)cma.getAnnotation(Results.class);
 			Result[] vals = val.value();
 			IArgument[] tmpresults = new IArgument[vals.length];
@@ -180,20 +263,16 @@ public class MicroClassReader
 					vals[i].description(), vals[i].typename(), null);
 				resmap.put(tmpresults[i].getName(), tmpresults[i]);
 			}
-			metainfo.setResults(tmpresults);
+			modelinfo.setResults(tmpresults);
 		}
 		Configuration[] configs = null;
 		if(cma.isAnnotationPresent(Configurations.class))
 		{
-			if(metainfo==null)
-				metainfo = new MicroAgentMetaInfo();
 			Configurations val = (Configurations)cma.getAnnotation(Configurations.class);
 			configs = val.value();
 		}
 		else if(cma.isAnnotationPresent(Configuration.class))
 		{
-			if(metainfo==null)
-				metainfo = new MicroAgentMetaInfo();
 			Configuration val = (Configuration)cma.getAnnotation(Configuration.class);
 			configs = new Configuration[]{val};
 		}
@@ -201,21 +280,23 @@ public class MicroClassReader
 		ConfigurationInfo[] cinfos = null;
 		if(configs!=null)
 		{
-			if(metainfo==null)
-				metainfo = new MicroAgentMetaInfo();
-			
 			List configinfos = new ArrayList();
 			
 			String[] confignames = new String[configs.length];
-			Map master = new HashMap();
-			Map daemon = new HashMap();
-			Map autosd = new HashMap();
+//			Map master = new HashMap();
+//			Map daemon = new HashMap();
+//			Map autosd = new HashMap();
 			for(int i=0; i<configs.length; i++)
 			{
 				confignames[i] = configs[i].name();
-				master.put(confignames[i], configs[i].master());
-				daemon.put(confignames[i], configs[i].daemon());
-				autosd.put(confignames[i], configs[i].autoshutdown());
+				
+				ConfigurationInfo configinfo = new ConfigurationInfo(confignames[i]);
+				configinfos.add(configinfo);
+				
+				configinfo.setMaster(configs[i].master());
+				configinfo.setDaemon(configs[i].daemon());
+				configinfo.setAutoShutdown(configs[i].autoshutdown());
+				configinfo.setSuspend(configs[i].suspend());
 				
 				NameValue[] argvals = configs[i].arguments();
 				for(int j=0; j<argvals.length; j++)
@@ -236,8 +317,6 @@ public class MicroClassReader
 				
 				// todo: store arguments in config not in valueprovider
 				
-				ConfigurationInfo configinfo = new ConfigurationInfo(confignames[i]);
-				configinfos.add(configinfo);
 				Component[] comps = configs[i].components();
 				for(int j=0; j<comps.length; j++)
 				{
@@ -285,10 +364,10 @@ public class MicroClassReader
 				}
 			}
 			
-			metainfo.setMaster(new ModelValueProvider(master));
-			metainfo.setDaemon(new ModelValueProvider(daemon));
-			metainfo.setAutoShutdown(new ModelValueProvider(autosd));
-			metainfo.setConfigs(confignames);
+//			metainfo.setMaster(new ModelValueProvider(master));
+//			metainfo.setDaemon(new ModelValueProvider(daemon));
+//			metainfo.setAutoShutdown(new ModelValueProvider(autosd));
+//			metainfo.setConfigs(confignames);
 			
 			cinfos = (ConfigurationInfo[])configinfos.toArray(new ConfigurationInfo[configinfos.size()]);
 		}
@@ -310,64 +389,16 @@ public class MicroClassReader
 		// jadex.base.gui.componentviewer.IAbstractViewerPanel.PROPERTY_VIEWERCLASS
 		if(cma.isAnnotationPresent(GuiClass.class))
 		{
-			if(metainfo==null)
-				metainfo = new MicroAgentMetaInfo();
 			GuiClass gui = (GuiClass)cma.getAnnotation(GuiClass.class);
 			Class clazz = gui.value();
-			metainfo.putPropertyValue("componentviewer.viewerclass", clazz);
+			modelinfo.addProperty("componentviewer.viewerclass", clazz);
 		}
 		else if(cma.isAnnotationPresent(GuiClassName.class))
 		{
-			if(metainfo==null)
-				metainfo = new MicroAgentMetaInfo();
 			GuiClassName gui = (GuiClassName)cma.getAnnotation(GuiClassName.class);
 			String clazzname = gui.value();
-			metainfo.putPropertyValue("componentviewer.viewerclass", clazzname);
+			modelinfo.addProperty("componentviewer.viewerclass", clazzname);
 		}
-
-		if(metainfo==null)
-		{
-			try
-			{
-				Method m = cma.getMethod("getMetaInfo", new Class[0]);
-				if(m!=null)
-					metainfo = (MicroAgentMetaInfo)m.invoke(null, new Object[0]);
-			}
-			catch(Exception e)
-			{
-	//			e.printStackTrace();
-			}
-		}
-		
-		String name = SReflect.getUnqualifiedClassName(cma);
-		if(name.endsWith("Agent"))
-			name = name.substring(0, name.lastIndexOf("Agent"));
-		String packagename = cma.getPackage()!=null? cma.getPackage().getName(): null;
-		String description = metainfo!=null && metainfo.getDescription()!=null? metainfo.getDescription(): null;
-		IErrorReport report = null;
-		String[] configurations = metainfo!=null? metainfo.getConfigurations(): null;
-		IArgument[] arguments = metainfo!=null? metainfo.getArguments(): null;
-		IArgument[] results = metainfo!=null? metainfo.getResults(): null;
-		Map properties = metainfo!=null && metainfo.getProperties()!=null? new HashMap(metainfo.getProperties()): new HashMap();
-		RequiredServiceInfo[] required = metainfo!=null? metainfo.getRequiredServices(): null;
-		ProvidedServiceInfo[] provided = metainfo!=null? metainfo.getProvidedServices(): null;
-		IModelValueProvider master = metainfo!=null? metainfo.getMaster(): null;
-		IModelValueProvider daemon= metainfo!=null? metainfo.getDaemon(): null;
-		IModelValueProvider autosd = metainfo!=null? metainfo.getAutoShutdown(): null;
-		
-		// Add debugger breakpoints
-		List names = new ArrayList();
-		for(int i=0; metainfo!=null && i<metainfo.getBreakpoints().length; i++)
-			names.add(metainfo.getBreakpoints()[i]);
-		properties.put("debugger.breakpoints", names);
-		
-		IModelInfo ret = new ModelInfo(name, packagename, description, report, 
-			configurations, arguments, results, true, model, properties, classloader, required, provided,
-			master, daemon, autosd, cinfos, subinfos);
-		
-		MicroModel mm = new MicroModel(ret);
-		mm.setImports(imports);
-		return mm;
 	}
 	
 	/**
