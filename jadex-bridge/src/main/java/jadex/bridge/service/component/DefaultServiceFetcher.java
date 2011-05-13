@@ -351,7 +351,9 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		final RequiredServiceBinding binding)
 	{
 		final Future ret = new Future();
-		getExternalAccess(provider, binding.getComponentName()).addResultListener(new DelegationResultListener(ret)
+		
+		IComponentIdentifier parent = RequiredServiceInfo.SCOPE_PARENT.equals(binding.getScope())? ((IComponentIdentifier)provider.getId()).getParent(): (IComponentIdentifier)provider.getId(); 
+		getExternalAccess(provider, binding.getComponentName(), parent).addResultListener(new DelegationResultListener(ret)
 		{
 			public void exceptionOccurred(Exception exception)
 			{
@@ -478,11 +480,9 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Create component identifier from name.
 	 */
-	protected IFuture createComponentIdentifier(final IServiceProvider provider, final String name)
+	protected IFuture createComponentIdentifier(final IServiceProvider provider, final String name, final IComponentIdentifier parent)
 	{
 		final Future ret = new Future();
-		
-		// todo: use parent names?!
 		
 		SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 			.addResultListener(new DelegationResultListener(ret)
@@ -492,8 +492,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 				IComponentManagementService cms = (IComponentManagementService)result;
 				if(name.indexOf("@")==-1)
 				{
-					// local todo:
-					ret.setResult(cms.createComponentIdentifier(name, true));
+					ret.setResult(cms.createComponentIdentifier(name, parent, parent.getAddresses()));
 				}
 				else
 				{
@@ -528,11 +527,11 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Get external access for component name.
 	 */
-	protected IFuture getExternalAccess(final IServiceProvider provider, final String name)
+	protected IFuture getExternalAccess(final IServiceProvider provider, final String name, IComponentIdentifier parent)
 	{
 		final Future ret = new Future();
 		
-		createComponentIdentifier(provider, name)
+		createComponentIdentifier(provider, name, parent)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)

@@ -1699,6 +1699,18 @@ public abstract class ComponentManagementService extends BasicService implements
 			name = name + "@" + ((IComponentIdentifier)exta.getServiceProvider().getId()).getPlatformName(); // Hack?!
 		return new ComponentIdentifier(name, addresses, null);		
 	}
+	
+	/**
+	 *  Create component identifier.
+	 *  @param name The name.
+	 *  @param addresses The addresses.
+	 *  @return The new component identifier.
+	 */
+	public IComponentIdentifier createComponentIdentifier(String name, IComponentIdentifier parent, String[] addresses)
+	{
+		String paname = parent.getName().replace('@', '.');
+		return new ComponentIdentifier(name+"@"+paname, addresses);
+	}
 
 	/**
 	 *  Create a search constraints object.

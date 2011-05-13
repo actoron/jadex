@@ -36,11 +36,15 @@
 			<components>
 				<component name="calculator" type="Calculator">
 					<requiredservices>
-						<binding name="addservice" componentname="adder"/>			
-						<binding name="subservice" componentname="subtractor"/>			
+						<binding name="addservice" componentname="adder" scope="parent"/>			
+						<binding name="subservice" componentname="subtractor" scope="parent"/>			
 					</requiredservices>
 				</component>
-				<component name="adder" type="Adder"/>
+				<component name="adder" type="Adder">
+					<arguments>
+						<argument name="arg">"new value"</argument>
+					</arguments>
+				</component>
 				<component name="subtractor" type="Subtractor"/>
 			</components>
 		</configuration>

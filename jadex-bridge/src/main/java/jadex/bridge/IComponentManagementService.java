@@ -169,6 +169,14 @@ public interface IComponentManagementService extends IService
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses);
 	
 	/**
+	 *  Create component identifier.
+	 *  @param name The name.
+	 *  @param addresses The addresses.
+	 *  @return The new component identifier.
+	 */
+	public IComponentIdentifier createComponentIdentifier(String name, IComponentIdentifier parent, String[] addresses);
+	
+	/**
 	 *  Create a component identifier that is allowed on the platform.
 	 *  @param name The base name.
 	 *  @return The component identifier.

@@ -10,6 +10,10 @@
 						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
 	name="Adder" package="jadex.micro.testcases.semiautomatic.compositeservice">
 	
+	<arguments>
+		<argument name="arg">"default"</argument>
+	</arguments>
+	
 	<services>
 		<providedservice class="IAddService">
 			<implementation>new AddService($component)</implementation>

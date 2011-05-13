@@ -133,6 +133,17 @@ public class ComponentInstanceInfo extends Startable
 	}
 
 	/**
+	 *  Add an argument.
+	 *  @param arg The argument.
+	 */
+	public void addArgument(UnparsedExpression argument)
+	{
+		if(arguments==null)
+			arguments = new ArrayList();
+		arguments.add(argument);
+	}
+	
+	/**
 	 *  Get the bindings.
 	 *  @return the bindings.
 	 */

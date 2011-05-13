@@ -122,7 +122,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 			{
 				public Object execute(IInternalAccess ia)
 				{
-					init(model.getModelInfo(), ComponentInterpreter.this.config, null, arguments, results, null)
+					init(model.getModelInfo(), ComponentInterpreter.this.config, null, ComponentInterpreter.this.arguments, results, null)
 						.addResultListener(createResultListener(new DelegationResultListener(inited)
 					{
 						public void customResultAvailable(Object result)
