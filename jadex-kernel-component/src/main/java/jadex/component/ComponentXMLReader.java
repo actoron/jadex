@@ -3,6 +3,7 @@ package jadex.component;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
+import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
@@ -14,10 +15,7 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
-import jadex.javaparser.IExpressionParser;
-import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -38,6 +36,7 @@ import jadex.xml.reader.Reader;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -112,6 +111,29 @@ public class ComponentXMLReader
 			ret.setLastModified(rinfo.getLastModified());
 			ret.setClassLoader(classloader);
 //			ret.initModelInfo(report);
+			
+			// todo: remove
+			
+			IArgument[] args = ret.getArguments(); 
+			if(args.length>0)
+			{
+				Map argsmap = new HashMap();
+				for(int i=0; i<args.length; i++)
+				{
+					argsmap.put(args[i].getName(), args[i]);
+				}
+				ConfigurationInfo[] configs = ret.getConfigurations();
+				for(int i=0; i<configs.length; i++)
+				{
+					UnparsedExpression[] unexps = configs[i].getArguments();
+					for(int j=0; j<unexps.length; j++)
+					{
+						Object val = SJavaParser.evaluateExpression(unexps[j].getValue(), ret.getAllImports(), null, ret.getClassLoader());
+						Argument arg = (Argument)argsmap.get(unexps[j].getName());
+						arg.setDefaultValue(configs[i].getName(), val);
+					}
+				}
+			}
 			
 			rinfo.getInputStream().close();
 		}
@@ -384,77 +406,77 @@ public class ComponentXMLReader
 
 	//-------- helper classes --------
 	
-	/**
-	 *  Parse expression text.
-	 */
-	public static class ExpressionProcessor	implements IPostProcessor
-	{
-		// Hack!!! Should be configurable.
-		protected static IExpressionParser	exp_parser	= new JavaCCExpressionParser();
-		
-		/**
-		 *  Parse expression text.
-		 */
-		public Object postProcess(IContext context, Object object)
-		{
-			Object ret = null;
-			
-			ComponentModel cm = (ComponentModel)context.getRootObject();
-			UnparsedExpression exp = (UnparsedExpression)object;
-			
-//			String classname = exp.getClassName();
-//			if(classname!=null)
+//	/**
+//	 *  Parse expression text.
+//	 */
+//	public static class ExpressionProcessor	implements IPostProcessor
+//	{
+//		// Hack!!! Should be configurable.
+//		protected static IExpressionParser	exp_parser	= new JavaCCExpressionParser();
+//		
+//		/**
+//		 *  Parse expression text.
+//		 */
+//		public Object postProcess(IContext context, Object object)
+//		{
+//			Object ret = null;
+//			
+//			ComponentModel cm = (ComponentModel)context.getRootObject();
+//			UnparsedExpression exp = (UnparsedExpression)object;
+//			
+////			String classname = exp.getClassName();
+////			if(classname!=null)
+////			{
+////				try
+////				{
+////					Class clazz = SReflect.findClass(classname, app.getAllImports(), context.getClassLoader());
+////					exp.setClazz(clazz);
+////				}
+////				catch(Exception e)
+////				{
+////					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+////					MultiCollection	report	= (MultiCollection)context.getUserContext();
+////					report.put(se, e.toString());
+////				}
+////			}
+//			
+//			String lang = exp.getLanguage();
+//			String value = exp.getValue(); 
+//			if(value!=null)
 //			{
-//				try
+//				if(lang==null || "java".equals(lang))
 //				{
-//					Class clazz = SReflect.findClass(classname, app.getAllImports(), context.getClassLoader());
-//					exp.setClazz(clazz);
-//				}
-//				catch(Exception e)
+//					try
+//					{
+//						IParsedExpression pexp = exp_parser.parseExpression(value, cm.getAllImports(), null, context.getClassLoader());
+//						ret = pexp.getValue(null);
+////						exp.setParsedValue(pexp);
+//					}
+//					catch(RuntimeException e)
+//					{
+//						Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+//						MultiCollection	report	= (MultiCollection)context.getUserContext();
+//						report.put(se, e.toString());
+//					}
+//				}	
+//				else
 //				{
 //					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
 //					MultiCollection	report	= (MultiCollection)context.getUserContext();
-//					report.put(se, e.toString());
+//					report.put(se, "Unknown expression language: "+lang);
 //				}
 //			}
-			
-			String lang = exp.getLanguage();
-			String value = exp.getValue(); 
-			if(value!=null)
-			{
-				if(lang==null || "java".equals(lang))
-				{
-					try
-					{
-						IParsedExpression pexp = exp_parser.parseExpression(value, cm.getAllImports(), null, context.getClassLoader());
-						ret = pexp.getValue(null);
-//						exp.setParsedValue(pexp);
-					}
-					catch(RuntimeException e)
-					{
-						Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
-						MultiCollection	report	= (MultiCollection)context.getUserContext();
-						report.put(se, e.toString());
-					}
-				}	
-				else
-				{
-					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
-					MultiCollection	report	= (MultiCollection)context.getUserContext();
-					report.put(se, "Unknown expression language: "+lang);
-				}
-			}
-			
-			return ret;
-		}
-		
-		/**
-		 *  Get the pass number.
-		 *  @return The pass number.
-		 */
-		public int getPass()
-		{
-			return 0;
-		}
-	}
+//			
+//			return ret;
+//		}
+//		
+//		/**
+//		 *  Get the pass number.
+//		 *  @return The pass number.
+//		 */
+//		public int getPass()
+//		{
+//			return 0;
+//		}
+//	}
 }
