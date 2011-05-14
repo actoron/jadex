@@ -3,8 +3,6 @@ package jadex.bridge;
 import jadex.commons.SUtil;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -18,10 +16,10 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	protected String name;
 	
 	/** Attribute for slot addresses. */
-	protected List addresses;
+	protected String[]	addresses;
 
-	/** Attribute for slot resolvers. */
-	protected List resolvers;
+//	/** Attribute for slot resolvers. */
+//	protected IComponentIdentifier[]	resolvers;
 
 	//-------- constructors --------
 
@@ -31,7 +29,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	 */
 	public ComponentIdentifier()
 	{
-		this(null, null, null);
+		this(null, null);
 	}
 
 	/**
@@ -40,7 +38,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	 */
 	public ComponentIdentifier(String name)
 	{
-		this(name, null, null);
+		this(name, null);
 	}
 
 	/**
@@ -50,26 +48,27 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	 */
 	public ComponentIdentifier(String name, String[] addresses)
 	{
-		this(name, addresses, null);
-	}
-
-	/**
-	 *  Create a new component identifier.
-	 *  @param name A local or global name.
-	 *  @param addresses A list of transport addresses.
-	 *  @param resolvers A list of resolvers, which may provide additional transport adresses.
-	 */
-	public ComponentIdentifier(String name, String[] addresses, IComponentIdentifier[] resolvers)
-	{
+//		this(name, addresses, null);
 		this.name = name;
+		this.addresses	= addresses;
 
-//		System.out.println("created: "+name);
-		
-		for(int i = 0; addresses != null && i < addresses.length; i++)
-			addAddress(addresses[i]);
-		for(int i = 0; resolvers != null && i < resolvers.length; i++)
-			addResolver(resolvers[i]);
 	}
+
+//	/**
+//	 *  Create a new component identifier.
+//	 *  @param name A local or global name.
+//	 *  @param addresses A list of transport addresses.
+//	 *  @param resolvers A list of resolvers, which may provide additional transport adresses.
+//	 */
+//	public ComponentIdentifier(String name, String[] addresses, IComponentIdentifier[] resolvers)
+//	{
+//		this.name = name;
+//
+////		System.out.println("created: "+name);
+//		
+//		this.addresses	= addresses;
+//		this.resolvers	= resolvers;
+//	}
 
 	//-------- accessor methods --------
 
@@ -96,10 +95,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	 */
 	public String[] getAddresses()
 	{
-		if(addresses!=null)
-			return (String[])addresses.toArray(new String[addresses.size()]);
-		else
-			return new String[0];
+		return addresses;
 	}
 
 	/**
@@ -108,146 +104,127 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	 */
 	public void setAddresses(String[] addresses)
 	{
-		if(this.addresses!=null)
-			this.addresses.clear();
-		else
-			this.addresses = new ArrayList();
-
-		for(int i = 0; i < addresses.length; i++)
-		{
-			if(addresses[i]==null)
-				throw new IllegalArgumentException("Addresses must not null: "+this);
-			this.addresses.add(addresses[i]);
-		}
+		this.addresses	= addresses;
 	}
 
-	/**
-	 *  Get an addresses of this ComponentIdentifier.
-	 *  @param idx The index.
-	 *  @return addresses
-	 */
-	public String getAddress(int idx)
-	{
-		if(addresses!=null)
-			return (String)this.addresses.get(idx);
-		else
-			throw new ArrayIndexOutOfBoundsException(idx);
-	}
+//	/**
+//	 *  Get an addresses of this ComponentIdentifier.
+//	 *  @param idx The index.
+//	 *  @return addresses
+//	 */
+//	public String getAddress(int idx)
+//	{
+//		if(addresses!=null)
+//			return (String)this.addresses.get(idx);
+//		else
+//			throw new ArrayIndexOutOfBoundsException(idx);
+//	}
 
-	/**
-	 *  Set a address to this ComponentIdentifier.
-	 *  @param idx The index.
-	 *  @param address a value to be added
-	 */
-	public void setAddress(int idx, String address)
-	{
-		if(addresses!=null)
-			this.addresses.set(idx, address);
-		else
-			throw new ArrayIndexOutOfBoundsException(idx);
-	}
+//	/**
+//	 *  Set a address to this ComponentIdentifier.
+//	 *  @param idx The index.
+//	 *  @param address a value to be added
+//	 */
+//	public void setAddress(int idx, String address)
+//	{
+//		if(addresses!=null)
+//			this.addresses.set(idx, address);
+//		else
+//			throw new ArrayIndexOutOfBoundsException(idx);
+//	}
 
-	/**
-	 *  Add a address to this ComponentIdentifier.
-	 *  @param address a value to be removed
-	 */
-	public void addAddress(String address)
-	{
-		if(addresses==null)
-			this.addresses = new ArrayList();			
-		this.addresses.add(address);
-	}
+//	/**
+//	 *  Add a address to this ComponentIdentifier.
+//	 *  @param address a value to be removed
+//	 */
+//	public void addAddress(String address)
+//	{
+//		if(addresses==null)
+//			this.addresses = new ArrayList();			
+//		this.addresses.add(address);
+//	}
 
-	/**
-	 *  Remove a address from this ComponentIdentifier.
-	 *  @param address a value to be removed
-	 *  @return  True when the addresses have changed.
-	 */
-	public boolean removeAddress(String address)
-	{
-		if(addresses!=null)
-			return this.addresses.remove(address);
-		else
-			return false;
-	}
+//	/**
+//	 *  Remove a address from this ComponentIdentifier.
+//	 *  @param address a value to be removed
+//	 *  @return  True when the addresses have changed.
+//	 */
+//	public boolean removeAddress(String address)
+//	{
+//		if(addresses!=null)
+//			return this.addresses.remove(address);
+//		else
+//			return false;
+//	}
 
 
-	/**
-	 *  Get the resolvers of this ComponentIdentifier.
-	 * @return resolvers
-	 */
-	public ComponentIdentifier[] getResolvers()
-	{
-		if(resolvers!=null)
-			return (ComponentIdentifier[])resolvers.toArray(new ComponentIdentifier[resolvers.size()]);
-		else
-			return new ComponentIdentifier[0];
-	}
+//	/**
+//	 *  Get the resolvers of this ComponentIdentifier.
+//	 * @return resolvers
+//	 */
+//	public IComponentIdentifier[] getResolvers()
+//	{
+//		return resolvers;
+//	}
 
-	/**
-	 *  Set the resolvers of this ComponentIdentifier.
-	 * @param resolvers the value to be set
-	 */
-	public void setResolvers(ComponentIdentifier[] resolvers)
-	{
-		if(this.resolvers!=null)
-			this.resolvers.clear();
-		else
-			this.resolvers = new ArrayList();
-			
-		for(int i = 0; i < resolvers.length; i++)
-			this.resolvers.add(resolvers[i]);
-	}
+//	/**
+//	 *  Set the resolvers of this ComponentIdentifier.
+//	 * @param resolvers the value to be set
+//	 */
+//	public void setResolvers(IComponentIdentifier[] resolvers)
+//	{
+//		this.resolvers	= resolvers;
+//	}
 
-	/**
-	 *  Get an resolvers of this ComponentIdentifier.
-	 *  @param idx The index.
-	 *  @return resolvers
-	 */
-	public ComponentIdentifier getResolver(int idx)
-	{
-		if(resolvers!=null)
-			return (ComponentIdentifier)this.resolvers.get(idx);
-		else
-			throw new ArrayIndexOutOfBoundsException(idx);
-	}
+//	/**
+//	 *  Get an resolvers of this ComponentIdentifier.
+//	 *  @param idx The index.
+//	 *  @return resolvers
+//	 */
+//	public ComponentIdentifier getResolver(int idx)
+//	{
+//		if(resolvers!=null)
+//			return (ComponentIdentifier)this.resolvers.get(idx);
+//		else
+//			throw new ArrayIndexOutOfBoundsException(idx);
+//	}
 
-	/**
-	 *  Set a resolver to this ComponentIdentifier.
-	 *  @param idx The index.
-	 *  @param resolver a value to be added
-	 */
-	public void setResolver(int idx, ComponentIdentifier resolver)
-	{
-		if(resolvers!=null)
-			this.resolvers.set(idx, resolver);
-		else
-			throw new ArrayIndexOutOfBoundsException(idx);
-	}
+//	/**
+//	 *  Set a resolver to this ComponentIdentifier.
+//	 *  @param idx The index.
+//	 *  @param resolver a value to be added
+//	 */
+//	public void setResolver(int idx, ComponentIdentifier resolver)
+//	{
+//		if(resolvers!=null)
+//			this.resolvers.set(idx, resolver);
+//		else
+//			throw new ArrayIndexOutOfBoundsException(idx);
+//	}
 
-	/**
-	 *  Add a resolver to this ComponentIdentifier.
-	 *  @param resolver a value to be removed
-	 */
-	public void addResolver(IComponentIdentifier resolver)
-	{
-		if(resolvers==null)
-			this.resolvers = new ArrayList();
-		this.resolvers.add(resolver);
-	}
+//	/**
+//	 *  Add a resolver to this ComponentIdentifier.
+//	 *  @param resolver a value to be removed
+//	 */
+//	public void addResolver(IComponentIdentifier resolver)
+//	{
+//		if(resolvers==null)
+//			this.resolvers = new ArrayList();
+//		this.resolvers.add(resolver);
+//	}
 
-	/**
-	 *  Remove a resolver from this ComponentIdentifier.
-	 *  @param resolver a value to be removed
-	 *  @return  True when the resolvers have changed.
-	 */
-	public boolean removeResolver(IComponentIdentifier resolver)
-	{
-		if(resolvers==null)
-			return this.resolvers.remove(resolver);
-		else
-			return false;
-	}
+//	/**
+//	 *  Remove a resolver from this ComponentIdentifier.
+//	 *  @param resolver a value to be removed
+//	 *  @return  True when the resolvers have changed.
+//	 */
+//	public boolean removeResolver(IComponentIdentifier resolver)
+//	{
+//		if(resolvers==null)
+//			return this.resolvers.remove(resolver);
+//		else
+//			return false;
+//	}
 	
 	/**
 	 *  Get the parent identifier.
@@ -262,12 +239,14 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 		{
 			String paname = name.substring(at+1, idx);
 			String pfname = name.substring(idx+1);
-			ret = new ComponentIdentifier(paname+"@"+pfname, getAddresses(), getResolvers());
+//			ret = new ComponentIdentifier(paname+"@"+pfname, getAddresses(), getResolvers());
+			ret = new ComponentIdentifier(paname+"@"+pfname, getAddresses());
 		}
 		else if(at!=-1)
 		{
 			String paname = name.substring(at+1);
-			ret = new ComponentIdentifier(paname, getAddresses(), getResolvers());
+//			ret = new ComponentIdentifier(paname, getAddresses(), getResolvers());
+			ret = new ComponentIdentifier(paname, getAddresses());
 		}
 		// else at root.
 		return ret;
@@ -279,7 +258,8 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	 */
 	public IComponentIdentifier getRoot()
 	{
-		return new ComponentIdentifier(getPlatformName(), getAddresses(), getResolvers());
+//		return new ComponentIdentifier(getPlatformName(), getAddresses(), getResolvers());
+		return new ComponentIdentifier(getPlatformName(), getAddresses());
 	}
 
 	//--------- methods --------
@@ -290,29 +270,29 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	 */
 	public Object clone()
 	{
-		ComponentIdentifier clone = new ComponentIdentifier(getName(), getAddresses(), null);
+		ComponentIdentifier clone = new ComponentIdentifier(getName(), getAddresses());
 
-		// Deep copy of resolvers.
-		ComponentIdentifier[] res = getResolvers();
-		for(int i = 0; i < res.length; i++)
-			clone.addResolver((ComponentIdentifier)res[i].clone());
+//		// Deep copy of resolvers.
+//		ComponentIdentifier[] res = getResolvers();
+//		for(int i = 0; i < res.length; i++)
+//			clone.addResolver((ComponentIdentifier)res[i].clone());
 
 		return clone;
 	}
 
-	/**
-	 * Checks if this adress equals one or more addresses in the identifier
-	 * @param address
-	 * @return true
-	 */
-	public boolean hasAddress(String address)
-	{
-		boolean ret = false;
-		for(int i = 0; !ret && addresses!=null && i < addresses.size(); i++)
-			ret = address.equals(addresses.get(i));
-
-		return ret;
-	}
+//	/**
+//	 * Checks if this adress equals one or more addresses in the identifier
+//	 * @param address
+//	 * @return true
+//	 */
+//	public boolean hasAddress(String address)
+//	{
+//		boolean ret = false;
+//		for(int i = 0; !ret && addresses!=null && i < addresses.size(); i++)
+//			ret = address.equals(addresses.get(i));
+//
+//		return ret;
+//	}
 
 	/**
 	 * @return the local name of a component

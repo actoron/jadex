@@ -72,7 +72,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		setType(type);
 //		setParent(parent);
 		setState(IComponentDescription.STATE_ACTIVE);
-		setProcessingState(IComponentDescription.PROCESSINGSTATE_IDLE);
+//		setProcessingState(IComponentDescription.PROCESSINGSTATE_IDLE);
 		setMaster(master);
 		setDaemon(daemon);
 		setAutoShutdown(autoshutdown);
@@ -99,24 +99,24 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		this.state = state;
 	}
 
-	/**
-	 *  Get the processing state of the component.
-	 *  I.e. ready, running or blocked.
-	 *  @return The processing state.
-	 */
-	public String getProcessingState()
-	{
-		return processingstate;
-	}
-
-	/**
-	 *  Set the processing state of the component.
-	 * @param processingstate the value to be set
-	 */
-	public void setProcessingState(String processingstate)
-	{
-		this.processingstate = processingstate;
-	}
+//	/**
+//	 *  Get the processing state of the component.
+//	 *  I.e. ready, running or blocked.
+//	 *  @return The processing state.
+//	 */
+//	public String getProcessingState()
+//	{
+//		return processingstate;
+//	}
+//
+//	/**
+//	 *  Set the processing state of the component.
+//	 * @param processingstate the value to be set
+//	 */
+//	public void setProcessingState(String processingstate)
+//	{
+//		this.processingstate = processingstate;
+//	}
 	
 	/**
 	 *  Get the componentidentifier of this CESComponentDescription.

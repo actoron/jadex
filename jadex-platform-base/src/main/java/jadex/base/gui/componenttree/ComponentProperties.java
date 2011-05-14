@@ -51,7 +51,7 @@ public class ComponentProperties	extends	PropertiesPanel
 		getTextField("Model name").setText(desc.getModelName());
 		getTextField("Ownership").setText(desc.getOwnership());
 		getTextField("State").setText(desc.getState());
-		getTextField("Processing state").setText(desc.getProcessingState());
+//		getTextField("Processing state").setText(desc.getProcessingState());
 		getCheckBox("Master").setSelected(desc.getMaster()==null? false: desc.getMaster().booleanValue());
 		getCheckBox("Daemon").setSelected(desc.getDaemon()==null? false: desc.getDaemon().booleanValue());
 		getCheckBox("Auto shutdown").setSelected(desc.getAutoShutdown()==null? false: desc.getAutoShutdown().booleanValue());

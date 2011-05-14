@@ -27,11 +27,11 @@ public class AgentCreationAgent extends MicroAgent
 {
 	//-------- attributes --------
 	
-	/** The cms (cached for speed). */
-	protected IFuture	cms;
-	
-	/** The clock service (cached for speed). */
-	protected IFuture	clock;
+//	/** The cms (cached for speed). */
+//	protected IFuture	cms;
+//	
+//	/** The clock service (cached for speed). */
+//	protected IFuture	clock;
 	
 	//-------- methods --------
 	
@@ -47,19 +47,26 @@ public class AgentCreationAgent extends MicroAgent
 		
 		if(args.get("num")==null)
 		{
-			getClock().addResultListener(createResultListener(new DefaultResultListener()
+			waitFor(10000, new IComponentStep()
 			{
-				public void resultAvailable(Object result)
+				public Object execute(IInternalAccess ia)
 				{
-					args.put("num", new Integer(1));
-					Long startmem = new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
-					Long starttime = new Long(((IClockService)result).getTime());
-					args.put("startmem", startmem);
-					args.put("starttime", starttime);
-					
-					step1(args);
+					getClock().addResultListener(createResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object result)
+						{
+							args.put("num", new Integer(1));
+							Long startmem = new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
+							Long starttime = new Long(((IClockService)result).getTime());
+							args.put("startmem", startmem);
+							args.put("starttime", starttime);
+							
+							step1(args);
+						}
+					}));
+					return null;
 				}
-			}));
+			});
 		}
 		else
 		{
@@ -114,7 +121,7 @@ public class AgentCreationAgent extends MicroAgent
 					// Delete prior agents.
 					if(!nested)
 					{
-						deletePeers(max-1, end, dur, pera, omem, upera, max, (IMicroExternalAccess)getExternalAccess(), nested);
+//						deletePeers(max-1, end, dur, pera, omem, upera, max, (IMicroExternalAccess)getExternalAccess(), nested);
 					}
 					
 					// If nested, use initial component to kill others
@@ -276,6 +283,7 @@ public class AgentCreationAgent extends MicroAgent
 	
 	protected IFuture	getCMS()
 	{
+		IFuture cms = null;	// Uncomment for no caching.
 		if(cms==null)
 		{
 			cms	= SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class); // Raw service
@@ -287,6 +295,7 @@ public class AgentCreationAgent extends MicroAgent
 	
 	protected IFuture	getClock()
 	{
+		IFuture clock = null;	// Uncomment for no caching.
 		if(clock==null)
 		{
 			clock	= SServiceProvider.getServiceUpwards(getServiceProvider(), IClockService.class); // Raw service

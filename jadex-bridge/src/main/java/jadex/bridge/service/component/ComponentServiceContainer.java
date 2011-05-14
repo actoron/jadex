@@ -28,8 +28,8 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	/** The component adapter. */
 	protected IComponentAdapter adapter;
 	
-	/** The external access. */
-	protected IExternalAccess exta;
+//	/** The external access. */
+//	protected IExternalAccess exta;
 	
 	/** The cms. */
 	protected IComponentManagementService cms;
@@ -113,31 +113,31 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		return ret;
 	}
 	
-	/**
-	 *  Get the external access.
-	 */
-	public IFuture getExternalAccess()
-	{
-		final Future ret = new Future();
-		if(exta==null)
-		{
-			cms.getExternalAccess(adapter.getComponentIdentifier())
-				.addResultListener(new DelegationResultListener(ret)
-			{
-				public void customResultAvailable(Object result)
-				{
-	//				System.out.println("exta: "+result);
-					exta = (IExternalAccess)result;
-					ret.setResult(exta);
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(exta);
-		}
-		return ret;
-	}
+//	/**
+//	 *  Get the external access.
+//	 */
+//	public IFuture getExternalAccess()
+//	{
+//		final Future ret = new Future();
+//		if(exta==null)
+//		{
+//			cms.getExternalAccess(adapter.getComponentIdentifier())
+//				.addResultListener(new DelegationResultListener(ret)
+//			{
+//				public void customResultAvailable(Object result)
+//				{
+//	//				System.out.println("exta: "+result);
+//					exta = (IExternalAccess)result;
+//					ret.setResult(exta);
+//				}
+//			});
+//		}
+//		else
+//		{
+//			ret.setResult(exta);
+//		}
+//		return ret;
+//	}
 	
 	/**
 	 *  Create a service fetcher.

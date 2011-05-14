@@ -63,9 +63,6 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	/** The results. */
 	protected Map results;
 	
-	/** The parent. */
-	protected IExternalAccess parent;
-	
 	/** The scheduled steps of the agent. */
 	protected List steps;
 	
@@ -90,9 +87,6 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	/** The service fetcher. */
 	protected IValueFetcher fetcher;
 	
-	/** The imports. */
-	protected String[] imports;
-	
 	//-------- constructors --------
 	
 	/**
@@ -107,14 +101,13 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		this.model = model;
 		this.config = config!=null? config: getModel().getConfigurationNames().length>0? getModel().getConfigurationNames()[0]: null;
 		this.arguments = args;
-		this.parent = parent;
 		this.bindings = bindings;
 		
 		try
 		{
 			this.microagent = (MicroAgent)microclass.newInstance();
-			this.microagent.init(MicroAgentInterpreter.this);
 			this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
+			this.microagent.init(MicroAgentInterpreter.this);
 			addStep((new Object[]{new IComponentStep()
 			{
 				public Object execute(IInternalAccess ia)
@@ -544,7 +537,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 */
 	public IExternalAccess getParent()
 	{
-		return parent;
+		return adapter.getParent();
 	}
 	
 	/**

@@ -1,8 +1,9 @@
 package jadex.examples.shop;
 
 import jadex.bdi.examples.shop.ItemInfo;
-import jadex.bridge.Argument;
-import jadex.bridge.IArgument;
+import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.IArgument;
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
@@ -21,9 +22,10 @@ public class ShopAgent extends MicroAgent
 	/**
 	 *  Called once after agent creation.
 	 */
-	public void agentCreated()
+	public IFuture	agentCreated()
 	{
 		addService(new ShopService(getExternalAccess(), (String)getArgument("name")));
+		return IFuture.DONE;
 	}
 	
 	/**

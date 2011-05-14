@@ -1702,7 +1702,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	{
 		if(local)
 			name = name + "@" + ((IComponentIdentifier)exta.getServiceProvider().getId()).getPlatformName(); // Hack?!
-		return new ComponentIdentifier(name, addresses, null);		
+		return new ComponentIdentifier(name, addresses);		
 	}
 	
 	/**
@@ -1899,7 +1899,7 @@ public abstract class ComponentManagementService extends BasicService implements
 //						&& (adesc.getName().getParent()==null || adesc.getName().getParent().equals(test.getParent()))
 						&& (adesc.getType()==null || adesc.getType().equals(test.getType()))
 						&& (adesc.getState()==null || adesc.getState().equals(test.getState()))
-						&& (adesc.getProcessingState()==null || adesc.getProcessingState().equals(test.getProcessingState()))
+//						&& (adesc.getProcessingState()==null || adesc.getProcessingState().equals(test.getProcessingState()))
 						&& (adesc.getModelName()==null || adesc.getModelName().equals(test.getModelName())))					
 					{
 						ret.add(test);

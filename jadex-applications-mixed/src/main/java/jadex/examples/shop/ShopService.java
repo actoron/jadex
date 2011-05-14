@@ -1,18 +1,18 @@
 package jadex.examples.shop;
 
-import jadex.bdi.examples.shop.IShop;
+import jadex.bdi.examples.shop.IShopService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.IResultCommand;
-import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.service.BasicService;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.BasicService;
+import jadex.commons.future.IFuture;
 import jadex.micro.IMicroExternalAccess;
+
 
 /**
  *  The shop for buying goods at the shop.
  */
-public class ShopService extends BasicService implements IShop 
+public class ShopService extends BasicService implements IShopService
 {
 	//-------- attributes --------
 	
@@ -30,7 +30,7 @@ public class ShopService extends BasicService implements IShop
 	 */
 	public ShopService(IExternalAccess comp, String name)
 	{
-		super(comp.getServiceProvider().getId(), IShop.class, null);
+		super(comp.getServiceProvider().getId(), IShopService.class, null);
 
 //		System.out.println("created: "+name);
 		this.comp = (IMicroExternalAccess)comp;
@@ -54,25 +54,14 @@ public class ShopService extends BasicService implements IShop
 	 */
 	public IFuture buyItem(final String item, final double price)
 	{
-		final Future ret = new Future();
-		
-		if(!isValid())
+		return comp.scheduleStep(new IComponentStep()
 		{
-			ret.setException(new RuntimeException("Service unavailable."));
-		}
-		else
-		{
-			comp.scheduleResultStep(new IResultCommand()
+			public Object execute(IInternalAccess ia)
 			{
-				public Object execute(Object args)
-				{
-					ShopAgent agent = (ShopAgent)args;
-					return agent.buyItem(item, price);
-				}
-			}).addResultListener(new DelegationResultListener(ret));
-		}
-		
-		return ret;
+				ShopAgent agent = (ShopAgent)ia;
+				return agent.buyItem(item, price);
+			}
+		});
 	}
 	
 	/**
@@ -81,25 +70,14 @@ public class ShopService extends BasicService implements IShop
 	 */	
 	public IFuture getCatalog()
 	{
-		final Future ret = new Future();
-		
-		if(!isValid())
+		return comp.scheduleStep(new IComponentStep()
 		{
-			ret.setException(new RuntimeException("Service unavailable."));
-		}
-		else
-		{
-			comp.scheduleResultStep(new IResultCommand()
+			public Object execute(IInternalAccess ia)
 			{
-				public Object execute(Object args)
-				{
-					ShopAgent agent = (ShopAgent)args;
-					return agent.getCatalog();
-				}
-			}).addResultListener(new DelegationResultListener(ret));
-		}
-		
-		return ret;
+				ShopAgent agent = (ShopAgent)ia;
+				return agent.getCatalog();
+			}
+		});
 	}
 
 	/**

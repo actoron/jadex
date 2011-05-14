@@ -47,9 +47,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	//-------- attributes --------
 
 	/** The component identifier. */
-	protected IComponentIdentifier cid;
-
-	/** The component identifier. */
 	protected IExternalAccess parent;
 
 	/** The component instance. */
@@ -120,7 +117,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	public AbstractComponentAdapter(IComponentDescription desc, IModelInfo model, IComponentInstance component, IExternalAccess parent)
 	{
 		this.desc = desc;
-		this.cid	= desc.getName();
 		this.model = model;
 		this.component = component;
 		this.parent	= parent;
@@ -162,7 +158,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		{
 			wokenup	= true;
 			if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
-				throw new ComponentTerminatedException(cid);
+				throw new ComponentTerminatedException(desc.getName());
 			
 			// Set processing state to ready if not running.
 //			if(IComponentDescription.PROCESSINGSTATE_IDLE.equals(desc.getProcessingState()))
@@ -205,7 +201,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public IComponentIdentifier getComponentIdentifier()
 	{
-		return cid;
+		return desc.getName();
 	}
 	
 	/**
@@ -444,7 +440,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public String toString()
 	{
-		return "StandaloneComponentAdapter("+cid.getName()+")";
+		return "StandaloneComponentAdapter("+desc.getName().getName()+")";
 	}
 
 	
@@ -505,7 +501,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //		System.out.println("killComponent: "+listener);
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 		{
-			ret.setException(new ComponentTerminatedException(cid));
+			ret.setException(new ComponentTerminatedException(desc.getName()));
 		}
 		else
 		{
@@ -526,7 +522,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 									shutdownContainer().addResultListener(new DelegationResultListener(ret));
 									
 //									System.out.println("Checking ext entries after cleanup: "+cid);
-									assert ext_entries==null || ext_entries.isEmpty() : "Ext entries after cleanup: "+cid+", "+ext_entries;
+									assert ext_entries==null || ext_entries.isEmpty() : "Ext entries after cleanup: "+desc.getName()+", "+ext_entries;
 								}
 							});
 							
@@ -592,7 +588,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	public void	receiveMessage(Map message, MessageType type)
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || exception!=null)
-			throw new ComponentTerminatedException(cid);
+			throw new ComponentTerminatedException(desc.getName());
 
 		// Add optional receival time.
 //		String rd = type.getReceiveDateIdentifier();
@@ -735,7 +731,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 					{
 						public void resultAvailable(Object result)
 						{
-							((IComponentManagementService)result).suspendComponent(cid);
+							((IComponentManagementService)result).suspendComponent(desc.getName());
 						}
 					});
 				}
@@ -771,7 +767,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 						{
 							public void resultAvailable(Object result)
 							{
-								((IComponentManagementService)result).suspendComponent(cid);
+								((IComponentManagementService)result).suspendComponent(desc.getName());
 							}
 						});
 					}
@@ -827,7 +823,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			{
 				IComponentManagementService	cms	= (IComponentManagementService)result;
 //				cms.setComponentException(cid, e);
-				cms.destroyComponent(cid);
+				cms.destroyComponent(desc.getName());
 			}
 		});
 	}
@@ -863,14 +859,14 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	public void invokeLater(Runnable action)
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || exception!=null)
-			throw new ComponentTerminatedException(cid);
+			throw new ComponentTerminatedException(desc.getName());
 
 		synchronized(this)
 		{
 //			System.out.println("Adding to ext entries: "+cid);
 			if(ext_forbidden)
 			{
-				throw new ComponentTerminatedException(cid)
+				throw new ComponentTerminatedException(desc.getName())
 				{
 					public void printStackTrace()
 					{
@@ -908,7 +904,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	{
 		Future ret = new Future();
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || exception!=null)
-			ret.setException(new ComponentTerminatedException(cid));
+			ret.setException(new ComponentTerminatedException(desc.getName()));
 		else if(dostep)
 			ret.setException(new RuntimeException("Only one step allowed at a time."));
 			

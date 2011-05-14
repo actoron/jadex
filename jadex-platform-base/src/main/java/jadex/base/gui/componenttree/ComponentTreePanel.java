@@ -549,28 +549,27 @@ public class ComponentTreePanel extends JSplitPane
 			{
 				Icon	ret	= null;
 				
-				// todo: interface or base class for real ac-nodes?
-				IComponentDescription	desc = null;
-				if(node instanceof IActiveComponentTreeNode)
-				{
-					desc = ((IActiveComponentTreeNode)node).getDescription();
-				
-					if(IComponentDescription.PROCESSINGSTATE_READY.equals(desc.getProcessingState()))
-					{
-						ret = icons.getIcon("overlay_ready");
-					}
-					else if(IComponentDescription.PROCESSINGSTATE_RUNNING.equals(desc.getProcessingState()))
-					{
-						ret = icons.getIcon("overlay_running");
-					}
-					else if(IComponentDescription.PROCESSINGSTATE_IDLE.equals(desc.getProcessingState()))
-					{
-						if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
-						{
-							ret = icons.getIcon("component_suspended");
-						}
-					}					
-				}
+//				IComponentDescription	desc = null;
+//				if(node instanceof IActiveComponentTreeNode)
+//				{
+//					desc = ((IActiveComponentTreeNode)node).getDescription();
+//				
+//					if(IComponentDescription.PROCESSINGSTATE_READY.equals(desc.getProcessingState()))
+//					{
+//						ret = icons.getIcon("overlay_ready");
+//					}
+//					else if(IComponentDescription.PROCESSINGSTATE_RUNNING.equals(desc.getProcessingState()))
+//					{
+//						ret = icons.getIcon("overlay_running");
+//					}
+//					else if(IComponentDescription.PROCESSINGSTATE_IDLE.equals(desc.getProcessingState()))
+//					{
+//						if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+//						{
+//							ret = icons.getIcon("component_suspended");
+//						}
+//					}					
+//				}
 				return ret;
 			}
 			

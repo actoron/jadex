@@ -70,12 +70,12 @@ public interface IComponentDescription
 	 */
 	public String getState();
 
-	/**
-	 *  Get the processing state of the component.
-	 *  I.e. ready, running or blocked.
-	 *  @return The processing state.
-	 */
-	public String getProcessingState();
+//	/**
+//	 *  Get the processing state of the component.
+//	 *  I.e. ready, running or blocked.
+//	 *  @return The processing state.
+//	 */
+//	public String getProcessingState();
 
 	//-------- internal properties not used for search --------
 	
