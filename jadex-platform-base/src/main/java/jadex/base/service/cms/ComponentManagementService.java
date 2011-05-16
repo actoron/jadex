@@ -541,6 +541,10 @@ public abstract class ComponentManagementService extends BasicService implements
 		{
 			nofac = true;
 		}
+		else if(factories.size()==0)
+		{
+			factories = null;
+		}
 		
 		if(nofac)
 		{
@@ -550,8 +554,6 @@ public abstract class ComponentManagementService extends BasicService implements
 				public void customResultAvailable(Object result)
 				{
 					factories = (Collection)result;
-					if(factories.size()==0)
-						factories = null;
 					getComponentFactory(model, cinfo, cl).addResultListener(new DelegationResultListener(ret));
 				}
 			});
@@ -559,7 +561,8 @@ public abstract class ComponentManagementService extends BasicService implements
 		else
 		{
 //			System.out.println("create start2: "+model+" "+cinfo.getParent());
-			selectComponentFactory((IComponentFactory[])factories.toArray(new IComponentFactory[factories.size()]), model, cinfo, cl, 0)
+						
+			selectComponentFactory(factories==null? null: (IComponentFactory[])factories.toArray(new IComponentFactory[factories.size()]), model, cinfo, cl, 0)
 				.addResultListener(new DelegationResultListener(ret)
 			{
 //				public void customResultAvailable(Object result)
