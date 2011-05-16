@@ -200,6 +200,8 @@ public class Starter
 			final IComponentFactory cfac = (IComponentFactory)cfclass.getConstructor(new Class[]{String.class})
 				.newInstance(new Object[]{"rootid"});
 			
+			compargs.put(COMPONENT_FACTORY, cfac);
+			
 			cfac.loadModel(configfile, null, cl).addResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result) 

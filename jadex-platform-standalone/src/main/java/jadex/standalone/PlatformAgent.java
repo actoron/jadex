@@ -11,6 +11,7 @@ import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.execution.IExecutionService;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -85,11 +86,11 @@ import jadex.micro.annotation.RequiredServices;
 	@ProvidedService(type=ILibraryService.class, implementation=@Implementation(expression="new LibraryService($args.libpath, $component.getServiceProvider(), SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_EXCLUDED}, new Object[]{new String[]{\"getClassLoader\"}}))", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IClockService.class, implementation=@Implementation(expression="$args.simulation? new ClockService(new ClockCreationInfo(IClock.TYPE_EVENT_DRIVEN, \"simulation_clock\", System.currentTimeMillis(), 100), $component.getServiceProvider(), SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{new String[]{\"getState\", \"getTime\", \"getTick\", \"getStarttime\", \"getDelta\", \"getDilation\", \"getNextTimer\", \"getTimers\", \"getClockType\", \"advanceEvent\"}})): new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, \"simulation_clock\", System.currentTimeMillis(), 100), $component.getServiceProvider(), SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{new String[]{\"getState\", \"getTime\", \"getTick\", \"getStarttime\", \"getDelta\", \"getDilation\", \"getNextTimer\", \"getTimers\", \"getClockType\", \"advanceEvent\"}}))", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IMessageService.class, implementation=@Implementation(expression="new MessageService($component.getExternalAccess(), new ITransport[]{new LocalTransport($component.getServiceProvider()), new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger())}, new MessageType[]{new FIPAMessageType()}, null, new CodecFactory())", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=IComponentManagementService.class, implementation=@Implementation(expression="new ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter())", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IComponentManagementService.class, implementation=@Implementation(expression="new ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter(), $args.componentfactory)", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IDF.class, implementation=@Implementation(expression="new DirectoryFacilitatorService($component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=ISimulationService.class, implementation=@Implementation(expression="new SimulationService($component, SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{new String[]{\"getMode\", \"isExecuting\"}}))")),
 //	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new ComponentComponentFactory($component.getServiceProvider())", direct=true)),
-	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new MicroAgentFactory($component.getServiceProvider(), null)")),
+//	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new MicroAgentFactory($component.getServiceProvider(), null)")),
 	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(expression="new DeploymentService($component.getServiceProvider())"))
 })
 
@@ -98,18 +99,18 @@ import jadex.micro.annotation.RequiredServices;
 })
 
 @Configurations({
-	@Configuration(name="mmicro_kernel auto (rms, awa, jcc)", arguments={
-			@NameValue(name="tcpport", value="0"),
-			@NameValue(name="niotcpport", value="0"),
-			@NameValue(name="platformname", value="null")
-		}, components={
-			@Component(name="kernel_multi", type="kernel_multi", daemon=true),
-			@Component(name="rms", type="rms", daemon=true),
-			@Component(name="awa", type="awa", daemon=true, 
-					arguments={@NameValue(name="includes", value="$args.awaincludes"),
-						@NameValue(name="excludes", value="$args.awaexcludes")}),
-			@Component(name="jcc", type="jcc", daemon=true)
-		}),
+	@Configuration(name="micro_kernel multi auto (rms, awa, jcc)", arguments={
+		@NameValue(name="tcpport", value="0"),
+		@NameValue(name="niotcpport", value="0"),
+		@NameValue(name="platformname", value="null")
+	}, components={
+		@Component(name="kernel_multi", type="kernel_multi", daemon=true),
+		@Component(name="rms", type="rms", daemon=true),
+		@Component(name="awa", type="awa", daemon=true, 
+			arguments={@NameValue(name="includes", value="$args.awaincludes"),
+				@NameValue(name="excludes", value="$args.awaexcludes")}),
+		@Component(name="jcc", type="jcc", daemon=true)
+	}),
 	@Configuration(name="micro_kernel auto (rms, awa, jcc)", arguments={
 		@NameValue(name="tcpport", value="0"),
 		@NameValue(name="niotcpport", value="0"),
@@ -140,4 +141,13 @@ import jadex.micro.annotation.RequiredServices;
 })
 public class PlatformAgent extends MicroAgent
 {
+	
+	/**
+	 * 
+	 */
+	public IFuture agentCreated()
+	{
+		
+		return super.agentCreated();
+	}
 }

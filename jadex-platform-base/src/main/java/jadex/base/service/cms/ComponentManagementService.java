@@ -105,6 +105,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	/** The cached factories. */
 	protected Collection factories;
 	
+	/** The bootstrap component factory. */
+	protected IComponentFactory componentfactory;
+	
     //-------- constructors --------
 
 	 /**
@@ -122,9 +125,21 @@ public abstract class ComponentManagementService extends BasicService implements
      */
     public ComponentManagementService(IExternalAccess exta, IComponentAdapter root)
 	{
+    	this(exta, root, null);
+    }
+    
+    /**
+     *  Create a new component execution service.
+     *  @param exta	The service provider.
+     */
+    public ComponentManagementService(IExternalAccess exta, IComponentAdapter root, IComponentFactory componentfactory)
+	{
 		super(exta.getServiceProvider().getId(), IComponentManagementService.class, null);
 
 		this.exta = exta;
+		this.root = root;
+		this.componentfactory = componentfactory;
+		
 		this.adapters = Collections.synchronizedMap(SCollection.createHashMap());
 		this.ccs = SCollection.createLinkedHashMap();
 		this.cfs = SCollection.createLinkedHashMap();
@@ -135,8 +150,6 @@ public abstract class ComponentManagementService extends BasicService implements
 //		this.initfutures = Collections.synchronizedMap(SCollection.createHashMap());
 		this.initinfos = Collections.synchronizedMap(SCollection.createHashMap());
 		this.childcounts = SCollection.createHashMap();
-		
-		this.root = root;
     }
     
 	/**
@@ -524,12 +537,9 @@ public abstract class ComponentManagementService extends BasicService implements
 		final Future ret = new Future();
 		
 		boolean nofac = false;
-		synchronized(this)
+		if(factories==null)
 		{
-			if(factories==null)
-			{
-				nofac = true;
-			}
+			nofac = true;
 		}
 		
 		if(nofac)
@@ -540,6 +550,8 @@ public abstract class ComponentManagementService extends BasicService implements
 				public void customResultAvailable(Object result)
 				{
 					factories = (Collection)result;
+					if(factories.size()==0)
+						factories = null;
 					getComponentFactory(model, cinfo, cl).addResultListener(new DelegationResultListener(ret));
 				}
 			});
@@ -590,7 +602,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	{
 		final Future ret = new Future();
 		
-		if(factories!=null)
+		if(factories!=null && factories.length>0)
 		{
 			factories[idx].isLoadable(model, cinfo.getImports(), cl)
 				.addResultListener(new DelegationResultListener(ret)
@@ -608,10 +620,47 @@ public abstract class ComponentManagementService extends BasicService implements
 					}
 					else
 					{
-						ret.setException(new RuntimeException("No factory found for: "+model));
+						selectFallbackFactory(model, cinfo, cl).addResultListener(new DelegationResultListener(ret));
 					}
 				}		
 			});
+		}
+		else
+		{
+			selectFallbackFactory(model, cinfo, cl).addResultListener(new DelegationResultListener(ret));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture selectFallbackFactory(final String model, final CreationInfo cinfo, final ClassLoader cl)
+	{
+		final Future ret = new Future();
+		
+		if(componentfactory!=null)
+		{
+			componentfactory.isLoadable(model, cinfo.getImports(), cl)
+				.addResultListener(new DelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+					if(((Boolean)result).booleanValue())
+					{
+						ret.setResult(componentfactory);
+					}
+					else
+					{
+						ret.setException(new RuntimeException("No factory found for: "+model));
+					}
+				}
+			});
+		}
+		else
+		{
+			ret.setException(new RuntimeException("No factory found for: "+model));
 		}
 		
 		return ret;
