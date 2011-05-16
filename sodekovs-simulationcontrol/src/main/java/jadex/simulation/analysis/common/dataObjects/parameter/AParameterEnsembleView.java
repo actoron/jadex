@@ -2,7 +2,7 @@ package jadex.simulation.analysis.common.dataObjects.parameter;
 
 import jadex.simulation.analysis.common.dataObjects.ADataObjectView;
 import jadex.simulation.analysis.common.dataObjects.IADataView;
-import jadex.simulation.analysis.common.dataObjects.Factories.ADataViewFactory;
+import jadex.simulation.analysis.common.dataObjects.factories.ADataViewFactory;
 import jadex.simulation.analysis.common.events.data.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 

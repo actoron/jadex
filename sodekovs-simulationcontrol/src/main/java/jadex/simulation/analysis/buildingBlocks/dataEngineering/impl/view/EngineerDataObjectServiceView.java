@@ -1,18 +1,17 @@
-package jadex.simulation.analysis.buildingBlocks.analysisProcess.lowLevelAnalysis.impl.view;
+package jadex.simulation.analysis.buildingBlocks.dataEngineering.impl.view;
 
-import jadex.base.gui.componenttree.ServiceProperties;
 import jadex.commons.future.ThreadSuspendable;
-import jadex.simulation.analysis.buildingBlocks.analysisProcess.lowLevelAnalysis.ILowLevelAnalysisService;
-import jadex.simulation.analysis.buildingBlocks.analysisProcess.lowLevelAnalysis.impl.LowLevelAnalysisService;
+import jadex.simulation.analysis.buildingBlocks.dataEngineering.IEngineerDataObjectService;
+import jadex.simulation.analysis.buildingBlocks.dataEngineering.impl.EngineerDataObjectService;
+import jadex.simulation.analysis.buildingBlocks.generalAnalysis.IGeneralAnalysisService;
+import jadex.simulation.analysis.buildingBlocks.generalAnalysis.impl.BasicGeneralAnalysisService;
 import jadex.simulation.analysis.common.dataObjects.IAExperiment;
 import jadex.simulation.analysis.common.dataObjects.IAModel;
 import jadex.simulation.analysis.common.dataObjects.factories.ADataViewFactory;
 import jadex.simulation.analysis.common.dataObjects.factories.AExperimentFactory;
 import jadex.simulation.analysis.common.dataObjects.parameter.ABasicParameter;
 import jadex.simulation.analysis.common.dataObjects.parameter.AParameterEnsemble;
-import jadex.simulation.analysis.common.dataObjects.parameter.ASeriesParameter;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
-import jadex.simulation.analysis.common.events.service.AServiceEvent;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -37,52 +36,38 @@ import javax.swing.border.TitledBorder;
 /**
  * The view for the explore service
  */
-public class LowLevelAnalysisServiceView extends JTabbedPane // implements IGeneralAnalysisServiceView
+public class EngineerDataObjectServiceView extends JPanel // implements IGeneralAnalysisServiceView
 {
 	// -------- attributes --------
-	protected LowLevelAnalysisService exploreService;
+	protected EngineerDataObjectService service;
 
+	private JPanel modelcomp;
+	private JPanel freePanel;
+	private JPanel expcomp;
+	private JPanel present;
+
+	private Set<JComponent> paraSet = new HashSet<JComponent>();
 	private ThreadSuspendable susThread = new ThreadSuspendable(this);
 
 	// -------- methods --------
 
-	public LowLevelAnalysisServiceView(ILowLevelAnalysisService service)
+	public EngineerDataObjectServiceView(IEngineerDataObjectService service)
 	{
 		super();
-		exploreService = (LowLevelAnalysisService) service;
-		exploreService.registerView(this);
+		this.service =  (EngineerDataObjectService) service;
 	}
+
 
 	public void init()
 	{
-		// TODO: Use Interface
-		
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
+				modelcomp = new JPanel(new GridBagLayout());
 
-				ServiceProperties serProp = new ServiceProperties();
-				serProp.setService(exploreService);
-//				serProp.remove(serProp.getComponentCount()-1);
-				
-				addTab("General", null, serProp);
-				setSelectedComponent(serProp);
-				
-				JButton button = new JButton("test");
-				button.addActionListener(new ActionListener()
-				{
-					
-					@Override
-					public void actionPerformed(ActionEvent e)
-					{
-						exploreService.serviceChanged(new AServiceEvent());
-					
-					}
-				});
-				addTab("Button", null, button);
-				validate();
-				updateUI();
+				modelcomp.validate();
+				modelcomp.updateUI();
 			}
 		});
 	}

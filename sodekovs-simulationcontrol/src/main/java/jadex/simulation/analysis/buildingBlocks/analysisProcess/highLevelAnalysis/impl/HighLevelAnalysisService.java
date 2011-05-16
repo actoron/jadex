@@ -10,6 +10,7 @@ import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.simulation.analysis.buildingBlocks.analysisProcess.highLevelAnalysis.IHighLevelAnalysisService;
 import jadex.simulation.analysis.buildingBlocks.analysisProcess.lowLevelAnalysis.impl.view.LowLevelAnalysisServiceView;
 import jadex.simulation.analysis.buildingBlocks.simulation.IModelInspectionService;
 import jadex.simulation.analysis.common.dataObjects.AModel;
@@ -31,7 +32,7 @@ import java.util.Set;
 
 import javax.swing.JComponent;
 
-public class HighLevelAnalysisService extends ABasicAnalysisService implements IAnalysisService
+public class HighLevelAnalysisService extends ABasicAnalysisService implements IHighLevelAnalysisService
 {
 
 	private IAModel model = null;
@@ -45,7 +46,7 @@ public class HighLevelAnalysisService extends ABasicAnalysisService implements I
 	public HighLevelAnalysisService(BpmnInterpreter instance)
 	{
 		// TODO: Hack??? No Interpreter?
-		super(instance.getExternalAccess());
+		super(instance.getExternalAccess(), IHighLevelAnalysisService.class);
 		this.instance = instance;
 		Map prop = getPropertyMap();
 		prop.put(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, "jadex.simulation.analysis.common.services.defaultView.DefaultServiceViewerPanel");

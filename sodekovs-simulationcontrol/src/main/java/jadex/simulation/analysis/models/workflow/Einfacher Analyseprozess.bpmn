@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_0Zg1oHcqEeCTO-YCjWTwNQ" iD="_0ZdyUXcqEeCTO-YCjWTwNQ">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ZkddwHc1EeCTO-YCjWTwNQ" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZkddwXc1EeCTO-YCjWTwNQ" key="editor_version" value="1.0"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_0bSXQXcqEeCTO-YCjWTwNQ" iD="_0bSXQHcqEeCTO-YCjWTwNQ" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_0creYXcqEeCTO-YCjWTwNQ" iD="_0creYHcqEeCTO-YCjWTwNQ" outgoingEdges="_m1m50XcsEeCTO-YCjWTwNQ" incomingEdges="_nfVMQXcsEeCTO-YCjWTwNQ" name="Experiment simulieren" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_6cIfYHcqEeCTO-YCjWTwNQ" iD="_6cH4UHcqEeCTO-YCjWTwNQ" outgoingEdges="_1CQJQXctEeCTO-YCjWTwNQ" incomingEdges="_m1m50XcsEeCTO-YCjWTwNQ" name="Konfidenzintervall bestimmen"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_c4r9sXcsEeCTO-YCjWTwNQ" iD="_c4r9sHcsEeCTO-YCjWTwNQ" outgoingEdges="_nfVMQXcsEeCTO-YCjWTwNQ" incomingEdges="_xZ7XsXctEeCTO-YCjWTwNQ" name="Experimente verteilen">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_CBa0wHc2EeCTO-YCjWTwNQ" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GFB0IHc2EeCTO-YCjWTwNQ" key="dimension" value="2:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GFB0IXc2EeCTO-YCjWTwNQ" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GFB0Inc2EeCTO-YCjWTwNQ" key="0:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GFB0I3c2EeCTO-YCjWTwNQ" key="0:1" value="experiment"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GFB0JHc2EeCTO-YCjWTwNQ" key="0:2" value="IAExperiment"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GFB0JXc2EeCTO-YCjWTwNQ" key="0:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GFB0Jnc2EeCTO-YCjWTwNQ" key="1:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GFB0J3c2EeCTO-YCjWTwNQ" key="1:1" value="name"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GFB0KHc2EeCTO-YCjWTwNQ" key="1:2" value="IAModel"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GFB0KXc2EeCTO-YCjWTwNQ" key="1:3" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_HsuKsHc2EeCTO-YCjWTwNQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HsuKsXc2EeCTO-YCjWTwNQ" key="class" value="TODO"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_rvdksXcsEeCTO-YCjWTwNQ" iD="_rvdksHcsEeCTO-YCjWTwNQ" incomingEdges="_Zne2MXctEeCTO-YCjWTwNQ" activityType="EventEndEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_Frx8wHctEeCTO-YCjWTwNQ" iD="_FrxVsHctEeCTO-YCjWTwNQ" outgoingEdges="_xZ7XsXctEeCTO-YCjWTwNQ" incomingEdges="_il0qMXctEeCTO-YCjWTwNQ _qKq7sXctEeCTO-YCjWTwNQ" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_WuKfsXctEeCTO-YCjWTwNQ" iD="_WuKfsHctEeCTO-YCjWTwNQ" outgoingEdges="_Zne2MXctEeCTO-YCjWTwNQ _il0qMXctEeCTO-YCjWTwNQ" incomingEdges="_1CQJQXctEeCTO-YCjWTwNQ" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_atNvMXctEeCTO-YCjWTwNQ" iD="_atNvMHctEeCTO-YCjWTwNQ" outgoingEdges="_qKq7sXctEeCTO-YCjWTwNQ" activityType="EventStartEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_m1m50XcsEeCTO-YCjWTwNQ" iD="_m1m50HcsEeCTO-YCjWTwNQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_nfVMQXcsEeCTO-YCjWTwNQ" iD="_nfVMQHcsEeCTO-YCjWTwNQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Zne2MXctEeCTO-YCjWTwNQ" iD="_Zne2MHctEeCTO-YCjWTwNQ" name="terminieren">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_grkDUHc1EeCTO-YCjWTwNQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_grkDUXc1EeCTO-YCjWTwNQ" key="condition" value="terminieren==true"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_il0qMXctEeCTO-YCjWTwNQ" iD="_il0qMHctEeCTO-YCjWTwNQ" name="weitere Experimente">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ad5AIHc1EeCTO-YCjWTwNQ" source="sequence_mappings_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_b-cM4Hc1EeCTO-YCjWTwNQ" key="dimension" value="1:2"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_b-cM4Xc1EeCTO-YCjWTwNQ" key="uniqueColumnIndex" value="0"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_b-cM4nc1EeCTO-YCjWTwNQ" key="0:0" value="experiment"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_b-cM43c1EeCTO-YCjWTwNQ" key="0:1" value="experiment"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_fPBz4Hc1EeCTO-YCjWTwNQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fPBz4Xc1EeCTO-YCjWTwNQ" key="condition" value="terminieren==false"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_qKq7sXctEeCTO-YCjWTwNQ" iD="_qKq7sHctEeCTO-YCjWTwNQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_xZ7XsXctEeCTO-YCjWTwNQ" iD="_xZ7XsHctEeCTO-YCjWTwNQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_1CQJQXctEeCTO-YCjWTwNQ" iD="_1CQJQHctEeCTO-YCjWTwNQ"/>
+  </pools>
+</bpmn:BpmnDiagram>

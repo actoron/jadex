@@ -7,6 +7,7 @@ import jadex.commons.future.IFuture;
 import jadex.bridge.service.BasicService;
 import jadex.simulation.analysis.buildingBlocks.simulation.IExecuteExperimentService;
 import jadex.simulation.analysis.common.dataObjects.IAExperiment;
+import jadex.simulation.analysis.common.services.ABasicAnalysisService;
 import jadex.simulation.analysis.models.desmoJ.VancarrierModel.VancarrierModel;
 
 import java.util.HashSet;
@@ -22,7 +23,7 @@ import desmoj.core.simulator.SimTime;
 /**
  * Implementation of a DesmoJ service for (single) experiments.
  */
-public class DesmoJExperimentService extends BasicService implements IExecuteExperimentService {
+public class DesmoJExperimentService extends ABasicAnalysisService implements IExecuteExperimentService {
 
 	JTextArea comp = new JTextArea();
 	
@@ -33,7 +34,7 @@ public class DesmoJExperimentService extends BasicService implements IExecuteExp
 	 *            The active generalComp.
 	 */
 	public DesmoJExperimentService(ICapability cap) {
-		super(cap.getServiceContainer().getId(), IExecuteExperimentService.class, null);
+		super(cap.getExternalAccess(), IExecuteExperimentService.class);
 //		Map prop = getPropertyMap();
 //		prop.put(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, "jadex.simulation.analysis.buildingBlocks.execution.ExecutionServiceView");
 //		setPropertyMap(prop);
@@ -74,7 +75,7 @@ public class DesmoJExperimentService extends BasicService implements IExecuteExp
 	}
 
 	@Override
-	public Set<String> supportedModels() {
+	public Set<String> getSupportedModes() {
 		Set<String> result = new HashSet<String>();
 		result.add("desmoJ");
 		return result;

@@ -5,8 +5,8 @@ import jadex.simulation.analysis.buildingBlocks.generalAnalysis.IGeneralAnalysis
 import jadex.simulation.analysis.buildingBlocks.generalAnalysis.impl.BasicGeneralAnalysisService;
 import jadex.simulation.analysis.common.dataObjects.IAExperiment;
 import jadex.simulation.analysis.common.dataObjects.IAModel;
-import jadex.simulation.analysis.common.dataObjects.Factories.ADataViewFactory;
-import jadex.simulation.analysis.common.dataObjects.Factories.AExperimentFactory;
+import jadex.simulation.analysis.common.dataObjects.factories.ADataViewFactory;
+import jadex.simulation.analysis.common.dataObjects.factories.AExperimentFactory;
 import jadex.simulation.analysis.common.dataObjects.parameter.ABasicParameter;
 import jadex.simulation.analysis.common.dataObjects.parameter.AParameterEnsemble;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;

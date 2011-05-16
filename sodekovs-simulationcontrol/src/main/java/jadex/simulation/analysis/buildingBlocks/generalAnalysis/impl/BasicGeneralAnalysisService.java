@@ -18,6 +18,9 @@ import jadex.simulation.analysis.common.dataObjects.AModel;
 import jadex.simulation.analysis.common.dataObjects.IAExperiment;
 import jadex.simulation.analysis.common.dataObjects.IAModel;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
+import jadex.simulation.analysis.common.events.service.AServiceEvent;
+import jadex.simulation.analysis.common.events.service.IAServiceListener;
+import jadex.simulation.analysis.common.services.ABasicAnalysisService;
 
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -29,10 +32,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.JComponent;
 
-public class BasicGeneralAnalysisService extends BasicService implements IGeneralAnalysisService
+public class BasicGeneralAnalysisService extends ABasicAnalysisService implements IGeneralAnalysisService
 {
 
 	private IAModel model = null;
@@ -46,7 +50,7 @@ public class BasicGeneralAnalysisService extends BasicService implements IGenera
 	public BasicGeneralAnalysisService(BpmnInterpreter instance)
 	{
 		// TODO: Hack??? No Interpreter?
-		super(instance.getServiceProvider().getId(), IGeneralAnalysisService.class, null);
+		super(instance.getExternalAccess(), IGeneralAnalysisService.class);
 		this.instance = instance;
 		Map prop = getPropertyMap();
 		prop.put(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, "jadex.simulation.analysis.buildingBlocks.generalAnalysis.viewer.GeneralAnalysisServiceViewerPanel");

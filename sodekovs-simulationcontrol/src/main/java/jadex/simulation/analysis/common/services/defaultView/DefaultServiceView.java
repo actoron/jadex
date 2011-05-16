@@ -8,6 +8,7 @@ import jadex.commons.future.ThreadSuspendable;
 import jadex.simulation.analysis.common.events.service.AServiceEvent;
 import jadex.simulation.analysis.common.events.service.IAServiceListener;
 import jadex.simulation.analysis.common.services.IAnalysisService;
+import jadex.simulation.analysis.common.services.IAnalysisSessionService;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -26,7 +27,7 @@ public class DefaultServiceView extends JTabbedPane implements IAServiceListener
 
 	// -------- methods --------
 
-	public DefaultServiceView(IAnalysisService service)
+	public DefaultServiceView(IAnalysisSessionService service)
 	{
 		super();
 		this.service = (IAnalysisService) service;
@@ -39,11 +40,13 @@ public class DefaultServiceView extends JTabbedPane implements IAServiceListener
 		{
 			public void run()
 			{
+				//TODO: ADD Workload
+//				serProp.createTextField("workload", ((Double)service.getWorkload().get(new ThreadSuspendable(this))).toString());
+
 				ServiceProperties serProp = new ServiceProperties();
 				serProp.setService(service);
 				serProp.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Jadex Service Eigenschaften "));
 				generalcomp = serProp;
-//				serProp.remove(serProp.getComponentCount()-1);
 				
 				addTab("Allgemein", null, generalcomp);
 				setSelectedComponent(serProp);

@@ -5,7 +5,7 @@ import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.simulation.analysis.common.dataObjects.ADataObjectView;
 import jadex.simulation.analysis.common.dataObjects.IADataView;
-import jadex.simulation.analysis.common.dataObjects.Factories.ADataViewFactory;
+import jadex.simulation.analysis.common.dataObjects.factories.ADataViewFactory;
 import jadex.simulation.analysis.common.events.data.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 import jadex.simulation.analysis.common.util.ParserClassValidator;
@@ -32,6 +32,7 @@ import javax.swing.SwingUtilities;
 public class ABasicParameterView extends ADataObjectView implements IADataView
 {
 	private ABasicParameter parameter;
+	private ABasicParameterController controller;
 
 	private JTextField paraNameValue;
 	private JTextField innerTypValue;
@@ -46,11 +47,13 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 		super(parameter);
 		component = new JPanel(new GridBagLayout());
 		this.parameter = (ABasicParameter) parameter;
+		controller = new ABasicParameterController(parameter, this);
 		init();
 	}
 
 	private void init()
 	{
+		
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
@@ -70,29 +73,45 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 				gridY++;
 				paraTypeValue.setToolTipText("Typ des Parameters");
 
-				// Parameter Name
-				JLabel paraName = new JLabel("Parametername");
-				paraName.setPreferredSize(new Dimension(150, 20));
-				component.add(paraName, new GridBagConstraints(0, gridY, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
-
-				paraNameValue = new JTextField(parameter.getName());
-				paraNameValue.setEditable(false);
-				paraNameValue.setPreferredSize(new Dimension(400, 20));
-				component.add(paraNameValue, new GridBagConstraints(1, gridY, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
-				gridY++;
-				paraNameValue.setToolTipText("Name des Parameters");
-
 				// Parameter Innere Tpye
 				JLabel innereTyp = new JLabel("Klasseausprägung");
 				innereTyp.setPreferredSize(new Dimension(150, 20));
 				component.add(innereTyp, new GridBagConstraints(0, gridY, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 
 				innerTypValue = new JTextField(parameter.getValueClass().toString());
-				innerTypValue.setEditable(false);
+				innerTypValue.setEditable(parameter.isEditable());
 				innerTypValue.setPreferredSize(new Dimension(400, 20));
 				component.add(innerTypValue, new GridBagConstraints(1, gridY, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 				innerTypValue.setToolTipText("Klasse die der Parameter hält");
 				gridY++;
+				
+				// Parameter Name
+				JLabel paraName = new JLabel("Parametername");
+				paraName.setPreferredSize(new Dimension(150, 20));
+				component.add(paraName, new GridBagConstraints(0, gridY, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
+
+				paraNameValue = new JTextField(parameter.getName());
+				paraNameValue.setEditable(parameter.isEditable());
+				paraNameValue.setPreferredSize(new Dimension(400, 20));
+				component.add(paraNameValue, new GridBagConstraints(1, gridY, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
+				paraNameValue.addFocusListener(new FocusListener()
+				{
+					
+					@Override
+					public void focusLost(FocusEvent e)
+					{
+						controller.setName(paraNameValue.getText());
+					}
+					
+					@Override
+					public void focusGained(FocusEvent e)
+					{
+						controller.setName(paraNameValue.getText());
+					}
+				});
+				
+				gridY++;
+				paraNameValue.setToolTipText("Name des Parameters");
 
 				JLabel valueLabel = new JLabel("Aktueller Wert");
 				valueLabel.setPreferredSize(new Dimension(150, 20));
@@ -110,7 +129,7 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 				{
 					synchronized (mutex)
 					{
-						parameter.setValue(valueBoolean.isSelected());
+						controller.setValue(Boolean.toString(valueBoolean.isSelected()));
 					}
 				}
 			});
@@ -126,7 +145,7 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 				@Override
 				public void focusLost(FocusEvent e)
 				{
-					validateField(valueField.getText());
+					controller.setValue(valueField.getText());
 				}
 
 				@Override
@@ -140,7 +159,7 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 				{
 					synchronized (mutex)
 					{
-						validateField(valueField.getText());
+						controller.setValue(valueField.getText());
 					}
 				}
 			});
@@ -166,7 +185,7 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 			{
 				synchronized (mutex)
 				{
-					parameter.setUsage(paraVariableBox.isSelected());
+					controller.setUsage(new Boolean(paraVariableBox.isSelected()));
 				}
 			}
 			});
@@ -200,7 +219,6 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 			{
 				if (valueComp instanceof JCheckBox)
 				{
-
 					JCheckBox box = (JCheckBox) valueComp;
 					box.setSelected((Boolean) parameter.getValue());
 				}
@@ -215,6 +233,8 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 			{
 				paraVariableBox.setEnabled(parameter.isEditable());
 				valueComp.setEnabled(parameter.isEditable());
+				paraNameValue.setEnabled(parameter.isEditable());
+				innerTypValue.setEnabled(parameter.isEditable());
 			}
 
 			if (command.equals(AConstants.PARAMETER_USAGE))
@@ -227,45 +247,6 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 		}
 	}
 		});
-	}
-
-	private void validateField(String text)
-	{
-		synchronized (mutex)
-		{
-			if (text.length() > 0)
-			{
-				if (parameter.getValueClass().equals(String.class))
-				{
-					parameter.setValue(text);
-				}
-				else
-				{
-					try
-					{
-						String[] imports = { "jadex.simulation.analysis.common.dataObject.*", "jadex.simulation.analysis.common.dataObject.parameter.*" };
-						IParsedExpression pex = new JavaCCExpressionParser().parseExpression(text, imports, null, SAnalysisClassLoader.getClassLoader());
-						Object value = pex.getValue(null);
-						if (value.getClass().equals(parameter.getValueClass()))
-						{
-							if (!(parameter.getValue().equals(value)))
-							{
-								parameter.setValue(value);
-							}
-
-						}
-						else
-						{
-							throw new RuntimeException();
-						}
-					}
-					catch (Exception ex)
-					{
-						JOptionPane.showMessageDialog(SwingUtilities.getRoot(component), "Aktueller Wert (" + parameter.getValueClass() + ") ist nicht zulässig!");
-					}
-				}
-			}
-		}
 	}
 
 	/**

@@ -77,7 +77,7 @@ public class BpmnComponentView extends JTabbedPane implements IATaskListener
 					public void run()
 					{
 						generalcomp = new JPanel(new GridBagLayout());
-						Insets insets = new Insets(2, 2, 2, 2);
+						Insets insets = new Insets(1, 1, 1, 1);
 
 						compProp.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Jadex 'bpmn active component' Eigenschaften "));
 						generalcomp.add(compProp, new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));

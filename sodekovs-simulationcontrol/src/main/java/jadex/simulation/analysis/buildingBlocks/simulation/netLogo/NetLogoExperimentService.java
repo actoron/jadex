@@ -8,6 +8,7 @@ import jadex.simulation.analysis.buildingBlocks.simulation.IExecuteExperimentSer
 import jadex.simulation.analysis.common.dataObjects.IAExperiment;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameter;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
+import jadex.simulation.analysis.common.services.ABasicAnalysisService;
 
 import java.io.File;
 import java.util.HashSet;
@@ -22,7 +23,7 @@ import org.nlogo.lite.InterfaceComponent;
 /**
  * Implementation of a NetLogo service for (single) experiments.
  */
-public class NetLogoExperimentService extends BasicService implements IExecuteExperimentService {
+public class NetLogoExperimentService extends ABasicAnalysisService implements IExecuteExperimentService {
 
 	InterfaceComponent comp = null;
 	JTextArea compLite = new JTextArea();
@@ -34,13 +35,15 @@ public class NetLogoExperimentService extends BasicService implements IExecuteEx
 	 *            The active generalComp.
 	 */
 	public NetLogoExperimentService(ICapability cap) {
-		super(cap.getServiceContainer().getId(), IExecuteExperimentService.class, null);
+		super(cap.getExternalAccess(), IExecuteExperimentService.class);
 //		Map prop = getPropertyMap();
 //		prop.put(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, "jadex.simulation.analysis.buildingBlocks.execution.ExecutionServiceView");
 //		setPropertyMap(prop);
 	}
 	
-	public Set<String> supportedModels() {
+	@Override
+	public Set<String> getSupportedModes()
+	{
 		Set<String> result = new HashSet<String>();
 		result.add("netLogo");
 		return result;

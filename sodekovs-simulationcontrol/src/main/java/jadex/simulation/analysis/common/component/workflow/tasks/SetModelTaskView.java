@@ -1,7 +1,7 @@
 package jadex.simulation.analysis.common.component.workflow.tasks;
 
 import jadex.simulation.analysis.common.component.workflow.tasks.general.ATaskView;
-import jadex.simulation.analysis.common.dataObjects.Factories.ADataViewFactory;
+import jadex.simulation.analysis.common.dataObjects.factories.ADataViewFactory;
 import jadex.simulation.analysis.common.events.task.ATaskEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 

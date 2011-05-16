@@ -5,7 +5,7 @@ import jadex.simulation.analysis.common.component.workflow.tasks.general.ATaskVi
 import jadex.simulation.analysis.common.component.workflow.tasks.general.IATask;
 import jadex.simulation.analysis.common.component.workflow.tasks.general.IATaskView;
 import jadex.simulation.analysis.common.component.workflow.tasks.general.TaskProperties;
-import jadex.simulation.analysis.common.dataObjects.Factories.ADataViewFactory;
+import jadex.simulation.analysis.common.dataObjects.factories.ADataViewFactory;
 import jadex.simulation.analysis.common.dataObjects.parameter.IAParameter;
 import jadex.simulation.analysis.common.events.task.ATaskEvent;
 import jadex.simulation.analysis.common.events.task.IATaskListener;
@@ -83,7 +83,7 @@ public class ATaskCollectionView extends JPanel implements IATaskListener
 						list.setLayoutOrientation(JList.VERTICAL);
 						list.setVisibleRowCount(-1);
 						list.setSelectedIndex(0);
-						list.setPreferredSize(new Dimension(150, 150));
+						list.setPreferredSize(new Dimension(250, 150));
 						list.setFixedCellWidth(150);
 						list.setSize(new Dimension(150, 150));
 						list.addListSelectionListener(new ListSelectionListener()
@@ -108,7 +108,7 @@ public class ATaskCollectionView extends JPanel implements IATaskListener
 
 						JScrollPane listScroller = new JScrollPane(list);
 						listScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-						listScroller.setPreferredSize(new Dimension(150, 200));
+						listScroller.setPreferredSize(new Dimension(250, 200));
 						listScroller.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Instanziierte Aktivitäten"));
 						JPanel leftPanel = new JPanel(new GridBagLayout());
 						leftPanel.add(listScroller,

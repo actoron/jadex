@@ -3,6 +3,7 @@ package jadex.simulation.analysis.buildingBlocks.simulation;
 import jadex.commons.future.IFuture;
 import jadex.bridge.service.IService;
 import jadex.simulation.analysis.common.dataObjects.IAExperiment;
+import jadex.simulation.analysis.common.services.IAnalysisService;
 
 import java.util.Set;
 
@@ -11,7 +12,7 @@ import javax.swing.JFrame;
 /**
  *  The simulation execution interface for executing (single) experiments.
  */
-public interface IExecuteExperimentService	extends IService
+public interface IExecuteExperimentService extends IAnalysisService
 {
 
 	/**
@@ -19,12 +20,6 @@ public interface IExecuteExperimentService	extends IService
 	 *  @param exp {@link IAExperiment}
 	 */
 	public IFuture executeExperiment(IAExperiment exp);
-	
-	/**
-	 * Return the model which the service support
-	 * @return modeltypes as Set
-	 */
-	public Set<String> supportedModels();
 	
 	public IFuture getView();
 

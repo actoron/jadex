@@ -1,4 +1,4 @@
-package jadex.simulation.analysis.common.component.workflow.Factory;
+package jadex.simulation.analysis.common.component.workflow.factories;
 
 import jadex.simulation.analysis.common.component.workflow.tasks.ExecuteExperimentTask;
 import jadex.simulation.analysis.common.component.workflow.tasks.ExecuteExperimentTaskView;

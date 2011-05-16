@@ -7,6 +7,7 @@ import jadex.commons.future.IFuture;
 import jadex.bridge.service.BasicService;
 import jadex.simulation.analysis.buildingBlocks.simulation.IExecuteExperimentService;
 import jadex.simulation.analysis.common.dataObjects.IAExperiment;
+import jadex.simulation.analysis.common.services.ABasicAnalysisService;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -17,7 +18,7 @@ import javax.swing.JFrame;
 /**
  * Implementation of a dummy service for (single) experiments.
  */
-public class DummyExperimentService extends BasicService implements IExecuteExperimentService {
+public class DummyExperimentService extends ABasicAnalysisService implements IExecuteExperimentService {
 	// -------- attributes --------
 
 	// -------- constructors --------
@@ -30,7 +31,7 @@ public class DummyExperimentService extends BasicService implements IExecuteExpe
 	 */
 	public DummyExperimentService(ICapability cap)
 	{
-		super(cap.getServiceContainer().getId(), IExecuteExperimentService.class, null);
+		super(cap.getExternalAccess(), IExecuteExperimentService.class);
 		Map prop = getPropertyMap();
 		prop.put(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, "jadex.simulation.analysis.buildingBlocks.execution.ExecutionServiceView");
 		setPropertyMap(prop);
@@ -48,12 +49,11 @@ public class DummyExperimentService extends BasicService implements IExecuteExpe
 		return res;
 	}
 
-	@Override
-	public Set<String> supportedModels() {
+	public java.util.Set<String> getSupportedModes() {
 		Set<String> result = new HashSet<String>();
 		result.add("dummy");
 		return result;
-	}
+	};
 
 	@Override
 	public IFuture getView() {

@@ -46,7 +46,7 @@ public class LowLevelAnalysisService extends ABasicAnalysisService implements IL
 	public LowLevelAnalysisService(IExternalAccess access)
 	{
 		//TODO: We can get ICapability here!
-		super(access);
+		super(access, ILowLevelAnalysisService.class);
 //		this.instance = instance;
 		Map prop = getPropertyMap();
 		prop.put(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, "jadex.simulation.analysis.common.services.defaultView.DefaultServiceViewerPanel");

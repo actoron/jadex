@@ -27,7 +27,7 @@ public class ADataObjectView implements IADataView
 			//TODO: Swing Thread
 			component = new JPanel(new GridBagLayout());
 			JComponent freePanel = new JPanel();
-			component.add(freePanel, new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+			component.add(freePanel, new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
 		}
 	}
 

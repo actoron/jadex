@@ -1,34 +1,23 @@
 package jadex.simulation.analysis.common.services;
 
-import jadex.bdi.runtime.ICapability;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.bridge.service.BasicService;
-import jadex.simulation.analysis.common.dataObjects.parameter.IAParameterEnsemble;
 import jadex.simulation.analysis.common.events.service.AServiceEvent;
 import jadex.simulation.analysis.common.events.service.IAServiceListener;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 public class ABasicAnalysisService extends BasicService implements IAnalysisService
 {
 	protected Object mutex = new Object();
 	protected Set<IAServiceListener> listeners = new HashSet<IAServiceListener>();
-	protected Map<UUID, IAParameterEnsemble> sessions;
 
-	public ABasicAnalysisService(IExternalAccess access)
+	public ABasicAnalysisService(IExternalAccess access, Class serviceInterface)
 	{
-		super(access.getServiceProvider().getId(), IAnalysisService.class, null);
-		synchronized (mutex)
-		{
-			sessions = Collections.synchronizedMap(new HashMap<UUID, IAParameterEnsemble>());
-		}
+		super(access.getServiceProvider().getId(), serviceInterface, null);
 	}
 	
 	// ------ IAnalysisService ------- (IAServiceObserver)
@@ -36,7 +25,14 @@ public class ABasicAnalysisService extends BasicService implements IAnalysisServ
 	@Override
 	public IFuture getWorkload()
 	{
-		return new Future(AWorkload.IDLE);
+		return new Future(0.0);
+	}
+	
+
+	@Override
+	public Set<String>  getSupportedModes()
+	{
+		return new HashSet<String>();
 	}
 	
 	@Override
@@ -75,23 +71,4 @@ public class ABasicAnalysisService extends BasicService implements IAnalysisServ
 		}	
 	}
 
-	@Override
-	public IFuture createSession(IAParameterEnsemble configuration)
-	{
-		synchronized (mutex)
-		{
-			UUID id = UUID.randomUUID();
-			sessions.put(id, configuration);
-			return new Future(id);
-		}
-	}
-
-	@Override
-	public void closeSession(UUID id)
-	{
-		synchronized (mutex)
-		{
-			sessions.remove(id);
-		}
-	}
 }

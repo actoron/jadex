@@ -4,30 +4,17 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.future.ThreadSuspendable;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
 import jadex.simulation.analysis.buildingBlocks.analysisProcess.lowLevelAnalysis.impl.LowLevelAnalysisService;
-import jadex.simulation.analysis.buildingBlocks.simulation.IExecuteExperimentService;
-import jadex.simulation.analysis.common.component.workflow.Factory.ATaskViewFactory;
 import jadex.simulation.analysis.common.component.workflow.defaultView.BpmnComponentView;
+import jadex.simulation.analysis.common.component.workflow.factories.ATaskViewFactory;
 import jadex.simulation.analysis.common.component.workflow.tasks.general.ATask;
 import jadex.simulation.analysis.common.component.workflow.tasks.general.IATask;
 import jadex.simulation.analysis.common.component.workflow.tasks.general.IATaskView;
 import jadex.simulation.analysis.common.dataObjects.IAExperiment;
-import jadex.simulation.analysis.common.dataObjects.IAModel;
-import jadex.simulation.analysis.common.dataObjects.Factories.AExperimentFactory;
 import jadex.simulation.analysis.common.events.service.AServiceEvent;
 import jadex.simulation.analysis.common.events.service.IAServiceListener;
 import jadex.simulation.analysis.common.events.task.ATaskEvent;
 import jadex.simulation.analysis.common.util.AConstants;
-
-import java.util.ArrayList;
-
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 
 /**
  * Task for executing Experiment

@@ -4,37 +4,37 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IGWFcTVoEeCjY4cMEzZuvg" key="editor_version" value="1.0"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_bVfa4DVoEeCjY4cMEzZuvg" source="jadex_imports_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Qx3s0Da1EeCGte1hWgVYsg" key="dimension" value="5:1"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Qx3s0Ta1EeCGte1hWgVYsg" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Qx3s0ja1EeCGte1hWgVYsg" key="0:0" value="jadex.simulation.analysis.common.component.workflow.tasks.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Qx3s0za1EeCGte1hWgVYsg" key="1:0" value="jadex.simulation.analysis.common.dataObjects.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Qx3s1Da1EeCGte1hWgVYsg" key="2:0" value="jadex.simulation.analysis.common.services.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Qx3s1Ta1EeCGte1hWgVYsg" key="3:0" value="jadex.simulation.analysis.common.component.workflow.tasks.general.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Qx3s1ja1EeCGte1hWgVYsg" key="4:0" value="jadex.simulation.analysis.common.component.workflow.defaultView.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TQQR8D9UEeCUOrBVfoinZQ" key="dimension" value="5:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TQQR8T9UEeCUOrBVfoinZQ" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TQQR8j9UEeCUOrBVfoinZQ" key="0:0" value="jadex.simulation.analysis.common.component.workflow.tasks.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TQQR8z9UEeCUOrBVfoinZQ" key="1:0" value="jadex.simulation.analysis.common.dataObjects.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TQQR9D9UEeCUOrBVfoinZQ" key="2:0" value="jadex.simulation.analysis.common.services.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TQQR9T9UEeCUOrBVfoinZQ" key="3:0" value="jadex.simulation.analysis.common.component.workflow.tasks.general.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TQQR9j9UEeCUOrBVfoinZQ" key="4:0" value="jadex.simulation.analysis.common.component.workflow.defaultView.*"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_zlMgIDVoEeCjY4cMEzZuvg" source="subProcess_properties_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O8m0UDa1EeCGte1hWgVYsg" key="dimension" value="2:2"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O8m0UTa1EeCGte1hWgVYsg" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O8m0Uja1EeCGte1hWgVYsg" key="0:0" value="componentviewer.viewerclass"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O8m0Uza1EeCGte1hWgVYsg" key="0:1" value="jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel.class"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O8m0VDa1EeCGte1hWgVYsg" key="1:0" value="viewerpanel.componentviewerclass"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O8m0VTa1EeCGte1hWgVYsg" key="1:1" value="jadex.simulation.analysis.common.component.workflow.defaultView.BpmnComponentViewerPanel.class"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZOcSwEv5EeCPvOXPlLNTrA" key="dimension" value="2:2"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZOcSwUv5EeCPvOXPlLNTrA" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZOcSwkv5EeCPvOXPlLNTrA" key="0:0" value="componentviewer.viewerclass"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZOcSw0v5EeCPvOXPlLNTrA" key="0:1" value="jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel.class"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZOcSxEv5EeCPvOXPlLNTrA" key="1:0" value="viewerpanel.componentviewerclass"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZOcSxUv5EeCPvOXPlLNTrA" key="1:1" value="jadex.simulation.analysis.common.component.workflow.defaultView.BpmnComponentViewerPanel.class"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ICy98DYzEeCYyMFV3Fi4lA" source="jadex_arguments_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cwNKIDhBEeCw6tpQgyRadA" key="dimension" value="2:6"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cwNKIThBEeCw6tpQgyRadA" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cwNKIjhBEeCw6tpQgyRadA" key="0:0" value="service"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cwNKIzhBEeCw6tpQgyRadA" key="0:1" value="false"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cwNKJDhBEeCw6tpQgyRadA" key="0:2" value="false"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cwNxMDhBEeCw6tpQgyRadA" key="0:3" value="service"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cwNxMThBEeCw6tpQgyRadA" key="0:4" value="IAnalysisService"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cwNxMjhBEeCw6tpQgyRadA" key="0:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cwNxMzhBEeCw6tpQgyRadA" key="1:0" value="view"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cwNxNDhBEeCw6tpQgyRadA" key="1:1" value="false"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cwNxNThBEeCw6tpQgyRadA" key="1:2" value="false"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cwNxNjhBEeCw6tpQgyRadA" key="1:3" value="view"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cwNxNzhBEeCw6tpQgyRadA" key="1:4" value="BpmnComponentView"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cwNxODhBEeCw6tpQgyRadA" key="1:5" value="new BpmnComponentView($interpreter.getExternalAccess())"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bacsMD9UEeCUOrBVfoinZQ" key="dimension" value="2:6"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bacsMT9UEeCUOrBVfoinZQ" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bacsMj9UEeCUOrBVfoinZQ" key="0:0" value="service"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bacsMz9UEeCUOrBVfoinZQ" key="0:1" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bacsND9UEeCUOrBVfoinZQ" key="0:2" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bacsNT9UEeCUOrBVfoinZQ" key="0:3" value="service"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bacsNj9UEeCUOrBVfoinZQ" key="0:4" value="IAnalysisService"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bacsNz9UEeCUOrBVfoinZQ" key="0:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bacsOD9UEeCUOrBVfoinZQ" key="1:0" value="view"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bacsOT9UEeCUOrBVfoinZQ" key="1:1" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bacsOj9UEeCUOrBVfoinZQ" key="1:2" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bacsOz9UEeCUOrBVfoinZQ" key="1:3" value="view"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bacsPD9UEeCUOrBVfoinZQ" key="1:4" value="BpmnComponentView"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bacsPT9UEeCUOrBVfoinZQ" key="1:5" value="new BpmnComponentView($interpreter.getExternalAccess())"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_5oO2ETVnEeCjY4cMEzZuvg" iD="_5oO2EDVnEeCjY4cMEzZuvg" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_5oO2EzVnEeCjY4cMEzZuvg" iD="_5oO2EjVnEeCjY4cMEzZuvg" outgoingEdges="_9xysejVnEeCjY4cMEzZuvg" incomingEdges="_8ln0QTVnEeCjY4cMEzZuvg" name="Modell setzen" activityType="Task">
@@ -57,16 +57,16 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MLvNgTVoEeCjY4cMEzZuvg" key="class" value="jadex.simulation.analysis.common.component.workflow.tasks.SetExperimentTask"/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_oBWCcDVoEeCjY4cMEzZuvg" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wHHjUDazEeCGte1hWgVYsg" key="dimension" value="2:4"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wHHjUTazEeCGte1hWgVYsg" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wHIKYDazEeCGte1hWgVYsg" key="0:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wHIKYTazEeCGte1hWgVYsg" key="0:1" value="model"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wHIKYjazEeCGte1hWgVYsg" key="0:2" value="IAModel"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wHIKYzazEeCGte1hWgVYsg" key="0:3" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wHIKZDazEeCGte1hWgVYsg" key="1:0" value="out"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wHIKZTazEeCGte1hWgVYsg" key="1:1" value="experiment"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wHIKZjazEeCGte1hWgVYsg" key="1:2" value="IAExperiment"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wHIKZzazEeCGte1hWgVYsg" key="1:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EVmd4Hc2EeCTO-YCjWTwNQ" key="dimension" value="2:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EVmd4Xc2EeCTO-YCjWTwNQ" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EVmd4nc2EeCTO-YCjWTwNQ" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EVmd43c2EeCTO-YCjWTwNQ" key="0:1" value="model"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EVmd5Hc2EeCTO-YCjWTwNQ" key="0:2" value="IAModel"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EVmd5Xc2EeCTO-YCjWTwNQ" key="0:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EVmd5nc2EeCTO-YCjWTwNQ" key="1:0" value="out"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EVmd53c2EeCTO-YCjWTwNQ" key="1:1" value="experiment"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EVmd6Hc2EeCTO-YCjWTwNQ" key="1:2" value="IAExperiment"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EVmd6Xc2EeCTO-YCjWTwNQ" key="1:3" value=""/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_BHk8gTVoEeCjY4cMEzZuvg" iD="_BHk8gDVoEeCjY4cMEzZuvg" outgoingEdges="_F0QHATVoEeCjY4cMEzZuvg" incomingEdges="_DPPcUTfIEeC6cJfyjHPJLA" name="Experiment ausführen" activityType="Task">

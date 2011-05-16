@@ -30,9 +30,10 @@ public class BpmnComponentViewerPanel extends AbstractComponentViewerPanel {
 		
 		if (view == null)
 		{
+			//default view
 			view = new JPanel();
 			JComponent generalcomp = new JPanel(new GridBagLayout());
-			Insets insets = new Insets(2, 2, 2, 2);
+			Insets insets = new Insets(1, 1, 1, 1);
 			IFuture cmsFut = SServiceProvider.getService(component.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 			IComponentManagementService cms = (IComponentManagementService) cmsFut.get(new ThreadSuspendable(this));
 

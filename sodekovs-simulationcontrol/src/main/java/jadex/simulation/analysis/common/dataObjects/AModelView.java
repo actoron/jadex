@@ -1,7 +1,7 @@
 package jadex.simulation.analysis.common.dataObjects;
 
-import jadex.simulation.analysis.common.dataObjects.Factories.AModelFactory;
-import jadex.simulation.analysis.common.dataObjects.Factories.ADataViewFactory;
+import jadex.simulation.analysis.common.dataObjects.factories.ADataViewFactory;
+import jadex.simulation.analysis.common.dataObjects.factories.AModelFactory;
 import jadex.simulation.analysis.common.events.data.ADataEvent;
 import jadex.simulation.analysis.common.events.data.IADataObservable;
 import jadex.simulation.analysis.common.util.AConstants;
@@ -169,7 +169,7 @@ public class AModelView extends ADataObjectView implements IADataView
 	{
 		IAModel model = AModelFactory.createTestAModel();
 		// IAModel model = AModelFactory.createAModel("AntsStop", "netLogo");
-		model.setEditable(false);
+//		model.setEditable(false);
 		
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

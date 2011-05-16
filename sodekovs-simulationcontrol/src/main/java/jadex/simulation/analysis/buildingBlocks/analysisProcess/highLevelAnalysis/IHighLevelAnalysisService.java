@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface IHighLevelAnalysisService extends IAnalysisService
 {
-	public IFuture executeAnalysis(UUID sessionID);
+//	public IFuture executeAnalysis(UUID sessionID);
 	
 	//TODO: public IFuture getRequiredServices();
 }

@@ -1,7 +1,7 @@
 package jadex.simulation.analysis.common.dataObjects;
 
-import jadex.simulation.analysis.common.dataObjects.Factories.AExperimentFactory;
-import jadex.simulation.analysis.common.dataObjects.Factories.ADataViewFactory;
+import jadex.simulation.analysis.common.dataObjects.factories.ADataViewFactory;
+import jadex.simulation.analysis.common.dataObjects.factories.AExperimentFactory;
 import jadex.simulation.analysis.common.events.data.ADataEvent;
 import jadex.simulation.analysis.common.events.data.IADataObservable;
 
@@ -48,7 +48,7 @@ public class AExperimentView extends ADataObjectView implements IADataView
 			public void run()
 			{
 				component.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Experimenteller Rahmen"));
-				final Insets insets = new Insets(2, 2, 2, 2);
+				final Insets insets = new Insets(1, 1, 1, 1);
 
 				ActionListener groupListener = new ActionListener()
 				{

@@ -1,13 +1,13 @@
 package jadex.simulation.analysis.common.dataObjects.parameter;
 
-import jadex.simulation.analysis.common.dataObjects.Factories.ADataViewFactory;
+import jadex.simulation.analysis.common.dataObjects.factories.ADataViewFactory;
 
 import java.util.Collections;
 import java.util.Set;
 
 import javax.swing.JFrame;
 
-public class AConstraintParameter extends ABasicParameter implements IAConstraintParameter
+public class AConstraintParameter extends ABasicParameter implements IAParameter
 {
 	protected Set<IAConstraint> constraints;
 
@@ -28,13 +28,11 @@ public class AConstraintParameter extends ABasicParameter implements IAConstrain
 
 	// ----- Interface IAConstraintParameter -----
 
-	@Override
 	public Set<IAConstraint> getConstraints()
 	{
 		return constraints;
 	}
 
-	@Override
 	public void addConstraint(IAConstraint constraint)
 	{
 		synchronized (mutex)
@@ -43,7 +41,6 @@ public class AConstraintParameter extends ABasicParameter implements IAConstrain
 		}
 	}
 
-	@Override
 	public void removeConstraint(IAConstraint constraint)
 	{
 		synchronized (mutex)
@@ -52,7 +49,6 @@ public class AConstraintParameter extends ABasicParameter implements IAConstrain
 		}
 	}
 
-	@Override
 	public void clearConstraints()
 	{
 		synchronized (mutex)
@@ -61,19 +57,16 @@ public class AConstraintParameter extends ABasicParameter implements IAConstrain
 		}
 	}
 
-	@Override
 	public boolean containsConstraint(IAConstraint constraint)
 	{
 		return constraints.contains(constraint);
 	}
 
-	@Override
 	public boolean hasConstraints()
 	{
 		return constraints.isEmpty();
 	}
 
-	@Override
 	public Integer numberOfConstaints()
 	{
 		return constraints.size();
@@ -81,7 +74,6 @@ public class AConstraintParameter extends ABasicParameter implements IAConstrain
 
 	// ----- Override ABasicParameter -----
 
-	@Override
 	public boolean isFeasable()
 	{
 		synchronized (mutex)
