@@ -48,7 +48,7 @@ public class LogDAO {
 		try {
 			createLogTable = conn.prepareStatement("create table " + GlobalConstants.DB_GNUPLOT_SCHEMA + "." + GlobalConstants.DB_GNUPLOT_LOGTABLE + " (" + ID
 					+ " integer not null primary key generated always as identity (start with 1, increment by 1), " + DATE + " timestamp, " + TYPE + " varchar(64), " + NAME + " varchar(64), "
-					+ MAINFILE + " CLOB(64 K), " + LOGFILE + " CLOB(64 K), " + LOGTIMESTAMP + " varchar(20))");
+					+ MAINFILE + " CLOB(64 K), " + LOGFILE + " CLOB(64 K), " + LOGTIMESTAMP + " varchar(40))");
 			createTableTestIfItDoesntExistYet();
 			insertNewLog = conn.prepareStatement("INSERT INTO " + GlobalConstants.DB_GNUPLOT_SCHEMA + "." + GlobalConstants.DB_GNUPLOT_LOGTABLE + " (" + DATE + ", " + TYPE + ", " + NAME + ", "
 					+ MAINFILE + ", " + LOGFILE + " , " + LOGTIMESTAMP + ") VALUES (?,?,?,?,?,?)");
