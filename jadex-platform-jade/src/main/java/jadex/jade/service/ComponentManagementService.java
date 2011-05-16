@@ -92,14 +92,6 @@ public class ComponentManagementService extends jadex.base.service.cms.Component
 	}
 	
 	/**
-	 *  Get the component description.
-	 */
-	public IComponentDescription getDescription(IComponentAdapter adapter)
-	{
-		return ((JadeComponentAdapter)adapter).getDescription();
-	}
-	
-	/**
 	 *  Get the component adapter for a component identifier.
 	 *  @param aid The component identifier.
 	 *  @param listener The result listener.

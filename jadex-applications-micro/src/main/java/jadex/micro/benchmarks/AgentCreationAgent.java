@@ -27,11 +27,11 @@ public class AgentCreationAgent extends MicroAgent
 {
 	//-------- attributes --------
 	
-//	/** The cms (cached for speed). */
-//	protected IFuture	cms;
-//	
-//	/** The clock service (cached for speed). */
-//	protected IFuture	clock;
+	/** The cms (cached for speed). */
+	protected IFuture	cms;
+	
+	/** The clock service (cached for speed). */
+	protected IFuture	clock;
 	
 	//-------- methods --------
 	
@@ -47,10 +47,10 @@ public class AgentCreationAgent extends MicroAgent
 		
 		if(args.get("num")==null)
 		{
-			waitFor(10000, new IComponentStep()
-			{
-				public Object execute(IInternalAccess ia)
-				{
+//			waitFor(10000, new IComponentStep()
+//			{
+//				public Object execute(IInternalAccess ia)
+//				{
 					getClock().addResultListener(createResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)
@@ -64,9 +64,9 @@ public class AgentCreationAgent extends MicroAgent
 							step1(args);
 						}
 					}));
-					return null;
-				}
-			});
+//					return null;
+//				}
+//			});
 		}
 		else
 		{
@@ -121,7 +121,7 @@ public class AgentCreationAgent extends MicroAgent
 					// Delete prior agents.
 					if(!nested)
 					{
-//						deletePeers(max-1, end, dur, pera, omem, upera, max, (IMicroExternalAccess)getExternalAccess(), nested);
+						deletePeers(max-1, end, dur, pera, omem, upera, max, (IMicroExternalAccess)getExternalAccess(), nested);
 					}
 					
 					// If nested, use initial component to kill others
@@ -283,7 +283,7 @@ public class AgentCreationAgent extends MicroAgent
 	
 	protected IFuture	getCMS()
 	{
-		IFuture cms = null;	// Uncomment for no caching.
+//		IFuture cms = null;	// Uncomment for no caching.
 		if(cms==null)
 		{
 			cms	= SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class); // Raw service
@@ -295,7 +295,7 @@ public class AgentCreationAgent extends MicroAgent
 	
 	protected IFuture	getClock()
 	{
-		IFuture clock = null;	// Uncomment for no caching.
+//		IFuture clock = null;	// Uncomment for no caching.
 		if(clock==null)
 		{
 			clock	= SServiceProvider.getServiceUpwards(getServiceProvider(), IClockService.class); // Raw service

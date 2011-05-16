@@ -89,12 +89,4 @@ public class ComponentManagementService extends jadex.base.service.cms.Component
 			.addResultListener(new DelegationResultListener(ret));
 		return ret;
 	}
-	
-	/**
-	 *  Get the component description.
-	 */
-	public IComponentDescription getDescription(IComponentAdapter adapter)
-	{
-		return ((StandaloneComponentAdapter)adapter).getDescription();
-	}
 }

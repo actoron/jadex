@@ -305,7 +305,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	/**
 	 *  Add a top level node.
 	 */
-	public void addTopLevelNode(File file)
+	public void	addTopLevelNode(File file)
 	{
 		assert !remote;
 		
@@ -313,6 +313,8 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		ITreeNode node = factory.createNode(root, model, tree, file, 
 			iconcache, filefilter, exta, factory);
 		root.addChild(node);
+		
+		tree.scrollPathToVisible(new TreePath(new Object[]{root, node}));
 	}
 	
 	/**

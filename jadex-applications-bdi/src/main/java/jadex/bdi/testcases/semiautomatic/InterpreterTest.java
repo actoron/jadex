@@ -193,4 +193,9 @@ class ComponentAdapter implements IComponentAdapter
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public IComponentDescription getDescription()
+	{
+		return null;
+	}
 }

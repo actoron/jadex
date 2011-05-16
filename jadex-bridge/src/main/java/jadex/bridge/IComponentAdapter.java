@@ -48,6 +48,11 @@ public interface IComponentAdapter
 	public IComponentIdentifier getComponentIdentifier() throws ComponentTerminatedException;
 	
 	/**
+	 *  Return the component description.
+	 */
+	public IComponentDescription getDescription();
+	
+	/**
 	 *  Get the component logger.
 	 *  @return The logger.
 	 */

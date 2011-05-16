@@ -62,9 +62,6 @@ public abstract class ComponentManagementService extends BasicService implements
 	/** The components (id->component adapter). */
 	protected Map adapters;
 	
-	/** The component descriptions (id -> component description). */
-	protected Map descs;
-	
 	/** The cleanup commands for the components (component id -> cleanup command). */
 	protected Map ccs;
 	
@@ -129,7 +126,6 @@ public abstract class ComponentManagementService extends BasicService implements
 
 		this.exta = exta;
 		this.adapters = Collections.synchronizedMap(SCollection.createHashMap());
-		this.descs = Collections.synchronizedMap(SCollection.createLinkedHashMap());
 		this.ccs = SCollection.createLinkedHashMap();
 		this.cfs = SCollection.createLinkedHashMap();
 //		this.children	= SCollection.createMultiCollection();
@@ -168,12 +164,6 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	public abstract IFuture doStep(IComponentAdapter adapter);
 	
-	/**
-	 *  Get the component description.
-	 */
-	public abstract IComponentDescription getDescription(IComponentAdapter adapter);
-	
-    
     //-------- IComponentManagementService interface --------
     
 	/**
@@ -265,27 +255,24 @@ public abstract class ComponentManagementService extends BasicService implements
 
 												synchronized(adapters)
 												{
-													synchronized(descs)
+													IComponentIdentifier pacid = parent.getComponentIdentifier();
+													String paname = pacid.getName().replace('@', '.');
+													if(name!=null)
 													{
-														IComponentIdentifier pacid = parent.getComponentIdentifier();
-														String paname = pacid.getName().replace('@', '.');
-														if(name!=null)
+														cid = new ComponentIdentifier(name+"@"+paname);
+														if(adapters.containsKey(cid) || initinfos.containsKey(cid))
 														{
-															cid = new ComponentIdentifier(name+"@"+paname);
-															if(adapters.containsKey(cid) || initinfos.containsKey(cid))
-															{
-																throw new RuntimeException("Component "+cid+" already exists.");
-															}
-															if(msgservice!=null)
-															{
-																cid.setAddresses(msgservice.getAddresses());
-															}
+															throw new RuntimeException("Component "+cid+" already exists.");
 														}
-														else
+														if(msgservice!=null)
 														{
-															cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName(), paname);
+															cid.setAddresses(msgservice.getAddresses());
 														}
-													}		
+													}
+													else
+													{
+														cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName(), paname);
+													}
 												}
 												
 												Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
@@ -309,45 +296,41 @@ public abstract class ComponentManagementService extends BasicService implements
 														
 														synchronized(adapters)
 														{
-															synchronized(descs)
-															{
-		//														System.out.println("created: "+ad);
-																
-																// Init successfully finished. Add description and adapter.
-																adapter = (IComponentAdapter)((Object[])result)[1];
-																
-																// Init finished. Set to suspended until parent registration is finished.
-																ad.setState(IComponentDescription.STATE_SUSPENDED);
-																
-																descs.put(cid, ad);
-		//														System.out.println("adding cid: "+cid+" "+ad.getMaster()+" "+ad.getDaemon()+" "+ad.getAutoShutdown());
-																adapters.put(cid, adapter);
-																// Removed in resumeComponent()
+	//														System.out.println("created: "+ad);
+															
+															// Init successfully finished. Add description and adapter.
+															adapter = (IComponentAdapter)((Object[])result)[1];
+															
+															// Init finished. Set to suspended until parent registration is finished.
+															ad.setState(IComponentDescription.STATE_SUSPENDED);
+															
+	//														System.out.println("adding cid: "+cid+" "+ad.getMaster()+" "+ad.getDaemon()+" "+ad.getAutoShutdown());
+															adapters.put(cid, adapter);
+															// Removed in resumeComponent()
 //																initinfos.remove(cid);
-																
-																CMSComponentDescription padesc;
-																Object[] painfo = getParentInfo(cinfo);
-																if(painfo!=null)
-																{
-																	padesc = (CMSComponentDescription)painfo[0];
-																}
-																else
-																{
-																	padesc = (CMSComponentDescription)descs.get(getParentIdentifier(cinfo));
-																}
-																padesc.addChild(cid);
-																
-																Boolean dae = ad.getDaemon();
-		//														if(padesc.isAutoShutdown() && !ad.isDaemon())
-		//														if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
-																// cannot check parent shutdown state because could be still uninited
-																if(dae==null || !dae.booleanValue())
-																{
-																	Integer	childcount	= (Integer)childcounts.get(padesc.getName());
-																	int cc = childcount!=null ? childcount.intValue()+1 : 1;
-																	childcounts.put(padesc.getName(), new Integer(cc));
-		//															System.out.println("childcount+:"+padesc.getName()+" "+cc);
-																}
+															
+															CMSComponentDescription padesc;
+															Object[] painfo = getParentInfo(cinfo);
+															if(painfo!=null)
+															{
+																padesc = (CMSComponentDescription)painfo[0];
+															}
+															else
+															{
+																padesc = (CMSComponentDescription)getDescription(getParentIdentifier(cinfo));
+															}
+															padesc.addChild(cid);
+															
+															Boolean dae = ad.getDaemon();
+	//														if(padesc.isAutoShutdown() && !ad.isDaemon())
+	//														if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
+															// cannot check parent shutdown state because could be still uninited
+															if(dae==null || !dae.booleanValue())
+															{
+																Integer	childcount	= (Integer)childcounts.get(padesc.getName());
+																int cc = childcount!=null ? childcount.intValue()+1 : 1;
+																childcounts.put(padesc.getName(), new Integer(cc));
+	//															System.out.println("childcount+:"+padesc.getName()+" "+cc);
 															}
 														}
 														
@@ -428,15 +411,11 @@ public abstract class ComponentManagementService extends BasicService implements
 																CleanupCommand	cc	= null;
 																synchronized(adapters)
 																{
-																	synchronized(descs)
-																	{
-																		adapters.remove(cid);
-																		descs.remove(cid);
-																		initinfos.remove(cid);		
+																	adapters.remove(cid);
+																	initinfos.remove(cid);		
 //																		if(exceptions!=null)
 //																			exceptions.remove(cid);
-																		cc	= (CleanupCommand)ccs.remove(cid);										
-																	}
+																	cc	= (CleanupCommand)ccs.remove(cid);										
 																}
 																
 																IResultListener reslis = (IResultListener)killresultlisteners.remove(cid);
@@ -500,11 +479,8 @@ public abstract class ComponentManagementService extends BasicService implements
 														// Store (invalid) desc, adapter and info for children
 														synchronized(adapters)
 														{
-															synchronized(descs)
-															{
-																// 0: description, 1: adapter, 2: creation info, 3: model, 4: initfuture
-																initinfos.put(cid, new Object[]{ad, comp[1], cinfo, lmodel, future});
-															}
+															// 0: description, 1: adapter, 2: creation info, 3: model, 4: initfuture
+															initinfos.put(cid, new Object[]{ad, comp[1], cinfo, lmodel, future});
 														}
 														
 														// Start the init procedure by waking up the adapter.
@@ -650,10 +626,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		Object[] ret;
 		synchronized(adapters)
 		{
-			synchronized(descs)
-			{
-				ret = (Object[])initinfos.get(paid);
-			}
+			ret = (Object[])initinfos.get(paid);
 		}
 		return ret;
 	}
@@ -667,13 +640,10 @@ public abstract class ComponentManagementService extends BasicService implements
 		IComponentAdapter adapter;
 		synchronized(adapters)
 		{
-			synchronized(descs)
+			adapter = (IComponentAdapter)adapters.get(paid);
+			if(adapter==null)
 			{
-				adapter = (IComponentAdapter)adapters.get(paid);
-				if(adapter==null)
-				{
-					adapter = (IComponentAdapter)getParentInfo(cinfo)[1];
-				}
+				adapter = (IComponentAdapter)getParentInfo(cinfo)[1];
 			}
 		}
 		return adapter;
@@ -688,14 +658,9 @@ public abstract class ComponentManagementService extends BasicService implements
 		CMSComponentDescription desc;
 		synchronized(adapters)
 		{
-			synchronized(descs)
-			{
-				desc = (CMSComponentDescription)descs.get(paid);
-				if(desc==null)
-				{
-					desc = (CMSComponentDescription)getParentInfo(cinfo)[0];
-				}
-			}
+			desc = adapters.containsKey(paid)
+				? (CMSComponentDescription)((IComponentAdapter)adapters.get(paid)).getDescription()
+				: (CMSComponentDescription)getParentInfo(cinfo)[0];
 		}
 		return desc;
 	}
@@ -791,74 +756,69 @@ public abstract class ComponentManagementService extends BasicService implements
 				logger.info("Terminating component structure: "+cid.getName());
 				synchronized(adapters)
 				{
-					synchronized(descs)
+					Object[] infos = (Object[])initinfos.get(cid);
+					if(infos!=null)
 					{
-						Object[] infos = (Object[])initinfos.get(cid);
-						if(infos!=null)
+						IComponentAdapter adap = (IComponentAdapter)infos[1];
+						((Future)infos[4]).setException(adap.getException());
+					}
+					
+					// Kill subcomponents
+					IComponentAdapter	ad = (IComponentAdapter)adapters.get(cid);
+					if(ad==null)
+					{
+						ret.setException(new RuntimeException("Component "+cid+" does not exist."));
+						return ret;
+					}
+					final CMSComponentDescription	desc	= (CMSComponentDescription)ad.getDescription();
+					IComponentIdentifier[] achildren = desc.getChildren();
+					
+					destroyComponentLoop(cid, achildren, achildren.length-1).addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object result)
 						{
-							IComponentAdapter adap = (IComponentAdapter)infos[1];
-							((Future)infos[4]).setException(adap.getException());
-						}
-						
-						// Kill subcomponents
-						final CMSComponentDescription	desc = (CMSComponentDescription)descs.get(cid);
-						if(desc==null)
-						{
-							ret.setException(new RuntimeException("Component "+cid+" does not exist."));
-							return ret;
-						}
-						IComponentIdentifier[] achildren = desc.getChildren();
-						
-						destroyComponentLoop(cid, achildren, achildren.length-1).addResultListener(new IResultListener()
-						{
-							public void resultAvailable(Object result)
+							synchronized(adapters)
 							{
-								synchronized(adapters)
+								IComponentAdapter component = (IComponentAdapter)adapters.get(cid);
+								// Component may be already killed (e.g. when autoshutdown).
+								if(component!=null)
 								{
-									synchronized(descs)
+//										System.out.println("destroy1: "+cid);//+" "+component.getParent().getComponentIdentifier().getLocalName());
+									
+									// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
+									// todo: killcomponent should only be called once for each component?
+									if(!ccs.containsKey(cid))
 									{
-										IComponentAdapter component = (IComponentAdapter)adapters.get(cid);
-										// Component may be already killed (e.g. when autoshutdown).
-										if(component!=null)
-										{
-	//										System.out.println("destroy1: "+cid);//+" "+component.getParent().getComponentIdentifier().getLocalName());
-											
-											// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
-											// todo: killcomponent should only be called once for each component?
-											if(!ccs.containsKey(cid))
-											{
-	//											System.out.println("killing a: "+cid);
-												
-												CleanupCommand	cc	= new CleanupCommand(cid);
-												ccs.put(cid, cc);
-												cc.addKillFuture(ret);
-												logger.info("Terminating component: "+cid.getName());
-												killComponent(component).addResultListener(cc);
-			//									component.killComponent(cc);	
-											}
-											else
-											{
-	//											System.out.println("killing b: "+cid);
-												
-												CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
-												if(cc==null)
-													ret.setException(new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
-												cc.addKillFuture(ret);
-											}
-										}
+//											System.out.println("killing a: "+cid);
+										
+										CleanupCommand	cc	= new CleanupCommand(cid);
+										ccs.put(cid, cc);
+										cc.addKillFuture(ret);
+										logger.info("Terminating component: "+cid.getName());
+										killComponent(component).addResultListener(cc);
+	//									component.killComponent(cc);	
+									}
+									else
+									{
+//											System.out.println("killing b: "+cid);
+										
+										CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
+										if(cc==null)
+											ret.setException(new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
+										cc.addKillFuture(ret);
 									}
 								}
-								
-								// Resume component to be killed.
-								resumeComponent(cid);
 							}
 							
-							public void exceptionOccurred(Exception exception)
-							{
-								ret.setException(exception);
-							}
-						});
-					}
+							// Resume component to be killed.
+							resumeComponent(cid);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
 				}
 			}
 		}
@@ -924,45 +884,43 @@ public abstract class ComponentManagementService extends BasicService implements
 		}
 		else
 		{
-			CMSComponentDescription ad;
+			CMSComponentDescription desc;
 			synchronized(adapters)
 			{
-				synchronized(descs)
+				final IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
+				if(adapter==null)
 				{
-					// Suspend subcomponents
-					CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
-					IComponentIdentifier[] achildren = desc.getChildren();
-	//				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
-					for(int i=0; i<achildren.length; i++)
-					{
-	//					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
-						if(IComponentDescription.STATE_ACTIVE.equals(((IComponentDescription)descs.get(achildren[i])).getState()))
-						{
-							suspendComponent(achildren[i]);	// todo: cascading suspend with wait.
-						}
-					}
-	
-					final IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
-					ad = (CMSComponentDescription)descs.get(cid);
-					if(adapter==null || ad==null)
-					{
-						ret.setException(new RuntimeException("Component identifier not registered: "+cid));
-						return ret;
-					}
-					if(!IComponentDescription.STATE_ACTIVE.equals(ad.getState())
-						/*&& !IComponentDescription.STATE_TERMINATING.equals(ad.getState())*/)
-					{
-						ret.setException(new RuntimeException("Component identifier not registered: "+cid));
-						return ret;
-					}
-					
-					ad.setState(IComponentDescription.STATE_SUSPENDED);
-					cancel(adapter).addResultListener(new DelegationResultListener(ret));
-//					exeservice.cancel(adapter).addResultListener(new DelegationResultListener(ret));
+					ret.setException(new RuntimeException("Component identifier not registered: "+cid));
+					return ret;
 				}
+				
+				// Suspend subcomponents
+				desc = (CMSComponentDescription)adapter.getDescription();
+				IComponentIdentifier[] achildren = desc.getChildren();
+//				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
+				for(int i=0; i<achildren.length; i++)
+				{
+//					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
+					IComponentDescription	cdesc	= getDescription(achildren[i]);
+					if(IComponentDescription.STATE_ACTIVE.equals(cdesc.getState()))
+					{
+						suspendComponent(achildren[i]);	// todo: cascading suspend with wait.
+					}
+				}
+
+				if(!IComponentDescription.STATE_ACTIVE.equals(desc.getState())
+					/*&& !IComponentDescription.STATE_TERMINATING.equals(ad.getState())*/)
+				{
+					ret.setException(new RuntimeException("Component identifier not registered: "+cid));
+					return ret;
+				}
+				
+				desc.setState(IComponentDescription.STATE_SUSPENDED);
+				cancel(adapter).addResultListener(new DelegationResultListener(ret));
+//					exeservice.cancel(adapter).addResultListener(new DelegationResultListener(ret));
 			}
 			
-			notifyListeners(cid, ad);
+			notifyListeners(cid, desc);
 //			ICMSComponentListener[]	alisteners;
 //			synchronized(listeners)
 //			{
@@ -1013,59 +971,55 @@ public abstract class ComponentManagementService extends BasicService implements
 		{
 			synchronized(adapters)
 			{
-				synchronized(descs)
+				// Resume subcomponents
+				final CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
+				if(desc!=null)
 				{
-					// Resume subcomponents
-					CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
-					if(desc!=null)
+					IComponentIdentifier[] achildren = desc.getChildren();
+					CounterResultListener lis = new CounterResultListener(achildren.length, true, new DefaultResultListener()
 					{
-						IComponentIdentifier[] achildren = desc.getChildren();
-						CounterResultListener lis = new CounterResultListener(achildren.length, true, new DefaultResultListener()
+						public void resultAvailable(Object result)
 						{
-							public void resultAvailable(Object result)
+							IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
+							boolean	changed	= false;
+							if(adapter==null)
 							{
-								IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
-								CMSComponentDescription ad = (CMSComponentDescription)descs.get(cid);
-								boolean	changed	= false;
-								if(adapter==null || ad==null)
-								{
-									ret.setException(new RuntimeException("Component identifier not registered: "+cid));
-									return;
-								}
-
-								// Hack for startup.
-								boolean suspend = false;
-								Object[] ii = (Object[])initinfos.remove(cid);
-								if(ii!=null)
-								{
-									CreationInfo cinfo = (CreationInfo)ii[2];
-									IModelInfo lmodel = (IModelInfo)ii[3];
-									suspend = isInitSuspend(cinfo, lmodel);
-								}
-//								System.out.println("resume: "+cid+" suspend:"+suspend);
-								if(!suspend && IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
-								{
-									ad.setState(IComponentDescription.STATE_ACTIVE);						
-									adapter.wakeup();
-									changed	= true;
-								}
-								
-								if(changed)
-									notifyListeners(cid, ad);
-							
-								ret.setResult(ad);
+								ret.setException(new RuntimeException("Component identifier not registered: "+cid));
+								return;
 							}
-						});
+
+							// Hack for startup.
+							boolean suspend = false;
+							Object[] ii = (Object[])initinfos.remove(cid);
+							if(ii!=null)
+							{
+								CreationInfo cinfo = (CreationInfo)ii[2];
+								IModelInfo lmodel = (IModelInfo)ii[3];
+								suspend = isInitSuspend(cinfo, lmodel);
+							}
+//								System.out.println("resume: "+cid+" suspend:"+suspend);
+							if(!suspend && IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+							{
+								desc.setState(IComponentDescription.STATE_ACTIVE);						
+								adapter.wakeup();
+								changed	= true;
+							}
+							
+							if(changed)
+								notifyListeners(cid, desc);
 						
-						for(int i=0; i<achildren.length; i++)
-						{
-							resumeComponent(achildren[i]).addResultListener(lis);
+							ret.setResult(desc);
 						}
-					}
-					else
+					});
+					
+					for(int i=0; i<achildren.length; i++)
 					{
-						ret.setResult(null);
+						resumeComponent(achildren[i]).addResultListener(lis);
 					}
+				}
+				else
+				{
+					ret.setResult(null);
 				}
 			}
 		}
@@ -1097,22 +1051,19 @@ public abstract class ComponentManagementService extends BasicService implements
 		{
 			synchronized(adapters)
 			{
-				synchronized(descs)
+				final IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
+				if(adapter==null)
 				{
-					final IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
-					IComponentDescription cd = (IComponentDescription)descs.get(cid);
-					if(adapter==null || cd==null)
-					{
-						ret.setException(new RuntimeException("Component identifier not registered: "+cid));
-						return ret;
-					}
-					if(!IComponentDescription.STATE_SUSPENDED.equals(cd.getState()))
-					{
-						ret.setException(new RuntimeException("Only suspended components can be stepped: "+cid+" "+cd.getState()));
-						return ret;
-					}
-					
-					doStep(adapter).addResultListener(new DelegationResultListener(ret));
+					ret.setException(new RuntimeException("Component identifier not registered: "+cid));
+					return ret;
+				}
+				if(!IComponentDescription.STATE_SUSPENDED.equals(adapter.getDescription().getState()))
+				{
+					ret.setException(new RuntimeException("Only suspended components can be stepped: "+cid+" "+adapter.getDescription().getState()));
+					return ret;
+				}
+				
+				doStep(adapter).addResultListener(new DelegationResultListener(ret));
 //					adapter.doStep(new IResultListener()
 //					{
 //						public void resultAvailable(Object source, Object result)
@@ -1125,7 +1076,6 @@ public abstract class ComponentManagementService extends BasicService implements
 //							ret.setException(exception);
 //						}
 //					});
-				}
 			}
 		}
 		
@@ -1157,9 +1107,9 @@ public abstract class ComponentManagementService extends BasicService implements
 		else
 		{
 			CMSComponentDescription ad;
-			synchronized(descs)
+			synchronized(adapters)
 			{
-				ad = (CMSComponentDescription)descs.get(cid);
+				ad = (CMSComponentDescription)getDescription(cid);
 				ad.setBreakpoints(breakpoints);
 			}
 			
@@ -1237,64 +1187,61 @@ public abstract class ComponentManagementService extends BasicService implements
 			Map results = null;
 			synchronized(adapters)
 			{
-				synchronized(descs)
-				{
 //					System.out.println("Terminating component finished: "+cid.getName());
-					logger.info("Terminating component finished: "+cid.getName());
+				logger.info("Terminating component finished: "+cid.getName());
 //					System.out.println("CleanupCommand: "+cid);
-		//			boolean shutdown = false;
-		
+	//			boolean shutdown = false;
+	
 //					System.out.println("CleanupCommand remove called for: "+cid);
-					adapter = (IComponentAdapter)adapters.remove(cid);
-					if(adapter==null)
-						throw new RuntimeException("Component Identifier not registered: "+cid);
+				adapter = (IComponentAdapter)adapters.remove(cid);
+				if(adapter==null)
+					throw new RuntimeException("Component Identifier not registered: "+cid);
 //					System.out.println("removed adapter: "+adapter.getComponentIdentifier().getLocalName()+" "+cid+" "+adapters);
-					
-					results = getComponentInstance(adapter).getResults();
-					
-					desc = (CMSComponentDescription)descs.remove(cid);
-					desc.setState(IComponentDescription.STATE_TERMINATED);
-					
-					ccs.remove(cid);
-					cfs.remove(cid);
-					
-					// Deregister destroyed component at parent.
-					if(desc.getName().getParent()!=null)
-					{
-						// Stop execution of component. When root component services are already shutdowned.
-						cancel(adapter);
+				
+				desc	= (CMSComponentDescription)adapter.getDescription();
+				results = getComponentInstance(adapter).getResults();
+				
+				desc.setState(IComponentDescription.STATE_TERMINATED);
+				
+				ccs.remove(cid);
+				cfs.remove(cid);
+				
+				// Deregister destroyed component at parent.
+				if(desc.getName().getParent()!=null)
+				{
+					// Stop execution of component. When root component services are already shutdowned.
+					cancel(adapter);
 //						exeservice.cancel(adapter);
-						
-						killparent = desc.getMaster()!=null && desc.getMaster().booleanValue();
-						CMSComponentDescription padesc = (CMSComponentDescription)descs.get(desc.getName().getParent());
-						if(padesc!=null)
-						{
-							padesc.removeChild(desc.getName());
-							Boolean pas = padesc.getAutoShutdown();
-							Boolean dae = desc.getDaemon();
+					
+					killparent = desc.getMaster()!=null && desc.getMaster().booleanValue();
+					CMSComponentDescription padesc = (CMSComponentDescription)getDescription(desc.getName().getParent());
+					if(padesc!=null)
+					{
+						padesc.removeChild(desc.getName());
+						Boolean pas = padesc.getAutoShutdown();
+						Boolean dae = desc.getDaemon();
 //							if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
-							if(dae==null || !dae.booleanValue())
+						if(dae==null || !dae.booleanValue())
 //							if(padesc.isAutoShutdown() && !desc.isDaemon())
-							{
-								Integer	childcount	= (Integer)childcounts.get(padesc.getName());
+						{
+							Integer	childcount	= (Integer)childcounts.get(padesc.getName());
 //								assert childcount!=null && childcount.intValue()>0;
-								if(childcount!=null)
-								{
-									int cc = childcount.intValue()-1;
-									if(cc>0)
-										childcounts.put(padesc.getName(), new Integer(cc));
-									else
-										childcounts.remove(padesc.getName());
+							if(childcount!=null)
+							{
+								int cc = childcount.intValue()-1;
+								if(cc>0)
+									childcounts.put(padesc.getName(), new Integer(cc));
+								else
+									childcounts.remove(padesc.getName());
 //									System.out.println("childcount-: "+padesc.getName()+" "+cc);
-								}
-								// todo: could fail when parent is still in init phase. 
-								// Should test for init phase and remember that it has to be killed.
-								killparent = killparent || (pas!=null && pas.booleanValue() 
-									&& (childcount==null || childcount.intValue()<=1));
 							}
+							// todo: could fail when parent is still in init phase. 
+							// Should test for init phase and remember that it has to be killed.
+							killparent = killparent || (pas!=null && pas.booleanValue() 
+								&& (childcount==null || childcount.intValue()<=1));
 						}
-						pad	= (IComponentAdapter)adapters.get(desc.getName().getParent());
 					}
+					pad	= (IComponentAdapter)adapters.get(desc.getName().getParent());
 				}
 			}
 			
@@ -1553,7 +1500,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		}
 		else
 		{
-			CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
+			CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
 			ret.setResult(desc!=null? desc.getName().getParent(): null);
 		}
 		return ret;
@@ -1588,14 +1535,11 @@ public abstract class ComponentManagementService extends BasicService implements
 	//		System.out.println("getChildren: "+this+" "+isValid());
 			synchronized(adapters)
 			{
-				synchronized(descs)
-				{
-					CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
-					IComponentIdentifier[] tmp = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
-						IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS: IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS;
-					ret.setResult(tmp);
-	//				System.out.println(getServiceIdentifier()+" "+desc.getName()+" "+SUtil.arrayToString(tmp));
-				}
+				CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
+				IComponentIdentifier[] tmp = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
+					IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS: IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS;
+				ret.setResult(tmp);
+//				System.out.println(getServiceIdentifier()+" "+desc.getName()+" "+SUtil.arrayToString(tmp));
 			}
 			
 			// Nice style to check for valid?
@@ -1648,19 +1592,16 @@ public abstract class ComponentManagementService extends BasicService implements
 		{
 			synchronized(adapters)
 			{
-				synchronized(descs)
+				CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
+				IComponentIdentifier[] tmp = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
+					IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS: IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS;
+				IComponentDescription[]	descs	= new IComponentDescription[tmp.length];
+				for(int i=0; i<descs.length; i++)
 				{
-					CMSComponentDescription desc = (CMSComponentDescription)this.descs.get(cid);
-					IComponentIdentifier[] tmp = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
-						IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS: IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS;
-					IComponentDescription[]	descs	= new IComponentDescription[tmp.length];
-					for(int i=0; i<descs.length; i++)
-					{
-						descs[i]	= (IComponentDescription)this.descs.get(tmp[i]);
-						assert descs[i]!=null;
-					}
-					ret.setResult(descs);
+					descs[i]	= (IComponentDescription)getDescription(tmp[i]);
+					assert descs[i]!=null;
 				}
+				ret.setResult(descs);
 			}
 		}
 		
@@ -1773,9 +1714,9 @@ public abstract class ComponentManagementService extends BasicService implements
 		else
 		{
 			IComponentDescription desc;
-			synchronized(descs)
+			synchronized(adapters)
 			{
-				desc = (IComponentDescription)descs.get(cid);
+				desc = (IComponentDescription)getDescription(cid);
 
 				// Hack, to retrieve description from component itself in init phase
 				if(desc==null)
@@ -1815,13 +1756,13 @@ public abstract class ComponentManagementService extends BasicService implements
 		Future fut = new Future();
 		
 		IComponentDescription[] ret;
-		synchronized(descs)
+		synchronized(adapters)
 		{
-			ret = new IComponentDescription[descs.size()];
+			ret = new IComponentDescription[adapters.size()];
 			int i=0;
-			for(Iterator it=descs.values().iterator(); i<ret.length; i++)
+			for(Iterator it=adapters.values().iterator(); i<ret.length; i++)
 			{
-				ret[i] = (IComponentDescription)((CMSComponentDescription)it.next()).clone();
+				ret[i] = (IComponentDescription)((CMSComponentDescription)((IComponentAdapter)it.next()).getDescription()).clone();
 			}
 		}
 		
@@ -1876,7 +1817,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		// If name is supplied, just lookup description.
 		if(adesc!=null && adesc.getName()!=null)
 		{
-			CMSComponentDescription ad = (CMSComponentDescription)descs.get(adesc.getName());
+			CMSComponentDescription ad = (CMSComponentDescription)getDescription(adesc.getName());
 			if(ad!=null && ad.getName().equals(adesc.getName()))
 			{
 				// Todo: addresses reuqired for interplatform comm.
@@ -1889,11 +1830,11 @@ public abstract class ComponentManagementService extends BasicService implements
 		// Otherwise search for matching descriptions.
 		else
 		{
-			synchronized(descs)
+			synchronized(adapters)
 			{
-				for(Iterator it=descs.values().iterator(); it.hasNext(); )
+				for(Iterator it=adapters.values().iterator(); it.hasNext(); )
 				{
-					CMSComponentDescription	test	= (CMSComponentDescription)it.next();
+					CMSComponentDescription	test	= (CMSComponentDescription)((IComponentAdapter)it.next()).getDescription();
 					if(adesc==null ||
 						(adesc.getOwnership()==null || adesc.getOwnership().equals(test.getOwnership()))
 //						&& (adesc.getName().getParent()==null || adesc.getName().getParent().equals(test.getParent()))
@@ -2076,9 +2017,9 @@ public abstract class ComponentManagementService extends BasicService implements
 		assert IComponentDescription.STATE_SUSPENDED.equals(state) : "wrong state: "+comp+", "+state;
 		
 		CMSComponentDescription	desc	= null;
-		synchronized(descs)
+		synchronized(adapters)
 		{
-			desc	= (CMSComponentDescription)descs.get(comp);
+			desc	= (CMSComponentDescription)getDescription(comp);
 			desc.setState(state);			
 		}
 		
@@ -2182,17 +2123,10 @@ public abstract class ComponentManagementService extends BasicService implements
 //									{
 										synchronized(adapters)
 										{
-											synchronized(descs)
-											{
-												// Hack?! Need to set transport addresses on root id.
-												((ComponentIdentifier)root.getComponentIdentifier()).setAddresses(msgservice.getAddresses());
-//												System.out.println("root: "+SUtil.arrayToString(msgservice.getAddresses())+" "+root.getComponentIdentifier().hashCode());
-												adapters.put(root.getComponentIdentifier(), root);
-												
-												IComponentDescription desc = getDescription(root);
-	//											IComponentDescription desc = ((IComponentAdapter)root).getDescription(); 
-												descs.put(root.getComponentIdentifier(), desc);
-											}
+											// Hack?! Need to set transport addresses on root id.
+											((ComponentIdentifier)root.getComponentIdentifier()).setAddresses(msgservice.getAddresses());
+//											System.out.println("root: "+SUtil.arrayToString(msgservice.getAddresses())+" "+root.getComponentIdentifier().hashCode());
+											adapters.put(root.getComponentIdentifier(), root);
 										}
 //									}
 									
@@ -2205,12 +2139,7 @@ public abstract class ComponentManagementService extends BasicService implements
 							{
 								synchronized(adapters)
 								{
-									synchronized(descs)
-									{
-										adapters.put(root.getComponentIdentifier(), root);
-										IComponentDescription desc = getDescription(root);
-										descs.put(root.getComponentIdentifier(), desc);
-									}
+									adapters.put(root.getComponentIdentifier(), root);
 								}
 							}
 						}
@@ -2306,7 +2235,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		// Parent already running.
 		else
 		{
-			CMSComponentDescription	padesc = (CMSComponentDescription)descs.get(getParentIdentifier(cinfo));
+			CMSComponentDescription	padesc = (CMSComponentDescription)getDescription(getParentIdentifier(cinfo));
 			pasuspend = IComponentDescription.STATE_SUSPENDED.equals(padesc.getState());
 		}
 		// Suspend when set to suspend or when parent is also suspended or when specified in model.
@@ -2333,6 +2262,18 @@ public abstract class ComponentManagementService extends BasicService implements
 	public IExecutionService getExecutionService()
 	{
 		return exeservice;
+	}
+	
+	/**
+	 *  Get the description for a component (if any).
+	 */
+	protected IComponentDescription	getDescription(IComponentIdentifier cid)
+	{
+		synchronized(adapters)
+		{
+			IComponentAdapter	adapter	= (IComponentAdapter)adapters.get(cid);
+			return adapter!=null ? adapter.getDescription() : null;
+		}
 	}
 	
 	/**
