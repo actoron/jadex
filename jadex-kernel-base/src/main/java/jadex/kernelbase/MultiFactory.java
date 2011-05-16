@@ -1,4 +1,4 @@
-package jadex.base;
+package jadex.kernelbase;
 
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentAdapterFactory;
@@ -10,6 +10,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMultiKernelNotifierService;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -28,6 +29,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.javaparser.SJavaParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,11 +48,14 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-
+/**
+ *  Kernel that delegates calls to sub-kernels it finds using on-demand searches.
+ *
+ */
 public class MultiFactory extends BasicService implements IComponentFactory
 {
 	/** Kernel model property for extensions */
-	protected static final String KERNEL_EXTENSIONS = "kernel_type_extensions";
+	protected static final String KERNEL_EXTENSIONS = "kernel.types";
 	
 	/** The internal access. */
 	protected IInternalAccess ia;
@@ -94,6 +99,14 @@ public class MultiFactory extends BasicService implements IComponentFactory
 	/** Call Multiplexer */
 	protected CallMultiplexer multiplexer;
 
+	/**
+	 *  Creates a new MultiFactory.
+	 *  @param ia Component internal access.
+	 *  @param defaultLocations Known kernel location to be checked first.
+	 *  @param kernelblacklist Kernels the factory should ignore.
+	 *  @param extensionblacklist File extension the factory should not consider to be models 
+	 *  	   (no extension and most files with .class extension are ignored by default)
+	 */
 	public MultiFactory(IInternalAccess ia, String[] defaultLocations, String[] kernelblacklist, String[] extensionblacklist)
 	{
 		super(ia.getServiceContainer().getId(), IComponentFactory.class, null);
@@ -123,6 +136,9 @@ public class MultiFactory extends BasicService implements IComponentFactory
 		this.potentialkernellocations = new HashSet();
 	}
 	
+	/**
+	 *  Starts the service.
+	 */
 	public IFuture startService()
 	{
 		final Future ret = new Future();
@@ -202,7 +218,7 @@ public class MultiFactory extends BasicService implements IComponentFactory
 										public void intermediateResultAvailable(Object result)
 										{
 											IModelInfo kernel = (IModelInfo) result;
-											String[] exts = (String[]) kernel.getProperties().get(KERNEL_EXTENSIONS);
+											String[] exts = (String[]) SJavaParser.evaluateExpression(((UnparsedExpression)kernel.getProperties().get(KERNEL_EXTENSIONS)).getValue(), null);
 											if (exts != null)
 												for (int i = 0; i < exts.length; ++i)
 													kerneldefaultlocations.put(exts[i], kernel.getFilename());
@@ -221,7 +237,7 @@ public class MultiFactory extends BasicService implements IComponentFactory
 		}));
 		return ret;
 	}
-
+	
 	/**
 	 * Load a model.
 	 * 
@@ -233,8 +249,22 @@ public class MultiFactory extends BasicService implements IComponentFactory
 	 */
 	public IFuture loadModel(final String model, final String[] imports, final ClassLoader classloader)
 	{
+		return loadModel(model, imports, classloader, false);
+	}
+
+	/**
+	 * Load a model.
+	 * 
+	 * @param model
+	 *            The model (e.g. file name).
+	 * @param The
+	 *            imports (if any).
+	 * @return The loaded model.
+	 */
+	public IFuture loadModel(final String model, final String[] imports, final ClassLoader classloader, boolean isrecur)
+	{
 		final Future ret = new Future();
-		findKernel(model, imports, classloader).addResultListener(ia.createResultListener(ia.createResultListener(new IResultListener()
+		findKernel(model, imports, classloader, isrecur).addResultListener(ia.createResultListener(ia.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -323,17 +353,6 @@ public class MultiFactory extends BasicService implements IComponentFactory
 	public IFuture getComponentType(final String model, final String[] imports, final ClassLoader classloader)
 	{
 		final Future ret = new Future();
-		ret.addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				System.out.println("FOUND: " + model + " " + getModelExtension(model) + " " + result);
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				System.out.println("NOT FOUND ex: " + model + " " + getModelExtension(model));
-			}
-		});
 		findKernel(model, imports, classloader).addResultListener(ia.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -422,29 +441,33 @@ public class MultiFactory extends BasicService implements IComponentFactory
 		return res;
 	}
 	
-	private Set accounter = new HashSet();
+	/**
+	 *  Attempts to find an active kernel factory, searching, loading and instantiating as required.
+	 *  
+	 *  @param model The model for which the kernel is needed.
+	 *  @param imports Model imports.
+	 *  @param classloader Model classloader.
+	 *  @return Factory instance of the kernel or null if no matching kernel was found.
+	 */
 	protected IFuture findKernel(final String model, final String[] imports, final ClassLoader classloader)
 	{
-		accounter.add(model);
-		System.out.println("IN: " + Arrays.toString(accounter.toArray()));
-		System.out.println("Find Kernel: " + getModelExtension(model));
+		return findKernel(model, imports, classloader, false);
+	}
+	
+	/**
+	 *  Attempts to find an active kernel factory, searching, loading and instantiating as required.
+	 *  
+	 *  @param model The model for which the kernel is needed.
+	 *  @param imports Model imports.
+	 *  @param classloader Model classloader.
+	 *  @return Factory instance of the kernel or null if no matching kernel was found.
+	 */
+	protected IFuture findKernel(final String model, final String[] imports, final ClassLoader classloader, final boolean isrecur)
+	{
 		if (extensionblacklist.contains(getModelExtension(model)))
-		{
-			accounter.remove(model);
-			System.out.println("OUT: " + accounter.size() + " " + Arrays.toString(accounter.toArray()) + " remove " +model);
 			return IFuture.DONE;
-		}
 		
 		final Future ret = new Future();
-		ret.addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				accounter.remove(model);
-				System.out.println("OUT: " + accounter.size() + " "  + Arrays.toString(accounter.toArray()) + " remove " +model);
-				System.out.println("FindKernel Result: " + result +" " + model);
-			}
-		});
 		
 		findActiveKernel(model, imports, classloader).addResultListener(ia.createResultListener(new IResultListener()
 		{
@@ -453,16 +476,16 @@ public class MultiFactory extends BasicService implements IComponentFactory
 				if (result != null)
 					ret.setResult(result);
 				else
-					findLoadableKernel(model, imports, classloader).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+					findLoadableKernel(model, imports, classloader, isrecur).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 					{
 						public void customResultAvailable(Object result)
 						{
-							System.out.println("DONE:" + getModelExtension(model));
 							if (result != null)
 								ret.setResult(result);
 							else
 							{
-								extensionblacklist.add(getModelExtension(model));
+								if (!isrecur)
+									extensionblacklist.add(getModelExtension(model));
 								ret.setResult(null);
 							}
 						}
@@ -472,7 +495,8 @@ public class MultiFactory extends BasicService implements IComponentFactory
 			public void exceptionOccurred(Exception exception)
 			{
 				// Give warning?
-				extensionblacklist.add(getModelExtension(model));
+				if (!isrecur)
+					extensionblacklist.add(getModelExtension(model));
 				resultAvailable(null);
 			}
 		}));
@@ -480,9 +504,16 @@ public class MultiFactory extends BasicService implements IComponentFactory
 		return ret;
 	}
 	
+	/**
+	 *  Attempts to find a running kernel matching the model.
+	 *  
+	 *  @param model The model for which the kernel is needed.
+	 *  @param imports Model imports.
+	 *  @param classloader Model classloader.
+	 *  @return Factory instance of the kernel or null if no matching kernel was found.
+	 */
 	protected IFuture findActiveKernel(final String model, final String[] imports, final ClassLoader classloader)
 	{
-		//System.out.println("findactive:" + model + " " + Arrays.toString(Thread.currentThread().getStackTrace()));
 		final Future ret = new Future();
 		SServiceProvider.getServices(ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_APPLICATION).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
@@ -527,33 +558,52 @@ public class MultiFactory extends BasicService implements IComponentFactory
 		return ret; 
 	}
 	
-	protected IFuture findLoadableKernel(final String model, final String[] imports, final ClassLoader classloader)
+	/**
+	 *  Attempts to find a kernel which is currently not loaded, matching the model.
+	 *  This method will instantiate the required kernel if it is found.
+	 *  
+	 *  @param model The model for which the kernel is needed.
+	 *  @param imports Model imports.
+	 *  @param classloader Model classloader.
+	 *  @return Factory instance of the activated kernel or null if no matching kernel was found.
+	 */
+	protected IFuture findLoadableKernel(final String model, final String[] imports, final ClassLoader classloader, boolean isrecur)
 	{
 		final Future ret = new Future();
 		String dl = (String) kerneldefaultlocations.get(getModelExtension(model));
 		if (dl != null)
-		{
-			System.out.println("DL: " + dl);
 			startLoadableKernel(model, imports, classloader, dl).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
-		}
 		else
-		{
-			return findKernelInCache(model, imports, classloader);
-		}
+			return findKernelInCache(model, imports, classloader, isrecur);
 		return ret;
 	}
 	
-	protected IFuture findKernelInCache(final String model, final String[] imports, final ClassLoader classloader)
+	/**
+	 *  Attempts to find a kernel which is currently not loaded in the
+	 *  cache or through search, matching the model.
+	 *  This method will instantiate the required kernel if it is found.
+	 *  
+	 *  @param model The model for which the kernel is needed.
+	 *  @param imports Model imports.
+	 *  @param classloader Model classloader.
+	 *  @return Factory instance of the activated kernel or null if no matching kernel was found.
+	 */
+	protected IFuture findKernelInCache(final String model, final String[] imports, final ClassLoader classloader, final boolean isrecur)
 	{
 		final Future ret = new Future();
-		final String cachedresult = getLocationFromCache(getModelExtension(model));
+		
+		Collection kernels = kernellocationcache.getCollection(getModelExtension(model));
+		String cachedresult = null;
+		if (!kernels.isEmpty())
+			cachedresult = (String) kernels.iterator().next();
+		
 		if (cachedresult != null)
 		{
 			startLoadableKernel(model, imports, classloader, cachedresult).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 		}
 		else
 		{
-			if (potentialurls.isEmpty())
+			if (potentialurls.isEmpty() || isrecur)
 				ret.setResult(null);
 			else
 			{
@@ -567,7 +617,7 @@ public class MultiFactory extends BasicService implements IComponentFactory
 				{
 					public void customResultAvailable(Object result)
 					{
-						findKernelInCache(model, imports, classloader).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
+						findKernelInCache(model, imports, classloader, isrecur).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 					}
 				}));
 			}
@@ -575,13 +625,22 @@ public class MultiFactory extends BasicService implements IComponentFactory
 		return ret;
 	}
 	
+	/**
+	 *  Starts a kernel matching the model.
+	 *  
+	 *  @param model The model for which the kernel is needed.
+	 *  @param imports Model imports.
+	 *  @param classloader Model classloader.
+	 *  @param kernelmodel Model of the kernel.
+	 *  @return Factory instance of the activated kernel.
+	 */
 	protected IFuture startLoadableKernel(final String model, final String[] imports, final ClassLoader classloader, final String kernelmodel)
 	{
 		return multiplexer.doCall(kernelmodel, new IResultCommand()
 		{
 			public Object execute(Object args)
 			{
-				System.out.println("Start Loadable Kernel " + kernelmodel);
+//				System.out.println("Starting: " + kernelmodel);
 				final Future ret = new Future();
 				SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
@@ -598,6 +657,11 @@ public class MultiFactory extends BasicService implements IComponentFactory
 									public void resultAvailable(Object result)
 									{
 										final IComponentFactory kernel = (IComponentFactory) result;
+										if (kernel == null)
+										{
+											ret.setResult(null);
+											return;
+										}
 										// If this is a new kernel, gather types and icons
 										if (!activatedkernels.contains(kernelmodel))
 										{
@@ -646,35 +710,69 @@ public class MultiFactory extends BasicService implements IComponentFactory
 		});
 	}
 	
+	/**
+	 *  Searches the set of potential URLs for a kernel supporting the extension,
+	 *  putting it in the cache for use if found.
+	 *  
+	 *  @param extension Extension the kernel must support.
+	 */
 	protected IFuture searchPotentialUrls(final String extension)
 	{
 		final Future ret = new Future();
-		final URL url = (URL) potentialurls.iterator().next();
-		potentialurls.remove(url);
-		quickKernelSearch(url).addResultListener(ia.createResultListener(new IResultListener()
+		SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
-				if (result != null && validurls.contains(url))
+				ILibraryService libservice = (ILibraryService) result;
+				examineKernelModels(new ArrayList(potentialkernellocations), libservice).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
-					Map kernelmap = (Map) result;
-					kernellocationcache.putAll(kernelmap);
-					for (Iterator it = kernelmap.values().iterator(); it.hasNext(); )
-						kernelurls.put(url, it.next());
-				}
-				
-				ret.setResult(null);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				resultAvailable(null);
+					public void customResultAvailable(Object result)
+					{
+						Map kernellocs = (Map) result;
+						if (kernellocs != null && !kernellocs.isEmpty())
+						{
+							kernellocationcache.putAll(kernellocs);
+							ret.setResult(null);
+						}
+						else
+						{
+							final URL url = (URL) potentialurls.iterator().next();
+							potentialurls.remove(url);
+							quickKernelSearch(url).addResultListener(ia.createResultListener(new IResultListener()
+							{
+								public void resultAvailable(Object result)
+								{
+									if (result != null && validurls.contains(url))
+									{
+										Map kernelmap = (Map) result;
+										kernellocationcache.putAll(kernelmap);
+										for (Iterator it = kernelmap.values().iterator(); it.hasNext(); )
+											kernelurls.put(url, it.next());
+									}
+									
+									ret.setResult(null);
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									resultAvailable(null);
+								}
+							}));
+						}
+					}
+				}));
 			}
 		}));
 		
 		return ret;
 	}
-
+	
+	/**
+	 *  Searches supplied URL for a potential kernel. This method calls kernelSearch()
+	 *  with a prefilter that excludes all files except the ones starting with "Kernel".
+	 *  
+	 *  @param url The URL to search
+	 */
 	protected IFuture quickKernelSearch(URL url)
 	{
 		final Future ret = new Future();
@@ -683,15 +781,21 @@ public class MultiFactory extends BasicService implements IComponentFactory
 			public boolean filter(Object obj)
 			{
 				String loc = (String) obj;
-				return loc.substring(loc.lastIndexOf('/') + 1).startsWith("Kernel");
+				return loc.substring(loc.lastIndexOf(File.separatorChar) + 1).startsWith("Kernel");
 			}
 		}).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 		return ret;
 	}
-
+	
+	/**
+	 *  Searches supplied URL for a potential kernel matching the filter and containing
+	 *  a description of loadable file extensions.
+	 *  
+	 *  @param url The URL to search
+	 *  @param prefilter Prefilter applied before further restrictions are applied.
+	 */
 	protected IFuture kernelSearch(final URL url, final IFilter prefilter)
 	{
-		System.out.println("Kernel Search " + url);
 		final Future ret = new Future();
 		
 		SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
@@ -708,8 +812,8 @@ public class MultiFactory extends BasicService implements IComponentFactory
 							String loc = (String) obj;
 							if (prefilter.filter(obj) &&
 							    !baseextensionblacklist.contains(getModelExtension(loc)) &&
-							   //((String) obj).endsWith("component.xml") &&
-							   !kernelblacklist.contains(loc.substring(loc.lastIndexOf('/') + 1).startsWith("Kernel")))
+							    //((String) obj).endsWith("component.xml") &&
+							    !kernelblacklist.contains(loc.substring(loc.lastIndexOf(File.separatorChar) + 1)))
 								return true;
 						}
 						return false;
@@ -722,43 +826,52 @@ public class MultiFactory extends BasicService implements IComponentFactory
 		return ret;
 	}
 	
+	/**
+	 *  Examines potential kernels whether their model can be loaded or loaded
+	 *  with the help of another kernel that can be found.
+	 *  
+	 *  @param modellocs List of locations of potential kernels.
+	 *  @param libservice Library service.
+	 *  @return Map of viable kernels with extension they support.
+	 */
 	protected IFuture examineKernelModels(List modellocs, final ILibraryService libservice)
 	{
 		final Map kernellocs = new HashMap();
+		if (modellocs.isEmpty())
+			return new Future(kernellocs);
 		final Future ret = new Future();
 		final IResultListener kernelCounter = ia.createResultListener(new CounterResultListener(modellocs.size(), true, new DefaultResultListener()
 		{
 			public void resultAvailable(
 					Object result)
 			{
-				if (kernellocs.size() > 0 && potentialkernellocations.size() > 0)
-				{
-					examineKernelModels(new ArrayList(potentialkernellocations), libservice).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
-					{
-						public void customResultAvailable(Object result)
-						{
-							kernellocs.putAll((Map) result);
-							ret.setResult(kernellocs);
-						}
-					}));
-				}
-				else
-					ret.setResult(kernellocs);
+				ret.setResult(kernellocs);
 			}
 		})
 		{
 			public void intermediateResultAvailable(Object result)
 			{
 				IModelInfo kernelmodel = (IModelInfo) result;
-				String[] exts = (String[]) kernelmodel.getProperties().get(KERNEL_EXTENSIONS);
-				System.out.println(kernelmodel.getFilename() + " " + Arrays.toString(exts));
-				if (exts != null)
+				try
 				{
-					for (int i = 0; i < exts.length; ++i)
+					String[] exts = null;
+					Object extprop = kernelmodel.getProperties().get(KERNEL_EXTENSIONS);
+					if (extprop instanceof String)
 					{
-						System.out.println("KERNEL: " + kernelmodel.getFilename());
-						kernellocs.put(exts[i], kernelmodel.getFilename());
+						exts = (String[]) SJavaParser.evaluateExpression((String) kernelmodel.getProperties().get(KERNEL_EXTENSIONS), null);
 					}
+					else if (extprop instanceof UnparsedExpression)
+					 	exts = (String[]) SJavaParser.evaluateExpression(((UnparsedExpression)kernelmodel.getProperties().get(KERNEL_EXTENSIONS)).getValue(), null);
+					//String[] exts = (String[]) kernelmodel.getProperties().get(KERNEL_EXTENSIONS);
+					if (exts != null)
+					{
+						for (int i = 0; i < exts.length; ++i)
+							kernellocs.put(exts[i], kernelmodel.getFilename());
+					}
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
 				}
 			}
 		});
@@ -766,7 +879,7 @@ public class MultiFactory extends BasicService implements IComponentFactory
 		for (Iterator it2 = modellocs.iterator(); it2.hasNext();)
 		{
 			final String kernelloc = (String) it2.next();
-			loadModel(kernelloc, null, libservice.getClassLoader()).addResultListener(ia.createResultListener(new IResultListener()
+			loadModel(kernelloc, null, libservice.getClassLoader(), true).addResultListener(ia.createResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -792,6 +905,12 @@ public class MultiFactory extends BasicService implements IComponentFactory
 		return ret;
 	}
 
+	/**
+	 *  Searches an URL, accepts both directory and .jar-based URLs.
+	 *  @param url The URL.
+	 *  @param filter The search filter.
+	 *  @return List of file locations matching the filter.
+	 */
 	protected List searchUrl(URL url, IFilter filter)
 	{
 		File file = new File(url.getFile());
@@ -803,6 +922,15 @@ public class MultiFactory extends BasicService implements IComponentFactory
 		return Collections.EMPTY_LIST;
 	}
 
+	/**
+	 *  Searches a directory for files matching a filter.
+	 *  
+	 *  @param dir The directory.
+	 *  @param filter The filter.
+	 *  @param prependDir Flag whether to prepend the directory name to files found,
+	 *  				  used when unwinding recursions.
+	 * @return List of files matching the filter.
+	 */
 	protected List searchDirectory(File dir, IFilter filter, boolean prependDir)
 	{
 		List ret = new ArrayList();
@@ -815,7 +943,7 @@ public class MultiFactory extends BasicService implements IComponentFactory
 				for (Iterator it = subList.iterator(); it.hasNext();)
 				{
 					if (prependDir)
-						ret.add(dir.getName().concat("/").concat(
+						ret.add(dir.getName().concat(File.separator).concat(
 								(String) it.next()));
 					else
 						ret.add(it.next());
@@ -824,7 +952,7 @@ public class MultiFactory extends BasicService implements IComponentFactory
 			else if (filter.filter(content[i].getName()))
 			{
 				if (prependDir)
-					ret.add(dir.getName().concat("/").concat(
+					ret.add(dir.getName().concat(File.separator).concat(
 							content[i].getName()));
 				else
 					ret.add(content[i].getName());
@@ -834,6 +962,13 @@ public class MultiFactory extends BasicService implements IComponentFactory
 		return ret;
 	}
 
+	/**
+	 *  Searches a .jar for files matching a filter.
+	 *  
+	 *  @param jar The .jar-file.
+	 *  @param filter The filter.
+	 * @return List of files matching the filter.
+	 */
 	protected List searchJar(File jar, IFilter filter)
 	{
 		List ret = new ArrayList();
@@ -855,17 +990,15 @@ public class MultiFactory extends BasicService implements IComponentFactory
 		return ret;
 	}
 	
-	protected String getLocationFromCache(String extension)
-	{
-		Collection kernels = kernellocationcache.getCollection(extension);
-		if (kernels.isEmpty())
-			return null;
-		return (String) kernels.iterator().next();
-	}
-	
+	/**
+	 *  Helper method for generating the file extension of a model.
+	 *  
+	 *  @param model The model.
+	 *  @return The file extension, special case for .class files.
+	 */
 	protected static String getModelExtension(String model)
 	{
-		int firstpoint = Math.max(0, model.lastIndexOf("/"));
+		int firstpoint = Math.max(0, model.lastIndexOf(File.separatorChar));
 		firstpoint = model.indexOf('.', firstpoint);
 		
 		if (firstpoint < 0 || firstpoint == (model.length() - 1))

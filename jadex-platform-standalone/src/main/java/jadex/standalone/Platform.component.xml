@@ -225,7 +225,14 @@
 				<component type="kernel_bdi" daemon="true"/>
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
 				<!-- <component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/> -->
-				<!-- <component name="kernel_multi" type="kernel_multi" daemon="true"/> -->
+				<component name="rms" type="rms" daemon="true"/>
+				<component name="jcc" type="jcc"/>
+			</components>
+		</configuration>
+		
+		<configuration name="multi_kernel (rms, jcc)">
+			<components>
+				<component name="kernel_multi" type="kernel_multi" daemon="true"/>
 				<component name="rms" type="rms" daemon="true"/>
 				<component name="jcc" type="jcc"/>
 			</components>

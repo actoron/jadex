@@ -13,17 +13,27 @@
 	</imports>
 	
 	<arguments>
-		<argument name="defaultkernels">new String[] {"jadex/micro/KernelMicro.component.xml"}</argument>
-		<argument name="ignorekernels">new String[] {"jadex/bdi/KernelBDI.component.xml"}</argument>
+		<argument name="defaultkernels">null</argument>
+		<argument name="ignorekernels">new String[] {"KernelBDI.component.xml"}</argument>
 		<argument name="ignoreextensions">null</argument>
 	</arguments>
 	
+	<properties>
+		<property name="kernel.types" class="String[]">
+			new String[] {}
+		</property>
+	</properties>
+	
 	<services>
 		<providedservice class="IMultiKernelNotifierService">
-			new jadex.base.MultiKernelNotifierService($component)
+			<implementation>
+				new jadex.kernelbase.MultiKernelNotifierService($component)
+			</implementation>
 		</providedservice>
 		<providedservice class="IComponentFactory">
-			new jadex.base.MultiFactory($component, $args.defaultkernels, $args.ignorekernels, $args.ignoreextensions)
+			<implementation>
+				new jadex.kernelbase.MultiFactory($component, $args.defaultkernels, $args.ignorekernels, $args.ignoreextensions)
+			</implementation>
 		</providedservice>
 	</services>
 </componenttype>

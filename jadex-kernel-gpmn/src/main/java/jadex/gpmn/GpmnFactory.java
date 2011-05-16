@@ -1,7 +1,5 @@
 package jadex.gpmn;
 
-import jadex.bdi.BDIAgentFactory;
-import jadex.bdi.model.OAVAgentModel;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
@@ -10,17 +8,22 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.UIDefaults;
@@ -58,7 +61,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	protected GpmnBDIConverter2 converter;
 	
 	/** The bdi agent factory. */
-	protected BDIAgentFactory factory;
+	protected IComponentFactory factory;
 	
 	/** The properties. */
 	protected Map properties;
@@ -78,18 +81,51 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 		this.legacyconverter = new GpmnBDIConverter();
 		this.converter = new GpmnBDIConverter2();
 		
-		SServiceProvider.getService(provider, new ComponentFactorySelector(BDIAgentFactory.FILETYPE_BDIAGENT)).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				factory = (BDIAgentFactory)result;
-				if(factory == null)
-					throw new RuntimeException("No bdi agent factory found.");
-			}
-		});
 	}
 	
 	//-------- methods --------
+	
+	public IFuture startService()
+	{
+		final Future ret = new Future();
+		final IFuture res = super.startService();
+		SServiceProvider.getServices(provider, IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				Collection factories = (Collection) result;
+				final IResultListener faccounter = new CounterResultListener(factories.size(), true, new DefaultResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+						res.addResultListener(new DelegationResultListener(ret));
+					}
+				});
+				for (Iterator it = factories.iterator(); it.hasNext(); )
+				{
+					final IComponentFactory fac = (IComponentFactory) it.next();
+					
+					fac.getComponentType("dummy.agent.xml", null, this.getClass().getClassLoader()).addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object result)
+						{
+							if (result != null && factory == null)
+							{
+								factory = fac;
+							}
+							faccounter.resultAvailable(result);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							resultAvailable(null);
+						}
+					});
+				}
+			}
+		});
+		return ret;
+	}
 	
 	/**
 	 *  Start the service.
@@ -224,7 +260,10 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 			else
 				ret = legacyconverter.convertGpmnModelToBDIAgents((jadex.gpmn.model.MGpmnModel)ret, modelinfo.getClassLoader());
 	
-			return new Future(this.factory.createComponentInstance(desc, factory, (OAVAgentModel)ret, config, arguments, parent, bindings, inited));
+			//factory.createComponentAdapter(desc, model, instance, parent);
+			//return new Future(this.factory.createComponentInstance(desc, factory, (OAVAgentModel)ret, config, arguments, parent, bindings, inited));
+			//TODO: BROKEN! FIXME! Probably needs interface adaption.
+			return null;
 		}
 		catch(Exception e)
 		{

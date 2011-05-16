@@ -337,7 +337,7 @@ public class MicroClassReader
 						UnparsedExpression[] exps = new UnparsedExpression[args.length];
 						for(int k=0; k<args.length; k++)
 						{
-							exps[k] = new UnparsedExpression(args[k].name(), null, args[i].value(), null);
+							exps[k] = new UnparsedExpression(args[k].name(), null, args[k].value(), null);
 						}
 						comp.setArguments(exps);
 					}

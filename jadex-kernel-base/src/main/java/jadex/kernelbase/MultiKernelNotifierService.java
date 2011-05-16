@@ -1,4 +1,4 @@
-package jadex.base;
+package jadex.kernelbase;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMultiKernelListener;

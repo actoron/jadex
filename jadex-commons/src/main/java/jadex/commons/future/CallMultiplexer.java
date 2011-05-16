@@ -33,11 +33,12 @@ public class CallMultiplexer
 		if (commandaskey)
 			keyargs = new Tuple(keyargs, call.getClass());
 		
-		IFuture ret = (IFuture) futureMap.get(keyargs);
-		if (ret == null)
+		final Future ret = new Future();
+		IFuture res = (IFuture) futureMap.get(keyargs);
+		if (res == null)
 		{
 			final Object key = keyargs;
-			ret = (IFuture) call.execute(null);
+			res = (IFuture) call.execute(null);
 			futureMap.put(key, ret);
 			ret.addResultListener(new IResultListener()
 			{
@@ -52,6 +53,14 @@ public class CallMultiplexer
 				}
 			});
 		}
+		res.addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				futureMap.remove(ret);
+				super.customResultAvailable(result);
+			}
+		});
 		return ret;
 	}
 }

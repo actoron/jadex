@@ -69,6 +69,7 @@ import jadex.micro.annotation.RequiredServices;
 	@ComponentType(name="kernel_bdi", filename="jadex/bdi/KernelBDI.component.xml"),
 	@ComponentType(name="kernel_bdibpmn", filename="jadex/bdibpmn/KernelBDIBPMN.component.xml"),
 	@ComponentType(name="kernel_bpmn", filename="jadex/bpmn/KernelBPMN.component.xml"),
+	@ComponentType(name="kernel_multi", filename="jadex/micro/KernelMultiAgent.class"),
 	@ComponentType(name="rms", filename="jadex/base/service/remote/RemoteServiceManagementAgent.class"),
 	@ComponentType(name="awa", filename="jadex/base/service/awareness/AwarenessAgent.class"),
 	@ComponentType(name="jcc", filename="jadex/tools/jcc/JCCAgent.class"),
@@ -97,6 +98,18 @@ import jadex.micro.annotation.RequiredServices;
 })
 
 @Configurations({
+	@Configuration(name="mmicro_kernel auto (rms, awa, jcc)", arguments={
+			@NameValue(name="tcpport", value="0"),
+			@NameValue(name="niotcpport", value="0"),
+			@NameValue(name="platformname", value="null")
+		}, components={
+			@Component(name="kernel_multi", type="kernel_multi", daemon=true),
+			@Component(name="rms", type="rms", daemon=true),
+			@Component(name="awa", type="awa", daemon=true, 
+					arguments={@NameValue(name="includes", value="$args.awaincludes"),
+						@NameValue(name="excludes", value="$args.awaexcludes")}),
+			@Component(name="jcc", type="jcc", daemon=true)
+		}),
 	@Configuration(name="micro_kernel auto (rms, awa, jcc)", arguments={
 		@NameValue(name="tcpport", value="0"),
 		@NameValue(name="niotcpport", value="0"),
