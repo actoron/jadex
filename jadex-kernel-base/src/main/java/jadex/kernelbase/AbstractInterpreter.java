@@ -307,7 +307,7 @@ public abstract class AbstractInterpreter implements IComponentInstance
 						
 						if(ser!=null)
 						{
-							addService(ser, impl.getProxytype());
+							addService(services[i].getType(), ser, impl.getProxytype());
 						}
 						else
 						{
@@ -507,12 +507,13 @@ public abstract class AbstractInterpreter implements IComponentInstance
 	
 	/**
 	 *  Add a service to the component. 
+	 *  @param type The service interface.
 	 *  @param service The service.
 	 *  @param proxytype	The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
-	public void addService(Object service, String proxytype)
+	public void addService(Class type, Object service, String proxytype)
 	{
-		IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(getInternalAccess(), getComponentAdapter(), service, proxytype);
+		IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(getInternalAccess(), getComponentAdapter(), type, service, proxytype);
 		getServiceContainer().addService(proxy);
 	}
 	

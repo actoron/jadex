@@ -1366,9 +1366,9 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 *  @param service The service.
 	 *  @param proxytype	The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
-	public void addService(Object service, String proxytype)
+	public void addService(Class type, Object service, String proxytype)
 	{
-		IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(new CapabilityFlyweight(state, ragent), adapter, service, proxytype);
+		IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(new CapabilityFlyweight(state, ragent), adapter, type, service, proxytype);
 		getServiceContainer().addService(proxy);
 	}
 

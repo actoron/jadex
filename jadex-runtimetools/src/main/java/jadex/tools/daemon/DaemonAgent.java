@@ -6,6 +6,7 @@ import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IRemoteChangeListener;
@@ -53,7 +54,7 @@ public class DaemonAgent extends MicroAgent
 	{
 		platforms = Collections.synchronizedMap(new HashMap());
 		listeners = Collections.synchronizedList(new ArrayList());
-		addDirectService(new DaemonService(getExternalAccess()));
+		addService(IDaemonService.class, new DaemonService(getExternalAccess()), BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()

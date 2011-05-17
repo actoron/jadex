@@ -233,7 +233,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 								
 								if(ser!=null)
 								{
-									addService(ser, st.getProxytype());
+									addService(st.getClazz(), ser, st.getProxytype());
 								}
 							}
 							catch(Exception e)
@@ -1569,9 +1569,9 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	 *  @param service The service.
 	 *  @param proxytype	The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
-	public void addService(Object service, String proxytype)
+	public void addService(Class type, Object service, String proxytype)
 	{
-		IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(this, getComponentAdapter(), service, proxytype);
+		IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(this, getComponentAdapter(), type, service, proxytype);
 		getServiceContainer().addService(proxy);
 	}
 	

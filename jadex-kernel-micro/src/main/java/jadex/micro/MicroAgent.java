@@ -571,33 +571,25 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  Add a service to the platform.
 	 *  If under the same name and type a service was contained,
 	 *  the old one is removed and shutdowned.
+	 *  @param type The public service interface.
 	 *  @param service The service.
+	 *  @param type The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
-	public void addRawService(Object service)
+	public void addService(Class type, Object service, String proxytype)
 	{
-		interpreter.addService(service, BasicServiceInvocationHandler.PROXYTYPE_RAW);
-	}
-	
-	/**
-	 *  Add a service to the platform.
-	 *  If under the same name and type a service was contained,
-	 *  the old one is removed and shutdowned.
-	 *  @param service The service.
-	 */
-	public void addDirectService(Object service)
-	{
-		interpreter.addService(service, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
+		interpreter.addService(type, service, proxytype);
 	}
 	
 	/**
 	 *  Add a service to the platform. 
 	 *  If under the same name and type a service was contained,
 	 *  the old one is removed and shutdowned.
+	 *  @param type The public service interface.
 	 *  @param service The service.
 	 */
-	public void addService(Object service)
+	public void addService(Class type, Object service)
 	{
-		interpreter.addService(service, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED);
+		interpreter.addService(type, service, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED);
 	}
 
 	/**

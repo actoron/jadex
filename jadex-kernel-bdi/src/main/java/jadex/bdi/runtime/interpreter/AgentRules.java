@@ -1204,6 +1204,7 @@ public class AgentRules
 				
 				try
 				{
+					Class type = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
 					String proxytype = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.providedservice_has_proxytype);
 					IParsedExpression pex = (IParsedExpression)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_parsed);
 					Class impl = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.providedservice_has_implementation);
@@ -1220,7 +1221,7 @@ public class AgentRules
 					
 					if(ser!=null)
 					{
-						BDIInterpreter.getInterpreter(state).addService(ser, proxytype);
+						BDIInterpreter.getInterpreter(state).addService(type, ser, proxytype);
 					}
 					else
 					{

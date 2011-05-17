@@ -254,6 +254,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		// can be Integer or Level
 		
 		Object prop = model.getProperties().get("logging.level");
+//		Level level = prop==null? Level.INFO: (Level)prop;
 		Level level = prop==null? Level.WARNING: (Level)prop;
 		logger.setLevel(level);
 

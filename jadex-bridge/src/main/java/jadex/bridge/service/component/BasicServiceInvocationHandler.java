@@ -272,7 +272,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	/**
 	 *  Static method for creating a standard service proxy for a provided service.
 	 */
-	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, Object service, String proxytype)
+	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, Class type, Object service, String proxytype)
 	{
 		IInternalService	ret;
 		
@@ -291,28 +291,37 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		{
 //			System.out.println("create: "+service.getServiceIdentifier().getServiceType());
 			BasicServiceInvocationHandler handler;
-			Class type;
 			if(service instanceof IService)
 			{
 				IService ser = (IService)service;
 				handler = new BasicServiceInvocationHandler(ser);
-				type = ser.getServiceIdentifier().getServiceType();
+				if(type==null)
+				{
+					type = ser.getServiceIdentifier().getServiceType();
+				}
+				else if(!type.equals(ser.getServiceIdentifier().getServiceType()))
+				{
+					throw new RuntimeException("Service does not match its type: "+type+", "+ser.getServiceIdentifier().getServiceType());
+				}
 			}
 			else
 			{
-				// Try to find service interface via annotation
-				if(service.getClass().isAnnotationPresent(ServiceInterface.class))
+				if(type==null)
 				{
-					ServiceInterface si = (ServiceInterface)service.getClass().getAnnotation(ServiceInterface.class);
-					type = si.value();
-				}
-				// Otherwise take interface if there is only one
-				else
-				{
-					Class[] types = service.getClass().getInterfaces();
-					if(types.length!=1)
-						throw new RuntimeException("Unknown service interface: "+SUtil.arrayToString(types));
-					type = types[0];
+					// Try to find service interface via annotation
+					if(service.getClass().isAnnotationPresent(ServiceInterface.class))
+					{
+						ServiceInterface si = (ServiceInterface)service.getClass().getAnnotation(ServiceInterface.class);
+						type = si.value();
+					}
+					// Otherwise take interface if there is only one
+					else
+					{
+						Class[] types = service.getClass().getInterfaces();
+						if(types.length!=1)
+							throw new RuntimeException("Unknown service interface: "+SUtil.arrayToString(types));
+						type = types[0];
+					}
 				}
 				
 				BasicService mgmntservice = new BasicService(ia.getExternalAccess().getServiceProvider().getId(), type, null);

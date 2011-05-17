@@ -1,5 +1,6 @@
 package jadex.micro.testcases.semiautomatic.remoteservice;
 
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 
@@ -13,7 +14,7 @@ public class MathAgent extends MicroAgent
 	 */
 	public IFuture	agentCreated()
 	{
-		addDirectService(new MathService(getServiceContainer()));
+		addService(IMathService.class, new MathService(getServiceContainer()), BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
 		return IFuture.DONE;
 	}
 }

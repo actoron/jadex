@@ -405,7 +405,7 @@ public class SelectorThread implements Runnable
 			// we'd like to be notified when there's data waiting to be read
 			sc.register(this.selector, SelectionKey.OP_READ, new NIOTCPInputConnection(sc, codecfac, libservice.getClassLoader()));
 			
-			logger.fine("Accepted connection from: "+sc.socket().getRemoteSocketAddress());
+			logger.info("Accepted connection from: "+sc.socket().getRemoteSocketAddress());
 		}
 		catch(Exception e)
 		{
@@ -462,7 +462,7 @@ public class SelectorThread implements Runnable
 			}
 			// Keep channel on hold until we are ready to write.
 		    key.interestOps(0);
-			logger.fine("Connected to : "+address);
+			logger.info("Connected to : "+address);
 			ret.setResult(con);
 		}
 		catch(Exception e)
@@ -598,7 +598,7 @@ public class SelectorThread implements Runnable
 				catch(Exception e)
 				{
 				}
-				logger.fine("Removed connection to : "+address);
+				logger.info("Removed connection to : "+address);
 			}
 		}
 		

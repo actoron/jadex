@@ -3,10 +3,12 @@ package jadex.base.service.remote;
 import jadex.base.fipa.SFipa;
 import jadex.base.service.remote.commands.RemoteResultCommand;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IRemoteServiceManagementService;
 import jadex.bridge.MessageType;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -54,7 +56,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					{
 						final ILibraryService libservice = (ILibraryService)result;
 						rms = new RemoteServiceManagementService((IMicroExternalAccess)getExternalAccess(), clock, libservice);
-						addDirectService(rms);
+						addService(IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
 						ret.setResult(null);
 					}
 				}));

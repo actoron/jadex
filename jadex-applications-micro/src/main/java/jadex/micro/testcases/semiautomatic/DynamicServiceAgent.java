@@ -4,6 +4,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.micro.MicroAgent;
 
 /**
@@ -20,7 +21,7 @@ public class DynamicServiceAgent extends MicroAgent
 		{
 			public Object execute(IInternalAccess ia)
 			{
-				addDirectService(new DummyService(getServiceContainer()));
+				addService(IDummyService.class, new DummyService(getServiceContainer()), BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
 				waitFor(3000, this);
 				return null;
 			}
