@@ -134,7 +134,7 @@ public class StarterPluginPanel extends JPanel
 						public void customResultAvailable(Object result)
 						{
 							if(((Boolean)result).booleanValue())
-								loadModel(ffilename);
+								spanel.loadModel(ffilename);
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
 					});
@@ -227,18 +227,6 @@ public class StarterPluginPanel extends JPanel
 		add(csplit, BorderLayout.CENTER);
 		
 		loadPlatformProperties();	// Todo: wait for loaded properties.
-	}
-	
-	
-	/**
-	 *  Load a model.
-	 *  @param model The model name.
-	 */
-	protected void loadModel(final String model)
-	{
-		csplit.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		spanel.loadModel(model);
-		csplit.setCursor(Cursor.getDefaultCursor());
 	}
 	
 	/**

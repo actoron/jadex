@@ -39,18 +39,25 @@ import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -62,6 +69,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -77,7 +85,7 @@ import javax.swing.table.DefaultTableModel;
 /**
  * The starter gui allows for starting components platform independently.
  */
-public class StarterPanel extends JPanel
+public class StarterPanel extends JLayeredPane
 {
 	//-------- static part --------
 
@@ -86,7 +94,8 @@ public class StarterPanel extends JPanel
 	{
 		"overlay_check", SGUI.makeIcon(StarterPanel.class, "/jadex/tools/common/images/overlay_check.png"),
 		"Browse", SGUI.makeIcon(StarterPanel.class,	"/jadex/tools/common/images/dots_small.png"),
-		"delete", SGUI.makeIcon(StarterPanel.class,	"/jadex/tools/common/images/delete_small.png")
+		"delete", SGUI.makeIcon(StarterPanel.class,	"/jadex/tools/common/images/delete_small.png"),
+		"loading", SGUI.makeIcon(StarterPanel.class,	"/jadex/tools/common/images/loading.png")
 	});
 
 	//-------- attributes --------
@@ -165,6 +174,12 @@ public class StarterPanel extends JPanel
 	/** The component specific panel. */
 	protected JPanel componentpanel;
 	
+	/** The content panel. */
+	protected JComponent content;
+	
+	/** The loading indicator. */
+	protected JComponent loading;
+	
 //	/** The application specific panel. */
 //	protected JPanel apppanel;
 	
@@ -204,7 +219,6 @@ public class StarterPanel extends JPanel
 	 */
 	public StarterPanel(final IExternalAccess exta, IControlCenter jcc)
 	{
-		super(new BorderLayout());		
 		this.exta = exta;
 		this.jcc = jcc;
 		this.resultsets = new MultiCollection();
@@ -238,19 +252,11 @@ public class StarterPanel extends JPanel
 	 */
 	public void init()
 	{
-		JPanel content = new JPanel(new GridBagLayout());
+		this.content = new JPanel(new GridBagLayout());
 
 		// Create the filename combo box.
 		filename = new JTextField();
 		filename.setEditable(false);
-		ActionListener filelistener = new ActionListener()
-		{
-			public void actionPerformed(ActionEvent ae)
-			{
-				loadModel(filename.getText());
-			}
-		};
-		filename.addActionListener(filelistener);
 
 		// The configuration.
 		config = new JComboBox();
@@ -689,7 +695,81 @@ public class StarterPanel extends JPanel
 		content.add(splitpanel, new GridBagConstraints(0, y, 5, 1, 1, 1, GridBagConstraints.CENTER,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 
-		this.add("Center", content);
+		// Create overlay component displayed while loading.
+		this.loading	= new JPanel(new BorderLayout())
+		{
+			protected void paintComponent(Graphics g)
+			{
+				g.setColor(getBackground());
+				g.fillRect(0, 0, getWidth(), getHeight());
+				super.paintComponent(g);
+			}
+		};
+		JLabel	label	= new JLabel("Loading...", icons.getIcon("loading"), JLabel.CENTER);
+		label.setVerticalTextPosition(JLabel.BOTTOM);
+		label.setHorizontalTextPosition(JLabel.CENTER);
+		label.setForeground(Color.WHITE);
+		label.setFont(label.getFont().deriveFont(label.getFont().getSize()*2f)); // Use f otherwise interpreted as int (i.e. style instead size).
+		loading.add(label, BorderLayout.CENTER);
+		loading.setOpaque(false);
+		loading.setBackground(new Color(0, 0, 0, 128));
+		loading.setVisible(false);
+		
+		this.add(content, new Integer(0));
+		this.add(loading, new Integer(1));
+		
+		// Manually resize inner panels when layered pane is resized
+		// as layered pane does not support separate layout manager for each layer (grrr).
+		this.addComponentListener(new ComponentListener()
+		{
+			public void componentShown(ComponentEvent e)
+			{
+			}
+			
+			public void componentResized(ComponentEvent e)
+			{
+				Rectangle	bounds	= getBounds();
+				Insets	insets	= getInsets();
+				bounds.x	= insets.left;
+				bounds.y	= insets.top;
+				bounds.width	-= insets.left + insets.right;
+				bounds.height	-= insets.top + insets.bottom;
+				content.setBounds(bounds);
+				loading.setBounds(bounds);
+				List	comps	= new ArrayList();
+				comps.add(content);
+				comps.add(loading);
+				for(int i=0; i<comps.size(); i++)
+				{
+					Container	comp	= (Container)comps.get(i);
+					comp.invalidate();
+					for(int j=0; j<comp.getComponentCount(); j++)
+					{
+						if(comp.getComponent(j) instanceof Container)
+						{
+							comps.add(i+1, comp.getComponent(j));
+						}
+					}
+				}
+				for(int i=0; i<comps.size(); i++)
+				{
+					Container	comp	= (Container)comps.get(i);
+					comp.doLayout();
+					comp.repaint();
+				}
+//				content.invalidate();
+//				content.doLayout();
+//				content.repaint();
+			}
+			
+			public void componentMoved(ComponentEvent e)
+			{
+			}
+			
+			public void componentHidden(ComponentEvent e)
+			{
+			}
+		});
 	}
 
 	/**
@@ -710,57 +790,92 @@ public class StarterPanel extends JPanel
 	 *  Load an component model.
 	 *  @param adf The adf to load.
 	 */
-	public void loadModel(final String adf)
+	public IFuture	loadModel(final String adf)
 	{
+		final Future	ret	= new Future();
+		
 		// Don't load same model again (only on reload).
 		if(adf!=null && adf.equals(lastfile))
-			return;
-		
-		lastfile	= adf;
-		
-//		System.out.println("loadModel: "+adf);
-//		String	error	= null;
-		
-		if(adf!=null)
 		{
-			SComponentFactory.isLoadable(exta, adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
-			{
-				public void customResultAvailable(Object result)
-				{
-					if(((Boolean)result).booleanValue())
-					{
-						SComponentFactory.loadModel(exta, adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
-						{
-							public void customResultAvailable(Object result)
-							{
-								model = (IModelInfo)result;
-								updateGuiForNewModel(adf);
-							}
-							
-							public void customExceptionOccurred(Exception exception)
-							{
-								model = null;
-								StringWriter sw = new StringWriter();
-								exception.printStackTrace(new PrintWriter(sw));
-								error = sw.toString();
-								updateGuiForNewModel(adf);
-							}
-						});
-					}
-					else
-					{
-						model = null;
-						updateGuiForNewModel(adf);
-					}
-				}
-			});
+			ret.setResult(null);
 		}
 		else
-		{
-			model = null;
-			error = null;
-			updateGuiForNewModel(adf);
+		{		
+			lastfile	= adf;
+			
+	//		System.out.println("loadModel: "+adf);
+	//		String	error	= null;
+			
+			if(adf!=null)
+			{
+				showLoading(ret);
+				SComponentFactory.isLoadable(exta, adf).addResultListener(new SwingDelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						if(((Boolean)result).booleanValue())
+						{
+							SComponentFactory.loadModel(exta, adf).addResultListener(new SwingDelegationResultListener(ret)
+							{
+								public void customResultAvailable(Object result)
+								{
+									model = (IModelInfo)result;
+									updateGuiForNewModel(adf);
+									ret.setResult(null);
+								}
+								
+								public void customExceptionOccurred(Exception exception)
+								{
+									model = null;
+									StringWriter sw = new StringWriter();
+									exception.printStackTrace(new PrintWriter(sw));
+									error = sw.toString();
+									updateGuiForNewModel(adf);
+									ret.setResult(null);
+								}
+							});
+						}
+						else
+						{
+							model = null;
+							updateGuiForNewModel(adf);
+							ret.setResult(null);
+						}
+					}
+				});
+			}
+			else
+			{
+				model = null;
+				error = null;
+				updateGuiForNewModel(adf);
+				ret.setResult(null);
+			}
 		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Show the loading panel and remove it when the future is done.
+	 */
+	protected void	showLoading(IFuture fut)
+	{
+		loading.setVisible(true);
+		loading.repaint();
+		fut.addResultListener(new SwingDefaultResultListener()
+		{
+			public void customResultAvailable(Object result)
+			{
+				loading.setVisible(false);
+				loading.repaint();
+			}
+			public void customExceptionOccurred(Exception exception)
+			{
+				loading.setVisible(false);
+				loading.repaint();
+			}
+		});
 	}
 
 	
