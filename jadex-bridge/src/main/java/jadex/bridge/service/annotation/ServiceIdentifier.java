@@ -13,4 +13,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ServiceIdentifier
 {
+	/**
+	 *  Supply the interface.
+	 */
+	public Class value() default Object.class;
 }
