@@ -70,7 +70,7 @@
 			<outputDirectory>sources</outputDirectory>
 		</file>
 		<file>
-			<source>/src/main/assembly/dist-assembly.xml</source>
+			<source>src/main/assembly/dist-assembly.xml</source>
 			<outputDirectory>sources/src/main/assembly</outputDirectory>
 		</file>
 		<file>
@@ -101,6 +101,14 @@
 		</file>
 		<file>
 			<source>docs/jadex_no_awareness.bat</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+		<file>
+			<source>docs/jadex.sh</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+		<file>
+			<source>docs/jadex_no_awareness.sh</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
 		<file>
