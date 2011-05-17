@@ -1,5 +1,7 @@
 package jadex.gpmn;
 
+import jadex.bdi.BDIAgentFactory;
+import jadex.bdi.model.OAVAgentModel;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
@@ -58,7 +60,8 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	protected GpmnBDIConverter converter;
 	
 	/** The bdi agent factory. */
-	protected IComponentFactory factory;
+	protected BDIAgentFactory factory;
+	//protected IComponentFactory factory;
 	
 	/** The properties. */
 	protected Map properties;
@@ -77,51 +80,11 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 		this.loader = new GpmnModelLoader();
 		this.converter = new GpmnBDIConverter();
 		
+		// TODO: Use external factory if possible?
+		this.factory = new BDIAgentFactory(properties, provider);
 	}
 	
 	//-------- methods --------
-	
-	public IFuture startService()
-	{
-		final Future ret = new Future();
-		final IFuture res = super.startService();
-		SServiceProvider.getServices(provider, IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				Collection factories = (Collection) result;
-				final IResultListener faccounter = new CounterResultListener(factories.size(), true, new DefaultResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						res.addResultListener(new DelegationResultListener(ret));
-					}
-				});
-				for (Iterator it = factories.iterator(); it.hasNext(); )
-				{
-					final IComponentFactory fac = (IComponentFactory) it.next();
-					
-					fac.getComponentType("dummy.agent.xml", null, this.getClass().getClassLoader()).addResultListener(new IResultListener()
-					{
-						public void resultAvailable(Object result)
-						{
-							if (result != null && factory == null)
-							{
-								factory = fac;
-							}
-							faccounter.resultAvailable(result);
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							resultAvailable(null);
-						}
-					});
-				}
-			}
-		});
-		return ret;
-	}
 	
 	/**
 	 *  Start the service.
@@ -240,26 +203,12 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 			ret = converter.convertGpmnModelToBDIAgents((jadex.gpmn.model.MGpmnModel)ret, modelinfo.getClassLoader());
 	
 			//factory.createComponentAdapter(desc, model, instance, parent);
-			//return new Future(this.factory.createComponentInstance(desc, factory, (OAVAgentModel)ret, config, arguments, parent, bindings, inited));
-			//TODO: BROKEN! FIXME! Probably needs interface adaption.
-			return null;
+			return new Future(this.factory.createComponentInstance(desc, factory, (OAVAgentModel)ret, config, arguments, parent, bindings, inited));
 		}
 		catch(Exception e)
 		{
 			throw new RuntimeException(e);
 		}
-		
-//		try
-//		{
-//			FileOutputStream os = new FileOutputStream("wurst.xml");
-//			Writer writer = OAVBDIXMLReader.getWriter();
-//			writer.write(agent.getState().getRootObjects().next(), os, libservice.getClassLoader(), agent.getState());
-//			os.close();
-//		}
-//		catch(Exception e)
-//		{
-//			e.printStackTrace();
-//		}
 	}
 	
 	/**
