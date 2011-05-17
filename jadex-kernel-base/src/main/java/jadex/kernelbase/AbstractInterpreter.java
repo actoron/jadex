@@ -4,7 +4,6 @@ import jadex.bridge.ComponentResultListener;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
-
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentListener;
@@ -22,6 +21,7 @@ import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
@@ -31,6 +31,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.ServiceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
@@ -714,6 +715,33 @@ public abstract class AbstractInterpreter implements IComponentInstance
 	public IServiceProvider getServiceProvider()
 	{
 		return getServiceContainer();
+	}
+	
+	/**
+	 *  Get a raw reference to a provided service implementation.
+	 */
+	public Object	getRawService(Class type)
+	{
+		Object	ret;
+		IService	service	= getServiceContainer().getProvidedService(type);
+		if(Proxy.isProxyClass(service.getClass()))
+		{
+			BasicServiceInvocationHandler	ih	= (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+			if(ih.getService() instanceof ServiceInfo)
+			{
+				ret	= ((ServiceInfo)ih.getService()).getDomainService();
+			}
+			else
+			{
+				ret	= ih.getService();
+			}
+		}
+		else
+		{
+			ret	= service;
+		}
+		
+		return ret;
 	}
 	
 //	/**
