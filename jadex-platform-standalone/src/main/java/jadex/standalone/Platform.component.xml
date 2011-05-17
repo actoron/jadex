@@ -57,6 +57,7 @@
 	</arguments>
 	
 	<componenttypes>
+		<componenttype filename="jadex/component/KernelComponent.component.xml" name="kernel_component"/>
 		<componenttype filename="jadex/application/KernelApplication.component.xml" name="kernel_application"/>
 		<componenttype filename="jadex/micro/KernelMicro.component.xml" name="kernel_micro"/>
 		<componenttype filename="jadex/bdi/KernelBDI.component.xml" name="kernel_bdi"/>
@@ -130,7 +131,7 @@
 		</providedservice>
 		<providedservice class="IComponentManagementService">
 			<implementation proxytype="raw">
-				new ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter())
+				new ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter(), $args.componentfactory)
 			</implementation>
 		</providedservice>
 		<!-- <providedservice class="IDF" direct="true">
@@ -150,11 +151,11 @@
 					new Object[]{new String[]{"getMode", "isExecuting"}}))
 			</implementation>
 		</providedservice>
-		<providedservice class="IComponentFactory">
+		<!-- <providedservice class="IComponentFactory">
 			<implementation proxytype="raw">
 				new ComponentComponentFactory($component.getServiceProvider())
 			</implementation>		
-		</providedservice>
+		</providedservice> -->
 		<providedservice class="IDeploymentService">
 			<implementation>
 				new DeploymentService($component.getServiceProvider())
@@ -188,7 +189,21 @@
 				<argument name="platformname">null</argument>
 			</arguments>
 			<components>
-				<!-- <component name="kernel_component" type="kernel_component" daemon="true"/> -->
+				<component name="kernel_multi" type="kernel_multi" daemon="true"/>
+				<component name="rms" type="rms" daemon="true"/>
+				<component name="awa" type="awa" daemon="true">
+					<arguments>
+						<argument name="includes">$args.awaincludes</argument>
+						<argument name="excludes">$args.awaexcludes</argument>
+					</arguments>
+				</component>
+				<component name="jcc" type="jcc"/>
+			</components>
+		</configuration>
+	
+		<configuration name="all_kernels (rms, awa, jcc)">
+			<components>
+				<component name="kernel_component" type="kernel_component" daemon="true"/>
 				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
 				<!-- <component type="kernel_bdi" daemon="true"/> -->
@@ -204,22 +219,10 @@
 				<component name="jcc" type="jcc"/>
 			</components>
 		</configuration>
-	
-		<configuration name="all_kernels (rms, awa, jcc)">
-			<components>
-				<component name="kernel_application" type="kernel_application" daemon="true"/>
-				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
-				<!-- <component type="kernel_bdi" daemon="true"/> -->
-				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
-				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
-				<component name="rms" type="rms" daemon="true"/>
-				<component name="awa" type="awa" daemon="true"/>
-				<component name="jcc" type="jcc"/>
-			</components>
-		</configuration>
 		
 		<configuration name="all_kernels (rms, jcc)">
 			<components>
+				<component name="kernel_component" type="kernel_component" daemon="true"/>
 				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
 				<component type="kernel_bdi" daemon="true"/>
@@ -240,18 +243,25 @@
 		
 		<configuration name="all_kernels (rms, awa)">
 			<components>
+				<component name="kernel_component" type="kernel_component" daemon="true"/>
 				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
 				<!-- <component type="kernel_bdi" daemon="true"/> -->
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
 				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
-				<component name="rms" type="rms" daemon="true"/>
+				<component name="awa" type="awa" daemon="true">
+					<arguments>
+						<argument name="includes">$args.awaincludes</argument>
+						<argument name="excludes">$args.awaexcludes</argument>
+					</arguments>
+				</component>
 				<component name="awa" type="awa" daemon="true"/>
 			</components>
 		</configuration>
 		
 		<configuration name="all_kernels (rms)">
 			<components>
+				<component name="kernel_component" type="kernel_component" daemon="true"/>
 				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
 				<!-- <component type="kernel_bdi" daemon="true"/> -->
@@ -263,6 +273,7 @@
 		
 		<configuration name="all_kernels (jcc)">
 			<components>
+				<component name="kernel_component" type="kernel_component" daemon="true"/>
 				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
 				<!-- <component type="kernel_bdi" daemon="true"/> -->
@@ -275,6 +286,7 @@
 		<!-- todo remove: support autoshutdown as instance level flag. -->
 		<configuration name="all_kernels_no_daemons">
 			<components>
+				<component name="kernel_component" type="kernel_component" daemon="true"/>
 				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro"/>
 				<!-- <component type="kernel_bdi"/> -->
@@ -293,6 +305,7 @@
 				<argument name="niotcpport">0</argument>
 			</arguments>
 			<components>
+				<component name="kernel_component" type="kernel_component" daemon="true"/>
 				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro"/>
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn"/>

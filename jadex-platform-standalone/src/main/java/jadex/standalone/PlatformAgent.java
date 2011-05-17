@@ -67,6 +67,7 @@ import jadex.micro.annotation.RequiredServices;
 //	@ComponentType(name="kernel_component", filename="jadex/component/KernelComponent.component.xml"),
 	@ComponentType(name="kernel_application", filename="jadex/application/KernelApplication.component.xml"),
 //	@ComponentType(name="kernel_micro", filename="jadex/micro/KernelMicro.component.xml"),
+	@ComponentType(name="kernel_micro", filename="jadex/micro/KernelMicroAgent.class"),
 	@ComponentType(name="kernel_bdi", filename="jadex/bdi/KernelBDI.component.xml"),
 	@ComponentType(name="kernel_bdibpmn", filename="jadex/bdibpmn/KernelBDIBPMN.component.xml"),
 	@ComponentType(name="kernel_bpmn", filename="jadex/bpmn/KernelBPMN.component.xml"),
@@ -116,6 +117,7 @@ import jadex.micro.annotation.RequiredServices;
 		@NameValue(name="niotcpport", value="0"),
 		@NameValue(name="platformname", value="null")
 	}, components={
+		@Component(name="kernel_micro", type="kernel_micro", daemon=true),
 		@Component(name="rms", type="rms", daemon=true),
 		@Component(name="awa", type="awa", daemon=true, 
 			arguments={@NameValue(name="includes", value="$args.awaincludes"),
@@ -141,13 +143,4 @@ import jadex.micro.annotation.RequiredServices;
 })
 public class PlatformAgent extends MicroAgent
 {
-	
-	/**
-	 * 
-	 */
-	public IFuture agentCreated()
-	{
-		
-		return super.agentCreated();
-	}
 }
