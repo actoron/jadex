@@ -478,12 +478,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 															
 															public void exceptionOccurred(Exception exception)
 															{
+//																exception.printStackTrace();
 																removeWaitingCall(callid);
 //																waitingcalls.remove(callid);
 //																System.out.println("Waitingcalls: "+waitingcalls.size());
 //																System.out.println("Cancel timeout (ex): "+callid+" "+future);
 //																errors.put(callid, new Object[]{"Cancel timeout (ex):", exception});
 																timer.cancel();
+																ia.getLogger().warning("Remote request failed: "+content+"\n"+exception.getMessage());
 															}
 														}));
 													}
@@ -509,6 +511,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							
 							public void exceptionOccurred(Exception exception)
 							{
+//								System.out.println("Message service not found: "+exception);
 //								errors.put(callid, new Object[]{"No msg service", exception});
 								removeWaitingCall(callid);
 //								waitingcalls.remove(callid);
@@ -520,6 +523,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 					
 					public void exceptionOccurred(Exception exception)
 					{
+//						System.out.println("Library service not found: "+exception);
 //						errors.put(callid, new Object[]{"No lib service", exception});
 						removeWaitingCall(callid);
 //						waitingcalls.remove(callid);

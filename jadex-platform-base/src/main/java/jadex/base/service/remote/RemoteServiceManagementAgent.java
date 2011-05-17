@@ -142,16 +142,16 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								{
 //									content	= null;
 									content = new RemoteResultCommand(null, new RuntimeException("Errors during XML decoding: "+errors), callid);
-									getLogger().warning("Remote service management service could not decode message from: "+msg.get(SFipa.SENDER));
-//									getLogger().warning("Remote service management service could not decode message."+orig+"\n"+errors);
 								}
+								getLogger().info("Remote service management service could not decode message from: "+msg.get(SFipa.SENDER));
+//								getLogger().warning("Remote service management service could not decode message."+orig+"\n"+errors);
 							}
 						}
 						catch(Exception e)
 						{
 //							content	= null;
 							content = new RemoteResultCommand(null, e, callid);
-							getLogger().warning("Remote service management service could not decode message from: "+msg.get(SFipa.SENDER));
+							getLogger().info("Remote service management service could not decode message from: "+msg.get(SFipa.SENDER));
 //							getLogger().warning("Remote service management service could not decode message."+orig);
 //							e.printStackTrace();
 						}
@@ -205,7 +205,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					}
 					else if(content!=null)
 					{
-						getLogger().warning("RMS unexpected message content: "+content);
+						getLogger().info("RMS unexpected message content: "+content);
 					}
 				}
 			}));
