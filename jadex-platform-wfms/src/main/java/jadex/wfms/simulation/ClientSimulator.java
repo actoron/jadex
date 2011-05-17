@@ -18,7 +18,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.gpmn.model2.MGpmnModel;
+import jadex.gpmn.model.MGpmnModel;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.guicomponents.LoginDialog;

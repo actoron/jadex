@@ -11,9 +11,9 @@ import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.gpmn.model2.MBpmnPlan;
-import jadex.gpmn.model2.MGpmnModel;
-import jadex.gpmn.model2.MSubprocess;
+import jadex.gpmn.model.MBpmnPlan;
+import jadex.gpmn.model.MGpmnModel;
+import jadex.gpmn.model.MSubprocess;
 import jadex.wfms.client.task.WorkitemTask;
 import jadex.wfms.simulation.stateset.ParameterStateSetFactory;
 

@@ -237,7 +237,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 			
 			ret = GpmnXMLReader2.read(modelinfo.getFilename(), modelinfo.getClassLoader(), null);
 			
-			ret = converter.convertGpmnModelToBDIAgents((jadex.gpmn.model2.MGpmnModel)ret, modelinfo.getClassLoader());
+			ret = converter.convertGpmnModelToBDIAgents((jadex.gpmn.model.MGpmnModel)ret, modelinfo.getClassLoader());
 	
 			//factory.createComponentAdapter(desc, model, instance, parent);
 			//return new Future(this.factory.createComponentInstance(desc, factory, (OAVAgentModel)ret, config, arguments, parent, bindings, inited));
