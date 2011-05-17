@@ -53,9 +53,6 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 
 	/** The gpmn loader. */
 	protected GpmnModelLoader loader;
-	
-	/** The legacy gpmn bdiagent converter. */
-	protected GpmnBDIConverter legacyconverter;
 
 	/** The gpmn 2 bdiagent converter. */
 	protected GpmnBDIConverter2 converter;
@@ -78,7 +75,6 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 		this.properties	= properties;
 		this.provider = provider;
 		this.loader = new GpmnModelLoader();
-		this.legacyconverter = new GpmnBDIConverter();
 		this.converter = new GpmnBDIConverter2();
 		
 	}
@@ -161,15 +157,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 			ResourceInfo rinfo = SUtil.getResourceInfo0(model, classloader);
 			BufferedReader br = new BufferedReader(new InputStreamReader(rinfo.getInputStream()));
 			br.readLine();
-			if(br.readLine().contains("version=\"2.0\""))
-			{
-				ret.setResult(GpmnXMLReader2.read(model, classloader, null).getModelInfo());
-			}
-			else
-			{
-				ret.setResult(GpmnXMLReader.read(model, classloader, null).getModelInfo());
-			}
-			
+			ret.setResult(GpmnXMLReader2.read(model, classloader, null).getModelInfo());
 		}
 		catch(Exception e)
 		{
@@ -246,19 +234,10 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 			ResourceInfo rinfo = SUtil.getResourceInfo0(modelinfo.getFilename(), modelinfo.getClassLoader());
 			BufferedReader br = new BufferedReader(new InputStreamReader(rinfo.getInputStream()));
 			br.readLine();
-			if(br.readLine().contains("version=\"2.0\""))
-			{
-				ret = GpmnXMLReader2.read(modelinfo.getFilename(), modelinfo.getClassLoader(), null);
-			}
-			else
-			{
-				ret = GpmnXMLReader.read(modelinfo.getFilename(), modelinfo.getClassLoader(), null);
-			}
-				
-			if(ret instanceof jadex.gpmn.model2.MGpmnModel)
-				ret = converter.convertGpmnModelToBDIAgents((jadex.gpmn.model2.MGpmnModel)ret, modelinfo.getClassLoader());
-			else
-				ret = legacyconverter.convertGpmnModelToBDIAgents((jadex.gpmn.model.MGpmnModel)ret, modelinfo.getClassLoader());
+			
+			ret = GpmnXMLReader2.read(modelinfo.getFilename(), modelinfo.getClassLoader(), null);
+			
+			ret = converter.convertGpmnModelToBDIAgents((jadex.gpmn.model2.MGpmnModel)ret, modelinfo.getClassLoader());
 	
 			//factory.createComponentAdapter(desc, model, instance, parent);
 			//return new Future(this.factory.createComponentInstance(desc, factory, (OAVAgentModel)ret, config, arguments, parent, bindings, inited));
