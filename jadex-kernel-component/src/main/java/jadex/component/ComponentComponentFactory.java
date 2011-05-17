@@ -187,7 +187,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	{
 		try
 		{
-			ComponentModel apptype = loader.loadComponentModel(modelinfo.getFilename(), null, modelinfo.getClassLoader());
+			ComponentModel model = loader.loadComponentModel(modelinfo.getFilename(), null, modelinfo.getClassLoader());
 //			List apps = apptype.getConfigurations();
 					
 //			// Select application instance according to configuration.
@@ -209,7 +209,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 //				app = new MConfiguration("default");
 	
 			// Create context for application.
-			ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype, config, factory, parent, arguments, bindings, ret);
+			ComponentInterpreter interpreter = new ComponentInterpreter(desc, model.getModelInfo(), config, factory, parent, arguments, bindings, ret);
 			
 			// todo: result listener?
 			// todo: create application context as return value?!

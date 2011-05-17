@@ -55,7 +55,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	protected IComponentAdapter	adapter;
 	
 	/** The application type. */
-	protected ComponentModel model;
+	protected IModelInfo model;
 	
 	/** The parent component. */
 	protected IExternalAccess parent;
@@ -98,12 +98,12 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	/**
 	 *  Create a new context.
 	 */
-	public ComponentInterpreter(final IComponentDescription desc, final ComponentModel model, final String config, 
+	public ComponentInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, 
 		final IComponentAdapterFactory factory, final IExternalAccess parent, final Map arguments, 
 		final RequiredServiceBinding[] bindings, final Future inited)
 	{
-		this.config = config!=null? config: model.getModelInfo().getConfigurationNames().length>0? 
-			model.getModelInfo().getConfigurationNames()[0]: null;
+		this.config = config!=null? config: model.getConfigurationNames().length>0? 
+			model.getConfigurationNames()[0]: null;
 		this.model = model;
 		this.parent = parent;
 		this.arguments = arguments;
@@ -116,12 +116,12 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	
 		try
 		{
-			this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
+			this.adapter = factory.createComponentAdapter(desc, getModel(), this, parent);
 			addStep((new Object[]{new IComponentStep()
 			{
 				public Object execute(IInternalAccess ia)
 				{
-					init(model.getModelInfo(), ComponentInterpreter.this.config, model.getModelInfo().getProperties(), ComponentInterpreter.this.properties)
+					init(getModel(), ComponentInterpreter.this.config, getModel().getProperties(), ComponentInterpreter.this.properties)
 						.addResultListener(createResultListener(new DelegationResultListener(inited)
 					{
 						public void customResultAvailable(Object result)
@@ -768,7 +768,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	 */
 	public IModelInfo getModel()
 	{
-		return model.getModelInfo();
+		return model;
 	}
 	
 	/**
@@ -787,7 +787,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 //			imports = (String[])imp.toArray(new String[imp.size()]);
 //		}
 //		return imports;
-		return model.getModelInfo().getAllImports();
+		return model.getAllImports();
 	}
 	
 	/**
