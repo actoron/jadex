@@ -6,7 +6,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-component
 						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
-	name="kernel_multi" package="jadex.component">
+	name="KernelMulti" package="jadex.component">
 	
 	<imports>
 		<import>jadex.bridge.*</import>
@@ -19,7 +19,7 @@
 	</arguments>
 	
 	<componenttypes>
-		<componenttype name="component_factory" filename="jadex/component/KernelComponent.component.xml"/>
+		<componenttype name="KernelComponent" filename="jadex/component/KernelComponent.component.xml"/>
 	</componenttypes>
 	
 	<properties>
@@ -44,7 +44,7 @@
 	<configurations>
 		<configuration name="component_kernel">
 			<components>
-				<component name="component_factory" type="component_factory"/>
+				<component name="kernel_component" type="KernelComponent"/>
 			</components>
 		</configuration>
 		<configuration name="no_kernel"/>

@@ -11,7 +11,6 @@ import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.execution.IExecutionService;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.concurrent.IThreadPool;
-import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -105,7 +104,7 @@ import jadex.micro.annotation.RequiredServices;
 		@NameValue(name="niotcpport", value="0"),
 		@NameValue(name="platformname", value="null")
 	}, components={
-		@Component(name="kernel_multi", type="kernel_multi", daemon=true),
+		@Component(name="kernels", type="kernel_multi", daemon=true),
 		@Component(name="rms", type="rms", daemon=true),
 		@Component(name="awa", type="awa", daemon=true, 
 			arguments={@NameValue(name="includes", value="$args.awaincludes"),

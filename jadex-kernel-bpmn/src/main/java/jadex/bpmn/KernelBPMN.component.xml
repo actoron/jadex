@@ -6,7 +6,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-component
 						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
-	name="kernel_bpmn" package="jadex.bpmn">
+	name="KernelBPMN" package="jadex.bpmn">
 	
 	<imports>
 		<import>jadex.commons.*</import>

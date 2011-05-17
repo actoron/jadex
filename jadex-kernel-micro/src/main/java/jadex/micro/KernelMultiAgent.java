@@ -28,11 +28,11 @@ import jadex.micro.annotation.ProvidedServices;
 	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new jadex.kernelbase.MultiFactory($component, $args.defaultkernels, $args.ignorekernels, $args.ignoreextensions)"))
 })
 @ComponentTypes({
-	@ComponentType(name="kernel_micro", filename="jadex/micro/KernelMicroAgent.class")
+	@ComponentType(name="KernelMicro", filename="jadex/micro/KernelMicroAgent.class")
 })
 @Configurations({
 	@Configuration(name="default", components={
-		@Component(name="kernel_micro", type="kernel_micro")
+		@Component(name="kernel_micro", type="KernelMicro")
 	})
 })
 public class KernelMultiAgent extends MicroAgent

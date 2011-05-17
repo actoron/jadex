@@ -16,6 +16,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.Excluded;
+import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
 import jadex.commons.IFilter;
@@ -642,66 +643,85 @@ public class MultiFactory extends BasicService implements IComponentFactory
 			{
 //				System.out.println("Starting: " + kernelmodel);
 				final Future ret = new Future();
-				SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(kernelmodel, null, classloader))
+					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						final IComponentManagementService cms = (IComponentManagementService) result;
-						CreationInfo ci = new CreationInfo(ia.getComponentIdentifier());
-						cms.createComponent(null, kernelmodel, ci, null).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+						IComponentFactory	fac	= (IComponentFactory)result;
+						fac.loadModel(kernelmodel, null, classloader).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
 							{
-								findActiveKernel(model, imports, classloader).addResultListener(ia.createResultListener(new DefaultResultListener()
+								final IModelInfo	info	= (IModelInfo)result;
+								SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 								{
-									public void resultAvailable(Object result)
+									public void customResultAvailable(Object result)
 									{
-										final IComponentFactory kernel = (IComponentFactory) result;
-										if (kernel == null)
+										final IComponentManagementService cms = (IComponentManagementService) result;										
+										CreationInfo ci = new CreationInfo(ia.getComponentIdentifier());
+										String	name	= info.getName().toLowerCase();
+										if(name.startsWith("kernel"))
+											name	= name.substring(6);
+										name	= "kernel_"+name;
+										cms.createComponent(name, kernelmodel, ci, null).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 										{
-											ret.setResult(null);
-											return;
-										}
-										// If this is a new kernel, gather types and icons
-										if (!activatedkernels.contains(kernelmodel))
-										{
-											final String[] types = kernel.getComponentTypes();
-											componenttypes.addAll(Arrays.asList(types));
-											
-											IResultListener typecounter = ia.createResultListener(new CounterResultListener(types.length, true, ia.createResultListener(new DelegationResultListener(ret)
+											public void customResultAvailable(Object result)
 											{
-												public void customResultAvailable(Object result)
+												findActiveKernel(model, imports, classloader).addResultListener(ia.createResultListener(new DefaultResultListener()
 												{
-													SServiceProvider.getService(ia.getServiceContainer(), IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_APPLICATION).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+													public void resultAvailable(Object result)
 													{
-														public void customResultAvailable(Object result)
+														final IComponentFactory kernel = (IComponentFactory) result;
+														if (kernel == null)
 														{
-															((IMultiKernelNotifierService) result).fireTypesAdded(types).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+															ret.setResult(null);
+															return;
+														}
+														// If this is a new kernel, gather types and icons
+														if (!activatedkernels.contains(kernelmodel))
+														{
+															final String[] types = kernel.getComponentTypes();
+															componenttypes.addAll(Arrays.asList(types));
+															
+															IResultListener typecounter = ia.createResultListener(new CounterResultListener(types.length, true, ia.createResultListener(new DelegationResultListener(ret)
 															{
 																public void customResultAvailable(Object result)
 																{
-																	ret.setResult(kernel);
+																	SServiceProvider.getService(ia.getServiceContainer(), IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_APPLICATION).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+																	{
+																		public void customResultAvailable(Object result)
+																		{
+																			((IMultiKernelNotifierService) result).fireTypesAdded(types).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+																			{
+																				public void customResultAvailable(Object result)
+																				{
+																					ret.setResult(kernel);
+																				};
+																			}));
+																		};
+																	}));
 																};
-															}));
-														};
-													}));
-												};
-											}))
-											{
-												public void intermediateResultAvailable(Object result)
-												{
-													iconcache.put(types[getCnt() - 1], result);
-												};
-											});
-											for (int i = 0; i < types.length; ++i)
-												kernel.getComponentTypeIcon(types[i]).addResultListener(typecounter);
-											activatedkernels.add(kernelmodel);
-										}
-										else
-											ret.setResult(kernel);
+															}))
+															{
+																public void intermediateResultAvailable(Object result)
+																{
+																	iconcache.put(types[getCnt() - 1], result);
+																};
+															});
+															for (int i = 0; i < types.length; ++i)
+																kernel.getComponentTypeIcon(types[i]).addResultListener(typecounter);
+															activatedkernels.add(kernelmodel);
+														}
+														else
+															ret.setResult(kernel);
+													}
+												}));
+											};
+										}));
 									}
 								}));
-							};
+							}
 						}));
 					}
 				}));
