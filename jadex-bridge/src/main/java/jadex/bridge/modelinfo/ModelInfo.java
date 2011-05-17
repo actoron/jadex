@@ -28,14 +28,11 @@ public class ModelInfo extends Startable implements IModelInfo
 	/** The description. */
 	protected String description;
 	
-//	/** The imports. */
-//	protected String[] imports;
+	/** The imports. */
+	protected List imports;
 	
 	/** The report. */
 	protected IErrorReport report;
-	
-//	/** The configurations. */
-//	protected String[] configurationnames;
 	
 	/** The configurations. */
 	protected List configurations;
@@ -65,20 +62,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	protected Map requiredservices;
 	
 	/** The provided services. */
-//	protected ProvidedServiceInfo[] providedservices;
 	protected List providedservices;
-	
-//	/** The suspend flag. */
-//	protected IModelValueProvider suspend;
-//	
-//	/** The master flag. */
-//	protected IModelValueProvider master;
-//	
-//	/** The daemon flag. */
-//	protected IModelValueProvider daemon;
-//
-//	/** The autoshutdown flag. */
-//	protected IModelValueProvider autoshutdown;
 	
 	/** The subcomponent types. */
 	protected List subcomponents;
@@ -91,7 +75,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	public ModelInfo()
 	{
 		this(null, null, null, null, null, null, 
-			false, null, null, null, null, null, null, null);
+			false, null, null, null, null, null, null, null, null);
 	}
 	
 	/**
@@ -102,10 +86,7 @@ public class ModelInfo extends Startable implements IModelInfo
 		IArgument[] arguments, IArgument[] results, boolean startable,
 		String filename, Map properties, ClassLoader classloader, 
 		RequiredServiceInfo[] requiredservices, ProvidedServiceInfo[] providedservices, 
-//		IModelValueProvider master, IModelValueProvider daemon, 
-//		IModelValueProvider autoshutdown, 
-		ConfigurationInfo[] configurations,
-		SubcomponentTypeInfo[] subcomponents)
+		ConfigurationInfo[] configurations, SubcomponentTypeInfo[] subcomponents, String[] imports)
 	{
 		this.name = name;
 		this.packagename = packagename;
@@ -124,7 +105,7 @@ public class ModelInfo extends Startable implements IModelInfo
 //		this.autoshutdown = autoshutdown;
 		this.configurations = configurations!=null? SUtil.arrayToList(configurations): null;
 		this.subcomponents = subcomponents!=null? SUtil.arrayToList(subcomponents): null;
-//		this.imports = imports;
+		this.imports = imports!=null? SUtil.arrayToList(imports): null;
 //		this.components = components;
 		setRequiredServices(requiredservices);
 	}
@@ -163,14 +144,42 @@ public class ModelInfo extends Startable implements IModelInfo
 		return fullname;
 	}
 	
-//	/**
-//	 *  Get the imports.
-//	 *  @return The imports.
-//	 */
-//	public String[] getImports()
-//	{
-//		return imports;
-//	}
+	/**
+	 *  Get the imports.
+	 *  @return The imports.
+	 */
+	public String[] getImports()
+	{
+		return imports==null? SUtil.EMPTY_STRING_ARRAY: (String[])imports.toArray(new String[imports.size()]);
+	}
+	
+	/**
+	 *  Get the imports including the package.
+	 *  @return The imports.
+	 */
+	public String[] getAllImports()
+	{
+		String[] ret = getImports();
+		if(packagename!=null || packagename.length()>0)
+		{
+			String[] tmp = new String[ret.length+1];
+			if(ret.length>0)
+				System.arraycopy(ret, 0, tmp, 0, ret.length);
+			tmp[tmp.length-1] = getPackage()+".*";
+			ret = tmp;
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Add an import statement.
+	 */
+	public void addImport(String imp)
+	{
+		if(imports==null)
+			imports = new ArrayList();
+		imports.add(imp);
+	}
 	
 	/**
 	 *  Get the model description.
@@ -382,7 +391,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	{
 		this.report = report;
 	}
-
+	
 //	/**
 //	 *  Set the configurations.
 //	 *  @param configurations The configurations to set.
@@ -392,6 +401,15 @@ public class ModelInfo extends Startable implements IModelInfo
 //		this.configurationnames = configurationnames;
 //	}
 	
+	/**
+	 *  Set the imports.
+	 *  @param imports The imports to set.
+	 */
+	public void setImports(String[] imports)
+	{
+		this.imports = SUtil.arrayToList(imports);
+	}
+
 	/**
 	 *  Set the configurations.
 	 *  @param configurations The configurations to set.
@@ -487,6 +505,16 @@ public class ModelInfo extends Startable implements IModelInfo
 		if(properties==null)
 			properties = new HashMap();
 		properties.put(name, value);
+	}
+	
+	/**
+	 *  Add a property.
+	 */
+	public void	addProperty(UnparsedExpression unexp)
+	{
+		if(properties==null)
+			properties = new HashMap();
+		properties.put(unexp.getName(), unexp);
 	}
 	
 	// Exclude from transfer?!
@@ -646,42 +674,6 @@ public class ModelInfo extends Startable implements IModelInfo
 		
 //		return suspend==null? null: (Boolean)suspend.getValue(configname);
 	}
-	
-//	/**
-//	 *  Set the master.
-//	 *  @param master The master to set.
-//	 */
-//	public void setMaster(IModelValueProvider master)
-//	{
-//		this.master = master;
-//	}
-//
-//	/**
-//	 *  Set the daemon.
-//	 *  @param daemon The daemon to set.
-//	 */
-//	public void setDaemon(IModelValueProvider daemon)
-//	{
-//		this.daemon = daemon;
-//	}
-//
-//	/**
-//	 *  Set the autoshutdown.
-//	 *  @param autoshutdown The autoshutdown to set.
-//	 */
-//	public void setAutoShutdown(IModelValueProvider autoshutdown)
-//	{
-//		this.autoshutdown = autoshutdown;
-//	}
-//
-//	/**
-//	 *  Set the suspend flag.
-//	 *  @param suspend The suspend to set.
-//	 */
-//	public void setSuspend(IModelValueProvider suspend)
-//	{
-//		this.suspend = suspend;
-//	}
 	
 	/**
 	 *  Get the subcomponent names. 

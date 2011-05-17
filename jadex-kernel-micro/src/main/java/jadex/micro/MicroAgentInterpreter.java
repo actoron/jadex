@@ -817,7 +817,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 //			imports = (String[])imp.toArray(new String[imp.size()]);
 //		}
 //		return imports;
-		return model.getImports();
+		return model.getModelInfo().getAllImports();
 	}
 	
 	/**

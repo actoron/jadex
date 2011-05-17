@@ -20,11 +20,8 @@ import java.util.Map;
 /**
  * 
  */
-public class ComponentModel extends ModelInfo implements ICacheableModel
+public class ComponentModel implements ICacheableModel
 {
-	/** The imports. */
-	protected List imports;
-	
 	/** The last modified date. */
 	protected long lastmodified;
 	
@@ -34,19 +31,19 @@ public class ComponentModel extends ModelInfo implements ICacheableModel
 	/** The model info. */
 	protected IModelInfo modelinfo;
 
-	
-	/** The filename. */
-	protected String filename;
-	
-	/** The class loader. */
-	protected ClassLoader classloader;
-	
 	/**
 	 * 
 	 */
 	public ComponentModel()
 	{
-		setStartable(true);
+	}
+	
+	/**
+	 * 
+	 */
+	public ComponentModel(IModelInfo modelinfo)
+	{
+		this.modelinfo = modelinfo;
 	}
 	
 	/**
@@ -55,10 +52,18 @@ public class ComponentModel extends ModelInfo implements ICacheableModel
 	 */
 	public IModelInfo getModelInfo()
 	{
-		// return a copy without addidtional data? or make additional methods not bean like?
-		return this;
+		return modelinfo;
 	}
 	
+	/**
+	 *  Set the modelinfo.
+	 *  @param modelinfo The modelinfo to set.
+	 */
+	public void setModelInfo(IModelInfo modelinfo)
+	{
+		this.modelinfo = modelinfo;
+	}
+
 	/**
 	 *  Get the lastmodified.
 	 *  @return the lastmodified.
@@ -95,84 +100,84 @@ public class ComponentModel extends ModelInfo implements ICacheableModel
 		this.lastchecked = lastchecked;
 	}
 
-	/**
-	 *  Get the imports.
-	 *  @return the imports.
-	 */
-	public String[] getImports()
-	{
-		return imports==null? SUtil.EMPTY_STRING_ARRAY: (String[])imports.toArray(new String[imports.size()]);
-	}
+//	/**
+//	 *  Get the imports.
+//	 *  @return the imports.
+//	 */
+//	public String[] getImports()
+//	{
+//		return imports==null? SUtil.EMPTY_STRING_ARRAY: (String[])imports.toArray(new String[imports.size()]);
+//	}
+//	
+//	/**
+//	 *  Get the imports.
+//	 *  @return the imports.
+//	 */
+//	public String[] getAllImports()
+//	{
+//		if(getPackage()==null)
+//			return getImports();
+//			
+//		String[] ret = imports==null? new String[1]: (String[])imports.toArray(new String[imports.size()+1]);
+//		ret[ret.length-1] = getPackage()+".*";
+//		
+//		return ret;
+//	}
+//
+//	/**
+//	 *  Set the imports.
+//	 *  @param imports The imports to set.
+//	 */
+//	public void setImports(String[] imports)
+//	{
+//		this.imports = SUtil.arrayToList(imports);
+//	}
 	
-	/**
-	 *  Get the imports.
-	 *  @return the imports.
-	 */
-	public String[] getAllImports()
-	{
-		if(getPackage()==null)
-			return getImports();
-			
-		String[] ret = imports==null? new String[1]: (String[])imports.toArray(new String[imports.size()+1]);
-		ret[ret.length-1] = getPackage()+".*";
-		
-		return ret;
-	}
+//	/**
+//	 *  Add an import statement.
+//	 */
+//	public void addImport(String imp)
+//	{
+//		if(imports==null)
+//			imports = new ArrayList();
+//		imports.add(imp);
+//	}
 
-	/**
-	 *  Set the imports.
-	 *  @param imports The imports to set.
-	 */
-	public void setImports(String[] imports)
-	{
-		this.imports = SUtil.arrayToList(imports);
-	}
-	
-	/**
-	 *  Add an import statement.
-	 */
-	public void addImport(String imp)
-	{
-		if(imports==null)
-			imports = new ArrayList();
-		imports.add(imp);
-	}
-
-	/**
-	 *  Get the filename.
-	 *  @return the filename.
-	 */
-	public String getFilename()
-	{
-		return filename;
-	}
-
-	/**
-	 *  Set the filename.
-	 *  @param filename The filename to set.
-	 */
-	public void setFilename(String filename)
-	{
-		this.filename = filename;
-	}
-
-	/**
-	 *  Get the classloader.
-	 *  @return the classloader.
-	 */
-	public ClassLoader getClassLoader()
-	{
-		return classloader;
-	}
-
-	/**
-	 *  Set the classloader.
-	 *  @param classloader The classloader to set.
-	 */
-	public void setClassLoader(ClassLoader classloader)
-	{
-		this.classloader = classloader;
-	}
+//	/**
+//	 *  Get the filename.
+//	 *  @return the filename.
+//	 */
+//	public String getFilename()
+//	{
+//		return filename;
+//	}
+//
+//	/**
+//	 *  Set the filename.
+//	 *  @param filename The filename to set.
+//	 */
+//	public void setFilename(String filename)
+//	{
+//		this.filename = filename;
+//	}
+//
+//	/**
+//	 *  Get the classloader.
+//	 *  @return the classloader.
+//	 */
+//	public ClassLoader getClassLoader()
+//	{
+//		return classloader;
+//	}
+//
+//	/**
+//	 *  Set the classloader.
+//	 *  @param classloader The classloader to set.
+//	 */
+//	public void setClassLoader(ClassLoader classloader)
+//	{
+//		this.classloader = classloader;
+//	}
 	
 	/**
 	 *  Build the error report.

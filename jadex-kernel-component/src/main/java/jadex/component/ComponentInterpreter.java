@@ -121,7 +121,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 			{
 				public Object execute(IInternalAccess ia)
 				{
-					init(model.getModelInfo(), ComponentInterpreter.this.config, model.getProperties(), ComponentInterpreter.this.properties)
+					init(model.getModelInfo(), ComponentInterpreter.this.config, model.getModelInfo().getProperties(), ComponentInterpreter.this.properties)
 						.addResultListener(createResultListener(new DelegationResultListener(inited)
 					{
 						public void customResultAvailable(Object result)
@@ -787,7 +787,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 //			imports = (String[])imp.toArray(new String[imp.size()]);
 //		}
 //		return imports;
-		return model.getAllImports();
+		return model.getModelInfo().getAllImports();
 	}
 	
 	/**

@@ -166,10 +166,10 @@ public class Reader
  	 */
 	public Object read(XMLStreamReader parser, final ClassLoader classloader, final Object callcontext) throws Exception
 	{
-		XMLReporter	reporter	= factory.getXMLReporter();
+		XMLReporter	reporter = factory.getXMLReporter();
 		if(reporter==null)
 		{
-			reporter	= new XMLReporter()
+			reporter = new XMLReporter()
 			{
 				public void report(String message, String errorType, Object relatedInformation, Location location) throws XMLStreamException
 				{
@@ -228,7 +228,7 @@ public class Reader
 		catch(RuntimeException e)
 		{
 //			e.printStackTrace();
-			Location	loc	= readcontext.getStack().size()>0 ? readcontext.getTopStackElement().getLocation() : parser.getLocation();
+			Location	loc	= readcontext.getStackSize()>0 ? readcontext.getTopStackElement().getLocation() : parser.getLocation();
 			reporter.report(e.toString(), "XML error", readcontext, loc);
 		}
 		finally
@@ -237,7 +237,7 @@ public class Reader
 			parser.close();
 		}
 
-		return readcontext.rootobject;
+		return readcontext.getRootObject();
 	}
 	
 	/**
@@ -285,7 +285,7 @@ public class Reader
 		}
 		else if(readcontext.getReadIgnore()==0)
 		{
-			List stack = readcontext.getStack();
+//			List stack = readcontext.getStack();
 
 			// Fetch for info when creating attributes.
 			Map rawattrs = null;
@@ -310,20 +310,20 @@ public class Reader
 //			QName localname = parser.getPrefix()==null || parser.getPrefix()==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getLocalName())
 //				: new QName(parser.getNamespaceURI(), parser.getLocalName(), parser.getPrefix());
 			
-			QName[] fullpath = getXMLPath(stack, localname);
+			QName[] fullpath = readcontext.getXMLPath(localname);
 			
 			TypeInfo typeinfo = handler.getTypeInfo(localname, fullpath, rawattrs);
 			
 			// Find out if we need to ignore. 
-			if(stack.size()>0)
+			if(readcontext.getStackSize()>0)
 			{
-				StackElement pse = (StackElement)stack.get(stack.size()-1);
+				StackElement pse = (StackElement)readcontext.getTopStackElement();
 				List pathname = new ArrayList();
 				pathname.add(localname);
-				for(int i=stack.size()-2; i>=0 && pse.getObject()==null; i--)
+				for(int i=readcontext.getStackSize()-2; i>=0 && pse.getObject()==null; i--)
 				{
-					pse = (StackElement)stack.get(i);
-					pathname.add(0, ((StackElement)stack.get(i+1)).getTag());
+					pse = (StackElement)readcontext.getStackElement(i);
+					pathname.add(0, readcontext.getStackElement(i+1).getTag());
 				}
 				
 				if(pse!=null)
@@ -350,12 +350,12 @@ public class Reader
 					{
 						object = readcontext.getReadObjects().get(idref);
 						StackElement se = new StackElement(localname, object, rawattrs, typeinfo, parser.getLocation());
-						stack.add(se);
+						readcontext.addStackElement(se);
 					}
 					else
 					{
 						StackElement se = new StackElement(localname, null, rawattrs, typeinfo, parser.getLocation());
-						stack.add(se);
+						readcontext.addStackElement(se);
 						readcontext.getReporter().report("idref not contained: "+idref, "idref error", se, se.getLocation());						
 					}
 				}
@@ -372,7 +372,7 @@ public class Reader
 					
 					try
 					{
-						object = handler.createObject(ti, readcontext.getStack().isEmpty(), readcontext, rawattrs);
+						object = handler.createObject(ti, readcontext.getStackSize()==0, readcontext, rawattrs);
 					}
 					catch(Exception e)
 					{
@@ -397,11 +397,7 @@ public class Reader
 						readcontext.getReadObjects().put(id, object);
 					}
 					
-					stack.add(new StackElement(localname, object, rawattrs, typeinfo, parser.getLocation()));
-					if(stack.size()==1)
-					{
-						readcontext.setRootObject(object);
-					}
+					readcontext.addStackElement(new StackElement(localname, object, rawattrs, typeinfo, parser.getLocation()));
 				
 					// Handle attributes.
 					int atcnt = attrcnt;
@@ -420,9 +416,9 @@ public class Reader
 						{
 							attrpath = new ArrayList();
 							attrpath.add(readcontext.getTopStackElement().getTag());
-							for(int i=stack.size()-2; i>=0 && object==null; i--)
+							for(int i=readcontext.getStackSize()-2; i>=0 && object==null; i--)
 							{
-								StackElement pse = (StackElement)stack.get(i);
+								StackElement pse = readcontext.getStackElement(i);
 								attrpath.add(pse.getTag());
 								object = pse.getObject();
 							}
@@ -505,7 +501,7 @@ public class Reader
 		if(readcontext.getReadIgnore()==0)
 		{
 			XMLStreamReader parser = readcontext.getParser();
-			List stack = readcontext.getStack();
+//			List stack = readcontext.getStack();
 			StackElement topse = readcontext.getTopStackElement();
 			
 	//		System.out.println("end: "+parser.getLocalName());
@@ -513,7 +509,7 @@ public class Reader
 //				: new QName(parser.getNamespaceURI(), parser.getLocalName(), parser.getPrefix());
 			
 			QName localname = parser.getName();
-			QName[] fullpath = getXMLPath(stack);
+			QName[] fullpath = readcontext.getXMLPath();
 			final TypeInfo typeinfo = handler.getTypeInfo(localname, fullpath, topse.getRawAttributes());
 	
 			// Hack. Change object to content when it is element of its own.
@@ -542,11 +538,9 @@ public class Reader
 				}
 				
 				topse = new StackElement(topse.getTag(), val, topse.getRawAttributes(), null, topse.getLocation());
-				stack.set(stack.size()-1, topse);
+				readcontext.setStackElement(topse, readcontext.getStackSize()-1);
+//				stack.set(stack.size()-1, topse);
 //				readcontext.setTopse(topse);
-				// If this is the only element on stack, set also root to it
-				if(stack.size()==1)
-					readcontext.setRootObject(topse.getObject());	
 			}
 			
 			// Handle content.
@@ -609,7 +603,7 @@ public class Reader
 			{					
 				// Handle linking
 				boolean bulklink = typeinfo!=null? typeinfo.isBulkLink(): this.bulklink;
-				if(stack.size()>0 && bulklink)
+				if(readcontext.getStackSize()>0 && bulklink)
 				{
 					// Invoke bulk link for the finished object (as parent).
 					List childs = readcontext.removeChildren(topse.getObject());
@@ -619,15 +613,15 @@ public class Reader
 						linker.bulkLinkObjects(topse.getObject(), childs, readcontext);
 					}
 				}
-				if(stack.size()>1)
+				if(readcontext.getStackSize()>1)
 				{
-					StackElement pse = (StackElement)stack.get(stack.size()-2);
+					StackElement pse = readcontext.getStackElement(readcontext.getStackSize()-2);
 					List pathname = new ArrayList();
 					pathname.add(localname);
-					for(int i=stack.size()-3; i>=0 && pse.getObject()==null; i--)
+					for(int i=readcontext.getStackSize()-3; i>=0 && pse.getObject()==null; i--)
 					{
-						pse = (StackElement)stack.get(i);
-						pathname.add(0, ((StackElement)stack.get(i+1)).getTag());
+						pse = readcontext.getStackElement(i);
+						pathname.add(0, readcontext.getStackElement(i+1).getTag());
 					}
 					
 					if(pse.getObject()!=null)
@@ -659,43 +653,12 @@ public class Reader
 				}
 			}
 			
-			stack.remove(stack.size()-1);
+			readcontext.removeStackElement();
 		}
 		else
 		{
 			readcontext.setReadIgnore(readcontext.getReadIgnore()-1);
 		}
-	}
-	
-	/**
-	 *  Get the xml path for a stack.
-	 *  @param stack The stack.
-	 *  @return The string representig the xml stack (e.g. tag1/tag2/tag3)
-	 */
-	protected QName[] getXMLPath(List stack)
-	{
-		QName[] ret = new QName[stack.size()];
-		for(int i=0; i<stack.size(); i++)
-		{
-			ret[i] = ((StackElement)stack.get(i)).getTag();
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Get the xml path for a stack.
-	 *  @param stack The stack.
-	 *  @return The string representig the xml stack (e.g. tag1/tag2/tag3)
-	 */
-	protected QName[] getXMLPath(List stack, QName tag)
-	{
-		QName[] ret = new QName[stack.size()+1];
-		for(int i=0; i<stack.size(); i++)
-		{
-			ret[i] = ((StackElement)stack.get(i)).getTag();
-		}
-		ret[ret.length-1] = tag;
-		return ret;		
 	}
 	
 	/**

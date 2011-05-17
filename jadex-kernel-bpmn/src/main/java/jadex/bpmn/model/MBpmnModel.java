@@ -208,6 +208,8 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 			modelinfo.setConfigurations(cinfo);
 		}
 		
+		if(imports!=null)
+			modelinfo.setImports((String[])imports.toArray(new String[imports.size()]));
 		
 		modelinfo.setStartable(true);
 	}

@@ -4,6 +4,8 @@ import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
@@ -77,7 +79,7 @@ public class ComponentXMLReader
 				IContext	context	= (IContext)Reader.READ_CONTEXT.get();
 				MultiCollection	report	= (MultiCollection)context.getUserContext();
 				String	pos;
-				Tuple	stack	= new Tuple(((ReadContext)context).getStack().toArray());
+				Tuple	stack	= new Tuple(((ReadContext)context).getStack());
 				if(stack.getEntities().length>0)
 				{
 					StackElement	se	= (StackElement)stack.get(stack.getEntities().length-1);
@@ -103,18 +105,19 @@ public class ComponentXMLReader
 	public ComponentModel read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
 	{
 		MultiCollection	report	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
-		ComponentModel ret = (ComponentModel)reader.read(rinfo.getInputStream(), classloader, report);
+		ModelInfo mi = (ModelInfo)reader.read(rinfo.getInputStream(), classloader, report);
+		ComponentModel ret = new ComponentModel(mi);
 		
 		if(ret!=null)
 		{
-			ret.setFilename(rinfo.getFilename());
+			mi.setFilename(rinfo.getFilename());
+			mi.setClassloader(classloader);
 			ret.setLastModified(rinfo.getLastModified());
-			ret.setClassLoader(classloader);
 //			ret.initModelInfo(report);
 			
 			// todo: remove
 			
-			IArgument[] args = ret.getArguments(); 
+			IArgument[] args = ret.getModelInfo().getArguments(); 
 			if(args.length>0)
 			{
 				Map argsmap = new HashMap();
@@ -122,13 +125,13 @@ public class ComponentXMLReader
 				{
 					argsmap.put(args[i].getName(), args[i]);
 				}
-				ConfigurationInfo[] configs = ret.getConfigurations();
+				ConfigurationInfo[] configs = ret.getModelInfo().getConfigurations();
 				for(int i=0; i<configs.length; i++)
 				{
 					UnparsedExpression[] unexps = configs[i].getArguments();
 					for(int j=0; j<unexps.length; j++)
 					{
-						Object val = SJavaParser.evaluateExpression(unexps[j].getValue(), ret.getAllImports(), null, ret.getClassLoader());
+						Object val = SJavaParser.evaluateExpression(unexps[j].getValue(), ret.getModelInfo().getAllImports(), null, ret.getModelInfo().getClassLoader());
 						Argument arg = (Argument)argsmap.get(unexps[j].getName());
 						arg.setDefaultValue(configs[i].getName(), val);
 					}
@@ -189,11 +192,11 @@ public class ComponentXMLReader
 				Object	ret	= null;
 				try
 				{
-					ret	= SJavaParser.evaluateExpression((String)val, ((ComponentModel)context.getRootObject()).getAllImports(), null, context.getClassLoader());
+					ret	= SJavaParser.evaluateExpression((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), null, context.getClassLoader());
 				}
 				catch(RuntimeException e)
 				{
-					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+					Object	se	= new Tuple(((ReadContext)context).getStack());
 					MultiCollection	report	= (MultiCollection)context.getUserContext();
 					report.put(se, e.toString());
 				}
@@ -209,11 +212,11 @@ public class ComponentXMLReader
 				Object	ret	= null;
 				try
 				{
-					ret	= SJavaParser.parseExpression((String)val, ((ComponentModel)context.getRootObject()).getAllImports(), context.getClassLoader());
+					ret	= SJavaParser.parseExpression((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), context.getClassLoader());
 				}
 				catch(RuntimeException e)
 				{
-					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+					Object	se	= new Tuple(((ReadContext)context).getStack());
 					MultiCollection	report	= (MultiCollection)context.getUserContext();
 					report.put(se, e.toString());
 				}
@@ -228,10 +231,10 @@ public class ComponentXMLReader
 				Object ret = val;
 				if(val instanceof String)
 				{
-					ret = SReflect.findClass0((String)val, ((ComponentModel)context.getRootObject()).getAllImports(), context.getClassLoader());
+					ret = SReflect.findClass0((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), context.getClassLoader());
 					if(ret==null)
 					{
-						Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+						Object	se	= new Tuple(((ReadContext)context).getStack());
 						MultiCollection	report	= (MultiCollection)context.getUserContext();
 						report.put(se, "Class not found: "+val);
 					}
@@ -250,7 +253,7 @@ public class ComponentXMLReader
 					ret = SReflect.getClassName((Class)val);
 					if(ret==null)
 					{
-						Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+						Object	se	= new Tuple(((ReadContext)context).getStack());
 						MultiCollection	report	= (MultiCollection)context.getUserContext();
 						report.put(se, "Class not found: "+val);
 					}
@@ -266,19 +269,19 @@ public class ComponentXMLReader
 //				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
 //			}, null));
 		
-		Method getname = null; 
-		Method putprop = null;
-		try
-		{
-			getname = UnparsedExpression.class.getMethod("getName", null);
-			putprop = ComponentModel.class.getMethod("addProperty", new Class[]{String.class, Object.class});
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+//		Method getname = null; 
+//		Method putprop = null;
+//		try
+//		{
+//			getname = UnparsedExpression.class.getMethod("getName", null);
+//			putprop = ModelInfo.class.getMethod("addProperty", new Class[]{String.class, Object.class});
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "componenttype")), new ObjectInfo(ComponentModel.class), 
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "componenttype")), new ObjectInfo(ModelInfo.class), 
 			new MappingInfo(null, "description", null,
 			new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
@@ -291,36 +294,35 @@ public class ComponentXMLReader
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "providedservice")}), new AccessInfo(new QName(uri, "providedservice"), "providedService")),
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "requiredservice")}), new AccessInfo(new QName(uri, "requiredservice"), "requiredService")),
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype")}), new AccessInfo(new QName(uri, "componenttype"), "subcomponentType")),
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "property")}), new AccessInfo(new QName(uri, "property"), "property", null, null, new BeanAccessInfo(putprop, null, "map", getname))),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "property")}), new AccessInfo(new QName(uri, "property"), "property", null, null))//, new BeanAccessInfo(putprop, null, "map", getname))),
 		})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "configuration")), new ObjectInfo(ConfigurationInfo.class, new IPostProcessor()
 		{
 			public Object postProcess(IContext context, Object object)
 			{
-//				ConfigurationInfo app = (ConfigurationInfo)object;
-//				ComponentModel mapp = (ComponentModel)context.getRootObject();
-//				
-//				List margs = app.getArguments();
-//				for(int i=0; i<margs.size(); i++)
-//				{
-//					try
-//					{
-//						MExpressionType overridenarg = (MExpressionType)margs.get(i);
-//						Argument arg = (Argument)mapp.getModelInfo().getArgument(overridenarg.getName());
-//						if(arg==null)
-//							throw new RuntimeException("Overridden argument not declared in component type: "+overridenarg.getName());
-//						
+				ConfigurationInfo app = (ConfigurationInfo)object;
+				IModelInfo mapp = (IModelInfo)context.getRootObject();
+				
+				UnparsedExpression[] margs = app.getArguments();
+				for(int i=0; i<margs.length; i++)
+				{
+					try
+					{
+						Argument arg = (Argument)mapp.getArgument(margs[i].getName());
+						if(arg==null)
+							throw new RuntimeException("Overridden argument not declared in component type: "+margs[i].getName());
+						
 //						Object val = overridenarg.getParsedValue().getValue(null);
 //						arg.setDefaultValue(app.getName(), val);
-//					}
-//					catch(RuntimeException e)
-//					{
-//						Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
-//						MultiCollection	report	= (MultiCollection)context.getUserContext();
-//						report.put(se, e.toString());
-//					}
-//				}
+					}
+					catch(RuntimeException e)
+					{
+						Object	se	= new Tuple(((ReadContext)context).getStack());
+						MultiCollection	report	= (MultiCollection)context.getUserContext();
+						report.put(se, e.toString());
+					}
+				}
 				
 				return null;
 			}

@@ -79,7 +79,7 @@ public class ApplicationXMLReader
 				IContext	context	= (IContext)Reader.READ_CONTEXT.get();
 				MultiCollection	report	= (MultiCollection)context.getUserContext();
 				String	pos;
-				Tuple	stack	= new Tuple(((ReadContext)context).getStack().toArray());
+				Tuple	stack	= new Tuple(((ReadContext)context).getStack());
 				if(stack.getEntities().length>0)
 				{
 					StackElement	se	= (StackElement)stack.get(stack.getEntities().length-1);
@@ -168,7 +168,7 @@ public class ApplicationXMLReader
 				}
 				catch(RuntimeException e)
 				{
-					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+					Object	se	= new Tuple(((ReadContext)context).getStack());
 					MultiCollection	report	= (MultiCollection)context.getUserContext();
 					report.put(se, e.toString());
 				}
@@ -188,7 +188,7 @@ public class ApplicationXMLReader
 				}
 				catch(RuntimeException e)
 				{
-					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+					Object	se	= new Tuple(((ReadContext)context).getStack());
 					MultiCollection	report	= (MultiCollection)context.getUserContext();
 					report.put(se, e.toString());
 				}
@@ -207,7 +207,7 @@ public class ApplicationXMLReader
 						context.getRootObject()).getAllImports(), context.getClassLoader());
 					if(ret==null)
 					{
-						Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+						Object	se	= new Tuple(((ReadContext)context).getStack());
 						MultiCollection	report	= (MultiCollection)context.getUserContext();
 						report.put(se, "Class not found: "+val);
 					}
@@ -226,7 +226,7 @@ public class ApplicationXMLReader
 					ret = SReflect.getClassName((Class)val);
 					if(ret==null)
 					{
-						Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+						Object	se	= new Tuple(((ReadContext)context).getStack());
 						MultiCollection	report	= (MultiCollection)context.getUserContext();
 						report.put(se, "Class not found: "+val);
 					}
@@ -276,7 +276,7 @@ public class ApplicationXMLReader
 					}
 					catch(RuntimeException e)
 					{
-						Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+						Object	se	= new Tuple(((ReadContext)context).getStack());
 						MultiCollection	report	= (MultiCollection)context.getUserContext();
 						report.put(se, e.toString());
 					}
@@ -386,7 +386,7 @@ public class ApplicationXMLReader
 				}
 				catch(Exception e)
 				{
-					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+					Object	se	= new Tuple(((ReadContext)context).getStack());
 					MultiCollection	report	= (MultiCollection)context.getUserContext();
 					report.put(se, e.toString());
 				}
@@ -405,14 +405,14 @@ public class ApplicationXMLReader
 					}
 					catch(RuntimeException e)
 					{
-						Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+						Object	se	= new Tuple(((ReadContext)context).getStack());
 						MultiCollection	report	= (MultiCollection)context.getUserContext();
 						report.put(se, e.toString());
 					}
 				}	
 				else
 				{
-					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+					Object	se	= new Tuple(((ReadContext)context).getStack());
 					MultiCollection	report	= (MultiCollection)context.getUserContext();
 					report.put(se, "Unknown condition language: "+lang);
 				}

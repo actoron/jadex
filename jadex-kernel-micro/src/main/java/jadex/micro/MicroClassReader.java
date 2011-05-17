@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  Reads micro agent classes and generates a model from metainfo and annotations.
  */
 public class MicroClassReader
 {
@@ -106,7 +106,7 @@ public class MicroClassReader
 	}
 	
 	/**
-	 * 
+	 *  Fill the model details using meta info.
 	 */
 	protected void fillMicroModelFromMetaInfo(MicroModel micromodel, String model, Class cma, ClassLoader classloader, MicroAgentMetaInfo metainfo)
 	{
@@ -164,7 +164,7 @@ public class MicroClassReader
 	}
 	
 	/**
-	 * 
+	 *  Fill the model details using annotation.
 	 */
 	protected void fillMicroModelFromAnnotations(MicroModel micromodel, String model, Class cma, ClassLoader classloader)
 	{
@@ -174,11 +174,11 @@ public class MicroClassReader
 		if(cma.isAnnotationPresent(Imports.class))
 		{
 			String[] tmp = ((Imports)cma.getAnnotation(Imports.class)).value();
-			String[] imp = new String[tmp.length+1];
-			imp[0] = imports[0];
-			System.arraycopy(tmp, 0, imp, 1, tmp.length);
-			imports = imp;
-			micromodel.setImports(imports);
+//			String[] imp = new String[tmp.length+1];
+//			imp[0] = imports[0];
+//			System.arraycopy(tmp, 0, imp, 1, tmp.length);
+//			imports = imp;
+			modelinfo.setImports(tmp);
 		}
 		if(cma.isAnnotationPresent(Description.class))
 		{

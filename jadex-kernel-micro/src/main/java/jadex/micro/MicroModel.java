@@ -8,9 +8,6 @@ import jadex.commons.ICacheableModel;
  */
 public class MicroModel implements ICacheableModel
 {
-	/** The imports. */
-	protected String[] imports;
-	
 	/** The last modified date. */
 	protected long lastmodified;
 	
@@ -71,23 +68,5 @@ public class MicroModel implements ICacheableModel
 	public void setLastChecked(long lastchecked)
 	{
 		this.lastchecked = lastchecked;
-	}
-
-	/**
-	 *  Get the imports.
-	 *  @return the imports.
-	 */
-	public String[] getImports()
-	{
-		return imports;
-	}
-
-	/**
-	 *  Set the imports.
-	 *  @param imports The imports to set.
-	 */
-	public void setImports(String[] imports)
-	{
-		this.imports = imports;
 	}
 }

@@ -1392,7 +1392,7 @@ public class MEnvSpaceType	extends MSpaceType
 	{
 		MultiCollection	report	= (MultiCollection)context.getUserContext();
 		String	pos;
-		Tuple	stack	= new Tuple(((ReadContext)context).getStack().toArray());
+		Tuple	stack	= new Tuple(((ReadContext)context).getStack());
 		if(stack.getEntities().length>0)
 		{
 			StackElement	se	= (StackElement)stack.get(stack.getEntities().length-1);

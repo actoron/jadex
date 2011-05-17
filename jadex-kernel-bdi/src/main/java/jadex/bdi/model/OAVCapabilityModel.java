@@ -102,9 +102,9 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		boolean startable = !this.getClass().equals(OAVCapabilityModel.class);
 		
 		Collection tmp = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_imports);
-		List imp = new ArrayList(tmp!=null? tmp: new ArrayList());
-		imp.add(state.getAttributeValue(handle, OAVBDIMetaModel.capability_has_package)+".*");
-//		String[] imports = (String[])imp.toArray(new String[0]);
+//		List imp = new ArrayList(tmp!=null? tmp: new ArrayList());
+//		imp.add(state.getAttributeValue(handle, OAVBDIMetaModel.capability_has_package)+".*");
+		String[] imports = (String[])tmp.toArray(new String[0]);
 		
 		String[] confignames = getConfigurations();
 		ConfigurationInfo[] cinfos = null;
@@ -119,7 +119,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		
 		this.modelinfo = new ModelInfo(getName(), getPackage(), getDescription(), null, getArguments(), 
 			getResults(), startable, filename, getProperties(), getClassLoader(), getRequiredServices(), 
-			getProvidedServices(), cinfos, null);
+			getProvidedServices(), cinfos, null, imports);
 		
 		// Build error report.
 		getModelInfo().setReport(new AbstractErrorReportBuilder(getModelInfo().getName(), getModelInfo().getFilename(),

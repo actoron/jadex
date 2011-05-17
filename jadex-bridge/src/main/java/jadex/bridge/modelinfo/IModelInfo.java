@@ -41,11 +41,17 @@ public interface IModelInfo
 	 */
 	public String getDescription();
 	
-//	/**
-//	 *  Get the imports.
-//	 *  @return The imports.
-//	 */
-//	public String[] getImports();
+	/**
+	 *  Get the imports.
+	 *  @return The imports.
+	 */
+	public String[] getImports();
+	
+	/**
+	 *  Get the imports including the package.
+	 *  @return The imports.
+	 */
+	public String[] getAllImports();
 	
 	/**
 	 *  Get the report.
@@ -76,6 +82,12 @@ public interface IModelInfo
 	 *  @return The arguments.
 	 */
 	public IArgument[] getArguments();
+	
+	/**
+	 *  Get the argument.
+	 *  @return The argument.
+	 */
+	public IArgument getArgument(String name);
 	
 	/**
 	 *  Get the results.

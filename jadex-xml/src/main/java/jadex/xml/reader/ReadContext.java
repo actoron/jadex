@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLReporter;
 import javax.xml.stream.XMLStreamReader;
 
@@ -82,7 +83,7 @@ public class ReadContext implements IContext
 		this.reporter = reporter;
 		this.callcontext = callcontext;
 		this.classloader = classloader;
-		this.rootobject = root;
+//		this.rootobject = root;
 		this.stack = stack;
 //		this.topse = topse;
 		this.comment = comment;
@@ -126,7 +127,10 @@ public class ReadContext implements IContext
 	 */
 	public Object getRootObject()
 	{
-		return rootobject;
+		if(rootobject!=null)
+			return rootobject;
+		else
+			return getStackElement(0).getObject();//rootobject;
 	}
 
 	/**
@@ -138,31 +142,39 @@ public class ReadContext implements IContext
 		return	getTopStackElement().getObject();
 	}*/
 
-	/**
-	 *  Set the root object.
-	 *  @param root The rootobject to set.
-	 */
-	public void setRootObject(Object root)
-	{
-		this.rootobject = root;
-	}
+//	/**
+//	 *  Set the root object.
+//	 *  @param root The rootobject to set.
+//	 */
+//	public void setRootObject(Object root)
+//	{
+//		this.rootobject = root;
+//	}
 
+//	/**
+//	 *  Get the stack.
+//	 *  @return The stack.
+//	 */
+//	public List getStack()
+//	{
+//		return stack;
+//	}
+//
+//	/**
+//	 *  Set the stack.
+//	 *  @param stack The stack to set.
+//	 */
+//	public void setStack(List stack)
+//	{
+//		this.stack = stack;
+//	}
+	
 	/**
-	 *  Get the stack.
-	 *  @return The stack.
+	 *  Get stack element.
 	 */
-	public List getStack()
+	public StackElement getStackElement(int pos)
 	{
-		return stack;
-	}
-
-	/**
-	 *  Set the stack.
-	 *  @param stack The stack to set.
-	 */
-	public void setStack(List stack)
-	{
-		this.stack = stack;
+		return (StackElement)stack.get(pos);
 	}
 
 	/**
@@ -182,7 +194,41 @@ public class ReadContext implements IContext
 		}
 		return ret;
 	}
+	
+	/**
+	 * 
+	 */
+	public void addStackElement(StackElement elem)
+	{
+		stack.add(elem);
+	}
+	
+	/**
+	 * 
+	 */
+	public void setStackElement(StackElement elem, int pos)
+	{
+		stack.set(pos, elem);
+	}
+	
+	/**
+	 * 
+	 */
+	public void removeStackElement()
+	{	
+		StackElement elem = (StackElement)stack.remove(stack.size()-1);
+		if(stack.size()==0)
+			rootobject = elem.getObject();
+	}
 
+	/**
+	 *  
+	 */
+	public int getStackSize()
+	{
+		return stack.size();
+	}
+	
 	/**
 	 *  Get the comment.
 	 *  @return The comment.
@@ -335,4 +381,42 @@ public class ReadContext implements IContext
 		return children==null? null: (List)children.remove(key);
 	}
 	
+	/**
+	 *  Get the xml path for a stack.
+	 *  @param stack The stack.
+	 *  @return The string representig the xml stack (e.g. tag1/tag2/tag3)
+	 */
+	public QName[] getXMLPath(QName tag)
+	{
+		QName[] ret = new QName[stack.size()+1];
+		for(int i=0; i<stack.size(); i++)
+		{
+			ret[i] = ((StackElement)stack.get(i)).getTag();
+		}
+		ret[ret.length-1] = tag;
+		return ret;		
+	}
+	
+	/**
+	 *  Get the xml path for a stack.
+	 *  @param stack The stack.
+	 *  @return The string representig the xml stack (e.g. tag1/tag2/tag3)
+	 */
+	protected QName[] getXMLPath()
+	{
+		QName[] ret = new QName[stack.size()];
+		for(int i=0; i<stack.size(); i++)
+		{
+			ret[i] = ((StackElement)stack.get(i)).getTag();
+		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public StackElement[] getStack()
+	{
+		return (StackElement[])stack.toArray(new StackElement[stack.size()]);
+	}
 }
