@@ -55,7 +55,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	protected GpmnModelLoader loader;
 
 	/** The gpmn 2 bdiagent converter. */
-	protected GpmnBDIConverter2 converter;
+	protected GpmnBDIConverter converter;
 	
 	/** The bdi agent factory. */
 	protected IComponentFactory factory;
@@ -75,7 +75,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 		this.properties	= properties;
 		this.provider = provider;
 		this.loader = new GpmnModelLoader();
-		this.converter = new GpmnBDIConverter2();
+		this.converter = new GpmnBDIConverter();
 		
 	}
 	
@@ -157,7 +157,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 			ResourceInfo rinfo = SUtil.getResourceInfo0(model, classloader);
 			BufferedReader br = new BufferedReader(new InputStreamReader(rinfo.getInputStream()));
 			br.readLine();
-			ret.setResult(GpmnXMLReader2.read(model, classloader, null).getModelInfo());
+			ret.setResult(GpmnXMLReader.read(model, classloader, null).getModelInfo());
 		}
 		catch(Exception e)
 		{
@@ -235,7 +235,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 			BufferedReader br = new BufferedReader(new InputStreamReader(rinfo.getInputStream()));
 			br.readLine();
 			
-			ret = GpmnXMLReader2.read(modelinfo.getFilename(), modelinfo.getClassLoader(), null);
+			ret = GpmnXMLReader.read(modelinfo.getFilename(), modelinfo.getClassLoader(), null);
 			
 			ret = converter.convertGpmnModelToBDIAgents((jadex.gpmn.model.MGpmnModel)ret, modelinfo.getClassLoader());
 	

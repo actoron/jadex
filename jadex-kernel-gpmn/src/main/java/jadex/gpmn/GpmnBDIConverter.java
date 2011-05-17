@@ -38,7 +38,7 @@ import java.util.Set;
 /**
  *  Class for converting a gpmn model description to an agent description.
  */
-public class GpmnBDIConverter2
+public class GpmnBDIConverter
 {
 	//-------- attributes --------
 	
@@ -50,7 +50,7 @@ public class GpmnBDIConverter2
 	/**
 	 *  Create a new converter.
 	 */
-	public GpmnBDIConverter2()
+	public GpmnBDIConverter()
 	{
 		this.loader = new OAVBDIModelLoader();
 	}

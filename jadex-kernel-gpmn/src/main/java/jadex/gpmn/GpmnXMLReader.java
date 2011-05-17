@@ -34,7 +34,7 @@ import javax.xml.namespace.QName;
 /**
  *  Reader for loading Gpmn XML models into a Java representation states.
  */
-public class GpmnXMLReader2
+public class GpmnXMLReader
 {
 	/**
 	 *  Main for testing.
