@@ -219,6 +219,14 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	}
 	
 	/**
+	 *  Get a raw reference to a provided service implementation.
+	 */
+	public Object	getRawService(Class type)
+	{
+		return interpreter.getRawService(type);
+	}
+	
+	/**
 	 *  Create a result listener that is executed as an agent step.
 	 *  @param listener The listener to be executed as an agent step.
 	 */

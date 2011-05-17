@@ -10,6 +10,7 @@
 	
 	<imports>
 		<import>jadex.bridge.*</import>
+		<import>jadex.commons.future.ThreadSuspendable</import>
 	</imports>
 	
 	<arguments>
@@ -29,18 +30,19 @@
 	</properties>
 	
 	<services>
-		<providedservice class="IMultiKernelNotifierService">
-			<implementation>
-				new jadex.kernelbase.MultiKernelNotifierService($component)
-			</implementation>
-		</providedservice>
 		<providedservice class="IComponentFactory">
 			<implementation>
-				new jadex.kernelbase.MultiFactory($component, $args.defaultkernels, $args.ignorekernels, $args.ignoreextensions)
+				new jadex.kernelbase.MultiFactory($args.defaultkernels, $args.ignorekernels, $args.ignoreextensions)
+			</implementation>
+		</providedservice>
+		
+		<providedservice class="IMultiKernelNotifierService">
+			<implementation>
+				$component.getRawService(IComponentFactory.class)
 			</implementation>
 		</providedservice>
 	</services>
-	
+	<!-- new jadex.kernelbase.MultiKernelNotifierService($component)  -->
 	<configurations>
 		<configuration name="component_kernel">
 			<components>

@@ -331,21 +331,25 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 				{
 					if(fields[i].isAnnotationPresent(ServiceIdentifier.class))
 					{
-						if(SReflect.isSupertype(IServiceIdentifier.class, fields[i].getType()))
+						ServiceIdentifier si = (ServiceIdentifier)fields[i].getAnnotation(ServiceIdentifier.class);
+						if (si.value().equals(Object.class) || si.value().equals(type))
 						{
-							try
+							if(SReflect.isSupertype(IServiceIdentifier.class, fields[i].getType()))
 							{
-								fields[i].setAccessible(true);
-								fields[i].set(service, mgmntservice.getServiceIdentifier());
+								try
+								{
+									fields[i].setAccessible(true);
+									fields[i].set(service, mgmntservice.getServiceIdentifier());
+								}
+								catch(Exception e)
+								{
+									e.printStackTrace();
+								}
 							}
-							catch(Exception e)
+							else
 							{
-								e.printStackTrace();
+								System.out.println("Field cannot store IServiceIdentifer: "+fields[i]);
 							}
-						}
-						else
-						{
-							System.out.println("Field cannot store IServiceIdentifer: "+fields[i]);
 						}
 					}
 					

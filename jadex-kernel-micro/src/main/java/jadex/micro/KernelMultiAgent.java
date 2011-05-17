@@ -24,8 +24,8 @@ import jadex.micro.annotation.ProvidedServices;
 	@Argument(name="ignoreextensions", description="File extensions that are ignored.",
 		typename="String[]", defaultvalue="null")})
 @ProvidedServices({
-	@ProvidedService(type=IMultiKernelNotifierService.class, implementation=@Implementation(expression="new jadex.kernelbase.MultiKernelNotifierService($component)")),
-	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new jadex.kernelbase.MultiFactory($component, $args.defaultkernels, $args.ignorekernels, $args.ignoreextensions)"))
+	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new jadex.kernelbase.MultiFactory($args.defaultkernels, $args.ignorekernels, $args.ignoreextensions)")),
+	@ProvidedService(type=IMultiKernelNotifierService.class, implementation=@Implementation(expression="$component.getRawService(jadex.bridge.IComponentFactory.class)"))
 })
 @ComponentTypes({
 	@ComponentType(name="KernelMicro", filename="jadex/micro/KernelMicroAgent.class")

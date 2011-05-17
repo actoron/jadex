@@ -1,7 +1,6 @@
 package jadex.bridge;
 
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.commons.future.Future;
@@ -15,7 +14,7 @@ import java.util.Map;
  *  and is capable of loading component models from files
  *  as well as instantiating components.
  */
-public interface IComponentFactory extends IService
+public interface IComponentFactory
 {
 	//-------- methods --------
 	

@@ -56,7 +56,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	/** The gpmn loader. */
 	protected GpmnModelLoader loader;
 
-	/** The gpmn 2 bdiagent converter. */
+	/** The gpmn bdiagent converter. */
 	protected GpmnBDIConverter converter;
 	
 	/** The bdi agent factory. */

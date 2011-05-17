@@ -140,19 +140,22 @@ public class GpmnBDIConverter
 		if(modelcontext!=null)
 		{
 			List elements = modelcontext.getElements();
-			for(int i=0; i<elements.size(); i++)
+			if (elements != null)
 			{
-				MContextElement element = (MContextElement)elements.get(i);
-				
-				String name = subprocess? modelname + "." + element.getName(): element.getName();
-				
-				if(!element.isSet())
+				for(int i=0; i<elements.size(); i++)
 				{
-					createBelief(state, scopehandle, name, element.getType(), element.getValue());
-				}
-				else
-				{
-					createBeliefSet(state, scopehandle, name, element.getType(), null, element.getValue());
+					MContextElement element = (MContextElement)elements.get(i);
+					
+					String name = subprocess? modelname + "." + element.getName(): element.getName();
+					
+					if(!element.isSet())
+					{
+						createBelief(state, scopehandle, name, element.getType(), element.getValue());
+					}
+					else
+					{
+						createBeliefSet(state, scopehandle, name, element.getType(), null, element.getValue());
+					}
 				}
 			}
 		}
@@ -406,7 +409,9 @@ public class GpmnBDIConverter
 			}
 			public Object getUserContext() 
 			{
-				return state;
+				//return state;
+				//TODO: Correcy?
+				return new OAVUserContext(state, this);
 			}
 		};
 		

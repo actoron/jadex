@@ -8,14 +8,19 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IMultiKernelListener;
 import jadex.bridge.IMultiKernelNotifierService;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.Excluded;
+import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceIdentifier;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
@@ -53,12 +58,13 @@ import java.util.jar.JarFile;
  *  Kernel that delegates calls to sub-kernels it finds using on-demand searches.
  *
  */
-public class MultiFactory extends BasicService implements IComponentFactory
+public class MultiFactory implements IComponentFactory, IMultiKernelNotifierService
 {
 	/** Kernel model property for extensions */
 	protected static final String KERNEL_EXTENSIONS = "kernel.types";
 	
 	/** The internal access. */
+	@ServiceComponent
 	protected IInternalAccess ia;
 	
 	/** Kernel default locations */
@@ -99,6 +105,16 @@ public class MultiFactory extends BasicService implements IComponentFactory
 	
 	/** Call Multiplexer */
 	protected CallMultiplexer multiplexer;
+	
+	/** The listeners. */
+	protected List listeners;
+	
+	/** The service identifier. */
+	@ServiceIdentifier(IComponentFactory.class)
+	protected IServiceIdentifier sid;
+	
+	/** Flag whether the service has started */
+	protected boolean started;
 
 	/**
 	 *  Creates a new MultiFactory.
@@ -108,10 +124,10 @@ public class MultiFactory extends BasicService implements IComponentFactory
 	 *  @param extensionblacklist File extension the factory should not consider to be models 
 	 *  	   (no extension and most files with .class extension are ignored by default)
 	 */
-	public MultiFactory(IInternalAccess ia, String[] defaultLocations, String[] kernelblacklist, String[] extensionblacklist)
+	public MultiFactory(String[] defaultLocations, String[] kernelblacklist, String[] extensionblacklist)
 	{
-		super(ia.getServiceContainer().getId(), IComponentFactory.class, null);
-		this.ia = ia;
+		//super(ia.getServiceContainer().getId(), IComponentFactory.class, null);
+		//this.ia = ia;
 		this.kernellocationcache = new MultiCollection();
 		this.kernelurls = new MultiCollection();
 		this.potentialurls = new HashSet();
@@ -135,103 +151,111 @@ public class MultiFactory extends BasicService implements IComponentFactory
 				this.kernelblacklist.addAll(Arrays.asList(kernelblacklist));
 		this.extensionblacklist = new HashSet(baseextensionblacklist);
 		this.potentialkernellocations = new HashSet();
+		this.listeners = new ArrayList();
+		started = false;
 	}
 	
 	/**
 	 *  Starts the service.
 	 */
+	@ServiceStart
 	public IFuture startService()
 	{
-		final Future ret = new Future();
-		super.startService().addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		if (started)
+			return IFuture.DONE;
+		
+		final Future ret = new Future()
 		{
-			public void customResultAvailable(final Object res)
+			public void setResult(Object result)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				started = true;
+				super.setResult(result);
+			}
+		};
+		
+		SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				final ILibraryService ls = (ILibraryService) result;
+				final IExternalAccess exta = ia.getExternalAccess();
+				ls.addLibraryServiceListener(new ILibraryServiceListener()
+				{
+					public IFuture urlRemoved(final URL url)
+					{
+						exta.scheduleStep(new IComponentStep()
+						{
+							public Object execute(IInternalAccess ia)
+							{
+								Collection affectedkernels = (Collection) kernelurls.remove(url);
+								if (affectedkernels != null)
+								{
+									String[] keys = (String[]) kernellocationcache.keySet().toArray(new String[0]);
+									for (int i = 0; i < keys.length; ++i)
+										for (Iterator it = affectedkernels.iterator(); it.hasNext(); )
+											kernellocationcache.remove(keys[i], it.next());
+								}
+								potentialurls.remove(url);
+								validurls.remove(url);
+								kernellocationcache = null;
+								return null;
+							}
+						});
+						return IFuture.DONE;
+					}
+					
+					public IFuture urlAdded(final URL url)
+					{
+						exta.scheduleStep(new IComponentStep()
+						{
+							public Object execute(IInternalAccess ia)
+							{
+								extensionblacklist = new HashSet(baseextensionblacklist);
+								validurls.add(url);
+								potentialurls.add(url);
+								return null;
+							}
+						});
+						return IFuture.DONE;
+					}
+				});
+				
+				ls.getAllURLs().addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						final ILibraryService ls = (ILibraryService) result;
-						final IExternalAccess exta = ia.getExternalAccess();
-						ls.addLibraryServiceListener(new ILibraryServiceListener()
-						{
-							public IFuture urlRemoved(final URL url)
-							{
-								exta.scheduleStep(new IComponentStep()
-								{
-									public Object execute(IInternalAccess ia)
-									{
-										Collection affectedkernels = (Collection) kernelurls.remove(url);
-										if (affectedkernels != null)
-										{
-											String[] keys = (String[]) kernellocationcache.keySet().toArray(new String[0]);
-											for (int i = 0; i < keys.length; ++i)
-												for (Iterator it = affectedkernels.iterator(); it.hasNext(); )
-													kernellocationcache.remove(keys[i], it.next());
-										}
-										potentialurls.remove(url);
-										validurls.remove(url);
-										kernellocationcache = null;
-										return null;
-									}
-								});
-								return IFuture.DONE;
-							}
-							
-							public IFuture urlAdded(final URL url)
-							{
-								exta.scheduleStep(new IComponentStep()
-								{
-									public Object execute(IInternalAccess ia)
-									{
-										extensionblacklist = new HashSet(baseextensionblacklist);
-										validurls.add(url);
-										potentialurls.add(url);
-										return null;
-									}
-								});
-								return IFuture.DONE;
-							}
-						});
+						potentialurls.addAll((Collection) result);
+						validurls.addAll((Collection) result);
 						
-						ls.getAllURLs().addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+						if (kerneldefaultlocations.isEmpty())
+							ret.setResult(null);
+						else
 						{
-							public void customResultAvailable(Object result)
+							// Initialize default locations
+							String[] dl = (String[]) kerneldefaultlocations.keySet().toArray(new String[kerneldefaultlocations.size()]);
+							kerneldefaultlocations.clear();
+							IResultListener loccounter = ia.createResultListener(new CounterResultListener(dl.length, ia.createResultListener(new DelegationResultListener(ret)
 							{
-								potentialurls.addAll((Collection) result);
-								validurls.addAll((Collection) result);
-								
-								if (kerneldefaultlocations.isEmpty())
-									ret.setResult(res);
-								else
+								public void customResultAvailable(Object result)
 								{
-									// Initialize default locations
-									String[] dl = (String[]) kerneldefaultlocations.keySet().toArray(new String[kerneldefaultlocations.size()]);
-									kerneldefaultlocations.clear();
-									IResultListener loccounter = ia.createResultListener(new CounterResultListener(dl.length, ia.createResultListener(new DelegationResultListener(ret)
-									{
-										public void customResultAvailable(Object result)
-										{
-											ret.setResult(res);
-										}
-									}))
-									{
-										public void intermediateResultAvailable(Object result)
-										{
-											IModelInfo kernel = (IModelInfo) result;
-											String[] exts = (String[]) SJavaParser.evaluateExpression(((UnparsedExpression)kernel.getProperties().get(KERNEL_EXTENSIONS)).getValue(), null);
-											if (exts != null)
-												for (int i = 0; i < exts.length; ++i)
-													kerneldefaultlocations.put(exts[i], kernel.getFilename());
-										}
-									});
-									
-									ClassLoader cl = ls.getClassLoader();
-									for (int i = 0; i < dl.length; ++i)
-										loadModel(dl[i], null, cl).addResultListener(loccounter);
+									ret.setResult(null);
 								}
-							}
-						}));
+							}))
+							{
+								public void intermediateResultAvailable(Object result)
+								{
+									IModelInfo kernel = (IModelInfo) result;
+									String[] exts = (String[]) SJavaParser.evaluateExpression(((UnparsedExpression)kernel.getProperties().get(KERNEL_EXTENSIONS)).getValue(), null);
+									if (exts != null)
+										for (int i = 0; i < exts.length; ++i)
+											kerneldefaultlocations.put(exts[i], kernel.getFilename());
+								}
+							});
+							
+							ClassLoader cl = ls.getClassLoader();
+							for (int i = 0; i < dl.length; ++i)
+								loadModel(dl[i], null, cl).addResultListener(loccounter);
+						}
 					}
 				}));
 			}
@@ -443,6 +467,58 @@ public class MultiFactory extends BasicService implements IComponentFactory
 	}
 	
 	/**
+	 *  Adds a kernel listener.
+	 *  @param listener The listener.
+	 *  @return Null, when done.
+	 */
+	public IFuture addKernelListener(IMultiKernelListener listener)
+	{
+		listeners.add(listener);
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Removes a kernel listener.
+	 *  @param listener The listener.
+	 *  @return Null, when done.
+	 */
+	public IFuture removeKernelListener(IMultiKernelListener listener)
+	{
+		listeners.remove(listeners);
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Fires a types added event.
+	 *  @param types The types added.
+	 *  @return Null, when done.
+	 */
+	public IFuture fireTypesAdded(String[] types)
+	{
+		final Future ret = new Future();
+		IMultiKernelListener[] ls = (IMultiKernelListener[]) listeners.toArray(new IMultiKernelListener[listeners.size()]);
+		IResultListener counter = ia.createResultListener(new CounterResultListener(ls.length, true, ia.createResultListener(new DelegationResultListener(ret))));
+		for (int i = 0; i < ls.length; ++i)
+			ls[i].componentTypesAdded(types).addResultListener(counter);
+		return ret;
+	}
+	
+	/**
+	 *  Fires a types removed event.
+	 *  @param types The types removed.
+	 *  @return Null, when done.
+	 */
+	public IFuture fireTypesRemoved(String[] types)
+	{
+		final Future ret = new Future();
+		IMultiKernelListener[] ls = (IMultiKernelListener[]) listeners.toArray(new IMultiKernelListener[listeners.size()]);
+		IResultListener counter = ia.createResultListener(new CounterResultListener(ls.length, true, ia.createResultListener(new DelegationResultListener(ret))));
+		for (int i = 0; i < ls.length; ++i)
+			ls[i].componentTypesAdded(types).addResultListener(counter);
+		return ret;
+	}
+	
+	/**
 	 *  Attempts to find an active kernel factory, searching, loading and instantiating as required.
 	 *  
 	 *  @param model The model for which the kernel is needed.
@@ -515,6 +591,7 @@ public class MultiFactory extends BasicService implements IComponentFactory
 	 */
 	protected IFuture findActiveKernel(final String model, final String[] imports, final ClassLoader classloader)
 	{
+		//SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(kernelmodel, null, classloader))
 		final Future ret = new Future();
 		SServiceProvider.getServices(ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_APPLICATION).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
@@ -641,10 +718,9 @@ public class MultiFactory extends BasicService implements IComponentFactory
 		{
 			public Object execute(Object args)
 			{
-//				System.out.println("Starting: " + kernelmodel);
+//				System.out.println("Starting kernel: " + kernelmodel);
 				final Future ret = new Future();
-				SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(kernelmodel, null, classloader))
-					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				findActiveKernel(kernelmodel, null, classloader).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -692,7 +768,7 @@ public class MultiFactory extends BasicService implements IComponentFactory
 																	{
 																		public void customResultAvailable(Object result)
 																		{
-																			((IMultiKernelNotifierService) result).fireTypesAdded(types).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+																			MultiFactory.this.fireTypesAdded(types).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 																			{
 																				public void customResultAvailable(Object result)
 																				{
@@ -801,7 +877,7 @@ public class MultiFactory extends BasicService implements IComponentFactory
 			public boolean filter(Object obj)
 			{
 				String loc = (String) obj;
-				return loc.substring(loc.lastIndexOf(File.separatorChar) + 1).startsWith("Kernel");
+				return loc.substring(loc.lastIndexOf(File.separatorChar) + 1).toLowerCase().startsWith("kernel");
 			}
 		}).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 		return ret;
@@ -1034,5 +1110,17 @@ public class MultiFactory extends BasicService implements IComponentFactory
 		}
 		
 		return ext;
+	}
+	
+	public int hashCode()
+	{
+		return sid.hashCode();
+	}
+	
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof IService)
+			return sid.equals(((IService) obj).getServiceIdentifier());
+		return false;
 	}
 }

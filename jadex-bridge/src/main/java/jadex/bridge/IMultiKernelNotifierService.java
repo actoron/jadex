@@ -23,6 +23,6 @@ public interface IMultiKernelNotifierService
 	public IFuture removeKernelListener(IMultiKernelListener listener);
 	
 	// TODO: Temporary, until service references become available.
-	public IFuture fireTypesAdded(String[] types);
-	public IFuture fireTypesRemoved(String[] types);
+	//public IFuture fireTypesAdded(String[] types);
+	//public IFuture fireTypesRemoved(String[] types);
 }
