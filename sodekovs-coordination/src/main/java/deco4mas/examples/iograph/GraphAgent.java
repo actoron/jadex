@@ -3,10 +3,10 @@
  */
 package deco4mas.examples.iograph;
 
-import jadex.bridge.Argument;
-import jadex.bridge.IArgument;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.IArgument;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;

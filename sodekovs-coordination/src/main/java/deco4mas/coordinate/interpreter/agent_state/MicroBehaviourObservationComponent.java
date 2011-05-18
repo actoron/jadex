@@ -1,10 +1,13 @@
 package deco4mas.coordinate.interpreter.agent_state;
 
 import jadex.application.runtime.IApplicationExternalAccess;
+import jadex.bridge.IComponentChangeEvent;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
+import jadex.commons.IFilter;
+import jadex.commons.future.IFuture;
 import jadex.micro.ExternalAccess;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
@@ -62,26 +65,61 @@ public class MicroBehaviourObservationComponent extends BehaviorObservationCompo
 
 		ExternalAccess externalAccess = (ExternalAccess) extAccess;
 		MicroAgentInterpreter interpreter = externalAccess.getInterpreter();
-		interpreter.setHistoryEnabled(true);
-		interpreter.addChangeListener(new IChangeListener() {
-
+		interpreter.addComponentListener(new IComponentListener() {
+			
 			@Override
-			public void changeOccurred(ChangeEvent event) {
-				if (event.getType().equals("addStep")) {
-					Object[] values = (Object[]) event.getValue();
-					IComponentStep step = (IComponentStep) values[0];
+			public IFilter getFilter() {
+				return new IFilter()
+				{
+					public boolean filter(Object obj)
+					{
+						// Nur EVENT_TYPE_CREATION Events sind interessant
+						IComponentChangeEvent cce = (IComponentChangeEvent) obj;
+						return IComponentChangeEvent.EVENT_TYPE_CREATION.equals(cce.getEventType());
+					}
+				};
+			}
+			
+			@Override
+			public IFuture eventOccured(IComponentChangeEvent cce) {
+				if (cce.getSourceCategory().equals(MicroAgentInterpreter.TYPE_STEP)) {
+					IComponentStep step = (IComponentStep) cce.getDetails();
 					if (step instanceof MicroAgent.ExecuteWaitForStep) {
 						MicroAgent.ExecuteWaitForStep waitForStep = (MicroAgent.ExecuteWaitForStep) step;
 						IComponentStep runStep = waitForStep.getComponentStep();
 						String nameOfElement = runStep.getClass().getSimpleName();
-
-						if (agentElement.getAgentElementType().equals(AgentElementType.MICRO_STEP.toString()) && agentElement.getElement_id().equals(nameOfElement)) {
+						
+						if (agentElement.getElement_id().equals(nameOfElement)) {
 							checkAndPublishIfApplicable(runStep, AgentElementType.MICRO_STEP, nameOfElement);
 						}
 					}
 				}
+				
+				return IFuture.DONE;
 			}
 		});
+		
+		
+//		interpreter.setHistoryEnabled(true);
+//		interpreter.addChangeListener(new IChangeListener() {
+//
+//			@Override
+//			public void changeOccurred(ChangeEvent event) {
+//				if (event.getType().equals("addStep")) {
+//					Object[] values = (Object[]) event.getValue();
+//					IComponentStep step = (IComponentStep) values[0];
+//					if (step instanceof MicroAgent.ExecuteWaitForStep) {
+//						MicroAgent.ExecuteWaitForStep waitForStep = (MicroAgent.ExecuteWaitForStep) step;
+//						IComponentStep runStep = waitForStep.getComponentStep();
+//						String nameOfElement = runStep.getClass().getSimpleName();
+//
+//						if (agentElement.getAgentElementType().equals(AgentElementType.MICRO_STEP.toString()) && agentElement.getElement_id().equals(nameOfElement)) {
+//							checkAndPublishIfApplicable(runStep, AgentElementType.MICRO_STEP, nameOfElement);
+//						}
+//					}
+//				}
+//			}
+//		});
 	}
 
 	/**
