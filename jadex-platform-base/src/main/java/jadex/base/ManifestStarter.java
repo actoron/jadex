@@ -32,10 +32,6 @@ public class ManifestStarter
 			if (urls[i].getPath().contains("jadex-platform-standalone-launch"))
 			{
 				String urlPath = urls[i].getPath();
-				// Oh, did I mention that the .jar-URL in the initial
-				// Java classloader is sometimes broken?
-				if (urls[i].getPath().startsWith("/jadex-platform-standalone-launch"))
-					urlPath = urlPath.substring(1);
 				
 				initialjarfile = new File(urlPath);
 				if (!initialjarfile.exists())
