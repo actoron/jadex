@@ -201,6 +201,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		List ret = new ArrayList();
 		ret.addAll(libcl.getDelegates().keySet());
 		ret.addAll(SUtil.getClasspathURLs(libcl));
+		ret.addAll(SUtil.getClasspathURLs(null));
 		return new Future(ret);
 	}
 	

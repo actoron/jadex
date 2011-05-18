@@ -998,11 +998,17 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected List searchUrl(URL url, IFilter filter)
 	{
-		File file = new File(url.getFile());
-		if (file.isDirectory())
-			return searchDirectory(file, filter, false);
-		else if (file.getName().endsWith(".jar"))
-			return searchJar(file, filter);
+		try
+		{
+			File file = new File(url.toURI());
+			if (file.isDirectory())
+				return searchDirectory(file, filter, false);
+			else if (file.getName().endsWith(".jar"))
+				return searchJar(file, filter);
+		}
+		catch (Exception e)
+		{
+		}
 
 		return Collections.EMPTY_LIST;
 	}
@@ -1070,7 +1076,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			// TODO: Print warning?
+			//System.out.println("Warning: File not found: " + jar.getAbsolutePath());
+			//e.printStackTrace();
 		}
 		return ret;
 	}
