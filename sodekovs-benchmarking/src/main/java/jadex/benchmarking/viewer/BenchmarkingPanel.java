@@ -144,9 +144,12 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 
 		historic_data_table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
-				System.out.println("Selection changed.");
-				IHistoricDataDescription selDataDesc = historic_data_table.getSelectedHistoricDataDescription();				
-				updateHistoryPNG(selDataDesc);
+				//Otherwise each mouse click would lead to two events be fired :mouse "click" and "release"
+				if (!e.getValueIsAdjusting()) {
+					System.out.println("Selection changed.");
+					IHistoricDataDescription selDataDesc = historic_data_table.getSelectedHistoricDataDescription();
+					updateHistoryPNG(selDataDesc);
+				}
 			}
 		});
 
@@ -449,7 +452,7 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 		historyPNGPnl.removeAll();
 
 		// HACK: And dieser Stelle gibt es das Problem, dass die PNG-Datei teilweise später erstellt wird, als die Gui fertig wird.
-		//Behoben durch einen Timer, der das Bild nachläd, sobald es zur Verfügung steht.
+		// Behoben durch einen Timer, der das Bild nachläd, sobald es zur Verfügung steht.
 		checkAndCreatePNGFile(dataDesc);
 
 		Image img = null;
@@ -468,13 +471,13 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 		} else {
 			historyPNGPnl.add(new JLabel("No history-png found of : " + dataDesc.getName() + " - " + dataDesc.getTimestamp() + "\n Please reload..."), BorderLayout.NORTH);
 			historyPNGPnl.add(new JLabel(icons.getIcon("png_not_found")), BorderLayout.CENTER);
-			
-			//Timer is used to check when png is created and to re-load png to panel.
+
+			// Timer is used to check when png is created and to re-load png to panel.
 			long TIME_TO_START = 500;
 			long DELAY_BETWEEN_POLLS = 250;
 			Timer timer = new Timer();
-			timer.schedule(new CheckFileThread(dataDesc.getLogAsPNG(),this, dataDesc), TIME_TO_START, DELAY_BETWEEN_POLLS);			
-			
+			timer.schedule(new CheckFileThread(dataDesc.getLogAsPNG(), this, dataDesc), TIME_TO_START, DELAY_BETWEEN_POLLS);
+
 		}
 		historyPNGPnl.revalidate();
 		// this.revalidate();
@@ -488,18 +491,18 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 	 */
 	protected void checkAndCreatePNGFile(IHistoricDataDescription dataDesc) {
 
-			if (pngFiles.containsKey(dataDesc.getLogAsPNG())) {
-				// Do nothing. file exists already
+		if (pngFiles.containsKey(dataDesc.getLogAsPNG())) {
+			// Do nothing. file exists already
+		} else {
+			// check wether file exists but has not been put into hashtable
+			if (FileHandler.fileExists(dataDesc.getLogAsPNG())) {
+				// add png file to hashtable
+				pngFiles.put(dataDesc.getLogAsPNG(), true);
 			} else {
-				// check wether file exists but has not been put into hashtable
-				if (FileHandler.fileExists(dataDesc.getLogAsPNG())) {
-					// add png file to hashtable
-					pngFiles.put(dataDesc.getLogAsPNG(), true);
-				} else {
-					// create file and add to hashtable
-					CreateImage.createImage(dataDesc);
-//					System.out.println("1111111111111111111111111");
-					pngFiles.put(dataDesc.getLogAsPNG(), true);
+				// create file and add to hashtable
+				CreateImage.createImage(dataDesc);
+				// System.out.println("1111111111111111111111111");
+				pngFiles.put(dataDesc.getLogAsPNG(), true);
 			}
 		}
 
