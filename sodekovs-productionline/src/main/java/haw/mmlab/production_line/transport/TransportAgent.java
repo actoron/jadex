@@ -18,10 +18,10 @@ import haw.mmlab.production_line.service.ServiceHelper;
 import haw.mmlab.production_line.state.MainState;
 import haw.mmlab.production_line.strategies.IStrategy;
 import haw.mmlab.production_line.strategies.StrategyFactory;
-import jadex.bridge.Argument;
-import jadex.bridge.IArgument;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.IFuture;
@@ -74,8 +74,8 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 		getLogger().addHandler(handler);
 		getLogger().setUseParentHandlers(false);
 
-		addService(new ProcessWorkpieceService(this, id, AgentConstants.AGENT_TYPE_TRANSPORT, getLogger()));
-
+		addService(IProcessWorkpieceService.class, new ProcessWorkpieceService(this, id, AgentConstants.AGENT_TYPE_TRANSPORT, getLogger()));
+		
 		getLogger().info(id + " created");
 
 		return IFuture.DONE;
@@ -153,7 +153,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 		 *            the given {@link Task}
 		 */
 		private void informWPProduced(final IInternalAccess ia, final Task task) {
-			SServiceProvider.getService(ia.getServiceProvider(), IManagerService.class).addResultListener(new IResultListener() {
+			SServiceProvider.getService(getServiceProvider(), IManagerService.class).addResultListener(new IResultListener() {
 
 				public void resultAvailable(Object result) {
 					IManagerService service = (IManagerService) result;
@@ -177,7 +177,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 		 *            the given {@link Workpiece}
 		 */
 		private void sendWorkpiece(final IInternalAccess ia, final Task task, final Workpiece workpiece) {
-			SServiceProvider.getServices(ia.getServiceProvider(), IProcessWorkpieceService.class).addResultListener(new IResultListener() {
+			SServiceProvider.getServices(getServiceProvider(), IProcessWorkpieceService.class).addResultListener(new IResultListener() {
 
 				public void resultAvailable(Object result) {
 					@SuppressWarnings("unchecked")
@@ -360,7 +360,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 		}
 
 		public Object execute(IInternalAccess ia) {
-			SServiceProvider.getServices(ia.getServiceProvider(), IProcessWorkpieceService.class).addResultListener(new IResultListener() {
+			SServiceProvider.getServices(getServiceProvider(), IProcessWorkpieceService.class).addResultListener(new IResultListener() {
 
 				public void resultAvailable(Object result) {
 					@SuppressWarnings("unchecked")

@@ -9,13 +9,13 @@ import haw.mmlab.production_line.configuration.Transport;
 import haw.mmlab.production_line.logging.database.DatabaseLogger;
 import haw.mmlab.production_line.service.IManagerService;
 import jadex.application.runtime.IApplicationExternalAccess;
-import jadex.bridge.Argument;
 import jadex.bridge.CreationInfo;
-import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.IFuture;
@@ -98,7 +98,7 @@ public class ManagerAgent extends MicroAgent {
 	@Override
 	public IFuture agentCreated() {
 		// add the manager service
-		addService(new ManagerService(this));
+		addService(IManagerService.class, new ManagerService(this));
 
 		// initialize the logger
 		getLogger().setLevel(Level.ALL);

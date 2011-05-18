@@ -22,10 +22,10 @@ import haw.mmlab.production_line.strategies.AgentData;
 import haw.mmlab.production_line.strategies.EvaluationResult;
 import haw.mmlab.production_line.strategies.IStrategy;
 import haw.mmlab.production_line.strategies.StrategyFactory;
-import jadex.bridge.Argument;
-import jadex.bridge.IArgument;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.IFuture;
@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
+
 
 /**
  * The robot agents, processes workpieces, stores them in his {@link Buffer} and sends them further to the next transport agent.
@@ -82,7 +83,7 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 		getLogger().info(id + " created");
 
 		// add the service
-		addService(new ProcessWorkpieceService(this, id, AgentConstants.AGENT_TYPE_ROBOT, getLogger()));
+		addService(IProcessWorkpieceService.class, new ProcessWorkpieceService(this, id, AgentConstants.AGENT_TYPE_ROBOT, getLogger()));
 
 		return IFuture.DONE;
 	}
@@ -214,8 +215,8 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 		private void sendWorkpiece(final BufferElement element, IInternalAccess ia) {
 			// Rolle aus Pufferelement holen
 			final Role role = element.getRole();
-
-			SServiceProvider.getServices(ia.getServiceProvider(), IProcessWorkpieceService.class).addResultListener(new IResultListener() {
+			
+			SServiceProvider.getServices(getServiceProvider(), IProcessWorkpieceService.class).addResultListener(new IResultListener() {
 
 				public void resultAvailable(Object result) {
 					@SuppressWarnings("unchecked")
