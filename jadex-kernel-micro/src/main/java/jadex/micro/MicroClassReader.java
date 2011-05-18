@@ -192,7 +192,8 @@ public class MicroClassReader
 			Map props = new HashMap();
 			for(int i=0; i<vals.length; i++)
 			{
-				props.put(vals[i].name(), vals[i].value());
+				// Todo: clazz, language
+				props.put(vals[i].name(), new UnparsedExpression(vals[i].name(), null, vals[i].value(), null) );
 			}
 			modelinfo.setProperties(props);
 		}

@@ -11,7 +11,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMultiKernelListener;
 import jadex.bridge.IMultiKernelNotifierService;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceBinding;
@@ -21,7 +20,6 @@ import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
 import jadex.commons.IFilter;
@@ -35,7 +33,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.javaparser.SJavaParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -245,7 +242,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 								public void intermediateResultAvailable(Object result)
 								{
 									IModelInfo kernel = (IModelInfo) result;
-									String[] exts = (String[]) SJavaParser.evaluateExpression(((UnparsedExpression)kernel.getProperties().get(KERNEL_EXTENSIONS)).getValue(), null);
+									String[] exts = (String[])kernel.getProperty(KERNEL_EXTENSIONS);
 									if (exts != null)
 										for (int i = 0; i < exts.length; ++i)
 											kerneldefaultlocations.put(exts[i], kernel.getFilename());
@@ -950,16 +947,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				IModelInfo kernelmodel = (IModelInfo) result;
 				try
 				{
-					String[] exts = null;
-					Object extprop = kernelmodel.getProperties().get(KERNEL_EXTENSIONS);
-					if (extprop instanceof String)
-					{
-						exts = (String[]) SJavaParser.evaluateExpression((String) kernelmodel.getProperties().get(KERNEL_EXTENSIONS), null);
-					}
-					else if (extprop instanceof UnparsedExpression)
-					 	exts = (String[]) SJavaParser.evaluateExpression(((UnparsedExpression)kernelmodel.getProperties().get(KERNEL_EXTENSIONS)).getValue(), null);
-					//String[] exts = (String[]) kernelmodel.getProperties().get(KERNEL_EXTENSIONS);
-					if (exts != null)
+					String[] exts = (String[])kernelmodel.getProperty(KERNEL_EXTENSIONS);
+					if(exts!=null)
 					{
 						for (int i = 0; i < exts.length; ++i)
 							kernellocs.put(exts[i], kernelmodel.getFilename());

@@ -2291,7 +2291,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			pasuspend = IComponentDescription.STATE_SUSPENDED.equals(padesc.getState());
 		}
 		// Suspend when set to suspend or when parent is also suspended or when specified in model.
-		boolean	debugging = lmodel.getProperties().get("debugging")==null? false: ((Boolean)lmodel.getProperties().get("debugging")).booleanValue();
+		boolean	debugging = lmodel.getProperty("debugging")==null? false: ((Boolean)lmodel.getProperty("debugging")).booleanValue();
 		debugging = debugging || lmodel.getSuspend(cinfo.getConfiguration())==null? false: lmodel.getSuspend(cinfo.getConfiguration()).booleanValue();
 		boolean sus = cinfo.getSuspend()==null? false: cinfo.getSuspend().booleanValue();
 		boolean	suspend	= sus || pasuspend || debugging;

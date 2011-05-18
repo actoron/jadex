@@ -837,7 +837,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		{
 			SimpleValueFetcher sfetcher = new SimpleValueFetcher();
 			sfetcher.setValue("$args", getArguments());
-			sfetcher.setValue("$properties", getModel().getProperties());
+//			sfetcher.setValue("$properties", getModel().getProperties());
 			sfetcher.setValue("$results", getResults());
 			sfetcher.setValue("$component", microagent);
 			sfetcher.setValue("$provider", getServiceProvider());

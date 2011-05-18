@@ -384,7 +384,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 									public void customResultAvailable(Object result)
 									{
 										final IExternalAccess exta = (IExternalAccess)result;
-										final Object clid = exta.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
+										final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
 									
 										if(clid instanceof String)
 										{
@@ -513,7 +513,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 								public void customResultAvailable(Object result)
 								{
 									final IExternalAccess exta = (IExternalAccess)result;
-									final Object clid = exta.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
+									final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
 									viewables.put(cid, clid==null? Boolean.FALSE: Boolean.TRUE);
 	//								System.out.println("node: "+viewables.get(cid));
 									node.refresh(false);

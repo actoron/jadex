@@ -17,6 +17,7 @@ import jadex.bridge.IMessageService;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
 import jadex.bridge.ServiceTerminatedException;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
@@ -249,7 +250,7 @@ public class MessageService extends BasicService implements IMessageService
 		}
 
 		// Conversion via platform specific codecs
-		IContentCodec[] compcodecs = getContentCodecs(comp.getModel().getProperties());
+		IContentCodec[] compcodecs = getContentCodecs(comp.getModel());
 		for(Iterator it=msgcopy.keySet().iterator(); it.hasNext(); )
 		{
 			String	name	= (String)it.next();
@@ -360,9 +361,10 @@ public class MessageService extends BasicService implements IMessageService
 	 *  @param props The properties.
 	 *  @return The content codec.
 	 */
-	public static IContentCodec[] getContentCodecs(Map props)
+	public static IContentCodec[] getContentCodecs(IModelInfo model)
 	{
 		List ret = null;
+		Map	props	= model.getProperties();
 		if(props!=null)
 		{
 			for(Iterator it=props.keySet().iterator(); ret==null && it.hasNext();)
@@ -372,7 +374,7 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					if(ret==null)
 						ret	= new ArrayList();
-					ret.add(props.get(name));
+					ret.add(model.getProperty(name));
 				}
 			}
 		}
@@ -908,7 +910,7 @@ public class MessageService extends BasicService implements IMessageService
 							}
 
 							// Conversion via platform specific codecs
-							IContentCodec[] compcodecs = getContentCodecs(component.getModel().getProperties());
+							IContentCodec[] compcodecs = getContentCodecs(component.getModel());
 							for(Iterator it=message.keySet().iterator(); it.hasNext(); )
 							{
 								String name = (String)it.next();

@@ -9,6 +9,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.SServiceProvider;
@@ -191,8 +192,12 @@ public class RemoteReferenceModule
 		Map properties = null;
 		
 		// Hack! as long as registry is not there
+		String[]	imports	= null;
+		ClassLoader	cl	= null;
 		if(target instanceof IExternalAccess)
 		{
+			imports	= ((IExternalAccess)target).getModel().getAllImports();
+			cl	= ((IExternalAccess)target).getModel().getClassLoader();
 			properties = ((IExternalAccess)target).getModel().getProperties();		
 		}
 		else if(properties==null && target instanceof IService)
@@ -205,7 +210,7 @@ public class RemoteReferenceModule
 		// Check for excluded and synchronous methods.
 		if(properties!=null)
 		{
-			Object ex = properties.get(RemoteServiceManagementService.REMOTE_EXCLUDED);
+			Object ex = UnparsedExpression.getProperty(properties, RemoteServiceManagementService.REMOTE_EXCLUDED, imports, null, cl);
 			if(ex!=null)
 			{
 				for(Iterator it = SReflect.getIterator(ex); it.hasNext(); )
@@ -217,7 +222,7 @@ public class RemoteReferenceModule
 					}
 				}
 			}
-			Object syn = properties.get(RemoteServiceManagementService.REMOTE_SYNCHRONOUS);
+			Object syn = UnparsedExpression.getProperty(properties, RemoteServiceManagementService.REMOTE_SYNCHRONOUS, imports, null, cl);
 			if(syn!=null)
 			{
 				for(Iterator it = SReflect.getIterator(syn); it.hasNext(); )
@@ -229,7 +234,7 @@ public class RemoteReferenceModule
 					}
 				}
 			}
-			Object un = properties.get(RemoteServiceManagementService.REMOTE_UNCACHED);
+			Object un = UnparsedExpression.getProperty(properties, RemoteServiceManagementService.REMOTE_UNCACHED, imports, null, cl);
 			if(un!=null)
 			{
 				for(Iterator it = SReflect.getIterator(un); it.hasNext(); )
@@ -241,7 +246,7 @@ public class RemoteReferenceModule
 					}
 				}
 			}
-			Object mr = properties.get(RemoteServiceManagementService.REMOTE_METHODREPLACEMENT);
+			Object mr = UnparsedExpression.getProperty(properties, RemoteServiceManagementService.REMOTE_METHODREPLACEMENT, imports, null, cl);
 			if(mr!=null)
 			{
 				for(Iterator it = SReflect.getIterator(mr); it.hasNext(); )
@@ -254,7 +259,7 @@ public class RemoteReferenceModule
 					}
 				}
 			}
-			Object to = properties.get(RemoteServiceManagementService.REMOTE_TIMEOUT);
+			Object to = UnparsedExpression.getProperty(properties, RemoteServiceManagementService.REMOTE_TIMEOUT, imports, null, cl);
 			if(to!=null)
 			{
 				for(Iterator it = SReflect.getIterator(to); it.hasNext(); )

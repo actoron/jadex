@@ -122,6 +122,15 @@ public interface IModelInfo
 	public Map	getProperties();
 
 	/**
+	 *  Get a parsed property.
+	 *  Unlike raw properties, which may be parsed or unparsed,
+	 *  this method always returns parsed property values.
+	 *  @param	name	The property name.  
+	 *  @return The property value.
+	 */
+	public Object	getProperty(String name);
+
+	/**
 	 *  Return the class loader corresponding to the model.
 	 *  @return The class loader corresponding to the model.
 	 */

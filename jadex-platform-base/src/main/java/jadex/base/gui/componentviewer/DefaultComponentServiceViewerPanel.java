@@ -125,7 +125,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 				});
 				
 				// Component panel.
-				Object clid = exta.getModel().getProperties().get(PROPERTY_COMPONENTVIEWERCLASS);
+				Object clid = exta.getModel().getProperty(PROPERTY_COMPONENTVIEWERCLASS);
 				Class clazz = clid instanceof Class? (Class)clid: clid instanceof String? SReflect.classForName0((String)clid, cl): null;
 				if(clid!=null)
 				{

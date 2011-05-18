@@ -2,12 +2,10 @@ package jadex.bdi.model;
 
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bridge.AbstractErrorReportBuilder;
-import jadex.bridge.IErrorReport;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.ModelInfo;
-import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
@@ -104,7 +102,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		Collection tmp = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_imports);
 //		List imp = new ArrayList(tmp!=null? tmp: new ArrayList());
 //		imp.add(state.getAttributeValue(handle, OAVBDIMetaModel.capability_has_package)+".*");
-		String[] imports = (String[])tmp.toArray(new String[0]);
+		String[] imports = tmp!=null ? (String[])tmp.toArray(new String[0]) : null;
 		
 		String[] confignames = getConfigurations();
 		ConfigurationInfo[] cinfos = null;

@@ -1,5 +1,10 @@
 package jadex.bridge.modelinfo;
 
+import jadex.javaparser.IValueFetcher;
+import jadex.javaparser.SJavaParser;
+
+import java.util.Map;
+
 
 /**
  * 
@@ -133,5 +138,27 @@ public class UnparsedExpression
 	public void setLanguage(String language)
 	{
 		this.language = language;
+	}
+	
+	//-------- static helpers --------
+	
+	/**
+	 *  Get a parsed property.
+	 *  Handles properties, which may be parsed or unparsed,
+	 *  and always returns a parsed property value.
+	 *  @param	name	The property name.  
+	 *  @return The property value or null if property not defined.
+	 */
+	public static Object	getProperty(Map properties, String name, String[] imports, IValueFetcher fetcher, ClassLoader classloader)
+	{
+		// Todo: caching of parsed values?
+		Object	ret	= properties!=null ? properties.get(name) : null;
+		if(ret instanceof UnparsedExpression)
+		{
+			// todo: language
+			UnparsedExpression	upe	= (UnparsedExpression)ret;
+			ret = SJavaParser.evaluateExpression(upe.getValue(), imports, fetcher, classloader);
+		}
+		return ret;
 	}
 }

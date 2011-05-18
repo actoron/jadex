@@ -22,8 +22,6 @@ import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.component.ComponentComponentFactory;
-import jadex.component.ComponentModel;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.AbstractInterpreter;
@@ -424,7 +422,9 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	 *  @param value The result value.
 	 */
 	public void setResultValue(String name, Object value)
-	{	
+	{
+		if(results==null)
+				results	= new HashMap();
 		results.put(name, value);
 	}
 	

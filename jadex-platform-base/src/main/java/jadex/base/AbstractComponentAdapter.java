@@ -253,14 +253,14 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		// the level of the logger
 		// can be Integer or Level
 		
-		Object prop = model.getProperties().get("logging.level");
+		Object prop = model.getProperty("logging.level");
 //		Level level = prop==null? Level.INFO: (Level)prop;
 		Level level = prop==null? Level.WARNING: (Level)prop;
 		logger.setLevel(level);
 
 		// if logger should use Handlers of parent (global) logger
 		// the global logger has a ConsoleHandler(Level:INFO) by default
-		prop = model.getProperties().get("logging.useParentHandlers");
+		prop = model.getProperty("logging.useParentHandlers");
 		if(prop!=null)
 		{
 			logger.setUseParentHandlers(((Boolean)prop).booleanValue());
@@ -268,7 +268,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			
 		// add a ConsoleHandler to the logger to print out
         // logs to the console. Set Level to given property value
-		prop = model.getProperties().get("addConsoleHandler");
+		prop = model.getProperty("addConsoleHandler");
 		if(prop!=null)
 		{
             ConsoleHandler console = new ConsoleHandler();
@@ -285,7 +285,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		// class, java.util.logging.FileHandler, 
 		// such as "%h" for the user's home directory.
 		// 
-		String logfile =	(String)model.getProperties().get("logging.file");
+		String logfile =	(String)model.getProperty("logging.file");
 		if(logfile!=null)
 		{
 		    try

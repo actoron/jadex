@@ -6,7 +6,6 @@ import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -29,14 +28,11 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 /**
  *  Show details of a debugged agent.
@@ -120,7 +116,7 @@ public class DebuggerMainPanel extends JSplitPane
 							{
 								if(props!=null && props.containsKey(KEY_DEBUGGER_BREAKPOINTS))
 								{
-									Collection	breakpoints	= (Collection)props.get(KEY_DEBUGGER_BREAKPOINTS);
+									Collection	breakpoints	= (Collection)exta.getModel().getProperty(KEY_DEBUGGER_BREAKPOINTS);
 									leftpanel[0] = new BreakpointPanel(breakpoints, desc, jcc.getPlatformAccess());
 									DebuggerMainPanel.this.setLeftComponent(leftpanel[0]);
 									DebuggerMainPanel.this.setDividerLocation(150);	// Hack???

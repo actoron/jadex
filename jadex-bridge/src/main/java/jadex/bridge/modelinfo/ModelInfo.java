@@ -160,7 +160,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	public String[] getAllImports()
 	{
 		String[] ret = getImports();
-		if(packagename!=null || packagename.length()>0)
+		if(packagename!=null && packagename.length()>0)
 		{
 			String[] tmp = new String[ret.length+1];
 			if(ret.length>0)
@@ -345,6 +345,19 @@ public class ModelInfo extends Startable implements IModelInfo
 	public Map	getProperties()
 	{
 		return properties;
+	}
+	
+	/**
+	 *  Get a parsed property.
+	 *  Unlike raw properties, which may be parsed or unparsed,
+	 *  this method always returns parsed property values.
+	 *  @param	name	The property name.  
+	 *  @return The property value or null if property not defined.
+	 */
+	public Object	getProperty(String name)
+	{
+		// Todo: caching of parsed values?
+		return UnparsedExpression.getProperty(getProperties(), name, getAllImports(), null, getClassLoader());
 	}
 
 	/**

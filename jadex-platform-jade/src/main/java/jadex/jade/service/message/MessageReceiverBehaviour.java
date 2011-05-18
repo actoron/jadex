@@ -90,7 +90,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 			
 			
 			// Conversion via platform specific codecs
-			IContentCodec[] compcodecs = jadex.base.service.message.MessageService.getContentCodecs(agent.getModel().getProperties());
+			IContentCodec[] compcodecs = jadex.base.service.message.MessageService.getContentCodecs(agent.getModel());
 			String[] params = ma.getMessageType().getParameterNames();
 			for(int i=0; i<params.length; i++)
 			{
