@@ -5,6 +5,7 @@ import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.benchmarking.helper.CheckFileThread;
+import jadex.benchmarking.helper.Constants;
 import jadex.benchmarking.services.IBenchmarkingManagementService;
 import jadex.bridge.service.IService;
 import jadex.commons.Properties;
@@ -13,7 +14,9 @@ import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.MediaTracker;
@@ -27,10 +30,10 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.ScrollPaneConstants;
@@ -53,7 +56,8 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[] { "refresh", SGUI.makeIcon(BenchmarkingPanel.class, "/jadex/base/gui/images/new_refresh_anim00.png"), "png_not_found",
-			SGUI.makeIcon(BenchmarkingPanel.class, "/jadex/benchmarking/viewer/images/PNGFileNotFound.png") });
+			SGUI.makeIcon(BenchmarkingPanel.class, "/jadex/benchmarking/viewer/images/PNGFileNotFound.png"), "manual_injection",
+			SGUI.makeIcon(BenchmarkingPanel.class, "/jadex/benchmarking/viewer/images/injection.png") });
 
 	// -------- attributes --------
 
@@ -69,8 +73,14 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 	/** The historic data table. */
 	protected HistoricDataTable historic_data_table;
 
-	/** The panel for depicting benchmark historiy as PNG. */
+	/** The panel for depicting benchmark history as PNG. */
 	protected JPanel historyPNGPnl;
+
+	/** The main panel for depicting details about selected running benchmark. */
+	protected JPanel benchmarkingDetailsMainPnl;
+
+	/** The "north" part of the main panel for depicting details about selected running benchmark. */
+	protected JPanel benchmarkingDetailsNorthPnl;
 
 	/** The service panel. */
 	// protected ServiceDescriptionPanel service_panel;
@@ -93,11 +103,20 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 	/** The refresh delay. */
 	protected int defrefresh;
 
-	/** The refresh selectzion buttons. */
-	protected JRadioButton[] rb_refresh;
+	// /** The refresh selection buttons. */
+	// protected JRadioButton[] rb_refresh;
+
+	/** The perform manual injection button. */
+	protected JButton perform_manual_injection;
 
 	/** The remote checkbox. */
 	protected JCheckBox remotecb;
+
+	/** Create the ActionComboBox: Gives option to create/delete component within SuT */
+	protected JComboBox actionBox;
+
+	/** Create the EditableComponentsBox: Show components of the SuT that can be manipulated. */
+	protected JComboBox editableComponentsBox;
 
 	/** Contains all png files that were already created. */
 	private Hashtable<String, Boolean> pngFiles = new Hashtable<String, Boolean>();
@@ -130,6 +149,14 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 		JScrollPane stscroll = new JScrollPane(service_table);
 		stscroll.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Found Benchmarks"));
 
+		// panel depicting detailed information about (currently) running benchmarks
+		benchmarkingDetailsMainPnl = new JPanel(new BorderLayout());
+		JScrollPane detailsScroll = new JScrollPane(benchmarkingDetailsMainPnl);
+		detailsScroll.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Details about selected Benchmark"));
+		detailsScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		detailsScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		initBenchmarkingDetailsPnl();
+
 		// panel with historic data from database
 		historic_data_table = new HistoricDataTable();
 		JScrollPane hiscroll = new JScrollPane(historic_data_table);
@@ -144,11 +171,22 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 
 		historic_data_table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
-				//Otherwise each mouse click would lead to two events be fired :mouse "click" and "release"
+				// Otherwise each mouse click would lead to two events be fired :mouse "click" and "release"
 				if (!e.getValueIsAdjusting()) {
 					System.out.println("Selection changed.");
 					IHistoricDataDescription selDataDesc = historic_data_table.getSelectedHistoricDataDescription();
 					updateHistoryPNG(selDataDesc);
+				}
+			}
+		});
+
+		service_table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				// Otherwise each mouse click would lead to two events be fired :mouse "click" and "release"
+				if (!e.getValueIsAdjusting()) {
+					System.out.println("Selection changed.");
+					IBenchmarkingDescription selDataDesc = service_table.getSelectedService();
+					updateBenchmarkingDetailsPnl(selDataDesc);
 				}
 			}
 		});
@@ -176,40 +214,22 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 		buttonPnl.add(new JLabel());// Hack to place in button in the center
 		buttonPnl.add(refreshHistoricDataBtn);
 		add(buttonPnl, BorderLayout.NORTH);
-		//
-		// component_table = new DFComponentTable(this);
-		// JScrollPane atscroll = new JScrollPane(component_table);
-		// atscroll.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Registered Component Descriptions"));
-		//
-		// component_table.getSelectionModel().addListSelectionListener(new ListSelectionListener()
-		// {
-		// public void valueChanged(ListSelectionEvent e)
-		// {
-		// //updateServices(old_ads);
-		// IDFComponentDescription[] selcomponents = component_table.getSelectedComponents();
-		// service_table.setComponentDescriptions(selcomponents);
-		// }
-		// });
-		// // service_table.getSelectionModel().addListSelectionListener(new ListSelectionListener()
-		// // {
-		// // public void valueChanged(ListSelectionEvent e)
-		// // {
-		// // updateDetailedService();
-		// // }
-		// // });
-		//
-		// setLayout(new BorderLayout());
-		//
+
+		split4 = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		split4.setDividerLocation(60);
+		split4.setOneTouchExpandable(true);
+		split4.add(stscroll);
+		split4.add(detailsScroll);
+		split4.setResizeWeight(0.5);
+
 		split3 = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		split3.setDividerLocation(130);
 		split3.setOneTouchExpandable(true);
-		split3.add(stscroll);
+		split3.add(split4);
 		split3.add(hiscroll);
-		// split3.add(service_panel);
-		// split3.setResizeWeight(1.0);
+
 		split2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		split2.setDividerLocation(280);
-		// split2.add(atscroll);
 		split2.add(split3);
 		split2.add(hisPNGcroll);
 		split2.setResizeWeight(0.5);
@@ -505,6 +525,146 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 				pngFiles.put(dataDesc.getLogAsPNG(), true);
 			}
 		}
+	}
+	
+	/**
+	 * Called when a currently running benchmark is selected.
+	 */
+	protected void updateBenchmarkingDetailsPnl(IBenchmarkingDescription benchDesc) {
 
+		// check whether this option is appropriate
+		if (benchDesc.getStatus().equalsIgnoreCase(Constants.RUNNING)) {
+			// Only the "BorderLayout.Center" is set
+			if (benchmarkingDetailsMainPnl.getComponentCount() == 1) {
+				benchmarkingDetailsMainPnl.remove(0);
+			} else if (benchmarkingDetailsMainPnl.getComponentCount() == 2) {
+				// "BorderLayout.Center" and "BorderLayout.North" is set
+				benchmarkingDetailsMainPnl.remove(0);
+				benchmarkingDetailsMainPnl.remove(1);
+			}
+			
+			// Create the EditableComponentsBox: Show components of the SuT that can be manipulated.
+			editableComponentsBox = new JComboBox();
+			editableComponentsBox.addItem(new String(benchDesc.getName()));
+			editableComponentsBox.addItem(new String(benchDesc.getType()));
+			editableComponentsBox.addItem(new String(benchDesc.getStatus()));
+
+			// create test label to check access to SuT
+			final JLabel testLbl = new JLabel(String.valueOf(System.currentTimeMillis()));
+			javax.swing.Timer t = new javax.swing.Timer(1000, new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					testLbl.setText(String.valueOf(System.currentTimeMillis()));
+					testLbl.repaint();
+				}
+			});
+			t.start();
+
+			// Button to perform manual injection to SuT
+			perform_manual_injection = new JButton("Perform manual injection", icons.getIcon("manual_injection"));
+			perform_manual_injection.setMargin(new Insets(2, 2, 2, 2));
+			perform_manual_injection.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					performInjection();
+				}
+			});
+
+			// create north part of benchmarking details panel
+			benchmarkingDetailsNorthPnl = new JPanel(new GridLayout(1, 6));
+			benchmarkingDetailsNorthPnl.add(new JLabel("Choose Action"));
+			benchmarkingDetailsNorthPnl.add(actionBox);
+			benchmarkingDetailsNorthPnl.add(new JLabel("Choose Component"));
+			benchmarkingDetailsNorthPnl.add(editableComponentsBox);
+			benchmarkingDetailsNorthPnl.add(testLbl);
+			benchmarkingDetailsNorthPnl.add(perform_manual_injection);
+			benchmarkingDetailsMainPnl.add(benchmarkingDetailsNorthPnl, BorderLayout.NORTH);
+			
+			benchmarkingDetailsMainPnl.add(new JLabel("SuT will be displayed shortly :-\')"), BorderLayout.CENTER);
+
+		} else {
+			if (benchmarkingDetailsMainPnl.getComponentCount() == 2) {
+				// Remove "BorderLayout.North"
+				benchmarkingDetailsMainPnl.remove(0);
+			}
+			benchmarkingDetailsMainPnl.add(new JLabel("Benchmark has already terminated. Please use the history function."), BorderLayout.CENTER);
+		}		
+
+		benchmarkingDetailsMainPnl.revalidate();
+	}
+
+	/**
+	 * Called only once on start
+	 */
+	protected void initBenchmarkingDetailsPnl() {
+
+		// Create the ActionComboBox: Gives option to create/delete component within SuT
+		actionBox = new JComboBox(new String[] { "Create", "Delete" });
+		actionBox.setSelectedIndex(0);
+
+		// Create the EditableComponentsBox: Show components of the SuT that can be manipulated.
+		editableComponentsBox = new JComboBox();
+
+		// Button to perform manual injection to SuT
+		perform_manual_injection = new JButton("Perform manual injection", icons.getIcon("manual_injection"));
+		perform_manual_injection.setMargin(new Insets(2, 2, 2, 2));
+		perform_manual_injection.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				performInjection();
+			}
+		});
+
+		// create north part of benchmarking details panel
+		benchmarkingDetailsNorthPnl = new JPanel(new GridLayout(1, 6));
+		benchmarkingDetailsNorthPnl.add(new JLabel("Choose Action"));
+		benchmarkingDetailsNorthPnl.add(actionBox);
+		benchmarkingDetailsNorthPnl.add(new JLabel("Choose Component"));
+		benchmarkingDetailsNorthPnl.add(editableComponentsBox);
+		benchmarkingDetailsNorthPnl.add(new JLabel());
+		benchmarkingDetailsNorthPnl.add(perform_manual_injection);
+	}
+
+	/**
+	 * Perform manual injection to SuT
+	 */
+	public void performInjection() {
+		System.out.println("Performing manual INJECTION!");
+		// benchmarkingDetailsMainPnl.removeAll();
+
+		// HACK: And dieser Stelle gibt es das Problem, dass die PNG-Datei teilweise später erstellt wird, als die Gui fertig wird.
+		// Behoben durch einen Timer, der das Bild nachläd, sobald es zur Verfügung steht.
+		// checkAndCreatePNGFile(dataDesc);
+		//
+		// Image img = null;
+		// ImageIcon icon1 = null;
+		// try {
+		// img = ImageIO.read(new File(dataDesc.getLogAsPNG()));
+		// icon1 = new ImageIcon(img);
+		// System.out.println("#BenchmarkingPanel#Status of history-png : " + icon1.getImageLoadStatus());
+		// } catch (Exception e1) {
+		// System.out.println("#BenchmarkingPanel# PNG not found: " + dataDesc.getLogAsPNG() + "\n" + e1);
+		// }
+		//
+		// if (icon1 != null && icon1.getImageLoadStatus() == MediaTracker.COMPLETE) {
+		// historyPNGPnl.add(new JLabel("History of: " + dataDesc.getName() + " - " + dataDesc.getTimestamp()), BorderLayout.NORTH);
+		// historyPNGPnl.add(new JLabel(icon1), BorderLayout.CENTER);
+		// } else {
+		// historyPNGPnl.add(new JLabel("No history-png found of : " + dataDesc.getName() + " - " + dataDesc.getTimestamp() + "\n Please reload..."), BorderLayout.NORTH);
+		// historyPNGPnl.add(new JLabel(icons.getIcon("png_not_found")), BorderLayout.CENTER);
+		//
+		// // Timer is used to check when png is created and to re-load png to panel.
+		// long TIME_TO_START = 500;
+		// long DELAY_BETWEEN_POLLS = 250;
+		// Timer timer = new Timer();
+		// timer.schedule(new CheckFileThread(dataDesc.getLogAsPNG(), this, dataDesc), TIME_TO_START, DELAY_BETWEEN_POLLS);
+		//
+		// }
+
+		// if (benchDesc.getStatus().equalsIgnoreCase(Constants.RUNNING)) {
+		// benchmarkingDetailsMainPnl.add(new JLabel("SuT will be displayed shortly :-\')"), BorderLayout.CENTER);
+		// } else {
+		// benchmarkingDetailsMainPnl.add(new JLabel("Benchmark has already terminated. Please use the history function."), BorderLayout.CENTER);
+		// }
+		// benchmarkingDetailsMainPnl.revalidate();
+		// // this.revalidate();
+		// // this.paint();
 	}
 }
