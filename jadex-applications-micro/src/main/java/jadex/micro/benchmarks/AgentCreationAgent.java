@@ -17,8 +17,12 @@ import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 import jadex.xml.annotation.XMLClassname;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  *  Agent creation benchmark. 
@@ -256,6 +260,33 @@ public class AgentCreationAgent extends MicroAgent
 						System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
 						System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 						System.out.println("Still used memory: "+stillused+"kB.");
+						
+						// Write values to property files for hudson plot plugin.
+						try
+						{
+							FileWriter	fw	= new FileWriter(new File("../microcreationtime.properties"));
+							Properties	props	=	new Properties();
+							props.setProperty("YVALUE", ""+pera);
+							props.store(fw, null);
+							fw.close();
+							
+							fw	= new FileWriter(new File("../microkillingtime.properties"));
+							props	=	new Properties();
+							props.setProperty("YVALUE", ""+killpera);
+							props.store(fw, null);
+							fw.close();
+							
+							fw	= new FileWriter(new File("../micromem.properties"));
+							props	=	new Properties();
+							props.setProperty("YVALUE", ""+upera);
+							props.store(fw, null);
+							fw.close();
+
+						}
+						catch(IOException e)
+						{
+							System.out.println("Waring: could not save values: "+e);
+						}
 				
 						getCMS().addResultListener(createResultListener(new DefaultResultListener()
 						{
