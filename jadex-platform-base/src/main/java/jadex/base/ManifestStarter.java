@@ -47,9 +47,9 @@ public class ManifestStarter
 
         try 
         {
-            JarFile jarFile = new JarFile(initialjarfile);
+            JarFile jarfile = new JarFile(initialjarfile);
 
-            final Manifest manifest = jarFile.getManifest();
+            final Manifest manifest = jarfile.getManifest();
             if (manifest != null)
             {
                 final String classpath = manifest.getMainAttributes().getValue(new Attributes.Name("Class-Path"));
