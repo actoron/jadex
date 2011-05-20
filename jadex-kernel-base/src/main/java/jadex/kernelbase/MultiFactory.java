@@ -194,7 +194,6 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 								}
 								potentialurls.remove(url);
 								validurls.remove(url);
-								kernellocationcache = null;
 								return null;
 							}
 						});
