@@ -143,18 +143,21 @@ public class Future implements IFuture
 //    	if(result==null)
 //    		System.out.println(this+" here: "+caller);
     	
-    	if(exception!=null)
+    	synchronized(this)
     	{
-    		throw exception instanceof RuntimeException ?(RuntimeException)exception 
-    			:new RuntimeException(exception);
-    	}
-    	else if(resultavailable)
-    	{
-    	   	return result;
-    	}
-    	else
-    	{
-    		throw new RuntimeException("Timeout while waiting for future.");
+	    	if(exception!=null)
+	    	{
+	    		throw exception instanceof RuntimeException ?(RuntimeException)exception 
+	    			:new RuntimeException(exception);
+	    	}
+	    	else if(resultavailable)
+	    	{
+	    	   	return result;
+	    	}
+	    	else
+	    	{
+	    		throw new RuntimeException("Timeout while waiting for future.");
+	    	}
     	}
     }
     

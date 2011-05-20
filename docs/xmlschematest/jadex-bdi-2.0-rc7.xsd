@@ -6,18 +6,17 @@
 			elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 			
 	<xs:redefine schemaLocation="http://jadex.sourceforge.net/jadex-component-2.0.xsd">
+		<!-- Hack!!! The following combined restriction/extension is actually not valid XSD but works for eclipse XML editor. -->
 		<xs:group name="configgroup">
 			<xs:all>
 				<xs:element name="components" type="configcomponents" minOccurs="0"/>
 				<xs:element name="services" type="configservices" minOccurs="0"/>
 				<xs:element name="providedservices" type="configprovidedservices" minOccurs="0"/>
-				<!-- 
 				<xs:element name="capabilities" type="MConfigCapabilitybase" minOccurs="0"/>
 				<xs:element name="beliefs" type="MConfigBeliefbase" minOccurs="0"/>
 				<xs:element name="goals" type="MConfigGoalbase" minOccurs="0"/>
 				<xs:element name="plans" type="MConfigPlanbase" minOccurs="0"/>
 				<xs:element name="events" type="MConfigEventbase" minOccurs="0"/>
-				 -->
 			</xs:all>
 		</xs:group>
 	</xs:redefine>
