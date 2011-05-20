@@ -1,10 +1,12 @@
 package jadex.commons.gui;
 
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
@@ -66,6 +68,23 @@ public class SGUI
 	
 	/** This property can be set on components to be automatically adjusted to equal sizes. */
 	public static final String	AUTO_ADJUST	= "auto-adjust";
+	
+	/** This is set to true if the VM has a working GUI environment available. */
+	public static boolean HAS_GUI = true;
+	static
+	{
+		try
+		{
+			HAS_GUI = !(GraphicsEnvironment.isHeadless() ||
+					 	  GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length < 1);
+		}
+		catch (Error e)
+		{
+			// On system misconfigurations, Java throws an Error (grr).
+			HAS_GUI = false;
+		}
+	}
+		
 	
 	//-------- methods --------
 
@@ -543,6 +562,73 @@ public class SGUI
 	{
 		double full = pane.getOrientation() == JSplitPane.HORIZONTAL_SPLIT? pane.getSize().getWidth(): pane.getSize().getHeight();
 		double ret = ((double)pane.getDividerLocation())/full;
+		return ret;
+	}
+	
+	/**
+	 *  Color conversion method for "web-style" color definitions.
+	 *  This method is needed because CSS.stringToColor() is
+	 *  protected and StyleSheet.stringToColor() may be unavailable
+	 *  without a GUI.
+	 */
+	public static Color stringToColor(String str)
+	{
+		// Note: Unlike CSS.stringToColor, this method is missing "rgb(1.0, 1.0, 1.0)"-style definitions.
+		if (str.length() == 0 || str.equalsIgnoreCase("Black"))
+			str = "#000000";
+		else if(str.equalsIgnoreCase("Silver"))
+			str = "#C0C0C0";
+		else if(str.equalsIgnoreCase("Gray"))
+			str = "#808080";
+		else if(str.equalsIgnoreCase("White"))
+			str = "#FFFFFF";
+		else if(str.equalsIgnoreCase("Maroon"))
+			str = "#800000";
+		else if(str.equalsIgnoreCase("Red"))
+			str = "#FF0000";
+		else if(str.equalsIgnoreCase("Purple"))
+			str = "#800080";
+		else if(str.equalsIgnoreCase("Fuchsia"))
+			str = "#FF00FF";
+		else if(str.equalsIgnoreCase("Green"))
+			str = "#008000";
+		else if(str.equalsIgnoreCase("Lime"))
+			str = "#00FF00";
+		else if(str.equalsIgnoreCase("Olive"))
+			str = "#808000";
+		else if(str.equalsIgnoreCase("Yellow"))
+			str = "#FFFF00";
+		else if(str.equalsIgnoreCase("Navy"))
+			str = "#000080";
+		else if(str.equalsIgnoreCase("Blue"))
+			str = "#0000FF";
+		else if(str.equalsIgnoreCase("Teal"))
+			str = "#008080";
+		else if(str.equalsIgnoreCase("Aqua"))
+			str = "#00FFFF";
+		
+		Color ret = null;
+		if(str.startsWith("#"))
+		{
+			String b = str.substring(5, 7);
+			String g = str.substring(3, 5);
+			String r = str.substring(1, 3);
+			if (str.length()==9)
+			{
+				String alpha = str.substring(7);
+				ret = new Color(Integer.parseInt(r, 16),
+						Integer.parseInt(g, 16),
+						Integer.parseInt(b, 16),
+						Integer.parseInt(alpha, 16));
+			}
+			else
+			{
+				ret = new Color(Integer.parseInt(r, 16),
+						  Integer.parseInt(g, 16),
+						  Integer.parseInt(b, 16));
+			}
+		}
+		
 		return ret;
 	}
 	

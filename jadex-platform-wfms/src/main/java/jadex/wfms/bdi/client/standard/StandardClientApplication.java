@@ -14,7 +14,8 @@ import jadex.wfms.bdi.client.standard.parametergui.ActivityComponent;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.gui.images.SImage;
-import jadex.wfms.guicomponents.LoginDialog;
+import jadex.wfms.guicomponents.CenteringLayout;
+import jadex.wfms.guicomponents.LoginPanel;
 import jadex.wfms.guicomponents.SGuiHelper;
 import jadex.wfms.service.IExternalWfmsService;
 import jadex.xml.annotation.XMLClassname;
@@ -24,8 +25,7 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -173,12 +173,12 @@ public class StandardClientApplication
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						if (e.getActionCommand().equals(CONNECT_OFF_ICON_PATH))
-							showConnectDialog();
-						else
+						if (e.getActionCommand().equals(CONNECT_ON_ICON_PATH))
 							disconnect();
 					}
 				});
+				
+				cleanUp();
 			}
 		});
 		
@@ -199,25 +199,40 @@ public class StandardClientApplication
 			mainSplitPane.setRightComponent(EMPTY_PANEL);
 		
 		mainSplitPane.setDividerLocation(0.45);
+		showConnectDialog();
 	}
 	
 	private void showConnectDialog()
 	{
-		mainFrame.setEnabled(false);
-		final LoginDialog loginDialog = new LoginDialog(agent, mainFrame);
-		loginDialog.setModal(false);
-		loginDialog.setLocation(SGUI.calculateMiddlePosition(loginDialog));
-		loginDialog.setVisible(true);
-		loginDialog.addComponentListener(new ComponentAdapter()
+		//mainFrame.setEnabled(false);
+		
+		final LoginPanel loginpanel = new LoginPanel(agent);
+		final JPanel centerpanel = CenteringLayout.createCenteringPanel(loginpanel);
+		loginpanel.setPreferredSize(new Dimension(500, 273));
+		mainFrame.getContentPane().remove(mainSplitPane);
+		GridBagConstraints g = new GridBagConstraints();
+		g.weightx = 1.0;
+		g.weighty = 1.0;
+		g.fill = GridBagConstraints.BOTH;
+		g.anchor = GridBagConstraints.CENTER;
+		
+		loginpanel.setLoginAction(new AbstractAction()
 		{
-			public void componentHidden(ComponentEvent e)
+			public void actionPerformed(ActionEvent e)
 			{
-				mainFrame.setEnabled(true);
-				if (loginDialog.isConnect())
+				if (loginpanel.isConnect())
 				{
+					mainFrame.getContentPane().remove(centerpanel);
+					GridBagConstraints g = new GridBagConstraints();
+					g.weightx = 1.0;
+					g.weighty = 1.0;
+					g.fill = GridBagConstraints.BOTH;
+					g.anchor = GridBagConstraints.CENTER;
+					mainFrame.add(mainSplitPane, g);
+					mainFrame.repaint();
 					try
 					{
-						connect(loginDialog.getWfms(), loginDialog.getUserName(), loginDialog.getPassword());
+						connect(loginpanel.getWfms(), loginpanel.getUserName(), loginpanel.getPassword());
 						connected = true;
 						statusBar.replaceIcon(CONNECT_ICON_NAME, CONNECT_ON_ICON_PATH);
 						statusBar.setText("Connected.");
@@ -230,6 +245,8 @@ public class StandardClientApplication
 				}
 			}
 		});
+		
+		mainFrame.getContentPane().add(centerpanel, g);
 	}
 	
 	private void connect(final IExternalWfmsService wfms, final String userName, final Object authToken)
@@ -275,9 +292,9 @@ public class StandardClientApplication
 		{
 			public void customResultAvailable(Object result)
 			{
-				cleanUp();
 				statusBar.replaceIcon(CONNECT_ICON_NAME, CONNECT_OFF_ICON_PATH);
 				connected = false;
+				cleanUp();
 			}
 		});
 	}
@@ -654,7 +671,6 @@ public class StandardClientApplication
 				connected = false;
 				statusBar.replaceIcon(CONNECT_ICON_NAME, CONNECT_OFF_ICON_PATH);
 				cleanUp();
-				showConnectDialog();
 			}
 		};
 		agent.scheduleStep(new SetBeliefStep("clientcap.lost_connection_controller", lcAction));

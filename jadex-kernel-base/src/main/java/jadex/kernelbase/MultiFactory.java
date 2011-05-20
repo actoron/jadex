@@ -33,6 +33,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.gui.SGUI;
 
 import java.io.File;
 import java.io.IOException;
@@ -756,34 +757,40 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 															final String[] types = kernel.getComponentTypes();
 															componenttypes.addAll(Arrays.asList(types));
 															
-															IResultListener typecounter = ia.createResultListener(new CounterResultListener(types.length, true, ia.createResultListener(new DelegationResultListener(ret)
-															{
-																public void customResultAvailable(Object result)
-																{
-																	SServiceProvider.getService(ia.getServiceContainer(), IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_APPLICATION).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
-																	{
-																		public void customResultAvailable(Object result)
-																		{
-																			MultiFactory.this.fireTypesAdded(types).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
-																			{
-																				public void customResultAvailable(Object result)
-																				{
-																					ret.setResult(kernel);
-																				};
-																			}));
-																		};
-																	}));
-																};
-															}))
-															{
-																public void intermediateResultAvailable(Object result)
-																{
-																	iconcache.put(types[getCnt() - 1], result);
-																};
-															});
-															for (int i = 0; i < types.length; ++i)
-																kernel.getComponentTypeIcon(types[i]).addResultListener(typecounter);
 															activatedkernels.add(kernelmodel);
+															
+															if (SGUI.HAS_GUI)
+															{
+																IResultListener typecounter = ia.createResultListener(new CounterResultListener(types.length, true, ia.createResultListener(new DelegationResultListener(ret)
+																{
+																	public void customResultAvailable(Object result)
+																	{
+																		SServiceProvider.getService(ia.getServiceContainer(), IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_APPLICATION).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+																		{
+																			public void customResultAvailable(Object result)
+																			{
+																				MultiFactory.this.fireTypesAdded(types).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+																				{
+																					public void customResultAvailable(Object result)
+																					{
+																						ret.setResult(kernel);
+																					};
+																				}));
+																			};
+																		}));
+																	};
+																}))
+																{
+																	public void intermediateResultAvailable(Object result)
+																	{
+																		iconcache.put(types[getCnt() - 1], result);
+																	};
+																});
+																for (int i = 0; i < types.length; ++i)
+																	kernel.getComponentTypeIcon(types[i]).addResultListener(typecounter);
+															}
+															else
+																ret.setResult(kernel);
 														}
 														else
 															ret.setResult(kernel);

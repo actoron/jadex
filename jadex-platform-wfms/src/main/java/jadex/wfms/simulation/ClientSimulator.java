@@ -375,9 +375,9 @@ public class ClientSimulator
 	private IFuture login(LoginDialog loginDialog)
 	{
 		final Future ret = new Future();
-		final String username = loginDialog.getUserName();
-		final String password = loginDialog.getPassword();
-		final IExternalWfmsService wfms = loginDialog.getWfms();
+		final String username = loginDialog.getLoginPanel().getUserName();
+		final String password = loginDialog.getLoginPanel().getPassword();
+		final IExternalWfmsService wfms = loginDialog.getLoginPanel().getWfms();
 		agent.scheduleStep(new DispatchGoalStep("clientcap.connect", new HashMap() {{
 			put("wfms", wfms);
 			put("user_name", username);

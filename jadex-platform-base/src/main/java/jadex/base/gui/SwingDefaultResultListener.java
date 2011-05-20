@@ -7,6 +7,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.gui.SGUI;
 
 import java.awt.Component;
+import java.awt.GraphicsEnvironment;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
@@ -59,7 +60,7 @@ public abstract class SwingDefaultResultListener extends DefaultResultListener
 	{
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
-		if(SwingUtilities.isEventDispatchThread() || Starter.isShutdown())
+		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread() || Starter.isShutdown())
 //		if(SwingUtilities.isEventDispatchThread())
 		{
 			customResultAvailable(result);			
@@ -85,7 +86,7 @@ public abstract class SwingDefaultResultListener extends DefaultResultListener
 //		exception.printStackTrace();
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
-		if(SwingUtilities.isEventDispatchThread() || Starter.isShutdown())
+		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread() || Starter.isShutdown())
 //		if(SwingUtilities.isEventDispatchThread())
 		{
 			customExceptionOccurred(exception);			

@@ -22,6 +22,7 @@ import jadex.application.space.envsupport.observer.perspective.Perspective2D;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.gui.SGUI;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
@@ -1255,8 +1256,6 @@ public class MEnvSpaceType	extends MSpaceType
 	 */
 	static class ColorConverter	implements IStringObjectConverter
 	{
-		protected StyleSheet ss = new StyleSheet();
-		
 		/**
 		 *  Convert a string value to a type.
 		 *  @param val The string value to convert.
@@ -1270,25 +1269,9 @@ public class MEnvSpaceType	extends MSpaceType
 		
 			if(val instanceof String)
 			{
-				String	str	= (String)val;
-				String	alpha	= null;
-				
-				if((str.startsWith("#")) && (str.length()==9))
-				{
-					alpha	= str.substring(7);
-					str	= str.substring(0, 7);
-				}
-				
-				// Cannot use CSS.stringToColor() because they haven't made it public :-(
-				Color	c	= ss.stringToColor((String)val);
-				if(alpha!=null)
-				{
-					ret	= new Color(c.getRed(), c.getGreen(), c.getBlue(), Integer.parseInt(alpha, 16));
-				}
-				else if(c!=null)
-				{
+				Color c = SGUI.stringToColor(val);
+				if (c != null)
 					ret = c;
-				}
 			}
 			
 //			System.out.println("tolerant conv: "+val+" "+ret+" "+(ret!=null? ""+ret.getClass(): ""));

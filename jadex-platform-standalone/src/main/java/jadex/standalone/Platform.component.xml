@@ -255,7 +255,6 @@
 						<argument name="excludes">$args.awaexcludes</argument>
 					</arguments>
 				</component>
-				<component name="awa" type="awa" daemon="true"/>
 			</components>
 		</configuration>
 		

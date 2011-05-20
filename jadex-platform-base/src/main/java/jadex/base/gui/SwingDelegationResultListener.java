@@ -1,8 +1,11 @@
 package jadex.base.gui;
 
+import java.awt.GraphicsEnvironment;
+
 import jadex.base.Starter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
+import jadex.commons.gui.SGUI;
 
 import javax.swing.SwingUtilities;
 
@@ -37,7 +40,7 @@ public class SwingDelegationResultListener implements IResultListener
 	{
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
-		if(SwingUtilities.isEventDispatchThread() || Starter.isShutdown())
+		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread() || Starter.isShutdown())
 //		if(SwingUtilities.isEventDispatchThread())
 		{
 			try
@@ -81,7 +84,7 @@ public class SwingDelegationResultListener implements IResultListener
 //		exception.printStackTrace();
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
-		if(SwingUtilities.isEventDispatchThread() || Starter.isShutdown())
+		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread() || Starter.isShutdown())
 //		if(SwingUtilities.isEventDispatchThread())
 		{
 			customExceptionOccurred(exception);			

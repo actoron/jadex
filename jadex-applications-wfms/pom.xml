@@ -25,6 +25,21 @@
 
 	<developers>
 		<developer>
+			<id>kai</id>
+			<name>Kai Jander</name>
+			<email>kai.jander@googlemail.com</email>
+			<url>http://vsis-www.informatik.uni-hamburg.de/members/info.php/974
+			</url>
+			<organization>University of Hamburg</organization>
+			<organizationUrl>http://vsis-www.informatik.uni-hamburg.de/
+			</organizationUrl>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+		</developer>
+		
+		<developer>
 			<id>alex</id>
 			<name>Alexander Pokahr</name>
 			<email>pokahr@gmx.net</email>
@@ -77,7 +92,7 @@
 	-->
 
 	<properties>
-		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   	</properties>
 
 	<build>
@@ -97,8 +112,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
         		<version>2.3.2</version>
 				<configuration>
-					<source>1.4</source>
-					<target>1.4</target>
+					<source>1.6</source>
+					<target>1.6</target>
 				</configuration>
 			</plugin>
 
@@ -155,6 +170,27 @@
 			<artifactId>junit</artifactId>
 			<version>3.8.1</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-application</artifactId>
+			<version>2.0-rc7</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bdi</artifactId>
+			<version>2.0-rc7</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-applib-bdi</artifactId>
+			<version>2.0-rc7</version>
+			<type>jar</type>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 </project>
