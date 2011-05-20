@@ -19,38 +19,21 @@ public class HandleDisasterPlan extends Plan
 		ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
 //		System.out.println("handle: "+disaster);
 	
-		int chemicals = ((Integer)disaster.getProperty("chemicals")).intValue();
-		int fire = ((Integer)disaster.getProperty("fire")).intValue();
-		int victims = ((Integer)disaster.getProperty("victims")).intValue();
+		IGoal	cc	= createGoal("clear_chemicals"); 
+		cc.getParameter("disaster").setValue(disaster);
+		dispatchSubgoal(cc);
+
+		IGoal	ef	= createGoal("extinguish_fires"); 
+		ef.getParameter("disaster").setValue(disaster);
+		dispatchSubgoal(ef);
+
+		IGoal	tv	= createGoal("treat_victims"); 
+		tv.getParameter("disaster").setValue(disaster);
+		dispatchSubgoal(tv);
 		
-		IGoal cc = null;
-		if(chemicals>0)
-		{
-			cc = createGoal("clear_chemicals"); 
-			cc.getParameter("disaster").setValue(disaster);
-			dispatchSubgoal(cc);
-		}
-		IGoal ef = null;
-		if(fire>0)
-		{
-			ef = createGoal("extinguish_fires"); 
-			ef.getParameter("disaster").setValue(disaster);
-			dispatchSubgoal(ef);
-		}
-		if(cc!=null)
-			waitForGoal(cc);
-		IGoal tv = null;
-		if(victims>0)
-		{
-			tv = createGoal("treat_victims"); 
-			tv.getParameter("disaster").setValue(disaster);
-			dispatchSubgoal(tv);
-		}
-		
-		if(ef!=null)
-			waitForGoal(ef);
-		if(tv!=null)
-			waitForGoal(tv);
+		waitForGoal(cc);
+		waitForGoal(ef);
+		waitForGoal(tv);
 	}
 	
 //	public void aborted()

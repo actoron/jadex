@@ -64,6 +64,11 @@
 			<parameter name="disaster" class="ISpaceObject"/>
 			<parameterset name="units" class="Object"/>
 			<targetcondition>$goal.disaster.getProperty("chemicals")==0</targetcondition>
+			<deliberation>
+				<inhibits ref="treat_victims">
+					$goal.disaster==$ref.disaster
+				</inhibits>
+			</deliberation>
 		</achievegoal>
 		
 		<achievegoal name="extinguish_fires" exclude="never">
