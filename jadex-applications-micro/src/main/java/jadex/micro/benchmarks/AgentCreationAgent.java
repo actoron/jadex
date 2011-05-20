@@ -9,6 +9,7 @@ import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
+import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -17,12 +18,8 @@ import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 import jadex.xml.annotation.XMLClassname;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  *  Agent creation benchmark. 
@@ -59,9 +56,16 @@ public class AgentCreationAgent extends MicroAgent
 					{
 						public void resultAvailable(Object result)
 						{
-							args.put("num", new Integer(1));
+							System.gc();
+							try
+							{
+								Thread.sleep(500);
+							}
+							catch(InterruptedException e){}
+							
 							Long startmem = new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
 							Long starttime = new Long(((IClockService)result).getTime());
+							args.put("num", new Integer(1));
 							args.put("startmem", startmem);
 							args.put("starttime", starttime);
 							
@@ -105,31 +109,39 @@ public class AgentCreationAgent extends MicroAgent
 		}
 		else
 		{
-			Long startmem = (Long)args.get("startmem");
-			final Long starttime = (Long)args.get("starttime");
-			final long used = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-			final long omem = (used-startmem.longValue())/1024;
-			final double upera = ((long)(1000*(used-startmem.longValue())/max/1024))/1000.0;
-			System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
-
-			getTime().addResultListener(createResultListener(new DefaultResultListener()
+			getClock().addResultListener(createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
-					final long end = ((Long)result).longValue();
+					final IClockService	clock	= (IClockService)result;
+					final long end = clock.getTime();
+					
+					System.gc();
+					try
+					{
+						Thread.sleep(500);
+					}
+					catch(InterruptedException e){}
+					final long used = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+					
+					Long startmem = (Long)args.get("startmem");
+					final Long starttime = (Long)args.get("starttime");
+					final long omem = (used-startmem.longValue())/1024;
+					final double upera = ((long)(1000*(used-startmem.longValue())/max/1024))/1000.0;
+					System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 					System.out.println("Last peer created. "+max+" agents started.");
 					final double dur = ((double)end-starttime.longValue())/1000.0;
 					final double pera = dur/max;
 					System.out.println("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
 				
 					// Delete prior agents.
-					if(!nested)
-					{
-						deletePeers(max-1, end, dur, pera, omem, upera, max, (IMicroExternalAccess)getExternalAccess(), nested);
-					}
+//					if(!nested)
+//					{
+//						deletePeers(max-1, clock.getTime(), dur, pera, omem, upera, max, (IMicroExternalAccess)getExternalAccess(), nested);
+//					}
 					
 					// If nested, use initial component to kill others
-					else
+//					else
 					{
 						getCMS().addResultListener(createResultListener(new DefaultResultListener()
 						{
@@ -143,7 +155,8 @@ public class AgentCreationAgent extends MicroAgent
 									public void resultAvailable(Object result)
 									{
 										IMicroExternalAccess	exta	= (IMicroExternalAccess)result;
-										deletePeers(max, end, dur, pera, omem, upera, max, exta, nested);
+										// Add sleep time for accurate killing results.
+										deletePeers(max, clock.getTime(), dur, pera, omem, upera, max, exta, nested);
 									}
 								}));
 							}
@@ -203,7 +216,8 @@ public class AgentCreationAgent extends MicroAgent
 									{
 										System.out.println("Successfully destroyed peer: "+name);
 										
-										if(cnt-1>(nested?1:0))
+										if(cnt-1>(nested?1:1))
+//										if(cnt-1>(nested?1:0))
 										{
 											deletePeers(cnt-1, killstarttime, dur, pera, omem, upera, max, exta, nested);
 										}
@@ -241,6 +255,7 @@ public class AgentCreationAgent extends MicroAgent
 		{
 			public void resultAvailable(final Object result)
 			{
+				// Schedule step to run on initial component instead of last.
 				exta.scheduleStep(new IComponentStep()
 				{
 					@XMLClassname("last")
@@ -250,9 +265,14 @@ public class AgentCreationAgent extends MicroAgent
 						long killend = cs.getTime();
 						System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
 						double killdur = ((double)killend-killstarttime)/1000.0;
-						double killpera = killdur/(max-1);
+						final double killpera = killdur/(max-1);
 						
 						Runtime.getRuntime().gc();
+						try
+						{
+							Thread.sleep(500);
+						}
+						catch(InterruptedException e){}
 						long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
 						
 						System.out.println("\nCumulated results:");
@@ -261,50 +281,10 @@ public class AgentCreationAgent extends MicroAgent
 						System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 						System.out.println("Still used memory: "+stillused+"kB.");
 						
-						// Write values to property files for hudson plot plugin.
-						try
-						{
-							FileWriter	fw	= new FileWriter(new File("../microcreationtime.properties"));
-							Properties	props	=	new Properties();
-							props.setProperty("YVALUE", ""+pera);
-							props.store(fw, null);
-							fw.close();
-							
-							fw	= new FileWriter(new File("../microkillingtime.properties"));
-							props	=	new Properties();
-							props.setProperty("YVALUE", ""+killpera);
-							props.store(fw, null);
-							fw.close();
-							
-							fw	= new FileWriter(new File("../micromem.properties"));
-							props	=	new Properties();
-							props.setProperty("YVALUE", ""+upera);
-							props.store(fw, null);
-							fw.close();
-
-						}
-						catch(IOException e)
-						{
-							System.out.println("Waring: could not save values: "+e);
-						}
-				
-						getCMS().addResultListener(createResultListener(new DefaultResultListener()
-						{
-							public void resultAvailable(final Object result)
-							{
-								exta.scheduleStep(new IComponentStep()
-								{
-									@XMLClassname("destroyMe")
-									public Object execute(IInternalAccess ia)
-									{
-										IComponentManagementService cms = (IComponentManagementService)result;
-										cms.destroyComponent(exta.getComponentIdentifier());
-										return null;
-									}
-								});
-							}
-						}));
-						
+						((MicroAgent)ia).setResultValue("microcreationtime", new Tuple(""+pera, "s"));
+						((MicroAgent)ia).setResultValue("microkillingtime", new Tuple(""+killpera, "s"));
+						((MicroAgent)ia).setResultValue("micromem", new Tuple(""+upera, "kb"));
+						ia.killComponent();
 						return null;
 					}
 				});
@@ -347,7 +327,7 @@ public class AgentCreationAgent extends MicroAgent
 			@XMLClassname("argument")
 			public Object getDefaultValue(String configname)
 			{
-				return new Integer(5000);	// Todo: support 10000 with gui.
+				return new Integer(10000);
 			}
 			public String getDescription()
 			{

@@ -1248,6 +1248,8 @@ public abstract class ComponentManagementService extends BasicService implements
 				adapter = (IComponentAdapter)adapters.remove(cid);
 				if(adapter==null)
 					throw new RuntimeException("Component Identifier not registered: "+cid);
+				
+//				if(cid.getName().indexOf("Peer")==-1)
 //					System.out.println("removed adapter: "+adapter.getComponentIdentifier().getLocalName()+" "+cid+" "+adapters);
 				
 				desc	= (CMSComponentDescription)adapter.getDescription();
