@@ -2,9 +2,9 @@
 <!--
 	<H3>Mandelbrot Application</H3>
 -->
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="Mandelbrot" package="jadex.micro.examples.mandelbrot" autoshutdown="true">
 	
@@ -40,8 +40,8 @@
 		</providedservice>
 	</services>
 	
-	<applications>
-		<application name="All Components">
+	<configurations>
+		<configuration name="All Components">
 			<components>
 				<component type="Generator">
 					<arguments>
@@ -51,8 +51,8 @@
 				<component type="Calculator"/>
 				<component type="Display"/>
 			</components>
-		</application>
-		<application name="Only Generator">
+		</configuration>
+		<configuration name="Only Generator">
 			<components>
 				<component type="Generator">
 					<arguments>
@@ -60,8 +60,8 @@
 					</arguments>
 				</component>
 			</components>
-		</application>
-		<application name="Only Calculators">
+		</configuration>
+		<configuration name="Only Calculators">
 			<components>
 				<component type="Calculator" number="10">
 					<arguments>
@@ -69,8 +69,8 @@
 					</arguments>
 				</component>
 			</components>
-		</application>
-		<!-- <application name="Test Config 1">
+		</configuration>
+		<!-- <configuration name="Test Config 1">
 			<arguments>
 				<argument name="delay">1000L</argument>
 			</arguments>
@@ -82,8 +82,8 @@
 				</component>
 				<component type="Display"/>
 			</components>
-		</application>
-		<application name="Test Config 2" autoshutdown="false">
+		</configuration>
+		<configuration name="Test Config 2" autoshutdown="false">
 			<components>
 				<component type="Generator" master="true">
 					<arguments>
@@ -92,7 +92,7 @@
 				</component>
 				<component type="Display"/>
 			</components>
-		</application> -->
-	</applications>
+		</configuration> -->
+	</configurations>
 	
 </applicationtype>

@@ -2,9 +2,9 @@
 <!--
   JADE platform properties.
 -->
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
 						http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="Platform" package="jadex.jade">
 	
@@ -54,7 +54,7 @@
 				)
 		</providedservice>
 	
-		<providedservice  class="IComponentManagementService" proxytype="raw">
+		<providedservice class="IComponentManagementService" proxytype="raw">
 			new ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter())
 		</providedservice>
 		
@@ -91,8 +91,8 @@
 		
 	</services>
 	
-	<applications>
-		<application name="all kernels (rms, awa, jcc)">
+	<configurations>
+		<configuration name="all kernels (rms, awa, jcc)">
 			<components>
 				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
@@ -103,8 +103,8 @@
 				<component name="awa" type="awa"/>
 				<component name="jcc" type="jcc"/>
 			</components>
-		</application>
-		<application name="all kernels (rms, jcc)">
+		</configuration>
+		<configuration name="all kernels (rms, jcc)">
 			<components>
 				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
@@ -114,8 +114,8 @@
 				<component name="rms" type="rms" daemon="true"/>
 				<component name="jcc" type="jcc"/>
 			</components>
-		</application>
-		<application name="testcases">
+		</configuration>
+		<configuration name="testcases">
 			<arguments>
 				<argument name="rma">false</argument>
 			</arguments>
@@ -127,6 +127,6 @@
 				<component name="kernel_bpmn" type="kernel_bpmn"/>
 				<component name="rms" type="rms"/>
 			</components>
-		</application>
-	</applications>
+		</configuration>
+	</configurations>
 </applicationtype>

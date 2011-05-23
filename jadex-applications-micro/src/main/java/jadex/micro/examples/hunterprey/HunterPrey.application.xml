@@ -6,10 +6,10 @@
 	moves around looking for food.
 -->
 
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
@@ -183,8 +183,8 @@
 		<componenttype name="MicroPrey" filename="jadex/micro/examples/hunterprey/MicroPreyAgent.class"/>
 	</componenttypes>
 
-	<applications>
-		<application name="One Micro Prey">
+	<configurations>
+		<configuration name="One Micro Prey">
 			<spaces>
 				<env:envspace name="my2dspace" type="2dspace">
 					<env:objects>
@@ -206,9 +206,9 @@
  			<components>
 				<component name="Mickey" type="MicroPrey"/>
 			</components>			
- 		</application>
+ 		</configuration>
 
-		<application name="Empty">
+		<configuration name="Empty">
 			<spaces>
 				<env:envspace name="my2dspace" type="2dspace">
 					<env:objects>
@@ -226,9 +226,9 @@
 					</env:observers>
 	 			</env:envspace>
 			</spaces>	
- 		</application>
+ 		</configuration>
 
-		<application name="Semi">
+		<configuration name="Semi">
 			<spaces>
 				<env:envspace name="my2dspace" type="2dspace" width="50" height="50">
 					<env:objects>
@@ -250,9 +250,9 @@
 			<components>
 				<component type="MicroPrey" number="100"/>
 			</components>
- 		</application>
+ 		</configuration>
  		
-		<application name="Multi">
+		<configuration name="Multi">
 			<spaces>
 				<env:envspace name="my2dspace" type="2dspace" width="75" height="75">
 					<env:objects>
@@ -274,8 +274,8 @@
 			<components>
 				<component type="MicroPrey" number="200"/>
 			</components>
- 		</application>
+ 		</configuration>
  		
-	</applications>
+	</configurations>
 
 </applicationtype>

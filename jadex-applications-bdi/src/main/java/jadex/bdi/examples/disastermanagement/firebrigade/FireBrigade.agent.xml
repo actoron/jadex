@@ -5,9 +5,9 @@
 	Moves to fires and extinguishes them
 	and clears chemicals.
 -->
-<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
+<agent xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
 	name="FireBrigade"
 	package="jadex.bdi.examples.disastermanagement.firebrigade">
@@ -123,8 +123,12 @@
 	</plans>
 	
 	<services>
-		<providedservice class="IExtinguishFireService" implementation="ExtinguishFireService"/>
-		<providedservice class="IClearChemicalsService" implementation="ClearChemicalsService"/>
+		<providedservice class="IExtinguishFireService">
+			<implementation class="ExtinguishFireService"/>
+		</providedservice>
+		<providedservice class="IClearChemicalsService">
+			<implementation class="ClearChemicalsService"/>
+		</providedservice>
 	</services>
 	
 	<configurations>

@@ -4,10 +4,10 @@
 
 	It can be started to launch a cleaner world scenario.
 -->
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
@@ -205,8 +205,8 @@
 		</property>
 	</properties>
 	
-	<applications>
-		<application name="One cleaner">
+	<configurations>
+		<configuration name="One cleaner">
 			<spaces>
 				<env:envspace name="my2dspace" type="2dspace" width="1.0" height="1.0">
 					<!-- <env:property name="daytime">true</env:property> -->
@@ -254,9 +254,9 @@
 			<components>
 				<component type="Cleaner"/>
 			</components>
-		</application>
+		</configuration>
 		
-		<application name="Two cleaners">
+		<configuration name="Two cleaners">
 			<spaces>
 				<env:envspace name="my2dspace" type="2dspace" width="1.0" height="1.0">
 					<!-- <env:property name="daytime">true</env:property> -->
@@ -305,7 +305,7 @@
 			<components>
 				<component type="Cleaner" number="2"/>
 			</components>
-		</application>
-	</applications>
+		</configuration>
+	</configurations>
 
 </applicationtype>

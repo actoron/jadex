@@ -4,9 +4,9 @@
 	<H3>Tests naming of initial and end elements.</H3>
 	Uses worker agent to perform the test.
  -->
-<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
+<agent xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
 						http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
 	name="ConfigElementRef"
 	package="jadex.bdi.testcases.misc">
@@ -39,7 +39,7 @@
 	</plans>
 
 	<events>
-		<messageevent name="inform_reports" type="fipa" description="receive">
+		<messageevent name="inform_reports" type="fipa" direction="receive">
 			<parameter name="performative" class="String">
 				<value>SFipa.INFORM</value>
 			</parameter>

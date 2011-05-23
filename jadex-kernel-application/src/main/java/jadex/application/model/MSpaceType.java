@@ -1,9 +1,11 @@
 package jadex.application.model;
 
+import jadex.bridge.modelinfo.IExtensionType;
+
 /**
  *  Space type representation.
  */
-public class MSpaceType
+public class MSpaceType implements IExtensionType
 {
 	//-------- attributes --------
 

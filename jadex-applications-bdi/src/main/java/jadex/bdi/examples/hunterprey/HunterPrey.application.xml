@@ -6,10 +6,10 @@
 	Hunters try to catch the prey, while prey
 	moves around looking for food.
 -->
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
@@ -314,8 +314,8 @@
 		<componenttype name="LAHunter" filename="jadex/bdi/examples/hunterprey/ldahunter/LAHunter.agent.xml"/>
 	</componenttypes>
 
-	<applications>
-		<application name="Classic">
+	<configurations>
+		<configuration name="Classic">
 			<spaces>
 				<env:envspace name="my2dspace" type="2dspace">
 					<env:objects>
@@ -346,9 +346,9 @@
 				<component type="LAHunter" name="Willy"/>
 				<!-- <component type="LAHunter" name="Wolfram"/> -->
 			</components>
- 		</application>
+ 		</configuration>
 
-		<application name="Land of Peace">
+		<configuration name="Land of Peace">
 			<spaces>
 				<env:envspace name="my2dspace" type="2dspace">
 					<env:objects>
@@ -371,9 +371,9 @@
 				<component type="CleverPrey" number="40" configuration="Clever"/>
 				<component type="CleverPrey" number="10" configuration="Opportunistic"/>
 			</components>
- 		</application>
+ 		</configuration>
  		
-		<application name="Lupo's Paradise">
+		<configuration name="Lupo's Paradise">
 			<spaces>
 				<env:envspace name="my2dspace" type="2dspace">
 					<env:objects>
@@ -398,9 +398,9 @@
 				<component type="CleverPrey" number="5" configuration="Lazy"/>
 				<component name="Lupo" type="DumbHunter"/>
 			</components>
- 		</application>
+ 		</configuration>
 
-		<application name="Battlefield">
+		<configuration name="Battlefield">
 			<spaces>
 				<env:envspace name="my2dspace" type="2dspace">
 					<env:objects>
@@ -426,9 +426,9 @@
 				<component type="DumbHunter" number="25"/>
 				<component type="LAHunter" number="5"/>
 			</components>
- 		</application>
+ 		</configuration>
 
-		<application name="Empty (no creatures)">
+		<configuration name="Empty (no creatures)">
 			<spaces>
 				<env:envspace name="my2dspace" type="2dspace">
 					<env:objects>
@@ -446,9 +446,9 @@
 					</env:observers>
 	 			</env:envspace>
 			</spaces>
- 		</application>
+ 		</configuration>
 		<!-- 
-		<application name="debug">
+		<configuration name="debug">
 			<components>
 				<component type="CleverPrey" name="testprey" />
 				<component type="CleverPrey" name="foodprey" />
@@ -481,7 +481,7 @@
 					<env:observer name="HunterPrey World" dataview="view_all" perspective="icons"/>
 				</env:observers>
  			</env:envspace>
- 		</application>
+ 		</configuration>
 		 -->
-	</applications>
+	</configurations>
 </applicationtype>

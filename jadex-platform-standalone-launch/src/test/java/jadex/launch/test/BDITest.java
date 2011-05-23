@@ -23,6 +23,7 @@ public class BDITest	extends	ComponentTestSuite
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{
+				"semiautomatic",
 				"BeliefSetChanges",
 				"BeliefSetContains",
 				"MultiplePlanTriggers",

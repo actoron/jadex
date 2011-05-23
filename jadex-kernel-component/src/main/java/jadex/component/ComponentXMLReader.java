@@ -31,12 +31,10 @@ import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
-import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.Reader;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -263,7 +261,7 @@ public class ComponentXMLReader
 			}
 		};
 		
-		String uri = "http://jadex.sourceforge.net/jadex-component";
+		String uri = "http://jadex.sourceforge.net/jadex";
 		
 //		TypeInfo satype = new TypeInfo(null, new ObjectInfo(MStartable.class),
 //			new MappingInfo(null, new AttributeInfo[]{

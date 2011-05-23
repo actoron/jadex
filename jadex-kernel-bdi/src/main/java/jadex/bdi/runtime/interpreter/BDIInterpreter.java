@@ -15,39 +15,32 @@ import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
-import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
-import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
-import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.ISynchronizator;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+import jadex.kernelbase.AbstractInterpreter;
 import jadex.rules.rulesystem.Activation;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.IRulebase;
@@ -83,7 +76,7 @@ import java.util.logging.SimpleFormatter;
  *  and performing the agent execution when
  *  being called from the platform.
  */
-public class BDIInterpreter implements IComponentInstance //, ISynchronizator
+public class BDIInterpreter	extends AbstractInterpreter
 {
 	//-------- static part --------
 	
@@ -452,7 +445,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 */
 	public ClassLoader getClassLoader()
 	{
-		return getModel().getState().getTypeModel().getClassLoader();
+		return model.getState().getTypeModel().getClassLoader();
 	}
 	
 	/**
@@ -712,15 +705,6 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	}
 	
 	/**
-	 *  Get the model.
-	 *  @return The model.
-	 */
-	public OAVAgentModel getModel()
-	{
-		return model;
-	}
-	
-	/**
 	 *  Get the rule system.
 	 */
 	// Hack!!! Used for debugging.
@@ -805,25 +789,6 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	}
 	
 	/**
-	 *  Kill the component.
-	 */
-	public IFuture killAgent()
-	{
-		final Future ret = new Future();
-		
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier())
-					.addResultListener(new DelegationResultListener(ret));
-			}
-		});
-		
-		return ret;
-	}
-	
-	/**
 	 *  Get the agent state.
 	 *  @return The agent state.
 	 */
@@ -858,15 +823,6 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	{
 		return msgservice;
 	}
-	
-	/**
-	 *  Get the cached df service.
-	 * /
-	// hack!!! to avoid dealing with futures.
-	public IDF	getDFService()
-	{
-		return msgservice;
-	}*/
 	
 	/**
 	 *  Invoke some code with agent behaviour synchronized on the agent.
@@ -968,25 +924,15 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	}
 	
 	/**
-	 *  Add an action from external thread.
-	 *  The contract of this method is as follows:
-	 *  The agent ensures the execution of the external action, otherwise
-	 *  the method will throw a agent terminated exception.
-	 *  @param action The action.
-	 * /
-	public void invokeLater(Runnable action)
+	 *  Schedule a step of the component.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the component.
+	 *  @return The result of the step.
+	 */
+	public IFuture scheduleStep(IComponentStep step)
 	{
-		synchronized(ext_entries)
-		{
-			if(ext_forbidden)
-			{
-				throw new ComponentTerminatedException("External actions cannot be accepted " +
-					"due to terminated agent state: "+ragent);
-			}
-			ext_entries.add(action);
-		}
-		adapter.wakeup();
-	}*/
+		return scheduleStep(step, ragent);
+	}
 	
 	/**
 	 *  Schedule a step of the agent.
@@ -1252,26 +1198,6 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	}
 	
 	/**
-	 *  Get the tool adapters.
-	 *  @return The tool adapters.
-	 * /
-	public IToolAdapter[] getToolAdapters()
-	{
-		return tooladapters;
-	}*/
-	
-	/**
-	 *  Get the flyweight cache.
-	 *  @return The flyweight cache.
-	 * /
-	public Map getFlyweightCache(Class type)
-	{
-//		System.out.println("stacache: "+stacache.size());
-//		System.out.println("volcache: "+volcache.size());
-		return stacacheelems.contains(type)? stacache: volcache;
-	}*/
-	
-	/**
 	 *  Put an element into the cache.
 	 */
 	public void putFlyweightCache(Class type, Object key, Object flyweight)
@@ -1305,14 +1231,6 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	}
 	
 	/**
-	 *  Get the service provider.
-	 */
-	public IServiceProvider getServiceProvider()
-	{
-		return getServiceContainer();
-	}
-	
-	/**
 	 *  Create the service container.
 	 *  @return The service container.
 	 */
@@ -1336,42 +1254,15 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			{
 //				container = new CacheServiceContainer(new ComponentServiceContainer(getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
 				RequiredServiceBinding[] bindings = (RequiredServiceBinding[])state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_bindings);
-				container = new ComponentServiceContainer(getAgentAdapter(), BDIAgentFactory.FILETYPE_BDIAGENT, getModel().getModelInfo().getRequiredServices(), bindings);
+				container = new ComponentServiceContainer(getAgentAdapter(), BDIAgentFactory.FILETYPE_BDIAGENT, getModel().getRequiredServices(), bindings);
 			}
 		}
 		return container;
 	}
 	
-	/**
-	 *  Create a component result listener.
-	 */
-	public IResultListener createResultListener(IResultListener listener)
-	{
-		return new ComponentResultListener(listener, adapter);
-	}
-	
-	/**
-	 *  Create a component result listener.
-	 */
-	public IIntermediateResultListener createResultListener(IIntermediateResultListener listener)
-	{
-		return new IntermediateComponentResultListener(listener, adapter);
-	}
-	
 	//-------- helper methods --------
 	
 	
-	/**
-	 *  Add a service to the component. 
-	 *  @param service The service.
-	 *  @param proxytype	The proxy type (@see{BasicServiceInvocationHandler}).
-	 */
-	public void addService(Class type, Object service, String proxytype)
-	{
-		IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(new CapabilityFlyweight(state, ragent), adapter, type, service, proxytype);
-		getServiceContainer().addService(proxy);
-	}
-
 	/**
 	 *  Get the interpreter for an agent object.
 	 */
@@ -1495,5 +1386,112 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		RULEBASE.addRule(ExternalAccessRules.createExternalAccessFactChangedTriggeredRule());
 		RULEBASE.addRule(ExternalAccessRules.createExternalAccessFactAddedTriggeredRule());
 		RULEBASE.addRule(ExternalAccessRules.createExternalAccessFactRemovedTriggeredRule());
+	}
+
+	/**
+	 *  Get the component adapter.
+	 *  @return The component adapter.
+	 */
+	public IComponentAdapter	getComponentAdapter()
+	{
+		return adapter;
+	}
+
+	/**
+	 *  Get the model info.
+	 *  @return The model info.
+	 */
+	public IModelInfo	getModel()
+	{
+		return model.getModelInfo();
+	}
+	
+	/**
+	 *  Get the service bindings.
+	 *  @return The service bindings.
+	 */
+	public RequiredServiceBinding[]	getServiceBindings()
+	{
+		return (RequiredServiceBinding[]) state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_bindings);
+	}
+	
+	/**
+	 *  Get the value fetcher.
+	 *  @return The value fetcher.
+	 */
+	public IValueFetcher	getFetcher()
+	{
+		return new OAVBDIFetcher(state, ragent);
+	}
+	
+	/**
+	 *  Add a default value for an argument (if not already present).
+	 *  Called once for each argument during init.
+	 *  @param name	The argument name.
+	 *  @param value	The argument value.
+	 */
+	public void	addDefaultArgument(String name, Object value)
+	{
+		// Not supported by BDI XML schema -> Shouldn't be called
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Add a default value for a result (if not already present).
+	 *  Called once for each result during init.
+	 *  @param name	The result name.
+	 *  @param value	The result value.
+	 */
+	public void	addDefaultResult(String name, Object value)
+	{
+		// Not supported by BDI XML schema -> Shouldn't be called
+		throw new UnsupportedOperationException();		
+	}
+
+	/**
+	 *  Get the internal access.
+	 *  @return The internal access.
+	 */
+	public IInternalAccess	getInternalAccess()
+	{
+		return new CapabilityFlyweight(state, ragent);
+	}
+	
+	/**
+	 *  Get the component listeners.
+	 *  @return The component listeners.
+	 */
+	public IComponentListener[]	getComponentListeners()
+	{
+		Collection	coll	= getState().getAttributeValues(ragent, OAVBDIRuntimeModel.agent_has_componentlisteners);
+		return coll!=null ? (IComponentListener[])coll.toArray(new IComponentListener[coll.size()]) : new IComponentListener[0];
+	}
+	
+	/**
+	 *  Remove component listener.
+	 */
+	public IFuture	removeComponentListener(IComponentListener listener)
+	{
+		getState().removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Add an extension instance.
+	 *  @param extension The extension instance.
+	 */
+	public void	addExtension(String name, Object extension)
+	{
+		throw new UnsupportedOperationException("todo");		
+	}
+	
+	/**
+	 *  Get a space of the application.
+	 *  @param name	The name of the space.
+	 *  @return	The space.
+	 */
+	public Object getExtension(final String name)
+	{
+		throw new UnsupportedOperationException("todo");		
 	}
 }

@@ -6,9 +6,9 @@
 	This example is inspired by the "robot" example
 	of the Jason BDI agent engine.
 -->
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="GarbageCollector" package="jadex.bdi.examples.garbagecollector">
 	
@@ -18,28 +18,28 @@
 		<componenttype name="Burner" filename="jadex/bdi/examples/garbagecollector_classic/GarbageBurner.agent.xml"/>
 	</componenttypes>
 	
-	<applications>
-		<application name="Two Burners / Two Collectors">
+	<configurations>
+		<configuration name="Two Burners / Two Collectors">
 			<components>
 				<component type="Environment"/>
 				<component type="Collector" number="2"/>
 				<component type="Burner" number="2" />
 			</components>
-		</application>
-		<application name="One Burner / One Collector">
+		</configuration>
+		<configuration name="One Burner / One Collector">
 			<components>
 				<component type="Environment"/>
 				<component type="Collector"/>
 				<component type="Burner"/>
 			</components>
-		</application>
-		<application name="Two Burners / Six Collectors">
+		</configuration>
+		<configuration name="Two Burners / Six Collectors">
 			<components>
 				<component type="Environment"/>
 				<component type="Collector" number="6"/>
 				<component type="Burner" number="2" />
 			</components>
-		</application>
-	</applications>
+		</configuration>
+	</configurations>
 
 </applicationtype>

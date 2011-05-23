@@ -17,9 +17,9 @@
 	see them. Every creature can see all objects and creatues in a
 	certain range around them.
 -->
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="HunterPrey" package="jadex.bdi.examples.hunterprey_classic">
 	
@@ -35,8 +35,8 @@
 		<componenttype name="CleverHunter" filename="jadex/bdi/examples/hunterprey_classic/creature/hunters/ldahunter/LAHunter.agent.xml"/>
 	</componenttypes>
 	
-	<applications>
-		<application name="Some hunters and preys">
+	<configurations>
+		<configuration name="Some hunters and preys">
 			<components>
 				<component type="Environment" />
 				<component type="DumbPrey" number="2"/>
@@ -44,13 +44,13 @@
 				<component type="DumbHunter" number="2" />
 				<component type="CleverHunter" number="1" />
 			</components>
-		</application>
-		<application name="Willy">
+		</configuration>
+		<configuration name="Willy">
 			<components>
 				<component type="Environment" />
 				<component type="CleverHunter" number="1" />
 			</components>
-		</application>
-	</applications>
+		</configuration>
+	</configurations>
 
 </applicationtype>

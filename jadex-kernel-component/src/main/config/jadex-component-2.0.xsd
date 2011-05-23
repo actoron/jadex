@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-application" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://jadex.sourceforge.net/jadex-application" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://jadex.sourceforge.net/jadex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 	<xs:element name="componenttype" type="componenttype">
 		<xs:annotation>
 			<xs:documentation>An application type specifies the structure and content of a agent application.</xs:documentation>

@@ -5,9 +5,9 @@
 	Uses a self-contained calculator component that
 	is tested by a user.
 -->
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="Calculate" package="jadex.micro.testcases.semiautomatic.compositeservice">
 	
@@ -24,17 +24,17 @@
 		</providedservice>
 	</services>
 	
-	<applications>
-		<application name="All Components Available">
+	<configurations>
+		<configuration name="All Components Available">
 			<components>
 				<component name="calculator" type="Calculator"/>
 				<component type="User"/>
 			</components>
-		</application>
-		<application name="Dynamically Create Calculator">
+		</configuration>
+		<configuration name="Dynamically Create Calculator">
 			<components>
 				<component type="User"/>
 			</components>
-		</application>
-	</applications>
+		</configuration>
+	</configurations>
 </applicationtype>

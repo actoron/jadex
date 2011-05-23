@@ -737,7 +737,7 @@ public class MessageEventRules
 						public void resultAvailable(Object result)
 						{
 							IFuture	sent = ((IMessageService)result).sendMessage(msg.getParameterMap(), msg.getMessageType(), 
-								interpreter.getAgentAdapter().getComponentIdentifier(), interpreter.getModel().getState().getTypeModel().getClassLoader(), codecids);
+								interpreter.getAgentAdapter().getComponentIdentifier(), interpreter.getState().getTypeModel().getClassLoader(), codecids);
 							
 							// ret may be null for initial events.
 							if(ret!=null)

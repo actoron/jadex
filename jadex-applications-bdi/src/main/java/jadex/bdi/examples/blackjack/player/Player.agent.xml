@@ -6,9 +6,9 @@
 	strategy and will play with an initial
 	amount of money (default is 100 credits).
 -->
-<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
+<agent xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
 	   name="Player"
 	   package="jadex.bdi.examples.blackjack.player">

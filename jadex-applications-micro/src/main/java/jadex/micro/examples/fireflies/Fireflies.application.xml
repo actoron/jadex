@@ -4,10 +4,10 @@
 	It can be started to launch a firefly scenario.
 -->
 
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
@@ -117,8 +117,8 @@
 		<componenttype name="Firefly" filename="jadex/micro/examples/fireflies/FireflyAgent.class"/>
 	</componenttypes>
 	
-	<applications>	
-		<application name="15x15 and 500 flies, kd-tree enabled">
+	<configurations>	
+		<configuration name="15x15 and 500 flies, kd-tree enabled">
 			<arguments>
 				<argument name="number">500</argument>
 				<argument name="flashes_to_reset">6</argument>
@@ -171,9 +171,9 @@
 			<components>
 				<component type="Firefly" number="$args.number"/>
 			</components>
-		</application>
+		</configuration>
 		
-		<application name="15x15 and 100 flies">
+		<configuration name="15x15 and 100 flies">
 			<arguments>
 				<argument name="number">100</argument>
 			</arguments>
@@ -219,9 +219,9 @@
 			<components>
 				<component type="Firefly" number="$args.number"/>
 			</components>
-		</application>
+		</configuration>
 		
-		<application name="15x15 and 100 flies without evaluation">
+		<configuration name="15x15 and 100 flies without evaluation">
 			<arguments>
 				<argument name="number">100</argument>
 			</arguments>
@@ -237,9 +237,9 @@
 			<components>
 				<component type="Firefly" number="$args.number"/>
 			</components>
-		</application>
+		</configuration>
 		
-		<application name="15x15 and 200 flies without evaluation">
+		<configuration name="15x15 and 200 flies without evaluation">
 			<arguments>
 				<argument name="number">200</argument>
 			</arguments>
@@ -255,7 +255,7 @@
 			<components>
 				<component type="Firefly" number="$args.number"/>
 			</components>
-		</application>
-	</applications>
+		</configuration>
+	</configurations>
 
 </applicationtype>

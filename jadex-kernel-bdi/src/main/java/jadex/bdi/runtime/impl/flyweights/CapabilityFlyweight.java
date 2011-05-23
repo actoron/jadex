@@ -324,7 +324,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IModelInfo getAgentModel()
 	{
-		return getInterpreter().getModel().getModelInfo();
+		return getInterpreter().getModel();
 	}
 
 	/**
@@ -498,7 +498,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 						|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1.equals(cs)
 						|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 					{
-						object = getInterpreter().killAgent();
+						object = getInterpreter().killComponent();
 					}
 				}
 			};
@@ -513,7 +513,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				//	System.out.println("set to terminating");
 				getInterpreter().startMonitorConsequences();
-				ret = getInterpreter().killAgent();
+				ret = getInterpreter().killComponent();
 				getInterpreter().endMonitorConsequences();
 			}
 		}
@@ -701,7 +701,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	public IModelInfo getModel()
 	{
 		// todo: return fitting capability model info.
-		return getInterpreter().getModel().getModelInfo();
+		return getInterpreter().getModel();
 	}
 
 	/**

@@ -3,7 +3,6 @@ package jadex.bdi.model;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
-import jadex.bridge.modelinfo.ModelValueProvider;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.rules.rulesystem.IPatternMatcherFunctionality;

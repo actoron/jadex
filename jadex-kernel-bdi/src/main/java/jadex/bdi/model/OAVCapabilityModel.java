@@ -99,7 +99,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	{
 		boolean startable = !this.getClass().equals(OAVCapabilityModel.class);
 		
-		Collection tmp = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_imports);
+		Collection tmp = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_imports) : null;
 //		List imp = new ArrayList(tmp!=null? tmp: new ArrayList());
 //		imp.add(state.getAttributeValue(handle, OAVBDIMetaModel.capability_has_package)+".*");
 		String[] imports = tmp!=null ? (String[])tmp.toArray(new String[0]) : null;
@@ -759,10 +759,11 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 			for(Iterator it=own.iterator(); it.hasNext(); )
 			{
 				Object ob = it.next();
-				Class clazz = (Class)state.getAttributeValue(ob, OAVBDIMetaModel.expression_has_class);
-				String text = (String)state.getAttributeValue(ob, OAVBDIMetaModel.expression_has_text);
+				Class clazz = (Class)state.getAttributeValue(ob, OAVBDIMetaModel.providedservice_has_class);
 				String proxytype = (String)state.getAttributeValue(ob, OAVBDIMetaModel.providedservice_has_proxytype);
-				Class impl = (Class)state.getAttributeValue(ob, OAVBDIMetaModel.providedservice_has_implementation);
+				Object	mexp	= state.getAttributeValue(ob, OAVBDIMetaModel.providedservice_has_implementation);
+				String text = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_text);				
+				Class impl = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);				
 				ProvidedServiceInfo psi = new ProvidedServiceInfo(clazz, new ProvidedServiceImplementation(impl, text, proxytype, null)); 
 				ret.add(psi);
 			}

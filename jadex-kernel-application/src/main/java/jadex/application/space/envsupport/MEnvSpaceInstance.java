@@ -192,12 +192,12 @@ public class MEnvSpaceInstance extends MSpaceInstance implements IExtensionInsta
 				{
 					if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_CREATION))
 					{
-						System.out.println("add: "+cce.getDetails());
+//						System.out.println("add: "+cce.getDetails());
 						space.componentAdded((IComponentDescription)cce.getDetails());
 					}
 					else if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_DISPOSAL))
 					{
-						System.out.println("rem: "+cce.getComponent());
+//						System.out.println("rem: "+cce.getComponent());
 						space.componentRemoved((IComponentDescription)cce.getDetails());
 					}
 					return IFuture.DONE;

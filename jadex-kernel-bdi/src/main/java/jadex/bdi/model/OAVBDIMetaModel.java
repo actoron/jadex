@@ -329,8 +329,11 @@ public class OAVBDIMetaModel
 	/** Provided service has direct attribute. */
 	public static OAVAttributeType providedservice_has_proxytype;
 
-	/** Provided service has implementation attribute. */
-	public static OAVAttributeType providedservice_has_implementationname;
+	/** Provided service has class name attribute. */
+	public static OAVAttributeType providedservice_has_classname;
+	
+	/** Provided service has class attribute. */
+	public static OAVAttributeType providedservice_has_class;
 	
 	/** Provided service has implementation attribute. */
 	public static OAVAttributeType providedservice_has_implementation;
@@ -1038,8 +1041,9 @@ public class OAVBDIMetaModel
 		expression_has_class = expression_type.createAttributeType("mexpression_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE, Object.class);
 
 		providedservice_has_proxytype = providedservice_type.createAttributeType("providedservice_has_proxytype", OAVJavaType.java_string_type, OAVAttributeType.NONE, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED);
-		providedservice_has_implementationname = providedservice_type.createAttributeType("mprovidedservice_has_implementationname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
-		providedservice_has_implementation = providedservice_type.createAttributeType("mprovidedservice_has_implementation", OAVJavaType.java_class_type, OAVAttributeType.NONE, Object.class);
+		providedservice_has_classname = providedservice_type.createAttributeType("providedservice_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
+		providedservice_has_class = providedservice_type.createAttributeType("providedservice_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE);
+		providedservice_has_implementation = providedservice_type.createAttributeType("mprovidedservice_has_implementation", expression_type, OAVAttributeType.NONE);
 
 		requiredservice_has_classname = requiredservice_type.createAttributeType("mrequiredservice_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
 		requiredservice_has_class = requiredservice_type.createAttributeType("mrequiredservice_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE);

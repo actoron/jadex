@@ -2,9 +2,9 @@
 <!-- 
 	<H3>Agent that provides a service and tries to get it.</H3>
  -->
-<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
+<agent xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
 	name="BeliefProvider"
 	package="jadex.bdi.testcases.service">
@@ -32,7 +32,9 @@
 	</plans>
 	
 	<services>
-		<providedservice class="IBeliefGetter">new BeliefGetter($scope.getExternalAccess())</providedservice>
+		<providedservice class="IBeliefGetter">
+			<implementation>new BeliefGetter($scope.getExternalAccess())</implementation>
+		</providedservice>
 	</services>
 	
 	<configurations>

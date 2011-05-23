@@ -59,13 +59,14 @@ public class OAVBDIXMLReader
 	{
 		// Post processors.
 		IPostProcessor expost = new ExpressionProcessor();
-		IPostProcessor pspost = new MultiPostProcessor(new IPostProcessor[]{
-			expost,
-			new ClassPostProcessor(OAVBDIMetaModel.providedservice_has_implementationname, OAVBDIMetaModel.providedservice_has_implementation)
-		});
+//		IPostProcessor pspost = new MultiPostProcessor(new IPostProcessor[]{
+//			expost,
+//			new ClassPostProcessor(OAVBDIMetaModel.providedservice_has_implementationname, OAVBDIMetaModel.providedservice_has_implementation)
+//		});
 
 		IPostProcessor tepost = new ClassPostProcessor(OAVBDIMetaModel.typedelement_has_classname, OAVBDIMetaModel.typedelement_has_class); 
 		IPostProcessor rspost = new ClassPostProcessor(OAVBDIMetaModel.requiredservice_has_classname, OAVBDIMetaModel.requiredservice_has_class); 
+		IPostProcessor pspost = new ClassPostProcessor(OAVBDIMetaModel.providedservice_has_classname, OAVBDIMetaModel.providedservice_has_class); 
 //		IPostProcessor bopost = new ClassPostProcessor(OAVBDIMetaModel.body_has_classname, OAVBDIMetaModel.body_has_class); 
 		IObjectStringConverter exconv = new ExpressionToStringConverter();
 		
@@ -73,7 +74,7 @@ public class OAVBDIXMLReader
 		
 		Set typeinfos = new HashSet();
 
-		String uri = "http://jadex.sourceforge.net/jadex-bdi";
+		String uri = "http://jadex.sourceforge.net/jadex";
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "exclude")),  new ObjectInfo(new IBeanObjectCreator()
 		{
@@ -275,12 +276,15 @@ public class OAVBDIXMLReader
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "binding")), new ObjectInfo(OAVBDIMetaModel.binding_type)));
 		
-		TypeInfo ti_service = new TypeInfo(new XMLInfo(new QName(uri, "providedservice")), new ObjectInfo(OAVBDIMetaModel.providedservice_type, pspost), 
-			new MappingInfo(ti_expression, 
-			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("implementation", OAVBDIMetaModel.providedservice_has_implementationname)),
+		TypeInfo ti_service = new TypeInfo(new XMLInfo(new QName(uri, "providedservice")), new ObjectInfo(OAVBDIMetaModel.providedservice_type, pspost),
+			new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", OAVBDIMetaModel.providedservice_has_classname)),
+				new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.providedservice_has_class, AccessInfo.IGNORE_WRITE))
 			}));
 		typeinfos.add(ti_service);
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "implementation")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
+				new MappingInfo(ti_expression)));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
 			new MappingInfo(ti_expression)));

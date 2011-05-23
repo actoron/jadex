@@ -31,12 +31,10 @@ import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
-import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.Reader;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -263,7 +261,7 @@ public class ApplicationXMLReader
 			}
 		};
 		
-		String uri = "http://jadex.sourceforge.net/jadex-application";
+		String uri = "http://jadex.sourceforge.net/jadex";
 		
 //		TypeInfo satype = new TypeInfo(null, new ObjectInfo(MStartable.class),
 //			new MappingInfo(null, new AttributeInfo[]{
@@ -299,8 +297,7 @@ public class ApplicationXMLReader
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "applications"), new QName(uri, "application")}), new AccessInfo(new QName(uri, "configuration"), "configuration", null, null))//, new BeanAccessInfo(putprop, null, "map", getname))),
 		})));
 		
-//		types.add(new TypeInfo(new XMLInfo(new QName(uri, "configuration")), new ObjectInfo(ConfigurationInfo.class, new IPostProcessor()
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "application")), new ObjectInfo(ConfigurationInfo.class, new IPostProcessor()
+		ObjectInfo	app	= new ObjectInfo(ConfigurationInfo.class, new IPostProcessor()
 		{
 			public Object postProcess(IContext context, Object object)
 			{
@@ -334,14 +331,23 @@ public class ApplicationXMLReader
 			{
 				return 0;
 			}
-		}), 
-			new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("type", "typeName")),
-				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown"))},
-				new SubobjectInfo[]{
-				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "component")}), new AccessInfo(new QName(uri, "component"), "componentInstance")),
-			})));
-		
+		});
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "configuration")), app, 
+				new MappingInfo(null, new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("type", "typeName")),
+					new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown"))},
+					new SubobjectInfo[]{
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "component")}), new AccessInfo(new QName(uri, "component"), "componentInstance")),
+				})));
+			
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "application")), app, 
+				new MappingInfo(null, new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("type", "typeName")),
+					new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown"))},
+					new SubobjectInfo[]{
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "component")}), new AccessInfo(new QName(uri, "component"), "componentInstance")),
+				})));
+			
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "applicationtype"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(Argument.class), 
 			new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)),
 			new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "typename"))}, null)));

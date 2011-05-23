@@ -19,7 +19,6 @@ import jadex.commons.future.IFuture;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
@@ -63,7 +62,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	 */
 	public IModelInfo	getModel()
 	{
-		return getInterpreter().getModel().getModelInfo();
+		return getInterpreter().getModel();
 	}
 
 	/**
@@ -205,7 +204,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 						|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1.equals(cs)
 						|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 					{
-						getInterpreter().killAgent().addResultListener(new DelegationResultListener(ret));
+						getInterpreter().killComponent().addResultListener(new DelegationResultListener(ret));
 					}
 				}
 			});
@@ -219,7 +218,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 			{
 				//	System.out.println("set to terminating");
 				getInterpreter().startMonitorConsequences();
-				getInterpreter().killAgent().addResultListener(new DelegationResultListener(ret));
+				getInterpreter().killComponent().addResultListener(new DelegationResultListener(ret));
 				getInterpreter().endMonitorConsequences();
 			}
 		}

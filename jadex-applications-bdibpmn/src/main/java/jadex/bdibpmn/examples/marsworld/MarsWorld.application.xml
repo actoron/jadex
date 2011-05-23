@@ -12,11 +12,11 @@
 	Objective is to carry as much ore as possible to the<br>
 	home base in a predefined mission time.<br>
 -->
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:agr="http://jadex.sourceforge.net/jadex-agrspace"
 	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
 						http://jadex.sourceforge.net/jadex-application-2.0.xsd
 						http://jadex.sourceforge.net/jadex-agrspace
 						http://jadex.sourceforge.net/jadex-agrspace-2.0.xsd
@@ -196,8 +196,8 @@
 		</property>
 	</properties>
 	
-	<applications>
-		<application name="1 Sentry / 2 Producers / 3 Carries">
+	<configurations>
+		<configuration name="1 Sentry / 2 Producers / 3 Carries">
 			<spaces>
 				<agr:agrspace name="myagrspace" type="marsagrspace">
 					<agr:group name="mymarsteam" type="marsteam">
@@ -251,9 +251,9 @@
   				<component type="Producer" number="2"/>
 				<component type="Carry" number="3"/>
 			</components>	 		
- 		</application>
+ 		</configuration>
 
-		<application name="Multi">
+		<configuration name="Multi">
 			<spaces>
 				<agr:agrspace name="myagrspace" type="marsagrspace">
 					<agr:group name="mymarsteam" type="marsteam">
@@ -287,7 +287,7 @@
 				<component type="Carry" number="10"/>
 			</components>
 
- 		</application>
-	</applications>
+ 		</configuration>
+	</configurations>
 
 </applicationtype>

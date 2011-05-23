@@ -4,9 +4,9 @@
 	
 	Starts pinging agents and agents to be ping'd. 
 -->
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
 						http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="PingScenario" package="jadex.micro.examples.ping">
 	
@@ -15,22 +15,22 @@
 		<componenttype name="Pinging" filename="jadex/micro/examples/ping/PingingAgent.class" master="true"/>
 	</componenttypes>
 	
-	<applications>
-		<application name="Simple Pinging">
+	<configurations>
+		<configuration name="Simple Pinging">
 			<components>
 				<component type="Ping" name="Ping" />
 				<component type="Pinging" name="Pinging" />
 			</components>
-		</application>
+		</configuration>
 
-		<application name="Multi Pinging">
+		<configuration name="Multi Pinging">
 			<components>
 				<component type="Ping" name="Ping"/>
 				<component type="Pinging" number="2"/>
 			</components>
-		</application>
+		</configuration>
 
-		<application name="Fast Pinging">
+		<configuration name="Fast Pinging">
 			<components>
 				<component type="Ping" name="Ping"/>
 				<component type="Pinging" name="FastPinging">
@@ -41,7 +41,7 @@
 					</arguments>
 				</component>
 			</components>
-		</application>
-	</applications>
+		</configuration>
+	</configurations>
 	
 </applicationtype>

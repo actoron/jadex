@@ -48,7 +48,6 @@ import jadex.commons.future.IResultListener;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SJavaParser;
 
-import java.awt.event.ComponentEvent;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -348,7 +347,6 @@ public abstract class AbstractInterpreter implements IComponentInstance
 						{
 							// todo: other Class imports, how can be found out?
 							ser = SJavaParser.evaluateExpression(impl.getExpression(), model.getAllImports(), getFetcher(), model.getClassLoader());
-							
 	//						System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
 						}
 						else if(services[i].getImplementation()!=null)

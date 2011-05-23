@@ -1200,14 +1200,15 @@ public class AgentRules
 		{
 			for(Iterator it=mservices.iterator(); it.hasNext(); )
 			{
-				Object mexp = it.next();
+				Object mpro = it.next();
 				
 				try
 				{
-					Class type = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
-					String proxytype = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.providedservice_has_proxytype);
+					Class type = (Class)state.getAttributeValue(mpro, OAVBDIMetaModel.providedservice_has_class);
+					String proxytype = (String)state.getAttributeValue(mpro, OAVBDIMetaModel.providedservice_has_proxytype);
+					Object	mexp	= state.getAttributeValue(mpro, OAVBDIMetaModel.providedservice_has_implementation);
 					IParsedExpression pex = (IParsedExpression)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_parsed);
-					Class impl = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.providedservice_has_implementation);
+					Class impl = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
 					Object ser = null;
 					if(pex!=null)
 					{
@@ -1231,7 +1232,7 @@ public class AgentRules
 				catch(Exception e)
 				{
 //					e.printStackTrace();
-					BDIInterpreter.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_text));
+					BDIInterpreter.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mpro, OAVBDIMetaModel.providedservice_has_classname));
 				}
 				
 //				try

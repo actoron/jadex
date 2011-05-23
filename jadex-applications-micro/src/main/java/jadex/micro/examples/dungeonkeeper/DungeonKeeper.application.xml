@@ -3,10 +3,10 @@
 
 -->
 
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
@@ -114,8 +114,8 @@
 		<componenttype name="Imp" filename="jadex/micro/examples/dungeonkeeper/ImpAgent.class"/>
 	</componenttypes>
 	
-	<applications>
-		<application name="Test map">
+	<configurations>
+		<configuration name="Test map">
 			<spaces>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="10" height="10">
 					<env:processes>
@@ -129,7 +129,7 @@
 					</env:observers>
 				</env:envspace>
 			</spaces>
-		</application>
-	</applications>
+		</configuration>
+	</configurations>
 
 </applicationtype>

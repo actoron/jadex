@@ -4,10 +4,10 @@
 	It can be started to launch a heatbugs scenario.
 -->
 
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
@@ -122,8 +122,8 @@
 		<!--  <componenttype name="Heatbug" filename="jadex.micro.examples.heatbugs.HeatbugAgent.class"/>-->
 	</componenttypes>
 	
-	<applications>
-		<application name="20x20 and 10 bugs">
+	<configurations>
+		<configuration name="20x20 and 10 bugs">
 			<spaces>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
 					<env:processes>
@@ -225,9 +225,9 @@
 					</arguments>
 				</agent> -->
 			</components>
-		</application>
+		</configuration>
 		
-		<application name="30x30 and 40 bugs">
+		<configuration name="30x30 and 40 bugs">
 			<spaces>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
 					<env:processes>
@@ -307,9 +307,9 @@
 			<components>
 				<component type="Heatbug" number="40"/>
 			</components>
-		</application>
+		</configuration>
 		
-		<application name="50x50 and 100 bugs">
+		<configuration name="50x50 and 100 bugs">
 			<spaces>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="50" height="50">
 					<env:processes>
@@ -360,9 +360,9 @@
 			<components>
 				<component type="Heatbug" number="100"/>
 			</components>
-		</application>
+		</configuration>
 		
-		<application name="20x20 and 10 bugs without evaluation">
+		<configuration name="20x20 and 10 bugs without evaluation">
 			<spaces>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="20" height="20">
 					<env:processes>
@@ -380,9 +380,9 @@
 			<components>
 				<component type="Heatbug" number="10"/>
 			</components>
-		</application>
+		</configuration>
 		
-		<application name="30x30 and 40 bugs without evaluation">
+		<configuration name="30x30 and 40 bugs without evaluation">
 			<spaces>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
 					<env:processes>
@@ -400,9 +400,9 @@
 			<components>
 				<component type="Heatbug" number="40"/>
 			</components>
-		</application>
+		</configuration>
 		
-		<application name="50x50 and 100 bugs without evaluation">
+		<configuration name="50x50 and 100 bugs without evaluation">
 			<spaces>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="50" height="50">
 					<env:processes>
@@ -420,7 +420,7 @@
 			<components>
 				<component type="Heatbug" number="100"/>
 			</components>
-		</application>
-	</applications>
+		</configuration>
+	</configurations>
 
 </applicationtype>

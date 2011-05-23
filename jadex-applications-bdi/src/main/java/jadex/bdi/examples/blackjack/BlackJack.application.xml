@@ -2,9 +2,9 @@
 <!--
 	<H3>BlackJack application descriptor</H3>
 -->
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="BlackJack" package="jadex.bdi.examples.blackjack">
 	
@@ -14,12 +14,12 @@
 		<componenttype name="Player" filename="jadex/bdi/examples/blackjack/player/Player.agent.xml"/>
 	</componenttypes>
 	
-	<applications>
-		<application name="Only Manager">
+	<configurations>
+		<configuration name="Only Manager">
 			<components>
 				<component type="Manager" master="true"/>
 			</components>
-		</application>
-	</applications>
+		</configuration>
+	</configurations>
 
 </applicationtype>
