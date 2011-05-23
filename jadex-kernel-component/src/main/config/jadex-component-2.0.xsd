@@ -82,6 +82,22 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
+			<xs:element name="extensiontypes" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Space types define concrete substructures of the
+						application context, e.g. a 2D environment space
+						or an agent-group-role based organization space.
+						The elements of space types are defined by
+						external XML schemas.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:any minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
 			<xs:element name="services" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>Service declarations of the application type.</xs:documentation>
@@ -190,7 +206,22 @@
 							</xs:sequence>
 						</xs:complexType>
 					</xs:element>
-					<xs:element name="providedservices"/>
+					<xs:element name="extensions" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+						Space types define concrete substructures of the
+						application context, e.g. a 2D environment space
+						or an agent-group-role based organization space.
+						The elements of space types are defined by
+						external XML schemas.
+					</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:any minOccurs="0" maxOccurs="unbounded"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
 				</xs:sequence>
 				<xs:attribute name="name" type="xs:string" use="required"/>
 			</xs:extension>

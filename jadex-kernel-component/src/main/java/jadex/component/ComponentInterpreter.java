@@ -18,16 +18,15 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.clock.ITimedObject;
 import jadex.bridge.service.component.ComponentServiceContainer;
-import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.AbstractInterpreter;
+import jadex.kernelbase.ExternalAccess;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,10 +57,6 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	/** The parent component. */
 	protected IExternalAccess parent;
 	
-	/** Component type mapping (cid -> modelname) and (modelname->application component type). */
-	protected Map ctypes;
-	protected MultiCollection instances;
-	
 	/** The arguments. */
 	protected Map arguments;
 	
@@ -90,6 +85,9 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	
 	/** The required service binding information. */
 	protected RequiredServiceBinding[] bindings;
+	
+	/** The extensions. */
+	protected Map extensions;
 
 	//-------- constructors --------
 	
@@ -106,8 +104,6 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 		this.parent = parent;
 		this.arguments = arguments;
 		this.properties = new HashMap();
-		this.ctypes = new HashMap(); 
-		this.instances = new MultiCollection(); 
 		this.steps	= new ArrayList();
 		this.willdostep	= true;
 		this.bindings = bindings;
@@ -138,31 +134,6 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 		}
 	}
 
-//	/**
-//	 *  Schedule a step of the component.
-//	 *  May safely be called from external threads.
-//	 *  @param step	Code to be executed as a step of the component.
-//	 */
-//	public IFuture scheduleStep(final IComponentStep step)
-//	{
-//		Future ret = new Future();
-//		
-//		boolean dowakeup;
-//		synchronized(steps)
-//		{
-//			steps.add(new Object[]{step, ret});
-//			dowakeup	= !willdostep;	// only wake up if not already scheduled.
-//		}
-////		notifyListeners(new ChangeEvent(this, "addStep", step));
-//		
-//		if(dowakeup)
-//		{
-//			adapter.wakeup();
-//		}
-//		
-//		return ret;
-//	}
-	
 	/**
 	 *  Schedule a step of the agent.
 	 *  May safely be called from external threads.
@@ -229,6 +200,16 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 ////		notifyListeners(new ChangeEvent(this, "removeStep", new Integer(0)));
 //		return ret;
 //	}
+	
+	/**
+	 *  Get a space of the application.
+	 *  @param name	The name of the space.
+	 *  @return	The space.
+	 */
+	public Object getExtension(final String name)
+	{
+		return extensions==null? null: extensions.get(name);
+	}
 	
 	//-------- methods to be called by adapter --------
 	
@@ -336,27 +317,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 		return ret;
 //		return adapter.getServiceContainer().shutdown(); // done in adapter
 	}
-	
-	
-//	/**
-//	 *  Kill the component.
-//	 */
-//	public IFuture killComponent()
-//	{
-//		final Future ret = new Future();
-//		
-//		SServiceProvider.getService(getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-//		{
-//			public void resultAvailable(Object result)
-//			{
-//				((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier())
-//					.addResultListener(new DelegationResultListener(ret));
-//			}
-//		});
-//		
-//		return ret;
-//	}
-	
+		
 	/**
 	 *  Can be called concurrently (also during executeAction()).
 	 * 
@@ -380,19 +341,6 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 		
 		return access;
 	}
-
-
-//	/**
-//	 *  Get the class loader of the component.
-//	 *  The component class loader is required to avoid incompatible class issues,
-//	 *  when changing the platform class loader while components are running. 
-//	 *  This may occur e.g. when decoding messages and instantiating parameter values.
-//	 *  @return	The component class loader. 
-//	 */
-//	public ClassLoader getClassLoader()
-//	{
-//		return model.getModelInfo().getClassLoader();
-//	}
 
 	/**
 	 *  Test if the component's execution is currently at one of the
@@ -440,228 +388,6 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 		return results;
 	}
 
-//	/**
-//	 *  Get the logical component type for a given component id.
-//	 */
-//	public String getComponentType(IComponentIdentifier cid)
-//	{
-//		return (String)ctypes.get(cid);
-//	}
-//
-//	/**
-//	 *  Get the file name for a logical type name of a subcomponent of this application.
-//	 */
-//	public String	getComponentFilename(String type)
-//	{
-//		return model.getMSubcomponentType(type).getFilename();
-//	}
-	
-	/**
-	 *  Get the parent.
-	 */
-	public IExternalAccess getParent()
-	{
-		return parent;
-	}	
-	
-//	/**
-//	 *  Create a result listener which is executed as an component step.
-//	 *  @param The original listener to be called.
-//	 *  @return The listener.
-//	 */
-//	public IResultListener createResultListener(IResultListener listener)
-//	{
-//		return new ComponentResultListener(listener, adapter);
-//	}
-//
-//	/**
-//	 *  Create a result listener which is executed as an component step.
-//	 *  @param The original listener to be called.
-//	 *  @return The listener.
-//	 */
-//	public IIntermediateResultListener createResultListener(IIntermediateResultListener listener)
-//	{
-//		return new IntermediateComponentResultListener(listener, adapter);
-//	}
-
-//	/**
-//	 *  Create subcomponents.
-//	 *  NOTE: parent cannot declare itself initing while subcomponents are created
-//	 *  because they need the external access of the parent, which is available only
-//	 *  after init is finished (otherwise there is a cyclic init dependency between parent and subcomps). 
-//	 */
-//	protected void createComponent(final List components, final IComponentManagementService cms, final int i, final Future inited)
-//	{
-//		if(i<components.size())
-//		{
-//			final MComponentInstance component = (MComponentInstance)components.get(i);
-////			System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
-//			int num = getNumber(component);
-//			final IResultListener crl = new CollectionResultListener(num, false, new IResultListener()
-//			{
-//				public void resultAvailable(Object result)
-//				{
-////					System.out.println("Create finished: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
-////					if(getParent()==null)
-////					{
-////						addStep(new Runnable()
-////						{
-////							public void run()
-////							{
-////								createComponent(components, cl, ces, i+1, inited);
-////							}
-////						});
-////					}
-////					else
-////					{
-//						scheduleStep(new IComponentStep()
-//						{
-//							@XMLClassname("createChild")
-//							public Object execute(IInternalAccess ia)
-//							{
-//								createComponent(components, cms, i+1, inited);
-//								return null;
-//							}
-//						});
-////					}
-//				}
-//				
-//				public void exceptionOccurred(Exception exception)
-//				{
-//					inited.setException(exception);
-//				}
-//			});
-//			for(int j=0; j<num; j++)
-//			{
-//				MSubcomponentType	type	= component.getType(model);
-//				if(type!=null)
-//				{
-//					final Boolean suspend	= component.getSuspend()!=null ? component.getSuspend() : type.getSuspend();
-//					Boolean	master = component.getMaster()!=null ? component.getMaster() : type.getMaster();
-//					Boolean	daemon = component.getDaemon()!=null ? component.getDaemon() : type.getDaemon();
-//					Boolean	autoshutdown = component.getAutoShutdown()!=null ? component.getAutoShutdown() : type.getAutoShutdown();
-//					List bindings = component.getRequiredServiceBindings();
-//					IFuture ret = cms.createComponent(component.getName(), component.getType(model).getFilename(),
-//						new CreationInfo(component.getConfiguration(), getArguments(component), adapter.getComponentIdentifier(),
-//						suspend, master, daemon, autoshutdown, model.getAllImports(), 
-//						bindings!=null? (RequiredServiceBinding[])bindings.toArray(new RequiredServiceBinding[bindings.size()]): null), null);
-//					ret.addResultListener(crl);
-//				}
-//				else
-//				{
-//					crl.exceptionOccurred(new RuntimeException("No such component type: "+component.getTypeName()));
-//				}
-//			}
-//		}
-//		else
-//		{
-//			// Init is now finished. Notify cms.
-////			System.out.println("Application init finished: "+ApplicationInterpreter.this);
-//
-//			// master, daemon, autoshutdown
-////			Boolean[] bools = new Boolean[3];
-////			bools[2] = model.getAutoShutdown();
-//			
-////			for(int j=0; j<tostart.size(); j++)
-////			{
-////				IComponentIdentifier cid = (IComponentIdentifier)tostart.get(j);
-////				cms.resumeComponent(cid);
-////			}
-//			
-//			inited.setResult(new Object[]{ComponentInterpreter.this, adapter});
-//		}
-//	}
-	
-//	/**
-//	 *  Get the file name of a component type.
-//	 *  @param ctype The component type.
-//	 *  @return The file name of this component type.
-//	 */
-//	public String getFileName(String ctype)
-//	{
-//		String ret = null;
-//		List componenttypes = model.getMComponentTypes();
-//		for(int i=0; ret==null && i<componenttypes.size(); i++)
-//		{
-//			MSubcomponentType at = (MSubcomponentType)componenttypes.get(i);
-//			if(at.getName().equals(ctype))
-//				ret = at.getFilename();
-//		}
-//		return ret;
-//	}
-
-	/**
-	 *  Get the arguments.
-	 *  @return The arguments as a map of name-value pairs.
-	 * /
-	public Map getArguments(String appname, ClassLoader classloader)
-	{
-		Map ret = null;	
-		
-		IArgument[] args = getModel().getArguments();
-		if(args!=null)
-		{
-			ret = new HashMap();
-
-			JavaCCExpressionParser	parser = new JavaCCExpressionParser();
-			String[] imports = getApplicationType().getAllImports();
-			for(int i=0; i<args.length; i++)
-			{
-				IArgument arg = (IArgument)args[i];
-				String valtext = (String)arg.getDefaultValue(appname);
-				
-				Object val = parser.parseExpression(valtext, imports, null, classloader).getValue(fetcher);
-				ret.put(arg.getName(), val);
-			}
-		}
-		
-		return ret;
-	}*/
-	
-//	/**
-//	 *  Get the arguments.
-//	 *  @return The arguments as a map of name-value pairs.
-//	 */
-//	public Map getArguments(MComponentInstance component)
-//	{
-//		Map ret = null;		
-//		List	arguments	= component.getArguments();
-//
-//		if(arguments!=null && !arguments.isEmpty())
-//		{
-//			ret = new HashMap();
-//
-//			for(int i=0; i<arguments.size(); i++)
-//			{
-//				MExpressionType p = (MExpressionType)arguments.get(i);
-//				Object val = p.getParsedValue().getValue(fetcher);
-//				ret.put(p.getName(), val);
-//			}
-//		}
-//		
-//		return ret;
-//	}
-	
-//	/**
-//	 *  Get the number of components to start.
-//	 *  @return The number.
-//	 */
-//	public int getNumber(MComponentInstance component)
-//	{
-//		Object val = component.getNumber()!=null? component.getNumber().getValue(fetcher): null;
-//		
-//		return val instanceof Integer? ((Integer)val).intValue(): 1;
-//	}
-
-	
-//	/**
-//	 *  Get the service provider.
-//	 */
-//	public IServiceProvider getServiceProvider()
-//	{
-//		return getServiceContainer();
-//	}
-	
 	/**
 	 *  Create the service container.
 	 *  @return The service container.
@@ -687,24 +413,6 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	}
 	
 	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 */
-	public Collection getChildren(final String type)
-	{
-		return (Collection)instances.get(type);
-	}
-	
-	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 */
-	public IFuture getChildren()
-	{
-		return adapter.getChildrenAccesses();
-	}
-	
-	/**
 	 *  Add an component listener.
 	 *  @param listener The listener.
 	 */
@@ -722,6 +430,16 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	public IFuture removeComponentListener(IComponentListener listener)
 	{
 		return removeComponentListener(componentlisteners, listener);
+	}
+	
+	/**
+	 *  Get the component listeners.
+	 *  @return The component listeners.
+	 */
+	public IComponentListener[] getComponentListeners()
+	{
+		return componentlisteners==null? new IComponentListener[0]: 
+			(IComponentListener[])componentlisteners.toArray(new IComponentListener[componentlisteners.size()]);
 	}
 	
 	/**
@@ -752,6 +470,15 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 		return ret;
 	}
 	
+	/**
+	 *  Get the parent.
+	 *  @return The parent.
+	 */
+	public IExternalAccess getParent()
+	{
+		return parent;
+	}
+	
 	//-------- abstract interpreter methods --------
 	
 	/**
@@ -769,25 +496,6 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	public IModelInfo getModel()
 	{
 		return model;
-	}
-	
-	/**
-	 *  Get the imports.
-	 *  @return The imports.
-	 */
-	public String[] getAllImports()
-	{
-//		if(imports==null)
-//		{
-//			List imp = new ArrayList();
-//			imp.add(microagent.getClass().getPackage().getName()+".*");
-//			
-//			// todo: http://stackoverflow.com/questions/3734825/find-out-which-classes-of-a-given-api-are-used
-//			
-//			imports = (String[])imp.toArray(new String[imp.size()]);
-//		}
-//		return imports;
-		return model.getAllImports();
 	}
 	
 	/**
@@ -847,6 +555,21 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 			results	= new HashMap();
 		}
 		results.put(name, value);
+	}
+	
+	/**
+	 *  Add a default value for an argument (if not already present).
+	 *  Called once for each argument during init.
+	 *  @param name	The argument name.
+	 *  @param value	The argument value.
+	 */
+	public void	addExtension(String name, Object value)
+	{
+		if(extensions==null)
+		{
+			extensions = new HashMap();
+		}
+		extensions.put(name, value);
 	}
 	
 	/**

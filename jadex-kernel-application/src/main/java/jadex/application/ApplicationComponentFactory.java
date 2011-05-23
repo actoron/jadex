@@ -1,13 +1,12 @@
 package jadex.application;
 
-import jadex.application.model.MApplicationInstance;
-import jadex.application.model.MApplicationType;
 import jadex.application.runtime.impl.ApplicationInterpreter;
 import jadex.application.space.agr.MAGRSpaceType;
 import jadex.application.space.envsupport.MEnvSpaceType;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
+import jadex.bridge.IComponentFactoryExtensionService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
@@ -17,14 +16,17 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
+import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -66,14 +68,6 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	//-------- constructors --------
 	
 	/**
-	 *  Create a new application factory.
-	 */
-	public ApplicationComponentFactory(IServiceProvider provider)
-	{
-		this(null, provider);
-	}
-	
-	/**
 	 *  Create a new application factory for startup.
 	 *  @param platform	The platform.
 	 *  @param mappings	The XML reader mappings of supported spaces (if any).
@@ -84,11 +78,11 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 		super(providerid, IComponentFactory.class, null);
 		
 		// Todo: hack!!! make mappings configurable also for reflective constructor (how?)
-		this.loader = new ApplicationModelLoader(new Set[]
-		{
-			MEnvSpaceType.getXMLMapping(),
-			MAGRSpaceType.getXMLMapping()
-		});
+//		this.loader = new ApplicationModelLoader(new Set[]
+//		{
+//			MEnvSpaceType.getXMLMapping(),
+//			MAGRSpaceType.getXMLMapping()
+//		});
 	}
 	
 	/**
@@ -96,48 +90,86 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param platform	The platform.
 	 *  @param mappings	The XML reader mappings of supported spaces (if any).
 	 */
-	public ApplicationComponentFactory(Set[] mappings, IServiceProvider provider)
+	public ApplicationComponentFactory(IServiceProvider provider)
 	{
 		super(provider.getId(), IComponentFactory.class, null);
-		this.loader = new ApplicationModelLoader(mappings);
 		this.provider = provider;
-		this.libservicelistener = new ILibraryServiceListener()
-		{
-			public IFuture urlRemoved(URL url)
-			{
-				loader.clearModelCache();
-				return IFuture.DONE;
-			}
-			
-			public IFuture urlAdded(URL url)
-			{
-				loader.clearModelCache();
-				return IFuture.DONE;
-			}
-		};
-		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				ILibraryService libService = (ILibraryService)result;
-				libService.addLibraryServiceListener(libservicelistener);
-			}
-		});
 	}
 	
 	/**
 	 *  Start the service.
-	 * /
-	public synchronized IFuture	startService()
+	 */
+	public IFuture startService()
 	{
-		return super.startService();
-	}*/
+		final Future ret = new Future();
+		super.startService().addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						final ILibraryService libservice = (ILibraryService)result;
+						
+						SServiceProvider.getServices(provider, IComponentFactoryExtensionService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+							.addResultListener(new DelegationResultListener(ret)
+						{
+							public void customResultAvailable(Object result)
+							{
+								Collection fes = (Collection)result;
+								
+								CollectionResultListener lis = new CollectionResultListener(fes.size(), true, new DefaultResultListener()
+								{
+									public void resultAvailable(Object result)
+									{
+										Collection exts = (Collection)result;
+										Set[] mappings = (Set[])exts.toArray(new Set[exts.size()]);
+										
+										loader = new ApplicationModelLoader(mappings);
+										
+										libservicelistener = new ILibraryServiceListener()
+										{
+											public IFuture urlRemoved(URL url)
+											{
+												loader.clearModelCache();
+												return IFuture.DONE;
+											}
+											
+											public IFuture urlAdded(URL url)
+											{
+												loader.clearModelCache();
+												return IFuture.DONE;
+											}
+										};
+										
+										libservice.addLibraryServiceListener(libservicelistener);
+										
+										ret.setResult(null);
+									}
+								});
+								
+								for(Iterator it=fes.iterator(); it.hasNext(); )
+								{
+									IComponentFactoryExtensionService fex = (IComponentFactoryExtensionService)it.next();
+									fex.getExtension(FILETYPE_APPLICATION).addResultListener(lis);
+								}
+							}	
+						});
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
 	
 	/**
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public synchronized IFuture	shutdownService()
+	public IFuture shutdownService()
 	{
 		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
@@ -188,30 +220,8 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	{
 		try
 		{
-			MApplicationType apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, modelinfo.getClassLoader());
-			List apps = apptype.getMApplicationInstances();
-					
-			// Select application instance according to configuration.
-			MApplicationInstance app = null;
-				
-			if(config!=null)
-			{
-				for(int i=0; app==null && i<apps.size(); i++)
-				{
-					MApplicationInstance tmp = (MApplicationInstance)apps.get(i);
-					if(config.equals(tmp.getName()))
-						app = tmp;
-				}
-			}
-			if(app==null && apps.size()>0)
-			{
-				app = (MApplicationInstance)apps.get(0);
-			}
-			if(app==null)
-				app = new MApplicationInstance("default");
-	
-			// Create context for application.
-			ApplicationInterpreter interpreter = new ApplicationInterpreter(desc, apptype, app, factory, parent, arguments, bindings, ret);
+			ApplicationModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, modelinfo.getClassLoader());
+			ApplicationInterpreter interpreter = new ApplicationInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, ret);
 			
 			// todo: result listener?
 			// todo: create application context as return value?!
@@ -222,6 +232,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 		{
 			throw new RuntimeException(e);
 		}
+
 	}
 		
 	/**

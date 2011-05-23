@@ -112,6 +112,7 @@ public class ComponentXMLReader
 		{
 			mi.setFilename(rinfo.getFilename());
 			mi.setClassloader(classloader);
+			mi.setStartable(true);
 			ret.setLastModified(rinfo.getLastModified());
 //			ret.initModelInfo(report);
 			
@@ -359,7 +360,7 @@ public class ComponentXMLReader
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("type", "typeName")),
 				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
-				new AttributeInfo(new AccessInfo("number"), new AttributeConverter(pexconv, null))
+				new AttributeInfo(new AccessInfo("number"))
 			}, null)));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "component"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 

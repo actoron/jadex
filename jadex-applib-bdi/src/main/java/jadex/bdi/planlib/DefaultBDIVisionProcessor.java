@@ -9,6 +9,7 @@ import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Double;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
@@ -76,7 +77,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 	 *  @param agent The agent identifier.
 	 *  @param agent The avatar of the agent (if any).
 	 */
-	public void processPercept(final IEnvironmentSpace space, final String type, final Object percept, final IComponentIdentifier agent, final ISpaceObject avatar)
+	public void processPercept(final IEnvironmentSpace space, final String type, final Object percept, final IComponentDescription agent, final ISpaceObject avatar)
 	{
 		boolean	invoke	= false;
 		final String[][] metainfos = getMetaInfos(type);
@@ -92,12 +93,12 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 		if(invoke)
 		{
 			// HACK!!! todo
-			SServiceProvider.getService(space.getContext().getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(space.getExternalAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
-					IFuture fut = ((IComponentManagementService)result).getExternalAccess(agent);
+					IFuture fut = ((IComponentManagementService)result).getExternalAccess(agent.getName());
 					fut.addResultListener(new IResultListener()
 					{
 						public void exceptionOccurred(Exception exception)

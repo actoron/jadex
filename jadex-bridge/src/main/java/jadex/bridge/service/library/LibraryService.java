@@ -298,6 +298,8 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 */
 	public void addLibraryServiceListener(ILibraryServiceListener listener)
 	{
+		if(listener==null)
+			System.out.println("here");
 		listeners.add(listener);
 	}
 

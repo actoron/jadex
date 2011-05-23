@@ -1,6 +1,5 @@
 package jadex.application;
 
-import jadex.application.model.MApplicationType;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
@@ -40,9 +39,9 @@ public class ApplicationModelLoader extends AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public MApplicationType loadApplicationModel(String name, String[] imports, ClassLoader classloader) throws Exception
+	public ApplicationModel loadApplicationModel(String name, String[] imports, ClassLoader classloader) throws Exception
 	{
-		return (MApplicationType)loadModel(name, FILE_EXTENSION_APPLICATION, imports, classloader);
+		return (ApplicationModel)loadModel(name, FILE_EXTENSION_APPLICATION, imports, classloader);
 	}
 	
 	//-------- AbstractModelLoader methods --------

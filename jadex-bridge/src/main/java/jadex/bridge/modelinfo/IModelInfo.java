@@ -186,4 +186,9 @@ public interface IModelInfo
 	 *  Get the subcomponent names. 
 	 */
 	public SubcomponentTypeInfo[] getSubcomponentTypes();
+	
+	/**
+	 *  Get the extension types.
+	 */
+	public IExtensionType[] getExtensionTypes();
 }

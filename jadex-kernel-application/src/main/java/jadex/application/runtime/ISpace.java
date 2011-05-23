@@ -1,7 +1,9 @@
 package jadex.application.runtime;
 
 import jadex.application.model.MSpaceInstance;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.javaparser.IValueFetcher;
 
 
@@ -21,7 +23,8 @@ public interface ISpace
 	 *  Initialize a space.
 	 *  Called once, when the space is created.
 	 */
-	public void	initSpace(IApplication context, MSpaceInstance config, IValueFetcher fetcher) throws Exception;
+//	public void	initSpace(IApplication context, MSpaceInstance config, IValueFetcher fetcher) throws Exception;
+	public void	initSpace(IInternalAccess ia, MSpaceInstance config, IValueFetcher fetcher);
 
 	/**
 	 *  Get the context.
@@ -34,13 +37,13 @@ public interface ISpace
 	 *  @param cid	The id of the added component.
 	 *  @param type	The logical type name.
 	 */
-	public void	componentAdded(IComponentIdentifier cid);
+	public void	componentAdded(IComponentDescription desc);
 
 	/**
 	 *  Called from application component, when a component was removed.
 	 *  @param cid	The id of the removed component.
 	 */
-	public void	componentRemoved(IComponentIdentifier cid);
+	public void	componentRemoved(IComponentDescription desc);
 	
 	/**
 	 *  Terminate the space.

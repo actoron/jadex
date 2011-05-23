@@ -18,11 +18,11 @@ public interface IExternalAccess extends IRemotable
 	 */
 	public IModelInfo getModel();
 
-	/**
-	 *  Get the parent (if any).
-	 *  @return The parent.
-	 */
-	public IComponentIdentifier getParent();
+//	/**
+//	 *  Get the parent (if any).
+//	 *  @return The parent.
+//	 */
+//	public IComponentIdentifier getParent();
 	
 	/**
 	 *  Get the id of the component.
@@ -75,7 +75,7 @@ public interface IExternalAccess extends IRemotable
 	//-------- normal --------
 	
 	/**
-	 *  Get the children (if any).
+	 *  Get the children (if any) component identifiers.
 	 *  @return The children.
 	 */
 	public IFuture getChildren();
@@ -86,7 +86,7 @@ public interface IExternalAccess extends IRemotable
 	public IFuture killComponent();
 	
 	/**
-	 *  Get the children (if any).
+	 *  Get the children (if any) component identifiers.
 	 *  @return The children component identifiers.
 	 */
 	public IFuture getChildren(String type);
@@ -98,7 +98,20 @@ public interface IExternalAccess extends IRemotable
 	 */
 	public IFuture getFileName(String ctype);
 	
+	/**
+	 *  Get the local type name of this component as defined in the parent.
+	 *  @return The type of this component type.
+	 */
+	public String getLocalType();
+	
 	//-------- exclude --------
+	
+	/**
+	 *  Get a space of the application.
+	 *  @param name	The name of the space.
+	 *  @return	The space.
+	 */
+	public IFuture getExtension(final String name);
 	
 	// todo: do we want this? should getArg() deliver only args supplied from
 	// outside or also values that are default/initial values in the model.

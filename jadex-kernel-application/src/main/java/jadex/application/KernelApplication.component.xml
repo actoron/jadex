@@ -26,11 +26,11 @@
 		<providedservice class="IComponentFactory">
 			<implementation proxytype="raw">
 				new ApplicationComponentFactory(
-					new Set[]
-					{
-						MEnvSpaceType.getXMLMapping(),
-						MAGRSpaceType.getXMLMapping()
-					}, 
+					//new Set[]
+					//{
+					//	MEnvSpaceType.getXMLMapping(),
+					//	MAGRSpaceType.getXMLMapping()
+					//}, 
 					$component.getServiceProvider()
 				)	
 			</implementation>

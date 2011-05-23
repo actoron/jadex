@@ -1,6 +1,7 @@
 package jadex.micro;
 
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
@@ -178,6 +179,15 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	public IComponentAdapter getComponentAdapter()
 	{
 		return interpreter.getAgentAdapter();
+	}
+	
+	/**
+	 *  Get the component description.
+	 *  @return The component description.
+	 */
+	public IComponentDescription getComponentDescription()
+	{
+		return interpreter.getComponentDescription();
 	}
 	
 	/**

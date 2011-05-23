@@ -1,25 +1,23 @@
 package jadex.application;
 
-import jadex.application.model.MApplicationInstance;
-import jadex.application.model.MApplicationType;
-import jadex.application.model.MComponentInstance;
-import jadex.application.model.MComponentType;
-import jadex.application.model.MExpressionType;
-import jadex.application.model.MProvidedServiceType;
-import jadex.application.model.MRequiredServiceType;
-import jadex.application.model.MSpaceInstance;
-import jadex.application.model.MSpaceType;
 import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.ComponentInstanceInfo;
+import jadex.bridge.modelinfo.ConfigurationInfo;
+import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.modelinfo.SubcomponentTypeInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.ProvidedServiceImplementation;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
-import jadex.javaparser.IExpressionParser;
-import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -33,10 +31,12 @@ import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
+import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.Reader;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,7 +52,7 @@ import javax.xml.stream.XMLReporter;
 import javax.xml.stream.XMLStreamException;
 
 /**
- *  Reader for loading Application XML models into a Java representation states.
+ *  Reader for loading component XML models into a Java representation states.
  */
 public class ApplicationXMLReader
 {
@@ -102,26 +102,55 @@ public class ApplicationXMLReader
 	 *  @param info	The resource info.
 	 *  @param classloader The classloader.
  	 */
-	public MApplicationType read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
+	public ApplicationModel read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
 	{
 		MultiCollection	report	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
-		MApplicationType ret = (MApplicationType)reader.read(rinfo.getInputStream(), classloader, report);
+		ModelInfo mi = (ModelInfo)reader.read(rinfo.getInputStream(), classloader, report);
+		ApplicationModel ret = new ApplicationModel(mi);
 		
-		ret.setFilename(rinfo.getFilename());
-		ret.setLastModified(rinfo.getLastModified());
-		ret.setClassloader(classloader);
-		ret.initModelInfo(report);
-		
-		// Exclude IApplicationExternalAccess 
-		Map props = ret.getModelInfo().getProperties();
-		if(props==null)
+		if(mi!=null)
 		{
-			props = new HashMap();
-			ret.getModelInfo().setProperties(props);
+			mi.setFilename(rinfo.getFilename());
+			mi.setClassloader(classloader);
+			mi.setStartable(true);
+			ret.setLastModified(rinfo.getLastModified());
+//			ret.initModelInfo(report);
+			
+			// todo: remove
+			
+			IArgument[] args = ret.getModelInfo().getArguments(); 
+			if(args.length>0)
+			{
+				Map argsmap = new HashMap();
+				for(int i=0; i<args.length; i++)
+				{
+					argsmap.put(args[i].getName(), args[i]);
+				}
+				ConfigurationInfo[] configs = ret.getModelInfo().getConfigurations();
+				for(int i=0; i<configs.length; i++)
+				{
+					UnparsedExpression[] unexps = configs[i].getArguments();
+					for(int j=0; j<unexps.length; j++)
+					{
+						Object val = SJavaParser.evaluateExpression(unexps[j].getValue(), ret.getModelInfo().getAllImports(), null, ret.getModelInfo().getClassLoader());
+						Argument arg = (Argument)argsmap.get(unexps[j].getName());
+						arg.setDefaultValue(configs[i].getName(), val);
+					}
+				}
+			}
+			
+			rinfo.getInputStream().close();
 		}
-		addMethodInfos(props, "remote_excluded", new String[]{"getSpace"});
+		else
+		{
+			String errtext = ApplicationModel.buildReport(rinfo.getFilename(), rinfo.getFilename(),
+				new String[]{"Component", "Configuration"}, report, null).getErrorText();
+			throw new RuntimeException("Model error: "+errtext);
+		}
 		
-		rinfo.getInputStream().close();
+		if(report.size()>0)
+			System.out.println("Error loading model: "+rinfo.getFilename()+" "+report);
+		
 		return ret;
 	}
 	
@@ -164,7 +193,7 @@ public class ApplicationXMLReader
 				Object	ret	= null;
 				try
 				{
-					ret	= SJavaParser.evaluateExpression((String)val, ((MApplicationType)context.getRootObject()).getAllImports(), null, context.getClassLoader());
+					ret	= SJavaParser.evaluateExpression((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), null, context.getClassLoader());
 				}
 				catch(RuntimeException e)
 				{
@@ -184,7 +213,7 @@ public class ApplicationXMLReader
 				Object	ret	= null;
 				try
 				{
-					ret	= SJavaParser.parseExpression((String)val, ((MApplicationType)context.getRootObject()).getAllImports(), context.getClassLoader());
+					ret	= SJavaParser.parseExpression((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), context.getClassLoader());
 				}
 				catch(RuntimeException e)
 				{
@@ -203,8 +232,7 @@ public class ApplicationXMLReader
 				Object ret = val;
 				if(val instanceof String)
 				{
-					ret = SReflect.findClass0((String)val, ((MApplicationType)
-						context.getRootObject()).getAllImports(), context.getClassLoader());
+					ret = SReflect.findClass0((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), context.getClassLoader());
 					if(ret==null)
 					{
 						Object	se	= new Tuple(((ReadContext)context).getStack());
@@ -242,7 +270,19 @@ public class ApplicationXMLReader
 //				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
 //			}, null));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "applicationtype")), new ObjectInfo(MApplicationType.class), 
+//		Method getname = null; 
+//		Method putprop = null;
+//		try
+//		{
+//			getname = UnparsedExpression.class.getMethod("getName", null);
+//			putprop = ModelInfo.class.getMethod("addProperty", new Class[]{String.class, Object.class});
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
+		
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "applicationtype")), new ObjectInfo(ModelInfo.class), 
 			new MappingInfo(null, "description", null,
 			new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
@@ -251,28 +291,33 @@ public class ApplicationXMLReader
 			new SubobjectInfo[]{
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "argument")}), new AccessInfo(new QName(uri, "argument"), "argument")),
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "result")}), new AccessInfo(new QName(uri, "result"), "result")),
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "container")}), new AccessInfo(new QName(uri, "container"), "container"))
-			})));
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "spacetype")), new ObjectInfo(MSpaceType.class)));
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "application")), new ObjectInfo(MApplicationInstance.class, new IPostProcessor()
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "container")}), new AccessInfo(new QName(uri, "container"), "container")),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "providedservice")}), new AccessInfo(new QName(uri, "providedservice"), "providedService")),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "requiredservice")}), new AccessInfo(new QName(uri, "requiredservice"), "requiredService")),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype")}), new AccessInfo(new QName(uri, "componenttype"), "subcomponentType")),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "property")}), new AccessInfo(new QName(uri, "property"), "property", null, null)),//, new BeanAccessInfo(putprop, null, "map", getname))),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "applications"), new QName(uri, "application")}), new AccessInfo(new QName(uri, "configuration"), "configuration", null, null))//, new BeanAccessInfo(putprop, null, "map", getname))),
+		})));
+		
+//		types.add(new TypeInfo(new XMLInfo(new QName(uri, "configuration")), new ObjectInfo(ConfigurationInfo.class, new IPostProcessor()
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "application")), new ObjectInfo(ConfigurationInfo.class, new IPostProcessor()
 		{
 			public Object postProcess(IContext context, Object object)
 			{
-				MApplicationInstance app = (MApplicationInstance)object;
-				MApplicationType mapp = (MApplicationType)context.getRootObject();
+				ConfigurationInfo app = (ConfigurationInfo)object;
+				IModelInfo mapp = (IModelInfo)context.getRootObject();
 				
-				List margs = app.getArguments();
-				for(int i=0; i<margs.size(); i++)
+				UnparsedExpression[] margs = app.getArguments();
+				for(int i=0; i<margs.length; i++)
 				{
 					try
 					{
-						MExpressionType overridenarg = (MExpressionType)margs.get(i);
-						Argument arg = (Argument)mapp.getModelInfo().getArgument(overridenarg.getName());
+						Argument arg = (Argument)mapp.getArgument(margs[i].getName());
 						if(arg==null)
-							throw new RuntimeException("Overridden argument not declared in application type: "+overridenarg.getName());
+							throw new RuntimeException("Overridden argument not declared in component type: "+margs[i].getName());
 						
-						Object val = overridenarg.getParsedValue().getValue(null);
-						arg.setDefaultValue(app.getName(), val);
+//						Object val = overridenarg.getParsedValue().getValue(null);
+//						arg.setDefaultValue(app.getName(), val);
 					}
 					catch(RuntimeException e)
 					{
@@ -292,64 +337,70 @@ public class ApplicationXMLReader
 		}), 
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("type", "typeName")),
-				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
+				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown"))},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "component")}), new AccessInfo(new QName(uri, "component"), "componentInstance")),
 			})));
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "space")), new ObjectInfo(MSpaceInstance.class)));
+		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "applicationtype"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(Argument.class), 
-				new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)))));
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "applicationtype"), new QName(uri, "arguments"), new QName(uri, "result")}), new ObjectInfo(Argument.class), 
-				new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)))));
+			new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)),
+			new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "typename"))}, null)));
+		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "import")), new ObjectInfo(String.class)));
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "application"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
+		
+//		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "configuration"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "application"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "className"))
 			}, null)));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "componenttype")), new ObjectInfo(MComponentType.class),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttypes"), new QName(uri, "componenttype")}), new ObjectInfo(SubcomponentTypeInfo.class),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
 			}, null)));		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "component")), new ObjectInfo(MComponentInstance.class),
+		
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "component")), new ObjectInfo(ComponentInstanceInfo.class),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("type", "typeName")),
 				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
-				new AttributeInfo(new AccessInfo("number"), new AttributeConverter(pexconv, null))
+				new AttributeInfo(new AccessInfo("number"))
 			}, null)));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "component"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "component"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "className"))
 			}, null)));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "providedservice")), new ObjectInfo(MProvidedServiceType.class, new ExpressionProcessor()), 
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "providedservice")), new ObjectInfo(ProvidedServiceInfo.class),// new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "className")),
+//				new AttributeInfo(new AccessInfo("class", "className")),
+				new AttributeInfo(new AccessInfo("class", "type"), new AttributeConverter(classconv, reclassconv)),
+//				new AttributeInfo(new AccessInfo("implementation", "implementation"))
+			}, null)));
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "implementation")), new ObjectInfo(ProvidedServiceImplementation.class),
+			new MappingInfo(null, null, "expression", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "implementation"), new AttributeConverter(classconv, reclassconv)),
+			}, null)));
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "requiredservice")), new ObjectInfo(RequiredServiceInfo.class), // new ExpressionProcessor()), 
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "type"), new AttributeConverter(classconv, reclassconv))
+			}, null)));
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "binding")), new ObjectInfo(RequiredServiceBinding.class), 
+				new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("componentname", "componentName")),
 				new AttributeInfo(new AccessInfo("componenttype", "componentType")),
-				new AttributeInfo(new AccessInfo("implementation", "implementation"), new AttributeConverter(classconv, reclassconv))
-			}, null)));
-		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "requiredservice")), new ObjectInfo(MRequiredServiceType.class, new ExpressionProcessor()), 
-			new MappingInfo(null, null, "value", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "className"))
-			}, null)));
-		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "container")), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
-			new MappingInfo(null, null, "value", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "className"))
-			}, null)));
-					
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
-			new MappingInfo(null, null, "value", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "className"))
-			}, null)));
-		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "binding")), new ObjectInfo(RequiredServiceBinding.class), 
-			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("componentname", "componentName")),
-			new AttributeInfo(new AccessInfo("componenttype", "componentType")),
 			})));
+		
+//		types.add(new TypeInfo(new XMLInfo(new QName(uri, "container")), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
+//			new MappingInfo(null, null, "value", new AttributeInfo[]{
+//				new AttributeInfo(new AccessInfo("class", "className"))
+//			}, null)));
 					
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "className"))
+			}, null)));
+		
 		for(int i=0; mappings!=null && i<mappings.length; i++)
 		{
 			types.addAll(mappings[i]);
@@ -360,74 +411,77 @@ public class ApplicationXMLReader
 
 	//-------- helper classes --------
 	
-	/**
-	 *  Parse expression text.
-	 */
-	public static class ExpressionProcessor	implements IPostProcessor
-	{
-		// Hack!!! Should be configurable.
-		protected static IExpressionParser	exp_parser	= new JavaCCExpressionParser();
-		
-		/**
-		 *  Parse expression text.
-		 */
-		public Object postProcess(IContext context, Object object)
-		{
-			MApplicationType app = (MApplicationType)context.getRootObject();
-			MExpressionType exp = (MExpressionType)object;
-			
-			String classname = exp.getClassName();
-			if(classname!=null)
-			{
-				try
-				{
-					Class clazz = SReflect.findClass(classname, app.getAllImports(), context.getClassLoader());
-					exp.setClazz(clazz);
-				}
-				catch(Exception e)
-				{
-					Object	se	= new Tuple(((ReadContext)context).getStack());
-					MultiCollection	report	= (MultiCollection)context.getUserContext();
-					report.put(se, e.toString());
-				}
-			}
-			
-			String lang = exp.getLanguage();
-			String value = exp.getValue(); 
-			if(value!=null)
-			{
-				if(lang==null || "java".equals(lang))
-				{
-					try
-					{
-						IParsedExpression pexp = exp_parser.parseExpression(value, app.getAllImports(), null, context.getClassLoader());
-						exp.setParsedValue(pexp);
-					}
-					catch(RuntimeException e)
-					{
-						Object	se	= new Tuple(((ReadContext)context).getStack());
-						MultiCollection	report	= (MultiCollection)context.getUserContext();
-						report.put(se, e.toString());
-					}
-				}	
-				else
-				{
-					Object	se	= new Tuple(((ReadContext)context).getStack());
-					MultiCollection	report	= (MultiCollection)context.getUserContext();
-					report.put(se, "Unknown condition language: "+lang);
-				}
-			}
-			
-			return null;
-		}
-		
-		/**
-		 *  Get the pass number.
-		 *  @return The pass number.
-		 */
-		public int getPass()
-		{
-			return 0;
-		}
-	}
+//	/**
+//	 *  Parse expression text.
+//	 */
+//	public static class ExpressionProcessor	implements IPostProcessor
+//	{
+//		// Hack!!! Should be configurable.
+//		protected static IExpressionParser	exp_parser	= new JavaCCExpressionParser();
+//		
+//		/**
+//		 *  Parse expression text.
+//		 */
+//		public Object postProcess(IContext context, Object object)
+//		{
+//			Object ret = null;
+//			
+//			ComponentModel cm = (ComponentModel)context.getRootObject();
+//			UnparsedExpression exp = (UnparsedExpression)object;
+//			
+////			String classname = exp.getClassName();
+////			if(classname!=null)
+////			{
+////				try
+////				{
+////					Class clazz = SReflect.findClass(classname, app.getAllImports(), context.getClassLoader());
+////					exp.setClazz(clazz);
+////				}
+////				catch(Exception e)
+////				{
+////					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+////					MultiCollection	report	= (MultiCollection)context.getUserContext();
+////					report.put(se, e.toString());
+////				}
+////			}
+//			
+//			String lang = exp.getLanguage();
+//			String value = exp.getValue(); 
+//			if(value!=null)
+//			{
+//				if(lang==null || "java".equals(lang))
+//				{
+//					try
+//					{
+//						IParsedExpression pexp = exp_parser.parseExpression(value, cm.getAllImports(), null, context.getClassLoader());
+//						ret = pexp.getValue(null);
+////						exp.setParsedValue(pexp);
+//					}
+//					catch(RuntimeException e)
+//					{
+//						Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+//						MultiCollection	report	= (MultiCollection)context.getUserContext();
+//						report.put(se, e.toString());
+//					}
+//				}	
+//				else
+//				{
+//					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+//					MultiCollection	report	= (MultiCollection)context.getUserContext();
+//					report.put(se, "Unknown expression language: "+lang);
+//				}
+//			}
+//			
+//			return ret;
+//		}
+//		
+//		/**
+//		 *  Get the pass number.
+//		 *  @return The pass number.
+//		 */
+//		public int getPass()
+//		{
+//			return 0;
+//		}
+//	}
 }

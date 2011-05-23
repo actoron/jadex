@@ -42,15 +42,16 @@ public class SJCC
 			{
 				final IComponentManagementService	cms	= (IComponentManagementService)result;
 				// Cannot use access getComponentIdentifier only as during JCC init parent can not be accessed from outside.
-				getRootIdentifier(cms, access.getParent()!=null ? access.getParent() : access.getComponentIdentifier())
-					.addResultListener(new SwingDelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result) throws Exception
-					{
-						cms.getExternalAccess((IComponentIdentifier)result)
+				
+//				getRootIdentifier(cms, access.getParent()!=null ? access.getParent() : access.getComponentIdentifier())
+//					.addResultListener(new SwingDelegationResultListener(ret)
+//				{
+//					public void customResultAvailable(Object result) throws Exception
+//					{
+						cms.getExternalAccess((IComponentIdentifier)access.getComponentIdentifier().getRoot())
 							.addResultListener(new SwingDelegationResultListener(ret));
-					}
-				});
+//					}
+//				});
 			}
 		});
 		return ret;

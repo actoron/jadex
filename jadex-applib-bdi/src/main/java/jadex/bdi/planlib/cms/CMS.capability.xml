@@ -389,7 +389,9 @@
 	</expressions> -->
 
 	<services>
-		<requiredservice name="cms" class="IComponentManagementService" scope="platform"/>
+		<requiredservice name="cms" class="IComponentManagementService">
+			<binding scope="platform"/>
+		</requiredservice>
 	</services>
 
 	<properties>

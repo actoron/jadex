@@ -304,7 +304,7 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 				marker.addPrimitive(markerPrimitive, Integer.MAX_VALUE);
 			}
 //			System.out.println("Persp: "+name+" opengl="+tryopengl);
-			ClassLoader	cl	= obscenter.getSpace().getContext().getApplicationType().getModelInfo().getClassLoader();
+			ClassLoader	cl	= obscenter.getSpace().getExternalAccess().getModel().getClassLoader();
 			viewport = createViewport(this, cl, bgColor, tryopengl);
 			viewport.setAreaSize(obscenter.getAreaSize());
 			viewport.addViewportListener(selectioncontroller);

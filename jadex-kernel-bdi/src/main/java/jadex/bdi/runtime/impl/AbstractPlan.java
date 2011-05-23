@@ -41,6 +41,7 @@ import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.clock.IClockService;
@@ -413,6 +414,15 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	public IComponentIdentifier	getComponentIdentifier()
 	{
 		return interpreter.getAgentAdapter().getComponentIdentifier();
+	}
+	
+	/**
+	 * Get the agent description.
+	 * @return The agent description.
+	 */
+	public IComponentDescription getComponentDescription()
+	{
+		return interpreter.getAgentAdapter().getDescription();
 	}
 
 	/**

@@ -1,7 +1,10 @@
-package jadex.component;
+package jadex.kernelbase;
 
+import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -21,8 +24,8 @@ public class ExternalAccess implements IExternalAccess
 {
 	//-------- attributes --------
 
-	/** The application component. */
-	protected ComponentInterpreter interpreter;
+	/** The component. */
+	protected AbstractInterpreter interpreter;
 
 	/** The component adapter. */
 	protected IComponentAdapter adapter;
@@ -38,12 +41,12 @@ public class ExternalAccess implements IExternalAccess
 	/**
 	 *	Create an external access.
 	 */
-	public ExternalAccess(ComponentInterpreter application)
+	public ExternalAccess(AbstractInterpreter interpreter)
 	{
-		this.interpreter = application;
-		this.adapter = application.getComponentAdapter();
-		this.tostring = application.getComponentIdentifier().getLocalName();
-		this.provider = application.getServiceContainer();
+		this.interpreter = interpreter;
+		this.adapter = interpreter.getComponentAdapter();
+		this.tostring = interpreter.getComponentIdentifier().getLocalName();
+		this.provider = interpreter.getServiceContainer();
 	}
 
 	//-------- methods --------
@@ -94,14 +97,6 @@ public class ExternalAccess implements IExternalAccess
 ////		
 ////		return ret;
 //	}
-	
-	/**
-	 *  Get the parent.
-	 */
-	public IComponentIdentifier getParent()
-	{
-		return interpreter.getParent()!=null ? interpreter.getParent().getComponentIdentifier() : null;
-	}
 	
 	/**
 	 *  Get the children (if any).
@@ -179,7 +174,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						ret.setResult(interpreter.getChildren(type));
+						interpreter.getChildren(type).addResultListener(new DelegationResultListener(ret));
 					}
 				});
 			}
@@ -190,7 +185,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ret.setResult(interpreter.getChildren(type));
+			interpreter.getChildren(type).addResultListener(new DelegationResultListener(ret));
 		}
 		
 		return ret;
@@ -247,6 +242,15 @@ public class ExternalAccess implements IExternalAccess
 	}
 	
 	/**
+	 *  Get the local type name of this component as defined in the parent.
+	 *  @return The type of this component type.
+	 */
+	public String getLocalType()
+	{
+		return interpreter.getLocalType();
+	}
+	
+	/**
 	 *  Schedule a step of the agent.
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the agent.
@@ -300,7 +304,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					try
 					{
-						ret.setResult(step.execute(interpreter));
+						ret.setResult(step.execute(interpreter.getInternalAccess()));
 					}
 					catch(Exception e)
 					{
@@ -378,6 +382,50 @@ public class ExternalAccess implements IExternalAccess
 		return ret;
 	}
 	
+	/**
+	 *  Get a space of the application.
+	 *  @param name	The name of the space.
+	 *  @return	The space.
+	 */
+	public IFuture getExtension(final String name)
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			try
+			{
+				adapter.invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						ret.setResult(interpreter.getExtension(name));
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setResult(interpreter.getExtension(name));
+		}
+		
+		return ret;
+	}
+
+	
+	/**
+	 *  Get the interpreter.
+	 *  @return the interpreter.
+	 */
+	public AbstractInterpreter getInterpreter()
+	{
+		return interpreter;
+	}
+
 	/**
 	 *  Get the string representation.
 	 */

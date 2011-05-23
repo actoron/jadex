@@ -1,6 +1,5 @@
 package jadex.application.space.envsupport;
 
-import jadex.application.model.MApplicationType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.model.MSpaceType;
 import jadex.application.space.envsupport.dataview.IDataView;
@@ -19,6 +18,8 @@ import jadex.application.space.envsupport.observer.graphics.layer.Layer;
 import jadex.application.space.envsupport.observer.graphics.layer.TiledLayer;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
 import jadex.application.space.envsupport.observer.perspective.Perspective2D;
+import jadex.bridge.modelinfo.IExtensionType;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.collection.MultiCollection;
@@ -1064,14 +1065,14 @@ public class MEnvSpaceType	extends MSpaceType
 				public Object postProcess(IContext context, Object object)
 				{
 					MSpaceInstance	si	= (MSpaceInstance)object;
-					MApplicationType	apptype	= (MApplicationType)context.getRootObject();
-					List spacetypes = apptype.getMSpaceTypes();
-					for(int i=0; i<spacetypes.size(); i++)
+					IModelInfo apptype	= (IModelInfo)context.getRootObject();
+					
+					IExtensionType[] spacetypes = apptype.getExtensionTypes();
+					for(int i=0; i<spacetypes.length; i++)
 					{
-						MSpaceType st = (MSpaceType)spacetypes.get(i);
-						if(st.getName().equals(si.getTypeName()))
+						if(spacetypes[i].getName().equals(si.getTypeName()))
 						{
-							si.setType(st);
+							si.setType((MSpaceType)spacetypes[i]);
 							break;
 						}
 					}
@@ -1214,7 +1215,7 @@ public class MEnvSpaceType	extends MSpaceType
 //			System.out.println("Found expression: "+val);
 			try
 			{
-				ret = exp_parser.parseExpression((String)val, ((MApplicationType)
+				ret = exp_parser.parseExpression((String)val, ((IModelInfo)
 					context.getRootObject()).getAllImports(), null, context.getClassLoader());
 			}
 			catch(Exception e)
@@ -1240,7 +1241,7 @@ public class MEnvSpaceType	extends MSpaceType
 			Object ret = val;
 			if(val instanceof String)
 			{
-				ret = SReflect.findClass0((String)val, ((MApplicationType)
+				ret = SReflect.findClass0((String)val, ((IModelInfo)
 					context.getRootObject()).getAllImports(), context.getClassLoader());
 				if(ret==null)
 				{

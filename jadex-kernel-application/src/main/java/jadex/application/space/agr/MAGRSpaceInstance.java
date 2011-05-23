@@ -1,7 +1,12 @@
 package jadex.application.space.agr;
 
 import jadex.application.model.MSpaceInstance;
+import jadex.application.runtime.ISpace;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.javaparser.IValueFetcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,5 +86,32 @@ public class MAGRSpaceInstance extends MSpaceInstance
 	public Class getClazz()
 	{
 		return AGRSpace.class;
+	}
+	
+	/**
+	 *  Initialize the extension.
+	 *  Called once, when the extension is created.
+	 */
+	public IFuture init(IInternalAccess ia, IValueFetcher fetcher)
+	{
+//		this.application = application;
+		
+		Future ret = new Future();
+		
+		System.out.println("init space: "+ia);
+		
+		try
+		{
+			final ISpace space = (ISpace)getClazz().newInstance();
+			space.initSpace(ia, this, fetcher);
+			ret.setResult(new Object[]{getName(), space});
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			ret.setException(e);
+		}
+		
+		return ret;
 	}
 }

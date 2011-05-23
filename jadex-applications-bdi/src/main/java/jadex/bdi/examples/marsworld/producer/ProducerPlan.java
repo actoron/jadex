@@ -1,6 +1,5 @@
 package jadex.bdi.examples.marsworld.producer;
 
-import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.agr.AGRSpace;
 import jadex.application.space.agr.Group;
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
@@ -12,6 +11,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 
 /**
  *  The main plan for the Producer Agent. <br>
@@ -65,7 +65,8 @@ public class ProducerPlan extends Plan
 	 */
 	protected void callCarryAgent(ISpaceObject target)
 	{
-		AGRSpace agrs = (AGRSpace)((IApplicationExternalAccess)getScope().getParent()).getSpace("myagrspace");
+		AGRSpace agrs = (AGRSpace)((IExternalAccess)getScope().getParent()).getExtension("myagrspace").get(this);
+
 		Group group = agrs.getGroup("mymarsteam");
 		IComponentIdentifier[]	carriers	= group.getAgentsForRole("carrier");
 		

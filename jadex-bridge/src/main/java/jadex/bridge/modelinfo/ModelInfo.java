@@ -66,6 +66,9 @@ public class ModelInfo extends Startable implements IModelInfo
 	
 	/** The subcomponent types. */
 	protected List subcomponents;
+	
+	/** The extensions. */
+	protected List extensions;
 		
 	//-------- constructors --------
 	
@@ -713,5 +716,42 @@ public class ModelInfo extends Startable implements IModelInfo
 		if(subcomponents==null)
 			subcomponents = new ArrayList();
 		subcomponents.add(subcomponent);
+	}
+	
+	/**
+	 *  Get the extension names. 
+	 */
+	public IExtensionType[] getExtensionTypes()
+	{
+		return extensions!=null? (IExtensionType[])extensions.toArray(new IExtensionType[extensions.size()]): new IExtensionType[0];
+	}
+	
+	/**
+	 *  Set the extension types.
+	 */
+	public void setExtensionTypes(IExtensionType[] extensions)
+	{
+		this.extensions = SUtil.arrayToList(extensions);
+	}
+	
+	/**
+	 *  Add a extension type.
+	 *  @param extension The extension type.
+	 */
+	public void addExtensiontype(IExtensionType extension)
+	{
+		if(extensions==null)
+			extensions = new ArrayList();
+		extensions.add(extension);
+	}
+	
+	// Hack! remove when xml schema has been corrected
+	/**
+	 *  Add a extension type.
+	 *  @param extension The extension type.
+	 */
+	public void addSpacetype(IExtensionType extension)
+	{
+		addExtensiontype(extension);
 	}
 }

@@ -12,6 +12,13 @@ public interface IComponentManagementService extends IService
 	//-------- management methods --------
 	
 	/**
+	 *  Load a component model.
+	 *  @param name The component name.
+	 *  @return The model info of the 
+	 */
+	public IFuture loadComponentModel(String filename);
+
+	/**
 	 *  Create a new component on the platform.
 	 *  @param name The component name.
 	 *  @param model The model identifier (e.g. file name).
@@ -193,7 +200,7 @@ public interface IComponentManagementService extends IService
 	 * @return The component description.
 	 */
 	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, 
-		String ownership, String type, String modelname);
+		String ownership, String type, String modelname, String localtype);
 	
 	/**
 	* Create a search constraints object.

@@ -1,6 +1,6 @@
 package jadex.application.space.envsupport.environment;
 
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentDescription;
 import jadex.commons.IPropertyObject;
 
 /**
@@ -19,5 +19,5 @@ public interface IPerceptProcessor extends IPropertyObject
 	 *  @param component The component identifier.
 	 *  @param component The avatar of the component (if any).
 	 */
-	public void processPercept(IEnvironmentSpace space, String type, Object percept, IComponentIdentifier component, ISpaceObject avatar);
+	public void processPercept(IEnvironmentSpace space, String type, Object percept, IComponentDescription component, ISpaceObject avatar);
 }

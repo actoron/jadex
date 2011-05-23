@@ -22,7 +22,6 @@ import jadex.bpmn.runtime.handler.TaskActivityHandler;
 import jadex.bpmn.runtime.task.ExecuteStepTask;
 import jadex.bpmn.tools.ProcessThreadInfo;
 import jadex.bridge.ComponentChangeEvent;
-import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
@@ -37,13 +36,10 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
-import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.MessageType;
-import jadex.bridge.RemoteComponentListener;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
@@ -56,14 +52,14 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SJavaParser;
+import jadex.kernelbase.AbstractInterpreter;
+import jadex.kernelbase.ExternalAccess;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -73,13 +69,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  *  The micro agent interpreter is the connection between the agent platform 
  *  and a user-written micro agent. 
  */
-public class BpmnInterpreter implements IComponentInstance, IInternalAccess
+public class BpmnInterpreter extends AbstractInterpreter implements IComponentInstance, IInternalAccess
 {	
 	//-------- static part --------
 	
@@ -231,6 +226,9 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	
 	/** The external access (cached). */
 	protected IExternalAccess	access;
+	
+	/** The extensions. */
+	protected Map extensions;
 	
 	//-------- constructors --------
 	
@@ -632,26 +630,6 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	}
 	
 	/**
-	 *  Kill the component.
-	 */
-	public IFuture killComponent()
-	{
-		final Future ret = new Future();
-		
-		SServiceProvider.getService(getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier())
-					.addResultListener(new DelegationResultListener(ret));
-			}
-		}));
-		
-		return ret;
-	}
-	
-	/**
 	 *  Can be called concurrently (also during executeAction()).
 	 * 
 	 *  Get the external access for this component.
@@ -673,18 +651,6 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		}
 		
 		return access;
-	}
-	
-	/**
-	 *  Get the class loader of the agent.
-	 *  The agent class loader is required to avoid incompatible class issues,
-	 *  when changing the platform class loader while agents are running. 
-	 *  This may occur e.g. when decoding messages and instantiating parameter values.
-	 *  @return	The agent class loader. 
-	 */
-	public ClassLoader getClassLoader()
-	{
-		return model.getModelInfo().getClassLoader();
 	}
 	
 	/**
@@ -864,15 +830,6 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	}
 	
 	/**
-	 *  Get the logger.
-	 *  @return The logger.
-	 */
-	public Logger getLogger()
-	{
-		return adapter.getLogger();
-	}
-
-	/**
 	 *  Get the agent adapter.
 	 *  @return The agent adapter.
 	 */
@@ -891,29 +848,12 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	}
 	
 	/**
-	 *  Get the id of the component.
-	 *  @return	The component id.
-	 */
-	public IComponentIdentifier	getComponentIdentifier()
-	{
-		return adapter.getComponentIdentifier();
-	}
-	
-	/**
 	 *  Get the parent component.
 	 *  @return The parent component.
 	 */
 	public IExternalAccess getParent()
 	{
 		return parent;
-	}
-	
-	/** 
-	 *  Get the service provider.
-	 */
-	public IServiceProvider getServiceProvider()
-	{
-		return getServiceContainer();
 	}
 	
 	/**
@@ -932,17 +872,6 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		return container;
 	}
 
-	/**
-	 *  Create a result listener which is called on agent thread.
-	 *  @param The original listener to be called.
-	 *  @return The listener.
-	 * /
-	public IResultListener createResultListener(IResultListener listener)
-	{
-		throw new UnsupportedOperationException();
-//		return new MicroListener(listener);
-	}*/
-	
 	/**
 	 *  Get the model of the BPMN process instance.
 	 *  @return The model.
@@ -1186,49 +1115,6 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		return this.fetcher;
 	}
 	
-//	/**
-//	 *  Add a change listener.
-//	 *  @param listener The listener.
-//	 */
-//	public void addChangeListener(IChangeListener listener)
-//	{
-//		if(listeners==null)
-//			listeners = new ArrayList();
-//		listeners.add(listener);
-//	}
-//	
-//	/**
-//	 *  Remove a change listener.
-//	 *  @param listener The listener.
-//	 */
-//	public void removeChangeListener(IChangeListener listener)
-//	{
-//		if(listeners!=null)
-//			listeners.remove(listener);
-//	}
-	
-//	/**
-//	 *  Notify the change listeners.
-//	 */
-//	public void notifyListeners(String type, ProcessThread thread)
-//	{
-//		if(listeners!=null)
-//		{
-//			ProcessThreadInfo	info	= new ProcessThreadInfo(thread.getId(), thread.getActivity().getBreakpointId(),
-//				thread.getActivity().getPool()!=null ? thread.getActivity().getPool().getName() : null,
-//				thread.getActivity().getLane()!=null ? thread.getActivity().getLane().getName() : null,
-//				thread.getException()!=null ? thread.getException().toString() : "",
-//				thread.isWaiting(), thread.getData()!=null ? thread.getData().toString() : "");
-//			ChangeEvent	event	= new ChangeEvent(null, type, info);
-////			System.out.println("change: "+event);
-//			
-//			for(int i=0; i<listeners.size(); i++)
-//			{
-//				((IChangeListener)listeners.get(i)).changeOccurred(event);
-//			}
-//		}
-//	}
-	
 	/**
 	 *  Test if the given context variable is declared.
 	 *  @param name	The variable name.
@@ -1370,44 +1256,6 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	}
 	
 	/**
-	 *  Called when a component has been created as a subcomponent of this component.
-	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
-	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
-	 *  @param comp	The newly created component.
-	 */
-	public IFuture	componentCreated(IComponentDescription desc, IModelInfo model)
-	{
-		return IFuture.DONE;
-	}
-
-	/**
-	 *  Called when a subcomponent of this component has been destroyed.
-	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
-	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
-	 *  @param comp	The destroyed component.
-	 */
-	public IFuture	componentDestroyed(IComponentDescription desc)
-	{
-		return IFuture.DONE;
-	}
-	
-	/**
-	 *  Create a component result listener.
-	 */
-	public IResultListener createResultListener(IResultListener listener)
-	{
-		return new ComponentResultListener(listener, adapter);
-	}
-	
-	/**
-	 *  Create a component result listener.
-	 */
-	public IIntermediateResultListener createResultListener(IIntermediateResultListener listener)
-	{
-		return new IntermediateComponentResultListener(listener, adapter);
-	}
-	
-	/**
 	 *  Fires an activity execution event.
 	 *  @param threadid ID of the executing ProcessThread.
 	 *  @param activity The activity being executed.
@@ -1501,15 +1349,6 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	}
 	
 	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 */
-	public IFuture getChildren()
-	{
-		return adapter.getChildrenAccesses();
-	}
-	
-	/**
 	 *  Adds an activity listener. The listener will be called
 	 *  once a process thread executes a new activity.
 	 *  @param listener The activity listener.
@@ -1539,13 +1378,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	{
 		if(componentlisteners==null)
 			componentlisteners = new ArrayList();
-		
-		// Hack! How to find out if remote listener?
-		if(Proxy.isProxyClass(listener.getClass()))
-			listener = new RemoteComponentListener(access, listener);
-		
-		componentlisteners.add(listener);
-		return IFuture.DONE;
+		return addComponentListener(componentlisteners, listener);
 	}
 	
 	/**
@@ -1554,15 +1387,17 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	 */
 	public IFuture removeComponentListener(IComponentListener listener)
 	{
-		// Hack! How to find out if remote listener?
-		if(Proxy.isProxyClass(listener.getClass()))
-			listener = new RemoteComponentListener(access, listener);
-		
-		if(componentlisteners!=null)
-			componentlisteners.remove(listener);
-		
-//		System.out.println("cl: "+componentlisteners);
-		return IFuture.DONE;
+		return removeComponentListener(componentlisteners, listener);
+	}
+	
+	/**
+	 *  Get the component listeners.
+	 *  @return The component listeners.
+	 */
+	public IComponentListener[] getComponentListeners()
+	{
+		return componentlisteners==null? new IComponentListener[0]: 
+			(IComponentListener[])componentlisteners.toArray(new IComponentListener[componentlisteners.size()]);
 	}
 	
 	/**
@@ -1608,75 +1443,93 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
             thread.isWaiting(), thread.getData()!=null ? thread.getData().toString() : "");
 		 return info;
 	}
+
+	//-------- abstract interpreter methods --------
 	
-//	/**
-//	 *  Get a required service of a given name.
-//	 *  @param name The service name.
-//	 *  @return The service.
-//	 */
-//	public IFuture getRequiredService(String name)
-//	{
-//		return getRequiredService(name, false);
-//	}
-//	
-//	/**
-//	 *  Get a required services of a given name.
-//	 *  @param name The services name.
-//	 *  @return The service.
-//	 */
-//	public IIntermediateFuture getRequiredServices(String name)
-//	{
-//		return getRequiredServices(name, false);
-//	}
-//	
-//	/**
-//	 *  Get a required service.
-//	 *  @return The service.
-//	 */
-//	public IFuture getRequiredService(String name, boolean rebind)
-//	{
-//		RequiredServiceInfo info = getModel().getRequiredService(name);
-//		RequiredServiceBinding binding = getRequiredServiceBinding(name);
-//		if(info==null)
+	/**
+	 *  Get the value fetcher.
+	 */
+	public IValueFetcher getFetcher()
+	{
+		return fetcher;
+	}
+	
+	/**
+	 *  Get the service bindings.
+	 */
+	public RequiredServiceBinding[] getServiceBindings()
+	{
+		return bindings;
+	}
+	
+	/**
+	 *  Add a default value for an argument (if not already present).
+	 *  Called once for each argument during init.
+	 *  @param name	The argument name.
+	 *  @param value	The argument value.
+	 */
+	public void	addDefaultArgument(String name, Object value)
+	{
+		throw new RuntimeException();
+		
+//		if(arguments==null)
 //		{
-//			Future ret = new Future();
-//			ret.setException(new ServiceNotFoundException(name));
-//			return ret;
+//			arguments	= new HashMap();
 //		}
-//		else
+//		if(!arguments.containsKey(name))
 //		{
-//			return getServiceContainer().getRequiredService(info, binding, rebind);
+//			arguments.put(name, value);
 //		}
-//	}
-//	
-//	/**
-//	 *  Get a required services.
-//	 *  @return The services.
-//	 */
-//	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
-//	{
-//		RequiredServiceInfo info = getModel().getRequiredService(name);
-//		RequiredServiceBinding binding = getRequiredServiceBinding(name);
-//		if(info==null)
+	}
+	
+	/**
+	 *  Add a default value for a result (if not already present).
+	 *  Called once for each result during init.
+	 *  @param name	The result name.
+	 *  @param value	The result value.
+	 */
+	public void	addDefaultResult(String name, Object value)
+	{
+		throw new RuntimeException();
+		
+//		if(results==null)
 //		{
-//			IntermediateFuture ret = new IntermediateFuture();
-//			ret.setException(new ServiceNotFoundException(name));
-//			return ret;
+//			results	= new HashMap();
 //		}
-//		else
-//		{
-//			return getServiceContainer().getRequiredServices(info, binding, rebind);
-//		}
-//	}
-//	
-//	/**
-//	 *  Get the binding info of a service.
-//	 *  @param name The required service name.
-//	 *  @return The binding info of a service.
-//	 */
-//	protected RequiredServiceBinding getRequiredServiceBinding(String name)
-//	{
-//		return bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
-//	}
+//		results.put(name, value);
+	}
+	
+	/**
+	 *  Get a space of the application.
+	 *  @param name	The name of the space.
+	 *  @return	The space.
+	 */
+	public Object getExtension(final String name)
+	{
+		return extensions==null? null: extensions.get(name);
+	}
+	
+	/**
+	 *  Add a default value for an argument (if not already present).
+	 *  Called once for each argument during init.
+	 *  @param name	The argument name.
+	 *  @param value	The argument value.
+	 */
+	public void	addExtension(String name, Object value)
+	{
+		if(extensions==null)
+		{
+			extensions = new HashMap();
+		}
+		extensions.put(name, value);
+	}
+	
+	/**
+	 *  Get the internal access.
+	 */
+	public IInternalAccess getInternalAccess()
+	{
+		return this;
+	}
 	
 }

@@ -53,6 +53,9 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	/** The model name. */
 	protected String modelname;
 	
+	/** The local type name (from parent). */
+	protected String localtype;
+	
 	//-------- constructors --------
 
 	/**
@@ -66,7 +69,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Create a new CESComponentDescription.
 	 */
 	public CMSComponentDescription(IComponentIdentifier cid, String type, //IComponentIdentifier parent, 
-		Boolean master, Boolean daemon, Boolean autoshutdown, String modelname)
+		Boolean master, Boolean daemon, Boolean autoshutdown, String modelname, String localtype)
 	{
 		setName(cid);
 		setType(type);
@@ -77,6 +80,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		setDaemon(daemon);
 		setAutoShutdown(autoshutdown);
 		setModelName(modelname);
+		setLocalType(localtype);
 	}
 
 	//-------- accessor methods --------
@@ -319,8 +323,24 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	{
 		this.modelname = modelname;
 	}
-		
-	//-------- methods --------
+	
+	/**
+	 *  Get the localtype.
+	 *  @return the localtype.
+	 */
+	public String getLocalType()
+	{
+		return localtype;
+	}
+
+	/**
+	 *  Set the localtype.
+	 *  @param localtype The localtype to set.
+	 */
+	public void setLocalType(String localtype)
+	{
+		this.localtype = localtype;
+	}
 
 	/**
 	 *  Test if this description equals another description.

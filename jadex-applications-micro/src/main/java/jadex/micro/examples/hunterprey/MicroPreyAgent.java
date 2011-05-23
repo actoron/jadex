@@ -1,6 +1,5 @@
 package jadex.micro.examples.hunterprey;
 
-import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.envsupport.environment.ISpaceAction;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Grid2D;
@@ -9,6 +8,7 @@ import jadex.application.space.envsupport.math.IVector2;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.xml.annotation.XMLClassname;
@@ -45,69 +45,77 @@ public class MicroPreyAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		this.env	= (Grid2D)((IApplicationExternalAccess)getParent()).getSpace("my2dspace");
-		this.myself	= env.getAvatar(getComponentIdentifier());
-		this.listener	= new IResultListener()
+		getParent().getExtension("my2dspace").addResultListener(createResultListener(new DefaultResultListener()
 		{
-			public void exceptionOccurred(Exception e)
-			{
-//				e.printStackTrace();
-				try
-				{
-					getExternalAccess().scheduleStep(new IComponentStep()
-					{
-						@XMLClassname("act")
-						public Object execute(IInternalAccess agent)
-						{
-							// If move failed, forget about food and turn 90°.
-							food	= null;
-							
-//							System.out.println("Move failed: "+e);
-							if(MoveAction.DIRECTION_LEFT.equals(lastdir) || MoveAction.DIRECTION_RIGHT.equals(lastdir))
-							{
-								lastdir	= Math.random()>0.5 ? MoveAction.DIRECTION_UP : MoveAction.DIRECTION_DOWN;
-							}
-							else
-							{
-								lastdir	= Math.random()>0.5 ? MoveAction.DIRECTION_LEFT : MoveAction.DIRECTION_RIGHT;
-							}
-	
-							act();
-							
-							return null;
-						}
-						
-						public String toString()
-						{
-							return "prey.act()";
-						}
-					});
-				}
-				catch(ComponentTerminatedException ate)
-				{
-				}
-			}
-			
 			public void resultAvailable(Object result)
 			{
-				getExternalAccess().scheduleStep(new IComponentStep()
+				if(result==null)
+					return;
+		
+				myself	= env.getAvatar(getComponentDescription());
+				listener = new IResultListener()
 				{
-					@XMLClassname("act2")
-					public Object execute(IInternalAccess ia)
+					public void exceptionOccurred(Exception e)
 					{
-						act();
-						return null;
+		//				e.printStackTrace();
+						try
+						{
+							getExternalAccess().scheduleStep(new IComponentStep()
+							{
+								@XMLClassname("act")
+								public Object execute(IInternalAccess agent)
+								{
+									// If move failed, forget about food and turn 90°.
+									food	= null;
+									
+		//							System.out.println("Move failed: "+e);
+									if(MoveAction.DIRECTION_LEFT.equals(lastdir) || MoveAction.DIRECTION_RIGHT.equals(lastdir))
+									{
+										lastdir	= Math.random()>0.5 ? MoveAction.DIRECTION_UP : MoveAction.DIRECTION_DOWN;
+									}
+									else
+									{
+										lastdir	= Math.random()>0.5 ? MoveAction.DIRECTION_LEFT : MoveAction.DIRECTION_RIGHT;
+									}
+			
+									act();
+									
+									return null;
+								}
+								
+								public String toString()
+								{
+									return "prey.act()";
+								}
+							});
+						}
+						catch(ComponentTerminatedException ate)
+						{
+						}
 					}
 					
-					public String toString()
+					public void resultAvailable(Object result)
 					{
-						return "prey.act()";
+						getExternalAccess().scheduleStep(new IComponentStep()
+						{
+							@XMLClassname("act2")
+							public Object execute(IInternalAccess ia)
+							{
+								act();
+								return null;
+							}
+							
+							public String toString()
+							{
+								return "prey.act()";
+							}
+						});
 					}
-				});
+				};
+		
+				act();
 			}
-		};
-
-		act();
+		}));
 	}
 	
 	//-------- methods --------
@@ -126,7 +134,7 @@ public class MicroPreyAgent extends MicroAgent
 		{
 			// Perform eat action.
 			Map params = new HashMap();
-			params.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
+			params.put(ISpaceAction.ACTOR_ID, getComponentDescription());
 			params.put(ISpaceAction.OBJECT_ID, food);
 			env.performSpaceAction("eat", params, listener);
 		}
@@ -163,7 +171,7 @@ public class MicroPreyAgent extends MicroAgent
 			
 			// Perform move action.
 			Map params = new HashMap();
-			params.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
+			params.put(ISpaceAction.ACTOR_ID, getComponentDescription());
 			params.put(MoveAction.PARAMETER_DIRECTION, lastdir);
 			env.performSpaceAction("move", params, listener);
 		}

@@ -22,6 +22,9 @@ public class ConfigurationInfo extends Startable
 	/** The list of argument default values. */
 	protected List arguments;
 	
+	/** The list of extensions. */
+	protected List extensions;
+	
 	//-------- constructors --------
 	
 	/**
@@ -107,5 +110,42 @@ public class ConfigurationInfo extends Startable
 		if(arguments==null)
 			arguments = new ArrayList();
 		arguments.add(argument);
+	}
+	
+	/**
+	 *  Get the extension names. 
+	 */
+	public IExtensionInstance[] getExtensions()
+	{
+		return extensions!=null? (IExtensionInstance[])extensions.toArray(new IExtensionInstance[extensions.size()]): new IExtensionInstance[0];
+	}
+	
+	/**
+	 *  Set the extension types.
+	 */
+	public void setExtensions(Object[] extensions)
+	{
+		this.extensions = SUtil.arrayToList(extensions);
+	}
+	
+	/**
+	 *  Add a extension type.
+	 *  @param extension The extension type.
+	 */
+	public void addExtension(Object extension)
+	{
+		if(extensions==null)
+			extensions = new ArrayList();
+		extensions.add(extension);
+	}
+	
+	// Hack! remove when xml schema has been corrected
+	/**
+	 *  Add a extension type.
+	 *  @param extension The extension type.
+	 */
+	public void addSpace(Object extension)
+	{
+		addExtension(extension);
 	}
 }

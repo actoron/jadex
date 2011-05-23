@@ -105,4 +105,10 @@ public interface IComponentDescription
 	 *  @return	The flag.
 	 */
 	public Boolean getAutoShutdown();
+	
+	/**
+	 *  Get the local type name of a component (defined in the parent).
+	 *  @return The local type.
+	 */
+	public String getLocalType();
 }

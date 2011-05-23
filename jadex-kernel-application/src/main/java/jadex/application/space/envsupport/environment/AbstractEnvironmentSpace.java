@@ -1,8 +1,6 @@
 package jadex.application.space.envsupport.environment;
 
-import jadex.application.model.MComponentType;
 import jadex.application.model.MSpaceInstance;
-import jadex.application.runtime.IApplication;
 import jadex.application.runtime.ISpace;
 import jadex.application.space.envsupport.IObjectCreator;
 import jadex.application.space.envsupport.MEnvSpaceInstance;
@@ -20,16 +18,22 @@ import jadex.application.space.envsupport.evaluation.SpaceObjectSource;
 import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.application.space.envsupport.observer.gui.ObserverCenter;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
+import jadex.base.fipa.CMSComponentDescription;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.IPropertyObject;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
@@ -58,7 +62,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	protected String name;
 	
 	/** The context. */
-	protected IApplication application;
+//	protected IApplication application;
+	protected IInternalAccess ia;
 	
 	/** The space object types. */
 	protected Map objecttypes;
@@ -87,7 +92,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/** Avatar mappings. */
 	protected MultiCollection avatarmappings;
 
-	/** Initial avatar settings (aid -> [type, props]). */
+	/** Initial avatar settings (cid -> [type, props]). */
 	protected Map initialavatars;
 
 	/** Data view mappings. */
@@ -102,6 +107,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/** Types of EnvironmentObjects and lists of EnvironmentObjects of that type (typed view). */
 	protected Map spaceobjectsbytype;
 	
+	/** Space objects by owner. */
 	protected Map spaceobjectsbyowner;
 	
 	/** Object id counter for new ids. */
@@ -132,7 +138,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	protected Map dataconsumers;
 
 	/** The zombie objects. */
-	protected Map	zombieobjects;
+	protected Map zombieobjects;
 
 	//-------- constructors --------
 	
@@ -171,469 +177,943 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/**
 	 *  Create a space.
 	 */
-	public void	initSpace(final IApplication context, MSpaceInstance config, IValueFetcher pfetcher) throws Exception
+	public void	initSpace(final IInternalAccess ia, MSpaceInstance config, IValueFetcher pfetcher)
 	{
-		MEnvSpaceInstance	si	= (MEnvSpaceInstance)config;
-		final MEnvSpaceType	mspacetype	= (MEnvSpaceType)config.getType();
-		
-		final SimpleValueFetcher fetcher = new SimpleValueFetcher(pfetcher);
-		fetcher.setValue("$space", this);
-		this.setFetcher(fetcher);
-		
-		List mspaceprops = mspacetype.getPropertyList("properties");
-		MEnvSpaceInstance.setProperties(this, mspaceprops, fetcher);
-		List spaceprops = si.getPropertyList("properties");
-		MEnvSpaceInstance.setProperties(this, spaceprops, fetcher);
-		
-		this.application	= context;
-		
-		if(this instanceof Space2D) // Hack?
+		try
 		{
-			Double width = si.getProperty("width")!=null? (Double)si.getProperty("width"): (Double)mspacetype.getProperty("width");
-			Double height = si.getProperty("height")!=null? (Double)si.getProperty("height"): (Double)mspacetype.getProperty("height");
-			((Space2D)this).setAreaSize(Vector2Double.getVector2(width, height));
-//			System.out.println("areasize: "+width+" "+height);
-		}
-		
-		// Create space object types.
-		List objecttypes = mspacetype.getPropertyList("objecttypes");
-		if(objecttypes!=null)
-		{
-			for(int i=0; i<objecttypes.size(); i++)
+			MEnvSpaceInstance	si	= (MEnvSpaceInstance)config;
+			final MEnvSpaceType	mspacetype	= (MEnvSpaceType)config.getType();
+			
+			final SimpleValueFetcher fetcher = new SimpleValueFetcher(pfetcher);
+			fetcher.setValue("$space", this);
+			this.setFetcher(fetcher);
+			
+			List mspaceprops = mspacetype.getPropertyList("properties");
+			MEnvSpaceInstance.setProperties(this, mspaceprops, fetcher);
+			List spaceprops = si.getPropertyList("properties");
+			MEnvSpaceInstance.setProperties(this, spaceprops, fetcher);
+			
+			this.ia = ia;
+			
+			if(this instanceof Space2D) // Hack?
 			{
-				MObjectType mobjecttype = (MObjectType)objecttypes.get(i);
-//				List props = (List)mobjecttype.get("properties");
-//				Map	properties = null;
-//				if(props!=null)
+				Double width = si.getProperty("width")!=null? (Double)si.getProperty("width"): (Double)mspacetype.getProperty("width");
+				Double height = si.getProperty("height")!=null? (Double)si.getProperty("height"): (Double)mspacetype.getProperty("height");
+				((Space2D)this).setAreaSize(Vector2Double.getVector2(width, height));
+	//			System.out.println("areasize: "+width+" "+height);
+			}
+			
+			// Create space object types.
+			List objecttypes = mspacetype.getPropertyList("objecttypes");
+			if(objecttypes!=null)
+			{
+				for(int i=0; i<objecttypes.size(); i++)
+				{
+					MObjectType mobjecttype = (MObjectType)objecttypes.get(i);
+	//				List props = (List)mobjecttype.get("properties");
+	//				Map	properties = null;
+	//				if(props!=null)
+	//				{
+	//					properties	= new LinkedHashMap();
+	//					Map propertiesMetaData = new HashMap();
+	//					for(int j=0; j<props.size(); j++)
+	//					{
+	//						Map	prop	= (Map)props.get(j);
+	//						properties.put(prop.get("name"), prop);
+	//					}
+	//				}
+	//				Map properties = convertProperties(props, fetcher);
+	//				System.out.println("Adding environment object type: "+(String)getProperty(mobjecttype, "name")+" "+props);
+					
+	//				for(Iterator it = mobjecttype.iterator(); it.hasNext();)
+	//					System.out.println(((MObjectTypeProperty)it.next()).getType());
+					
+					this.addSpaceObjectType(mobjecttype.getName(), mobjecttype);
+				}
+			}
+			
+			// Add avatar mappings.
+			List avmappings = mspacetype.getPropertyList("avatarmappings");
+			if(avmappings!=null)
+			{
+				for(int i=0; i<avmappings.size(); i++)
+				{
+					AvatarMapping mapping = (AvatarMapping)avmappings.get(i);
+	//				String componenttype = (String)MEnvSpaceInstance.getProperty(mmapping, "componenttype");
+	//				String avatartype = (String)(String)MEnvSpaceInstance.getProperty(mmapping, "objecttype");
+	//				Boolean createavatar = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "createavatar");
+	//				Boolean createcomponent = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "createcomponent");
+	//				Boolean killavatar = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "killavatar");
+	//				Boolean killcomponent = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "killcomponent");
+	//				
+	//				AvatarMapping mapping = new AvatarMapping(componenttype, avatartype);
+	//				if(createavatar!=null)
+	//					mapping.setCreateAvatar(createavatar.booleanValue());
+	//				if(createcomponent!=null)
+	//					mapping.setCreateComponent(createcomponent.booleanValue());
+	//				if(killavatar!=null)
+	//					mapping.setKillAvatar(killavatar.booleanValue());
+	//				if(killcomponent!=null)
+	//					mapping.setKillComponent(killcomponent.booleanValue());
+	//				
+					this.addAvatarMappings(mapping);
+				}
+			}
+			// Create space percept types.
+			List percepttypes = mspacetype.getPropertyList("percepttypes");
+			if(percepttypes!=null)
+			{
+				for(int i=0; i<percepttypes.size(); i++)
+				{
+					Map mpercepttype = (Map)percepttypes.get(i);
+	
+					PerceptType pt = new PerceptType();
+					
+					pt.setName((String)MEnvSpaceInstance.getProperty(mpercepttype, "name"));
+					
+					List atypes = (List)mpercepttype.get("componenttypes");
+					pt.setComponentTypes(atypes==null? null: new HashSet(atypes));
+					
+					List otypes = (List)mpercepttype.get("objecttypes");
+					pt.setObjectTypes(otypes==null? null: new HashSet(otypes));
+					
+	//				System.out.println("Adding environment percept type: "+pt);
+					this.addPerceptType(pt);
+				}
+			}
+			
+			// Create space actions.
+			List spaceactions = mspacetype.getPropertyList("actiontypes");
+			if(spaceactions!=null)
+			{
+				for(int i=0; i<spaceactions.size(); i++)
+				{
+					Map maction = (Map)spaceactions.get(i);
+					ISpaceAction action = (ISpaceAction)((Class)MEnvSpaceInstance.getProperty(maction, "clazz")).newInstance();
+					List props = (List)maction.get("properties");
+					MEnvSpaceInstance.setProperties(action, props, fetcher);
+					
+	//				System.out.println("Adding environment action: "+MEnvSpaceInstance.getProperty(maction, "name"));
+					this.addSpaceAction((String)MEnvSpaceInstance.getProperty(maction, "name"), action);
+				}
+			}
+			
+			// Create process types.
+			List processtypes = mspacetype.getPropertyList("processtypes");
+			if(processtypes!=null)
+			{
+				for(int i=0; i<processtypes.size(); i++)
+				{
+					Map mprocess = (Map)processtypes.get(i);
+	//				ISpaceProcess process = (ISpaceProcess)((Class)MEnvSpaceInstance.getProperty(mprocess, "clazz")).newInstance();
+					List props = (List)mprocess.get("properties");
+					String name = (String)MEnvSpaceInstance.getProperty(mprocess, "name");
+					Class clazz = (Class)MEnvSpaceInstance.getProperty(mprocess, "clazz");
+					
+	//				System.out.println("Adding environment process: "+MEnvSpaceInstance.getProperty(mprocess, "name"));
+					this.addSpaceProcessType(name, clazz, props);
+				}
+			}
+			
+	
+			// Create task types.
+			List tasks = mspacetype.getPropertyList("tasktypes");
+			if(tasks!=null)
+			{
+				for(int i=0; i<tasks.size(); i++)
+				{
+					Map mtask = (Map)tasks.get(i);
+					List props = (List)mtask.get("properties");
+					String name = (String)MEnvSpaceInstance.getProperty(mtask, "name");
+					Class clazz = (Class)MEnvSpaceInstance.getProperty(mtask, "clazz");
+					
+	//				System.out.println("Adding object task: "+MEnvSpaceInstance.getProperty(mtask, "name"));
+					this.addObjectTaskType(name, clazz, props);
+				}
+			}
+			
+			// Create percept generators.
+			List gens = mspacetype.getPropertyList("perceptgenerators");
+			if(gens!=null)
+			{
+				for(int i=0; i<gens.size(); i++)
+				{
+					Map mgen = (Map)gens.get(i);
+					IPerceptGenerator gen = (IPerceptGenerator)((Class)MEnvSpaceInstance.getProperty(mgen, "clazz")).newInstance();
+					List props = (List)mgen.get("properties");
+					MEnvSpaceInstance.setProperties(gen, props, fetcher);
+					
+	//				System.out.println("Adding environment percept generator: "+MEnvSpaceInstance.getProperty(mgen, "name"));
+					this.addPerceptGenerator(MEnvSpaceInstance.getProperty(mgen, "name"), gen);
+				}
+			}
+			
+			// Create percept processors.
+			List pmaps = mspacetype.getPropertyList("perceptprocessors");
+			if(pmaps!=null)
+			{
+				for(int i=0; i<pmaps.size(); i++)
+				{
+					Map mproc = (Map)pmaps.get(i);
+					IPerceptProcessor proc = (IPerceptProcessor)((Class)MEnvSpaceInstance.getProperty(mproc, "clazz")).newInstance();
+					List props = (List)mproc.get("properties");
+					MEnvSpaceInstance.setProperties(proc, props, fetcher);
+					
+					String componenttype = (String)MEnvSpaceInstance.getProperty(mproc, "componenttype");
+					List ptypes = (List)mproc.get("percepttypes");
+					this.addPerceptProcessor(componenttype, ptypes==null? null: new HashSet(ptypes), proc);
+				}
+			}
+			
+			// Create initial objects.
+			List objects = (List)si.getPropertyList("objects");
+			if(objects!=null)
+			{
+				for(int i=0; i<objects.size(); i++)
+				{
+					Map mobj = (Map)objects.get(i);
+					List mprops = (List)mobj.get("properties");
+					int num	= 1;
+					if(mobj.containsKey("number"))
+					{
+						num	= ((Number)MEnvSpaceInstance.getProperty(mobj, "number")).intValue();
+					}
+					
+					for(int j=0; j<num; j++)
+					{
+						fetcher.setValue("$number", new Integer(j));
+						Map props = MEnvSpaceInstance.convertProperties(mprops, fetcher);
+						this.createSpaceObject((String)MEnvSpaceInstance.getProperty(mobj, "type"), props, null);
+					}
+				}
+			}
+			
+			// Register initial avatars
+			List avatars = (List)si.getPropertyList("avatars");
+			if(avatars!=null)
+			{
+				for(int i=0; i<avatars.size(); i++)
+				{
+					Map mobj = (Map)avatars.get(i);
+				
+					List mprops = (List)mobj.get("properties");
+					String	owner	= (String)MEnvSpaceInstance.getProperty(mobj, "owner");
+					if(owner==null)
+						throw new RuntimeException("Attribute 'owner' required for avatar: "+mobj);
+					IComponentIdentifier	ownerid	= null;
+					
+					// HACK!!! Do not use ThreadSuspendable
+					IComponentManagementService ces = ((IComponentManagementService)SServiceProvider.getServiceUpwards
+						(ia.getServiceContainer(), IComponentManagementService.class).get(new ThreadSuspendable()));
+					if(owner.indexOf("@")!=-1)
+						ownerid	= ces.createComponentIdentifier((String)owner, false);
+					else
+						ownerid	= ces.createComponentIdentifier((String)owner, true);
+					
+					Map props = MEnvSpaceInstance.convertProperties(mprops, fetcher);
+					this.addInitialAvatar(ownerid, (String)MEnvSpaceInstance.getProperty(mobj, "type"), props);
+				}
+			}
+			
+			// Create initial processes.
+			List procs = (List)si.getPropertyList("processes");
+			if(procs!=null)
+			{
+				for(int i=0; i<procs.size(); i++)
+				{
+					Map mproc = (Map)procs.get(i);
+					List mprops = (List)mproc.get("properties");
+					Map props = MEnvSpaceInstance.convertProperties(mprops, fetcher);
+					this.createSpaceProcess((String)MEnvSpaceInstance.getProperty(mproc, "type"), props);
+	//				System.out.println("Create space process: "+MEnvSpaceInstance.getProperty(mproc, "type"));
+				}
+			}
+			
+			// Create initial space actions.
+			List actions = (List)si.getPropertyList("spaceactions");
+			if(actions!=null)
+			{
+				for(int i=0; i<actions.size(); i++)
+				{
+					Map action = (Map)actions.get(i);
+					List ps = (List)action.get("parameters");
+					Map params = null;
+					if(ps!=null)
+					{
+						params = new HashMap();
+						for(int j=0; j<ps.size(); j++)
+						{
+							Map param = (Map)ps.get(j);
+							IParsedExpression exp = (IParsedExpression)param.get("value");
+							params.put(param.get("name"), exp.getValue(fetcher));
+						}
+					}
+					
+	//				System.out.println("Performing initial space action: "+getProperty(action, "type"));
+					this.performSpaceAction((String)MEnvSpaceInstance.getProperty(action, "type"), params);
+				}
+			}
+			
+	//		Map themes = new HashMap();
+			List sourceviews = mspacetype.getPropertyList("dataviews");
+			if(sourceviews!=null)
+			{
+				for(int i=0; i<sourceviews.size(); i++)
+				{				
+					Map sourceview = (Map)sourceviews.get(i);
+					if(MEnvSpaceInstance.getProperty(sourceview, "objecttype")==null)
+					{
+						Map viewargs = new HashMap();
+						viewargs.put("sourceview", sourceview);
+						viewargs.put("space", this);
+						
+						IDataView	view	= (IDataView)((IObjectCreator)MEnvSpaceInstance.getProperty(sourceview, "creator")).createObject(viewargs);
+						this.addDataView((String)MEnvSpaceInstance.getProperty(sourceview, "name"), view);
+					}
+					else
+					{
+						this.addDataViewMapping((String)MEnvSpaceInstance.getProperty(sourceview, "objecttype"), sourceview);
+					}
+				}
+			}
+			
+			// Create the data providers.
+			List providers = mspacetype.getPropertyList("dataproviders");
+			List tmp = si.getPropertyList("dataproviders");
+			
+			if(providers==null && tmp!=null)
+				providers = tmp;
+			else if(providers!=null && tmp!=null)
+				providers.addAll(tmp);
+			
+	//		System.out.println("data providers: "+providers);
+			if(providers!=null)
+			{
+				for(int i=0; i<providers.size(); i++)
+				{
+					Map dcol = (Map)providers.get(i);
+	
+					List sources = (List)dcol.get("source");
+					IObjectSource[] provs = new IObjectSource[sources.size()];
+					for(int j=0; j<sources.size(); j++)
+					{
+						Map source = (Map)sources.get(j);
+						String varname = source.get("name")!=null? (String)source.get("name"): "$object";
+						String objecttype = (String)source.get("objecttype");
+						boolean aggregate = source.get("aggregate")!=null? ((Boolean)source.get("aggregate")).booleanValue(): false;
+						IParsedExpression dataexp = (IParsedExpression)source.get("content");
+						IParsedExpression includeexp = (IParsedExpression)source.get("includecondition");
+						provs[j] = new SpaceObjectSource(varname, this, objecttype, aggregate, dataexp, includeexp);
+					}
+					
+					String tablename = (String)MEnvSpaceInstance.getProperty(dcol, "name");
+					List subdatas = (List)dcol.get("data");
+					String[] columnnames = new String[subdatas.size()];
+					IParsedExpression[] exps = new IParsedExpression[subdatas.size()];
+					for(int j=0; j<subdatas.size(); j++)
+					{
+						Map subdata = (Map)subdatas.get(j);
+						columnnames[j] = (String)MEnvSpaceInstance.getProperty(subdata, "name");
+						exps[j] = (IParsedExpression)MEnvSpaceInstance.getProperty(subdata, "content");
+					}
+					
+					ITableDataProvider tprov = new DefaultDataProvider(this, provs, tablename, columnnames, exps);
+					this.addDataProvider(tablename, tprov);
+				}
+			}
+			
+			// Create the data consumers.
+			List consumers = mspacetype.getPropertyList("dataconsumers");
+			tmp = si.getPropertyList("dataconsumers");
+			
+			if(consumers==null && tmp!=null)
+				consumers = tmp;
+			else if(consumers!=null && tmp!=null)
+				consumers.addAll(tmp);
+			
+	//		System.out.println("data consumers: "+consumers);
+			if(consumers!=null)
+			{
+				for(int i=0; i<consumers.size(); i++)
+				{
+					Map dcon = (Map)consumers.get(i);
+					String name = (String)MEnvSpaceInstance.getProperty(dcon, "name");
+					Class clazz = (Class)MEnvSpaceInstance.getProperty(dcon, "class");
+					ITableDataConsumer con = (ITableDataConsumer)clazz.newInstance();
+					MEnvSpaceInstance.setProperties(con, (List)dcon.get("properties"), fetcher);
+					con.setProperty("envspace", this);
+					this.addDataConsumer(name, con);
+				}
+			}
+			
+			List observers = si.getPropertyList("observers");
+			if(observers!=null)
+			{
+				for(int i=0; i<observers.size(); i++)
+				{				
+					Map observer = (Map)observers.get(i);
+					
+					final String title = MEnvSpaceInstance.getProperty(observer, "name")!=null? (String)MEnvSpaceInstance.getProperty(observer, "name"): "Default Observer";
+					final Boolean	killonexit	= (Boolean)MEnvSpaceInstance.getProperty(observer, "killonexit");
+					
+					List plugs = (List)observer.get("plugins");
+					final List plugins = plugs!=null ? new ArrayList() : null;
+					if(plugs!=null)
+					{
+						for(int j=0; j<plugs.size(); j++)
+						{
+							Map plug = (Map)plugs.get(j);
+							Class clazz = (Class)MEnvSpaceInstance.getProperty(plug, "clazz");
+							IPropertyObject po = (IPropertyObject)clazz.newInstance();
+							MEnvSpaceInstance.setProperties(po, (List)plug.get("properties"), fetcher);
+							plugins.add(po);
+						}
+					}
+					
+					final ObserverCenter oc = new ObserverCenter(title, AbstractEnvironmentSpace.this,
+						getExternalAccess().getModel().getClassLoader(), plugins,
+						killonexit!=null ? killonexit.booleanValue() : true);
+									
+					SServiceProvider.getServiceUpwards(getExternalAccess().getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(final Object result)
+						{
+							((IComponentManagementService)result).addComponentListener(getExternalAccess().getComponentIdentifier(), new ICMSComponentListener()
+							{
+								public IFuture componentRemoved(IComponentDescription desc, Map results)
+								{
+									((IComponentManagementService)result).removeComponentListener(getExternalAccess().getComponentIdentifier(), this);
+									oc.dispose();
+									return IFuture.DONE;
+								}
+								
+								public IFuture componentChanged(IComponentDescription desc)
+								{
+									return IFuture.DONE;
+								}
+								
+								public IFuture componentAdded(IComponentDescription desc)
+								{
+									return IFuture.DONE;
+								}
+							});
+						}
+					});
+	
+					List perspectives = mspacetype.getPropertyList("perspectives");
+					for(int j=0; j<perspectives.size(); j++)
+					{
+						Map sourcepers = (Map)perspectives.get(j);
+						Map args = new HashMap();
+						args.put("object", sourcepers);
+						args.put("fetcher", fetcher);
+						try
+						{
+							IPerspective persp	= (IPerspective)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcepers, "creator")).createObject(args);
+							
+							List props = (List)sourcepers.get("properties");
+							MEnvSpaceInstance.setProperties(persp, props, fetcher);
+							
+							oc.addPerspective((String)MEnvSpaceInstance.getProperty(sourcepers, "name"), persp);
+						}
+						catch(Exception e)
+						{
+							System.out.println("Exception while creating perspective: "+sourcepers);
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+			
+			// Create the environment executor.
+			Map mse = (Map)MEnvSpaceInstance.getProperty(mspacetype.getProperties(), "spaceexecutor");
+			IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(mse, "expression");
+			ISpaceExecutor exe = null;
+			if(exp!=null)
+			{
+				exe = (ISpaceExecutor)exp.getValue(fetcher);	// Executor starts itself
+			}
+			else
+			{
+				exe = (ISpaceExecutor)((Class)MEnvSpaceInstance.getProperty(mse, "clazz")).newInstance();
+				List props = (List)mse.get("properties");
+				MEnvSpaceInstance.setProperties(exe, props, fetcher);
+			}
+			if(exe!=null)
+				exe.start();	
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+//	/**
+//	 *  Create a space.
+//	 */
+//	public void	initSpace(final IApplication context, MSpaceInstance config, IValueFetcher pfetcher) throws Exception
+//	{
+//		MEnvSpaceInstance	si	= (MEnvSpaceInstance)config;
+//		final MEnvSpaceType	mspacetype	= (MEnvSpaceType)config.getType();
+//		
+//		final SimpleValueFetcher fetcher = new SimpleValueFetcher(pfetcher);
+//		fetcher.setValue("$space", this);
+//		this.setFetcher(fetcher);
+//		
+//		List mspaceprops = mspacetype.getPropertyList("properties");
+//		MEnvSpaceInstance.setProperties(this, mspaceprops, fetcher);
+//		List spaceprops = si.getPropertyList("properties");
+//		MEnvSpaceInstance.setProperties(this, spaceprops, fetcher);
+//		
+//		this.application	= context;
+//		
+//		if(this instanceof Space2D) // Hack?
+//		{
+//			Double width = si.getProperty("width")!=null? (Double)si.getProperty("width"): (Double)mspacetype.getProperty("width");
+//			Double height = si.getProperty("height")!=null? (Double)si.getProperty("height"): (Double)mspacetype.getProperty("height");
+//			((Space2D)this).setAreaSize(Vector2Double.getVector2(width, height));
+////			System.out.println("areasize: "+width+" "+height);
+//		}
+//		
+//		// Create space object types.
+//		List objecttypes = mspacetype.getPropertyList("objecttypes");
+//		if(objecttypes!=null)
+//		{
+//			for(int i=0; i<objecttypes.size(); i++)
+//			{
+//				MObjectType mobjecttype = (MObjectType)objecttypes.get(i);
+////				List props = (List)mobjecttype.get("properties");
+////				Map	properties = null;
+////				if(props!=null)
+////				{
+////					properties	= new LinkedHashMap();
+////					Map propertiesMetaData = new HashMap();
+////					for(int j=0; j<props.size(); j++)
+////					{
+////						Map	prop	= (Map)props.get(j);
+////						properties.put(prop.get("name"), prop);
+////					}
+////				}
+////				Map properties = convertProperties(props, fetcher);
+////				System.out.println("Adding environment object type: "+(String)getProperty(mobjecttype, "name")+" "+props);
+//				
+////				for(Iterator it = mobjecttype.iterator(); it.hasNext();)
+////					System.out.println(((MObjectTypeProperty)it.next()).getType());
+//				
+//				this.addSpaceObjectType(mobjecttype.getName(), mobjecttype);
+//			}
+//		}
+//		
+//		// Add avatar mappings.
+//		List avmappings = mspacetype.getPropertyList("avatarmappings");
+//		if(avmappings!=null)
+//		{
+//			for(int i=0; i<avmappings.size(); i++)
+//			{
+//				AvatarMapping mapping = (AvatarMapping)avmappings.get(i);
+////				String componenttype = (String)MEnvSpaceInstance.getProperty(mmapping, "componenttype");
+////				String avatartype = (String)(String)MEnvSpaceInstance.getProperty(mmapping, "objecttype");
+////				Boolean createavatar = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "createavatar");
+////				Boolean createcomponent = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "createcomponent");
+////				Boolean killavatar = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "killavatar");
+////				Boolean killcomponent = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "killcomponent");
+////				
+////				AvatarMapping mapping = new AvatarMapping(componenttype, avatartype);
+////				if(createavatar!=null)
+////					mapping.setCreateAvatar(createavatar.booleanValue());
+////				if(createcomponent!=null)
+////					mapping.setCreateComponent(createcomponent.booleanValue());
+////				if(killavatar!=null)
+////					mapping.setKillAvatar(killavatar.booleanValue());
+////				if(killcomponent!=null)
+////					mapping.setKillComponent(killcomponent.booleanValue());
+////				
+//				this.addAvatarMappings(mapping);
+//			}
+//		}
+//		// Create space percept types.
+//		List percepttypes = mspacetype.getPropertyList("percepttypes");
+//		if(percepttypes!=null)
+//		{
+//			for(int i=0; i<percepttypes.size(); i++)
+//			{
+//				Map mpercepttype = (Map)percepttypes.get(i);
+//
+//				PerceptType pt = new PerceptType();
+//				
+//				pt.setName((String)MEnvSpaceInstance.getProperty(mpercepttype, "name"));
+//				
+//				List atypes = (List)mpercepttype.get("componenttypes");
+//				pt.setComponentTypes(atypes==null? null: new HashSet(atypes));
+//				
+//				List otypes = (List)mpercepttype.get("objecttypes");
+//				pt.setObjectTypes(otypes==null? null: new HashSet(otypes));
+//				
+////				System.out.println("Adding environment percept type: "+pt);
+//				this.addPerceptType(pt);
+//			}
+//		}
+//		
+//		// Create space actions.
+//		List spaceactions = mspacetype.getPropertyList("actiontypes");
+//		if(spaceactions!=null)
+//		{
+//			for(int i=0; i<spaceactions.size(); i++)
+//			{
+//				Map maction = (Map)spaceactions.get(i);
+//				ISpaceAction action = (ISpaceAction)((Class)MEnvSpaceInstance.getProperty(maction, "clazz")).newInstance();
+//				List props = (List)maction.get("properties");
+//				MEnvSpaceInstance.setProperties(action, props, fetcher);
+//				
+////				System.out.println("Adding environment action: "+MEnvSpaceInstance.getProperty(maction, "name"));
+//				this.addSpaceAction((String)MEnvSpaceInstance.getProperty(maction, "name"), action);
+//			}
+//		}
+//		
+//		// Create process types.
+//		List processtypes = mspacetype.getPropertyList("processtypes");
+//		if(processtypes!=null)
+//		{
+//			for(int i=0; i<processtypes.size(); i++)
+//			{
+//				Map mprocess = (Map)processtypes.get(i);
+////				ISpaceProcess process = (ISpaceProcess)((Class)MEnvSpaceInstance.getProperty(mprocess, "clazz")).newInstance();
+//				List props = (List)mprocess.get("properties");
+//				String name = (String)MEnvSpaceInstance.getProperty(mprocess, "name");
+//				Class clazz = (Class)MEnvSpaceInstance.getProperty(mprocess, "clazz");
+//				
+////				System.out.println("Adding environment process: "+MEnvSpaceInstance.getProperty(mprocess, "name"));
+//				this.addSpaceProcessType(name, clazz, props);
+//			}
+//		}
+//		
+//
+//		// Create task types.
+//		List tasks = mspacetype.getPropertyList("tasktypes");
+//		if(tasks!=null)
+//		{
+//			for(int i=0; i<tasks.size(); i++)
+//			{
+//				Map mtask = (Map)tasks.get(i);
+//				List props = (List)mtask.get("properties");
+//				String name = (String)MEnvSpaceInstance.getProperty(mtask, "name");
+//				Class clazz = (Class)MEnvSpaceInstance.getProperty(mtask, "clazz");
+//				
+////				System.out.println("Adding object task: "+MEnvSpaceInstance.getProperty(mtask, "name"));
+//				this.addObjectTaskType(name, clazz, props);
+//			}
+//		}
+//		
+//		// Create percept generators.
+//		List gens = mspacetype.getPropertyList("perceptgenerators");
+//		if(gens!=null)
+//		{
+//			for(int i=0; i<gens.size(); i++)
+//			{
+//				Map mgen = (Map)gens.get(i);
+//				IPerceptGenerator gen = (IPerceptGenerator)((Class)MEnvSpaceInstance.getProperty(mgen, "clazz")).newInstance();
+//				List props = (List)mgen.get("properties");
+//				MEnvSpaceInstance.setProperties(gen, props, fetcher);
+//				
+////				System.out.println("Adding environment percept generator: "+MEnvSpaceInstance.getProperty(mgen, "name"));
+//				this.addPerceptGenerator(MEnvSpaceInstance.getProperty(mgen, "name"), gen);
+//			}
+//		}
+//		
+//		// Create percept processors.
+//		List pmaps = mspacetype.getPropertyList("perceptprocessors");
+//		if(pmaps!=null)
+//		{
+//			for(int i=0; i<pmaps.size(); i++)
+//			{
+//				Map mproc = (Map)pmaps.get(i);
+//				IPerceptProcessor proc = (IPerceptProcessor)((Class)MEnvSpaceInstance.getProperty(mproc, "clazz")).newInstance();
+//				List props = (List)mproc.get("properties");
+//				MEnvSpaceInstance.setProperties(proc, props, fetcher);
+//				
+//				String componenttype = (String)MEnvSpaceInstance.getProperty(mproc, "componenttype");
+//				List ptypes = (List)mproc.get("percepttypes");
+//				this.addPerceptProcessor(componenttype, ptypes==null? null: new HashSet(ptypes), proc);
+//			}
+//		}
+//		
+//		// Create initial objects.
+//		List objects = (List)si.getPropertyList("objects");
+//		if(objects!=null)
+//		{
+//			for(int i=0; i<objects.size(); i++)
+//			{
+//				Map mobj = (Map)objects.get(i);
+//				List mprops = (List)mobj.get("properties");
+//				int num	= 1;
+//				if(mobj.containsKey("number"))
 //				{
-//					properties	= new LinkedHashMap();
-//					Map propertiesMetaData = new HashMap();
-//					for(int j=0; j<props.size(); j++)
+//					num	= ((Number)MEnvSpaceInstance.getProperty(mobj, "number")).intValue();
+//				}
+//				
+//				for(int j=0; j<num; j++)
+//				{
+//					fetcher.setValue("$number", new Integer(j));
+//					Map props = MEnvSpaceInstance.convertProperties(mprops, fetcher);
+//					this.createSpaceObject((String)MEnvSpaceInstance.getProperty(mobj, "type"), props, null);
+//				}
+//			}
+//		}
+//		
+//		// Register initial avatars
+//		List avatars = (List)si.getPropertyList("avatars");
+//		if(avatars!=null)
+//		{
+//			for(int i=0; i<avatars.size(); i++)
+//			{
+//				Map mobj = (Map)avatars.get(i);
+//			
+//				List mprops = (List)mobj.get("properties");
+//				String	owner	= (String)MEnvSpaceInstance.getProperty(mobj, "owner");
+//				if(owner==null)
+//					throw new RuntimeException("Attribute 'owner' required for avatar: "+mobj);
+//				IComponentIdentifier	ownerid	= null;
+//				
+//				// HACK!!! Do not use ThreadSuspendable
+//				IComponentManagementService ces = ((IComponentManagementService)SServiceProvider.getServiceUpwards
+//					(context.getServiceContainer(), IComponentManagementService.class).get(new ThreadSuspendable()));
+//				if(owner.indexOf("@")!=-1)
+//					ownerid	= ces.createComponentIdentifier((String)owner, false);
+//				else
+//					ownerid	= ces.createComponentIdentifier((String)owner, true);
+//				
+//				Map props = MEnvSpaceInstance.convertProperties(mprops, fetcher);
+//				this.addInitialAvatar(ownerid, (String)MEnvSpaceInstance.getProperty(mobj, "type"), props);
+//			}
+//		}
+//		
+//		// Create initial processes.
+//		List procs = (List)si.getPropertyList("processes");
+//		if(procs!=null)
+//		{
+//			for(int i=0; i<procs.size(); i++)
+//			{
+//				Map mproc = (Map)procs.get(i);
+//				List mprops = (List)mproc.get("properties");
+//				Map props = MEnvSpaceInstance.convertProperties(mprops, fetcher);
+//				this.createSpaceProcess((String)MEnvSpaceInstance.getProperty(mproc, "type"), props);
+////				System.out.println("Create space process: "+MEnvSpaceInstance.getProperty(mproc, "type"));
+//			}
+//		}
+//		
+//		// Create initial space actions.
+//		List actions = (List)si.getPropertyList("spaceactions");
+//		if(actions!=null)
+//		{
+//			for(int i=0; i<actions.size(); i++)
+//			{
+//				Map action = (Map)actions.get(i);
+//				List ps = (List)action.get("parameters");
+//				Map params = null;
+//				if(ps!=null)
+//				{
+//					params = new HashMap();
+//					for(int j=0; j<ps.size(); j++)
 //					{
-//						Map	prop	= (Map)props.get(j);
-//						properties.put(prop.get("name"), prop);
+//						Map param = (Map)ps.get(j);
+//						IParsedExpression exp = (IParsedExpression)param.get("value");
+//						params.put(param.get("name"), exp.getValue(fetcher));
 //					}
 //				}
-//				Map properties = convertProperties(props, fetcher);
-//				System.out.println("Adding environment object type: "+(String)getProperty(mobjecttype, "name")+" "+props);
-				
-//				for(Iterator it = mobjecttype.iterator(); it.hasNext();)
-//					System.out.println(((MObjectTypeProperty)it.next()).getType());
-				
-				this.addSpaceObjectType(mobjecttype.getName(), mobjecttype);
-			}
-		}
-		
-		// Add avatar mappings.
-		List avmappings = mspacetype.getPropertyList("avatarmappings");
-		if(avmappings!=null)
-		{
-			for(int i=0; i<avmappings.size(); i++)
-			{
-				AvatarMapping mapping = (AvatarMapping)avmappings.get(i);
-//				String componenttype = (String)MEnvSpaceInstance.getProperty(mmapping, "componenttype");
-//				String avatartype = (String)(String)MEnvSpaceInstance.getProperty(mmapping, "objecttype");
-//				Boolean createavatar = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "createavatar");
-//				Boolean createcomponent = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "createcomponent");
-//				Boolean killavatar = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "killavatar");
-//				Boolean killcomponent = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "killcomponent");
 //				
-//				AvatarMapping mapping = new AvatarMapping(componenttype, avatartype);
-//				if(createavatar!=null)
-//					mapping.setCreateAvatar(createavatar.booleanValue());
-//				if(createcomponent!=null)
-//					mapping.setCreateComponent(createcomponent.booleanValue());
-//				if(killavatar!=null)
-//					mapping.setKillAvatar(killavatar.booleanValue());
-//				if(killcomponent!=null)
-//					mapping.setKillComponent(killcomponent.booleanValue());
+////				System.out.println("Performing initial space action: "+getProperty(action, "type"));
+//				this.performSpaceAction((String)MEnvSpaceInstance.getProperty(action, "type"), params);
+//			}
+//		}
+//		
+////		Map themes = new HashMap();
+//		List sourceviews = mspacetype.getPropertyList("dataviews");
+//		if(sourceviews!=null)
+//		{
+//			for(int i=0; i<sourceviews.size(); i++)
+//			{				
+//				Map sourceview = (Map)sourceviews.get(i);
+//				if(MEnvSpaceInstance.getProperty(sourceview, "objecttype")==null)
+//				{
+//					Map viewargs = new HashMap();
+//					viewargs.put("sourceview", sourceview);
+//					viewargs.put("space", this);
+//					
+//					IDataView	view	= (IDataView)((IObjectCreator)MEnvSpaceInstance.getProperty(sourceview, "creator")).createObject(viewargs);
+//					this.addDataView((String)MEnvSpaceInstance.getProperty(sourceview, "name"), view);
+//				}
+//				else
+//				{
+//					this.addDataViewMapping((String)MEnvSpaceInstance.getProperty(sourceview, "objecttype"), sourceview);
+//				}
+//			}
+//		}
+//		
+//		// Create the data providers.
+//		List providers = mspacetype.getPropertyList("dataproviders");
+//		List tmp = si.getPropertyList("dataproviders");
+//		
+//		if(providers==null && tmp!=null)
+//			providers = tmp;
+//		else if(providers!=null && tmp!=null)
+//			providers.addAll(tmp);
+//		
+////		System.out.println("data providers: "+providers);
+//		if(providers!=null)
+//		{
+//			for(int i=0; i<providers.size(); i++)
+//			{
+//				Map dcol = (Map)providers.get(i);
+//
+//				List sources = (List)dcol.get("source");
+//				IObjectSource[] provs = new IObjectSource[sources.size()];
+//				for(int j=0; j<sources.size(); j++)
+//				{
+//					Map source = (Map)sources.get(j);
+//					String varname = source.get("name")!=null? (String)source.get("name"): "$object";
+//					String objecttype = (String)source.get("objecttype");
+//					boolean aggregate = source.get("aggregate")!=null? ((Boolean)source.get("aggregate")).booleanValue(): false;
+//					IParsedExpression dataexp = (IParsedExpression)source.get("content");
+//					IParsedExpression includeexp = (IParsedExpression)source.get("includecondition");
+//					provs[j] = new SpaceObjectSource(varname, this, objecttype, aggregate, dataexp, includeexp);
+//				}
 //				
-				this.addAvatarMappings(mapping);
-			}
-		}
-		// Create space percept types.
-		List percepttypes = mspacetype.getPropertyList("percepttypes");
-		if(percepttypes!=null)
-		{
-			for(int i=0; i<percepttypes.size(); i++)
-			{
-				Map mpercepttype = (Map)percepttypes.get(i);
-
-				PerceptType pt = new PerceptType();
-				
-				pt.setName((String)MEnvSpaceInstance.getProperty(mpercepttype, "name"));
-				
-				List atypes = (List)mpercepttype.get("componenttypes");
-				pt.setComponentTypes(atypes==null? null: new HashSet(atypes));
-				
-				List otypes = (List)mpercepttype.get("objecttypes");
-				pt.setObjectTypes(otypes==null? null: new HashSet(otypes));
-				
-//				System.out.println("Adding environment percept type: "+pt);
-				this.addPerceptType(pt);
-			}
-		}
-		
-		// Create space actions.
-		List spaceactions = mspacetype.getPropertyList("actiontypes");
-		if(spaceactions!=null)
-		{
-			for(int i=0; i<spaceactions.size(); i++)
-			{
-				Map maction = (Map)spaceactions.get(i);
-				ISpaceAction action = (ISpaceAction)((Class)MEnvSpaceInstance.getProperty(maction, "clazz")).newInstance();
-				List props = (List)maction.get("properties");
-				MEnvSpaceInstance.setProperties(action, props, fetcher);
-				
-//				System.out.println("Adding environment action: "+MEnvSpaceInstance.getProperty(maction, "name"));
-				this.addSpaceAction((String)MEnvSpaceInstance.getProperty(maction, "name"), action);
-			}
-		}
-		
-		// Create process types.
-		List processtypes = mspacetype.getPropertyList("processtypes");
-		if(processtypes!=null)
-		{
-			for(int i=0; i<processtypes.size(); i++)
-			{
-				Map mprocess = (Map)processtypes.get(i);
-//				ISpaceProcess process = (ISpaceProcess)((Class)MEnvSpaceInstance.getProperty(mprocess, "clazz")).newInstance();
-				List props = (List)mprocess.get("properties");
-				String name = (String)MEnvSpaceInstance.getProperty(mprocess, "name");
-				Class clazz = (Class)MEnvSpaceInstance.getProperty(mprocess, "clazz");
-				
-//				System.out.println("Adding environment process: "+MEnvSpaceInstance.getProperty(mprocess, "name"));
-				this.addSpaceProcessType(name, clazz, props);
-			}
-		}
-		
-
-		// Create task types.
-		List tasks = mspacetype.getPropertyList("tasktypes");
-		if(tasks!=null)
-		{
-			for(int i=0; i<tasks.size(); i++)
-			{
-				Map mtask = (Map)tasks.get(i);
-				List props = (List)mtask.get("properties");
-				String name = (String)MEnvSpaceInstance.getProperty(mtask, "name");
-				Class clazz = (Class)MEnvSpaceInstance.getProperty(mtask, "clazz");
-				
-//				System.out.println("Adding object task: "+MEnvSpaceInstance.getProperty(mtask, "name"));
-				this.addObjectTaskType(name, clazz, props);
-			}
-		}
-		
-		// Create percept generators.
-		List gens = mspacetype.getPropertyList("perceptgenerators");
-		if(gens!=null)
-		{
-			for(int i=0; i<gens.size(); i++)
-			{
-				Map mgen = (Map)gens.get(i);
-				IPerceptGenerator gen = (IPerceptGenerator)((Class)MEnvSpaceInstance.getProperty(mgen, "clazz")).newInstance();
-				List props = (List)mgen.get("properties");
-				MEnvSpaceInstance.setProperties(gen, props, fetcher);
-				
-//				System.out.println("Adding environment percept generator: "+MEnvSpaceInstance.getProperty(mgen, "name"));
-				this.addPerceptGenerator(MEnvSpaceInstance.getProperty(mgen, "name"), gen);
-			}
-		}
-		
-		// Create percept processors.
-		List pmaps = mspacetype.getPropertyList("perceptprocessors");
-		if(pmaps!=null)
-		{
-			for(int i=0; i<pmaps.size(); i++)
-			{
-				Map mproc = (Map)pmaps.get(i);
-				IPerceptProcessor proc = (IPerceptProcessor)((Class)MEnvSpaceInstance.getProperty(mproc, "clazz")).newInstance();
-				List props = (List)mproc.get("properties");
-				MEnvSpaceInstance.setProperties(proc, props, fetcher);
-				
-				String componenttype = (String)MEnvSpaceInstance.getProperty(mproc, "componenttype");
-				List ptypes = (List)mproc.get("percepttypes");
-				this.addPerceptProcessor(componenttype, ptypes==null? null: new HashSet(ptypes), proc);
-			}
-		}
-		
-		// Create initial objects.
-		List objects = (List)si.getPropertyList("objects");
-		if(objects!=null)
-		{
-			for(int i=0; i<objects.size(); i++)
-			{
-				Map mobj = (Map)objects.get(i);
-				List mprops = (List)mobj.get("properties");
-				int num	= 1;
-				if(mobj.containsKey("number"))
-				{
-					num	= ((Number)MEnvSpaceInstance.getProperty(mobj, "number")).intValue();
-				}
-				
-				for(int j=0; j<num; j++)
-				{
-					fetcher.setValue("$number", new Integer(j));
-					Map props = MEnvSpaceInstance.convertProperties(mprops, fetcher);
-					this.createSpaceObject((String)MEnvSpaceInstance.getProperty(mobj, "type"), props, null);
-				}
-			}
-		}
-		
-		// Register initial avatars
-		List avatars = (List)si.getPropertyList("avatars");
-		if(avatars!=null)
-		{
-			for(int i=0; i<avatars.size(); i++)
-			{
-				Map mobj = (Map)avatars.get(i);
-			
-				List mprops = (List)mobj.get("properties");
-				String	owner	= (String)MEnvSpaceInstance.getProperty(mobj, "owner");
-				if(owner==null)
-					throw new RuntimeException("Attribute 'owner' required for avatar: "+mobj);
-				IComponentIdentifier	ownerid	= null;
-				
-				// HACK!!! Do not use ThreadSuspendable
-				IComponentManagementService ces = ((IComponentManagementService)SServiceProvider.getServiceUpwards
-					(context.getServiceContainer(), IComponentManagementService.class).get(new ThreadSuspendable()));
-				if(owner.indexOf("@")!=-1)
-					ownerid	= ces.createComponentIdentifier((String)owner, false);
-				else
-					ownerid	= ces.createComponentIdentifier((String)owner, true);
-				
-				Map props = MEnvSpaceInstance.convertProperties(mprops, fetcher);
-				this.addInitialAvatar(ownerid, (String)MEnvSpaceInstance.getProperty(mobj, "type"), props);
-			}
-		}
-		
-		// Create initial processes.
-		List procs = (List)si.getPropertyList("processes");
-		if(procs!=null)
-		{
-			for(int i=0; i<procs.size(); i++)
-			{
-				Map mproc = (Map)procs.get(i);
-				List mprops = (List)mproc.get("properties");
-				Map props = MEnvSpaceInstance.convertProperties(mprops, fetcher);
-				this.createSpaceProcess((String)MEnvSpaceInstance.getProperty(mproc, "type"), props);
-//				System.out.println("Create space process: "+MEnvSpaceInstance.getProperty(mproc, "type"));
-			}
-		}
-		
-		// Create initial space actions.
-		List actions = (List)si.getPropertyList("spaceactions");
-		if(actions!=null)
-		{
-			for(int i=0; i<actions.size(); i++)
-			{
-				Map action = (Map)actions.get(i);
-				List ps = (List)action.get("parameters");
-				Map params = null;
-				if(ps!=null)
-				{
-					params = new HashMap();
-					for(int j=0; j<ps.size(); j++)
-					{
-						Map param = (Map)ps.get(j);
-						IParsedExpression exp = (IParsedExpression)param.get("value");
-						params.put(param.get("name"), exp.getValue(fetcher));
-					}
-				}
-				
-//				System.out.println("Performing initial space action: "+getProperty(action, "type"));
-				this.performSpaceAction((String)MEnvSpaceInstance.getProperty(action, "type"), params);
-			}
-		}
-		
-//		Map themes = new HashMap();
-		List sourceviews = mspacetype.getPropertyList("dataviews");
-		if(sourceviews!=null)
-		{
-			for(int i=0; i<sourceviews.size(); i++)
-			{				
-				Map sourceview = (Map)sourceviews.get(i);
-				if(MEnvSpaceInstance.getProperty(sourceview, "objecttype")==null)
-				{
-					Map viewargs = new HashMap();
-					viewargs.put("sourceview", sourceview);
-					viewargs.put("space", this);
-					
-					IDataView	view	= (IDataView)((IObjectCreator)MEnvSpaceInstance.getProperty(sourceview, "creator")).createObject(viewargs);
-					this.addDataView((String)MEnvSpaceInstance.getProperty(sourceview, "name"), view);
-				}
-				else
-				{
-					this.addDataViewMapping((String)MEnvSpaceInstance.getProperty(sourceview, "objecttype"), sourceview);
-				}
-			}
-		}
-		
-		// Create the data providers.
-		List providers = mspacetype.getPropertyList("dataproviders");
-		List tmp = si.getPropertyList("dataproviders");
-		
-		if(providers==null && tmp!=null)
-			providers = tmp;
-		else if(providers!=null && tmp!=null)
-			providers.addAll(tmp);
-		
-//		System.out.println("data providers: "+providers);
-		if(providers!=null)
-		{
-			for(int i=0; i<providers.size(); i++)
-			{
-				Map dcol = (Map)providers.get(i);
-
-				List sources = (List)dcol.get("source");
-				IObjectSource[] provs = new IObjectSource[sources.size()];
-				for(int j=0; j<sources.size(); j++)
-				{
-					Map source = (Map)sources.get(j);
-					String varname = source.get("name")!=null? (String)source.get("name"): "$object";
-					String objecttype = (String)source.get("objecttype");
-					boolean aggregate = source.get("aggregate")!=null? ((Boolean)source.get("aggregate")).booleanValue(): false;
-					IParsedExpression dataexp = (IParsedExpression)source.get("content");
-					IParsedExpression includeexp = (IParsedExpression)source.get("includecondition");
-					provs[j] = new SpaceObjectSource(varname, this, objecttype, aggregate, dataexp, includeexp);
-				}
-				
-				String tablename = (String)MEnvSpaceInstance.getProperty(dcol, "name");
-				List subdatas = (List)dcol.get("data");
-				String[] columnnames = new String[subdatas.size()];
-				IParsedExpression[] exps = new IParsedExpression[subdatas.size()];
-				for(int j=0; j<subdatas.size(); j++)
-				{
-					Map subdata = (Map)subdatas.get(j);
-					columnnames[j] = (String)MEnvSpaceInstance.getProperty(subdata, "name");
-					exps[j] = (IParsedExpression)MEnvSpaceInstance.getProperty(subdata, "content");
-				}
-				
-				ITableDataProvider tprov = new DefaultDataProvider(this, provs, tablename, columnnames, exps);
-				this.addDataProvider(tablename, tprov);
-			}
-		}
-		
-		// Create the data consumers.
-		List consumers = mspacetype.getPropertyList("dataconsumers");
-		tmp = si.getPropertyList("dataconsumers");
-		
-		if(consumers==null && tmp!=null)
-			consumers = tmp;
-		else if(consumers!=null && tmp!=null)
-			consumers.addAll(tmp);
-		
-//		System.out.println("data consumers: "+consumers);
-		if(consumers!=null)
-		{
-			for(int i=0; i<consumers.size(); i++)
-			{
-				Map dcon = (Map)consumers.get(i);
-				String name = (String)MEnvSpaceInstance.getProperty(dcon, "name");
-				Class clazz = (Class)MEnvSpaceInstance.getProperty(dcon, "class");
-				ITableDataConsumer con = (ITableDataConsumer)clazz.newInstance();
-				MEnvSpaceInstance.setProperties(con, (List)dcon.get("properties"), fetcher);
-				con.setProperty("envspace", this);
-				this.addDataConsumer(name, con);
-			}
-		}
-		
-		List observers = si.getPropertyList("observers");
-		if(observers!=null)
-		{
-			for(int i=0; i<observers.size(); i++)
-			{				
-				Map observer = (Map)observers.get(i);
-				
-				final String title = MEnvSpaceInstance.getProperty(observer, "name")!=null? (String)MEnvSpaceInstance.getProperty(observer, "name"): "Default Observer";
-				final Boolean	killonexit	= (Boolean)MEnvSpaceInstance.getProperty(observer, "killonexit");
-				
-				List plugs = (List)observer.get("plugins");
-				final List plugins = plugs!=null ? new ArrayList() : null;
-				if(plugs!=null)
-				{
-					for(int j=0; j<plugs.size(); j++)
-					{
-						Map plug = (Map)plugs.get(j);
-						Class clazz = (Class)MEnvSpaceInstance.getProperty(plug, "clazz");
-						IPropertyObject po = (IPropertyObject)clazz.newInstance();
-						MEnvSpaceInstance.setProperties(po, (List)plug.get("properties"), fetcher);
-						plugins.add(po);
-					}
-				}
-				
-				final ObserverCenter oc = new ObserverCenter(title, AbstractEnvironmentSpace.this,
-					getContext().getApplicationType().getModelInfo().getClassLoader(), plugins,
-					killonexit!=null ? killonexit.booleanValue() : true);
-								
-				SServiceProvider.getServiceUpwards(context.getServiceContainer(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(final Object result)
-					{
-						((IComponentManagementService)result).addComponentListener(context.getComponentIdentifier(), new ICMSComponentListener()
-						{
-							public IFuture componentRemoved(IComponentDescription desc, Map results)
-							{
-								((IComponentManagementService)result).removeComponentListener(context.getComponentIdentifier(), this);
-								oc.dispose();
-								return IFuture.DONE;
-							}
-							
-							public IFuture componentChanged(IComponentDescription desc)
-							{
-								return IFuture.DONE;
-							}
-							
-							public IFuture componentAdded(IComponentDescription desc)
-							{
-								return IFuture.DONE;
-							}
-						});
-					}
-				});
-
-				List perspectives = mspacetype.getPropertyList("perspectives");
-				for(int j=0; j<perspectives.size(); j++)
-				{
-					Map sourcepers = (Map)perspectives.get(j);
-					Map args = new HashMap();
-					args.put("object", sourcepers);
-					args.put("fetcher", fetcher);
-					try
-					{
-						IPerspective persp	= (IPerspective)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcepers, "creator")).createObject(args);
-						
-						List props = (List)sourcepers.get("properties");
-						MEnvSpaceInstance.setProperties(persp, props, fetcher);
-						
-						oc.addPerspective((String)MEnvSpaceInstance.getProperty(sourcepers, "name"), persp);
-					}
-					catch(Exception e)
-					{
-						System.out.println("Exception while creating perspective: "+sourcepers);
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-		
-		// Create the environment executor.
-		Map mse = (Map)MEnvSpaceInstance.getProperty(mspacetype.getProperties(), "spaceexecutor");
-		IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(mse, "expression");
-		ISpaceExecutor exe = null;
-		if(exp!=null)
-		{
-			exe = (ISpaceExecutor)exp.getValue(fetcher);	// Executor starts itself
-		}
-		else
-		{
-			exe = (ISpaceExecutor)((Class)MEnvSpaceInstance.getProperty(mse, "clazz")).newInstance();
-			List props = (List)mse.get("properties");
-			MEnvSpaceInstance.setProperties(exe, props, fetcher);
-		}
-		if(exe!=null)
-			exe.start();			
-	}
+//				String tablename = (String)MEnvSpaceInstance.getProperty(dcol, "name");
+//				List subdatas = (List)dcol.get("data");
+//				String[] columnnames = new String[subdatas.size()];
+//				IParsedExpression[] exps = new IParsedExpression[subdatas.size()];
+//				for(int j=0; j<subdatas.size(); j++)
+//				{
+//					Map subdata = (Map)subdatas.get(j);
+//					columnnames[j] = (String)MEnvSpaceInstance.getProperty(subdata, "name");
+//					exps[j] = (IParsedExpression)MEnvSpaceInstance.getProperty(subdata, "content");
+//				}
+//				
+//				ITableDataProvider tprov = new DefaultDataProvider(this, provs, tablename, columnnames, exps);
+//				this.addDataProvider(tablename, tprov);
+//			}
+//		}
+//		
+//		// Create the data consumers.
+//		List consumers = mspacetype.getPropertyList("dataconsumers");
+//		tmp = si.getPropertyList("dataconsumers");
+//		
+//		if(consumers==null && tmp!=null)
+//			consumers = tmp;
+//		else if(consumers!=null && tmp!=null)
+//			consumers.addAll(tmp);
+//		
+////		System.out.println("data consumers: "+consumers);
+//		if(consumers!=null)
+//		{
+//			for(int i=0; i<consumers.size(); i++)
+//			{
+//				Map dcon = (Map)consumers.get(i);
+//				String name = (String)MEnvSpaceInstance.getProperty(dcon, "name");
+//				Class clazz = (Class)MEnvSpaceInstance.getProperty(dcon, "class");
+//				ITableDataConsumer con = (ITableDataConsumer)clazz.newInstance();
+//				MEnvSpaceInstance.setProperties(con, (List)dcon.get("properties"), fetcher);
+//				con.setProperty("envspace", this);
+//				this.addDataConsumer(name, con);
+//			}
+//		}
+//		
+//		List observers = si.getPropertyList("observers");
+//		if(observers!=null)
+//		{
+//			for(int i=0; i<observers.size(); i++)
+//			{				
+//				Map observer = (Map)observers.get(i);
+//				
+//				final String title = MEnvSpaceInstance.getProperty(observer, "name")!=null? (String)MEnvSpaceInstance.getProperty(observer, "name"): "Default Observer";
+//				final Boolean	killonexit	= (Boolean)MEnvSpaceInstance.getProperty(observer, "killonexit");
+//				
+//				List plugs = (List)observer.get("plugins");
+//				final List plugins = plugs!=null ? new ArrayList() : null;
+//				if(plugs!=null)
+//				{
+//					for(int j=0; j<plugs.size(); j++)
+//					{
+//						Map plug = (Map)plugs.get(j);
+//						Class clazz = (Class)MEnvSpaceInstance.getProperty(plug, "clazz");
+//						IPropertyObject po = (IPropertyObject)clazz.newInstance();
+//						MEnvSpaceInstance.setProperties(po, (List)plug.get("properties"), fetcher);
+//						plugins.add(po);
+//					}
+//				}
+//				
+//				final ObserverCenter oc = new ObserverCenter(title, AbstractEnvironmentSpace.this,
+//					getContext().getApplicationType().getModelInfo().getClassLoader(), plugins,
+//					killonexit!=null ? killonexit.booleanValue() : true);
+//								
+//				SServiceProvider.getServiceUpwards(context.getServiceContainer(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+//				{
+//					public void resultAvailable(final Object result)
+//					{
+//						((IComponentManagementService)result).addComponentListener(context.getComponentIdentifier(), new ICMSComponentListener()
+//						{
+//							public IFuture componentRemoved(IComponentDescription desc, Map results)
+//							{
+//								((IComponentManagementService)result).removeComponentListener(context.getComponentIdentifier(), this);
+//								oc.dispose();
+//								return IFuture.DONE;
+//							}
+//							
+//							public IFuture componentChanged(IComponentDescription desc)
+//							{
+//								return IFuture.DONE;
+//							}
+//							
+//							public IFuture componentAdded(IComponentDescription desc)
+//							{
+//								return IFuture.DONE;
+//							}
+//						});
+//					}
+//				});
+//
+//				List perspectives = mspacetype.getPropertyList("perspectives");
+//				for(int j=0; j<perspectives.size(); j++)
+//				{
+//					Map sourcepers = (Map)perspectives.get(j);
+//					Map args = new HashMap();
+//					args.put("object", sourcepers);
+//					args.put("fetcher", fetcher);
+//					try
+//					{
+//						IPerspective persp	= (IPerspective)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcepers, "creator")).createObject(args);
+//						
+//						List props = (List)sourcepers.get("properties");
+//						MEnvSpaceInstance.setProperties(persp, props, fetcher);
+//						
+//						oc.addPerspective((String)MEnvSpaceInstance.getProperty(sourcepers, "name"), persp);
+//					}
+//					catch(Exception e)
+//					{
+//						System.out.println("Exception while creating perspective: "+sourcepers);
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//		}
+//		
+//		// Create the environment executor.
+//		Map mse = (Map)MEnvSpaceInstance.getProperty(mspacetype.getProperties(), "spaceexecutor");
+//		IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(mse, "expression");
+//		ISpaceExecutor exe = null;
+//		if(exp!=null)
+//		{
+//			exe = (ISpaceExecutor)exp.getValue(fetcher);	// Executor starts itself
+//		}
+//		else
+//		{
+//			exe = (ISpaceExecutor)((Class)MEnvSpaceInstance.getProperty(mse, "clazz")).newInstance();
+//			List props = (List)mse.get("properties");
+//			MEnvSpaceInstance.setProperties(exe, props, fetcher);
+//		}
+//		if(exe!=null)
+//			exe.start();			
+//	}
 	
 	//-------- methods --------
 	
@@ -914,7 +1394,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			// Store in owner objects.
 			if(properties!=null && properties.containsKey(ISpaceObject.PROPERTY_OWNER))
 			{
-				IComponentIdentifier	owner	= (IComponentIdentifier)properties.get(ISpaceObject.PROPERTY_OWNER);
+				Object owner = properties.get(ISpaceObject.PROPERTY_OWNER);
 				List ownerobjects = (List)spaceobjectsbyowner.get(owner);
 				if(ownerobjects == null)
 				{
@@ -967,7 +1447,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			// Store in owner objects.
 			if(properties!=null && properties.containsKey(ISpaceObject.PROPERTY_OWNER))
 			{
-				IComponentIdentifier	owner	= (IComponentIdentifier)properties.get(ISpaceObject.PROPERTY_OWNER);
+				Object owner = properties.get(ISpaceObject.PROPERTY_OWNER);
 				List ownerobjects = (List)spaceobjectsbyowner.get(owner);
 				if(ownerobjects == null)
 				{
@@ -1052,29 +1532,40 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					}
 					
 					final String compotype = componenttype;
-					SServiceProvider.getServiceUpwards(application.getServiceContainer(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+					
+					getExternalAccess().getFileName(compotype).addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
-							IComponentManagementService cms = (IComponentManagementService)result;
-							// cannot be dummy cid because agent calls getAvatar(cid) in init and needs its avatar
-							// the cid must be the final cid of the component hence it creates unique ids
-							IComponentIdentifier cid = cms.generateComponentIdentifier(SUtil.createUniqueId(compotype, 3), getContext().getComponentIdentifier().getName().replace("@", "."));
-//							IComponentIdentifier cid = new ComponentIdentifier("dummy@hummy");				
-							setOwner(ret.getId(), cid);
-							IFuture	future	= cms.createComponent(cid.getLocalName(), getContext().getComponentFilename(compotype),
-								new CreationInfo(null, null, getContext().getComponentIdentifier(), false, getContext().getAllImports()), null);
-							future.addResultListener(new IResultListener()
+							final String filename = (String)result;
+							
+							SServiceProvider.getServiceUpwards(ia.getServiceContainer(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
-//									setOwner(ret.getId(), (IComponentIdentifier)result);
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									// Todo: propagate exception: kills application!?
-									exception.printStackTrace();
+									IComponentManagementService cms = (IComponentManagementService)result;
+									// cannot be dummy cid because agent calls getAvatar(cid) in init and needs its avatar
+									// the cid must be the final cid of the component hence it creates unique ids
+									IComponentIdentifier cid = cms.generateComponentIdentifier(SUtil.createUniqueId(compotype, 3), getExternalAccess().getComponentIdentifier().getName().replace("@", "."));
+//									IComponentIdentifier cid = new ComponentIdentifier("dummy@hummy");				
+									CMSComponentDescription desc = new CMSComponentDescription();
+									desc.setName(cid);
+									setOwner(ret.getId(), desc);
+									IFuture	future	= cms.createComponent(cid.getLocalName(), filename,
+										new CreationInfo(null, null, getExternalAccess().getComponentIdentifier(), false, getExternalAccess().getModel().getAllImports()), null);
+									future.addResultListener(new IResultListener()
+									{
+										public void resultAvailable(Object result)
+										{
+//											setOwner(ret.getId(), (IComponentIdentifier)result);
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											// Todo: propagate exception: kills application!?
+											exception.printStackTrace();
+										}
+									});
 								}
 							});
 						}
@@ -1168,32 +1659,44 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //		System.out.println("destroy so: "+id);
 		
 		SpaceObject obj;
+		IComponentDescription tmp = null;
+		String ot = null;
 		synchronized(monitor)
 		{
 			obj = (SpaceObject)spaceobjects.get(id);
 			if(obj==null)
 				throw new RuntimeException("No object found for id: "+id);
-			String	objecttype	= obj.getType();
+			ot = obj.getType();
 			
 			// Possibly kill component.
-			final IComponentIdentifier component = (IComponentIdentifier)obj.getProperty(ISpaceObject.PROPERTY_OWNER);
-			if(component!=null)
+			tmp = (IComponentDescription)obj.getProperty(ISpaceObject.PROPERTY_OWNER);
+		}	
+//		String	componenttype = getExternalAccess().getLocalType(cid);
+		final String objecttype = ot;	
+		final IComponentDescription desc = tmp;
+		
+		if(desc!=null)
+		{
+			synchronized(monitor)
 			{
-				String	componenttype = getContext().getComponentType(component);
+				String componenttype = desc.getLocalType();
 				AvatarMapping mapping = getAvatarMapping(componenttype, objecttype);
 				if(mapping.isKillComponent())
 				{
-					SServiceProvider.getServiceUpwards(getContext().getServiceContainer(), IComponentManagementService.class)
+					SServiceProvider.getServiceUpwards(getExternalAccess().getServiceProvider(), IComponentManagementService.class)
 						.addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
-							((IComponentManagementService)result).destroyComponent(component);
+							((IComponentManagementService)result).destroyComponent(desc.getName());
 						}
 					});
 				}
 			}
+		}
 
+		synchronized(monitor)
+		{
 			// Mark obsolete actions
 			ActionEntry[] actions = actionlist.getActionEntries();
 			for(int i=0; i<actions.length; i++)
@@ -1201,7 +1704,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				Object actorid = actions[i].parameters.get(ISpaceAction.ACTOR_ID);
 				if(actorid!=null)
 				{
-					ISpaceObject so = getAvatar((IComponentIdentifier)actorid);
+					ISpaceObject so = getAvatar((IComponentDescription)actorid);
 					if(so!=null)
 					{
 						Object avatarid = so.getId();
@@ -1400,18 +1903,19 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  Create a percept for the given component.
 	 *  @param typename The percept type.
 	 *  @param data	The content of the percept (if any).
-	 *  @param component The component that should receive the percept.
+	 *  @param cid The component that should receive the percept.
 	 */
-	public void createPercept(String typename, Object data, IComponentIdentifier component, ISpaceObject avatar)
+	public void createPercept(final String typename, final Object data, final IComponentDescription comp, final ISpaceObject avatar)
 	{
+		String	componenttype = comp.getLocalType();
 		synchronized(monitor)
 		{
-//			if(!percepttypes.containsKey(typename))
-//				throw new RuntimeException("Unknown percept type: "+typename);
+//					if(!percepttypes.containsKey(typename))
+//						throw new RuntimeException("Unknown percept type: "+typename);
 			
-//			System.out.println("New percept: "+typename+", "+data+", "+component);
+//					System.out.println("New percept: "+typename+", "+data+", "+component);
 			
-			String	componenttype = application.getComponentType(component);
+//					String	componenttype = ia.getComponentType(cid);
 			List procs	= (List)perceptprocessors.get(componenttype);
 			IPerceptProcessor proc = null;
 			if(procs!=null)
@@ -1425,9 +1929,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			}
 			
 			if(proc!=null)
-				perceptlist.schedulePercept(typename, data, component, avatar, proc);
+				perceptlist.schedulePercept(typename, data, comp, avatar, proc);
 			else
-				System.out.println("Warning: No processor for percept: "+typename+", "+data+", "+component+", "+avatar);
+				System.out.println("Warning: No processor for percept: "+typename+", "+data+", "+comp+", "+avatar);
 		}
 	}
 	
@@ -1452,7 +1956,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  @param id The object id.
 	 *  @param pos The object owner.
 	 */
-	public void setOwner(Object id, IComponentIdentifier owner)
+	public void setOwner(Object id, IComponentDescription owner)
 	{
 		synchronized(monitor)
 		{
@@ -1485,7 +1989,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  Get the avatar objects.
 	 *  @return The avatar objects. 
 	 */
-	public ISpaceObject[] getAvatars(IComponentIdentifier owner)
+	public ISpaceObject[] getAvatars(IComponentDescription owner)
 	{
 		synchronized(monitor)
 		{
@@ -1494,23 +1998,23 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		}
 	}
 	
-	/**
-	 *  Get the avatar objects.
-	 *  @return The avatar objects. 
-	 */
-	public IComponentIdentifier[] getComponents()
-	{
-		synchronized(monitor)
-		{
-			return (IComponentIdentifier[])spaceobjectsbyowner.keySet().toArray(new IComponentIdentifier[spaceobjectsbyowner.keySet().size()]);
-		}
-	}
+//	/**
+//	 *  Get the avatar objects.
+//	 *  @return The avatar objects. 
+//	 */
+//	public IComponentIdentifier[] getComponents()
+//	{
+//		synchronized(monitor)
+//		{
+//			return (IComponentIdentifier[])spaceobjectsbyowner.keySet().toArray(new IComponentIdentifier[spaceobjectsbyowner.keySet().size()]);
+//		}
+//	}
 	
 	/**
 	 *  Get the avatar object.
 	 *  @return The avatar object. 
 	 */
-	public ISpaceObject getAvatar(IComponentIdentifier owner)
+	public ISpaceObject getAvatar(IComponentDescription owner)
 	{
 		synchronized(monitor)
 		{
@@ -1532,7 +2036,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  Get the avatar object.
 	 *  @return The avatar object. 
 	 */
-	public ISpaceObject getAvatar(IComponentIdentifier owner, String fullname)
+	public ISpaceObject getAvatar(IComponentDescription owner, String fullname)
 	{
 		ISpaceObject	ret	= getAvatar(owner);
 
@@ -1548,7 +2052,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/**
 	 *  Create an avatar.
 	 */
-	protected ISpaceObject createAvatar(IComponentIdentifier owner, String fullname, boolean zombie)
+	protected ISpaceObject createAvatar(IComponentDescription owner, String fullname, boolean zombie)
 	{
 		ISpaceObject	ret	= null;
 		// Possibly add or create avatar(s) if any.
@@ -1565,17 +2069,16 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		}
 		else
 		{
-			String	componenttype	= application.getComponentType(owner);
+			String	componenttype	= owner.getLocalType();
 			if(componenttype==null && fullname!=null)
 			{
-				List atypes	= application.getApplicationType().getMComponentTypes();
-				for(int i=0; i<atypes.size(); i++)
+				SubcomponentTypeInfo[] atypes = ia.getModel().getSubcomponentTypes();
+				for(int i=0; i<atypes.length; i++)
 				{
-					final MComponentType atype = (MComponentType)atypes.get(i);
-					String tmp = atype.getFilename().replace('/', '.');
+					String tmp = atypes[i].getFilename().replace('/', '.');
 					if(tmp.indexOf(fullname)!=-1)
 					{
-						componenttype = atype.getName();
+						componenttype = atypes[i].getName();
 						break;
 					}
 				}
@@ -1795,89 +2298,134 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/**
 	 *  Called when an component was added. 
 	 */
-	public void componentAdded(IComponentIdentifier aid)//, String type)
+	public void componentAdded(final IComponentDescription owner)//, String type)
 	{
-		synchronized(monitor)
-		{
-			// Possibly add or create avatar(s) if any.
-			List ownedobjs = (List)spaceobjectsbyowner.get(aid);
-			if(ownedobjs==null)
-			{
-				createAvatar(aid, null, false);
-			}
-			else
-			{
-				// Init zombie avatars.
-				for(Iterator it=ownedobjs.iterator(); it.hasNext(); )
+//		getComponentType(cid).addResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object result)
+//			{
+//				String componenttype = (String)result;
+				String componenttype = owner.getLocalType();
+				synchronized(monitor)
 				{
-					ISpaceObject	obj	= (ISpaceObject)it.next();
-					if(!spaceobjects.containsKey(obj.getId()))
+					// Possibly add or create avatar(s) if any.
+					List ownedobjs = (List)spaceobjectsbyowner.get(owner);
+					if(ownedobjs==null)
 					{
-						initSpaceObject(obj);
+						createAvatar(owner, null, false);
+					}
+					else
+					{
+						// Init zombie avatars.
+						for(Iterator it=ownedobjs.iterator(); it.hasNext(); )
+						{
+							ISpaceObject	obj	= (ISpaceObject)it.next();
+							if(!spaceobjects.containsKey(obj.getId()))
+							{
+								initSpaceObject(obj);
+							}
+						}
+					}
+					
+					if(perceptgenerators!=null)
+					{
+						for(Iterator it=perceptgenerators.keySet().iterator(); it.hasNext(); )
+						{
+							IPerceptGenerator gen = (IPerceptGenerator)perceptgenerators.get(it.next());
+							gen.componentAdded(owner, AbstractEnvironmentSpace.this);
+						}
 					}
 				}
-			}
-			
-			if(perceptgenerators!=null)
-			{
-				for(Iterator it=perceptgenerators.keySet().iterator(); it.hasNext(); )
-				{
-					IPerceptGenerator gen = (IPerceptGenerator)perceptgenerators.get(it.next());
-					gen.componentAdded(aid, this);
-				}
-			}
-		}
+//			}
+//		});
 	}
 	
 	/**
 	 *  Called when an component was removed.
 	 */
-	public void componentRemoved(IComponentIdentifier aid)
+	public void componentRemoved(final IComponentDescription desc)
 	{
 //		System.out.println("comp removed: "+aid);
-		synchronized(monitor)
-		{
-			String	componenttype	= application.getComponentType(aid);
-			
-			// Possibly kill avatars of that component.
-			if(componenttype!=null && avatarmappings.getCollection(componenttype)!=null)
-			{
-				ISpaceObject[] avatars = getAvatars(aid);
-				if(avatars!=null)
+		
+//		getComponentType(cid)
+//			.addResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object result)
+//			{
+//				String componenttype = (String)result;
+				String componenttype = desc.getLocalType();
+		
+				synchronized(monitor)
 				{
-					for(int i=0; i<avatars.length; i++)
+//							String	componenttype = application.getComponentType(cid);
+					
+					// Possibly kill avatars of that component.
+					if(componenttype!=null && avatarmappings.getCollection(componenttype)!=null)
 					{
-						String avatartype = avatars[i].getType();
-						AvatarMapping mapping = getAvatarMapping(componenttype, avatartype);
-						
-						if(mapping!=null && mapping.isKillAvatar())
+						ISpaceObject[] avatars = getAvatars(desc);
+						if(avatars!=null)
 						{
-							destroySpaceObject(avatars[i].getId());
+							for(int i=0; i<avatars.length; i++)
+							{
+								String avatartype = avatars[i].getType();
+								AvatarMapping mapping = getAvatarMapping(componenttype, avatartype);
+								
+								if(mapping!=null && mapping.isKillAvatar())
+								{
+									destroySpaceObject(avatars[i].getId());
+								}
+							}
+						}
+					}
+					
+					if(perceptgenerators!=null)
+					{
+						for(Iterator it=perceptgenerators.keySet().iterator(); it.hasNext(); )
+						{
+							IPerceptGenerator gen = (IPerceptGenerator)perceptgenerators.get(it.next());
+							gen.componentRemoved(desc, AbstractEnvironmentSpace.this);
 						}
 					}
 				}
-			}
-			
-			if(perceptgenerators!=null)
-			{
-				for(Iterator it=perceptgenerators.keySet().iterator(); it.hasNext(); )
-				{
-					IPerceptGenerator gen = (IPerceptGenerator)perceptgenerators.get(it.next());
-					gen.componentRemoved(aid, this);
-				}
-			}
-		}
+//			}
+//		});
 		
 		// Remove the owned object too?
 	}
 		
 	/**
+	 * 
+	 */
+	protected IFuture getComponentType(final IComponentIdentifier cid)
+	{
+		final Future ret = new Future();
+		SServiceProvider.getService(getExternalAccess().getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				IComponentManagementService cms = (IComponentManagementService)result;
+				cms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						IExternalAccess exta = (IExternalAccess)result;
+						String componenttype = exta.getLocalType();
+						ret.setResult(componenttype);
+					}
+				});
+			}
+		});
+		return ret;
+	}
+	
+	/**
 	 *  Get the context.
 	 *  @return The context.
 	 */
-	public IApplication getContext()
+	public IExternalAccess getExternalAccess()
 	{
-		return application;
+		return ia.getExternalAccess();
 	}
 	
 	/**

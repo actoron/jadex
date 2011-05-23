@@ -4,6 +4,7 @@ import jadex.application.space.envsupport.dataview.IDataView;
 import jadex.application.space.envsupport.environment.ComponentActionList.ActionEntry;
 import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -86,7 +87,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	public void start()
 	{
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
-		final IServiceProvider provider	= space.getContext().getServiceContainer();
+		final IServiceProvider provider	= space.getExternalAccess().getServiceProvider();
 
 		SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
@@ -110,13 +111,13 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 							
 							if(entries.length>0)
 							{
-								IComponentIdentifier	actor	= entry.parameters!=null ?
-									(IComponentIdentifier)entry.parameters.get(ISpaceAction.ACTOR_ID) : null;
+								IComponentDescription actor	= entry.parameters!=null ?
+									(IComponentDescription)entry.parameters.get(ISpaceAction.ACTOR_ID) : null;
 								
 								for(int i=0; actor!=null && i<entries.length; i++)
 								{
-									IComponentIdentifier	actor2	= entries[i].parameters!=null ?
-										(IComponentIdentifier)entries[i].parameters.get(ISpaceAction.ACTOR_ID) : null;
+									IComponentDescription actor2 = entries[i].parameters!=null ?
+										(IComponentDescription)entries[i].parameters.get(ISpaceAction.ACTOR_ID) : null;
 									if(actor.equals(actor2))
 									{
 		//								System.out.println("Removing duplicate action: "+entries[i]);
@@ -209,7 +210,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 									RoundBasedExecutor.this.currenttime = currenttime;
 									try
 									{
-										space.getContext().scheduleStep(step);
+										space.getExternalAccess().scheduleStep(step);
 									}
 									catch(ComponentTerminatedException cte)
 									{

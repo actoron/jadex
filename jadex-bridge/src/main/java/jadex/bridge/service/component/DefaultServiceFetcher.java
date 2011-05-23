@@ -50,8 +50,15 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/** The result. */
 	protected Object result;
 	
-	//-------- methods --------
+	/**
+	 * 
+	 */
+	public DefaultServiceFetcher()
+	{
+	}
 	
+	//-------- methods --------
+
 	/**
 	 *  Get a required service.
 	 */
@@ -423,6 +430,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 					public void customResultAvailable(Object result)
 					{
 						IExternalAccess exta = (IExternalAccess)result;
+						System.out.println("exta: "+exta.getComponentIdentifier()+" "+binding.getComponentType());
 						exta.getChildren(binding.getComponentType()).addResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object result)

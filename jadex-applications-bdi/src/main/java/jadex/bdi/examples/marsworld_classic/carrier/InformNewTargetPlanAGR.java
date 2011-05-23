@@ -1,6 +1,5 @@
 package jadex.bdi.examples.marsworld_classic.carrier;
 
-import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.agr.AGRSpace;
 import jadex.application.space.agr.Group;
 import jadex.base.fipa.SFipa;
@@ -8,6 +7,7 @@ import jadex.bdi.examples.marsworld_classic.Target;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.SUtil;
 
 /**
@@ -42,8 +42,8 @@ public class InformNewTargetPlanAGR extends Plan
 	{
 		//System.out.println("Informing all sentry agents.");
 		
-		IApplicationExternalAccess app = (IApplicationExternalAccess)getScope().getParent();		
-		AGRSpace agrs = (AGRSpace)app.getSpace("myagrspace");
+		AGRSpace agrs = (AGRSpace)((IExternalAccess)getScope().getParent()).getExtension("myagrspace").get(this);
+
 		Group group = agrs.getGroup("mymarsteam");
 		IComponentIdentifier[]	sentries	= group.getAgentsForRole("sentry");
 		

@@ -12,14 +12,19 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IRemoteServiceManagementService;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.ServiceNotFoundException;
+import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.bridge.service.execution.IExecutionService;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.IRemotable;
@@ -33,6 +38,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.RemoteDelegationResultListener;
+import jadex.xml.annotation.XMLClassname;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -180,6 +186,61 @@ public abstract class ComponentManagementService extends BasicService implements
     //-------- IComponentManagementService interface --------
     
 	/**
+	 *  Load a component model.
+	 *  @param name The component name.
+	 *  @return The model info of the 
+	 */
+	public IFuture loadComponentModel(final String filename)
+	{
+		final Future ret = new Future();
+		
+		exta.scheduleStep(new IComponentStep()
+		{
+			@XMLClassname("loadModel")
+			public Object execute(final IInternalAccess ia)
+			{
+				final Future ret = new Future();
+				
+				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						final ILibraryService ls = (ILibraryService)result;
+						
+						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(filename, null, ls.getClassLoader()))
+							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+						{
+							public void customResultAvailable(Object result)
+							{
+								IComponentFactory fac = (IComponentFactory)result;
+								fac.loadModel(filename, null, ls.getClassLoader())
+									.addResultListener(new DelegationResultListener(ret));
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								if(exception instanceof ServiceNotFoundException)
+								{
+									ret.setResult(null);
+								}
+								else
+								{
+									super.exceptionOccurred(exception);
+								}
+							}
+						}));
+					}
+				}));
+				
+				return ret;
+			}
+		}).addResultListener(new DelegationResultListener(ret));
+		
+		return ret;
+	}
+	
+	/**
 	 *  Create a new component on the platform.
 	 *  @param name The component name.
 	 *  @param model The model identifier (e.g. file name).
@@ -187,11 +248,32 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param listener The result listener (if any). Will receive the id of the component as result, when the component has been created.
 	 *  @param killlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 */
-	public IFuture createComponent(final String name, final String model, CreationInfo info, final IResultListener killlistener)
+	public IFuture createComponent(final String name, String modelname, CreationInfo info, final IResultListener killlistener)
 	{				
 		final Future inited = new Future();
 		
 		final CreationInfo cinfo = info!=null? info: new CreationInfo();	// Dummy default info, if null.
+		
+		if(modelname==null)
+			modelname = cinfo.getLocalType();
+		
+		String filename = null;
+		if(cinfo.getParent()!=null)
+		{
+			IComponentAdapter pad = getParentAdapter(cinfo);
+			IExternalAccess parent = getComponentInstance(pad).getExternalAccess();
+			SubcomponentTypeInfo[] subcomps = parent.getModel().getSubcomponentTypes();
+			for(int i=0; i<subcomps.length; i++)
+			{
+				if(subcomps[i].getName().equals(modelname))
+				{
+					filename = subcomps[i].getFilename();
+					cinfo.setLocalType(modelname);
+					break;
+				}
+			}
+		}
+		final String model = filename!=null? filename: modelname;
 		
 		if(cinfo.getParent()!=null && isRemoteComponent(cinfo.getParent()))
 		{
@@ -286,12 +368,13 @@ public abstract class ComponentManagementService extends BasicService implements
 													{
 														cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName(), paname);
 													}
+													initinfos.put(cid, new Object[0]);
 												}
 												
 												Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
 												Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
 												Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
-												final CMSComponentDescription ad = new CMSComponentDescription(cid, type, master, daemon, autosd, lmodel.getFullName());
+												final CMSComponentDescription ad = new CMSComponentDescription(cid, type, master, daemon, autosd, lmodel.getFullName(), cinfo.getLocalType());
 												
 												logger.info("Starting component: "+cid.getName());
 		//										System.err.println("Pre-Init: "+cid);
@@ -493,6 +576,7 @@ public abstract class ComponentManagementService extends BasicService implements
 														synchronized(adapters)
 														{
 															// 0: description, 1: adapter, 2: creation info, 3: model, 4: initfuture
+//															System.out.println("infos: "+ad.getName());
 															initinfos.put(cid, new Object[]{ad, comp[1], cinfo, lmodel, future});
 														}
 														
@@ -670,7 +754,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	}
 
 	/**
-	 *  Get the adapter of the parent component.
+	 *  Get the info of the parent component.
 	 */
 	protected Object[] getParentInfo(CreationInfo cinfo)
 	{
@@ -678,7 +762,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		Object[] ret;
 		synchronized(adapters)
 		{
-			ret = (Object[])initinfos.get(paid);
+			ret = getInitInfo(paid);
 		}
 		return ret;
 	}
@@ -808,7 +892,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				logger.info("Terminating component structure: "+cid.getName());
 				synchronized(adapters)
 				{
-					Object[] infos = (Object[])initinfos.get(cid);
+					Object[] infos = getInitInfo(cid);
 					if(infos!=null)
 					{
 						IComponentAdapter adap = (IComponentAdapter)infos[1];
@@ -1043,7 +1127,7 @@ public abstract class ComponentManagementService extends BasicService implements
 							// Hack for startup.
 							boolean suspend = false;
 							Object[] ii = (Object[])initinfos.remove(cid);
-							if(ii!=null)
+							if(ii!=null && ii.length>0)
 							{
 								CreationInfo cinfo = (CreationInfo)ii[2];
 								IModelInfo lmodel = (IModelInfo)ii[3];
@@ -1422,13 +1506,16 @@ public abstract class ComponentManagementService extends BasicService implements
 		}
 		else
 		{
-			IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
-			if(adapter==null)
+			IComponentAdapter adapter = null;
+			synchronized(adapters)
 			{
-				// Hack? Allows components to getExternalAccess in init phase
-				Object[] ii = (Object[])initinfos.get(cid);
-				if(ii!=null)
+				adapter = (IComponentAdapter)adapters.get(cid);
+				if(adapter==null)
+				{
+					// Hack? Allows components to getExternalAccess in init phase
+					Object[] ii = getInitInfo(cid);
 					adapter = (IComponentAdapter)ii[1];
+				}
 			}
 			
 			if(adapter==null)
@@ -1735,9 +1822,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	 * @param parent The parent.
 	 * @return The component description.
 	 */
-	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type, String modelname)
+	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type, String modelname, String localtype)
 	{
-		CMSComponentDescription	ret	= new CMSComponentDescription(id, type, null, null, null, modelname);
+		CMSComponentDescription	ret	= new CMSComponentDescription(id, type, null, null, null, modelname, localtype);
 		ret.setState(state);
 		ret.setOwnership(ownership);
 		return ret;
@@ -1775,9 +1862,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				// Hack, to retrieve description from component itself in init phase
 				if(desc==null)
 				{
-					Object[] ii= (Object[])initinfos.get(cid);
-					if(ii!=null)
-						desc = (IComponentDescription)ii[0];
+					Object[] ii= getInitInfo(cid);
 				}
 				
 				// Todo: addresses required for communication across platforms.
@@ -2481,6 +2566,17 @@ public abstract class ComponentManagementService extends BasicService implements
 					.addResultListener(new DelegationResultListener(ret));
 			}
 		});
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected Object[] getInitInfo(IComponentIdentifier cid)
+	{
+		Object[] ret = (Object[])initinfos.get(cid);
+		if(ret!=null && ret.length==0)
+			ret = null;
 		return ret;
 	}
 }

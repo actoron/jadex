@@ -87,6 +87,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	/** The service fetcher. */
 	protected IValueFetcher fetcher;
 	
+	/** The extensions. */
+	protected Map extensions;
+	
 	//-------- constructors --------
 	
 	/**
@@ -323,6 +326,16 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	public boolean isAtBreakpoint(String[] breakpoints)
 	{
 		return microagent.isAtBreakpoint(breakpoints);
+	}
+	
+	/**
+	 *  Get a space of the application.
+	 *  @param name	The name of the space.
+	 *  @return	The space.
+	 */
+	public Object getExtension(final String name)
+	{
+		return extensions==null? null: extensions.get(name);
 	}
 	
 	//-------- helpers --------
@@ -585,34 +598,13 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	}
 	
 	/**
-	 *  Notify the component listeners.
+	 *  Get the component listeners.
+	 *  @return The component listeners.
 	 */
-	public void notifyListeners(IComponentChangeEvent event)
+	public IComponentListener[] getComponentListeners()
 	{
-		if(componentlisteners!=null)
-		{
-			IComponentListener[] lstnrs = (IComponentListener[])componentlisteners.toArray(new IComponentListener[componentlisteners.size()]);
-			for(int i=0; i<lstnrs.length; i++)
-			{
-				final IComponentListener lis = lstnrs[i];
-				
-				if(lis.getFilter().filter(event))
-				{
-					lis.eventOccured(event).addResultListener(new IResultListener()
-					{
-						public void resultAvailable(Object result)
-						{
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							//Print exception?
-							componentlisteners.remove(lis);
-						}
-					});
-				}
-			}
-		}
+		return componentlisteners==null? new IComponentListener[0]: 
+			(IComponentListener[])componentlisteners.toArray(new IComponentListener[componentlisteners.size()]);
 	}
 	
 	/**
@@ -804,25 +796,6 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	}
 	
 	/**
-	 *  Get the imports.
-	 *  @return The imports.
-	 */
-	public String[] getAllImports()
-	{
-//		if(imports==null)
-//		{
-//			List imp = new ArrayList();
-//			imp.add(microagent.getClass().getPackage().getName()+".*");
-//			
-//			// todo: http://stackoverflow.com/questions/3734825/find-out-which-classes-of-a-given-api-are-used
-//			
-//			imports = (String[])imp.toArray(new String[imp.size()]);
-//		}
-//		return imports;
-		return model.getModelInfo().getAllImports();
-	}
-	
-	/**
 	 *  Get the service bindings.
 	 */
 	public RequiredServiceBinding[] getServiceBindings()
@@ -880,7 +853,21 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		}
 		results.put(name, value);
 	}
-
+	
+	/**
+	 *  Add a default value for an argument (if not already present).
+	 *  Called once for each argument during init.
+	 *  @param name	The argument name.
+	 *  @param value	The argument value.
+	 */
+	public void	addExtension(String name, Object value)
+	{
+		if(extensions==null)
+		{
+			extensions = new HashMap();
+		}
+		extensions.put(name, value);
+	}
 
 	/**
 	 *  Get the internal access.

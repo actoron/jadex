@@ -1,6 +1,5 @@
 package jadex.bdi.examples.marsworld_classic.producer;
 
-import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.agr.AGRSpace;
 import jadex.application.space.agr.Group;
 import jadex.base.fipa.SFipa;
@@ -14,6 +13,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 
 /**
  *  The main plan for the Production Agent. <br>
@@ -81,9 +81,9 @@ public class ProductionPlanAGR extends Plan
 	 */
 	private void callCarryAgent(Target target)
 	{
-		IApplicationExternalAccess app = (IApplicationExternalAccess)getScope().getParent();		
-		AGRSpace agrspace = (AGRSpace)app.getSpace("myagrspace");
-		Group group = agrspace.getGroup("mymarsteam");
+		AGRSpace agrs = (AGRSpace)((IExternalAccess)getScope().getParent()).getExtension("myagrspace").get(this);
+
+		Group group = agrs.getGroup("mymarsteam");
 		IComponentIdentifier[]	carriers	= group.getAgentsForRole("carrier");
 		
 		if(carriers.length>0)

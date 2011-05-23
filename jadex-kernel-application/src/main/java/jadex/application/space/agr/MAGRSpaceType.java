@@ -1,6 +1,5 @@
 package jadex.application.space.agr;
 
-import jadex.application.model.MApplicationType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.model.MSpaceType;
 import jadex.commons.SReflect;
@@ -12,6 +11,7 @@ import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -120,17 +120,21 @@ public class MAGRSpaceType	extends MSpaceType
 			public Object postProcess(IContext context, Object object)
 			{
 				MSpaceInstance	si	= (MSpaceInstance)object;
-				MApplicationType	apptype	= (MApplicationType)context.getRootObject();
-				List spacetypes = apptype.getMSpaceTypes();
-				for(int i=0; i<spacetypes.size(); i++)
-				{
-					MSpaceType st = (MSpaceType)spacetypes.get(i);
-					if(st.getName().equals(si.getTypeName()))
-					{
-						si.setType(st);
-						break;
-					}
-				}
+				
+				// todo:
+				
+//				MApplicationType apptype	= (MApplicationType)context.getRootObject();
+//				List spacetypes = apptype.getMSpaceTypes();
+//				for(int i=0; i<spacetypes.size(); i++)
+//				{
+//					MSpaceType st = (MSpaceType)spacetypes.get(i);
+//					if(st.getName().equals(si.getTypeName()))
+//					{
+//						si.setType(st);
+//						break;
+//					}
+//				}
+				
 				return null;
 			}
 			

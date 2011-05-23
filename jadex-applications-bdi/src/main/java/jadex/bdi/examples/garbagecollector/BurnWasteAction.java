@@ -4,6 +4,7 @@ import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceAction;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Grid2D;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SimplePropertyObject;
 
@@ -26,7 +27,7 @@ public class BurnWasteAction extends SimplePropertyObject implements ISpaceActio
 		
 		Grid2D grid = (Grid2D)space;
 		
-		IComponentIdentifier owner = (IComponentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
+		IComponentDescription owner = (IComponentDescription)parameters.get(ISpaceAction.ACTOR_ID);
 		ISpaceObject so = grid.getAvatar(owner);
 		
 		assert so.getProperty("garbage")!=null;

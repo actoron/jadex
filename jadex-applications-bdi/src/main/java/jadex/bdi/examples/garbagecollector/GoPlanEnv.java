@@ -56,7 +56,7 @@ public class GoPlanEnv extends Plan
 			
 			Map params = new HashMap();
 			params.put(GoAction.DIRECTION, dir);
-			params.put(ISpaceAction.OBJECT_ID, env.getAvatar(getComponentIdentifier()).getId());
+			params.put(ISpaceAction.OBJECT_ID, env.getAvatar(getComponentDescription()).getId());
 			SyncResultListener srl	= new SyncResultListener();
 			env.performSpaceAction("go", params, srl); 
 			srl.waitForResult();

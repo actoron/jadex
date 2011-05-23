@@ -36,7 +36,7 @@ public class EatPlan extends Plan
 					fail();
 				SyncResultListener srl	= new SyncResultListener();
 				Map params = new HashMap();
-				params.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
+				params.put(ISpaceAction.ACTOR_ID, getComponentDescription());
 				params.put(MoveAction.PARAMETER_DIRECTION, move);
 				env.performSpaceAction("move", params, srl);
 				srl.waitForResult();
@@ -46,7 +46,7 @@ public class EatPlan extends Plan
 			// Eat food.
 			SyncResultListener srl	= new SyncResultListener();
 			Map params = new HashMap();
-			params.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
+			params.put(ISpaceAction.ACTOR_ID, getComponentDescription());
 			params.put(ISpaceAction.OBJECT_ID, food);
 			env.performSpaceAction("eat", params, srl);
 			srl.waitForResult();

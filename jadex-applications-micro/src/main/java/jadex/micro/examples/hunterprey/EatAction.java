@@ -5,6 +5,7 @@ import jadex.application.space.envsupport.environment.ISpaceAction;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Grid2D;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.SServiceProvider;
@@ -36,7 +37,7 @@ public class EatAction extends SimplePropertyObject implements ISpaceAction
 //		System.out.println("eat action: "+parameters);
 		
 		Grid2D grid = (Grid2D)space;
-		IComponentIdentifier owner = (IComponentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
+		IComponentDescription owner = (IComponentDescription)parameters.get(ISpaceAction.ACTOR_ID);
 		ISpaceObject avatar = grid.getAvatar(owner);
 		final ISpaceObject target = (ISpaceObject)parameters.get(ISpaceAction.OBJECT_ID);
 		
@@ -70,12 +71,12 @@ public class EatAction extends SimplePropertyObject implements ISpaceAction
 		if(target.getProperty(ISpaceObject.PROPERTY_OWNER)!=null)
 		{
 //			System.err.println("Destroying: "+target.getProperty(ISpaceObject.PROPERTY_OWNER));
-			SServiceProvider.getServiceUpwards(space.getContext().getServiceContainer(), IComponentManagementService.class).addResultListener(new IResultListener()
+			SServiceProvider.getServiceUpwards(space.getExternalAccess().getServiceProvider(), IComponentManagementService.class).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
 					IComponentManagementService cms = (IComponentManagementService)result;
-					cms.destroyComponent((IComponentIdentifier)target.getProperty(ISpaceObject.PROPERTY_OWNER));
+					cms.destroyComponent(((IComponentDescription)target.getProperty(ISpaceObject.PROPERTY_OWNER)).getName());
 				}
 				
 				public void exceptionOccurred(Exception exception)

@@ -3,6 +3,7 @@ package jadex.component;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
+import jadex.bridge.IComponentFactoryExtensionService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
@@ -12,15 +13,17 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
+import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.component.ComponentInterpreter;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -78,13 +81,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	public ComponentComponentFactory(String providerid)
 	{
 		super(providerid, IComponentFactory.class, null);
-		
-		// Todo: hack!!! make mappings configurable also for reflective constructor (how?)
 		this.loader = new ComponentModelLoader(new Set[0]);
-//		{
-//			MEnvSpaceType.getXMLMapping(),
-//			MAGRSpaceType.getXMLMapping()
-//		});
 	}
 	
 	/**
@@ -95,23 +92,25 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	public ComponentComponentFactory(Set[] mappings, IServiceProvider provider)
 	{
 		super(provider.getId(), IComponentFactory.class, null);
-		this.loader = new ComponentModelLoader(mappings);
 		this.provider = provider;
-		this.libservicelistener = new ILibraryServiceListener()
-		{
-			public IFuture urlRemoved(URL url)
-			{
-				loader.clearModelCache();
-				return IFuture.DONE;
-			}
-			
-			public IFuture urlAdded(URL url)
-			{
-				loader.clearModelCache();
-				return IFuture.DONE;
-			}
-		};
+//		this.loader = new ComponentModelLoader(mappings);
+//		this.libservicelistener = new ILibraryServiceListener()
+//		{
+//			public IFuture urlRemoved(URL url)
+//			{
+//				loader.clearModelCache();
+//				return IFuture.DONE;
+//			}
+//			
+//			public IFuture urlAdded(URL url)
+//			{
+//				loader.clearModelCache();
+//				return IFuture.DONE;
+//			}
+//		};
 	}
+
+	// todo: get mappings whenever changes to extension providers occur or on each load model?
 	
 	/**
 	 *  Start the service.
@@ -119,16 +118,66 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	public IFuture startService()
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new DelegationResultListener(ret)
+		super.startService().addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				ILibraryService libservice = (ILibraryService)result;
-				libservice.addLibraryServiceListener(libservicelistener);
-				ComponentComponentFactory.super.startService().addResultListener(new DelegationResultListener(ret));
+				SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						final ILibraryService libservice = (ILibraryService)result;
+						
+						SServiceProvider.getServices(provider, IComponentFactoryExtensionService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+							.addResultListener(new DelegationResultListener(ret)
+						{
+							public void customResultAvailable(Object result)
+							{
+								Collection fes = (Collection)result;
+								
+								CollectionResultListener lis = new CollectionResultListener(fes.size(), true, new DefaultResultListener()
+								{
+									public void resultAvailable(Object result)
+									{
+										Collection exts = (Collection)result;
+										Set[] mappings = (Set[])exts.toArray(new Set[exts.size()]);
+										
+										loader = new ComponentModelLoader(mappings);
+										
+										libservicelistener = new ILibraryServiceListener()
+										{
+											public IFuture urlRemoved(URL url)
+											{
+												loader.clearModelCache();
+												return IFuture.DONE;
+											}
+											
+											public IFuture urlAdded(URL url)
+											{
+												loader.clearModelCache();
+												return IFuture.DONE;
+											}
+										};
+										
+										libservice.addLibraryServiceListener(libservicelistener);
+
+										ret.setResult(null);
+									}
+								});
+								
+								for(Iterator it=fes.iterator(); it.hasNext(); )
+								{
+									IComponentFactoryExtensionService fex = (IComponentFactoryExtensionService)it.next();
+									fex.getExtension(FILETYPE_COMPONENT).addResultListener(lis);
+								}
+							}	
+						});
+					}
+				});
 			}
 		});
+		
 		return ret;
 	}
 	

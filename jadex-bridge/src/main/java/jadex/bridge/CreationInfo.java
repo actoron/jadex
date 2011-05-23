@@ -44,6 +44,9 @@ public class CreationInfo
 	/** The bindings. */
 	protected RequiredServiceBinding[] bindings;
 	
+	/** The local component type name. */
+	protected String localtype;
+	
 	//-------- constructors --------
 	
 	/**
@@ -367,5 +370,23 @@ public class CreationInfo
 	public void setRequiredServiceBindings(RequiredServiceBinding[] bindings)
 	{
 		this.bindings = bindings;
+	}
+
+	/**
+	 *  Get the localtype.
+	 *  @return the localtype.
+	 */
+	public String getLocalType()
+	{
+		return localtype;
+	}
+
+	/**
+	 *  Set the localtype.
+	 *  @param localtype The localtype to set.
+	 */
+	public void setLocalType(String localtype)
+	{
+		this.localtype = localtype;
 	}
 }

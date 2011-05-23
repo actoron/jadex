@@ -254,7 +254,7 @@ public class Starter
 							try
 							{
 								String ctype = (String)result;
-								final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, null, null, Boolean.TRUE, model.getFullName());
+								final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, null, null, Boolean.TRUE, model.getFullName(), null);
 								
 								String afclname = (String)cmdargs.get(ADAPTER_FACTORY)!=null? 
 									(String)cmdargs.get(ADAPTER_FACTORY): FALLBACK_ADAPTER_FACTORY;

@@ -19,6 +19,7 @@ import jadex.commons.future.IFuture;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
@@ -374,6 +375,26 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	 */
 	public IFuture getFileName(String ctype)
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
+	
+	/**
+	 *  Get a space of the application.
+	 *  @param name	The name of the space.
+	 *  @return	The space.
+	 */
+	public IFuture getExtension(final String name)
+	{
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Get the local type name of this component as defined in the parent.
+	 *  @return The type of this component type.
+	 */
+	public String getLocalType()
+	{
+		return null;
+	}
+	
 }

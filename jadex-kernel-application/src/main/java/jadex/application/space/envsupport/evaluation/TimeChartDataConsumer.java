@@ -1,6 +1,5 @@
 package jadex.application.space.envsupport.evaluation;
 
-import jadex.application.runtime.IApplication;
 import jadex.commons.ResourceInfo;
 
 import java.awt.Image;
@@ -72,9 +71,8 @@ public class TimeChartDataConsumer extends AbstractChartDataConsumer
 		{
 			try
 			{
-				IApplication app = getSpace().getContext();
-				ClassLoader cl = app.getApplicationType().getModelInfo().getClassLoader();
-				ResourceInfo rinfo = getResourceInfo(bgimagefn, app.getApplicationType().getAllImports(), cl);
+				ClassLoader cl = getSpace().getExternalAccess().getModel().getClassLoader();
+				ResourceInfo rinfo = getResourceInfo(bgimagefn, getSpace().getExternalAccess().getModel().getAllImports(), cl);
 				Image image = ImageIO.read(rinfo.getInputStream());
 				rinfo.getInputStream().close();
 				

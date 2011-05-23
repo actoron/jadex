@@ -1,6 +1,5 @@
 package jadex.bdi.examples.cleanerworld;
 
-import jadex.application.runtime.IApplication;
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.ISpaceProcess;
@@ -61,7 +60,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 	 *  @param clock	The clock.
 	 *  @param space	The space this process is running in.
 	 */
-	public void execute(IClockService clock, IEnvironmentSpace space)
+	public void execute(IClockService clock, final IEnvironmentSpace space)
 	{
 		ISpaceObject[] wastebins = space.getSpaceObjectsByType("wastebin");
 		
@@ -81,18 +80,18 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 			if(todo.size()>0)
 			{
 //				System.out.println("Creating garbage collection truck.");
-				final IApplication app = space.getContext();
+//				final IApplication app = space.getContext();
 				final Map params = new HashMap();
 				params.put("wastebins", todo.toArray());
 				ongoing.addAll(todo);
-				SServiceProvider.getServiceUpwards(app.getServiceContainer(), IComponentManagementService.class)
+				SServiceProvider.getServiceUpwards(space.getExternalAccess().getServiceProvider(), IComponentManagementService.class)
 					.addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
 						final IComponentManagementService cms	= (IComponentManagementService)result;
-						IFuture ret = cms.createComponent(null, app.getComponentFilename("Truck"),
-							new CreationInfo(null, params, app.getComponentIdentifier(), null, null, null, null, app.getAllImports(), null), null);
+						IFuture ret = cms.createComponent(null, "Truck",
+							new CreationInfo(null, params, space.getExternalAccess().getComponentIdentifier(), null, null, null, null, space.getExternalAccess().getModel().getAllImports(), null), null);
 						
 						IResultListener lis = new IResultListener()
 						{

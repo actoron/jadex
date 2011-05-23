@@ -1,13 +1,16 @@
 package jadex.kernelbase;
 
+import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
@@ -16,6 +19,7 @@ import jadex.bridge.RemoteComponentListener;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
@@ -44,8 +48,10 @@ import jadex.commons.future.IResultListener;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SJavaParser;
 
+import java.awt.event.ComponentEvent;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -57,6 +63,9 @@ import java.util.logging.Logger;
  */
 public abstract class AbstractInterpreter implements IComponentInstance
 {
+	/** Constant for step event. */
+	public static final String TYPE_COMPONENT = "component";
+	
 	//-------- interface methods --------
 	
 	/**
@@ -136,6 +145,9 @@ public abstract class AbstractInterpreter implements IComponentInstance
 	 */
 	public IFuture	componentCreated(final IComponentDescription desc, final IModelInfo model)
 	{
+//		System.out.println("created: "+desc.getName());
+		ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_COMPONENT, model.getFullName(), desc.getName().getName(), getComponentIdentifier(), desc);
+		notifyListeners(event);
 		return IFuture.DONE;
 	}
 	
@@ -147,8 +159,26 @@ public abstract class AbstractInterpreter implements IComponentInstance
 	 */
 	public IFuture	componentDestroyed(final IComponentDescription desc)
 	{
+//		System.out.println("destroyed: "+desc.getName());
+		ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_COMPONENT, desc.getModelName(), desc.getName().getName(), getComponentIdentifier(), desc);
+		notifyListeners(event);
 		return IFuture.DONE;
 	}
+	
+	/**
+	 *  Schedule a step of the component.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the component.
+	 *  @return The result of the step.
+	 */
+	public abstract IFuture scheduleStep(IComponentStep step);
+	
+	/**
+	 *  Get a space of the application.
+	 *  @param name	The name of the space.
+	 *  @return	The space.
+	 */
+	public abstract Object getExtension(final String name);
 
 	//-------- internally used methods --------
 	
@@ -163,12 +193,6 @@ public abstract class AbstractInterpreter implements IComponentInstance
 	 *  @return The model info.
 	 */
 	public abstract IModelInfo getModel();
-	
-	/**
-	 *  Get the imports.
-	 *  @return The imports.
-	 */
-	public abstract String[] getAllImports();
 	
 	/**
 	 *  Get the service bindings.
@@ -188,7 +212,7 @@ public abstract class AbstractInterpreter implements IComponentInstance
 	 *  @param name	The argument name.
 	 *  @param value	The argument value.
 	 */
-	public abstract void	addDefaultArgument(String name, Object value);
+	public abstract void addDefaultArgument(String name, Object value);
 
 	/**
 	 *  Add a default value for a result (if not already present).
@@ -196,14 +220,33 @@ public abstract class AbstractInterpreter implements IComponentInstance
 	 *  @param name	The result name.
 	 *  @param value	The result value.
 	 */
-	public abstract void	addDefaultResult(String name, Object value);
+	public abstract void addDefaultResult(String name, Object value);
 
 	/**
 	 *  Get the internal access.
 	 *  @return The internal access.
 	 */
 	public abstract IInternalAccess getInternalAccess();
-
+	
+	/**
+	 *  Add an extension instance.
+	 *  @param extension The extension instance.
+	 */
+	public abstract void addExtension(String name, Object extension);
+	
+	/**
+	 *  Get the component listeners.
+	 *  @return The component listeners.
+	 */
+	public abstract IComponentListener[] getComponentListeners();
+	
+	/**
+	 *  Remove component listener.
+	 */
+	public abstract IFuture removeComponentListener(IComponentListener listener);
+	
+	//-------- methods --------
+	
 	/**
 	 *  Main init method consists of the following steps:
 	 *  - init arguments and results
@@ -230,13 +273,20 @@ public abstract class AbstractInterpreter implements IComponentInstance
 						{
 							public void customResultAvailable(Object result)
 							{
-								initComponents(model, config).addResultListener(
+								initExtensions(model, config).addResultListener(
 									createResultListener(new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(Object result)
 									{
-										super.customResultAvailable(new Object[]{AbstractInterpreter.this, getComponentAdapter()});
-									}		
+										initComponents(model, config).addResultListener(
+												createResultListener(new DelegationResultListener(ret)
+											{
+												public void customResultAvailable(Object result)
+												{
+													super.customResultAvailable(new Object[]{AbstractInterpreter.this, getComponentAdapter()});
+												}		
+											}));
+										}
 								}));
 							}
 						}));
@@ -297,7 +347,7 @@ public abstract class AbstractInterpreter implements IComponentInstance
 						if(impl.getExpression()!=null)
 						{
 							// todo: other Class imports, how can be found out?
-							ser = SJavaParser.evaluateExpression(impl.getExpression(), getAllImports(), getFetcher(), model.getClassLoader());
+							ser = SJavaParser.evaluateExpression(impl.getExpression(), model.getAllImports(), getFetcher(), model.getClassLoader());
 							
 	//						System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
 						}
@@ -352,7 +402,7 @@ public abstract class AbstractInterpreter implements IComponentInstance
 				if(value instanceof UnparsedExpression)
 				{
 					final UnparsedExpression unexp = (UnparsedExpression)value;
-					final Object val = SJavaParser.evaluateExpression(unexp.getValue(), getAllImports(), getFetcher(), getClassLoader());
+					final Object val = SJavaParser.evaluateExpression(unexp.getValue(), getModel().getAllImports(), getFetcher(), getClassLoader());
 					if(unexp.getClazz()!=null && SReflect.isSupertype(IFuture.class, unexp.getClazz()))
 					{
 //						System.out.println("Future property: "+mexp.getName()+", "+val);
@@ -438,6 +488,47 @@ public abstract class AbstractInterpreter implements IComponentInstance
 					createComponent(components, ces, 0, ret);
 				}
 			}));
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Init the extensions.
+	 */
+	public IFuture initExtensions(IModelInfo model, String config)
+	{
+		final Future ret = new Future();
+		
+		if(config!=null)
+		{
+			ConfigurationInfo conf = model.getConfiguration(config);
+			IExtensionInstance[] exts = conf.getExtensions();
+			
+			CollectionResultListener lis = new CollectionResultListener(exts.length, true, new DelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+					Collection res = (Collection)result;
+					
+					for(Iterator it = res.iterator(); it.hasNext(); )
+					{
+						Object[] ext = (Object[])it.next();
+						addExtension((String)ext[0], ext[1]);
+					}
+					
+					super.customResultAvailable(null);
+				}
+			});
+			
+			for(int i=0; i<exts.length; i++)
+			{
+				exts[i].init(getInternalAccess(), getFetcher()).addResultListener(lis);	
+			}
 		}
 		else
 		{
@@ -567,6 +658,24 @@ public abstract class AbstractInterpreter implements IComponentInstance
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Get the local type name of this component as defined in the parent.
+	 *  @return The type of this component type.
+	 */
+	public String getLocalType()
+	{
+		return getComponentAdapter().getDescription().getLocalType();
+	}
+	
+	/**
+	 *  Get the component description.
+	 *  @return The component description.
+	 */
+	public IComponentDescription getComponentDescription()
+	{
+		return getComponentAdapter().getDescription();
+	}
 		
 	/**
 	 *  Create a result listener which is executed as an component step.
@@ -645,9 +754,9 @@ public abstract class AbstractInterpreter implements IComponentInstance
 					Boolean	daemon = components[i].getDaemon()!=null ? components[i].getDaemon() : type.getDaemon();
 					Boolean	autoshutdown = components[i].getAutoShutdown()!=null ? components[i].getAutoShutdown() : type.getAutoShutdown();
 					RequiredServiceBinding[] bindings = components[i].getBindings();
-					IFuture ret = cms.createComponent(components[i].getName(), type.getFilename(),
+					IFuture ret = cms.createComponent(components[i].getName(), type.getName(),
 						new CreationInfo(components[i].getConfiguration(), getArguments(components[i]), getComponentAdapter().getComponentIdentifier(),
-						suspend, master, daemon, autoshutdown, getAllImports(), bindings), null);
+						suspend, master, daemon, autoshutdown, getModel().getAllImports(), bindings), null);
 					ret.addResultListener(crl);
 				}
 				else
@@ -691,7 +800,7 @@ public abstract class AbstractInterpreter implements IComponentInstance
 			for(int i=0; i<arguments.length; i++)
 			{
 				// todo: language
-				Object val = SJavaParser.evaluateExpression(arguments[i].getValue(), getAllImports(), getFetcher(), getClassLoader());
+				Object val = SJavaParser.evaluateExpression(arguments[i].getValue(), getModel().getAllImports(), getFetcher(), getClassLoader());
 				ret.put(arguments[i].getName(), val);
 			}
 		}
@@ -705,7 +814,7 @@ public abstract class AbstractInterpreter implements IComponentInstance
 	 */
 	public int getNumber(ComponentInstanceInfo component)
 	{
-		Object val = component.getNumber()!=null? SJavaParser.evaluateExpression(component.getNumber(), getAllImports(), getFetcher(), getClassLoader()): null;
+		Object val = component.getNumber()!=null? SJavaParser.evaluateExpression(component.getNumber(), getModel().getAllImports(), getFetcher(), getClassLoader()): null;
 		return val instanceof Integer? ((Integer)val).intValue(): 1;
 	}
 
@@ -798,5 +907,88 @@ public abstract class AbstractInterpreter implements IComponentInstance
 		
 //		System.out.println("cl: "+componentlisteners);
 		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren(final String type)
+	{
+		final Future ret = new Future();
+		final String filename = getComponentFilename(type);
+		
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(createResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				IComponentManagementService cms = (IComponentManagementService)result;
+				cms.loadComponentModel(filename).addResultListener(createResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						IModelInfo model = (IModelInfo)result;
+						final String modelname = model.getFullName();
+					
+						getChildren().addResultListener(createResultListener(new DelegationResultListener(ret)
+						{
+							public void customResultAvailable(Object result)
+							{
+								Collection col = (Collection)result;
+								List res = new ArrayList();
+								for(Iterator it=col.iterator(); it.hasNext(); )
+								{
+									IExternalAccess subcomp = (IExternalAccess)it.next();
+									if(modelname.equals(subcomp.getModel().getFullName()))
+									{
+										res.add(subcomp.getComponentIdentifier());
+									}
+								}
+								super.customResultAvailable(res);
+							}
+						}));
+					}
+				}));
+			}	
+		}));
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren()
+	{
+		return getComponentAdapter().getChildrenAccesses();
+	}
+	
+	/**
+	 *  Notify the component listeners.
+	 */
+	public void notifyListeners(IComponentChangeEvent event)
+	{
+		IComponentListener[] componentlisteners = getComponentListeners();
+		for(int i=0; i<componentlisteners.length; i++)
+		{
+			final IComponentListener lis = componentlisteners[i];
+			if(lis.getFilter().filter(event))
+			{
+				lis.eventOccured(event).addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						//Print exception?
+						removeComponentListener(lis);
+					}
+				});
+			}
+		}
 	}
 }

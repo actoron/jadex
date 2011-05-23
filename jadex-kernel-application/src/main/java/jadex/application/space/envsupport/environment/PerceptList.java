@@ -1,5 +1,6 @@
 package jadex.application.space.envsupport.environment;
 
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IFilter;
 
@@ -46,7 +47,7 @@ public class PerceptList
 	 *  @param avatar	The avatar of the component (if any).
 	 *  @param processor	The percept processor.
 	 */
-	public void schedulePercept(String type, Object data, IComponentIdentifier component, ISpaceObject avatar, IPerceptProcessor processor)
+	public void schedulePercept(String type, Object data, IComponentDescription component, ISpaceObject avatar, IPerceptProcessor processor)
 	{
 		if(percepts==null)
 			percepts	= new LinkedHashSet();
@@ -122,7 +123,7 @@ public class PerceptList
 		public Object	data;
 		
 		/** The receiving component. */
-		public IComponentIdentifier	component;
+		public IComponentDescription	component;
 		
 		/** The avatar of the component (if any). */
 		public ISpaceObject	avatar;
@@ -135,7 +136,7 @@ public class PerceptList
 		/**
 		 *  Convenience constructor for inline entry creation.
 		 */
-		public PerceptEntry(String type, Object data, IComponentIdentifier component, ISpaceObject avatar, IPerceptProcessor processor)
+		public PerceptEntry(String type, Object data, IComponentDescription component, ISpaceObject avatar, IPerceptProcessor processor)
 		{
 			this.type	= type;
 			this.data	= data;

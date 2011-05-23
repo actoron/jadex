@@ -1,6 +1,5 @@
 package jadex.bdi.examples.marsworld.sentry;
 
-import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.agr.AGRSpace;
 import jadex.application.space.agr.Group;
 import jadex.application.space.envsupport.environment.AbstractTask;
@@ -14,6 +13,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,7 +69,8 @@ public class AnalyzeTargetPlan extends Plan
 	{
 //		System.out.println("Calling some Production Agent...");
 
-		AGRSpace agrs = (AGRSpace)((IApplicationExternalAccess)getScope().getParent()).getSpace("myagrspace");
+		AGRSpace agrs = (AGRSpace)((IExternalAccess)getScope().getParent()).getExtension("myagrspace").get(this);
+
 		Group group = agrs.getGroup("mymarsteam");
 		IComponentIdentifier[]	producers	= group.getAgentsForRole("producer");
 

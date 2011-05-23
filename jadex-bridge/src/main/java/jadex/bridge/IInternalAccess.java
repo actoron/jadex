@@ -86,6 +86,13 @@ public interface IInternalAccess
 	 */
 	public IFuture removeComponentListener(IComponentListener listener);
 	
+//	/**
+//	 *  Get the model name of a component type.
+//	 *  @param ctype The component type.
+//	 *  @return The model name of this component type.
+//	 */
+//	public IFuture getFileName(String ctype);
+	
 	/**
 	 *  Wait for some time and execute a component step afterwards.
 	 */

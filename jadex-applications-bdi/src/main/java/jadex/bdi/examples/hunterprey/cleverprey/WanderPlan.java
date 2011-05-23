@@ -42,7 +42,7 @@ public class WanderPlan extends Plan
 			{
 				SyncResultListener srl	= new SyncResultListener();
 				Map params = new HashMap();
-				params.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
+				params.put(ISpaceAction.ACTOR_ID, getComponentDescription());
 				params.put(MoveAction.PARAMETER_DIRECTION, lastdir);
 				env.performSpaceAction("move", params, srl);
 				srl.waitForResult();

@@ -1,9 +1,10 @@
 
 package jadex.application.space.envsupport.environment;
 
-import jadex.application.runtime.IApplication;
 import jadex.application.space.envsupport.dataview.IDataView;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.IPropertyObject;
 import jadex.commons.future.IResultListener;
 import jadex.commons.meta.IPropertyMetaDataSet;
@@ -23,10 +24,9 @@ public interface IEnvironmentSpace extends IPropertyObject
 	public String getName();*/
 	
 	/**
-	 *  Get the context of the space.
+	 *  Get the component of the space.
 	 */
-	// hack???
-	public IApplication	getContext();
+	public IExternalAccess	getExternalAccess();
 	
 	/**
 	 *  Add a space percept type.
@@ -219,19 +219,19 @@ public interface IEnvironmentSpace extends IPropertyObject
 	 *  @param id The object id.
 	 *  @param owner The object owner.
 	 */
-	public void setOwner(Object id, IComponentIdentifier owner);
+	public void setOwner(Object id, IComponentDescription owner);
 	
 	/**
 	 *  Get the owned objects.
 	 *  @return The owned objects. 
 	 */
-	public ISpaceObject[] getAvatars(IComponentIdentifier owner);
+	public ISpaceObject[] getAvatars(IComponentDescription owner);
 	
 	/**
 	 *  Get the avatar.
 	 *  @return The avatar. 
 	 */
-	public ISpaceObject getAvatar(IComponentIdentifier owner);
+	public ISpaceObject getAvatar(IComponentDescription owner);
 	
 	/**
 	 * Adds a dataview to the space.

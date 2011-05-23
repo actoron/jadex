@@ -667,7 +667,7 @@ public class ObserverCenter
 		{
 			if(delay==-1)
 			{
-				SServiceProvider.getService(space.getContext().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(space.getExternalAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object result)
@@ -680,7 +680,7 @@ public class ObserverCenter
 			}
 			else if(delay==0)
 			{
-				SServiceProvider.getService(space.getContext().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(space.getExternalAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object result)
@@ -693,7 +693,7 @@ public class ObserverCenter
 			}
 			else
 			{
-				SServiceProvider.getService(space.getContext().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(space.getExternalAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object result)
@@ -723,13 +723,13 @@ public class ObserverCenter
 			dispose();
 			if(killonexit)
 			{
-				SServiceProvider.getServiceUpwards(space.getContext().getServiceContainer(), IComponentManagementService.class)
+				SServiceProvider.getServiceUpwards(space.getExternalAccess().getServiceProvider(), IComponentManagementService.class)
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object result)
 					{
 						IComponentManagementService	cms = (IComponentManagementService)result;
-						cms.destroyComponent(space.getContext().getComponentIdentifier());
+						cms.destroyComponent(space.getExternalAccess().getComponentIdentifier());
 					}
 				});
 			}
@@ -768,7 +768,7 @@ public class ObserverCenter
 		
 		if(clocklistener != null)
 		{
-			SServiceProvider.getService(space.getContext().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(space.getExternalAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDefaultResultListener(mainwindow)
 			{
 				public void customResultAvailable(Object result)

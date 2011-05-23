@@ -171,6 +171,9 @@
 				$component.getServiceProvider()
 			)		
 		</providedservice> -->
+		<providedservice class="IComponentFactoryExtensionService">
+			<implementation class="EnvSupportExtensionService"/>
+		</providedservice>
 		
 		<requiredservice name="factoryservices" class="IComponentFactory" multiple="true"/>
 	</services>

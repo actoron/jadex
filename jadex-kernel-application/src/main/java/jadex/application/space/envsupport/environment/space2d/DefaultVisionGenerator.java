@@ -9,7 +9,7 @@ import jadex.application.space.envsupport.environment.PerceptType;
 import jadex.application.space.envsupport.math.IVector1;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Double;
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentDescription;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.collection.MultiCollection;
 
@@ -67,7 +67,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 	 *  @param component The component identifier.
 	 *  @param space The space.
 	 */
-	public void componentAdded(IComponentIdentifier component, IEnvironmentSpace space)
+	public void componentAdded(IComponentDescription component, IEnvironmentSpace space)
 	{
 	}
 	
@@ -76,7 +76,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 	 *  @param component The component identifier.
 	 *  @param space The space.
 	 */
-	public void componentRemoved(IComponentIdentifier component, IEnvironmentSpace space)
+	public void componentRemoved(IComponentDescription component, IEnvironmentSpace space)
 	{
 	}
 	
@@ -92,7 +92,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 		IVector1 maxrange = getDefaultRange();
 		
 		IVector2 pos = (IVector2)event.getSpaceObject().getProperty(Space2D.PROPERTY_POSITION);
-		IComponentIdentifier eventowner	= (IComponentIdentifier)event.getSpaceObject().getProperty(ISpaceObject.PROPERTY_OWNER);
+		IComponentDescription eventowner	= (IComponentDescription)event.getSpaceObject().getProperty(ISpaceObject.PROPERTY_OWNER);
 
 		if(EnvironmentEvent.OBJECT_PROPERTY_CHANGED.equals(event.getType()) && Space2D.PROPERTY_POSITION.equals(event.getProperty()))
 		{
@@ -104,7 +104,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 			for(int i=0; i<objects.length; i++)
 			{
 				IVector2 objpos = (IVector2)objects[i].getProperty(Space2D.PROPERTY_POSITION);
-				IComponentIdentifier owner = (IComponentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
+				IComponentDescription owner = (IComponentDescription)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 
 				// Create event for component that is seen by moving component.
 				if(owner!=null)
@@ -112,7 +112,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 					if((oldpos==null || space.getDistance(oldpos, objpos).greater(getRange(objects[i])))
 						&& !space.getDistance(pos, objpos).greater(getRange(objects[i])))
 					{
-						String percepttype = getPerceptType(space, event.getSpace().getContext().getComponentType(owner), event.getSpaceObject().getType(), APPEARED);
+						String percepttype = getPerceptType(space, owner.getLocalType(), event.getSpaceObject().getType(), APPEARED);
 						if(percepttype!=null)
 							((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, event.getSpaceObject(), owner, objects[i]);
 					}
@@ -124,7 +124,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 					if((oldpos==null || space.getDistance(oldpos, objpos).greater(getRange(event.getSpaceObject())))
 						&& !space.getDistance(pos, objpos).greater(getRange(event.getSpaceObject())))
 					{
-						String percepttype = getPerceptType(space, event.getSpace().getContext().getComponentType(eventowner), objects[i].getType(), APPEARED);
+						String percepttype = getPerceptType(space, eventowner.getLocalType(), objects[i].getType(), APPEARED);
 						if(percepttype!=null)
 							((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, objects[i], eventowner, event.getSpaceObject());
 					}
@@ -136,7 +136,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 					if(oldpos!=null && !space.getDistance(oldpos, objpos).greater(getRange(objects[i]))
 						&& !space.getDistance(pos, objpos).greater(getRange(objects[i])))
 					{
-						String percepttype = getPerceptType(space, event.getSpace().getContext().getComponentType(owner), event.getSpaceObject().getType(), MOVED);
+						String percepttype = getPerceptType(space, owner.getLocalType(), event.getSpaceObject().getType(), MOVED);
 						if(percepttype!=null)
 							((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, event.getSpaceObject(), owner, objects[i]);
 					}
@@ -146,7 +146,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 			// Objects, which were previously seen, but are no longer in range.
 			for(int i=0; i<oldobjects.length; i++)
 			{
-				IComponentIdentifier owner = (IComponentIdentifier)oldobjects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
+				IComponentDescription owner = (IComponentDescription)oldobjects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 				IVector2 objpos = (IVector2)oldobjects[i].getProperty(Space2D.PROPERTY_POSITION);
 
 				if(owner!=null)
@@ -154,7 +154,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 					if(!space.getDistance(oldpos, objpos).greater(getRange(oldobjects[i]))
 						&& (pos==null || space.getDistance(pos, objpos).greater(getRange(oldobjects[i]))))
 					{
-						String percepttype = getPerceptType(space, event.getSpace().getContext().getComponentType(owner), event.getSpaceObject().getType(), DISAPPEARED);
+						String percepttype = getPerceptType(space, owner.getLocalType(), event.getSpaceObject().getType(), DISAPPEARED);
 						if(percepttype!=null)
 							((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, event.getSpaceObject(), owner, oldobjects[i]);
 					}
@@ -165,7 +165,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 					if(!space.getDistance(oldpos, objpos).greater(getRange(event.getSpaceObject()))
 						&& (pos==null || space.getDistance(pos, objpos).greater(getRange(event.getSpaceObject()))))
 					{
-						String percepttype = getPerceptType(space, event.getSpace().getContext().getComponentType(eventowner), oldobjects[i].getType(), DISAPPEARED);
+						String percepttype = getPerceptType(space, eventowner.getLocalType(), oldobjects[i].getType(), DISAPPEARED);
 						if(percepttype!=null)
 							((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, oldobjects[i], eventowner, event.getSpaceObject());
 					}
@@ -181,13 +181,13 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 				// Post appearance for object itself (if component) as well as all components in vision range
 				for(int i=0; i<objects.length; i++)
 				{
-					IComponentIdentifier owner = (IComponentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
+					IComponentDescription owner = (IComponentDescription)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 					IVector2 objpos = (IVector2)objects[i].getProperty(Space2D.PROPERTY_POSITION);
 					if(owner!=null)
 					{
 						if(!space.getDistance(pos, objpos).greater(getRange(objects[i])))
 						{
-							String percepttype = getPerceptType(space, event.getSpace().getContext().getComponentType(owner), event.getSpaceObject().getType(), CREATED);
+							String percepttype = getPerceptType(space, owner.getLocalType(), event.getSpaceObject().getType(), CREATED);
 							if(percepttype!=null)
 								((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, event.getSpaceObject(), owner, objects[i]);
 						}
@@ -197,7 +197,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 					{
 						if(!space.getDistance(pos, objpos).greater(getRange(event.getSpaceObject())))
 						{
-							String percepttype = getPerceptType(space, event.getSpace().getContext().getComponentType(eventowner), objects[i].getType(), CREATED);
+							String percepttype = getPerceptType(space, eventowner.getLocalType(), objects[i].getType(), CREATED);
 							if(percepttype!=null)
 								((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, objects[i], eventowner, event.getSpaceObject());
 						}
@@ -214,13 +214,13 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 				// Post disappearance for all components in vision range
 				for(int i=0; i<objects.length; i++)
 				{
-					IComponentIdentifier owner = (IComponentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
+					IComponentDescription owner = (IComponentDescription)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 					if(owner!=null)
 					{
 						IVector2 objpos = (IVector2)objects[i].getProperty(Space2D.PROPERTY_POSITION);
 						if(!space.getDistance(pos, objpos).greater(getRange(objects[i])))
 						{
-							String percepttype = getPerceptType(space, event.getSpace().getContext().getComponentType(owner), event.getSpaceObject().getType(), DESTROYED);
+							String percepttype = getPerceptType(space, owner.getLocalType(), event.getSpaceObject().getType(), DESTROYED);
 							if(percepttype!=null)
 								((AbstractEnvironmentSpace)event.getSpace()).createPercept(percepttype, event.getSpaceObject(), owner, objects[i]);
 //							else

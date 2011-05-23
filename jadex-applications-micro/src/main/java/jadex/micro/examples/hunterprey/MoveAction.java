@@ -7,6 +7,7 @@ import jadex.application.space.envsupport.environment.space2d.Grid2D;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector2Int;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SimplePropertyObject;
 
@@ -56,7 +57,7 @@ public class MoveAction extends SimplePropertyObject implements ISpaceAction
 //		System.out.println("move action: "+parameters);
 		
 		Grid2D grid = (Grid2D)space;
-		IComponentIdentifier actor = (IComponentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
+		IComponentDescription actor = (IComponentDescription)parameters.get(ISpaceAction.ACTOR_ID);
 		String direction = (String)parameters.get(PARAMETER_DIRECTION);
 		ISpaceObject avatar = grid.getAvatar(actor);
 

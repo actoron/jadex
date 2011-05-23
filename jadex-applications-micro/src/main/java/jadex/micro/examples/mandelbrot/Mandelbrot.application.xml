@@ -26,13 +26,17 @@
 	
 	<services>
 		<providedservice class="IGenerateService">
-			<binding componenttype="Generator"/>
+			<implementation>
+				<binding componenttype="Generator"/>
+			</implementation>
 		</providedservice>
 		<!-- <providedservice class="ICalculateService">
 			<binding componenttype="Calculator"/>
 		</providedservice> -->
 		<providedservice class="IDisplayService">
-			<binding componenttype="Display"/>
+			<implementation>
+				<binding componenttype="Display"/>
+			</implementation>
 		</providedservice>
 	</services>
 	

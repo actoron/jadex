@@ -1,7 +1,7 @@
 package jadex.application.space.agr;
 
-import jadex.application.model.MComponentType;
-import jadex.application.model.MApplicationType;
+import jadex.application.ApplicationModel;
+import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.commons.SReflect;
 
 /**
@@ -57,9 +57,20 @@ public class MPosition
 	 *  Get the agent type.
 	 *  @return The agent type.
 	 */
-	public MComponentType	getMComponentType(MApplicationType apptype)
+	public SubcomponentTypeInfo getMComponentType(ApplicationModel apptype)
 	{
-		return apptype.getMComponentType(componenttype);
+		SubcomponentTypeInfo ret = null;
+		SubcomponentTypeInfo[] types = apptype.getModelInfo().getSubcomponentTypes();
+		for(int i=0; i<types.length; i++)
+		{
+			if(types[i].getName().equals(componenttype))
+			{
+				ret = types[i];
+				break;
+			}
+		}
+		return ret;
+//		getMComponentType(componenttype);
 	}
 	
 	/**
