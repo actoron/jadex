@@ -62,8 +62,120 @@ public class ComponentXMLReader
 	/** The reader instance. */
 	protected Reader reader;
 	
-	/** The mappings. */
 	protected Set[] mappings;
+	
+	public static IStringObjectConverter exconv = new IStringObjectConverter()
+	{
+		public Object convertString(String val, IContext context)
+		{
+			Object	ret	= null;
+			try
+			{
+				ret	= SJavaParser.evaluateExpression((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), null, context.getClassLoader());
+			}
+			catch(RuntimeException e)
+			{
+				Object	se	= new Tuple(((ReadContext)context).getStack());
+				MultiCollection	report	= (MultiCollection)context.getUserContext();
+				report.put(se, e.toString());
+			}
+			return  ret;
+		}
+	};
+	
+	// Convert expression into parsed expression object.
+	public static IStringObjectConverter pexconv = new IStringObjectConverter()
+	{
+		public Object convertString(String val, IContext context)
+		{
+			Object	ret	= null;
+			try
+			{
+				ret	= SJavaParser.parseExpression((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), context.getClassLoader());
+			}
+			catch(RuntimeException e)
+			{
+				Object	se	= new Tuple(((ReadContext)context).getStack());
+				MultiCollection	report	= (MultiCollection)context.getUserContext();
+				report.put(se, e.toString());
+			}
+			return  ret;
+		}
+	};
+	
+	public static IStringObjectConverter classconv = new IStringObjectConverter()
+	{
+		public Object convertString(String val, IContext context) throws Exception
+		{
+			Object ret = val;
+			if(val instanceof String)
+			{
+				ret = SReflect.findClass0((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), context.getClassLoader());
+				if(ret==null)
+				{
+					Object	se	= new Tuple(((ReadContext)context).getStack());
+					MultiCollection	report	= (MultiCollection)context.getUserContext();
+					report.put(se, "Class not found: "+val);
+				}
+			}
+			return ret;
+		}
+	};
+	
+	public static IObjectStringConverter reclassconv = new IObjectStringConverter()
+	{
+		public String convertObject(Object val, IContext context)
+		{
+			String ret = null;
+			if(val instanceof Class)
+			{
+				ret = SReflect.getClassName((Class)val);
+				if(ret==null)
+				{
+					Object	se	= new Tuple(((ReadContext)context).getStack());
+					MultiCollection	report	= (MultiCollection)context.getUserContext();
+					report.put(se, "Class not found: "+val);
+				}
+			}
+			return ret;
+		}
+	};
+	
+	public static IPostProcessor configpp = new IPostProcessor()
+	{
+		public Object postProcess(IContext context, Object object)
+		{
+			ConfigurationInfo app = (ConfigurationInfo)object;
+			IModelInfo mapp = (IModelInfo)context.getRootObject();
+			
+			UnparsedExpression[] margs = app.getArguments();
+			for(int i=0; i<margs.length; i++)
+			{
+				try
+				{
+					Argument arg = (Argument)mapp.getArgument(margs[i].getName());
+					if(arg==null)
+						throw new RuntimeException("Overridden argument not declared in component type: "+margs[i].getName());
+					
+//					Object val = overridenarg.getParsedValue().getValue(null);
+//					arg.setDefaultValue(app.getName(), val);
+				}
+				catch(RuntimeException e)
+				{
+					Object	se	= new Tuple(((ReadContext)context).getStack());
+					MultiCollection	report	= (MultiCollection)context.getUserContext();
+					report.put(se, e.toString());
+				}
+			}
+			
+			return null;
+		}
+		
+		public int getPass()
+		{
+			return 0;
+		}
+	};
 	
 	//-------- constructors --------
 	
@@ -72,7 +184,15 @@ public class ComponentXMLReader
 	 */
 	public ComponentXMLReader(Set[] mappings)
 	{
-		this.reader = new Reader(new BeanObjectReaderHandler(getXMLMapping(mappings)), false, false, new XMLReporter()
+		this(getXMLMapping(mappings));
+	}
+	
+	/**
+	 *  Create a new reader.
+	 */
+	public ComponentXMLReader(Set mappings)
+	{
+		this.reader = new Reader(new BeanObjectReaderHandler(mappings), false, false, new XMLReporter()
 		{
 			public void report(String msg, String type, Object info, Location location) throws XMLStreamException
 			{
@@ -186,84 +306,6 @@ public class ComponentXMLReader
 	{
 		Set types = new HashSet();
 		
-		// Convert expression directly into value.
-		IStringObjectConverter exconv = new IStringObjectConverter()
-		{
-			public Object convertString(String val, IContext context)
-			{
-				Object	ret	= null;
-				try
-				{
-					ret	= SJavaParser.evaluateExpression((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), null, context.getClassLoader());
-				}
-				catch(RuntimeException e)
-				{
-					Object	se	= new Tuple(((ReadContext)context).getStack());
-					MultiCollection	report	= (MultiCollection)context.getUserContext();
-					report.put(se, e.toString());
-				}
-				return  ret;
-			}
-		};
-		
-		// Convert expression into parsed expression object.
-		IStringObjectConverter pexconv = new IStringObjectConverter()
-		{
-			public Object convertString(String val, IContext context)
-			{
-				Object	ret	= null;
-				try
-				{
-					ret	= SJavaParser.parseExpression((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), context.getClassLoader());
-				}
-				catch(RuntimeException e)
-				{
-					Object	se	= new Tuple(((ReadContext)context).getStack());
-					MultiCollection	report	= (MultiCollection)context.getUserContext();
-					report.put(se, e.toString());
-				}
-				return  ret;
-			}
-		};
-		
-		IStringObjectConverter classconv = new IStringObjectConverter()
-		{
-			public Object convertString(String val, IContext context) throws Exception
-			{
-				Object ret = val;
-				if(val instanceof String)
-				{
-					ret = SReflect.findClass0((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), context.getClassLoader());
-					if(ret==null)
-					{
-						Object	se	= new Tuple(((ReadContext)context).getStack());
-						MultiCollection	report	= (MultiCollection)context.getUserContext();
-						report.put(se, "Class not found: "+val);
-					}
-				}
-				return ret;
-			}
-		};
-		
-		IObjectStringConverter reclassconv = new IObjectStringConverter()
-		{
-			public String convertObject(Object val, IContext context)
-			{
-				String ret = null;
-				if(val instanceof Class)
-				{
-					ret = SReflect.getClassName((Class)val);
-					if(ret==null)
-					{
-						Object	se	= new Tuple(((ReadContext)context).getStack());
-						MultiCollection	report	= (MultiCollection)context.getUserContext();
-						report.put(se, "Class not found: "+val);
-					}
-				}
-				return ret;
-			}
-		};
-		
 		String uri = "http://jadex.sourceforge.net/jadex";
 		
 //		TypeInfo satype = new TypeInfo(null, new ObjectInfo(MStartable.class),
@@ -299,41 +341,7 @@ public class ComponentXMLReader
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "property")}), new AccessInfo(new QName(uri, "property"), "property", null, null))//, new BeanAccessInfo(putprop, null, "map", getname))),
 		})));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "configuration")), new ObjectInfo(ConfigurationInfo.class, new IPostProcessor()
-		{
-			public Object postProcess(IContext context, Object object)
-			{
-				ConfigurationInfo app = (ConfigurationInfo)object;
-				IModelInfo mapp = (IModelInfo)context.getRootObject();
-				
-				UnparsedExpression[] margs = app.getArguments();
-				for(int i=0; i<margs.length; i++)
-				{
-					try
-					{
-						Argument arg = (Argument)mapp.getArgument(margs[i].getName());
-						if(arg==null)
-							throw new RuntimeException("Overridden argument not declared in component type: "+margs[i].getName());
-						
-//						Object val = overridenarg.getParsedValue().getValue(null);
-//						arg.setDefaultValue(app.getName(), val);
-					}
-					catch(RuntimeException e)
-					{
-						Object	se	= new Tuple(((ReadContext)context).getStack());
-						MultiCollection	report	= (MultiCollection)context.getUserContext();
-						report.put(se, e.toString());
-					}
-				}
-				
-				return null;
-			}
-			
-			public int getPass()
-			{
-				return 0;
-			}
-		}), 
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "configuration")), new ObjectInfo(ConfigurationInfo.class, configpp), 
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("type", "typeName")),
 				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown"))},
@@ -541,4 +549,5 @@ public class ComponentXMLReader
 //			return 0;
 //		}
 //	}
+    
 }
