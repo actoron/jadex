@@ -108,7 +108,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	{
 //		return new CacheServiceContainer(new ComponentServiceContainer(getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
 		return new ComponentServiceContainer(getAgentAdapter(), MicroAgentFactory.FILETYPE_MICROAGENT,
-			interpreter.getModel().getRequiredServices(), interpreter.getRequiredServiceBindings());
+			interpreter.getModel().getRequiredServices(), interpreter.getServiceBindings());
 	}
 	
 	/**

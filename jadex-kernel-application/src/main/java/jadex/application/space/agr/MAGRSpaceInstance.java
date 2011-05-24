@@ -1,7 +1,7 @@
 package jadex.application.space.agr;
 
-import jadex.application.model.MSpaceInstance;
-import jadex.application.runtime.ISpace;
+import jadex.application.space.ISpace;
+import jadex.application.space.MSpaceInstance;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
 import jadex.commons.future.Future;
@@ -98,7 +98,7 @@ public class MAGRSpaceInstance extends MSpaceInstance
 		
 		Future ret = new Future();
 		
-		System.out.println("init space: "+ia);
+//		System.out.println("init space: "+ia);
 		
 		try
 		{

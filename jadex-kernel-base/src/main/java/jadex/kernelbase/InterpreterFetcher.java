@@ -14,12 +14,12 @@ import jadex.javaparser.SimpleValueFetcher;
 public class InterpreterFetcher extends SimpleValueFetcher
 {
 	/** The interpreter. */
-	protected AbstractInterpreter interpreter;
+	protected StatelessAbstractInterpreter interpreter;
 	
 	/**
 	 *  Create a new interpreter.
 	 */
-	public InterpreterFetcher(AbstractInterpreter interpreter)
+	public InterpreterFetcher(StatelessAbstractInterpreter interpreter)
 	{
 		this.interpreter = interpreter;
 	}
@@ -68,7 +68,7 @@ public class InterpreterFetcher extends SimpleValueFetcher
 	 *  Get the interpreter.
 	 *  @return The interpreter.
 	 */
-	public AbstractInterpreter getInterpreter()
+	public StatelessAbstractInterpreter getInterpreter()
 	{
 		return interpreter;
 	}

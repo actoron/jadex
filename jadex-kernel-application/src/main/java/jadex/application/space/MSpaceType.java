@@ -1,4 +1,4 @@
-package jadex.application.model;
+package jadex.application.space;
 
 import jadex.bridge.modelinfo.IExtensionType;
 

@@ -3,6 +3,7 @@ package jadex.micro;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
+import jadex.kernelbase.CacheableKernelModel;
 
 /**
  * 
@@ -37,9 +38,9 @@ public class MicroModelLoader extends AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public MicroModel loadComponentModel(String name, String[] imports, ClassLoader classloader) throws Exception
+	public CacheableKernelModel loadComponentModel(String name, String[] imports, ClassLoader classloader) throws Exception
 	{
-		return (MicroModel)loadModel(name, FILE_EXTENSION_MICRO, imports, classloader);
+		return (CacheableKernelModel)loadModel(name, FILE_EXTENSION_MICRO, imports, classloader);
 	}
 	
 	//-------- AbstractModelLoader methods --------

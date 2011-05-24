@@ -7,7 +7,6 @@ import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -21,8 +20,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.javaparser.IValueFetcher;
-import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.AbstractInterpreter;
 
 import java.io.PrintWriter;
@@ -30,7 +27,6 @@ import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,54 +41,18 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	
 	//-------- attributes --------
 	
-	/** The platform adapter for the agent. */
-	protected IComponentAdapter	adapter;
-	
-	/** The micro agent model. */
-	protected MicroModel model;
-	
 	/** The micro agent. */
 	protected MicroAgent microagent;
-	
-	/** The configuration. */
-	protected String config;
-	
-	/** The arguments. */
-	protected Map arguments;
-	
-	/** The results. */
-	protected Map results;
 	
 	/** The scheduled steps of the agent. */
 	protected List steps;
 	
-	/** The service container. */
-	protected IServiceContainer container;
-	
-	/** The component listeners. */
-	protected List componentlisteners;
-	
 	/** Flag indicating that no steps may be scheduled any more. */
 	protected boolean nosteps;
-	
-	/** The external access. */
-	protected IExternalAccess access;
 	
 	/** The list of message handlers. */
 	protected List messagehandlers;
 
-	/** The service bindings. */
-	protected RequiredServiceBinding[] bindings;
-	
-	/** The service fetcher. */
-	protected IValueFetcher fetcher;
-	
-	/** The extensions. */
-	protected Map extensions;
-	
-	/** The properties. */
-	protected Map properties;
-	
 	//-------- constructors --------
 	
 	/**
@@ -101,24 +61,21 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 *  @param microagent The microagent.
 	 */
 	public MicroAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
-		final MicroModel model, Class microclass, final Map args, final String config, 
+		final IModelInfo model, Class microclass, final Map args, final String config, 
 		final IExternalAccess parent, RequiredServiceBinding[] bindings, final Future inited)
 	{
-		this.model = model;
-		this.config = config!=null? config: getModel().getConfigurationNames().length>0? getModel().getConfigurationNames()[0]: null;
-		this.arguments = args;
-		this.bindings = bindings;
+		super(desc, model, config, factory, parent, args, bindings, inited);
 		
 		try
 		{
 			this.microagent = (MicroAgent)microclass.newInstance();
-			this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
+			this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 			this.microagent.init(MicroAgentInterpreter.this);
 			addStep((new Object[]{new IComponentStep()
 			{
 				public Object execute(IInternalAccess ia)
 				{
-					init(model.getModelInfo(), MicroAgentInterpreter.this.config, null)
+					init(model, MicroAgentInterpreter.this.config, null)
 						.addResultListener(createResultListener(new DelegationResultListener(inited)
 					{
 						public void customResultAvailable(Object result)
@@ -288,38 +245,6 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	}
 	
 	/**
-	 *  Can be called concurrently (also during executeAction()).
-	 * 
-	 *  Get the external access for this agent.
-	 *  The specific external access interface is kernel specific
-	 *  and has to be casted to its corresponding incarnation.
-	 *  @param listener	External access is delivered via result listener.
-	 */
-	public IExternalAccess getExternalAccess()
-	{
-		if(access==null)
-		{
-			synchronized(this)
-			{
-				if(access==null)
-				{
-					access = new ExternalAccess(microagent, this);
-				}
-			}
-		}
-		return access;
-	}
-	
-	/**
-	 *  Get the results.
-	 *  @return The results map.
-	 */
-	public Map getResults()
-	{
-		return results!=null? Collections.unmodifiableMap(results): Collections.EMPTY_MAP;
-	}
-	
-	/**
 	 *  Test if the component's execution is currently at one of the
 	 *  given breakpoints. If yes, the component will be suspended by
 	 *  the platform.
@@ -329,16 +254,6 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	public boolean isAtBreakpoint(String[] breakpoints)
 	{
 		return microagent.isAtBreakpoint(breakpoints);
-	}
-	
-	/**
-	 *  Get a space of the application.
-	 *  @param name	The name of the space.
-	 *  @return	The space.
-	 */
-	public Object getExtension(final String name)
-	{
-		return extensions==null? null: extensions.get(name);
 	}
 	
 	//-------- helpers --------
@@ -525,57 +440,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 */
 	public IComponentAdapter getAgentAdapter()
 	{
-		return adapter;
+		return getComponentAdapter();
 	}
 
-	/**
-	 *  Get the arguments.
-	 *  @return The arguments.
-	 */
-	public Map getArguments()
-	{
-		return arguments!=null? arguments: Collections.EMPTY_MAP;
-	}
-	
-	/**
-	 *  Get the properties.
-	 *  @return The properties.
-	 */
-	public Map getProperties()
-	{
-		return properties!=null? properties: Collections.EMPTY_MAP;
-	}
-	
-	/**
-	 *  Set a result value.
-	 *  @param name The result name.
-	 *  @param value The result value.
-	 */
-	public void setResultValue(String name, Object value)
-	{	
-		if(results==null)
-			results = new HashMap();
-		results.put(name, value);
-	}
-	
-	/**
-	 *  Get the parent component.
-	 *  @return The parent (if any).
-	 */
-	public IExternalAccess getParent()
-	{
-		return adapter.getParent();
-	}
-	
-	/**
-	 *  Get the configuration.
-	 *  @return The configuration.
-	 */
-	public String getConfiguration()
-	{
-		return this.config;
-	}
-	
 	/**
 	 *  Create the service container.
 	 *  @return The service container.
@@ -590,36 +457,6 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	}
 
 	/**
-	 *  Add an component listener.
-	 *  @param listener The listener.
-	 */
-	public IFuture addComponentListener(IComponentListener listener)
-	{
-		if(componentlisteners==null)
-			componentlisteners = new ArrayList();
-		return addComponentListener(componentlisteners, listener);
-	}
-	
-	/**
-	 *  Remove a component listener.
-	 *  @param listener The listener.
-	 */
-	public IFuture removeComponentListener(IComponentListener listener)
-	{
-		return removeComponentListener(componentlisteners, listener);
-	}
-	
-	/**
-	 *  Get the component listeners.
-	 *  @return The component listeners.
-	 */
-	public IComponentListener[] getComponentListeners()
-	{
-		return componentlisteners==null? new IComponentListener[0]: 
-			(IComponentListener[])componentlisteners.toArray(new IComponentListener[componentlisteners.size()]);
-	}
-	
-	/**
 	 *  Add a message handler.
 	 *  @param  The handler.
 	 */
@@ -629,7 +466,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			throw new RuntimeException("Filter must not null in handler: "+handler);
 			
 		if(messagehandlers==null)
+		{
 			messagehandlers = new ArrayList();
+		}
 		if(handler.getTimeout()>0)
 		{
 			microagent.waitFor(handler.getTimeout(), new IComponentStep()
@@ -655,7 +494,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	public void removeMessageHandler(IMessageHandler handler)
 	{
 		if(messagehandlers!=null)
+		{
 			messagehandlers.remove(handler);
+		}
 	}
 	
 	/**
@@ -685,31 +526,44 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		}
 	}
 
-//	/**
-//	 *  Get the binding info of a service.
-//	 *  @param name The required service name.
-//	 *  @return The binding info of a service.
-//	 */
-//	protected RequiredServiceBinding getRequiredServiceBinding(String name)
-//	{
-//		return bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
-//	}
+	/**
+	 *  Get the internal access.
+	 */
+	public IInternalAccess getInternalAccess()
+	{
+		return microagent;
+	}
 	
 	/**
-	 *  Get the bindings.
-	 *  @return the bindings.
+	 *  Can be called concurrently (also during executeAction()).
+	 * 
+	 *  Get the external access for this component.
+	 *  The specific external access interface is kernel specific
+	 *  and has to be casted to its corresponding incarnation.
+	 *  @param listener	External access is delivered via result listener.
 	 */
-	public RequiredServiceBinding[] getRequiredServiceBindings()
+	public IExternalAccess getExternalAccess()
 	{
-		return bindings;
+		if(access==null)
+		{
+			synchronized(this)
+			{
+				if(access==null)
+				{
+					access	= new ExternalAccess(microagent, this);
+				}
+			}
+		}
+		
+		return access;
 	}
-
+	
 	/**
 	 *  Step to handle a message.
 	 */
 	public static class HandleMessageStep implements IComponentStep
 	{
-		private final IMessageAdapter	message;
+		private final IMessageAdapter message;
 
 		public static final String XML_CLASSNAME = "msg";
 
@@ -787,117 +641,5 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		
 		return buf.toString();
 	}
-	
-	//-------- abstract interpreter methods --------
-	
-	/**
-	 *  Get the component adapter.
-	 *  @return The component adapter.
-	 */
-	public IComponentAdapter getComponentAdapter()
-	{
-		return adapter;
-	}
 
-	/**
-	 *  Get the model.
-	 */
-	public IModelInfo getModel()
-	{
-		return model.getModelInfo();
-	}
-	
-	/**
-	 *  Get the service bindings.
-	 */
-	public RequiredServiceBinding[] getServiceBindings()
-	{
-		return bindings;
-	}
-	
-	/**
-	 *  Get the value fetcher.
-	 */
-	public IValueFetcher getFetcher()
-	{
-		if(fetcher==null)
-		{
-			SimpleValueFetcher sfetcher = new SimpleValueFetcher();
-			sfetcher.setValue("$args", getArguments());
-//			sfetcher.setValue("$properties", getModel().getProperties());
-			sfetcher.setValue("$results", getResults());
-			sfetcher.setValue("$component", microagent);
-			sfetcher.setValue("$provider", getServiceProvider());
-			fetcher = sfetcher;
-		}
-		return fetcher;
-	}
-	
-	/**
-	 *  Add a default value for an argument (if not already present).
-	 *  Called once for each argument during init.
-	 *  @param name	The argument name.
-	 *  @param value	The argument value.
-	 */
-	public void	addDefaultArgument(String name, Object value)
-	{
-		if(arguments==null)
-		{
-			arguments	= new HashMap();
-		}
-		if(!arguments.containsKey(name))
-		{
-			arguments.put(name, value);
-		}
-	}
-
-	/**
-	 *  Add a default value for a result (if not already present).
-	 *  Called once for each result during init.
-	 *  @param name	The result name.
-	 *  @param value	The result value.
-	 */
-	public void	addDefaultResult(String name, Object value)
-	{
-		if(results==null)
-		{
-			results	= new HashMap();
-		}
-		results.put(name, value);
-	}
-	
-	/**
-	 *  Add a default value for an argument (if not already present).
-	 *  Called once for each argument during init.
-	 *  @param name	The argument name.
-	 *  @param value	The argument value.
-	 */
-	public void	addExtension(String name, Object value)
-	{
-		if(extensions==null)
-		{
-			extensions = new HashMap();
-		}
-		extensions.put(name, value);
-	}
-
-	/**
-	 *  Get the internal access.
-	 */
-	public IInternalAccess getInternalAccess()
-	{
-		return microagent;
-	}
-	
-	/**
-	 *  Add a property value.
-	 *  @param name The name.
-	 *  @param val The value.
-	 */
-	public void addProperty(String name, Object val)
-	{
-		if(properties==null)
-			properties = new HashMap();
-		properties.put(name, val);
-	}
 }

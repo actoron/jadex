@@ -1,8 +1,6 @@
-package jadex.application.runtime;
+package jadex.application.space;
 
-import jadex.application.model.MSpaceInstance;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.javaparser.IValueFetcher;
 
@@ -23,7 +21,6 @@ public interface ISpace
 	 *  Initialize a space.
 	 *  Called once, when the space is created.
 	 */
-//	public void	initSpace(IApplication context, MSpaceInstance config, IValueFetcher fetcher) throws Exception;
 	public void	initSpace(IInternalAccess ia, MSpaceInstance config, IValueFetcher fetcher);
 
 	/**

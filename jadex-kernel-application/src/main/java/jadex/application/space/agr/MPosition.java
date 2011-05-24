@@ -1,6 +1,6 @@
 package jadex.application.space.agr;
 
-import jadex.application.ApplicationModel;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.commons.SReflect;
 
@@ -57,10 +57,10 @@ public class MPosition
 	 *  Get the agent type.
 	 *  @return The agent type.
 	 */
-	public SubcomponentTypeInfo getMComponentType(ApplicationModel apptype)
+	public SubcomponentTypeInfo getMComponentType(IModelInfo model)
 	{
 		SubcomponentTypeInfo ret = null;
-		SubcomponentTypeInfo[] types = apptype.getModelInfo().getSubcomponentTypes();
+		SubcomponentTypeInfo[] types = model.getSubcomponentTypes();
 		for(int i=0; i<types.length; i++)
 		{
 			if(types[i].getName().equals(componenttype))

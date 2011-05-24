@@ -1,7 +1,7 @@
 package jadex.application.space.agr;
 
-import jadex.application.model.MSpaceInstance;
-import jadex.application.model.MSpaceType;
+import jadex.application.space.MSpaceInstance;
+import jadex.application.space.MSpaceType;
 import jadex.commons.SReflect;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;

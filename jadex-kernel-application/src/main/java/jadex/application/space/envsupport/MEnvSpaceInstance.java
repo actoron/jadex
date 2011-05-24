@@ -1,7 +1,7 @@
 package jadex.application.space.envsupport;
 
-import jadex.application.model.MSpaceInstance;
-import jadex.application.runtime.ISpace;
+import jadex.application.space.ISpace;
+import jadex.application.space.MSpaceInstance;
 import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentListener;
@@ -13,7 +13,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
-import jadex.kernelbase.AbstractInterpreter;
+import jadex.kernelbase.StatelessAbstractInterpreter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -162,7 +162,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 	{
 		Future ret = new Future();
 		
-		System.out.println("init space: "+ia);
+//		System.out.println("init space: "+ia);
 		
 		try
 		{
@@ -176,7 +176,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 					public boolean filter(Object obj)
 					{
 						IComponentChangeEvent event = (IComponentChangeEvent)obj;
-						return event.getSourceCategory().equals(AbstractInterpreter.TYPE_COMPONENT);
+						return event.getSourceCategory().equals(StatelessAbstractInterpreter.TYPE_COMPONENT);
 					}
 				};
 				public IFilter getFilter()

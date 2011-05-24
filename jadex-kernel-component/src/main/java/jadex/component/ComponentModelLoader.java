@@ -3,6 +3,7 @@ package jadex.component;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
+import jadex.kernelbase.CacheableKernelModel;
 
 import java.util.Set;
 
@@ -39,9 +40,9 @@ public class ComponentModelLoader extends AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public ComponentModel loadComponentModel(String name, String[] imports, ClassLoader classloader) throws Exception
+	public CacheableKernelModel loadComponentModel(String name, String[] imports, ClassLoader classloader) throws Exception
 	{
-		return (ComponentModel)loadModel(name, FILE_EXTENSION_COMPONENT, imports, classloader);
+		return (CacheableKernelModel)loadModel(name, FILE_EXTENSION_COMPONENT, imports, classloader);
 	}
 	
 	//-------- AbstractModelLoader methods --------

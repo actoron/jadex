@@ -37,6 +37,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
+import jadex.bridge.RemoteComponentListener;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
@@ -56,10 +57,11 @@ import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SJavaParser;
-import jadex.kernelbase.AbstractInterpreter;
+import jadex.kernelbase.StatelessAbstractInterpreter;
 import jadex.kernelbase.ExternalAccess;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -74,7 +76,7 @@ import java.util.Set;
  *  The micro agent interpreter is the connection between the agent platform 
  *  and a user-written micro agent. 
  */
-public class BpmnInterpreter extends AbstractInterpreter implements IComponentInstance, IInternalAccess
+public class BpmnInterpreter extends StatelessAbstractInterpreter implements IComponentInstance, IInternalAccess
 {	
 	//-------- static part --------
 	
@@ -1378,7 +1380,13 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	{
 		if(componentlisteners==null)
 			componentlisteners = new ArrayList();
-		return addComponentListener(componentlisteners, listener);
+		
+		// Hack! How to find out if remote listener?
+		if(Proxy.isProxyClass(listener.getClass()))
+			listener = new RemoteComponentListener(getExternalAccess(), listener);
+		
+		componentlisteners.add(listener);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -1387,7 +1395,15 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	 */
 	public IFuture removeComponentListener(IComponentListener listener)
 	{
-		return removeComponentListener(componentlisteners, listener);
+		// Hack! How to find out if remote listener?
+		if(Proxy.isProxyClass(listener.getClass()))
+			listener = new RemoteComponentListener(getExternalAccess(), listener);
+		
+		if(componentlisteners!=null)
+			componentlisteners.remove(listener);
+		
+//		System.out.println("cl: "+componentlisteners);
+		return IFuture.DONE;
 	}
 	
 	/**

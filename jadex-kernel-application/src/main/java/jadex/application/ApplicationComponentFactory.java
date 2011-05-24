@@ -20,6 +20,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.component.ComponentInterpreter;
+import jadex.kernelbase.CacheableKernelModel;
 
 import java.net.URL;
 import java.util.Collection;
@@ -218,7 +219,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	{
 		try
 		{
-			ApplicationModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, modelinfo.getClassLoader());
+			CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, modelinfo.getClassLoader());
 			ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, ret);
 			
 			// todo: result listener?

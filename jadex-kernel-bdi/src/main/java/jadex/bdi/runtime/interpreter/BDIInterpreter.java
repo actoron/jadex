@@ -40,7 +40,7 @@ import jadex.commons.future.IFuture;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
-import jadex.kernelbase.AbstractInterpreter;
+import jadex.kernelbase.StatelessAbstractInterpreter;
 import jadex.rules.rulesystem.Activation;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.IRulebase;
@@ -76,7 +76,7 @@ import java.util.logging.SimpleFormatter;
  *  and performing the agent execution when
  *  being called from the platform.
  */
-public class BDIInterpreter	extends AbstractInterpreter
+public class BDIInterpreter	extends StatelessAbstractInterpreter
 {
 	//-------- static part --------
 	

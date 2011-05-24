@@ -1,7 +1,7 @@
 package jadex.application.space.envsupport;
 
-import jadex.application.model.MSpaceInstance;
-import jadex.application.model.MSpaceType;
+import jadex.application.space.MSpaceInstance;
+import jadex.application.space.MSpaceType;
 import jadex.application.space.envsupport.dataview.IDataView;
 import jadex.application.space.envsupport.environment.AvatarMapping;
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;

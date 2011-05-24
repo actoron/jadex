@@ -25,7 +25,7 @@ public class ExternalAccess implements IExternalAccess
 	//-------- attributes --------
 
 	/** The component. */
-	protected AbstractInterpreter interpreter;
+	protected StatelessAbstractInterpreter interpreter;
 
 	/** The component adapter. */
 	protected IComponentAdapter adapter;
@@ -41,7 +41,7 @@ public class ExternalAccess implements IExternalAccess
 	/**
 	 *	Create an external access.
 	 */
-	public ExternalAccess(AbstractInterpreter interpreter)
+	public ExternalAccess(StatelessAbstractInterpreter interpreter)
 	{
 		this.interpreter = interpreter;
 		this.adapter = interpreter.getComponentAdapter();
@@ -421,7 +421,7 @@ public class ExternalAccess implements IExternalAccess
 	 *  Get the interpreter.
 	 *  @return the interpreter.
 	 */
-	public AbstractInterpreter getInterpreter()
+	public StatelessAbstractInterpreter getInterpreter()
 	{
 		return interpreter;
 	}

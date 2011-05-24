@@ -1,5 +1,7 @@
 package jadex.component;
 
+import jadex.bridge.AbstractErrorReportBuilder;
+import jadex.bridge.IErrorReport;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -18,6 +20,7 @@ import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
 import jadex.javaparser.SJavaParser;
+import jadex.kernelbase.CacheableKernelModel;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -100,11 +103,11 @@ public class ComponentXMLReader
 	 *  @param info	The resource info.
 	 *  @param classloader The classloader.
  	 */
-	public ComponentModel read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
+	public CacheableKernelModel read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
 	{
 		MultiCollection	report	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
 		ModelInfo mi = (ModelInfo)reader.read(rinfo.getInputStream(), classloader, report);
-		ComponentModel ret = new ComponentModel(mi);
+		CacheableKernelModel ret = new CacheableKernelModel(mi);
 		
 		if(ret!=null)
 		{
@@ -141,7 +144,7 @@ public class ComponentXMLReader
 		}
 		else
 		{
-			String errtext = ComponentModel.buildReport(rinfo.getFilename(), rinfo.getFilename(),
+			String errtext = buildReport(rinfo.getFilename(), rinfo.getFilename(),
 				new String[]{"Component", "Configuration"}, report, null).getErrorText();
 			throw new RuntimeException("Model error: "+errtext);
 		}
@@ -406,6 +409,63 @@ public class ComponentXMLReader
 		return types;
 	}
 
+	/**
+     *  Build the error report.
+     */
+    public static IErrorReport buildReport(String modelname, String filename, String[] cats, MultiCollection entries, Map externals)
+    {
+        return new AbstractErrorReportBuilder(modelname, filename,
+            new String[]{"Component", "Configuration"}, entries, null)
+        {
+            public boolean isInCategory(Object obj, String category)
+            {
+                return "Component".equals(category) && obj instanceof SubcomponentTypeInfo
+                    || "Configuration".equals(category) && obj instanceof ConfigurationInfo;
+            }
+
+            public Object getPathElementObject(Object element)
+            {
+                return ((StackElement)element).getObject();
+            }
+
+            public String getObjectName(Object obj)
+            {
+                String    name    = null;
+                String    type    = obj!=null ? SReflect.getInnerClassName(obj.getClass()) : null;
+                if(obj instanceof SubcomponentTypeInfo)
+                {
+                    name    = ((SubcomponentTypeInfo)obj).getName();
+                }
+                else if(obj instanceof ConfigurationInfo)
+                {
+                    name    = ((ConfigurationInfo)obj).getName();
+                    type    = "Configuration";
+                }
+                else if(obj instanceof UnparsedExpression)
+                {
+                    name    = ((UnparsedExpression)obj).getName();
+                }
+//                else if(obj instanceof MExpressionType)
+//                {
+//                    IParsedExpression    pexp    = ((MExpressionType)obj).getParsedValue();
+//                    String    exp    = pexp!=null ? pexp.getExpressionText() : null;
+//                    name    = exp!=null ? ""+exp : null;
+//                }
+
+//                if(type!=null && type.startsWith("M") && type.endsWith("Type"))
+//                {
+//                    type    = type.substring(1, type.length()-4);
+//                }
+                if(type!=null && type.endsWith("Info"))
+                {
+                    type    = type.substring(0, type.length()-4);
+                }
+
+                return type!=null ? name!=null ? type+" "+name : type : name!=null ? name : "";
+            }
+        }.buildErrorReport();
+    }
+	
 	//-------- helper classes --------
 	
 //	/**

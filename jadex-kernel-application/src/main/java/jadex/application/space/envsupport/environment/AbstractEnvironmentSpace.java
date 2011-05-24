@@ -1,7 +1,7 @@
 package jadex.application.space.envsupport.environment;
 
-import jadex.application.model.MSpaceInstance;
-import jadex.application.runtime.ISpace;
+import jadex.application.space.ISpace;
+import jadex.application.space.MSpaceInstance;
 import jadex.application.space.envsupport.IObjectCreator;
 import jadex.application.space.envsupport.MEnvSpaceInstance;
 import jadex.application.space.envsupport.MEnvSpaceType;

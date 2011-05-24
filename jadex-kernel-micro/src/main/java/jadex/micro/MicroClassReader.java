@@ -16,6 +16,7 @@ import jadex.bridge.service.annotation.GuiClassName;
 import jadex.commons.SReflect;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SJavaParser;
+import jadex.kernelbase.CacheableKernelModel;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -53,7 +54,7 @@ public class MicroClassReader
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public MicroModel read(String model, String[] imports, ClassLoader classloader)
+	public CacheableKernelModel read(String model, String[] imports, ClassLoader classloader)
 	{
 //		System.out.println("loading micro: "+model);
 		String clname = model;
@@ -72,10 +73,10 @@ public class MicroClassReader
 	/**
 	 *  Load the model.
 	 */
-	protected MicroModel read(String model, Class cma, ClassLoader classloader)
+	protected CacheableKernelModel read(String model, Class cma, ClassLoader classloader)
 	{
 		ModelInfo modelinfo = new ModelInfo();
-		MicroModel ret = new MicroModel(modelinfo);
+		CacheableKernelModel ret = new CacheableKernelModel(modelinfo);
 		
 		String name = SReflect.getUnqualifiedClassName(cma);
 		if(name.endsWith("Agent"))
@@ -108,7 +109,7 @@ public class MicroClassReader
 	/**
 	 *  Fill the model details using meta info.
 	 */
-	protected void fillMicroModelFromMetaInfo(MicroModel micromodel, String model, Class cma, ClassLoader classloader, MicroAgentMetaInfo metainfo)
+	protected void fillMicroModelFromMetaInfo(CacheableKernelModel micromodel, String model, Class cma, ClassLoader classloader, MicroAgentMetaInfo metainfo)
 	{
 		try
 		{
@@ -166,7 +167,7 @@ public class MicroClassReader
 	/**
 	 *  Fill the model details using annotation.
 	 */
-	protected void fillMicroModelFromAnnotations(MicroModel micromodel, String model, Class cma, ClassLoader classloader)
+	protected void fillMicroModelFromAnnotations(CacheableKernelModel micromodel, String model, Class cma, ClassLoader classloader)
 	{
 		ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
 		String[] imports = new String[]{cma.getClass().getPackage().getName()+".*"};

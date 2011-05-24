@@ -1,4 +1,4 @@
-package jadex.application.model;
+package jadex.application.space;
 
 import jadex.bridge.modelinfo.IExtensionInstance;
 
@@ -17,7 +17,7 @@ public abstract class MSpaceInstance implements IExtensionInstance
 	protected String type;
 	
 	/** The space type (resolved during loading). */
-	protected MSpaceType	spacetype;
+	protected MSpaceType spacetype;
 	
 	//-------- constructors --------
 

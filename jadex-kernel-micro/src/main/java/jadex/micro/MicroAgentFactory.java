@@ -275,9 +275,10 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	{
 		try
 		{
-			MicroModel mm = loader.loadComponentModel(model.getFilename(), null, model.getClassLoader());
+			// todo: is model info ok also in remote case?
+//			MicroModel mm = loader.loadComponentModel(model.getFilename(), null, model.getClassLoader());
 	
-			MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+"Agent", 
+			MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, model, getMicroAgentClass(model.getFullName()+"Agent", 
 				null, model.getClassLoader()), arguments, config, parent, binding, ret);
 			return new Future(new Object[]{mai, mai.getAgentAdapter()});
 		}
