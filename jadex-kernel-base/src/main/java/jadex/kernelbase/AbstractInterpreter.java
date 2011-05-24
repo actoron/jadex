@@ -58,7 +58,9 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- * 
+ *  Base class for all kinds of interpreters.
+ *  Implements the IComponentInstance interface and is responsible
+ *  for realizing the outer structure of active components.
  */
 public abstract class AbstractInterpreter implements IComponentInstance
 {
@@ -244,6 +246,13 @@ public abstract class AbstractInterpreter implements IComponentInstance
 	 */
 	public abstract IFuture removeComponentListener(IComponentListener listener);
 	
+	/**
+	 *  Add a property value.
+	 *  @param name The name.
+	 *  @param val The value.
+	 */
+	public abstract void addProperty(String name, Object val);
+	
 	//-------- methods --------
 	
 	/**
@@ -253,7 +262,7 @@ public abstract class AbstractInterpreter implements IComponentInstance
 	 *  - init required and provided services
 	 *  - init subcomponents
 	 */
-	public IFuture init(final IModelInfo model, final String config, final Map props, final Map properties)
+	public IFuture init(final IModelInfo model, final String config, final Map props)
 	{
 		final Future ret = new Future();
 		
@@ -262,7 +271,7 @@ public abstract class AbstractInterpreter implements IComponentInstance
 		{
 			public void customResultAvailable(Object result)
 			{
-				initFutureProperties(props, properties).addResultListener(
+				initFutureProperties(props).addResultListener(
 					createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
@@ -385,7 +394,7 @@ public abstract class AbstractInterpreter implements IComponentInstance
 	/**
 	 *  Init the future properties.
 	 */
-	public IFuture initFutureProperties(final Map props, final Map properties)
+	public IFuture initFutureProperties(final Map props)
 	{
 		Future ret = new Future();
 		
@@ -412,11 +421,8 @@ public abstract class AbstractInterpreter implements IComponentInstance
 							{
 								public void resultAvailable(Object result)
 								{
-									synchronized(properties)
-									{
-//										System.out.println("Setting future property: "+mexp.getName()+" "+result);
-										properties.put(unexp.getName(), result);
-									}
+									System.out.println("Setting future property: "+unexp.getName()+" "+result);
+									addProperty(unexp.getName(), result);
 									retu.setResult(result);
 								}
 							}));
@@ -430,7 +436,7 @@ public abstract class AbstractInterpreter implements IComponentInstance
 					else
 					{
 						// Todo: handle specific properties (logging etc.)
-						properties.put(name, val);
+						addProperty(name, val);
 					}
 				}
 			}

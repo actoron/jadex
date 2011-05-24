@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  *  Java representation of environment space instance for xml description.
  */
-public class MEnvSpaceInstance extends MSpaceInstance implements IExtensionInstance
+public class MEnvSpaceInstance extends MSpaceInstance
 {
 	//-------- attributes --------
 	

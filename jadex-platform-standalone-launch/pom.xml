@@ -269,6 +269,12 @@
 			<version>2.0-rc7</version>
 		</dependency>
 
+		<!-- <dependency>
+		    <groupId>log4j</groupId>
+		    <artifactId>log4j</artifactId>
+		    <version>1.2.16</version>
+		</dependency> -->
+		
 		<!--
 			<dependency> <groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bdi-continuations</artifactId>

@@ -1532,4 +1532,16 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		return this;
 	}
 	
+	/**
+	 *  Add a property value.
+	 *  @param name The name.
+	 *  @param val The value.
+	 */
+	public void addProperty(String name, Object val)
+	{
+		if(variables==null)
+			variables = new HashMap();
+		variables.put(name, val);
+	}
+	
 }

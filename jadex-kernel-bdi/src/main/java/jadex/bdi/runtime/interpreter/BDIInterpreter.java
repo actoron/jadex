@@ -14,6 +14,7 @@ import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
@@ -1493,5 +1494,20 @@ public class BDIInterpreter	extends AbstractInterpreter
 	public Object getExtension(final String name)
 	{
 		throw new UnsupportedOperationException("todo");		
+	}
+	
+	/**
+	 *  Add a property value.
+	 *  @param name The name.
+	 *  @param val The value.
+	 */
+	public void addProperty(String name, Object val)
+	{
+		Object rparam = state.createObject(OAVBDIRuntimeModel.parameter_type);
+		state.setAttributeValue(rparam, OAVBDIRuntimeModel.parameter_has_name, name);
+		state.setAttributeValue(rparam, OAVBDIRuntimeModel.parameter_has_type, val.getClass());
+		state.setAttributeValue(rparam, OAVBDIRuntimeModel.parameter_has_value, val);
+
+		getState().addAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_properties, rparam);
 	}
 }

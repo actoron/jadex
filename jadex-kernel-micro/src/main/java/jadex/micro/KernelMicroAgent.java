@@ -5,7 +5,7 @@ import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
-/**
+/** 
  *  Micro kernel.
  */
 @ProvidedServices({

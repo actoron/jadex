@@ -1,10 +1,12 @@
 package jadex.application.model;
 
+import jadex.bridge.modelinfo.IExtensionInstance;
+
 
 /**
  *  Space instance representation.
  */
-public abstract class MSpaceInstance
+public abstract class MSpaceInstance implements IExtensionInstance
 {
 	//-------- attributes --------
 

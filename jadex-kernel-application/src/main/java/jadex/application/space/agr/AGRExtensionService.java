@@ -1,19 +1,19 @@
-package jadex.application.space.envsupport;
+package jadex.application.space.agr;
 
 import jadex.bridge.IComponentFactoryExtensionService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
- *  Extension service for loading env support models.
+ *  Extension service for loading agr models.
  */
-public class EnvSupportExtensionService implements IComponentFactoryExtensionService
+public class AGRExtensionService implements IComponentFactoryExtensionService
 {
 	/**
 	 *  Get extension. 
 	 */
 	public IFuture getExtension(String componenttype)
 	{
-		return new Future(MEnvSpaceType.getXMLMapping());
+		return new Future(MAGRSpaceType.getXMLMapping());
 	}
 }

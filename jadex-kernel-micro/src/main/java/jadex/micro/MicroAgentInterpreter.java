@@ -90,6 +90,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	/** The extensions. */
 	protected Map extensions;
 	
+	/** The properties. */
+	protected Map properties;
+	
 	//-------- constructors --------
 	
 	/**
@@ -115,7 +118,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			{
 				public Object execute(IInternalAccess ia)
 				{
-					init(model.getModelInfo(), MicroAgentInterpreter.this.config, null, null)
+					init(model.getModelInfo(), MicroAgentInterpreter.this.config, null)
 						.addResultListener(createResultListener(new DelegationResultListener(inited)
 					{
 						public void customResultAvailable(Object result)
@@ -875,5 +878,17 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	public IInternalAccess getInternalAccess()
 	{
 		return microagent;
+	}
+	
+	/**
+	 *  Add a property value.
+	 *  @param name The name.
+	 *  @param val The value.
+	 */
+	public void addProperty(String name, Object val)
+	{
+		if(properties==null)
+			properties = new HashMap();
+		properties.put(name, val);
 	}
 }

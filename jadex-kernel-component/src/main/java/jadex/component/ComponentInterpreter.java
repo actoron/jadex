@@ -103,7 +103,6 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 		this.model = model;
 		this.parent = parent;
 		this.arguments = arguments;
-		this.properties = new HashMap();
 		this.steps	= new ArrayList();
 		this.willdostep	= true;
 		this.bindings = bindings;
@@ -115,7 +114,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 			{
 				public Object execute(IInternalAccess ia)
 				{
-					init(getModel(), ComponentInterpreter.this.config, getModel().getProperties(), ComponentInterpreter.this.properties)
+					init(getModel(), ComponentInterpreter.this.config, getModel().getProperties())
 						.addResultListener(createResultListener(new DelegationResultListener(inited)
 					{
 						public void customResultAvailable(Object result)
@@ -578,6 +577,18 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	public IInternalAccess getInternalAccess()
 	{
 		return this;
+	}
+	
+	/**
+	 *  Add a property value.
+	 *  @param name The name.
+	 *  @param val The value.
+	 */
+	public void addProperty(String name, Object val)
+	{
+		if(properties==null)
+			properties = new HashMap();
+		properties.put(name, val);
 	}
 	
 }
