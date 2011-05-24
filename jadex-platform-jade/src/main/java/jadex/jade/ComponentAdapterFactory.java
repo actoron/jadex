@@ -5,7 +5,6 @@ import jade.core.AID;
 import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
 import jade.wrapper.PlatformController;
-import jadex.application.runtime.IApplication;
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentAdapter;
@@ -15,6 +14,7 @@ import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.jade.service.message.JadexMessageTransportProtocol;
+import jadex.kernelbase.AbstractInterpreter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,9 +80,9 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 			
 			
 			Map	args	= null;
-			if(instance instanceof IApplication)
+			if(instance instanceof AbstractInterpreter)
 			{
-				args	= ((IApplication)instance).getArguments();
+				args	= ((AbstractInterpreter)instance).getArguments();
 			}
 			Object	rma	= args!=null ? args.get("rma") : null;
 			boolean	gui	= rma!=null && rma instanceof Boolean && ((Boolean)rma).booleanValue();
