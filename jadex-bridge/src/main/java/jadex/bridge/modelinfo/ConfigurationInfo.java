@@ -138,14 +138,4 @@ public class ConfigurationInfo extends Startable
 			extensions = new ArrayList();
 		extensions.add(extension);
 	}
-	
-	// Hack! remove when xml schema has been corrected
-	/**
-	 *  Add a extension type.
-	 *  @param extension The extension type.
-	 */
-	public void addSpace(Object extension)
-	{
-		addExtension(extension);
-	}
 }

@@ -1,142 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
-	<xs:element name="agent">
+<xs:schema	targetNamespace="http://jadex.sourceforge.net/jadex"
+			xmlns="http://jadex.sourceforge.net/jadex"
+			xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+			
+	<xs:redefine schemaLocation="http://jadex.sourceforge.net/jadex-component-2.0.xsd">
+		<!-- Hack!!! The following combined restriction/extension is actually not valid XSD but works for eclipse XML editor. -->
+		<xs:group name="comptypegroup">
+			<xs:all>
+				<xs:element name="imports" type="imports" minOccurs="0"/>
+				<xs:element name="componenttypes" type="componenttypes" minOccurs="0"/>
+				<xs:element name="services" type="services" minOccurs="0"/>
+				<xs:element name="properties" type="properties" minOccurs="0"/>
+				<xs:element name="configurations" type="configurations" minOccurs="0"/>
+				<xs:element name="extensiontypes" type="extensiontypes" minOccurs="0"/>
+				<xs:element name="capabilities" type="MCapabilityBase" minOccurs="0"/>
+				<xs:element name="beliefs" type="MBeliefbase" minOccurs="0"/>
+				<xs:element name="goals" type="MGoalbase" minOccurs="0"/>
+				<xs:element name="plans" type="MPlanbase" minOccurs="0"/>
+				<xs:element name="events" type="MEventbase" minOccurs="0"/>
+				<xs:element name="expressions" type="MExpressionbase" minOccurs="0"/>
+			</xs:all>
+		</xs:group>
+		<xs:group name="configgroup">
+			<xs:all>
+				<xs:element name="components" type="configcomponents" minOccurs="0"/>
+				<xs:element name="services" type="configservices" minOccurs="0"/>
+				<xs:element name="providedservices" type="configprovidedservices" minOccurs="0"/>
+				<xs:element name="extensions" type="extensions" minOccurs="0"/>
+				<xs:element name="capabilities" type="MConfigCapabilitybase" minOccurs="0"/>
+				<xs:element name="beliefs" type="MConfigBeliefbase" minOccurs="0"/>
+				<xs:element name="goals" type="MConfigGoalbase" minOccurs="0"/>
+				<xs:element name="plans" type="MConfigPlanbase" minOccurs="0"/>
+				<xs:element name="events" type="MConfigEventbase" minOccurs="0"/>
+			</xs:all>
+		</xs:group>
+	</xs:redefine>
+	
+	<xs:element name="agent" type="componenttype">
 		<xs:annotation>
 			<xs:documentation>Defines a new agent type.</xs:documentation>
 		</xs:annotation>
-		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="MBDIAgent"/>
-			</xs:complexContent>
-		</xs:complexType>
 	</xs:element>
-	<xs:element name="capability">
+	<xs:element name="capability" type="MCapability">
 		<xs:annotation>
 			<xs:documentation>Defines a new capability type.</xs:documentation>
 		</xs:annotation>
-		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="MCapability"/>
-			</xs:complexContent>
-		</xs:complexType>
 	</xs:element>
-	<xs:element name="properties" type="MPropertybase">
+	
+	<xs:complexType name="MCapabilityBase">
 		<xs:annotation>
-			<xs:documentation>Defines a new property file.</xs:documentation>
+			<xs:documentation>In the capabilities section arbitrary many capabilities can be declared. The functionality of a capability can be used within the agent resp. capability.</xs:documentation>
 		</xs:annotation>
-	</xs:element>
-	<xs:complexType name="MBDIAgent">
-		<xs:annotation>
-			<xs:documentation>Base type for a Jadex BDI agent.</xs:documentation>
-		</xs:annotation>
-		<xs:complexContent>
-			<xs:extension base="MCapability">
-				<xs:attribute name="propertyfile" type="xs:string" use="optional" default="jadex.config.runtime"/>
-				<xs:attribute name="suspend" type="xs:boolean" use="optional" default="false"/>
-				<xs:attribute name="master" type="xs:boolean" use="optional" default="false"/>
-				<xs:attribute name="daemon" type="xs:boolean" use="optional" default="false"/>
-				<xs:attribute name="autoshutdown" type="xs:boolean" use="optional" default="false"/>
-			</xs:extension>
-		</xs:complexContent>
+		<xs:sequence>
+			<xs:element name="capability" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>A capability usage declaration must include the local name of this capability (symbolic name) and the capability's type name (file) or an identifier for its identification.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="MCapabilityReference"/>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
 	</xs:complexType>
+	
 	<xs:complexType name="MCapability">
 		<xs:annotation>
 			<xs:documentation>Base type for a capability.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
-			<xs:extension base="MElement">
-				<xs:sequence>
-					<xs:element name="imports" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>In the imports section single classes, packages and Capability files and packages can be imported with arbitrarily many import statements. Once imported the short Class resp. Capability name can be used to refer to such an element.</xs:documentation>
-						</xs:annotation>
-						<xs:complexType>
-							<xs:sequence>
-								<xs:element name="import" type="xs:string" minOccurs="0" maxOccurs="unbounded">
-									<xs:annotation>
-										<xs:documentation>An import statement allows to import one class, package resp. Capability file.</xs:documentation>
-									</xs:annotation>
-								</xs:element>
-							</xs:sequence>
-						</xs:complexType>
-					</xs:element>
-					<xs:element name="capabilities" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>In the capabilities section arbitrary many capabilities can be declared. The functionality of a capability can be used within the agent resp. capability.</xs:documentation>
-						</xs:annotation>
-						<xs:complexType>
-							<xs:sequence>
-								<xs:element name="capability" minOccurs="0" maxOccurs="unbounded">
-									<xs:annotation>
-										<xs:documentation>A capability usage declaration must include the local name of this capability (symbolic name) and the capability's type name (file) or an identifier for its identification.</xs:documentation>
-									</xs:annotation>
-									<xs:complexType>
-										<xs:complexContent>
-											<xs:extension base="MCapabilityReference"/>
-										</xs:complexContent>
-									</xs:complexType>
-								</xs:element>
-							</xs:sequence>
-						</xs:complexType>
-					</xs:element>
-					<xs:element name="beliefs" type="MBeliefbase" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>In the beliefs section single-valued beliefs or multi-valued belief-references can be declared. Additionally references to exported or abstract beliefs of other capabilities can be specified. </xs:documentation>
-						</xs:annotation>
-					</xs:element>
-					<xs:element name="goals" type="MGoalbase" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>In this section different kinds of goals and goal references can be specified. Supported goal types are perform, achieve, query, maintain and meta goals. Also refernces for all types can be specified.</xs:documentation>
-						</xs:annotation>
-					</xs:element>
-					<xs:element name="plans" type="MPlanbase" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>In this section plans can be specified.</xs:documentation>
-						</xs:annotation>
-					</xs:element>
-					<xs:element name="events" type="MEventbase" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>In this section internal and message events can be specified. Also references for both can be declared.</xs:documentation>
-						</xs:annotation>
-					</xs:element>
-					<xs:element name="expressions" type="MExpressionbase" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>In this section predefined expressions and conditions can be declared.  Also references for both can be declared.</xs:documentation>
-						</xs:annotation>
-					</xs:element>
-					<xs:element name="services" type="MServicebase" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>In this section the provided and required services can be declared.</xs:documentation>
-						</xs:annotation>
-					</xs:element>
-					<xs:element name="properties" type="MPropertybase" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>In this section arbitrary properties can be specified.</xs:documentation>
-						</xs:annotation>
-					</xs:element>
-					<xs:element name="configurations" type="MConfigurationbase" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>In this section arbitrary many initial capability states can be defined. Such a state is used for initialization when an agent is born.</xs:documentation>
-						</xs:annotation>
-					</xs:element>
-				</xs:sequence>
-				<xs:attribute name="package" type="xs:string" use="optional">
-					<xs:annotation>
-						<xs:documentation>The package to which this capability belongs.</xs:documentation>
-					</xs:annotation>
-				</xs:attribute>
-				<xs:attribute name="abstract" type="xs:boolean" use="optional" default="false">
-					<xs:annotation>
-						<xs:documentation>When a capability is declared as abstract, it cannot be used directly for execution. Instead there need to be some implementation for this capability that will be resolved from the capability identifier.</xs:documentation>
-					</xs:annotation>
-				</xs:attribute>
-			</xs:extension>
+			<xs:restriction base="componenttype">
+				<xs:group ref="comptypegroup"/>
+				<xs:attribute name="suspend" use="prohibited"/>
+				<xs:attribute name="master" use="prohibited"/>
+				<xs:attribute name="autoshutdown" use="prohibited"/>
+				<xs:attribute name="daemon" use="prohibited"/>
+			</xs:restriction>
 		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="MBeliefbase">
 		<xs:annotation>
-			<xs:documentation>Container for beliefs, beliefsets and corresponding references.</xs:documentation>
+			<xs:documentation>Container for beliefs, beliefsets and corresponding references. In the beliefs section single-valued beliefs or multi-valued belief-references can be declared. Additionally references to exported or abstract beliefs of other capabilities can be specified.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="MBase">
@@ -167,7 +114,7 @@
 	</xs:complexType>
 	<xs:complexType name="MGoalbase">
 		<xs:annotation>
-			<xs:documentation>Container for goals and corresponding references.</xs:documentation>
+			<xs:documentation>Container for goals and corresponding references. In this section different kinds of goals and goal references can be specified. Supported goal types are perform, achieve, query, maintain and meta goals. Also refernces for all types can be specified.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="MBase">
@@ -228,7 +175,7 @@
 	</xs:complexType>
 	<xs:complexType name="MPlanbase">
 		<xs:annotation>
-			<xs:documentation>Container for plans.</xs:documentation>
+			<xs:documentation>Container for plans. In this section plans can be specified.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="MBase">
@@ -244,7 +191,7 @@
 	</xs:complexType>
 	<xs:complexType name="MEventbase">
 		<xs:annotation>
-			<xs:documentation>Container for internal, message events and corresponding references.</xs:documentation>
+			<xs:documentation>Container for internal, message events and corresponding references. In this section internal and message events can be specified. Also references for both can be declared.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="MBase">
@@ -275,7 +222,7 @@
 	</xs:complexType>
 	<xs:complexType name="MExpressionbase">
 		<xs:annotation>
-			<xs:documentation>Container for expressions, conditions and corresponding references.</xs:documentation>
+			<xs:documentation>Container for expressions, conditions and corresponding references. In this section predefined expressions and conditions can be declared.  Also references for both can be declared.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="MBase">
@@ -304,22 +251,6 @@
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
-	<xs:complexType name="MPropertybase">
-		<xs:annotation>
-			<xs:documentation>Container for properties.</xs:documentation>
-		</xs:annotation>
-		<xs:complexContent>
-			<xs:extension base="MBase">
-				<xs:sequence>
-					<xs:element name="property" type="MStaticValue" minOccurs="0" maxOccurs="unbounded">
-						<xs:annotation>
-							<xs:documentation>A property can be used to specify a user defined value.  It is interpreted as non-dynamic program code expression that is evaluted once on initialization.</xs:documentation>
-						</xs:annotation>
-					</xs:element>
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
 	<xs:complexType name="MConfigurationbase">
 		<xs:annotation>
 			<xs:documentation>Container for configurations.</xs:documentation>
@@ -327,7 +258,7 @@
 		<xs:complexContent>
 			<xs:extension base="MConfigBase">
 				<xs:sequence>
-					<xs:element name="configuration" type="MConfiguration" minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="configuration" type="configuration" minOccurs="0" maxOccurs="unbounded">
 						<xs:annotation>
 							<xs:documentation>Any number of configurations.</xs:documentation>
 						</xs:annotation>
@@ -353,15 +284,10 @@
 							<xs:documentation>If a goal is declared unique only one instance of this type is allowed being adopted at any one time. To determine if two goals are equal the type and parameters are used. Parameters that should not be considered can explicitly be excluded. </xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="creationcondition" minOccurs="0">
+					<xs:element name="creationcondition" type="MBindingCondition" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>A condition that creates a new goal of the given type when triggered. If binding-parameters are used for each possible binding a new goal is created. </xs:documentation>
 						</xs:annotation>
-						<xs:complexType mixed="true">
-							<xs:complexContent mixed="true">
-								<xs:extension base="MBindingCondition"/>
-							</xs:complexContent>
-						</xs:complexType>
 					</xs:element>
 					<xs:element name="contextcondition" type="MInternalCondition" minOccurs="0">
 						<xs:annotation>
@@ -792,7 +718,7 @@
 		<xs:complexContent mixed="true">
 			<xs:extension base="MTypedElement">
 				<xs:sequence>
-					<xs:element name="fact" type="MInternalExpression" minOccurs="0">
+					<xs:element name="fact" type="MFactType" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>Initial value for a belief. Per default it is static, i.e. it is only evalued only once on creation.</xs:documentation>
 						</xs:annotation>
@@ -801,6 +727,12 @@
 				<xs:attribute name="argument" type="xs:boolean"/>
 				<xs:attribute name="result" type="xs:boolean"/>
 			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!-- Dummy type without refinements to avoid xs:type attribute on fact. -->
+	<xs:complexType name="MFactType">
+		<xs:complexContent>
+			<xs:extension base="MInternalExpression"/>
 		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="MBeliefSet" mixed="true">
@@ -984,21 +916,8 @@
 				<xs:attribute name="class" type="xs:string" use="optional">
 					<xs:annotation>
 						<xs:documentation>
-																									The
-																									required
-																									Java
-																									class
-																									of
-																									the
-																									expression.
-																									Used
-																									for
-																									type
-																									checking
-																									the
-																									evaluation
-																									result.
-																					</xs:documentation>
+							The required Java class of the expression. Used for type checking the evaluation result.
+						</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
 				<xs:attribute name="language" type="xs:string" use="optional"/>
@@ -1057,11 +976,6 @@
 		<xs:attribute name="name" type="xs:string" use="required">
 			<xs:annotation>
 				<xs:documentation>The elements name.</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-		<xs:attribute name="description" type="xs:string" use="optional">
-			<xs:annotation>
-				<xs:documentation>The elements optional description text.</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
@@ -1557,46 +1471,6 @@
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
-	<xs:complexType name="MConfiguration">
-		<xs:annotation>
-			<xs:documentation>Defines configurations for capabilities and agents.</xs:documentation>
-		</xs:annotation>
-		<xs:complexContent>
-			<xs:extension base="MElement">
-				<xs:sequence>
-					<xs:element name="capabilities" type="MConfigCapabilitybase" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>Any number of initially customized capabilities.</xs:documentation>
-						</xs:annotation>
-					</xs:element>
-					<xs:element name="beliefs" type="MConfigBeliefbase" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>Any number of initially customized beliefs.</xs:documentation>
-						</xs:annotation>
-					</xs:element>
-					<xs:element name="goals" type="MConfigGoalbase" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>Any number of initially created goals.</xs:documentation>
-						</xs:annotation>
-					</xs:element>
-					<xs:element name="plans" type="MConfigPlanbase" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>Any number of initially created plans.</xs:documentation>
-						</xs:annotation>
-					</xs:element>
-					<xs:element name="events" type="MConfigEventbase" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>Any number of initially created events.</xs:documentation>
-						</xs:annotation>
-					</xs:element>
-				</xs:sequence>
-				<xs:attribute name="suspend" type="xs:boolean" use="optional" default="false"/>
-				<xs:attribute name="master" type="xs:boolean" use="optional" default="false"/>
-				<xs:attribute name="daemon" type="xs:boolean" use="optional" default="false"/>
-				<xs:attribute name="autoshutdown" type="xs:boolean" use="optional" default="false"/>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
 	<xs:complexType name="MConfigElement" abstract="true">
 		<xs:annotation>
 			<xs:documentation>Base type for configuration elements.</xs:documentation>
@@ -1985,71 +1859,9 @@
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
-	<xs:complexType name="MServicebase">
-		<xs:annotation>
-			<xs:documentation>Container for service declarations.</xs:documentation>
-		</xs:annotation>
-		<xs:complexContent>
-			<xs:extension base="MElementNoName">
-				<xs:sequence>
-					<xs:element name="providedservice" type="MProvidedService" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="requiredservice" type="MRequiredService" minOccurs="0" maxOccurs="unbounded"/>
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
-	<xs:complexType name="MProvidedService">
-		<xs:annotation>
-			<xs:documentation>A provided service definition.</xs:documentation>
-		</xs:annotation>
-		<xs:complexContent>
-			<xs:extension base="MInternalExpression">
-				<xs:attribute name="direct" type="xs:boolean" use="optional" default="false"/>
-				<xs:attribute name="implementation" type="xs:string" use="optional"/>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
-	<xs:complexType name="MRequiredService">
-		<xs:annotation>
-			<xs:documentation>A required service definition.</xs:documentation>
-		</xs:annotation>
-		<xs:complexContent>
-			<xs:extension base="MElement">
-				<xs:sequence>
-					<xs:element name="binding" type="MBinding" minOccurs="0"/>
-				</xs:sequence>
-				<xs:attribute name="class" type="xs:string" use="required"/>
-				<xs:attribute name="multiple" type="xs:boolean" use="optional" default="false"/>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
 	<xs:complexType name="MElementNoName" abstract="true">
 		<xs:annotation>
 			<xs:documentation>Base element without name.</xs:documentation>
 		</xs:annotation>
-		<xs:attribute name="description" type="xs:string" use="optional"/>
-	</xs:complexType>
-	<xs:complexType name="MBinding">
-		<xs:annotation>
-			<xs:documentation>Required service binding specification.</xs:documentation>
-		</xs:annotation>
-		<xs:attribute name="name" type="xs:string" use="optional"/>
-		<xs:attribute name="scope" use="optional" default="application">
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="local"/>
-					<xs:enumeration value="component"/>
-					<xs:enumeration value="application"/>
-					<xs:enumeration value="platform"/>
-					<xs:enumeration value="global"/>
-					<xs:enumeration value="upwards"/>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:attribute>
-		<xs:attribute name="componentname" type="xs:string" use="optional"/>
-		<xs:attribute name="componenttype" type="xs:string" use="optional"/>
-		<xs:attribute name="dynamic" type="xs:boolean" use="optional" default="false"/>
-		<xs:attribute name="create" type="xs:boolean" use="optional" default="false"/>
-		<xs:attribute name="recover" type="xs:boolean" use="optional" default="false"/>
 	</xs:complexType>
 </xs:schema>

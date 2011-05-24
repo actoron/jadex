@@ -2255,7 +2255,7 @@ public class AgentRules
 	 *  Build initial values for capability and direct sub capabilities (from references).
 	 *  @return A map of maps with initial values for each subcapability.
 	 *    Local values are added to arguments.
-	 */
+	 * /
 	protected static Map collectInitialValues(IOAVState state, Object mcap, Object mconfig, Map arguments, IValueFetcher fetcher)
 	{
 		Map	inivals	= null;
@@ -2484,7 +2484,7 @@ public class AgentRules
 		}
 
 		return inivals;
-	}
+	}*/
 	
 	/**
 	 *  Evaluate an mexpression.

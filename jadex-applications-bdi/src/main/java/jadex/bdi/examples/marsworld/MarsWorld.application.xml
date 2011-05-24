@@ -44,7 +44,7 @@
 		<import>jadex.bridge.service.*</import>
 	</imports>
 	
-	<spacetypes>
+	<extensiontypes>
 		<agr:agrspacetype name="marsagrspace">
 			<agr:grouptype name="marsteam">
 				<agr:roles>
@@ -184,7 +184,7 @@
 				<env:property name="tick">true</env:property>
 			</env:spaceexecutor>
 		</env:envspacetype>
-	</spacetypes>
+	</extensiontypes>
 
 	<componenttypes>
 		<componenttype name="Sentry" filename="jadex/bdi/examples/marsworld/sentry/Sentry.agent.xml"/>
@@ -200,7 +200,7 @@
 
 	<configurations>
 		<configuration name="1 Sentry / 2 Producers / 3 Carries">
-			<spaces>
+			<extensions>
 				<agr:agrspace name="myagrspace" type="marsagrspace">
 					<agr:group name="mymarsteam" type="marsteam">
 						<agr:position role="sentry" componenttype="Sentry" />
@@ -276,7 +276,7 @@
 						</env:observer>
 					</env:observers>
 	 			</env:envspace>
-			</spaces>
+			</extensions>
 			<components>
 				<component type="Sentry" number="1"/>
   				<component type="Producer" number="2"/>
@@ -285,7 +285,7 @@
  		</configuration>
 
 		<configuration name="Multi">
-			<spaces>
+			<extensions>
 				<agr:agrspace name="myagrspace" type="marsagrspace">
 					<agr:group name="mymarsteam" type="marsteam">
 						<agr:position role="sentry" componenttype="Sentry" />
@@ -310,7 +310,7 @@
 						<env:observer name="MarsWorld" dataview="view_all" perspective="icons"/>
 					</env:observers>
 	 			</env:envspace>
-			</spaces>
+			</extensions>
 			<components>
 				<component type="Sentry" number="1"/> <!-- todo: support more than one sentry (requires coordination between sentries) -->
   				<component type="Producer" number="5"/>

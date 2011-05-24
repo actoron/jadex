@@ -20,7 +20,7 @@
 		<import>jadex.application.space.envsupport.observer.perspective.*</import>
 	</imports>
 	
-	<spacetypes>
+	<extensiontypes>
 		<env:envspacetype name="gc2dspace" width="1" height="1" class="Grid2D">
 			<!-- <env:property name="neighborhood">Grid2D.NEIGHBORHOOD_MOORE</env:property> -->
 
@@ -108,7 +108,7 @@
 				<env:property name="space">$space</env:property>
 			</env:spaceexecutor>
 		</env:envspacetype>
-	</spacetypes>
+	</extensiontypes>
 	
 	<componenttypes>
 		<componenttype name="Imp" filename="jadex/micro/examples/dungeonkeeper/ImpAgent.class"/>
@@ -116,7 +116,7 @@
 	
 	<configurations>
 		<configuration name="Test map">
-			<spaces>
+			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="10" height="10">
 					<env:processes>
 						<env:process type="init">
@@ -128,7 +128,7 @@
 						<env:observer name="world" dataview="view_all" perspective="main"/>
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 		</configuration>
 	</configurations>
 

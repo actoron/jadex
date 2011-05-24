@@ -34,7 +34,7 @@
 		<argument name="ideal_temp" typename="Double">0.3</argument>
 	</arguments>
 	
-	<spacetypes>
+	<extensiontypes>
 		<env:envspacetype name="gc2dspace" width="20" height="20" class="Grid2D">
 			<env:property name="neighborhood">Grid2D.NEIGHBORHOOD_MOORE</env:property>
 			<env:property name="min_ideal_temp">100.0</env:property>
@@ -115,7 +115,7 @@
 				<env:property name="space">$space</env:property>
 			</env:spaceexecutor>
 		</env:envspacetype>
-	</spacetypes>
+	</extensiontypes>
 	
 	<componenttypes>
 		<componenttype name="Heatbug" filename="jadex/micro/examples/heatbugs/HeatbugAgent.class"/>
@@ -124,7 +124,7 @@
 	
 	<configurations>
 		<configuration name="20x20 and 10 bugs">
-			<spaces>
+			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
 					<env:processes>
 						<env:process type="diffuse"/>
@@ -215,7 +215,7 @@
 						</env:observer>
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 
 			<components>
 				<component type="Heatbug" number="10"/>
@@ -228,7 +228,7 @@
 		</configuration>
 		
 		<configuration name="30x30 and 40 bugs">
-			<spaces>
+			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
 					<env:processes>
 						<env:process type="diffuse"/>
@@ -302,7 +302,7 @@
 						</env:observer>
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 
 			<components>
 				<component type="Heatbug" number="40"/>
@@ -310,7 +310,7 @@
 		</configuration>
 		
 		<configuration name="50x50 and 100 bugs">
-			<spaces>
+			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="50" height="50">
 					<env:processes>
 						<env:process type="diffuse"/>
@@ -355,7 +355,7 @@
 						</env:observer>
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 
 			<components>
 				<component type="Heatbug" number="100"/>
@@ -363,7 +363,7 @@
 		</configuration>
 		
 		<configuration name="20x20 and 10 bugs without evaluation">
-			<spaces>
+			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="20" height="20">
 					<env:processes>
 						<env:process type="diffuse"/>
@@ -375,7 +375,7 @@
 						</env:observer>
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 
 			<components>
 				<component type="Heatbug" number="10"/>
@@ -383,7 +383,7 @@
 		</configuration>
 		
 		<configuration name="30x30 and 40 bugs without evaluation">
-			<spaces>
+			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
 					<env:processes>
 						<env:process type="diffuse"/>
@@ -395,7 +395,7 @@
 						</env:observer>
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 
 			<components>
 				<component type="Heatbug" number="40"/>
@@ -403,7 +403,7 @@
 		</configuration>
 		
 		<configuration name="50x50 and 100 bugs without evaluation">
-			<spaces>
+			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="50" height="50">
 					<env:processes>
 						<env:process type="diffuse"/>
@@ -415,7 +415,7 @@
 						</env:observer>
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 
 			<components>
 				<component type="Heatbug" number="100"/>

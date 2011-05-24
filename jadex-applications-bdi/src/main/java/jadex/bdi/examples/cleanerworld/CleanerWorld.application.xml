@@ -27,7 +27,7 @@
 		<import>jadex.commons.future.*</import>
 	</imports>
 	
-	<spacetypes>
+	<extensiontypes>
 		<env:envspacetype name="2dspace" class="ContinuousSpace2D" width="1" height="1">
 			<env:property name="border">Space2D.BORDER_STRICT</env:property>
 			<env:property name="time" dynamic="true">$properties.clock.getTime()</env:property>
@@ -192,7 +192,7 @@
 				<env:property name="tick">true</env:property>
 			</env:spaceexecutor>
 		</env:envspacetype>
-	</spacetypes>
+	</extensiontypes>
 	
 	<componenttypes>
 		<componenttype name="Cleaner" filename="jadex/bdi/examples/cleanerworld/cleaner/Cleaner.agent.xml"/>
@@ -207,7 +207,7 @@
 	
 	<configurations>
 		<configuration name="One cleaner">
-			<spaces>
+			<extensions>
 				<env:envspace name="my2dspace" type="2dspace" width="1.0" height="1.0">
 					<!-- <env:property name="daytime">true</env:property> -->
 					
@@ -250,14 +250,14 @@
 						<env:observer name="Observer" dataview="view_all" perspective="abstract" />
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 			<components>
 				<component type="Cleaner"/>
 			</components>
 		</configuration>
 		
 		<configuration name="Two cleaners">
-			<spaces>
+			<extensions>
 				<env:envspace name="my2dspace" type="2dspace" width="1.0" height="1.0">
 					<!-- <env:property name="daytime">true</env:property> -->
 					
@@ -300,7 +300,7 @@
 						<env:observer name="Observer" dataview="view_all" perspective="abstract" />
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 
 			<components>
 				<component type="Cleaner" number="2"/>

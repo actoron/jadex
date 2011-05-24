@@ -47,46 +47,62 @@
 	</componenttypes>
 	
 	<services>
-		<providedservice class="ILibraryService" proxytype="raw">
-			new LibraryService($args.libpath, $component.getServiceProvider(), 
-				SUtil.createHashMap(new Object[]{"componentviewer.viewerclass", RemoteServiceManagementService.REMOTE_EXCLUDED}, 
-				new Object[]{"jadex.base.gui.componentviewer.libservice.LibServiceBrowser", new String[]{"getClassLoader"}})
-				)
+		<providedservice class="ILibraryService">
+			<implementation proxytype="raw">
+				new LibraryService($args.libpath, $component.getServiceProvider(), 
+					SUtil.createHashMap(new Object[]{"componentviewer.viewerclass", RemoteServiceManagementService.REMOTE_EXCLUDED}, 
+					new Object[]{"jadex.base.gui.componentviewer.libservice.LibServiceBrowser", new String[]{"getClassLoader"}})
+					)
+			</implementation>
 		</providedservice>
 	
-		<providedservice class="IComponentManagementService" proxytype="raw">
-			new ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter())
+		<providedservice class="IComponentManagementService">
+			<implementation proxytype="raw">
+				new ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter())
+			</implementation>
 		</providedservice>
 		
-		<providedservice class="IComponentFactory" proxytype="raw">
-			new ComponentComponentFactory($component.getServiceProvider())		
+		<providedservice class="IComponentFactory">
+			<implementation proxytype="raw">
+				new ComponentComponentFactory($component.getServiceProvider())
+			</implementation>
 		</providedservice>
 		
-		<providedservice class="IMessageService" proxytype="raw">
-			new MessageService($component.getServiceProvider(),
-				new MessageType[]
-				{
-					new FIPAMessageType()
-				})
+		<providedservice class="IMessageService">
+			<implementation proxytype="raw">
+				new MessageService($component.getServiceProvider(),
+					new MessageType[]
+					{
+						new FIPAMessageType()
+					})
+			</implementation>
 		</providedservice>
 		
-		<providedservice class="IThreadPool" proxytype="raw">
-			new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
+		<providedservice class="IThreadPool">
+			<implementation proxytype="raw">
+				new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
+			</implementation>
 		</providedservice>
 		
-		<providedservice class="IClockService" proxytype="raw">
-			 new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "simulation_clock", System.currentTimeMillis(), 100), $component.getServiceProvider(),
-				SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
-				new Object[]{new String[]{"getState", "getTime", "getTick", "getStarttime", "getDelta", "getDilation", "getNextTimer", "getTimers", "getClockType", "advanceEvent"}}))
+		<providedservice class="IClockService">
+			<implementation proxytype="raw">
+				 new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "simulation_clock", System.currentTimeMillis(), 100), $component.getServiceProvider(),
+					SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
+					new Object[]{new String[]{"getState", "getTime", "getTick", "getStarttime", "getDelta", "getDilation", "getNextTimer", "getTimers", "getClockType", "advanceEvent"}}))
+			</implementation>
 		</providedservice>
 		
-		<providedservice class="IExecutionService" proxytype="raw">
-			 new ExecutionService($component.getServiceProvider(), SUtil.createHashMap(new Object[]{
-				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{new String[]{"isIdle", "getTasks"}}))
+		<providedservice class="IExecutionService">
+			<implementation proxytype="raw">
+				 new ExecutionService($component.getServiceProvider(), SUtil.createHashMap(new Object[]{
+					RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{new String[]{"isIdle", "getTasks"}}))
+			</implementation>
 		</providedservice>
 		
-		<providedservice class="IDF" proxytype="raw">
-			 new DirectoryFacilitatorService($component.getServiceProvider())
+		<providedservice class="IDF">
+			<implementation proxytype="raw">
+				 new DirectoryFacilitatorService($component.getServiceProvider())
+			</implementation>
 		</providedservice>
 		
 	</services>

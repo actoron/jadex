@@ -125,7 +125,7 @@
 				<argument name="cycle_length">12</argument>
 			</arguments>
 			
-			<spaces>
+			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="15" height="15">
 					<env:processes>
 						<env:process type="enableKdTree" />
@@ -165,7 +165,7 @@
 						</env:observer>
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 
 			<components>
 				<component type="Firefly" number="$args.number"/>
@@ -177,7 +177,7 @@
 				<argument name="number">100</argument>
 			</arguments>
 			
-			<spaces>
+			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="15" height="15">
 					<env:dataproviders>
 						<env:dataprovider name="flashes">
@@ -213,7 +213,7 @@
 						</env:observer>
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 
 			<components>
 				<component type="Firefly" number="$args.number"/>
@@ -225,13 +225,13 @@
 				<argument name="number">100</argument>
 			</arguments>
 			
-			<spaces>
+			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="15" height="15">
 					<env:observers>
 						<env:observer name="world" dataview="view_all" perspective="main" />
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 
 			<components>
 				<component type="Firefly" number="$args.number"/>
@@ -243,13 +243,13 @@
 				<argument name="number">200</argument>
 			</arguments>
 			
-			<spaces>
+			<extensions>				
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="15" height="15">
 					<env:observers>
 						<env:observer name="world" dataview="view_all" perspective="main" />
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 
 			<components>
 				<component type="Firefly" number="$args.number"/>

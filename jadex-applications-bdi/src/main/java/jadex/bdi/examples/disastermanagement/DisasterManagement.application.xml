@@ -25,7 +25,7 @@
 		<import>jadex.commons.SFunction</import>
 	</imports>
 	
-	<spacetypes>
+	<extensiontypes>
 		<env:envspacetype name="2dspace" class="ContinuousSpace2D" width="1" height="1">
 			<env:property name="border">Space2D.BORDER_STRICT</env:property>
 		
@@ -160,7 +160,7 @@
 				<env:property name="tick">true</env:property>
 			</env:spaceexecutor>
 		</env:envspacetype>
-	</spacetypes>
+	</extensiontypes>
 	
 	<componenttypes>
 		<componenttype name="FireBrigade" filename="firebrigade/FireBrigade.agent.xml"/>
@@ -170,7 +170,7 @@
 
 	<configurations>
 		<configuration name="default">
-			<spaces>
+			<extensions>
 				<env:envspace name="my2dspace" type="2dspace">
 					<env:objects>
 						<!-- Firestation with 3 brigades -->
@@ -255,14 +255,14 @@
 						</env:observer>
 					</env:observers>
 	 			</env:envspace>
-			</spaces>
+			</extensions>
 			<components>
 				<component type="Commander"/>
 			</components>
  		</configuration>
 
 		<configuration name="No Evaluation">
-			<spaces>
+			<extensions>
 				<env:envspace name="my2dspace" type="2dspace">
 					<env:objects>
 						<!-- Firestation with 3 brigades -->
@@ -307,7 +307,7 @@
 						<env:observer name="DisasterManagement" dataview="view_all" perspective="icons"/>
 					</env:observers>
 	 			</env:envspace>
-			</spaces>
+			</extensions>
 			<components>
 				<component type="Commander"/>
 			</components>

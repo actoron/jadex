@@ -22,7 +22,7 @@
 	                    http://jadex.sourceforge.net/jadex-agrspace-2.0.xsd"
 	name="MarsWorldAGR" package="jadex.bdi.examples.marsworld_classic">
 	
-	<spacetypes>
+	<extensiontypes>
 		<agr:agrspacetype name="marsagrspace">
 			<agr:grouptype name="marsteam">
 				<agr:roles>
@@ -32,7 +32,7 @@
 				</agr:roles>
 			</agr:grouptype>
 		</agr:agrspacetype>
-	</spacetypes>
+	</extensiontypes>
 	
 	<componenttypes>
 		<componenttype name="Environment" filename="jadex/bdi/examples/marsworld_classic/environment/Environment.agent.xml"/>
@@ -43,7 +43,7 @@
 	
 	<configurations>
 		<configuration name="1 Sentry / 2 Producers / 3 Carriers">
-			<spaces>
+			<extensions>
 				<agr:agrspace name="myagrspace" type="marsagrspace">
 					<agr:group name="mymarsteam" type="marsteam">
 						<agr:position role="sentry" componenttype="Sentry" />
@@ -51,7 +51,7 @@
 						<agr:position role="carrier" componenttype="Carrier" />
 					</agr:group>
 				</agr:agrspace>
-			</spaces>
+			</extensions>
 			<components>
 				<component type="Environment" master="true"/>
 				<component type="Sentry"/>

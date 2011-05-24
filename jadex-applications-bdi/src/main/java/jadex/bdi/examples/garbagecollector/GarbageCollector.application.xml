@@ -28,7 +28,7 @@
 	</imports>
 	
 	<!-- Space types of this application. Spaces are shared by agents of the same application. -->
-	<spacetypes>
+	<extensiontypes>
 	
 		<!-- Declaration of a grid environment as space type. -->
 		<env:envspacetype name="gc2dspace" width="10" height="10" class="Grid2D">
@@ -206,7 +206,7 @@
 				<env:property name="space">$space</env:property>
 			</env:spaceexecutor>
 		</env:envspacetype>
-	</spacetypes>
+	</extensiontypes>
 	
 	<!-- Agent types of the application. -->
 	<componenttypes>
@@ -218,7 +218,7 @@
 	<configurations>
 	
 		<configuration name="One Burner / One Collector">
-			<spaces>
+			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace">
 					<env:processes>
 						<env:process type="create">
@@ -230,7 +230,7 @@
 						<env:observer name="world" dataview="view_all" perspective="abstract"/>
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 
 			<components>
 				<component type="Collector"/>
@@ -239,7 +239,7 @@
 		</configuration>
 		
 		<configuration name="One Burner / Two Collectors">
-			<spaces>
+			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace">
 					<env:processes>
 						<env:process type="create">
@@ -251,7 +251,7 @@
 						<env:observer name="world" dataview="view_all" perspective="abstract"/>
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 			
 			<components>
 				<!-- Using names for agents is problemat -->
@@ -264,7 +264,7 @@
 		</configuration>
 		
 		<configuration name="Two Burners / Three Collectors">
-			<spaces>
+			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="14" height="14">
 					<env:processes>
 						<env:process type="create">
@@ -276,7 +276,7 @@
 						<env:observer name="world" dataview="view_all" perspective="abstract" />
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 
 			<components>
 				<component type="Collector" number="3"/>
@@ -285,7 +285,7 @@
 		</configuration>
 		
 		<configuration name="Many Burners / Too Many Collectors">
-			<spaces>
+			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
 					<env:processes>
 						<env:process type="create">
@@ -297,7 +297,7 @@
 						<env:observer name="world" dataview="view_all" perspective="abstract" />
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 
 			<components>
 				<component type="Collector" number="30"/>
@@ -306,7 +306,7 @@
 		</configuration>
 		
 		<configuration name="No Agents">
-			<spaces>
+			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace">
 					<env:processes>
 						<env:process type="create">
@@ -318,7 +318,7 @@
 						<env:observer name="world" dataview="view_all" perspective="abstract"/>
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 		</configuration>
 	</configurations>
 

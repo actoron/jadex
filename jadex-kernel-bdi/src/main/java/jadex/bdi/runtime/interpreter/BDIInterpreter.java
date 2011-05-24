@@ -14,7 +14,6 @@ import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
-import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;

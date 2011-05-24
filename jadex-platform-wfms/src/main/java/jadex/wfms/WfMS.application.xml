@@ -26,22 +26,34 @@
 	
 	<services>
 		<providedservice class="IAAAService">
-			jadex.wfms.service.impl.BasicAAAService.getTestService($component.getServiceProvider())
+			<implementation>
+				jadex.wfms.service.impl.BasicAAAService.getTestService($component.getServiceProvider())
+			</implementation>
 		</providedservice>
 		<providedservice class="IExecutionService">
-			new ExecutionService($component.getComponentIdentifier(), $component.getExternalAccess())
+			<implementation>
+				new ExecutionService($component.getComponentIdentifier(), $component.getExternalAccess())
+			</implementation>
 		</providedservice>
 		<providedservice class="IExternalWfmsService">
-			new ExternalWfmsService($component.getServiceProvider())
+			<implementation>
+				new ExternalWfmsService($component.getServiceProvider())
+			</implementation>
 		</providedservice>
 		<providedservice class="IWorkitemHandlerService">
-			new WorkitemHandlerService($component.getServiceProvider())
+			<implementation>
+				new WorkitemHandlerService($component.getServiceProvider())
+			</implementation>
 		</providedservice>
 		<providedservice class="IModelRepositoryService">
-			new LinkedModelRepositoryService($component.getServiceProvider())
+			<implementation>
+				new LinkedModelRepositoryService($component.getServiceProvider())
+			</implementation>
 		</providedservice>
 		<providedservice class="ILogService">
-			new LogService($component.getServiceProvider())
+			<implementation>
+				new LogService($component.getServiceProvider())
+			</implementation>
 		</providedservice>
 	</services>
 

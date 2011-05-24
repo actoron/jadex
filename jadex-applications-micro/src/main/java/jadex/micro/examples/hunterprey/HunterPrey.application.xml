@@ -26,7 +26,7 @@
 		<import>jadex.application.space.envsupport.observer.perspective.*</import>
 	</imports>
 	
-	<spacetypes>
+	<extensiontypes>
 		<env:envspacetype name="2dspace" class="Grid2D" width="30" height="30">
 			<env:objecttypes>
 				<env:objecttype name="hunter" />
@@ -177,7 +177,7 @@
 				<env:property name="mode">"lastaction"</env:property>
 			</env:spaceexecutor>
 		</env:envspacetype>
-	</spacetypes>
+	</extensiontypes>
 
 	<componenttypes>
 		<componenttype name="MicroPrey" filename="jadex/micro/examples/hunterprey/MicroPreyAgent.class"/>
@@ -185,7 +185,7 @@
 
 	<configurations>
 		<configuration name="One Micro Prey">
-			<spaces>
+			<extensions>
 				<env:envspace name="my2dspace" type="2dspace">
 					<env:objects>
 						<env:object type="obstacle" number="125"/>
@@ -201,7 +201,7 @@
 						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" />
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
  			
  			<components>
 				<component name="Mickey" type="MicroPrey"/>
@@ -209,7 +209,7 @@
  		</configuration>
 
 		<configuration name="Empty">
-			<spaces>
+			<extensions>
 				<env:envspace name="my2dspace" type="2dspace">
 					<env:objects>
 						<env:object type="obstacle" number="125"/>
@@ -225,11 +225,11 @@
 						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons"/>
 					</env:observers>
 	 			</env:envspace>
-			</spaces>	
+			</extensions>	
  		</configuration>
 
 		<configuration name="Semi">
-			<spaces>
+			<extensions>
 				<env:envspace name="my2dspace" type="2dspace" width="50" height="50">
 					<env:objects>
 						<env:object type="obstacle" number="250"/>
@@ -245,7 +245,7 @@
 						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" />
 					</env:observers>
 	 			</env:envspace>
-			</spaces>
+			</extensions>
 
 			<components>
 				<component type="MicroPrey" number="100"/>
@@ -253,7 +253,7 @@
  		</configuration>
  		
 		<configuration name="Multi">
-			<spaces>
+			<extensions>
 				<env:envspace name="my2dspace" type="2dspace" width="75" height="75">
 					<env:objects>
 						<env:object type="obstacle" number="750"/>
@@ -269,7 +269,7 @@
 						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" />
 					</env:observers>
 	 			</env:envspace>
-			</spaces>
+			</extensions>
 
 			<components>
 				<component type="MicroPrey" number="200"/>
