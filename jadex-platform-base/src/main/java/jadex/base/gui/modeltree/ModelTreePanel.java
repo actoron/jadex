@@ -1,7 +1,5 @@
 package jadex.base.gui.modeltree;
 
-import jadex.base.gui.SwingDefaultResultListener;
-import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.DefaultNodeHandler;
 import jadex.base.gui.filetree.FileTreePanel;
 import jadex.bridge.IExternalAccess;
@@ -9,7 +7,6 @@ import jadex.bridge.IMultiKernelListener;
 import jadex.bridge.IMultiKernelNotifierService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.PopupBuilder;
 
@@ -17,24 +14,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.Action;
-import javax.swing.SwingUtilities;
 
 /**
  *  Tree for component models.
  */
 public class ModelTreePanel extends FileTreePanel
 {
+	protected static int LISTENER_COUNTER = 0;
+	
 	//-------- attributes --------
 	
 	/** The actions. */
 	protected Map actions;
+	
+	/** Kernel listener */
+	protected IMultiKernelListener kernellistener;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new model tree panel.
 	 */
-	public ModelTreePanel(IExternalAccess exta, boolean remote)
+	public ModelTreePanel(IExternalAccess exta, IExternalAccess localexta, boolean remote)
 	{
 		super(exta, remote, false);
 		actions = new HashMap();
@@ -55,40 +56,13 @@ public class ModelTreePanel extends FileTreePanel
 		dnh.addAction(new RemovePathAction(this), null);
 		addNodeHandler(dnh);
 		
-		SServiceProvider.getService(exta.getServiceProvider(), IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new IResultListener()
+		final String lid = exta.getServiceProvider().getId().toString() + localexta.getServiceProvider().getId().toString() + "_" + LISTENER_COUNTER++;
+		SServiceProvider.getService(exta.getServiceProvider(), IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
-				((IMultiKernelNotifierService)result).addKernelListener(new IMultiKernelListener()
-				{
-					protected Runnable refresh = new Runnable()
-					{
-						public void run()
-						{
-							((ModelFileFilterMenuItemConstructor)getMenuItemConstructor()).getSupportedComponentTypes()
-								.addResultListener(new SwingDefaultResultListener()
-							{
-								public void customResultAvailable(Object result)
-								{
-									((ITreeNode)getTree().getModel().getRoot()).refresh(true);
-								}
-							});
-						}
-					};
-					
-					public IFuture componentTypesRemoved(String[] types)
-					{
-						SwingUtilities.invokeLater(refresh);
-						return IFuture.DONE;
-					}
-					
-					public IFuture componentTypesAdded(String[] types)
-					{
-						SwingUtilities.invokeLater(refresh);
-						return IFuture.DONE;
-					}
-				});
+				kernellistener = new TreePanelKernelListener(lid, getTree(), ((ModelFileFilterMenuItemConstructor)getMenuItemConstructor()));
+				((IMultiKernelNotifierService) result).addKernelListener(kernellistener);
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -108,5 +82,26 @@ public class ModelTreePanel extends FileTreePanel
 	public Action getAction(String name)
 	{
 		return (Action)actions.get(name);
+	}
+	
+	@Override
+	public void dispose()
+	{
+		if (kernellistener != null)
+		{
+			SServiceProvider.getService(exta.getServiceProvider(), IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object result)
+				{
+					((IMultiKernelNotifierService) result).removeKernelListener(kernellistener);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					// Ignore, no multi-kernel
+				}
+			});
+		}
+		super.dispose();
 	}
 }
