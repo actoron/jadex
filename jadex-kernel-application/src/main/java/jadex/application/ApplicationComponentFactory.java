@@ -112,7 +112,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 					{
 						final ILibraryService libservice = (ILibraryService)result;
 						
-						SServiceProvider.getServices(provider, IComponentFactoryExtensionService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+						SServiceProvider.getServices(provider, IComponentFactoryExtensionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)

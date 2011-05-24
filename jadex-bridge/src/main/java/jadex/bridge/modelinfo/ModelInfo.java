@@ -95,7 +95,6 @@ public class ModelInfo extends Startable implements IModelInfo
 		this.packagename = packagename;
 		this.description = description;
 		this.report = report;//!=null? report: new ErrorReport();
-//		this.configurationnames = configurationnames;
 		this.arguments = arguments!=null? SUtil.arrayToList(arguments): null;
 		this.results = results!=null? SUtil.arrayToList(results): null;
 		this.startable = startable;
@@ -103,13 +102,9 @@ public class ModelInfo extends Startable implements IModelInfo
 		this.properties = properties!=null? properties: new HashMap();
 		this.classloader = classloader;
 		this.providedservices = providedservices!=null? SUtil.arrayToList(providedservices): null;
-//		this.master = master;
-//		this.daemon = daemon;
-//		this.autoshutdown = autoshutdown;
 		this.configurations = configurations!=null? SUtil.arrayToList(configurations): null;
 		this.subcomponents = subcomponents!=null? SUtil.arrayToList(subcomponents): null;
 		this.imports = imports!=null? SUtil.arrayToList(imports): null;
-//		this.components = components;
 		setRequiredServices(requiredservices);
 	}
 
@@ -726,10 +721,11 @@ public class ModelInfo extends Startable implements IModelInfo
 		return extensions!=null? (IExtensionType[])extensions.toArray(new IExtensionType[extensions.size()]): new IExtensionType[0];
 	}
 	
+	// written with small 'types' to exclude from xml 
 	/**
 	 *  Set the extension types.
 	 */
-	public void setExtensionTypes(IExtensionType[] extensions)
+	public void setExtensiontypes(IExtensionType[] extensions)
 	{
 		this.extensions = SUtil.arrayToList(extensions);
 	}

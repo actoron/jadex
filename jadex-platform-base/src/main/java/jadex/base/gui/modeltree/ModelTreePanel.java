@@ -55,21 +55,23 @@ public class ModelTreePanel extends FileTreePanel
 		dnh.addAction(new RemovePathAction(this), null);
 		addNodeHandler(dnh);
 		
-		SServiceProvider.getService(exta.getServiceProvider(), IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
+		SServiceProvider.getService(exta.getServiceProvider(), IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
-				((IMultiKernelNotifierService) result).addKernelListener(new IMultiKernelListener()
+				((IMultiKernelNotifierService)result).addKernelListener(new IMultiKernelListener()
 				{
 					protected Runnable refresh = new Runnable()
 					{
 						public void run()
 						{
-							((ModelFileFilterMenuItemConstructor)getMenuItemConstructor()).getSupportedComponentTypes().addResultListener(new SwingDefaultResultListener()
+							((ModelFileFilterMenuItemConstructor)getMenuItemConstructor()).getSupportedComponentTypes()
+								.addResultListener(new SwingDefaultResultListener()
 							{
 								public void customResultAvailable(Object result)
 								{
-									((ITreeNode) getTree().getModel().getRoot()).refresh(true);
+									((ITreeNode)getTree().getModel().getRoot()).refresh(true);
 								}
 							});
 						}

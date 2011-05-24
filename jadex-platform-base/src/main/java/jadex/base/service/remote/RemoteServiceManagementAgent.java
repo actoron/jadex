@@ -127,11 +127,13 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						{	
 //							content = JavaReader.objectFromXML((String)content, ls.getClassLoader());
 							List	errors	= new ArrayList();
+							String contentcopy = (String)content;
 							content = Reader.objectFromXML(rms.getReader(), (String)content, ls.getClassLoader(), errors);
 							
 							// For corrupt result (e.g. if class not found) set exception to clean up waiting call.
 							if(!errors.isEmpty())
 							{
+								System.out.println("Error: "+contentcopy);
 								if(content instanceof RemoteResultCommand)
 								{
 //									System.out.println("corrupt content: "+content);

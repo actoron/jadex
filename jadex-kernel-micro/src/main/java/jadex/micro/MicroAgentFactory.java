@@ -18,6 +18,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
+import jadex.kernelbase.CacheableKernelModel;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -276,9 +277,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		try
 		{
 			// todo: is model info ok also in remote case?
-//			MicroModel mm = loader.loadComponentModel(model.getFilename(), null, model.getClassLoader());
+			CacheableKernelModel mm = loader.loadComponentModel(model.getFilename(), null, model.getClassLoader());
 	
-			MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, model, getMicroAgentClass(model.getFullName()+"Agent", 
+			MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, mm.getModelInfo(), getMicroAgentClass(model.getFullName()+"Agent", 
 				null, model.getClassLoader()), arguments, config, parent, binding, ret);
 			return new Future(new Object[]{mai, mai.getAgentAdapter()});
 		}

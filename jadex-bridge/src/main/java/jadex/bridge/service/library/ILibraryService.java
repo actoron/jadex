@@ -1,6 +1,7 @@
 package jadex.bridge.service.library;
 
 import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.commons.future.IFuture;
 
@@ -83,6 +84,7 @@ public interface ILibraryService extends IService
 	 *  Returns the current ClassLoader.
 	 *  @return the current ClassLoader
 	 */
+	@Excluded()
 	public ClassLoader getClassLoader();
 	
 	//-------- listener methods --------

@@ -94,21 +94,14 @@
 		</providedservice>
 		<providedservice class="ILibraryService">
 			<implementation proxytype="raw">
-				new LibraryService($args.libpath, $component.getServiceProvider(), 
-					SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_EXCLUDED}, 
-					new Object[]{new String[]{"getClassLoader"}})
-					)
+				new LibraryService($args.libpath, $component.getServiceProvider())
 			</implementation>
 		</providedservice>
 		<providedservice class="IClockService">
 			<implementation proxytype="raw">
 				$args.simulation
-				? new ClockService(new ClockCreationInfo(IClock.TYPE_EVENT_DRIVEN, "simulation_clock", System.currentTimeMillis(), 100), $component.getServiceProvider(),
-					SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
-					new Object[]{new String[]{"getState", "getTime", "getTick", "getStarttime", "getDelta", "getDilation", "getNextTimer", "getTimers", "getClockType", "advanceEvent"}}))
-				: new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "simulation_clock", System.currentTimeMillis(), 100), $component.getServiceProvider(),
-					SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
-					new Object[]{new String[]{"getState", "getTime", "getTick", "getStarttime", "getDelta", "getDilation", "getNextTimer", "getTimers", "getClockType", "advanceEvent"}}))
+				? new ClockService(new ClockCreationInfo(IClock.TYPE_EVENT_DRIVEN, "simulation_clock", System.currentTimeMillis(), 100), $component.getServiceProvider())
+				: new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "simulation_clock", System.currentTimeMillis(), 100), $component.getServiceProvider())
 			</implementation>
 		</providedservice>
 		<providedservice class="IMessageService">
@@ -134,11 +127,6 @@
 				new ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter(), $args.componentfactory)
 			</implementation>
 		</providedservice>
-		<!-- <providedservice class="IDF" direct="true">
-			new DirectoryFacilitatorService($component.getServiceProvider(), SUtil.createHashMap(
-				new Object[]{"componentviewer.viewerclass"}, 
-				new Object[]{"jadex.base.gui.componentviewer.dfservice.DFBrowserPanel"}))
-		</providedservice> -->
 		<providedservice class="IDF">
 			<implementation proxytype="raw">
 				new DirectoryFacilitatorService($component.getServiceProvider())
@@ -146,31 +134,14 @@
 		</providedservice>
 		<providedservice class="ISimulationService">
 			<implementation>
-				new SimulationService($component,
-					SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
-					new Object[]{new String[]{"getMode", "isExecuting"}}))
+				new SimulationService($component)
 			</implementation>
 		</providedservice>
-		<!-- <providedservice class="IComponentFactory">
-			<implementation proxytype="raw">
-				new ComponentComponentFactory($component.getServiceProvider())
-			</implementation>		
-		</providedservice> -->
 		<providedservice class="IDeploymentService">
 			<implementation>
 				new DeploymentService($component.getServiceProvider())
 			</implementation>		
 		</providedservice>
-		<!-- <providedservice class="IComponentFactory" direct="true">
-			new ApplicationComponentFactory(
-				new Set[]
-				{
-					MEnvSpaceType.getXMLMapping(),
-					MAGRSpaceType.getXMLMapping()
-				}, 
-				$component.getServiceProvider()
-			)		
-		</providedservice> -->
 		<providedservice class="IComponentFactoryExtensionService">
 			<implementation class="EnvSupportExtensionService"/>
 		</providedservice>

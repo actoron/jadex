@@ -6,7 +6,7 @@ import jadex.javaparser.IValueFetcher;
 
 
 /**
- * 
+ *  Interface for kernel extension instances.
  */
 public interface IExtensionInstance
 {

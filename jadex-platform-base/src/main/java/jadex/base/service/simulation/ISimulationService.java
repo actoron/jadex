@@ -3,6 +3,7 @@ package jadex.base.service.simulation;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.GuiClassName;
+import jadex.bridge.service.annotation.Uncached;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.execution.IExecutionService;
 import jadex.commons.IChangeListener;
@@ -68,12 +69,14 @@ public interface ISimulationService	extends IService
 	 *  Get the platform clock.
 	 *  @return The clock.
 	 */
+//	@Excluded
 	public IClockService getClockService();
 	
 	/**
 	 *  Get the executor service.
 	 *  @return The executor service.
 	 */
+//	@Excluded
 	public IExecutionService getExecutorService();
 	
 	// todo: hack remove method?!

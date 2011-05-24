@@ -74,14 +74,6 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	//-------- constructors --------
 	
 	/**
-	 *  Create a new application factory.
-	 */
-	public ComponentComponentFactory(IServiceProvider provider)
-	{
-		this(null, provider);
-	}
-	
-	/**
 	 *  Create a new application factory for startup.
 	 *  @param platform	The platform.
 	 *  @param mappings	The XML reader mappings of supported spaces (if any).
@@ -98,28 +90,12 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 *  @param platform	The platform.
 	 *  @param mappings	The XML reader mappings of supported spaces (if any).
 	 */
-	public ComponentComponentFactory(Set[] mappings, IServiceProvider provider)
+	public ComponentComponentFactory(IServiceProvider provider)
 	{
 		super(provider.getId(), IComponentFactory.class, null);
 		this.provider = provider;
-//		this.loader = new ComponentModelLoader(mappings);
-//		this.libservicelistener = new ILibraryServiceListener()
-//		{
-//			public IFuture urlRemoved(URL url)
-//			{
-//				loader.clearModelCache();
-//				return IFuture.DONE;
-//			}
-//			
-//			public IFuture urlAdded(URL url)
-//			{
-//				loader.clearModelCache();
-//				return IFuture.DONE;
-//			}
-//		};
+		// todo: get mappings whenever changes to extension providers occur or on each load model?
 	}
-
-	// todo: get mappings whenever changes to extension providers occur or on each load model?
 	
 	/**
 	 *  Start the service.
@@ -138,7 +114,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 					{
 						final ILibraryService libservice = (ILibraryService)result;
 						
-						SServiceProvider.getServices(provider, IComponentFactoryExtensionService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+						SServiceProvider.getServices(provider, IComponentFactoryExtensionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
