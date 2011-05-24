@@ -47,7 +47,7 @@
 			<env:property name="show_dark_flies">$args.show_dark_flies</env:property>
 			
 			<env:objecttypes>
-				<env:objecttype name="firefly">
+				<env:objecttype name="firefly" kdtree="true">
 					<env:property name="direction">Math.random()*2*Math.PI</env:property>
 					<env:property name="clock">(int)(Math.random()*($space.cycle_length))</env:property>
 					<env:property name="threshold">$space.flash_length</env:property>
@@ -56,10 +56,6 @@
 					<env:property name="flashing" dynamic="true">$object.clock &lt; $object.threshold</env:property>
 				</env:objecttype>
 			</env:objecttypes>
-			
-			<env:processtypes>
-				<env:processtype name="enableKdTree" class="EnableKdTreeProcess" />
-			</env:processtypes>
 			
 			<env:dataviews>
 				<env:dataview name="view_all" class="GeneralDataView2D" />
@@ -128,9 +124,6 @@
 			
 			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="15" height="15">
-					<env:processes>
-						<env:process type="enableKdTree" />
-					</env:processes>
 					
 					<env:dataproviders>
 						<env:dataprovider name="flashes">

@@ -189,7 +189,10 @@ public class MEnvSpaceType	extends MSpaceType
 			new SubobjectInfo(new AccessInfo(new QName(uri, "property"), "properties", null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			}));		
 		
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "objecttype")}), new ObjectInfo(MObjectType.class)));
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "objecttype")}), new ObjectInfo(MObjectType.class),
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("kdtree", "kdTree"))
+			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "envspacetype")}), new ObjectInfo(MEnvSpaceType.class),
 			new MappingInfo(null, new AttributeInfo[]{

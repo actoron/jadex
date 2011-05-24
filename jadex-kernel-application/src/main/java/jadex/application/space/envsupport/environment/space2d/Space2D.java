@@ -1,5 +1,6 @@
 package jadex.application.space.envsupport.environment.space2d;
 
+import jadex.application.space.envsupport.MObjectType;
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
@@ -12,6 +13,7 @@ import jadex.application.space.envsupport.math.Vector2Int;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.IFilter;
 import jadex.commons.SimplePropertyObject;
+import jadex.commons.meta.IPropertyMetaDataSet;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -117,6 +119,14 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 		KdTree kdTree = kdTrees.get(ret.getType());
 		if (kdTree != null)
 			kdTree.addObject(ret);
+	}
+	
+	public void addSpaceObjectType(String typename,
+			IPropertyMetaDataSet mobjecttype)
+	{
+		super.addSpaceObjectType(typename, mobjecttype);
+		if (((MObjectType) mobjecttype).isKdTree())
+			enableKdTree(typename);
 	}
 
 	/**

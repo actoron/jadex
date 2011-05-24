@@ -53,7 +53,7 @@
 				<env:objecttype name="patch">
 					<env:property name="heat">0.0</env:property>
 				</env:objecttype>
-				<env:objecttype name="heatbug">
+				<env:objecttype name="heatbug" kdtree="true">
 					<env:property name="ideal_temp">$space.min_ideal_temp + Math.random()*($space.max_ideal_temp - $space.min_ideal_temp)</env:property>
 					<env:property name="output_heat">$space.min_output_heat + Math.random()*($space.max_output_heat - $space.min_output_heat)</env:property>
 					<env:property name="random_move_chance">$space.random_move_chance</env:property>

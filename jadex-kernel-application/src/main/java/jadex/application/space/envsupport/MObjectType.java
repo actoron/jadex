@@ -10,6 +10,7 @@ import java.util.Map;
 public class MObjectType implements IPropertyMetaDataSet {
 
 	private String name;
+	private boolean kdtree;
 	private Map properties = new HashMap();
 
 	public String getName() {
@@ -20,6 +21,14 @@ public class MObjectType implements IPropertyMetaDataSet {
 		this.name = name;
 	}
 	
+	public boolean isKdTree() {
+		return kdtree;
+	}
+
+	public void setKdTree(boolean kdtree) {
+		this.kdtree = kdtree;
+	}
+
 	public void addProperty(MObjectTypeProperty property) {
 		properties.put(property.getName(), property);
 	}
