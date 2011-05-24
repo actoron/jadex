@@ -8,6 +8,7 @@ import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -154,7 +155,7 @@ class CleanerPanel extends JPanel
 				g.fillOval(p.x-w, p.y-h, w*2, h*2);
 				g.setColor(new Color(50, 50, 50, 180));
 				g.fillOval(p.x-3, p.y-3, 7, 7);
-				g.drawString(drawdata.cleaners[i].getProperty(ISpaceObject.PROPERTY_OWNER).toString(),
+				g.drawString(((IComponentDescription)drawdata.cleaners[i].getProperty(ISpaceObject.PROPERTY_OWNER)).getName().toString(),
 					p.x+5, p.y-5);
 				g.drawString("battery: " + (int)(((Double)drawdata.cleaners[i].getProperty("chargestate")).doubleValue()*100.0) + "%",
 					p.x+5, p.y+5);

@@ -2,11 +2,16 @@ package jadex.application.space.agr;
 
 import jadex.application.space.ISpace;
 import jadex.application.space.MSpaceInstance;
+import jadex.bridge.IComponentChangeEvent;
+import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.IValueFetcher;
+import jadex.kernelbase.StatelessAbstractInterpreter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,6 +109,38 @@ public class MAGRSpaceInstance extends MSpaceInstance
 		{
 			final ISpace space = (ISpace)getClazz().newInstance();
 			space.initSpace(ia, this, fetcher);
+			
+			ia.addComponentListener(new IComponentListener()
+			{
+				IFilter filter = new IFilter()
+				{
+					public boolean filter(Object obj)
+					{
+						IComponentChangeEvent event = (IComponentChangeEvent)obj;
+						return event.getSourceCategory().equals(StatelessAbstractInterpreter.TYPE_COMPONENT);
+					}
+				};
+				public IFilter getFilter()
+				{
+					return filter;
+				}
+				
+				public IFuture eventOccured(IComponentChangeEvent cce)
+				{
+					if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_CREATION))
+					{
+//						System.out.println("add: "+cce.getDetails());
+						space.componentAdded((IComponentDescription)cce.getDetails());
+					}
+					else if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_DISPOSAL))
+					{
+//						System.out.println("rem: "+cce.getComponent());
+						space.componentRemoved((IComponentDescription)cce.getDetails());
+					}
+					return IFuture.DONE;
+				}
+			});
+
 			ret.setResult(new Object[]{getName(), space});
 		}
 		catch(Exception e)

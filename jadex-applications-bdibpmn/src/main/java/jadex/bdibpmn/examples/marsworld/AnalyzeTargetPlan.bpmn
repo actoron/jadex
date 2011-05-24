@@ -57,20 +57,17 @@
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_RRrF0YKEEd6rVea0-FiZ3Q" iD="_RRrF0IKEEd6rVea0-FiZ3Q" outgoingEdges="_ieRUuoKEEd6rVea0-FiZ3Q" incomingEdges="_nxPfqoKDEd6rVea0-FiZ3Q" name="Find Producer">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_zQOpwEb3Ed-qm5VDdIP35A" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zQOpwUb3Ed-qm5VDdIP35A" key="class" value=""/>
-      </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_9N0qGQROEeCnwcpWvxOwkg" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9N0qGgROEeCnwcpWvxOwkg" key="dimension" value="2:4"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9N0qGwROEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9N0qHAROEeCnwcpWvxOwkg" key="0:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9N0qHQROEeCnwcpWvxOwkg" key="0:1" value="agrs"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9N0qHgROEeCnwcpWvxOwkg" key="0:2" value="AGRSpace"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9N0qHwROEeCnwcpWvxOwkg" key="0:3" value="((IApplicationExternalAccess)$scope.getParent()).getSpace(&quot;myagrspace&quot;)"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9N0qIAROEeCnwcpWvxOwkg" key="1:0" value="out"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9N0qIQROEeCnwcpWvxOwkg" key="1:1" value="producers"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9N0qIgROEeCnwcpWvxOwkg" key="1:2" value="IComponentIdentifier[]"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9N0qIwROEeCnwcpWvxOwkg" key="1:3" value="agrs.getGroup(&quot;mymarsteam&quot;).getAgentsForRole(&quot;producer&quot;)"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZmMNMIYJEeCsRZWMzIwlvw" key="dimension" value="2:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZmMNMYYJEeCsRZWMzIwlvw" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZmMNMoYJEeCsRZWMzIwlvw" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZmMNM4YJEeCsRZWMzIwlvw" key="0:1" value="agrs"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZmM0QIYJEeCsRZWMzIwlvw" key="0:2" value="AGRSpace"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZmM0QYYJEeCsRZWMzIwlvw" key="0:3" value="$beliefbase.agrspace"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZmM0QoYJEeCsRZWMzIwlvw" key="1:0" value="out"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZmM0Q4YJEeCsRZWMzIwlvw" key="1:1" value="producers"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZmM0RIYJEeCsRZWMzIwlvw" key="1:2" value="IComponentIdentifier[]"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZmM0RYYJEeCsRZWMzIwlvw" key="1:3" value="agrs.getGroup(&quot;mymarsteam&quot;).getAgentsForRole(&quot;producer&quot;)"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_ieRUsYKEEd6rVea0-FiZ3Q" iD="_ieRUsIKEEd6rVea0-FiZ3Q" outgoingEdges="_jX8HoYKEEd6rVea0-FiZ3Q _6o3QeoKEEd6rVea0-FiZ3Q" incomingEdges="_ieRUuoKEEd6rVea0-FiZ3Q" activityType="GatewayDataBasedExclusive"/>

@@ -47,6 +47,10 @@
 		<beliefref name="environment">
 			<concrete ref="move.environment"/>
 		</beliefref>
+		
+		<belief name="agrspace" class="AGRSpace">
+			<fact class="IFuture">$scope.getParent().getExtension("myagrspace")</fact>
+		</belief>
 	</beliefs>
 
   	<goals>

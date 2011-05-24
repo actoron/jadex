@@ -1,6 +1,5 @@
 package jadex.bdi.planlib.iasteps;
 
-import jadex.bdi.model.IMParameter;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
@@ -88,11 +87,11 @@ public class DispatchGoalStep implements IComponentStep
 				IParameter[] params = (IParameter[]) result;
 				for (int i = 0; i < params.length; ++i)
 				{
-					String dir = ((IMParameter) params[i].getModelElement()).getDirection();
+//					String dir = ((IMParameter) params[i].getModelElement()).getDirection();
 					//System.out.println(params[i].getName() + " " + params[i].getValue() + " " + dir);
 					//if (OAVBDIMetaModel.PARAMETER_DIRECTION_INOUT.equals(dir) ||
 						//OAVBDIMetaModel.PARAMETER_DIRECTION_OUT.equals(dir))
-						results.put(params[i].getName(), params[i].getValue());
+					results.put(params[i].getName(), params[i].getValue());
 				}
 				ret.setResult(results);
 			}

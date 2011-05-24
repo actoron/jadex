@@ -6,7 +6,6 @@ import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Grid2D;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.SimplePropertyObject;
@@ -76,7 +75,7 @@ public class EatAction extends SimplePropertyObject implements ISpaceAction
 				public void resultAvailable(Object result)
 				{
 					IComponentManagementService cms = (IComponentManagementService)result;
-					cms.destroyComponent((IComponentIdentifier)target.getProperty(ISpaceObject.PROPERTY_OWNER));
+					cms.destroyComponent(((IComponentDescription)target.getProperty(ISpaceObject.PROPERTY_OWNER)).getName());
 				}
 				
 				public void exceptionOccurred(Exception exception)

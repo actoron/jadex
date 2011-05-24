@@ -14,6 +14,7 @@ import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
@@ -361,6 +362,32 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	}
 	
 	/**
+	 * Get the component description.
+	 * @return The component description.
+	 */
+	public IComponentDescription	getComponentDescription()
+	{
+		// Todo: synchronization across components?
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					object = adapter.getDescription();
+				}
+			};
+			return (IComponentDescription)invoc.object;
+		}
+		else
+		{
+			return adapter.getDescription();
+		}
+	}
+
+
+	
+	/**
 	 *  Get the platform specific agent object.
 	 *  Allows to do platform specific things.
 	 *  @return The agent object.
@@ -533,14 +560,14 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				public void run()
 				{
-					getState().addAttributeValue(getScope(), OAVBDIRuntimeModel.agent_has_componentlisteners, (IComponentListener) arg);
+					getState().addAttributeValue(getInterpreter().getAgent(), OAVBDIRuntimeModel.agent_has_componentlisteners, (IComponentListener) arg);
 					ret.setResult(null);
 				}
 			};
 		}
 		else
 		{
-			getState().addAttributeValue(getScope(), OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
+			getState().addAttributeValue(getInterpreter().getAgent(), OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
 			ret.setResult(null);
 		}
 		return ret;
@@ -559,7 +586,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				public void run()
 				{
-					removeComponentListener((IComponentListener) arg, agent, getState(), getScope());
+					removeComponentListener((IComponentListener) arg, agent, getState(), getInterpreter().getAgent());
 					ret.setResult(null);
 				}
 			};

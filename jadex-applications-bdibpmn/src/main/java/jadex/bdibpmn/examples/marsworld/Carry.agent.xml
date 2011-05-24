@@ -37,6 +37,9 @@
 		<beliefref name="myself">
 			<concrete ref="move.myself"/>
 		</beliefref>
+		<belief name="agrspace" class="AGRSpace">
+			<fact class="IFuture">$scope.getParent().getExtension("myagrspace")</fact>
+		</belief>
 	</beliefs>
 
   	<goals>

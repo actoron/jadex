@@ -1,6 +1,5 @@
 package jadex.micro.examples.dungeonkeeper;
 
-import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.envsupport.environment.ISpaceAction;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Grid2D;
@@ -28,14 +27,13 @@ public class ImpAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		IApplicationExternalAccess	app	= (IApplicationExternalAccess)getParent();
-		final Grid2D space = (Grid2D)app.getSpace("mygc2dspace");
+		final Grid2D space = (Grid2D)getParent().getExtension("mygc2dspace");
 		
 		IComponentStep com = new IComponentStep()
 		{
 			public Object execute(IInternalAccess ia)
 			{
-				final ISpaceObject avatar = space.getAvatar(getComponentIdentifier());
+				final ISpaceObject avatar = space.getAvatar(getComponentDescription());
 				IVector2 mypos = (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
 				double dir = ((Number)avatar.getProperty("direction")).doubleValue();
 

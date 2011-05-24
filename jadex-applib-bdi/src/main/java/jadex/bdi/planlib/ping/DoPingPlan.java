@@ -10,7 +10,7 @@ public class DoPingPlan extends Plan
 {
 	/**
 	 * The body method is called on the
-	 * instatiated plan instance from the scheduler.
+	 * instantiated plan instance from the scheduler.
 	 */
 	public void body()
 	{
@@ -24,6 +24,7 @@ public class DoPingPlan extends Plan
 		IGoal query = createGoal("procap.qp_initiate");
 		query.getParameter("receiver").setValue(getParameter("receiver").getValue());
 		query.getParameter("timeout").setValue(getParameter("timeout").getValue());
+		query.getParameter("action").setValue(getParameter("content").getValue());
 		dispatchSubgoalAndWait(query);
 	}
 }

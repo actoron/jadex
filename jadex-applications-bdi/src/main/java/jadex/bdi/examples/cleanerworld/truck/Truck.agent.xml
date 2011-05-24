@@ -27,11 +27,11 @@
 
 	<beliefs>
 		<belief name="environment" class="ContinuousSpace2D">
- 			<fact>(ContinuousSpace2D)((IApplicationExternalAccess)$scope.getParent()).getSpace("my2dspace")</fact>
+ 			<fact class="IFuture">$scope.getParent().getExtension("my2dspace")</fact>
  		</belief>
  		
  		<belief name="myself" class="ISpaceObject" exported="true">
- 			<fact>$beliefbase.environment.getAvatar($scope.getComponentIdentifier(), $scope.getAgentModel().getFullName())</fact>
+ 			<fact>$beliefbase.environment.getAvatar($scope.getComponentDescription(), $scope.getAgentModel().getFullName())</fact>
  		</belief>
 
 		<beliefset name="wastebins"  class="ISpaceObject" exported="true"/>

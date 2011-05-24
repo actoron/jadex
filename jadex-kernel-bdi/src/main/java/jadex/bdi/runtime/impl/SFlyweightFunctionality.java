@@ -29,6 +29,7 @@ import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.future.IFuture;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -68,7 +69,9 @@ public class SFlyweightFunctionality
 			// Init on demand.
 			if(!state.containsKey(rscope[1], OAVBDIRuntimeModel.capability_has_beliefs, mbel))
 			{
-				AgentRules.initBelief(state, rscope[1], mbel, null);
+				IFuture	fut	= AgentRules.initBelief(state, rscope[1], mbel, null);
+				if(!fut.isDone())
+					throw new RuntimeException("Future belief not available: "+rscope[0]+" in "+rscope[1]);
 			}
 			Object rbel = state.getAttributeValue(rscope[1], OAVBDIRuntimeModel.capability_has_beliefs, mbel);	
 			
@@ -102,7 +105,11 @@ public class SFlyweightFunctionality
 			// Init on demand.
 			if(!state.containsKey(rscope[1], OAVBDIRuntimeModel.capability_has_beliefsets, mbelset))
 			{
-				AgentRules.initBeliefSet(state, rscope[1], mbelset, null);
+				IFuture	fut	= AgentRules.initBeliefSet(state, rscope[1], mbelset, null);
+				if(!fut.isDone())
+				{
+					throw new RuntimeException("Future beliefset not available: "+rscope[0]+" in "+rscope[1]);					
+				}
 			}
 			
 			Object rbelset = state.getAttributeValue(rscope[1], OAVBDIRuntimeModel.capability_has_beliefsets, mbelset);	

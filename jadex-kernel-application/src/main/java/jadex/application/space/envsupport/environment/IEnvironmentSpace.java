@@ -3,7 +3,6 @@ package jadex.application.space.envsupport.environment;
 
 import jadex.application.space.envsupport.dataview.IDataView;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IPropertyObject;
 import jadex.commons.future.IResultListener;

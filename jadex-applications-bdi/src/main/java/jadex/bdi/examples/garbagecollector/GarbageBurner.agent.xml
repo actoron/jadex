@@ -13,6 +13,7 @@
 	package="jadex.bdi.examples.garbagecollector">
 
 	<imports>
+		<import>jadex.commons.future.*</import>
 		<import>jadex.base.contextservice.*</import>
 		<import>jadex.base.appdescriptor.*</import>
 		<import>jadex.application.runtime.*</import>
@@ -26,12 +27,12 @@
 	<beliefs>
 		<!-- Environment. -->
 		<belief name="env" class="Grid2D">
- 			<fact>(Grid2D)((IApplicationExternalAccess)$scope.getParent()).getSpace("mygc2dspace")</fact>
+ 			<fact class="IFuture">$scope.getParent().getExtension("mygc2dspace")</fact>
  		</belief>
  		
  		<!-- Myself. -->
  		<belief name="myself" class="ISpaceObject">
- 			<fact>$beliefbase.env.getAvatar($scope.getComponentIdentifier(), $scope.getAgentModel().getFullName())</fact>
+ 			<fact>$beliefbase.env.getAvatar($scope.getComponentDescription(), $scope.getAgentModel().getFullName())</fact>
  		</belief>
 
 		<!-- The actual position on the grid world. -->

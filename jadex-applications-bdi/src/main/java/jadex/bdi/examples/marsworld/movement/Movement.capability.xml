@@ -21,7 +21,7 @@
 	<beliefs>
 		<!-- Environment. -->
 		<belief name="environment" class="ContinuousSpace2D">
- 			<fact>$properties.env</fact>
+ 			<fact class="IFuture">$scope.getParent().getExtension("my2dspace")</fact>
  		</belief>
  		
  		<!-- Myself. -->
@@ -103,10 +103,11 @@
 			</trigger>
 		</plan>
 	</plans>
-	
+	<!-- 
 	<properties>
 		<property name="env" class="IFuture">
 			$scope.getParent().getExtension("my2dspace")		
 		</property>
 	</properties>
+	 -->
 </capability>

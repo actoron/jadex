@@ -17,6 +17,7 @@
 	package="jadex.bdi.examples.hunterprey.cleverprey">
 
 	<imports>
+		<import>jadex.commons.future.*</import>
 		<import>jadex.application.runtime.*</import>
 		<import>jadex.application.space.envsupport.environment.space2d.*</import>
 		<import>jadex.application.space.envsupport.environment.*</import>
@@ -27,12 +28,12 @@
 	<beliefs>
 		<!-- Environment. -->
 		<belief name="env" class="Grid2D">
-			<fact>(Grid2D)((IApplicationExternalAccess)$scope.getParent()).getSpace("my2dspace")</fact>
+ 			<fact class="IFuture">$scope.getParent().getExtension("my2dspace")</fact>
  		</belief>
  		
  		<!-- Myself. -->
  		<belief name="myself" class="ISpaceObject">
- 			<fact>$beliefbase.env.getAvatar($scope.getComponentIdentifier(), $scope.getAgentModel().getFullName())</fact>
+ 			<fact>$beliefbase.env.getAvatar($scope.getComponentDescription(), $scope.getAgentModel().getFullName())</fact>
  		</belief>
 
  		<!-- The currently seen food. -->

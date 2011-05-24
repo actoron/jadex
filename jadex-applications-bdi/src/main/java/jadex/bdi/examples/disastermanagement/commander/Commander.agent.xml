@@ -12,6 +12,7 @@
 	package="jadex.bdi.examples.disastermanagement.commander">
 
 	<imports>
+		<import>jadex.commons.future.*</import>
 		<import>java.util.*</import>
 		<import>java.util.logging.*</import>
 		<import>jadex.bridge.*</import>
@@ -28,7 +29,7 @@
 	<beliefs>
 		<!-- Environment imported inherited from move capability. -->
 		<belief name="environment" class="ContinuousSpace2D">
-			<fact>(ContinuousSpace2D)((IApplicationExternalAccess)$scope.getParent()).getSpace("my2dspace")</fact>
+ 			<fact class="IFuture">$scope.getParent().getExtension("my2dspace")</fact>
 		</belief>
 		
 		<!-- Required to have disasters in OAV state. -->

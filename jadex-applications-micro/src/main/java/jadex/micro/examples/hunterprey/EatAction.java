@@ -7,7 +7,6 @@ import jadex.application.space.envsupport.environment.space2d.Grid2D;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.IResultListener;

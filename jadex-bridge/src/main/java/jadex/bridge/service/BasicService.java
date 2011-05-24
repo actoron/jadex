@@ -57,9 +57,17 @@ public class BasicService implements IInternalService
 	 */
 	public BasicService(Object providerid, Class type, Map properties)
 	{
+		this(providerid, type, null, properties);
+	}
+	
+	/**
+	 *  Create a new service.
+	 */
+	public BasicService(Object providerid, Class type, Class implclazz, Map properties)
+	{
 //		if(!SReflect.isSupertype(type, getClass()))
 //			throw new RuntimeException("Service must implement provided interface: "+getClass().getName()+", "+type.getName());
-		this.sid = createServiceIdentifier(providerid, type, getClass());
+		this.sid = createServiceIdentifier(providerid, type, implclazz==null ? getClass() : implclazz);
 		this.properties	= properties;
 		
 		// todo: move to be able to use the constant

@@ -433,7 +433,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 							{
 								public void resultAvailable(Object result)
 								{
-									System.out.println("Setting future property: "+unexp.getName()+" "+result);
+//									System.out.println("Setting future property: "+unexp.getName()+" "+result);
 									addProperty(unexp.getName(), result);
 									retu.setResult(result);
 								}

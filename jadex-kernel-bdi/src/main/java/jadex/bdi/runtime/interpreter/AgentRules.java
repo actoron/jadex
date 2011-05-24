@@ -204,23 +204,28 @@ public class AgentRules
 		ragentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1));
 		IAction	action	= new IAction()
 		{
-			public void execute(IOAVState state, IVariableAssignments assignments)
+			public void execute(final IOAVState state, IVariableAssignments assignments)
 			{
-				Object	ragent	= assignments.getVariableValue("?ragent");
+				final Object	ragent	= assignments.getVariableValue("?ragent");
+				final BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
 				
-				initializeCapabilityInstance(state, ragent);
-				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, null);
-				
-				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE);
-				// Remove arguments from state.
-				if(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments)!=null) 
-					state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
-				
-				// Inform get-external-access listeners (if any). Hack???
-				BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
-				
-				// When init has finished -> notify cms.
-				bdii.inited.setResult(new Object[]{bdii, bdii.getAgentAdapter()});
+				initializeCapabilityInstance(state, ragent).addResultListener(
+					bdii.createResultListener(new DelegationResultListener(bdii.inited)
+					{
+						public void customResultAvailable(Object result)
+						{
+							state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, null);
+							
+							state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE);
+							// Remove arguments from state.
+							if(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments)!=null) 
+								state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
+							
+							// When init has finished -> notify cms.
+							bdii.inited.setResult(new Object[]{bdii, bdii.getAgentAdapter()});
+						}
+					})
+				);
 			}
 		};
 		Rule rule = new Rule("agent_init1", ragentcon, action);
@@ -383,7 +388,9 @@ public class AgentRules
 								// Init on demand.
 								if(!state.containsKey(scope[1], OAVBDIRuntimeModel.capability_has_beliefs, mbel))
 								{
-									AgentRules.initBelief(state, scope[1], mbel, null);
+									IFuture	fut	= AgentRules.initBelief(state, scope[1], mbel, null);
+									if(!fut.isDone())
+										throw new RuntimeException("Future belief not available: "+scope[0]+" in "+scope[1]);
 								}
 								Object rbel = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_beliefs, mbel);	
 								Object val = BeliefRules.getBeliefValue(state, rbel, scope[1]);
@@ -425,7 +432,9 @@ public class AgentRules
 								// Init on demand.
 								if(!state.containsKey(scope[1], OAVBDIRuntimeModel.capability_has_beliefsets, mbelset))
 								{
-									AgentRules.initBelief(state, scope[1], mbelset, null);
+									IFuture	fut	= AgentRules.initBeliefSet(state, scope[1], mbelset, null);
+									if(!fut.isDone())
+										throw new RuntimeException("Future beliefset not available: "+scope[0]+" in "+scope[1]);
 								}
 								Object rbelset = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_beliefsets, mbelset);	
 								if(rbelset!=null)
@@ -1313,18 +1322,20 @@ public class AgentRules
 	 *  @param rcapa The reference to the capability instance.
 	 *  @param inivals Initial values for beliefs (e.g. arguments or config elements from outer capability);
 	 */
-	protected static void initializeCapabilityInstance(final IOAVState state, final Object rcapa)
+	protected static IFuture	initializeCapabilityInstance(final IOAVState state, final Object rcapa)
 	{
+		final Future	ret	= new Future();
+		
 		// Get configuration.
-		Object	mcapa	= state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model);
-		Object	mconfig = getConfiguration(state, rcapa);
+		final Object	mcapa	= state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model);
+		final Object	mconfig = getConfiguration(state, rcapa);
 		
 //		// Hack!!! cache expression parameters?
 		final OAVBDIFetcher fetcher = new OAVBDIFetcher(state, rcapa);
 //		InitFetcher fet = new InitFetcher(state, rcapa, parents, arguments);
 
 		// Register belief(set) types for mplan triggers (must be done before beliefs are initialized).
-		Collection	mplans	= state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_plans);
+		final Collection	mplans	= state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_plans);
 		if(mplans!=null)
 		{
 			for(Iterator it=mplans.iterator(); it.hasNext(); )
@@ -1400,273 +1411,336 @@ public class AgentRules
 		}
 
 		// Initialize beliefs.
+		IFuture	belsdone;
 		Collection	mbels = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_beliefs);
 		if(mbels!=null)
 		{
-			for(Iterator it=mbels.iterator(); it.hasNext(); )
+			Future	fut	= new Future();
+			belsdone	= fut;
+			final Iterator	it	= mbels.iterator();
+			IResultListener	rl	= new DelegationResultListener(fut)
 			{
-				final Object mbel = it.next();
-				// Create runtime belief if not already there.
-				if(state.getAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_beliefs, mbel)==null)
+				public void customResultAvailable(Object result)
 				{
-					initBelief(state, rcapa, mbel, fetcher);
+					if(it.hasNext())
+					{
+						Object mbel = it.next();
+						// Create runtime belief if not already there.
+						if(state.getAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_beliefs, mbel)==null)
+						{
+							initBelief(state, rcapa, mbel, fetcher).addResultListener(
+								BDIInterpreter.getInterpreter(state).createResultListener(this));
+						}
+						else
+						{
+							// continue with next belief
+							customResultAvailable(null);
+						}
+					}
+					else
+					{
+						// finished: now set result
+						super.customResultAvailable(null);
+					}
 				}
-			}
+			};
+			rl.resultAvailable(null);
+		}
+		else
+		{
+			belsdone	= IFuture.DONE;
 		}
 
-		// Init assigntos for belief references
-		Collection	mbelrefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_beliefrefs);
-		if(mbelrefs!=null)
+		belsdone.addResultListener(BDIInterpreter.getInterpreter(state).createResultListener(new DelegationResultListener(ret)
 		{
-			for(Iterator it=mbelrefs.iterator(); it.hasNext(); )
+			public void customResultAvailable(Object result)
 			{
-				Object mbelref = it.next();
-				registerAssignTos(state, rcapa, mbelref, OAVBDIMetaModel.beliefreference_type, OAVBDIMetaModel.capability_has_beliefrefs);
-			}
-		}
-			
-		// Initialize beliefsets.
-		Collection	mbelsets = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_beliefsets);
-		if(mbelsets!=null)
-		{
-			for(Iterator it=mbelsets.iterator(); it.hasNext(); )
-			{
-				final Object mbelset = it.next();
-				// Create runtime beliefset if not already there.
-				if(state.getAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_beliefsets, mbelset)==null)
+				// Init assigntos for belief references
+				Collection	mbelrefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_beliefrefs);
+				if(mbelrefs!=null)
 				{
-					initBeliefSet(state, rcapa, mbelset, fetcher);
+					for(Iterator it=mbelrefs.iterator(); it.hasNext(); )
+					{
+						Object mbelref = it.next();
+						registerAssignTos(state, rcapa, mbelref, OAVBDIMetaModel.beliefreference_type, OAVBDIMetaModel.capability_has_beliefrefs);
+					}
 				}
+					
+				// Initialize beliefsets.
+				Collection	mbelsets = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_beliefsets);
+				if(mbelsets!=null)
+				{
+					for(Iterator it=mbelsets.iterator(); it.hasNext(); )
+					{
+						final Object mbelset = it.next();
+						// Create runtime beliefset if not already there.
+						if(state.getAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_beliefsets, mbelset)==null)
+						{
+							initBeliefSet(state, rcapa, mbelset, fetcher);
+						}
+					}
+				}
+				
+				// Init assigntos for beliefset references
+				Collection	mbelsetrefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_beliefsetrefs);
+				if(mbelsetrefs!=null)
+				{
+					for(Iterator it=mbelsetrefs.iterator(); it.hasNext(); )
+					{
+						Object mbelsetref = it.next();
+						registerAssignTos(state, rcapa, mbelsetref, OAVBDIMetaModel.beliefsetreference_type, OAVBDIMetaModel.capability_has_beliefsetrefs);
+					}
+				}
+
+				// Init assigntos for goals
+				Collection	mgoals = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_goals);
+				if(mgoals!=null)
+				{
+					for(Iterator it=mgoals.iterator(); it.hasNext(); )
+					{
+						Object mgoal = it.next();
+						registerAssignTos(state, rcapa, mgoal, OAVBDIMetaModel.goalreference_type, OAVBDIMetaModel.capability_has_goalrefs);
+					}
+				}
+
+				// Init assigntos for goalreferences
+				Collection	mgoalrefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_goalrefs);
+				if(mgoalrefs!=null)
+				{
+					for(Iterator it=mgoalrefs.iterator(); it.hasNext(); )
+					{
+						Object mgoalref = it.next();
+						registerAssignTos(state, rcapa, mgoalref, OAVBDIMetaModel.goalreference_type, OAVBDIMetaModel.capability_has_goalrefs);
+					}
+				}
+
+				// Init assigntos for internalevents
+				Collection	minternalevents = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_internalevents);
+				if(minternalevents!=null)
+				{
+					for(Iterator it=minternalevents.iterator(); it.hasNext(); )
+					{
+						Object minternalevent = it.next();
+						registerAssignTos(state, rcapa, minternalevent, OAVBDIMetaModel.internaleventreference_type, OAVBDIMetaModel.capability_has_internaleventrefs);
+					}
+				}
+
+				// Init assigntos for internaleventreferences
+				Collection	minternaleventrefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_internaleventrefs);
+				if(minternaleventrefs!=null)
+				{
+					for(Iterator it=minternaleventrefs.iterator(); it.hasNext(); )
+					{
+						Object minternaleventref = it.next();
+						registerAssignTos(state, rcapa, minternaleventref, OAVBDIMetaModel.internaleventreference_type, OAVBDIMetaModel.capability_has_internaleventrefs);
+					}
+				}
+
+				// Init assigntos for messageevents
+				Collection	mmessageevents = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_messageevents);
+				if(mmessageevents!=null)
+				{
+					for(Iterator it=mmessageevents.iterator(); it.hasNext(); )
+					{
+						Object mmessageevent = it.next();
+						registerAssignTos(state, rcapa, mmessageevent, OAVBDIMetaModel.messageeventreference_type, OAVBDIMetaModel.capability_has_messageeventrefs);
+					}
+				}
+
+				// Init assigntos for messageeventreferences
+				Collection	mmessageeventrefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_messageeventrefs);
+				if(mmessageeventrefs!=null)
+				{
+					for(Iterator it=mmessageeventrefs.iterator(); it.hasNext(); )
+					{
+						Object mmessageeventref = it.next();
+						registerAssignTos(state, rcapa, mmessageeventref, OAVBDIMetaModel.messageeventreference_type, OAVBDIMetaModel.capability_has_messageeventrefs);
+					}
+				}
+
+				// Initialize subcapabilities.
+				IFuture	subcapsdone;
+				Collection caparefs = state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_subcapabilities);
+				if(caparefs!=null)
+				{
+					Future	fut	= new Future();
+					subcapsdone	= fut;
+					final Iterator	it	= caparefs.iterator();
+					IResultListener	rl	= new DelegationResultListener(fut)
+					{
+						public void customResultAvailable(Object result)
+						{
+							if(it.hasNext())
+							{
+								Object caparef = it.next();
+								Object rsubcapa = state.getAttributeValue(caparef, OAVBDIRuntimeModel.capabilityreference_has_capability);
+								initializeCapabilityInstance(state, rsubcapa).addResultListener(
+									BDIInterpreter.getInterpreter(state).createResultListener(this));
+							}
+							else
+							{
+								// finished: now set result
+								super.customResultAvailable(null);
+							}
+						}
+					};
+					rl.resultAvailable(null);
+				}
+				else
+				{
+					subcapsdone	= IFuture.DONE;
+				}
+				
+				subcapsdone.addResultListener(BDIInterpreter.getInterpreter(state).createResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						// Initialize mplan triggers (cached for speed and simplicity of rules).
+						if(mplans!=null)
+						{
+							for(Iterator it=mplans.iterator(); it.hasNext(); )
+							{
+								Object	mplan	= it.next();
+								Object	trigger	= state.getAttributeValue(mplan, OAVBDIMetaModel.plan_has_trigger);
+								if(trigger!=null)
+								{
+									Collection	triggerrefs	= state.getAttributeValues(trigger, OAVBDIMetaModel.plantrigger_has_goals);
+									if(triggerrefs!=null)
+									{
+										for(Iterator it2=triggerrefs.iterator(); it2.hasNext(); )
+										{
+											Object	triggerref	= it2.next();
+											String	ref	= (String)state.getAttributeValue(triggerref, OAVBDIMetaModel.triggerreference_has_ref);
+											Object[] scope = resolveCapability(ref, OAVBDIMetaModel.goal_type, rcapa, state);
+											Object	mscope	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+											Object	precand	= state.createObject(OAVBDIRuntimeModel.precandidate_type);
+											state.setAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_mplan, mplan);
+											state.setAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_capability, rcapa);
+											state.setAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_triggerreference, triggerref);
+					
+											Object	mpe	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_goals, scope[0]);
+											if(mpe==null)
+												throw new RuntimeException("Cannot resolve plan trigger: "+ref);
+											Object	precandlist	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_precandidates, mpe);
+											if(precandlist==null)
+											{
+												precandlist	= state.createObject(OAVBDIRuntimeModel.precandidatelist_type);
+												state.setAttributeValue(precandlist, OAVBDIRuntimeModel.precandidatelist_has_processableelement, mpe);
+												state.addAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_precandidates, precandlist);
+											}
+											state.addAttributeValue(precandlist, OAVBDIRuntimeModel.precandidatelist_has_precandidates, precand);
+										}
+									}
+					
+									triggerrefs	= state.getAttributeValues(trigger, OAVBDIMetaModel.trigger_has_internalevents);
+									if(triggerrefs!=null)
+									{
+										for(Iterator it2=triggerrefs.iterator(); it2.hasNext(); )
+										{
+											Object	triggerref	= it2.next();
+											String	ref	= (String)state.getAttributeValue(triggerref, OAVBDIMetaModel.triggerreference_has_ref);
+											Object[]	scope	= resolveCapability(ref, OAVBDIMetaModel.internalevent_type, rcapa, state);
+											Object	mscope	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+											Object	precand	= state.createObject(OAVBDIRuntimeModel.precandidate_type);
+											state.setAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_mplan, mplan);
+											state.setAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_capability, rcapa);
+											state.setAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_triggerreference, triggerref);
+					
+											Object	mpe	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_internalevents, scope[0]);
+											if(mpe==null)
+												throw new RuntimeException("Cannot resolve plan trigger: "+ref);
+											Object	precandlist	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_precandidates, mpe);
+											if(precandlist==null)
+											{
+												precandlist	= state.createObject(OAVBDIRuntimeModel.precandidatelist_type);
+												state.setAttributeValue(precandlist, OAVBDIRuntimeModel.precandidatelist_has_processableelement, mpe);
+												state.addAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_precandidates, precandlist);
+											}
+											state.addAttributeValue(precandlist, OAVBDIRuntimeModel.precandidatelist_has_precandidates, precand);
+										}
+									}
+					
+									triggerrefs	= state.getAttributeValues(trigger, OAVBDIMetaModel.trigger_has_messageevents);
+									if(triggerrefs!=null)
+									{
+										for(Iterator it2=triggerrefs.iterator(); it2.hasNext(); )
+										{
+											Object	triggerref	= it2.next();
+											String	ref	= (String)state.getAttributeValue(triggerref, OAVBDIMetaModel.triggerreference_has_ref);
+											Object[]	scope	= resolveCapability(ref, OAVBDIMetaModel.messageevent_type, rcapa, state);
+											Object	mscope	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+											Object	precand	= state.createObject(OAVBDIRuntimeModel.precandidate_type);
+											state.setAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_mplan, mplan);
+											state.setAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_capability, rcapa);
+											state.setAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_triggerreference, triggerref);
+					
+											Object	mpe	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_messageevents, scope[0]);
+											if(mpe==null)
+												throw new RuntimeException("Cannot resolve plan trigger: "+ref);
+											Object	precandlist	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_precandidates, mpe);
+											if(precandlist==null)
+											{
+												precandlist	= state.createObject(OAVBDIRuntimeModel.precandidatelist_type);
+												state.setAttributeValue(precandlist, OAVBDIRuntimeModel.precandidatelist_has_processableelement, mpe);
+												state.addAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_precandidates, precandlist);
+											}
+											state.addAttributeValue(precandlist, OAVBDIRuntimeModel.precandidatelist_has_precandidates, precand);
+										}
+									}
+								}
+							}
+						}
+
+						if(mconfig!=null)
+						{	
+							// Create initial goals.
+							Collection	cgoals	= state.getAttributeValues(mconfig, OAVBDIMetaModel.configuration_has_initialgoals);
+							if(cgoals!=null)
+							{
+								for(Iterator it=cgoals.iterator(); it.hasNext(); )
+								{
+									createConfigGoal(state, rcapa, it.next(), fetcher);
+								}
+							}
+							
+							// Create initial plans.
+							Collection	cplans	= state.getAttributeValues(mconfig, OAVBDIMetaModel.configuration_has_initialplans);
+							if(cplans!=null)
+							{
+								for(Iterator it=cplans.iterator(); it.hasNext(); )
+								{
+									createConfigPlan(state, rcapa, mcapa, it.next(), fetcher);
+								}
+							}
+					
+							// Create initial message events.
+							Collection	cmevents = state.getAttributeValues(mconfig, OAVBDIMetaModel.configuration_has_initialmessageevents);
+							if(cmevents!=null)
+							{
+								for(Iterator it=cmevents.iterator(); it.hasNext(); )
+								{
+									createConfigMessageEvent(state, rcapa, it.next(), fetcher);
+								}
+							}
+							
+							// Create initial internal events.
+							Collection	cievents = state.getAttributeValues(mconfig, OAVBDIMetaModel.configuration_has_initialinternalevents);
+							if(cievents!=null)
+							{
+								for(Iterator it=cievents.iterator(); it.hasNext(); )
+								{
+									createConfigInternalEvent(state, rcapa, it.next(), fetcher);
+								}
+							}
+						}
+						
+						ret.setResult(null);
+					}
+				}));
 			}
-		}
+		}));
 		
-		// Init assigntos for beliefset references
-		Collection	mbelsetrefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_beliefsetrefs);
-		if(mbelsetrefs!=null)
-		{
-			for(Iterator it=mbelsetrefs.iterator(); it.hasNext(); )
-			{
-				Object mbelsetref = it.next();
-				registerAssignTos(state, rcapa, mbelsetref, OAVBDIMetaModel.beliefsetreference_type, OAVBDIMetaModel.capability_has_beliefsetrefs);
-			}
-		}
-
-		// Init assigntos for goals
-		Collection	mgoals = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_goals);
-		if(mgoals!=null)
-		{
-			for(Iterator it=mgoals.iterator(); it.hasNext(); )
-			{
-				Object mgoal = it.next();
-				registerAssignTos(state, rcapa, mgoal, OAVBDIMetaModel.goalreference_type, OAVBDIMetaModel.capability_has_goalrefs);
-			}
-		}
-
-		// Init assigntos for goalreferences
-		Collection	mgoalrefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_goalrefs);
-		if(mgoalrefs!=null)
-		{
-			for(Iterator it=mgoalrefs.iterator(); it.hasNext(); )
-			{
-				Object mgoalref = it.next();
-				registerAssignTos(state, rcapa, mgoalref, OAVBDIMetaModel.goalreference_type, OAVBDIMetaModel.capability_has_goalrefs);
-			}
-		}
-
-		// Init assigntos for internalevents
-		Collection	minternalevents = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_internalevents);
-		if(minternalevents!=null)
-		{
-			for(Iterator it=minternalevents.iterator(); it.hasNext(); )
-			{
-				Object minternalevent = it.next();
-				registerAssignTos(state, rcapa, minternalevent, OAVBDIMetaModel.internaleventreference_type, OAVBDIMetaModel.capability_has_internaleventrefs);
-			}
-		}
-
-		// Init assigntos for internaleventreferences
-		Collection	minternaleventrefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_internaleventrefs);
-		if(minternaleventrefs!=null)
-		{
-			for(Iterator it=minternaleventrefs.iterator(); it.hasNext(); )
-			{
-				Object minternaleventref = it.next();
-				registerAssignTos(state, rcapa, minternaleventref, OAVBDIMetaModel.internaleventreference_type, OAVBDIMetaModel.capability_has_internaleventrefs);
-			}
-		}
-
-		// Init assigntos for messageevents
-		Collection	mmessageevents = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_messageevents);
-		if(mmessageevents!=null)
-		{
-			for(Iterator it=mmessageevents.iterator(); it.hasNext(); )
-			{
-				Object mmessageevent = it.next();
-				registerAssignTos(state, rcapa, mmessageevent, OAVBDIMetaModel.messageeventreference_type, OAVBDIMetaModel.capability_has_messageeventrefs);
-			}
-		}
-
-		// Init assigntos for messageeventreferences
-		Collection	mmessageeventrefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_messageeventrefs);
-		if(mmessageeventrefs!=null)
-		{
-			for(Iterator it=mmessageeventrefs.iterator(); it.hasNext(); )
-			{
-				Object mmessageeventref = it.next();
-				registerAssignTos(state, rcapa, mmessageeventref, OAVBDIMetaModel.messageeventreference_type, OAVBDIMetaModel.capability_has_messageeventrefs);
-			}
-		}
-
-		// Initialize beliefs from subcapas.
-		Collection caparefs = state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_subcapabilities);
-		if(caparefs!=null)
-		{
-			for(Iterator it=caparefs.iterator(); it.hasNext(); )
-			{
-				Object caparef = it.next();
-				Object rsubcapa = state.getAttributeValue(caparef, OAVBDIRuntimeModel.capabilityreference_has_capability);
-				initializeCapabilityInstance(state, rsubcapa);
-			}
-		}
-		
-		// Initialize mplan triggers (cached for speed and simplicity of rules).
-		if(mplans!=null)
-		{
-			for(Iterator it=mplans.iterator(); it.hasNext(); )
-			{
-				Object	mplan	= it.next();
-				Object	trigger	= state.getAttributeValue(mplan, OAVBDIMetaModel.plan_has_trigger);
-				if(trigger!=null)
-				{
-					Collection	triggerrefs	= state.getAttributeValues(trigger, OAVBDIMetaModel.plantrigger_has_goals);
-					if(triggerrefs!=null)
-					{
-						for(Iterator it2=triggerrefs.iterator(); it2.hasNext(); )
-						{
-							Object	triggerref	= it2.next();
-							String	ref	= (String)state.getAttributeValue(triggerref, OAVBDIMetaModel.triggerreference_has_ref);
-							Object[] scope = resolveCapability(ref, OAVBDIMetaModel.goal_type, rcapa, state);
-							Object	mscope	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
-							Object	precand	= state.createObject(OAVBDIRuntimeModel.precandidate_type);
-							state.setAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_mplan, mplan);
-							state.setAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_capability, rcapa);
-							state.setAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_triggerreference, triggerref);
-	
-							Object	mpe	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_goals, scope[0]);
-							if(mpe==null)
-								throw new RuntimeException("Cannot resolve plan trigger: "+ref);
-							Object	precandlist	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_precandidates, mpe);
-							if(precandlist==null)
-							{
-								precandlist	= state.createObject(OAVBDIRuntimeModel.precandidatelist_type);
-								state.setAttributeValue(precandlist, OAVBDIRuntimeModel.precandidatelist_has_processableelement, mpe);
-								state.addAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_precandidates, precandlist);
-							}
-							state.addAttributeValue(precandlist, OAVBDIRuntimeModel.precandidatelist_has_precandidates, precand);
-						}
-					}
-	
-					triggerrefs	= state.getAttributeValues(trigger, OAVBDIMetaModel.trigger_has_internalevents);
-					if(triggerrefs!=null)
-					{
-						for(Iterator it2=triggerrefs.iterator(); it2.hasNext(); )
-						{
-							Object	triggerref	= it2.next();
-							String	ref	= (String)state.getAttributeValue(triggerref, OAVBDIMetaModel.triggerreference_has_ref);
-							Object[]	scope	= resolveCapability(ref, OAVBDIMetaModel.internalevent_type, rcapa, state);
-							Object	mscope	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
-							Object	precand	= state.createObject(OAVBDIRuntimeModel.precandidate_type);
-							state.setAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_mplan, mplan);
-							state.setAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_capability, rcapa);
-							state.setAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_triggerreference, triggerref);
-	
-							Object	mpe	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_internalevents, scope[0]);
-							if(mpe==null)
-								throw new RuntimeException("Cannot resolve plan trigger: "+ref);
-							Object	precandlist	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_precandidates, mpe);
-							if(precandlist==null)
-							{
-								precandlist	= state.createObject(OAVBDIRuntimeModel.precandidatelist_type);
-								state.setAttributeValue(precandlist, OAVBDIRuntimeModel.precandidatelist_has_processableelement, mpe);
-								state.addAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_precandidates, precandlist);
-							}
-							state.addAttributeValue(precandlist, OAVBDIRuntimeModel.precandidatelist_has_precandidates, precand);
-						}
-					}
-	
-					triggerrefs	= state.getAttributeValues(trigger, OAVBDIMetaModel.trigger_has_messageevents);
-					if(triggerrefs!=null)
-					{
-						for(Iterator it2=triggerrefs.iterator(); it2.hasNext(); )
-						{
-							Object	triggerref	= it2.next();
-							String	ref	= (String)state.getAttributeValue(triggerref, OAVBDIMetaModel.triggerreference_has_ref);
-							Object[]	scope	= resolveCapability(ref, OAVBDIMetaModel.messageevent_type, rcapa, state);
-							Object	mscope	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
-							Object	precand	= state.createObject(OAVBDIRuntimeModel.precandidate_type);
-							state.setAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_mplan, mplan);
-							state.setAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_capability, rcapa);
-							state.setAttributeValue(precand, OAVBDIRuntimeModel.precandidate_has_triggerreference, triggerref);
-	
-							Object	mpe	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_messageevents, scope[0]);
-							if(mpe==null)
-								throw new RuntimeException("Cannot resolve plan trigger: "+ref);
-							Object	precandlist	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_precandidates, mpe);
-							if(precandlist==null)
-							{
-								precandlist	= state.createObject(OAVBDIRuntimeModel.precandidatelist_type);
-								state.setAttributeValue(precandlist, OAVBDIRuntimeModel.precandidatelist_has_processableelement, mpe);
-								state.addAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_precandidates, precandlist);
-							}
-							state.addAttributeValue(precandlist, OAVBDIRuntimeModel.precandidatelist_has_precandidates, precand);
-						}
-					}
-				}
-			}
-		}
-
-		if(mconfig!=null)
-		{	
-			// Create initial goals.
-			Collection	cgoals	= state.getAttributeValues(mconfig, OAVBDIMetaModel.configuration_has_initialgoals);
-			if(cgoals!=null)
-			{
-				for(Iterator it=cgoals.iterator(); it.hasNext(); )
-				{
-					createConfigGoal(state, rcapa, it.next(), fetcher);
-				}
-			}
-			
-			// Create initial plans.
-			Collection	cplans	= state.getAttributeValues(mconfig, OAVBDIMetaModel.configuration_has_initialplans);
-			if(cplans!=null)
-			{
-				for(Iterator it=cplans.iterator(); it.hasNext(); )
-				{
-					createConfigPlan(state, rcapa, mcapa, it.next(), fetcher);
-				}
-			}
-	
-			// Create initial message events.
-			Collection	cmevents = state.getAttributeValues(mconfig, OAVBDIMetaModel.configuration_has_initialmessageevents);
-			if(cmevents!=null)
-			{
-				for(Iterator it=cmevents.iterator(); it.hasNext(); )
-				{
-					createConfigMessageEvent(state, rcapa, it.next(), fetcher);
-				}
-			}
-			
-			// Create initial internal events.
-			Collection	cievents = state.getAttributeValues(mconfig, OAVBDIMetaModel.configuration_has_initialinternalevents);
-			if(cievents!=null)
-			{
-				for(Iterator it=cievents.iterator(); it.hasNext(); )
-				{
-					createConfigInternalEvent(state, rcapa, it.next(), fetcher);
-				}
-			}
-		}
+		return ret;
 	}
 	
 	/**
@@ -1703,8 +1777,6 @@ public class AgentRules
 		return mconfig;
 	}
 	
-	protected static Object UNDEFINED = new Object();
-
 	/**
 	 *  Initialize a belief.
 	 *  @param state The state.
@@ -1712,8 +1784,10 @@ public class AgentRules
 	 *  @param mbel The belief model.
 	 *  @param fetcher The fetcher.
 	 */
-	public static void initBelief(final IOAVState state, final Object rcapa, final Object mbel, IValueFetcher fetcher)
+	public static IFuture	initBelief(final IOAVState state, final Object rcapa, final Object mbel, IValueFetcher fetcher)
 	{
+		final Future	ret	= new Future();
+		
 		Object agent = BDIInterpreter.getInterpreter(state).getAgent();
 		Map parents = (Map)state.getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_initparents);
 		Map arguments = (Map)state.getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_arguments);
@@ -1729,53 +1803,91 @@ public class AgentRules
 		// Set a value if the belief is static (or first value for update rate).
 		if(OAVBDIMetaModel.EVALUATIONMODE_STATIC.equals(evamode) || update!=null)
 		{
-			Object value = findValue(state, rcapa, rbel, parents, fetcher, arguments);
-			
-			// Set value.
-			if(value!=UNDEFINED)
+			findValue(state, rcapa, rbel, parents, fetcher, arguments).addResultListener(BDIInterpreter.getInterpreter(state)
+				.createResultListener(new DelegationResultListener(ret)
 			{
-				BeliefRules.setBeliefValue(state, rbel, value);
-			}
+				public void customResultAvailable(Object result)
+				{
+					BeliefRules.setBeliefValue(state, rbel, result);
+					
+					if(update!=null)
+					{
+						final ITimedObject[]	to	= new ITimedObject[1];
+						final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
+						to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), new CheckedAction()
+						{
+							public void run()
+							{
+								final Object	exp = state.getAttributeValue(mbel, OAVBDIMetaModel.belief_has_fact);
+								try
+								{
+//									Object agent = BDIInterpreter.getInterpreter(state).getAgent();
+//									String name = (String)state.getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_name);
+									Object value = evaluateExpression(state, exp, fet);
+									if(value instanceof IFuture && IFuture.class.equals(state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_class)))
+									{
+										((IFuture)value).addResultListener(BDIInterpreter.getInterpreter(state)
+											.createResultListener(new IResultListener()
+										{
+											public void resultAvailable(Object result)
+											{
+												BeliefRules.setBeliefValue(state, rbel, result);
+												state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
+														BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+											}
+											
+											public void exceptionOccurred(Exception exception)
+											{
+												String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getName();
+												BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed));
+												state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
+														BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+											}
+										}));
+									}
+									else
+									{
+										BeliefRules.setBeliefValue(state, rbel, value);
+										state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
+												BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+									}
+
+//									System.out.println("Updating belief: "+state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name)+" = "+value+", "+BDIInterpreter.getInterpreter(state).getClockService().getTime());
+								}
+								catch(Exception e)
+								{
+									String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getName();
+									BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed));
+									state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
+											BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+								}
+							}
+							
+							public String toString()
+							{
+								return "CheckedAction: initBelief(), "+state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name)+", "+state.getAttributeValue(rbel, OAVBDIRuntimeModel.belief_has_fact);
+							}
+						});
+						
+				//			// changed *.class to *.TYPE due to javaflow bug
+						state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
+							BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+					}
+					
+					// Todo: why assigntos after setting value?
+					registerAssignTos(state, rcapa, mbel, OAVBDIMetaModel.beliefreference_type, OAVBDIMetaModel.capability_has_beliefrefs);
+
+					ret.setResult(null);
+				}
+			}));
 		}
-		
-		if(update!=null)
+		else
 		{
-			final ITimedObject[]	to	= new ITimedObject[1];
-			final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
-			to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), new CheckedAction()
-			{
-				public void run()
-				{
-					Object	exp = state.getAttributeValue(mbel, OAVBDIMetaModel.belief_has_fact);
-					try
-					{
-//						Object agent = BDIInterpreter.getInterpreter(state).getAgent();
-//						String name = (String)state.getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_name);
-						Object value = evaluateExpression(state, exp, fet);
-						BeliefRules.setBeliefValue(state, rbel, value);
-//						System.out.println("Updating belief: "+state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name)+" = "+value+", "+BDIInterpreter.getInterpreter(state).getClockService().getTime());
-					}
-					catch(Exception e)
-					{
-						String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getName();
-						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed));
-					}
-					state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
-						BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
-				}
-				
-				public String toString()
-				{
-					return "CheckedAction: initBelief(), "+state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name)+", "+state.getAttributeValue(rbel, OAVBDIRuntimeModel.belief_has_fact);
-				}
-			});
-			
-	//			// changed *.class to *.TYPE due to javaflow bug
-			state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
-				BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+			registerAssignTos(state, rcapa, mbel, OAVBDIMetaModel.beliefreference_type, OAVBDIMetaModel.capability_has_beliefrefs);
+			ret.setResult(null);
 		}
 		
-		registerAssignTos(state, rcapa, mbel, OAVBDIMetaModel.beliefreference_type, OAVBDIMetaModel.capability_has_beliefrefs);
+		return ret;
 	}
 
 	/**
@@ -1826,55 +1938,57 @@ public class AgentRules
 	 *  @param fetcher The fetcher.
 	 *  @param arguments The arguments.
 	 */
-	protected static Object findValue(IOAVState state, Object rcapa, Object rbel, Map parents, IValueFetcher fetcher, Map arguments)
+	protected static IFuture	findValue(IOAVState state, Object rcapa, Object rbel, Map parents, IValueFetcher fetcher, Map arguments)
 	{	
-		Object ret = UNDEFINED;
+		Future	ret	= new Future();
 		Object mbel = state.getAttributeValue(rbel, OAVBDIRuntimeModel.element_has_model);
 		String belname = (String)state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name);
-		
-		if(ret==UNDEFINED)
+
+		// Find parents of capability.
+		List ps = new ArrayList();
+		Object tmp = rcapa;
+		while(tmp!=null)
 		{
-			List ps = new ArrayList();
-			Object tmp = rcapa;
-			while(tmp!=null)
-			{
-				ps.add(0, tmp);
-				tmp = parents.get(tmp);
-			}
+			ps.add(0, tmp);
+			tmp = parents.get(tmp);
+		}
 			
-			// Try to find argument value for the belief.
-			// Try to find from arguments if agent.
-			if(arguments!=null)
+		// Try to find argument value for the belief.
+		// Try to find from arguments if agent.
+		if(arguments!=null)
+		{
+			Object ragent = ps.get(0);
+			if(rcapa==ragent && arguments.containsKey(belname))
 			{
-				Object ragent = ps.get(0);
-				if(rcapa==ragent && arguments.containsKey(belname))
+				ret.setResult(arguments.get(belname));
+			}
+			else
+			{
+				Object magent = state.getAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model);				
+				Collection belrefs = state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_beliefrefs);
+				if(belrefs!=null)
 				{
-					ret = arguments.get(belname);
-				}
-				else
-				{
-					Object magent = state.getAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model);				
-					Collection belrefs = state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_beliefrefs);
-					if(belrefs!=null)
+					for(Iterator it=belrefs.iterator(); !ret.isDone() && it.hasNext(); )
 					{
-						for(Iterator it=belrefs.iterator(); it.hasNext(); )
+						Object belref = it.next();
+						String name =(String)state.getAttributeValue(belref, OAVBDIMetaModel.modelelement_has_name);
+						Object[] res = resolveCapability(name, OAVBDIMetaModel.belief_type, ragent, state);
+						if(res[0].equals(belname) && res[1].equals(rcapa))
 						{
-							Object belref = it.next();
-							String name =(String)state.getAttributeValue(belref, OAVBDIMetaModel.modelelement_has_name);
-							Object[] res = resolveCapability(name, OAVBDIMetaModel.belief_type, ragent, state);
-							if(res[0].equals(belname) && res[1].equals(rcapa))
-							{
-								if(arguments.containsKey(name))
-									ret = arguments.get(name);
-							}
+							if(arguments.containsKey(name))
+								ret.setResult(arguments.get(name));
 						}
 					}
 				}
 			}
+		}
 			
+		if(!ret.isDone())
+		{
 			// Try to get value from outer capability (owner).
-			// If undefined try go get initial value. 
-			for(int i=0; i<ps.size() && ret==UNDEFINED; i++)
+			// If undefined try go get initial value.
+			Object	fact	= null;
+			for(int i=0; i<ps.size() && fact==null; i++)
 			{
 				Object mconfig = getConfiguration(state, ps.get(i));
 				if(mconfig!=null)
@@ -1890,33 +2004,52 @@ public class AgentRules
 							Object[] res = resolveCapability(name, OAVBDIMetaModel.belief_type, ps.get(i), state);
 							if(res[0].equals(belname) && res[1].equals(rcapa))
 							{
-								Object	fact	= state.getAttributeValue(minibel, OAVBDIMetaModel.belief_has_fact);
-								ret	= evaluateExpression(state, fact, fetcher);
+								fact	= state.getAttributeValue(minibel, OAVBDIMetaModel.belief_has_fact);
 							}
 						}
 					}
 				}
 			}
-		}
-		
-		// Try to fetch default value which is only contained in original.
-		if(state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_beliefs).contains(rbel))
-		{		
-			// If undefined try to get default value.
-			if(ret==UNDEFINED)
+			
+			if(fact!=null)
 			{
-				Object	exp = state.getAttributeValue(mbel, OAVBDIMetaModel.belief_has_fact);
-				if(exp!=null)
+				Object	val	= evaluateExpression(state, fact, fetcher);
+				if(val instanceof IFuture && IFuture.class.equals(state.getAttributeValue(fact, OAVBDIMetaModel.expression_has_class)))
 				{
-					ret	= evaluateExpression(state, exp, fetcher);
+					((IFuture)val).addResultListener(BDIInterpreter.getInterpreter(state)
+						.createResultListener(new DelegationResultListener(ret)));
+				}
+				else
+				{
+					ret.setResult(val);
 				}
 			}
-			
-			// If undefined try to get basic value.
-			if(ret==UNDEFINED)
+			else
 			{
-				Class clazz = (Class)state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_class);
-				ret = BeliefRules.getInitialValue(clazz);
+				// Try to fetch default value which is only contained in original.
+				if(state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_beliefs).contains(rbel))
+				{		
+					Object	exp = state.getAttributeValue(mbel, OAVBDIMetaModel.belief_has_fact);
+					if(exp!=null)
+					{
+						Object	val	= evaluateExpression(state, exp, fetcher);
+						if(val instanceof IFuture && IFuture.class.equals(state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_class)))
+						{
+							((IFuture)val).addResultListener(BDIInterpreter.getInterpreter(state)
+								.createResultListener(new DelegationResultListener(ret)));
+						}
+						else
+						{
+							ret.setResult(val);
+						}
+
+					}
+					else
+					{
+						Class clazz = (Class)state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_class);
+						ret.setResult(BeliefRules.getInitialValue(clazz));
+					}
+				}				
 			}
 		}
 		
@@ -1930,8 +2063,10 @@ public class AgentRules
 	 *  @param mbelset The beliefset model.
 	 *  @param fetcher The fetcher.
 	 */
-	public static void initBeliefSet(final IOAVState state, final Object rcapa, final Object mbelset, IValueFetcher fetcher)
+	public static IFuture	initBeliefSet(final IOAVState state, final Object rcapa, final Object mbelset, IValueFetcher fetcher)
 	{
+		Future	ret	= new Future();
+		
 		Object agent = BDIInterpreter.getInterpreter(state).getAgent();
 		Map parents = (Map)state.getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_initparents);
 		Map arguments = (Map)state.getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_arguments);
@@ -1947,45 +2082,78 @@ public class AgentRules
 		// Set a value if the belief is static (or first value for update rate).
 		if(OAVBDIMetaModel.EVALUATIONMODE_STATIC.equals(evamode) || update!=null)
 		{
-			Object values = findValues(state, rcapa, rbelset, parents, fetcher, arguments);
-			
-			// Set value.
-			if(values!=UNDEFINED)
+			findValues(state, rcapa, rbelset, parents, fetcher, arguments)
+				.addResultListener(BDIInterpreter.getInterpreter(state).createResultListener(new DelegationResultListener(ret)
 			{
-				for(Iterator it=SReflect.getIterator(values); it.hasNext(); )
-					BeliefRules.addBeliefSetValue(state, rbelset, it.next());
-			}
+				public void customResultAvailable(Object result)
+				{
+					for(Iterator it=SReflect.getIterator(result); it.hasNext(); )
+					{
+						BeliefRules.addBeliefSetValue(state, rbelset, it.next());
+					}
+
+					if(update!=null)
+					{
+						final ITimedObject[]	to	= new ITimedObject[1];
+						
+						final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
+						to[0]	= new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), new CheckedAction()
+						{
+							public void run()
+							{
+								final Object	exp = state.getAttributeValue(mbelset, OAVBDIMetaModel.beliefset_has_factsexpression);
+								try
+								{
+									Object values	= evaluateExpression(state, exp, fet);
+									if(values instanceof IFuture && IFuture.class.equals(state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_class)))
+									{
+										((IFuture)values).addResultListener(BDIInterpreter.getInterpreter(state)
+											.createResultListener(new IResultListener()
+										{
+											public void resultAvailable(Object result)
+											{
+												BeliefRules.updateBeliefSet(state, rbelset, result);
+												state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+											}
+											public void exceptionOccurred(Exception exception)
+											{
+												String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getName();
+												BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed));
+												state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+											}
+										}));
+									}
+									else
+									{
+										BeliefRules.updateBeliefSet(state, rbelset, values);
+										state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+									}
+								}
+								catch(Exception e)
+								{
+									String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getName();
+									BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed));
+									state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+								}
+							}
+						});
+						state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+					}
+
+					registerAssignTos(state, rcapa, mbelset, OAVBDIMetaModel.beliefsetreference_type, OAVBDIMetaModel.capability_has_beliefsetrefs);
+					
+					super.customResultAvailable(null);
+				}
+			}));
+		}
+		else
+		{
+			registerAssignTos(state, rcapa, mbelset, OAVBDIMetaModel.beliefsetreference_type, OAVBDIMetaModel.capability_has_beliefsetrefs);
+			
+			ret.setResult(null);			
 		}
 		
-		if(update!=null)
-		{
-			final ITimedObject[]	to	= new ITimedObject[1];
-			
-			final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
-			to[0]	= new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), new CheckedAction()
-			{
-				public void run()
-				{
-					Object	exp = state.getAttributeValue(mbelset, OAVBDIMetaModel.beliefset_has_factsexpression);
-					try
-					{
-						Object values	= evaluateExpression(state, exp, fet);
-						BeliefRules.updateBeliefSet(state, rbelset, values);
-					}
-					catch(Exception e)
-					{
-						String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getName();
-						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed));
-					}
-					// changed *.class to *.TYPE due to javaflow bug
-					state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
-				}
-			});
-//			// changed *.class to *.TYPE due to javaflow bug
-			state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
-		}
-
-		registerAssignTos(state, rcapa, mbelset, OAVBDIMetaModel.beliefsetreference_type, OAVBDIMetaModel.capability_has_beliefsetrefs);
+		return ret;
 	}
 	
 	/**
@@ -1997,55 +2165,57 @@ public class AgentRules
 	 *  @param fetcher The fetcher.
 	 *  @param arguments The arguments.
 	 */
-	protected static Object findValues(IOAVState state, Object rcapa, Object rbelset, Map parents, IValueFetcher fetcher, Map arguments)
+	protected static IFuture	findValues(IOAVState state, Object rcapa, Object rbelset, Map parents, IValueFetcher fetcher, Map arguments)
 	{	
-		Object ret = UNDEFINED;
+		Future	ret	= new Future();
 		Object mbelset = state.getAttributeValue(rbelset, OAVBDIRuntimeModel.element_has_model);
 		String belsetname = (String)state.getAttributeValue(mbelset, OAVBDIMetaModel.modelelement_has_name);
 		
-		if(ret==UNDEFINED)
+		List ps = new ArrayList();
+		Object tmp = rcapa;
+		while(tmp!=null)
 		{
-			List ps = new ArrayList();
-			Object tmp = rcapa;
-			while(tmp!=null)
+			ps.add(0, tmp);
+			tmp = parents.get(tmp);
+		}
+		
+		// Try to find argument value for the belief.
+		// Try to find from arguments if agent.
+		if(arguments!=null)
+		{
+			Object ragent = ps.get(0);
+			if(rcapa==ragent && arguments.containsKey(belsetname))
 			{
-				ps.add(0, tmp);
-				tmp = parents.get(tmp);
+				ret.setResult(arguments.get(belsetname));
 			}
-			
-			// Try to find argument value for the belief.
-			// Try to find from arguments if agent.
-			if(arguments!=null)
+			else
 			{
-				Object ragent = ps.get(0);
-				if(rcapa==ragent && arguments.containsKey(belsetname))
+				Object magent = state.getAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model);
+				Collection belsetrefs = state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_beliefsetrefs);
+				if(belsetrefs!=null)
 				{
-					ret = arguments.get(belsetname);
-				}
-				else
-				{
-					Object magent = state.getAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model);
-					Collection belsetrefs = state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_beliefsetrefs);
-					if(belsetrefs!=null)
+					for(Iterator it=belsetrefs.iterator(); !ret.isDone() && it.hasNext(); )
 					{
-						for(Iterator it=belsetrefs.iterator(); it.hasNext(); )
+						Object belsetref = it.next();
+						String name =(String)state.getAttributeValue(belsetref, OAVBDIMetaModel.modelelement_has_name);
+						Object[] res = resolveCapability(name, OAVBDIMetaModel.beliefset_type, ragent, state);
+						if(res[0].equals(belsetname) && res[1].equals(rcapa))
 						{
-							Object belsetref = it.next();
-							String name =(String)state.getAttributeValue(belsetref, OAVBDIMetaModel.modelelement_has_name);
-							Object[] res = resolveCapability(name, OAVBDIMetaModel.beliefset_type, ragent, state);
-							if(res[0].equals(belsetname) && res[1].equals(rcapa))
-							{
-								if(arguments.containsKey(name))
-									ret = arguments.get(name);
-							}
+							if(arguments.containsKey(name))
+								ret.setResult(arguments.get(name));
 						}
 					}
 				}
 			}
-			
+		}
+		
+		if(!ret.isDone())
+		{
+			Object	fact	= null;
+			Collection	facts	= null;
 			// Try to get value from outer capability (owner).
 			// If undefined try go get initial value. 
-			for(int i=0; i<ps.size() && ret==UNDEFINED; i++)
+			for(int i=0; i<ps.size() && fact==null && facts==null; i++)
 			{
 				Object mconfig = getConfiguration(state, ps.get(i));
 				if(mconfig!=null)
@@ -2054,60 +2224,81 @@ public class AgentRules
 					Collection	minibelsets = state.getAttributeValues(mconfig, OAVBDIMetaModel.configuration_has_initialbeliefsets);
 					if(minibelsets!=null)
 					{
-						for(Iterator it=minibelsets.iterator(); it.hasNext(); )
+						for(Iterator it=minibelsets.iterator(); it.hasNext() && fact==null && facts==null; )
 						{
 							Object	minibelset	= it.next();
 							String name =(String)state.getAttributeValue(minibelset, OAVBDIMetaModel.configbeliefset_has_ref);
 							Object[] res = resolveCapability(name, OAVBDIMetaModel.beliefset_type, ps.get(i), state);
 							if(res[0].equals(belsetname) && res[1].equals(rcapa))
 							{
-								Object	fact = state.getAttributeValue(minibelset, OAVBDIMetaModel.beliefset_has_factsexpression);
-								Collection	facts = state.getAttributeValues(minibelset, OAVBDIMetaModel.beliefset_has_facts);
-//								System.out.println("fact:"+fact+" facts: "+facts);
-								if(fact!=null)
-								{
-									ret = evaluateExpression(state, fact, fetcher);
-								}
-								else if(facts!=null)
-								{
-									List values	= new ArrayList();
-									for(Iterator it2=facts.iterator(); it2.hasNext(); )
-									{
-										fact	= it2.next();
-										values.add(evaluateExpression(state, fact, fetcher));
-									}
-									ret	= values;
-								}
+								fact = state.getAttributeValue(minibelset, OAVBDIMetaModel.beliefset_has_factsexpression);
+								facts = state.getAttributeValues(minibelset, OAVBDIMetaModel.beliefset_has_facts);
 							}
 						}
 					}
 				}
 			}
-		}
-		
-		// Try to fetch default value which is only contained in original.
-		if(state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_beliefsets).contains(rbelset))
-		{		
-			// If undefined try to get default value.
-			if(ret==UNDEFINED)
+			
+//			System.out.println("fact:"+fact+" facts: "+facts);
+			if(fact!=null)
 			{
-				Collection	facts	= state.getAttributeValues(mbelset, OAVBDIMetaModel.beliefset_has_facts);
-				if(facts!=null)
+				Object	val	= evaluateExpression(state, fact, fetcher);
+				if(val instanceof IFuture && IFuture.class.equals(state.getAttributeValue(fact, OAVBDIMetaModel.expression_has_class)))
 				{
-					List values	= new ArrayList();
-					for(Iterator it2=facts.iterator(); it2.hasNext(); )
-					{
-						Object	fact	= it2.next();
-						values.add(evaluateExpression(state, fact, fetcher));
-					}
-					ret	= values;
+					((IFuture)val).addResultListener(BDIInterpreter.getInterpreter(state)
+						.createResultListener(new DelegationResultListener(ret)));
 				}
 				else
 				{
-					Object	factsexp	= state.getAttributeValue(mbelset, OAVBDIMetaModel.beliefset_has_factsexpression);
-					if(factsexp!=null)
+					ret.setResult(val);
+				}
+			}
+			else if(facts!=null)
+			{
+				List values	= new ArrayList();
+				for(Iterator it2=facts.iterator(); it2.hasNext(); )
+				{
+					fact	= it2.next();
+					values.add(evaluateExpression(state, fact, fetcher));
+				}
+				ret.setResult(values);
+			}
+			else
+			{
+				// Try to fetch default value which is only contained in original.
+				if(state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_beliefsets).contains(rbelset))
+				{		
+					facts	= state.getAttributeValues(mbelset, OAVBDIMetaModel.beliefset_has_facts);
+					if(facts!=null)
 					{
-						ret	= evaluateExpression(state, factsexp, fetcher);
+						List values	= new ArrayList();
+						for(Iterator it2=facts.iterator(); it2.hasNext(); )
+						{
+							fact	= it2.next();
+							values.add(evaluateExpression(state, fact, fetcher));
+						}
+						ret.setResult(values);
+					}
+					else
+					{
+						Object	factsexp	= state.getAttributeValue(mbelset, OAVBDIMetaModel.beliefset_has_factsexpression);
+						if(factsexp!=null)
+						{
+							Object	val	= evaluateExpression(state, factsexp, fetcher);
+							if(val instanceof IFuture && IFuture.class.equals(state.getAttributeValue(factsexp, OAVBDIMetaModel.expression_has_class)))
+							{
+								((IFuture)val).addResultListener(BDIInterpreter.getInterpreter(state)
+									.createResultListener(new DelegationResultListener(ret)));
+							}
+							else
+							{
+								ret.setResult(val);
+							}
+						}
+						else
+						{
+							ret.setResult(null);
+						}
 					}
 				}
 			}

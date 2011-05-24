@@ -1,5 +1,6 @@
 package jadex.bdi.runtime;
 
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IExternalAccess;
@@ -105,6 +106,12 @@ public interface ICapability	extends IElement
 	 * @return The agent identifier.
 	 */
 	public IComponentIdentifier	getComponentIdentifier();
+
+	/**
+	 * Get the component description.
+	 * @return The component description.
+	 */
+	public IComponentDescription	getComponentDescription();
 
 	/**
 	 *  Get the platform specific agent object.

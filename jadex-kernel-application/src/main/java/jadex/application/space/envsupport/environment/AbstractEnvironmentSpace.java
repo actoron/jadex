@@ -2305,7 +2305,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //			public void resultAvailable(Object result)
 //			{
 //				String componenttype = (String)result;
-				String componenttype = owner.getLocalType();
+//				String componenttype = owner.getLocalType();
 				synchronized(monitor)
 				{
 					// Possibly add or create avatar(s) if any.

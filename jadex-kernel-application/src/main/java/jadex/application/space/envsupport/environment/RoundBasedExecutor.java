@@ -5,7 +5,6 @@ import jadex.application.space.envsupport.environment.ComponentActionList.Action
 import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IServiceProvider;

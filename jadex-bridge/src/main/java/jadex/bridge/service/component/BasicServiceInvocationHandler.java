@@ -324,7 +324,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 					}
 				}
 				
-				BasicService mgmntservice = new BasicService(ia.getExternalAccess().getServiceProvider().getId(), type, null);
+				BasicService mgmntservice = new BasicService(ia.getExternalAccess().getServiceProvider().getId(), type, service.getClass(), null);
 	
 				Field fields[] = service.getClass().getDeclaredFields();
 				for(int i=0; i<fields.length; i++)

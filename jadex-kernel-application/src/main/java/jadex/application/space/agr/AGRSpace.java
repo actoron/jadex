@@ -3,7 +3,6 @@ package jadex.application.space.agr;
 import jadex.application.space.ISpace;
 import jadex.application.space.MSpaceInstance;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.javaparser.IValueFetcher;
 

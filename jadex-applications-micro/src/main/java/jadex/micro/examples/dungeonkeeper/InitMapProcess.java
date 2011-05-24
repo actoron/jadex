@@ -81,7 +81,7 @@ public class InitMapProcess extends SimplePropertyObject implements ISpaceProces
 		try
 		{
 			final Space2D grid = (Space2D)space;
-			ClassLoader cl = space.getContext().getApplicationType().getModelInfo().getClassLoader();
+			ClassLoader cl = space.getExternalAccess().getModel().getClassLoader();
 			String mapfile = (String)getProperty("mapfile");
 			InputStream is = SUtil.getResource(mapfile, cl);
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));

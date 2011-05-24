@@ -1,6 +1,5 @@
 package jadex.application.space.agr;
 
-import jadex.application.space.MSpaceInstance;
 import jadex.application.space.MSpaceType;
 import jadex.commons.SReflect;
 import jadex.xml.AccessInfo;
@@ -119,7 +118,7 @@ public class MAGRSpaceType	extends MSpaceType
 			new ObjectInfo(MAGRSpaceInstance.class, new IPostProcessor() {
 			public Object postProcess(IContext context, Object object)
 			{
-				MSpaceInstance	si	= (MSpaceInstance)object;
+//				MSpaceInstance	si	= (MSpaceInstance)object;
 				
 				// todo:
 				

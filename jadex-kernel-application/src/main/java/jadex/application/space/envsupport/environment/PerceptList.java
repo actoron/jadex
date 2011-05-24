@@ -1,7 +1,6 @@
 package jadex.application.space.envsupport.environment;
 
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IFilter;
 
 import java.util.Comparator;
