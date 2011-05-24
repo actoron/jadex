@@ -422,7 +422,8 @@ public abstract class AbstractInterpreter implements IComponentInstance
 				{
 					final UnparsedExpression unexp = (UnparsedExpression)value;
 					final Object val = SJavaParser.evaluateExpression(unexp.getValue(), getModel().getAllImports(), getFetcher(), getClassLoader());
-					if(unexp.getClazz()!=null && SReflect.isSupertype(IFuture.class, unexp.getClazz()))
+					Class clazz = unexp.getClazz(getModel().getClassLoader(), getModel().getAllImports());
+					if(SReflect.isSupertype(IFuture.class, clazz!=null? clazz: val.getClass()))
 					{
 //						System.out.println("Future property: "+mexp.getName()+", "+val);
 						if(val instanceof IFuture)

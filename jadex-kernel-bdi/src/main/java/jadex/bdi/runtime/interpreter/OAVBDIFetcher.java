@@ -107,7 +107,7 @@ public class OAVBDIFetcher extends SimpleValueFetcher
 			ret = EventbaseFlyweight.getEventbaseFlyweight(state, rcapa);
 		else if(name.equals("$expressionbase"))
 			ret = ExpressionbaseFlyweight.getExpressionbaseFlyweight(state, rcapa);
-		else if(name.equals("$propertybase"))
+		else if(name.equals("$propertybase") || name.equals("$properties"))
 			ret = PropertybaseFlyweight.getPropertybaseFlyweight(state, rcapa);
 		else if(name.equals("$goal") && rgoal!=null)
 			ret = GoalFlyweight.getGoalFlyweight(state, rcapa, rgoal);

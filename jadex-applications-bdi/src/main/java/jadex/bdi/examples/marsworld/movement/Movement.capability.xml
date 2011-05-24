@@ -15,17 +15,18 @@
 		<import>jadex.application.space.envsupport.environment.*</import>
 		<import>jadex.application.space.envsupport.environment.space2d.*</import>
 		<import>jadex.application.space.envsupport.math.*</import>
+		<import>jadex.commons.future.*</import>
 	</imports>
 
 	<beliefs>
 		<!-- Environment. -->
 		<belief name="environment" class="ContinuousSpace2D">
- 			<fact>(ContinuousSpace2D)((IApplicationExternalAccess)$scope.getParent()).getSpace("my2dspace")</fact>
+ 			<fact>$properties.env</fact>
  		</belief>
  		
  		<!-- Myself. -->
  		<belief name="myself" class="ISpaceObject" exported="true">
- 			<fact>$beliefbase.environment.getAvatar($scope.getComponentIdentifier(), $scope.getAgentModel().getFullName())</fact>
+ 			<fact>$beliefbase.environment.getAvatar($scope.getComponentDescription(), $scope.getAgentModel().getFullName())</fact>
  		</belief>
 
 		<!-- Is the mission finished? -->
@@ -102,4 +103,10 @@
 			</trigger>
 		</plan>
 	</plans>
+	
+	<properties>
+		<property name="env" class="IFuture">
+			$scope.getParent().getExtension("my2dspace")		
+		</property>
+	</properties>
 </capability>

@@ -1,5 +1,6 @@
 package jadex.bridge.modelinfo;
 
+import jadex.commons.SReflect;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SJavaParser;
 
@@ -86,23 +87,37 @@ public class UnparsedExpression
 		this.classname = classname;
 	}
 
+//	/**
+//	 *  Get the clazz.
+//	 *  @return The clazz.
+//	 */
+//	public Class getClazz()
+//	{
+//		return clazz;
+//	}
+	
 	/**
 	 *  Get the clazz.
 	 *  @return The clazz.
 	 */
-	public Class getClazz()
+	public Class getClazz(ClassLoader classloader, String[] imports)
 	{
+		if(clazz==null && classname!=null)
+		{
+			clazz = SReflect.findClass0(classname, imports, classloader);
+		}
 		return clazz;
 	}
 
-	/**
-	 *  Set the clazz.
-	 *  @param clazz The clazz to set.
-	 */
-	public void setClazz(Class clazz)
-	{
-		this.clazz = clazz;
-	}
+	// Excluded to avoid sending per xml 
+//	/**
+//	 *  Set the clazz.
+//	 *  @param clazz The clazz to set.
+//	 */
+//	public void setClazz(Class clazz)
+//	{
+//		this.clazz = clazz;
+//	}
 
 	/**
 	 *  Get the value.
