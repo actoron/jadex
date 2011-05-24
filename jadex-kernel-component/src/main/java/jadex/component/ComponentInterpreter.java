@@ -25,6 +25,7 @@ import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.AbstractInterpreter;
 import jadex.kernelbase.ExternalAccess;
+import jadex.kernelbase.InterpreterFetcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -386,6 +387,15 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	{
 		return results;
 	}
+	
+	/**
+	 *  Get the properties.
+	 *  @return the properties.
+	 */
+	public Map getProperties()
+	{
+		return properties;
+	}
 
 	/**
 	 *  Create the service container.
@@ -512,13 +522,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	{
 		if(fetcher==null)
 		{
-			final SimpleValueFetcher sfetcher = new SimpleValueFetcher();
-			sfetcher.setValue("$args", getArguments());
-			sfetcher.setValue("$properties", properties);
-			sfetcher.setValue("$results", getResults());
-			sfetcher.setValue("$component", this);
-			sfetcher.setValue("$provider", getServiceContainer());
-			fetcher = sfetcher;
+			fetcher = new InterpreterFetcher(this);
 		}
 		return fetcher;
 	}

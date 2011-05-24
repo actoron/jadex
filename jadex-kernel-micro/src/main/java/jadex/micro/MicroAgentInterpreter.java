@@ -534,7 +534,16 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 */
 	public Map getArguments()
 	{
-		return arguments!=null ? arguments : Collections.EMPTY_MAP;
+		return arguments!=null? arguments: Collections.EMPTY_MAP;
+	}
+	
+	/**
+	 *  Get the properties.
+	 *  @return The properties.
+	 */
+	public Map getProperties()
+	{
+		return properties!=null? properties: Collections.EMPTY_MAP;
 	}
 	
 	/**

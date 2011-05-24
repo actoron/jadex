@@ -1508,6 +1508,36 @@ public class BDIInterpreter	extends AbstractInterpreter
 		state.setAttributeValue(rparam, OAVBDIRuntimeModel.parameter_has_type, val.getClass());
 		state.setAttributeValue(rparam, OAVBDIRuntimeModel.parameter_has_value, val);
 
-		getState().addAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_properties, rparam);
+		state.addAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_properties, rparam);
+	}
+	
+	/**
+	 *  Get the properties.
+	 */
+	public Map getProperties()
+	{
+		Map ret = null;
+		Collection params = state.getAttributeValues(ragent, OAVBDIRuntimeModel.capability_has_properties);
+		if(params!=null)
+		{
+			ret = new HashMap();
+			for(Iterator it=params.iterator(); it.hasNext(); )
+			{
+				Object param = it.next();
+				Object name = state.getAttributeValue(param, OAVBDIRuntimeModel.parameter_has_name);
+				Object val = state.getAttributeValue(param, OAVBDIRuntimeModel.parameter_has_value);
+				ret.put(name, val);
+			}
+		}
+		return ret!=null? ret: Collections.EMPTY_MAP;
+	}
+	
+	/**
+	 *  Get the properties.
+	 */
+	public Map getArguments()
+	{
+		// todo:
+		throw new UnsupportedOperationException();
 	}
 }

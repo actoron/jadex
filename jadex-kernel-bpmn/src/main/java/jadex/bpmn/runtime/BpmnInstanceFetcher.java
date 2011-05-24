@@ -1,17 +1,15 @@
 package jadex.bpmn.runtime;
 
 import jadex.javaparser.IValueFetcher;
+import jadex.kernelbase.InterpreterFetcher;
 
 /**
  *  Fetch values from the context variables of a BPMN process instance
  *  or its superordinated fetcher.
  */
-public class BpmnInstanceFetcher implements IValueFetcher
+public class BpmnInstanceFetcher extends InterpreterFetcher
 {
 	//-------- attributes --------
-	
-	/** The BPMN process instance. */
-	protected BpmnInterpreter	interpreter;
 	
 	/** The superordinated value fetcher (if any). */
 	protected IValueFetcher	fetcher;
@@ -23,7 +21,7 @@ public class BpmnInstanceFetcher implements IValueFetcher
 	 */
 	public BpmnInstanceFetcher(BpmnInterpreter interpreter, IValueFetcher fetcher)
 	{
-		this.interpreter	= interpreter;
+		super(interpreter);
 		this.fetcher	= fetcher;
 	}
 	
@@ -48,9 +46,10 @@ public class BpmnInstanceFetcher implements IValueFetcher
 	public Object fetchValue(String name)
 	{
 		Object	ret;
-		if(interpreter.hasContextVariable(name))
+		BpmnInterpreter inter = (BpmnInterpreter)getInterpreter();
+		if(inter.hasContextVariable(name))
 		{
-			ret	= interpreter.getContextVariable(name);
+			ret	= inter.getContextVariable(name);
 		}
 		else if(fetcher!=null)
 		{

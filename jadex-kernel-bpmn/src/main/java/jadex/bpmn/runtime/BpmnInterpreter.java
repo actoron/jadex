@@ -1544,4 +1544,20 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		variables.put(name, val);
 	}
 	
+	/**
+	 *  Get the properties.
+	 */
+	public Map getProperties()
+	{
+		return variables!=null? variables: Collections.EMPTY_MAP;
+	}
+	
+	/**
+	 *  Get the arguments.
+	 *  @return The arguments.
+	 */
+	public Map getArguments()
+	{
+		return getModel().getProperties();
+	}
 }

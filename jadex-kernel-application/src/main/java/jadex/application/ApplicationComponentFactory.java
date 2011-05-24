@@ -1,8 +1,5 @@
 package jadex.application;
 
-import jadex.application.runtime.impl.ApplicationInterpreter;
-import jadex.application.space.agr.MAGRSpaceType;
-import jadex.application.space.envsupport.MEnvSpaceType;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
@@ -22,6 +19,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
+import jadex.component.ComponentInterpreter;
 
 import java.net.URL;
 import java.util.Collection;
@@ -221,7 +219,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 		try
 		{
 			ApplicationModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, modelinfo.getClassLoader());
-			ApplicationInterpreter interpreter = new ApplicationInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, ret);
+			ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, ret);
 			
 			// todo: result listener?
 			// todo: create application context as return value?!

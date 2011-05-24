@@ -253,6 +253,18 @@ public abstract class AbstractInterpreter implements IComponentInstance
 	 */
 	public abstract void addProperty(String name, Object val);
 	
+	/**
+	 *  Get the properties.
+	 *  @return The properties.
+	 */
+	public abstract Map getProperties();
+	
+	/**
+	 *  Get the arguments.
+	 *  @return The arguments.
+	 */
+	public abstract Map getArguments();
+	
 	//-------- methods --------
 	
 	/**

@@ -2,14 +2,10 @@ package jadex.application.space.envsupport;
 
 import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.ISpace;
-import jadex.application.runtime.impl.ApplicationInterpreter;
-import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.commons.IFilter;
 import jadex.commons.IPropertyObject;
 import jadex.commons.collection.MultiCollection;
