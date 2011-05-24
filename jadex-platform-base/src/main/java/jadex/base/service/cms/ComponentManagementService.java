@@ -1863,6 +1863,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				if(desc==null)
 				{
 					Object[] ii= getInitInfo(cid);
+					desc	= (IComponentDescription) ii[0];
 				}
 				
 				// Todo: addresses required for communication across platforms.

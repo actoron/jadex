@@ -1,6 +1,5 @@
 package jadex.bpmn.tools;
 
-import jadex.bpmn.runtime.ProcessThread;
 import jadex.commons.SUtil;
 
 

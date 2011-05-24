@@ -2,7 +2,6 @@ package jadex.standalone.service;
 
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;

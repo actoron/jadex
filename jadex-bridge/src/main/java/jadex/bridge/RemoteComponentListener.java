@@ -1,6 +1,5 @@
 package jadex.bridge;
 
-import jadex.bridge.service.annotation.Replacement;
 import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;

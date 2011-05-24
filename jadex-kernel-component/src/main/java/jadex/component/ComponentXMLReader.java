@@ -229,7 +229,7 @@ public class ComponentXMLReader
 		ModelInfo mi = (ModelInfo)reader.read(rinfo.getInputStream(), classloader, report);
 		CacheableKernelModel ret = new CacheableKernelModel(mi);
 		
-		if(ret!=null)
+//		if(ret!=null)
 		{
 			mi.setFilename(rinfo.getFilename());
 			mi.setClassloader(classloader);
@@ -262,12 +262,12 @@ public class ComponentXMLReader
 			
 			rinfo.getInputStream().close();
 		}
-		else
-		{
-			String errtext = buildReport(rinfo.getFilename(), rinfo.getFilename(),
-				new String[]{"Component", "Configuration"}, report, null).getErrorText();
-			throw new RuntimeException("Model error: "+errtext);
-		}
+//		else
+//		{
+//			String errtext = buildReport(rinfo.getFilename(), rinfo.getFilename(),
+//				new String[]{"Component", "Configuration"}, report, null).getErrorText();
+//			throw new RuntimeException("Model error: "+errtext);
+//		}
 		
 		if(report.size()>0)
 			System.out.println("Error loading model: "+rinfo.getFilename()+" "+report);

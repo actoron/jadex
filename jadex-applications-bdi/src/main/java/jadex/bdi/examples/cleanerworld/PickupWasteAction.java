@@ -8,7 +8,6 @@ import jadex.application.space.envsupport.math.IVector1;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Double;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SimplePropertyObject;
 
 import java.util.Map;

@@ -6,7 +6,6 @@ import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceAction;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentIdentifier;
 
 import java.util.Comparator;
 

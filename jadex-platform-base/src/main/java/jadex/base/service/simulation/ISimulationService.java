@@ -3,7 +3,6 @@ package jadex.base.service.simulation;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.GuiClassName;
-import jadex.bridge.service.annotation.Uncached;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.execution.IExecutionService;
 import jadex.commons.IChangeListener;

@@ -8,7 +8,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.gui.SGUI;
 import jadex.rules.tools.reteviewer.RetePanel;
-import jadex.rules.tools.stateviewer.OAVPanel;
 import jadex.tools.debugger.IDebuggerPanel;
 
 import javax.swing.Icon;

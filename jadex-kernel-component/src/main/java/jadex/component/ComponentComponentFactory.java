@@ -1,16 +1,11 @@
 package jadex.component;
 
-import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentFactoryExtensionService;
-import jadex.bridge.IErrorReport;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.modelinfo.SubcomponentTypeInfo;
-import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
@@ -18,8 +13,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
-import jadex.commons.SReflect;
-import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -27,7 +20,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.kernelbase.CacheableKernelModel;
-import jadex.xml.StackElement;
 
 import java.net.URL;
 import java.util.Collection;

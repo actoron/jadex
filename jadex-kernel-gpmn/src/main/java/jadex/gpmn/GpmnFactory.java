@@ -10,22 +10,14 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
-import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.UIDefaults;

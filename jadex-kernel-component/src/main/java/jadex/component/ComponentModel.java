@@ -4,17 +4,13 @@ import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.xml.StackElement;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**

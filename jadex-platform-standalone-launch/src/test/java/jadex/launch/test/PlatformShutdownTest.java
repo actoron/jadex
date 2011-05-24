@@ -13,8 +13,6 @@ import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
 
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import junit.framework.TestCase;
 

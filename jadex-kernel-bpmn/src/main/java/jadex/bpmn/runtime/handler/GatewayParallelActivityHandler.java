@@ -49,7 +49,7 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 					newthread.setLastEdge((MSequenceEdge)outgoing.get(i));
 					thread.getThreadContext().addThread(newthread);
 //					instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_ADDED, newthread);
-					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, instance.TYPE_THREAD, thread.getClass().getName(), 
+					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
 						thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(thread));
 					instance.notifyListeners(cce);
 				}
@@ -125,7 +125,7 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 					
 					thread.getThreadContext().removeThread(pt);
 //					instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, pt);
-					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, instance.TYPE_THREAD, thread.getClass().getName(), 
+					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
 						thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(thread));
 					instance.notifyListeners(cce);
 				}

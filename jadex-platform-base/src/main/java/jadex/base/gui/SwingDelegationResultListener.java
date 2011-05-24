@@ -1,6 +1,5 @@
 package jadex.base.gui;
 
-import java.awt.GraphicsEnvironment;
 
 import jadex.base.Starter;
 import jadex.commons.future.Future;

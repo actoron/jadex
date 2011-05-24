@@ -7,7 +7,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.gui.SGUI;
 
 import java.awt.Component;
-import java.awt.GraphicsEnvironment;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;

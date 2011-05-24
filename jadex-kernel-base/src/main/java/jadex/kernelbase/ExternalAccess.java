@@ -1,10 +1,7 @@
 package jadex.kernelbase;
 
-import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentAdapter;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;

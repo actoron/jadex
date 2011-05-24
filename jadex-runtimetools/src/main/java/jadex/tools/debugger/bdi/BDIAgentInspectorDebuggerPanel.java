@@ -12,7 +12,6 @@ import jadex.tools.debugger.IDebuggerPanel;
 
 import java.awt.BorderLayout;
 
-import javax.help.UnsupportedOperationException;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;

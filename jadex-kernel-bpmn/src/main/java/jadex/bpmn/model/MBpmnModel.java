@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import javax.security.auth.login.Configuration;
 
 /**
  *  Java representation of a bpmn model for xml description.

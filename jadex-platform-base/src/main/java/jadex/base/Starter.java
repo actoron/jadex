@@ -3,13 +3,11 @@ package jadex.base;
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.SReflect;
@@ -19,7 +17,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.javaparser.SJavaParser;
 
 import java.net.InetAddress;
@@ -28,8 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  *  Starter class for  
@@ -105,7 +100,7 @@ public class Starter
 		{
 			public void resultAvailable(Object result)
 			{
-				final IExternalAccess	access	= (IExternalAccess)result;
+//				final IExternalAccess	access	= (IExternalAccess)result;
 //				Runtime.getRuntime().addShutdownHook(new Thread()
 //				{
 //					public void run()

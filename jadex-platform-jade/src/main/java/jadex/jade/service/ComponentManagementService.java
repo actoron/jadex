@@ -2,7 +2,6 @@ package jadex.jade.service;
 
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
