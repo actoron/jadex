@@ -60,6 +60,9 @@
 			<parameter name="performative" class="String" direction="fixed">
 				<value>SFipa.INFORM</value>
 			</parameter>
+			<parameter name="content" class="String" direction="inout">
+				<value>((Object)java.util.Arrays.asList(new Object[1000])).toString()</value>
+			</parameter>
 		</messageevent>
 	</events>
 
