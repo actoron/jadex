@@ -24,11 +24,11 @@ public class OAVBDIRuntimeModel
 {
 	//-------- agent states --------
 	
-	/** The agent init0 state. */
-	public static final String	AGENTLIFECYCLESTATE_INITING0	= "initing0";
-	
-	/** The agent init1 state. */
-	public static final String	AGENTLIFECYCLESTATE_INITING1	= "initing1";
+//	/** The agent init0 state. */
+//	public static final String	AGENTLIFECYCLESTATE_INITING0	= "initing0";
+//	
+//	/** The agent init1 state. */
+//	public static final String	AGENTLIFECYCLESTATE_INITING1	= "initing1";
 	
 	/** The agent alive state. */
 	public static final String	AGENTLIFECYCLESTATE_ALIVE	= "alive";

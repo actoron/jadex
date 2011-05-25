@@ -287,12 +287,12 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				{
 					public void customResultAvailable(Object result)
 					{
-						initServices(model, config).addResultListener(
+						initExtensions(model, config).addResultListener(
 							createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
 							{
-								initExtensions(model, config).addResultListener(
+								initServices(model, config).addResultListener(
 									createResultListener(new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(Object result)
@@ -350,43 +350,23 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 */
 	public IFuture initServices(IModelInfo model, String config)
 	{
+		IFuture	ret	= null;
 		ProvidedServiceInfo[] services = model.getProvidedServices();
 //		System.out.println("init sers: "+services);
 		if(services!=null)
 		{
-			for(int i=0; i<services.length; i++)
+			for(int i=0; ret==null && i<services.length; i++)
 			{
-				Object ser = null;
-				
 				ProvidedServiceImplementation impl = services[i].getImplementation(); 
-				if(impl.getExpression()!=null || impl.getImplementation()!=null)
+				if(impl!=null && (impl.getExpression()!=null || impl.getImplementation()!=null))
 				{
 					try
 					{
-						if(impl.getExpression()!=null)
-						{
-							// todo: other Class imports, how can be found out?
-							ser = SJavaParser.evaluateExpression(impl.getExpression(), model.getAllImports(), getFetcher(), model.getClassLoader());
-	//						System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
-						}
-						else if(services[i].getImplementation()!=null)
-						{
-							ser = impl.getImplementation().newInstance();
-						}
-						
-						if(ser!=null)
-						{
-							addService(services[i].getType(), ser, impl.getProxytype());
-						}
-						else
-						{
-							getLogger().warning("Service creation error: "+impl.getExpression());
-						}
+						initService(services[i]);
 					}
 					catch(Exception e)
 					{
-						e.printStackTrace();
-						getLogger().warning("Service creation error: "+impl.getExpression());
+						ret	= new Future(e);
 					}
 				}
 				else 
@@ -399,7 +379,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				}
 			}
 		}
-		return getServiceContainer().start();
+		return ret!=null ? ret : getServiceContainer().start();
 	}
 	
 	/**
@@ -623,6 +603,46 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	{
 		IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(getInternalAccess(), getComponentAdapter(), type, service, proxytype);
 		getServiceContainer().addService(proxy);
+	}
+	
+	/**
+	 *  Add a service to the component. 
+	 *  @param info The provided service info.
+	 */
+	protected void initService(ProvidedServiceInfo info)
+	{
+		ProvidedServiceImplementation	impl	= info.getImplementation();
+		Object	ser	= null;
+		if(impl.getExpression()!=null)
+		{
+			// todo: other Class imports, how can be found out?
+			ser = SJavaParser.evaluateExpression(impl.getExpression(), getModel().getAllImports(), getFetcher(), getModel().getClassLoader());
+//						System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
+		}
+		else if(impl.getImplementation()!=null)
+		{
+			try
+			{
+				ser = impl.getImplementation().newInstance();
+			}
+			catch(InstantiationException e)
+			{
+				throw new RuntimeException(e);
+			}
+			catch (IllegalAccessException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		
+		if(ser!=null)
+		{
+			addService(info.getType(), ser, info.getImplementation().getProxytype());
+		}
+		else
+		{
+			throw new RuntimeException("Service creation error: "+impl.getExpression());
+		}
 	}
 	
 	//-------- methods to be called by adapter --------

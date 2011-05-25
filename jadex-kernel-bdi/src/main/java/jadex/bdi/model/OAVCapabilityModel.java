@@ -766,7 +766,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 				Object	mexp	= state.getAttributeValue(ob, OAVBDIMetaModel.providedservice_has_implementation);
 				String text = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_text);				
 				Class impl = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);				
-				ProvidedServiceInfo psi = new ProvidedServiceInfo(clazz, new ProvidedServiceImplementation(impl, text, proxytype, null)); 
+				ProvidedServiceInfo psi = new ScopedProvidedServiceInfo(clazz, new ProvidedServiceImplementation(impl, text, proxytype, null), handle); 
 				ret.add(psi);
 			}
 		}

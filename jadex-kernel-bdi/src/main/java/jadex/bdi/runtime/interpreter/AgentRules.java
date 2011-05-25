@@ -3,22 +3,15 @@ package jadex.bdi.runtime.interpreter;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
-import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ParameterFlyweight;
 import jadex.bridge.CheckedAction;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
-import jadex.bridge.IMessageService;
 import jadex.bridge.modelinfo.IArgument;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.clock.ITimedObject;
 import jadex.bridge.service.clock.ITimer;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -66,171 +59,171 @@ public class AgentRules
 	
 	//-------- rule methods --------
 
-	/**
-	 *  Create the init1 agent rule.
-	 */
-	protected static Rule createInit0AgentRule()
-	{
-		ObjectCondition	ragentcon	= new ObjectCondition(OAVBDIRuntimeModel.agent_type);
-		ragentcon.addConstraint(new BoundConstraint(null, new Variable("?ragent", OAVBDIRuntimeModel.agent_type)));
-		ragentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING0));
-		IAction	action	= new IAction()
-		{
-			public void execute(IOAVState state, IVariableAssignments assignments)
-			{
-				final Object ragent	= assignments.getVariableValue("?ragent");
-				final BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-				
-				// Init the external access
-				ip.ea = new ExternalAccessFlyweight(state, ragent);
-				
-				// Get the services.
-				final boolean services[]	= new boolean[3];
-				SServiceProvider.getService(ip.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ip.createResultListener(new DefaultResultListener()
-	//			SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						ip.clockservice	= (IClockService)result;
-						boolean	startagent;
-						synchronized(services)
-						{
-							services[0]	= true;
-							startagent	= services[0] && services[1] && services[2];// && services[3];
-						}
-						if(startagent)
-						{
-							ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);							
-						}
-					}
-				}));
-				SServiceProvider.getService(ip.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ip.createResultListener(new DefaultResultListener()
-	//			SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						ip.cms	= (IComponentManagementService)result;
-						boolean	startagent;
-						synchronized(services)
-						{
-							services[1]	= true;
-							startagent	= services[0] && services[1] && services[2];// && services[3];
-						}
-						if(startagent)
-							ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);
-					}
-				}));
-				SServiceProvider.getService(ip.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ip.createResultListener(new DefaultResultListener()
-	//			SServiceProvider.getService(getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						ip.msgservice	= (IMessageService)result;
-						boolean	startagent;
-						synchronized(services)
-						{
-							services[2]	= true;
-							startagent	= services[0] && services[1] && services[2];// && services[3];
-						}
-						if(startagent)
-							ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);
-					}
-				}));
-	
-				// Previously done in createStartAgentRule
-				Map parents = new HashMap(); 
-				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
-				AgentRules.createCapabilityInstance(state, ragent, parents);
-//				List	futures	= AgentRules.createCapabilityInstance(state, ragent, parents);
-				
-//				// Start service container.
-//				futures.add(ip.getServiceContainer().start());
-				
-//				IResultListener	crs	= new CounterResultListener(futures.size(), new IResultListener()
+//	/**
+//	 *  Create the init1 agent rule.
+//	 */
+//	protected static Rule createInit0AgentRule()
+//	{
+//		ObjectCondition	ragentcon	= new ObjectCondition(OAVBDIRuntimeModel.agent_type);
+//		ragentcon.addConstraint(new BoundConstraint(null, new Variable("?ragent", OAVBDIRuntimeModel.agent_type)));
+//		ragentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING0));
+//		IAction	action	= new IAction()
+//		{
+//			public void execute(IOAVState state, IVariableAssignments assignments)
+//			{
+//				final Object ragent	= assignments.getVariableValue("?ragent");
+//				final BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+//				
+//				// Init the external access
+//				ip.ea = new ExternalAccessFlyweight(state, ragent);
+//				
+//				// Get the services.
+//				final boolean services[]	= new boolean[3];
+//				SServiceProvider.getService(ip.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ip.createResultListener(new DefaultResultListener()
+//	//			SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new DefaultResultListener()
 //				{
 //					public void resultAvailable(Object result)
 //					{
+//						ip.clockservice	= (IClockService)result;
 //						boolean	startagent;
 //						synchronized(services)
 //						{
-//							services[3]	= true;
-//							startagent	= services[0] && services[1] && services[2] && services[3];
+//							services[0]	= true;
+//							startagent	= services[0] && services[1] && services[2];// && services[3];
 //						}
 //						if(startagent)
 //						{
-//							ip.getAgentAdapter().invokeLater(new Runnable()
-//							{
-//								public void run()
-//								{
-//									ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);
-//								}
-//							});
+//							ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);							
 //						}
 //					}
-//					
-//					public void exceptionOccurred(Exception exception)
-//					{
-//					}
-//				});
-//				if(!futures.isEmpty())
+//				}));
+//				SServiceProvider.getService(ip.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ip.createResultListener(new DefaultResultListener()
+//	//			SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 //				{
-//					for(int i=0; i<futures.size(); i++)
+//					public void resultAvailable(Object result)
 //					{
-//						((Future)futures.get(i)).addResultListener(crs);
+//						ip.cms	= (IComponentManagementService)result;
+//						boolean	startagent;
+//						synchronized(services)
+//						{
+//							services[1]	= true;
+//							startagent	= services[0] && services[1] && services[2];// && services[3];
+//						}
+//						if(startagent)
+//							ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);
 //					}
-//				}
-	//			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
+//				}));
+//				SServiceProvider.getService(ip.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ip.createResultListener(new DefaultResultListener()
+//	//			SServiceProvider.getService(getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
+//				{
+//					public void resultAvailable(Object result)
+//					{
+//						ip.msgservice	= (IMessageService)result;
+//						boolean	startagent;
+//						synchronized(services)
+//						{
+//							services[2]	= true;
+//							startagent	= services[0] && services[1] && services[2];// && services[3];
+//						}
+//						if(startagent)
+//							ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);
+//					}
+//				}));
+//	
+//				// Previously done in createStartAgentRule
+//				Map parents = new HashMap(); 
+//				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
+//				AgentRules.createCapabilityInstance(state, ragent, parents);
+////				List	futures	= AgentRules.createCapabilityInstance(state, ragent, parents);
+//				
+////				// Start service container.
+////				futures.add(ip.getServiceContainer().start());
+//				
+////				IResultListener	crs	= new CounterResultListener(futures.size(), new IResultListener()
+////				{
+////					public void resultAvailable(Object result)
+////					{
+////						boolean	startagent;
+////						synchronized(services)
+////						{
+////							services[3]	= true;
+////							startagent	= services[0] && services[1] && services[2] && services[3];
+////						}
+////						if(startagent)
+////						{
+////							ip.getAgentAdapter().invokeLater(new Runnable()
+////							{
+////								public void run()
+////								{
+////									ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);
+////								}
+////							});
+////						}
+////					}
+////					
+////					public void exceptionOccurred(Exception exception)
+////					{
+////					}
+////				});
+////				if(!futures.isEmpty())
+////				{
+////					for(int i=0; i<futures.size(); i++)
+////					{
+////						((Future)futures.get(i)).addResultListener(crs);
+////					}
+////				}
+//	//			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
+//	
+//				
+//				// This is the clean way to init the logger, but since 
+//				// Java 6 the LogManager is a memory leak
+//				// Also in Java 7 the memory leak exists :-(
+//				// So only access logger if really necessary
+//	//			Logger logger = adapter.getLogger();
+//	//			initLogger(ragent, logger);			
+//			}
+//		};
+//		Rule rule = new Rule("agent_init0", ragentcon, action);
+//		return rule;
+//	}
 	
-				
-				// This is the clean way to init the logger, but since 
-				// Java 7 the LogManager is a memory leak
-				// Also in Java 7 the memory leak exists :-(
-				// So only access logger if really necessary
-	//			Logger logger = adapter.getLogger();
-	//			initLogger(ragent, logger);			
-			}
-		};
-		Rule rule = new Rule("agent_init0", ragentcon, action);
-		return rule;
-	}
-	
-	/**
-	 *  Create the start agent rule.
-	 */
-	protected static Rule createInit1AgentRule()
-	{
-		ObjectCondition	ragentcon	= new ObjectCondition(OAVBDIRuntimeModel.agent_type);
-		ragentcon.addConstraint(new BoundConstraint(null, new Variable("?ragent", OAVBDIRuntimeModel.agent_type)));
-		ragentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1));
-		IAction	action	= new IAction()
-		{
-			public void execute(final IOAVState state, IVariableAssignments assignments)
-			{
-				final Object	ragent	= assignments.getVariableValue("?ragent");
-				final BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
-				
-				initializeCapabilityInstance(state, ragent).addResultListener(
-					bdii.createResultListener(new DelegationResultListener(bdii.inited)
-					{
-						public void customResultAvailable(Object result)
-						{
-							state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, null);
-							
-							state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE);
-							// Remove arguments from state.
-							if(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments)!=null) 
-								state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
-							
-							// When init has finished -> notify cms.
-							bdii.inited.setResult(new Object[]{bdii, bdii.getAgentAdapter()});
-						}
-					})
-				);
-			}
-		};
-		Rule rule = new Rule("agent_init1", ragentcon, action);
-		return rule;
-	}
+//	/**
+//	 *  Create the start agent rule.
+//	 */
+//	protected static Rule createInit1AgentRule()
+//	{
+//		ObjectCondition	ragentcon	= new ObjectCondition(OAVBDIRuntimeModel.agent_type);
+//		ragentcon.addConstraint(new BoundConstraint(null, new Variable("?ragent", OAVBDIRuntimeModel.agent_type)));
+//		ragentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1));
+//		IAction	action	= new IAction()
+//		{
+//			public void execute(final IOAVState state, IVariableAssignments assignments)
+//			{
+//				final Object	ragent	= assignments.getVariableValue("?ragent");
+//				final BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
+//				
+//				initializeCapabilityInstance(state, ragent).addResultListener(
+//					bdii.createResultListener(new DelegationResultListener(bdii.inited)
+//					{
+//						public void customResultAvailable(Object result)
+//						{
+//							state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, null);
+//							
+//							state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE);
+//							// Remove arguments from state.
+//							if(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments)!=null) 
+//								state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
+//							
+//							// When init has finished -> notify cms.
+//							bdii.inited.setResult(new Object[]{bdii, bdii.getAgentAdapter()});
+//						}
+//					})
+//				);
+//			}
+//		};
+//		Rule rule = new Rule("agent_init1", ragentcon, action);
+//		return rule;
+//	}
 
 	/**
 	 *  Terminating start agent rule. Exits running and e
@@ -1243,27 +1236,27 @@ public class AgentRules
 ////					e.printStackTrace();
 //					BDIInterpreter.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mpro, OAVBDIMetaModel.providedservice_has_classname));
 //				}
-//				
-////				try
-////				{
-//////					String name = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name);
-////					IInternalService val = (IInternalService)evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
-//////					Class type = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
-////					// cast hack?!
-////					Boolean direct = (Boolean)state.getAttributeValue(mexp, OAVBDIMetaModel.providedservice_has_direct);
-////					if(!direct.booleanValue())
-////					{
-////						val = DecouplingServiceInvocationInterceptor.createServiceProxy(BDIInterpreter.getInterpreter(state).getExternalAccess(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), val);
-//////						System.out.println("Created decoupled service: "+val);
-////					}
-////					((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(val);
-//////					System.out.println("Service: "+name+" "+val+" "+type);
-////				}
-////				catch(Exception e)
-////				{
-//////					e.printStackTrace();
-////					BDIInterpreter.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_text));
-////				}
+				
+//				try
+//				{
+////					String name = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name);
+//					IInternalService val = (IInternalService)evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
+////					Class type = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
+//					// cast hack?!
+//					Boolean direct = (Boolean)state.getAttributeValue(mexp, OAVBDIMetaModel.providedservice_has_direct);
+//					if(!direct.booleanValue())
+//					{
+//						val = DecouplingServiceInvocationInterceptor.createServiceProxy(BDIInterpreter.getInterpreter(state).getExternalAccess(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), val);
+////						System.out.println("Created decoupled service: "+val);
+//					}
+//					((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(val);
+////					System.out.println("Service: "+name+" "+val+" "+type);
+//				}
+//				catch(Exception e)
+//				{
+////					e.printStackTrace();
+//					BDIInterpreter.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_text));
+//				}
 //			}
 //		}
 		

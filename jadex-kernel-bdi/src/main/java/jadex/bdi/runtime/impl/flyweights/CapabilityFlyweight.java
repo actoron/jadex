@@ -521,11 +521,13 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 				public void run()
 				{
 					Object cs = getState().getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_state);
-					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING0.equals(cs) 
-						|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1.equals(cs)
-						|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
+					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 					{
 						object = getInterpreter().killComponent();
+					}
+					else
+					{
+						object	= new Future(new RuntimeException("Component not running: "+getComponentIdentifier().getName()));
 					}
 				}
 			};
@@ -534,14 +536,16 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		else
 		{
 			Object cs = getState().getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_state);
-			if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING0.equals(cs) 
-				|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1.equals(cs)
-				|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
+			if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 			{
 				//	System.out.println("set to terminating");
 				getInterpreter().startMonitorConsequences();
 				ret = getInterpreter().killComponent();
 				getInterpreter().endMonitorConsequences();
+			}
+			else
+			{
+				ret	= new Future(new RuntimeException("Component not running: "+getComponentIdentifier().getName()));
 			}
 		}
 		return ret;

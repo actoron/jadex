@@ -200,11 +200,13 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 				public void run()
 				{
 					Object cs = getState().getAttributeValue(getInterpreter().getAgent(), OAVBDIRuntimeModel.agent_has_state);
-					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING0.equals(cs) 
-						|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1.equals(cs)
-						|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
+					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 					{
 						getInterpreter().killComponent().addResultListener(new DelegationResultListener(ret));
+					}
+					else
+					{
+						ret.setException(new RuntimeException("Component not running: "+getComponentIdentifier().getName()));
 					}
 				}
 			});
@@ -212,14 +214,16 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		else
 		{
 			Object cs = getState().getAttributeValue(getInterpreter().getAgent(), OAVBDIRuntimeModel.agent_has_state);
-			if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING0.equals(cs) 
-				|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1.equals(cs)
-				|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
+			if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 			{
 				//	System.out.println("set to terminating");
 				getInterpreter().startMonitorConsequences();
 				getInterpreter().killComponent().addResultListener(new DelegationResultListener(ret));
 				getInterpreter().endMonitorConsequences();
+			}
+			else
+			{
+				ret.setException(new RuntimeException("Component not running: "+getComponentIdentifier().getName()));
 			}
 		}
 		

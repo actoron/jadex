@@ -3,6 +3,7 @@ package jadex.bdi.runtime.interpreter;
 import jadex.bdi.BDIAgentFactory;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.ScopedProvidedServiceInfo;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefSet;
@@ -15,6 +16,7 @@ import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
+import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
@@ -27,17 +29,25 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.ProvidedServiceImplementation;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.ISynchronizator;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.IValueFetcher;
+import jadex.javaparser.SJavaParser;
 import jadex.kernelbase.StatelessAbstractInterpreter;
 import jadex.rules.rulesystem.Activation;
 import jadex.rules.rulesystem.IRule;
@@ -296,7 +306,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				{
 					public void customResultAvailable(Object result)
 					{
-						state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING0);
+						state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE);
+						// When init has finished -> notify cms.
+						inited.setResult(new Object[]{BDIInterpreter.this, getAgentAdapter()});
 					}
 				}));
 				return null;
@@ -304,6 +316,171 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		});
 		
 		this.initthread = null;
+	}
+
+	/**
+	 *  Overridden to init BDI internals before services.
+	 */
+	public IFuture initServices(final IModelInfo model, final String config)
+	{
+		final Future	ret	= new Future();
+		init0().addResultListener(createResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				init1().addResultListener(createResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						BDIInterpreter.super.initServices(model, config).addResultListener(new DelegationResultListener(ret));
+						
+					}
+				}));				
+			}
+		}));
+		return ret;
+	}
+	
+	/**
+	 *  Overridden to pass correct scope access to service.
+	 */
+	protected void initService(ProvidedServiceInfo info)
+	{
+		ProvidedServiceImplementation	impl	= info.getImplementation();
+		Object	mscope	= ((ScopedProvidedServiceInfo)info).fetchScope();
+		Object	rscope	= findSubcapability(mscope);
+		assert rscope!=null;
+		IValueFetcher	fetcher	= new OAVBDIFetcher(state, rscope);
+		IInternalAccess	ia	= new CapabilityFlyweight(state, rscope);
+		
+		Object	ser	= null;
+		if(impl.getExpression()!=null)
+		{
+			// todo: other Class imports, how can be found out?
+			ser = SJavaParser.evaluateExpression(impl.getExpression(), getModel().getAllImports(), fetcher, getModel().getClassLoader());
+//						System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
+		}
+		else if(impl.getImplementation()!=null)
+		{
+			try
+			{
+				ser = impl.getImplementation().newInstance();
+			}
+			catch(InstantiationException e)
+			{
+				throw new RuntimeException(e);
+			}
+			catch (IllegalAccessException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		
+		if(ser!=null)
+		{
+			IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
+				ia, getComponentAdapter(), info.getType(), ser, info.getImplementation().getProxytype());
+			getServiceContainer().addService(proxy);
+		}
+		else
+		{
+			throw new RuntimeException("Service creation error: "+impl.getExpression());
+		}
+	}
+	
+	/**
+	 *  First init step of agent.
+	 */
+	protected IFuture	init0()
+	{
+		final Future	ret	= new Future();
+		
+		// Init the external access
+		ea = new ExternalAccessFlyweight(state, ragent);
+		
+		// Get the services.
+		final boolean services[]	= new boolean[3];
+		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(createResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				clockservice	= (IClockService)result;
+				boolean	startagent;
+				synchronized(services)
+				{
+					services[0]	= true;
+					startagent	= services[0] && services[1] && services[2];// && services[3];
+				}
+				if(startagent)
+				{
+					ret.setResult(null);
+				}
+			}
+		}));
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(createResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				cms	= (IComponentManagementService)result;
+				boolean	startagent;
+				synchronized(services)
+				{
+					services[1]	= true;
+					startagent	= services[0] && services[1] && services[2];// && services[3];
+				}
+				if(startagent)
+					ret.setResult(null);
+			}
+		}));
+		SServiceProvider.getService(getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(createResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				msgservice	= (IMessageService)result;
+				boolean	startagent;
+				synchronized(services)
+				{
+					services[2]	= true;
+					startagent	= services[0] && services[1] && services[2];// && services[3];
+				}
+				if(startagent)
+					ret.setResult(null);
+			}
+		}));
+
+		// Previously done in createStartAgentRule
+		Map parents = new HashMap(); 
+		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
+		AgentRules.createCapabilityInstance(state, ragent, parents);
+		
+		return ret;
+	}
+	
+	/**
+	 *  Second init step of agent.
+	 */
+	protected IFuture	init1()
+	{
+		final Future	ret	= new Future();
+		AgentRules.initializeCapabilityInstance(state, ragent)
+			.addResultListener(createResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, null);
+				
+				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE);
+				// Remove arguments from state.
+				if(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments)!=null) 
+					state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
+
+				ret.setResult(null);
+			}
+		}));
+		return ret;
 	}
 	
 	//-------- IKernelAgent interface --------
@@ -399,11 +576,13 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				{
 					state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_killlisteners, new DelegationResultListener(ret));
 					Object cs = state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state);
-					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING0.equals(cs) 
-						|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1.equals(cs) 
-						|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
+					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 					{
 						AgentRules.startTerminating(state, ragent);
+					}
+					else
+					{
+						ret.setException(new RuntimeException("Component not running: "+getComponentIdentifier().getName()));
 					}
 				}
 			});
@@ -616,6 +795,41 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 					ret = findSubcapability(subcapa, targetcapa, path);
 					if(!ret)
 						path.remove(path.size()-1);
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Find the runtime element to a capability model.
+	 *  @param rcapa The start capability.
+	 *  @param targetcapa The target capability.
+	 *  @param path The result path as list of capas.
+	 *  @return True if found.
+	 */
+	protected Object	findSubcapability(Object mcapa)
+	{
+		Object	ret	= null;
+		List	capas = SCollection.createArrayList();
+		capas.add(ragent);
+		for(int i=0; ret==null && i<capas.size(); i++)
+		{
+			Object	rcapa	= capas.get(i);
+			if(state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model)==mcapa)
+			{
+				ret	= rcapa;
+			}
+			else
+			{
+				Collection	subcaps	= state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_subcapabilities);
+				if(subcaps!=null)
+				{
+					for(Iterator it=subcaps.iterator(); it.hasNext(); )
+					{
+						capas.add(state.getAttributeValue(it.next(), OAVBDIRuntimeModel.capabilityreference_has_capability));
+					}
 				}
 			}
 		}
@@ -1294,8 +1508,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		RULEBASE = new Rulebase();
 		
 		// Agent rules.
-		RULEBASE.addRule(AgentRules.createInit0AgentRule());
-		RULEBASE.addRule(AgentRules.createInit1AgentRule());
+//		RULEBASE.addRule(AgentRules.createInit0AgentRule());
+//		RULEBASE.addRule(AgentRules.createInit1AgentRule());
 		RULEBASE.addRule(AgentRules.createTerminatingEndAgentRule());
 		RULEBASE.addRule(AgentRules.createTerminateAgentRule());
 		RULEBASE.addRule(AgentRules.createRemoveChangeEventRule());
