@@ -22,6 +22,6 @@
 	
 	<properties>
 		<property name="componentviewer.viewerclass">"jadex.bdi.planlib.DefaultBDIViewerPanel"</property>
-		<!-- <property name="bdiviewerpanel.agentviewerclass">"..."</property> -->
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
 	</properties>
 </agent>

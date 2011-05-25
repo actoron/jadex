@@ -50,7 +50,7 @@ public class InterpreterFetcher extends SimpleValueFetcher
 		}
 		else if(name.equals("$component"))
 		{
-			ret = interpreter;
+			ret = interpreter.getInternalAccess();
 		}
 		else if(name.equals("$provider"))
 		{
