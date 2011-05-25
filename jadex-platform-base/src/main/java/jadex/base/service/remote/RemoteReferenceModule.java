@@ -11,7 +11,9 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Replacement;
@@ -34,6 +36,7 @@ import jadex.xml.annotation.XMLClassname;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -162,9 +165,10 @@ public class RemoteReferenceModule
 		ProxyReference	ret	= new ProxyReference(pi, rr);
 
 		// Check interface methods and possibly cache constant calls.
-		for(int i=0; i<remoteinterfaces.length; i++)
+		Class[] allinterfaces = SReflect.getSuperInterfaces(remoteinterfaces);
+		for(int i=0; i<allinterfaces.length; i++)
 		{
-			Method[] methods = remoteinterfaces[i].getMethods();
+			Method[] methods = allinterfaces[i].getMethods();
 			for(int j=0; j<methods.length; j++)
 			{
 				addCachedMethodValue(ret, pi, methods[j], target);
@@ -187,7 +191,7 @@ public class RemoteReferenceModule
 	{
 		checkThread();
 		// todo: dgc, i.e. remember that target is a remote object (for which a proxyinfo is sent away).
-		
+			
 		ProxyInfo ret = new ProxyInfo(remoteinterfaces);
 		Map properties = null;
 		
@@ -276,18 +280,21 @@ public class RemoteReferenceModule
 		
 		// Add properties from annotations.
 		// Todo: merge with external properties (which precedence?)
-		for(int i=0; i<remoteinterfaces.length; i++)
+		
+		Class[] allinterfaces = SReflect.getSuperInterfaces(remoteinterfaces);
+		
+		for(int i=0; i<allinterfaces.length; i++)
 		{
 			// Default timeout for interface
 			Long	deftimeout	= null;
-			if(remoteinterfaces[i].isAnnotationPresent(Timeout.class))
+			if(allinterfaces[i].isAnnotationPresent(Timeout.class))
 			{
-				Timeout	ta	= (Timeout)remoteinterfaces[i].getAnnotation(Timeout.class);
+				Timeout	ta	= (Timeout)allinterfaces[i].getAnnotation(Timeout.class);
 				deftimeout	= new Long(ta.value());
 			}
 			
-			boolean	allex	= remoteinterfaces[i].isAnnotationPresent(Excluded.class);
-			Method[]	methods	= remoteinterfaces[i].getDeclaredMethods();
+			boolean	allex	= allinterfaces[i].isAnnotationPresent(Excluded.class);
+			Method[]	methods	= allinterfaces[i].getDeclaredMethods();
 			for(int j=0; j<methods.length; j++)
 			{
 				// Excluded
@@ -411,7 +418,7 @@ public class RemoteReferenceModule
 			{
 //				System.out.println("Warning, void method call will be executed asynchronously: "+type+" "+methods[i].getName());
 			}
-			else if(!(rt.isAssignableFrom(IFuture.class)))
+			else if(!(SReflect.isSupertype(IFuture.class, rt)))
 			{
 				if(ar.length>0)
 				{

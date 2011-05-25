@@ -8,7 +8,9 @@ import jadex.commons.future.IFuture;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 
-/** Listener for Kernel Updates */
+/**
+ *  Listener for Kernel Updates.
+ */
 public class TreePanelKernelListener implements IMultiKernelListener
 {
 	/** Refresh Operation */
@@ -25,6 +27,7 @@ public class TreePanelKernelListener implements IMultiKernelListener
 	 */
 	public TreePanelKernelListener(String id, final JTree tree, final ModelFileFilterMenuItemConstructor mffmic)
 	{
+		this.id = id;
 		refresh = new Runnable()
 		{
 			public void run()

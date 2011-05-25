@@ -243,7 +243,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 										{
 											paramvalues[i] = Boolean.FALSE;
 										}
-										else if(SReflect.isBasicType(clazz))
+										else if(SReflect.isBasicType(paramtypes[i]))
 										{
 											paramvalues[i] = 0;
 										}

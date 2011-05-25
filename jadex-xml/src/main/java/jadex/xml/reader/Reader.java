@@ -376,7 +376,7 @@ public class Reader
 					}
 					catch(Exception e)
 					{
-//						e.printStackTrace();
+						e.printStackTrace();
 						readcontext.getReporter().report(e.toString(), "creation error", readcontext, parser.getLocation());
 					}
 					

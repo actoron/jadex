@@ -240,7 +240,6 @@ public class ClockPanel	extends JPanel
 								@XMLClassname("setDilation")
 								public Object execute(IInternalAccess ia)
 								{
-
 									cs.setDilation(dil);
 									return null;
 								}
@@ -272,7 +271,6 @@ public class ClockPanel	extends JPanel
 								@XMLClassname("setDilation")
 								public Object execute(IInternalAccess ia)
 								{
-
 									cs.setDelta(tick);
 									return null;
 								}

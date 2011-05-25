@@ -123,7 +123,7 @@
 	</componenttypes>
 	
 	<configurations>
-		<configuration name="20x20 and 10 bugs">
+		<configuration name="20x20 and 20 bugs">
 			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
 					<env:processes>
@@ -218,7 +218,7 @@
 			</extensions>
 
 			<components>
-				<component type="Heatbug" number="10"/>
+				<component type="Heatbug" number="20"/>
 				<!-- <agent type="Heatbug">
 					<arguments>
 						<argument name="ideal_temp">$args.ideal_temp</argument>
@@ -227,7 +227,7 @@
 			</components>
 		</configuration>
 		
-		<configuration name="30x30 and 40 bugs">
+		<configuration name="30x30 and 100 bugs">
 			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
 					<env:processes>
@@ -305,11 +305,11 @@
 			</extensions>
 
 			<components>
-				<component type="Heatbug" number="40"/>
+				<component type="Heatbug" number="100"/>
 			</components>
 		</configuration>
 		
-		<configuration name="50x50 and 100 bugs">
+		<configuration name="50x50 and 300 bugs">
 			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="50" height="50">
 					<env:processes>
@@ -358,11 +358,11 @@
 			</extensions>
 
 			<components>
-				<component type="Heatbug" number="100"/>
+				<component type="Heatbug" number="300"/>
 			</components>
 		</configuration>
 		
-		<configuration name="20x20 and 10 bugs without evaluation">
+		<configuration name="20x20 and 20 bugs without evaluation">
 			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="20" height="20">
 					<env:processes>
@@ -378,11 +378,11 @@
 			</extensions>
 
 			<components>
-				<component type="Heatbug" number="10"/>
+				<component type="Heatbug" number="20"/>
 			</components>
 		</configuration>
 		
-		<configuration name="30x30 and 40 bugs without evaluation">
+		<configuration name="30x30 and 100 bugs without evaluation">
 			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
 					<env:processes>
@@ -398,11 +398,11 @@
 			</extensions>
 
 			<components>
-				<component type="Heatbug" number="40"/>
+				<component type="Heatbug" number="100"/>
 			</components>
 		</configuration>
 		
-		<configuration name="50x50 and 100 bugs without evaluation">
+		<configuration name="50x50 and 300 bugs without evaluation">
 			<extensions>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="50" height="50">
 					<env:processes>
@@ -418,7 +418,7 @@
 			</extensions>
 
 			<components>
-				<component type="Heatbug" number="100"/>
+				<component type="Heatbug" number="300"/>
 			</components>
 		</configuration>
 	</configurations>

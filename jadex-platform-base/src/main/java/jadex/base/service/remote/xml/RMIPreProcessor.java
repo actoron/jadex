@@ -69,7 +69,9 @@ public class RMIPreProcessor implements IPreProcessor
 				for(int i=0; i<interfaces.length; i++)
 				{
 					if(SReflect.isSupertype(IRemotable.class, interfaces[i]))
+					{
 						ret.add(interfaces[i]);
+					}
 				}
 				clazz = clazz.getSuperclass();
 			}

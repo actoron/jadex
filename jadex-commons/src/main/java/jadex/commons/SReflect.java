@@ -6,6 +6,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -947,6 +948,22 @@ public class SReflect
 	public static boolean instanceOf(Object o, Class c)
 	{
 		return isSupertype(c, o.getClass());
+	}
+	
+	/**
+	 *  Get the super interfaces.
+	 *  @param interfaces The interfaces
+	 *  @return All super interfaces.
+	 */
+	public static Class[] getSuperInterfaces(Class[] interfaces) 
+	{
+		List ret = new ArrayList();
+		for(int i = 0; i<interfaces.length; i++) 
+		{
+			ret.add(interfaces[i]);
+			ret.addAll(Arrays.asList(getSuperInterfaces(interfaces[i].getInterfaces())));
+		}
+		return (Class[])ret.toArray(new Class[ret.size()]);
 	}
 }
 

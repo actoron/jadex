@@ -4,6 +4,7 @@ import jadex.base.service.remote.commands.RemoteMethodInvocationCommand;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -88,7 +89,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 			{
 				Class rt = method.getReturnType();
 				Class[] ar = method.getParameterTypes();
-				if(!rt.equals(void.class) && !(rt.isAssignableFrom(IFuture.class)) && ar.length==0)
+				if(!rt.equals(void.class) && !(SReflect.isSupertype(IFuture.class, rt)) && ar.length==0)
 				{
 					return pr.getCache().get(method.getName());
 				}

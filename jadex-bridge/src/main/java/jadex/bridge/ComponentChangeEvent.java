@@ -329,10 +329,10 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	{
 		if(componentlisteners!=null)
 		{
-			IComponentListener[] listeners = (IComponentListener[]) componentlisteners.toArray(new IComponentListener[componentlisteners.size()]);
+			IComponentListener[] listeners = (IComponentListener[])componentlisteners.toArray(new IComponentListener[componentlisteners.size()]);
 			for(int i=0; i<listeners.length; i++)
 			{
-				if (listeners[i].getFilter().filter(event))
+				if(listeners[i].getFilter().filter(event))
 				{
 					final IComponentListener lis = listeners[i];
 					lis.eventOccured(event).addResultListener(new IResultListener()
@@ -362,11 +362,11 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	 *  @param finished Future, called when the event has been dispatched.
 	 */
 	public static final void dispatchTerminatedEvent(final IComponentAdapter adapter, final IModelInfo model,
-			IServiceProvider provider, final Collection componentlisteners, final Future finished)
+		IServiceProvider provider, final Collection componentlisteners, final Future finished)
 	{
 		if (componentlisteners == null || componentlisteners.isEmpty())
 		{
-			if (finished != null && !finished.isDone())
+			if(finished != null && !finished.isDone())
 				finished.setResult(null);
 			return;
 		}
@@ -375,10 +375,8 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 			public void resultAvailable(Object result)
 			{
 				ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
-																	  IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT,
-																	  model.getName(),
-																	  adapter.getComponentIdentifier().getName(),
-																	  adapter.getComponentIdentifier(), null, null, (Long) result);
+					IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT, model.getName(), adapter.getComponentIdentifier().getName(),
+					adapter.getComponentIdentifier(), null, null, (Long) result);
 				dispatchComponentChangeEvent(event, componentlisteners, finished);
 			}
 		});
@@ -393,9 +391,9 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	 *  @param finished Future, called when the event has been dispatched.
 	 */
 	public static final void dispatchTerminatingEvent(final IComponentAdapter adapter, final IModelInfo model,
-			IServiceProvider provider, final Collection componentlisteners, final Future finished)
+		IServiceProvider provider, final Collection componentlisteners, final Future finished)
 	{
-		if (componentlisteners == null || componentlisteners.isEmpty())
+		if(componentlisteners == null || componentlisteners.isEmpty())
 		{
 			if (finished != null && !finished.isDone())
 				finished.setResult(null);
@@ -406,10 +404,8 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 			public void resultAvailable(Object result)
 			{
 				ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_OCCURRENCE,
-																	  IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT,
-																	  model.getName(),
-																	  adapter.getComponentIdentifier().getName(),
-																	  adapter.getComponentIdentifier(), null, "terminating", (Long) result);
+					 IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT, model.getName(), adapter.getComponentIdentifier().getName(),
+					adapter.getComponentIdentifier(), null, "terminating", (Long) result);
 				dispatchComponentChangeEvent(event, componentlisteners, finished);
 			}
 		});
