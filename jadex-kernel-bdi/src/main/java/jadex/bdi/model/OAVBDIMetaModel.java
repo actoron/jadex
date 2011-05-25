@@ -511,7 +511,7 @@ public class OAVBDIMetaModel
 	/** Capability has expressions attribute. */
 	public static OAVAttributeType capability_has_requiredservices;
 	public static OAVAttributeType capability_has_providedservices;
-	// todo: servicerefs
+	// todo: servicerefs??
 	
 	/** Capability has properties attribute. */
 	public static OAVAttributeType capability_has_properties;

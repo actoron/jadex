@@ -18,10 +18,8 @@
 		<belief name="test" class="String">
 			<fact>"testfact"</fact>
 		</belief>
+		<belief name="wait" class="IFuture">
+			<fact class="IFuture">$beliefbase.future</fact>
+		</belief>
 	</beliefs>
-	
-	<properties>
-		<property name="futureprop" class="IFuture">$beliefbase.future</property>
-	</properties>
-
 </agent>

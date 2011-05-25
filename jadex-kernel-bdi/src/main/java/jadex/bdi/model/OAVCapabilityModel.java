@@ -6,6 +6,7 @@ import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
@@ -17,7 +18,6 @@ import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
-import jadex.commons.future.IFuture;
 import jadex.javaparser.IParsedExpression;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.Rulebase;
@@ -34,8 +34,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.xml.namespace.QName;
 
 /**
  *  The capability model contains the OAV capability model in a state
@@ -517,31 +515,35 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		{
 			for(Iterator it=oprops.iterator(); it.hasNext(); )
 			{
-				Object	key	= it.next();
+				String	key	= (String) it.next();
 				Object	mexp	= state.getAttributeValue(capa, OAVBDIMetaModel.capability_has_properties, key);
 				Class	clazz	= (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
-				// Ignore future properties, which are evaluated at component instance startup time.
-				if(clazz==null || !SReflect.isSupertype(IFuture.class, clazz))
-				{
-					IParsedExpression	pex = (IParsedExpression)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_parsed);
-					if(pex!=null)
-					{
-						try
-						{
-							Object	value	= pex.getValue(null);
-							props.put(key, value);
-						}
-						catch(Exception e)
-						{
-							Tuple	se;
-							se	= new Tuple(new Object[]{
-								new StackElement(new QName(state.getType(capa).isSubtype(OAVBDIMetaModel.agent_type) ? "agent" : "capability"), capa, null),
-								new StackElement(new QName("properties"), null, null),				
-								new StackElement(new QName("property"), mexp, null)});				
-							addEntry(se, "Error in property: "+e);
-						}
-					}
-				}
+				String	value	= (String)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_text);
+				String	language	= (String)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_language);
+				props.put(key, new UnparsedExpression(key, clazz, value, language));
+				
+//				// Ignore future properties, which are evaluated at component instance startup time.
+//				if(clazz==null || !SReflect.isSupertype(IFuture.class, clazz))
+//				{
+//					IParsedExpression	pex = (IParsedExpression)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_parsed);
+//					if(pex!=null)
+//					{
+//						try
+//						{
+//							Object	value	= pex.getValue(null);
+//							props.put(key, value);
+//						}
+//						catch(Exception e)
+//						{
+//							Tuple	se;
+//							se	= new Tuple(new Object[]{
+//								new StackElement(new QName(state.getType(capa).isSubtype(OAVBDIMetaModel.agent_type) ? "agent" : "capability"), capa, null),
+//								new StackElement(new QName("properties"), null, null),				
+//								new StackElement(new QName("property"), mexp, null)});				
+//							addEntry(se, "Error in property: "+e);
+//						}
+//					}
+//				}
 			}
 		}
 		

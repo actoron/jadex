@@ -33,18 +33,14 @@
 					SUtil.createHashMap(
 					new String[]
 					{
-						"messagetype_fipa", 
 						"planexecutor_standard", 
-						"standard.timeout", 
 						"microplansteps",
 						"planexecutor_bpmn",
 						"debugger.panels"
 					},
 					new Object[]
 					{
-						new FIPAMessageType(), 
 						new JavaStandardPlanExecutor((IThreadPoolService)SServiceProvider.getService($component.getServiceProvider(), IThreadPoolService.class).get(new ThreadSuspendable())),
-						new Long(10000),
 						Boolean.TRUE,
 						new BpmnPlanExecutor(),
 						//"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"

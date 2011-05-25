@@ -22,6 +22,10 @@ public class TreatVictimsService implements ITreatVictimsService
 	@ServiceComponent
 	protected IBDIInternalAccess agent;
 	
+	public TreatVictimsService()
+	{
+	}
+	
 	//-------- methods --------
 	
 	/**

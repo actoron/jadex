@@ -18,7 +18,6 @@ import jadex.bridge.service.clock.ITimer;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
-import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -86,7 +85,7 @@ public class AgentRules
 				ip.ea = new ExternalAccessFlyweight(state, ragent);
 				
 				// Get the services.
-				final boolean services[]	= new boolean[4];
+				final boolean services[]	= new boolean[3];
 				SServiceProvider.getService(ip.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ip.createResultListener(new DefaultResultListener()
 	//			SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new DefaultResultListener()
 				{
@@ -97,7 +96,7 @@ public class AgentRules
 						synchronized(services)
 						{
 							services[0]	= true;
-							startagent	= services[0] && services[1] && services[2] && services[3];
+							startagent	= services[0] && services[1] && services[2];// && services[3];
 						}
 						if(startagent)
 						{
@@ -115,7 +114,7 @@ public class AgentRules
 						synchronized(services)
 						{
 							services[1]	= true;
-							startagent	= services[0] && services[1] && services[2] && services[3];
+							startagent	= services[0] && services[1] && services[2];// && services[3];
 						}
 						if(startagent)
 							ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);
@@ -131,7 +130,7 @@ public class AgentRules
 						synchronized(services)
 						{
 							services[2]	= true;
-							startagent	= services[0] && services[1] && services[2] && services[3];
+							startagent	= services[0] && services[1] && services[2];// && services[3];
 						}
 						if(startagent)
 							ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);
@@ -141,44 +140,45 @@ public class AgentRules
 				// Previously done in createStartAgentRule
 				Map parents = new HashMap(); 
 				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
-				List	futures	= AgentRules.createCapabilityInstance(state, ragent, parents);
+				AgentRules.createCapabilityInstance(state, ragent, parents);
+//				List	futures	= AgentRules.createCapabilityInstance(state, ragent, parents);
 				
-				// Start service container.
-				futures.add(ip.getServiceContainer().start());
+//				// Start service container.
+//				futures.add(ip.getServiceContainer().start());
 				
-				IResultListener	crs	= new CounterResultListener(futures.size(), new IResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						boolean	startagent;
-						synchronized(services)
-						{
-							services[3]	= true;
-							startagent	= services[0] && services[1] && services[2] && services[3];
-						}
-						if(startagent)
-						{
-							ip.getAgentAdapter().invokeLater(new Runnable()
-							{
-								public void run()
-								{
-									ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);
-								}
-							});
-						}
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-					}
-				});
-				if(!futures.isEmpty())
-				{
-					for(int i=0; i<futures.size(); i++)
-					{
-						((Future)futures.get(i)).addResultListener(crs);
-					}
-				}
+//				IResultListener	crs	= new CounterResultListener(futures.size(), new IResultListener()
+//				{
+//					public void resultAvailable(Object result)
+//					{
+//						boolean	startagent;
+//						synchronized(services)
+//						{
+//							services[3]	= true;
+//							startagent	= services[0] && services[1] && services[2] && services[3];
+//						}
+//						if(startagent)
+//						{
+//							ip.getAgentAdapter().invokeLater(new Runnable()
+//							{
+//								public void run()
+//								{
+//									ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);
+//								}
+//							});
+//						}
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//					}
+//				});
+//				if(!futures.isEmpty())
+//				{
+//					for(int i=0; i<futures.size(); i++)
+//					{
+//						((Future)futures.get(i)).addResultListener(crs);
+//					}
+//				}
 	//			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
 	
 				
@@ -1127,145 +1127,145 @@ public class AgentRules
 	 *  @param inivals Initial values for beliefs (e.g. arguments or config elements from outer capability);
 	 *  @return A list of futures to wait for the evaluation to finish.
 	 */
-	protected static List	createCapabilityInstance(final IOAVState state, final Object rcapa, Map parents)//, Map arguments)
+	protected static void	createCapabilityInstance(final IOAVState state, final Object rcapa, Map parents)//, Map arguments)
 	{
-		List	futures	= new ArrayList();
+//		List	futures	= new ArrayList();
 		
 		// Get configuration.
 		Object	mcapa	= state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model);
 		Object	mconfig = getConfiguration(state, rcapa);
 		
-		// Initialize properties.
-		Collection	mprops = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_properties);
-		if(mprops!=null)
-		{
-			for(Iterator it=mprops.iterator(); it.hasNext(); )
-			{
-				Object mexp = it.next();
-				final String name = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name);
-				Object	val	= evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
-				Class	clazz	= (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
-				if(clazz!=null && SReflect.isSupertype(IFuture.class, clazz))
-				{
-//					System.out.println("Future property: "+name+" "+val);
-					if(val instanceof IFuture)
-					{
-						// Use second future to start agent only when value has already been set.
-						final Future	ret	= new Future();
-						((IFuture)val).addResultListener(BDIInterpreter.getInterpreter(state).createResultListener(new IResultListener()
-						{
-							public void resultAvailable(Object result)
-							{
-//								System.out.println("Setting future property: "+name+" "+result);
-								Object param = state.createObject(OAVBDIRuntimeModel.parameter_type);	
-								state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_name, name);
-								state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_value, result);
-								state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_properties, param);
-								ret.setResult(result);
-							}
-
-							public void exceptionOccurred(Exception exception)
-							{
-								throw new RuntimeException(exception);
-							}
-						}));
-						futures.add(ret);
-					}
-					else if(val!=null)
-					{
-						throw new RuntimeException("Future property must evaluate to object of type jadex.commons.Future: "+name+", "+val);
-					}
-				}
-				else
-				{
-					Object param = state.createObject(OAVBDIRuntimeModel.parameter_type);	
-					state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_name, name);
-					state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_value, val);
-					state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_properties, param);
-//					System.out.println("Property: "+name+" "+val);
-				}
-			}
-		}
-		// Hack? Add kernelprops to agent properties.
-		if(state.getType(mcapa).isSubtype(OAVBDIMetaModel.agent_type))
-		{
-			Map kernelprops = BDIInterpreter.getInterpreter(state).getKernelProperties();
-			for(Iterator it=kernelprops.keySet().iterator(); it.hasNext(); )
-			{
-				String name = (String)it.next();
-				Object val = kernelprops.get(name);
-				Object param = state.createObject(OAVBDIRuntimeModel.parameter_type);	
-				state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_name, name);
-				state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_value, val);
-				state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_properties, param);
-			}
-		}
+//		// Initialize properties.
+//		Collection	mprops = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_properties);
+//		if(mprops!=null)
+//		{
+//			for(Iterator it=mprops.iterator(); it.hasNext(); )
+//			{
+//				Object mexp = it.next();
+//				final String name = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name);
+//				Object	val	= evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
+//				Class	clazz	= (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
+//				if(clazz!=null && SReflect.isSupertype(IFuture.class, clazz))
+//				{
+////					System.out.println("Future property: "+name+" "+val);
+//					if(val instanceof IFuture)
+//					{
+//						// Use second future to start agent only when value has already been set.
+//						final Future	ret	= new Future();
+//						((IFuture)val).addResultListener(BDIInterpreter.getInterpreter(state).createResultListener(new IResultListener()
+//						{
+//							public void resultAvailable(Object result)
+//							{
+////								System.out.println("Setting future property: "+name+" "+result);
+//								Object param = state.createObject(OAVBDIRuntimeModel.parameter_type);	
+//								state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_name, name);
+//								state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_value, result);
+//								state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_properties, param);
+//								ret.setResult(result);
+//							}
+//
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								throw new RuntimeException(exception);
+//							}
+//						}));
+//						futures.add(ret);
+//					}
+//					else if(val!=null)
+//					{
+//						throw new RuntimeException("Future property must evaluate to object of type jadex.commons.Future: "+name+", "+val);
+//					}
+//				}
+//				else
+//				{
+//					Object param = state.createObject(OAVBDIRuntimeModel.parameter_type);	
+//					state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_name, name);
+//					state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_value, val);
+//					state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_properties, param);
+////					System.out.println("Property: "+name+" "+val);
+//				}
+//			}
+//		}
+//		// Hack? Add kernelprops to agent properties.
+//		if(state.getType(mcapa).isSubtype(OAVBDIMetaModel.agent_type))
+//		{
+//			Map kernelprops = BDIInterpreter.getInterpreter(state).getKernelProperties();
+//			for(Iterator it=kernelprops.keySet().iterator(); it.hasNext(); )
+//			{
+//				String name = (String)it.next();
+//				Object val = kernelprops.get(name);
+//				Object param = state.createObject(OAVBDIRuntimeModel.parameter_type);	
+//				state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_name, name);
+//				state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_value, val);
+//				state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_properties, param);
+//			}
+//		}
 		
 		// Initialize services.
 		
-		// todo: connect services of capabilities, name them accordingly
-		Collection	mservices = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_providedservices);
-		if(mservices!=null)
-		{
-			for(Iterator it=mservices.iterator(); it.hasNext(); )
-			{
-				Object mpro = it.next();
-				
-				try
-				{
-					Class type = (Class)state.getAttributeValue(mpro, OAVBDIMetaModel.providedservice_has_class);
-					String proxytype = (String)state.getAttributeValue(mpro, OAVBDIMetaModel.providedservice_has_proxytype);
-					Object	mexp	= state.getAttributeValue(mpro, OAVBDIMetaModel.providedservice_has_implementation);
-					IParsedExpression pex = (IParsedExpression)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_parsed);
-					Class impl = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
-					Object ser = null;
-					if(pex!=null)
-					{
-						ser = evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
-					}
-					// object.class is set als deafult of expression attribute class in OAVBDIMetamodel 
-					else if(impl!=null && !Object.class.equals(impl))
-					{
-						ser = impl.newInstance();
-					}
-					
-					if(ser!=null)
-					{
-						BDIInterpreter.getInterpreter(state).addService(type, ser, proxytype);
-					}
-					else
-					{
-						BDIInterpreter.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_text));
-					}
-				}
-				catch(Exception e)
-				{
-//					e.printStackTrace();
-					BDIInterpreter.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mpro, OAVBDIMetaModel.providedservice_has_classname));
-				}
-				
+//		// todo: connect services of capabilities, name them accordingly
+//		Collection	mservices = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_providedservices);
+//		if(mservices!=null)
+//		{
+//			for(Iterator it=mservices.iterator(); it.hasNext(); )
+//			{
+//				Object mpro = it.next();
+//				
 //				try
 //				{
-////					String name = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name);
-//					IInternalService val = (IInternalService)evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
-////					Class type = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
-//					// cast hack?!
-//					Boolean direct = (Boolean)state.getAttributeValue(mexp, OAVBDIMetaModel.providedservice_has_direct);
-//					if(!direct.booleanValue())
+//					Class type = (Class)state.getAttributeValue(mpro, OAVBDIMetaModel.providedservice_has_class);
+//					String proxytype = (String)state.getAttributeValue(mpro, OAVBDIMetaModel.providedservice_has_proxytype);
+//					Object	mexp	= state.getAttributeValue(mpro, OAVBDIMetaModel.providedservice_has_implementation);
+//					IParsedExpression pex = (IParsedExpression)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_parsed);
+//					Class impl = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
+//					Object ser = null;
+//					if(pex!=null)
 //					{
-//						val = DecouplingServiceInvocationInterceptor.createServiceProxy(BDIInterpreter.getInterpreter(state).getExternalAccess(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), val);
-////						System.out.println("Created decoupled service: "+val);
+//						ser = evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
 //					}
-//					((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(val);
-////					System.out.println("Service: "+name+" "+val+" "+type);
+//					// object.class is set als deafult of expression attribute class in OAVBDIMetamodel 
+//					else if(impl!=null && !Object.class.equals(impl))
+//					{
+//						ser = impl.newInstance();
+//					}
+//					
+//					if(ser!=null)
+//					{
+//						BDIInterpreter.getInterpreter(state).addService(type, ser, proxytype);
+//					}
+//					else
+//					{
+//						BDIInterpreter.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_text));
+//					}
 //				}
 //				catch(Exception e)
 //				{
 ////					e.printStackTrace();
-//					BDIInterpreter.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_text));
+//					BDIInterpreter.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mpro, OAVBDIMetaModel.providedservice_has_classname));
 //				}
-			}
-		}
+//				
+////				try
+////				{
+//////					String name = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name);
+////					IInternalService val = (IInternalService)evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
+//////					Class type = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
+////					// cast hack?!
+////					Boolean direct = (Boolean)state.getAttributeValue(mexp, OAVBDIMetaModel.providedservice_has_direct);
+////					if(!direct.booleanValue())
+////					{
+////						val = DecouplingServiceInvocationInterceptor.createServiceProxy(BDIInterpreter.getInterpreter(state).getExternalAccess(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), val);
+//////						System.out.println("Created decoupled service: "+val);
+////					}
+////					((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(val);
+//////					System.out.println("Service: "+name+" "+val+" "+type);
+////				}
+////				catch(Exception e)
+////				{
+//////					e.printStackTrace();
+////					BDIInterpreter.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_text));
+////				}
+//			}
+//		}
 		
 		// Create subcapabilities.
 		Collection	mcaps	= state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs);
@@ -1308,12 +1308,13 @@ public class AgentRules
 				state.setAttributeValue(rcaparef, OAVBDIRuntimeModel.capabilityreference_has_capability, rsubcapa);
 				state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_subcapabilities, rcaparef);
 				parents.put(rsubcapa, rcapa);
-				List	fs	= createCapabilityInstance(state, rsubcapa, parents);//, null);//inivals!=null ? (Map)inivals.get(name) : null);
-				futures.addAll(fs);
+				createCapabilityInstance(state, rsubcapa, parents);//, null);//inivals!=null ? (Map)inivals.get(name) : null);
+//				List	fs	= createCapabilityInstance(state, rsubcapa, parents);//, null);//inivals!=null ? (Map)inivals.get(name) : null);
+//				futures.addAll(fs);
 			}
 		}
 		
-		return futures;
+//		return futures;
 	}
 	
 	/**

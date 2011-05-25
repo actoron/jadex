@@ -51,8 +51,7 @@
 	</plans>
 
 	<properties>
-<!--        <property name="logging.level">java.util.logging.Level.FINE</property>-->
-<!--        <property name="debugging">true</property>-->
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
 	</properties>
 
 	<configurations>

@@ -37,9 +37,7 @@ import jadex.commons.concurrent.ISynchronizator;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.kernelbase.StatelessAbstractInterpreter;
 import jadex.rules.rulesystem.Activation;
 import jadex.rules.rulesystem.IRule;
@@ -200,7 +198,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 */
 	public BDIInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, final IOAVState state, final OAVAgentModel model, 
-		final String config, final Map arguments, final IExternalAccess parent, RequiredServiceBinding[] bindings, final Map kernelprops, Future inited)
+		final String config, final Map arguments, final IExternalAccess parent, RequiredServiceBinding[] bindings, final Map kernelprops, final Future inited)
 	{	
 		this.initthread = Thread.currentThread();
 		
@@ -238,29 +236,29 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 			}
 		});
 		
-		// Evaluate arguments if necessary
-		// Hack! use constant
-		if(arguments!=null && arguments.get("evaluation_language")!=null)
-		{
-			arguments.remove("evaluation_language");
-			// todo: support more than Java language parsers
-			JavaCCExpressionParser parser = new JavaCCExpressionParser();
-			for(Iterator it=arguments.keySet().iterator(); it.hasNext(); )
-			{
-				Object key = it.next();
-				try
-				{
-					IParsedExpression pex = parser.parseExpression((String)arguments.get(key), null, null, state.getTypeModel().getClassLoader());
-					Object val = pex.getValue(null);
-					arguments.put(key, val);
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-					throw new RuntimeException("Could not evaluate argument: "+key);
-				}
-			}
-		}
+//		// Evaluate arguments if necessary
+//		// Hack! use constant
+//		if(arguments!=null && arguments.get("evaluation_language")!=null)
+//		{
+//			arguments.remove("evaluation_language");
+//			// todo: support more than Java language parsers
+//			JavaCCExpressionParser parser = new JavaCCExpressionParser();
+//			for(Iterator it=arguments.keySet().iterator(); it.hasNext(); )
+//			{
+//				Object key = it.next();
+//				try
+//				{
+//					IParsedExpression pex = parser.parseExpression((String)arguments.get(key), null, null, state.getTypeModel().getClassLoader());
+//					Object val = pex.getValue(null);
+//					arguments.put(key, val);
+//				}
+//				catch(Exception e)
+//				{
+//					e.printStackTrace();
+//					throw new RuntimeException("Could not evaluate argument: "+key);
+//				}
+//			}
+//		}
 		
 		// Set up initial state of agent
 		ragent = state.createRootObject(OAVBDIRuntimeModel.agent_type);
@@ -271,7 +269,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		if(bindings!=null)
 			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_bindings, bindings);
 
-		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING0);
+//		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING0);
 		
 		reificator	= new EventReificator(state, ragent);
 		
@@ -289,6 +287,21 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
 //		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_name, adapter.getComponentIdentifier().getName());
 //		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_localname, adapter.getComponentIdentifier().getLocalName());
+		
+		scheduleStep(new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+				init(getModel(), config, getModel().getProperties()).addResultListener(createResultListener(new DelegationResultListener(inited)
+				{
+					public void customResultAvailable(Object result)
+					{
+						state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING0);
+					}
+				}));
+				return null;
+			}
+		});
 		
 		this.initthread = null;
 	}
@@ -1423,6 +1436,16 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	{
 		return new OAVBDIFetcher(state, ragent);
 	}
+	
+	/**
+	 *  Init the arguments and results.
+	 */
+	public IFuture initArguments(IModelInfo model, final String config)
+	{
+		// Do nothing: args and results are inited as beliefs.
+		return IFuture.DONE;
+	}
+
 	
 	/**
 	 *  Add a default value for an argument (if not already present).

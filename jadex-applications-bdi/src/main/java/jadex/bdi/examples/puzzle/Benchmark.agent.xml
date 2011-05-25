@@ -99,8 +99,8 @@
 	</plans>
 
 	<properties>
-		<property name="debugging">false</property>
-    </properties>
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+	</properties>
 
 	<configurations default="alter-long">
 		<configuration name="none">
