@@ -94,7 +94,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oWWPcwRPEeCnwcpWvxOwkg" key="0:0" value="performative"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oWWPdARPEeCnwcpWvxOwkg" key="0:1" value="SFipa.INFORM"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oWWPdQRPEeCnwcpWvxOwkg" key="1:0" value="receivers"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oWWPdgRPEeCnwcpWvxOwkg" key="1:1" value="new IComponentIdentifier[]{$interpreter.getComponentIdentifier()}"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oWWPdgRPEeCnwcpWvxOwkg" key="1:1" value="new IComponentIdentifier[]{$component.getComponentIdentifier()}"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oWWPdwRPEeCnwcpWvxOwkg" key="2:0" value="content"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oWWPeARPEeCnwcpWvxOwkg" key="2:1" value="&quot;content&quot;"/>
       </eAnnotations>

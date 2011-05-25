@@ -106,7 +106,6 @@ public class ProcessViewPanel extends JPanel
 		final JCheckBox hon = new JCheckBox("Store History");
 		hon.setSelected(true);
 			
-		
 		listener = new IComponentListener()
 		{
 			protected IFilter filter = new IFilter()
@@ -155,6 +154,8 @@ public class ProcessViewPanel extends JPanel
 							threadinfos.remove(cce.getDetails());
 							threadinfos.add(cce.getDetails());
 						}
+						
+						updateViews();
 					}
 				});
 				return IFuture.DONE;

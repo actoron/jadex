@@ -1,7 +1,5 @@
 package jadex.base;
 
-import java.util.Collection;
-
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -11,10 +9,18 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.ServiceNotFoundException;
 import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.bridge.service.library.ILibraryService;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -331,13 +337,34 @@ public class SComponentFactory
 			public Object execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
-				SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(type))
+				SServiceProvider.getServices(ia.getServiceContainer(), IComponentFactory.class)
 					.addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						IComponentFactory fac = (IComponentFactory)result;
-						ret.setResult(fac.getProperties(type));
+						boolean found = false;
+						if(result!=null)
+						{
+							for(Iterator it=((Collection)result).iterator(); it.hasNext() && !found; )
+							{
+								IComponentFactory fac = (IComponentFactory)it.next();
+								if(SUtil.arrayToSet(fac.getComponentTypes()).contains(type))
+								{
+									Map res = fac.getProperties(type);
+									if(res!=null && !res.isEmpty())
+									{
+										ret.setResult(res);
+										found = true;
+									}
+								}
+							}
+							if(!found)
+								ret.setResult(Collections.EMPTY_MAP);
+						}
+						else
+						{
+							ret.setResult(Collections.EMPTY_MAP);
+						}
 					}
 					
 					public void exceptionOccurred(Exception exception)

@@ -28,6 +28,7 @@ import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.bridge.service.execution.IExecutionService;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.IRemotable;
+import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.CollectionResultListener;
@@ -2535,6 +2536,9 @@ public abstract class ComponentManagementService extends BasicService implements
 			alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
 		}
 		// todo: can be called after listener has (concurrently) deregistered
+		
+//		System.out.println("comp changed: "+desc+" "+listeners);
+		
 		for(int i=0; i<alisteners.length; i++)
 		{
 			alisteners[i].componentChanged(desc).addResultListener(new IResultListener()

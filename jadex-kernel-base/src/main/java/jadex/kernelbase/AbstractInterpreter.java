@@ -235,6 +235,15 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	}
 	
 	/**
+	 *  Get the component listeners.
+	 *  @return The component listeners.
+	 */
+	public List getInternalComponentListeners()
+	{
+		return componentlisteners;	
+	}
+	
+	/**
 	 *  Get the parent.
 	 *  @return The parent.
 	 */

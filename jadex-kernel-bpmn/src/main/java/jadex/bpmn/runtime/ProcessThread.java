@@ -412,7 +412,7 @@ public class ProcessThread	implements ITaskContext
 			try
 			{
 //				System.out.println("here: "+ret);
-				ret = ((IParsedExpression)ret).getValue(new ProcessThreadValueFetcher(this, true, instance.getValueFetcher()));
+				ret = ((IParsedExpression)ret).getValue(new ProcessThreadValueFetcher(this, true, instance.getFetcher()));
 			}
 			catch(RuntimeException e)
 			{
@@ -548,7 +548,7 @@ public class ProcessThread	implements ITaskContext
 				Map mappings = getLastEdge().getParameterMappings();
 				if(mappings!=null)
 				{
-					IValueFetcher fetcher = new ProcessThreadValueFetcher(this, false, instance.getValueFetcher());
+					IValueFetcher fetcher = new ProcessThreadValueFetcher(this, false, instance.getFetcher());
 					for(Iterator it=mappings.keySet().iterator(); it.hasNext(); )
 					{
 						boolean	found	= false;
@@ -628,7 +628,7 @@ public class ProcessThread	implements ITaskContext
 			// todo: parameter direction / class
 			
 			Set before = data!=null? new HashSet(data.keySet()): Collections.EMPTY_SET;
-			IValueFetcher fetcher = new ProcessThreadValueFetcher(this, true, instance.getValueFetcher());
+			IValueFetcher fetcher = new ProcessThreadValueFetcher(this, true, instance.getFetcher());
 			Map params = getActivity().getParameters();
 			if(params!=null)
 			{

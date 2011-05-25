@@ -184,7 +184,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 												if(param.getInitialValue()!=null)
 												{
 													if(fetcher==null)
-														fetcher	= new ProcessThreadValueFetcher(thread, false, instance.getValueFetcher());
+														fetcher	= new ProcessThreadValueFetcher(thread, false, instance.getFetcher());
 													try
 													{
 														thread.setParameterValue(param.getName(), param.getInitialValue().getValue(fetcher));

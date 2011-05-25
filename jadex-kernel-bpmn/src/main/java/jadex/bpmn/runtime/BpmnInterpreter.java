@@ -29,7 +29,6 @@ import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -37,9 +36,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
-import jadex.bridge.RemoteComponentListener;
 import jadex.bridge.modelinfo.IArgument;
-import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -57,11 +54,10 @@ import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SJavaParser;
-import jadex.kernelbase.StatelessAbstractInterpreter;
-import jadex.kernelbase.ExternalAccess;
+import jadex.kernelbase.AbstractInterpreter;
+import jadex.kernelbase.InterpreterFetcher;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -73,30 +69,17 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *  The micro agent interpreter is the connection between the agent platform 
- *  and a user-written micro agent. 
+ *  The bpmn interpreter is able to execute bpmn diagrams.
+ *  
+ *  Arguments are treated in BPMN as parameters, i.e. the argument
+ *  values will be fed into corresponding parameters.
  */
-public class BpmnInterpreter extends StatelessAbstractInterpreter implements IComponentInstance, IInternalAccess
+public class BpmnInterpreter extends AbstractInterpreter implements IComponentInstance, IInternalAccess
 {	
 	//-------- static part --------
 	
-//	/** The change event prefix for the history. */
-//	public static final String	EVENT_HISTORY	= "history";
-	
 	/** The change event prefix denoting a thread event. */
 	public static final String	TYPE_THREAD	= "thread";
-	
-//	/** The change event denoting a step for the history. */
-//	public static final String	EVENT_HISTORY_ADDED	= EVENT_HISTORY + RemoteChangeListenerHandler.EVENT_OCCURRED;
-//	
-//	/** The change event denoting a new thread. */
-//	public static final String	EVENT_THREAD_ADDED	= EVENT_THREAD + RemoteChangeListenerHandler.EVENT_ADDED;
-//	
-//	/** The change event denoting a changed thread. */
-//	public static final String	EVENT_THREAD_CHANGED	= EVENT_THREAD + RemoteChangeListenerHandler.EVENT_CHANGED;
-//	
-//	/** The change event denoting a finished thread. */
-//	public static final String	EVENT_THREAD_REMOVED	= EVENT_THREAD + RemoteChangeListenerHandler.EVENT_REMOVED;
 	
 	/** The activity execution handlers (activity type -> handler). */
 	public static final Map DEFAULT_ACTIVITY_HANDLERS;
@@ -163,14 +146,8 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 	
 	//-------- attributes --------
 	
-	/** The platform adapter for the agent. */
-	protected IComponentAdapter	adapter;
-	
 	/** The micro agent model. */
 	protected MBpmnModel model;
-	
-	/** The configuration. */
-	protected String config;
 	
 	/** The configuration. */
 	protected String pool;
@@ -178,23 +155,14 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 	/** The configuration. */
 	protected String lane;
 	
-	/** The parent. */
-	protected IExternalAccess	parent;
-	
 	/** The activity handlers. */
 	protected Map activityhandlers;
 	
 	/** The step handlers. */
 	protected Map stephandlers;
 
-	/** The global value fetcher. */
-	protected IValueFetcher	fetcher;
-
 	/** The thread context. */
 	protected ThreadContext	context;
-	
-//	/** The change listeners. */
-//	protected List listeners;
 	
 	/** The context variables. */
 	protected Map variables;
@@ -205,9 +173,6 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 	/** The messages waitqueue. */
 	protected List messages;
 	
-	/** The service container. */
-	protected IServiceContainer container;
-	
 	/** The flag if is inited. */
 	protected boolean initedflag;
 	
@@ -217,20 +182,8 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 	/** Listeners for activities. */
 	protected List activitylisteners;
 	
-	/** The component listeners. */
-	protected List componentlisteners;
-
 	/** The thread id counter. */
-	protected int	idcnt;
-	
-	/** The required service binding information. */
-	protected RequiredServiceBinding[] bindings;
-	
-	/** The external access (cached). */
-	protected IExternalAccess	access;
-	
-	/** The extensions. */
-	protected Map extensions;
+	protected int idcnt;
 	
 	//-------- constructors --------
 	
@@ -244,14 +197,13 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 		IValueFetcher fetcher, IComponentManagementService cms, IClockService cs, IMessageService ms,
 		IServiceContainer container)
 	{
-		this.adapter = adapter;
-		construct(model, arguments, config, parent, activityhandlers, stephandlers, fetcher, null);
+		super(null, model.getModelInfo(), config, null, parent, arguments, null, new Future());
+		construct(model, activityhandlers, stephandlers);		
+		this.fetcher = fetcher!=null? fetcher: new BpmnInstanceFetcher(this, fetcher);
+		
 		variables.put("$cms", cms);
 		variables.put("$clock", cs);
 		variables.put("$msgservice", ms);
-		
-		// Assign container
-		this.container = container;
 		
 		initContextVariables();
 		
@@ -278,24 +230,22 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
 		IValueFetcher fetcher, RequiredServiceBinding[] bindings, Future inited)
 	{
+		super(desc, model.getModelInfo(), config, factory, parent, arguments, bindings, inited);
 		this.inited = inited;
 		this.variables	= new HashMap();
-		construct(model, arguments, config, parent, activityhandlers, stephandlers, fetcher, bindings);
+		construct(model, activityhandlers, stephandlers);
 		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
 	}
 	
 	/**
 	 *  Init method holds constructor code for both implementations.
 	 */
-	protected void construct(final MBpmnModel model, Map arguments, String config, 
-		final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
-		IValueFetcher fetcher, RequiredServiceBinding[] bindings)
+	protected void construct(final MBpmnModel model, Map activityhandlers, Map stephandlers)
 	{
 		this.model = model;
-		this.config = config;
-		this.bindings = bindings;
 		
 		// Extract pool/lane from config.
+		String config = getConfiguration();
 		if(config==null || ALL.equals(config))
 		{
 			this.pool	= null;
@@ -316,27 +266,25 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 			}
 		}
 		
-		this.parent	= parent;
 		this.activityhandlers = activityhandlers!=null? activityhandlers: DEFAULT_ACTIVITY_HANDLERS;
 		this.stephandlers = stephandlers!=null? stephandlers: DEFAULT_STEP_HANDLERS;
-		this.fetcher = fetcher!=null? fetcher: new BpmnInstanceFetcher(this, fetcher);
 		this.context = new ThreadContext(model);
 		this.messages = new ArrayList();
 		this.variables	= new HashMap();
 
 		// Init the arguments with default values.
-		IArgument[] args = model.getModelInfo().getArguments();
-		for(int i=0; i<args.length; i++)
-		{
-			if(arguments!=null && arguments.containsKey(args[i].getName()))
-			{
-				this.variables.put(args[i].getName(), arguments.get(args[i].getName()));
-			}
-			else if(args[i].getDefaultValue(config)!=null)
-			{
-				this.variables.put(args[i].getName(), args[i].getDefaultValue(config));
-			}
-		}		
+//		IArgument[] args = model.getModelInfo().getArguments();
+//		for(int i=0; i<args.length; i++)
+//		{
+//			if(arguments!=null && arguments.containsKey(args[i].getName()))
+//			{
+//				this.variables.put(args[i].getName(), arguments.get(args[i].getName()));
+//			}
+//			else if(args[i].getDefaultValue(config)!=null)
+//			{
+//				this.variables.put(args[i].getName(), args[i].getDefaultValue(config));
+//			}
+//		}		
 	}
 	
 	//-------- IComponentInstance interface --------
@@ -486,20 +434,15 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 		// Initialize context variables.
 		variables.put("$interpreter", this);
 		
-		if(getModel().getName().indexOf("AddTargetPlan")!=-1)
-		{
-			System.out.println("debug sdlkhfyg");
-		}
-		
 		initContextVariables();
 
-		// Start the container and notify cms when start has finished.		
-		getServiceContainer().start().addResultListener(createResultListener(new IResultListener()
+		init(getModel(), getConfiguration(), getModel().getProperties())
+			.addResultListener(createResultListener(new DelegationResultListener(inited)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
 				// Create initial thread(s). 
-				List	startevents	= model.getStartActivities();
+				List startevents	= model.getStartActivities();
 				for(int i=0; startevents!=null && i<startevents.size(); i++)
 				{
 					ProcessThread	thread	= new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
@@ -507,20 +450,19 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 //					notifyListeners(EVENT_THREAD_ADDED, thread);
 					notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_THREAD, thread.getClass().getName(), 
 						thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread)));
-
 				}
 				
 				// Notify cms that init is finished.
 				inited.setResult(new Object[]{BpmnInterpreter.this, adapter});
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				inited.setException(exception);
+				
+				super.customResultAvailable(result);
 			}
 		}));
 	}
 
+	/**
+	 *  Init context variables.
+	 */
 	protected void initContextVariables()
 	{
 		Set	vars	= model.getContextVariables();
@@ -535,7 +477,7 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 				{
 					try
 					{
-						value	= exp.getValue(this.fetcher);
+						value = exp.getValue(getFetcher());
 					}
 					catch(RuntimeException e)
 					{
@@ -556,7 +498,7 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 	 */
 	public void messageArrived(final IMessageAdapter message)
 	{
-		adapter.invokeLater(new Runnable()
+		getComponentAdapter().invokeLater(new Runnable()
 		{
 			public void run()
 			{
@@ -610,9 +552,9 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 			}
 		}*/
 		
-		ComponentChangeEvent.dispatchTerminatingEvent(adapter, getModel(), getServiceProvider(), componentlisteners, null);
+		ComponentChangeEvent.dispatchTerminatingEvent(getComponentAdapter(), getModel(), getServiceProvider(), getInternalComponentListeners(), null);
 		
-		adapter.invokeLater(new Runnable()
+		getComponentAdapter().invokeLater(new Runnable()
 		{
 			public void run()
 			{	
@@ -624,55 +566,11 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 //					System.out.println("Cancelling: "+pt.getActivity()+" "+pt.getId());
 				}
 				
-				ComponentChangeEvent.dispatchTerminatedEvent(adapter, getModel(), getServiceProvider(), componentlisteners, ret);
+				ComponentChangeEvent.dispatchTerminatedEvent(getComponentAdapter(), getModel(), getServiceProvider(), getInternalComponentListeners(), ret);
 			}
 		});
 		
 		return ret;
-	}
-	
-	/**
-	 *  Can be called concurrently (also during executeAction()).
-	 * 
-	 *  Get the external access for this component.
-	 *  The specific external access interface is kernel specific
-	 *  and has to be casted to its corresponding incarnation.
-	 *  @param listener	External access is delivered via result listener.
-	 */
-	public IExternalAccess getExternalAccess()
-	{
-		if(access==null)
-		{
-			synchronized(this)
-			{
-				if(access==null)
-				{
-					access	= new ExternalAccess(this);
-				}
-			}
-		}
-		
-		return access;
-	}
-	
-	/**
-	 *  Get the results of the component (considering it as a functionality).
-	 *  @return The results map (name -> value). 
-	 */
-	public Map getResults()
-	{
-		IArgument[] results = getModel().getResults();
-		Map res = new HashMap();
-		
-		for(int i=0; i<results.length; i++)
-		{
-			String resname = results[i].getName();
-			if(variables.containsKey(resname))
-			{
-				res.put(resname, variables.get(resname));
-			}
-		}
-		return res;
 	}
 	
 	/**
@@ -832,33 +730,6 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 	}
 	
 	/**
-	 *  Get the agent adapter.
-	 *  @return The agent adapter.
-	 */
-	public IComponentAdapter getComponentAdapter()
-	{
-		return adapter;
-	}
-
-	/**
-	 *  Get the agent model.
-	 *  @return The model.
-	 */
-	public IModelInfo getModel()
-	{
-		return model.getModelInfo();
-	}
-	
-	/**
-	 *  Get the parent component.
-	 *  @return The parent component.
-	 */
-	public IExternalAccess getParent()
-	{
-		return parent;
-	}
-	
-	/**
 	 *  Create the service container.
 	 *  @return The service container.
 	 */
@@ -878,7 +749,7 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 	 *  Get the model of the BPMN process instance.
 	 *  @return The model.
 	 */
-	public MBpmnModel	getModelElement()
+	public MBpmnModel getModelElement()
 	{
 		return (MBpmnModel)context.getModelElement();
 	}
@@ -1074,21 +945,6 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 	}
 	
 	/**
-	 *  Add an external entry to be invoked during the next executeStep.
-	 *  This method may be called from external threads.
-	 *  @param code	The external code. 
-	 */
-//	public void	invokeLater(Runnable code)
-//	{
-//		synchronized(extentries)
-//		{
-//			extentries.add(code);
-//		}
-//		if(adapter!=null)
-//			adapter.wakeUp();
-//	}
-	
-	/**
 	 *  Get the activity handler for an activity.
 	 *  @param actvity The activity.
 	 *  @return The activity handler.
@@ -1108,15 +964,6 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 		return ret!=null? ret: (IStepHandler)stephandlers.get(IStepHandler.STEP_HANDLER);
 	}
 
-	/**
-	 *  Get the global value fetcher.
-	 *  @return The value fetcher (if any).
-	 */
-	public IValueFetcher getValueFetcher()
-	{
-		return this.fetcher;
-	}
-	
 	/**
 	 *  Test if the given context variable is declared.
 	 *  @param name	The variable name.
@@ -1350,102 +1197,27 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 		return ret;
 	}
 	
-	/**
-	 *  Adds an activity listener. The listener will be called
-	 *  once a process thread executes a new activity.
-	 *  @param listener The activity listener.
-	 */
-	public void addActivityListener(IActivityListener listener)
-	{
-		if(activitylisteners==null)
-			activitylisteners = new ArrayList();
-		activitylisteners.add(listener);
-	}
-	
-	/**
-	 *  Removes an activity listener.
-	 *  @param listener The activity listener.
-	 */
-	public void removeActivityListener(IActivityListener listener)
-	{
-		if(activitylisteners!=null)
-			activitylisteners.remove(listener);
-	}
-	
-	/**
-	 *  Add an component listener.
-	 *  @param listener The listener.
-	 */
-	public IFuture addComponentListener(IComponentListener listener)
-	{
-		if(componentlisteners==null)
-			componentlisteners = new ArrayList();
-		
-		// Hack! How to find out if remote listener?
-		if(Proxy.isProxyClass(listener.getClass()))
-			listener = new RemoteComponentListener(getExternalAccess(), listener);
-		
-		componentlisteners.add(listener);
-		return IFuture.DONE;
-	}
-	
-	/**
-	 *  Remove a component listener.
-	 *  @param listener The listener.
-	 */
-	public IFuture removeComponentListener(IComponentListener listener)
-	{
-		// Hack! How to find out if remote listener?
-		if(Proxy.isProxyClass(listener.getClass()))
-			listener = new RemoteComponentListener(getExternalAccess(), listener);
-		
-		if(componentlisteners!=null)
-			componentlisteners.remove(listener);
-		
-//		System.out.println("cl: "+componentlisteners);
-		return IFuture.DONE;
-	}
-	
-	/**
-	 *  Get the component listeners.
-	 *  @return The component listeners.
-	 */
-	public IComponentListener[] getComponentListeners()
-	{
-		return componentlisteners==null? new IComponentListener[0]: 
-			(IComponentListener[])componentlisteners.toArray(new IComponentListener[componentlisteners.size()]);
-	}
-	
-	/**
-	 *  Notify the component listeners.
-	 */
-	public void notifyListeners(IComponentChangeEvent event)
-	{
-		if(componentlisteners!=null)
-		{
-			IComponentListener[] lstnrs = (IComponentListener[])componentlisteners.toArray(new IComponentListener[componentlisteners.size()]);
-			for(int i=0; i<lstnrs.length; i++)
-			{
-				final IComponentListener lis = lstnrs[i];
-				
-				if(lis.getFilter().filter(event))
-				{
-					lis.eventOccured(event).addResultListener(new IResultListener()
-					{
-						public void resultAvailable(Object result)
-						{
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							//Print exception?
-							componentlisteners.remove(lis);
-						}
-					});
-				}
-			}
-		}
-	}
+//	/**
+//	 *  Adds an activity listener. The listener will be called
+//	 *  once a process thread executes a new activity.
+//	 *  @param listener The activity listener.
+//	 */
+//	public void addActivityListener(IActivityListener listener)
+//	{
+//		if(activitylisteners==null)
+//			activitylisteners = new ArrayList();
+//		activitylisteners.add(listener);
+//	}
+//	
+//	/**
+//	 *  Removes an activity listener.
+//	 *  @param listener The activity listener.
+//	 */
+//	public void removeActivityListener(IActivityListener listener)
+//	{
+//		if(activitylisteners!=null)
+//			activitylisteners.remove(listener);
+//	}
 	
 	/**
 	 * 
@@ -1467,15 +1239,11 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 	 */
 	public IValueFetcher getFetcher()
 	{
+		if(fetcher==null)
+		{
+			fetcher = new BpmnInstanceFetcher(this, new InterpreterFetcher(this));
+		}
 		return fetcher;
-	}
-	
-	/**
-	 *  Get the service bindings.
-	 */
-	public RequiredServiceBinding[] getServiceBindings()
-	{
-		return bindings;
 	}
 	
 	/**
@@ -1486,16 +1254,12 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 	 */
 	public void	addDefaultArgument(String name, Object value)
 	{
-		throw new RuntimeException();
-		
-//		if(arguments==null)
-//		{
-//			arguments	= new HashMap();
-//		}
-//		if(!arguments.containsKey(name))
-//		{
-//			arguments.put(name, value);
-//		}
+		// super to ensure that getArguments() return correct values.
+		super.addDefaultArgument(name, value); 
+		if(!variables.containsKey(name))
+		{
+			variables.put(name, value);
+		}
 	}
 	
 	/**
@@ -1506,38 +1270,31 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 	 */
 	public void	addDefaultResult(String name, Object value)
 	{
-		throw new RuntimeException();
-		
-//		if(results==null)
-//		{
-//			results	= new HashMap();
-//		}
-//		results.put(name, value);
-	}
-	
-	/**
-	 *  Get a space of the application.
-	 *  @param name	The name of the space.
-	 *  @return	The space.
-	 */
-	public Object getExtension(final String name)
-	{
-		return extensions==null? null: extensions.get(name);
-	}
-	
-	/**
-	 *  Add a default value for an argument (if not already present).
-	 *  Called once for each argument during init.
-	 *  @param name	The argument name.
-	 *  @param value	The argument value.
-	 */
-	public void	addExtension(String name, Object value)
-	{
-		if(extensions==null)
+//		super.addDefaultResult(name, value);
+		if(!variables.containsKey(name))
 		{
-			extensions = new HashMap();
+			variables.put(name, value);
 		}
-		extensions.put(name, value);
+	}
+	
+	/**
+	 *  Get the results of the component (considering it as a functionality).
+	 *  @return The results map (name -> value). 
+	 */
+	public Map getResults()
+	{
+		IArgument[] results = getModel().getResults();
+		Map res = new HashMap();
+		
+		for(int i=0; i<results.length; i++)
+		{
+			String resname = results[i].getName();
+			if(variables.containsKey(resname))
+			{
+				res.put(resname, variables.get(resname));
+			}
+		}
+		return res;
 	}
 	
 	/**
@@ -1548,32 +1305,23 @@ public class BpmnInterpreter extends StatelessAbstractInterpreter implements ICo
 		return this;
 	}
 	
-	/**
-	 *  Add a property value.
-	 *  @param name The name.
-	 *  @param val The value.
-	 */
-	public void addProperty(String name, Object val)
-	{
-		if(variables==null)
-			variables = new HashMap();
-		variables.put(name, val);
-	}
-	
-	/**
-	 *  Get the properties.
-	 */
-	public Map getProperties()
-	{
-		return variables!=null? variables: Collections.EMPTY_MAP;
-	}
-	
-	/**
-	 *  Get the arguments.
-	 *  @return The arguments.
-	 */
-	public Map getArguments()
-	{
-		return getModel().getProperties();
-	}
+//	/**
+//	 *  Add a property value.
+//	 *  @param name The name.
+//	 *  @param val The value.
+//	 */
+//	public void addProperty(String name, Object val)
+//	{
+//		if(variables==null)
+//			variables = new HashMap();
+//		variables.put(name, val);
+//	}
+//	
+//	/**
+//	 *  Get the properties.
+//	 */
+//	public Map getProperties()
+//	{
+//		return variables!=null? variables: Collections.EMPTY_MAP;
+//	}
 }

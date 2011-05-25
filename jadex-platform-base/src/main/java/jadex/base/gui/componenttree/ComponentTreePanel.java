@@ -549,11 +549,11 @@ public class ComponentTreePanel extends JSplitPane
 			{
 				Icon	ret	= null;
 				
-//				IComponentDescription	desc = null;
-//				if(node instanceof IActiveComponentTreeNode)
-//				{
-//					desc = ((IActiveComponentTreeNode)node).getDescription();
-//				
+				IComponentDescription	desc = null;
+				if(node instanceof IActiveComponentTreeNode)
+				{
+					desc = ((IActiveComponentTreeNode)node).getDescription();
+				
 //					if(IComponentDescription.PROCESSINGSTATE_READY.equals(desc.getProcessingState()))
 //					{
 //						ret = icons.getIcon("overlay_ready");
@@ -564,12 +564,13 @@ public class ComponentTreePanel extends JSplitPane
 //					}
 //					else if(IComponentDescription.PROCESSINGSTATE_IDLE.equals(desc.getProcessingState()))
 //					{
-//						if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
-//						{
-//							ret = icons.getIcon("component_suspended");
-//						}
-//					}					
-//				}
+//						// -> susp
+//					}		
+					if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+					{
+						ret = icons.getIcon("component_suspended");
+					}
+				}
 				return ret;
 			}
 			

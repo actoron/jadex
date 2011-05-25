@@ -8,6 +8,7 @@ import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.IComponentDescription;
 import jadex.commons.Properties;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.CombiIcon;
@@ -158,7 +159,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 					Object node = tree.getSelectionPath().getLastPathComponent();
 					if(node instanceof IActiveComponentTreeNode)
 					{
-						cards.show(((IActiveComponentTreeNode)node).getDescription());
+						cards.show(((IActiveComponentTreeNode)node).getId());
 					}
 				}
 			}
