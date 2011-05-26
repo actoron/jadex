@@ -77,6 +77,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 {	
 	//-------- static part --------
 	
+	/** Constant for step event. */
+	public static final String TYPE_ACTIVITY = "activity";
+	
 	/** The change event prefix denoting a thread event. */
 	public static final String	TYPE_THREAD	= "thread";
 	
@@ -177,9 +180,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	
 	/** The inited future. */
 	protected Future inited;
-	
-//	/** Listeners for activities. */
-//	protected List activitylisteners;
 	
 	/** The thread id counter. */
 	protected int idcnt;
@@ -803,10 +803,11 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_THREAD, thread.getClass().getName(), 
 				thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread)));
 			
-//			if(thread.getLastEdge()!=null && thread.getLastEdge().getSource()!=null)
-//				fireEndActivity(thread.getId(), thread.getLastEdge().getSource());
-//			
-//			fireStartActivity(thread.getId(), thread.getActivity());
+			if(thread.getLastEdge()!=null && thread.getLastEdge().getSource()!=null)
+				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_ACTIVITY, thread.getLastEdge().getSource().getName(), thread.getId(), getComponentIdentifier(), null));
+
+			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_ACTIVITY, thread.getActivity().getName(), thread.getId(), getComponentIdentifier(), null));
+
 //			System.out.println("step: "+getComponentIdentifier()+" "+thread.getId()+" "+thread.getActivity());
 			
 //			System.out.println("Step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+thread.getActivity()+" "+thread);
@@ -1054,11 +1055,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 //	protected void fireStartActivity(String threadid, MActivity activity)
 //	{
 ////		System.out.println("fire start: "+activity);
-//		if(activitylisteners!=null)
-//		{
-//			for(Iterator it = activitylisteners.iterator(); it.hasNext(); )
-//				((IActivityListener)it.next()).activityStarted(new ChangeEvent(threadid, null, activity));
-//		}
+//		notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, ACTIVITY, activity.getName(), threadid, getComponentIdentifier(), null));
 //	}
 //	
 //	/**

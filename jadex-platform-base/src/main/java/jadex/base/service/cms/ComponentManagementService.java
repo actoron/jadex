@@ -1515,7 +1515,8 @@ public abstract class ComponentManagementService extends BasicService implements
 				{
 					// Hack? Allows components to getExternalAccess in init phase
 					Object[] ii = getInitInfo(cid);
-					adapter = (IComponentAdapter)ii[1];
+					if(ii!=null)
+						adapter = (IComponentAdapter)ii[1];
 				}
 			}
 			
@@ -1864,7 +1865,8 @@ public abstract class ComponentManagementService extends BasicService implements
 				if(desc==null)
 				{
 					Object[] ii= getInitInfo(cid);
-					desc	= (IComponentDescription) ii[0];
+					if(ii!=null)
+						desc	= (IComponentDescription) ii[0];
 				}
 				
 				// Todo: addresses required for communication across platforms.
@@ -2575,7 +2577,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	}
 	
 	/**
-	 * 
+	 *  Get the init info for a component identifier.
 	 */
 	protected Object[] getInitInfo(IComponentIdentifier cid)
 	{
