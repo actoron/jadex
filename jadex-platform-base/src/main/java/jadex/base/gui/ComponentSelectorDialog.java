@@ -365,7 +365,7 @@ public class ComponentSelectorDialog
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				addSelectedAgent(new ComponentIdentifier("@"+access.getComponentIdentifier().getPlatformName(), null), list);
+				addSelectedAgent(new ComponentIdentifier("@"+access.getComponentIdentifier().getPlatformName(), (String[])null), list);
 			}
 		});
 		remove.addActionListener(new ActionListener()

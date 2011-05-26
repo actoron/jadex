@@ -44,7 +44,6 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.clock.ITimedObject;
 import jadex.bridge.service.component.ComponentServiceContainer;
-import jadex.commons.ChangeEvent;
 import jadex.commons.IFilter;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -179,8 +178,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	/** The inited future. */
 	protected Future inited;
 	
-	/** Listeners for activities. */
-	protected List activitylisteners;
+//	/** Listeners for activities. */
+//	protected List activitylisteners;
 	
 	/** The thread id counter. */
 	protected int idcnt;
@@ -270,7 +269,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		this.stephandlers = stephandlers!=null? stephandlers: DEFAULT_STEP_HANDLERS;
 		this.context = new ThreadContext(model);
 		this.messages = new ArrayList();
-		this.variables	= new HashMap();
+		this.variables	= new HashMap(getArguments());
 
 		// Init the arguments with default values.
 //		IArgument[] args = model.getModelInfo().getArguments();
@@ -317,7 +316,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 				if(!isFinished(pool, lane) && isReady(pool, lane))
 					executeStep(pool, lane);
 				
-	//			System.out.println("After step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+isFinished(pool, lane));
+//				System.out.println("After step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+isFinished(pool, lane));
 				if(!finishing && isFinished(pool, lane))
 				{
 					finishing = true;
@@ -804,10 +803,11 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_THREAD, thread.getClass().getName(), 
 				thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread)));
 			
-			if(thread.getLastEdge()!=null && thread.getLastEdge().getSource()!=null)
-				fireEndActivity(thread.getId(), thread.getLastEdge().getSource());
-			
-			fireStartActivity(thread.getId(), thread.getActivity());
+//			if(thread.getLastEdge()!=null && thread.getLastEdge().getSource()!=null)
+//				fireEndActivity(thread.getId(), thread.getLastEdge().getSource());
+//			
+//			fireStartActivity(thread.getId(), thread.getActivity());
+//			System.out.println("step: "+getComponentIdentifier()+" "+thread.getId()+" "+thread.getActivity());
 			
 //			System.out.println("Step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+thread.getActivity()+" "+thread);
 			MActivity act = thread.getActivity();
@@ -1045,94 +1045,36 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 			throw new RuntimeException("Undeclared context variable: "+name+", "+this);
 		}
 	}
-
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(String name)
-	{
-		IComponentManagementService cms = (IComponentManagementService)variables.get("$cms");
-		return cms.createComponentIdentifier(name);
-	}
 	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
-	{
-		return createComponentIdentifier(name, local);
-	}
-	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(final String name, final boolean local, final String[] addresses)
-	{
-		IComponentManagementService cms = (IComponentManagementService)variables.get("$cms");
-		return cms.createComponentIdentifier(name, local, addresses);
-	}
-	
-	/**
-	 *  Create a reply to this message event.
-	 *  @param msgeventtype	The message event type.
-	 *  @return The reply event.
-	 */
-	public Map createReply(IMessageAdapter msg)
-	{
-		return createReply(msg.getParameterMap(), msg.getMessageType());
-	}
-	
-	/**
-	 *  Create a reply to this message event.
-	 *  @param msgeventtype	The message event type.
-	 *  @return The reply event.
-	 */
-	public Map createReply(final Map msg, final MessageType mt)
-	{
-		return mt.createReply(msg);
-	}
-	
-	/**
-	 *  Fires an activity execution event.
-	 *  @param threadid ID of the executing ProcessThread.
-	 *  @param activity The activity being executed.
-	 */
-	protected void fireStartActivity(String threadid, MActivity activity)
-	{
-//		System.out.println("fire start: "+activity);
-		if(activitylisteners!=null)
-		{
-			for(Iterator it = activitylisteners.iterator(); it.hasNext(); )
-				((IActivityListener)it.next()).activityStarted(new ChangeEvent(threadid, null, activity));
-		}
-	}
-	
-	/**
-	 *  Fires an activity execution event.
-	 *  @param threadid ID of the executing ProcessThread.
-	 *  @param activity The activity being executed.
-	 */
-	protected void fireEndActivity(String threadid, MActivity activity)
-	{
-//		System.out.println("fire end: "+activity);
-		if(activitylisteners!=null)
-		{
-			for(Iterator it = activitylisteners.iterator(); it.hasNext(); )
-				((IActivityListener)it.next()).activityEnded(new ChangeEvent(threadid, null, activity));
-		}
-	}
+//	/**
+//	 *  Fires an activity execution event.
+//	 *  @param threadid ID of the executing ProcessThread.
+//	 *  @param activity The activity being executed.
+//	 */
+//	protected void fireStartActivity(String threadid, MActivity activity)
+//	{
+////		System.out.println("fire start: "+activity);
+//		if(activitylisteners!=null)
+//		{
+//			for(Iterator it = activitylisteners.iterator(); it.hasNext(); )
+//				((IActivityListener)it.next()).activityStarted(new ChangeEvent(threadid, null, activity));
+//		}
+//	}
+//	
+//	/**
+//	 *  Fires an activity execution event.
+//	 *  @param threadid ID of the executing ProcessThread.
+//	 *  @param activity The activity being executed.
+//	 */
+//	protected void fireEndActivity(String threadid, MActivity activity)
+//	{
+////		System.out.println("fire end: "+activity);
+//		if(activitylisteners!=null)
+//		{
+//			for(Iterator it = activitylisteners.iterator(); it.hasNext(); )
+//				((IActivityListener)it.next()).activityEnded(new ChangeEvent(threadid, null, activity));
+//		}
+//	}
 	
 	/**
 	 *  Schedule a step of the agent.
@@ -1305,23 +1247,90 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		return this;
 	}
 	
+	//-------- message handling methods --------
+	
+	// todo: remove?
+	
 //	/**
-//	 *  Add a property value.
+//	 *  Create component identifier.
 //	 *  @param name The name.
-//	 *  @param val The value.
+//	 *  @param local True for local name.
+//	 *  @param addresses The addresses.
+//	 *  @return The new component identifier.
 //	 */
-//	public void addProperty(String name, Object val)
+//	public IComponentIdentifier createComponentIdentifier(String name)
 //	{
-//		if(variables==null)
-//			variables = new HashMap();
-//		variables.put(name, val);
+//		IComponentManagementService cms = (IComponentManagementService)variables.get("$cms");
+//		return cms.createComponentIdentifier(name);
 //	}
 //	
 //	/**
-//	 *  Get the properties.
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param local True for local name.
+//	 *  @param addresses The addresses.
+//	 *  @return The new component identifier.
 //	 */
-//	public Map getProperties()
+//	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
 //	{
-//		return variables!=null? variables: Collections.EMPTY_MAP;
+//		IComponentManagementService cms = (IComponentManagementService)variables.get("$cms");
+//		return cms.createComponentIdentifier(name, local);
 //	}
+//	
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param local True for local name.
+//	 *  @param addresses The addresses.
+//	 *  @return The new component identifier.
+//	 */
+//	public IComponentIdentifier createComponentIdentifier(final String name, final boolean local, final String[] addresses)
+//	{
+//		IComponentManagementService cms = (IComponentManagementService)variables.get("$cms");
+//		return cms.createComponentIdentifier(name, local, addresses);
+//	}
+//	
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param addresses The addresses.
+//	 *  @return The new component identifier.
+//	 */
+//	public IComponentIdentifier createComponentIdentifier(String name, IComponentIdentifier parent)
+//	{
+//		IComponentManagementService cms = (IComponentManagementService)variables.get("$cms");
+//		return cms.createComponentIdentifier(name, parent, null);
+//	}
+//	
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param addresses The addresses.
+//	 *  @return The new component identifier.
+//	 */
+//	public IComponentIdentifier createComponentIdentifier(String name, IComponentIdentifier parent, String[] addresses)
+//	{
+//		IComponentManagementService cms = (IComponentManagementService)variables.get("$cms");
+//		return cms.createComponentIdentifier(name, parent, addresses);
+//	}
+	
+	/**
+	 *  Create a reply to this message event.
+	 *  @param msgeventtype	The message event type.
+	 *  @return The reply event.
+	 */
+	public Map createReply(IMessageAdapter msg)
+	{
+		return createReply(msg.getParameterMap(), msg.getMessageType());
+	}
+	
+	/**
+	 *  Create a reply to this message event.
+	 *  @param msgeventtype	The message event type.
+	 *  @return The reply event.
+	 */
+	public Map createReply(final Map msg, final MessageType mt)
+	{
+		return mt.createReply(msg);
+	}
 }

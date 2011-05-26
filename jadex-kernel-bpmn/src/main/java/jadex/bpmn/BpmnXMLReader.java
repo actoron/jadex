@@ -15,10 +15,15 @@ import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.IFilter;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple;
+import jadex.commons.collection.MultiCollection;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.AccessInfo;
@@ -32,6 +37,7 @@ import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
+import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.Reader;
 
 import java.io.File;
@@ -74,6 +80,42 @@ public class BpmnXMLReader
 	
 	/** The singleton reader instance. */
 	protected static Reader	reader;
+	
+	public static IPostProcessor configpp = new IPostProcessor()
+	{
+		public Object postProcess(IContext context, Object object)
+		{
+			ConfigurationInfo app = (ConfigurationInfo)object;
+			IModelInfo mapp = (IModelInfo)context.getRootObject();
+			
+			UnparsedExpression[] margs = app.getArguments();
+			for(int i=0; i<margs.length; i++)
+			{
+				try
+				{
+					Argument arg = (Argument)mapp.getArgument(margs[i].getName());
+					if(arg==null)
+						throw new RuntimeException("Overridden argument not declared in component type: "+margs[i].getName());
+					
+//					Object val = overridenarg.getParsedValue().getValue(null);
+//					arg.setDefaultValue(app.getName(), val);
+				}
+				catch(RuntimeException e)
+				{
+					Object	se	= new Tuple(((ReadContext)context).getStack());
+					MultiCollection	report	= (MultiCollection)context.getUserContext();
+					report.put(se, e.toString());
+				}
+			}
+			
+			return null;
+		}
+		
+		public int getPass()
+		{
+			return 0;
+		}
+	};
 	
 	//-------- methods --------
 	

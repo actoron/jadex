@@ -25,7 +25,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wqnyxQRPEeCnwcpWvxOwkg" key="1:0" value="content"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wqnyxgRPEeCnwcpWvxOwkg" key="1:1" value="&quot;Order sent by D5&quot;"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wqnyxwRPEeCnwcpWvxOwkg" key="2:0" value="receivers"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wqnyyARPEeCnwcpWvxOwkg" key="2:1" value="$component.createComponentIdentifier(&quot;D3_MessageReceival&quot;)"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wqnyyARPEeCnwcpWvxOwkg" key="2:1" value="D3_MessageReceival"/>
       </eAnnotations>
     </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_q6FG-kYiEd-3iKqz0F2Flw" iD="_q6FG-UYiEd-3iKqz0F2Flw"/>

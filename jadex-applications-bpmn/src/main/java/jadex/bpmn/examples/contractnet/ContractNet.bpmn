@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_cLVu4FT6Ed-32983CGnnJA" iD="_cLMk8FT6Ed-32983CGnnJA">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_auWB8FamEd-1RJ7RXx1qjA" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_auWB8VamEd-1RJ7RXx1qjA" key="Description" value="&lt;h1>Contract Net&lt;/h1>This process implements initiator and participant of a contract net interaction."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_auWB8lamEd-1RJ7RXx1qjA" key="Package" value="jadex.bpmn.examples.contractnet"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dyDKRQRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z81bMIeAEeCPcZYF99FtaQ" key="description" value="&lt;h1>Contract Net&lt;/h1>This process implements initiator and participant of a contract net interaction."/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_doEu4ARPEeCnwcpWvxOwkg" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_doEu4QRPEeCnwcpWvxOwkg" key="dimension" value="3:1"/>
@@ -91,10 +91,7 @@
       <vertices xmi:type="bpmn:Activity" xmi:id="_sCuo8VaoEd-1RJ7RXx1qjA" iD="_sCuo8FaoEd-1RJ7RXx1qjA" incomingEdges="_sCuo-laoEd-1RJ7RXx1qjA" name="" activityType="EventIntermediateMessage">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-oEzcFaoEd-1RJ7RXx1qjA" source="jadex">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-oEzcVaoEd-1RJ7RXx1qjA" key="mode" value=""/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-oEzclaoEd-1RJ7RXx1qjA" key="msgtype" value=""/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-oEzc1aoEd-1RJ7RXx1qjA" key="message" value=""/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-oEzdFaoEd-1RJ7RXx1qjA" key="filter" value=""/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WkzOkGJrEd-Q9q1HfsZXQw" key="match expression" value=""/>
         </eAnnotations>
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dxdUawRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxdUbARPEeCnwcpWvxOwkg" key="dimension" value="5:2"/>
@@ -115,10 +112,7 @@
       <vertices xmi:type="bpmn:Activity" xmi:id="_uk_xYVaoEd-1RJ7RXx1qjA" iD="_uk_xYFaoEd-1RJ7RXx1qjA" outgoingEdges="_t6hi0VguEd-F7Z1jfVSjng" incomingEdges="_ulJiYVaoEd-1RJ7RXx1qjA" name="" activityType="EventIntermediateMessage">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wH7jwFaoEd-1RJ7RXx1qjA" source="jadex">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wH7jwVaoEd-1RJ7RXx1qjA" key="mode" value=""/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wH7jwlaoEd-1RJ7RXx1qjA" key="msgtype" value=""/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wH7jw1aoEd-1RJ7RXx1qjA" key="message" value=""/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wH7jxFaoEd-1RJ7RXx1qjA" key="filter" value=""/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cZC0MGJiEd-Q9q1HfsZXQw" key="match expression" value=""/>
         </eAnnotations>
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dxdUeARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxdUeQRPEeCnwcpWvxOwkg" key="dimension" value="5:2"/>
@@ -177,7 +171,6 @@
     <vertices xmi:type="bpmn:SubProcess" xmi:id="_J11FUVapEd-1RJ7RXx1qjA" iD="_J11FUFapEd-1RJ7RXx1qjA" outgoingEdges="_9R7RIVauEd-1RJ7RXx1qjA" incomingEdges="_y8pRoVapEd-1RJ7RXx1qjA" name="For all Participants" activityType="SubProcess" looping="false">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KMVg0FapEd-1RJ7RXx1qjA" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KMVg0VapEd-1RJ7RXx1qjA" key="class" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_40ChUWG2Ed-BsY75SRM2Ug" key="file" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_40ChUmG2Ed-BsY75SRM2Ug" key="parallel" value="true"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_40ChU2G2Ed-BsY75SRM2Ug" key="items" value="participants"/>
       </eAnnotations>
@@ -207,7 +200,7 @@
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFagRPEeCnwcpWvxOwkg" key="0:0" value="performative"/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFawRPEeCnwcpWvxOwkg" key="0:1" value="&quot;refuse&quot;"/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFbARPEeCnwcpWvxOwkg" key="1:0" value="sender"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFbQRPEeCnwcpWvxOwkg" key="1:1" value="$component.createComponentIdentifier(item)"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFbQRPEeCnwcpWvxOwkg" key="1:1" value="item"/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFbgRPEeCnwcpWvxOwkg" key="2:0" value="conversation_id"/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFbwRPEeCnwcpWvxOwkg" key="2:1" value="convid"/>
         </eAnnotations>
@@ -216,10 +209,7 @@
       <vertices xmi:type="bpmn:Activity" xmi:id="_NmBZcVapEd-1RJ7RXx1qjA" iD="_NmBZcFapEd-1RJ7RXx1qjA" outgoingEdges="_3_QtQVglEd-UBaPlSCV7pQ" incomingEdges="_NmBZelapEd-1RJ7RXx1qjA" activityType="EventIntermediateMessage">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ZWpH0FapEd-1RJ7RXx1qjA" source="jadex">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZWpH0VapEd-1RJ7RXx1qjA" key="mode" value=""/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZWpH0lapEd-1RJ7RXx1qjA" key="msgtype" value=""/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZWpH01apEd-1RJ7RXx1qjA" key="message" value=""/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZWpH1FapEd-1RJ7RXx1qjA" key="filter" value=""/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vIFm4GJaEd-Q9q1HfsZXQw" key="match expression" value=""/>
         </eAnnotations>
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dxnFcARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFcQRPEeCnwcpWvxOwkg" key="dimension" value="3:2"/>
@@ -227,7 +217,7 @@
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFcwRPEeCnwcpWvxOwkg" key="0:0" value="performative"/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFdARPEeCnwcpWvxOwkg" key="0:1" value="&quot;propose&quot;"/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFdQRPEeCnwcpWvxOwkg" key="1:0" value="sender"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFdgRPEeCnwcpWvxOwkg" key="1:1" value="$component.createComponentIdentifier(item)"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFdgRPEeCnwcpWvxOwkg" key="1:1" value="item"/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFdwRPEeCnwcpWvxOwkg" key="2:0" value="conversation_id"/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFeARPEeCnwcpWvxOwkg" key="2:1" value="convid"/>
         </eAnnotations>
@@ -236,24 +226,21 @@
       <vertices xmi:type="bpmn:Activity" xmi:id="_rTd5wVapEd-1RJ7RXx1qjA" iD="_rTd5wFapEd-1RJ7RXx1qjA" outgoingEdges="_x679AVapEd-1RJ7RXx1qjA" incomingEdges="_1ybzAVapEd-1RJ7RXx1qjA" name="" activityType="EventIntermediateMessage" looping="false">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_rVjkcFapEd-1RJ7RXx1qjA" source="jadex">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rVjkcVapEd-1RJ7RXx1qjA" key="mode" value=""/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rVjkclapEd-1RJ7RXx1qjA" key="msgtype" value=""/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rVjkc1apEd-1RJ7RXx1qjA" key="message" value=""/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rVjkdFapEd-1RJ7RXx1qjA" key="filter" value=""/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HibBUGG3Ed-BsY75SRM2Ug" key="match expression" value=""/>
         </eAnnotations>
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dxnFeQRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFegRPEeCnwcpWvxOwkg" key="dimension" value="5:2"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFewRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFfARPEeCnwcpWvxOwkg" key="0:0" value="performative"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFfQRPEeCnwcpWvxOwkg" key="0:1" value="&quot;cfp&quot;"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFfgRPEeCnwcpWvxOwkg" key="1:0" value="receivers"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFfwRPEeCnwcpWvxOwkg" key="1:1" value="$component.createComponentIdentifier(item)"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFgARPEeCnwcpWvxOwkg" key="2:0" value="content"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFgQRPEeCnwcpWvxOwkg" key="2:1" value="cfp"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFggRPEeCnwcpWvxOwkg" key="3:0" value="conversation_id"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFgwRPEeCnwcpWvxOwkg" key="3:1" value="convid"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFhARPEeCnwcpWvxOwkg" key="4:0" value="protocol"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFhQRPEeCnwcpWvxOwkg" key="4:1" value="&quot;fipa-contract-net&quot;"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Gz8pUIeBEeCPcZYF99FtaQ" key="dimension" value="5:2"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Gz8pUYeBEeCPcZYF99FtaQ" key="uniqueColumnIndex" value="1"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Gz9QYIeBEeCPcZYF99FtaQ" key="0:0" value="performative"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Gz9QYYeBEeCPcZYF99FtaQ" key="0:1" value="&quot;cfp&quot;"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Gz9QYoeBEeCPcZYF99FtaQ" key="1:0" value="receivers"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Gz9QY4eBEeCPcZYF99FtaQ" key="1:1" value="item"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Gz9QZIeBEeCPcZYF99FtaQ" key="2:0" value="content"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Gz9QZYeBEeCPcZYF99FtaQ" key="2:1" value="cfp"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Gz9QZoeBEeCPcZYF99FtaQ" key="3:0" value="conversation_id"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Gz9QZ4eBEeCPcZYF99FtaQ" key="3:1" value="convid"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Gz9QaIeBEeCPcZYF99FtaQ" key="4:0" value="protocol"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Gz9QaYeBEeCPcZYF99FtaQ" key="4:1" value="&quot;fipa-contract-net&quot;"/>
         </eAnnotations>
         <outgoingMessages xmi:type="bpmn:MessagingEdge" href="#_zydxMVT6Ed-32983CGnnJA"/>
       </vertices>
@@ -415,10 +402,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_uWrd8VT6Ed-32983CGnnJA" iD="_uWrd8FT6Ed-32983CGnnJA" outgoingEdges="_3piJalT6Ed-32983CGnnJA" incomingEdges="_wU91Cla6Ed-1RJ7RXx1qjA" activityType="EventIntermediateMessage" looping="false">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_sv8PEFa6Ed-1RJ7RXx1qjA" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sv8PEVa6Ed-1RJ7RXx1qjA" key="mode" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sv8PEla6Ed-1RJ7RXx1qjA" key="msgtype" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sv8PE1a6Ed-1RJ7RXx1qjA" key="message" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sv8PFFa6Ed-1RJ7RXx1qjA" key="filter" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_unTOAGJaEd-Q9q1HfsZXQw" key="match expression" value=""/>
       </eAnnotations>
       <incomingMessages xmi:type="bpmn:MessagingEdge" href="#_zydxMVT6Ed-32983CGnnJA"/>
     </vertices>
@@ -426,10 +410,8 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_FNYI4VT7Ed-32983CGnnJA" iD="_FNYI4FT7Ed-32983CGnnJA" outgoingEdges="_i2I9ilT7Ed-32983CGnnJA" incomingEdges="_7gJOmVT6Ed-32983CGnnJA" name="" activityType="EventIntermediateMessage">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_TwcUUFapEd-1RJ7RXx1qjA" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TwcUUVapEd-1RJ7RXx1qjA" key="mode" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TwcUUlapEd-1RJ7RXx1qjA" key="msgtype" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TwcUU1apEd-1RJ7RXx1qjA" key="message" value="$component.createReply(msg)"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TwcUVFapEd-1RJ7RXx1qjA" key="filter" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IYzPsGG3Ed-BsY75SRM2Ug" key="match expression" value=""/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dxwPcARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxwPcQRPEeCnwcpWvxOwkg" key="dimension" value="2:2"/>
@@ -507,10 +489,8 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_1XO6IVT7Ed-32983CGnnJA" iD="_1XO6IFT7Ed-32983CGnnJA" outgoingEdges="_GCv1OlT8Ed-32983CGnnJA" incomingEdges="_1XO6KlT7Ed-32983CGnnJA" name="" activityType="EventIntermediateMessage">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_1hF5cFarEd-1RJ7RXx1qjA" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1hF5cVarEd-1RJ7RXx1qjA" key="mode" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1hF5clarEd-1RJ7RXx1qjA" key="msgtype" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1hF5c1arEd-1RJ7RXx1qjA" key="message" value="$component.createReply(msg)"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1hF5dFarEd-1RJ7RXx1qjA" key="filter" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MPfAkGJrEd-Q9q1HfsZXQw" key="match expression" value=""/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dx6AXQRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dx6AXgRPEeCnwcpWvxOwkg" key="dimension" value="2:2"/>
@@ -525,10 +505,8 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_3XYM8VT7Ed-32983CGnnJA" iD="_3XYM8FT7Ed-32983CGnnJA" outgoingEdges="_HOvuQVT8Ed-32983CGnnJA" incomingEdges="_3XYM-lT7Ed-32983CGnnJA" name="" activityType="EventIntermediateMessage">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KeSKMFdeEd-_rc0-j01YLA" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KeSKMVdeEd-_rc0-j01YLA" key="mode" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KeSKMldeEd-_rc0-j01YLA" key="msgtype" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KeSKM1deEd-_rc0-j01YLA" key="message" value="$component.createReply(msg)"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KeSKNFdeEd-_rc0-j01YLA" key="filter" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MZ6u8GJrEd-Q9q1HfsZXQw" key="match expression" value=""/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dx6AZARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dx6AZQRPEeCnwcpWvxOwkg" key="dimension" value="2:2"/>

@@ -29,7 +29,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	 */
 	public ComponentIdentifier()
 	{
-		this(null, null);
+		this(null, (String[])null);
 	}
 
 	/**
@@ -38,7 +38,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	 */
 	public ComponentIdentifier(String name)
 	{
-		this(name, null);
+		this(name, (String[])null);
 	}
 
 	/**
@@ -51,7 +51,28 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 //		this(name, addresses, null);
 		this.name = name;
 		this.addresses	= addresses;
-
+	}
+	
+	/**
+	 *  Create component identifier.
+	 *  @param name The name.
+	 *  @param addresses The addresses.
+	 *  @return The new component identifier.
+	 */
+	public ComponentIdentifier(String name, IComponentIdentifier parent)
+	{
+		this(name, parent, parent.getAddresses());
+	}
+	
+	/**
+	 *  Create component identifier.
+	 *  @param name The name.
+	 *  @param addresses The addresses.
+	 *  @return The new component identifier.
+	 */
+	public ComponentIdentifier(String name, IComponentIdentifier parent, String[] addresses)
+	{
+		this(name+"@"+parent.getName().replace('@', '.'), addresses);
 	}
 
 //	/**

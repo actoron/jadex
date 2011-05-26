@@ -113,7 +113,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 									Object rec = it.next();
 									if(rec instanceof String)
 									{
-										newrecs.add(cms.createComponentIdentifier((String)rec, true, null));
+										newrecs.add(cms.createComponentIdentifier((String)rec, instance.getComponentIdentifier().getParent(), null));
 									}
 									else
 									{
@@ -125,7 +125,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 							{
 								if(recs instanceof String)
 								{
-									newrecs.add(cms.createComponentIdentifier((String)recs, true, null));
+									newrecs.add(cms.createComponentIdentifier((String)recs, instance.getComponentIdentifier().getParent(), null));
 								}
 								else
 								{
