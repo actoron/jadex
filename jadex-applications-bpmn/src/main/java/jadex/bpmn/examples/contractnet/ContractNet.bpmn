@@ -189,20 +189,17 @@
       <vertices xmi:type="bpmn:Activity" xmi:id="_M4SJsVapEd-1RJ7RXx1qjA" iD="_M4SJsFapEd-1RJ7RXx1qjA" incomingEdges="_M4SJulapEd-1RJ7RXx1qjA" activityType="EventIntermediateMessage">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_YzewYFapEd-1RJ7RXx1qjA" source="jadex">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YzewYVapEd-1RJ7RXx1qjA" key="mode" value=""/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YzewYlapEd-1RJ7RXx1qjA" key="msgtype" value=""/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YzewY1apEd-1RJ7RXx1qjA" key="message" value=""/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YzewZFapEd-1RJ7RXx1qjA" key="filter" value=""/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vpUEoGJaEd-Q9q1HfsZXQw" key="match expression" value=""/>
         </eAnnotations>
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dxnFZwRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFaARPEeCnwcpWvxOwkg" key="dimension" value="3:2"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFaQRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFagRPEeCnwcpWvxOwkg" key="0:0" value="performative"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFawRPEeCnwcpWvxOwkg" key="0:1" value="&quot;refuse&quot;"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFbARPEeCnwcpWvxOwkg" key="1:0" value="sender"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFbQRPEeCnwcpWvxOwkg" key="1:1" value="item"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFbgRPEeCnwcpWvxOwkg" key="2:0" value="conversation_id"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFbwRPEeCnwcpWvxOwkg" key="2:1" value="convid"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tBTbwIeuEeCPcZYF99FtaQ" key="dimension" value="3:2"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tBTbwYeuEeCPcZYF99FtaQ" key="uniqueColumnIndex" value="1"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tBUC0IeuEeCPcZYF99FtaQ" key="0:0" value="performative"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tBUC0YeuEeCPcZYF99FtaQ" key="0:1" value="&quot;refuse&quot;"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tBUC0oeuEeCPcZYF99FtaQ" key="1:0" value="sender"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tBUC04euEeCPcZYF99FtaQ" key="1:1" value="item"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tBUC1IeuEeCPcZYF99FtaQ" key="2:0" value="conversation_id"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tBUC1YeuEeCPcZYF99FtaQ" key="2:1" value="convid"/>
         </eAnnotations>
         <incomingMessages xmi:type="bpmn:MessagingEdge" href="#_VFhQ4VapEd-1RJ7RXx1qjA"/>
       </vertices>
@@ -212,14 +209,14 @@
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZWpH1FapEd-1RJ7RXx1qjA" key="filter" value=""/>
         </eAnnotations>
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dxnFcARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFcQRPEeCnwcpWvxOwkg" key="dimension" value="3:2"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFcgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFcwRPEeCnwcpWvxOwkg" key="0:0" value="performative"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFdARPEeCnwcpWvxOwkg" key="0:1" value="&quot;propose&quot;"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFdQRPEeCnwcpWvxOwkg" key="1:0" value="sender"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFdgRPEeCnwcpWvxOwkg" key="1:1" value="item"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFdwRPEeCnwcpWvxOwkg" key="2:0" value="conversation_id"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxnFeARPEeCnwcpWvxOwkg" key="2:1" value="convid"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sN0JUIeuEeCPcZYF99FtaQ" key="dimension" value="3:2"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sN0JUYeuEeCPcZYF99FtaQ" key="uniqueColumnIndex" value="1"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sN0JUoeuEeCPcZYF99FtaQ" key="0:0" value="performative"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sN0JU4euEeCPcZYF99FtaQ" key="0:1" value="&quot;propose&quot;"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sN0JVIeuEeCPcZYF99FtaQ" key="1:0" value="sender"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sN0wYIeuEeCPcZYF99FtaQ" key="1:1" value="item"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sN0wYYeuEeCPcZYF99FtaQ" key="2:0" value="conversation_id"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sN0wYoeuEeCPcZYF99FtaQ" key="2:1" value="convid"/>
         </eAnnotations>
         <incomingMessages xmi:type="bpmn:MessagingEdge" href="#_UjQRUVapEd-1RJ7RXx1qjA"/>
       </vertices>
@@ -427,10 +424,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_kEXrMVT7Ed-32983CGnnJA" iD="_kEXrMFT7Ed-32983CGnnJA" outgoingEdges="_ts_LQVT7Ed-32983CGnnJA" incomingEdges="_uUFpkVaSEd-1RJ7RXx1qjA" activityType="EventIntermediateMessage">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_lJWVUFazEd-1RJ7RXx1qjA" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lJWVUVazEd-1RJ7RXx1qjA" key="mode" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lJWVUlazEd-1RJ7RXx1qjA" key="msgtype" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lJWVU1azEd-1RJ7RXx1qjA" key="message" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lJWVVFazEd-1RJ7RXx1qjA" key="filter" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vud7UGJjEd-Q9q1HfsZXQw" key="match expression" value=""/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dxwPdwRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxwPeARPEeCnwcpWvxOwkg" key="dimension" value="2:2"/>
@@ -445,10 +439,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_mEhlEVT7Ed-32983CGnnJA" iD="_mEhlEFT7Ed-32983CGnnJA" outgoingEdges="_rc4w4VT7Ed-32983CGnnJA" incomingEdges="_t40p4VaSEd-1RJ7RXx1qjA" activityType="EventIntermediateMessage">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_9VZoYFddEd-_rc0-j01YLA" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9VZoYVddEd-_rc0-j01YLA" key="mode" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9VZoYlddEd-_rc0-j01YLA" key="msgtype" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9VZoY1ddEd-_rc0-j01YLA" key="message" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9VZoZFddEd-_rc0-j01YLA" key="filter" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LvAJsGJrEd-Q9q1HfsZXQw" key="match expression" value=""/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dxwPfgRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dxwPfwRPEeCnwcpWvxOwkg" key="dimension" value="2:2"/>

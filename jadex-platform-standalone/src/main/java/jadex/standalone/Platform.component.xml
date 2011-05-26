@@ -156,7 +156,7 @@
 		<property name="componentviewer.viewerclass">"jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel"</property>
 		<!-- <property name="viewerpanel.componentviewerclass">""</property> -->
 		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
-		<property name="logging.level">java.util.logging.Level.WARNING</property>
+		<!-- <property name="logging.level">java.util.logging.Level.WARNING</property> -->
 	</properties>
 	
 	<configurations>

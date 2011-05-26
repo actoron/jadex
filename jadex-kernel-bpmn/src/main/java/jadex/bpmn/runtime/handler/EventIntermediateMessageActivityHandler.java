@@ -3,6 +3,7 @@ package jadex.bpmn.runtime.handler;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
@@ -220,7 +221,20 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 								if(!params[i].equals("isThrowing"))
 								{
 									// Fetch property from message event activity, because current activity might be multiple event.
-									ret	= SUtil.equals(thread.getPropertyValue(params[i], activity), msg.getValue(params[i]));
+									Object propval = thread.getPropertyValue(params[i], activity);
+									Object msgval = msg.getValue(params[i]);
+									
+									// Hack to support string component names and component identifiers
+									if(propval instanceof String && msgval instanceof IComponentIdentifier)
+									{
+										msgval = ((IComponentIdentifier)msgval).getLocalName();
+									}
+									else if(msgval instanceof String && propval instanceof IComponentIdentifier)
+									{
+										propval = ((IComponentIdentifier)propval).getLocalName();
+									}
+									
+									ret	= SUtil.equals(propval, msgval);
 								}
 							}
 						}
