@@ -27,9 +27,12 @@ public class ComponentIdentifierRenderer extends DefaultTableCellRenderer
 			setText(cid.getName());
 			String[] addresses = cid.getAddresses();
 			String tooltip = "<b>" + cid.getName() + "</b>";
-			for(int i = 0; i < addresses.length; i++)
+			if(addresses!=null)
 			{
-				tooltip += "<br>" + addresses[i];
+				for(int i = 0; i < addresses.length; i++)
+				{
+					tooltip += "<br>" + addresses[i];
+				}
 			}
 			setToolTipText("<html>" + tooltip + "</html>");
 		}
