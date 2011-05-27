@@ -1,12 +1,12 @@
 package jadex.bdi.examples.disastermanagement.commander;
 
-import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.service.IService;
+import jadex.extension.envsupport.environment.ISpaceObject;
 
 import java.util.ArrayList;
 import java.util.Collection;

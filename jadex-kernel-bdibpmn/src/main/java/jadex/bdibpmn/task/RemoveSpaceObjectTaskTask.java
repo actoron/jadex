@@ -1,12 +1,12 @@
 package jadex.bdibpmn.task;
 
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.bpmn.runtime.task.TaskMetaInfo;
 import jadex.commons.future.IFuture;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
 
 /**
  *  Create a task for a space object.

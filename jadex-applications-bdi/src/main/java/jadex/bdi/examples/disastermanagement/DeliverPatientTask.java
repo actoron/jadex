@@ -1,9 +1,9 @@
 package jadex.bdi.examples.disastermanagement;
 
-import jadex.application.space.envsupport.environment.AbstractTask;
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bridge.service.clock.IClockService;
+import jadex.extension.envsupport.environment.AbstractTask;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceObject;
 
 /**
  *  Deliver a patient at the hospital.

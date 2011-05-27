@@ -16,16 +16,16 @@
 	name="HunterPrey" package="jadex.bdi.examples.hunterprey">
 	
 	<imports>
-		<import>jadex.application.space.envsupport.environment.*</import>
-		<import>jadex.application.space.envsupport.environment.space2d.*</import>
-		<import>jadex.application.space.envsupport.environment.RoundBasedExecutor</import>
-		<import>jadex.application.space.envsupport.math.*</import>
+		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.environment.RoundBasedExecutor</import>
+		<import>jadex.extension.envsupport.math.*</import>
 		<import>jadex.bridge.service.clock.IClockService</import>
-		<import>jadex.application.space.envsupport.dataview.*</import>
+		<import>jadex.extension.envsupport.dataview.*</import>
 		<import>jadex.bdi.examples.hunterprey.dumbprey.*</import>
 		<import>jadex.bdi.examples.hunterprey.cleverprey.*</import>
 		<import>jadex.bdi.examples.hunterprey.dumbhunter.*</import>
-		<import>jadex.application.space.envsupport.observer.perspective.*</import>
+		<import>jadex.extension.envsupport.observer.perspective.*</import>
 		<import>jadex.bdi.planlib.*</import>
 	</imports>
 	

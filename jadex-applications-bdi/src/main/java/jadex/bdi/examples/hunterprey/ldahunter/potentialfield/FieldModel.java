@@ -10,11 +10,11 @@
  */
 package jadex.bdi.examples.hunterprey.ldahunter.potentialfield;
 
-import jadex.application.space.envsupport.math.IVector2;
-import jadex.application.space.envsupport.math.Vector1Double;
-import jadex.application.space.envsupport.math.Vector1Int;
-import jadex.application.space.envsupport.math.Vector2Double;
-import jadex.application.space.envsupport.math.Vector2Int;
+import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.Vector1Double;
+import jadex.extension.envsupport.math.Vector1Int;
+import jadex.extension.envsupport.math.Vector2Double;
+import jadex.extension.envsupport.math.Vector2Int;
 
 
 /**

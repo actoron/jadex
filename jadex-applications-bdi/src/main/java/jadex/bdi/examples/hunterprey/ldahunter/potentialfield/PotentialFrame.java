@@ -6,15 +6,15 @@
  */
 package jadex.bdi.examples.hunterprey.ldahunter.potentialfield;
 
-import jadex.application.space.envsupport.math.IVector2;
-import jadex.application.space.envsupport.math.Vector1Int;
-import jadex.application.space.envsupport.math.Vector2Int;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
 import jadex.commons.gui.SGUI;
+import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.Vector1Int;
+import jadex.extension.envsupport.math.Vector2Int;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Color;

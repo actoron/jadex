@@ -4,8 +4,8 @@
  */
 package jadex.bdi.examples.marsworld;
 
-import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.base.fipa.IComponentAction;
+import jadex.extension.envsupport.environment.ISpaceObject;
 
 
 /**

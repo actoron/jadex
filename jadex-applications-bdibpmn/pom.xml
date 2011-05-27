@@ -192,5 +192,11 @@
 			<artifactId>jadex-applib-bdi</artifactId>
 			<version>2.0-rc7</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-extension-envsupport</artifactId>
+			<version>2.0-rc7</version>
+		</dependency>
 	</dependencies>
 </project>

@@ -33,8 +33,6 @@
 		<import>jadex.base.service.settings.*</import>
 		<import>jadex.component.*</import>
 		<import>jadex.application.*</import>
-		<import>jadex.application.space.envsupport.*</import>
-		<import>jadex.application.space.agr.*</import>
 		<import>java.util.*</import>
 		<import>java.lang.reflect.*</import>
 	</imports>
@@ -143,10 +141,10 @@
 			</implementation>		
 		</providedservice>
 		<providedservice class="IComponentFactoryExtensionService">
-			<implementation class="EnvSupportExtensionService"/>
+			<implementation class="jadex.extension.envsupport.EnvSupportExtensionService"/>
 		</providedservice>
 		<providedservice class="IComponentFactoryExtensionService">
-			<implementation class="AGRExtensionService"/>
+			<implementation class="jadex.extension.agr.AGRExtensionService"/>
 		</providedservice>
 		
 		<requiredservice name="factoryservices" class="IComponentFactory" multiple="true"/>

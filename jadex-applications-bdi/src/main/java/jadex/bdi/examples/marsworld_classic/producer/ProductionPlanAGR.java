@@ -1,7 +1,5 @@
 package jadex.bdi.examples.marsworld_classic.producer;
 
-import jadex.application.space.agr.AGRSpace;
-import jadex.application.space.agr.Group;
 import jadex.base.fipa.SFipa;
 import jadex.bdi.examples.marsworld_classic.AgentInfo;
 import jadex.bdi.examples.marsworld_classic.Environment;
@@ -14,6 +12,8 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.extension.agr.AGRSpace;
+import jadex.extension.agr.Group;
 
 /**
  *  The main plan for the Production Agent. <br>

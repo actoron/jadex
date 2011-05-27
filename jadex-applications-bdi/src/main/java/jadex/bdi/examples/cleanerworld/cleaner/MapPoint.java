@@ -1,8 +1,8 @@
 package jadex.bdi.examples.cleanerworld.cleaner;
 
-import jadex.application.space.envsupport.math.IVector2;
-import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.commons.SReflect;
+import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.Vector2Double;
 
 /**
  *  A map point reflects how often the agent

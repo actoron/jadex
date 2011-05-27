@@ -1,14 +1,14 @@
 package jadex.bdi.examples.marsworld.carry;
 
-import jadex.application.space.agr.AGRSpace;
-import jadex.application.space.agr.Group;
-import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IChangeEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.extension.agr.AGRSpace;
+import jadex.extension.agr.Group;
+import jadex.extension.envsupport.environment.ISpaceObject;
 
 /**
  *  Inform the sentry agent about a new target.

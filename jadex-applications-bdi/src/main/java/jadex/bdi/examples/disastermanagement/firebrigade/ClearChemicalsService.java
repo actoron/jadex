@@ -1,6 +1,5 @@
 package jadex.bdi.examples.disastermanagement.firebrigade;
 
-import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.examples.disastermanagement.IClearChemicalsService;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIInternalAccess;
@@ -9,6 +8,7 @@ import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.extension.envsupport.environment.ISpaceObject;
 
 /**
  *   Clear chemicals service.

@@ -15,11 +15,11 @@
 	name="GameOfLife" package="jadex.micro.examples.gameoflife">
 	
 	<imports>
-		<import>jadex.application.space.envsupport.environment.space2d.*</import>
-		<import>jadex.application.space.envsupport.environment.RoundBasedExecutor</import>
-		<import>jadex.application.space.envsupport.math.*</import>
-		<import>jadex.application.space.envsupport.dataview.*</import>
-		<import>jadex.application.space.envsupport.observer.perspective.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.environment.RoundBasedExecutor</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.extension.envsupport.dataview.*</import>
+		<import>jadex.extension.envsupport.observer.perspective.*</import>
 	</imports>
 	
 	<extensiontypes>

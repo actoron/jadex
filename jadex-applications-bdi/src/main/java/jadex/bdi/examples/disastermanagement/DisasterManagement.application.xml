@@ -15,13 +15,13 @@
 	name="DisasterManagement" package="jadex.bdi.examples.disastermanagement">
 	
 	<imports>
-		<import>jadex.application.space.envsupport.environment.*</import>
-		<import>jadex.application.space.envsupport.environment.space2d.*</import>
-		<import>jadex.application.space.envsupport.math.*</import>
-		<import>jadex.application.space.envsupport.dataview.*</import>
-		<import>jadex.application.space.envsupport.observer.perspective.*</import>
-		<import>jadex.application.space.envsupport.evaluation.*</import>
-		<import>jadex.application.space.envsupport.observer.gui.plugin.*</import>
+		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.extension.envsupport.dataview.*</import>
+		<import>jadex.extension.envsupport.observer.perspective.*</import>
+		<import>jadex.extension.envsupport.evaluation.*</import>
+		<import>jadex.extension.envsupport.observer.gui.plugin.*</import>
 		<import>jadex.commons.SFunction</import>
 	</imports>
 	

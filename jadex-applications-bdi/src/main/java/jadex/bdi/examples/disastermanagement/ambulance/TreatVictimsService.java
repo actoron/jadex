@@ -1,6 +1,5 @@
 package jadex.bdi.examples.disastermanagement.ambulance;
 
-import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.examples.disastermanagement.DeliverPatientTask;
 import jadex.bdi.examples.disastermanagement.ITreatVictimsService;
 import jadex.bdi.runtime.AgentEvent;
@@ -10,6 +9,7 @@ import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.extension.envsupport.environment.ISpaceObject;
 
 /**
  *   Treat victims service.

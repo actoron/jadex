@@ -245,12 +245,7 @@
 			<artifactId>jadex-kernel-application</artifactId>
 			<version>2.0-rc7</version>
 		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-application-opengl</artifactId>
-			<version>2.0-rc7</version>
-		</dependency>
-
+	
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-gpmn</artifactId>
@@ -269,6 +264,25 @@
 			<version>2.0-rc7</version>
 		</dependency>
 
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-extension-agr</artifactId>
+			<version>2.0-rc7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-extension-envsupport</artifactId>
+			<version>2.0-rc7</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-application-opengl</artifactId>
+			<version>2.0-rc7</version>
+		</dependency>
+		
+		
 		<!-- <dependency>
 		    <groupId>log4j</groupId>
 		    <artifactId>log4j</artifactId>

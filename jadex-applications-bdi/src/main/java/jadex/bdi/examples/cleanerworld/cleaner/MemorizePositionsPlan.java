@@ -1,9 +1,9 @@
 package jadex.bdi.examples.cleanerworld.cleaner;
 
-import jadex.application.space.envsupport.math.IVector1;
-import jadex.application.space.envsupport.math.IVector2;
-import jadex.application.space.envsupport.math.Vector1Double;
 import jadex.bdi.runtime.Plan;
+import jadex.extension.envsupport.math.IVector1;
+import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.Vector1Double;
 
 /**
  *  Memorize the visited positions.

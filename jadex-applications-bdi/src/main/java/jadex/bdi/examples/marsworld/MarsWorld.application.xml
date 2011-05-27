@@ -26,19 +26,19 @@
 	name="MarsWorld" package="jadex.bdi.examples.marsworld">
 	
 	<imports>
-		<import>jadex.application.space.envsupport.environment.space2d.*</import>
-		<import>jadex.application.space.envsupport.environment.DeltaTimeExecutor</import>
-		<import>jadex.application.space.envsupport.math.*</import>
-		<import>jadex.application.space.envsupport.dataview.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.environment.DeltaTimeExecutor</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.extension.envsupport.dataview.*</import>
 		<import>java.text.SimpleDateFormat</import>
 		<import>java.util.Date</import>
-		<import>jadex.application.space.envsupport.observer.perspective.*</import>
+		<import>jadex.extension.envsupport.observer.perspective.*</import>
 		<import>jadex.bdi.examples.marsworld.carry.*</import>
 		<import>jadex.bdi.examples.marsworld.producer.*</import>
 		<import>jadex.bdi.examples.marsworld.sentry.*</import>
 		<import>jadex.bdi.examples.marsworld.movement.*</import>
-		<import>jadex.application.space.envsupport.evaluation.*</import>
-		<import>jadex.application.space.envsupport.observer.gui.plugin.*</import>
+		<import>jadex.extension.envsupport.evaluation.*</import>
+		<import>jadex.extension.envsupport.observer.gui.plugin.*</import>
 		<import>jadex.bridge.service.clock.IClockService</import>
 		<import>jadex.commons.future.*</import>
 		<import>jadex.bridge.service.*</import>

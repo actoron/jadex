@@ -1,11 +1,11 @@
 package jadex.bdi.examples.hunterprey;
 
-import jadex.application.space.envsupport.environment.ComponentActionList;
-import jadex.application.space.envsupport.environment.ComponentActionList.ActionEntry;
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceAction;
-import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bridge.IComponentDescription;
+import jadex.extension.envsupport.environment.ComponentActionList;
+import jadex.extension.envsupport.environment.ComponentActionList.ActionEntry;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceAction;
+import jadex.extension.envsupport.environment.ISpaceObject;
 
 import java.util.Comparator;
 

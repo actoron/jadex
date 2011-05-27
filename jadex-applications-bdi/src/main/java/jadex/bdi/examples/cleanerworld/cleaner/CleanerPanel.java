@@ -1,8 +1,5 @@
 package jadex.bdi.examples.cleanerworld.cleaner;
 
-import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.application.space.envsupport.environment.space2d.Space2D;
-import jadex.application.space.envsupport.math.IVector2;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IExpression;
@@ -13,6 +10,9 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.Space2D;
+import jadex.extension.envsupport.math.IVector2;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Color;
