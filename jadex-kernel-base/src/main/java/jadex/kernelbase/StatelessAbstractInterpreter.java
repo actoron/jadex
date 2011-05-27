@@ -353,12 +353,19 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		final Future iret = new Future();
 		ret.addResultListener(new DelegationResultListener(iret)
 		{
-			public void exceptionOccurred(Exception exception)
+			public void exceptionOccurred(final Exception exception)
 			{
-				removeExtensions().addResultListener(new DelegationResultListener(iret));
+				removeExtensions().addResultListener(new DelegationResultListener(iret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						super.exceptionOccurred(exception);
+					}
+				});
 			}
 		});
 		
+//		return ret;
 		return iret;
 	}
 	
@@ -603,7 +610,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		IExtensionInstance ext = getExtension(name);
 		if(ext!=null)
 		{
-			ext.terminate().addResultListener(createResultListener(new DelegationResultListener(ret)));
+			ext.terminate().addResultListener(new DelegationResultListener(ret));
 		}
 		else
 		{
