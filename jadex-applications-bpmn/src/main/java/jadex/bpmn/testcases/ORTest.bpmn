@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_K4e8gYfTEeC_zvqXTpWMdg" iD="_K4e8gIfTEeC_zvqXTpWMdg">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_qgDxwIfUEeC_zvqXTpWMdg" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qgDxwYfUEeC_zvqXTpWMdg" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qgE_4IfUEeC_zvqXTpWMdg" key="Package" value=""/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_K5KR8IfTEeC_zvqXTpWMdg" iD="_K5Jq4IfTEeC_zvqXTpWMdg" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_K5MHIIfTEeC_zvqXTpWMdg" iD="_K5LgEIfTEeC_zvqXTpWMdg" outgoingEdges="_hkZ60YfTEeC_zvqXTpWMdg" incomingEdges="_ZaGL0YfTEeC_zvqXTpWMdg" name="A" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_PWFwQIfTEeC_zvqXTpWMdg" iD="_PWFJMIfTEeC_zvqXTpWMdg" outgoingEdges="_YkYEwYfTEeC_zvqXTpWMdg" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_W14ioYfTEeC_zvqXTpWMdg" iD="_W14ioIfTEeC_zvqXTpWMdg" outgoingEdges="_ZaGL0YfTEeC_zvqXTpWMdg _a4SoIIfTEeC_zvqXTpWMdg" incomingEdges="_YkYEwYfTEeC_zvqXTpWMdg" activityType="GatewayDataBasedInclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_a4JeMYfTEeC_zvqXTpWMdg" iD="_a4JeMIfTEeC_zvqXTpWMdg" outgoingEdges="_ie5NIYfTEeC_zvqXTpWMdg" incomingEdges="_a4SoIIfTEeC_zvqXTpWMdg" name="B" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_hkO7sYfTEeC_zvqXTpWMdg" iD="_hkO7sIfTEeC_zvqXTpWMdg" outgoingEdges="_kR3moYfTEeC_zvqXTpWMdg" incomingEdges="_hkZ60YfTEeC_zvqXTpWMdg _ie5NIYfTEeC_zvqXTpWMdg" activityType="GatewayDataBasedInclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_kRtOkIfTEeC_zvqXTpWMdg" iD="_kRsngIfTEeC_zvqXTpWMdg" outgoingEdges="_meIC0YfTEeC_zvqXTpWMdg _q4J-IYfTEeC_zvqXTpWMdg" incomingEdges="_kR3moYfTEeC_zvqXTpWMdg" activityType="GatewayDataBasedInclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_md-R0YfTEeC_zvqXTpWMdg" iD="_md-R0IfTEeC_zvqXTpWMdg" outgoingEdges="_yP8rEYfTEeC_zvqXTpWMdg" incomingEdges="_meIC0YfTEeC_zvqXTpWMdg" name="C" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_q39w4YfTEeC_zvqXTpWMdg" iD="_q39w4IfTEeC_zvqXTpWMdg" outgoingEdges="_zMvDcYfTEeC_zvqXTpWMdg" incomingEdges="_q4J-IYfTEeC_zvqXTpWMdg" name="D" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_yP0vQYfTEeC_zvqXTpWMdg" iD="_yP0vQIfTEeC_zvqXTpWMdg" outgoingEdges="_-Hx0sYfTEeC_zvqXTpWMdg" incomingEdges="_yP8rEYfTEeC_zvqXTpWMdg _zMvDcYfTEeC_zvqXTpWMdg" activityType="GatewayDataBasedInclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_-HpR0YfTEeC_zvqXTpWMdg" iD="_-HpR0IfTEeC_zvqXTpWMdg" outgoingEdges="_lk8ioYfUEeC_zvqXTpWMdg _m_6r0YfUEeC_zvqXTpWMdg" incomingEdges="_-Hx0sYfTEeC_zvqXTpWMdg" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_lk0m0YfUEeC_zvqXTpWMdg" iD="_lk0m0IfUEeC_zvqXTpWMdg" incomingEdges="_lk8ioYfUEeC_zvqXTpWMdg" name="Success" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_pt24wIfUEeC_zvqXTpWMdg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pt24wYfUEeC_zvqXTpWMdg" key="class" value=""/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_m_0lMYfUEeC_zvqXTpWMdg" iD="_m_0lMIfUEeC_zvqXTpWMdg" incomingEdges="_m_6r0YfUEeC_zvqXTpWMdg" name="Failure" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_oDkhMIfUEeC_zvqXTpWMdg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oDkhMYfUEeC_zvqXTpWMdg" key="class" value=""/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_YkYEwYfTEeC_zvqXTpWMdg" iD="_YkYEwIfTEeC_zvqXTpWMdg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_ZaGL0YfTEeC_zvqXTpWMdg" iD="_ZaGL0IfTEeC_zvqXTpWMdg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_a4SoIIfTEeC_zvqXTpWMdg" iD="_a4SBEIfTEeC_zvqXTpWMdg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_hkZ60YfTEeC_zvqXTpWMdg" iD="_hkZ60IfTEeC_zvqXTpWMdg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_ie5NIYfTEeC_zvqXTpWMdg" iD="_ie5NIIfTEeC_zvqXTpWMdg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_kR3moYfTEeC_zvqXTpWMdg" iD="_kR3moIfTEeC_zvqXTpWMdg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_meIC0YfTEeC_zvqXTpWMdg" iD="_meIC0IfTEeC_zvqXTpWMdg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_q4J-IYfTEeC_zvqXTpWMdg" iD="_q4J-IIfTEeC_zvqXTpWMdg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_yP8rEYfTEeC_zvqXTpWMdg" iD="_yP8rEIfTEeC_zvqXTpWMdg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_zMvDcYfTEeC_zvqXTpWMdg" iD="_zMvDcIfTEeC_zvqXTpWMdg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_-Hx0sYfTEeC_zvqXTpWMdg" iD="_-Hx0sIfTEeC_zvqXTpWMdg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_lk8ioYfUEeC_zvqXTpWMdg" iD="_lk8ioIfUEeC_zvqXTpWMdg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_m_6r0YfUEeC_zvqXTpWMdg" iD="_m_6r0IfUEeC_zvqXTpWMdg"/>
+  </pools>
+</bpmn:BpmnDiagram>

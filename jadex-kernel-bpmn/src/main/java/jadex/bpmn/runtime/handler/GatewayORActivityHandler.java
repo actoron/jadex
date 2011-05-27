@@ -5,10 +5,14 @@ import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bpmn.runtime.ProcessThreadValueFetcher;
 import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.IComponentChangeEvent;
 import jadex.commons.SUtil;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.IValueFetcher;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -19,9 +23,9 @@ import java.util.StringTokenizer;
 
 
 /**
- *  Handler for parallel split and join gateways.
+ *  Handler for or split and join gateways.
  */
-public class GatewayParallelActivityHandler implements IActivityHandler
+public class GatewayORActivityHandler implements IActivityHandler
 {
 	/**
 	 *  Execute an activity.
@@ -35,25 +39,51 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 		List	outgoing	= activity.getOutgoingSequenceEdges();
 		
 		// Split
+		List threads = new ArrayList();
 		if(incoming!=null && incoming.size()==1 && outgoing!=null && outgoing.size()>1)
 		{
+			IValueFetcher fetcher = new ProcessThreadValueFetcher(thread, false, instance.getFetcher());
 			for(int i=0; i<outgoing.size(); i++)
 			{
-				if(i==0)
+				MSequenceEdge edge = (MSequenceEdge)outgoing.get(i);
+				IParsedExpression exp = edge.getCondition();
+				boolean follow = false;
+				if(exp!=null)
 				{
-					thread.setLastEdge((MSequenceEdge)outgoing.get(i));
+					if(edge.isDefault())
+						throw new RuntimeException("Default edge must not have a condition: "+activity+", "+instance+", "+thread+", "+exp);
+					if(isValid(thread, exp, fetcher))
+					{
+						follow = true;
+					}
 				}
-				else
+
+				if(follow)
 				{
-					ProcessThread	newthread	= thread.createCopy();
-					newthread.setLastEdge((MSequenceEdge)outgoing.get(i));
-					thread.getThreadContext().addThread(newthread);
-//					instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_ADDED, newthread);
-					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
-						thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(thread));
-					instance.notifyListeners(cce);
+					if(threads.size()==0)
+					{
+						thread.setLastEdge((MSequenceEdge)outgoing.get(i));
+						threads.add(thread);
+					}
+					else
+					{
+						ProcessThread	newthread	= thread.createCopy();
+						newthread.setLastEdge((MSequenceEdge)outgoing.get(i));
+						thread.getThreadContext().addThread(newthread);
+		//				instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_ADDED, newthread);
+						ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
+							thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(thread));
+						instance.notifyListeners(cce);
+					}
+//					cnt++;
 				}
 			}
+			
+//			for(int i=0; i<outgoing.size(); i++)
+//			{
+//				
+//			}
+//			thread.getThreadContext().get
 		}
 		
 		// Join
@@ -61,7 +91,7 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 		{
 			// Try to find threads for all incoming edges.
 			Set	edges	= new HashSet(incoming);
-			Set	threads	= new LinkedHashSet();	// Threads to be deleted.
+//			Set	threads	= new LinkedHashSet();	// Threads to be deleted.
 			edges.remove(thread.getLastEdge());	// Edge of current thread not required.
 			
 			for(Iterator it=thread.getThreadContext().getThreads().iterator(); !edges.isEmpty() && it.hasNext(); )
@@ -124,7 +154,7 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 					}
 					
 					thread.getThreadContext().removeThread(pt);
-//					instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, pt);
+	//				instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, pt);
 					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
 						thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(thread));
 					instance.notifyListeners(cce);
@@ -132,7 +162,7 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 			}
 			else
 			{
-//				thread.setWaitingState(ProcessThread.WAITING_FOR_JOIN);
+	//			thread.setWaitingState(ProcessThread.WAITING_FOR_JOIN);
 				thread.setWaiting(true);
 			}
 		}
@@ -153,5 +183,25 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 	public void cancel(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
 	}
-
+	
+	/**
+	 *  Safely evaluate a branch expression.
+	 */
+	protected boolean isValid(ProcessThread thread, IParsedExpression exp, IValueFetcher fetcher)
+	{
+		boolean ret = false;
+		try
+		{
+//			System.out.println("Evaluating: "+thread.getInstance()+", "+exp.getExpressionText());
+			ret = ((Boolean)exp.getValue(fetcher)).booleanValue();
+//			System.out.println("Evaluated: "+ret);
+		}
+		catch(Exception e)
+		{
+			thread.getInstance().getLogger().warning("Error in branch condition: "+thread+", "+exp+", "+e);
+//			e.printStackTrace();
+		}
+		return ret;
+	}
 }
+	
