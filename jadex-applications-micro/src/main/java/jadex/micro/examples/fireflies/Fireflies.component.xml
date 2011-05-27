@@ -115,7 +115,7 @@
 	<configurations>	
 		<configuration name="15x15 and 500 flies, kd-tree enabled">
 			<arguments>
-				<argument name="number">1</argument>
+				<argument name="number">500</argument>
 				<argument name="flashes_to_reset">6</argument>
 				<argument name="flash_length">3</argument>
 				<argument name="cycle_length">12</argument>

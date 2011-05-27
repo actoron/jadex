@@ -27,11 +27,14 @@ public class FireflyAgent extends MicroAgent
 {
 	//-------- methods --------
 
-	public IFuture agentCreated()
-	{
-		throw new RuntimeException();
-//		return super.agentCreated();
-	}
+//	/**
+//	 *  Init method.
+//	 */
+//	public IFuture agentCreated()
+//	{
+//		throw new RuntimeException();
+////		return super.agentCreated();
+//	}
 	
 	/**
 	 *  Execute an agent step.
