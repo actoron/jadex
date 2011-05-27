@@ -1,6 +1,7 @@
 package jadex.xml;
 
 import jadex.commons.SUtil;
+import jadex.xml.reader.IObjectReaderHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,9 @@ public class StackElement
 {
 	//-------- attributes --------
 	
+	/** The reader handler (if any). */
+	protected IObjectReaderHandler	readerhandler;
+
 	/** The xml tag. */
 	protected QName tag;
 	
@@ -45,24 +49,34 @@ public class StackElement
 	/**
 	 *  Create a new stack element.
 	 */
+	// Used for writing, thus no reader handler
 	public StackElement(QName tag, Object object)
 	{
-		this(tag, object, null);
+		this(null, tag, object, null);
 	}
 	
 	/**
 	 *  Create a new stack element.
 	 */
-	public StackElement(QName tag, Object object, Map rawattrs)
+	public StackElement(IObjectReaderHandler readerhandler, QName tag, Object object)
 	{
-		this(tag, object, rawattrs, null, null);
+		this(readerhandler, tag, object, null);
 	}
 	
 	/**
 	 *  Create a new stack element.
 	 */
-	public StackElement(QName tag, Object object, Map rawattrs, TypeInfo typeinfo, Location location)
+	public StackElement(IObjectReaderHandler readerhandler, QName tag, Object object, Map rawattrs)
 	{
+		this(readerhandler, tag, object, rawattrs, null, null);
+	}
+	
+	/**
+	 *  Create a new stack element.
+	 */
+	public StackElement(IObjectReaderHandler readerhandler, QName tag, Object object, Map rawattrs, TypeInfo typeinfo, Location location)
+	{
+		this.readerhandler	= readerhandler;
 		this.tag = tag;
 		this.object = object;
 		this.rawattrs = rawattrs;
@@ -213,7 +227,12 @@ public class StackElement
 		}
 		return ret;
 	}
-	
-	
-	
+
+	/**
+	 *  Get the current reader handler.
+	 */
+	public IObjectReaderHandler getReaderHandler()
+	{
+		return readerhandler;
+	}
 }

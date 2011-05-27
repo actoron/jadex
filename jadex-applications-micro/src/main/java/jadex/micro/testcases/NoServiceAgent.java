@@ -1,7 +1,5 @@
 package jadex.micro.testcases;
 
-import java.util.Collections;
-
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.modelinfo.Argument;
@@ -11,6 +9,8 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
+
+import java.util.Collections;
 
 /**
  *  Test searching for services that don't exist. 

@@ -213,9 +213,9 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 					if(cmodel.getModelInfo().getReport()!=null)
 					{
 						Tuple	se	= new Tuple(new Object[]{
-							new StackElement(new QName(model instanceof OAVAgentModel ? "agent" : "capability"), mcapa, null),
-							new StackElement(new QName("capabilities"), null, null),
-							new StackElement(new QName("capability"), mcrs[i], null)});
+							new StackElement(new QName(model instanceof OAVAgentModel ? "agent" : "capability"), mcapa),
+							new StackElement(new QName("capabilities"), null),
+							new StackElement(new QName("capability"), mcrs[i])});
 						model.addEntry(se, "Included capability <a href=\"#"+cmodel.getModelInfo().getFilename()+"\">"+cmodel.getName()+"</a> has errors.");
 						model.addDocument(cmodel.getModelInfo().getFilename(), cmodel.getModelInfo().getReport().getErrorHTML());
 					}
@@ -229,9 +229,9 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 					state.removeAttributeValue(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs, name);
 					
 					Tuple	se	= new Tuple(new Object[]{
-						new StackElement(new QName(model instanceof OAVAgentModel ? "agent" : "capability"), mcapa, null),
-						new StackElement(new QName("capabilities"), null, null),
-						new StackElement(new QName("capability"), mcrs[i], null)});	// Todo: mcaparef no longer in state!=
+						new StackElement(new QName(model instanceof OAVAgentModel ? "agent" : "capability"), mcapa),
+						new StackElement(new QName("capabilities"), null),
+						new StackElement(new QName("capability"), mcrs[i])});	// Todo: mcaparef no longer in state!=
 					model.addEntry(se, "Included capability '"+file+"' cannot be loaded: "+e);
 				}
 			}
@@ -571,15 +571,15 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 			if(melement!=null)
 			{
 				se	= new Tuple(new Object[]{
-					new StackElement(new QName(model instanceof OAVAgentModel ? "agent" : "capability"), mcapa, null),
-					new StackElement(new QName(state.getType(melement).getName()), melement, null),
-					new StackElement(new QName(state.getType(mcondition).getName()), mcondition, null)});
+					new StackElement(new QName(model instanceof OAVAgentModel ? "agent" : "capability"), mcapa),
+					new StackElement(new QName(state.getType(melement).getName()), melement),
+					new StackElement(new QName(state.getType(mcondition).getName()), mcondition)});
 			}
 			else
 			{
 				se	= new Tuple(new Object[]{
-					new StackElement(new QName(model instanceof OAVAgentModel ? "agent" : "capability"), mcapa, null),
-					new StackElement(new QName(state.getType(mcondition).getName()), mcondition, null)});				
+					new StackElement(new QName(model instanceof OAVAgentModel ? "agent" : "capability"), mcapa),
+					new StackElement(new QName(state.getType(mcondition).getName()), mcondition)});				
 			}
 			model.addEntry(se, "Error in condition: "+e);
 		}

@@ -34,6 +34,7 @@ import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
+import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
@@ -122,7 +123,7 @@ public class BpmnXMLReader
 	// Initialize reader instance.
 	static
 	{
-		reader = new Reader(new BeanObjectReaderHandler(getXMLMapping()));
+		reader = new Reader(new TypeInfoPathManager(getXMLMapping()));
 	}
 	
 	/**
@@ -165,7 +166,7 @@ public class BpmnXMLReader
 		String uri = "http://stp.eclipse.org/bpmn";
 		String xmiuri = "http://www.omg.org/XMI";
 		
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "BpmnDiagram")}), new ObjectInfo(MBpmnModel.class, new BpmnModelPostProcessor()), 
+		TypeInfo	diatype	= new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "BpmnDiagram")}), new ObjectInfo(MBpmnModel.class, new BpmnModelPostProcessor()), 
 			new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), AccessInfo.IGNORE_READWRITE)),
 			new AttributeInfo(new AccessInfo(new QName("http://www.omg.org/XMI", "version"), null, AccessInfo.IGNORE_READWRITE)),
@@ -176,7 +177,9 @@ public class BpmnXMLReader
 			new SubobjectInfo(new AccessInfo("artifacts", "artifact")),
 			new SubobjectInfo(new AccessInfo("messages", "messagingEdge")),
 			new SubobjectInfo(new AccessInfo("eAnnotations", "annotation"))
-			})));
+		}));
+		diatype.setReaderHandler(new BeanObjectReaderHandler());
+		types.add(diatype);
 		
 		types.add(new TypeInfo(new XMLInfo("eAnnotations"), new ObjectInfo(MAnnotation.class), 
 			new MappingInfo(null, new BeanAccessInfo[]{

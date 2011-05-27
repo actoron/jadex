@@ -127,10 +127,9 @@ public class ReadContext implements IContext
 	 */
 	public Object getRootObject()
 	{
-		if(rootobject!=null)
-			return rootobject;
-		else
-			return getStackElement(0).getObject();//rootobject;
+		return rootobject!=null ? rootobject
+			: stack!=null && !stack.isEmpty()? ((StackElement) stack.get(0)).getObject()
+			: null;
 	}
 
 	/**

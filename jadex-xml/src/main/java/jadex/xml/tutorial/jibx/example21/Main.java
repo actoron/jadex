@@ -11,6 +11,7 @@ import jadex.xml.ObjectInfo;
 import jadex.xml.SubObjectConverter;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
+import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
@@ -70,7 +71,7 @@ public class Main
 		
 		// Create an xml reader with standard bean object reader and the
 		// custom typeinfos
-		Reader xmlreader = new Reader(new BeanObjectReaderHandler(typeinfos));
+		Reader xmlreader = new Reader(new TypeInfoPathManager(typeinfos), false, false, false, null, new BeanObjectReaderHandler());
 		InputStream is = SUtil.getResource("jadex/xml/tutorial/jibx/example21/data0.xml", null);
 		Object object1 = xmlreader.read(is, null, null);
 		is.close();
@@ -115,7 +116,7 @@ public class Main
 			}, null))
 		})));	
 		
-		xmlreader = new Reader(new BeanObjectReaderHandler(typeinfos));
+		xmlreader = new Reader(new TypeInfoPathManager(typeinfos), false, false, false, null, new BeanObjectReaderHandler());
 		is = SUtil.getResource("jadex/xml/tutorial/jibx/example21/data1.xml", null);
 		Object object2 = xmlreader.read(is, null, null);
 		is.close();

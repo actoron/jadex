@@ -1,10 +1,10 @@
 package jadex.xml;
 
+import jadex.commons.IFilter;
+
 import java.util.StringTokenizer;
 
 import javax.xml.namespace.QName;
-
-import jadex.commons.IFilter;
 
 /**
  *  Info for an xml element, i.e. identifying tag(path), filter etc. 

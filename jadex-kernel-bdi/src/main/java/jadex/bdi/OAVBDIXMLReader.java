@@ -25,6 +25,7 @@ import jadex.xml.ObjectInfo;
 import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
+import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.IBeanObjectCreator;
 import jadex.xml.reader.ReadContext;
@@ -175,6 +176,7 @@ public class OAVBDIXMLReader
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "configurations"), new QName(uri, "configuration")}), new AccessInfo(new QName(uri, "configuration"), OAVBDIMetaModel.capability_has_configurations)),
 			}));
 		
+		ti_capability.setReaderHandler(new OAVObjectReaderHandler());
 		typeinfos.add(ti_capability);
 		
 		TypeInfo ti_expression = new TypeInfo(null, new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
@@ -371,10 +373,10 @@ public class OAVBDIXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endinternalevent"), new QName(uri, "parameterset")}), new ObjectInfo(OAVBDIMetaModel.configparameterset_type), new MappingInfo(ti_paramset)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endmessageevent"), new QName(uri, "parameter")}), new ObjectInfo(OAVBDIMetaModel.configparameter_type)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endmessageevent"), new QName(uri, "parameterset")}), new ObjectInfo(OAVBDIMetaModel.configparameterset_type), new MappingInfo(ti_paramset)));
-
+		
 		// Different readers and writers should not work on the same typeinfos
 		// because they may alter them (e.g. add additional array types).
-		reader = new Reader(new OAVObjectReaderHandler(typeinfos), false, false, new XMLReporter()
+		reader = new Reader(new TypeInfoPathManager(typeinfos), false, false, new XMLReporter()
 		{
 			public void report(String msg, String type, Object info, Location location) throws XMLStreamException
 			{

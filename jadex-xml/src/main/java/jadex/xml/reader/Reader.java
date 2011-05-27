@@ -8,6 +8,7 @@ import jadex.xml.SXML;
 import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
+import jadex.xml.TypeInfoPathManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -47,8 +48,11 @@ public class Reader
 	
 	//-------- attributes --------
 	
-	/** The object creator. */
-	protected IObjectReaderHandler handler;
+	/** The type info manager. */
+	protected TypeInfoPathManager tipmanager;
+	
+	/** The default object reader handler (if any). */
+	protected IObjectReaderHandler defaulthandler;
 	
 	/** The link mode. */
 	protected boolean bulklink;
@@ -62,38 +66,39 @@ public class Reader
 	 *  Create a new reader.
 	 *  @param handler The handler.
 	 */
-	public Reader(IObjectReaderHandler handler)
+	public Reader(TypeInfoPathManager tipmanager)
 	{
-		this(handler, false);
+		this(tipmanager, false);
 	}
 	
 	/**
 	 *  Create a new reader.
 	 *  @param handler The handler.
 	 */
-	public Reader(IObjectReaderHandler handler, boolean bulklink)
+	public Reader(TypeInfoPathManager tipmanager, boolean bulklink)
 	{
-		this(handler, bulklink, false, null);
+		this(tipmanager, bulklink, false, null);
 	}
 	
 	/**
 	 *  Create a new reader.
 	 *  @param handler The handler.
 	 */
-	public Reader(IObjectReaderHandler handler, boolean bulklink, boolean validate, XMLReporter reporter)
+	public Reader(TypeInfoPathManager tipmanager, boolean bulklink, boolean validate, XMLReporter reporter)
 	{
 		// Xerces has a stackoverflow bug when coalescing is set to true :-(
-		this(handler, bulklink, validate, false, reporter);
+		this(tipmanager, bulklink, validate, false, reporter, null);
 	}
 	
 	/**
 	 *  Create a new reader.
 	 *  @param handler The handler.
 	 */
-	public Reader(IObjectReaderHandler handler, boolean bulklink, boolean validate, boolean coalescing, XMLReporter reporter)
+	public Reader(TypeInfoPathManager tipmanager, boolean bulklink, boolean validate, boolean coalescing, XMLReporter reporter, IObjectReaderHandler defaulthandler)
 	{
-		this.handler = handler;
+		this.tipmanager = tipmanager;
 		this.bulklink = bulklink;
+		this.defaulthandler = defaulthandler;
 		factory	= XMLInputFactory.newInstance();
 		
 		try
@@ -227,7 +232,7 @@ public class Reader
 		}
 		catch(RuntimeException e)
 		{
-//			e.printStackTrace();
+			e.printStackTrace();
 			Location	loc	= readcontext.getStackSize()>0 ? readcontext.getTopStackElement().getLocation() : parser.getLocation();
 			reporter.report(e.toString(), "XML error", readcontext, loc);
 		}
@@ -312,7 +317,24 @@ public class Reader
 			
 			QName[] fullpath = readcontext.getXMLPath(localname);
 			
-			TypeInfo typeinfo = handler.getTypeInfo(localname, fullpath, rawattrs);
+			// Get type info and corresponding handler.
+			TypeInfo typeinfo = tipmanager.getTypeInfo(localname, fullpath, rawattrs);
+			IObjectReaderHandler	handler	= typeinfo!=null ? typeinfo.getReaderHandler() : null;
+			if(handler==null)
+			{
+				if(readcontext.getTopStackElement()!=null && readcontext.getTopStackElement().getReaderHandler()!=null)
+				{
+					handler	= readcontext.getTopStackElement().getReaderHandler();
+				}
+				else if(defaulthandler!=null)
+				{
+					handler	= defaulthandler;
+				}
+				else
+				{
+					readcontext.getReporter().report("No handler for element: "+localname, "type info error", readcontext, parser.getLocation());
+				}
+			}
 			
 			// Find out if we need to ignore. 
 			if(readcontext.getStackSize()>0)
@@ -349,12 +371,12 @@ public class Reader
 					if(readcontext.getReadObjects().containsKey(idref))
 					{
 						object = readcontext.getReadObjects().get(idref);
-						StackElement se = new StackElement(localname, object, rawattrs, typeinfo, parser.getLocation());
+						StackElement se = new StackElement(handler, localname, object, rawattrs, typeinfo, parser.getLocation());
 						readcontext.addStackElement(se);
 					}
 					else
 					{
-						StackElement se = new StackElement(localname, null, rawattrs, typeinfo, parser.getLocation());
+						StackElement se = new StackElement(handler, localname, null, rawattrs, typeinfo, parser.getLocation());
 						readcontext.addStackElement(se);
 						readcontext.getReporter().report("idref not contained: "+idref, "idref error", se, se.getLocation());						
 					}
@@ -397,7 +419,7 @@ public class Reader
 						readcontext.getReadObjects().put(id, object);
 					}
 					
-					readcontext.addStackElement(new StackElement(localname, object, rawattrs, typeinfo, parser.getLocation()));
+					readcontext.addStackElement(new StackElement(handler, localname, object, rawattrs, typeinfo, parser.getLocation()));
 				
 					// Handle attributes.
 					int atcnt = attrcnt;
@@ -510,7 +532,8 @@ public class Reader
 			
 			QName localname = parser.getName();
 			QName[] fullpath = readcontext.getXMLPath();
-			final TypeInfo typeinfo = handler.getTypeInfo(localname, fullpath, topse.getRawAttributes());
+			final TypeInfo typeinfo = tipmanager.getTypeInfo(localname, fullpath, topse.getRawAttributes());
+			IObjectReaderHandler	handler	= topse.getReaderHandler();
 	
 			// Hack. Change object to content when it is element of its own.
 			if((topse.getObject()==null && topse.getContent()!=null && topse.getContent().trim().length()>0) || topse.getObject()==STRING_MARKER)
@@ -537,7 +560,7 @@ public class Reader
 					}
 				}
 				
-				topse = new StackElement(topse.getTag(), val, topse.getRawAttributes(), null, topse.getLocation());
+				topse = new StackElement(handler, topse.getTag(), val, topse.getRawAttributes(), null, topse.getLocation());
 				readcontext.setStackElement(topse, readcontext.getStackSize()-1);
 //				stack.set(stack.size()-1, topse);
 //				readcontext.setTopse(topse);

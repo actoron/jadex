@@ -139,7 +139,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	protected List	excludes;
 	
 	/** The java reader for parsing received awareness infos. */
-	protected JavaReader	reader;
+	protected Reader	reader;
 	
 	/** Flag indicating that the agent is started and the send behavior may be activated. */
 	protected boolean	started;
@@ -166,7 +166,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 			throw new RuntimeException(e);
 		}
 		this.discovered = new LinkedHashMap();
-		this.reader	= new JavaReader(new XMLReporter()
+		this.reader	= JavaReader.getReader(new XMLReporter()
 		{
 			public void report(String message, String type, Object related, Location location) throws XMLStreamException
 			{

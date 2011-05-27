@@ -18,6 +18,7 @@ import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
+import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.Reader;
@@ -59,7 +60,7 @@ public class GpmnXMLReader
 	// Initialize reader instance.
 	static
 	{
-		reader = new Reader(new BeanObjectReaderHandler(getXMLMapping()));
+		reader = new Reader(new TypeInfoPathManager(getXMLMapping()));
 	}
 	
 	/**
@@ -144,7 +145,7 @@ public class GpmnXMLReader
 		
 		String schemaloc = "http://www.w3.org/2001/XMLSchema-instance";
 		
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "GpmnDiagram")}), new ObjectInfo(MGpmnModel.class),
+		TypeInfo	diatype	= new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "GpmnDiagram")}), new ObjectInfo(MGpmnModel.class),
 			new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo(new QName(schemaloc, "schemaLocation"), null, AccessInfo.IGNORE_READWRITE)),
 			new AttributeInfo(new AccessInfo("version", null, AccessInfo.IGNORE_READWRITE)),
@@ -157,7 +158,9 @@ public class GpmnXMLReader
 			new SubobjectInfo(new AccessInfo("activationEdge")),
 			new SubobjectInfo(new AccessInfo("planEdge")),
 			new SubobjectInfo(new AccessInfo("artifacts", "artifact")),
-		})));
+		}));
+		diatype.setReaderHandler(new BeanObjectReaderHandler());
+		types.add(diatype);
 		
 		types.add(new TypeInfo(new XMLInfo("context"), 
 				new ObjectInfo(MContext.class),

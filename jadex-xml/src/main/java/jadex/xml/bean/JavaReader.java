@@ -16,6 +16,7 @@ import jadex.xml.SXML;
 import jadex.xml.SubObjectConverter;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
+import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.reader.Reader;
 
@@ -43,32 +44,12 @@ import javax.xml.stream.XMLReporter;
 /**
  *  Java specific reader that supports collection classes and arrays.
  */
-public class JavaReader extends Reader
+public class JavaReader
 {
 	//-------- attributes --------
 
 	/** The reader. */
 	protected static Reader reader;
-
-	//-------- constructors --------
-
-	/**
-	 *  Create a new reader.
-	 *  @param reporter The error reporter.
-	 */
-	public JavaReader(XMLReporter reporter)
-	{
-		super(new BeanObjectReaderHandler(getTypeInfos()), false, false, reporter);
-	}
-
-	/**
-	 *  Create a new reader.
-	 *  @param handler The handler.
-	 */
-	public JavaReader(Set typeinfos)
-	{
-		super(new BeanObjectReaderHandler(joinTypeInfos(typeinfos)));
-	}
 
 	/**
 	 *  Join sets of typeinfos.
@@ -719,9 +700,7 @@ public class JavaReader extends Reader
 	 */
 	public static Object objectFromXML(String val, ClassLoader classloader)
 	{
-		if(reader==null)
-			createReader();
-		return Reader.objectFromXML(reader, val, classloader);
+		return Reader.objectFromXML(getInstance(), val, classloader);
 	}
 	
 	/**
@@ -732,9 +711,7 @@ public class JavaReader extends Reader
 	 */
 	public static Object objectFromByteArray(byte[] val, ClassLoader classloader)
 	{
-		if(reader==null)
-			createReader();
-		return Reader.objectFromByteArray(reader, val, classloader);
+		return Reader.objectFromByteArray(getInstance(), val, classloader);
 	}
 	
 	/**
@@ -749,6 +726,16 @@ public class JavaReader extends Reader
 	}
 	
 	/**
+	 *  Get the default Java reader.
+	 *  @return The Java reader.
+	 */
+	public static Reader	getReader(XMLReporter reporter)
+	{
+		Set	typeinfos	= getTypeInfos();
+		return new Reader(new TypeInfoPathManager(typeinfos), false, false, false, reporter, new BeanObjectReaderHandler(typeinfos));
+	}
+	
+	/**
 	 *  Conditionally create the reader instance.
 	 *  Note that the synchronized check needs to be done.
 	 *  Otherwise double creation may happen (leading to
@@ -757,6 +744,9 @@ public class JavaReader extends Reader
 	protected static synchronized void createReader()
 	{
 		if(reader==null)
-			reader = new JavaReader((Set)null);
+		{
+			Set	typeinfos	= getTypeInfos();
+			reader	= new Reader(new TypeInfoPathManager(typeinfos), false, false, false, null, new BeanObjectReaderHandler(typeinfos));
+		}
 	}
 }

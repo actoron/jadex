@@ -36,6 +36,7 @@ import jadex.micro.MicroAgent;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
 import jadex.xml.TypeInfo;
+import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.BeanObjectReaderHandler;
@@ -129,7 +130,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			new ObjectInfo(IRemotable.class));
 		typeinfoswrite.add(ti_proxyable);
 		
-		this.reader = new Reader(new BeanObjectReaderHandler(typeinfosread), false, false, new XMLReporter()
+		this.reader = new Reader(new TypeInfoPathManager(typeinfosread), false, false, false, new XMLReporter()
 		{
 			public void report(String message, String error, Object info, Location location)
 				throws XMLStreamException
@@ -137,7 +138,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				List	errors	= (List)((ReadContext)Reader.READ_CONTEXT.get()).getUserContext();
 				errors.add(new Tuple(new Object[]{message, error, info, location}));
 			}
-		});
+		}, new BeanObjectReaderHandler(typeinfosread));
 		this.writer = new Writer(new BeanObjectWriterHandler(typeinfoswrite, true));
 	}
 	

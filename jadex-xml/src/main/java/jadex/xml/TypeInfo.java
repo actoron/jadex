@@ -1,5 +1,7 @@
 package jadex.xml;
 
+import jadex.xml.reader.IObjectReaderHandler;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +22,9 @@ public class TypeInfo	extends AbstractInfo
 	//-------- attributes -------- 
 	
 	// todo: IPreWriter for doing sth with the object before writing?
+	
+	/** The reader handler (if any). */
+	protected IObjectReaderHandler	readerhandler;
 	
 	/** The object info for storing info about the object side, e.g. the object type. */
 	protected ObjectInfo objectinfo;
@@ -394,5 +399,21 @@ public class TypeInfo	extends AbstractInfo
 			ret.put(xmlname, attributeinfos[i]);
 		}
 		return ret;
+	}
+
+	/**
+	 *  Set the reader handler associated to the object type (if any).
+	 */
+	public void	setReaderHandler(IObjectReaderHandler readerhandler)
+	{
+		this.readerhandler	= readerhandler;
+	}
+
+	/**
+	 *  Get the reader handler associated to the object type (if any).
+	 */
+	public IObjectReaderHandler	getReaderHandler()
+	{
+		return readerhandler!=null ? readerhandler : getSupertype()!=null ? getSupertype().getReaderHandler() : null;
 	}
 }

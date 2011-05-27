@@ -13,6 +13,7 @@ import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
+import jadex.xml.bean.BeanObjectReaderHandler;
 
 import java.util.Set;
 
@@ -44,7 +45,7 @@ public class ApplicationXMLReader extends ComponentXMLReader
 		
 		String uri = "http://jadex.sourceforge.net/jadex";
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "applicationtype")), new ObjectInfo(ModelInfo.class), 
+		TypeInfo	apptype	= new TypeInfo(new XMLInfo(new QName(uri, "applicationtype")), new ObjectInfo(ModelInfo.class), 
 			new MappingInfo(null, "description", null,
 			new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
@@ -60,7 +61,9 @@ public class ApplicationXMLReader extends ComponentXMLReader
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "property")}), new AccessInfo(new QName(uri, "property"), "property", null, null)),//, new BeanAccessInfo(putprop, null, "map", getname))),
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "configurations"), new QName(uri, "configuration")}), new AccessInfo(new QName(uri, "configuration"), "configuration", null, null)),//, new BeanAccessInfo(putprop, null, "map", getname))),
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "applications"), new QName(uri, "application")}), new AccessInfo(new QName(uri, "configuration"), "configuration", null, null))//, new BeanAccessInfo(putprop, null, "map", getname))),
-		})));
+		}));
+		apptype.setReaderHandler(new BeanObjectReaderHandler());
+		types.add(apptype);
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "applicationtype"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(Argument.class), 
 			new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)),

@@ -33,6 +33,7 @@ import jadex.xml.ObjectInfo;
 import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
+import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.ReadContext;
@@ -192,11 +193,12 @@ public class ComponentXMLReader
 	 */
 	public ComponentXMLReader(Set mappings)
 	{
-		this.reader = new Reader(new BeanObjectReaderHandler(mappings), false, false, new XMLReporter()
+		this.reader = new Reader(new TypeInfoPathManager(mappings), false, false, new XMLReporter()
 		{
 			public void report(String msg, String type, Object info, Location location) throws XMLStreamException
 			{
 //				System.out.println("XML error: "+msg+", "+type+", "+info+", "+location);
+//				Thread.dumpStack();
 				IContext	context	= (IContext)Reader.READ_CONTEXT.get();
 				MultiCollection	report	= (MultiCollection)context.getUserContext();
 				String	pos;
@@ -229,17 +231,14 @@ public class ComponentXMLReader
 		ModelInfo mi = (ModelInfo)reader.read(rinfo.getInputStream(), classloader, report);
 		CacheableKernelModel ret = new CacheableKernelModel(mi);
 		
-//		if(ret!=null)
+		if(mi!=null)
 		{
 			mi.setFilename(rinfo.getFilename());
 			mi.setClassloader(classloader);
 			mi.setStartable(true);
-			ret.setLastModified(rinfo.getLastModified());
-//			ret.initModelInfo(report);
 			
-			// todo: remove
-			
-			IArgument[] args = ret.getModelInfo().getArguments(); 
+			// todo: remove		
+			IArgument[] args = mi.getArguments(); 
 			if(args.length>0)
 			{
 				Map argsmap = new HashMap();
@@ -259,9 +258,14 @@ public class ComponentXMLReader
 					}
 				}
 			}
-			
-			rinfo.getInputStream().close();
 		}
+		ret.setLastModified(rinfo.getLastModified());
+		
+		// Todo: error report for component models.
+//		ret.initModelInfo(report);
+		
+		
+		rinfo.getInputStream().close();
 //		else
 //		{
 //			String errtext = buildReport(rinfo.getFilename(), rinfo.getFilename(),
@@ -325,7 +329,7 @@ public class ComponentXMLReader
 //			e.printStackTrace();
 //		}
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "componenttype")), new ObjectInfo(ModelInfo.class), 
+		TypeInfo	comptype	= new TypeInfo(new XMLInfo(new QName(uri, "componenttype")), new ObjectInfo(ModelInfo.class), 
 			new MappingInfo(null, "description", null,
 			new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
@@ -339,7 +343,9 @@ public class ComponentXMLReader
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "requiredservice")}), new AccessInfo(new QName(uri, "requiredservice"), "requiredService")),
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype")}), new AccessInfo(new QName(uri, "componenttype"), "subcomponentType")),
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "property")}), new AccessInfo(new QName(uri, "property"), "property", null, null))//, new BeanAccessInfo(putprop, null, "map", getname))),
-		})));
+		}));
+		comptype.setReaderHandler(new BeanObjectReaderHandler());
+		types.add(comptype);
 		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "configuration")), new ObjectInfo(ConfigurationInfo.class, configpp), 
 			new MappingInfo(null, new AttributeInfo[]{
@@ -415,7 +421,7 @@ public class ComponentXMLReader
 		{
 			types.addAll(mappings[i]);
 		}
-				
+		
 		return types;
 	}
 

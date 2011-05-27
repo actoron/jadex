@@ -9,23 +9,17 @@ import jadex.xml.AttributeInfo;
 import jadex.xml.BasicTypeConverter;
 import jadex.xml.IPostProcessor;
 import jadex.xml.IStringObjectConverter;
-import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
 import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
-import jadex.xml.TypeInfoPathManager;
-import jadex.xml.TypeInfoTypeManager;
 import jadex.xml.bean.IBeanObjectCreator;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.LinkData;
 import jadex.xml.reader.ReadContext;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -35,29 +29,13 @@ import javax.xml.namespace.QName;
  */
 public class OAVObjectReaderHandler implements IObjectReaderHandler
 {
-	//-------- attributes --------
-	
-	/** The type info path manager. */
-	protected TypeInfoPathManager tipmanager;
-	
-	/** The type info manager. */
-	// For special case that an object is created via the built-in 
-	// tag mechanism and there is a type info for that kind of created
-	// object. Allows specifying generic type infos with interfaces.
-	protected TypeInfoTypeManager titmanager;
-	
-	/** No type infos. */
-	protected Set no_typeinfos;
-	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new handler.
 	 */
-	public OAVObjectReaderHandler(Set typeinfos)
+	public OAVObjectReaderHandler()
 	{
-		this.tipmanager = new TypeInfoPathManager(typeinfos);
-		this.titmanager = new TypeInfoTypeManager(typeinfos);
 	}
 	
 	//-------- methods --------
@@ -68,90 +46,9 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	public TypeInfo getTypeInfo(QName tag, QName[] fullpath, Map rawattributes)
+	public TypeInfo	getTypeInfo(Object object, QName[] fullpath, ReadContext context)
 	{
-		return tipmanager.getTypeInfo(tag, fullpath, rawattributes);
-	}
-	
-	/**
-	 *  Get the most specific mapping info.
-	 *  @param tag The tag.
-	 *  @param fullpath The full path.
-	 *  @return The most specific mapping info.
-	 */
-	public synchronized TypeInfo getTypeInfo(Object object, QName[] fullpath, ReadContext context)
-	{
-		Object type = getObjectType(object, context);
-		if(no_typeinfos!=null && no_typeinfos.contains(type))
-			return null;
-			
-		TypeInfo ret = titmanager.getTypeInfo(type, fullpath);
-		// Hack! due to HashMap.Entry is not visible as class
-		if(ret==null)
-		{
-			if(type instanceof Class)
-			{
-				// Class name not necessary no more
-//				Class clazz = (Class)type;
-//				type = SReflect.getClassName(clazz);
-//				ret = findTypeInfo((Set)typeinfos.get(type), fullpath);
-//				if(ret==null)
-//				{
-				
-				// Try if interface or supertype is registered
-				List tocheck = new ArrayList();
-				tocheck.add(type);
-				
-				for(int i=0; i<tocheck.size() && ret==null; i++)
-				{
-					Class clazz = (Class)tocheck.get(i);
-//					Set tis = titmanager.getTypeInfosByType(clazz);
-//					ret = titmanager.findTypeInfo(tis, fullpath);
-					ret = titmanager.getTypeInfo(clazz, fullpath);
-					if(ret==null)
-					{
-						Class[] interfaces = clazz.getInterfaces();
-						for(int j=0; j<interfaces.length; j++)
-							tocheck.add(interfaces[j]);
-						clazz = clazz.getSuperclass();
-						if(clazz!=null)
-							tocheck.add(clazz);
-					}
-				}
-				
-				// Special case array
-				// Requires Object[].class being registered 
-				if(ret==null && ((Class)type).isArray())
-				{
-					ret = titmanager.findTypeInfo(titmanager.getTypeInfosByType(Object[].class), fullpath);
-				}
-				
-				// Add concrete class for same info if it is used
-				if(ret!=null)
-				{
-					ObjectInfo cri =ret.getObjectInfo();
-					ObjectInfo cricpy = cri!=null? new ObjectInfo(type, cri.getPostProcessor()): new ObjectInfo(type);
-					
-					TypeInfo ti = new TypeInfo(ret.getXMLInfo(),
-						cricpy, ret.getMappingInfo(), ret.getLinkInfo());
-					
-//					TypeInfo ti = new TypeInfo(ret.getSupertype(), ret.getXMLPath(), 
-//						type, ret.getCommentInfo(), ret.getContentInfo(), 
-//						ret.getDeclaredAttributeInfos(), ret.getPostProcessor(), ret.getFilter(), 
-//						ret.getDeclaredSubobjectInfos());
-					
-					titmanager.addTypeInfo(ti);
-				}
-				else
-				{
-					if(no_typeinfos==null)
-						no_typeinfos = new HashSet();
-					no_typeinfos.add(type);
-				}
-			}
-		}
-		
-		return ret;
+		return null;
 	}
 	
 	/**

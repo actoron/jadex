@@ -1,15 +1,15 @@
 package jadex.micro.examples.dungeonkeeper;
 
-import jadex.application.space.envsupport.environment.ISpaceAction;
-import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.application.space.envsupport.environment.space2d.Grid2D;
-import jadex.application.space.envsupport.environment.space2d.Space2D;
-import jadex.application.space.envsupport.environment.space2d.action.GetPosition;
-import jadex.application.space.envsupport.math.IVector2;
-import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IResultListener;
+import jadex.extension.envsupport.environment.ISpaceAction;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.Grid2D;
+import jadex.extension.envsupport.environment.space2d.Space2D;
+import jadex.extension.envsupport.environment.space2d.action.GetPosition;
+import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.Vector2Double;
 import jadex.micro.MicroAgent;
 
 import java.util.HashMap;
