@@ -38,6 +38,9 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	/** Constant for gateway data based exclusive. */
 	public static final String GATEWAY_DATABASED_EXCLUSIVE = "GatewayDataBasedExclusive";
 
+	/** Constant for gateway data based exclusive. */
+	public static final String GATEWAY_DATABASED_INCLUSIVE = "GatewayDataBasedInclusive";
+	
 	
 	/** Constant for event start empty. */
 	public static final String EVENT_START_EMPTY = "EventStartEmpty";

@@ -17,6 +17,8 @@ import java.util.Collection;
  */
 public class ComponentChangeEvent implements IComponentChangeEvent
 {
+	//-------- attributes --------
+	
 	/** The time of the event. */
 	protected long time;
 
@@ -44,6 +46,8 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	/** Event details (e.g. step details of micro agents). */
 	protected Object details;
 	
+	//-------- constructors --------
+
 	/**
 	 *  Create a new event.
 	 */
@@ -76,6 +80,8 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 		this.details = details;
 	}
 
+	//-------- methods --------
+	
 	/**
 	 *  Returns the type of the event.
 	 *  @return The type of the event.

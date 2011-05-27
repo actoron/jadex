@@ -15,6 +15,7 @@ import jadex.bpmn.runtime.handler.EventIntermediateMultipleActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateNotificationHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateTimerActivityHandler;
 import jadex.bpmn.runtime.handler.EventMultipleStepHandler;
+import jadex.bpmn.runtime.handler.GatewayORActivityHandler;
 import jadex.bpmn.runtime.handler.GatewayParallelActivityHandler;
 import jadex.bpmn.runtime.handler.GatewayXORActivityHandler;
 import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
@@ -110,6 +111,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		// Gateway handler.
 		activityhandlers.put(MBpmnModel.GATEWAY_PARALLEL, new GatewayParallelActivityHandler());
 		activityhandlers.put(MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE, new GatewayXORActivityHandler());
+		activityhandlers.put(MBpmnModel.GATEWAY_DATABASED_INCLUSIVE, new GatewayORActivityHandler());
 	
 		// Initial events.
 		// Options: empty, message, rule, timer, signal, multi, link

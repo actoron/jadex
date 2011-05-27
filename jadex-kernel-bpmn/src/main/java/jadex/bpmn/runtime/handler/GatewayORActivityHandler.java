@@ -27,6 +27,9 @@ import java.util.StringTokenizer;
  */
 public class GatewayORActivityHandler implements IActivityHandler
 {
+	/** The split id counter. */
+	protected int splitidcnt;
+	
 	/**
 	 *  Execute an activity.
 	 *  @param activity	The activity to execute.
@@ -39,23 +42,20 @@ public class GatewayORActivityHandler implements IActivityHandler
 		List	outgoing	= activity.getOutgoingSequenceEdges();
 		
 		// Split
-		List threads = new ArrayList();
 		if(incoming!=null && incoming.size()==1 && outgoing!=null && outgoing.size()>1)
 		{
+			List threads = new ArrayList();
 			IValueFetcher fetcher = new ProcessThreadValueFetcher(thread, false, instance.getFetcher());
 			for(int i=0; i<outgoing.size(); i++)
 			{
 				MSequenceEdge edge = (MSequenceEdge)outgoing.get(i);
 				IParsedExpression exp = edge.getCondition();
-				boolean follow = false;
+				boolean follow = true;
 				if(exp!=null)
 				{
 					if(edge.isDefault())
 						throw new RuntimeException("Default edge must not have a condition: "+activity+", "+instance+", "+thread+", "+exp);
-					if(isValid(thread, exp, fetcher))
-					{
-						follow = true;
-					}
+					follow = isValid(thread, exp, fetcher);
 				}
 
 				if(follow)
@@ -72,18 +72,20 @@ public class GatewayORActivityHandler implements IActivityHandler
 						thread.getThreadContext().addThread(newthread);
 		//				instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_ADDED, newthread);
 						ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
-							thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(thread));
+							thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(newthread));
 						instance.notifyListeners(cce);
+						threads.add(newthread);
 					}
-//					cnt++;
 				}
 			}
 			
-//			for(int i=0; i<outgoing.size(); i++)
-//			{
-//				
-//			}
-//			thread.getThreadContext().get
+			int splitid = getNextSplitId();
+			for(int i=0; i<threads.size(); i++)
+			{
+				ProcessThread pt = (ProcessThread)threads.get(i);
+				pt.setSplitId(splitid);
+				pt.setSplitCount(threads.size());
+			}
 		}
 		
 		// Join
@@ -91,21 +93,27 @@ public class GatewayORActivityHandler implements IActivityHandler
 		{
 			// Try to find threads for all incoming edges.
 			Set	edges	= new HashSet(incoming);
-//			Set	threads	= new LinkedHashSet();	// Threads to be deleted.
+			Set	threads	= new LinkedHashSet();	// Threads to be deleted.
 			edges.remove(thread.getLastEdge());	// Edge of current thread not required.
 			
+			// Find threads that belong to my split and have arrived at gate.
 			for(Iterator it=thread.getThreadContext().getThreads().iterator(); !edges.isEmpty() && it.hasNext(); )
 			{
 				ProcessThread oldthread	= (ProcessThread)it.next();
-				if(edges.contains(oldthread.getLastEdge()))
+				if(oldthread.getSplitId()==thread.getSplitId() && edges.contains(oldthread.getLastEdge()))
 				{
 					threads.add(oldthread);
 					edges.remove(oldthread.getLastEdge());
 				}
 			}
 			
-			if(edges.isEmpty())
+			if(threads.size()==thread.getSplitCount()-1)
 			{
+				// Reset split settings.
+				thread.setSplitCount(0);
+				thread.setSplitId(0);
+				
+				// Handle parameter merging of incoming values.
 				Set	ignore	= null;
 				if(thread.hasPropertyValue("ignore"))
 				{
@@ -156,7 +164,7 @@ public class GatewayORActivityHandler implements IActivityHandler
 					thread.getThreadContext().removeThread(pt);
 	//				instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, pt);
 					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
-						thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(thread));
+						thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(pt));
 					instance.notifyListeners(cce);
 				}
 			}
@@ -202,6 +210,14 @@ public class GatewayORActivityHandler implements IActivityHandler
 //			e.printStackTrace();
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Get next split id.
+	 */
+	protected int getNextSplitId()
+	{
+		return ++splitidcnt;
 	}
 }
 	

@@ -17,6 +17,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.management.ThreadInfo;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -113,8 +114,8 @@ public class ProcessViewPanel extends JPanel
 				@XMLClassname("filter")
 				public boolean filter(Object obj)
 				{
-					IComponentChangeEvent cce = (IComponentChangeEvent)obj;
-					return cce.getSourceCategory().equals(BpmnInterpreter.TYPE_THREAD);
+//					IComponentChangeEvent cce = (IComponentChangeEvent)obj;
+					return true;//cce.getSourceCategory().equals(BpmnInterpreter.TYPE_THREAD);
 				}
 			};
 			
@@ -140,21 +141,23 @@ public class ProcessViewPanel extends JPanel
 				{
 					public void run()
 					{
-						if(IComponentChangeEvent.EVENT_TYPE_CREATION.equals(cce.getEventType()) && BpmnInterpreter.TYPE_THREAD.equals(cce.getSourceCategory()))
+						if(cce.getSourceCategory().equals(BpmnInterpreter.TYPE_THREAD))
 						{
-							threadinfos.add(cce.getDetails());
+							if(IComponentChangeEvent.EVENT_TYPE_CREATION.equals(cce.getEventType()) && BpmnInterpreter.TYPE_THREAD.equals(cce.getSourceCategory()))
+							{
+								threadinfos.add(cce.getDetails());
+							}
+							else if(IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()) && BpmnInterpreter.TYPE_THREAD.equals(cce.getSourceCategory()))
+							{
+								threadinfos.remove(cce.getDetails());
+								historyinfos.add(0, cce.getDetails());
+							}
+							else if(IComponentChangeEvent.EVENT_TYPE_MODIFICATION.equals(cce.getEventType()) && BpmnInterpreter.TYPE_THREAD.equals(cce.getSourceCategory()))
+							{
+								threadinfos.remove(cce.getDetails());
+								threadinfos.add(cce.getDetails());
+							}
 						}
-						else if(IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()) && BpmnInterpreter.TYPE_THREAD.equals(cce.getSourceCategory()))
-						{
-							threadinfos.remove(cce.getDetails());
-							historyinfos.add(0, cce.getDetails());
-						}
-						else if(IComponentChangeEvent.EVENT_TYPE_MODIFICATION.equals(cce.getEventType()) && BpmnInterpreter.TYPE_THREAD.equals(cce.getSourceCategory()))
-						{
-							threadinfos.remove(cce.getDetails());
-							threadinfos.add(cce.getDetails());
-						}
-						
 						updateViews();
 					}
 				});

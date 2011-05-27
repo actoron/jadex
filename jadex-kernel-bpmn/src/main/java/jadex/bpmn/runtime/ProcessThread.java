@@ -87,7 +87,13 @@ public class ProcessThread	implements ITaskContext
 	
 	/** The id counter for sub processes. */
 	public int	idcnt;
-		
+	
+	/** The split id. */
+	public int splitid;
+	
+	/** The split number of threads. */
+	public int splitcnt;
+	
 	//-------- constructors --------
 
 	/**
@@ -696,6 +702,44 @@ public class ProcessThread	implements ITaskContext
 		}
 	}
 	
+	
+	
+	/**
+	 *  Get the splitid.
+	 *  @return the splitid.
+	 */
+	public int getSplitId()
+	{
+		return splitid;
+	}
+
+	/**
+	 *  Set the splitid.
+	 *  @param splitid The splitid to set.
+	 */
+	public void setSplitId(int splitid)
+	{
+		this.splitid = splitid;
+	}
+
+	/**
+	 *  Get the splitcnt.
+	 *  @return the splitcnt.
+	 */
+	public int getSplitCount()
+	{
+		return splitcnt;
+	}
+
+	/**
+	 *  Set the splitcnt.
+	 *  @param splitcnt The splitcnt to set.
+	 */
+	public void setSplitCount(int splitcnt)
+	{
+		this.splitcnt = splitcnt;
+	}
+
 	/**
 	 *  Create a string representation of this process thread.
 	 *  @return A string representation of this process thread.

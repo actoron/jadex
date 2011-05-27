@@ -1023,42 +1023,24 @@ public class BpmnXMLReader
 									{
 										String maptext = stok.nextToken();
 
-										StringTokenizer stok2 = new StringTokenizer(
-												maptext,
-												LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+										StringTokenizer stok2 = new StringTokenizer(maptext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
 										if (stok2.countTokens() == 2)
 										{
 											String propname = stok2.nextToken();
 											String proptext = stok2.nextToken();
 
-											IParsedExpression exp = parser
-													.parseExpression(
-															proptext,
-															dia.getAllImports(),
-															null,
-															context.getClassLoader());
+											IParsedExpression exp = parser.parseExpression(proptext, dia.getAllImports(),
+												null, context.getClassLoader());
 											IParsedExpression iexp = null;
 
-											if (propname.endsWith("]")
-													&& propname.indexOf("[") != -1)
+											if (propname.endsWith("]") && propname.indexOf("[") != -1)
 											{
-												String itext = propname
-														.substring(
-																propname.indexOf("[") + 1,
-																propname.length() - 1);
-												propname = propname.substring(
-														0,
-														propname.indexOf("["));
-												iexp = parser
-														.parseExpression(
-																itext,
-																dia.getAllImports(),
-																null,
-																context.getClassLoader());
+												String itext = propname.substring(propname.indexOf("[") + 1,propname.length() - 1);
+												propname = propname.substring(0,propname.indexOf("["));
+												iexp = parser.parseExpression(itext, dia.getAllImports(), null, context.getClassLoader());
 											}
 
-											edge.addParameterMapping(propname,
-													exp, iexp);
+											edge.addParameterMapping(propname, exp, iexp);
 										}
 										// System.out.println("Mapping: "+propname+" "+exp);
 									}
@@ -1066,13 +1048,9 @@ public class BpmnXMLReader
 								else
 								// todo: remove old mappings handling until here
 
-								if ("condition".equals(key) && value != null
-										&& value.length() > 0)
+								if ("condition".equals(key) && value != null && value.length() > 0)
 								{
-									IParsedExpression cond = parser
-											.parseExpression(value,
-													dia.getAllImports(), null,
-													context.getClassLoader());
+									IParsedExpression cond = parser.parseExpression(value, dia.getAllImports(), null, context.getClassLoader());
 									edge.setCondition(cond);
 
 									// System.out.println("Condition: "+key+" "+value);
@@ -1091,54 +1069,61 @@ public class BpmnXMLReader
 				// second line: condition
 				// lines with = in it: parameters
 				
-				StringTokenizer	stok = new StringTokenizer(edge.getDescription(), "\r\n");
-				String lineone = null;
-				String linetwo = null;
-				while(stok.hasMoreTokens())
+				try
 				{
-					String prop = stok.nextToken();
-					int	idx	= prop.indexOf("=");
-					boolean	comp	= idx>0 && (prop.charAt(idx-1)=='!' || prop.charAt(idx-1)=='<' || prop.charAt(idx-1)=='>');
-					boolean	eq	= idx!=-1 && idx<prop.length()-1 && prop.charAt(idx+1)=='=';
-					boolean	assignment	= idx!=-1 && !comp && !eq;
-					if(assignment)
+					StringTokenizer	stok = new StringTokenizer(edge.getDescription(), "\r\n");
+					String lineone = null;
+					String linetwo = null;
+					while(stok.hasMoreTokens())
 					{
-						String	propname = prop.substring(0, idx).trim();
-						String	proptext = prop.substring(idx+1).trim();
-						IParsedExpression exp = parser.parseExpression(proptext, dia.getAllImports(), null, context.getClassLoader());
-						IParsedExpression iexp	= null;
-
-						if(propname.endsWith("]") && propname.indexOf("[")!=-1)
+						String prop = stok.nextToken();
+						int	idx	= prop.indexOf("=");
+						boolean	comp	= idx>0 && (prop.charAt(idx-1)=='!' || prop.charAt(idx-1)=='<' || prop.charAt(idx-1)=='>');
+						boolean	eq	= idx!=-1 && idx<prop.length()-1 && prop.charAt(idx+1)=='=';
+						boolean	assignment	= idx!=-1 && !comp && !eq;
+						if(assignment)
 						{
-							String	itext	= propname.substring(propname.indexOf("[")+1, propname.length()-1);
-							propname	= propname.substring(0, propname.indexOf("["));
-							iexp	= parser.parseExpression(itext, dia.getAllImports(), null, context.getClassLoader());
+							String	propname = prop.substring(0, idx).trim();
+							String	proptext = prop.substring(idx+1).trim();
+							IParsedExpression exp = parser.parseExpression(proptext, dia.getAllImports(), null, context.getClassLoader());
+							IParsedExpression iexp	= null;
+	
+							if(propname.endsWith("]") && propname.indexOf("[")!=-1)
+							{
+								String	itext	= propname.substring(propname.indexOf("[")+1, propname.length()-1);
+								propname	= propname.substring(0, propname.indexOf("["));
+								iexp	= parser.parseExpression(itext, dia.getAllImports(), null, context.getClassLoader());
+							}
+	
+							edge.addParameterMapping(propname, exp, iexp);
 						}
-
-						edge.addParameterMapping(propname, exp, iexp);
-					}
-					else
-					{
-						// last line without "=" is assumed to be condition
-						if(lineone==null)
-							lineone = prop;
 						else
-							linetwo = prop;
+						{
+							// last line without "=" is assumed to be condition
+							if(lineone==null)
+								lineone = prop;
+							else
+								linetwo = prop;
+						}
+					}
+					
+					if(lineone!=null && linetwo!=null)
+					{
+						edge.setName(lineone);
+						IParsedExpression cond = parser.parseExpression(linetwo, 
+							dia.getAllImports(), null, context.getClassLoader());
+						edge.setCondition(cond);
+					}
+					else if(lineone!=null)
+					{
+						IParsedExpression cond = parser.parseExpression(lineone, 
+							dia.getAllImports(), null, context.getClassLoader());
+						edge.setCondition(cond);
 					}
 				}
-				
-				if(lineone!=null && linetwo!=null)
+				catch(Exception e)
 				{
-					edge.setName(lineone);
-					IParsedExpression cond = parser.parseExpression(linetwo, 
-						dia.getAllImports(), null, context.getClassLoader());
-					edge.setCondition(cond);
-				}
-				else if(lineone!=null)
-				{
-					IParsedExpression cond = parser.parseExpression(lineone, 
-						dia.getAllImports(), null, context.getClassLoader());
-					edge.setCondition(cond);
+					// nop, maybe just comment
 				}
 			}
 			
