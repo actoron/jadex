@@ -1,4 +1,4 @@
-package jadex.application.space.envsupport.observer.graphics.opengl;
+package jadex.extension.envsupport.observer.graphics.opengl;
 
 import jadex.commons.SUtil;
 import jadex.extension.envsupport.math.IVector2;

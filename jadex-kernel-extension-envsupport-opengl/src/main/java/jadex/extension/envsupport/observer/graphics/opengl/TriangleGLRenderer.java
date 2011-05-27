@@ -1,4 +1,4 @@
-package jadex.application.space.envsupport.observer.graphics.opengl;
+package jadex.extension.envsupport.observer.graphics.opengl;
 
 import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
