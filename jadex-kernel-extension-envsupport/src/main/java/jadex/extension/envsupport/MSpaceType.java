@@ -12,6 +12,9 @@ public class MSpaceType implements IExtensionType
 	/** The name. */
 	protected String name;
 
+	/** The class name. */
+	protected String classname;
+	
 	//-------- methods --------
 
 	/**
@@ -30,5 +33,23 @@ public class MSpaceType implements IExtensionType
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+
+	/**
+	 *  Get the classname.
+	 *  @return the classname.
+	 */
+	public String getClassName()
+	{
+		return classname;
+	}
+
+	/**
+	 *  Set the classname.
+	 *  @param classname The classname to set.
+	 */
+	public void setClassName(String classname)
+	{
+		this.classname = classname;
 	}
 }

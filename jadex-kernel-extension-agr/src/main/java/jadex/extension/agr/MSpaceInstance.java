@@ -83,9 +83,4 @@ public abstract class MSpaceInstance implements IExtensionInstance
 	{
 		this.spacetype	= spacetype;
 	}
-
-	/**
-	 *  Get the implementation class of the space.
-	 */
-	public abstract Class	getClazz();
 }

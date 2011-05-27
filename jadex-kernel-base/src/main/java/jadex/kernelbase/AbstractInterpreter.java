@@ -1,12 +1,12 @@
 package jadex.kernelbase;
 
-import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.RemoteComponentListener;
+import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
@@ -16,6 +16,7 @@ import jadex.javaparser.IValueFetcher;
 
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -94,35 +95,6 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	}
 	
 	//-------- methods to be called by adapter --------
-	
-	/**
-	 *  Can be called concurrently (also during executeAction()).
-	 *   
-	 *  Request component to kill itself.
-	 *  The component might perform arbitrary cleanup activities during which executeAction()
-	 *  will still be called as usual.
-	 *  Can be called concurrently (also during executeAction()).
-	 *  @param listener	When cleanup of the component is finished, the listener must be notified.
-	 */
-	public IFuture cleanupComponent()
-	{
-		ComponentChangeEvent.dispatchTerminatingEvent(adapter, getModel(), getServiceProvider(), componentlisteners, null);
-		
-		// todo: call some application functionality for terminating?!
-		
-		final Future ret = new Future();
-		
-		adapter.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				ComponentChangeEvent.dispatchTerminatedEvent(adapter, getModel(), getServiceProvider(), componentlisteners, ret);
-			}
-		});
-		
-		return ret;
-//		return adapter.getServiceContainer().shutdown(); // done in adapter
-	}
 		
 	/**
 	 *  Can be called concurrently (also during executeAction()).
@@ -238,7 +210,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  Get the component listeners.
 	 *  @return The component listeners.
 	 */
-	public List getInternalComponentListeners()
+	public Collection getInternalComponentListeners()
 	{
 		return componentlisteners;	
 	}
@@ -330,13 +302,13 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  @param name	The argument name.
 	 *  @param value	The argument value.
 	 */
-	public void	addExtension(String name, Object value)
+	public void	addExtension(IExtensionInstance value)
 	{
 		if(extensions==null)
 		{
 			extensions = new HashMap();
 		}
-		extensions.put(name, value);
+		extensions.put(value.getName(), value);
 	}
 	
 	/**
@@ -356,9 +328,20 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  @param name	The name of the space.
 	 *  @return	The space.
 	 */
-	public Object getExtension(final String name)
+	public IExtensionInstance getExtension(final String name)
 	{
-		return extensions==null? null: extensions.get(name);
+		return extensions==null? null: (IExtensionInstance)extensions.get(name);
+	}
+	
+	/**
+	 *  Get a space of the application.
+	 *  @param name	The name of the space.
+	 *  @return	The space.
+	 */
+	public IExtensionInstance[] getExtensions()
+	{
+		return extensions==null? new IExtensionInstance[0]: 
+			(IExtensionInstance[])extensions.values().toArray(new IExtensionInstance[extensions.size()]);
 	}
 	
 	/**
@@ -369,5 +352,5 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	{
 		return this.config;
 	}
-
+	
 }

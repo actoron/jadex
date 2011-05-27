@@ -1,8 +1,17 @@
 package jadex.extension.agr;
 
+import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.IFilter;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.javaparser.IValueFetcher;
+import jadex.kernelbase.StatelessAbstractInterpreter;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,7 +20,7 @@ import java.util.Map;
 /**
  *  An AGR (agent-group-role) space.
  */
-public class AGRSpace implements ISpace
+public class AGRSpace extends MAGRSpaceInstance
 {
 	//-------- attributes --------
 	
@@ -76,14 +85,9 @@ public class AGRSpace implements ISpace
 	}
 	
 	/**
-	 *  Terminate the space.
+	 *  Init the space
 	 */
-	public void terminate()
-	{
-		// nothing to do.
-	}
-	
-	public void initSpace(IInternalAccess ia, MSpaceInstance config, IValueFetcher fetcher)
+	public void initSpace(IExternalAccess exta, MSpaceInstance config, IValueFetcher fetcher)
 	{
 //		this.application = application;
 		MGroupInstance[]	mgroups	= ((MAGRSpaceInstance)config).getMGroupInstances();
@@ -100,5 +104,83 @@ public class AGRSpace implements ISpace
 				group.addRoleForType(at, rt);
 			}
 		}
+	}
+	
+	/**
+	 *  Initialize the extension.
+	 *  Called once, when the extension is created.
+	 */
+	public IFuture init(IExternalAccess exta, IValueFetcher fetcher)
+	{
+//		this.application = application;
+		
+		final Future ret = new Future();
+		
+//		System.out.println("init space: "+ia);
+		
+		try
+		{
+			initSpace(exta, this, fetcher);
+			
+			exta.scheduleStep(new IComponentStep()
+			{
+				public Object execute(IInternalAccess ia)
+				{
+					ia.addComponentListener(new IComponentListener()
+					{
+						IFilter filter = new IFilter()
+						{
+							public boolean filter(Object obj)
+							{
+								IComponentChangeEvent event = (IComponentChangeEvent)obj;
+								return event.getSourceCategory().equals(StatelessAbstractInterpreter.TYPE_COMPONENT);
+							}
+						};
+						public IFilter getFilter()
+						{
+							return filter;
+						}
+						
+						public IFuture eventOccured(IComponentChangeEvent cce)
+						{
+							if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_CREATION))
+							{
+//								System.out.println("add: "+cce.getDetails());
+								componentAdded((IComponentDescription)cce.getDetails());
+							}
+							else if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_DISPOSAL))
+							{
+//								System.out.println("rem: "+cce.getComponent());
+								componentRemoved((IComponentDescription)cce.getDetails());
+							}
+							return IFuture.DONE;
+						}
+					});
+					return null;
+				}
+			}).addResultListener(new DelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+					ret.setResult(AGRSpace.this);
+				}
+			});
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			ret.setException(e);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Initialize the extension.
+	 *  Called once, when the extension is terminate.
+	 */
+	public IFuture terminate()
+	{
+		return IFuture.DONE;
 	}
 }

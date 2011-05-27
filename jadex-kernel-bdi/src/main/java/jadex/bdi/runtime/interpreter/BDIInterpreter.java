@@ -28,6 +28,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
+import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
@@ -1717,7 +1718,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  Add an extension instance.
 	 *  @param extension The extension instance.
 	 */
-	public void	addExtension(String name, Object extension)
+	public void	addExtension(IExtensionInstance ext)
 	{
 		throw new UnsupportedOperationException("todo");		
 	}
@@ -1727,7 +1728,17 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  @param name	The name of the space.
 	 *  @return	The space.
 	 */
-	public Object getExtension(final String name)
+	public IExtensionInstance getExtension(final String name)
+	{
+		throw new UnsupportedOperationException("todo");		
+	}
+	
+	/**
+	 *  Get a space of the application.
+	 *  @param name	The name of the space.
+	 *  @return	The space.
+	 */
+	public IExtensionInstance[] getExtensions()
 	{
 		throw new UnsupportedOperationException("todo");		
 	}
@@ -1774,6 +1785,15 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	public Map getArguments()
 	{
 		// todo:
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Get the component listeners.
+	 *  @return The component listeners.
+	 */
+	public Collection getInternalComponentListeners()
+	{
 		throw new UnsupportedOperationException();
 	}
 }

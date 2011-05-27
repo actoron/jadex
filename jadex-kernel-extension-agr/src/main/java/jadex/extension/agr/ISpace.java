@@ -1,7 +1,7 @@
 package jadex.extension.agr;
 
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IInternalAccess;
+import jadex.bridge.IExternalAccess;
 import jadex.javaparser.IValueFetcher;
 
 /**
@@ -20,7 +20,7 @@ public interface ISpace
 	 *  Initialize a space.
 	 *  Called once, when the space is created.
 	 */
-	public void	initSpace(IInternalAccess ia, MSpaceInstance config, IValueFetcher fetcher);
+	public void	initSpace(IExternalAccess exta, MSpaceInstance config, IValueFetcher fetcher);
 
 	/**
 	 *  Get the context.

@@ -1,15 +1,6 @@
 package jadex.extension.agr;
 
-import jadex.bridge.IComponentChangeEvent;
-import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentListener;
-import jadex.bridge.IInternalAccess;
-import jadex.commons.IFilter;
 import jadex.commons.SReflect;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.javaparser.IValueFetcher;
-import jadex.kernelbase.StatelessAbstractInterpreter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +8,7 @@ import java.util.List;
 /**
  *  An instance of an AGR space. 
  */
-public class MAGRSpaceInstance extends MSpaceInstance
+public abstract class MAGRSpaceInstance extends MSpaceInstance
 {
 	//-------- attributes --------
 	
@@ -83,70 +74,12 @@ public class MAGRSpaceInstance extends MSpaceInstance
 		return sbuf.toString();
 	}
 
-	/**
-	 *  Get the implementation class of the space.
-	 */
-	public Class getClazz()
-	{
-		return AGRSpace.class;
-	}
-	
-	/**
-	 *  Initialize the extension.
-	 *  Called once, when the extension is created.
-	 */
-	public IFuture init(IInternalAccess ia, IValueFetcher fetcher)
-	{
-//		this.application = application;
-		
-		Future ret = new Future();
-		
-//		System.out.println("init space: "+ia);
-		
-		try
-		{
-			final ISpace space = (ISpace)getClazz().newInstance();
-			space.initSpace(ia, this, fetcher);
-			
-			ia.addComponentListener(new IComponentListener()
-			{
-				IFilter filter = new IFilter()
-				{
-					public boolean filter(Object obj)
-					{
-						IComponentChangeEvent event = (IComponentChangeEvent)obj;
-						return event.getSourceCategory().equals(StatelessAbstractInterpreter.TYPE_COMPONENT);
-					}
-				};
-				public IFilter getFilter()
-				{
-					return filter;
-				}
-				
-				public IFuture eventOccured(IComponentChangeEvent cce)
-				{
-					if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_CREATION))
-					{
-//						System.out.println("add: "+cce.getDetails());
-						space.componentAdded((IComponentDescription)cce.getDetails());
-					}
-					else if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_DISPOSAL))
-					{
-//						System.out.println("rem: "+cce.getComponent());
-						space.componentRemoved((IComponentDescription)cce.getDetails());
-					}
-					return IFuture.DONE;
-				}
-			});
+//	/**
+//	 *  Get the implementation class of the space.
+//	 */
+//	public Class getClazz()
+//	{
+//		return AGRSpace.class;
+//	}
 
-			ret.setResult(new Object[]{getName(), space});
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			ret.setException(e);
-		}
-		
-		return ret;
-	}
 }

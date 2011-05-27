@@ -499,7 +499,7 @@ public abstract class ComponentManagementService extends BasicService implements
 													
 													public void exceptionOccurred(final Exception exception)
 													{
-														exception.printStackTrace();
+//														exception.printStackTrace();
 		//												System.out.println("Ex: "+cid+" "+exception);
 														final Runnable	cleanup	= new Runnable()
 														{

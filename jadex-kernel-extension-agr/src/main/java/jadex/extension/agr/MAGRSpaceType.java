@@ -114,7 +114,7 @@ public class MAGRSpaceType	extends MSpaceType
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "grouptype")}), new ObjectInfo(MGroupType.class)));
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "role")}), new ObjectInfo(MRoleType.class)));
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "agrspace")}), 
-			new ObjectInfo(MAGRSpaceInstance.class, new IPostProcessor() {
+			new ObjectInfo(AGRSpace.class, new IPostProcessor() {
 			public Object postProcess(IContext context, Object object)
 			{
 //				MSpaceInstance	si	= (MSpaceInstance)object;

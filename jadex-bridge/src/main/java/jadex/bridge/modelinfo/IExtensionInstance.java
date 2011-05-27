@@ -1,6 +1,6 @@
 package jadex.bridge.modelinfo;
 
-import jadex.bridge.IInternalAccess;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.IValueFetcher;
 
@@ -11,8 +11,19 @@ import jadex.javaparser.IValueFetcher;
 public interface IExtensionInstance
 {
 	/**
+	 *  Get the extension name.
+	 */
+	public String getName();
+	
+	/**
 	 *  Initialize the extension.
 	 *  Called once, when the extension is created.
 	 */
-	public IFuture init(IInternalAccess ia, IValueFetcher fetcher);
+	public IFuture init(IExternalAccess ia, IValueFetcher fetcher);
+	
+	/**
+	 *  Initialize the extension.
+	 *  Called once, when the extension is terminate.
+	 */
+	public IFuture terminate();
 }

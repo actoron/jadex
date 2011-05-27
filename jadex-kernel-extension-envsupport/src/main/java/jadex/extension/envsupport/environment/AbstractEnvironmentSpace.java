@@ -3,13 +3,18 @@ package jadex.extension.envsupport.environment;
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.ICMSComponentListener;
+import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.commons.IFilter;
 import jadex.commons.IPropertyObject;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
@@ -21,12 +26,11 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.meta.IPropertyMetaDataSet;
 import jadex.extension.envsupport.IObjectCreator;
-import jadex.extension.envsupport.ISpace;
-import jadex.extension.envsupport.MEnvSpaceInstance;
 import jadex.extension.envsupport.MEnvSpaceType;
 import jadex.extension.envsupport.MObjectType;
 import jadex.extension.envsupport.MObjectTypeProperty;
 import jadex.extension.envsupport.MSpaceInstance;
+import jadex.extension.envsupport.MSpaceType;
 import jadex.extension.envsupport.dataview.IDataView;
 import jadex.extension.envsupport.environment.ComponentActionList.ActionEntry;
 import jadex.extension.envsupport.environment.space2d.Space2D;
@@ -41,6 +45,7 @@ import jadex.extension.envsupport.observer.perspective.IPerspective;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
+import jadex.kernelbase.StatelessAbstractInterpreter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,16 +59,12 @@ import java.util.Set;
 /**
  *  Abstract base class for environment space. 
  */
-public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObject implements IEnvironmentSpace, ISpace
+public abstract class AbstractEnvironmentSpace extends MSpaceInstance implements IEnvironmentSpace
 {
 	//-------- attributes --------
-	
-	/** The space name. */
-	protected String name;
-	
+		
 	/** The context. */
-//	protected IApplication application;
-	protected IInternalAccess ia;
+	protected IExternalAccess exta;
 	
 	/** The space object types. */
 	protected Map objecttypes;
@@ -139,6 +140,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 
 	/** The zombie objects. */
 	protected Map zombieobjects;
+	
+	/** The observers. */
+	protected List observercenters;
 
 	//-------- constructors --------
 	
@@ -147,7 +151,6 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 */
 	public AbstractEnvironmentSpace()
 	{
-		super(null, new Object());
 		this.views = new HashMap();
 		this.avatarmappings = new MultiCollection();
 		this.dataviewmappings = new MultiCollection();
@@ -172,33 +175,35 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		
 		this.dataproviders = new HashMap();
 		this.dataconsumers = new HashMap();
+		
+		this.observercenters = new ArrayList();
 	}
 	
 	/**
 	 *  Create a space.
 	 */
-	public void	initSpace(final IInternalAccess ia, MSpaceInstance config, IValueFetcher pfetcher)
+	public void	initSpace(final IExternalAccess exta, IValueFetcher pfetcher)
 	{
 		try
 		{
-			MEnvSpaceInstance	si	= (MEnvSpaceInstance)config;
-			final MEnvSpaceType	mspacetype	= (MEnvSpaceType)config.getType();
+//			MEnvSpaceInstance	si	= (MEnvSpaceInstance)config;
+			final MEnvSpaceType	mspacetype	= (MEnvSpaceType)getType();
 			
 			final SimpleValueFetcher fetcher = new SimpleValueFetcher(pfetcher);
 			fetcher.setValue("$space", this);
 			this.setFetcher(fetcher);
 			
 			List mspaceprops = mspacetype.getPropertyList("properties");
-			MEnvSpaceInstance.setProperties(this, mspaceprops, fetcher);
-			List spaceprops = si.getPropertyList("properties");
-			MEnvSpaceInstance.setProperties(this, spaceprops, fetcher);
+			MEnvSpaceType.setProperties(this, mspaceprops, fetcher);
+			List spaceprops = getInitPropertyList("properties");
+			MEnvSpaceType.setProperties(this, spaceprops, fetcher);
 			
-			this.ia = ia;
+			this.exta = exta;
 			
 			if(this instanceof Space2D) // Hack?
 			{
-				Double width = si.getProperty("width")!=null? (Double)si.getProperty("width"): (Double)mspacetype.getProperty("width");
-				Double height = si.getProperty("height")!=null? (Double)si.getProperty("height"): (Double)mspacetype.getProperty("height");
+				Double width = getInitProperty("width")!=null? (Double)getInitProperty("width"): (Double)mspacetype.getProperty("width");
+				Double height = getInitProperty("height")!=null? (Double)getInitProperty("height"): (Double)mspacetype.getProperty("height");
 				((Space2D)this).setAreaSize(Vector2Double.getVector2(width, height));
 	//			System.out.println("areasize: "+width+" "+height);
 			}
@@ -239,12 +244,12 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				for(int i=0; i<avmappings.size(); i++)
 				{
 					AvatarMapping mapping = (AvatarMapping)avmappings.get(i);
-	//				String componenttype = (String)MEnvSpaceInstance.getProperty(mmapping, "componenttype");
-	//				String avatartype = (String)(String)MEnvSpaceInstance.getProperty(mmapping, "objecttype");
-	//				Boolean createavatar = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "createavatar");
-	//				Boolean createcomponent = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "createcomponent");
-	//				Boolean killavatar = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "killavatar");
-	//				Boolean killcomponent = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "killcomponent");
+	//				String componenttype = (String)getProperty(mmapping, "componenttype");
+	//				String avatartype = (String)(String)getProperty(mmapping, "objecttype");
+	//				Boolean createavatar = (Boolean)getProperty(mmapping, "createavatar");
+	//				Boolean createcomponent = (Boolean)getProperty(mmapping, "createcomponent");
+	//				Boolean killavatar = (Boolean)getProperty(mmapping, "killavatar");
+	//				Boolean killcomponent = (Boolean)getProperty(mmapping, "killcomponent");
 	//				
 	//				AvatarMapping mapping = new AvatarMapping(componenttype, avatartype);
 	//				if(createavatar!=null)
@@ -269,7 +274,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	
 					PerceptType pt = new PerceptType();
 					
-					pt.setName((String)MEnvSpaceInstance.getProperty(mpercepttype, "name"));
+					pt.setName((String)MEnvSpaceType.getProperty(mpercepttype, "name"));
 					
 					List atypes = (List)mpercepttype.get("componenttypes");
 					pt.setComponentTypes(atypes==null? null: new HashSet(atypes));
@@ -289,12 +294,12 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				for(int i=0; i<spaceactions.size(); i++)
 				{
 					Map maction = (Map)spaceactions.get(i);
-					ISpaceAction action = (ISpaceAction)((Class)MEnvSpaceInstance.getProperty(maction, "clazz")).newInstance();
+					ISpaceAction action = (ISpaceAction)((Class)MEnvSpaceType.getProperty(maction, "clazz")).newInstance();
 					List props = (List)maction.get("properties");
-					MEnvSpaceInstance.setProperties(action, props, fetcher);
+					MEnvSpaceType.setProperties(action, props, fetcher);
 					
-	//				System.out.println("Adding environment action: "+MEnvSpaceInstance.getProperty(maction, "name"));
-					this.addSpaceAction((String)MEnvSpaceInstance.getProperty(maction, "name"), action);
+	//				System.out.println("Adding environment action: "+getProperty(maction, "name"));
+					this.addSpaceAction((String)MEnvSpaceType.getProperty(maction, "name"), action);
 				}
 			}
 			
@@ -305,12 +310,12 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				for(int i=0; i<processtypes.size(); i++)
 				{
 					Map mprocess = (Map)processtypes.get(i);
-	//				ISpaceProcess process = (ISpaceProcess)((Class)MEnvSpaceInstance.getProperty(mprocess, "clazz")).newInstance();
+	//				ISpaceProcess process = (ISpaceProcess)((Class)getProperty(mprocess, "clazz")).newInstance();
 					List props = (List)mprocess.get("properties");
-					String name = (String)MEnvSpaceInstance.getProperty(mprocess, "name");
-					Class clazz = (Class)MEnvSpaceInstance.getProperty(mprocess, "clazz");
+					String name = (String)MEnvSpaceType.getProperty(mprocess, "name");
+					Class clazz = (Class)MEnvSpaceType.getProperty(mprocess, "clazz");
 					
-	//				System.out.println("Adding environment process: "+MEnvSpaceInstance.getProperty(mprocess, "name"));
+	//				System.out.println("Adding environment process: "+getProperty(mprocess, "name"));
 					this.addSpaceProcessType(name, clazz, props);
 				}
 			}
@@ -324,10 +329,10 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				{
 					Map mtask = (Map)tasks.get(i);
 					List props = (List)mtask.get("properties");
-					String name = (String)MEnvSpaceInstance.getProperty(mtask, "name");
-					Class clazz = (Class)MEnvSpaceInstance.getProperty(mtask, "clazz");
+					String name = (String)MEnvSpaceType.getProperty(mtask, "name");
+					Class clazz = (Class)MEnvSpaceType.getProperty(mtask, "clazz");
 					
-	//				System.out.println("Adding object task: "+MEnvSpaceInstance.getProperty(mtask, "name"));
+	//				System.out.println("Adding object task: "+getProperty(mtask, "name"));
 					this.addObjectTaskType(name, clazz, props);
 				}
 			}
@@ -339,12 +344,12 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				for(int i=0; i<gens.size(); i++)
 				{
 					Map mgen = (Map)gens.get(i);
-					IPerceptGenerator gen = (IPerceptGenerator)((Class)MEnvSpaceInstance.getProperty(mgen, "clazz")).newInstance();
+					IPerceptGenerator gen = (IPerceptGenerator)((Class)MEnvSpaceType.getProperty(mgen, "clazz")).newInstance();
 					List props = (List)mgen.get("properties");
-					MEnvSpaceInstance.setProperties(gen, props, fetcher);
+					MEnvSpaceType.setProperties(gen, props, fetcher);
 					
-	//				System.out.println("Adding environment percept generator: "+MEnvSpaceInstance.getProperty(mgen, "name"));
-					this.addPerceptGenerator(MEnvSpaceInstance.getProperty(mgen, "name"), gen);
+	//				System.out.println("Adding environment percept generator: "+getProperty(mgen, "name"));
+					this.addPerceptGenerator(MEnvSpaceType.getProperty(mgen, "name"), gen);
 				}
 			}
 			
@@ -355,18 +360,18 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				for(int i=0; i<pmaps.size(); i++)
 				{
 					Map mproc = (Map)pmaps.get(i);
-					IPerceptProcessor proc = (IPerceptProcessor)((Class)MEnvSpaceInstance.getProperty(mproc, "clazz")).newInstance();
+					IPerceptProcessor proc = (IPerceptProcessor)((Class)MEnvSpaceType.getProperty(mproc, "clazz")).newInstance();
 					List props = (List)mproc.get("properties");
-					MEnvSpaceInstance.setProperties(proc, props, fetcher);
+					MEnvSpaceType.setProperties(proc, props, fetcher);
 					
-					String componenttype = (String)MEnvSpaceInstance.getProperty(mproc, "componenttype");
+					String componenttype = (String)MEnvSpaceType.getProperty(mproc, "componenttype");
 					List ptypes = (List)mproc.get("percepttypes");
 					this.addPerceptProcessor(componenttype, ptypes==null? null: new HashSet(ptypes), proc);
 				}
 			}
 			
 			// Create initial objects.
-			List objects = (List)si.getPropertyList("objects");
+			List objects = (List)getInitPropertyList("objects");
 			if(objects!=null)
 			{
 				for(int i=0; i<objects.size(); i++)
@@ -376,20 +381,20 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					int num	= 1;
 					if(mobj.containsKey("number"))
 					{
-						num	= ((Number)MEnvSpaceInstance.getProperty(mobj, "number")).intValue();
+						num	= ((Number)MEnvSpaceType.getProperty(mobj, "number")).intValue();
 					}
 					
 					for(int j=0; j<num; j++)
 					{
 						fetcher.setValue("$number", new Integer(j));
-						Map props = MEnvSpaceInstance.convertProperties(mprops, fetcher);
-						this.createSpaceObject((String)MEnvSpaceInstance.getProperty(mobj, "type"), props, null);
+						Map props = MEnvSpaceType.convertProperties(mprops, fetcher);
+						this.createSpaceObject((String)MEnvSpaceType.getProperty(mobj, "type"), props, null);
 					}
 				}
 			}
 			
 			// Register initial avatars
-			List avatars = (List)si.getPropertyList("avatars");
+			List avatars = (List)getInitPropertyList("avatars");
 			if(avatars!=null)
 			{
 				for(int i=0; i<avatars.size(); i++)
@@ -397,40 +402,40 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					Map mobj = (Map)avatars.get(i);
 				
 					List mprops = (List)mobj.get("properties");
-					String	owner	= (String)MEnvSpaceInstance.getProperty(mobj, "owner");
+					String	owner	= (String)MEnvSpaceType.getProperty(mobj, "owner");
 					if(owner==null)
 						throw new RuntimeException("Attribute 'owner' required for avatar: "+mobj);
 					IComponentIdentifier	ownerid	= null;
 					
 					// HACK!!! Do not use ThreadSuspendable
 					IComponentManagementService ces = ((IComponentManagementService)SServiceProvider.getServiceUpwards
-						(ia.getServiceContainer(), IComponentManagementService.class).get(new ThreadSuspendable()));
+						(exta.getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable()));
 					if(owner.indexOf("@")!=-1)
 						ownerid	= ces.createComponentIdentifier((String)owner, false);
 					else
 						ownerid	= ces.createComponentIdentifier((String)owner, true);
 					
-					Map props = MEnvSpaceInstance.convertProperties(mprops, fetcher);
-					this.addInitialAvatar(ownerid, (String)MEnvSpaceInstance.getProperty(mobj, "type"), props);
+					Map props = MEnvSpaceType.convertProperties(mprops, fetcher);
+					this.addInitialAvatar(ownerid, (String)MEnvSpaceType.getProperty(mobj, "type"), props);
 				}
 			}
 			
 			// Create initial processes.
-			List procs = (List)si.getPropertyList("processes");
+			List procs = (List)getInitPropertyList("processes");
 			if(procs!=null)
 			{
 				for(int i=0; i<procs.size(); i++)
 				{
 					Map mproc = (Map)procs.get(i);
 					List mprops = (List)mproc.get("properties");
-					Map props = MEnvSpaceInstance.convertProperties(mprops, fetcher);
-					this.createSpaceProcess((String)MEnvSpaceInstance.getProperty(mproc, "type"), props);
-	//				System.out.println("Create space process: "+MEnvSpaceInstance.getProperty(mproc, "type"));
+					Map props = MEnvSpaceType.convertProperties(mprops, fetcher);
+					this.createSpaceProcess((String)MEnvSpaceType.getProperty(mproc, "type"), props);
+	//				System.out.println("Create space process: "+getProperty(mproc, "type"));
 				}
 			}
 			
 			// Create initial space actions.
-			List actions = (List)si.getPropertyList("spaceactions");
+			List actions = (List)getInitPropertyList("spaceactions");
 			if(actions!=null)
 			{
 				for(int i=0; i<actions.size(); i++)
@@ -450,7 +455,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					}
 					
 	//				System.out.println("Performing initial space action: "+getProperty(action, "type"));
-					this.performSpaceAction((String)MEnvSpaceInstance.getProperty(action, "type"), params);
+					this.performSpaceAction((String)MEnvSpaceType.getProperty(action, "type"), params);
 				}
 			}
 			
@@ -461,25 +466,25 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				for(int i=0; i<sourceviews.size(); i++)
 				{				
 					Map sourceview = (Map)sourceviews.get(i);
-					if(MEnvSpaceInstance.getProperty(sourceview, "objecttype")==null)
+					if(MEnvSpaceType.getProperty(sourceview, "objecttype")==null)
 					{
 						Map viewargs = new HashMap();
 						viewargs.put("sourceview", sourceview);
 						viewargs.put("space", this);
 						
-						IDataView	view	= (IDataView)((IObjectCreator)MEnvSpaceInstance.getProperty(sourceview, "creator")).createObject(viewargs);
-						this.addDataView((String)MEnvSpaceInstance.getProperty(sourceview, "name"), view);
+						IDataView	view	= (IDataView)((IObjectCreator)MEnvSpaceType.getProperty(sourceview, "creator")).createObject(viewargs);
+						this.addDataView((String)MEnvSpaceType.getProperty(sourceview, "name"), view);
 					}
 					else
 					{
-						this.addDataViewMapping((String)MEnvSpaceInstance.getProperty(sourceview, "objecttype"), sourceview);
+						this.addDataViewMapping((String)MEnvSpaceType.getProperty(sourceview, "objecttype"), sourceview);
 					}
 				}
 			}
 			
 			// Create the data providers.
 			List providers = mspacetype.getPropertyList("dataproviders");
-			List tmp = si.getPropertyList("dataproviders");
+			List tmp = getInitPropertyList("dataproviders");
 			
 			if(providers==null && tmp!=null)
 				providers = tmp;
@@ -506,15 +511,15 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 						provs[j] = new SpaceObjectSource(varname, this, objecttype, aggregate, dataexp, includeexp);
 					}
 					
-					String tablename = (String)MEnvSpaceInstance.getProperty(dcol, "name");
+					String tablename = (String)MEnvSpaceType.getProperty(dcol, "name");
 					List subdatas = (List)dcol.get("data");
 					String[] columnnames = new String[subdatas.size()];
 					IParsedExpression[] exps = new IParsedExpression[subdatas.size()];
 					for(int j=0; j<subdatas.size(); j++)
 					{
 						Map subdata = (Map)subdatas.get(j);
-						columnnames[j] = (String)MEnvSpaceInstance.getProperty(subdata, "name");
-						exps[j] = (IParsedExpression)MEnvSpaceInstance.getProperty(subdata, "content");
+						columnnames[j] = (String)MEnvSpaceType.getProperty(subdata, "name");
+						exps[j] = (IParsedExpression)MEnvSpaceType.getProperty(subdata, "content");
 					}
 					
 					ITableDataProvider tprov = new DefaultDataProvider(this, provs, tablename, columnnames, exps);
@@ -524,7 +529,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			
 			// Create the data consumers.
 			List consumers = mspacetype.getPropertyList("dataconsumers");
-			tmp = si.getPropertyList("dataconsumers");
+			tmp = getInitPropertyList("dataconsumers");
 			
 			if(consumers==null && tmp!=null)
 				consumers = tmp;
@@ -537,24 +542,24 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				for(int i=0; i<consumers.size(); i++)
 				{
 					Map dcon = (Map)consumers.get(i);
-					String name = (String)MEnvSpaceInstance.getProperty(dcon, "name");
-					Class clazz = (Class)MEnvSpaceInstance.getProperty(dcon, "class");
+					String name = (String)MEnvSpaceType.getProperty(dcon, "name");
+					Class clazz = (Class)MEnvSpaceType.getProperty(dcon, "class");
 					ITableDataConsumer con = (ITableDataConsumer)clazz.newInstance();
-					MEnvSpaceInstance.setProperties(con, (List)dcon.get("properties"), fetcher);
+					MEnvSpaceType.setProperties(con, (List)dcon.get("properties"), fetcher);
 					con.setProperty("envspace", this);
 					this.addDataConsumer(name, con);
 				}
 			}
 			
-			List observers = si.getPropertyList("observers");
+			List observers = getInitPropertyList("observers");
 			if(observers!=null)
 			{
 				for(int i=0; i<observers.size(); i++)
 				{				
 					Map observer = (Map)observers.get(i);
 					
-					final String title = MEnvSpaceInstance.getProperty(observer, "name")!=null? (String)MEnvSpaceInstance.getProperty(observer, "name"): "Default Observer";
-					final Boolean	killonexit	= (Boolean)MEnvSpaceInstance.getProperty(observer, "killonexit");
+					final String title = MEnvSpaceType.getProperty(observer, "name")!=null? (String)MEnvSpaceType.getProperty(observer, "name"): "Default Observer";
+					final Boolean	killonexit	= (Boolean)MEnvSpaceType.getProperty(observer, "killonexit");
 					
 					List plugs = (List)observer.get("plugins");
 					final List plugins = plugs!=null ? new ArrayList() : null;
@@ -563,9 +568,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 						for(int j=0; j<plugs.size(); j++)
 						{
 							Map plug = (Map)plugs.get(j);
-							Class clazz = (Class)MEnvSpaceInstance.getProperty(plug, "clazz");
+							Class clazz = (Class)MEnvSpaceType.getProperty(plug, "clazz");
 							IPropertyObject po = (IPropertyObject)clazz.newInstance();
-							MEnvSpaceInstance.setProperties(po, (List)plug.get("properties"), fetcher);
+							MEnvSpaceType.setProperties(po, (List)plug.get("properties"), fetcher);
 							plugins.add(po);
 						}
 					}
@@ -573,7 +578,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					final ObserverCenter oc = new ObserverCenter(title, AbstractEnvironmentSpace.this,
 						getExternalAccess().getModel().getClassLoader(), plugins,
 						killonexit!=null ? killonexit.booleanValue() : true);
-									
+					observercenters.add(oc);	
+					
 					SServiceProvider.getServiceUpwards(getExternalAccess().getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(final Object result)
@@ -609,12 +615,12 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 						args.put("fetcher", fetcher);
 						try
 						{
-							IPerspective persp	= (IPerspective)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcepers, "creator")).createObject(args);
+							IPerspective persp	= (IPerspective)((IObjectCreator)MEnvSpaceType.getProperty(sourcepers, "creator")).createObject(args);
 							
 							List props = (List)sourcepers.get("properties");
-							MEnvSpaceInstance.setProperties(persp, props, fetcher);
+							MEnvSpaceType.setProperties(persp, props, fetcher);
 							
-							oc.addPerspective((String)MEnvSpaceInstance.getProperty(sourcepers, "name"), persp);
+							oc.addPerspective((String)MEnvSpaceType.getProperty(sourcepers, "name"), persp);
 						}
 						catch(Exception e)
 						{
@@ -626,8 +632,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			}
 			
 			// Create the environment executor.
-			Map mse = (Map)MEnvSpaceInstance.getProperty(mspacetype.getProperties(), "spaceexecutor");
-			IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(mse, "expression");
+			Map mse = (Map)MEnvSpaceType.getProperty(mspacetype.getProperties(), "spaceexecutor");
+			IParsedExpression exp = (IParsedExpression)MEnvSpaceType.getProperty(mse, "expression");
 			ISpaceExecutor exe = null;
 			if(exp!=null)
 			{
@@ -635,9 +641,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			}
 			else
 			{
-				exe = (ISpaceExecutor)((Class)MEnvSpaceInstance.getProperty(mse, "clazz")).newInstance();
+				exe = (ISpaceExecutor)((Class)MEnvSpaceType.getProperty(mse, "clazz")).newInstance();
 				List props = (List)mse.get("properties");
-				MEnvSpaceInstance.setProperties(exe, props, fetcher);
+				MEnvSpaceType.setProperties(exe, props, fetcher);
 			}
 			if(exe!=null)
 				exe.start();	
@@ -661,9 +667,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //		this.setFetcher(fetcher);
 //		
 //		List mspaceprops = mspacetype.getPropertyList("properties");
-//		MEnvSpaceInstance.setProperties(this, mspaceprops, fetcher);
+//		setProperties(this, mspaceprops, fetcher);
 //		List spaceprops = si.getPropertyList("properties");
-//		MEnvSpaceInstance.setProperties(this, spaceprops, fetcher);
+//		setProperties(this, spaceprops, fetcher);
 //		
 //		this.application	= context;
 //		
@@ -711,12 +717,12 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //			for(int i=0; i<avmappings.size(); i++)
 //			{
 //				AvatarMapping mapping = (AvatarMapping)avmappings.get(i);
-////				String componenttype = (String)MEnvSpaceInstance.getProperty(mmapping, "componenttype");
-////				String avatartype = (String)(String)MEnvSpaceInstance.getProperty(mmapping, "objecttype");
-////				Boolean createavatar = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "createavatar");
-////				Boolean createcomponent = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "createcomponent");
-////				Boolean killavatar = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "killavatar");
-////				Boolean killcomponent = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "killcomponent");
+////				String componenttype = (String)getProperty(mmapping, "componenttype");
+////				String avatartype = (String)(String)getProperty(mmapping, "objecttype");
+////				Boolean createavatar = (Boolean)getProperty(mmapping, "createavatar");
+////				Boolean createcomponent = (Boolean)getProperty(mmapping, "createcomponent");
+////				Boolean killavatar = (Boolean)getProperty(mmapping, "killavatar");
+////				Boolean killcomponent = (Boolean)getProperty(mmapping, "killcomponent");
 ////				
 ////				AvatarMapping mapping = new AvatarMapping(componenttype, avatartype);
 ////				if(createavatar!=null)
@@ -741,7 +747,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //
 //				PerceptType pt = new PerceptType();
 //				
-//				pt.setName((String)MEnvSpaceInstance.getProperty(mpercepttype, "name"));
+//				pt.setName((String)getProperty(mpercepttype, "name"));
 //				
 //				List atypes = (List)mpercepttype.get("componenttypes");
 //				pt.setComponentTypes(atypes==null? null: new HashSet(atypes));
@@ -761,12 +767,12 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //			for(int i=0; i<spaceactions.size(); i++)
 //			{
 //				Map maction = (Map)spaceactions.get(i);
-//				ISpaceAction action = (ISpaceAction)((Class)MEnvSpaceInstance.getProperty(maction, "clazz")).newInstance();
+//				ISpaceAction action = (ISpaceAction)((Class)getProperty(maction, "clazz")).newInstance();
 //				List props = (List)maction.get("properties");
-//				MEnvSpaceInstance.setProperties(action, props, fetcher);
+//				setProperties(action, props, fetcher);
 //				
-////				System.out.println("Adding environment action: "+MEnvSpaceInstance.getProperty(maction, "name"));
-//				this.addSpaceAction((String)MEnvSpaceInstance.getProperty(maction, "name"), action);
+////				System.out.println("Adding environment action: "+getProperty(maction, "name"));
+//				this.addSpaceAction((String)getProperty(maction, "name"), action);
 //			}
 //		}
 //		
@@ -777,12 +783,12 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //			for(int i=0; i<processtypes.size(); i++)
 //			{
 //				Map mprocess = (Map)processtypes.get(i);
-////				ISpaceProcess process = (ISpaceProcess)((Class)MEnvSpaceInstance.getProperty(mprocess, "clazz")).newInstance();
+////				ISpaceProcess process = (ISpaceProcess)((Class)getProperty(mprocess, "clazz")).newInstance();
 //				List props = (List)mprocess.get("properties");
-//				String name = (String)MEnvSpaceInstance.getProperty(mprocess, "name");
-//				Class clazz = (Class)MEnvSpaceInstance.getProperty(mprocess, "clazz");
+//				String name = (String)getProperty(mprocess, "name");
+//				Class clazz = (Class)getProperty(mprocess, "clazz");
 //				
-////				System.out.println("Adding environment process: "+MEnvSpaceInstance.getProperty(mprocess, "name"));
+////				System.out.println("Adding environment process: "+getProperty(mprocess, "name"));
 //				this.addSpaceProcessType(name, clazz, props);
 //			}
 //		}
@@ -796,10 +802,10 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //			{
 //				Map mtask = (Map)tasks.get(i);
 //				List props = (List)mtask.get("properties");
-//				String name = (String)MEnvSpaceInstance.getProperty(mtask, "name");
-//				Class clazz = (Class)MEnvSpaceInstance.getProperty(mtask, "clazz");
+//				String name = (String)getProperty(mtask, "name");
+//				Class clazz = (Class)getProperty(mtask, "clazz");
 //				
-////				System.out.println("Adding object task: "+MEnvSpaceInstance.getProperty(mtask, "name"));
+////				System.out.println("Adding object task: "+getProperty(mtask, "name"));
 //				this.addObjectTaskType(name, clazz, props);
 //			}
 //		}
@@ -811,12 +817,12 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //			for(int i=0; i<gens.size(); i++)
 //			{
 //				Map mgen = (Map)gens.get(i);
-//				IPerceptGenerator gen = (IPerceptGenerator)((Class)MEnvSpaceInstance.getProperty(mgen, "clazz")).newInstance();
+//				IPerceptGenerator gen = (IPerceptGenerator)((Class)getProperty(mgen, "clazz")).newInstance();
 //				List props = (List)mgen.get("properties");
-//				MEnvSpaceInstance.setProperties(gen, props, fetcher);
+//				setProperties(gen, props, fetcher);
 //				
-////				System.out.println("Adding environment percept generator: "+MEnvSpaceInstance.getProperty(mgen, "name"));
-//				this.addPerceptGenerator(MEnvSpaceInstance.getProperty(mgen, "name"), gen);
+////				System.out.println("Adding environment percept generator: "+getProperty(mgen, "name"));
+//				this.addPerceptGenerator(getProperty(mgen, "name"), gen);
 //			}
 //		}
 //		
@@ -827,11 +833,11 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //			for(int i=0; i<pmaps.size(); i++)
 //			{
 //				Map mproc = (Map)pmaps.get(i);
-//				IPerceptProcessor proc = (IPerceptProcessor)((Class)MEnvSpaceInstance.getProperty(mproc, "clazz")).newInstance();
+//				IPerceptProcessor proc = (IPerceptProcessor)((Class)getProperty(mproc, "clazz")).newInstance();
 //				List props = (List)mproc.get("properties");
-//				MEnvSpaceInstance.setProperties(proc, props, fetcher);
+//				setProperties(proc, props, fetcher);
 //				
-//				String componenttype = (String)MEnvSpaceInstance.getProperty(mproc, "componenttype");
+//				String componenttype = (String)getProperty(mproc, "componenttype");
 //				List ptypes = (List)mproc.get("percepttypes");
 //				this.addPerceptProcessor(componenttype, ptypes==null? null: new HashSet(ptypes), proc);
 //			}
@@ -848,14 +854,14 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //				int num	= 1;
 //				if(mobj.containsKey("number"))
 //				{
-//					num	= ((Number)MEnvSpaceInstance.getProperty(mobj, "number")).intValue();
+//					num	= ((Number)getProperty(mobj, "number")).intValue();
 //				}
 //				
 //				for(int j=0; j<num; j++)
 //				{
 //					fetcher.setValue("$number", new Integer(j));
-//					Map props = MEnvSpaceInstance.convertProperties(mprops, fetcher);
-//					this.createSpaceObject((String)MEnvSpaceInstance.getProperty(mobj, "type"), props, null);
+//					Map props = convertProperties(mprops, fetcher);
+//					this.createSpaceObject((String)getProperty(mobj, "type"), props, null);
 //				}
 //			}
 //		}
@@ -869,7 +875,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //				Map mobj = (Map)avatars.get(i);
 //			
 //				List mprops = (List)mobj.get("properties");
-//				String	owner	= (String)MEnvSpaceInstance.getProperty(mobj, "owner");
+//				String	owner	= (String)getProperty(mobj, "owner");
 //				if(owner==null)
 //					throw new RuntimeException("Attribute 'owner' required for avatar: "+mobj);
 //				IComponentIdentifier	ownerid	= null;
@@ -882,8 +888,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //				else
 //					ownerid	= ces.createComponentIdentifier((String)owner, true);
 //				
-//				Map props = MEnvSpaceInstance.convertProperties(mprops, fetcher);
-//				this.addInitialAvatar(ownerid, (String)MEnvSpaceInstance.getProperty(mobj, "type"), props);
+//				Map props = convertProperties(mprops, fetcher);
+//				this.addInitialAvatar(ownerid, (String)getProperty(mobj, "type"), props);
 //			}
 //		}
 //		
@@ -895,9 +901,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //			{
 //				Map mproc = (Map)procs.get(i);
 //				List mprops = (List)mproc.get("properties");
-//				Map props = MEnvSpaceInstance.convertProperties(mprops, fetcher);
-//				this.createSpaceProcess((String)MEnvSpaceInstance.getProperty(mproc, "type"), props);
-////				System.out.println("Create space process: "+MEnvSpaceInstance.getProperty(mproc, "type"));
+//				Map props = convertProperties(mprops, fetcher);
+//				this.createSpaceProcess((String)getProperty(mproc, "type"), props);
+////				System.out.println("Create space process: "+getProperty(mproc, "type"));
 //			}
 //		}
 //		
@@ -922,7 +928,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //				}
 //				
 ////				System.out.println("Performing initial space action: "+getProperty(action, "type"));
-//				this.performSpaceAction((String)MEnvSpaceInstance.getProperty(action, "type"), params);
+//				this.performSpaceAction((String)getProperty(action, "type"), params);
 //			}
 //		}
 //		
@@ -933,18 +939,18 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //			for(int i=0; i<sourceviews.size(); i++)
 //			{				
 //				Map sourceview = (Map)sourceviews.get(i);
-//				if(MEnvSpaceInstance.getProperty(sourceview, "objecttype")==null)
+//				if(getProperty(sourceview, "objecttype")==null)
 //				{
 //					Map viewargs = new HashMap();
 //					viewargs.put("sourceview", sourceview);
 //					viewargs.put("space", this);
 //					
-//					IDataView	view	= (IDataView)((IObjectCreator)MEnvSpaceInstance.getProperty(sourceview, "creator")).createObject(viewargs);
-//					this.addDataView((String)MEnvSpaceInstance.getProperty(sourceview, "name"), view);
+//					IDataView	view	= (IDataView)((IObjectCreator)getProperty(sourceview, "creator")).createObject(viewargs);
+//					this.addDataView((String)getProperty(sourceview, "name"), view);
 //				}
 //				else
 //				{
-//					this.addDataViewMapping((String)MEnvSpaceInstance.getProperty(sourceview, "objecttype"), sourceview);
+//					this.addDataViewMapping((String)getProperty(sourceview, "objecttype"), sourceview);
 //				}
 //			}
 //		}
@@ -978,15 +984,15 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //					provs[j] = new SpaceObjectSource(varname, this, objecttype, aggregate, dataexp, includeexp);
 //				}
 //				
-//				String tablename = (String)MEnvSpaceInstance.getProperty(dcol, "name");
+//				String tablename = (String)getProperty(dcol, "name");
 //				List subdatas = (List)dcol.get("data");
 //				String[] columnnames = new String[subdatas.size()];
 //				IParsedExpression[] exps = new IParsedExpression[subdatas.size()];
 //				for(int j=0; j<subdatas.size(); j++)
 //				{
 //					Map subdata = (Map)subdatas.get(j);
-//					columnnames[j] = (String)MEnvSpaceInstance.getProperty(subdata, "name");
-//					exps[j] = (IParsedExpression)MEnvSpaceInstance.getProperty(subdata, "content");
+//					columnnames[j] = (String)getProperty(subdata, "name");
+//					exps[j] = (IParsedExpression)getProperty(subdata, "content");
 //				}
 //				
 //				ITableDataProvider tprov = new DefaultDataProvider(this, provs, tablename, columnnames, exps);
@@ -1009,10 +1015,10 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //			for(int i=0; i<consumers.size(); i++)
 //			{
 //				Map dcon = (Map)consumers.get(i);
-//				String name = (String)MEnvSpaceInstance.getProperty(dcon, "name");
-//				Class clazz = (Class)MEnvSpaceInstance.getProperty(dcon, "class");
+//				String name = (String)getProperty(dcon, "name");
+//				Class clazz = (Class)getProperty(dcon, "class");
 //				ITableDataConsumer con = (ITableDataConsumer)clazz.newInstance();
-//				MEnvSpaceInstance.setProperties(con, (List)dcon.get("properties"), fetcher);
+//				setProperties(con, (List)dcon.get("properties"), fetcher);
 //				con.setProperty("envspace", this);
 //				this.addDataConsumer(name, con);
 //			}
@@ -1025,8 +1031,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //			{				
 //				Map observer = (Map)observers.get(i);
 //				
-//				final String title = MEnvSpaceInstance.getProperty(observer, "name")!=null? (String)MEnvSpaceInstance.getProperty(observer, "name"): "Default Observer";
-//				final Boolean	killonexit	= (Boolean)MEnvSpaceInstance.getProperty(observer, "killonexit");
+//				final String title = getProperty(observer, "name")!=null? (String)getProperty(observer, "name"): "Default Observer";
+//				final Boolean	killonexit	= (Boolean)getProperty(observer, "killonexit");
 //				
 //				List plugs = (List)observer.get("plugins");
 //				final List plugins = plugs!=null ? new ArrayList() : null;
@@ -1035,9 +1041,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //					for(int j=0; j<plugs.size(); j++)
 //					{
 //						Map plug = (Map)plugs.get(j);
-//						Class clazz = (Class)MEnvSpaceInstance.getProperty(plug, "clazz");
+//						Class clazz = (Class)getProperty(plug, "clazz");
 //						IPropertyObject po = (IPropertyObject)clazz.newInstance();
-//						MEnvSpaceInstance.setProperties(po, (List)plug.get("properties"), fetcher);
+//						setProperties(po, (List)plug.get("properties"), fetcher);
 //						plugins.add(po);
 //					}
 //				}
@@ -1081,12 +1087,12 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //					args.put("fetcher", fetcher);
 //					try
 //					{
-//						IPerspective persp	= (IPerspective)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcepers, "creator")).createObject(args);
+//						IPerspective persp	= (IPerspective)((IObjectCreator)getProperty(sourcepers, "creator")).createObject(args);
 //						
 //						List props = (List)sourcepers.get("properties");
-//						MEnvSpaceInstance.setProperties(persp, props, fetcher);
+//						setProperties(persp, props, fetcher);
 //						
-//						oc.addPerspective((String)MEnvSpaceInstance.getProperty(sourcepers, "name"), persp);
+//						oc.addPerspective((String)getProperty(sourcepers, "name"), persp);
 //					}
 //					catch(Exception e)
 //					{
@@ -1098,8 +1104,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //		}
 //		
 //		// Create the environment executor.
-//		Map mse = (Map)MEnvSpaceInstance.getProperty(mspacetype.getProperties(), "spaceexecutor");
-//		IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(mse, "expression");
+//		Map mse = (Map)getProperty(mspacetype.getProperties(), "spaceexecutor");
+//		IParsedExpression exp = (IParsedExpression)getProperty(mse, "expression");
 //		ISpaceExecutor exe = null;
 //		if(exp!=null)
 //		{
@@ -1107,9 +1113,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //		}
 //		else
 //		{
-//			exe = (ISpaceExecutor)((Class)MEnvSpaceInstance.getProperty(mse, "clazz")).newInstance();
+//			exe = (ISpaceExecutor)((Class)getProperty(mse, "clazz")).newInstance();
 //			List props = (List)mse.get("properties");
-//			MEnvSpaceInstance.setProperties(exe, props, fetcher);
+//			setProperties(exe, props, fetcher);
 //		}
 //		if(exe!=null)
 //			exe.start();			
@@ -1118,9 +1124,27 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	//-------- methods --------
 	
 	/**
+	 *  Get the name.
+	 *  @return the name.
+	 */
+	public String getName()
+	{
+		return name;
+	}
+	
+	/**
+	 *  Set the name.
+	 *  @param name The name to set.
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	/**
 	 *  Add a space type.
 	 *  @param typename The type name.
-	 *  @param properties The MobjectType.
+	 *  @param initproperties The MobjectType.
 	 */
 	public void addSpaceObjectType(String typename, IPropertyMetaDataSet mobjecttype)
 	{
@@ -1287,7 +1311,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/**
 	 *  Remove an object task.
 	 *  @param typename The type name.
-	 *  @param properties The properties.
+	 *  @param initproperties The properties.
 	 */
 	public void removeObjectTask(Object taskid, Object objectid)
 	{
@@ -1464,7 +1488,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/** 
 	 * Creates an object in this space.
 	 * @param type the object's type
-	 * @param properties initial properties (may be null)
+	 * @param initproperties initial properties (may be null)
 	 * @param tasks initial task list (may be null)
 	 * @param listeners initial listeners (may be null)
 	 * @return the object's ID
@@ -1501,8 +1525,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 						viewargs.put("space", this);
 						viewargs.put("object", ret);
 						
-						IDataView	view	= (IDataView)((IObjectCreator)MEnvSpaceInstance.getProperty(sourceview, "creator")).createObject(viewargs);
-						addDataView((String)MEnvSpaceInstance.getProperty(sourceview, "name")+"_"+ret.getId(), view);
+						IDataView	view	= (IDataView)((IObjectCreator)MEnvSpaceType.getProperty(sourceview, "creator")).createObject(viewargs);
+						addDataView((String)MEnvSpaceType.getProperty(sourceview, "name")+"_"+ret.getId(), view);
 					}
 					catch(Exception e)
 					{
@@ -1539,7 +1563,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 						{
 							final String filename = (String)result;
 							
-							SServiceProvider.getServiceUpwards(ia.getServiceContainer(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+							SServiceProvider.getServiceUpwards(exta.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
@@ -1740,7 +1764,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				for(Iterator it=dataviewmappings.getCollection(objecttype).iterator(); it.hasNext(); )
 				{
 					Map	sourceview	= (Map)it.next();
-					removeDataView((String)MEnvSpaceInstance.getProperty(sourceview, "name")+"_"+id);
+					removeDataView((String)MEnvSpaceType.getProperty(sourceview, "name")+"_"+id);
 				}
 			}
 		}
@@ -2072,7 +2096,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			String	componenttype	= owner.getLocalType();
 			if(componenttype==null && fullname!=null)
 			{
-				SubcomponentTypeInfo[] atypes = ia.getModel().getSubcomponentTypes();
+				SubcomponentTypeInfo[] atypes = exta.getModel().getSubcomponentTypes();
 				for(int i=0; i<atypes.length; i++)
 				{
 					String tmp = atypes[i].getFilename().replace('/', '.');
@@ -2425,36 +2449,28 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 */
 	public IExternalAccess getExternalAccess()
 	{
-		return ia.getExternalAccess();
+		return exta;
 	}
 	
-	/**
-	 *  Terminate the space.
-	 */
-	public void terminate()
-	{
-		
-	}
-
-	/**
-	 * Returns a property.
-	 * @param name name of the property
-	 * @return the property
-	 */
-	public Object getProperty(String name)
-	{
-		synchronized(monitor)
-		{
-			Object ret = super.getProperty(name);
-			
-			if(ret instanceof IParsedExpression)
-			{
-				ret = ((IParsedExpression) ret).getValue(getFetcher());
-			}
-			
-			return ret;
-		}
-	}
+//	/**
+//	 * Returns a property.
+//	 * @param name name of the property
+//	 * @return the property
+//	 */
+//	public Object getProperty(String name)
+//	{
+//		synchronized(monitor)
+//		{
+//			Object ret = super.getProperty(name);
+//			
+//			if(ret instanceof IParsedExpression)
+//			{
+//				ret = ((IParsedExpression) ret).getValue(getFetcher());
+//			}
+//			
+//			return ret;
+//		}
+//	}
 	
 	/**
 	 *  Get the value fetcher.
@@ -2660,5 +2676,88 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	public Collection getDataConsumers()
 	{
 		return dataconsumers.values();
+	}
+	
+	/**
+	 *  Initialize the extension.
+	 *  Called once, when the extension is created.
+	 */
+	public IFuture init(IExternalAccess exta, IValueFetcher fetcher)
+	{
+		final Future ret = new Future();
+		
+//		System.out.println("init space: "+ia);
+		
+		try
+		{
+//			space = (ISpace)getClazz().newInstance();
+			initSpace(exta, fetcher);
+			
+			exta.scheduleStep(new IComponentStep()
+			{
+				public Object execute(IInternalAccess ia)
+				{
+					ia.addComponentListener(new IComponentListener()
+					{
+						IFilter filter = new IFilter()
+						{
+							public boolean filter(Object obj)
+							{
+								IComponentChangeEvent event = (IComponentChangeEvent)obj;
+								return event.getSourceCategory().equals(StatelessAbstractInterpreter.TYPE_COMPONENT);
+							}
+						};
+						public IFilter getFilter()
+						{
+							return filter;
+						}
+						
+						public IFuture eventOccured(IComponentChangeEvent cce)
+						{
+							if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_CREATION))
+							{
+//								System.out.println("add: "+cce.getDetails());
+								componentAdded((IComponentDescription)cce.getDetails());
+							}
+							else if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_DISPOSAL))
+							{
+//								System.out.println("rem: "+cce.getComponent());
+								componentRemoved((IComponentDescription)cce.getDetails());
+							}
+							return IFuture.DONE;
+						}
+					});
+					return null;
+				}
+			}).addResultListener(new DelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+					ret.setResult(AbstractEnvironmentSpace.this);
+				}
+			});
+		}
+		catch(Exception e)
+		{
+			System.out.println("Exception while creating space: "+getName());
+			e.printStackTrace();
+			ret.setException(e);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Initialize the extension.
+	 *  Called once, when the extension is terminate.
+	 */
+	public IFuture terminate()
+	{
+		for(int i=0; i<observercenters.size(); i++)
+		{
+			ObserverCenter oc = (ObserverCenter)observercenters.get(i);
+			oc.dispose();
+		}
+		return IFuture.DONE;
 	}
 }

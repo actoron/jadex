@@ -32,7 +32,7 @@ public class LogEvent extends SimplePropertyObject
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		Map props = new HashMap(getProperties());
+		Map props = new HashMap(getInitProperties());
 		String et = (String) props.remove(EVENT_TYPE_PROPERTY);
 		if (et != null)
 		{

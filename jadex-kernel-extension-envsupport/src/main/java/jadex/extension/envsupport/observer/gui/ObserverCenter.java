@@ -757,7 +757,8 @@ public class ObserverCenter
 	 */
 	public void dispose()
 	{
-		plugintimer.stop();
+		if(plugintimer!=null)
+			plugintimer.stop();
 		
 		for (Iterator it = perspectives.values().iterator(); it.hasNext(); )
 		{

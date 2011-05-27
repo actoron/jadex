@@ -2,11 +2,13 @@ package jadex.extension.envsupport;
 
 import jadex.bridge.modelinfo.IExtensionType;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.commons.IPropertyObject;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.gui.SGUI;
 import jadex.extension.envsupport.dataview.IDataView;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.AvatarMapping;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.math.IVector2;
@@ -34,7 +36,6 @@ import jadex.xml.BasicTypeConverter;
 import jadex.xml.IAttributeConverter;
 import jadex.xml.IContext;
 import jadex.xml.IObjectObjectConverter;
-import jadex.xml.IPostProcessor;
 import jadex.xml.IStringObjectConverter;
 import jadex.xml.ISubObjectConverter;
 import jadex.xml.MappingInfo;
@@ -45,6 +46,7 @@ import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanAccessInfo;
+import jadex.xml.bean.IBeanObjectCreator;
 import jadex.xml.reader.ReadContext;
 
 import java.awt.Color;
@@ -193,7 +195,8 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "envspacetype")}), new ObjectInfo(MEnvSpaceType.class),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("property")), attypeconv),
+//			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("property")), attypeconv),
+			new AttributeInfo(new AccessInfo("class", "className")),
 			new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo("property")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
 			new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo("property")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
 			new AttributeInfo(new AccessInfo("depth", null, null, null, new BeanAccessInfo("property")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
@@ -319,7 +322,7 @@ public class MEnvSpaceType	extends MSpaceType
 				{
 					Map sourceview = (Map)args.get("sourceview");
 					IEnvironmentSpace space = (IEnvironmentSpace)args.get("space");
-					IDataView ret = (IDataView)((Class)MEnvSpaceInstance.getProperty(sourceview, "clazz")).newInstance();
+					IDataView ret = (IDataView)((Class)getProperty(sourceview, "clazz")).newInstance();
 					
 					Map	props	= null;
 					List lprops = (List)sourceview.get("properties");
@@ -329,7 +332,7 @@ public class MEnvSpaceType	extends MSpaceType
 						fetcher.setValue("$space", space);
 						fetcher.setValue("$object", args.get("object"));
 						fetcher.setValue("$view", args.get(ret));
-						props = MEnvSpaceInstance.convertProperties(lprops, fetcher);
+						props = convertProperties(lprops, fetcher);
 					}
 					
 					ret.init(space, props);
@@ -355,29 +358,29 @@ public class MEnvSpaceType	extends MSpaceType
 					IValueFetcher fetcher = (IValueFetcher)args.get("fetcher");
 					args = (Map)args.get("object");
 					
-					IPerspective ret = (IPerspective)((Class)MEnvSpaceInstance.getProperty(args, "clazz")).newInstance();
-					boolean opengl = MEnvSpaceInstance.getProperty(args, "opengl")!=null? 
-						((Boolean)MEnvSpaceInstance.getProperty(args, "opengl")).booleanValue(): true;
+					IPerspective ret = (IPerspective)((Class)getProperty(args, "clazz")).newInstance();
+					boolean opengl = getProperty(args, "opengl")!=null? 
+						((Boolean)getProperty(args, "opengl")).booleanValue(): true;
 					ret.setOpenGl(opengl);
-//					String name = (String)MEnvSpaceInstance.getProperty(args, "name");
+//					String name = (String)getProperty(args, "name");
 //					System.out.println("Perspective: "+name+" using opengl="+opengl);
 					
 					// Hack!!!
 					if(ret instanceof Perspective2D)
 					{
 						Perspective2D pers = (Perspective2D)ret;
-						Boolean invertx = (Boolean)MEnvSpaceInstance.getProperty(args, "invertxaxis");
+						Boolean invertx = (Boolean)getProperty(args, "invertxaxis");
 						pers.setInvertYAxis(invertx.booleanValue());
-						Boolean inverty = (Boolean)MEnvSpaceInstance.getProperty(args, "invertyaxis");
+						Boolean inverty = (Boolean)getProperty(args, "invertyaxis");
 						pers.setInvertYAxis(inverty.booleanValue());
 						
-						pers.setBackground((Color)MEnvSpaceInstance.getProperty(args, "bgcolor"));
+						pers.setBackground((Color)getProperty(args, "bgcolor"));
 						
-						String	placement	= (String)MEnvSpaceInstance.getProperty(args, "objectplacement");
+						String	placement	= (String)getProperty(args, "objectplacement");
 						if(OBJECTPLACEMENT_CENTER.equals(placement))
 							pers.setObjectShift(new Vector2Double(0.5));
 						
-						Double zoomlimit = (Double)MEnvSpaceInstance.getProperty(args, "zoomlimit");
+						Double zoomlimit = (Double)getProperty(args, "zoomlimit");
 						if(zoomlimit != null)
 							pers.setZoomLimit(zoomlimit.doubleValue());
 					}
@@ -391,8 +394,8 @@ public class MEnvSpaceType	extends MSpaceType
 							Map tmp = new HashMap();
 							tmp.put("fetcher", fetcher);
 							tmp.put("object", sourcedrawable);
-							ret.addVisual(MEnvSpaceInstance.getProperty(sourcedrawable, "objecttype"), 
-								((IObjectCreator)MEnvSpaceInstance.getProperty(sourcedrawable, "creator")).createObject(tmp));
+							ret.addVisual(getProperty(sourcedrawable, "objecttype"), 
+								((IObjectCreator)getProperty(sourcedrawable, "creator")).createObject(tmp));
 						}
 					}
 					
@@ -404,7 +407,7 @@ public class MEnvSpaceType	extends MSpaceType
 						{
 							Map layer = (Map)prelayers.get(k);
 //							System.out.println("prelayer: "+layer);
-							targetprelayers.add(((IObjectCreator)MEnvSpaceInstance.getProperty(layer, "creator")).createObject(layer));
+							targetprelayers.add(((IObjectCreator)getProperty(layer, "creator")).createObject(layer));
 						}
 						((Perspective2D) ret).setPrelayers((Layer[]) targetprelayers.toArray(new Layer[0]));
 					}
@@ -417,7 +420,7 @@ public class MEnvSpaceType	extends MSpaceType
 						{
 							Map layer = (Map)postlayers.get(k);
 //							System.out.println("postlayer: "+layer);
-							targetpostlayers.add(((IObjectCreator)MEnvSpaceInstance.getProperty(layer, "creator")).createObject(layer));
+							targetpostlayers.add(((IObjectCreator)getProperty(layer, "creator")).createObject(layer));
 						}
 						((Perspective2D) ret).setPostlayers((Layer[]) targetpostlayers.toArray(new Layer[0]));
 					}
@@ -455,25 +458,25 @@ public class MEnvSpaceType	extends MSpaceType
 				{
 					IValueFetcher fetcher = (IValueFetcher)args.get("fetcher");
 					args = (Map)args.get("object");
-					Object position = MEnvSpaceInstance.getProperty(args, "position");
+					Object position = getProperty(args, "position");
 					if(position==null)
 					{
-						position = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "x"),
-							(Double)MEnvSpaceInstance.getProperty(args, "y"));
+						position = Vector2Double.getVector2((Double)getProperty(args, "x"),
+							(Double)getProperty(args, "y"));
 					}				
-					Object rotation = MEnvSpaceInstance.getProperty(args, "rotation");
+					Object rotation = getProperty(args, "rotation");
 					if(rotation==null)
 					{
-						Double rx = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
-						Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatey");
-						Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatez");
+						Double rx = (Double)getProperty(args, "rotatex");
+						Double ry = (Double)getProperty(args, "rotatey");
+						Double rz = (Double)getProperty(args, "rotatez");
 						rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
 					}
-					Object size = MEnvSpaceInstance.getProperty(args, "size");
+					Object size = getProperty(args, "size");
 					if(size==null)
 					{
-						size = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
-							(Double)MEnvSpaceInstance.getProperty(args, "height"));
+						size = Vector2Double.getVector2((Double)getProperty(args, "width"),
+							(Double)getProperty(args, "height"));
 					}
 					DrawableCombiner ret = new DrawableCombiner(position, rotation, size);
 					
@@ -483,13 +486,13 @@ public class MEnvSpaceType	extends MSpaceType
 						for(int l=0; l<parts.size(); l++)
 						{
 							Map sourcepart = (Map)parts.get(l);
-							int layer = MEnvSpaceInstance.getProperty(sourcepart, "layer")!=null? ((Integer)MEnvSpaceInstance.getProperty(sourcepart, "layer")).intValue(): 0;
-							ret.addPrimitive((Primitive)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcepart, "creator")).createObject(sourcepart), layer);
+							int layer = getProperty(sourcepart, "layer")!=null? ((Integer)getProperty(sourcepart, "layer")).intValue(): 0;
+							ret.addPrimitive((Primitive)((IObjectCreator)getProperty(sourcepart, "creator")).createObject(sourcepart), layer);
 						}
 					}
 					
 					List props = (List)args.get("properties");
-					MEnvSpaceInstance.setProperties(ret, props, fetcher);
+					setProperties(ret, props, fetcher);
 					
 					return ret;
 				}
@@ -527,32 +530,32 @@ public class MEnvSpaceType	extends MSpaceType
 			{
 				public Object createObject(Map args) throws Exception
 				{
-					Object position = MEnvSpaceInstance.getProperty(args, "position");
+					Object position = getProperty(args, "position");
 					if(position==null)
 					{
-						position = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "x"),
-							(Double)MEnvSpaceInstance.getProperty(args, "y"));
+						position = Vector2Double.getVector2((Double)getProperty(args, "x"),
+							(Double)getProperty(args, "y"));
 					}				
-					Object rotation = MEnvSpaceInstance.getProperty(args, "rotation");
+					Object rotation = getProperty(args, "rotation");
 					if(rotation==null)
 					{
-						Double rx = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
-						Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatey");
-						Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatez");
+						Double rx = (Double)getProperty(args, "rotatex");
+						Double ry = (Double)getProperty(args, "rotatey");
+						Double rz = (Double)getProperty(args, "rotatez");
 						rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
 					}
-					Object size = MEnvSpaceInstance.getProperty(args, "size");
+					Object size = getProperty(args, "size");
 					if(size==null)
 					{
-						size = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
-							(Double)MEnvSpaceInstance.getProperty(args, "height"));
+						size = Vector2Double.getVector2((Double)getProperty(args, "width"),
+							(Double)getProperty(args, "height"));
 					}
-					int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
+					int absFlags = Boolean.TRUE.equals(getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+					absFlags |= Boolean.TRUE.equals(getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
+					absFlags |= Boolean.TRUE.equals(getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
 
-					IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-					return new TexturedRectangle(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), (String)MEnvSpaceInstance.getProperty(args, "imagepath"), exp);
+					IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
+					return new TexturedRectangle(position, rotation, size, absFlags, getProperty(args, "color"), (String)getProperty(args, "imagepath"), exp);
 				}
 			}, new BeanAccessInfo(AccessInfo.THIS)))
 			}, 
@@ -581,34 +584,34 @@ public class MEnvSpaceType	extends MSpaceType
 			{
 				public Object createObject(Map args) throws Exception
 				{
-					Object position = MEnvSpaceInstance.getProperty(args, "position");
+					Object position = getProperty(args, "position");
 					if(position==null)
 					{
-						position = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "x"),
-							(Double)MEnvSpaceInstance.getProperty(args, "y"));
+						position = Vector2Double.getVector2((Double)getProperty(args, "x"),
+							(Double)getProperty(args, "y"));
 					}				
-					Object rotation = MEnvSpaceInstance.getProperty(args, "rotation");
+					Object rotation = getProperty(args, "rotation");
 					if(rotation==null)
 					{
-						Double rx = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
-						Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatey");
-						Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatez");
+						Double rx = (Double)getProperty(args, "rotatex");
+						Double ry = (Double)getProperty(args, "rotatey");
+						Double rz = (Double)getProperty(args, "rotatez");
 						rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
 					}
-					Object size = MEnvSpaceInstance.getProperty(args, "size");
+					Object size = getProperty(args, "size");
 					if(size==null)
 					{
-						size = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
-							(Double)MEnvSpaceInstance.getProperty(args, "height"));
+						size = Vector2Double.getVector2((Double)getProperty(args, "width"),
+							(Double)getProperty(args, "height"));
 					}
 					
-					int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
+					int absFlags = Boolean.TRUE.equals(getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+					absFlags |= Boolean.TRUE.equals(getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
+					absFlags |= Boolean.TRUE.equals(getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
 					
-					IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-					return new Primitive(Primitive.PRIMITIVE_TYPE_TRIANGLE, position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
-					//return new Triangle(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
+					IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
+					return new Primitive(Primitive.PRIMITIVE_TYPE_TRIANGLE, position, rotation, size, absFlags, getProperty(args, "color"), exp);
+					//return new Triangle(position, rotation, size, absFlags, getProperty(args, "color"), exp);
 				}
 			}, new BeanAccessInfo(AccessInfo.THIS)))
 			},
@@ -637,33 +640,33 @@ public class MEnvSpaceType	extends MSpaceType
 			{
 				public Object createObject(Map args) throws Exception
 				{
-					Object position = MEnvSpaceInstance.getProperty(args, "position");
+					Object position = getProperty(args, "position");
 					if(position==null)
 					{
-						position = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "x"),
-							(Double)MEnvSpaceInstance.getProperty(args, "y"));
+						position = Vector2Double.getVector2((Double)getProperty(args, "x"),
+							(Double)getProperty(args, "y"));
 					}				
-					Object rotation = MEnvSpaceInstance.getProperty(args, "rotation");
+					Object rotation = getProperty(args, "rotation");
 					if(rotation==null)
 					{
-						Double rx = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
-						Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatey");
-						Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatez");
+						Double rx = (Double)getProperty(args, "rotatex");
+						Double ry = (Double)getProperty(args, "rotatey");
+						Double rz = (Double)getProperty(args, "rotatez");
 						rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
 					}
-					Object size = MEnvSpaceInstance.getProperty(args, "size");
+					Object size = getProperty(args, "size");
 					if(size==null)
 					{
-						size = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
-							(Double)MEnvSpaceInstance.getProperty(args, "height"));
+						size = Vector2Double.getVector2((Double)getProperty(args, "width"),
+							(Double)getProperty(args, "height"));
 					}
-					int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
+					int absFlags = Boolean.TRUE.equals(getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+					absFlags |= Boolean.TRUE.equals(getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
+					absFlags |= Boolean.TRUE.equals(getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
 					
-					IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-					return new Primitive(Primitive.PRIMITIVE_TYPE_RECTANGLE, position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
-					//return new Rectangle(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
+					IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
+					return new Primitive(Primitive.PRIMITIVE_TYPE_RECTANGLE, position, rotation, size, absFlags, getProperty(args, "color"), exp);
+					//return new Rectangle(position, rotation, size, absFlags, getProperty(args, "color"), exp);
 				}
 			}, new BeanAccessInfo(AccessInfo.THIS)))
 			},
@@ -693,36 +696,36 @@ public class MEnvSpaceType	extends MSpaceType
 			{
 				public Object createObject(Map args) throws Exception
 				{
-					Object position = MEnvSpaceInstance.getProperty(args, "position");
+					Object position = getProperty(args, "position");
 					if(position==null)
 					{
-						position = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "x"),
-							(Double)MEnvSpaceInstance.getProperty(args, "y"));
+						position = Vector2Double.getVector2((Double)getProperty(args, "x"),
+							(Double)getProperty(args, "y"));
 					}				
-					Object rotation = MEnvSpaceInstance.getProperty(args, "rotation");
+					Object rotation = getProperty(args, "rotation");
 					if(rotation==null)
 					{
-						Double rx = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
-						Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatey");
-						Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatez");
+						Double rx = (Double)getProperty(args, "rotatex");
+						Double ry = (Double)getProperty(args, "rotatey");
+						Double rz = (Double)getProperty(args, "rotatez");
 						rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
 					}
-					Object size = MEnvSpaceInstance.getProperty(args, "size");
+					Object size = getProperty(args, "size");
 					if(size==null)
 					{
-						size = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
-							(Double)MEnvSpaceInstance.getProperty(args, "height"));
+						size = Vector2Double.getVector2((Double)getProperty(args, "width"),
+							(Double)getProperty(args, "height"));
 					}
 					
-					int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
+					int absFlags = Boolean.TRUE.equals(getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+					absFlags |= Boolean.TRUE.equals(getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
+					absFlags |= Boolean.TRUE.equals(getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
 					
-					int vertices  = MEnvSpaceInstance.getProperty(args, "vertices")==null? 3: 
-						((Integer)MEnvSpaceInstance.getProperty(args, "vertices")).intValue();
+					int vertices  = getProperty(args, "vertices")==null? 3: 
+						((Integer)getProperty(args, "vertices")).intValue();
 					
-					IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-					return new RegularPolygon(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), vertices, exp);
+					IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
+					return new RegularPolygon(position, rotation, size, absFlags, getProperty(args, "color"), vertices, exp);
 				}
 			}, new BeanAccessInfo(AccessInfo.THIS)))
 			},
@@ -751,34 +754,34 @@ public class MEnvSpaceType	extends MSpaceType
 			{
 				public Object createObject(Map args) throws Exception
 				{
-					Object position = MEnvSpaceInstance.getProperty(args, "position");
+					Object position = getProperty(args, "position");
 					if(position==null)
 					{
-						position = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "x"),
-							(Double)MEnvSpaceInstance.getProperty(args, "y"));
+						position = Vector2Double.getVector2((Double)getProperty(args, "x"),
+							(Double)getProperty(args, "y"));
 					}				
-					Object rotation = MEnvSpaceInstance.getProperty(args, "rotation");
+					Object rotation = getProperty(args, "rotation");
 					if(rotation==null)
 					{
-						Double rx = (Double)MEnvSpaceInstance.getProperty(args, "rotatex");
-						Double ry = (Double)MEnvSpaceInstance.getProperty(args, "rotatey");
-						Double rz = (Double)MEnvSpaceInstance.getProperty(args, "rotatez");
+						Double rx = (Double)getProperty(args, "rotatex");
+						Double ry = (Double)getProperty(args, "rotatey");
+						Double rz = (Double)getProperty(args, "rotatez");
 						rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
 					}
-					Object size = MEnvSpaceInstance.getProperty(args, "size");
+					Object size = getProperty(args, "size");
 					if(size==null)
 					{
-						size = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
-							(Double)MEnvSpaceInstance.getProperty(args, "height"));
+						size = Vector2Double.getVector2((Double)getProperty(args, "width"),
+							(Double)getProperty(args, "height"));
 					}
 					
-					int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
+					int absFlags = Boolean.TRUE.equals(getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+					absFlags |= Boolean.TRUE.equals(getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
+					absFlags |= Boolean.TRUE.equals(getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
 					
-					IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-					return new Primitive(Primitive.PRIMITIVE_TYPE_ELLIPSE, position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
-					//return new Ellipse(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
+					IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
+					return new Primitive(Primitive.PRIMITIVE_TYPE_ELLIPSE, position, rotation, size, absFlags, getProperty(args, "color"), exp);
+					//return new Ellipse(position, rotation, size, absFlags, getProperty(args, "color"), exp);
 				}
 			}, new BeanAccessInfo(AccessInfo.THIS)))
 			},
@@ -804,49 +807,49 @@ public class MEnvSpaceType	extends MSpaceType
 			{
 				public Object createObject(Map args) throws Exception
 				{
-					Object position = MEnvSpaceInstance.getProperty(args, "position");
+					Object position = getProperty(args, "position");
 					if(position==null)
 					{
-						position = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "x"),
-							(Double)MEnvSpaceInstance.getProperty(args, "y"));
+						position = Vector2Double.getVector2((Double)getProperty(args, "x"),
+							(Double)getProperty(args, "y"));
 					}
 					
-					String fontname = (String) MEnvSpaceInstance.getProperty(args, "font");
+					String fontname = (String) getProperty(args, "font");
 					if(fontname==null)
 					{
 						fontname = "Default";
 					}
-					Integer fontstyle = (Integer) MEnvSpaceInstance.getProperty(args, "style");
+					Integer fontstyle = (Integer) getProperty(args, "style");
 					if (fontstyle==null)
 					{
 						fontstyle = new Integer(Font.PLAIN);
 					}
-					Integer fontsize = (Integer) MEnvSpaceInstance.getProperty(args, "size");
+					Integer fontsize = (Integer) getProperty(args, "size");
 					if (fontsize==null)
 					{
 						fontsize = new Integer(12);
 					}
 					Font font = new Font(fontname, fontstyle.intValue(), fontsize.intValue());
 					
-					String text = (String) MEnvSpaceInstance.getProperty(args, "text");
+					String text = (String) getProperty(args, "text");
 					text = String.valueOf(text);
 					
 					// Hack! Upstream needs to provide _proper_ newlines not a \n literal
 					// Attributes are probably not the right place for text...
 					text = text.replaceAll("\\\\n", "\n").replaceAll("\\\\\\\\", "\\");
 					
-					String aligntxt = String.valueOf(MEnvSpaceInstance.getProperty(args, "align"));
+					String aligntxt = String.valueOf(getProperty(args, "align"));
 					int align = Text.ALIGN_LEFT;
 					if (aligntxt.equals("right"))
 						align = Text.ALIGN_RIGHT;
 					else if (aligntxt.equals("center"))
 						align = Text.ALIGN_CENTER;
 					
-					int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
+					int absFlags = Boolean.TRUE.equals(getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+					absFlags |= Boolean.TRUE.equals(getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
 					
-					IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-					return new Text(position, font, (Color)MEnvSpaceInstance.getProperty(args, "color"), text, align, absFlags, exp);
+					IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
+					return new Text(position, font, (Color)getProperty(args, "color"), text, align, absFlags, exp);
 				}
 			}, new BeanAccessInfo(AccessInfo.THIS)))
 			},
@@ -864,9 +867,9 @@ public class MEnvSpaceType	extends MSpaceType
 			{
 				public Object createObject(Map args) throws Exception
 				{
-					IVector2 size = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
-							(Double)MEnvSpaceInstance.getProperty(args, "height"));
-					return new GridLayer(size, MEnvSpaceInstance.getProperty(args, "color"));
+					IVector2 size = Vector2Double.getVector2((Double)getProperty(args, "width"),
+							(Double)getProperty(args, "height"));
+					return new GridLayer(size, getProperty(args, "color"));
 				}
 			}, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
@@ -882,9 +885,9 @@ public class MEnvSpaceType	extends MSpaceType
 			{
 				public Object createObject(Map args) throws Exception
 				{
-					IVector2 size = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
-						(Double)MEnvSpaceInstance.getProperty(args, "height"));
-					return new TiledLayer(size, MEnvSpaceInstance.getProperty(args, "color"), (String)MEnvSpaceInstance.getProperty(args, "imagepath"));
+					IVector2 size = Vector2Double.getVector2((Double)getProperty(args, "width"),
+						(Double)getProperty(args, "height"));
+					return new TiledLayer(size, getProperty(args, "color"), (String)getProperty(args, "imagepath"));
 				}
 			}, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
@@ -897,7 +900,7 @@ public class MEnvSpaceType	extends MSpaceType
 			{
 				public Object createObject(Map args) throws Exception
 				{
-					return new Layer(Layer.LAYER_TYPE_COLOR, MEnvSpaceInstance.getProperty(args, "color"));
+					return new Layer(Layer.LAYER_TYPE_COLOR, getProperty(args, "color"));
 				}
 			}, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
@@ -1060,47 +1063,46 @@ public class MEnvSpaceType	extends MSpaceType
 		// type instance declarations.
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "envspace")}), 
-			new ObjectInfo(MEnvSpaceInstance.class, new IPostProcessor()
+			new ObjectInfo(new IBeanObjectCreator()
 			{
-				public Object postProcess(IContext context, Object object)
+				public Object createObject(IContext context, Map rawattributes) throws Exception
 				{
-					MSpaceInstance	si	= (MSpaceInstance)object;
-					IModelInfo apptype	= (IModelInfo)context.getRootObject();
+					AbstractEnvironmentSpace ret = null;
+					String typename = (String)rawattributes.get("type");
+					IModelInfo mi = (IModelInfo)context.getRootObject();
 					
-					IExtensionType[] spacetypes = apptype.getExtensionTypes();
+					IExtensionType[] spacetypes = mi.getExtensionTypes();
 					for(int i=0; i<spacetypes.length; i++)
 					{
-						if(spacetypes[i].getName().equals(si.getTypeName()))
+						if(spacetypes[i].getName().equals(typename))
 						{
-							si.setType((MSpaceType)spacetypes[i]);
+							String classname = spacetypes[i].getClassName();
+							Class clazz = SReflect.findClass(classname, mi.getAllImports(), mi.getClassLoader());
+							ret = (AbstractEnvironmentSpace)clazz.newInstance();
+							ret.setType((MSpaceType)spacetypes[i]);
 							break;
 						}
 					}
-					return null;
-				}
-				
-				public int getPass()
-				{
-					return 1;
+					return ret;
 				}
 			}),
 			new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("type", "typeName")),
-			new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo("property")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo("property")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("depth", null, null, null, new BeanAccessInfo("property")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("border", null, null, null, new BeanAccessInfo("property"))),
-			new AttributeInfo(new AccessInfo("neighborhood", null, null, null, new BeanAccessInfo("property")))
+			new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo("initProperty")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo("initProperty")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("depth", null, null, null, new BeanAccessInfo("initProperty")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("border", null, null, null, new BeanAccessInfo("initProperty"))),
+			new AttributeInfo(new AccessInfo("neighborhood", null, null, null, new BeanAccessInfo("initProperty")))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "property"), "properties", null, null, new BeanAccessInfo("property"))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "object"), "objects", null, null, new BeanAccessInfo("property"))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "avatar"), "avatars", null, null, new BeanAccessInfo("property"))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "process"), "processes", null, null, new BeanAccessInfo("property"))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "spaceaction"), "spaceactions", null, null, new BeanAccessInfo("property"))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "dataprovider"), "dataproviders", null, null, new BeanAccessInfo("property"))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "dataconsumer"), "dataconsumers", null, null, new BeanAccessInfo("property"))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "observer"), "observers", null, null, new BeanAccessInfo("property")))			
+			new SubobjectInfo(new AccessInfo(new QName(uri, "property"), "properties", null, null, new BeanAccessInfo("initProperty"))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "object"), "objects", null, null, new BeanAccessInfo("initProperty"))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "avatar"), "avatars", null, null, new BeanAccessInfo("initProperty"))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "process"), "processes", null, null, new BeanAccessInfo("initProperty"))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "spaceaction"), "spaceactions", null, null, new BeanAccessInfo("initProperty"))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "dataprovider"), "dataproviders", null, null, new BeanAccessInfo("initProperty"))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "dataconsumer"), "dataconsumers", null, null, new BeanAccessInfo("initProperty"))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "observer"), "observers", null, null, new BeanAccessInfo("initProperty")))			
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "object")}), new ObjectInfo(MultiCollection.class),
@@ -1387,5 +1389,75 @@ public class MEnvSpaceType	extends MSpaceType
 			pos	= " (line 0, column 0)";			
 		}
 		report.put(stack, error+pos);
+	}
+	
+	/**
+	 *  Set properties on a IPropertyObject.
+	 *  @param object The IPropertyObject.
+	 *  @param properties A list properties (containing maps with "name", "value" keys).
+	 *  @param fetcher The fetcher for parsing the Java expression (can provide
+	 *  predefined values to the expression)
+	 */
+	public static void setProperties(IPropertyObject object, List properties, IValueFetcher fetcher)
+	{
+		if(properties!=null)
+		{
+			for(int i=0; i<properties.size(); i++)
+			{
+				Map prop = (Map)properties.get(i);
+				IParsedExpression exp = (IParsedExpression)prop.get("value");
+				boolean dyn = ((Boolean)prop.get("dynamic")).booleanValue();
+				if(dyn)
+					object.setProperty((String)prop.get("name"), exp);
+				else
+					object.setProperty((String)prop.get("name"), exp==null? null: exp.getValue(fetcher));
+			}
+		}
+	}
+	
+	/**
+	 *  Set properties on a map.
+	 *  @param properties A list properties (containing maps with "name", "value" keys).
+	 *  @param fetcher The fetcher for parsing the Java expression (can provide
+	 *  predefined values to the expression)
+	 */
+	public static Map convertProperties(List properties, IValueFetcher fetcher)
+	{
+		HashMap ret = null;
+		if(properties!=null)
+		{
+			ret = new HashMap();
+			for(int i=0; i<properties.size(); i++)
+			{
+				Map prop = (Map)properties.get(i);
+				IParsedExpression exp = (IParsedExpression)prop.get("value");
+				boolean dyn = ((Boolean)prop.get("dynamic")).booleanValue();
+				if(dyn)
+					ret.put((String)prop.get("name"), exp);
+				else
+					ret.put((String)prop.get("name"), exp==null? null: exp.getValue(fetcher));
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get a property from a (multi)map.
+	 *  @param map The map.
+	 *  @param name The name.
+	 *  @return The property.
+	 */
+	public static Object getProperty(Map map, String name)
+	{
+		try
+		{
+		Object tmp = map.get(name);
+		return (tmp instanceof List)? ((List)tmp).get(0): tmp; 
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 	}
 }

@@ -129,13 +129,37 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	/**
 	 *  Can be called concurrently (also during executeAction()).
 	 *   
-	 *  Request component to cleanup itself after kill.
+	 *  Request component to kill itself.
 	 *  The component might perform arbitrary cleanup activities during which executeAction()
 	 *  will still be called as usual.
 	 *  Can be called concurrently (also during executeAction()).
-	 *  @return When cleanup of the component is finished, the future is notified.
+	 *  @param listener	When cleanup of the component is finished, the listener must be notified.
 	 */
-	public abstract IFuture cleanupComponent();
+	public IFuture cleanupComponent()
+	{
+		final Future ret = new Future();
+
+		ComponentChangeEvent.dispatchTerminatingEvent(getComponentAdapter(), getModel(), getServiceProvider(), getInternalComponentListeners(), null);
+		
+		removeExtensions().addResultListener(createResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				ComponentChangeEvent.dispatchTerminatedEvent(getComponentAdapter(), getModel(), getServiceProvider(), getInternalComponentListeners(), ret);
+
+//				getComponentAdapter().invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+//					}
+//				});
+				super.customResultAvailable(result);
+			}
+		}));
+		
+		return ret;
+//		return adapter.getServiceContainer().shutdown(); // done in adapter
+	}
 	
 	/**
 	 *  Called when a component has been created as a subcomponent of this component.
@@ -174,11 +198,17 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	public abstract IFuture scheduleStep(IComponentStep step);
 	
 	/**
-	 *  Get a space of the application.
+	 *  Get a space of the component.
 	 *  @param name	The name of the space.
 	 *  @return	The space.
 	 */
-	public abstract Object getExtension(final String name);
+	public abstract IExtensionInstance getExtension(final String name);
+	
+	/**
+	 *  Get all spaces of the component.
+	 *  @return	The spaces.
+	 */
+	public abstract IExtensionInstance[] getExtensions();
 
 	//-------- internally used methods --------
 	
@@ -232,13 +262,19 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  Add an extension instance.
 	 *  @param extension The extension instance.
 	 */
-	public abstract void addExtension(String name, Object extension);
+	public abstract void addExtension(IExtensionInstance extension);
 	
 	/**
 	 *  Get the component listeners.
 	 *  @return The component listeners.
 	 */
 	public abstract IComponentListener[] getComponentListeners();
+	
+	/**
+	 *  Get the component listeners.
+	 *  @return The component listeners.
+	 */
+	public abstract Collection getInternalComponentListeners();
 	
 	/**
 	 *  Remove component listener.
@@ -314,7 +350,16 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			}
 		}));
 		
-		return ret;
+		final Future iret = new Future();
+		ret.addResultListener(new DelegationResultListener(iret)
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				removeExtensions().addResultListener(new DelegationResultListener(iret));
+			}
+		});
+		
+		return iret;
 	}
 	
 	/**
@@ -513,8 +558,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					
 					for(Iterator it = res.iterator(); it.hasNext(); )
 					{
-						Object[] ext = (Object[])it.next();
-						addExtension((String)ext[0], ext[1]);
+						IExtensionInstance ext = (IExtensionInstance)it.next();
+						addExtension(ext);
 					}
 					
 					super.customResultAvailable(null);
@@ -523,7 +568,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			
 			for(int i=0; i<exts.length; i++)
 			{
-				exts[i].init(getInternalAccess(), getFetcher()).addResultListener(lis);	
+				exts[i].init(getExternalAccess(), getFetcher()).addResultListener(lis);	
 			}
 		}
 		else
@@ -531,6 +576,39 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			ret.setResult(null);
 		}
 		
+		return ret;
+	}
+	
+	/**
+	 *  Terminate all extension.
+	 */
+	public IFuture removeExtensions()
+	{
+		Future ret = new Future();
+		IExtensionInstance[] exts = getExtensions();
+		CounterResultListener lis = new CounterResultListener(exts.length, true, new DelegationResultListener(ret));
+		for(int i=0; i<exts.length; i++)
+		{
+			removeExtension(exts[i].getName()).addResultListener(lis);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Terminate all extension.
+	 */
+	public IFuture removeExtension(String name)
+	{
+		Future ret = new Future();
+		IExtensionInstance ext = getExtension(name);
+		if(ext!=null)
+		{
+			ext.terminate().addResultListener(createResultListener(new DelegationResultListener(ret)));
+		}
+		else
+		{
+			ret.setException(new RuntimeException("Unknown extension: "+name));
+		}
 		return ret;
 	}
 		

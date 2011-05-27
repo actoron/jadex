@@ -5,6 +5,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IFilter;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
@@ -25,6 +26,12 @@ import java.util.Set;
 public class FireflyAgent extends MicroAgent
 {
 	//-------- methods --------
+
+	public IFuture agentCreated()
+	{
+		throw new RuntimeException();
+//		return super.agentCreated();
+	}
 	
 	/**
 	 *  Execute an agent step.
