@@ -25,6 +25,7 @@ public class DefaultActivityHandler implements IActivityHandler
 	{
 		doExecute(activity, instance, thread);
 		instance.getStepHandler(activity).step(activity, instance, thread, null);
+//		return thread;
 	}
 	
 	/**

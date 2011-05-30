@@ -23,6 +23,9 @@ import java.util.StringTokenizer;
  */
 public class GatewayParallelActivityHandler implements IActivityHandler
 {
+	/** The split id counter. */
+	protected int splitidcnt;
+	
 	/**
 	 *  Execute an activity.
 	 *  @param activity	The activity to execute.
@@ -37,16 +40,20 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 		// Split
 		if(incoming!=null && incoming.size()==1 && outgoing!=null && outgoing.size()>1)
 		{
+			int splitid = getNextSplitId();
+			
 			for(int i=0; i<outgoing.size(); i++)
 			{
 				if(i==0)
 				{
 					thread.setLastEdge((MSequenceEdge)outgoing.get(i));
+					thread.pushSplitInfo(splitid, outgoing.size());
 				}
 				else
 				{
 					ProcessThread	newthread	= thread.createCopy();
 					newthread.setLastEdge((MSequenceEdge)outgoing.get(i));
+					newthread.pushSplitInfo(splitid, outgoing.size());
 					thread.getThreadContext().addThread(newthread);
 //					instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_ADDED, newthread);
 					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
@@ -67,7 +74,7 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 			for(Iterator it=thread.getThreadContext().getThreads().iterator(); !edges.isEmpty() && it.hasNext(); )
 			{
 				ProcessThread oldthread	= (ProcessThread)it.next();
-				if(edges.contains(oldthread.getLastEdge()))
+				if(oldthread.getSplitId()==thread.getSplitId() && edges.contains(oldthread.getLastEdge()))
 				{
 					threads.add(oldthread);
 					edges.remove(oldthread.getLastEdge());
@@ -76,6 +83,27 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 			
 			if(edges.isEmpty())
 			{
+				// Find surviving thread (incoming thread has deepest stack).
+				ProcessThread tmp = thread;
+				for(Iterator it=threads.iterator(); it.hasNext(); )
+				{
+					ProcessThread pt = (ProcessThread)it.next();
+					if(pt.getSplitDepth()>tmp.getSplitDepth())
+					{
+						tmp = pt;
+					}
+				}
+				if(!tmp.equals(thread))
+				{
+					thread.setSplitInfos(tmp.getSplitInfos());
+//					threads.remove(tmp);
+//					threads.add(thread);
+//					thread = tmp;
+				}
+				
+				// Reset split settings.
+				thread.popSplitInfo();
+				
 				Set	ignore	= null;
 				if(thread.hasPropertyValue("ignore"))
 				{
@@ -91,9 +119,11 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 				}
 				
 				thread.setLastEdge((MSequenceEdge)outgoing.get(0));
+				
 				for(Iterator it=threads.iterator(); it.hasNext(); )
 				{
 					ProcessThread pt = (ProcessThread)it.next();
+					pt.popSplitInfo();
 					
 					Map data = pt.getData();
 					if(data!=null)
@@ -136,7 +166,6 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 				thread.setWaiting(true);
 			}
 		}
-		
 		else
 		{
 			throw new UnsupportedOperationException("Invalid number of edges for parallel split/join: "+activity+", "+instance);
@@ -152,6 +181,14 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 	 */
 	public void cancel(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
+	}
+	
+	/**
+	 *  Get next split id.
+	 */
+	protected int getNextSplitId()
+	{
+		return ++splitidcnt;
 	}
 
 }

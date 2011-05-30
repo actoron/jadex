@@ -83,8 +83,7 @@ public class GatewayORActivityHandler implements IActivityHandler
 			for(int i=0; i<threads.size(); i++)
 			{
 				ProcessThread pt = (ProcessThread)threads.get(i);
-				pt.setSplitId(splitid);
-				pt.setSplitCount(threads.size());
+				pt.pushSplitInfo(splitid, threads.size());
 			}
 		}
 		
@@ -109,9 +108,26 @@ public class GatewayORActivityHandler implements IActivityHandler
 			
 			if(threads.size()==thread.getSplitCount()-1)
 			{
+				// Find surviving thread (incoming thread has deepest stack).
+				ProcessThread tmp = thread;
+				for(Iterator it=threads.iterator(); it.hasNext(); )
+				{
+					ProcessThread pt = (ProcessThread)it.next();
+					if(pt.getSplitDepth()>tmp.getSplitDepth())
+					{
+						tmp = pt;
+					}
+				}
+				if(!tmp.equals(thread))
+				{
+					thread.setSplitInfos(tmp.getSplitInfos());
+//					threads.remove(tmp);
+//					threads.add(thread);
+//					thread = tmp;
+				}
+				
 				// Reset split settings.
-				thread.setSplitCount(0);
-				thread.setSplitId(0);
+				thread.popSplitInfo();
 				
 				// Handle parameter merging of incoming values.
 				Set	ignore	= null;
@@ -132,6 +148,7 @@ public class GatewayORActivityHandler implements IActivityHandler
 				for(Iterator it=threads.iterator(); it.hasNext(); )
 				{
 					ProcessThread pt = (ProcessThread)it.next();
+					pt.popSplitInfo();
 					
 					Map data = pt.getData();
 					if(data!=null)
@@ -174,11 +191,11 @@ public class GatewayORActivityHandler implements IActivityHandler
 				thread.setWaiting(true);
 			}
 		}
-		
 		else
 		{
 			throw new UnsupportedOperationException("Invalid number of edges for parallel split/join: "+activity+", "+instance);
 		}
+		
 	}
 	
 	/**

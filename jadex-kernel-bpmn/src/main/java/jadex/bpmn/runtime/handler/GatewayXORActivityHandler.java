@@ -67,7 +67,6 @@ public class GatewayXORActivityHandler implements IActivityHandler
 			// Only one thread arrives.
 			thread.setLastEdge((MSequenceEdge)outgoing.get(0));
 		}
-		
 		else
 		{
 			throw new UnsupportedOperationException("Invalid number of edges for xor split/join: "+activity+", "+instance);

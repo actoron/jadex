@@ -813,6 +813,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 			
 //			System.out.println("Step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+thread.getActivity()+" "+thread);
 			MActivity act = thread.getActivity();
+//			thread = handler.execute(act, this, thread);
 			handler.execute(act, this, thread);
 	
 			// Moved to StepHandler

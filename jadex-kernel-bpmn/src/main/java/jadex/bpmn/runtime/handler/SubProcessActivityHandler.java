@@ -255,6 +255,5 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 		{
 			throw new RuntimeException("External subprocess may not have inner activities: "+activity+", "+instance);
 		}
-		
 	}
 }

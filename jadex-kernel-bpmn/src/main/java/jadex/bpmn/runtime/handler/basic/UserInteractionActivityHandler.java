@@ -60,7 +60,6 @@ public class UserInteractionActivityHandler extends DefaultActivityHandler
 		
 		frame.pack();
 		frame.setVisible(true);
-		
 	}
 	
 }

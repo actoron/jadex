@@ -88,11 +88,8 @@ public class ProcessThread	implements ITaskContext
 	/** The id counter for sub processes. */
 	public int	idcnt;
 	
-	/** The split id. */
-	public int splitid;
-	
-	/** The split number of threads. */
-	public int splitcnt;
+	/** The split info stack (splitid, threadnumber). */
+	public List splitinfos;
 	
 	//-------- constructors --------
 
@@ -702,42 +699,78 @@ public class ProcessThread	implements ITaskContext
 		}
 	}
 	
-	
+	/**
+	 *  Set the split infos.
+	 */
+	public void setSplitInfos(List splitinfos)
+	{
+		this.splitinfos = splitinfos!=null? new ArrayList(splitinfos): null;
+	}
 	
 	/**
-	 *  Get the splitid.
-	 *  @return the splitid.
+	 *  Get the split infos.
 	 */
-	public int getSplitId()
+	public List getSplitInfos()
 	{
-		return splitid;
+		return splitinfos;
 	}
-
+	
 	/**
 	 *  Set the splitid.
 	 *  @param splitid The splitid to set.
 	 */
-	public void setSplitId(int splitid)
+	public void pushSplitInfo(int splitid, int splitcount)
 	{
-		this.splitid = splitid;
+		if(splitinfos==null)
+			splitinfos = new ArrayList();
+//		System.out.println("push: "+getId()+" "+splitinfos);
+		splitinfos.add(new int[]{splitid, splitcount});
 	}
 
 	/**
-	 *  Get the splitcnt.
-	 *  @return the splitcnt.
+	 *  Remove the split info.
+	 *  @return The split info.
+	 */
+	public int[] popSplitInfo()
+	{
+//		System.out.println("pop: "+getId()+" "+splitinfos);
+		return (int[])splitinfos.remove(splitinfos.size()-1);
+	}
+	
+	/**
+	 *  Get the topmost split info.
+	 *  @return The split info.
+	 */
+	public int[] peakSplitInfo()
+	{
+		return (int[])splitinfos.get(splitinfos.size()-1);
+	}
+	
+	/**
+	 *  Get the current split id.
+	 *  @return The split id.
+	 */
+	public int getSplitId()
+	{
+		return splitinfos==null? 0: ((int[])splitinfos.get(splitinfos.size()-1))[0];
+	}
+	
+	/**
+	 *  Get the current split count.
+	 *  @return The split count.
 	 */
 	public int getSplitCount()
 	{
-		return splitcnt;
+		return splitinfos==null? 0: ((int[])splitinfos.get(splitinfos.size()-1))[1];
 	}
-
+	
 	/**
-	 *  Set the splitcnt.
-	 *  @param splitcnt The splitcnt to set.
+	 *  Get the current split depth.
+	 *  @return The split depth.
 	 */
-	public void setSplitCount(int splitcnt)
+	public int getSplitDepth()
 	{
-		this.splitcnt = splitcnt;
+		return splitinfos==null? 0: splitinfos.size();
 	}
 
 	/**
