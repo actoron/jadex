@@ -134,7 +134,10 @@ public class ComponentTestSuite extends TestSuite
 						{
 							addTest(new ComponentTest(cms, abspath));
 						}
-//						else if()
+						else if(model.getReport()!=null)
+						{
+							addTest(new BrokenComponentTest(abspath, model.getReport()));
+						}
 					}
 				}
 			}

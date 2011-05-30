@@ -66,7 +66,7 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
-				String[] subcapnames = (String[])scope.getPropertybase().getProperty(PROPERTY_INCLUDESUBCAPABILITIES);
+				String[] subcapnames = (String[])scope.getModel().getProperty(PROPERTY_INCLUDESUBCAPABILITIES);
 				if(subcapnames==null)
 				{
 					subcapnames = (String[])scope.getSubcapabilityNames();
@@ -111,7 +111,7 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 		});
 		
 		// Agent panel.
-		String clname = (String)scope.getPropertybase().getProperty(PROPERTY_AGENTVIEWERCLASS);
+		String clname = (String)scope.getModel().getProperty(PROPERTY_AGENTVIEWERCLASS);
 		if(clname!=null)
 		{
 			try
@@ -137,7 +137,7 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 			for(int i=0; i<subcapnames.length; i++)
 			{
 				ICapability subcap = (ICapability)scope.getSubcapability(subcapnames[i]);
-				Object clid = subcap.getPropertybase().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
+				Object clid = subcap.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
 				Class clazz = clid instanceof Class? (Class)clid: clid instanceof String? SReflect.classForName0((String)clid, subcap.getClassLoader()): null;
 				try
 				{

@@ -14,7 +14,6 @@ import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.MessageEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanbaseFlyweight;
-import jadex.bdi.runtime.impl.flyweights.PropertybaseFlyweight;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.MessageType;
 import jadex.javaparser.SimpleValueFetcher;
@@ -108,7 +107,8 @@ public class OAVBDIFetcher extends SimpleValueFetcher
 		else if(name.equals("$expressionbase"))
 			ret = ExpressionbaseFlyweight.getExpressionbaseFlyweight(state, rcapa);
 		else if(name.equals("$propertybase") || name.equals("$properties"))
-			ret = PropertybaseFlyweight.getPropertybaseFlyweight(state, rcapa);
+			ret = BDIInterpreter.getInterpreter(state).getProperties();
+//			ret = PropertybaseFlyweight.getPropertybaseFlyweight(state, rcapa);
 		else if(name.equals("$goal") && rgoal!=null)
 			ret = GoalFlyweight.getGoalFlyweight(state, rcapa, rgoal);
 		else if(name.equals("$event") && rmessageevent!=null)

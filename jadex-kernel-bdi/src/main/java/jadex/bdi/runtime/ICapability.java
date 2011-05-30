@@ -59,11 +59,11 @@ public interface ICapability	extends IElement
 	 */
 	public IExpressionbase getExpressionbase();
 
-	/**
-	 * Get the property base.
-	 * @return The property base.
-	 */
-	public IPropertybase getPropertybase();
+//	/**
+//	 * Get the property base.
+//	 * @return The property base.
+//	 */
+//	public IPropertybase getPropertybase();
 
 	/**
 	 *  Register a subcapability.
@@ -88,6 +88,12 @@ public interface ICapability	extends IElement
 	 * @return The agent model.
 	 */
 	public IModelInfo getAgentModel();
+
+	/**
+	 * Get the capability model.
+	 * @return The capability model.
+	 */
+	public IModelInfo getModel();
 
 	/**
 	 * Get the agent name.

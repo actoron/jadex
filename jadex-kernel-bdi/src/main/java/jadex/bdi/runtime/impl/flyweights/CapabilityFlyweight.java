@@ -10,7 +10,6 @@ import jadex.bdi.runtime.IEventbase;
 import jadex.bdi.runtime.IExpressionbase;
 import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.IPlanbase;
-import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentDescription;
@@ -226,28 +225,28 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		}
 	}
 
-	/**
-	 *  Get the property base.
-	 *  @return The property base.
-	 */
-	public IPropertybase getPropertybase()
-	{
-		if(getInterpreter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					object = PropertybaseFlyweight.getPropertybaseFlyweight(getState(), getScope());
-				}
-			};
-			return (IPropertybase)invoc.object;
-		}
-		else
-		{
-			return PropertybaseFlyweight.getPropertybaseFlyweight(getState(), getScope());
-		}
-	}
+//	/**
+//	 *  Get the property base.
+//	 *  @return The property base.
+//	 */
+//	public IPropertybase getPropertybase()
+//	{
+//		if(getInterpreter().isExternalThread())
+//		{
+//			AgentInvocation invoc = new AgentInvocation()
+//			{
+//				public void run()
+//				{
+//					object = PropertybaseFlyweight.getPropertybaseFlyweight(getState(), getScope());
+//				}
+//			};
+//			return (IPropertybase)invoc.object;
+//		}
+//		else
+//		{
+//			return PropertybaseFlyweight.getPropertybaseFlyweight(getState(), getScope());
+//		}
+//	}
 
 	/**
 	 *  Register a subcapability.

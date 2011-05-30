@@ -16,7 +16,6 @@ import jadex.bdi.runtime.IParameter;
 import jadex.bdi.runtime.IParameterSet;
 import jadex.bdi.runtime.IPlan;
 import jadex.bdi.runtime.IPlanbase;
-import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.IWaitqueue;
 import jadex.bdi.runtime.PlanFailureException;
 import jadex.bdi.runtime.impl.flyweights.BeliefbaseFlyweight;
@@ -33,7 +32,6 @@ import jadex.bdi.runtime.impl.flyweights.ParameterFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ParameterSetFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanbaseFlyweight;
-import jadex.bdi.runtime.impl.flyweights.PropertybaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.WaitqueueFlyweight;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
@@ -506,14 +504,14 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 		return ExpressionbaseFlyweight.getExpressionbaseFlyweight(state, rcapa);
 	}
 	
-	/**
-	 *  Get the property base.
-	 *  @return The property base.
-	 */
-	public IPropertybase getPropertybase()
-	{
-		return PropertybaseFlyweight.getPropertybaseFlyweight(state, rcapa);
-	}
+//	/**
+//	 *  Get the property base.
+//	 *  @return The property base.
+//	 */
+//	public IPropertybase getPropertybase()
+//	{
+//		return PropertybaseFlyweight.getPropertybaseFlyweight(state, rcapa);
+//	}
 
 	/**
 	 *  Get the clock.

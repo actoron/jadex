@@ -8,7 +8,6 @@ import jadex.bdi.model.IMEventbase;
 import jadex.bdi.model.IMExpressionbase;
 import jadex.bdi.model.IMGoalbase;
 import jadex.bdi.model.IMPlanbase;
-import jadex.bdi.model.IMPropertybase;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.editable.IMEBeliefbase;
 import jadex.bdi.model.editable.IMECapability;
@@ -17,7 +16,6 @@ import jadex.bdi.model.editable.IMEEventbase;
 import jadex.bdi.model.editable.IMEExpressionbase;
 import jadex.bdi.model.editable.IMEGoalbase;
 import jadex.bdi.model.editable.IMEPlanbase;
-import jadex.bdi.model.editable.IMEPropertybase;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -269,28 +267,28 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 		}
 	}
 	
-	/**
-	 *  Get the propertybase.
-	 *  @return The propertybase.
-	 */
-	public IMPropertybase getPropertybase()
-	{
-		if(isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					object = new MPropertybaseFlyweight(getState(), getScope());
-				}
-			};
-			return (IMPropertybase)invoc.object;
-		}
-		else
-		{
-			return new MPropertybaseFlyweight(getState(), getScope());
-		}
-	}
+//	/**
+//	 *  Get the propertybase.
+//	 *  @return The propertybase.
+//	 */
+//	public IMPropertybase getPropertybase()
+//	{
+//		if(isExternalThread())
+//		{
+//			AgentInvocation invoc = new AgentInvocation()
+//			{
+//				public void run()
+//				{
+//					object = new MPropertybaseFlyweight(getState(), getScope());
+//				}
+//			};
+//			return (IMPropertybase)invoc.object;
+//		}
+//		else
+//		{
+//			return new MPropertybaseFlyweight(getState(), getScope());
+//		}
+//	}
 	
 //	/**
 //	 *  Get the services.
@@ -572,14 +570,14 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 		return new MExpressionbaseFlyweight(getState(), getHandle());
 	}
 	
-	/**
-	 *  Get the propertybase.
-	 *  @return The propertybase.
-	 */
-	public IMEPropertybase createPropertybase()
-	{
-		return new MPropertybaseFlyweight(getState(), getHandle());
-	}
+//	/**
+//	 *  Get the propertybase.
+//	 *  @return The propertybase.
+//	 */
+//	public IMEPropertybase createPropertybase()
+//	{
+//		return new MPropertybaseFlyweight(getState(), getHandle());
+//	}
 	
 //	/**
 //	 *  Add a service.
