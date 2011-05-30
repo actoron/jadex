@@ -28,7 +28,6 @@ import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.bridge.service.execution.IExecutionService;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.IRemotable;
-import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.CollectionResultListener;

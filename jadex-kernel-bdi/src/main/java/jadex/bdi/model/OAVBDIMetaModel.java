@@ -1,16 +1,11 @@
 package jadex.bdi.model;
 
 import jadex.bridge.MessageType;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.javaparser.IParsedExpression;
-import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
-
-import java.util.Collection;
 
 /**
  *  OAV BDI-meta model.
@@ -88,6 +83,12 @@ public class OAVBDIMetaModel
 	
 	/** The message event type java type. */
 	public static OAVJavaType	java_messagetype_type;
+	
+//	/** The provided service java type. */
+//	public static OAVJavaType	java_providedservice_type;
+//	
+//	/** The required service java type. */
+//	public static OAVJavaType	java_requiredservice_type;
 	
 	//-------- object --------
 	
@@ -323,58 +324,58 @@ public class OAVBDIMetaModel
 
 	//-------- service --------
 	
-	/** The provided service type. */
-	public static OAVObjectType providedservice_type;
-	
-	/** Provided service has direct attribute. */
-	public static OAVAttributeType providedservice_has_proxytype;
-
-	/** Provided service has class name attribute. */
-	public static OAVAttributeType providedservice_has_classname;
-	
-	/** Provided service has class attribute. */
-	public static OAVAttributeType providedservice_has_class;
-	
-	/** Provided service has implementation attribute. */
-	public static OAVAttributeType providedservice_has_implementation;
-
-	
-	/** The required service type. */
-	public static OAVObjectType requiredservice_type;
-
-	/** Required service has classname. */
-	public static OAVAttributeType requiredservice_has_classname;
-	
-	/** Required service has class. */
-	public static OAVAttributeType requiredservice_has_class;
-	
-	/** Required service has multiple flag. */
-	public static OAVAttributeType requiredservice_has_multiple;
-
-	/** Required service has binding. */
-	public static OAVAttributeType requiredservice_has_binding;
-
-	
-	/** The binding type. */
-	public static OAVObjectType binding_type;
-
-	/** Binding has component name. */
-	public static OAVAttributeType binding_has_componentname;
-
-	/** Binding has component type. */
-	public static OAVAttributeType binding_has_componenttype;
-
-	/** Binding has dynamic flag. */
-	public static OAVAttributeType binding_has_dynamic;
-
-	/** Binding has scope. */
-	public static OAVAttributeType binding_has_scope;
-
-	/** Binding has create flag. */
-	public static OAVAttributeType binding_has_create;
-
-	/** Binding has recover flag. */
-	public static OAVAttributeType binding_has_recover;
+//	/** The provided service type. */
+//	public static OAVObjectType providedservice_type;
+//	
+//	/** Provided service has direct attribute. */
+//	public static OAVAttributeType providedservice_has_proxytype;
+//
+//	/** Provided service has class name attribute. */
+//	public static OAVAttributeType providedservice_has_classname;
+//	
+//	/** Provided service has class attribute. */
+//	public static OAVAttributeType providedservice_has_class;
+//	
+//	/** Provided service has implementation attribute. */
+//	public static OAVAttributeType providedservice_has_implementation;
+//
+//	
+//	/** The required service type. */
+//	public static OAVObjectType requiredservice_type;
+//
+//	/** Required service has classname. */
+//	public static OAVAttributeType requiredservice_has_classname;
+//	
+//	/** Required service has class. */
+//	public static OAVAttributeType requiredservice_has_class;
+//	
+//	/** Required service has multiple flag. */
+//	public static OAVAttributeType requiredservice_has_multiple;
+//
+//	/** Required service has binding. */
+//	public static OAVAttributeType requiredservice_has_binding;
+//
+//	
+//	/** The binding type. */
+//	public static OAVObjectType binding_type;
+//
+//	/** Binding has component name. */
+//	public static OAVAttributeType binding_has_componentname;
+//
+//	/** Binding has component type. */
+//	public static OAVAttributeType binding_has_componenttype;
+//
+//	/** Binding has dynamic flag. */
+//	public static OAVAttributeType binding_has_dynamic;
+//
+//	/** Binding has scope. */
+//	public static OAVAttributeType binding_has_scope;
+//
+//	/** Binding has create flag. */
+//	public static OAVAttributeType binding_has_create;
+//
+//	/** Binding has recover flag. */
+//	public static OAVAttributeType binding_has_recover;
 
 	
 //	/** Expression has parameters attribute. */
@@ -430,20 +431,20 @@ public class OAVBDIMetaModel
 	/** The agent (model) type. */
 	public static OAVObjectType agent_type;
 
-	/** The agent has a service container type. */
-	public static OAVAttributeType agent_has_servicecontainer;
+//	/** The agent has a service container type. */
+//	public static OAVAttributeType agent_has_servicecontainer;
 	
-	/** The agent has a suspend attribute. */
-	public static OAVAttributeType agent_has_suspend;
-
-	/** The agent has a master attribute. */
-	public static OAVAttributeType agent_has_master;
-
-	/** The agent has a daemon attribute. */
-	public static OAVAttributeType agent_has_daemon;
-
-	/** The agent has a daemon attribute. */
-	public static OAVAttributeType agent_has_autoshutdown;
+//	/** The agent has a suspend attribute. */
+//	public static OAVAttributeType agent_has_suspend;
+//
+//	/** The agent has a master attribute. */
+//	public static OAVAttributeType agent_has_master;
+//
+//	/** The agent has a daemon attribute. */
+//	public static OAVAttributeType agent_has_daemon;
+//
+//	/** The agent has a daemon attribute. */
+//	public static OAVAttributeType agent_has_autoshutdown;
 
 	
 //	/** Agent has propertyfile attribute. */
@@ -454,14 +455,14 @@ public class OAVBDIMetaModel
 	/** The capability type. */
 	public static OAVObjectType capability_type;
 	
-	/** Capability has package attribute. */
-	public static OAVAttributeType capability_has_package;
+//	/** Capability has package attribute. */
+//	public static OAVAttributeType capability_has_package;
 	
 	/** Capability has abstract attribute. */
 	public static OAVAttributeType capability_has_abstract;
 	
-	/** Capability has imports attribute. */
-	public static OAVAttributeType capability_has_imports;
+//	/** Capability has imports attribute. */
+//	public static OAVAttributeType capability_has_imports;
 	
 	/** Capability has capabilities attribute. */
 	public static OAVAttributeType capability_has_capabilityrefs;
@@ -508,13 +509,13 @@ public class OAVBDIMetaModel
 	/** Capability has conditions attribute. */
 	public static OAVAttributeType capability_has_conditions;
 				
-	/** Capability has expressions attribute. */
-	public static OAVAttributeType capability_has_requiredservices;
-	public static OAVAttributeType capability_has_providedservices;
-	// todo: servicerefs??
+//	/** Capability has expressions attribute. */
+//	public static OAVAttributeType capability_has_requiredservices;
+//	public static OAVAttributeType capability_has_providedservices;
+//	// todo: servicerefs??
 	
-	/** Capability has properties attribute. */
-	public static OAVAttributeType capability_has_properties;
+//	/** Capability has properties attribute. */
+//	public static OAVAttributeType capability_has_properties;
 	
 	/** Capability has default configuration attribute. */
 	public static OAVAttributeType capability_has_defaultconfiguration;
@@ -825,17 +826,17 @@ public class OAVBDIMetaModel
 	/** The configuration type. */
 	public static OAVObjectType configuration_type;
 	
-	/** The agent has a suspend attribute. */
-	public static OAVAttributeType configuration_has_suspend;
-
-	/** The agent has a master attribute. */
-	public static OAVAttributeType configuration_has_master;
-
-	/** The agent has a daemon attribute. */
-	public static OAVAttributeType configuration_has_daemon;
-
-	/** The agent has a daemon attribute. */
-	public static OAVAttributeType configuration_has_autoshutdown;
+//	/** The agent has a suspend attribute. */
+//	public static OAVAttributeType configuration_has_suspend;
+//
+//	/** The agent has a master attribute. */
+//	public static OAVAttributeType configuration_has_master;
+//
+//	/** The agent has a daemon attribute. */
+//	public static OAVAttributeType configuration_has_daemon;
+//
+//	/** The agent has a daemon attribute. */
+//	public static OAVAttributeType configuration_has_autoshutdown;
 	
 	/** Configuration has initial capabilities attribute. */
 	public static OAVAttributeType configuration_has_initialcapabilities;
@@ -939,6 +940,8 @@ public class OAVBDIMetaModel
 		// All types.
 		java_parsedexpression_type	= bdimm_type_model.createJavaType(IParsedExpression.class, OAVJavaType.KIND_VALUE);
 		java_messagetype_type	= bdimm_type_model.createJavaType(MessageType.class, OAVJavaType.KIND_VALUE);
+//		java_providedservice_type	= bdimm_type_model.createJavaType(ProvidedServiceInfo.class, OAVJavaType.KIND_VALUE);
+//		java_requiredservice_type	= bdimm_type_model.createJavaType(RequiredServiceInfo.class, OAVJavaType.KIND_VALUE);
 		
 		object_type = bdimm_type_model.createType("object");
 		modelelement_type = bdimm_type_model.createType("melement", object_type);
@@ -950,9 +953,9 @@ public class OAVBDIMetaModel
 		expression_type = bdimm_type_model.createType("mexpression", referenceableelement_type);
 		expressionreference_type = bdimm_type_model.createType("mexpressionreference", elementreference_type);
 		condition_type = bdimm_type_model.createType("mcondition", expression_type);
-		providedservice_type = bdimm_type_model.createType("mprovidedservice", expression_type);
-		requiredservice_type = bdimm_type_model.createType("mrequiredservice", modelelement_type);
-		binding_type = bdimm_type_model.createType("mbinding", modelelement_type);
+//		providedservice_type = bdimm_type_model.createType("mprovidedservice", expression_type);
+//		requiredservice_type = bdimm_type_model.createType("mrequiredservice", modelelement_type);
+//		binding_type = bdimm_type_model.createType("mbinding", modelelement_type);
 //		relevantbelief_type = bdimm_type_model.createType("mrelevantbelief", expressionrelevant_type);
 //		relevantbeliefset_type = bdimm_type_model.createType("mrelevantbeliefset", expressionrelevant_type);
 //		relevantgoal_type = bdimm_type_model.createType("mrelevantgoal", expressionrelevant_type);
@@ -1040,22 +1043,22 @@ public class OAVBDIMetaModel
 		expression_has_classname = expression_type.createAttributeType("mexpression_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
 		expression_has_class = expression_type.createAttributeType("mexpression_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE, Object.class);
 
-		providedservice_has_proxytype = providedservice_type.createAttributeType("providedservice_has_proxytype", OAVJavaType.java_string_type, OAVAttributeType.NONE, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED);
-		providedservice_has_classname = providedservice_type.createAttributeType("providedservice_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
-		providedservice_has_class = providedservice_type.createAttributeType("providedservice_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE);
-		providedservice_has_implementation = providedservice_type.createAttributeType("mprovidedservice_has_implementation", expression_type, OAVAttributeType.NONE);
-
-		requiredservice_has_classname = requiredservice_type.createAttributeType("mrequiredservice_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
-		requiredservice_has_class = requiredservice_type.createAttributeType("mrequiredservice_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE);
-		requiredservice_has_multiple = requiredservice_type.createAttributeType("mrequiredservice_has_multiple", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-		requiredservice_has_binding = requiredservice_type.createAttributeType("mrequiredservice_has_binding", binding_type, OAVAttributeType.NONE);
-		
-		binding_has_scope = binding_type.createAttributeType("mbinding_has_scope", OAVJavaType.java_string_type, OAVAttributeType.NONE, RequiredServiceInfo.SCOPE_APPLICATION);
-		binding_has_componentname = binding_type.createAttributeType("mbinding_has_componentname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
-		binding_has_componenttype = binding_type.createAttributeType("mbinding_has_componenttype", OAVJavaType.java_string_type, OAVAttributeType.NONE);
-		binding_has_create = binding_type.createAttributeType("mbinding_has_create", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-		binding_has_dynamic = binding_type.createAttributeType("mbinding_has_dynamic", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-		binding_has_recover = binding_type.createAttributeType("mbinding_has_recover", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+//		providedservice_has_proxytype = providedservice_type.createAttributeType("providedservice_has_proxytype", OAVJavaType.java_string_type, OAVAttributeType.NONE, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED);
+//		providedservice_has_classname = providedservice_type.createAttributeType("providedservice_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
+//		providedservice_has_class = providedservice_type.createAttributeType("providedservice_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE);
+//		providedservice_has_implementation = providedservice_type.createAttributeType("mprovidedservice_has_implementation", expression_type, OAVAttributeType.NONE);
+//
+//		requiredservice_has_classname = requiredservice_type.createAttributeType("mrequiredservice_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
+//		requiredservice_has_class = requiredservice_type.createAttributeType("mrequiredservice_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE);
+//		requiredservice_has_multiple = requiredservice_type.createAttributeType("mrequiredservice_has_multiple", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+//		requiredservice_has_binding = requiredservice_type.createAttributeType("mrequiredservice_has_binding", binding_type, OAVAttributeType.NONE);
+//		
+//		binding_has_scope = binding_type.createAttributeType("mbinding_has_scope", OAVJavaType.java_string_type, OAVAttributeType.NONE, RequiredServiceInfo.SCOPE_APPLICATION);
+//		binding_has_componentname = binding_type.createAttributeType("mbinding_has_componentname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
+//		binding_has_componenttype = binding_type.createAttributeType("mbinding_has_componenttype", OAVJavaType.java_string_type, OAVAttributeType.NONE);
+//		binding_has_create = binding_type.createAttributeType("mbinding_has_create", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+//		binding_has_dynamic = binding_type.createAttributeType("mbinding_has_dynamic", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+//		binding_has_recover = binding_type.createAttributeType("mbinding_has_recover", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
 		
 //		expression_has_class = expression_type.createAttributeType("mexpression_has_class", OAVJavaType.java_class_type);
 //		expression_has_parameters = expression_type.createAttributeType("mexpression_has_parameters",  expressionparameter_type, OAVAttributeType.LIST);
@@ -1249,15 +1252,15 @@ public class OAVBDIMetaModel
 		configuration_has_initialmessageevents = configuration_type.createAttributeType("mconfiguration_has_initialmessageevents", configelement_type, OAVAttributeType.LIST);
 		configuration_has_endinternalevents = configuration_type.createAttributeType("mconfiguration_has_endinternalevents", configelement_type, OAVAttributeType.LIST);
 		configuration_has_endmessageevents = configuration_type.createAttributeType("mconfiguration_has_endmessageevents", configelement_type, OAVAttributeType.LIST);
-		configuration_has_suspend = configuration_type.createAttributeType("mconfiguration_has_suspend", OAVJavaType.java_boolean_type);
-		configuration_has_master = configuration_type.createAttributeType("mconfiguration_has_master", OAVJavaType.java_boolean_type);
-		configuration_has_daemon = configuration_type.createAttributeType("mconfiguration_has_daemon", OAVJavaType.java_boolean_type);
-		configuration_has_autoshutdown = configuration_type.createAttributeType("mconfiguration_has_autoshutdown", OAVJavaType.java_boolean_type);
+//		configuration_has_suspend = configuration_type.createAttributeType("mconfiguration_has_suspend", OAVJavaType.java_boolean_type);
+//		configuration_has_master = configuration_type.createAttributeType("mconfiguration_has_master", OAVJavaType.java_boolean_type);
+//		configuration_has_daemon = configuration_type.createAttributeType("mconfiguration_has_daemon", OAVJavaType.java_boolean_type);
+//		configuration_has_autoshutdown = configuration_type.createAttributeType("mconfiguration_has_autoshutdown", OAVJavaType.java_boolean_type);
 		
 		// capability
-		capability_has_package = capability_type.createAttributeType("mcapability_has_package", OAVJavaType.java_string_type);
+//		capability_has_package = capability_type.createAttributeType("mcapability_has_package", OAVJavaType.java_string_type);
 		capability_has_abstract = capability_type.createAttributeType("mcapability_has_abstract", OAVJavaType.java_boolean_type);
-		capability_has_imports = capability_type.createAttributeType("mcapability_has_imports", OAVJavaType.java_string_type, OAVAttributeType.LIST);
+//		capability_has_imports = capability_type.createAttributeType("mcapability_has_imports", OAVJavaType.java_string_type, OAVAttributeType.LIST);
 		capability_has_capabilityrefs = capability_type.createAttributeType("mcapability_has_mcapabilityrefs", capabilityref_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 		capability_has_beliefs = capability_type.createAttributeType("mcapability_has_mbeliefs", belief_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 		capability_has_beliefsets = capability_type.createAttributeType("mcapability_has_mbeliefsets", beliefset_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
@@ -1273,49 +1276,49 @@ public class OAVBDIMetaModel
 		capability_has_expressionrefs = capability_type.createAttributeType("mcapability_has_mexpressionrefs", expressionreference_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 		capability_has_expressions = capability_type.createAttributeType("mcapability_has_mexpressions", expression_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 		capability_has_conditions = capability_type.createAttributeType("mcapability_has_mconditions", condition_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
-		capability_has_requiredservices = capability_type.createAttributeType("mcapability_has_mrequiredservices", requiredservice_type, OAVAttributeType.LIST);
-		capability_has_providedservices = capability_type.createAttributeType("mcapability_has_mprovidedservices", providedservice_type, OAVAttributeType.LIST);
-		capability_has_properties = capability_type.createAttributeType("mcapability_has_mproperties", expression_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+//		capability_has_requiredservices = capability_type.createAttributeType("mcapability_has_mrequiredservices", java_requiredservice_type, OAVAttributeType.LIST);
+//		capability_has_providedservices = capability_type.createAttributeType("mcapability_has_mprovidedservices", java_providedservice_type, OAVAttributeType.LIST);
+//		capability_has_properties = capability_type.createAttributeType("mcapability_has_mproperties", OAVJavaType.java_object_type, OAVAttributeType.LIST);
 		capability_has_defaultconfiguration = capability_type.createAttributeType("mcapability_has_defaultconfiguration", OAVJavaType.java_string_type);
 		capability_has_configurations = capability_type.createAttributeType("mcapability_has_mconfigurations", configuration_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 
 		// agent
 //		agent_has_propertyfile	= agent_type.createAttributeType("magent_has_propertyfile", OAVJavaType.java_string_type);
-		agent_has_servicecontainer = agent_type.createAttributeType("magent_has_servicecontainer", expression_type);
-		agent_has_suspend = agent_type.createAttributeType("magent_has_suspend", OAVJavaType.java_boolean_type);
-		agent_has_master = agent_type.createAttributeType("magent_has_master", OAVJavaType.java_boolean_type);
-		agent_has_daemon = agent_type.createAttributeType("magent_has_daemon", OAVJavaType.java_boolean_type);
-		agent_has_autoshutdown = agent_type.createAttributeType("magent_has_autoshutdown", OAVJavaType.java_boolean_type);
+//		agent_has_servicecontainer = agent_type.createAttributeType("magent_has_servicecontainer", expression_type);
+//		agent_has_suspend = agent_type.createAttributeType("magent_has_suspend", OAVJavaType.java_boolean_type);
+//		agent_has_master = agent_type.createAttributeType("magent_has_master", OAVJavaType.java_boolean_type);
+//		agent_has_daemon = agent_type.createAttributeType("magent_has_daemon", OAVJavaType.java_boolean_type);
+//		agent_has_autoshutdown = agent_type.createAttributeType("magent_has_autoshutdown", OAVJavaType.java_boolean_type);
 		
 		// propertybase
 		properties_has_properties	= properties_type.createAttributeType("properties_has_properties", properties_type, OAVAttributeType.LIST);
 	}
 
 
-	/**
-	 *  Extract imports from ADF.
-	 */
-	public static String[] getImports(IOAVState state, Object root)
-	{
-		Collection	coll	= state.getAttributeValues(root, capability_has_imports);
-		String[] imports	= coll!=null ? (String[])coll.toArray(new String[coll.size()]) : null;
-		String	pkg	= (String)state.getAttributeValue(root, capability_has_package);
-		if(pkg!=null)
-		{
-			if(imports!=null)
-			{
-				String[]	newimports	= new String[imports.length+1];
-				for(int i=0; i<imports.length; i++)
-					newimports[i+1]	= imports[i]!=null ? imports[i].trim() : null;
-				imports	= newimports;
-			}
-			else
-			{
-				imports	= new String[1];
-			}
-			imports[0]	= pkg.trim()+".*";
-		}
-		return imports;
-	}
+//	/**
+//	 *  Extract imports from ADF.
+//	 */
+//	public static String[] getImports(IOAVState state, Object root)
+//	{
+//		Collection	coll	= state.getAttributeValues(root, capability_has_imports);
+//		String[] imports	= coll!=null ? (String[])coll.toArray(new String[coll.size()]) : null;
+//		String	pkg	= (String)state.getAttributeValue(root, capability_has_package);
+//		if(pkg!=null)
+//		{
+//			if(imports!=null)
+//			{
+//				String[]	newimports	= new String[imports.length+1];
+//				for(int i=0; i<imports.length; i++)
+//					newimports[i+1]	= imports[i]!=null ? imports[i].trim() : null;
+//				imports	= newimports;
+//			}
+//			else
+//			{
+//				imports	= new String[1];
+//			}
+//			imports[0]	= pkg.trim()+".*";
+//		}
+//		return imports;
+//	}
 
 }

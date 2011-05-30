@@ -69,7 +69,7 @@ public class ApplicationXMLReader extends ComponentXMLReader
 			new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)),
 			new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "typename"))}, null)));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "application")),  new ObjectInfo(ConfigurationInfo.class, configpp),
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "application")),  new ObjectInfo(ConfigurationInfo.class),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("type", "typeName")),
 				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown"))},

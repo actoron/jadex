@@ -68,10 +68,19 @@ public class TypeInfo	extends AbstractInfo
 	 */
 	public TypeInfo(XMLInfo xmlinfo, ObjectInfo objectinfo, MappingInfo mapinfo, LinkingInfo linkinfo)
 	{
+		this(xmlinfo, objectinfo, mapinfo, linkinfo, null);
+	}
+	
+	/**
+	 *  Create a new type info.
+	 */
+	public TypeInfo(XMLInfo xmlinfo, ObjectInfo objectinfo, MappingInfo mapinfo, LinkingInfo linkinfo, IObjectReaderHandler readerhandler)
+	{
 		super(xmlinfo);
 		this.objectinfo = objectinfo;
 		this.mapinfo = mapinfo;
 		this.linkinfo = linkinfo;
+		this.readerhandler	= readerhandler;
 		
 		if(mapinfo!=null && mapinfo.getAttributeInfos()!=null)
 			this.attributeinfos = createAttributeInfos(mapinfo.getAttributeInfos());
@@ -89,7 +98,8 @@ public class TypeInfo	extends AbstractInfo
 	 */
 	public Object getTypeInfo()
 	{
-		return objectinfo!=null? objectinfo.getTypeInfo(): null;
+		return getObjectInfo()!=null && getObjectInfo().getTypeInfo()!=null ? getObjectInfo().getTypeInfo()
+			: mapinfo!=null && mapinfo.getSupertype()!=null ? mapinfo.getSupertype().getTypeInfo() : null;
 	}
 
 	/**
@@ -98,7 +108,8 @@ public class TypeInfo	extends AbstractInfo
 	 */
 	public ObjectInfo getObjectInfo()
 	{
-		return objectinfo;
+		return objectinfo!=null ? objectinfo :
+			mapinfo!=null && mapinfo.getSupertype()!=null ? mapinfo.getSupertype().getObjectInfo() : null;
 	}
 
 	/**
@@ -236,7 +247,7 @@ public class TypeInfo	extends AbstractInfo
 	 */
 	public Collection getSubobjectInfos()
 	{
-		Collection ret = subobjectinfoswrite!=null? subobjectinfoswrite.values(): new LinkedHashSet();
+		Collection ret = subobjectinfoswrite!=null? new LinkedHashSet(subobjectinfoswrite.values()): new LinkedHashSet();
 		if(getSupertype()!=null)
 			ret.addAll(getSupertype().getSubobjectInfos());
 		return ret;
@@ -284,7 +295,7 @@ public class TypeInfo	extends AbstractInfo
 	 */
 	public Object getLinker()
 	{
-		return linkinfo!=null? linkinfo.getLinker(): null;
+		return linkinfo!=null? linkinfo.getLinker(): mapinfo!=null && mapinfo.getSupertype()!=null ? mapinfo.getSupertype().getLinker() : null;
 	}
 
 	/**

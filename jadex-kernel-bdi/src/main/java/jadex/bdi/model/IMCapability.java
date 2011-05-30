@@ -6,17 +6,17 @@ package jadex.bdi.model;
  */
 public interface IMCapability extends IMElement
 {
-	/**
-	 *  Get the package.
-	 *  @return The package.
-	 */
-	public String getPackage();
-	
-	/**
-	 *  Get the imports.
-	 *  @return The imports.
-	 */
-	public String[] getImports();
+//	/**
+//	 *  Get the package.
+//	 *  @return The package.
+//	 */
+//	public String getPackage();
+//	
+//	/**
+//	 *  Get the imports.
+//	 *  @return The imports.
+//	 */
+//	public String[] getImports();
 	
 	/**
 	 *  Test if is abstract.
@@ -60,17 +60,17 @@ public interface IMCapability extends IMElement
 	 */
 	public IMExpressionbase getExpressionbase();
 	
-	/**
-	 *  Get the propertybase.
-	 *  @return The propertybase.
-	 */
-	public IMPropertybase getPropertybase();
+//	/**
+//	 *  Get the propertybase.
+//	 *  @return The propertybase.
+//	 */
+//	public IMPropertybase getPropertybase();
 	
-	/**
-	 *  Get the services.
-	 *  @return The services.
-	 */
-	public IMExpression[] getServices();
+//	/**
+//	 *  Get the services.
+//	 *  @return The services.
+//	 */
+//	public IMExpression[] getServices();
 	
 	/**
 	 *  Get the configurations.

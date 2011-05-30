@@ -76,8 +76,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 		String clname = (String)state.getAttributeValue(mbody, OAVBDIMetaModel.body_has_impl);
 		if(clname==null)
 			throw new RuntimeException("Classname must not be null: "+state.getAttributeValue(state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
-		Class clazz = SReflect.findClass(clname, OAVBDIMetaModel.getImports(interpreter.getState(), interpreter.getState().getAttributeValue
-			(rcapability, OAVBDIRuntimeModel.element_has_model)), state.getTypeModel().getClassLoader());
+		Class clazz = SReflect.findClass(clname, interpreter.getModel(rcapability).getAllImports(), state.getTypeModel().getClassLoader());
 		
 		Object	body = null;
 		if(clazz!=null)

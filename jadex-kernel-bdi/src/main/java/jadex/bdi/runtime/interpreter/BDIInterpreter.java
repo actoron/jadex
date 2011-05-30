@@ -118,6 +118,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/** The kernel properties. */
 	protected Map kernelprops;
 	
+	/** The extensions. */
+	protected Map extensions;
+	
 	//-------- recreate on init (no state) --------
 	
 	/** The event reificator creates changeevent objects for relevant state changes. */
@@ -358,7 +361,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		if(impl.getExpression()!=null)
 		{
 			// todo: other Class imports, how can be found out?
-			ser = SJavaParser.evaluateExpression(impl.getExpression(), getModel().getAllImports(), fetcher, getModel().getClassLoader());
+			ser = SJavaParser.evaluateExpression(impl.getExpression(), getModel(rscope).getAllImports(), fetcher, getModel(rscope).getClassLoader());
 //						System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
 		}
 		else if(impl.getImplementation()!=null)
@@ -1466,24 +1469,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	{
 		if(container==null)
 		{
-			Object mexp = state.getAttributeValue(model.getHandle(), OAVBDIMetaModel.agent_has_servicecontainer);
-			if(mexp!=null)
-			{
-//				try
-//				{
-					container = (IServiceContainer)AgentRules.evaluateExpression(state, mexp, new OAVBDIFetcher(state, ragent));
-//				}
-//				catch(Exception e)
-//				{
-//					e.printStackTrace();
-//				}
-			}
-			else
-			{
-//				container = new CacheServiceContainer(new ComponentServiceContainer(getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
-				RequiredServiceBinding[] bindings = (RequiredServiceBinding[])state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_bindings);
-				container = new ComponentServiceContainer(getAgentAdapter(), BDIAgentFactory.FILETYPE_BDIAGENT, getModel().getRequiredServices(), bindings);
-			}
+			RequiredServiceBinding[] bindings = (RequiredServiceBinding[])state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_bindings);
+			container = new ComponentServiceContainer(getAgentAdapter(), BDIAgentFactory.FILETYPE_BDIAGENT, getModel().getRequiredServices(), bindings);
 		}
 		return container;
 	}
@@ -1635,6 +1622,17 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	}
 	
 	/**
+	 *  Get the model info of a capability
+	 *  @param rcapa	The capability.
+	 *  @return The model info.
+	 */
+	public IModelInfo	getModel(Object rcapa)
+	{
+		Object	mcapa	= state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model);
+		return model.getSubcapabilityModel(mcapa).getModelInfo();
+	}
+	
+	/**
 	 *  Get the service bindings.
 	 *  @return The service bindings.
 	 */
@@ -1720,7 +1718,11 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public void	addExtension(IExtensionInstance ext)
 	{
-		throw new UnsupportedOperationException("todo");		
+		if(extensions==null)
+		{
+			extensions = new HashMap();
+		}
+		extensions.put(ext.getName(), ext);
 	}
 	
 	/**
@@ -1730,7 +1732,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public IExtensionInstance getExtension(final String name)
 	{
-		throw new UnsupportedOperationException("todo");		
+		return extensions==null? null: (IExtensionInstance)extensions.get(name);
 	}
 	
 	/**
@@ -1740,7 +1742,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public IExtensionInstance[] getExtensions()
 	{
-		throw new UnsupportedOperationException("todo");		
+		return extensions==null? new IExtensionInstance[0]: 
+			(IExtensionInstance[])extensions.values().toArray(new IExtensionInstance[extensions.size()]);
 	}
 	
 	/**

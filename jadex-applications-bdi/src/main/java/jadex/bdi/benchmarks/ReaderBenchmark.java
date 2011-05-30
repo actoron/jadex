@@ -2,8 +2,10 @@ package jadex.bdi.benchmarks;
 
 import jadex.bdi.OAVBDIXMLReader;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.commons.collection.MultiCollection;
+import jadex.component.ComponentXMLReader;
 import jadex.rules.state.IOAVState;
-import jadex.rules.state.io.xml.OAVUserContext;
+import jadex.rules.state.io.xml.OAVObjectReaderHandler;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 import jadex.xml.reader.Reader;
 
@@ -42,7 +44,10 @@ public class ReaderBenchmark
 		Map kernelprops = new HashMap();
 		kernelprops.put("messagetype_fipa", new jadex.base.fipa.FIPAMessageType());
 		
-		Object	obj	= reader.read(new FileInputStream(args[0]), null, new OAVUserContext(state, null));
+		Map	user	= new HashMap();
+		user.put(OAVObjectReaderHandler.CONTEXT_STATE, state);
+		user.put(ComponentXMLReader.CONTEXT_ENTRIES, new MultiCollection());
+		Object	obj	= reader.read(new FileInputStream(args[0]), null, user);
 		
 		// Start tests.
 		int cnt	= 100;
@@ -82,7 +87,10 @@ public class ReaderBenchmark
 		{
 			states[i]	= OAVStateFactory.createOAVState(OAVBDIMetaModel.bdimm_type_model);
 //			states[i]	= new JenaOAVState();
-			reader.read(new FileInputStream(arg), null, new OAVUserContext(states[i], null));
+			Map	user	= new HashMap();
+			user.put(OAVObjectReaderHandler.CONTEXT_STATE, states[i]);
+			user.put(ComponentXMLReader.CONTEXT_ENTRIES, new MultiCollection());
+			reader.read(new FileInputStream(arg), null, user);
 		}
 		return states;
 	}

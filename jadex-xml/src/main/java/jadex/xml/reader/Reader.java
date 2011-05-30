@@ -533,7 +533,6 @@ public class Reader
 			QName localname = parser.getName();
 			QName[] fullpath = readcontext.getXMLPath();
 			final TypeInfo typeinfo = tipmanager.getTypeInfo(localname, fullpath, topse.getRawAttributes());
-			IObjectReaderHandler	handler	= topse.getReaderHandler();
 	
 			// Hack. Change object to content when it is element of its own.
 			if((topse.getObject()==null && topse.getContent()!=null && topse.getContent().trim().length()>0) || topse.getObject()==STRING_MARKER)
@@ -556,11 +555,11 @@ public class Reader
 					}
 					else
 					{
-						val = handler.convertContentObject((String)val, localname, readcontext);
+						val = topse.getReaderHandler().convertContentObject((String)val, localname, readcontext);
 					}
 				}
 				
-				topse = new StackElement(handler, topse.getTag(), val, topse.getRawAttributes(), null, topse.getLocation());
+				topse = new StackElement(topse.getReaderHandler(), topse.getTag(), val, topse.getRawAttributes(), null, topse.getLocation());
 				readcontext.setStackElement(topse, readcontext.getStackSize()-1);
 //				stack.set(stack.size()-1, topse);
 //				readcontext.setTopse(topse);
@@ -571,7 +570,7 @@ public class Reader
 			{
 				if(typeinfo!=null && typeinfo.getContentInfo()!=null) 
 				{
-					handler.handleAttributeValue(topse.getObject(), null, null, topse.getContent(), typeinfo.getContentInfo(), readcontext);
+					topse.getReaderHandler().handleAttributeValue(topse.getObject(), null, null, topse.getContent(), typeinfo.getContentInfo(), readcontext);
 				}
 				else
 				{
@@ -581,7 +580,7 @@ public class Reader
 			}
 				
 			// Handle post-processing			
-			final IPostProcessor postproc = handler.getPostProcessor(topse.getObject(), typeinfo);
+			final IPostProcessor postproc = topse.getReaderHandler().getPostProcessor(topse.getObject(), typeinfo);
 			if(postproc!=null)
 			{
 				if(postproc.getPass()==0)
@@ -632,7 +631,7 @@ public class Reader
 					List childs = readcontext.removeChildren(topse.getObject());
 					if(childs!=null)
 					{
-						IBulkObjectLinker linker = (IBulkObjectLinker)(typeinfo!=null && typeinfo.getLinker()!=null? typeinfo.getLinker(): handler);
+						IBulkObjectLinker linker = (IBulkObjectLinker)(typeinfo!=null && typeinfo.getLinker()!=null? typeinfo.getLinker(): topse.getReaderHandler());
 						linker.bulkLinkObjects(topse.getObject(), childs, readcontext);
 					}
 				}
@@ -657,7 +656,7 @@ public class Reader
 						
 						if(!bulklink)
 						{
-							IObjectLinker linker = (IObjectLinker)(typeinfo!=null && typeinfo.getLinker()!=null? typeinfo.getLinker(): handler);
+							IObjectLinker linker = (IObjectLinker)(patypeinfo!=null && patypeinfo.getLinker()!=null? patypeinfo.getLinker(): pse.getReaderHandler());
 							linker.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo, 
 								(QName[])pathname.toArray(new QName[pathname.size()]), readcontext);
 						}

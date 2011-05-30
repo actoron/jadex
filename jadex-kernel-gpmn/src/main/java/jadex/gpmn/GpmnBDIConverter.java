@@ -5,6 +5,8 @@ import jadex.bdi.OAVBDIXMLReader;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.commons.collection.MultiCollection;
+import jadex.component.ComponentXMLReader;
 import jadex.gpmn.model.MActivationEdge;
 import jadex.gpmn.model.MActivationPlan;
 import jadex.gpmn.model.MBpmnPlan;
@@ -19,7 +21,7 @@ import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
-import jadex.rules.state.io.xml.OAVUserContext;
+import jadex.rules.state.io.xml.OAVObjectReaderHandler;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 import jadex.xml.IContext;
 import jadex.xml.IPostProcessor;
@@ -97,21 +99,21 @@ public class GpmnBDIConverter
 		state.setAttributeValue(handle, OAVBDIMetaModel.modelelement_has_name, model.getModelInfo().getName());
 		//TODO: Add process description
 		//state.setAttributeValue(handle, OAVBDIMetaModel.modelelement_has_description, model.getDescription());
-		state.setAttributeValue(handle, OAVBDIMetaModel.capability_has_package, model.getModelInfo().getPackage());
-		String[] imports = (String[]) model.getImports().toArray(new String[0]);
-		if(imports!=null)
-		{
-			for(int i=0; i<imports.length; i++)
-			{
-				state.addAttributeValue(handle, OAVBDIMetaModel.capability_has_imports, imports[i]);
-			}
-		}
+//		state.setAttributeValue(handle, OAVBDIMetaModel.capability_has_package, model.getModelInfo().getPackage());
+//		String[] imports = (String[]) model.getImports().toArray(new String[0]);
+//		if(imports!=null)
+//		{
+//			for(int i=0; i<imports.length; i++)
+//			{
+//				state.addAttributeValue(handle, OAVBDIMetaModel.capability_has_imports, imports[i]);
+//			}
+//		}
 		doConvert(model, classloader, state, handle, false);
 		state.removeStateListener(listener);
-		agentmodel =  new OAVAgentModel(state, handle, types, model.getModelInfo().getFilename(), model.getLastModified(), null);
+		agentmodel =  new OAVAgentModel(state, handle, model.getModelInfo(), types, model.getLastModified(), null);
 		try
 		{
-			loader.createAgentModelEntry(agentmodel);//, report);
+			loader.createAgentModelEntry(agentmodel, model.getModelInfo());
 		}
 		catch(Exception e)
 		{
@@ -409,9 +411,10 @@ public class GpmnBDIConverter
 			}
 			public Object getUserContext() 
 			{
-				//return state;
-				//TODO: Correcy?
-				return new OAVUserContext(state, this);
+				Map	user	= new HashMap();
+				user.put(OAVObjectReaderHandler.CONTEXT_STATE, state);
+				user.put(ComponentXMLReader.CONTEXT_ENTRIES, new MultiCollection());	// Todo: check for errors after conversion?
+				return user;
 			}
 		};
 		
@@ -746,8 +749,8 @@ public class GpmnBDIConverter
 	protected void postProcessParameterElement(IContext context, Object paramelem, 
 		IPostProcessor exproc, IPostProcessor clproc)
 	{
-		OAVUserContext	ouc	= (OAVUserContext)context.getUserContext();
-		IOAVState state = (IOAVState)ouc.getState();
+		Map	ouc	= (Map)context.getUserContext();
+		IOAVState state = (IOAVState)ouc.get(OAVObjectReaderHandler.CONTEXT_STATE);
 		Collection paramhandles = state.getAttributeValues(paramelem, OAVBDIMetaModel.parameterelement_has_parameters);
 		if(paramhandles!=null)
 		{

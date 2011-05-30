@@ -500,6 +500,16 @@ public abstract class OAVAbstractState	implements IOAVState
 	}
 	
 	/**
+	 *  Test if the object represents an identifier.
+	 *  @param object The suspected object identifier.
+	 *  @return True, if object identifier.
+	 */
+	public boolean isIdentifier(Object object)
+	{
+		return generator.isId(object);
+	}
+
+	/**
 	 *  Get the type of an object (oid or java object).
 	 *  @return The type of an object.
 	 */
@@ -1123,8 +1133,8 @@ public abstract class OAVAbstractState	implements IOAVState
 	 */
 	public Collection getAttributeValues(Object id, OAVAttributeType attribute)
 	{
-//		if(!generator.isId(id))
-//			System.out.println("dflb");
+		if(!generator.isId(id))
+			System.out.println("dflb");
 		// #ifndef MIDP
 		assert nocheck || generator.isId(id);
 		assert nocheck || checkValidStateObjectRead(id);
@@ -1276,7 +1286,7 @@ public abstract class OAVAbstractState	implements IOAVState
 	 */
 	public boolean containsKey(Object id, OAVAttributeType attribute, Object key)
 	{
-		// #ifndef MIDP
+		// #ifndef MIDP0
 //		if(!generator.isId(id))
 //			System.out.println("no id: "+id);
 		assert nocheck || generator.isId(id);
@@ -1347,6 +1357,8 @@ public abstract class OAVAbstractState	implements IOAVState
 	public void	addAttributeValue(Object id, OAVAttributeType attribute, Object value)
 	{
 		// #ifndef MIDP
+		if(!generator.isId(id))
+			System.out.println("no id: "+id);
 		assert nocheck || generator.isId(id);
 		assert nocheck || checkValidStateObject(id);
 		assert nocheck || checkValidStateValue(value) : value;

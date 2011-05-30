@@ -26,7 +26,6 @@ import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
 import jadex.xml.IObjectStringConverter;
-import jadex.xml.IPostProcessor;
 import jadex.xml.IStringObjectConverter;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
@@ -58,6 +57,11 @@ import javax.xml.stream.XMLStreamException;
  */
 public class ComponentXMLReader
 {
+	//-------- constants --------
+	
+	/** Key for error entries in read context. */
+	public static final String CONTEXT_ENTRIES = "entries";
+	
 	//-------- attributes --------
 	
 	/** The reader instance. */
@@ -77,7 +81,8 @@ public class ComponentXMLReader
 			catch(RuntimeException e)
 			{
 				Object	se	= new Tuple(((ReadContext)context).getStack());
-				MultiCollection	report	= (MultiCollection)context.getUserContext();
+				Map	user	= (Map)context.getUserContext();
+				MultiCollection	report	= (MultiCollection)user.get(CONTEXT_ENTRIES);
 				report.put(se, e.toString());
 			}
 			return  ret;
@@ -97,7 +102,8 @@ public class ComponentXMLReader
 			catch(RuntimeException e)
 			{
 				Object	se	= new Tuple(((ReadContext)context).getStack());
-				MultiCollection	report	= (MultiCollection)context.getUserContext();
+				Map	user	= (Map)context.getUserContext();
+				MultiCollection	report	= (MultiCollection)user.get(CONTEXT_ENTRIES);
 				report.put(se, e.toString());
 			}
 			return  ret;
@@ -115,7 +121,8 @@ public class ComponentXMLReader
 				if(ret==null)
 				{
 					Object	se	= new Tuple(((ReadContext)context).getStack());
-					MultiCollection	report	= (MultiCollection)context.getUserContext();
+					Map	user	= (Map)context.getUserContext();
+					MultiCollection	report	= (MultiCollection)user.get(CONTEXT_ENTRIES);
 					report.put(se, "Class not found: "+val);
 				}
 			}
@@ -134,50 +141,15 @@ public class ComponentXMLReader
 				if(ret==null)
 				{
 					Object	se	= new Tuple(((ReadContext)context).getStack());
-					MultiCollection	report	= (MultiCollection)context.getUserContext();
+					Map	user	= (Map)context.getUserContext();
+					MultiCollection	report	= (MultiCollection)user.get(CONTEXT_ENTRIES);
 					report.put(se, "Class not found: "+val);
 				}
 			}
 			return ret;
 		}
 	};
-	
-	public static IPostProcessor configpp = new IPostProcessor()
-	{
-		public Object postProcess(IContext context, Object object)
-		{
-			ConfigurationInfo app = (ConfigurationInfo)object;
-			IModelInfo mapp = (IModelInfo)context.getRootObject();
-			
-			UnparsedExpression[] margs = app.getArguments();
-			for(int i=0; i<margs.length; i++)
-			{
-				try
-				{
-					Argument arg = (Argument)mapp.getArgument(margs[i].getName());
-					if(arg==null)
-						throw new RuntimeException("Overridden argument not declared in component type: "+margs[i].getName());
-					
-//					Object val = overridenarg.getParsedValue().getValue(null);
-//					arg.setDefaultValue(app.getName(), val);
-				}
-				catch(RuntimeException e)
-				{
-					Object	se	= new Tuple(((ReadContext)context).getStack());
-					MultiCollection	report	= (MultiCollection)context.getUserContext();
-					report.put(se, e.toString());
-				}
-			}
-			
-			return null;
-		}
 		
-		public int getPass()
-		{
-			return 0;
-		}
-	};
-	
 	//-------- constructors --------
 	
 	/**
@@ -200,7 +172,8 @@ public class ComponentXMLReader
 //				System.out.println("XML error: "+msg+", "+type+", "+info+", "+location);
 //				Thread.dumpStack();
 				IContext	context	= (IContext)Reader.READ_CONTEXT.get();
-				MultiCollection	report	= (MultiCollection)context.getUserContext();
+				Map	user	= (Map)context.getUserContext();
+				MultiCollection	report	= (MultiCollection)user.get(CONTEXT_ENTRIES);
 				String	pos;
 				Tuple	stack	= new Tuple(((ReadContext)context).getStack());
 				if(stack.getEntities().length>0)
@@ -227,8 +200,10 @@ public class ComponentXMLReader
  	 */
 	public CacheableKernelModel read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
 	{
+		Map	user	= new HashMap();
 		MultiCollection	report	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
-		ModelInfo mi = (ModelInfo)reader.read(rinfo.getInputStream(), classloader, report);
+		user.put(CONTEXT_ENTRIES, report);
+		ModelInfo mi = (ModelInfo)reader.read(rinfo.getInputStream(), classloader, user);
 		CacheableKernelModel ret = new CacheableKernelModel(mi);
 		
 		if(mi!=null)
@@ -329,37 +304,35 @@ public class ComponentXMLReader
 //			e.printStackTrace();
 //		}
 		
-		TypeInfo	comptype	= new TypeInfo(new XMLInfo(new QName(uri, "componenttype")), new ObjectInfo(ModelInfo.class), 
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "componenttype")), new ObjectInfo(ModelInfo.class), 
 			new MappingInfo(null, "description", null,
-			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
-			new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AccessInfo.IGNORE_READWRITE))
-			}, 
-			new SubobjectInfo[]{
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "argument")}), new AccessInfo(new QName(uri, "argument"), "argument")),
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "result")}), new AccessInfo(new QName(uri, "result"), "result")),
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "container")}), new AccessInfo(new QName(uri, "container"), "container")),
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "providedservice")}), new AccessInfo(new QName(uri, "providedservice"), "providedService")),
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "requiredservice")}), new AccessInfo(new QName(uri, "requiredservice"), "requiredService")),
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype")}), new AccessInfo(new QName(uri, "componenttype"), "subcomponentType")),
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "property")}), new AccessInfo(new QName(uri, "property"), "property", null, null))//, new BeanAccessInfo(putprop, null, "map", getname))),
-		}));
-		comptype.setReaderHandler(new BeanObjectReaderHandler());
-		types.add(comptype);
+				new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
+				new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AccessInfo.IGNORE_READWRITE))
+				}, 
+				new SubobjectInfo[]{
+				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "argument")}), new AccessInfo(new QName(uri, "argument"), "argument")),
+				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "result")}), new AccessInfo(new QName(uri, "result"), "result")),
+				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "container")}), new AccessInfo(new QName(uri, "container"), "container")),
+				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "providedservice")}), new AccessInfo(new QName(uri, "providedservice"), "providedService")),
+				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "requiredservice")}), new AccessInfo(new QName(uri, "requiredservice"), "requiredService")),
+				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype")}), new AccessInfo(new QName(uri, "componenttype"), "subcomponentType")),
+				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "property")}), new AccessInfo(new QName(uri, "property"), "property", null, null))//, new BeanAccessInfo(putprop, null, "map", getname))),
+			}), null, new BeanObjectReaderHandler()));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "configuration")), new ObjectInfo(ConfigurationInfo.class, configpp), 
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "configuration")), new ObjectInfo(ConfigurationInfo.class), 
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("type", "typeName")),
 				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown"))},
 				new SubobjectInfo[]{
 				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "component")}), new AccessInfo(new QName(uri, "component"), "componentInstance")),
-			})));
+			}), null, new BeanObjectReaderHandler()));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(Argument.class), 
 			new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)),
-			new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "typename"))}, null)));
+			new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "typename"))}, null), null, new BeanObjectReaderHandler()));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "import")), new ObjectInfo(String.class)));
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "import")), new ObjectInfo(String.class), null, null, new BeanObjectReaderHandler()));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "configuration"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
@@ -369,7 +342,7 @@ public class ComponentXMLReader
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttypes"), new QName(uri, "componenttype")}), new ObjectInfo(SubcomponentTypeInfo.class),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
-			}, null)));		
+			}, null), null, new BeanObjectReaderHandler()));		
 		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "component")), new ObjectInfo(ComponentInstanceInfo.class),
 			new MappingInfo(null, new AttributeInfo[]{
@@ -388,7 +361,7 @@ public class ComponentXMLReader
 //				new AttributeInfo(new AccessInfo("class", "className")),
 				new AttributeInfo(new AccessInfo("class", "type"), new AttributeConverter(classconv, reclassconv)),
 //				new AttributeInfo(new AccessInfo("implementation", "implementation"))
-			}, null)));
+			}, null), null, new BeanObjectReaderHandler()));
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "implementation")), new ObjectInfo(ProvidedServiceImplementation.class),
 			new MappingInfo(null, null, "expression", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "implementation"), new AttributeConverter(classconv, reclassconv)),
@@ -398,7 +371,7 @@ public class ComponentXMLReader
 				new AttributeInfo(new AccessInfo("class", "type"), new AttributeConverter(classconv, reclassconv))
 			}, new SubobjectInfo[]{
 				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "binding")}), new AccessInfo(new QName(uri, "binding"), "defaultBinding")),
-			})));
+			}), null, new BeanObjectReaderHandler()));
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "binding")), new ObjectInfo(RequiredServiceBinding.class), 
 				new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("componentname", "componentName")),
@@ -413,7 +386,7 @@ public class ComponentXMLReader
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "className"))
-			}, null)));
+			}, null), null, new BeanObjectReaderHandler()));
 					
 		
 		

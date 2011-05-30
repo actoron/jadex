@@ -11,12 +11,18 @@ import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.GoalProcessingRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
+import jadex.bridge.modelinfo.IExtensionType;
+import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.modelinfo.SubcomponentTypeInfo;
+import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
 import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
+import jadex.component.ComponentXMLReader;
 import jadex.rules.parser.conditions.ParserHelper;
 import jadex.rules.parser.conditions.javagrammar.IParserHelper;
 import jadex.rules.rulesystem.IAction;
@@ -39,17 +45,19 @@ import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
-import jadex.rules.state.io.xml.OAVUserContext;
+import jadex.rules.state.io.xml.OAVObjectReaderHandler;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 import jadex.xml.StackElement;
 import jadex.xml.reader.Reader;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
@@ -72,6 +80,9 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 
 	/** Flag for using all rules. */
 	public static final boolean ALL_RULES = false;
+	
+	/** Key for the OAV root object in the read context. */
+	public static final String CONTEXT_OAVROOT = "oavroot";
 	
 	/** Turn on debugging output (e.g. for automatic rule selection). */
 	protected static boolean DEBUG	= false;
@@ -153,10 +164,15 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 		state.addStateListener(listener, false);
 		// Use index map to keep insertion order for elements.
 		MultiCollection	entries	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
-		Object handle	= null;
+		ModelInfo	mi	= null;
+		Object	handle	= null;
+		Map	user	= new HashMap();
+		user.put(OAVObjectReaderHandler.CONTEXT_STATE, state);
+		user.put(ComponentXMLReader.CONTEXT_ENTRIES, entries);
 		try
 		{
-			handle = reader.read(info.getInputStream(), classloader, new OAVUserContext(state, entries));
+			mi = (ModelInfo)reader.read(info.getInputStream(), classloader, user);
+			handle	= user.get(CONTEXT_OAVROOT);
 		}
 		catch(Exception e)
 		{
@@ -168,21 +184,27 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 		{
 			if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
 			{
-				ret	=  new OAVAgentModel(state, handle, types, info.getFilename(), info.getLastModified(), entries);
+				ret	=  new OAVAgentModel(state, handle, mi, types, info.getLastModified(), entries);
+				mi.setStartable(true);
 			}
 			else
 			{
-				ret	=  new OAVCapabilityModel(state, handle, types, info.getFilename(), info.getLastModified(), entries);
+				ret	=  new OAVCapabilityModel(state, handle, mi, types, info.getLastModified(), entries);
 			}
 			
-			createAgentModelEntry(ret);
+			createAgentModelEntry(ret, mi);
+			
+			
+			// Initialize the model info.
+			ret.initModelInfo();
+			mi.setClassloader(classloader);
+			mi.setFilename(info.getFilename());
 		}
 		else
 		{
 			// Todo: capability or agent?
-			ret	=  new OAVCapabilityModel(state, handle, types, info.getFilename(), info.getLastModified(), entries);
+			ret	=  new OAVCapabilityModel(state, handle, mi, types, info.getLastModified(), entries);
 		}
-		ret.initModelInfo();
 		
 		return ret;
 	}
@@ -191,12 +213,12 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	 *  Rules for agent elements have to be created and added to the generic
 	 *  BDI interpreter rules.
 	 */
-	public void	createAgentModelEntry(OAVCapabilityModel model)
+	public void	createAgentModelEntry(OAVCapabilityModel model, ModelInfo info)
 	{
 		IRulebase rb = model.getRulebase();
 		IOAVState state	= model.getState();
 		Object mcapa = model.getHandle();
-		String[] imports = OAVBDIMetaModel.getImports(state, mcapa);
+		String[] imports = model.getModelInfo().getAllImports();
 		
 		// Load subcapabilities.
 		Collection mcaparefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs);
@@ -208,7 +230,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 				String	file	= (String)state.getAttributeValue(mcrs[i], OAVBDIMetaModel.capabilityref_has_file);
 				try
 				{
-					OAVCapabilityModel	cmodel	= loadCapabilityModel(file, imports, model.getClassLoader());
+					OAVCapabilityModel	cmodel	= loadCapabilityModel(file, imports, model.getModelInfo().getClassLoader());
 					model.addSubcapabilityModel(cmodel);
 					if(cmodel.getModelInfo().getReport()!=null)
 					{
@@ -216,11 +238,36 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 							new StackElement(new QName(model instanceof OAVAgentModel ? "agent" : "capability"), mcapa),
 							new StackElement(new QName("capabilities"), null),
 							new StackElement(new QName("capability"), mcrs[i])});
-						model.addEntry(se, "Included capability <a href=\"#"+cmodel.getModelInfo().getFilename()+"\">"+cmodel.getName()+"</a> has errors.");
+						model.addEntry(se, "Included capability <a href=\"#"+cmodel.getModelInfo().getFilename()+"\">"+cmodel.getModelInfo().getName()+"</a> has errors.");
 						model.addDocument(cmodel.getModelInfo().getFilename(), cmodel.getModelInfo().getReport().getErrorHTML());
 					}
 	
 					state.setAttributeValue(mcrs[i], OAVBDIMetaModel.capabilityref_has_capability, cmodel.getHandle());
+					
+					// Add provided services from subcapabilities.
+					ProvidedServiceInfo[]	psi	= cmodel.getModelInfo().getProvidedServices();
+					for(int j=0; j<psi.length; j++)
+					{
+						info.addProvidedService(psi[j]);
+					}
+					// Add required services from subcapabilities.
+					RequiredServiceInfo[]	rsi	= cmodel.getModelInfo().getRequiredServices();
+					for(int j=0; j<rsi.length; j++)
+					{
+						info.addRequiredService(rsi[j]);
+					}
+					// Add components from subcapabilities.
+					SubcomponentTypeInfo[]	sti	= cmodel.getModelInfo().getSubcomponentTypes();
+					for(int j=0; j<sti.length; j++)
+					{
+						info.addSubcomponentType(sti[j]);
+					}
+					// Add extensions from subcapabilities.
+					IExtensionType[]	et	= cmodel.getModelInfo().getExtensionTypes();
+					for(int j=0; j<et.length; j++)
+					{
+						info.addExtensiontype(et[j]);
+					}
 				}
 				catch(Exception e)
 				{
@@ -236,7 +283,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 				}
 			}
 		}
-
+		
 		// Build user defined goal conditions and add them to the rule base.
 		Collection mgoals = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_goals);
 		if(mgoals!=null)
@@ -509,7 +556,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 			}
 			
 			if(DEBUG)
-				System.out.println("Rules for agent model "+model.getName()+" ("+compressed.getRules().size()+" rules)"+": "+model.getTypes());
+				System.out.println("Rules for agent model "+model.getModelInfo().getName()+" ("+compressed.getRules().size()+" rules)"+": "+model.getTypes());
 			
 			// Todo: use factory for hiding rule engine implementation. 
 			RetePatternMatcherFunctionality pm = new RetePatternMatcherFunctionality(compressed);

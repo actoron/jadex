@@ -204,9 +204,6 @@ public class StarterPanel extends JLayeredPane
 	/** The split pane. */
 	protected JSplitPanel splitpanel;
 	
-	/** The library service. */
-	protected ILibraryService libservice;
-	
 	/** The last divider location. */
 	protected double lastdivloc;
 	protected boolean closed;
@@ -226,32 +223,6 @@ public class StarterPanel extends JLayeredPane
 		this.closed = true;
 		this.lastdivloc = 0.5;
 		
-		exta.scheduleStep(new IComponentStep()
-		{
-			@XMLClassname("create-arguments")
-			public Object execute(IInternalAccess ia)
-			{
-				Future ret = new Future();
-				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//				ia.getRequiredService("libservice")
-					.addResultListener(new DelegationResultListener(ret));
-				return ret;
-			}
-		}).addResultListener(new SwingDefaultResultListener()
-		{
-			public void customResultAvailable(Object result)
-			{
-				libservice = (ILibraryService)result;
-				init();
-			}
-		});
-	}
-	
-	/**
-	 *  Init the panel.
-	 */
-	public void init()
-	{
 		this.content = new JPanel(new GridBagLayout());
 
 		// Create the filename combo box.
@@ -1196,44 +1167,26 @@ public class StarterPanel extends JLayeredPane
 	/**
 	 *  Create the arguments panel.
 	 */
-	protected void createArguments()
+	protected void	createArguments()
 	{
-//		exta.scheduleStep(new IComponentStep()
-//		{
-//			@XMLClassname("create-arguments")
-//			public Object execute(IInternalAccess ia)
-//			{
-//				Future ret = new Future();
-//				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-////				ia.getRequiredService("libservice")
-//					.addResultListener(new DelegationResultListener(ret));
-//				return ret;
-//			}
-//		}).addResultListener(new SwingDelegationResultListener(ret)
-//		{
-//			public void customResultAvailable(Object result)
-//			{
-//				ILibraryService ls = (ILibraryService)result;
-				argelems = SCollection.createArrayList();
-				arguments.removeAll();
-				arguments.setBorder(null);
-				
-				if(model!=null)
-				{
-					IArgument[] args = model.getArguments();
-					
-					for(int i=0; i<args.length; i++)
-					{
-						argelems.add(args[i]);
-						createArgumentGui(args[i], i, libservice);
-					}
-					loadargs	= null;
-					
-					if(args.length>0)
-						arguments.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Arguments "));
-				}
-//			}
-//		});
+		argelems = SCollection.createArrayList();
+		arguments.removeAll();
+		arguments.setBorder(null);
+		
+		if(model!=null)
+		{
+			IArgument[] args = model.getArguments();
+			
+			for(int i=0; i<args.length; i++)
+			{
+				argelems.add(args[i]);
+				createArgumentGui(args[i], i);
+			}
+			loadargs	= null;
+			
+			if(args.length>0)
+				arguments.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Arguments "));
+		}
 	}
 	
 	/**
@@ -1375,7 +1328,7 @@ public class StarterPanel extends JLayeredPane
 	 *  @param arg The belief or belief reference.
 	 *  @param y The row number where to add.
 	 */
-	protected void createArgumentGui(IArgument arg, int y, ILibraryService ls)
+	protected void createArgumentGui(IArgument arg, int y)
 	{
 		// todo:
 //		System.out.println("argument gui: "+arg+" "+model);
@@ -1384,7 +1337,7 @@ public class StarterPanel extends JLayeredPane
 		final JValidatorTextField valt = new JValidatorTextField(loadargs!=null && loadargs.length>y ? loadargs[y] : "", 15);
 		try
 		{
-			valt.setValidator(new ParserValidator(ls.getClassLoader()));
+			valt.setValidator(new ParserValidator(model.getClassLoader()));
 		}
 		catch(Exception e)
 		{
@@ -1609,7 +1562,8 @@ public class StarterPanel extends JLayeredPane
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					KillListener.this.exceptionOccurred(exception);
+					// handled in createComponent(...)
+//					KillListener.this.exceptionOccurred(exception);
 				}
 			});
 		}

@@ -7,6 +7,9 @@ public class Startable
 {
 	//-------- attributes --------
 	
+	/** The description. */
+	protected String description;
+
 	/** The suspend flag. */
 	private Boolean suspend;
 	
@@ -20,6 +23,24 @@ public class Startable
 	private Boolean autoshutdown;
 	
 	//-------- methods --------
+	
+	/**
+	 *  Get the model description.
+	 *  @return The model description.
+	 */
+	public String getDescription()
+	{
+		return description;
+	}
+	
+	/**
+	 *  Set the description.
+	 *  @param description The description to set.
+	 */
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
 	
 	/**
 	 *  Get the master.

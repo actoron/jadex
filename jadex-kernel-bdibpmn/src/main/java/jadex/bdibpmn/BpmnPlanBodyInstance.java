@@ -963,8 +963,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	{
 		// Hack!!! Should be configurable.
 		IExpressionParser	exp_parser	= new JavaCCExpressionParser();
-		Object mcapa = state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model);
-		String[]	imports	= OAVBDIMetaModel.getImports(state, mcapa);
+		String[]	imports	= interpreter.getModel(rcapa).getAllImports();
 		
 		Map	params	= null;
 		if(paramnames!=null)

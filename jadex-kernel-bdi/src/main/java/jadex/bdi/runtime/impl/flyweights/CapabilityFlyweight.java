@@ -13,7 +13,6 @@ import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
-import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
@@ -46,11 +45,8 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 {
 	//-------- attributes --------
 	
-	/** The agent handle. */
-	protected Object agent;
-	
-	/** The agent adapter. */
-	protected IComponentAdapter adapter;
+	/** The capability model info (cached for synchronous access). */
+	protected IModelInfo	model;
 	
 	//-------- constructors --------
 	
@@ -64,8 +60,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	public CapabilityFlyweight(IOAVState state, Object scope)
 	{
 		super(state, scope, scope);
-		this.agent = getInterpreter().getAgent();
-		this.adapter = getInterpreter().getAgentAdapter();
+		this.model	= getInterpreter().getModel(scope);
 	}
 	
 	//-------- methods concerning beliefs --------
@@ -307,14 +302,14 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				public void run()
 				{
-					string = adapter.getComponentIdentifier().getLocalName();
+					string = getInterpreter().getComponentIdentifier().getLocalName();
 				}
 			};
 			return invoc.string;
 		}
 		else
 		{
-			return adapter.getComponentIdentifier().getLocalName();
+			return getInterpreter().getComponentIdentifier().getLocalName();
 		}
 		
 	}
@@ -343,22 +338,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IComponentIdentifier	getComponentIdentifier()
 	{
-		// Todo: synchronization across components?
-		if(getInterpreter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					object = adapter.getComponentIdentifier();
-				}
-			};
-			return (IComponentIdentifier)invoc.object;
-		}
-		else
-		{
-			return adapter.getComponentIdentifier();
-		}
+		return getInterpreter().getComponentIdentifier();
 	}
 	
 	/**
@@ -367,22 +347,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IComponentDescription	getComponentDescription()
 	{
-		// Todo: synchronization across components?
-		if(getInterpreter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					object = adapter.getDescription();
-				}
-			};
-			return (IComponentDescription)invoc.object;
-		}
-		else
-		{
-			return adapter.getDescription();
-		}
+		return getInterpreter().getComponentDescription();
 	}
 
 
@@ -394,21 +359,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public Object getPlatformComponent()
 	{
-		if(getInterpreter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					object = adapter;
-				}
-			};
-			return invoc.object;
-		}
-		else
-		{
-			return adapter;
-		}
+		return getInterpreter().getAgentAdapter();
 	}
 
 	/**
@@ -520,7 +471,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				public void run()
 				{
-					Object cs = getState().getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_state);
+					Object cs = getState().getAttributeValue(getInterpreter().getAgent(), OAVBDIRuntimeModel.agent_has_state);
 					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 					{
 						object = getInterpreter().killComponent();
@@ -535,7 +486,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		}
 		else
 		{
-			Object cs = getState().getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_state);
+			Object cs = getState().getAttributeValue(getInterpreter().getAgent(), OAVBDIRuntimeModel.agent_has_state);
 			if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 			{
 				//	System.out.println("set to terminating");
@@ -590,34 +541,25 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				public void run()
 				{
-					removeComponentListener((IComponentListener) arg, agent, getState(), getInterpreter().getAgent());
+					removeComponentListener((IComponentListener) arg, getInterpreter().getAgent(), getState());
 					ret.setResult(null);
 				}
 			};
 		}
 		else
 		{
-			removeComponentListener(listener, agent, getState(), getScope());
+			removeComponentListener(listener, getInterpreter().getAgent(), getState());
 			ret.setResult(null);
 		}
 		return ret;
 	}
 	
-	protected static void removeComponentListener(IComponentListener listener, Object agent, IOAVState state, Object scope)
+	protected static void removeComponentListener(IComponentListener listener, Object agent, IOAVState state)
 	{
-		Object le = state.getAttributeValue(scope, OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
+		Object le = state.getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
 		if (le == null)
 			throw new RuntimeException("Listener not found: "+listener);
-		state.removeAttributeValue(scope, OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
-	}
-	
-	/**
-	 *  Get the adapter agent.
-	 *  @return The adapter agent.
-	 */
-	public IComponentAdapter	getAgentAdapter()
-	{
-		return adapter;
+		state.removeAttributeValue(agent, OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
 	}
 	
 	/**

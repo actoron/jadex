@@ -7,17 +7,17 @@ import jadex.bdi.model.IMCapability;
  */
 public interface IMECapability extends IMCapability, IMEElement
 {
-	/**
-	 *  Set the package.
-	 *  @param The package.
-	 */
-	public void setPackage(String name);
-	
-	/**
-	 *  Set the imports.
-	 *  @param The imports.
-	 */
-	public void setImports(String[] imports);
+//	/**
+//	 *  Set the package.
+//	 *  @param The package.
+//	 */
+//	public void setPackage(String name);
+//	
+//	/**
+//	 *  Set the imports.
+//	 *  @param The imports.
+//	 */
+//	public void setImports(String[] imports);
 	
 	/**
 	 *  Set if is abstract.
@@ -61,21 +61,21 @@ public interface IMECapability extends IMCapability, IMEElement
 	 */
 	public IMEExpressionbase createExpressionbase();
 	
-	/**
-	 *  Get the propertybase.
-	 *  @return The propertybase.
-	 */
-	public IMEPropertybase createPropertybase();
+//	/**
+//	 *  Get the propertybase.
+//	 *  @return The propertybase.
+//	 */
+//	public IMEPropertybase createPropertybase();
 	
-	/**
-	 *  Add a service.
-	 *  @param name	The service name.
-	 *  @param clazz	The service type (for lookups).
-	 *  @param expression	The creation expression for the service object.
-	 *  @param language	The expression language (or null for default java-like language).
-	 *  @return The service expression object.
-	 */
-	public IMEExpression createService(String name, Class clazz, String expression, String language);
+//	/**
+//	 *  Add a service.
+//	 *  @param name	The service name.
+//	 *  @param clazz	The service type (for lookups).
+//	 *  @param expression	The creation expression for the service object.
+//	 *  @param language	The expression language (or null for default java-like language).
+//	 *  @return The service expression object.
+//	 */
+//	public IMEExpression createService(String name, Class clazz, String expression, String language);
 	
 	/**
 	 *  Create a configuration.

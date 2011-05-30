@@ -36,7 +36,7 @@ public class HelloWorldAgentCreator
 					{
 						BDIAgentFactory fac = (BDIAgentFactory)result;
 						
-						IMECapability agent = fac.createAgentModel("HelloWorld", "jadex.bdi.examples.helloworld", null);
+						IMECapability agent = fac.createAgentModel("HelloWorld"); //, "jadex.bdi.examples.helloworld", null);
 						
 						IMEBelief	msgbelief	= agent.createBeliefbase().createBelief("msg");
 						msgbelief.createFact("\"Welcome to editable models!\"", null);

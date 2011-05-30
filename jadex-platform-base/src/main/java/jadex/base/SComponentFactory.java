@@ -15,11 +15,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 

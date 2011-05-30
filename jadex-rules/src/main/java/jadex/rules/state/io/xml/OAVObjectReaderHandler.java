@@ -29,6 +29,11 @@ import javax.xml.namespace.QName;
  */
 public class OAVObjectReaderHandler implements IObjectReaderHandler
 {
+	//-------- constants --------
+	
+	/** Key of the state in the user context map. */
+	public static final String	CONTEXT_STATE	= "state";
+	
 	//-------- constructors --------
 	
 	/**
@@ -61,7 +66,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	public Object createObject(Object type, boolean root, ReadContext context, Map rawattributes) throws Exception
 	{
 		Object ret = null;
-		IOAVState state = ((OAVUserContext)context.getUserContext()).getState();
+		IOAVState state = (IOAVState)((Map)context.getUserContext()).get(CONTEXT_STATE);
 		
 		if(type instanceof TypeInfo)
 			type =  ((TypeInfo)type).getTypeInfo();
@@ -160,7 +165,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		if(attrval==null && !(attrinfo instanceof AttributeInfo && ((AttributeInfo)attrinfo).getAccessInfo().getDefaultValue()!=null))
 			return;
 		
-		IOAVState state = ((OAVUserContext)context.getUserContext()).getState();
+		IOAVState state = (IOAVState)((Map)context.getUserContext()).get(CONTEXT_STATE);
 
 		OAVAttributeType attrtype = null;
 		Object val = attrval;
@@ -256,7 +261,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 */
 	public void linkObject(Object elem, Object parent, Object linkinfo, QName[] pathname, ReadContext context) throws Exception
 	{
-		IOAVState state = ((OAVUserContext)context.getUserContext()).getState();
+		IOAVState state = (IOAVState)((Map)context.getUserContext()).get(CONTEXT_STATE);
 	
 //		int idx = pathname.lastIndexOf("/");
 //		String tagname = idx!=-1? pathname.substring(idx+1): pathname;
@@ -273,6 +278,10 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		if(linkinfo instanceof SubobjectInfo)
 		{
 			SubobjectInfo info = (SubobjectInfo)linkinfo;
+			if(!(info.getAccessInfo().getObjectIdentifier() instanceof OAVAttributeType))
+			{
+				System.out.println("kldg");
+			}
 			attrtype = (OAVAttributeType)info.getAccessInfo().getObjectIdentifier();
 			
 			// todo:?

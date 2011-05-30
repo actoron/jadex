@@ -134,6 +134,7 @@ public class ComponentTestSuite extends TestSuite
 						{
 							addTest(new ComponentTest(cms, abspath));
 						}
+//						else if()
 					}
 				}
 			}

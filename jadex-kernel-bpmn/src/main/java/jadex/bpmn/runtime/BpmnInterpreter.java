@@ -28,7 +28,6 @@ import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
@@ -271,7 +270,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		this.stephandlers = stephandlers!=null? stephandlers: DEFAULT_STEP_HANDLERS;
 		this.context = new ThreadContext(model);
 		this.messages = new ArrayList();
-		this.variables	= new HashMap(getArguments());
+		this.variables	= getArguments()!=null ? new HashMap(getArguments()) : new HashMap();
 
 		// Init the arguments with default values.
 //		IArgument[] args = model.getModelInfo().getArguments();

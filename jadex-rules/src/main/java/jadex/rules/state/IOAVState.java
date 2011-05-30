@@ -87,6 +87,13 @@ public interface IOAVState
 	public boolean containsObject(Object object);
 	
 	/**
+	 *  Test if the object represents an identifier.
+	 *  @param object The suspected object identifier.
+	 *  @return True, if object identifier.
+	 */
+	public boolean isIdentifier(Object object);
+	
+	/**
 	 *  Get the type of an object.
 	 *  @param object The object identifier.
 	 */

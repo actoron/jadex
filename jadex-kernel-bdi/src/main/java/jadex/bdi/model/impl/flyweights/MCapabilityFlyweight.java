@@ -5,7 +5,6 @@ import jadex.bdi.model.IMCapability;
 import jadex.bdi.model.IMCapabilityReference;
 import jadex.bdi.model.IMConfiguration;
 import jadex.bdi.model.IMEventbase;
-import jadex.bdi.model.IMExpression;
 import jadex.bdi.model.IMExpressionbase;
 import jadex.bdi.model.IMGoalbase;
 import jadex.bdi.model.IMPlanbase;
@@ -15,12 +14,10 @@ import jadex.bdi.model.editable.IMEBeliefbase;
 import jadex.bdi.model.editable.IMECapability;
 import jadex.bdi.model.editable.IMEConfiguration;
 import jadex.bdi.model.editable.IMEEventbase;
-import jadex.bdi.model.editable.IMEExpression;
 import jadex.bdi.model.editable.IMEExpressionbase;
 import jadex.bdi.model.editable.IMEGoalbase;
 import jadex.bdi.model.editable.IMEPlanbase;
 import jadex.bdi.model.editable.IMEPropertybase;
-import jadex.commons.SUtil;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -43,53 +40,53 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	
 	//-------- methods --------
 
-	/**
-	 *  Get the package.
-	 *  @return The package.
-	 */
-	public String getPackage()
-	{
-		if(isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					string = (String)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_package);
-				}
-			};
-			return invoc.string;
-		}
-		else
-		{
-			return (String)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_package);
-		}
-	}
-	
-	/**
-	 *  Get the imports.
-	 *  @return The imports.
-	 */
-	public String[] getImports()
-	{
-		if(isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					Collection elems = (Collection)getState().getAttributeValues(getHandle(), OAVBDIMetaModel.capability_has_imports);
-					sarray = elems!=null? (String[])elems.toArray(new String[elems.size()]): SUtil.EMPTY_STRING_ARRAY;
-				}
-			};
-			return invoc.sarray;
-		}
-		else
-		{
-			Collection elems = (Collection)getState().getAttributeValues(getHandle(), OAVBDIMetaModel.capability_has_imports);
-			return elems!=null? (String[])elems.toArray(new String[elems.size()]): SUtil.EMPTY_STRING_ARRAY;
-		}
-	}
+//	/**
+//	 *  Get the package.
+//	 *  @return The package.
+//	 */
+//	public String getPackage()
+//	{
+//		if(isExternalThread())
+//		{
+//			AgentInvocation invoc = new AgentInvocation()
+//			{
+//				public void run()
+//				{
+//					string = (String)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_package);
+//				}
+//			};
+//			return invoc.string;
+//		}
+//		else
+//		{
+//			return (String)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_package);
+//		}
+//	}
+//	
+//	/**
+//	 *  Get the imports.
+//	 *  @return The imports.
+//	 */
+//	public String[] getImports()
+//	{
+//		if(isExternalThread())
+//		{
+//			AgentInvocation invoc = new AgentInvocation()
+//			{
+//				public void run()
+//				{
+//					Collection elems = (Collection)getState().getAttributeValues(getHandle(), OAVBDIMetaModel.capability_has_imports);
+//					sarray = elems!=null? (String[])elems.toArray(new String[elems.size()]): SUtil.EMPTY_STRING_ARRAY;
+//				}
+//			};
+//			return invoc.sarray;
+//		}
+//		else
+//		{
+//			Collection elems = (Collection)getState().getAttributeValues(getHandle(), OAVBDIMetaModel.capability_has_imports);
+//			return elems!=null? (String[])elems.toArray(new String[elems.size()]): SUtil.EMPTY_STRING_ARRAY;
+//		}
+//	}
 	
 	/**
 	 *  Test if is abstract.
@@ -295,48 +292,48 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 		}
 	}
 	
-	/**
-	 *  Get the services.
-	 *  @return The services.
-	 */
-	public IMExpression[] getServices()
-	{
-		if(isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_providedservices);
-					IMExpression[] ret = new IMExpression[elems==null? 0: elems.size()];
-					if(elems!=null)
-					{
-						int i=0;
-						for(Iterator it=elems.iterator(); it.hasNext(); )
-						{
-							ret[i++] = new MExpressionFlyweight(getState(), getScope(), it.next());
-						}
-					}
-					object = ret;
-				}
-			};
-			return (IMExpression[])invoc.object;
-		}
-		else
-		{
-			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_providedservices);
-			IMExpression[] ret = new IMExpression[elems==null? 0: elems.size()];
-			if(elems!=null)
-			{
-				int i=0;
-				for(Iterator it=elems.iterator(); it.hasNext(); )
-				{
-					ret[i++] = new MExpressionFlyweight(getState(), getScope(), it.next());
-				}
-			}
-			return ret;
-		}
-	}
+//	/**
+//	 *  Get the services.
+//	 *  @return The services.
+//	 */
+//	public IMExpression[] getServices()
+//	{
+//		if(isExternalThread())
+//		{
+//			AgentInvocation invoc = new AgentInvocation()
+//			{
+//				public void run()
+//				{
+//					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_providedservices);
+//					IMExpression[] ret = new IMExpression[elems==null? 0: elems.size()];
+//					if(elems!=null)
+//					{
+//						int i=0;
+//						for(Iterator it=elems.iterator(); it.hasNext(); )
+//						{
+//							ret[i++] = new MExpressionFlyweight(getState(), getScope(), it.next());
+//						}
+//					}
+//					object = ret;
+//				}
+//			};
+//			return (IMExpression[])invoc.object;
+//		}
+//		else
+//		{
+//			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.capability_has_providedservices);
+//			IMExpression[] ret = new IMExpression[elems==null? 0: elems.size()];
+//			if(elems!=null)
+//			{
+//				int i=0;
+//				for(Iterator it=elems.iterator(); it.hasNext(); )
+//				{
+//					ret[i++] = new MExpressionFlyweight(getState(), getScope(), it.next());
+//				}
+//			}
+//			return ret;
+//		}
+//	}
 	
 	
 	
@@ -408,77 +405,77 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	
 	//-------- IMECapability interface ---------
 	
-	/**
-	 *  Set the package.
-	 *  @param The package.
-	 */
-	public void setPackage(final String name)
-	{
-		if(isExternalThread())
-		{
-			new AgentInvocation()
-			{
-				public void run()
-				{
-					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_package, name);
-				}
-			};
-		}
-		else
-		{
-			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_package, name);
-		}
-	}
-	
-	/**
-	 *  Set the imports.
-	 *  @param The imports.
-	 */
-	public void setImports(final String[] imports)
-	{
-		if(isExternalThread())
-		{
-			new AgentInvocation()
-			{
-				public void run()
-				{
-					Collection	old	= getState().getAttributeValues(getHandle(), OAVBDIMetaModel.capability_has_imports);
-					if(old!=null)
-					{
-						for(Iterator it=old.iterator(); it.hasNext(); )
-						{
-							getState().removeAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_imports, it.next());
-						}
-					}
-					if(imports!=null)
-					{
-						for(int i=0; i<imports.length; i++)
-						{
-							getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_imports, imports[i]);
-						}
-					}
-				}
-			};
-		}
-		else
-		{
-			Collection	old	= getState().getAttributeValues(getHandle(), OAVBDIMetaModel.capability_has_imports);
-			if(old!=null)
-			{
-				for(Iterator it=old.iterator(); it.hasNext(); )
-				{
-					getState().removeAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_imports, it.next());
-				}
-			}
-			if(imports!=null)
-			{
-				for(int i=0; i<imports.length; i++)
-				{
-					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_imports, imports[i]);
-				}
-			}
-		}
-	}
+//	/**
+//	 *  Set the package.
+//	 *  @param The package.
+//	 */
+//	public void setPackage(final String name)
+//	{
+//		if(isExternalThread())
+//		{
+//			new AgentInvocation()
+//			{
+//				public void run()
+//				{
+//					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_package, name);
+//				}
+//			};
+//		}
+//		else
+//		{
+//			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_package, name);
+//		}
+//	}
+//	
+//	/**
+//	 *  Set the imports.
+//	 *  @param The imports.
+//	 */
+//	public void setImports(final String[] imports)
+//	{
+//		if(isExternalThread())
+//		{
+//			new AgentInvocation()
+//			{
+//				public void run()
+//				{
+//					Collection	old	= getState().getAttributeValues(getHandle(), OAVBDIMetaModel.capability_has_imports);
+//					if(old!=null)
+//					{
+//						for(Iterator it=old.iterator(); it.hasNext(); )
+//						{
+//							getState().removeAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_imports, it.next());
+//						}
+//					}
+//					if(imports!=null)
+//					{
+//						for(int i=0; i<imports.length; i++)
+//						{
+//							getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_imports, imports[i]);
+//						}
+//					}
+//				}
+//			};
+//		}
+//		else
+//		{
+//			Collection	old	= getState().getAttributeValues(getHandle(), OAVBDIMetaModel.capability_has_imports);
+//			if(old!=null)
+//			{
+//				for(Iterator it=old.iterator(); it.hasNext(); )
+//				{
+//					getState().removeAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_imports, it.next());
+//				}
+//			}
+//			if(imports!=null)
+//			{
+//				for(int i=0; i<imports.length; i++)
+//				{
+//					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_imports, imports[i]);
+//				}
+//			}
+//		}
+//	}
 	
 	/**
 	 *  Set if is abstract.
@@ -584,42 +581,42 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 		return new MPropertybaseFlyweight(getState(), getHandle());
 	}
 	
-	/**
-	 *  Add a service.
-	 *  @param name	The service name.
-	 *  @param clazz	The service type (for lookups).
-	 *  @param expression	The creation expression for the service object.
-	 *  @param language	The expression language (or null for default java-like language).
-	 *  @return The service expression object.
-	 */
-	public IMEExpression createService(final String name, final Class cls, final String expression, final String language)
-	{
-		if(isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					MExpressionFlyweight mexp = MExpressionbaseFlyweight.createExpression(expression, language, getState(), getHandle());
-					getState().setAttributeValue(mexp.getHandle(), OAVBDIMetaModel.modelelement_has_name, name);
-					getState().setAttributeValue(mexp, OAVBDIMetaModel.expression_has_class, cls);
-					
-					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_providedservices, mexp.getHandle());
-					object	= mexp;
-				}
-			};
-			return (IMEExpression)invoc.object;
-		}
-		else
-		{
-			MExpressionFlyweight mexp = MExpressionbaseFlyweight.createExpression(expression, language, getState(), getHandle());
-			getState().setAttributeValue(mexp.getHandle(), OAVBDIMetaModel.modelelement_has_name, name);
-			getState().setAttributeValue(mexp, OAVBDIMetaModel.expression_has_class, cls);
-
-			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_providedservices, mexp.getHandle());			
-			return mexp;
-		}
-	}
+//	/**
+//	 *  Add a service.
+//	 *  @param name	The service name.
+//	 *  @param clazz	The service type (for lookups).
+//	 *  @param expression	The creation expression for the service object.
+//	 *  @param language	The expression language (or null for default java-like language).
+//	 *  @return The service expression object.
+//	 */
+//	public IMEExpression createService(final String name, final Class cls, final String expression, final String language)
+//	{
+//		if(isExternalThread())
+//		{
+//			AgentInvocation invoc = new AgentInvocation()
+//			{
+//				public void run()
+//				{
+//					MExpressionFlyweight mexp = MExpressionbaseFlyweight.createExpression(expression, language, getState(), getHandle());
+//					getState().setAttributeValue(mexp.getHandle(), OAVBDIMetaModel.modelelement_has_name, name);
+//					getState().setAttributeValue(mexp, OAVBDIMetaModel.expression_has_class, cls);
+//					
+//					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_providedservices, mexp.getHandle());
+//					object	= mexp;
+//				}
+//			};
+//			return (IMEExpression)invoc.object;
+//		}
+//		else
+//		{
+//			MExpressionFlyweight mexp = MExpressionbaseFlyweight.createExpression(expression, language, getState(), getHandle());
+//			getState().setAttributeValue(mexp.getHandle(), OAVBDIMetaModel.modelelement_has_name, name);
+//			getState().setAttributeValue(mexp, OAVBDIMetaModel.expression_has_class, cls);
+//
+//			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_providedservices, mexp.getHandle());			
+//			return mexp;
+//		}
+//	}
 	
 	/**
 	 *  Create a configuration.

@@ -53,8 +53,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		Object	mplan	= interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model);
 		Object	mbody	= interpreter.getState().getAttributeValue(mplan, OAVBDIMetaModel.plan_has_body);
 		String	impl	= (String)interpreter.getState().getAttributeValue(mbody, OAVBDIMetaModel.body_has_impl);
-		Object	mcapa	= interpreter.getState().getAttributeValue(rcapability, OAVBDIRuntimeModel.element_has_model);
-		String[] imports	= OAVBDIMetaModel.getImports(interpreter.getState(), mcapa);
+		String[] imports	= interpreter.getModel(rcapability).getAllImports();
 		
 		MBpmnModel bodymodel = loader.loadBpmnModel(impl, imports, interpreter.getClassLoader()); 
 

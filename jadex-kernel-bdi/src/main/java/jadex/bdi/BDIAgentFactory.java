@@ -12,6 +12,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
@@ -323,9 +324,8 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	 *  Create a new agent model, which can be manually edited before
 	 *  starting.
 	 *  @param name	A type name for the agent model.
-	 *  @param classloader	A type name for the agent model.
 	 */
-	public IMECapability	createAgentModel(String name, String pkg, String[] imports)
+	public IMECapability	createAgentModel(String name)
 	{
 		OAVTypeModel	typemodel	= new OAVTypeModel(name+"_typemodel", null); // todo: classloader???
 		// Requires runtime meta model, because e.g. user conditions can refer to runtime elements (belief, goal, etc.) 
@@ -354,14 +354,14 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 		
 		Object	handle	= state.createRootObject(OAVBDIMetaModel.agent_type);
 		state.setAttributeValue(handle, OAVBDIMetaModel.modelelement_has_name, name);
-		state.setAttributeValue(handle, OAVBDIMetaModel.capability_has_package, pkg);
-		if(imports!=null)
-		{
-			for(int i=0; i<imports.length; i++)
-			{
-				state.addAttributeValue(handle, OAVBDIMetaModel.capability_has_imports, imports[i]);
-			}
-		}
+//		state.setAttributeValue(handle, OAVBDIMetaModel.capability_has_package, pkg);
+//		if(imports!=null)
+//		{
+//			for(int i=0; i<imports.length; i++)
+//			{
+//				state.addAttributeValue(handle, OAVBDIMetaModel.capability_has_imports, imports[i]);
+//			}
+//		}
 		
 		mtypes.put(handle, new Object[]{types, listener});
 
@@ -389,16 +389,16 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 //		Report	report	= new Report();
 		if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
 		{
-			ret	=  new OAVAgentModel(state, handle, (Set)(types!=null ? types[0] : null), filename, System.currentTimeMillis(), null);
+			ret	=  new OAVAgentModel(state, handle, new ModelInfo(), (Set)(types!=null ? types[0] : null), System.currentTimeMillis(), null);
 		}
 		else
 		{
-			ret	=  new OAVCapabilityModel(state, handle, (Set)(types!=null ? types[0] : null), filename, System.currentTimeMillis(), null);
+			ret	=  new OAVCapabilityModel(state, handle, new ModelInfo(), (Set)(types!=null ? types[0] : null), System.currentTimeMillis(), null);
 		}
 		
 		try
 		{
-			loader.createAgentModelEntry(ret);
+			loader.createAgentModelEntry(ret, (ModelInfo)ret.getModelInfo());
 		}
 		catch(Exception e)
 		{

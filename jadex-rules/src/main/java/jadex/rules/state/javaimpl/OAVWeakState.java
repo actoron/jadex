@@ -479,6 +479,16 @@ public class OAVWeakState	implements IOAVState
 	}
 	
 	/**
+	 *  Test if the object represents an identifier.
+	 *  @param object The suspected object identifier.
+	 *  @return True, if object identifier.
+	 */
+	public boolean isIdentifier(Object object)
+	{
+		return generator.isId(object);
+	}
+
+	/**
 	 *  Get the type of an object.
 	 *  @return The type of an object.
 	 */

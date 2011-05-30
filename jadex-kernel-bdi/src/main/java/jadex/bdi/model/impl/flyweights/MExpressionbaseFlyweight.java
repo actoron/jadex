@@ -275,8 +275,7 @@ public class MExpressionbaseFlyweight  extends MElementFlyweight implements IMEx
         }
 
         IExpressionParser    exp_parser    = new JavaCCExpressionParser();    // Hack!!! Map language to parser somewhere?
-        IParsedExpression    pexp    = exp_parser.parseExpression(expression,
-            OAVBDIMetaModel.getImports(state, scope), null, state.getTypeModel().getClassLoader());
+        IParsedExpression    pexp    = exp_parser.parseExpression(expression, null, null, state.getTypeModel().getClassLoader());
         return pexp;
     }
 

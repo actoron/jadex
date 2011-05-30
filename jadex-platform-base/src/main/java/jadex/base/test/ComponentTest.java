@@ -3,6 +3,7 @@ package jadex.base.test;
 
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ThreadSuspendable;
 
 import java.util.Map;
 
@@ -57,7 +58,7 @@ public class ComponentTest implements	Test
 //		Map	args	= new HashMap();
 //		args.put("timeout", new Long(3000000));
 //		CreationInfo	ci	= new CreationInfo(args);
-		cms.createComponent(null, comp, null, trl);
+		cms.createComponent(null, comp, null, trl).get(new ThreadSuspendable(), 300000);
 
 		// Evaluate the results.
 		try

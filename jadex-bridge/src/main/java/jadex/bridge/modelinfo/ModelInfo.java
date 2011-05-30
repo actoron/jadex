@@ -25,9 +25,6 @@ public class ModelInfo extends Startable implements IModelInfo
 	/** The package. */
 	protected String packagename;
 	
-	/** The description. */
-	protected String description;
-	
 	/** The imports. */
 	protected List imports;
 	
@@ -177,15 +174,6 @@ public class ModelInfo extends Startable implements IModelInfo
 		if(imports==null)
 			imports = new ArrayList();
 		imports.add(imp);
-	}
-	
-	/**
-	 *  Get the model description.
-	 *  @return The model description.
-	 */
-	public String getDescription()
-	{
-		return description;
 	}
 	
 	/**
@@ -383,15 +371,6 @@ public class ModelInfo extends Startable implements IModelInfo
 	public void setPackage(String packagename)
 	{
 		this.packagename = packagename;
-	}
-
-	/**
-	 *  Set the description.
-	 *  @param description The description to set.
-	 */
-	public void setDescription(String description)
-	{
-		this.description = description;
 	}
 
 	/**
@@ -739,15 +718,5 @@ public class ModelInfo extends Startable implements IModelInfo
 		if(extensions==null)
 			extensions = new ArrayList();
 		extensions.add(extension);
-	}
-	
-	// Hack! remove when xml schema has been corrected
-	/**
-	 *  Add a extension type.
-	 *  @param extension The extension type.
-	 */
-	public void addSpacetype(IExtensionType extension)
-	{
-		addExtensiontype(extension);
 	}
 }

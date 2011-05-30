@@ -332,6 +332,17 @@ public class CopyState implements IOAVState
 	}
 	
 	/**
+	 *  Test if the object represents an identifier.
+	 *  @param object The suspected object identifier.
+	 *  @return True, if object identifier.
+	 */
+	public boolean isIdentifier(Object object)
+	{
+		throw new UnsupportedOperationException("Not yet implemented");
+	}
+
+	
+	/**
 	 *  Get the type of an object.
 	 *  @param object The object identifier.
 	 */
