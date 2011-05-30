@@ -1,7 +1,6 @@
 package jadex.kernelbase;
 
 import jadex.bridge.CreationInfo;
-import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
@@ -121,9 +120,6 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	
 	/** Library service listener */
 	protected ILibraryServiceListener liblistener;
-	
-	/** CMS listener */
-	protected ICMSComponentListener cmslistener;
 
 	/**
 	 *  Creates a new MultiFactory.
