@@ -231,75 +231,44 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				
 				ls.addLibraryServiceListener(liblistener);
 				
-				SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ls.getAllURLs().addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						final IComponentManagementService cms = (IComponentManagementService) result;
+						potentialurls.addAll((Collection) result);
+						validurls.addAll((Collection) result);
 						
-						cmslistener = new ICMSComponentListener()
+						if (kerneldefaultlocations.isEmpty())
+							ret.setResult(null);
+						else
 						{
-							public IFuture componentRemoved(IComponentDescription desc, Map results)
+							// Initialize default locations
+							String[] dl = (String[]) kerneldefaultlocations.keySet().toArray(new String[kerneldefaultlocations.size()]);
+							kerneldefaultlocations.clear();
+							IResultListener loccounter = ia.createResultListener(new CounterResultListener(dl.length, ia.createResultListener(new DelegationResultListener(ret)
 							{
-								//System.out.println(desc.getLocalType());
-								return IFuture.DONE;
-							}
-							
-							public IFuture componentChanged(IComponentDescription desc)
-							{
-								return IFuture.DONE;
-							}
-							
-							public IFuture componentAdded(IComponentDescription desc)
-							{
-								//System.out.println(desc.get);
-								return IFuture.DONE;
-							}
-						};
-						cms.addComponentListener(null, cmslistener);
-						
-						ls.getAllURLs().addResultListener(ia.createResultListener(new DelegationResultListener(ret)
-						{
-							public void customResultAvailable(Object result)
-							{
-								potentialurls.addAll((Collection) result);
-								validurls.addAll((Collection) result);
-								
-								if (kerneldefaultlocations.isEmpty())
-									ret.setResult(null);
-								else
+								public void customResultAvailable(Object result)
 								{
-									// Initialize default locations
-									String[] dl = (String[]) kerneldefaultlocations.keySet().toArray(new String[kerneldefaultlocations.size()]);
-									kerneldefaultlocations.clear();
-									IResultListener loccounter = ia.createResultListener(new CounterResultListener(dl.length, ia.createResultListener(new DelegationResultListener(ret)
-									{
-										public void customResultAvailable(Object result)
-										{
-											ret.setResult(null);
-										}
-									}))
-									{
-										public void intermediateResultAvailable(Object result)
-										{
-											IModelInfo kernel = (IModelInfo) result;
-											String[] exts = (String[])kernel.getProperty(KERNEL_EXTENSIONS);
-											if (exts != null)
-												for (int i = 0; i < exts.length; ++i)
-													kerneldefaultlocations.put(exts[i], kernel.getFilename());
-										}
-									});
-									
-									ClassLoader cl = ls.getClassLoader();
-									for (int i = 0; i < dl.length; ++i)
-										loadModel(dl[i], null, cl).addResultListener(loccounter);
+									ret.setResult(null);
 								}
-							}
-						}));
+							}))
+							{
+								public void intermediateResultAvailable(Object result)
+								{
+									IModelInfo kernel = (IModelInfo) result;
+									String[] exts = (String[])kernel.getProperty(KERNEL_EXTENSIONS);
+									if (exts != null)
+										for (int i = 0; i < exts.length; ++i)
+											kerneldefaultlocations.put(exts[i], kernel.getFilename());
+								}
+							});
+							
+							ClassLoader cl = ls.getClassLoader();
+							for (int i = 0; i < dl.length; ++i)
+								loadModel(dl[i], null, cl).addResultListener(loccounter);
+						}
 					}
 				}));
-				
-				
 			}
 		}));
 		return ret;
