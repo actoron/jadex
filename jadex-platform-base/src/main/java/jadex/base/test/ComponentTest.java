@@ -58,11 +58,11 @@ public class ComponentTest implements	Test
 //		Map	args	= new HashMap();
 //		args.put("timeout", new Long(3000000));
 //		CreationInfo	ci	= new CreationInfo(args);
-		cms.createComponent(null, comp, null, trl).get(new ThreadSuspendable(), 300000);
 
 		// Evaluate the results.
 		try
 		{
+			cms.createComponent(null, comp, null, trl).get(new ThreadSuspendable(), 300000);
 			Testcase	tc	= trl.waitForResult();
 			TestReport[]	reports	= tc.getReports();
 			if(tc.getTestCount()!=reports.length)

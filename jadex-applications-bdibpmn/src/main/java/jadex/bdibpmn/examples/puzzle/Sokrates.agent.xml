@@ -108,21 +108,21 @@
 		<property name="debugging">false</property>
     </properties>
 
-	<configurations default="5x5 board (standard)">
-		<configuration name="3x3 board (no solution)">
+	<configurations>
+		<configuration name="5x5 board (standard)" >
 			<beliefs>
 				<initialbelief ref="board">
- 					<fact>new Board(3)</fact>
+ 					<fact>new Board(5)</fact>
 				</initialbelief>
 			</beliefs>
 			<plans>
 				<initialplan name="start_playing" ref="play_game_plan"/>
 			</plans>
 		</configuration>
-		<configuration name="5x5 board (standard)" >
+		<configuration name="3x3 board (no solution)">
 			<beliefs>
 				<initialbelief ref="board">
- 					<fact>new Board(5)</fact>
+ 					<fact>new Board(3)</fact>
 				</initialbelief>
 			</beliefs>
 			<plans>

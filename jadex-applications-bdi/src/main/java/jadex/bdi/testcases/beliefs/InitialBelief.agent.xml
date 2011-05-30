@@ -26,14 +26,15 @@
 	package="jadex.bdi.testcases.beliefs">
 
 	<imports>
+		<import>jadex.bdi.planlib.test.*</import>
 		<import>jadex.bdi.testcases.*</import>
 	</imports>
 
 	<capabilities>
-		<capability name="cap_a" file="jadex/bdi/testcases/beliefs/InitialBelief.capability.xml"/>
-		<capability name="cap_b" file="jadex/bdi/testcases/beliefs/InitialBelief.capability.xml"/>
-		<capability name="cap_c" file="jadex/bdi/testcases/beliefs/InitialBelief.capability.xml"/>
-		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+		<capability name="cap_a" file="InitialBelief.capability.xml"/>
+		<capability name="cap_b" file="InitialBelief.capability.xml"/>
+		<capability name="cap_c" file="InitialBelief.capability.xml"/>
+		<capability name="testcap" file="Test.capability.xml"/>
 	</capabilities>
 
 	<beliefs>

@@ -107,7 +107,7 @@ public class OAVBDIFetcher extends SimpleValueFetcher
 		else if(name.equals("$expressionbase"))
 			ret = ExpressionbaseFlyweight.getExpressionbaseFlyweight(state, rcapa);
 		else if(name.equals("$propertybase") || name.equals("$properties"))
-			ret = BDIInterpreter.getInterpreter(state).getProperties();
+			ret = BDIInterpreter.getInterpreter(state).getModel();	// hack: model provides getProperty() method
 //			ret = PropertybaseFlyweight.getPropertybaseFlyweight(state, rcapa);
 		else if(name.equals("$goal") && rgoal!=null)
 			ret = GoalFlyweight.getGoalFlyweight(state, rcapa, rgoal);

@@ -229,6 +229,7 @@
 		<xs:complexContent>
 			<xs:extension base="propertyobject">
 				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="kdtree" type="xs:boolean" use="optional" default="false"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

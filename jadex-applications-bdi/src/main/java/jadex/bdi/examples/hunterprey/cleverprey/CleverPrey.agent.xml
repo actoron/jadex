@@ -18,10 +18,9 @@
 
 	<imports>
 		<import>jadex.commons.future.*</import>
-		<import>jadex.application.runtime.*</import>
-		<import>jadex.application.space.envsupport.environment.space2d.*</import>
-		<import>jadex.application.space.envsupport.environment.*</import>
-		<import>jadex.application.space.envsupport.math.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.extension.envsupport.math.*</import>
 		<import>java.util.Arrays</import>
 	</imports>
 

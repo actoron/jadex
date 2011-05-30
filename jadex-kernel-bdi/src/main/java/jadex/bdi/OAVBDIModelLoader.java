@@ -192,13 +192,14 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 				ret	=  new OAVCapabilityModel(state, handle, mi, types, info.getLastModified(), entries);
 			}
 			
+			// Need to set class loader before create agent model entry to load subcapabilities.
+			mi.setClassloader(classloader);
+			mi.setFilename(info.getFilename());
 			createAgentModelEntry(ret, mi);
 			
 			
 			// Initialize the model info.
 			ret.initModelInfo();
-			mi.setClassloader(classloader);
-			mi.setFilename(info.getFilename());
 		}
 		else
 		{

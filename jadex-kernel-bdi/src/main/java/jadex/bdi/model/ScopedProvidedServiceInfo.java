@@ -19,6 +19,14 @@ public class ScopedProvidedServiceInfo	extends ProvidedServiceInfo
 	/**
 	 *  Create a new service info.
 	 */
+	public ScopedProvidedServiceInfo()
+	{
+		// Bean constructor.
+	}
+	
+	/**
+	 *  Create a new service info.
+	 */
 	public ScopedProvidedServiceInfo(Class type, ProvidedServiceImplementation implementation, Object scope)
 	{
 		super(type, implementation);
@@ -34,5 +42,14 @@ public class ScopedProvidedServiceInfo	extends ProvidedServiceInfo
 	public Object	fetchScope()
 	{
 		return scope;
+	}
+	
+	/**
+	 *  Set the scope.
+	 */
+	// No bean accessor, because only used internally.
+	public void	putScope(Object scope)
+	{
+		this.scope	= scope;
 	}
 }

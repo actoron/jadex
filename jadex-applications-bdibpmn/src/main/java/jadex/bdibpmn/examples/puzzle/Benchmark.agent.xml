@@ -112,7 +112,17 @@
 		<property name="debugging">false</property>
     </properties>
 
-	<configurations default="alter-long">
+	<configurations>
+		<configuration name="alter-long">
+			<beliefs>
+				<initialbelief ref="ml">
+ 					<fact>"alter_long"</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="play_game_plan"/>
+			</plans>
+		</configuration>
 		<configuration name="none">
 			<beliefs>
 				<initialbelief ref="ml">
@@ -137,16 +147,6 @@
 			<beliefs>
 				<initialbelief ref="ml">
  					<fact>"same_long"</fact>
-				</initialbelief>
-			</beliefs>
-			<plans>
-				<initialplan ref="play_game_plan"/>
-			</plans>
-		</configuration>
-		<configuration name="alter-long">
-			<beliefs>
-				<initialbelief ref="ml">
- 					<fact>"alter_long"</fact>
 				</initialbelief>
 			</beliefs>
 			<plans>

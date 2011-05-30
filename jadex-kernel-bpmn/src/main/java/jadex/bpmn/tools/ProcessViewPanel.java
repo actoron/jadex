@@ -17,7 +17,6 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.management.ThreadInfo;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;

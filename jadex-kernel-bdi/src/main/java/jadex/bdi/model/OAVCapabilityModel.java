@@ -824,16 +824,23 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 			String belname = name.substring(idx+1);
 			
 			Object subcaparef = state.getAttributeValue(scope, OAVBDIMetaModel.capability_has_capabilityrefs, capaname);
-			Object subcapa  = state.getAttributeValue(subcaparef, OAVBDIMetaModel.capabilityref_has_capability);
-			
-			belref = state.getAttributeValue(subcapa, OAVBDIMetaModel.capability_has_beliefs, belname);
-			if(belref==null)
-				belref = state.getAttributeValue(subcapa, OAVBDIMetaModel.capability_has_beliefrefs, belname);
-			
-			ret = findBeliefType(state, subcapa, belref);
+			if(subcaparef!=null)
+			{
+				Object subcapa  = state.getAttributeValue(subcaparef, OAVBDIMetaModel.capabilityref_has_capability);
+				
+				belref = state.getAttributeValue(subcapa, OAVBDIMetaModel.capability_has_beliefs, belname);
+				if(belref==null)
+					belref = state.getAttributeValue(subcapa, OAVBDIMetaModel.capability_has_beliefrefs, belname);
+				
+				if(belref!=null)
+				{
+					ret = findBeliefType(state, subcapa, belref);
+				}
+			}
 		}
 		
-		return ret;
+		// For broken subcapability: Return something, otherwise JCC panics.
+		return ret!=null ? ret : void.class;
 	}
 	
 //	/**
@@ -999,16 +1006,22 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 			String belname = name.substring(idx+1);
 			
 			Object subcaparef = state.getAttributeValue(scope, OAVBDIMetaModel.capability_has_capabilityrefs, capaname);
-			Object subcapa  = state.getAttributeValue(subcaparef, OAVBDIMetaModel.capabilityref_has_capability);
-			
-			belref = state.getAttributeValue(subcapa, OAVBDIMetaModel.capability_has_beliefs, belname);
-			if(belref==null)
-				belref = state.getAttributeValue(subcapa, OAVBDIMetaModel.capability_has_beliefrefs, belname);
-			
-			ret = findBeliefSetType(state, subcapa, belref);
+			if(subcaparef!=null)
+			{
+				Object subcapa  = state.getAttributeValue(subcaparef, OAVBDIMetaModel.capabilityref_has_capability);
+				
+				belref = state.getAttributeValue(subcapa, OAVBDIMetaModel.capability_has_beliefs, belname);
+				if(belref==null)
+					belref = state.getAttributeValue(subcapa, OAVBDIMetaModel.capability_has_beliefrefs, belname);
+				if(belref!=null)
+				{
+					ret = findBeliefSetType(state, subcapa, belref);
+				}
+			}
 		}
 		
-		return ret;
+		// For broken subcapability: Return something, otherwise JCC panics.
+		return ret!=null ? ret : void.class;
 	}
 	
 //	/**

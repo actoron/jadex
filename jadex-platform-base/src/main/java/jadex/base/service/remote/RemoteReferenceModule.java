@@ -11,9 +11,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Replacement;
@@ -36,7 +34,6 @@ import jadex.xml.annotation.XMLClassname;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
