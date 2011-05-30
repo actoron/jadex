@@ -1,6 +1,7 @@
 package jadex.kernelbase;
 
 import jadex.bridge.CreationInfo;
+import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
@@ -19,6 +20,7 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
+import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
@@ -68,6 +70,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	/** Kernel default locations */
 	protected Map kerneldefaultlocations;
 	
+	/** Cache of known factories */
+	protected Map factorycache;
+	
 	/** Cache of kernel locations */
 	protected MultiCollection kernellocationcache;
 	
@@ -113,6 +118,12 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	
 	/** Flag whether the service has started */
 	protected boolean started;
+	
+	/** Library service listener */
+	protected ILibraryServiceListener liblistener;
+	
+	/** CMS listener */
+	protected ICMSComponentListener cmslistener;
 
 	/**
 	 *  Creates a new MultiFactory.
@@ -126,6 +137,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	{
 		//super(ia.getServiceContainer().getId(), IComponentFactory.class, null);
 		//this.ia = ia;
+		this.factorycache = new HashMap();
 		this.kernellocationcache = new MultiCollection();
 		this.kernelurls = new MultiCollection();
 		this.potentialurls = new HashSet();
@@ -177,7 +189,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			{
 				final ILibraryService ls = (ILibraryService) result;
 				final IExternalAccess exta = ia.getExternalAccess();
-				ls.addLibraryServiceListener(new ILibraryServiceListener()
+				liblistener = new ILibraryServiceListener()
 				{
 					public IFuture urlRemoved(final URL url)
 					{
@@ -215,48 +227,101 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 						});
 						return IFuture.DONE;
 					}
-				});
+				};
 				
-				ls.getAllURLs().addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ls.addLibraryServiceListener(liblistener);
+				
+				SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						potentialurls.addAll((Collection) result);
-						validurls.addAll((Collection) result);
+						final IComponentManagementService cms = (IComponentManagementService) result;
 						
-						if (kerneldefaultlocations.isEmpty())
-							ret.setResult(null);
-						else
+						cmslistener = new ICMSComponentListener()
 						{
-							// Initialize default locations
-							String[] dl = (String[]) kerneldefaultlocations.keySet().toArray(new String[kerneldefaultlocations.size()]);
-							kerneldefaultlocations.clear();
-							IResultListener loccounter = ia.createResultListener(new CounterResultListener(dl.length, ia.createResultListener(new DelegationResultListener(ret)
+							public IFuture componentRemoved(IComponentDescription desc, Map results)
 							{
-								public void customResultAvailable(Object result)
-								{
-									ret.setResult(null);
-								}
-							}))
-							{
-								public void intermediateResultAvailable(Object result)
-								{
-									IModelInfo kernel = (IModelInfo) result;
-									String[] exts = (String[])kernel.getProperty(KERNEL_EXTENSIONS);
-									if (exts != null)
-										for (int i = 0; i < exts.length; ++i)
-											kerneldefaultlocations.put(exts[i], kernel.getFilename());
-								}
-							});
+								//System.out.println(desc.getLocalType());
+								return IFuture.DONE;
+							}
 							
-							ClassLoader cl = ls.getClassLoader();
-							for (int i = 0; i < dl.length; ++i)
-								loadModel(dl[i], null, cl).addResultListener(loccounter);
-						}
+							public IFuture componentChanged(IComponentDescription desc)
+							{
+								return IFuture.DONE;
+							}
+							
+							public IFuture componentAdded(IComponentDescription desc)
+							{
+								//System.out.println(desc.get);
+								return IFuture.DONE;
+							}
+						};
+						cms.addComponentListener(null, cmslistener);
+						
+						ls.getAllURLs().addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+						{
+							public void customResultAvailable(Object result)
+							{
+								potentialurls.addAll((Collection) result);
+								validurls.addAll((Collection) result);
+								
+								if (kerneldefaultlocations.isEmpty())
+									ret.setResult(null);
+								else
+								{
+									// Initialize default locations
+									String[] dl = (String[]) kerneldefaultlocations.keySet().toArray(new String[kerneldefaultlocations.size()]);
+									kerneldefaultlocations.clear();
+									IResultListener loccounter = ia.createResultListener(new CounterResultListener(dl.length, ia.createResultListener(new DelegationResultListener(ret)
+									{
+										public void customResultAvailable(Object result)
+										{
+											ret.setResult(null);
+										}
+									}))
+									{
+										public void intermediateResultAvailable(Object result)
+										{
+											IModelInfo kernel = (IModelInfo) result;
+											String[] exts = (String[])kernel.getProperty(KERNEL_EXTENSIONS);
+											if (exts != null)
+												for (int i = 0; i < exts.length; ++i)
+													kerneldefaultlocations.put(exts[i], kernel.getFilename());
+										}
+									});
+									
+									ClassLoader cl = ls.getClassLoader();
+									for (int i = 0; i < dl.length; ++i)
+										loadModel(dl[i], null, cl).addResultListener(loccounter);
+								}
+							}
+						}));
 					}
 				}));
+				
+				
 			}
 		}));
+		return ret;
+	}
+	
+	/**
+	 *  Stops the service.
+	 */
+	@ServiceShutdown
+	public IFuture shutdownService()
+	{
+		Future ret = new Future();
+		
+		SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				ILibraryService ls = (ILibraryService) result;
+				ls.removeLibraryServiceListener(liblistener);
+			}
+		}));
+		
 		return ret;
 	}
 	
@@ -286,6 +351,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	public IFuture loadModel(final String model, final String[] imports, final ClassLoader classloader, boolean isrecur)
 	{
 		final Future ret = new Future();
+		
 		findKernel(model, imports, classloader, isrecur).addResultListener(ia.createResultListener(ia.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -452,12 +518,17 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			final Map arguments, final IExternalAccess parent,
 			final RequiredServiceBinding[] bindings, final Future ret)
 	{
+		IComponentFactory fac = (IComponentFactory) factorycache.get(getModelExtension(model.getFilename()));
+		if (fac != null)
+			return fac.createComponentInstance(desc, factory, model, config, arguments, parent, bindings, ret);
+		
 		final Future res = new Future();
+		
 		findKernel(model.getFilename(), null, model.getClassLoader()).addResultListener(ia.createResultListener(new DelegationResultListener(res)
 		{
 			public void customResultAvailable(Object result)
 			{
-				((IComponentFactory) result).createComponentInstance(desc, factory, model, config, arguments, parent, bindings, ret).addResultListener(ia.createResultListener(new DelegationResultListener(res)));
+				((IComponentFactory) result).createComponentInstance(desc, factory, model, config, arguments, parent, bindings, ret).addResultListener(new DelegationResultListener(res));
 			}
 		}));
 		return res;
@@ -538,8 +609,13 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture findKernel(final String model, final String[] imports, final ClassLoader classloader, final boolean isrecur)
 	{
-		if (extensionblacklist.contains(getModelExtension(model)))
+		final String ext = getModelExtension(model);
+		if (extensionblacklist.contains(ext))
 			return IFuture.DONE;
+		
+		IComponentFactory fac = (IComponentFactory) factorycache.get(ext);
+		if (fac != null)
+			return new Future(fac);
 		
 		final Future ret = new Future();
 		
@@ -548,7 +624,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			public void resultAvailable(Object result)
 			{
 				if (result != null)
+				{
 					ret.setResult(result);
+				}
 				else
 					findLoadableKernel(model, imports, classloader, isrecur).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 					{
@@ -559,7 +637,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 							else
 							{
 								if (!isrecur)
-									extensionblacklist.add(getModelExtension(model));
+									extensionblacklist.add(ext);
 								ret.setResult(null);
 							}
 						}
@@ -570,7 +648,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			{
 				// Give warning?
 				if (!isrecur)
-					extensionblacklist.add(getModelExtension(model));
+					extensionblacklist.add(ext);
 				resultAvailable(null);
 			}
 		}));
@@ -737,7 +815,21 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 										if(name.startsWith("kernel"))
 											name	= name.substring(6);
 										name	= "kernel_"+name;
-										cms.createComponent(name, kernelmodel, ci, null).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+										
+										final String[] kexts = (String[]) info.getProperty(KERNEL_EXTENSIONS) == null? new String[0] : (String[]) info.getProperty(KERNEL_EXTENSIONS);
+										cms.createComponent(name, kernelmodel, ci, ia.createResultListener(new IResultListener()
+										{
+											public void resultAvailable(Object result)
+											{
+												for (int i = 0; i < kexts.length; ++i)
+													factorycache.remove(kexts[i]);
+											}
+											
+											public void exceptionOccurred(Exception exception)
+											{
+												resultAvailable(null);
+											}
+										})).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 										{
 											public void customResultAvailable(Object result)
 											{
@@ -751,6 +843,11 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 															ret.setResult(null);
 															return;
 														}
+														for (int i = 0; i < kexts.length; ++i)
+														{
+															factorycache.put(kexts[i], kernel);
+														}
+														
 														// If this is a new kernel, gather types and icons
 														if (!activatedkernels.contains(kernelmodel))
 														{
@@ -1097,7 +1194,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected static String getModelExtension(String model)
 	{
-		int firstpoint = Math.max(0, model.lastIndexOf(File.separatorChar));
+		int firstpoint = Math.max(Math.max(0, model.lastIndexOf(File.separatorChar)), model.lastIndexOf('/'));
 		firstpoint = model.indexOf('.', firstpoint);
 		
 		if (firstpoint < 0 || firstpoint == (model.length() - 1))
