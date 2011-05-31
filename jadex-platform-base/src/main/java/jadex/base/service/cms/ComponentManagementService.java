@@ -2414,6 +2414,13 @@ public abstract class ComponentManagementService extends BasicService implements
 		synchronized(adapters)
 		{
 			IComponentAdapter	adapter	= (IComponentAdapter)adapters.get(cid);
+			// Hack? Allows components to getExternalAccess in init phase
+			if(adapter==null)
+			{
+				Object[] ii = getInitInfo(cid);
+				if(ii!=null)
+					adapter = (IComponentAdapter)ii[1];
+			}
 			return adapter!=null ? adapter.getDescription() : null;
 		}
 	}

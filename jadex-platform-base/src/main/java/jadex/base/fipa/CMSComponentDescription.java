@@ -167,6 +167,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		// CMS / external access / component may access description concurrently?!
 		synchronized(this)
 		{
+//			System.out.println("add child: "+child+" "+getName());
 			if(children==null)
 				children = new LinkedHashSet();
 			children.add(child);
