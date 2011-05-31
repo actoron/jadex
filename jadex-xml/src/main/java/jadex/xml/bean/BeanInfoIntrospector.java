@@ -4,6 +4,8 @@ package jadex.xml.bean;
 import jadex.commons.collection.LRU;
 import jadex.xml.SXML;
 import jadex.xml.annotation.XMLClassname;
+import jadex.xml.annotation.XMLExclude;
+import jadex.xml.annotation.XMLInclude;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -65,28 +67,46 @@ public class BeanInfoIntrospector implements IBeanIntrospector
 					Method getter = pd.getReadMethod();
 					if(setter != null && getter != null) 
 					{
-						Class[] setter_param_type = setter.getParameterTypes();
-						if (setter_param_type.length==1) 
+						XMLExclude exset = setter.getAnnotation(XMLExclude.class);
+						XMLExclude exget = getter.getAnnotation(XMLExclude.class);
+						if(exset==null && exget==null)
 						{
-							ret.put(pd.getName(), new BeanProperty(pd.getName(), pd.getPropertyType(), getter, setter, setter_param_type[0]));
+							Class[] setter_param_type = setter.getParameterTypes();
+							if (setter_param_type.length==1) 
+							{
+								ret.put(pd.getName(), new BeanProperty(pd.getName(), pd.getPropertyType(), getter, setter, setter_param_type[0]));
+							}
 						}
 					}
 				}
 				
 	            // Get all public fields.
-	            if(includefields)
-	            {
-		            Field[] fields = clazz.getFields();
-		            for(int i=0; i<fields.length; i++)
-		            {
-		            	String property_java_name = fields[i].getName();
-		            	if(!ret.containsKey(property_java_name))
-		            	{
-		            		ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
-		            	}
-		            }
-	            }
-	            
+				if(includefields)
+				{
+					Field[] fields = clazz.getFields();
+					for(int i = 0; i < fields.length; i++)
+					{
+						String property_java_name = fields[i].getName();
+						XMLExclude ex = fields[i].getAnnotation(XMLExclude.class);
+						if(!ret.containsKey(property_java_name) && ex==null)
+						{
+							ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
+						}
+					}
+				}
+				else
+				{
+					Field[] fields = clazz.getFields();
+					for(int i = 0; i < fields.length; i++)
+					{
+						String property_java_name = fields[i].getName();
+						XMLInclude in = fields[i].getAnnotation(XMLInclude.class);
+						if(!ret.containsKey(property_java_name) && in!=null)
+						{
+							ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
+						}
+					}
+				}
 	            
 	            // Get final values (val$xyz fields) for anonymous classes.
 	            if(clazz.isAnonymousClass())

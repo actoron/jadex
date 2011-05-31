@@ -4,7 +4,10 @@ package jadex.xml.bean;
 import jadex.commons.collection.LRU;
 import jadex.xml.SXML;
 import jadex.xml.annotation.XMLClassname;
+import jadex.xml.annotation.XMLExclude;
+import jadex.xml.annotation.XMLInclude;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -59,16 +62,19 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 			for(int i = 0; i < ms.length; i++)
 			{
 				String method_name = ms[i].getName();
-				if((method_name.startsWith("is") || method_name
-						.startsWith("get"))
+				XMLExclude ex = ms[i].getAnnotation(XMLExclude.class);
+				if(ex==null)
+				{
+					if((method_name.startsWith("is") || method_name.startsWith("get"))
 						&& ms[i].getParameterTypes().length == 0)
-				{
-					getters.put(method_name, ms[i]);
-				}
-				else if(method_name.startsWith("set")
+					{
+						getters.put(method_name, ms[i]);
+					}
+					else if(method_name.startsWith("set")
 						&& ms[i].getParameterTypes().length == 1)
-				{
-					setters.add(ms[i]);
+					{
+						setters.add(ms[i]);
+					}
 				}
 			}
 
@@ -87,12 +93,10 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 				if(getter != null)
 				{
 					Class[] setter_param_type = setter.getParameterTypes();
-					String property_java_name = Character
-							.toLowerCase(property_name.charAt(0))
-							+ property_name.substring(1);
-					ret.put(property_java_name, new BeanProperty(
-							property_java_name, getter.getReturnType(), getter,
-							setter, setter_param_type[0]));
+					String property_java_name = Character.toLowerCase(property_name.charAt(0))
+						+ property_name.substring(1);
+					ret.put(property_java_name, new BeanProperty(property_java_name, 
+						getter.getReturnType(), getter, setter, setter_param_type[0]));
 				}
 			}
 
@@ -103,10 +107,23 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 				for(int i = 0; i < fields.length; i++)
 				{
 					String property_java_name = fields[i].getName();
-					if(!ret.containsKey(property_java_name))
+					XMLExclude ex = fields[i].getAnnotation(XMLExclude.class);
+					if(!ret.containsKey(property_java_name) && ex==null)
 					{
-						ret.put(property_java_name, new BeanProperty(
-								property_java_name, fields[i]));
+						ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
+					}
+				}
+			}
+			else
+			{
+				Field[] fields = clazz.getFields();
+				for(int i = 0; i < fields.length; i++)
+				{
+					String property_java_name = fields[i].getName();
+					XMLInclude in = fields[i].getAnnotation(XMLInclude.class);
+					if(!ret.containsKey(property_java_name) && in!=null)
+					{
+						ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
 					}
 				}
 			}
@@ -123,16 +140,14 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 						property_java_name = property_java_name.substring(4);
 						if(!ret.containsKey(property_java_name))
 						{
-							ret.put(property_java_name, new BeanProperty(
-									property_java_name, fields[i]));
+							ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
 						}
 					}
 
 					// Add XML class name property if field present (hack!!!)
 					else if(SXML.XML_CLASSNAME.equals(property_java_name))
 					{
-						ret.put(property_java_name, new BeanProperty(
-								property_java_name, fields[i]));
+						ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
 					}
 				}
 

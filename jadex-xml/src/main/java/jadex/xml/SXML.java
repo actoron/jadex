@@ -32,6 +32,9 @@ public class SXML
 	/** Constant for anonymous inner classes. */
 	public static final String XML_CLASSNAME = "XML_CLASSNAME";
 
+	/**
+	 *  Get the xmlclassname annotation.
+	 */
 	public static XMLClassname getXMLClassnameAnnotation(Class clazz)
 	{
 		XMLClassname	xmlc	= null;
