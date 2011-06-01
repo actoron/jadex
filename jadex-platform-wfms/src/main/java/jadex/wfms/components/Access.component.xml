@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  WfMS Access Component.
+-->
+<componenttype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
+	name="Access" package="jadex.wfms.components">
+	
+	<imports>
+		<import>jadex.wfms.service.IExternalWfmsService</import>
+	</imports>
+	
+	<services>
+		<providedservice class="IExternalWfmsService">
+			<implementation>
+				new jadex.wfms.service.impl.ExternalWfmsService()
+			</implementation>
+		</providedservice>
+	</services>
+	
+</componenttype>

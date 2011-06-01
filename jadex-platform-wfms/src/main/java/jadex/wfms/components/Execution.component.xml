@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  WfMS Execution Component.
+-->
+<componenttype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
+	name="Execution" package="jadex.wfms.components">
+	
+	<imports>
+		<import>jadex.wfms.service.IExecutionService</import>
+		<import>jadex.wfms.service.IModelRepositoryService</import>
+	</imports>
+	
+	<services>
+		<providedservice class="IExecutionService">
+			<implementation>
+				new jadex.wfms.service.impl.ExecutionService()
+			</implementation>
+		</providedservice>
+		<providedservice class="IModelRepositoryService">
+			<implementation>
+				new jadex.wfms.service.impl.LinkedModelRepositoryService()
+			</implementation>
+		</providedservice>
+	</services>
+	
+</componenttype>
