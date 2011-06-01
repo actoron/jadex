@@ -5,10 +5,6 @@ import jadex.editor.common.model.properties.table.AbstractCommonTablePropertySec
 import jadex.editor.common.model.properties.table.MultiColumnTable;
 import jadex.editor.common.model.properties.table.MultiColumnTable.MultiColumnTableRow;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -74,11 +70,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		this.util = new JadexBpmnPropertiesUtil(containerEAnnotationName,
 				annotationDetailName, this);
 
-		//assert (uniqueColumnIndex != -1 && uniqueColumnIndex < columns.length);
-		
-//		this.uniqueColumnValuesMap = new HashMap<EModelElement, HashSet<String>>();
-
-//		this.uniqueColumnIndex = uniqueColumnIndex;
+		this.uniqueColumnIndex = uniqueColumnIndex;
 
 	}
 
