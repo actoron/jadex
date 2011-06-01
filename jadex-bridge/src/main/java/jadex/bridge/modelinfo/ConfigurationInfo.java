@@ -1,10 +1,12 @@
 package jadex.bridge.modelinfo;
 
 
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.commons.SUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -24,6 +26,9 @@ public class ConfigurationInfo extends Startable
 	
 	/** The list of extensions. */
 	protected List extensions;
+	
+	/** The provided service overridings. */
+	protected List providedservices;
 	
 	//-------- constructors --------
 	
@@ -137,5 +142,35 @@ public class ConfigurationInfo extends Startable
 		if(extensions==null)
 			extensions = new ArrayList();
 		extensions.add(extension);
+	}
+	
+	/**
+	 *  Get the provided services.
+	 *  @return The provided services.
+	 */
+	public ProvidedServiceInfo[] getProvidedServices()
+	{
+		return providedservices==null? new ProvidedServiceInfo[0]: 
+			(ProvidedServiceInfo[])providedservices.toArray(new ProvidedServiceInfo[providedservices.size()]);
+	}
+
+	/**
+	 *  Set the provided services.
+	 *  @param provided services The provided services to set.
+	 */
+	public void setProvidedServices(ProvidedServiceInfo[] providedservices)
+	{
+		this.providedservices = SUtil.arrayToList(providedservices);
+	}
+	
+	/**
+	 *  Add a provided service.
+	 *  @param providedservice The provided service.
+	 */
+	public void addProvidedService(ProvidedServiceInfo providedservice)
+	{
+		if(providedservices==null)
+			providedservices = new ArrayList();
+		providedservices.add(providedservice);
 	}
 }

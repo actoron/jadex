@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Service configurations.
+-->
+<componenttype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
+	name="ServiceConfigurations" package="jadex.micro.testcases">
+	
+	<imports>
+		<import>jadex.bridge.service*</import>
+	</imports>
+	
+	<services>
+		<providedservice class="IAService">
+			<implementation class="ServiceConfigurationsAgent"/>
+		</providedservice>
+	</services>
+	
+	<configurations>
+		<configuration name="a"/>
+		<configuration name="b">
+			<services>
+				<providedservice ref="IAService">
+					<implementation>ServiceConfigurationsAgent.getService()</implementation>
+				</providedservice>
+			</services>
+		</configuration>
+	</configurations>
+	
+</componenttype>

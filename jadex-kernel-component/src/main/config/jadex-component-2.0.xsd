@@ -177,7 +177,6 @@
 			<xs:element name="arguments" type="configarguments" minOccurs="0"/>
 			<xs:element name="components" type="configcomponents" minOccurs="0"/>
 			<xs:element name="services" type="configservices" minOccurs="0"/>
-			<xs:element name="providedservices" type="configprovidedservices" minOccurs="0"/>
 			<xs:element name="extensions" type="extensions" minOccurs="0"/>
 		</xs:all>
 	</xs:group>
@@ -315,7 +314,7 @@
 		<xs:annotation>
 			<xs:documentation>Defines a provided service type.</xs:documentation>
 		</xs:annotation>
-		<xs:choice>
+		<xs:sequence>
 			<xs:element name="implementation">
 				<xs:complexType>
 					<xs:complexContent>
@@ -327,7 +326,7 @@
 					</xs:complexContent>
 				</xs:complexType>
 			</xs:element>
-		</xs:choice>
+		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required"/>
 	</xs:complexType>
 	<xs:complexType name="requiredservicetype">
@@ -380,6 +379,9 @@
 		<xs:attribute name="ref" type="xs:string" use="required"/>
 	</xs:complexType>
 	<xs:complexType name="implementation" mixed="true">
+		<xs:sequence>
+			<xs:element name="binding" type="binding" minOccurs="0"/>
+		</xs:sequence>
 		<xs:attribute name="language" type="xs:string" use="optional"/>
 		<xs:attribute name="class" type="xs:string" use="optional"/>
 		<xs:attribute name="proxytype" use="optional" default="decoupled">

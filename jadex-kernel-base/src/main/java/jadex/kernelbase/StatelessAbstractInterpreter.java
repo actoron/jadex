@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -410,8 +411,28 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	public IFuture initServices(IModelInfo model, String config)
 	{
 		IFuture	ret	= null;
-		ProvidedServiceInfo[] services = model.getProvidedServices();
+		
 //		System.out.println("init sers: "+services);
+		ProvidedServiceInfo[] ms = model.getProvidedServices();
+		
+		Map sermap = new LinkedHashMap();
+		for(int i=0; i<ms.length; i++)
+		{
+			sermap.put(ms[i].getType(), ms[i]);
+		}
+
+		if(config!=null)
+		{
+			ConfigurationInfo cinfo = model.getConfiguration(config);
+			ProvidedServiceInfo[] cs = cinfo.getProvidedServices();
+			for(int i=0; i<cs.length; i++)
+			{
+	//			ProvidedServiceInfo psi = (ProvidedServiceInfo)sermap.get(cs[i].getType());
+				sermap.put(cs[i].getType(), cs[i]);
+			}
+		}
+		
+		ProvidedServiceInfo[] services = (ProvidedServiceInfo[])sermap.values().toArray(new ProvidedServiceInfo[sermap.size()]);
 		if(services!=null)
 		{
 			for(int i=0; ret==null && i<services.length; i++)
@@ -1119,4 +1140,5 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			}
 		}
 	}
+	
 }

@@ -186,7 +186,6 @@ public class ComponentXMLReader
 					pos	= " (line 0, column 0)";			
 				}
 				report.put(stack, msg+pos);
-				report.size();
 			}
 		});
 	}
@@ -249,8 +248,10 @@ public class ComponentXMLReader
 //		}
 		
 		if(report.size()>0)
-			System.out.println("Error loading model: "+rinfo.getFilename()+" "+report);
-		
+		{
+//			System.out.println("Error loading model: "+rinfo.getFilename()+" "+report);
+			mi.setReport(buildReport(mi.getFullName(), mi.getFilename(), report));
+		}
 		return ret;
 	}
 	
@@ -326,6 +327,8 @@ public class ComponentXMLReader
 				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown"))},
 				new SubobjectInfo[]{
 				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "component")}), new AccessInfo(new QName(uri, "component"), "componentInstance")),
+				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "providedservice")}), new AccessInfo(new QName(uri, "providedservice"), "providedService")),
+				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "requiredservice")}), new AccessInfo(new QName(uri, "requiredservice"), "requiredService")),
 			}), null, new BeanObjectReaderHandler()));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(Argument.class), 
@@ -356,7 +359,8 @@ public class ComponentXMLReader
 				new AttributeInfo(new AccessInfo("class", "className"))
 			}, null)));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "providedservice")), new ObjectInfo(ProvidedServiceInfo.class),// new ExpressionProcessor()), 
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype"), new QName(uri, "services"), new QName(uri, "providedservice")}), 
+			new ObjectInfo(ProvidedServiceInfo.class),// new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 //				new AttributeInfo(new AccessInfo("class", "className")),
 				new AttributeInfo(new AccessInfo("class", "type"), new AttributeConverter(classconv, reclassconv)),
@@ -370,13 +374,23 @@ public class ComponentXMLReader
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "type"), new AttributeConverter(classconv, reclassconv))
 			}, new SubobjectInfo[]{
-				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "binding")}), new AccessInfo(new QName(uri, "binding"), "defaultBinding")),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "binding")}), new AccessInfo(new QName(uri, "binding"), "defaultBinding")),
 			}), null, new BeanObjectReaderHandler()));
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "binding")), new ObjectInfo(RequiredServiceBinding.class), 
-				new MappingInfo(null, new AttributeInfo[]{
+			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("componentname", "componentName")),
 				new AttributeInfo(new AccessInfo("componenttype", "componentType")),
 			})));
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "configuration"), new QName(uri, "services"), new QName(uri, "providedservice")}), 
+			new ObjectInfo(ProvidedServiceInfo.class),// new ExpressionProcessor()), 
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("ref", "type"), new AttributeConverter(classconv, reclassconv)),
+			}, null), null, new BeanObjectReaderHandler()));
+		
+//		types.add(new TypeInfo(new XMLInfo(new QName(uri, "providedservice")), new ObjectInfo(ProvidedServiceInfo.class),// new ExpressionProcessor()), 
+//			new MappingInfo(null, null, "value", new AttributeInfo[]{
+//			new AttributeInfo(new AccessInfo("class", "type"), new AttributeConverter(classconv, reclassconv)),
+//			}, null), null, new BeanObjectReaderHandler()));
 		
 //		types.add(new TypeInfo(new XMLInfo(new QName(uri, "container")), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
 //			new MappingInfo(null, null, "value", new AttributeInfo[]{
@@ -401,7 +415,7 @@ public class ComponentXMLReader
 	/**
      *  Build the error report.
      */
-    public static IErrorReport buildReport(String modelname, String filename, String[] cats, MultiCollection entries, Map externals)
+    public static IErrorReport buildReport(String modelname, String filename, MultiCollection entries)
     {
         return new AbstractErrorReportBuilder(modelname, filename,
             new String[]{"Component", "Configuration"}, entries, null)

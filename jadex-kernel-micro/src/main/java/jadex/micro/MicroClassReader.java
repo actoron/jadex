@@ -312,6 +312,23 @@ public class MicroClassReader
 					arg.setDefaultValue(confignames[i], val);
 				}
 				
+				ProvidedService[] provs = configs[i].providedservices();
+				ProvidedServiceInfo[] psis = new ProvidedServiceInfo[provs.length];
+				for(int j=0; j<provs.length; j++)
+				{
+					Implementation im = provs[j].implementation();
+					Binding bd = im.binding();
+					RequiredServiceBinding bind = bd==null? null: new RequiredServiceBinding(bd.name(), 
+						bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
+						bd.dynamic(), bd.scope(), bd.create(), bd.recover());
+					ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
+						im.expression().length()>0? im.expression(): null, im.proxytype(), bind);
+					psis[j] = new ProvidedServiceInfo(provs[j].type(), impl);
+					configinfo.setProvidedServices(psis);
+				}
+				
+				// todo required services
+				
 				// todo: store arguments in config not in valueprovider
 				
 				Component[] comps = configs[i].components();
