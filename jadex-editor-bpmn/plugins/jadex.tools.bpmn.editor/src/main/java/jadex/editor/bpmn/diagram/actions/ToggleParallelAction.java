@@ -58,6 +58,7 @@ public class ToggleParallelAction extends DiagramAction
 		refresh();
 	}
 
+	@Override
 	public void refresh()
 	{
 		if (getStructuredSelection().isEmpty()
@@ -75,7 +76,7 @@ public class ToggleParallelAction extends DiagramAction
 		SubProcess process = (SubProcess) ((SubProcessEditPart) getStructuredSelection()
 				.getFirstElement()).resolveSemanticElement();
 		String annotation = EcoreUtil.getAnnotation(process,
-				JadexBpmnPropertiesUtil.JADEX_SUBPROCESS_ANNOTATION,
+				JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
 				IS_PARALLEL_KEY_ID);
 		if (annotation == null || annotation.equals("false")) //$NON-NLS-1$
 		{
@@ -146,7 +147,7 @@ public class ToggleParallelAction extends DiagramAction
 					EcoreUtil
 							.setAnnotation(
 									model,
-									JadexBpmnPropertiesUtil.JADEX_SUBPROCESS_ANNOTATION,
+									JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
 									IS_PARALLEL_KEY_ID, "true"); //$NON-NLS-1$
 				}
 				else
@@ -154,7 +155,7 @@ public class ToggleParallelAction extends DiagramAction
 					EcoreUtil
 							.setAnnotation(
 									model,
-									JadexBpmnPropertiesUtil.JADEX_SUBPROCESS_ANNOTATION,
+									JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
 									IS_PARALLEL_KEY_ID, "false"); //$NON-NLS-1$
 				}
 				((SubProcessEditPart) getStructuredSelection()

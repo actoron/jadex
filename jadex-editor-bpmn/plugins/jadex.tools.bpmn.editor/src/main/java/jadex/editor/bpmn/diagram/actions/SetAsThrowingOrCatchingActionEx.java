@@ -42,7 +42,6 @@ public class SetAsThrowingOrCatchingActionEx extends
 			public void execute()
 			{
 				super.execute();
-				// hopefully this will call "setInput()" on the properties page
 				part.activate();
 			}
 		};

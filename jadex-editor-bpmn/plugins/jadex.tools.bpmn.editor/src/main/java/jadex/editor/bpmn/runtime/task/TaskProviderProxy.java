@@ -28,7 +28,7 @@ public class TaskProviderProxy implements IEditorTaskProvider
 	@Override
 	public void dispose()
 	{
-		// TODO Auto-generated method stub
+		// nothing to dispose
 	}
 	
 	/*

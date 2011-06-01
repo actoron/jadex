@@ -109,7 +109,7 @@
         <propertySection
               class="jadex.editor.bpmn.editor.properties.JadexCommonParameterSection"
               filter="jadex.editor.bpmn.editor.properties.JadexUserTaskActivityFilter"
-              id="jadex.tools.bpmn.editor.properties.JadexCommonDiagramParameterSection"
+              id="jadex.tools.bpmn.editor.properties.JadexCommonParameterSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexUserTaskImplComboSection">
            <input type="org.eclipse.stp.bpmn.Activity"/>

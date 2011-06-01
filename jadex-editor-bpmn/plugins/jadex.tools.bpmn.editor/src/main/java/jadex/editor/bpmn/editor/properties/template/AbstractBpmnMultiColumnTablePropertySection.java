@@ -37,9 +37,6 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	/** The unique column index for this TablePropertySection */
 	private int uniqueColumnIndex;
 
-//	/** The table column unique values cache for model elements */
-//	private Map<EModelElement, HashSet<String>> uniqueColumnValuesMap;
-
 	// ---- constructor ----
 
 	/**
@@ -102,33 +99,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	public void setInput(IWorkbenchPart part, ISelection selection)
 	{
 		super.setInput(part, selection);
-
-		if (modelElement != null)
-		{
-//			getUniqueColumnValueCache(modelElement);
-			return;
-		}
 	}
-
-//	/**
-//	 * Updates the uniqueColumnValueCache for modelElement
-//	 * 
-//	 * @param element
-//	 * @return
-//	 */
-//	private HashSet<String> getUniqueColumnValueCache(EModelElement element)
-//	{
-//		if (uniqueColumnValuesMap.containsKey(modelElement))
-//		{
-//			return uniqueColumnValuesMap.get(modelElement);
-//		}
-//		else
-//		{
-//			HashSet<String> newSet = new HashSet<String>();
-//			uniqueColumnValuesMap.put(modelElement, newSet);
-//			return newSet;
-//		}
-//	}
 
 	// ---- control creation methods ----
 
@@ -146,19 +117,12 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 			{
 
 				MultiColumnTableRow newRow;
-//				HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
-//				synchronized (uniqueValueCache)
-//				{
-					MultiColumnTable table = getTableFromAnnotation();
-					newRow = table.new MultiColumnTableRow(
-							getDefaultListElementAttributeValues(),
-							table);
-//					String uniqueValue = createUniqueRowValue(newRow, table);
-//					newRow.getColumnValues()[uniqueColumnIndex] = uniqueValue;
-//					addUniqueRowValue(uniqueValue);
-					table.add(newRow);
-					updateTableAnnotation(table);
-//				}
+				MultiColumnTable table = getTableFromAnnotation();
+				newRow = table.new MultiColumnTableRow(
+						getDefaultListElementAttributeValues(),
+						table);
+				table.add(newRow);
+				updateTableAnnotation(table);
 
 				return CommandResult.newOKCommandResult(newRow);
 			}
@@ -178,18 +142,13 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 					IProgressMonitor monitor, IAdaptable info)
 					throws ExecutionException
 			{
-//				HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
-//				synchronized (uniqueValueCache)
-//				{
-					MultiColumnTableRow rowToRemove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
-							.getSelection()).getFirstElement();
 
-					MultiColumnTable tableRowList = getTableFromAnnotation();
-//					uniqueValueCache
-//							.remove(rowToRemove.getColumnValues()[uniqueColumnIndex]);
-					tableRowList.remove(rowToRemove);
-					updateTableAnnotation(tableRowList);
-//				}
+				MultiColumnTableRow rowToRemove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
+						.getSelection()).getFirstElement();
+				MultiColumnTable tableRowList = getTableFromAnnotation();
+				tableRowList.remove(rowToRemove);
+				updateTableAnnotation(tableRowList);
+
 
 				return CommandResult.newOKCommandResult(null);
 			}
@@ -210,23 +169,20 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 					throws ExecutionException
 			{
 
-//				HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
-//				synchronized (uniqueValueCache)
-//				{
-					MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
-							.getSelection()).getFirstElement();
 
-					MultiColumnTable tableRowList = getTableFromAnnotation();
-					int index = tableRowList.indexOf(rowToMove);
+				MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
+						.getSelection()).getFirstElement();
 
-					if (0 < index && index < tableRowList.size())
-					{
-						MultiColumnTableRow tableRow = tableRowList.get(index);
-						tableRowList.remove(index);
-						tableRowList.add(index - 1, tableRow);
-						updateTableAnnotation(tableRowList);
-					}
-//				}
+				MultiColumnTable tableRowList = getTableFromAnnotation();
+				int index = tableRowList.indexOf(rowToMove);
+
+				if (0 < index && index < tableRowList.size())
+				{
+					MultiColumnTableRow tableRow = tableRowList.get(index);
+					tableRowList.remove(index);
+					tableRowList.add(index - 1, tableRow);
+					updateTableAnnotation(tableRowList);
+				}
 
 				return CommandResult.newOKCommandResult(null);
 			}
@@ -246,23 +202,20 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 					IProgressMonitor monitor, IAdaptable info)
 					throws ExecutionException
 			{
-//				HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
-//				synchronized (uniqueValueCache)
-//				{
-					MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
-							.getSelection()).getFirstElement();
 
-					MultiColumnTable tableRowList = getTableFromAnnotation();
-					int index = tableRowList.indexOf(rowToMove);
+				MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
+						.getSelection()).getFirstElement();
 
-					if (0 <= index && index < tableRowList.size() - 1)
-					{
-						MultiColumnTableRow tableRow = tableRowList.get(index);
-						tableRowList.remove(index);
-						tableRowList.add(index + 1, tableRow);
-						updateTableAnnotation(tableRowList);
-					}
-//				}
+				MultiColumnTable tableRowList = getTableFromAnnotation();
+				int index = tableRowList.indexOf(rowToMove);
+
+				if (0 <= index && index < tableRowList.size() - 1)
+				{
+					MultiColumnTableRow tableRow = tableRowList.get(index);
+					tableRowList.remove(index);
+					tableRowList.add(index + 1, tableRow);
+					updateTableAnnotation(tableRowList);
+				}
 
 				return CommandResult.newOKCommandResult(null);
 			}
@@ -282,12 +235,8 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 					IProgressMonitor monitor, IAdaptable info)
 					throws ExecutionException
 			{
-//				HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
-//				synchronized (uniqueValueCache)
-//				{
-					updateTableAnnotation(null);
-//					uniqueValueCache.clear();
-//				}
+
+				updateTableAnnotation(null);
 
 				return CommandResult.newOKCommandResult(null);
 			}
@@ -323,46 +272,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 
 	}
 
-//	private String createUniqueRowValue(MultiColumnTableRow row,
-//			MultiColumnTable table)
-//	{
-//		assert (row != null && table != null);
-//
-//		HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
-//		synchronized (uniqueValueCache)
-//		{
-//			String uniqueColumnValue = row.getColumnValues()[uniqueColumnIndex];
-//
-//			int counter = 1;
-//			String uniqueValueToUse = uniqueColumnValue;
-//			while (uniqueValueCache.contains(uniqueValueToUse))
-//			{
-//				uniqueValueToUse = uniqueColumnValue + counter;
-//				counter++;
-//			}
-//
-//			return uniqueValueToUse;
-//		}
-//
-//	}
 
-//	private boolean addUniqueRowValue(String uniqueValue)
-//	{
-//		HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
-//		synchronized (uniqueValueCache)
-//		{
-//			return uniqueValueCache.add(uniqueValue);
-//		}
-//	}
-
-//	private boolean removeUniqueRowValue(String uniqueValue)
-//	{
-//		HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
-//		synchronized (uniqueValueCache)
-//		{
-//			return uniqueValueCache.remove(uniqueValue);
-//		}
-//	}
 
 	/**
 	 * Retrieve the EAnnotation from the modelElement and converts it to a
@@ -380,11 +290,6 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 						getTableAnnotationIdentifier());
 		if (table != null)
 		{
-//			for (MultiColumnTableRow multiColumnTableRow : table.getRowList())
-//			{
-//				addUniqueRowValue(multiColumnTableRow
-//						.getColumnValueAt(table.getUniqueColumn()));
-//			}
 			return table;
 		}
 
@@ -403,39 +308,6 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 				getTableAnnotationIdentifier(), table);
 	}
 
-//	/**
-//	 * Check if have to convert the annotation to new format
-//	 * 
-//	 * @return true if a conversion is done
-//	 */
-//	private boolean checkAnnotationConversion()
-//	{
-//		EAnnotation ea = modelElement
-//				.getEAnnotation(util.containerEAnnotationName);
-//		if (ea != null)
-//		{
-//			String value = (String) ea.getDetails().get(
-//					util.annotationDetailName);
-//			if (value != null)
-//			{
-//				// This is the old format, so convert to new format an remove
-//				// detail.
-//				//TableColumn[] columns = tableViewer.getTable().getColumns();
-//				MultiColumnTable table = MultiColumnTable
-//						.convertMultiColumnTableString(value, /*columns.length,*/
-//								uniqueColumnIndex);
-//				// save the new annotation
-//				JadexBpmnPropertiesUtil.updateJadexEAnnotationTable(
-//						modelElement, getTableAnnotationIdentifier(), table);
-//				// remove the old detail, this removes annotation if details are
-//				// empty too
-//				util.updateJadexEAnnotation(util.annotationDetailName, null);
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-	
 	/**
 	 * Check if have to convert the annotation to new format
 	 * 
@@ -558,26 +430,6 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 
 							// update the corresponding table element
 							tableViewerRow.getColumnValues()[attributeIndex] = rowToEdit.getColumnValueAt(attributeIndex);
-							
-							
-//							HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
-//							synchronized (uniqueValueCache)
-//							{
-//								removeUniqueRowValue(rowToEdit
-//										.getColumnValues()[uniqueColumnIndex]);
-//
-//								rowToEdit.getColumnValues()[attributeIndex] = newValue;
-//								String newUniqueValue = createUniqueRowValue(
-//										rowToEdit, tableRowList);
-//								rowToEdit.getColumnValues()[attributeIndex] = newUniqueValue;
-//
-//								addUniqueRowValue(newUniqueValue);
-//
-//								updateTableAnnotation(tableRowList);
-//
-//								// update the corresponding table element
-//								tableViewerRow.getColumnValues()[attributeIndex] = newUniqueValue;
-//							}
 
 							return CommandResult.newOKCommandResult();
 						}

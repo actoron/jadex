@@ -88,8 +88,6 @@ public abstract class AbstractParameterTablePropertySection extends
 	{
 		super(containerEAnnotationName, annotationDetailName,
 				"Parameter", UNIQUE_PARAMETER_ROW_ATTRIBUTE);
-		
-		// TODO: use column weights!
 	}
 	
 	 // ---- static methods ----

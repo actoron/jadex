@@ -57,7 +57,8 @@ public abstract class AbstractCommonPropertySection extends
 	/** The ScrolledComposite for the property section - static because there is only one instance */
 	private static ScrolledComposite propertyComposite;
 	
-
+	private final Set<EditPart> refreshPending = new HashSet<EditPart>();
+	
 	// ---- constructor ----
 	
 	public AbstractCommonPropertySection()
@@ -67,6 +68,13 @@ public abstract class AbstractCommonPropertySection extends
 	}
 
 	// ---- method overrides ----
+	
+	@Override
+	public void refresh()
+	{
+		super.refresh();
+		//System.err.println("Refresh called by: " + this);
+	}
 	
 	/**
 	 * Creates the UI of the section.
@@ -254,13 +262,19 @@ public abstract class AbstractCommonPropertySection extends
 					if (selElt instanceof EditPart)
 					{
 						final EditPart part = (EditPart) selElt;
-						Display.getCurrent().asyncExec(new Runnable()
+						
+						if (!refreshPending.contains(part))
 						{
-							public void run()
+							refreshPending.add(part);
+							Display.getCurrent().asyncExec(new Runnable()
 							{
-								part.refresh();
-							}
-						});
+								public void run()
+								{
+									part.refresh();
+									refreshPending.remove(part);
+								}
+							});
+						}
 					}
 				}
 		}
@@ -290,23 +304,6 @@ public abstract class AbstractCommonPropertySection extends
 		return sectionGroup;
 	}
 
-//	/**
-//	 * Dummy method for empty composites
-//	 */
-//	protected static Composite createEmptyComposite(Composite parent, AbstractPropertySection section)
-//	{
-//		Composite newComposite = section.getWidgetFactory().createComposite(parent/*, SWT.BORDER*/);
-//		
-//		// The layout of the composite
-//		GridLayout layout = new GridLayout(1, false);
-//		newComposite.setLayout(layout);
-//		
-//		//section.getWidgetFactory().createCLabel(newComposite, "---- empty composite ----");
-//		
-//		return newComposite;
-//	}
-	
-	
 	// ---- getter / setter ----
 	
 	/** 
