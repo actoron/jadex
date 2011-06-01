@@ -33,16 +33,15 @@ public @interface Configuration
 	 */
 	public Component[] components() default {};
 	
-// todo:
-//	/**
-//	 *  The provided service implementations.
-//	 */
-//	public NameValue[] serviceimplementations() default {};
-//	
-//	/**
-//	 *  The required service bindings.
-//	 */
-//	public Binding[] servicebindings() default {};
+	/**
+	 *  The provided service implementations.
+	 */
+	public ProvidedService[] providedservices() default {};
+	
+	/**
+	 *  The provided service implementations.
+	 */
+	public RequiredService[] requiredservices() default {};
 	
 	/**
 	 *  The master flag.

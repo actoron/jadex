@@ -441,16 +441,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		{
 			public void customResultAvailable(Object result)
 			{
-				// Create initial thread(s). 
-				List startevents	= model.getStartActivities();
-				for(int i=0; startevents!=null && i<startevents.size(); i++)
-				{
-					ProcessThread	thread	= new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
-					context.addThread(thread);
-//					notifyListeners(EVENT_THREAD_ADDED, thread);
-					notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_THREAD, thread.getClass().getName(), 
-						thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread)));
-				}
+				
 				
 				// Notify cms that init is finished.
 				inited.setResult(new Object[]{BpmnInterpreter.this, adapter});
@@ -460,6 +451,23 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		}));
 	}
 
+	/**
+	 *  Start the component behavior.
+	 */
+	public void startBehavior()
+	{
+		// Create initial thread(s). 
+		List startevents	= model.getStartActivities();
+		for(int i=0; startevents!=null && i<startevents.size(); i++)
+		{
+			ProcessThread	thread	= new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
+			context.addThread(thread);
+//			notifyListeners(EVENT_THREAD_ADDED, thread);
+			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_THREAD, thread.getClass().getName(), 
+				thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread)));
+		}
+	}
+	
 	/**
 	 *  Init context variables.
 	 */

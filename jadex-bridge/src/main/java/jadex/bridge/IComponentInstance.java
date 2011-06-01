@@ -110,4 +110,10 @@ public interface IComponentInstance
 	 *  @return The service container.
 	 */
 	public IServiceContainer getServiceContainer();
+	
+	/**
+	 *  Start the behavior of a component.
+	 *  @return Future when behavior is started.
+	 */
+	public void startBehavior();
 }

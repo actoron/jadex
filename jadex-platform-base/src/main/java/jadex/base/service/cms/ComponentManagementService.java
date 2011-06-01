@@ -443,7 +443,9 @@ public abstract class ComponentManagementService extends BasicService implements
 																// any call to wakeup would immediately start executing the component.
 //																if(isInitSuspend(cinfo, lmodel))
 //																{
-																	ad.setState(CMSComponentDescription.STATE_SUSPENDED);
+																	// not set to suspend to allow other initing sibling components invoking services
+																	
+																	//ad.setState(CMSComponentDescription.STATE_SUSPENDED);
 //																}
 //																else
 //																{
@@ -575,9 +577,9 @@ public abstract class ComponentManagementService extends BasicService implements
 														// Store (invalid) desc, adapter and info for children
 														synchronized(adapters)
 														{
-															// 0: description, 1: adapter, 2: creation info, 3: model, 4: initfuture
+															// 0: description, 1: adapter, 2: creation info, 3: model, 4: initfuture, 5: component instance
 //															System.out.println("infos: "+ad.getName());
-															initinfos.put(cid, new Object[]{ad, comp[1], cinfo, lmodel, future});
+															initinfos.put(cid, new Object[]{ad, comp[1], cinfo, lmodel, future, comp[0]});
 														}
 														
 														// Start the init procedure by waking up the adapter.
@@ -1132,6 +1134,8 @@ public abstract class ComponentManagementService extends BasicService implements
 								CreationInfo cinfo = (CreationInfo)ii[2];
 								IModelInfo lmodel = (IModelInfo)ii[3];
 								suspend = isInitSuspend(cinfo, lmodel);
+								IComponentInstance instance = (IComponentInstance)ii[5];
+								instance.startBehavior();
 							}
 //								System.out.println("resume: "+cid+" suspend:"+suspend);
 							if(!suspend && IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))

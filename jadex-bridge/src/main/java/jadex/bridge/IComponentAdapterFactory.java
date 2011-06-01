@@ -30,4 +30,5 @@ public interface IComponentAdapterFactory
 	 *  @param adapter	The component adapter.
 	 */
 	public void	initialWakeup(IComponentAdapter adapter);
+
 }

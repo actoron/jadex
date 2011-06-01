@@ -88,20 +88,6 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 //									System.out.println("initend: "+getComponentAdapter().getComponentIdentifier());
 									// Init is now finished. Notify cms.
 									inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
-								
-									addStep(new Object[]{new IComponentStep()
-									{
-										public Object execute(IInternalAccess ia)
-										{
-//											System.out.println("body: "+getComponentAdapter().getComponentIdentifier());
-											microagent.executeBody();
-											return null;
-										}
-										public String toString()
-										{
-											return "microagent.executeBody()_#"+this.hashCode();
-										}
-									}, new Future()});
 								}
 							});
 						}
@@ -115,6 +101,26 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		{
 			inited.setException(e);
 		}
+	}
+	
+	/**
+	 *  Start the component behavior.
+	 */
+	public void startBehavior()
+	{
+		addStep(new Object[]{new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+//				System.out.println("body: "+getComponentAdapter().getComponentIdentifier());
+				microagent.executeBody();
+				return null;
+			}
+			public String toString()
+			{
+				return "microagent.executeBody()_#"+this.hashCode();
+			}
+		}, new Future()});
 	}
 	
 	//-------- IKernelAgent interface --------

@@ -190,6 +190,13 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	}
 	
 	/**
+	 *  Start the component behavior.
+	 */
+	public void startBehavior()
+	{
+	}
+	
+	/**
 	 *  Schedule a step of the component.
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the component.
@@ -209,7 +216,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  @return	The spaces.
 	 */
 	public abstract IExtensionInstance[] getExtensions();
-
+	
 	//-------- internally used methods --------
 	
 	/**

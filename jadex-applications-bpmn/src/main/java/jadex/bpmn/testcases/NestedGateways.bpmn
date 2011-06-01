@@ -61,12 +61,12 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_Mg2dgYq9EeC2-YXsn_T4wg" iD="_Mg2dgIq9EeC2-YXsn_T4wg" outgoingEdges="_NWu8oYq9EeC2-YXsn_T4wg _PNdNsYq9EeC2-YXsn_T4wg" incomingEdges="_Mg5g0Yq9EeC2-YXsn_T4wg" activityType="GatewayParallel"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_NWoO8Yq9EeC2-YXsn_T4wg" iD="_NWoO8Iq9EeC2-YXsn_T4wg" outgoingEdges="_YxyqsYq9EeC2-YXsn_T4wg" incomingEdges="_NWu8oYq9EeC2-YXsn_T4wg" name="F" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_6TQxEIrPEeC2-YXsn_T4wg" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_71UZsIrPEeC2-YXsn_T4wg" key="dimension" value="1:4"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_71UZsYrPEeC2-YXsn_T4wg" key="uniqueColumnIndex" value="0"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_71UZsorPEeC2-YXsn_T4wg" key="0:0" value="inout"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_71UZs4rPEeC2-YXsn_T4wg" key="0:1" value="b"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_71UZtIrPEeC2-YXsn_T4wg" key="0:2" value="int"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_71UZtYrPEeC2-YXsn_T4wg" key="0:3" value="b+1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IwJGgIwyEeCT4OIslcxWsQ" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IwJGgYwyEeCT4OIslcxWsQ" key="uniqueColumnIndex" value="0"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IwJGgowyEeCT4OIslcxWsQ" key="0:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IwJGg4wyEeCT4OIslcxWsQ" key="0:1" value="b"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IwJtkIwyEeCT4OIslcxWsQ" key="0:2" value="int"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IwJtkYwyEeCT4OIslcxWsQ" key="0:3" value="b+1"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_PNV48Yq9EeC2-YXsn_T4wg" iD="_PNV48Iq9EeC2-YXsn_T4wg" outgoingEdges="_ZJ-hMYq9EeC2-YXsn_T4wg" incomingEdges="_PNdNsYq9EeC2-YXsn_T4wg" name="G" activityType="Task"/>

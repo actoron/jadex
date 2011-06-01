@@ -69,6 +69,7 @@
 		<componenttype filename="jadex/tools/jcc/JCCAgent.class" name="jcc"/>
 		<componenttype filename="jadex/bdi/benchmarks/AgentCreation.agent.xml" name="CreationBDI"/>
 		<componenttype filename="jadex/micro/benchmarks/AgentCreationAgent.class" name="CreationMicro"/>
+		<componenttype filename="jadex/micro/benchmarks/MegaParallelStarterAgent.class" name="CreationMicroParallel"/>
 		<componenttype filename="jadex/bpmn/benchmarks/AgentCreation2.bpmn" name="CreationBPMN"/>
 	</componenttypes>
 	
@@ -80,7 +81,8 @@
 		</providedservice>
 		<providedservice class="IThreadPool">
 			<implementation proxytype="raw">
-				new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
+				//new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
+				new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 500)), $component.getServiceProvider())
 			</implementation>
 		</providedservice>
 		<providedservice class="IExecutionService">
@@ -309,6 +311,22 @@
 			<components>
 				<component type="kernel_micro" daemon="true"/>
 				<component type="CreationMicro">
+					<arguments>
+						<argument name="max">100000</argument>
+					</arguments>
+				</component>
+			</components>
+		</configuration>
+		
+		<configuration name="creation_test_micro_parallel">
+			<arguments>
+				<argument name="platformname">"testcases"</argument>
+				<argument name="saveonexit">false</argument>
+				<argument name="libpath">new Object[]{"../jadex-applications-micro/target/classes"}</argument>
+			</arguments>
+			<components>
+				<component type="kernel_micro" daemon="true"/>
+				<component type="CreationMicroParallel">
 					<arguments>
 						<argument name="max">100000</argument>
 					</arguments>

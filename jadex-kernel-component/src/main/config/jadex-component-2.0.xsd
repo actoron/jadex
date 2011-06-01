@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://jadex.sourceforge.net/jadex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 	<xs:element name="componenttype" type="componenttype">
 		<xs:annotation>
 			<xs:documentation>A component type specifies the interface, the structure and content of a component.</xs:documentation>
@@ -206,8 +207,28 @@
 	</xs:complexType>
 	<xs:complexType name="configservices">
 		<xs:sequence>
-			<xs:element name="implementation" minOccurs="0" maxOccurs="unbounded"/>
-			<xs:element name="binding" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="providedservice" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="serviceref">
+							<xs:sequence>
+								<xs:element name="implementation" type="implementation"/>
+							</xs:sequence>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="requiredservice" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="serviceref">
+							<xs:sequence>
+								<xs:element name="binding" type="binding"/>
+							</xs:sequence>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="configprovidedservices"/>
@@ -223,7 +244,6 @@
 			<xs:any minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
-	
 	<xs:complexType name="component">
 		<xs:annotation>
 			<xs:documentation>An agent instance to be created when the application is started.</xs:documentation>
@@ -296,22 +316,15 @@
 			<xs:documentation>Defines a provided service type.</xs:documentation>
 		</xs:annotation>
 		<xs:choice>
-			<xs:element name="implementation" minOccurs="1">
-				<xs:complexType mixed="true">
-					<xs:sequence minOccurs="0">
-						<xs:element name="binding" type="binding" minOccurs="0"/>
-					</xs:sequence>
-					<xs:attribute name="language" type="xs:string" use="optional"/>
-					<xs:attribute name="class" type="xs:string" use="optional"/>
-					<xs:attribute name="proxytype" use="optional" default="decoupled">
-						<xs:simpleType>
-							<xs:restriction base="xs:string">
-								<xs:enumeration value="decoupled"/>
-								<xs:enumeration value="direct"/>
-								<xs:enumeration value="raw"/>
-							</xs:restriction>
-						</xs:simpleType>
-					</xs:attribute>					
+			<xs:element name="implementation">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="implementation">
+							<xs:sequence>
+								<xs:element name="binding" type="binding" minOccurs="0"/>
+							</xs:sequence>
+						</xs:extension>
+					</xs:complexContent>
 				</xs:complexType>
 			</xs:element>
 		</xs:choice>
@@ -363,4 +376,20 @@
 		<xs:attribute name="recover" type="xs:boolean" use="optional" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="describabletype"/>
+	<xs:complexType name="serviceref">
+		<xs:attribute name="ref" type="xs:string" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="implementation" mixed="true">
+		<xs:attribute name="language" type="xs:string" use="optional"/>
+		<xs:attribute name="class" type="xs:string" use="optional"/>
+		<xs:attribute name="proxytype" use="optional" default="decoupled">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="decoupled"/>
+					<xs:enumeration value="direct"/>
+					<xs:enumeration value="raw"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
 </xs:schema>
