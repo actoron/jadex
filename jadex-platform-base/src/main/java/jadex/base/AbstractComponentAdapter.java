@@ -619,6 +619,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //		}
 		
 //		System.out.println("entering exe: "+getComponentIdentifier());
+		
 		if(executing)
 		{
 			System.err.println(getComponentIdentifier()+": double execution");

@@ -398,7 +398,8 @@ public abstract class ComponentManagementService extends BasicService implements
 															adapter = (IComponentAdapter)((Object[])result)[1];
 															
 															// Init finished. Set to suspended until parent registration is finished.
-															ad.setState(IComponentDescription.STATE_SUSPENDED);
+															// not set to suspend to allow other initing sibling components invoking services
+//															ad.setState(IComponentDescription.STATE_SUSPENDED);
 															
 	//														System.out.println("adding cid: "+cid+" "+ad.getMaster()+" "+ad.getDaemon()+" "+ad.getAutoShutdown());
 															adapters.put(cid, adapter);
@@ -444,8 +445,7 @@ public abstract class ComponentManagementService extends BasicService implements
 //																if(isInitSuspend(cinfo, lmodel))
 //																{
 																	// not set to suspend to allow other initing sibling components invoking services
-																	
-																	//ad.setState(CMSComponentDescription.STATE_SUSPENDED);
+//																	ad.setState(CMSComponentDescription.STATE_SUSPENDED);
 //																}
 //																else
 //																{

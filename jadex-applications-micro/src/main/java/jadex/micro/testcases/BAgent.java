@@ -32,9 +32,23 @@ public class BAgent extends MicroAgent implements IBService
 		SServiceProvider.getService(access.getServiceContainer(), IAService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(access.createResultListener(new DelegationResultListener(ret)
 		{
+			public void customResultAvailable(Object result)
+			{
+				System.out.println("found service");
+				IAService ser = (IAService)result;
+				ser.test().addResultListener(createResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result) 
+					{
+						System.out.println("invoked service");
+						ret.setResult(result);
+					};
+				}));
+			}	
+				
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println("here");
+				System.out.println("could not find service");
 				super.exceptionOccurred(exception);
 			}
 		}));
