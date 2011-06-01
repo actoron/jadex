@@ -1138,7 +1138,7 @@ public abstract class ComponentManagementService extends BasicService implements
 								instance.startBehavior();
 							}
 //								System.out.println("resume: "+cid+" suspend:"+suspend);
-							if(!suspend && IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+							if(!suspend)// && IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
 							{
 								desc.setState(IComponentDescription.STATE_ACTIVE);						
 								adapter.wakeup();

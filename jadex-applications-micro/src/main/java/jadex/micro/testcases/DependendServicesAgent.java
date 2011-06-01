@@ -11,9 +11,16 @@ import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
 /**
- * 
+ *  Starts two agents a and b
+ *  a has service sa 
+ *  b has service sb
+ *  init of service sb searches for sa and uses the service
+ *  
+ *  (problem is that component a has finished its init but must execute the service call for sb)
+ *  
+ *  // todo: make real testcase
  */
-@Description("A simple test showing how the test center works with micro agents.")
+@Description("Test if services of (earlier) sibling components can be found and used.")
 @Results(@Result(name="testresults", typename="Testcase"))
 @ComponentTypes({
 	@ComponentType(name="a", filename="AAgent.class"), 
