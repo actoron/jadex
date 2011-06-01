@@ -1,23 +1,33 @@
-package jadex.wfms.bdi.client.standard;
+package jadex.wfms.client.standard;
 
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bdi.planlib.iasteps.DispatchGoalStep;
 import jadex.bdi.planlib.iasteps.SetBeliefStep;
 import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.wfms.bdi.client.standard.parametergui.ActivityComponent;
+import jadex.wfms.client.ClientInfo;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
+import jadex.wfms.client.ProcessResource;
+import jadex.wfms.client.standard.parametergui.ActivityComponent;
 import jadex.wfms.gui.images.SImage;
 import jadex.wfms.guicomponents.CenteringLayout;
-import jadex.wfms.guicomponents.LoginPanel;
+import jadex.wfms.guicomponents.ComponentLoginPanel;
 import jadex.wfms.guicomponents.SGuiHelper;
 import jadex.wfms.service.IExternalWfmsService;
+import jadex.wfms.service.listeners.ActivityEvent;
+import jadex.wfms.service.listeners.IActivityListener;
+import jadex.wfms.service.listeners.ILogListener;
+import jadex.wfms.service.listeners.IProcessRepositoryListener;
+import jadex.wfms.service.listeners.IWorkitemListener;
+import jadex.wfms.service.listeners.ProcessRepositoryEvent;
+import jadex.wfms.service.listeners.WorkitemEvent;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Dimension;
@@ -28,6 +38,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileInputStream;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -44,8 +57,6 @@ import javax.swing.filechooser.FileFilter;
 
 public class StandardClientApplication
 {
-	private static final String WINDOW_TITLE = "Workflow Client Application";
-	
 	private static final String WORKITEM_LIST_TAB_NAME = "Workitem List";
 	
 	private static final String PROCESS_MODEL_TAB_NAME = "Process Models";
@@ -58,9 +69,11 @@ public class StandardClientApplication
 	private static final String CONNECT_OFF_ICON_PATH = SImage.IMAGE_PATH.concat("connection_off_small.png");
 	private static final String CONNECT_ON_ICON_PATH = SImage.IMAGE_PATH.concat("connection_on_small.png");
 	
-	private IBDIExternalAccess agent;
+	private IExternalAccess ea;
 	
-	private JFrame mainFrame;
+	//private JFrame mainFrame;
+	
+	protected JPanel mainPanel;
 	
 	private StatusBar statusBar;
 	
@@ -74,73 +87,30 @@ public class StandardClientApplication
 	
 	private AdminActivitiesComponent aaComponent;
 	
-	private boolean connected;
+	private IExternalWfmsService wfms;
 	
 	private Set capabilities;
 	
-	public StandardClientApplication(IExternalAccess appAgent)
+	public StandardClientApplication(IExternalAccess access)
 	{
-		connected = false;
-		this.agent = (IBDIExternalAccess) appAgent;
-		
-		agent.scheduleStep(new IComponentStep()
-		{
-			@XMLClassname("dispose") 
-			public Object execute(IInternalAccess ia)
-			{
-				ia.addComponentListener(new TerminationAdapter()
-				{
-					public void componentTerminated()
-					{
-						EventQueue.invokeLater(new Runnable()
-						{
-							
-							public void run()
-							{
-								mainFrame.dispose();
-							}
-						});
-					}
-				});
-				
-				return null;
-			}
-		});
+		this.ea = access;
 		
 		EventQueue.invokeLater(new Runnable()
 		{
 			
 			public void run()
 			{
-				mainFrame = new JFrame(WINDOW_TITLE);
-				mainFrame.addWindowListener(new WindowAdapter()
-				{
-					public void windowClosing(WindowEvent e)
-					{
-						if (connected)
-							disconnect();
-						agent.scheduleStep(new IComponentStep()
-						{
-							@XMLClassname("kill") 
-							public Object execute(IInternalAccess ia)
-							{
-								ia.killComponent();
-								return null;
-							}
-						});
-						mainFrame.dispose();
-					}
-				});
-				
+				if (mainPanel == null)
+					mainPanel = new JPanel();
 				mainSplitPane = new JSplitPane();
 				mainSplitPane.setOneTouchExpandable(true);
-				mainFrame.getContentPane().setLayout(new GridBagLayout());
+				mainPanel.setLayout(new GridBagLayout());
 				GridBagConstraints g = new GridBagConstraints();
 				g.weightx = 1.0;
 				g.weighty = 1.0;
 				g.fill = GridBagConstraints.BOTH;
 				g.anchor = GridBagConstraints.CENTER;
-				mainFrame.getContentPane().add(mainSplitPane, g);
+				mainPanel.add(mainSplitPane, g);
 				
 				statusBar = new StatusBar();
 				statusBar.addIcon(CONNECT_ICON_NAME, CONNECT_OFF_ICON_PATH);
@@ -151,17 +121,13 @@ public class StandardClientApplication
 				g.gridy = 1;
 				g.weightx = 1.0;
 				g.fill = GridBagConstraints.HORIZONTAL;
-				mainFrame.getContentPane().add(statusBar, g);
+				mainPanel.add(statusBar, g);
 				
 				mainSplitPane.setRightComponent(new JTabbedPane());
 				
 				toolPane = new JTabbedPane();
 				mainSplitPane.setLeftComponent(toolPane);
 				
-				mainFrame.pack();
-				mainFrame.setSize(800, 550);
-				mainFrame.setLocation(SGUI.calculateMiddlePosition(mainFrame));
-				mainFrame.setVisible(true);
 				mainSplitPane.setDividerLocation(0.45);
 				
 				wlComponent = new WorkitemListComponent();
@@ -181,6 +147,13 @@ public class StandardClientApplication
 			}
 		});
 		
+	}
+	
+	public JPanel getView()
+	{
+		if (mainPanel == null)
+			mainPanel = new JPanel();
+		return mainPanel;
 	}
 	
 	private void cleanUp()
@@ -205,10 +178,10 @@ public class StandardClientApplication
 	{
 		//mainFrame.setEnabled(false);
 		
-		final LoginPanel loginpanel = new LoginPanel(agent);
+		final ComponentLoginPanel loginpanel = new ComponentLoginPanel(ea.getServiceProvider());
 		final JPanel centerpanel = CenteringLayout.createCenteringPanel(loginpanel);
 		loginpanel.setPreferredSize(new Dimension(500, 273));
-		mainFrame.getContentPane().remove(mainSplitPane);
+		mainPanel.remove(mainSplitPane);
 		GridBagConstraints g = new GridBagConstraints();
 		g.weightx = 1.0;
 		g.weighty = 1.0;
@@ -221,81 +194,95 @@ public class StandardClientApplication
 			{
 				if (loginpanel.isConnect())
 				{
-					mainFrame.getContentPane().remove(centerpanel);
+					mainPanel.remove(centerpanel);
 					GridBagConstraints g = new GridBagConstraints();
 					g.weightx = 1.0;
 					g.weighty = 1.0;
 					g.fill = GridBagConstraints.BOTH;
 					g.anchor = GridBagConstraints.CENTER;
-					mainFrame.add(mainSplitPane, g);
-					mainFrame.repaint();
-					try
-					{
-						connect(loginpanel.getWfms(), loginpanel.getUserName(), loginpanel.getPassword());
-						connected = true;
-						statusBar.replaceIcon(CONNECT_ICON_NAME, CONNECT_ON_ICON_PATH);
-						statusBar.setText("Connected.");
-					}
-					catch (GoalFailureException e1)
-					{
-						e1.printStackTrace();
-						cleanUp();
-					}
+					mainPanel.add(mainSplitPane, g);
+					mainPanel.repaint();
+					IExternalWfmsService selectedwfms = loginpanel.getWfms();
+					connect(selectedwfms, loginpanel.getUserName(), loginpanel.getPassword());
 				}
 			}
 		});
 		
-		mainFrame.getContentPane().add(centerpanel, g);
+		mainPanel.add(centerpanel, g);
 	}
 	
-	private void connect(final IExternalWfmsService wfms, final String userName, final Object authToken)
+	private void connect(final IExternalWfmsService wfms, final String username, final Object authToken)
 	{
-		agent.scheduleStep(new DispatchGoalStep("clientcap.connect", new HashMap() {{
-			   put("wfms", wfms);
-			   put("user_name", userName);
-			   put("auth_token", authToken);
-			}})).addResultListener(new SwingDefaultResultListener()
-			{
-				
-				public void customResultAvailable(Object result)
-				{
-					Map parameters = (Map) result;
-					capabilities = (Set) parameters.get("capabilities");
-					if (capabilities.containsAll(SCapReqs.ACTIVITY_HANDLING))
-						setupActivityHandling();
-					
-					if (capabilities.containsAll(SCapReqs.WORKITEM_LIST))
-					{
-						toolPane.add(WORKITEM_LIST_TAB_NAME, wlComponent);
-						setupWorkitemListComponent();
-					}
-					
-					if (capabilities.containsAll(SCapReqs.PROCESS_LIST))
-					{
-						toolPane.add(PROCESS_MODEL_TAB_NAME, pmComponent);
-						setupProcessModelComponent();
-					}
-					
-					if (capabilities.containsAll(SCapReqs.ADMIN_ACTIVITIES))
-					{
-						toolPane.add(ADMIN_ACTIVITIES_TAB_NAME, aaComponent);
-						setupAdminActivitiesComponent();
-					}
-				}
-			});
-	}
-	
-	private void disconnect()
-	{
-		agent.scheduleStep(new DispatchGoalStep("clientcap.disconnect")).addResultListener(new SwingDefaultResultListener()
+		ClientInfo info = new ClientInfo(username);
+		wfms.authenticate(ea.getComponentIdentifier(), info).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
 			{
-				statusBar.replaceIcon(CONNECT_ICON_NAME, CONNECT_OFF_ICON_PATH);
-				connected = false;
+				if (Boolean.TRUE.equals(result))
+				{
+					wfms.getCapabilities(ea.getComponentIdentifier()).addResultListener(new SwingDefaultResultListener()
+					{
+						public void customResultAvailable(Object result)
+						{
+							StandardClientApplication.this.wfms = wfms;
+							capabilities = (Set) result;
+							if (capabilities.containsAll(SCapReqs.ACTIVITY_HANDLING))
+								setupActivityHandling();
+							
+							if (capabilities.containsAll(SCapReqs.WORKITEM_LIST))
+							{
+								toolPane.add(WORKITEM_LIST_TAB_NAME, wlComponent);
+								setupWorkitemListComponent();
+							}
+							
+							if (capabilities.containsAll(SCapReqs.PROCESS_LIST))
+							{
+								toolPane.add(PROCESS_MODEL_TAB_NAME, pmComponent);
+								setupProcessModelComponent();
+							}
+							
+							if (capabilities.containsAll(SCapReqs.ADMIN_ACTIVITIES))
+							{
+								toolPane.add(ADMIN_ACTIVITIES_TAB_NAME, aaComponent);
+								setupAdminActivitiesComponent();
+							}
+							
+							
+							statusBar.replaceIcon(CONNECT_ICON_NAME, CONNECT_ON_ICON_PATH);
+							statusBar.setText("Connected.");
+						}
+						
+						public void customExceptionOccurred(Exception exception)
+						{
+							//TODO: Do something. Cleanup ok?
+							cleanUp();
+						}
+					});
+				}
+			}
+			
+			public void customExceptionOccurred(Exception exception)
+			{
+				//TODO: Do something. Cleanup ok?
 				cleanUp();
 			}
 		});
+	}
+	
+	public void disconnect()
+	{
+		if (wfms != null)
+		{
+			wfms.deauthenticate(ea.getComponentIdentifier()).addResultListener(new SwingDefaultResultListener()
+			{
+				public void customResultAvailable(Object result)
+				{
+					statusBar.replaceIcon(CONNECT_ICON_NAME, CONNECT_OFF_ICON_PATH);
+					StandardClientApplication.this.wfms = null;
+					cleanUp();
+				}
+			});
+		}
 	}
 	
 	private ActivityComponent createActivityComponent(IClientActivity activity)
@@ -327,7 +314,7 @@ public class StandardClientApplication
 				final IClientActivity activity = ac.getActivity();
 				activity.setMultipleParameterValues(ac.getParameterValues());
 				
-				agent.scheduleStep(new DispatchGoalStep("clientcap.finish_activity", "activity", activity)).addResultListener(new SwingDefaultResultListener()
+				wfms.finishActivity(ea.getComponentIdentifier(), activity).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -335,7 +322,7 @@ public class StandardClientApplication
 					
 					public void customExceptionOccurred(Exception exception)
 					{
-						JOptionPane.showMessageDialog(mainFrame, "Failed finishing activity.");
+						JOptionPane.showMessageDialog(mainPanel, "Failed finishing activity.");
 					}
 				});
 			}
@@ -360,7 +347,7 @@ public class StandardClientApplication
 	
 	private void cancelActivity(final IClientActivity activity)
 	{
-		agent.scheduleStep(new DispatchGoalStep("clientcap.cancel_activity", "activity", activity)).addResultListener(new SwingDefaultResultListener()
+		wfms.cancelActivity(ea.getComponentIdentifier(), activity).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -368,7 +355,7 @@ public class StandardClientApplication
 			
 			public void customExceptionOccurred(Exception exception)
 			{
-				JOptionPane.showMessageDialog(mainFrame, "Activity cancelation failed.");
+				JOptionPane.showMessageDialog(mainPanel, "Activity cancelation failed.");
 			}
 		});
 	}
@@ -383,7 +370,7 @@ public class StandardClientApplication
 				final IWorkitem wi = wlComponent.getSelectedWorkitem();
 				if (wi != null)
 				{
-					agent.scheduleStep(new DispatchGoalStep("clientcap.begin_activity", "workitem", wi)).addResultListener(new SwingDefaultResultListener()
+					wfms.beginActivity(ea.getComponentIdentifier(), wi).addResultListener(new SwingDefaultResultListener()
 					{
 						public void customResultAvailable(Object result)
 						{
@@ -391,69 +378,54 @@ public class StandardClientApplication
 						
 						public void customExceptionOccurred(Exception exception)
 						{
-							JOptionPane.showMessageDialog(mainFrame, "Start of activity failed.");
+							JOptionPane.showMessageDialog(mainPanel, "Start of activity failed.");
 						}
 					});
 				}
 			}
 		});
 		
-		Action wiAdded = new AbstractAction()
+		wfms.addWorkitemListener(ea.getComponentIdentifier(), new IWorkitemListener()
 		{
-			public void actionPerformed(final ActionEvent e)
+			public IFuture workitemRemoved(WorkitemEvent event)
 			{
-				IWorkitem wi = (IWorkitem) e.getSource();
-				wlComponent.addWorkitem(wi);
+				wlComponent.removeWorkitem(event.getWorkitem());
+				return IFuture.DONE;
 			}
-		};
-		
-		agent.scheduleStep(new SetBeliefStep("clientcap.add_workitem_controller", wiAdded));
-		
-		Action wiRemoved = new AbstractAction()
-		{
-			public void actionPerformed(final ActionEvent e)
+			
+			public IFuture workitemAdded(WorkitemEvent event)
 			{
-				IWorkitem wi = (IWorkitem) e.getSource();
-				wlComponent.removeWorkitem(wi);
+				wlComponent.addWorkitem(event.getWorkitem());
+				return IFuture.DONE;
 			}
-		};
-		agent.scheduleStep(new SetBeliefStep("clientcap.remove_workitem_controller", wiRemoved));
-		
-		agent.scheduleStep(new DispatchGoalStep("clientcap.start_workitem_subscription"));
+		});
 	}
 	
 	private void setupProcessModelComponent()
 	{
-		Action pmAdded = new AbstractAction()
+		wfms.addProcessRepositoryListener(ea.getComponentIdentifier(), new IProcessRepositoryListener()
 		{
-			public void actionPerformed(final ActionEvent e)
+			public IFuture processModelRemoved(ProcessRepositoryEvent event)
 			{
-				String modelName = (String) e.getSource();
-				pmComponent.addProcessModelName(modelName);
+				pmComponent.removeProcessModelName(event.getModelName());
+				return IFuture.DONE;
 			}
-		};
-		agent.scheduleStep(new SetBeliefStep("clientcap.add_process_model_controller", pmAdded));
-		
-		Action pmRemoved = new AbstractAction()
-		{
-			public void actionPerformed(final ActionEvent e)
+			
+			public IFuture processModelAdded(ProcessRepositoryEvent event)
 			{
-				String modelName = (String) e.getSource();
-				pmComponent.removeProcessModelName(modelName);
+				pmComponent.addProcessModelName(event.getModelName());
+				return IFuture.DONE;
 			}
-		};
-		agent.scheduleStep(new SetBeliefStep("clientcap.remove_process_model_controller", pmRemoved));
-		
-		agent.scheduleStep(new DispatchGoalStep("clientcap.start_model_repository_subscription"));
+		});
 		
 		pmComponent.setStartAction(new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				final String processName = pmComponent.getSelectedModelName();
-				if (processName != null)
+				final String processname = pmComponent.getSelectedModelName();
+				if (processname != null)
 				{
-					agent.scheduleStep(new DispatchGoalStep("clientcap.start_process", "process_name", processName)).addResultListener(new SwingDefaultResultListener()
+					wfms.startProcess(ea.getComponentIdentifier(), processname).addResultListener(new SwingDefaultResultListener()
 					{
 						public void customResultAvailable(Object result)
 						{
@@ -461,7 +433,7 @@ public class StandardClientApplication
 						
 						public void customExceptionOccurred(Exception exception)
 						{
-							JOptionPane.showMessageDialog(mainFrame, "Process Start failed.");
+							JOptionPane.showMessageDialog(mainPanel, "Process Start failed.");
 						}
 					});
 				}
@@ -507,12 +479,28 @@ public class StandardClientApplication
 						return f.getName().toLowerCase().endsWith(".jar");
 					}
 				});
-				int result = fileChooser.showOpenDialog(mainFrame);
+				int result = fileChooser.showOpenDialog(mainPanel);
 				if (result == JFileChooser.APPROVE_OPTION)
 				{
-					final String path = fileChooser.getSelectedFile().getAbsolutePath();
-					
-					agent.scheduleStep(new DispatchGoalStep("clientcap.add_model_resource", "resource_path", path));
+					//TODO: Move file operations?
+					String path = fileChooser.getSelectedFile().getAbsolutePath();
+					if (!path.toLowerCase().endsWith(".jar"))
+						throw new RuntimeException("File not found: " + path);
+					File resourceFile = new File(path);
+					ProcessResource pr = null;
+					try
+					{
+						MappedByteBuffer map = (new FileInputStream(resourceFile)).getChannel().map(FileChannel.MapMode.READ_ONLY, 0, resourceFile.length());
+						byte[] resource = new byte[map.capacity()];
+						map.get(resource, 0, map.capacity());
+						pr = new ProcessResource(resourceFile.getName(), resource);
+					}
+					catch (Exception e1)
+					{
+						e1.printStackTrace();
+						throw new RuntimeException("Error sending file: " + path);
+					}
+					wfms.addProcessResource(ea.getComponentIdentifier(), pr);
 				}
 			}
 		});
@@ -524,7 +512,7 @@ public class StandardClientApplication
 				final String name = pmComponent.getSelectedModelName();
 				if (name != null)
 				{
-					agent.scheduleStep(new DispatchGoalStep("clientcap.remove_process", "process_name", name)).addResultListener(new SwingDefaultResultListener()
+					wfms.removeProcessResource(ea.getComponentIdentifier(), name).addResultListener(new SwingDefaultResultListener()
 					{
 						public void customResultAvailable(Object result)
 						{
@@ -532,7 +520,7 @@ public class StandardClientApplication
 						
 						public void customExceptionOccurred(Exception exception)
 						{
-							JOptionPane.showMessageDialog(mainFrame, "Removing process failed.");
+							JOptionPane.showMessageDialog(mainPanel, "Removing process resource failed.");
 						}
 					});
 				}
@@ -549,7 +537,7 @@ public class StandardClientApplication
 				final IClientActivity activity = aaComponent.getSelectedActivity();
 				if (activity != null)
 				{
-					agent.scheduleStep(new DispatchGoalStep("clientcap.terminate_activity", "activity", activity)).addResultListener(new SwingDefaultResultListener()
+					wfms.terminateActivity(ea.getComponentIdentifier(), activity).addResultListener(new SwingDefaultResultListener()
 					{
 						public void customResultAvailable(Object result)
 						{							
@@ -557,85 +545,50 @@ public class StandardClientApplication
 						
 						public void customExceptionOccurred(Exception exception)
 						{
-							JOptionPane.showMessageDialog(mainFrame, "Activity termination failed.");
+							JOptionPane.showMessageDialog(mainPanel, "Activity termination failed.");
 						}
 					});
 				}
 			}
 		});
 		
-		Action uacAdded = new AbstractAction()
+		wfms.addActivitiesListener(ea.getComponentIdentifier(), new IActivityListener()
 		{
-			public void actionPerformed(final ActionEvent e)
+			public IFuture activityRemoved(ActivityEvent event)
 			{
-				aaComponent.addUserActivity(e.getActionCommand(), (IClientActivity) e.getSource());
+				aaComponent.removeUserActivity(event.getUserName(), event.getActivity());
+				return IFuture.DONE;
 			}
-		};
-		agent.scheduleStep(new SetBeliefStep("clientcap.add_user_activity_controller", uacAdded));
-		
-		Action uacRemoved = new AbstractAction()
-		{
-			public void actionPerformed(final ActionEvent e)
+			
+			public IFuture activityAdded(ActivityEvent event)
 			{
-				aaComponent.removeUserActivity(e.getActionCommand(), (IClientActivity) e.getSource());
+				aaComponent.addUserActivity(event.getUserName(), event.getActivity());
+				return IFuture.DONE;
 			}
-		};
-		agent.scheduleStep(new SetBeliefStep("clientcap.remove_user_activity_controller", uacRemoved));
-		
-		agent.scheduleStep(new DispatchGoalStep("clientcap.start_user_activities_subscription"));
+		});
 		
 		setupMonitoringComponent();
 	}
 	
 	protected void setupMonitoringComponent()
 	{
-		Action lEvent = new AbstractAction()
+		wfms.addLogListener(ea.getComponentIdentifier(), new ILogListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			public IFuture logMessage(IComponentChangeEvent event)
 			{
-				System.out.println("Client-side input: " + e.getSource());
+				System.out.println("Client-side input: " + event);
+				return IFuture.DONE;
 			}
-		};
-		agent.scheduleStep(new SetBeliefStep("clientcap.log_controller", lEvent));
-		
-		agent.scheduleStep(new DispatchGoalStep("clientcap.start_log_event_subscription"));
+		}, true);
 	}
 	
 	private void setupActivityHandling()
 	{
-		Action acAdded = new AbstractAction()
+		wfms.addActivityListener(ea.getComponentIdentifier(), new IActivityListener()
 		{
-			public void actionPerformed(final ActionEvent e)
+			public IFuture activityRemoved(ActivityEvent event)
 			{
-				if (mainSplitPane.getRightComponent() instanceof ActivityComponent)
-				{
-					ActivityComponent currentAc = (ActivityComponent) mainSplitPane.getRightComponent();
-					cancelActivity(currentAc);
-					mainSplitPane.setRightComponent(EMPTY_PANEL);
-				}
-				
-				IClientActivity activity = (IClientActivity) e.getSource();
-				ActivityComponent ac = createActivityComponent(activity);
-				
-				if (mainSplitPane.getRightComponent().equals(EMPTY_PANEL))
-				{
-					mainSplitPane.setRightComponent(ac);
-				}
-				else if (mainSplitPane.getRightComponent() instanceof JTabbedPane)
-				{
-					JTabbedPane tabPane = (JTabbedPane) mainSplitPane.getRightComponent();
-					tabPane.add(ac, SGuiHelper.beautifyName(ac.getActivity().getName()));
-					tabPane.setSelectedComponent(ac);
-				}
-			}
-		};
-		agent.scheduleStep(new SetBeliefStep("clientcap.add_activity_controller", acAdded));
-		
-		Action acRemoved = new AbstractAction()
-		{
-			public void actionPerformed(final ActionEvent e)
-			{
-				IClientActivity activity = (IClientActivity) e.getSource();
+				IClientActivity activity = event.getActivity();
 				
 				if (mainSplitPane.getRightComponent() instanceof ActivityComponent)
 				{
@@ -652,29 +605,51 @@ public class StandardClientApplication
 						if (ac.getActivity().equals(activity))
 						{
 							tabPane.remove(i);
-							return;
+							return IFuture.DONE;
 						}
 					}
 				}
+				return IFuture.DONE;
 			}
-		};
-		agent.scheduleStep(new SetBeliefStep("clientcap.remove_activity_controller", acRemoved));
+			
+			public IFuture activityAdded(ActivityEvent event)
+			{
+				if (mainSplitPane.getRightComponent() instanceof ActivityComponent)
+				{
+					ActivityComponent currentAc = (ActivityComponent) mainSplitPane.getRightComponent();
+					cancelActivity(currentAc);
+					mainSplitPane.setRightComponent(EMPTY_PANEL);
+				}
+				
+				IClientActivity activity = event.getActivity();
+				ActivityComponent ac = createActivityComponent(activity);
+				
+				if (mainSplitPane.getRightComponent().equals(EMPTY_PANEL))
+				{
+					mainSplitPane.setRightComponent(ac);
+				}
+				else if (mainSplitPane.getRightComponent() instanceof JTabbedPane)
+				{
+					JTabbedPane tabPane = (JTabbedPane) mainSplitPane.getRightComponent();
+					tabPane.add(ac, SGuiHelper.beautifyName(ac.getActivity().getName()));
+					tabPane.setSelectedComponent(ac);
+				}
+				return IFuture.DONE;
+			}
+		});
 		
-		//TODO: put somewhere else
 		
-		
-		Action lcAction = new AbstractAction()
+		//TODO: Move connection loss handling somewhere else
+		/*Action lcAction = new AbstractAction()
 		{
 			public void actionPerformed(final ActionEvent e)
 			{
-				connected = false;
+				wfms = null;
 				statusBar.replaceIcon(CONNECT_ICON_NAME, CONNECT_OFF_ICON_PATH);
 				cleanUp();
 			}
 		};
-		agent.scheduleStep(new SetBeliefStep("clientcap.lost_connection_controller", lcAction));
-		
-		agent.scheduleStep(new DispatchGoalStep("clientcap.start_activity_subscription"));
+		agent.scheduleStep(new SetBeliefStep("clientcap.lost_connection_controller", lcAction));*/
 	}
 	
 	public void flushActions()
@@ -689,7 +664,7 @@ public class StandardClientApplication
 		pmComponent.setStartAction(emptyAction);
 		aaComponent.setTerminateAction(emptyAction);
 		
-		agent.scheduleStep(new SetBeliefStep(new HashMap()
+		/*agent.scheduleStep(new SetBeliefStep(new HashMap()
 		{{
 			put("clientcap.add_workitem_controller", null);
 			put("clientcap.remove_workitem_controller", null);
@@ -698,7 +673,7 @@ public class StandardClientApplication
 			put("clientcap.add_process_model_controller", null);
 			put("clientcap.remove_process_model_controller", null);
 			put("clientcap.log_controller", null);
-		}}));
+		}}));*/
 		
 		/*agent.getBeliefbase().setBeliefFact("clientcap.add_workitem_controller", null);
 		agent.getBeliefbase().setBeliefFact("clientcap.remove_workitem_controller", null);

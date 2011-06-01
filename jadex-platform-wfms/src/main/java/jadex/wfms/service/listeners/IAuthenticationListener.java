@@ -2,6 +2,7 @@ package jadex.wfms.service.listeners;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IRemotable;
+import jadex.commons.future.IFuture;
 import jadex.wfms.client.ClientInfo;
 
 /**
@@ -14,11 +15,11 @@ public interface IAuthenticationListener extends IRemotable
 	 * This method triggers when a client has been authenticated.
 	 * @param client client which has been authenticated
 	 */
-	public void authenticated(IComponentIdentifier client, ClientInfo info);
+	public IFuture authenticated(IComponentIdentifier client, ClientInfo info);
 	
 	/**
 	 * This method triggers when a client has been deauthenticated.
 	 * @param client client which has been deauthenticated
 	 */
-	public void deauthenticated(IComponentIdentifier client, ClientInfo info);
+	public IFuture deauthenticated(IComponentIdentifier client, ClientInfo info);
 }

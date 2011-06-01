@@ -1,11 +1,11 @@
 package jadex.wfms.guicomponents;
 
 import jadex.base.gui.SwingDefaultResultListener;
-import jadex.bdi.planlib.iasteps.DispatchGoalStep;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.wfms.gui.images.SImage;
 import jadex.wfms.service.IExternalWfmsService;
 
@@ -38,7 +38,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.ListDataListener;
 
-public class LoginPanel extends JPanel
+public abstract class AbstractLoginPanel extends JPanel
 {
 	protected static final String LOGIN_DIALOG_TITLE = "Login";
 	
@@ -58,17 +58,17 @@ public class LoginPanel extends JPanel
 	
 	protected JButton loginButton;
 	
-	protected IBDIExternalAccess agent;
+	//protected IBDIExternalAccess agent;
 	
 	protected boolean connect = false;
 	
 	protected Action loginaction;
 	
-	public LoginPanel(IBDIExternalAccess agent)
+	public AbstractLoginPanel()
 	{
 		//super(owner, LOGIN_DIALOG_TITLE, true);
 		
-		this.agent = agent;
+		//this.agent = agent;
 		
 		setLayout(new GridBagLayout());
 		
@@ -139,8 +139,6 @@ public class LoginPanel extends JPanel
 		gbc.insets = new Insets(0, 0, 10, 10);
 		gbc.anchor = GridBagConstraints.EAST;
 		add(loginButton, gbc);
-		
-		updateWfmsList();
 	}
 	
 	public void setLoginAction(Action action)
@@ -260,26 +258,17 @@ public class LoginPanel extends JPanel
 	
 	protected void updateWfmsList()
 	{
-		agent.scheduleStep(new DispatchGoalStep("clientcap.discover_wfms")).addResultListener(new DefaultResultListener()
+		discoverWfms().addResultListener(new SwingDefaultResultListener()
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
+				final Collection coll = (Collection) result;
 				
-				final Map params = (Map) result;
-				final Collection coll = (Collection) params.get("wfms");
-				
-				final List idlist = new ArrayList();
-				
-				CounterResultListener wfmsCounter = new CounterResultListener(coll.size(), true, new SwingDefaultResultListener()
+				getWfmsNames(coll).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object result)
 					{
-						Object[] ids = idlist.toArray();
-						Object[] wfms = coll.toArray();
-						Map data = new HashMap();
-						for (int i = 0; i < ids.length; ++i)
-							if (ids[i] != null)
-								data.put(ids[i], wfms[i]);
+						Map data = (Map) result;
 						wfmsChooser.setModel(new MapComboModel(data));
 						if (!data.isEmpty())
 						{
@@ -287,36 +276,56 @@ public class LoginPanel extends JPanel
 							loginButton.setEnabled(true);
 						}
 					}
-				})
-				{
-					public boolean intermediateExceptionOccurred(
-							Exception exception)
-					{
-						idlist.add(null);
-						return false;
-					}
-					
-					public void intermediateResultAvailable(
-							Object result)
-					{
-						Map goalresults = ((Map) result);
-						idlist.add(goalresults.get("name"));
-					}
-				};
-				
-				for (Iterator it = coll.iterator(); it.hasNext(); )
-				{
-					final Object wfms = it.next();
-					agent.scheduleStep(new DispatchGoalStep("clientcap.request_wfms_name", new HashMap()
-					{
-						{
-							put("wfms", wfms);
-						}
-					})).addResultListener(wfmsCounter);
-				}
+				});
 			}
 		});
 	}
+	
+	protected IFuture getWfmsNames(final Collection wfmslist)
+	{
+		final Future ret = new Future();
+		final List idlist = new ArrayList();
+		
+		CounterResultListener wfmsCounter = new CounterResultListener(wfmslist.size(), true, new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				Object[] ids = idlist.toArray();
+				Object[] wfms = wfmslist.toArray();
+				Map data = new HashMap();
+				for (int i = 0; i < ids.length; ++i)
+					if (ids[i] != null)
+						data.put(ids[i], wfms[i]);
+				ret.setResult(data);
+			}
+		})
+		{
+			public boolean intermediateExceptionOccurred(
+					Exception exception)
+			{
+				idlist.add(null);
+				return false;
+			}
+			
+			public void intermediateResultAvailable(
+					Object result)
+			{
+				idlist.add(result);
+			}
+		};
+		
+		for (Iterator it = wfmslist.iterator(); it.hasNext(); )
+		{
+			IExternalWfmsService wfms = (IExternalWfmsService) it.next();
+			getWfmsName(wfms).addResultListener(wfmsCounter);
+		}
+		
+		return ret;
+	}
+	
+	protected abstract IFuture discoverWfms();
+	
+	protected abstract IFuture getWfmsName(IExternalWfmsService wfms);
 	
 	protected static class MapComboModel implements ComboBoxModel
 	{

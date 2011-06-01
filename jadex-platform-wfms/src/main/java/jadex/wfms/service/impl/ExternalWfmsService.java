@@ -1,9 +1,9 @@
 package jadex.wfms.service.impl;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.ICommand;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -27,17 +27,16 @@ import jadex.wfms.service.listeners.IProcessRepositoryListener;
 import jadex.wfms.service.listeners.IWorkitemListener;
 
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Set;
 
-public class ExternalWfmsService extends BasicService implements IExternalWfmsService
+public class ExternalWfmsService implements IExternalWfmsService
 {
-	/** WfMS Service Container */
-	protected IServiceContainer provider;
+	/** Component access. */
+	@ServiceComponent
+	protected IInternalAccess ia;
 	
-	public ExternalWfmsService(IServiceContainer provider)
+	public ExternalWfmsService()
 	{
-		super(provider.getId(), IExternalWfmsService.class, new HashMap());
-		this.provider = provider;
 	}
 	
 	/**
@@ -46,15 +45,15 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	 */
 	public IFuture getName()
 	{
-		final Future ret = new Future(provider.getId());
+		final Future ret = new Future(ia.getServiceContainer().getId());
 		
-		/*provider.getParent().addResultListener(new DelegationResultListener(ret)
+		/*ia.getServiceContainer().getParent().addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
 				System.out.println((((IServiceContainer) result).getId()));
 				ret.setResult(((IServiceContainer) result).getId());
-				((IServiceContainer) result).getParent().addResultListener(new DelegationResultListener(ret)
+				((IServiceContainer) result).getParent().addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -75,17 +74,13 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture authenticate(final IComponentIdentifier client, final ClientInfo info)
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				boolean auth = ((IAAAService) result).authenticate(client, info);
-				if (auth)
-					ret.setResult(Boolean.TRUE);
-				else
-					ret.setResult(Boolean.FALSE);
+				((IAAAService) result).authenticate(client, info).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 			}
-		});
+		}));
 		
 		return ret;
 	}
@@ -97,15 +92,14 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture deauthenticate(final IComponentIdentifier client)
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(provider, IAAAService.class)
-			.addResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class)
+			.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				((IAAAService) result).deauthenticate(client);
-				ret.setResult(null);
+				((IAAAService) result).deauthenticate(client).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 			}
-		});
+		}));
 		return ret;
 	}
 	
@@ -117,14 +111,26 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture getCapabilities(final IComponentIdentifier client)
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				IAAAService as = (IAAAService) result;
-				ret.setResult(as.getCapabilities(as.getSecurityRole(as.getUserName(client))));
+				final IAAAService as = (IAAAService) result;
+				as.getUserName(client).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						as.getSecurityRole((String) result).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+						{
+							public void customResultAvailable(Object result)
+							{
+								as.getCapabilities((Set) result).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
+							}
+						}));
+					}
+				}));
 			}
-		});
+		}));
 		return ret;
 	}
 	
@@ -136,24 +142,30 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture startProcess(IComponentIdentifier client, final String name)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.START_PROCESS)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.START_PROCESS)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IModelRepositoryService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IModelRepositoryService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						final String filename = ((IModelRepositoryService) result).getProcessFileName(name);
-						SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DelegationResultListener(ret)
+						((IModelRepositoryService) result).getProcessFileName(name).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
 							{
-								((IExecutionService) result).startProcess(filename, null, null).addResultListener(new DelegationResultListener(ret));
+								final String filename = (String) result;
+								SServiceProvider.getService(ia.getServiceContainer(), IExecutionService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+								{
+									public void customResultAvailable(Object result)
+									{
+										((IExecutionService) result).startProcess(filename, null, null).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
+									}
+								}));
 							}
-						});
+						}));
 					}
-				});
+				}));
 			}
 		});
 		
@@ -168,17 +180,17 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture getModelNames(IComponentIdentifier client)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.PD_REQUEST_MODEL_NAMES)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.PD_REQUEST_MODEL_NAMES)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IModelRepositoryService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IModelRepositoryService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						ret.setResult(((IModelRepositoryService) result).getModelNames());
 					}
-				});
+				}));
 			}
 		});
 		return ret;
@@ -192,26 +204,32 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture finishActivity(final IComponentIdentifier client, final IClientActivity activity)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.COMMIT_WORKITEM)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.COMMIT_WORKITEM)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						final String userName = ((IAAAService) result).getUserName(client);
-						SServiceProvider.getService(provider, IWorkitemHandlerService.class).addResultListener(new DelegationResultListener(ret)
+						((IAAAService) result).getUserName(client).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
 							{
-								IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
-								wh.finishActivity(userName , activity);
-								ret.setResult(null);
+								final String username = (String) result;
+								SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+								{
+									public void customResultAvailable(Object result)
+									{
+										IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
+										wh.finishActivity(username , activity);
+										ret.setResult(null);
+									}
+								}));
 							}
-						});
+						}));
 					};
-				});
+				}));
 			}
 		});
 		
@@ -226,26 +244,32 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture beginActivity(final IComponentIdentifier client, final IWorkitem workitem)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.ACQUIRE_WORKITEM)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.ACQUIRE_WORKITEM)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						final String userName = ((IAAAService) result).getUserName(client);
-						SServiceProvider.getService(provider, IWorkitemHandlerService.class).addResultListener(new DelegationResultListener(ret)
+						((IAAAService) result).getUserName(client).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
 							{
-								IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
-								wh.beginActivity(userName, workitem);
-								ret.setResult(null);
+								final String username = (String) result;
+								SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+								{
+									public void customResultAvailable(Object result)
+									{
+										IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
+										wh.beginActivity(username, workitem);
+										ret.setResult(null);
+									}
+								}));
 							}
-						});
+						}));
 					};
-				});
+				}));
 			}
 		});
 		
@@ -260,26 +284,33 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture cancelActivity(final IComponentIdentifier client, final IClientActivity activity)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.RELEASE_WORKITEM)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.RELEASE_WORKITEM)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						final String userName = ((IAAAService) result).getUserName(client);
-						SServiceProvider.getService(provider, IWorkitemHandlerService.class).addResultListener(new DelegationResultListener(ret)
+						((IAAAService) result).getUserName(client).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
 							{
-								IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
-								wh.cancelActivity(userName, activity);
-								ret.setResult(null);
+								final String username = (String) result;
+								SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+								{
+									public void customResultAvailable(Object result)
+									{
+										IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
+										wh.cancelActivity(username, activity);
+										ret.setResult(null);
+									}
+								}));
 							}
-						});
+						}));
+						
 					};
-				});
+				}));
 			}
 		});
 		
@@ -294,25 +325,31 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture getAvailableWorkitems(final IComponentIdentifier client)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.REQUEST_AVAILABLE_WORKITEMS)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.REQUEST_AVAILABLE_WORKITEMS)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						final String userName = ((IAAAService) result).getUserName(client);
-						SServiceProvider.getService(provider, IWorkitemHandlerService.class).addResultListener(new DelegationResultListener(ret)
+						((IAAAService) result).getUserName(client).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
 							{
-								IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
-								wh.getAvailableWorkitems(userName).addResultListener(new DelegationResultListener(ret));
-							};
-						});
+								final String username = (String) result;
+								SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+								{
+									public void customResultAvailable(Object result)
+									{
+										IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
+										wh.getAvailableWorkitems(username).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
+									};
+								}));
+							}							
+						}));
 					}
-				});
+				}));
 			}
 		});
 		
@@ -327,25 +364,31 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture getAvailableActivities(final IComponentIdentifier client)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.REQUEST_AVAILABLE_ACTIVITIES)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.REQUEST_AVAILABLE_ACTIVITIES)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						final String userName = ((IAAAService) result).getUserName(client);
-						SServiceProvider.getService(provider, IWorkitemHandlerService.class).addResultListener(new DelegationResultListener(ret)
+						((IAAAService) result).getUserName(client).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
 							{
-								IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
-								wh.getAvailableActivities(userName).addResultListener(new DelegationResultListener(ret));
-							};
-						});
+								final String username = (String) result;
+								SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+								{
+									public void customResultAvailable(Object result)
+									{
+										IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
+										wh.getAvailableActivities(username).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
+									};
+								}));
+							}
+						}));
 					}
-				});
+				}));
 			}
 		});
 		
@@ -360,18 +403,18 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture addWorkitemListener(final IComponentIdentifier client, final IWorkitemListener listener)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.ADD_WORKITEM_LISTENER)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.ADD_WORKITEM_LISTENER)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IWorkitemHandlerService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
-						wh.addWorkitemListener(client, listener).addResultListener(new DelegationResultListener(ret));
+						wh.addWorkitemListener(client, listener).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 					};
-				});
+				}));
 			}
 		});
 		
@@ -386,18 +429,18 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture removeWorkitemListener(final IComponentIdentifier client, final IWorkitemListener listener)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.REMOVE_WORKITEM_LISTENER)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.REMOVE_WORKITEM_LISTENER)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IWorkitemHandlerService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
-						wh.removeWorkitemListener(client, listener).addResultListener(new DelegationResultListener(ret));
+						wh.removeWorkitemListener(client, listener).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 					};
-				});
+				}));
 			}
 		});
 		
@@ -412,18 +455,18 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture addActivityListener(final IComponentIdentifier client, final IActivityListener listener)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.ADD_ACTIVITY_LISTENER)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.ADD_ACTIVITY_LISTENER)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IWorkitemHandlerService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
-						wh.addActivityListener(client, listener).addResultListener(new DelegationResultListener(ret));
+						wh.addActivityListener(client, listener).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 					};
-				});
+				}));
 			}
 		});
 		
@@ -438,18 +481,18 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture removeActivityListener(final IComponentIdentifier client, final IActivityListener listener)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.REMOVE_ACTIVITY_LISTENER)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.REMOVE_ACTIVITY_LISTENER)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IWorkitemHandlerService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
-						wh.removeActivityListener(client, listener).addResultListener(new DelegationResultListener(ret));
+						wh.removeActivityListener(client, listener).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 					};
-				});
+				}));
 			}
 		});
 		
@@ -464,11 +507,11 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture addProcessResource(IComponentIdentifier client, final ProcessResource resource)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.PD_ADD_PROCESS_MODEL)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.PD_ADD_PROCESS_MODEL)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IModelRepositoryService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(ia.getServiceContainer(), IModelRepositoryService.class).addResultListener(ia.createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -476,7 +519,7 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 						mr.addProcessResource(resource);
 						ret.setResult(null);
 					}
-				});
+				}));
 			}
 		});
 		return ret;
@@ -490,11 +533,11 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture removeProcessResource(final IComponentIdentifier client, final String resourceName)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.PD_REMOVE_PROCESS_MODEL)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.PD_REMOVE_PROCESS_MODEL)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IModelRepositoryService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(ia.getServiceContainer(), IModelRepositoryService.class).addResultListener(ia.createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -502,7 +545,7 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 						mr.removeProcessResource(resourceName);
 						ret.setResult(null);
 					}
-				});
+				}));
 			}
 		});
 		return ret;
@@ -516,18 +559,18 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture getProcessModel(IComponentIdentifier client, final String name)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.PD_REQUEST_PROCESS_MODEL)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.PD_REQUEST_PROCESS_MODEL)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IModelRepositoryService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IModelRepositoryService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						IModelRepositoryService mr = (IModelRepositoryService) result;
-						mr.getProcessModel(name).addResultListener(new DelegationResultListener(future));
+						mr.getProcessModel(name).addResultListener(ia.createResultListener(new DelegationResultListener(future)));
 					};
-				});
+				}));
 			}
 		});
 		
@@ -544,18 +587,18 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture loadProcessModel(final IComponentIdentifier client, final String path, final String[] imports)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.PD_REQUEST_PROCESS_MODEL)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.PD_REQUEST_PROCESS_MODEL)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IExecutionService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						IExecutionService es = (IExecutionService) result;
-						es.loadModel(path, imports).addResultListener(new DelegationResultListener(future));
+						es.loadModel(path, imports).addResultListener(ia.createResultListener(new DelegationResultListener(future)));
 					};
-				});
+				}));
 			}
 		});
 		
@@ -571,18 +614,18 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture getProcessModelNames(IComponentIdentifier client)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.PD_REQUEST_MODEL_NAMES)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.PD_REQUEST_MODEL_NAMES)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IModelRepositoryService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IModelRepositoryService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						IModelRepositoryService mr = (IModelRepositoryService) result;
-						ret.setResult(new HashSet(mr.getModelNames()));
+						mr.getModelNames().addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 					};
-				});
+				}));
 			}
 		});
 		
@@ -597,18 +640,18 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture getLoadableModelPaths(IComponentIdentifier client)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.PD_REQUEST_MODEL_PATHS)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.PD_REQUEST_MODEL_PATHS)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IModelRepositoryService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IModelRepositoryService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						IModelRepositoryService mr = (IModelRepositoryService) result;
-						mr.getLoadableModels().addResultListener(new DelegationResultListener(ret));
+						mr.getLoadableModels().addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 					};
-				});
+				}));
 			}
 		});
 		
@@ -624,11 +667,11 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture addProcessRepositoryListener(final IComponentIdentifier client, final IProcessRepositoryListener listener)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.PD_ADD_REPOSITORY_LISTENER)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.PD_ADD_REPOSITORY_LISTENER)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IModelRepositoryService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IModelRepositoryService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -636,7 +679,7 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 						mr.addProcessRepositoryListener(client, listener);
 						ret.setResult(null);
 					};
-				});
+				}));
 			}
 		});
 		
@@ -652,11 +695,11 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture removeProcessRepositoryListener(final IComponentIdentifier client, final IProcessRepositoryListener listener)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.PD_REMOVE_REPOSITORY_LISTENER)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.PD_REMOVE_REPOSITORY_LISTENER)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IModelRepositoryService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IModelRepositoryService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -664,7 +707,7 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 						mr.removeProcessRepositoryListener(client, listener);
 						ret.setResult(null);
 					};
-				});
+				}));
 			}
 		});
 		
@@ -680,18 +723,18 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture getUserActivities(IComponentIdentifier client)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.ADMIN_REQUEST_ALL_ACTIVITIES)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.ADMIN_REQUEST_ALL_ACTIVITIES)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IWorkitemHandlerService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
-						ret.setResult(new HashMap(wh.getUserActivities()));
+						wh.getUserActivities().addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 					};
-				});
+				}));
 			}
 		});
 		
@@ -707,11 +750,11 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture terminateActivity(IComponentIdentifier client, final IClientActivity activity)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.ADMIN_TERMINATE_ACTIVITY)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.ADMIN_TERMINATE_ACTIVITY)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IWorkitemHandlerService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -719,7 +762,7 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 						wh.terminateActivity(activity);
 						ret.setResult(null);
 					};
-				});
+				}));
 			}
 		});
 		
@@ -736,11 +779,11 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture addActivitiesListener(final IComponentIdentifier client, final IActivityListener listener)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.ADMIN_ADD_ACTIVITIES_LISTENER)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.ADMIN_ADD_ACTIVITIES_LISTENER)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IWorkitemHandlerService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -748,7 +791,7 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 						wh.addGlobalActivityListener(client, listener);
 						ret.setResult(null);
 					};
-				});
+				}));
 			}
 		});
 		
@@ -764,11 +807,11 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture removeActivitiesListener(final IComponentIdentifier client, final IActivityListener listener)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.ADMIN_REMOVE_ACTIVITIES_LISTENER)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.ADMIN_REMOVE_ACTIVITIES_LISTENER)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IWorkitemHandlerService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -776,7 +819,7 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 						wh.removeGlobalActivityListener(client, listener);
 						ret.setResult(null);
 					};
-				});
+				}));
 			}
 		});
 		
@@ -793,18 +836,18 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture addLogListener(final IComponentIdentifier client, final ILogListener listener, final boolean pastEvents)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.ADMIN_ADD_LOG_LISTENER)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.ADMIN_ADD_LOG_LISTENER)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, ILogService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), ILogService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						ILogService ls = ((ILogService) result);
 						ls.addLogListener(client, listener, pastEvents);
 					}
-				});
+				}));
 			}
 		});
 		
@@ -820,18 +863,18 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture removeLogListener(final IComponentIdentifier client, final ILogListener listener)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.ADMIN_REMOVE_LOG_LISTENER)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.ADMIN_REMOVE_LOG_LISTENER)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, ILogService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), ILogService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						ILogService ls = ((ILogService) result);
 						ls.removeLogListener(client, listener);
 					}
-				});
+				}));
 			}
 		});
 		
@@ -847,18 +890,18 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture addProcessListener(final IComponentIdentifier client, final IProcessListener listener)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.START_PROCESS)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.START_PROCESS)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IExecutionService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						IExecutionService es = ((IExecutionService) result);
-						es.addProcessListener(client, listener).addResultListener(new DelegationResultListener(ret));
+						es.addProcessListener(client, listener).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 					}
-				});
+				}));
 			}
 		});
 		
@@ -874,18 +917,18 @@ public class ExternalWfmsService extends BasicService implements IExternalWfmsSe
 	public IFuture removeProcessListener(final IComponentIdentifier client, final IProcessListener listener)
 	{
 		final Future ret = new Future();
-		(new AccessControlCheck(client, IAAAService.START_PROCESS)).checkAccess(ret, provider, new ICommand()
+		(new AccessControlCheck(client, IAAAService.START_PROCESS)).checkAccess(ret, ia.getServiceContainer(), new ICommand()
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IExecutionService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						IExecutionService es = ((IExecutionService) result);
-						es.removeProcessListener(client, listener).addResultListener(new DelegationResultListener(ret));
+						es.removeProcessListener(client, listener).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 					}
-				});
+				}));
 			}
 		});
 		

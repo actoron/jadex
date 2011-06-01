@@ -1,6 +1,7 @@
 package jadex.wfms.service;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.future.IFuture;
 import jadex.wfms.client.ClientInfo;
 import jadex.wfms.service.listeners.IAuthenticationListener;
 
@@ -95,20 +96,21 @@ public interface IAAAService
 	 * @param client the new client
 	 * @return true, if the client has been successfully authenticated.
 	 */
-	public boolean authenticate(IComponentIdentifier client, ClientInfo info);
+	public IFuture authenticate(IComponentIdentifier client, ClientInfo info);
 	
 	/**
 	 * Deauthenticate a client.
 	 * @param client the client
+	 * @return True, when done.
 	 */
-	public void deauthenticate(IComponentIdentifier client);
+	public IFuture deauthenticate(IComponentIdentifier client);
 	
 	/**
 	 * Returns the authenticated clients for a specific user name
 	 * @parameter userName the user name
 	 * @return Set of connected clients
 	 */
-	public Set getAuthenticatedClients(String userName);
+	public IFuture getAuthenticatedClients(String userName);
 	
 	/**
 	 * Checks if a client can access an action
@@ -116,7 +118,7 @@ public interface IAAAService
 	 * @param action the action the client is requesting
 	 * @return true, if the client is authorized to perform the action, false otherwise
 	 */
-	public boolean accessAction(IComponentIdentifier client, Integer action);
+	public IFuture accessAction(IComponentIdentifier client, Integer action);
 	
 	/**
 	 * Checks if a client can access an event
@@ -130,48 +132,50 @@ public interface IAAAService
 	 *  @param client the client
 	 *  @return user name
 	 */
-	public String getUserName(IComponentIdentifier client);
+	public IFuture getUserName(IComponentIdentifier client);
 	
 	/**
 	 * Returns the roles of a particular user
 	 * @param userName the user name
-	 * @return the roles of the client
+	 * @return Set of the roles of the client.
 	 */
-	public Set getRoles(String userName);
+	public IFuture getRoles(String userName);
 	
 	/**
 	 * Returns the security roles of the user
 	 * @param userName the user name
-	 * @return the security roles
+	 * @return Set of the security roles.
 	 */
-	public Set getSecurityRole(String userName);
+	public IFuture getSecurityRole(String userName);
 	
 	/**
 	 * Returns the capabilities of a security role
 	 * @param secRole the security role
-	 * @return the capabilities of the security role
+	 * @return Set of the capabilities of the security role.
 	 */
-	public Set getCapabilities(String secRole);
+	public IFuture getCapabilities(String secRole);
 	
 	/**
 	 * Returns the capabilities a set of security roles
 	 * @param secRoles the security roles
 	 * @return the combined capabilities of the security roles
 	 */
-	public Set getCapabilities(Set secRoles);
+	public IFuture getCapabilities(Set secRoles);
 	
 	/**
 	 * Adds an authentication listener which triggers on
 	 * authentications and deauthentications.
 	 * 
 	 * @param listener the listener
+	 * @return Null, when done.
 	 */
-	public void addAuthenticationListener(IAuthenticationListener listener);
+	public IFuture addAuthenticationListener(IAuthenticationListener listener);
 	
 	/**
 	 * Removes an authentication listener.
 	 * 
 	 * @param listener the listener
+	 * @return Null, when done.
 	 */
-	public void removeAuthenticationListener(IAuthenticationListener listener);
+	public IFuture removeAuthenticationListener(IAuthenticationListener listener);
 }

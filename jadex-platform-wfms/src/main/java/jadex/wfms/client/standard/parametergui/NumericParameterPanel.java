@@ -1,6 +1,6 @@
-package jadex.wfms.bdi.client.standard.parametergui;
+package jadex.wfms.client.standard.parametergui;
 
-import jadex.wfms.bdi.client.standard.SNumberUtils;
+import jadex.wfms.client.standard.SNumberUtils;
 
 import java.awt.GridBagConstraints;
 

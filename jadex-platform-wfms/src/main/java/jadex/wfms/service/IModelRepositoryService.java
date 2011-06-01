@@ -15,19 +15,19 @@ public interface IModelRepositoryService
 	 *  Add a process model resource.
 	 *  @param url The URL of the model resource.
 	 */
-	public void addProcessResource(ProcessResource resource);
+	public IFuture addProcessResource(ProcessResource resource);
 	
 	/**
 	 *  Remove a process model resource.
 	 *  @param url The URL of the model resource.
 	 */
-	public void removeProcessResource(String resourceName);
+	public IFuture removeProcessResource(String resourceName);
 	
 	/**
 	 * Gets all available models.
 	 * @return names of all models
 	 */
-	public Collection getModelNames();
+	public IFuture getModelNames();
 	
 	/**
 	 * Returns a potentially incomplete set of loadable models
@@ -48,24 +48,24 @@ public interface IModelRepositoryService
 	 *  @param name The model name.
 	 *  @return The process model file name.
 	 */
-	public String getProcessFileName(String name);
+	public IFuture getProcessFileName(String name);
 	
 	/**
 	 *  Get the imports.
 	 */
-	public String[] getImports();
+	public IFuture getImports();
 	
 	/**
 	 * Adds a process repository listener.
 	 * 
 	 * @param listener the listener
 	 */
-	public void addProcessRepositoryListener(IComponentIdentifier client, IProcessRepositoryListener listener);
+	public IFuture addProcessRepositoryListener(IComponentIdentifier client, IProcessRepositoryListener listener);
 	
 	/**
 	 * Removes a process repository listener.
 	 * 
 	 * @param listener the listener
 	 */
-	public void removeProcessRepositoryListener(IComponentIdentifier client, IProcessRepositoryListener listener);
+	public IFuture removeProcessRepositoryListener(IComponentIdentifier client, IProcessRepositoryListener listener);
 }

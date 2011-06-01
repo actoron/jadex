@@ -2,9 +2,14 @@ package jadex.wfms.service.impl;
 
 import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceShutdown;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -31,26 +36,35 @@ import java.util.Set;
 /**
  * 
  */
-public class WorkitemHandlerService extends BasicService implements IWorkitemHandlerService
+public class WorkitemHandlerService implements IWorkitemHandlerService
 {
-	private IServiceContainer provider;
+	/** Component access. */
+	@ServiceComponent
+	protected IInternalAccess ia;
 	
-	private Map workitemQueues;
+	/** The workitem queues */
+	protected Map workitemQueues;
 	
-	private Map userActivities;
+	/** Current user activities */
+	protected Map userActivities;
 	
-	private Map processWorkitemListeners;
 	
-	private Map workitemQueueListeners;
+	protected Map processWorkitemListeners;
 	
-	private Map activityListeners;
+	/** Listeners for workitems */
+	protected Map workitemQueueListeners;
 	
-	private Map globalActivityListeners;
+	/** User-specific activity listeners */
+	protected Map activityListeners;
 	
-	public WorkitemHandlerService(IServiceContainer provider)
+	/** Global (not user-specific) activity listeners */
+	protected Map globalActivityListeners;
+	
+	/** Authentication listener */
+	protected IAuthenticationListener authlistener;
+	
+	public WorkitemHandlerService()
 	{
-		super(provider.getId(), IWorkitemHandlerService.class, null);
-		this.provider = provider;
 		processWorkitemListeners = new HashMap();
 		workitemQueues = new HashMap();
 		userActivities = new HashMap();
@@ -59,63 +73,96 @@ public class WorkitemHandlerService extends BasicService implements IWorkitemHan
 		globalActivityListeners = new HashMap();
 	}
 	
-	//TODO: Hack!
-	private boolean active = false;
-	
+	/**
+	 *  Start the service.
+	 */
+	@ServiceStart
 	public IFuture startService()
 	{
-		if (!active)
-		{
-			active = true;
-			SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DefaultResultListener()
-			{
-				public void resultAvailable(Object result)
-				{
-					IAAAService as = (IAAAService) result;
-					as.addAuthenticationListener(new IAuthenticationListener()
-					{
-						public void deauthenticated(IComponentIdentifier client, ClientInfo info)
-						{
-							processWorkitemListeners.remove(client);
-							workitemQueues.remove(client);
-							userActivities.remove(client);
-							workitemQueueListeners.remove(client);
-							activityListeners.remove(client);
-							globalActivityListeners.remove(client);
-						}
-						
-						public void authenticated(IComponentIdentifier client, ClientInfo info)
-						{
-						}
-					});
-				}
-			});
-			return super.startService();
-		}
-		return new Future(null);
-	}
-	
-	public IFuture shutdownService()
-	{
-		if (active)
-		{
-			active = false;
-			return super.shutdownService();
-		}
-		return new Future(null);
-	}
-	
-	public synchronized void queueWorkitem(final IWorkitem workitem, IResultListener listener)
-	{
-		ComponentChangeEvent.getTimeStamp(provider).addResultListener(new DefaultResultListener()
+		final Future ret = new Future();
+		ret.addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
-				LogService.dispatchLogServiceEvent(provider, new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_CREATION, SOURCE_CATEGORY_WORKITEM, workitem.getName(), workitem.getId(), workitem.getProcess(), null, null, (Long) result));
+				System.out.println("DONE");
 			}
 		});
+		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				System.out.println("GOT AAA");
+				IAAAService as = (IAAAService) result;
+				final IExternalAccess exta = ia.getExternalAccess();
+				authlistener = new IAuthenticationListener()
+				{
+					public IFuture deauthenticated(final IComponentIdentifier client, ClientInfo info)
+					{
+						return exta.scheduleStep(new IComponentStep()
+						{
+							
+							public Object execute(IInternalAccess ia)
+							{
+								processWorkitemListeners.remove(client);
+								workitemQueues.remove(client);
+								userActivities.remove(client);
+								workitemQueueListeners.remove(client);
+								activityListeners.remove(client);
+								globalActivityListeners.remove(client);
+								return null;
+							}
+						});
+					}
+					
+					public IFuture authenticated(IComponentIdentifier client, ClientInfo info)
+					{
+						return IFuture.DONE;
+					}
+				};
+				
+				as.addAuthenticationListener(authlistener).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
+			}
+		}));
+		return ret;
+	}
+	
+	/**
+	 *  Stops the service.
+	 */
+	@ServiceShutdown
+	public IFuture shutdownService()
+	{
+		final Future ret = new Future();
+		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				IAAAService as = (IAAAService) result;
+				as.removeAuthenticationListener(authlistener);
+				ret.setResult(null);
+			}
+		}));
+		return ret;
+	}
+	
+	/**
+	 *  Queues a new Workitem.
+	 *  @param workitem the workitem
+	 *  @param listener result listener
+	 *  @return Null, when done.
+	 */
+	public IFuture queueWorkitem(final IWorkitem workitem, IResultListener listener)
+	{
+		ComponentChangeEvent.getTimeStamp(ia.getServiceContainer()).addResultListener(ia.createResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				LogService.dispatchLogServiceEvent(ia.getServiceContainer(), new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_CREATION, SOURCE_CATEGORY_WORKITEM, workitem.getName(), workitem.getId(), workitem.getProcess(), null, null, (Long) result));
+			}
+		}));
 		
 		requeueWorkitem(workitem, listener);
+		return IFuture.DONE;
 	}
 	
 	protected void requeueWorkitem(final IWorkitem workitem, IResultListener listener)
@@ -137,7 +184,7 @@ public class WorkitemHandlerService extends BasicService implements IWorkitemHan
 	 * 
 	 * @return current activities for all users
 	 */
-	public synchronized Map getUserActivities()
+	public IFuture getUserActivities()
 	{
 		Map ret = new HashMap();
 		for (Iterator it = userActivities.entrySet().iterator(); it.hasNext(); )
@@ -147,15 +194,16 @@ public class WorkitemHandlerService extends BasicService implements IWorkitemHan
 			ret.put(userEntry.getKey(), new HashSet(activities));
 		}
 		
-		return ret;
+		return new Future(ret);
 	}
 	
 	/**
 	 * Terminates the activity of a user.
 	 * 
 	 * @param activity the activity
+	 * @return Null, when done.
 	 */
-	public synchronized void terminateActivity(final IClientActivity activity)
+	public IFuture terminateActivity(final IClientActivity activity)
 	{
 		String userName = null;
 		for (Iterator it = userActivities.entrySet().iterator(); it.hasNext(); )
@@ -173,61 +221,65 @@ public class WorkitemHandlerService extends BasicService implements IWorkitemHan
 			final String id = activity.getActivityId();
 			final String user = userName;
 			activity.setActivityId(null);
-			ComponentChangeEvent.getTimeStamp(provider).addResultListener(new DefaultResultListener()
+			ComponentChangeEvent.getTimeStamp(ia.getServiceContainer()).addResultListener(ia.createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
-					LogService.dispatchLogServiceEvent(provider, new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_ACTIVITY, activity.getName(), id, activity.getProcess(), "Finished", user, (Long) result));
+					LogService.dispatchLogServiceEvent(ia.getServiceContainer(), new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_ACTIVITY, activity.getName(), id, activity.getProcess(), "Finished", user, (Long) result));
 				}
-			});
+			}));
 			((Set) userActivities.get(userName)).remove(activity);
 			fireActivityRemovedEvent(userName, activity);
 			requeueWorkitem((IWorkitem) activity, null);
 		}
+		return IFuture.DONE;
 	}
 	
 	/**
 	 *  Finishes an Activity.
 	 *  @param userName the user name
 	 *  @param activity the activity being finished
+	 *  @return Null, when done.
 	 */
-	public synchronized void finishActivity(final String userName, IClientActivity activity)
+	public IFuture finishActivity(final String userName, IClientActivity activity)
 	{
 		final IWorkitem workitem = (IWorkitem) activity;
 		final String id = activity.getActivityId();
 		activity.setActivityId(null);
-		ComponentChangeEvent.getTimeStamp(provider).addResultListener(new DefaultResultListener()
+		ComponentChangeEvent.getTimeStamp(ia.getServiceContainer()).addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
-				LogService.dispatchLogServiceEvent(provider, new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_ACTIVITY, workitem.getName(), id, workitem.getProcess(), "Finished", userName, (Long) result));
-				LogService.dispatchLogServiceEvent(provider, new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_WORKITEM, workitem.getName(), workitem.toString(), workitem.getProcess(), "Finished", null, (Long) result));
+				LogService.dispatchLogServiceEvent(ia.getServiceContainer(), new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_ACTIVITY, workitem.getName(), id, workitem.getProcess(), "Finished", userName, (Long) result));
+				LogService.dispatchLogServiceEvent(ia.getServiceContainer(), new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_WORKITEM, workitem.getName(), workitem.toString(), workitem.getProcess(), "Finished", null, (Long) result));
 			}
-		});
+		}));
 		IResultListener listener = (IResultListener) processWorkitemListeners.remove(activity);
 		((HashSet) userActivities.get(userName)).remove(activity);
 		fireActivityRemovedEvent(userName, activity);
 		listener.resultAvailable(activity);
+		return IFuture.DONE;
 	}
 	
 	/**
 	 *  Begins an activity for a client.
 	 *  @param userName the user name
 	 *  @param workitem the workitem being requested for the activity
+	 *  @return Null, when done.
 	 */
-	public synchronized void beginActivity(final String userName, final IWorkitem workitem)
+	public IFuture beginActivity(final String userName, final IWorkitem workitem)
 	{
 		final IClientActivity activity = (IClientActivity) workitem;
 		activity.setActivityId(SUtil.createUniqueId("Activity"));
-		ComponentChangeEvent.getTimeStamp(provider).addResultListener(new DefaultResultListener()
+		ComponentChangeEvent.getTimeStamp(ia.getServiceContainer()).addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				ComponentChangeEvent event = new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_CREATION, SOURCE_CATEGORY_ACTIVITY, activity.getName(), activity.getActivityId(), activity.getProcess(), "Requested", userName, (Long) result);
 				event.setParent(activity.getId());
-				LogService.dispatchLogServiceEvent(provider, event);
+				LogService.dispatchLogServiceEvent(ia.getServiceContainer(), event);
 			}
-		});
+		}));
 		Set workitems = (Set) workitemQueues.get(workitem.getRole());
 		if (workitems.remove(workitem))
 		{
@@ -241,62 +293,68 @@ public class WorkitemHandlerService extends BasicService implements IWorkitemHan
 			activities.add(activity);
 			fireActivityAddedEvent(userName, activity);
 		}
+		return IFuture.DONE;
 	}
 	
 	/**
 	 *  Cancel an activity.
 	 *  @param userName the user name
 	 *  @param activity the activity being canceled
+	 *  @return Null, when done.
 	 */
-	public void cancelActivity(final String userName, final IClientActivity activity)
+	public IFuture cancelActivity(final String userName, final IClientActivity activity)
 	{
 		final String id = activity.getActivityId();
 		activity.setActivityId(null);
-		ComponentChangeEvent.getTimeStamp(provider).addResultListener(new DefaultResultListener()
+		ComponentChangeEvent.getTimeStamp(ia.getServiceContainer()).addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
-				LogService.dispatchLogServiceEvent(provider, new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_ACTIVITY, activity.getName(), id, activity.getProcess(), "Canceled", userName, (Long) result));
+				LogService.dispatchLogServiceEvent(ia.getServiceContainer(), new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_ACTIVITY, activity.getName(), id, activity.getProcess(), "Canceled", userName, (Long) result));
 			}
-		});
+		}));
 		((HashSet) userActivities.get(userName)).remove(activity);
 		fireActivityRemovedEvent(userName, activity);
 		requeueWorkitem((IWorkitem) activity, null);
+		return IFuture.DONE;
 	}
 	
-	public IFuture getAvailableWorkitems(final String userName)
+	public IFuture getAvailableWorkitems(final String username)
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(provider, IAAAService.class)
-			.addResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+			.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				Set roles = ((IAAAService) result).getRoles(userName);
-				Set workitems = new HashSet();
-				synchronized(WorkitemHandlerService.this)
+				((IAAAService) result).getRoles(username).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
-					if (roles.contains(IAAAService.ALL_ROLES))
+					public void customResultAvailable(Object result)
 					{
-						for (Iterator it = workitemQueues.values().iterator(); it.hasNext(); )
+						Set roles = (Set) result;
+						Set workitems = new HashSet();
+						if (roles.contains(IAAAService.ALL_ROLES))
 						{
-							Set roleItems = (Set) it.next();
-							workitems.addAll(roleItems);
-						}
-					}
-					else
-					{
-						for (Iterator it = roles.iterator(); it.hasNext(); )
-						{
-							Set roleItems = (Set) workitemQueues.get(it.next());
-							if (roleItems != null)
+							for (Iterator it = workitemQueues.values().iterator(); it.hasNext(); )
+							{
+								Set roleItems = (Set) it.next();
 								workitems.addAll(roleItems);
+							}
 						}
+						else
+						{
+							for (Iterator it = roles.iterator(); it.hasNext(); )
+							{
+								Set roleItems = (Set) workitemQueues.get(it.next());
+								if (roleItems != null)
+									workitems.addAll(roleItems);
+							}
+						}
+						ret.setResult(workitems);
 					}
-				}
-				ret.setResult(workitems);
+				}));
 			}
-		});
+		}));
 		
 		return ret;
 	}
@@ -309,10 +367,7 @@ public class WorkitemHandlerService extends BasicService implements IWorkitemHan
 	public IFuture getAvailableActivities(final String userName)
 	{
 		final Future ret = new Future();
-		synchronized(WorkitemHandlerService.this)
-		{
-			ret.setResult(new HashSet((Set) userActivities.get(userName)));
-		}
+		ret.setResult(new HashSet((Set) userActivities.get(userName)));
 		return ret;
 	}
 	
@@ -325,40 +380,43 @@ public class WorkitemHandlerService extends BasicService implements IWorkitemHan
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				IAAAService as = (IAAAService) result;
-				String userName = as.getUserName(client);
-				getAvailableWorkitems(userName).addResultListener(new DelegationResultListener(ret)
+				as.getUserName(client).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						synchronized(WorkitemHandlerService.this)
+						String username = (String) result;
+						getAvailableWorkitems(username).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
-							Set workitems = (Set) result;
-							Set listeners = (Set) workitemQueueListeners.get(client);
-							if (listeners == null)
+							public void customResultAvailable(Object result)
 							{
-								listeners = new HashSet();
-								workitemQueueListeners.put(client, listeners);
-							}
-							listeners.add(listener);
-						
-							if (workitems != null)
-							{
-								for (Iterator it = workitems.iterator(); it.hasNext(); )
+								Set workitems = (Set) result;
+								Set listeners = (Set) workitemQueueListeners.get(client);
+								if (listeners == null)
 								{
-									listener.workitemAdded(new WorkitemEvent((IWorkitem) it.next()));
+									listeners = new HashSet();
+									workitemQueueListeners.put(client, listeners);
 								}
+								listeners.add(listener);
+							
+								if (workitems != null)
+								{
+									for (Iterator it = workitems.iterator(); it.hasNext(); )
+									{
+										listener.workitemAdded(new WorkitemEvent((IWorkitem) it.next()));
+									}
+								}
+								ret.setResult(null);
 							}
-						}
-						ret.setResult(null);
+						}));
 					}
-				});
+				}));
 			}
-		});
+		}));
 		
 		
 		return ret;
@@ -372,20 +430,18 @@ public class WorkitemHandlerService extends BasicService implements IWorkitemHan
 	public IFuture removeWorkitemListener(final IComponentIdentifier client, final IWorkitemListener listener)
 	{
 		final Future ret = new Future();
-		synchronized(WorkitemHandlerService.this)
-		{
-			Set listeners = (Set) workitemQueueListeners.get(client);
-			if (listeners != null)
-				listeners.remove(listener);
-		}
+		Set listeners = (Set) workitemQueueListeners.get(client);
+		if (listeners != null)
+			listeners.remove(listener);
 		return ret;
 	}
 	
 	/**
 	 *  Adds a listener for activity changes.
 	 *  @param listener a new activity listener
+	 *  @return Null, when done.
 	 */
-	public synchronized void addGlobalActivityListener(IComponentIdentifier client, IActivityListener listener)
+	public IFuture addGlobalActivityListener(IComponentIdentifier client, IActivityListener listener)
 	{
 		Set listeners = (Set) globalActivityListeners.get(client);
 		if (listeners == null)
@@ -403,17 +459,20 @@ public class WorkitemHandlerService extends BasicService implements IWorkitemHan
 			for (Iterator it2 = activities.iterator(); it2.hasNext(); )
 				listener.activityAdded(new ActivityEvent(userName, (IClientActivity) it2.next()));
 		}
+		return IFuture.DONE;
 	}
 	
 	/**
 	 *  Removes a listener for activity changes.
 	 *  @param listener activity listener
+	 *  @return Null, when done.
 	 */
-	public synchronized void removeGlobalActivityListener(IComponentIdentifier client, IActivityListener listener)
+	public IFuture removeGlobalActivityListener(IComponentIdentifier client, IActivityListener listener)
 	{
 		Set listeners = (Set) globalActivityListeners.get(client);
 		if (listeners != null)
 			listeners.remove(listener);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -424,32 +483,35 @@ public class WorkitemHandlerService extends BasicService implements IWorkitemHan
 	public IFuture addActivityListener(final IComponentIdentifier client, final IActivityListener listener)
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				IAAAService as = (IAAAService) result;
-				String userName = as.getUserName(client);
-				synchronized(WorkitemHandlerService.this)
+				as.getUserName(client).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
-					Set listeners = (Set) activityListeners.get(client);
-					if (listeners == null)
+					public void customResultAvailable(Object result)
 					{
-						listeners = new HashSet();
-						activityListeners.put(client, listeners);
-					}
-					listeners.add(listener);
-					Set activities = (Set) userActivities.get(userName);
-					if (activities != null)
-					{
-						for (Iterator it = activities.iterator(); it.hasNext(); )
+						String username = (String) result;
+						Set listeners = (Set) activityListeners.get(client);
+						if (listeners == null)
 						{
-							listener.activityAdded(new ActivityEvent(userName, (IClientActivity) it.next()));
+							listeners = new HashSet();
+							activityListeners.put(client, listeners);
+						}
+						listeners.add(listener);
+						Set activities = (Set) userActivities.get(username);
+						if (activities != null)
+						{
+							for (Iterator it = activities.iterator(); it.hasNext(); )
+							{
+								listener.activityAdded(new ActivityEvent(username, (IClientActivity) it.next()));
+							}
 						}
 					}
-				}
+				}));
 			}
-		});
+		}));
 		
 		return ret;
 	}
@@ -462,126 +524,161 @@ public class WorkitemHandlerService extends BasicService implements IWorkitemHan
 	public IFuture removeActivityListener(final IComponentIdentifier client, final IActivityListener listener)
 	{
 		final Future ret = new Future();
-		synchronized (WorkitemHandlerService.this)
-		{
-			Set listeners = (Set) activityListeners.get(client);
-			if (listeners != null)
-				listeners.remove(listener);
-		}
+		Set listeners = (Set) activityListeners.get(client);
+		if (listeners != null)
+			listeners.remove(listener);
 		
 		return ret;
 	}
 	
-	private synchronized void fireWorkitemAddedEvent(final IWorkitem workitem)
+	private void fireWorkitemAddedEvent(final IWorkitem workitem)
 	{
-		SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
-				IAAAService as = (IAAAService) result;
+				final IAAAService as = (IAAAService) result;
 				for (Iterator it = workitemQueueListeners.entrySet().iterator(); it.hasNext(); )
 				{
 					Map.Entry entry = (Map.Entry) it.next();
 					IComponentIdentifier client = (IComponentIdentifier) entry.getKey();
-					Set listeners = (Set) entry.getValue();
+					final Set listeners = (Set) entry.getValue();
 					
-					if (as.getRoles(as.getUserName(client)).contains(workitem.getRole()) ||
-						workitem.getRole().equals(IAAAService.ANY_ROLE) ||
-						as.getRoles(as.getUserName(client)).contains(IAAAService.ALL_ROLES))
+					as.getUserName(client).addResultListener(ia.createResultListener(new DefaultResultListener()
 					{
-						WorkitemEvent evt = new WorkitemEvent(workitem);
-						for (Iterator it2 = listeners.iterator(); it2.hasNext(); )
-							((IWorkitemListener) it2.next()).workitemAdded(evt);
-					}
+						public void resultAvailable(Object result)
+						{
+							String username = (String) result;
+							as.getRoles(username).addResultListener(ia.createResultListener(new DefaultResultListener()
+							{
+								public void resultAvailable(Object result)
+								{
+									Set roles = (Set) result;
+									if (roles.contains(workitem.getRole()) ||
+										workitem.getRole().equals(IAAAService.ANY_ROLE) ||
+										roles.contains(IAAAService.ALL_ROLES))
+									{
+										WorkitemEvent evt = new WorkitemEvent(workitem);
+										for (Iterator it2 = listeners.iterator(); it2.hasNext(); )
+											((IWorkitemListener) it2.next()).workitemAdded(evt);
+									}
+								}
+							}));
+						}
+					}));
 				}
 			}
-		});
+		}));
 	}
 	
-	private synchronized void fireWorkitemRemovedEvent(final IWorkitem workitem)
+	private void fireWorkitemRemovedEvent(final IWorkitem workitem)
 	{
-		SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			
 			public void resultAvailable(Object result)
 			{
-				IAAAService as = (IAAAService) result;
+				final IAAAService as = (IAAAService) result;
 				for (Iterator it = workitemQueueListeners.entrySet().iterator(); it.hasNext(); )
 				{
 					Map.Entry entry = (Map.Entry) it.next();
 					IComponentIdentifier client = (IComponentIdentifier) entry.getKey();
-					Set listeners = (Set) entry.getValue();
+					final Set listeners = (Set) entry.getValue();
 					
-					if (as.getRoles(as.getUserName(client)).contains(workitem.getRole()) ||
-						workitem.getRole().equals(IAAAService.ANY_ROLE) ||
-						as.getRoles(as.getUserName(client)).contains(IAAAService.ALL_ROLES))
+					as.getUserName(client).addResultListener(ia.createResultListener(new DefaultResultListener()
 					{
-						WorkitemEvent evt = new WorkitemEvent(workitem);
-						for (Iterator it2 = listeners.iterator(); it2.hasNext(); )
-							((IWorkitemListener) it2.next()).workitemRemoved(evt);
-					}
+						public void resultAvailable(Object result)
+						{
+							String username = (String) result;
+							as.getRoles(username).addResultListener(ia.createResultListener(new DefaultResultListener()
+							{
+								public void resultAvailable(Object result)
+								{
+									Set roles = (Set) result;
+									if (roles.contains(workitem.getRole()) ||
+										workitem.getRole().equals(IAAAService.ANY_ROLE) ||
+										roles.contains(IAAAService.ALL_ROLES))
+									{
+										WorkitemEvent evt = new WorkitemEvent(workitem);
+										for (Iterator it2 = listeners.iterator(); it2.hasNext(); )
+											((IWorkitemListener) it2.next()).workitemRemoved(evt);
+									}
+								}
+							}));
+						}
+					}));
 				}
 			}
-		});
+		}));
 	}
 	
-	private synchronized void fireActivityAddedEvent(final String userName, final IClientActivity activity)
+	private void fireActivityAddedEvent(final String userName, final IClientActivity activity)
 	{
-		SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				IAAAService as = (IAAAService) result;
-				Set clients = as.getAuthenticatedClients(userName);
-				
-				for (Iterator it = clients.iterator(); it.hasNext(); )
+				as.getAuthenticatedClients(userName).addResultListener(ia.createResultListener(new DefaultResultListener()
 				{
-					IComponentIdentifier currentClient = (IComponentIdentifier) it.next();
-					
-					Set listeners = (Set) activityListeners.get(currentClient);
-					
-					for (Iterator it2 = listeners.iterator(); it2.hasNext(); )
+					public void resultAvailable(Object result)
 					{
-						IActivityListener listener = (IActivityListener) it2.next();
-						ActivityEvent evt = new ActivityEvent(userName, activity);
-						listener.activityAdded(evt);
+						Set clients = (Set) result;
+						for (Iterator it = clients.iterator(); it.hasNext(); )
+						{
+							IComponentIdentifier currentClient = (IComponentIdentifier) it.next();
+							
+							Set listeners = (Set) activityListeners.get(currentClient);
+							
+							for (Iterator it2 = listeners.iterator(); it2.hasNext(); )
+							{
+								IActivityListener listener = (IActivityListener) it2.next();
+								ActivityEvent evt = new ActivityEvent(userName, activity);
+								listener.activityAdded(evt);
+							}
+						}
+						
+						for (Iterator it = globalActivityListeners.values().iterator(); it.hasNext(); )
+							for (Iterator it2 = ((Set) it.next()).iterator(); it2.hasNext(); )
+								((IActivityListener) it2.next()).activityAdded(new ActivityEvent(userName, activity));
 					}
-				}
-				
-				for (Iterator it = globalActivityListeners.values().iterator(); it.hasNext(); )
-					for (Iterator it2 = ((Set) it.next()).iterator(); it2.hasNext(); )
-						((IActivityListener) it2.next()).activityAdded(new ActivityEvent(userName, activity));
+				}));
 			}
-		});
+		}));
 	}
 	
-	private synchronized void fireActivityRemovedEvent(final String userName, final IClientActivity activity)
+	private void fireActivityRemovedEvent(final String userName, final IClientActivity activity)
 	{
-		SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				IAAAService as = (IAAAService) result;
-				Set clients = as.getAuthenticatedClients(userName);
-				
-				for (Iterator it = clients.iterator(); it.hasNext(); )
+				as.getAuthenticatedClients(userName).addResultListener(ia.createResultListener(new DefaultResultListener()
 				{
-					IComponentIdentifier currentClient = (IComponentIdentifier) it.next();
-					
-					Set listeners = (Set) activityListeners.get(currentClient);
-					
-					for (Iterator it2 = listeners.iterator(); it2.hasNext(); )
+					public void resultAvailable(Object result)
 					{
-						IActivityListener listener = (IActivityListener) it2.next();
-						ActivityEvent evt = new ActivityEvent(userName, activity);
-						listener.activityRemoved(evt);
+						Set clients = (Set) result;
+						for (Iterator it = clients.iterator(); it.hasNext(); )
+						{
+							IComponentIdentifier currentClient = (IComponentIdentifier) it.next();
+							
+							Set listeners = (Set) activityListeners.get(currentClient);
+							
+							for (Iterator it2 = listeners.iterator(); it2.hasNext(); )
+							{
+								IActivityListener listener = (IActivityListener) it2.next();
+								ActivityEvent evt = new ActivityEvent(userName, activity);
+								listener.activityRemoved(evt);
+							}
+						}
+						
+						for (Iterator it = globalActivityListeners.values().iterator(); it.hasNext(); )
+							for (Iterator it2 = ((Set) it.next()).iterator(); it2.hasNext(); )
+								((IActivityListener) it2.next()).activityRemoved(new ActivityEvent(userName, activity));
 					}
-				}
-				
-				for (Iterator it = globalActivityListeners.values().iterator(); it.hasNext(); )
-					for (Iterator it2 = ((Set) it.next()).iterator(); it2.hasNext(); )
-						((IActivityListener) it2.next()).activityRemoved(new ActivityEvent(userName, activity));
+				}));
 			}
-		});
+		}));
 	}
 }

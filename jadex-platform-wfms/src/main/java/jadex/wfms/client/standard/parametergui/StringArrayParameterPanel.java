@@ -1,4 +1,4 @@
-package jadex.wfms.bdi.client.standard.parametergui;
+package jadex.wfms.client.standard.parametergui;
 
 import jadex.wfms.guicomponents.SGuiHelper;
 import jadex.wfms.guicomponents.StringTable;

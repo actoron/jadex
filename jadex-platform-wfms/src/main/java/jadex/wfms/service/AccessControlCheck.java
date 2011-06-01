@@ -4,8 +4,10 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.ICommand;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.IResultListener;
 
 import java.security.AccessControlException;
 
@@ -32,14 +34,33 @@ public class AccessControlCheck
 		{
 			public void customResultAvailable(Object result)
 			{
-				for (int i = 0; i < actions.length; ++i)
-					if (!((IAAAService) result).accessAction(client, actions[i]))
+				final IResultListener actionCounter = new CounterResultListener(actions.length, false, new DelegationResultListener(targetFuture)
+				{
+					public void customResultAvailable(Object result)
 					{
-						targetFuture.setException(new AccessControlException("Not allowed: "+client + " " + actions[i]));
-						return;
+						actionCommand.execute(actions);
 					}
-				
-				actionCommand.execute(actions);	
+				});
+				for (int i = 0; i < actions.length; ++i)
+				{
+					final Integer action = actions[i];
+					((IAAAService) result).accessAction(client, action).addResultListener(new IResultListener()
+					{
+						
+						public void resultAvailable(Object result)
+						{
+							if (Boolean.TRUE.equals(result))
+								actionCounter.resultAvailable(true);
+							else
+								actionCounter.exceptionOccurred(new AccessControlException("Not allowed: "+client + " " + action));
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							actionCounter.exceptionOccurred(new AccessControlException("Not allowed: "+client + " " + exception));
+						}
+					});
+				}	
 			}
 		});
 	}

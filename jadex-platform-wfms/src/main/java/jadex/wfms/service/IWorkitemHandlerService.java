@@ -18,37 +18,41 @@ public interface IWorkitemHandlerService
 	/**
 	 * Returns the current activities for all users
 	 * 
-	 * @return current activities for all users
+	 * @return Map of current activities for all users.
 	 */
-	public Map getUserActivities();
+	public IFuture getUserActivities();
 	
 	/**
 	 * Terminates the activity of a user.
 	 * 
 	 * @param activity the activity
+	 * @return Null, when done.
 	 */
-	public void terminateActivity(IClientActivity activity);
+	public IFuture terminateActivity(IClientActivity activity);
 	
 	/**
 	 *  Finishes an Activity.
 	 *  @param userName the user name
 	 *  @param workitem the activity being finished
+	 *  @return Null, when done.
 	 */
-	public void finishActivity(String userName, IClientActivity activity);
+	public IFuture finishActivity(String userName, IClientActivity activity);
 	
 	/**
 	 *  Begins an activity for a client.
 	 *  @param userName the user name
 	 *  @param workitem the workitem being requested for the activity
+	 *  @return Null, when done.
 	 */
-	public void beginActivity(String userName, IWorkitem workitem);
+	public IFuture beginActivity(String userName, IWorkitem workitem);
 	
 	/**
 	 *  Cancel an activity.
 	 *  @param userName the user name
 	 *  @param activity the activity being canceled
+	 *  @return Null, when done.
 	 */
-	public void cancelActivity(String userName, IClientActivity activity);
+	public IFuture cancelActivity(String userName, IClientActivity activity);
 	
 	public IFuture getAvailableWorkitems(String userName);
 	
@@ -76,14 +80,16 @@ public interface IWorkitemHandlerService
 	/**
 	 *  Adds a listener for activity changes.
 	 *  @param listener a new activity listener
+	 *  @return Null, when done.
 	 */
-	public void addGlobalActivityListener(IComponentIdentifier client, IActivityListener listener);
+	public IFuture addGlobalActivityListener(IComponentIdentifier client, IActivityListener listener);
 	
 	/**
 	 *  Removes a listener for activity changes.
 	 *  @param listener activity listener
+	 *  @return Null, when done.
 	 */
-	public void removeGlobalActivityListener(IComponentIdentifier client, IActivityListener listener);
+	public IFuture removeGlobalActivityListener(IComponentIdentifier client, IActivityListener listener);
 	
 	/**
 	 *  Adds a listener for activity changes of the client.
@@ -103,6 +109,7 @@ public interface IWorkitemHandlerService
 	 *  Queues a new Workitem.
 	 *  @param workitem the workitem
 	 *  @param listener result listener
+	 *  @return Null, when done.
 	 */
-	public void queueWorkitem(IWorkitem workitem, IResultListener listener);
+	public IFuture queueWorkitem(IWorkitem workitem, IResultListener listener);
 }

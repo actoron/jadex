@@ -8,30 +8,30 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JDialog;
 
-public class LoginDialog extends JDialog
+public class BDILoginDialog extends JDialog
 {
 	protected static final String LOGIN_DIALOG_TITLE = "Login";
 	
-	protected LoginPanel loginpanel;
+	protected BDILoginPanel loginpanel;
 	
-	public LoginDialog(IBDIExternalAccess agent, Frame owner)
+	public BDILoginDialog(IBDIExternalAccess agent, Frame owner)
 	{
 		super(owner, LOGIN_DIALOG_TITLE, true);
-		loginpanel = new LoginPanel(agent);
-		add(new LoginPanel(agent));
+		loginpanel = new BDILoginPanel(agent);
+		add(new BDILoginPanel(agent));
 		
 		loginpanel.setLoginAction(new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				LoginDialog.this.setVisible(false);
+				BDILoginDialog.this.setVisible(false);
 			}
 		});
 		pack();
 		setSize(500, 273);
 	}
 	
-	public LoginPanel getLoginPanel()
+	public BDILoginPanel getLoginPanel()
 	{
 		return loginpanel;
 	}

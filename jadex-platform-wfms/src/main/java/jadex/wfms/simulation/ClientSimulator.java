@@ -21,7 +21,7 @@ import jadex.commons.gui.SGUI;
 import jadex.gpmn.model.MGpmnModel;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
-import jadex.wfms.guicomponents.LoginDialog;
+import jadex.wfms.guicomponents.BDILoginDialog;
 import jadex.wfms.guicomponents.SGuiHelper;
 import jadex.wfms.service.IExternalWfmsService;
 import jadex.wfms.simulation.gui.SimulationWindow;
@@ -364,15 +364,15 @@ public class ClientSimulator
 		simWindow.refreshParameterStates();
 	}
 	
-	private LoginDialog showLoginDialog()
+	private BDILoginDialog showLoginDialog()
 	{
-		LoginDialog loginDialog = new LoginDialog(agent, simWindow);
+		BDILoginDialog loginDialog = new BDILoginDialog(agent, simWindow);
 		loginDialog.setLocation(SGUI.calculateMiddlePosition(loginDialog));
 		loginDialog.setVisible(true);
 		return loginDialog;
 	}
 	
-	private IFuture login(LoginDialog loginDialog)
+	private IFuture login(BDILoginDialog loginDialog)
 	{
 		final Future ret = new Future();
 		final String username = loginDialog.getLoginPanel().getUserName();

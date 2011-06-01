@@ -1,4 +1,4 @@
-package jadex.wfms.bdi.client.standard.parametergui;
+package jadex.wfms.client.standard.parametergui;
 
 import jadex.commons.SReflect;
 import jadex.wfms.parametertypes.Document;

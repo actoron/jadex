@@ -1,4 +1,4 @@
-package jadex.wfms.bdi.client.standard;
+package jadex.wfms.client.standard;
 
 import jadex.wfms.service.IAAAService;
 

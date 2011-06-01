@@ -15,6 +15,9 @@ import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceShutdown;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -33,38 +36,47 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-public class LogService extends BasicService implements ILogService
+public class LogService implements ILogService
 {
-	protected IServiceContainer provider;
+	/** Component access. */
+	@ServiceComponent
+	protected IInternalAccess ia;
 	
+	/** The event log */
 	protected List<IComponentChangeEvent> eventLog;
 	
+	/** Log listeners */
 	protected Map<IComponentIdentifier, Set<ILogListener>> listeners;
 	
-	public LogService(IServiceContainer provider)
+	/** CMS listener */
+	protected ICMSComponentListener cmslistener;
+	
+	public LogService()
 	{
-		super(provider.getId(), ILogService.class, new HashMap());
 		this.eventLog = Collections.synchronizedList(new ArrayList<IComponentChangeEvent>());
 		this.listeners = Collections.synchronizedMap(new HashMap<IComponentIdentifier, Set<ILogListener>>());
-		this.provider = provider;
 	}
 	
+	/**
+	 *  Start the service.
+	 */
+	@ServiceStart
 	public IFuture startService()
 	{
-		super.startService();
 		final Future ret = new Future();
-		SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(ia.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
 			
 			public void resultAvailable(Object result)
 			{
 				final IClockService clockservice = (IClockService) result;
-				SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						final IComponentManagementService cms = (IComponentManagementService) result;
-						cms.addComponentListener(null, new ICMSComponentListener()
+						final IExternalAccess exta = ia.getExternalAccess();
+						cmslistener = new ICMSComponentListener()
 						{
 							public IFuture componentRemoved(IComponentDescription desc, Map results)
 							{
@@ -78,88 +90,79 @@ public class LogService extends BasicService implements ILogService
 							
 							public IFuture componentAdded(final IComponentDescription desc)
 							{
-								if(!sid.getProviderId().equals(desc.getName().getParent()))
-									return IFuture.DONE;
-								IComponentChangeEvent ce = new ComponentChangeEvent()
+								return exta.scheduleStep(new IComponentStep()
 								{
+									public Object execute(IInternalAccess ia)
 									{
-										setTime(clockservice.getTime());
-										setEventType(IComponentChangeEvent.EVENT_TYPE_CREATION);
-										setSourceCategory(desc.getType());
-										setSourceType(desc.getModelName());
-										setSourceName(desc.getName().getName());
-										setComponent(desc.getName());
-									}
-								};
-								logEvent(ce);
-								
-								cms.getExternalAccess(desc.getName()).addResultListener(new DefaultResultListener()
-								{
-									public void resultAvailable(Object result)
-									{
-										((IExternalAccess) result).scheduleStep(new IComponentStep()
+										//TODO: Hack!
+										if (!desc.getName().getParent().getName().toLowerCase().contains("execution"))
+											return null;
+										IComponentChangeEvent ce = new ComponentChangeEvent()
 										{
-											public Object execute(IInternalAccess ia)
 											{
-												ia.addComponentListener(new ComponentAdapter()
+												setTime(clockservice.getTime());
+												setEventType(IComponentChangeEvent.EVENT_TYPE_CREATION);
+												setSourceCategory(desc.getType());
+												setSourceType(desc.getModelName());
+												setSourceName(desc.getName().getName());
+												setComponent(desc.getName());
+											}
+										};
+										logEvent(ce);
+										
+										cms.getExternalAccess(desc.getName()).addResultListener(new DefaultResultListener()
+										{
+											public void resultAvailable(Object result)
+											{
+												((IExternalAccess) result).scheduleStep(new IComponentStep()
 												{
-													public IFuture eventOccured(
-															IComponentChangeEvent cce)
+													public Object execute(IInternalAccess ia)
 													{
-														logEvent(cce);
-														return IFuture.DONE;
+														ia.addComponentListener(new ComponentAdapter()
+														{
+															public IFuture eventOccured(
+																	IComponentChangeEvent cce)
+															{
+																logEvent(cce);
+																return IFuture.DONE;
+															}
+														});
+														return null;
 													}
 												});
-												return null;
 											}
 										});
+										return null;
 									}
 								});
-								
-								return IFuture.DONE;
 							}
-						});
-						
+						};
+						cms.addComponentListener(null, cmslistener);
 						ret.setResult(null);
 					}
 				});
 			}
 		});
-		
-		/*SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				// TODO Auto-generated method stub
-				SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						((IExecutionService) result).addProcessListener(null, new IProcessListener()
-						{
-							public IFuture processFinished(ProcessEvent event)
-							{
-								Future ret = new Future();
-								logEvent(new LogEvent(LogEvent.EVENT_TYPE_DISPOSAL,
-													  LogEvent.EVENT_SOURCE_PROCESS_INSTANCE,
-													  event.getInstanceId()));
-								return ret;
-							}
-						});
-					}
-				});
-				
-				sFuture.addResultListener(new DelegationResultListener(ret));
-			}
-		});*/
 		return ret;
 	}
 	
-	@Override
+	/**
+	 *  Stops the service.
+	 */
+	@ServiceShutdown
 	public IFuture shutdownService()
 	{
-		// TODO Auto-generated method stub
-		return super.shutdownService();
+		final Future ret = new Future();
+		SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				final IComponentManagementService cms = (IComponentManagementService) result;
+				cms.removeComponentListener(null, cmslistener);
+				ret.setResult(null);
+			}
+		});
+		return ret;
 	}
 	
 	/**
@@ -238,7 +241,7 @@ public class LogService extends BasicService implements ILogService
 	
 	protected static final void dispatchLogServiceEvent(IServiceProvider provider, final IComponentChangeEvent cce)
 	{
-		SServiceProvider.getService(provider, ILogService.class, RequiredServiceInfo.SCOPE_APPLICATION).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, ILogService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
