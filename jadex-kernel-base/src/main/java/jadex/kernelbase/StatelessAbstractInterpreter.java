@@ -283,7 +283,12 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  @return The component listeners.
 	 */
 	public abstract Collection getInternalComponentListeners();
-	
+
+	/**
+	 *  Add component listener.
+	 */
+	public abstract IFuture addComponentListener(IComponentListener listener);
+
 	/**
 	 *  Remove component listener.
 	 */

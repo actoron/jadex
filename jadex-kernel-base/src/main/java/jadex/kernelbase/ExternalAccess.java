@@ -2,6 +2,7 @@ package jadex.kernelbase;
 
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -413,6 +414,104 @@ public class ExternalAccess implements IExternalAccess
 		return ret;
 	}
 
+	/**
+	 *  Add an component listener.
+	 *  @param listener The listener.
+	 */
+	public IFuture addComponentListener(final IComponentListener listener)
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			try
+			{
+				adapter.invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						ret.setResult(interpreter.addComponentListener(listener));
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setResult(interpreter.addComponentListener(listener));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Remove a component listener.
+	 *  @param listener The listener.
+	 */
+	public IFuture removeComponentListener(final IComponentListener listener)
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			try
+			{
+				adapter.invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						ret.setResult(interpreter.removeComponentListener(listener));
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setResult(interpreter.removeComponentListener(listener));
+		}
+		
+		return ret;
+	}
+
+	/**
+	 *  Get the component results.
+	 *  @return The results.
+	 */
+	public IFuture getResults()
+	{
+	final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			try
+			{
+				adapter.invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						ret.setResult(interpreter.getResults());
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setResult(interpreter.getResults());
+		}
+		
+		return ret;
+	}
 	
 	/**
 	 *  Get the interpreter.

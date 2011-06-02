@@ -104,6 +104,24 @@ public interface IExternalAccess extends IRemotable
 	 */
 	public String getLocalType();
 	
+	/**
+	 *  Add an component listener.
+	 *  @param listener The listener.
+	 */
+	public IFuture addComponentListener(IComponentListener listener);
+	
+	/**
+	 *  Remove a component listener.
+	 *  @param listener The listener.
+	 */
+	public IFuture removeComponentListener(IComponentListener listener);
+
+	/**
+	 *  Get the component results.
+	 *  @return The results.
+	 */
+	public IFuture getResults();
+	
 	//-------- exclude --------
 	
 	/**

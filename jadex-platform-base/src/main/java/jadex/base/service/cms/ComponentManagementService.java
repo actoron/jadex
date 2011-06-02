@@ -898,7 +898,8 @@ public abstract class ComponentManagementService extends BasicService implements
 					if(infos!=null)
 					{
 						IComponentAdapter adap = (IComponentAdapter)infos[1];
-						((Future)infos[4]).setException(adap.getException());
+						// Could already contain exception in case init went wrong
+						((Future)infos[4]).setExceptionIfUndone(adap.getException());
 					}
 					
 					// Kill subcomponents

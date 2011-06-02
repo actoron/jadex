@@ -1713,6 +1713,15 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	}
 	
 	/**
+	 *  Add component listener.
+	 */
+	public IFuture	addComponentListener(IComponentListener listener)
+	{
+		getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
+		return IFuture.DONE;
+	}
+	
+	/**
 	 *  Add an extension instance.
 	 *  @param extension The extension instance.
 	 */

@@ -1,5 +1,16 @@
 package jadex.micro.testcases;
 
+import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
+import jadex.bridge.IComponentChangeEvent;
+import jadex.bridge.IComponentListener;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.TerminationAdapter;
+import jadex.commons.IFilter;
+import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
@@ -9,6 +20,10 @@ import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  *  Starts two agents a and b
@@ -32,4 +47,83 @@ import jadex.micro.annotation.Results;
 }))
 public class DependendServicesAgent extends MicroAgent
 {
+	/**
+	 *  Init code.
+	 */
+	public IFuture agentCreated()
+	{
+		getChildren().addResultListener(createResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				IExternalAccess[] childs = (IExternalAccess[])((Collection)result).toArray(new IExternalAccess[0]);
+				final CollectionResultListener lis = new CollectionResultListener(childs.length, true, new DefaultResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+						Collection col = (Collection)result;
+						TestReport	tr	= new TestReport("#1", "Test child component service initialization.");
+						if(col.size()==0)
+						{
+							tr.setSucceeded(true);
+						}
+						else
+						{
+							tr.setFailed(""+col.iterator().next());
+						}
+						setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+						killAgent();
+					}
+				});
+
+				for(int i=0; i<childs.length; i++)
+				{
+					final IExternalAccess child = childs[i];
+					child.addComponentListener(new TerminationAdapter()
+					{
+						public void componentTerminated()
+						{
+							System.out.println("del: "+child.getComponentIdentifier()+" "+child.getResults());
+							child.getResults().addResultListener(createResultListener(new DefaultResultListener()
+							{
+								public void resultAvailable(Object result)
+								{
+									Map res = (Map)result;
+									Exception e = (Exception)res.get("exception");
+									if(e==null)
+									{
+										// use exception occurred to not save null in coll
+										lis.exceptionOccurred(e);
+									}
+									else
+									{
+										lis.resultAvailable(e);	
+									}
+								}
+							}));
+						}
+					});
+				}
+			}
+		}));
+		return super.agentCreated();
+	}
+	
+	/**
+	 *  The agent body.
+	 */
+	public void executeBody()
+	{
+		getChildren().addResultListener(createResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				IExternalAccess[] childs = (IExternalAccess[])((Collection)result).toArray(new IExternalAccess[0]);
+				for(int i=0; i<childs.length; i++)
+				{
+					childs[i].killComponent();
+				}
+			}
+		}));
+	}
 }

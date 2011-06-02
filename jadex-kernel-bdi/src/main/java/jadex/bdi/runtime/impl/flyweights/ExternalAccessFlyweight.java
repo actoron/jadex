@@ -5,6 +5,7 @@ import jadex.bdi.model.impl.flyweights.MCapabilityFlyweight;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceProvider;
@@ -400,4 +401,102 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		return null;
 	}
 	
+	/**
+	 *  Add an component listener.
+	 *  @param listener The listener.
+	 */
+	public IFuture addComponentListener(final IComponentListener listener)
+	{
+		final Future ret = new Future();
+		
+		if(getInterpreter().getAgentAdapter().isExternalThread())
+		{
+			try
+			{
+				getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						ret.setResult(getInterpreter().addComponentListener(listener));
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setResult(getInterpreter().addComponentListener(listener));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Remove a component listener.
+	 *  @param listener The listener.
+	 */
+	public IFuture removeComponentListener(final IComponentListener listener)
+	{
+		final Future ret = new Future();
+		
+		if(getInterpreter().getAgentAdapter().isExternalThread())
+		{
+			try
+			{
+				getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						ret.setResult(getInterpreter().removeComponentListener(listener));
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setResult(getInterpreter().removeComponentListener(listener));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the component results.
+	 *  @return The results.
+	 */
+	public IFuture getResults()
+	{
+		final Future ret = new Future();
+		
+		if(getInterpreter().getAgentAdapter().isExternalThread())
+		{
+			try
+			{
+				getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						ret.setResult(getInterpreter().getResults());
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setResult(getInterpreter().getResults());
+		}
+		
+		return ret;
+	}
 }

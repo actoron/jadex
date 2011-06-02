@@ -20,4 +20,12 @@ public class AAgent extends MicroAgent implements IAService
 		System.out.println("called service");
 		return IFuture.DONE;
 	}
+	
+	/**
+	 *  The agent body.
+	 */
+	public void executeBody()
+	{
+		killAgent();
+	}
 }

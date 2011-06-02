@@ -26,7 +26,7 @@ public abstract class TerminationAdapter implements IComponentListener
 		{
 			public boolean filter(Object obj)
 			{
-				IComponentChangeEvent cce = (IComponentChangeEvent) obj;
+				IComponentChangeEvent cce = (IComponentChangeEvent)obj;
 				return IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT.equals(cce.getSourceCategory()) &&
 					   IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType());
 			}
