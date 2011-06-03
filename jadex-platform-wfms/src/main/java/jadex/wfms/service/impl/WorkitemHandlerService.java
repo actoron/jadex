@@ -80,18 +80,10 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	public IFuture startService()
 	{
 		final Future ret = new Future();
-		ret.addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				System.out.println("DONE");
-			}
-		});
 		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
-				System.out.println("GOT AAA");
 				IAAAService as = (IAAAService) result;
 				final IExternalAccess exta = ia.getExternalAccess();
 				authlistener = new IAuthenticationListener()

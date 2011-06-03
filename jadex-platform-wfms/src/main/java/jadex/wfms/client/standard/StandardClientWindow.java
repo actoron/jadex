@@ -64,9 +64,6 @@ public class StandardClientWindow extends JFrame
 		});
 		
 		app = new StandardClientApplication(access);
-		System.out.println(app);
-		System.out.println(getContentPane());
-		System.out.println(app.getView());
 		getContentPane().add(app.getView());
 		
 		pack();

@@ -71,13 +71,6 @@ public class BasicAAAService implements IAAAService
 		clientInfos = new HashMap<IComponentIdentifier, ClientInfo>();
 	}
 	
-	@ServiceStart
-	public IFuture startService()
-	{
-		System.out.println("Starting AAA Service (UserManagement Component)");
-		return IFuture.DONE;
-	}
-	
 	/**
 	 * Authenticate a new client.
 	 * @param client the new client
@@ -256,7 +249,6 @@ public class BasicAAAService implements IAAAService
 	 */
 	public IFuture addAuthenticationListener(IAuthenticationListener listener)
 	{
-		System.out.println("addAuthenticationListener");
 		authenticationListeners.add(listener);
 		return IFuture.DONE;
 	}

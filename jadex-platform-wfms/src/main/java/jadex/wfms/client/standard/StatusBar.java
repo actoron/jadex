@@ -61,20 +61,22 @@ public class StatusBar extends JPanel
 		statusTextLabel.setText(text);
 	}
 	
-	public void addIcon(String name, String path)
+	public void addIcon(String name, String path, String tooltip)
 	{
 		ImageIcon icon = new ImageIcon(getClass().getClassLoader().getResource(path));
 		JLabel label = new JLabel(icon);
+		label.setToolTipText(tooltip);
 		icons.put(name, label);
 		iconPaths.put(name, path);
 		
 		iconPanel.add(label);
 	}
 	
-	public void replaceIcon(String name, String path)
+	public void replaceIcon(String name, String path, String tooltip)
 	{
 		JLabel label = (JLabel) icons.get(name);
 		label.setIcon(new ImageIcon(getClass().getClassLoader().getResource(path)));
+		label.setToolTipText(tooltip);
 		iconPaths.put(name, path);
 	}
 	

@@ -12,6 +12,7 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
 import jadex.bridge.service.library.LibraryService;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -57,24 +58,35 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 	//private Set imports;
 	
 	/** The process repository listeners */
-	protected Map<IComponentIdentifier, Set<IProcessRepositoryListener>> pListeners;
+	protected MultiCollection processlisteners;
+	//protected Map<IComponentIdentifier, Set<IProcessRepositoryListener>> pListeners;
 	
 	/** URL entries */
-	protected Map urlEntries;
+	protected Map urlentries;
 	
 	/** Model reference counter */
-	protected Map modelRefCount;
+	protected Map modelrefcount;
 	
 	/** Resource directory */
-	protected File resourceDir;
+	protected File resourcedir;
 	
 	/** Library service listener */
 	protected ILibraryServiceListener liblistener;
 	
+	/** Authentication listener */
+	protected IAuthenticationListener authlistener;
+	
+	/** AAA Service */
+	protected IAAAService aaaservice;
+	
+	/**
+	 *  Creates a new linked model repository.
+	 */
 	public LinkedModelRepositoryService()
 	{
-		this.urlEntries = new HashMap();
-		this.modelRefCount = new HashMap();
+		this.urlentries = new HashMap();
+		this.modelrefcount = new HashMap();
+		this.processlisteners = new MultiCollection();
 	}
 	
 	/**
@@ -83,100 +95,134 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 	@ServiceStart
 	public IFuture startService()
 	{
-		System.out.println("Starting Repository Service (Execution Component)");
 		final Future ret = new Future();
-			
-		SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
+		
+		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
-			public void customResultAvailable(Object result)
+			public void resultAvailable(Object result)
 			{
-				final IExternalAccess exta = ia.getExternalAccess();
-				liblistener = new ILibraryServiceListener()
+				aaaservice = (IAAAService) result;
+				authlistener = new IAuthenticationListener()
 				{
-					public IFuture urlRemoved(final URL url)
+					final IExternalAccess exta = ia.getExternalAccess();
+					public IFuture deauthenticated(final IComponentIdentifier client, ClientInfo info)
 					{
 						return exta.scheduleStep(new IComponentStep()
 						{
+							
 							public Object execute(IInternalAccess ia)
 							{
-								Set modelSet = (Set) urlEntries.remove(url);
-								if (modelSet != null)
-								{
-									for (Iterator it = modelSet.iterator(); it.hasNext(); )
-									{
-										String path = (String) it.next();
-										removeModel(path);
-									}
-								}
+								processlisteners.remove(client);
 								return null;
 							}
 						});
 					}
 					
-					public IFuture urlAdded(final URL url)
+					public IFuture authenticated(IComponentIdentifier client, ClientInfo info)
 					{
-						return exta.scheduleStep(new IComponentStep()
-						{
-							public Object execute(IInternalAccess ia)
-							{
-								File dir = new File(url.getFile());
-								Set modelSet = new HashSet();
-								if (dir.isDirectory())
-									modelSet = searchDirectory(dir, false);
-								else if (dir.getName().endsWith(".jar"))
-									modelSet = searchJar(dir);
-								for (Iterator it = modelSet.iterator(); it.hasNext(); )
-									addModel((String) it.next());
-								urlEntries.put(url, modelSet);
-								
-								return null;
-							}
-						});
+						return IFuture.DONE;
 					}
 				};
 				
-				((ILibraryService)result).addLibraryServiceListener(liblistener);
-				
-				getLoadableModels().addResultListener(new DelegationResultListener(ret)
+				aaaservice.addAuthenticationListener(authlistener).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						Set loadableModels = (Set) result;
-						for (Iterator it = loadableModels.iterator(); it.hasNext(); )
+						SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
 						{
-							String path = (String) it.next();
-							addModel(path);
-						}
-						
-						resourceDir = new File(System.getProperty("user.home") + File.separator + ".jadexwfms");
-						if (!resourceDir.exists())
-							resourceDir.mkdir();
-						if (!resourceDir.isDirectory())
-						{
-							ret.setException(new RuntimeException("Resource directory blocked " + resourceDir));
-							return;
-						}
-						
-						File[] files = resourceDir.listFiles();
-						for (int i = 0; i < files.length; ++i)
-							if (files[i].isFile() && files[i].getName().endsWith(".jar"))
+							public void customResultAvailable(Object result)
 							{
-								final File file = files[i];
-								SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DefaultResultListener()
+								final IExternalAccess exta = ia.getExternalAccess();
+								liblistener = new ILibraryServiceListener()
 								{
-									
-									public void resultAvailable(Object result)
+									public IFuture urlRemoved(final URL url)
 									{
-										((ILibraryService) result).addURL(LibraryService.toURL(file));
+										return exta.scheduleStep(new IComponentStep()
+										{
+											public Object execute(IInternalAccess ia)
+											{
+												Set modelSet = (Set) urlentries.remove(url);
+												if (modelSet != null)
+												{
+													for (Iterator it = modelSet.iterator(); it.hasNext(); )
+													{
+														String path = (String) it.next();
+														removeModel(path);
+													}
+												}
+												return null;
+											}
+										});
 									}
-								}));
+									
+									public IFuture urlAdded(final URL url)
+									{
+										return exta.scheduleStep(new IComponentStep()
+										{
+											public Object execute(IInternalAccess ia)
+											{
+												File dir = new File(url.getFile());
+												Set modelSet = new HashSet();
+												if (dir.isDirectory())
+													modelSet = searchDirectory(dir, false);
+												else if (dir.getName().endsWith(".jar"))
+													modelSet = searchJar(dir);
+												for (Iterator it = modelSet.iterator(); it.hasNext(); )
+													addModel((String) it.next());
+												urlentries.put(url, modelSet);
+												
+												return null;
+											}
+										});
+									}
+								};
+								
+								((ILibraryService)result).addLibraryServiceListener(liblistener);
+								
+								getLoadableModels().addResultListener(new DelegationResultListener(ret)
+								{
+									public void customResultAvailable(Object result)
+									{
+										Set loadableModels = (Set) result;
+										for (Iterator it = loadableModels.iterator(); it.hasNext(); )
+										{
+											String path = (String) it.next();
+											addModel(path);
+										}
+										
+										resourcedir = new File(System.getProperty("user.home") + File.separator + ".jadexwfms");
+										if (!resourcedir.exists())
+											resourcedir.mkdir();
+										if (!resourcedir.isDirectory())
+										{
+											ret.setException(new RuntimeException("Resource directory blocked " + resourcedir));
+											return;
+										}
+										
+										File[] files = resourcedir.listFiles();
+										for (int i = 0; i < files.length; ++i)
+											if (files[i].isFile() && files[i].getName().endsWith(".jar"))
+											{
+												final File file = files[i];
+												SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DefaultResultListener()
+												{
+													
+													public void resultAvailable(Object result)
+													{
+														((ILibraryService) result).addURL(LibraryService.toURL(file));
+													}
+												}));
+											}
+										
+										ret.setResult(null);
+									};
+								});
 							}
-						
-						ret.setResult(null);
-					};
-				});
+						});
+					}
+				}));
 			}
-		});
+		}));
 		
 		return ret;
 	}
@@ -194,9 +240,13 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 			{
 				ILibraryService libservice = (ILibraryService) result;
 				libservice.removeLibraryServiceListener(liblistener);
-				ret.setResult(null);
+				
+				
 			}
 		}));
+		
+		aaaservice.removeAuthenticationListener(authlistener);
+		
 		return ret;
 	}
 	
@@ -206,7 +256,7 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 	 */
 	public IFuture addProcessResource(final ProcessResource resource)
 	{
-		final File file = new File(resourceDir + File.separator + resource.getFileName());
+		final File file = new File(resourcedir + File.separator + resource.getFileName());
 		if (file.exists())
 			return IFuture.DONE;
 		
@@ -255,7 +305,7 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 			public void customResultAvailable(Object result)
 			{
 				ILibraryService ls = (ILibraryService) result;
-				File file = new File(resourceDir + File.separator + resourceName);
+				File file = new File(resourcedir + File.separator + resourceName);
 				if (file.exists())
 				{
 					try
@@ -311,7 +361,13 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 		return ret;
 	}
 	
-	private Set searchDirectory(File dir, boolean prependDir)
+	/**
+	 *  Recursively search a directory for workflow models.
+	 * 	@param dir The directory.
+	 * 	@param prependDir Flag whether to prepend the directory as path to the model path (used for recursion).
+	 * 	@return Set of model paths in the directory.
+	 */
+	protected Set searchDirectory(File dir, boolean prependDir)
 	{
 		HashSet ret = new HashSet();
 		File[] content = dir.listFiles();
@@ -340,6 +396,11 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 		return ret;
 	}
 	
+	/**
+	 *  Searches a .jar-archive for workflow models.
+	 * 	@param jar The .jar-file.
+	 * 	@return Set of model paths in the archive.
+	 */
 	private Set searchJar(File jar)
 	{
 		HashSet ret = new HashSet();
@@ -386,7 +447,7 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 	 */
 	public IFuture getModelNames()
 	{
-		return new Future(new HashSet(modelRefCount.keySet()));
+		return new Future(new HashSet(modelrefcount.keySet()));
 	}
 	
 	/**
@@ -404,16 +465,9 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 	 */
 	public IFuture addProcessRepositoryListener(IComponentIdentifier client, IProcessRepositoryListener listener)
 	{
-		Map<IComponentIdentifier, Set<IProcessRepositoryListener>> listeners = getListeners();
-		Set<IProcessRepositoryListener> lisset = listeners.get(client);
-		if (lisset == null)
-		{
-			lisset = new HashSet<IProcessRepositoryListener>();
-			listeners.put(client, lisset);
-		}
-		lisset.add(listener);
+		processlisteners.put(client, listener);
 		
-		for (Iterator it = modelRefCount.keySet().iterator(); it.hasNext(); )
+		for (Iterator it = modelrefcount.keySet().iterator(); it.hasNext(); )
 			listener.processModelAdded(new ProcessRepositoryEvent((String) it.next()));
 		return IFuture.DONE;
 	}
@@ -425,110 +479,71 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 	 */
 	public IFuture removeProcessRepositoryListener(IComponentIdentifier client, IProcessRepositoryListener listener)
 	{
-		Set<IProcessRepositoryListener> lisset = getListeners().get(client);
-		if (lisset != null)
-			lisset.remove(listener);
+		processlisteners.remove(client, listener);
 		return IFuture.DONE;
 	}
 	
-	protected Map<IComponentIdentifier, Set<IProcessRepositoryListener>> getListeners()
+	/**
+	 *  Fire an model addition event.
+	 *  @param modelName The new model.
+	 */
+	protected void fireModelAddedEvent(String modelName)
 	{
-		if (pListeners == null)
+		Object[] ls = processlisteners.getObjects();
+		for (int i = 0; i < ls.length; ++i)
 		{
-			pListeners = new HashMap<IComponentIdentifier, Set<IProcessRepositoryListener>>();
-			SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
+			final IProcessRepositoryListener listener = (IProcessRepositoryListener) ls[i];
+			listener.processModelAdded(new ProcessRepositoryEvent(modelName)).addResultListener(ia.createResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
-					IAAAService as = (IAAAService) result;
-					as.addAuthenticationListener(new IAuthenticationListener()
-					{
-						final IExternalAccess exta = ia.getExternalAccess();
-						public IFuture deauthenticated(final IComponentIdentifier client, ClientInfo info)
-						{
-							return exta.scheduleStep(new IComponentStep()
-							{
-								
-								public Object execute(IInternalAccess ia)
-								{
-									pListeners.remove(client);
-									return null;
-								}
-							});
-						}
-						
-						public IFuture authenticated(IComponentIdentifier client, ClientInfo info)
-						{
-							return IFuture.DONE;
-						}
-					});
 				}
 				
-				@Override
 				public void exceptionOccurred(Exception exception)
 				{
-					super.exceptionOccurred(exception);
+					Object[] keys = processlisteners.getKeys();
+					for (int i = 0; i < keys.length; ++i)
+						processlisteners.remove(keys[i], listener);
 				}
 			}));
-			
 		}
-		return pListeners;
 	}
 	
-	private void fireModelAddedEvent(String modelName)
+	/**
+	 *  Fire an model removal event.
+	 *  @param modelName The removed model.
+	 */
+	protected void fireModelRemovedEvent(String modelName)
 	{
-		Map<IComponentIdentifier, Set<IProcessRepositoryListener>> listeners = getListeners();
-		for (Iterator<Set<IProcessRepositoryListener>> it = listeners.values().iterator(); it.hasNext(); )
+		Object[] ls = processlisteners.getObjects();
+		for (int i = 0; i < ls.length; ++i)
 		{
-			final Set<IProcessRepositoryListener> listset = it.next();
-			IProcessRepositoryListener[] ls = (IProcessRepositoryListener[]) listset.toArray(new IProcessRepositoryListener[0]);
-			for (int i = 0; i < ls.length; ++i)
+			final IProcessRepositoryListener listener = (IProcessRepositoryListener) ls[i];
+			listener.processModelRemoved(new ProcessRepositoryEvent(modelName)).addResultListener(ia.createResultListener(new IResultListener()
 			{
-				final IProcessRepositoryListener listener = ls[i];
-				listener.processModelAdded(new ProcessRepositoryEvent(modelName)).addResultListener(ia.createResultListener(new IResultListener()
+				public void resultAvailable(Object result)
 				{
-					public void resultAvailable(Object result)
-					{
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						listset.remove(listener);
-					}
-				}));
-			}
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					Object[] keys = processlisteners.getKeys();
+					for (int i = 0; i < keys.length; ++i)
+						processlisteners.remove(keys[i], listener);
+				}
+			}));
 		}
 	}
 	
-	private void fireModelRemovedEvent(String modelName)
-	{
-		Map<IComponentIdentifier, Set<IProcessRepositoryListener>> listeners = getListeners();
-		for (Iterator<Set<IProcessRepositoryListener>> it = listeners.values().iterator(); it.hasNext(); )
-		{
-			final Set<IProcessRepositoryListener> listset = it.next();
-			IProcessRepositoryListener[] ls = (IProcessRepositoryListener[]) listset.toArray(new IProcessRepositoryListener[0]);
-			for (int i = 0; i < ls.length; ++i)
-			{
-				final IProcessRepositoryListener listener = ls[i];
-				listener.processModelRemoved(new ProcessRepositoryEvent(modelName)).addResultListener(ia.createResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						listset.remove(listener);
-					}
-				}));
-			}
-		}
-	}
-	
-	private IFuture loadProcessModel(final String filename)
+	/**
+	 *  Loads a workflow model.
+	 *  @param filename File name of the model.
+	 *  @return The workflow model.
+	 */
+	protected IFuture loadProcessModel(final String filename)
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(ia.getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_APPLICATION).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getService(ia.getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -540,17 +555,19 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 		return ret;
 	}
 	
-	
-	
-	private void addModel(String path)
+	/**
+	 *  Adds a model to the repository.
+	 *  @param path Path of the model.
+	 */
+	protected void addModel(String path)
 	{
 		try
 		{
-			Integer refcount = (Integer) modelRefCount.get(path);
+			Integer refcount = (Integer) modelrefcount.get(path);
 			if (refcount == null)
 				refcount = new Integer(0);
 			refcount = new Integer(refcount.intValue() + 1);
-			modelRefCount.put(path, refcount);
+			modelrefcount.put(path, refcount);
 			fireModelAddedEvent(path);
 		}
 		catch (Exception e)
@@ -559,15 +576,19 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 		}
 	}
 	
-	private void removeModel(String path)
+	/**
+	 *  Removes a model from the repository.
+	 *  @param path Path of the model.
+	 */
+	protected void removeModel(String path)
 	{
-		Integer refcount = (Integer) modelRefCount.get(path);
+		Integer refcount = (Integer) modelrefcount.get(path);
 		if ((refcount != null))
 		{
 			refcount = new Integer(refcount.intValue() - 1);
 			if (refcount.intValue() <= 0)
 			{
-				modelRefCount.remove(path);
+				modelrefcount.remove(path);
 				fireModelRemovedEvent(path);
 			}
 		}

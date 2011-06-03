@@ -57,39 +57,41 @@ import javax.swing.filechooser.FileFilter;
 
 public class StandardClientApplication
 {
-	private static final String WORKITEM_LIST_TAB_NAME = "Workitem List";
+	protected static final String WORKITEM_LIST_TAB_NAME = "Workitem List";
 	
-	private static final String PROCESS_MODEL_TAB_NAME = "Process Models";
+	protected static final String PROCESS_MODEL_TAB_NAME = "Process Models";
 	
-	private static final String ADMIN_ACTIVITIES_TAB_NAME = "Activities";
+	protected static final String ADMIN_ACTIVITIES_TAB_NAME = "Activities";
 	
-	private static final JPanel EMPTY_PANEL = new JPanel();
+	protected static final String DISCONNECT_TOOLTIP = "Disconnect";
 	
-	private static final String CONNECT_ICON_NAME = "Connection";
-	private static final String CONNECT_OFF_ICON_PATH = SImage.IMAGE_PATH.concat("connection_off_small.png");
-	private static final String CONNECT_ON_ICON_PATH = SImage.IMAGE_PATH.concat("connection_on_small.png");
+	protected static final JPanel EMPTY_PANEL = new JPanel();
 	
-	private IExternalAccess ea;
+	protected static final String CONNECT_ICON_NAME = "Connection";
+	protected static final String CONNECT_OFF_ICON_PATH = SImage.IMAGE_PATH.concat("connection_off_small.png");
+	protected static final String CONNECT_ON_ICON_PATH = SImage.IMAGE_PATH.concat("connection_on_small.png");
 	
-	//private JFrame mainFrame;
+	protected IExternalAccess ea;
+	
+	//protected JFrame mainFrame;
 	
 	protected JPanel mainPanel;
 	
-	private StatusBar statusBar;
+	protected StatusBar statusBar;
 	
-	private JSplitPane mainSplitPane;
+	protected JSplitPane mainSplitPane;
 	
-	private JTabbedPane toolPane;
+	protected JTabbedPane toolPane;
 	
-	private WorkitemListComponent wlComponent;
+	protected WorkitemListComponent wlComponent;
 	
-	private ProcessModelTreeComponent pmComponent;
+	protected ProcessModelTreeComponent pmComponent;
 	
-	private AdminActivitiesComponent aaComponent;
+	protected AdminActivitiesComponent aaComponent;
 	
-	private IExternalWfmsService wfms;
+	protected IExternalWfmsService wfms;
 	
-	private Set capabilities;
+	protected Set capabilities;
 	
 	public StandardClientApplication(IExternalAccess access)
 	{
@@ -113,7 +115,7 @@ public class StandardClientApplication
 				mainPanel.add(mainSplitPane, g);
 				
 				statusBar = new StatusBar();
-				statusBar.addIcon(CONNECT_ICON_NAME, CONNECT_OFF_ICON_PATH);
+				statusBar.addIcon(CONNECT_ICON_NAME, CONNECT_OFF_ICON_PATH, null);
 				statusBar.setText("Ready.");
 				statusBar.setPreferredSize(new Dimension(100, 24));
 				
@@ -248,7 +250,7 @@ public class StandardClientApplication
 							}
 							
 							
-							statusBar.replaceIcon(CONNECT_ICON_NAME, CONNECT_ON_ICON_PATH);
+							statusBar.replaceIcon(CONNECT_ICON_NAME, CONNECT_ON_ICON_PATH, DISCONNECT_TOOLTIP);
 							statusBar.setText("Connected.");
 						}
 						
@@ -277,7 +279,7 @@ public class StandardClientApplication
 			{
 				public void customResultAvailable(Object result)
 				{
-					statusBar.replaceIcon(CONNECT_ICON_NAME, CONNECT_OFF_ICON_PATH);
+					statusBar.replaceIcon(CONNECT_ICON_NAME, CONNECT_OFF_ICON_PATH, null);
 					StandardClientApplication.this.wfms = null;
 					cleanUp();
 				}
@@ -576,7 +578,7 @@ public class StandardClientApplication
 		{
 			public IFuture logMessage(IComponentChangeEvent event)
 			{
-				System.out.println("Client-side input: " + event);
+				System.out.println("Client-side received event: " + event);
 				return IFuture.DONE;
 			}
 		}, true);
