@@ -9,9 +9,12 @@ import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -302,57 +305,80 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 //					System.err.println("searchChildren queued4: "+ComponentTreeNode.this);
 				final IExternalAccess	ea	= (IExternalAccess)result;
 				
-				SServiceProvider.getDeclaredServices(ea.getServiceProvider())
-					.addResultListener(new SwingDefaultResultListener()
+				ea.scheduleStep(new IComponentStep()
+				{
+					public Object execute(IInternalAccess ia)
+					{
+						return ia.getServiceContainer().getRequiredServiceInfos();
+					}
+				}).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object result)
 					{
-//						if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
-//							System.err.println("searchChildren done6?: "+ComponentTreeNode.this);
-						List	services	= (List)result;
-						if(services!=null && !services.isEmpty())
+						final RequiredServiceInfo[] reqs = (RequiredServiceInfo[])result;
+						
+						SServiceProvider.getDeclaredServices(ea.getServiceProvider())
+							.addResultListener(new SwingDefaultResultListener()
 						{
-							ServiceContainerNode	scn	= (ServiceContainerNode)getModel().getNode(getId()+ServiceContainerNode.NAME);
-							if(scn==null)
-								scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel(), getTree(), (IServiceContainer)ea.getServiceProvider());
-//							System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+scn);
-							children.add(0, scn);
-							
-							final List	subchildren	= new ArrayList();
-							for(int i=0; i<services.size(); i++)
+							public void customResultAvailable(Object result)
 							{
-								IService service	= (IService)services.get(i);
-								ServiceNode	sn	= (ServiceNode)getModel().getNode(service.getServiceIdentifier());
-								if(sn==null)
-									sn	= new ServiceNode(scn, getModel(), getTree(), service);
-								subchildren.add(sn);
+	//							if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
+	//								System.err.println("searchChildren done6?: "+ComponentTreeNode.this);
+								List	services	= (List)result;
+								if(services!=null && !services.isEmpty())
+								{
+									ServiceContainerNode	scn	= (ServiceContainerNode)getModel().getNode(getId()+ServiceContainerNode.NAME);
+									if(scn==null)
+										scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel(), getTree(), (IServiceContainer)ea.getServiceProvider());
+	//								System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+scn);
+									children.add(0, scn);
+									
+									final List	subchildren	= new ArrayList();
+									for(int i=0; i<services.size(); i++)
+									{
+										IService service	= (IService)services.get(i);
+										ServiceNode	sn	= (ServiceNode)getModel().getNode(service.getServiceIdentifier());
+										if(sn==null)
+											sn	= new ServiceNode(scn, getModel(), getTree(), service);
+										subchildren.add(sn);
+									}
+									
+									for(int i=0; i<reqs.length; i++)
+									{
+										String nid = ea.getServiceProvider().getId()+"."+reqs[i].getName();
+										RequiredServiceNode	sn = (RequiredServiceNode)getModel().getNode(nid);
+										if(sn==null)
+											sn	= new RequiredServiceNode(scn, getModel(), getTree(), reqs[i], nid);
+										subchildren.add(sn);
+									}
+									
+									final ServiceContainerNode	node	= scn;
+									ret.addResultListener(new SwingDefaultResultListener()
+									{
+										public void customResultAvailable(Object result)
+										{
+											node.setChildren(subchildren);
+										}
+										public void customExceptionOccurred(Exception exception)
+										{
+											// Children not found -> don't add services.
+										}
+									});
+								}
+	
+								ready[1]	= true;
+								if(ready[0] &&  ready[1])
+								{
+									ret.setResult(children);
+								}
 							}
-							
-							final ServiceContainerNode	node	= scn;
-							ret.addResultListener(new SwingDefaultResultListener()
+							public void customExceptionOccurred(Exception exception)
 							{
-								public void customResultAvailable(Object result)
-								{
-									node.setChildren(subchildren);
-								}
-								public void customExceptionOccurred(Exception exception)
-								{
-									// Children not found -> don't add services.
-								}
-							});
-						}
-
-						ready[1]	= true;
-						if(ready[0] &&  ready[1])
-						{
-							ret.setResult(children);
-						}
-					}
-					public void customExceptionOccurred(Exception exception)
-					{
-//						if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
-//							System.err.println("searchChildren done7: "+ComponentTreeNode.this);
-						ret.setExceptionIfUndone(exception);
+	//							if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
+	//								System.err.println("searchChildren done7: "+ComponentTreeNode.this);
+								ret.setExceptionIfUndone(exception);
+							}
+						});
 					}
 				});
 			}

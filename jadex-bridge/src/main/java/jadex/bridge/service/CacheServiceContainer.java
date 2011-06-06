@@ -380,6 +380,11 @@ public class CacheServiceContainer	implements IServiceContainer
 	{
 		return null;
 	}
+	
+	public RequiredServiceInfo[] getRequiredServiceInfos()
+	{
+		return null;
+	}
 
 	public IFuture getRequiredService(String name)
 	{

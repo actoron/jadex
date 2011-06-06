@@ -43,12 +43,12 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	/**
 	 *  Create a new service container.
 	 */
-	public BasicServiceContainer(Object id, RequiredServiceInfo[] infos, RequiredServiceBinding[] bindings)
+	public BasicServiceContainer(Object id, RequiredServiceInfo[] infos)
 	{
 		this.id = id;
 		
 		setRequiredServiceInfos(infos);
-		setRequiredServiceBindings(bindings);
+//		setRequiredServiceBindings(bindings);
 	}
 	
 	//-------- interface methods --------
@@ -293,7 +293,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	protected Map requiredserviceinfos;
 
 	/** The service bindings. */
-	protected Map bindings;
+//	protected Map bindings;
 
 	
 	/**
@@ -360,31 +360,31 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		return requiredserviceinfos==null? null: (RequiredServiceInfo)requiredserviceinfos.get(name);
 	}
 	
-	/**
-	 *  Set the required service bindings.
-	 *  @param bindings The bindings.
-	 */
-	public void setRequiredServiceBindings(RequiredServiceBinding[] bindings)
-	{
-		if(bindings!=null && bindings.length>0)
-		{
-			this.bindings = new HashMap();
-			for(int i=0; i<bindings.length; i++)
-			{
-				this.bindings.put(bindings[i].getName(), bindings[i]);
-			}
-		}
-	}
+//	/**
+//	 *  Set the required service bindings.
+//	 *  @param bindings The bindings.
+//	 */
+//	public void setRequiredServiceBindings(RequiredServiceBinding[] bindings)
+//	{
+//		if(bindings!=null && bindings.length>0)
+//		{
+//			this.bindings = new HashMap();
+//			for(int i=0; i<bindings.length; i++)
+//			{
+//				this.bindings.put(bindings[i].getName(), bindings[i]);
+//			}
+//		}
+//	}
 	
-	/**
-	 *  Get the binding info of a service.
-	 *  @param name The required service name.
-	 *  @return The binding info of a service.
-	 */
-	public RequiredServiceBinding getRequiredServiceBinding(String name)
-	{
-		return bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
-	}
+//	/**
+//	 *  Get the binding info of a service.
+//	 *  @param name The required service name.
+//	 *  @return The binding info of a service.
+//	 */
+//	public RequiredServiceBinding getRequiredServiceBinding(String name)
+//	{
+//		return bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
+//	}
 	
 	/**
 	 *  Get a required service.
@@ -431,7 +431,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	public IFuture getRequiredService(String name, boolean rebind)
 	{
 		RequiredServiceInfo info = getRequiredServiceInfo(name);
-		RequiredServiceBinding binding = getRequiredServiceBinding(name);
+		RequiredServiceBinding binding = info.getDefaultBinding();//getRequiredServiceBinding(name);
 		if(info==null)
 		{
 			Future ret = new Future();
@@ -451,7 +451,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
 	{
 		RequiredServiceInfo info = getRequiredServiceInfo(name);
-		RequiredServiceBinding binding = getRequiredServiceBinding(name);
+		RequiredServiceBinding binding = info.getDefaultBinding();//getRequiredServiceBinding(name);
 		if(info==null)
 		{
 			IntermediateFuture ret = new IntermediateFuture();

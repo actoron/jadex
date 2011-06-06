@@ -8,6 +8,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IVisitDecider;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -15,6 +16,9 @@ import jadex.commons.future.IIntermediateFuture;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *  For prefixed access of required services in capability.
+ */
 public class ServiceContainerProxy implements IServiceContainer
 {
 	//-------- attributes --------
@@ -210,5 +214,13 @@ public class ServiceContainerProxy implements IServiceContainer
 			prefix	+= plan.getState().getAttributeValue(path.get(i), OAVBDIRuntimeModel.capabilityreference_has_name)+ ".";
 		}
 		return prefix;
+	}
+
+	/**
+	 *  Get the required service infos.
+	 */
+	public RequiredServiceInfo[] getRequiredServiceInfos()
+	{
+		return plan.getInterpreter().getServiceContainer().getRequiredServiceInfos();
 	}
 }

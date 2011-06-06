@@ -394,10 +394,20 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 							new RequiredServiceBinding(cs[i].getDefaultBinding()));
 						sermap.put(cs[i].getName(), newrsi);
 					}
+					if(bindings!=null)
+					{
+						for(int i=0; i<bindings.length; i++)
+						{
+							RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(bindings[i].getName());
+							RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType(), rsi.isMultiple(), 
+								new RequiredServiceBinding(bindings[i]));
+							sermap.put(bindings[i].getName(), newrsi);
+						}
+					}
 				}
 				
 				container = new ComponentServiceContainer(getComponentAdapter(), getComponentDescription().getType(),
-					(RequiredServiceInfo[])sermap.values().toArray(new RequiredServiceInfo[sermap.size()]), bindings);
+					(RequiredServiceInfo[])sermap.values().toArray(new RequiredServiceInfo[sermap.size()]));
 //			}			
 		}
 		return container;

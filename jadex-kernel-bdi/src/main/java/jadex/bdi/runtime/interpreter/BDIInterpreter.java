@@ -1490,7 +1490,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	{
 		if(container==null)
 		{
-			container = new ComponentServiceContainer(getAgentAdapter(), BDIAgentFactory.FILETYPE_BDIAGENT, null, bindings);
+			// todo: bindings
+			
+			container = new ComponentServiceContainer(getAgentAdapter(), BDIAgentFactory.FILETYPE_BDIAGENT, null);
 			Map	capas	= new HashMap();	// prefix -> cap.
 			capas.put("", model.getHandle());
 			while(!capas.isEmpty())

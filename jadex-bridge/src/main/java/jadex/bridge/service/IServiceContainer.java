@@ -50,6 +50,11 @@ public interface IServiceContainer extends IServiceProvider
 	public IService[] getProvidedServices(Class clazz);
 	
 	/**
+	 *  Get the required service infos.
+	 */
+	public RequiredServiceInfo[] getRequiredServiceInfos();
+	
+	/**
 	 *  Get a required service of a given name.
 	 *  @param name The service name.
 	 *  @return The service.
