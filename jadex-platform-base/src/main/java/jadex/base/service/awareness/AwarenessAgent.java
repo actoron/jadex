@@ -75,7 +75,7 @@ import javax.xml.stream.XMLStreamException;
 	@Configuration(name="Medium updates (20s)", arguments=@NameValue(name="delay", value="20000")),
 	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"))
 })
-@Properties(@NameValue(name="componentviewer.viewerclass", value="jadex.base.service.awareness.AwarenessAgentPanel"))
+@Properties(@NameValue(name="componentviewer.viewerclass", value="\"jadex.base.service.awareness.AwarenessAgentPanel\""))
 @RequiredServices(
 {
 	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),

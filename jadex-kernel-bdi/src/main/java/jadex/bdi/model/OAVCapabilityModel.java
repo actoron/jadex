@@ -62,7 +62,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	/** The documents for external elements (e.g. capabilities). */
 	protected Map externals;
 	
-	/** The sub capability models. */
+	/** The sub capability models (mcapa -> model). */
 	protected Map	models;
 	
 	//-------- constructors --------
@@ -79,6 +79,8 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		this.rulebase	= new Rulebase();
 		this.lastmod	= lastmod;
 		this.entries	= entries;
+		models	= new HashMap();
+		models.put(handle, this);
 	}
 	
 	/**
@@ -597,18 +599,9 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		// Add types from subcapability.
 		types.addAll(cmodel.getTypes());
 		
-		if(models==null)
-		{
-			models	= new HashMap();
-		}
-		models.put(cmodel.getHandle(), cmodel);
-		if(cmodel.models!=null)
-		{
-			models.putAll(cmodel.models);
-		}
+		models.putAll(cmodel.models);
 	}
 	
-
 	/**
 	 *  Get the model for a subcapability.
 	 *	@param mcapa
@@ -616,7 +609,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	 */
 	public OAVCapabilityModel getSubcapabilityModel(Object mcapa)
 	{
-		return mcapa.equals(handle) ? this : (OAVCapabilityModel)models.get(mcapa);
+		return (OAVCapabilityModel)models.get(mcapa);
 	}
 
 	/**

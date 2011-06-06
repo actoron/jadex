@@ -977,27 +977,27 @@ public class SFlyweightFunctionality
 		return ret;
 	}
 	
-	//-------- propertybase --------
-	
-	/**
-	 * 
-	 */
-	public static String[] getPropertyNames(IOAVState state, Object handle)
-	{
-		String[] ret = new String[0];
-		Collection coll = state.getAttributeValues(handle, OAVBDIRuntimeModel.capability_has_properties);
-		if(coll!=null)
-		{
-			ret = new String[coll.size()];
-			int i = 0;
-			for(Iterator it=coll.iterator(); it.hasNext(); )
-			{
-				Object prop = it.next();
-				ret[i++] = (String)state.getAttributeValue(prop, OAVBDIRuntimeModel.parameter_has_name);
-			}
-		}
-		return ret;
-	}
+//	//-------- propertybase --------
+//	
+//	/**
+//	 * 
+//	 */
+//	public static String[] getPropertyNames(IOAVState state, Object handle)
+//	{
+//		String[] ret = new String[0];
+//		Collection coll = state.getAttributeValues(handle, OAVBDIRuntimeModel.capability_has_properties);
+//		if(coll!=null)
+//		{
+//			ret = new String[coll.size()];
+//			int i = 0;
+//			for(Iterator it=coll.iterator(); it.hasNext(); )
+//			{
+//				Object prop = it.next();
+//				ret[i++] = (String)state.getAttributeValue(prop, OAVBDIRuntimeModel.parameter_has_name);
+//			}
+//		}
+//		return ret;
+//	}
 	
 	//-------- waitabstraction --------
 	

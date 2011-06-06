@@ -177,9 +177,8 @@
 				<initialgoal ref="df_register">
 					<parameter ref="description">
 						<value>
-							$propertybase.getProperty("dfservice")
-								.createDFComponentDescription(null, $propertybase.getProperty("dfservice")
-								.createDFServiceDescription("sell", "service_seller", "UniHH"))
+							$properties.dfservice.createDFComponentDescription(null,
+								$properties.dfservice.createDFServiceDescription("sell", "service_seller", "UniHH"))
 						</value>
 					</parameter>
 				</initialgoal>

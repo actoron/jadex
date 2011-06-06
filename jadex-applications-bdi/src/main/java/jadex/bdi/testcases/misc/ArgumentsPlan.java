@@ -35,13 +35,10 @@ public class ArgumentsPlan extends Plan
 		catch(GoalFailureException e)
 		{
 			tr.setReason("Could not create worker agent.");
-			getLogger().severe("Exception while creating the worker agent: "+ e);
 		}
 		catch(TimeoutException e)
 		{
 			tr.setReason("Worker did not send message.");
-			getLogger().severe("Timeout while waiting for message receival: "+ e);
-			
 		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 		

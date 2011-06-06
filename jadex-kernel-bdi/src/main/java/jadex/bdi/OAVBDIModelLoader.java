@@ -11,11 +11,7 @@ import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.GoalProcessingRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
-import jadex.bridge.modelinfo.IExtensionType;
 import jadex.bridge.modelinfo.ModelInfo;
-import jadex.bridge.modelinfo.SubcomponentTypeInfo;
-import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
@@ -244,31 +240,6 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 					}
 	
 					state.setAttributeValue(mcrs[i], OAVBDIMetaModel.capabilityref_has_capability, cmodel.getHandle());
-					
-					// Add provided services from subcapabilities.
-					ProvidedServiceInfo[]	psi	= cmodel.getModelInfo().getProvidedServices();
-					for(int j=0; j<psi.length; j++)
-					{
-						info.addProvidedService(psi[j]);
-					}
-					// Add required services from subcapabilities.
-					RequiredServiceInfo[]	rsi	= cmodel.getModelInfo().getRequiredServices();
-					for(int j=0; j<rsi.length; j++)
-					{
-						info.addRequiredService(rsi[j]);
-					}
-					// Add components from subcapabilities.
-					SubcomponentTypeInfo[]	sti	= cmodel.getModelInfo().getSubcomponentTypes();
-					for(int j=0; j<sti.length; j++)
-					{
-						info.addSubcomponentType(sti[j]);
-					}
-					// Add extensions from subcapabilities.
-					IExtensionType[]	et	= cmodel.getModelInfo().getExtensionTypes();
-					for(int j=0; j<et.length; j++)
-					{
-						info.addExtensiontype(et[j]);
-					}
 				}
 				catch(Exception e)
 				{

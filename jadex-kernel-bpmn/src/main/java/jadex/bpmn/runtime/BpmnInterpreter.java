@@ -435,7 +435,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		
 		initContextVariables();
 
-		init(getModel(), getConfiguration(), getModel().getProperties())
+		init(getModel(), getConfiguration())
 			.addResultListener(createResultListener(new DelegationResultListener(inited)
 		{
 			public void customResultAvailable(Object result)

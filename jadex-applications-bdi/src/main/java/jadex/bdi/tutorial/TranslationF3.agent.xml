@@ -60,9 +60,8 @@
 				<initialgoal ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
-							$propertybase.getProperty("dfservice")
-								.createDFComponentDescription(null, $propertybase.getProperty("dfservice")
-								.createDFServiceDescription("service_translate", "translate english_german", "University of Hamburg"))
+							$properties.dfservice.createDFComponentDescription(null,
+								$properties.dfservice.createDFServiceDescription("service_translate", "translate english_german", "University of Hamburg"))
  						</value>
 					</parameter>
 					<parameter ref="leasetime">

@@ -1,7 +1,6 @@
 package jadex.bdi;
 
 import jadex.bdi.model.OAVBDIMetaModel;
-import jadex.bdi.model.ScopedProvidedServiceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.SReflect;
@@ -170,7 +169,7 @@ public class OAVBDIXMLReader
 			{
 				configtype	= ti;
 			}
-			if(proservtype==null && ti.getXMLInfo().getXMLPath().equals(new XMLInfo(new QName(uri, "providedservice")).getXMLPath()))
+			if(proservtype==null && ti.getXMLInfo().getXMLPath().equals(new XMLInfo(new QName[]{new QName(uri, "componenttype"), new QName(uri, "services"), new QName(uri, "providedservice")}).getXMLPath()))
 			{
 				proservtype	= ti;
 			}
@@ -239,23 +238,6 @@ public class OAVBDIXMLReader
 			}
 		};
 
-		IPostProcessor	proservproc	= new IPostProcessor()
-		{
-			public Object postProcess(IContext context, Object object)
-			{
-				Map	user	= (Map)context.getUserContext();
-				IOAVState	state	= (IOAVState)user.get(OAVObjectReaderHandler.CONTEXT_STATE);
-				((ScopedProvidedServiceInfo)object).putScope(getOAVRoot(uri, (ReadContext)context, user, state));
-				return object;
-			}
-			
-			public int getPass()
-			{
-				return 0;
-			}
-		};
-
-		
 		TypeInfo ti_capability = new TypeInfo(new XMLInfo(new QName(uri, "capability")), new ObjectInfo(null, capaproc), 
 			new MappingInfo(comptype, null, null, 
 				new AttributeInfo[]{
@@ -461,9 +443,9 @@ public class OAVBDIXMLReader
 			new ObjectInfo(null, configproc), new MappingInfo(configtype, null, configsubs), new LinkingInfo(configlinker)));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "agent"), new QName(uri, "services"), new QName(uri, "providedservice")}),
-			new ObjectInfo(ScopedProvidedServiceInfo.class, proservproc)));
+			null, new MappingInfo(proservtype)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "capability"), new QName(uri, "services"), new QName(uri, "providedservice")}),
-			new ObjectInfo(ScopedProvidedServiceInfo.class, proservproc)));
+			null, new MappingInfo(proservtype)));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialcapability")), new ObjectInfo(OAVBDIMetaModel.initialcapability_type),
 			null, null, new OAVObjectReaderHandler()));

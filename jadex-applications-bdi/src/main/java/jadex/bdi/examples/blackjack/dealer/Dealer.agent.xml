@@ -418,9 +418,8 @@
 							     the dealers is registered at the directory facilitator.
 							     Note, that the dealer only offers one service, that is 'dealing'
 							     (see service description below).	-->
-							$propertybase.getProperty("dfservice")
-								.createDFComponentDescription(null, $propertybase.getProperty("dfservice")
-								.createDFServiceDescription("dealing", "blackjack", "University of Hamburg"))
+							$properties.dfservice.createDFComponentDescription(null,
+								$properties.dfservice.createDFServiceDescription("dealing", "blackjack", "University of Hamburg"))
 	
 						</value>
 					</parameter>
@@ -446,9 +445,8 @@
 							     the dealers is registered at the directory facilitator.
 							     Note, that the dealer only offers one service, that is 'dealing'
 							     (see service description below).	-->
-							$propertybase.getProperty("dfservice")
-								.createDFComponentDescription(null, $propertybase.getProperty("dfservice")
-								.createDFServiceDescription("dealing", "blackjack", "University of Hamburg"))
+							$properties.dfservice.createDFComponentDescription(null,
+								$properties.dfservice.createDFServiceDescription("dealing", "blackjack", "University of Hamburg"))
 	
 						</value>
 					</parameter>

@@ -287,9 +287,8 @@
 				<initialgoal ref="df_register">
 					<parameter ref="description">
 						<value>
-							$propertybase.getProperty("dfservice")
-								.createDFComponentDescription(null, $propertybase.getProperty("dfservice")
-									.createDFServiceDescription("environment-service", "hunter-prey environment", "University of Hamburg",
+							$properties.dfservice.createDFComponentDescription(null,
+								$properties.dfservice.createDFServiceDescription("environment-service", "hunter-prey environment", "University of Hamburg",
 										new String[]{"JADEX_XML"}, new String[]{"hunterprey"}, new String[]{"fipa-request"}, null))
 						</value>
 					</parameter>

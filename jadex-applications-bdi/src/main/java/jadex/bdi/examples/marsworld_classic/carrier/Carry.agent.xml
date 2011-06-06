@@ -144,9 +144,8 @@
 				<initialgoal ref="dfcap.df_register">
 					<parameter ref="description">
 						<value>
-							$propertybase.getProperty("dfservice")
-								.createDFComponentDescription(null, $propertybase.getProperty("dfservice")
-									.createDFServiceDescription("service_carry", "service_carry", "University of Hamburg"))
+							$properties.dfservice.createDFComponentDescription(null, 
+								$properties.dfservice.createDFServiceDescription("service_carry", "service_carry", "University of Hamburg"))
 						</value>
 					</parameter>
 				</initialgoal>

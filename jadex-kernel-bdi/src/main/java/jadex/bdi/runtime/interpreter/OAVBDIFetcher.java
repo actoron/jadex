@@ -106,9 +106,8 @@ public class OAVBDIFetcher extends SimpleValueFetcher
 			ret = EventbaseFlyweight.getEventbaseFlyweight(state, rcapa);
 		else if(name.equals("$expressionbase"))
 			ret = ExpressionbaseFlyweight.getExpressionbaseFlyweight(state, rcapa);
-		else if(name.equals("$propertybase") || name.equals("$properties"))
-			ret = BDIInterpreter.getInterpreter(state).getModel();	// hack: model provides getProperty() method
-//			ret = PropertybaseFlyweight.getPropertybaseFlyweight(state, rcapa);
+		else if(name.equals("$properties"))
+			ret = BDIInterpreter.getInterpreter(state).getProperties();
 		else if(name.equals("$goal") && rgoal!=null)
 			ret = GoalFlyweight.getGoalFlyweight(state, rcapa, rgoal);
 		else if(name.equals("$event") && rmessageevent!=null)
@@ -117,10 +116,6 @@ public class OAVBDIFetcher extends SimpleValueFetcher
 			ret = InternalEventFlyweight.getInternalEventFlyweight(state, rcapa, rinternalevent);
 		else if(name.equals("$plan") && rplan!=null)
 			ret = PlanFlyweight.getPlanFlyweight(state, rcapa, rplan);
-		
-		// Hack! todo: remove and replace with async service call
-//		else if(name.equals("$clock"))
-//			ret = BDIInterpreter.getInterpreter(state).getClockService();
 		
 		else
 			ret = super.fetchValue(name);

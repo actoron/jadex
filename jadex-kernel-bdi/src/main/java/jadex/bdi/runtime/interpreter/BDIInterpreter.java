@@ -1,8 +1,9 @@
 package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.BDIAgentFactory;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.model.OAVBDIMetaModel;
-import jadex.bdi.model.ScopedProvidedServiceInfo;
+import jadex.bdi.model.OAVCapabilityModel;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefSet;
@@ -27,18 +28,13 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
-import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
-import jadex.bridge.service.ProvidedServiceImplementation;
-import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
-import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
@@ -47,8 +43,8 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.javaparser.IValueFetcher;
-import jadex.javaparser.SJavaParser;
 import jadex.kernelbase.StatelessAbstractInterpreter;
 import jadex.rules.rulesystem.Activation;
 import jadex.rules.rulesystem.IRule;
@@ -68,7 +64,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -121,6 +116,12 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	
 	/** The extensions. */
 	protected Map extensions;
+	
+	/** The properties. */
+	protected Map properties;
+	
+	/** The external service bindings. */
+	protected RequiredServiceBinding[] bindings;
 	
 	//-------- recreate on init (no state) --------
 	
@@ -192,7 +193,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 //	protected Set eal;
 	
 	/** The service container. */
-	protected IServiceContainer container;
+	protected ComponentServiceContainer container;
 	
 	/** The cms future for init return. */
 	protected Future inited;
@@ -281,8 +282,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		state.setAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_configuration, config);
 		if(arguments!=null && !arguments.isEmpty())
 			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, arguments);
-		if(bindings!=null)
-			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_bindings, bindings);
+		this.bindings	= bindings;
 
 //		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING0);
 		
@@ -300,18 +300,15 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		}
 		
 		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
-//		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_name, adapter.getComponentIdentifier().getName());
-//		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_localname, adapter.getComponentIdentifier().getLocalName());
 		
 		scheduleStep(new IComponentStep()
 		{
 			public Object execute(IInternalAccess ia)
 			{
-				init(getModel(), config, getModel().getProperties()).addResultListener(createResultListener(new DelegationResultListener(inited)
+				init(getModel(), config).addResultListener(createResultListener(new DelegationResultListener(inited)
 				{
 					public void customResultAvailable(Object result)
 					{
-						state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE);
 						// When init has finished -> notify cms.
 						inited.setResult(new Object[]{BDIInterpreter.this, getAgentAdapter()});
 					}
@@ -322,75 +319,114 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		
 		this.initthread = null;
 	}
+	
+	/**
+	 *  Start the component behavior.
+	 */
+	public void startBehavior()
+	{
+		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, null);
+		
+		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE);
+		// Remove arguments from state.
+		if(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments)!=null) 
+			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
+	}
+	
+	/**
+	 *  Extended init procedure including subcapabilities.
+	 */
+	public IFuture init(IModelInfo model,String config)
+	{
+		return initCapability(this.model, config);
+	}
+	
+	/**
+	 *  Init the component portion of a capability.
+	 */
+	protected IFuture	initCapability(final OAVCapabilityModel oavmodel, final String config)
+	{
+		final Future	ret	= new Future();
+		BDIInterpreter.super.init(oavmodel.getModelInfo(), config)
+			.addResultListener(createResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				Collection subcaps	= state.getAttributeValues(oavmodel.getHandle(), OAVBDIMetaModel.capability_has_capabilityrefs);
+				if(subcaps!=null)
+				{
+					final Iterator it	= subcaps.iterator();
+					IResultListener	lis	= new DelegationResultListener(ret)
+					{
+						public void customResultAvailable(Object result)
+						{
+							if(it.hasNext())
+							{
+								Object	mcaparef	= it.next();
+								String	subconf	= null;
+								if(config!=null)
+								{
+									Object	mconfig	= state.getAttributeValue(oavmodel.getHandle(), OAVBDIMetaModel.capability_has_configurations, config);
+									Object	inicap	= AgentRules.getInitialCapability(state, oavmodel.getHandle(), mconfig, mcaparef);
+									if(inicap!=null)
+									{
+										subconf	= (String) state.getAttributeValue(inicap, OAVBDIMetaModel.initialcapability_has_configuration);
+									}
+								}
+								Object	mcapa	= state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_capability); 
+								OAVCapabilityModel	submodel	= oavmodel.getSubcapabilityModel(mcapa);
+								initCapability(submodel, subconf).addResultListener(createResultListener(this));
+							}
+							else
+							{
+								super.customResultAvailable(result);
+							}
+						}
+					};
+					lis.resultAvailable(null);
+				}
+				else
+				{
+					super.customResultAvailable(result);
+				}
+			}
+		}));
+		
+		return ret;
+	}
 
 	/**
 	 *  Overridden to init BDI internals before services.
 	 */
 	public IFuture initServices(final IModelInfo model, final String config)
 	{
-		final Future	ret	= new Future();
-		init0().addResultListener(createResultListener(new DelegationResultListener(ret)
+		IFuture	ret;
+		if(model==getModel())
 		{
-			public void customResultAvailable(Object result)
+			final Future	fut	= new Future();
+			ret	= fut;
+			// Agent model: init agent stuff first.
+			init0().addResultListener(createResultListener(new DelegationResultListener(fut)
 			{
-				init1().addResultListener(createResultListener(new DelegationResultListener(ret)
+				public void customResultAvailable(Object result)
 				{
-					public void customResultAvailable(Object result)
+					init1().addResultListener(createResultListener(new DelegationResultListener(fut)
 					{
-						BDIInterpreter.super.initServices(model, config).addResultListener(new DelegationResultListener(ret));
-						
-					}
-				}));				
-			}
-		}));
-		return ret;
-	}
-	
-	/**
-	 *  Overridden to pass correct scope access to service.
-	 */
-	protected void initService(ProvidedServiceInfo info)
-	{
-		ProvidedServiceImplementation	impl	= info.getImplementation();
-		Object	mscope	= ((ScopedProvidedServiceInfo)info).fetchScope();
-		Object	rscope	= findSubcapability(mscope);
-		assert rscope!=null;
-		IValueFetcher	fetcher	= new OAVBDIFetcher(state, rscope);
-		IInternalAccess	ia	= new CapabilityFlyweight(state, rscope);
-		
-		Object	ser	= null;
-		if(impl.getExpression()!=null)
-		{
-			// todo: other Class imports, how can be found out?
-			ser = SJavaParser.evaluateExpression(impl.getExpression(), getModel(rscope).getAllImports(), fetcher, getModel(rscope).getClassLoader());
-//						System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
-		}
-		else if(impl.getImplementation()!=null)
-		{
-			try
-			{
-				ser = impl.getImplementation().newInstance();
-			}
-			catch(InstantiationException e)
-			{
-				throw new RuntimeException(e);
-			}
-			catch (IllegalAccessException e)
-			{
-				throw new RuntimeException(e);
-			}
-		}
-		
-		if(ser!=null)
-		{
-			IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
-				ia, getComponentAdapter(), info.getType(), ser, info.getImplementation().getProxytype());
-			getServiceContainer().addService(proxy);
+						public void customResultAvailable(Object result)
+						{
+							BDIInterpreter.super.initServices(model, config).addResultListener(new DelegationResultListener(fut));
+						}
+					}));				
+				}
+			}));
 		}
 		else
 		{
-			throw new RuntimeException("Service creation error: "+impl.getExpression());
+			// Capability model: agent stuff already inited.
+//			ret	= BDIInterpreter.super.initServices(model, config);
+			ret	= IFuture.DONE;
 		}
+		return ret;
 	}
 	
 	/**
@@ -469,23 +505,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	protected IFuture	init1()
 	{
-		final Future	ret	= new Future();
-		AgentRules.initializeCapabilityInstance(state, ragent)
-			.addResultListener(createResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, null);
-				
-				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE);
-				// Remove arguments from state.
-				if(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments)!=null) 
-					state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
-
-				ret.setResult(null);
-			}
-		}));
-		return ret;
+		return AgentRules.initializeCapabilityInstance(state, ragent);
 	}
 	
 	//-------- IKernelAgent interface --------
@@ -642,7 +662,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public ClassLoader getClassLoader()
 	{
-		return model.getState().getTypeModel().getClassLoader();
+		return model.getModelInfo().getClassLoader();
 	}
 	
 	/**
@@ -779,7 +799,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  @param path The result path as list of capas.
 	 *  @return True if found.
 	 */
-	protected boolean findSubcapability(Object rcapa, Object targetcapa, List path)
+	public boolean findSubcapability(Object rcapa, Object targetcapa, List path)
 	{
 		boolean ret = false;
 		
@@ -1462,19 +1482,39 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		return parent;
 	}
 	
-//	/**
-//	 *  Create the service container.
-//	 *  @return The service container.
-//	 */
-//	public IServiceContainer getServiceContainer()
-//	{
-//		if(container==null)
-//		{
-//			RequiredServiceBinding[] bindings = (RequiredServiceBinding[])state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_bindings);
-//			container = new ComponentServiceContainer(getAgentAdapter(), BDIAgentFactory.FILETYPE_BDIAGENT, getModel().getRequiredServices(), bindings);
-//		}
-//		return container;
-//	}
+	/**
+	 *  Create the service container.
+	 *  @return The service container.
+	 */
+	public IServiceContainer getServiceContainer()
+	{
+		if(container==null)
+		{
+			container = new ComponentServiceContainer(getAgentAdapter(), BDIAgentFactory.FILETYPE_BDIAGENT, null, bindings);
+			Map	capas	= new HashMap();	// prefix -> cap.
+			capas.put("", model.getHandle());
+			while(!capas.isEmpty())
+			{
+				String	prefix	= (String)capas.keySet().iterator().next();
+				Object	mcapa	= capas.remove(prefix);
+				OAVCapabilityModel	oavmodel	= model.getSubcapabilityModel(mcapa);
+				RequiredServiceInfo[]	creqs	= oavmodel.getModelInfo().getRequiredServices();
+				container.addRequiredServiceInfos(prefix, creqs);
+				
+				Collection	coll	= state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs);
+				if(coll!=null)
+				{
+					for(Iterator it=coll.iterator(); it.hasNext(); )
+					{
+						Object	mcaparef	= it.next();
+						capas.put(prefix + state.getAttributeValue(mcaparef, OAVBDIMetaModel.modelelement_has_name) + ".",
+							state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_capability));
+					}
+				}
+			}
+		}
+		return container;
+	}
 	
 	//-------- helper methods --------
 	
@@ -1633,15 +1673,6 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	}
 	
 	/**
-	 *  Get the service bindings.
-	 *  @return The service bindings.
-	 */
-	public RequiredServiceBinding[]	getServiceBindings()
-	{
-		return (RequiredServiceBinding[]) state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_bindings);
-	}
-	
-	/**
 	 *  Get the value fetcher.
 	 *  @return The value fetcher.
 	 */
@@ -1756,41 +1787,36 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	}
 	
 	/**
+	 *  Get the properties.
+	 *  @return the properties.
+	 */
+	public Map getProperties()
+	{
+		return properties;
+	}
+	
+	/**
+	 *  Get the properties for a subcapability.
+	 *  @return the properties.
+	 */
+	public Map getProperties(Object rcapa)
+	{
+		// Todo
+		return properties;
+	}
+	
+	/**
 	 *  Add a property value.
 	 *  @param name The name.
 	 *  @param val The value.
 	 */
 	public void addProperty(String name, Object val)
 	{
-		Object rparam = state.createObject(OAVBDIRuntimeModel.parameter_type);
-		state.setAttributeValue(rparam, OAVBDIRuntimeModel.parameter_has_name, name);
-		state.setAttributeValue(rparam, OAVBDIRuntimeModel.parameter_has_type, val.getClass());
-		state.setAttributeValue(rparam, OAVBDIRuntimeModel.parameter_has_value, val);
+		if(properties==null)
+			properties = new HashMap();
+		properties.put(name, val);
+	}
 
-		state.addAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_properties, rparam);
-	}
-	
-	/**
-	 *  Get the properties.
-	 */
-	public Map getProperties()
-	{
-		Map ret = null;
-		Collection params = state.getAttributeValues(ragent, OAVBDIRuntimeModel.capability_has_properties);
-		if(params!=null)
-		{
-			ret = new HashMap();
-			for(Iterator it=params.iterator(); it.hasNext(); )
-			{
-				Object param = it.next();
-				Object name = state.getAttributeValue(param, OAVBDIRuntimeModel.parameter_has_name);
-				Object val = state.getAttributeValue(param, OAVBDIRuntimeModel.parameter_has_value);
-				ret.put(name, val);
-			}
-		}
-		return ret!=null? ret: Collections.EMPTY_MAP;
-	}
-	
 	/**
 	 *  Get the properties.
 	 */
@@ -1809,50 +1835,49 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		throw new UnsupportedOperationException();
 	}
 	
-	/**
-	 *  Create the service container.
-	 *  @return The service container.
-	 */
-	public IServiceContainer getServiceContainer()
-	{
-		if(container==null)
-		{
-			// Init service container.
-//			MExpressionType mex = model.getContainer();
-//			if(mex!=null)
-//			{
-//				container = (IServiceContainer)mex.getParsedValue().getValue(fetcher);
-//			}
-//			else
-//			{
-//				container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
-				
-				RequiredServiceInfo[] ms = getModel().getRequiredServices();
-				
-				Map sermap = new LinkedHashMap();
-				for(int i=0; i<ms.length; i++)
-				{
-					sermap.put(ms[i].getName(), ms[i]);
-				}
-	
-				String config = (String)getState().getAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_configuration);
-				if(config!=null)
-				{
-					ConfigurationInfo cinfo = getModel().getConfiguration(config);
-					RequiredServiceInfo[] cs = cinfo.getRequiredServices();
-					for(int i=0; i<cs.length; i++)
-					{
-						RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(cs[i].getName());
-						RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType(), rsi.isMultiple(), 
-							new RequiredServiceBinding(cs[i].getDefaultBinding()));
-						sermap.put(newrsi.getName(), newrsi);
-					}
-				}
-				RequiredServiceBinding[] bindings = (RequiredServiceBinding[])getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_bindings);
-				container = new ComponentServiceContainer(getComponentAdapter(), getComponentDescription().getType(),
-					(RequiredServiceInfo[])sermap.values().toArray(new RequiredServiceInfo[sermap.size()]), bindings);
-//			}			
-		}
-		return container;
-	}
+//	/**
+//	 *  Create the service container.
+//	 *  @return The service container.
+//	 */
+//	public IServiceContainer getServiceContainer()
+//	{
+//		if(container==null)
+//		{
+//			// Init service container.
+////			MExpressionType mex = model.getContainer();
+////			if(mex!=null)
+////			{
+////				container = (IServiceContainer)mex.getParsedValue().getValue(fetcher);
+////			}
+////			else
+////			{
+////				container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+//				
+//				RequiredServiceInfo[] ms = getModel().getRequiredServices();
+//				
+//				Map sermap = new LinkedHashMap();
+//				for(int i=0; i<ms.length; i++)
+//				{
+//					sermap.put(ms[i].getName(), ms[i]);
+//				}
+//	
+//				String config = (String)getState().getAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_configuration);
+//				if(config!=null)
+//				{
+//					ConfigurationInfo cinfo = getModel().getConfiguration(config);
+//					RequiredServiceInfo[] cs = cinfo.getRequiredServices();
+//					for(int i=0; i<cs.length; i++)
+//					{
+//						RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(cs[i].getName());
+//						RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType(), rsi.isMultiple(), 
+//							new RequiredServiceBinding(cs[i].getDefaultBinding()));
+//						sermap.put(newrsi.getName(), newrsi);
+//					}
+//				}
+//				container = new ComponentServiceContainer(getComponentAdapter(), getComponentDescription().getType(),
+//					(RequiredServiceInfo[])sermap.values().toArray(new RequiredServiceInfo[sermap.size()]), bindings);
+////			}			
+//		}
+//		return container;
+//	}
 }

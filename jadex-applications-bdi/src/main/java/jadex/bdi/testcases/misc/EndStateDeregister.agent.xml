@@ -21,11 +21,11 @@
 		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
 	</capabilities>
 	
-	<beliefs>
-		<belief name="dfservice" class="IDF">
-			<fact class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class)</fact>
-		</belief>
-	</beliefs>
+	<properties>
+		<property name="dfservice" class="IFuture">
+			SServiceProvider.getService($scope.getServiceProvider(), IDF.class)
+		</property>
+	</properties>
 	
 	<configurations>
 		<configuration name="default">
@@ -33,8 +33,8 @@
 				<initialgoal ref="dfcap.df_register">
 					<parameter ref="description">
 						<value>
-							$beliefbase.dfservice.createDFComponentDescription(null,
-								$beliefbase.dfservice.createDFServiceDescription("endstate_testservice", "endstate_testservice", "EndStateDeregister"))
+							$properties.dfservice.createDFComponentDescription(null,
+								$properties.dfservice.createDFServiceDescription("endstate_testservice", "endstate_testservice", "EndStateDeregister"))
 						</value>
 					</parameter>
 				</initialgoal>

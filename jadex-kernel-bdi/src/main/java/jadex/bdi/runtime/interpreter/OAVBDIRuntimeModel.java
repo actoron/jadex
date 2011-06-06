@@ -242,8 +242,8 @@ public class OAVBDIRuntimeModel
 	/** The agent results. */
 	public static OAVAttributeType agent_has_results;
 	
-	/** The agent has service bindings. */
-	public static OAVAttributeType agent_has_bindings;
+//	/** The agent has service bindings. */
+//	public static OAVAttributeType agent_has_bindings;
 	
 	/** The agent has init parents (only available during start agent action). */
 	// Hack!!! remove???
@@ -309,8 +309,8 @@ public class OAVBDIRuntimeModel
 	/** The capability has configuration. */
 	public static OAVAttributeType capability_has_configuration;
 	
-	/** Capability has properties attribute. */
-	public static OAVAttributeType capability_has_properties;
+//	/** Capability has properties attribute. */
+//	public static OAVAttributeType capability_has_properties;
 
 	
 
@@ -958,7 +958,7 @@ public class OAVBDIRuntimeModel
 		capability_has_externalaccesses = capability_type.createAttributeType("capability_has_externalaccesses", externalaccess_type, OAVAttributeType.LIST);
 		capability_has_precandidates = capability_type.createAttributeType("capability_has_precandidates", precandidatelist_type, OAVAttributeType.MAP, null, precandidatelist_has_processableelement);
 		capability_has_abstractsources = capability_type.createAttributeType("capability_has_abstractsources", abstractsource_type, OAVAttributeType.MAP, null, abstractsource_has_abstract);
-		capability_has_properties = capability_type.createAttributeType("capability_has_properties", parameter_type, OAVAttributeType.MAP, null, parameter_has_name);
+//		capability_has_properties = capability_type.createAttributeType("capability_has_properties", parameter_type, OAVAttributeType.MAP, null, parameter_has_name);
 		
 		// agent
 //		agent_has_name = agent_type.createAttributeType("agent_has_name", OAVJavaType.java_string_type);
@@ -978,7 +978,7 @@ public class OAVBDIRuntimeModel
 		agent_has_killlisteners = agent_type.createAttributeType("agent_has_killlisteners", java_resultlistener_type, OAVAttributeType.SET);
 		agent_has_componentlisteners = agent_type.createAttributeType("agent_has_componentlisteners", java_componentlistener_type, OAVAttributeType.LIST);
 		agent_has_changeevents = agent_type.createAttributeType("agent_has_changeevents", changeevent_type, OAVAttributeType.LIST);
-		agent_has_bindings = agent_type.createAttributeType("agent_has_bindings", OAVJavaType.java_object_type);
+//		agent_has_bindings = agent_type.createAttributeType("agent_has_bindings", OAVJavaType.java_object_type);
 //		agent_has_eventprocessing = agent_type.createAttributeType("agent_has_eventprocessing", processableelement_type);
 
 		// changeevents

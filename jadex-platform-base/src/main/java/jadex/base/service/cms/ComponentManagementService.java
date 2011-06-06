@@ -1137,11 +1137,19 @@ public abstract class ComponentManagementService extends BasicService implements
 								suspend = isInitSuspend(cinfo, lmodel);
 								IComponentInstance instance = (IComponentInstance)ii[5];
 								instance.startBehavior();
-								adapter.wakeup();
+								if(suspend)
+								{
+									desc.setState(IComponentDescription.STATE_SUSPENDED);
+									changed	= true;
+								}
+								else
+								{
+									adapter.wakeup();
+								}
 							}
 							else if(!suspend && IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
 							{
-								desc.setState(IComponentDescription.STATE_ACTIVE);						
+								desc.setState(IComponentDescription.STATE_ACTIVE);
 								adapter.wakeup();
 								changed	= true;
 							}

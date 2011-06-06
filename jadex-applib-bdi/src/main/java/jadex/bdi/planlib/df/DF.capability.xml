@@ -283,7 +283,7 @@
 		<configuration name="default">
 			<beliefs>
 				<initialbelief ref="timeout">
-<!-- 					<fact>(Integer)$propertybase.getProperty("standard.timeout")</fact> -->
+<!-- 					<fact>(Integer)$properties.get("standard.timeout")</fact> -->
 					<fact>20000</fact>
 				</initialbelief>
 			</beliefs>

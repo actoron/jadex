@@ -337,6 +337,24 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	}
 	
 	/**
+	 *  Add required services for a given prefix.
+	 *  @param prefix The name prefix to use.
+	 *  @param required services The required services to set.
+	 */
+	public void addRequiredServiceInfos(String prefix, RequiredServiceInfo[] requiredservices)
+	{
+		if(requiredservices!=null && requiredservices.length>0)
+		{
+			if(this.requiredserviceinfos==null)
+				this.requiredserviceinfos = new HashMap();
+			for(int i=0; i<requiredservices.length; i++)
+			{
+				this.requiredserviceinfos.put(prefix+requiredservices[i].getName(), requiredservices[i]);
+			}
+		}
+	}
+	
+	/**
 	 *  Get a required service info.
 	 *  @return The required service info.
 	 */

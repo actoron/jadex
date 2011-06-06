@@ -75,7 +75,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			{
 				public Object execute(IInternalAccess ia)
 				{
-					init(model, MicroAgentInterpreter.this.config, null)
+					init(model, MicroAgentInterpreter.this.config)
 						.addResultListener(createResultListener(new DelegationResultListener(inited)
 					{
 						public void customResultAvailable(Object result)

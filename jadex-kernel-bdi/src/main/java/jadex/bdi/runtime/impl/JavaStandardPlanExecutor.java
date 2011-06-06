@@ -464,7 +464,8 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 	 */
 	protected long getMaxExecutionTime(BDIInterpreter interpreter)
 	{
-		Number max = (Number)interpreter.getState().getAttributeValue(interpreter.getAgent(), OAVBDIRuntimeModel.capability_has_properties, MAX_PLANSTEP_TIME);
+		Map	props	= interpreter.getProperties();
+		Number max = props!=null ? (Number)props.get(MAX_PLANSTEP_TIME) : null;
 		return max!=null? max.longValue(): 0;
 		
 //		if(maxexetime==null)

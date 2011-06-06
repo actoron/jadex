@@ -20,7 +20,7 @@
 	<beliefs>
 		<!-- The environment as singleton object. -->
 		<belief name="environment" class="Environment">
-			<fact>Environment.createInstance($propertybase.getProperty("clock"))</fact>
+			<fact>Environment.createInstance($properties.clock)</fact>
 	  	</belief>
 
 		<belief name="gui" class="jadex.bdi.planlib.GuiCreator">

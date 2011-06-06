@@ -1270,24 +1270,7 @@ public class AgentRules
 				String	name	= (String)state.getAttributeValue(mcaparef, OAVBDIMetaModel.modelelement_has_name);
 				Object	msubcapa	= state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_capability);
 				
-				Object	inicap	= null;
-				if(mconfig!=null)
-				{
-					Collection	inicaps	= state.getAttributeValues(mconfig, OAVBDIMetaModel.configuration_has_initialcapabilities);
-					if(inicaps!=null)
-					{
-						for(Iterator it2=inicaps.iterator(); inicap==null && it2.hasNext(); )
-						{
-							Object	tmp	= it2.next();
-							String	refname	= (String)state.getAttributeValue(tmp, OAVBDIMetaModel.initialcapability_has_ref);
-							Object	iniref	= state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs, refname);
-							if(iniref==mcaparef)
-							{
-								inicap	= tmp;
-							}
-						}
-					}
-				}
+				Object inicap = getInitialCapability(state, mcapa, mconfig,	mcaparef);
 
 				Object	rsubcapa	= state.createObject(OAVBDIRuntimeModel.capability_type);
 				state.setAttributeValue(rsubcapa, OAVBDIRuntimeModel.element_has_model, msubcapa);
@@ -1308,6 +1291,32 @@ public class AgentRules
 		}
 		
 //		return futures;
+	}
+
+	/**
+	 *  Get the initial capability (if any) from the configuration.
+	 */
+	protected static Object getInitialCapability(IOAVState state, Object mcapa, Object mconfig, Object mcaparef)
+	{
+		Object	inicap	= null;
+		if(mconfig!=null)
+		{
+			Collection	inicaps	= state.getAttributeValues(mconfig, OAVBDIMetaModel.configuration_has_initialcapabilities);
+			if(inicaps!=null)
+			{
+				for(Iterator it2=inicaps.iterator(); inicap==null && it2.hasNext(); )
+				{
+					Object	tmp	= it2.next();
+					String	refname	= (String)state.getAttributeValue(tmp, OAVBDIMetaModel.initialcapability_has_ref);
+					Object	iniref	= state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs, refname);
+					if(iniref==mcaparef)
+					{
+						inicap	= tmp;
+					}
+				}
+			}
+		}
+		return inicap;
 	}
 	
 	/**
@@ -3421,13 +3430,9 @@ public class AgentRules
 		activateEndState(state, ragent);
 		
 		// Hack! Make timeout explicit/configurable.
-		Long prop	= null;
 		final BDIInterpreter interpreter = BDIInterpreter.getInterpreter(state);
-		Object param	= state.getAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_properties, TERMINATION_TIMEOUT);
-		if(param!=null)
-		{
-			prop	= (Long)state.getAttributeValue(param, OAVBDIRuntimeModel.parameter_has_value);
-		}
+		Map	props	= interpreter.getProperties();
+		Long prop	= props!=null ? (Long)props.get(TERMINATION_TIMEOUT) : null;
 		long tt = prop!=null? prop.longValue(): 10000;
 //		System.out.println("Adding termination timeout: "+interpreter.getAgentAdapter().getComponentIdentifier().getLocalName()+", "+tt);
 		
@@ -3464,7 +3469,7 @@ public class AgentRules
 	 */
 	public static Object getPropertyValue(IOAVState state, Object rcapa, String name)
 	{
-		Object rparam = state.getAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_properties, name);
-		return rparam==null? null: state.getAttributeValue(rparam, OAVBDIRuntimeModel.parameter_has_value);
+		Map	props	= BDIInterpreter.getInterpreter(state).getProperties(rcapa);
+		return props!=null ? props.get(name) : null;
 	}
 }

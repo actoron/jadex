@@ -23,7 +23,7 @@
 		<!-- Timeout for messages. -->
 		<belief name="timeout" class="Long" exported="true">
 			<fact>
-				//(Integer)$propertybase.getProperty("standard.timeout")
+				// (Integer)$properties.get("standard.timeout")
 				20000L
 			</fact>
 		</belief>

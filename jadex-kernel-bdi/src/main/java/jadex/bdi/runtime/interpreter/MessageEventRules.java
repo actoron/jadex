@@ -1099,8 +1099,9 @@ public class MessageEventRules
 	 */
 	protected static int getStoredMessagesSize(BDIInterpreter interpreter)
 	{
-		Number ret = (Number)interpreter.getState().getAttributeValue(interpreter.getAgent(), OAVBDIRuntimeModel.capability_has_properties, MESSAGEEVENTS_MAX);
-		return ret!=null? ret.intValue(): 0;
+		Map	props	= interpreter.getProperties();
+		Number num	= props!=null ? (Number)props.get(MESSAGEEVENTS_MAX) : null;
+		return num!=null? num.intValue(): 0;
 	}
 	
 	/**
@@ -1339,18 +1340,17 @@ public class MessageEventRules
 	public static IContentCodec[] getContentCodecs(Object rcapa, IOAVState state)
 	{
 		List ret	= null;
-		Collection rprops = state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_properties);
+		Map	rprops = BDIInterpreter.getInterpreter(state).getProperties(rcapa);
 		if(rprops!=null)
 		{
-			for(Iterator it=rprops.iterator(); ret==null && it.hasNext();)
+			for(Iterator it=rprops.keySet().iterator(); ret==null && it.hasNext();)
 			{
-				Object param = it.next();
-				String	name = (String)state.getAttributeValue(param, OAVBDIRuntimeModel.parameter_has_name);
+				String	name	= (String) it.next();
 				if(name.startsWith("contentcodec."))
 				{
 					if(ret==null)
 						ret	= new ArrayList();
-					ret.add(AgentRules.getPropertyValue(state, rcapa, name));
+					ret.add(rprops.get(name));
 				}
 			}
 		}

@@ -233,14 +233,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	public abstract IModelInfo getModel();
 	
 	/**
-	 *  Get the service bindings.
-	 *  @return The service bindings.
-	 */
-	public abstract RequiredServiceBinding[] getServiceBindings();
-	
-	/**
 	 *  Get the value fetcher.
-	 *  @return The value fetcher.
 	 */
 	public abstract IValueFetcher getFetcher();
 	
@@ -322,7 +315,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  - init required and provided services
 	 *  - init subcomponents
 	 */
-	public IFuture init(final IModelInfo model, final String config, final Map props)
+	public IFuture init(final IModelInfo model, final String config)
 	{
 		final Future ret = new Future();
 		
@@ -331,7 +324,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		{
 			public void customResultAvailable(Object result)
 			{
-				initFutureProperties(props).addResultListener(
+				initFutureProperties(model).addResultListener(
 					createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
@@ -448,7 +441,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				{
 					try
 					{
-						initService(services[i]);
+						initService(services[i], model);
 					}
 					catch(Exception e)
 					{
@@ -471,12 +464,13 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	/**
 	 *  Init the future properties.
 	 */
-	public IFuture initFutureProperties(final Map props)
+	public IFuture initFutureProperties(IModelInfo model)
 	{
 		Future ret = new Future();
 		
 		// Evaluate (future) properties.
-		final List futures = new ArrayList();
+		final List	futures	= new ArrayList();
+		final Map	props	= model.getProperties();
 		if(props!=null)
 		{
 			for(Iterator it=props.keySet().iterator(); it.hasNext(); )
@@ -486,8 +480,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				if(value instanceof UnparsedExpression)
 				{
 					final UnparsedExpression unexp = (UnparsedExpression)value;
-					final Object val = SJavaParser.evaluateExpression(unexp.getValue(), getModel().getAllImports(), getFetcher(), getClassLoader());
-					Class clazz = unexp.getClazz(getModel().getClassLoader(), getModel().getAllImports());
+					final Object val = SJavaParser.evaluateExpression(unexp.getValue(), model.getAllImports(), getFetcher(), model.getClassLoader());
+					Class clazz = unexp.getClazz(model.getClassLoader(), model.getAllImports());
 					if(SReflect.isSupertype(IFuture.class, clazz!=null? clazz: val.getClass()))
 					{
 //						System.out.println("Future property: "+mexp.getName()+", "+val);
@@ -536,7 +530,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	/**
 	 *  Init the subcomponents.
 	 */
-	public IFuture initComponents(IModelInfo model, String config)
+	public IFuture initComponents(final IModelInfo model, String config)
 	{
 		final Future ret = new Future();
 		
@@ -551,9 +545,9 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			}
 			final ComponentInstanceInfo[] components = conf.getComponentInstances();
 			SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
-				.addResultListener(createResultListener(new DefaultResultListener()
+				.addResultListener(createResultListener(new DelegationResultListener(ret)
 			{
-				public void resultAvailable(Object result)
+				public void customResultAvailable(Object result)
 				{
 					// NOTE: in current implementation application waits for subcomponents
 					// to be finished and cms implements a hack to get the external
@@ -567,7 +561,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					// might depend on each other (e.g. bdi factory must be there for jcc)).
 					
 					final IComponentManagementService ces = (IComponentManagementService)result;
-					createComponent(components, ces, 0, ret);
+					createComponent(components, ces, model, 0)
+						.addResultListener(createResultListener(new DelegationResultListener(ret)));
 				}
 			}));
 		}
@@ -728,14 +723,14 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  Add a service to the component. 
 	 *  @param info The provided service info.
 	 */
-	protected void initService(ProvidedServiceInfo info)
+	protected void initService(ProvidedServiceInfo info, IModelInfo model)
 	{
 		ProvidedServiceImplementation	impl	= info.getImplementation();
 		Object	ser	= null;
 		if(impl.getExpression()!=null)
 		{
 			// todo: other Class imports, how can be found out?
-			ser = SJavaParser.evaluateExpression(impl.getExpression(), getModel().getAllImports(), getFetcher(), getModel().getClassLoader());
+			ser = SJavaParser.evaluateExpression(impl.getExpression(), model.getAllImports(), getFetcher(), model.getClassLoader());
 //						System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
 		}
 		else if(impl.getImplementation()!=null)
@@ -854,54 +849,26 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 
 	/**
 	 *  Create subcomponents.
-	 *  NOTE: parent cannot declare itself initing while subcomponents are created
-	 *  because they need the external access of the parent, which is available only
-	 *  after init is finished (otherwise there is a cyclic init dependency between parent and subcomps). 
 	 */
-	public void createComponent(final ComponentInstanceInfo[] components, final IComponentManagementService cms, final int i, final Future inited)
+	public IFuture	createComponent(final ComponentInstanceInfo[] components, final IComponentManagementService cms, final IModelInfo model, final int i)
 	{
+		IFuture	ret;
 		if(i<components.length)
 		{
-//			System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
-			int num = getNumber(components[i]);
-			final IResultListener crl = new CollectionResultListener(num, false, createResultListener(new IResultListener()
+			final Future	fut	= new Future();
+			ret	= fut;
+			int num = getNumber(components[i], model);
+			IResultListener crl = new CollectionResultListener(num, false, createResultListener(new DelegationResultListener(fut)
 			{
-				public void resultAvailable(Object result)
+				public void customResultAvailable(Object result)
 				{
-//					System.out.println("Create finished: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
-//					if(getParent()==null)
-//					{
-//						addStep(new Runnable()
-//						{
-//							public void run()
-//							{
-//								createComponent(components, cl, ces, i+1, inited);
-//							}
-//						});
-//					}
-//					else
-//					{
-						createComponent(components, cms, i+1, inited);
-//						scheduleStep(new IComponentStep()
-//						{
-//							@XMLClassname("createChild")
-//							public Object execute(IInternalAccess ia)
-//							{
-//								createComponent(components, cms, i+1, inited);
-//								return null;
-//							}
-//						});
-//					}
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					inited.setException(exception);
+					createComponent(components, cms, model, i+1)
+						.addResultListener(createResultListener(new DelegationResultListener(fut)));
 				}
 			}));
 			for(int j=0; j<num; j++)
 			{
-				SubcomponentTypeInfo type = components[i].getType(getModel());
+				SubcomponentTypeInfo type = components[i].getType(model);
 				if(type!=null)
 				{
 					final Boolean suspend	= components[i].getSuspend()!=null ? components[i].getSuspend() : type.getSuspend();
@@ -909,10 +876,9 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					Boolean	daemon = components[i].getDaemon()!=null ? components[i].getDaemon() : type.getDaemon();
 					Boolean	autoshutdown = components[i].getAutoShutdown()!=null ? components[i].getAutoShutdown() : type.getAutoShutdown();
 					RequiredServiceBinding[] bindings = components[i].getBindings();
-					IFuture ret = cms.createComponent(components[i].getName(), type.getName(),
-						new CreationInfo(components[i].getConfiguration(), getArguments(components[i]), getComponentAdapter().getComponentIdentifier(),
-						suspend, master, daemon, autoshutdown, getModel().getAllImports(), bindings), null);
-					ret.addResultListener(crl);
+					cms.createComponent(components[i].getName(), type.getName(),
+						new CreationInfo(components[i].getConfiguration(), getArguments(components[i], model), getComponentAdapter().getComponentIdentifier(),
+						suspend, master, daemon, autoshutdown, model.getAllImports(), bindings), null).addResultListener(crl);
 				}
 				else
 				{
@@ -922,28 +888,16 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		}
 		else
 		{
-			// Init is now finished. Notify cms.
-//			System.out.println("Application init finished: "+ApplicationInterpreter.this);
-
-			// master, daemon, autoshutdown
-//			Boolean[] bools = new Boolean[3];
-//			bools[2] = model.getAutoShutdown();
-			
-//			for(int j=0; j<tostart.size(); j++)
-//			{
-//				IComponentIdentifier cid = (IComponentIdentifier)tostart.get(j);
-//				cms.resumeComponent(cid);
-//			}
-			
-			inited.setResult(new Object[]{StatelessAbstractInterpreter.this, getComponentAdapter()});
+			ret	= IFuture.DONE;
 		}
+		return ret;
 	}
 	
 	/**
 	 *  Get the arguments.
 	 *  @return The arguments as a map of name-value pairs.
 	 */
-	public Map getArguments(ComponentInstanceInfo component)
+	public Map getArguments(ComponentInstanceInfo component, IModelInfo model)
 	{
 		Map ret = null;		
 		UnparsedExpression[] arguments = component.getArguments();
@@ -955,7 +909,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			for(int i=0; i<arguments.length; i++)
 			{
 				// todo: language
-				Object val = SJavaParser.evaluateExpression(arguments[i].getValue(), getModel().getAllImports(), getFetcher(), getClassLoader());
+				Object val = SJavaParser.evaluateExpression(arguments[i].getValue(), model.getAllImports(), getFetcher(), model.getClassLoader());
 				ret.put(arguments[i].getName(), val);
 			}
 		}
@@ -967,9 +921,9 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  Get the number of components to start.
 	 *  @return The number.
 	 */
-	public int getNumber(ComponentInstanceInfo component)
+	public int getNumber(ComponentInstanceInfo component, IModelInfo model)
 	{
-		Object val = component.getNumber()!=null? SJavaParser.evaluateExpression(component.getNumber(), getModel().getAllImports(), getFetcher(), getClassLoader()): null;
+		Object val = component.getNumber()!=null? SJavaParser.evaluateExpression(component.getNumber(), model.getAllImports(), getFetcher(), model.getClassLoader()): null;
 		return val instanceof Integer? ((Integer)val).intValue(): 1;
 	}
 
