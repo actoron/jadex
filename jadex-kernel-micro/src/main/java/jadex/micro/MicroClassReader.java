@@ -327,7 +327,18 @@ public class MicroClassReader
 					configinfo.setProvidedServices(psis);
 				}
 				
-				// todo required services
+				RequiredService[] reqs = configs[i].requiredservices();
+				RequiredServiceInfo[] rsis = new RequiredServiceInfo[reqs.length];
+				for(int j=0; j<reqs.length; j++)
+				{
+					Binding bd = reqs[j].binding();
+					RequiredServiceBinding binding = new RequiredServiceBinding(reqs[j].name(), 
+						bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
+						bd.dynamic(), bd.scope(), bd.create(), bd.recover());
+					rsis[j] = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), 
+						reqs[j].multiple(), binding);
+					configinfo.setRequiredServices(rsis);
+				}
 				
 				// todo: store arguments in config not in valueprovider
 				

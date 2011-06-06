@@ -50,13 +50,6 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/** The result. */
 	protected Object result;
 	
-	/**
-	 * 
-	 */
-	public DefaultServiceFetcher()
-	{
-	}
-	
 	//-------- methods --------
 
 	/**

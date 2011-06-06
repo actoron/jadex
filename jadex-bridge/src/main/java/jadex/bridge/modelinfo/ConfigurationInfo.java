@@ -2,14 +2,14 @@ package jadex.bridge.modelinfo;
 
 
 import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
- * 
+ *  Information contained in a component configuration.
  */
 public class ConfigurationInfo extends Startable
 {
@@ -29,6 +29,9 @@ public class ConfigurationInfo extends Startable
 	
 	/** The provided service overridings. */
 	protected List providedservices;
+	
+	/** The required service overridings. */
+	protected List requiredservices;
 	
 	//-------- constructors --------
 	
@@ -172,5 +175,35 @@ public class ConfigurationInfo extends Startable
 		if(providedservices==null)
 			providedservices = new ArrayList();
 		providedservices.add(providedservice);
+	}
+	
+	/**
+	 *  Get the required services.
+	 *  @return The required services.
+	 */
+	public RequiredServiceInfo[] getRequiredServices()
+	{
+		return requiredservices==null? new RequiredServiceInfo[0]: 
+			(RequiredServiceInfo[])requiredservices.toArray(new RequiredServiceInfo[requiredservices.size()]);
+	}
+
+	/**
+	 *  Set the required services.
+	 *  @param required services The required services to set.
+	 */
+	public void setRequiredServices(RequiredServiceInfo[] requiredservices)
+	{
+		this.requiredservices = SUtil.arrayToList(requiredservices);
+	}
+	
+	/**
+	 *  Add a required service.
+	 *  @param requiredservice The required service.
+	 */
+	public void addRequiredService(RequiredServiceInfo requiredservice)
+	{
+		if(requiredservices==null)
+			requiredservices = new ArrayList();
+		requiredservices.add(requiredservice);
 	}
 }

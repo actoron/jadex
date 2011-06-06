@@ -55,6 +55,14 @@ public class ProvidedServiceInfo
 		this.implementation = implementation;
 	}
 	
+//	/**
+//	 *  Create a new service info.
+//	 */
+//	public ProvidedServiceInfo(ProvidedServiceInfo orig)
+//	{
+//		this(orig.getType(), new ProvidedServiceImplementation(orig.getImplementation()));
+//	}
+	
 	//-------- methods --------
 
 	/**

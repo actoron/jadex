@@ -43,7 +43,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.clock.ITimedObject;
-import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.commons.IFilter;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -737,22 +736,22 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		return adapter.isExternalThread();
 	}
 	
-	/**
-	 *  Create the service container.
-	 *  @return The service container.
-	 */
-	public IServiceContainer getServiceContainer()
-	{
-		if(container==null)
-		{
-			// todo: support container customization via bpmn file
-//			container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
-			container = new ComponentServiceContainer(getComponentAdapter(), BpmnFactory.FILETYPE_BPMNPROCESS,
-				getModel().getRequiredServices(), bindings);
-		}
-		return container;
-	}
-
+//	/**
+//	 *  Create the service container.
+//	 *  @return The service container.
+//	 */
+//	public IServiceContainer getServiceContainer()
+//	{
+//		if(container==null)
+//		{
+//			// todo: support container customization via bpmn file
+////			container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+//			container = new ComponentServiceContainer(getComponentAdapter(), BpmnFactory.FILETYPE_BPMNPROCESS,
+//				getModel().getRequiredServices(), bindings);
+//		}
+//		return container;
+//	}
+	
 	/**
 	 *  Get the model of the BPMN process instance.
 	 *  @return The model.

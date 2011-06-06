@@ -63,7 +63,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	protected Logger logger;
 	
 	/** Flag to indicate a fatal error (component termination will not be passed to instance) */
-//	protected boolean fatalerror;
 	protected Exception exception;
 	
 	/** Flag to indicate that the initial step was performed. */

@@ -450,18 +450,18 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		return getComponentAdapter();
 	}
 
-	/**
-	 *  Create the service container.
-	 *  @return The service container.
-	 */
-	public IServiceContainer getServiceContainer()
-	{
-		if(container==null)
-		{
-			container = microagent.createServiceContainer();
-		}
-		return container;
-	}
+//	/**
+//	 *  Create the service container.
+//	 *  @return The service container.
+//	 */
+//	public IServiceContainer getServiceContainer()
+//	{
+//		if(container==null)
+//		{
+//			container = microagent.createServiceContainer();
+//		}
+//		return container;
+//	}
 
 	/**
 	 *  Add a message handler.

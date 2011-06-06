@@ -145,9 +145,9 @@
 		<providedservice class="IComponentFactoryExtensionService">
 			<implementation class="jadex.extension.envsupport.EnvSupportExtensionService"/>
 		</providedservice>
-		<providedservice class="IComponentFactoryExtensionService">
+		<!-- <providedservice class="IComponentFactoryExtensionService">
 			<implementation class="jadex.extension.agr.AGRExtensionService"/>
-		</providedservice>
+		</providedservice> -->
 		
 		<requiredservice name="factoryservices" class="IComponentFactory" multiple="true"/>
 	</services>

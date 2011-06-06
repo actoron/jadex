@@ -60,7 +60,7 @@ public class RequiredServiceBinding
 	 *  Create a new binding.
 	 */
 	public RequiredServiceBinding(String name, String componentname,
-			String componenttype, boolean dynamic, String scope, boolean create, boolean recover)
+		String componenttype, boolean dynamic, String scope, boolean create, boolean recover)
 	{
 		this.name = name;
 		this.componentname = componentname;
@@ -70,6 +70,15 @@ public class RequiredServiceBinding
 		this.create = create;
 		this.recover = recover;
 //		this.componentfilename = componentfilename;
+	}
+	
+	/**
+	 *  Create a new binding.
+	 */
+	public RequiredServiceBinding(RequiredServiceBinding orig)
+	{
+		this(orig.getName(), orig.getComponentName(), orig.getComponentType(), 
+			orig.isDynamic(), orig.getScope(), orig.isCreate(), orig.isRecover());
 	}
 
 	//-------- methods --------

@@ -6,10 +6,13 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.RemoteComponentListener;
+import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.IValueFetcher;
@@ -19,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -351,6 +355,52 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	public String getConfiguration()
 	{
 		return this.config;
+	}
+	
+	/**
+	 *  Create the service container.
+	 *  @return The service container.
+	 */
+	public IServiceContainer getServiceContainer()
+	{
+		if(container==null)
+		{
+			// Init service container.
+//			MExpressionType mex = model.getContainer();
+//			if(mex!=null)
+//			{
+//				container = (IServiceContainer)mex.getParsedValue().getValue(fetcher);
+//			}
+//			else
+//			{
+//				container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+				
+				RequiredServiceInfo[] ms = getModel().getRequiredServices();
+				
+				Map sermap = new LinkedHashMap();
+				for(int i=0; i<ms.length; i++)
+				{
+					sermap.put(ms[i].getName(), ms[i]);
+				}
+	
+				if(getConfiguration()!=null)
+				{
+					ConfigurationInfo cinfo = getModel().getConfiguration(getConfiguration());
+					RequiredServiceInfo[] cs = cinfo.getRequiredServices();
+					for(int i=0; i<cs.length; i++)
+					{
+						RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(cs[i].getName());
+						RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType(), rsi.isMultiple(), 
+							new RequiredServiceBinding(cs[i].getDefaultBinding()));
+						sermap.put(newrsi.getName(), newrsi);
+					}
+				}
+				
+				container = new ComponentServiceContainer(getComponentAdapter(), getComponentDescription().getType(),
+					(RequiredServiceInfo[])sermap.values().toArray(new RequiredServiceInfo[sermap.size()]), bindings);
+//			}			
+		}
+		return container;
 	}
 	
 }

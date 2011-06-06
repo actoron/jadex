@@ -432,8 +432,9 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			ProvidedServiceInfo[] cs = cinfo.getProvidedServices();
 			for(int i=0; i<cs.length; i++)
 			{
-	//			ProvidedServiceInfo psi = (ProvidedServiceInfo)sermap.get(cs[i].getType());
-				sermap.put(cs[i].getType(), cs[i]);
+				ProvidedServiceInfo psi = (ProvidedServiceInfo)sermap.get(cs[i].getType());
+				ProvidedServiceInfo newpsi= new ProvidedServiceInfo(psi.getType(), new ProvidedServiceImplementation(cs[i].getImplementation()));
+				sermap.put(newpsi.getType(), newpsi);
 			}
 		}
 		

@@ -1,6 +1,5 @@
 package jadex.bdi.runtime.interpreter;
 
-import jadex.bdi.BDIAgentFactory;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.ScopedProvidedServiceInfo;
@@ -28,6 +27,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
+import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IInternalService;
@@ -68,6 +68,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1461,22 +1462,21 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		return parent;
 	}
 	
-	/**
-	 *  Create the service container.
-	 *  @return The service container.
-	 */
-	public IServiceContainer getServiceContainer()
-	{
-		if(container==null)
-		{
-			RequiredServiceBinding[] bindings = (RequiredServiceBinding[])state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_bindings);
-			container = new ComponentServiceContainer(getAgentAdapter(), BDIAgentFactory.FILETYPE_BDIAGENT, getModel().getRequiredServices(), bindings);
-		}
-		return container;
-	}
+//	/**
+//	 *  Create the service container.
+//	 *  @return The service container.
+//	 */
+//	public IServiceContainer getServiceContainer()
+//	{
+//		if(container==null)
+//		{
+//			RequiredServiceBinding[] bindings = (RequiredServiceBinding[])state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_bindings);
+//			container = new ComponentServiceContainer(getAgentAdapter(), BDIAgentFactory.FILETYPE_BDIAGENT, getModel().getRequiredServices(), bindings);
+//		}
+//		return container;
+//	}
 	
 	//-------- helper methods --------
-	
 	
 	/**
 	 *  Get the interpreter for an agent object.
@@ -1807,5 +1807,52 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	public Collection getInternalComponentListeners()
 	{
 		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Create the service container.
+	 *  @return The service container.
+	 */
+	public IServiceContainer getServiceContainer()
+	{
+		if(container==null)
+		{
+			// Init service container.
+//			MExpressionType mex = model.getContainer();
+//			if(mex!=null)
+//			{
+//				container = (IServiceContainer)mex.getParsedValue().getValue(fetcher);
+//			}
+//			else
+//			{
+//				container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+				
+				RequiredServiceInfo[] ms = getModel().getRequiredServices();
+				
+				Map sermap = new LinkedHashMap();
+				for(int i=0; i<ms.length; i++)
+				{
+					sermap.put(ms[i].getName(), ms[i]);
+				}
+	
+				String config = (String)getState().getAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_configuration);
+				if(config!=null)
+				{
+					ConfigurationInfo cinfo = getModel().getConfiguration(config);
+					RequiredServiceInfo[] cs = cinfo.getRequiredServices();
+					for(int i=0; i<cs.length; i++)
+					{
+						RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(cs[i].getName());
+						RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType(), rsi.isMultiple(), 
+							new RequiredServiceBinding(cs[i].getDefaultBinding()));
+						sermap.put(newrsi.getName(), newrsi);
+					}
+				}
+				RequiredServiceBinding[] bindings = (RequiredServiceBinding[])getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_bindings);
+				container = new ComponentServiceContainer(getComponentAdapter(), getComponentDescription().getType(),
+					(RequiredServiceInfo[])sermap.values().toArray(new RequiredServiceInfo[sermap.size()]), bindings);
+//			}			
+		}
+		return container;
 	}
 }

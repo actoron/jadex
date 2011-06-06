@@ -3,11 +3,16 @@ package jadex.bridge.service;
 import jadex.commons.SReflect;
 
 /**
- * 
+ *  Contains information for provided service implementation:
+ *  - implementation class or
+ *  - creation expression or
+ *  - implementation forward to other component via binding 
  */
 public class ProvidedServiceImplementation
 {
 	// todo: use UnparsedExpression instead of implementation and expression text?
+	
+	//-------- attributes --------
 	
 	/** The implementation class. */
 	protected Class implementation;
@@ -19,17 +24,20 @@ public class ProvidedServiceImplementation
 	protected RequiredServiceBinding binding;
 
 	/** The proxy type. */
-	protected String	proxytype;
+	protected String proxytype;
+	
+	//-------- constructors --------
 	
 	/**
-	 * 
+	 *  Create a new service implementation.
 	 */
 	public ProvidedServiceImplementation()
 	{
+		// bean constructor.
 	}
 	
 	/**
-	 * 
+	 *  Create a new service implementation.
 	 */
 	public ProvidedServiceImplementation(Class implementation,
 		String expression, String proxytype, RequiredServiceBinding binding)
@@ -39,7 +47,17 @@ public class ProvidedServiceImplementation
 		this.proxytype = proxytype;
 		this.binding = binding;
 	}
+	
+	/**
+	 *  Create a new service implementation.
+	 */
+	public ProvidedServiceImplementation(ProvidedServiceImplementation prov)
+	{
+		this(prov.getImplementation(), prov.getExpression(), prov.getProxytype(), prov.getBinding()!=null? new RequiredServiceBinding(prov.getBinding()): null);
+	}
 
+	//-------- methods --------
+	
 	/**
 	 *  Get the implementation.
 	 *  @return The implementation.
