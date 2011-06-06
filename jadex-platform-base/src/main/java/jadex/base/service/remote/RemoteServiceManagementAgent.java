@@ -56,7 +56,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					{
 						final ILibraryService libservice = (ILibraryService)result;
 						rms = new RemoteServiceManagementService((IMicroExternalAccess)getExternalAccess(), clock, libservice);
-						addService(IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
+						addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
 						ret.setResult(null);
 					}
 				}));

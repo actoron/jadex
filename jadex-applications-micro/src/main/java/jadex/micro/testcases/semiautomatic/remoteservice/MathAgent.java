@@ -14,7 +14,7 @@ public class MathAgent extends MicroAgent
 	 */
 	public IFuture	agentCreated()
 	{
-		addService(IMathService.class, new MathService(getServiceContainer()), BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
+		addService("mathservice", IMathService.class, new MathService(getServiceContainer()), BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
 		return IFuture.DONE;
 	}
 }

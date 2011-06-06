@@ -34,6 +34,22 @@ public class BasicService implements IInternalService
 	/** The service properties. */
 	protected Map properties;
 	
+	
+	/** The provider id. */
+	protected Object providerid;
+	
+	/** The type. */
+	protected Class type;
+//	
+//	/** The name. */
+//	protected String name;
+//	
+//	/** The type. */
+//	protected Class type;
+//	
+//	/** The implementation class. */
+//	protected Class implclazz;
+	
 	//-------- constructors --------
 
 	/**
@@ -52,22 +68,25 @@ public class BasicService implements IInternalService
 		this.sid = sid;
 	}*/
 	
-	/**
-	 *  Create a new service.
-	 */
-	public BasicService(Object providerid, Class type, Map properties)
-	{
-		this(providerid, type, null, properties);
-	}
+//	/**
+//	 *  Create a new service.
+//	 */
+//	public BasicService(Object providerid, Class type, Map properties)
+//	{
+//		this(providerid, type, null, properties);
+//	}
 	
 	/**
 	 *  Create a new service.
 	 */
-	public BasicService(Object providerid, Class type, Class implclazz, Map properties)
+//	public BasicService(Object providerid, Class type, Class implclazz, Map properties)
+	public BasicService(Object providerid, Class type, Map properties)
 	{
 //		if(!SReflect.isSupertype(type, getClass()))
 //			throw new RuntimeException("Service must implement provided interface: "+getClass().getName()+", "+type.getName());
-		this.sid = createServiceIdentifier(providerid, type, implclazz==null ? getClass() : implclazz);
+		this.providerid = providerid;
+		this.type = type;
+//		this.implclazz = implclazz;
 		this.properties	= properties;
 		
 		// todo: move to be able to use the constant
@@ -106,11 +125,22 @@ public class BasicService implements IInternalService
 	}
 	
 	/**
+	 *  Set the service identifier.
+	 */
+	public void createServiceIdentifier(String name, Class implclazz)
+	{
+		this.sid = createServiceIdentifier(providerid, name, type, implclazz);
+	}
+	
+	/**
 	 *  Get the service id.
 	 *  @return The service id.
 	 */
 	public IServiceIdentifier getServiceIdentifier()
 	{
+		if(sid==null)
+			throw new RuntimeException("No service identifier: "+this);
+//			sid = createServiceIdentifier(providerid, name, type, implclazz==null ? getClass() : implclazz);
 		return sid;
 	}
 	
@@ -218,9 +248,9 @@ public class BasicService implements IInternalService
 	 *  @param servicename The service name.
 	 *  @return A service identifier.
 	 */
-	public static IServiceIdentifier createServiceIdentifier(Object providerid, Class servicetype, Class serviceimpl)
+	public static IServiceIdentifier createServiceIdentifier(Object providerid, String servicename, Class servicetype, Class serviceimpl)
 	{
-		return new ServiceIdentifier(providerid, servicetype, generateServiceName(serviceimpl));
+		return new ServiceIdentifier(providerid, servicetype, servicename!=null? servicename: generateServiceName(serviceimpl));
 	}
 	
 	/**

@@ -228,7 +228,7 @@ public class MicroClassReader
 					bd.dynamic(), bd.scope(), bd.create(), bd.recover());
 				ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
 					im.expression().length()>0? im.expression(): null, im.proxytype(), bind);
-				psis[i] = new ProvidedServiceInfo(vals[i].type(), impl);
+				psis[i] = new ProvidedServiceInfo(vals[i].name().length()>0? vals[i].name(): null, vals[i].type(), impl);
 			}
 			modelinfo.setProvidedServices(psis);
 		}
@@ -323,7 +323,7 @@ public class MicroClassReader
 						bd.dynamic(), bd.scope(), bd.create(), bd.recover());
 					ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
 						im.expression().length()>0? im.expression(): null, im.proxytype(), bind);
-					psis[j] = new ProvidedServiceInfo(provs[j].type(), impl);
+					psis[j] = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl);
 					configinfo.setProvidedServices(psis);
 				}
 				

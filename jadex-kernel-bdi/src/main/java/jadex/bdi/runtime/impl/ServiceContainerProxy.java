@@ -81,9 +81,9 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  @param class The interface.
 	 *  @return The service.
 	 */
-	public IService getProvidedService(Class clazz)
+	public IService[] getProvidedServices(Class clazz)
 	{
-		return plan.getInterpreter().getServiceContainer().getProvidedService(clazz);
+		return plan.getInterpreter().getServiceContainer().getProvidedServices(clazz);
 	}
 	
 	/**

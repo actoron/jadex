@@ -43,7 +43,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 	 *  Get the service provider identifier.
 	 *  @return The provider id.
 	 */
-	public Object	getProviderId()
+	public Object getProviderId()
 	{
 		return providerid;
 	}
@@ -61,7 +61,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 	 *  Get the service type.
 	 *  @return The service type.
 	 */
-	public Class	getServiceType()
+	public Class getServiceType()
 	{
 		return type;
 	}
@@ -80,7 +80,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 	 *  Get the service name.
 	 *  @return The service name.
 	 */
-	public String	getServiceName()
+	public String getServiceName()
 	{
 		return servicename;
 	}

@@ -33,6 +33,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	protected static Set SERVICEMETHODS;
 	protected static Method START_METHOD;
 	protected static Method SHUTDOWN_METHOD;
+	protected static Method CREATESID_METHOD;
 	
 	static
 	{
@@ -44,6 +45,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			SERVICEMETHODS.add(IService.class.getMethod("getServiceIdentifier", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("getPropertyMap", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("isValid", new Class[0]));
+			SERVICEMETHODS.add(IInternalService.class.getMethod("createServiceIdentifier", new Class[]{String.class, Class.class}));
 		}
 		catch(Exception e)
 		{

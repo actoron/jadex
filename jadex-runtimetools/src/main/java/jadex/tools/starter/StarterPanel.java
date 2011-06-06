@@ -1628,6 +1628,7 @@ public class StarterPanel extends JLayeredPane
 					public void exceptionOccurred(Exception exception)
 					{
 						ret.setException(exception);
+//						exception.printStackTrace();
 						jcc.displayError("Problem Starting Component", "Component could not be started.", exception);
 					}
 				});

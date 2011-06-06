@@ -12,6 +12,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ProvidedService
 {
+	/**
+	 *  The name (for referencing/overriding).
+	 */
+	public String name() default "";
+	
 	/** 
 	 *  The service interface type. 
 	 */

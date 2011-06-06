@@ -36,6 +36,7 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -416,7 +417,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		Map sermap = new LinkedHashMap();
 		for(int i=0; i<ms.length; i++)
 		{
-			sermap.put(ms[i].getType(), ms[i]);
+			Object key = ms[i].getName()!=null? ms[i].getName(): ms[i].getType();
+			sermap.put(key, ms[i]);
 		}
 
 		if(config!=null)
@@ -425,9 +427,10 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			ProvidedServiceInfo[] cs = cinfo.getProvidedServices();
 			for(int i=0; i<cs.length; i++)
 			{
-				ProvidedServiceInfo psi = (ProvidedServiceInfo)sermap.get(cs[i].getType());
-				ProvidedServiceInfo newpsi= new ProvidedServiceInfo(psi.getType(), new ProvidedServiceImplementation(cs[i].getImplementation()));
-				sermap.put(newpsi.getType(), newpsi);
+				Object key = cs[i].getName()!=null? cs[i].getName(): cs[i].getType();
+				ProvidedServiceInfo psi = (ProvidedServiceInfo)sermap.get(key);
+				ProvidedServiceInfo newpsi= new ProvidedServiceInfo(psi.getName(), psi.getType(), new ProvidedServiceImplementation(cs[i].getImplementation()));
+				sermap.put(key, newpsi);
 			}
 		}
 		
@@ -452,7 +455,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				{
 					RequiredServiceInfo info = new RequiredServiceInfo("virtual", services[i].getType());
 					IServiceIdentifier sid = BasicService.createServiceIdentifier(getExternalAccess().getServiceProvider().getId(), 
-						info.getType(), BasicServiceInvocationHandler.class);
+						info.getName(), info.getType(), BasicServiceInvocationHandler.class);
 					IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(getExternalAccess(), getComponentAdapter(), sid, info, impl.getBinding());
 					getServiceContainer().addService(service);
 				}
@@ -713,9 +716,9 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  @param service The service.
 	 *  @param proxytype	The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
-	public void addService(Class type, Object service, String proxytype)
+	public void addService(String name, Class type, String proxytype, Object service)
 	{
-		IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(getInternalAccess(), getComponentAdapter(), type, service, proxytype);
+		IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(getInternalAccess(), getComponentAdapter(), service, name, type, proxytype);
 		getServiceContainer().addService(proxy);
 	}
 	
@@ -751,7 +754,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		
 		if(ser!=null)
 		{
-			addService(info.getType(), ser, info.getImplementation().getProxytype());
+			addService(info.getName(), info.getType(), info.getImplementation().getProxytype(), ser);
 		}
 		else
 		{
@@ -941,7 +944,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	public Object	getRawService(Class type)
 	{
 		Object	ret;
-		IService	service	= getServiceContainer().getProvidedService(type);
+		IService[] sers = getServiceContainer().getProvidedServices(type);
+		IService service = sers[0];
 		if(Proxy.isProxyClass(service.getClass()))
 		{
 			BasicServiceInvocationHandler	ih	= (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);

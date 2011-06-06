@@ -129,7 +129,7 @@ public class ProvidedServiceImplementation
 	{
 		this.binding = binding;
 	}
-
+	
 	/**
 	 *  Get the string representation.
 	 */

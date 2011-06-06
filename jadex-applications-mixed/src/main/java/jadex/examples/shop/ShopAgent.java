@@ -25,7 +25,7 @@ public class ShopAgent extends MicroAgent
 	 */
 	public IFuture	agentCreated()
 	{
-		addService(IShopService.class, new ShopService(getExternalAccess(), (String)getArgument("name")));
+		addService("shopservice", IShopService.class, new ShopService(getExternalAccess(), (String)getArgument("name")));
 		return IFuture.DONE;
 	}
 	

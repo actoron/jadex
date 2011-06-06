@@ -9,10 +9,8 @@ public class ProvidedServiceInfo
 {
 	//-------- attributes --------
 
-	// todo:
-	
-//	/** The name (used for referencing). */
-//	protected String name;
+	/** The name (used for referencing). */
+	protected String name;
 	
 	/** The service interface type. */
 	protected Class type;
@@ -35,22 +33,31 @@ public class ProvidedServiceInfo
 	 */
 	public ProvidedServiceInfo(Class type)
 	{
-		this(type, (ProvidedServiceImplementation)null);
+		this(null, type);
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
-	public ProvidedServiceInfo(Class type, String expression)
+	public ProvidedServiceInfo(String name, Class type)
 	{
-		this(type, new ProvidedServiceImplementation(null, expression, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null));
+		this(name, type, (ProvidedServiceImplementation)null);
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
-	public ProvidedServiceInfo(Class type, ProvidedServiceImplementation implementation)
+	public ProvidedServiceInfo(String name, Class type, String expression)
 	{
+		this(name, type, new ProvidedServiceImplementation(null, expression, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null));
+	}
+	
+	/**
+	 *  Create a new service info.
+	 */
+	public ProvidedServiceInfo(String name, Class type, ProvidedServiceImplementation implementation)
+	{
+		this.name = name;
 		this.type = type;
 		this.implementation = implementation;
 	}
@@ -65,6 +72,24 @@ public class ProvidedServiceInfo
 	
 	//-------- methods --------
 
+	/**
+	 *  Get the name.
+	 *  @return the name.
+	 */
+	public String getName()
+	{
+		return name;
+	}
+
+	/**
+	 *  Set the name.
+	 *  @param name The name to set.
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+	
 	/**
 	 *  Get the type.
 	 *  @return The type.
@@ -106,9 +131,6 @@ public class ProvidedServiceInfo
 	 */
 	public String toString()
 	{
-		return "ProvidedServiceInfo(type=" + type + ", implementation="
-			+ implementation + ")";
+		return "ProvidedServiceInfo(name="+name+", type="+ type + ", implementation="+ implementation + ")";
 	}
-	
-	
 }

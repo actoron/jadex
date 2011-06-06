@@ -8,6 +8,8 @@ import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.ProvidedServiceImplementation;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -82,7 +84,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	public BasicServiceInvocationHandler(IService service)
 	{
 		this.service = service;
-		this.sid = service.getServiceIdentifier();
+//		this.sid = service.getServiceIdentifier();
 	}
 	
 	/**
@@ -91,7 +93,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	public BasicServiceInvocationHandler(ServiceInfo service)
 	{
 		this.service = service;
-		this.sid = service.getManagementService().getServiceIdentifier();
+//		this.sid = service.getManagementService().getServiceIdentifier();
 	}
 	
 	//-------- methods --------
@@ -158,7 +160,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			}
 			else
 			{
-				System.out.println("Warning, blocking call: "+method.getName()+" "+sid);
+				System.out.println("Warning, blocking call: "+method.getName()+" "+getServiceIdentifier());
 				ret = fut.get(new ThreadSuspendable());
 			}
 		}
@@ -172,6 +174,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 */
 	public IServiceIdentifier getServiceIdentifier()
 	{
+		if(sid==null)
+		{
+			sid = service instanceof ServiceInfo? ((ServiceInfo)service).getManagementService().getServiceIdentifier():
+				((IService)service).getServiceIdentifier();
+		}
 		return sid;
 	}
 	
@@ -248,7 +255,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 */
 	public int hashCode()
 	{
-		return 31+sid.hashCode();
+		return 31+getServiceIdentifier().hashCode();
 	}
 	
 	/**
@@ -256,7 +263,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 */
 	public boolean equals(Object obj)
 	{
-		return obj instanceof BasicServiceInvocationHandler && ((BasicServiceInvocationHandler)obj).getServiceIdentifier().equals(sid);
+		return obj instanceof BasicServiceInvocationHandler && ((BasicServiceInvocationHandler)obj).getServiceIdentifier().equals(getServiceIdentifier());
 	}
 	
 	/**
@@ -264,7 +271,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 */
 	public String toString()
 	{
-		return sid.toString();
+		return getServiceIdentifier().toString();
 	}
 	
 	//-------- static methods --------
@@ -272,9 +279,14 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	/**
 	 *  Static method for creating a standard service proxy for a provided service.
 	 */
-	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, Class type, Object service, String proxytype)
+	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, Object service, String name, Class type, String proxytype)
 	{
 		IInternalService	ret;
+		
+		if(service instanceof IInternalService)
+		{
+			((IInternalService)service).createServiceIdentifier(name, service.getClass());
+		}
 		
 		if(PROXYTYPE_RAW.equals(proxytype))
 		{
@@ -295,14 +307,14 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			{
 				IService ser = (IService)service;
 				handler = new BasicServiceInvocationHandler(ser);
-				if(type==null)
-				{
-					type = ser.getServiceIdentifier().getServiceType();
-				}
-				else if(!type.equals(ser.getServiceIdentifier().getServiceType()))
-				{
-					throw new RuntimeException("Service does not match its type: "+type+", "+ser.getServiceIdentifier().getServiceType());
-				}
+//				if(type==null)
+//				{
+//					type = ser.getServiceIdentifier().getServiceType();
+//				}
+//				else if(!type.equals(ser.getServiceIdentifier().getServiceType()))
+//				{
+//					throw new RuntimeException("Service does not match its type: "+type+", "+ser.getServiceIdentifier().getServiceType());
+//				}
 			}
 			else
 			{
@@ -324,8 +336,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 					}
 				}
 				
-				BasicService mgmntservice = new BasicService(ia.getExternalAccess().getServiceProvider().getId(), type, service.getClass(), null);
-	
+				BasicService mgmntservice = new BasicService(ia.getExternalAccess().getServiceProvider().getId(), type, null);
+				mgmntservice.createServiceIdentifier(name, service.getClass());
+				
 				Field fields[] = service.getClass().getDeclaredFields();
 				for(int i=0; i<fields.length; i++)
 				{
@@ -385,8 +398,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 				
 				ServiceInfo si = new ServiceInfo(service, mgmntservice);
 				handler = new BasicServiceInvocationHandler(si);
-				
 			}
+			
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 			if(!(service instanceof IService))
 			{
@@ -399,6 +412,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			}
 			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess().getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 		}
+		
+		
 		return ret;
 	}
 	

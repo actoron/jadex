@@ -35,10 +35,4 @@ public interface IService extends IRemotable
 	 *  @return The service property map (if any).
 	 */
 	public Map getPropertyMap();
-	
-//	/**
-//	 *  Get a future that signals when the service is started.
-//	 *  @return A future that signals when the service has been started.
-//	 */
-//	public IFuture signalStarted();
 }

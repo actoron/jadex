@@ -376,7 +376,7 @@ public class CacheServiceContainer	implements IServiceContainer
 
 	// todo: factor out this part of service management?!
 	
-	public IService getProvidedService(Class clazz)
+	public IService[] getProvidedServices(Class clazz)
 	{
 		return null;
 	}

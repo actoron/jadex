@@ -301,13 +301,10 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param class The interface.
 	 *  @return The service.
 	 */
-	public IService getProvidedService(Class clazz)
+	public IService[] getProvidedServices(Class clazz)
 	{
-		IService ret = null;
 		Collection coll = (Collection)services.get(clazz);
-		if(coll!=null && coll.size()>0)
-			ret = (IService)coll.iterator().next();
-		return ret;
+		return coll==null? new IService[0]:(IService[])coll.toArray(new IService[coll.size()]);
 	}
 	
 	/**

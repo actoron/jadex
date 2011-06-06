@@ -31,7 +31,7 @@ public class CorruptAdderAgent extends MicroAgent
 	 */
 	public IFuture agentCreated()
 	{
-		IService addser = getServiceContainer().getProvidedService(IAddService.class);
+		IService addser = getServiceContainer().getProvidedServices(IAddService.class)[0];
 		
 		getServiceContainer().addInterceptor(new AbstractApplicableInterceptor()
 		{

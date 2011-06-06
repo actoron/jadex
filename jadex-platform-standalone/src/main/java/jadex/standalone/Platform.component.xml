@@ -142,12 +142,12 @@
 				new DeploymentService($component.getServiceProvider())
 			</implementation>		
 		</providedservice>
-		<providedservice class="IComponentFactoryExtensionService">
+		<providedservice name="envextension" class="IComponentFactoryExtensionService">
 			<implementation class="jadex.extension.envsupport.EnvSupportExtensionService"/>
 		</providedservice>
-		<!-- <providedservice class="IComponentFactoryExtensionService">
+		<providedservice name="agrextension" class="IComponentFactoryExtensionService">
 			<implementation class="jadex.extension.agr.AGRExtensionService"/>
-		</providedservice> -->
+		</providedservice>
 		
 		<requiredservice name="factoryservices" class="IComponentFactory" multiple="true"/>
 	</services>

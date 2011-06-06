@@ -1,5 +1,7 @@
 package jadex.micro.testcases;
 
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Configuration;
@@ -17,14 +19,21 @@ import jadex.micro.annotation.ProvidedServices;
 	@Configuration(name="b", providedservices=@ProvidedService(type=IAService.class, 
 		implementation=@Implementation(expression="$component.getService()")))
 })
-public class ServiceConfigurationsAgent extends MicroAgent implements IAService
+public class ProvidedServiceConfigurationsAgent extends MicroAgent implements IAService
 {
 	/**
 	 *  Agent created.
 	 */
 	public IFuture agentCreated()
 	{
-		System.out.println("service impl: "+getServiceContainer().getProvidedService(IAService.class));
+		IAService as = (IAService)getServiceContainer().getProvidedServices(IAService.class)[0];
+		as.test().addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				System.out.println(result);
+			}
+		});
 		return super.agentCreated();
 	}
 	
@@ -33,8 +42,7 @@ public class ServiceConfigurationsAgent extends MicroAgent implements IAService
 	 */
 	public IFuture test()
 	{
-		System.out.println("a");
-		return IFuture.DONE;
+		return new Future("a");
 	}
 	
 	/**
@@ -46,8 +54,7 @@ public class ServiceConfigurationsAgent extends MicroAgent implements IAService
 		{
 			public IFuture test()
 			{
-				System.out.println("b");
-				return IFuture.DONE;
+				return new Future("b");
 			}
 		};
 	}

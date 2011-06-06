@@ -80,7 +80,7 @@ public class ChatPanel extends JPanel
 			@XMLClassname("addlistener")
 			public Object execute(IInternalAccess ia)
 			{
-				return ia.getServiceContainer().getProvidedService(IChatService.class);
+				return ia.getServiceContainer().getProvidedServices(IChatService.class)[0];
 //				final Future ret = new Future();
 //				ia.getServiceContainer().getRequiredService("mychatservice").addResultListener(
 //					ia.createResultListener(new DelegationResultListener(ret)));

@@ -18,4 +18,9 @@ public interface IInternalService extends IService
 	 *  @return A future that is done when the service has completed its shutdown.  
 	 */
 	public IFuture	shutdownService();
+	
+	/**
+	 *  Set the service identifier.
+	 */
+	public void createServiceIdentifier(String name, Class implclazz);
 }
