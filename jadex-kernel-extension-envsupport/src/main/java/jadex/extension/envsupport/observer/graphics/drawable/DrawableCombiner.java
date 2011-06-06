@@ -160,7 +160,6 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 				fetcher.setValue("$drawable", this);
 				fetcher.setValue("$object", obj);
 				fetcher.setValue("$perspective", viewport.getPerspective());
-//				fetcher.setValue("$space", viewport.getPerspective().getObserverCenter().getSpace());
 				ret = ((IParsedExpression)ret).getValue(fetcher);
 			}
 			

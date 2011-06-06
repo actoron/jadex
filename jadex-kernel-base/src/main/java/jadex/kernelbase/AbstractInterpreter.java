@@ -392,7 +392,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 						RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(cs[i].getName());
 						RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType(), rsi.isMultiple(), 
 							new RequiredServiceBinding(cs[i].getDefaultBinding()));
-						sermap.put(newrsi.getName(), newrsi);
+						sermap.put(cs[i].getName(), newrsi);
 					}
 				}
 				

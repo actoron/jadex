@@ -54,6 +54,9 @@ public class RequiredServiceInfo
 	public RequiredServiceInfo()
 	{
 		// bean constructor
+		
+		// Hack!!! Initialize with default values to resemble annotation behavior.
+		this(null, null);
 	}
 	
 	/**

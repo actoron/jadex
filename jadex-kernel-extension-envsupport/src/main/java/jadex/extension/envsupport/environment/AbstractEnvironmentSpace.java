@@ -2450,25 +2450,25 @@ public abstract class AbstractEnvironmentSpace extends MSpaceInstance implements
 		return exta;
 	}
 	
-//	/**
-//	 * Returns a property.
-//	 * @param name name of the property
-//	 * @return the property
-//	 */
-//	public Object getProperty(String name)
-//	{
-//		synchronized(monitor)
-//		{
-//			Object ret = super.getProperty(name);
-//			
-//			if(ret instanceof IParsedExpression)
-//			{
-//				ret = ((IParsedExpression) ret).getValue(getFetcher());
-//			}
-//			
-//			return ret;
-//		}
-//	}
+	/**
+	 * Returns a property.
+	 * @param name name of the property
+	 * @return the property
+	 */
+	public Object getProperty(String name)
+	{
+		synchronized(monitor)
+		{
+			Object ret = super.getProperty(name);
+			
+			if(ret instanceof IParsedExpression)
+			{
+				ret = ((IParsedExpression) ret).getValue(getFetcher());
+			}
+			
+			return ret;
+		}
+	}
 	
 	/**
 	 *  Get the value fetcher.

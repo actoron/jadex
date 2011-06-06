@@ -35,7 +35,6 @@ public abstract class AbstractJ2DRenderer implements IJ2DRenderer
 			SimpleValueFetcher fetcher = new SimpleValueFetcher(vp.getPerspective().getObserverCenter().getSpace().getFetcher());
 			fetcher.setValue("$object", obj);
 			fetcher.setValue("$perspective", vp.getPerspective());
-//			fetcher.setValue("$space", vp.getPerspective().getObserverCenter().getSpace());
 
 			draw = ((Boolean)drawcondition.getValue(fetcher)).booleanValue();
 		}
