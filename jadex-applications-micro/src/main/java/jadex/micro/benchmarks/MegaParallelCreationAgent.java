@@ -11,7 +11,7 @@ import java.util.Map;
  *  Agent creation benchmark. 
  */
 @Arguments({
-	@Argument(name="num", defaultvalue="1", typename="int"),
+	@Argument(name="num", defaultvalue="1", typename="int")
 })
 public class MegaParallelCreationAgent extends MicroAgent
 {

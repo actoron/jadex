@@ -38,8 +38,8 @@ import java.util.Map;
 @Description("Test if services of (earlier) sibling components can be found and used.")
 @Results(@Result(name="testresults", typename="Testcase"))
 @ComponentTypes({
-	@ComponentType(name="a", filename="AAgent.class"), 
-	@ComponentType(name="b", filename="BAgent.class"), 
+	@ComponentType(name="a", filename="AAgent.class"),
+	@ComponentType(name="b", filename="BAgent.class")
 })
 @Configurations(@Configuration(name="def", components={
 	@Component(type="a"), 
