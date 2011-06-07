@@ -1,13 +1,10 @@
 package jadex.micro.testcases;
 
-import javax.management.ServiceNotFoundException;
-
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -18,8 +15,10 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
+import javax.management.ServiceNotFoundException;
+
 /**
- * 
+ *  Simple test agent with one service.
  */
 @ProvidedServices(@ProvidedService(type=IBService.class, implementation=@Implementation(expression="$component")))
 @Results(@Result(name="exception", typename="Exception"))
@@ -29,7 +28,7 @@ public class BAgent extends MicroAgent implements IBService
 	protected IInternalAccess access;
 	
 	/**
-	 * 
+	 *  Init service method.
 	 */
 	@ServiceStart
 	public IFuture start()
@@ -40,13 +39,13 @@ public class BAgent extends MicroAgent implements IBService
 		{
 			public void resultAvailable(Object result)
 			{
-				System.out.println("found service");
+//				System.out.println("found service");
 				IAService ser = (IAService)result;
 				ser.test().addResultListener(createResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
-						System.out.println("invoked service");
+//						System.out.println("invoked service");
 						ret.setResult(result);
 					}
 					

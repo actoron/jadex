@@ -14,7 +14,7 @@
 	
 	<services>
 		<providedservice class="IAService">
-			<implementation class="ServiceConfigurationsAgent"/>
+			<implementation class="ProvidedServiceConfigurationsAgent"/>
 		</providedservice>
 	</services>
 	
@@ -22,7 +22,7 @@
 		<configuration name="a"/>
 		<configuration name="b">
 			<services>
-				<providedservice ref="IAService">
+				<providedservice name="IAService">
 					<implementation>ServiceConfigurationsAgent.getService()</implementation>
 				</providedservice>
 			</services>

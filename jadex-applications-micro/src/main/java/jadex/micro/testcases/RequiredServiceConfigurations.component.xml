@@ -22,7 +22,7 @@
 		<configuration name="a"/>
 		<configuration name="b">
 			<services>
-				<requiredservice ref="IAService">
+				<requiredservice name="IAService">
 					<binding scope="local"/>
 				</requiredservice>
 			</services>

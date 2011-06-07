@@ -359,12 +359,10 @@ public class ComponentXMLReader
 				new AttributeInfo(new AccessInfo("class", "className"))
 			}, null)));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype"), new QName(uri, "services"), new QName(uri, "providedservice")}), 
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "providedservice")}), 
 			new ObjectInfo(ProvidedServiceInfo.class),// new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
-//				new AttributeInfo(new AccessInfo("class", "className")),
 				new AttributeInfo(new AccessInfo("class", "type"), new AttributeConverter(classconv, reclassconv)),
-//				new AttributeInfo(new AccessInfo("implementation", "implementation"))
 			}, null), null, new BeanObjectReaderHandler()));
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "implementation")), new ObjectInfo(ProvidedServiceImplementation.class),
 			new MappingInfo(null, null, "expression", new AttributeInfo[]{
@@ -381,16 +379,6 @@ public class ComponentXMLReader
 				new AttributeInfo(new AccessInfo("componentname", "componentName")),
 				new AttributeInfo(new AccessInfo("componenttype", "componentType")),
 			})));
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "configuration"), new QName(uri, "services"), new QName(uri, "providedservice")}), 
-			new ObjectInfo(ProvidedServiceInfo.class),// new ExpressionProcessor()), 
-			new MappingInfo(null, null, "value", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("ref", "type"), new AttributeConverter(classconv, reclassconv)),
-			}, null), null, new BeanObjectReaderHandler()));
-		
-//		types.add(new TypeInfo(new XMLInfo(new QName(uri, "providedservice")), new ObjectInfo(ProvidedServiceInfo.class),// new ExpressionProcessor()), 
-//			new MappingInfo(null, null, "value", new AttributeInfo[]{
-//			new AttributeInfo(new AccessInfo("class", "type"), new AttributeConverter(classconv, reclassconv)),
-//			}, null), null, new BeanObjectReaderHandler()));
 		
 //		types.add(new TypeInfo(new XMLInfo(new QName(uri, "container")), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
 //			new MappingInfo(null, null, "value", new AttributeInfo[]{
@@ -401,8 +389,6 @@ public class ComponentXMLReader
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "className"))
 			}, null), null, new BeanObjectReaderHandler()));
-					
-		
 		
 		for(int i=0; mappings!=null && i<mappings.length; i++)
 		{

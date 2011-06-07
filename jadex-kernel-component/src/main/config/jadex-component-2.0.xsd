@@ -377,7 +377,8 @@
 	</xs:complexType>
 	<xs:complexType name="describabletype"/>
 	<xs:complexType name="serviceref">
-		<xs:attribute name="ref" type="xs:string" use="required"/>
+		<xs:attribute name="name" type="xs:string" use="optional"/>
+		<xs:attribute name="class" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<xs:complexType name="implementation" mixed="true">
 		<xs:sequence>
