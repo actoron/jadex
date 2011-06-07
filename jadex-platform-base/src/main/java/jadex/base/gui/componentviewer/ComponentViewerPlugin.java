@@ -7,7 +7,7 @@ import jadex.base.gui.asynctree.INodeListener;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
-import jadex.base.gui.componenttree.ServiceNode;
+import jadex.base.gui.componenttree.ProvidedServiceNode;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
@@ -321,9 +321,9 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 				{
 					final Object tmp = paths[i].getLastPathComponent();
 					
-					if(tmp instanceof ServiceNode)
+					if(tmp instanceof ProvidedServiceNode)
 					{
-						final ServiceNode node = (ServiceNode)tmp;
+						final ProvidedServiceNode node = (ProvidedServiceNode)tmp;
 						final IService service = node.getService();
 
 						AbstractJCCPlugin.getClassLoader(((IActiveComponentTreeNode)node.getParent().getParent()).getComponentIdentifier(), getJCC())
@@ -478,9 +478,9 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	protected boolean isNodeViewable(final ITreeNode node)
 	{
 		boolean ret = false;
-		if(node instanceof ServiceNode)
+		if(node instanceof ProvidedServiceNode)
 		{
-			Map	props	= ((ServiceNode)node).getService().getPropertyMap();
+			Map	props	= ((ProvidedServiceNode)node).getService().getPropertyMap();
 			ret = props!=null && props.get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS)!=null;
 		}
 		else if(node instanceof IActiveComponentTreeNode)

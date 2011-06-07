@@ -325,7 +325,8 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	//							if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
 	//								System.err.println("searchChildren done6?: "+ComponentTreeNode.this);
 								List	services	= (List)result;
-								if(services!=null && !services.isEmpty())
+								
+								if((services!=null && services.size()>0 || (reqs!=null && reqs.length>0)))
 								{
 									ServiceContainerNode	scn	= (ServiceContainerNode)getModel().getNode(getId()+ServiceContainerNode.NAME);
 									if(scn==null)
@@ -334,22 +335,28 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 									children.add(0, scn);
 									
 									final List	subchildren	= new ArrayList();
-									for(int i=0; i<services.size(); i++)
+									if(services!=null)
 									{
-										IService service	= (IService)services.get(i);
-										ServiceNode	sn	= (ServiceNode)getModel().getNode(service.getServiceIdentifier());
-										if(sn==null)
-											sn	= new ServiceNode(scn, getModel(), getTree(), service);
-										subchildren.add(sn);
+										for(int i=0; i<services.size(); i++)
+										{
+											IService service	= (IService)services.get(i);
+											ProvidedServiceNode	sn	= (ProvidedServiceNode)getModel().getNode(service.getServiceIdentifier());
+											if(sn==null)
+												sn	= new ProvidedServiceNode(scn, getModel(), getTree(), service);
+											subchildren.add(sn);
+										}
 									}
 									
-									for(int i=0; i<reqs.length; i++)
+									if(reqs!=null)
 									{
-										String nid = ea.getServiceProvider().getId()+"."+reqs[i].getName();
-										RequiredServiceNode	sn = (RequiredServiceNode)getModel().getNode(nid);
-										if(sn==null)
-											sn	= new RequiredServiceNode(scn, getModel(), getTree(), reqs[i], nid);
-										subchildren.add(sn);
+										for(int i=0; i<reqs.length; i++)
+										{
+											String nid = ea.getServiceProvider().getId()+"."+reqs[i].getName();
+											RequiredServiceNode	sn = (RequiredServiceNode)getModel().getNode(nid);
+											if(sn==null)
+												sn	= new RequiredServiceNode(scn, getModel(), getTree(), reqs[i], nid);
+											subchildren.add(sn);
+										}
 									}
 									
 									final ServiceContainerNode	node	= scn;
@@ -365,7 +372,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 										}
 									});
 								}
-	
+								
 								ready[1]	= true;
 								if(ready[0] &&  ready[1])
 								{

@@ -4,6 +4,7 @@ import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.commons.SReflect;
 import jadex.commons.gui.SGUI;
 
 import javax.swing.Icon;
@@ -21,7 +22,8 @@ public class RequiredServiceNode extends AbstractTreeNode
 	/** The service container icon. */
 	private static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"service", SGUI.makeIcon(ServiceNode.class, "/jadex/base/gui/images/configure_16.png")
+		"service", SGUI.makeIcon(RequiredServiceNode.class, "/jadex/base/gui/images/required_16.png"),
+		"services", SGUI.makeIcon(RequiredServiceNode.class, "/jadex/base/gui/images/required_multiple_16.png")
 	});
 	
 	//-------- attributes --------
@@ -33,7 +35,7 @@ public class RequiredServiceNode extends AbstractTreeNode
 	protected final String nid;
 
 	/** The properties component (if any). */
-	protected ServiceProperties	propcomp;
+	protected RequiredServiceProperties	propcomp;
 
 	//-------- constructors --------
 	
@@ -73,7 +75,7 @@ public class RequiredServiceNode extends AbstractTreeNode
 	 */
 	public Icon	getIcon()
 	{
-		return icons.getIcon("service");
+		return info.isMultiple()? icons.getIcon("services"): icons.getIcon("service");
 	}
 
 	/**
@@ -91,7 +93,11 @@ public class RequiredServiceNode extends AbstractTreeNode
 	 */
 	public String toString()
 	{
-		return "name: "+info.getName()+" interface:"+info.getType();
+		StringBuffer buf = new StringBuffer();
+		buf.append(SReflect.getUnqualifiedClassName(info.getType()));
+		if(info.getName()!=null)	
+			buf.append(" (").append(info.getName()).append(")");
+		return buf.toString();
 	}
 
 	/**
@@ -108,13 +114,11 @@ public class RequiredServiceNode extends AbstractTreeNode
 	 */
 	public JComponent	getPropertiesComponent()
 	{
-		// todo
-		return null;
-//		if(propcomp==null)
-//		{
-//			propcomp	= new ServiceProperties();
-//		}
-//		propcomp.setService(service);
-//		return propcomp;
+		if(propcomp==null)
+		{
+			propcomp	= new RequiredServiceProperties();
+		}
+		propcomp.setService(info);
+		return propcomp;
 	}
 }

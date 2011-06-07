@@ -453,7 +453,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				}
 				else 
 				{
-					RequiredServiceInfo info = new RequiredServiceInfo("virtual", services[i].getType());
+					RequiredServiceInfo info = new RequiredServiceInfo(BasicService.generateServiceName(services[i].getType())+":virtual", services[i].getType());
 					IServiceIdentifier sid = BasicService.createServiceIdentifier(getExternalAccess().getServiceProvider().getId(), 
 						info.getName(), info.getType(), BasicServiceInvocationHandler.class);
 					IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(getExternalAccess(), getComponentAdapter(), sid, info, impl.getBinding());

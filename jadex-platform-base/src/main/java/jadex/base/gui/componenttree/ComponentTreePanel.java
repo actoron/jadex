@@ -409,7 +409,7 @@ public class ComponentTreePanel extends JSplitPane
 				if(path!=null)
 				{
 					final ServiceContainerNode scn = (ServiceContainerNode)path.getPathComponent(path.getPathCount()-2);
-					final ServiceNode sn = (ServiceNode)path.getLastPathComponent();
+					final ProvidedServiceNode sn = (ProvidedServiceNode)path.getLastPathComponent();
 					scn.getContainer().removeService(sn.getService().getServiceIdentifier()).addResultListener(new SwingDefaultResultListener(proppanel)
 					{
 						public void customResultAvailable(Object result)
@@ -430,9 +430,9 @@ public class ComponentTreePanel extends JSplitPane
 				if(path!=null)
 				{
 					final ITreeNode node = (ITreeNode)path.getLastPathComponent();
-					if(node instanceof ServiceNode)
+					if(node instanceof ProvidedServiceNode)
 					{
-						Object obj = ((ServiceNode)node).getService();
+						Object obj = ((ProvidedServiceNode)node).getService();
 						JPanel panel = new ObjectInspectorPanel(obj);
 						showProperties(panel);
 					}
@@ -483,7 +483,7 @@ public class ComponentTreePanel extends JSplitPane
 						ret.add(pshowprops);
 					}
 					
-					if(nodes[0] instanceof ServiceNode || nodes[0] instanceof IActiveComponentTreeNode)
+					if(nodes[0] instanceof ProvidedServiceNode || nodes[0] instanceof IActiveComponentTreeNode)
 					{
 						Action pshowobject = new AbstractAction((String)showobject.getValue(Action.NAME),
 							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_showobject")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
@@ -496,7 +496,7 @@ public class ComponentTreePanel extends JSplitPane
 						ret.add(pshowobject);
 					}
 					
-					if(nodes[0] instanceof ServiceNode && !Proxy.isProxyClass(((ServiceNode)nodes[0]).getService().getClass()))
+					if(nodes[0] instanceof ProvidedServiceNode && !Proxy.isProxyClass(((ProvidedServiceNode)nodes[0]).getService().getClass()))
 					{
 						Action premoveservice = new AbstractAction((String)removeservice.getValue(Action.NAME),
 							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_kill")}) : (Icon)showprops.getValue(Action.SMALL_ICON))

@@ -4,10 +4,9 @@ import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.gui.SGUI;
-
-import java.lang.reflect.Proxy;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -17,14 +16,14 @@ import javax.swing.UIDefaults;
 /**
  *  Node object representing a service container.
  */
-public class ServiceNode	extends AbstractTreeNode
+public class ProvidedServiceNode	extends AbstractTreeNode
 {
 	//-------- constants --------
 	
 	/** The service container icon. */
 	private static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"service", SGUI.makeIcon(ServiceNode.class, "/jadex/base/gui/images/configure_16.png")
+		"service", SGUI.makeIcon(ProvidedServiceNode.class, "/jadex/base/gui/images/provided_16.png")
 	});
 	
 	//-------- attributes --------
@@ -33,14 +32,14 @@ public class ServiceNode	extends AbstractTreeNode
 	private final IService	service;
 
 	/** The properties component (if any). */
-	protected ServiceProperties	propcomp;
+	protected ProvidedServiceProperties	propcomp;
 
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service container node.
 	 */
-	public ServiceNode(ITreeNode parent, AsyncTreeModel model, JTree tree, IService service)
+	public ProvidedServiceNode(ITreeNode parent, AsyncTreeModel model, JTree tree, IService service)
 	{
 		super(parent, model, tree);
 		this.service	= service;
@@ -92,10 +91,17 @@ public class ServiceNode	extends AbstractTreeNode
 	{
 //		try
 //		{
-		return Proxy.isProxyClass(service.getClass())
-			? SReflect.getUnqualifiedClassName(service.getServiceIdentifier().getServiceType())
-				+" ("+service.getServiceIdentifier().getProviderId()+")"
-			: SReflect.getUnqualifiedClassName(service.getClass());
+		StringBuffer buf = new StringBuffer();
+		buf.append(SReflect.getUnqualifiedClassName(service.getServiceIdentifier().getServiceType()));
+//		buf.append(" (").append(service.getServiceIdentifier().getServiceName()).append(") ");
+//		if(!Proxy.isProxyClass(service.getClass()))
+//			buf.append(" :").append(SReflect.getUnqualifiedClassName(service.getClass()));
+		return buf.toString();
+		
+//		return Proxy.isProxyClass(service.getClass())
+//			? SReflect.getUnqualifiedClassName(service.getServiceIdentifier().getServiceType())
+//				+" ("+service.getServiceIdentifier().getProviderId()+")"
+//			: SReflect.getUnqualifiedClassName(service.getClass());
 //		}
 //		catch(Exception e)
 //		{	
@@ -120,7 +126,7 @@ public class ServiceNode	extends AbstractTreeNode
 	{
 		if(propcomp==null)
 		{
-			propcomp	= new ServiceProperties();
+			propcomp	= new ProvidedServiceProperties();
 		}
 		propcomp.setService(service);
 		return propcomp;

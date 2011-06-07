@@ -234,7 +234,7 @@ public class BasicService implements IInternalService
 	 *  Generate a unique name.
 	 *  @param The calling service class.
 	 */
-	protected static String generateServiceName(Class service)
+	public static String generateServiceName(Class service)
 	{
 		synchronized(BasicService.class)
 		{
