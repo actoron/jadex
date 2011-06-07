@@ -123,20 +123,28 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		{
 			public void customResultAvailable(Object result)
 			{
-				searchChildren(cms, getComponentIdentifier())
-					.addResultListener(new IResultListener()
+				if(result!=null)
 				{
-					public void resultAvailable(Object result)
+					searchChildren(cms, getComponentIdentifier())
+						.addResultListener(new IResultListener()
 					{
-						connected = true;			
-						setChildren((List)result);
-					}
-					public void exceptionOccurred(Exception exception)
-					{
-						connected = false;			
-						setChildren(Collections.EMPTY_LIST);
-					}
-				});
+						public void resultAvailable(Object result)
+						{
+							connected = true;			
+							setChildren((List)result);
+						}
+						public void exceptionOccurred(Exception exception)
+						{
+							connected = false;			
+							setChildren(Collections.EMPTY_LIST);
+						}
+					});
+				}
+				else
+				{
+					connected = false;
+					setChildren(Collections.EMPTY_LIST);					
+				}
 			}
 			
 			public void customExceptionOccurred(Exception exception)

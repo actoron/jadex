@@ -71,6 +71,7 @@ public class ManifestStarter
                 	}
                 	catch (Exception e)
                 	{
+                		e.printStackTrace();
                 	}
                 }
             }
@@ -85,6 +86,7 @@ public class ManifestStarter
         // addUrl is protected - thanks a lot.
 		try
 		{
+//			System.out.println("Manifest Classpath: "+manifestclasspath);
 			Method addurl = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] {URL.class});
 			addurl.setAccessible(true);
 			for (Iterator it = manifestclasspath.iterator(); it.hasNext(); )
