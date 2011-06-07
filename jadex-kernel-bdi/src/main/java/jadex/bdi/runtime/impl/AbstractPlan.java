@@ -542,7 +542,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 */
 	public IServiceContainer getServiceContainer()
 	{
-		return new ServiceContainerProxy(this); 
+		return new ServiceContainerProxy(getInterpreter(), getRCapability()); 
 	}
 
 	//-------- goalbase shortcut methods --------

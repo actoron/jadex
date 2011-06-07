@@ -10,6 +10,7 @@ import jadex.bdi.runtime.IEventbase;
 import jadex.bdi.runtime.IExpressionbase;
 import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.IPlanbase;
+import jadex.bdi.runtime.impl.ServiceContainerProxy;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentDescription;
@@ -396,14 +397,14 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				public void run()
 				{
-					object = getInterpreter().getServiceContainer();
+					object = new ServiceContainerProxy(getInterpreter(), getHandle());
 				}
 			};
 			return (IServiceContainer)invoc.object;
 		}
 		else
 		{
-			return getInterpreter().getServiceContainer();
+			return new ServiceContainerProxy(getInterpreter(), getHandle());
 		}
 	}
 	

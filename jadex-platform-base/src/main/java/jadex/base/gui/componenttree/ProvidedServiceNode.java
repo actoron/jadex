@@ -4,7 +4,6 @@ import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.gui.SGUI;
 

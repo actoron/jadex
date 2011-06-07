@@ -1501,7 +1501,11 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				Object	mcapa	= capas.remove(prefix);
 				OAVCapabilityModel	oavmodel	= model.getSubcapabilityModel(mcapa);
 				RequiredServiceInfo[]	creqs	= oavmodel.getModelInfo().getRequiredServices();
-				container.addRequiredServiceInfos(prefix, creqs);
+				for(int i=0; i<creqs.length; i++)
+				{
+					creqs[i] = new RequiredServiceInfo(prefix+creqs[i].getName(), creqs[i].getType(), creqs[i].isMultiple(), creqs[i].getDefaultBinding());					
+				}
+				container.addRequiredServiceInfos(creqs);
 				
 				Collection	coll	= state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs);
 				if(coll!=null)

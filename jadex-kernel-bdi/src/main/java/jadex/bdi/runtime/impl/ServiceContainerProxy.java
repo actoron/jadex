@@ -1,5 +1,6 @@
 package jadex.bdi.runtime.impl;
 
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IResultSelector;
@@ -23,17 +24,21 @@ public class ServiceContainerProxy implements IServiceContainer
 {
 	//-------- attributes --------
 	
-	/** The plan. */
-	protected AbstractPlan	plan;
+	/** The interpreter. */
+	protected BDIInterpreter	interpreter;
+	
+	/** The scope (rcapability). */
+	protected Object	scope;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a service container proxy.
 	 */
-	public ServiceContainerProxy(AbstractPlan plan)
+	public ServiceContainerProxy(BDIInterpreter interpreter, Object scope)
 	{
-		this.plan	= plan;
+		this.interpreter	= interpreter;
+		this.scope	= scope;
 	}
 	
 	//-------- internal admin methods --------
@@ -65,7 +70,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture	addService(IInternalService service)
 	{
-		return plan.getInterpreter().getServiceContainer().addService(service);
+		return interpreter.getServiceContainer().addService(service);
 	}
 	
 
@@ -75,7 +80,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture	removeService(IServiceIdentifier sid)
 	{
-		return plan.getInterpreter().getServiceContainer().removeService(sid);
+		return interpreter.getServiceContainer().removeService(sid);
 	}
 	
 	//-------- internal user methods --------
@@ -87,7 +92,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IService[] getProvidedServices(Class clazz)
 	{
-		return plan.getInterpreter().getServiceContainer().getProvidedServices(clazz);
+		return interpreter.getServiceContainer().getProvidedServices(clazz);
 	}
 	
 	/**
@@ -98,7 +103,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	public IFuture getRequiredService(String name)
 	{
 		String prefix = findServicePrefix();
-		return plan.getInterpreter().getServiceContainer().getRequiredService(prefix+name);
+		return interpreter.getServiceContainer().getRequiredService(prefix+name);
 	}
 
 	/**
@@ -109,7 +114,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	public IIntermediateFuture getRequiredServices(String name)
 	{
 		String prefix = findServicePrefix();
-		return plan.getInterpreter().getServiceContainer().getRequiredServices(prefix+name);
+		return interpreter.getServiceContainer().getRequiredServices(prefix+name);
 	}
 	
 	/**
@@ -119,7 +124,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	public IFuture getRequiredService(String name, boolean rebind)
 	{
 		String prefix = findServicePrefix();
-		return plan.getInterpreter().getServiceContainer().getRequiredService(prefix+name, rebind);
+		return interpreter.getServiceContainer().getRequiredService(prefix+name, rebind);
 	}
 	
 	/**
@@ -129,7 +134,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
 	{
 		String prefix = findServicePrefix();
-		return plan.getInterpreter().getServiceContainer().getRequiredServices(prefix+name, rebind);
+		return interpreter.getServiceContainer().getRequiredServices(prefix+name, rebind);
 	}
 	
 	/**
@@ -140,7 +145,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public void addInterceptor(IServiceInvocationInterceptor interceptor, IService service, int pos)
 	{
-		plan.getInterpreter().getServiceContainer().addInterceptor(interceptor, service, pos);
+		interpreter.getServiceContainer().addInterceptor(interceptor, service, pos);
 	}
 
 	/**
@@ -150,7 +155,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public void removeInterceptor(IServiceInvocationInterceptor interceptor, IService service)
 	{
-		plan.getInterpreter().getServiceContainer().removeInterceptor(interceptor, service);
+		interpreter.getServiceContainer().removeInterceptor(interceptor, service);
 	}
 
 	/**
@@ -160,7 +165,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IIntermediateFuture	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
 	{
-		return plan.getInterpreter().getServiceContainer().getServices(manager, decider, selector);
+		return interpreter.getServiceContainer().getServices(manager, decider, selector);
 	}
 	
 	/**
@@ -169,7 +174,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture	getParent()
 	{
-		return plan.getInterpreter().getServiceContainer().getParent();
+		return interpreter.getServiceContainer().getParent();
 	}
 	
 	/**
@@ -178,7 +183,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture	getChildren()
 	{
-		return plan.getInterpreter().getServiceContainer().getChildren();
+		return interpreter.getServiceContainer().getChildren();
 	}
 	
 	/**
@@ -187,7 +192,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public Object	getId()
 	{
-		return plan.getInterpreter().getServiceContainer().getId();
+		return interpreter.getServiceContainer().getId();
 	}
 	
 	/**
@@ -196,7 +201,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public String	getType()
 	{
-		return plan.getInterpreter().getServiceContainer().getType();
+		return interpreter.getServiceContainer().getType();
 	}
 	
 	//-------- helper methods --------
@@ -207,11 +212,11 @@ public class ServiceContainerProxy implements IServiceContainer
 	protected String findServicePrefix()
 	{
 		List	path	= new ArrayList();
-		plan.getInterpreter().findSubcapability(plan.getInterpreter().getAgent(), plan.getRCapability(), path);
+		interpreter.findSubcapability(interpreter.getAgent(), scope, path);
 		String prefix	= "";
 		for(int i=0; i<path.size(); i++)
 		{
-			prefix	+= plan.getState().getAttributeValue(path.get(i), OAVBDIRuntimeModel.capabilityreference_has_name)+ ".";
+			prefix	+= interpreter.getState().getAttributeValue(path.get(i), OAVBDIRuntimeModel.capabilityreference_has_name)+ ".";
 		}
 		return prefix;
 	}
@@ -221,6 +226,6 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public RequiredServiceInfo[] getRequiredServiceInfos()
 	{
-		return plan.getInterpreter().getServiceContainer().getRequiredServiceInfos();
+		return interpreter.getServiceContainer().getRequiredServiceInfos();
 	}
 }

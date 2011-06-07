@@ -323,14 +323,8 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public void setRequiredServiceInfos(RequiredServiceInfo[] requiredservices)
 	{
-		if(requiredservices!=null && requiredservices.length>0)
-		{
-			this.requiredserviceinfos = new HashMap();
-			for(int i=0; i<requiredservices.length; i++)
-			{
-				this.requiredserviceinfos.put(requiredservices[i].getName(), requiredservices[i]);
-			}
-		}
+		this.requiredserviceinfos = null;
+		addRequiredServiceInfos(requiredservices);
 	}
 	
 	/**
@@ -338,7 +332,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param prefix The name prefix to use.
 	 *  @param required services The required services to set.
 	 */
-	public void addRequiredServiceInfos(String prefix, RequiredServiceInfo[] requiredservices)
+	public void addRequiredServiceInfos(RequiredServiceInfo[] requiredservices)
 	{
 		if(requiredservices!=null && requiredservices.length>0)
 		{
@@ -346,7 +340,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 				this.requiredserviceinfos = new HashMap();
 			for(int i=0; i<requiredservices.length; i++)
 			{
-				this.requiredserviceinfos.put(prefix+requiredservices[i].getName(), requiredservices[i]);
+				this.requiredserviceinfos.put(requiredservices[i].getName(), requiredservices[i]);
 			}
 		}
 	}
