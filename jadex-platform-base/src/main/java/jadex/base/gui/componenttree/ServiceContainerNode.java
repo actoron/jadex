@@ -26,7 +26,8 @@ public class ServiceContainerNode	extends AbstractTreeNode
 	/** The service container icon. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"service-container", SGUI.makeIcon(ServiceContainerNode.class, "/jadex/base/gui/images/services.png"),
+		"service-container", SGUI.makeIcon(ServiceContainerNode.class, "/jadex/base/gui/images/services_16.png"),
+//		"service-container", SGUI.makeIcon(ServiceContainerNode.class, "/jadex/base/gui/images/services.png"),
 		"overlay_broken", SGUI.makeIcon(ServiceContainerNode.class, "/jadex/base/gui/images/overlay_check.png")
 	});
 	
