@@ -8,8 +8,6 @@ import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.ProvidedServiceImplementation;
-import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.ServiceComponent;

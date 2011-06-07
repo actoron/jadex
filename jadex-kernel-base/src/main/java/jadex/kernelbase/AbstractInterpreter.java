@@ -70,7 +70,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	/** The required service binding information. */
 	protected RequiredServiceBinding[] bindings;
 	
-	/** The extensions. */
+	/** The extension instances. */
 	protected Map extensions;
 
 	//-------- constructors --------
@@ -306,13 +306,13 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  @param name	The argument name.
 	 *  @param value	The argument value.
 	 */
-	public void	addExtension(IExtensionInstance value)
+	public void	addExtension(String name, IExtensionInstance value)
 	{
 		if(extensions==null)
 		{
 			extensions = new HashMap();
 		}
-		extensions.put(value.getName(), value);
+		extensions.put(name, value);
 	}
 	
 	/**

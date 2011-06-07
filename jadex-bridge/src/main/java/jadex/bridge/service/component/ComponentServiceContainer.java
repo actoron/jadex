@@ -6,7 +6,6 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IRequiredServiceFetcher;
-import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.CollectionResultListener;

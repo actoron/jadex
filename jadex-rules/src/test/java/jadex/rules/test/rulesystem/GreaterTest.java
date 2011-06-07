@@ -78,8 +78,8 @@ public class GreaterTest extends TestCase
 		
 		// Create rule system.
 		Rulebase rb = new Rulebase();
+		rb.addRule(rule);
 		system	= new RuleSystem(state,rb, new RetePatternMatcherFunctionality(rb));
-		system.getRulebase().addRule(rule);
 		system.init();
 		
 		// Add blocks with different weights and sizes.

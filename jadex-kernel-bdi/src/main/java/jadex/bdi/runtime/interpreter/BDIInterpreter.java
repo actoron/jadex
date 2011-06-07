@@ -1758,13 +1758,13 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  Add an extension instance.
 	 *  @param extension The extension instance.
 	 */
-	public void	addExtension(IExtensionInstance ext)
+	public void	addExtension(String name, IExtensionInstance ext)
 	{
 		if(extensions==null)
 		{
 			extensions = new HashMap();
 		}
-		extensions.put(ext.getName(), ext);
+		extensions.put(name, ext);
 	}
 	
 	/**
@@ -1772,7 +1772,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  @param name	The name of the space.
 	 *  @return	The space.
 	 */
-	public IExtensionInstance getExtension(final String name)
+	public IExtensionInstance getExtension(String name)
 	{
 		return extensions==null? null: (IExtensionInstance)extensions.get(name);
 	}

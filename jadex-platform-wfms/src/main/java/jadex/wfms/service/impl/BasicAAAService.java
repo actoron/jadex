@@ -5,7 +5,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;

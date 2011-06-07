@@ -70,7 +70,7 @@ public class LoggerAgent extends MicroAgent
 					}
 				});
 				
-				getLogger().warning("test log message");
+				getLogger().info("test log message");
 				
 				setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
 				killAgent();

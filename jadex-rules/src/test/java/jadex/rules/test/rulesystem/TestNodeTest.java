@@ -66,9 +66,9 @@ public class TestNodeTest extends TestCase
 		
 		Rule rule = new Rule("1==1", cond, action);
 		Rulebase rb = new Rulebase();
+		rb.addRule(rule);
 		RuleSystem system = new RuleSystem(OAVStateFactory.createOAVState(OAVJavaType.java_type_model),
 			rb, new RetePatternMatcherFunctionality(rb));
-		system.getRulebase().addRule(rule);
 		system.init();
 		
 //		RetePatternMatcherState rs = ((RetePatternMatcherState)system.getMatcherState());
@@ -112,9 +112,9 @@ public class TestNodeTest extends TestCase
 		
 		Rule rule = new Rule("1==1", cond, action);
 		Rulebase rb = new Rulebase();
+		rb.addRule(rule);
 		RuleSystem system = new RuleSystem(OAVStateFactory.createOAVState(Numberbox.numberbox_type_model),
 			rb, new RetePatternMatcherFunctionality(rb));
-		system.getRulebase().addRule(rule);
 		system.init();
 		
 //		RetePatternMatcherState rs = ((RetePatternMatcherState)system.getMatcherState());

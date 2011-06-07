@@ -1,6 +1,5 @@
 package jadex.extension.envsupport;
 
-import jadex.bridge.modelinfo.IExtensionType;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.IPropertyObject;
 import jadex.commons.SReflect;
@@ -8,7 +7,6 @@ import jadex.commons.Tuple;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.gui.SGUI;
 import jadex.extension.envsupport.dataview.IDataView;
-import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.AvatarMapping;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.math.IVector2;
@@ -36,6 +34,7 @@ import jadex.xml.BasicTypeConverter;
 import jadex.xml.IAttributeConverter;
 import jadex.xml.IContext;
 import jadex.xml.IObjectObjectConverter;
+import jadex.xml.IPostProcessor;
 import jadex.xml.IStringObjectConverter;
 import jadex.xml.ISubObjectConverter;
 import jadex.xml.MappingInfo;
@@ -46,7 +45,6 @@ import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanAccessInfo;
-import jadex.xml.bean.IBeanObjectCreator;
 import jadex.xml.reader.ReadContext;
 
 import java.awt.Color;
@@ -63,7 +61,7 @@ import javax.xml.namespace.QName;
 /**
  *  Java representation of environment space type for xml description.
  */
-public class MEnvSpaceType	extends MSpaceType
+public class MEnvSpaceType
 {
 	//-------- constants --------
 	
@@ -75,10 +73,52 @@ public class MEnvSpaceType	extends MSpaceType
 	
 	//-------- attributes --------
 	
+	/** The name. */
+	protected String name;
+
+	/** The class name. */
+	protected String classname;
+	
 	/** The properties. */
 	protected Map properties;
 	
 	//-------- methods --------
+	
+	/**
+	 *  Get the name.
+	 *  @return The name.
+	 */
+	public String getName()
+	{
+		return this.name;
+	}
+
+	/**
+	 *  Set the name.
+	 *  @param name The name to set.
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	/**
+	 *  Get the classname.
+	 *  @return the classname.
+	 */
+	public String getClassName()
+	{
+		return classname;
+	}
+
+	/**
+	 *  Set the classname.
+	 *  @param classname The classname to set.
+	 */
+	public void setClassName(String classname)
+	{
+		this.classname = classname;
+	}
 	
 	/**
 	 *  Add a property.
@@ -1063,46 +1103,47 @@ public class MEnvSpaceType	extends MSpaceType
 		// type instance declarations.
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "envspace")}), 
-			new ObjectInfo(new IBeanObjectCreator()
-			{
-				public Object createObject(IContext context, Map rawattributes) throws Exception
+			new ObjectInfo(MEnvSpaceInstance.class, new IPostProcessor()
+		{
+				public Object postProcess(IContext context, Object object)
 				{
-					AbstractEnvironmentSpace ret = null;
-					String typename = (String)rawattributes.get("type");
-					IModelInfo mi = (IModelInfo)context.getRootObject();
-					
-					IExtensionType[] spacetypes = mi.getExtensionTypes();
-					for(int i=0; i<spacetypes.length; i++)
+					MEnvSpaceInstance	si	= (MEnvSpaceInstance)object;
+					IModelInfo	model	= (IModelInfo)context.getRootObject();
+					Object[] extypes = model.getExtensionTypes();
+					for(int i=0; i<extypes.length; i++)
 					{
-						if(spacetypes[i].getName().equals(typename))
+						if(extypes[i] instanceof MEnvSpaceType && ((MEnvSpaceType)extypes[i]).getName().equals(si.getTypeName()))
 						{
-							String classname = spacetypes[i].getClassName();
-							Class clazz = SReflect.findClass(classname, mi.getAllImports(), mi.getClassLoader());
-							ret = (AbstractEnvironmentSpace)clazz.newInstance();
-							ret.setType((MSpaceType)spacetypes[i]);
+							si.setType((MEnvSpaceType)extypes[i]);
 							break;
 						}
 					}
-					return ret;
+					
+					return null;
 				}
-			}),
+				
+				public int getPass()
+				{
+					return 1;
+				}
+		}),
 			new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("type", "typeName")),
-			new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo("initProperty")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo("initProperty")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("depth", null, null, null, new BeanAccessInfo("initProperty")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("border", null, null, null, new BeanAccessInfo("initProperty"))),
-			new AttributeInfo(new AccessInfo("neighborhood", null, null, null, new BeanAccessInfo("initProperty")))
+			new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo("property")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo("property")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("depth", null, null, null, new BeanAccessInfo("property")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("border", null, null, null, new BeanAccessInfo("property"))),
+			new AttributeInfo(new AccessInfo("neighborhood", null, null, null, new BeanAccessInfo("property")))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "property"), "properties", null, null, new BeanAccessInfo("initProperty"))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "object"), "objects", null, null, new BeanAccessInfo("initProperty"))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "avatar"), "avatars", null, null, new BeanAccessInfo("initProperty"))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "process"), "processes", null, null, new BeanAccessInfo("initProperty"))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "spaceaction"), "spaceactions", null, null, new BeanAccessInfo("initProperty"))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "dataprovider"), "dataproviders", null, null, new BeanAccessInfo("initProperty"))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "dataconsumer"), "dataconsumers", null, null, new BeanAccessInfo("initProperty"))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "observer"), "observers", null, null, new BeanAccessInfo("initProperty")))			
+			new SubobjectInfo(new AccessInfo(new QName(uri, "property"), "properties", null, null, new BeanAccessInfo("property"))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "object"), "objects", null, null, new BeanAccessInfo("property"))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "avatar"), "avatars", null, null, new BeanAccessInfo("property"))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "process"), "processes", null, null, new BeanAccessInfo("property"))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "spaceaction"), "spaceactions", null, null, new BeanAccessInfo("property"))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "dataprovider"), "dataproviders", null, null, new BeanAccessInfo("property"))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "dataconsumer"), "dataconsumers", null, null, new BeanAccessInfo("property"))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "observer"), "observers", null, null, new BeanAccessInfo("property")))			
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "object")}), new ObjectInfo(MultiCollection.class),
@@ -1451,8 +1492,8 @@ public class MEnvSpaceType	extends MSpaceType
 	{
 		try
 		{
-		Object tmp = map.get(name);
-		return (tmp instanceof List)? ((List)tmp).get(0): tmp; 
+			Object tmp = map.get(name);
+			return (tmp instanceof List)? ((List)tmp).get(0): tmp; 
 		}
 		catch(Exception e)
 		{

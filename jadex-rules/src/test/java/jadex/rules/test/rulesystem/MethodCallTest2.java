@@ -74,8 +74,8 @@ public class MethodCallTest2 extends TestCase
 		
 		// Create rule system.
 		Rulebase rb = new Rulebase();
+		rb.addRule(rule);
 		system	= new RuleSystem(state, rb, new RetePatternMatcherFunctionality(rb));
-		system.getRulebase().addRule(rule);
 		system.init();
 		
 //			state.notifyEventListeners();

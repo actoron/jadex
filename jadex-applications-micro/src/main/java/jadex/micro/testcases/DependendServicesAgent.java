@@ -4,7 +4,6 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.TerminationAdapter;
-import jadex.commons.SUtil;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
@@ -34,7 +33,7 @@ import java.util.Map;
 @Results(@Result(name="testresults", typename="Testcase"))
 @ComponentTypes({
     @ComponentType(name="a", filename="AAgent.class"),
-    @ComponentType(name="b", filename="BAgent.class"),
+    @ComponentType(name="b", filename="BAgent.class")
 })
 @Configurations(@Configuration(name="def", components={
     @Component(type="a"),

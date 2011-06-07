@@ -39,6 +39,8 @@ public class RetePatternMatcherFunctionality
 		// Build existing rules of the rulebase.
 		for(Iterator it=rulebase.getRules().iterator(); it.hasNext(); )
 			node.addRule((IRule)it.next());
+		
+		node.setInited(true);
 
 		rulebase.addRulebaseListener(this);
 	}

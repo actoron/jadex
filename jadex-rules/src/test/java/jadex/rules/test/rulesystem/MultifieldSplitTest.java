@@ -35,9 +35,6 @@ public class MultifieldSplitTest extends TestCase
 	/** The state. */
 	protected IOAVState	state;
 	
-	/** The rule system. */
-	protected RuleSystem	system;
-	
 	/** The list is filled by the action of the condition. */
 	protected List	result;
 		
@@ -50,11 +47,6 @@ public class MultifieldSplitTest extends TestCase
 	{
 		state	= OAVStateFactory.createOAVState(Numberbox.numberbox_type_model);
 		result	= new ArrayList();
-		
-		// Create rule system.
-		Rulebase rb = new Rulebase();
-		system	= new RuleSystem(state, rb, new RetePatternMatcherFunctionality(rb));
-		system.init();
 	}
 	
 	//-------- test methods --------
@@ -83,7 +75,11 @@ public class MultifieldSplitTest extends TestCase
 				result.add("("+x+","+y+")");
 			}
 		});
-		system.getRulebase().addRule(rule);
+		Rulebase rb = new Rulebase();
+		rb.addRule(rule);
+		// Create rule system.
+		RuleSystem	system	= new RuleSystem(state, rb, new RetePatternMatcherFunctionality(rb));
+		system.init();
 		
 //		RetePanel.createReteFrame("Split test", ((RetePatternMatcher)system.getMatcher()).getReteNode());
 //		synchronized(system){system.wait();}
@@ -105,7 +101,6 @@ public class MultifieldSplitTest extends TestCase
 		assertEquals("The condition should trigger with: "+test, test, result);
 		
 //		System.out.println(result);
-		system.getRulebase().removeRule(rule);
 	}
 	
 	/**
@@ -132,7 +127,11 @@ public class MultifieldSplitTest extends TestCase
 				result.add("("+x+")");
 			}
 		});
-		system.getRulebase().addRule(rule);
+		Rulebase rb = new Rulebase();
+		rb.addRule(rule);
+		// Create rule system.
+		RuleSystem	system	= new RuleSystem(state, rb, new RetePatternMatcherFunctionality(rb));
+		system.init();
 		
 //		RetePanel.createReteFrame("Split test", ((RetePatternMatcher)system.getMatcher()).getReteNode());
 //		try{synchronized(system){system.wait();}} catch(Exception e){}
@@ -156,7 +155,6 @@ public class MultifieldSplitTest extends TestCase
 		assertEquals("The condition should trigger with: "+test, test, result);
 		
 //		System.out.println(result);
-		system.getRulebase().removeRule(rule);
 	}
 
 
@@ -190,7 +188,11 @@ public class MultifieldSplitTest extends TestCase
 				result.add("("+x+","+y+")");
 			}
 		});
-		system.getRulebase().addRule(rule);
+		Rulebase rb = new Rulebase();
+		rb.addRule(rule);
+		// Create rule system.
+		RuleSystem	system	= new RuleSystem(state, rb, new RetePatternMatcherFunctionality(rb));
+		system.init();
 		
 //		RetePanel.createReteFrame("Split test", ((RetePatternMatcher)system.getMatcher()).getReteNode());
 //		synchronized(system){system.wait();}
@@ -212,7 +214,6 @@ public class MultifieldSplitTest extends TestCase
 		assertEquals("The condition should trigger with: "+test, test, result);
 		
 //		System.out.println(result);
-		system.getRulebase().removeRule(rule);
 	}
 	
 	/**
@@ -246,7 +247,11 @@ public class MultifieldSplitTest extends TestCase
 				result.add("("+x+","+y+")");
 			}
 		});
-		system.getRulebase().addRule(rule);
+		Rulebase rb = new Rulebase();
+		rb.addRule(rule);
+		// Create rule system.
+		RuleSystem	system	= new RuleSystem(state, rb, new RetePatternMatcherFunctionality(rb));
+		system.init();
 				
 //		RetePanel.createReteFrame("Split test", ((RetePatternMatcher)system.getMatcher()).getReteNode());
 			
@@ -273,7 +278,6 @@ public class MultifieldSplitTest extends TestCase
 		assertEquals("The condition should trigger with: "+test, test, result);
 		
 //		System.out.println(result);
-		system.getRulebase().removeRule(rule);
 	}
 
 	/**
@@ -310,7 +314,11 @@ public class MultifieldSplitTest extends TestCase
 				result.add("("+x+","+y+")");
 			}
 		});
-		system.getRulebase().addRule(rule);
+		Rulebase rb = new Rulebase();
+		rb.addRule(rule);
+		// Create rule system.
+		RuleSystem	system	= new RuleSystem(state, rb, new RetePatternMatcherFunctionality(rb));
+		system.init();
 				
 //		RetePanel.createReteFrame("Split test", ((RetePatternMatcher)system.getMatcher()).getReteNode());
 			
@@ -345,8 +353,6 @@ public class MultifieldSplitTest extends TestCase
 //		test.add("(4,3)");
 		system.fireAllRules();
 		assertEquals("The condition should trigger with: "+test, test, result);
-		
-		system.getRulebase().removeRule(rule);
 	}
 	
 	/**

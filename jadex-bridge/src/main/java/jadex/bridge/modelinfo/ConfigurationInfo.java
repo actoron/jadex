@@ -123,9 +123,9 @@ public class ConfigurationInfo extends Startable
 	/**
 	 *  Get the extension names. 
 	 */
-	public IExtensionInstance[] getExtensions()
+	public IExtensionInfo[] getExtensions()
 	{
-		return extensions!=null? (IExtensionInstance[])extensions.toArray(new IExtensionInstance[extensions.size()]): new IExtensionInstance[0];
+		return extensions!=null? (IExtensionInfo[])extensions.toArray(new IExtensionInfo[extensions.size()]): new IExtensionInfo[0];
 	}
 	
 	/**

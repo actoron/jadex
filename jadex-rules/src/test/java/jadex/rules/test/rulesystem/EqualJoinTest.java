@@ -78,8 +78,8 @@ public class EqualJoinTest extends TestCase
 		
 		// Create rule system.
 		Rulebase rb = new Rulebase();
+		rb.addRule(rule);
 		system	= new RuleSystem(state,rb, new RetePatternMatcherFunctionality(rb));
-		system.getRulebase().addRule(rule);
 		system.init();
 		
 		/*RetePanel.createReteFrame("Equal Join Test",

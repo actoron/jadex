@@ -4,7 +4,6 @@ import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.component.ComponentXMLReader;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
@@ -66,13 +65,6 @@ public class ApplicationXMLReader extends ComponentXMLReader
 		apptype.setReaderHandler(new BeanObjectReaderHandler());
 		types.add(apptype);
 		
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "applicationtype"), new QName(uri, "services"), new QName(uri, "providedservice")}), 
-				new ObjectInfo(ProvidedServiceInfo.class),// new ExpressionProcessor()), 
-				new MappingInfo(null, null, "value", new AttributeInfo[]{
-//					new AttributeInfo(new AccessInfo("class", "className")),
-					new AttributeInfo(new AccessInfo("class", "type"), new AttributeConverter(classconv, reclassconv)),
-//					new AttributeInfo(new AccessInfo("implementation", "implementation"))
-				}, null), null, new BeanObjectReaderHandler()));
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "applicationtype"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(Argument.class), 
 			new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)),
 			new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "typename"))}, null)));

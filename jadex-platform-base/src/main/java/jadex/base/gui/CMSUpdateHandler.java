@@ -142,16 +142,16 @@ public class CMSUpdateHandler
 		assert SwingUtilities.isEventDispatchThread();
 		
 //		System.out.println("added: "+cid+" "+listener+" "+this);
-		if(cid==null)
-			System.out.println("cid: "+cid);
-		if(cid.getPlatformName()==null)
-			System.out.println("platformname: "+cid.getPlatformName());
-		if(access==null)
-			System.out.println("access: "+access);
-		if(access.getComponentIdentifier()==null)
-			System.out.println("accesscid"+access.getComponentIdentifier());
-		if(access.getComponentIdentifier().getPlatformName()==null)
-			System.out.println("accesscidpfname: "+access.getComponentIdentifier().getPlatformName());
+//		if(cid==null)
+//			System.out.println("cid: "+cid);
+//		if(cid.getPlatformName()==null)
+//			System.out.println("platformname: "+cid.getPlatformName());
+//		if(access==null)
+//			System.out.println("access: "+access);
+//		if(access.getComponentIdentifier()==null)
+//			System.out.println("accesscid"+access.getComponentIdentifier());
+//		if(access.getComponentIdentifier().getPlatformName()==null)
+//			System.out.println("accesscidpfname: "+access.getComponentIdentifier().getPlatformName());
 		
 		
 		// For local component use direct listener.
@@ -196,13 +196,13 @@ public class CMSUpdateHandler
 			{
 				public void customResultAvailable(Object result)
 				{
-					if(cid==null)
-						System.out.println("result cid: "+cid);
-					if(futures==null)
-						System.out.println("result futures: "+futures);
+//					if(cid==null)
+//						System.out.println("result cid: "+cid);
+//					if(futures==null)
+//						System.out.println("result futures: "+futures);
 					Collection coll	= futures.getCollection(cid);
-					if(coll==null)
-						System.out.println("result coll: "+coll);
+//					if(coll==null)
+//						System.out.println("result coll: "+coll);
 					for(Iterator it=coll.iterator(); it.hasNext(); )
 					{
 						((Future)it.next()).setResult(null);

@@ -1,16 +1,22 @@
 package jadex.extension.envsupport;
 
-import jadex.bridge.modelinfo.IExtensionInstance;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.modelinfo.IExtensionInfo;
+import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
-import jadex.extension.envsupport.environment.SynchronizedPropertyObject;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.javaparser.IValueFetcher;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ * 	Configuration of an Env space.
  */
-public abstract class MSpaceInstance extends SynchronizedPropertyObject implements IExtensionInstance
+public class MEnvSpaceInstance	implements IExtensionInfo
 {
 	//-------- attributes --------
 	
@@ -21,30 +27,48 @@ public abstract class MSpaceInstance extends SynchronizedPropertyObject implemen
 	protected String type;
 	
 	/** The space type (resolved during loading). */
-	protected MSpaceType spacetype;
+	protected MEnvSpaceType spacetype;
 	
 	/** The properties. */
-	protected Map initproperties;
+	protected Map properties;
 	
+	//-------- IExtensionInfo interface --------
+
 	/**
-	 *  Create a new space instance.
+	 *  Instantiate the extension for a specific component instance.
+	 *  @param access	The external access of the component.
+	 *  @param fetcher	The value fetcher of the component to be used for evaluating dynamic expressions. 
+	 *  @return The extension instance object.
 	 */
-	public MSpaceInstance()
+	public IFuture createInstance(IExternalAccess access, IValueFetcher fetcher)
 	{
-		super(null, new Object());
+		Future	ret	= new Future();
+		try
+		{
+			Class	clazz	= SReflect.findClass(spacetype.getClassName(), access.getModel().getAllImports(), access.getModel().getClassLoader());
+			AbstractEnvironmentSpace	space	= (AbstractEnvironmentSpace) clazz.newInstance();
+			space.init(access, this, fetcher).addResultListener(new DelegationResultListener(ret));
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
+		return ret;
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Add a property.
 	 *  @param key The key.
 	 *  @param value The value.
 	 */
-	public void addInitProperty(String key, Object value)
+	public void addProperty(String key, Object value)
 	{
 //		System.out.println("addP: "+key+" "+value);
-		if(initproperties==null)
-			initproperties = new MultiCollection();
-		initproperties.put(key, value);
+		if(properties==null)
+			properties = new MultiCollection();
+		properties.put(key, value);
 	}
 	
 	/**
@@ -52,18 +76,18 @@ public abstract class MSpaceInstance extends SynchronizedPropertyObject implemen
 	 *  @param key The key.
 	 *  @return The value.
 	 */
-	public List getInitPropertyList(String key)
+	public List getPropertyList(String key)
 	{
-		return initproperties!=null? (List)initproperties.get(key):  null;
+		return properties!=null? (List)properties.get(key):  null;
 	}
 	
 	/**
 	 *  Get the properties.
 	 *  @return The properties.
 	 */
-	public Map getInitProperties()
+	public Map getProperties()
 	{
-		return initproperties;
+		return properties;
 	}
 	
 	/**
@@ -72,9 +96,9 @@ public abstract class MSpaceInstance extends SynchronizedPropertyObject implemen
 	 *  @param name The name.
 	 *  @return The property.
 	 */
-	public Object getInitProperty(String name)
+	public Object getProperty(String name)
 	{
-		return initproperties!=null? MEnvSpaceType.getProperty(initproperties, name): null;
+		return properties!=null? MEnvSpaceType.getProperty(properties, name): null;
 	}
 	
 	/**
@@ -99,7 +123,7 @@ public abstract class MSpaceInstance extends SynchronizedPropertyObject implemen
 	 *  Get the type of this element.
 	 *  @return The structure type.
 	 */
-	public MSpaceType getType()
+	public MEnvSpaceType getType()
 	{
 		return spacetype;
 	}
@@ -108,7 +132,7 @@ public abstract class MSpaceInstance extends SynchronizedPropertyObject implemen
 	 *  Set the type of this element.
 	 *  @return The structure type.
 	 */
-	public void	setType(MSpaceType spacetype)
+	public void	setType(MEnvSpaceType spacetype)
 	{
 		this.spacetype	= spacetype;
 	}

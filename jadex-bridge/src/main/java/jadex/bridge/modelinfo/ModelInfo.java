@@ -695,16 +695,16 @@ public class ModelInfo extends Startable implements IModelInfo
 	/**
 	 *  Get the extension names. 
 	 */
-	public IExtensionType[] getExtensionTypes()
+	public Object[] getExtensionTypes()
 	{
-		return extensions!=null? (IExtensionType[])extensions.toArray(new IExtensionType[extensions.size()]): new IExtensionType[0];
+		return extensions!=null? extensions.toArray(): new Object[0];
 	}
 	
 	// written with small 'types' to exclude from xml 
 	/**
 	 *  Set the extension types.
 	 */
-	public void setExtensiontypes(IExtensionType[] extensions)
+	public void setExtensiontypes(Object[] extensions)
 	{
 		this.extensions = SUtil.arrayToList(extensions);
 	}
@@ -713,7 +713,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	 *  Add a extension type.
 	 *  @param extension The extension type.
 	 */
-	public void addExtensiontype(IExtensionType extension)
+	public void addExtensiontype(Object extension)
 	{
 		if(extensions==null)
 			extensions = new ArrayList();

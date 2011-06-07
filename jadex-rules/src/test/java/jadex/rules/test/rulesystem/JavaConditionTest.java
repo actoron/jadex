@@ -70,10 +70,9 @@ public class JavaConditionTest extends TestCase
 		
 		Rule rule = new Rule("block_is_clear", cond, action);
 		Rulebase rb = new Rulebase();
+		rb.addRule(rule);
 		RetePatternMatcherFunctionality pm = new RetePatternMatcherFunctionality(rb);
 		this.system = new RuleSystem(OAVStateFactory.createOAVState(Blocks.blocksworld_type_model), rb, pm);
-		
-		system.getRulebase().addRule(rule);
 		system.init();
 	}
 	

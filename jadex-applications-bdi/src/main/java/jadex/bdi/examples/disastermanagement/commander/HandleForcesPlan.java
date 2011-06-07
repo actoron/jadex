@@ -6,6 +6,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.service.IService;
+import jadex.commons.SUtil;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
 import java.util.ArrayList;
@@ -69,7 +70,7 @@ public abstract class HandleForcesPlan extends Plan
 				}
 			}
 			
-//			System.out.println("hf: "+disaster.getId()+" "+number+" "+getParameterSet("units").getValues().length+" "+as+" "+busy.size()+" "+SUtil.arrayToString(busy.getFacts()));
+			System.out.println("hf: "+disaster.getId()+" "+number+" "+getParameterSet("units").getValues().length+" "+as+" "+busy.size()+" "+SUtil.arrayToString(busy.getFacts()));
 			
 			waitFor(1000);
 		}

@@ -1,6 +1,5 @@
 package jadex.bpmn.runtime;
 
-import jadex.bpmn.BpmnFactory;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;

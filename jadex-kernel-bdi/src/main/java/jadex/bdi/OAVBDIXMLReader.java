@@ -157,8 +157,7 @@ public class OAVBDIXMLReader
 		// Find type infos. hack???
 		TypeInfo	comptype	= null;
 		TypeInfo	configtype	= null;
-		TypeInfo	proservtype	= null;
-		for(Iterator it=typeinfos.iterator(); (proservtype==null || configtype==null || comptype==null) && it.hasNext(); )
+		for(Iterator it=typeinfos.iterator(); (configtype==null || comptype==null) && it.hasNext(); )
 		{
 			TypeInfo	ti	= (TypeInfo)it.next();
 			if(comptype==null && ti.getXMLInfo().getXMLPath().equals(new XMLInfo(new QName(uri, "componenttype")).getXMLPath()))
@@ -168,10 +167,6 @@ public class OAVBDIXMLReader
 			if(configtype==null && ti.getXMLInfo().getXMLPath().equals(new XMLInfo(new QName(uri, "configuration")).getXMLPath()))
 			{
 				configtype	= ti;
-			}
-			if(proservtype==null && ti.getXMLInfo().getXMLPath().equals(new XMLInfo(new QName[]{new QName(uri, "componenttype"), new QName(uri, "services"), new QName(uri, "providedservice")}).getXMLPath()))
-			{
-				proservtype	= ti;
 			}
 		}
 
@@ -441,12 +436,7 @@ public class OAVBDIXMLReader
 			new ObjectInfo(null, configproc), new MappingInfo(configtype, null, configsubs), new LinkingInfo(configlinker)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "capability"), new QName(uri, "configurations"), new QName(uri, "configuration")}),
 			new ObjectInfo(null, configproc), new MappingInfo(configtype, null, configsubs), new LinkingInfo(configlinker)));
-		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "agent"), new QName(uri, "services"), new QName(uri, "providedservice")}),
-			null, new MappingInfo(proservtype)));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "capability"), new QName(uri, "services"), new QName(uri, "providedservice")}),
-			null, new MappingInfo(proservtype)));
-		
+				
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialcapability")), new ObjectInfo(OAVBDIMetaModel.initialcapability_type),
 			null, null, new OAVObjectReaderHandler()));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialbelief")), new ObjectInfo(OAVBDIMetaModel.configbelief_type),

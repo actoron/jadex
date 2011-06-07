@@ -2,18 +2,12 @@ package jadex.wfms.guicomponents;
 
 import jadex.bdi.planlib.iasteps.DispatchGoalStep;
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.wfms.service.IExternalWfmsService;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 public class BDILoginPanel extends AbstractLoginPanel

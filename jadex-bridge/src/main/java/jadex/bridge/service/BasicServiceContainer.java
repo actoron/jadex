@@ -431,7 +431,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	public IFuture getRequiredService(String name, boolean rebind)
 	{
 		RequiredServiceInfo info = getRequiredServiceInfo(name);
-		RequiredServiceBinding binding = info.getDefaultBinding();//getRequiredServiceBinding(name);
 		if(info==null)
 		{
 			Future ret = new Future();
@@ -440,6 +439,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		}
 		else
 		{
+			RequiredServiceBinding binding = info.getDefaultBinding();//getRequiredServiceBinding(name);
 			return getRequiredService(info, binding, rebind);
 		}
 	}
@@ -451,7 +451,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
 	{
 		RequiredServiceInfo info = getRequiredServiceInfo(name);
-		RequiredServiceBinding binding = info.getDefaultBinding();//getRequiredServiceBinding(name);
 		if(info==null)
 		{
 			IntermediateFuture ret = new IntermediateFuture();
@@ -460,6 +459,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		}
 		else
 		{
+			RequiredServiceBinding binding = info.getDefaultBinding();//getRequiredServiceBinding(name);
 			return getRequiredServices(info, binding, rebind);
 		}
 	}

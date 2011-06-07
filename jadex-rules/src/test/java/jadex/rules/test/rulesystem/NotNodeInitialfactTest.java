@@ -67,8 +67,8 @@ public class NotNodeInitialfactTest extends TestCase
 		
 		// Create rule system.
 		Rulebase rb = new Rulebase();
+		rb.addRule(rule1);
 		system	= new RuleSystem(state, rb, new RetePatternMatcherFunctionality(rb));
-		system.getRulebase().addRule(rule1);
 		system.init();
 
 //		RetePanel.createReteFrame("Not Node Test", ((RetePatternMatcher)system.getMatcher()).getReteNode());

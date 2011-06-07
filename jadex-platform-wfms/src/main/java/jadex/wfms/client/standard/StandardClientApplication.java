@@ -1,16 +1,9 @@
 package jadex.wfms.client.standard;
 
 import jadex.base.gui.SwingDefaultResultListener;
-import jadex.bdi.planlib.iasteps.DispatchGoalStep;
-import jadex.bdi.planlib.iasteps.SetBeliefStep;
-import jadex.bdi.runtime.GoalFailureException;
 import jadex.bridge.IComponentChangeEvent;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.TerminationAdapter;
 import jadex.commons.future.IFuture;
-import jadex.commons.gui.SGUI;
 import jadex.wfms.client.ClientInfo;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
@@ -28,27 +21,22 @@ import jadex.wfms.service.listeners.IProcessRepositoryListener;
 import jadex.wfms.service.listeners.IWorkitemListener;
 import jadex.wfms.service.listeners.ProcessRepositoryEvent;
 import jadex.wfms.service.listeners.WorkitemEvent;
-import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;

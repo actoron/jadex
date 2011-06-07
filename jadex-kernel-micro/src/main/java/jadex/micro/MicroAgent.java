@@ -21,7 +21,6 @@ import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.clock.ITimedObject;
 import jadex.bridge.service.clock.ITimer;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
-import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.commons.ComposedFilter;
 import jadex.commons.IFilter;
 import jadex.commons.future.DefaultResultListener;

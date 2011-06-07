@@ -67,7 +67,15 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		{
 			public void customResultAvailable(Object result)
 			{
-				addCMSListener((IComponentIdentifier)result);
+				if(result!=null)
+				{
+					addCMSListener((IComponentIdentifier)result);
+				}
+				else
+				{
+					connected	= false;
+					getModel().fireNodeChanged(ProxyComponentTreeNode.this);					
+				}
 			}
 			public void customExceptionOccurred(Exception exception)
 			{

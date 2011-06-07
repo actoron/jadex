@@ -4,8 +4,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.commons.future.IFuture;
 import jadex.wfms.client.ProcessResource;
 import jadex.wfms.service.listeners.IProcessRepositoryListener;
-
-import java.util.Collection;
 /**
  * Repository service for accessing process models.
  */

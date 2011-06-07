@@ -76,9 +76,8 @@ public class FunctionTest extends TestCase
 		
 		Rule rule = new Rule("sum", cond, action);
 		Rulebase rb = new Rulebase();
+		rb.addRule(rule);
 		RuleSystem system = new RuleSystem(OAVStateFactory.createOAVState(Numberbox.numberbox_type_model), rb, new RetePatternMatcherFunctionality(rb));
-		
-		system.getRulebase().addRule(rule);
 		system.init();
 		
 		//RetePanel.createReteFrame("Numberbox Test", mat.getReteNode());
@@ -133,10 +132,9 @@ public class FunctionTest extends TestCase
 		
 		Rule rule = new Rule("length", cond, action);
 		Rulebase rb = new Rulebase();
+		rb.addRule(rule);
 		RuleSystem system = new RuleSystem(OAVStateFactory.createOAVState(Numberbox.numberbox_type_model), 
 			rb, new RetePatternMatcherFunctionality(rb));
-
-		system.getRulebase().addRule(rule);
 		system.init();
 		
 		//RetePanel.createReteFrame("Numberbox Test", mat.getReteNode());
@@ -190,8 +188,8 @@ public class FunctionTest extends TestCase
 		
 		Rule rule = new Rule("nested", cond, action);
 		Rulebase rb = new Rulebase();
+		rb.addRule(rule);
 		RuleSystem system = new RuleSystem(OAVStateFactory.createOAVState(Numberbox.numberbox_type_model), rb, new RetePatternMatcherFunctionality(rb));
-		system.getRulebase().addRule(rule);
 		system.init();
 		
 		//RetePanel.createReteFrame("Numberbox Test", mat.getReteNode());
@@ -255,8 +253,8 @@ public class FunctionTest extends TestCase
 		
 		Rule rule = new Rule("beta", cond, action);
 		Rulebase rb = new Rulebase();
+		rb.addRule(rule);
 		RuleSystem system = new RuleSystem(OAVStateFactory.createOAVState(Numberbox.numberbox_type_model), rb, new RetePatternMatcherFunctionality(rb));
-		system.getRulebase().addRule(rule);
 		system.init();
 		
 //		RetePanel.createReteFrame("Numberbox Test", system, new Object());

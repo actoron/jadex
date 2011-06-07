@@ -18,6 +18,7 @@ import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.IExtensionInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
@@ -36,7 +37,6 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.commons.SReflect;
-import jadex.commons.Tuple;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -143,7 +143,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 
 		ComponentChangeEvent.dispatchTerminatingEvent(getComponentAdapter(), getModel(), getServiceProvider(), getInternalComponentListeners(), null);
 		
-		removeExtensions().addResultListener(createResultListener(new DelegationResultListener(ret)
+		terminateExtensions().addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -264,7 +264,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  Add an extension instance.
 	 *  @param extension The extension instance.
 	 */
-	public abstract void addExtension(IExtensionInstance extension);
+	public abstract void addExtension(String name, IExtensionInstance extension);
 	
 	/**
 	 *  Get the component listeners.
@@ -362,7 +362,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		{
 			public void exceptionOccurred(final Exception exception)
 			{
-				removeExtensions().addResultListener(new DelegationResultListener(iret)
+				terminateExtensions().addResultListener(new DelegationResultListener(iret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -587,28 +587,31 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		if(config!=null)
 		{
 			ConfigurationInfo conf = model.getConfiguration(config);
-			IExtensionInstance[] exts = conf.getExtensions();
-			
-			CollectionResultListener lis = new CollectionResultListener(exts.length, true, new DelegationResultListener(ret)
+			final IExtensionInfo[] exts = conf.getExtensions();
+			IResultListener	rl	= new DelegationResultListener(ret)
 			{
+				int	i=0;
 				public void customResultAvailable(Object result)
 				{
-					Collection res = (Collection)result;
-					
-					for(Iterator it = res.iterator(); it.hasNext(); )
+					if(i>0)
 					{
-						IExtensionInstance ext = (IExtensionInstance)it.next();
-						addExtension(ext);
+						addExtension(exts[i-1].getName(), (IExtensionInstance)result);
 					}
 					
-					super.customResultAvailable(null);
+					if(i<exts.length)
+					{
+						i++;
+						exts[i-1].createInstance(getExternalAccess(), getFetcher())
+							.addResultListener(createResultListener(this));
+					}
+					else
+					{
+						super.customResultAvailable(result);
+					}
 				}
-			});
+			};
 			
-			for(int i=0; i<exts.length; i++)
-			{
-				exts[i].init(getExternalAccess(), getFetcher()).addResultListener(lis);	
-			}
+			rl.resultAvailable(null);
 		}
 		else
 		{
@@ -619,38 +622,20 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	}
 	
 	/**
-	 *  Terminate all extension.
+	 *  Terminate all extensions.
 	 */
-	public IFuture removeExtensions()
+	public IFuture terminateExtensions()
 	{
 		Future ret = new Future();
 		IExtensionInstance[] exts = getExtensions();
-		CounterResultListener lis = new CounterResultListener(exts.length, true, new DelegationResultListener(ret));
+		CounterResultListener lis = new CounterResultListener(exts.length, false, new DelegationResultListener(ret));
 		for(int i=0; i<exts.length; i++)
 		{
-			removeExtension(exts[i].getName()).addResultListener(lis);
+			exts[i].terminate().addResultListener(lis);
 		}
 		return ret;
 	}
 	
-	/**
-	 *  Terminate all extension.
-	 */
-	public IFuture removeExtension(String name)
-	{
-		Future ret = new Future();
-		IExtensionInstance ext = getExtension(name);
-		if(ext!=null)
-		{
-			ext.terminate().addResultListener(new DelegationResultListener(ret));
-		}
-		else
-		{
-			ret.setException(new RuntimeException("Unknown extension: "+name));
-		}
-		return ret;
-	}
-		
 	/**
 	 *  Get the logger.
 	 *  @return The logger.

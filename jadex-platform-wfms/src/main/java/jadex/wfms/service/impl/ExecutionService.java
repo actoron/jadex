@@ -9,7 +9,6 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -28,7 +27,6 @@ import jadex.wfms.service.listeners.ProcessEvent;
 
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;

@@ -6,6 +6,7 @@ import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.commons.IFilter;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -20,15 +21,12 @@ import java.util.Map;
 /**
  *  An AGR (agent-group-role) space.
  */
-public class AGRSpace extends MAGRSpaceInstance
+public class AGRSpace	implements IExtensionInstance
 {
 	//-------- attributes --------
 	
 	/** The groups. */
 	protected Map groups;
-	
-	/** The application. */
-//	protected IApplication application;
 	
 	//-------- methods --------
 	
@@ -85,32 +83,10 @@ public class AGRSpace extends MAGRSpaceInstance
 	}
 	
 	/**
-	 *  Init the space
-	 */
-	public void initSpace(IExternalAccess exta, MSpaceInstance config, IValueFetcher fetcher)
-	{
-//		this.application = application;
-		MGroupInstance[]	mgroups	= ((MAGRSpaceInstance)config).getMGroupInstances();
-		for(int g=0; g<mgroups.length; g++)
-		{
-			Group	group	= new Group(mgroups[g].getName());
-			this.addGroup(group);
-			
-			MPosition[]	positions	= mgroups[g].getMPositions();
-			for(int p=0; positions!=null && p<positions.length; p++)
-			{
-				String	at	= positions[p].getComponentType();
-				String	rt	= positions[p].getRoleType();
-				group.addRoleForType(at, rt);
-			}
-		}
-	}
-	
-	/**
 	 *  Initialize the extension.
 	 *  Called once, when the extension is created.
 	 */
-	public IFuture init(IExternalAccess exta, IValueFetcher fetcher)
+	public IFuture init(IExternalAccess exta, MAGRSpaceInstance config, IValueFetcher fetcher)
 	{
 //		this.application = application;
 		
@@ -120,7 +96,20 @@ public class AGRSpace extends MAGRSpaceInstance
 		
 		try
 		{
-			initSpace(exta, this, fetcher);
+			MGroupInstance[]	mgroups	= ((MAGRSpaceInstance)config).getMGroupInstances();
+			for(int g=0; g<mgroups.length; g++)
+			{
+				Group	group	= new Group(mgroups[g].getName());
+				this.addGroup(group);
+				
+				MPosition[]	positions	= mgroups[g].getMPositions();
+				for(int p=0; positions!=null && p<positions.length; p++)
+				{
+					String	at	= positions[p].getComponentType();
+					String	rt	= positions[p].getRoleType();
+					group.addRoleForType(at, rt);
+				}
+			}
 			
 			exta.scheduleStep(new IComponentStep()
 			{
@@ -168,7 +157,7 @@ public class AGRSpace extends MAGRSpaceInstance
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			ret.setException(e);
 		}
 		

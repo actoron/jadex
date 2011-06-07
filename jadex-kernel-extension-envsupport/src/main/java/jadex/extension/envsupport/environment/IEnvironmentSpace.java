@@ -4,6 +4,7 @@ package jadex.extension.envsupport.environment;
 import jadex.extension.envsupport.dataview.IDataView;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.commons.IPropertyObject;
 import jadex.commons.future.IResultListener;
 import jadex.commons.meta.IPropertyMetaDataSet;
@@ -14,7 +15,7 @@ import java.util.Map;
 /**
  *  Main interface for an environment space.
  */
-public interface IEnvironmentSpace extends IPropertyObject
+public interface IEnvironmentSpace extends IPropertyObject, IExtensionInstance
 {
 	/**
 	 * Returns the space's name.

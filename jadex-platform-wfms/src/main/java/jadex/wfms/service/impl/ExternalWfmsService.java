@@ -26,7 +26,6 @@ import jadex.wfms.service.listeners.IProcessListener;
 import jadex.wfms.service.listeners.IProcessRepositoryListener;
 import jadex.wfms.service.listeners.IWorkitemListener;
 
-import java.util.HashMap;
 import java.util.Set;
 
 public class ExternalWfmsService implements IExternalWfmsService

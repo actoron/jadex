@@ -1,6 +1,10 @@
 package jadex.extension.agr;
 
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.modelinfo.IExtensionInfo;
 import jadex.commons.SReflect;
+import jadex.commons.future.IFuture;
+import jadex.javaparser.IValueFetcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,14 +12,91 @@ import java.util.List;
 /**
  *  An instance of an AGR space. 
  */
-public abstract class MAGRSpaceInstance extends MSpaceInstance
+public class MAGRSpaceInstance	implements IExtensionInfo
 {
 	//-------- attributes --------
+	
+	/** The name. */
+	protected String name;
+
+	/** The space type name. */
+	protected String type;
+	
+	/** The space type (resolved during loading). */
+	protected MAGRSpaceType spacetype;
 	
 	/** The groups. */
 	protected List groups;
 	
+	//-------- IExtensionInfo interface --------
+
+	/**
+	 *  Instantiate the extension for a specific component instance.
+	 *  @param access	The external access of the component.
+	 *  @param fetcher	The value fetcher of the component to be used for evaluating dynamic expressions. 
+	 *  @return The extension instance object.
+	 */
+	public IFuture createInstance(IExternalAccess access, IValueFetcher fetcher)
+	{
+		AGRSpace	space	= new AGRSpace();
+		return space.init(access, this, fetcher);
+	}
+	
 	//-------- methods --------
+	
+	/**
+	 *  Get the name.
+	 *  @return The name.
+	 */
+	public String getName()
+	{
+		return this.name;
+	}
+
+	/**
+	 *  Set the name.
+	 *  @param name The name to set.
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	/**
+	 *  Get the type name.
+	 *  @return The type name. 
+	 */
+	public String getTypeName()
+	{
+		return this.type;
+	}
+
+	/**
+	 *  Set the type name.
+	 *  @param type The type name to set.
+	 */
+	public void setTypeName(String type)
+	{
+		this.type = type;
+	}
+	
+	/**
+	 *  Get the type of this element.
+	 *  @return The structure type.
+	 */
+	public MAGRSpaceType getType()
+	{
+		return spacetype;
+	}
+
+	/**
+	 *  Set the type of this element.
+	 *  @return The structure type.
+	 */
+	public void	setType(MAGRSpaceType spacetype)
+	{
+		this.spacetype	= spacetype;
+	}
 	
 	/**
 	 *  Get the groups of this space.

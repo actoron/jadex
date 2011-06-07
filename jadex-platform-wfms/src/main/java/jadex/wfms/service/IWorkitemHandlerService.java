@@ -8,7 +8,6 @@ import jadex.wfms.client.IWorkitem;
 import jadex.wfms.service.listeners.IActivityListener;
 import jadex.wfms.service.listeners.IWorkitemListener;
 
-import java.util.Map;
 
 public interface IWorkitemHandlerService
 {

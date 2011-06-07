@@ -12,7 +12,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.clock.ITimer;
 import jadex.commons.SReflect;

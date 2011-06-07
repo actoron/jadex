@@ -56,6 +56,9 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	/** The node counter in this network. */
 	protected int nodecounter;
 	
+	/** For debugging: node is inited and network must not be changed anymore. */
+	protected boolean inited;
+	
 	//-------- constructors --------
 	
 	/**
@@ -281,6 +284,8 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	 */
 	public void addObjectConsumer(IObjectConsumerNode node)
 	{
+		assert !inited;
+		
 		if(node instanceof TypeNode)
 		{
 			if(typenodes.put(((TypeNode)node).getObjectType(), node)!=null)
@@ -306,6 +311,8 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	 */
 	public void removeObjectConsumer(IObjectConsumerNode node)
 	{
+		assert !inited;
+		
 		typenodes.remove(((TypeNode)node).getObjectType());
 	}
 	
@@ -366,6 +373,7 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	 */
 	public AttributeSet	getRelevantAttributes()
 	{
+		assert inited;
 		if(relevants==null)
 		{
 			synchronized(this) 
@@ -699,5 +707,15 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	public int getNextNodeId()
 	{
 		return nodecounter++;
+	}
+	
+	//-------- debugging --------
+	
+	/**
+	 *  Set the inited state.
+	 */
+	public void	setInited(boolean inited)
+	{
+		this.inited	= inited;
 	}
 }

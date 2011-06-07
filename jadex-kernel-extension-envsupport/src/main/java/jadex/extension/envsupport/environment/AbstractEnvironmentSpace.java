@@ -28,7 +28,7 @@ import jadex.extension.envsupport.IObjectCreator;
 import jadex.extension.envsupport.MEnvSpaceType;
 import jadex.extension.envsupport.MObjectType;
 import jadex.extension.envsupport.MObjectTypeProperty;
-import jadex.extension.envsupport.MSpaceInstance;
+import jadex.extension.envsupport.MEnvSpaceInstance;
 import jadex.extension.envsupport.dataview.IDataView;
 import jadex.extension.envsupport.environment.ComponentActionList.ActionEntry;
 import jadex.extension.envsupport.environment.space2d.Space2D;
@@ -57,7 +57,7 @@ import java.util.Set;
 /**
  *  Abstract base class for environment space. 
  */
-public abstract class AbstractEnvironmentSpace extends MSpaceInstance implements IEnvironmentSpace
+public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObject	implements IEnvironmentSpace
 {
 	//-------- attributes --------
 		
@@ -149,6 +149,8 @@ public abstract class AbstractEnvironmentSpace extends MSpaceInstance implements
 	 */
 	public AbstractEnvironmentSpace()
 	{
+		super(null, new Object());
+		
 		this.views = new HashMap();
 		this.avatarmappings = new MultiCollection();
 		this.dataviewmappings = new MultiCollection();
@@ -180,12 +182,11 @@ public abstract class AbstractEnvironmentSpace extends MSpaceInstance implements
 	/**
 	 *  Create a space.
 	 */
-	public void	initSpace(final IExternalAccess exta, IValueFetcher pfetcher)
+	public void	initSpace(final IExternalAccess exta, MEnvSpaceInstance config, IValueFetcher pfetcher)
 	{
 		try
 		{
-//			MEnvSpaceInstance	si	= (MEnvSpaceInstance)config;
-			final MEnvSpaceType	mspacetype	= (MEnvSpaceType)getType();
+			final MEnvSpaceType	mspacetype	= (MEnvSpaceType)config.getType();
 			
 			final SimpleValueFetcher fetcher = new SimpleValueFetcher(pfetcher);
 			fetcher.setValue("$space", this);
@@ -193,15 +194,15 @@ public abstract class AbstractEnvironmentSpace extends MSpaceInstance implements
 			
 			List mspaceprops = mspacetype.getPropertyList("properties");
 			MEnvSpaceType.setProperties(this, mspaceprops, fetcher);
-			List spaceprops = getInitPropertyList("properties");
+			List spaceprops = config.getPropertyList("properties");
 			MEnvSpaceType.setProperties(this, spaceprops, fetcher);
 			
 			this.exta = exta;
 			
 			if(this instanceof Space2D) // Hack?
 			{
-				Double width = getInitProperty("width")!=null? (Double)getInitProperty("width"): (Double)mspacetype.getProperty("width");
-				Double height = getInitProperty("height")!=null? (Double)getInitProperty("height"): (Double)mspacetype.getProperty("height");
+				Double width = config.getProperty("width")!=null? (Double)config.getProperty("width"): (Double)mspacetype.getProperty("width");
+				Double height = config.getProperty("height")!=null? (Double)config.getProperty("height"): (Double)mspacetype.getProperty("height");
 				((Space2D)this).setAreaSize(Vector2Double.getVector2(width, height));
 	//			System.out.println("areasize: "+width+" "+height);
 			}
@@ -369,7 +370,7 @@ public abstract class AbstractEnvironmentSpace extends MSpaceInstance implements
 			}
 			
 			// Create initial objects.
-			List objects = (List)getInitPropertyList("objects");
+			List objects = (List)config.getPropertyList("objects");
 			if(objects!=null)
 			{
 				for(int i=0; i<objects.size(); i++)
@@ -392,7 +393,7 @@ public abstract class AbstractEnvironmentSpace extends MSpaceInstance implements
 			}
 			
 			// Register initial avatars
-			List avatars = (List)getInitPropertyList("avatars");
+			List avatars = (List)config.getPropertyList("avatars");
 			if(avatars!=null)
 			{
 				for(int i=0; i<avatars.size(); i++)
@@ -419,7 +420,7 @@ public abstract class AbstractEnvironmentSpace extends MSpaceInstance implements
 			}
 			
 			// Create initial processes.
-			List procs = (List)getInitPropertyList("processes");
+			List procs = (List)config.getPropertyList("processes");
 			if(procs!=null)
 			{
 				for(int i=0; i<procs.size(); i++)
@@ -433,7 +434,7 @@ public abstract class AbstractEnvironmentSpace extends MSpaceInstance implements
 			}
 			
 			// Create initial space actions.
-			List actions = (List)getInitPropertyList("spaceactions");
+			List actions = (List)config.getPropertyList("spaceactions");
 			if(actions!=null)
 			{
 				for(int i=0; i<actions.size(); i++)
@@ -482,7 +483,7 @@ public abstract class AbstractEnvironmentSpace extends MSpaceInstance implements
 			
 			// Create the data providers.
 			List providers = mspacetype.getPropertyList("dataproviders");
-			List tmp = getInitPropertyList("dataproviders");
+			List tmp = config.getPropertyList("dataproviders");
 			
 			if(providers==null && tmp!=null)
 				providers = tmp;
@@ -527,7 +528,7 @@ public abstract class AbstractEnvironmentSpace extends MSpaceInstance implements
 			
 			// Create the data consumers.
 			List consumers = mspacetype.getPropertyList("dataconsumers");
-			tmp = getInitPropertyList("dataconsumers");
+			tmp = config.getPropertyList("dataconsumers");
 			
 			if(consumers==null && tmp!=null)
 				consumers = tmp;
@@ -549,7 +550,7 @@ public abstract class AbstractEnvironmentSpace extends MSpaceInstance implements
 				}
 			}
 			
-			List observers = getInitPropertyList("observers");
+			List observers = config.getPropertyList("observers");
 			if(observers!=null)
 			{
 				for(int i=0; i<observers.size(); i++)
@@ -1120,24 +1121,6 @@ public abstract class AbstractEnvironmentSpace extends MSpaceInstance implements
 //	}
 	
 	//-------- methods --------
-	
-	/**
-	 *  Get the name.
-	 *  @return the name.
-	 */
-	public String getName()
-	{
-		return name;
-	}
-	
-	/**
-	 *  Set the name.
-	 *  @param name The name to set.
-	 */
-	public void setName(String name)
-	{
-		this.name = name;
-	}
 
 	/**
 	 *  Add a space type.
@@ -1545,13 +1528,13 @@ public abstract class AbstractEnvironmentSpace extends MSpaceInstance implements
 //					final Object	fid	= id;
 					
 //					String	name	= null;
-					if(mapping.getComponentName()!=null)
-					{
-//						SimpleValueFetcher fetch = new SimpleValueFetcher();
-//						fetch.setValue("$space", this);
-//						fetch.setValue("$object", ret);
-						name = (String)mapping.getComponentName().getValue(getFetcher());
-					}
+//					if(mapping.getComponentName()!=null)
+//					{
+////						SimpleValueFetcher fetch = new SimpleValueFetcher();
+////						fetch.setValue("$space", this);
+////						fetch.setValue("$object", ret);
+//						name = (String)mapping.getComponentName().getValue(getFetcher());
+//					}
 					
 					final String compotype = componenttype;
 					
@@ -2680,7 +2663,7 @@ public abstract class AbstractEnvironmentSpace extends MSpaceInstance implements
 	 *  Initialize the extension.
 	 *  Called once, when the extension is created.
 	 */
-	public IFuture init(IExternalAccess exta, IValueFetcher fetcher)
+	public IFuture init(IExternalAccess exta, MEnvSpaceInstance config, IValueFetcher fetcher)
 	{
 		final Future ret = new Future();
 		
@@ -2689,7 +2672,7 @@ public abstract class AbstractEnvironmentSpace extends MSpaceInstance implements
 		try
 		{
 //			space = (ISpace)getClazz().newInstance();
-			initSpace(exta, fetcher);
+			initSpace(exta, config, fetcher);
 			
 			exta.scheduleStep(new IComponentStep()
 			{
@@ -2737,7 +2720,7 @@ public abstract class AbstractEnvironmentSpace extends MSpaceInstance implements
 		}
 		catch(Exception e)
 		{
-			System.out.println("Exception while creating space: "+getName());
+			System.out.println("Exception while creating space: "+config.getName());
 			e.printStackTrace();
 			ret.setException(e);
 		}

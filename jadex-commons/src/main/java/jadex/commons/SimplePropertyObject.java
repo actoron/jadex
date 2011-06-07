@@ -77,7 +77,7 @@ public class SimplePropertyObject implements IPropertyObject
 	/**
 	 *  Get the properties (bean accessor).
 	 */
-	public Map	getInitProperties()
+	public Map	getProperties()
 	{
 		return this.properties;
 	}
