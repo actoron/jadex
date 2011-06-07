@@ -12,6 +12,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.clock.ITimer;
 import jadex.commons.SReflect;
@@ -648,4 +649,17 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		return buf.toString();
 	}
 
+	/**
+	 *  Create the service container.
+	 *  @return The service container.
+	 */
+	public IServiceContainer getServiceContainer()
+	{
+		if(container==null)
+		{
+			container	= microagent.createServiceContainer();
+		}
+		
+		return super.getServiceContainer();
+	}
 }

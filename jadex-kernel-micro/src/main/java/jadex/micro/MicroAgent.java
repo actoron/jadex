@@ -810,4 +810,12 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 			return run;
 		}
 	}
+
+	/**
+	 *  May be overriden to provide a custom service container implementations.
+	 */
+	public IServiceContainer createServiceContainer()
+	{
+		return null;
+	}
 }

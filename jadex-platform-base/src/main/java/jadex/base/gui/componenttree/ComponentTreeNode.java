@@ -21,6 +21,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
+import jadex.xml.annotation.XMLClassname;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -307,6 +308,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 				
 				ea.scheduleStep(new IComponentStep()
 				{
+					@XMLClassname("getRequiredServiceInfos")
 					public Object execute(IInternalAccess ia)
 					{
 						return ia.getServiceContainer().getRequiredServiceInfos();
