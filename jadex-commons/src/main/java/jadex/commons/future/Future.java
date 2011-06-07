@@ -198,6 +198,8 @@ public class Future implements IFuture
      */
     public void	setExceptionIfUndone(Exception exception)
     {
+    	if(exception==null)
+    		throw new IllegalArgumentException();
     	synchronized(this)
 		{
     		// If done just return.
