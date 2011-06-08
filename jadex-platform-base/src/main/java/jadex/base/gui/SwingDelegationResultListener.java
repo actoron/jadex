@@ -115,6 +115,7 @@ public class SwingDelegationResultListener implements IResultListener
 	 */
 	public void customExceptionOccurred(Exception exception)
 	{
+//		System.err.println("Problem: "+exception);
 		future.setException(exception);
 	}
 }

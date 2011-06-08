@@ -57,6 +57,7 @@ public class DelegationResultListener implements IResultListener
 	 */
 	public void exceptionOccurred(Exception exception)
 	{
+//		System.err.println("Problem: "+exception);
 		future.setException(exception);
 	}
 }

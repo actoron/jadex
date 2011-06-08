@@ -133,7 +133,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					public void customResultAvailable(Object result)
 					{
 						final IComponentManagementService ces = (IComponentManagementService)result;
-						dealeraid = ces.createComponentIdentifier(LOCAL_DEALER, true, null);
+						dealeraid = ces.createComponentIdentifier(LOCAL_DEALER, access.getComponentIdentifier().getParent(), null);
 						dealertf.setText(dealeraid.getName());
 					}
 				});

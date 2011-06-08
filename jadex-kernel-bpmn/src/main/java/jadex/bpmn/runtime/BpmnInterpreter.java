@@ -454,16 +454,23 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	 */
 	public void startBehavior()
 	{
-		// Create initial thread(s). 
-		List startevents	= model.getStartActivities();
-		for(int i=0; startevents!=null && i<startevents.size(); i++)
+		scheduleStep(new IComponentStep()
 		{
-			ProcessThread	thread	= new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
-			context.addThread(thread);
-//			notifyListeners(EVENT_THREAD_ADDED, thread);
-			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_THREAD, thread.getClass().getName(), 
-				thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread)));
-		}
+			public Object execute(IInternalAccess ia)
+			{
+				// Create initial thread(s). 
+				List startevents	= model.getStartActivities();
+				for(int i=0; startevents!=null && i<startevents.size(); i++)
+				{
+					ProcessThread	thread	= new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
+					context.addThread(thread);
+//					notifyListeners(EVENT_THREAD_ADDED, thread);
+					notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_THREAD, thread.getClass().getName(), 
+						thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread)));
+				}
+				return null;
+			}
+		});
 	}
 	
 	/**
@@ -1087,32 +1094,39 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	 *  @param step	Code to be executed as a step of the agent.
 	 *  @return The result of the step.
 	 */
-	public IFuture scheduleStep(IComponentStep step)
+	public IFuture scheduleStep(final IComponentStep step)
 	{
-		// To schedule a step an implicit activity is created.
-		// In order to put the step parameter value it is necessary
-		// to have an edge with a mapping. Otherwise the parameter
-		// value with be deleted in process thread updateParametersBeforeStep().
+		final Future ret = new Future();
 		
-		Future ret = new Future();
-		MActivity act = new MActivity();
-		act.setName("External Step Activity.");
-		act.setClazz(ExecuteStepTask.class);
-		act.addParameter(new MParameter(MParameter.DIRECTION_IN, Object[].class, "step", null));
-		act.setActivityType(MBpmnModel.TASK);
-		MSequenceEdge edge = new MSequenceEdge();
-		edge.setTarget(act);
-		edge.addParameterMapping("step", SJavaParser.parseExpression("step", null, null), null);
-		act.addIncomingSequenceEdge(edge);
-		MPool pl = model.getPool(pool);
-		act.setPool(pl);
-		ProcessThread thread = new ProcessThread(""+idcnt++, act, context, this);
-		thread.setLastEdge(edge);
-		thread.setParameterValue("step", new Object[]{step, ret});
-		context.addExternalThread(thread);
-//		notifyListeners(EVENT_THREAD_ADDED, pt);
-		notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_THREAD, thread.getClass().getName(), 
-			thread.getId(), getComponentIdentifier(), new ProcessThreadInfo(thread.getId(), act.getName(), pool, lane)));
+		getComponentAdapter().invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				// To schedule a step an implicit activity is created.
+				// In order to put the step parameter value it is necessary
+				// to have an edge with a mapping. Otherwise the parameter
+				// value with be deleted in process thread updateParametersBeforeStep().
+				
+				MActivity act = new MActivity();
+				act.setName("External Step Activity.");
+				act.setClazz(ExecuteStepTask.class);
+				act.addParameter(new MParameter(MParameter.DIRECTION_IN, Object[].class, "step", null));
+				act.setActivityType(MBpmnModel.TASK);
+				MSequenceEdge edge = new MSequenceEdge();
+				edge.setTarget(act);
+				edge.addParameterMapping("step", SJavaParser.parseExpression("step", null, null), null);
+				act.addIncomingSequenceEdge(edge);
+				MPool pl = model.getPool(pool);
+				act.setPool(pl);
+				ProcessThread thread = new ProcessThread(""+idcnt++, act, context, BpmnInterpreter.this);
+				thread.setLastEdge(edge);
+				thread.setParameterValue("step", new Object[]{step, ret});
+				context.addExternalThread(thread);
+//				notifyListeners(EVENT_THREAD_ADDED, pt);
+				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_THREAD, thread.getClass().getName(), 
+					thread.getId(), getComponentIdentifier(), new ProcessThreadInfo(thread.getId(), act.getName(), pool, lane)));
+			}
+		});
 		return ret;
 	}
 	

@@ -2,6 +2,7 @@ package jadex.base.gui.componenttree;
 
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
@@ -321,7 +322,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 					{
 						return ia.getServiceContainer().getRequiredServiceInfos();
 					}
-				}).addResultListener(new SwingDefaultResultListener()
+				}).addResultListener(new SwingDelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{

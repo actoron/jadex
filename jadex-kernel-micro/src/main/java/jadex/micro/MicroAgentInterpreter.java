@@ -109,7 +109,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	public void startBehavior()
 	{
 //		System.out.println("started: "+getComponentIdentifier());
-		addStep(new Object[]{new IComponentStep()
+		scheduleStep(new IComponentStep()
 		{
 			public Object execute(IInternalAccess ia)
 			{
@@ -121,7 +121,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			{
 				return "microagent.executeBody()_#"+this.hashCode();
 			}
-		}, new Future()});
+		});
 	}
 	
 	//-------- IKernelAgent interface --------

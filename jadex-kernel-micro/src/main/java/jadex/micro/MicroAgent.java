@@ -581,9 +581,9 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param service The service.
 	 *  @param type The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
-	public void addService(String name, Class type, Object service, String proxytype)
+	public IFuture	addService(String name, Class type, Object service, String proxytype)
 	{
-		interpreter.addService(name, type, proxytype, service);
+		return interpreter.addService(name, type, proxytype, service);
 	}
 	
 	/**
@@ -593,18 +593,18 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param type The public service interface.
 	 *  @param service The service.
 	 */
-	public void addService(String name, Class type, Object service)
+	public IFuture	addService(String name, Class type, Object service)
 	{
-		interpreter.addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, service);
+		return interpreter.addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, service);
 	}
 
 	/**
 	 *  Removes a service from the platform (shutdowns also the service).
 	 *  @param service The service.
 	 */
-	public void removeService(IServiceIdentifier sid)
+	public IFuture	removeService(IServiceIdentifier sid)
 	{
-		((IServiceContainer)interpreter.getServiceProvider()).removeService(sid);
+		return ((IServiceContainer)interpreter.getServiceProvider()).removeService(sid);
 	}
 	
 	/**

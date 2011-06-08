@@ -4,6 +4,7 @@ import jadex.bridge.modelinfo.ModelInfo;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.rules.rulesystem.IPatternMatcherFunctionality;
+import jadex.rules.rulesystem.IRule;
 import jadex.rules.state.IOAVState;
 
 import java.util.ArrayList;
@@ -77,19 +78,19 @@ public class OAVAgentModel	extends OAVCapabilityModel
 		this.matcherfunc	= matcherfunc;
 	}
 	
-//	/**
-//	 *  Init the model info.
-//	 */
-//	public void initModelInfo()
-//	{
-//		super.initModelInfo();
-//		
-//		// Hack!!!!! todo: remove
-//		// Debugger breakpoints for BDI and user rules.
-//		List names = new ArrayList();
-//		for(Iterator it=matcherfunc.getRulebase().getRules().iterator(); it.hasNext(); )
-//			names.add(((IRule)it.next()).getName());
-//		modelinfo.addProperty("debugger.breakpoints", names);
+	/**
+	 *  Init the model info.
+	 */
+	public void initModelInfo()
+	{
+		super.initModelInfo();
+		
+		// Hack!!!!! todo: remove
+		// Debugger breakpoints for BDI and user rules.
+		List names = new ArrayList();
+		for(Iterator it=matcherfunc.getRulebase().getRules().iterator(); it.hasNext(); )
+			names.add(((IRule)it.next()).getName());
+		modelinfo.addProperty("debugger.breakpoints", names);
 //		
 ////		// Exclude IExternalAccess 
 ////		// Exclude all IBDIExternalAccess methods! :-( they work on flyweights
@@ -226,7 +227,7 @@ public class OAVAgentModel	extends OAVCapabilityModel
 //////		return properties;
 ////			
 ////		return ret;
-//	}
+	}
 	
 	/**
 	 *  Add method info.

@@ -6,12 +6,10 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.RemoteComponentListener;
-import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -22,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -91,6 +88,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 			this.arguments = arguments;
 			this.bindings = bindings;
 			this.adapter = factory.createComponentAdapter(desc, model, this, parent);
+			this.container = new ComponentServiceContainer(adapter, desc.getType());
 		}
 		catch(Exception e)
 		{
@@ -142,6 +140,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public Map getResults()
 	{
+		assert !getComponentAdapter().isExternalThread();
+		
 		return results!=null? Collections.unmodifiableMap(results): Collections.EMPTY_MAP;
 	}
 	
@@ -152,6 +152,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public void setResultValue(String name, Object value)
 	{
+		assert !getComponentAdapter().isExternalThread();
+		
 		if(results==null)
 			results	= new HashMap();
 		results.put(name, value);
@@ -172,6 +174,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public IFuture addComponentListener(IComponentListener listener)
 	{
+		assert !getComponentAdapter().isExternalThread();
+		
 		if(componentlisteners==null)
 			componentlisteners = new ArrayList();
 		
@@ -189,6 +193,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public IFuture removeComponentListener(IComponentListener listener)
 	{
+		assert !getComponentAdapter().isExternalThread();
+		
 		// Hack! How to find out if remote listener?
 		if(Proxy.isProxyClass(listener.getClass()))
 			listener = new RemoteComponentListener(getExternalAccess(), listener);
@@ -206,6 +212,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public IComponentListener[] getComponentListeners()
 	{
+		assert !getComponentAdapter().isExternalThread();
+		
 		return componentlisteners==null? new IComponentListener[0]: 
 			(IComponentListener[])componentlisteners.toArray(new IComponentListener[componentlisteners.size()]);
 	}
@@ -216,6 +224,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public Collection getInternalComponentListeners()
 	{
+		assert !getComponentAdapter().isExternalThread();
+		
 		return componentlisteners;	
 	}
 	
@@ -260,6 +270,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public IValueFetcher getFetcher()
 	{
+		assert !getComponentAdapter().isExternalThread();
+		
 		if(fetcher==null)
 		{
 			fetcher = new InterpreterFetcher(this);
@@ -275,6 +287,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public void	addDefaultArgument(String name, Object value)
 	{
+		assert !getComponentAdapter().isExternalThread();
+		
 		if(arguments==null)
 		{
 			arguments	= new HashMap();
@@ -293,6 +307,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public void	addDefaultResult(String name, Object value)
 	{
+		assert !getComponentAdapter().isExternalThread();
+		
 		if(results==null)
 		{
 			results	= new HashMap();
@@ -301,13 +317,14 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	}
 	
 	/**
-	 *  Add a default value for an argument (if not already present).
-	 *  Called once for each argument during init.
+	 *  Add an extension.
 	 *  @param name	The argument name.
-	 *  @param value	The argument value.
+	 *  @param value	The extension.
 	 */
 	public void	addExtension(String name, IExtensionInstance value)
 	{
+		assert !getComponentAdapter().isExternalThread();
+		
 		if(extensions==null)
 		{
 			extensions = new HashMap();
@@ -322,6 +339,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public void addProperty(String name, Object val)
 	{
+		assert !getComponentAdapter().isExternalThread();
+		
 		if(properties==null)
 			properties = new HashMap();
 		properties.put(name, val);
@@ -334,6 +353,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public IExtensionInstance getExtension(final String name)
 	{
+		assert !getComponentAdapter().isExternalThread();
+		
 		return extensions==null? null: (IExtensionInstance)extensions.get(name);
 	}
 	
@@ -344,6 +365,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public IExtensionInstance[] getExtensions()
 	{
+		assert !getComponentAdapter().isExternalThread();
+		
 		return extensions==null? new IExtensionInstance[0]: 
 			(IExtensionInstance[])extensions.values().toArray(new IExtensionInstance[extensions.size()]);
 	}
@@ -358,59 +381,22 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	}
 	
 	/**
+	 *  Get the bindings.
+	 *  @return The bindings.
+	 */
+	public RequiredServiceBinding[]	getBindings()
+	{
+		return bindings;
+	}
+	
+	/**
 	 *  Create the service container.
 	 *  @return The service container.
 	 */
 	public IServiceContainer getServiceContainer()
 	{
-		if(container==null)
-		{
-			// Init service container.
-//			MExpressionType mex = model.getContainer();
-//			if(mex!=null)
-//			{
-//				container = (IServiceContainer)mex.getParsedValue().getValue(fetcher);
-//			}
-//			else
-//			{
-//				container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
-				
-				RequiredServiceInfo[] ms = getModel().getRequiredServices();
-				
-				Map sermap = new LinkedHashMap();
-				for(int i=0; i<ms.length; i++)
-				{
-					sermap.put(ms[i].getName(), ms[i]);
-				}
-	
-				if(getConfiguration()!=null)
-				{
-					ConfigurationInfo cinfo = getModel().getConfiguration(getConfiguration());
-					RequiredServiceInfo[] cs = cinfo.getRequiredServices();
-					for(int i=0; i<cs.length; i++)
-					{
-						RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(cs[i].getName());
-						RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType(), rsi.isMultiple(), 
-							new RequiredServiceBinding(cs[i].getDefaultBinding()));
-						sermap.put(cs[i].getName(), newrsi);
-					}
-					if(bindings!=null)
-					{
-						for(int i=0; i<bindings.length; i++)
-						{
-							RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(bindings[i].getName());
-							RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType(), rsi.isMultiple(), 
-								new RequiredServiceBinding(bindings[i]));
-							sermap.put(bindings[i].getName(), newrsi);
-						}
-					}
-				}
-				
-				container = new ComponentServiceContainer(getComponentAdapter(), getComponentDescription().getType(),
-					(RequiredServiceInfo[])sermap.values().toArray(new RequiredServiceInfo[sermap.size()]));
-//			}			
-		}
+		assert container!=null;
+		
 		return container;
 	}
-	
 }

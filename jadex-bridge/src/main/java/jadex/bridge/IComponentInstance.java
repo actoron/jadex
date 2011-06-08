@@ -113,6 +113,7 @@ public interface IComponentInstance
 	
 	/**
 	 *  Start the behavior of a component.
+	 *  Called from external thread that needs to be decoupled.
 	 *  @return Future when behavior is started.
 	 */
 	public void startBehavior();

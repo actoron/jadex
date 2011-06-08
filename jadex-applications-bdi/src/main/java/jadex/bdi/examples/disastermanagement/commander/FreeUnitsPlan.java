@@ -5,7 +5,6 @@ import jadex.bdi.examples.disastermanagement.IExtinguishFireService;
 import jadex.bdi.examples.disastermanagement.ITreatVictimsService;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.commons.SUtil;
 
 /**
  * 
@@ -21,7 +20,7 @@ public class FreeUnitsPlan extends Plan
 		if(!((IGoal)getReason()).isSucceeded())
 		{
 			Object[] units = getParameterSet("units").getValues();
-			System.out.println("Freeing units: "+SUtil.arrayToString(units));
+//			System.out.println("Freeing units: "+SUtil.arrayToString(units));
 			for(int i=0; i<units.length; i++)
 			{
 				if(units[i] instanceof IExtinguishFireService)

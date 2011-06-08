@@ -43,12 +43,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	/**
 	 *  Create a new service container.
 	 */
-	public BasicServiceContainer(Object id, RequiredServiceInfo[] infos)
+	public BasicServiceContainer(Object id)
 	{
 		this.id = id;
-		
-		setRequiredServiceInfos(infos);
-//		setRequiredServiceBindings(bindings);
 	}
 	
 	//-------- interface methods --------

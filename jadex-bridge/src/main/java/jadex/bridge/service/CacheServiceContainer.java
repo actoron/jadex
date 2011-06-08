@@ -395,6 +395,15 @@ public class CacheServiceContainer	implements IServiceContainer
 	{
 		return null;
 	}
+	
+	public void setRequiredServiceInfos(RequiredServiceInfo[] requiredservices)
+	{
+	}
+	
+	public void addRequiredServiceInfos(RequiredServiceInfo[] requiredservices)
+	{
+	}
+
 
 	public IFuture getRequiredService(String name)
 	{

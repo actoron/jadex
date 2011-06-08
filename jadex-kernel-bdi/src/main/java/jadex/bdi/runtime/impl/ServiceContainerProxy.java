@@ -1,7 +1,6 @@
 package jadex.bdi.runtime.impl;
 
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
-import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IResultSelector;
 import jadex.bridge.service.ISearchManager;
@@ -13,9 +12,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  For prefixed access of required services in capability.
@@ -113,7 +109,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture getRequiredService(String name)
 	{
-		String prefix = findServicePrefix();
+		String prefix = interpreter.findServicePrefix(scope);
 		return interpreter.getServiceContainer().getRequiredService(prefix+name);
 	}
 
@@ -124,7 +120,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IIntermediateFuture getRequiredServices(String name)
 	{
-		String prefix = findServicePrefix();
+		String prefix = interpreter.findServicePrefix(scope);
 		return interpreter.getServiceContainer().getRequiredServices(prefix+name);
 	}
 	
@@ -134,7 +130,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture getRequiredService(String name, boolean rebind)
 	{
-		String prefix = findServicePrefix();
+		String prefix = interpreter.findServicePrefix(scope);
 		return interpreter.getServiceContainer().getRequiredService(prefix+name, rebind);
 	}
 	
@@ -144,7 +140,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
 	{
-		String prefix = findServicePrefix();
+		String prefix = interpreter.findServicePrefix(scope);
 		return interpreter.getServiceContainer().getRequiredServices(prefix+name, rebind);
 	}
 	
@@ -214,23 +210,6 @@ public class ServiceContainerProxy implements IServiceContainer
 	{
 		return interpreter.getServiceContainer().getType();
 	}
-	
-	//-------- helper methods --------
-	
-	/**
-	 *  The prefix is the name of the capability starting from the agent.
-	 */
-	protected String findServicePrefix()
-	{
-		List	path	= new ArrayList();
-		interpreter.findSubcapability(interpreter.getAgent(), scope, path);
-		String prefix	= "";
-		for(int i=0; i<path.size(); i++)
-		{
-			prefix	+= interpreter.getState().getAttributeValue(path.get(i), OAVBDIRuntimeModel.capabilityreference_has_name)+ ".";
-		}
-		return prefix;
-	}
 
 	/**
 	 *  Get the required service infos.
@@ -238,5 +217,24 @@ public class ServiceContainerProxy implements IServiceContainer
 	public RequiredServiceInfo[] getRequiredServiceInfos()
 	{
 		return interpreter.getServiceContainer().getRequiredServiceInfos();
+	}
+
+	/**
+	 *  Set the required services.
+	 *  @param required services The required services to set.
+	 */
+	public void setRequiredServiceInfos(RequiredServiceInfo[] requiredservices)
+	{
+		interpreter.getServiceContainer().setRequiredServiceInfos(requiredservices);
+	}
+	
+	/**
+	 *  Add required services for a given prefix.
+	 *  @param prefix The name prefix to use.
+	 *  @param required services The required services to set.
+	 */
+	public void addRequiredServiceInfos(RequiredServiceInfo[] requiredservices)
+	{
+		interpreter.getServiceContainer().addRequiredServiceInfos(requiredservices);
 	}
 }

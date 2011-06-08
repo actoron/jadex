@@ -44,7 +44,7 @@ public class RemoteServiceContainer extends BasicServiceContainer
 	 */
 	public RemoteServiceContainer(IComponentIdentifier componentid, IComponentAdapter adapter)
 	{
-		super(adapter.getComponentIdentifier(), null);
+		super(adapter.getComponentIdentifier());
 		this.adapter = adapter;
 		this.componentid = componentid;
 	}

@@ -50,7 +50,7 @@ public class TreatVictimsService implements ITreatVictimsService
 			{
 				public void goalFinished(AgentEvent ae)
 				{
-					System.out.println("tv fin: "+agent.getAgentName());
+//					System.out.println("tv fin: "+agent.getAgentName());
 					if(tv.isSucceeded())
 						ret.setResult(null);
 					else
@@ -61,7 +61,7 @@ public class TreatVictimsService implements ITreatVictimsService
 				{
 				}
 			});
-			System.out.println("tv start: "+agent.getAgentName());
+//			System.out.println("tv start: "+agent.getAgentName());
 			agent.getGoalbase().dispatchTopLevelGoal(tv);
 		}
 		

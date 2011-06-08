@@ -507,35 +507,41 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		{
 			if(exception==null)
 			{
-				component.cleanupComponent().addResultListener(new IResultListener()
+				invokeLater(new Runnable()
 				{
-					public void resultAvailable(Object result)
+					public void run()
 					{
-						synchronized(AbstractComponentAdapter.this)
+						component.cleanupComponent().addResultListener(new IResultListener()
 						{
-							// Do final cleanup step as (last) ext_entry
-							// for allowing previously added entries still be executed.
-							invokeLater(new Runnable()
-							{								
-								public void run()
+							public void resultAvailable(Object result)
+							{
+								synchronized(AbstractComponentAdapter.this)
 								{
-									shutdownContainer().addResultListener(new DelegationResultListener(ret));
+									// Do final cleanup step as (last) ext_entry
+									// for allowing previously added entries still be executed.
+									invokeLater(new Runnable()
+									{								
+										public void run()
+										{
+											shutdownContainer().addResultListener(new DelegationResultListener(ret));
+											
+//											System.out.println("Checking ext entries after cleanup: "+cid);
+											assert ext_entries==null || ext_entries.isEmpty() : "Ext entries after cleanup: "+desc.getName()+", "+ext_entries;
+										}
+									});
 									
-//									System.out.println("Checking ext entries after cleanup: "+cid);
-									assert ext_entries==null || ext_entries.isEmpty() : "Ext entries after cleanup: "+desc.getName()+", "+ext_entries;
+									// No more ext entries after cleanup step allowed.
+									ext_forbidden	= true;
 								}
-							});
+								
+							}
 							
-							// No more ext entries after cleanup step allowed.
-							ext_forbidden	= true;
-						}
-						
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						getLogger().warning("Exception during component cleanup: "+exception);
-						shutdownContainer().addResultListener(new DelegationResultListener(ret));
+							public void exceptionOccurred(Exception exception)
+							{
+								getLogger().warning("Exception during component cleanup: "+exception);
+								shutdownContainer().addResultListener(new DelegationResultListener(ret));
+							}
+						});
 					}
 				});
 			}
