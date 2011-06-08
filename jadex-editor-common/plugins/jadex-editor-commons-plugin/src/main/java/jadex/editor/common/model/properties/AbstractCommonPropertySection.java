@@ -73,7 +73,7 @@ public abstract class AbstractCommonPropertySection extends
 	public void refresh()
 	{
 		super.refresh();
-		//System.err.println("Refresh called by: " + this);
+		//System.err.println("Refresh called by: " + Thread.currentThread());
 	}
 	
 	/**
@@ -210,6 +210,8 @@ public abstract class AbstractCommonPropertySection extends
 	@Override
 	public void setInput(IWorkbenchPart part, ISelection selection)
 	{
+		//System.out.println("SetInput called by: " + Thread.currentThread());
+		
 		super.setInput(part, selection);
 		if (selection instanceof IStructuredSelection)
 		{

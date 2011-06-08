@@ -150,13 +150,12 @@ public abstract class AbstractCommonTablePropertySection extends
 	{
 		super.refresh();
 		
-		// disabled table viewer refresh - TEST !! 
-		// may avoid problems on input element change
-		
-		//if (tableViewer != null && modelElement != null)				
-		//{
-		//	tableViewer.refresh();
-		//}
+		// this is needed for table add / remove etc. to 
+		// instantly show change!
+		if (tableViewer != null && modelElement != null)				
+		{
+			tableViewer.refresh();
+		}
 		
 	}
 	
