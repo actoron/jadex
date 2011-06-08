@@ -1,11 +1,14 @@
 package jadex.base.gui.componenttree;
 
+import java.lang.reflect.Proxy;
+
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.gui.SGUI;
+import jadex.micro.annotation.Binding;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -93,11 +96,15 @@ public class RequiredServiceNode extends AbstractTreeNode
 	 */
 	public String toString()
 	{
-		StringBuffer buf = new StringBuffer();
-		buf.append(SReflect.getUnqualifiedClassName(info.getType()));
-		if(info.getName()!=null)	
-			buf.append(" (").append(info.getName()).append(")");
-		return buf.toString();
+		return SReflect.getUnqualifiedClassName(info.getType());
+	}
+	
+	/**
+	 *  Get tooltip text.
+	 */
+	public String getTooltipText()
+	{
+		return info.getName()+" "+info.getDefaultBinding();
 	}
 
 	/**

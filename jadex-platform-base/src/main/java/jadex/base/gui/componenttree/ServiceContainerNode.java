@@ -101,6 +101,14 @@ public class ServiceContainerNode	extends AbstractTreeNode
 	{
 		return NAME;
 	}
+	
+	/**
+	 *  Get tooltip text.
+	 */
+	public String getTooltipText()
+	{
+		return null;
+	}
 
 	/**
 	 *  Set the children.

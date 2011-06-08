@@ -42,12 +42,12 @@ public class AsyncTreeCellRenderer extends DefaultTreeCellRenderer
 		// Change icons depending on node type.
 		ITreeNode node = (ITreeNode)value;
 		Icon icon = node.getIcon();
+		String tooltip = node.getTooltipText();
 		// Add overlays to icon (if any).
 		if(tree.getModel() instanceof AsyncTreeModel)
 		{
 			List icons = null;
-			INodeHandler[] handlers = ((AsyncTreeModel)tree.getModel())
-					.getNodeHandlers();
+			INodeHandler[] handlers = ((AsyncTreeModel)tree.getModel()).getNodeHandlers();
 			for(int i = 0; handlers != null && i < handlers.length; i++)
 			{
 				Icon overlay = handlers[i].getOverlay(node);
@@ -83,9 +83,13 @@ public class AsyncTreeCellRenderer extends DefaultTreeCellRenderer
 			setClosedIcon(getDefaultClosedIcon());
 			setLeafIcon(getDefaultLeafIcon());
 		}
-
+		if(tooltip!=null)
+		{
+			setToolTipText(tooltip);
+		}
+		
 		JComponent comp = (JComponent)super.getTreeCellRendererComponent(tree,
-				value, selected, expanded, leaf, row, hasFocus);
+			value, selected, expanded, leaf, row, hasFocus);
 
 		return comp;
 	}

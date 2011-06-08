@@ -209,21 +209,14 @@ public class RequiredServiceBinding
 		this.recover = recover;
 	}
 
-//	/**
-//	 *  Get the componentfilename.
-//	 *  @return The componentfilename.
-//	 */
-//	public String getComponentFilename()
-//	{
-//		return componentfilename;
-//	}
-//
-//	/**
-//	 *  Set the componentfilename.
-//	 *  @param componentfilename The componentfilename to set.
-//	 */
-//	public void setComponentFilename(String componentfilename)
-//	{
-//		this.componentfilename = componentfilename;
-//	}
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return " scope=" + scope + ", dynamic="+ dynamic + ", create=" + create + ", recover=" 
+			+ recover+ ", componentname=" + componentname + ", componenttype="+ componenttype;
+	}
+
+	
 }

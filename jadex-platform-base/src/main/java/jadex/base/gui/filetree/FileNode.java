@@ -109,6 +109,14 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 	{
 		return FileData.getDisplayName(file);
 	}
+	
+	/**
+	 *  Get tooltip text.
+	 */
+	public String getTooltipText()
+	{
+		return file.getAbsolutePath();
+	}
 
 	/**
 	 *  True, if the node has properties that can be displayed.

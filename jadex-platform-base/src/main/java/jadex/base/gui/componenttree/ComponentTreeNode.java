@@ -123,6 +123,14 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	}
 	
 	/**
+	 *  Get tooltip text.
+	 */
+	public String getTooltipText()
+	{
+		return desc.toString();
+	}
+	
+	/**
 	 *  Refresh the node.
 	 *  @param recurse	Recursively refresh subnodes, if true.
 	 */

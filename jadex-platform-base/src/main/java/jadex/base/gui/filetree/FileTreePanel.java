@@ -40,6 +40,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.ToolTipManager;
 import javax.swing.tree.TreePath;
 
 /**
@@ -116,6 +117,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		tree.setToggleClickCount(0);
 		tree.setRootVisible(false);
 		tree.setRowHeight(16);
+		ToolTipManager.sharedInstance().registerComponent(tree);
 		
 		this.add(new JScrollPane(tree), BorderLayout.CENTER);
 		

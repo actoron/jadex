@@ -53,6 +53,11 @@ public interface ITreeNode
 	public Icon	getIcon();
 	
 	/**
+	 *  Get the tooltip text.
+	 */
+	public String getTooltipText();
+	
+	/**
 	 *  Refresh the node.
 	 *  @param recurse	Recursively refresh subnodes, if true.
 	 */

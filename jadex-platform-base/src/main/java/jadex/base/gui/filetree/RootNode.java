@@ -147,6 +147,14 @@ public class RootNode extends AbstractTreeNode
 	{
 		return "root";
 	}
+	
+	/**
+	 *  Get tooltip text.
+	 */
+	public String getTooltipText()
+	{
+		return null;
+	}
 
 	/**
 	 *  True, if the node has properties that can be displayed.

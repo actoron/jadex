@@ -47,6 +47,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
+import javax.swing.ToolTipManager;
 import javax.swing.UIDefaults;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
@@ -170,6 +171,8 @@ public class ComponentTreePanel extends JSplitPane
 		final ComponentIconCache	cic	= new ComponentIconCache(access, tree);
 		JScrollPane	scroll	= new JScrollPane(tree);
 		this.add(scroll);
+		// needed to show tooltips: http://info.michael-simons.eu/2008/08/12/enabling-tooltips-on-a-jtree/
+		ToolTipManager.sharedInstance().registerComponent(tree);
 		
 		this.proppanel	= new JScrollPane();
 		proppanel.setMinimumSize(new Dimension(0, 0));

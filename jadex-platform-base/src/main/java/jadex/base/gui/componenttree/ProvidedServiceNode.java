@@ -1,5 +1,7 @@
 package jadex.base.gui.componenttree;
 
+import java.lang.reflect.Proxy;
+
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
@@ -88,25 +90,19 @@ public class ProvidedServiceNode	extends AbstractTreeNode
 	 */
 	public String toString()
 	{
-//		try
-//		{
+		return SReflect.getUnqualifiedClassName(service.getServiceIdentifier().getServiceType());
+	}
+	
+	/**
+	 *  Get tooltip text.
+	 */
+	public String getTooltipText()
+	{
 		StringBuffer buf = new StringBuffer();
-		buf.append(SReflect.getUnqualifiedClassName(service.getServiceIdentifier().getServiceType()));
-//		buf.append(" (").append(service.getServiceIdentifier().getServiceName()).append(") ");
-//		if(!Proxy.isProxyClass(service.getClass()))
-//			buf.append(" :").append(SReflect.getUnqualifiedClassName(service.getClass()));
+		buf.append(service.getServiceIdentifier().getServiceName());
+		if(!Proxy.isProxyClass(service.getClass()))
+			buf.append(" :").append(SReflect.getUnqualifiedClassName(service.getClass())); 
 		return buf.toString();
-		
-//		return Proxy.isProxyClass(service.getClass())
-//			? SReflect.getUnqualifiedClassName(service.getServiceIdentifier().getServiceType())
-//				+" ("+service.getServiceIdentifier().getProviderId()+")"
-//			: SReflect.getUnqualifiedClassName(service.getClass());
-//		}
-//		catch(Exception e)
-//		{	
-////			e.printStackTrace();
-//			return e.toString();
-//		}
 	}
 
 	/**

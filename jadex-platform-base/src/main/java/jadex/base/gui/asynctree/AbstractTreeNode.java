@@ -211,6 +211,11 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	 *  Get the icon for a node.
 	 */
 	public abstract Icon	getIcon();
+	
+	/**
+	 *  Get tooltip text.
+	 */
+	public abstract String getTooltipText();
 
 	/**
 	 *  Asynchronously search for children.
