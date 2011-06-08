@@ -3,8 +3,8 @@
  */
 package deco4mas.coordinate.interpreter.coordination_information;
 
-import jadex.application.space.envsupport.environment.EnvironmentEvent;
-import jadex.application.space.envsupport.environment.IPerceptGenerator;
+import jadex.extension.envsupport.environment.EnvironmentEvent;
+import jadex.extension.envsupport.environment.IPerceptGenerator;
 
 
 

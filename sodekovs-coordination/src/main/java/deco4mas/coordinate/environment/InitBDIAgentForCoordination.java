@@ -1,12 +1,11 @@
 package deco4mas.coordinate.environment;
 
-import jadex.application.runtime.IApplication;
-import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceObject;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,10 +34,9 @@ public class InitBDIAgentForCoordination {
 	private BDIBehaviorObservationComponent behObserver = null;
 	private IBDIExternalAccess exta = null;
 	private String agentType;
-	private IComponentIdentifier ai;
+	private IComponentDescription ai;
 	private MASDynamics masDyn;
 	private AbstractEnvironmentSpace space;
-	private IApplication context;
 	private int numberOfPublishPercepts = 0;
 	private int numberOfPerceivePercepts = 0;
 
@@ -52,12 +50,11 @@ public class InitBDIAgentForCoordination {
 	 */
 	// public Map<String, Object[]> startInits(IAgentIdentifier ai, IContext
 	// context, AbstractEnvironmentSpace space, MASDynamics masDyn) {
-	public void startInits(IComponentIdentifier ai, IBDIExternalAccess exta, IApplication context, AbstractEnvironmentSpace space, MASDynamics masDyn) {
+	public void startInits(IComponentDescription ai, IBDIExternalAccess exta, AbstractEnvironmentSpace space, MASDynamics masDyn) {
 		this.ai = ai;
 		this.exta = exta;
 		this.masDyn = masDyn;
 		this.space = space;
-		this.context = context;
 
 		boolean exeption = initAvatar();
 		if (!exeption)
@@ -150,7 +147,7 @@ public class InitBDIAgentForCoordination {
 				+ numberOfPerceivePercepts + " PerceivePercepts");
 
 		// agentData.put(getAgentType(ai, this.getContext()), res);
-		((CoordinationSpace) space).getAgentData().put(((IApplication) context).getComponentType(ai), behObserver.getRoleDefinitionsForPerceive());
+		((CoordinationSpace) space).getAgentData().put(ai.getType(), behObserver.getRoleDefinitionsForPerceive());
 		// return behObserver.getRoleDefinitionsForPerceive();
 		// getBeliefbase().getBelief(Constants.DECO4MAS_BELIEF_NAME).setFact(decom4MasMap);
 	}
@@ -248,7 +245,7 @@ public class InitBDIAgentForCoordination {
 			try {
 				Map props = new HashMap();
 				props.put(ISpaceObject.PROPERTY_OWNER, ai);
-				space.createSpaceObject(((IApplication) space.getContext()).getComponentType(ai), props, null);
+				space.createSpaceObject(ai.getType(), props, null);
 			} catch (RuntimeException e) {
 				if (e.getMessage().contains("Unknown space object type")) {
 					exeption = true;
@@ -272,9 +269,7 @@ public class InitBDIAgentForCoordination {
 			@Override
 			public Object execute(IInternalAccess ia) {
 				behObserver = new BDIBehaviorObservationComponent(exta, masDyn);
-				// agentType =
-				// exta.getApplicationContext().getAgentType(ai);
-				agentType = context.getComponentType(ai);
+				agentType = ai.getType();
 				initPublishAndPercept();
 				return null;
 			}

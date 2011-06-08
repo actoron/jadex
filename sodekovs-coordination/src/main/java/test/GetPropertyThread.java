@@ -1,6 +1,6 @@
 package test;
 
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import deco.lang.dynamics.MASDynamics;
 
 /**

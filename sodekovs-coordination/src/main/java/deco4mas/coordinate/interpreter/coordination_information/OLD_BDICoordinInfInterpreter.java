@@ -4,12 +4,12 @@ package deco4mas.coordinate.interpreter.coordination_information;
  * TODO (4-8-10): Analyse this in order to enable the running of the example with the TupleSapce -> there is a problem with the part (1==1) around 
  */
 
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentDescription;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 
@@ -89,7 +89,7 @@ public class OLD_BDICoordinInfInterpreter extends SimplePropertyObject implement
 	 */
 	// @Override
 
-	public void processPercept(final IEnvironmentSpace space, final String type, final Object percept, final IComponentIdentifier agent,
+	public void processPercept(final IEnvironmentSpace space, final String type, final Object percept, final IComponentDescription agent,
 		final ISpaceObject avatar)
 	{
 //		boolean invoke = false;

@@ -1,11 +1,11 @@
 package deco4mas.coordinate.environment;
 
-import jadex.application.space.envsupport.MObjectType;
-import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-import jadex.application.space.envsupport.environment.IPerceptGenerator;
-import jadex.application.space.envsupport.environment.IPerceptProcessor;
-import jadex.application.space.envsupport.environment.PerceptType;
+import jadex.extension.envsupport.MObjectType;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.IPerceptGenerator;
+import jadex.extension.envsupport.environment.IPerceptProcessor;
+import jadex.extension.envsupport.environment.PerceptType;
 
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -8,20 +8,19 @@ package deco4mas.coordinate.interpreter.coordination_information;
  *
  */
 
-import jadex.application.runtime.IApplication;
-import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.application.space.envsupport.environment.EnvironmentEvent;
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.application.space.envsupport.environment.PerceptType;
-import jadex.application.space.envsupport.environment.space2d.Space2D;
-import jadex.application.space.envsupport.math.IVector1;
-import jadex.application.space.envsupport.math.IVector2;
-import jadex.application.space.envsupport.math.Vector1Double;
-import jadex.application.space.envsupport.math.Vector2Double;
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentDescription;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.collection.MultiCollection;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.extension.envsupport.environment.EnvironmentEvent;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.PerceptType;
+import jadex.extension.envsupport.environment.space2d.Space2D;
+import jadex.extension.envsupport.math.IVector1;
+import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.Vector1Double;
+import jadex.extension.envsupport.math.Vector2Double;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -77,20 +76,6 @@ public class DefaultCoordinationEventGenerator extends SimplePropertyObject impl
 	/** The percept receiving agent types. */
 	protected Map actiontypes;
 
-	// -------- IPerceptGenerator --------
-
-	@Override
-	public void componentAdded(IComponentIdentifier component, IEnvironmentSpace space) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void componentRemoved(IComponentIdentifier component, IEnvironmentSpace space) {
-		// TODO Auto-generated method stub
-
-	}
-
 	// -------- IEnvironmentListener --------
 
 	/**
@@ -102,34 +87,34 @@ public class DefaultCoordinationEventGenerator extends SimplePropertyObject impl
 	public void dispatchEnvironmentEvent(EnvironmentEvent event) {
 		CoordinationSpace space = (CoordinationSpace) event.getSpace();
 
-		IComponentIdentifier eventowner = (IComponentIdentifier) event.getSpaceObject().getProperty(ISpaceObject.PROPERTY_OWNER);
+		IComponentDescription eventowner = (IComponentDescription) event.getSpaceObject().getProperty(ISpaceObject.PROPERTY_OWNER);
 
 		if (CoordinationEvent.COORDINATE_BROADCAST.equals(event.getType())) {
 			ISpaceObject[] objects = (ISpaceObject[]) space.getNearObjects(new Vector2Double(0.0, 0.0), new Vector1Double(20.0)).toArray(new ISpaceObject[0]);
 
 			for (int i = 0; i < objects.length; i++) {
-				IComponentIdentifier owner = (IComponentIdentifier) objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
+				IComponentDescription owner = (IComponentDescription) objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 				IVector2 objpos = (IVector2) objects[i].getProperty(Space2D.PROPERTY_POSITION);
 				if (owner != null) {
-					String percepttype = getPerceptType(space, ((IApplication) event.getSpace().getContext()).getComponentType(owner), event.getSpaceObject().getType(), COORDINATE_INFO);
+					String percepttype = getPerceptType(space, owner.getType(), event.getSpaceObject().getType(), COORDINATE_INFO);
 					if (percepttype != null) {
 						((AbstractEnvironmentSpace) event.getSpace()).createPercept(percepttype, event.getSpaceObject(), owner, objects[i]);
 					}
 				}
 
 				if (eventowner != null) {
-					String percepttype = getPerceptType(space, ((IApplication) event.getSpace().getContext()).getComponentType(eventowner), objects[i].getType(), COORDINATE_INFO);
+					String percepttype = getPerceptType(space, eventowner.getType(), objects[i].getType(), COORDINATE_INFO);
 					if (percepttype != null) {
 						((AbstractEnvironmentSpace) event.getSpace()).createPercept(percepttype, objects[i], eventowner, event.getSpaceObject());
 					}
 				}
 			}
 		} else if (event.getType().startsWith(CoordinationEvent.COORDINATE_DIRECT)) {
-			List<IComponentIdentifier> receiver = space.getReceiverData().get(event.getType());
+			List<IComponentDescription> receiver = space.getReceiverData().get(event.getType());
 
 			if (receiver != null) {
-				for (IComponentIdentifier receiverIdentifier : receiver) {
-					String percepttype = getPerceptType(space, space.getContext().getComponentType(receiverIdentifier), event.getSpaceObject().getType(), COORDINATE_INFO);
+				for (IComponentDescription receiverIdentifier : receiver) {
+					String percepttype = getPerceptType(space, receiverIdentifier.getType(), event.getSpaceObject().getType(), COORDINATE_INFO);
 					if (percepttype != null) {
 						space.createPercept(percepttype, event.getSpaceObject(), receiverIdentifier, space.getAvatar(receiverIdentifier));
 					}
@@ -234,6 +219,16 @@ public class DefaultCoordinationEventGenerator extends SimplePropertyObject impl
 	protected String getRangePropertyName() {
 		Object tmp = getProperty(PROPERTY_RANGE);
 		return tmp == null ? "range" : (String) tmp;
+	}
+
+	@Override
+	public void componentAdded(IComponentDescription component,
+			IEnvironmentSpace space) {
+	}
+
+	@Override
+	public void componentRemoved(IComponentDescription component,
+			IEnvironmentSpace space) {
 	}
 
 	/**

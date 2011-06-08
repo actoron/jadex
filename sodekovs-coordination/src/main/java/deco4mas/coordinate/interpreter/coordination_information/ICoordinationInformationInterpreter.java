@@ -1,9 +1,9 @@
 package deco4mas.coordinate.interpreter.coordination_information;
 
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-import jadex.application.space.envsupport.environment.IPerceptProcessor;
-import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentDescription;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.IPerceptProcessor;
+import jadex.extension.envsupport.environment.ISpaceObject;
 
 /**
  * This interface specifies the "Coordination Information Interpreter" component.
@@ -53,5 +53,5 @@ public interface ICoordinationInformationInterpreter extends IPerceptProcessor {
 	// public void dispatchWhenApplicable(String type, Object data, IAgentIdentifier agent, ISpaceObject avatars);
 
 	// public void processPercept(ISpace space, String type, Object percept, IComponentIdentifier agent, ISpaceObject avatar);
-	public void processPercept(IEnvironmentSpace space, String type, Object percept, IComponentIdentifier component, ISpaceObject avatar);
+	public void processPercept(IEnvironmentSpace space, String type, Object percept, IComponentDescription component, ISpaceObject avatar);
 }

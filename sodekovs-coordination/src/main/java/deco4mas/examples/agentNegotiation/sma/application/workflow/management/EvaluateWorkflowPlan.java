@@ -1,14 +1,12 @@
 package deco4mas.examples.agentNegotiation.sma.application.workflow.management;
 
-import jadex.application.runtime.IApplicationExternalAccess;
-import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.bdi.runtime.Plan;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 
 import java.util.logging.Logger;
 
 import deco4mas.examples.agentNegotiation.common.dataObjects.WorkflowData;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
-import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.HistorytimeTrustFunction;
 
 /**
  * Evaluate the workflow

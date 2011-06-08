@@ -1,14 +1,7 @@
 package deco4mas.coordinate.environment;
 
-import jadex.application.model.MSpaceInstance;
-import jadex.application.runtime.IApplication;
-import jadex.application.space.envsupport.MObjectType;
-import jadex.application.space.envsupport.environment.EnvironmentEvent;
-import jadex.application.space.envsupport.environment.IPerceptGenerator;
-import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.application.space.envsupport.environment.space2d.ContinuousSpace2D;
-import jadex.application.space.envsupport.environment.space2d.Grid2D;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
@@ -16,6 +9,13 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
+import jadex.extension.envsupport.MEnvSpaceInstance;
+import jadex.extension.envsupport.MObjectType;
+import jadex.extension.envsupport.environment.EnvironmentEvent;
+import jadex.extension.envsupport.environment.IPerceptGenerator;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
+import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.javaparser.IValueFetcher;
 import jadex.micro.IMicroExternalAccess;
 
@@ -41,7 +41,7 @@ public class CoordinationSpace extends Grid2D {
 	private Map<String, Map<String, Set<Object[]>>> agentData = new HashMap<String, Map<String, Set<Object[]>>>();
 
 	/** Contains the receivers for the direct addressing */
-	private Map<String, List<IComponentIdentifier>> receiverData = new HashMap<String, List<IComponentIdentifier>>();
+	private Map<String, List<IComponentDescription>> receiverData = new HashMap<String, List<IComponentDescription>>();
 
 	// -------- constructors --------
 
@@ -61,22 +61,9 @@ public class CoordinationSpace extends Grid2D {
 	}
 
 	@Override
-	public void initSpace(IApplication context, MSpaceInstance config, IValueFetcher fetcher) throws Exception {
-		super.initSpace(context, config, new IValueFetcher() {
-
-			@Override
-			public Object fetchValue(String name, Object object) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public Object fetchValue(String name) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-		});
-
+	public void initSpace(IExternalAccess exta, MEnvSpaceInstance config, IValueFetcher fetcher) {
+		super.initSpace(exta, config, fetcher);
+		
 		initSpaces();
 		initDeco4mas();
 		for (ICoordinationMechanism icord : activeCoordinationMechanisms) {
@@ -143,26 +130,27 @@ public class CoordinationSpace extends Grid2D {
 		this.fireEnvironmentEvent(new EnvironmentEvent(key, this, newObj, "Coordinate Event Nr. " + mechanismEventNumber, null));
 	}
 
-	private List<IComponentIdentifier> getIdentifier(List<String> agentNames) {
-		List<IComponentIdentifier> componentIdentifiers = new ArrayList<IComponentIdentifier>();
+	private List<IComponentDescription> getIdentifier(List<String> agentNames) {
+		List<IComponentDescription> componentDescriptions = new ArrayList<IComponentDescription>();
 
-		IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getServiceUpwards(this.getContext().getServiceContainer(), IComponentManagementService.class).get(
+		IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getServiceUpwards(this.getExternalAccess().getServiceProvider(), IComponentManagementService.class).get(
 				new ThreadSuspendable());
-		IComponentIdentifier[] identifiers = (IComponentIdentifier[]) cms.getComponentIdentifiers().get(new ThreadSuspendable());
-		for (IComponentIdentifier identifier : identifiers) {
-			if (agentNames.contains(identifier.getLocalName())) {
-				agentNames.remove(identifier.getLocalName());
-				componentIdentifiers.add(identifier);
+		IComponentDescription[] descriptions = (IComponentDescription[]) cms.getComponentDescriptions().get(new ThreadSuspendable());
+//		IComponentIdentifier[] identifiers = (IComponentIdentifier[]) cms.getComponentIdentifiers().get(new ThreadSuspendable());
+		for (IComponentDescription description : descriptions) {
+			if (agentNames.contains(description.getName().getLocalName())) {
+				agentNames.remove(description.getName().getLocalName());
+				componentDescriptions.add(description);
 			}
 		}
 
-		return componentIdentifiers;
+		return componentDescriptions;
 	}
 
 	/**
 	 * @return the receiverData
 	 */
-	public Map<String, List<IComponentIdentifier>> getReceiverData() {
+	public Map<String, List<IComponentDescription>> getReceiverData() {
 		return receiverData;
 	}
 
@@ -204,13 +192,13 @@ public class CoordinationSpace extends Grid2D {
 	 * This methods causes the creation of the INIT_Deco4MAS_Coordination-Percept. This percept is perceived by those Agent which participate as "active parts/members", means those agents that create
 	 * percepts. The percept triggers a plan within the agents and initializes the "Agent-State-Interpreter" /"Agent Behaviour Observation Component".
 	 */
-	private void initParticipatingAgent(final IComponentIdentifier ai) {
+	private void initParticipatingAgent(final IComponentDescription ai) {
 		// get the IComponentManagementService
-		IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getServiceUpwards(this.getContext().getServiceContainer(), IComponentManagementService.class).get(
+		IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getServiceUpwards(this.getExternalAccess().getServiceProvider(), IComponentManagementService.class).get(
 				new ThreadSuspendable());
 
 		// get the external access for the agent
-		IFuture fut = cms.getExternalAccess(ai);
+		IFuture fut = cms.getExternalAccess(ai.getName());
 		fut.addResultListener(new IResultListener() {
 
 			@Override
@@ -222,11 +210,11 @@ public class CoordinationSpace extends Grid2D {
 				if (externalAccess instanceof IBDIExternalAccess) {
 					IBDIExternalAccess exta = (IBDIExternalAccess) externalAccess;
 
-					new InitBDIAgentForCoordination().startInits(ai, exta, CoordinationSpace.this.getContext(), CoordinationSpace.this, masDnyModel);
+					new InitBDIAgentForCoordination().startInits(ai, exta, CoordinationSpace.this, masDnyModel);
 				} else if (externalAccess instanceof IMicroExternalAccess) {
 					IMicroExternalAccess exta = (IMicroExternalAccess) externalAccess;
 
-					new InitMicroAgentForCoordination().startInits(ai, exta, CoordinationSpace.this.getContext(), CoordinationSpace.this, masDnyModel);
+					new InitMicroAgentForCoordination().startInits(ai, exta, CoordinationSpace.this, masDnyModel);
 				}
 			}
 
@@ -240,12 +228,13 @@ public class CoordinationSpace extends Grid2D {
 	/**
 	 * Called when an component was added.
 	 */
-	public void componentAdded(IComponentIdentifier aid) {
+	@Override
+	public void componentAdded(IComponentDescription owner) {
 		synchronized (monitor) {
 			// Possibly add or create avatar(s) if any.
-			List ownedobjs = (List) spaceobjectsbyowner.get(aid);
+			List ownedobjs = (List) spaceobjectsbyowner.get(owner);
 			if (ownedobjs == null) {
-				createAvatar(aid, null, false);
+				createAvatar(owner, null, false);
 			} else {
 				// Init zombie avatars.
 				for (Iterator it = ownedobjs.iterator(); it.hasNext();) {
@@ -259,11 +248,11 @@ public class CoordinationSpace extends Grid2D {
 			if (perceptgenerators != null) {
 				for (Iterator it = perceptgenerators.keySet().iterator(); it.hasNext();) {
 					IPerceptGenerator gen = (IPerceptGenerator) perceptgenerators.get(it.next());
-					gen.componentAdded(aid, this);
+					gen.componentAdded(owner, this);
 				}
 			}
 			// init Agent for deco4MAS participation
-			initParticipatingAgent(aid);
+			initParticipatingAgent(owner);
 		}
 	}
 

@@ -1,6 +1,6 @@
 package deco4mas.mechanism.v2.tspaces;
 
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
 
 import com.ibm.tspaces.Callback;
 import com.ibm.tspaces.SuperTuple;

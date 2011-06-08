@@ -3,7 +3,6 @@
  */
 package deco4mas.coordinate.interpreter.agent_state;
 
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIExternalAccess;
@@ -26,6 +25,7 @@ import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.rules.state.IOAVState;
 
 import java.util.HashMap;

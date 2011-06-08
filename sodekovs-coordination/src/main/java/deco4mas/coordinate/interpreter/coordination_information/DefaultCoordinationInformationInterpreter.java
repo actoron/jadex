@@ -3,8 +3,6 @@
  */
 package deco4mas.coordinate.interpreter.coordination_information;
 
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBelief;
@@ -20,6 +18,7 @@ import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.flyweights.GoalbaseFlyweight;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
@@ -30,6 +29,8 @@ import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
@@ -119,7 +120,8 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 
 	// -------- methods --------
 
-	public void processPercept(final IEnvironmentSpace space, final String type, final Object percept, final IComponentIdentifier agent, final ISpaceObject avatar) {
+	@Override
+	public void processPercept(final IEnvironmentSpace space, final String type, final Object percept, final IComponentDescription agent, final ISpaceObject avatar) {
 		boolean invoke = false;
 		final String[][] metainfos = getMetaInfos(type);
 		for (int i = 0; !invoke && metainfos != null && i < metainfos.length; i++) {
@@ -130,9 +132,9 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 		if (invoke) {
 			// IAMS ams = (IAMS) ((IApplicationContext)
 			// space.getContext()).getPlatform().getService(IComponentManagementService.class);
-			IComponentManagementService ams = (IComponentManagementService) SServiceProvider.getServiceUpwards(space.getContext().getServiceContainer(), IComponentManagementService.class).get(
+			IComponentManagementService ams = (IComponentManagementService) SServiceProvider.getServiceUpwards(space.getExternalAccess().getServiceProvider(), IComponentManagementService.class).get(
 					new ThreadSuspendable());
-			final IExternalAccess exta = (IExternalAccess) ams.getExternalAccess(agent).get(new ThreadSuspendable());
+			final IExternalAccess exta = (IExternalAccess) ams.getExternalAccess(agent.getName()).get(new ThreadSuspendable());
 			exta.scheduleStep(new IComponentStep() {
 
 				@Override

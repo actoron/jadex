@@ -1,8 +1,8 @@
 package deco4mas.coordinate.environment;
 
-import jadex.application.space.envsupport.environment.EnvironmentEvent;
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.EnvironmentEvent;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceObject;
 
 /**
  * 

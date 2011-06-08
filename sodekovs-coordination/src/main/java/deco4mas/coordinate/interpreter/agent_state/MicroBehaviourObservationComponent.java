@@ -1,6 +1,5 @@
 package deco4mas.coordinate.interpreter.agent_state;
 
-import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
@@ -64,7 +63,7 @@ public class MicroBehaviourObservationComponent extends BehaviorObservationCompo
 		addValueToMap(agentEventDCMRealizationMappings, AgentElementType.MICRO_STEP + "::" + agentElement.getElement_id(), mechanismRealizationId);
 
 		ExternalAccess externalAccess = (ExternalAccess) extAccess;
-		MicroAgentInterpreter interpreter = externalAccess.getInterpreter();
+		MicroAgentInterpreter interpreter = (MicroAgentInterpreter) externalAccess.getInterpreter();
 		interpreter.addComponentListener(new IComponentListener() {
 			
 			@Override

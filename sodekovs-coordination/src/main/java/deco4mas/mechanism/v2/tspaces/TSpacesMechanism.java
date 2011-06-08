@@ -1,6 +1,6 @@
 package deco4mas.mechanism.v2.tspaces;
 
-import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.ISpaceObject;
 import deco4mas.coordinate.environment.CoordinationSpace;
 import deco4mas.mechanism.CoordinationInformation;
 import deco4mas.mechanism.ICoordinationMechanism;

@@ -1,11 +1,10 @@
 package deco4mas.examples.agentNegotiation.sma.coordination.capability.serviceOfferer.trustOwner;
 
-import jadex.application.runtime.IApplicationExternalAccess;
-import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 
 import java.util.Iterator;
 import java.util.logging.Logger;

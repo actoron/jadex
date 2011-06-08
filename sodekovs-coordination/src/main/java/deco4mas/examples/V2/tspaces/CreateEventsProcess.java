@@ -1,11 +1,11 @@
 package deco4mas.examples.V2.tspaces;
 
 
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceProcess;
-import jadex.application.space.envsupport.environment.space2d.Grid2D;
-import jadex.commons.SimplePropertyObject;
 import jadex.bridge.service.clock.IClockService;
+import jadex.commons.SimplePropertyObject;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceProcess;
+import jadex.extension.envsupport.environment.space2d.Grid2D;
 import deco.lang.dynamics.AgentElementType;
 import deco4mas.annotation.agent.CoordinationAnnotation.CoordinationType;
 import deco4mas.coordinate.environment.CoordinationSpaceObject;

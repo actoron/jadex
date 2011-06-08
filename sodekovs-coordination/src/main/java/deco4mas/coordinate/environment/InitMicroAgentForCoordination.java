@@ -1,11 +1,10 @@
 package deco4mas.coordinate.environment;
 
-import jadex.application.runtime.IApplication;
-import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.micro.IMicroExternalAccess;
 
 import java.util.ArrayList;
@@ -35,11 +34,9 @@ import deco4mas.helper.Constants;
  */
 public class InitMicroAgentForCoordination {
 
-	private IComponentIdentifier ai = null;
+	private IComponentDescription ai = null;
 
 	private IMicroExternalAccess extAccess = null;
-
-	private IApplication context = null;
 
 	private AbstractEnvironmentSpace space = null;
 
@@ -62,10 +59,9 @@ public class InitMicroAgentForCoordination {
 	 * @param space
 	 * @param masDyn
 	 */
-	public void startInits(IComponentIdentifier ai, IMicroExternalAccess exta, IApplication context, AbstractEnvironmentSpace space, MASDynamics masDyn) {
+	public void startInits(IComponentDescription ai, IMicroExternalAccess exta, AbstractEnvironmentSpace space, MASDynamics masDyn) {
 		this.ai = ai;
 		this.extAccess = exta;
-		this.context = context;
 		this.space = space;
 		this.masDyn = masDyn;
 
@@ -84,9 +80,9 @@ public class InitMicroAgentForCoordination {
 
 		if (space.getAvatar(ai) == null) {
 			try {
-				Map<String, IComponentIdentifier> props = new HashMap<String, IComponentIdentifier>();
+				Map<String, IComponentDescription> props = new HashMap<String, IComponentDescription>();
 				props.put(ISpaceObject.PROPERTY_OWNER, ai);
-				space.createSpaceObject(((IApplication) space.getContext()).getComponentType(ai), props, null);
+				space.createSpaceObject(ai.getType(), props, null);
 			} catch (RuntimeException e) {
 				if (e.getMessage().contains("Unknown space object type")) {
 					exeption = true;
@@ -109,7 +105,7 @@ public class InitMicroAgentForCoordination {
 			public Object execute(IInternalAccess ia) {
 				ArrayList<String> spaces = getSpaces();
 				behaviourObserver = new MicroBehaviourObservationComponent(extAccess, masDyn, spaces);
-				agentType = context.getComponentType(ai);
+				agentType = ai.getType();
 				initPublishAndPercept();
 				return null;
 			}
@@ -194,7 +190,7 @@ public class InitMicroAgentForCoordination {
 		System.out.println("#InitMicroAgentCoordinationPlan-" + extAccess.getComponentIdentifier().getName() + "# Completed initialization: " + numberOfPublishPercepts + " PublishPercepts and "
 				+ numberOfPerceivePercepts + " PerceivePercepts");
 
-		((CoordinationSpace) space).getAgentData().put(((IApplication) context).getComponentType(ai), behaviourObserver.getRoleDefinitionsForPerceive());
+		((CoordinationSpace) space).getAgentData().put(ai.getType(), behaviourObserver.getRoleDefinitionsForPerceive());
 	}
 
 	/**

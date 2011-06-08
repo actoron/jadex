@@ -1,9 +1,8 @@
 package deco4mas.examples.agentNegotiation.sa.application;
 
-import jadex.application.runtime.IApplicationExternalAccess;
-import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 
 import java.util.Random;
 import java.util.logging.Logger;

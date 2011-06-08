@@ -1,9 +1,9 @@
 package deco4mas.examples.agentNegotiation.deco.media;
 
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceProcess;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.SimplePropertyObject;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceProcess;
 import deco4mas.coordinate.environment.CoordinationSpace;
 import deco4mas.mechanism.ICoordinationMechanism;
 

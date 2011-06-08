@@ -1,7 +1,7 @@
 package deco4mas.mechanism.v2.tspaces;
 
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceObject;
 
 import java.io.Serializable;
 import java.util.Map.Entry;

@@ -6,13 +6,13 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ExternalAccess;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.future.IFuture;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.commons.future.IFuture;
 import jadex.javaparser.SimpleValueFetcher;
+import jadex.kernelbase.ExternalAccess;
 
 import java.util.ArrayList;
 import java.util.HashSet;

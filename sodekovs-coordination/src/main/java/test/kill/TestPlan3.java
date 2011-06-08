@@ -1,11 +1,9 @@
 package test.kill;
 
-import jadex.application.runtime.IApplicationExternalAccess;
-import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.service.SServiceProvider;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 
 
 /**

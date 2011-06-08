@@ -4,12 +4,12 @@ import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ExternalAccess;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.future.IFuture;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.commons.future.IFuture;
+import jadex.kernelbase.ExternalAccess;
 
 import java.util.logging.Logger;
 
