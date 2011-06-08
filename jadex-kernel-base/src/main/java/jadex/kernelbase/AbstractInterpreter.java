@@ -140,8 +140,6 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public Map getResults()
 	{
-		assert !getComponentAdapter().isExternalThread();
-		
 		return results!=null? Collections.unmodifiableMap(results): Collections.EMPTY_MAP;
 	}
 	
