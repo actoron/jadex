@@ -340,15 +340,22 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 								{
 									public void customResultAvailable(Object result)
 									{
-										initComponents(model, config).addResultListener(
+										startServices(model, config).addResultListener(
 											createResultListener(new DelegationResultListener(ret)
+										{
+											public void customResultAvailable(Object result)
 											{
-												public void customResultAvailable(Object result)
+												initComponents(model, config).addResultListener(
+													createResultListener(new DelegationResultListener(ret)
 												{
-													super.customResultAvailable(new Object[]{StatelessAbstractInterpreter.this, getComponentAdapter()});
-												}		
-											}));
-										}
+													public void customResultAvailable(Object result)
+													{
+														super.customResultAvailable(new Object[]{StatelessAbstractInterpreter.this, getComponentAdapter()});
+													}		
+												}));
+											}
+										}));
+									}
 								}));
 							}
 						}));
@@ -461,7 +468,15 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				}
 			}
 		}
-		return ret!=null ? ret : getServiceContainer().start();
+		return ret!=null ? ret : IFuture.DONE;
+	}
+	
+	/**
+	 *  Start the services.
+	 */
+	public IFuture startServices(IModelInfo model, String config)
+	{
+		return getServiceContainer().start();
 	}
 	
 	/**

@@ -204,6 +204,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/** The initthread. */
 	protected Thread initthread;
 	
+	/** The currently inited mcapability. */
+	protected Object	initcapa;
+	
 	//-------- constructors --------
 	
 	/**
@@ -347,11 +350,13 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	protected IFuture	initCapability(final OAVCapabilityModel oavmodel, final String config)
 	{
 		final Future	ret	= new Future();
+		initcapa	= oavmodel.getHandle();
 		BDIInterpreter.super.init(oavmodel.getModelInfo(), config)
 			.addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
+				initcapa	= null;
 				Collection subcaps	= state.getAttributeValues(oavmodel.getHandle(), OAVBDIMetaModel.capability_has_capabilityrefs);
 				if(subcaps!=null)
 				{
@@ -423,11 +428,31 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		else
 		{
 			// Capability model: agent stuff already inited.
-//			ret	= BDIInterpreter.super.initServices(model, config);
+			ret	= BDIInterpreter.super.initServices(model, config);
+//			ret	= IFuture.DONE;
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Start the services.
+	 */
+	public IFuture startServices(IModelInfo model, String config)
+	{
+		IFuture	ret;
+		if(model==getModel())
+		{
+			// Agent model: start services
+			ret	= super.startServices(model, config);
+		}
+		else
+		{
+			// Capability model: agent stuff already inited.
 			ret	= IFuture.DONE;
 		}
 		return ret;
 	}
+
 	
 	/**
 	 *  First init step of agent.
@@ -1684,7 +1709,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public IValueFetcher	getFetcher()
 	{
-		return new OAVBDIFetcher(state, ragent);
+		return new OAVBDIFetcher(state, initcapa!=null ? findSubcapability(initcapa) : ragent);
 	}
 	
 	/**
@@ -1727,7 +1752,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public IInternalAccess	getInternalAccess()
 	{
-		return new CapabilityFlyweight(state, ragent);
+		return new CapabilityFlyweight(state, initcapa!=null ? findSubcapability(initcapa) : ragent);
 	}
 	
 	/**
