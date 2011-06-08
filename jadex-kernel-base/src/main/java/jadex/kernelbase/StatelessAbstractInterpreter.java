@@ -941,14 +941,45 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	/**
 	 *  Get a raw reference to a provided service implementation.
 	 */
-	public Object	getRawService(Class type)
+	public Object getRawService(String name)
 	{
-		Object	ret;
+		return convertRawService(getServiceContainer().getProvidedService(name));
+	}
+	
+	/**
+	 *  Get a raw reference to a provided service implementation.
+	 */
+	public Object getRawService(Class type)
+	{
 		IService[] sers = getServiceContainer().getProvidedServices(type);
-		IService service = sers[0];
+		return convertRawService(sers[0]);
+	}
+	
+	/**
+	 *  Get a raw reference to a provided service implementation.
+	 */
+	public Object[] getRawServices(Class type)
+	{
+		IService[] sers = getServiceContainer().getProvidedServices(type);
+		Object[] ret = new Object[sers.length];
+		
+		for(int i=0; i<ret.length; i++)
+		{
+			convertRawService(sers[i]);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Convert to raw service.
+	 */
+	protected Object convertRawService(IService service)
+	{
+		Object ret;
 		if(Proxy.isProxyClass(service.getClass()))
 		{
-			BasicServiceInvocationHandler	ih	= (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+			BasicServiceInvocationHandler ih	= (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
 			if(ih.getService() instanceof ServiceInfo)
 			{
 				ret	= ((ServiceInfo)ih.getService()).getDomainService();
@@ -960,9 +991,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		}
 		else
 		{
-			ret	= service;
+			ret = service;
 		}
-		
 		return ret;
 	}
 	

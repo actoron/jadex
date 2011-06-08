@@ -215,13 +215,13 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	{
 		return interpreter.getConfiguration();
 	}
-	
+		
 	/**
 	 *  Get a raw reference to a provided service implementation.
 	 */
-	public Object	getRawService(Class type)
+	public Object[] getRawServices(Class type)
 	{
-		return interpreter.getRawService(type);
+		return interpreter.getRawServices(type);
 	}
 	
 	/**

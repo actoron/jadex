@@ -9,6 +9,11 @@ import jadex.commons.future.IIntermediateFuture;
  *  Internal interface for a service container. Allows
  *  adding and removing services. 
  */
+
+// todo: remove IServiceProvider interface
+// move search method from IServiceProvider to IExternalAccess 
+// use external access for searching
+// make this interface the public interface for internal usage of provider 
 public interface IServiceContainer extends IServiceProvider
 {	
 	//-------- internal admin methods --------
@@ -27,6 +32,8 @@ public interface IServiceContainer extends IServiceProvider
 	// todo: remove, only call from platform
 	public IFuture shutdown();
 	
+	
+	
 	/**
 	 *  Add a service to the container.
 	 *  The service is started, if the container is already running.
@@ -39,8 +46,13 @@ public interface IServiceContainer extends IServiceProvider
 	 *  @param service The service identifier.
 	 */
 	public IFuture	removeService(IServiceIdentifier sid);
-	
-	//-------- internal user methods --------
+		
+	/**
+	 *  Get provided (declared) service.
+	 *  @param name The service name.
+	 *  @return The service.
+	 */
+	public IService getProvidedService(String name);
 	
 	/**
 	 *  Get provided (declared) service.

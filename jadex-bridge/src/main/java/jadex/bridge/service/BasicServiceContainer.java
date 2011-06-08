@@ -295,6 +295,30 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	/** The service bindings. */
 //	protected Map bindings;
 
+
+	/**
+	 *  Get provided (declared) service.
+	 *  @param class The interface.
+	 *  @return The service.
+	 */
+	public IService getProvidedService(String name)
+	{
+		IService ret = null;
+		for(Iterator it=services.keySet().iterator(); it.hasNext() && ret==null; )
+		{
+			Collection sers = (Collection)services.get(it.next());
+			for(Iterator it2=sers.iterator(); it.hasNext() && ret==null; )
+			{
+				IService ser = (IService)it2.next();
+				if(ser.getServiceIdentifier().getServiceName().equals(name))
+				{
+					ret = ser;
+				}
+			}
+		}
+		
+		return ret;
+	}
 	
 	/**
 	 *  Get provided (declared) service.

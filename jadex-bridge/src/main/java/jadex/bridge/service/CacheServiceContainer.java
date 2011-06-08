@@ -375,6 +375,16 @@ public class CacheServiceContainer	implements IServiceContainer
 	}
 
 	// todo: factor out this part of service management?!
+
+	/**
+	 *  Get provided (declared) service.
+	 *  @param name The service name.
+	 *  @return The service.
+	 */
+	public IService getProvidedService(String name)
+	{
+		return null;
+	}
 	
 	public IService[] getProvidedServices(Class clazz)
 	{

@@ -87,6 +87,17 @@ public class ServiceContainerProxy implements IServiceContainer
 	
 	/**
 	 *  Get provided (declared) service.
+	 *  @param name The service name.
+	 *  @return The service.
+	 */
+	public IService getProvidedService(String name)
+	{
+		// todo: possibly use prefix
+		return interpreter.getServiceContainer().getProvidedService(name);
+	}
+	
+	/**
+	 *  Get provided (declared) service.
 	 *  @param class The interface.
 	 *  @return The service.
 	 */
