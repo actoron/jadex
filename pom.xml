@@ -487,11 +487,13 @@
 				<module>jadex-bridge</module>
 				<module>jadex-javaparser</module>
 				<module>jadex-platform-base</module>
+				<module>jadex-kernel-extension-envsupport</module>
+				<module>jadex-kernel-bdibpmn</module>
+				<module>jadex-kernel-component</module>
 				<module>jadex-kernel-application</module>
 				<module>jadex-kernel-base</module>
 				<module>jadex-kernel-bpmn</module>
 				<module>jadex-kernel-bdi</module>
-				<module>jadex-kernel-bdibpmn</module>
 				<module>jadex-kernel-gpmn</module>
 				<module>jadex-kernel-micro</module>
 				<module>jadex-rules</module>
