@@ -136,8 +136,12 @@ public class WorkitemTask implements ITask
 		if (role == null)
 			role = IAAAService.ANY_ROLE;
 		
-		//TODO: Set correct parent
-		Workitem wi = new Workitem(process.getComponentIdentifier(), process.getParent().getModel().getName(), name, role, parameterTypes, parameterValues, metaProperties, readOnlyParameters);
+		//TODO: Set correct parent, works now?
+		//System.out.println("Process: " + process);
+		//System.out.println("Parent: " + process.getParent());
+		//System.out.println("Model: " + process.getModel());
+		//System.out.println("Modelname: " + process.getModel().getFilename());
+		Workitem wi = new Workitem(process.getComponentIdentifier(), context.getActivity().getName(), name, role, parameterTypes, parameterValues, metaProperties, readOnlyParameters);
 		wi.setId(context.getModelElement().getName() + "_" + String.valueOf(Integer.toHexString(System.identityHashCode(wi))));
 		return wi;
 	}

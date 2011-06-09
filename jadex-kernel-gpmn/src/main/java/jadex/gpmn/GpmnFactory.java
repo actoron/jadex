@@ -2,6 +2,8 @@ package jadex.gpmn;
 
 import jadex.bdi.BDIAgentFactory;
 import jadex.bdi.model.OAVAgentModel;
+import jadex.bdi.runtime.impl.JavaStandardPlanExecutor;
+import jadex.bdibpmn.BpmnPlanExecutor;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
@@ -10,14 +12,22 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.threadpool.IThreadPoolService;
 import jadex.commons.ResourceInfo;
+import jadex.commons.SFunction;
 import jadex.commons.SUtil;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.SGUI;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.UIDefaults;
@@ -71,20 +81,27 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 		this.provider = provider;
 		this.loader = new GpmnModelLoader();
 		this.converter = new GpmnBDIConverter();
-		
-		// TODO: Use external factory if possible?
-		this.factory = new BDIAgentFactory(properties, provider);
 	}
 	
-	//-------- methods --------
-	
-	/**
-	 *  Start the service.
-	 * /
-	public synchronized IFuture	startService()
+	public IFuture startService()
 	{
-		return super.startService();
-	}*/
+		final IFuture sfuture = super.startService();
+		final Future ret = new Future();
+		SServiceProvider.getService(provider, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				IThreadPoolService tps = (IThreadPoolService) result;
+				Map bdiprops = new HashMap();
+				bdiprops.put("planexecutor_standard", new JavaStandardPlanExecutor(tps));
+				bdiprops.put("microplansteps", Boolean.TRUE);
+				bdiprops.put("planexecutor_bpmn", new BpmnPlanExecutor());
+				factory = new BDIAgentFactory(bdiprops, provider);
+				sfuture.addResultListener(new DelegationResultListener(ret));
+			}
+		});
+		return ret;
+	}
 	
 	/**
 	 *  Shutdown the service.
@@ -129,6 +146,8 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 */
 	public IFuture isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
+		System.out.println("loadable " + model.endsWith(".gpmn"));
+		System.out.println("startable " + isStartable(model, imports, classloader));
 		return new Future(model.endsWith(".gpmn"));
 	}
 	
@@ -182,7 +201,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, Future inited)
 	{
 //		ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
-		
+		System.out.println(factory.getClass().toString());
 		try
 		{
 			Object ret = null;

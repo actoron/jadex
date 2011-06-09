@@ -127,7 +127,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	public BpmnPlanBodyInstance(MBpmnModel model, final BDIInterpreter interpreter, 
 		final Object rcapa, final Object rplan)
 	{
-		super(interpreter.getAgentAdapter(), model, null, null, null, PLAN_ACTIVITY_HANDLERS, 
+		super(interpreter.getAgentAdapter(), model, null, null, interpreter.getParent(), PLAN_ACTIVITY_HANDLERS, 
 			null, new OAVBDIFetcher(interpreter.getState(), rcapa, rplan), 
 			interpreter.getCMS(), interpreter.getClockService(), interpreter.getMessageService(), 
 			interpreter.getServiceContainer());

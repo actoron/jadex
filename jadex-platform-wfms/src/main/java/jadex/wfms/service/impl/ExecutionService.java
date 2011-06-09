@@ -27,6 +27,7 @@ import jadex.wfms.service.listeners.ProcessEvent;
 
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -97,7 +98,8 @@ public class ExecutionService implements IExecutionService
 				prefix = prefix.substring(0, Math.min(prefix.lastIndexOf("."), prefix.length()));
 				ByteBuffer b = ByteBuffer.allocate(8);
 				b.putLong(random.nextLong());
-				cms.createComponent(prefix + "_" + Base64.encodeBytes(b.array()), modelname, ci, null).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				//prefix + "_" + Base64.encodeBytes(b.array())
+				cms.createComponent(null, modelname, ci, null).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{

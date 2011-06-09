@@ -7,15 +7,15 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qJDagGmAEd-bhvVt-Y1Mlg" key="arguments" value=""/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_Zpth92l6Ed-bhvVt-Y1Mlg" iD="_Zpth9ml6Ed-bhvVt-Y1Mlg" name="body">
-    <vertices xmi:type="bpmn:Activity" xmi:id="_ZpuJAWl6Ed-bhvVt-Y1Mlg" iD="_ZpuJAGl6Ed-bhvVt-Y1Mlg" outgoingEdges="_CzjXoWl8Ed-bhvVt-Y1Mlg" incomingEdges="_tDnqAWmHEd-JjYbz-RPfWg _ikB8IWl7Ed-bhvVt-Y1Mlg" name="Choose&#xA;Type_of_Entry" lanes="_fVwCQWl7Ed-bhvVt-Y1Mlg" activityType="Task">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_ZpuJAWl6Ed-bhvVt-Y1Mlg" iD="_ZpuJAGl6Ed-bhvVt-Y1Mlg" outgoingEdges="_CzjXoWl8Ed-bhvVt-Y1Mlg" incomingEdges="_tDnqAWmHEd-JjYbz-RPfWg _ikB8IWl7Ed-bhvVt-Y1Mlg" name="Eingabeart_waehlen" lanes="_fVwCQWl7Ed-bhvVt-Y1Mlg" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_c4ofkGl7Ed-bhvVt-Y1Mlg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c4ofkWl7Ed-bhvVt-Y1Mlg" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_omqM8Gl7Ed-bhvVt-Y1Mlg" key="parameters" value="inout␋Type_of_Entry␋ListChoice␋new ListChoice(new String[] {&quot;Enter serial numbers manual&quot;, &quot;Import from support drawing&quot;, &quot;Import from module and position identifier&quot;})"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_omqM8Gl7Ed-bhvVt-Y1Mlg" key="parameters" value="inout␋Eingabeart␋ListChoice␋new ListChoice(new String[] {&quot;Enter serial numbers manual&quot;, &quot;Import from support drawing&quot;, &quot;Import from module and position identifier&quot;})"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_iUPMoWl7Ed-bhvVt-Y1Mlg" iD="_iUPMoGl7Ed-bhvVt-Y1Mlg" outgoingEdges="_ikB8IWl7Ed-bhvVt-Y1Mlg" lanes="_fVwCQWl7Ed-bhvVt-Y1Mlg" activityType="EventStartEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_BxjvIWl8Ed-bhvVt-Y1Mlg" iD="_BxjvIGl8Ed-bhvVt-Y1Mlg" outgoingEdges="_HjG3AWl8Ed-bhvVt-Y1Mlg _QOpDwWl8Ed-bhvVt-Y1Mlg _QqtUsWl8Ed-bhvVt-Y1Mlg" incomingEdges="_CzjXoWl8Ed-bhvVt-Y1Mlg" lanes="_fVwCQWl7Ed-bhvVt-Y1Mlg" activityType="GatewayDataBasedExclusive"/>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_Gww0EWl8Ed-bhvVt-Y1Mlg" iD="_Gww0EGl8Ed-bhvVt-Y1Mlg" outgoingEdges="_IVNFgWmAEd-bhvVt-Y1Mlg" incomingEdges="_HjG3AWl8Ed-bhvVt-Y1Mlg" name="Enter_Part_Serial_Numbers" lanes="_fVwCQWl7Ed-bhvVt-Y1Mlg">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_Gww0EWl8Ed-bhvVt-Y1Mlg" iD="_Gww0EGl8Ed-bhvVt-Y1Mlg" outgoingEdges="_IVNFgWmAEd-bhvVt-Y1Mlg" incomingEdges="_HjG3AWl8Ed-bhvVt-Y1Mlg" name="TeilePerSNrEingeben" lanes="_fVwCQWl7Ed-bhvVt-Y1Mlg">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_G4ZtIGl8Ed-bhvVt-Y1Mlg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_G4ZtIWl8Ed-bhvVt-Y1Mlg" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mKLRgGl9Ed-bhvVt-Y1Mlg" key="parameters" value="in␋Text␋Text␋new Text(&quot;&lt;HTML> &lt;H3> &lt;B>Please specifiy the affected parts by entering their serial number: &lt;/B>&lt;/H3> &lt;/HTML>&quot;)␟inout␋Affected_Parts ␋String[]␋$beliefbase.Teile_ohne_AenderungsArt␟out␋All_affected_parts_specified␋boolean␋"/>
@@ -27,7 +27,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KnDhcGmCEd-bhvVt-Y1Mlg" key="parameters" value="inout␋Support_Drawing␋Document␋"/>
       </eAnnotations>
     </vertices>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_N0Yn0Wl8Ed-bhvVt-Y1Mlg" iD="_N0Yn0Gl8Ed-bhvVt-Y1Mlg" outgoingEdges="_4dLDkWmEEd-bhvVt-Y1Mlg" incomingEdges="_QqtUsWl8Ed-bhvVt-Y1Mlg" name="Enter_Structured_Info" lanes="_fVwCQWl7Ed-bhvVt-Y1Mlg">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_N0Yn0Wl8Ed-bhvVt-Y1Mlg" iD="_N0Yn0Gl8Ed-bhvVt-Y1Mlg" outgoingEdges="_4dLDkWmEEd-bhvVt-Y1Mlg" incomingEdges="_QqtUsWl8Ed-bhvVt-Y1Mlg" name="StrukturinfoEingaben" lanes="_fVwCQWl7Ed-bhvVt-Y1Mlg">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Oh_UsGl8Ed-bhvVt-Y1Mlg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Oh_7wGl8Ed-bhvVt-Y1Mlg" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LZVoEGmEEd-bhvVt-Y1Mlg" key="parameters" value="in␋Text␋Text␋new Text(&quot;&lt;HTML> &lt;H3> &lt;B> Please enter the path in the product structure tree where to import the searial numbers from. &lt;/B> &lt;/H3> &lt;/HTML>&quot;)␟out␋Main_module␋String␋␟out␋Module␋String␋␟out␋Submodule␋String␋␟out␋Position␋String␋␟out␋Position_variants␋String[]␋"/>
@@ -55,7 +55,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_m4syIWmCEd-bhvVt-Y1Mlg" iD="_m4syIGmCEd-bhvVt-Y1Mlg" outgoingEdges="_BqgnwWmDEd-bhvVt-Y1Mlg" incomingEdges="_rYrkcWmCEd-bhvVt-Y1Mlg _8ucEcWmEEd-bhvVt-Y1Mlg" name="Teileauswahl" lanes="_fVwCQWl7Ed-bhvVt-Y1Mlg">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_nAA7EGmCEd-bhvVt-Y1Mlg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nABiIGmCEd-bhvVt-Y1Mlg" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yXfwsGmCEd-bhvVt-Y1Mlg" key="parameters" value="in␋Text␋Text␋new Text(TeileText)␟inout␋Affected_Parts␋MultiListChoice␋new MultiListChoice(new String[] {&quot;A22147112921&quot;,&quot;A22147112922&quot;})␟out␋All_affected_parts_specified␋boolean␋"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yXfwsGmCEd-bhvVt-Y1Mlg" key="parameters" value="in␋Text␋Text␋new Text(TeileText)␟inout␋Affected_Parts␋MultiListChoice␋new MultiListChoice(Teile)␟out␋All_affected_parts_specified␋boolean␋"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_-sLOYGmCEd-bhvVt-Y1Mlg" iD="_-sKnUGmCEd-bhvVt-Y1Mlg" outgoingEdges="_7N_eAWmHEd-JjYbz-RPfWg" incomingEdges="_BqgnwWmDEd-bhvVt-Y1Mlg" name="Write_Context" lanes="_fVwCQWl7Ed-bhvVt-Y1Mlg">
@@ -67,7 +67,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_z126MWmEEd-bhvVt-Y1Mlg" iD="_z126MGmEEd-bhvVt-Y1Mlg" outgoingEdges="_8ucEcWmEEd-bhvVt-Y1Mlg" incomingEdges="_4dLDkWmEEd-bhvVt-Y1Mlg" name="TeileausStruktImportieren_BoM_Unimpl" lanes="_zfqdMWmDEd-bhvVt-Y1Mlg">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_z7uRoGmEEd-bhvVt-Y1Mlg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z7uRoWmEEd-bhvVt-Y1Mlg" key="class" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Yc-oEGmFEd-bhvVt-Y1Mlg" key="parameters" value="inout␋Teile␋String[]␋␟inout␋TeileText␋String␋&quot;The following serial numbers where imported from module structure. Select the affected parts.&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Yc-oEGmFEd-bhvVt-Y1Mlg" key="parameters" value="inout␋Teile␋String[]␋new String[] {&quot;A22147112921&quot;,&quot;A22147112922&quot;}␟inout␋TeileText␋String␋&quot;The following serial numbers where imported from module structure. Select the affected parts.&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_7fP4AWmFEd-bhvVt-Y1Mlg" iD="_7fP4AGmFEd-bhvVt-Y1Mlg" outgoingEdges="_s5xVAWmIEd-JjYbz-RPfWg" incomingEdges="_Tk9B0GmIEd-JjYbz-RPfWg" name="Show_acknowledge" lanes="_zfqdMWmDEd-bhvVt-Y1Mlg">
@@ -89,17 +89,17 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_weXDkWydEd-Ce-4ZDE0HWw" key="condition" value=""/>
       </eAnnotations>
     </sequenceEdges>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_HjG3AWl8Ed-bhvVt-Y1Mlg" iD="_HjG3AGl8Ed-bhvVt-Y1Mlg" name="&quot;Enter serial numbers manual&quot;.equals(Eingabeart.getSelection())">
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_HjG3AWl8Ed-bhvVt-Y1Mlg" iD="_HjG3AGl8Ed-bhvVt-Y1Mlg">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WVVVMGl8Ed-bhvVt-Y1Mlg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WVVVMWl8Ed-bhvVt-Y1Mlg" key="condition" value="&quot;Enter serial numbers manual&quot;.equals(Eingabeart.getSelection())"/>
       </eAnnotations>
     </sequenceEdges>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_QOpDwWl8Ed-bhvVt-Y1Mlg" iD="_QOpDwGl8Ed-bhvVt-Y1Mlg" name="&quot;Import from support drawing&quot;.equals(Eingabeart.getSelection())">
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_QOpDwWl8Ed-bhvVt-Y1Mlg" iD="_QOpDwGl8Ed-bhvVt-Y1Mlg">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_iSUEkGl8Ed-bhvVt-Y1Mlg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_iSUroGl8Ed-bhvVt-Y1Mlg" key="condition" value="&quot;Import from support drawing&quot;.equals(Eingabeart.getSelection())"/>
       </eAnnotations>
     </sequenceEdges>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_QqtUsWl8Ed-bhvVt-Y1Mlg" iD="_QqtUsGl8Ed-bhvVt-Y1Mlg" name="&quot;Import from module and position identifier&quot;.equals(Eingabeart.getSelection())">
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_QqtUsWl8Ed-bhvVt-Y1Mlg" iD="_QqtUsGl8Ed-bhvVt-Y1Mlg">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_mABscGl8Ed-bhvVt-Y1Mlg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mABscWl8Ed-bhvVt-Y1Mlg" key="condition" value="&quot;Import from module and position identifier&quot;.equals(Eingabeart.getSelection())"/>
       </eAnnotations>

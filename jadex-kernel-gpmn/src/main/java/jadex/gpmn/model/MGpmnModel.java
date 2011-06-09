@@ -5,6 +5,7 @@ import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -36,7 +37,7 @@ public class MGpmnModel implements ICacheableModel//, IModelInfo
 //	protected String modelpackage;
 	
 	/** The imports. */
-	protected List imports;
+	//protected List imports;
 	
 	/** The goals. */
 	protected Map goals;
@@ -67,7 +68,7 @@ public class MGpmnModel implements ICacheableModel//, IModelInfo
 	 */
 	public MGpmnModel()
 	{
-		this.imports = new ArrayList();
+		//this.imports = new ArrayList();
 		this.goals = new HashMap();
 		this.activationplans = new HashMap();
 		this.bpmnplans = new HashMap();
@@ -339,17 +340,19 @@ public class MGpmnModel implements ICacheableModel//, IModelInfo
 	 */
 	public void addImport(String theImport)
 	{
-		imports.add(theImport);
+		//imports.add(theImport);
+		modelinfo.addImport(theImport);
 	}
 	
 	/**
 	 *  Removes an import.
 	 *  @param theImport The import.
 	 */
-	public void removeImport(String theImport)
-	{
-		imports.remove(theImport);
-	}
+	//public void removeImport(String theImport)
+	//{
+		//imports.remove(theImport);
+		//modelinfo.removeImport(theImport);
+	//}
 	
 	/**
 	 *  Adds a goal.
@@ -483,7 +486,7 @@ public class MGpmnModel implements ICacheableModel//, IModelInfo
 	 */
 	public List getImports()
 	{
-		return imports;
+		return Arrays.asList(modelinfo.getAllImports());
 	}
 
 	/**

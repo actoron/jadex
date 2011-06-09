@@ -71,6 +71,7 @@ public class GpmnXMLReader
 	protected static MGpmnModel read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
 	{
 		MGpmnModel ret = (MGpmnModel)reader.read(rinfo.getInputStream(), classloader, null);
+		ret.getModelInfo().setStartable(true);
 		ret.setFilename(rinfo.getFilename());
 		ret.setLastModified(rinfo.getLastModified());
 		ret.setClassloader(classloader);
@@ -95,6 +96,7 @@ public class GpmnXMLReader
 		if(rinfo==null)
 			throw new RuntimeException("Could not find resource: "+filename);
 		MGpmnModel ret = (MGpmnModel)reader.read(rinfo.getInputStream(), classloader, context);
+		ret.getModelInfo().setStartable(true);
 		
 		ret.setLastModified(rinfo.getLastModified());
 		ret.setFilename(rinfo.getFilename());

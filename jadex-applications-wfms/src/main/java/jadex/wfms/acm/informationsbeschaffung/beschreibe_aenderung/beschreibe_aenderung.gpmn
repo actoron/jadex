@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gpmn:GpmnDiagram xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" version="2.0">
+  <package>jadex.wfms.acm.informationsbeschaffung.beschreibe_aenderung</package>
+  <import>jadex.wfms.acm.types.Person</import>
   <context>
     <element name="FuehrenderEntwickler" type="Person">
       <value>new Person()</value>
@@ -86,8 +88,6 @@
       <value></value>
     </element>
   </context>
-  <package>jadex.wfms.acm.informationsbeschaffung.beschreibe_aenderung</package>
-  <import>jadex.wfms.acm.types.Person</import>
   <goal id="_zo-F0GllEd-b8_mMvbk3bw" name="Describe_CR" goalType="AchieveGoal"/>
   <goal id="__mrN8GllEd-hbIX0o73kVA" name="Define_LeadDeveloper" goalType="AchieveGoal">
     <targetcondition>$beliefbase.FuehrenderEntwickler.name != null &amp;&amp; $beliefbase.FuehrenderEntwickler.orga != null &amp;&amp; $beliefbase.FuehrenderEntwickler.email != null</targetcondition>
@@ -114,7 +114,7 @@
     <contextcondition>$beliefbase.StellungnahmenTeileFertig &amp;&amp; $beliefbase.StellungnahmenTechnBeschreibungFertig &amp;&amp; $beliefbase.StellungnahmeEntwicklungskostenFertig &amp;&amp; $beliefbase.StellungnahmeTermineEntwFertig</contextcondition>
   </goal>
   <goal id="_yBQqoGymEd-Ce-4ZDE0HWw" name="Do_PostParts_Operations" goalType="AchieveGoal"/>
-  <plan xsi:type="gpmn:ActivationPlan" id="_Ci9Y4GlmEd-hbIX0o73kVA"/>
+  <plan xsi:type="gpmn:ActivationPlan" id="_Ci9Y4GlmEd-hbIX0o73kVA" name="  "/>
   <plan xsi:type="gpmn:BpmnPlan" id="_9B9ZAGlmEd-hbIX0o73kVA" name="LeadDeveloper_Definition_M1" planref="jadex/wfms/acm/informationsbeschaffung/beschreibe_aenderung/fuehrendenentwickler_festlegen/FuehrendenEntwickler_festlegen_M1.bpmn">
     <precondition>$beliefbase.FuehrenderEntwickler.name==null &amp;&amp;  !(&quot;Developer_DC&quot;.equals($beliefbase.PAEV_V.orga)) &amp;&amp; $beliefbase.Vorfilter_Genehmigung</precondition>
   </plan>
@@ -125,11 +125,11 @@
     <precondition>$beliefbase.LeadExtern &amp;&amp; $beliefbase.FuehrenderEntwickler.name==null &amp;&amp; !(&quot;Developer_DC&quot;.equals($beliefbase.PAEV_V.orga)) &amp;&amp; $beliefbase.Vorfilter_Genehmigung</precondition>
   </plan>
   <plan xsi:type="gpmn:BpmnPlan" id="_dHY1oGltEd-hbIX0o73kVA" name="Solution_Description" planref="jadex/wfms/acm/informationsbeschaffung/beschreibe_aenderung/loesung_beschreiben/loesung_beschreiben.bpmn"/>
-  <plan xsi:type="gpmn:BpmnPlan" id="_lDUKYGltEd-hbIX0o73kVA" name="AffectedParts_determination" planref="jadex/wfms/acm/informationsbeschaffung/beschreibe_aenderung/Ermittlung_betroffeneTeile/Determine_AffectedParts.bpmn"/>
+  <plan xsi:type="gpmn:BpmnPlan" id="_lDUKYGltEd-hbIX0o73kVA" name="AffectedParts_determination" planref="jadex/wfms/acm/informationsbeschaffung/beschreibe_aenderung/Ermittlung_betroffeneTeile/Ermittlung_betroffeneTeile.bpmn"/>
   <plan xsi:type="gpmn:BpmnPlan" id="_pkvuMGltEd-hbIX0o73kVA" name="ExpertsDevelopment_definition" planref="jadex/wfms/acm/informationsbeschaffung/beschreibe_aenderung/ExpertenEntwicklung_festlegen/ExpEntw_festlegen.bpmn"/>
-  <plan xsi:type="gpmn:ActivationPlan" id="_AqJPgGpKEd-hCvoq5nCi-Q" mode="Sequential"/>
-  <plan xsi:type="gpmn:ActivationPlan" id="_NVT6kGpKEd-hCvoq5nCi-Q"/>
-  <plan xsi:type="gpmn:ActivationPlan" id="_qivWsGpNEd-hCvoq5nCi-Q"/>
+  <plan xsi:type="gpmn:ActivationPlan" id="_AqJPgGpKEd-hCvoq5nCi-Q" name="  " mode="Sequential"/>
+  <plan xsi:type="gpmn:ActivationPlan" id="_NVT6kGpKEd-hCvoq5nCi-Q" name="  "/>
+  <plan xsi:type="gpmn:ActivationPlan" id="_qivWsGpNEd-hCvoq5nCi-Q" name="  "/>
   <plan xsi:type="gpmn:BpmnPlan" id="_0XlU4GpNEd-hCvoq5nCi-Q" name="Relevance_Quality_Plant_Check" planref="jadex/wfms/acm/informationsbeschaffung/beschreibe_aenderung/Relevanzen_ermitteln/QualiRelevanz_ermitteln.bpmn"/>
   <plan xsi:type="gpmn:BpmnPlan" id="_5naPwGpNEd-hCvoq5nCi-Q" name="Relevance_Packaging_Check" planref="jadex/wfms/acm/informationsbeschaffung/beschreibe_aenderung/Relevanzen_ermitteln/Packagingrelevanz_ermitteln.bpmn"/>
   <plan xsi:type="gpmn:BpmnPlan" id="_9seAoGpNEd-hCvoq5nCi-Q" name="Relevance_Certification_Check" planref="jadex/wfms/acm/informationsbeschaffung/beschreibe_aenderung/Relevanzen_ermitteln/Zertifizierungsrelevanz_ermitteln.bpmn"/>

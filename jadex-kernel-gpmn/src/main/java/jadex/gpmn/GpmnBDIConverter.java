@@ -5,6 +5,7 @@ import jadex.bdi.OAVBDIXMLReader;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.collection.MultiCollection;
 import jadex.component.ComponentXMLReader;
 import jadex.gpmn.model.MActivationEdge;
@@ -399,11 +400,12 @@ public class GpmnBDIConverter
 
 		// Do second pass post-processing
 		
+		final IModelInfo modelinfo = model.getModelInfo();
 		IContext context = new IContext() 
 		{
 			public Object getRootObject() 
 			{
-				return scopehandle;
+				return modelinfo;
 			}
 			public ClassLoader getClassLoader() 
 			{
@@ -429,7 +431,7 @@ public class GpmnBDIConverter
 			{
 				Object belhandle = it.next();
 				Object exphandle = state.getAttributeValue(belhandle, OAVBDIMetaModel.belief_has_fact);
-//				clpost.postProcess(state, belhandle, scopehandle, classloader);
+				//clpost.postProcess(state, belhandle, scopehandle, classloader);
 				clpost.postProcess(context, belhandle);
 				if(exphandle!=null)
 					expost.postProcess(context, exphandle);

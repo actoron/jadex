@@ -198,6 +198,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		super(null, model.getModelInfo(), config, null, parent, arguments, null, new Future());
 		construct(model, activityhandlers, stephandlers);		
 		this.fetcher = fetcher!=null? fetcher: new BpmnInstanceFetcher(this, fetcher);
+		this.adapter = adapter;
+		this.container = container;
 		
 		variables.put("$cms", cms);
 		variables.put("$clock", cs);
