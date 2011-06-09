@@ -205,7 +205,7 @@ public class EditableList extends JTable
 	 */
 	public void setEntries(String[] entries)
 	{
-		this.entries = SUtil.arrayToList(entries);
+		this.entries = entries!=null ? SUtil.arrayToList(entries) : new ArrayList();
 		if(!allowduplicates)
 			removeDuplicates();
 		refresh();

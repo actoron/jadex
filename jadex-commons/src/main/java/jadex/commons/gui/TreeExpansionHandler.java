@@ -184,7 +184,7 @@ public class TreeExpansionHandler	implements TreeExpansionListener, TreeModelLis
 	 */
 	public boolean	isExpanded(TreePath path)
 	{
-		return expanded.contains(path.getLastPathComponent());
+		return expanded!=null && expanded.contains(path.getLastPathComponent());
 	}
 	
 	//-------- helper methods --------

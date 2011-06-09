@@ -292,7 +292,6 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		
 		// Initialize rule system.
 		rulesystem = new RuleSystem(state, model.getMatcherFunctionality().getRulebase(), model.getMatcherFunctionality(), new PriorityAgenda());
-		rulesystem.init();
 		
 		if(kernelprops!=null)
 		{
@@ -338,6 +337,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				// Remove arguments from state.
 				if(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments)!=null) 
 					state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
+
+				rulesystem.init();
+				
 				return null;
 			}
 		});
@@ -556,23 +558,32 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	{
 		try
 		{
-			// Hack!!! platform should inform about ext entries to update agenda.
-			Activation	act	= rulesystem.getAgenda().getLastActivation();
-			state.getProfiler().start(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
-			state.expungeStaleObjects();
-			state.notifyEventListeners();
-			state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
-
-			rulesystem.getAgenda().fireRule();
-
-			act	= rulesystem.getAgenda().getLastActivation();
-			System.err.println("here: "+act+", "+rulesystem.getAgenda().getActivations());
-			state.getProfiler().start(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
-			state.expungeStaleObjects();
-			state.notifyEventListeners();
-			state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
-
-			return !rulesystem.getAgenda().isEmpty(); 
+			if(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)!=null)
+			{
+				// Hack!!! platform should inform about ext entries to update agenda.
+				Activation	act	= rulesystem.getAgenda().getLastActivation();
+				state.getProfiler().start(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
+				state.expungeStaleObjects();
+				state.notifyEventListeners();
+				state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
+	
+				rulesystem.getAgenda().fireRule();
+	
+				act	= rulesystem.getAgenda().getLastActivation();
+	//			System.err.println("here: "+act+", "+rulesystem.getAgenda().getActivations());
+				state.getProfiler().start(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
+				state.expungeStaleObjects();
+				state.notifyEventListeners();
+				state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
+	
+				return !rulesystem.getAgenda().isEmpty();
+			}
+			else
+			{
+				// still in init
+				return false;
+			}
+			
 		}
 		catch(Throwable e)
 		{
@@ -762,14 +773,21 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public boolean isAtBreakpoint(String[] breakpoints)
 	{
+		assert isAgentThread();
+		
 		boolean	isatbreakpoint	= false;
-		Set	bps	= new HashSet(Arrays.asList(breakpoints));	// Todo: cache set across invocations for speed?
-		Iterator	it	= getRuleSystem().getAgenda().getActivations().iterator();
-		while(!isatbreakpoint && it.hasNext())
+		
+		if(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)!=null)
 		{
-			IRule	rule	= ((Activation)it.next()).getRule();
-			isatbreakpoint	= bps.contains(rule.getName());
+			Set	bps	= new HashSet(Arrays.asList(breakpoints));	// Todo: cache set across invocations for speed?
+			Iterator	it	= getRuleSystem().getAgenda().getActivations().iterator();
+			while(!isatbreakpoint && it.hasNext())
+			{
+				IRule	rule	= ((Activation)it.next()).getRule();
+				isatbreakpoint	= bps.contains(rule.getName());
+			}
 		}
+		// else still in init
 		
 		return isatbreakpoint;
 	}
@@ -1239,7 +1257,23 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 						// Todo: fix termination such that external entries are properly executed!?
 						if(state.containsObject(ragent))
 						{
-							getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope});							
+							if(getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)==null)
+							{
+								// Hack!!! During init phase use invokeLater() as rule engine isn't running.
+								try
+								{
+									((IComponentStep)step).execute(getInternalAccess());
+									ret.setResult(null);
+								}
+								catch(Exception e)
+								{
+									ret.setException(e);
+								}
+							}
+							else
+							{
+								getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope});
+							}
 						}
 						else
 						{
@@ -1255,7 +1289,23 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		}
 		else
 		{
-			getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope});
+			if(getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)==null)
+			{
+				// Hack!!! During init phase use invokeLater() as rule engine isn't running.
+				try
+				{
+					((IComponentStep)step).execute(getInternalAccess());
+					ret.setResult(null);
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}
+			}
+			else
+			{
+				getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope});
+			}
 		}
 
 		return ret;
