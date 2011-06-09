@@ -23,6 +23,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -50,6 +51,9 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 
 	/** Current ClassLoader. */
 	protected DelegationClassLoader	libcl;
+	
+	/** URL reference count */
+	protected Map urlrefcount;
 
 	//-------- constructors --------
 	
@@ -86,6 +90,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		this.libcl = new DelegationClassLoader(ClassLoader.getSystemClassLoader(), urls);
 		
 		listeners	= Collections.synchronizedSet(new HashSet());
+		urlrefcount = Collections.synchronizedMap(new HashMap());
 	}
 	
 	/**
@@ -106,35 +111,42 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	public void addURL(URL url)
 	{
 //		System.out.println("add "+url);
-		
-		ILibraryServiceListener[] lis;
+		ILibraryServiceListener[] lis = null;
 		synchronized(this)
 		{
-			Map<URL, ClassLoader> delegates = libcl.getDelegates();
-			delegates.put(url, new URLClassLoader(new URL[] {url}));
-			libcl = new DelegationClassLoader(ClassLoader.getSystemClassLoader(), delegates);
-			lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
+			Integer refcount = (Integer) urlrefcount.get(url);
+			if (refcount != null)
+				urlrefcount.put(url, new Integer(refcount.intValue() + 1));
+			else
+			{
+				urlrefcount.put(url, new Integer(1));
+				Map<URL, ClassLoader> delegates = libcl.getDelegates();
+				delegates.put(url, new URLClassLoader(new URL[] {url}));
+				libcl = new DelegationClassLoader(ClassLoader.getSystemClassLoader(), delegates);
+				lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
+			}
 		}
 		
 		// Do not notify listeners with lock held!
-		for(int i=0; i<lis.length; i++)
+		if (lis != null)
 		{
-			final ILibraryServiceListener liscopy = lis[i];
-			lis[i].urlAdded(url).addResultListener(new IResultListener()
+			for(int i=0; i<lis.length; i++)
 			{
-				public void resultAvailable(Object result)
+				final ILibraryServiceListener liscopy = lis[i];
+				lis[i].urlAdded(url).addResultListener(new IResultListener()
 				{
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					exception.printStackTrace();
-					removeLibraryServiceListener(liscopy);
-				}
-			});
+					public void resultAvailable(Object result)
+					{
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+						removeLibraryServiceListener(liscopy);
+					}
+				});
+			}
 		}
-		
-//		fireURLAdded(url);
 	}
 	
 	/**
@@ -143,35 +155,41 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 */
 	public void removeURL(URL url)
 	{
-		ILibraryServiceListener[] lis;
+		ILibraryServiceListener[] lis = null;
 		synchronized(this)
 		{
-			Map<URL, ClassLoader> delegates = libcl.getDelegates();
-			if (delegates.remove(url) == null)
-					throw new RuntimeException("Unknown URL: "+url);
-			libcl = new DelegationClassLoader(ClassLoader.getSystemClassLoader(), delegates);
-			lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
+			Integer refcount = (Integer) urlrefcount.get(url);
+			if (refcount == null)
+				throw new RuntimeException("Unknown URL: "+url);
+			refcount = new Integer(refcount.intValue() - 1);
+			if (refcount.intValue() < 1)
+			{
+				Map<URL, ClassLoader> delegates = libcl.getDelegates();
+				libcl = new DelegationClassLoader(ClassLoader.getSystemClassLoader(), delegates);
+				lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
+			}
 		}
 		
 		// Do not notify listeners with lock held!
-		for(int i=0; i<lis.length; i++)
+		if (lis != null)
 		{
-			final ILibraryServiceListener liscopy = lis[i];
-			lis[i].urlRemoved(url).addResultListener(new IResultListener()
+			for(int i=0; i<lis.length; i++)
 			{
-				public void resultAvailable(Object result)
+				final ILibraryServiceListener liscopy = lis[i];
+				lis[i].urlRemoved(url).addResultListener(new IResultListener()
 				{
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					exception.printStackTrace();
-					removeLibraryServiceListener(liscopy);
-				}
-			});
+					public void resultAvailable(Object result)
+					{
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+						removeLibraryServiceListener(liscopy);
+					}
+				});
+			}
 		}
-		
-//		fireURLRemoved(url);
 	}
 	
 	/**

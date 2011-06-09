@@ -123,10 +123,10 @@ public class KdTree
 	 */
 	public ISpaceObject getNearestObject(IVector2 point, double searchRadius, IFilter filter)
 	{
-		double sr2 = searchRadius * searchRadius;
 		ISpaceObject ret = null;
 		if (rootNode != null)
 		{
+			double sr2 = searchRadius * searchRadius;
 			ret = rootNode.getNearestObject(point, sr2, filter);
 			if (ret != null && KdNode.getDistance(ret, point).getSquaredLength().getAsDouble() > sr2)
 				return null;
