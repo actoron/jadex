@@ -369,7 +369,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	 */
 	public IFuture getChildren(String type)
 	{
-		return new Future(null);
+		return getInterpreter().getChildren(type);
 	}
 	
 	/**
@@ -377,9 +377,49 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	 *  @param ctype The component type.
 	 *  @return The model name of this component type.
 	 */
-	public IFuture getFileName(String ctype)
+	public IFuture getFileName(final String ctype)
 	{
-		return IFuture.DONE;
+		final Future ret = new Future();
+		
+		if(getInterpreter().getAgentAdapter().isExternalThread())
+		{
+			try
+			{
+				getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						String fn = getInterpreter().getComponentFilename(ctype);
+						if(fn!=null)
+						{
+							ret.setResult(fn);
+						}
+						else
+						{
+							ret.setException(new RuntimeException("Unknown component type: "+ctype));
+						}
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			String fn = getInterpreter().getComponentFilename(ctype);
+			if(fn!=null)
+			{
+				ret.setResult(fn);
+			}
+			else
+			{
+				ret.setException(new RuntimeException("Unknown component type: "+ctype));
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -389,7 +429,31 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	 */
 	public IFuture getExtension(final String name)
 	{
-		return IFuture.DONE;
+		final Future ret = new Future();
+		
+		if(getInterpreter().getAgentAdapter().isExternalThread())
+		{
+			try
+			{
+				getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						ret.setResult(getInterpreter().getExtension(name));
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setResult(getInterpreter().getExtension(name));
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -398,7 +462,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	 */
 	public String getLocalType()
 	{
-		return null;
+		return getInterpreter().getLocalType();
 	}
 	
 	/**
