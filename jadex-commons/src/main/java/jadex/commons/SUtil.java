@@ -1004,8 +1004,7 @@ public class SUtil
 	 * @return The info object for the resource or null when the resource was
 	 *         not found.
 	 */
-	public synchronized static ResourceInfo getResourceInfo0(String name,
-			ClassLoader classloader)
+	public synchronized static ResourceInfo getResourceInfo0(String name, ClassLoader classloader)
 	{
 		ResourceInfo ret = null;
 		File file;
@@ -1022,19 +1021,32 @@ public class SUtil
 			{
 				if(file.isDirectory())
 				{
-					ret = new ResourceInfo(file.getAbsolutePath(), null,
-							file.lastModified());
+					try
+					{
+						ret = new ResourceInfo(file.getCanonicalPath(), null,
+								file.lastModified());
+					}
+					catch(IOException e)
+					{
+						// shouldn't happen
+						e.printStackTrace();
+					}
 				}
 				else
 				{
 					try
 					{
-						ret = new ResourceInfo(file.getAbsolutePath(),
+						ret = new ResourceInfo(file.getCanonicalPath(),
 								new FileInputStream(file), file.lastModified());
 					}
 					catch(FileNotFoundException e)
 					{
 						// File is directory, or maybe locked...
+					}
+					catch(IOException e)
+					{
+						// shouldn't happen
+						e.printStackTrace();
 					}
 				}
 			}
@@ -1079,21 +1091,34 @@ public class SUtil
 						{
 							if(file.isDirectory())
 							{
-								ret = new ResourceInfo(file.getAbsolutePath(),
-										null, file.lastModified());
+								try
+								{
+									ret = new ResourceInfo(file.getCanonicalPath(),
+											null, file.lastModified());
+								}
+								catch(IOException e)
+								{
+									// shouldn't happen
+									e.printStackTrace();
+								}
 							}
 							else
 							{
 								try
 								{
 									ret = new ResourceInfo(
-											file.getAbsolutePath(),
+											file.getCanonicalPath(),
 											new FileInputStream(file),
 											file.lastModified());
 								}
 								catch(FileNotFoundException fnfe)
 								{
 									// File is directory, or maybe locked...
+								}
+								catch(IOException e)
+								{
+									// shouldn't happen
+									e.printStackTrace();
 								}
 							}
 						}
