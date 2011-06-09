@@ -27,6 +27,7 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TextCellEditor;
@@ -369,7 +370,7 @@ public abstract class AbstractCommonTablePropertySection extends
 	 */
 	private void createButtons(Composite parent)
 	{
-
+//		System.out.println("buts: "+this.getClass()+this);
 		GridData gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		gridData.widthHint = 80;
 
@@ -379,7 +380,6 @@ public abstract class AbstractCommonTablePropertySection extends
 		add.setLayoutData(gridData);
 		add.addSelectionListener(new TableButtonSelectionAdapter()
 		{
-			@Override
 			protected ModifyEObjectCommand getButtonCommand()
 			{
 				return getAddCommand();
@@ -396,8 +396,6 @@ public abstract class AbstractCommonTablePropertySection extends
 		delete.setLayoutData(gridData);
 		delete.addSelectionListener(new TableButtonSelectionAdapter()
 		{
-			
-			@Override
 			protected ModifyEObjectCommand getButtonCommand()
 			{
 				return getDeleteCommand();
@@ -414,7 +412,6 @@ public abstract class AbstractCommonTablePropertySection extends
 		up.setLayoutData(gridData);
 		up.addSelectionListener(new TableButtonSelectionAdapter()
 		{
-			@Override
 			protected ModifyEObjectCommand getButtonCommand()
 			{
 				return getUpCommand();
@@ -430,7 +427,6 @@ public abstract class AbstractCommonTablePropertySection extends
 		down.setLayoutData(gridData);
 		down.addSelectionListener(new TableButtonSelectionAdapter()
 		{
-			@Override
 			protected ModifyEObjectCommand getButtonCommand()
 			{
 				return getDownCommand();
@@ -446,7 +442,6 @@ public abstract class AbstractCommonTablePropertySection extends
 		clear.setLayoutData(gridData);
 		clear.addSelectionListener(new TableButtonSelectionAdapter()
 		{
-			@Override
 			protected ModifyEObjectCommand getButtonCommand()
 			{
 				return getClearCommand();
@@ -477,10 +472,8 @@ public abstract class AbstractCommonTablePropertySection extends
 	 * Label provider in charge of rendering the keys and columnValues of the annotation
 	 * attached to the object. Currently based on CommonLabelProvider.
 	 */
-	protected class MultiColumnTableLabelProvider extends ColumnLabelProvider
-			implements ITableLabelProvider
+	protected class MultiColumnTableLabelProvider extends ColumnLabelProvider implements ITableLabelProvider
 	{
-	
 		// ---- attributes ----
 		
 		/** 
@@ -517,7 +510,6 @@ public abstract class AbstractCommonTablePropertySection extends
 		
 		// ---- ColumnLabelProvider overrides ----
 		
-		@Override
 		public Image getImage(Object element)
 		{
 			if (columIndex >= 0)
@@ -570,8 +562,6 @@ public abstract class AbstractCommonTablePropertySection extends
 	/**
 	 * Abstract EditingSupport in charge of edit the table 
 	 * cell and update the corresponding model
-	 * 
-	 * @author Claas
 	 *
 	 */
 	protected abstract class MultiColumnTableEditingSupport extends EditingSupport {

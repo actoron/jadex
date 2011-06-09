@@ -1,42 +1,34 @@
-/**
- * 
- */
 package jadex.editor.bpmn.editor.properties;
 
 import jadex.editor.bpmn.editor.properties.template.AbstractBpmnMultiColumnTablePropertySection;
 import jadex.editor.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
 
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.widgets.TableColumn;
 
-
 /**
- * @author Claas Altschaffel
  * 
  */
-public class JadexSequenceMappingSection extends
-		AbstractBpmnMultiColumnTablePropertySection
+public class JadexBpmnDiagramProvidedServicesTableSection extends
+	AbstractBpmnMultiColumnTablePropertySection
 {
-
-	public static final String[] COLUMN_NAMES = new String[]{"Name", "Value"};
-	public static final int[] COLUMN_WEIGHTS = new int[]{1 ,6};
-	public static final String[] DEFAUL_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", ""};
+	public static final String[] COLUMN_NAMES = new String[]{"Name", "Interface", "Implementation"};
+	public static final int[] COLUMN_WEIGHTS = new int[]{1, 2, 2};
+	public static final String[] DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "", ""};
 	public static final int UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX = 0;
 	
 	/**
-	 * Default constructor, initializes super class
+	 *  Default constructor, initializes super class.
 	 */
-	public JadexSequenceMappingSection()
+	public JadexBpmnDiagramProvidedServicesTableSection()
 	{
-		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_MAPPING_LIST_DETAIL,
-				"Mappings", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX);
-		
+		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_PROVIDEDSERVICES_LIST_DETAIL,
+			"Provided Services", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX);
 	}
 
 	protected String[] getDefaultListElementAttributeValues()
 	{
-		return DEFAUL_LISTELEMENT_ATTRIBUTE_VALUES;
+		return DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES;
 	}
 
 	protected void createColumns(TableViewer viewer)
@@ -50,10 +42,6 @@ public class JadexSequenceMappingSection extends
 		{
 			return COLUMN_WEIGHTS;
 		}
-		
 		return super.getColumnWeights(columns);
 	}
-	
-	
-
 }

@@ -71,12 +71,10 @@ public abstract class AbstractCheckboxPropertySection extends
 		checkboxGridData.minimumWidth = 50;
 		checkboxGridData.widthHint = 50;
 
-		Label cLabel = getWidgetFactory().createLabel(sectionComposite,
-				checkboxLabel + ":");
+		Label cLabel = getWidgetFactory().createLabel(sectionComposite, checkboxLabel + ":");
 		addDisposable(cLabel);
 		
-		Button button = getWidgetFactory().createButton(sectionComposite, null,
-				SWT.CHECK);
+		Button button = getWidgetFactory().createButton(sectionComposite, null, SWT.CHECK);
 		addDisposable(button);
 
 		button.addSelectionListener(new SelectionAdapter()

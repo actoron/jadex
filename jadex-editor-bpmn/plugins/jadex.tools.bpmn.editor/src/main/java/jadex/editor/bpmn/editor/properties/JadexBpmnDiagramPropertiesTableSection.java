@@ -7,11 +7,11 @@ import jadex.editor.bpmn.editor.properties.template.AbstractBpmnMultiColumnTable
 import jadex.editor.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
 
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.widgets.TableColumn;
 
 
 /**
- * @author Claas Altschaffel
  * 
  */
 public class JadexBpmnDiagramPropertiesTableSection extends
@@ -29,23 +29,15 @@ public class JadexBpmnDiagramPropertiesTableSection extends
 	public JadexBpmnDiagramPropertiesTableSection()
 	{
 		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_PROPERTIES_LIST_DETAIL,
-				"Properties", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX);
+			"Properties", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX);
 		
 	}
 
-	@Override
 	protected String[] getDefaultListElementAttributeValues()
 	{
 		return DEFAUL_LISTELEMENT_ATTRIBUTE_VALUES;
 	}
 
-	@Override
-	protected void createColumns(TableViewer viewer)
-	{
-		super.createColumns(viewer, COLUMN_NAMES);
-	}
-
-	@Override
 	protected int[] getColumnWeights(TableColumn[] columns)
 	{
 		if (columns.length == COLUMN_WEIGHTS.length)
@@ -55,7 +47,10 @@ public class JadexBpmnDiagramPropertiesTableSection extends
 		
 		return super.getColumnWeights(columns);
 	}
-	
-	
+
+	protected void createColumns(TableViewer viewer)
+	{
+		super.createColumns(viewer, COLUMN_NAMES);
+	}
 
 }

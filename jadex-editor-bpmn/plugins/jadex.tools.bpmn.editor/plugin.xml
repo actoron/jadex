@@ -381,6 +381,58 @@
      </propertySections>
    </extension>
    
+    <!-- the jadex bpmndiagram provided services section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.editor.bpmn.JadexBpmnEditor">
+        <propertySection
+              class="jadex.editor.bpmn.editor.properties.JadexBpmnDiagramProvidedServicesTableSection"
+              id="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramProvidedServicesTableSection"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramPropertiesTableSection">
+           <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
+        </propertySection>
+     </propertySections>
+	</extension>
+   
+	<!-- the jadex bpmndiagram required services section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.editor.bpmn.JadexBpmnEditor">
+        <propertySection
+              class="jadex.editor.bpmn.editor.properties.JadexBpmnDiagramRequiredServicesTableSection"
+              id="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramRequiredServicesTableSection"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramProvidedServicesTableSection">
+           <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
+        </propertySection>
+     </propertySections>
+   </extension>
+   
+   	<!-- the jadex bpmndiagram service binding section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.editor.bpmn.JadexBpmnEditor">
+        <propertySection
+              class="jadex.editor.bpmn.editor.properties.JadexBpmnDiagramServiceBindingsTableSection"
+              id="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramServiceBindingsTableSection"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramRequiredServicesTableSection">
+           <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
+        </propertySection>
+     </propertySections>
+   </extension>
+   
+   	<!-- the jadex bpmndiagram service binding section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.editor.bpmn.JadexBpmnEditor">
+        <propertySection
+              class="jadex.editor.bpmn.editor.properties.JadexBpmnDiagramSubcomponentsTableSection"
+              id="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramSubcomponentsTableSection"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramServiceBindingsTableSection">
+           <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
+        </propertySection>
+     </propertySections>
+   </extension>
+   
    <!-- annotation decorator in diagram -->
 	<!--
 	<extension

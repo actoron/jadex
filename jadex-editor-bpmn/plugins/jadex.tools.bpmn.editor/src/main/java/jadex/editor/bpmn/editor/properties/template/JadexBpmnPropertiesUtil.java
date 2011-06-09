@@ -142,6 +142,18 @@ public class JadexBpmnPropertiesUtil
 	/** Key for the arguments of a BPMN diagram. */
 	public static final String JADEX_RESULTS_LIST_DETAIL = "results";
 	
+	/** Key for the provided services map of a BPMN diagram. */
+	public static final String JADEX_PROVIDEDSERVICES_LIST_DETAIL = "providedservices";
+
+	/** Key for the required services map of a BPMN diagram. */
+	public static final String JADEX_REQUIREDSERVICES_LIST_DETAIL = "requiredservices";
+
+	/** Key for the bindings map of a BPMN diagram. */
+	public static final String JADEX_BINDINGS_LIST_DETAIL = "bindings";
+	
+	/** Key for the bindings map of a BPMN diagram. */
+	public static final String JADEX_SUBCOMPONENTS_LIST_DETAIL = "subcomponents";
+	
 	/** Key for the implementing class of a task. */
 	public static final String JADEX_ACTIVITY_CLASS_DETAIL = "class";
 	
@@ -150,7 +162,7 @@ public class JadexBpmnPropertiesUtil
 	
 	/** Key for the properties map of a SubProcess. */
 	public static final String JADEX_PROPERTIES_LIST_DETAIL = "properties";
-	
+		
 	/** Key for the mapping map of a sequence edge. */
 	public static final String JADEX_MAPPING_LIST_DETAIL = "mappings";
 	

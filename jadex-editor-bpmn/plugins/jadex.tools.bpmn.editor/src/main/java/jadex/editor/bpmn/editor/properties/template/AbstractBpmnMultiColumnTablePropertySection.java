@@ -5,12 +5,16 @@ import jadex.editor.common.model.properties.table.AbstractCommonTablePropertySec
 import jadex.editor.common.model.properties.table.MultiColumnTable;
 import jadex.editor.common.model.properties.table.MultiColumnTable.MultiColumnTableRow;
 
+import java.util.Map;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.gmf.runtime.common.core.command.CommandResult;
 import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.CheckboxCellEditor;
+import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -18,17 +22,19 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IWorkbenchPart;
 
 /**
  * Property section Tab to enable Jadex specific properties
- * 
- * @author Claas Altschaffel
  */
 public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		AbstractCommonTablePropertySection
 {
-
+	public static final String TEXT = "text";
+	public static final String CHECKBOX = "checkbox";
+	public static final String COMBOBOX = "combobox";
+	
 	// ---- attributes ----
 
 	/** Utility class to hold attribute an element reference */
@@ -103,24 +109,18 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 
 	// ---- control creation methods ----
 
-	@Override
 	protected ModifyEObjectCommand getAddCommand()
 	{
 		// modify the EModelElement annotation
 		ModifyEObjectCommand command = new ModifyEObjectCommand(modelElement,
-				"Add EModelElement annotation element")
+			"Add EModelElement annotation element")
 		{
-			@Override
-			protected CommandResult doExecuteWithResult(
-					IProgressMonitor monitor, IAdaptable info)
-					throws ExecutionException
+			protected CommandResult doExecuteWithResult(IProgressMonitor monitor, IAdaptable info)
+				throws ExecutionException
 			{
-
 				MultiColumnTableRow newRow;
 				MultiColumnTable table = getTableFromAnnotation();
-				newRow = table.new MultiColumnTableRow(
-						getDefaultListElementAttributeValues(),
-						table);
+				newRow = table.new MultiColumnTableRow(getDefaultListElementAttributeValues(), table);
 				table.add(newRow);
 				updateTableAnnotation(table);
 
@@ -130,25 +130,20 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		return command;
 	}
 
-	@Override
 	protected ModifyEObjectCommand getDeleteCommand()
 	{
 		// modify the EModelElement annotation
 		ModifyEObjectCommand command = new ModifyEObjectCommand(modelElement,
 				"Delete EModelElement annotation element")
 		{
-			@Override
-			protected CommandResult doExecuteWithResult(
-					IProgressMonitor monitor, IAdaptable info)
-					throws ExecutionException
+			protected CommandResult doExecuteWithResult(IProgressMonitor monitor, IAdaptable info)
+				throws ExecutionException
 			{
-
-				MultiColumnTableRow rowToRemove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
-						.getSelection()).getFirstElement();
+				MultiColumnTableRow rowToRemove = (MultiColumnTableRow) ((IStructuredSelection)tableViewer
+					.getSelection()).getFirstElement();
 				MultiColumnTable tableRowList = getTableFromAnnotation();
 				tableRowList.remove(rowToRemove);
 				updateTableAnnotation(tableRowList);
-
 
 				return CommandResult.newOKCommandResult(null);
 			}
@@ -156,21 +151,15 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		return command;
 	}
 
-	@Override
 	protected ModifyEObjectCommand getUpCommand()
 	{
 		// modify the EModelElement annotation
-		ModifyEObjectCommand command = new ModifyEObjectCommand(modelElement,
-				"Move parameter element up")
+		ModifyEObjectCommand command = new ModifyEObjectCommand(modelElement, "Move parameter element up")
 		{
-			@Override
 			protected CommandResult doExecuteWithResult(
-					IProgressMonitor monitor, IAdaptable info)
-					throws ExecutionException
+				IProgressMonitor monitor, IAdaptable info) throws ExecutionException
 			{
-
-
-				MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
+				MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection)tableViewer
 						.getSelection()).getFirstElement();
 
 				MultiColumnTable tableRowList = getTableFromAnnotation();
@@ -190,21 +179,17 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		return command;
 	}
 
-	@Override
 	protected ModifyEObjectCommand getDownCommand()
 	{
 		// modify the EModelElement annotation
-		ModifyEObjectCommand command = new ModifyEObjectCommand(modelElement,
-				"Move parameter element down")
+		ModifyEObjectCommand command = new ModifyEObjectCommand(modelElement, "Move parameter element down")
 		{
-			@Override
 			protected CommandResult doExecuteWithResult(
 					IProgressMonitor monitor, IAdaptable info)
 					throws ExecutionException
 			{
-
 				MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
-						.getSelection()).getFirstElement();
+					.getSelection()).getFirstElement();
 
 				MultiColumnTable tableRowList = getTableFromAnnotation();
 				int index = tableRowList.indexOf(rowToMove);
@@ -223,28 +208,22 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		return command;
 	}
 
-	@Override
 	protected ModifyEObjectCommand getClearCommand()
 	{
 		// modify the EModelElement annotation
 		ModifyEObjectCommand command = new ModifyEObjectCommand(modelElement,
 				"Clear parameter")
 		{
-			@Override
-			protected CommandResult doExecuteWithResult(
-					IProgressMonitor monitor, IAdaptable info)
-					throws ExecutionException
+			protected CommandResult doExecuteWithResult(IProgressMonitor monitor, IAdaptable info)
+				throws ExecutionException
 			{
-
 				updateTableAnnotation(null);
-
 				return CommandResult.newOKCommandResult(null);
 			}
 		};
 		return command;
 	}
 
-	@Override
 	protected IStructuredContentProvider getTableContentProvider()
 	{
 		MultiColumnTableContentProvider contentProvider = new MultiColumnTableContentProvider();
@@ -259,19 +238,120 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	 */
 	protected void createColumns(TableViewer viewer, String[] columnNames)
 	{
-		for (int columnIndex = 0; columnIndex < columnNames.length; columnIndex++)
+		createColumns(viewer, columnNames, null, null);
+	}
+	
+	/**
+	 * Helper method to ease creation of simple string valued tables
+	 */
+	protected void createColumns(TableViewer viewer, String[] columnNames, String[] columntypes, Map values)
+	{
+		TableViewerColumn[] ret = new TableViewerColumn[columnNames.length];
+		for(int i = 0; i<columnNames.length; i++)
 		{
-			TableViewerColumn column = new TableViewerColumn(viewer, SWT.LEFT);
-			column.getColumn().setText(columnNames[columnIndex]);
-
-			column.setEditingSupport(new BpmnMultiColumnTableEditingSupport(
-					viewer, columnIndex));
-			column.setLabelProvider(new MultiColumnTableLabelProvider(
-					columnIndex));
+			if(columntypes==null || columntypes[i].equals(TEXT))
+			{
+				ret[i] = createTextColumn(viewer, columnNames[i], i);
+			}
+			else if(columntypes[i].equals(CHECKBOX))
+			{
+				ret[i] = createCheckboxColumn(viewer, columnNames[i], i);
+			}
+			else if(columntypes[i].equals(COMBOBOX))
+			{
+				ret[i] = createComboboxColumn(viewer, columnNames[i], i, values==null? null: (String[])values.get(columnNames[i]));
+			}
 		}
-
 	}
 
+	/**
+	 *  Create a text column.
+	 */
+	protected TableViewerColumn createTextColumn(TableViewer viewer, String name, int idx)
+	{
+		TableViewerColumn ret = new TableViewerColumn(viewer, SWT.LEFT);
+		ret.getColumn().setText(name);
+		ret.setEditingSupport(new BpmnMultiColumnTableEditingSupport(viewer, idx));
+		ret.setLabelProvider(new MultiColumnTableLabelProvider(idx));
+		return ret;
+	}
+	
+	/**
+	 *  Create a checkbox column.
+	 */
+	public TableViewerColumn createCheckboxColumn(TableViewer viewer, String name, final int idx)
+	{
+		TableViewerColumn ret = new TableViewerColumn(viewer, SWT.LEFT);
+		ret.getColumn().setText(name);
+		
+		ret.setEditingSupport(new BpmnMultiColumnTableEditingSupport(viewer, idx, 
+			new CheckboxCellEditor(((TableViewer)viewer).getTable(), SWT.ARROW))
+		{
+			protected Object getValue(Object element)
+			{
+				return Boolean.valueOf(((MultiColumnTableRow)element).getColumnValueAt(idx));
+			}
+	
+			protected void doSetValue(Object element, Object value)
+			{
+				super.doSetValue(element, ((Boolean)value).toString());
+			}
+		});
+		
+		ret.setLabelProvider(new MultiColumnTableLabelProvider(idx)
+		{
+			public Image getColumnImage(Object element, int columnIndex)
+			{
+				if(Boolean.valueOf(((MultiColumnTableRow)element).getColumnValueAt(idx)))
+				{
+					return checkboxImageProvider.getCheckboxImage(true, true);
+				}
+				return checkboxImageProvider.getCheckboxImage(false, true);
+			}
+	
+			public String getColumnText(Object element, int columnIndex)
+			{
+				return null;
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Create a checkbox column.
+	 */
+	public TableViewerColumn createComboboxColumn(TableViewer viewer, String name, final int idx, final String[] values)
+	{
+		TableViewerColumn ret = new TableViewerColumn(viewer, SWT.LEFT);
+		ret.getColumn().setText(name);
+		
+		ComboBoxCellEditor editor = new ComboBoxCellEditor(((TableViewer)viewer).getTable(), values, SWT.READ_ONLY);
+		ret.setEditingSupport(new BpmnMultiColumnTableEditingSupport(viewer, idx, editor)
+		{
+			protected Object getValue(Object element)
+			{
+				for(int i=0; i<values.length; i++)
+				{
+					if(values[i].equals(((MultiColumnTableRow)element).getColumnValueAt(i)))
+					{
+						return new Integer(i);
+					}
+				}
+				// fall through
+				return new Integer(0);
+			}
+	
+			protected void doSetValue(Object element, Object value)
+			{
+				super.doSetValue(element, values[((Integer)value).intValue()]);
+			}
+		});
+		ret.setLabelProvider(new MultiColumnTableLabelProvider(idx));
+		
+		return ret;
+	}
+	
 
 
 	/**
@@ -286,8 +366,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		checkAnnotationConversion();
 
 		MultiColumnTable table = JadexBpmnPropertiesUtil
-				.getJadexEAnnotationTable(modelElement,
-						getTableAnnotationIdentifier());
+			.getJadexEAnnotationTable(modelElement, getTableAnnotationIdentifier());
 		if (table != null)
 		{
 			return table;
@@ -305,7 +384,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	private void updateTableAnnotation(MultiColumnTable table)
 	{
 		JadexBpmnPropertiesUtil.updateJadexEAnnotationTable(modelElement,
-				getTableAnnotationIdentifier(), table);
+			getTableAnnotationIdentifier(), table);
 	}
 
 	/**
@@ -334,8 +413,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	 * Simple content provider that reflects the table values of the specified
 	 * annotation detail given as value from containing class.
 	 */
-	protected class MultiColumnTableContentProvider implements
-			IStructuredContentProvider
+	protected class MultiColumnTableContentProvider implements IStructuredContentProvider
 	{
 
 		/**
@@ -375,15 +453,12 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		{
 			// no actions taken.
 		}
-
 	}
 
-	protected class BpmnMultiColumnTableEditingSupport extends
-			MultiColumnTableEditingSupport
+	protected class BpmnMultiColumnTableEditingSupport extends MultiColumnTableEditingSupport
 	{
 
-		public BpmnMultiColumnTableEditingSupport(TableViewer viewer,
-				int attributeIndex)
+		public BpmnMultiColumnTableEditingSupport(TableViewer viewer, int attributeIndex)
 		{
 			super(viewer, attributeIndex);
 
@@ -449,5 +524,6 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		}
 
 	}
-
+	
+	
 }
