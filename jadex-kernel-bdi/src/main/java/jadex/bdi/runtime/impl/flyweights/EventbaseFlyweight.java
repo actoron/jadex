@@ -405,6 +405,31 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	/**
 	 *  Create component identifier.
 	 *  @param name The name.
+	 *  @param parent The parent identifier.
+	 *  @return The new component identifier.
+	 */
+	public IComponentIdentifier createComponentIdentifier(final String name, final IComponentIdentifier parent)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation ai = new AgentInvocation()
+			{
+				public void run()
+				{
+					object = getInterpreter().getCMS().createComponentIdentifier(name, parent, parent.getAddresses());
+				}
+			};
+			return (IComponentIdentifier)ai.object;
+		}
+		else
+		{
+			return getInterpreter().getCMS().createComponentIdentifier(name, parent, parent.getAddresses());
+		}
+	}
+	
+	/**
+	 *  Create component identifier.
+	 *  @param name The name.
 	 *  @param local True for local name.
 	 *  @param addresses The addresses.
 	 *  @return The new component identifier.

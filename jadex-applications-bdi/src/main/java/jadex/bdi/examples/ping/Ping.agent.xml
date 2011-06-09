@@ -14,5 +14,9 @@
 	<capabilities>
 		<capability name="ping" file="jadex.bdi.planlib.ping.Ping"/>
 	</capabilities>
+	
+	<properties>
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+	</properties>
 
 </agent>

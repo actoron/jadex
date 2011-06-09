@@ -104,6 +104,14 @@ public interface IEventbase extends IElement
 	/**
 	 *  Create component identifier.
 	 *  @param name The name.
+	 *  @param parent The parent identifier.
+	 *  @return The new component identifier.
+	 */
+	public IComponentIdentifier createComponentIdentifier(String name, IComponentIdentifier parent);
+	
+	/**
+	 *  Create component identifier.
+	 *  @param name The name.
 	 *  @param local True for local name.
 	 *  @param addresses The addresses.
 	 *  @return The new component identifier.
