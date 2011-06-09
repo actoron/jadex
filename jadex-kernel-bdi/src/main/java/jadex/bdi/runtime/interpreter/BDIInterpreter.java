@@ -566,7 +566,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 			rulesystem.getAgenda().fireRule();
 
 			act	= rulesystem.getAgenda().getLastActivation();
-//			System.err.println("here: "+act);
+			System.err.println("here: "+act+", "+rulesystem.getAgenda().getActivations());
 			state.getProfiler().start(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
 			state.expungeStaleObjects();
 			state.notifyEventListeners();

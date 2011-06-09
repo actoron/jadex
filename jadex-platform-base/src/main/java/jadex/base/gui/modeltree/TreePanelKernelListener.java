@@ -49,6 +49,7 @@ public class TreePanelKernelListener implements IMultiKernelListener
 	 */
 	public IFuture componentTypesRemoved(String[] types)
 	{
+//		System.out.println("types removed: "+SUtil.arrayToString(types));
 		SwingUtilities.invokeLater(refresh);
 		return IFuture.DONE;
 	}
@@ -59,6 +60,7 @@ public class TreePanelKernelListener implements IMultiKernelListener
 	 */
 	public IFuture componentTypesAdded(String[] types)
 	{
+//		System.out.println("types added: "+SUtil.arrayToString(types));
 		SwingUtilities.invokeLater(refresh);
 		return IFuture.DONE;
 	}

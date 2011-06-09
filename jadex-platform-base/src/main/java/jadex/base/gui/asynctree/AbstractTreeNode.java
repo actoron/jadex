@@ -4,6 +4,7 @@ import jadex.base.Starter;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.TreeExpansionHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -87,6 +88,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 		if(children==null && !searching)
 		{
 			searching	= true;
+//			System.out.println("searchChildren: "+getId());
 			searchChildren();
 		}
 		return children==null ? 0 : children.size();
@@ -102,6 +104,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 		if(children==null && !searching)
 		{
 			searching	= true;
+//			System.out.println("searchChildren: "+getId());
 			searchChildren();
 		}
 		return children==null ? null : (ITreeNode)children.get(index);
@@ -117,6 +120,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 		if(children==null && !searching)
 		{
 			searching	= true;
+//			System.out.println("searchChildren: "+getId());
 			searchChildren();
 		}
 		return children==null ? -1 : children.indexOf(child);
@@ -146,6 +150,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 		{
 			searching	= true;
 			this.recurse	= recurse;
+//			System.out.println("searchChildren: "+getId());
 			searchChildren();
 		}
 		else
@@ -180,6 +185,8 @@ public abstract class AbstractTreeNode	implements ITreeNode
 		}
 		
 		IFuture	ret	= childrenfuture;
+		
+//		System.out.println("searchChildren: "+getId());
 		
 		searchChildren();	// might reset childrenfuture.
 		
@@ -243,6 +250,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 		{
 			// Restart search when nodes have been added/removed in the mean time.
 			dirty	= false;
+//			System.out.println("searchChildren: "+getId());
 			searchChildren();
 		}
 		else
@@ -347,7 +355,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 				childrenfuture	= null;
 			}
 			
-			if(dorecurse && tree.isExpanded(new TreePath(model.buildTreePath(AbstractTreeNode.this).toArray())))
+			if(dorecurse && TreeExpansionHandler.isTreeExpanded(tree, new TreePath(model.buildTreePath(AbstractTreeNode.this).toArray())))
 			{
 				for(int i=0; children!=null && i<children.size(); i++)
 				{

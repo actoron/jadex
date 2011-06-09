@@ -10,6 +10,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.gui.TreeExpansionHandler;
 
 import java.io.File;
 import java.util.Collection;
@@ -146,7 +147,7 @@ public class DirNode extends FileNode
 	 */
 	public void refresh(boolean recurse)
 	{
-		if(tree.isExpanded(new TreePath(model.buildTreePath(this).toArray())))
+		if(TreeExpansionHandler.isTreeExpanded(tree, new TreePath(model.buildTreePath(this).toArray())))
 			super.refresh(recurse);
 	}
 	

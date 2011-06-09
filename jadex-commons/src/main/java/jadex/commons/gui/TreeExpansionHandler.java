@@ -4,7 +4,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.JTree;
@@ -44,6 +46,13 @@ public class TreeExpansionHandler	implements TreeExpansionListener, TreeModelLis
 		this.expanded	= new HashSet();
 		tree.addTreeExpansionListener(this);
 		tree.getModel().addTreeModelListener(this);
+		List	tehs	= (List)tree.getClientProperty(TreeExpansionHandler.class);
+		if(tehs==null)
+		{
+			tehs	= new ArrayList();
+			tree.putClientProperty(TreeExpansionHandler.class, tehs);			
+		}
+		tehs.add(this);
 	}
 
 	//-------- TreeExpansionListener interface --------
@@ -166,6 +175,34 @@ public class TreeExpansionHandler	implements TreeExpansionListener, TreeModelLis
 		else
 		{
 			ret.setResult(null);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Test if a path is expanded or should be.
+	 */
+	public boolean	isExpanded(TreePath path)
+	{
+		return expanded.contains(path.getLastPathComponent());
+	}
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Test if a tree node is expanded or should be.
+	 */
+	public static boolean	isTreeExpanded(JTree tree, TreePath path)
+	{
+		boolean	ret	= tree.isExpanded(path);
+		if(!ret)
+		{
+			List	tehs	= (List)tree.getClientProperty(TreeExpansionHandler.class);
+			for(int i=0; !ret && tehs!=null && i<tehs.size(); i++)
+			{
+				TreeExpansionHandler	teh	= (TreeExpansionHandler)tehs.get(i);
+				ret	= teh.isExpanded(path);
+			}
 		}
 		return ret;
 	}
