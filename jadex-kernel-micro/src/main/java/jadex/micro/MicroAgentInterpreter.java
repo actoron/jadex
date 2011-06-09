@@ -69,8 +69,15 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		try
 		{
 			this.microagent = (MicroAgent)microclass.newInstance();
-			this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 			this.microagent.init(MicroAgentInterpreter.this);
+			
+			// Hack!!! Change service container to custom implementation (required only for ProxyAgent) 
+			IServiceContainer	cont	= microagent.createServiceContainer();
+			if(cont!=null)
+			{
+				this.container	= cont;
+			}
+			
 			addStep((new Object[]{new IComponentStep()
 			{
 				public Object execute(IInternalAccess ia)
@@ -647,19 +654,5 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		}
 		
 		return buf.toString();
-	}
-
-	/**
-	 *  Create the service container.
-	 *  @return The service container.
-	 */
-	public IServiceContainer getServiceContainer()
-	{
-		if(container==null)
-		{
-			container	= microagent.createServiceContainer();
-		}
-		
-		return super.getServiceContainer();
 	}
 }
