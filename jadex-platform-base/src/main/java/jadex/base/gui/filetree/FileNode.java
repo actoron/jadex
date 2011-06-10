@@ -6,6 +6,7 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.commons.SUtil;
 
 import java.io.File;
+import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -107,7 +108,46 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 	 */
 	public String toString()
 	{
-		return FileData.getDisplayName(file);
+		String	name	= FileData.getDisplayName(file);
+		
+		// For equally named path entries (e.g. 'classes') build larger name to differentiate (e.g. 'myapp/classes').
+		if(getParent() instanceof RootNode)
+		{
+			int	up	= 0;
+			List	siblings	= getParent().getCachedChildren();
+			for(int i=0; siblings!=null && i<siblings.size(); i++)
+			{
+				if(siblings.get(i)!=this)
+				{
+					File	sib	= ((FileNode)siblings.get(i)).getFile();
+					if(FileData.getDisplayName(sib).equals(name))
+					{
+						int	up0	= 0;
+						File	tmp	= file;
+						do
+						{
+							up0++;
+							tmp	= tmp.getParentFile();
+							sib	= sib.getParentFile();
+						}
+						while(tmp!=null && sib!=null && FileData.getDisplayName(sib).equals(FileData.getDisplayName(tmp)));
+						
+						up	= Math.max(up, up0);
+					}
+				}
+			}
+			
+			if(up>0)
+			{
+				File	tmp	= file;
+				for(int i=0; i<up; i++)
+				{
+					tmp	= tmp.getParentFile();
+					name	= FileData.getDisplayName(tmp) + "/" +name;
+				}
+			}
+		}
+		return name;
 	}
 	
 	/**
