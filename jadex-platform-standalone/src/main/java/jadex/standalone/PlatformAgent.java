@@ -4,6 +4,7 @@ import jadex.base.fipa.IDF;
 import jadex.base.service.deployment.IDeploymentService;
 import jadex.base.service.simulation.ISimulationService;
 import jadex.bridge.IComponentFactory;
+import jadex.bridge.IComponentFactoryExtensionService;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IMessageService;
 import jadex.bridge.ISettingsService;
@@ -47,7 +48,9 @@ import jadex.micro.annotation.RequiredServices;
 	"jadex.base.service.simulation.*",
 	"jadex.component.*",
 	"jadex.base.service.deployment.*",
-	"jadex.micro.*"
+	"jadex.micro.*",
+	"jadex.extension.envsupport.*",
+	"jadex.extension.agr.*"
 })
 
 @Arguments({
@@ -89,9 +92,9 @@ import jadex.micro.annotation.RequiredServices;
 	@ProvidedService(type=IComponentManagementService.class, implementation=@Implementation(expression="new ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter(), $args.componentfactory)", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IDF.class, implementation=@Implementation(expression="new DirectoryFacilitatorService($component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=ISimulationService.class, implementation=@Implementation(expression="new SimulationService($component, SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{new String[]{\"getMode\", \"isExecuting\"}}))")),
-//	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new ComponentComponentFactory($component.getServiceProvider())", direct=true)),
-//	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new MicroAgentFactory($component.getServiceProvider(), null)")),
-	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(expression="new DeploymentService($component.getServiceProvider())"))
+	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(expression="new DeploymentService($component.getServiceProvider())")),
+	@ProvidedService(name="envextension", type=IComponentFactoryExtensionService.class, implementation=@Implementation(expression="new EnvSupportExtensionService()")),	// expression to avoid compile-time dependency
+	@ProvidedService(name="agrextension", type=IComponentFactoryExtensionService.class, implementation=@Implementation(expression="new AGRExtensionService()"))	// expression to avoid compile-time dependency
 })
 
 @RequiredServices({

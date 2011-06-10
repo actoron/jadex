@@ -170,15 +170,10 @@ public class MicroClassReader
 	protected void fillMicroModelFromAnnotations(CacheableKernelModel micromodel, String model, Class cma, ClassLoader classloader)
 	{
 		ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
-		String[] imports = new String[]{cma.getClass().getPackage().getName()+".*"};
 		
 		if(cma.isAnnotationPresent(Imports.class))
 		{
 			String[] tmp = ((Imports)cma.getAnnotation(Imports.class)).value();
-//			String[] imp = new String[tmp.length+1];
-//			imp[0] = imports[0];
-//			System.arraycopy(tmp, 0, imp, 1, tmp.length);
-//			imports = imp;
 			modelinfo.setImports(tmp);
 		}
 		if(cma.isAnnotationPresent(Description.class))
@@ -241,7 +236,7 @@ public class MicroClassReader
 			for(int i=0; i<vals.length; i++)
 			{
 //				Object arg = SJavaParser.evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
-				Object defval = evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
+				Object defval = evaluateExpression(vals[i].defaultvalue(), modelinfo.getAllImports(), null, classloader);
 				tmpargs[i] = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
 					vals[i].description(), vals[i].typename(), defval);
 				argsmap.put(tmpargs[i].getName(), tmpargs[i]);
@@ -300,7 +295,7 @@ public class MicroClassReader
 				{
 					jadex.bridge.modelinfo.Argument arg = (jadex.bridge.modelinfo.Argument)argsmap.get(argvals[j].name());
 //					Object val = SJavaParser.evaluateExpression(argvals[j].value(), imports, null, classloader);
-					Object val = evaluateExpression(argvals[j].value(), imports, null, classloader);
+					Object val = evaluateExpression(argvals[j].value(), modelinfo.getAllImports(), null, classloader);
 					arg.setDefaultValue(confignames[i], val);
 				}
 				NameValue[] resvals = configs[i].results();
@@ -308,7 +303,7 @@ public class MicroClassReader
 				{
 					jadex.bridge.modelinfo.Argument arg = (jadex.bridge.modelinfo.Argument)resmap.get(resvals[j].name());
 //					Object val = SJavaParser.evaluateExpression(resvals[j].value(), imports, null, classloader);
-					Object val = evaluateExpression(resvals[j].value(), imports, null, classloader);
+					Object val = evaluateExpression(resvals[j].value(), modelinfo.getAllImports(), null, classloader);
 					arg.setDefaultValue(confignames[i], val);
 				}
 				
