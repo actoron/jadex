@@ -159,8 +159,8 @@ public class ModelInfo extends Startable implements IModelInfo
 		{
 			String[] tmp = new String[ret.length+1];
 			if(ret.length>0)
-				System.arraycopy(ret, 0, tmp, 0, ret.length);
-			tmp[tmp.length-1] = getPackage()+".*";
+				System.arraycopy(ret, 0, tmp, 1, ret.length);
+			tmp[0] = getPackage()+".*";
 			ret = tmp;
 		}
 		return ret;

@@ -1,6 +1,5 @@
 package jadex.base.gui.componenttree;
 
-import java.lang.reflect.Proxy;
 
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
@@ -8,7 +7,6 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.gui.SGUI;
-import jadex.micro.annotation.Binding;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;

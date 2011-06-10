@@ -30,12 +30,12 @@
 		</beliefref>
 		<belief name="date1" class="Date">
 			<fact>
-				new Date()
+				new Date($scope.getTime())
 			</fact>
 		</belief>
 		<belief name="date2" class="Date" evaluationmode="pull">
 			<fact>
-				new Date()
+				new Date($scope.getTime())
 			</fact>
 		</belief>
 	</beliefs>

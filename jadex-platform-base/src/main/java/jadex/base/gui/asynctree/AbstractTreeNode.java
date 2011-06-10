@@ -144,7 +144,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	{
 		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
-//		System.out.println("refresh: "+getId());
+//		System.out.println("ATN refresh: "+getId());
 		
 		if(!searching)
 		{

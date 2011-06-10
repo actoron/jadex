@@ -91,7 +91,7 @@ public class MessageService extends BasicService implements IMessageService
 	protected DeliverMessage delivermsg;
 	
 	/** The logger. */
-	protected Logger logger;
+	protected Logger	logger;
 	
 	/** The listeners (listener->filter). */
 	protected Map listeners;
@@ -117,17 +117,17 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Constructor for Outbox.
 	 *  @param platform
 	 */
-	public MessageService(IExternalAccess component, ITransport[] transports, 
+	public MessageService(IExternalAccess component, Logger logger, ITransport[] transports, 
 		MessageType[] messagetypes)
 	{
-		this(component, transports, messagetypes, null, null);
+		this(component, logger, transports, messagetypes, null, null);
 	}
 	
 	/**
 	 *  Constructor for Outbox.
 	 *  @param platform
 	 */
-	public MessageService(IExternalAccess component, ITransport[] transports, 
+	public MessageService(IExternalAccess component, Logger logger, ITransport[] transports, 
 		MessageType[] messagetypes, IContentCodec[] contentcodecs, CodecFactory codecfactory)
 	{
 		super(component.getServiceProvider().getId(), IMessageService.class, null);
@@ -140,7 +140,7 @@ public class MessageService extends BasicService implements IMessageService
 		for(int i=0; i<messagetypes.length; i++)
 			this.messagetypes.put(messagetypes[i].getName(), messagetypes[i]);		
 		this.delivermsg = new DeliverMessage();
-		this.logger = Logger.getLogger("MessageService" + this);
+		this.logger = logger;
 		
 		this.managers = new LRU(800);
 		if(contentcodecs!=null)

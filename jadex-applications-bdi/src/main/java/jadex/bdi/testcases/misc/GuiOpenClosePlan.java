@@ -78,7 +78,7 @@ public class GuiOpenClosePlan extends Plan
 	public void body()
 	{
 		TestReport tr = new TestReport("#1", "Test closing a gui throws gui_event.");
-		final Timer t = new Timer(200, null);
+		final Timer t = new Timer(100, null);
 		t.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -91,7 +91,17 @@ public class GuiOpenClosePlan extends Plan
 		getLogger().info("Plan is waiting 3 seconds for gui close.");
 		try
 		{
-			waitForInternalEvent("gui_closed", 3000);
+			// Timeout fails in sim mode because clock doesn't wait -> wait before event. (hack???)
+			getWaitqueue().addInternalEvent("gui_closed");
+			try
+			{
+				Thread.sleep(200);
+			}
+			catch(InterruptedException e)
+			{
+			}
+			
+			waitForInternalEvent("gui_closed", 3000); 
 			getLogger().info("Gui was closed.");
 			tr.setSucceeded(true);
 		}

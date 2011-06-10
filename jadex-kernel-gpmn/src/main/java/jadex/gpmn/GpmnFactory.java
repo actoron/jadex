@@ -16,13 +16,11 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.threadpool.IThreadPoolService;
 import jadex.commons.ResourceInfo;
-import jadex.commons.SFunction;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.SGUI;
 
 import java.io.BufferedReader;

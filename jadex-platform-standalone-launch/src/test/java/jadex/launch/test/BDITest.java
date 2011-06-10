@@ -24,19 +24,11 @@ public class BDITest	extends	ComponentTestSuite
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{
-				"semiautomatic",
 				"BeliefSetChanges",
 				"BeliefSetContains",
 				"MultiplePlanTriggers",
-				"Evaluationmodes",	// Doesn't work in simulation?
-				"UpdatingBelief",	// Doesn't work in simulation?
-				"GUICloser",	// Doesn't work in simulation?
-				"Leaker",	// Breaks simulation?
-				"Watchdog",	// Prints ugly warnings but works.
 				"CMSTest",	// missing cms agent?
 				"DFTest",	// missing df agent?
-				"WaitFor",	// Missing synchronization between simulation clock and external clock
-				"Callback",	// Unclear threading issues -> refactor test (are listeners called on agent thread?)
 				"MessagingTest"	// wrong email configuration?
 			});
 	}

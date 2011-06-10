@@ -137,6 +137,8 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	 */
 	public void refresh(final boolean recurse)
 	{
+//		System.out.println("CTN refresh: "+getId());
+		
 		cms.getComponentDescription(desc.getName()).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
@@ -161,8 +163,8 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	 */
 	protected void	searchChildren()
 	{
-//		if(getComponentIdentifier().getName().indexOf("Hunter")!=-1)
-//			System.out.println("hunterpey: "+this);
+//		if(getComponentIdentifier().getName().indexOf("Garbage")!=-1)
+//			System.out.println("searchChildren: "+getId());
 		searchChildren(cms, getComponentIdentifier())
 			.addResultListener(new IResultListener()
 		{
@@ -315,7 +317,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 //					System.err.println("searchChildren queued4: "+ComponentTreeNode.this);
 				final IExternalAccess	ea	= (IExternalAccess)result;
 				
-				ea.scheduleStep(new IComponentStep()
+				ea.scheduleImmediate(new IComponentStep()
 				{
 					@XMLClassname("getRequiredServiceInfos")
 					public Object execute(IInternalAccess ia)

@@ -30,6 +30,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -69,6 +70,8 @@ public class TimerPanel	extends JPanel
 	 */
 	public TimerPanel(SimCenterPanel simp)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
 		this.simp = simp;
 		setLayout(new BorderLayout());
 		setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Active Timers "));
@@ -83,13 +86,12 @@ public class TimerPanel	extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				synchronized(TimerPanel.this)
+				assert SwingUtilities.isEventDispatchThread();
+				
+				setActive(update.isSelected());
+				if(!update.isSelected())
 				{
-					setActive(update.isSelected());
-					if(!update.isSelected())
-					{
-						model.removeAllRows();
-					}
+					model.removeAllRows();
 				}
 			}
 		});
@@ -103,6 +105,8 @@ public class TimerPanel	extends JPanel
 			public Component getTableCellRendererComponent(JTable table,
 				Object value, boolean selected, boolean focus, int row, int column)
 			{
+				assert SwingUtilities.isEventDispatchThread();
+				
 				Component comp = super.getTableCellRendererComponent(table,
 					value, selected, focus, row, column);
 				setOpaque(true);
@@ -127,6 +131,8 @@ public class TimerPanel	extends JPanel
 	 */
 	public void	updateView()
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		if(lastentries!=null)
 		{
 			updateView(lastentries);
@@ -138,6 +144,8 @@ public class TimerPanel	extends JPanel
 	 */
 	public void	updateView(TimerEntries entries)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
 		this.lastentries	= entries;
 		
 		if(update.isSelected())
@@ -198,7 +206,7 @@ public class TimerPanel	extends JPanel
 					return IFuture.DONE;
 				}
 				
-				public void	handleEvent(ChangeEvent event)
+				public void	handleEvent(final ChangeEvent event)
 				{
 					if(RemoteChangeListenerHandler.EVENT_BULK.equals(event.getType()))
 					{
@@ -210,7 +218,13 @@ public class TimerPanel	extends JPanel
 					}
 					else
 					{
-						updateView((TimerEntries)event.getValue());
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								updateView((TimerEntries)event.getValue());
+							}
+						});
 					}
 				}
 			};

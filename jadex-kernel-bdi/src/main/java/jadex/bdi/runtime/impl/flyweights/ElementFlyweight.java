@@ -3,7 +3,6 @@ package jadex.bdi.runtime.impl.flyweights;
 import jadex.bdi.runtime.IElement;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
-import jadex.bridge.ComponentTerminatedException;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.rules.state.IOAVState;
@@ -57,7 +56,7 @@ public abstract class ElementFlyweight implements IElement
 		
 		this.interpreter = BDIInterpreter.getInterpreter(state);
 		if(interpreter==null)
-			throw new ComponentTerminatedException(null);
+			throw new RuntimeException("No interpreter");
 		setHandle(handle);
 	}
 	

@@ -13,7 +13,8 @@
 	package="jadex.bdi.testcases.misc">
 
 	<imports>
-		<import>jadex.bdi.testcases.*</import>
+		<import>jadex.bdi.testcases.AnswerPlan</import>
+		<import>jadex.bdi.testcases.ResultPlan</import>
 		<import>jadex.base.fipa.*</import>
 	</imports>
 

@@ -106,7 +106,7 @@
 		</providedservice>
 		<providedservice class="IMessageService">
 			<implementation proxytype="raw">
-				new MessageService($component.getExternalAccess(),
+				new MessageService($component.getExternalAccess(), $component.getLogger(),
 				new ITransport[]
 				{
 					new LocalTransport($component.getServiceProvider()),
@@ -157,6 +157,7 @@
 		<!-- <property name="viewerpanel.componentviewerclass">""</property> -->
 		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
 		<!-- <property name="logging.level">java.util.logging.Level.WARNING</property> -->
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
 	</properties>
 	
 	<configurations>

@@ -1,12 +1,10 @@
 package jadex.base.gui.filetree;
 
-import java.lang.reflect.Proxy;
 
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.SReflect;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;

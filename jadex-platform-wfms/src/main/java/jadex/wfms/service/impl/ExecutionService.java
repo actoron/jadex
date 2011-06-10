@@ -27,14 +27,12 @@ import jadex.wfms.service.listeners.ProcessEvent;
 
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.jivesoftware.smack.util.Base64;
 
 /**
  *  The meta execution service wraps all specific process execution services.
