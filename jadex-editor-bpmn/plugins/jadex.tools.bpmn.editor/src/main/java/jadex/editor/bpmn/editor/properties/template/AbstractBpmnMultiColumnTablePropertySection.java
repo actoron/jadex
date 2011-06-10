@@ -7,6 +7,8 @@ import jadex.editor.common.model.properties.table.MultiColumnTable.MultiColumnTa
 
 import java.util.Map;
 
+import javax.swing.DefaultCellEditor;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -22,7 +24,11 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IWorkbenchPart;
 
 /**
@@ -34,6 +40,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	public static final String TEXT = "text";
 	public static final String CHECKBOX = "checkbox";
 	public static final String COMBOBOX = "combobox";
+	public static final String SPINNER = "spinner";
 	
 	// ---- attributes ----
 
@@ -261,6 +268,10 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 			{
 				ret[i] = createComboboxColumn(viewer, columnNames[i], i, values==null? null: (String[])values.get(columnNames[i]));
 			}
+			else if(columntypes[i].equals(SPINNER))
+			{
+				ret[i] = createSpinnerColumn(viewer, columnNames[i], i);
+			}
 		}
 	}
 
@@ -352,7 +363,44 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		return ret;
 	}
 	
-
+	/**
+	 *  Create a spinner column.
+	 */
+	public TableViewerColumn createSpinnerColumn(TableViewer viewer, String name, final int idx)
+	{
+		TableViewerColumn ret = new TableViewerColumn(viewer, SWT.LEFT);
+		ret.getColumn().setText(name);
+		
+		SpinnerCellEditor editor = new SpinnerCellEditor(((TableViewer)viewer).getTable());
+		ret.setEditingSupport(new BpmnMultiColumnTableEditingSupport(viewer, idx, editor)
+		{
+			protected Object getValue(Object element)
+			{
+				Object value = ((MultiColumnTableRow)element).getColumnValueAt(idx);
+				Integer val = new Integer(0);
+				if(value instanceof String && ((String)value).length()>0)
+				{
+					try
+					{
+						val = new Integer((String)value);
+					}
+					catch(Exception e)
+					{
+					}
+				}
+				return val;
+			}
+	
+			protected void doSetValue(Object element, Object value)
+			{
+				System.out.println("value: "+value);
+				super.doSetValue(element, value);
+			}
+		});
+		ret.setLabelProvider(new MultiColumnTableLabelProvider(idx));
+		
+		return ret;
+	}
 
 	/**
 	 * Retrieve the EAnnotation from the modelElement and converts it to a

@@ -12,10 +12,10 @@ import org.eclipse.swt.widgets.TableColumn;
 public class JadexBpmnDiagramSubcomponentsTableSection extends
 	AbstractBpmnMultiColumnTablePropertySection
 {
-	public static final String[] COLUMN_NAMES = new String[]{"Local Type Name", "Filename", "Suspend", "Master", "Daemon", "Autoshutdown"};
-	public static final String[] COLUMN_TYPES = new String[]{TEXT, TEXT, CHECKBOX, CHECKBOX, CHECKBOX, CHECKBOX};
+	public static final String[] COLUMN_NAMES = new String[]{"Local Type Name", "Filename", "Instance Name", "Number", "Arguments"};//, "Suspend", "Master", "Daemon", "Autoshutdown"};
+	public static final String[] COLUMN_TYPES = new String[]{TEXT, TEXT, TEXT, SPINNER, TEXT};// CHECKBOX, CHECKBOX, CHECKBOX, CHECKBOX};
 	public static final int[] COLUMN_WEIGHTS = new int[]{3, 3, 1, 1, 1, 1};
-	public static final String[] DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "", "", "", "", ""};
+	public static final String[] DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "filename", "", "", "", ""};
 	public static final int UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX = 0;
 	
 	/**

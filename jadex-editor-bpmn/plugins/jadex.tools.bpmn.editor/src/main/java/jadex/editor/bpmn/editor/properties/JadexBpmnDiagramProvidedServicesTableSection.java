@@ -14,7 +14,7 @@ public class JadexBpmnDiagramProvidedServicesTableSection extends
 {
 	public static final String[] COLUMN_NAMES = new String[]{"Name", "Interface", "Implementation"};
 	public static final int[] COLUMN_WEIGHTS = new int[]{1, 2, 2};
-	public static final String[] DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "", ""};
+	public static final String[] DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "class", "implclass"};
 	public static final int UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX = 0;
 	
 	/**

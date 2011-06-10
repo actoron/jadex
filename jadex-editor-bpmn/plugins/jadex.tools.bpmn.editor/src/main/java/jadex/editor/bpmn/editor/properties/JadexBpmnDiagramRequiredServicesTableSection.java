@@ -15,7 +15,7 @@ public class JadexBpmnDiagramRequiredServicesTableSection extends
 	public static final String[] COLUMN_NAMES = new String[]{"Name", "Interface", "Multiple", "Binding Name"};
 	public static final String[] COLUMN_TYPES = new String[]{TEXT, TEXT, CHECKBOX, TEXT};
 	public static final int[] COLUMN_WEIGHTS = new int[]{2, 5, 1};
-	public static final String[] DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "", "", ""};
+	public static final String[] DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "class", "false", "bindingname"};
 	public static final int UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX = 0;
 	
 	/**

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package jadex.editor.bpmn.editor.properties.template;
 
 import org.eclipse.jface.viewers.ISelection;
@@ -16,7 +13,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
- * @author Claas Altschaffel
+ * 
  */
 public abstract class AbstractCheckboxPropertySection extends
 		AbstractBpmnPropertySection
@@ -35,16 +32,11 @@ public abstract class AbstractCheckboxPropertySection extends
 
 	/**
 	 * Default Constructor
-	 * 
-	 * @param textFieldNames
-	 * @param textFields
 	 */
 	protected AbstractCheckboxPropertySection(String containerEAnnotationName,
 			String eAnnotationDetailId, String checkboxLabel)
 	{
-		super(containerEAnnotationName,
-				eAnnotationDetailId != null ? eAnnotationDetailId
-						: checkboxLabel);
+		super(containerEAnnotationName, eAnnotationDetailId != null ? eAnnotationDetailId: checkboxLabel);
 		this.checkboxLabel = checkboxLabel != null ? checkboxLabel
 				: DEFAULT_NAME;
 	}
@@ -54,9 +46,7 @@ public abstract class AbstractCheckboxPropertySection extends
 	/**
 	 * Creates the UI of the section.
 	 */
-	@Override
-	public void createControls(Composite parent,
-			TabbedPropertySheetPage aTabbedPropertySheetPage)
+	public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage)
 	{
 		super.createControls(parent, aTabbedPropertySheetPage);
 
@@ -81,10 +71,8 @@ public abstract class AbstractCheckboxPropertySection extends
 		{
 			/**
 			 * Add a ContextElement to the Context and refresh the view
-			 * 
 			 * @generated NOT
 			 */
-			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
 				boolean state = ((Button) e.getSource()).getSelection();
@@ -102,7 +90,6 @@ public abstract class AbstractCheckboxPropertySection extends
 	/**
 	 * Manages the input.
 	 */
-	@Override
 	public void setInput(IWorkbenchPart part, ISelection selection)
 	{
 		super.setInput(part, selection);

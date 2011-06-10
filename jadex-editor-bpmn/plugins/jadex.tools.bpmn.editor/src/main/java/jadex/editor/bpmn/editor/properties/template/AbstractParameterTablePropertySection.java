@@ -18,7 +18,6 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IWorkbenchPart;
 
 /**
- * @author Claas
  *
  */
 public abstract class AbstractParameterTablePropertySection extends
@@ -174,7 +173,6 @@ public abstract class AbstractParameterTablePropertySection extends
 	/* (non-Javadoc)
 	 * @see jadex.tools.bpmn.editor.properties.AbstractJadexPropertySection#dispose()
 	 */
-	@Override
 	public void dispose()
 	{
 		removeParameterTableViewerFor(modelElement, tableViewer);
@@ -186,7 +184,6 @@ public abstract class AbstractParameterTablePropertySection extends
 	/* (non-Javadoc)
 	 * @see jadex.tools.bpmn.editor.properties.AbstractMultiColumnTablePropertySection#setInput(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
 	 */
-	@Override
 	public void setInput(IWorkbenchPart part, ISelection selection)
 	{
 		// unregister the old viewer
@@ -198,13 +195,11 @@ public abstract class AbstractParameterTablePropertySection extends
 		addParameterTableViewerFor(modelElement, tableViewer);
 	}
 	
-	@Override
 	protected String[] getDefaultListElementAttributeValues()
 	{
 		return DEFAULT_PARAMETER_LISTELEMENT_ATTRIBUTE_VALUES;
 	}
 
-	@Override
 	protected int[] getColumnWeights(TableColumn[] columns)
 	{
 		if (columns.length == DEFAULT_PARAMETER_COLUMN_WEIGHTS.length)
@@ -220,7 +215,6 @@ public abstract class AbstractParameterTablePropertySection extends
 	 * @param parent
 	 * 
 	 */
-	@Override
 	protected void createColumns(TableViewer viewer) 
 	{
 

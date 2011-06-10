@@ -17,15 +17,13 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 
 /**
- * @author Claas Altschaffel
  * 
  */
-public abstract class AbstractMultiTextfieldPropertySection extends
-		AbstractBpmnPropertySection
+public abstract class AbstractMultiTextfieldPropertySection extends AbstractBpmnPropertySection
 {
 	// ---- constants ----
 	
-	protected static final String[] DEFAULT_NAMES = new String[] { "Default_1", "Default_2", "Default_3" };
+	protected static final String[] DEFAULT_NAMES = new String[] {"Default_1", "Default_2", "Default_3" };
 	
 	// ---- attributes ----
 
@@ -41,9 +39,7 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 	 * @param textFieldNames
 	 * @param textFields
 	 */
-	protected AbstractMultiTextfieldPropertySection(
-			String containerEAnnotationName,
-			String[] textFieldNames)
+	protected AbstractMultiTextfieldPropertySection(String containerEAnnotationName, String[] textFieldNames)
 	{
 		super(containerEAnnotationName, null);
 		this.textFieldNames = textFieldNames != null ? textFieldNames : DEFAULT_NAMES;
@@ -55,7 +51,6 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 	/* (non-Javadoc)
 	 * @see jadex.tools.model.common.properties.AbstractCommonPropertySection#dispose()
 	 */
-	@Override
 	public void dispose()
 	{
 		// nothing to dispose here, use addDisposable(Object) instead
@@ -66,9 +61,7 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 	/**
 	 * Creates the UI of the section.
 	 */
-	@Override
-	public void createControls(Composite parent,
-			TabbedPropertySheetPage aTabbedPropertySheetPage)
+	public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage)
 	{
 		super.createControls(parent, aTabbedPropertySheetPage);
 		
@@ -84,7 +77,7 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 		labelGridData.widthHint = 80;
 
 		textFields = new Text[textFieldNames.length];
-		for (int i = 0; i < textFieldNames.length; i++)
+		for(int i = 0; i < textFieldNames.length; i++)
 		{
 			// TO DO: use group?
 			Composite cComposite = getWidgetFactory().createComposite(sectionComposite);
@@ -106,7 +99,6 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 	/**
 	 * Manages the input.
 	 */
-	@Override
 	public void setInput(IWorkbenchPart part, ISelection selection)
 	{
 		super.setInput(part, selection);
@@ -119,7 +111,7 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 				{
 					String tmpName = textFieldNames[i];
 					Text tmpField = textFields[i];
-					String tmpValue = (String) util.getJadexEAnnotationDetail(tmpName);
+					String tmpValue = (String)util.getJadexEAnnotationDetail(tmpName);
 					tmpField.setText(tmpValue != null ? tmpValue : "");
 					tmpField.setEnabled(true);
 				}
@@ -137,13 +129,11 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 		}
 		
 		// fall through
-		for (int i = 0; i < textFieldNames.length; i++)
+		for(int i = 0; i < textFieldNames.length; i++)
 		{
 			Text tmpField = textFields[i];
 			tmpField.setEnabled(false);
 		}
-		
-		
 	}
 
 	// ---- internal used classes ----
@@ -162,22 +152,20 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 			this.field = field;
 		}
 
-		@Override
 		public void focusGained(FocusEvent e)
 		{
 			// nothing to to
 		}
 
-		@Override
 		public void focusLost(FocusEvent e)
 		{
-			if (modelElement == null)
+			if(modelElement == null)
 			{ 
 				// the value was just initialized
 				return;
 			}
 			String value = field.getText();
-			if (value != null)
+			if(value != null)
 			{
 				updateJadexEAnnotation(key, value);
 			}

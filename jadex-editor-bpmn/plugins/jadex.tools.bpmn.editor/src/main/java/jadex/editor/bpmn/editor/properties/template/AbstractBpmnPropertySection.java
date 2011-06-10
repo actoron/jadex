@@ -38,7 +38,6 @@ public abstract class AbstractBpmnPropertySection extends AbstractCommonProperty
 	/* (non-Javadoc)
 	 * @see jadex.tools.model.common.properties.AbstractCommonPropertySection#dispose()
 	 */
-	@Override
 	public void dispose()
 	{
 		// nothing to dispose here, use addDisposable(Object) instead
@@ -67,7 +66,6 @@ public abstract class AbstractBpmnPropertySection extends AbstractCommonProperty
 		return success;
 	}
 
-	@Override
 	public void setInput(IWorkbenchPart part, ISelection selection) 
 	{
 		super.setInput(part, selection);
