@@ -7,8 +7,6 @@ import jadex.editor.common.model.properties.table.MultiColumnTable.MultiColumnTa
 
 import java.util.Map;
 
-import javax.swing.DefaultCellEditor;
-
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -24,11 +22,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IWorkbenchPart;
 
 /**
@@ -393,7 +387,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	
 			protected void doSetValue(Object element, Object value)
 			{
-				System.out.println("value: "+value);
+//				System.out.println("value: "+value);
 				super.doSetValue(element, value);
 			}
 		});

@@ -1,5 +1,8 @@
 package jadex.editor.bpmn.editor.properties;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.editor.bpmn.editor.properties.template.AbstractBpmnMultiColumnTablePropertySection;
 import jadex.editor.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
 
@@ -12,10 +15,16 @@ import org.eclipse.swt.widgets.TableColumn;
 public class JadexBpmnDiagramProvidedServicesTableSection extends
 	AbstractBpmnMultiColumnTablePropertySection
 {
-	public static final String[] COLUMN_NAMES = new String[]{"Name", "Interface", "Implementation"};
-	public static final int[] COLUMN_WEIGHTS = new int[]{1, 2, 2};
-	public static final String[] DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "class", "implclass"};
+	public static final String[] COLUMN_NAMES = new String[]{"Name", "Interface", "Implementation", "Proxytype"};
+	public static final String[] COLUMN_TYPES = new String[]{TEXT, TEXT, TEXT, COMBOBOX};
+	public static final int[] COLUMN_WEIGHTS = new int[]{1, 2, 2, 2};
+	public static final String[] DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "class", "implclass", "decoupled"};
 	public static final int UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX = 0;
+	public static final Map VALUES = new HashMap();
+	static
+	{
+		VALUES.put("Proxytype", new String[]{"decoupled", "direct", "raw"});
+	}
 	
 	/**
 	 *  Default constructor, initializes super class.
@@ -33,7 +42,7 @@ public class JadexBpmnDiagramProvidedServicesTableSection extends
 
 	protected void createColumns(TableViewer viewer)
 	{
-		super.createColumns(viewer, COLUMN_NAMES);
+		super.createColumns(viewer, COLUMN_NAMES, COLUMN_TYPES, VALUES);
 	}
 
 	protected int[] getColumnWeights(TableColumn[] columns)
