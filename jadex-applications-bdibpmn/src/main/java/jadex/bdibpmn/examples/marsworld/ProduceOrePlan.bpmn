@@ -6,12 +6,12 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__AzDowROEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-4T18AROEeCnwcpWvxOwkg" source="jadex_imports_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-4T18QROEeCnwcpWvxOwkg" key="dimension" value="4:1"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-4T18gROEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-4T18wROEeCnwcpWvxOwkg" key="0:0" value="jadex.application.space.envsupport.environment.space2d.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-4T19AROEeCnwcpWvxOwkg" key="1:0" value="jadex.application.space.envsupport.environment.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-4T19QROEeCnwcpWvxOwkg" key="2:0" value="jadex.commons.SUtil"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-4T19gROEeCnwcpWvxOwkg" key="3:0" value="jadex.bdi.planlib.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GaIYwJOCEeChC-Quu1e_BQ" key="dimension" value="4:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GaIYwZOCEeChC-Quu1e_BQ" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GaIYwpOCEeChC-Quu1e_BQ" key="0:0" value="jadex.extension.envsupport.environment.space2d.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GaIYw5OCEeChC-Quu1e_BQ" key="1:0" value="jadex.extension.envsupport.environment.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GaIYxJOCEeChC-Quu1e_BQ" key="2:0" value="jadex.commons.SUtil"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GaIYxZOCEeChC-Quu1e_BQ" key="3:0" value="jadex.bdi.planlib.*"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_HdXXh4AxEd6N8dR31QwQkg" iD="_HdXXhoAxEd6N8dR31QwQkg" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_HdXXiYAxEd6N8dR31QwQkg" iD="_HdXXiIAxEd6N8dR31QwQkg" outgoingEdges="_ESK78YAzEd6N8dR31QwQkg" name="Move to Target" activityType="Task">

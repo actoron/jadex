@@ -6,10 +6,10 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__oadMAROEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__d1k4AROEeCnwcpWvxOwkg" source="jadex_imports_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__d1k4QROEeCnwcpWvxOwkg" key="dimension" value="2:1"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__d1k4gROEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__d1k4wROEeCnwcpWvxOwkg" key="0:0" value="jadex.application.space.envsupport.math.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__d1k5AROEeCnwcpWvxOwkg" key="1:0" value="jadex.commons.SUtil"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DpigcJOCEeChC-Quu1e_BQ" key="dimension" value="2:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DpigcZOCEeChC-Quu1e_BQ" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DpigcpOCEeChC-Quu1e_BQ" key="0:0" value="jadex.extension.envsupport.math.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Dpigc5OCEeChC-Quu1e_BQ" key="1:0" value="jadex.commons.SUtil"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_isytYXzoEd6zCuIqBrMhmQ" iD="_isytYHzoEd6zCuIqBrMhmQ" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_iuIxMXzoEd6zCuIqBrMhmQ" iD="_iuIxMHzoEd6zCuIqBrMhmQ" name="Move" activityType="Task">

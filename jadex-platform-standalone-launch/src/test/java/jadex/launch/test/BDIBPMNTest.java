@@ -7,18 +7,18 @@ import java.io.File;
 import junit.framework.Test;
 
 /**
- *  Test suite for micro agent tests.
+ *  Test suite for BDI BPMN agent tests.
  */
-public class MicroTest	extends ComponentTestSuite
+public class BDIBPMNTest	extends ComponentTestSuite
 {
 	/**
 	 *  Constructor called by Maven JUnit runner.
 	 */
-	public MicroTest()	throws Exception
+	public BDIBPMNTest()	throws Exception
 	{
-		// Use micro application classes directory as classpath root,
-		super(new File("../jadex-applications-micro/target/classes/"),
-			new File("../jadex-applications-micro/target/classes"),
+		// Use bdibpmn application classes directory as classpath root,
+		super(new File("../jadex-applications-bdibpmn/target/classes/"),
+			new File("../jadex-applications-bdibpmn/target/classes"),
 			// Exclude failing tests to allow maven build.
 			new String[]{});
 	}
@@ -28,6 +28,6 @@ public class MicroTest	extends ComponentTestSuite
 	 */
 	public static Test suite() throws Exception
 	{
-		return new MicroTest();
+		return new BDIBPMNTest();
 	}
 }

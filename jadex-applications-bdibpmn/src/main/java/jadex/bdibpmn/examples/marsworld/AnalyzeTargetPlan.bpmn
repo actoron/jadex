@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_tI-10YKCEd6rVea0-FiZ3Q" iD="_tI-10IKCEd6rVea0-FiZ3Q">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_l2BvcEbsEd-qm5VDdIP35A" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l2BvcUbsEd-qm5VDdIP35A" key="Description" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l2LgcEbsEd-qm5VDdIP35A" key="Package" value="jadex.bdibpmn.examples.marsworld"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9N0qNwROEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_9F7SUAROEeCnwcpWvxOwkg" source="jadex_imports_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9F7SUQROEeCnwcpWvxOwkg" key="dimension" value="7:1"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9F7SUgROEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9F7SUwROEeCnwcpWvxOwkg" key="0:0" value="jadex.application.space.envsupport.environment.space2d.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9F7SVAROEeCnwcpWvxOwkg" key="1:0" value="jadex.application.space.envsupport.environment.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9F7SVQROEeCnwcpWvxOwkg" key="2:0" value="jadex.commons.SUtil"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9F7SVgROEeCnwcpWvxOwkg" key="3:0" value="jadex.bdi.planlib.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9F7SVwROEeCnwcpWvxOwkg" key="4:0" value="jadex.bridge.IComponentIdentifier"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9F7SWAROEeCnwcpWvxOwkg" key="5:0" value="jadex.application.space.agr.AGRSpace"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9F7SWQROEeCnwcpWvxOwkg" key="6:0" value="jadex.application.runtime.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LpLQgJOCEeChC-Quu1e_BQ" key="dimension" value="6:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LpLQgZOCEeChC-Quu1e_BQ" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LpLQgpOCEeChC-Quu1e_BQ" key="0:0" value="jadex.extension.envsupport.environment.space2d.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LpLQg5OCEeChC-Quu1e_BQ" key="1:0" value="jadex.extension.envsupport.environment.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LpLQhJOCEeChC-Quu1e_BQ" key="2:0" value="jadex.commons.SUtil"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LpLQhZOCEeChC-Quu1e_BQ" key="3:0" value="jadex.bdi.planlib.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LpLQhpOCEeChC-Quu1e_BQ" key="4:0" value="jadex.bridge.IComponentIdentifier"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LpLQh5OCEeChC-Quu1e_BQ" key="5:0" value="jadex.extension.agr.AGRSpace"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_tI-114KCEd6rVea0-FiZ3Q" iD="_tI-11oKCEd6rVea0-FiZ3Q" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_tI-12YKCEd6rVea0-FiZ3Q" iD="_tI-12IKCEd6rVea0-FiZ3Q" outgoingEdges="_k_e-IYKNEd6rVea0-FiZ3Q" name="Move to Target" activityType="Task">

@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_Gdz1cYAlEd6N8dR31QwQkg" iD="_Gdz1cIAlEd6N8dR31QwQkg">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_A2BLAEbtEd-qm5VDdIP35A" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A2BLAUbtEd-qm5VDdIP35A" key="Description" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A2BLAkbtEd-qm5VDdIP35A" key="Package" value="jadex.bdibpmn.examples.marsworld"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_r-XwPgO5EeC8hO3dQeqcmQ" key="editor_version" value="1.0"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_r-N_MAO5EeC8hO3dQeqcmQ" source="jadex_imports_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_r-N_MQO5EeC8hO3dQeqcmQ" key="dimension" value="4:1"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_r-N_MgO5EeC8hO3dQeqcmQ" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_r-N_MwO5EeC8hO3dQeqcmQ" key="0:0" value="jadex.commons.SUtil"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_r-N_NAO5EeC8hO3dQeqcmQ" key="1:0" value="jadex.bridge.IComponentIdentifier"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_r-N_NQO5EeC8hO3dQeqcmQ" key="2:0" value="jadex.application.space.agr.AGRSpace"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_r-N_NgO5EeC8hO3dQeqcmQ" key="3:0" value="jadex.application.runtime.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3uJFcJOBEeChC-Quu1e_BQ" key="dimension" value="3:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3uJFcZOBEeChC-Quu1e_BQ" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3uJFcpOBEeChC-Quu1e_BQ" key="0:0" value="jadex.commons.SUtil"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3uJFc5OBEeChC-Quu1e_BQ" key="1:0" value="jadex.bridge.IComponentIdentifier"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3uJFdJOBEeChC-Quu1e_BQ" key="2:0" value="jadex.extension.agr.AGRSpace"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_r-N_NwO5EeC8hO3dQeqcmQ" source="jadex_arguments_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_r-N_OAO5EeC8hO3dQeqcmQ" key="dimension" value="1:6"/>

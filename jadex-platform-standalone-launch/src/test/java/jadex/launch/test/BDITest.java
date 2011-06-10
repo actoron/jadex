@@ -17,8 +17,6 @@ public class BDITest	extends	ComponentTestSuite
 	public BDITest()	throws Exception
 	{
 		// Use BDI classes directory as classpath root,
-		// but only look in testcases package.
-//		super(new File("../jadex-applications-bdi/target/classes/jadex/bdi/testcases"),
 		super(new File("../jadex-applications-bdi/target/classes/"),
 			new File("../jadex-applications-bdi/target/classes"),
 			// Exclude failing tests to allow maven build.

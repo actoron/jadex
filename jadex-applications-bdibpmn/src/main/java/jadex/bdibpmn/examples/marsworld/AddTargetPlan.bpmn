@@ -6,9 +6,9 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_83LrsAROEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_8sT4cAROEeCnwcpWvxOwkg" source="jadex_imports_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8sT4cQROEeCnwcpWvxOwkg" key="dimension" value="1:1"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8sT4cgROEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8sT4cwROEeCnwcpWvxOwkg" key="0:0" value="jadex.application.space.envsupport.environment.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_NE95EJOCEeChC-Quu1e_BQ" key="dimension" value="1:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_NE95EZOCEeChC-Quu1e_BQ" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_NE95EpOCEeChC-Quu1e_BQ" key="0:0" value="jadex.extension.envsupport.environment.*"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_8sT4dAROEeCnwcpWvxOwkg" source="jadex_arguments_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8sT4dQROEeCnwcpWvxOwkg" key="dimension" value="1:6"/>

@@ -6,11 +6,11 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-pHjYAROEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-g7QsAROEeCnwcpWvxOwkg" source="jadex_imports_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-hEaoAROEeCnwcpWvxOwkg" key="dimension" value="3:1"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-hEaoQROEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-hEaogROEeCnwcpWvxOwkg" key="0:0" value="jadex.application.space.envsupport.environment.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-hEaowROEeCnwcpWvxOwkg" key="1:0" value="jadex.commons.SUtil"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-hEapAROEeCnwcpWvxOwkg" key="2:0" value="jadex.bdi.planlib.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Hy9M4JOCEeChC-Quu1e_BQ" key="dimension" value="3:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Hy9M4ZOCEeChC-Quu1e_BQ" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Hy9M4pOCEeChC-Quu1e_BQ" key="0:0" value="jadex.extension.envsupport.environment.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Hy9M45OCEeChC-Quu1e_BQ" key="1:0" value="jadex.commons.SUtil"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Hy9M5JOCEeChC-Quu1e_BQ" key="2:0" value="jadex.bdi.planlib.*"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-hEapQROEeCnwcpWvxOwkg" source="jadex_arguments_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-hEapgROEeCnwcpWvxOwkg" key="dimension" value="1:6"/>

@@ -14,15 +14,20 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bridge.AbstractErrorReportBuilder;
+import jadex.bridge.IErrorReport;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.IFilter;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
+import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -32,6 +37,7 @@ import jadex.xml.IContext;
 import jadex.xml.IPostProcessor;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
+import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoPathManager;
@@ -47,12 +53,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.Location;
+import javax.xml.stream.XMLReporter;
+import javax.xml.stream.XMLStreamException;
 
 /**
  *  Reader for loading Bpmn XML models into a Java representation states.
@@ -60,6 +70,9 @@ import javax.xml.namespace.QName;
 public class BpmnXMLReader
 {
 	//-------- constants --------
+	
+	/** Key for error entries in read context. */
+	public static final String CONTEXT_ENTRIES = "entries";
 	
 	// Copied from jadex.tools.bpmn.editor.properties.AbstractJadexPropertySection
 	
@@ -123,7 +136,29 @@ public class BpmnXMLReader
 	// Initialize reader instance.
 	static
 	{
-		reader = new Reader(new TypeInfoPathManager(getXMLMapping()));
+		reader = new Reader(new TypeInfoPathManager(getXMLMapping()), false, false, new XMLReporter()
+		{
+			public void report(String msg, String type, Object info, Location location) throws XMLStreamException
+			{
+//				System.out.println("XML error: "+msg+", "+type+", "+info+", "+location);
+//				Thread.dumpStack();
+				IContext	context	= (IContext)Reader.READ_CONTEXT.get();
+				Map	user	= (Map)context.getUserContext();
+				MultiCollection	report	= (MultiCollection)user.get(CONTEXT_ENTRIES);
+				String	pos;
+				Tuple	stack	= new Tuple(((ReadContext)context).getStack());
+				if(stack.getEntities().length>0)
+				{
+					StackElement	se	= (StackElement)stack.get(stack.getEntities().length-1);
+					pos	= " (line "+se.getLocation().getLineNumber()+", column "+se.getLocation().getColumnNumber()+")";
+				}
+				else
+				{
+					pos	= " (line 0, column 0)";			
+				}
+				report.put(stack, msg+pos);
+			}
+		});
 	}
 	
 	/**
@@ -141,7 +176,10 @@ public class BpmnXMLReader
  	 */
 	public static MBpmnModel read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
 	{
-		MBpmnModel ret = (MBpmnModel)reader.read(rinfo.getInputStream(), classloader, null);
+		Map	user	= new HashMap();
+		MultiCollection	report	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
+		user.put(CONTEXT_ENTRIES, report);
+		MBpmnModel ret = (MBpmnModel)reader.read(rinfo.getInputStream(), classloader, user);
 		
 		ret.setFilename(rinfo.getFilename());
 		ret.setLastModified(rinfo.getLastModified());
@@ -152,8 +190,72 @@ public class BpmnXMLReader
 		ret.initModelInfo();
 		rinfo.getInputStream().close();
 		
+		if(report.size()>0)
+		{
+//			System.out.println("Error loading model: "+rinfo.getFilename()+" "+report);
+			((ModelInfo)ret.getModelInfo()).setReport(buildReport(ret.getModelInfo().getFullName(), ret.getModelInfo().getFilename(), report));
+		}
+		
 		return ret;
 	}
+	
+	/**
+     *  Build the error report.
+     */
+    public static IErrorReport buildReport(String modelname, String filename, MultiCollection entries)
+    {
+        return new AbstractErrorReportBuilder(modelname, filename,
+            new String[]{"Component", "Configuration"}, entries, null)
+        {
+            public boolean isInCategory(Object obj, String category)
+            {
+                return "Component".equals(category) && obj instanceof SubcomponentTypeInfo
+                    || "Configuration".equals(category) && obj instanceof ConfigurationInfo;
+            }
+
+            public Object getPathElementObject(Object element)
+            {
+                return ((StackElement)element).getObject();
+            }
+
+            public String getObjectName(Object obj)
+            {
+                String    name    = null;
+                String    type    = obj!=null ? SReflect.getInnerClassName(obj.getClass()) : null;
+                if(obj instanceof SubcomponentTypeInfo)
+                {
+                    name    = ((SubcomponentTypeInfo)obj).getName();
+                }
+                else if(obj instanceof ConfigurationInfo)
+                {
+                    name    = ((ConfigurationInfo)obj).getName();
+                    type    = "Configuration";
+                }
+                else if(obj instanceof UnparsedExpression)
+                {
+                    name    = ((UnparsedExpression)obj).getName();
+                }
+//                else if(obj instanceof MExpressionType)
+//                {
+//                    IParsedExpression    pexp    = ((MExpressionType)obj).getParsedValue();
+//                    String    exp    = pexp!=null ? pexp.getExpressionText() : null;
+//                    name    = exp!=null ? ""+exp : null;
+//                }
+
+//                if(type!=null && type.startsWith("M") && type.endsWith("Type"))
+//                {
+//                    type    = type.substring(1, type.length()-4);
+//                }
+                if(type!=null && type.endsWith("Info"))
+                {
+                    type    = type.substring(0, type.length()-4);
+                }
+
+                return type!=null ? name!=null ? type+" "+name : type : name!=null ? name : "";
+            }
+        }.buildErrorReport();
+    }
+
 	
 	
 	/**

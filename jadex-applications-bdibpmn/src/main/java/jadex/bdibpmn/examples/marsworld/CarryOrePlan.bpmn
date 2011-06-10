@@ -6,12 +6,12 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9p0pxgROEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_9g4wAAROEeCnwcpWvxOwkg" source="jadex_imports_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9g4wAQROEeCnwcpWvxOwkg" key="dimension" value="4:1"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9g4wAgROEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9g4wAwROEeCnwcpWvxOwkg" key="0:0" value="jadex.application.space.envsupport.environment.space2d.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9g4wBAROEeCnwcpWvxOwkg" key="1:0" value="jadex.application.space.envsupport.environment.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9g4wBQROEeCnwcpWvxOwkg" key="2:0" value="jadex.commons.SUtil"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9g4wBgROEeCnwcpWvxOwkg" key="3:0" value="jadex.bdi.planlib.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KW5wUJOCEeChC-Quu1e_BQ" key="dimension" value="4:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KW5wUZOCEeChC-Quu1e_BQ" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KW5wUpOCEeChC-Quu1e_BQ" key="0:0" value="jadex.extension.envsupport.environment.space2d.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KW5wU5OCEeChC-Quu1e_BQ" key="1:0" value="jadex.extension.envsupport.environment.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KW5wVJOCEeChC-Quu1e_BQ" key="2:0" value="jadex.commons.SUtil"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KW5wVZOCEeChC-Quu1e_BQ" key="3:0" value="jadex.bdi.planlib.*"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_9g4wBwROEeCnwcpWvxOwkg" source="jadex_arguments_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9g4wCAROEeCnwcpWvxOwkg" key="dimension" value="2:6"/>

@@ -17,8 +17,7 @@ public class BPMNTest	extends ComponentTestSuite
 	public BPMNTest()	throws Exception
 	{
 		// Use BPMN classes directory as classpath root,
-		// but only look in testcases package.
-		super(new File("../jadex-applications-bpmn/target/classes/jadex/bpmn/testcases"),
+		super(new File("../jadex-applications-bpmn/target/classes/"),
 			new File("../jadex-applications-bpmn/target/classes"),
 			// Exclude failing tests to allow maven build.
 			new String[]
