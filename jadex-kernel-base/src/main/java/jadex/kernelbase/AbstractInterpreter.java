@@ -364,7 +364,9 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public IExtensionInstance[] getExtensions()
 	{
-		assert !getComponentAdapter().isExternalThread();
+		// Hack!!! When init fails , terminateExtensions() can not be called on component thread
+		// as component already terminated.
+		assert !getComponentAdapter().isExternalThread() || IComponentDescription.STATE_TERMINATED.equals(getComponentDescription().getState());
 		
 		return extensions==null? new IExtensionInstance[0]: 
 			(IExtensionInstance[])extensions.values().toArray(new IExtensionInstance[extensions.size()]);

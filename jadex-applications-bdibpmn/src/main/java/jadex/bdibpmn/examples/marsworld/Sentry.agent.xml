@@ -16,10 +16,12 @@
 		<import>java.util.*</import>
 		<import>java.util.logging.*</import>
 		<import>jadex.base.fipa.*</import>
-		<import>jadex.application.space.envsupport.environment.*</import>
-		<import>jadex.application.space.envsupport.math.*</import>
+		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.extension.envsupport.math.*</import>
 		<import>jadex.bdi.examples.marsworld.*</import>
 		<import>jadex.bdi.examples.marsworld.sentry.*</import>
+		<import>jadex.commons.future.*</import>
+		<import>jadex.extension.agr.*</import>
 	</imports>
 
 	<capabilities>

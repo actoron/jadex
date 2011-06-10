@@ -127,6 +127,16 @@ public class Reader
 		{
 			factory.setProperty(XMLInputFactory.REPORTER, reporter);
 		}
+		else
+		{
+			factory.setProperty(XMLInputFactory.REPORTER, new XMLReporter()
+			{
+				public void report(String message, String error, Object related, Location location)	throws XMLStreamException
+				{
+					throw new XMLStreamException(message, location);
+				}
+			});			
+		}
 	}
 	
 	//-------- methods --------
@@ -171,18 +181,7 @@ public class Reader
  	 */
 	public Object read(XMLStreamReader parser, final ClassLoader classloader, final Object callcontext) throws Exception
 	{
-		XMLReporter	reporter = factory.getXMLReporter();
-		if(reporter==null)
-		{
-			reporter = new XMLReporter()
-			{
-				public void report(String message, String errorType, Object relatedInformation, Location location) throws XMLStreamException
-				{
-					throw new XMLStreamException(message, location);
-				}
-			};
-		}
-		ReadContext readcontext = new ReadContext(parser, reporter, callcontext, classloader);
+		ReadContext readcontext = new ReadContext(parser, factory.getXMLReporter(), callcontext, classloader);
 		READ_CONTEXT.set(readcontext);
 		try
 		{
@@ -223,7 +222,7 @@ public class Reader
 						catch(RuntimeException e)
 						{
 							StackElement	se	= readcontext.getTopStackElement();
-							readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", se, se.getLocation());																				
+							readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", se, se!=null ? se.getLocation() : readcontext.getParser().getLocation());																				
 						}
 					}
 				}
@@ -234,7 +233,7 @@ public class Reader
 		{
 			e.printStackTrace();
 			Location	loc	= readcontext.getStackSize()>0 ? readcontext.getTopStackElement().getLocation() : parser.getLocation();
-			reporter.report(e.toString(), "XML error", readcontext, loc);
+			readcontext.getReporter().report(e.toString(), "XML error", readcontext, loc);
 		}
 		finally
 		{

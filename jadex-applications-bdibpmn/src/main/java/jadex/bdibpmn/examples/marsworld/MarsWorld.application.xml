@@ -25,14 +25,14 @@
 	name="MarsWorld" package="jadex.bdibpmn.examples.marsworld">
 		
 	<imports>
-		<import>jadex.application.space.envsupport.environment.space2d.*</import>
-		<import>jadex.application.space.envsupport.environment.DeltaTimeExecutor</import>
-		<import>jadex.application.space.envsupport.math.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.environment.DeltaTimeExecutor</import>
+		<import>jadex.extension.envsupport.math.*</import>
 		<import>jadex.bridge.serviceclock.IClockService</import>
-		<import>jadex.application.space.envsupport.dataview.*</import>
+		<import>jadex.extension.envsupport.dataview.*</import>
 		<import>java.text.SimpleDateFormat</import>
 		<import>java.util.Date</import>
-		<import>jadex.application.space.envsupport.observer.perspective.*</import>
+		<import>jadex.extension.envsupport.observer.perspective.*</import>
 		<import>jadex.bdi.examples.marsworld.*</import>
 		<import>jadex.bdi.examples.marsworld.carry.*</import>
 		<import>jadex.bdi.examples.marsworld.producer.*</import>
@@ -40,6 +40,8 @@
 		<import>jadex.bdi.examples.marsworld.movement.*</import>
 		<import>jjadex.bridge.serviceServiceProvider</import>
 		<import>jadex.commons.IFuture</import>
+		<import>jadex.bridge.service.clock.IClockService</import>
+		<import>jadex.bridge.service.*</import>
 	</imports>
 	
 	<extensiontypes>
@@ -192,7 +194,7 @@
 
 	<properties>
 		<property name="clock" class="IFuture">
-			SServiceProvider.getService($component.getServiceProvider(), IClockService.class)
+			SServiceProvider.getService($component.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 		</property>
 	</properties>
 	

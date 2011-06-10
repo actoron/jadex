@@ -6,6 +6,7 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.gui.SGUI;
+import jadex.component.ComponentXMLReader;
 import jadex.extension.envsupport.dataview.IDataView;
 import jadex.extension.envsupport.environment.AvatarMapping;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
@@ -1417,7 +1418,8 @@ public class MEnvSpaceType
 	 */
 	protected static void reportError(IContext context, String error)
 	{
-		MultiCollection	report	= (MultiCollection)context.getUserContext();
+		Map	user	= (Map)context.getUserContext();
+		MultiCollection	report	= (MultiCollection)user.get(ComponentXMLReader.CONTEXT_ENTRIES);
 		String	pos;
 		Tuple	stack	= new Tuple(((ReadContext)context).getStack());
 		if(stack.getEntities().length>0)

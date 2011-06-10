@@ -752,7 +752,9 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 */
 	public IFuture terminateExtensions()
 	{
-		assert !getComponentAdapter().isExternalThread();
+		// Hack!!! When init fails , terminateExtensions() can not be called on component thread
+		// as component already terminated.
+		assert !getComponentAdapter().isExternalThread() || IComponentDescription.STATE_TERMINATED.equals(getComponentDescription().getState());
 		
 		Future ret = new Future();
 		IExtensionInstance[] exts = getExtensions();
