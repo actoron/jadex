@@ -113,38 +113,27 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 		// For equally named path entries (e.g. 'classes') build larger name to differentiate (e.g. 'myapp/classes').
 		if(getParent() instanceof RootNode)
 		{
-			int	up	= 0;
+			int	idx	= -1;
 			List	siblings	= getParent().getCachedChildren();
 			for(int i=0; siblings!=null && i<siblings.size(); i++)
 			{
 				if(siblings.get(i)!=this)
 				{
 					File	sib	= ((FileNode)siblings.get(i)).getFile();
-					if(FileData.getDisplayName(sib).equals(name))
+					if(FileData.getDisplayName(sib).equals(name) && !sib.getPath().endsWith(file.getPath()))
 					{
-						int	up0	= 0;
-						File	tmp	= file;
-						do
+						int	tmp	= Math.max(file.getPath().lastIndexOf("/"), file.getPath().lastIndexOf("\\"))+1;
+						while(sib.getPath().endsWith(file.getPath().substring(tmp)))
 						{
-							up0++;
-							tmp	= tmp.getParentFile();
-							sib	= sib.getParentFile();
+							tmp	= Math.max(file.getPath().lastIndexOf("/", tmp-2), file.getPath().lastIndexOf("\\", tmp-2))+1;
 						}
-						while(tmp!=null && sib!=null && FileData.getDisplayName(sib).equals(FileData.getDisplayName(tmp)));
-						
-						up	= Math.max(up, up0);
+						idx	= idx==-1 ? tmp : Math.min(idx, tmp);
 					}
 				}
 			}
-			
-			if(up>0)
+			if(idx>-1)
 			{
-				File	tmp	= file;
-				for(int i=0; i<up; i++)
-				{
-					tmp	= tmp.getParentFile();
-					name	= FileData.getDisplayName(tmp) + "/" +name;
-				}
+				name	= file.getPath().substring(idx);
 			}
 		}
 		return name;

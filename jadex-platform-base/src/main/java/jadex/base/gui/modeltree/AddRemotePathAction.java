@@ -11,6 +11,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -24,6 +25,7 @@ import java.net.MalformedURLException;
 
 import javax.swing.Icon;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.UIDefaults;
 import javax.swing.filechooser.FileFilter;
 
@@ -175,7 +177,17 @@ public class AddRemotePathAction extends ToolTipAction
 						{
 							public void customResultAvailable(Object result)
 							{
-								treepanel.addTopLevelNode((FileData)result);
+								if(treepanel.getModel().getNode(result.toString())==null)
+								{
+									treepanel.addTopLevelNode((FileData)result);
+								}
+								else
+								{
+									// Todo: already added to library service (remove?)
+									String	msg	= SUtil.wrapText("Path can not be added twice:\n"+((FileData)result).getPath());
+									JOptionPane.showMessageDialog(SGUI.getWindowParent(treepanel),
+										msg, "Duplicate path", JOptionPane.INFORMATION_MESSAGE);
+								}
 							}
 						});
 					}

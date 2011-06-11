@@ -6,6 +6,8 @@ import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IExternalAccess;
 
+import java.util.List;
+
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JTree;
@@ -124,7 +126,35 @@ public class RemoteFileNode  extends AbstractTreeNode	implements IFileNode
 	 */
 	public String toString()
 	{
-		return file.getDisplayName();
+		String	name	= file.getDisplayName();
+		
+		// For equally named path entries (e.g. 'classes') build larger name to differentiate (e.g. 'myapp/classes').
+		if(getParent() instanceof RootNode)
+		{
+			int	idx	= -1;
+			List	siblings	= getParent().getCachedChildren();
+			for(int i=0; siblings!=null && i<siblings.size(); i++)
+			{
+				if(siblings.get(i)!=this)
+				{
+					FileData	sib	= ((RemoteFileNode)siblings.get(i)).getRemoteFile();
+					if(sib.getDisplayName().equals(name) && !sib.getPath().endsWith(file.getPath()))
+					{
+						int	tmp	= Math.max(file.getPath().lastIndexOf("/"), file.getPath().lastIndexOf("\\"))+1;
+						while(sib.getPath().endsWith(file.getPath().substring(tmp)))
+						{
+							tmp	= Math.max(file.getPath().lastIndexOf("/", tmp-2), file.getPath().lastIndexOf("\\", tmp-2))+1;
+						}
+						idx	= idx==-1 ? tmp : Math.min(idx, tmp);
+					}
+				}
+			}
+			if(idx>-1)
+			{
+				name	= file.getPath().substring(idx);
+			}
+		}
+		return name;
 	}
 	
 	/**

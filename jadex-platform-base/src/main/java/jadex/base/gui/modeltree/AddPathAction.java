@@ -104,36 +104,40 @@ public class AddPathAction extends ToolTipAction
 					file	= file.getParentFile();
 				if(file.exists())
 				{
-					// Add file/directory to tree.
-//						ITreeNode	node	= getModel().getRoot().addPathEntry(file);
-					
-					// todo: jars
-					if(treepanel.getExternalAccess()!=null)
+					if(treepanel.getModel().getNode(file)==null)
 					{
-						final File fcopy = file;
-						SServiceProvider.getService(treepanel.getExternalAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+						// Add file/directory to tree.
+						treepanel.addTopLevelNode(file);
+						
+						// todo: jars
+						if(treepanel.getExternalAccess()!=null)
 						{
-							public void resultAvailable(Object result)
+							final File fcopy = file;
+							SServiceProvider.getService(treepanel.getExternalAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 							{
-								ILibraryService ls = (ILibraryService)result;
-								File f = new File(fcopy.getParentFile(), fcopy.getName());
-								try
+								public void resultAvailable(Object result)
 								{
-//									System.out.println("adding:"+f.toURI().toURL());
-									ls.addURL(f.toURI().toURL());
+									ILibraryService ls = (ILibraryService)result;
+									File f = new File(fcopy.getParentFile(), fcopy.getName());
+									try
+									{
+	//									System.out.println("adding:"+f.toURI().toURL());
+										ls.addURL(f.toURI().toURL());
+									}
+									catch(MalformedURLException ex)
+									{
+										ex.printStackTrace();
+									}
 								}
-								catch(MalformedURLException ex)
-								{
-									ex.printStackTrace();
-								}
-							}
-						});
+							});
+						}
 					}
-					
-					treepanel.addTopLevelNode(file);
-//					final RootNode root = (RootNode)getModel().getRoot();
-//					ITreeNode node = createNode(root, model, tree, file, iconcache, filefilter, exta);
-//					root.addChild(node);
+					else
+					{
+						String	msg	= SUtil.wrapText("Path can not be added twice:\n"+file);
+						JOptionPane.showMessageDialog(SGUI.getWindowParent(treepanel),
+							msg, "Duplicate path", JOptionPane.INFORMATION_MESSAGE);
+					}
 				}
 				else
 				{
