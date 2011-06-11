@@ -206,8 +206,9 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 			for(int i=0; i<confignames.length; i++)
 			{
 				cinfo[i] = new ConfigurationInfo(confignames[i]);
+				modelinfo.addConfiguration(cinfo[i]);
 			}
-			modelinfo.setConfigurations(cinfo);
+//			modelinfo.setConfigurations(cinfo);
 		}
 		
 		if(imports!=null)

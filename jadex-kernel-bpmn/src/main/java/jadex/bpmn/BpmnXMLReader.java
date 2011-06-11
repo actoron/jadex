@@ -1332,18 +1332,17 @@ public class BpmnXMLReader
 				{
 					MAnnotation anno = (MAnnotation)annos.get(i);
 					
-					if (anno.getSource().toLowerCase().endsWith("_imports_table")) 
+					if(anno.getSource().toLowerCase().endsWith("_imports_table")) 
 					{
-						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
-								.getDetails());
+						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno.getDetails());
 
-						for (int row = 0; row < table.dimension[0]; row++) 
+						for(int row = 0; row < table.dimension[0]; row++) 
 						{
 							// normal import has 1 value
 							assert table.data[row].length == 1;
 
 							String imp = table.data[row][0];
-							if (imp.length() > 0)
+							if(imp.length() > 0)
 								model.addImport(imp);
 						}
 
@@ -1357,24 +1356,22 @@ public class BpmnXMLReader
 				{
 					MAnnotation anno = (MAnnotation)annos.get(i);
 
-					if (!anno.getSource().toLowerCase().endsWith("table"))
+					if(!anno.getSource().toLowerCase().endsWith("table"))
 					{
 						List details = anno.getDetails();
-						if (details != null)
+						if(details != null)
 						{
-							for (int j = 0; j < details.size(); j++)
+							for(int j = 0; j < details.size(); j++)
 							{
-								MAnnotationDetail detail = (MAnnotationDetail) details
-										.get(j);
+								MAnnotationDetail detail = (MAnnotationDetail)details.get(j);
 								String key = detail.getKey().toLowerCase();
 								String value = detail.getValue();
 								
 								// TODO: remove old imports handling
-								if ("imports".equals(key))
+								if("imports".equals(key))
 								{
-									StringTokenizer stok = new StringTokenizer(
-											value, LIST_ELEMENT_DELIMITER);
-									for (int k = 0; stok.hasMoreElements(); k++)
+									StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
+									for(int k = 0; stok.hasMoreElements(); k++)
 									{
 										String imp = stok.nextToken().trim();
 										if (imp.length() > 0)
@@ -1385,7 +1382,7 @@ public class BpmnXMLReader
 								else 
 								// todo: remove old imports until here
 									
-								if ("package".equals(key))
+								if("package".equals(key))
 								{
 									model.setPackage(value);
 									// System.out.println("Package: "+value);
@@ -1395,7 +1392,6 @@ public class BpmnXMLReader
 					}
 				}
 				
-				
 				for(int i=0; i<annos.size(); i++)
 				{
 					MAnnotation anno = (MAnnotation)annos.get(i);
@@ -1403,13 +1399,12 @@ public class BpmnXMLReader
 					// new jadex arguments handling
 					if(anno.getSource().toLowerCase().endsWith("_arguments_table"))
 					{
-						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
-								.getDetails());
+						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno.getDetails());
 						
-						for (int row = 0; row < table.dimension[0]; row++)
+						for(int row = 0; row < table.dimension[0]; row++)
 						{
 							// normal argument has 6 values
-							assert table.data[row].length == 6;
+							assert table.data[row].length == 7;
 							
 							String name = table.data[row][0];
 							String isarg = table.data[row][1];
@@ -1419,11 +1414,12 @@ public class BpmnXMLReader
 							String val = table.data[row][5] != "" ? table.data[row][5] : null;
 							IParsedExpression exp = null;
 
+							// todo: inserz initial values for arguments in configurations
+							
 							// context variable
 							Class clazz = SReflect.findClass0(typename, model.getAllImports(), context.getClassLoader());
 							if(clazz!=null)
 							{
-								
 								if(val!=null && val.length()>0)
 								{
 									exp = parser.parseExpression(val, model.getAllImports(), null, context.getClassLoader());
@@ -1465,13 +1461,9 @@ public class BpmnXMLReader
 								model.addResult(arg);
 							}
 //								System.out.println("Argument: "+arg);
-
 						}
-						
-						// next annotation
-						//continue;
-						
-					} // end new arguments handling
+					} 
+					
 					// new jadex properties handling
 					else if(anno.getSource().toLowerCase().endsWith("_properties_table"))
 					{
@@ -1512,6 +1504,10 @@ public class BpmnXMLReader
 								else if("description".equals(key))
 								{
 									model.setDescription(value);
+								}
+								else if("configuration".equals(key))
+								{
+									((ModelInfo)model.getModelInfo()).addConfiguration(new ConfigurationInfo(value));
 								}
 								else if("parameters".equals(key))
 								{
