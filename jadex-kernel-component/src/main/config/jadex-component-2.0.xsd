@@ -318,11 +318,7 @@
 			<xs:element name="implementation">
 				<xs:complexType>
 					<xs:complexContent>
-						<xs:extension base="implementation">
-							<xs:sequence>
-								<xs:element name="binding" type="binding" minOccurs="0"/>
-							</xs:sequence>
-						</xs:extension>
+						<xs:extension base="implementation"/>
 					</xs:complexContent>
 				</xs:complexType>
 			</xs:element>
