@@ -68,18 +68,18 @@ public class SUtil
 
 
 	/** An empty enumeration. */
-	public static final Enumeration	EMPTY_ENUMERATION		= new Enumeration()
-															{
-																public boolean hasMoreElements()
-																{
-																	return false;
-																}
+	public static final Enumeration	EMPTY_ENUMERATION	= new Enumeration()
+	{
+		public boolean hasMoreElements()
+		{
+			return false;
+		}
 
-																public Object nextElement()
-																{
-																	return null;
-																}
-															};
+		public Object nextElement()
+		{
+			return null;
+		}
+	};
 
 	/** An empty string array. */
 	public static final String[] EMPTY_STRING_ARRAY	 = new String[0];

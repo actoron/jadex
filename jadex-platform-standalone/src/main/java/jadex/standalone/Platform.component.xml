@@ -101,7 +101,7 @@
 			<implementation proxytype="raw">
 				$args.simulation
 				? new ClockService(new ClockCreationInfo(IClock.TYPE_EVENT_DRIVEN, "simulation_clock", System.currentTimeMillis(), 100), $component.getServiceProvider())
-				: new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "simulation_clock", System.currentTimeMillis(), 100), $component.getServiceProvider())
+				: new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "system_clock", System.currentTimeMillis(), 100), $component.getServiceProvider())
 			</implementation>
 		</providedservice>
 		<providedservice class="IMessageService">
@@ -117,8 +117,7 @@
 				new MessageType[]
 				{
 					new FIPAMessageType()
-				}, null,
-				new CodecFactory()
+				}, null, new CodecFactory()
 				)
 			</implementation>
 		</providedservice>

@@ -2050,7 +2050,7 @@ public class AgentRules
 					else
 					{
 						Class clazz = (Class)state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_class);
-						ret.setResult(BeliefRules.getInitialValue(clazz));
+						ret.setResult(SReflect.getDefaultValue(clazz));
 					}
 				}				
 			}

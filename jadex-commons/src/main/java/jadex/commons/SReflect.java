@@ -965,6 +965,37 @@ public class SReflect
 		}
 		return (Class[])ret.toArray(new Class[ret.size()]);
 	}
+	
+	/**
+	 *  Get default value for basic types.
+	 */
+	public static Object getDefaultValue(Class clazz)
+	{
+		Object ret = null;
+		
+		if(clazz!=null && SReflect.isBasicType(clazz))
+			// changed *.class to *.TYPE due to javaflow bug
+		{
+			if(clazz==Boolean.TYPE)
+				ret	= Boolean.FALSE;
+			else if(clazz==Byte.TYPE)
+				ret	= new Byte((byte)0);
+			else if(clazz==Character.TYPE)
+				ret	= new Character((char)0);
+			else if(clazz==Short.TYPE)
+				ret	= new Short((short)0);
+			else if(clazz==Double.TYPE)
+				ret	= new Double(0);
+			else if(clazz==Float.TYPE)
+				ret	= new Float(0);
+			else if(clazz==Long.TYPE)
+				ret	= new Long(0);
+			else if(clazz==Integer.TYPE)
+				ret	= new Integer(0);
+		}
+		
+		return ret;
+	}
 }
 
 

@@ -1225,6 +1225,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		super.addDefaultArgument(name, value); 
 		if(!variables.containsKey(name))
 		{
+//			System.out.println("arg: "+name+" "+value);
 			variables.put(name, value);
 		}
 	}

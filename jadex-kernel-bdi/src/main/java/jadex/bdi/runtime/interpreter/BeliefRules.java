@@ -373,7 +373,7 @@ public class BeliefRules
 		state.setAttributeValue(rparam, OAVBDIRuntimeModel.parameter_has_name, name);
 		state.setAttributeValue(rparam, OAVBDIRuntimeModel.parameter_has_type, clazz);
 		if(value==null)
-			value = getInitialValue(clazz);
+			value = SReflect.getDefaultValue(clazz);
 		if(value!=null)
 			BeliefRules.setParameterValue(state, rparam, value);
 		if(rpe!=null)
@@ -611,36 +611,4 @@ public class BeliefRules
 
 		state.removeAttributeValue(rparameterset, OAVBDIRuntimeModel.parameterset_has_values, value);
 	}
-	
-	/**
-	 *  Get initial value for basic types.
-	 */
-	public static Object getInitialValue(Class clazz)
-	{
-		Object ret = null;
-		
-		if(clazz!=null && SReflect.isBasicType(clazz))
-			// changed *.class to *.TYPE due to javaflow bug
-		{
-			if(clazz==Boolean.TYPE)
-				ret	= Boolean.FALSE;
-			else if(clazz==Byte.TYPE)
-				ret	= new Byte((byte)0);
-			else if(clazz==Character.TYPE)
-				ret	= new Character((char)0);
-			else if(clazz==Short.TYPE)
-				ret	= new Short((short)0);
-			else if(clazz==Double.TYPE)
-				ret	= new Double(0);
-			else if(clazz==Float.TYPE)
-				ret	= new Float(0);
-			else if(clazz==Long.TYPE)
-				ret	= new Long(0);
-			else if(clazz==Integer.TYPE)
-				ret	= new Integer(0);
-		}
-		
-		return ret;
-	}
-	
 }

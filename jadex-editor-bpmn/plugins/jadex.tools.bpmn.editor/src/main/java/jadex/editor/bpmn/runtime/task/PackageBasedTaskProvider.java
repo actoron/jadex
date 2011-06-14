@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.emf.common.util.UniqueEList;
 
 /**
- * @author claas
  *
  */
 public class PackageBasedTaskProvider extends TaskProviderSupport

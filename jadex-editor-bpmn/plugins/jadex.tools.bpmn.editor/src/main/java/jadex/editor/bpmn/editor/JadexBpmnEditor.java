@@ -23,9 +23,6 @@ import org.eclipse.ui.PlatformUI;
  * This editor extends the BPMN-Diagram editor. With this extension we have full
  * control about the displayed properties and editor sheets. We also can extend
  * the editor with new edit parts and views.
- * 
- * @author Claas Altschaffel
- * 
  */
 public class JadexBpmnEditor extends BpmnDiagramEditor
 {
@@ -53,19 +50,16 @@ public class JadexBpmnEditor extends BpmnDiagramEditor
 
 	/**
 	 * Log a exception into eclipse error log
-	 * 
-	 * @param Exception
-	 *            to log
+	 * @param Exception to log
 	 * @param int flag from {@link IStatus}
 	 */
 	public static void log(String message, Exception ex, int iStatus)
 	{
 		String exMessage = ex != null ? " - " + ex.getMessage() : "";
 		BpmnDiagramEditorPlugin.getInstance().getLog()
-				.log(new Status(iStatus, ID, iStatus, message + exMessage, ex));
+			.log(new Status(iStatus, ID, iStatus, message + exMessage, ex));
 	}
 
-	@Override
 	public void doSave(IProgressMonitor progressMonitor)
 	{
 		Object editPart = getDiagramEditPart();
@@ -78,7 +72,6 @@ public class JadexBpmnEditor extends BpmnDiagramEditor
 		super.doSave(progressMonitor);
 	}
 
-	@Override
 	protected void initializeGraphicalViewer()
 	{
 		super.initializeGraphicalViewer();
@@ -100,8 +93,6 @@ public class JadexBpmnEditor extends BpmnDiagramEditor
 
 			Display.getCurrent().asyncExec(new Runnable()
 			{
-
-				@Override
 				public void run()
 				{
 					String title = "Jadex properties conversion";
@@ -167,7 +158,6 @@ public class JadexBpmnEditor extends BpmnDiagramEditor
 	 */
 	private boolean checkDiagramConversion()
 	{
-
 		Object editPart = getDiagramEditPart();
 
 		if (editPart instanceof BpmnDiagramEditPart)

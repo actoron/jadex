@@ -841,65 +841,65 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		return ret;
 	}
 
-//	/**
-//	 *  Add a context variable declaration.
-//	 *  @param name	The variable name.
-//	 *  @param clazz	The type of the variable
-//	 *  @param exp	An initialization expression (if any).
-//	 */
-//	public void addContextVariable(String name, Class clazz, IParsedExpression exp)
-//	{
-//		if(variables==null)
-//			variables	= new HashMap();
-//		
-//		variables.put(name, new Object[]{clazz, exp});
-//	}
-//
-//	/**
-//	 *  Remove a context variable declaration.
-//	 *  @param name	The variable name.
-//	 */
-//	public void removeContextVariable(String name)
-//	{
-//		if(variables!=null)
-//		{
-//			variables.remove(name);
-//			
-//			if(variables.isEmpty())
-//			{
-//				variables	= null;
-//			}
-//		}
-//	}
-//
-//	/**
-//	 *  Get the declared context variables.
-//	 *  @return A set of variable names.
-//	 */
-//	public Set getContextVariables()
-//	{
-//		return variables!=null ? variables.keySet() : Collections.EMPTY_SET;
-//	}
-//
-//	/**
-//	 *  Get the class of a declared context variable.
-//	 *  @param name	The variable name.
-//	 *  @return The class of the variable.
-//	 */
-//	public Class	getContextVariableClass(String name)
-//	{
-//		return (Class)((Object[])variables.get(name))[0];
-//	}
-//
-//	/**
-//	 *  Get the initialization expression of a declared context variable.
-//	 *  @param name	The variable name.
-//	 *  @return The initialization expression (if any).
-//	 */
-//	public IParsedExpression	getContextVariableExpression(String name)
-//	{
-//		return (IParsedExpression)((Object[])variables.get(name))[1];
-//	}
+	/**
+	 *  Add a context variable declaration.
+	 *  @param name	The variable name.
+	 *  @param clazz	The type of the variable
+	 *  @param exp	An initialization expression (if any).
+	 */
+	public void addContextVariable(String name, Class clazz, IParsedExpression exp)
+	{
+		if(variables==null)
+			variables	= new HashMap();
+		
+		variables.put(name, new Object[]{clazz, exp});
+	}
+
+	/**
+	 *  Remove a context variable declaration.
+	 *  @param name	The variable name.
+	 */
+	public void removeContextVariable(String name)
+	{
+		if(variables!=null)
+		{
+			variables.remove(name);
+			
+			if(variables.isEmpty())
+			{
+				variables	= null;
+			}
+		}
+	}
+
+	/**
+	 *  Get the declared context variables.
+	 *  @return A set of variable names.
+	 */
+	public Set getContextVariables()
+	{
+		return variables!=null ? variables.keySet() : Collections.EMPTY_SET;
+	}
+
+	/**
+	 *  Get the class of a declared context variable.
+	 *  @param name	The variable name.
+	 *  @return The class of the variable.
+	 */
+	public Class getContextVariableClass(String name)
+	{
+		return (Class)((Object[])variables.get(name))[0];
+	}
+
+	/**
+	 *  Get the initialization expression of a declared context variable.
+	 *  @param name	The variable name.
+	 *  @return The initialization expression (if any).
+	 */
+	public IParsedExpression getContextVariableExpression(String name)
+	{
+		return (IParsedExpression)((Object[])variables.get(name))[1];
+	}
 
 	/**
 	 *  Get the filename.

@@ -1,5 +1,6 @@
 package jadex.bridge.modelinfo;
 
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 import java.util.HashMap;
@@ -146,6 +147,12 @@ public class Argument implements IArgument
 		if(defaultvalues!=null)
 		{
 			ret = defaultvalues.get(configname!=null && defaultvalues.containsKey(configname)? configname: ANY_CONFIG);
+		
+			// todo: support default value for basic types
+//			if(ret==null && getClazz()!=null)
+//			{
+//				ret = SReflect.getDefaultValue(clazz);
+//			}
 		}
 		return ret;
 	}
