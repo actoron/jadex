@@ -674,11 +674,8 @@ public class TestCenterPanel extends JSplitPanel
 			// Number column.
 			text.append("<td width=\"25\" align=\"right\"><strong>");
 			text.append(i+1);
-			text.append("</strong></td>\n");
+			text.append("&nbsp;</strong></td>\n");
 			
-			// Empty columns consuming extra space. Hack!!!
-			text.append("<td>&nbsp;</td>\n");
-
 			// Name column (with link for already performed testcases).
 			if(testcases[i]!=null && testcases[i].isPerformed())
 			{
@@ -695,24 +692,24 @@ public class TestCenterPanel extends JSplitPanel
 				text.append(names[i]);
 				text.append("</td>\n");
 			}
-
+			
 			// Column for success state.
 			if(testcases[i]!=null)
 			{
 				if(testcases[i].isPerformed() && testcases[i].isSucceeded())
 				{
 					text.append("<td align=\"left\" style=\"color: #00FF00\">");
-					text.append("<strong>O</strong>");
+					text.append("<strong>O&nbsp;</strong>");
 				}
 				else if(testcases[i].isPerformed() && !testcases[i].isSucceeded())
 				{
 					text.append("<td align=\"left\" style=\"color: #FF0000\">");
-					text.append("<strong>X</strong>");
+					text.append("<strong>X&nbsp;</strong>");
 				}
 				else // test in progress
 				{
 					text.append("<td align=\"left\" style=\"color: #444444\">");
-					text.append("<strong>?</strong>");					
+					text.append("<strong>?&nbsp;</strong>");					
 				}
 				text.append("</td>\n");
 			}
@@ -721,7 +718,7 @@ public class TestCenterPanel extends JSplitPanel
 			else if(suite.isAborted())
 			{
 				text.append("<td align=\"left\" style=\"color: #444444\">");
-				text.append("<strong>?</strong>");					
+				text.append("<strong>?&nbsp;</strong>");					
 				text.append("</td>\n");
 			}
 			
@@ -730,7 +727,7 @@ public class TestCenterPanel extends JSplitPanel
 			{
 				text.append("<td align=\"left\">&nbsp;</td>\n");				
 			}
-			
+
 			// Duration column.
 			if(testcases[i]!=null && testcases[i].isPerformed())
 			{
@@ -743,16 +740,6 @@ public class TestCenterPanel extends JSplitPanel
 				text.append("<td>&nbsp;</td>\n");
 			}
 
-			// Empty columns consuming extra space. Hack!!!
-			text.append("<td>&nbsp;</td>\n");
-			text.append("<td>&nbsp;</td>\n");
-			text.append("<td>&nbsp;</td>\n");
-			text.append("<td>&nbsp;</td>\n");
-			text.append("<td>&nbsp;</td>\n");
-			text.append("<td>&nbsp;</td>\n");
-			text.append("<td>&nbsp;</td>\n");
-			text.append("<td>&nbsp;</td>\n");
-			
 			text.append("</tr>\n");
 		}
 		text.append("</table>\n");
@@ -766,8 +753,8 @@ public class TestCenterPanel extends JSplitPanel
 				text.append(names[i]);
 				text.append(i);
 				text.append("\"></a>\n");
-				text.append(testcases[i].getHTMLFragment(i+1));
-				text.append("<a href=\"#top\">Back to top.</a>");
+				text.append(testcases[i].getHTMLFragment(i+1, names[i]));
+				text.append("<a href=\"#top\">Back to top.</a> &nbsp;\n");
 			}
 		}
 
@@ -1127,15 +1114,15 @@ public class TestCenterPanel extends JSplitPanel
 							{
 								abortTestcase((IComponentIdentifier)result);
 							}
-							
-							running	= !testcases.isEmpty();
+							startNextTestcases();
 							updateProgress();
 							updateDetails();
-							startNextTestcases();
 						}
 					});
 				}
 			}
+			
+			running	= !testcases.isEmpty();
 		}
 
 		/**
@@ -1226,10 +1213,9 @@ public class TestCenterPanel extends JSplitPanel
 								}
 							}
 							testcases.remove(name);
-							running	= !testcases.isEmpty();
+							startNextTestcases();
 							updateProgress();
 							updateDetails();
-							startNextTestcases();
 						}
 					}
 				});

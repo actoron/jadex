@@ -9,9 +9,6 @@ public class Testcase
 {
 	//-------- attributes --------
 
-	/** The component type. */
-	protected String type;
-
 	/** The number of tests to be performed. */
 	protected int	cnt;
 	
@@ -32,15 +29,6 @@ public class Testcase
 	}
 	
 	/**
-	 *  Create a new testcase.
-	 */
-	public Testcase(String type)
-	{
-		this.type	= type;
-		this.cnt = -1; // Count unknown.
-	}
-
-	/**
 	 *  Create a testcase which is already performed.
 	 */
 	public Testcase(int cnt, TestReport[] reports)
@@ -50,25 +38,6 @@ public class Testcase
 	}
 
 	//-------- methods --------
-
-	/**
-	 *  Get the type.
-	 *  @return The type.
-	 */
-	public String getType()
-	{
-		return type;
-	}
-
-	/**
-	 *  Set the type.
-	 *  @param type The type.
-	 */
-	public void setType(String type)
-	{
-		this.type = type;
-	}
-
 
 	/**
 	 *  Get the test count.
@@ -194,14 +163,12 @@ public class Testcase
 	public String toString()
 	{
 		StringBuffer ret = new StringBuffer();
-		ret.append("Testcase type: ");
-		ret.append(type);
-		ret.append(", result: ");
+		ret.append("Testcase result: ");
 		if(isSucceeded())
 		{
 			ret.append("succeeded.");
 		}
-		if(!isSucceeded())
+		else
 		{
 			ret.append("failed, reports: ");
 			ret.append(SUtil.arrayToString(reports));
@@ -214,8 +181,9 @@ public class Testcase
 	 *  Create an HTML representation of this element that can be
 	 *  included in an HTML document.
 	 *  @param number The number of the testcase (when displayed in a longer list), -1 for no number.
+	 *  @param name The name of the testcase (when displayed in a longer list), null for no name.
 	 */
-	public String	getHTMLFragment(int number)
+	public String	getHTMLFragment(int number, String name)
 	{
 		StringBuffer ret = new StringBuffer();
 		ret.append("<h3>");
@@ -234,7 +202,8 @@ public class Testcase
 			ret.append(number);
 		}
 		ret.append(": ");
-		ret.append(type);
+		if(name!=null)
+			ret.append(name);
 		ret.append("</h3>\n");
 		
 		// Add list of reports.
