@@ -2,6 +2,7 @@
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
 <xs:schema	targetNamespace="http://jadex.sourceforge.net/jadex"
 			xmlns="http://jadex.sourceforge.net/jadex"
+			xmlns:jadex="http://jadex.sourceforge.net/jadex"
 			xmlns:xs="http://www.w3.org/2001/XMLSchema"
 			elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 			
@@ -27,7 +28,6 @@
 			<xs:all>
 				<xs:element name="components" type="configcomponents" minOccurs="0"/>
 				<xs:element name="services" type="configservices" minOccurs="0"/>
-				<xs:element name="providedservices" type="configprovidedservices" minOccurs="0"/>
 				<xs:element name="extensions" type="extensions" minOccurs="0"/>
 				<xs:element name="capabilities" type="MConfigCapabilitybase" minOccurs="0"/>
 				<xs:element name="beliefs" type="MConfigBeliefbase" minOccurs="0"/>
@@ -42,11 +42,79 @@
 		<xs:annotation>
 			<xs:documentation>Defines a new agent type.</xs:documentation>
 		</xs:annotation>
+		<!-- copied from jadex-component.xsd, prefixed with 'agent_' to avoid name clashes. -->
+		<xs:key name="agent_component_name">
+			<xs:selector xpath="jadex:componenttypes/jadex:componenttype"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
+		<xs:key name="agent_providedservice_key">
+			<xs:selector xpath="jadex:services/jadex:providedservice"/>
+			<xs:field xpath="@name|@class"/>
+		</xs:key>
+		<xs:unique name="agent_providedservice_name">
+			<xs:selector xpath="jadex:services/jadex:providedservice"/>
+			<xs:field xpath="@name"/>
+		</xs:unique>
+		<xs:key name="agent_requiredservice_name">
+			<xs:selector xpath="jadex:services/jadex:requiredservice"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
+		<xs:key name="agent_property_name">
+			<xs:selector xpath="jadex:properties/jadex:property"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
+		<!-- key references in configurations -->
+		<xs:keyref name="agent_component_reference" refer="agent_component_name">
+			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:components/jadex:component"/>
+			<xs:field xpath="@type"/>
+		</xs:keyref>
+		<xs:keyref name="agent_providedservice_reference" refer="agent_providedservice_key">
+			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:services/jadex:providedservice"/>
+			<xs:field xpath="@name|@class"/>
+		</xs:keyref>
+		<xs:keyref name="agent_requiredservice_reference" refer="agent_requiredservice_name">
+			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:services/jadex:requiredservice"/>
+			<xs:field xpath="@name"/>
+		</xs:keyref>
 	</xs:element>
 	<xs:element name="capability" type="MCapability">
 		<xs:annotation>
 			<xs:documentation>Defines a new capability type.</xs:documentation>
 		</xs:annotation>
+		<!-- copied from jadex-component.xsd, prefixed with 'capa_' to avoid name clashes. -->
+		<xs:key name="capa_component_name">
+			<xs:selector xpath="jadex:componenttypes/jadex:componenttype"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
+		<xs:key name="capa_providedservice_key">
+			<xs:selector xpath="jadex:services/jadex:providedservice"/>
+			<xs:field xpath="@name|@class"/>
+		</xs:key>
+		<xs:unique name="capa_providedservice_name">
+			<xs:selector xpath="jadex:services/jadex:providedservice"/>
+			<xs:field xpath="@name"/>
+		</xs:unique>
+		<xs:key name="capa_requiredservice_name">
+			<xs:selector xpath="jadex:services/jadex:requiredservice"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
+		<xs:key name="capa_property_name">
+			<xs:selector xpath="jadex:properties/jadex:property"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
+		<!-- key references in configurations -->
+		<xs:keyref name="capa_component_reference" refer="capa_component_name">
+			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:components/jadex:component"/>
+			<xs:field xpath="@type"/>
+		</xs:keyref>
+		<xs:keyref name="capa_providedservice_reference" refer="capa_providedservice_key">
+			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:services/jadex:providedservice"/>
+			<xs:field xpath="@name|@class"/>
+		</xs:keyref>
+		<xs:keyref name="capa_requiredservice_reference" refer="capa_requiredservice_name">
+			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:services/jadex:requiredservice"/>
+			<xs:field xpath="@name"/>
+		</xs:keyref>
 	</xs:element>
 	
 	<xs:complexType name="MCapabilityBase">
