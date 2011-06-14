@@ -24,8 +24,8 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 		}
 		catch(Exception e)
 		{
-			System.out.println("e: "+sic.getMethod()+" "+sic.getObject()+" "+sic.getArgumentArray());
-			e.printStackTrace();
+//			System.out.println("e: "+sic.getMethod()+" "+sic.getObject()+" "+sic.getArgumentArray());
+//			e.printStackTrace();
 			
 			if(sic.getMethod().getReturnType().equals(IFuture.class))
 			{

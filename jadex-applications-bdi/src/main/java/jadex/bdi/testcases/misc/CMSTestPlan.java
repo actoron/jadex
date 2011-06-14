@@ -1,5 +1,6 @@
 package jadex.bdi.testcases.misc;
 
+import jadex.base.fipa.SFipa;
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IBDIExternalAccess;
@@ -27,10 +28,10 @@ public class CMSTestPlan extends Plan
 		num = performTests(num, null); // test locally
 		
 		// Todo: support remote CMS agent!?
-//		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getServiceUpwards(
-//			getScope().getServiceProvider(), IComponentManagementService.class).get(this);
-//		IComponentIdentifier aa = ces.createComponentIdentifier(SFipa.CMS_COMPONENT, true, null);
-//		performTests(num, aa); // test remotely
+		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getServiceUpwards(
+			getScope().getServiceContainer(), IComponentManagementService.class).get(this);
+		IComponentIdentifier aa = ces.createComponentIdentifier(SFipa.CMS_COMPONENT, getComponentIdentifier(), null);
+		performTests(num, aa); // test remotely
 	}
 
 	/**
@@ -143,7 +144,7 @@ public class CMSTestPlan extends Plan
 		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 
-		if(ams==null && agent!=null)
+		if(agent!=null)
 		{
 			tr = new TestReport("#"+num++, "Get an external access.");
 			if(create.isSucceeded())

@@ -25,8 +25,6 @@ public class BDITest	extends	ComponentTestSuite
 				"BeliefSetChanges",
 				"BeliefSetContains",
 				"MultiplePlanTriggers",
-				"CMSTest",	// missing cms agent?
-				"DFTest",	// missing df agent?
 				"MessagingTest"	// wrong email configuration?
 			});
 	}

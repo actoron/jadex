@@ -126,6 +126,10 @@
 			<match>$content instanceof Done</match>
 		</messageevent>
 	</events>
+	
+	<componenttypes>
+		<componenttype name="CMS" filename="jadex/bdi/cmsagent/CMS.agent.xml"/>
+	</componenttypes>
 
 	<properties>
 		<property name="debugging">false</property>
@@ -136,12 +140,15 @@
 		<configuration name="default">
 			<beliefs>
 				<initialbelief ref="testcap.testcase_cnt">
-					<fact>6</fact>
+					<fact>12</fact>
 				</initialbelief>
 			</beliefs>
 			<plans>
 				<initialplan ref="test"/>
 			</plans>
+			<components>
+				<component name="cms" type="CMS"/>
+			</components>
 		</configuration>
 	</configurations>
 </agent>
