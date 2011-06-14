@@ -822,6 +822,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		
 		// Fatal error!
 		exception = e;
+		e.printStackTrace();
 		
 		// Remove component from platform.
 		getCMS().addResultListener(new DefaultResultListener()

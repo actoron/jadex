@@ -135,6 +135,7 @@ public class SettingsService extends BasicService implements ISettingsService
 	 */
 	public IFuture	registerPropertiesProvider(String id, IPropertiesProvider provider)
 	{
+//		System.out.println("register: "+id);
 		Future	ret	= new Future();
 		if(providers.containsKey(id))
 		{

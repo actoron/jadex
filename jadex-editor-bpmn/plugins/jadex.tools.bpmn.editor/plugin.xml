@@ -329,6 +329,7 @@
      </propertySections>
    </extension>
    
+   
     <!-- the jadex bpmndiagram property section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.editor.bpmn.JadexBpmnEditor">
@@ -341,7 +342,7 @@
         </propertySection>
      </propertySections>
    </extension>
-   
+     
     <!-- the jadex bpmndiagram import section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.editor.bpmn.JadexBpmnEditor">
@@ -355,6 +356,19 @@
      </propertySections>
    </extension>
    
+    <!-- the jadex bpmndiagram configurations section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.editor.bpmn.JadexBpmnEditor">
+        <propertySection
+              class="jadex.editor.bpmn.editor.properties.JadexBpmnDiagramConfigurationsTableSection"
+              id="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramConfigurationsTableSection"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramImportsSection">
+           <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
+        </propertySection>
+     </propertySections>
+   </extension>
+   
     <!-- the jadex bpmndiagram parameter section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.editor.bpmn.JadexBpmnEditor">
@@ -362,7 +376,7 @@
               class="jadex.editor.bpmn.editor.properties.JadexBpmnDiagramParameterSection"
               id="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramParameterSection"
               tab="Jadex"
-              afterSection="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramImportsSection">
+              afterSection="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramConfigurationsTableSection">
            <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
         </propertySection>
      </propertySections>

@@ -98,6 +98,17 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 		});
 	}
 	
+	/**
+	 *  Create a new factory for startup.
+	 *  @param platform	The platform.
+	 */
+	// This constructor is used by the Starter class and the ADFChecker plugin. 
+	public BpmnFactory(String providerid)
+	{
+		super(providerid, IComponentFactory.class, null);
+		this.loader = new BpmnModelLoader();
+	}
+	
 	//-------- methods --------
 	
 	/**

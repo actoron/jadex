@@ -134,43 +134,22 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	
 	//-------- added structures --------
 
-//	/** The name of the model. */
-//	protected String name;
-	
-//	/** The package. */
-//	protected String packagename;
-	
-//	/** The description. */
-//	protected String description;
-	
-//	/** The properties. */
-//	protected Map properties;
-
 	/** The imports. */
 	protected List imports;
 	
 	/** The context variables (name -> [class, initexpression]). */
-	protected Map	variables;
+	protected Map variables;
 	
-//	/** The arguments. */
-//	protected List arguments;
-//	
-//	/** The results. */
-//	protected List results;
+	/** The pool/names in configurations. */
+	protected Map configpoollanes;
 	
 	//-------- model management --------
-	
-//	/** The filename. */
-//	protected String filename;
 	
 	/** The last modified date. */
 	protected long lastmodified;
 	
 	/** The last check date. */
 	protected long lastchecked;
-	
-//	/** The classloader. */
-//	protected ClassLoader classloader;
 	
 	/** The model info. */
 	protected ModelInfo modelinfo;
@@ -727,23 +706,69 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  Get all start activities of the model.
 	 *  @return A non-empty List of start activities or null, if none.
 	 */
-	public List getStartActivities()
+	public List getStartActivities(String poolname, String lanename)
 	{
-		List	ret	= null;
+		List ret	= null;
 		for(int i=0; pools!=null && i<pools.size(); i++)
 		{
-			MPool	pool	= (MPool) pools.get(i);
-			List	tmp	= pool.getStartActivities();
-			if(tmp!=null)
+			MPool pool = (MPool)pools.get(i);
+			if(poolname==null || poolname.equals(pool.getName()))
 			{
-				if(ret!=null)
-					ret.addAll(tmp);
-				else
-					ret	= tmp;
+				List tmp = pool.getStartActivities();
+				if(tmp!=null)
+				{
+					if(lanename==null)
+					{
+						if(ret!=null)
+						{
+							ret.addAll(tmp);
+						}
+						else
+						{
+							ret	= tmp;
+						}
+					}
+					else
+					{
+						if(ret==null)
+						{
+							ret = new ArrayList();
+						}
+						for(int j=0; j<tmp.size(); j++)
+						{
+							MActivity act = (MActivity)tmp.get(j);
+							if(lanename.equals(act.getLane()))
+							{
+								ret.add(act);
+							}
+						}
+					}
+				}
 			}
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Add a pool/lane activation for a configurations.
+	 *  @param config The configuration name.
+	 *  @param poollane The poollane name (dot separated).
+	 */
+	public void addPoolLane(String config, String poollane)
+	{
+		if(configpoollanes==null)
+			configpoollanes = new HashMap();
+		configpoollanes.put(config, poollane);
+	}
+	
+	/**
+	 *  Get the pool lane.
+	 *  @param config The configurations.
+	 */
+	public String getPoolLane(String config)
+	{
+		return configpoollanes==null? null: (String)configpoollanes.get(config);
 	}
 
 	/**

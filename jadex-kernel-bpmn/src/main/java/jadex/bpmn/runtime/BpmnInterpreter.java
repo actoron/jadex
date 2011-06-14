@@ -47,7 +47,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SJavaParser;
@@ -150,6 +149,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	/** The micro agent model. */
 	protected MBpmnModel model;
 	
+	// todo: allow multiple pools/lanes?
 	/** The configuration. */
 	protected String pool;
 	
@@ -208,7 +208,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		initContextVariables();
 		
 		// Create initial thread(s). 
-		List	startevents	= model.getStartActivities();
+		List	startevents	= model.getStartActivities(null, null);
 		for(int i=0; startevents!=null && i<startevents.size(); i++)
 		{
 			ProcessThread	thread	= new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
@@ -253,6 +253,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		}
 		else
 		{
+			String poollane = model.getPoolLane(config);
 			int idx	= config.indexOf('.');
 			if(idx==-1)
 			{
@@ -264,12 +265,12 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 				this.pool	= config.substring(0, idx);
 				this.lane	= config.substring(idx+1);
 			}
-			if(!model.getPools().contains(this.pool) || !model.getPool(this.pool).getLanes().contains(this.lane))
-			{
-				System.out.println("Resetting pool/lane config");
-				this.pool = null;
-				this.lane = null;
-			}
+//			if(!model.getPools().contains(this.pool) || !model.getPool(this.pool).getLanes().contains(this.lane))
+//			{
+//				System.out.println("Resetting pool/lane config");
+//				this.pool = null;
+//				this.lane = null;
+//			}
 		}
 		
 		this.activityhandlers = activityhandlers!=null? activityhandlers: DEFAULT_ACTIVITY_HANDLERS;
@@ -314,9 +315,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		if(!initedflag)
 		{
 			initedflag = true;
-			executeInitStep1();
+			executeInitStep2();
 		}
-		else if(inited.isDone())	// Todo: do we need this?
+		// Must be able to execute externally scheduled steps, e.g. service calls
+		else //if(inited.isDone())	// Todo: do we need this?
 		{
 			try
 			{
@@ -324,19 +326,22 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 					executeStep(pool, lane);
 				
 //				System.out.println("After step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+isFinished(pool, lane));
-				if(!finishing && isFinished(pool, lane))
+				Boolean autosdtmp = getComponentDescription().getAutoShutdown();
+				boolean autosd = autosdtmp!=null? autosdtmp.booleanValue(): false;
+				if(!finishing && isFinished(pool, lane) && autosd)
 				{
+					System.out.println("terminating: "+getComponentIdentifier());
 					finishing = true;
-					((IComponentManagementService)variables.get("$cms")).destroyComponent(adapter.getComponentIdentifier());
+//					((IComponentManagementService)variables.get("$cms")).destroyComponent(adapter.getComponentIdentifier());
 					
-	//				SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
-	//					.addResultListener(createResultListener(new DefaultResultListener()
-	//				{
-	//					public void resultAvailable(Object source, Object result)
-	//					{
-	//						((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier());
-	//					}
-	//				}));
+					SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+						.addResultListener(createResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object result)
+						{
+							((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier());
+						}
+					}));
 				}
 				
 	//			System.out.println("Process wants: "+this.getComponentAdapter().getComponentIdentifier().getLocalName()+" "+!isFinished(null, null)+" "+isReady(null, null));
@@ -355,7 +360,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 
 	/**
 	 *  Execute the init step 1.
-	 */
+	 * /
 	protected void executeInitStep1()
 	{
 		// Fetch and cache services, then init service container.
@@ -430,7 +435,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 				inited.setException(exception);
 			}
 		}));
-	}
+	}*/
 	
 	/**
 	 *  Execute the init step 2.
@@ -440,14 +445,14 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		// Initialize context variables.
 		variables.put("$interpreter", this);
 		
-		initContextVariables();
-
 		init(getModel(), getConfiguration())
 			.addResultListener(createResultListener(new DelegationResultListener(inited)
 		{
 			public void customResultAvailable(Object result)
 			{
 				// Notify cms that init is finished.
+				initContextVariables();
+
 				inited.setResult(new Object[]{BpmnInterpreter.this, adapter});
 				
 				super.customResultAvailable(result);
@@ -465,7 +470,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 			public Object execute(IInternalAccess ia)
 			{
 				// Create initial thread(s). 
-				List startevents	= model.getStartActivities();
+				List startevents	= model.getStartActivities(pool, lane);
 				for(int i=0; startevents!=null && i<startevents.size(); i++)
 				{
 					ProcessThread	thread	= new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);

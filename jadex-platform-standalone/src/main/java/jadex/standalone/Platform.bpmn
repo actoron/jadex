@@ -3,7 +3,6 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_O8uNQJN0EeC8LZB_zl9TAg" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O8uNQZN0EeC8LZB_zl9TAg" key="description" value="The platform in BPMN."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VGb9gJN0EeC8LZB_zl9TAg" key="package" value="jadex.standalone"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WPVfQJN0EeC8LZB_zl9TAg" key="configuration" value="default"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x5_ocJN0EeC8LZB_zl9TAg" key="editor_version" value="1.0"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WP8jQJN0EeC8LZB_zl9TAg" source="jadex_imports_table">
@@ -91,130 +90,146 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_SYHVpJZfEeCLuOLPcRfKaw" key="7:6" value=""/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_VG_hsJN1EeC8LZB_zl9TAg" source="jadex_subcomponents_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugf1sJN3EeC8LZB_zl9TAg" key="dimension" value="13:6"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugf1sZN3EeC8LZB_zl9TAg" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugf1spN3EeC8LZB_zl9TAg" key="0:0" value="kernel_component"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugf1s5N3EeC8LZB_zl9TAg" key="0:1" value="jadex/component/KernelComponentAgent.class"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugf1tJN3EeC8LZB_zl9TAg" key="0:2" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggcwJN3EeC8LZB_zl9TAg" key="0:3" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggcwZN3EeC8LZB_zl9TAg" key="0:4" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggcwpN3EeC8LZB_zl9TAg" key="0:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggcw5N3EeC8LZB_zl9TAg" key="1:0" value="kernel_application"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggcxJN3EeC8LZB_zl9TAg" key="1:1" value="jadex/application/KernelApplication.component.xml"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggcxZN3EeC8LZB_zl9TAg" key="1:2" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggcxpN3EeC8LZB_zl9TAg" key="1:3" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggcx5N3EeC8LZB_zl9TAg" key="1:4" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggcyJN3EeC8LZB_zl9TAg" key="1:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggcyZN3EeC8LZB_zl9TAg" key="2:0" value="kernel_micro"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggcypN3EeC8LZB_zl9TAg" key="2:1" value="jadex/micro/KernelMicroAgent.class"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggcy5N3EeC8LZB_zl9TAg" key="2:2" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggczJN3EeC8LZB_zl9TAg" key="2:3" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggczZN3EeC8LZB_zl9TAg" key="2:4" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggczpN3EeC8LZB_zl9TAg" key="2:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggcz5N3EeC8LZB_zl9TAg" key="3:0" value="kernel_bdi"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggc0JN3EeC8LZB_zl9TAg" key="3:1" value="jadex/bdi/KernelBDI.component.xml"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggc0ZN3EeC8LZB_zl9TAg" key="3:2" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggc0pN3EeC8LZB_zl9TAg" key="3:3" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggc05N3EeC8LZB_zl9TAg" key="3:4" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggc1JN3EeC8LZB_zl9TAg" key="3:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggc1ZN3EeC8LZB_zl9TAg" key="4:0" value="kernel_bdibpmn"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggc1pN3EeC8LZB_zl9TAg" key="4:1" value="jadex/bdibpmn/KernelBDIBPMN.component.xml"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggc15N3EeC8LZB_zl9TAg" key="4:2" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggc2JN3EeC8LZB_zl9TAg" key="4:3" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggc2ZN3EeC8LZB_zl9TAg" key="4:4" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggc2pN3EeC8LZB_zl9TAg" key="4:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggc25N3EeC8LZB_zl9TAg" key="5:0" value="kernel_bpmn"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggc3JN3EeC8LZB_zl9TAg" key="5:1" value="jadex/bpmn/KernelBPMN.component.xml"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggc3ZN3EeC8LZB_zl9TAg" key="5:2" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggc3pN3EeC8LZB_zl9TAg" key="5:3" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggc35N3EeC8LZB_zl9TAg" key="5:4" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uggc4JN3EeC8LZB_zl9TAg" key="5:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD0JN3EeC8LZB_zl9TAg" key="6:0" value="kernel_multi"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD0ZN3EeC8LZB_zl9TAg" key="6:1" value="jadex/micro/KernelMultiAgent.class"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD0pN3EeC8LZB_zl9TAg" key="6:2" value="kernels"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD05N3EeC8LZB_zl9TAg" key="6:3" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD1JN3EeC8LZB_zl9TAg" key="6:4" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD1ZN3EeC8LZB_zl9TAg" key="6:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD1pN3EeC8LZB_zl9TAg" key="7:0" value="rms"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD15N3EeC8LZB_zl9TAg" key="7:1" value="jadex/base/service/remote/RemoteServiceManagementAgent.class"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD2JN3EeC8LZB_zl9TAg" key="7:2" value="rms"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD2ZN3EeC8LZB_zl9TAg" key="7:3" value="1"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD2pN3EeC8LZB_zl9TAg" key="7:4" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD25N3EeC8LZB_zl9TAg" key="7:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD3JN3EeC8LZB_zl9TAg" key="8:0" value="awa"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD3ZN3EeC8LZB_zl9TAg" key="8:1" value="jadex/base/service/awareness/AwarenessAgent.class"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD3pN3EeC8LZB_zl9TAg" key="8:2" value="awa"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD35N3EeC8LZB_zl9TAg" key="8:3" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD4JN3EeC8LZB_zl9TAg" key="8:4" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD4ZN3EeC8LZB_zl9TAg" key="8:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD4pN3EeC8LZB_zl9TAg" key="9:0" value="jcc"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD45N3EeC8LZB_zl9TAg" key="9:1" value="jadex/tools/jcc/JCCAgent.class"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD5JN3EeC8LZB_zl9TAg" key="9:2" value="jcc"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD5ZN3EeC8LZB_zl9TAg" key="9:3" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD5pN3EeC8LZB_zl9TAg" key="9:4" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD55N3EeC8LZB_zl9TAg" key="9:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD6JN3EeC8LZB_zl9TAg" key="10:0" value="CreationBDI"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD6ZN3EeC8LZB_zl9TAg" key="10:1" value="jadex/bdi/benchmarks/AgentCreation.agent.xml"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD6pN3EeC8LZB_zl9TAg" key="10:2" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD65N3EeC8LZB_zl9TAg" key="10:3" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD7JN3EeC8LZB_zl9TAg" key="10:4" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD7ZN3EeC8LZB_zl9TAg" key="10:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD7pN3EeC8LZB_zl9TAg" key="11:0" value="CreationMicro"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD75N3EeC8LZB_zl9TAg" key="11:1" value="jadex/micro/benchmarks/AgentCreationAgent.class"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD8JN3EeC8LZB_zl9TAg" key="11:2" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughD8ZN3EeC8LZB_zl9TAg" key="11:3" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughq4JN3EeC8LZB_zl9TAg" key="11:4" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughq4ZN3EeC8LZB_zl9TAg" key="11:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughq4pN3EeC8LZB_zl9TAg" key="12:0" value="CreationBPMN"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughq45N3EeC8LZB_zl9TAg" key="12:1" value="jadex/bpmn/benchmarks/AgentCreation2.bpmn"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughq5JN3EeC8LZB_zl9TAg" key="12:2" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughq5ZN3EeC8LZB_zl9TAg" key="12:3" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughq5pN3EeC8LZB_zl9TAg" key="12:4" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ughq55N3EeC8LZB_zl9TAg" key="12:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgRkcJafEeC88uAYkhe8Fw" key="dimension" value="13:6"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgRkcZafEeC88uAYkhe8Fw" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgRkcpafEeC88uAYkhe8Fw" key="0:0" value="kernel_component"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgRkc5afEeC88uAYkhe8Fw" key="0:1" value="jadex/component/KernelComponentAgent.class"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgSLgJafEeC88uAYkhe8Fw" key="0:2" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgSLgZafEeC88uAYkhe8Fw" key="0:3" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgSLgpafEeC88uAYkhe8Fw" key="0:4" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgSLg5afEeC88uAYkhe8Fw" key="0:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgSLhJafEeC88uAYkhe8Fw" key="1:0" value="kernel_application"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgSLhZafEeC88uAYkhe8Fw" key="1:1" value="jadex/application/KernelApplication.component.xml"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgSLhpafEeC88uAYkhe8Fw" key="1:2" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgSLh5afEeC88uAYkhe8Fw" key="1:3" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgSLiJafEeC88uAYkhe8Fw" key="1:4" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgSLiZafEeC88uAYkhe8Fw" key="1:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgSLipafEeC88uAYkhe8Fw" key="2:0" value="kernel_micro"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgSykJafEeC88uAYkhe8Fw" key="2:1" value="jadex/micro/KernelMicroAgent.class"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgSykZafEeC88uAYkhe8Fw" key="2:2" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgSykpafEeC88uAYkhe8Fw" key="2:3" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgSyk5afEeC88uAYkhe8Fw" key="2:4" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgSylJafEeC88uAYkhe8Fw" key="2:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgSylZafEeC88uAYkhe8Fw" key="3:0" value="kernel_bdi"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgSylpafEeC88uAYkhe8Fw" key="3:1" value="jadex/bdi/KernelBDI.component.xml"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgSyl5afEeC88uAYkhe8Fw" key="3:2" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgSymJafEeC88uAYkhe8Fw" key="3:3" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgTZoJafEeC88uAYkhe8Fw" key="3:4" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgTZoZafEeC88uAYkhe8Fw" key="3:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgTZopafEeC88uAYkhe8Fw" key="4:0" value="kernel_bdibpmn"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgTZo5afEeC88uAYkhe8Fw" key="4:1" value="jadex/bdibpmn/KernelBDIBPMN.component.xml"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgTZpJafEeC88uAYkhe8Fw" key="4:2" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgTZpZafEeC88uAYkhe8Fw" key="4:3" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgTZppafEeC88uAYkhe8Fw" key="4:4" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgTZp5afEeC88uAYkhe8Fw" key="4:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgTZqJafEeC88uAYkhe8Fw" key="5:0" value="kernel_bpmn"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgTZqZafEeC88uAYkhe8Fw" key="5:1" value="jadex/bpmn/KernelBPMN.component.xml"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgUAsJafEeC88uAYkhe8Fw" key="5:2" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgUAsZafEeC88uAYkhe8Fw" key="5:3" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgUAspafEeC88uAYkhe8Fw" key="5:4" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgUAs5afEeC88uAYkhe8Fw" key="5:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgUAtJafEeC88uAYkhe8Fw" key="6:0" value="kernel_multi"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgUAtZafEeC88uAYkhe8Fw" key="6:1" value="jadex/bpmn/KernelMulti.bpmn"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgUAtpafEeC88uAYkhe8Fw" key="6:2" value="kernels"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgUAt5afEeC88uAYkhe8Fw" key="6:3" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgUAuJafEeC88uAYkhe8Fw" key="6:4" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgUAuZafEeC88uAYkhe8Fw" key="6:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgUnwJafEeC88uAYkhe8Fw" key="7:0" value="rms"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgUnwZafEeC88uAYkhe8Fw" key="7:1" value="jadex/base/service/remote/RemoteServiceManagementAgent.class"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgUnwpafEeC88uAYkhe8Fw" key="7:2" value="rms"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgUnw5afEeC88uAYkhe8Fw" key="7:3" value="1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgUnxJafEeC88uAYkhe8Fw" key="7:4" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgUnxZafEeC88uAYkhe8Fw" key="7:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgUnxpafEeC88uAYkhe8Fw" key="8:0" value="awa"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgUnx5afEeC88uAYkhe8Fw" key="8:1" value="jadex/base/service/awareness/AwarenessAgent.class"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgUnyJafEeC88uAYkhe8Fw" key="8:2" value="awa"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgVO0JafEeC88uAYkhe8Fw" key="8:3" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgVO0ZafEeC88uAYkhe8Fw" key="8:4" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgVO0pafEeC88uAYkhe8Fw" key="8:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgVO05afEeC88uAYkhe8Fw" key="9:0" value="jcc"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgVO1JafEeC88uAYkhe8Fw" key="9:1" value="jadex/tools/jcc/JCCAgent.class"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgVO1ZafEeC88uAYkhe8Fw" key="9:2" value="jcc"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgVO1pafEeC88uAYkhe8Fw" key="9:3" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgVO15afEeC88uAYkhe8Fw" key="9:4" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgVO2JafEeC88uAYkhe8Fw" key="9:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgVO2ZafEeC88uAYkhe8Fw" key="10:0" value="CreationBDI"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgV14JafEeC88uAYkhe8Fw" key="10:1" value="jadex/bdi/benchmarks/AgentCreation.agent.xml"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgV14ZafEeC88uAYkhe8Fw" key="10:2" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgV14pafEeC88uAYkhe8Fw" key="10:3" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgV145afEeC88uAYkhe8Fw" key="10:4" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgV15JafEeC88uAYkhe8Fw" key="10:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgV15ZafEeC88uAYkhe8Fw" key="11:0" value="CreationMicro"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgV15pafEeC88uAYkhe8Fw" key="11:1" value="jadex/micro/benchmarks/AgentCreationAgent.class"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgV155afEeC88uAYkhe8Fw" key="11:2" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgV16JafEeC88uAYkhe8Fw" key="11:3" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgV16ZafEeC88uAYkhe8Fw" key="11:4" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgWc8JafEeC88uAYkhe8Fw" key="11:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgWc8ZafEeC88uAYkhe8Fw" key="12:0" value="CreationBPMN"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgWc8pafEeC88uAYkhe8Fw" key="12:1" value="jadex/bpmn/benchmarks/AgentCreation2.bpmn"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgWc85afEeC88uAYkhe8Fw" key="12:2" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgWc9JafEeC88uAYkhe8Fw" key="12:3" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgWc9ZafEeC88uAYkhe8Fw" key="12:4" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MgWc9pafEeC88uAYkhe8Fw" key="12:5" value=""/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_CLJGQJN2EeC8LZB_zl9TAg" source="jadex_providedservices_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u054EJN6EeCMzq_DpuBqhQ" key="dimension" value="10:4"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u054EZN6EeCMzq_DpuBqhQ" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u054EpN6EeCMzq_DpuBqhQ" key="0:0" value="name"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u06fIJN6EeCMzq_DpuBqhQ" key="0:1" value="ISettingsService"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u06fIZN6EeCMzq_DpuBqhQ" key="0:2" value="new SettingsService($args.platformname, $component, $args.saveonexit)"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u06fIpN6EeCMzq_DpuBqhQ" key="0:3" value="decoupled"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u06fI5N6EeCMzq_DpuBqhQ" key="1:0" value="name1"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u06fJJN6EeCMzq_DpuBqhQ" key="1:1" value="IThreadPool"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u06fJZN6EeCMzq_DpuBqhQ" key="1:2" value="new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u06fJpN6EeCMzq_DpuBqhQ" key="1:3" value="raw"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u06fJ5N6EeCMzq_DpuBqhQ" key="2:0" value="name2"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u06fKJN6EeCMzq_DpuBqhQ" key="2:1" value="IExecutionService"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u06fKZN6EeCMzq_DpuBqhQ" key="2:2" value="$args.simulation? new SyncExecutionService($component.getServiceProvider()): new AsyncExecutionService($component.getServiceProvider())"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07GMJN6EeCMzq_DpuBqhQ" key="2:3" value="raw"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07GMZN6EeCMzq_DpuBqhQ" key="3:0" value="name3"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07GMpN6EeCMzq_DpuBqhQ" key="3:1" value="ILibraryService"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07GM5N6EeCMzq_DpuBqhQ" key="3:2" value="new LibraryService($args.libpath, $component.getServiceProvider())"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07GNJN6EeCMzq_DpuBqhQ" key="3:3" value="raw"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07GNZN6EeCMzq_DpuBqhQ" key="4:0" value="name4"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07GNpN6EeCMzq_DpuBqhQ" key="4:1" value="IClockService"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07GN5N6EeCMzq_DpuBqhQ" key="4:2" value="$args.simulation? new ClockService(new ClockCreationInfo(IClock.TYPE_EVENT_DRIVEN, &quot;simulation_clock&quot;, System.currentTimeMillis(), 100), $component.getServiceProvider()): new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, &quot;simulation_clock&quot;, System.currentTimeMillis(), 100), $component.getServiceProvider())"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07GOJN6EeCMzq_DpuBqhQ" key="4:3" value="raw"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07GOZN6EeCMzq_DpuBqhQ" key="5:0" value="name5"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07GOpN6EeCMzq_DpuBqhQ" key="5:1" value="IMessageService"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07tQJN6EeCMzq_DpuBqhQ" key="5:2" value="new MessageService($component.getExternalAccess(), new ITransport[]{new LocalTransport($component.getServiceProvider()), new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger())}, new MessageType[]{new FIPAMessageType()}, null, new CodecFactory())"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07tQZN6EeCMzq_DpuBqhQ" key="5:3" value="raw"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07tQpN6EeCMzq_DpuBqhQ" key="6:0" value="name6"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07tQ5N6EeCMzq_DpuBqhQ" key="6:1" value="IComponentManagementService"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07tRJN6EeCMzq_DpuBqhQ" key="6:2" value="new ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter(), $args.componentfactory)"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07tRZN6EeCMzq_DpuBqhQ" key="6:3" value="raw"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07tRpN6EeCMzq_DpuBqhQ" key="7:0" value="name7"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07tR5N6EeCMzq_DpuBqhQ" key="7:1" value="IDF"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07tSJN6EeCMzq_DpuBqhQ" key="7:2" value="new DirectoryFacilitatorService($component.getServiceProvider())"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07tSZN6EeCMzq_DpuBqhQ" key="7:3" value="raw"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u07tSpN6EeCMzq_DpuBqhQ" key="8:0" value="name8"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u08UUJN6EeCMzq_DpuBqhQ" key="8:1" value="ISimulationService"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u08UUZN6EeCMzq_DpuBqhQ" key="8:2" value="new SimulationService($component, SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{new String[]{\&quot;getMode\&quot;, \&quot;isExecuting\&quot;}}))"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u08UUpN6EeCMzq_DpuBqhQ" key="8:3" value="decoupled"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u08UU5N6EeCMzq_DpuBqhQ" key="9:0" value="name9"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u08UVJN6EeCMzq_DpuBqhQ" key="9:1" value="IDeploymentService"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u08UVZN6EeCMzq_DpuBqhQ" key="9:2" value="new DeploymentService($component.getServiceProvider())"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u08UVpN6EeCMzq_DpuBqhQ" key="9:3" value="decoupled"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfF3AJaeEeCiOdGap2wqmg" key="dimension" value="12:4"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfF3AZaeEeCiOdGap2wqmg" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfF3ApaeEeCiOdGap2wqmg" key="0:0" value="name"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfGeEJaeEeCiOdGap2wqmg" key="0:1" value="ISettingsService"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfGeEZaeEeCiOdGap2wqmg" key="0:2" value="new SettingsService($args.platformname, $component, $args.saveonexit)"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfGeEpaeEeCiOdGap2wqmg" key="0:3" value="decoupled"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfGeE5aeEeCiOdGap2wqmg" key="1:0" value="name1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfGeFJaeEeCiOdGap2wqmg" key="1:1" value="IThreadPool"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfGeFZaeEeCiOdGap2wqmg" key="1:2" value="new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfGeFpaeEeCiOdGap2wqmg" key="1:3" value="raw"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfGeF5aeEeCiOdGap2wqmg" key="2:0" value="name2"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfGeGJaeEeCiOdGap2wqmg" key="2:1" value="IExecutionService"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfGeGZaeEeCiOdGap2wqmg" key="2:2" value="$args.simulation? new SyncExecutionService($component.getServiceProvider()): new AsyncExecutionService($component.getServiceProvider())"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfGeGpaeEeCiOdGap2wqmg" key="2:3" value="raw"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHFIJaeEeCiOdGap2wqmg" key="3:0" value="name3"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHFIZaeEeCiOdGap2wqmg" key="3:1" value="ILibraryService"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHFIpaeEeCiOdGap2wqmg" key="3:2" value="new LibraryService($args.libpath, $component.getServiceProvider())"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHFI5aeEeCiOdGap2wqmg" key="3:3" value="raw"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHFJJaeEeCiOdGap2wqmg" key="4:0" value="name4"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHFJZaeEeCiOdGap2wqmg" key="4:1" value="IClockService"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHFJpaeEeCiOdGap2wqmg" key="4:2" value="$args.simulation? new ClockService(new ClockCreationInfo(IClock.TYPE_EVENT_DRIVEN, &quot;simulation_clock&quot;, System.currentTimeMillis(), 100), $component.getServiceProvider()): new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, &quot;simulation_clock&quot;, System.currentTimeMillis(), 100), $component.getServiceProvider())"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHFJ5aeEeCiOdGap2wqmg" key="4:3" value="raw"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHFKJaeEeCiOdGap2wqmg" key="5:0" value="name5"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHFKZaeEeCiOdGap2wqmg" key="5:1" value="IMessageService"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHFKpaeEeCiOdGap2wqmg" key="5:2" value="new MessageService($component.getExternalAccess(), $component.getLogger(), new ITransport[]{new LocalTransport($component.getServiceProvider()), new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger())}, new MessageType[]{new FIPAMessageType()}, null, new CodecFactory())"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHFK5aeEeCiOdGap2wqmg" key="5:3" value="raw"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHsMJaeEeCiOdGap2wqmg" key="6:0" value="name6"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHsMZaeEeCiOdGap2wqmg" key="6:1" value="IComponentManagementService"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHsMpaeEeCiOdGap2wqmg" key="6:2" value="new ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter(), $args.componentfactory)"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHsM5aeEeCiOdGap2wqmg" key="6:3" value="raw"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHsNJaeEeCiOdGap2wqmg" key="7:0" value="name7"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHsNZaeEeCiOdGap2wqmg" key="7:1" value="IDF"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHsNpaeEeCiOdGap2wqmg" key="7:2" value="new DirectoryFacilitatorService($component.getServiceProvider())"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHsN5aeEeCiOdGap2wqmg" key="7:3" value="raw"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHsOJaeEeCiOdGap2wqmg" key="8:0" value="name8"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfHsOZaeEeCiOdGap2wqmg" key="8:1" value="ISimulationService"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfITQJaeEeCiOdGap2wqmg" key="8:2" value="new SimulationService($component)"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfITQZaeEeCiOdGap2wqmg" key="8:3" value="decoupled"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfITQpaeEeCiOdGap2wqmg" key="9:0" value="name9"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfITQ5aeEeCiOdGap2wqmg" key="9:1" value="IDeploymentService"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfITRJaeEeCiOdGap2wqmg" key="9:2" value="new DeploymentService($component.getServiceProvider())"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfITRZaeEeCiOdGap2wqmg" key="9:3" value="decoupled"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfITRpaeEeCiOdGap2wqmg" key="10:0" value="envextension"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfITR5aeEeCiOdGap2wqmg" key="10:1" value="IComponentFactoryExtensionService"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfITSJaeEeCiOdGap2wqmg" key="10:2" value="jadex.extension.envsupport.EnvSupportExtensionService"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfITSZaeEeCiOdGap2wqmg" key="10:3" value="decoupled"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfITSpaeEeCiOdGap2wqmg" key="11:0" value="agrextension"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfI6UJaeEeCiOdGap2wqmg" key="11:1" value="IComponentFactoryExtensionService"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfI6UZaeEeCiOdGap2wqmg" key="11:2" value="jadex.extension.agr.AGRExtensionService"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OfI6UpaeEeCiOdGap2wqmg" key="11:3" value="decoupled"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_0JYnAJZ7EeCGSdC0Kjh73A" source="jadex_configurations_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2JsR4JZ7EeCGSdC0Kjh73A" key="dimension" value="2:2"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2Js48JZ7EeCGSdC0Kjh73A" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2Js48ZZ7EeCGSdC0Kjh73A" key="0:0" value="config1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2Js48pZ7EeCGSdC0Kjh73A" key="0:1" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2Js485Z7EeCGSdC0Kjh73A" key="1:0" value="config2"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2Js49JZ7EeCGSdC0Kjh73A" key="1:1" value=""/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_J77M5ZN0EeC8LZB_zl9TAg" iD="_J77M5JN0EeC8LZB_zl9TAg" name="Pool"/>
 </bpmn:BpmnDiagram>

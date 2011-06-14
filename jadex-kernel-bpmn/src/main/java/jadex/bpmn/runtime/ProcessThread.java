@@ -4,6 +4,7 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MParameter;
+import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.commons.IFilter;
@@ -509,7 +510,9 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public boolean belongsTo(String pool, String lane)
 	{
-		boolean	ret	= pool==null  || pool.equals(getActivity().getPool().getName());
+		// Pool null for external steps.
+		MPool po = getActivity().getPool();
+		boolean	ret	= pool==null || po==null || pool.equals(po.getName());
 		
 		// Test lane
 		if(ret && lane!=null)

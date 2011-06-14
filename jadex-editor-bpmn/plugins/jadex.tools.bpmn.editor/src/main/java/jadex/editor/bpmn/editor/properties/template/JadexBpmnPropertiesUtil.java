@@ -136,6 +136,9 @@ public class JadexBpmnPropertiesUtil
 	/** Key for the imports of a BPMN diagram. */
 	public static final String JADEX_IMPORT_LIST_DETAIL = "imports";
 	
+	/** Key for the configurations map of a BPMN diagram. */
+	public static final String JADEX_CONFIGURATIONS_LIST_DETAIL = "configurations";
+	
 	/** Key for the arguments of a BPMN diagram. */
 	public static final String JADEX_ARGUMENTS_LIST_DETAIL = "arguments";
 	
@@ -182,8 +185,6 @@ public class JadexBpmnPropertiesUtil
 	public static final String JADEX_EVENT_ERROR_DETAIL = "error";
 	
 	
-	
-	
 	/** Key for the table unique column index. */
 	public static final String JADEX_TABLE_KEY_EXTENSION = "table";
 	
@@ -197,8 +198,6 @@ public class JadexBpmnPropertiesUtil
 	public static final String JADEX_TABLE_DIMENSION_DELIMITER = ":";
 	
 	
-	
-	
 	/** Delimiter for combined keys (e.g. "annotationIdentifier + annotaionDetailIdentifier" for e.g. tables) */
 	public static final String JADEX_COMBINED_KEY_DELIMITER = "_";
 
@@ -208,10 +207,6 @@ public class JadexBpmnPropertiesUtil
 	static {
 		RESERVED_BPMN_ANNOTATIONS.add("isThrowing");
 	}
-	
-	
-	
-	
 	
 	
 	/** The modelElement, may NOT be null. */
@@ -224,8 +219,7 @@ public class JadexBpmnPropertiesUtil
 	protected String annotationDetailName;
 
 	/**
-	 * @param containerEAnnotationName
-	 * @param annotationDetailName
+	 * 
 	 */
 	public JadexBpmnPropertiesUtil(String containerEAnnotationName,
 			String annotationDetailName, AbstractCommonPropertySection section)
@@ -239,7 +233,6 @@ public class JadexBpmnPropertiesUtil
 		this.section = section;
 		this.containerEAnnotationName = containerEAnnotationName;
 		this.annotationDetailName = annotationDetailName;
-		
 	}
 
 
@@ -247,8 +240,6 @@ public class JadexBpmnPropertiesUtil
 
 	/**
 	 * Update 
-	 * @param detail
-	 * @param value
 	 */
 	protected boolean updateJadexEAnnotation(final String detail, final String value)
 	{

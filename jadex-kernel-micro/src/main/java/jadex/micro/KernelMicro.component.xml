@@ -15,7 +15,7 @@
 	
 	<properties>
 		<property name="kernel.types" class="String[]">
-			new String[] {"Agent.class"}
+			new String[]{"Agent.class"}
 		</property>
 	</properties>
 	

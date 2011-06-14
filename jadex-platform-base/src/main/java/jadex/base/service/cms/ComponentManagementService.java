@@ -252,6 +252,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	public IFuture createComponent(final String name, final String modelname, CreationInfo info, final IResultListener killlistener)
 	{				
+//		System.out.println("create component: "+modelname+" "+name);
 		final Future inited = new Future();
 		
 		final CreationInfo cinfo = info!=null? info: new CreationInfo();	// Dummy default info, if null.
@@ -301,6 +302,11 @@ public abstract class ComponentManagementService extends BasicService implements
 						getComponentFactory(model, cinfo, cl)
 							.addResultListener(new DelegationResultListener(inited)
 						{
+							public void exceptionOccurred(Exception exception)
+							{
+								super.exceptionOccurred(exception);
+							}
+								
 							public void customResultAvailable(Object result)
 							{
 								final IComponentFactory factory = (IComponentFactory)result;
@@ -375,7 +381,7 @@ public abstract class ComponentManagementService extends BasicService implements
 															
 															synchronized(adapters)
 															{
-		//														System.out.println("created: "+ad);
+//																System.out.println("created: "+ad);
 																
 																// Init successfully finished. Add description and adapter.
 																adapter = (IComponentAdapter)((Object[])result)[1];
@@ -912,6 +918,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	public IFuture destroyComponent(final IComponentIdentifier cid)
 	{
+//		System.out.println("destroy component: "+cid);
 		boolean contains = false;
 		Future tmp;
 		synchronized(adapters)

@@ -87,7 +87,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 			this.parent = parent;
 			this.arguments = arguments;
 			this.bindings = bindings;
-			if (factory != null)
+			if(factory != null)
 				this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 			this.container = new ComponentServiceContainer(adapter, desc.getType());
 		}

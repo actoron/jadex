@@ -173,7 +173,9 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 */
 	public IFuture	componentCreated(final IComponentDescription desc, final IModelInfo model)
 	{
-		return scheduleStep(new IComponentStep()
+		// cannot use scheduleStep as it is not available in init phase of component.
+//		return scheduleStep(new IComponentStep()
+		return getExternalAccess().scheduleImmediate(new IComponentStep()
 		{
 			public Object execute(IInternalAccess ia)
 			{
@@ -193,6 +195,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 */
 	public IFuture	componentDestroyed(final IComponentDescription desc)
 	{
+//		System.out.println("dest: "+desc.getName());
 		return scheduleStep(new IComponentStep()
 		{
 			public Object execute(IInternalAccess ia)
@@ -336,12 +339,12 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		
 		final Future ret = new Future();
 		
-		initArguments(model, config).addResultListener(
+		initFutureProperties(model).addResultListener(
 			createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				initFutureProperties(model).addResultListener(
+				initArguments(model, config).addResultListener(
 					createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)

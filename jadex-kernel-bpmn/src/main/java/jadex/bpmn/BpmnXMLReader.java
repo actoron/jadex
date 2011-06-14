@@ -17,6 +17,7 @@ import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -1319,6 +1320,7 @@ public class BpmnXMLReader
 		public Object postProcess(IContext context, Object object)
 		{
 			MBpmnModel model = (MBpmnModel)context.getRootObject();
+			ModelInfo mi = (ModelInfo)model.getModelInfo();
 			JavaCCExpressionParser parser = new JavaCCExpressionParser();
 
 			// Handle the annotations of the model (Jadex BPMN Editor).
@@ -1389,6 +1391,25 @@ public class BpmnXMLReader
 								}
 							}
 						}
+					}
+				}
+				
+				for(int i=0; i<annos.size(); i++)
+				{
+					MAnnotation anno = (MAnnotation)annos.get(i);
+					if(anno.getSource().toLowerCase().endsWith("_configurations_table"))
+					{
+						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno.getDetails());
+						for(int row = 0; row < table.getDimension(0); row++)
+						{
+							// normal configurations has 2 values
+							assert table.getRow(row).length == 2;
+							String name = table.getCellValue(row, 0);
+							String poollane = table.getCellValue(row, 1);
+							mi.addConfiguration(new ConfigurationInfo(name));
+							model.addPoolLane(name, poollane);
+						}
+						break;
 					}
 				}
 				
@@ -1490,7 +1511,7 @@ public class BpmnXMLReader
 						for(int row=0; row<table.getDimension(0); row++)
 						{
 							// normal property has 4 values
-							assert table.getRow(row).length == 4;
+//							assert table.getRow(row).length == 4;
 							String name = table.getCellValue(row, 0);
 							String typename = table.getCellValue(row, 1);
 							String implname = table.getCellValue(row, 2);
@@ -1503,8 +1524,41 @@ public class BpmnXMLReader
 							Class type = SReflect.findClass0(typename, model.getAllImports(), context.getClassLoader());
 							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, psim);
 
-							ModelInfo mi = (ModelInfo)model.getModelInfo();
 							mi.addProvidedService(psi);
+						}
+					}
+					else if(anno.getSource().toLowerCase().endsWith("_subcomponents_table"))
+					{
+						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno.getDetails());
+						for(int row=0; row<table.getDimension(0); row++)
+						{
+							// normal property has 5 values
+//							assert table.getRow(row).length == 5;
+							String name = table.getCellValue(row, 0);
+							String filename = table.getCellValue(row, 1);
+
+							SubcomponentTypeInfo suco = new SubcomponentTypeInfo(name, filename);
+							mi.addSubcomponentType(suco);
+							
+							ConfigurationInfo[] configs = mi.getConfigurations();
+							// todo: repair me
+							int j=0;
+//							for(int j=0; j<configs.length; j++)
+							{
+								String instname = table.getCellValue(row, 2);
+								String number = table.getCellValue(row, 3);
+								
+								// todo: config and args
+//								String config = table.getCellValue(row, 4);
+//								String args = table.getCellValue(row, 4);
+								if((instname!=null && instname.length()>0) || (number!=null && number.length()>0))
+								{
+									ComponentInstanceInfo cii = new ComponentInstanceInfo(instname!=null && instname.length()>0? instname: null, 
+										name!=null && name.length()>0? name: null, null, number!=null && number.length()>0? number: null);
+									// todo: support arguments
+									configs[j].addComponentInstance(cii);
+								}
+							}
 						}
 					}
 					else if (!anno.getSource().toLowerCase().endsWith("table"))
@@ -1529,10 +1583,6 @@ public class BpmnXMLReader
 								else if("description".equals(key))
 								{
 									model.setDescription(value);
-								}
-								else if("configuration".equals(key))
-								{
-									((ModelInfo)model.getModelInfo()).addConfiguration(new ConfigurationInfo(value));
 								}
 								else if("parameters".equals(key))
 								{

@@ -40,6 +40,17 @@ public class ComponentInstanceInfo extends Startable
 	{
 	}
 	
+	/**
+	 *  Create a new component.
+	 */
+	public ComponentInstanceInfo(String name, String typename, String configuration, String number)
+	{
+		this.name = name;
+		this.typename = typename;
+		this.configuration = configuration;
+		this.number = number;
+	}
+	
 	//-------- methods --------
 	
 	/**

@@ -62,6 +62,9 @@ public class Starter
 	/** The adapter factory classname. */
 	public static final String ADAPTER_FACTORY = "adapterfactory";
 	
+	/** The autoshutdown flag. */
+	public static final String AUTOSHUTDOWN = "autoshutdown";
+
 	
 	/** The reserved platform parameters. */
 	public static final Set RESERVED;
@@ -74,6 +77,7 @@ public class Starter
 		RESERVED.add(PLATFORM_NAME);
 		RESERVED.add(COMPONENT_FACTORY);
 		RESERVED.add(ADAPTER_FACTORY);
+		RESERVED.add(AUTOSHUTDOWN);
 	}
 	
 	/** The shutdown in progress flag. */
@@ -249,7 +253,21 @@ public class Starter
 							try
 							{
 								String ctype = (String)result;
-								final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, null, null, Boolean.TRUE, model.getFullName(), null);
+								
+								Boolean autosd = null; 
+								String autosdstr = (String)cmdargs.get(AUTOSHUTDOWN);
+								if(autosdstr!=null)
+								{
+									try
+									{
+										autosd = new Boolean(autosdstr);
+									}
+									catch(Exception e)
+									{
+									}
+								}
+								
+								final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, null, null, autosd, model.getFullName(), null);
 								
 								String afclname = (String)cmdargs.get(ADAPTER_FACTORY)!=null? 
 									(String)cmdargs.get(ADAPTER_FACTORY): FALLBACK_ADAPTER_FACTORY;

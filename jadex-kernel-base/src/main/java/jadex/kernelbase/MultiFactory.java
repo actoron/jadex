@@ -145,16 +145,22 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		this.baseextensionblacklist.add(null);
 		
 		kerneldefaultlocations = new HashMap();
-		if (defaultLocations != null)
+		if(defaultLocations != null)
+		{
 			for (int i = 0; i < defaultLocations.length; ++i)
+			{
 				kerneldefaultlocations.put(defaultLocations[i], null);
+			}
+		}
 		
 		activatedkernels = new HashSet();
 		componenttypes = new HashSet();
 		iconcache = new HashMap();
 		this.kernelblacklist = new HashSet();
-		if (kernelblacklist != null)
-				this.kernelblacklist.addAll(Arrays.asList(kernelblacklist));
+		if(kernelblacklist != null)
+		{
+			this.kernelblacklist.addAll(Arrays.asList(kernelblacklist));
+		}
 		this.extensionblacklist = new HashSet(baseextensionblacklist);
 		this.potentialkernellocations = new HashSet();
 		this.listeners = new ArrayList();
@@ -338,10 +344,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	/**
 	 * Test if a model can be loaded by the factory.
 	 * 
-	 * @param model
-	 *            The model (e.g. file name).
-	 * @param The
-	 *            imports (if any).
+	 * @param model The model (e.g. file name).
+	 * @param The imports (if any).
 	 * @return True, if model can be loaded.
 	 */
 	public IFuture isLoadable(String model, String[] imports, ClassLoader classloader)
@@ -351,7 +355,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		{
 			public void resultAvailable(Object result)
 			{
-				if (result != null)
+				if(result != null)
 					ret.setResult(true);
 				else
 					ret.setResult(false);
@@ -575,13 +579,13 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	protected IFuture findKernel(final String model, final String[] imports, final ClassLoader classloader, final boolean isrecur)
 	{
 		final String ext = getModelExtension(model);
-		if (extensionblacklist.contains(ext))
+		if(extensionblacklist.contains(ext))
 			return IFuture.DONE;
 		
 //		System.out.println("findKernel: "+model);
 		
-		IComponentFactory fac = (IComponentFactory) factorycache.get(ext);
-		if (fac != null)
+		IComponentFactory fac = (IComponentFactory)factorycache.get(ext);
+		if(fac != null)
 			return new Future(fac);
 		
 		final Future ret = new Future();
@@ -616,7 +620,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			public void exceptionOccurred(Exception exception)
 			{
 				// Give warning?
-				if (!isrecur)
+				if(!isrecur)
 					extensionblacklist.add(ext);
 				resultAvailable(null);
 			}

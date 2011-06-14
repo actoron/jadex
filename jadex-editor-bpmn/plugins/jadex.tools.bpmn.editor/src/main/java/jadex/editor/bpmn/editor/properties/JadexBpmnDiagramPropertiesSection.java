@@ -27,8 +27,8 @@ public class JadexBpmnDiagramPropertiesSection extends AbstractMultiTextfieldPro
 	
 	private static final String[] textFieldNames = new String[]{
 		Messages.JadexGlobalDiagramSection_Description_Label,
-		Messages.JadexGlobalDiagramSection_Package_Label,
-		"Configuration"
+		Messages.JadexGlobalDiagramSection_Package_Label
+		//"Configuration"
 //		Messages.JadexGlobalDiagramSection_Configuration_Label
 	};
 	
