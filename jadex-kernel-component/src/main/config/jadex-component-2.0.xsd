@@ -1,10 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" xmlns:jadex="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 	<xs:element name="componenttype" type="componenttype">
 		<xs:annotation>
 			<xs:documentation>A component type specifies the interface, the structure and content of a component.</xs:documentation>
 		</xs:annotation>
+		<!-- keys on type level -->
+		<xs:key name="argument_name">
+			<xs:selector xpath="jadex:arguments/jadex:argument"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
+		<xs:key name="component_name">
+			<xs:selector xpath="jadex:componenttypes/jadex:componenttype"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
+		<xs:key name="providedservice_key">
+			<xs:selector xpath="jadex:services/jadex:providedservice"/>
+			<xs:field xpath="@name|@class"/>
+		</xs:key>
+		<xs:unique name="providedservice_name">
+			<xs:selector xpath="jadex:services/jadex:providedservice"/>
+			<xs:field xpath="@name"/>
+		</xs:unique>
+		<xs:key name="requiredservice_name">
+			<xs:selector xpath="jadex:services/jadex:requiredservice"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
+		<xs:key name="property_name">
+			<xs:selector xpath="jadex:properties/jadex:property"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
+		<!-- key references in configurations -->
+		<xs:keyref name="argument_reference" refer="argument_name">
+			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:arguments/jadex:argument"/>
+			<xs:field xpath="@name"/>
+		</xs:keyref>
+		<xs:keyref name="component_reference" refer="component_name">
+			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:components/jadex:component"/>
+			<xs:field xpath="@type"/>
+		</xs:keyref>
+		<xs:keyref name="providedservice_reference" refer="providedservice_key">
+			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:services/jadex:providedservice"/>
+			<xs:field xpath="@name|@class"/>
+		</xs:keyref>
+		<xs:keyref name="requiredservice_reference" refer="requiredservice_name">
+			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:services/jadex:requiredservice"/>
+			<xs:field xpath="@name"/>
+		</xs:keyref>
 	</xs:element>
 	<xs:complexType name="componenttype">
 		<xs:annotation>
@@ -127,6 +169,23 @@
 						configuration.
 					</xs:documentation>
 				</xs:annotation>
+				<!-- Configuration unique constraints defined here, because elements need only be unique inside one config. -->
+				<xs:key name="config_argument_name">
+					<xs:selector xpath="jadex:arguments/jadex:argument"/>
+					<xs:field xpath="@name"/>
+				</xs:key>
+				<xs:key name="config_providedservice_key">
+					<xs:selector xpath="jadex:services/jadex:providedservice"/>
+					<xs:field xpath="@name|@class"/>
+				</xs:key>
+				<xs:unique name="config_providedservice_name">
+					<xs:selector xpath="jadex:services/jadex:providedservice"/>
+					<xs:field xpath="@name"/>
+				</xs:unique>
+				<xs:key name="config_requiredservice_name">
+					<xs:selector xpath="jadex:services/jadex:requiredservice"/>
+					<xs:field xpath="@name"/>
+				</xs:key>
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
@@ -209,7 +268,7 @@
 			<xs:element name="providedservice" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:complexContent>
-						<xs:extension base="serviceref">
+						<xs:extension base="providedserviceref">
 							<xs:sequence>
 								<xs:element name="implementation" type="implementation"/>
 							</xs:sequence>
@@ -220,7 +279,7 @@
 			<xs:element name="requiredservice" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:complexContent>
-						<xs:extension base="serviceref">
+						<xs:extension base="requiredserviceref">
 							<xs:sequence>
 								<xs:element name="binding" type="binding"/>
 							</xs:sequence>
@@ -315,13 +374,7 @@
 			<xs:documentation>Defines a provided service type.</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="implementation">
-				<xs:complexType>
-					<xs:complexContent>
-						<xs:extension base="implementation"/>
-					</xs:complexContent>
-				</xs:complexType>
-			</xs:element>
+			<xs:element name="implementation" type="implementation"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="optional"/>
 		<xs:attribute name="class" type="xs:string" use="required"/>
@@ -372,7 +425,10 @@
 		<xs:attribute name="recover" type="xs:boolean" use="optional" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="describabletype"/>
-	<xs:complexType name="serviceref">
+	<xs:complexType name="requiredserviceref">
+		<xs:attribute name="name" type="xs:string" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="providedserviceref">
 		<xs:attribute name="name" type="xs:string" use="optional"/>
 		<xs:attribute name="class" type="xs:string" use="optional"/>
 	</xs:complexType>

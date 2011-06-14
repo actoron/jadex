@@ -1,6 +1,5 @@
 package jadex.bridge.modelinfo;
 
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 import java.util.HashMap;

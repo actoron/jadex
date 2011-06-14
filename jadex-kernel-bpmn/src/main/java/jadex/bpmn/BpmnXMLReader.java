@@ -32,7 +32,6 @@ import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
 import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.SJavaParser;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
