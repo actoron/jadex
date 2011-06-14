@@ -158,7 +158,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				{
 					IComponentManagementService cms = (IComponentManagementService)result;
 					IFuture ret = cms.createComponent(null, file,
-						new CreationInfo(null, args, instance.getComponentIdentifier(), false, instance.getModelElement().getAllImports()), 
+						new CreationInfo(null, args, instance.getComponentIdentifier(), false, instance.getModelElement().getModelInfo().getAllImports()), 
 						new IResultListener()
 						{
 							public void resultAvailable(final Object result)

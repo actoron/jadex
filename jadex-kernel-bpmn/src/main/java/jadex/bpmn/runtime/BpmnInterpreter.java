@@ -1008,14 +1008,20 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	 */
 	public Object getContextVariable(String name)
 	{
+		Object ret;
 		if(variables!=null && variables.containsKey(name))
 		{
-			return variables.get(name);			
+			ret = variables.get(name);			
+		}
+		else if(getModel().getArgument(name)!=null)
+		{
+			ret = getModel().getArgument(name);
 		}
 		else
 		{
 			throw new RuntimeException("Undeclared context variable: "+name+", "+this);
 		}
+		return ret;
 	}
 	
 	/**
@@ -1035,41 +1041,56 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	 */
 	public void setContextVariable(String name, Object key, Object value)
 	{
-		if(variables!=null && variables.containsKey(name))
+		boolean isvar = variables!=null && variables.containsKey(name);
+		boolean isres = getModel().getResult(name)!=null;
+		if(!isres && !isvar)
 		{
-			if(key==null)
+			throw new RuntimeException("Undeclared context variable: "+name+", "+this);
+		}
+		
+		if(key==null)
+		{
+			if(isres)
 			{
-				variables.put(name, value);	
+				setResultValue(name, value);
 			}
 			else
 			{
-				Object coll = variables.get(name);
-				if(coll instanceof List)
-				{
-					int index = key==null? -1: ((Number)key).intValue();
-					if(index>=0)
-						((List)coll).set(index, value);
-					else
-						((List)coll).add(value);
-				}
-				else if(coll!=null && coll.getClass().isArray())
-				{
-					int index = ((Number)key).intValue();
-					Array.set(coll, index, value);
-				}
-				else if(coll instanceof Map)
-				{
-					((Map)coll).put(key, value);
-				}
-//				else
-//				{
-//					throw new RuntimeException("Unsupported collection type: "+coll);
-//				}
+				variables.put(name, value);	
 			}
 		}
 		else
 		{
-			throw new RuntimeException("Undeclared context variable: "+name+", "+this);
+			Object coll;
+			if(isres)
+			{
+				coll = getResults().get(name);
+			}
+			else
+			{
+				coll = variables.get(name);
+			}
+			if(coll instanceof List)
+			{
+				int index = key==null? -1: ((Number)key).intValue();
+				if(index>=0)
+					((List)coll).set(index, value);
+				else
+					((List)coll).add(value);
+			}
+			else if(coll!=null && coll.getClass().isArray())
+			{
+				int index = ((Number)key).intValue();
+				Array.set(coll, index, value);
+			}
+			else if(coll instanceof Map)
+			{
+				((Map)coll).put(key, value);
+			}
+//				else
+//				{
+//					throw new RuntimeException("Unsupported collection type: "+coll);
+//				}
 		}
 	}
 	
@@ -1218,57 +1239,57 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		return fetcher;
 	}
 	
-	/**
-	 *  Add a default value for an argument (if not already present).
-	 *  Called once for each argument during init.
-	 *  @param name	The argument name.
-	 *  @param value	The argument value.
-	 */
-	public void	addDefaultArgument(String name, Object value)
-	{
-		// super to ensure that getArguments() return correct values.
-		super.addDefaultArgument(name, value); 
-		if(!variables.containsKey(name))
-		{
-//			System.out.println("arg: "+name+" "+value);
-			variables.put(name, value);
-		}
-	}
+//	/**
+//	 *  Add a default value for an argument (if not already present).
+//	 *  Called once for each argument during init.
+//	 *  @param name	The argument name.
+//	 *  @param value	The argument value.
+//	 */
+//	public void	addDefaultArgument(String name, Object value)
+//	{
+//		// super to ensure that getArguments() return correct values.
+//		super.addDefaultArgument(name, value); 
+//		if(!variables.containsKey(name))
+//		{
+////			System.out.println("arg: "+name+" "+value);
+//			variables.put(name, value);
+//		}
+//	}
 	
-	/**
-	 *  Add a default value for a result (if not already present).
-	 *  Called once for each result during init.
-	 *  @param name	The result name.
-	 *  @param value	The result value.
-	 */
-	public void	addDefaultResult(String name, Object value)
-	{
-//		super.addDefaultResult(name, value);
-		if(!variables.containsKey(name))
-		{
-			variables.put(name, value);
-		}
-	}
+//	/**
+//	 *  Add a default value for a result (if not already present).
+//	 *  Called once for each result during init.
+//	 *  @param name	The result name.
+//	 *  @param value	The result value.
+//	 */
+//	public void	addDefaultResult(String name, Object value)
+//	{
+////		super.addDefaultResult(name, value);
+//		if(!variables.containsKey(name))
+//		{
+//			variables.put(name, value);
+//		}
+//	}
 	
-	/**
-	 *  Get the results of the component (considering it as a functionality).
-	 *  @return The results map (name -> value). 
-	 */
-	public Map getResults()
-	{
-		IArgument[] results = getModel().getResults();
-		Map res = new HashMap();
-		
-		for(int i=0; i<results.length; i++)
-		{
-			String resname = results[i].getName();
-			if(variables.containsKey(resname))
-			{
-				res.put(resname, variables.get(resname));
-			}
-		}
-		return res;
-	}
+//	/**
+//	 *  Get the results of the component (considering it as a functionality).
+//	 *  @return The results map (name -> value). 
+//	 */
+//	public Map getResults()
+//	{
+//		IArgument[] results = getModel().getResults();
+//		Map res = new HashMap();
+//		
+//		for(int i=0; i<results.length; i++)
+//		{
+//			String resname = results[i].getName();
+//			if(variables.containsKey(resname))
+//			{
+//				res.put(resname, variables.get(resname));
+//			}
+//		}
+//		return res;
+//	}
 	
 	/**
 	 *  Get the internal access.

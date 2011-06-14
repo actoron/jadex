@@ -96,6 +96,13 @@ public interface IModelInfo
 	public IArgument[] getResults();
 	
 	/**
+	 *  Get the results.
+	 *  @param name The name.
+	 *  @return The results.
+	 */
+	public IArgument getResult(String name);
+	
+	/**
 	 *  Is the model startable.
 	 *  @return True, if startable.
 	 */

@@ -117,7 +117,7 @@ public class CreateComponentTask implements ITask
 				
 				cms.createComponent(name, model,
 					new CreationInfo(config, args, sub ? instance.getComponentAdapter().getComponentIdentifier() : null, 
-						suspend, master, daemon, autoshutdown, instance.getModelElement().getAllImports(), bindings), lis);
+						suspend, master, daemon, autoshutdown, instance.getModelElement().getModelInfo().getAllImports(), bindings), lis);
 
 				if(!wait)
 				{

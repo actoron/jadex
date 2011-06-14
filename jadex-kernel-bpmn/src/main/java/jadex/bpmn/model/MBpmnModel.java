@@ -134,8 +134,8 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	
 	//-------- added structures --------
 
-	/** The imports. */
-	protected List imports;
+//	/** The imports. */
+//	protected List imports;
 	
 	/** The context variables (name -> [class, initexpression]). */
 	protected Map variables;
@@ -190,8 +190,8 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 //			modelinfo.setConfigurations(cinfo);
 		}
 		
-		if(imports!=null)
-			modelinfo.setImports((String[])imports.toArray(new String[imports.size()]));
+//		if(imports!=null)
+//			modelinfo.setImports((String[])imports.toArray(new String[imports.size()]));
 		
 		modelinfo.setStartable(true);
 	}
@@ -771,19 +771,19 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		return configpoollanes==null? null: (String)configpoollanes.get(config);
 	}
 
-	/**
-	 *  Get all imports.
-	 *  @return The imports.
-	 */
-	public String[] getAllImports()
-	{
-		List ret = new ArrayList();
-		if(modelinfo.getPackage()!=null)
-			ret.add(modelinfo.getPackage()+".*");
-		if(imports!=null)
-			ret.addAll(imports);
-		return (String[])ret.toArray(new String[ret.size()]);
-	}
+//	/**
+//	 *  Get all imports.
+//	 *  @return The imports.
+//	 */
+//	public String[] getAllImports()
+//	{
+//		List ret = new ArrayList();
+//		if(modelinfo.getPackage()!=null)
+//			ret.add(modelinfo.getPackage()+".*");
+//		if(imports!=null)
+//			ret.addAll(imports);
+//		return (String[])ret.toArray(new String[ret.size()]);
+//	}
 	
 	/**
 	 *  Set the imports.
@@ -800,9 +800,10 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 */
 	public void addImport(String imp)
 	{
-		if(imports==null)
-			imports = new ArrayList();
-		this.imports.add(imp);
+		modelinfo.addImport(imp);
+//		if(imports==null)
+//			imports = new ArrayList();
+//		this.imports.add(imp);
 	}
 	
 	/**
