@@ -64,6 +64,12 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 					{
 						inited.setResult(new Object[]{ComponentInterpreter.this, adapter});
 					}
+					public void exceptionOccurred(Exception exception)
+					{
+						// Hack!!! May be set already when component terminated during init.
+						if(!future.isDone())
+							super.exceptionOccurred(exception);
+					}
 				}));
 				
 				return null;
