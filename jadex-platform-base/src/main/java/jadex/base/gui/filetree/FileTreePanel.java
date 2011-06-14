@@ -307,16 +307,25 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	/**
 	 *  Add a top level node.
 	 */
+	public void	removeTopLevelNode(ITreeNode node)
+	{
+		RootNode root = (RootNode)getModel().getRoot();
+		root.removeChild(node);
+		for(int i=0; i<root.getChildCount(); i++)
+			model.fireNodeChanged((ITreeNode) root.getCachedChildren().get(i));
+	}
+	
+	/**
+	 *  Add a top level node.
+	 */
 	public void	addTopLevelNode(File file)
 	{
 		assert !remote;
 		
-		final RootNode root = (RootNode)getModel().getRoot();
+		RootNode root = (RootNode)getModel().getRoot();
 		ITreeNode node = factory.createNode(root, model, tree, file, 
 			iconcache, filefilter, exta, factory);
-		root.addChild(node);
-		
-		tree.scrollPathToVisible(new TreePath(new Object[]{root, node}));
+		addNode(node);
 	}
 	
 	/**
@@ -329,7 +338,20 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		final RootNode root = (RootNode)getModel().getRoot();
 		ITreeNode node = factory.createNode(root, model, tree, file, 
 			iconcache, filefilter, exta, factory);
+		addNode(node);
+	}
+	
+	/**
+	 *  Add a root node to the tree panel. 
+	 */
+	protected void	addNode(ITreeNode node)
+	{
+		final RootNode root = (RootNode)getModel().getRoot();
 		root.addChild(node);
+		
+		for(int i=0; i<root.getChildCount(); i++)
+			model.fireNodeChanged((ITreeNode) root.getCachedChildren().get(i));
+		tree.scrollPathToVisible(new TreePath(new Object[]{root, node}));
 	}
 	
 	/**
@@ -455,7 +477,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 							for(int i=0; i<entries.length; i++)
 							{
 								ITreeNode node = factory.createNode(root, model, tree, new File(entries[i]), iconcache, filefilter, exta, factory);
-								root.addChild(node);
+								addNode(node);
 							}
 							rootdone.setResult(null);
 						}
@@ -481,7 +503,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 									for(int i=0; i<entries.length; i++)
 									{
 										ITreeNode node = factory.createNode(root, model, tree, entries[i], iconcache, filefilter, exta, factory);
-										root.addChild(node);
+										addNode(node);
 									}
 									rootdone.setResult(null);
 								}

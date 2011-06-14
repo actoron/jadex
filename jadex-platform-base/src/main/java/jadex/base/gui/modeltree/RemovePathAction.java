@@ -4,7 +4,6 @@ import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.FileTreePanel;
-import jadex.base.gui.filetree.RootNode;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
@@ -73,7 +72,7 @@ public class RemovePathAction extends ToolTipAction
 	public void actionPerformed(ActionEvent e)
 	{
 		final ITreeNode	node = (ITreeNode)treepanel.getTree().getLastSelectedPathComponent();
-		((RootNode)treepanel.getTree().getModel().getRoot()).removeChild(node);
+		treepanel.removeTopLevelNode(node);
 		
 		// todo: jars
 		if(treepanel.getExternalAccess()!=null && node instanceof FileNode)
