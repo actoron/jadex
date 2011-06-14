@@ -23,6 +23,8 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.ProvidedServiceImplementation;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.commons.IFilter;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
@@ -30,6 +32,7 @@ import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
 import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SJavaParser;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
@@ -622,19 +625,18 @@ public class BpmnXMLReader
 					// new jadex parameter handling - we accept ALL "_parameters_table"
 					if(anno.getSource().toLowerCase().endsWith("_parameters_table"))
 					{
-						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
-								.getDetails());
+						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno.getDetails());
 						
-						for (int row = 0; row < table.dimension[0]; row++)
+						for(int row = 0; row < table.getDimension(0); row++)
 						{
 							// normal activity parameter has 4 values
-							if (table.data[row].length == 4)
+							if(table.getRow(row).length == 4)
 							{
 							
-								String dir = table.data[row][0]; 		// direction
-								String name = table.data[row][1];		// name
-								String clazzname = table.data[row][2];	// class
-								String val = table.data[row][3] != "" ? table.data[row][3] : null;		// value
+								String dir = table.getCellValue(row, 0); 		// direction
+								String name = table.getCellValue(row, 1);		// name
+								String clazzname = table.getCellValue(row, 2);	// class
+								String val = table.getCellValue(row, 3) != "" ? table.getCellValue(row, 3) : null;		// value
 								
 								try
 								{
@@ -656,10 +658,10 @@ public class BpmnXMLReader
 							
 							// Parameters of event handlers have 2 elements = are treated as properties?! 
 							// TODO: rename parameters to properties in editor and write converter?
-							else if (table.data[row].length == 2)
+							else if (table.getRow(row).length == 2)
 							{
-								String name =  table.data[row][0];
-								String val = table.data[row][1] != "" ? table.data[row][1] : null;
+								String name =  table.getCellValue(row, 0);
+								String val = table.getCellValue(row, 1) != "" ? table.getCellValue(row, 1) : null;
 								
 								// context variable
 								IParsedExpression exp = null;
@@ -672,7 +674,7 @@ public class BpmnXMLReader
 							
 							else
 							{
-								throw new RuntimeException("Parameter specification error: "+table.data[row].length+" "+Arrays.toString(table.data[row]));
+								throw new RuntimeException("Parameter specification error: "+table.getRow(row).length+" "+Arrays.toString(table.getRow(row)));
 							}
 								
 						}
@@ -687,13 +689,13 @@ public class BpmnXMLReader
 						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
 								.getDetails());
 						
-						for (int row = 0; row < table.dimension[0]; row++)
+						for (int row = 0; row < table.getDimension(0); row++)
 						{
 							// normal property has 2 values
-							assert table.data[row].length == 2;
+							assert table.getRow(row).length == 2;
 			
-							String name =  table.data[row][0];
-							String val = table.data[row][1] != "" ? table.data[row][1] : null;
+							String name =  table.getCellValue(row, 0);
+							String val = table.getCellValue(row, 1) != "" ? table.getCellValue(row, 1) : null;
 							
 							// context variable
 							IParsedExpression exp = null;
@@ -1066,15 +1068,14 @@ public class BpmnXMLReader
 					// todo: enhance mappings with index?
 					if(anno.getSource().toLowerCase().endsWith("_mappings_table"))
 					{
-						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
-								.getDetails());
+						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno.getDetails());
 						
-						for (int row = 0; row < table.dimension[0]; row++)
+						for (int row = 0; row < table.getDimension(0); row++)
 						{
 							try
 							{
 								// normal mapping has 2 values
-								assert table.data[row].length == 2;
+								assert table.getRow(row).length == 2;
 							}
 							catch (AssertionError e)
 							{
@@ -1082,8 +1083,8 @@ public class BpmnXMLReader
 								e.printStackTrace();
 							}
 							
-							String propname = table.data[row][0];
-							String proptext = table.data[row][1];
+							String propname = table.getCellValue(row, 0);
+							String proptext = table.getCellValue(row, 1);
 
 							IParsedExpression exp = parser.parseExpression(proptext, dia.getAllImports(), null, context.getClassLoader());
 							IParsedExpression iexp	= null;
@@ -1336,12 +1337,12 @@ public class BpmnXMLReader
 					{
 						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno.getDetails());
 
-						for(int row = 0; row < table.dimension[0]; row++) 
+						for(int row = 0; row < table.getDimension(0); row++) 
 						{
 							// normal import has 1 value
-							assert table.data[row].length == 1;
+							assert table.getRow(row).length == 1;
 
-							String imp = table.data[row][0];
+							String imp = table.getCellValue(row, 0);
 							if(imp.length() > 0)
 								model.addImport(imp);
 						}
@@ -1401,17 +1402,17 @@ public class BpmnXMLReader
 					{
 						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno.getDetails());
 						
-						for(int row = 0; row < table.dimension[0]; row++)
+						for(int row = 0; row < table.getDimension(0); row++)
 						{
-							// normal argument has 6 values
-							assert table.data[row].length == 7;
+							// normal argument has 6 (+x) values
+							assert table.getRow(row).length == 7;
 							
-							String name = table.data[row][0];
-							String isarg = table.data[row][1];
-							String isres = table.data[row][2];
-							String desc = table.data[row][3];
-							String typename = table.data[row][4];
-							String val = table.data[row][5] != "" ? table.data[row][5] : null;
+							String name = table.getCellValue(row, 0);
+							String isarg = table.getCellValue(row, 1);
+							String isres = table.getCellValue(row, 2);
+							String desc = table.getCellValue(row, 3);
+							String typename = table.getCellValue(row, 4);
+							String val = table.getCellValue(row, 5) != "" ? table.getCellValue(row, 5) : null;
 							IParsedExpression exp = null;
 
 							// todo: inserz initial values for arguments in configurations
@@ -1468,12 +1469,12 @@ public class BpmnXMLReader
 					else if(anno.getSource().toLowerCase().endsWith("_properties_table"))
 					{
 						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno.getDetails());
-						for(int row=0; row<table.dimension[0]; row++)
+						for(int row=0; row<table.getDimension(0); row++)
 						{
 							// normal property has 2 values
-							assert table.data[row].length == 2;
-							String name = table.data[row][0];
-							String value = table.data[row][1];
+							assert table.getRow(row).length == 2;
+							String name = table.getCellValue(row, 0);
+							String value = table.getCellValue(row, 1);
 
 							if(value!=null && value.length()>0)
 							{
@@ -1481,7 +1482,30 @@ public class BpmnXMLReader
 								model.addProperty(name, exp.getValue(null));
 							}
 						}
-					} // end new properties handling
+					}
+					else if(anno.getSource().toLowerCase().endsWith("_providedservices_table"))
+					{
+						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno.getDetails());
+						for(int row=0; row<table.getDimension(0); row++)
+						{
+							// normal property has 4 values
+							assert table.getRow(row).length == 4;
+							String name = table.getCellValue(row, 0);
+							String typename = table.getCellValue(row, 1);
+							String implname = table.getCellValue(row, 2);
+							String proxytype = table.getCellValue(row, 3);
+
+							// todo: binding
+							Class impltype = SReflect.findClass0(implname, model.getAllImports(), context.getClassLoader());
+							ProvidedServiceImplementation psim = new ProvidedServiceImplementation(impltype, impltype==null? implname: null, proxytype, null);
+
+							Class type = SReflect.findClass0(typename, model.getAllImports(), context.getClassLoader());
+							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, psim);
+
+							ModelInfo mi = (ModelInfo)model.getModelInfo();
+							mi.addProvidedService(psi);
+						}
+					}
 					else if (!anno.getSource().toLowerCase().endsWith("table"))
 					{
 						// handle other annotation details here
@@ -1794,10 +1818,10 @@ public class BpmnXMLReader
 class BpmnMultiColumTable
 {
 	/** The table dimension [x, y] */
-	int[] dimension;
+	private int[] dimension;
 	
 	/** The table data */
-	String[][] data;
+	private String[][] data;
 
 	/**
 	 * Create a BpmnMultiColumnTable with given dimension
@@ -1805,7 +1829,6 @@ class BpmnMultiColumTable
 	 */
 	public BpmnMultiColumTable(String tableDimension) 
 	{
-		super();
 		this.dimension = parseCellIndex(tableDimension);
 		this.data = new String[dimension[0]][dimension[1]];
 	}
@@ -1815,7 +1838,7 @@ class BpmnMultiColumTable
 	 * @param index
 	 * @return int[]{row, column} 
 	 */
-	private int[] parseCellIndex(String index)
+	protected int[] parseCellIndex(String index)
 	{
 		assert index != null;
 		String[] xy = index.split(":");
@@ -1858,5 +1881,28 @@ class BpmnMultiColumTable
 		assert index[1] < data[index[0]].length;
 		return data[index[0]][index[1]];
 	}
+	
+	/**
+	 *  Get the call data.
+	 */
+	public String getCellValue(int x, int y)
+	{
+		return data[x][y];
+	}
+	
+	/**
+	 *  Get the dimension.
+	 */
+	public int getDimension(int i)
+	{
+		return dimension[i];
+	}
 
+	/**
+	 *  Get row.
+	 */
+	public String[] getRow(int x)
+	{
+		return data[x];
+	}
 }

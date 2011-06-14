@@ -264,6 +264,12 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 				this.pool	= config.substring(0, idx);
 				this.lane	= config.substring(idx+1);
 			}
+			if(!model.getPools().contains(this.pool) || !model.getPool(this.pool).getLanes().contains(this.lane))
+			{
+				System.out.println("Resetting pool/lane config");
+				this.pool = null;
+				this.lane = null;
+			}
 		}
 		
 		this.activityhandlers = activityhandlers!=null? activityhandlers: DEFAULT_ACTIVITY_HANDLERS;
@@ -441,8 +447,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		{
 			public void customResultAvailable(Object result)
 			{
-				
-				
 				// Notify cms that init is finished.
 				inited.setResult(new Object[]{BpmnInterpreter.this, adapter});
 				

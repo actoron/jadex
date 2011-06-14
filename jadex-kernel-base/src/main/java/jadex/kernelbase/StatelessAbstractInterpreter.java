@@ -867,6 +867,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			ret	= new Future(e);
 		}
 		
