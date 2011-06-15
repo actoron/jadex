@@ -154,7 +154,7 @@
 	<configurations>
 		<configuration name="default">
 			<beliefs>
-				<initialbelief ref="testcap.testcase_cnt">
+				<initialbelief cref="testcap.testcase_cnt">
 					<fact>5</fact>
 				</initialbelief>
 			</beliefs>

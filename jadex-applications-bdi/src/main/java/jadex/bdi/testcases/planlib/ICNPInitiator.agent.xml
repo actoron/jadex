@@ -55,7 +55,7 @@
 			</parameterset>
 			<body class="ICNPEvaluatorPlan"/>
 			<trigger>
-				<goal ref="cnpcap.icnp_evaluate_proposals"/>
+				<goal cref="cnpcap.icnp_evaluate_proposals"/>
 			</trigger>
 			<precondition>!($goal.cfp_info instanceof IProposalEvaluator)</precondition>
 		</plan>
@@ -82,7 +82,7 @@
 			</parameterset>
 			<body class="ICNPNextroundInfoPlan"/>
 			<trigger>
-				<goal ref="cnpcap.icnp_nextround_info"/>
+				<goal cref="cnpcap.icnp_nextround_info"/>
 			</trigger>
 			<precondition>!($goal.cfp_info instanceof IQueryNextroundInfo)</precondition>
 		</plan>
@@ -96,7 +96,7 @@
 	<configurations>
 		<configuration name="default">
 			<beliefs>
-				<initialbelief ref="testcap.testcase_cnt">
+				<initialbelief cref="testcap.testcase_cnt">
 					<fact>4</fact>
 				</initialbelief>
 			</beliefs>

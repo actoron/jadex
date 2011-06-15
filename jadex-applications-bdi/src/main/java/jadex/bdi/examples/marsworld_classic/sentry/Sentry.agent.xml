@@ -96,7 +96,7 @@
 			</dropcondition>
 
 			<deliberation>
-				<inhibits ref="move.walk_around"/>
+				<inhibits cref="move.walk_around"/>
 			</deliberation>
 			<!-- The goal is reached when the target is analysed. -->
 			<targetcondition language="jcl">
@@ -169,19 +169,19 @@
 	<configurations>
 		<configuration name="default">
 			<beliefs>
-				<initialbelief ref="move.my_type">
+				<initialbelief cref="move.my_type">
 					<fact>Environment.SENTRY_AGENT</fact>
 				</initialbelief>
-				<initialbelief ref="move.my_speed">
+				<initialbelief cref="move.my_speed">
 					<fact>5.0</fact>
 				</initialbelief>
-				<initialbelief ref="move.my_vision">
+				<initialbelief cref="move.my_vision">
 					<fact>0.1</fact>
 				</initialbelief>
 			</beliefs>
 			<goals>
 				<!-- Create initial goals. -->
-				<initialgoal ref="dfcap.df_register">
+				<initialgoal cref="dfcap.df_register">
 					<parameter ref="description">
 						<value>
 							$properties.dfservice.createDFComponentDescription(null, 
@@ -190,10 +190,10 @@
 					</parameter>
 				</initialgoal>
 				<!-- Create a goal for walking around. -->
-				<initialgoal ref="move.walk_around"/>
+				<initialgoal cref="move.walk_around"/>
 				<!-- Create a goal for finding targets. -->
 				<initialgoal ref="find_targets"/>
-				<endgoal ref="dfcap.df_deregister"/>
+				<endgoal cref="dfcap.df_deregister"/>
 			</goals>
 		</configuration>
 	</configurations>

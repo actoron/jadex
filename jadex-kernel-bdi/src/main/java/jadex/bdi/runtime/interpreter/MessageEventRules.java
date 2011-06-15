@@ -1268,7 +1268,7 @@ public class MessageEventRules
 						sourceval = state.getAttributeValue(sourceparam, OAVBDIRuntimeModel.parameter_has_value);
 					// todo: model value copy
 					
-					if(sourceval!=null)
+//					if(sourceval!=null)	// Override null values also (e.g. language==null of received event overrides language==jadex_xml defined in model).
 					{
 //						System.out.println("Copied: "+sourceval);
 						Object destparam = state.getAttributeValue(rreply, OAVBDIRuntimeModel.parameterelement_has_parameters, params[i].getName());

@@ -33,11 +33,11 @@
 			<body class="ConfigElementRefWorkerPlan"/>
 			<waitqueue>
 				<internalevent ref="testevent"/>
-				<internalevent ref="configrefcap.testevent"/>
+				<internalevent cref="configrefcap.testevent"/>
 				<messageevent ref="testmsg"/>
-				<messageevent ref="configrefcap.testmsg"/>
+				<messageevent cref="configrefcap.testmsg"/>
 				<goalfinished ref="testgoal"/>
-				<goalfinished ref="configrefcap.testgoal"/>
+				<goalfinished cref="configrefcap.testgoal"/>
 			</waitqueue>
 		</plan>
 		<plan name="testplan">
@@ -86,9 +86,9 @@
 		<configuration name="default">
 			<goals>
  				<initialgoal	ref="testgoal"		name="namedinitialgoal"/>
-				<initialgoal	ref="configrefcap.testgoal"	name="namedcapinitialgoal"/>
+				<initialgoal	cref="configrefcap.testgoal"	name="namedcapinitialgoal"/>
  				<endgoal		ref="testgoal"		name="namedendgoal"/>
-				<endgoal		ref="configrefcap.testgoal"	name="namedcapendgoal"/>
+				<endgoal		cref="configrefcap.testgoal"	name="namedcapendgoal"/>
 			</goals>
 			<plans>
 				<initialplan	ref="configelementrefworker_plan"/>
@@ -97,13 +97,13 @@
 			</plans>
  			<events>
 				<initialinternalevent	ref="testevent"		name="namedinitialevent"/>
-				<initialinternalevent	ref="configrefcap.testevent"	name="namedcapinitialevent"/>
+				<initialinternalevent	cref="configrefcap.testevent"	name="namedcapinitialevent"/>
 				<initialmessageevent	ref="testmsg"		name="namedinitialmsg"/>
-				<initialmessageevent	ref="configrefcap.testmsg"	name="namedcapinitialmsg"/>
+				<initialmessageevent	cref="configrefcap.testmsg"	name="namedcapinitialmsg"/>
 				<endinternalevent		ref="testevent"		name="namedendevent"/>
-				<endinternalevent		ref="configrefcap.testevent"	name="namedcapendevent"/>
+				<endinternalevent		cref="configrefcap.testevent"	name="namedcapendevent"/>
 				<endmessageevent		ref="testmsg"		name="namedendmsg"/>
-				<endmessageevent		ref="configrefcap.testmsg"	name="namedcapendmsg"/>
+				<endmessageevent		cref="configrefcap.testmsg"	name="namedcapendmsg"/>
 			</events>
 		</configuration>
 	</configurations>

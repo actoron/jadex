@@ -64,10 +64,10 @@
 				<initialcapability ref="cap_c" configuration="test_1"/>
 			</capabilities>
 			<beliefs>
-				<initialbelief ref="cap_a.bel">
+				<initialbelief cref="cap_a.bel">
 					<fact>"agent_initial_bel"</fact>
 				</initialbelief>
-				<initialbeliefset ref="cap_a.belset">
+				<initialbeliefset cref="cap_a.belset">
 					<fact>"agent_initial_belset_0"</fact>
 					<fact>"agent_initial_belset_1"</fact>
 				</initialbeliefset>

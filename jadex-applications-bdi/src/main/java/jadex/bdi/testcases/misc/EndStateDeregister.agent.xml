@@ -30,7 +30,7 @@
 	<configurations>
 		<configuration name="default">
 			<goals>
-				<initialgoal ref="dfcap.df_register">
+				<initialgoal cref="dfcap.df_register">
 					<parameter ref="description">
 						<value>
 							$properties.dfservice.createDFComponentDescription(null,
@@ -38,7 +38,7 @@
 						</value>
 					</parameter>
 				</initialgoal>
-				<endgoal ref="dfcap.df_deregister"/>
+				<endgoal cref="dfcap.df_deregister"/>
 			</goals>
 		</configuration>
 	</configurations>

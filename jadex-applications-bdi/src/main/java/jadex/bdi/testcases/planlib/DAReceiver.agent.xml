@@ -44,7 +44,7 @@
 			</parameter>
 			<body class="DADecideParticipationPlan"/>
 			<trigger>
-				<goal ref="dacap.da_decide_participation"></goal>
+				<goal cref="dacap.da_decide_participation"></goal>
 			</trigger>
 		</plan>
 		
@@ -69,7 +69,7 @@
 			</parameterset>
 			<body class="DAMakeProposalPlan"/>
 			<trigger>
-				<goal ref="dacap.da_make_proposal"/>
+				<goal cref="dacap.da_make_proposal"/>
 			</trigger>
 		</plan>
 		
@@ -86,7 +86,7 @@
 			</parameter>
 			<body class="PrintResultPlan"/>
 			<trigger>
-				<goalfinished ref="dacap.da_receiver_interaction"/>
+				<goalfinished cref="dacap.da_receiver_interaction"/>
 			</trigger>
 		</plan>
 	</plans>
@@ -98,7 +98,7 @@
 	<configurations>
 		<configuration name="default">
 			<beliefs>
-				<initialbelief ref="dacap.da_filter">
+				<initialbelief cref="dacap.da_filter">
 					<fact>IFilter.ALWAYS</fact>
 				</initialbelief>
 			</beliefs>

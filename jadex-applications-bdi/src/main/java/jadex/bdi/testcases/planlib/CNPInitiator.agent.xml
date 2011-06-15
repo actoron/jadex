@@ -55,7 +55,7 @@
 			</parameterset>
 			<body class="CNPEvaluatorPlan"/>
 			<trigger>
-				<goal ref="cnpcap.cnp_evaluate_proposals"/>
+				<goal cref="cnpcap.cnp_evaluate_proposals"/>
 			</trigger>
 			<precondition>!($goal.cfp_info instanceof IProposalEvaluator)</precondition>
 		</plan>
@@ -70,7 +70,7 @@
 	<configurations>
 		<configuration name="default">
 			<beliefs>
-				<initialbelief ref="testcap.testcase_cnt">
+				<initialbelief cref="testcap.testcase_cnt">
 					<fact>4</fact>
 				</initialbelief>
 			</beliefs>

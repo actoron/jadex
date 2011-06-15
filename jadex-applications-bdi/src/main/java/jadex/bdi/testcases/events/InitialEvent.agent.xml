@@ -87,7 +87,7 @@
 	<configurations>
 		<configuration name="test">
 			<beliefs>
-				<initialbelief ref="testcap.testcase_cnt">
+				<initialbelief cref="testcap.testcase_cnt">
 					<fact>2</fact>
 				</initialbelief>
 			</beliefs>

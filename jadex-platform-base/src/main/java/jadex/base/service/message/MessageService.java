@@ -170,21 +170,19 @@ public class MessageService extends BasicService implements IMessageService
 			return ret;
 		}
 	
-		final Map msgcopy = new HashMap(msg);
-		
 		// Automatically add optional meta information.
 		String senid = type.getSenderIdentifier();
-		Object sen = msgcopy.get(senid);
+		Object sen = msg.get(senid);
 		if(sen==null)
-			msgcopy.put(senid, sender);
+			msg.put(senid, sender);
 		
 		final String idid = type.getIdIdentifier();
-		Object id = msgcopy.get(idid);
+		Object id = msg.get(idid);
 		if(id==null)
-			msgcopy.put(idid, SUtil.createUniqueId(sender.getLocalName()));
+			msg.put(idid, SUtil.createUniqueId(sender.getLocalName()));
 
 		final String sd = type.getTimestampIdentifier();
-		final Object senddate = msgcopy.get(sd);
+		final Object senddate = msg.get(sd);
 		
 		// External access of sender required for content encoding etc.
 		SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
@@ -207,15 +205,15 @@ public class MessageService extends BasicService implements IMessageService
 //									if(result!=null)
 //										msgcopy.put(sd, ""+((IClockService)result).getTime());
 									
-									msgcopy.put(sd, ""+clockservice.getTime());
+									msg.put(sd, ""+clockservice.getTime());
 									
-									doSendMessage(msg, type, exta, cl, msgcopy, ret, codecids);
+									doSendMessage(msg, type, exta, cl, ret, codecids);
 //								}
 //							});
 						}
 						else
 						{
-							doSendMessage(msg, type, exta, cl, msgcopy, ret, codecids);
+							doSendMessage(msg, type, exta, cl, ret, codecids);
 						}
 					}
 				});
@@ -229,8 +227,9 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Extracted method to be callable from listener.
 	 */
-	protected void doSendMessage(Map msg, MessageType type, IExternalAccess comp, ClassLoader cl, Map msgcopy, Future ret, byte[] codecids)
+	protected void doSendMessage(Map msg, MessageType type, IExternalAccess comp, ClassLoader cl, Future ret, byte[] codecids)
 	{
+		Map msgcopy	= new HashMap(msg);
 		Object tmp = msgcopy.get(type.getReceiverIdentifier());
 		if(tmp==null || SReflect.isIterable(tmp) &&	!SReflect.getIterator(tmp).hasNext())
 		{
@@ -283,7 +282,7 @@ public class MessageService extends BasicService implements IMessageService
 		if(lis!=null)
 		{
 			// Hack?!
-			IMessageAdapter msgadapter = new DefaultMessageAdapter(msgcopy, type);
+			IMessageAdapter msgadapter = new DefaultMessageAdapter(msg, type);
 			for(int i=0; i<lis.length; i++)
 			{
 				IMessageListener li = (IMessageListener)lis[i];
@@ -389,44 +388,6 @@ public class MessageService extends BasicService implements IMessageService
 	 */
 	public void deliverMessage(Map message, String msgtype, IComponentIdentifier[] receivers)
 	{	
-		IFilter[] fils;
-		IMessageListener[] lis;
-		synchronized(this)
-		{
-			fils = listeners==null? null: (IFilter[])listeners.values().toArray(new IFilter[listeners.size()]);
-			lis = listeners==null? null: (IMessageListener[])listeners.keySet().toArray(new IMessageListener[listeners.size()]);
-		}
-		
-		if(lis!=null)
-		{
-			// Hack?!
-			IMessageAdapter msg = new DefaultMessageAdapter(message, getMessageType(msgtype));
-			for(int i=0; i<lis.length; i++)
-			{
-				IMessageListener li = (IMessageListener)lis[i];
-				boolean	match	= false;
-				try
-				{
-					match	= fils[i]==null || fils[i].filter(msg);
-				}
-				catch(Exception e)
-				{
-					logger.warning("Filter threw exception: "+fils[i]+", "+e);
-				}
-				if(match)
-				{
-					try
-					{
-						li.messageReceived(msg);
-					}
-					catch(Exception e)
-					{
-						logger.warning("Listener threw exception: "+li+", "+e);
-					}
-				}
-			}
-		}
-		
 		delivermsg.addMessage(message, msgtype, receivers);
 	}
 	
@@ -938,7 +899,7 @@ public class MessageService extends BasicService implements IMessageService
 						}
 						catch(Exception e)
 						{
-							logger.warning("Message could not be delivered to receiver(s): " + receivers[i] + ", "+ message.get(messagetype.getIdIdentifier())+", "+e);
+							logger.warning("Message could not be delivered to receiver: " + receivers[i] + ", "+ message.get(messagetype.getIdIdentifier())+", "+e);
 
 							// todo: notify sender that message could not be delivered!
 							// Problem: there is no connection back to the sender, so that
@@ -947,11 +908,50 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						logger.warning("Message could not be delivered to receiver(s): " + receivers[i] + ", "+ msg.get(messagetype.getIdIdentifier()));
+						logger.warning("Message could not be delivered to receiver: " + receivers[i] + ", "+ msg.get(messagetype.getIdIdentifier()));
 
 						// todo: notify sender that message could not be delivered!
 						// Problem: there is no connection back to the sender, so that
 						// the only chance is sending a separate failure message.
+					}
+				}
+
+				IFilter[] fils;
+				IMessageListener[] lis;
+				synchronized(this)
+				{
+					fils = listeners==null? null: (IFilter[])listeners.values().toArray(new IFilter[listeners.size()]);
+					lis = listeners==null? null: (IMessageListener[])listeners.keySet().toArray(new IMessageListener[listeners.size()]);
+				}
+				
+				if(lis!=null)
+				{
+					// Hack?! Use message decoded for some component. What if listener has different class loader? 
+					Map	message	= decoded.isEmpty() ? msg : (Map)decoded.get(decoded.keySet().iterator().next());
+					IMessageAdapter msg = new DefaultMessageAdapter(message, messagetype);
+					for(int i=0; i<lis.length; i++)
+					{
+						IMessageListener li = (IMessageListener)lis[i];
+						boolean	match	= false;
+						try
+						{
+							match	= fils[i]==null || fils[i].filter(msg);
+						}
+						catch(Exception e)
+						{
+							logger.warning("Filter threw exception: "+fils[i]+", "+e);
+						}
+						if(match)
+						{
+							try
+							{
+								li.messageReceived(msg);
+							}
+							catch(Exception e)
+							{
+								logger.warning("Listener threw exception: "+li+", "+e);
+							}
+						}
 					}
 				}
 			}	

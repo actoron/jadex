@@ -32,7 +32,7 @@
 			</parameter>
 			<body class="ResultPlan"/>
 			<trigger>
-				<goal ref="procap.rp_decide_request"/>
+				<goal cref="procap.rp_decide_request"/>
 			</trigger>
 		</plan>
 
@@ -46,7 +46,7 @@
 	<configurations>
 		<configuration name="default">
 			<beliefs>
-				<initialbelief ref="procap.rp_filter">
+				<initialbelief cref="procap.rp_filter">
 					<fact>IFilter.ALWAYS</fact>
 				</initialbelief>
 			</beliefs>

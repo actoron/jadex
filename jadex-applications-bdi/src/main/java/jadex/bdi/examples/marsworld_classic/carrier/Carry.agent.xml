@@ -48,6 +48,15 @@
 		<beliefref name="missionend">
 			<concrete ref="move.missionend"/>
 		</beliefref>
+		<beliefref name="my_type">
+			<concrete ref="move.my_type"/>
+		</beliefref>
+		<beliefref name="my_speed">
+			<concrete ref="move.my_speed"/>
+		</beliefref>
+		<beliefref name="my_vision">
+			<concrete ref="move.my_vision"/>
+		</beliefref>
 	</beliefs>
 
 	<goals>
@@ -59,7 +68,7 @@
 				// (belief (element_has_model.melement_has_name "missionend") (belief_has_fact true))
 			</dropcondition>
 			<deliberation>
-				<inhibits ref="move.walk_around"/>
+				<inhibits cref="move.walk_around"/>
 			</deliberation>
 		</achievegoal>
 	</goals>
@@ -91,7 +100,7 @@
 		<plan name="informer">
 			<body class="InformNewTargetPlan"/>
 			<trigger>
-				<factadded ref="move.my_targets"/>
+				<factadded cref="move.my_targets"/>
 			</trigger>
 		</plan>
 	</plans>
@@ -129,19 +138,19 @@
 	<configurations>
 		<configuration name="default">
 			<beliefs>
-				<initialbelief ref="move.my_type">
+				<initialbelief ref="my_type">
 					<fact>Environment.CARRY_AGENT</fact>
 				</initialbelief>
-				<initialbelief ref="move.my_speed">
+				<initialbelief ref="my_speed">
 					<fact>15.0</fact>
 				</initialbelief>
-				<initialbelief ref="move.my_vision">
+				<initialbelief ref="my_vision">
 					<fact>0.05</fact>
 				</initialbelief>
 			</beliefs>
 			<goals>
 				<!-- Create a goal for registering and keeping registerd at the df. -->
-				<initialgoal ref="dfcap.df_register">
+				<initialgoal cref="dfcap.df_register">
 					<parameter ref="description">
 						<value>
 							$properties.dfservice.createDFComponentDescription(null, 
@@ -150,10 +159,10 @@
 					</parameter>
 				</initialgoal>
 				<!-- Create a goal for walking around. -->
-				<initialgoal ref="move.walk_around"/>
+				<initialgoal cref="move.walk_around"/>
 				<!-- Create a goal for watching for targets. -->
-				<initialgoal ref="move.watch_targets"/>
-				<endgoal ref="dfcap.df_deregister"/>
+				<initialgoal cref="move.watch_targets"/>
+				<endgoal cref="dfcap.df_deregister"/>
 			</goals>
 			<plans>
 				<initialplan ref="carry"/>

@@ -142,7 +142,7 @@ Test 7: Test if '$removedfact' can be accessed within body expression.
 	<configurations>
 		<configuration name="default">
 			<beliefs>
-				<initialbelief ref="testcap.testcase_cnt">
+				<initialbelief cref="testcap.testcase_cnt">
 					<fact>7</fact>
 				</initialbelief>
 			</beliefs>

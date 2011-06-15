@@ -77,7 +77,7 @@
 			</parameter>
 			<body class="RequestReceiverPlan"/>
 			<trigger>
-				<goal ref="procap.rp_execute_request"/>
+				<goal cref="procap.rp_execute_request"/>
 			</trigger>
 		</plan>
 	</plans>
@@ -96,7 +96,7 @@
 	<configurations>
 		<configuration name="default">
 			<beliefs>
-				<initialbelief ref="procap.rp_filter">
+				<initialbelief cref="procap.rp_filter">
 					<fact>IFilter.ALWAYS</fact>
 				</initialbelief>
 			</beliefs>

@@ -40,7 +40,7 @@
 			</parameter>
 			<body class="CNPMakeProposalPlan"/>
 			<trigger>
-				<goal ref="cnpcap.cnp_make_proposal"/>
+				<goal cref="cnpcap.cnp_make_proposal"/>
 			</trigger>
 		</plan>
 
@@ -56,7 +56,7 @@
 			</parameter>
 			<body class="CNPExecuteTaskPlan"/>
 			<trigger>
-				<goal ref="cnpcap.cnp_execute_task"></goal>
+				<goal cref="cnpcap.cnp_execute_task"></goal>
 			</trigger>
 		</plan>
 		
@@ -73,7 +73,7 @@
 			</parameter>
 			<body class="PrintResultPlan"/>
 			<trigger>
-				<goalfinished ref="cnpcap.cnp_receiver_interaction"/>
+				<goalfinished cref="cnpcap.cnp_receiver_interaction"/>
 			</trigger>
 		</plan>
 	</plans>
@@ -85,7 +85,7 @@
 	<configurations>
 		<configuration name="default">
 			<beliefs>
-				<initialbelief ref="cnpcap.cnp_filter">
+				<initialbelief cref="cnpcap.cnp_filter">
 					<fact>IFilter.ALWAYS</fact>
 				</initialbelief>
 			</beliefs>

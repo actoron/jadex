@@ -89,11 +89,11 @@
 			<body class="EndStateWorkerTestPlan"/>
 			<trigger>
 				<internalevent ref="endevent"/>
- 				<internalevent ref="endcap.endevent"/>
+ 				<internalevent cref="endcap.endevent"/>
 				<messageevent ref="endmsg"/>
-				<messageevent ref="endcap.endmsg"/>
+				<messageevent cref="endcap.endmsg"/>
 				<goal ref="endgoal"/>
-				<goal ref="endcap.endgoal"/>
+				<goal cref="endcap.endgoal"/>
 		</trigger>
 		</plan>
 		<plan name="endstateworkertest_plan2">
@@ -159,7 +159,7 @@
 		<configuration name="default">
 			<goals>
 				<endgoal ref="endgoal"/>
- 				<endgoal ref="endcap.endgoal"/>
+ 				<endgoal cref="endcap.endgoal"/>
 			</goals>
 			<plans>
 				<initialplan ref="endstateworker_plan"/>
@@ -172,9 +172,9 @@
 			</plans>
 			<events>
 				<endinternalevent ref="endevent"/>
-				<endinternalevent ref="endcap.endevent"/>
+				<endinternalevent cref="endcap.endevent"/>
 				<endmessageevent ref="endmsg"/>
-				<endmessageevent ref="endcap.endmsg"/>
+				<endmessageevent cref="endcap.endmsg"/>
 			</events>
 		</configuration>
 	</configurations>

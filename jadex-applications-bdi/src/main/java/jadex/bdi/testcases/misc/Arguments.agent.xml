@@ -73,7 +73,7 @@
 				<initialbelief ref="arg1">
 					<fact>"initial"</fact>
 				</initialbelief>
-				<initialbelief ref="testcap.testcase_cnt">
+				<initialbelief ref="testcase_cnt">
 					<fact>1</fact>
 				</initialbelief>
 			</beliefs>
@@ -86,7 +86,7 @@
 				<initialbelief ref="arg1">
 					<fact>"initial_alter"</fact>
 				</initialbelief>
-				<initialbelief ref="testcap.testcase_cnt">
+				<initialbelief ref="testcase_cnt">
 					<fact>2</fact>
 				</initialbelief>
 			</beliefs>

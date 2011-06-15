@@ -117,37 +117,6 @@
 			</trigger>
 		</plan>
 		
-		<plan name="send_icq_plan">
-			<parameter name="account" class="IMAccount">
-				<goalmapping ref="send_icq.account" />
-			</parameter>
-			<parameter name="content" class="String">
-				<goalmapping ref="send_icq.content" />
-			</parameter>
-			<parameterset name="receivers" class="String">
-				<goalmapping ref="send_icq.receivers" />
-			</parameterset>
-			<body class="SendICQPlan" />
-			<trigger>
-				<goal ref="send_icq" />
-			</trigger>
-		</plan>
-		
-		<plan name="send_xmpp_plan">
-			<parameter name="account" class="IMAccount">
-				<goalmapping ref="send_xmpp.account" />
-			</parameter>
-			<parameter name="content" class="String">
-				<goalmapping ref="send_xmpp.content" />
-			</parameter>
-			<parameterset name="receivers" class="String">
-				<goalmapping ref="send_xmpp.receivers" />
-			</parameterset>
-			<body class="SendXMPPPlan" />
-			<trigger>
-				<goal ref="send_xmpp" />
-			</trigger>
-		</plan>
 	</plans>
 	
 </capability>

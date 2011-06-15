@@ -47,12 +47,12 @@
 	<configurations>
 		<configuration name="default">
 			<beliefs>
-				<initialbelief ref="testcap.testcase_cnt">
+				<initialbelief cref="testcap.testcase_cnt">
 					<fact>14</fact>
 				</initialbelief>
 			</beliefs>
 			<goals>
-				<initialgoal name="initial_keep" ref="dfcap.df_keep_registered">
+				<initialgoal name="initial_keep" cref="dfcap.df_keep_registered">
 					<parameter ref="description">
 						<value>
 							new DFComponentDescription(null, new IDFServiceDescription[]

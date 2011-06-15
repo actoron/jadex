@@ -210,11 +210,11 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			public IFuture messageReceived(IMessageAdapter msg)
 			{
 				convcenter.addMessage(msg);
-				return new Future(null);
+				return IFuture.DONE;
 			}
 			public IFuture messageSent(IMessageAdapter msg)
 			{
-				return new Future(null);
+				return IFuture.DONE;
 			}
 		};
 		

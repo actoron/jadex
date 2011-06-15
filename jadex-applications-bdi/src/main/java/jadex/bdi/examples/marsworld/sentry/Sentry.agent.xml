@@ -101,7 +101,7 @@
 			</dropcondition>
 
 			<deliberation cardinality="1">
-				<inhibits ref="move.walk_around"/>
+				<inhibits cref="move.walk_around"/>
 			</deliberation>
 			<!-- The goal is reached when the target is analysed. - ->
 			<!- - Target condition prevents producers from being called by sentry, because plan is aborted. - ->  
@@ -164,7 +164,7 @@
 		<configuration name="default">
 			<goals>
 				<!-- Create a goal for walking around. -->
-				<initialgoal ref="move.walk_around"/>
+				<initialgoal cref="move.walk_around"/>
 			</goals>
 		</configuration>
 	</configurations>

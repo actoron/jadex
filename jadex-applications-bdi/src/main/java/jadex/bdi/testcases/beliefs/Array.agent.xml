@@ -44,7 +44,7 @@
 	<configurations>
 		<configuration name="default">
 			<beliefs>
-				<initialbeliefset ref="testcap.reports">
+				<initialbeliefset cref="testcap.reports">
 					<fact>new TestReport("#1", "Test if agent can be loaded.", true, null)</fact>
 				</initialbeliefset>
 			</beliefs>

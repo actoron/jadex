@@ -20,10 +20,10 @@
 	<configurations>
 		<configuration name="default">
 			<beliefs>
-				<initialbelief ref="ping_content">
+				<initialbelief cref="ping.ping_content">
 					<fact>"pong"</fact>
 				</initialbelief>
-				<initialbelief ref="ping_answer">
+				<initialbelief cref="ping.ping_answer">
 					<fact>"alaaf"</fact>
 				</initialbelief>
 			</beliefs>

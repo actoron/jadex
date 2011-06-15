@@ -50,7 +50,7 @@
 			</parameterset>
 			<body class="GoalReferenceParameterSetPlan"/>
 			<trigger>
-				<goal ref="cap.testgoal"/>
+				<goal cref="cap.testgoal"/>
 			</trigger>
 		</plan>
 	</plans>
@@ -63,7 +63,7 @@
 	<configurations>
 		<configuration name="default">
 			<beliefs>
-				<initialbelief ref="testcap.testcase_cnt">
+				<initialbelief cref="testcap.testcase_cnt">
 					<fact>3</fact>
 				</initialbelief>
 			</beliefs>

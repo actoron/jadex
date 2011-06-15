@@ -32,7 +32,7 @@
 			</parameter>
 			<body class="RPDecideRequestPlan"/>
 			<trigger>
-				<goal ref="procap.qp_decide_request"/>
+				<goal cref="procap.qp_decide_request"/>
 			</trigger>
 		</plan>
 
@@ -45,7 +45,7 @@
 			</parameter>
 			<body class="RPExecuteActionPlan"/>
 			<trigger>
-				<goal ref="procap.qp_execute_request"/>
+				<goal cref="procap.qp_execute_request"/>
 			</trigger>
 		</plan>
 		
@@ -62,7 +62,7 @@
 			</parameter>
 			<body class="PrintResultPlan"/>
 			<trigger>
-				<goalfinished ref="procap.qp_receiver_interaction"/>
+				<goalfinished cref="procap.qp_receiver_interaction"/>
 			</trigger>
 		</plan>
 	</plans>
@@ -76,7 +76,7 @@
 	<configurations>
 		<configuration name="default">
 			<beliefs>
-				<initialbelief ref="procap.qp_filter">
+				<initialbelief cref="procap.qp_filter">
 					<fact>IFilter.ALWAYS</fact>
 				</initialbelief>
 			</beliefs>

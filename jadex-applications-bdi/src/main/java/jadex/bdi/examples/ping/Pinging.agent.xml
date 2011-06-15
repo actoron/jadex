@@ -34,7 +34,7 @@
 	<configurations>
 		<configuration name="default">
 			<goals>
-				<initialgoal ref="ping.pinging">
+				<initialgoal cref="ping.pinging">
 					<parameter ref="receiver">
 						<value>
 							$beliefbase.ping_receiver

@@ -53,7 +53,7 @@
 				// (belief (element_has_model.melement_has_name "missionend") (belief_has_fact true))
 			</dropcondition>
 			<deliberation>
-				<inhibits ref="move.walk_around"/>
+				<inhibits cref="move.walk_around"/>
 			</deliberation>
 		</achievegoal>
 	</goals>
@@ -85,7 +85,7 @@
 		<plan name="informer">
 			<body class="InformNewTargetPlanAGR"/>
 			<trigger>
-				<factadded ref="move.my_targets"/>
+				<factadded cref="move.my_targets"/>
 			</trigger>
 		</plan>
 	</plans>
@@ -121,21 +121,21 @@
 	<configurations>
 		<configuration name="default">
 			<beliefs>
-				<initialbelief ref="move.my_type">
+				<initialbelief cref="move.my_type">
 					<fact>Environment.CARRY_AGENT</fact>
 				</initialbelief>
-				<initialbelief ref="move.my_speed">
+				<initialbelief cref="move.my_speed">
 					<fact>15.0</fact>
 				</initialbelief>
-				<initialbelief ref="move.my_vision">
+				<initialbelief cref="move.my_vision">
 					<fact>0.05</fact>
 				</initialbelief>
 			</beliefs>
 			<goals>
 				<!-- Create a goal for walking around. -->
-				<initialgoal ref="move.walk_around"/>
+				<initialgoal cref="move.walk_around"/>
 				<!-- Create a goal for watching for targets. -->
-				<initialgoal ref="move.watch_targets"/>
+				<initialgoal cref="move.watch_targets"/>
 			</goals>
 			<plans>
 				<initialplan ref="carry"/>
