@@ -7,7 +7,6 @@ import jadex.bridge.IRemoteServiceManagementService;
 import jadex.bridge.MessageType;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.future.DefaultResultListener;
@@ -43,23 +42,15 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	public IFuture	agentCreated()
 	{
 		final Future	ret	= new Future();
-		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				final IClockService clock = (IClockService)result;
-				SServiceProvider.getService(getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(createResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						final ILibraryService libservice = (ILibraryService)result;
-						rms = new RemoteServiceManagementService((IMicroExternalAccess)getExternalAccess(), clock, libservice);
-						addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
-						ret.setResult(null);
-					}
-				}));
+				final ILibraryService libservice = (ILibraryService)result;
+				rms = new RemoteServiceManagementService((IMicroExternalAccess)getExternalAccess(), libservice);
+				addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
+				ret.setResult(null);
 			}
 		}));
 		return ret;

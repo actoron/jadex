@@ -5,19 +5,15 @@ import jadex.base.service.message.transport.codecs.CodecFactory;
 import jadex.base.service.message.transport.codecs.ICodec;
 import jadex.bridge.IMessageService;
 import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.clock.IClockService;
-import jadex.bridge.service.clock.ITimedObject;
-import jadex.bridge.service.clock.ITimer;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -31,6 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import javax.swing.Timer;
 
 /**
  * The selector thread waits for NIO events and issues the appropriate actions
@@ -556,7 +554,7 @@ public class SelectorThread implements Runnable
 	 *  Class for cleaning output connections after 
 	 *  max keep alive time has been reached.
 	 */
-	protected class Cleaner implements ITimedObject
+	protected class Cleaner	implements	ActionListener
 	{
 		//-------- attributes --------
 		
@@ -564,7 +562,8 @@ public class SelectorThread implements Runnable
 		protected InetSocketAddress address;
 		
 		/** The timer. */
-		protected ITimer timer;
+		// Hack!!! java.util.Timer does not support cancellation of scheduled tasks, grrr.
+		protected Timer timer;
 		
 		//-------- constructors --------
 		
@@ -579,10 +578,11 @@ public class SelectorThread implements Runnable
 		
 		//-------- methods --------
 		
+		
 		/**
 		 *  Called when timepoint was reached.
 		 */
-		public void timeEventOccurred(long currenttime)
+	    public void actionPerformed(ActionEvent event)
 		{
 			Object	con;
 			synchronized(connections)
@@ -607,19 +607,15 @@ public class SelectorThread implements Runnable
 		 */
 		public void refresh()
 		{
-			SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new DefaultResultListener()
+			if(timer==null)
 			{
-				public void resultAvailable(Object result)
-				{
-					IClockService clock = (IClockService)result;
-					long time = clock.getTime()+NIOTCPTransport.MAX_KEEPALIVE;
-					if(timer==null)
-						timer = clock.createTimer(time, Cleaner.this);
-					else
-						timer.setNotificationTime(time);
-				}
-			});
+				timer = new Timer(NIOTCPTransport.MAX_KEEPALIVE, this);
+				timer.start();
+			}
+			else
+			{
+				timer.restart();
+			}
 		}
 		
 		/**
@@ -628,7 +624,7 @@ public class SelectorThread implements Runnable
 		public void remove()
 		{
 			if(timer!=null)
-				timer.cancel();
+				timer.stop();
 		}
 	}
 }

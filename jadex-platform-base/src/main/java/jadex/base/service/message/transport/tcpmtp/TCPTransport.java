@@ -8,9 +8,6 @@ import jadex.bridge.IMessageService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.clock.IClockService;
-import jadex.bridge.service.clock.ITimedObject;
-import jadex.bridge.service.clock.ITimer;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.threadpool.IThreadPoolService;
 import jadex.commons.collection.ILRUEntryCleaner;
@@ -22,6 +19,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -35,6 +34,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import javax.swing.Timer;
 
 /**
  *  The tcp transport for sending messages over
@@ -503,7 +504,7 @@ public class TCPTransport implements ITransport
 	 *  Class for cleaning output connections after 
 	 *  max keep alive time has been reached.
 	 */
-	protected class Cleaner implements ITimedObject
+	protected class Cleaner implements ActionListener
 	{
 		//-------- attributes --------
 		
@@ -511,7 +512,8 @@ public class TCPTransport implements ITransport
 		protected String address;
 		
 		/** The timer. */
-		protected ITimer timer;
+		// Hack!!! java.util.timer does not support cancellation of scheduled tasks.
+		protected Timer timer;
 		
 		//-------- constructors --------
 		
@@ -529,9 +531,9 @@ public class TCPTransport implements ITransport
 		/**
 		 *  Called when timepoint was reached.
 		 */
-		public void timeEventOccurred(long currenttime)
+	    public void actionPerformed(ActionEvent e)
 		{
-			//System.out.println("Timeout reached for: "+address);
+			logger.info("Timeout reached for: "+address);
 			removeConnection(address);
 		}
 		
@@ -540,22 +542,15 @@ public class TCPTransport implements ITransport
 		 */
 		public void refresh()
 		{
-			//platform.getTimerService().addEntry(this, System.currentTimeMillis()+MAX_KEEPALIVE);
-			/*if(timer!=null)
-				timer.cancel();
-			timer = platform.getClock().createTimer(System.currentTimeMillis()+MAX_KEEPALIVE, this);*/
-			SServiceProvider.getService(container, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+			if(timer==null)
 			{
-				// Todo: synchronize?
-				public void resultAvailable(Object result)
-				{
-					long time = ((IClockService)result).getTime()+MAX_KEEPALIVE;
-					if(timer==null)
-						timer = ((IClockService)result).createTimer(time, Cleaner.this);
-					else
-						timer.setNotificationTime(time);
-				}
-			});
+				timer	= new Timer(MAX_KEEPALIVE, this);
+				timer.start();
+			}
+			else
+			{
+				timer.restart();
+			}
 		}
 		
 		/**
@@ -563,9 +558,8 @@ public class TCPTransport implements ITransport
 		 */
 		public void remove()
 		{
-			//platform.getTimerService().removeEntry(this);
 			if(timer!=null)
-				timer.cancel();
+				timer.stop();
 		}
 	}
 }

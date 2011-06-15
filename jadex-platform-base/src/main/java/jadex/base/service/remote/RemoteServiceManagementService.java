@@ -20,19 +20,15 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.ServiceNotFoundException;
 import jadex.bridge.service.TypeResultSelector;
-import jadex.bridge.service.clock.IClockService;
-import jadex.bridge.service.clock.ITimer;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.IRemotable;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.IMicroExternalAccess;
-import jadex.micro.MicroAgent;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
 import jadex.xml.TypeInfo;
@@ -52,6 +48,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
@@ -104,19 +102,23 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	
 	/** The rmi xml to object reader. */
 	protected Reader reader;
-		
+	
+	/** The timer. */
+	protected Timer	timer;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new remote service management service.
 	 */
-	public RemoteServiceManagementService(IMicroExternalAccess component, IClockService clock, ILibraryService libservice)
+	public RemoteServiceManagementService(IMicroExternalAccess component,ILibraryService libservice)
 	{
 		super(component.getServiceProvider().getId(), IRemoteServiceManagementService.class, null);
 
 		this.component = component;
-		this.rrm = new RemoteReferenceModule(this, clock, libservice);
+		this.rrm = new RemoteReferenceModule(this, libservice);
 		this.waitingcalls = new HashMap();
+		this.timer	= new Timer(true);
 		
 		QName[] pr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "ProxyReference")};
 		
@@ -434,67 +436,45 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 									public void resultAvailable(Object result)
 									{
 										// ok message could be sent.
-										component.scheduleStep(new IComponentStep()
+										timer.schedule(new TimerTask()
 										{
-											@XMLClassname("oksent")
-											public Object execute(final IInternalAccess ia)
+											public void run()
 											{
-//												System.out.println("waitfor");
-												MicroAgent pa = (MicroAgent)ia;
-												pa.waitFor(timeout, new IComponentStep()
+//												System.out.println("timeout triggered: "+msg);
+												removeWaitingCall(callid);
+//												waitingcalls.remove(callid);
+//												System.out.println("Waitingcalls: "+waitingcalls.size());
+												future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+callid)
 												{
-													public Object execute(IInternalAccess ia)
+													public void printStackTrace()
 													{
-//														System.out.println("timeout triggered: "+msg);
-														removeWaitingCall(callid);
-//														waitingcalls.remove(callid);
-//														System.out.println("Waitingcalls: "+waitingcalls.size());
-														future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+callid)
-														{
-															public void printStackTrace()
-															{
-																Thread.dumpStack();
-																super.printStackTrace();
-															}
-														});
-														return null;
+														Thread.dumpStack();
+														super.printStackTrace();
 													}
-												}).addResultListener(ia.createResultListener(new DefaultResultListener()
-												{
-													public void resultAvailable(Object result)
-													{
-														// cancel timer when future is finished before. 
-														final ITimer timer = (ITimer)result;
-														future.addResultListener(ia.createResultListener(new IResultListener()
-														{
-															public void resultAvailable(Object result)
-															{
-																removeWaitingCall(callid);
-//																waitingcalls.remove(callid);
-//																System.out.println("Waitingcalls: "+waitingcalls.size());
-//																System.out.println("Cancel timeout (res): "+callid+" "+future);
-//																errors.put(callid, new Object[]{"Cancel timeout (res)", result});
-																timer.cancel();
-															}
-															
-															public void exceptionOccurred(Exception exception)
-															{
-//																exception.printStackTrace();
-																removeWaitingCall(callid);
-//																waitingcalls.remove(callid);
-//																System.out.println("Waitingcalls: "+waitingcalls.size());
-//																System.out.println("Cancel timeout (ex): "+callid+" "+future);
-//																errors.put(callid, new Object[]{"Cancel timeout (ex):", exception});
-																timer.cancel();
-																ia.getLogger().warning("Remote request failed: "+content+"\n"+exception.getMessage());
-															}
-														}));
-													}
-												}));
-												
-												return null;
+												});
 											}
-										});
+										}, timeout);
+
+										future.addResultListener(ia.createResultListener(new IResultListener()
+										{
+											public void resultAvailable(Object result)
+											{
+												removeWaitingCall(callid);
+//												System.out.println("Waitingcalls: "+waitingcalls.size());
+//												System.out.println("Cancel timeout (res): "+callid+" "+future);
+//												errors.put(callid, new Object[]{"Cancel timeout (res)", result});
+											}
+															
+											public void exceptionOccurred(Exception exception)
+											{
+//												exception.printStackTrace();
+												removeWaitingCall(callid);
+//												System.out.println("Waitingcalls: "+waitingcalls.size());
+//												System.out.println("Cancel timeout (ex): "+callid+" "+future);
+//												errors.put(callid, new Object[]{"Cancel timeout (ex):", exception});
+												ia.getLogger().warning("Remote request failed: "+content+"\n"+exception.getMessage());
+											}
+										}));
 									}
 									
 									public void exceptionOccurred(Exception exception)
@@ -536,6 +516,15 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				return null;
 			}
 		});
+	}
+
+	/**
+	 *  Called when the service is shut down.
+	 */
+	public IFuture shutdownService()
+	{
+		timer.cancel();
+		return super.shutdownService();
 	}
 }
 

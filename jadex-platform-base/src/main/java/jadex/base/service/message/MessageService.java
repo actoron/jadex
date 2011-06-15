@@ -183,6 +183,10 @@ public class MessageService extends BasicService implements IMessageService
 
 		final String sd = type.getTimestampIdentifier();
 		final Object senddate = msg.get(sd);
+		if(senddate==null)
+		{
+			msg.put(sd, ""+clockservice.getTime());
+		}
 		
 		// External access of sender required for content encoding etc.
 		SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
@@ -196,25 +200,7 @@ public class MessageService extends BasicService implements IMessageService
 					public void customResultAvailable(Object result)
 					{
 						IExternalAccess exta = (IExternalAccess)result;
-						if(senddate==null)
-						{
-//							SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
-//							{
-//								public void resultAvailable(Object source, Object result)
-//								{
-//									if(result!=null)
-//										msgcopy.put(sd, ""+((IClockService)result).getTime());
-									
-									msg.put(sd, ""+clockservice.getTime());
-									
-									doSendMessage(msg, type, exta, cl, ret, codecids);
-//								}
-//							});
-						}
-						else
-						{
-							doSendMessage(msg, type, exta, cl, ret, codecids);
-						}
+						doSendMessage(msg, type, exta, cl, ret, codecids);
 					}
 				});
 			}
