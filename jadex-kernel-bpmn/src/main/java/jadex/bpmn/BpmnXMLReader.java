@@ -689,7 +689,7 @@ public class BpmnXMLReader
 						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
 								.getDetails());
 						
-						for (int row = 0; row < table.getDimension(0); row++)
+						for(int row = 0; row < table.getDimension(0); row++)
 						{
 							// normal property has 2 values
 							assert table.getRow(row).length == 2;

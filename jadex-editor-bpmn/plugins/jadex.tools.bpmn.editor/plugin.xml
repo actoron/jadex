@@ -343,6 +343,19 @@
      </propertySections>
    </extension>
      
+    <!-- the jadex bpmndiagram flags section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.editor.bpmn.JadexBpmnEditor">
+        <propertySection
+              class="jadex.editor.bpmn.editor.properties.JadexBpmnDiagramFlagsSection"
+              id="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramFlagsSection"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramPropertiesSection">
+           <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
+        </propertySection>
+     </propertySections>
+   </extension> 
+     
     <!-- the jadex bpmndiagram import section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.editor.bpmn.JadexBpmnEditor">
@@ -350,7 +363,7 @@
               class="jadex.editor.bpmn.editor.properties.JadexBpmnDiagramImportsSection"
               id="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramImportsSection"
               tab="Jadex"
-              afterSection="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramPropertiesSection">
+              afterSection="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramFlagsSection">
            <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
         </propertySection>
      </propertySections>

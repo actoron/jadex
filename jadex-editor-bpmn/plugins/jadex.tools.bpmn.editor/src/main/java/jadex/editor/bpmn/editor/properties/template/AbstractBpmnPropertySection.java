@@ -18,25 +18,19 @@ public abstract class AbstractBpmnPropertySection extends AbstractCommonProperty
 	protected JadexBpmnPropertiesUtil util;
 
 	/**
-	 * @param containerEAnnotationName
-	 * @param annotationDetailName
+	 *  Create a new property section.
 	 */
-	protected AbstractBpmnPropertySection(String containerEAnnotationName,
-			String annotationDetailName)
+	protected AbstractBpmnPropertySection(String containerEAnnotationName, String annotationDetailName)
 	{
-		super();
-		
 		assert containerEAnnotationName != null && !containerEAnnotationName.isEmpty() : this.getClass() + ": containerEAnnotationName not set";
 		assert annotationDetailName != null && !annotationDetailName.isEmpty() : this.getClass() + ": annotationDetailName not set";
-
 		this.util = new JadexBpmnPropertiesUtil(containerEAnnotationName, annotationDetailName, this);
-		
 	}
 
 	// ---- methods ----
 	
-	/* (non-Javadoc)
-	 * @see jadex.tools.model.common.properties.AbstractCommonPropertySection#dispose()
+	/**
+	 *  Dispose.
 	 */
 	public void dispose()
 	{
@@ -45,20 +39,12 @@ public abstract class AbstractBpmnPropertySection extends AbstractCommonProperty
 	}
 
 	/**
-	 * Update 
-	 * @param detail
-	 * @param value
-	 * 
+	 * Update the model.
 	 */
 	protected boolean updateJadexEAnnotation(final String detail, final String value)
 	{
-		if(modelElement == null)
-		{
-			return false;
-		}
-		
-		boolean success = util.updateJadexEAnnotation(detail, value);
-		if (success)
+		boolean success = modelElement!=null && util.updateJadexEAnnotation(detail, value);
+		if(success)
 		{
 			refreshSelectedEditPart();
 		}
@@ -66,6 +52,9 @@ public abstract class AbstractBpmnPropertySection extends AbstractCommonProperty
 		return success;
 	}
 
+	/**
+	 *  Set the input on model.
+	 */
 	public void setInput(IWorkbenchPart part, ISelection selection) 
 	{
 		super.setInput(part, selection);

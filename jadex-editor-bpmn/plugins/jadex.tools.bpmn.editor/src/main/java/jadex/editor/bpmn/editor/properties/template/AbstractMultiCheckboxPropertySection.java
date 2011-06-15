@@ -1,54 +1,46 @@
-/**
- * 
- */
 package jadex.editor.bpmn.editor.properties.template;
 
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
-
 /**
- * 
+ *  Multi checkbox section.
  */
-public abstract class AbstractMultiTextfieldPropertySection extends AbstractBpmnPropertySection
+public class AbstractMultiCheckboxPropertySection extends AbstractBpmnPropertySection
 {
-	// ---- constants ----
-	
 	protected static final String[] DEFAULT_NAMES = new String[] {"Default_1", "Default_2", "Default_3" };
 	
-	// ---- attributes ----
-
-	private String[] textFieldNames;
-	private Text[] textFields;
+	private String[] checkboxnames;
+	private Button[] checkboxes;
+	private boolean[] defaultvalues;
 	
 	// ---- constructor ----
 	
 	/**
-	 * Default Constructor
-	 * 
-	 * @param textFieldNames
-	 * @param textFields
+	 * Default constructor
 	 */
-	protected AbstractMultiTextfieldPropertySection(String containerEAnnotationName, String[] textFieldNames)
+	protected AbstractMultiCheckboxPropertySection(String containerEAnnotationName, String[] checkboxnames, boolean[] defaultvalues)
 	{
 		super(containerEAnnotationName, null);
-		this.textFieldNames = textFieldNames != null ? textFieldNames : DEFAULT_NAMES;
+		this.checkboxnames = checkboxnames!= null? checkboxnames: DEFAULT_NAMES;
+		this.defaultvalues = defaultvalues;
 	}
 
 
 	// ---- methods ----
 
-	/* (non-Javadoc)
-	 * @see jadex.tools.model.common.properties.AbstractCommonPropertySection#dispose()
+	/**
+	 *  Dispose.
 	 */
 	public void dispose()
 	{
@@ -75,22 +67,21 @@ public abstract class AbstractMultiTextfieldPropertySection extends AbstractBpmn
 		labelGridData.minimumWidth = 80;
 		labelGridData.widthHint = 80;
 
-		textFields = new Text[textFieldNames.length];
-		for(int i = 0; i < textFieldNames.length; i++)
+		checkboxes = new Button[checkboxnames.length];
+		for(int i = 0; i < checkboxnames.length; i++)
 		{
 			// TO DO: use group?
 			Composite cComposite = getWidgetFactory().createComposite(sectionComposite);
 			addDisposable(cComposite);
 			cComposite.setLayout(new GridLayout(2, false));
 			
-			Label cLabel = getWidgetFactory().createLabel(cComposite, textFieldNames[i]+":"); // //$NON-NLS-1$
+			Label cLabel = getWidgetFactory().createLabel(cComposite, checkboxnames[i]+":"); // //$NON-NLS-1$
 			addDisposable(cLabel);
-			Text cTextfield = getWidgetFactory().createText(cComposite, "");
-			addDisposable(cTextfield);
-			textFields[i] = cTextfield;
-			cTextfield.addFocusListener(new ModifyJadexEAnnotation(textFieldNames[i], cTextfield));
+			checkboxes[i] = getWidgetFactory().createButton(cComposite, null, SWT.CHECK);
+			addDisposable(checkboxes[i]);
+			checkboxes[i].addFocusListener(new ModifyJadexEAnnotation(checkboxnames[i], checkboxes[i]));
 			cLabel.setLayoutData(labelGridData);
-			cTextfield.setLayoutData(textGridData);
+			checkboxes[i].setLayoutData(textGridData);
 		}
 	}
 	
@@ -100,37 +91,36 @@ public abstract class AbstractMultiTextfieldPropertySection extends AbstractBpmn
 	public void setInput(IWorkbenchPart part, ISelection selection)
 	{
 		super.setInput(part, selection);
-		if (modelElement != null)
+		if(modelElement != null)
 		{
 			EAnnotation ea = modelElement.getEAnnotation(util.containerEAnnotationName);
-			if (ea != null)
+			if(ea != null)
 			{
-				for (int i = 0; i < textFieldNames.length; i++)
+				for(int i = 0; i < checkboxnames.length; i++)
 				{
-					String tmpName = textFieldNames[i];
-					Text tmpField = textFields[i];
+					String tmpName = checkboxnames[i];
 					String tmpValue = (String)util.getJadexEAnnotationDetail(tmpName);
-					tmpField.setText(tmpValue != null ? tmpValue : "");
-					tmpField.setEnabled(true);
+					boolean sel = tmpValue!=null? new Boolean(tmpValue).booleanValue(): defaultvalues!=null? defaultvalues[i]: false; 
+					checkboxes[i].setSelection(sel);
+					checkboxes[i].setEnabled(true);
 				}
 			}
 			else
 			{
-				for (int i = 0; i < textFieldNames.length; i++)
+				for(int i = 0; i < checkboxnames.length; i++)
 				{
-					textFields[i].setText("");
-					textFields[i].setEnabled(true);
+					boolean sel = defaultvalues!=null? defaultvalues[i]: false; 
+					checkboxes[i].setSelection(sel);
+					checkboxes[i].setEnabled(true);
 				}
 			}
-
 			return;
 		}
-		
+
 		// fall through
-		for(int i = 0; i < textFieldNames.length; i++)
+		for(int i = 0; i < checkboxnames.length; i++)
 		{
-			Text tmpField = textFields[i];
-			tmpField.setEnabled(false);
+			checkboxes[i].setEnabled(false);
 		}
 	}
 
@@ -142,9 +132,9 @@ public abstract class AbstractMultiTextfieldPropertySection extends AbstractBpmn
 	private class ModifyJadexEAnnotation implements FocusListener
 	{
 		private String key;
-		private Text field;
+		private Button field;
 
-		public ModifyJadexEAnnotation(String k, Text field)
+		public ModifyJadexEAnnotation(String k, Button field)
 		{
 			key = k;
 			this.field = field;
@@ -162,11 +152,8 @@ public abstract class AbstractMultiTextfieldPropertySection extends AbstractBpmn
 				// the value was just initialized
 				return;
 			}
-			String value = field.getText();
-			if(value != null)
-			{
-				updateJadexEAnnotation(key, value);
-			}
+			boolean value = field.getSelection();
+			updateJadexEAnnotation(key, ""+value);
 		}
 	}
 

@@ -115,7 +115,7 @@ public class DefaultStepHandler implements IStepHandler
 							List	handlers	= activity.getEventHandlers();
 							for(int i=0; handlers!=null && i<handlers.size(); i++)
 							{
-								MActivity handler = (MActivity) handlers.get(i);
+								MActivity handler = (MActivity)handlers.get(i);
 								instance.getActivityHandler(handler).cancel(handler, instance, remove.getInitiator());
 							}
 						}
@@ -142,7 +142,7 @@ public class DefaultStepHandler implements IStepHandler
 			{
 				ProcessThread	pt	= (ProcessThread)it.next();
 				ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, BpmnInterpreter.TYPE_THREAD, pt.getClass().getName(), 
-						pt.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(pt));
+					pt.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(pt));
 				instance.notifyListeners(cce);
 //				instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, (ProcessThread)it.next());
 			}
@@ -154,7 +154,6 @@ public class DefaultStepHandler implements IStepHandler
 
 		if(next!=null)
 		{
-
 			// Todo: store exception as parameter!?
 			if(ex!=null)
 				thread.setException(null);

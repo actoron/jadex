@@ -3,6 +3,10 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_6AR9YJaFEeCjkIoLnIcXpQ" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6ASkcJaFEeCjkIoLnIcXpQ" key="package" value="jadex.bpmn"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_d39yYJaGEeCjkIoLnIcXpQ" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_SgX34JdeEeCZD5U_TbGNZg" key="autoshutdown" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h3DicJdoEeCSlYs3pKGwZg" key="suspend" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h7evcJdoEeCSlYs3pKGwZg" key="master" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_iDteYJdoEeCSlYs3pKGwZg" key="daemon" value="false"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_6BCLUJaFEeCjkIoLnIcXpQ" source="jadex_configurations_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6xSjkJaFEeCjkIoLnIcXpQ" key="dimension" value="1:2"/>

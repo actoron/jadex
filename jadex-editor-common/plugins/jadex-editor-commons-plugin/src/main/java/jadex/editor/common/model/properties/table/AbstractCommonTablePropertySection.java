@@ -54,8 +54,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * @author Claas
  *
  */
-public abstract class AbstractCommonTablePropertySection extends
-		AbstractCommonPropertySection
+public abstract class AbstractCommonTablePropertySection extends AbstractCommonPropertySection
 {
 
 	/** The label string for the tableViewer */
@@ -539,7 +538,7 @@ public abstract class AbstractCommonTablePropertySection extends
 		
 		public Image getImage(Object element)
 		{
-			if (columIndex >= 0)
+			if(columIndex >= 0)
 			{
 				return this.getColumnImage(element, columIndex);
 			}
@@ -549,10 +548,9 @@ public abstract class AbstractCommonTablePropertySection extends
 			}
 		}
 	
-		@Override
 		public String getText(Object element)
 		{
-			if (columIndex >= 0)
+			if(columIndex >= 0)
 			{
 				return this.getColumnText(element, columIndex);
 			}
@@ -577,11 +575,20 @@ public abstract class AbstractCommonTablePropertySection extends
 		 */
 		public String getColumnText(Object element, int columnIndex)
 		{
-			if (element instanceof MultiColumnTableRow)
+			String ret = null;
+			if(element instanceof MultiColumnTableRow)
 			{
-				return ((MultiColumnTableRow) element).getColumnValues()[columnIndex];
+				String[] vals = ((MultiColumnTableRow)element).getColumnValues();
+				if(columnIndex<vals.length)
+				{
+					ret = vals[columnIndex];
+				}
 			}
-			return super.getText(element);
+			else
+			{
+				ret = super.getText(element);
+			}
+			return ret;
 		}
 		
 	}
