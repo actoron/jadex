@@ -766,12 +766,18 @@ public class StarterPanel extends JLayeredPane
 		final Future	ret	= new Future();
 		
 		// Don't load same model again (only on reload).
-		if(adf!=null && adf.equals(lastfile))
+		if(adf!=null && lastfile!=null && SUtil.convertPathToRelative(adf).equals(SUtil.convertPathToRelative(lastfile)))
 		{
 			ret.setResult(null);
 		}
 		else
-		{		
+		{
+			// Reset start flags for new model.
+			suspend.setSelected(false);
+			daemoncb.setSelected(false);
+			mastercb.setSelected(false);
+			autosdcb.setSelected(false);
+			
 			lastfile	= adf;
 			
 	//		System.out.println("loadModel: "+adf);
@@ -978,14 +984,13 @@ public class StarterPanel extends JLayeredPane
 	 */
 	protected void refreshFlags()
 	{
-		// todo: suspend?!
 		if(model!=null)
 		{
 			String c = (String)config.getSelectedItem();
-			boolean s = model.getSuspend(c)==null? false: model.getSuspend(c).booleanValue();
-			boolean m = model.getMaster(c)==null? false: model.getMaster(c).booleanValue();
-			boolean d = model.getDaemon(c)==null? false: model.getDaemon(c).booleanValue();
-			boolean a = model.getAutoShutdown(c)==null? false: model.getAutoShutdown(c).booleanValue();
+			boolean s = model.getSuspend(c)==null? suspend.isSelected(): model.getSuspend(c).booleanValue();
+			boolean m = model.getMaster(c)==null? mastercb.isSelected(): model.getMaster(c).booleanValue();
+			boolean d = model.getDaemon(c)==null? daemoncb.isSelected(): model.getDaemon(c).booleanValue();
+			boolean a = model.getAutoShutdown(c)==null? autosdcb.isSelected(): model.getAutoShutdown(c).booleanValue();
 			suspend.setSelected(s);
 			mastercb.setSelected(m);
 			daemoncb.setSelected(d);
