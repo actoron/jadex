@@ -35,7 +35,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
-import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -213,9 +212,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		{
 			ProcessThread	thread	= new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
 			context.addThread(thread);
-//			notifyListeners(EVENT_THREAD_ADDED, thread);
-			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_THREAD, thread.getClass().getName(), 
-				thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread)));
 
 		}
 		initedflag = true;	// No further init for BDI plan.
@@ -254,23 +250,20 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		else
 		{
 			String poollane = model.getPoolLane(config);
-			int idx	= config.indexOf('.');
-			if(idx==-1)
+			if(poollane!=null && poollane.length()>0)
 			{
-				this.pool	= config;
-				this.lane	= null;
+				int idx	= config.indexOf('.');
+				if(idx==-1)
+				{
+					this.pool	= config;
+					this.lane	= null;
+				}
+				else
+				{
+					this.pool	= config.substring(0, idx);
+					this.lane	= config.substring(idx+1);
+				}
 			}
-			else
-			{
-				this.pool	= config.substring(0, idx);
-				this.lane	= config.substring(idx+1);
-			}
-//			if(!model.getPools().contains(this.pool) || !model.getPool(this.pool).getLanes().contains(this.lane))
-//			{
-//				System.out.println("Resetting pool/lane config");
-//				this.pool = null;
-//				this.lane = null;
-//			}
 		}
 		
 		this.activityhandlers = activityhandlers!=null? activityhandlers: DEFAULT_ACTIVITY_HANDLERS;
@@ -330,7 +323,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 				boolean autosd = autosdtmp!=null? autosdtmp.booleanValue(): false;
 				if(!finishing && isFinished(pool, lane) && autosd)
 				{
-					System.out.println("terminating: "+getComponentIdentifier());
+//					System.out.println("terminating: "+getComponentIdentifier());
 					finishing = true;
 //					((IComponentManagementService)variables.get("$cms")).destroyComponent(adapter.getComponentIdentifier());
 					
@@ -475,9 +468,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 				{
 					ProcessThread	thread	= new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
 					context.addThread(thread);
-//					notifyListeners(EVENT_THREAD_ADDED, thread);
-					notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_THREAD, thread.getClass().getName(), 
-						thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread)));
 				}
 				return null;
 			}
@@ -824,22 +814,13 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 			if(handler==null)
 				throw new UnsupportedOperationException("No handler for activity: "+thread);
 
-//			notifyListeners(EVENT_HISTORY_ADDED, thread);
-			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_THREAD, thread.getClass().getName(), 
-				thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread)));
-			
-			if(thread.getLastEdge()!=null && thread.getLastEdge().getSource()!=null)
-				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_ACTIVITY, thread.getLastEdge().getSource().getName(), thread.getId(), getComponentIdentifier(), null));
-
-			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_ACTIVITY, thread.getActivity().getName(), thread.getId(), getComponentIdentifier(), null));
-
 //			System.out.println("step: "+getComponentIdentifier()+" "+thread.getId()+" "+thread.getActivity());
-			
-//			System.out.println("Step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+thread.getActivity()+" "+thread);
 			MActivity act = thread.getActivity();
+			notifyListeners(createActivityEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, thread, thread.getActivity()));
 //			thread = handler.execute(act, this, thread);
 			handler.execute(act, this, thread);
-	
+
+			
 			// Moved to StepHandler
 //			thread.updateParametersAfterStep(act, this);
 			
@@ -864,9 +845,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 				}
 			}
 			
-//			notifyListeners(EVENT_THREAD_CHANGED, thread);
-			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, TYPE_THREAD, thread.getClass().getName(), 
-				thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread)));
+			if(thread.getThreadContext()!=null)
+				notifyListeners(createThreadEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, thread));
 		}
 	}
 
@@ -906,12 +886,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 					if(isCurrentActivity(activity, thread))
 					{
 //						System.out.println("Notify: "+activity+" "+thread+" "+event);
-						getStepHandler(activity).step(activity, BpmnInterpreter.this, thread, event);
+						step(activity, BpmnInterpreter.this, thread, event);
 						thread.setNonWaiting();
-//						notifyListeners(EVENT_THREAD_CHANGED, thread);
-						notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, TYPE_THREAD, thread.getClass().getName(), 
-							thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread)));
-
+						if(thread.getThreadContext()!=null)
+							notifyListeners(createThreadEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, thread));
 					}
 					else
 					{
@@ -925,11 +903,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 			if(isCurrentActivity(activity, thread))
 			{
 //				System.out.println("Notify: "+activity+" "+thread+" "+event);
-				getStepHandler(activity).step(activity, BpmnInterpreter.this, thread, event);
+				step(activity, BpmnInterpreter.this, thread, event);
 				thread.setNonWaiting();
-//				notifyListeners(EVENT_THREAD_CHANGED, thread);
-				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, TYPE_THREAD, thread.getClass().getName(), 
-					thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread)));
+				if(thread.getThreadContext()!=null)
+					notifyListeners(createThreadEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, thread));
 			}
 			else
 			{
@@ -981,14 +958,31 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		return (IActivityHandler)activityhandlers.get(activity.getActivityType());
 	}
 	
+//	/**
+//	 *  Get the step handler.
+//	 *  @return The step handler.
+//	 */
+//	public IStepHandler getStepHandler(MActivity activity)
+//	{
+//		IStepHandler ret = (IStepHandler)stephandlers.get(activity.getActivityType());
+//		return ret!=null? ret: (IStepHandler)stephandlers.get(IStepHandler.STEP_HANDLER);
+//	}
+	
 	/**
-	 *  Get the step handler.
-	 *  @return The step handler.
+	 *  Make a process step, i.e. find the next edge or activity for a just executed thread.
+	 *  @param activity	The activity to execute.
+	 *  @param instance	The process instance.
+	 *  @param thread	The process thread.
 	 */
-	public IStepHandler getStepHandler(MActivity activity)
+	public void step(MActivity activity, BpmnInterpreter instance, ProcessThread thread, Object event)
 	{
+//		System.out.println("step: "+activity.getName());
+		notifyListeners(createActivityEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, thread, activity));
+		
 		IStepHandler ret = (IStepHandler)stephandlers.get(activity.getActivityType());
-		return ret!=null? ret: (IStepHandler)stephandlers.get(IStepHandler.STEP_HANDLER);
+		if(ret==null) 
+			ret = (IStepHandler)stephandlers.get(IStepHandler.STEP_HANDLER);
+		ret.step(activity, instance, thread, event);
 	}
 
 	/**
@@ -1126,6 +1120,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	 *  @param step	Code to be executed as a step of the agent.
 	 *  @return The result of the step.
 	 */
+	protected int cnt;
 	public IFuture scheduleStep(final IComponentStep step)
 	{
 		final Future ret = new Future();
@@ -1140,7 +1135,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 				// value with be deleted in process thread updateParametersBeforeStep().
 				
 				MActivity act = new MActivity();
-				act.setName("External Step Activity.");
+				act.setName("External Step Activity: "+(cnt++));
 				act.setClazz(ExecuteStepTask.class);
 				act.addParameter(new MParameter(MParameter.DIRECTION_IN, Object[].class, "step", null));
 				act.setActivityType(MBpmnModel.TASK);
@@ -1148,15 +1143,12 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 				edge.setTarget(act);
 				edge.addParameterMapping("step", SJavaParser.parseExpression("step", null, null), null);
 				act.addIncomingSequenceEdge(edge);
-				MPool pl = model.getPool(pool);
+				MPool pl = pool!=null? model.getPool(pool): (MPool)model.getPools().get(0);
 				act.setPool(pl);
 				ProcessThread thread = new ProcessThread(""+idcnt++, act, context, BpmnInterpreter.this);
 				thread.setLastEdge(edge);
 				thread.setParameterValue("step", new Object[]{step, ret});
 				context.addExternalThread(thread);
-//				notifyListeners(EVENT_THREAD_ADDED, pt);
-				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_THREAD, thread.getClass().getName(), 
-					thread.getId(), getComponentIdentifier(), new ProcessThreadInfo(thread.getId(), act.getName(), pool, lane)));
 			}
 		});
 		return ret;
@@ -1317,5 +1309,23 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	public Map createReply(final Map msg, final MessageType mt)
 	{
 		return mt.createReply(msg);
+	}
+	
+	/**
+	 *  Create a thread event (creation, modification, termination).
+	 */
+	public IComponentChangeEvent createThreadEvent(String type, ProcessThread thread)
+	{
+		return new ComponentChangeEvent(type, TYPE_THREAD, thread.getClass().getName(), 
+			thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread));
+	}
+	
+	/**
+	 *  Create an activity event (start, end).
+	 */
+	public IComponentChangeEvent createActivityEvent(String type, ProcessThread thread, MActivity activity)
+	{
+		return new ComponentChangeEvent(type, TYPE_ACTIVITY, activity.getName(), 
+			thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread));
 	}
 }

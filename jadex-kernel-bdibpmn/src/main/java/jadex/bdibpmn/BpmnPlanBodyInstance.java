@@ -1423,7 +1423,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 					{
 						try
 						{
-							getStepHandler(activity).step(activity, BpmnPlanBodyInstance.this, thread, event);
+							step(activity, BpmnPlanBodyInstance.this, thread, event);
 						}
 						catch(Throwable t)
 						{
@@ -1450,7 +1450,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 			{
 				try
 				{
-					getStepHandler(activity).step(activity, BpmnPlanBodyInstance.this, thread, event);
+					step(activity, BpmnPlanBodyInstance.this, thread, event);
 				}
 				catch(Throwable t)
 				{

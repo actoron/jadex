@@ -142,21 +142,28 @@ public class ProcessViewPanel extends JPanel
 					{
 						if(cce.getSourceCategory().equals(BpmnInterpreter.TYPE_THREAD))
 						{
-							if(IComponentChangeEvent.EVENT_TYPE_CREATION.equals(cce.getEventType()) && BpmnInterpreter.TYPE_THREAD.equals(cce.getSourceCategory()))
+							if(IComponentChangeEvent.EVENT_TYPE_CREATION.equals(cce.getEventType()))
 							{
 								threadinfos.add(cce.getDetails());
 							}
-							else if(IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()) && BpmnInterpreter.TYPE_THREAD.equals(cce.getSourceCategory()))
+							else if(IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()))
 							{
 								threadinfos.remove(cce.getDetails());
-								historyinfos.add(0, cce.getDetails());
 							}
-							else if(IComponentChangeEvent.EVENT_TYPE_MODIFICATION.equals(cce.getEventType()) && BpmnInterpreter.TYPE_THREAD.equals(cce.getSourceCategory()))
+							else if(IComponentChangeEvent.EVENT_TYPE_MODIFICATION.equals(cce.getEventType()))
 							{
 								threadinfos.remove(cce.getDetails());
 								threadinfos.add(cce.getDetails());
 							}
 						}
+						else if(cce.getSourceCategory().equals(BpmnInterpreter.TYPE_ACTIVITY))
+						{
+							if(IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()))
+							{
+								historyinfos.add(0, cce.getDetails());
+							}
+						}
+//						System.out.println("ti: "+threadinfos.size()+" "+cce.getSourceName()+" "+cce.getSourceType()+" "+cce.getEventType());
 						updateViews();
 					}
 				});

@@ -252,6 +252,15 @@ public class ProcessThread	implements ITaskContext
 	{
 		return context;
 	}
+	
+	/**
+	 *  Set the context.
+	 *  @param context The context to set.
+	 */
+	public void setThreadContext(ThreadContext context)
+	{
+		this.context = context;
+	}
 
 	/**
 	 *  Create a copy of this thread (e.g. for a parallel split).
@@ -512,7 +521,8 @@ public class ProcessThread	implements ITaskContext
 	{
 		// Pool null for external steps.
 		MPool po = getActivity().getPool();
-		boolean	ret	= pool==null || po==null || pool.equals(po.getName());
+		assert po !=null: getActivity();
+		boolean	ret	= pool==null || pool.equals(po.getName());
 		
 		// Test lane
 		if(ret && lane!=null)

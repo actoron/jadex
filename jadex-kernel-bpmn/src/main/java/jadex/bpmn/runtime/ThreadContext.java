@@ -3,6 +3,7 @@ package jadex.bpmn.runtime;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bridge.IComponentChangeEvent;
 import jadex.commons.SReflect;
 
 import java.util.HashSet;
@@ -92,6 +93,7 @@ public class ThreadContext
 		
 		threads.put(thread, null);
 		
+		thread.getInstance().notifyListeners(thread.getInstance().createThreadEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, thread));
 //		System.out.println("add: "+thread);
 	}
 	
@@ -108,6 +110,7 @@ public class ThreadContext
 		if(oldthreads!=null)
 			threads.putAll(oldthreads);
 		
+		thread.getInstance().notifyListeners(thread.getInstance().createThreadEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, thread));
 //		System.out.println("add: "+thread);
 	}
 	
@@ -119,10 +122,18 @@ public class ThreadContext
 	{
 		if(threads!=null)
 		{
+			boolean rem = threads.containsKey(thread);
 			threads.remove(thread);
+			thread.setThreadContext(null);
 			
 			if(threads.isEmpty())
 				threads	= null;
+		
+			if(rem)
+			{
+				BpmnInterpreter in = thread.getInstance();
+				in.notifyListeners(in.createThreadEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, thread));
+			}
 		}
 		
 //		System.out.println("remove: "+thread);
@@ -248,6 +259,7 @@ public class ThreadContext
 	 */
 	public ProcessThread getExecutableThread(String pool, String lane)
 	{
+		// Iterate over all thread contexts and find executable thread
 		ProcessThread	ret	= null;
 		if(threads!=null)
 		{

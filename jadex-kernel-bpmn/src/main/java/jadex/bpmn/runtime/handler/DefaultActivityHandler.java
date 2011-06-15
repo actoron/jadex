@@ -24,7 +24,7 @@ public class DefaultActivityHandler implements IActivityHandler
 	public void execute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
 		doExecute(activity, instance, thread);
-		instance.getStepHandler(activity).step(activity, instance, thread, null);
+		instance.step(activity, instance, thread, null);
 //		return thread;
 	}
 	

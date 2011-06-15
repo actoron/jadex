@@ -58,7 +58,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 				}
 			}
 			inst.sendMessage(me);
-			instance.getStepHandler(activity).step(activity, instance, thread, null);
+			instance.step(activity, instance, thread, null);
 		}
 		else 
 		{

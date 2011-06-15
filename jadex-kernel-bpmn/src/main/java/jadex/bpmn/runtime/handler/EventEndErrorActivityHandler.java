@@ -19,7 +19,7 @@ public class EventEndErrorActivityHandler extends DefaultActivityHandler
 		if(ex==null)
 			ex = new EventIntermediateErrorException(activity.getDescription());
 		thread.setException(ex);
-		instance.getStepHandler(activity).step(activity, instance, thread, null);
+		instance.step(activity, instance, thread, null);
 	}
 	
 	/**

@@ -200,11 +200,11 @@ public class ProcessThreadInfo
 	public String toString()
 	{
 		return "ProcessThreadInfo(id="+id
-			+ ", activity=" + this.activity 
-			+ ", pool=" + this.pool
-			+ ", lane=" + this.lane 
-			+ ", exception=" + this.exception
-			+ ", waiting="+ this.waiting + ")";
+			+ ", activity=" + this.activity+")"; 
+//			+ ", pool=" + this.pool
+//			+ ", lane=" + this.lane 
+//			+ ", exception=" + this.exception
+//			+ ", waiting="+ this.waiting + ")";
 	}
 
 	/**

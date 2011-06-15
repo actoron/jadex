@@ -34,6 +34,9 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 	 */
 	public void execute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
+		// Notify listeners as gateways are not followed by step handler execution
+		instance.notifyListeners(instance.createActivityEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, thread, activity));
+
 		List	incoming	= activity.getIncomingSequenceEdges();
 		List	outgoing	= activity.getOutgoingSequenceEdges();
 		
@@ -154,10 +157,6 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 					}
 					
 					thread.getThreadContext().removeThread(pt);
-//					instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, pt);
-					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
-						thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(pt));
-					instance.notifyListeners(cce);
 				}
 			}
 			else

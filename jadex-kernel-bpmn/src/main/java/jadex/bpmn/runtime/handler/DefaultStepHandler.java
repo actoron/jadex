@@ -138,7 +138,6 @@ public class DefaultStepHandler implements IStepHandler
 			// Todo: Callbacks for aborted threads (to abort external activities)
 			thread.getThreadContext().removeSubcontext(remove);
 			
-			
 			for(Iterator it=remove.getAllThreads().iterator(); it.hasNext(); )
 			{
 				ProcessThread	pt	= (ProcessThread)it.next();
@@ -180,10 +179,6 @@ public class DefaultStepHandler implements IStepHandler
 		else if(next==null)
 		{
 			thread.getThreadContext().removeThread(thread);
-//			instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, thread);
-			ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
-				thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(thread));
-			instance.notifyListeners(cce);
 		} 
 		else
 		{

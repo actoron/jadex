@@ -127,7 +127,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			else
 			{
 				thread.setNonWaiting();
-				instance.getStepHandler(activity).step(activity, instance, thread, null);				
+				instance.step(activity, instance, thread, null);				
 			}
 		}
 		
@@ -201,7 +201,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 											}
 										}
 										thread.setNonWaiting();
-										instance.getStepHandler(activity).step(activity, instance, thread, null);
+										instance.step(activity, instance, thread, null);
 									}
 								});
 							}
@@ -215,7 +215,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 //										System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
 										thread.setNonWaiting();
 										thread.setException(exception);
-										instance.getStepHandler(activity).step(activity, instance, thread, null);
+										instance.step(activity, instance, thread, null);
 									}
 								});
 							}
@@ -247,7 +247,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 		else if((start==null || start.isEmpty()) && file==null)
 		{
 			// If no activity in sub process, step immediately. 
-			instance.getStepHandler(activity).step(activity, instance, thread, null);
+			instance.step(activity, instance, thread, null);
 		}
 		
 		// Inconsistent subprocess.

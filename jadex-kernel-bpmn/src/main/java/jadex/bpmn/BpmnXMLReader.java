@@ -1397,7 +1397,7 @@ public class BpmnXMLReader
 						for(int row = 0; row < table.getDimension(0); row++)
 						{
 							// normal argument has 6 (+x) values
-							assert table.getRow(row).length == 7;
+//							assert table.getRow(row).length == 7;
 							
 							String name = table.getCellValue(row, 0);
 							String isarg = table.getCellValue(row, 1);
