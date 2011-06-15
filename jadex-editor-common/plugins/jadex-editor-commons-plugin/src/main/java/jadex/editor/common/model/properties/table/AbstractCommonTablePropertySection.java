@@ -9,6 +9,9 @@ import jadex.editor.common.model.properties.AbstractCommonPropertySection;
 import jadex.editor.common.model.properties.ModifyEObjectCommand;
 import jadex.editor.common.model.properties.table.MultiColumnTable.MultiColumnTableRow;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -30,6 +33,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -74,7 +78,12 @@ public abstract class AbstractCommonTablePropertySection extends
 	
 	/** The table clear button */
 	protected Button clearButton;
-
+	
+	
+	List<ICellFocusChangedListener> selectionChangedListener = new ArrayList<ICellFocusChangedListener>();
+	
+	
+	
 	/**
 	 * @param tableViewerLabel
 	 */
@@ -309,7 +318,16 @@ public abstract class AbstractCommonTablePropertySection extends
 		
 		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(
 				viewer,
-				new FocusCellOwnerDrawHighlighter(viewer));
+				new FocusCellOwnerDrawHighlighter(viewer) {
+					
+					@Override
+					protected void focusCellChanged(ViewerCell newCell, ViewerCell oldCell) 
+					{
+						super.focusCellChanged(newCell, oldCell);
+						cellFocusChangedHook(newCell, oldCell);
+					}
+					
+				});
 
 		ColumnViewerEditorActivationStrategy editorActivationSupport = new ColumnViewerEditorActivationStrategy(
 				viewer)
@@ -463,6 +481,16 @@ public abstract class AbstractCommonTablePropertySection extends
 			weights[i] = 1;
 		}
 		return weights;
+	}
+	
+	/**
+	 * HACK!
+	 * Hook to support additional listener when cell focus is changed
+	 * @param newCell
+	 * @param oldCell
+	 */
+	protected void cellFocusChangedHook(ViewerCell newCell, ViewerCell oldCell) 
+	{
 	}
 	
 	// ---- internal used classes ----

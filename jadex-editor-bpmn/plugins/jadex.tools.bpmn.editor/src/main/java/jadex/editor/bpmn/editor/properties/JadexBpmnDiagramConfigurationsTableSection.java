@@ -2,8 +2,11 @@ package jadex.editor.bpmn.editor.properties;
 
 import jadex.editor.bpmn.editor.properties.template.AbstractBpmnMultiColumnTablePropertySection;
 import jadex.editor.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
+import jadex.editor.common.model.properties.table.MultiColumnTable.MultiColumnTableRow;
 
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.widgets.TableColumn;
 
 /**
@@ -24,7 +27,7 @@ public class JadexBpmnDiagramConfigurationsTableSection extends
 	public JadexBpmnDiagramConfigurationsTableSection()
 	{
 		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_CONFIGURATIONS_LIST_DETAIL,
-			"Configurations", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX);
+			"Configurations", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX, null);
 	}
 
 	protected String[] getDefaultListElementAttributeValues()
@@ -35,8 +38,26 @@ public class JadexBpmnDiagramConfigurationsTableSection extends
 	protected void createColumns(TableViewer viewer)
 	{
 		super.createColumns(viewer, COLUMN_NAMES, COLUMN_TYPES, null);
+		
+		
 	}
 
+	@Override
+	protected void cellFocusChangedHook(ViewerCell newCell, ViewerCell oldCell)
+	{
+		// TODO: avoid nullpointer with no selection
+		// TODO: check "real" change of configuration
+		MultiColumnTableRow selectedRow = (MultiColumnTableRow) ((IStructuredSelection) tableViewer.getSelection()).getFirstElement();
+		String selectedConfiguration = selectedRow.getColumnValueAt(UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX);
+		
+		// FIXME: write to model
+		
+		System.err.println("New selection: " + selectedConfiguration);
+	}
+	
+	
+	
+	
 	protected int[] getColumnWeights(TableColumn[] columns)
 	{
 		if(columns.length == COLUMN_WEIGHTS.length)

@@ -92,7 +92,10 @@ public class MultiColumnTableEx extends MultiColumnTable
 	 */
 	public boolean isComplexColumn(int coulumnIndex)
 	{
-		return isComplexColumn[coulumnIndex];
+		if (isComplexColumn != null && coulumnIndex < isComplexColumn.length)
+			return isComplexColumn[coulumnIndex];
+		
+		return false;
 	}
 	
 	
