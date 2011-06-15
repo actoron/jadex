@@ -39,16 +39,18 @@ public class MultiColumnTable
 	
 	/** 
 	 * String delimiter for list elements <p>
-	 * <p><code>\u001E</code> RS 	Record Separator</p>
+	 * @deprecated
 	 */
 	public static final String LIST_ELEMENT_DELIMITER = "\u241F"; // "<*>";
+	/** @deprecated */
 	public static final String DEPRECATED_LIST_ELEMENT_DELIMITER = "\u241F"; // "<*>";
 	
 	/** 
 	 * String delimiter for element attributes  <p>
-	 * <p><code>\u001F</code> US 	Unit Separator </p>
+	 * @deprecated
 	 */
 	public static final String LIST_ELEMENT_ATTRIBUTE_DELIMITER = "\u240B";
+	/** @deprecated */
 	public static final String DEPRECATED_LIST_ELEMENT_ATTRIBUTE_DELIMITER = "\u240B"; //"#|#";
 
 	// ---- attributes ----
@@ -59,10 +61,13 @@ public class MultiColumnTable
 	private int uniqueColumn = 0;
 	private HashSet<String> uniqueValues;
 	
-	// ---- constructor ----
+	// ---- constructors ----
 	
+
 	/**
 	 * 
+	 * @param rowCount
+	 * @param uniqueColumn
 	 */
 	public MultiColumnTable(int rowCount, int uniqueColumn)
 	{
@@ -108,7 +113,7 @@ public class MultiColumnTable
 	{
 		return uniqueColumn;
 	}
-	
+
 	public String createUniqueValue(String desiredValue)
 	{
 		int counter = 1;
@@ -135,7 +140,7 @@ public class MultiColumnTable
 		// don't add empty unique values
 		if (row.columnValues[uniqueColumn].trim().isEmpty())
 		{
-			return;
+			throw new UnsupportedOperationException("Empty string is not a valid unique identifier for column index: " + getUniqueColumn() );
 		}
 		
 		row.setTable(this);
@@ -447,7 +452,6 @@ public class MultiColumnTable
 		// ---- attributes ----
 
 		private String[] columnValues;
-		//private int uniqueColumnIndex;
 		private MultiColumnTable table;
 		
 		// ---- constructors ----
@@ -568,7 +572,7 @@ public class MultiColumnTable
 		 * Get the parent for this row
 		 * @return The parent table for this table row
 		 */
-		private MultiColumnTable getTable()
+		public MultiColumnTable getTable()
 		{
 			return table;
 		}
