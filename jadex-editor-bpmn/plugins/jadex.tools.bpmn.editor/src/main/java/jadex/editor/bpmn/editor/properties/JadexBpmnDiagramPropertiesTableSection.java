@@ -29,7 +29,7 @@ public class JadexBpmnDiagramPropertiesTableSection extends
 	public JadexBpmnDiagramPropertiesTableSection()
 	{
 		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_PROPERTIES_LIST_DETAIL,
-			"Properties", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX);
+			"Properties", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX, null);
 		
 	}
 

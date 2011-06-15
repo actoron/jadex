@@ -9,13 +9,17 @@ import jadex.editor.bpmn.editor.properties.JadexBpmnDiagramPropertiesTableSectio
 import jadex.editor.bpmn.editor.properties.JadexCommonParameterSection;
 import jadex.editor.bpmn.editor.properties.JadexIntermediateEventsParameterSection;
 import jadex.editor.bpmn.editor.properties.JadexSequenceMappingSection;
+import jadex.editor.bpmn.model.MultiColumnTableEx;
 import jadex.editor.common.model.properties.AbstractCommonPropertySection;
 import jadex.editor.common.model.properties.ModifyEObjectCommand;
 import jadex.editor.common.model.properties.table.MultiColumnTable;
 import jadex.editor.common.model.properties.table.MultiColumnTable.MultiColumnTableRow;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -194,6 +198,9 @@ public class JadexBpmnPropertiesUtil
 	/** Key for the table unique column index. */
 	public static final String JADEX_TABLE_UNIQUE_COLUMN_DETAIL = "uniqueColumnIndex";
 	
+	/** Key for the table unique column index. */
+	public static final String JADEX_TABLE_COMPLEX_COLUMNS_DETAIL = "complexColumns";
+	
 	/** Delimiter for the table cell index and dimension */
 	public static final String JADEX_TABLE_DIMENSION_DELIMITER = ":";
 	
@@ -298,7 +305,28 @@ public class JadexBpmnPropertiesUtil
 				+ JADEX_COMBINED_KEY_DELIMITER
 				+ JADEX_TABLE_KEY_EXTENSION;
 	}
+	
+	/**
+	 * Create the annotation identifier from util instance values
+	 * 
+	 * @return
+	 */
+	public static String getComplexValueAnnotationIdentifier(String annotationID, String detailID, String defaultValue)
+	{
+		StringBuffer b = new StringBuffer(getTableAnnotationIdentifier(annotationID, detailID));
+		b.append(JADEX_COMBINED_KEY_DELIMITER);
+		b.append(defaultValue);
+		
+		return b.toString();
+	}
 
+	/**
+	 * 
+	 * @param element
+	 * @param annotationIdentifier
+	 * @param create
+	 * @return
+	 */
 	public static EAnnotation getJadexEAnnotation(final EModelElement element, final String annotationIdentifier, boolean create)
 	{
 		if(element == null)
@@ -317,6 +345,8 @@ public class JadexBpmnPropertiesUtil
 			// change upper case annotation identifier
 			if (annotation != null && !RESERVED_BPMN_ANNOTATIONS.contains(annotationIdentifier))
 			{
+				// XXX: FixME!!! Use command!
+				
 				if (element.getEAnnotations().remove(annotation))
 				{
 					annotation.setSource(lcAnnotationIdentifier);
@@ -362,6 +392,45 @@ public class JadexBpmnPropertiesUtil
 		}
 
 		return annotation;
+	}
+	
+	public static boolean removeJadexEAnnotation(final EModelElement element, final String annotationIdentifier)
+	{
+		final EAnnotation eAnnotation = getJadexEAnnotation(element, annotationIdentifier, false);
+		if (eAnnotation != null)
+		{
+			// update or create the annotation detail
+			ModifyEObjectCommand command = new ModifyEObjectCommand(
+					element, Messages.JadexCommonPropertySection_update_eannotation_command_name)
+			{
+				@Override
+				protected CommandResult doExecuteWithResult(
+						IProgressMonitor arg0, IAdaptable arg1)
+						throws ExecutionException
+				{
+					element.getEAnnotations().remove(eAnnotation);
+					return CommandResult.newOKCommandResult();
+				}
+			};
+			
+			// execute command
+			try
+			{
+				IStatus status = command.execute(new NullProgressMonitor(), null);
+				return status.isOK();
+			}
+			catch (ExecutionException exception)
+			{
+				JadexBpmnEditorActivator.getDefault().getLog().log(
+						new Status(IStatus.ERROR, JadexBpmnEditorActivator.ID,
+								IStatus.ERROR, exception.getMessage(),
+								exception));
+				
+			}
+		}
+		
+		// fall through
+		return false;
 	}
 	
 	/**
@@ -502,7 +571,7 @@ public class JadexBpmnPropertiesUtil
 	 * @param value
 	 * @return
 	 */
-	public static boolean updateJadexEAnnotationTable(final EModelElement element, final String annotationIdentifier, final MultiColumnTable table)
+	public static boolean updateJadexEAnnotationTable(final EModelElement element, final String annotationIdentifier, final MultiColumnTableEx table)
 	{
 		if(element == null)
 		{
@@ -533,12 +602,22 @@ public class JadexBpmnPropertiesUtil
 						annotation.getDetails().clear();
 						annotation.getDetails().put(JADEX_TABLE_DIMESION_DETAIL, tableDimension);
 						annotation.getDetails().put(JADEX_TABLE_UNIQUE_COLUMN_DETAIL, String.valueOf(table.getUniqueColumn()));
+						annotation.getDetails().put(JADEX_TABLE_COMPLEX_COLUMNS_DETAIL, encodeComplexColumnMarker(table.getComplexColumnsMarker()));
 						int rowIndex = 0;
 						for (MultiColumnTableRow row : table.getRowList())
 						{
 							for (int columnIndex = 0; columnIndex < row.getColumnValues().length; columnIndex++)
 							{
 								annotation.getDetails().put(new TableCellIndex(rowIndex, columnIndex).toString(), row.getColumnValueAt(columnIndex));
+								
+								// save complex values
+								if (table.isComplexColumn(columnIndex))
+								{
+									EAnnotation complexValueAnnotation = element.getEAnnotation(row.getColumnValueAt(columnIndex));
+									complexValueAnnotation.getDetails().clear();
+									complexValueAnnotation.getDetails().putAll(table.getComplexValue(row.getColumnValueAt(columnIndex)));
+								}
+								
 							}
 							rowIndex++;
 						}
@@ -569,14 +648,17 @@ public class JadexBpmnPropertiesUtil
 			return false;
 		}
 	}
+	
+	
+	
 	/**
 	 * Get annotation detail
 	 * @param element
 	 * @param annotationIdentifier
-	 * @param annotationDetail
+	 * @param cellDimensionIdentifier
 	 * @return
 	 */
-	public static MultiColumnTable getJadexEAnnotationTable(final EModelElement element, final String annotationIdentifier)
+	public static MultiColumnTableEx getJadexEAnnotationTable(final EModelElement element, final String annotationIdentifier)
 	{
 		if(element == null)
 		{
@@ -586,35 +668,103 @@ public class JadexBpmnPropertiesUtil
 		EAnnotation annotation = element.getEAnnotation(annotationIdentifier);
 		if (annotation != null)
 		{
+			MultiColumnTableEx newTable;
+			
 			String dimension = annotation.getDetails().get(JADEX_TABLE_DIMESION_DETAIL);
 			int uniqueColumn = Integer.valueOf(annotation.getDetails().get(JADEX_TABLE_UNIQUE_COLUMN_DETAIL));
+			boolean[] complexColumnMarker = decodeComplexColumnMarker(annotation.getDetails().get(JADEX_TABLE_UNIQUE_COLUMN_DETAIL));
 			if (dimension != null) 
 			{
 				TableCellIndex tableDimension = new TableCellIndex(dimension);
-				MultiColumnTable newTable = new MultiColumnTable(tableDimension.getRowCount(), uniqueColumn);
+				newTable = new MultiColumnTableEx(tableDimension.getRowCount(), uniqueColumn, complexColumnMarker);
 				for (int rowIndex = 0; rowIndex < tableDimension.rowCount; rowIndex++)
 				{
 					String[] newRow = new String[tableDimension.columnCount];
 					for (int columnIndex = 0; columnIndex < tableDimension.columnCount; columnIndex++)
 					{
 						newRow[columnIndex] = annotation.getDetails().get((new TableCellIndex(rowIndex, columnIndex)).toString());
+						
+						// set complex values
+						if (newTable.isComplexColumn(columnIndex))
+						{
+							EAnnotation complexValueAnnotation = element.getEAnnotation(newRow[columnIndex]);
+							if (complexValueAnnotation != null)
+							{
+								Map<String, String> complexValue = new HashMap<String, String>();
+								for (Entry<String, String> e : complexValueAnnotation.getDetails().entrySet())
+								{
+									complexValue.put(e.getKey(), e.getValue());
+								}
+								
+								newTable.setComplexValue(newRow[columnIndex], complexValue);
+							}
+						}
+						
 					}
 					newTable.add(newTable.new MultiColumnTableRow(newRow, newTable));
 				}
-				
+
 				return newTable;
 			}
 			
 			// fall through
-			MultiColumnTable table = new MultiColumnTable(0,uniqueColumn);
+			newTable = new MultiColumnTableEx(0, uniqueColumn, complexColumnMarker);
 			// set parameter
-			return table;
+			return newTable;
 		}
 	
 		return null;
 		
 	}
 	
+	/**
+	 * 
+	 * @param string
+	 * @return string as boolean[] marker
+	 */
+	private static boolean[] decodeComplexColumnMarker(String markerString)
+	{
+		boolean[] marker = null;
+		
+		if (markerString != null && !markerString.trim().isEmpty())
+		{
+			String[] split = markerString
+					.split(JADEX_TABLE_DIMENSION_DELIMITER);
+			marker = new boolean[split.length];
+			for (int i = 0; i < split.length; i++)
+			{
+				marker[i] = Boolean.parseBoolean(split[i]);
+			}
+		}
+		return marker;
+	}
+	
+
+	/**
+	 * 
+	 * @param marker
+	 * @return boolean[] marker as String
+	 */
+	private static String encodeComplexColumnMarker(boolean[] marker)
+	{
+		
+		if (marker != null)
+		{
+			StringBuffer b = new StringBuffer();
+			for (int i = 0; i < marker.length; i++)
+			{
+				b.append(marker[i]);
+				if (i + 1 < marker.length)
+				{
+					b.append(JADEX_TABLE_DIMENSION_DELIMITER);
+				}
+			}
+			return b.toString();
+		}
+		
+		return "";
+	}
+
 	/**
 	 * Check if have to convert the annotation to new format
 	 * 
@@ -647,7 +797,7 @@ public class JadexBpmnPropertiesUtil
 						uniqueColumnIndex);
 				// save the new annotation
 				JadexBpmnPropertiesUtil.updateJadexEAnnotationTable(
-						modelElement, getTableAnnotationIdentifier(annotationId, detailId), table);
+						modelElement, getTableAnnotationIdentifier(annotationId, detailId), new MultiColumnTableEx(table));
 				// remove the old detail, this removes annotation if details are
 				// empty too
 				JadexBpmnPropertiesUtil.updateJadexEAnnotationDetail(
@@ -791,11 +941,8 @@ public class JadexBpmnPropertiesUtil
 	}
 }
 
-
-
 /**
  * A cell index data type
- * @TODO: replace with "toString" overridden existing java class * Point?
  * @author Claas
  */
 class TableCellIndex
@@ -811,6 +958,15 @@ class TableCellIndex
 	 * @param columnCount
 	 */
 	protected TableCellIndex(int rowCount, int columnCount)
+	{
+		this(rowCount, columnCount, null);
+	}
+	
+	/**
+	 * @param rowCount
+	 * @param columnCount
+	 */
+	protected TableCellIndex(int rowCount, int columnCount, String cellDimension)
 	{
 		super();
 		this.rowCount = rowCount;
@@ -835,7 +991,7 @@ class TableCellIndex
 	@Override
 	public String toString()
 	{
-		return rowCount+JadexBpmnPropertiesUtil.JADEX_TABLE_DIMENSION_DELIMITER+columnCount;
+		return rowCount + JadexBpmnPropertiesUtil.JADEX_TABLE_DIMENSION_DELIMITER + columnCount;
 	}
 
 	/**
@@ -870,8 +1026,6 @@ class TableCellIndex
 		this.columnCount = columnCount;
 	}
 
-	
-	
 }
 
 class TableAnnotationIdentifier

@@ -1,5 +1,7 @@
 package jadex.editor.bpmn.editor.properties.template;
 
+import jadex.editor.bpmn.editor.JadexBpmnEditor;
+import jadex.editor.bpmn.model.MultiColumnTableEx;
 import jadex.editor.common.model.properties.ModifyEObjectCommand;
 import jadex.editor.common.model.properties.table.AbstractCommonTablePropertySection;
 import jadex.editor.common.model.properties.table.MultiColumnTable;
@@ -10,6 +12,7 @@ import java.util.Map;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.gmf.runtime.common.core.command.CommandResult;
 import org.eclipse.jface.viewers.CellEditor;
@@ -43,6 +46,9 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 
 	/** The unique column index for this TablePropertySection */
 	private int uniqueColumnIndex;
+	
+	/** A boolean array to mark a column as reference column */
+	private boolean[] complexColumnMarker;
 
 	// ---- constructor ----
 
@@ -60,7 +66,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	 */
 	protected AbstractBpmnMultiColumnTablePropertySection(
 			String containerEAnnotationName, String annotationDetailName,
-			String tableLabel, int uniqueColumnIndex)
+			String tableLabel, int uniqueColumnIndex, boolean[] complexColumnMarker)
 	{
 		super(tableLabel);
 
@@ -71,10 +77,15 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 				.getClass()
 				+ ": annotationDetailName not set";
 
-		this.util = new JadexBpmnPropertiesUtil(containerEAnnotationName,
-				annotationDetailName, this);
-
+		
+		this.util = new JadexBpmnPropertiesUtil(containerEAnnotationName, annotationDetailName, this);
 		this.uniqueColumnIndex = uniqueColumnIndex;
+		this.complexColumnMarker = complexColumnMarker;
+		
+		if (this.complexColumnMarker == null)
+		{
+			this.complexColumnMarker = new boolean[getDefaultListElementAttributeValues().length];
+		}
 
 	}
 
@@ -84,7 +95,30 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	protected abstract String[] getDefaultListElementAttributeValues();
 
 	// ---- methods ----
-
+	
+	/**
+	 * 
+	 * @param values
+	 * @param table
+	 * @return
+	 */
+	private String[] extendDefaultListElementAttributeValues(
+			MultiColumnTableEx table)
+	{
+		String[] values = getDefaultListElementAttributeValues();
+		for (int i = 0; i < values.length; i++)
+		{
+			if (table.isComplexColumn(i))
+			{
+				values[i] = JadexBpmnPropertiesUtil
+						.getComplexValueAnnotationIdentifier(
+								util.containerEAnnotationName,
+								util.annotationDetailName, values[i]);
+			}
+		}
+		return values;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -120,8 +154,8 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 				throws ExecutionException
 			{
 				MultiColumnTableRow newRow;
-				MultiColumnTable table = getTableFromAnnotation();
-				newRow = table.new MultiColumnTableRow(getDefaultListElementAttributeValues(), table);
+				MultiColumnTableEx table = getTableFromAnnotation();
+				newRow = table.new MultiColumnTableRow(extendDefaultListElementAttributeValues(table), table);
 				table.add(newRow);
 				updateTableAnnotation(table);
 
@@ -142,10 +176,26 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 			{
 				MultiColumnTableRow rowToRemove = (MultiColumnTableRow) ((IStructuredSelection)tableViewer
 					.getSelection()).getFirstElement();
-				MultiColumnTable tableRowList = getTableFromAnnotation();
-				tableRowList.remove(rowToRemove);
-				updateTableAnnotation(tableRowList);
-
+				MultiColumnTableEx table = getTableFromAnnotation();
+				table.remove(rowToRemove);
+				updateTableAnnotation(table);
+				
+				// remove complex values as well
+				String[] columnValues = rowToRemove.getColumnValues();
+				for (int columnIndex = 0; columnIndex < columnValues.length; columnIndex++)
+				{
+					if (table.isComplexColumn(columnIndex))
+					{
+						boolean complexAnnotationRemoved = JadexBpmnPropertiesUtil.removeJadexEAnnotation(modelElement, columnValues[columnIndex]);
+						if (!complexAnnotationRemoved)
+						{
+							JadexBpmnEditor
+									.log("Complex table value annotation not removed!",
+											null, IStatus.INFO);
+						}
+					}
+				}
+				
 				return CommandResult.newOKCommandResult(null);
 			}
 		};
@@ -163,7 +213,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 				MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection)tableViewer
 						.getSelection()).getFirstElement();
 
-				MultiColumnTable tableRowList = getTableFromAnnotation();
+				MultiColumnTableEx tableRowList = getTableFromAnnotation();
 				int index = tableRowList.indexOf(rowToMove);
 
 				if (0 < index && index < tableRowList.size())
@@ -192,7 +242,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 				MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
 					.getSelection()).getFirstElement();
 
-				MultiColumnTable tableRowList = getTableFromAnnotation();
+				MultiColumnTableEx tableRowList = getTableFromAnnotation();
 				int index = tableRowList.indexOf(rowToMove);
 
 				if (0 <= index && index < tableRowList.size() - 1)
@@ -245,7 +295,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	/**
 	 * Helper method to ease creation of simple string valued tables
 	 */
-	protected void createColumns(TableViewer viewer, String[] columnNames, String[] columntypes, Map values)
+	protected void createColumns(TableViewer viewer, String[] columnNames, String[] columntypes, Map<String, String[]> values)
 	{
 		TableViewerColumn[] ret = new TableViewerColumn[columnNames.length];
 		for(int i = 0; i<columnNames.length; i++)
@@ -403,11 +453,11 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	 * @param act
 	 * @return
 	 */
-	private MultiColumnTable getTableFromAnnotation()
+	private MultiColumnTableEx getTableFromAnnotation()
 	{
 		checkAnnotationConversion();
 
-		MultiColumnTable table = JadexBpmnPropertiesUtil
+		MultiColumnTableEx table = JadexBpmnPropertiesUtil
 			.getJadexEAnnotationTable(modelElement, getTableAnnotationIdentifier());
 		if (table != null)
 		{
@@ -415,7 +465,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		}
 
 		// fall through
-		return new MultiColumnTable(0, uniqueColumnIndex);
+		return new MultiColumnTableEx(0, uniqueColumnIndex, complexColumnMarker);
 	}
 
 	/**
@@ -423,7 +473,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	 * 
 	 * @param table
 	 */
-	private void updateTableAnnotation(MultiColumnTable table)
+	private void updateTableAnnotation(MultiColumnTableEx table)
 	{
 		JadexBpmnPropertiesUtil.updateJadexEAnnotationTable(modelElement,
 			getTableAnnotationIdentifier(), table);
@@ -512,6 +562,35 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 			super(viewer, attributeIndex, editor);
 		}
 
+		
+		
+		/**
+		 * Respect the complex value types in BPMN tables
+		 * @see jadex.editor.common.model.properties.table.AbstractCommonTablePropertySection.MultiColumnTableEditingSupport#getValue(java.lang.Object)
+		 */
+		@Override
+		protected Object getValue(Object element)
+		{
+			MultiColumnTableRow row = (MultiColumnTableRow) element;
+			Object o = row.getTable();
+			if (o instanceof MultiColumnTableEx)
+			{
+				MultiColumnTableEx table = (MultiColumnTableEx) o;
+				if (table.isComplexColumn(attributeIndex))
+				{
+					// the value should be a redirection
+					String complexValueIdentifier = row.getColumnValueAt(attributeIndex);
+					Map<String, String> complexValueMap = table.getComplexValue(complexValueIdentifier);
+					
+					// FIXME: Here we need the current selected configuration
+					String value = complexValueMap.get("default");
+					return value != null ? value : "";
+				}
+			}
+				
+			return super.getValue(element);
+		}
+
 		@Override
 		protected ModifyEObjectCommand getSetValueCommand(
 				final MultiColumnTableRow tableViewerRow, final Object value)
@@ -528,35 +607,42 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 						throws ExecutionException
 				{
 
-					MultiColumnTable modelTable = getTableFromAnnotation();
-					MultiColumnTableRow rowToEdit = (MultiColumnTableRow) modelTable
-							.get(modelTable.indexOf(tableViewerRow));
+					MultiColumnTableEx table = getTableFromAnnotation();
+					MultiColumnTableRow rowToEdit = (MultiColumnTableRow) table
+							.get(table.indexOf(tableViewerRow));
 
-					if (attributeIndex == modelTable.getUniqueColumn())
+					if (attributeIndex == table.getUniqueColumn())
 					{
 						if (!newValue
 								.equals(rowToEdit.getColumnValues()[attributeIndex]))
 						{
-							int rowIndex = modelTable.indexOf(rowToEdit);
-							modelTable.remove(rowIndex);
+							int rowIndex = table.indexOf(rowToEdit);
+							table.remove(rowIndex);
 							rowToEdit.setColumnValueAt(attributeIndex, newValue);
-							modelTable.add(rowIndex, rowToEdit);
-							
-							// update the model annotation
-							updateTableAnnotation(modelTable);
+							table.add(rowIndex, rowToEdit);
 
-							// update the corresponding table element
-							tableViewerRow.getColumnValues()[attributeIndex] = rowToEdit.getColumnValueAt(attributeIndex);
-
-							return CommandResult.newOKCommandResult();
 						}
+					} 
+					else if (table.isComplexColumn(attributeIndex))
+					{
+						// the value should be a redirection
+						String complexValueIdentifier = rowToEdit.getColumnValueAt(attributeIndex);
+						Map<String, String> complexValueMap = table.getComplexValue(complexValueIdentifier);
+						
+						// FIXME: Here we need the current selected configuration
+						complexValueMap.put("default", newValue);
+						
 					}
-
-					rowToEdit.getColumnValues()[attributeIndex] = newValue;
-					updateTableAnnotation(modelTable);
+					else
+					{
+						rowToEdit.getColumnValues()[attributeIndex] = newValue;
+					}
+					
+					// update the model annotation
+					updateTableAnnotation(table);
 
 					// update the corresponding table element
-					tableViewerRow.getColumnValues()[attributeIndex] = newValue;
+					tableViewerRow.getColumnValues()[attributeIndex] = rowToEdit.getColumnValueAt(attributeIndex);
 
 					return CommandResult.newOKCommandResult();
 				}

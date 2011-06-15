@@ -29,11 +29,12 @@ public class JadexBpmnDiagramServiceBindingsTableSection extends
 	
 	/**
 	 *  Default constructor, initializes super class.
+	 *  XXX: add correct complex boolean[]
 	 */
 	public JadexBpmnDiagramServiceBindingsTableSection()
 	{
 		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_BINDINGS_LIST_DETAIL,
-			"Service Bindings", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX);
+			"Service Bindings", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX, null);
 	}
 
 	protected String[] getDefaultListElementAttributeValues()

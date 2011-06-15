@@ -28,11 +28,12 @@ public class JadexBpmnDiagramProvidedServicesTableSection extends
 	
 	/**
 	 *  Default constructor, initializes super class.
+	 *  XXX: add correct complex boolean[]
 	 */
 	public JadexBpmnDiagramProvidedServicesTableSection()
 	{
 		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_PROVIDEDSERVICES_LIST_DETAIL,
-			"Provided Services", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX);
+			"Provided Services", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX, null);
 	}
 
 	protected String[] getDefaultListElementAttributeValues()

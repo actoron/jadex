@@ -6,6 +6,7 @@ package jadex.editor.bpmn.editor.properties;
 import jadex.editor.bpmn.editor.preferences.JadexBpmnClassLoaderPreferencePage;
 import jadex.editor.bpmn.editor.properties.template.AbstractComboPropertySection;
 import jadex.editor.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
+import jadex.editor.bpmn.model.MultiColumnTableEx;
 import jadex.editor.bpmn.runtime.task.IEditorParameterMetaInfo;
 import jadex.editor.bpmn.runtime.task.IEditorTaskMetaInfo;
 import jadex.editor.bpmn.runtime.task.IEditorTaskProvider;
@@ -531,7 +532,7 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 		IEditorParameterMetaInfo[] taskParameter = metaInfo
 				.getParameterMetaInfos();
 
-		MultiColumnTable parameterTable = JadexBpmnPropertiesUtil
+		MultiColumnTableEx parameterTable = JadexBpmnPropertiesUtil
 				.getJadexEAnnotationTable(
 						modelElement,
 						JadexBpmnPropertiesUtil
@@ -541,7 +542,7 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 
 		if (parameterTable != null)
 		{
-			// TO DO: remove this BUGFIX in future versions?
+			// TO-DO: remove this BUGFIX in future versions?
 			fixUniqueColumnIndexBugInCorruptedBpmnDiagrams(parameterTable,
 					JadexCommonParameterSection.UNIQUE_PARAMETER_ROW_ATTRIBUTE);
 
@@ -575,12 +576,13 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 	 * @param parameterMetaInfo
 	 * @return
 	 */
-	private MultiColumnTable createNewParameterTable(
+	private MultiColumnTableEx createNewParameterTable(
 			IEditorParameterMetaInfo[] parameterMetaInfo)
 	{
-		MultiColumnTable newTable = new MultiColumnTable(
+		MultiColumnTableEx newTable = new MultiColumnTableEx(
 				parameterMetaInfo.length,
-				JadexCommonParameterSection.UNIQUE_PARAMETER_ROW_ATTRIBUTE);
+				JadexCommonParameterSection.UNIQUE_PARAMETER_ROW_ATTRIBUTE,
+				null);
 		for (int i = 0; i < parameterMetaInfo.length; i++)
 		{
 			String[] columnValues = new String[] {
@@ -602,12 +604,12 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 	 * @param table
 	 * @param metaInfo
 	 */
-	private MultiColumnTable addTaskParamterTable(MultiColumnTable table,
+	private MultiColumnTableEx addTaskParamterTable(MultiColumnTableEx table,
 			IEditorParameterMetaInfo[] metaInfo)
 	{
 		boolean hasUniqueValueChanged = false;
 		
-		MultiColumnTable newTable = createNewParameterTable(metaInfo);
+		MultiColumnTableEx newTable = createNewParameterTable(metaInfo);
 
 		for (MultiColumnTableRow row : newTable.getRowList())
 		{

@@ -28,7 +28,7 @@ public class JadexBpmnDiagramParameterSection extends
 	public JadexBpmnDiagramParameterSection()
 	{
 		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_ARGUMENTS_LIST_DETAIL,
-			"Parameter", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX);
+			"Parameter", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX, null);
 	}
 
 	protected String[] getDefaultListElementAttributeValues()

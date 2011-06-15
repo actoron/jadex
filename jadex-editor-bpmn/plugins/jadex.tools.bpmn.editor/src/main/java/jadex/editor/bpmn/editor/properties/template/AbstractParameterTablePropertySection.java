@@ -86,7 +86,7 @@ public abstract class AbstractParameterTablePropertySection extends
 	public AbstractParameterTablePropertySection(String containerEAnnotationName, String annotationDetailName, int[] columnWeights)
 	{
 		super(containerEAnnotationName, annotationDetailName,
-				"Parameter", UNIQUE_PARAMETER_ROW_ATTRIBUTE);
+				"Parameter", UNIQUE_PARAMETER_ROW_ATTRIBUTE, null);
 	}
 	
 	 // ---- static methods ----

@@ -7,7 +7,6 @@ import jadex.editor.bpmn.editor.properties.template.AbstractBpmnMultiColumnTable
 import jadex.editor.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
 
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.widgets.TableColumn;
 
 
@@ -30,7 +29,7 @@ public class JadexSequenceMappingSection extends
 	public JadexSequenceMappingSection()
 	{
 		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_MAPPING_LIST_DETAIL,
-				"Mappings", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX);
+				"Mappings", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX, null);
 		
 	}
 

@@ -25,7 +25,7 @@ public class JadexBpmnDiagramImportsSection extends
 	public JadexBpmnDiagramImportsSection()
 	{
 		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, 
-			JadexBpmnPropertiesUtil.JADEX_IMPORT_LIST_DETAIL, "Imports", UNIQUE_COLUMN_INDEX);
+			JadexBpmnPropertiesUtil.JADEX_IMPORT_LIST_DETAIL, "Imports", UNIQUE_COLUMN_INDEX, null);
 	}
 
 	protected String[] getDefaultListElementAttributeValues()

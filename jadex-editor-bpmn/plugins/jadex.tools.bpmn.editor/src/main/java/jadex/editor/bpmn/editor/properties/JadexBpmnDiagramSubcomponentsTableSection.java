@@ -20,11 +20,12 @@ public class JadexBpmnDiagramSubcomponentsTableSection extends
 	
 	/**
 	 *  Default constructor, initializes super class.
+	 *  XXX: add correct complex boolean[]
 	 */
 	public JadexBpmnDiagramSubcomponentsTableSection()
 	{
 		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_SUBCOMPONENTS_LIST_DETAIL,
-			"Subcomponents", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX);
+			"Subcomponents", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX, null);
 	}
 
 	protected String[] getDefaultListElementAttributeValues()
