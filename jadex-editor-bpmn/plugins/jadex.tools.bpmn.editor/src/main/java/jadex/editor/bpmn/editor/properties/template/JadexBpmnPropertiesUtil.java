@@ -35,6 +35,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.gmf.runtime.common.core.command.CommandResult;
 import org.eclipse.gmf.runtime.notation.View;
+import org.eclipse.stp.bpmn.BpmnDiagram;
 import org.eclipse.stp.bpmn.diagram.edit.parts.BpmnDiagramEditPart;
 
 public class JadexBpmnPropertiesUtil
@@ -142,6 +143,9 @@ public class JadexBpmnPropertiesUtil
 	
 	/** Key for the configurations map of a BPMN diagram. */
 	public static final String JADEX_CONFIGURATIONS_LIST_DETAIL = "configurations";
+	
+	/** Key for the configurations map of a BPMN diagram. */
+	public static final String JADEX_ACTIVE_CONFIGURATION_DETAIL = "configuration";
 	
 	/** Key for the arguments of a BPMN diagram. */
 	public static final String JADEX_ARGUMENTS_LIST_DETAIL = "arguments";
@@ -672,7 +676,7 @@ public class JadexBpmnPropertiesUtil
 			
 			String dimension = annotation.getDetails().get(JADEX_TABLE_DIMESION_DETAIL);
 			int uniqueColumn = Integer.valueOf(annotation.getDetails().get(JADEX_TABLE_UNIQUE_COLUMN_DETAIL));
-			boolean[] complexColumnMarker = decodeComplexColumnMarker(annotation.getDetails().get(JADEX_TABLE_UNIQUE_COLUMN_DETAIL));
+			boolean[] complexColumnMarker = decodeComplexColumnMarker(annotation.getDetails().get(JADEX_TABLE_COMPLEX_COLUMNS_DETAIL));
 			if (dimension != null) 
 			{
 				TableCellIndex tableDimension = new TableCellIndex(dimension);
@@ -938,6 +942,26 @@ public class JadexBpmnPropertiesUtil
 				(EModelElement) diagramEModelElement, JADEX_GLOBAL_ANNOTATION,
 				JADEX_PROPERTIES_VERSION_DETAIL, new Double(
 						JadexBpmnEditor.EDITOR_VERSION).toString());
+	}
+
+
+	public static EModelElement retrieveBpmnDiagram(EModelElement element)
+	{
+		// save a marker 
+		EModelElement elm = element;
+		
+		while (element.eContainer()!= null && !(element instanceof BpmnDiagram))
+		{
+			element = (EModelElement) element.eContainer();
+		}
+		
+		if (!(element instanceof BpmnDiagram))
+		{
+			throw new UnsupportedOperationException("The method " + JadexBpmnPropertiesUtil.class.getSimpleName() + "#retrieveBpmnDiagram(EModelElement element) doesnt support the input: " + elm);
+		}
+		
+		return element;
+		
 	}
 }
 

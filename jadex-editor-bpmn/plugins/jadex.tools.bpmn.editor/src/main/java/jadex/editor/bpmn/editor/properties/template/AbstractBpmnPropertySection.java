@@ -27,6 +27,20 @@ public abstract class AbstractBpmnPropertySection extends AbstractCommonProperty
 		this.util = new JadexBpmnPropertiesUtil(containerEAnnotationName, annotationDetailName, this);
 	}
 
+	// ---- abstract methods ----
+	/**
+	 * This method should contain all "update" code for controls
+	 * currently used in setInput(). This method is called at the
+	 * end of setInput().
+	 * 
+	 * @see jadex.editor.common.model.properties.AbstractCommonPropertySection#updateSectionValues()
+	 */
+	@Override
+	protected void updateSectionValues()
+	{
+		// empty default method
+	}
+	
 	// ---- methods ----
 	
 	/**

@@ -91,6 +91,15 @@ public class AbstractMultiCheckboxPropertySection extends AbstractBpmnPropertySe
 	public void setInput(IWorkbenchPart part, ISelection selection)
 	{
 		super.setInput(part, selection);
+		updateSectionValues();
+	}
+
+
+	/**
+	 * 
+	 */
+	protected void updateSectionValues()
+	{
 		if(modelElement != null)
 		{
 			EAnnotation ea = modelElement.getEAnnotation(util.containerEAnnotationName);

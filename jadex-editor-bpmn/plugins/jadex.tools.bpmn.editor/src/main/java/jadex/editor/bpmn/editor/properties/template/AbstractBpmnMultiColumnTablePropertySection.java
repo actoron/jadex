@@ -1,6 +1,7 @@
 package jadex.editor.bpmn.editor.properties.template;
 
 import jadex.editor.bpmn.editor.JadexBpmnEditor;
+import jadex.editor.bpmn.editor.properties.JadexBpmnDiagramConfigurationsTableSection;
 import jadex.editor.bpmn.model.MultiColumnTableEx;
 import jadex.editor.common.model.properties.ModifyEObjectCommand;
 import jadex.editor.common.model.properties.table.AbstractCommonTablePropertySection;
@@ -34,15 +35,24 @@ import org.eclipse.ui.IWorkbenchPart;
 public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		AbstractCommonTablePropertySection
 {
+	
+	
+	// ---- constants ----
+	
 	public static final String TEXT = "text";
 	public static final String CHECKBOX = "checkbox";
 	public static final String COMBOBOX = "combobox";
 	public static final String SPINNER = "spinner";
 	
+	
+	
 	// ---- attributes ----
 
 	/** Utility class to hold attribute an element reference */
 	protected JadexBpmnPropertiesUtil util;
+	
+	
+	
 
 	/** The unique column index for this TablePropertySection */
 	private int uniqueColumnIndex;
@@ -94,7 +104,31 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	/** Retrieve the default values for a new row */
 	protected abstract String[] getDefaultListElementAttributeValues();
 
+	
+	
 	// ---- methods ----
+
+	/**
+	 * This method should contain all "update" code for controls
+	 * currently used in setInput(). This method is called at the
+	 * end of setInput().
+	 * @see jadex.editor.common.model.properties.AbstractCommonPropertySection#updateSectionValues()
+	 */
+	@Override
+	protected void updateSectionValues()
+	{
+		// empty default method
+	}
+
+	/**
+	 * Hook to be informed about configuration changes. Override if needed!
+	 * @param oldConfiguration
+	 * @param newConfiguration
+	 */
+	protected void configurationChangedHook(String oldConfiguration, String newConfiguration)
+	{
+		// empty default method
+	}
 	
 	/**
 	 * 
@@ -582,8 +616,8 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 					String complexValueIdentifier = row.getColumnValueAt(attributeIndex);
 					Map<String, String> complexValueMap = table.getComplexValue(complexValueIdentifier);
 					
-					// FIXME: Here we need the current selected configuration
-					String value = complexValueMap.get("default");
+					String selectedConfiguration = JadexBpmnDiagramConfigurationsTableSection.getConfigurationSectionInstanceForModelElement(modelElement).getCurrentConfiguration();
+					String value = complexValueMap.get(selectedConfiguration);
 					return value != null ? value : "";
 				}
 			}
@@ -629,8 +663,8 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 						String complexValueIdentifier = rowToEdit.getColumnValueAt(attributeIndex);
 						Map<String, String> complexValueMap = table.getComplexValue(complexValueIdentifier);
 						
-						// FIXME: Here we need the current selected configuration
-						complexValueMap.put("default", newValue);
+						String selectedConfiguration = JadexBpmnDiagramConfigurationsTableSection.getConfigurationSectionInstanceForModelElement(modelElement).getCurrentConfiguration();
+						complexValueMap.put(selectedConfiguration, newValue);
 						
 					}
 					else
