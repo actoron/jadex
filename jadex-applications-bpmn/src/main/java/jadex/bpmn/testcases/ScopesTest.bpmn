@@ -4,6 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x4BIsRS6Ed-3Ruc_856dPQ" key="Package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__0sBsBaYEd-YccbjZenQqQ" key="Description" value="Test if parameter scopes work."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c9aL0ARQEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i_baIJf0EeCntfZh2ayVhg" key="autoshutdown" value="false"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_o5Cs0ARPEeCnwcpWvxOwkg" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_o5Cs0QRPEeCnwcpWvxOwkg" key="dimension" value="2:1"/>

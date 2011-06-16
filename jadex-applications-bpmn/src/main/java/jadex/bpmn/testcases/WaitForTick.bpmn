@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_JopMoUMbEd-aDdXkLqEWvQ" iD="_JopMoEMbEd-aDdXkLqEWvQ">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KOMJsEMbEd-aDdXkLqEWvQ" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KOMJskMbEd-aDdXkLqEWvQ" key="Description" value="Test if waiting for a tick works."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KOV6sEMbEd-aDdXkLqEWvQ" key="Package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qznjMQRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qfQowJf0EeCntfZh2ayVhg" key="autoshutdown" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_E1TLkJf5EeCa3stmdlhHqg" key="description" value="Test if waiting for a tick works."/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_qsBGUARPEeCnwcpWvxOwkg" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qsBGUQRPEeCnwcpWvxOwkg" key="dimension" value="2:1"/>

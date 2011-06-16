@@ -4,6 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vDB_4hV7Ed-yC473XtaJZQ" key="Package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_g8QfgBaZEd-YccbjZenQqQ" key="Description" value="Test if a subworklow can be started and wait for its results."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_p4VmzgRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mV4YkJf0EeCntfZh2ayVhg" key="autoshutdown" value="false"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_pxpIwARPEeCnwcpWvxOwkg" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pxpIwQRPEeCnwcpWvxOwkg" key="dimension" value="2:1"/>

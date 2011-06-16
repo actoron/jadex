@@ -128,6 +128,9 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	/** The pool/names in configurations. */
 	protected Map configpoollanes;
 	
+	/** The keep alive flag that allows processes to stay after end event. */
+	protected boolean keepalive;
+	
 	//-------- model management --------
 	
 	/** The last modified date. */
@@ -1080,6 +1083,24 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	public IModelInfo getModelInfo()
 	{
 		return modelinfo;
+	}
+
+	/**
+	 *  Get the keepalive.
+	 *  @return the keepalive.
+	 */
+	public boolean isKeepAlive()
+	{
+		return keepalive;
+	}
+
+	/**
+	 *  Set the keepalive.
+	 *  @param keepalive The keepalive to set.
+	 */
+	public void setKeepAlive(boolean keepalive)
+	{
+		this.keepalive = keepalive;
 	}
 	
 }

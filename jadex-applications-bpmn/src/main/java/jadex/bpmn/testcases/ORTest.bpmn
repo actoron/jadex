@@ -4,6 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_r33FAIg-EeCN3vTQelQ0Ow" key="editor_version" value="1.0"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w-WdsIg-EeCN3vTQelQ0Ow" key="description" value="Test inclusive or gateway functionality"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zSOk0Ig-EeCN3vTQelQ0Ow" key="package" value="jadex.bpmn.testcases"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gsjYkJf0EeCntfZh2ayVhg" key="autoshutdown" value="false"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_0pLJoIg-EeCN3vTQelQ0Ow" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5jdSUIg-EeCN3vTQelQ0Ow" key="dimension" value="2:1"/>

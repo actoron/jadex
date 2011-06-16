@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_oUHuUVdaEd-_rc0-j01YLA" iD="_oUHuUFdaEd-_rc0-j01YLA">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_o9h3sFdaEd-_rc0-j01YLA" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_o9h3sVdaEd-_rc0-j01YLA" key="Description" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_o9h3sldaEd-_rc0-j01YLA" key="Package" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oBMe1QRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bm3RIJf0EeCntfZh2ayVhg" key="autoshutdown" value="false"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_n4jgMARPEeCnwcpWvxOwkg" source="jadex_arguments_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_n4jgMQRPEeCnwcpWvxOwkg" key="dimension" value="1:6"/>

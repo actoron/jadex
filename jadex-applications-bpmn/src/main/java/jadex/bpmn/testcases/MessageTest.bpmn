@@ -2,8 +2,9 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_uFG-IRJREd-3Ruc_856dPQ" iD="_uFG-IBJREd-3Ruc_856dPQ">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_jCnb4BJjEd-3Ruc_856dPQ" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jCnb4hJjEd-3Ruc_856dPQ" key="Package" value="jadex.bpmn.testcases"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5CRSsBaYEd-YccbjZenQqQ" key="Description" value="Test if a message can be sent and received by a process."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oWWPeQRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ctyc8Jf0EeCntfZh2ayVhg" key="description" value="Test if a message can be sent and received by a process."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c3WooJf0EeCntfZh2ayVhg" key="autoshutdown" value="false"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_oOvyoARPEeCnwcpWvxOwkg" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oOvyoQRPEeCnwcpWvxOwkg" key="dimension" value="5:1"/>

@@ -4,6 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BeUJUBTVEd-a46HbtL-N3Q" key="Package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_d8Mn0BaZEd-YccbjZenQqQ" key="Description" value="Test if a parallel subprocess works."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pluMoQRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lNaUoJf0EeCntfZh2ayVhg" key="autoshutdown" value="false"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_pelC0ARPEeCnwcpWvxOwkg" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pelC0QRPEeCnwcpWvxOwkg" key="dimension" value="3:1"/>

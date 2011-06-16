@@ -29,6 +29,7 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.commons.IFilter;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
@@ -1348,7 +1349,7 @@ public class BpmnXMLReader
 									for(int k = 0; stok.hasMoreElements(); k++)
 									{
 										String imp = stok.nextToken().trim();
-										if (imp.length() > 0)
+										if(imp.length() > 0)
 											model.addImport(imp);
 									}
 									// System.out.println("Imports: "+SUtil.arrayToString(imps));
@@ -1572,6 +1573,10 @@ public class BpmnXMLReader
 								{
 									mi.setSuspend(new Boolean(value));
 								}
+								else if("keepalive".equals(key))
+								{
+									model.setKeepAlive(new Boolean(value).booleanValue());
+								}
 								else if("parameters".equals(key))
 								{
 									throw new RuntimeException("parameters no longer separately");
@@ -1724,6 +1729,7 @@ public class BpmnXMLReader
 						}
 						catch(Exception e)
 						{
+//							e.printStackTrace();
 							throw new RuntimeException("Error parsing argument: "+model+", "+argstr, e);
 						}
 					}
@@ -1831,22 +1837,20 @@ public class BpmnXMLReader
 		
 		assert table != null;
 		
-		for (int j = 0; j < details.size(); j++) 
+		for(int j = 0; j < details.size(); j++) 
 		{
-			MAnnotationDetail detail = (MAnnotationDetail) details
-					.get(j);
+			MAnnotationDetail detail = (MAnnotationDetail)details.get(j);
 
 			String key = detail.getKey().toLowerCase();
 			String value = detail.getValue();
 
-			if ("dimension".equals(key)
-					|| "uniquecolumnindex".equals(key)) 
+			// todo: fixme
+			if("dimension".equals(key) || "uniquecolumnindex".equals(key) || "complexcolumns".equals(key)) 
 			{
 				continue;
 			}
 			
 			table.setCellValue(key, value);
-
 		}
 		
 		return table;

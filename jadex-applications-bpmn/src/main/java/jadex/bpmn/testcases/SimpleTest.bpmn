@@ -2,8 +2,9 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_Kpd_YfxtEd6BS97d4w8Gew" iD="_Kpd_YPxtEd6BS97d4w8Gew">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_c6EKYBDQEd-nouu311XMtg" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6EKYhDQEd-nouu311XMtg" key="Package" value="jadex.bpmn.testcases"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DC4cABaZEd-YccbjZenQqQ" key="Description" value="Test if a testcase works in principle."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pRdz6wRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_j3C-oJf0EeCntfZh2ayVhg" key="description" value="Test if a testcase works in principle."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_j9KNsJf0EeCntfZh2ayVhg" key="autoshutdown" value="false"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_pMQjwARPEeCnwcpWvxOwkg" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pMQjwQRPEeCnwcpWvxOwkg" key="dimension" value="3:1"/>

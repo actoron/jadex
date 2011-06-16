@@ -326,7 +326,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			steps.add(step);
 			if(componentlisteners!=null)
 			{
-				// Um die Koordination der MicroAgents zu ermoeglichen wird der Step im Event uebergeben und nicht nur die StepDetails als String
+				// For coordination space step is set as detail (problem remote comm?)
 //				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, step[0].getClass().getName(), 
 //					step[0].toString(), microagent.getComponentIdentifier(), getStepDetails((IComponentStep)step[0])));
 				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, step[0].getClass().getName(), step[0].toString(), microagent.getComponentIdentifier(), step[0]));

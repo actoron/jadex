@@ -2,8 +2,9 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_RxIF0RF6Ed-qQOr2ZLx-Mw" iD="_RxIF0BF6Ed-qQOr2ZLx-Mw">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Ekt5cBF7Ed-qQOr2ZLx-Mw" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ekt5chF7Ed-qQOr2ZLx-Mw" key="Package" value="jadex.bpmn.testcases"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xyPaoBaYEd-YccbjZenQqQ" key="Description" value="Test if a timer is cancelled when subprocess normally continues."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qIlCMQRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ntfEsJf0EeCntfZh2ayVhg" key="autoshutdown" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ClvjwJf5EeCa3stmdlhHqg" key="description" value="Test if a timer is cancelled when subprocess normally continues."/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_qDEP8ARPEeCnwcpWvxOwkg" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qDEP8QRPEeCnwcpWvxOwkg" key="dimension" value="2:1"/>

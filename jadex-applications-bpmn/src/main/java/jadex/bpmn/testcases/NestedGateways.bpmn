@@ -4,6 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AF_fUYq9EeCOq9b0uJ2xfg" key="editor_version" value="1.0"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__4PugIrNEeC2-YXsn_T4wg" key="description" value="Test nested gateways with or/xor and and"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_B5wTQIrOEeC2-YXsn_T4wg" key="package" value="jadex.bpmn.testcases"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_e-dfEJf0EeCntfZh2ayVhg" key="autoshutdown" value="false"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_AapmEIrQEeC2-YXsn_T4wg" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DC9sIIrQEeC2-YXsn_T4wg" key="dimension" value="2:1"/>

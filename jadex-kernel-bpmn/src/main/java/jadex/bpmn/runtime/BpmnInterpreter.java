@@ -173,11 +173,11 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	/** The messages waitqueue. */
 	protected List messages;
 	
-	/** The flag if is inited. */
-	protected boolean initedflag;
-	
 	/** The inited future. */
 	protected Future inited;
+	
+	/** The started flag. */
+	protected boolean started;
 	
 	/** The thread id counter. */
 	protected int idcnt;
@@ -214,7 +214,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 			context.addThread(thread);
 
 		}
-		initedflag = true;	// No further init for BDI plan.
 	}	
 		
 	/**
@@ -231,6 +230,15 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		this.variables	= new HashMap();
 		construct(model, activityhandlers, stephandlers);
 		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
+		
+		scheduleStep(new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+				executeInitStep2();
+				return null;
+			}
+		});
 	}
 	
 	/**
@@ -271,20 +279,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		this.context = new ThreadContext(model);
 		this.messages = new ArrayList();
 		this.variables	= getArguments()!=null ? new HashMap(getArguments()) : new HashMap();
-
-		// Init the arguments with default values.
-//		IArgument[] args = model.getModelInfo().getArguments();
-//		for(int i=0; i<args.length; i++)
-//		{
-//			if(arguments!=null && arguments.containsKey(args[i].getName()))
-//			{
-//				this.variables.put(args[i].getName(), arguments.get(args[i].getName()));
-//			}
-//			else if(args[i].getDefaultValue(config)!=null)
-//			{
-//				this.variables.put(args[i].getName(), args[i].getDefaultValue(config));
-//			}
-//		}		
 	}
 	
 	//-------- IComponentInstance interface --------
@@ -305,47 +299,37 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	{
 		boolean ret = false;
 		
-		if(!initedflag)
+		try
 		{
-			initedflag = true;
-			executeInitStep2();
-		}
-		// Must be able to execute externally scheduled steps, e.g. service calls
-		else //if(inited.isDone())	// Todo: do we need this?
-		{
-			try
+			if(!isFinished(pool, lane) && isReady(pool, lane))
+				executeStep(pool, lane);
+			
+//			System.out.println("After step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+isFinished(pool, lane));
+			
+			if(!finishing && isFinished(pool, lane) && !model.isKeepAlive() && started)
 			{
-				if(!isFinished(pool, lane) && isReady(pool, lane))
-					executeStep(pool, lane);
+//				System.out.println("terminating: "+getComponentIdentifier());
+				finishing = true;
+//				((IComponentManagementService)variables.get("$cms")).destroyComponent(adapter.getComponentIdentifier());
 				
-//				System.out.println("After step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+isFinished(pool, lane));
-				Boolean autosdtmp = getComponentDescription().getAutoShutdown();
-				boolean autosd = autosdtmp!=null? autosdtmp.booleanValue(): false;
-				if(!finishing && isFinished(pool, lane) && autosd)
+				SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+					.addResultListener(createResultListener(new DefaultResultListener()
 				{
-//					System.out.println("terminating: "+getComponentIdentifier());
-					finishing = true;
-//					((IComponentManagementService)variables.get("$cms")).destroyComponent(adapter.getComponentIdentifier());
-					
-					SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
-						.addResultListener(createResultListener(new DefaultResultListener()
+					public void resultAvailable(Object result)
 					{
-						public void resultAvailable(Object result)
-						{
-							((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier());
-						}
-					}));
-				}
-				
-	//			System.out.println("Process wants: "+this.getComponentAdapter().getComponentIdentifier().getLocalName()+" "+!isFinished(null, null)+" "+isReady(null, null));
-				
-				ret = !isFinished(pool, lane) && isReady(pool, lane);
+						((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier());
+					}
+				}));
 			}
-			catch(ComponentTerminatedException ate)
-			{
-				// Todo: fix kernel bug.
-				ate.printStackTrace();
-			}
+			
+//			System.out.println("Process wants: "+this.getComponentAdapter().getComponentIdentifier().getLocalName()+" "+!isFinished(null, null)+" "+isReady(null, null));
+			
+			ret = !isFinished(pool, lane) && isReady(pool, lane);
+		}
+		catch(ComponentTerminatedException ate)
+		{
+			// Todo: fix kernel bug.
+			ate.printStackTrace();
 		}
 		
 		return ret;
@@ -469,6 +453,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 					ProcessThread	thread	= new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
 					context.addThread(thread);
 				}
+				started = true;
 				return null;
 			}
 		});

@@ -2,8 +2,9 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_Mj1zwRDZEd-hjJU8_9Katg" iD="_Mj1zwBDZEd-hjJU8_9Katg">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_5AfH4BDjEd-hjJU8_9Katg" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5AfH4hDjEd-hjJU8_9Katg" key="Package" value="jadex.bpmn.testcases"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1ZSZ0BaYEd-YccbjZenQqQ" key="Description" value="Test if the for loop works."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nrAMeQRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZKgjcJf0EeCntfZh2ayVhg" key="description" value="Test if the for loop works."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZTYLkJf0EeCntfZh2ayVhg" key="autoshutdown" value="false"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_nkJ9gARPEeCnwcpWvxOwkg" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nkJ9gQRPEeCnwcpWvxOwkg" key="dimension" value="2:1"/>

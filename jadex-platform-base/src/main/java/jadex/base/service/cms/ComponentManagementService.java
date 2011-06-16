@@ -1447,7 +1447,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			Map results = null;
 			synchronized(adapters)
 			{
-				System.out.println("Terminating component finished: "+cid.getName());
+//				System.out.println("Terminating component finished: "+cid.getName());
 				logger.info("Terminating component finished: "+cid.getName());
 //					System.out.println("CleanupCommand: "+cid);
 	//			boolean shutdown = false;

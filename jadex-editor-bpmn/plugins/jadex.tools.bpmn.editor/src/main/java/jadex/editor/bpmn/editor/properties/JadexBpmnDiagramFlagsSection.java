@@ -10,8 +10,8 @@ public class JadexBpmnDiagramFlagsSection extends AbstractMultiCheckboxPropertyS
 {
 	// ---- constants ----
 	
-	protected static final String[] CHECKBOX_NAMES = new String[]{"Suspend", "Master", "Daemon", "Autoshutdown"};
-	protected static final boolean[] CHECKBOX_STATES = new boolean[]{false, false, false, true};
+	protected static final String[] CHECKBOX_NAMES = new String[]{"Suspend", "Master", "Daemon", "Autoshutdown", "Keep alive"};
+	protected static final boolean[] CHECKBOX_STATES = new boolean[]{false, false, false, false, false};
 	
 	// ---- constructor ----
 	

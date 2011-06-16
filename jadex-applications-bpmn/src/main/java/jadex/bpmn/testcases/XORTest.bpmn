@@ -4,6 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nQAekhVyEd-9a_-KE2TdXg" key="Package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mrbo0BaZEd-YccbjZenQqQ" key="Description" value="Test if xor gateway works."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rLJSpQRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_r72ikJf0EeCntfZh2ayVhg" key="autoshutdown" value="false"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_rBni4ARPEeCnwcpWvxOwkg" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rBni4QRPEeCnwcpWvxOwkg" key="dimension" value="3:1"/>

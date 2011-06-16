@@ -4,7 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5Bu5gCbmEd-LGeDmwCGsJg" key="Package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_m-Li8gRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_E_rnIJdrEeCdC8SIAvni5w" key="description" value="Test and split and joing using parameters"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Jm8tMJdrEeCdC8SIAvni5w" key="autoshutdown" value="true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Jm8tMJdrEeCdC8SIAvni5w" key="autoshutdown" value="false"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_mxETsARPEeCnwcpWvxOwkg" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mxETsQRPEeCnwcpWvxOwkg" key="dimension" value="2:1"/>
