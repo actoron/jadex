@@ -9,9 +9,6 @@ import jadex.editor.common.model.properties.AbstractCommonPropertySection;
 import jadex.editor.common.model.properties.ModifyEObjectCommand;
 import jadex.editor.common.model.properties.table.MultiColumnTable.MultiColumnTableRow;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -77,11 +74,7 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 	
 	/** The table clear button */
 	protected Button clearButton;
-	
-	
-	List<ICellFocusChangedListener> selectionChangedListener = new ArrayList<ICellFocusChangedListener>();
-	
-	
+
 	
 	/**
 	 * @param tableViewerLabel

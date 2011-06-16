@@ -48,6 +48,9 @@ public abstract class AbstractCommonPropertySection extends
 	/** The modelElement, may be null. */
 	protected EModelElement modelElement;
 	
+	/** The lastModelElement, may be null. */
+	protected EModelElement lastModelElement;
+	
 	/** all controls/resources/... for this section */
 	private Set<Object> disposableObjects;
 	
@@ -67,6 +70,15 @@ public abstract class AbstractCommonPropertySection extends
 		this.disposableObjects = new HashSet<Object>();
 	}
 
+	// ---- abstract methods ----
+	
+	/**
+	 * This method should contain all "update" code for controls
+	 * currently used in setInput(). This method is called at the
+	 * end of setInput().
+	 */
+	protected abstract void updateSectionValues();
+	
 	// ---- method overrides ----
 	
 	@Override
@@ -217,6 +229,7 @@ public abstract class AbstractCommonPropertySection extends
 		{
 			Object unknownInput = ((IStructuredSelection) selection)
 					.getFirstElement();
+			
 			if (unknownInput instanceof IGraphicalEditPart
 					&& (((IGraphicalEditPart) unknownInput)
 							.resolveSemanticElement() != null))
@@ -225,11 +238,13 @@ public abstract class AbstractCommonPropertySection extends
 				unknownInput = ((IGraphicalEditPart) unknownInput)
 						.resolveSemanticElement();
 			}
+			
 			if (unknownInput instanceof EModelElement)
 			{
 				EModelElement elm = (EModelElement) unknownInput;
 				modelElement = (EModelElement) elm;
 				
+				updateSectionValues();
 				return;
 			}
 			if (unknownInput instanceof EditPart)
@@ -239,7 +254,11 @@ public abstract class AbstractCommonPropertySection extends
 		// fall through
 		modelElement = null;
 
+		
+		
 	}
+
+	
 
 	protected void changed(Control[] changed)
 	{
