@@ -5,6 +5,8 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_orCtGwRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hny40Jf0EeCntfZh2ayVhg" key="description" value="Simple process that fowards an argument as its result."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hvPkoJf0EeCntfZh2ayVhg" key="autoshutdown" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0603oJgTEeCV-cc4Hk1JDg" key="master" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1G_EUJgTEeCV-cc4Hk1JDg" key="suspend" value="false"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_oj5jQARPEeCnwcpWvxOwkg" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6u_0gJf5EeCa3stmdlhHqg" key="dimension" value="4:1"/>

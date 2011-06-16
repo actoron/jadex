@@ -221,7 +221,7 @@ public class Reader
 						}
 						catch(RuntimeException e)
 						{
-							e.printStackTrace();
+//							e.printStackTrace();
 							StackElement	se	= readcontext.getTopStackElement();
 							readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", se, se!=null ? se.getLocation() : readcontext.getParser().getLocation());																				
 						}

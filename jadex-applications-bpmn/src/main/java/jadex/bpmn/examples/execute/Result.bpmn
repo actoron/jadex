@@ -5,7 +5,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4hCGExcVEd-OSKK6OfNWqA" key="Package" value="jadex.bpmn.examples.execute"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_g56TEARPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
   </eAnnotations>
-  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_a2tyUepfEd62vdy0afypXQ" iD="_a2tyUOpfEd62vdy0afypXQ" name="package jadex.bpmn.examples.execute&#xD;&#xA;&#xD;&#xA;import jadex.bpmn.runtime.task.*&#xD;&#xA;import jadex.bpmn.model.*&#xD;&#xA;import jadex.bridge.*&#xD;&#xA;&#xD;&#xA;argument new Argument(&quot;in&quot;, &quot;Argument value.&quot;, &quot;String&quot;, &quot;some_value&quot;) &#xD;&#xA;result new Argument(&quot;out&quot;, &quot;Result value.&quot;, &quot;String&quot;, null) ">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_a2tyUepfEd62vdy0afypXQ" iD="_a2tyUOpfEd62vdy0afypXQ" name="package jadex.bpmn.examples.execute&#xD;&#xA;&#xD;&#xA;import jadex.bpmn.runtime.task.*&#xD;&#xA;import jadex.bpmn.model.*&#xD;&#xA;import jadex.bridge.*&#xD;&#xA;import jadex.bridge.modelinfo.*&#xD;&#xA;&#xD;&#xA;argument new Argument(&quot;in&quot;, &quot;Argument value.&quot;, &quot;String&quot;, &quot;some_value&quot;) &#xD;&#xA;result new Argument(&quot;out&quot;, &quot;Result value.&quot;, &quot;String&quot;, null) ">
     <associations xmi:type="bpmn:Association" xmi:id="_cF134OpfEd62vdy0afypXQ"/>
   </artifacts>
   <pools xmi:type="bpmn:Pool" xmi:id="_X7G80epfEd62vdy0afypXQ" iD="_X7G80OpfEd62vdy0afypXQ" associations="_cF134OpfEd62vdy0afypXQ" name="Pool">

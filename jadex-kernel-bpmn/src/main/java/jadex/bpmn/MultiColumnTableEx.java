@@ -4,6 +4,7 @@
 package jadex.bpmn;
 
 
+import jadex.bpmn.MultiColumnTable.MultiColumnTableRow;
 import jadex.bpmn.model.MAnnotationDetail;
 
 import java.util.HashMap;
@@ -84,6 +85,21 @@ public class MultiColumnTableEx extends MultiColumnTable
 	
 
 	// ---- methods ----
+	
+	/**
+	 *  Get the cell value.
+	 *  @param row The row.
+	 *  @param i The column.
+	 */
+	public String getCellValue(int row, int i)
+	{
+//		MultiColumnTableRow multiColumnTableRow = get(row);
+//		if (isComplexColumn(i))
+//		{
+//			return getComplexValue((String)multiColumnTableRow.getColumnValueAt(i));
+//		}
+		return (String)get(row).getColumnValueAt(i);
+	}
 	
 	/**
 	 * If this method returns true for a column index, the value
@@ -240,6 +256,8 @@ public class MultiColumnTableEx extends MultiColumnTable
 		return newTable;
 
 	}
+
+	
 
 }
 

@@ -26,6 +26,8 @@ import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.IFilter;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
@@ -1384,6 +1386,39 @@ public class BpmnXMLReader
 						break;
 					}
 				}
+
+				Map bindings = new HashMap();
+				for(int i=0; i<annos.size(); i++)
+				{
+					MAnnotation anno = (MAnnotation)annos.get(i);
+					
+					if(anno.getSource().toLowerCase().endsWith("_bindings_table")) 
+					{
+						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails());
+
+						for(int row = 0; row < table.size(); row++) 
+						{
+							// normal import has 7 values
+							//assert table.getRow(row).length == 7;
+
+							String name = table.getCellValue(row, 0);
+							String scope = table.getCellValue(row, 1);
+							String compname = table.getCellValue(row, 2);
+							String comptype = table.getCellValue(row, 3);
+							String dynamictxt = table.getCellValue(row, 4);
+							String createtxt = table.getCellValue(row, 5);
+							String recovertxt = table.getCellValue(row, 6);
+							boolean dynamic = new Boolean(dynamictxt).booleanValue();
+							boolean create = new Boolean(createtxt).booleanValue();
+							boolean recover = new Boolean(recovertxt).booleanValue();
+							
+							RequiredServiceBinding binding = new RequiredServiceBinding(null, compname, comptype, dynamic, scope, create, recover);
+							bindings.put(name, binding);
+						}
+
+						break;
+					}
+				}
 				
 				for(int i=0; i<annos.size(); i++)
 				{
@@ -1484,19 +1519,48 @@ public class BpmnXMLReader
 						{
 							// normal property has 4 values
 //							assert table.get(row).size() == 4;
-							String name = (String) table.get(row).getColumnValueAt(0);
-							String typename = (String) table.get(row).getColumnValueAt(1);
-							String implname = (String) table.get(row).getColumnValueAt(2);
-							String proxytype = (String) table.get(row).getColumnValueAt(3);
+							String name = table.getCellValue(row, 0);
+							String typename = table.getCellValue(row, 1);
+							String implname = table.getCellValue(row, 2);
+							String proxytype = table.getCellValue(row, 3);
 
-							// todo: binding
 							Class impltype = SReflect.findClass0(implname, mi.getAllImports(), context.getClassLoader());
-							ProvidedServiceImplementation psim = new ProvidedServiceImplementation(impltype, impltype==null? implname: null, proxytype, null);
-
 							Class type = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
-							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, psim);
 
+							RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(implname);
+							ProvidedServiceImplementation psim;
+							if(binding!=null)
+							{
+								psim = new ProvidedServiceImplementation(impltype, null, proxytype, binding);
+							}
+							else
+							{
+								psim = new ProvidedServiceImplementation(impltype, impltype==null? implname: null, proxytype, null);
+							}
+							
+							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, psim);
 							mi.addProvidedService(psi);
+						}
+					}
+					else if(anno.getSource().toLowerCase().endsWith("_requiredservices_table"))
+					{
+						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails());
+						for(int row=0; row<table.size(); row++)
+						{
+							// normal property has 4 values
+//							assert table.getRow(row).length == 4;
+							String name = table.getCellValue(row, 0);
+							String typename = table.getCellValue(row, 1);
+							String multi = table.getCellValue(row, 2);
+							String bindingname = table.getCellValue(row, 3);
+							Class type = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
+							boolean multiple = new Boolean(multi).booleanValue();
+							
+							RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(bindingname);
+							if(binding==null)
+								throw new RuntimeException("Unknown binding: "+bindingname);
+							RequiredServiceInfo rsi = new RequiredServiceInfo(name, type, multiple, binding);
+							mi.addRequiredService(rsi);
 						}
 					}
 					else if(anno.getSource().toLowerCase().endsWith("_subcomponents_table"))
