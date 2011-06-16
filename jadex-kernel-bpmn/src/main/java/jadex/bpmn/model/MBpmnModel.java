@@ -94,18 +94,6 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	
 	//-------- attributes --------
 	
-	/** The suspend flag. */
-	protected Boolean suspend;
-	
-	/** The master flag. */
-	protected Boolean master;
-	
-	/** The daemon flag. */
-	protected Boolean daemon;
-	
-	/** The autoshutdown flag. */
-	protected Boolean autoshutdown;
-	
 	/** The pools. */
 	protected List pools;
 	
@@ -134,9 +122,6 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	
 	//-------- added structures --------
 
-//	/** The imports. */
-//	protected List imports;
-	
 	/** The context variables (name -> [class, initexpression]). */
 	protected Map variables;
 	
@@ -1031,36 +1016,6 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		return ret;
 	}
 	
-//	/**
-//	 *  Is the model startable.
-//	 *  @return True, if startable.
-//	 */
-//	public boolean isStartable()
-//	{
-//		return true;
-//	}
-	
-	/**
-	 *  Set the description.
-	 *  @param description The description to set.
-	 */
-	public void setDescription(String description)
-	{
-		modelinfo.setDescription(description);
-	}
-	
-	/**
-	 *  Get the model description.
-	 *  @return The model description.
-	 * /
-	public String getDescription()
-	{
-		// todo: implement me
-		// use description from artifact, or from property field of special editor
-		
-		return modelinfo.getDescription();
-	}*/
-	
 	/**
 	 *  Add an argument.
 	 *  @param argument The argument.
@@ -1070,24 +1025,6 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		modelinfo.addArgument(argument);
 	}
 	
-	/**
-	 *  Get the arguments.
-	 *  @return The arguments.
-	 * /
-	public IArgument[] getArguments()
-	{		
-		return modelinfo.getArguments();
-	}*/
-	
-	/**
-	 *  Get the report.
-	 *  @return The report.
-	 * /
-	public IReport getReport()
-	{
-		return modelinfo.getReport();
-	}*/
-
 	/**
 	 *  Get the properties.
 	 *  Arbitrary properties that can e.g. be used to
@@ -1119,14 +1056,6 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	}
 
 	/**
-	 *  Return the class loader corresponding to the micro agent class.
-	 * /
-	public ClassLoader getClassLoader()
-	{
-		return modelinfo.getClassLoader();
-	}*/
-	
-	/**
 	 *  Add a result.
 	 *  @param result The result.
 	 */
@@ -1135,15 +1064,6 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		modelinfo.addResult(result);
 	}
 	
-	/**
-	 *  Get the results.
-	 *  @return The results.
-	 * /
-	public IArgument[] getResults()
-	{
-		return modelinfo.getResults();
-	}*/
-
 	/**
 	 *  Set the classloader.
 	 *  @param classloader The classloader to set.
@@ -1161,78 +1081,5 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	{
 		return modelinfo;
 	}
-	
-	/**
-	 *  Get the master.
-	 *  @return the master.
-	 */
-	public Boolean getMaster()
-	{
-		return master;
-	}
-
-	/**
-	 *  Set the master.
-	 *  @param master The master to set.
-	 */
-	public void setMaster(Boolean master)
-	{
-		this.master = master;
-	}
-
-	/**
-	 *  Get the daemon.
-	 *  @return the daemon.
-	 */
-	public Boolean getDaemon()
-	{
-		return daemon;
-	}
-
-	/**
-	 *  Set the daemon.
-	 *  @param daemon The daemon to set.
-	 */
-	public void setDaemon(Boolean daemon)
-	{
-		this.daemon = daemon;
-	}
-
-	/**
-	 *  Get the autoshutdown.
-	 *  @return the autoshutdown.
-	 */
-	public Boolean getAutoShutdown()
-	{
-		return autoshutdown;
-	}
-
-	/**
-	 *  Set the autoshutdown.
-	 *  @param autoshutdown The autoshutdown to set.
-	 */
-	public void setAutoShutdown(Boolean autoshutdown)
-	{
-		this.autoshutdown = autoshutdown;
-	}
-
-	/**
-	 *  Get the suspend.
-	 *  @return the suspend.
-	 */
-	public Boolean getSuspend()
-	{
-		return suspend;
-	}
-
-	/**
-	 *  Set the suspend.
-	 *  @param suspend The suspend to set.
-	 */
-	public void setSuspend(Boolean suspend)
-	{
-		this.suspend = suspend;
-	}
-	
 	
 }

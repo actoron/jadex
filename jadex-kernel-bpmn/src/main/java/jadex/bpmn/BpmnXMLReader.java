@@ -1554,7 +1554,23 @@ public class BpmnXMLReader
 								}
 								else if("description".equals(key))
 								{
-									model.setDescription(value);
+									mi.setDescription(value);
+								}
+								else if("master".equals(key))
+								{
+									mi.setMaster(new Boolean(value));
+								}
+								else if("daemon".equals(key))
+								{
+									mi.setDaemon(new Boolean(value));
+								}
+								else if("autoshutdown".equals(key))
+								{
+									mi.setAutoShutdown(new Boolean(value));
+								}
+								else if("suspend".equals(key))
+								{
+									mi.setSuspend(new Boolean(value));
 								}
 								else if("parameters".equals(key))
 								{
