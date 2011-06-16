@@ -238,6 +238,24 @@ public class UserInteractionTask implements ITask
 		return ret;
 	}
 	
+	/**
+	 *  Compensate in case the task is canceled.
+	 *  @return	To be notified, when the compensation has completed.
+	 */
+	public IFuture compensate(final BpmnInterpreter instance)
+	{
+		final Future ret = new Future();
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				dialog.setVisible(false);
+				ret.setResult(null);
+			}
+		});
+		return ret;
+	}
+	
 	//-------- static methods --------
 	
 	/**

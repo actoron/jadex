@@ -18,7 +18,6 @@ public interface IComponentIdentifier
 	 *  @return The local name of an component.
 	 */
 	public String getLocalName();
-
 	/**
 	 *  Get the platform name.
 	 *  @return The platform name.

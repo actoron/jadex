@@ -9,7 +9,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aZgC0dFGEd-OeJnOjY27qg" key="uniqueColumnIndex" value="1"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aZgC0tFGEd-OeJnOjY27qg" key="0:0" value="jadex.wfms.parametertypes.*"/>
   </eAnnotations>
-  <pools xmi:type="bpmn:Pool" xmi:id="_KWBxBMCkEd-jKppMsEcWIw" iD="_KWBxA8CkEd-jKppMsEcWIw" name="Pool">
+  <pools xmi:type="bpmn:Pool" xmi:id="_KWBxBMCkEd-jKppMsEcWIw" iD="_KWBxA8CkEd-jKppMsEcWIw" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_KWBxBsCkEd-jKppMsEcWIw" iD="_KWBxBcCkEd-jKppMsEcWIw" outgoingEdges="_LomEEdBmEd-GH-BUqFZ3gw" incomingEdges="_AwyNAdBmEd-GH-BUqFZ3gw" name="Bestaetigung_Datensatz_geladen" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_XPUsENBlEd-GH-BUqFZ3gw" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XPUsEdBlEd-GH-BUqFZ3gw" key="class" value="jadex.wfms.client.task.WorkitemTask"/>

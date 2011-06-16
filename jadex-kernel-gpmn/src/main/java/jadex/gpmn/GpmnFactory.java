@@ -8,9 +8,9 @@ import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
@@ -50,8 +50,8 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	
 	//-------- attributes --------
 	
-	/** The provider. */
-	protected IServiceProvider provider;
+	/** The internal access. */
+	protected IInternalAccess ia;
 
 	/** The gpmn loader. */
 	protected GpmnModelLoader loader;
@@ -71,12 +71,12 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	/**
 	 *  Create a new GpmnProcessService.
 	 */
-	public GpmnFactory(IServiceProvider provider, Map properties)
+	public GpmnFactory(IInternalAccess access, Map properties)
 	{
-		super(provider.getId(), IComponentFactory.class, properties);
+		super(access.getServiceContainer().getId(), IComponentFactory.class, properties);
 		
 		this.properties	= properties;
-		this.provider = provider;
+		this.ia = access;
 		this.loader = new GpmnModelLoader();
 		this.converter = new GpmnBDIConverter();
 	}
@@ -85,7 +85,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	{
 		final IFuture sfuture = super.startService();
 		final Future ret = new Future();
-		SServiceProvider.getService(provider, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(ia.getServiceContainer(), IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -94,10 +94,10 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 				bdiprops.put("planexecutor_standard", new JavaStandardPlanExecutor(tps));
 				bdiprops.put("microplansteps", Boolean.TRUE);
 				bdiprops.put("planexecutor_bpmn", new BpmnPlanExecutor());
-				factory = new BDIAgentFactory(bdiprops, provider);
-				sfuture.addResultListener(new DelegationResultListener(ret));
+				factory = new BDIAgentFactory(bdiprops, ia.getServiceContainer());
+				sfuture.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 			}
-		});
+		}));
 		return ret;
 	}
 	

@@ -111,4 +111,11 @@ public interface IWorkitemHandlerService
 	 *  @return Null, when done.
 	 */
 	public IFuture queueWorkitem(IWorkitem workitem, IResultListener listener);
+	
+	/**
+	 *  Withdraws a Workitem/Activity.
+	 *  @param workitem The workitem being withdrawn.
+	 *  @return Null, when done.
+	 */
+	public IFuture withdrawWorkitem(IWorkitem workitem);
 }

@@ -12,6 +12,7 @@ import jadex.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.bpmn.runtime.task.TaskMetaInfo;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -21,12 +22,18 @@ import java.util.Map;
  */
 public class DispatchGoalTask	implements ITask
 {
+	/** Future to indicate creation completion. */
+	protected Future creationFuture;
+	
+	/** The goal. */
+	protected IGoal	goal;
+	
 	/**
 	 *  Execute the task.
 	 */
 	public IFuture execute(final ITaskContext context, BpmnInterpreter instance)
 	{
-		final Future ret = new Future();
+		creationFuture = new Future();
 		
 		try
 		{
@@ -43,7 +50,7 @@ public class DispatchGoalTask	implements ITask
 
 //			System.out.println("Create goal task: "+type+" "+params);
 				
-			final IGoal	goal	= plan.createGoal(type);
+			goal = plan.createGoal(type);
 			if(params!=null)
 			{
 				for(Iterator it=params.keySet().iterator(); it.hasNext(); )
@@ -65,14 +72,14 @@ public class DispatchGoalTask	implements ITask
 						goal.removeGoalListener(this);
 						if(goal.isSucceeded())
 						{
-							ret.setResult(null);
+							creationFuture.setResult(null);
 //							listener.resultAvailable(DispatchGoalTask.this, null);
 						}
 						else
 						{
 							Exception	e	= new GoalFailureException();
 							e.fillInStackTrace();
-							ret.setException(e);
+							creationFuture.setException(e);
 //							listener.exceptionOccurred(DispatchGoalTask.this, e);
 						}
 					}
@@ -89,15 +96,38 @@ public class DispatchGoalTask	implements ITask
 				plan.dispatchTopLevelGoal(goal);
 			
 			if(!wait)
-				ret.setResult(null);
+				creationFuture.setResult(null);
 //				listener.resultAvailable(this, null);
 		}
 		catch(Exception e)
 		{
-			ret.setException(e);
+			creationFuture.setException(e);
 //			listener.exceptionOccurred(this, e);
 		}
 		
+		return creationFuture;
+	}
+	
+	/**
+	 *  Compensate in case the task is canceled.
+	 *  @return	To be notified, when the compensation has completed.
+	 */
+	public IFuture compensate(final BpmnInterpreter instance)
+	{
+		final Future ret = new Future();
+		creationFuture.addResultListener(instance.createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				goal.drop();
+				ret.setResult(null);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setResult(null);
+			}
+		}));
 		return ret;
 	}
 	

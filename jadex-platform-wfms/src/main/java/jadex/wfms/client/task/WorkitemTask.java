@@ -26,6 +26,9 @@ import java.util.Set;
 
 public class WorkitemTask implements ITask
 {
+	/** The workitem. */
+	protected IWorkitem workitem;
+	
 	/**
 	 *  Execute the task.
 	 *  @param context	The accessible values.
@@ -42,7 +45,29 @@ public class WorkitemTask implements ITask
 			public void resultAvailable(Object result)
 			{
 				IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
-				wh.queueWorkitem(createWorkitem(process, context), createListener(context, ret));
+				workitem = createWorkitem(process, context);
+				wh.queueWorkitem(workitem, createListener(context, ret));
+			}
+		});
+		return ret;
+	}
+	
+	/**
+	 *  Compensate in case the task is canceled.
+	 *  @return	To be notified, when the compensation has completed.
+	 */
+	public IFuture compensate(final BpmnInterpreter instance)
+	{
+		final Future ret = new Future();
+		IServiceContainer wfms = instance.getServiceContainer();
+		SServiceProvider.getService(wfms, IWorkitemHandlerService.class, RequiredServiceInfo.SCOPE_APPLICATION).addResultListener(new DefaultResultListener()
+		{
+			
+			public void resultAvailable(Object result)
+			{
+				IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
+				wh.withdrawWorkitem(workitem);
+				ret.setResult(null);
 			}
 		});
 		return ret;

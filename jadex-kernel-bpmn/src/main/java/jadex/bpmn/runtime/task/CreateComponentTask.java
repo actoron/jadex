@@ -5,10 +5,12 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bridge.CreationInfo;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -24,6 +26,9 @@ import java.util.Set;
  */
 public class CreateComponentTask implements ITask
 {
+	/** Future called when the component is created to allow compensation (i.e. killing the component). */
+	protected Future creationFuture = new Future();
+	
 	static Set reserved;
 	static
 	{
@@ -117,7 +122,7 @@ public class CreateComponentTask implements ITask
 				
 				cms.createComponent(name, model,
 					new CreationInfo(config, args, sub ? instance.getComponentAdapter().getComponentIdentifier() : null, 
-						suspend, master, daemon, autoshutdown, instance.getModelElement().getModelInfo().getAllImports(), bindings), lis);
+						suspend, master, daemon, autoshutdown, instance.getModelElement().getModelInfo().getAllImports(), bindings), lis).addResultListener(instance.createResultListener(new DelegationResultListener(creationFuture)));
 
 				if(!wait)
 				{
@@ -133,6 +138,43 @@ public class CreateComponentTask implements ITask
 			}
 		}));
 		
+		return ret;
+	}
+	
+	/**
+	 *  Compensate in case the task is canceled.
+	 *  @return	To be notified, when the compensation has completed.
+	 */
+	public IFuture compensate(final BpmnInterpreter instance)
+	{
+		final Future ret = new Future();
+		creationFuture.addResultListener(instance.createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				final IComponentIdentifier id = ((IComponentIdentifier) result);
+				SServiceProvider.getService(instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(instance.createResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+						IComponentManagementService	cms	= (IComponentManagementService)result;
+						cms.destroyComponent(id).addResultListener(new DelegationResultListener(ret));
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+						ret.setResult(null);
+					}
+					
+				}));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setResult(null);
+			}
+		}));
 		return ret;
 	}
 	

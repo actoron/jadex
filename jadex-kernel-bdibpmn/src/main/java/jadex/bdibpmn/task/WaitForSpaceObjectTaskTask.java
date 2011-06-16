@@ -34,6 +34,15 @@ public class WaitForSpaceObjectTaskTask	implements ITask
 		return ret;
 	}
 	
+	/**
+	 *  Compensate in case the task is canceled.
+	 *  @return	To be notified, when the compensation has completed.
+	 */
+	public IFuture compensate(final BpmnInterpreter instance)
+	{
+		return IFuture.DONE;
+	}
+	
 	//-------- static methods --------
 	
 	/**

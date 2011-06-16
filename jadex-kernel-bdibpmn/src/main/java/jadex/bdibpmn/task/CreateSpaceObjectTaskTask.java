@@ -8,6 +8,7 @@ import jadex.bpmn.runtime.task.TaskMetaInfo;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 
 import java.util.Map;
@@ -17,22 +18,34 @@ import java.util.Map;
  */
 public class CreateSpaceObjectTaskTask	implements	ITask
 {
+	/** Future to indicate creation completion. */
+	protected Future creationFuture;
+	
+	/** The space. */
+	protected IEnvironmentSpace	space;
+	
+	/** The task ID. */
+	protected Object taskid;
+	
+	/** The object ID. */
+	protected Object objectid;
+	
 	/**
 	 *  Execute the task.
 	 */
 	public IFuture execute(ITaskContext context, BpmnInterpreter instance)
 	{
-		Future ret = new Future();
+		creationFuture = new Future();
 		
 		try
 		{
 			String type	= (String)context.getParameterValue("type");
-			IEnvironmentSpace	space	= (IEnvironmentSpace)context.getParameterValue("space");
-			Object	objectid	= context.getParameterValue("objectid");
+			space	= (IEnvironmentSpace)context.getParameterValue("space");
+			objectid	= context.getParameterValue("objectid");
 			Map	properties	= context.hasParameterValue("properties")
 				? (Map)context.getParameterValue("properties") : null;
 			
-			Object	taskid	= space.createObjectTask(type, properties, objectid);
+			taskid	= space.createObjectTask(type, properties, objectid);
 			
 			if(context.hasParameterValue("taskid"))
 				context.setParameterValue("taskid", taskid);
@@ -41,18 +54,41 @@ public class CreateSpaceObjectTaskTask	implements	ITask
 				? ((Boolean)context.getParameterValue("wait")).booleanValue() : true;
 			if(wait)
 			{
-				space.addTaskListener(taskid, objectid, new DelegationResultListener(ret));
+				space.addTaskListener(taskid, objectid, new DelegationResultListener(creationFuture));
 			}
 			else
 			{
-				ret.setResult(null);
+				creationFuture.setResult(null);
 			}
 		}
 		catch(Exception e)
 		{
-			ret.setException(e);
+			creationFuture.setException(e);
 		}
 		
+		return creationFuture;
+	}
+	
+	/**
+	 *  Compensate in case the task is canceled.
+	 *  @return	To be notified, when the compensation has completed.
+	 */
+	public IFuture compensate(final BpmnInterpreter instance)
+	{
+		final Future ret = new Future();
+		creationFuture.addResultListener(instance.createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				space.removeObjectTask(taskid, objectid);
+				ret.setResult(null);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setResult(null);
+			}
+		}));
 		return ret;
 	}
 	

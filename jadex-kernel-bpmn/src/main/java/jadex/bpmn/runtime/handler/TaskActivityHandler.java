@@ -19,6 +19,9 @@ public class TaskActivityHandler extends DefaultActivityHandler
 	 */
 	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
+		if (thread.isCanceled())
+			return;
+		
 		Class taskimpl = activity.getClazz();
 		if(taskimpl!=null)
 		{
@@ -27,17 +30,23 @@ public class TaskActivityHandler extends DefaultActivityHandler
 			try
 			{
 				ITask task = (ITask)taskimpl.newInstance();
+				thread.setTask(task);
+				thread.setCanceled(false);
 				task.execute(thread, instance).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
-						instance.notify(activity, thread, null);
+						if (!thread.isCanceled())
+							instance.notify(activity, thread, null);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						thread.setException(exception);
-						instance.notify(activity, thread, null);
+						if (!thread.isCanceled())
+						{
+							thread.setException(exception);
+							instance.notify(activity, thread, null);
+						}	
 					}
 				});
 			}
@@ -51,5 +60,21 @@ public class TaskActivityHandler extends DefaultActivityHandler
 		{
 			super.execute(activity, instance, thread);
 		}
+	}
+	
+	/**
+	 *  Cancel an activity.
+	 *  @param activity	The activity to execute.
+	 *  @param instance	The process instance.
+	 *  @param thread The process thread.
+	 *  @param info The info object.
+	 */
+
+	public void cancel(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+	{
+		thread.setCanceled(true);
+		ITask task = thread.getTask();
+		if (task != null)
+			task.compensate(instance);
 	}
 }

@@ -19,5 +19,9 @@ public interface ITask
 	// Todo: Provide cancel() method for tasks no longer required
 	// (e.g. when subprocess finished while task not completed)
 	// to allow tasks doing some cleanup.
-	// public void	cancel();
+	/**
+	 *  Compensate in case the task is canceled.
+	 *  @return	To be notified, when the compensation has completed.
+	 */
+	public IFuture compensate(BpmnInterpreter instance);
 }

@@ -52,6 +52,9 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	/** The component adapter. */
 	protected IComponentAdapter	adapter;
 	
+	/** The component creation time. */
+	protected long creationtime;
+	
 	/** The value fetcher. */
 	protected IValueFetcher	fetcher;
 	
@@ -87,9 +90,10 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 			this.parent = parent;
 			this.arguments = arguments;
 			this.bindings = bindings;
-			if(factory != null)
+			if (factory != null)
 				this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 			this.container = new ComponentServiceContainer(adapter, desc.getType());
+			this.creationtime = System.currentTimeMillis();
 		}
 		catch(Exception e)
 		{
@@ -343,6 +347,17 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		if(properties==null)
 			properties = new HashMap();
 		properties.put(name, val);
+	}
+	
+	/**
+	 *  Return the creation time of the component,
+	 *  expressed in system time.
+	 *  
+	 *  @return The creation time of the component.
+	 */
+	public long getCreationTime()
+	{
+		return creationtime;
 	}
 	
 	/**

@@ -172,6 +172,38 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	}
 	
 	/**
+	 *  Withdraws a Workitem/Activity.
+	 *  @param workitem the workitem being terminated
+	 *  @return Null, when done.
+	 */
+	public IFuture withdrawWorkitem(final IWorkitem workitem)
+	{
+		final Future ret = new Future();
+		terminateActivity((IClientActivity) workitem).addResultListener(ia.createResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				IResultListener listener = (IResultListener) processWorkitemListeners.remove(workitem);
+				listener.exceptionOccurred(new RuntimeException("Workitem terminated."));
+				workitemQueues.get(workitem.getRole());
+				Set workitems = (Set) workitemQueues.get(workitem.getRole());
+				if (workitems.remove(workitem))
+					fireWorkitemRemovedEvent(workitem);
+				ComponentChangeEvent.getTimeStamp(ia.getServiceContainer()).addResultListener(ia.createResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+						LogService.dispatchLogServiceEvent(ia.getServiceContainer(), new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_WORKITEM, workitem.getName(), workitem.toString(), workitem.getProcess(), "Withdrawn", null, (Long) result));
+					}
+				}));
+				
+				ret.setResult(null);
+			}
+		}));
+		return ret;
+	}
+	
+	/**
 	 * Returns the current activities for all users
 	 * 
 	 * @return current activities for all users
@@ -217,7 +249,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 			{
 				public void resultAvailable(Object result)
 				{
-					LogService.dispatchLogServiceEvent(ia.getServiceContainer(), new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_ACTIVITY, activity.getName(), id, activity.getProcess(), "Finished", user, (Long) result));
+					LogService.dispatchLogServiceEvent(ia.getServiceContainer(), new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_ACTIVITY, activity.getName(), id, activity.getProcess(), "Terminated", user, (Long) result));
 				}
 			}));
 			((Set) userActivities.get(userName)).remove(activity);
@@ -565,6 +597,8 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	
 	private void fireWorkitemRemovedEvent(final IWorkitem workitem)
 	{
+		// Workitem Disposed event CANNOT be here since its semantics are different
+		// (workitems are not "disposed" when an activity starts)
 		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			

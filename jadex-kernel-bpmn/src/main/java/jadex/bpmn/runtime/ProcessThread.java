@@ -86,6 +86,12 @@ public class ProcessThread	implements ITaskContext
 	/** The wait filter. */
 	protected IFilter waitfilter;
 	
+	/** The current task. */
+	protected ITask task;
+	
+	/** Is the task canceled. */
+	protected boolean canceled;
+	
 	/** The id counter for sub processes. */
 	public int	idcnt;
 	
@@ -135,6 +141,42 @@ public class ProcessThread	implements ITaskContext
 	{
 		this.edge	= null;
 		this.activity	= activity;
+	}
+	
+	/**
+	 *  Is the current task canceled?
+	 *  @return The canceled flag.
+	 */
+	public boolean isCanceled()
+	{
+		return canceled;
+	}
+	
+	/**
+	 *  Set the canceled state.
+	 *  @param canceled True, if canceled.
+	 */
+	public void setCanceled(boolean canceled)
+	{
+		this.canceled = canceled;
+	}
+	
+	/**
+	 *  Gets the current task.
+	 *  @return The current task.
+	 */
+	public ITask getTask()
+	{
+		return task;
+	}
+	
+	/**
+	 *  Sets the current task.
+	 *  @param task The current task.
+	 */
+	public void setTask(ITask task)
+	{
+		this.task = task;
 	}
 	
 	/**

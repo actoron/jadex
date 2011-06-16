@@ -37,6 +37,9 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	/** Component which generated the event. */
 	protected IComponentIdentifier component;
 	
+	/** Creation time of the component. */
+	protected long componentcreationtime;
+	
 	/** Parent of the source which generated the event. */
 	protected String parent;
 	

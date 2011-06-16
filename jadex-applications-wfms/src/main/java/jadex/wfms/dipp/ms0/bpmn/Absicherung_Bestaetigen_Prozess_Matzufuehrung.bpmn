@@ -3,13 +3,14 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_4xvWINFSEd-OeJnOjY27qg" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4xvWIdFSEd-OeJnOjY27qg" key="Description" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4xxLUNFSEd-OeJnOjY27qg" key="Package" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZRlx4EM8EeCM_bCeMiRW9w" key="editor_version" value="1.0"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_PL7EMNFTEd-OeJnOjY27qg" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Pg_8UNFTEd-OeJnOjY27qg" key="dimension" value="1:1"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Pg_8UdFTEd-OeJnOjY27qg" key="uniqueColumnIndex" value="0"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Pg_8UtFTEd-OeJnOjY27qg" key="0:0" value="jadex.wfms.parametertypes.*"/>
   </eAnnotations>
-  <pools xmi:type="bpmn:Pool" xmi:id="_CWpf4MAFEd-Dc7YUB4bIuQ" iD="_CWo40MAFEd-Dc7YUB4bIuQ" name=".">
+  <pools xmi:type="bpmn:Pool" xmi:id="_CWpf4MAFEd-Dc7YUB4bIuQ" iD="_CWo40MAFEd-Dc7YUB4bIuQ" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_CW4JYcAFEd-Dc7YUB4bIuQ" iD="_CW4JYMAFEd-Dc7YUB4bIuQ" outgoingEdges="_DBtKEdFTEd-OeJnOjY27qg" incomingEdges="_-bTmsdFSEd-OeJnOjY27qg" name="Bestaetigung_Datensatz_geladen" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_9gwC8NFSEd-OeJnOjY27qg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9gwC8dFSEd-OeJnOjY27qg" key="class" value="jadex.wfms.client.task.WorkitemTask"/>

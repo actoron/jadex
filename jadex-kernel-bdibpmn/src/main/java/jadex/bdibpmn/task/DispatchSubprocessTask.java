@@ -7,7 +7,11 @@ import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.bpmn.runtime.task.TaskMetaInfo;
 import jadex.bridge.CreationInfo;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -20,6 +24,9 @@ import java.util.Map;
  */
 public class DispatchSubprocessTask	implements ITask
 {
+	/** Future to indicate creation completion. */
+	protected Future creationFuture;
+	
 	/**
 	 *  Execute the task.
 	 */
@@ -44,7 +51,7 @@ public class DispatchSubprocessTask	implements ITask
 			ResultFuture rf = new ResultFuture();
 			if (params == null)
 				params = new HashMap();
-			cms.createComponent(null, processref, new CreationInfo(params), rf);
+			cms.createComponent(null, processref, new CreationInfo(params), rf).addResultListener(instance.createResultListener(new DelegationResultListener(creationFuture)));
 			
 			if(context.getModelElement().hasParameter("resultfuture"))
 				context.setParameterValue("resultfuture", rf);
@@ -69,6 +76,43 @@ public class DispatchSubprocessTask	implements ITask
 //			listener.exceptionOccurred(this, e);
 		}
 		
+		return ret;
+	}
+	
+	/**
+	 *  Compensate in case the task is canceled.
+	 *  @return	To be notified, when the compensation has completed.
+	 */
+	public IFuture compensate(final BpmnInterpreter instance)
+	{
+		final Future ret = new Future();
+		creationFuture.addResultListener(instance.createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				final IComponentIdentifier id = ((IComponentIdentifier) result);
+				SServiceProvider.getService(instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(instance.createResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+						IComponentManagementService	cms	= (IComponentManagementService)result;
+						cms.destroyComponent(id).addResultListener(new DelegationResultListener(ret));
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+						ret.setResult(null);
+					}
+					
+				}));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setResult(null);
+			}
+		}));
 		return ret;
 	}
 	

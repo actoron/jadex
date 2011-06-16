@@ -13,12 +13,15 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 /**
  *  A task that displays a message using a JOptionPane.
  */
 public class AsynchronousOKTask	 implements ITask
 {
+	protected JDialog	dialog = new JDialog((JDialog)null, false);
+	
 	/**
 	 *  Execute the task.
 	 */
@@ -32,7 +35,7 @@ public class AsynchronousOKTask	 implements ITask
 			? ((Integer)context.getParameterValue("y_offset")).intValue() : 0;
 		
 		JOptionPane	pane	= new JOptionPane(message, JOptionPane.INFORMATION_MESSAGE);
-		final JDialog	dialog	= new JDialog((JDialog)null, title, false);
+		dialog.setTitle(title);
 		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		dialog.setContentPane(pane);
 		dialog.pack();
@@ -56,6 +59,24 @@ public class AsynchronousOKTask	 implements ITask
 		
 		dialog.setVisible(true);
 	
+		return ret;
+	}
+	
+	/**
+	 *  Compensate in case the task is canceled.
+	 *  @return	To be notified, when the compensation has completed.
+	 */
+	public IFuture compensate(final BpmnInterpreter instance)
+	{
+		final Future ret = new Future();
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				dialog.setVisible(false);
+				ret.setResult(null);
+			}
+		});
 		return ret;
 	}
 }

@@ -75,7 +75,7 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_CW6lo8AFEd-Dc7YUB4bIuQ" fillColor="16771304"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_CW6lpMAFEd-Dc7YUB4bIuQ" lineColor="11119017"/>
     <element xmi:type="bpmn:Pool" href="Absicherung_Bestaetigen_Prozess_Matzufuehrung.bpmn#_CWpf4MAFEd-Dc7YUB4bIuQ"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_CXJ2NMAFEd-Dc7YUB4bIuQ" x="16" y="16" width="860" height="200"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_CXJ2NMAFEd-Dc7YUB4bIuQ" x="16" y="133" width="860" height="200"/>
   </children>
   <styles xmi:type="notation:PageStyle" xmi:id="_CWHUYMAFEd-Dc7YUB4bIuQ"/>
   <styles xmi:type="notation:GuideStyle" xmi:id="_CWHUYcAFEd-Dc7YUB4bIuQ"/>

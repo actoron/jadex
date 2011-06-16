@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_ARfZcJgKEeChsdIjfm9JaA" iD="_AReLUJgKEeChsdIjfm9JaA">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_SvRG4JgLEeChsdIjfm9JaA" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_SvRt8JgLEeChsdIjfm9JaA" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mo91MJgLEeChsdIjfm9JaA" key="package" value="jadex.bpmn.testcases"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_o0R2MJgLEeChsdIjfm9JaA" key="description" value="Task compensation after component kill"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_qltXkJgLEeChsdIjfm9JaA" source="jadex_arguments_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uapBwJgLEeChsdIjfm9JaA" key="dimension" value="1:6"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uapBwZgLEeChsdIjfm9JaA" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uapBwpgLEeChsdIjfm9JaA" key="0:0" value="testresults"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uapBw5gLEeChsdIjfm9JaA" key="0:1" value="true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uapBxJgLEeChsdIjfm9JaA" key="0:2" value="true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uapBxZgLEeChsdIjfm9JaA" key="0:3" value="The test results."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uapBxpgLEeChsdIjfm9JaA" key="0:4" value="Testcase"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uapBx5gLEeChsdIjfm9JaA" key="0:5" value=""/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_ARn8UZgKEeChsdIjfm9JaA" iD="_ARn8UJgKEeChsdIjfm9JaA" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_ARojYZgKEeChsdIjfm9JaA" iD="_ARojYJgKEeChsdIjfm9JaA" outgoingEdges="_KlF6wZgLEeChsdIjfm9JaA" incomingEdges="_KKY7wZgLEeChsdIjfm9JaA" name="Compensation Task" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_NJTj8JgLEeChsdIjfm9JaA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QVyuEJgLEeChsdIjfm9JaA" key="class" value="jadex.bpmn.testcases.CompensationTestTask"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_Hc0iQZgLEeChsdIjfm9JaA" iD="_Hc0iQJgLEeChsdIjfm9JaA" outgoingEdges="_KKY7wZgLEeChsdIjfm9JaA" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_JjKjsZgLEeChsdIjfm9JaA" iD="_JjKjsJgLEeChsdIjfm9JaA" incomingEdges="_KlF6wZgLEeChsdIjfm9JaA" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_KKY7wZgLEeChsdIjfm9JaA" iD="_KKY7wJgLEeChsdIjfm9JaA"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_KlF6wZgLEeChsdIjfm9JaA" iD="_KlF6wJgLEeChsdIjfm9JaA"/>
+  </pools>
+</bpmn:BpmnDiagram>

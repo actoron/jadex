@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gpmn:GpmnDiagram xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" version="2.0">
+  <import>jadex.wfms.dipp.ms0.bpmn.*</import>
   <context/>
   <goal id="_HfF9MMABEd-Dc7YUB4bIuQ" name="Prozessplanung_absichern" goalType="AchieveGoal"/>
   <goal id="_KYU0IMABEd-Dc7YUB4bIuQ" name="AKVerfuegbarkeit_abgesichern" goalType="AchieveGoal"/>
