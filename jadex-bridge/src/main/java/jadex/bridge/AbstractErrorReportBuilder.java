@@ -6,6 +6,7 @@ import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -267,7 +268,13 @@ public abstract class AbstractErrorReportBuilder
 			{
 				Object	obj	= getObject(elements[i]);
 				if(obj!=null && !errors.contains(obj))
+				{
 					errors.add(obj);
+				}
+				else
+				{
+					errors.add(elements[i]);
+				}
 			}
 		}
 		return errors;
@@ -293,19 +300,27 @@ public abstract class AbstractErrorReportBuilder
 	 */
 	protected Tuple[]	getElementErrors(Object ancestor)
 	{
-		List	errors	= SCollection.createArrayList();
-		Tuple[]	elements	= getElements();			
-		for(int i=0; i<elements.length; i++)
+		List	errors;
+		if(entries.containsKey(ancestor))
 		{
-			boolean	added	= errors.contains(elements[i]);
-			for(int j=0; !added && j<elements[i].getEntities().length; j++)
+			errors	=  Collections.singletonList(ancestor);
+		}
+		else
+		{
+			errors	= SCollection.createArrayList();
+			Tuple[]	elements	= getElements();			
+			for(int i=0; i<elements.length; i++)
 			{
-				Object	se	= elements[i].getEntity(j);
-				Object	obj	= getPathElementObject(se);
-				if(ancestor.equals(obj))
+				boolean	added	= errors.contains(elements[i]);
+				for(int j=0; !added && j<elements[i].getEntities().length; j++)
 				{
-					errors.add(elements[i]);
-					added	= true;
+					Object	se	= elements[i].getEntity(j);
+					Object	obj	= getPathElementObject(se);
+					if(ancestor.equals(obj))
+					{
+						errors.add(elements[i]);
+						added	= true;
+					}
 				}
 			}
 		}

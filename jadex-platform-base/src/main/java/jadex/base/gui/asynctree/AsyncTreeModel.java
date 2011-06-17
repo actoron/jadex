@@ -40,8 +40,8 @@ public class AsyncTreeModel implements TreeModel
 	/** The added nodes. */
 	protected final Map	added;
 	
-	/** The zombie node ids. */
-	protected final Set	zombies;
+	/** The zombie node ids (id->remove counter). */
+	protected final Map	zombies;
 	
 	/** The icon overlays. */
 	protected final List	overlays;
@@ -60,7 +60,7 @@ public class AsyncTreeModel implements TreeModel
 		this.nodelisteners	= new ArrayList();
 		this.nodes	= new HashMap();
 		this.added	= new HashMap();
-		this.zombies	= new HashSet();
+		this.zombies	= new HashMap();
 		this.overlays	= new ArrayList();
 	}
 	
@@ -404,7 +404,7 @@ public class AsyncTreeModel implements TreeModel
 		boolean	notify	= false;
 		synchronized(nodes)
 		{
-			if(zombies.contains(node.getId()))
+			if(zombies.containsKey(node.getId()))
 			{
 				zombies.remove(node.getId());
 				nodes.remove(node.getId());
@@ -474,20 +474,6 @@ public class AsyncTreeModel implements TreeModel
 	}
 	
 	/**
-	 *  Called, when a node should be removed that isn't there (yet).
-	 */
-	public void addZombieNode(Object id)
-	{
-		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
-
-		synchronized(nodes)
-		{
-			assert !nodes.containsKey(id) : id;
-			zombies.add(id);
-		}
-	}
-	
-	/**
 	 *  Check, if a node is a zombie.
 	 */
 	public boolean	isZombieNode(Object id)
@@ -497,7 +483,7 @@ public class AsyncTreeModel implements TreeModel
 		boolean ret;
 		synchronized(nodes)
 		{
-			ret	= zombies.contains(id);
+			ret	= zombies.containsKey(id);
 		}
 		return ret;
 	}
@@ -533,9 +519,51 @@ public class AsyncTreeModel implements TreeModel
 			ret	= (ITreeNode)nodes.get(id);
 			if(ret==null)
 			{
-				zombies.add(id);
+				addZombieNode(id);
 			}
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Add a zombie node or increase the counter.
+	 */
+	public void	addZombieNode(Object id)
+	{
+		synchronized(nodes)
+		{
+			Integer	num	= (Integer)zombies.get(id);
+			num	= new Integer(num!=null ? num.intValue()+1 : 1);
+			zombies.put(id, num);
+//			if(id.toString().startsWith("ANDTest@"))
+//				System.out.println("Zombie node count increased: "+id+", "+num);
+		}
+	}
+	
+
+	/**
+	 *  Remove a zombie node.
+	 */
+	public void	removeZombieNode(ITreeNode node)
+	{
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
+		synchronized(nodes)
+		{
+			Integer	num	= (Integer)zombies.get(node.getId());
+			if(num.intValue()>1)
+			{
+				num	= new Integer(num!=null ? num.intValue()-1 : 1);
+				zombies.put(node.getId(), num);
+//				if(node.getId().toString().startsWith("ANDTest@"))
+//					System.out.println("Zombie node count decreased: "+node+", "+num);
+			}
+			else
+			{
+//				if(node.getId().toString().startsWith("ANDTest@"))
+//					System.out.println("Zombie node removed: "+node+", "+num);
+				deregisterNode(node);
+			}
+		}
+	}
+
 }

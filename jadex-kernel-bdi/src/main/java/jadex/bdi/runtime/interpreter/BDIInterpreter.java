@@ -643,14 +643,23 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 			{
 				public void run()
 				{
-					state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_killlisteners, new DelegationResultListener(ret));
 					Object cs = state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state);
 					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 					{
+						state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_killlisteners, new DelegationResultListener(ret));
 						AgentRules.startTerminating(state, ragent);
+					}
+					else if(cs==null)
+					{
+						// Killed after init (behavior not started)
+						// -> Call cleanup directly as rule engine is not running and end state is not executed.
+						state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED);
+						state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_killlisteners, new DelegationResultListener(ret));
+						AgentRules.cleanupAgent(state, ragent);						
 					}
 					else
 					{
+						// Killed after termination.
 						ret.setException(new RuntimeException("Component not running: "+getComponentIdentifier().getName()));
 					}
 				}
@@ -777,7 +786,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		
 		boolean	isatbreakpoint	= false;
 		
-		if(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)!=null)
+		Object	cs	= state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state);
+		if(cs!=null && !OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED.equals(cs))
 		{
 			Set	bps	= new HashSet(Arrays.asList(breakpoints));	// Todo: cache set across invocations for speed?
 			Iterator	it	= getRuleSystem().getAgenda().getActivations().iterator();

@@ -443,12 +443,12 @@ public abstract class AbstractTreeNode	implements ITreeNode
 			model.fireNodeAdded(this, node, index);
 			if(searching)
 				dirty	= true;
-			
-//			System.err.println("Node added: "+children);
+//			if(node.getId().toString().startsWith("ANDTest@"))
+//				System.out.println("Node added: "+node+", "+children);
 		}
 		else
 		{
-			model.deregisterNode(node);
+			model.removeZombieNode(node);
 		}
 	}
 	
@@ -474,11 +474,34 @@ public abstract class AbstractTreeNode	implements ITreeNode
 		int index	= getIndexOfChild(node);
 		if(index!=-1)
 		{
+//			boolean	removed	=
 			children.remove(node);
+//			if(node.getId().toString().startsWith("ANDTest@"))
+//				System.out.println("removed: "+node+", "+removed);
 			model.deregisterNode(node);
 			model.fireNodeRemoved(this, node, index);
 			if(searching)
 				dirty	= true;
 		}
+		else
+		{
+			getModel().addZombieNode(node.getId());
+		}
+	}
+	
+	/**
+	 *  Test if two nodes are equal.
+	 */
+	public boolean equals(Object obj)
+	{
+		return obj instanceof ITreeNode && SUtil.equals(getId(), ((ITreeNode)obj).getId());
+	}
+	
+	/**
+	 *  Generate a has code.
+	 */
+	public int hashCode()
+	{
+		return 31 + (getId()!=null ? getId().hashCode() : 0);
 	}
 }

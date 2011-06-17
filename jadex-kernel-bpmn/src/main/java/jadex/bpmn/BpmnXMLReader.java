@@ -147,11 +147,12 @@ public class BpmnXMLReader
 			{
 //				System.out.println("XML error: "+msg+", "+type+", "+info+", "+location);
 //				Thread.dumpStack();
-				IContext	context	= (IContext)Reader.READ_CONTEXT.get();
+				IContext	context	= (IContext)(info instanceof IContext ? info : Reader.READ_CONTEXT.get());
+				Tuple	stack	= new Tuple(info instanceof StackElement[] ? (StackElement[])info : ((ReadContext)context).getStack());
+				
 				Map	user	= (Map)context.getUserContext();
 				MultiCollection	report	= (MultiCollection)user.get(CONTEXT_ENTRIES);
 				String	pos;
-				Tuple	stack	= new Tuple(((ReadContext)context).getStack());
 				if(stack.getEntities().length>0)
 				{
 					StackElement	se	= (StackElement)stack.get(stack.getEntities().length-1);

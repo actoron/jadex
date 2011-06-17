@@ -215,16 +215,7 @@ public class Reader
 				{
 					for(int j=0; j<ps.size(); j++)
 					{
-						try
-						{
-							((Runnable)ps.get(j)).run();
-						}
-						catch(RuntimeException e)
-						{
-//							e.printStackTrace();
-							StackElement	se	= readcontext.getTopStackElement();
-							readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", se, se!=null ? se.getLocation() : readcontext.getParser().getLocation());																				
-						}
+						((IPostProcessorCall)ps.get(j)).callPostProcessor();
 					}
 				}
 	//			System.out.println("i: "+i);
@@ -593,20 +584,29 @@ public class Reader
 					}
 					catch(RuntimeException e)
 					{
-						StackElement	se	= readcontext.getTopStackElement();
-						readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", se, se.getLocation());																				
+						readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", topse, topse.getLocation());																				
 					}
 				}
 				else
 				{
-					final Object object = topse.getObject();
-					readcontext.getPostProcessors().put(new Integer(postproc.getPass()), new Runnable()
+					final StackElement	ftopse	= topse;
+					final StackElement[]	stack	= readcontext.getStack();	// Use snapshot of stack for error report, as stack isn't available in delayed post processors.
+					readcontext.getPostProcessors().put(new Integer(postproc.getPass()), new IPostProcessorCall()
 					{
-						public void run()
+						public void callPostProcessor() throws XMLStreamException
 						{
-							Object check = postproc.postProcess(readcontext, object);
-							if(check!=null)
-								throw new RuntimeException("Object replacement only possible in first pass.");
+							try
+							{
+								Object check = postproc.postProcess(readcontext, ftopse.getObject());
+								if(check!=null)
+								{
+									readcontext.getReporter().report("Object replacement only possible in first pass.", "postprocessor error", ftopse, ftopse!=null ? ftopse.getLocation() : readcontext.getParser().getLocation());																				
+								}
+							}
+							catch(RuntimeException e)
+							{
+								readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", stack, ftopse!=null ? ftopse.getLocation() : readcontext.getParser().getLocation());																				
+							}
 						}
 					});
 				}

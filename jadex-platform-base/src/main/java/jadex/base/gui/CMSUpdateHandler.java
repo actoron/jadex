@@ -270,6 +270,8 @@ public class CMSUpdateHandler
 	 */
 	protected void informListeners(final ChangeEvent event, ICMSComponentListener[] cls)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
 		if(EVENT_COMPONENT_ADDED.equals(event.getType()))
 		{
 			for(int i=0; i<cls.length; i++)

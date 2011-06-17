@@ -4,7 +4,6 @@
 package jadex.bpmn;
 
 
-import jadex.bpmn.MultiColumnTable.MultiColumnTableRow;
 import jadex.bpmn.model.MAnnotationDetail;
 
 import java.util.HashMap;

@@ -425,14 +425,18 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 			public IFuture componentRemoved(final IComponentDescription desc, Map results)
 			{
 				final ITreeNode node = getModel().getNodeOrAddZombie(desc.getName());
+//				if(desc.getName().toString().startsWith("ANDTest@"))
+//					System.out.println("Component removed0: "+desc.getName().getName()+", zombie="+(node==null));
 				if(node!=null)
 				{
 					SwingUtilities.invokeLater(new Runnable()
 					{
 						public void run()
 						{
-							if(node.getParent()!=null)
+							if(getModel().getNodeOrAddZombie(desc.getName())!=null)
 							{
+//								if(desc.getName().toString().startsWith("ANDTest@"))
+//									System.out.println("Component removed: "+desc.getName().getName());
 								((AbstractTreeNode)node.getParent()).removeChild(node);
 							}
 						}
@@ -460,6 +464,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 			
 			public IFuture componentAdded(final IComponentDescription desc)
 			{
+//				System.out.println("Component added0: "+desc.getName().getName());
 //				System.err.println(""+model.hashCode()+" Panel->addChild queued: "+desc.getName()+", "+desc.getParent());
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -477,9 +482,16 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 							{
 								if(parentnode.getIndexOfChild(node)==-1)
 								{
+//									if(desc.getName().toString().startsWith("ANDTest@"))
+//										System.out.println("Component added: "+desc.getName().getName());
 //									System.err.println(""+model.hashCode()+" Panel->addChild: "+node+", "+parentnode);
 									parentnode.addChild(node);
 								}
+//								else
+//								{
+//									if(desc.getName().toString().startsWith("ANDTest@"))
+//										System.out.println("Not added: "+desc.getName().getName());
+//								}
 							}
 							catch(Exception e)
 							{
