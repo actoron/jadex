@@ -1,28 +1,19 @@
 package jadex.editor.bpmn.editor.properties;
 
 import jadex.editor.bpmn.editor.properties.template.AbstractBpmnMultiColumnTablePropertySection;
-import jadex.editor.bpmn.editor.properties.template.IConfigurationChangedListener;
 import jadex.editor.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
 import jadex.editor.common.model.properties.table.MultiColumnTable.MultiColumnTableRow;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.emf.ecore.EModelElement;
-import org.eclipse.gef.EditPart;
-import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 
 /**
  * 
@@ -42,7 +33,6 @@ public class JadexBpmnDiagramConfigurationsTableSection extends AbstractBpmnMult
 	// ---- attributes ----
 	
 	private String currentConfiguration;
-	private List<IConfigurationChangedListener> configurationListener;
 
 	// ---- constructor ----
 
@@ -53,8 +43,6 @@ public class JadexBpmnDiagramConfigurationsTableSection extends AbstractBpmnMult
 	{
 		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_CONFIGURATIONS_LIST_DETAIL,
 			"Configurations", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX, null);
-		
-		this.configurationListener  = new ArrayList<IConfigurationChangedListener>();
 	}
 
 	// ---- static methods ----
@@ -96,43 +84,8 @@ public class JadexBpmnDiagramConfigurationsTableSection extends AbstractBpmnMult
 		JadexBpmnPropertiesUtil.updateJadexEAnnotationDetail(modelElement, JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, 
 			JadexBpmnPropertiesUtil.JADEX_ACTIVE_CONFIGURATION_DETAIL, newConfiguration);
 
-//		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 		tabbedPage.refresh();
-		
-//		Control[] controls = sectionComposite.getChildren();
-//		System.out.println("a: "+controls);
-		
-		// call Hook!
-//		configurationChangedHook(oldConfiguration, newConfiguration);
-		
-		// We need listeners, because the common superclass of sections is NOT in BPMN
-//		for(IConfigurationChangedListener configurationChangedListener : configurationListener)
-//		{
-//			configurationChangedListener.fireConfigurationChanged(oldConfiguration, newConfiguration);
-//		}
 	}
-	
-//	/**
-//	 * Add a listener to be informed of configuration changes
-//	 * @param listener
-//	 * @return true, if listener was added
-//	 */
-//	protected boolean addConfigurationChangedListener(IConfigurationChangedListener listener)
-//	{
-//		//System.err.println("Registered Listener: " + configurationListener + " -- add listener: " + listener);
-//		return configurationListener.add(listener);
-//	}
-//	
-//	/**
-//	 * Remove a registered listener
-//	 * @param listener
-//	 * @return true, if listener was removed
-//	 */
-//	protected boolean removeConfigurationChangedListener(IConfigurationChangedListener listener)
-//	{
-//		//System.err.println("Registered Listener: " + configurationListener + " -- remove listener: " + listener);
-//		return configurationListener.remove(listener);
-//	}
 	
 	// ---- overrides ----
 

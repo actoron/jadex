@@ -26,12 +26,12 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * Property section Tab to enable Jadex specific properties
  */
-public abstract class AbstractBpmnMultiColumnTablePropertySection extends
-		AbstractCommonTablePropertySection
+public abstract class AbstractBpmnMultiColumnTablePropertySection extends AbstractCommonTablePropertySection
 {
 	// ---- constants ----
 	
@@ -50,6 +50,9 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	
 	/** A boolean array to mark a column as reference column */
 	private boolean[] complexColumnMarker;
+	
+	/** The column names. */
+	private String[] colnames;
 
 	// ---- constructor ----
 
@@ -81,15 +84,12 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		{
 			this.complexColumnMarker = new boolean[getDefaultListElementAttributeValues().length];
 		}
-
 	}
 
 	// ---- abstract methods ----
 
 	/** Retrieve the default values for a new row */
 	protected abstract String[] getDefaultListElementAttributeValues();
-
-	
 	
 	// ---- methods ----
 
@@ -104,15 +104,26 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		// empty default method
 	}
 
-//	/**
-//	 * Hook to be informed about configuration changes. Override if needed!
-//	 * @param oldConfiguration
-//	 * @param newConfiguration
-//	 */
-//	protected void configurationChangedHook(String oldConfiguration, String newConfiguration)
-//	{
-//		// empty default method
-//	}
+	/**
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#refresh()
+	 */
+	public void refresh()
+	{
+		super.refresh();
+		
+		for(int i=0; i<complexColumnMarker.length; i++)
+		{
+			if(complexColumnMarker[i])
+			{
+				TableColumn col = tableViewer.getTable().getColumn(i);
+				String config = getConfiguration();
+				String name = colnames[i];
+				if(config!=null && config.length()>0)
+					name = name + " [" + config + "]";
+				col.setText(name);
+			}
+		}
+	}
 	
 	/**
 	 *  Get the current configuration.
@@ -314,6 +325,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	 */
 	protected void createColumns(TableViewer viewer, String[] columnNames, String[] columntypes, Map<String, String[]> values)
 	{
+		this.colnames = columnNames;
 		TableViewerColumn[] ret = new TableViewerColumn[columnNames.length];
 		for(int i = 0; i<columnNames.length; i++)
 		{

@@ -145,7 +145,7 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 		
 		// this is needed for table add / remove etc. to 
 		// instantly show change!
-		if (tableViewer != null && modelElement != null)				
+		if(tableViewer != null && modelElement != null)				
 		{
 			tableViewer.refresh();
 		}
