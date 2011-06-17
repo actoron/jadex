@@ -70,6 +70,7 @@ public class MegaParallelStarterAgent extends MicroAgent
 						for(int i=1; i<=max; i++)
 						{
 							args.put("num", new Integer(i));
+//							System.out.println("Created agent: "+i);
 							cms.createComponent(subname+"_#"+i, model, new CreationInfo(new HashMap(args), getComponentIdentifier()), 
 								createResultListener(new DefaultResultListener()
 							{
