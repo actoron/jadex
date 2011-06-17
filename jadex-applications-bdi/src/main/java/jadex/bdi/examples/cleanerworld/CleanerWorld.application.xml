@@ -11,7 +11,7 @@
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
-	name="CleanerWorldSpace" package="jadex.bdi.examples.cleanerworld">
+	name="CleanerWorld" package="jadex.bdi.examples.cleanerworld">
 	
 	<imports>
 		<import>jadex.extension.envsupport.environment.space2d.*</import>

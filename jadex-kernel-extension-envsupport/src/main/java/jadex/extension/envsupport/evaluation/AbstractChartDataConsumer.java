@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -39,74 +40,81 @@ public abstract class AbstractChartDataConsumer extends SimplePropertyObject imp
 	/**
 	 *  Consume data from the provider.
 	 */
-	public void consumeData(long currenttime, double tick)
+	public void consumeData(final long currenttime, final double tick)
 	{
 		ITableDataProvider provider = getTableDataProvider();
-		DataTable data = provider.getTableData(currenttime, tick);
-		List rows = data.getRows();
+		final DataTable data = provider.getTableData(currenttime, tick);
 		
-		if(rows!=null && rows.size()>0)
+		SwingUtilities.invokeLater(new Runnable()
 		{
-			SimpleValueFetcher fetcher = new SimpleValueFetcher();
-			fetcher.setValue("$object", data);
-
-			for(int s=0; ;s++)
+			public void run()
 			{
-				String serid;
-				if(s==0 && getPropertyNames().contains("seriesid"))
-					serid = (String)getProperty("seriesid");
-				else
-					serid = (String)getProperty("seriesid_"+s);
+				List rows = data.getRows();
 				
-				if(serid!=null)
+				if(rows!=null && rows.size()>0)
 				{
-					// For a multi-series each row has to be processed.
+					SimpleValueFetcher fetcher = new SimpleValueFetcher();
+					fetcher.setValue("$object", data);
 
-					for(int i=0; i<rows.size(); i++)
+					for(int s=0; ;s++)
 					{
-						// Determine x, y values for series.
-						fetcher.setValue("$rowcnt", new Integer(i));
+						String serid;
+						if(s==0 && getPropertyNames().contains("seriesid"))
+							serid = (String)getProperty("seriesid");
+						else
+							serid = (String)getProperty("seriesid_"+s);
 						
-						Object[] row = (Object[])rows.get(i);
-						
-						Object[] values = getValues(s, data, row, fetcher);
+						if(serid!=null)
+						{
+							// For a multi-series each row has to be processed.
+
+							for(int i=0; i<rows.size(); i++)
+							{
+								// Determine x, y values for series.
+								fetcher.setValue("$rowcnt", new Integer(i));
+								
+								Object[] row = (Object[])rows.get(i);
+								
+								Object[] values = getValues(s, data, row, fetcher);
+									
+								// Add value to series
+								
+								Comparable sername = (Comparable)row[data.getColumnIndex(serid)];
+												
+								addValue(sername, values[0], values[1], data, row);
+							}	
+						}
+						else
+						{
+							// For a named series only one (all should be the same) value will be processed.
+							Comparable sername;
+							if(s==0 && getPropertyNames().contains("seriesname"))
+								sername = (String)getProperty("seriesname");
+							else
+								sername = (String)getProperty("seriesname_"+s);
 							
-						// Add value to series
-						
-						Comparable sername = (Comparable)row[data.getColumnIndex(serid)];
-										
-						addValue(sername, values[0], values[1], data, row);
-					}	
-				}
-				else
-				{
-					// For a named series only one (all should be the same) value will be processed.
-					Comparable sername;
-					if(s==0 && getPropertyNames().contains("seriesname"))
-						sername = (String)getProperty("seriesname");
-					else
-						sername = (String)getProperty("seriesname_"+s);
-					
-					if(sername!=null)
-					{
-						// Determine x, y values for series.
-						fetcher.setValue("$rowcnt", new Integer(0));
-						
-						Object[] row = (Object[])rows.get(0);
-						
-						Object[] values = getValues(s, data, row, fetcher);
-							
-						// Add value to series
-						
-						addValue(sername, values[0], values[1], data, row);
-					}
-					else
-					{
-						break;
+							if(sername!=null)
+							{
+								// Determine x, y values for series.
+								fetcher.setValue("$rowcnt", new Integer(0));
+								
+								Object[] row = (Object[])rows.get(0);
+								
+								Object[] values = getValues(s, data, row, fetcher);
+									
+								// Add value to series
+								
+								addValue(sername, values[0], values[1], data, row);
+							}
+							else
+							{
+								break;
+							}
+						}
 					}
 				}
 			}
-		}
+		});		
 	}
 	
 	/**
@@ -157,6 +165,8 @@ public abstract class AbstractChartDataConsumer extends SimplePropertyObject imp
 	 */
 	public JFreeChart getChart()
 	{
+		// Todo: should be swing thread?
+//		assert SwingUtilities.isEventDispatchThread();
 		if(chart==null)
 			chart = createChart();
 		return this.chart;
@@ -167,7 +177,13 @@ public abstract class AbstractChartDataConsumer extends SimplePropertyObject imp
 	 */
 	public void refresh()
 	{
-		getChart().fireChartChanged();
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				getChart().fireChartChanged();
+			}
+		});
 	}
 	
 	/**
@@ -233,6 +249,8 @@ public abstract class AbstractChartDataConsumer extends SimplePropertyObject imp
 	 */
 	public JPanel getChartPanel()
 	{
+		// Todo: should be swing thread?
+//		assert SwingUtilities.isEventDispatchThread();
 		ChartPanel panel = new ChartPanel(getChart(), false, false, false, false, false);
         panel.setFillZoomRectangle(true);
         return panel;
