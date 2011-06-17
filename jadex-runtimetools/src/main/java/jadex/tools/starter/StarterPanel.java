@@ -777,6 +777,8 @@ public class StarterPanel extends JLayeredPane
 			daemoncb.setSelected(false);
 			mastercb.setSelected(false);
 			autosdcb.setSelected(false);
+			genname.setSelected(false);
+			numcomponents.setValue(new Integer(1));
 			
 			lastfile	= adf;
 			
@@ -909,8 +911,6 @@ public class StarterPanel extends JLayeredPane
 			componentnamel.setPreferredSize(confdummy.getPreferredSize());
 			
 			componentname.setText(loadname!=null ? loadname	: model.getName());
-			if(genname.isSelected())
-				genname.setSelected(false);
 			
 			loadname	= null;
 		}
@@ -1042,6 +1042,7 @@ public class StarterPanel extends JLayeredPane
 				props.addProperty(new Property("startsuspended", ""+suspend.isSelected()));
 
 				props.addProperty(new Property("autogenerate", ""+genname.isSelected()));
+				props.addProperty(new Property("number", ""+numcomponents.getValue()));
 				
 				props.addProperty(new Property("name", componentname.getText()));
 				// Cannot get components during shutdown as awt blocks tree lock.
@@ -1086,6 +1087,7 @@ public class StarterPanel extends JLayeredPane
 		setStartSuspended(props.getBooleanProperty("startsuspended"));
 
 		setAutoGenerate(props.getBooleanProperty("autogenerate"));
+		numcomponents.setValue(new Integer(props.getIntProperty("number")));
 	}
 
 	/**
