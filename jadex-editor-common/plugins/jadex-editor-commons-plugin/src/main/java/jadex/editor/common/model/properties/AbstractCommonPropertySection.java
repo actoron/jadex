@@ -33,12 +33,16 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
-public abstract class AbstractCommonPropertySection extends
-		AbstractPropertySection
+/**
+ * 
+ */
+public abstract class AbstractCommonPropertySection extends AbstractPropertySection
 {
-	
 	public static final int PROPERTY_SECTION_SCROLL_INCREMENT = 10;
 
+	/** The tabbed property sheet page. */
+	protected TabbedPropertySheetPage tabbedPage;
+	
 	/** The composite that holds the section parts */
 	protected Composite sectionComposite;
 	
@@ -66,7 +70,6 @@ public abstract class AbstractCommonPropertySection extends
 	
 	public AbstractCommonPropertySection()
 	{
-		super();
 		this.disposableObjects = new HashSet<Object>();
 	}
 
@@ -81,7 +84,6 @@ public abstract class AbstractCommonPropertySection extends
 	
 	// ---- method overrides ----
 	
-	@Override
 	public void refresh()
 	{
 		super.refresh();
@@ -91,11 +93,11 @@ public abstract class AbstractCommonPropertySection extends
 	/**
 	 * Creates the UI of the section.
 	 */
-	@Override
-	public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage)
+	public void createControls(Composite parent, TabbedPropertySheetPage tabbedPage)
 	{
-		super.createControls(parent, aTabbedPropertySheetPage);
+		super.createControls(parent, tabbedPage);
 		
+		this.tabbedPage = tabbedPage;
 		sectionComposite = getWidgetFactory().createComposite(parent); //.createScrolledComposite(parent, SWT.DEFAULT); //
 		sectionComposite.setLayout(new FillLayout());
 
@@ -150,7 +152,6 @@ public abstract class AbstractCommonPropertySection extends
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#dispose()
 	 */
-	@Override
 	public void dispose()
 	{
 		synchronized (disposableObjects)
@@ -219,46 +220,39 @@ public abstract class AbstractCommonPropertySection extends
 	/**
 	 * Manages the input.
 	 */
-	@Override
 	public void setInput(IWorkbenchPart part, ISelection selection)
 	{
 		//System.out.println("SetInput called by: " + Thread.currentThread());
 		
 		super.setInput(part, selection);
-		if (selection instanceof IStructuredSelection)
+		if(selection instanceof IStructuredSelection)
 		{
-			Object unknownInput = ((IStructuredSelection) selection)
-					.getFirstElement();
+			Object unknownInput = ((IStructuredSelection)selection).getFirstElement();
 			
-			if (unknownInput instanceof IGraphicalEditPart
-					&& (((IGraphicalEditPart) unknownInput)
-							.resolveSemanticElement() != null))
+			if(unknownInput instanceof IGraphicalEditPart && (((IGraphicalEditPart) unknownInput)
+				.resolveSemanticElement() != null))
 			{
-				editPart = (IGraphicalEditPart) unknownInput;
-				unknownInput = ((IGraphicalEditPart) unknownInput)
-						.resolveSemanticElement();
+				editPart = (IGraphicalEditPart)unknownInput;
+				unknownInput = ((IGraphicalEditPart)unknownInput).resolveSemanticElement();
 			}
 			
-			if (unknownInput instanceof EModelElement)
+			if(unknownInput instanceof EModelElement)
 			{
-				EModelElement elm = (EModelElement) unknownInput;
-				modelElement = (EModelElement) elm;
+				EModelElement elm = (EModelElement)unknownInput;
+				modelElement = (EModelElement)elm;
 				
 				updateSectionValues();
 				return;
 			}
-			if (unknownInput instanceof EditPart)
-				editPart = (EditPart) unknownInput;
+			if(unknownInput instanceof EditPart)
+			{
+				editPart = (EditPart)unknownInput;
+			}
 		}
 
 		// fall through
 		modelElement = null;
-
-		
-		
 	}
-
-	
 
 	protected void changed(Control[] changed)
 	{
@@ -274,10 +268,11 @@ public abstract class AbstractCommonPropertySection extends
 	 */
 	public void refreshSelectedEditPart()
 	{
-		if (getSelection() instanceof IStructuredSelection)
+		if(getSelection() instanceof IStructuredSelection)
 		{
 			IStructuredSelection sel = (IStructuredSelection) getSelection();
-			if (null != sel)
+			if(null != sel)
+			{
 				for (Object selElt : sel.toList())
 				{
 					if (selElt instanceof EditPart)
@@ -298,6 +293,7 @@ public abstract class AbstractCommonPropertySection extends
 						}
 					}
 				}
+			}
 		}
 	}
 
@@ -370,8 +366,7 @@ public abstract class AbstractCommonPropertySection extends
 
 		protected void setValue(Object element, Object value)
 		{
-			ModifyEObjectCommand command = getTransactionalEditCommand(element,
-					value);
+			ModifyEObjectCommand command = getTransactionalEditCommand(element, value);
 
 			try
 			{
@@ -379,18 +374,15 @@ public abstract class AbstractCommonPropertySection extends
 			}
 			catch (ExecutionException ex)
 			{
-				CommonsActivator.getDefault().getLog().log(
-						new Status(IStatus.ERROR,
-								CommonsActivator.PLUGIN_ID, IStatus.ERROR,
-								ex.getMessage(), ex));
+				CommonsActivator.getDefault().getLog().log(new Status(IStatus.ERROR,
+					CommonsActivator.PLUGIN_ID, IStatus.ERROR, ex.getMessage(), ex));
 			}
 
 			getViewer().update(element, null);
 			refreshSelectedEditPart();
 		}
 
-		protected abstract ModifyEObjectCommand getTransactionalEditCommand(
-				Object element, Object value);
+		protected abstract ModifyEObjectCommand getTransactionalEditCommand(Object element, Object value);
 	}
 }
 

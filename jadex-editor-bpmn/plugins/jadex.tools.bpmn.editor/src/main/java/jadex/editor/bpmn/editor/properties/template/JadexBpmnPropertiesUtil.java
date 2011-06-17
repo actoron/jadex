@@ -233,10 +233,8 @@ public class JadexBpmnPropertiesUtil
 	 * 
 	 */
 	public JadexBpmnPropertiesUtil(String containerEAnnotationName,
-			String annotationDetailName, AbstractCommonPropertySection section)
+		String annotationDetailName, AbstractCommonPropertySection section)
 	{
-		super();
-		
 		assert section != null : "PropertySection may NOT be null";
 		assert containerEAnnotationName != null && !containerEAnnotationName.isEmpty() : this.getClass() + ": containerEAnnotationName not set";
 		assert annotationDetailName != null && !annotationDetailName.isEmpty() : this.getClass() + ": annotationDetailName not set";
@@ -298,38 +296,26 @@ public class JadexBpmnPropertiesUtil
 
 	/**
 	 * Create the annotation identifier from util instance values
-	 * 
-	 * @return
 	 */
 	public static String getTableAnnotationIdentifier(String annotationID, String detailID)
 	{
-		return annotationID
-				+ JADEX_COMBINED_KEY_DELIMITER
-				+ detailID
-				+ JADEX_COMBINED_KEY_DELIMITER
-				+ JADEX_TABLE_KEY_EXTENSION;
+		return annotationID + JADEX_COMBINED_KEY_DELIMITER + detailID 
+			+ JADEX_COMBINED_KEY_DELIMITER + JADEX_TABLE_KEY_EXTENSION;
 	}
 	
 	/**
 	 * Create the annotation identifier from util instance values
-	 * 
-	 * @return
 	 */
 	public static String getComplexValueAnnotationIdentifier(String annotationID, String detailID, String defaultValue)
 	{
 		StringBuffer b = new StringBuffer(getTableAnnotationIdentifier(annotationID, detailID));
 		b.append(JADEX_COMBINED_KEY_DELIMITER);
 		b.append(defaultValue);
-		
 		return b.toString();
 	}
 
 	/**
-	 * 
-	 * @param element
-	 * @param annotationIdentifier
-	 * @param create
-	 * @return
+	 *  Get an annotation.
 	 */
 	public static EAnnotation getJadexEAnnotation(final EModelElement element, final String annotationIdentifier, boolean create)
 	{
@@ -342,16 +328,16 @@ public class JadexBpmnPropertiesUtil
 		EAnnotation annotation = element.getEAnnotation(lcAnnotationIdentifier);
 		
 		// try the upper case value
-		if (annotation == null)
+		if(annotation == null)
 		{
 			annotation = element.getEAnnotation(annotationIdentifier);
 			
 			// change upper case annotation identifier
-			if (annotation != null && !RESERVED_BPMN_ANNOTATIONS.contains(annotationIdentifier))
+			if(annotation != null && !RESERVED_BPMN_ANNOTATIONS.contains(annotationIdentifier))
 			{
 				// XXX: FixME!!! Use command!
 				
-				if (element.getEAnnotations().remove(annotation))
+				if(element.getEAnnotations().remove(annotation))
 				{
 					annotation.setSource(lcAnnotationIdentifier);
 					element.getEAnnotations().add(annotation);
@@ -360,16 +346,14 @@ public class JadexBpmnPropertiesUtil
 		}
 		
 		// create annotation if not found yet
-		if (create && annotation == null)
+		if(create && annotation == null)
 		{
 			// update or create the annotation detail
 			ModifyEObjectCommand command = new ModifyEObjectCommand(
-					element, Messages.JadexCommonPropertySection_update_eannotation_command_name)
+				element, Messages.JadexCommonPropertySection_update_eannotation_command_name)
 			{
-				@Override
-				protected CommandResult doExecuteWithResult(
-						IProgressMonitor arg0, IAdaptable arg1)
-						throws ExecutionException
+				protected CommandResult doExecuteWithResult(IProgressMonitor arg0, IAdaptable arg1)
+					throws ExecutionException
 				{
 					EAnnotation annotation = EcoreFactory.eINSTANCE.createEAnnotation();
 					annotation.setSource(lcAnnotationIdentifier);
@@ -387,11 +371,8 @@ public class JadexBpmnPropertiesUtil
 			}
 			catch (ExecutionException exception)
 			{
-				JadexBpmnEditorActivator.getDefault().getLog().log(
-						new Status(IStatus.ERROR, JadexBpmnEditorActivator.ID,
-								IStatus.ERROR, exception.getMessage(),
-								exception));
-				
+				JadexBpmnEditorActivator.getDefault().getLog().log(new Status(IStatus.ERROR, 
+					JadexBpmnEditorActivator.ID, IStatus.ERROR, exception.getMessage(), exception));
 			}
 		}
 
@@ -407,10 +388,8 @@ public class JadexBpmnPropertiesUtil
 			ModifyEObjectCommand command = new ModifyEObjectCommand(
 					element, Messages.JadexCommonPropertySection_update_eannotation_command_name)
 			{
-				@Override
-				protected CommandResult doExecuteWithResult(
-						IProgressMonitor arg0, IAdaptable arg1)
-						throws ExecutionException
+				protected CommandResult doExecuteWithResult(IProgressMonitor arg0, IAdaptable arg1)
+					throws ExecutionException
 				{
 					element.getEAnnotations().remove(eAnnotation);
 					return CommandResult.newOKCommandResult();
@@ -425,11 +404,8 @@ public class JadexBpmnPropertiesUtil
 			}
 			catch (ExecutionException exception)
 			{
-				JadexBpmnEditorActivator.getDefault().getLog().log(
-						new Status(IStatus.ERROR, JadexBpmnEditorActivator.ID,
-								IStatus.ERROR, exception.getMessage(),
-								exception));
-				
+				JadexBpmnEditorActivator.getDefault().getLog().log(new Status(IStatus.ERROR, JadexBpmnEditorActivator.ID,
+					IStatus.ERROR, exception.getMessage(), exception));
 			}
 		}
 		
@@ -439,13 +415,9 @@ public class JadexBpmnPropertiesUtil
 	
 	/**
 	 * Update annotation detail
-	 * @param element
-	 * @param annotationIdentifier
-	 * @param annotationDetail
-	 * @param value
-	 * @return
 	 */
-	public static boolean updateJadexEAnnotationDetail(final EModelElement element, final String annotationIdentifier, final String annotationDetail, final String value)
+	public static boolean updateJadexEAnnotationDetail(final EModelElement element, 
+		final String annotationIdentifier, final String annotationDetail, final String value)
 	{
 		if(element == null)
 		{
@@ -454,19 +426,15 @@ public class JadexBpmnPropertiesUtil
 		
 		// update or create the annotation detail
 		ModifyEObjectCommand command = new ModifyEObjectCommand(
-				element, Messages.JadexCommonPropertySection_update_eannotation_command_name)
+			element, Messages.JadexCommonPropertySection_update_eannotation_command_name)
 		{
-			@Override
 			protected CommandResult doExecuteWithResult(
-					IProgressMonitor arg0, IAdaptable arg1)
-					throws ExecutionException
+				IProgressMonitor arg0, IAdaptable arg1) throws ExecutionException
 			{
 				EAnnotation annotation = getJadexEAnnotation(element, annotationIdentifier, true);
 				
 				// use only lower case identifier strings!
 				String lcAnnotationDetail = annotationDetail.toLowerCase();
-
-				
 				
 				// remove upper case annotation detail
 				if (!lcAnnotationDetail.equals(annotationDetail))
@@ -499,8 +467,6 @@ public class JadexBpmnPropertiesUtil
 				
 				return CommandResult.newOKCommandResult();
 			}
-			
-			
 		};
 
 		
@@ -512,10 +478,8 @@ public class JadexBpmnPropertiesUtil
 		}
 		catch (ExecutionException exception)
 		{
-			JadexBpmnEditorActivator.getDefault().getLog().log(
-					new Status(IStatus.ERROR, JadexBpmnEditorActivator.ID,
-							IStatus.ERROR, exception.getMessage(),
-							exception));
+			JadexBpmnEditorActivator.getDefault().getLog().log(new Status(IStatus.ERROR, JadexBpmnEditorActivator.ID,
+				IStatus.ERROR, exception.getMessage(), exception));
 			
 			return false;
 		}
@@ -536,13 +500,13 @@ public class JadexBpmnPropertiesUtil
 		
 		EAnnotation annotation = element.getEAnnotation(annotationIdentifier);
 		
-		if (annotation == null)
+		if(annotation == null)
 		{
 			// try the lower case identifier
 			annotation = element.getEAnnotation(annotationIdentifier.toLowerCase());
 		}
 		
-		if (annotation != null)
+		if(annotation != null)
 		{
 			Object detail = annotation.getDetails().get(annotationDetail);
 			if (detail == null)
@@ -559,21 +523,14 @@ public class JadexBpmnPropertiesUtil
 			
 			// fall through, return empty string as detail
 			return "";
-			
 		}
 	
 		return null;
 		
 	}
 	
-	
 	/**
 	 * Update annotation detail
-	 * @param element
-	 * @param annotationIdentifier
-	 * @param annotationDetail
-	 * @param value
-	 * @return
 	 */
 	public static boolean updateJadexEAnnotationTable(final EModelElement element, final String annotationIdentifier, final MultiColumnTableEx table)
 	{
@@ -582,59 +539,61 @@ public class JadexBpmnPropertiesUtil
 			return false;
 		}
 
-			// update or create the annotation / detail
-			ModifyEObjectCommand command = new ModifyEObjectCommand(
-					element, Messages.JadexCommonPropertySection_update_eannotation_command_name)
+		// update or create the annotation / detail
+		ModifyEObjectCommand command = new ModifyEObjectCommand(
+			element, Messages.JadexCommonPropertySection_update_eannotation_command_name)
+		{
+			protected CommandResult doExecuteWithResult(IProgressMonitor arg0, IAdaptable arg1)
+				throws ExecutionException
 			{
-				@Override
-				protected CommandResult doExecuteWithResult(
-						IProgressMonitor arg0, IAdaptable arg1)
-						throws ExecutionException
+				EAnnotation annotation = element.getEAnnotation(annotationIdentifier);
+				if(annotation == null && table != null)
 				{
-					
-					EAnnotation annotation = element.getEAnnotation(annotationIdentifier);
-					if (annotation == null && table != null)
-					{
-						annotation = EcoreFactory.eINSTANCE.createEAnnotation();
-						annotation.setSource(annotationIdentifier);
-						annotation.setEModelElement(element);
-					}
-					
-					if (table != null && !table.isEmpty())
-					{
-						String tableDimension =  (new TableCellIndex(table.size(), table.getRowSize())).toString();
-						annotation.getDetails().clear();
-						annotation.getDetails().put(JADEX_TABLE_DIMESION_DETAIL, tableDimension);
-						annotation.getDetails().put(JADEX_TABLE_UNIQUE_COLUMN_DETAIL, String.valueOf(table.getUniqueColumn()));
-						annotation.getDetails().put(JADEX_TABLE_COMPLEX_COLUMNS_DETAIL, encodeComplexColumnMarker(table.getComplexColumnsMarker()));
-						int rowIndex = 0;
-						for (MultiColumnTableRow row : table.getRowList())
-						{
-							for (int columnIndex = 0; columnIndex < row.getColumnValues().length; columnIndex++)
-							{
-								annotation.getDetails().put(new TableCellIndex(rowIndex, columnIndex).toString(), row.getColumnValueAt(columnIndex));
-								
-								// save complex values
-								if (table.isComplexColumn(columnIndex))
-								{
-									EAnnotation complexValueAnnotation = element.getEAnnotation(row.getColumnValueAt(columnIndex));
-									complexValueAnnotation.getDetails().clear();
-									complexValueAnnotation.getDetails().putAll(table.getComplexValue(row.getColumnValueAt(columnIndex)));
-								}
-								
-							}
-							rowIndex++;
-						}
-					}
-					else
-					{
-						element.getEAnnotations().remove(annotation);
-					}
-					
-					return CommandResult.newOKCommandResult();
+					annotation = EcoreFactory.eINSTANCE.createEAnnotation();
+					annotation.setSource(annotationIdentifier);
+					annotation.setEModelElement(element);
 				}
-			};
-
+				
+				if(table != null && !table.isEmpty())
+				{
+					String tableDimension =  (new TableCellIndex(table.size(), table.getRowSize())).toString();
+					annotation.getDetails().clear();
+					annotation.getDetails().put(JADEX_TABLE_DIMESION_DETAIL, tableDimension);
+					annotation.getDetails().put(JADEX_TABLE_UNIQUE_COLUMN_DETAIL, String.valueOf(table.getUniqueColumn()));
+					annotation.getDetails().put(JADEX_TABLE_COMPLEX_COLUMNS_DETAIL, encodeComplexColumnMarker(table.getComplexColumnsMarker()));
+					int rowIndex = 0;
+					for(MultiColumnTableRow row : table.getRowList())
+					{
+						for(int columnIndex = 0; columnIndex < row.getColumnValues().length; columnIndex++)
+						{
+							annotation.getDetails().put(new TableCellIndex(rowIndex, columnIndex).toString(), row.getColumnValueAt(columnIndex));
+							
+							// save complex values
+							if(table.isComplexColumn(columnIndex))
+							{
+								String anname = row.getColumnValueAt(columnIndex);
+								EAnnotation cvan = element.getEAnnotation(anname);
+								if(cvan == null)
+								{
+									cvan = EcoreFactory.eINSTANCE.createEAnnotation();
+									cvan.setSource(anname);
+									cvan.setEModelElement(element);
+								}
+								cvan.getDetails().clear();
+								cvan.getDetails().putAll(table.getComplexValue(row.getColumnValueAt(columnIndex)));
+							}
+						}
+						rowIndex++;
+					}
+				}
+				else
+				{
+					element.getEAnnotations().remove(annotation);
+				}
+				
+				return CommandResult.newOKCommandResult();
+			}
+		};
 		
 		// execute command
 		try
@@ -644,11 +603,8 @@ public class JadexBpmnPropertiesUtil
 		}
 		catch (ExecutionException exception)
 		{
-			JadexBpmnEditorActivator.getDefault().getLog().log(
-					new Status(IStatus.ERROR, JadexBpmnEditorActivator.ID,
-							IStatus.ERROR, exception.getMessage(),
-							exception));
-			
+			JadexBpmnEditorActivator.getDefault().getLog().log(new Status(IStatus.ERROR, JadexBpmnEditorActivator.ID,
+				IStatus.ERROR, exception.getMessage(), exception));
 			return false;
 		}
 	}
@@ -657,10 +613,6 @@ public class JadexBpmnPropertiesUtil
 	
 	/**
 	 * Get annotation detail
-	 * @param element
-	 * @param annotationIdentifier
-	 * @param cellDimensionIdentifier
-	 * @return
 	 */
 	public static MultiColumnTableEx getJadexEAnnotationTable(final EModelElement element, final String annotationIdentifier)
 	{
@@ -670,51 +622,51 @@ public class JadexBpmnPropertiesUtil
 		}
 	
 		EAnnotation annotation = element.getEAnnotation(annotationIdentifier);
-		if (annotation != null)
+		if(annotation != null)
 		{
-			MultiColumnTableEx newTable;
+			MultiColumnTableEx table;
 			
 			String dimension = annotation.getDetails().get(JADEX_TABLE_DIMESION_DETAIL);
 			int uniqueColumn = Integer.valueOf(annotation.getDetails().get(JADEX_TABLE_UNIQUE_COLUMN_DETAIL));
 			boolean[] complexColumnMarker = decodeComplexColumnMarker(annotation.getDetails().get(JADEX_TABLE_COMPLEX_COLUMNS_DETAIL));
-			if (dimension != null) 
+			if(dimension != null) 
 			{
 				TableCellIndex tableDimension = new TableCellIndex(dimension);
-				newTable = new MultiColumnTableEx(tableDimension.getRowCount(), uniqueColumn, complexColumnMarker);
-				for (int rowIndex = 0; rowIndex < tableDimension.rowCount; rowIndex++)
+				table = new MultiColumnTableEx(tableDimension.getRowCount(), uniqueColumn, complexColumnMarker);
+				for(int rowIndex = 0; rowIndex < tableDimension.rowCount; rowIndex++)
 				{
-					String[] newRow = new String[tableDimension.columnCount];
-					for (int columnIndex = 0; columnIndex < tableDimension.columnCount; columnIndex++)
+					String[] rowdata = new String[tableDimension.columnCount];
+					for(int columnIndex = 0; columnIndex < tableDimension.columnCount; columnIndex++)
 					{
-						newRow[columnIndex] = annotation.getDetails().get((new TableCellIndex(rowIndex, columnIndex)).toString());
+						rowdata[columnIndex] = annotation.getDetails().get((new TableCellIndex(rowIndex, columnIndex)).toString());
 						
 						// set complex values
-						if (newTable.isComplexColumn(columnIndex))
+						if(table.isComplexColumn(columnIndex))
 						{
-							EAnnotation complexValueAnnotation = element.getEAnnotation(newRow[columnIndex]);
-							if (complexValueAnnotation != null)
+							EAnnotation cvan = element.getEAnnotation(rowdata[columnIndex]);
+							if(cvan != null)
 							{
-								Map<String, String> complexValue = new HashMap<String, String>();
-								for (Entry<String, String> e : complexValueAnnotation.getDetails().entrySet())
+								Map<String, String> cv = new HashMap<String, String>();
+								for(Entry<String, String> e: cvan.getDetails().entrySet())
 								{
-									complexValue.put(e.getKey(), e.getValue());
+									cv.put(e.getKey(), e.getValue());
 								}
 								
-								newTable.setComplexValue(newRow[columnIndex], complexValue);
+								table.setComplexValue(rowdata[columnIndex], cv);
 							}
 						}
 						
 					}
-					newTable.add(newTable.new MultiColumnTableRow(newRow, newTable));
+					table.add(table.new MultiColumnTableRow(rowdata, table));
 				}
 
-				return newTable;
+				return table;
 			}
 			
 			// fall through
-			newTable = new MultiColumnTableEx(0, uniqueColumn, complexColumnMarker);
+			table = new MultiColumnTableEx(0, uniqueColumn, complexColumnMarker);
 			// set parameter
-			return newTable;
+			return table;
 		}
 	
 		return null;
@@ -950,12 +902,12 @@ public class JadexBpmnPropertiesUtil
 		// save a marker 
 		EModelElement elm = element;
 		
-		while (element.eContainer()!= null && !(element instanceof BpmnDiagram))
+		while(element.eContainer()!= null && !(element instanceof BpmnDiagram))
 		{
-			element = (EModelElement) element.eContainer();
+			element = (EModelElement)element.eContainer();
 		}
 		
-		if (!(element instanceof BpmnDiagram))
+		if(!(element instanceof BpmnDiagram))
 		{
 			throw new UnsupportedOperationException("The method " + JadexBpmnPropertiesUtil.class.getSimpleName() + "#retrieveBpmnDiagram(EModelElement element) doesnt support the input: " + elm);
 		}

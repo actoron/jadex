@@ -97,16 +97,14 @@ public class JadexBpmnEditor extends BpmnDiagramEditor
 				{
 					String title = "Jadex properties conversion";
 					String message = "The annotated jadex properties needs a conversion to version 2. Please klick OK to start the conversion";
-					boolean confirm = MessageDialog.openConfirm(Display
-							.getCurrent().getActiveShell(), title, message);
-					if (confirm)
+					boolean confirm = MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), title, message);
+					if(confirm)
 					{
 						// convert properties
 						Object editPart = getDiagramEditPart();
-						if (editPart instanceof BpmnDiagramEditPart)
+						if(editPart instanceof BpmnDiagramEditPart)
 						{
-							JadexBpmnPropertiesUtil
-									.convertDiagramProperties((BpmnDiagramEditPart) editPart);
+							JadexBpmnPropertiesUtil.convertDiagramProperties((BpmnDiagramEditPart) editPart);
 							// save editor input
 							myEditor.doSave(getProgressMonitor());
 						}
@@ -116,11 +114,9 @@ public class JadexBpmnEditor extends BpmnDiagramEditor
 						// open warning and close editor?
 						String errorTitle = "Can't open BPMN diagram";
 						String errorMessage = "The version of this diagram is not supported by this editor. Please convert the diagram or re-open it with the default STP BPMN editor. You may also want to change the default editor for *.bpmn_diagram files by changing the option in Jadex BPMN preferences";
-						MessageDialog.openError(Display.getCurrent()
-								.getActiveShell(), errorTitle, errorMessage);
+						MessageDialog.openError(Display.getCurrent().getActiveShell(), errorTitle, errorMessage);
 						// close editor
-						PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-								.getActivePage().closeEditor(myEditor, false);
+						PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().closeEditor(myEditor, false);
 					}
 
 				}
@@ -128,23 +124,21 @@ public class JadexBpmnEditor extends BpmnDiagramEditor
 		}
 	}
 
+	/**
+	 * 
+	 */
 	private boolean jadexEAnnotationExist()
 	{
 		boolean eAnnotationExists = false;
 
 		Object editPart = getDiagramEditPart();
-		if (editPart instanceof BpmnDiagramEditPart)
+		if(editPart instanceof BpmnDiagramEditPart)
 		{
-
-			final EObject eObject = ((IGraphicalEditPart) editPart)
-					.resolveSemanticElement();
-			if (eObject instanceof EModelElement)
+			final EObject eObject = ((IGraphicalEditPart)editPart).resolveSemanticElement();
+			if(eObject instanceof EModelElement)
 			{
-				EAnnotation jadexEAnnotation = JadexBpmnPropertiesUtil
-						.getJadexEAnnotation(
-								(EModelElement) eObject,
-								JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
-								false);
+				EAnnotation jadexEAnnotation = JadexBpmnPropertiesUtil.getJadexEAnnotation((EModelElement)eObject,
+					JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, false);
 				eAnnotationExists = (jadexEAnnotation != null);
 			}
 		}
@@ -153,29 +147,19 @@ public class JadexBpmnEditor extends BpmnDiagramEditor
 
 	/**
 	 * Checks the diagram version
-	 * 
-	 * @return true if diagram properties needs conversion
 	 */
 	private boolean checkDiagramConversion()
 	{
 		Object editPart = getDiagramEditPart();
 
-		if (editPart instanceof BpmnDiagramEditPart)
+		if(editPart instanceof BpmnDiagramEditPart)
 		{
-			final EObject eObject = ((IGraphicalEditPart) editPart)
-					.resolveSemanticElement();
-			if (eObject instanceof EModelElement)
+			final EObject eObject = ((IGraphicalEditPart)editPart).resolveSemanticElement();
+			if(eObject instanceof EModelElement)
 			{
-
-				String diagramVersion = JadexBpmnPropertiesUtil
-						.getJadexEAnnotationDetail(
-								(EModelElement) eObject,
-								JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
-								JadexBpmnPropertiesUtil.JADEX_PROPERTIES_VERSION_DETAIL);
-				if (diagramVersion == null
-						|| diagramVersion.isEmpty()
-						|| (new Double(EDITOR_VERSION).compareTo(Double
-								.valueOf(diagramVersion))) < 0)
+				String diagramVersion = JadexBpmnPropertiesUtil.getJadexEAnnotationDetail((EModelElement)eObject,
+					JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_PROPERTIES_VERSION_DETAIL);
+				if(diagramVersion == null || diagramVersion.isEmpty() || (new Double(EDITOR_VERSION).compareTo(Double.valueOf(diagramVersion))) < 0)
 				{
 					return true;
 				}

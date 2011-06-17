@@ -35,7 +35,6 @@ public abstract class AbstractBpmnPropertySection extends AbstractCommonProperty
 	 * 
 	 * @see jadex.editor.common.model.properties.AbstractCommonPropertySection#updateSectionValues()
 	 */
-	@Override
 	protected void updateSectionValues()
 	{
 		// empty default method
@@ -83,8 +82,4 @@ public abstract class AbstractBpmnPropertySection extends AbstractCommonProperty
 //			util.containerEAnnotationName = "jadex";
 //		}
 	}
-	
-	
-	
-
 }

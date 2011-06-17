@@ -48,7 +48,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
- * @author Claas
  *
  */
 public abstract class AbstractCommonTablePropertySection extends AbstractCommonPropertySection
@@ -75,19 +74,15 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 	/** The table clear button */
 	protected Button clearButton;
 
-	
 	/**
-	 * @param tableViewerLabel
+	 * 
 	 */
 	protected AbstractCommonTablePropertySection(String tableViewerLabel)
 	{
-		super();
 		this.tableViewerLabel = tableViewerLabel;
 	}
 	
-	
 	// ---- abstract methods ----
-	
 	
 	protected abstract ModifyEObjectCommand getAddCommand();
 	protected abstract ModifyEObjectCommand getDeleteCommand();
@@ -107,7 +102,6 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 	/**
 	 * @see org.eclipse.gmf.runtime.diagram.ui.properties.sections.AbstractModelerPropertySection#dispose()
 	 */
-	@Override
 	public void dispose()
 	{
 		// dispose of buttons is handled in superclass via control list
@@ -117,12 +111,11 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 	/**
 	 * Manages the input.
 	 */
-	@Override
 	public void setInput(IWorkbenchPart part, ISelection selection)
 	{
 		super.setInput(part, selection);
 
-		if (modelElement != null)
+		if(modelElement != null)
 		{
 			tableViewer.setInput(modelElement);
 			addButton.setEnabled(true);
@@ -146,7 +139,6 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#refresh()
 	 */
-	@Override
 	public void refresh()
 	{
 		super.refresh();
@@ -168,7 +160,6 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 	 * 
 	 * @generated NOT
 	 */
-	@Override
 	public void createControls(Composite parent,
 			TabbedPropertySheetPage tabbedPropertySheetPage)
 	{
@@ -216,7 +207,6 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 			// TODO: add Editors as well?
 		}
 		
-		
 		// get content provider from implementation class
 		viewer.setContentProvider(getTableContentProvider());
 		addDisposable(viewer.getContentProvider());
@@ -230,7 +220,6 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 		return tableViewer = viewer;
 		
 	}
-
 
 	/**
 	 * @param viewer
@@ -253,8 +242,6 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 	
 	/**
 	 * Create the parameter edit table
-	 * @param parent
-	 * 
 	 */
 	protected TableViewer createTable(Composite parent, GridData tableLayoutData)
 	{
@@ -485,6 +472,14 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 	{
 	}
 	
+	/**
+	 * 
+	 */
+	public ITableLabelProvider createTableLabelProvider(int idx)
+	{
+		return new MultiColumnTableLabelProvider(idx);
+	}
+	
 	// ---- internal used classes ----
 	
 	/**
@@ -512,7 +507,6 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 		 */
 		public MultiColumnTableLabelProvider()
 		{
-			super();
 			this.columIndex = -1;
 		}
 		
@@ -521,7 +515,6 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 		 */
 		public MultiColumnTableLabelProvider(int columIndex)
 		{
-			super();
 			assert columIndex >= 0 : "column index < 0";
 			this.columIndex = columIndex;
 			this.checkboxImageProvider = new CheckboxImages(JFaceResources.getImageRegistry(), PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
@@ -533,7 +526,7 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 		{
 			if(columIndex >= 0)
 			{
-				return this.getColumnImage(element, columIndex);
+				return getColumnImage(element, columIndex);
 			}
 			else
 			{
@@ -545,7 +538,7 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 		{
 			if(columIndex >= 0)
 			{
-				return this.getColumnText(element, columIndex);
+				return getColumnText(element, columIndex);
 			}
 			else
 			{
@@ -614,7 +607,7 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 		 */
 		public boolean canEdit(Object element)
 		{
-			if (element instanceof MultiColumnTableRow)
+			if(element instanceof MultiColumnTableRow)
 			{
 				return true;
 			}
@@ -641,7 +634,7 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 		 */
 		protected Object getValue(Object element)
 		{
-			return ((MultiColumnTableRow) element).getColumnValues()[attributeIndex];
+			return ((MultiColumnTableRow)element).getColumnValues()[attributeIndex];
 		}
 		
 		/**
@@ -673,16 +666,8 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 			}
 			catch (ExecutionException e)
 			{
-				CommonsActivator
-						.getDefault()
-						.getLog()
-						.log(
-								new Status(
-										IStatus.ERROR,
-										CommonsActivator.PLUGIN_ID,
-										IStatus.ERROR, e
-												.getMessage(),
-										e));
+				CommonsActivator.getDefault().getLog().log(
+					new Status(IStatus.ERROR, CommonsActivator.PLUGIN_ID, IStatus.ERROR, e.getMessage(),e));
 			}
 
 		}
@@ -705,7 +690,6 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 		 * Get the execute command, execute it and refresh the view
 		 * @generated NOT 
 		 */
-		@Override
 		public void widgetSelected(SelectionEvent e)
 		{
 			ModifyEObjectCommand command = getButtonCommand();
@@ -720,9 +704,8 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 				}
 				catch (ExecutionException ex)
 				{
-					CommonsActivator.getDefault().getLog().log(
-							new Status(IStatus.ERROR, CommonsActivator.PLUGIN_ID,
-									IStatus.ERROR, ex.getMessage(), ex));
+					CommonsActivator.getDefault().getLog().log(new Status(IStatus.ERROR, CommonsActivator.PLUGIN_ID,
+						IStatus.ERROR, ex.getMessage(), ex));
 				}
 			}
 		}

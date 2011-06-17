@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 /**
- * @author Claas
  *
  */
 public class MultiColumnTable
@@ -339,8 +338,6 @@ public class MultiColumnTable
 		return rows.toArray(a);
 	}
 	
-	
-	
 	// ---- @deprecated static conversion methods ----
 
 	/**
@@ -410,12 +407,12 @@ public class MultiColumnTable
 					// we found a delimiter
 					else
 					{
-						if (	// we found a delimiter at the first position
-								lastToken == null 
-								// we found a delimiter at the last position, 
-								|| !parameterTokens.hasMoreElements()
-								// we found two delimiter without any content between
-								|| attributeToken.equals(lastToken))
+						if(// we found a delimiter at the first position
+							lastToken == null 
+							// we found a delimiter at the last position, 
+							|| !parameterTokens.hasMoreElements()
+							// we found two delimiter without any content between
+							|| attributeToken.equals(lastToken))
 						{
 							attributes[attributeIndexCounter] = "";
 							attributeIndexCounter++;
@@ -444,8 +441,6 @@ public class MultiColumnTable
 	
 	/**
 	 * Representation of a MultiColumnTableRow
-	 * 
-	 * @author Claas Altschaffel
 	 */
 	public class MultiColumnTableRow {
 		
@@ -459,12 +454,10 @@ public class MultiColumnTable
 		/** default constructor */
 		public MultiColumnTableRow(String[] columnValues, MultiColumnTable parent)
 		{
-			super();
-			
 			table = parent;
 			
 			this.columnValues = new String[columnValues.length];
-			for (int i = 0; i < columnValues.length; i++)
+			for(int i = 0; i < columnValues.length; i++)
 			{
 				//assert columnValues[i] != null : "Value for column index '"+i+"' is null";
 				this.columnValues[i] = new String(columnValues[i] != null ? columnValues[i] : "");
@@ -482,15 +475,12 @@ public class MultiColumnTable
 			int uniqueColumnIndex = getUniqueColumnIndex();
 			return uniqueColumnIndex >= 0 && uniqueColumnIndex < columnValues.length;
 		}
-		
-		
 
 		// ---- overrides ----
 		
 		/**
 		 * @see java.lang.Object#equals(java.lang.Object)
 		 */
-		@Override
 		public boolean equals(Object obj)
 		{
 			if (!(obj instanceof MultiColumnTableRow))
@@ -517,7 +507,6 @@ public class MultiColumnTable
 		/**
 		 * @see java.lang.Object#hashCode()
 		 */
-		@Override
 		public int hashCode()
 		{
 			int returnHash = 31;
@@ -539,7 +528,6 @@ public class MultiColumnTable
 		/**
 		 * @see java.lang.Object#toString()
 		 */
-		@Override
 		public String toString()
 		{
 			StringBuffer buffer = new StringBuffer();

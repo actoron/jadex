@@ -100,7 +100,7 @@ public abstract class AbstractMultiTextfieldPropertySection extends AbstractBpmn
 	public void setInput(IWorkbenchPart part, ISelection selection)
 	{
 		super.setInput(part, selection);
-		if (modelElement != null)
+		if(modelElement != null)
 		{
 			EAnnotation ea = modelElement.getEAnnotation(util.containerEAnnotationName);
 			if (ea != null)

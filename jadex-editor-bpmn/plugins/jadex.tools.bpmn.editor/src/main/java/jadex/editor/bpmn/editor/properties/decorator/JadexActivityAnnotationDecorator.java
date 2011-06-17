@@ -15,7 +15,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-
+/**
+ * 
+ */
 public class JadexActivityAnnotationDecorator extends BpmnEAnnotationDecoratorProvider implements IEAnnotationDecorator 
 {
 

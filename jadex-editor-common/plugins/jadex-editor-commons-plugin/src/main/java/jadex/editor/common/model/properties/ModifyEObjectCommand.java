@@ -9,13 +9,11 @@ import org.eclipse.gmf.runtime.emf.commands.core.command.AbstractTransactionalCo
  * Utility class thats simplify the creation of AbstractTransactionalCommand.
  * @generated NOT
  */
-public abstract class ModifyEObjectCommand extends
-		AbstractTransactionalCommand
+public abstract class ModifyEObjectCommand extends AbstractTransactionalCommand
 {
 	public ModifyEObjectCommand(EObject element, String label)
 	{
 		super((TransactionalEditingDomain) AdapterFactoryEditingDomain
-				.getEditingDomainFor(element), label,
-				getWorkspaceFiles(element));
+			.getEditingDomainFor(element), label, getWorkspaceFiles(element));
 	}
 }

@@ -5,11 +5,11 @@ package jadex.editor.bpmn.model;
 
 import jadex.editor.common.model.properties.table.MultiColumnTable;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author Claas
  *
  */
 public class MultiColumnTableEx extends MultiColumnTable
@@ -19,7 +19,7 @@ public class MultiColumnTableEx extends MultiColumnTable
 	
 	boolean[] isComplexColumn;
 	
-	Map<String, Map<String, String>> complexValues;
+	Map<String, Map<String, String>>complexValues;
 	
 	// ---- constructors ----
 	
@@ -43,7 +43,7 @@ public class MultiColumnTableEx extends MultiColumnTable
 		this(table.getRowList().size(), table.getUniqueColumn(), null);
 		
 		// add rows from table
-		for (MultiColumnTableRow row : table.getRowList())
+		for(MultiColumnTableRow row : table.getRowList())
 		{
 			super.add(row);
 		}
@@ -76,9 +76,8 @@ public class MultiColumnTableEx extends MultiColumnTable
 	 */
 	public Map<String, String> getComplexValue(String identifier)
 	{
-		return this.complexValues.get(identifier);
+		return complexValues.get(identifier)==null? Collections.EMPTY_MAP: complexValues.get(identifier);
 	}
-	
 
 	// ---- methods ----
 	
@@ -92,43 +91,35 @@ public class MultiColumnTableEx extends MultiColumnTable
 	 */
 	public boolean isComplexColumn(int coulumnIndex)
 	{
-		if (isComplexColumn != null && coulumnIndex < isComplexColumn.length)
+		if(isComplexColumn != null && coulumnIndex < isComplexColumn.length)
 			return isComplexColumn[coulumnIndex];
 		
 		return false;
 	}
-	
-	
 	
 	// ---- overrides ----
 	
 	/**
 	 * @see jadex.editor.common.model.properties.table.MultiColumnTable#add(int, jadex.editor.common.model.properties.table.MultiColumnTable.MultiColumnTableRow)
 	 */
-	@Override
 	public void add(int index, MultiColumnTableRow row)
 	{
 		// no complex type in table
-		if (isComplexColumn == null)
+		if(isComplexColumn == null)
 		{
 			super.add(index, row);
 			return;
 		}
 		
 		// ensure unique reference identifier for complex types
-		for (int column = 0; column < isComplexColumn.length; column++)
+		for(int column = 0; column < isComplexColumn.length; column++)
 		{
-			if (isComplexColumn[column])
+			if(isComplexColumn[column])
 			{
 				row.setColumnValueAt(column, createUniqueValue(row.getColumnValueAt(column)));
 			}
 		}
 		
 		super.add(index, row);
-		
 	}
-
-	
-	
-	
 }

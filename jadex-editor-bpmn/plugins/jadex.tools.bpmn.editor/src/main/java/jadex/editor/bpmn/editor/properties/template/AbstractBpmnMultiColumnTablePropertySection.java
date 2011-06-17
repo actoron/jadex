@@ -19,7 +19,6 @@ import org.eclipse.gmf.runtime.common.core.command.CommandResult;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -27,7 +26,6 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.IWorkbenchPart;
 
 /**
  * Property section Tab to enable Jadex specific properties
@@ -35,8 +33,6 @@ import org.eclipse.ui.IWorkbenchPart;
 public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		AbstractCommonTablePropertySection
 {
-	
-	
 	// ---- constants ----
 	
 	public static final String TEXT = "text";
@@ -44,15 +40,10 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	public static final String COMBOBOX = "combobox";
 	public static final String SPINNER = "spinner";
 	
-	
-	
 	// ---- attributes ----
 
 	/** Utility class to hold attribute an element reference */
 	protected JadexBpmnPropertiesUtil util;
-	
-	
-	
 
 	/** The unique column index for this TablePropertySection */
 	private int uniqueColumnIndex;
@@ -66,33 +57,27 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	 * Protected constructor for subclasses
 	 * 
 	 * @param containerEAnnotationName
-	 *            @see {@link AbstractBpmnPropertySection}
+	 *   @see {@link AbstractBpmnPropertySection}
 	 * @param annotationDetailName
-	 *            @see {@link AbstractBpmnPropertySection}
-	 * @param tableLabel
-	 *            the name of table
-	 * @param uniqueColumnIndex
-	 *            the unique value column of the table
+	 *   @see {@link AbstractBpmnPropertySection}
+	 * @param tableLabel the name of table
+	 * @param uniqueColumnIndex the unique value column of the table
 	 */
 	protected AbstractBpmnMultiColumnTablePropertySection(
-			String containerEAnnotationName, String annotationDetailName,
-			String tableLabel, int uniqueColumnIndex, boolean[] complexColumnMarker)
+		String containerEAnnotationName, String annotationDetailName,
+		String tableLabel, int uniqueColumnIndex, boolean[] complexColumnMarker)
 	{
 		super(tableLabel);
 
-		assert containerEAnnotationName != null
-				&& !containerEAnnotationName.isEmpty() : this.getClass()
-				+ ": containerEAnnotationName not set";
-		assert annotationDetailName != null && !annotationDetailName.isEmpty() : this
-				.getClass()
-				+ ": annotationDetailName not set";
-
+		assert containerEAnnotationName != null && !containerEAnnotationName.isEmpty() 
+			: this.getClass()+ ": containerEAnnotationName not set";
+		assert annotationDetailName != null && !annotationDetailName.isEmpty() : this.getClass()+ ": annotationDetailName not set";
 		
 		this.util = new JadexBpmnPropertiesUtil(containerEAnnotationName, annotationDetailName, this);
 		this.uniqueColumnIndex = uniqueColumnIndex;
 		this.complexColumnMarker = complexColumnMarker;
 		
-		if (this.complexColumnMarker == null)
+		if(this.complexColumnMarker == null)
 		{
 			this.complexColumnMarker = new boolean[getDefaultListElementAttributeValues().length];
 		}
@@ -114,67 +99,67 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	 * end of setInput().
 	 * @see jadex.editor.common.model.properties.AbstractCommonPropertySection#updateSectionValues()
 	 */
-	@Override
 	protected void updateSectionValues()
 	{
 		// empty default method
 	}
 
+//	/**
+//	 * Hook to be informed about configuration changes. Override if needed!
+//	 * @param oldConfiguration
+//	 * @param newConfiguration
+//	 */
+//	protected void configurationChangedHook(String oldConfiguration, String newConfiguration)
+//	{
+//		// empty default method
+//	}
+	
 	/**
-	 * Hook to be informed about configuration changes. Override if needed!
-	 * @param oldConfiguration
-	 * @param newConfiguration
+	 *  Get the current configuration.
 	 */
-	protected void configurationChangedHook(String oldConfiguration, String newConfiguration)
+	protected String getConfiguration()
 	{
-		// empty default method
+		return JadexBpmnPropertiesUtil.getJadexEAnnotationDetail(modelElement, JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, 
+			JadexBpmnPropertiesUtil.JADEX_ACTIVE_CONFIGURATION_DETAIL);
 	}
 	
 	/**
 	 * 
-	 * @param values
-	 * @param table
-	 * @return
 	 */
-	private String[] extendDefaultListElementAttributeValues(
-			MultiColumnTableEx table)
+	private String[] extendDefaultListElementAttributeValues(MultiColumnTableEx table)
 	{
 		String[] values = getDefaultListElementAttributeValues();
-		for (int i = 0; i < values.length; i++)
+		for(int i = 0; i < values.length; i++)
 		{
-			if (table.isComplexColumn(i))
+			if(table.isComplexColumn(i))
 			{
-				values[i] = JadexBpmnPropertiesUtil
-						.getComplexValueAnnotationIdentifier(
-								util.containerEAnnotationName,
-								util.annotationDetailName, values[i]);
+				values[i] = JadexBpmnPropertiesUtil.getComplexValueAnnotationIdentifier(
+					util.containerEAnnotationName, util.annotationDetailName, values[i]);
 			}
 		}
 		return values;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * jadex.tools.model.common.properties.AbstractCommonPropertySection#dispose
-	 * ()
-	 */
-	@Override
-	public void dispose()
-	{
-		// nothing to dispose here, use addDisposable(Object) instead
-		super.dispose();
-	}
+//	/*
+//	 * (non-Javadoc)
+//	 * 
+//	 * @see
+//	 * jadex.tools.model.common.properties.AbstractCommonPropertySection#dispose
+//	 * ()
+//	 */
+//	public void dispose()
+//	{
+//		// nothing to dispose here, use addDisposable(Object) instead
+//		super.dispose();
+//	}
 
-	/**
-	 * Manages the input.
-	 */
-	@Override
-	public void setInput(IWorkbenchPart part, ISelection selection)
-	{
-		super.setInput(part, selection);
-	}
+//	/**
+//	 * Manages the input.
+//	 */
+//	public void setInput(IWorkbenchPart part, ISelection selection)
+//	{
+//		super.setInput(part, selection);
+//	}
 
 	// ---- control creation methods ----
 
@@ -223,9 +208,8 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 						boolean complexAnnotationRemoved = JadexBpmnPropertiesUtil.removeJadexEAnnotation(modelElement, columnValues[columnIndex]);
 						if (!complexAnnotationRemoved)
 						{
-							JadexBpmnEditor
-									.log("Complex table value annotation not removed!",
-											null, IStatus.INFO);
+							JadexBpmnEditor.log("Complex table value annotation not removed!",
+								null, IStatus.INFO);
 						}
 					}
 				}
@@ -245,7 +229,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 				IProgressMonitor monitor, IAdaptable info) throws ExecutionException
 			{
 				MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection)tableViewer
-						.getSelection()).getFirstElement();
+					.getSelection()).getFirstElement();
 
 				MultiColumnTableEx tableRowList = getTableFromAnnotation();
 				int index = tableRowList.indexOf(rowToMove);
@@ -269,11 +253,10 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		// modify the EModelElement annotation
 		ModifyEObjectCommand command = new ModifyEObjectCommand(modelElement, "Move parameter element down")
 		{
-			protected CommandResult doExecuteWithResult(
-					IProgressMonitor monitor, IAdaptable info)
-					throws ExecutionException
+			protected CommandResult doExecuteWithResult(IProgressMonitor monitor, IAdaptable info)
+				throws ExecutionException
 			{
-				MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
+				MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection)tableViewer
 					.getSelection()).getFirstElement();
 
 				MultiColumnTableEx tableRowList = getTableFromAnnotation();
@@ -361,7 +344,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		TableViewerColumn ret = new TableViewerColumn(viewer, SWT.LEFT);
 		ret.getColumn().setText(name);
 		ret.setEditingSupport(new BpmnMultiColumnTableEditingSupport(viewer, idx));
-		ret.setLabelProvider(new MultiColumnTableLabelProvider(idx));
+		ret.setLabelProvider(new BpmnMultiColumnTableLabelProvider(idx));
 		return ret;
 	}
 	
@@ -387,7 +370,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 			}
 		});
 		
-		ret.setLabelProvider(new MultiColumnTableLabelProvider(idx)
+		ret.setLabelProvider(new BpmnMultiColumnTableLabelProvider(idx)
 		{
 			public Image getColumnImage(Object element, int columnIndex)
 			{
@@ -436,7 +419,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 				super.doSetValue(element, values[((Integer)value).intValue()]);
 			}
 		});
-		ret.setLabelProvider(new MultiColumnTableLabelProvider(idx));
+		ret.setLabelProvider(new BpmnMultiColumnTableLabelProvider(idx));
 		
 		return ret;
 	}
@@ -475,7 +458,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 				super.doSetValue(element, value);
 			}
 		});
-		ret.setLabelProvider(new MultiColumnTableLabelProvider(idx));
+		ret.setLabelProvider(new BpmnMultiColumnTableLabelProvider(idx));
 		
 		return ret;
 	}
@@ -483,9 +466,6 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	/**
 	 * Retrieve the EAnnotation from the modelElement and converts it to a
 	 * {@link MultiColumnTableRow} list
-	 * 
-	 * @param act
-	 * @return
 	 */
 	private MultiColumnTableEx getTableFromAnnotation()
 	{
@@ -493,7 +473,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 
 		MultiColumnTableEx table = JadexBpmnPropertiesUtil
 			.getJadexEAnnotationTable(modelElement, getTableAnnotationIdentifier());
-		if (table != null)
+		if(table != null)
 		{
 			return table;
 		}
@@ -504,8 +484,6 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 
 	/**
 	 * Updates the EAnnotation for the modelElement with table data
-	 * 
-	 * @param table
 	 */
 	private void updateTableAnnotation(MultiColumnTableEx table)
 	{
@@ -515,24 +493,21 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 
 	/**
 	 * Check if have to convert the annotation to new format
-	 * 
 	 * @return true if a conversion is done
 	 */
 	private boolean checkAnnotationConversion()
 	{
 		return JadexBpmnPropertiesUtil.checkAnnotationConversion(modelElement,
-				util.containerEAnnotationName, util.annotationDetailName, uniqueColumnIndex);
+			util.containerEAnnotationName, util.annotationDetailName, uniqueColumnIndex);
 	}
 
 	/**
 	 * Create the annotation identifier from util values
-	 * 
-	 * @return
 	 */
 	private String getTableAnnotationIdentifier()
 	{
 		return JadexBpmnPropertiesUtil.getTableAnnotationIdentifier(util.containerEAnnotationName,
-				util.annotationDetailName);
+			util.annotationDetailName);
 	}
 	
 	/**
@@ -552,15 +527,16 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		{
 			checkAnnotationConversion();
 			
-			if (inputElement instanceof EModelElement)
+			if(inputElement instanceof EModelElement)
 			{
-				MultiColumnTable table = JadexBpmnPropertiesUtil.getJadexEAnnotationTable((EModelElement)inputElement, getTableAnnotationIdentifier());
-				if (table != null)
+				MultiColumnTable table = JadexBpmnPropertiesUtil.getJadexEAnnotationTable(
+					(EModelElement)inputElement, getTableAnnotationIdentifier());
+				if(table != null)
 					return table.toArray();
 			}
 
 			// fall through
-			return new Object[] {};
+			return new Object[]{};
 		}
 
 		/**
@@ -581,13 +557,44 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		}
 	}
 
+	protected class BpmnMultiColumnTableLabelProvider extends MultiColumnTableLabelProvider
+	{
+		/**
+		 * empty constructor, sets column index to -1
+		 */
+		public BpmnMultiColumnTableLabelProvider()
+		{
+		}
+		
+		/**
+		 * @param columIndex the column index to provide the label for
+		 */
+		public BpmnMultiColumnTableLabelProvider(int columIndex)
+		{
+			super(columIndex);
+		}
+		
+		/**
+		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
+		 */
+		public String getColumnText(Object element, int columnIndex)
+		{
+			String ret = super.getColumnText(element, columnIndex);
+			MultiColumnTableEx table = getTableFromAnnotation();
+			if(table.isComplexColumn(columnIndex))
+			{
+				ret = (String)table.getComplexValue(ret).get(getConfiguration());
+			}
+			return ret;
+		}
+	}
+	
 	protected class BpmnMultiColumnTableEditingSupport extends MultiColumnTableEditingSupport
 	{
 
 		public BpmnMultiColumnTableEditingSupport(TableViewer viewer, int attributeIndex)
 		{
 			super(viewer, attributeIndex);
-
 		}
 
 		public BpmnMultiColumnTableEditingSupport(TableViewer viewer,
@@ -595,22 +602,19 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		{
 			super(viewer, attributeIndex, editor);
 		}
-
-		
 		
 		/**
 		 * Respect the complex value types in BPMN tables
 		 * @see jadex.editor.common.model.properties.table.AbstractCommonTablePropertySection.MultiColumnTableEditingSupport#getValue(java.lang.Object)
 		 */
-		@Override
 		protected Object getValue(Object element)
 		{
-			MultiColumnTableRow row = (MultiColumnTableRow) element;
+			MultiColumnTableRow row = (MultiColumnTableRow)element;
 			Object o = row.getTable();
-			if (o instanceof MultiColumnTableEx)
+			if(o instanceof MultiColumnTableEx)
 			{
 				MultiColumnTableEx table = (MultiColumnTableEx) o;
-				if (table.isComplexColumn(attributeIndex))
+				if(table.isComplexColumn(attributeIndex))
 				{
 					// the value should be a redirection
 					String complexValueIdentifier = row.getColumnValueAt(attributeIndex);
@@ -625,47 +629,36 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 			return super.getValue(element);
 		}
 
-		@Override
-		protected ModifyEObjectCommand getSetValueCommand(
-				final MultiColumnTableRow tableViewerRow, final Object value)
+		protected ModifyEObjectCommand getSetValueCommand(final MultiColumnTableRow tableViewerRow, final Object value)
 		{
 			final String newValue = value.toString();
 
 			// modify the Model
-			ModifyEObjectCommand command = new ModifyEObjectCommand(
-					modelElement, "Update EModelElement parameter list")
+			ModifyEObjectCommand command = new ModifyEObjectCommand(modelElement, "Update EModelElement parameter list")
 			{
-				@Override
-				protected CommandResult doExecuteWithResult(
-						IProgressMonitor monitor, IAdaptable info)
-						throws ExecutionException
+				protected CommandResult doExecuteWithResult(IProgressMonitor monitor, IAdaptable info)
+					throws ExecutionException
 				{
-
 					MultiColumnTableEx table = getTableFromAnnotation();
-					MultiColumnTableRow rowToEdit = (MultiColumnTableRow) table
-							.get(table.indexOf(tableViewerRow));
+					MultiColumnTableRow rowToEdit = (MultiColumnTableRow)table.get(table.indexOf(tableViewerRow));
 
-					if (attributeIndex == table.getUniqueColumn())
+					if(attributeIndex == table.getUniqueColumn())
 					{
-						if (!newValue
-								.equals(rowToEdit.getColumnValues()[attributeIndex]))
+						if(!newValue.equals(rowToEdit.getColumnValues()[attributeIndex]))
 						{
 							int rowIndex = table.indexOf(rowToEdit);
 							table.remove(rowIndex);
 							rowToEdit.setColumnValueAt(attributeIndex, newValue);
 							table.add(rowIndex, rowToEdit);
-
 						}
 					} 
-					else if (table.isComplexColumn(attributeIndex))
+					else if(table.isComplexColumn(attributeIndex))
 					{
 						// the value should be a redirection
 						String complexValueIdentifier = rowToEdit.getColumnValueAt(attributeIndex);
 						Map<String, String> complexValueMap = table.getComplexValue(complexValueIdentifier);
-						
 						String selectedConfiguration = JadexBpmnDiagramConfigurationsTableSection.getConfigurationSectionInstanceForModelElement(modelElement).getCurrentConfiguration();
 						complexValueMap.put(selectedConfiguration, newValue);
-						
 					}
 					else
 					{
@@ -684,8 +677,5 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 
 			return command;
 		}
-
 	}
-	
-	
 }

@@ -98,7 +98,6 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#dispose()
 	 */
-	@Override
 	public void dispose()
 	{
 		this.taskProvider = null;
@@ -109,7 +108,6 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 	/**
 	 * @see jadex.editor.bpmn.editor.properties.template.AbstractComboPropertySection#getComboItems()
 	 */
-	@Override
 	protected String[] getComboItems()
 	{
 		// return comboItems;
@@ -119,7 +117,6 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 	/**
 	 * Manages the input.
 	 */
-	@Override
 	public void setInput(IWorkbenchPart part, ISelection selection)
 	{
 		super.setInput(part, selection);
@@ -275,7 +272,6 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 			 * 
 			 * @generated NOT
 			 */
-			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
 				String taskClassName = cCombo.getText();
@@ -331,20 +327,16 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 		
 		preferenceLink.addHyperlinkListener(new IHyperlinkListener()
 		{
-			
-			@Override
 			public void linkExited(org.eclipse.ui.forms.events.HyperlinkEvent e)
 			{
 				// ignore
 			}
 			
-			@Override
 			public void linkEntered(org.eclipse.ui.forms.events.HyperlinkEvent e)
 			{
 				// ignore
 			}
 			
-			@Override
 			public void linkActivated(org.eclipse.ui.forms.events.HyperlinkEvent e)
 			{
 				showClassLoaderPreferencePage();
@@ -396,13 +388,11 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 
 	private void updateTaskMetaInfo(String taskClassName)
 	{
-
-			createTaskMetaInfoStyledText(taskProvider
-					.getTaskMetaInfo(taskClassName), taskMetaInfoText);
-			
-			createTaskMetaInfoStyledParameter(taskProvider
-					.getTaskMetaInfo(taskClassName), taskMetaInfoParameter);
-
+		createTaskMetaInfoStyledText(taskProvider
+			.getTaskMetaInfo(taskClassName), taskMetaInfoText);
+		
+		createTaskMetaInfoStyledParameter(taskProvider
+			.getTaskMetaInfo(taskClassName), taskMetaInfoParameter);
 	}
 
 	/**
@@ -414,7 +404,6 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 	private void createTaskMetaInfoStyledText(
 			IEditorTaskMetaInfo taskMetaInfo, StyledText textfield)
 	{		
-		
 		if (taskMetaInfo == null)
 		{
 			textfield.setText("");
@@ -429,10 +418,10 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 		style.fontStyle = SWT.BOLD | SWT.ITALIC;
 		info.append(description, style);
 
-		try {
+		try 
+		{
 			textfield.setText(info.toString());
 			textfield.setStyleRanges(info.getStyleRanges());
-			
 			setScrollbarVisibility(textfield);
 		}
 		catch (IllegalArgumentException iae)
@@ -466,8 +455,7 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 	private void createTaskMetaInfoStyledParameter(
 			IEditorTaskMetaInfo taskMetaInfo, StyledText textfield)
 	{		
-		
-		if (taskMetaInfo == null)
+		if(taskMetaInfo == null)
 		{
 			textfield.setText("");
 			textfield.setStyleRanges(new StyleRange[0]);
@@ -487,7 +475,6 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 		{
 			for (int i = 0; i < params.length; i++)
 			{
-				
 				info.append(PARAMETER, new StyleRange(style));
 				info.append(params[i].getName() + "\n", null);
 				
@@ -504,7 +491,6 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 				info.append("\t" + params[i].getDescription() + "\n", null);
 	
 				info.append("\n", null);
-				
 			}
 		}
 
@@ -523,28 +509,21 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 	}
 	
 	
-	
-
 	private void updateTaskParameterTable(String taskClassName)
 	{
-		IEditorTaskMetaInfo metaInfo = taskProvider
-				.getTaskMetaInfo(taskClassName);
-		IEditorParameterMetaInfo[] taskParameter = metaInfo
-				.getParameterMetaInfos();
+		IEditorTaskMetaInfo metaInfo = taskProvider.getTaskMetaInfo(taskClassName);
+		IEditorParameterMetaInfo[] taskParameter = metaInfo.getParameterMetaInfos();
 
 		MultiColumnTableEx parameterTable = JadexBpmnPropertiesUtil
-				.getJadexEAnnotationTable(
-						modelElement,
-						JadexBpmnPropertiesUtil
-								.getTableAnnotationIdentifier(
-										JadexCommonParameterSection.PARAMETER_ANNOTATION_IDENTIFIER,
-										JadexCommonParameterSection.PARAMETER_ANNOTATION_DETAIL_IDENTIFIER));
+			.getJadexEAnnotationTable(modelElement, JadexBpmnPropertiesUtil.getTableAnnotationIdentifier(
+			JadexCommonParameterSection.PARAMETER_ANNOTATION_IDENTIFIER,
+			JadexCommonParameterSection.PARAMETER_ANNOTATION_DETAIL_IDENTIFIER));
 
-		if (parameterTable != null)
+		if(parameterTable != null)
 		{
 			// TO-DO: remove this BUGFIX in future versions?
 			fixUniqueColumnIndexBugInCorruptedBpmnDiagrams(parameterTable,
-					JadexCommonParameterSection.UNIQUE_PARAMETER_ROW_ATTRIBUTE);
+				JadexCommonParameterSection.UNIQUE_PARAMETER_ROW_ATTRIBUTE);
 
 			parameterTable = addTaskParamterTable(parameterTable, taskParameter);
 		}
@@ -553,18 +532,12 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 			parameterTable = createNewParameterTable(taskParameter);
 		}
 
-		JadexBpmnPropertiesUtil
-				.updateJadexEAnnotationTable(
-						modelElement,
-						JadexBpmnPropertiesUtil
-								.getTableAnnotationIdentifier(
-										JadexCommonParameterSection.PARAMETER_ANNOTATION_IDENTIFIER,
-										JadexCommonParameterSection.PARAMETER_ANNOTATION_DETAIL_IDENTIFIER),
-						parameterTable);
+		JadexBpmnPropertiesUtil.updateJadexEAnnotationTable(modelElement, JadexBpmnPropertiesUtil.getTableAnnotationIdentifier(
+			JadexCommonParameterSection.PARAMETER_ANNOTATION_IDENTIFIER,
+			JadexCommonParameterSection.PARAMETER_ANNOTATION_DETAIL_IDENTIFIER), parameterTable);
 
-		TableViewer viewer = JadexCommonParameterSection
-				.getParameterTableViewerFor(modelElement);
-		if (viewer != null)
+		TableViewer viewer = JadexCommonParameterSection.getParameterTableViewerFor(modelElement);
+		if(viewer != null)
 		{
 			viewer.refresh();
 		}
@@ -572,27 +545,19 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 
 	/**
 	 * Create a new Table for meta info
-	 * 
-	 * @param parameterMetaInfo
-	 * @return
 	 */
-	private MultiColumnTableEx createNewParameterTable(
-			IEditorParameterMetaInfo[] parameterMetaInfo)
+	private MultiColumnTableEx createNewParameterTable(IEditorParameterMetaInfo[] parameterMetaInfo)
 	{
-		MultiColumnTableEx newTable = new MultiColumnTableEx(
-				parameterMetaInfo.length,
-				JadexCommonParameterSection.UNIQUE_PARAMETER_ROW_ATTRIBUTE,
-				null);
-		for (int i = 0; i < parameterMetaInfo.length; i++)
+		MultiColumnTableEx newTable = new MultiColumnTableEx(parameterMetaInfo.length,
+			JadexCommonParameterSection.UNIQUE_PARAMETER_ROW_ATTRIBUTE, null);
+		for(int i = 0; i < parameterMetaInfo.length; i++)
 		{
 			String[] columnValues = new String[] {
-					parameterMetaInfo[i].getDirection(),
-					parameterMetaInfo[i].getName(),
-					parameterMetaInfo[i].getClazz().getName(),
-					parameterMetaInfo[i].getInitialValue() };
-			newTable.add(newTable.new MultiColumnTableRow(columnValues,
-					newTable));
-
+				parameterMetaInfo[i].getDirection(),
+				parameterMetaInfo[i].getName(),
+				parameterMetaInfo[i].getClazz().getName(),
+				parameterMetaInfo[i].getInitialValue() };
+			newTable.add(newTable.new MultiColumnTableRow(columnValues, newTable));
 		}
 
 		return newTable;
@@ -600,9 +565,6 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 
 	/**
 	 * Update the table with meta info
-	 * 
-	 * @param table
-	 * @param metaInfo
 	 */
 	private MultiColumnTableEx addTaskParamterTable(MultiColumnTableEx table,
 			IEditorParameterMetaInfo[] metaInfo)
@@ -611,7 +573,7 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 		
 		MultiColumnTableEx newTable = createNewParameterTable(metaInfo);
 
-		for (MultiColumnTableRow row : newTable.getRowList())
+		for(MultiColumnTableRow row : newTable.getRowList())
 		{
 			// save the original unique value
 			String uniqueColumnValue = row.getColumnValueAt(row.getUniqueColumnIndex());
@@ -622,7 +584,7 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 			}
 		}
 
-		if (hasUniqueValueChanged)
+		if(hasUniqueValueChanged)
 		{
 			displayUniqueValueChangedWarning();
 		}
@@ -638,14 +600,10 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 	{
 		Display.getCurrent().asyncExec(new Runnable()
 		{
-			@Override
 			public void run()
 			{
-				MessageDialog
-						.openWarning(
-								Display.getCurrent().getActiveShell(),
-								"Unique value change",
-								"During the \"Add Default\" action at least one added parameter was changed due to unique value restrictions. Please check the added parameter carefully");
+				MessageDialog.openWarning(Display.getCurrent().getActiveShell(),
+					"Unique value change", "During the \"Add Default\" action at least one added parameter was changed due to unique value restrictions. Please check the added parameter carefully");
 			}
 		});
 	}
@@ -653,12 +611,8 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 	
 	private void showClassLoaderPreferencePage()
 	{
-		PreferenceDialog preferenceDialog = PreferencesUtil.createPreferenceDialogOn(
-				Display.getCurrent().getActiveShell(),
-				JadexBpmnClassLoaderPreferencePage.PREFERENCE_PAGE_ID, 
-				null,
-				null);
-		
+		PreferenceDialog preferenceDialog = PreferencesUtil.createPreferenceDialogOn(Display.getCurrent().getActiveShell(),
+			JadexBpmnClassLoaderPreferencePage.PREFERENCE_PAGE_ID, null, null);
 		preferenceDialog.open();
 	}
 
@@ -672,13 +626,12 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 	 * @return
 	 */
 	private MultiColumnTable fixUniqueColumnIndexBugInCorruptedBpmnDiagrams(
-			MultiColumnTable parameterTable, int correctUniqueColumnIndex)
+		MultiColumnTable parameterTable, int correctUniqueColumnIndex)
 	{
 		if (parameterTable.getUniqueColumn() != correctUniqueColumnIndex)
 		{
 			List<MultiColumnTableRow> rows = parameterTable.getRowList();
-			parameterTable = new MultiColumnTable(rows.size(),
-					correctUniqueColumnIndex);
+			parameterTable = new MultiColumnTable(rows.size(), correctUniqueColumnIndex);
 			for (MultiColumnTableRow multiColumnTableRow : rows)
 			{
 				parameterTable.add(multiColumnTableRow);
@@ -704,7 +657,6 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 		
 		public StyledStringBuffer()
 		{
-			super();
 			this.nextOffset = 0;
 			this.buffer = new StringBuffer();
 			this.styleRanges = new ArrayList<StyleRange>();
