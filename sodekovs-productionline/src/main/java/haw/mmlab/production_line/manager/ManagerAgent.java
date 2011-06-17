@@ -8,11 +8,11 @@ import haw.mmlab.production_line.configuration.Task;
 import haw.mmlab.production_line.configuration.Transport;
 import haw.mmlab.production_line.logging.database.DatabaseLogger;
 import haw.mmlab.production_line.service.IManagerService;
-import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IArgument;
@@ -98,7 +98,7 @@ public class ManagerAgent extends MicroAgent {
 	@Override
 	public IFuture agentCreated() {
 		// add the manager service
-		addService(IManagerService.class, new ManagerService(this));
+		addService("ManagerService", IManagerService.class, new ManagerService(this));
 
 		// initialize the logger
 		getLogger().setLevel(Level.ALL);
@@ -222,7 +222,7 @@ public class ManagerAgent extends MicroAgent {
 			public void resultAvailable(Object result) {
 				IComponentManagementService cms = (IComponentManagementService) result;
 
-				IApplicationExternalAccess app = (IApplicationExternalAccess) ManagerAgent.this.getParent();
+				IExternalAccess parent = ManagerAgent.this.getParent();
 
 				// start the robot agents
 				getLogger().info("Manager agent is starting robots...");
@@ -231,7 +231,7 @@ public class ManagerAgent extends MicroAgent {
 					args.put("config", robot);
 					args.put("taskMap", tasks);
 					args.put("strategy", strategyName);
-					CreationInfo cr = new CreationInfo(args, app.getComponentIdentifier());
+					CreationInfo cr = new CreationInfo(args, parent.getComponentIdentifier());
 
 					cms.createComponent(robot.getAgentId(), "haw/mmlab/production_line/robot/RobotAgent.class", cr, null).addResultListener(new IResultListener() {
 
@@ -252,7 +252,7 @@ public class ManagerAgent extends MicroAgent {
 					Map<String, Object> args = new HashMap<String, Object>();
 					args.put("config", transport);
 					args.put("taskMap", tasks);
-					CreationInfo cr = new CreationInfo(args, app.getComponentIdentifier());
+					CreationInfo cr = new CreationInfo(args, parent.getComponentIdentifier());
 
 					cms.createComponent(transport.getAgentId(), "haw/mmlab/production_line/transport/TransportAgent.class", cr, null).addResultListener(new IResultListener() {
 

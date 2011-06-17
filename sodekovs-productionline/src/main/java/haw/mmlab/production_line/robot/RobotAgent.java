@@ -83,7 +83,7 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 		getLogger().info(id + " created");
 
 		// add the service
-		addService(IProcessWorkpieceService.class, new ProcessWorkpieceService(this, id, AgentConstants.AGENT_TYPE_ROBOT, getLogger()));
+		addService("ProcessWorkpieceService", IProcessWorkpieceService.class, new ProcessWorkpieceService(this, id, AgentConstants.AGENT_TYPE_ROBOT, getLogger()));
 
 		return IFuture.DONE;
 	}

@@ -74,7 +74,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 		getLogger().addHandler(handler);
 		getLogger().setUseParentHandlers(false);
 
-		addService(IProcessWorkpieceService.class, new ProcessWorkpieceService(this, id, AgentConstants.AGENT_TYPE_TRANSPORT, getLogger()));
+		addService("ProcessWorkpieceService", IProcessWorkpieceService.class, new ProcessWorkpieceService(this, id, AgentConstants.AGENT_TYPE_TRANSPORT, getLogger()));
 		
 		getLogger().info(id + " created");
 

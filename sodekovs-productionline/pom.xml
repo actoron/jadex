@@ -175,15 +175,7 @@
 			<version>2.0-rc7</version>
 			<type>jar</type>
 			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-application-opengl</artifactId>
-			<version>2.0-rc7</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
+		</dependency><dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-gpmn</artifactId>
 			<version>2.0-rc7</version>
