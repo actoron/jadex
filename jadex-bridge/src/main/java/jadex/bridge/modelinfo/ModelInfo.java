@@ -397,7 +397,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	 */
 	public void setImports(String[] imports)
 	{
-		this.imports = SUtil.arrayToList(imports);
+		this.imports = imports!=null ? SUtil.arrayToList(imports) : null;
 	}
 
 	/**

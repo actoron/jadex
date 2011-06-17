@@ -16,6 +16,7 @@ import jadex.bdi.model.editable.IMEEventbase;
 import jadex.bdi.model.editable.IMEExpressionbase;
 import jadex.bdi.model.editable.IMEGoalbase;
 import jadex.bdi.model.editable.IMEPlanbase;
+import jadex.bridge.modelinfo.ModelInfo;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -26,6 +27,12 @@ import java.util.Iterator;
  */
 public class MCapabilityFlyweight extends MElementFlyweight implements IMCapability, IMECapability
 {
+	//-------- attributes --------
+	
+	/** The model info. */
+	// Only for dynamically created models (hack!!!)
+	protected ModelInfo	info;
+	
 	//-------- constructors --------
 	
 	/**
@@ -34,6 +41,15 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	public MCapabilityFlyweight(IOAVState state, Object scope)
 	{
 		super(state, scope, scope);
+	}
+	
+	/**
+	 *  Create a new element flyweight.
+	 */
+	public MCapabilityFlyweight(IOAVState state, Object scope, ModelInfo info)
+	{
+		this(state, scope);
+		this.info	= info;
 	}
 	
 	//-------- methods --------
@@ -643,5 +659,14 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_configurations, conf);
 			return new MConfigurationFlyweight(getState(), getHandle(), conf);
 		}
+	}
+	
+	
+	/**
+	 *  Get the model info for editing component level settings.
+	 */
+	public ModelInfo	getModelInfo()
+	{
+		return getInterpreter()!=null ? (ModelInfo)getInterpreter().getModel(getHandle()) : info;
 	}
 }

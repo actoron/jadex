@@ -1,6 +1,7 @@
 package jadex.bdi.model.editable;
 
 import jadex.bdi.model.IMCapability;
+import jadex.bridge.modelinfo.ModelInfo;
 
 /**
  *  Interface for editable version of capability.
@@ -83,4 +84,9 @@ public interface IMECapability extends IMCapability, IMEElement
 	 *  @return The configuration.
 	 */
 	public IMEConfiguration createConfiguration(String name);
+	
+	/**
+	 *  Get the model info for editing component level settings.
+	 */
+	public ModelInfo	getModelInfo();
 }

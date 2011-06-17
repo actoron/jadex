@@ -1,15 +1,16 @@
 package jadex.bdi.examples.helloworld;
 
+import jadex.base.SComponentFactory;
 import jadex.base.Starter;
-import jadex.bdi.BDIAgentFactory;
+import jadex.bdi.IDynamicBDIFactory;
 import jadex.bdi.model.editable.IMEBelief;
 import jadex.bdi.model.editable.IMECapability;
 import jadex.bdi.model.editable.IMEConfiguration;
 import jadex.bdi.model.editable.IMEPlan;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.commons.future.DefaultResultListener;
 
 /**
@@ -29,36 +30,44 @@ public class HelloWorldAgentCreator
 			public void resultAvailable(Object result)
 			{
 				final IExternalAccess plat = (IExternalAccess)result;
-				SServiceProvider.getService(plat.getServiceProvider(), new ComponentFactorySelector(BDIAgentFactory.FILETYPE_BDIAGENT))
-					.addResultListener(new DefaultResultListener()
+				
+				// Load dummy model to force loading of bdi kernel.
+				SComponentFactory.isLoadable(plat, "Dummy.agent.xml").addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
-						BDIAgentFactory fac = (BDIAgentFactory)result;
-						
-						IMECapability agent = fac.createAgentModel("HelloWorld"); //, "jadex.bdi.examples.helloworld", null);
-						
-						IMEBelief	msgbelief	= agent.createBeliefbase().createBelief("msg");
-						msgbelief.createFact("\"Welcome to editable models!\"", null);
-						
-						IMEPlan helloplan = agent.createPlanbase().createPlan("hello");
-						helloplan.createBody("HelloWorldPlan", null);
-						IMEConfiguration conf = agent.createConfiguration("default");
-						conf.createInitialPlan("hello");
-						
-						fac.registerAgentModel(agent, "helloagent.agent.xml");
-						
-						SServiceProvider.getServiceUpwards(plat.getServiceProvider(), IComponentManagementService.class)
+						SServiceProvider.getService(plat.getServiceProvider(), IDynamicBDIFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
-								IComponentManagementService cms = (IComponentManagementService)result;
-								cms.createComponent("hw1", "helloagent.agent.xml", null, new DefaultResultListener()
+								IDynamicBDIFactory fac = (IDynamicBDIFactory)result;
+								
+								IMECapability agent = fac.createAgentModel("HelloWorld", "jadex.bdi.examples.helloworld", null);
+								
+								IMEBelief	msgbelief	= agent.createBeliefbase().createBelief("msg");
+								msgbelief.createFact("\"Welcome to editable models!\"", null);
+								
+								IMEPlan helloplan = agent.createPlanbase().createPlan("hello");
+								helloplan.createBody("HelloWorldPlan", null);
+								IMEConfiguration conf = agent.createConfiguration("default");
+								conf.createInitialPlan("hello");
+								
+								fac.registerAgentModel(agent, "helloagent.agent.xml");
+								
+								SServiceProvider.getServiceUpwards(plat.getServiceProvider(), IComponentManagementService.class)
+									.addResultListener(new DefaultResultListener()
 								{
 									public void resultAvailable(Object result)
 									{
-										System.out.println("finished.");
+										IComponentManagementService cms = (IComponentManagementService)result;
+										cms.createComponent("hw1", "helloagent.agent.xml", null, new DefaultResultListener()
+										{
+											public void resultAvailable(Object result)
+											{
+												System.out.println("finished.");
+											}
+										});
 									}
 								});
 							}

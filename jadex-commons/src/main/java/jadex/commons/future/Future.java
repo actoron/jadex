@@ -126,8 +126,11 @@ public class Future implements IFuture
     			if(CALLER_QUEUED.equals(state))
     			{
     	    	   	callers.put(caller, CALLER_SUSPENDED);
-//    				System.out.println(this+" caller suspending: "+caller+" "+mon);
-    				caller.suspend(timeout);
+//    	    	   	if(caller.toString().indexOf("ExtinguishFirePlan")!=-1)
+//    	    	   		System.out.println("caller suspending: "+caller+", "+this);
+    				caller.suspend(this, timeout);
+//    	    	   	if(caller.toString().indexOf("ExtinguishFirePlan")!=-1)
+//    	    	   		System.out.println("caller resumed: "+caller+", "+this);
     		    	if(exception!=null)
     		    	{
     		    		// Nest exception to have both calling and manually set exception stack trace.
@@ -268,14 +271,15 @@ public class Future implements IFuture
 		    	{
 		    		ISuspendable caller = (ISuspendable)it.next();
 		    		Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
-		//    		System.out.println(this+" resume: "+caller+" "+mon);
 		    		synchronized(mon)
 					{
 		    			Object	state	= callers.get(caller);
 		    			if(CALLER_SUSPENDED.equals(state))
 		    			{
 		    				// Only reactivate thread when previously suspended.
-		    				caller.resume();
+//		    			   	if(caller.toString().indexOf("ExtinguishFirePlan")!=-1)
+//		    			   		System.out.println("resume caller: "+caller+", "+this);
+		    				caller.resume(this);
 		    			}
 		    			callers.put(caller, CALLER_RESUMED);
 					}

@@ -8,6 +8,7 @@ import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISuspendable;
 
@@ -529,12 +530,13 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	/** Property change listener handling support. */
 //    private PropertyChangeSupport pcs	= new PropertyChangeSupport(this);
     protected SyncResultListener lis;
+    protected IFuture future;
     
 	/**
 	 *  Suspend the execution of the plan.
 	 *  @param timeout The timeout.
 	 */
-	public void suspend(long timeout)
+	public void suspend(IFuture future, long timeout)
 	{
 		if(lis==null)
 		{
@@ -544,18 +546,51 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 		if(!getInterpreter().isPlanThread())
 			throw new RuntimeException("SyncResultListener may only be used from plan thread.");
 		
-		waitForExternalCondition(lis, timeout);	// Don't use waitForResult(), because of exception being thrown.
-		lis.reset();
+		if(this.future!=null)
+			throw new RuntimeException("Already suspended");
+		
+		this.future	= future;
+		
+//	   	if(toString().indexOf("ExtinguishFirePlan")!=-1)
+//	   		System.out.println("suspend "+this+", "+lis+", "+Thread.currentThread());
+	   	try
+	   	{
+	   		waitForExternalCondition(lis, timeout);	// Don't use waitForResult(), because of exception being thrown.
+	   	}
+//	   	catch(Throwable t)
+//	   	{
+//		   	if(toString().indexOf("ExtinguishFirePlan")!=-1)
+//		   	{
+//		   		System.out.println("resumed with error "+this+", "+lis);
+//		   		t.printStackTrace();
+//		   	}
+//	   		if(t instanceof Error)
+//	   			throw (Error)t;
+//	   		else
+//	   			throw (RuntimeException)t;
+//	   	}
+	   	finally
+	   	{
+			this.future	= null;
+			lis.reset();
+//		   	if(toString().indexOf("ExtinguishFirePlan")!=-1)
+//		   		System.out.println("resumed "+this+", "+lis);	   		
+	   	}
 	}
 	
 	/**
 	 *  Resume the execution of the plan.
 	 */
-	public void resume()
+	public void resume(IFuture future)
 	{
-//		System.out.println(this+"resume");
-		lis.resultAvailable(null);
-//	   	pcs.firePropertyChange("true", Boolean.FALSE, Boolean.TRUE);
+		// Only wake up if still waiting for same futur
+		// (invalid resume might be called from outdated future after timeout already occurred or body aborted).
+		if(this.future==future)
+		{
+//		   	if(toString().indexOf("ExtinguishFirePlan")!=-1)
+//				System.out.println("resume "+this+", "+lis);
+			lis.resultAvailable(null);
+		}
 	}
 	
 	/**
@@ -626,7 +661,8 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 		 */
 		public void resultAvailable(Object result)
 		{
-//			System.out.println("resultAvailable: "+this+", "+result);
+//		   	if(Plan.this.toString().indexOf("ExtinguishFirePlan")!=-1)
+//		   		System.out.println("resultAvailable: "+Plan.this+", "+this+", "+result);
 			SyncResultListener.this.result = result;
 			SyncResultListener.this.alreadyresumed = true;
 			pcs.firePropertyChange("true", Boolean.FALSE, Boolean.TRUE);
@@ -638,7 +674,8 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 		 */
 		public void exceptionOccurred(Exception exception)
 		{
-//			System.out.println("exeception: "+this+", "+exception);
+//		   	if(Plan.this.toString().indexOf("ExtinguishFirePlan")!=-1)
+//		   		System.out.println("exeception: "+Plan.this+", "+this+", "+exception);
 //			exception.printStackTrace();
 			SyncResultListener.this.exception = exception;
 			SyncResultListener.this.alreadyresumed = true;
@@ -690,7 +727,8 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 		 */
 		protected void reset()
 		{
-//			System.out.println("resetting: "+this+", "+exception);
+//		   	if(Plan.this.toString().indexOf("ExtinguishFirePlan")!=-1)
+//		   		System.out.println("resetting: "+Plan.this+", "+this+", "+exception);
 			alreadysuspended	= false;
 			alreadyresumed	= false;
 			exception	= null;

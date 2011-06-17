@@ -74,6 +74,7 @@ public class ExtinguishFireService implements IExtinguishFireService
 	 */
 	public IFuture abort()
 	{
+//		System.out.println("Aborting force: "+agent.getAgentName());
 		final Future ret = new Future();
 		
 		IGoal[] goals = (IGoal[])agent.getGoalbase().getGoals("extinguish_fire");
@@ -84,6 +85,7 @@ public class ExtinguishFireService implements IExtinguishFireService
 		}
 		ret.setResult(null);
 		
+//		System.out.println("Aborted force: "+agent.getAgentName());
 		return ret;
 	}
 

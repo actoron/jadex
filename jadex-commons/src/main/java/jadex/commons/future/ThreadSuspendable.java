@@ -11,6 +11,9 @@ public class ThreadSuspendable implements ISuspendable
 	/** The monitor. */
 	protected Object monitor;
 	
+	/** The future. */
+	protected IFuture	future;
+	
 	//-------- constructors --------
 	
 	/**
@@ -35,10 +38,11 @@ public class ThreadSuspendable implements ISuspendable
 	 *  Suspend the execution of the suspendable.
 	 *  @param timeout The timeout.
 	 */
-	public void suspend(long timeout)
+	public void suspend(IFuture future, long timeout)
 	{
 		synchronized(monitor)
 		{
+			this.future	= future;
 			try
 			{
 				if(timeout>0)
@@ -54,18 +58,26 @@ public class ThreadSuspendable implements ISuspendable
 			{
 				e.printStackTrace();
 				throw new RuntimeException(e);
-			}	
+			}
+			finally
+			{
+				this.future	= null;
+			}
 		}
 	}
 	
 	/**
 	 *  Resume the execution of the suspendable.
 	 */
-	public void resume()
+	public void resume(IFuture future)
 	{
 		synchronized(monitor)
 		{
-			monitor.notify();	
+			// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
+			if(future==this.future)
+			{
+				monitor.notify();
+			}
 		}
 	}
 	

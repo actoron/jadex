@@ -304,7 +304,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		for(Iterator it=services.keySet().iterator(); it.hasNext() && ret==null; )
 		{
 			Collection sers = (Collection)services.get(it.next());
-			for(Iterator it2=sers.iterator(); it.hasNext() && ret==null; )
+			for(Iterator it2=sers.iterator(); it2.hasNext() && ret==null; )
 			{
 				IService ser = (IService)it2.next();
 				if(ser.getServiceIdentifier().getServiceName().equals(name))

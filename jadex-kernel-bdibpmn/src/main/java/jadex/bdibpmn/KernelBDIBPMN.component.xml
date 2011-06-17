@@ -27,8 +27,8 @@
 	</properties>
 	
 	<services>
-		<providedservice class="IComponentFactory">
-			<implementation proxytype="raw">
+		<providedservice name="component_factory" class="IComponentFactory">
+			<implementation proxytype="direct">
 				new BDIAgentFactory(
 					SUtil.createHashMap(
 					new String[]
@@ -46,7 +46,12 @@
 						"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
 						//"jadex.tools.debugger.bdi.BDIViewerDebuggerPanel"
 					}
-				), $component.getServiceProvider())
+				))
+			</implementation>
+		</providedservice>
+		<providedservice class="IDynamicBDIFactory">
+			<implementation>
+				$component.getRawService("component_factory")
 			</implementation>
 		</providedservice>
 	</services>

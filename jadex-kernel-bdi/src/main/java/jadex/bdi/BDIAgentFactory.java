@@ -11,16 +11,18 @@ import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
-import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceShutdown;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
-import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
@@ -43,7 +45,7 @@ import javax.swing.UIDefaults;
 /**
  *  Factory for creating Jadex V2 BDI agents.
  */
-public class BDIAgentFactory extends BasicService implements IComponentFactory
+public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 {
 	//-------- constants --------
 	
@@ -71,7 +73,8 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	protected OAVBDIModelLoader loader;
 	
 	/** The provider. */
-	protected IServiceProvider provider;
+	@ServiceComponent
+	protected IInternalAccess component;
 		
 	/** The types of a manually edited agent model. */
 	protected Map mtypes;
@@ -79,28 +82,28 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	/** The library service listener */
 	protected ILibraryServiceListener libservicelistener;
 	
+	/** The library service */
+	protected ILibraryService libservice;
+	
 	//-------- constructors --------
 	
 	/**
-	 *  Create a stand alone agent factory for checking.
+	 *  Create a new agent factory.
 	 */
-	public BDIAgentFactory(String id)
+	// Constructor used by GPMN factory.
+	public BDIAgentFactory(Map props, IInternalAccess component)
 	{
-		super(id, IComponentFactory.class, null);
-		this.loader	= new OAVBDIModelLoader();
-		this.mtypes	= Collections.synchronizedMap(new WeakHashMap());
+		this(props);
+		this.component	= component;
 	}
-		
+	
 	/**
 	 *  Create a new agent factory.
 	 */
-	public BDIAgentFactory(Map props, IServiceProvider provider)
+	public BDIAgentFactory(Map props)
 	{
-		super(provider.getId(), IComponentFactory.class, null);
-
 		this.props = props;
 		this.loader	= new OAVBDIModelLoader();
-		this.provider = provider;
 		this.mtypes	= Collections.synchronizedMap(new WeakHashMap());
 		this.libservicelistener = new ILibraryServiceListener()
 		{
@@ -116,46 +119,47 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 				return IFuture.DONE;
 			}
 		};
-		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				if(result!=null)
-				{
-					ILibraryService libService = (ILibraryService) result;
-					libService.addLibraryServiceListener(libservicelistener);
-				}
-//				else
-//				{
-//					System.err.println("Warning: No library service found. Cannot clear BDI mode cache.");
-//				}
-			}
-		});
 	}
 	
 	/**
 	 *  Start the service.
-	 * /
+	 */
+	@ServiceStart
 	public synchronized IFuture	startService()
 	{
-		return super.startService();
-	}*/
+		Future	fut	= new Future();
+		SServiceProvider.getService(component.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(component.createResultListener(new DelegationResultListener(fut)
+		{
+			public void customResultAvailable(Object result)
+			{
+				libservice = (ILibraryService) result;
+				libservice.addLibraryServiceListener(libservicelistener);
+				super.customResultAvailable(null);
+			}
+		}));
+		return fut;
+	}
 	
 	/**
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
+	@ServiceShutdown
 	public synchronized IFuture	shutdownService()
 	{
-		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		Future	fut	= new Future();
+		SServiceProvider.getService(component.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(component.createResultListener(new DelegationResultListener(fut)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
 				ILibraryService libService = (ILibraryService) result;
 				libService.removeLibraryServiceListener(libservicelistener);
+				super.customResultAvailable(null);
 			}
-		});
-		return super.shutdownService();
+		}));
+		return fut;
 	}
 	
 	//-------- IAgentFactory interface --------
@@ -325,9 +329,9 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	 *  starting.
 	 *  @param name	A type name for the agent model.
 	 */
-	public IMECapability	createAgentModel(String name)
+	public IMECapability	createAgentModel(String name, String pkg, String[] imports)
 	{
-		OAVTypeModel	typemodel	= new OAVTypeModel(name+"_typemodel", null); // todo: classloader???
+		OAVTypeModel	typemodel	= new OAVTypeModel(name+"_typemodel", libservice.getClassLoader());
 		// Requires runtime meta model, because e.g. user conditions can refer to runtime elements (belief, goal, etc.) 
 		typemodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
 		IOAVState	state	= OAVStateFactory.createOAVState(typemodel);
@@ -364,8 +368,13 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 //		}
 		
 		mtypes.put(handle, new Object[]{types, listener});
+		
+		ModelInfo	info	= new ModelInfo();
+		info.setName(name);
+		info.setPackage(pkg);
+		info.setImports(imports);
 
-		return new MCapabilityFlyweight(state, handle);		
+		return new MCapabilityFlyweight(state, handle, info);
 	}
 	
 	/**
@@ -389,11 +398,11 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 //		Report	report	= new Report();
 		if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
 		{
-			ret	=  new OAVAgentModel(state, handle, new ModelInfo(), (Set)(types!=null ? types[0] : null), System.currentTimeMillis(), null);
+			ret	=  new OAVAgentModel(state, handle, fw.getModelInfo(), (Set)(types!=null ? types[0] : null), System.currentTimeMillis(), null);
 		}
 		else
 		{
-			ret	=  new OAVCapabilityModel(state, handle, new ModelInfo(), (Set)(types!=null ? types[0] : null), System.currentTimeMillis(), null);
+			ret	=  new OAVCapabilityModel(state, handle, fw.getModelInfo(), (Set)(types!=null ? types[0] : null), System.currentTimeMillis(), null);
 		}
 		
 		try
@@ -408,6 +417,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 				throw new RuntimeException(e);
 		}
 		
+		((ModelInfo)ret.getModelInfo()).setFilename(filename);
 		loader.registerModel(filename, ret);
 		
 		return ret.getModelInfo();

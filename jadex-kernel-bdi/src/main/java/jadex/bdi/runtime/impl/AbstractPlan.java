@@ -390,9 +390,9 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	{
 		StringBuffer buf = new StringBuffer();
 		buf.append(SReflect.getInnerClassName(this.getClass()));
-//		buf.append("(name=");
-//		buf.append(getName());
-//		buf.append(")");
+		buf.append("(");
+		buf.append(rplan);
+		buf.append(")");
 		return buf.toString();
 	}
 

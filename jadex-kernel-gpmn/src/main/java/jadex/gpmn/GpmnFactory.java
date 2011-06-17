@@ -94,7 +94,8 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 				bdiprops.put("planexecutor_standard", new JavaStandardPlanExecutor(tps));
 				bdiprops.put("microplansteps", Boolean.TRUE);
 				bdiprops.put("planexecutor_bpmn", new BpmnPlanExecutor());
-				factory = new BDIAgentFactory(bdiprops, ia.getServiceContainer());
+				factory = new BDIAgentFactory(bdiprops, ia);
+				factory.startService();
 				sfuture.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 			}
 		}));
