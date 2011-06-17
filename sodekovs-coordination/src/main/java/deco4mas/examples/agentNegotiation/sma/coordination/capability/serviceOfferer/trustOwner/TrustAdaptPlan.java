@@ -42,10 +42,10 @@ public class TrustAdaptPlan extends Plan
 			((HistorytimeTrustFunction) getBeliefbase().getBelief("trustFunction").getFact()).logTrust(getTime());
 			
 			//Hack for this special Negotation.application.xml
-			AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace("mycoordspace"));
+			AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) getScope().getParent().getExtension("mycoordspace"));
 			HistorytimeTrustFunction trustFunction = (HistorytimeTrustFunction) getBeliefbase().getBelief("trustFunction").getFact();
 			Iterator<String> it = trustFunction.getHistory().getSas().iterator();
-			IClockService clock = (IClockService)SServiceProvider.getServiceUpwards(space.getContext().getServiceContainer(), IClockService.class).get(this);
+			IClockService clock = (IClockService)SServiceProvider.getServiceUpwards(space.getExternalAccess().getServiceProvider(), IClockService.class).get(this);
 			while (it.hasNext()) {				
 				String saId = it.next();
 				double trust = trustFunction.getTrust(saId, clock.getTime());				

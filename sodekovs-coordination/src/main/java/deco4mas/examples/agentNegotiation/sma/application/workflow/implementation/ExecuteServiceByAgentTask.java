@@ -69,4 +69,10 @@ public class ExecuteServiceByAgentTask implements ITask {
 		cms.createComponent(name, model, new CreationInfo(null, args, instance.getComponentIdentifier()), lis);
 		return fut;
 	}
+
+	@Override
+	public IFuture compensate(BpmnInterpreter instance) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

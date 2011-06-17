@@ -28,7 +28,7 @@ public class TestPlan3 extends Plan {
 		
 		
 		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class).get(this);
-		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace("mycoordspace");		
-		ces.destroyComponent(space.getContext().getComponentIdentifier()).get(this);
+		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) getScope().getParent().getExtension("mycoordspace");
+		ces.destroyComponent(space.getExternalAccess().getComponentIdentifier());
 	}
 }

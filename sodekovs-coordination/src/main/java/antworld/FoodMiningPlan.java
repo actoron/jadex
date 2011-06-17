@@ -1,14 +1,14 @@
 package antworld;
 
 
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceAction;
-import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.application.space.envsupport.environment.space2d.Space2D;
-import jadex.application.space.envsupport.math.IVector2;
-import jadex.application.space.envsupport.math.Vector2Int;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceAction;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.Space2D;
+import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.Vector2Int;
 
 import java.security.SecureRandom;
 import java.util.HashMap;

@@ -1,13 +1,13 @@
 package antworld;
 
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceProcess;
-import jadex.application.space.envsupport.environment.space2d.Grid2D;
-import jadex.application.space.envsupport.environment.space2d.Space2D;
-import jadex.application.space.envsupport.math.IVector2;
-import jadex.application.space.envsupport.math.Vector2Int;
-import jadex.commons.SimplePropertyObject;
 import jadex.bridge.service.clock.IClockService;
+import jadex.commons.SimplePropertyObject;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceProcess;
+import jadex.extension.envsupport.environment.space2d.Grid2D;
+import jadex.extension.envsupport.environment.space2d.Space2D;
+import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.Vector2Int;
 
 import java.util.ArrayList;
 import java.util.HashMap;

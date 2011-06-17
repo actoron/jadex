@@ -3,10 +3,12 @@ package deco4mas.coordinate.interpreter.agent_state;
 import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IChangeListener;
 import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.ExternalAccess;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
@@ -181,13 +183,23 @@ public class MicroBehaviourObservationComponent extends BehaviorObservationCompo
 	 * @param ma
 	 */
 	private void publishEvent(Object value, HashMap<String, Object> parameterDataMappings, String agentElementName, AgentElementType agentElementType, String dmlRealizationName, MicroAgent ma) {
-		CoordinationInfo coordInfo = createCoordinationInfo(value, parameterDataMappings, agentElementName, agentElementType, dmlRealizationName);
+		final CoordinationInfo coordInfo = createCoordinationInfo(value, parameterDataMappings, agentElementName, agentElementType, dmlRealizationName);
 		coordInfo.addValue(CoordinationSpaceObject.AGENT_ARCHITECTURE, "Micro");
 
-		IApplicationExternalAccess app = (IApplicationExternalAccess) ma.getParent();
+		IExternalAccess parent = ma.getParent();
 		for (String spaceName : spaces) {
-			CoordinationSpace space = (CoordinationSpace) app.getSpace(spaceName);
-			eventPublication.publishEvent(coordInfo, space);
+			parent.getExtension(spaceName).addResultListener(new IResultListener() {
+				
+				@Override
+				public void resultAvailable(Object result) {
+					CoordinationSpace space = (CoordinationSpace) result;
+					eventPublication.publishEvent(coordInfo, space);
+				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception) {
+				}
+			});
 		}
 	}
 }

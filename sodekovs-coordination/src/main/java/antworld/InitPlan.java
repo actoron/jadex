@@ -1,8 +1,8 @@
 package antworld;
 
-import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.bdi.runtime.Plan;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.Space2D;
 
 /**
  *  Init the ant agent. Should an ant know its nest on start-up?

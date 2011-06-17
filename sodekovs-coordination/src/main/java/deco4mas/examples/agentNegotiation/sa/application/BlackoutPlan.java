@@ -68,7 +68,7 @@ public class BlackoutPlan extends Plan
 				//*************************************************************
 				// This is a hack for this special application.xml -> AgentNegotiation
 				//: save result also to space in order to enable evaluation by automated simulation component
-				AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace("mycoordspace"));
+				AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) getScope().getParent().getExtension("mycoordspace"));
 				//substring: geht the "right" part of the id -> only the type: billig, normal, teuer
 				String timeConstant = "BlackoutTIME";
 				String numberConstant = "BlackoutNUMBER";

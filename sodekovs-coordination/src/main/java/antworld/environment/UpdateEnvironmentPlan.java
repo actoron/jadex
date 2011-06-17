@@ -1,10 +1,8 @@
 package antworld.environment;
 
-import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.application.space.envsupport.environment.space2d.Space2D;
-import jadex.base.service.simulation.ISimulationService;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.service.IServiceContainer;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.Space2D;
 
 import java.awt.Color;
 import java.awt.GridLayout;

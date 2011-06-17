@@ -96,14 +96,14 @@ public class DefaultCoordinationEventGenerator extends SimplePropertyObject impl
 				IComponentDescription owner = (IComponentDescription) objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 				IVector2 objpos = (IVector2) objects[i].getProperty(Space2D.PROPERTY_POSITION);
 				if (owner != null) {
-					String percepttype = getPerceptType(space, owner.getType(), event.getSpaceObject().getType(), COORDINATE_INFO);
+					String percepttype = getPerceptType(space, owner.getLocalType(), event.getSpaceObject().getType(), COORDINATE_INFO);
 					if (percepttype != null) {
 						((AbstractEnvironmentSpace) event.getSpace()).createPercept(percepttype, event.getSpaceObject(), owner, objects[i]);
 					}
 				}
 
 				if (eventowner != null) {
-					String percepttype = getPerceptType(space, eventowner.getType(), objects[i].getType(), COORDINATE_INFO);
+					String percepttype = getPerceptType(space, eventowner.getLocalType(), objects[i].getType(), COORDINATE_INFO);
 					if (percepttype != null) {
 						((AbstractEnvironmentSpace) event.getSpace()).createPercept(percepttype, objects[i], eventowner, event.getSpaceObject());
 					}
@@ -114,7 +114,7 @@ public class DefaultCoordinationEventGenerator extends SimplePropertyObject impl
 
 			if (receiver != null) {
 				for (IComponentDescription receiverIdentifier : receiver) {
-					String percepttype = getPerceptType(space, receiverIdentifier.getType(), event.getSpaceObject().getType(), COORDINATE_INFO);
+					String percepttype = getPerceptType(space, receiverIdentifier.getLocalType(), event.getSpaceObject().getType(), COORDINATE_INFO);
 					if (percepttype != null) {
 						space.createPercept(percepttype, event.getSpaceObject(), receiverIdentifier, space.getAvatar(receiverIdentifier));
 					}

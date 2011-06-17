@@ -147,7 +147,7 @@ public class InitBDIAgentForCoordination {
 				+ numberOfPerceivePercepts + " PerceivePercepts");
 
 		// agentData.put(getAgentType(ai, this.getContext()), res);
-		((CoordinationSpace) space).getAgentData().put(ai.getType(), behObserver.getRoleDefinitionsForPerceive());
+		((CoordinationSpace) space).getAgentData().put(ai.getLocalType(), behObserver.getRoleDefinitionsForPerceive());
 		// return behObserver.getRoleDefinitionsForPerceive();
 		// getBeliefbase().getBelief(Constants.DECO4MAS_BELIEF_NAME).setFact(decom4MasMap);
 	}
@@ -245,7 +245,7 @@ public class InitBDIAgentForCoordination {
 			try {
 				Map props = new HashMap();
 				props.put(ISpaceObject.PROPERTY_OWNER, ai);
-				space.createSpaceObject(ai.getType(), props, null);
+				space.createSpaceObject(ai.getLocalType(), props, null);
 			} catch (RuntimeException e) {
 				if (e.getMessage().contains("Unknown space object type")) {
 					exeption = true;
@@ -269,7 +269,7 @@ public class InitBDIAgentForCoordination {
 			@Override
 			public Object execute(IInternalAccess ia) {
 				behObserver = new BDIBehaviorObservationComponent(exta, masDyn);
-				agentType = ai.getType();
+				agentType = ai.getLocalType();
 				initPublishAndPercept();
 				return null;
 			}

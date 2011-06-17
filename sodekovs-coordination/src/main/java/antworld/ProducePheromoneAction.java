@@ -1,13 +1,14 @@
 package antworld;
 
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceAction;
-import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.application.space.envsupport.environment.space2d.Grid2D;
-import jadex.application.space.envsupport.environment.space2d.Space2D;
-import jadex.application.space.envsupport.math.IVector2;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SimplePropertyObject;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceAction;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.Grid2D;
+import jadex.extension.envsupport.environment.space2d.Space2D;
+import jadex.extension.envsupport.math.IVector2;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -43,7 +44,7 @@ public class ProducePheromoneAction extends SimplePropertyObject implements ISpa
 		
 		IVector2 position = (IVector2) parameters.get(POSITION);
 //		Object ownerAgentId = (Object) parameters.get(ISpaceAction.OBJECT_ID);
-		IComponentIdentifier owner = (IComponentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
+		IComponentDescription owner = (IComponentDescription)parameters.get(ISpaceAction.ACTOR_ID);
 		ISpaceObject so = grid.getAvatar(owner);
 		Integer strength = (Integer) parameters.get(STRENGTH);
 	

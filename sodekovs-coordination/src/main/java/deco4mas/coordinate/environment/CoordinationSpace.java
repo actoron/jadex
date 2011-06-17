@@ -2,7 +2,6 @@ package deco4mas.coordinate.environment;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.SServiceProvider;

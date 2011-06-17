@@ -82,7 +82,7 @@ public class InitMicroAgentForCoordination {
 			try {
 				Map<String, IComponentDescription> props = new HashMap<String, IComponentDescription>();
 				props.put(ISpaceObject.PROPERTY_OWNER, ai);
-				space.createSpaceObject(ai.getType(), props, null);
+				space.createSpaceObject(ai.getLocalType(), props, null);
 			} catch (RuntimeException e) {
 				if (e.getMessage().contains("Unknown space object type")) {
 					exeption = true;
@@ -105,7 +105,7 @@ public class InitMicroAgentForCoordination {
 			public Object execute(IInternalAccess ia) {
 				ArrayList<String> spaces = getSpaces();
 				behaviourObserver = new MicroBehaviourObservationComponent(extAccess, masDyn, spaces);
-				agentType = ai.getType();
+				agentType = ai.getLocalType();
 				initPublishAndPercept();
 				return null;
 			}
@@ -190,7 +190,7 @@ public class InitMicroAgentForCoordination {
 		System.out.println("#InitMicroAgentCoordinationPlan-" + extAccess.getComponentIdentifier().getName() + "# Completed initialization: " + numberOfPublishPercepts + " PublishPercepts and "
 				+ numberOfPerceivePercepts + " PerceivePercepts");
 
-		((CoordinationSpace) space).getAgentData().put(ai.getType(), behaviourObserver.getRoleDefinitionsForPerceive());
+		((CoordinationSpace) space).getAgentData().put(ai.getLocalType(), behaviourObserver.getRoleDefinitionsForPerceive());
 	}
 
 	/**

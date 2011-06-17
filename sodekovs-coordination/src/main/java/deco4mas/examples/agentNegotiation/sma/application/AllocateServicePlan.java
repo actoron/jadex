@@ -82,7 +82,7 @@ public class AllocateServicePlan extends Plan
 						//*************************************************************
 						// This is a hack for this special application.xml -> AgentNegotiation
 						//: save result also to space in order to enable evaluation by automated simulation component
-						AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace("mycoordspace"));
+						AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) getScope().getParent().getExtension("mycoordspace"));
 						//substring: geht the "right" part of the id -> only the type: billig, normal, teuer
 						String keyOfSA = currentSa.getLocalName().substring(currentSa.getLocalName().indexOf("(")+1, currentSa.getLocalName().lastIndexOf(")"));
 						keyOfSA = keyOfSA.replace("-", "");						
@@ -129,7 +129,7 @@ public class AllocateServicePlan extends Plan
 					//*************************************************************
 					// This is a hack for this special application.xml -> AgentNegotiation
 					//: save result also to space in order to enable evaluation by automated simulation component
-					AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace("mycoordspace"));
+					AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) getScope().getParent().getExtension("mycoordspace"));
 					//substring: geht the "right" part of the id -> only the type: billig, normal, teuer
 					String keyOfSA = currentSa.getLocalName().substring(currentSa.getLocalName().indexOf("(")+1, currentSa.getLocalName().lastIndexOf(")"));
 					keyOfSA = keyOfSA.replace("-", "");						

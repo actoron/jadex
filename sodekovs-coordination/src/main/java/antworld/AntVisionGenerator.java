@@ -1,5 +1,6 @@
 package antworld;
 
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SimplePropertyObject;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
@@ -44,9 +45,9 @@ public class AntVisionGenerator extends SimplePropertyObject implements IPercept
 	 * @param space
 	 *            The space.
 	 */
-	public void agentAdded(IComponentIdentifier agent, IEnvironmentSpace space) {
+	public void agentAdded(IComponentDescription agent, IEnvironmentSpace space) {
 		// Only add agents of type "Ant"
-		if ("Ant".equals((space.getContext()).getComponentType(agent))) {
+		if ("Ant".equals(agent.getType())) {
 			if (agents == null)
 				agents = new ArrayList();
 			agents.add(agent);
@@ -61,7 +62,7 @@ public class AntVisionGenerator extends SimplePropertyObject implements IPercept
 	 * @param space
 	 *            The space.
 	 */
-	public void agentRemoved(IComponentIdentifier agent, IEnvironmentSpace space) {
+	public void agentRemoved(IComponentDescription agent, IEnvironmentSpace space) {
 		agents.remove(agent);
 		if (agents.size() == 0)
 			agents = null;
@@ -92,7 +93,7 @@ public class AntVisionGenerator extends SimplePropertyObject implements IPercept
 		// event.getSpaceObject().getType());
 		if (agents != null && "ant".equals(event.getSpaceObject().getType())) {
 			for (int i = 0; i < agents.size(); i++) {
-				IComponentIdentifier agent = (IComponentIdentifier) agents.get(i);				
+				IComponentDescription agent = (IComponentDescription) agents.get(i);				
 				if(EnvironmentEvent.OBJECT_PROPERTY_CHANGED.equals(event.getType()) && Space2D.PROPERTY_POSITION.equals(event.getProperty())) {
 					IVector2 pos = (IVector2) event.getSpaceObject().getProperty(Space2D.PROPERTY_POSITION);
 					// IVector2 oldpos = (IVector2) event.getInfo();
@@ -151,14 +152,14 @@ public class AntVisionGenerator extends SimplePropertyObject implements IPercept
 	}
 
 	@Override
-	public void componentAdded(IComponentIdentifier component,
+	public void componentAdded(IComponentDescription component,
 			IEnvironmentSpace space) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void componentRemoved(IComponentIdentifier component,
+	public void componentRemoved(IComponentDescription component,
 			IEnvironmentSpace space) {
 		// TODO Auto-generated method stub
 		

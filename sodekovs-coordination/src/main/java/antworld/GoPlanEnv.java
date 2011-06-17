@@ -1,12 +1,11 @@
 package antworld;
 
-import jadex.application.space.envsupport.environment.ISpaceAction;
-import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.application.space.envsupport.environment.space2d.Space2D;
-import jadex.application.space.envsupport.math.IVector2;
 import jadex.bdi.examples.garbagecollector.GoAction;
 import jadex.bdi.runtime.Plan;
-import jadex.bdi.runtime.Plan.SyncResultListener;
+import jadex.extension.envsupport.environment.ISpaceAction;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.Space2D;
+import jadex.extension.envsupport.math.IVector2;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +27,7 @@ import java.util.Map;
 		//		System.out.println("#GoPlanEnv# Plan started to walk from " + myself.getProperty(Space2D.PROPERTY_POSITION) + " to " + target + " for ant: " + myself.getId());		
 		// Update destination and gravitationSensor of ant on space
 		Map params = new HashMap();
-		params.put(ISpaceAction.OBJECT_ID, env.getAvatar(getComponentIdentifier()).getId());
+		params.put(ISpaceAction.OBJECT_ID, env.getAvatar(getComponentDescription()).getId());
 		params.put(UpdateDestinationAction.DESTINATION, target);
 //		params.put(GravitationListener.FEELS_GRAVITATION, hasGravitation);
 		// params.put("owner", myself.getId());
@@ -76,7 +75,7 @@ import java.util.Map;
 			params = new HashMap();
 			params.put(GoAction.DIRECTION, dir);
 //			params.put(ISpaceAction.OBJECT_ID, env.getAvatars(getAgentIdentifier())[0].getId());
-			params.put(ISpaceAction.OBJECT_ID, env.getAvatar(getComponentIdentifier()).getId());
+			params.put(ISpaceAction.OBJECT_ID, env.getAvatar(getComponentDescription()).getId());
 			SyncResultListener srl = new SyncResultListener();
 			env.performSpaceAction("go", params, srl);
 			srl.waitForResult();

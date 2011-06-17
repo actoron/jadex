@@ -13,26 +13,24 @@
 	which results in the starting of specified steps in the receiving agent.
 -->
 
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
-	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd	                    
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
 	name="MicroTSpace" package="deco4mas.examples.micro.tspaces">	
 
 	<imports>
-		<import>jadex.application.space.envsupport.environment.space2d.*</import>
-		<import>jadex.application.space.envsupport.environment.RoundBasedExecutor</import>	
-		<import>jadex.application.space.envsupport.environment.DeltaTimeExecutor</import>	
-		<import>jadex.adapter.base.envsupport.environment.*</import>
-		<import>jadex.application.space.envsupport.math.*</import>
-		<import>jadex.service.clock.IClockService</import>
-		<import>jadex.adapter.base.envsupport.dataview.GeneralDataView2D</import>
-		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.extension.envsupport.dataview.*</import>
+		<import>jadex.extension.envsupport.observer.perspective.*</import>
 		<import>jadex.bdi.planlib.*</import>
-		<import>jadex.application.space.envsupport.dataview.*</import>
+		<import>jadex.bridge.service.*</import>
+		<import>jadex.commons.future.*</import>
 		<import>deco4mas.coordinate.interpreter.coordination_information.*</import>
 		<import>deco4mas.coordinate.environment.*</import>
 		<import>deco4mas.annotation.agent.*</import>
@@ -41,7 +39,7 @@
 	</imports>	
 
 			
-	<spacetypes>
+	<extensiontypes>
 		<env:envspacetype name="coordspace" width="11" height="11" class="CoordinationSpace">		
 			<env:property name="dynamics_configuration">"sodekovs-coordination/src/main/java/deco4mas/examples/micro/tspaces/step.dynamics.xml"</env:property>
 
@@ -50,7 +48,7 @@
 				<env:property name="tick">true</env:property>
 			</env:spaceexecutor>
 		</env:envspacetype>
-	</spacetypes>
+	</extensiontypes>
 	
 	<componenttypes>
 		<componenttype name="Sender" filename="deco4mas/examples/micro/tspaces/SenderAgent.class" />
@@ -61,9 +59,9 @@
 	<applications>
 	
 	<application name="MicroTest">
-			<spaces>	
+			<extensions>	
 				<env:envspace name="mycoordspace" type="coordspace" width="2" height ="2" />
-			</spaces>
+			</extensions>
 			<components>
 				<component type="Sender" number="1"/>
   				<component type="Receiver" number="1"/>				

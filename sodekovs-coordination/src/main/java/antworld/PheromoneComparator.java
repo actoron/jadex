@@ -1,6 +1,6 @@
 package antworld;
 
-import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.ISpaceObject;
 
 import java.util.Comparator;
 

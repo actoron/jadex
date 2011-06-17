@@ -1,11 +1,11 @@
 package antworld;
 
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.application.space.envsupport.environment.ISpaceProcess;
-import jadex.application.space.envsupport.environment.space2d.Grid2D;
-import jadex.commons.SimplePropertyObject;
 import jadex.bridge.service.clock.IClockService;
+import jadex.commons.SimplePropertyObject;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.ISpaceProcess;
+import jadex.extension.envsupport.environment.space2d.Grid2D;
 
 /**
  * Process is responsible for the life cycle of the food source objects.

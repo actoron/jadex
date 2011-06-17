@@ -53,7 +53,7 @@ public class RestartWorkflowPlan extends Plan
 			} else
 			{
 				ValueLogger.log();
-				AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace("mycoordspace"));
+				AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) getScope().getParent().getExtension("mycoordspace"));
 				System.out.println("\n\n******* WORKFLOW COMPLETLY EXECUTED *******************\n\n");
 				System.out.println("B:" + space.getSpaceObjectsByType("KIVSeval")[0].getProperty("Chassisbaubillig").toString() + "("+ space.getSpaceObjectsByType("KIVSeval")[0].getProperty("ChassisbaubilligFALSE").toString() + ")" + "; " +"N:" + space.getSpaceObjectsByType("KIVSeval")[0].getProperty("Chassisbaunormal").toString() +"("+ space.getSpaceObjectsByType("KIVSeval")[0].getProperty("ChassisbaunormalFALSE").toString() + ")" + ";" + "T:" +  space.getSpaceObjectsByType("KIVSeval")[0].getProperty("Chassisbauteuer").toString() + "("+ space.getSpaceObjectsByType("KIVSeval")[0].getProperty("ChassisbauteuerFALSE").toString() + ")");
 				System.out.println("\n\n******* WORKFLOW COMPLETLY EXECUTED *******************\n\n");

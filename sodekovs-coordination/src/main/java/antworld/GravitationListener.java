@@ -1,6 +1,6 @@
 package antworld;
 
-import jadex.application.space.envsupport.environment.ObjectEvent;
+import jadex.extension.envsupport.environment.ObjectEvent;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
