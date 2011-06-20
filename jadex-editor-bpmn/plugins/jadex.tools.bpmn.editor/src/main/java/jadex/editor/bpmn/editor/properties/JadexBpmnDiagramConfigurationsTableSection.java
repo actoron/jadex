@@ -77,6 +77,8 @@ public class JadexBpmnDiagramConfigurationsTableSection extends AbstractBpmnMult
 	 */
 	private void setCurrentConfiguration(String newConfiguration)
 	{
+//		System.out.println("config: "+newConfiguration);
+		
 		String oldConfiguration = currentConfiguration;
 		this.currentConfiguration = newConfiguration;
 		
@@ -136,30 +138,31 @@ public class JadexBpmnDiagramConfigurationsTableSection extends AbstractBpmnMult
 		if(newCell == null)
 			return;
 		
-		String selectedConfiguration;
-		// TODO: Lars, please remove this condition at your desire!
+		String selectedConfiguration = null;
 		// only set active configuration on "name" column cell selection  
 		if(newCell.getColumnIndex() == UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX)
 		{
 			ISelection iSelection = tableViewer.getSelection();
-			if (iSelection != null && !iSelection.isEmpty())
+			if(iSelection != null && !iSelection.isEmpty())
 			{
-				MultiColumnTableRow selectedRow = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
+				MultiColumnTableRow selectedRow = (MultiColumnTableRow)((IStructuredSelection)tableViewer
 					.getSelection()).getFirstElement();
 				selectedConfiguration = selectedRow.getColumnValueAt(UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX);
 			}
-			else
-			{
-				selectedConfiguration = ((MultiColumnTableRow)newCell.getElement()).getColumnValueAt(UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX);
-			}
-			if (selectedConfiguration != null && !selectedConfiguration.equals(currentConfiguration))
-			{
-				setCurrentConfiguration(selectedConfiguration);
-				//System.err.println("New selection: " + selectedConfiguration);
-			}
+//			else
+//			{
+//				selectedConfiguration = ((MultiColumnTableRow)newCell.getElement()).getColumnValueAt(UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX);
+//			}
 		}
 		
-		System.out.println("selected config is: "+currentConfiguration);
+		if(!(selectedConfiguration==currentConfiguration || selectedConfiguration!=null 
+			&& selectedConfiguration.equals(currentConfiguration)))
+		{
+			setCurrentConfiguration(selectedConfiguration);
+			//System.err.println("New selection: " + selectedConfiguration);
+		}
+		
+//		System.out.println("selected config is: "+currentConfiguration);
 	}
 	
 }

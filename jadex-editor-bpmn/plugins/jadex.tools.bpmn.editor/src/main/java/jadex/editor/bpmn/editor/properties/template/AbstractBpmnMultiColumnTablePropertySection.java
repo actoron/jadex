@@ -119,7 +119,13 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 				String config = getConfiguration();
 				String name = colnames[i];
 				if(config!=null && config.length()>0)
-					name = name + " [" + config + "]";
+				{
+					name += " [" + config + "]";
+				}
+				else
+				{
+					name += " [select config]";
+				}
 				col.setText(name);
 			}
 		}
@@ -528,7 +534,6 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 	 */
 	protected class MultiColumnTableContentProvider implements IStructuredContentProvider
 	{
-
 		/**
 		 * Generate the content for the table.
 		 * 
@@ -613,6 +618,31 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 				int attributeIndex, CellEditor editor)
 		{
 			super(viewer, attributeIndex, editor);
+		}
+		
+		/**
+		 * Can edit all columns.
+		 */
+		public boolean canEdit(Object element)
+		{
+			boolean ret = super.canEdit(element);
+			if(ret)
+			{
+				if(getConfiguration()==null || getConfiguration().length()==0)
+				{
+					MultiColumnTableRow row = (MultiColumnTableRow)element;
+					Object o = row.getTable();
+					if(o instanceof MultiColumnTableEx)
+					{
+						MultiColumnTableEx table = (MultiColumnTableEx)o;
+						if(table.isComplexColumn(attributeIndex))
+						{
+							ret = false;
+						}
+					}
+				}
+			}
+			return ret;
 		}
 		
 		/**
