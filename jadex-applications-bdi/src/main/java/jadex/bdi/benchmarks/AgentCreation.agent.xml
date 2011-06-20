@@ -41,7 +41,6 @@
 			<fact>new Counter()</fact>
 		</belief>
 		<belief name="starttime" class="Long" exported="true">
-			<!-- <fact>new Long($scope.getTime())</fact> -->
 			<fact>new Long($scope.getTime())</fact>
 		</belief>
 		<belief name="startmem" class="Long" exported="true">

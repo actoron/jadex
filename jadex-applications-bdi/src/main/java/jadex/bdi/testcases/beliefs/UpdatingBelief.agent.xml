@@ -43,7 +43,7 @@
 
 		<!-- The current time formatted as string. -->
 		<belief name="time" class="String" updaterate="500">
-			<fact>$beliefbase.getBelief("dateformat").getFact().format(new Date())</fact>
+			<fact>$beliefbase.getBelief("dateformat").getFact().format($scope.getTime())</fact>
 		</belief>
 
 		<!-- An example of a self-referencing belief -->
