@@ -216,11 +216,12 @@ public class InitialFactNode extends AbstractNode implements ITupleSourceNode, I
 			{
 				if(relevants==null)
 				{
-					relevants	= new AttributeSet();
+					AttributeSet	relevants	= new AttributeSet();
 					for(int i=0; tconsumers!=null && i<tconsumers.length; i++)
 					{
 						relevants.addAll(tconsumers[i].getRelevantAttributes());
 					}
+					this.relevants	= relevants;
 				}
 			}
 		}

@@ -638,7 +638,9 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 			}
 		}
 		else
+		{
 			entries = new String[0];
+		}
 		
 		Properties props	= new Properties();
 		for(int i=0; i<entries.length; i++)

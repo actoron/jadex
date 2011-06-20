@@ -31,6 +31,8 @@ import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.IRemotable;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple;
+import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.CollectionResultListener;
@@ -111,6 +113,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	/** Number of non-daemon children for each autoshutdown component (cid->Integer). */
 	protected Map childcounts;
 	
+	/**	The local filename cache (tuple(parent filename, child filename) -> local typename)*/
+	protected Map	localtypes;
+	
 	/** The cached factories. */
 	protected Collection factories;
 	
@@ -159,6 +164,7 @@ public abstract class ComponentManagementService extends BasicService implements
 //		this.initfutures = Collections.synchronizedMap(SCollection.createHashMap());
 		this.initinfos = Collections.synchronizedMap(SCollection.createHashMap());
 		this.childcounts = SCollection.createHashMap();
+		this.localtypes	= Collections.synchronizedMap(new LRU(100));
     }
     
 	/**
@@ -651,26 +657,35 @@ public abstract class ComponentManagementService extends BasicService implements
 			}
 			
 			// Try to find local type for file
-			if(cinfo.getLocalType()==null)
+			if(cinfo.getLocalType()==null && subcomps.length>0)
 			{
-				ResourceInfo	info	= SUtil.getResourceInfo0(filename, cl);
-				if(info!=null)
+				Tuple	key	= new Tuple(parent.getModel().getFullName(), filename);
+				if(localtypes.containsKey(key))
 				{
-					for(int i=0; cinfo.getLocalType()==null && i<subcomps.length; i++)
-					{
-						ResourceInfo	info1	= SUtil.getResourceInfo0(subcomps[i].getFilename(), cl);
-						if(info1!=null)
-						{
-							if(info.getFilename().equals(info1.getFilename()))
-							{
-								cinfo.setLocalType(subcomps[i].getName());
-							}
-							info1.cleanup();
-						}
-					}
-					info.cleanup();
+					cinfo.setLocalType((String)localtypes.get(key));
 				}
-//				System.out.println("Local type: "+cinfo.getLocalType()+", "+pad.getComponentIdentifier());
+				else
+				{
+					ResourceInfo	info	= SUtil.getResourceInfo0(filename, cl);
+					if(info!=null)
+					{
+						for(int i=0; cinfo.getLocalType()==null && i<subcomps.length; i++)
+						{
+							ResourceInfo	info1	= SUtil.getResourceInfo0(subcomps[i].getFilename(), cl);
+							if(info1!=null)
+							{
+								if(info.getFilename().equals(info1.getFilename()))
+								{
+									cinfo.setLocalType(subcomps[i].getName());
+								}
+								info1.cleanup();
+							}
+						}
+						info.cleanup();
+					}
+					localtypes.put(key, cinfo.getLocalType());
+	//				System.out.println("Local type: "+cinfo.getLocalType()+", "+pad.getComponentIdentifier());
+				}
 			}
 		}
 		

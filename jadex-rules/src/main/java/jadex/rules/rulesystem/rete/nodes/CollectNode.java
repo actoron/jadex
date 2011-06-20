@@ -429,7 +429,7 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 			{
 				if(relevants==null)
 				{
-					relevants	= new AttributeSet();
+					AttributeSet	relevants	= new AttributeSet();
 					for(int i=0; evaluators!=null && i<evaluators.length; i++)
 					{
 						relevants.addAll(evaluators[i].getRelevantAttributes());
@@ -438,6 +438,7 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 					{
 						relevants.addAll(tconsumers[i].getRelevantAttributes());
 					}
+					this.relevants	= relevants;
 				}
 			}
 		}
@@ -458,11 +459,12 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 			{
 				if(indirects==null)
 				{
-					indirects	= new AttributeSet();
+					AttributeSet	indirects	= new AttributeSet();
 					for(int i=0; evaluators!=null && i<evaluators.length; i++)
 					{
 						indirects.addAll(evaluators[i].getIndirectAttributes());
 					}
+					this.indirects	= indirects; 
 				}
 			}
 		}

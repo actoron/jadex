@@ -230,12 +230,13 @@ public class TerminalNode extends AbstractNode implements ITupleConsumerNode
 					}
 					else
 					{
-						relevants	= new AttributeSet();
+						AttributeSet	relevants	= new AttributeSet();
 						for(Iterator it=extractors.values().iterator(); it.hasNext(); )
 						{
 							IValueExtractor ex = (IValueExtractor)it.next();
 							relevants.addAll(ex.getRelevantAttributes());
 						}
+						this.relevants	= relevants;
 					}
 				}
 			}
@@ -263,12 +264,13 @@ public class TerminalNode extends AbstractNode implements ITupleConsumerNode
 					}
 					else
 					{
-						indirects	= new AttributeSet();
+						AttributeSet	indirects	= new AttributeSet();
 						for(Iterator it=extractors.values().iterator(); it.hasNext(); )
 						{
 							IValueExtractor ex = (IValueExtractor)it.next();
 							indirects.addAll(ex.getIndirectAttributes());
 						}
+						this.indirects	= indirects;
 					}
 				}
 			}

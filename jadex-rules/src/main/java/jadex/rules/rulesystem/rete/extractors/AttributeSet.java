@@ -42,6 +42,16 @@ public class AttributeSet implements Cloneable
 	 */
 	public void addAttribute(OAVAttributeType attr)
 	{
+//		boolean found	= false;
+//		StackTraceElement[]	ste	= Thread.currentThread().getStackTrace();
+//		for(int i=0; !found && i<ste.length; i++)
+//		{
+//			found	= ste[i].getClassName().equals("jadex.rules.rulesystem.rete.nodes.ReteNode")
+//			&& (ste[i].getMethodName().equals("getRelevantAttributes")
+//				|| ste[i].getMethodName().equals("getIndirectNodes"));
+//		}
+//		if(!found)
+//			Thread.dumpStack();
 		if(attributes==null)
 			attributes = new HashSet();
 		
@@ -54,6 +64,16 @@ public class AttributeSet implements Cloneable
 	 */
 	public void removeAttribute(OAVAttributeType attr)
 	{
+//		boolean found	= false;
+//		StackTraceElement[]	ste	= Thread.currentThread().getStackTrace();
+//		for(int i=0; !found && i<ste.length; i++)
+//		{
+//			found	= ste[i].getClassName().equals("jadex.rules.rulesystem.rete.nodes.ReteNode")
+//			&& (ste[i].getMethodName().equals("getRelevantAttributes")
+//				|| ste[i].getMethodName().equals("getIndirectNodes"));
+//		}
+//		if(!found)
+//			Thread.dumpStack();
 		if(attributes!=null)
 			attributes.remove(attr);
 	}
@@ -122,6 +142,17 @@ public class AttributeSet implements Cloneable
 	 */
 	public void addAll(AttributeSet attrset)
 	{
+//		boolean found	= false;
+//		StackTraceElement[]	ste	= Thread.currentThread().getStackTrace();
+//		for(int i=0; !found && i<ste.length; i++)
+//		{
+//			found	= (ste[i].getClassName().equals("jadex.rules.rulesystem.rete.nodes.ReteNode")
+//				|| ste[i].getClassName().equals("jadex.rules.rulesystem.rete.extractors.JavaMethodExtractor"))
+//				&& (ste[i].getMethodName().equals("getRelevantAttributes")
+//					|| ste[i].getMethodName().equals("getIndirectNodes"));
+//		}
+//		if(!found)
+//			Thread.dumpStack();
 		if(attrset.getAttributeSet()!=null)
 		{
 			if(attributes==null)

@@ -212,6 +212,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	 */
 	public void	createAgentModelEntry(OAVCapabilityModel model, ModelInfo info)
 	{
+//		System.out.println("createAgentModelEntry: "+info.getFullName());
 		IRulebase rb = model.getRulebase();
 		IOAVState state	= model.getState();
 		Object mcapa = model.getHandle();

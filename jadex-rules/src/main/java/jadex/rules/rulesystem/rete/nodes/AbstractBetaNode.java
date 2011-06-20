@@ -775,7 +775,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 			{
 				if(relevants==null)
 				{
-					relevants	= new AttributeSet();
+					AttributeSet	relevants	= new AttributeSet();
 					for(int i=0; indexers!=null && i<indexers.length; i++)
 					{
 						relevants.addAll(indexers[i].getRelevantAttributes());
@@ -788,6 +788,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 					{
 						relevants.addAll(tconsumers[i].getRelevantAttributes());
 					}
+					this.relevants	= relevants;
 				}
 			}
 		}
@@ -808,7 +809,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 			{
 				if(indirects==null)
 				{
-					indirects	= new AttributeSet();
+					AttributeSet	indirects	= new AttributeSet();
 					for(int i=0; indexers!=null && i<indexers.length; i++)
 					{
 						indirects.addAll(indexers[i].getIndirectAttributes());
@@ -817,6 +818,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 					{
 						indirects.addAll(evaluators[i].getIndirectAttributes());
 					}
+					this.indirects	= indirects;
 				}
 			}
 		}

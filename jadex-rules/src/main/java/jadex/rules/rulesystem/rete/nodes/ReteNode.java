@@ -85,6 +85,8 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	 */
 	public void addObject(Object id, OAVObjectType type, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
+//		if(type.getName().equals("goal"))
+//			System.out.println("Value added: "+id+" "+type);
 //		System.out.println("Value added: "+id+" "+type);
 		
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
@@ -113,6 +115,8 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	 */
 	public void removeObject(Object id, OAVObjectType type, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
+//		if(type.getName().equals("goal"))
+//			System.out.println("Value removed: "+id+" "+type);
 //		if(type instanceof OAVJavaType && ((OAVJavaType)type).getClazz().getName().indexOf("Wastebin")!=-1)
 //		{
 //			System.out.println("removedRETE: "+id);
@@ -148,7 +152,8 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	public void modifyObject(Object id, OAVObjectType type, OAVAttributeType attr, Object oldvalue, 
 		Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
-//		System.out.println("Value set: "+id+" "+type+" "+value);
+//		if(type.getName().equals("goal"))
+//			System.out.println("Value set: "+id+" "+type+" "+attr+" "+newvalue);
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTMODIFIED);
 		
@@ -157,6 +162,8 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 		
 		if(getRelevantAttributes().contains(attr))
 		{
+//			if(type.getName().equals("goal"))
+//				System.out.println("Value set: "+id+" "+type+" "+attr+" "+newvalue+" relevant!");
 			Set	tns	= getTypeNodes(type);
 			
 			if(tns!=null && !tns.isEmpty())
@@ -380,11 +387,12 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 			{
 				if(relevants==null)
 				{
-					relevants	= new AttributeSet();
+					AttributeSet	relevants	= new AttributeSet();
 					for(Iterator it=typenodes.values().iterator(); it.hasNext(); )
 					{
 						relevants.addAll(((INode)it.next()).getRelevantAttributes());
 					}
+					this.relevants	= relevants;
 				}
 			}
 		}
@@ -450,13 +458,14 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	 */
 	protected Set getIndirectNodes(OAVAttributeType attrtype, OAVTypeModel tmodel)
 	{
+		assert inited;
 		if(indirectnodesets==null)
 		{
 			synchronized(this)
 			{
 				if(indirectnodesets==null)
 				{
-					indirectnodesets = new HashMap();
+					HashMap	indirectnodesets = new HashMap();
 					List nodelist	= new ArrayList();
 					List nodeset	= new ArrayList();
 					nodelist.addAll(typenodes.values());
@@ -520,6 +529,7 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 							}
 						}
 					}
+					this.indirectnodesets	= indirectnodesets;
 				}
 			}
 		}

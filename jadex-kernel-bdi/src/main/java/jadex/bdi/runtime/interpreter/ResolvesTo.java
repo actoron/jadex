@@ -63,7 +63,7 @@ public class ResolvesTo implements IFunction
 	{
 		if(relevants==null)
 		{
-			relevants = new AttributeSet();
+			AttributeSet	relevants = new AttributeSet();
 			relevants.addAttribute(OAVBDIRuntimeModel.element_has_model);
 			relevants.addAttribute(OAVBDIMetaModel.modelelement_has_name);
 			relevants.addAttribute(OAVBDIRuntimeModel.capability_has_beliefs);
@@ -73,6 +73,7 @@ public class ResolvesTo implements IFunction
 			relevants.addAttribute(OAVBDIRuntimeModel.capability_has_messageevents);
 			relevants.addAttribute(OAVBDIRuntimeModel.capability_has_subcapabilities);
 			relevants.addAttribute(OAVBDIRuntimeModel.capabilityreference_has_capability);
+			this.relevants	= relevants;
 			
 		}
 		return relevants;

@@ -365,7 +365,7 @@ public class AlphaNode extends AbstractNode implements IObjectConsumerNode, IObj
 			{
 				if(relevants==null)
 				{
-					relevants	= new AttributeSet();
+					AttributeSet	relevants	= new AttributeSet();
 					for(int i=0; evaluators!=null && i<evaluators.length; i++)
 					{
 						relevants.addAll(evaluators[i].getRelevantAttributes());
@@ -374,6 +374,7 @@ public class AlphaNode extends AbstractNode implements IObjectConsumerNode, IObj
 					{
 						relevants.addAll(oconsumers[i].getRelevantAttributes());
 					}
+					this.relevants	= relevants;
 				}
 			}
 		}
@@ -394,11 +395,12 @@ public class AlphaNode extends AbstractNode implements IObjectConsumerNode, IObj
 			{
 				if(indirects==null)
 				{
-					indirects	= new AttributeSet();
+					AttributeSet	indirects	= new AttributeSet();
 					for(int i=0; evaluators!=null && i<evaluators.length; i++)
 					{
 						indirects.addAll(evaluators[i].getIndirectAttributes());
 					}
+					this.indirects	= indirects;
 				}
 			}
 		}

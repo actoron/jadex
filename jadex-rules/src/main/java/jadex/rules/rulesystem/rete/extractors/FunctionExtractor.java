@@ -92,6 +92,7 @@ public class FunctionExtractor implements IValueExtractor
 		AttributeSet ret = new AttributeSet();
 		for(int i=0; i<extractors.length; i++)
 			ret.addAll(extractors[i].getRelevantAttributes());
+//		System.out.println("function: "+function.getClass());
 		ret.addAll(function.getRelevantAttributes());
 		return ret;
 	}

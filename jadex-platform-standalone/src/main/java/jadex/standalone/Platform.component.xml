@@ -328,7 +328,7 @@
 				<component type="kernel_micro" daemon="true"/>
 				<component type="CreationMicroParallel">
 					<arguments>
-						<argument name="max">10000</argument>
+						<argument name="max">100000</argument>
 					</arguments>
 				</component>
 			</components>

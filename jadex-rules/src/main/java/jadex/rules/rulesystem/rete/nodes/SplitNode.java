@@ -403,12 +403,13 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 			{
 				if(relevants==null)
 				{
-					relevants	= new AttributeSet();
+					AttributeSet	relevants	= new AttributeSet();
 					relevants.addAll(extractor.getRelevantAttributes());
 					for(int i=0; oconsumers!=null && i<oconsumers.length; i++)
 					{
 						relevants.addAll(oconsumers[i].getRelevantAttributes());
 					}
+					this.relevants	= relevants;
 				}
 			}
 		}
@@ -429,8 +430,9 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 			{
 				if(indirects==null)
 				{
-					indirects	= new AttributeSet();
+					AttributeSet	indirects	= new AttributeSet();
 					indirects.addAll(extractor.getIndirectAttributes());
+					this.indirects	= indirects;
 				}
 			}
 		}

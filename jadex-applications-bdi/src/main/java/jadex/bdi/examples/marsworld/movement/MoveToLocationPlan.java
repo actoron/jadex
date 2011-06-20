@@ -20,6 +20,8 @@ public class MoveToLocationPlan extends Plan
 	 */
 	public void body()
 	{
+//		System.out.println("MoveToLocation: "+getComponentIdentifier());
+		
 		ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 		IVector2 dest = (IVector2)getParameter("destination").getValue();
 		

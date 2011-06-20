@@ -198,11 +198,12 @@ public class RightInputAdapterNode extends AbstractNode implements ITupleConsume
 			{
 				if(relevants==null)
 				{
-					relevants	= new AttributeSet();
+					AttributeSet	relevants	= new AttributeSet();
 					for(int i=0; oconsumers!=null && i<oconsumers.length; i++)
 					{
 						relevants.addAll(oconsumers[i].getRelevantAttributes());
 					}
+					this.relevants	= relevants;
 				}
 			}
 		}

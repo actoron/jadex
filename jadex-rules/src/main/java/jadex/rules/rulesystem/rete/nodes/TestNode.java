@@ -260,12 +260,13 @@ public class TestNode extends AbstractNode implements ITupleConsumerNode, ITuple
 			{
 				if(relevants==null)
 				{
-					relevants	= new AttributeSet();
+					AttributeSet	relevants	= new AttributeSet();
 					relevants.addAll(evaluator.getRelevantAttributes());
 					for(int i=0; tconsumers!=null && i<tconsumers.length; i++)
 					{
 						relevants.addAll(tconsumers[i].getRelevantAttributes());
 					}
+					this.relevants	= relevants;
 				}
 			}
 		}
@@ -286,8 +287,9 @@ public class TestNode extends AbstractNode implements ITupleConsumerNode, ITuple
 			{
 				if(indirects==null)
 				{
-					indirects	= new AttributeSet();
+					AttributeSet	indirects	= new AttributeSet();
 					indirects.addAll(evaluator.getIndirectAttributes());
+					this.indirects	= indirects;
 				}
 			}
 		}

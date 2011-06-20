@@ -229,11 +229,12 @@ public class LeftInputAdapterNode extends AbstractNode implements IObjectConsume
 			{
 				if(relevants==null)
 				{
-					relevants	= new AttributeSet();
+					AttributeSet	relevants	= new AttributeSet();
 					for(int i=0; tconsumers!=null && i<tconsumers.length; i++)
 					{
 						relevants.addAll(tconsumers[i].getRelevantAttributes());
 					}
+					this.relevants	= relevants;
 				}
 			}
 		}
