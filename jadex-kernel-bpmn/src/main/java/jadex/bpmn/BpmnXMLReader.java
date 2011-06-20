@@ -628,14 +628,13 @@ public class BpmnXMLReader
 					// new jadex parameter handling - we accept ALL "_parameters_table"
 					if(anno.getSource().toLowerCase().endsWith("_parameters_table"))
 					{
-						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails());
+						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails(), annos);
 						
 						for(int row = 0; row < table.size(); row++)
 						{
 							// normal activity parameter has 4 values
 							if(table.get(row).size() == 4)
 							{
-							
 								String dir = (String) table.get(row).getColumnValueAt(0); 		// direction
 								String name = (String) table.get(row).getColumnValueAt(1);		// name
 								String clazzname = (String) table.get(row).getColumnValueAt(2);	// class
@@ -689,8 +688,7 @@ public class BpmnXMLReader
 					// we accept ALL "_properties_table"
 					else if (anno.getSource().toLowerCase().endsWith("_properties_table"))
 					{
-						MultiColumnTableEx table = parseBpmnMultiColumTable(anno
-								.getDetails());
+						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails(), annos);
 						
 						for(int row = 0; row < table.size(); row++)
 						{
@@ -730,15 +728,12 @@ public class BpmnXMLReader
 								// TODO: remove old parameter handling
 								if ("parameters".equals(key))
 								{
-									StringTokenizer stok = new StringTokenizer(
-											value, LIST_ELEMENT_DELIMITER);
+									StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
 
 									while (stok.hasMoreTokens())
 									{
 										String paramtext = stok.nextToken();
-										StringTokenizer stok2 = new StringTokenizer(
-												paramtext,
-												LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+										StringTokenizer stok2 = new StringTokenizer(paramtext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
 
 										// Parameters of normal activities have 4 elements
 										int tokcnt = stok2.countTokens();
@@ -746,10 +741,8 @@ public class BpmnXMLReader
 										{
 											String dir = stok2.nextToken();
 											String name = stok2.nextToken();
-											String clazzname = stok2
-													.nextToken();
-											String val = stok2.hasMoreTokens() ? stok2
-													.nextToken() : null;
+											String clazzname = stok2.nextToken();
+											String val = stok2.hasMoreTokens() ? stok2.nextToken() : null;
 
 											try
 											{
@@ -1043,7 +1036,7 @@ public class BpmnXMLReader
 					// todo: enhance mappings with index?
 					if(anno.getSource().toLowerCase().endsWith("_mappings_table"))
 					{
-						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails());
+						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails(), annos);
 						
 						for (int row = 0; row < table.size(); row++)
 						{
@@ -1311,7 +1304,7 @@ public class BpmnXMLReader
 					
 					if(anno.getSource().toLowerCase().endsWith("_imports_table")) 
 					{
-						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails());
+						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails(), annos);
 
 						for(int row = 0; row < table.size(); row++) 
 						{
@@ -1374,7 +1367,7 @@ public class BpmnXMLReader
 					MAnnotation anno = (MAnnotation)annos.get(i);
 					if(anno.getSource().toLowerCase().endsWith("_configurations_table"))
 					{
-						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails());
+						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails(), annos);
 						for(int row = 0; row < table.size(); row++)
 						{
 							// normal configurations has 2 values
@@ -1382,7 +1375,8 @@ public class BpmnXMLReader
 							String name = (String) table.get(row).getColumnValueAt(0);
 							String poollane = (String) table.get(row).getColumnValueAt(1);
 							mi.addConfiguration(new ConfigurationInfo(name));
-							model.addPoolLane(name, poollane);
+							if(poollane!=null && poollane.length()>0)
+								model.addPoolLane(name, poollane);
 						}
 						break;
 					}
@@ -1395,7 +1389,7 @@ public class BpmnXMLReader
 					
 					if(anno.getSource().toLowerCase().endsWith("_bindings_table")) 
 					{
-						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails());
+						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails(), annos);
 
 						for(int row = 0; row < table.size(); row++) 
 						{
@@ -1428,38 +1422,25 @@ public class BpmnXMLReader
 					// new jadex arguments handling
 					if(anno.getSource().toLowerCase().endsWith("_arguments_table"))
 					{
-						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails());
+						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails(), annos);
 						
 						for(int row = 0; row < table.size(); row++)
 						{
 							// normal argument has 6 (+x) values
 //							assert table.get(row).size() == 7;
 							
-							String name = (String) table.get(row).getColumnValueAt(0);
-							String isarg = (String) table.get(row).getColumnValueAt(1);
-							String isres = (String) table.get(row).getColumnValueAt(2);
-							String desc = (String) table.get(row).getColumnValueAt(3);
-							String typename = (String) table.get(row).getColumnValueAt(4);
-							String val = (String) table.get(row).getColumnValueAt(5) != "" ? (String) table.get(row).getColumnValueAt(5) : null;
+							String name = table.getCellValue(row, 0);
+							String isarg = table.getCellValue(row, 1);
+							String isres = table.getCellValue(row, 2);
+							String desc = table.getCellValue(row, 3);
+							String typename = table.getCellValue(row, 4);
+							String val = table.getCellValue(row, 5).length()>0? table.getCellValue(row, 5): null;
+							String complexref = table.getCellValue(row, 6);
 							IParsedExpression exp = null;
-
-							// todo: inserz initial values for arguments in configurations
-							
-							// context variable
-//							Class clazz = SReflect.findClass0(typename, model.getAllImports(), context.getClassLoader());
-//							if(clazz!=null)
-//							{
-//								if(val!=null && val.length()>0)
-//								{
-//									exp = parser.parseExpression(val, model.getAllImports(), null, context.getClassLoader());
-//								}
-//								model.addContextVariable(name, clazz, exp);
-////								System.out.println("Context variable: "+name);
-//							}
-							
-							IArgument arg	= null;
-							Object	argval	= null;
 							Class clazz = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
+							
+							Argument arg	= null;
+							Object	argval	= null;
 							try
 							{
 								if(clazz!=null)
@@ -1477,6 +1458,26 @@ public class BpmnXMLReader
 							}
 							arg = new Argument(name, desc, typename, argval);
 							
+							Map vals = table.getComplexValue(complexref);
+							for(Iterator it=vals.keySet().iterator(); it.hasNext(); )
+							{
+								String configname = (String)it.next();
+								String valtext = (String)vals.get(configname);
+								if(valtext!=null && valtext.length()>0)
+								{
+									exp = parser.parseExpression(valtext, model.getModelInfo().getAllImports(), null, context.getClassLoader());
+									Object inival = exp!=null ? exp.getValue(null) : null;
+									arg.setDefaultValue(configname, inival);
+
+									// Hack! Should add argument values in configurations not in argument!
+//									ConfigurationInfo cinfo = mi.getConfiguration(configname);
+//									if(cinfo!=null)
+//									{
+//										cinfo.addArgument(new UnparsedExpression(configname, clazz, valtext, null));
+//									}
+								}
+							}
+							
 							boolean argi = isarg!=null && Boolean.parseBoolean(isarg);
 							boolean resu = isres!=null && Boolean.parseBoolean(isres);
 							if(argi)
@@ -1491,6 +1492,7 @@ public class BpmnXMLReader
 							{
 								model.addContextVariable(name, clazz, exp);
 							}
+						
 //							System.out.println("Argument: "+arg);
 						}
 					} 
@@ -1498,7 +1500,7 @@ public class BpmnXMLReader
 					// new jadex properties handling
 					else if(anno.getSource().toLowerCase().endsWith("_properties_table"))
 					{
-						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails());
+						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails(), annos);
 						for(int row=0; row<table.size(); row++)
 						{
 							// normal property has 2 values
@@ -1515,7 +1517,7 @@ public class BpmnXMLReader
 					}
 					else if(anno.getSource().toLowerCase().endsWith("_providedservices_table"))
 					{
-						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails());
+						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails(), annos);
 						for(int row=0; row<table.size(); row++)
 						{
 							// normal property has 4 values
@@ -1545,7 +1547,7 @@ public class BpmnXMLReader
 					}
 					else if(anno.getSource().toLowerCase().endsWith("_requiredservices_table"))
 					{
-						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails());
+						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails(), annos);
 						for(int row=0; row<table.size(); row++)
 						{
 							// normal property has 4 values
@@ -1566,7 +1568,7 @@ public class BpmnXMLReader
 					}
 					else if(anno.getSource().toLowerCase().endsWith("_subcomponents_table"))
 					{
-						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails());
+						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails(), annos);
 						for(int row=0; row<table.size(); row++)
 						{
 							// normal property has 5 values
@@ -1620,6 +1622,10 @@ public class BpmnXMLReader
 								else if("description".equals(key))
 								{
 									mi.setDescription(value);
+								}
+								else if("configuration".equals(key))
+								{
+									// ignore? The selected configuration for next editor opening
 								}
 								else if("master".equals(key))
 								{
@@ -1744,7 +1750,7 @@ public class BpmnXMLReader
 										}
 									}
 								}
-								else if(!"package".equals(key) && !"imports".equals(key))
+								else if(!"package".equals(key) && !"imports".equals(key) && !key.endsWith("complex"))
 								{
 									throw new RuntimeException("Error parsing annotation: "+key+", "+value);
 								}
@@ -1873,6 +1879,29 @@ public class BpmnXMLReader
 		{
 			return 1;
 		}
+		
+//		/**
+//		 * 
+//		 */
+//		protected Object parseValue(Class clazz, String val, JavaCCExpressionParser parser, )
+//		{
+//			Object ret = null;
+//			try
+//			{
+//				if(clazz!=null)
+//				{
+//					if(val!=null && val.length()>0)
+//					{
+//						exp = parser.parseExpression(val, model.getModelInfo().getAllImports(), null, context.getClassLoader());
+//						argval	= exp!=null ? exp.getValue(null) : null;
+//					}
+//				}
+//			}
+//			catch(RuntimeException e)
+//			{
+//				// Hack!!! initial value for context variable might not be accessible statically.
+//			}
+//		}
 	}
 	
 	// ---- Helper method for various post IPostProcessor ----
@@ -1926,10 +1955,20 @@ public class BpmnXMLReader
 	 * @param details
 	 * @return BpmnMultiColumTable from details
 	 */
-	public static MultiColumnTableEx parseBpmnMultiColumTable(List details)
+	public static MultiColumnTableEx parseBpmnMultiColumTable(List details, List annos)
 	{
-		return MultiColumnTableEx.parseEAnnotationTable(details);
+		return MultiColumnTableEx.parseEAnnotationTable(details, annos);
 	}
+	
+//	/**
+//	 * Parse a list of annotation details into an MultiColumnTableEx
+//	 * @param details
+//	 * @return BpmnMultiColumTable from details
+//	 */
+//	public static MultiColumnTableEx parseBpmnMultiColumTable(List details)
+//	{
+//		return MultiColumnTableEx.parseEAnnotationTable(details, null);
+//	}
 	
 	
 }

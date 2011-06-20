@@ -12,20 +12,20 @@ import org.eclipse.swt.widgets.TableColumn;
 public class JadexBpmnDiagramRequiredServicesTableSection extends
 	AbstractBpmnMultiColumnTablePropertySection
 {
-	public static final String[] COLUMN_NAMES = new String[]{"Name", "Interface", "Multiple", "Binding Name"};
-	public static final String[] COLUMN_TYPES = new String[]{TEXT, TEXT, CHECKBOX, TEXT};
-	public static final int[] COLUMN_WEIGHTS = new int[]{2, 5, 1};
-	public static final String[] DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "class", "false", "bindingname"};
+	public static final String[] COLUMN_NAMES = new String[]{"Name", "Interface", "Multiple", "Default Binding", "Initial Binding"};
+	public static final String[] COLUMN_TYPES = new String[]{TEXT, TEXT, CHECKBOX, TEXT, TEXT};
+	public static final boolean[] COLUMN_COMPLEX = new boolean[]{false, false, false, false, true};
+	public static final int[] COLUMN_WEIGHTS = new int[]{2, 2, 1, 2, 2};
+	public static final String[] DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "class", "false", "bindingname", ""};
 	public static final int UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX = 0;
 	
 	/**
 	 *  Default constructor, initializes super class.
-	 *  XXX: add correct complex boolean[]
 	 */
 	public JadexBpmnDiagramRequiredServicesTableSection()
 	{
 		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_REQUIREDSERVICES_LIST_DETAIL,
-			"Required Services", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX, null);
+			"Required Services", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX, COLUMN_COMPLEX);
 	}
 
 	protected String[] getDefaultListElementAttributeValues()

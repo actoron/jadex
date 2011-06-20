@@ -4,6 +4,7 @@
 package jadex.bpmn;
 
 
+import jadex.bpmn.model.MAnnotation;
 import jadex.bpmn.model.MAnnotationDetail;
 
 import java.util.HashMap;
@@ -223,31 +224,49 @@ public class MultiColumnTableEx extends MultiColumnTable
 	 * @param cellDimensionIdentifier
 	 * @return
 	 */
-	public static MultiColumnTableEx parseEAnnotationTable(List details)
+	public static MultiColumnTableEx parseEAnnotationTable(List details, List annos)
 	{
-		
 		MultiColumnTableEx newTable;
 		Map detailsMap = convertDetailsToMap(details);
 		
-		String dimension = (String) detailsMap.get("dimension");
-		boolean[] complexColumnMarker = decodeComplexColumnMarker((String) detailsMap.get("complexColumns"));
+		String dimension = (String)detailsMap.get("dimension");
+		boolean[] complexColumnMarker = decodeComplexColumnMarker((String)detailsMap.get("complexcolumns"));
 
 		TableCellIndex tableDimension = new TableCellIndex(dimension);
 		newTable = new MultiColumnTableEx(tableDimension.getRowCount(), complexColumnMarker);
-		for (int rowIndex = 0; rowIndex < tableDimension.rowCount; rowIndex++)
+		for(int rowIndex = 0; rowIndex < tableDimension.rowCount; rowIndex++)
 		{
 			String[] newRow = new String[tableDimension.columnCount];
-			for (int columnIndex = 0; columnIndex < tableDimension.columnCount; columnIndex++)
+			for(int columnIndex = 0; columnIndex < tableDimension.columnCount; columnIndex++)
 			{
-				newRow[columnIndex] = (String) detailsMap.get((new TableCellIndex(rowIndex, columnIndex)).toString());
+				newRow[columnIndex] = (String)detailsMap.get((new TableCellIndex(rowIndex, columnIndex)).toString());
 
 				// initialize complex values
-				if (newTable.isComplexColumn(columnIndex))
+				if(newTable.isComplexColumn(columnIndex))
 				{
-					Map<String, String> complexValue = new HashMap<String, String>();
-					newTable.setComplexValue(newRow[columnIndex], complexValue);
+					Map valmap = new HashMap();
+					
+					MAnnotation ref = null;
+					for(int i=0; i<annos.size(); i++)
+					{
+						MAnnotation anno = (MAnnotation)annos.get(i);
+						if(anno.getSource().equals(newRow[columnIndex]))
+						{
+							ref = anno;
+							break;
+						}
+					}
+					if(ref==null)
+						throw new RuntimeException("Complex values not found: "+detailsMap);
+					
+					List det = ref.getDetails();
+					for(int i=0; i<det.size(); i++)
+					{
+						MAnnotationDetail ad = (MAnnotationDetail)det.get(i);
+						valmap.put(ad.getKey(), ad.getValue());
+					}
+					newTable.setComplexValue(newRow[columnIndex], valmap);
 				}
-
 			}
 			newTable.add(newTable.new MultiColumnTableRow(newRow, newTable));
 		}

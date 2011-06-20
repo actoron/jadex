@@ -151,7 +151,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 			if(table.isComplexColumn(i))
 			{
 				values[i] = JadexBpmnPropertiesUtil.getComplexValueAnnotationIdentifier(
-					util.containerEAnnotationName, util.annotationDetailName, values[i]);
+					util.containerEAnnotationName, util.annotationDetailName, colnames[i]);
 			}
 		}
 		return values;
@@ -660,10 +660,11 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 				{
 					// the value should be a redirection
 					String complexValueIdentifier = row.getColumnValueAt(attributeIndex);
-					Map<String, String> complexValueMap = table.getComplexValue(complexValueIdentifier);
-					
-					String selectedConfiguration = JadexBpmnDiagramConfigurationsTableSection.getConfigurationSectionInstanceForModelElement(modelElement).getCurrentConfiguration();
-					String value = complexValueMap.get(selectedConfiguration);
+					Map<String, String> vals = table.getComplexValue(complexValueIdentifier);
+//					String selectedConfiguration = JadexBpmnDiagramConfigurationsTableSection.getConfigurationSectionInstanceForModelElement(modelElement).getCurrentConfiguration();
+					String selconf = getConfiguration();
+					String value = vals.get(selconf);
+					System.out.println("selconf: "+selconf+" "+value);
 					return value != null ? value : "";
 				}
 			}
@@ -697,10 +698,12 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 					else if(table.isComplexColumn(attributeIndex))
 					{
 						// the value should be a redirection
-						String complexValueIdentifier = rowToEdit.getColumnValueAt(attributeIndex);
-						Map<String, String> complexValueMap = table.getComplexValue(complexValueIdentifier);
-						String selectedConfiguration = JadexBpmnDiagramConfigurationsTableSection.getConfigurationSectionInstanceForModelElement(modelElement).getCurrentConfiguration();
-						complexValueMap.put(selectedConfiguration, newValue);
+						String id = rowToEdit.getColumnValueAt(attributeIndex);
+						Map<String, String> map = table.getComplexValue(id);
+						//String selectedConfiguration = JadexBpmnDiagramConfigurationsTableSection.getConfigurationSectionInstanceForModelElement(modelElement).getCurrentConfiguration();
+						String selconf = getConfiguration();
+						System.out.println("setting: "+selconf+" "+newValue+" "+map);
+						map.put(selconf, newValue);
 					}
 					else
 					{

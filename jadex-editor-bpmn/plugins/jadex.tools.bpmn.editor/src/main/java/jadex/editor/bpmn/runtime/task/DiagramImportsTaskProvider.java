@@ -98,15 +98,12 @@ public class DiagramImportsTaskProvider extends PackageBasedTaskProvider
 	protected List<String> parseDiagramImports()
 	{
 
-		MultiColumnTable table =
-			JadexBpmnPropertiesUtil.getJadexEAnnotationTable(
-				bpmnDiagram,
-				JadexBpmnPropertiesUtil.getTableAnnotationIdentifier(
-						JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
-						JadexBpmnPropertiesUtil.JADEX_IMPORT_LIST_DETAIL));
+		MultiColumnTable table = JadexBpmnPropertiesUtil.getJadexEAnnotationTable(bpmnDiagram,
+			JadexBpmnPropertiesUtil.getTableAnnotationIdentifier(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
+			JadexBpmnPropertiesUtil.JADEX_IMPORT_LIST_DETAIL));
 		
 		// exit without annotation table
-		if (table == null)
+		if(table == null)
 		{
 			return Collections.emptyList();
 		}
@@ -114,7 +111,7 @@ public class DiagramImportsTaskProvider extends PackageBasedTaskProvider
 		int uniqueColumnIndex = table.getUniqueColumn();
 		List<String> packageImports = new ArrayList<String>();
 		
-		for (MultiColumnTableRow row : table.getRowList())
+		for(MultiColumnTableRow row : table.getRowList())
 		{
 			String importValue = row.getColumnValueAt(uniqueColumnIndex);
 			if (importValue.endsWith(".*"))

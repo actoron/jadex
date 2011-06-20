@@ -15,10 +15,11 @@ import org.eclipse.swt.widgets.TableColumn;
 public class JadexBpmnDiagramProvidedServicesTableSection extends
 	AbstractBpmnMultiColumnTablePropertySection
 {
-	public static final String[] COLUMN_NAMES = new String[]{"Name", "Interface", "Implementation", "Proxytype"};
-	public static final String[] COLUMN_TYPES = new String[]{TEXT, TEXT, TEXT, COMBOBOX};
-	public static final int[] COLUMN_WEIGHTS = new int[]{1, 2, 2, 2};
-	public static final String[] DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "class", "implclass", "decoupled"};
+	public static final String[] COLUMN_NAMES = new String[]{"Name", "Interface", "Proxytype", "Default Impl", "Initial Impl"};
+	public static final String[] COLUMN_TYPES = new String[]{TEXT, TEXT, COMBOBOX, TEXT, TEXT};
+	public static final boolean[] COLUMN_COMPLEX = new boolean[]{false, false, false, false, true};
+	public static final int[] COLUMN_WEIGHTS = new int[]{1, 2, 2, 2, 2};
+	public static final String[] DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "class", "decoupled", "implclass", ""};
 	public static final int UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX = 0;
 	public static final Map VALUES = new HashMap();
 	static
@@ -28,12 +29,11 @@ public class JadexBpmnDiagramProvidedServicesTableSection extends
 	
 	/**
 	 *  Default constructor, initializes super class.
-	 *  XXX: add correct complex boolean[]
 	 */
 	public JadexBpmnDiagramProvidedServicesTableSection()
 	{
 		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_PROVIDEDSERVICES_LIST_DETAIL,
-			"Provided Services", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX, null);
+			"Provided Services", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX, COLUMN_COMPLEX);
 	}
 
 	protected String[] getDefaultListElementAttributeValues()

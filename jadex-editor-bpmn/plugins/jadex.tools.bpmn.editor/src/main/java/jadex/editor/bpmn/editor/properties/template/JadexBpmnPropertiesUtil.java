@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.Map.Entry;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -306,14 +307,19 @@ public class JadexBpmnPropertiesUtil
 	/**
 	 * Create the annotation identifier from util instance values
 	 */
-	public static String getComplexValueAnnotationIdentifier(String annotationID, String detailID, String defaultValue)
+	public static String getComplexValueAnnotationIdentifier(String annotationID, String detailID, String colname)
 	{
 		StringBuffer b = new StringBuffer(getTableAnnotationIdentifier(annotationID, detailID));
 		b.append(JADEX_COMBINED_KEY_DELIMITER);
-		b.append(defaultValue);
+		b.append(colname);
+		b.append(JADEX_COMBINED_KEY_DELIMITER);
+		b.append(UUID.randomUUID());
+		b.append(JADEX_COMBINED_KEY_DELIMITER);
+		b.append("complex");
+//		b.append(JADEX_TABLE_COMPLEX_COLUMNS_DETAIL);
 		return b.toString();
 	}
-
+	
 	/**
 	 *  Get an annotation.
 	 */
@@ -768,7 +774,6 @@ public class JadexBpmnPropertiesUtil
 	
 	public static boolean checkAnnotationConversion(final EModelElement eModelElement)
 	{
-	
 		if(eModelElement == null)
 		{
 			return false;
@@ -776,20 +781,18 @@ public class JadexBpmnPropertiesUtil
 
 			// update or create the annotation / detail
 			ModifyEObjectCommand command = new ModifyEObjectCommand(
-					eModelElement, Messages.JadexCommonPropertySection_update_eannotation_command_name)
+				eModelElement, Messages.JadexCommonPropertySection_update_eannotation_command_name)
 			{
-				@Override
 				protected CommandResult doExecuteWithResult(
 						IProgressMonitor arg0, IAdaptable arg1)
 						throws ExecutionException
 				{
-					
 					// move all details into a single "jadex" annotation
 					EAnnotation jadexAnnotation = eModelElement.getEAnnotation(JADEX_GLOBAL_ANNOTATION);
 					EList<EAnnotation> annos = eModelElement.getEAnnotations();
 					
 					// if there is no jadex annotation but another annotation
-					if (jadexAnnotation == null && annos.size() > 1)
+					if(jadexAnnotation == null && annos.size() > 1)
 					{
 						// create the jadex annotation
 						jadexAnnotation = EcoreFactory.eINSTANCE.createEAnnotation();

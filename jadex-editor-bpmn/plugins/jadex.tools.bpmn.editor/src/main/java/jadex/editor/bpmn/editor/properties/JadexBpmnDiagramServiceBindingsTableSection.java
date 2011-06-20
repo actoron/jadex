@@ -29,7 +29,6 @@ public class JadexBpmnDiagramServiceBindingsTableSection extends
 	
 	/**
 	 *  Default constructor, initializes super class.
-	 *  XXX: add correct complex boolean[]
 	 */
 	public JadexBpmnDiagramServiceBindingsTableSection()
 	{

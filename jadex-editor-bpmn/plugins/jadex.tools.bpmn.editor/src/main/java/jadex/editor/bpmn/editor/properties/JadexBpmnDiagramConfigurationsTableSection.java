@@ -47,20 +47,20 @@ public class JadexBpmnDiagramConfigurationsTableSection extends AbstractBpmnMult
 
 	// ---- static methods ----
 	
-	public static JadexBpmnDiagramConfigurationsTableSection getConfigurationSectionInstanceForModelElement(EModelElement element)
-	{
-		if(element == null)
-			return null;
-		
-		// ensure we have a BpmnDiagram as key!
-		// todo: fix me: is a BpmnDiagramImpl that is not accessible
-//		if(!(element instanceof BpmnDiagram))
-		{
-			element = JadexBpmnPropertiesUtil.retrieveBpmnDiagram(element);
-		}
-		
-		return configurationSectionsMap.get(element);
-	}
+//	public static JadexBpmnDiagramConfigurationsTableSection getConfigurationSectionInstanceForModelElement(EModelElement element)
+//	{
+//		if(element == null)
+//			return null;
+//		
+//		// ensure we have a BpmnDiagram as key!
+//		// todo: fix me: is a BpmnDiagramImpl that is not accessible
+////		if(!(element instanceof BpmnDiagram))
+//		{
+//			element = JadexBpmnPropertiesUtil.retrieveBpmnDiagram(element);
+//		}
+//		
+//		return configurationSectionsMap.get(element);
+//	}
 	
 	// ---- methods ----
 	
@@ -116,7 +116,7 @@ public class JadexBpmnDiagramConfigurationsTableSection extends AbstractBpmnMult
 	}
 
 	/**
-	 * 
+	 *  Get the column weights.
 	 */
 	protected int[] getColumnWeights(TableColumn[] columns)
 	{

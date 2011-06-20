@@ -19,7 +19,7 @@ public class JadexBpmnDiagramParameterSection extends AbstractBpmnMultiColumnTab
 	public static final boolean[] COLUMN_COMPLEX = new boolean[]{false, false, false, false, false, false, true};
 	public static final String[] COLUMN_TYPES = new String[]{TEXT, CHECKBOX, CHECKBOX, TEXT, TEXT, TEXT, TEXT};
 	public static final int[] COLUMN_WEIGHTS = new int[]{3,2,2,3,3,5,5};
-	public static final String[] DEFAUL_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "false", "false", "description", "Object", "", ""};
+	public static final String[] DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "false", "false", "description", "Object", "", ""};
 	public static final int UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX = 0;
 	
 	/**
@@ -33,7 +33,7 @@ public class JadexBpmnDiagramParameterSection extends AbstractBpmnMultiColumnTab
 
 	protected String[] getDefaultListElementAttributeValues()
 	{
-		return DEFAUL_LISTELEMENT_ATTRIBUTE_VALUES;
+		return DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES;
 	}
 
 	protected void createColumns(TableViewer viewer)
@@ -43,7 +43,7 @@ public class JadexBpmnDiagramParameterSection extends AbstractBpmnMultiColumnTab
 
 	protected int[] getColumnWeights(TableColumn[] columns)
 	{
-		if (columns.length == COLUMN_WEIGHTS.length)
+		if(columns.length == COLUMN_WEIGHTS.length)
 		{
 			return COLUMN_WEIGHTS;
 		}

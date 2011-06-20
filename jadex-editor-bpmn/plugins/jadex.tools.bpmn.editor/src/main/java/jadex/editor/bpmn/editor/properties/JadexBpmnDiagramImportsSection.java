@@ -12,8 +12,7 @@ import org.eclipse.jface.viewers.TableViewer;
 /**
  * 
  */
-public class JadexBpmnDiagramImportsSection extends
-		AbstractBpmnMultiColumnTablePropertySection
+public class JadexBpmnDiagramImportsSection extends AbstractBpmnMultiColumnTablePropertySection
 {
 	public static final int UNIQUE_COLUMN_INDEX = 0;
 	public static final String[] DEFAULT_IMPORT_VALUE = new String[]{"jadex.*"};
@@ -37,7 +36,4 @@ public class JadexBpmnDiagramImportsSection extends
 	{
 		super.createColumns(viewer, IMPORT_COLUMN_LABELS);
 	}
-	
-	
-
 }
