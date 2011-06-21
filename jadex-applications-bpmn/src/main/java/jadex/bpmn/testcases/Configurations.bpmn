@@ -62,31 +62,51 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_D6WM1pv3EeCF4Y7HOcQrlg" key="id1" value="inibindingb"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_En2MAJv3EeCF4Y7HOcQrlg" source="jadex_bindings_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf9cMJv3EeCF4Y7HOcQrlg" key="dimension" value="3:7"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf9cMZv3EeCF4Y7HOcQrlg" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf9cMpv3EeCF4Y7HOcQrlg" key="complexColumns" value="false:false:false:false:false:false:false"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf9cM5v3EeCF4Y7HOcQrlg" key="0:0" value="defbinding"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf9cNJv3EeCF4Y7HOcQrlg" key="0:1" value="local"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf9cNZv3EeCF4Y7HOcQrlg" key="0:2" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf9cNpv3EeCF4Y7HOcQrlg" key="0:3" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf9cN5v3EeCF4Y7HOcQrlg" key="0:4" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf-DQJv3EeCF4Y7HOcQrlg" key="0:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf-DQZv3EeCF4Y7HOcQrlg" key="0:6" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf-DQpv3EeCF4Y7HOcQrlg" key="1:0" value="inibinding1"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf-DQ5v3EeCF4Y7HOcQrlg" key="1:1" value="application"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf-DRJv3EeCF4Y7HOcQrlg" key="1:2" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf-DRZv3EeCF4Y7HOcQrlg" key="1:3" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf-DRpv3EeCF4Y7HOcQrlg" key="1:4" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf-DR5v3EeCF4Y7HOcQrlg" key="1:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf-DSJv3EeCF4Y7HOcQrlg" key="1:6" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf-DSZv3EeCF4Y7HOcQrlg" key="2:0" value="inibinding2"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf-DSpv3EeCF4Y7HOcQrlg" key="2:1" value="platform"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf-DS5v3EeCF4Y7HOcQrlg" key="2:2" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf-DTJv3EeCF4Y7HOcQrlg" key="2:3" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf-DTZv3EeCF4Y7HOcQrlg" key="2:4" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf-qUJv3EeCF4Y7HOcQrlg" key="2:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf-qUZv3EeCF4Y7HOcQrlg" key="2:6" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2Xg8Jv4EeCF4Y7HOcQrlg" key="dimension" value="3:7"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2Xg8Zv4EeCF4Y7HOcQrlg" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2Xg8pv4EeCF4Y7HOcQrlg" key="complexColumns" value="false:false:false:false:false:false:false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2Xg85v4EeCF4Y7HOcQrlg" key="0:0" value="defbinding"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2Xg9Jv4EeCF4Y7HOcQrlg" key="0:1" value="local"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2Xg9Zv4EeCF4Y7HOcQrlg" key="0:2" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2YIAJv4EeCF4Y7HOcQrlg" key="0:3" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2YIAZv4EeCF4Y7HOcQrlg" key="0:4" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2YIApv4EeCF4Y7HOcQrlg" key="0:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2YIA5v4EeCF4Y7HOcQrlg" key="0:6" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2YIBJv4EeCF4Y7HOcQrlg" key="1:0" value="inibindinga"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2YIBZv4EeCF4Y7HOcQrlg" key="1:1" value="application"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2YIBpv4EeCF4Y7HOcQrlg" key="1:2" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2YIB5v4EeCF4Y7HOcQrlg" key="1:3" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2YICJv4EeCF4Y7HOcQrlg" key="1:4" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2YICZv4EeCF4Y7HOcQrlg" key="1:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2YICpv4EeCF4Y7HOcQrlg" key="1:6" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2YIC5v4EeCF4Y7HOcQrlg" key="2:0" value="inibindingb"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2YIDJv4EeCF4Y7HOcQrlg" key="2:1" value="platform"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2YvEJv4EeCF4Y7HOcQrlg" key="2:2" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2YvEZv4EeCF4Y7HOcQrlg" key="2:3" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2YvEpv4EeCF4Y7HOcQrlg" key="2:4" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2YvE5v4EeCF4Y7HOcQrlg" key="2:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2YvFJv4EeCF4Y7HOcQrlg" key="2:6" value=""/>
   </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_hNORAJv3EeCF4Y7HOcQrlg" source="jadex_subcomponents_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GfekJv6EeCF4Y7HOcQrlg" key="dimension" value="1:6"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgFoJv6EeCF4Y7HOcQrlg" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgFoZv6EeCF4Y7HOcQrlg" key="complexColumns" value="false:false:true:true:true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgFopv6EeCF4Y7HOcQrlg" key="0:0" value="result"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgFo5v6EeCF4Y7HOcQrlg" key="0:1" value="Result.bpmn"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgFpJv6EeCF4Y7HOcQrlg" key="0:2" value="jadex_subcomponents_table_Instance-Name_dbadddcd-e93a-4709-9f0f-8d78d10b60f8_complex"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgFp5v6EeCF4Y7HOcQrlg" key="0:3" value="jadex_subcomponents_table_Number_4afb5a1f-6612-4ddd-98fe-f5becd6ed0c5_complex"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgssZv6EeCF4Y7HOcQrlg" key="0:4" value="jadex_subcomponents_table_Arguments_e02a2e86-1391-40f6-a341-4d58a29be18a_complex"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2Ggsspv6EeCF4Y7HOcQrlg" key="0:5" value=""/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_hNO4Fpv3EeCF4Y7HOcQrlg" source="jadex_subcomponents_table_Instance-Name_dbadddcd-e93a-4709-9f0f-8d78d10b60f8_complex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgFpZv6EeCF4Y7HOcQrlg" key="id" value="resultia"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgFppv6EeCF4Y7HOcQrlg" key="id1" value=""/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_hNO4GJv3EeCF4Y7HOcQrlg" source="jadex_subcomponents_table_Number_4afb5a1f-6612-4ddd-98fe-f5becd6ed0c5_complex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgFqJv6EeCF4Y7HOcQrlg" key="id" value="1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgssJv6EeCF4Y7HOcQrlg" key="id1" value="2"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_hNPfIZv3EeCF4Y7HOcQrlg" source="jadex_subcomponents_table_Arguments_e02a2e86-1391-40f6-a341-4d58a29be18a_complex"/>
   <pools xmi:type="bpmn:Pool" xmi:id="_xP5y0ZvpEeCjj9yzP5OiyQ" iD="_xP5y0JvpEeCjj9yzP5OiyQ" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_xP5y05vpEeCjj9yzP5OiyQ" iD="_xP5y0pvpEeCjj9yzP5OiyQ" incomingEdges="_mxp5AZvuEeCt9a2MpUzG-A" name="Invoke own service" activityType="Task"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_mZHdMZvuEeCt9a2MpUzG-A" iD="_mZHdMJvuEeCt9a2MpUzG-A" outgoingEdges="_mxp5AZvuEeCt9a2MpUzG-A" activityType="EventStartEmpty"/>

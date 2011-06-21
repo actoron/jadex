@@ -1599,6 +1599,25 @@ public class BpmnXMLReader
 								throw new RuntimeException("Unknown binding: "+bindingname);
 							RequiredServiceInfo rsi = new RequiredServiceInfo(name, type, multiple, binding);
 							mi.addRequiredService(rsi);
+							
+							if(table.getRowSize()>4)
+							{
+								String initialref = table.getCellValue(row, 4);
+								Map vals = table.getComplexValue(initialref);
+								for(Iterator it=vals.keySet().iterator(); it.hasNext(); )
+								{
+									String configid = (String)it.next();
+									bindingname = (String)vals.get(configid);
+									ConfigurationInfo ci = (ConfigurationInfo)configurations.get(configid);
+									if(ci!=null)
+									{
+										binding = (RequiredServiceBinding)bindings.get(bindingname);
+										if(binding==null)
+											throw new RuntimeException("Unknown binding: "+bindingname);
+										ci.addRequiredService(new RequiredServiceInfo(name, type, multiple, binding));
+									}
+								}
+							}
 						}
 					}
 					else if(anno.getSource().toLowerCase().endsWith("_subcomponents_table"))
@@ -1617,25 +1636,28 @@ public class BpmnXMLReader
 							SubcomponentTypeInfo suco = new SubcomponentTypeInfo(name, filename);
 							mi.addSubcomponentType(suco);
 							
-							Map instnames = table.getComplexValue(instnameref);
-							Map nums = table.getComplexValue(numref);
-							Map args = table.getComplexValue(argref);
-							
-							for(Iterator it=configurations.keySet().iterator(); it.hasNext(); )
+							if(table.getRowSize()>5)
 							{
-								String configid = (String)it.next();
-								ConfigurationInfo ci = (ConfigurationInfo)configurations.get(configid);
-								String instname = (String)instnames.get(configid);
-								String number = (String)nums.get(configid);
+								Map instnames = table.getComplexValue(instnameref);
+								Map nums = table.getComplexValue(numref);
+								Map args = table.getComplexValue(argref);
 								
-								// todo: support arguments
-								String argsttext = (String)args.get(configid);
-								
-								if((instname!=null && instname.length()>0) || (number!=null && number.length()>0))
+								for(Iterator it=configurations.keySet().iterator(); it.hasNext(); )
 								{
-									ComponentInstanceInfo cii = new ComponentInstanceInfo(instname!=null && instname.length()>0? instname: null, 
-										name!=null && name.length()>0? name: null, null, number!=null && number.length()>0? number: null);
-									ci.addComponentInstance(cii);
+									String configid = (String)it.next();
+									ConfigurationInfo ci = (ConfigurationInfo)configurations.get(configid);
+									String instname = (String)instnames.get(configid);
+									String number = (String)nums.get(configid);
+									
+									// todo: support arguments
+									String argsttext = (String)args.get(configid);
+									
+									if((instname!=null && instname.length()>0) || (number!=null && number.length()>0))
+									{
+										ComponentInstanceInfo cii = new ComponentInstanceInfo(instname!=null && instname.length()>0? instname: null, 
+											name!=null && name.length()>0? name: null, null, number!=null && number.length()>0? number: null);
+										ci.addComponentInstance(cii);
+									}
 								}
 							}
 						}

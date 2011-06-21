@@ -686,7 +686,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 //					String selectedConfiguration = JadexBpmnDiagramConfigurationsTableSection.getConfigurationSectionInstanceForModelElement(modelElement).getCurrentConfiguration();
 					String selconf = getConfigurationId();
 					String value = vals.get(selconf);
-					System.out.println("selconf: "+selconf+" "+value+" "+vals);
+//					System.out.println("selconf: "+selconf+" "+value+" "+vals);
 					return value != null ? value : "";
 				}
 			}
@@ -728,7 +728,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 						//String selectedConfiguration = JadexBpmnDiagramConfigurationsTableSection.getConfigurationSectionInstanceForModelElement(modelElement).getCurrentConfiguration();
 						String selconf = getConfigurationId();
 						map.put(selconf, newValue);
-						System.out.println("setting: "+selconf+" "+newValue+" "+map);
+//						System.out.println("setting: "+selconf+" "+newValue+" "+map);
 					}
 					else
 					{

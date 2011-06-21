@@ -260,10 +260,13 @@ public class MultiColumnTableEx extends MultiColumnTable
 						throw new RuntimeException("Complex values not found: "+detailsMap);
 					
 					List det = ref.getDetails();
-					for(int i=0; i<det.size(); i++)
+					if(det!=null)
 					{
-						MAnnotationDetail ad = (MAnnotationDetail)det.get(i);
-						valmap.put(ad.getKey(), ad.getValue());
+						for(int i=0; i<det.size(); i++)
+						{
+							MAnnotationDetail ad = (MAnnotationDetail)det.get(i);
+							valmap.put(ad.getKey(), ad.getValue());
+						}
 					}
 					newTable.setComplexValue(newRow[columnIndex], valmap);
 				}
