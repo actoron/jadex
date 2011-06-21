@@ -31,6 +31,10 @@ public class ComponentInstanceInfo extends Startable
 	/** The list of required service binding infos. */
 	protected List bindings;
 	
+	/** The arguments expression (Hack for 
+	    BPMN Editor that saves args as one string. */
+	protected UnparsedExpression argumentsexp;
+	
 	//-------- constructors --------
 	
 	/**
@@ -154,6 +158,24 @@ public class ComponentInstanceInfo extends Startable
 		arguments.add(argument);
 	}
 	
+	/**
+	 *  Get the arguments expression.
+	 *  @return The arguments expression.
+	 */
+	public UnparsedExpression getArgumentsExpression()
+	{
+		return argumentsexp;
+	}
+
+	/**
+	 *  Set the arguments expression.
+	 *  @param argumentsexp The arguments to set.
+	 */
+	public void setArgumentsExpression(UnparsedExpression argumentsexp)
+	{
+		this.argumentsexp = argumentsexp;
+	}
+
 	/**
 	 *  Get the bindings.
 	 *  @return the bindings.

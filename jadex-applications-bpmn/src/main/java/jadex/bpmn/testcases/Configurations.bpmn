@@ -12,7 +12,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zmLGopvpEeCjj9yzP5OiyQ" key="1:2" value=""/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_y-D9wJvpEeCjj9yzP5OiyQ" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_y-Ek0JvpEeCjj9yzP5OiyQ" key="configuration" value="id1:b"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_y-Ek0JvpEeCjj9yzP5OiyQ" key="configuration" value="id:a"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5lAckJvpEeCjj9yzP5OiyQ" key="editor_version" value="1.0"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_kp9CIJvtEeCjj9yzP5OiyQ" key="package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ietdIJvuEeCt9a2MpUzG-A" key="keep alive" value="true"/>
@@ -88,25 +88,33 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z2YvFJv4EeCF4Y7HOcQrlg" key="2:6" value=""/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_hNORAJv3EeCF4Y7HOcQrlg" source="jadex_subcomponents_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GfekJv6EeCF4Y7HOcQrlg" key="dimension" value="1:6"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgFoJv6EeCF4Y7HOcQrlg" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgFoZv6EeCF4Y7HOcQrlg" key="complexColumns" value="false:false:true:true:true"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgFopv6EeCF4Y7HOcQrlg" key="0:0" value="result"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgFo5v6EeCF4Y7HOcQrlg" key="0:1" value="Result.bpmn"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgFpJv6EeCF4Y7HOcQrlg" key="0:2" value="jadex_subcomponents_table_Instance-Name_dbadddcd-e93a-4709-9f0f-8d78d10b60f8_complex"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgFp5v6EeCF4Y7HOcQrlg" key="0:3" value="jadex_subcomponents_table_Number_4afb5a1f-6612-4ddd-98fe-f5becd6ed0c5_complex"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgssZv6EeCF4Y7HOcQrlg" key="0:4" value="jadex_subcomponents_table_Arguments_e02a2e86-1391-40f6-a341-4d58a29be18a_complex"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2Ggsspv6EeCF4Y7HOcQrlg" key="0:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmmxwJxBEeC3-cIdV9ycxw" key="dimension" value="1:6"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmmxwZxBEeC3-cIdV9ycxw" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmmxwpxBEeC3-cIdV9ycxw" key="complexColumns" value="false:false:true:true:true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmmxw5xBEeC3-cIdV9ycxw" key="0:0" value="result"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmmxxJxBEeC3-cIdV9ycxw" key="0:1" value="Result.bpmn"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmmxxZxBEeC3-cIdV9ycxw" key="0:2" value="jadex_subcomponents_table_Instance-Name_dbadddcd-e93a-4709-9f0f-8d78d10b60f8_complex"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmnY0pxBEeC3-cIdV9ycxw" key="0:3" value="jadex_subcomponents_table_Number_4afb5a1f-6612-4ddd-98fe-f5becd6ed0c5_complex"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmn_4ZxBEeC3-cIdV9ycxw" key="0:4" value="jadex_subcomponents_table_Arguments_e02a2e86-1391-40f6-a341-4d58a29be18a_complex"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmn_45xBEeC3-cIdV9ycxw" key="0:5" value=""/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_hNO4Fpv3EeCF4Y7HOcQrlg" source="jadex_subcomponents_table_Instance-Name_dbadddcd-e93a-4709-9f0f-8d78d10b60f8_complex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgFpZv6EeCF4Y7HOcQrlg" key="id" value="resultia"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgFppv6EeCF4Y7HOcQrlg" key="id1" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmnY0JxBEeC3-cIdV9ycxw" key="id" value="resultia"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmnY0ZxBEeC3-cIdV9ycxw" key="id1" value=""/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_hNO4GJv3EeCF4Y7HOcQrlg" source="jadex_subcomponents_table_Number_4afb5a1f-6612-4ddd-98fe-f5becd6ed0c5_complex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgFqJv6EeCF4Y7HOcQrlg" key="id" value="1"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2GgssJv6EeCF4Y7HOcQrlg" key="id1" value="2"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmnY05xBEeC3-cIdV9ycxw" key="id" value="1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmn_4JxBEeC3-cIdV9ycxw" key="id1" value="2"/>
   </eAnnotations>
-  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_hNPfIZv3EeCF4Y7HOcQrlg" source="jadex_subcomponents_table_Arguments_e02a2e86-1391-40f6-a341-4d58a29be18a_complex"/>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_hNPfIZv3EeCF4Y7HOcQrlg" source="jadex_subcomponents_table_Arguments_e02a2e86-1391-40f6-a341-4d58a29be18a_complex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmn_4pxBEeC3-cIdV9ycxw" key="id" value="SUtil.createHashMap(new String[]{&quot;in&quot;}, new String[]{&quot;initial&quot;})"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_y4VBMJxBEeC3-cIdV9ycxw" source="jadex_imports_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z3BeEJxBEeC3-cIdV9ycxw" key="dimension" value="1:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z3BeEZxBEeC3-cIdV9ycxw" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z3BeEpxBEeC3-cIdV9ycxw" key="complexColumns" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z3BeE5xBEeC3-cIdV9ycxw" key="0:0" value="jadex.commons.*"/>
+  </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_xP5y0ZvpEeCjj9yzP5OiyQ" iD="_xP5y0JvpEeCjj9yzP5OiyQ" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_xP5y05vpEeCjj9yzP5OiyQ" iD="_xP5y0pvpEeCjj9yzP5OiyQ" incomingEdges="_mxp5AZvuEeCt9a2MpUzG-A" name="Invoke own service" activityType="Task"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_mZHdMZvuEeCt9a2MpUzG-A" iD="_mZHdMJvuEeCt9a2MpUzG-A" outgoingEdges="_mxp5AZvuEeCt9a2MpUzG-A" activityType="EventStartEmpty"/>

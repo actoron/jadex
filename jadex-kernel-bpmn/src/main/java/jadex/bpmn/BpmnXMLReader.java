@@ -693,7 +693,7 @@ public class BpmnXMLReader
 						for(int row = 0; row < table.size(); row++)
 						{
 							// normal property has 2 values
-							assert table.get(row).size() == 2;
+//							assert table.get(row).size() == 2;
 			
 							String name =  (String) table.get(row).getColumnValueAt(0);
 							String val = (String) table.get(row).getColumnValueAt(1) != "" ? (String) table.get(row).getColumnValueAt(1) : null;
@@ -1040,16 +1040,16 @@ public class BpmnXMLReader
 						
 						for(int row = 0; row < table.size(); row++)
 						{
-							try
-							{
-								// normal mapping has 2 values
-								assert table.get(row).size() == 2;
-							}
-							catch (AssertionError e)
-							{
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+//							try
+//							{
+//								// normal mapping has 2 values
+//								assert table.get(row).size() == 2;
+//							}
+//							catch (AssertionError e)
+//							{
+//								// TODO Auto-generated catch block
+//								e.printStackTrace();
+//							}
 							
 							String propname = (String) table.get(row).getColumnValueAt(0);
 							String proptext = (String) table.get(row).getColumnValueAt(1);
@@ -1309,7 +1309,7 @@ public class BpmnXMLReader
 						for(int row = 0; row < table.size(); row++) 
 						{
 							// normal import has 1 value
-							assert table.get(row).size() == 1;
+//							assert table.get(row).size() == 1;
 
 							String imp = (String) table.get(row).getColumnValueAt(0);
 							if(imp.length() > 0)
@@ -1650,13 +1650,13 @@ public class BpmnXMLReader
 									String instname = (String)instnames.get(configid);
 									String number = (String)nums.get(configid);
 									
-									// todo: support arguments
-									String argsttext = (String)args.get(configid);
+									String argstext = (String)args.get(configid);
 									
 									if((instname!=null && instname.length()>0) || (number!=null && number.length()>0))
 									{
 										ComponentInstanceInfo cii = new ComponentInstanceInfo(instname!=null && instname.length()>0? instname: null, 
 											name!=null && name.length()>0? name: null, null, number!=null && number.length()>0? number: null);
+										cii.setArgumentsExpression(new UnparsedExpression(null, Map.class, argstext, null));
 										ci.addComponentInstance(cii);
 									}
 								}

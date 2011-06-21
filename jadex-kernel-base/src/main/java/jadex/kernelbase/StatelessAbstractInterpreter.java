@@ -1030,7 +1030,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		
 		Map ret = null;		
 		UnparsedExpression[] arguments = component.getArguments();
-
+		UnparsedExpression argumentsexp = component.getArgumentsExpression();
+		
 		if(arguments.length>0)
 		{
 			ret = new HashMap();
@@ -1041,6 +1042,11 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				Object val = SJavaParser.evaluateExpression(arguments[i].getValue(), model.getAllImports(), getFetcher(), model.getClassLoader());
 				ret.put(arguments[i].getName(), val);
 			}
+		}
+		else if(argumentsexp!=null)
+		{
+			// todo: language
+			ret = (Map)SJavaParser.evaluateExpression(argumentsexp.getValue(), model.getAllImports(), getFetcher(), model.getClassLoader());
 		}
 		
 		return ret;
