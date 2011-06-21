@@ -145,8 +145,6 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 */
 	public IFuture isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
-		System.out.println("loadable " + model.endsWith(".gpmn"));
-		System.out.println("startable " + isStartable(model, imports, classloader));
 		return new Future(model.endsWith(".gpmn"));
 	}
 	
