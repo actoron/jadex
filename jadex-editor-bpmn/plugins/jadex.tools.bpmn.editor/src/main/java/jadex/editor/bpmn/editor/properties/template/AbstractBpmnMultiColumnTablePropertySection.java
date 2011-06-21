@@ -664,7 +664,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 //					String selectedConfiguration = JadexBpmnDiagramConfigurationsTableSection.getConfigurationSectionInstanceForModelElement(modelElement).getCurrentConfiguration();
 					String selconf = getConfiguration();
 					String value = vals.get(selconf);
-					System.out.println("selconf: "+selconf+" "+value);
+//					System.out.println("selconf: "+selconf+" "+value+" "+vals);
 					return value != null ? value : "";
 				}
 			}
@@ -682,8 +682,11 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 				protected CommandResult doExecuteWithResult(IProgressMonitor monitor, IAdaptable info)
 					throws ExecutionException
 				{
+					// Always use the fresh row from editor. Otherwise complex values will be lost.
 					MultiColumnTableEx table = getTableFromAnnotation();
-					MultiColumnTableRow rowToEdit = (MultiColumnTableRow)table.get(table.indexOf(tableViewerRow));
+					MultiColumnTableRow rowToEdit = tableViewerRow;
+					table.set(table.indexOf(tableViewerRow), tableViewerRow);
+//					MultiColumnTableRow rowToEdit = (MultiColumnTableRow)table.get(table.indexOf(tableViewerRow));
 
 					if(attributeIndex == table.getUniqueColumn())
 					{
@@ -702,8 +705,8 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 						Map<String, String> map = table.getComplexValue(id);
 						//String selectedConfiguration = JadexBpmnDiagramConfigurationsTableSection.getConfigurationSectionInstanceForModelElement(modelElement).getCurrentConfiguration();
 						String selconf = getConfiguration();
-						System.out.println("setting: "+selconf+" "+newValue+" "+map);
 						map.put(selconf, newValue);
+//						System.out.println("setting: "+selconf+" "+newValue+" "+map);
 					}
 					else
 					{

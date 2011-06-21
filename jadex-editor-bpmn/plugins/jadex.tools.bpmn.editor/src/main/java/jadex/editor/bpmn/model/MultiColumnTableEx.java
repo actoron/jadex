@@ -17,9 +17,9 @@ public class MultiColumnTableEx extends MultiColumnTable
 
 	// ---- attributes ----
 	
-	boolean[] isComplexColumn;
+	protected boolean[] isComplexColumn;
 	
-	Map<String, Map<String, String>>complexValues;
+	protected Map<String, Map<String, String>>complexValues;
 	
 	// ---- constructors ----
 	

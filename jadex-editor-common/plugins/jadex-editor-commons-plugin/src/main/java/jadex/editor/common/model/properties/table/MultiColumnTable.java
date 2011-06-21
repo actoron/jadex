@@ -70,7 +70,6 @@ public class MultiColumnTable
 	 */
 	public MultiColumnTable(int rowCount, int uniqueColumn)
 	{
-		super();
 		this.uniqueColumn = uniqueColumn;
 		this.rows = new ArrayList<MultiColumnTableRow>(rowCount);
 		this.uniqueValues = new HashSet<String>();
@@ -93,10 +92,10 @@ public class MultiColumnTable
 	 */
 	public int getRowSize()
 	{
-		if (!rows.isEmpty())
+		if(!rows.isEmpty())
 		{
 			// ensure an element is found (don't use index 0 statically)
-			for (MultiColumnTableRow row : rows)
+			for(MultiColumnTableRow row : rows)
 			{
 				return row.size();
 			}
@@ -137,7 +136,7 @@ public class MultiColumnTable
 	public void add(int index, MultiColumnTableRow row)
 	{
 		// don't add empty unique values
-		if (row.columnValues[uniqueColumn].trim().isEmpty())
+		if(row.columnValues[uniqueColumn].trim().isEmpty())
 		{
 			throw new UnsupportedOperationException("Empty string is not a valid unique identifier for column index: " + getUniqueColumn() );
 		}
