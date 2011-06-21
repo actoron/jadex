@@ -232,10 +232,10 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 		Font tableFont = viewer.getTable().getFont();
 		
 		TableLayout tableLayout = new TableLayout();
-		for (int columnIndex = 0; columnIndex < columns.length; columnIndex++)
+		for(int columnIndex = 0; columnIndex < columns.length; columnIndex++)
 		{
 			tableLayout.addColumnData(new ColumnWeightData(columnWeights[columnIndex],
-					FigureUtilities.getTextWidth(columns[columnIndex].getText(), tableFont), true));
+				FigureUtilities.getTextWidth(columns[columnIndex].getText(), tableFont), true));
 		}
 		viewer.getTable().setLayout(tableLayout);
 	}

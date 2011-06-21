@@ -116,7 +116,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 			if(complexColumnMarker[i])
 			{
 				TableColumn col = tableViewer.getTable().getColumn(i);
-				String config = getConfiguration();
+				String config = getConfigurationName();
 				String name = colnames[i];
 				if(config!=null && config.length()>0)
 				{
@@ -138,6 +138,28 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 	{
 		return JadexBpmnPropertiesUtil.getJadexEAnnotationDetail(modelElement, JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, 
 			JadexBpmnPropertiesUtil.JADEX_ACTIVE_CONFIGURATION_DETAIL);
+	}
+	
+	/**
+	 *  Get the current configuration.
+	 */
+	protected String getConfigurationName()
+	{
+		String ret = getConfiguration();
+		if(ret!=null && ret.indexOf(":")!=-1)
+			ret = ret.substring(ret.indexOf(":")+1);
+		return ret;
+	}
+	
+	/**
+	 *  Get the current configuration.
+	 */
+	protected String getConfigurationId()
+	{
+		String ret = getConfiguration();
+		if(ret!=null && ret.indexOf(":")!=-1)
+			ret = ret.substring(0, ret.indexOf(":"));
+		return ret;
 	}
 	
 	/**
@@ -600,7 +622,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 			MultiColumnTableEx table = getTableFromAnnotation();
 			if(table.isComplexColumn(columnIndex))
 			{
-				ret = (String)table.getComplexValue(ret).get(getConfiguration());
+				ret = (String)table.getComplexValue(ret).get(getConfigurationId());
 			}
 			return ret;
 		}
@@ -662,9 +684,9 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 					String complexValueIdentifier = row.getColumnValueAt(attributeIndex);
 					Map<String, String> vals = table.getComplexValue(complexValueIdentifier);
 //					String selectedConfiguration = JadexBpmnDiagramConfigurationsTableSection.getConfigurationSectionInstanceForModelElement(modelElement).getCurrentConfiguration();
-					String selconf = getConfiguration();
+					String selconf = getConfigurationId();
 					String value = vals.get(selconf);
-//					System.out.println("selconf: "+selconf+" "+value+" "+vals);
+					System.out.println("selconf: "+selconf+" "+value+" "+vals);
 					return value != null ? value : "";
 				}
 			}
@@ -704,9 +726,9 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 						String id = rowToEdit.getColumnValueAt(attributeIndex);
 						Map<String, String> map = table.getComplexValue(id);
 						//String selectedConfiguration = JadexBpmnDiagramConfigurationsTableSection.getConfigurationSectionInstanceForModelElement(modelElement).getCurrentConfiguration();
-						String selconf = getConfiguration();
+						String selconf = getConfigurationId();
 						map.put(selconf, newValue);
-//						System.out.println("setting: "+selconf+" "+newValue+" "+map);
+						System.out.println("setting: "+selconf+" "+newValue+" "+map);
 					}
 					else
 					{

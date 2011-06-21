@@ -1,0 +1,40 @@
+package jadex.bpmn.testcases;
+
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+
+/**
+ * 
+ */
+public class AService implements IAService
+{
+	/** The test string. */
+	protected String test;
+	
+	/**
+	 *  Create a new service.
+	 */
+	public AService() 
+	{
+		this.test = "no value";
+	}
+	
+	/**
+	 *  Create a new service.
+	 */
+	public AService(String test) 
+	{
+		this.test = test;
+	}
+
+
+
+	/**
+	 *  Test method.
+	 */
+	public IFuture test()
+	{
+		System.out.println("val: "+test);
+		return new Future(test);
+	}
+}

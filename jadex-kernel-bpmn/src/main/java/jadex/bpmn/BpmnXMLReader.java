@@ -1291,6 +1291,8 @@ public class BpmnXMLReader
 			ModelInfo mi = (ModelInfo)model.getModelInfo();
 			JavaCCExpressionParser parser = new JavaCCExpressionParser();
 
+			Map configurations = new HashMap();
+			
 			// Handle the annotations of the model (Jadex BPMN Editor).
 			List annos = model.getAnnotations();
 			if(annos!=null)
@@ -1371,10 +1373,13 @@ public class BpmnXMLReader
 						for(int row = 0; row < table.size(); row++)
 						{
 							// normal configurations has 2 values
-							assert table.get(row).size() == 2;
-							String name = (String) table.get(row).getColumnValueAt(0);
-							String poollane = (String) table.get(row).getColumnValueAt(1);
-							mi.addConfiguration(new ConfigurationInfo(name));
+//							assert table.get(row).size() == 3;
+							String id = table.getCellValue(row, 0);
+							String name = table.getCellValue(row, 1);
+							String poollane = table.getCellValue(row, 2);
+							ConfigurationInfo ci = new ConfigurationInfo(name);
+							mi.addConfiguration(ci);
+							configurations.put(id, ci);
 							if(poollane!=null && poollane.length()>0)
 								model.addPoolLane(name, poollane);
 						}
@@ -1435,7 +1440,7 @@ public class BpmnXMLReader
 							String desc = table.getCellValue(row, 3);
 							String typename = table.getCellValue(row, 4);
 							String val = table.getCellValue(row, 5).length()>0? table.getCellValue(row, 5): null;
-							String complexref = table.getCellValue(row, 6);
+							
 							IParsedExpression exp = null;
 							Class clazz = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
 							
@@ -1458,23 +1463,28 @@ public class BpmnXMLReader
 							}
 							arg = new Argument(name, desc, typename, argval);
 							
-							Map vals = table.getComplexValue(complexref);
-							for(Iterator it=vals.keySet().iterator(); it.hasNext(); )
+							if(table.getRowSize()>6)
 							{
-								String configname = (String)it.next();
-								String valtext = (String)vals.get(configname);
-								if(valtext!=null && valtext.length()>0)
+								String complexref = table.getCellValue(row, 6);
+								Map vals = table.getComplexValue(complexref);
+								for(Iterator it=vals.keySet().iterator(); it.hasNext(); )
 								{
-									exp = parser.parseExpression(valtext, model.getModelInfo().getAllImports(), null, context.getClassLoader());
-									Object inival = exp!=null ? exp.getValue(null) : null;
-									arg.setDefaultValue(configname, inival);
-
-									// Hack! Should add argument values in configurations not in argument!
-//									ConfigurationInfo cinfo = mi.getConfiguration(configname);
-//									if(cinfo!=null)
-//									{
-//										cinfo.addArgument(new UnparsedExpression(configname, clazz, valtext, null));
-//									}
+									String configid = (String)it.next();
+									String valtext = (String)vals.get(configid);
+									if(valtext!=null && valtext.length()>0)
+									{
+										exp = parser.parseExpression(valtext, model.getModelInfo().getAllImports(), null, context.getClassLoader());
+										Object inival = exp!=null ? exp.getValue(null) : null;
+										ConfigurationInfo ci = (ConfigurationInfo)configurations.get(configid);
+										arg.setDefaultValue(ci.getName(), inival);
+	
+										// Hack! Should add argument values in configurations not in argument!
+	//									ConfigurationInfo cinfo = mi.getConfiguration(configname);
+	//									if(cinfo!=null)
+	//									{
+	//										cinfo.addArgument(new UnparsedExpression(configname, clazz, valtext, null));
+	//									}
+									}
 								}
 							}
 							
@@ -1524,8 +1534,8 @@ public class BpmnXMLReader
 //							assert table.get(row).size() == 4;
 							String name = table.getCellValue(row, 0);
 							String typename = table.getCellValue(row, 1);
-							String implname = table.getCellValue(row, 2);
-							String proxytype = table.getCellValue(row, 3);
+							String proxytype = table.getCellValue(row, 2);
+							String implname = table.getCellValue(row, 3);
 
 							Class impltype = SReflect.findClass0(implname, mi.getAllImports(), context.getClassLoader());
 							Class type = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
@@ -1573,34 +1583,39 @@ public class BpmnXMLReader
 						{
 							// normal property has 5 values
 //							assert table.get(row).size() == 5;
-							String name = (String) table.get(row).getColumnValueAt(0);
-							String filename = (String) table.get(row).getColumnValueAt(1);
-
+							String name = table.getCellValue(row, 0);
+							String filename = table.getCellValue(row, 1);
+							String instnameref = table.getCellValue(row, 2);
+							String numref = table.getCellValue(row, 3);
+							String argref = table.getCellValue(row, 4);
+							
 							SubcomponentTypeInfo suco = new SubcomponentTypeInfo(name, filename);
 							mi.addSubcomponentType(suco);
 							
-							ConfigurationInfo[] configs = mi.getConfigurations();
-							// todo: repair me
-							int j=0;
-//							for(int j=0; j<configs.length; j++)
+							Map instnames = table.getComplexValue(instnameref);
+							Map nums = table.getComplexValue(numref);
+							Map args = table.getComplexValue(argref);
+							
+							for(Iterator it=configurations.keySet().iterator(); it.hasNext(); )
 							{
-								String instname = (String) table.get(row).getColumnValueAt(2);
-								String number = (String) table.get(row).getColumnValueAt(3);
+								String configid = (String)it.next();
+								ConfigurationInfo ci = (ConfigurationInfo)configurations.get(configid);
+								String instname = (String)instnames.get(configid);
+								String number = (String)nums.get(configid);
 								
-								// todo: config and args
-//								String config = (String) table.get(row).getColumnValueAt(4);
-//								String args = (String) table.get(row).getColumnValueAt(4);
+								// todo: support arguments
+								String argsttext = (String)args.get(configid);
+								
 								if((instname!=null && instname.length()>0) || (number!=null && number.length()>0))
 								{
 									ComponentInstanceInfo cii = new ComponentInstanceInfo(instname!=null && instname.length()>0? instname: null, 
 										name!=null && name.length()>0? name: null, null, number!=null && number.length()>0? number: null);
-									// todo: support arguments
-									configs[j].addComponentInstance(cii);
+									ci.addComponentInstance(cii);
 								}
 							}
 						}
 					}
-					else if (!anno.getSource().toLowerCase().endsWith("table"))
+					else if(!anno.getSource().toLowerCase().endsWith("table") && !anno.getSource().toLowerCase().endsWith("complex"))
 					{
 						// handle other annotation details here
 					
@@ -1643,7 +1658,7 @@ public class BpmnXMLReader
 								{
 									mi.setSuspend(new Boolean(value));
 								}
-								else if("keepalive".equals(key))
+								else if("keep alive".equals(key))
 								{
 									model.setKeepAlive(new Boolean(value).booleanValue());
 								}
@@ -1750,7 +1765,7 @@ public class BpmnXMLReader
 										}
 									}
 								}
-								else if(!"package".equals(key) && !"imports".equals(key) && !key.endsWith("complex"))
+								else if(!"package".equals(key) && !"imports".equals(key))
 								{
 									throw new RuntimeException("Error parsing annotation: "+key+", "+value);
 								}

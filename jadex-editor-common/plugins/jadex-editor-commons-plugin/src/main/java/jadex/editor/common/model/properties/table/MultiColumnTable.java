@@ -4,10 +4,13 @@
 package jadex.editor.common.model.properties.table;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
@@ -57,12 +60,11 @@ public class MultiColumnTable
 	/** The list of rows in this table */
 	private List<MultiColumnTableRow> rows;
 	
-	private int uniqueColumn = 0;
+	private int uniqueColumn;
 	private HashSet<String> uniqueValues;
 	
 	// ---- constructors ----
 	
-
 	/**
 	 * 
 	 * @param rowCount
@@ -112,11 +114,15 @@ public class MultiColumnTable
 		return uniqueColumn;
 	}
 
+	/**
+	 *  Create a unique value based on desired value
+	 *  using a counter.
+	 */
 	public String createUniqueValue(String desiredValue)
 	{
 		int counter = 1;
 		String uniqueValueToUse = desiredValue;
-		while (uniqueValues.contains(uniqueValueToUse))
+		while(uniqueValues.contains(uniqueValueToUse))
 		{
 			uniqueValueToUse = desiredValue + counter;
 			counter++;
@@ -126,7 +132,6 @@ public class MultiColumnTable
 	}
 	
 	// ---- List delegations ----
-	
 	
 	/**
 	 * @param index
@@ -185,7 +190,7 @@ public class MultiColumnTable
 	public boolean equals(Object o)
 	{
 		return (o instanceof MultiColumnTable) 
-			&& uniqueColumn == (((MultiColumnTable) o).uniqueColumn)
+			&& uniqueColumn == (((MultiColumnTable)o).uniqueColumn)
 			&& rows.equals(((MultiColumnTable) o).rows)
 			&& uniqueValues.equals(((MultiColumnTable) o).uniqueValues);
 	}
@@ -352,7 +357,6 @@ public class MultiColumnTable
 	public static MultiColumnTable convertMultiColumnTableString(
 			String stringToConvert, int uniqueColumn)
 	{
-
 		StringTokenizer listTokens = new StringTokenizer(stringToConvert, LIST_ELEMENT_DELIMITER, false);
 		
 //		long countRowTokens = listTokens.countTokens();
@@ -441,8 +445,8 @@ public class MultiColumnTable
 	/**
 	 * Representation of a MultiColumnTableRow
 	 */
-	public class MultiColumnTableRow {
-		
+	public class MultiColumnTableRow 
+	{
 		// ---- attributes ----
 
 		private String[] columnValues;
@@ -488,9 +492,10 @@ public class MultiColumnTable
 			}
 			
 			boolean returnValue = true;
-			if (useUniqueColumn())
+			if(useUniqueColumn())
 			{
-				returnValue = this.columnValues[getUniqueColumnIndex()].equals(((MultiColumnTableRow) obj).columnValues[getUniqueColumnIndex()]);
+				int uniqueColumnIndex = getUniqueColumnIndex();
+				returnValue = this.columnValues[uniqueColumnIndex].equals(((MultiColumnTableRow)obj).columnValues[uniqueColumnIndex]);
 			}
 			else
 			{
@@ -510,7 +515,7 @@ public class MultiColumnTable
 		{
 			int returnHash = 31;
 			
-			if (useUniqueColumn())
+			if(useUniqueColumn())
 			{
 				returnHash = this.columnValues[getUniqueColumnIndex()].hashCode();
 			}

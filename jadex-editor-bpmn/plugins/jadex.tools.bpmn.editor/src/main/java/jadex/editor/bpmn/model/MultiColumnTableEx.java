@@ -14,7 +14,6 @@ import java.util.Map;
  */
 public class MultiColumnTableEx extends MultiColumnTable
 {
-
 	// ---- attributes ----
 	
 	protected boolean[] isComplexColumn;

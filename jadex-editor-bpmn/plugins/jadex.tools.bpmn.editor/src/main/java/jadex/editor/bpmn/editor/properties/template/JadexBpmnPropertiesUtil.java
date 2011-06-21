@@ -311,7 +311,7 @@ public class JadexBpmnPropertiesUtil
 	{
 		StringBuffer b = new StringBuffer(getTableAnnotationIdentifier(annotationID, detailID));
 		b.append(JADEX_COMBINED_KEY_DELIMITER);
-		b.append(colname);
+		b.append(colname.replace(" ", "-"));
 		b.append(JADEX_COMBINED_KEY_DELIMITER);
 		b.append(UUID.randomUUID());
 		b.append(JADEX_COMBINED_KEY_DELIMITER);
