@@ -1471,11 +1471,11 @@ public class BpmnXMLReader
 								{
 									String configid = (String)it.next();
 									String valtext = (String)vals.get(configid);
-									if(valtext!=null && valtext.length()>0)
+									ConfigurationInfo ci = (ConfigurationInfo)configurations.get(configid);
+									if(ci!=null && valtext!=null && valtext.length()>0)
 									{
 										exp = parser.parseExpression(valtext, model.getModelInfo().getAllImports(), null, context.getClassLoader());
 										Object inival = exp!=null ? exp.getValue(null) : null;
-										ConfigurationInfo ci = (ConfigurationInfo)configurations.get(configid);
 										arg.setDefaultValue(ci.getName(), inival);
 	
 										// Hack! Should add argument values in configurations not in argument!
@@ -1514,7 +1514,7 @@ public class BpmnXMLReader
 						for(int row=0; row<table.size(); row++)
 						{
 							// normal property has 2 values
-							assert table.get(row).size() == 2;
+//							assert table.get(row).size() == 2;
 							String name = (String) table.get(row).getColumnValueAt(0);
 							String value = (String) table.get(row).getColumnValueAt(1);
 
@@ -1539,7 +1539,6 @@ public class BpmnXMLReader
 
 							Class impltype = SReflect.findClass0(implname, mi.getAllImports(), context.getClassLoader());
 							Class type = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
-
 							RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(implname);
 							ProvidedServiceImplementation psim;
 							if(binding!=null)
@@ -1553,6 +1552,32 @@ public class BpmnXMLReader
 							
 							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, psim);
 							mi.addProvidedService(psi);
+							
+							if(table.getRowSize()>4)
+							{
+								String initialref = table.getCellValue(row, 4);
+								Map vals = table.getComplexValue(initialref);
+								for(Iterator it=vals.keySet().iterator(); it.hasNext(); )
+								{
+									String configid = (String)it.next();
+									implname = (String)vals.get(configid);
+									ConfigurationInfo ci = (ConfigurationInfo)configurations.get(configid);
+									if(ci!=null)
+									{
+										impltype = SReflect.findClass0(implname, mi.getAllImports(), context.getClassLoader());
+										binding = (RequiredServiceBinding)bindings.get(implname);
+										if(binding!=null)
+										{
+											psim = new ProvidedServiceImplementation(impltype, null, proxytype, binding);
+										}
+										else
+										{
+											psim = new ProvidedServiceImplementation(impltype, impltype==null? implname: null, proxytype, null);
+										}
+										ci.addProvidedService(new ProvidedServiceInfo(name, type, psim));
+									}
+								}
+							}
 						}
 					}
 					else if(anno.getSource().toLowerCase().endsWith("_requiredservices_table"))
