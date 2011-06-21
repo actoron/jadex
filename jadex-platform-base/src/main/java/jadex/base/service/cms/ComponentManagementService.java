@@ -1099,7 +1099,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				((CMSComponentDescription)desc).setState(IComponentDescription.STATE_TERMINATED);
 			}
 			ccs.remove(cid);
-			ret	= (Future) cfs.remove(cid);
+			ret	= (Future)cfs.remove(cid);
 		}
 		if(ret!=null)
 		{
@@ -1569,7 +1569,6 @@ public abstract class ComponentManagementService extends BasicService implements
 				desc	= (CMSComponentDescription)adapter.getDescription();
 				results = getComponentInstance(adapter).getResults();
 				
-				exitDestroy(cid, desc, null, results);
 //				desc.setState(IComponentDescription.STATE_TERMINATED);
 //				ccs.remove(cid);
 //				cfs.remove(cid);
@@ -1618,9 +1617,19 @@ public abstract class ComponentManagementService extends BasicService implements
 			// space executor->general loop->distributed percepts->(holds space mon -> needs adapter mon for getting external access)
 			if(pad!=null)
 			{
-				getComponentInstance(pad).componentDestroyed(desc);
+				try
+				{
+					getComponentInstance(pad).componentDestroyed(desc);
+				}
+				catch(ComponentTerminatedException cte)
+				{
+					// Parent just killed: ignore.
+				}
 			}
 			// else parent has just been killed.
+			
+			exitDestroy(cid, desc, null, results);
+
 			
 			ICMSComponentListener[] alisteners;
 			synchronized(listeners)

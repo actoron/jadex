@@ -511,7 +511,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				{
 					public void run()
 					{
-						component.cleanupComponent().addResultListener(new IResultListener()
+						component.cleanupComponent()
+							.addResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
