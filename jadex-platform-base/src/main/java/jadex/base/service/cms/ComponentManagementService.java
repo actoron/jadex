@@ -1631,7 +1631,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			}
 			
 			// todo: can be called after listener has (concurrently) deregistered
-			logger.info("Component removed: "+cid.getName()+", "+SUtil.arrayToString(alisteners));
+//			logger.info("Component removed: "+cid.getName()+", "+SUtil.arrayToString(alisteners));
 			for(int i=0; i<alisteners.length; i++)
 			{
 				try
