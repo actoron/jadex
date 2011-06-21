@@ -3,6 +3,8 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_I19JcJaMEeCj2rAtY6yqkw" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I19JcZaMEeCj2rAtY6yqkw" key="package" value="jadex.bpmn"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_da7pYJaMEeCj2rAtY6yqkw" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KC99oJwHEeCTM9TB44euIw" key="keep alive" value="true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KOgfQJwHEeCTM9TB44euIw" key="autoshutdown" value="false"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_MgPC0JaMEeCj2rAtY6yqkw" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OQ3S8JaMEeCj2rAtY6yqkw" key="dimension" value="2:1"/>
@@ -21,8 +23,8 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gGYjAZaMEeCj2rAtY6yqkw" key="uniqueColumnIndex" value="0"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gGYjApaMEeCj2rAtY6yqkw" key="0:0" value="name"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gGYjA5aMEeCj2rAtY6yqkw" key="0:1" value="IComponentFactory"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gGYjBJaMEeCj2rAtY6yqkw" key="0:2" value="new BpmnFactory($component.getServiceProvider(), SUtil.createHashMap(new String[]{&quot;debugger.panels&quot;},new Object[]{&quot;jadex.tools.debugger.bpmn.BpmnDebuggerPanel&quot;}))"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gGYjBZaMEeCj2rAtY6yqkw" key="0:3" value="raw"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gGYjBZaMEeCj2rAtY6yqkw" key="0:2" value="raw"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gGYjBJaMEeCj2rAtY6yqkw" key="0:3" value="new BpmnFactory($component.getServiceProvider(), SUtil.createHashMap(new String[]{&quot;debugger.panels&quot;},new Object[]{&quot;jadex.tools.debugger.bpmn.BpmnDebuggerPanel&quot;}))"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_EpnE0ZaMEeCj2rAtY6yqkw" iD="_EpnE0JaMEeCj2rAtY6yqkw" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_Epnr4ZaMEeCj2rAtY6yqkw" iD="_Epnr4JaMEeCj2rAtY6yqkw" name="Task" activityType="Task"/>

@@ -1,70 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_wj-bAZaFEeCjkIoLnIcXpQ" iD="_wj-bAJaFEeCjkIoLnIcXpQ">
-  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_6AR9YJaFEeCjkIoLnIcXpQ" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6ASkcJaFEeCjkIoLnIcXpQ" key="package" value="jadex.bpmn"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_d39yYJaGEeCjkIoLnIcXpQ" key="editor_version" value="1.0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_SgX34JdeEeCZD5U_TbGNZg" key="autoshutdown" value="false"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h3DicJdoEeCSlYs3pKGwZg" key="suspend" value="false"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h7evcJdoEeCSlYs3pKGwZg" key="master" value="false"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_iDteYJdoEeCSlYs3pKGwZg" key="daemon" value="false"/>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_j_bxkZwFEeCTM9TB44euIw" iD="_j_bxkJwFEeCTM9TB44euIw">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_rh7SoJwFEeCTM9TB44euIw" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rh75sJwFEeCTM9TB44euIw" key="package" value="jadex.bpmn"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LaZgEJwGEeCTM9TB44euIw" key="configuration" value="id:default"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MdFFEJwGEeCTM9TB44euIw" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_JPPaoJwHEeCTM9TB44euIw" key="keep alive" value="true"/>
   </eAnnotations>
-  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_6BCLUJaFEeCjkIoLnIcXpQ" source="jadex_configurations_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6xSjkJaFEeCjkIoLnIcXpQ" key="dimension" value="1:2"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6xTKoJaFEeCjkIoLnIcXpQ" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6xTKoZaFEeCjkIoLnIcXpQ" key="0:0" value="default"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6xTKopaFEeCjkIoLnIcXpQ" key="0:1" value=""/>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_sfjYgJwFEeCTM9TB44euIw" source="jadex_imports_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_swSjMJwFEeCTM9TB44euIw" key="dimension" value="1:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_swSjMZwFEeCTM9TB44euIw" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_swSjMpwFEeCTM9TB44euIw" key="complexColumns" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_swSjM5wFEeCTM9TB44euIw" key="0:0" value="jadex.bridge.*"/>
   </eAnnotations>
-  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_8J58UJaFEeCjkIoLnIcXpQ" source="jadex_arguments_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uY5AJaKEeCj2rAtY6yqkw" key="dimension" value="3:7"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uY5AZaKEeCj2rAtY6yqkw" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uZgEJaKEeCj2rAtY6yqkw" key="0:0" value="defaultkernels"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uZgEZaKEeCj2rAtY6yqkw" key="0:1" value="true"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uZgEpaKEeCj2rAtY6yqkw" key="0:2" value="false"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uZgE5aKEeCj2rAtY6yqkw" key="0:3" value="Kernel default locations."/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uZgFJaKEeCj2rAtY6yqkw" key="0:4" value="String[]"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uZgFZaKEeCj2rAtY6yqkw" key="0:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uaHIJaKEeCj2rAtY6yqkw" key="0:6" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uaHIZaKEeCj2rAtY6yqkw" key="1:0" value="ignorekernels"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uaHIpaKEeCj2rAtY6yqkw" key="1:1" value="true"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uaHI5aKEeCj2rAtY6yqkw" key="1:2" value="false"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uaHJJaKEeCj2rAtY6yqkw" key="1:3" value="Kernels that are ignored."/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uaHJZaKEeCj2rAtY6yqkw" key="1:4" value="String[]"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uauMJaKEeCj2rAtY6yqkw" key="1:5" value="new String[] {&quot;KernelBDI.component.xml&quot;}"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uauMZaKEeCj2rAtY6yqkw" key="1:6" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uauMpaKEeCj2rAtY6yqkw" key="2:0" value="ignoreextensions"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uauM5aKEeCj2rAtY6yqkw" key="2:1" value="true"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uauNJaKEeCj2rAtY6yqkw" key="2:2" value="false"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uauNZaKEeCj2rAtY6yqkw" key="2:3" value="File extensions that are ignored."/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-uauNpaKEeCj2rAtY6yqkw" key="2:4" value="String[]"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-ubVQJaKEeCj2rAtY6yqkw" key="2:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-ubVQZaKEeCj2rAtY6yqkw" key="2:6" value=""/>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_0Tz_AJwFEeCTM9TB44euIw" source="jadex_arguments_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zkVIJwFEeCTM9TB44euIw" key="dimension" value="3:7"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8MJwFEeCTM9TB44euIw" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8MZwFEeCTM9TB44euIw" key="complexColumns" value="false:false:false:false:false:false:true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8MpwFEeCTM9TB44euIw" key="0:0" value="defaultkernels"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8M5wFEeCTM9TB44euIw" key="0:1" value="true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8NJwFEeCTM9TB44euIw" key="0:2" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8NZwFEeCTM9TB44euIw" key="0:3" value="Kernel default locations."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8NpwFEeCTM9TB44euIw" key="0:4" value="String[]"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8N5wFEeCTM9TB44euIw" key="0:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8OJwFEeCTM9TB44euIw" key="0:6" value="jadex_arguments_table_Initial-Value_a093f570-e991-45db-b63e-05f37c1cd409_complex"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8OZwFEeCTM9TB44euIw" key="1:0" value="ignorekernels"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8OpwFEeCTM9TB44euIw" key="1:1" value="true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8O5wFEeCTM9TB44euIw" key="1:2" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8PJwFEeCTM9TB44euIw" key="1:3" value="Kernels that are ignored."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8PZwFEeCTM9TB44euIw" key="1:4" value="String[]"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8PpwFEeCTM9TB44euIw" key="1:5" value="new String[] {&quot;KernelBDI.component.xml&quot;}"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8P5wFEeCTM9TB44euIw" key="1:6" value="jadex_arguments_table_Initial-Value_6b96a803-e7ad-4347-8a25-1b23922dce25_complex"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8QJwFEeCTM9TB44euIw" key="2:0" value="ignoreextensions"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8QZwFEeCTM9TB44euIw" key="2:1" value="true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8QpwFEeCTM9TB44euIw" key="2:2" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8Q5wFEeCTM9TB44euIw" key="2:3" value="File extensions that are ignored."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8RJwFEeCTM9TB44euIw" key="2:4" value="String[]"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8RZwFEeCTM9TB44euIw" key="2:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7zk8RpwFEeCTM9TB44euIw" key="2:6" value="jadex_arguments_table_Initial-Value_014c0cc0-d48a-4d34-a84f-d0b7c2a3288a_complex"/>
   </eAnnotations>
-  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KGi2UJaGEeCjkIoLnIcXpQ" source="jadex_providedservices_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Qj468JaLEeCj2rAtY6yqkw" key="dimension" value="2:4"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Qj468ZaLEeCj2rAtY6yqkw" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Qj468paLEeCj2rAtY6yqkw" key="0:0" value="name"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Qj4685aLEeCj2rAtY6yqkw" key="0:1" value="IComponentFactory"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Qj5iAJaLEeCj2rAtY6yqkw" key="0:2" value="new jadex.kernelbase.MultiFactory($args.defaultkernels, $args.ignorekernels, $args.ignoreextensions)"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Qj5iAZaLEeCj2rAtY6yqkw" key="0:3" value="decoupled"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Qj5iApaLEeCj2rAtY6yqkw" key="1:0" value="name1"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Qj5iA5aLEeCj2rAtY6yqkw" key="1:1" value="IMultiKernelNotifierService"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Qj5iBJaLEeCj2rAtY6yqkw" key="1:2" value="$component.getRawService(jadex.bridge.IComponentFactory.class)"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Qj5iBZaLEeCj2rAtY6yqkw" key="1:3" value="decoupled"/>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_0T0mGJwFEeCTM9TB44euIw" source="jadex_arguments_table_Initial-Value_a093f570-e991-45db-b63e-05f37c1cd409_complex"/>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_0VWQF5wFEeCTM9TB44euIw" source="jadex_arguments_table_Initial-Value_6b96a803-e7ad-4347-8a25-1b23922dce25_complex"/>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_0WzoopwFEeCTM9TB44euIw" source="jadex_arguments_table_Initial-Value_014c0cc0-d48a-4d34-a84f-d0b7c2a3288a_complex"/>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-CrRAJwFEeCTM9TB44euIw" source="jadex_providedservices_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Fs05QJwGEeCTM9TB44euIw" key="dimension" value="2:5"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Fs05QZwGEeCTM9TB44euIw" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Fs05QpwGEeCTM9TB44euIw" key="complexColumns" value="false:false:false:false:true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Fs05Q5wGEeCTM9TB44euIw" key="0:0" value="name"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Fs05RJwGEeCTM9TB44euIw" key="0:1" value="IComponentFactory"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Fs05RZwGEeCTM9TB44euIw" key="0:2" value="decoupled"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Fs05RpwGEeCTM9TB44euIw" key="0:3" value="new jadex.kernelbase.MultiFactory($args.defaultkernels, $args.ignorekernels, $args.ignoreextensions)"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Fs05R5wGEeCTM9TB44euIw" key="0:4" value="jadex_providedservices_table_Initial-Impl_f5ae30de-8983-496a-bb88-1d0b26793b1d_complex"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Fs05SJwGEeCTM9TB44euIw" key="1:0" value="name1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Fs05SZwGEeCTM9TB44euIw" key="1:1" value="IMultiKernelNotifierService"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Fs05SpwGEeCTM9TB44euIw" key="1:2" value="decoupled"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Fs05S5wGEeCTM9TB44euIw" key="1:3" value="$component.getRawService(jadex.bridge.IComponentFactory.class)"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Fs05TJwGEeCTM9TB44euIw" key="1:4" value="jadex_providedservices_table_Initial-Impl_f4987aee-2d8f-42ab-bf84-69fc1812043e_complex"/>
   </eAnnotations>
-  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_UDXEwJaGEeCjkIoLnIcXpQ" source="jadex_subcomponents_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ulcr4JaLEeCj2rAtY6yqkw" key="dimension" value="1:6"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ulcr4ZaLEeCj2rAtY6yqkw" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ulcr4paLEeCj2rAtY6yqkw" key="0:0" value="KernelBpmn"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ulcr45aLEeCj2rAtY6yqkw" key="0:1" value="jadex/bpmn/KernelBpmn.bpmn"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_UldS8JaLEeCj2rAtY6yqkw" key="0:2" value="kernel_bpmn"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_UldS8ZaLEeCj2rAtY6yqkw" key="0:3" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_UldS8paLEeCj2rAtY6yqkw" key="0:4" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_UldS85aLEeCj2rAtY6yqkw" key="0:5" value=""/>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-Cr4GJwFEeCTM9TB44euIw" source="jadex_providedservices_table_Initial-Impl_f5ae30de-8983-496a-bb88-1d0b26793b1d_complex"/>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-EDxHJwFEeCTM9TB44euIw" source="jadex_providedservices_table_Initial-Impl_f4987aee-2d8f-42ab-bf84-69fc1812043e_complex"/>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_H_02oJwGEeCTM9TB44euIw" source="jadex_subcomponents_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MMr4oJwGEeCTM9TB44euIw" key="dimension" value="1:6"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MMr4oZwGEeCTM9TB44euIw" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MMr4opwGEeCTM9TB44euIw" key="complexColumns" value="false:false:true:true:true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MMr4o5wGEeCTM9TB44euIw" key="0:0" value="KernelBpmn"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MMr4pJwGEeCTM9TB44euIw" key="0:1" value="jadex/bpmn/KernelBpmn.bpmn"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MMr4pZwGEeCTM9TB44euIw" key="0:2" value="jadex_subcomponents_table_Instance-Name_97754b92-d1b3-41da-8b74-58ac20a8d4b9_complex"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MMsfsJwGEeCTM9TB44euIw" key="0:3" value="jadex_subcomponents_table_Number_1065a59c-4170-4b9e-aa6a-5138d324674e_complex"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MMsfsZwGEeCTM9TB44euIw" key="0:4" value="jadex_subcomponents_table_Arguments_b445297f-4400-4f2d-8db4-ad5f2582c834_complex"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MMsfspwGEeCTM9TB44euIw" key="0:5" value=""/>
   </eAnnotations>
-  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_fXXy0JaKEeCj2rAtY6yqkw" source="jadex_imports_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gDyz8JaKEeCj2rAtY6yqkw" key="dimension" value="1:1"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gDyz8ZaKEeCj2rAtY6yqkw" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gDzbAJaKEeCj2rAtY6yqkw" key="0:0" value="jadex.bridge.*"/>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_H_1dtpwGEeCTM9TB44euIw" source="jadex_subcomponents_table_Instance-Name_97754b92-d1b3-41da-8b74-58ac20a8d4b9_complex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MMr4ppwGEeCTM9TB44euIw" key="id" value="kernel_bpmn"/>
   </eAnnotations>
-  <pools xmi:type="bpmn:Pool" xmi:id="_wkQu4ZaFEeCjkIoLnIcXpQ" iD="_wkQu4JaFEeCjkIoLnIcXpQ" name="Pool"/>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_H_1duJwGEeCTM9TB44euIw" source="jadex_subcomponents_table_Number_1065a59c-4170-4b9e-aa6a-5138d324674e_complex"/>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_H_1dupwGEeCTM9TB44euIw" source="jadex_subcomponents_table_Arguments_b445297f-4400-4f2d-8db4-ad5f2582c834_complex"/>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KrAqgJwGEeCTM9TB44euIw" source="jadex_configurations_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LPpooJwGEeCTM9TB44euIw" key="dimension" value="1:3"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LPpooZwGEeCTM9TB44euIw" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LPpoopwGEeCTM9TB44euIw" key="complexColumns" value="false:false:false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LPpoo5wGEeCTM9TB44euIw" key="0:0" value="id"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LPpopJwGEeCTM9TB44euIw" key="0:1" value="default"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LPpopZwGEeCTM9TB44euIw" key="0:2" value=""/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_j_cYoZwFEeCTM9TB44euIw" iD="_j_cYoJwFEeCTM9TB44euIw" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_j_cYo5wFEeCTM9TB44euIw" iD="_j_cYopwFEeCTM9TB44euIw" name="Task" activityType="Task"/>
+  </pools>
 </bpmn:BpmnDiagram>

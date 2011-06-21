@@ -866,7 +866,14 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				ser = impl.getImplementation().newInstance();
 			}
 			
-			ret	= addService(info.getName(), info.getType(), info.getImplementation().getProxytype(), ser);
+			if(ser==null)
+			{
+				ret = new Future(new RuntimeException("Service creation error: "+impl.getImplementation()+" "+impl.getExpression()+" "+impl.getBinding()));
+			}
+			else
+			{
+				ret	= addService(info.getName(), info.getType(), info.getImplementation().getProxytype(), ser);
+			}
 		}
 		catch(Exception e)
 		{

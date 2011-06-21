@@ -584,6 +584,7 @@ public class Reader
 					}
 					catch(RuntimeException e)
 					{
+						e.printStackTrace();
 						readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", topse, topse.getLocation());																				
 					}
 				}
@@ -605,6 +606,7 @@ public class Reader
 							}
 							catch(RuntimeException e)
 							{
+								e.printStackTrace();
 								readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", stack, ftopse!=null ? ftopse.getLocation() : readcontext.getParser().getLocation());																				
 							}
 						}

@@ -1038,7 +1038,7 @@ public class BpmnXMLReader
 					{
 						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails(), annos);
 						
-						for (int row = 0; row < table.size(); row++)
+						for(int row = 0; row < table.size(); row++)
 						{
 							try
 							{
@@ -1077,10 +1077,9 @@ public class BpmnXMLReader
 						List details = anno.getDetails();
 						if (details != null)
 						{
-							for (int j = 0; j < details.size(); j++)
+							for(int j = 0; j < details.size(); j++)
 							{
-								MAnnotationDetail detail = (MAnnotationDetail) details
-										.get(j);
+								MAnnotationDetail detail = (MAnnotationDetail)details.get(j);
 
 								String key = detail.getKey();
 								String value = detail.getValue();
@@ -1088,8 +1087,7 @@ public class BpmnXMLReader
 								// TODO: remove old mappings handling
 								if ("mappings".equals(key))
 								{
-									StringTokenizer stok = new StringTokenizer(
-											value, LIST_ELEMENT_DELIMITER);
+									StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
 									while (stok.hasMoreTokens())
 									{
 										String maptext = stok.nextToken();
@@ -1467,23 +1465,26 @@ public class BpmnXMLReader
 							{
 								String complexref = table.getCellValue(row, 6);
 								Map vals = table.getComplexValue(complexref);
-								for(Iterator it=vals.keySet().iterator(); it.hasNext(); )
+								if(vals!=null)
 								{
-									String configid = (String)it.next();
-									String valtext = (String)vals.get(configid);
-									ConfigurationInfo ci = (ConfigurationInfo)configurations.get(configid);
-									if(ci!=null && valtext!=null && valtext.length()>0)
+									for(Iterator it=vals.keySet().iterator(); it.hasNext(); )
 									{
-										exp = parser.parseExpression(valtext, model.getModelInfo().getAllImports(), null, context.getClassLoader());
-										Object inival = exp!=null ? exp.getValue(null) : null;
-										arg.setDefaultValue(ci.getName(), inival);
-	
-										// Hack! Should add argument values in configurations not in argument!
-	//									ConfigurationInfo cinfo = mi.getConfiguration(configname);
-	//									if(cinfo!=null)
-	//									{
-	//										cinfo.addArgument(new UnparsedExpression(configname, clazz, valtext, null));
-	//									}
+										String configid = (String)it.next();
+										String valtext = (String)vals.get(configid);
+										ConfigurationInfo ci = (ConfigurationInfo)configurations.get(configid);
+										if(ci!=null && valtext!=null && valtext.length()>0)
+										{
+											exp = parser.parseExpression(valtext, model.getModelInfo().getAllImports(), null, context.getClassLoader());
+											Object inival = exp!=null ? exp.getValue(null) : null;
+											arg.setDefaultValue(ci.getName(), inival);
+		
+											// Hack! Should add argument values in configurations not in argument!
+		//									ConfigurationInfo cinfo = mi.getConfiguration(configname);
+		//									if(cinfo!=null)
+		//									{
+		//										cinfo.addArgument(new UnparsedExpression(configname, clazz, valtext, null));
+		//									}
+										}
 									}
 								}
 							}
