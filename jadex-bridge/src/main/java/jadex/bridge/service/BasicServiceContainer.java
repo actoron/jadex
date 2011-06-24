@@ -541,7 +541,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Add a service interceptor.
 	 *  @param interceptor The interceptor.
 	 *  @param service The service.
-	 *  @param pos The position (0=first).
+	 *  @param pos The position (0=first, -1=last-1, i.e. one before method invocation).
 	 */
 	public void addInterceptor(IServiceInvocationInterceptor interceptor, Object service, int pos)
 	{

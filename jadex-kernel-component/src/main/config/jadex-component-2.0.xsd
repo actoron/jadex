@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" xmlns:jadex="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jadex="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 	<xs:element name="componenttype" type="componenttype">
 		<xs:annotation>
 			<xs:documentation>A component type specifies the interface, the structure and content of a component.</xs:documentation>
 		</xs:annotation>
-		<!-- keys on type level -->
 		<xs:key name="argument_name">
 			<xs:selector xpath="jadex:arguments/jadex:argument"/>
 			<xs:field xpath="@name"/>
@@ -30,7 +29,6 @@
 			<xs:selector xpath="jadex:properties/jadex:property"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
-		<!-- key references in configurations -->
 		<xs:keyref name="argument_reference" refer="argument_name">
 			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:arguments/jadex:argument"/>
 			<xs:field xpath="@name"/>
@@ -47,6 +45,8 @@
 			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:services/jadex:requiredservice"/>
 			<xs:field xpath="@name"/>
 		</xs:keyref>
+		<!-- keys on type level -->
+		<!-- key references in configurations -->
 	</xs:element>
 	<xs:complexType name="componenttype">
 		<xs:annotation>
@@ -169,7 +169,6 @@
 						configuration.
 					</xs:documentation>
 				</xs:annotation>
-				<!-- Configuration unique constraints defined here, because elements need only be unique inside one config. -->
 				<xs:key name="config_argument_name">
 					<xs:selector xpath="jadex:arguments/jadex:argument"/>
 					<xs:field xpath="@name"/>
@@ -186,6 +185,7 @@
 					<xs:selector xpath="jadex:services/jadex:requiredservice"/>
 					<xs:field xpath="@name"/>
 				</xs:key>
+				<!-- Configuration unique constraints defined here, because elements need only be unique inside one config. -->
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
@@ -375,6 +375,7 @@
 		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="implementation" type="implementation"/>
+			<xs:element name="interceptor" type="interceptortype" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="optional"/>
 		<xs:attribute name="class" type="xs:string" use="required"/>
@@ -385,6 +386,7 @@
 		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="binding" type="binding" minOccurs="0"/>
+			<xs:element name="interceptor" type="interceptortype" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="required"/>
 		<xs:attribute name="class" type="xs:string" use="required"/>
@@ -447,5 +449,10 @@
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="interceptortype" mixed="true">
+		<xs:attribute name="pos" type="xs:int" use="optional" default="-1"/>
+		<xs:attribute name="class" type="xs:string" use="optional"/>
+		<xs:attribute name="language" type="xs:string" use="optional"/>
 	</xs:complexType>
 </xs:schema>

@@ -210,7 +210,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	{
 		if(interceptors==null)
 			interceptors = new ArrayList();
-		interceptors.add(pos>-1? pos: interceptors.size(), interceptor);
+		// Hack? -1 for default position one before method invocation interceptor
+		interceptors.add(pos>-1? pos: interceptors.size()-1, interceptor);
 	}
 	
 	/**
@@ -274,7 +275,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	/**
 	 *  Static method for creating a standard service proxy for a provided service.
 	 */
-	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, Object service, String name, Class type, String proxytype)
+	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, Object service, 
+		String name, Class type, String proxytype, IServiceInvocationInterceptor[] ics)
 	{
 		IInternalService	ret;
 		
@@ -405,7 +407,18 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			{
 				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia.getExternalAccess(), adapter));
 			}
-			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess().getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
+			
+			if(ics!=null)
+			{
+				for(int i=0; i<ics.length; i++)
+				{
+					// todo: pos
+					handler.addServiceInterceptor(ics[i], -1);
+				}
+			}
+			
+			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
+				.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 		}
 		
 		

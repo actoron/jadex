@@ -1,5 +1,9 @@
 package jadex.bridge.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 
 /**
@@ -17,6 +21,9 @@ public class ProvidedServiceInfo
 	
 	/** The service implementation. */
 	protected ProvidedServiceImplementation implementation;
+	
+	/** The list of interceptors. */
+	protected List interceptors;
 	
 	//-------- constructors --------
 	
@@ -126,6 +133,36 @@ public class ProvidedServiceInfo
 		this.implementation = implementation;
 	}
 
+	/**
+	 *  Add an interceptor.
+	 *  @param interceptor The interceptor.
+	 */
+	public void addInterceptor(UnparsedExpression interceptor)
+	{
+		if(interceptors==null)
+			interceptors = new ArrayList();
+		interceptors.add(interceptor);
+	}
+	
+	/**
+	 *  Remove an interceptor.
+	 *  @param interceptor The interceptor.
+	 */
+	public void removeInterceptor(UnparsedExpression interceptor)
+	{
+		interceptors.remove(interceptor);
+	}
+	
+	/**
+	 *  Get the interceptors.
+	 *  @return All interceptors.
+	 */
+	public UnparsedExpression[] getInterceptors()
+	{
+		return interceptors==null? new UnparsedExpression[0]: (UnparsedExpression[])
+			interceptors.toArray(new UnparsedExpression[interceptors.size()]);
+	}
+	
 	/**
 	 *  Get the string representation.
 	 */

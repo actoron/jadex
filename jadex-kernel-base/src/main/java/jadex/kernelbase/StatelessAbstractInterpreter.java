@@ -35,6 +35,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
@@ -328,8 +329,9 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	
 	/**
 	 *  Main init method consists of the following steps:
-	 *  - init arguments and results
 	 *  - init future properties
+	 *  - init arguments and results
+	 *  - init extensions
 	 *  - init required and provided services
 	 *  - init subcomponents
 	 */
@@ -834,11 +836,12 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  @param service The service.
 	 *  @param proxytype	The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
-	public IFuture	addService(String name, Class type, String proxytype, Object service)
+	public IFuture	addService(String name, Class type, String proxytype, IServiceInvocationInterceptor[] ics, Object service)
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
-		IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(getInternalAccess(), getComponentAdapter(), service, name, type, proxytype);
+		IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
+			getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics);
 		return getServiceContainer().addService(proxy);
 	}
 	
@@ -872,7 +875,25 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			}
 			else
 			{
-				ret	= addService(info.getName(), info.getType(), info.getImplementation().getProxytype(), ser);
+				UnparsedExpression[] ins = info.getInterceptors();
+				IServiceInvocationInterceptor[] ics = null;
+				if(ins!=null)
+				{
+					ics = new IServiceInvocationInterceptor[ins.length];
+					for(int i=0; i<ins.length; i++)
+					{
+						if(ins[i].getValue()!=null && ins[i].getValue().length()>0)
+						{
+							// todo: pos
+							ics[i] = (IServiceInvocationInterceptor)SJavaParser.evaluateExpression(ins[i].getValue(), model.getAllImports(), getFetcher(), model.getClassLoader());
+						}
+						else
+						{
+							ics[i] = (IServiceInvocationInterceptor)ins[i].getClazz(model.getClassLoader(), model.getAllImports()).newInstance();
+						}
+					}
+				}
+				ret	= addService(info.getName(), info.getType(), info.getImplementation().getProxytype(), ics, ser);
 			}
 		}
 		catch(Exception e)

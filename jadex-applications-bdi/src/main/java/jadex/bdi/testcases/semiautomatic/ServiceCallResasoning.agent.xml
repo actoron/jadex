@@ -33,6 +33,7 @@
 	<services>
 		<providedservice name="printservice" class="IPrintHelloService">
 			<implementation>new PrintHelloService($scope.getServiceProvider())</implementation>
+			<interceptor>new BDIReasoningInterceptor($scope)</interceptor>
 		</providedservice>
 	</services>
 	

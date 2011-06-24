@@ -591,7 +591,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public IFuture	addService(String name, Class type, Object service, String proxytype)
 	{
-		return interpreter.addService(name, type, proxytype, service);
+		return interpreter.addService(name, type, proxytype, null, service);
 	}
 	
 	/**
@@ -603,7 +603,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public IFuture	addService(String name, Class type, Object service)
 	{
-		return interpreter.addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, service);
+		return interpreter.addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service);
 	}
 
 	/**

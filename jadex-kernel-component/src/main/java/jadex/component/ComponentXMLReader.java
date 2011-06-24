@@ -368,6 +368,10 @@ public class ComponentXMLReader
 			new MappingInfo(null, null, "expression", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "implementation"), new AttributeConverter(classconv, reclassconv)),
 			}, null)));
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "interceptor")}), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "className"))
+			}, null)));
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "requiredservice")), new ObjectInfo(RequiredServiceInfo.class), // new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "type"), new AttributeConverter(classconv, reclassconv))
