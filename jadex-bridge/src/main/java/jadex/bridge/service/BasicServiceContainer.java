@@ -543,7 +543,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param service The service.
 	 *  @param pos The position (0=first).
 	 */
-	public void addInterceptor(IServiceInvocationInterceptor interceptor, IService service, int pos)
+	public void addInterceptor(IServiceInvocationInterceptor interceptor, Object service, int pos)
 	{
 		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
 		handler.addServiceInterceptor(interceptor, pos);
@@ -554,10 +554,21 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param interceptor The interceptor.
 	 *  @param service The service.
 	 */
-	public void removeInterceptor(IServiceInvocationInterceptor interceptor, IService service)
+	public void removeInterceptor(IServiceInvocationInterceptor interceptor, Object service)
 	{
 		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
 		handler.removeServiceInterceptor(interceptor);
+	}
+	
+	/**
+	 *  Get the interceptors of a service.
+	 *  @param service The service.
+	 *  @return The interceptors.
+	 */
+	public IServiceInvocationInterceptor[] getInterceptors(Object service)
+	{
+		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+		return handler.getInterceptors();
 	}
 	
 //	/**

@@ -210,12 +210,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	{
 		if(interceptors==null)
 			interceptors = new ArrayList();
-		interceptors.add(pos, interceptor);
+		interceptors.add(pos>-1? pos: interceptors.size(), interceptor);
 	}
 	
 	/**
-	 *  Remove an interceptor.
-	 *  
+	 *  Add an interceptor.
 	 *  Must be synchronized as invoke() is called from arbitrary threads.
 	 */
 	public synchronized void addServiceInterceptor(int pos)
@@ -226,7 +225,6 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	
 	/**
 	 *  Remove an interceptor.
-	 *  
 	 *  Must be synchronized as invoke() is called from arbitrary threads.
 	 */
 	public synchronized void removeServiceInterceptor(IServiceInvocationInterceptor interceptor)
@@ -237,7 +235,6 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	
 	/**
 	 *  Get interceptors.
-	 *  
 	 *  Must be synchronized as invoke() is called from arbitrary threads.
 	 */
 	public synchronized IServiceInvocationInterceptor[] getInterceptors()

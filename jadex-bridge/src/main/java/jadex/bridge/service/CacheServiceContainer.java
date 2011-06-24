@@ -425,11 +425,16 @@ public class CacheServiceContainer	implements IServiceContainer
 		return null;
 	}
 
-	public void addInterceptor(IServiceInvocationInterceptor interceptor, IService service, int pos)
+	public void addInterceptor(IServiceInvocationInterceptor interceptor, Object service, int pos)
 	{
 	}
 
-	public void removeInterceptor(IServiceInvocationInterceptor interceptor, IService service)
+	public void removeInterceptor(IServiceInvocationInterceptor interceptor, Object service)
 	{
+	}
+	
+	public IServiceInvocationInterceptor[] getInterceptors(Object service)
+	{
+		return null;
 	}
 }

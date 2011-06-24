@@ -150,7 +150,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  @param service The service.
 	 *  @param pos The position (0=first).
 	 */
-	public void addInterceptor(IServiceInvocationInterceptor interceptor, IService service, int pos)
+	public void addInterceptor(IServiceInvocationInterceptor interceptor, Object service, int pos)
 	{
 		interpreter.getServiceContainer().addInterceptor(interceptor, service, pos);
 	}
@@ -160,9 +160,18 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  @param interceptor The interceptor.
 	 *  @param service The service.
 	 */
-	public void removeInterceptor(IServiceInvocationInterceptor interceptor, IService service)
+	public void removeInterceptor(IServiceInvocationInterceptor interceptor, Object service)
 	{
 		interpreter.getServiceContainer().removeInterceptor(interceptor, service);
+	}
+	
+	/**
+	 *  Get all service interceptors.
+	 *  @return The interceptors.
+	 */
+	public IServiceInvocationInterceptor[] getInterceptors(Object service)
+	{
+		return interpreter.getServiceContainer().getInterceptors(service);
 	}
 
 	/**
