@@ -2003,17 +2003,17 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 		}
 	}
 	
-//	/**
-//	 *  Get the avatar objects.
-//	 *  @return The avatar objects. 
-//	 */
-//	public IComponentIdentifier[] getComponents()
-//	{
-//		synchronized(monitor)
-//		{
-//			return (IComponentIdentifier[])spaceobjectsbyowner.keySet().toArray(new IComponentIdentifier[spaceobjectsbyowner.keySet().size()]);
-//		}
-//	}
+	/**
+	 *  Get the avatar objects.
+	 *  @return The avatar objects. 
+	 */
+	public IComponentDescription[] getComponents()
+	{
+		synchronized(monitor)
+		{
+			return (IComponentDescription[])spaceobjectsbyowner.keySet().toArray(new IComponentDescription[spaceobjectsbyowner.keySet().size()]);
+		}
+	}
 	
 	/**
 	 *  Get the avatar object.

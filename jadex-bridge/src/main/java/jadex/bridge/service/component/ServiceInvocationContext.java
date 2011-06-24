@@ -16,7 +16,7 @@ public class ServiceInvocationContext
 {
 	//-------- attributes --------
 	
-	/** The origin (proxy object. */
+	/** The origin (proxy object). */
 	protected Object proxy;
 	
 	
