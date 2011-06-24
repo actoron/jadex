@@ -43,7 +43,8 @@
 	</extensiontypes>
 	
 	<componenttypes>
-		<componenttype name="Graph" filename="deco4mas/examples/iograph/GraphAgent.class" />	
+		<componenttype name="Graph" filename="deco4mas/examples/iograph/GraphAgent.class" />
+		<componenttype name="BDIGraph" filename="deco4mas/examples/iograph/BDIGraph.agent.xml" />
 	</componenttypes>
 
 
@@ -56,22 +57,22 @@
 			<components>
 				<component type="Graph">
 					<arguments>
-						<argument name="id">"1"</argument>
+						<argument name="graphId">"1"</argument>
 					</arguments>
 				</component>
 				<component type="Graph">
 					<arguments>
-						<argument name="id">"2"</argument>
+						<argument name="graphId">"2"</argument>
+					</arguments>
+				</component>
+				<component type="BDIGraph">
+					<arguments>
+						<argument name="graphId">"3"</argument>
 					</arguments>
 				</component>
 				<component type="Graph">
 					<arguments>
-						<argument name="id">"3"</argument>
-					</arguments>
-				</component>
-				<component type="Graph">
-					<arguments>
-						<argument name="id">"4"</argument>
+						<argument name="graphId">"4"</argument>
 					</arguments>
 				</component>
 			</components>

@@ -113,7 +113,7 @@ public class CoordinationSpace extends Grid2D {
 	 * @param mechanismEventNumber
 	 *            the number of the event in the used mechanism
 	 */
-	public void publishCoordinationEvent(Object obj, List<String> receiver, String realizationName, Integer mechanismEventNumber) {
+	public void publishCoordinationEvent(Object obj, List<IComponentDescription> receiver, String realizationName, Integer mechanismEventNumber) {
 		ISpaceObject newObj = this.createSpaceObject("CoordinationSpaceObject", ((CoordinationInformation) obj).getValues(), null);
 		newObj.setProperty(Constants.ROLE_DEFINITIONS_FOR_PERCEIVE, agentData);
 
@@ -125,25 +125,8 @@ public class CoordinationSpace extends Grid2D {
 			key += "::" + mechanismEventNumber;
 		}
 
-		receiverData.put(key, getIdentifier(receiver));
+		receiverData.put(key, receiver);
 		this.fireEnvironmentEvent(new EnvironmentEvent(key, this, newObj, "Coordinate Event Nr. " + mechanismEventNumber, null));
-	}
-
-	private List<IComponentDescription> getIdentifier(List<String> agentNames) {
-		List<IComponentDescription> componentDescriptions = new ArrayList<IComponentDescription>();
-
-		IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getServiceUpwards(this.getExternalAccess().getServiceProvider(), IComponentManagementService.class).get(
-				new ThreadSuspendable());
-		IComponentDescription[] descriptions = (IComponentDescription[]) cms.getComponentDescriptions().get(new ThreadSuspendable());
-//		IComponentIdentifier[] identifiers = (IComponentIdentifier[]) cms.getComponentIdentifiers().get(new ThreadSuspendable());
-		for (IComponentDescription description : descriptions) {
-			if (agentNames.contains(description.getName().getLocalName())) {
-				agentNames.remove(description.getName().getLocalName());
-				componentDescriptions.add(description);
-			}
-		}
-
-		return componentDescriptions;
 	}
 
 	/**

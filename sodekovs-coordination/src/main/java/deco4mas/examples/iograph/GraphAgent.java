@@ -21,20 +21,20 @@ import deco4mas.mechanism.graph.IOGraph;
  */
 public class GraphAgent extends MicroAgent {
 
-	private String id = null;
+	private String graphId = null;
 
 	@Override
 	public IFuture agentCreated() {
-		id = (String) getArgument("id");
+		graphId = (String) getArgument("graphId");
 
 		return super.agentCreated();
 	}
 
 	@Override
 	public void executeBody() {
-		if (id.equals("1")) {
-			System.out.println("GraphAgent " + id + " is going to send a coordination information containing his id.");
-			waitFor(7000, new SendStep(id));
+		if (graphId.equals("1")) {
+			System.out.println("GraphAgent " + graphId + " is going to send a coordination information containing his id.");
+			waitFor(7000, new SendStep(graphId));
 		}
 	}
 
@@ -50,7 +50,7 @@ public class GraphAgent extends MicroAgent {
 	 */
 	public static MicroAgentMetaInfo getMetaInfo() {
 		MicroAgentMetaInfo meta = new MicroAgentMetaInfo();
-		meta.setArguments(new IArgument[] { new Argument("id", "The Agents Id", "String") });
+		meta.setArguments(new IArgument[] { new Argument("graphId", "The Agents Graph Id", "String") });
 		return meta;
 	}
 
@@ -85,8 +85,8 @@ public class GraphAgent extends MicroAgent {
 
 		@Override
 		public Object execute(IInternalAccess ia) {
-			System.out.println("ReceiveStep called in GraphAgent " + id + " receiving the id from GraphAgent " + receivedId);
-			waitForTick(new SendStep(id));
+			System.out.println("ReceiveStep called in GraphAgent " + graphId + " receiving the id from GraphAgent " + receivedId);
+			waitForTick(new SendStep(graphId));
 			return null;
 		}
 	}

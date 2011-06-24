@@ -49,6 +49,8 @@ public class Constants {
 
 	/** The sender agents id */
 	public static String SENDER_AGENT = "senderAgent";
+	
+	public static String SENDER_AGENT_IDENTIFIER = "senderAgentIdentifier";
 
 	// --- Constants from the old CoordinationProcessor
 

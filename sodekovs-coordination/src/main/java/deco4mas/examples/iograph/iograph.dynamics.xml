@@ -17,9 +17,11 @@
 		<role_occupations>
 			<role_occupation name="sender" multiple="false">
 				<agent id="Graph" />
+				<agent id="BDIGraph" />
 			</role_occupation>
 			<role_occupation name="receiver" multiple="false">
 				<agent id="Graph" />
+				<agent id="BDIGraph" />
 			</role_occupation>
 		</role_occupations>
 	</system_properties>
@@ -51,6 +53,11 @@
 							<mapping ref="id" name="id"/>
 						</parameter_mappings>
 					</agent_element>
+					<agent_element element="send_message" agent_id="BDIGraph" type="BDI_GOAL">
+						<parameter_mappings>
+							<mapping ref="id" name="message"/>
+						</parameter_mappings>
+					</agent_element>
 				</from>
 				<!-- Coordination Medium configuration: -->
 				<mechanism_configuration
@@ -64,7 +71,12 @@
 					</properties>
 				</mechanism_configuration>
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->
-					<agent_element element="ReceiveStep" agent_id="Graph" type="MICRO_STEP">
+					<agent_element element="ReceiveStep" agent_id="Graph" type="INTERNAL_EVENT">
+						<parameter_mappings>
+							<mapping ref="id" name="receivedId"/>
+						</parameter_mappings>
+					</agent_element>
+					<agent_element element="receive_message" agent_id="BDIGraph" type="BDI_EVENT">
 						<parameter_mappings>
 							<mapping ref="id" name="receivedId"/>
 						</parameter_mappings>
