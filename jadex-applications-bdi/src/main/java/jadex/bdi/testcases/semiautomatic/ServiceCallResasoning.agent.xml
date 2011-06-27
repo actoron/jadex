@@ -48,6 +48,16 @@
 				<initialplan ref="start"/>
 			</plans>
 		</configuration>
+		<configuration name="no_interceptor">
+			<plans>
+				<initialplan ref="start"/>
+			</plans>
+			<services>
+				<providedservice name="printservice" class="IPrintHelloService">
+					<implementation>new PrintHelloService($scope.getServiceProvider())</implementation>
+				</providedservice>
+			</services>
+		</configuration>
 	</configurations>
 
 </agent>
