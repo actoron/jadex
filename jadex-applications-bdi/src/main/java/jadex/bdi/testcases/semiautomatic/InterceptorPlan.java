@@ -1,15 +1,6 @@
 package jadex.bdi.testcases.semiautomatic;
 
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IGoalListener;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.service.ServiceInvalidException;
-import jadex.bridge.service.component.IServiceInvocationInterceptor;
-import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 
 /**
  *  Plan that adds a reasoning interceptor to the service and invokes it.
@@ -59,15 +50,12 @@ public class InterceptorPlan extends Plan
 //		IServiceInvocationInterceptor[] ics = getServiceContainer().getInterceptors(ps);
 //		getServiceContainer().addInterceptor(ic, ps, ics.length-1);
 
-		callPrintService();
-		callPrintService();
-		callPrintService();
-		callPrintService();
-		callPrintService();
+		for(int i=0; i<3; i++)
+			callPrintService();
 	}
 	
 	/**
-	 * 
+	 *  Invoke the print service.
 	 */
 	protected void callPrintService()
 	{

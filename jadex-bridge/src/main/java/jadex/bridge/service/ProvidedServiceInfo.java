@@ -21,10 +21,7 @@ public class ProvidedServiceInfo
 	
 	/** The service implementation. */
 	protected ProvidedServiceImplementation implementation;
-	
-	/** The list of interceptors. */
-	protected List interceptors;
-	
+		
 	//-------- constructors --------
 	
 	/**
@@ -131,36 +128,6 @@ public class ProvidedServiceInfo
 	public void setImplementation(ProvidedServiceImplementation implementation)
 	{
 		this.implementation = implementation;
-	}
-
-	/**
-	 *  Add an interceptor.
-	 *  @param interceptor The interceptor.
-	 */
-	public void addInterceptor(UnparsedExpression interceptor)
-	{
-		if(interceptors==null)
-			interceptors = new ArrayList();
-		interceptors.add(interceptor);
-	}
-	
-	/**
-	 *  Remove an interceptor.
-	 *  @param interceptor The interceptor.
-	 */
-	public void removeInterceptor(UnparsedExpression interceptor)
-	{
-		interceptors.remove(interceptor);
-	}
-	
-	/**
-	 *  Get the interceptors.
-	 *  @return All interceptors.
-	 */
-	public UnparsedExpression[] getInterceptors()
-	{
-		return interceptors==null? new UnparsedExpression[0]: (UnparsedExpression[])
-			interceptors.toArray(new UnparsedExpression[interceptors.size()]);
 	}
 	
 	/**

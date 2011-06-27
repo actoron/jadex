@@ -862,7 +862,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			{
 				// todo: other Class imports, how can be found out?
 				ser = SJavaParser.evaluateExpression(impl.getExpression(), model.getAllImports(), getFetcher(), model.getClassLoader());
-	//						System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
+//				System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
 			}
 			else if(impl.getImplementation()!=null)
 			{
@@ -875,7 +875,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			}
 			else
 			{
-				UnparsedExpression[] ins = info.getInterceptors();
+				UnparsedExpression[] ins = info.getImplementation().getInterceptors();
 				IServiceInvocationInterceptor[] ics = null;
 				if(ins!=null)
 				{
@@ -884,7 +884,6 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					{
 						if(ins[i].getValue()!=null && ins[i].getValue().length()>0)
 						{
-							// todo: pos
 							ics[i] = (IServiceInvocationInterceptor)SJavaParser.evaluateExpression(ins[i].getValue(), model.getAllImports(), getFetcher(), model.getClassLoader());
 						}
 						else
@@ -898,7 +897,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			ret	= new Future(e);
 		}
 		
