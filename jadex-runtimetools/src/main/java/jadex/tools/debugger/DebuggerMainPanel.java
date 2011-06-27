@@ -130,20 +130,19 @@ public class DebuggerMainPanel extends JSplitPane
 								}
 								
 								// Sub panels of right panel.
-								SComponentFactory.getProperties(DebuggerMainPanel.this.jcc.getPlatformAccess(), DebuggerMainPanel.this.desc.getType())
+								SComponentFactory.getProperty(DebuggerMainPanel.this.jcc.getPlatformAccess(), DebuggerMainPanel.this.desc.getType(), KEY_DEBUGGER_PANELS)
 									.addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
 								{
 									public void customResultAvailable(Object result)
 									{
-										final Map props2 = (Map)result;
-										if(props2!=null && props2.containsKey(KEY_DEBUGGER_PANELS))
+										final String	panels	= (String)result;
+										if(panels!=null)
 										{
 											AbstractJCCPlugin.getClassLoader(desc.getName(), jcc).addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
 											{
 												public void customResultAvailable(Object result)
 												{
 													final ClassLoader	cl	= (ClassLoader)result;
-													String	panels	= (String)props2.get(KEY_DEBUGGER_PANELS);
 													StringTokenizer	stok	= new StringTokenizer(panels, ", \t\n\r\f");
 													while(stok.hasMoreTokens())
 													{

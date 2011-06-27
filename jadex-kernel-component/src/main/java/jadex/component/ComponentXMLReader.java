@@ -89,26 +89,26 @@ public class ComponentXMLReader
 		}
 	};
 	
-	// Convert expression into parsed expression object.
-	public static IStringObjectConverter pexconv = new IStringObjectConverter()
-	{
-		public Object convertString(String val, IContext context)
-		{
-			Object	ret	= null;
-			try
-			{
-				ret	= SJavaParser.parseExpression((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), context.getClassLoader());
-			}
-			catch(RuntimeException e)
-			{
-				Object	se	= new Tuple(((ReadContext)context).getStack());
-				Map	user	= (Map)context.getUserContext();
-				MultiCollection	report	= (MultiCollection)user.get(CONTEXT_ENTRIES);
-				report.put(se, e.toString());
-			}
-			return  ret;
-		}
-	};
+//	// Convert expression into parsed expression object.
+//	public static IStringObjectConverter pexconv = new IStringObjectConverter()
+//	{
+//		public Object convertString(String val, IContext context)
+//		{
+//			Object	ret	= null;
+//			try
+//			{
+//				ret	= SJavaParser.parseExpression((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), context.getClassLoader());
+//			}
+//			catch(RuntimeException e)
+//			{
+//				Object	se	= new Tuple(((ReadContext)context).getStack());
+//				Map	user	= (Map)context.getUserContext();
+//				MultiCollection	report	= (MultiCollection)user.get(CONTEXT_ENTRIES);
+//				report.put(se, e.toString());
+//			}
+//			return  ret;
+//		}
+//	};
 	
 	public static IStringObjectConverter classconv = new IStringObjectConverter()
 	{

@@ -1,5 +1,7 @@
 package jadex.tools.debugger.bdi;
 
+import java.awt.BorderLayout;
+
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
@@ -12,6 +14,8 @@ import jadex.tools.debugger.IDebuggerPanel;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.UIDefaults;
 
 /**
@@ -25,13 +29,17 @@ public class BDIAgentRuleEngineDebuggerPanel	implements IDebuggerPanel
 	 * The image icons.
 	 */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
-		"show_rete", SGUI.makeIcon(BDIAgentRuleEngineDebuggerPanel.class, "/jadex/tools/common/images/bug_small.png")
+		"show_rete", SGUI.makeIcon(BDIAgentRuleEngineDebuggerPanel.class, "/jadex/tools/common/images/bug_small.png"),
+		"empty", SGUI.makeIcon(BDIAgentRuleEngineDebuggerPanel.class, "/jadex/tools/common/images/introspector_empty.png")
 	});
 
 	//-------- IDebuggerPanel methods --------
 	
-	/** The gui component. */
+	/** The rete panel. */
 	protected RetePanel retepanel;
+	
+	/** The gui component (rete panel or empty label). */
+	protected JComponent	component;
 
 	//-------- IDebuggerPanel methods --------
 
@@ -45,8 +53,21 @@ public class BDIAgentRuleEngineDebuggerPanel	implements IDebuggerPanel
 	 */
 	public void init(IControlCenter jcc, IBreakpointPanel bpp, IComponentIdentifier name, IExternalAccess access)
 	{
-		BDIInterpreter bdii = ((ElementFlyweight)access).getInterpreter();
-		this.retepanel = new RetePanel(bdii.getRuleSystem(), null, bpp);
+		if(access instanceof ElementFlyweight)
+		{
+			BDIInterpreter bdii = ((ElementFlyweight)access).getInterpreter();
+			this.retepanel = new RetePanel(bdii.getRuleSystem(), null, bpp);
+			this.component	= retepanel;
+		}
+		else
+		{
+			JLabel	emptylabel	= new JLabel("Rule engine debugger only supported for local components.", JLabel.CENTER);
+			emptylabel.setVerticalAlignment(JLabel.CENTER);
+			emptylabel.setHorizontalTextPosition(JLabel.CENTER);
+			emptylabel.setFont(emptylabel.getFont().deriveFont(emptylabel.getFont().getSize()*1.3f));
+			this.component	= new JPanel(new BorderLayout());
+			component.add(emptylabel, BorderLayout.CENTER);
+		}
 	}
 
 	/**
@@ -73,7 +94,7 @@ public class BDIAgentRuleEngineDebuggerPanel	implements IDebuggerPanel
 	 */
 	public JComponent getComponent()
 	{
-		return retepanel;
+		return component;
 	}
 	
 	/**

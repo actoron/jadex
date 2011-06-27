@@ -3,6 +3,7 @@ package jadex.bridge;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
@@ -256,32 +257,37 @@ public abstract class RemoteChangeListenerHandler
 								{
 									ChangeEvent	event	= events.size()==1 ? (ChangeEvent)events.get(0)
 										: new ChangeEvent(null, EVENT_BULK, events);
-									rcl.changeOccurred(event).addResultListener(new IResultListener()
+									IFuture	fut	= rcl.changeOccurred(event);
+									IInternalAccess	tmp	= instance;	// instance might be set to null concurrently.
+									if(tmp!=null)
 									{
-										public void resultAvailable(Object result)
+										fut.addResultListener(tmp.createResultListener(new IResultListener()
 										{
-	//										System.out.println("update succeeded: "+desc);
-											startTimer();
-										}
-										public void exceptionOccurred(Exception exception)
-										{
-//											System.err.println("update not succeeded: "+exception);
-//											exception.printStackTrace();
-											if(instance!=null)
+											public void resultAvailable(Object result)
 											{
-	//											System.out.println("Removing listener due to failed update: "+RemoteCMSListener.this.id);
-												try
-												{
-													dispose();
-												}
-												catch(RuntimeException e)
-												{
-	//												System.out.println("Listener already removed: "+id);
-												}
-												instance	= null;	// Set to null to avoid multiple removal due to delayed errors. 
+		//										System.out.println("update succeeded: "+desc);
+												startTimer();
 											}
-										}
-									});
+											public void exceptionOccurred(Exception exception)
+											{
+	//											System.err.println("update not succeeded: "+exception);
+	//											exception.printStackTrace();
+												if(instance!=null)
+												{
+		//											System.out.println("Removing listener due to failed update: "+RemoteCMSListener.this.id);
+													try
+													{
+														dispose();
+													}
+													catch(RuntimeException e)
+													{
+		//												System.out.println("Listener already removed: "+id);
+													}
+													instance	= null;	// Set to null to avoid multiple removal due to delayed errors. 
+												}
+											}
+										}));
+									}
 								}
 							}
 							catch(Exception e)

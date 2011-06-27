@@ -100,7 +100,7 @@ class CleanerPanel extends JPanel
 					public void customExceptionOccurred(Exception exception)
 					{
 //						exception.printStackTrace();
-//						updating	= false;	// Keep to false to disable any more updates
+						updating	= false;	// Keep to true to disable any more updates
 					}
 				});
 			}

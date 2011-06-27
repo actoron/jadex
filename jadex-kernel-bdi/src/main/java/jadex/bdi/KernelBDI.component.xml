@@ -41,8 +41,7 @@
 						new JavaStandardPlanExecutor((IThreadPoolService)
 							SServiceProvider.getService($component.getServiceProvider(), IThreadPoolService.class).get(new ThreadSuspendable())),
 						Boolean.TRUE,
-						//"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
-						"jadex.tools.debugger.bdi.BDIViewerDebuggerPanel"
+						"jadex.tools.debugger.bdi.BDIViewerDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
 					}
 				))
 			</implementation>

@@ -14,6 +14,7 @@ import java.awt.BorderLayout;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
@@ -34,8 +35,11 @@ public class BDIAgentInspectorDebuggerPanel	implements IDebuggerPanel
 
 	//-------- IDebuggerPanel methods --------
 	
-	/** The gui component. */
-	protected JComponent	oavpanel;
+	/** The oav panel. */
+	protected OAVPanel	oavpanel;
+
+	/** The gui component (oavpanel or empty label). */
+	protected JComponent	component;
 
 	//-------- IDebuggerPanel methods --------
 
@@ -49,28 +53,40 @@ public class BDIAgentInspectorDebuggerPanel	implements IDebuggerPanel
 	 */
 	public void init(IControlCenter jcc, IBreakpointPanel bpp, IComponentIdentifier name, IExternalAccess access)
 	{
-		this.oavpanel	= new JPanel(new BorderLayout());
-		
-		// Hack!!!
-		final BDIInterpreter bdii = ((ElementFlyweight)access).getInterpreter();
-		// Open tool on introspected agent thread as required for copy state constructor (hack!!!)
-		bdii.getAgentAdapter().invokeLater(new Runnable()
+		if(access instanceof ElementFlyweight)
 		{
-			public void run()
+			this.component	= new JPanel(new BorderLayout());
+			
+			// Hack!!!
+			final BDIInterpreter bdii = ((ElementFlyweight)access).getInterpreter();
+			// Open tool on introspected agent thread as required for copy state constructor (hack!!!)
+			bdii.getAgentAdapter().invokeLater(new Runnable()
 			{
-				final	JPanel	tmp	= new OAVPanel(bdii.getRuleSystem().getState());
-				SwingUtilities.invokeLater(new Runnable()
+				public void run()
 				{
-					public void run()
+					oavpanel	= new OAVPanel(bdii.getRuleSystem().getState());
+					SwingUtilities.invokeLater(new Runnable()
 					{
-						oavpanel.add(BorderLayout.CENTER, tmp);
-						oavpanel.invalidate();
-						oavpanel.doLayout();
-						oavpanel.repaint();
-					}
-				});
-			}
-		});
+						public void run()
+						{
+							component.add(BorderLayout.CENTER, oavpanel);
+							component.invalidate();
+							component.doLayout();
+							component.repaint();
+						}
+					});
+				}
+			});
+		}
+		else
+		{
+			JLabel	emptylabel	= new JLabel("BDI introspector only supported for local components.", JLabel.CENTER);
+			emptylabel.setVerticalAlignment(JLabel.CENTER);
+			emptylabel.setHorizontalTextPosition(JLabel.CENTER);
+			emptylabel.setFont(emptylabel.getFont().deriveFont(emptylabel.getFont().getSize()*1.3f));
+			this.component	= new JPanel(new BorderLayout());
+			component.add(emptylabel, BorderLayout.CENTER);
+		}
 	}
 
 	/**
@@ -97,7 +113,7 @@ public class BDIAgentInspectorDebuggerPanel	implements IDebuggerPanel
 	 */
 	public JComponent getComponent()
 	{
-		return oavpanel;
+		return component;
 	}
 	
 	/**
@@ -114,10 +130,9 @@ public class BDIAgentInspectorDebuggerPanel	implements IDebuggerPanel
 	 */
 	public void dispose()
 	{
-		if(oavpanel!=null && oavpanel.getComponentCount()>0)
+		if(oavpanel!=null)
 		{
-			((OAVPanel)oavpanel.getComponent(0)).dispose();
+			oavpanel.dispose();
 		}
 	}
-
 }

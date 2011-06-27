@@ -16,7 +16,6 @@ import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -325,13 +324,13 @@ public class SComponentFactory
 	/**
 	 * Get a default icon for a file type.
 	 */
-	public static IFuture getProperties(IExternalAccess exta, final String type)
+	public static IFuture getProperty(IExternalAccess exta, final String type, final String key)
 	{
 		final Future ret = new Future();
 		
 		exta.scheduleStep(new IComponentStep()
 		{
-			@XMLClassname("getProperties")
+			@XMLClassname("getProperty")
 			public Object execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
@@ -349,19 +348,19 @@ public class SComponentFactory
 								if(SUtil.arrayToSet(fac.getComponentTypes()).contains(type))
 								{
 									Map res = fac.getProperties(type);
-									if(res!=null && !res.isEmpty())
+									if(res!=null && res.containsKey(key))
 									{
-										ret.setResult(res);
+										ret.setResult(res.get(key));
 										found = true;
 									}
 								}
 							}
 							if(!found)
-								ret.setResult(Collections.EMPTY_MAP);
+								ret.setResult(null);
 						}
 						else
 						{
-							ret.setResult(Collections.EMPTY_MAP);
+							ret.setResult(null);
 						}
 					}
 					

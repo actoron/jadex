@@ -154,6 +154,10 @@ public class OAVBDIRuntimeModel
 	/** The goal dropped changeeevent type. */
 	public static final String	CHANGEEVENT_GOALDROPPED	= "goaldropped";
 	
+	/** The goal changed changeeevent type. */
+	// Hack!!! only for BDI viewer
+	public static final String	CHANGEEVENT_GOALCHANGED	= "goalchanged";
+	
 	/** The agent terminating changeeevent type. */
 	public static final String	CHANGEEVENT_AGENTTERMINATING	= "agentterminating";
 	
@@ -165,6 +169,10 @@ public class OAVBDIRuntimeModel
 	
 	/** The plan finished changeeevent type. */
 	public static final String	CHANGEEVENT_PLANREMOVED	= "planremoved";
+	
+	/** The goal changed changeeevent type. */
+	// Hack!!! only for BDI viewer
+	public static final String	CHANGEEVENT_PLANCHANGED	= "planchanged";
 	
 	//-------- model --------
 	

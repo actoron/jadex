@@ -1,12 +1,9 @@
 package jadex.bdi.runtime.interpreter;
 
-import jadex.bdi.runtime.impl.flyweights.BeliefFlyweight;
-import jadex.bdi.runtime.impl.flyweights.BeliefSetFlyweight;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
 import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.MessageEventFlyweight;
-import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
 import jadex.bridge.ComponentChangeEvent;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
@@ -169,6 +166,18 @@ public class EventReificator implements IOAVStateListener
 					createChangeEvent(oldvalue, id, OAVBDIRuntimeModel.CHANGEEVENT_PLANREMOVED, null);
 				}
 			}
+
+			// Goal changed. (Hack!!! Only required for BDI viewer)
+			else if(OAVBDIRuntimeModel.goal_has_lifecyclestate.equals(attr)
+					|| OAVBDIRuntimeModel.goal_has_processingstate.equals(attr))
+			{
+				fireComponentChangeEvent(state, id, null, OAVBDIRuntimeModel.CHANGEEVENT_GOALCHANGED, null);
+			}
+			// Plan changed. (Hack!!! Only required for BDI viewer)
+			else if(OAVBDIRuntimeModel.plan_has_lifecyclestate.equals(attr))
+			{
+				fireComponentChangeEvent(state, id, null, OAVBDIRuntimeModel.CHANGEEVENT_PLANCHANGED, null);
+			}
 		}
 	}
 	
@@ -328,25 +337,27 @@ public class EventReificator implements IOAVStateListener
 			long time = bdiint.getClockService().getTime();
 			ComponentChangeEvent event = new ComponentChangeEvent();
 			event.setComponent(bdiint.getAgentAdapter().getComponentIdentifier());
-			if (scope == null)
+			if(scope == null)
 				scope = bdiint.getAgent();
 			
 			event.setTime(time);
 			
-			if (OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED.equals(type) ||
+			if(OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED.equals(type) ||
 				OAVBDIRuntimeModel.CHANGEEVENT_GOALADDED.equals(type) ||
 				OAVBDIRuntimeModel.CHANGEEVENT_PLANADDED.equals(type))
 			{
 				event.setEventType(ComponentChangeEvent.EVENT_TYPE_CREATION);
 			}
-			else if (OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATED.equals(type) ||
-					 OAVBDIRuntimeModel.CHANGEEVENT_FACTREMOVED.equals(type) ||
-					 OAVBDIRuntimeModel.CHANGEEVENT_GOALDROPPED.equals(type) ||
-					 OAVBDIRuntimeModel.CHANGEEVENT_PLANREMOVED.equals(type))
+			else if(OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATED.equals(type) ||
+				 OAVBDIRuntimeModel.CHANGEEVENT_FACTREMOVED.equals(type) ||
+				 OAVBDIRuntimeModel.CHANGEEVENT_GOALDROPPED.equals(type) ||
+				 OAVBDIRuntimeModel.CHANGEEVENT_PLANREMOVED.equals(type))
 			{
 				event.setEventType(ComponentChangeEvent.EVENT_TYPE_DISPOSAL);
 			}
-			else if (OAVBDIRuntimeModel.CHANGEEVENT_FACTCHANGED.equals(type))
+			else if(OAVBDIRuntimeModel.CHANGEEVENT_FACTCHANGED.equals(type) ||
+				OAVBDIRuntimeModel.CHANGEEVENT_GOALCHANGED.equals(type) ||
+				OAVBDIRuntimeModel.CHANGEEVENT_PLANCHANGED.equals(type))
 			{
 				event.setEventType(ComponentChangeEvent.EVENT_TYPE_MODIFICATION);
 			}
@@ -362,35 +373,34 @@ public class EventReificator implements IOAVStateListener
 				OAVBDIRuntimeModel.CHANGEEVENT_FACTCHANGED.equals(type) ||
 				OAVBDIRuntimeModel.CHANGEEVENT_FACTREMOVED.equals(type))
 			{
+				BeliefInfo	info	= BeliefInfo.createBeliefInfo(state, element, scope);
 				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_FACT);
-				if (OAVBDIRuntimeModel.belief_type.equals(state.getType(element)))
-				{
-					BeliefFlyweight bf = BeliefFlyweight.getBeliefFlyweight(state, scope, element);
-					event.setSourceType(bf.getModelElement().getName());
-				}
-				else if (OAVBDIRuntimeModel.beliefset_type.equals(state.getType(element)))
-				{
-					BeliefSetFlyweight bf = BeliefSetFlyweight.getBeliefSetFlyweight(state, scope, element);
-					event.setSourceType(bf.getModelElement().getName());
-				}
+				event.setSourceName(element.toString());
+				event.setSourceType(info.getType());
+				event.setDetails(info);
 			}
-			else if (OAVBDIRuntimeModel.CHANGEEVENT_PLANADDED.equals(type) ||
-					 OAVBDIRuntimeModel.CHANGEEVENT_PLANREMOVED.equals(type))
+			else if(OAVBDIRuntimeModel.CHANGEEVENT_PLANADDED.equals(type) ||
+				OAVBDIRuntimeModel.CHANGEEVENT_PLANCHANGED.equals(type) ||
+				OAVBDIRuntimeModel.CHANGEEVENT_PLANREMOVED.equals(type))
 			{
+				PlanInfo	info	= PlanInfo.createPlanInfo(state, element, scope);
 				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_PLAN);
-				PlanFlyweight pf = PlanFlyweight.getPlanFlyweight(state, scope, element);
-				event.setSourceName(pf.getHandle().toString());
-				event.setSourceType(pf.getType());
+				event.setSourceName(element.toString());
+				event.setSourceType(info.getType());
+				event.setDetails(info);
 			}
-			else if (OAVBDIRuntimeModel.CHANGEEVENT_GOALADDED.equals(type) ||
-					 OAVBDIRuntimeModel.CHANGEEVENT_GOALDROPPED.equals(type))
+			else if(OAVBDIRuntimeModel.CHANGEEVENT_GOALADDED.equals(type) ||
+				 OAVBDIRuntimeModel.CHANGEEVENT_GOALCHANGED.equals(type) ||
+				 OAVBDIRuntimeModel.CHANGEEVENT_GOALDROPPED.equals(type))
 			{
+				GoalInfo	info	= GoalInfo.createGoalInfo(state, element, scope);
 				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_GOAL);
-				GoalFlyweight gf = GoalFlyweight.getGoalFlyweight(state, scope, element);
-				event.setSourceName(gf.getHandle().toString());
-				event.setSourceType(gf.getType());
+				event.setSourceName(element.toString());
+				event.setSourceType(info.getType());
+				event.setDetails(info);
 				if (OAVBDIRuntimeModel.CHANGEEVENT_GOALDROPPED.equals(type))
 				{
+					GoalFlyweight gf = GoalFlyweight.getGoalFlyweight(state, scope, element);
 					if (gf.isSucceeded())
 						event.setReason("Success");
 					else if (gf.getException() != null)

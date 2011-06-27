@@ -43,8 +43,6 @@ import java.util.logging.Logger;
  */
 public class CapabilityFlyweight extends ElementFlyweight implements ICapability, IBDIInternalAccess
 {
-	//-------- attributes --------
-	
 	/** The capability model info (cached for synchronous access). */
 	protected IModelInfo	model;
 	
@@ -673,8 +671,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IModelInfo getModel()
 	{
-		// todo: return fitting capability model info.
-		return getInterpreter().getModel();
+		return model;
 	}
 
 	/**

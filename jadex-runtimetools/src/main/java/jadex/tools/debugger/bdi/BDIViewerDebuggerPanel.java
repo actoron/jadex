@@ -7,7 +7,6 @@ import jadex.commons.IBreakpointPanel;
 import jadex.commons.gui.SGUI;
 import jadex.tools.debugger.IDebuggerPanel;
 
-import javax.help.UnsupportedOperationException;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.UIDefaults;
@@ -87,11 +86,10 @@ public class BDIViewerDebuggerPanel implements IDebuggerPanel
 	 */
 	public void dispose()
 	{
-		// todo:
-		throw new UnsupportedOperationException();
-//		if(panel!=null)
-//		{
-//			panel.dispose();
-//		}
+		if(panel!=null)
+		{
+			// Todo: wait for future.
+			panel.dispose();
+		}
 	}
 }
