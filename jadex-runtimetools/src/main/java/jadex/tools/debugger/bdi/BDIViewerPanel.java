@@ -14,9 +14,9 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IFilter;
+import jadex.commons.SUtil;
 import jadex.commons.collection.SortedList;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
 import jadex.rules.state.IOAVState;
@@ -37,6 +37,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.border.BevelBorder;
@@ -69,6 +70,9 @@ public class BDIViewerPanel extends JPanel
 	
 	/** The beliefs. */
 	protected List	beliefs;
+	
+	/** The selected belief (if any). */
+	protected BeliefInfo	selbel;
 	
 	/** The goals. */
 	protected List	goals;
@@ -122,7 +126,7 @@ public class BDIViewerPanel extends JPanel
 		}, true);
 		
 		JPanel	beliefpanel	= new JPanel(new BorderLayout());
-		beliefpanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED), "Beliefs"));
+		beliefpanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(BevelBorder.LOWERED), "Beliefs"));
 		final AbstractTableModel	beliefmodel	= new AbstractTableModel()
 		{
 			protected String[]	columnames	= new String[]{"Name", "Type", "Value"};
@@ -152,6 +156,10 @@ public class BDIViewerPanel extends JPanel
 				else if(col==2)
 				{
 					ret	= info.getValue();
+					if(ret instanceof String[])
+					{
+						ret	= SUtil.arrayToString(ret);
+					}
 				}
 				return ret;
 			}
@@ -176,10 +184,35 @@ public class BDIViewerPanel extends JPanel
 				return super.getTableCellRendererComponent(table, value, sel, foc, row, column);
 			}
 		});
-		beliefpanel.add(new JScrollPane(belieftable), BorderLayout.CENTER);
+		final JPanel	beldetails	= new JPanel(new BorderLayout());
+		final AbstractTableModel	factmodel	= new AbstractTableModel()
+		{
+			public int getColumnCount()
+			{
+				return 1;
+			}
+			public String getColumnName(int column)
+			{
+				return "Facts";
+			}
+			public int getRowCount()
+			{
+				return (selbel!=null && selbel.getValue() instanceof String[]) ? ((String[])selbel.getValue()).length : 1;
+			}
+			public Object getValueAt(int row, int column)
+			{
+				return (selbel!=null && selbel.getValue() instanceof String[]) ? ((String[])selbel.getValue())[row] : selbel!=null ? selbel.getValue() : "";
+			}
+		};
+		beldetails.add(new JScrollPane(new JTable(factmodel)), BorderLayout.CENTER);
+		JSplitPanel	spbel	= new JSplitPanel(JSplitPanel.VERTICAL_SPLIT, new JScrollPane(belieftable), beldetails);
+		spbel.setOneTouchExpandable(true);
+		spbel.setDividerLocation(0.75);
+		beliefpanel.add(spbel, BorderLayout.CENTER);
+		belieftable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
 		JPanel	goalpanel	= new JPanel(new BorderLayout());
-		goalpanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED), "Goals"));
+		goalpanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(BevelBorder.LOWERED), "Goals"));
 		final AbstractTableModel	goalmodel	= new AbstractTableModel()
 		{
 			protected String[]	columnames	= new String[]{
@@ -237,7 +270,7 @@ public class BDIViewerPanel extends JPanel
 		goalpanel.add(new JScrollPane(goaltable), BorderLayout.CENTER);
 		
 		JPanel	planpanel	= new JPanel(new BorderLayout());
-		planpanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED), "Plans"));
+		planpanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(BevelBorder.LOWERED), "Plans"));
 		final AbstractTableModel	planmodel	= new AbstractTableModel()
 		{
 			protected String[]	columnames	= new String[]{"Name", "State"};
@@ -287,10 +320,10 @@ public class BDIViewerPanel extends JPanel
 
 		JSplitPanel	sp1	= new JSplitPanel(JSplitPane.VERTICAL_SPLIT, beliefpanel, goalpanel);
 		sp1.setOneTouchExpandable(true);
-		sp1.setDividerLocation(0.5);
+		sp1.setDividerLocation(4.0/7.0);
 		JSplitPanel	sp2	= new JSplitPanel(JSplitPane.VERTICAL_SPLIT, sp1, planpanel);
 		sp2.setOneTouchExpandable(true);
-		sp2.setDividerLocation(2.0/3.0);
+		sp2.setDividerLocation(0.7);
 		this.setLayout(new BorderLayout());
 		this.add(sp2, BorderLayout.CENTER);
 		
@@ -319,13 +352,17 @@ public class BDIViewerPanel extends JPanel
 				{
 					public void run()
 					{
+						List beliefsel = getTableSelection(belieftable, beliefs);
+						List goalsel = getTableSelection(goaltable, goals);
+						List plansel = getTableSelection(plantable, plans);
+						
 						handleEvent(cce);
-						beliefmodel.fireTableDataChanged();
-						goalmodel.fireTableDataChanged();
-						planmodel.fireTableDataChanged();
-						belieftable.repaint();
-						goaltable.repaint();
-						plantable.repaint();
+						
+						updateTable(belieftable, beliefs, beliefsel);
+						updateTable(goaltable, goals, goalsel);
+						updateTable(plantable, plans, plansel);
+						
+						updateSelectedBelief(belieftable, factmodel);
 					}
 					
 					public void handleEvent(IComponentChangeEvent event)
@@ -424,21 +461,6 @@ public class BDIViewerPanel extends JPanel
 				ia.addComponentListener(lis);
 				return null;
 			}
-		})
-		.addResultListener(new IResultListener()
-		{
-			
-			public void resultAvailable(Object result)
-			{
-				// TODO Auto-generated method stub
-				
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				// TODO Auto-generated method stub
-				exception.printStackTrace();
-			}
 		});
 	}
 	
@@ -508,6 +530,9 @@ public class BDIViewerPanel extends JPanel
 		}
 	}
 	
+	/**
+	 *  Dispose the panel.
+	 */
 	public IFuture	dispose()
 	{
 		final IComponentListener lis = listener;
@@ -521,5 +546,49 @@ public class BDIViewerPanel extends JPanel
 			}
 		});
 
+	}
+
+	/**
+	 *  Get the currently selected items.
+	 */
+	protected List getTableSelection(JTable table, List items)
+	{
+		int[]	sel	= table.getSelectedRows();
+		List	goalsel	= new ArrayList();
+		for(int i=0; i<sel.length; i++)
+			goalsel.add(items.get(sel[i]));
+		return goalsel;
+	}
+
+	/**
+	 *  Update the model and set the selected based on selected items.
+	 */
+	protected void updateTable(JTable table, List items, List selection)
+	{
+		((AbstractTableModel)table.getModel()).fireTableDataChanged();
+		table.repaint();
+
+		table.getSelectionModel().clearSelection();
+		for(int i=0; i<selection.size(); i++)
+		{
+			int index	= items.indexOf(selection.get(i));
+			if(index!=-1)
+			{
+				table.getSelectionModel().addSelectionInterval(index, index);
+			}
+		}
+	}
+	
+	/**
+	 *  Update the belief selection.
+	 */
+	protected void	updateSelectedBelief(JTable belieftable, AbstractTableModel factmodel)
+	{
+		selbel	= null;
+		if(belieftable.getSelectedRow()>=0 && belieftable.getSelectedRow()<beliefs.size())
+		{
+			selbel	= (BeliefInfo)beliefs.get(belieftable.getSelectedRow());
+		}
+		factmodel.fireTableDataChanged();
 	}
 }

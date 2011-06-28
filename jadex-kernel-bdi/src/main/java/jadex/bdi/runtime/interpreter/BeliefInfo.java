@@ -6,6 +6,8 @@ import jadex.commons.SUtil;
 import jadex.rules.state.IOAVState;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -27,8 +29,8 @@ public class BeliefInfo
 	/** The belief value type (e.g. int). */
 	protected String	valuetype;
 	
-	/** The value. */
-	protected String value;
+	/** The value(s) (string for belief or array of strings for belief set). */
+	protected Object value;
 	
 	//-------- constructors --------
 	
@@ -43,7 +45,7 @@ public class BeliefInfo
 	/**
 	 *  Create a new goal info.
 	 */
-	public BeliefInfo(Object id, String kind, String type, String valuetype, String value)
+	public BeliefInfo(Object id, String kind, String type, String valuetype, Object value)
 	{
 		this.id	= id;
 		this.kind	= kind;
@@ -120,16 +122,18 @@ public class BeliefInfo
 
 	/**
 	 *  Return the value.
+	 *  (string for belief or array of strings for belief set)
 	 */
-	public String getValue()
+	public Object getValue()
 	{
 		return value;
 	}
 
 	/**
 	 *  Set the value.
+	 *  (string for belief or array of strings for belief set)
 	 */
-	public void setValue(String value)
+	public void setValue(Object value)
 	{
 		this.value = value;
 	}
@@ -187,9 +191,30 @@ public class BeliefInfo
 		String	kind	= state.getType(belief).equals(OAVBDIRuntimeModel.belief_type) ? "belief" : "beliefset"; 
 		String	type	= (String)state.getAttributeValue(mbelief, OAVBDIMetaModel.modelelement_has_name);
 		String	valuetype	= SReflect.getInnerClassName((Class)state.getAttributeValue(mbelief, OAVBDIMetaModel.typedelement_has_class));
-		String	value	= state.getType(belief).equals(OAVBDIRuntimeModel.belief_type)
-			? ""+state.getAttributeValue(belief, OAVBDIRuntimeModel.belief_has_fact)
-			: ""+state.getAttributeValues(belief, OAVBDIRuntimeModel.beliefset_has_facts);
+		Object	value;
+		if(state.getType(belief).equals(OAVBDIRuntimeModel.belief_type))
+		{
+			value	= "" + state.getAttributeValue(belief, OAVBDIRuntimeModel.belief_has_fact); 
+		}
+		else
+		{
+			Collection	coll	= state.getAttributeValues(belief, OAVBDIRuntimeModel.beliefset_has_facts);
+			if(coll!=null)
+			{
+				String[]	vals	= new String[coll.size()];
+				Iterator	it	= coll.iterator();
+				for(int i=0; i<vals.length; i++)
+				{
+					vals[i]	= "" + it.next();
+				}
+				value	= vals;
+			}
+			else
+			{
+				value	= SUtil.EMPTY_STRING_ARRAY;
+			}
+		}
+		
 		if(scope!=null)
 		{
 			BDIInterpreter interpreter	= BDIInterpreter.getInterpreter(state);
