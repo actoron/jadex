@@ -1,6 +1,8 @@
 package jadex.bpmn.tools;
 
 import jadex.bpmn.runtime.BpmnInterpreter;
+import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.BulkComponentChangeEvent;
 import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
@@ -178,16 +180,13 @@ public class ProcessViewPanel extends JPanel
 			public Object execute(IInternalAccess ia)
 			{
 				// Post current state to remote listener
-//				final List	events	= new ArrayList();
-//				for(Iterator it=((MicroAgentInterpreter)ia).getThreadContext().getAllThreads().iterator(); it.hasNext(); )
-//				{
-//					ProcessThread	thread	= (ProcessThread)it.next();
-//					events.add(new ChangeEvent(null, BpmnInterpreter.EVENT_THREAD_ADDED,
-//						new ProcessThreadInfo(thread.getId(), thread.getActivity().getBreakpointId(),
-//							thread.getActivity().getPool()!=null ? thread.getActivity().getPool().getName() : null,
-//							thread.getActivity().getLane()!=null ? thread.getActivity().getLane().getName() : null)));
-//				}
-//				rcl.changeOccurred(new ChangeEvent(null, RemoteChangeListenerHandler.EVENT_BULK, events));
+				BpmnInterpreter	interpreter	= (BpmnInterpreter)ia;
+				final List	events	= new ArrayList();
+				for(Iterator it=interpreter.getThreadContext().getAllThreads().iterator(); it.hasNext(); )
+				{
+					events.add(interpreter.createThreadEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, (ProcessThread)it.next()));
+				}
+				lis.eventOccured(new BulkComponentChangeEvent((IComponentChangeEvent[])events.toArray(new IComponentChangeEvent[events.size()])));
 				
 				ia.addComponentListener(lis);
 				return null;

@@ -146,7 +146,7 @@
 					
 					<env:drawable objecttype="cleaner" width="0.1" height="0.1">
 						<env:property name="vision_size" dynamic="true">new Vector2Double($object.vision_range*20)</env:property>
-						<env:property name="text" dynamic="true">$object.owner.getName()</env:property>
+						<env:property name="text" dynamic="true">$object.owner.getName().getLocalName()</env:property>
 						<env:texturedrectangle layer="2" width="0.8" height="0.8" imagepath="jadex/bdi/examples/cleanerworld/images/cleaner.png" />
 						<env:text layer="4" align="center" y="-0.6" color="black" text="$text$" size="8"/>
 						<env:ellipse layer="-1" size="vision_size" color="#ffff007f" />
@@ -156,7 +156,7 @@
 					</env:drawable>
 					
 					<env:drawable objecttype="truck" width="0.2" height="0.15">
-						<env:property name="text" dynamic="true">$object.owner.getName()</env:property>
+						<env:property name="text" dynamic="true">$object.owner.getName().getLocalName()</env:property>
 						<env:texturedrectangle layer="2" width="0.8" height="0.8" imagepath="jadex/bdi/examples/cleanerworld/images/truck.png" />
 						<env:text layer="4" align="center" y="-0.5" color="black" text="$text$" size="8"/>
 					</env:drawable>
