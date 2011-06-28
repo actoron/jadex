@@ -33,7 +33,7 @@ public class SortedList	extends LinkedList
 
 	/**
 	 *  Constructs an empty list with given order.
-	 *  @param ascending	True, if the list shoudl sort ascending.
+	 *  @param ascending	True, if the list should sort ascending.
 	 */
 	public SortedList(boolean ascending)
 	{

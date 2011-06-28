@@ -1,7 +1,6 @@
 package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.model.OAVBDIMetaModel;
-import jadex.commons.SUtil;
 import jadex.rules.state.IOAVState;
 
 import java.util.ArrayList;
@@ -10,15 +9,9 @@ import java.util.List;
 /**
  *  Transferable information about a plan.
  */
-public class PlanInfo
+public class PlanInfo	extends AbstractBDIInfo
 {
 	//-------- attributes --------
-	
-	/** The plan id. */
-	protected Object	id;
-	
-	/** The goal type (e.g. patrol_plan). */
-	protected String	type;
 	
 	/** The plan state (body, passed, failed, aborted). */
 	protected String state;
@@ -26,7 +19,7 @@ public class PlanInfo
 	//-------- constructors --------
 	
 	/**
-	 *  Create a new goal info.
+	 *  Create a new info.
 	 */
 	public PlanInfo()
 	{
@@ -34,49 +27,16 @@ public class PlanInfo
 	}
 
 	/**
-	 *  Create a new goal info.
+	 *  Create a new info.
 	 */
 	public PlanInfo(Object id, String type, String state)
 	{
-		this.id	= id;
-		this.type	= type;
+		super(id, type);
 		this.state	= state;
 	}
 	
 	//--------- methods ---------
 	
-	/**
-	 *  Return the id.
-	 */
-	public Object getId()
-	{
-		return id;
-	}
-
-	/**
-	 *  Set the id.
-	 */
-	public void setId(Object id)
-	{
-		this.id = id;
-	}
-
-	/**
-	 *  Return the type.
-	 */
-	public String getType()
-	{
-		return type;
-	}
-
-	/**
-	 *  Set the type.
-	 */
-	public void setType(String type)
-	{
-		this.type = type;
-	}
-
 	/**
 	 *  Return the state.
 	 */
@@ -99,28 +59,12 @@ public class PlanInfo
 	 */
 	public String toString()
 	{
-		return "GoalInfo(id="+id
+		return "PlanInfo(id="+id
 			+ ", type=" + this.type
 			+ ", state=" + this.state
 			+ ")";
 	}
 
-	/**
-	 *  Test if two objects are equal.
-	 */
-	public boolean	equals(Object obj)
-	{
-		return obj instanceof PlanInfo && SUtil.equals(((PlanInfo)obj).id, id);
-	}
-	
-	/**
-	 *  Get the hashcode
-	 */
-	public int	hashCode()
-	{
-		return 31+id.hashCode();
-	}
-	
 	//-------- helper methods --------
 	
 	/**

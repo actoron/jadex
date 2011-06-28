@@ -13,18 +13,12 @@ import java.util.List;
 /**
  *  Transferable information about a belief.
  */
-public class BeliefInfo
+public class BeliefInfo	extends AbstractBDIInfo
 {
 	//-------- attributes --------
 	
-	/** The belief id. */
-	protected Object	id;
-	
 	/** The belief kind (belief or beliefset). */
 	protected String	kind;
-	
-	/** The belief type (patrol_points). */
-	protected String	type;
 	
 	/** The belief value type (e.g. int). */
 	protected String	valuetype;
@@ -43,35 +37,18 @@ public class BeliefInfo
 	}
 
 	/**
-	 *  Create a new goal info.
+	 *  Create a new belief info.
 	 */
 	public BeliefInfo(Object id, String kind, String type, String valuetype, Object value)
 	{
-		this.id	= id;
+		super(id, type);
 		this.kind	= kind;
-		this.type	= type;
 		this.valuetype	= valuetype;
 		this.value	= value;
 	}
 	
 	//--------- methods ---------
 	
-	/**
-	 *  Return the id.
-	 */
-	public Object getId()
-	{
-		return id;
-	}
-
-	/**
-	 *  Set the id.
-	 */
-	public void setId(Object id)
-	{
-		this.id = id;
-	}
-
 	/**
 	 *  Return the kind.
 	 */
@@ -86,22 +63,6 @@ public class BeliefInfo
 	public void setKind(String kind)
 	{
 		this.kind = kind;
-	}
-
-	/**
-	 *  Return the type.
-	 */
-	public String getType()
-	{
-		return type;
-	}
-
-	/**
-	 *  Set the type.
-	 */
-	public void setType(String type)
-	{
-		this.type = type;
 	}
 
 	/**
@@ -151,22 +112,6 @@ public class BeliefInfo
 			+ ")";
 	}
 
-	/**
-	 *  Test if two objects are equal.
-	 */
-	public boolean	equals(Object obj)
-	{
-		return obj instanceof BeliefInfo && SUtil.equals(((BeliefInfo)obj).id, id);
-	}
-	
-	/**
-	 *  Get the hashcode
-	 */
-	public int	hashCode()
-	{
-		return 31+id.hashCode();
-	}
-	
 	//-------- helper methods --------
 	
 	/**

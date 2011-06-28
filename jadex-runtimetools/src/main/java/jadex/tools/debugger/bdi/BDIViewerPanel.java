@@ -1,6 +1,7 @@
 package jadex.tools.debugger.bdi;
 
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
+import jadex.bdi.runtime.interpreter.AbstractBDIInfo;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.BeliefInfo;
 import jadex.bdi.runtime.interpreter.GoalInfo;
@@ -24,15 +25,27 @@ import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -40,7 +53,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
-import javax.swing.border.BevelBorder;
+import javax.swing.border.EtchedBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
@@ -60,13 +73,18 @@ public class BDIViewerPanel extends JPanel
 		"maintain",	SGUI.makeIcon(BDIViewerPanel.class, "/jadex/tools/common/images/cloud2m.png"),
 		"query",	SGUI.makeIcon(BDIViewerPanel.class, "/jadex/tools/common/images/cloud2q.png"),
 		"goal",	SGUI.makeIcon(BDIViewerPanel.class, "/jadex/tools/common/images/cloud2.png"),
-		"plan",	SGUI.makeIcon(BDIViewerPanel.class, "/jadex/tools/common/images/plan2.png")
+		"plan",	SGUI.makeIcon(BDIViewerPanel.class, "/jadex/tools/common/images/plan2.png"),
+		"agent",	SGUI.makeIcon(BDIViewerPanel.class, "/jadex/tools/common/images/bdi_agent.png"),
+		"capa",	SGUI.makeIcon(BDIViewerPanel.class, "/jadex/tools/common/images/bdi_capability.png")
 	});
 	
 	//-------- attributes ---------
 	
 	/** The external access to the agent. */
 	protected IExternalAccess	access;
+	
+	/** The beliefs of selected capabilities. */
+	protected List	allbeliefs;
 	
 	/** The beliefs. */
 	protected List	beliefs;
@@ -75,13 +93,25 @@ public class BDIViewerPanel extends JPanel
 	protected BeliefInfo	selbel;
 	
 	/** The goals. */
+	protected List	allgoals;
+
+	/** The goals of selected capabilities. */
 	protected List	goals;
 	
 	/** The plans. */
+	protected List	allplans;
+	
+	/** The plans of selected capabilities. */
 	protected List	plans;
 	
 	/** The component listener. */
 	protected IComponentListener	listener;
+	
+	/** The known capabilities (full name). */
+	protected Set capas;
+	
+	/** The shown capabilities (full name). */
+	protected Set shown;
 	
 	//--------- constructors --------
 	
@@ -91,42 +121,29 @@ public class BDIViewerPanel extends JPanel
 	public BDIViewerPanel(IExternalAccess access)
 	{
 		this.access	= access;
-		this.beliefs	= new SortedList(new Comparator()
+		this.capas	= new TreeSet();
+		this.shown	= capas;
+		capas.add("<agent>");
+		Comparator	comp	= new Comparator()
 		{
 			public int compare(Object o1, Object o2)
 			{
-				BeliefInfo	info1	= (BeliefInfo)o1;
-				BeliefInfo	info2	= (BeliefInfo)o2;
+				AbstractBDIInfo	info1	= (AbstractBDIInfo)o1;
+				AbstractBDIInfo	info2	= (AbstractBDIInfo)o2;
 				int	caps1	= new StringTokenizer(info1.getType(), ".").countTokens();
 				int	caps2	= new StringTokenizer(info2.getType(), ".").countTokens();
 				return caps1!=caps2 ? caps1-caps2 : info1.getType().compareTo(info2.getType());
 			}
-		}, true);
-		this.goals	= new SortedList(new Comparator()
-		{
-			public int compare(Object o1, Object o2)
-			{
-				GoalInfo	info1	= (GoalInfo)o1;
-				GoalInfo	info2	= (GoalInfo)o2;
-				int	caps1	= new StringTokenizer(info1.getType(), ".").countTokens();
-				int	caps2	= new StringTokenizer(info2.getType(), ".").countTokens();
-				return caps1!=caps2 ? caps1-caps2 : info1.getType().compareTo(info2.getType());
-			}
-		}, true);
-		this.plans	= new SortedList(new Comparator()
-		{
-			public int compare(Object o1, Object o2)
-			{
-				PlanInfo	info1	= (PlanInfo)o1;
-				PlanInfo	info2	= (PlanInfo)o2;
-				int	caps1	= new StringTokenizer(info1.getType(), ".").countTokens();
-				int	caps2	= new StringTokenizer(info2.getType(), ".").countTokens();
-				return caps1!=caps2 ? caps1-caps2 : info1.getType().compareTo(info2.getType());
-			}
-		}, true);
+		};
+		this.allbeliefs	= new SortedList(comp, true);
+		this.allgoals	= new SortedList(comp, true);
+		this.allplans	= new SortedList(comp, true);
+		this.beliefs	= new SortedList(comp, true);
+		this.goals	= new SortedList(comp, true);
+		this.plans	= new SortedList(comp, true);
 		
 		JPanel	beliefpanel	= new JPanel(new BorderLayout());
-		beliefpanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(BevelBorder.LOWERED), "Beliefs"));
+		beliefpanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), "Beliefs"));
 		final AbstractTableModel	beliefmodel	= new AbstractTableModel()
 		{
 			protected String[]	columnames	= new String[]{"Name", "Type", "Value"};
@@ -212,7 +229,7 @@ public class BDIViewerPanel extends JPanel
 		belieftable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
 		JPanel	goalpanel	= new JPanel(new BorderLayout());
-		goalpanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(BevelBorder.LOWERED), "Goals"));
+		goalpanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), "Goals"));
 		final AbstractTableModel	goalmodel	= new AbstractTableModel()
 		{
 			protected String[]	columnames	= new String[]{
@@ -270,7 +287,7 @@ public class BDIViewerPanel extends JPanel
 		goalpanel.add(new JScrollPane(goaltable), BorderLayout.CENTER);
 		
 		JPanel	planpanel	= new JPanel(new BorderLayout());
-		planpanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(BevelBorder.LOWERED), "Plans"));
+		planpanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), "Plans"));
 		final AbstractTableModel	planmodel	= new AbstractTableModel()
 		{
 			protected String[]	columnames	= new String[]{"Name", "State"};
@@ -326,6 +343,59 @@ public class BDIViewerPanel extends JPanel
 		sp2.setDividerLocation(0.7);
 		this.setLayout(new BorderLayout());
 		this.add(sp2, BorderLayout.CENTER);
+		JButton	hide	= new JButton("Hide...");
+		JButton	show	= new JButton("Show All");
+		hide.setPreferredSize(show.getPreferredSize());
+		hide.setMinimumSize(show.getMinimumSize());
+		hide.setToolTipText("Select capabilities to hide");
+		show.setToolTipText("Show all capabilities");
+		JPanel	showhide	= new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 2));
+		showhide.add(hide);
+		showhide.add(show);
+		this.add(showhide, BorderLayout.SOUTH);
+		hide.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				JCheckBox[]	cbs	= new JCheckBox[capas.size()];
+				JPanel	panel	= new JPanel(new GridBagLayout());
+				panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), "Capabilities"));
+				GridBagConstraints	gbc	= new GridBagConstraints();
+				gbc.gridy	= 0;
+				gbc.anchor	= GridBagConstraints.WEST;
+				for(Iterator it=capas.iterator(); it.hasNext(); )
+				{
+					String	capa	= (String)it.next();
+					cbs[gbc.gridy]	= new JCheckBox(capa, !shown.contains(capa));
+					gbc.weightx	= 0;
+					panel.add(new JLabel("<agent>".equals(capa) ? icons.getIcon("agent") : icons.getIcon("capa")), gbc);
+					gbc.weightx	= 1;
+					panel.add(cbs[gbc.gridy], gbc);
+					gbc.gridy++;
+				}
+				int	option	= JOptionPane.showOptionDialog(BDIViewerPanel.this, panel, "Select capabilities to hide", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
+				if(JOptionPane.OK_OPTION==option)
+				{
+					shown	= new HashSet();
+					for(int i=0; i<cbs.length; i++)
+					{
+						if(!cbs[i].isSelected())
+							shown.add(cbs[i].getText());
+					}
+
+					updateShown(belieftable, factmodel, goaltable, plantable);
+
+				}
+			}
+		});
+		show.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				shown	= capas;
+				updateShown(belieftable, factmodel, goaltable, plantable);
+			}
+		});
 		
 		listener = new IComponentListener()
 		{
@@ -380,17 +450,22 @@ public class BDIViewerPanel extends JPanel
 						else if(cce.getSourceCategory().equals(IComponentChangeEvent.SOURCE_CATEGORY_FACT))
 						{
 							// Hack!!! create/disposal only for facts, not for beliefs, just check for changes, removal not supported.
-							int	index	= beliefs.indexOf(cce.getDetails());
+							int	index	= allbeliefs.indexOf(cce.getDetails());
 							if(index!=-1)
 							{
 								BeliefInfo	newinfo	= (BeliefInfo)cce.getDetails();
-								BeliefInfo	oldinfo	= (BeliefInfo)beliefs.remove(index);
+								BeliefInfo	oldinfo	= (BeliefInfo)allbeliefs.remove(index);
+								beliefs.remove(newinfo);
 								newinfo.setType(oldinfo.getType());	// Hack!!! Keep capability information which is unavailable for modified events.
-								beliefs.add(index, newinfo);
+								allbeliefs.add(newinfo);
+								if(checkCapa(newinfo.getType()))
+									beliefs.add(newinfo);								
 							}
 							else
 							{
-								beliefs.add(cce.getDetails());
+								allbeliefs.add(cce.getDetails());
+								if(checkCapa(((BeliefInfo)cce.getDetails()).getType()))
+									beliefs.add(cce.getDetails());
 							}
 						}
 						
@@ -398,21 +473,27 @@ public class BDIViewerPanel extends JPanel
 						{
 							if(IComponentChangeEvent.EVENT_TYPE_CREATION.equals(cce.getEventType()))
 							{
-								goals.add(cce.getDetails());
+								allgoals.add(cce.getDetails());
+								if(checkCapa(((GoalInfo)cce.getDetails()).getType()))
+									goals.add(cce.getDetails());
 							}
 							else if(IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()))
 							{
+								allgoals.remove(cce.getDetails());
 								goals.remove(cce.getDetails());
 							}
 							else if(IComponentChangeEvent.EVENT_TYPE_MODIFICATION.equals(cce.getEventType()))
 							{
-								int	index	= goals.indexOf(cce.getDetails());
+								int	index	= allgoals.indexOf(cce.getDetails());
 								if(index!=-1)
 								{
 									GoalInfo	newinfo	= (GoalInfo)cce.getDetails();
-									GoalInfo	oldinfo	= (GoalInfo)goals.remove(index);
+									GoalInfo	oldinfo	= (GoalInfo)allgoals.remove(index);
+									goals.remove(newinfo);
 									newinfo.setType(oldinfo.getType());	// Hack!!! Keep capability information which is unavailable for modified events.
-									goals.add(index, newinfo);
+									allgoals.add(newinfo);
+									if(checkCapa(newinfo.getType()))
+										goals.add(newinfo);
 								}
 							}
 						}
@@ -421,21 +502,27 @@ public class BDIViewerPanel extends JPanel
 						{
 							if(IComponentChangeEvent.EVENT_TYPE_CREATION.equals(cce.getEventType()))
 							{
-								plans.add(cce.getDetails());
+								allplans.add(cce.getDetails());
+								if(checkCapa(((PlanInfo)cce.getDetails()).getType()))
+									plans.add(cce.getDetails());
 							}
 							else if(IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()))
 							{
+								allplans.remove(cce.getDetails());
 								plans.remove(cce.getDetails());
 							}
 							else if(IComponentChangeEvent.EVENT_TYPE_MODIFICATION.equals(cce.getEventType()))
 							{
-								int	index	= plans.indexOf(cce.getDetails());
+								int	index	= allplans.indexOf(cce.getDetails());
 								if(index!=-1)
 								{
 									PlanInfo	newinfo	= (PlanInfo)cce.getDetails();
-									PlanInfo	oldinfo	= (PlanInfo)plans.remove(index);
+									PlanInfo	oldinfo	= (PlanInfo)allplans.remove(index);
+									plans.remove(newinfo);
 									newinfo.setType(oldinfo.getType());	// Hack!!! Keep capability information which is unavailable for modified events.
-									plans.add(index, newinfo);
+									allplans.add(newinfo);
+									if(checkCapa(newinfo.getType()))
+										plans.add(newinfo);
 								}
 							}
 						}
@@ -590,5 +677,63 @@ public class BDIViewerPanel extends JPanel
 			selbel	= (BeliefInfo)beliefs.get(belieftable.getSelectedRow());
 		}
 		factmodel.fireTableDataChanged();
+	}
+	
+	/**
+	 *  Check if the capability is shown.
+	 */
+	protected boolean	checkCapa(String name)
+	{
+		int i	= name.lastIndexOf('.');
+		if(i!=-1)
+		{
+			name	= name.substring(0, i);
+			capas.add(name);
+		}
+		else
+		{
+			name	= "<agent>";
+		}
+		return shown.contains(name);
+	}
+
+	protected void updateShown(final JTable belieftable,
+			final AbstractTableModel factmodel, final JTable goaltable,
+			final JTable plantable)
+	{
+		List beliefsel = getTableSelection(belieftable, beliefs);
+		List goalsel = getTableSelection(goaltable, goals);
+		List plansel = getTableSelection(plantable, plans);
+
+		beliefs.clear();
+		goals.clear();
+		plans.clear();
+		for(int i=0; i<allbeliefs.size(); i++)
+		{
+			if(checkCapa(((AbstractBDIInfo)allbeliefs.get(i)).getType()))
+			{
+				beliefs.add(allbeliefs.get(i));
+			}
+		}
+		for(int i=0; i<allgoals.size(); i++)
+		{
+			if(checkCapa(((AbstractBDIInfo)allgoals.get(i)).getType()))
+			{
+				goals.add(allgoals.get(i));
+			}
+		}
+		for(int i=0; i<allplans.size(); i++)
+		{
+			if(checkCapa(((AbstractBDIInfo)allplans.get(i)).getType()))
+			{
+				plans.add(allplans.get(i));
+			}
+		}
+		
+		updateTable(belieftable, beliefs, beliefsel);
+		updateTable(goaltable, goals, goalsel);
+		updateTable(plantable, plans, plansel);
+		
+		updateSelectedBelief(belieftable, factmodel);
 	}
 }
