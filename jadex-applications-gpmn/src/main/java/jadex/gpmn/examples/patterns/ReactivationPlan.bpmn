@@ -2,8 +2,8 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_x8YacSxXEd-fR-V1BYdsIg" iD="_x8YacCxXEd-fR-V1BYdsIg">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_yeBH4CxXEd-fR-V1BYdsIg" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yeBH4SxXEd-fR-V1BYdsIg" key="Description" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yeDkICxXEd-fR-V1BYdsIg" key="Package" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2CqOewRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_P32WAKGcEeCahZentkTDFw" key="package" value="jadex.gpmn.examples.patterns"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_x8ZBhSxXEd-fR-V1BYdsIg" iD="_x8ZBhCxXEd-fR-V1BYdsIg" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_x8aPoCxXEd-fR-V1BYdsIg" iD="_x8ZokCxXEd-fR-V1BYdsIg" outgoingEdges="_1SvSQCxXEd-fR-V1BYdsIg" incomingEdges="_0X1wQSxXEd-fR-V1BYdsIg" name="ReactivationTask" activityType="Task">

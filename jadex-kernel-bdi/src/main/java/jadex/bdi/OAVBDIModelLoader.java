@@ -191,6 +191,14 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 			// Need to set class loader before create agent model entry to load subcapabilities.
 			mi.setClassloader(classloader);
 			mi.setFilename(info.getFilename());
+			if(!mi.checkName())
+			{
+				entries.put(new Tuple(new Object[]{new StackElement(new QName("capability"), handle)}), "Name '"+mi.getName()+"' does not match file name '"+mi.getFilename()+"'.");				
+			}
+			if(!mi.checkPackage())
+			{
+				entries.put(new Tuple(new Object[]{new StackElement(new QName("capability"), handle)}), "Package '"+mi.getPackage()+"' does not match file name '"+mi.getFilename()+"'.");				
+			}
 			createAgentModelEntry(ret, mi);
 			
 			

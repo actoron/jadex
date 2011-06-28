@@ -2,8 +2,8 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_ctJuYStsEd-cIrzPTxeRYA" iD="_ctJuYCtsEd-cIrzPTxeRYA">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dIAeYCtsEd-cIrzPTxeRYA" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dIBFcCtsEd-cIrzPTxeRYA" key="Description" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dIEIwCtsEd-cIrzPTxeRYA" key="Package" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1aJc9wRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_NeggEKGcEeCahZentkTDFw" key="package" value="jadex.gpmn.examples.patterns"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_cta0IStsEd-cIrzPTxeRYA" iD="_cta0ICtsEd-cIrzPTxeRYA" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_ctcCQStsEd-cIrzPTxeRYA" iD="_ctcCQCtsEd-cIrzPTxeRYA" outgoingEdges="_jPL4AStsEd-cIrzPTxeRYA" incomingEdges="_indwsStsEd-cIrzPTxeRYA" name="FailureWarning" activityType="Task">

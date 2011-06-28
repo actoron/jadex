@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_wmlFwWZBEd69fIOIR1mR4w" iD="_wmlFwGZBEd69fIOIR1mR4w">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_8E3VcDZfEd-GR8OzZk56OA" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8E3VcTZfEd-GR8OzZk56OA" key="Description" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8E3VcjZfEd-GR8OzZk56OA" key="Package" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_j2wesARPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_NPoMAKGbEeCahZentkTDFw" key="package" value="jadex.bpmn.examples.load"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_wmlFx2ZBEd69fIOIR1mR4w" iD="_wmlFxmZBEd69fIOIR1mR4w" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_wmlFyWZBEd69fIOIR1mR4w" iD="_wmlFyGZBEd69fIOIR1mR4w" outgoingEdges="_x9J3IWZBEd69fIOIR1mR4w" incomingEdges="_4MOPEWfOEd6wnMj69c-ZtQ" name="Task" activityType="Task"/>

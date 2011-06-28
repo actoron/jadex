@@ -2,8 +2,8 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_P3fdwXLtEd-fEqakq96uUw" iD="_P3fdwHLtEd-fEqakq96uUw">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_EfIsIHLyEd-fEqakq96uUw" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EfIsIXLyEd-fEqakq96uUw" key="Description" value="&lt;h1>Simple Delivery Process&lt;/h1> This process sends payment reminders to the JCC. Try sending the process an 'inform(payment)'."/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EfJ6QHLyEd-fEqakq96uUw" key="Package" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c89f4ARQEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__VqykKGaEeCahZentkTDFw" key="package" value="jadex.bpmn.examples.execute"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_fJxLIARPEeCnwcpWvxOwkg" source="jadex_arguments_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fJxLIQRPEeCnwcpWvxOwkg" key="dimension" value="1:6"/>

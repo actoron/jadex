@@ -2,8 +2,8 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_5q6OQVm7Ed-CVtZr0hfiVg" iD="_5q6OQFm7Ed-CVtZr0hfiVg">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_6Aqb0Fm7Ed-CVtZr0hfiVg" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6Aqb0Vm7Ed-CVtZr0hfiVg" key="Description" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6Aqb0lm7Ed-CVtZr0hfiVg" key="Package" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_er_C-wRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8PS3gKGaEeCahZentkTDFw" key="package" value="jadex.bpmn.examples.contractnet"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ejWEUARPEeCnwcpWvxOwkg" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ejWEUQRPEeCnwcpWvxOwkg" key="dimension" value="1:1"/>

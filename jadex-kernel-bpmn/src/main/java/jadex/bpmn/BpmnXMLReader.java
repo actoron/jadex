@@ -196,6 +196,16 @@ public class BpmnXMLReader
 		ret.initModelInfo();
 		rinfo.getInputStream().close();
 		
+		if(!((ModelInfo)ret.getModelInfo()).checkName())
+		{
+			report.put(new Tuple(new Object[]{new StackElement(new QName("BpmnDiagram"), ret)}), "Name '"+ret.getModelInfo().getName()+"' does not match file name '"+ret.getModelInfo().getFilename()+"'.");				
+		}
+		if(!((ModelInfo)ret.getModelInfo()).checkPackage())
+		{
+			report.put(new Tuple(new Object[]{new StackElement(new QName("BpmnDiagram"), ret)}), "Package '"+ret.getModelInfo().getPackage()+"' does not match file name '"+ret.getModelInfo().getFilename()+"'.");				
+		}
+
+		
 		if(report.size()>0)
 		{
 //			System.out.println("Error loading model: "+rinfo.getFilename()+" "+report);

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_-B4aEVmxEd-CVtZr0hfiVg" iD="_-B4aEFmxEd-CVtZr0hfiVg">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-yILQFmxEd-CVtZr0hfiVg" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-yILQVmxEd-CVtZr0hfiVg" key="Description" value="&lt;h1>Standard Proposal Evaluation Process&lt;/h1> This process randomly selects some of the available proposals."/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-yILQlmxEd-CVtZr0hfiVg" key="Package" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_eFaLIARPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4QZZAKGaEeCahZentkTDFw" key="description" value="&lt;h1>Standard Proposal Evaluation Process&lt;/h1> This process randomly selects some of the available proposals."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7ClMwKGaEeCahZentkTDFw" key="package" value="jadex.bpmn.examples.contractnet"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_d9OfgARPEeCnwcpWvxOwkg" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_d9OfgQRPEeCnwcpWvxOwkg" key="dimension" value="1:1"/>

@@ -719,4 +719,59 @@ public class ModelInfo extends Startable implements IModelInfo
 			extensions = new ArrayList();
 		extensions.add(extension);
 	}
+
+	/**
+	 *  Check if the specified name matches the file name.
+	 */
+	public boolean checkName()
+	{
+		boolean	check	= true;
+		if(filename!=null)
+		{
+			String	test	= filename;
+			int index	= Math.max(test.lastIndexOf("\\"), test.lastIndexOf("/"));
+			if(index>0)
+			{
+				test	= test.substring(index+1);
+			}
+			check	= test.startsWith(name);
+		}
+		return check;
+	}
+
+
+	/**
+	 *  Check if the specified package matches the file name.
+	 */
+	public boolean checkPackage()
+	{
+		boolean	check	= true;
+		if(filename!=null && packagename!=null)
+		{
+			String	test	= filename;
+			int index	= Math.max(filename.lastIndexOf("\\"), filename.lastIndexOf("/"));
+			if(index==-1)
+			{
+				check	= "".equals(packagename);
+			}
+			else
+			{
+				test	= test.substring(0, index);
+				String	testpackage	= packagename;
+				while(check && test!=null && testpackage!=null)
+				{
+					index	= Math.max(test.lastIndexOf("\\"), test.lastIndexOf("/"));
+					String	test1	= index==-1 ? test : test.substring(index+1); 
+					test	= index!=-1 ? test.substring(0, index) : null;
+
+					int	index2	= testpackage.lastIndexOf(".");
+					String	test2	= index2==-1 ? testpackage : testpackage.substring(index2+1);
+					testpackage	= index2!=-1 ? testpackage.substring(0, index2) : null;
+					
+					check	= SUtil.equals(test1, test2) && (test!=null || testpackage==null);
+				}
+			}
+		}
+		return check;
+	}
 }

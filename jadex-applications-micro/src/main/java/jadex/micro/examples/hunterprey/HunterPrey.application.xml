@@ -13,7 +13,7 @@
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
-	name="HunterPrey" package="jadex.micro.examples.hunterprey_env">
+	name="HunterPrey" package="jadex.micro.examples.hunterprey">
 	
 	<imports>
 		<import>jadex.extension.envsupport.environment.*</import>

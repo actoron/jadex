@@ -210,7 +210,16 @@ public class ComponentXMLReader
 			mi.setFilename(rinfo.getFilename());
 			mi.setClassloader(classloader);
 			mi.setStartable(true);
-			
+
+			if(!mi.checkName())
+			{
+				report.put(new Tuple(new Object[]{new StackElement(new QName("BpmnDiagram"), ret)}), "Name '"+mi.getName()+"' does not match file name '"+ret.getModelInfo().getFilename()+"'.");				
+			}
+			if(!mi.checkPackage())
+			{
+				report.put(new Tuple(new Object[]{new StackElement(new QName("BpmnDiagram"), ret)}), "Package '"+mi.getPackage()+"' does not match file name '"+ret.getModelInfo().getFilename()+"'.");				
+			}
+
 			// todo: remove		
 			IArgument[] args = mi.getArguments(); 
 			if(args.length>0)

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_QZS7sRcWEd-OSKK6OfNWqA" iD="_QZS7sBcWEd-OSKK6OfNWqA">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_RzTbkBcWEd-OSKK6OfNWqA" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_RzclgBcWEd-OSKK6OfNWqA" key="Package" value=" jadex.bpmn.examples.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_orCtGwRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hny40Jf0EeCntfZh2ayVhg" key="description" value="Simple process that fowards an argument as its result."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hvPkoJf0EeCntfZh2ayVhg" key="autoshutdown" value="false"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0603oJgTEeCV-cc4Hk1JDg" key="master" value="false"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1G_EUJgTEeCV-cc4Hk1JDg" key="suspend" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ls96EKGaEeCahZentkTDFw" key="package" value="jadex.bpmn.testcases"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_oj5jQARPEeCnwcpWvxOwkg" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6u_0gJf5EeCa3stmdlhHqg" key="dimension" value="4:1"/>
