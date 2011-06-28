@@ -3,15 +3,10 @@
  */
 package deco4mas.mechanism.graph;
 
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IBelief;
-import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.ExternalAccess;
