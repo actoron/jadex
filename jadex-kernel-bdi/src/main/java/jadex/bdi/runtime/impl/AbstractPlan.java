@@ -70,6 +70,10 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	/** The bdi interpreter. */
 	protected BDIInterpreter interpreter;
 	
+	/** The external access. */
+	// cached because requested from external thread
+	protected IBDIExternalAccess access;
+	
 	/** The runtime plan element. */
 	private Object rplan;
 	
@@ -95,6 +99,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 		this.rcapa	= ((Object[])planinit.get(myadr))[2];
 		
 		this.state = interpreter.getState();
+		this.access	= new ExternalAccessFlyweight(state, rcapa);
 		
 		if(interpreter==null || rplan==null || rcapa==null)
 			throw new RuntimeException("Plan could not be inited: "+myadr+" - "+interpreter+" "+rplan);
@@ -668,7 +673,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 */
 	public IBDIExternalAccess getExternalAccess()
 	{
-		return new ExternalAccessFlyweight(state, rcapa);
+		return access;
 	}
 
 	//-------- expressionbase shortcut methods --------
