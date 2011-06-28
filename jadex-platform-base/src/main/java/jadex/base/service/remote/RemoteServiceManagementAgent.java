@@ -104,8 +104,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					
 //					System.out.println("received: "+callid);
 					
-//					if(((String)content).indexOf("getServices")!=-1)
-//						System.out.println("getS: "+callid);
+//					if(((String)content).indexOf("DiscoveryInfo")!=-1)
+//						System.out.println("DiscoveryInfo: "+callid);
 					
 					if(content instanceof String)
 					{

@@ -278,10 +278,10 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		if(linkinfo instanceof SubobjectInfo)
 		{
 			SubobjectInfo info = (SubobjectInfo)linkinfo;
-			if(!(info.getAccessInfo().getObjectIdentifier() instanceof OAVAttributeType))
-			{
-				System.out.println("kldg");
-			}
+//			if(!(info.getAccessInfo().getObjectIdentifier() instanceof OAVAttributeType))
+//			{
+//				System.out.println("kldg");
+//			}
 			attrtype = (OAVAttributeType)info.getAccessInfo().getObjectIdentifier();
 			
 			// todo:?

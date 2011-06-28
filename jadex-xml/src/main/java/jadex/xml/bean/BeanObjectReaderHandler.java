@@ -487,8 +487,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		}
 		else
 		{
-			// Try linking via tag name.
-			for(int i=pathname.length-1; !linked && i>=0; i--)
+			// Try linking via tag name. Todo: order to try tags?
+			// for(int i=pathname.length-1; !linked && i>=0; i--)
+			for(int i=0; !linked && i<pathname.length; i++)	// This order works for discovery info (setProxy instead of setComponentIdentifier)
 			{
 				linked	= setElementValue(null, pathname[i], parent, object, null, null, context);
 			}
@@ -566,8 +567,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		}
 		else
 		{
-			// Try linking via tag name.
-			for(int i=pathname.length-1; !linked && i>=0; i--)
+			// Try linking via tag name. Todo: order to try tags?
+			// for(int i=pathname.length-1; !linked && i>=0; i--)
+			for(int i=0; !linked && i<pathname.length; i++)	// This order works for discovery info (setProxy instead of setComponentIdentifier)
 			{
 				linked	= setBulkAttributeValues(null, pathname[i], parent, childs, null, null, context);
 			}
