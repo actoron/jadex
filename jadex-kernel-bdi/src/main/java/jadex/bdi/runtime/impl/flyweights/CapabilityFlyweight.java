@@ -25,6 +25,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.clock.ITimedObject;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -805,6 +806,15 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		}));
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the fetcher.
+	 *  @return The fetcher.
+	 */
+	public IValueFetcher getFetcher()
+	{
+		return getInterpreter().getFetcher();
 	}
 	
 //	/**

@@ -1,4 +1,4 @@
-package jadex.javaparser;
+package jadex.commons;
 
 /**
  *  Interface for fetching a predefined value.
@@ -6,7 +6,7 @@ package jadex.javaparser;
  *  predefined values such as "$val".
  *  
  *  This interfaces is better than a value map because
- *  values can 
+ *  values can be dynamically retrieved.
  */
 public interface IValueFetcher
 {

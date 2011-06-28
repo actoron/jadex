@@ -143,7 +143,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public IRequiredServiceFetcher createServiceFetcher(String name)
 	{
-		return new DefaultServiceFetcher();
+		return new DefaultServiceFetcher(this);
 	}
 	
 	/**

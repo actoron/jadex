@@ -8,10 +8,10 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.commons.IFilter;
+import jadex.commons.IValueFetcher;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.javaparser.IValueFetcher;
 import jadex.kernelbase.StatelessAbstractInterpreter;
 
 import java.util.HashMap;

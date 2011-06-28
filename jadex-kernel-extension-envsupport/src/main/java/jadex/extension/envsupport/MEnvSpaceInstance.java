@@ -2,13 +2,13 @@ package jadex.extension.envsupport;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IExtensionInfo;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.javaparser.IValueFetcher;
 
 import java.util.List;
 import java.util.Map;

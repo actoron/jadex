@@ -3,6 +3,7 @@ package jadex.bridge.service.component;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
@@ -19,6 +20,7 @@ import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.component.interceptors.RecoveryInterceptor;
 import jadex.bridge.service.component.interceptors.ResolveInterceptor;
 import jadex.bridge.service.component.interceptors.ValidationInterceptor;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -28,6 +30,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.ThreadSuspendable;
+import jadex.javaparser.SJavaParser;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
@@ -203,7 +206,6 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	
 	/**
 	 *  Add an interceptor.
-	 *  
 	 *  Must be synchronized as invoke() is called from arbitrary threads.
 	 */
 	public synchronized void addServiceInterceptor(IServiceInvocationInterceptor interceptor, int pos)
@@ -218,10 +220,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  Add an interceptor.
 	 *  Must be synchronized as invoke() is called from arbitrary threads.
 	 */
-	public synchronized void addServiceInterceptor(int pos)
+	public synchronized void addServiceInterceptor(IServiceInvocationInterceptor interceptor)
 	{
-		if(interceptors!=null)
-			interceptors.remove(pos);
+		addServiceInterceptor(interceptor, -1);
 	}
 	
 	/**
@@ -594,16 +595,25 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	}
 
 	/**
-	 *  Static method for creating a standard service proxy for a provided service.
+	 *  Static method for creating a standard service proxy for a required service.
 	 */
-	public static IInternalService createRequiredServiceProxy(IExternalAccess ea, IComponentAdapter adapter, IInternalService service, 
+	public static IInternalService createRequiredServiceProxy(IInternalAccess ia, IExternalAccess ea, IComponentAdapter adapter, IInternalService service, 
 		IRequiredServiceFetcher fetcher, RequiredServiceInfo info, RequiredServiceBinding binding)
 	{
 //		System.out.println("create: "+service.getServiceIdentifier().getServiceType());
 		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(service);
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 		if(binding.isRecover())
-			handler.addFirstServiceInterceptor(new RecoveryInterceptor(ea, info, binding, fetcher));
+			handler.addFirstServiceInterceptor(new RecoveryInterceptor(info, binding, fetcher));
+		UnparsedExpression[] interceptors = binding.getInterceptors();
+		if(interceptors!=null && interceptors.length>0)
+		{
+			for(int i=0; i<interceptors.length; i++)
+			{
+				IServiceInvocationInterceptor interceptor = (IServiceInvocationInterceptor)SJavaParser.evaluateExpression(interceptors[i].getValue(), ea.getModel().getAllImports(), ia.getFetcher(), ea.getModel().getClassLoader());
+				handler.addServiceInterceptor(interceptor);
+			}
+		}
 		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, service.getServiceIdentifier().getServiceType()}, handler); 
 	}
 }

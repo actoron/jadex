@@ -47,12 +47,19 @@ public class ProvidedServiceImplementation
 	 *  Create a new service implementation.
 	 */
 	public ProvidedServiceImplementation(Class implementation,
-		String expression, String proxytype, RequiredServiceBinding binding)
+		String expression, String proxytype, RequiredServiceBinding binding, UnparsedExpression[] interceptors)
 	{
 		this.implementation = implementation;
 		this.expression = expression;
 		this.proxytype = proxytype;
 		this.binding = binding;
+		if(interceptors!=null)
+		{
+			for(int i=0; i<interceptors.length; i++)
+			{
+				addInterceptor(interceptors[i]);
+			}
+		}
 	}
 	
 	/**
@@ -60,7 +67,8 @@ public class ProvidedServiceImplementation
 	 */
 	public ProvidedServiceImplementation(ProvidedServiceImplementation prov)
 	{
-		this(prov.getImplementation(), prov.getExpression(), prov.getProxytype(), prov.getBinding()!=null? new RequiredServiceBinding(prov.getBinding()): null);
+		this(prov.getImplementation(), prov.getExpression(), prov.getProxytype(), prov.getBinding()!=null? 
+			new RequiredServiceBinding(prov.getBinding()): null, prov.getInterceptors());
 	}
 
 	//-------- methods --------

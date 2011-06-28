@@ -3,7 +3,7 @@ package jadex.micro.annotation;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 
 /**
- * 
+ *  Service implementation details.
  */
 public @interface Implementation
 {
@@ -39,4 +39,9 @@ public @interface Implementation
 	 *  The binding for forwarding service calls to another component.
 	 */
 	public Binding binding() default @Binding();
+	
+	/**
+	 *  The interceptors.
+	 */
+	public Value[] interceptors() default {};
 }

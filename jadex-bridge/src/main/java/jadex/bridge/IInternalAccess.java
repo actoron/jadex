@@ -2,6 +2,7 @@ package jadex.bridge;
 
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
+import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
@@ -75,6 +76,12 @@ public interface IInternalAccess
 	public Logger getLogger();
 	
 	/**
+	 *  Get the fetcher.
+	 *  @return The fetcher.
+	 */
+	public IValueFetcher getFetcher();
+	
+	/**
 	 *  Add an component listener.
 	 *  @param listener The listener.
 	 */
@@ -85,7 +92,7 @@ public interface IInternalAccess
 	 *  @param listener The listener.
 	 */
 	public IFuture removeComponentListener(IComponentListener listener);
-	
+		
 //	/**
 //	 *  Get the model name of a component type.
 //	 *  @param ctype The component type.

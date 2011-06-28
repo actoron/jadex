@@ -69,11 +69,11 @@ public abstract class DefaultResultListener implements IResultListener
 	
 	/**
 	 *  Called when an exception occurred.
-	 * @param exception The exception.
+	 *  @param exception The exception.
 	 */
 	public void exceptionOccurred(Exception exception)
 	{
-		exception.printStackTrace();
+//		exception.printStackTrace();
 		logger.severe("Exception occurred: "+exception);
 	}
 }

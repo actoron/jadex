@@ -13,8 +13,8 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
-import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SJavaParser;
 import jadex.kernelbase.CacheableKernelModel;
 import jadex.micro.annotation.Argument;
@@ -36,6 +36,7 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+import jadex.micro.annotation.Value;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -200,10 +201,7 @@ public class MicroClassReader
 			RequiredServiceInfo[] rsis = new RequiredServiceInfo[vals.length];
 			for(int i=0; i<vals.length; i++)
 			{
-				Binding bd = vals[i].binding();
-				RequiredServiceBinding binding = new RequiredServiceBinding(vals[i].name(), 
-					bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
-					bd.dynamic(), bd.scope(), bd.create(), bd.recover());
+				RequiredServiceBinding binding = createBinding(vals[i].binding());
 				rsis[i] = new RequiredServiceInfo(vals[i].name(), vals[i].type(), 
 					vals[i].multiple(), binding);
 			}
@@ -217,12 +215,18 @@ public class MicroClassReader
 			for(int i=0; i<vals.length; i++)
 			{
 				Implementation im = vals[i].implementation();
-				Binding bd = im.binding();
-				RequiredServiceBinding bind = bd==null? null: new RequiredServiceBinding(bd.name(), 
-					bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
-					bd.dynamic(), bd.scope(), bd.create(), bd.recover());
-				ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
-					im.expression().length()>0? im.expression(): null, im.proxytype(), bind);
+				Value[] inters = im.interceptors();
+				UnparsedExpression[] interceptors = null;
+				if(inters.length>0)
+				{
+					interceptors = new UnparsedExpression[inters.length];
+					for(int j=0; j<inters.length; j++)
+					{
+						interceptors[j] = new UnparsedExpression(null, inters[j].clazz(), inters[j].value(), null);
+					}
+				}
+				RequiredServiceBinding bind = createBinding(im.binding());
+				ProvidedServiceImplementation impl = createImplementation(im);
 				psis[i] = new ProvidedServiceInfo(vals[i].name().length()>0? vals[i].name(): null, vals[i].type(), impl);
 			}
 			modelinfo.setProvidedServices(psis);
@@ -312,12 +316,19 @@ public class MicroClassReader
 				for(int j=0; j<provs.length; j++)
 				{
 					Implementation im = provs[j].implementation();
-					Binding bd = im.binding();
-					RequiredServiceBinding bind = bd==null? null: new RequiredServiceBinding(bd.name(), 
-						bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
-						bd.dynamic(), bd.scope(), bd.create(), bd.recover());
+					Value[] inters = im.interceptors();
+					UnparsedExpression[] interceptors = null;
+					if(inters.length>0)
+					{
+						interceptors = new UnparsedExpression[inters.length];
+						for(int k=0; k<inters.length; k++)
+						{
+							interceptors[k] = new UnparsedExpression(null, inters[k].clazz(), inters[k].value(), null);
+						}
+					}
+					RequiredServiceBinding bind = createBinding(im.binding());
 					ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
-						im.expression().length()>0? im.expression(): null, im.proxytype(), bind);
+						im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
 					psis[j] = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl);
 					configinfo.setProvidedServices(psis);
 				}
@@ -326,10 +337,7 @@ public class MicroClassReader
 				RequiredServiceInfo[] rsis = new RequiredServiceInfo[reqs.length];
 				for(int j=0; j<reqs.length; j++)
 				{
-					Binding bd = reqs[j].binding();
-					RequiredServiceBinding binding = new RequiredServiceBinding(reqs[j].name(), 
-						bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
-						bd.dynamic(), bd.scope(), bd.create(), bd.recover());
+					RequiredServiceBinding binding = createBinding(reqs[j].binding());
 					rsis[j] = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), 
 						reqs[j].multiple(), binding);
 					configinfo.setRequiredServices(rsis);
@@ -373,9 +381,7 @@ public class MicroClassReader
 						RequiredServiceBinding[] bds = new RequiredServiceBinding[binds.length];
 						for(int k=0; k<binds.length; k++)
 						{
-							bds[k] = new RequiredServiceBinding(binds[k].name(), 
-								binds[k].componentname().length()==0? null: binds[k].componentname(), binds[k].componenttype().length()==0? null: binds[k].componenttype(), 
-								binds[k].dynamic(), binds[k].scope(), binds[k].create(), binds[k].recover());
+							bds[k] = createBinding(binds[k]);
 						}
 						comp.setBindings(bds);
 					}
@@ -429,6 +435,42 @@ public class MicroClassReader
 	protected Object evaluateExpression(String exp, String[] imports, IValueFetcher fetcher, ClassLoader classloader)
 	{
 		return exp.length()==0? null: SJavaParser.evaluateExpression(exp, imports, null, classloader);
+	}
+	
+	/**
+	 *  Create a service implementation.
+	 */
+	protected ProvidedServiceImplementation createImplementation(Implementation impl)
+	{
+		return new ProvidedServiceImplementation(!impl.value().equals(Object.class)? impl.value(): null, 
+			impl.expression().length()>0? impl.expression(): null, impl.proxytype(), createBinding(impl.binding()), createUnparsedExpressions(impl.interceptors()));
+	}
+	
+	/**
+	 *  Create a service binding.
+	 */
+	protected RequiredServiceBinding createBinding(Binding bd)
+	{
+		return bd==null? null: new RequiredServiceBinding(bd.name(), 
+			bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
+			bd.dynamic(), bd.scope(), bd.create(), bd.recover(), createUnparsedExpressions(bd.interceptors()));
+	}
+	
+	/**
+	 *  Create an unparsed expression.
+	 */
+	protected UnparsedExpression[] createUnparsedExpressions(Value[] values)
+	{
+		UnparsedExpression[] ret = null;
+		if(values.length>0)
+		{
+			ret = new UnparsedExpression[values.length];
+			for(int j=0; j<values.length; j++)
+			{
+				ret[j] = new UnparsedExpression(null, values[j].clazz(), values[j].value(), null);
+			}
+		}
+		return ret;
 	}
 	
 	/**

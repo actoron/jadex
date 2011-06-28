@@ -305,11 +305,16 @@ public class ServiceInvocationContext
 			int start = used.size()==0? -1: (Integer)used.get(used.size()-1);
 			for(int i=start+1; i<interceptors.length; i++)
 			{
+				// add before to allow isApplicable fetch context values.
+				used.add(new Integer(i));
 				if(interceptors[i].isApplicable(this))
 				{
 					ret = interceptors[i];
-					used.add(new Integer(i));
 					break;
+				}
+				else
+				{
+					used.remove(new Integer(i));
 				}
 			}
 		}

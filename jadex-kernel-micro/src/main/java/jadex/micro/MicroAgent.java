@@ -23,6 +23,7 @@ import jadex.bridge.service.clock.ITimer;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.ComposedFilter;
 import jadex.commons.IFilter;
+import jadex.commons.IValueFetcher;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -825,5 +826,14 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	public IServiceContainer createServiceContainer()
 	{
 		return null;
+	}
+	
+	/**
+	 *  Get the fetcher.
+	 *  @return The fetcher.
+	 */
+	public IValueFetcher getFetcher()
+	{
+		return interpreter.getFetcher();
 	}
 }

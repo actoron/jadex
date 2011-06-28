@@ -1,5 +1,10 @@
 package jadex.bridge.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import jadex.bridge.modelinfo.UnparsedExpression;
+
 /**
  *  Required service binding information.
  */
@@ -30,6 +35,9 @@ public class RequiredServiceBinding
 	
 	/** The recover flag. */
 	protected boolean recover;
+	
+	/** The interceptors. */
+	protected List interceptors;
 
 	//-------- constructors --------
 
@@ -53,14 +61,15 @@ public class RequiredServiceBinding
 	 */
 	public RequiredServiceBinding(String name, String scope, boolean dynamic)
 	{
-		this(name, null, null, dynamic, scope, false, false);
+		this(name, null, null, dynamic, scope, false, false, null);
 	}
 
 	/**
 	 *  Create a new binding.
 	 */
 	public RequiredServiceBinding(String name, String componentname,
-		String componenttype, boolean dynamic, String scope, boolean create, boolean recover)
+		String componenttype, boolean dynamic, String scope, boolean create, boolean recover,
+		UnparsedExpression[] interceptors)
 	{
 		this.name = name;
 		this.componentname = componentname;
@@ -69,6 +78,13 @@ public class RequiredServiceBinding
 		this.scope = scope;
 		this.create = create;
 		this.recover = recover;
+		if(interceptors!=null)
+		{
+			for(int i=0; i<interceptors.length; i++)
+			{
+				addInterceptor(interceptors[i]);
+			}
+		}
 //		this.componentfilename = componentfilename;
 	}
 	
@@ -78,7 +94,7 @@ public class RequiredServiceBinding
 	public RequiredServiceBinding(RequiredServiceBinding orig)
 	{
 		this(orig.getName(), orig.getComponentName(), orig.getComponentType(), 
-			orig.isDynamic(), orig.getScope(), orig.isCreate(), orig.isRecover());
+			orig.isDynamic(), orig.getScope(), orig.isCreate(), orig.isRecover(), orig.getInterceptors());
 	}
 
 	//-------- methods --------
@@ -207,6 +223,36 @@ public class RequiredServiceBinding
 	public void setRecover(boolean recover)
 	{
 		this.recover = recover;
+	}
+	
+	/**
+	 *  Add an interceptor.
+	 *  @param interceptor The interceptor.
+	 */
+	public void addInterceptor(UnparsedExpression interceptor)
+	{
+		if(interceptors==null)
+			interceptors = new ArrayList();
+		interceptors.add(interceptor);
+	}
+	
+	/**
+	 *  Remove an interceptor.
+	 *  @param interceptor The interceptor.
+	 */
+	public void removeInterceptor(UnparsedExpression interceptor)
+	{
+		interceptors.remove(interceptor);
+	}
+	
+	/**
+	 *  Get the interceptors.
+	 *  @return All interceptors.
+	 */
+	public UnparsedExpression[] getInterceptors()
+	{
+		return interceptors==null? new UnparsedExpression[0]: (UnparsedExpression[])
+			interceptors.toArray(new UnparsedExpression[interceptors.size()]);
 	}
 
 	/**

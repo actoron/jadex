@@ -1,6 +1,6 @@
 package jadex.bpmn.runtime;
 
-import jadex.javaparser.IValueFetcher;
+import jadex.commons.IValueFetcher;
 import jadex.kernelbase.InterpreterFetcher;
 
 /**

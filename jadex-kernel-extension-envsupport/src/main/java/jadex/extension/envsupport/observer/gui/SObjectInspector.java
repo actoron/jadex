@@ -2,8 +2,8 @@ package jadex.extension.envsupport.observer.gui;
 
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.commons.IPropertyObject;
+import jadex.commons.IValueFetcher;
 import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.IValueFetcher;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;

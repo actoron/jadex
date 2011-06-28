@@ -53,4 +53,9 @@ public @interface Binding
 	 *  The error recover flag.
 	 */
 	public boolean recover() default false;
+	
+	/**
+	 *  The interceptors.
+	 */
+	public Value[] interceptors() default {};
 }

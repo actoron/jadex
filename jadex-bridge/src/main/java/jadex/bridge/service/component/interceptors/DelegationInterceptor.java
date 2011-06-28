@@ -57,7 +57,7 @@ public class DelegationInterceptor extends AbstractMultiInterceptor
 		this.ea = ea;
 		this.info = info;
 		this.binding = binding;
-		this.fetcher = fetcher!=null? fetcher: new DefaultServiceFetcher();
+		this.fetcher = fetcher!=null? fetcher: new DefaultServiceFetcher(ea.getServiceProvider());
 	}
 	
 	//-------- methods --------
@@ -69,7 +69,7 @@ public class DelegationInterceptor extends AbstractMultiInterceptor
 	 */
 	public IFuture doExecute(final ServiceInvocationContext sic) 	
 	{
-		Future ret = new Future(); 
+		final Future ret = new Future(); 
 //		System.out.println("Invoked: "+method.getName());
 		
 		// This works because context has not to be transferred remotely.
@@ -81,7 +81,7 @@ public class DelegationInterceptor extends AbstractMultiInterceptor
 			public Object execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
-				fetcher.getService(info, binding, ia.getServiceContainer(), false)
+				fetcher.getService(info, binding, false)
 					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result) 

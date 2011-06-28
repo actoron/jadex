@@ -1,5 +1,7 @@
 package jadex.javaparser;
 
+import jadex.commons.IValueFetcher;
+
 import java.util.HashMap;
 import java.util.Map;
 

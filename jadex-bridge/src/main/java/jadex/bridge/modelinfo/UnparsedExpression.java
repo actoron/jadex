@@ -1,7 +1,7 @@
 package jadex.bridge.modelinfo;
 
+import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
-import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SJavaParser;
 
 import java.util.Map;

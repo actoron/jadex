@@ -1420,7 +1420,9 @@ public class BpmnXMLReader
 							boolean create = new Boolean(createtxt).booleanValue();
 							boolean recover = new Boolean(recovertxt).booleanValue();
 							
-							RequiredServiceBinding binding = new RequiredServiceBinding(null, compname, comptype, dynamic, scope, create, recover);
+							// todo: interceptors
+							
+							RequiredServiceBinding binding = new RequiredServiceBinding(null, compname, comptype, dynamic, scope, create, recover, null);
 							bindings.put(name, binding);
 						}
 
@@ -1554,11 +1556,13 @@ public class BpmnXMLReader
 							ProvidedServiceImplementation psim;
 							if(binding!=null)
 							{
-								psim = new ProvidedServiceImplementation(impltype, null, proxytype, binding);
+								// todo: interceptors
+								psim = new ProvidedServiceImplementation(impltype, null, proxytype, binding, null);
 							}
 							else
 							{
-								psim = new ProvidedServiceImplementation(impltype, impltype==null? implname: null, proxytype, null);
+								// todo: interceptors
+								psim = new ProvidedServiceImplementation(impltype, impltype==null? implname: null, proxytype, null, null);
 							}
 							
 							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, psim);
@@ -1579,11 +1583,13 @@ public class BpmnXMLReader
 										binding = (RequiredServiceBinding)bindings.get(implname);
 										if(binding!=null)
 										{
-											psim = new ProvidedServiceImplementation(impltype, null, proxytype, binding);
+											// todo: interceptors
+											psim = new ProvidedServiceImplementation(impltype, null, proxytype, binding, null);
 										}
 										else
 										{
-											psim = new ProvidedServiceImplementation(impltype, impltype==null? implname: null, proxytype, null);
+											// todo: interceptors
+											psim = new ProvidedServiceImplementation(impltype, impltype==null? implname: null, proxytype, null, null);
 										}
 										ci.addProvidedService(new ProvidedServiceInfo(name, type, psim));
 									}

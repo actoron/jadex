@@ -11,9 +11,9 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.component.ComponentServiceContainer;
+import jadex.commons.IValueFetcher;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.javaparser.IValueFetcher;
 
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;

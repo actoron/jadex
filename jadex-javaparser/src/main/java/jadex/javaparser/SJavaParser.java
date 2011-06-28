@@ -1,5 +1,6 @@
 package jadex.javaparser;
 
+import jadex.commons.IValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 /**

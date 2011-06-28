@@ -2,9 +2,9 @@ package jadex.extension.agr;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IExtensionInfo;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
-import jadex.javaparser.IValueFetcher;
 
 import java.util.ArrayList;
 import java.util.List;

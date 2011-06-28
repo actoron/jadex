@@ -8,10 +8,10 @@ import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.commons.IFilter;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.IValueFetcher;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;

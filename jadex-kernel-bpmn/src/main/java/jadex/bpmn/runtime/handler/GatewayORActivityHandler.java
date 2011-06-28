@@ -8,9 +8,9 @@ import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ProcessThreadValueFetcher;
 import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.IComponentChangeEvent;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SUtil;
 import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.IValueFetcher;
 
 import java.util.ArrayList;
 import java.util.HashSet;

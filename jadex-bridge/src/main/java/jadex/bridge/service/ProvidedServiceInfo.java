@@ -53,7 +53,8 @@ public class ProvidedServiceInfo
 	 */
 	public ProvidedServiceInfo(String name, Class type, String expression)
 	{
-		this(name, type, new ProvidedServiceImplementation(null, expression, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null));
+		this(name, type, new ProvidedServiceImplementation(null, expression, 
+			BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, null));
 	}
 	
 	/**

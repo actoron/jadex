@@ -30,7 +30,7 @@ public class RecoveryInterceptor extends AbstractApplicableInterceptor
 	//-------- attributes --------
 	
 	/** The external access. */
-	protected IExternalAccess ea;
+//	protected IExternalAccess ea;
 		
 	/** The service info. */
 	protected RequiredServiceInfo info;
@@ -46,10 +46,10 @@ public class RecoveryInterceptor extends AbstractApplicableInterceptor
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public RecoveryInterceptor(IExternalAccess ea, RequiredServiceInfo info, 
+	public RecoveryInterceptor(RequiredServiceInfo info, 
 		RequiredServiceBinding binding, IRequiredServiceFetcher fetcher)
 	{
-		this.ea = ea;
+//		this.ea = ea;
 		this.info = info;
 		this.binding = binding;
 		this.fetcher = fetcher;
@@ -113,7 +113,7 @@ public class RecoveryInterceptor extends AbstractApplicableInterceptor
 		
 		// todo: problem, search delivers failed service as result again
 		
-		fetcher.getService(info, binding, ea.getServiceProvider(), false)
+		fetcher.getService(info, binding, false)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result) 

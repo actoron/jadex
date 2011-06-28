@@ -1,8 +1,8 @@
 package jadex.javaparser.javaccimpl;
 
+import jadex.commons.IValueFetcher;
 import jadex.commons.SUtil;
 import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.IValueFetcher;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

@@ -2,6 +2,7 @@ package jadex.extension.envsupport;
 
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.IPropertyObject;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.collection.MultiCollection;
@@ -25,7 +26,6 @@ import jadex.extension.envsupport.observer.perspective.IPerspective;
 import jadex.extension.envsupport.observer.perspective.Perspective2D;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.AccessInfo;

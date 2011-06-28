@@ -1,9 +1,9 @@
 package jadex.javaparser.javaccimpl;
 
+import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
 import jadex.commons.collection.SortedList;
-import jadex.javaparser.IValueFetcher;
 
 import java.util.AbstractList;
 import java.util.ArrayList;

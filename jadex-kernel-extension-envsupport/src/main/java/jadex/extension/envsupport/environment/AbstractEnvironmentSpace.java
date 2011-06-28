@@ -15,6 +15,7 @@ import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.IFilter;
 import jadex.commons.IPropertyObject;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DefaultResultListener;
@@ -41,7 +42,6 @@ import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.observer.gui.ObserverCenter;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
 import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.StatelessAbstractInterpreter;
 

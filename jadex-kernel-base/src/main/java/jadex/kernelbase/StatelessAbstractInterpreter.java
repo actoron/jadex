@@ -37,6 +37,7 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInfo;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
@@ -46,7 +47,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SJavaParser;
 
 import java.lang.reflect.Proxy;
@@ -486,15 +486,15 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 								new RequiredServiceBinding(cs[i].getDefaultBinding()));
 							sermap.put(rsi.getName(), newrsi);
 						}
-						if(getBindings()!=null)
+					}
+					if(getBindings()!=null)
+					{
+						for(int i=0; i<getBindings().length; i++)
 						{
-							for(int i=0; i<getBindings().length; i++)
-							{
-								RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(getBindings()[i].getName());
-								RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType(), rsi.isMultiple(), 
-									new RequiredServiceBinding(getBindings()[i]));
-								sermap.put(rsi.getName(), newrsi);
-							}
+							RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(getBindings()[i].getName());
+							RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType(), rsi.isMultiple(), 
+								new RequiredServiceBinding(getBindings()[i]));
+							sermap.put(rsi.getName(), newrsi);
 						}
 					}
 					RequiredServiceInfo[]	rservices	= (RequiredServiceInfo[])sermap.values().toArray(new RequiredServiceInfo[sermap.size()]);

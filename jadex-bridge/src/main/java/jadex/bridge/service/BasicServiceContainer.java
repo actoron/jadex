@@ -493,7 +493,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		}
 		
 		IRequiredServiceFetcher fetcher = getRequiredServiceFetcher(info.getName());
-		return fetcher.getService(info, binding, this, rebind);
+		return fetcher.getService(info, binding, rebind);
 	}
 	
 	/**
@@ -510,7 +510,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		}
 		
 		IRequiredServiceFetcher fetcher = getRequiredServiceFetcher(info.getName());
-		return fetcher.getServices(info, binding, this, rebind);
+		return fetcher.getServices(info, binding, rebind);
 	}
 	
 	/**

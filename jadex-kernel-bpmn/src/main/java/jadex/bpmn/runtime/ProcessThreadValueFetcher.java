@@ -1,7 +1,7 @@
 package jadex.bpmn.runtime;
 
 import jadex.bridge.IMessageAdapter;
-import jadex.javaparser.IValueFetcher;
+import jadex.commons.IValueFetcher;
 
 import java.util.Map;
 

@@ -7,8 +7,8 @@ import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ProcessThreadValueFetcher;
 import jadex.bridge.IComponentChangeEvent;
+import jadex.commons.IValueFetcher;
 import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.IValueFetcher;
 
 import java.util.List;
 

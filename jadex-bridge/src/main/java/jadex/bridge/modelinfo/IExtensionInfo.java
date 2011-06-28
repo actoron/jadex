@@ -1,8 +1,8 @@
 package jadex.bridge.modelinfo;
 
 import jadex.bridge.IExternalAccess;
+import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
-import jadex.javaparser.IValueFetcher;
 
 
 /**

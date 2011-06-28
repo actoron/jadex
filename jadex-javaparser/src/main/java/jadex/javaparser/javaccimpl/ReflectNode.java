@@ -1,9 +1,9 @@
 package jadex.javaparser.javaccimpl;
 
 import jadex.commons.IPropertyObject;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.javaparser.IValueFetcher;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;

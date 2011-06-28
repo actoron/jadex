@@ -8,6 +8,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.IFuture;
@@ -20,7 +21,6 @@ import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Double;
 import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.xml.annotation.XMLClassname;
 

@@ -13,11 +13,11 @@ import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.javaparser.IValueFetcher;
 
 import java.util.HashMap;
 import java.util.Iterator;

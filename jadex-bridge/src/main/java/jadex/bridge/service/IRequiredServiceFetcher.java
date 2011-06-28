@@ -14,7 +14,7 @@ public interface IRequiredServiceFetcher
 	 *  @param provider The provider.
 	 *  @param rebind Flag if should be rebound.
 	 */
-	public IFuture getService(RequiredServiceInfo info, RequiredServiceBinding binding, IServiceProvider provider, boolean rebind);
+	public IFuture getService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind);
 	
 	/**
 	 *  Get a required multi service.
@@ -22,5 +22,5 @@ public interface IRequiredServiceFetcher
 	 *  @param provider The provider.
 	 *  @param rebind Flag if should be rebound.
 	 */
-	public IIntermediateFuture getServices(RequiredServiceInfo info, RequiredServiceBinding binding, IServiceProvider provider, boolean rebind);
+	public IIntermediateFuture getServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind);
 }

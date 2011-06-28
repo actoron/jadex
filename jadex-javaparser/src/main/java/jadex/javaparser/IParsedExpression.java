@@ -1,5 +1,7 @@
 package jadex.javaparser;
 
+import jadex.commons.IValueFetcher;
+
 
 /**
  *  An expression, that can be evaluated in a given state.
