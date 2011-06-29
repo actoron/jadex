@@ -225,7 +225,6 @@ public class MicroClassReader
 						interceptors[j] = new UnparsedExpression(null, inters[j].clazz(), inters[j].value(), null);
 					}
 				}
-				RequiredServiceBinding bind = createBinding(im.binding());
 				ProvidedServiceImplementation impl = createImplementation(im);
 				psis[i] = new ProvidedServiceInfo(vals[i].name().length()>0? vals[i].name(): null, vals[i].type(), impl);
 			}

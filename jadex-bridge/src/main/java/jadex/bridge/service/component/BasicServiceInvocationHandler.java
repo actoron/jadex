@@ -21,7 +21,6 @@ import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.component.interceptors.RecoveryInterceptor;
 import jadex.bridge.service.component.interceptors.ResolveInterceptor;
 import jadex.bridge.service.component.interceptors.ValidationInterceptor;
-import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -290,7 +289,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		if(!PROXYTYPE_RAW.equals(proxytype) || (ics!=null && ics.length>0))
 		{
 			BasicServiceInvocationHandler handler = createHandler(name, ia, type, service);
-			handler.addInterceptors(handler, service, ics, adapter, ia, proxytype);
+			BasicServiceInvocationHandler.addInterceptors(handler, service, ics, adapter, ia, proxytype);
 			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
 				.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 		}

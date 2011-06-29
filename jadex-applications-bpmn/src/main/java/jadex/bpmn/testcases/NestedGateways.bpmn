@@ -108,7 +108,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cqxpR4rPEeC2-YXsn_T4wg" key="1:3" value="1"/>
       </eAnnotations>
     </vertices>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_46p6AYq8EeCOq9b0uJ2xfg" iD="_46p6AIq8EeCOq9b0uJ2xfg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_46p6AYq8EeCOq9b0uJ2xfg" iD="_46p6AIq8EeCOq9b0uJ2xfg" conditionType="Default" isDefault="true"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_84hdwYq8EeCOq9b0uJ2xfg" iD="_84hdwIq8EeCOq9b0uJ2xfg"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_-BTDsYq8EeCOq9b0uJ2xfg" iD="_-BTDsIq8EeCOq9b0uJ2xfg" name="false">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dcMfIIrPEeC2-YXsn_T4wg" source="jadex">
@@ -121,7 +121,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_seuqMYrPEeC2-YXsn_T4wg" key="condition" value="false"/>
       </eAnnotations>
     </sequenceEdges>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_GcdSIYq9EeC2-YXsn_T4wg" iD="_GcdSIIq9EeC2-YXsn_T4wg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_GcdSIYq9EeC2-YXsn_T4wg" iD="_GcdSIIq9EeC2-YXsn_T4wg" conditionType="Default" isDefault="true"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_KEtLMYq9EeC2-YXsn_T4wg" iD="_KEtLMIq9EeC2-YXsn_T4wg"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_KwvKwYq9EeC2-YXsn_T4wg" iD="_KwvKwIq9EeC2-YXsn_T4wg"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Mg5g0Yq9EeC2-YXsn_T4wg" iD="_Mg5g0Iq9EeC2-YXsn_T4wg"/>
@@ -139,7 +139,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zX3FMIrPEeC2-YXsn_T4wg" key="condition" value="a==3 &amp;&amp; b==3"/>
       </eAnnotations>
     </sequenceEdges>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_j1-w4Yq9EeC2-YXsn_T4wg" iD="_j1-w4Iq9EeC2-YXsn_T4wg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_j1-w4Yq9EeC2-YXsn_T4wg" iD="_j1-w4Iq9EeC2-YXsn_T4wg" conditionType="Default" isDefault="true"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_m21SwYq9EeC2-YXsn_T4wg" iD="_m21SwIq9EeC2-YXsn_T4wg"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_nGT5MYq9EeC2-YXsn_T4wg" iD="_nGT5MIq9EeC2-YXsn_T4wg"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_d_xiwYrOEeC2-YXsn_T4wg" iD="_d_xiwIrOEeC2-YXsn_T4wg"/>

@@ -29,7 +29,6 @@ import jadex.commons.future.IntermediateFuture;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -215,12 +214,12 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 										}
 									});
 									
-									SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-										.addResultListener(new DelegationResultListener(future)
-									{
-										public void customResultAvailable(Object result)
-										{
-											final IComponentManagementService cms = (IComponentManagementService)result;
+//									SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+//										.addResultListener(new DelegationResultListener(future)
+//									{
+//										public void customResultAvailable(Object result)
+//										{
+//											final IComponentManagementService cms = (IComponentManagementService)result;
 	
 											for(Iterator it=coll.iterator(); it.hasNext(); )
 											{
@@ -252,8 +251,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 													}
 												});
 											}
-										}
-									});
+//										}
+//									});
 								}
 								else
 								{

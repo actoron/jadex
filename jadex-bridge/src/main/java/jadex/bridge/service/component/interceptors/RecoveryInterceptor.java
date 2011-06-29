@@ -1,7 +1,6 @@
 package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;

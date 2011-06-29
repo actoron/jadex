@@ -6,9 +6,6 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IRequiredServiceFetcher;
-import jadex.bridge.service.IResultSelector;
-import jadex.bridge.service.ISearchManager;
-import jadex.bridge.service.IVisitDecider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
@@ -18,7 +15,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.IntermediateFuture;
 
 import java.util.Collections;
 import java.util.logging.Logger;
