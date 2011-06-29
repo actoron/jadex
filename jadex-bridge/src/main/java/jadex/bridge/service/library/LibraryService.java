@@ -165,6 +165,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 			if (refcount.intValue() < 1)
 			{
 				Map<URL, ClassLoader> delegates = libcl.getDelegates();
+				delegates.remove(url);
 				libcl = new DelegationClassLoader(ClassLoader.getSystemClassLoader(), delegates);
 				lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
 			}
