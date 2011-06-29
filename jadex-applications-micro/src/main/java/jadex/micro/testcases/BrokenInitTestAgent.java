@@ -79,7 +79,7 @@ public class BrokenInitTestAgent extends MicroAgent
 	protected IFuture testBrokenComponent(final String model)
 	{
 		final Future	fut1	= new Future();
-		getRequiredService("cms").addResultListener(createResultListener(new DelegationResultListener(fut1)
+		getRequiredService("cms").addResultListener(new DelegationResultListener(fut1)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -106,7 +106,7 @@ public class BrokenInitTestAgent extends MicroAgent
 					}
 				}));
 			}
-		}));
+		});
 		return fut1;
 	}
 }

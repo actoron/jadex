@@ -59,7 +59,7 @@ public class WatchdogAgent	extends MicroAgent	implements IWatchdogService
 					public void resultAvailable(Object result)
 					{
 						// Pinging finished: Search for new watchdogs.
-						getRequiredServices("watchdogs").addResultListener(createResultListener(new IResultListener()
+						getRequiredServices("watchdogs").addResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
@@ -83,7 +83,7 @@ public class WatchdogAgent	extends MicroAgent	implements IWatchdogService
 							{
 								throw exception instanceof RuntimeException ? (RuntimeException)exception : new RuntimeException(exception);
 							}
-						}));
+						});
 					}
 					
 					public void exceptionOccurred(Exception exception)
@@ -98,7 +98,7 @@ public class WatchdogAgent	extends MicroAgent	implements IWatchdogService
 				{
 					final Object	key	= keys[i];
 					IWatchdogService	watchdog	= (IWatchdogService)watchdogs.get(key);
-					watchdog.ping().addResultListener(createResultListener(new IResultListener()
+					watchdog.ping().addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -111,7 +111,7 @@ public class WatchdogAgent	extends MicroAgent	implements IWatchdogService
 							watchdogs.remove(key);
 							crl.resultAvailable(null);
 						}
-					}));
+					});
 				}
 				
 				return null;

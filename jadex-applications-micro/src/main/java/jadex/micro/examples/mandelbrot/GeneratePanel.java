@@ -90,14 +90,15 @@ public class GeneratePanel extends JPanel
 						{
 //							SServiceProvider.getDeclaredService(agent.getServiceProvider(), IGenerateService.class)
 							ia.getServiceContainer().getRequiredService("generateservice")
-								.addResultListener(ia.createResultListener(new DefaultResultListener()
+//								.addResultListener(ia.createResultListener(new DefaultResultListener()
+								.addResultListener(new DefaultResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
 									IGenerateService gs = (IGenerateService)result;
 									
 									AreaData ad = new AreaData(x1, x2, y1, y2, sizex, sizey, max, par, tasksize, algorithm);
-									gs.generateArea(ad).addResultListener(ia.createResultListener(new DefaultResultListener()
+									gs.generateArea(ad).addResultListener(new DefaultResultListener()
 									{
 										public void resultAvailable(Object result)
 										{
@@ -120,9 +121,9 @@ public class GeneratePanel extends JPanel
 												}
 											});
 										}
-									}));
+									});
 								}
-							}));
+							});
 							return null;
 						}
 					});

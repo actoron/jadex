@@ -79,14 +79,15 @@ public class HelplineAgent extends MicroAgent
 	{
 //		SServiceProvider.getService(getServiceProvider(), IClockService.class)
 		getRequiredService("clockservice")
-			.addResultListener(createResultListener(new DefaultResultListener()
+//			.addResultListener(createResultListener(new DefaultResultListener()
+			.addResultListener(new DefaultResultListener() // not needed as decoupled service
 		{
 			public void resultAvailable(Object result)
 			{
 				IClockService cs = (IClockService)result;
 				infos.put(name, new InformationEntry(name, info, cs.getTime()));
 			}
-		}));
+		});
 	}
 	
 	/**

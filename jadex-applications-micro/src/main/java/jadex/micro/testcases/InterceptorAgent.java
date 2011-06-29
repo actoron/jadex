@@ -68,7 +68,7 @@ public class InterceptorAgent extends MicroAgent implements IAService
 	{
 		final Future ret = new Future();
 		IAService ser = (IAService)getServiceContainer().getProvidedService("aservice");
-		ser.test().addResultListener(createResultListener(new DelegationResultListener(ret)
+		ser.test().addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -84,7 +84,7 @@ public class InterceptorAgent extends MicroAgent implements IAService
 				testresults.add(tr);
 				ret.setResult(null);
 			}
-		}));
+		});
 		return ret;
 	}
 	
@@ -94,12 +94,12 @@ public class InterceptorAgent extends MicroAgent implements IAService
 	public IFuture performRequiredServiceTest(final List testresults)
 	{
 		final Future ret = new Future();
-		getRequiredService("aservice").addResultListener(createResultListener(new DefaultResultListener()
+		getRequiredService("aservice").addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				IAService ser = (IAService)result;
-				ser.test().addResultListener(createResultListener(new DefaultResultListener()
+				ser.test().addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -115,9 +115,9 @@ public class InterceptorAgent extends MicroAgent implements IAService
 						testresults.add(tr);
 						ret.setResult(null);
 					}
-				}));
+				});
 			}
-		}));
+		});
 		return ret;
 	}
 	

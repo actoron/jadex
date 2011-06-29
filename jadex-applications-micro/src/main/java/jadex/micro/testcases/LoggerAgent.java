@@ -32,7 +32,7 @@ public class LoggerAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		getRequiredService("clockservice").addResultListener(createResultListener(new DefaultResultListener()
+		getRequiredService("clockservice").addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -75,6 +75,6 @@ public class LoggerAgent extends MicroAgent
 				setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
 				killAgent();
 			}
-		}));
+		});
 	}
 }

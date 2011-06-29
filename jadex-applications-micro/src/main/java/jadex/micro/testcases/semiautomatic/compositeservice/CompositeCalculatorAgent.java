@@ -62,19 +62,19 @@ public class CompositeCalculatorAgent extends MicroAgent
 	protected IFuture add(final double a, final double b)
 	{
 		final Future ret = new Future();
-		getRequiredService("addservice").addResultListener(createResultListener(new IResultListener()
+		getRequiredService("addservice").addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				IAddService add = (IAddService)result;
-				add.add(a, b).addResultListener(createResultListener(new DelegationResultListener(ret)));
+				add.add(a, b).addResultListener(new DelegationResultListener(ret));
 			}
 			public void exceptionOccurred(Exception exception)
 			{
 				exception.printStackTrace();
 				System.out.println("Could not get required add service: "+exception);
 			}
-		}));
+		});
 		return ret;
 	}
 }

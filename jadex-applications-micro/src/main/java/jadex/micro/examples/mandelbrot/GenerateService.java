@@ -73,8 +73,7 @@ public class GenerateService implements IGenerateService
 				final AreaData	data	= (AreaData)user;	// global area
 				ad.setCalculatorId((IComponentIdentifier)service.getServiceIdentifier().getProviderId());
 				
-				agent.getRequiredService("displayservice").addResultListener(
-					agent.createResultListener(new DefaultResultListener()
+				agent.getRequiredService("displayservice").addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -82,21 +81,19 @@ public class GenerateService implements IGenerateService
 						final ProgressData	pd	= new ProgressData(ad.getCalculatorId(), ad.getId(),
 							new Rectangle(ad.getXOffset(), ad.getYOffset(), ad.getSizeX(), ad.getSizeY()),
 							false, data.getSizeX(), data.getSizeY());
-						ds.displayIntermediateResult(pd).addResultListener(
-							agent.createResultListener(new DefaultResultListener()
+						ds.displayIntermediateResult(pd).addResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
 //								System.out.println("calc start: "+service);
 								((ICalculateService)service).calculateArea(ad).addResultListener(
-									agent.createResultListener(new DelegationResultListener(ret)
+									new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(final Object calcresult)
 									{
 //										System.out.println("calc end");
 										pd.setFinished(true);
-										ds.displayIntermediateResult(pd).addResultListener(
-											agent.createResultListener(new IResultListener()
+										ds.displayIntermediateResult(pd).addResultListener(new IResultListener()
 										{
 											public void resultAvailable(Object result)
 											{
@@ -111,28 +108,26 @@ public class GenerateService implements IGenerateService
 												// Use result from calculation service instead of exception from display service.
 												ret.setResult(calcresult);
 											}
-										}));
+										});
 									}
 									public void exceptionOccurred(Exception exception)
 									{
 										super.exceptionOccurred(exception);
 									}
-								}));
+								});
 							}
 							public void exceptionOccurred(Exception exception)
 							{
-								((ICalculateService)service).calculateArea(ad).addResultListener(
-									agent.createResultListener(new DelegationResultListener(ret)));
+								((ICalculateService)service).calculateArea(ad).addResultListener(new DelegationResultListener(ret));
 							}
-						}));
+						});
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						((ICalculateService)service).calculateArea(ad).addResultListener(
-							agent.createResultListener(new DelegationResultListener(ret)));
+						((ICalculateService)service).calculateArea(ad).addResultListener(new DelegationResultListener(ret));
 					}
-				}));
+				});
 				
 				return ret;
 			}

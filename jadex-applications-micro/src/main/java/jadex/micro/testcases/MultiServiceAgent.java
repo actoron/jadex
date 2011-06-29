@@ -40,28 +40,28 @@ public class MultiServiceAgent	extends MicroAgent	implements IAddService, ISubSe
 	{
 		final Future	fut	= new Future();
 		
-		getRequiredService("add").addResultListener(createResultListener(new DelegationResultListener(fut)
+		getRequiredService("add").addResultListener(new DelegationResultListener(fut)
 		{
 			public void customResultAvailable(Object result)
 			{
 				final IAddService	add	= (IAddService)result;
-				getRequiredService("sub").addResultListener(createResultListener(new DelegationResultListener(fut)
+				getRequiredService("sub").addResultListener(new DelegationResultListener(fut)
 				{
 					public void customResultAvailable(Object result)
 					{
 						final ISubService	sub	= (ISubService)result;
-						add.add(17, 4).addResultListener(createResultListener(new DelegationResultListener(fut)
+						add.add(17, 4).addResultListener(new DelegationResultListener(fut)
 						{
 							public void customResultAvailable(Object result)
 							{
 								Double	val	= (Double)result;
-								sub.sub(val.doubleValue(), 12).addResultListener(createResultListener(new DelegationResultListener(fut)));
+								sub.sub(val.doubleValue(), 12).addResultListener(new DelegationResultListener(fut));
 							}
-						}));
+						});
 					}
-				}));
+				});
 			}
-		}));
+		});
 		
 		// Check result of service execution and store test result.
 		final TestReport	tr	= new TestReport("#1", "Test if multiple services can be used.");

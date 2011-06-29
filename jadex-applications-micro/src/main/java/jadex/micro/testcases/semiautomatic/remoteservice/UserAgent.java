@@ -62,7 +62,7 @@ public class UserAgent extends MicroAgent
 							{
 								IMathService service = (IMathService)result;
 								invokeAddService("IMathService searched via rms.", service)
-									.addResultListener(createResultListener(lis));
+									.addResultListener(lis);
 							}
 							public void exceptionOccurred(Exception exception)
 							{
@@ -90,7 +90,7 @@ public class UserAgent extends MicroAgent
 			{
 				IMathService service = (IMathService)result;
 				invokeAddService("IMathService searched via platform proxy.", service)
-					.addResultListener(createResultListener(lis));
+					.addResultListener(lis);
 			}
 			public void exceptionOccurred(Exception exception)
 			{

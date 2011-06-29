@@ -41,7 +41,7 @@ public class BAgent extends MicroAgent implements IBService
 			{
 //				System.out.println("found service");
 				IAService ser = (IAService)result;
-				ser.test().addResultListener(createResultListener(new IResultListener()
+				ser.test().addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -54,7 +54,7 @@ public class BAgent extends MicroAgent implements IBService
 						setResultValue("exception", new RuntimeException("Service invocation exception"));
 						ret.setResult(null);
 					}
-				}));
+				});
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -66,40 +66,5 @@ public class BAgent extends MicroAgent implements IBService
 		
 		return ret;
 	}
-	
-//	/**
-//	 * 
-//	 */
-//	@ServiceStart
-//	public IFuture start()
-//	{
-//		final Future ret = new Future();
-//		SServiceProvider.getService(access.getServiceContainer(), IAService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//			.addResultListener(access.createResultListener(new DelegationResultListener(ret)
-//		{
-//			public void customResultAvailable(Object result)
-//			{
-//				System.out.println("found service");
-//				IAService ser = (IAService)result;
-//				ser.test().addResultListener(createResultListener(new DelegationResultListener(ret)
-//				{
-//					public void customResultAvailable(Object result) 
-//					{
-//						System.out.println("invoked service");
-//						ret.setResult(result);
-////						ret.setException(new RuntimeException());
-//					};
-//				}));
-//			}	
-//				
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				System.out.println("could not find service");
-//				super.exceptionOccurred(exception);
-//			}
-//		}));
-//		
-//		return ret;
-//	}
 		
 }
