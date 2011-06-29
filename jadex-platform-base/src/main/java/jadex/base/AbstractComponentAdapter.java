@@ -803,7 +803,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			ret	= false;
 		}
 		
-//		System.out.println("end: "+getComponentIdentifier());
+//		System.out.println("end: "+getComponentIdentifier()+", "+ret);
 		executing	= false;
 //		synchronized(AsyncExecutionService.DEBUG)
 //		{

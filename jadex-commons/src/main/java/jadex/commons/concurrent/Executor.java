@@ -129,7 +129,7 @@ public class Executor implements Runnable
 			}
 		}
 		
-		//System.out.println("exited: "+this);
+//		System.out.println("exited: "+this+", "+executable);
 	}
 
 	/**
@@ -141,7 +141,6 @@ public class Executor implements Runnable
 		
 		synchronized(this)
 		{
-//			System.out.println("executing: "+this+" "+running);
 //			Thread.dumpStack();
 			if(!shutdown)
 			{		
@@ -156,6 +155,7 @@ public class Executor implements Runnable
 					execute	= true;
 				}
 			}
+//			System.out.println("executing: "+this+" "+running+", "+execute);
 		}
 
 		if(execute)

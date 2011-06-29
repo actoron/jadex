@@ -329,8 +329,8 @@ public class Future implements IFuture
      */
     protected void notifyListener(IResultListener listener)
     {
-    	try
-    	{
+//    	try
+//    	{
 			if(exception!=null)
 			{
 				listener.exceptionOccurred(exception);
@@ -339,11 +339,11 @@ public class Future implements IFuture
 			{
 				listener.resultAvailable(result); 
 			}
-    	}
-    	catch(Exception e)
-    	{
-    		e.printStackTrace();
-    	}
+//    	}
+//    	catch(Exception e)
+//    	{
+//    		e.printStackTrace();
+//    	}
     }
     
     /**

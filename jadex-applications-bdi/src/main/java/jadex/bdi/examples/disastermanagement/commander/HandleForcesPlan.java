@@ -71,6 +71,7 @@ public abstract class HandleForcesPlan extends Plan
 			
 //			System.out.println("hf: "+disaster.getId()+" "+number+" "+getParameterSet("units").getValues().length+" "+as+" "+busy.size()+" "+SUtil.arrayToString(busy.getFacts()));
 			
+//			waitForFactRemoved("busy_entities");
 			waitFor(1000);
 		}
 	}

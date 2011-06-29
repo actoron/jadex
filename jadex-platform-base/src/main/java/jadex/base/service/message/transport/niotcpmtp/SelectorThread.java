@@ -148,7 +148,8 @@ public class SelectorThread implements Runnable
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
+				// Key may be cancelled just after isValid() has been tested.
+//				e.printStackTrace();
 			}
 		}
 	}

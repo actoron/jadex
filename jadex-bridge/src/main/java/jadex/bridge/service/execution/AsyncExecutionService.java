@@ -99,7 +99,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 //		{
 //			DEBUG.put(task, "execute called");
 //		}
-		//System.out.println("execute called: "+task);
+//		System.out.println("execute called: "+task);
 		if(!customIsValid())
 			throw new RuntimeException("Not running: "+task);
 		
@@ -124,20 +124,20 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 //			{
 				exe = new Executor(threadpool, task)
 				{
-					// Hack!!! overwritten for debugging.
-					protected boolean code()
-					{
+//					// Hack!!! overwritten for debugging.
+//					protected boolean code()
+//					{
 //						synchronized(DEBUG)
 //						{
 //							DEBUG.put(task, "executing code(): "+this);
 //						}
-						boolean	ret	= super.code();
+//						boolean	ret	= super.code();
 //						synchronized(DEBUG)
 //						{						
 //							DEBUG.put(task, "code() finished: "+this);
 //						}
-						return ret;
-					}
+//						return ret;
+//					}
 					
 					// Hack!!! overwritten to know, when executor ends.
 					public void run()
