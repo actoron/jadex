@@ -34,9 +34,21 @@ public class IntermediateDelegationResultListener implements IIntermediateResult
 		{
 			customResultAvailable(result);
 		}
+		catch(DuplicateResultException e)
+		{
+			if(e.getFuture()==future)
+			{
+				// Rethrow duplicate result exception to notify about usage error.
+				throw e;
+			}
+			else
+			{
+				future.setExceptionIfUndone(e);				
+			}
+		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			// Could happen that overridden customResultAvailable method
 			// first sets result and then throws exception (listener ex are catched).
 			future.setExceptionIfUndone(e);
@@ -53,9 +65,21 @@ public class IntermediateDelegationResultListener implements IIntermediateResult
 		{
 			customIntermediateResultAvailable(result);
 		}
+		catch(DuplicateResultException e)
+		{
+			if(e.getFuture()==future)
+			{
+				// Rethrow duplicate result exception to notify about usage error.
+				throw e;
+			}
+			else
+			{
+				future.setExceptionIfUndone(e);				
+			}
+		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			// Could happen that overridden customResultAvailable method
 			// first sets result and then throws exception (listener ex are catched).
 			future.setExceptionIfUndone(e);

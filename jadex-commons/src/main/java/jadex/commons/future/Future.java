@@ -177,12 +177,12 @@ public class Future implements IFuture
         	{
         		if(this.exception!=null)
         		{
-        			this.exception.printStackTrace();
-            		throw new RuntimeException("Duplicate exception: "+this.exception, exception);
+//        			this.exception.printStackTrace();
+            		throw new DuplicateResultException(DuplicateResultException.TYPE_EXCEPTION_EXCEPTION, this, this.exception, exception);
         		}
         		else
         		{
-            		throw new RuntimeException("Duplicate result/exception: "+this.result, exception);        			
+            		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_EXCEPTION, this, result, exception);        			
         		}
         	}	
         	
@@ -227,7 +227,17 @@ public class Future implements IFuture
     	synchronized(this)
 		{
         	if(resultavailable)
-        		throw new RuntimeException("Duplicate result: "+result+", "+this.result);
+        	{
+        		if(this.exception!=null)
+        		{
+//        			this.exception.printStackTrace();
+            		throw new DuplicateResultException(DuplicateResultException.TYPE_EXCEPTION_RESULT, this, this.exception, result);
+        		}
+        		else
+        		{
+            		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_RESULT,this, result, result);        			
+        		}
+        	}
         	
 //        	System.out.println(this+" setResult: "+result);
         	this.result = result;

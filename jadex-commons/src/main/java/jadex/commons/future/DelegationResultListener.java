@@ -33,6 +33,18 @@ public class DelegationResultListener implements IResultListener
 		{
 			customResultAvailable(result);
 		}
+		catch(DuplicateResultException e)
+		{
+			if(e.getFuture()==future)
+			{
+				// Rethrow duplicate result exception to notify about usage error.
+				throw e;
+			}
+			else
+			{
+				future.setExceptionIfUndone(e);				
+			}
+		}
 		catch(Exception e)
 		{
 //			e.printStackTrace();

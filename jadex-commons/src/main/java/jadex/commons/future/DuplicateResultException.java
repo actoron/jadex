@@ -7,7 +7,24 @@ import jadex.commons.SReflect;
  */
 public class DuplicateResultException	extends RuntimeException
 {
+	//-------- constants --------
+	
+	/** Two results. */
+	public static final int	TYPE_RESULT_RESULT	= 1;
+	
+	/** First result then exception. */
+	public static final int	TYPE_RESULT_EXCEPTION	= 2;
+	
+	/** First exception then result. */
+	public static final int	TYPE_EXCEPTION_RESULT	= 3;
+	
+	/** Two exceptions. */
+	public static final int	TYPE_EXCEPTION_EXCEPTION	= 4;
+	
 	//-------- attributes --------
+	
+	/** The type. */
+	protected int	type;
 	
 	/** The future. */
 	protected IFuture	future;
@@ -23,8 +40,9 @@ public class DuplicateResultException	extends RuntimeException
 	/**
 	 *  Create a duplicate result exception.
 	 */
-	public DuplicateResultException(IFuture future, Object first, Object second)
+	public DuplicateResultException(int type, IFuture future, Object first, Object second)
 	{
+		this.type	= type;
 		this.future	= future;
 		this.first	= first;
 		this.second	= second;
@@ -45,6 +63,9 @@ public class DuplicateResultException	extends RuntimeException
 	 */
 	public String	toString()
 	{
-		return SReflect.getInnerClassName(getClass())+"(first="+first+", second="+second+")";
+		return type==TYPE_RESULT_RESULT ? SReflect.getInnerClassName(getClass())+"(result1="+first+", result2="+second+")"
+				: type==TYPE_RESULT_EXCEPTION ? SReflect.getInnerClassName(getClass())+"(result1="+first+", exception2="+second+")"
+				: type==TYPE_EXCEPTION_RESULT ? SReflect.getInnerClassName(getClass())+"(exception1="+first+", result2="+second+")"
+				: SReflect.getInnerClassName(getClass())+"(exception1="+first+", exception2="+second+")";
 	}
 }
