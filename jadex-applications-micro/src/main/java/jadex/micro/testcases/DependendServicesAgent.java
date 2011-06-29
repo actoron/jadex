@@ -18,7 +18,10 @@ import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -57,20 +60,17 @@ public class DependendServicesAgent extends MicroAgent
                 {
                     public void resultAvailable(Object result)
                     {
-//                      System.out.println("fini");
-                        Collection col = (Collection)result;
-                        TestReport    tr    = new TestReport("#1", "Test child component service initialization.");
-                        if(col.size()==0)
-                        {
-                            tr.setSucceeded(true);
-                        }
-                        else
-                        {
-                            tr.setFailed(""+col.iterator().next());
-                        }
-                        setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
-
-                        killAgent();
+//						System.out.println("fini: "+result);
+						List tests = new ArrayList();
+						Collection col = (Collection)result;
+						for(Iterator it=col.iterator(); it.hasNext(); )
+						{
+							Collection tmp = (Collection)it.next();
+							tests.addAll(tmp);
+						}
+						setResultValue("testresults", new Testcase(tests.size(), (TestReport[])tests.toArray(new TestReport[tests.size()])));
+						
+						killAgent();
                     }
                 });
 
@@ -87,16 +87,8 @@ public class DependendServicesAgent extends MicroAgent
                                 {
 //                                  System.out.println("del: "+child.getComponentIdentifier()+" "+result);
                                     Map res = (Map)result;
-                                    Exception e = (Exception)res.get("exception");
-                                    if(e==null)
-                                    {
-                                        // use exception occurred to not save null in coll
-                                        lis.exceptionOccurred(e);
-                                    }
-                                    else
-                                    {
-                                        lis.resultAvailable(e);
-                                    }
+                                    List tests = (List)res.get("testcases");
+                                    lis.resultAvailable(tests);
                                 }
                             }));
                         }
@@ -106,7 +98,6 @@ public class DependendServicesAgent extends MicroAgent
             }
         }));
         return ret;
-//        return super.agentCreated();
     }
 
     /**
