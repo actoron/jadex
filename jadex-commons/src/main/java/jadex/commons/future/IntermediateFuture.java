@@ -56,6 +56,15 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 	 */
 	public void	addIntermediateResult(Object result)
 	{
+	   	synchronized(this)
+		{
+        	if(resultavailable)
+        	{
+        		first.printStackTrace();
+        		throw new RuntimeException("Duplicate result: "+result+", "+this.result);
+        	}
+        }
+	   	
 		intermediate = true;
 		
 		List	ilisteners	= null;
@@ -99,6 +108,7 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
      *  Listener notifications occur on calling thread of this method.
      *  @param result The result.
      */
+	Exception first;
     public void	setResult(Object result)
     {
     	boolean ex = false;
@@ -109,16 +119,17 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 		}
     	if(ex)
     	{
-    		setException(new RuntimeException("setResult() only allowed without intermediate results:"+results));
+    		throw new RuntimeException("setResult() only allowed without intermediate results:"+results);
     	}
     	else
     	{
     		if(result!=null && !(result instanceof Collection))
     		{
-    			setException(new IllegalArgumentException("Result must be collection: "+result));
+    			throw new IllegalArgumentException("Result must be collection: "+result);
     		}
     		else
     		{
+    			first = new RuntimeException();
     			if(result!=null)
     				this.results = (Collection)result;
     			super.setResult(results);
@@ -141,13 +152,13 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 		}
     	if(ex)
     	{
-    		setException(new RuntimeException("setResultIfUndone() only allowed without intermediate results:"+results));
+    		throw new RuntimeException("setResultIfUndone() only allowed without intermediate results:"+results);
     	}
     	else
     	{
     		if(result!=null && !(result instanceof Collection))
     		{
-    			setException(new IllegalArgumentException("Result must be collection: "+result));
+    			throw new IllegalArgumentException("Result must be collection: "+result);
     		}
     		else
     		{
