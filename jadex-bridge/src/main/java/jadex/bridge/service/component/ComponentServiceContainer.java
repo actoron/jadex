@@ -6,12 +6,19 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IRequiredServiceFetcher;
+import jadex.bridge.service.IResultSelector;
+import jadex.bridge.service.ISearchManager;
+import jadex.bridge.service.IVisitDecider;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateFuture;
 
 import java.util.Collections;
 import java.util.logging.Logger;
@@ -26,8 +33,8 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	/** The component adapter. */
 	protected IComponentAdapter adapter;
 	
-//	/** The external access. */
-//	protected IExternalAccess exta;
+	/** The external access. */
+	protected IExternalAccess ea;
 	
 	/** The cms. */
 	protected IComponentManagementService cms;
@@ -41,6 +48,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	/**
 	 *  Create a new service container.
 	 */
+//	public ComponentServiceContainer(IExternalAccess ea, IComponentAdapter adapter, String type)
 	public ComponentServiceContainer(IComponentAdapter adapter, String type)
 	{
 		super(adapter.getComponentIdentifier());
@@ -48,7 +56,41 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		this.type	= type;
 	}
 	
+	// Hack! necessary because external access already needs container in constructor
+	public void init(IExternalAccess ea)
+	{
+		this.ea = ea;
+	}
+	
 	//-------- interface methods --------
+	
+//	/**
+//	 *  Get all services of a type.
+//	 *  @param type The class.
+//	 *  @return The corresponding services.
+//	 */
+//	public IIntermediateFuture	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
+//	{
+//		return new ComponentIntermediateFuture(ea, adapter, super.getServices(manager, decider, selector));
+//	}
+//	
+	/**
+	 *  Get a required service.
+	 *  @return The service.
+	 */
+	public IFuture getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+	{
+		return new ComponentFuture(ea, adapter, super.getRequiredService(info, binding, rebind));
+	}
+	
+	/**
+	 *  Get required services.
+	 *  @return The services.
+	 */
+	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+	{
+		return new ComponentIntermediateFuture(ea, adapter, super.getRequiredServices(info, binding, rebind));
+	}
 	
 	/**
 	 *  Get the parent service container.
@@ -69,7 +111,8 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public IFuture	getChildren()
 	{
-		final Future ret = new Future();
+		final Future oldret = new Future();
+		ComponentFuture ret = new ComponentFuture(ea, adapter, oldret);
 		
 		adapter.getChildrenIdentifiers().addResultListener(new IResultListener()
 		{
@@ -80,7 +123,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 					IComponentIdentifier[] childs = (IComponentIdentifier[])result;
 //					System.out.println("childs: "+adapter.getComponentIdentifier()+" "+SUtil.arrayToString(childs));
 					final IResultListener lis = new CollectionResultListener(
-						childs.length, true, new DelegationResultListener(ret));
+						childs.length, true, new DelegationResultListener(oldret));
 					for(int i=0; i<childs.length; i++)
 					{
 						cms.getExternalAccess(childs[i]).addResultListener(new IResultListener()
@@ -100,12 +143,12 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 				}
 				else
 				{
-					ret.setResult(Collections.EMPTY_LIST);
+					oldret.setResult(Collections.EMPTY_LIST);
 				}
 			}
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setException(exception);
+				oldret.setException(exception);
 			}
 		});
 		

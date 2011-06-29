@@ -60,8 +60,6 @@ public class InterpreterTest
 			
 			OAVBDIModelLoader loader = new OAVBDIModelLoader();
 			OAVAgentModel loaded = loader.loadAgentModel(model, null, null);
-	
-			
 			
 			// Initialize agent interpreter.
 			Future ret = new Future();
@@ -122,7 +120,9 @@ class ComponentAdapter implements IComponentAdapter
 	
 	public ComponentAdapter(final IComponentInstance interpreter)
 	{
+		IExternalAccess ea = ((BDIInterpreter)interpreter).getExternalAccess();
 		container = new ComponentServiceContainer(this, "platform");
+		((ComponentServiceContainer)this.container).init(ea);
 		ThreadPoolService tps = new ThreadPoolService(ThreadPoolFactory.createThreadPool(), container);
 		container.addService(tps);
 		ClockService clock = new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "system"), container);

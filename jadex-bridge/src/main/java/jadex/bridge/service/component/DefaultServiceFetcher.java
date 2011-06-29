@@ -58,7 +58,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	protected Object result;
 	
 	/**
-	 * 
+	 *  Create a new required service fetcher.
 	 */
 	public DefaultServiceFetcher(IServiceProvider provider)
 	{
@@ -71,7 +71,6 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	 *  Get a required service.
 	 */
 	public IFuture getService(final RequiredServiceInfo info, RequiredServiceBinding bd, final boolean rebind)
-//		final IServiceProvider provider, final boolean rebind)
 	{
 		final Future ret = new Future();
 		final RequiredServiceBinding binding = bd!=null? bd: info.getDefaultBinding();

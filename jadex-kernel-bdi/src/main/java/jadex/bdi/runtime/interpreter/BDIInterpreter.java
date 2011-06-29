@@ -300,9 +300,12 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				microplansteps = mps.booleanValue();
 		}
 		
+		// Init the external access
 		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
 		this.container = new ComponentServiceContainer(adapter, desc.getType());
-		
+		this.ea = new ExternalAccessFlyweight(state, ragent);
+		((ComponentServiceContainer)this.container).init(ea);
+
 		scheduleStep(new IComponentStep()
 		{
 			public Object execute(IInternalAccess ia)
@@ -470,7 +473,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		final Future	ret	= new Future();
 		
 		// Init the external access
-		ea = new ExternalAccessFlyweight(state, ragent);
+//		ea = new ExternalAccessFlyweight(state, ragent);
 		
 		// Get the services.
 		final boolean services[]	= new boolean[3];
