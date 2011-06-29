@@ -135,8 +135,7 @@ public class GenerateService implements IGenerateService
 			public IFuture createService()
 			{
 				final Future	ret	= new Future();
-				agent.getRequiredService("cmsservice").addResultListener(
-					agent.createResultListener(new DelegationResultListener(ret)
+				agent.getRequiredService("cmsservice").addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -171,7 +170,7 @@ public class GenerateService implements IGenerateService
 							}
 						}));
 					}
-				}));
+				});
 				return ret;
 			}
 		}, -1);

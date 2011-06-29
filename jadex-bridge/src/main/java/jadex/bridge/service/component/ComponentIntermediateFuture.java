@@ -1,6 +1,7 @@
 package jadex.bridge.service.component;
 
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -27,8 +28,11 @@ public class ComponentIntermediateFuture extends IntermediateFuture
 			{
 				if(adapter.isExternalThread())
 				{
+//					if(adapter.getDescription().getState().equals(IComponentDescription.STATE_SUSPENDED))
+//						adapter.getLogger().warning("Warning schedule step on suspended component");
+
 					ea.scheduleStep(new IComponentStep()
-					{
+					{		
 						public Object execute(IInternalAccess ia)
 						{
 							setResult(result);
@@ -46,6 +50,9 @@ public class ComponentIntermediateFuture extends IntermediateFuture
 			{
 				if(adapter.isExternalThread())
 				{
+//					if(adapter.getDescription().getState().equals(IComponentDescription.STATE_SUSPENDED))
+//						adapter.getLogger().warning("Warning schedule step on suspended component");
+	
 					ea.scheduleStep(new IComponentStep()
 					{
 						public Object execute(IInternalAccess ia)
@@ -65,6 +72,9 @@ public class ComponentIntermediateFuture extends IntermediateFuture
 			{
 				if(adapter.isExternalThread())
 				{
+//					if(adapter.getDescription().getState().equals(IComponentDescription.STATE_SUSPENDED))
+//						adapter.getLogger().warning("Warning schedule step on suspended component");
+	
 					ea.scheduleStep(new IComponentStep()
 					{
 						public Object execute(IInternalAccess ia)
@@ -84,6 +94,9 @@ public class ComponentIntermediateFuture extends IntermediateFuture
 			{
 				if(adapter.isExternalThread())
 				{
+//					if(adapter.getDescription().getState().equals(IComponentDescription.STATE_SUSPENDED))
+//						adapter.getLogger().warning("Warning schedule step on suspended component");
+	
 					ea.scheduleStep(new IComponentStep()
 					{
 						public Object execute(IInternalAccess ia)

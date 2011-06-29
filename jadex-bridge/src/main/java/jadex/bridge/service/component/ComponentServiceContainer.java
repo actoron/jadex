@@ -60,16 +60,6 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	
 	//-------- interface methods --------
 	
-//	/**
-//	 *  Get all services of a type.
-//	 *  @param type The class.
-//	 *  @return The corresponding services.
-//	 */
-//	public IIntermediateFuture	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
-//	{
-//		return new ComponentIntermediateFuture(ea, adapter, super.getServices(manager, decider, selector));
-//	}
-//	
 	/**
 	 *  Get a required service.
 	 *  @return The service.
@@ -107,8 +97,8 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public IFuture	getChildren()
 	{
-		final Future oldret = new Future();
-		ComponentFuture ret = new ComponentFuture(ea, adapter, oldret);
+		final Future ret = new Future();
+//		ComponentFuture ret = new ComponentFuture(ea, adapter, oldret);
 		
 		adapter.getChildrenIdentifiers().addResultListener(new IResultListener()
 		{
@@ -119,7 +109,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 					IComponentIdentifier[] childs = (IComponentIdentifier[])result;
 //					System.out.println("childs: "+adapter.getComponentIdentifier()+" "+SUtil.arrayToString(childs));
 					final IResultListener lis = new CollectionResultListener(
-						childs.length, true, new DelegationResultListener(oldret));
+						childs.length, true, new DelegationResultListener(ret));
 					for(int i=0; i<childs.length; i++)
 					{
 						cms.getExternalAccess(childs[i]).addResultListener(new IResultListener()
@@ -139,12 +129,12 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 				}
 				else
 				{
-					oldret.setResult(Collections.EMPTY_LIST);
+					ret.setResult(Collections.EMPTY_LIST);
 				}
 			}
 			public void exceptionOccurred(Exception exception)
 			{
-				oldret.setException(exception);
+				ret.setException(exception);
 			}
 		});
 		
