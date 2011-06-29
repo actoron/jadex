@@ -1001,85 +1001,100 @@ public abstract class ComponentManagementService extends BasicService implements
 		}
 		else
 		{
+			IComponentAdapter ad;
+			Object[] infos;
 			synchronized(adapters)
 			{
-				IComponentAdapter ad = (IComponentAdapter)adapters.get(cid);					
-				Object[] infos = (Object[])initinfos.get(cid);
+				ad = (IComponentAdapter)adapters.get(cid);
+				infos = (Object[])initinfos.get(cid);
+			}
+			// Terminate component that is shut down during init.
+			if(infos!=null && infos.length>0)
+			{
+				logger.info("Queued component termination during init: "+cid.getName());
+			}
+			// Terminate normally inited component.
+			else 
+			{
+				final IComponentAdapter adapter = ad;
 				
-				// Terminate component that is shut down during init.
-				if(infos!=null && infos.length>0)
+				// Kill subcomponents
+				if(adapter==null)
 				{
-					logger.info("Queued component termination during init: "+cid.getName());
+					// Todo: need to kill children!? How to reproduce this case!?
+					logger.info("Terminating component structure adapter is null: "+cid.getName());
+					exitDestroy(cid, null, new RuntimeException("Component "+cid+" does not exist."), null);
 				}
-				// Terminate normally inited component.
-				else 
+				else
 				{
-					final IComponentAdapter adapter = ad;
-					
-					// Kill subcomponents
-					if(adapter==null)
+					logger.info("Terminating component structure: "+cid.getName());
+					final CMSComponentDescription	desc;
+					IComponentIdentifier[] achildren;
+					synchronized(adapters)
 					{
-						// Todo: need to kill children!? How to reproduce this case!?
-						logger.info("Terminating component structure adapter is null: "+cid.getName());
-						exitDestroy(cid, null, new RuntimeException("Component "+cid+" does not exist."), null);
+						desc	= (CMSComponentDescription)adapter.getDescription();
+						achildren = desc.getChildren();
 					}
-					else
-					{
-						logger.info("Terminating component structure: "+cid.getName());
-						final CMSComponentDescription	desc	= (CMSComponentDescription)adapter.getDescription();
-						IComponentIdentifier[] achildren = desc.getChildren();
-						
+					
 //						System.out.println("kill childs: "+cid+" "+SUtil.arrayToString(achildren));
-						
-						destroyComponentLoop(cid, achildren, achildren.length-1).addResultListener(new IResultListener()
+					
+					destroyComponentLoop(cid, achildren, achildren.length-1).addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object result)
 						{
-							public void resultAvailable(Object result)
+							logger.info("Terminated component structure: "+cid.getName());
+							boolean	exit	= false;
+							synchronized(adapters)
 							{
-								logger.info("Terminated component structure: "+cid.getName());
-								synchronized(adapters)
+								IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
+								// Component may be already killed (e.g. when autoshutdown).
+								if(adapter!=null)
 								{
-									IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
-									// Component may be already killed (e.g. when autoshutdown).
-									if(adapter!=null)
-									{
 //											System.out.println("destroy1: "+cid);//+" "+component.getParent().getComponentIdentifier().getLocalName());
-										
-										// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
-										// todo: killcomponent should only be called once for each component?
-										if(!ccs.containsKey(cid))
-										{
+									
+									// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
+									// todo: killcomponent should only be called once for each component?
+									if(!ccs.containsKey(cid))
+									{
 //										System.out.println("killing a: "+cid);
-											
-											CleanupCommand	cc	= new CleanupCommand(cid);
-											ccs.put(cid, cc);
-											logger.info("Terminating component: "+cid.getName());
-											killComponent(adapter).addResultListener(cc);
-		//									component.killComponent(cc);	
-										}
-										else
-										{
+										
+										CleanupCommand	cc	= new CleanupCommand(cid);
+										ccs.put(cid, cc);
+										logger.info("Terminating component: "+cid.getName());
+										killComponent(adapter).addResultListener(cc);
+	//									component.killComponent(cc);	
+									}
+									else
+									{
 //										System.out.println("killing b: "+cid);
-											
-											CleanupCommand cc = (CleanupCommand)ccs.get(cid);
-											if(cc==null)
-											{
-												exitDestroy(cid, desc, new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()), null);
-											}
+										
+										CleanupCommand cc = (CleanupCommand)ccs.get(cid);
+										if(cc==null)
+										{
+											// Todo: what is this case?
+											exit	= true;
 										}
 									}
 								}
-								
+							}
+							
+							if(exit)
+							{
+								exitDestroy(cid, desc, new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()), null);
+							}
+							else
+							{
 								// Resume component to be killed in case it is currently suspended.
 								resumeComponent(cid);
 							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-//									System.out.println("ex: "+exception);
-								exitDestroy(cid, desc, exception, null);
-							}
-						});
-					}
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+//							System.out.println("ex: "+exception);
+							exitDestroy(cid, desc, exception, null);
+						}
+					});
 				}
 			}
 		}
@@ -1547,6 +1562,18 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		public void resultAvailable(Object result)
 		{
+			doCleanup(null);
+		}
+		
+		
+		public void exceptionOccurred(Exception exception)
+		{
+			doCleanup(exception);
+		}
+
+		
+		protected void doCleanup(Exception exception)
+		{
 			boolean	killparent	= false;
 			IComponentAdapter adapter = null;
 			IComponentAdapter pad = null;
@@ -1628,7 +1655,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			}
 			// else parent has just been killed.
 			
-			exitDestroy(cid, desc, null, results);
+			exitDestroy(cid, desc, exception, results);
 
 			
 			ICMSComponentListener[] alisteners;
@@ -1689,11 +1716,6 @@ public abstract class ComponentManagementService extends BasicService implements
 //				System.out.println("killparent: "+pad.getComponentIdentifier());
 				destroyComponent(pad.getComponentIdentifier());
 			}
-		}
-		
-		public void exceptionOccurred(Exception exception)
-		{
-			resultAvailable(cid);
 		}
 	}
 	

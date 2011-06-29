@@ -542,32 +542,29 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		final Future ret = new Future();
 		// Todo: cleanup required???
 		
-		/*if(componentlisteners!=null)
-		{
-			for(int i=0; i<componentlisteners.size(); i++)
-			{
-				IComponentListener lis = (IComponentListener)componentlisteners.get(i);
-				lis.componentTerminating(new ChangeEvent(adapter.getComponentIdentifier()));
-			}
-		}*/
-		
 		ComponentChangeEvent.dispatchTerminatingEvent(getComponentAdapter(), getModel(), getServiceProvider(), getInternalComponentListeners(), null);
 		
-		getComponentAdapter().invokeLater(new Runnable()
+		terminateExtensions().addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
-			public void run()
-			{	
-				// Call cancel on all running threads.
-				for(Iterator it= getThreadContext().getAllThreads().iterator(); it.hasNext(); )
+			public void customResultAvailable(Object result)
+			{
+				getComponentAdapter().invokeLater(new Runnable()
 				{
-					ProcessThread pt = (ProcessThread)it.next();
-					getActivityHandler(pt.getActivity()).cancel(pt.getActivity(), BpmnInterpreter.this, pt);
-//					System.out.println("Cancelling: "+pt.getActivity()+" "+pt.getId());
-				}
-				
-				ComponentChangeEvent.dispatchTerminatedEvent(getComponentAdapter(), getModel(), getServiceProvider(), getInternalComponentListeners(), ret);
+					public void run()
+					{	
+						// Call cancel on all running threads.
+						for(Iterator it= getThreadContext().getAllThreads().iterator(); it.hasNext(); )
+						{
+							ProcessThread pt = (ProcessThread)it.next();
+							getActivityHandler(pt.getActivity()).cancel(pt.getActivity(), BpmnInterpreter.this, pt);
+//							System.out.println("Cancelling: "+pt.getActivity()+" "+pt.getId());
+						}
+						
+						ComponentChangeEvent.dispatchTerminatedEvent(getComponentAdapter(), getModel(), getServiceProvider(), getInternalComponentListeners(), ret);
+					}
+				});
 			}
-		});
+		}));
 		
 		return ret;
 	}

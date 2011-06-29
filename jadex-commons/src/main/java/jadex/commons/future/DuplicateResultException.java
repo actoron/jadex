@@ -68,4 +68,16 @@ public class DuplicateResultException	extends RuntimeException
 				: type==TYPE_EXCEPTION_RESULT ? SReflect.getInnerClassName(getClass())+"(exception1="+first+", result2="+second+")"
 				: SReflect.getInnerClassName(getClass())+"(exception1="+first+", exception2="+second+")";
 	}
+	
+	/**
+	 *  Prints also stack trace of first exception, if available.
+	 */
+	public void printStackTrace()
+	{
+		if(future instanceof Future && ((Future)future).first!=null)
+		{
+			((Future)future).first.printStackTrace();
+		}
+		super.printStackTrace();
+	}
 }

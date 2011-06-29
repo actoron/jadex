@@ -68,6 +68,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	/** Flag to indicate that the initial step was performed. */
 	protected boolean	inited;
 	
+	/** The kill future to be notified in case of fatal error during shutdown. */
+	protected Future	killfuture;
+	
 	//-------- steppable attributes --------
 	
 	/** The flag for a scheduled step (true when a step is allowed in stepwise execution). */
@@ -496,12 +499,14 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public IFuture killComponent()
 	{
-		final Future ret = new Future();
+		assert killfuture==null;
+		
+		killfuture = new Future();
 		
 //		System.out.println("killComponent: "+listener);
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 		{
-			ret.setException(new ComponentTerminatedException(desc.getName()));
+			killfuture.setException(new ComponentTerminatedException(desc.getName()));
 		}
 		else
 		{
@@ -524,7 +529,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 									{								
 										public void run()
 										{
-											shutdownContainer().addResultListener(new DelegationResultListener(ret));
+											shutdownContainer().addResultListener(new DelegationResultListener(killfuture));
 											
 //											System.out.println("Checking ext entries after cleanup: "+cid);
 											assert ext_entries==null || ext_entries.isEmpty() : "Ext entries after cleanup: "+desc.getName()+", "+ext_entries;
@@ -540,7 +545,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 							public void exceptionOccurred(Exception exception)
 							{
 								getLogger().warning("Exception during component cleanup: "+exception);
-								shutdownContainer().addResultListener(new DelegationResultListener(ret));
+								shutdownContainer().addResultListener(new DelegationResultListener(killfuture));
 							}
 						});
 					}
@@ -548,12 +553,12 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			}
 			else
 			{
-				ret.setResult(getComponentIdentifier());
+				killfuture.setResult(getComponentIdentifier());
 //				listener.resultAvailable(this, getComponentIdentifier());
 			}
 		}
 		
-		return ret;
+		return killfuture;
 		
 		// LogManager causes memory leak till Java 7
 		// No way to remove loggers and no weak references. 
@@ -819,22 +824,31 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	protected void fatalError(final Exception e)
 	{
+		System.err.println("fatal error: "+getComponentIdentifier());
 //		e.printStackTrace();
 		
 		// Fatal error!
 		exception = e;
-		e.printStackTrace();
+//		e.printStackTrace();
 		
-		// Remove component from platform.
-		getCMS().addResultListener(new DefaultResultListener()
+		if(killfuture!=null)
 		{
-			public void resultAvailable(Object result)
+			// Already in termination.
+			killfuture.setException(exception);
+		}
+		else
+		{
+			// Remove component from platform.
+			getCMS().addResultListener(new DefaultResultListener()
 			{
-				IComponentManagementService	cms	= (IComponentManagementService)result;
-//				cms.setComponentException(cid, e);
-				cms.destroyComponent(desc.getName());
-			}
-		});
+				public void resultAvailable(Object result)
+				{
+					IComponentManagementService	cms	= (IComponentManagementService)result;
+	//				cms.setComponentException(cid, e);
+					cms.destroyComponent(desc.getName());
+				}
+			});
+		}
 	}
 	
 	/**

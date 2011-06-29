@@ -108,7 +108,6 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
      *  Listener notifications occur on calling thread of this method.
      *  @param result The result.
      */
-	Exception first;
     public void	setResult(Object result)
     {
     	boolean ex = false;

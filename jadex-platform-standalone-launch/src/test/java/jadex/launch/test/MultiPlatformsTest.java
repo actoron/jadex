@@ -14,7 +14,8 @@ public class MultiPlatformsTest extends TestCase
 {
 	public void	testMultiplePlatforms()
 	{
-		int number	= 1;
+		int number	= 1000;
+		long timeout	= -1; //10000;
 		
 		IFuture[]	futures	= new IFuture[number];
 		for(int i=0; i<futures.length; i++)
@@ -24,7 +25,6 @@ public class MultiPlatformsTest extends TestCase
 		}
 		
 		IExternalAccess[]	platforms	= new IExternalAccess[futures.length];
-		long timeout	= -1; //10000;
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		for(int i=0; i<futures.length; i++)
 		{

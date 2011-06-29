@@ -45,6 +45,10 @@ public class Future implements IFuture
 	/** The listeners. */
 	protected List listeners;
 	
+	/** For capturing call stack of first setResult/Exception call. */
+	// Only for debugging;
+	protected Exception first;
+	
 	//-------- constructors --------
 	
 	/**
@@ -184,7 +188,12 @@ public class Future implements IFuture
         		{
             		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_EXCEPTION, this, result, exception);        			
         		}
-        	}	
+        	}
+        	else
+        	{
+        		first	= new RuntimeException("first setException()");
+        		first.fillInStackTrace();
+        	}
         	
 //        	System.out.println(this+" setResult: "+result);
         	this.exception = exception;
@@ -237,6 +246,11 @@ public class Future implements IFuture
         		{
             		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_RESULT,this, result, result);        			
         		}
+        	}
+        	else
+        	{
+        		first	= new RuntimeException("first setResult()");
+        		first.fillInStackTrace();
         	}
         	
 //        	System.out.println(this+" setResult: "+result);

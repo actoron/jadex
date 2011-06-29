@@ -151,14 +151,6 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			public void customResultAvailable(Object result)
 			{
 				ComponentChangeEvent.dispatchTerminatedEvent(getComponentAdapter(), getModel(), getServiceProvider(), getInternalComponentListeners(), ret);
-
-//				getComponentAdapter().invokeLater(new Runnable()
-//				{
-//					public void run()
-//					{
-//					}
-//				});
-				super.customResultAvailable(result);
 			}
 		}));
 		
