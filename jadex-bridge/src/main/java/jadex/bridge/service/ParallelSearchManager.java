@@ -165,14 +165,12 @@ public class ParallelSearchManager implements ISearchManager
 							}
 						}
 					}
-					finished[0]	= true;
-					checkAndSetResults(finished, ret);
+					checkAndSetResults(ret, finished, 0);
 				}
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					finished[0]	= true;
-					checkAndSetResults(finished, ret);
+					checkAndSetResults(ret, finished, 0);
 				}
 			});
 
@@ -191,35 +189,30 @@ public class ParallelSearchManager implements ISearchManager
 							{
 								public void resultAvailable(Object result)
 								{
-									finished[1]	= true;
-									checkAndSetResults(finished, ret);
+									checkAndSetResults(ret, finished, 1);
 								}
 								
 								public void exceptionOccurred(Exception exception)
 								{
-									finished[1]	= true;
-									checkAndSetResults(finished, ret);
+									checkAndSetResults(ret, finished, 1);
 								}
 							});
 						}
 						else
 						{
-							finished[1]	= true;
-							checkAndSetResults(finished, ret);
+							checkAndSetResults(ret, finished, 1);
 						}
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						finished[1]	= true;
-						checkAndSetResults(finished, ret);
+						checkAndSetResults(ret, finished, 1);
 					}
 				});
 			}
 			else
 			{
-				finished[1]	= true;
-				checkAndSetResults(finished, ret);				
+				checkAndSetResults(ret, finished, 1);
 			}
 			
 			if(down)
@@ -238,14 +231,12 @@ public class ParallelSearchManager implements ISearchManager
 							{
 								public void resultAvailable(Object result)
 								{
-									finished[2]	= true;
-									checkAndSetResults(finished, ret);
+									checkAndSetResults(ret, finished, 2);
 								}
 								
 								public void exceptionOccurred(Exception exception)
 								{
-									finished[2]	= true;
-									checkAndSetResults(finished, ret);
+									checkAndSetResults(ret, finished, 2);
 								}
 							});
 							for(Iterator it=coll.iterator(); it.hasNext(); )
@@ -257,22 +248,19 @@ public class ParallelSearchManager implements ISearchManager
 						}
 						else
 						{
-							finished[2]	= true;
-							checkAndSetResults(finished, ret);				
+							checkAndSetResults(ret, finished, 2);
 						}
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						finished[2]	= true;
-						checkAndSetResults(finished, ret);
+						checkAndSetResults(ret, finished, 2);
 					}
 				});
 			}
 			else
 			{
-				finished[2]	= true;
-				checkAndSetResults(finished, ret);
+				checkAndSetResults(ret, finished, 2);
 			}
 		}
 		else
@@ -282,18 +270,19 @@ public class ParallelSearchManager implements ISearchManager
 		
 		return ret;
 	}
-	
+
 	/**
-	 *  Check if all results are finished and the set the results.
+	 *  Test if all items are finished and set the result.
 	 */
-	protected static void	checkAndSetResults(boolean[] finished, Future ret)
+	protected void checkAndSetResults(Future ret, boolean[] finished, int num)
 	{
+		boolean	set;
 		synchronized(finished)
 		{
-			if(finished[0] && finished[1] && finished[2])
-			{
-				ret.setResult(null);
-			}
+			finished[num]	= true;
+			set	= finished[0] && finished[1] && finished[2];
 		}
+		if(set)
+			ret.setResult(null);
 	}
 }
