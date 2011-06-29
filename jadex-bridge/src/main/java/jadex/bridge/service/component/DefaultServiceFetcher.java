@@ -700,6 +700,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 					{
 						final IExternalAccess ea = (IExternalAccess)result;
 						final IComponentAdapter adapter = cms.getComponentAdapter((IComponentIdentifier)provider.getId());
+						if(adapter==null)
+							System.out.println("this");
 						ea.scheduleStep(new IComponentStep()
 						{
 							public Object execute(IInternalAccess ia)

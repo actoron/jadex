@@ -1823,7 +1823,19 @@ public abstract class ComponentManagementService extends BasicService implements
     // Todo: Hack!!! remove?
 	public IComponentAdapter getComponentAdapter(IComponentIdentifier cid)
 	{
-		return (IComponentAdapter)adapters.get(cid);
+		IComponentAdapter ret;
+		synchronized(adapters)
+		{
+			ret = (IComponentAdapter)adapters.get(cid);
+			// Hack, to retrieve description from component itself in init phase
+			if(ret==null)
+			{
+				Object[] ii= getInitInfo(cid);
+				if(ii!=null && ii.length>0)
+					ret	= (IComponentAdapter)ii[1];
+			}
+		}
+		return ret;
 	}
 
 	//-------- parent/child component accessors --------

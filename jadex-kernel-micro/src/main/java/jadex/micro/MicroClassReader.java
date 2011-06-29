@@ -453,7 +453,8 @@ public class MicroClassReader
 	{
 		return bd==null? null: new RequiredServiceBinding(bd.name(), 
 			bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
-			bd.dynamic(), bd.scope(), bd.create(), bd.recover(), createUnparsedExpressions(bd.interceptors()));
+			bd.dynamic(), bd.scope(), bd.create(), bd.recover(), createUnparsedExpressions(bd.interceptors()),
+			bd.proxytype());
 	}
 	
 	/**

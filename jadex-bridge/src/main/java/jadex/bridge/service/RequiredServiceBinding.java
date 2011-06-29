@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 
 /**
  *  Required service binding information.
@@ -38,6 +39,9 @@ public class RequiredServiceBinding
 	
 	/** The interceptors. */
 	protected List interceptors;
+	
+	/** The proxytype. */
+	protected String proxytype;
 
 	//-------- constructors --------
 
@@ -61,7 +65,7 @@ public class RequiredServiceBinding
 	 */
 	public RequiredServiceBinding(String name, String scope, boolean dynamic)
 	{
-		this(name, null, null, dynamic, scope, false, false, null);
+		this(name, null, null, dynamic, scope, false, false, null, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED);
 	}
 
 	/**
@@ -69,7 +73,7 @@ public class RequiredServiceBinding
 	 */
 	public RequiredServiceBinding(String name, String componentname,
 		String componenttype, boolean dynamic, String scope, boolean create, boolean recover,
-		UnparsedExpression[] interceptors)
+		UnparsedExpression[] interceptors, String proxytype)
 	{
 		this.name = name;
 		this.componentname = componentname;
@@ -78,6 +82,7 @@ public class RequiredServiceBinding
 		this.scope = scope;
 		this.create = create;
 		this.recover = recover;
+		this.proxytype = proxytype;
 		if(interceptors!=null)
 		{
 			for(int i=0; i<interceptors.length; i++)
@@ -94,7 +99,8 @@ public class RequiredServiceBinding
 	public RequiredServiceBinding(RequiredServiceBinding orig)
 	{
 		this(orig.getName(), orig.getComponentName(), orig.getComponentType(), 
-			orig.isDynamic(), orig.getScope(), orig.isCreate(), orig.isRecover(), orig.getInterceptors());
+			orig.isDynamic(), orig.getScope(), orig.isCreate(), orig.isRecover(), 
+			orig.getInterceptors(), orig.getProxytype());
 	}
 
 	//-------- methods --------
@@ -253,6 +259,24 @@ public class RequiredServiceBinding
 	{
 		return interceptors==null? new UnparsedExpression[0]: (UnparsedExpression[])
 			interceptors.toArray(new UnparsedExpression[interceptors.size()]);
+	}
+	
+	/**
+	 *  Get the proxytype.
+	 *  @return the proxytype.
+	 */
+	public String getProxytype()
+	{
+		return proxytype;
+	}
+
+	/**
+	 *  Set the proxytype.
+	 *  @param proxytype The proxytype to set.
+	 */
+	public void setProxytype(String proxytype)
+	{
+		this.proxytype = proxytype;
 	}
 
 	/**

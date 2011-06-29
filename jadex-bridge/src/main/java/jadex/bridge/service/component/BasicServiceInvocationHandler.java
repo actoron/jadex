@@ -15,6 +15,7 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceInterface;
 import jadex.bridge.service.component.interceptors.DecouplingInterceptor;
+import jadex.bridge.service.component.interceptors.DecouplingReturnInterceptor;
 import jadex.bridge.service.component.interceptors.DelegationInterceptor;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.component.interceptors.RecoveryInterceptor;
@@ -600,21 +601,32 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	public static IInternalService createRequiredServiceProxy(IInternalAccess ia, IExternalAccess ea, IComponentAdapter adapter, IInternalService service, 
 		IRequiredServiceFetcher fetcher, RequiredServiceInfo info, RequiredServiceBinding binding)
 	{
-//		System.out.println("create: "+service.getServiceIdentifier().getServiceType());
-		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(service);
-		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
-		if(binding.isRecover())
-			handler.addFirstServiceInterceptor(new RecoveryInterceptor(info, binding, fetcher));
-		UnparsedExpression[] interceptors = binding.getInterceptors();
-		if(interceptors!=null && interceptors.length>0)
+		IInternalService ret = service;
+		
+		if(!PROXYTYPE_RAW.equals(binding.getProxytype()))
 		{
-			for(int i=0; i<interceptors.length; i++)
+	//		System.out.println("create: "+service.getServiceIdentifier().getServiceType());
+			BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(service);
+			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
+			if(binding.isRecover())
+				handler.addFirstServiceInterceptor(new RecoveryInterceptor(info, binding, fetcher));
+			if(PROXYTYPE_DECOUPLED.equals(binding.getProxytype()))
+				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(ea, adapter));
+			UnparsedExpression[] interceptors = binding.getInterceptors();
+			if(interceptors!=null && interceptors.length>0)
 			{
-				IServiceInvocationInterceptor interceptor = (IServiceInvocationInterceptor)SJavaParser.evaluateExpression(interceptors[i].getValue(), ea.getModel().getAllImports(), ia.getFetcher(), ea.getModel().getClassLoader());
-				handler.addServiceInterceptor(interceptor);
+				for(int i=0; i<interceptors.length; i++)
+				{
+					IServiceInvocationInterceptor interceptor = (IServiceInvocationInterceptor)SJavaParser.evaluateExpression(
+						interceptors[i].getValue(), ea.getModel().getAllImports(), ia.getFetcher(), ea.getModel().getClassLoader());
+					handler.addServiceInterceptor(interceptor);
+				}
 			}
+			ret = (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, 
+				service.getServiceIdentifier().getServiceType()}, handler); 
 		}
-		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, service.getServiceIdentifier().getServiceType()}, handler); 
+		
+		return ret;
 	}
 }
 

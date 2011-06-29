@@ -28,6 +28,7 @@ import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.IFilter;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
@@ -1420,9 +1421,10 @@ public class BpmnXMLReader
 							boolean create = new Boolean(createtxt).booleanValue();
 							boolean recover = new Boolean(recovertxt).booleanValue();
 							
-							// todo: interceptors
+							// todo: interceptors, proxytype
 							
-							RequiredServiceBinding binding = new RequiredServiceBinding(null, compname, comptype, dynamic, scope, create, recover, null);
+							RequiredServiceBinding binding = new RequiredServiceBinding(null, compname, comptype, dynamic, 
+								scope, create, recover, null, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED);
 							bindings.put(name, binding);
 						}
 

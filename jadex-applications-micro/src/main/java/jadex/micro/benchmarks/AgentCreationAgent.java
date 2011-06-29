@@ -294,25 +294,25 @@ public class AgentCreationAgent extends MicroAgent
 	
 	protected IFuture	getCMS()
 	{
-		IFuture cms = null;	// Uncomment for no caching.
-		if(cms==null)
+		IFuture ret = null;	// Uncomment for no caching.
+		if(ret==null)
 		{
-			cms	= SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class); // Raw service
+			ret	= SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class); // Raw service
 //			cms	= getRequiredService("cmsservice");	// Required service proxy
 		}
-		return cms;
+		return ret;
 	}
 	
 	
-	protected IFuture	getClock()
+	protected IFuture getClock()
 	{
-		IFuture clock = null;	// Uncomment for no caching.
-		if(clock==null)
+		IFuture ret = null;	// Uncomment for no caching.
+		if(ret==null)
 		{
-			clock	= SServiceProvider.getServiceUpwards(getServiceProvider(), IClockService.class); // Raw service
+			ret	= SServiceProvider.getServiceUpwards(getServiceProvider(), IClockService.class); // Raw service
 //			clock	= getRequiredService("clockservice");	// Required service proxy
 		}
-		return clock;
+		return ret;
 	}
 	
 	/**
