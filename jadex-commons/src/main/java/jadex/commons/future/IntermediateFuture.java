@@ -60,8 +60,15 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 		{
         	if(resultavailable)
         	{
-        		first.printStackTrace();
-        		throw new RuntimeException("Duplicate result: "+result+", "+this.result);
+        		if(this.exception!=null)
+        		{
+//        			this.exception.printStackTrace();
+            		throw new DuplicateResultException(DuplicateResultException.TYPE_EXCEPTION_EXCEPTION, this, this.exception, exception);
+        		}
+        		else
+        		{
+            		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_EXCEPTION, this, result, exception);        			
+        		}
         	}
         }
 	   	
@@ -128,7 +135,6 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
     		}
     		else
     		{
-    			first = new RuntimeException();
     			if(result!=null)
     				this.results = (Collection)result;
     			super.setResult(results);

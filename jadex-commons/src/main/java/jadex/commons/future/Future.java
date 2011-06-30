@@ -27,6 +27,9 @@ public class Future implements IFuture
 	/** A caller is suspended. */
 	protected final String	CALLER_SUSPENDED	= "suspended";
 	
+	/** Debug flag. */
+	public final boolean DEBUG = false;
+	
 	//-------- attributes --------
 	
 	/** The result. */
@@ -154,7 +157,7 @@ public class Future implements IFuture
     	{
 	    	if(exception!=null)
 	    	{
-	    		throw exception instanceof RuntimeException ?(RuntimeException)exception 
+	    		throw exception instanceof RuntimeException? (RuntimeException)exception 
 	    			:new RuntimeException(exception);
 	    	}
 	    	else if(resultavailable)
@@ -189,7 +192,7 @@ public class Future implements IFuture
             		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_EXCEPTION, this, result, exception);        			
         		}
         	}
-        	else
+        	else if(DEBUG)
         	{
         		first	= new RuntimeException("first setException()");
         		first.fillInStackTrace();
@@ -244,10 +247,10 @@ public class Future implements IFuture
         		}
         		else
         		{
-            		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_RESULT,this, result, result);        			
+            		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_RESULT, this, result, result);        			
         		}
         	}
-        	else
+        	else if(DEBUG)
         	{
         		first	= new RuntimeException("first setResult()");
         		first.fillInStackTrace();
