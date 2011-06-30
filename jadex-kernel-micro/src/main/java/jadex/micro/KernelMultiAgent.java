@@ -18,11 +18,11 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Arguments({
 	@Argument(name="defaultkernels", description= "Kernel default locations.", 
-		typename="String[]", defaultvalue="null"),
+		clazz=String[].class, defaultvalue="null"),
 	@Argument(name="ignorekernels", description="Kernels that are ignored.",
-		typename="String[]", defaultvalue="new String[] {\"KernelBDI.component.xml\"}"),
+		clazz=String[].class, defaultvalue="new String[] {\"KernelBDI.component.xml\"}"),
 	@Argument(name="ignoreextensions", description="File extensions that are ignored.",
-		typename="String[]", defaultvalue="null")})
+		clazz=String[].class, defaultvalue="null")})
 @ProvidedServices({
 	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new jadex.kernelbase.MultiFactory($args.defaultkernels, $args.ignorekernels, $args.ignoreextensions)")),
 	@ProvidedService(type=IMultiKernelNotifierService.class, implementation=@Implementation(expression="$component.getRawService(jadex.bridge.IComponentFactory.class)"))

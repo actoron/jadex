@@ -23,7 +23,7 @@ import jadex.micro.annotation.Results;
 		implementation=@Implementation(expression="$component.getService()"))),
 	@Configuration(name="b")
 })
-@Results(@Result(name="testresults", typename="Testcase")) 
+@Results(@Result(name="testresults", clazz=Testcase.class)) 
 public class ProvidedServiceConfigurationsAgent extends MicroAgent implements IAService
 {
 	/**

@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
@@ -189,37 +190,21 @@ public class ParallelAgentCreationAgent extends MicroAgent
 	{
 		return new MicroAgentMetaInfo("This agents benchmarks parallel agent creation and termination.", 
 			new String[0],
-			new IArgument[]{new IArgument()
-		{
-			public Object getDefaultValue(String configname)
+			new IArgument[]{new Argument("num", "Number of agents to create.", "Integer", new Integer(10000))
 			{
-				return new Integer(10000);
-			}
-			public String getDescription()
-			{
-				return "Number of agents to create.";
-			}
-			public String getName()
-			{
-				return "num";
-			}
-			public String getTypename()
-			{
-				return "Integer";
-			}
-			public boolean validate(String input)
-			{
-				boolean ret = true;
-				try
+				public boolean validate(String input)
 				{
-					Integer.parseInt(input);
+					boolean ret = true;
+					try
+					{
+						Integer.parseInt(input);
+					}
+					catch(Exception e)
+					{
+						ret = false;
+					}
+					return ret;
 				}
-				catch(Exception e)
-				{
-					ret = false;
-				}
-				return ret;
-			}
-		}}, null, null, null);
+			}}, null, null, null);
 	}
 }

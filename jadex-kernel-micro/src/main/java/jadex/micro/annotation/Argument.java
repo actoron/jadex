@@ -22,10 +22,15 @@ public @interface Argument
 	 */
 	public String description() default "";
 	
+//	/**
+//	 *  The class name.
+//	 */
+//	public String classname() default "";
+	
 	/**
-	 *  The type name.
+	 *  The class.
 	 */
-	public String typename();
+	public Class clazz();
 	
 	/**
 	 *  The default value as expression string, i.e. will be parsed.

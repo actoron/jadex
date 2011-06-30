@@ -8,7 +8,7 @@ import java.util.Map;
 
 
 /**
- * 
+ *  An unparsed expression for being able to transfer to other nodes.
  */
 public class UnparsedExpression
 {

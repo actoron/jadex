@@ -27,11 +27,11 @@
 	
 	<arguments>
 		<!-- The diffusion rate for heat distribution. -->
-		<argument name="diffusion_rate" typename="Double">0.2</argument>
+		<argument name="diffusion_rate" class="Double">0.2</argument>
 		<!-- The evaporation rate for heat cooling. -->
-		<argument name="evaporation_rate" typename="Double">0.03</argument>
+		<argument name="evaporation_rate" class="Double">0.03</argument>
 		<!-- The heatbug ideal temperature. -->
-		<argument name="ideal_temp" typename="Double">0.3</argument>
+		<argument name="ideal_temp" class="Double">0.3</argument>
 	</arguments>
 	
 	<extensiontypes>

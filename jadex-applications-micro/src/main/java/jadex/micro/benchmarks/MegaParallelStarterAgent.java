@@ -20,7 +20,7 @@ import java.util.Map;
  *  Agent creation benchmark. 
  */
 @Arguments({
-	@Argument(name="max", defaultvalue="20000", typename="int")
+	@Argument(name="max", defaultvalue="20000", clazz=int.class)
 })
 public class MegaParallelStarterAgent extends MicroAgent 
 {

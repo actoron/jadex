@@ -22,7 +22,7 @@ import jadex.micro.annotation.Results;
 	@Configuration(name="a", requiredservices=@RequiredService(name="as", type=IAService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_LOCAL))),
 	@Configuration(name="b")
 })
-@Results(@Result(name="testresults", typename="Testcase")) 
+@Results(@Result(name="testresults", clazz=Testcase.class)) 
 public class RequiredServiceConfigurationsAgent extends MicroAgent
 {
 	/**

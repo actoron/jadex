@@ -59,15 +59,15 @@ import javax.xml.stream.XMLStreamException;
 @Description("This agent looks for other awareness agents in the local net.")
 @Arguments(
 {
-	@Argument(name="address", typename="String", defaultvalue="\"224.0.0.0\"", description="The ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255)."),
-	@Argument(name="port", typename="int", defaultvalue="55667", description="The port used for finding other agents."),
-	@Argument(name="delay", typename="long", defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
-	@Argument(name="fast", typename="boolean", defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
-	@Argument(name="autocreate", typename="boolean", defaultvalue="true", description="Set if new proxies should be automatically created when discovering new components."),
-	@Argument(name="autodelete", typename="boolean", defaultvalue="true", description="Set if proxies should be automatically deleted when not discovered any longer."),
-	@Argument(name="proxydelay", typename="long", defaultvalue="15000", description="The delay used by proxies."),
-	@Argument(name="includes", typename="String", defaultvalue="\"\"", description="A list of platforms/IPs/hostnames to include (comma separated). Matches start of platform/IP/hostname."),
-	@Argument(name="excludes", typename="String", defaultvalue="\"\"", description="A list of platforms/IPs/hostnames to exclude (comma separated). Matches start of platform/IP/hostname.")
+	@Argument(name="address", clazz=String.class, defaultvalue="\"224.0.0.0\"", description="The ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255)."),
+	@Argument(name="port", clazz=int.class, defaultvalue="55667", description="The port used for finding other agents."),
+	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
+	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
+	@Argument(name="autocreate", clazz=boolean.class, defaultvalue="true", description="Set if new proxies should be automatically created when discovering new components."),
+	@Argument(name="autodelete", clazz=boolean.class, defaultvalue="true", description="Set if proxies should be automatically deleted when not discovered any longer."),
+	@Argument(name="proxydelay", clazz=long.class, defaultvalue="15000", description="The delay used by proxies."),
+	@Argument(name="includes", clazz=String.class, defaultvalue="\"\"", description="A list of platforms/IPs/hostnames to include (comma separated). Matches start of platform/IP/hostname."),
+	@Argument(name="excludes", clazz=String.class, defaultvalue="\"\"", description="A list of platforms/IPs/hostnames to exclude (comma separated). Matches start of platform/IP/hostname.")
 })
 @Configurations(
 {

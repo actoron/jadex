@@ -28,12 +28,12 @@
 	</imports>
 	
 	<arguments>
-		<argument name="number" typename="Integer">10</argument>
-		<argument name="strategy_delay" typename="Boolean">true</argument>
-		<argument name="flashes_to_reset" typename="Integer">1</argument>
-		<argument name="flash_length" typename="Integer">1</argument>
-		<argument name="cycle_length" typename="Integer">10</argument>
-		<argument name="show_dark_flies" typename="Boolean">true</argument>
+		<argument name="number" class="Integer">10</argument>
+		<argument name="strategy_delay" class="Boolean">true</argument>
+		<argument name="flashes_to_reset" class="Integer">1</argument>
+		<argument name="flash_length" class="Integer">1</argument>
+		<argument name="cycle_length" class="Integer">10</argument>
+		<argument name="show_dark_flies" class="Boolean">true</argument>
 	</arguments>
 	
 	<componenttypes>

@@ -16,7 +16,7 @@ import jadex.micro.annotation.Results;
  *  Simple test agent with one service.
  */
 @ProvidedServices(@ProvidedService(type=IAService.class, implementation=@Implementation(expression="$component")))
-@Results(@Result(name="testcases", typename="List"))
+@Results(@Result(name="testcases", clazz=List.class))
 public class AAgent extends MicroAgent implements IAService
 {
 	/**

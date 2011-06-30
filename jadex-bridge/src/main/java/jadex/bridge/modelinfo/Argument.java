@@ -1,5 +1,6 @@
 package jadex.bridge.modelinfo;
 
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 import java.util.HashMap;
@@ -24,8 +25,11 @@ public class Argument implements IArgument
 	/** The description. */
 	protected String description;
 	
-	/** The typename. */
-	protected String typename;
+	/** The class name. */
+	protected String classname;
+	
+	/** The class. */
+	protected Class clazz;
 	
 	/** The default values. */
 	protected Map defaultvalues;
@@ -33,50 +37,38 @@ public class Argument implements IArgument
 	//-------- constructors --------
 	
 	/**
-	 * @param name
-	 * @param description
-	 * @param classname
-	 * @param defaultvalue
+	 *  Create a new argument.
 	 */
 	public Argument()
 	{
 	}
 	
 	/**
-	 * @param name
-	 * @param description
-	 * @param typename
-	 * @param defaultvalue
+	 *  Create a new argument.
 	 */
-	public Argument(String name, String description, String typename)
+	public Argument(String name, String description, String classname)
 	{
 		this.name = name;
 		this.description = description;
-		this.typename = typename;
+		this.classname = classname;
 	}
 	
 	/**
-	 * @param name
-	 * @param description
-	 * @param typename
-	 * @param defaultvalue
+	 *  Create a new argument.
 	 */
-	public Argument(String name, String description, String typename, Object defaultvalue)
+	public Argument(String name, String description, String classname, Object defaultvalue)
 	{
-		this(name, description, typename, SUtil.createHashMap(new Object[]{ANY_CONFIG}, new Object[]{defaultvalue}));
+		this(name, description, classname, SUtil.createHashMap(new Object[]{ANY_CONFIG}, new Object[]{defaultvalue}));
 	}
 	
 	/**
-	 * @param name
-	 * @param description
-	 * @param typename
-	 * @param defaultvalue
+	 *  Create a new argument.
 	 */
-	public Argument(String name, String description, String typename, Map defaultvalues)
+	public Argument(String name, String description, String classname, Map defaultvalues)
 	{
 		this.name = name;
 		this.description = description;
-		this.typename = typename;
+		this.classname = classname;
 		this.defaultvalues = defaultvalues;
 	}
 	
@@ -122,18 +114,31 @@ public class Argument implements IArgument
 	 *  Get the typename.
 	 *  @return The typename. 
 	 */
-	public String getTypename()
+	public String getClassname()
 	{
-		return typename;
+		return classname;
 	}
 	
 	/**
-	 *  Set the typename.
-	 *  @param typename The typename to set.
+	 *  Set the class name.
+	 *  @param classname The class name to set.
 	 */
-	public void setTypename(String typename)
+	public void setClassname(String classname)
 	{
-		this.typename = typename;
+		this.classname = classname;
+	}
+	
+	/**
+	 *  Get the clazz.
+	 *  @return The clazz.
+	 */
+	public Class getClazz(ClassLoader classloader, String[] imports)
+	{
+		if(clazz==null && classname!=null)
+		{
+			clazz = SReflect.findClass0(classname, imports, classloader);
+		}
+		return clazz;
 	}
 	
 	/**
@@ -215,6 +220,6 @@ public class Argument implements IArgument
 	{
 		return "Argument(defaultvalues=" + this.defaultvalues + ", description="
 			+ this.description + ", name=" + this.name + ", typename="
-			+ this.typename + ")";
+			+ this.classname + ")";
 	}
 }

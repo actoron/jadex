@@ -67,7 +67,7 @@ public class ApplicationXMLReader extends ComponentXMLReader
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "applicationtype"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(Argument.class), 
 			new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)),
-			new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "typename"))}, null)));
+			new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "classname"))}, null)));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "application")),  new ObjectInfo(ConfigurationInfo.class),
 			new MappingInfo(null, new AttributeInfo[]{

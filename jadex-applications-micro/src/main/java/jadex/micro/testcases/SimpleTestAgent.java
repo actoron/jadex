@@ -11,7 +11,7 @@ import jadex.micro.annotation.Results;
  *  A minimal test case agent serving as a demonstrator.
  */
 @Description("A simple test showing how the test center works with micro agents.")
-@Results(@Result(name="testresults", typename="Testcase"))
+@Results(@Result(name="testresults", clazz=Testcase.class))
 public class SimpleTestAgent extends MicroAgent
 {
 	/**

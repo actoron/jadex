@@ -28,7 +28,7 @@ import jadex.micro.testcases.semiautomatic.compositeservice.ISubService;
 	@RequiredService(name="add", type=IAddService.class),
 	@RequiredService(name="sub", type=ISubService.class)
 })
-@Results(@Result(name="testresults", typename="Testcase"))
+@Results(@Result(name="testresults", clazz=Testcase.class))
 public class MultiServiceAgent	extends MicroAgent	implements IAddService, ISubService
 {
 	//-------- testcase implementation --------

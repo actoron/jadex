@@ -240,8 +240,9 @@ public class MicroClassReader
 			{
 //				Object arg = SJavaParser.evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
 				Object defval = evaluateExpression(vals[i].defaultvalue(), modelinfo.getAllImports(), null, classloader);
+				tmpargs[i] = createArgument(vals[i], defval);
 				tmpargs[i] = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
-					vals[i].description(), vals[i].typename(), defval);
+					vals[i].description(), SReflect.getClassName(vals[i].clazz()), defval);
 				argsmap.put(tmpargs[i].getName(), tmpargs[i]);
 			}
 			modelinfo.setArguments(tmpargs);
@@ -256,7 +257,7 @@ public class MicroClassReader
 			{
 //				Object res = evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
 				tmpresults[i] = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
-					vals[i].description(), vals[i].typename(), null);
+					vals[i].description(), SReflect.getClassName(vals[i].clazz()), null);
 				resmap.put(tmpresults[i].getName(), tmpresults[i]);
 			}
 			modelinfo.setResults(tmpresults);
@@ -471,6 +472,15 @@ public class MicroClassReader
 			}
 		}
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IArgument createArgument(Argument arg, Object val)
+	{
+		return new jadex.bridge.modelinfo.Argument(arg.name(), 
+			arg.description(), SReflect.getClassName(arg.clazz()), val);
 	}
 	
 	/**

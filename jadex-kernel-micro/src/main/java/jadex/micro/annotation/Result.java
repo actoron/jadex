@@ -22,8 +22,13 @@ public @interface Result
 	 */
 	public String description() default "";
 	
+//	/**
+//	 *  The class name.
+//	 */
+//	public String classname();
+	
 	/**
-	 *  The type name.
+	 *  The class.
 	 */
-	public String typename();
+	public Class clazz();
 }

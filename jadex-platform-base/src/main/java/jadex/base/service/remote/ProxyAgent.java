@@ -13,7 +13,7 @@ import jadex.micro.annotation.Description;
  *  A proxy agent is a pseudo component that mirrors services of a remote platform (or component).
  */
 @Description("This agent represents a proxy for a remote component.")
-@Arguments(@Argument(name="component", typename="jadex.bridge.IComponentIdentifier", defaultvalue="null", description="The component id of the remote component/platform."))
+@Arguments(@Argument(name="component", clazz=IComponentIdentifier.class, defaultvalue="null", description="The component id of the remote component/platform."))
 public class ProxyAgent extends MicroAgent
 {
 	//-------- attributes --------

@@ -322,39 +322,23 @@ public class AgentCreationAgent extends MicroAgent
 	{
 		return new MicroAgentMetaInfo("This agents benchmarks agent creation and termination.", 
 			new String[0],
-			new IArgument[]{new IArgument()
-		{
-			@XMLClassname("argument")
-			public Object getDefaultValue(String configname)
+			new IArgument[]{new Argument("max", "Maximum number of agents to create.", "Integer", new Integer(10000))
 			{
-				return new Integer(10000);
-			}
-			public String getDescription()
-			{
-				return "Maximum number of agents to create.";
-			}
-			public String getName()
-			{
-				return "max";
-			}
-			public String getTypename()
-			{
-				return "Integer";
-			}
-			public boolean validate(String input)
-			{
-				boolean ret = true;
-				try
+				@XMLClassname("argument")
+				public boolean validate(String input)
 				{
-					Integer.parseInt(input);
+					boolean ret = true;
+					try
+					{
+						Integer.parseInt(input);
+					}
+					catch(Exception e)
+					{
+						ret = false;
+					}
+					return ret;
 				}
-				catch(Exception e)
-				{
-					ret = false;
-				}
-				return ret;
-			}
-		}, new Argument("nested", "If true, each agent is created as a subcomponent of the previous agent.", "boolean", Boolean.FALSE)}, 
+			}, new Argument("nested", "If true, each agent is created as a subcomponent of the previous agent.", "boolean", Boolean.FALSE)}, 
 		null, null, null,
 		null,	// Uncomment this when using required services below.
 //		new RequiredServiceInfo[]{

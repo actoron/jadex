@@ -1356,7 +1356,7 @@ public class StarterPanel extends JLayeredPane
 		//mvalt.setMinimumSize(new Dimension(mvalt.getPreferredSize().width/4, mvalt.getPreferredSize().height/4));
 		mvalt.setEditable(false);
 		
-		JLabel typel = new JLabel(arg.getTypename()!=null? arg.getTypename(): "undefined");
+		JLabel typel = new JLabel(arg.getClassname()!=null? arg.getClassname(): "undefined");
 		
 		String description = arg.getDescription();
 		if(description!=null)
@@ -1396,7 +1396,7 @@ public class StarterPanel extends JLayeredPane
 		//mvalt.setMinimumSize(new Dimension(mvalt.getPreferredSize().width/4, mvalt.getPreferredSize().height/4));
 		mvalt.setEditable(false);
 		
-		JLabel typel = new JLabel(arg.getTypename()!=null? arg.getTypename(): "undefined");
+		JLabel typel = new JLabel(arg.getClassname()!=null? arg.getClassname(): "undefined");
 		
 		String description = arg.getDescription();
 		if(description!=null)

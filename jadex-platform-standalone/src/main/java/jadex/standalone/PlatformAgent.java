@@ -54,14 +54,14 @@ import jadex.micro.annotation.RequiredServices;
 })
 
 @Arguments({
-	@Argument(name="platformname", typename="String", defaultvalue="\"jadex\""),
-	@Argument(name="saveonexit", typename="boolean", defaultvalue="true"),
-	@Argument(name="simulation", typename="boolean", defaultvalue="false"),
-	@Argument(name="libpath", typename="String[]"),
-	@Argument(name="tcpport", typename="int", defaultvalue="9876"),
-	@Argument(name="niotcpport", typename="int", defaultvalue="8765"),
-	@Argument(name="awaincludes", typename="String", defaultvalue="\"\""),
-	@Argument(name="awaexcludes", typename="String", defaultvalue="\"\"")
+	@Argument(name="platformname", clazz=String.class, defaultvalue="\"jadex\""),
+	@Argument(name="saveonexit", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="simulation", clazz=boolean.class, defaultvalue="false"),
+	@Argument(name="libpath", clazz=String[].class),
+	@Argument(name="tcpport", clazz=int.class, defaultvalue="9876"),
+	@Argument(name="niotcpport", clazz=int.class, defaultvalue="8765"),
+	@Argument(name="awaincludes", clazz=String.class, defaultvalue="\"\""),
+	@Argument(name="awaexcludes", clazz=String.class, defaultvalue="\"\"")
 })
 
 @ComponentTypes({

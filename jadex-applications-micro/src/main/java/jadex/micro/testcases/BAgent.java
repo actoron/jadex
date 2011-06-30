@@ -24,7 +24,7 @@ import java.util.List;
  */
 @ProvidedServices(@ProvidedService(type=IBService.class, implementation=@Implementation(expression="$component")))
 //@Results(@Result(name="exception", typename="Exception"))
-@Results(@Result(name="testcases", typename="List"))
+@Results(@Result(name="testcases", clazz=List.class))
 public class BAgent extends MicroAgent implements IBService
 {
 	@ServiceComponent

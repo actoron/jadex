@@ -19,7 +19,7 @@
 	
 	<arguments>
 		<!-- The number of messages to send by the sender. -->
-		<argument name="message_number" typename="Integer">1000</argument>
+		<argument name="message_number" class="Integer">1000</argument>
 	</arguments>
 	
 	<componenttypes>

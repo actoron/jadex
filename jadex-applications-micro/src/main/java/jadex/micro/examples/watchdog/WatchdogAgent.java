@@ -29,7 +29,7 @@ import java.util.Map;
 @ProvidedServices(@ProvidedService(type=IWatchdogService.class, implementation=@Implementation(expression="$component")))
 @RequiredServices(@RequiredService(name="watchdogs", type=IWatchdogService.class, multiple=true,
 	binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL, dynamic=true)))
-@Arguments(@Argument(typename="long", name="delay", description="Delay between pings.", defaultvalue="3000"))
+@Arguments(@Argument(clazz=long.class, name="delay", description="Delay between pings.", defaultvalue="3000"))
 public class WatchdogAgent	extends MicroAgent	implements IWatchdogService
 {
 	//-------- attributes --------

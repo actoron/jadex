@@ -37,7 +37,7 @@ public class STestCenter
 								IArgument[]	results	= model.getResults();
 								for(int i=0; !istest && i<results.length; i++)
 								{
-									if(results[i].getName().equals("testresults") && results[i].getTypename().equals("Testcase"))
+									if(results[i].getName().equals("testresults") && results[i].getClassname().equals("Testcase"))
 										istest	= true;
 								}
 							}

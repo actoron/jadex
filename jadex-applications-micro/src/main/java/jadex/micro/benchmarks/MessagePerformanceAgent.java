@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.MessageType;
+import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.commons.future.DefaultResultListener;
 import jadex.micro.MicroAgent;
@@ -133,24 +134,8 @@ public class MessagePerformanceAgent extends MicroAgent
 		return new MicroAgentMetaInfo("This agents benchmarks agent message sending.", 
 			new String[0], new IArgument[]
 			{
-				new IArgument()
+				new Argument("max", "Maximum number of messages to send.", "Integer", new Integer(1000))
 				{
-					public Object getDefaultValue(String configname)
-					{
-						return new Integer(1000);
-					}
-					public String getDescription()
-					{
-						return "Maximum number of messages to send.";
-					}
-					public String getName()
-					{
-						return "max";
-					}
-					public String getTypename()
-					{
-						return "Integer";
-					}
 					public boolean validate(String input)
 					{
 						boolean ret = true;
@@ -165,24 +150,8 @@ public class MessagePerformanceAgent extends MicroAgent
 						return ret;
 					}
 				},
-				new IArgument()
+				new Argument("codec", "Use content codec for message content.", "boolean", Boolean.FALSE)
 				{
-					public Object getDefaultValue(String configname)
-					{
-						return Boolean.FALSE;
-					}
-					public String getDescription()
-					{
-						return "Use content codec for message content.";
-					}
-					public String getName()
-					{
-						return "codec";
-					}
-					public String getTypename()
-					{
-						return "boolean";
-					}
 					public boolean validate(String input)
 					{
 						boolean ret = true;

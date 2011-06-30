@@ -12,7 +12,7 @@ import jadex.micro.annotation.Description;
  */
 @Description("This agent prints out a hello message.")
 @Arguments(@Argument(name="welcome text", description= "This parameter is the text printed by the agent.", 
-	typename="String", defaultvalue="\"Hello world, this is a Jadex micro agent.\""))
+	clazz=String.class, defaultvalue="\"Hello world, this is a Jadex micro agent.\""))
 public class HelloWorldAgent extends MicroAgent
 {
 	//-------- methods --------

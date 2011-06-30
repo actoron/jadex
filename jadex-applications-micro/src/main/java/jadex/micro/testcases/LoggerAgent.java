@@ -22,7 +22,7 @@ import java.util.logging.LogRecord;
  *  A minimal test case agent serving as a demonstrator.
  */
 @Description("Tests the logger.")
-@Results(@Result(name="testresults", description= "The test results.", typename="Testcase"))
+@Results(@Result(name="testresults", description= "The test results.", clazz=Testcase.class))
 @RequiredServices({@RequiredService(name="clockservice", type=IClockService.class, 
 	binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))})
 public class LoggerAgent extends MicroAgent

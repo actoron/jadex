@@ -33,7 +33,7 @@ import java.util.Map;
  *  (problem is that component a has finished its init but must execute the service call for sb)
  */
 @Description("Test if services of (earlier) sibling components can be found and used.")
-@Results(@Result(name="testresults", typename="Testcase"))
+@Results(@Result(name="testresults", clazz=Testcase.class))
 @ComponentTypes({
     @ComponentType(name="a", filename="AAgent.class"),
     @ComponentType(name="b", filename="BAgent.class")

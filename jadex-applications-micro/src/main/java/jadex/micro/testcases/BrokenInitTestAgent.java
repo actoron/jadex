@@ -20,7 +20,7 @@ import jadex.micro.annotation.Results;
  *  Testing broken init.
  */
 @Description("Testing broken init.")
-@Results(@Result(name="testresults", typename="Testcase"))
+@Results(@Result(name="testresults", clazz=Testcase.class))
 @RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class))
 public class BrokenInitTestAgent extends MicroAgent
 {
