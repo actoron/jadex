@@ -47,6 +47,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.kernelbase.AbstractInterpreter;
@@ -222,7 +223,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	// Constructor for self-contained bpmn components
 	public BpmnInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, MBpmnModel model, Map arguments, 
 		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
-		IValueFetcher fetcher, RequiredServiceBinding[] bindings, Future inited)
+		IValueFetcher fetcher, RequiredServiceBinding[] bindings, final Future inited)
 	{
 		super(desc, model.getModelInfo(), config, factory, parent, arguments, bindings, inited);
 		this.inited = inited;
@@ -235,6 +236,22 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 			{
 				executeInitStep2();
 				return null;
+			}
+		}).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object result){}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				if(inited.isDone())
+				{
+					// Exception after init finished!?
+					exception.printStackTrace();
+				}
+				else
+				{
+					inited.setException(exception);
+				}
 			}
 		});
 	}
@@ -429,8 +446,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 				initContextVariables();
 
 				inited.setResult(new Object[]{BpmnInterpreter.this, adapter});
-				
-				super.customResultAvailable(result);
 			}
 		}));
 	}
