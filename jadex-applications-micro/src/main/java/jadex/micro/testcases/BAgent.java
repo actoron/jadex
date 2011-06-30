@@ -39,8 +39,8 @@ public class BAgent extends MicroAgent implements IBService
 		final List tests = new ArrayList();
 
 		final Future ret = new Future();
-		SServiceProvider.getService(access.getServiceContainer(), IAService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(access.createResultListener(new IResultListener()
+		access.getServiceContainer().searchService(IAService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -75,7 +75,7 @@ public class BAgent extends MicroAgent implements IBService
 				setResultValue("testcases", tests);
 				ret.setResult(null);
 			}
-		}));
+		});
 		
 		return ret;
 	}

@@ -383,58 +383,113 @@ public class CacheServiceContainer	implements IServiceContainer
 	 */
 	public IService getProvidedService(String name)
 	{
-		return null;
+		throw new UnsupportedOperationException();
 	}
 	
 	public IService[] getProvidedServices(Class clazz)
 	{
-		return null;
+		throw new UnsupportedOperationException();
 	}
 	
 	public RequiredServiceInfo[] getRequiredServiceInfos()
 	{
-		return null;
+		throw new UnsupportedOperationException();
 	}
 	
 	public void setRequiredServiceInfos(RequiredServiceInfo[] requiredservices)
 	{
+		throw new UnsupportedOperationException();
 	}
 	
 	public void addRequiredServiceInfos(RequiredServiceInfo[] requiredservices)
 	{
+		throw new UnsupportedOperationException();
 	}
 
 
 	public IFuture getRequiredService(String name)
 	{
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	public IIntermediateFuture getRequiredServices(String name)
 	{
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	public IFuture getRequiredService(String name, boolean rebind)
 	{
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
 	{
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	public void addInterceptor(IServiceInvocationInterceptor interceptor, Object service, int pos)
 	{
+		throw new UnsupportedOperationException();
 	}
 
 	public void removeInterceptor(IServiceInvocationInterceptor interceptor, Object service)
 	{
+		throw new UnsupportedOperationException();
 	}
 	
 	public IServiceInvocationInterceptor[] getInterceptors(Object service)
 	{
-		return null;
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public IFuture searchService(Class type)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public IFuture searchService(Class type, String scope)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	// todo: remove
+	/**
+	 *  Get one service of a type and only search upwards (parents).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public IFuture searchServiceUpwards(Class type)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public IIntermediateFuture searchServices(Class type)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public IIntermediateFuture searchServices(Class type, String scope)
+	{
+		throw new UnsupportedOperationException();
 	}
 }

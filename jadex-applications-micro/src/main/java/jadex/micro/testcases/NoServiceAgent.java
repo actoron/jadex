@@ -21,8 +21,7 @@ public class NoServiceAgent extends MicroAgent
 	{
 		final TestReport	tr	= new TestReport("#1", "Searching for services.");
 		
-		SServiceProvider.getServices(getServiceContainer(), INoService.class).addResultListener(
-			createResultListener(new IResultListener()
+		getServiceContainer().searchServices(INoService.class).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -44,7 +43,7 @@ public class NoServiceAgent extends MicroAgent
 				setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
 				killAgent();
 			}
-		}));
+		});
 	}
 	
 	/** Test service interface. */

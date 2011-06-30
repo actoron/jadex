@@ -37,16 +37,16 @@ public class UserAgent extends MicroAgent
 		});
 		
 		// get remote management service 
-		SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
-			.addResultListener(createResultListener(new IResultListener()
+		getServiceContainer().searchServiceUpwards(IComponentManagementService.class)
+			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				final IComponentManagementService cms = (IComponentManagementService)result;
 				
 				// get remote management service and fetch service via rms.getProxy()
-				SServiceProvider.getService(getServiceContainer(), IRemoteServiceManagementService.class)
-					.addResultListener(createResultListener(new IResultListener()
+				getServiceContainer().searchService(IRemoteServiceManagementService.class)
+					.addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -74,17 +74,17 @@ public class UserAgent extends MicroAgent
 					{
 						lis.resultAvailable(null);
 					}
-				}));
+				});
 			}
 			public void exceptionOccurred(Exception exception)
 			{
 				lis.resultAvailable(null);
 			}
-		}));
+		});
 		
 		// search on local platform and find service via ProxyAgent to other platform
-		SServiceProvider.getService(getServiceContainer(), IMathService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-			.addResultListener(createResultListener(new IResultListener()
+		getServiceContainer().searchService(IMathService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -96,7 +96,7 @@ public class UserAgent extends MicroAgent
 			{
 				lis.resultAvailable(null);
 			}
-		}));
+		});
 	}
 	
 	/**

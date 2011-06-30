@@ -10,6 +10,7 @@ import jadex.bridge.service.ISearchManager;
 import jadex.bridge.service.IVisitDecider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.component.ComponentFuture;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -241,6 +242,57 @@ public class RemoteServiceContainer extends BasicServiceContainer
 	public void removeService(Class type, Object service)
 	{
 		throw new UnsupportedOperationException("Unsupported operation on remote container.");
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public IFuture searchService(Class type)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public IFuture searchService(Class type, String scope)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	// todo: remove
+	/**
+	 *  Get one service of a type and only search upwards (parents).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public IFuture searchServiceUpwards(Class type)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public IIntermediateFuture searchServices(Class type)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public IIntermediateFuture searchServices(Class type, String scope)
+	{
+		throw new UnsupportedOperationException();
 	}
 		
 	/**

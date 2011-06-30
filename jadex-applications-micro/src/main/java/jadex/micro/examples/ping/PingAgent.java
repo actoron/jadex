@@ -23,7 +23,7 @@ public class PingAgent extends MicroAgent
 		if((SFipa.QUERY_IF.equals(perf) || SFipa.QUERY_REF.equals(perf)) 
 			&& "ping".equals(msg.get(SFipa.CONTENT)))
 		{
-			createReply(msg, mt).addResultListener(createResultListener(new DefaultResultListener()
+			createReply(msg, mt).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -33,7 +33,7 @@ public class PingAgent extends MicroAgent
 					reply.put(SFipa.SENDER, getComponentIdentifier());
 					sendMessage(reply, mt);
 				}
-			}));
+			});
 		}
 		else
 		{

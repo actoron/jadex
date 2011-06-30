@@ -37,7 +37,7 @@ public class MessagePerformanceAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		getTime().addResultListener(createResultListener(new DefaultResultListener()
+		getTime().addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -101,7 +101,7 @@ public class MessagePerformanceAgent extends MicroAgent
 				
 				send.execute(MessagePerformanceAgent.this);
 			}
-		}));
+		});
 	}
 	
 	/**
@@ -113,7 +113,7 @@ public class MessagePerformanceAgent extends MicroAgent
 		final int msgcnt = ((Integer)getArgument("max")).intValue();
 		if(received==msgcnt)
 		{
-			getTime().addResultListener(createResultListener(new DefaultResultListener()
+			getTime().addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -121,7 +121,7 @@ public class MessagePerformanceAgent extends MicroAgent
 					System.out.println("Sending/receiving " + msgcnt + " messages took: " + dur + " milliseconds.");
 					killAgent();
 				}
-			}));
+			});
 		}
 	}
 	

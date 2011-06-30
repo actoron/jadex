@@ -52,7 +52,7 @@ public class MegaParallelStarterAgent extends MicroAgent
 		System.out.println("Created starter: "+getComponentIdentifier());
 		this.subname = "peer";
 		
-		getClock().addResultListener(createResultListener(new DefaultResultListener()
+		getClock().addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -61,7 +61,7 @@ public class MegaParallelStarterAgent extends MicroAgent
 				
 				final int max = ((Integer)args.get("max")).intValue();
 				
-				getCMS().addResultListener(createResultListener(new DefaultResultListener()
+				getCMS().addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -78,7 +78,7 @@ public class MegaParallelStarterAgent extends MicroAgent
 								{
 									if(--agents==0)
 									{
-										getClock().addResultListener(createResultListener(new DefaultResultListener()
+										getClock().addResultListener(new DefaultResultListener()
 										{
 											public void resultAvailable(final Object result)
 											{
@@ -101,7 +101,7 @@ public class MegaParallelStarterAgent extends MicroAgent
 												setResultValue("micromem", new Tuple(""+upera, "kb"));
 												killComponent();
 											}
-										}));
+										});
 									}
 								}
 							})).addResultListener(createResultListener(new DefaultResultListener()
@@ -110,7 +110,7 @@ public class MegaParallelStarterAgent extends MicroAgent
 								{
 									if(++agents==max)
 									{
-										getClock().addResultListener(createResultListener(new DefaultResultListener()
+										getClock().addResultListener(new DefaultResultListener()
 										{
 											public void resultAvailable(final Object result)
 											{
@@ -128,15 +128,15 @@ public class MegaParallelStarterAgent extends MicroAgent
 												killstarttime = clock.getTime();
 												deletePeers(max);
 											}
-										}));
+										});
 									}
 								}
 							}));
 						}
 					}
-				}));
+				});
 			}
-		}));
+		});
 	}
 
 	/**
@@ -147,7 +147,7 @@ public class MegaParallelStarterAgent extends MicroAgent
 	{
 		final String name = subname+"_#"+cnt;
 //		System.out.println("Destroying peer: "+name);
-		getCMS().addResultListener(createResultListener(new DefaultResultListener()
+		getCMS().addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(final Object result)
 			{
@@ -172,7 +172,7 @@ public class MegaParallelStarterAgent extends MicroAgent
 				IFuture ret = cms.destroyComponent(aid);
 				ret.addResultListener(lis);
 			}
-		}));
+		});
 	}
 	
 	protected IFuture	getCMS()
@@ -180,7 +180,7 @@ public class MegaParallelStarterAgent extends MicroAgent
 		IFuture cms = null;	// Uncomment for no caching.
 		if(cms==null)
 		{
-			cms	= SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class); // Raw service
+			cms	= getServiceContainer().searchServiceUpwards(IComponentManagementService.class); // Raw service
 //			cms	= getRequiredService("cmsservice");	// Required service proxy
 		}
 		return cms;
@@ -192,7 +192,7 @@ public class MegaParallelStarterAgent extends MicroAgent
 		IFuture clock = null;	// Uncomment for no caching.
 		if(clock==null)
 		{
-			clock	= SServiceProvider.getServiceUpwards(getServiceProvider(), IClockService.class); // Raw service
+			clock	= getServiceContainer().searchServiceUpwards(IClockService.class); // Raw service
 //			clock	= getRequiredService("clockservice");	// Required service proxy
 		}
 		return clock;

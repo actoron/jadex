@@ -246,4 +246,55 @@ public class ServiceContainerProxy implements IServiceContainer
 	{
 		interpreter.getServiceContainer().addRequiredServiceInfos(requiredservices);
 	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public IFuture searchService(Class type)
+	{
+		return interpreter.getServiceContainer().searchService(type);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public IFuture searchService(Class type, String scope)
+	{
+		return interpreter.getServiceContainer().searchService(type, scope);
+	}
+	
+	// todo: remove
+	/**
+	 *  Get one service of a type and only search upwards (parents).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public IFuture searchServiceUpwards(Class type)
+	{
+		return interpreter.getServiceContainer().searchServiceUpwards(type);
+	}
+
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public IIntermediateFuture searchServices(Class type)
+	{
+		return interpreter.getServiceContainer().searchServices(type);
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public IIntermediateFuture searchServices(Class type, String scope)
+	{
+		return interpreter.getServiceContainer().searchServices(type, scope);
+	}
 }

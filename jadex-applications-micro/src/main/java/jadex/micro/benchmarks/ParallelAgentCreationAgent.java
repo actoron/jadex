@@ -35,12 +35,12 @@ public class ParallelAgentCreationAgent extends MicroAgent
 		final int num	= ((Integer)arguments.get("num")).intValue();
 		if(num>0)
 		{
-			SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
+			getServiceContainer().searchServiceUpwards(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
 					final IComponentManagementService	cms	= (IComponentManagementService)result;
-					SServiceProvider.getService(getServiceContainer(), IClockService.class).addResultListener(createResultListener(new DefaultResultListener()
+					getServiceContainer().searchService(IClockService.class).addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -169,9 +169,9 @@ public class ParallelAgentCreationAgent extends MicroAgent
 									.addResultListener(creationlis);
 							}
 						}
-					}));
+					});
 				}
-			}));
+			});
 		}
 	}
 

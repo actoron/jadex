@@ -52,7 +52,7 @@ public class AgentCreationAgent extends MicroAgent
 //			{
 //				public Object execute(IInternalAccess ia)
 //				{
-					getClock().addResultListener(createResultListener(new DefaultResultListener()
+					getClock().addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -71,7 +71,7 @@ public class AgentCreationAgent extends MicroAgent
 							
 							step1(args);
 						}
-					}));
+					});
 //					return null;
 //				}
 //			});
@@ -98,18 +98,18 @@ public class AgentCreationAgent extends MicroAgent
 			args.put("num", new Integer(num+1));
 //			System.out.println("Args: "+num+" "+args);
 
-			getCMS().addResultListener(createResultListener(new DefaultResultListener()
+			getCMS().addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
 					((IComponentManagementService)result).createComponent(createPeerName(num+1, getComponentIdentifier()), AgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class",
 						new CreationInfo(args, nested ? getComponentIdentifier() : null), null);
 				}
-			}));
+			});
 		}
 		else
 		{
-			getClock().addResultListener(createResultListener(new DefaultResultListener()
+			getClock().addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -143,7 +143,7 @@ public class AgentCreationAgent extends MicroAgent
 					// If nested, use initial component to kill others
 //					else
 					{
-						getCMS().addResultListener(createResultListener(new DefaultResultListener()
+						getCMS().addResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
@@ -160,10 +160,10 @@ public class AgentCreationAgent extends MicroAgent
 									}
 								}));
 							}
-						}));
+						});
 					}
 				}
-			}));
+			});
 		}
 	}
 
@@ -297,7 +297,7 @@ public class AgentCreationAgent extends MicroAgent
 		IFuture ret = null;	// Uncomment for no caching.
 		if(ret==null)
 		{
-			ret	= SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class); // Raw service
+			ret	= getServiceContainer().searchServiceUpwards(IComponentManagementService.class); // Raw service
 //			cms	= getRequiredService("cmsservice");	// Required service proxy
 		}
 		return ret;
@@ -309,7 +309,7 @@ public class AgentCreationAgent extends MicroAgent
 		IFuture ret = null;	// Uncomment for no caching.
 		if(ret==null)
 		{
-			ret	= SServiceProvider.getServiceUpwards(getServiceProvider(), IClockService.class); // Raw service
+			ret	= getServiceContainer().searchServiceUpwards(IClockService.class); // Raw service
 //			clock	= getRequiredService("clockservice");	// Required service proxy
 		}
 		return ret;

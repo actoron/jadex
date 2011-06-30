@@ -25,7 +25,7 @@ public class UserAgent extends MicroAgent
 			public void resultAvailable(Object result)
 			{
 				IAddService addser = (IAddService)result;
-				addser.add(1, 1).addResultListener(createResultListener(new IResultListener()
+				addser.add(1, 1).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -36,7 +36,7 @@ public class UserAgent extends MicroAgent
 					{
 						System.out.println("invocation failed: "+exception);
 					}
-				}));
+				});
 			}
 		});
 	}

@@ -259,22 +259,21 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new DefaultResultListener()
+		getServiceContainer().searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				IClockService cs = (IClockService)result;
 				ret.setResult(new Long(cs.getTime()));
 			}
-		}));
+		});
 		
 		return ret;
 	}
 	
 	// for debugging.
-	protected long	longtime	= 0;
-	
+//	protected long	longtime	= 0;
 	/**
 	 *  Wait for an specified amount of time.
 	 *  @param time The time.
@@ -282,11 +281,11 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public IFuture waitFor(final long time, final IComponentStep run)
 	{
-		longtime	= Math.max(longtime, time);
+//		longtime	= Math.max(longtime, time);
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new IResultListener()
+		getServiceContainer().searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -314,7 +313,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 			{
 				ret.setException(exception);
 			}
-		}));
+		});
 		
 		return ret;
 	}
@@ -327,8 +326,8 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new IResultListener()
+		getServiceContainer().searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -351,7 +350,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 			{
 				ret.setException(exception);
 			}
-		}));
+		});
 		
 		return ret;
 	}
@@ -371,15 +370,15 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	public IFuture killAgent()
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new DefaultResultListener()
+		getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 				cms.destroyComponent(getComponentIdentifier()).addResultListener(new DelegationResultListener(ret));
 			}
-		}));
+		});
 		return ret;
 	}
 		

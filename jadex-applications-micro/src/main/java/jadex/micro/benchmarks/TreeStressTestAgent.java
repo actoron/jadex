@@ -23,8 +23,8 @@ public class TreeStressTestAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
-			.addResultListener(createResultListener(new IResultListener()
+		getServiceContainer().searchServiceUpwards(IComponentManagementService.class)
+			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -52,7 +52,7 @@ public class TreeStressTestAgent extends MicroAgent
 			{
 				exception.printStackTrace();
 			}
-		}));
+		});
 	}
 	
 	/**

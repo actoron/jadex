@@ -127,37 +127,39 @@ public interface IServiceContainer extends IServiceProvider
 	 */
 	public IServiceInvocationInterceptor[] getInterceptors(Object service);
 	
-//	/**
-//	 *  Add a provided service interceptor (at first position in the chain).
-//	 *  @param clazz The interface of the provided service.
-//	 *  @param pos The position in the chain (0=first).
-//	 *  @param interceptor The interceptor.
-//	 *  @return Null using future when done.
-//	 */
-//	public IFuture addProvidedServiceInterceptor(Class clazz, IServiceInvocationInterceptor interceptor, int pos);
-//	
-//	/**
-//	 *  Remove a provided service interceptor.
-//	 *  @param clazz The interface of the provided service.
-//	 *  @param interceptor The interceptor.
-//	 *  @return Null using future when done.
-//	 */
-//	public IFuture removeProvidedServiceInterceptor(Class clazz, IServiceInvocationInterceptor interceptor);
-//
-//	/**
-//	 *  Add a required service interceptor (at first position in the chain).
-//	 *  @param name The name of the required service.
-//	 *  @param pos The position in the chain (0=first).
-//	 *  @param interceptor The interceptor.
-//	 *  @return Null using future when done.
-//	 */
-//	public IFuture addRequiredServiceInterceptor(String name, IServiceInvocationInterceptor interceptor, int pos);
-//	
-//	/**
-//	 *  Remove a required service interceptor.
-//	 *  @param clazz The interface of the provided service.
-//	 *  @param interceptor The interceptor.
-//	 *  @return Null using future when done.
-//	 */
-//	public IFuture removeRequiredServiceInterceptor(String name, IServiceInvocationInterceptor interceptor);
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public IFuture searchService(Class type);
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public IFuture searchService(Class type, String scope);
+	
+	// todo: remove
+	/**
+	 *  Get one service of a type and only search upwards (parents).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public IFuture searchServiceUpwards(Class type);
+
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public IIntermediateFuture searchServices(Class type);
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public IIntermediateFuture searchServices(Class type, String scope);
 }

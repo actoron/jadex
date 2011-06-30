@@ -31,8 +31,8 @@ public class ResultAgent extends MicroAgent
 		{
 			setResultValue("result", "not last: "+getAgentName()+": "+Math.random());
 			
-			SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
-				.addResultListener(createResultListener(new DefaultResultListener()
+			getServiceContainer().searchService(IComponentManagementService.class)
+				.addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -64,7 +64,7 @@ public class ResultAgent extends MicroAgent
 						}
 					});
 				}
-			}));
+			});
 		}
 	}
 	

@@ -53,8 +53,7 @@ public class WatchdogAgent	extends MicroAgent	implements IWatchdogService
 			{
 				final IComponentStep	step	= this;
 				Object[]	keys	= watchdogs.keySet().toArray();
-				final IResultListener	crl	= new CounterResultListener(keys.length,
-					createResultListener(new IResultListener()
+				final IResultListener	crl	= new CounterResultListener(keys.length, new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -90,7 +89,7 @@ public class WatchdogAgent	extends MicroAgent	implements IWatchdogService
 					{
 						throw exception instanceof RuntimeException ? (RuntimeException)exception : new RuntimeException(exception);
 					}
-				}));
+				});
 
 				// Ping known watchdogs
 //				System.out.println("Pinging: "+SUtil.arrayToString(keys));

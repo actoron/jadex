@@ -152,8 +152,8 @@ public class ServicePoolManager
 			searching	= true;
 			
 			// Start timer to be triggered when search is not finished after 1 second.
-			SServiceProvider.getService(component.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(component.createResultListener(new IResultListener()
+			component.getServiceContainer().searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -186,11 +186,11 @@ public class ServicePoolManager
 				{
 					// No timeout supported; ignore
 				}
-			}));
+			});
 			
 //			System.out.println("wurksn0");
 			component.getServiceContainer().getRequiredServices(name).addResultListener(
-				component.createResultListener(new IIntermediateResultListener()
+				new IIntermediateResultListener()
 			{
 				/**
 				 *  A service has been found.
@@ -257,7 +257,7 @@ public class ServicePoolManager
 					// ignored
 //					System.out.println("wurksnrr");
 				}
-			}));
+			});
 		}
 	}
 	

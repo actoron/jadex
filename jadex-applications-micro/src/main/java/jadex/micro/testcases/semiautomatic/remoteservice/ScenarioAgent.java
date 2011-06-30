@@ -18,8 +18,7 @@ public class ScenarioAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		SServiceProvider.getService(getServiceContainer(), ILibraryService.class)
-			.addResultListener(createResultListener(new DefaultResultListener()
+		getServiceContainer().searchService(ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -43,6 +42,6 @@ public class ScenarioAgent extends MicroAgent
 					}
 				}));
 			}
-		}));
+		});
 	}
 }

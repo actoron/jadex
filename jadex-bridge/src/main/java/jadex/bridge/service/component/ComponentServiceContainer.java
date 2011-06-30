@@ -79,6 +79,57 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	}
 	
 	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public IFuture searchService(Class type)
+	{
+		return new ComponentFuture(ea, adapter, SServiceProvider.getService(this, type));
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public IFuture searchService(Class type, String scope)
+	{
+		return new ComponentFuture(ea, adapter, SServiceProvider.getService(this, type, scope));
+	}
+	
+	// todo: remove
+	/**
+	 *  Get one service of a type and only search upwards (parents).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public IFuture searchServiceUpwards(Class type)
+	{
+		return new ComponentFuture(ea, adapter, SServiceProvider.getServiceUpwards(this, type));
+	}
+
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public IIntermediateFuture searchServices(Class type)
+	{
+		return new ComponentIntermediateFuture(ea, adapter, SServiceProvider.getServices(this, type));
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public IIntermediateFuture searchServices(Class type, String scope)
+	{
+		return new ComponentIntermediateFuture(ea, adapter, SServiceProvider.getServices(this, type, scope));
+	}
+	
+	/**
 	 *  Get the parent service container.
 	 *  @return The parent container.
 	 */

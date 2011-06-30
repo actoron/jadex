@@ -75,15 +75,14 @@ public class PingingAgent extends MicroAgent
 		
 		if(receiver==null)
 		{
-			createComponentIdentifier("Ping").addResultListener(
-				createResultListener(new DefaultResultListener()
+			createComponentIdentifier("Ping").addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
 					receiver = (IComponentIdentifier)result;
 					scheduleStep(step);
 				}
-			}));
+			});
 		}
 		else
 		{

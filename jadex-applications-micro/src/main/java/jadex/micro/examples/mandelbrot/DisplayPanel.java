@@ -358,6 +358,7 @@ public class DisplayPanel extends JComponent
 																{
 																	IExternalAccess	ea	= (IExternalAccess)result;
 																	// It is not really possible to define the progress services as required service.
+																	// Needs component specific progress service.
 																	SServiceProvider.getService(ea.getServiceProvider(), IProgressService.class)
 																		.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 																	{
