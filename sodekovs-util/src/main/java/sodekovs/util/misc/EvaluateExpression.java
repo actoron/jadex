@@ -1,10 +1,9 @@
 package sodekovs.util.misc;
 
-import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 
@@ -53,7 +52,7 @@ public class EvaluateExpression {
 	 * @param expression
 	 * @return
 	 */
-	public static boolean evaluateExpression(IValueFetcher fetcher, String expression) {
+	public static boolean evaluateExpression(jadex.commons.IValueFetcher fetcher, String expression) {
 		// String expression = "$object.getProperty(\"ore\") >= 10";
 		Object val = SJavaParser.evaluateExpression(expression, fetcher);
 

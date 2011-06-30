@@ -1,7 +1,8 @@
 package sodekovs.util.misc;
 
-import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 
 /**
  * Class for helper methods regarding BDI Agents
@@ -18,10 +19,10 @@ public class AgentMethods {
 	 * @return
 	 */
 	public static IComponentIdentifier getIComponentIdentifier(AbstractEnvironmentSpace space, String agentType) {
+	
+		for (IComponentDescription agentIdentifier : space.getComponents()) {			
+			if (agentIdentifier.getLocalType().equals(agentType)) {						
 
-		for (IComponentIdentifier agentIdentifier : space.getComponents()) {
-			if (space.getContext().getComponentType(agentIdentifier).equals(agentType)) {
-				return agentIdentifier;
 			}
 		}
 		System.err.println("#AgentMethods:getICompIdent# Error on finding IComponentIdentifier for " + agentType);

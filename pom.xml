@@ -562,6 +562,7 @@
 				<module>sodekovs-benchmarking</module>
 				<module>sodekovs-util</module>
 				<module>sodekovs-productionline</module>
+				<module>sodekovs-applications</module>
 				<module>jadex-distributed</module>
 			</modules>
 		</profile>

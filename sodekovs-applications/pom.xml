@@ -2,10 +2,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.sourceforge.jadex</groupId>
-	<artifactId>sodekovs-util</artifactId>
+	<artifactId>sodekovs-applications</artifactId>
 	<packaging>jar</packaging>
 	<version>2.0-rc7</version>
-	<name>sodekovs-util</name>
+	<name>sodekovs-applications</name>
 	<!-- <url>http://jadex.sourceforge.net</url> -->
 
 	<!--
@@ -106,6 +106,11 @@
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-extension-agr</artifactId>
+			<version>2.0-rc7</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>sodekovs-util</artifactId>
 			<version>2.0-rc7</version>
 		</dependency>	
 	</dependencies>
