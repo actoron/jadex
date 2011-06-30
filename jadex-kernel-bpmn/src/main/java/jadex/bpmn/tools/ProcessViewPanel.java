@@ -127,6 +127,8 @@ public class ProcessViewPanel extends JPanel
 			
 			public IFuture eventOccured(final IComponentChangeEvent cce)
 			{
+				System.out.println("event: "+cce);
+
 				// todo: hide decomposing bulk events
 				if(cce.getBulkEvents().length>0)
 				{
@@ -137,7 +139,7 @@ public class ProcessViewPanel extends JPanel
 					}
 					return IFuture.DONE;
 				}
-				
+								
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()

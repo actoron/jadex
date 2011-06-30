@@ -212,7 +212,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		{
 			ProcessThread	thread	= new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
 			context.addThread(thread);
-
 		}
 	}	
 		
@@ -229,7 +228,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		this.inited = inited;
 		this.variables	= new HashMap();
 		construct(model, activityhandlers, stephandlers);
-		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
 		
 		scheduleStep(new IComponentStep()
 		{

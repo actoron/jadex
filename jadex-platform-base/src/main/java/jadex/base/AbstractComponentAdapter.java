@@ -118,6 +118,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public AbstractComponentAdapter(IComponentDescription desc, IModelInfo model, IComponentInstance component, IExternalAccess parent)
 	{
+		System.out.println("created: "+desc);
 		this.desc = desc;
 		this.model = model;
 		this.component = component;
