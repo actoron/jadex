@@ -58,7 +58,7 @@ public class ComponentInstanceInfo extends Startable
 	//-------- methods --------
 	
 	/**
-	 *  Get the name.
+	 *  Get the name (expression).
 	 *  @return The name.
 	 */
 	public String getName()

@@ -160,7 +160,7 @@
 			</extensions>
 
 			<components>
-				<component type="Firefly" number="$args.number"/>
+				<component name="&quot;Firefly#&quot;+$n" type="Firefly" number="$args.number"/>
 			</components>
 		</configuration>
 		
@@ -208,7 +208,7 @@
 			</extensions>
 
 			<components>
-				<component type="Firefly" number="$args.number"/>
+				<component name="&quot;Firefly#&quot;+$n" type="Firefly" number="$args.number"/>
 			</components>
 		</configuration>
 		
@@ -226,7 +226,7 @@
 			</extensions>
 
 			<components>
-				<component type="Firefly" number="$args.number"/>
+				<component name="&quot;Firefly#&quot;+$n" type="Firefly" number="$args.number"/>
 			</components>
 		</configuration>
 		
@@ -244,7 +244,7 @@
 			</extensions>
 
 			<components>
-				<component type="Firefly" number="$args.number"/>
+				<component name="&quot;Firefly#&quot;+$n" type="Firefly" number="$args.number"/>
 			</components>
 		</configuration>
 	</configurations>

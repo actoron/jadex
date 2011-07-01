@@ -218,7 +218,7 @@
 			</extensions>
 
 			<components>
-				<component type="Heatbug" number="20"/>
+				<component name="&quot;Heatbug#&quot;+$n" type="Heatbug" number="20"/>
 				<!-- <agent type="Heatbug">
 					<arguments>
 						<argument name="ideal_temp">$args.ideal_temp</argument>
@@ -305,7 +305,7 @@
 			</extensions>
 
 			<components>
-				<component type="Heatbug" number="100"/>
+				<component name="&quot;Heatbug#&quot;+$n" type="Heatbug" number="100"/>
 			</components>
 		</configuration>
 		
@@ -358,7 +358,7 @@
 			</extensions>
 
 			<components>
-				<component type="Heatbug" number="300"/>
+				<component name="&quot;Heatbug#&quot;+$n" type="Heatbug" number="300"/>
 			</components>
 		</configuration>
 		
@@ -378,7 +378,7 @@
 			</extensions>
 
 			<components>
-				<component type="Heatbug" number="20"/>
+				<component name="&quot;Heatbug#&quot;+$n" type="Heatbug" number="20"/>
 			</components>
 		</configuration>
 		
@@ -398,7 +398,7 @@
 			</extensions>
 
 			<components>
-				<component type="Heatbug" number="100"/>
+				<component name="&quot;Heatbug#&quot;+$n" type="Heatbug" number="100"/>
 			</components>
 		</configuration>
 		
@@ -418,7 +418,7 @@
 			</extensions>
 
 			<components>
-				<component type="Heatbug" number="300"/>
+				<component name="&quot;Heatbug#&quot;+$n" type="Heatbug" number="300"/>
 			</components>
 		</configuration>
 	</configurations>

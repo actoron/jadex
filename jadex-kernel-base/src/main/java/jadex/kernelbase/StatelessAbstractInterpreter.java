@@ -48,6 +48,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
+import jadex.javaparser.SimpleValueFetcher;
 
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -1015,7 +1016,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					Boolean	daemon = components[i].getDaemon()!=null ? components[i].getDaemon() : type.getDaemon();
 					Boolean	autoshutdown = components[i].getAutoShutdown()!=null ? components[i].getAutoShutdown() : type.getAutoShutdown();
 					RequiredServiceBinding[] bindings = components[i].getBindings();
-					cms.createComponent(components[i].getName(), type.getName(),
+					cms.createComponent(getName(components[i], model, j+1), type.getName(),
 						new CreationInfo(components[i].getConfiguration(), getArguments(components[i], model), getComponentAdapter().getComponentIdentifier(),
 						suspend, master, daemon, autoshutdown, model.getAllImports(), bindings), null).addResultListener(crl);
 				}
@@ -1072,8 +1073,32 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
-		Object val = component.getNumber()!=null? SJavaParser.evaluateExpression(component.getNumber(), model.getAllImports(), getFetcher(), model.getClassLoader()): null;
-		return val instanceof Integer? ((Integer)val).intValue(): 1;
+		Object ret = component.getNumber()!=null? SJavaParser.evaluateExpression(component.getNumber(), model.getAllImports(), getFetcher(), model.getClassLoader()): null;
+		return ret instanceof Integer? ((Integer)ret).intValue(): 1;
+	}
+	
+	/**
+	 *  Get the name of components to start.
+	 *  @return The name.
+	 */
+	public String getName(ComponentInstanceInfo component, IModelInfo model, int cnt)
+	{
+		assert !getComponentAdapter().isExternalThread();
+		
+		String ret = component.getName();
+		if(ret!=null)
+		{
+			SimpleValueFetcher fetcher = new SimpleValueFetcher(getFetcher());
+			fetcher.setValue("$n", new Integer(cnt));
+			try
+			{
+				ret = (String)SJavaParser.evaluateExpression(component.getName(), model.getAllImports(), fetcher, model.getClassLoader());
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		return ret;
 	}
 
 	/**
