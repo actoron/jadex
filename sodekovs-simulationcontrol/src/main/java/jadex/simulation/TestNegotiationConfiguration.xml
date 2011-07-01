@@ -12,8 +12,8 @@
 	nameOfSpace="mycoordspace">
 	
 	<Imports>
-		<Import>jadex.application.space.envsupport.evaluation.*</Import>
-		<Import>jadex.application.space.envsupport.*</Import>
+		<Import>jadex.extension.envsupport.evaluation.*</Import>
+		<Import>jadex.extension.envsupport.*</Import>
 		<Import>jadex.simulation.evaluation.*</Import>
 	</Imports>
 

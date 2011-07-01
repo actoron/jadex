@@ -1,10 +1,10 @@
 package jadex.simulation.evaluation;
 
-import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.application.space.envsupport.evaluation.DataTable;
-import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
-import jadex.application.space.envsupport.evaluation.ITableDataProvider;
 import jadex.commons.SimplePropertyObject;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.extension.envsupport.evaluation.DataTable;
+import jadex.extension.envsupport.evaluation.ITableDataConsumer;
+import jadex.extension.envsupport.evaluation.ITableDataProvider;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.model.ObservedEvent;
 
@@ -40,8 +40,14 @@ public class SimulationDataConsumer extends SimplePropertyObject implements ITab
 	public void consumeData(long timestamp, double tick) {
 
 		// Things needed for the simulation
-		String experimentId = (String) getSpace().getContext().getArguments().get(Constants.EXPERIMENT_ID);
-		String appName = getSpace().getContext().getComponentIdentifier().getLocalName();
+								
+		String experimentId = (String) getSpace().getProperty(Constants.EXPERIMENT_ID);
+		
+//		String experimentId = (String) getSpace().getContext().getArguments().get(Constants.EXPERIMENT_ID);
+//		String appName = getSpace().getContext().getComponentIdentifier().getLocalName();		
+		String appName = getSpace().getExternalAccess().getComponentIdentifier().getLocalName();
+		
+		
 		ArrayList<ObservedEvent> observedEvents = new ArrayList<ObservedEvent>();
 //		IServiceContainer container = getSpace().getContext().getServiceContainer();
 //		IClockService clockservice = (IClockService) container.getService(IClockService.class);

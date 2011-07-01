@@ -35,6 +35,7 @@
 		<import>jadex.application.*</import>
 		<import>java.util.*</import>
 		<import>java.lang.reflect.*</import>
+		<import>jadex.benchmarking.services.*</import>
 	</imports>
 	
 	<arguments>
@@ -66,7 +67,8 @@
 		<componenttype filename="jadex/base/service/awareness/AwarenessAgent.class" name="awa"/>
 
 		<!-- <componenttype filename="jadex/tools/jcc/JCC.agent.xml" name="jcc"/> -->
-		<componenttype filename="jadex/tools/jcc/JCCAgent.class" name="jcc"/>
+		<!--<componenttype filename="jadex/tools/jcc/JCCAgent.class" name="jcc"/>-->
+		<componenttype filename="/jadex/benchmarking/viewer/JCCAgent.class" name="jcc"/>
 		<componenttype filename="jadex/bdi/benchmarks/AgentCreation.agent.xml" name="CreationBDI"/>
 		<componenttype filename="jadex/micro/benchmarks/AgentCreationAgent.class" name="CreationMicro"/>
 		<componenttype filename="jadex/micro/benchmarks/MegaParallelStarterAgent.class" name="CreationMicroParallel"/>
@@ -129,6 +131,11 @@
 		<providedservice class="IDF">
 			<implementation proxytype="raw">
 				new DirectoryFacilitatorService($component.getServiceProvider())
+			</implementation>
+		</providedservice>
+		<providedservice class="IBenchmarkingManagementService">
+		<implementation proxytype="raw">
+			new BenchmarkingManagementService($component.getServiceProvider())
 			</implementation>
 		</providedservice>
 		<providedservice class="ISimulationService">

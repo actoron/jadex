@@ -1,8 +1,5 @@
 package jadex.benchmarking.scheduler;
 
-import jadex.application.runtime.IApplicationExternalAccess;
-import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.runtime.Plan;
 import jadex.benchmarking.helper.Methods;
 import jadex.benchmarking.logger.ScheduleLogger;
@@ -13,10 +10,13 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +36,7 @@ public abstract class AbstractSchedulerPlan extends Plan {
 	// Space of System Under Test
 	protected AbstractEnvironmentSpace sutSpace = null;
 	// Exta of System Under Test
-	protected IApplicationExternalAccess sutExta = null;
+	protected IExternalAccess sutExta = null;
 	// List of sequences to be executed, ordered by starttime
 	protected ArrayList<Sequence> sortedSequenceList = null;
 	//Logs events of the schedule
@@ -54,7 +54,7 @@ public abstract class AbstractSchedulerPlan extends Plan {
 		} else if (action.getComponenttype().equalsIgnoreCase(GlobalConstants.BDI_AGENT)) {
 			for (int i = 0; i < action.getNumberOfComponents(); i++) {
 				// Get random required in order to avoid creating components with the same name/id.
-				cms.createComponent(action.getComponentname() + "-" + GetRandom.getRandom(100000), action.getComponentmodel(), new CreationInfo("", componentProperties, sutCID, false, false), null)
+				cms.createComponent(action.getComponentname() + "-" + GetRandom.getRandom(100000), action.getComponentmodel(), new CreationInfo(null, componentProperties, sutCID, false, false), null)
 						.addResultListener(new DefaultResultListener() {
 							public void resultAvailable(Object result) {
 								System.out.println("Created Component : " + " -> " + getTimestamp());

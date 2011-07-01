@@ -1,25 +1,25 @@
 package jadex.simulation.environment;
 
-import jadex.application.space.envsupport.dataview.IDataView;
-import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceExecutor;
-import jadex.application.space.envsupport.environment.ISpaceProcess;
-import jadex.application.space.envsupport.environment.SpaceObject;
-import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.ChangeEvent;
-import jadex.commons.IChangeListener;
-import jadex.commons.SimplePropertyObject;
-import jadex.commons.future.DefaultResultListener;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.clock.ITimedObject;
 import jadex.bridge.service.clock.ITimer;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
+import jadex.commons.SimplePropertyObject;
+import jadex.commons.future.DefaultResultListener;
+import jadex.extension.envsupport.dataview.IDataView;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceExecutor;
+import jadex.extension.envsupport.environment.ISpaceProcess;
+import jadex.extension.envsupport.environment.SpaceObject;
+import jadex.extension.envsupport.evaluation.ITableDataConsumer;
 import jadex.simulation.model.ObservedEvent;
 
 import java.util.ArrayList;
@@ -96,7 +96,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 		allObservedEventsMap = new ConcurrentHashMap<Long, ArrayList<ObservedEvent>>();
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
 		final boolean tick = getProperty("tick")!=null && ((Boolean)getProperty("tick")).booleanValue();
-		this.container	= space.getContext().getServiceContainer();
+		this.container	= space.getExternalAccess().getServiceProvider();
 		
 		SServiceProvider.getService(container, IClockService.class,RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
@@ -204,7 +204,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 //										System.out.println("scheduled step");
 										try
 										{
-											space.getContext().scheduleStep(step);
+											space.getExternalAccess().scheduleStep(step);
 										}
 										catch(ComponentTerminatedException cte)
 										{
@@ -233,7 +233,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 //								System.out.println("scheduled step");
 								try
 								{
-									space.getContext().scheduleStep(step);
+									space.getExternalAccess().scheduleStep(step);
 								}
 								catch(ComponentTerminatedException cte)
 								{

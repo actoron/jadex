@@ -6,10 +6,10 @@
 	<b>Production agents</b> produce ore at available ore location.<br> - <b>Carry 
 	agents</b> are able to carry ore to the base.<br><br> Objective is to carry 
 	as much ore as possible to the<br> home base in a predefined mission time.<br> -->
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:agr="http://jadex.sourceforge.net/jadex-agrspace" xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-agrspace 
 	                    http://jadex.sourceforge.net/jadex-agrspace-2.0.xsd
@@ -18,38 +18,38 @@
 	name="MarsWorld4SimulationExperiments" package="jadex.simulation.examples.marsworld">
 
 	<imports>
-		<import>jadex.application.space.envsupport.environment.space2d.*</import>
-		<import>jadex.application.space.envsupport.environment.DeltaTimeExecutor</import>
-		<import>jadex.application.space.envsupport.math.*</import>
-		<import>jadex.application.space.envsupport.dataview.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.environment.DeltaTimeExecutor</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.extension.envsupport.dataview.*</import>
+		<import>jadex.extension.envsupport.observer.perspective.*</import>
+		<import>jadex.extension.envsupport.evaluation.*</import>
+		<import>jadex.extension.envsupport.evaluation.XYChartDataConsumer</import>
+		<import>jadex.extension.envsupport.observer.gui.plugin.*</import>
 		<import>java.text.SimpleDateFormat</import>
-		<import>java.util.Date</import>
-		<import>jadex.application.space.envsupport.observer.perspective.*</import>
+		<import>java.util.Date</import>		
 		<import>jadex.simulation.examples.marsworld.carry.*</import>
 		<import>jadex.simulation.examples.marsworld.producer.*</import>
 		<import>jadex.simulation.examples.marsworld.sentry.*</import>
-		<import>jadex.simulation.examples.marsworld.movement.*</import>
-		<import>jadex.application.space.envsupport.evaluation.*</import>
-		<import>jadex.application.space.envsupport.observer.gui.plugin.*</import>
+		<import>jadex.simulation.examples.marsworld.movement.*</import>		
 		<import>jadex.bridge.service.clock.IClockService</import>
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.commons.future.*</import>
-		<import>jadex.simulation.environment.*</import>
-		<import>jadex.application.space.envsupport.evaluation.*</import>
+		<import>jadex.simulation.environment.*</import>		
 	</imports>
 
 	<arguments>
 		<!-- The mission time. -->
-		<argument name="tmp_mission_time" typename="String">"Init"</argument>
-		<argument name="tmp_start_time" typename="long"></argument>
-		<argument name="al" typename="Int">new Integer(258)</argument>
-		<argument name="simulationFacts" typename="Map" />
+		<argument name="tmp_mission_time" class="String">"Init"</argument>
+		<argument name="tmp_start_time" class="long"></argument>
+		<argument name="al" class="Int">new Integer(258)</argument>
+		<argument name="simulationFacts" class="Map" />
 		<!-- <argument name="nrr" typename="Int">new Integer(10)</argument> -->
-		<argument name="SentryNumber" typename="Int">new Integer(10)</argument>
-		<argument name="Experiment_id" typename="String">"not set"</argument>
+		<argument name="SentryNumber" class="Int">new Integer(10)</argument>
+		<argument name="Experiment_id" class="String">"not set"</argument>
 	</arguments>
-
-	<spacetypes>
+	 
+	<extensiontypes>
 		<agr:agrspacetype name="marsagrspace">
 			<agr:grouptype name="marsteam">
 				<agr:roles>
@@ -222,7 +222,7 @@
 				<env:property name="tick">true</env:property>
 			</env:spaceexecutor>
 		</env:envspacetype>
-	</spacetypes>
+	</extensiontypes>
 
 	<componenttypes>
 		<componenttype name="Sentry"
@@ -243,9 +243,9 @@
 		</property>
 	</properties>
 
-	<applications>
-		<application name="1 Sentry / 2 Producers / 3 Carries">
-			<spaces>
+	<configurations>
+		<configuration name="1 Sentry / 2 Producers / 3 Carries">
+			<extensions>
 				<agr:agrspace name="myagrspace" type="marsagrspace">
 					<agr:group name="mymarsteam" type="marsteam">
 						<agr:position role="sentry" componenttype="Sentry" />
@@ -317,7 +317,7 @@
 						</env:observer>
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 			<components>
 				<component type="Sentry" number="$args.NumberOfSentries" />
 				<component type="Producer" number="$args.NumberOfProducers" />
@@ -330,10 +330,10 @@
 					</arguments>
 				</component>
 			</components>
-		</application>
+		</configuration>
 
-		<application name="TestRemote">
-			<spaces>
+		<configuration name="TestRemote">
+			<extensions>
 				<agr:agrspace name="myagrspace" type="marsagrspace">
 					<agr:group name="mymarsteam" type="marsteam">
 						<agr:position role="sentry" componenttype="Sentry" />
@@ -405,16 +405,16 @@
 						</env:observer>
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 			<components>
 				<component type="Sentry" number="$args.NumberOfSentries" />
 				<component type="Producer" number="$args.NumberOfProducers" />
 				<component type="Carry" number="$args.NumberOfCarries" />			
 			</components>
-		</application>
+		</configuration>
 
-		<application name="Multi">
-			<spaces>
+		<configuration name="Multi">
+			<extensions>
 				<agr:agrspace name="myagrspace" type="marsagrspace">
 					<agr:group name="mymarsteam" type="marsteam">
 						<agr:position role="sentry" componenttype="Sentry" />
@@ -443,14 +443,14 @@
 							perspective="icons" />
 					</env:observers>
 				</env:envspace>
-			</spaces>
+			</extensions>
 
 			<components>
 				<component type="Sentry" number="2" />
 				<component type="Producer" number="5" />
 				<component type="Carry" number="10" />
 			</components>
-		</application>
-	</applications>
+		</configuration>
+	</configurations>
 
 </applicationtype>

@@ -3,9 +3,9 @@
  */
 package jadex.benchmarking.model;
 
-import jadex.application.runtime.IApplicationExternalAccess;
-import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 
 import java.util.ArrayList;
 
@@ -19,7 +19,7 @@ public class SuTinfo {
 	// Component Identifier of System Under Test
 	private IComponentIdentifier sutCID = null;
 	// Exta of System Under Test
-	private IApplicationExternalAccess sutExta = null;
+	private IExternalAccess sutExta = null;
 	// Space of System Under Test
 	private AbstractEnvironmentSpace sutSpace = null;
 	
@@ -30,7 +30,7 @@ public class SuTinfo {
 	 * @param sutExta
 	 * @param sutSpace
 	 */
-	public SuTinfo(ArrayList<Sequence> sortedSequenceList, IComponentIdentifier sutCID, IApplicationExternalAccess sutExta, AbstractEnvironmentSpace sutSpace) {
+	public SuTinfo(ArrayList<Sequence> sortedSequenceList, IComponentIdentifier sutCID, IExternalAccess sutExta, AbstractEnvironmentSpace sutSpace) {
 		super();
 		this.sortedSequenceList = sortedSequenceList;
 		this.sutCID = sutCID;
@@ -50,10 +50,10 @@ public class SuTinfo {
 	public void setSutCID(IComponentIdentifier sutCID) {
 		this.sutCID = sutCID;
 	}
-	public IApplicationExternalAccess getSutExta() {
+	public IExternalAccess getSutExta() {
 		return sutExta;
 	}
-	public void setSutExta(IApplicationExternalAccess sutExta) {
+	public void setSutExta(IExternalAccess sutExta) {
 		this.sutExta = sutExta;
 	}
 	public AbstractEnvironmentSpace getSutSpace() {

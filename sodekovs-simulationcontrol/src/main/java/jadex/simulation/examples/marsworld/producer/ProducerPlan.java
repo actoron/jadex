@@ -1,17 +1,17 @@
 package jadex.simulation.examples.marsworld.producer;
 
 import jadex.base.fipa.SFipa;
-import jadex.application.runtime.IApplicationExternalAccess;
-import jadex.application.space.agr.AGRSpace;
-import jadex.application.space.agr.Group;
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.simulation.examples.marsworld.RequestCarry;
-import jadex.simulation.examples.marsworld.RequestProduction;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.extension.agr.AGRSpace;
+import jadex.extension.agr.Group;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.simulation.examples.marsworld.RequestCarry;
+import jadex.simulation.examples.marsworld.RequestProduction;
 
 /**
  *  The main plan for the Producer Agent. <br>
@@ -65,7 +65,7 @@ public class ProducerPlan extends Plan
 	 */
 	protected void callCarryAgent(ISpaceObject target)
 	{
-		AGRSpace agrs = (AGRSpace)((IApplicationExternalAccess)getScope().getParent()).getSpace("myagrspace");
+		AGRSpace agrs = (AGRSpace)((IExternalAccess)getScope().getParent()).getExtension("myagrspace").get(this);		
 		Group group = agrs.getGroup("mymarsteam");
 		IComponentIdentifier[]	carriers	= group.getAgentsForRole("carrier");
 		

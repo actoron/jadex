@@ -1,14 +1,5 @@
 package jadex.simulation.client;
 
-import jadex.application.runtime.IApplicationExternalAccess;
-import jadex.application.space.envsupport.MEnvSpaceInstance;
-import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.application.space.envsupport.evaluation.AbstractChartDataConsumer;
-import jadex.application.space.envsupport.evaluation.DefaultDataProvider;
-import jadex.application.space.envsupport.evaluation.IObjectSource;
-import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
-import jadex.application.space.envsupport.evaluation.ITableDataProvider;
-import jadex.application.space.envsupport.evaluation.SpaceObjectSource;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
@@ -22,6 +13,14 @@ import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
+import jadex.extension.envsupport.MEnvSpaceType;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.extension.envsupport.evaluation.AbstractChartDataConsumer;
+import jadex.extension.envsupport.evaluation.DefaultDataProvider;
+import jadex.extension.envsupport.evaluation.IObjectSource;
+import jadex.extension.envsupport.evaluation.ITableDataConsumer;
+import jadex.extension.envsupport.evaluation.ITableDataProvider;
+import jadex.extension.envsupport.evaluation.SpaceObjectSource;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -66,11 +65,11 @@ public class RuntimeManagerPlan extends Plan {
 	 * External access of the application that is executed and observed by this
 	 * agent
 	 */
-	private IApplicationExternalAccess exta = null;
+	private IExternalAccess exta = null;
 	private IClockService clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 	private IComponentManagementService cms = null;
 	private OnlineVisualisation vis = null;
-	private String appFilePath = null;
+//	private String appFilePath = null;
 
 	public void body() {
 		HashMap<String,Object> clientConfMap = (HashMap<String, Object>) getParameter("clientConf").getValue();
@@ -84,7 +83,8 @@ public class RuntimeManagerPlan extends Plan {
 		System.out.println("#RumtimeManagerPlan# Startet Simulation Experiment Nr.:" + clientConfMap.get(Constants.EXPERIMENT_ID) + ") with Optimization Values: "
 				+ clientConfMap.get(Constants.CURRENT_PARAMETER_CONFIGURATION));
 
-		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) exta.getSpace(simConf.getNameOfSpace());
+		IFuture fut = exta.getExtension(simConf.getNameOfSpace());
+		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
 
 		// Determine terminate condition
 		// Time determines termination
@@ -134,7 +134,7 @@ public class RuntimeManagerPlan extends Plan {
 					}
 				} else {
 					IComponentIdentifier agentIdentifier = AgentMethods.getIComponentIdentifier(space, targetFunct.getObjectSource().getName());
-					IFuture fut = cms.getExternalAccess(agentIdentifier);
+					fut = cms.getExternalAccess(agentIdentifier);
 					IExternalAccess exta = (IExternalAccess) fut.get(this);
 
 					IOAVState state = ((ElementFlyweight) exta).getState();
@@ -165,8 +165,8 @@ public class RuntimeManagerPlan extends Plan {
 		vis.dispose();
 		
 		
-		FileHandler.deleteFile(appFilePath);
-		appFilePath = null;
+//		FileHandler.deleteFile(appFilePath);
+//		appFilePath = null;
 		
 
 		cms.destroyComponent(exta.getComponentIdentifier());
@@ -233,13 +233,13 @@ public class RuntimeManagerPlan extends Plan {
 	private void startApplication(Map appConf, HashMap<String,Object> clientConf, SimulationConfiguration simConf) {
 		
 		//store file application.xml
-		appFilePath = System.getProperty("user.dir") + "\\"+ simConf.getName()+ (String) clientConf.get(Constants.EXPERIMENT_ID)+ ".application.xml";
-		FileHandler.writeToFile(System.getProperty("user.dir"), simConf.getName()+ (String) clientConf.get(Constants.EXPERIMENT_ID)+ ".application.xml", (String) clientConf.get(Constants.APPLICATION_FILE_AS_XML_STRING));
+//		appFilePath = System.getProperty("user.dir") + "\\"+ simConf.getName()+ (String) clientConf.get(Constants.EXPERIMENT_ID)+ ".application.xml";
+//		FileHandler.writeToFile(System.getProperty("user.dir"), simConf.getName()+ (String) clientConf.get(Constants.EXPERIMENT_ID)+ ".application.xml", (String) clientConf.get(Constants.APPLICATION_FILE_AS_XML_STRING));
 		
 		// create application in suspended modus
-		IFuture fut = cms.createComponent(simConf.getName() + (String) clientConf.get(Constants.EXPERIMENT_ID), appFilePath, new CreationInfo(simConf.getApplicationConfiguration(), appConf, null, true, false), null);
+		IFuture fut = cms.createComponent(simConf.getName() + (String) clientConf.get(Constants.EXPERIMENT_ID), simConf.getApplicationReference(), new CreationInfo(simConf.getApplicationConfiguration(), appConf, null, true, false), null);
 		IComponentIdentifier cid = (IComponentIdentifier) fut.get(this);
-		this.exta = (IApplicationExternalAccess) cms.getExternalAccess(cid).get(this);
+		this.exta = (IExternalAccess) cms.getExternalAccess(cid).get(this);
 
 		// add DataConsumer and Provider
 		addDataConsumerAndProvider(simConf);
@@ -250,9 +250,13 @@ public class RuntimeManagerPlan extends Plan {
 		// Hack: Synchronize start time!
 //		System.out.println("-->StartTime at Client: " + startTime);
 		long startTime = clockservice.getTime();
-		AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) (exta).getSpace(simConf.getNameOfSpace()));
+		
+		fut = exta.getExtension(simConf.getNameOfSpace());
+		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
 		space.setProperty("REAL_START_TIME_OF_SIMULATION", startTime);
 
+		//(Hack?): add experiment-id to space
+		space.setProperty(Constants.EXPERIMENT_ID, (String) clientConf.get(Constants.EXPERIMENT_ID));
 		
 		//resume application
 		cms.resumeComponent(cid);
@@ -273,7 +277,10 @@ public class RuntimeManagerPlan extends Plan {
 
 	private void addDataConsumerAndProvider(SimulationConfiguration simConf) {
 
-		AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) (exta).getSpace(simConf.getNameOfSpace()));
+		IFuture fut =  (exta).getExtension(simConf.getNameOfSpace());
+		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
+		
+//		AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) (exta).getExtension(simConf.getNameOfSpace()));
 		IExpressionParser parser = new JavaCCExpressionParser();
 
 		// add new data provider
@@ -330,6 +337,9 @@ public class RuntimeManagerPlan extends Plan {
 					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) simConf.getImports().getImport()),
 							((ILibraryService) SServiceProvider.getService(getScope().getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this)).getClassLoader());
 
+					
+//					clazz = SReflect.findClass0(classname, imports, classloader);
+					
 				} catch (ClassNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -359,16 +369,18 @@ public class RuntimeManagerPlan extends Plan {
 				}
 				// MEnvSpaceInstance.setProperties(con,
 				// (List)dcon.get("properties"), fetcher);
-				MEnvSpaceInstance.setProperties(con, tmpPropertyList, space.getFetcher());//
+				MEnvSpaceType.setProperties(con, tmpPropertyList, space.getFetcher());//
 				con.setProperty("envspace", space);
 				space.addDataConsumer(name, con);
-			}
+		 	}
 		}
 		// System.out.println("nnnnnnnnnnneded iterations: " + counterTmp);
 	}
 
 	private void startOnlineVisualization(SimulationConfiguration simConf){
-		AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) (exta).getSpace(simConf.getNameOfSpace()));
+		
+		IFuture fut =  exta.getExtension(simConf.getNameOfSpace());
+		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
 
 		// init online visualization
 		ArrayList<AbstractChartDataConsumer> chartDataConsumer = new ArrayList<AbstractChartDataConsumer>();

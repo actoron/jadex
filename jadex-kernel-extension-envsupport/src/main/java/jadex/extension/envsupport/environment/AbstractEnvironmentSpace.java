@@ -1945,14 +1945,14 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	 *  @param id The id.
 	 *  @return The owner.
 	 */
-	public IComponentIdentifier	getOwner(Object id)
+	public IComponentDescription	getOwner(Object id)
 	{
 		synchronized(monitor)
 		{
 			ISpaceObject obj = getSpaceObject(id); 
 			if(obj==null)
 				throw new RuntimeException("Space object not found: "+id);
-			return (IComponentIdentifier)obj.getProperty(ISpaceObject.PROPERTY_OWNER);
+			return (IComponentDescription)obj.getProperty(ISpaceObject.PROPERTY_OWNER);
 		}
 	}
 	

@@ -24,7 +24,7 @@ public class InitSimulationPlan extends Plan{
 		String simulationDescription = (String) getBeliefbase().getBelief("simulationDescriptionFile").getFact();
 		SimulationConfiguration simConf = (SimulationConfiguration) XMLHandler.parseXMLFromXMLFile(simulationDescription, SimulationConfiguration.class);
 		
-		
+
 		//Start Simulation Control Center
 		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 		Map args = SCollection.createHashMap();

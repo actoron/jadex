@@ -1,33 +1,14 @@
 package jadex.simulation.controlcenter;
 
-import jadex.application.space.envsupport.evaluation.AbstractChartDataConsumer;
 import jadex.commons.gui.SGUI;
-import jadex.simulation.model.Observer;
-import jadex.simulation.model.SimulationConfiguration;
-import jadex.simulation.model.result.IntermediateResult;
+import jadex.extension.envsupport.evaluation.AbstractChartDataConsumer;
 
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.nio.CharBuffer;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 
 /**
  * Gui, showing details about the simulation setting and the progress.

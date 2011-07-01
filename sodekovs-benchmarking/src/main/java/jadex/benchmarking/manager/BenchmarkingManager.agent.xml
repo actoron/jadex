@@ -2,15 +2,15 @@
 <!-- <H3>Benchmarking Manager</H3> Responsible for generating workload /faultload 
 	according to specified schedule xml file. -->
 
-<agent xmlns="http://jadex.sourceforge.net/jadex-bdi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+<agent xmlns="http://jadex.sourceforge.net/jadex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
 	name="BenchmarkingManager" package="jadex.benchmarking.manager">
 
 	<imports>
-		<import>jadex.base.contextservice.*</import>
-		<import>jadex.base.appdescriptor.*</import>
-		<import>jadex.base.envsupport.math.*</import>
+		<!-- <import>jadex.base.contextservice.*</import>
+		<import>jadex.base.appdescriptor.*</import>		
+		<import>jadex.extension.envsupport.math.*</import>-->
 		<import>jadex.base.fipa.*</import>
 		<import>java.util.Map</import>
 		<import>java.util.HashMap</import>
@@ -44,8 +44,7 @@
 			This file is parsed on agent start. The reference to the file is passes by 
 			the surrounding application file description. -->
 		<belief name="scheduleDescriptionFile" class="String">
-			<fact>"../sodekovs-benchmarking/src/main/java/jadex/benchmarking/examples/TestBenchmark2.xml"
-			</fact>
+			<fact>"../sodekovs-benchmarking/src/main/java/jadex/benchmarking/examples/TestBenchmark2.xml"</fact>
 		</belief>
 
 		<!-- Store information about the status of the executed benchmark: preparing_start, 
@@ -91,8 +90,10 @@
 	</configurations>
 
 	<services>
-		<providedservice class="IBenchmarkingExecutionService">new
-			BenchmarkingExecutionService($scope)</providedservice>
+	<providedservice class="IBenchmarkingExecutionService">
+			<implementation>new BenchmarkingExecutionService($scope)</implementation>
+		</providedservice>
 	</services>
+	
 
 </agent>

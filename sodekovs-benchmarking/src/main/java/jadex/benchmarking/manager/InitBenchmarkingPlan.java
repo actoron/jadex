@@ -1,7 +1,5 @@
 package jadex.benchmarking.manager;
 
-import jadex.application.runtime.IApplicationExternalAccess;
-import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
@@ -20,6 +18,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.IFuture;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.rules.state.IOAVState;
 
 import java.util.ArrayList;
@@ -42,7 +41,7 @@ public class InitBenchmarkingPlan extends Plan {
 	// Component Identifier of System Under Test
 	private IComponentIdentifier sutCID = null;
 	// Exta of System Under Test
-	private IApplicationExternalAccess sutExta = null;
+	private IExternalAccess sutExta = null;
 	// Space of System Under Test
 	private AbstractEnvironmentSpace sutSpace = null;
 	// Component Identifier of scheduler
@@ -118,8 +117,9 @@ public class InitBenchmarkingPlan extends Plan {
 		IFuture fut = cms.createComponent(schedule.getName() + GetRandom.getRandom(100000), sutProperties.get(Constants.APPLICATION_FILE_PATH),
 				new CreationInfo(sutProperties.get(Constants.APPLICATION_COONFIGURATION), new HashMap(), null, true, false), null);
 		sutCID = (IComponentIdentifier) fut.get(this);
-		sutExta = (IApplicationExternalAccess) cms.getExternalAccess(sutCID).get(this);
-		sutSpace = ((AbstractEnvironmentSpace) (sutExta).getSpace(sutProperties.get(Constants.SPACE_NAME)));
+		sutExta = (IExternalAccess) cms.getExternalAccess(sutCID).get(this);
+		fut = sutExta.getExtension(sutProperties.get(Constants.SPACE_NAME));
+		sutSpace = (AbstractEnvironmentSpace) fut.get(this);
 	}
 
 	/*

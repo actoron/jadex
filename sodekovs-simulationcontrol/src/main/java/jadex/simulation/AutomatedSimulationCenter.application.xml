@@ -3,9 +3,9 @@
 		<H3>This application shows how the automated simulation management
 		works.</H3>
 	-->
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="AutomatedSimulationCenter" package="jadex.simulation">
 
@@ -17,17 +17,8 @@
 			filename="jadex/simulation/remote/RemoteClientSimulator.agent.xml" />
 	</componenttypes>
 	
-	<applications>
-		<application name="Simulate MarsWorld">
-			<components>
-				<component type="SimulationManager" master="true">
-					<arguments>
-						<argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/Configuration2.xml"</argument>
-					</arguments>
-				</component>
-			</components>
-		</application>
-		<application name="Simulate MarsWorld with included Remote Client">
+	<configurations>
+	<configuration name="Simulate MarsWorld with included Remote Client">
 			<components>
 				<component type="SimulationManager" master="true">
 					<arguments>
@@ -36,8 +27,17 @@
 				</component>
 			<component type="RemoteSimulationClient" master="false"/>
 			</components>
-		</application>
-		<application name="Simulate AgentNegotiation">
+		</configuration>
+		<configuration name="Simulate MarsWorld">
+			<components>
+				<component type="SimulationManager" master="true">
+					<arguments>
+						<argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/Configuration2.xml"</argument>
+					</arguments>
+				</component>
+			</components>
+		</configuration>
+		<configuration name="Simulate AgentNegotiation">
 			<components>
 				<component type="SimulationManager" master="true">
 					<arguments>
@@ -45,8 +45,8 @@
 					</arguments>
 				</component>
 			</components>
-		</application>
-		<application name="Simulate AgentNegotiation with included Remote Client">
+		</configuration>
+		<configuration name="Simulate AgentNegotiation with included Remote Client">
 			<components>
 				<component type="SimulationManager" master="true">
 					<arguments>
@@ -55,6 +55,6 @@
 				</component>
 				<component type="RemoteSimulationClient" master="false"/>
 			</components>
-		</application>
-	</applications>
+		</configuration>
+	</configurations>
 </applicationtype>

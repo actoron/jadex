@@ -50,7 +50,8 @@ import jadex.micro.annotation.RequiredServices;
 	"jadex.base.service.deployment.*",
 	"jadex.micro.*",
 	"jadex.extension.envsupport.*",
-	"jadex.extension.agr.*"
+	"jadex.extension.agr.*",
+	"jadex.benchmarking.services.*"
 })
 
 @Arguments({

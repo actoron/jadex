@@ -1,12 +1,13 @@
 package jadex.simulation.examples.marsworld.carry;
 
-import jadex.application.space.envsupport.environment.AbstractTask;
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.application.space.envsupport.environment.space2d.Space2D;
+
 import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.extension.envsupport.environment.AbstractTask;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.simulation.examples.marsworld.producer.ProduceOreTask;
 import jadex.simulation.examples.marsworld.sentry.AnalyzeTargetTask;
 

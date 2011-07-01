@@ -1,13 +1,14 @@
 package jadex.simulation.examples.marsworld.carry;
 
-import jadex.application.space.envsupport.environment.AbstractTask;
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.application.space.envsupport.environment.space2d.Space2D;
-import jadex.application.space.envsupport.math.IVector2;
+
+import jadex.bridge.service.clock.IClockService;
+import jadex.extension.envsupport.environment.AbstractTask;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.Space2D;
+import jadex.extension.envsupport.math.IVector2;
 import jadex.simulation.examples.marsworld.producer.ProduceOreTask;
 import jadex.simulation.examples.marsworld.sentry.AnalyzeTargetTask;
-import jadex.bridge.service.clock.IClockService;
 
 /**
  *  Move an object towards a destination.

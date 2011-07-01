@@ -5,9 +5,9 @@
 	Then calls the Production Agent to produce the ore.
 	After all locations have been visited the Agent moves home.
 -->
-<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
+<agent xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
 	name="Sentry"
 	package="jadex.simulation.examples.marsworld.sentry">	         
@@ -16,8 +16,8 @@
 		<import>java.util.*</import>
 		<import>java.util.logging.*</import>
 		<import>jadex.base.fipa.*</import>
-		<import>jadex.application.space.envsupport.environment.*</import>
-		<import>jadex.application.space.envsupport.math.*</import>
+		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.extension.envsupport.math.*</import>
 		<import>jadex.simulation.examples.marsworld.movement.*</import>
 	</imports>
 
@@ -111,7 +111,7 @@
 			</dropcondition>
 
 			<deliberation cardinality="1">
-				<inhibits ref="move.walk_around"/>
+				<inhibits cref="move.walk_around"/>
 			</deliberation>
 			<!-- The goal is reached when the target is analysed. - ->
 			<!- - Target condition prevents producers from being called by sentry, because plan is aborted. - ->  
@@ -179,7 +179,7 @@
 		<configuration name="default">
 			<goals>
 				<!-- Create a goal for walking around. -->
-				<initialgoal ref="move.walk_around"/>				
+				<initialgoal cref="move.walk_around"/>				
 			</goals>
 			<plans>
 			<initialplan ref="tmpCounterPlan"/>

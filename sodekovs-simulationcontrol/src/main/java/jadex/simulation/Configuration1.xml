@@ -16,7 +16,7 @@
 	-->
 
 	<Imports>
-		<Import>jadex.application.space.envsupport.evaluation.*</Import>
+		<Import>jadex.extension.envsupport.evaluation.*</Import>
 		<Import>jadex.simulation.evaluation.*</Import>
 	</Imports>
 
@@ -28,7 +28,7 @@
 			/> <Filter mode="all" /> </Observer>
 		-->
 		<Observer>
-			<Data name="HomebaseLogger"><!-- TODO: How to deal with Strings, Lists? -->
+			<Data name="HomebaseLogger"><!-- TODO: How to deal with Strings, Lists? -->"sodekovs-simulationcontrol/src/main/java/jadex/simulation/TestNegotiationConfiguration.xml"
 				<ObjectSource type="ISpaceObject" name="homebase" />
 				<ElementSource type="Property" name="ore" class="String" />
 				<!-- Add type of element: String, long, int etc.? -->

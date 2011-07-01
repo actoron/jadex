@@ -4,17 +4,15 @@
 		Observer.
 	-->
 
-<agent xmlns="http://jadex.sourceforge.net/jadex-bdi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+<agent xmlns="http://jadex.sourceforge.net/jadex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
 	name="ClientSimulator" package="jadex.simulation.client">
 
-	<imports>
-		<import>jadex.base.contextservice.*</import>
-		<import>jadex.base.appdescriptor.*</import>
-		<import>jadex.base.envsupport.environment.space2d.*</import>
-		<import>jadex.base.envsupport.environment.*</import>
-		<import>jadex.base.envsupport.math.*</import>
+	<imports>		
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.extension.envsupport.math.*</import>
 		<import>jadex.base.fipa.*</import>
 		<import>java.util.*</import>
 		<import>jadex.simulation.model.Observer</import>

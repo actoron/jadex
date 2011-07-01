@@ -16,9 +16,9 @@
 		applicationConfiguration="1 Sentry / 2 Producers / 3 Carries">
 	-->
 
-	<Imports>
-		<Import>jadex.application.space.envsupport.evaluation.*</Import>
-		<Import>jadex.application.space.envsupport.*</Import>
+	<Imports>		
+		<Import>jadex.extension.envsupport.evaluation.XYChartDataConsumer</Import>		
+		<Import>jadex.extension.envsupport.environment.*</Import>
 		<Import>jadex.simulation.evaluation.*</Import>
 	</Imports>
 
@@ -117,8 +117,8 @@
 		
 		<!-- Important: Number of sweeps has to be equal with number of rows!-->
 		<ParameterSweeping strategy="recursively"> <!-- space, list or algorithm (algorithm is not implemented yet!)-->
-			<Configuration type="space" name="NumberOfCarries" start="1" end="4" step="1" class="int" />
-			<Configuration type="list" name="NumberOfSentries" values="1;" class="int" />
+			<Configuration type="space" name="NumberOfCarries" start="2" end="4" step="1" class="int" />
+			<Configuration type="list" name="NumberOfSentries" values="2;" class="int" />
 			<Configuration type="list" name="NumberOfProducers" values="2;3;" class="int" />
 			<!-- <Configuration type="list" name="NumberOfProducers" values="1;2;" class="int" />--><!-- Has to be comma separated list, with a comma as last character. -->			
 		</ParameterSweeping>
@@ -144,7 +144,7 @@
 		</General>
 		<Rows experiments="2">
 			<TerminateCondition>
-				   <Time value="3000" type="relative" />
+				   <Time value="6000" type="relative" />
 				  				
 					<TargetFunction function="$object.getProperty(&quot;ore&quot;) >=
 					55">	<ObjectSource type="ISpaceObject" name="homebase" /> </TargetFunction>

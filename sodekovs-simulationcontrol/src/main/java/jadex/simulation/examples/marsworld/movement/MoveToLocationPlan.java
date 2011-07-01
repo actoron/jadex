@@ -1,12 +1,11 @@
 package jadex.simulation.examples.marsworld.movement;
 
-import jadex.application.space.envsupport.environment.AbstractTask;
-import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.application.space.envsupport.math.IVector2;
-import jadex.simulation.examples.marsworld.movement.MoveTask;
 import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.Plan;
+import jadex.extension.envsupport.environment.AbstractTask;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.math.IVector2;
 
 import java.util.HashMap;
 import java.util.Map;

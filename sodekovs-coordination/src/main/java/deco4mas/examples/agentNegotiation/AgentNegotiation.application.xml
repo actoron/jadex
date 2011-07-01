@@ -27,9 +27,9 @@
 
 	<arguments>
 		<!-- The initial weights for the utility function of the SMA. -->		
-		<argument name="TrustWeight" typename="Double">0.6</argument>
-		<argument name="CostWeight" typename="Double">0.2</argument>
-		<argument name="DurationWeight" typename="Double">0.2</argument>
+		<argument name="TrustWeight" class="Double">0.6</argument>
+		<argument name="CostWeight" class="Double">0.2</argument>
+		<argument name="DurationWeight" class="Double">0.2</argument>
 	</arguments>
 	
 	<spacetypes>
