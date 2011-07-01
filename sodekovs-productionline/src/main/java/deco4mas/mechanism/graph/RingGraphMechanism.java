@@ -13,21 +13,20 @@ import java.util.List;
 import javax.xml.bind.JAXBException;
 
 import deco4mas.coordinate.environment.CoordinationSpace;
-import deco4mas.helper.Constants;
-import deco4mas.mechanism.CoordinationInfo;
-import deco4mas.mechanism.ICoordinationMechanism;
 import deco4mas.util.file.FileFinder;
 import deco4mas.util.xml.XmlUtil;
 
-public class RingGraphMechanism extends ICoordinationMechanism {
+/**
+ * A token ring based coordination mechanism extending the {@link GenericGraphMechanism}.
+ * 
+ * @author Thomas Preisler
+ */
+public class RingGraphMechanism extends GenericGraphMechanism {
 
 	private ProductionLineConfiguration plc = null;
 
-	private Integer eventNumber = null;
-
 	public RingGraphMechanism(CoordinationSpace space) {
 		super(space);
-		eventNumber = 0;
 	}
 
 	@Override
@@ -56,16 +55,6 @@ public class RingGraphMechanism extends ICoordinationMechanism {
 	public void suspend() {
 	}
 
-	@Override
-	public void perceiveCoordinationEvent(Object obj) {
-		CoordinationInfo ci = (CoordinationInfo) obj;
-		IComponentIdentifier senderAgent = (IComponentIdentifier) ci.getValueByName(Constants.SENDER_AGENT);
-		List<String> receiver = lookupReceiver(senderAgent);
-		if (receiver != null && !receiver.isEmpty()) {
-			space.publishCoordinationEvent(obj, receiver, getRealisationName(), ++eventNumber);
-		}
-	}
-
 	/**
 	 * Looks up in the graph which agents should receive coordination information from the given sender agent.
 	 * 
@@ -73,7 +62,7 @@ public class RingGraphMechanism extends ICoordinationMechanism {
 	 *            the given sender agent
 	 * @return a {@link List} of receiving agents (their local names)
 	 */
-	private List<String> lookupReceiver(IComponentIdentifier senderAgent) {
+	protected List<String> lookupReceiver(IComponentIdentifier senderAgent) {
 		if (plc != null) {
 			List<String> receiver = new ArrayList<String>();
 
