@@ -22,12 +22,12 @@ public class ReceiveMessagePlan extends Plan {
 	 */
 	@Override
 	public void body() {
-		String id = (String) getBeliefbase().getBelief("graphId").getFact();
+		String name = getComponentDescription().getName().getLocalName();
 		String message = (String) getParameter("message").getValue();
-		System.out.println("ReceiveMessagePlan called in BDIGraphAgent " + id + " receiving the id from GraphAgent " + message);
-		
+		System.out.println("ReceiveMessagePlan called in BDIGraphAgent " + name + " receiving the id from GraphAgent " + message);
+
 		IGoal goal = createGoal("send_message");
-		goal.getParameter("message").setValue(id);
+		goal.getParameter("message").setValue(name);
 		dispatchTopLevelGoal(goal);
 	}
 }

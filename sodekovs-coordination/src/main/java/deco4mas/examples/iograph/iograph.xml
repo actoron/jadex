@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <iograph>
 	<entries>
-		<entry id="1">
+		<entry id="Graph1">
 			<inputs>
 			</inputs>
 			<outputs>
-				<output>2</output>
+				<output>Graph2</output>
 			</outputs>
 		</entry>
-		<entry id="2">
+		<entry id="Graph2">
 			<inputs>
-				<input>2</input>
+				<input>Graph1</input>
 			</inputs>
 			<outputs>
-				<output>3</output>
+				<output>Graph3</output>
 			</outputs>
 		</entry>
-		<entry id="3">
+		<entry id="Graph3">
 			<inputs>
-				<input>2</input>
+				<input>Graph2</input>
 			</inputs>
 			<outputs>
-				<output>4</output>
+				<output>Graph4</output>
 			</outputs>
 		</entry>
-		<entry id="4">
+		<entry id="Graph4">
 			<inputs>
-				<input>3</input>
+				<input>Graph3</input>
 			</inputs>
 			<outputs>
 			</outputs>

@@ -23,10 +23,6 @@
 		<belief name="env" class="CoordinationSpace">
 			<fact>(CoordinationSpace)$scope.getParent().getExtension("mycoordspace").get(new ThreadSuspendable())</fact>
 		</belief>
-		
-		<belief name="graphId" class="String">
-			<fact>"no id"</fact>
-		</belief>
 	</beliefs>
 	
 	<goals>

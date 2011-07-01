@@ -71,12 +71,12 @@
 					</properties>
 				</mechanism_configuration>
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->
-					<agent_element element="ReceiveStep" agent_id="Graph" type="INTERNAL_EVENT">
+					<agent_element element="ReceiveStep" agent_id="Graph" type="MICRO_STEP">
 						<parameter_mappings>
 							<mapping ref="id" name="receivedId"/>
 						</parameter_mappings>
 					</agent_element>
-					<agent_element element="receive_message" agent_id="BDIGraph" type="BDI_EVENT">
+					<agent_element element="receive_message" agent_id="BDIGraph" type="INTERNAL_EVENT">
 						<parameter_mappings>
 							<mapping ref="id" name="receivedId"/>
 						</parameter_mappings>

@@ -19,22 +19,19 @@ import jadex.bdi.runtime.impl.flyweights.GoalbaseFlyweight;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.SServiceProvider;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
-import jadex.micro.ExternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.rules.state.IOAVState;
 
@@ -215,7 +212,7 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 														} else if (elementType.equals(AgentElementType.INTERNAL_EVENT.toString())) {
 															processBDIInternalEvent(dci, bia, elementId, exta, coordinationSpaceObj, ae, receivedParamDataMappings);
 														} else if (elementType.equals(AgentElementType.MICRO_STEP.toString())) {
-															processMicroStep(dci, exta, elementId, ae, receivedParamDataMappings);
+															processMicroStep(dci, (MicroAgent) ia, elementId, ae, receivedParamDataMappings);
 														}
 													}
 												}
@@ -376,66 +373,53 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 	 * Process the perception of an {@link AgentElementType#MICRO_STEP}.
 	 * 
 	 * @param dci
-	 * @param exta
+	 * @param ma
 	 * @param elementId
 	 * @param ae
 	 * @param receivedParamDataMappings
 	 */
-	private void processMicroStep(CoordinationInformation dci, IExternalAccess exta, final String elementId, final AgentElement ae, final HashMap<String, Object> receivedParamDataMappings) {
+	private void processMicroStep(CoordinationInformation dci, MicroAgent ma, final String elementId, final AgentElement ae, final HashMap<String, Object> receivedParamDataMappings) {
 		if (dci.getCoordinationType().equals(CoordinationType.NEGATIVE)) {
-			System.out.println(exta.getComponentIdentifier().getName() + ":");
+			System.out.println(ma.getComponentDescription().getName() + ":");
 			System.out.println("\t ERROR: can not remove micro agent steps from execution context.");
 			// TODO make exception for this incident
 		} else {
-			final ExternalAccess microExtAcc = (ExternalAccess) exta;
-			microExtAcc.getAgent().addResultListener(new IResultListener() {
+			try {
+				Class<?> clazz = ma.getClass();
+				boolean found = false;
 
-				@Override
-				public void resultAvailable(Object result) {
-					try {
-						MicroAgent ma = (MicroAgent) result;
-						Class<?> clazz = ma.getClass();
-						boolean found = false;
+				while (!found && clazz != null) {
+					Class<?>[] classes = clazz.getDeclaredClasses();
 
-						while (!found && clazz != null) {
-							Class<?>[] classes = clazz.getDeclaredClasses();
+					for (Class<?> c : classes) {
+						if (c.getSimpleName().equals(elementId)) {
+							found = true;
+							Constructor<?> constructor = c.getConstructor(clazz);
 
-							for (Class<?> c : classes) {
-								if (c.getSimpleName().equals(elementId)) {
-									found = true;
-									Constructor<?> constructor = c.getConstructor(clazz);
+							IComponentStep step = (IComponentStep) constructor.newInstance(ma);
 
-									IComponentStep step = (IComponentStep) constructor.newInstance(ma);
-
-									for (ParameterMapping pm : ae.getParameter_mappings()) {
-										try {
-											Field field = c.getField(pm.getLocalName());
-											field.set(step, receivedParamDataMappings.get(pm.getRef()));
-										} catch (Exception e) {
-											throw new RuntimeException("No such field: " + pm.getLocalName() + " in " + c);
-										}
-									}
-
-									microExtAcc.scheduleStep(step);
+							for (ParameterMapping pm : ae.getParameter_mappings()) {
+								try {
+									Field field = c.getField(pm.getLocalName());
+									field.set(step, receivedParamDataMappings.get(pm.getRef()));
+								} catch (Exception e) {
+									throw new RuntimeException("No such field: " + pm.getLocalName() + " in " + c);
 								}
 							}
 
-							clazz = clazz.getSuperclass();
+							ma.scheduleStep(step);
 						}
-
-						if (!found) {
-							throw new RuntimeException("No such step: " + elementId + " in " + clazz);
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
 					}
+
+					clazz = clazz.getSuperclass();
 				}
 
-				@Override
-				public void exceptionOccurred(Exception exception) {
-					exception.printStackTrace();
+				if (!found) {
+					throw new RuntimeException("No such step: " + elementId + " in " + clazz);
 				}
-			});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

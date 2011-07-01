@@ -49,7 +49,7 @@ public class Constants {
 
 	/** The sender agents id */
 	public static String SENDER_AGENT = "senderAgent";
-	
+
 	public static String SENDER_AGENT_IDENTIFIER = "senderAgentIdentifier";
 
 	// --- Constants from the old CoordinationProcessor
@@ -62,12 +62,6 @@ public class Constants {
 
 	/** The identifier of all elements of a beliefset. */
 	public static final String BELIEFSET_UPDATE_ALL_IDENTIFIER = "all";
-
-	/** The identifier of the event that notifies about plan adoptions. */
-	private static final String PLAN_ACTIVATION_EVENT = "BDI_planAdded";
-
-	/** The identifier of the event that notifies about goal adoptions. */
-	private static final String GOAL_ACTIVATION_EVENT = "BDI_goalAdded";
 
 	// ------------------------
 }

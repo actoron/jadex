@@ -5,6 +5,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.SServiceProvider;
+import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
@@ -15,7 +16,6 @@ import jadex.extension.envsupport.environment.IPerceptGenerator;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
-import jadex.javaparser.IValueFetcher;
 import jadex.micro.IMicroExternalAccess;
 
 import java.util.ArrayList;
@@ -42,6 +42,9 @@ public class CoordinationSpace extends Grid2D {
 	/** Contains the receivers for the direct addressing */
 	private Map<String, List<IComponentDescription>> receiverData = new HashMap<String, List<IComponentDescription>>();
 
+	/** Contains the mapping of an agent's name and it's {@link IComponentDescription} */
+	private Map<String, IComponentDescription> descriptionMapping = new HashMap<String, IComponentDescription>();
+
 	// -------- constructors --------
 
 	/**
@@ -59,10 +62,17 @@ public class CoordinationSpace extends Grid2D {
 
 	}
 
+	/**
+	 * @return the descriptionMapping
+	 */
+	public Map<String, IComponentDescription> getDescriptionMapping() {
+		return descriptionMapping;
+	}
+
 	@Override
 	public void initSpace(IExternalAccess exta, MEnvSpaceInstance config, IValueFetcher fetcher) {
 		super.initSpace(exta, config, fetcher);
-		
+
 		initSpaces();
 		initDeco4mas();
 		for (ICoordinationMechanism icord : activeCoordinationMechanisms) {
@@ -214,13 +224,14 @@ public class CoordinationSpace extends Grid2D {
 	public void componentAdded(IComponentDescription owner) {
 		synchronized (monitor) {
 			// Possibly add or create avatar(s) if any.
-			List ownedobjs = (List) spaceobjectsbyowner.get(owner);
+			@SuppressWarnings("unchecked")
+			List<ISpaceObject> ownedobjs = (List<ISpaceObject>) spaceobjectsbyowner.get(owner);
 			if (ownedobjs == null) {
 				createAvatar(owner, null, false);
 			} else {
 				// Init zombie avatars.
-				for (Iterator it = ownedobjs.iterator(); it.hasNext();) {
-					ISpaceObject obj = (ISpaceObject) it.next();
+				for (Iterator<ISpaceObject> it = ownedobjs.iterator(); it.hasNext();) {
+					ISpaceObject obj = it.next();
 					if (!spaceobjects.containsKey(obj.getId())) {
 						initSpaceObject(obj);
 					}
@@ -228,7 +239,8 @@ public class CoordinationSpace extends Grid2D {
 			}
 
 			if (perceptgenerators != null) {
-				for (Iterator it = perceptgenerators.keySet().iterator(); it.hasNext();) {
+				for (@SuppressWarnings("rawtypes")
+				Iterator it = perceptgenerators.keySet().iterator(); it.hasNext();) {
 					IPerceptGenerator gen = (IPerceptGenerator) perceptgenerators.get(it.next());
 					gen.componentAdded(owner, this);
 				}
@@ -250,5 +262,17 @@ public class CoordinationSpace extends Grid2D {
 	 */
 	public ArrayList<ICoordinationMechanism> getActiveCoordinationMechanisms() {
 		return activeCoordinationMechanisms;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see jadex.extension.envsupport.environment.AbstractEnvironmentSpace#createAvatar(jadex.bridge.IComponentDescription, java.lang.String, boolean)
+	 */
+	@Override
+	protected ISpaceObject createAvatar(IComponentDescription owner, String fullname, boolean zombie) {
+		descriptionMapping.put(owner.getName().getLocalName(), owner);
+
+		return super.createAvatar(owner, fullname, zombie);
 	}
 }

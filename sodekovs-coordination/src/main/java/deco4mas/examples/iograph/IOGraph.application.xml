@@ -55,26 +55,10 @@
 				<env:envspace name="mycoordspace" type="coordspace" width="2" height ="2" />
 			</extensions>
 			<components>
-				<component type="Graph">
-					<arguments>
-						<argument name="graphId">"1"</argument>
-					</arguments>
-				</component>
-				<component type="Graph">
-					<arguments>
-						<argument name="graphId">"2"</argument>
-					</arguments>
-				</component>
-				<component type="BDIGraph">
-					<arguments>
-						<argument name="graphId">"3"</argument>
-					</arguments>
-				</component>
-				<component type="Graph">
-					<arguments>
-						<argument name="graphId">"4"</argument>
-					</arguments>
-				</component>
+				<component name="Graph1" type="Graph" />
+				<component name="Graph2" type="Graph" />
+				<component name="Graph3" type="BDIGraph" />
+				<component name="Graph4" type="Graph" />
 			</components>
  		</application>
 	</applications>

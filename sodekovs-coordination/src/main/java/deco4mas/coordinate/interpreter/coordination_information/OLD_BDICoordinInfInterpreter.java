@@ -6,12 +6,12 @@ package deco4mas.coordinate.interpreter.coordination_information;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bridge.IComponentDescription;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.IValueFetcher;
 
 import java.util.HashMap;
 import java.util.Map;

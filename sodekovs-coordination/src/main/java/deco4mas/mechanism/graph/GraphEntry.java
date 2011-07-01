@@ -25,6 +25,43 @@ public class GraphEntry {
 
 	private List<String> outputs = new ArrayList<String>();
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((inputs == null) ? 0 : inputs.hashCode());
+		result = prime * result + ((outputs == null) ? 0 : outputs.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		GraphEntry other = (GraphEntry) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (inputs == null) {
+			if (other.inputs != null)
+				return false;
+		} else if (!inputs.equals(other.inputs))
+			return false;
+		if (outputs == null) {
+			if (other.outputs != null)
+				return false;
+		} else if (!outputs.equals(other.outputs))
+			return false;
+		return true;
+	}
+
 	/**
 	 * @return the id
 	 */
@@ -77,8 +114,6 @@ public class GraphEntry {
 
 	@Override
 	public String toString() {
-		final int maxLen = 10;
-		return "GraphEntry [" + (id != null ? "id=" + id + ", " : "") + (inputs != null ? "inputs=" + inputs.subList(0, Math.min(inputs.size(), maxLen)) + ", " : "")
-				+ (outputs != null ? "outputs=" + outputs.subList(0, Math.min(outputs.size(), maxLen)) : "") + "]";
+		return "GraphEntry [id=" + id + ", inputs=" + inputs + ", outputs=" + outputs + "]";
 	}
 }

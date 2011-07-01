@@ -1,8 +1,8 @@
 package deco4mas.helper;
 
+import jadex.commons.IValueFetcher;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 /**

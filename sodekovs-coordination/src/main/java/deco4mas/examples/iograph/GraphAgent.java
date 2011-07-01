@@ -5,11 +5,8 @@ package deco4mas.examples.iograph;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.modelinfo.Argument;
-import jadex.bridge.modelinfo.IArgument;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
 import deco4mas.coordinate.annotation.CoordinationParameter;
 import deco4mas.coordinate.annotation.CoordinationStep;
 import deco4mas.mechanism.graph.IOGraph;
@@ -21,37 +18,26 @@ import deco4mas.mechanism.graph.IOGraph;
  */
 public class GraphAgent extends MicroAgent {
 
-	private String graphId = null;
+	private String name = null;
 
 	@Override
 	public IFuture agentCreated() {
-		graphId = (String) getArgument("graphId");
+		name = getComponentDescription().getName().getLocalName();
 
-		return super.agentCreated();
+		return IFuture.DONE;
 	}
 
 	@Override
 	public void executeBody() {
-		if (graphId.equals("1")) {
-			System.out.println("GraphAgent " + graphId + " is going to send a coordination information containing his id.");
-			waitFor(7000, new SendStep(graphId));
+		if (name.equals("Graph1")) {
+			System.out.println("GraphAgent " + name + " is going to send a coordination information containing his id.");
+			waitFor(7000, new SendStep(name));
 		}
 	}
 
 	@Override
 	public IFuture agentKilled() {
 		return super.agentKilled();
-	}
-
-	/**
-	 * Returns the {@link MicroAgentMetaInfo}.
-	 * 
-	 * @return the {@link MicroAgentMetaInfo}
-	 */
-	public static MicroAgentMetaInfo getMetaInfo() {
-		MicroAgentMetaInfo meta = new MicroAgentMetaInfo();
-		meta.setArguments(new IArgument[] { new Argument("graphId", "The Agents Graph Id", "String") });
-		return meta;
 	}
 
 	/**
@@ -85,8 +71,8 @@ public class GraphAgent extends MicroAgent {
 
 		@Override
 		public Object execute(IInternalAccess ia) {
-			System.out.println("ReceiveStep called in GraphAgent " + graphId + " receiving the id from GraphAgent " + receivedId);
-			waitForTick(new SendStep(graphId));
+			System.out.println("ReceiveStep called in GraphAgent " + name + " receiving the id from GraphAgent " + receivedId);
+			waitForTick(new SendStep(name));
 			return null;
 		}
 	}

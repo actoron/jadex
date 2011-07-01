@@ -113,12 +113,14 @@ public class DefaultCoordinationEventGenerator extends SimplePropertyObject impl
 			List<IComponentDescription> receiver = space.getReceiverData().get(event.getType());
 
 			if (receiver != null) {
-				for (IComponentDescription receiverIdentifier : receiver) {
-					String percepttype = getPerceptType(space, receiverIdentifier.getLocalType(), event.getSpaceObject().getType(), COORDINATE_INFO);
+				for (IComponentDescription receiverDescription : receiver) {
+					String percepttype = getPerceptType(space, receiverDescription.getLocalType(), event.getSpaceObject().getType(), COORDINATE_INFO);
 					if (percepttype != null) {
-						space.createPercept(percepttype, event.getSpaceObject(), receiverIdentifier, space.getAvatar(receiverIdentifier));
+						space.createPercept(percepttype, event.getSpaceObject(), receiverDescription, space.getAvatar(receiverDescription));
 					}
 				}
+				
+				space.getReceiverData().remove(event.getType());
 			}
 		}
 	}
