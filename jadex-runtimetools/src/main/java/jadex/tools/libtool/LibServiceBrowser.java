@@ -158,8 +158,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 					classpaths.removeEntry(entries[sel[i]]);
 					try
 					{
-//						libservice.removeURL(new URL("file:///"+entries[sel[i]]));
-						libservice.removeURL(new URL(entries[sel[i]]));
+						libservice.removeURLCompletely(new URL(entries[sel[i]]));
 					}
 					catch(Exception ex)
 					{
@@ -204,7 +203,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 						{
 							try
 							{
-								libservice.removeURL(new URL(ele.getData(i).toString()));
+								libservice.removeURLCompletely(new URL(ele.getData(i).toString()));
 							}
 							catch(MalformedURLException ex)
 							{

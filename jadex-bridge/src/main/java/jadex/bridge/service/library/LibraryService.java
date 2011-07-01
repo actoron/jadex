@@ -122,7 +122,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 			else
 			{
 				urlrefcount.put(url, new Integer(1));
-				Map<URL, ClassLoader> delegates = libcl.getDelegates();
+				Map delegates = libcl.getDelegates();
 				delegates.put(url, new URLClassLoader(new URL[] {url}));
 				libcl = new DelegationClassLoader(ClassLoader.getSystemClassLoader(), delegates);
 				lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
@@ -164,13 +164,52 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 			if(refcount == null)
 				throw new RuntimeException("Unknown URL: "+url);
 			refcount = new Integer(refcount.intValue() - 1);
+			urlrefcount.put(url, refcount);
 			if(refcount.intValue() < 1)
 			{
-				Map<URL, ClassLoader> delegates = libcl.getDelegates();
+				Map delegates = libcl.getDelegates();
 				delegates.remove(url);
 				libcl = new DelegationClassLoader(ClassLoader.getSystemClassLoader(), delegates);
 				lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
 			}
+		}
+		
+		// Do not notify listeners with lock held!
+		if(lis != null)
+		{
+			for(int i=0; i<lis.length; i++)
+			{
+				final ILibraryServiceListener liscopy = lis[i];
+				lis[i].urlRemoved(url).addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+						removeLibraryServiceListener(liscopy);
+					}
+				});
+			}
+		}
+	}
+	
+	/**
+	 *  Remove a url completely (all references).
+	 *  @param url The url.
+	 */
+	public void removeURLCompletely(URL url)
+	{
+		ILibraryServiceListener[] lis = null;
+		synchronized(this)
+		{
+			urlrefcount.remove(url);
+			Map delegates = libcl.getDelegates();
+			delegates.remove(url);
+			libcl = new DelegationClassLoader(ClassLoader.getSystemClassLoader(), delegates);
+			lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
 		}
 		
 		// Do not notify listeners with lock held!

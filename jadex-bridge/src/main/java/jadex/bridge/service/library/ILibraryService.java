@@ -31,17 +31,16 @@ public interface ILibraryService extends IService
 	public void addURL(URL url);
 	
 	/**
-	 *  Add a path.
-	 *  @param path The path.
-	 */
-	// todo: make return IFuture
-	public void addPath(String path);
-	
-	/**
 	 *  Remove a url.
 	 *  @param url The url.
 	 */
 	public void removeURL(URL url);
+	
+	/**
+	 *  Remove a url completely (all references).
+	 *  @param url The url.
+	 */
+	public void removeURLCompletely(URL url);
 	
 	/**
 	 *  Get all managed entries as URLs.
