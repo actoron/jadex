@@ -6,8 +6,9 @@ import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 
 /**
  * Class for helper methods regarding BDI Agents
+ * 
  * @author Ante Vilenica
- *
+ * 
  */
 public class AgentMethods {
 
@@ -19,9 +20,9 @@ public class AgentMethods {
 	 * @return
 	 */
 	public static IComponentIdentifier getIComponentIdentifier(AbstractEnvironmentSpace space, String agentType) {
-	
-		for (IComponentDescription agentIdentifier : space.getComponents()) {			
-			if (agentIdentifier.getLocalType().equals(agentType)) {						
+
+		for (IComponentDescription agentIdentifier : space.getComponents()) {
+			if (agentIdentifier.getLocalType().equals(agentType)) {
 
 			}
 		}
