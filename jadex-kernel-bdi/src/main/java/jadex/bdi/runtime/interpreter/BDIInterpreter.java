@@ -119,6 +119,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/** The properties. */
 	protected Map properties;
 	
+	/** The arguments. */
+	protected Map arguments;
+	
 	/** The external service bindings. */
 	protected RequiredServiceBinding[] bindings;
 	
@@ -1761,7 +1764,6 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		// Do nothing: args and results are inited as beliefs.
 		return IFuture.DONE;
 	}
-
 	
 	/**
 	 *  Add a default value for an argument (if not already present).
@@ -1772,7 +1774,10 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	public void	addDefaultArgument(String name, Object value)
 	{
 		// Not supported by BDI XML schema -> Shouldn't be called
-		throw new UnsupportedOperationException();
+//		throw new UnsupportedOperationException();
+		if(arguments==null)
+			arguments = new HashMap();
+		arguments.put(name, value);
 	}
 
 	/**
@@ -1874,7 +1879,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	public Map getProperties(Object rcapa)
 	{
 		// Todo
-		return properties;
+		return properties==null? Collections.EMPTY_MAP: properties;
 	}
 	
 	/**
@@ -1890,12 +1895,11 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	}
 
 	/**
-	 *  Get the properties.
+	 *  Get the arguments.
 	 */
 	public Map getArguments()
 	{
-		// todo:
-		throw new UnsupportedOperationException();
+		return arguments==null? Collections.EMPTY_MAP: arguments;
 	}
 	
 	/**

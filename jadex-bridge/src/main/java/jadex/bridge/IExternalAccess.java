@@ -122,6 +122,12 @@ public interface IExternalAccess extends IRemotable
 	 */
 	public IFuture getResults();
 	
+	/**
+	 *  Get the arguments.
+	 *  @return The arguments.
+	 */
+	public IFuture getArguments();
+	
 	//-------- exclude --------
 	
 	/**

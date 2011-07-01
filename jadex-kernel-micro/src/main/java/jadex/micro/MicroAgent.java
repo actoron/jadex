@@ -189,6 +189,15 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	}
 	
 	/**
+	 *  Get the component results.
+	 *  @return The results.
+	 */
+	public Map getResults()
+	{
+		return interpreter.getResults();
+	}
+	
+	/**
 	 *  Set a result value.
 	 *  @param name The result name.
 	 *  @param value The result value.

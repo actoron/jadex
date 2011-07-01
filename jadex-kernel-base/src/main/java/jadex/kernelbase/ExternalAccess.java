@@ -481,12 +481,45 @@ public class ExternalAccess implements IExternalAccess
 	}
 
 	/**
+	 *  Get the arguments.
+	 *  @return The arguments.
+	 */
+	public IFuture getArguments()
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			try
+			{
+				adapter.invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						ret.setResult(interpreter.getArguments());
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setResult(interpreter.getArguments());
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 *  Get the component results.
 	 *  @return The results.
 	 */
 	public IFuture getResults()
 	{
-	final Future ret = new Future();
+		final Future ret = new Future();
 		
 		if(adapter.isExternalThread())
 		{

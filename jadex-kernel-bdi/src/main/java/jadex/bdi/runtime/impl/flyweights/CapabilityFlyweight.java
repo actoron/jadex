@@ -36,6 +36,7 @@ import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
@@ -815,6 +816,52 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	public IValueFetcher getFetcher()
 	{
 		return getInterpreter().getFetcher();
+	}
+	
+	/**
+	 *  Get the arguments.
+	 *  @return The arguments.
+	 */
+	public Map getArguments()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					object = getInterpreter().getArguments();
+				}
+			};
+			return (Map)invoc.object;
+		}
+		else
+		{
+			return getInterpreter().getArguments();
+		}
+	}
+	
+	/**
+	 *  Get the component results.
+	 *  @return The results.
+	 */
+	public Map getResults()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					object = getInterpreter().getResults();
+				}
+			};
+			return (Map)invoc.object;
+		}
+		else
+		{
+			return getInterpreter().getResults();
+		}
 	}
 	
 //	/**

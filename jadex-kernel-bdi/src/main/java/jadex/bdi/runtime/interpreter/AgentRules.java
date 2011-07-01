@@ -1675,6 +1675,30 @@ public class AgentRules
 				{
 					BeliefRules.setBeliefValue(state, rbel, result);
 					
+					// Set also argument value if belief is declared as argument.
+					if(state.getType(rcapa).equals(OAVBDIRuntimeModel.agent_type))
+					{
+						boolean isarg = false;
+						if(state.getType(mbel).equals(OAVBDIMetaModel.belief_type))
+						{
+							isarg = ((Boolean)state.getAttributeValue(mbel, OAVBDIMetaModel.belief_has_argument)).booleanValue();
+						}
+						else if(state.getType(mbel).equals(OAVBDIMetaModel.beliefreference_type))
+						{
+							isarg = ((Boolean)state.getAttributeValue(mbel, OAVBDIMetaModel.beliefreference_has_argument)).booleanValue();
+						}
+						if(!isarg)
+						{
+							String exp = ((String)state.getAttributeValue(mbel, OAVBDIMetaModel.referenceableelement_has_exported));
+							isarg = exp.equals(OAVBDIMetaModel.EXPORTED_TRUE);
+						}
+						if(isarg)
+						{
+							String name = (String)state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name);
+							BDIInterpreter.getInterpreter(state).addDefaultArgument(name, result);
+						}
+					}
+					
 					if(update!=null)
 					{
 						final ITimedObject[]	to	= new ITimedObject[1];
@@ -1955,6 +1979,30 @@ public class AgentRules
 					for(Iterator it=SReflect.getIterator(result); it.hasNext(); )
 					{
 						BeliefRules.addBeliefSetValue(state, rbelset, it.next());
+					}
+					
+					// Set also argument values if beliefset is declared as argument.
+					if(state.getType(rcapa).equals(OAVBDIRuntimeModel.agent_type))
+					{
+						boolean isarg = false;
+						if(state.getType(mbelset).equals(OAVBDIMetaModel.beliefset_type))
+						{
+							isarg = ((Boolean)state.getAttributeValue(mbelset, OAVBDIMetaModel.beliefset_has_argument)).booleanValue();
+						}
+						else if(state.getType(mbelset).equals(OAVBDIMetaModel.beliefsetreference_type))
+						{
+							isarg = ((Boolean)state.getAttributeValue(mbelset, OAVBDIMetaModel.beliefsetreference_has_argument)).booleanValue();
+						}	
+						if(!isarg)
+						{
+							String exp = ((String)state.getAttributeValue(mbelset, OAVBDIMetaModel.referenceableelement_has_exported));
+							isarg = exp.equals(OAVBDIMetaModel.EXPORTED_TRUE);
+						}
+						if(isarg)
+						{
+							String name = (String)state.getAttributeValue(mbelset, OAVBDIMetaModel.modelelement_has_name);
+							BDIInterpreter.getInterpreter(state).addDefaultArgument(name, result);
+						}
 					}
 
 					if(update!=null)

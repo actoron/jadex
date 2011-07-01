@@ -532,6 +532,39 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	}
 	
 	/**
+	 *  Get the arguments.
+	 *  @return The arguments.
+	 */
+	public IFuture getArguments()
+	{
+		final Future ret = new Future();
+		
+		if(getInterpreter().getAgentAdapter().isExternalThread())
+		{
+			try
+			{
+				getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						ret.setResult(getInterpreter().getArguments());
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setResult(getInterpreter().getArguments());
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 *  Get the component results.
 	 *  @return The results.
 	 */

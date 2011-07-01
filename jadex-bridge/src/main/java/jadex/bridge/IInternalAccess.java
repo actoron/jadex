@@ -7,6 +7,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -93,6 +94,18 @@ public interface IInternalAccess
 	 */
 	public IFuture removeComponentListener(IComponentListener listener);
 		
+	/**
+	 *  Get the arguments.
+	 *  @return The arguments.
+	 */
+	public Map getArguments();
+	
+	/**
+	 *  Get the component results.
+	 *  @return The results.
+	 */
+	public Map getResults();
+	
 //	/**
 //	 *  Get the model name of a component type.
 //	 *  @param ctype The component type.
