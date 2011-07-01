@@ -1093,6 +1093,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			try
 			{
 				ret = (String)SJavaParser.evaluateExpression(component.getName(), model.getAllImports(), fetcher, model.getClassLoader());
+				if(ret==null)
+					ret = component.getName();
 			}
 			catch(Exception e)
 			{

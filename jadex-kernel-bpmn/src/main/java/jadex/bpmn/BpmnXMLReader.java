@@ -1528,11 +1528,23 @@ public class BpmnXMLReader
 						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails(), annos);
 						for(int row=0; row<table.size(); row++)
 						{
-							// normal property has 2 values
 //							assert table.get(row).size() == 2;
-							String name = (String) table.get(row).getColumnValueAt(0);
-							String value = (String) table.get(row).getColumnValueAt(1);
-
+							
+							// normal property has 3 values
+							String name = null;
+							Class clazz = Object.class;
+							String value = null;
+							name = table.getCellValue(row, 0);
+							if(table.get(row).size()==2)
+							{
+								value = table.getCellValue(row, 1);
+							}
+							else if(table.get(row).size()==3)
+							{
+								String typename = table.getCellValue(row, 1);
+								value = table.getCellValue(row, 2);
+								clazz = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
+							}
 							if(value!=null && value.length()>0)
 							{
 								IParsedExpression exp = parser.parseExpression(value, mi.getAllImports(), null, context.getClassLoader());
