@@ -234,7 +234,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 		Future ret = new Future();
 		try
 		{
-			System.out.println("loading bdi: "+filename);
+//			System.out.println("loading bdi: "+filename);
 			OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, imports, classloader);
 			ret.setResult(loaded.getModelInfo());
 		}

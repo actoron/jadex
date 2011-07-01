@@ -957,7 +957,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	 */
 	public boolean hasContextVariable(String name)
 	{
-		return variables!=null && variables.containsKey(name);
+		return (variables!=null && variables.containsKey(name)) || getModel().getArgument(name)!=null  || getModel().getResult(name)!=null;
 	}
 	
 	/**
@@ -974,7 +974,11 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		}
 		else if(getModel().getArgument(name)!=null)
 		{
-			ret = getModel().getArgument(name);
+			ret = getArguments().get(name);
+		}
+		else if(getModel().getResult(name)!=null)
+		{
+			ret	= getResults().get(name);
 		}
 		else
 		{
@@ -1004,7 +1008,14 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		boolean isres = getModel().getResult(name)!=null;
 		if(!isres && !isvar)
 		{
-			throw new RuntimeException("Undeclared context variable: "+name+", "+this);
+			if(getModel().getArgument(name)!=null)
+			{
+				throw new RuntimeException("Cannot set argument: "+name+", "+this);
+			}
+			else
+			{
+				throw new RuntimeException("Undeclared context variable: "+name+", "+this);				
+			}
 		}
 		
 		if(key==null)

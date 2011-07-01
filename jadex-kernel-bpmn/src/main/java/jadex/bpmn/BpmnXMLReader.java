@@ -1547,8 +1547,8 @@ public class BpmnXMLReader
 							}
 							if(value!=null && value.length()>0)
 							{
-								IParsedExpression exp = parser.parseExpression(value, mi.getAllImports(), null, context.getClassLoader());
-								model.addProperty(name, exp.getValue(null));
+//								IParsedExpression exp = parser.parseExpression(value, mi.getAllImports(), null, context.getClassLoader());
+								model.addProperty(name, new UnparsedExpression(name, null, value, null));
 							}
 						}
 					}

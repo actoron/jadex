@@ -68,11 +68,7 @@
 
 		<!-- <componenttype filename="jadex/tools/jcc/JCC.agent.xml" name="jcc"/> -->
 		<!--<componenttype filename="jadex/tools/jcc/JCCAgent.class" name="jcc"/>-->
-		<componenttype filename="/jadex/benchmarking/viewer/JCCAgent.class" name="jcc"/>
-		<componenttype filename="jadex/bdi/benchmarks/AgentCreation.agent.xml" name="CreationBDI"/>
-		<componenttype filename="jadex/micro/benchmarks/AgentCreationAgent.class" name="CreationMicro"/>
-		<componenttype filename="jadex/micro/benchmarks/MegaParallelStarterAgent.class" name="CreationMicroParallel"/>
-		<componenttype filename="jadex/bpmn/benchmarks/AgentCreation2.bpmn" name="CreationBPMN"/>
+		<componenttype filename="/jadex/tools/jcc/JCCAgent.class" name="jcc"/>
 	</componenttypes>
 	
 	<services>
@@ -131,11 +127,6 @@
 		<providedservice class="IDF">
 			<implementation proxytype="raw">
 				new DirectoryFacilitatorService($component.getServiceProvider())
-			</implementation>
-		</providedservice>
-		<providedservice class="IBenchmarkingManagementService">
-		<implementation proxytype="raw">
-			new BenchmarkingManagementService($component.getServiceProvider())
 			</implementation>
 		</providedservice>
 		<providedservice class="ISimulationService">
@@ -297,61 +288,5 @@
 			</components>
 		</configuration>
 		
-		<configuration name="creation_test_bdi">
-			<arguments>
-				<argument name="platformname">"testcases"</argument>
-				<argument name="saveonexit">false</argument>
-				<argument name="libpath">new Object[]{"../jadex-applications-bdi/target/classes"}</argument>
-			</arguments>
-			<components>
-				<component type="kernel_bdi" daemon="true"/>
-				<component type="CreationBDI"/>
-			</components>
-		</configuration>
-		
-		<configuration name="creation_test_micro">
-			<arguments>
-				<argument name="platformname">"testcases"</argument>
-				<argument name="saveonexit">false</argument>
-				<argument name="libpath">new Object[]{"../jadex-applications-micro/target/classes"}</argument>
-			</arguments>
-			<components>
-				<component type="kernel_micro" daemon="true"/>
-				<component type="CreationMicro">
-					<arguments>
-						<argument name="max">100000</argument>
-					</arguments>
-				</component>
-			</components>
-		</configuration>
-		
-		<configuration name="creation_test_micro_parallel">
-			<arguments>
-				<argument name="platformname">"testcases"</argument>
-				<argument name="saveonexit">false</argument>
-				<argument name="libpath">new Object[]{"../jadex-applications-micro/target/classes"}</argument>
-			</arguments>
-			<components>
-				<component type="kernel_micro" daemon="true"/>
-				<component type="CreationMicroParallel">
-					<arguments>
-						<argument name="max">100000</argument>
-					</arguments>
-				</component>
-			</components>
-		</configuration>
-
-		<configuration name="creation_test_bpmn">
-			<arguments>
-				<argument name="platformname">"testcases"</argument>
-				<argument name="saveonexit">false</argument>
-				<argument name="libpath">new Object[]{"../jadex-applications-bpmn/target/classes"}</argument>
-			</arguments>
-			<components>
-				<component type="kernel_bpmn" daemon="true"/>
-				<component type="CreationBPMN"/>
-			</components>
-		</configuration>		
 	</configurations>
-	
 </componenttype>

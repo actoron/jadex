@@ -141,6 +141,17 @@ public class Argument implements IArgument
 		return clazz;
 	}
 	
+	
+	/**
+	 *  Get the default value.
+	 *  @return The default value.
+	 */
+	public Object getDefaultValue()
+	{
+		return getDefaultValue(null);
+	}
+
+	
 	/**
 	 *  Get the default value.
 	 *  @return The default value.

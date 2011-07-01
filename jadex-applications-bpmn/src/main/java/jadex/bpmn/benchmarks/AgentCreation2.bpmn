@@ -3,44 +3,58 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_t_U5MNkMEd6KRaQAf_IpCg" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_t_U5MtkMEd6KRaQAf_IpCg" key="package" value="jadex.bpmn.benchmarks"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cybUsNtDEd6x4pN6Y6csZw" key="Package" value="jadex.bpmn.benchmarks"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rra3oBbrEd-OSKK6OfNWqA" key="Description" value="&lt;h3>Creation Benchmark&lt;/h3>This benchmark measures the time for starting and killing a number of processes."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct_sZwRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2aAQQKMoEeC5HPORDO2-ow" key="description" value="&lt;h3>Creation Benchmark&lt;/h3>This benchmark measures the time for starting and killing a number of processes."/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_che6QARPEeCnwcpWvxOwkg" source="jadex_imports_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_che6QQRPEeCnwcpWvxOwkg" key="dimension" value="4:1"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_che6QgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_che6QwRPEeCnwcpWvxOwkg" key="0:0" value="jadex.commons.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_che6RARPEeCnwcpWvxOwkg" key="1:0" value="jadex.bridge.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_che6RQRPEeCnwcpWvxOwkg" key="2:0" value="jadex.bpmn.runtime.task.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_che6RgRPEeCnwcpWvxOwkg" key="3:0" value="jadex.bpmn.model.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vq-wUKMkEeC5HPORDO2-ow" key="dimension" value="6:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vq-wUaMkEeC5HPORDO2-ow" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vq-wUqMkEeC5HPORDO2-ow" key="0:0" value="jadex.commons.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vq-wU6MkEeC5HPORDO2-ow" key="1:0" value="jadex.bridge.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vq-wVKMkEeC5HPORDO2-ow" key="2:0" value="jadex.bpmn.runtime.task.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vq-wVaMkEeC5HPORDO2-ow" key="3:0" value="jadex.bpmn.model.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vq-wVqMkEeC5HPORDO2-ow" key="4:0" value="jadex.bridge.service.clock.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vq-wV6MkEeC5HPORDO2-ow" key="5:0" value="jadex.bridge.service.*"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_chorQARPEeCnwcpWvxOwkg" source="jadex_arguments_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorQQRPEeCnwcpWvxOwkg" key="dimension" value="4:6"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorQgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorQwRPEeCnwcpWvxOwkg" key="0:0" value="max"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorRARPEeCnwcpWvxOwkg" key="0:1" value="true"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorRQRPEeCnwcpWvxOwkg" key="0:2" value="&quot;int&quot;"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorRgRPEeCnwcpWvxOwkg" key="0:3" value="The maximum numbers of processes to create."/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorRwRPEeCnwcpWvxOwkg" key="0:4" value="int"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorSARPEeCnwcpWvxOwkg" key="0:5" value="1000"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorSQRPEeCnwcpWvxOwkg" key="1:0" value="num"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorSgRPEeCnwcpWvxOwkg" key="1:1" value="true"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorSwRPEeCnwcpWvxOwkg" key="1:2" value="false"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorTARPEeCnwcpWvxOwkg" key="1:3" value="The current process to create."/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorTQRPEeCnwcpWvxOwkg" key="1:4" value="int"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorTgRPEeCnwcpWvxOwkg" key="1:5" value="1"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorTwRPEeCnwcpWvxOwkg" key="2:0" value="startmem"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorUARPEeCnwcpWvxOwkg" key="2:1" value="true"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorUQRPEeCnwcpWvxOwkg" key="2:2" value="false"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorUgRPEeCnwcpWvxOwkg" key="2:3" value="n/a"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorUwRPEeCnwcpWvxOwkg" key="2:4" value="Object"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorVARPEeCnwcpWvxOwkg" key="2:5" value="Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory()"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorVQRPEeCnwcpWvxOwkg" key="3:0" value="starttime"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorVgRPEeCnwcpWvxOwkg" key="3:1" value="true"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorVwRPEeCnwcpWvxOwkg" key="3:2" value="false"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorWARPEeCnwcpWvxOwkg" key="3:3" value="n/a"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorWQRPEeCnwcpWvxOwkg" key="3:4" value="Object"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_chorWgRPEeCnwcpWvxOwkg" key="3:5" value="$clock.getTime()"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhMKMoEeC5HPORDO2-ow" key="dimension" value="5:6"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhMaMoEeC5HPORDO2-ow" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhMqMoEeC5HPORDO2-ow" key="0:0" value="max"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhM6MoEeC5HPORDO2-ow" key="0:1" value="true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhNKMoEeC5HPORDO2-ow" key="0:2" value="&quot;int&quot;"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhNaMoEeC5HPORDO2-ow" key="0:3" value="The maximum numbers of processes to create."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhNqMoEeC5HPORDO2-ow" key="0:4" value="int"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhN6MoEeC5HPORDO2-ow" key="0:5" value="1000"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhOKMoEeC5HPORDO2-ow" key="1:0" value="num"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhOaMoEeC5HPORDO2-ow" key="1:1" value="true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhOqMoEeC5HPORDO2-ow" key="1:2" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhO6MoEeC5HPORDO2-ow" key="1:3" value="The current process to create."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhPKMoEeC5HPORDO2-ow" key="1:4" value="int"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhPaMoEeC5HPORDO2-ow" key="1:5" value="1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhPqMoEeC5HPORDO2-ow" key="2:0" value="startmem"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhP6MoEeC5HPORDO2-ow" key="2:1" value="true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhQKMoEeC5HPORDO2-ow" key="2:2" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhQaMoEeC5HPORDO2-ow" key="2:3" value="n/a"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhQqMoEeC5HPORDO2-ow" key="2:4" value="Object"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhQ6MoEeC5HPORDO2-ow" key="2:5" value="Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory()"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhRKMoEeC5HPORDO2-ow" key="3:0" value="starttime"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhRaMoEeC5HPORDO2-ow" key="3:1" value="true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhRqMoEeC5HPORDO2-ow" key="3:2" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhR6MoEeC5HPORDO2-ow" key="3:3" value="n/a"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhSKMoEeC5HPORDO2-ow" key="3:4" value="Object"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhSaMoEeC5HPORDO2-ow" key="3:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhSqMoEeC5HPORDO2-ow" key="4:0" value="_starttime"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhS6MoEeC5HPORDO2-ow" key="4:1" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhTKMoEeC5HPORDO2-ow" key="4:2" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhTaMoEeC5HPORDO2-ow" key="4:3" value="n/a"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhTqMoEeC5HPORDO2-ow" key="4:4" value="Object"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8pKhT6MoEeC5HPORDO2-ow" key="4:5" value="$args.starttime!=null ? $args.starttime : $properties.clock.getTime()"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_aaToAKMkEeC5HPORDO2-ow" source="jadex_properties_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_iC77YKMmEeC5HPORDO2-ow" key="dimension" value="1:2"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_iC77YaMmEeC5HPORDO2-ow" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_iC77YqMmEeC5HPORDO2-ow" key="0:0" value="clock"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_iC77Y6MmEeC5HPORDO2-ow" key="0:1" value="SServiceProvider.getService($provider, IClockService.class)"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_fZ7WEdkMEd6KRaQAf_IpCg" iD="_fZ7WENkMEd6KRaQAf_IpCg" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_fZ7WE9kMEd6KRaQAf_IpCg" iD="_fZ7WEtkMEd6KRaQAf_IpCg" outgoingEdges="_6dcU2tkOEd6KRaQAf_IpCg" name="Print Creation Notice" activityType="Task">
@@ -62,32 +76,32 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_46QX0dnfEd6-RuLHHhoEBw" key="class" value="jadex.bpmn.runtime.task.CreateComponentTask"/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ct17QARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17QQRPEeCnwcpWvxOwkg" key="dimension" value="6:4"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17QgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17QwRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17RARPEeCnwcpWvxOwkg" key="0:1" value="model"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17RQRPEeCnwcpWvxOwkg" key="0:2" value="String"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17RgRPEeCnwcpWvxOwkg" key="0:3" value="&quot;/jadex/bpmn/benchmarks/AgentCreation2.bpmn&quot;"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17RwRPEeCnwcpWvxOwkg" key="1:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17SARPEeCnwcpWvxOwkg" key="1:1" value="name"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17SQRPEeCnwcpWvxOwkg" key="1:2" value="String"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17SgRPEeCnwcpWvxOwkg" key="1:3" value="$component.getComponentIdentifier().getLocalName().indexOf(&quot;#&quot;)==-1? $component.getComponentIdentifier().getLocalName()+&quot;_#&quot;+(num+1): $component.getComponentIdentifier().getLocalName().substring(0, $component.getComponentIdentifier().getLocalName().indexOf(&quot;#&quot;)+1)+(num+1)"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17SwRPEeCnwcpWvxOwkg" key="2:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17TARPEeCnwcpWvxOwkg" key="2:1" value="num"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17TQRPEeCnwcpWvxOwkg" key="2:2" value="Integer"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17TgRPEeCnwcpWvxOwkg" key="2:3" value="new Integer(num +1)"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17TwRPEeCnwcpWvxOwkg" key="3:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17UARPEeCnwcpWvxOwkg" key="3:1" value="startmem"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17UQRPEeCnwcpWvxOwkg" key="3:2" value="Long"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17UgRPEeCnwcpWvxOwkg" key="3:3" value="startmem"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17UwRPEeCnwcpWvxOwkg" key="4:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17VARPEeCnwcpWvxOwkg" key="4:1" value="starttime"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17VQRPEeCnwcpWvxOwkg" key="4:2" value="Long"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17VgRPEeCnwcpWvxOwkg" key="4:3" value="starttime"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17VwRPEeCnwcpWvxOwkg" key="5:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17WARPEeCnwcpWvxOwkg" key="5:1" value="max"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17WQRPEeCnwcpWvxOwkg" key="5:2" value="Long"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17WgRPEeCnwcpWvxOwkg" key="5:3" value="max"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L4KMoEeC5HPORDO2-ow" key="dimension" value="6:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L4aMoEeC5HPORDO2-ow" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L4qMoEeC5HPORDO2-ow" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L46MoEeC5HPORDO2-ow" key="0:1" value="model"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L5KMoEeC5HPORDO2-ow" key="0:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L5aMoEeC5HPORDO2-ow" key="0:3" value="&quot;/jadex/bpmn/benchmarks/AgentCreation2.bpmn&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L5qMoEeC5HPORDO2-ow" key="1:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L56MoEeC5HPORDO2-ow" key="1:1" value="name"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L6KMoEeC5HPORDO2-ow" key="1:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L6aMoEeC5HPORDO2-ow" key="1:3" value="$component.getComponentIdentifier().getLocalName().indexOf(&quot;#&quot;)==-1? $component.getComponentIdentifier().getLocalName()+&quot;_#&quot;+(num+1): $component.getComponentIdentifier().getLocalName().substring(0, $component.getComponentIdentifier().getLocalName().indexOf(&quot;#&quot;)+1)+(num+1)"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L6qMoEeC5HPORDO2-ow" key="2:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L66MoEeC5HPORDO2-ow" key="2:1" value="num"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L7KMoEeC5HPORDO2-ow" key="2:2" value="Integer"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L7aMoEeC5HPORDO2-ow" key="2:3" value="new Integer(num +1)"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L7qMoEeC5HPORDO2-ow" key="3:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L76MoEeC5HPORDO2-ow" key="3:1" value="startmem"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L8KMoEeC5HPORDO2-ow" key="3:2" value="Long"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L8aMoEeC5HPORDO2-ow" key="3:3" value="startmem"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L8qMoEeC5HPORDO2-ow" key="4:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L86MoEeC5HPORDO2-ow" key="4:1" value="starttime"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L9KMoEeC5HPORDO2-ow" key="4:2" value="Long"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L9aMoEeC5HPORDO2-ow" key="4:3" value="_starttime"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L9qMoEeC5HPORDO2-ow" key="5:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L96MoEeC5HPORDO2-ow" key="5:1" value="max"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L-KMoEeC5HPORDO2-ow" key="5:2" value="Long"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1C-L-aMoEeC5HPORDO2-ow" key="5:3" value="max"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_TQjzsdkQEd6KRaQAf_IpCg" iD="_TQjzsNkQEd6KRaQAf_IpCg" outgoingEdges="_YrA_WtkSEd6KRaQAf_IpCg" incomingEdges="_TQs9otkQEd6KRaQAf_IpCg" name="Print Creation&#xD;&#xA;Results" activityType="Task">
@@ -112,7 +126,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17agRPEeCnwcpWvxOwkg" key="3:0" value="in"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17awRPEeCnwcpWvxOwkg" key="3:1" value="end"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17bARPEeCnwcpWvxOwkg" key="3:2" value="long"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17bQRPEeCnwcpWvxOwkg" key="3:3" value="$clock.getTime()"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17bQRPEeCnwcpWvxOwkg" key="3:3" value="$properties.clock.getTime()"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17bgRPEeCnwcpWvxOwkg" key="4:0" value="inout"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17bwRPEeCnwcpWvxOwkg" key="4:1" value="dur"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17cARPEeCnwcpWvxOwkg" key="4:2" value="double"/>
@@ -132,7 +146,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17fgRPEeCnwcpWvxOwkg" key="8:0" value="inout"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17fwRPEeCnwcpWvxOwkg" key="8:1" value="killstarttime"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17gARPEeCnwcpWvxOwkg" key="8:2" value="long"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17gQRPEeCnwcpWvxOwkg" key="8:3" value="$clock.getTime()"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17gQRPEeCnwcpWvxOwkg" key="8:3" value="$properties.clock.getTime()"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_Uey2gdkSEd6KRaQAf_IpCg" iD="_Uey2gNkSEd6KRaQAf_IpCg" incomingEdges="_Ue8niNkSEd6KRaQAf_IpCg" name="Wait For Ever" activityType="EventIntermediateSignal"/>
@@ -184,7 +198,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17pARPEeCnwcpWvxOwkg" key="0:0" value="in"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17pQRPEeCnwcpWvxOwkg" key="0:1" value="killdur"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17pgRPEeCnwcpWvxOwkg" key="0:2" value="double"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17pwRPEeCnwcpWvxOwkg" key="0:3" value="((double)$clock.getTime()-killstarttime)/1000.0"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17pwRPEeCnwcpWvxOwkg" key="0:3" value="((double)$properties.clock.getTime()-killstarttime)/1000.0"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17qARPEeCnwcpWvxOwkg" key="1:0" value="in"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17qQRPEeCnwcpWvxOwkg" key="1:1" value="stillused"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17qgRPEeCnwcpWvxOwkg" key="1:2" value="long"/>

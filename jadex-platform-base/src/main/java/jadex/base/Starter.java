@@ -3,15 +3,21 @@ package jadex.base;
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentManagementService;
+import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.SServiceProvider;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -21,8 +27,10 @@ import jadex.javaparser.SJavaParser;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -65,6 +73,9 @@ public class Starter
 	/** The autoshutdown flag. */
 	public static final String AUTOSHUTDOWN = "autoshutdown";
 
+	/** The component flag (for starting an additional component). */
+	public static final String COMPONENT = "component";
+
 	
 	/** The reserved platform parameters. */
 	public static final Set RESERVED;
@@ -77,7 +88,7 @@ public class Starter
 		RESERVED.add(PLATFORM_NAME);
 		RESERVED.add(COMPONENT_FACTORY);
 		RESERVED.add(ADAPTER_FACTORY);
-		RESERVED.add(AUTOSHUTDOWN);
+		RESERVED.add(COMPONENT);
 	}
 	
 	/** The shutdown in progress flag. */
@@ -168,6 +179,7 @@ public class Starter
 		
 			final Map cmdargs = new HashMap();
 			final Map compargs = new HashMap();
+			final List components = new ArrayList();
 			for(int i=0; args!=null && i<args.length; i+=2)
 			{
 				String key = args[i].substring(1);
@@ -184,7 +196,15 @@ public class Starter
 						System.out.println("Argument parse exception using as string: "+args[i]+"="+args[i+1]);
 					}
 				}
-				cmdargs.put(key, val);
+				
+				if(COMPONENT.equals(key))
+				{
+					components.add(val);
+				}
+				else
+				{
+					cmdargs.put(key, val);
+				}
 			}
 			
 			// Load the platform (component) model.
@@ -211,24 +231,49 @@ public class Starter
 						throw new RuntimeException("Error loading model:\n"+model.getReport().getErrorText());
 					
 					// Create an instance of the component.
-					String configname = (String)cmdargs.get("configname")!=null? (String)cmdargs.get("configname"): 
-						model.getConfigurationNames().length>0?  model.getConfigurationNames()[0]: null;
 					
 					String platformname = (String)cmdargs.get(PLATFORM_NAME);
 					if(platformname==null)
 					{
-						IArgument[] cargs = model.getArguments();
-						for(int i=0; i<cargs.length; i++)
+						ConfigurationInfo	config	= (String)cmdargs.get("configname")!=null
+							? model.getConfiguration((String)cmdargs.get("configname")) 
+							: model.getConfigurations().length>0 ? model.getConfigurations()[0] : null;
+							
+						boolean	found	= false;
+						Object	value	= null;
+						if(config!=null)
 						{
-							Object argval = cargs[i].getDefaultValue(configname);
-//							if(!compargs.containsKey(cargs[i].getName()))
-//							{
-//								compargs.put(cargs[i].getName(), argval);
-//							}
-							if("platformname".equals(cargs[i].getName()))
+							UnparsedExpression[]	upes	= config.getArguments();
+							for(int i=0; !found && i<upes.length; i++)
 							{
-								platformname = (String)argval;
+								if(PLATFORM_NAME.equals(upes[i].getName()))
+								{
+									found	= true;
+									value	= null;
+								}
 							}
+						}
+						if(!found)
+						{
+							 IArgument	arg	= model.getArgument(PLATFORM_NAME);
+							 if(arg!=null)
+							 {
+								value	= arg.getDefaultValue(); 
+							 }
+						}
+						if(value instanceof UnparsedExpression)
+						{
+							// todo: language
+							UnparsedExpression	upe	= (UnparsedExpression)value;
+							value = SJavaParser.evaluateExpression(upe.getValue(), model.getAllImports(), null, null);
+						}
+						if(value instanceof String)
+						{
+							platformname	= (String)value;
+						}
+						else if(value!=null)
+						{
+							ret.setException(new RuntimeException("platformname not string: "+value));
 						}
 					}
 					if(platformname==null)
@@ -253,20 +298,7 @@ public class Starter
 							try
 							{
 								String ctype = (String)result;
-								
-								Boolean autosd = null; 
-								String autosdstr = (String)cmdargs.get(AUTOSHUTDOWN);
-								if(autosdstr!=null)
-								{
-									try
-									{
-										autosd = new Boolean(autosdstr);
-									}
-									catch(Exception e)
-									{
-									}
-								}
-								
+								Boolean autosd = (Boolean)cmdargs.get(AUTOSHUTDOWN);
 								final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, null, null, autosd, model.getFullName(), null);
 								
 								String afclname = (String)cmdargs.get(ADAPTER_FACTORY)!=null? 
@@ -280,15 +312,62 @@ public class Starter
 									public void resultAvailable(Object result)
 									{
 										Object[] root = (Object[])result;
-										IComponentInstance instance = (IComponentInstance)root[0];
+										final IComponentInstance instance = (IComponentInstance)root[0];
 			//							final IComponentAdapter adapter = (IComponentAdapter)root[1];
 			//							System.out.println("Instance: "+instance);
 										
-										long startup = System.currentTimeMillis() - starttime;
-										System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
-								//		platform.logger.info("Platform startup time: " + startup + " ms.");
 										
-										ret.setResult(instance.getExternalAccess());
+										final CounterResultListener	crl	= new CounterResultListener(components.size(), new DelegationResultListener(ret)
+										{
+											public void customResultAvailable(Object result)
+											{
+												long startup = System.currentTimeMillis() - starttime;
+												//		platform.logger.info("Platform startup time: " + startup + " ms.");
+												System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
+												ret.setResult(instance.getExternalAccess());
+											}
+										});
+										
+										// Start additional components.
+										if(!components.isEmpty())
+										{
+											SServiceProvider.getService(instance.getServiceContainer(), IComponentManagementService.class)
+												.addResultListener(new DelegationResultListener(ret)
+											{
+												public void customResultAvailable(Object result)
+												{
+													IComponentManagementService	cms	= (IComponentManagementService)result;
+													for(int i=0; i<components.size(); i++)
+													{
+														String	name	= null;
+														String	config	= null;
+														String	comp	= (String)components.get(i);
+														int	i1	= comp.indexOf(':');
+														if(i1!=-1)
+														{
+															name	= comp.substring(0, i1);
+															comp	= comp.substring(i1+1);
+														}
+														int	i2	= comp.indexOf('(');
+														if(i2!=-1)
+														{
+															if(comp.endsWith("("))
+															{
+																config	= comp.substring(i2+1, comp.length()-1);
+																comp	= comp.substring(0, i2);
+															}
+															else
+															{
+																throw new RuntimeException("Component specification does not match scheme [<name>:]<type>[(<config>)] : "+components.get(i));
+															}
+														}
+														
+														cms.createComponent(name, comp, new CreationInfo(config, null), null)
+															.addResultListener(crl);
+													}
+												}
+											});
+										}
 									}
 									
 									public void exceptionOccurred(Exception exception)

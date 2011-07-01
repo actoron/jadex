@@ -44,6 +44,15 @@
 		<beliefref name="testresults"  result="true">
 			<concrete ref="testcap.testresults"/>
 		</beliefref>
+		<beliefref name="abel" argument="true">
+			<concrete ref="cap_a.bel"/>
+		</beliefref>
+		<beliefref name="bbel" argument="true">
+			<concrete ref="cap_b.bel"/>
+		</beliefref>
+		<beliefref name="cbel" argument="true">
+			<concrete ref="cap_c.bel"/>
+		</beliefref>
 	</beliefs>
 
 	<plans>
@@ -64,6 +73,9 @@
 				<initialcapability ref="cap_c" configuration="test_1"/>
 			</capabilities>
 			<beliefs>
+				<initialbelief cref="testcap.testcase_cnt">
+					<fact>2</fact>
+				</initialbelief>
 				<initialbelief cref="cap_a.bel">
 					<fact>"agent_initial_bel"</fact>
 				</initialbelief>

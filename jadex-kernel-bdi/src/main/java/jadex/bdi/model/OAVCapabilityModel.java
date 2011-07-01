@@ -1,5 +1,6 @@
 package jadex.bdi.model;
 
+import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IArgument;
@@ -18,6 +19,7 @@ import jadex.rules.state.IOAVState;
 import jadex.xml.StackElement;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,6 +27,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.xml.namespace.QName;
 
 /**
  *  The capability model contains the OAV capability model in a state
@@ -88,17 +92,25 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	 */
 	public void initModelInfo()
 	{
-		// Add arguments as specified in beliefs.
-		IArgument[]	as	= getArguments();
-		for(int j=0; j<as.length; j++)
+		try
 		{
-			modelinfo.addArgument(as[j]);
+			// Add arguments as specified in beliefs.
+			IArgument[]	as	= getArguments();
+			for(int j=0; j<as.length; j++)
+			{
+				modelinfo.addArgument(as[j]);
+			}
+			// Add results as specified in beliefs.
+			IArgument[]	rs	= getResults();
+			for(int j=0; j<rs.length; j++)
+			{
+				modelinfo.addResult(rs[j]);
+			}
 		}
-		// Add results as specified in beliefs.
-		IArgument[]	rs	= getResults();
-		for(int j=0; j<rs.length; j++)
+		catch(RuntimeException e)
 		{
-			modelinfo.addResult(rs[j]);
+			addEntry(new Tuple(new Object[]{new StackElement(new QName(this instanceof OAVAgentModel ? "agent" : "capability"), handle)}),
+				"Exception when resolving arguments/results: "+e);
 		}
 		
 		// Build error report.
@@ -737,60 +749,29 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		String description = (String)state.getAttributeValue(handle, OAVBDIMetaModel.modelelement_has_description);
 		String typename = SReflect.getInnerClassName(beliefset? findBeliefSetType(state, capa, handle)
 			: findBeliefType(state, capa, handle));
-
+		
 		Argument arg = new Argument(name, description, typename);
 		
+		Map defvals = new HashMap();
+		Collection configs = (Collection)state.getAttributeValues(capa, OAVBDIMetaModel.capability_has_configurations);
+		if(configs!=null)
+		{
+			for(Iterator it=configs.iterator(); it.hasNext(); )
+			{
+				Object config = it.next();
+				String configname = (String)state.getAttributeValue(config, OAVBDIMetaModel.modelelement_has_name);
+				Object val = beliefset? findBeliefSetDefaultValue(state, capa, handle, configname, name)
+					: findBeliefDefaultValue(state, capa, handle, configname, name);
+				defvals.put(configname, val);
+			}
+		}
+		Object val =beliefset? findBeliefSetDefaultValue(state, capa, handle, null, name)
+			: findBeliefDefaultValue(state, capa, handle, null, name);
+		defvals.put(Argument.ANY_CONFIG, val);
+		arg.setDefaultValues(defvals);
+
 		return arg;
 	}
-	
-//	/**
-//	 *  Init an argument.
-//	 */
-//	public static void initArgument(Argument arg, IOAVState state, Object capa)
-//	{
-//		String name = arg.getName();
-//		
-//		boolean beliefset = false;
-//		Object handle = state.getAttributeValue(capa, OAVBDIMetaModel.capability_has_beliefs, name);
-//		if(handle==null)
-//		{
-//			handle = state.getAttributeValue(capa, OAVBDIMetaModel.capability_has_beliefrefs, name);
-//			if(handle==null)
-//			{
-//				beliefset = true;
-//				handle = state.getAttributeValue(capa, OAVBDIMetaModel.capability_has_beliefsets, name);
-//				if(handle==null)
-//				{
-//					handle = state.getAttributeValue(capa, OAVBDIMetaModel.capability_has_beliefsetrefs, name);
-//				}
-//			}
-//		}
-//		
-//		String typename = SReflect.getInnerClassName(beliefset? findBeliefSetType(state, capa, handle)
-//			: findBeliefType(state, capa, handle));
-//		arg.setTypename(typename);
-//		
-//		Collection configs = (Collection)state.getAttributeValues(capa, OAVBDIMetaModel.capability_has_configurations);
-//		if(configs!=null)
-//		{
-//			Map defvals = new HashMap();
-//			for(Iterator it=configs.iterator(); it.hasNext(); )
-//			{
-//				Object config = it.next();
-//				String configname = (String)state.getAttributeValue(config, OAVBDIMetaModel.modelelement_has_name);
-//				Object val = beliefset? findBeliefSetDefaultValue(state, capa, handle, configname, name)
-//					: findBeliefDefaultValue(state, capa, handle, configname, name);
-//				defvals.put(configname, val);
-//			}
-//			arg.setDefaultValues(defvals);
-//		}
-//		else
-//		{
-//			Object val =beliefset? findBeliefSetDefaultValue(state, capa, handle, null, name)
-//				: findBeliefDefaultValue(state, capa, handle, null, name);
-//			arg.setDefaultValue(val);
-//		}
-//	}
 	
 	/**
 	 *  Find the belief/ref type.
@@ -836,143 +817,143 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		return ret!=null ? ret : void.class;
 	}
 	
-//	/**
-//	 *  Find the belief/ref value.
-//	 *  Returns the expression text of the default value.
-//	 */
-//	// Todo: other kernels provide object values!? 
-//	protected static String	findBeliefDefaultValue(IOAVState state, Object mcapa, Object handle, String configname, String elemname)
-//	{
-//		String ret = null;
-//		boolean found = false;
-//		
-//		// Search initial value in configurations.
-//		Object config;
-//		if(configname==null)
-//		{
-//			configname = (String)state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_defaultconfiguration);
-//			config = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_configurations, configname);
-//		}
-//		else
-//		{
-//			config = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_configurations, configname);
-//		}
-//	
-//		if(config!=null)
-//		{
-//			Object[] belres;
-//			if(OAVBDIMetaModel.beliefreference_type.equals(state.getType(handle)))
-//			{
-//				String ref = (String)state.getAttributeValue(handle, OAVBDIMetaModel.elementreference_has_concrete);
-//				belres = AgentRules.resolveMCapability(ref, OAVBDIMetaModel.belief_type, mcapa, state);
-//			}
-//			else
-//			{
-//				belres = new Object[]{elemname, mcapa};
-//			}
-//			
-//			Collection inibels = state.getAttributeValues(config, OAVBDIMetaModel.configuration_has_initialbeliefs);
-//			if(inibels!=null)
-//			{
-//				for(Iterator it=inibels.iterator(); it.hasNext(); )
-//				{
-//					Object inibel = it.next();
-//					String ref = (String)state.getAttributeValue(inibel, OAVBDIMetaModel.configbelief_has_ref);
-//					Object[] inibelres = AgentRules.resolveMCapability(ref, OAVBDIMetaModel.belief_type, mcapa, state);
-//					
-//					if(Arrays.equals(inibelres, belres))
-//					{	
-//						Object exp = state.getAttributeValue(inibel, OAVBDIMetaModel.belief_has_fact);
-//						if(exp!=null)
-//						{
-//							// todo: evaluate expression?
-//							IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed);
-//							if(parsedexp!=null)
-//							{
-//								ret = parsedexp.getExpressionText();
-//							}
-//							else
-//							{
-//								ret	= (String)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_text);
-//								if(ret!=null)
-//									ret	= ret.trim();
-//							}
-//							found = true;
-//						}
-//					}
-//				}
-//			}
-//		}
-//		
-//		// If not found 
-//		// a) its a belief -> get default value
-//		// b) its a ref -> recursively call this method with ref, subcapa and config
-//		
-//		if(!found)
-//		{
-//			if(OAVBDIMetaModel.belief_type.equals(state.getType(handle)))
-//			{
-//				Object exp = state.getAttributeValue(handle, OAVBDIMetaModel.belief_has_fact);
-//				if(exp!=null)
-//				{
-//					// todo: evaluate expression?
-//					IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed);
-//					if(parsedexp!=null)
-//					{
-//						ret = parsedexp.getExpressionText();
-//					}
-//					else
-//					{
-//						ret	= (String)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_text);
-//						if(ret!=null)
-//							ret	= ret.trim();
-//					}
-//				}
-//			}
-//			else
-//			{
-//				String name = (String)state.getAttributeValue(handle, OAVBDIMetaModel.elementreference_has_concrete);
-//				Object belref;
-//				int idx = name.indexOf(".");
-//				if(idx==-1)
-//				{
-//					belref = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefrefs, name);
-//					name = (String)state.getAttributeValue(belref, OAVBDIMetaModel.elementreference_has_concrete);
-//				}
-//				String capaname = name.substring(0, idx);
-//				String belname = name.substring(idx+1);
-//				
-//				Object subcaparef = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs, capaname);
-//				Object subcapa  = state.getAttributeValue(subcaparef, OAVBDIMetaModel.capabilityref_has_capability);
-//				
-//				belref = state.getAttributeValue(subcapa, OAVBDIMetaModel.capability_has_beliefs, belname);
-//				if(belref==null)
-//					belref = state.getAttributeValue(subcapa, OAVBDIMetaModel.capability_has_beliefrefs, belname);
-//				
-//				String subconfigname = null;
-//				if(config!=null)
-//				{
-//					Collection inicapas = state.getAttributeValues(config, OAVBDIMetaModel.configuration_has_initialcapabilities);
-//					if(inicapas!=null)
-//					{
-//						for(Iterator it=inicapas.iterator(); subconfigname==null && it.hasNext(); )
-//						{
-//							Object inicapa = it.next();
-//							
-//							if(state.getAttributeValue(inicapa, OAVBDIMetaModel.initialcapability_has_ref).equals(subcaparef))
-//							{	
-//								subconfigname = (String)state.getAttributeValue(inicapa, OAVBDIMetaModel.initialcapability_has_configuration);
-//							}
-//						}
-//					}
-//				}
-//				
-//				ret = findBeliefDefaultValue(state, subcapa, belref, subconfigname, belname);
-//			}
-//		}
-//		
-//		return ret;
-//	}
+	/**
+	 *  Find the belief/ref value.
+	 *  Returns the expression text of the default value.
+	 */
+	// Todo: other kernels provide object values!? 
+	protected static String	findBeliefDefaultValue(IOAVState state, Object mcapa, Object handle, String configname, String elemname)
+	{
+		String ret = null;
+		boolean found = false;
+		
+		// Search initial value in configurations.
+		Object config;
+		if(configname==null)
+		{
+			configname = (String)state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_defaultconfiguration);
+			config = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_configurations, configname);
+		}
+		else
+		{
+			config = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_configurations, configname);
+		}
+	
+		if(config!=null)
+		{
+			Object[] belres;
+			if(OAVBDIMetaModel.beliefreference_type.equals(state.getType(handle)))
+			{
+				String ref = (String)state.getAttributeValue(handle, OAVBDIMetaModel.elementreference_has_concrete);
+				belres = AgentRules.resolveMCapability(ref, OAVBDIMetaModel.belief_type, mcapa, state);
+			}
+			else
+			{
+				belres = new Object[]{elemname, mcapa, ""};
+			}
+			
+			Collection inibels = state.getAttributeValues(config, OAVBDIMetaModel.configuration_has_initialbeliefs);
+			if(inibels!=null)
+			{
+				for(Iterator it=inibels.iterator(); it.hasNext(); )
+				{
+					Object inibel = it.next();
+					String ref = (String)state.getAttributeValue(inibel, OAVBDIMetaModel.configbelief_has_ref);
+					Object[] inibelres = AgentRules.resolveMCapability(ref, OAVBDIMetaModel.belief_type, mcapa, state);
+					
+					if(Arrays.equals(inibelres, belres))
+					{	
+						Object exp = state.getAttributeValue(inibel, OAVBDIMetaModel.belief_has_fact);
+						if(exp!=null)
+						{
+							// todo: evaluate expression?
+							IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed);
+							if(parsedexp!=null)
+							{
+								ret = parsedexp.getExpressionText();
+							}
+							else
+							{
+								ret	= (String)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_text);
+								if(ret!=null)
+									ret	= ret.trim();
+							}
+							found = true;
+						}
+					}
+				}
+			}
+		}
+		
+		// If not found 
+		// a) its a belief -> get default value
+		// b) its a ref -> recursively call this method with ref, subcapa and config
+		
+		if(!found)
+		{
+			if(OAVBDIMetaModel.belief_type.equals(state.getType(handle)))
+			{
+				Object exp = state.getAttributeValue(handle, OAVBDIMetaModel.belief_has_fact);
+				if(exp!=null)
+				{
+					// todo: evaluate expression?
+					IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed);
+					if(parsedexp!=null)
+					{
+						ret = parsedexp.getExpressionText();
+					}
+					else
+					{
+						ret	= (String)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_text);
+						if(ret!=null)
+							ret	= ret.trim();
+					}
+				}
+			}
+			else
+			{
+				String name = (String)state.getAttributeValue(handle, OAVBDIMetaModel.elementreference_has_concrete);
+				Object belref;
+				int idx = name.indexOf(".");
+				if(idx==-1)
+				{
+					belref = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefrefs, name);
+					name = (String)state.getAttributeValue(belref, OAVBDIMetaModel.elementreference_has_concrete);
+				}
+				String capaname = name.substring(0, idx);
+				String belname = name.substring(idx+1);
+				
+				Object subcaparef = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs, capaname);
+				Object subcapa  = state.getAttributeValue(subcaparef, OAVBDIMetaModel.capabilityref_has_capability);
+				
+				belref = state.getAttributeValue(subcapa, OAVBDIMetaModel.capability_has_beliefs, belname);
+				if(belref==null)
+					belref = state.getAttributeValue(subcapa, OAVBDIMetaModel.capability_has_beliefrefs, belname);
+				
+				String subconfigname = null;
+				if(config!=null)
+				{
+					Collection inicapas = state.getAttributeValues(config, OAVBDIMetaModel.configuration_has_initialcapabilities);
+					if(inicapas!=null)
+					{
+						for(Iterator it=inicapas.iterator(); subconfigname==null && it.hasNext(); )
+						{
+							Object inicapa = it.next();
+							
+							if(state.getAttributeValue(inicapa, OAVBDIMetaModel.initialcapability_has_ref).equals(capaname))
+							{	
+								subconfigname = (String)state.getAttributeValue(inicapa, OAVBDIMetaModel.initialcapability_has_configuration);
+							}
+						}
+					}
+				}
+				
+				ret = findBeliefDefaultValue(state, subcapa, belref, subconfigname, belname);
+			}
+		}
+		
+		return ret;
+	}
 	
 	/**
 	 *  Find the belief/ref type.
@@ -1017,198 +998,198 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		return ret!=null ? ret : void.class;
 	}
 	
-//	/**
-//	 *  Find the beliefset/ref value.
-//	 */
-//	protected static String	findBeliefSetDefaultValue(IOAVState state, Object mcapa, Object handle, String configname, String elemname)
-//	{
-//		String ret = null;
-//		boolean found = false;
-//		
-//		// Search initial value in configurations.
-//		Object config;
-//		if(configname==null)
-//		{
-//			config = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_defaultconfiguration);
-//		}
-//		else
-//		{
-//			config = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_configurations, configname);
-//		}
-//	
-//		if(config!=null)
-//		{
-//			Object[] belsetres;
-//			if(OAVBDIMetaModel.beliefsetreference_type.equals(state.getType(handle)))
-//			{
-//				String ref = (String)state.getAttributeValue(handle, OAVBDIMetaModel.elementreference_has_concrete);
-//				belsetres = AgentRules.resolveMCapability(ref, OAVBDIMetaModel.beliefset_type, mcapa, state);
-//			}
-//			else
-//			{
-//				belsetres = new Object[]{elemname, mcapa};
-//			}
-//			
-//			Collection inibelsets = state.getAttributeValues(config, OAVBDIMetaModel.configuration_has_initialbeliefsets);
-//			if(inibelsets!=null)
-//			{
-//				for(Iterator it=inibelsets.iterator(); it.hasNext(); )
-//				{
-//					Object inibelset = it.next();
-//					String ref = (String)state.getAttributeValue(inibelset, OAVBDIMetaModel.configbeliefset_has_ref);
-//					Object[] inibelsetres = AgentRules.resolveMCapability(ref, OAVBDIMetaModel.beliefset_type, mcapa, state);
-//					
-//					if(Arrays.equals(inibelsetres, belsetres))
-//					{	
-//						Collection vals = state.getAttributeValues(inibelset, OAVBDIMetaModel.beliefset_has_facts);
-//						if(vals==null)
-//						{
-//							Object exp = state.getAttributeValue(inibelset, OAVBDIMetaModel.beliefset_has_factsexpression);
-//							if(exp!=null)
-//							{
-//								// todo: evaluate expression?
-//								IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed);
-//								if(parsedexp!=null)
-//								{
-//									ret = parsedexp.getExpressionText();
-//								}
-//								else
-//								{
-//									ret	= (String)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_text);
-//									if(ret!=null)
-//										ret	= ret.trim();
-//								}
-//								found = true;
-//							}
-//						}
-//						else
-//						{
-//							List	rets	= new ArrayList();
-//							for(Iterator vit=vals.iterator(); vit.hasNext(); )
-//							{
-//								Object exp = state.getAttributeValue(inibelset, OAVBDIMetaModel.beliefset_has_factsexpression);
-//								if(exp!=null)
-//								{
-//									// todo: evaluate expression?
-//									IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed);
-//									if(parsedexp!=null)
-//									{
-//										rets.add(parsedexp.getExpressionText());
-//									}
-//									else
-//									{
-//										String	text	= (String)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_text);
-//										if(text!=null)
-//											text	= text.trim();
-//										rets.add(text);
-//									}
-//								}
-//							}
-//							found = true;
-//							ret	= rets.toString();
-//						}
-//					}
-//				}
-//			}
-//		}
-//		
-//		// If not found 
-//		// a) its a belief -> get default value
-//		// b) its a ref -> recursively call this method with ref, subcapa and config
-//		
-//		if(!found)
-//		{
-//			if(OAVBDIMetaModel.beliefset_type.equals(state.getType(handle)))
-//			{
-//				Collection vals = state.getAttributeValues(handle, OAVBDIMetaModel.beliefset_has_facts);
-//				if(vals==null)
-//				{
-//					Object exp = state.getAttributeValue(handle, OAVBDIMetaModel.beliefset_has_factsexpression);
-//					if(exp!=null)
-//					{
-//						// todo: evaluate expression?
-//						IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed);
-//						if(parsedexp!=null)
-//						{
-//							ret = parsedexp.getExpressionText();
-//						}
-//						else
-//						{
-//							ret	= (String)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_text);
-//							if(ret!=null)
-//								ret	= ret.trim();
-//						}
-//						found = true;
-//					}
-//				}
-//				else
-//				{
-//					List	rets	= new ArrayList();
-//					for(Iterator vit=vals.iterator(); vit.hasNext(); )
-//					{
-//						Object exp = state.getAttributeValue(handle, OAVBDIMetaModel.beliefset_has_factsexpression);
-//						if(exp!=null)
-//						{
-//							// todo: evaluate expression?
-//							IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed);
-//							if(parsedexp!=null)
-//							{
-//								rets.add(parsedexp.getExpressionText());
-//							}
-//							else
-//							{
-//								String	text	= (String)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_text);
-//								if(text!=null)
-//									text	= text.trim();
-//								rets.add(text);
-//							}
-//						}
-//					}
-//					found = true;
-//					ret	= rets.toString();
-//				}
-//			}
-//			else
-//			{
-//				String name = (String)state.getAttributeValue(handle, OAVBDIMetaModel.elementreference_has_concrete);
-//				Object belref;
-//				int idx = name.indexOf(".");
-//				if(idx==-1)
-//				{
-//					belref = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefsetrefs, name);
-//					name = (String)state.getAttributeValue(belref, OAVBDIMetaModel.elementreference_has_concrete);
-//				}
-//				String capaname = name.substring(0, idx);
-//				String belname = name.substring(idx+1);
-//				
-//				Object subcaparef = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs, capaname);
-//				Object subcapa  = state.getAttributeValue(subcaparef, OAVBDIMetaModel.capabilityref_has_capability);
-//				
-//				belref = state.getAttributeValue(subcapa, OAVBDIMetaModel.capability_has_beliefsets, belname);
-//				if(belref==null)
-//					belref = state.getAttributeValue(subcapa, OAVBDIMetaModel.capability_has_beliefsetrefs, belname);
-//				
-//				String subconfigname = null;
-//				if(config!=null)
-//				{
-//					Collection inicapas = state.getAttributeValues(config, OAVBDIMetaModel.configuration_has_initialcapabilities);
-//					if(inicapas!=null)
-//					{
-//						for(Iterator it=inicapas.iterator(); subconfigname==null && it.hasNext(); )
-//						{
-//							Object inicapa = it.next();
-//							if(state.getAttributeValue(inicapa, OAVBDIMetaModel.initialcapability_has_ref).equals(subcaparef))
-//							{	
-//								subconfigname = (String)state.getAttributeValue(inicapa, OAVBDIMetaModel.initialcapability_has_configuration);
-//							}
-//						}
-//					}
-//				}
-//				
-//				ret = findBeliefSetDefaultValue(state, subcapa, belref, subconfigname, belname);
-//			}
-//		}
-//		
-//		return ret;
-//	}
+	/**
+	 *  Find the beliefset/ref value.
+	 */
+	protected static String	findBeliefSetDefaultValue(IOAVState state, Object mcapa, Object handle, String configname, String elemname)
+	{
+		String ret = null;
+		boolean found = false;
+		
+		// Search initial value in configurations.
+		Object config;
+		if(configname==null)
+		{
+			config = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_defaultconfiguration);
+		}
+		else
+		{
+			config = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_configurations, configname);
+		}
+	
+		if(config!=null)
+		{
+			Object[] belsetres;
+			if(OAVBDIMetaModel.beliefsetreference_type.equals(state.getType(handle)))
+			{
+				String ref = (String)state.getAttributeValue(handle, OAVBDIMetaModel.elementreference_has_concrete);
+				belsetres = AgentRules.resolveMCapability(ref, OAVBDIMetaModel.beliefset_type, mcapa, state);
+			}
+			else
+			{
+				belsetres = new Object[]{elemname, mcapa, ""};
+			}
+			
+			Collection inibelsets = state.getAttributeValues(config, OAVBDIMetaModel.configuration_has_initialbeliefsets);
+			if(inibelsets!=null)
+			{
+				for(Iterator it=inibelsets.iterator(); it.hasNext(); )
+				{
+					Object inibelset = it.next();
+					String ref = (String)state.getAttributeValue(inibelset, OAVBDIMetaModel.configbeliefset_has_ref);
+					Object[] inibelsetres = AgentRules.resolveMCapability(ref, OAVBDIMetaModel.beliefset_type, mcapa, state);
+					
+					if(Arrays.equals(inibelsetres, belsetres))
+					{	
+						Collection vals = state.getAttributeValues(inibelset, OAVBDIMetaModel.beliefset_has_facts);
+						if(vals==null)
+						{
+							Object exp = state.getAttributeValue(inibelset, OAVBDIMetaModel.beliefset_has_factsexpression);
+							if(exp!=null)
+							{
+								// todo: evaluate expression?
+								IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed);
+								if(parsedexp!=null)
+								{
+									ret = parsedexp.getExpressionText();
+								}
+								else
+								{
+									ret	= (String)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_text);
+									if(ret!=null)
+										ret	= ret.trim();
+								}
+								found = true;
+							}
+						}
+						else
+						{
+							List	rets	= new ArrayList();
+							for(Iterator vit=vals.iterator(); vit.hasNext(); )
+							{
+								Object exp = vit.next();
+								if(exp!=null)
+								{
+									// todo: evaluate expression?
+									IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed);
+									if(parsedexp!=null)
+									{
+										rets.add(parsedexp.getExpressionText());
+									}
+									else
+									{
+										String	text	= (String)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_text);
+										if(text!=null)
+											text	= text.trim();
+										rets.add(text);
+									}
+								}
+							}
+							found = true;
+							ret	= rets.toString();
+						}
+					}
+				}
+			}
+		}
+		
+		// If not found 
+		// a) its a belief -> get default value
+		// b) its a ref -> recursively call this method with ref, subcapa and config
+		
+		if(!found)
+		{
+			if(OAVBDIMetaModel.beliefset_type.equals(state.getType(handle)))
+			{
+				Collection vals = state.getAttributeValues(handle, OAVBDIMetaModel.beliefset_has_facts);
+				if(vals==null)
+				{
+					Object exp = state.getAttributeValue(handle, OAVBDIMetaModel.beliefset_has_factsexpression);
+					if(exp!=null)
+					{
+						// todo: evaluate expression?
+						IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed);
+						if(parsedexp!=null)
+						{
+							ret = parsedexp.getExpressionText();
+						}
+						else
+						{
+							ret	= (String)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_text);
+							if(ret!=null)
+								ret	= ret.trim();
+						}
+						found = true;
+					}
+				}
+				else
+				{
+					List	rets	= new ArrayList();
+					for(Iterator vit=vals.iterator(); vit.hasNext(); )
+					{
+						Object exp = vit.next();
+						if(exp!=null)
+						{
+							// todo: evaluate expression?
+							IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed);
+							if(parsedexp!=null)
+							{
+								rets.add(parsedexp.getExpressionText());
+							}
+							else
+							{
+								String	text	= (String)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_text);
+								if(text!=null)
+									text	= text.trim();
+								rets.add(text);
+							}
+						}
+					}
+					found = true;
+					ret	= rets.toString();
+				}
+			}
+			else
+			{
+				String name = (String)state.getAttributeValue(handle, OAVBDIMetaModel.elementreference_has_concrete);
+				Object belref;
+				int idx = name.indexOf(".");
+				if(idx==-1)
+				{
+					belref = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefsetrefs, name);
+					name = (String)state.getAttributeValue(belref, OAVBDIMetaModel.elementreference_has_concrete);
+				}
+				String capaname = name.substring(0, idx);
+				String belname = name.substring(idx+1);
+				
+				Object subcaparef = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs, capaname);
+				Object subcapa  = state.getAttributeValue(subcaparef, OAVBDIMetaModel.capabilityref_has_capability);
+				
+				belref = state.getAttributeValue(subcapa, OAVBDIMetaModel.capability_has_beliefsets, belname);
+				if(belref==null)
+					belref = state.getAttributeValue(subcapa, OAVBDIMetaModel.capability_has_beliefsetrefs, belname);
+				
+				String subconfigname = null;
+				if(config!=null)
+				{
+					Collection inicapas = state.getAttributeValues(config, OAVBDIMetaModel.configuration_has_initialcapabilities);
+					if(inicapas!=null)
+					{
+						for(Iterator it=inicapas.iterator(); subconfigname==null && it.hasNext(); )
+						{
+							Object inicapa = it.next();
+							if(state.getAttributeValue(inicapa, OAVBDIMetaModel.initialcapability_has_ref).equals(capaname))
+							{	
+								subconfigname = (String)state.getAttributeValue(inicapa, OAVBDIMetaModel.initialcapability_has_configuration);
+							}
+						}
+					}
+				}
+				
+				ret = findBeliefSetDefaultValue(state, subcapa, belref, subconfigname, belname);
+			}
+		}
+		
+		return ret;
+	}
 }

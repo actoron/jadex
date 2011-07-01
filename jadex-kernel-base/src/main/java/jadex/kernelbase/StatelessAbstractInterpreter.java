@@ -607,7 +607,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					Class clazz = unexp.getClazz(model.getClassLoader(), model.getAllImports());
 					if(SReflect.isSupertype(IFuture.class, clazz!=null? clazz: val.getClass()))
 					{
-//						System.out.println("Future property: "+mexp.getName()+", "+val);
+//						System.out.println("Future property: "+unexp.getName()+", "+val);
 						if(val instanceof IFuture)
 						{
 							// Use second future to start component only when value has already been set.

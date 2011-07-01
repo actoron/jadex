@@ -3119,7 +3119,7 @@ public class AgentRules
 	 */
 	public static Object[] resolveMCapability(String name, OAVObjectType type, Object mcapa, IOAVState state)
 	{
-		return resolveMCapability(name, type, mcapa, state, true);
+		return resolveMCapability(name, type, mcapa, state, true, "");
 	}
 
 	/**
@@ -3128,10 +3128,12 @@ public class AgentRules
 	 *  @param type The object type (belief, beliefset, goal, internalevent, messageevent).
 	 *  @param rcapa The runtime scope.
 	 *  @param recurse	recurse (true) or resolve only one level (false).
-	 *  @return An array [restname, scope].
+	 *  @return An array [restname, scope, path].
 	 */
-	public static Object[] resolveMCapability(String name, OAVObjectType type, Object mcapa, IOAVState state, boolean recurse)
+	public static Object[] resolveMCapability(String name, OAVObjectType type, Object mcapa, IOAVState state, boolean recurse, String path)
 	{
+		Object[] ret;  // Object[]{name, mcapa, capname};
+
 		int	idx;
 		if((idx=name.indexOf('.'))!=-1)
 		{
@@ -3144,9 +3146,9 @@ public class AgentRules
 			if(mcaparef==null)
 				throw new RuntimeException("No such capability: "+capname);
 			mcapa = state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_capability);
+			
+			path	= path.equals("") ? capname : path+"."+capname;
 		}
-		
-		Object[] ret = new Object[]{name, mcapa};
 		
 		// Check if name is a reference. Then resolve reference further.
 		if(recurse)
@@ -3187,7 +3189,7 @@ public class AgentRules
 				name = (String)state.getAttributeValue(refelem, OAVBDIMetaModel.elementreference_has_concrete);
 				if(name!=null)
 				{
-					ret = resolveMCapability(name, type, mcapa, state, true);
+					ret = resolveMCapability(name, type, mcapa, state, true, path);
 				}
 				else
 				{
@@ -3205,8 +3207,16 @@ public class AgentRules
 //					name	= (String)state.getAttributeValue(sourceelem, OAVBDIMetaModel.modelelement_has_name);
 //					ret	= resolveCapability(name, type, sourcecapa, state, true);
 				}
-					
 			}
+			else
+			{
+				// Not a reference.
+				ret	= new Object[]{name, mcapa, path};
+			}
+		}
+		else
+		{
+			ret	= new Object[]{name, mcapa, path};
 		}
 		
 		return ret;	

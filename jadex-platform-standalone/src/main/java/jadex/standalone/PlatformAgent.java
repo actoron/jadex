@@ -77,10 +77,7 @@ import jadex.micro.annotation.RequiredServices;
 	@ComponentType(name="kernel_multi", filename="jadex/micro/KernelMultiAgent.class"),
 	@ComponentType(name="rms", filename="jadex/base/service/remote/RemoteServiceManagementAgent.class"),
 	@ComponentType(name="awa", filename="jadex/base/service/awareness/AwarenessAgent.class"),
-	@ComponentType(name="jcc", filename="jadex/tools/jcc/JCCAgent.class"),
-	@ComponentType(name="CreationBDI", filename="jadex/bdi/benchmarks/AgentCreation.agent.xml"),
-	@ComponentType(name="CreationMicro", filename="jadex/micro/benchmarks/AgentCreationAgent.class"),
-	@ComponentType(name="CreationBPMN", filename="jadex/bpmn/benchmarks/AgentCreation2.bpmn")
+	@ComponentType(name="jcc", filename="jadex/tools/jcc/JCCAgent.class")
 })
 
 @ProvidedServices({

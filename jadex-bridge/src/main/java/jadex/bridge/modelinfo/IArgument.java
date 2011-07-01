@@ -37,6 +37,12 @@ public interface IArgument
 	public Object getDefaultValue(String configname);
 	
 	/**
+	 *  Get the default value.
+	 *  @return The default value.
+	 */
+	public Object getDefaultValue();
+	
+	/**
 	 *  Check the validity of an input.
 	 *  @param input The input.
 	 *  @return True, if valid.

@@ -2,7 +2,11 @@ package jadex.bdi.testcases.beliefs;
 
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.modelinfo.IArgument;
 import jadex.commons.SUtil;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *  Test initial belief values.
@@ -26,7 +30,31 @@ public class BeliefValuePlan extends Plan
 	 */
 	public void body()
 	{
-		TestReport tr = new TestReport("#1", "Test initial belief values.");
+		TestReport tr = new TestReport("#1", "Test belief default values.");
+		Map	check	= new HashMap();
+		check.put("timeout", "20000L");
+		check.put("abel", "\"agent_initial_bel\"");
+		check.put("bbel", "\"capability_initial_bel\"");
+		check.put("cbel", "\"capability_default_bel\"");
+		IArgument[]	args	= getScope().getAgentModel().getArguments();
+		boolean	ok	= args.length==check.size();
+		for(int i=0; ok && i<args.length; i++)
+		{
+			ok	= SUtil.equals(args[i].getDefaultValue("default"), check.get(args[i].getName()));
+		}
+		if(ok)
+		{
+			tr.setSucceeded(true);
+		}
+		else
+		{
+			tr.setFailed("Argument values incorrect: "+SUtil.arrayToString(args)+", "+check);
+		}
+		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
+		
+		
+		
+		tr = new TestReport("#2", "Test initial belief values.");
 
 		String bel_a = (String)getBeliefbase().getBelief("cap_a.bel").getFact();
 		String bel_b = (String)getBeliefbase().getBelief("cap_b.bel").getFact();

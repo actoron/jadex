@@ -7,7 +7,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IArgument;
-import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
@@ -155,8 +154,15 @@ public class AgentCreationAgent extends MicroAgent
 									public void resultAvailable(Object result)
 									{
 										IMicroExternalAccess	exta	= (IMicroExternalAccess)result;
-										// Add sleep time for accurate killing results.
-										deletePeers(max, clock.getTime(), dur, pera, omem, upera, max, exta, nested);
+										exta.scheduleStep(new IComponentStep()
+										{
+											@XMLClassname("deletePeers")
+											public Object execute(IInternalAccess ia)
+											{
+												((AgentCreationAgent)ia).deletePeers(max, clock.getTime(), dur, pera, omem, upera, max, nested);
+												return null;
+											}
+										});
 									}
 								}));
 							}
@@ -190,57 +196,39 @@ public class AgentCreationAgent extends MicroAgent
 	 *  @param cnt The highest number of the agent to kill.
 	 */
 	protected void deletePeers(final int cnt, final long killstarttime, final double dur, final double pera,
-		final long omem, final double upera, final int max, final IMicroExternalAccess exta, final boolean nested)
+		final long omem, final double upera, final int max, final boolean nested)
 	{
-		final String name = createPeerName(cnt, exta.getComponentIdentifier());
+		final String name = createPeerName(cnt, getComponentIdentifier());
 //		System.out.println("Destroying peer: "+name);
 		getCMS().addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(final Object result)
 			{
-				exta.scheduleStep(new IComponentStep()
+				IComponentManagementService cms = (IComponentManagementService)result;
+				IComponentIdentifier aid = cms.createComponentIdentifier(name, true, null);
+				IResultListener lis = new IResultListener()
 				{
-					@XMLClassname("destroy1")
-					public Object execute(IInternalAccess ia)
+					public void resultAvailable(Object result)
 					{
-						IComponentManagementService cms = (IComponentManagementService)result;
-						IComponentIdentifier aid = cms.createComponentIdentifier(name, true, null);
-						IResultListener lis = new IResultListener()
-						{
-							public void resultAvailable(Object result)
-							{
-								exta.scheduleStep(new IComponentStep()
-								{
-									@XMLClassname("destroy2")
-									public Object execute(IInternalAccess ia)
-									{
-										System.out.println("Successfully destroyed peer: "+name);
-										
-										if(cnt-1>(nested?1:1))
-//										if(cnt-1>(nested?1:0))
-										{
-											deletePeers(cnt-1, killstarttime, dur, pera, omem, upera, max, exta, nested);
-										}
-										else
-										{
-											killLastPeer(max, killstarttime, dur, pera, omem, upera, exta);
-										}
-										
-										return null;
-									}
-								});
-							}
-							public void exceptionOccurred(Exception exception)
-							{
-								exception.printStackTrace();
-							}
-						};
-						IFuture ret = cms.destroyComponent(aid);
-						ret.addResultListener(lis);
+						System.out.println("Successfully destroyed peer: "+name);
 						
-						return null;
+						if(cnt-1>(nested?1:1))
+//										if(cnt-1>(nested?1:0))
+						{
+							deletePeers(cnt-1, killstarttime, dur, pera, omem, upera, max, nested);
+						}
+						else
+						{
+							killLastPeer(max, killstarttime, dur, pera, omem, upera);
+						}
 					}
-				});
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+					}
+				};
+				
+				cms.destroyComponent(aid).addResultListener(lis);
 			}
 		});
 	}
@@ -249,45 +237,36 @@ public class AgentCreationAgent extends MicroAgent
 	 *  Kill the last peer and print out the results.
 	 */
 	protected void killLastPeer(final int max, final long killstarttime, final double dur, final double pera, 
-		final long omem, final double upera, final IMicroExternalAccess exta)
+		final long omem, final double upera)
 	{
 		getClock().addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(final Object result)
 			{
-				// Schedule step to run on initial component instead of last.
-				exta.scheduleStep(new IComponentStep()
+				IClockService cs = (IClockService)result;
+				long killend = cs.getTime();
+				System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
+				double killdur = ((double)killend-killstarttime)/1000.0;
+				final double killpera = killdur/(max-1);
+				
+				Runtime.getRuntime().gc();
+				try
 				{
-					@XMLClassname("last")
-					public Object execute(IInternalAccess ia)
-					{
-						IClockService cs = (IClockService)result;
-						long killend = cs.getTime();
-						System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
-						double killdur = ((double)killend-killstarttime)/1000.0;
-						final double killpera = killdur/(max-1);
-						
-						Runtime.getRuntime().gc();
-						try
-						{
-							Thread.sleep(500);
-						}
-						catch(InterruptedException e){}
-						long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
-						
-						System.out.println("\nCumulated results:");
-						System.out.println("Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
-						System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
-						System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
-						System.out.println("Still used memory: "+stillused+"kB.");
-						
-						((MicroAgent)ia).setResultValue("microcreationtime", new Tuple(""+pera, "s"));
-						((MicroAgent)ia).setResultValue("microkillingtime", new Tuple(""+killpera, "s"));
-						((MicroAgent)ia).setResultValue("micromem", new Tuple(""+upera, "kb"));
-						ia.killComponent();
-						return null;
-					}
-				});
+					Thread.sleep(500);
+				}
+				catch(InterruptedException e){}
+				long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
+				
+				System.out.println("\nCumulated results:");
+				System.out.println("Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
+				System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
+				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
+				System.out.println("Still used memory: "+stillused+"kB.");
+				
+				setResultValue("microcreationtime", new Tuple(""+pera, "s"));
+				setResultValue("microkillingtime", new Tuple(""+killpera, "s"));
+				setResultValue("micromem", new Tuple(""+upera, "kb"));
+				killComponent();
 			}
 		});
 	}

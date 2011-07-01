@@ -80,17 +80,7 @@ public class ProcessThreadValueFetcher implements IValueFetcher
 				found	= true;
 			}
 		}
-		
-		// Check for process instance variable.
-		if(!found)
-		{
-			if(thread.getInstance().hasContextVariable(name))
-			{
-				value = thread.getInstance().getContextVariable(name);
-				found = true;
-			}
-		}
-		
+				
 		if(!found)
 		{
 			if("$thread".equals(name))
