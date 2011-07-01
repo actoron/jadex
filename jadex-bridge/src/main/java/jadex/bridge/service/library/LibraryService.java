@@ -115,8 +115,10 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		synchronized(this)
 		{
 			Integer refcount = (Integer) urlrefcount.get(url);
-			if (refcount != null)
+			if(refcount != null)
+			{
 				urlrefcount.put(url, new Integer(refcount.intValue() + 1));
+			}
 			else
 			{
 				urlrefcount.put(url, new Integer(1));
@@ -128,7 +130,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		}
 		
 		// Do not notify listeners with lock held!
-		if (lis != null)
+		if(lis != null)
 		{
 			for(int i=0; i<lis.length; i++)
 			{
@@ -158,11 +160,11 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		ILibraryServiceListener[] lis = null;
 		synchronized(this)
 		{
-			Integer refcount = (Integer) urlrefcount.get(url);
-			if (refcount == null)
+			Integer refcount = (Integer)urlrefcount.get(url);
+			if(refcount == null)
 				throw new RuntimeException("Unknown URL: "+url);
 			refcount = new Integer(refcount.intValue() - 1);
-			if (refcount.intValue() < 1)
+			if(refcount.intValue() < 1)
 			{
 				Map<URL, ClassLoader> delegates = libcl.getDelegates();
 				delegates.remove(url);
@@ -172,7 +174,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		}
 		
 		// Do not notify listeners with lock held!
-		if (lis != null)
+		if(lis != null)
 		{
 			for(int i=0; i<lis.length; i++)
 			{
@@ -618,7 +620,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	public IFuture getProperties()
 	{
 		String[]	entries;
-		if (libcl != null)
+		if(libcl != null)
 		{
 			synchronized(this)
 			{

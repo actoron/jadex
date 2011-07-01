@@ -1619,8 +1619,6 @@ public class SUtil
 			index++;
 		}
 		
-		
-		
 		String ret;
 		// Relative if common directory on drive exists.
 		if(index>1)

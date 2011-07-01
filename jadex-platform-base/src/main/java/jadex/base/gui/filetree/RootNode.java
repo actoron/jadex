@@ -103,7 +103,8 @@ public class RootNode extends AbstractTreeNode
 	}
 	
 	/**
-	 * 
+	 *  Add a child node.
+	 *  @param child The child node.
 	 */
 	public void addChild(ITreeNode child)
 	{
@@ -115,6 +116,7 @@ public class RootNode extends AbstractTreeNode
 	
 	/**
 	 *  Remove a path entry from the tree.
+	 *  @param child The child node.
 	 */
 	public void removeChild(ITreeNode child)
 	{
