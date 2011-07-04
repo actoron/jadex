@@ -158,9 +158,7 @@ public class ExpansionHandler extends TreeExpansionHandler
 				for(int k=0; !found && k<model.getChildCount(node); k++)
 				{
 					Object	child	= model.getChild(node, k);
-					String	name	= child instanceof FileNode
-						? ((FileNode)child).getFile().getName()
-						: ((RemoteFileNode)child).getFileName();
+					String	name	= ((IFileNode)child).getFileName();
 					if(path[j].equals(name))
 					{
 						found	= true;

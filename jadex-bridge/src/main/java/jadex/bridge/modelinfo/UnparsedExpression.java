@@ -45,6 +45,18 @@ public class UnparsedExpression
 	{
 		this.name = name;
 		this.clazz = clazz;
+		this.classname	= clazz!=null ? clazz.getName() : null;
+		this.value = value;
+		this.language = language;
+	}
+	
+	/**
+	 *  Create a new expression.
+	 */
+	public UnparsedExpression(String name, String classname, String value, String language)
+	{
+		this.name = name;
+		this.classname	= classname;
 		this.value = value;
 		this.language = language;
 	}
@@ -175,5 +187,24 @@ public class UnparsedExpression
 			ret = SJavaParser.evaluateExpression(upe.getValue(), imports, fetcher, classloader);
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Get a parsed value.
+	 *  Handles values, which may be parsed or unparsed,
+	 *  and always returns a parsed value.
+	 *  @param	value	The value.  
+	 *  @return The parsed and evaluated value.
+	 */
+	public static Object	getParsedValue(Object value, String[] imports, IValueFetcher fetcher, ClassLoader classloader)
+	{
+		if(value instanceof UnparsedExpression)
+		{
+			// todo: language
+			UnparsedExpression	upe	= (UnparsedExpression)value;
+			value = upe.getValue()==null ? null
+				: SJavaParser.evaluateExpression(upe.getValue(), imports, fetcher, classloader);
+		}
+		return value;
 	}
 }

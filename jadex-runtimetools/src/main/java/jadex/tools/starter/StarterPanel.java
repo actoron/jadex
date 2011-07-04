@@ -14,8 +14,10 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
@@ -237,6 +239,7 @@ public class StarterPanel extends JLayeredPane
 			public void itemStateChanged(ItemEvent e)
 			{
 				refreshArguments();
+				refreshDefaultResults();
 				refreshFlags();
 			}
 		});
@@ -1151,7 +1154,24 @@ public class StarterPanel extends JLayeredPane
 		for(int i=0; argelems!=null && i<argelems.size(); i++)
 		{
 			JTextField valt = (JTextField)arguments.getComponent(i*4+2);
-			valt.setText(""+((IArgument)argelems.get(i)).getDefaultValue((String)config.getSelectedItem()));
+			valt.setText(getDefaultValue(model, ((IArgument)argelems.get(i)).getName(), (String)config.getSelectedItem()));
+		}
+	}
+	
+	/**
+	 *  Refresh the default result values.
+	 *  Called only from gui thread.
+	 */
+	protected void refreshDefaultResults()
+	{
+		// Assert that all argument components are there.
+		if(model==null || results==null || reselems==null)
+			return;
+		
+		for(int i=0; reselems!=null && i<reselems.size(); i++)
+		{
+			JTextField valt = (JTextField)results.getComponent(i*4+2);
+			valt.setText(getResultDefaultValue(model, ((IArgument)reselems.get(i)).getName(), (String)config.getSelectedItem()));
 		}
 	}
 	
@@ -1351,7 +1371,7 @@ public class StarterPanel extends JLayeredPane
 			// ignore, currently validator does not work remotely
 		}
 		String configname = (String)config.getSelectedItem();
-		JTextField mvalt = new JTextField(""+arg.getDefaultValue(configname));
+		JTextField mvalt = new JTextField(getDefaultValue(model, arg.getName(), configname));
 		// Java JTextField bug: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4247013
 		//mvalt.setMinimumSize(new Dimension(mvalt.getPreferredSize().width/4, mvalt.getPreferredSize().height/4));
 		mvalt.setEditable(false);
@@ -1391,7 +1411,7 @@ public class StarterPanel extends JLayeredPane
 		valt.setEditable(false);
 		
 		String configname = (String)config.getSelectedItem();
-		JTextField mvalt = new JTextField(""+arg.getDefaultValue(configname));
+		JTextField mvalt = new JTextField(getResultDefaultValue(model, arg.getName(), configname));
 		// Java JTextField bug: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4247013
 		//mvalt.setMinimumSize(new Dimension(mvalt.getPreferredSize().width/4, mvalt.getPreferredSize().height/4));
 		mvalt.setEditable(false);
@@ -1643,6 +1663,75 @@ public class StarterPanel extends JLayeredPane
 		});
 		return ret;
 	}
+	
+	/**
+	 *  Get the default value for an argument.
+	 */
+	public String	getDefaultValue(IModelInfo model, String arg, String config)
+	{
+		String	ret	= null;
+		ConfigurationInfo	ci	= config!=null ? model.getConfiguration(config) : null;
+		if(ci!=null)
+		{
+			UnparsedExpression[]	upes	= ci.getArguments();
+			for(int i=0; ret==null && i<upes.length; i++)
+			{
+				if(upes[i].getName().equals(arg))
+				{
+					ret	= upes[i].getValue()!=null ? upes[i].getValue() : "";
+				}
+			}
+		}
+		if(ret==null)
+		{
+			IArgument	iarg	= model.getArgument(arg);
+			if(iarg!=null)
+			{
+				ret	= iarg.getDefaultValue() instanceof UnparsedExpression
+					? ((UnparsedExpression)iarg.getDefaultValue()).getValue()!=null ? ((UnparsedExpression)iarg.getDefaultValue()).getValue() : ""
+					: ""+iarg.getDefaultValue();
+			}
+		}
+		if(ret==null)
+		{
+			ret	= "";
+		}
+		return ret;
+	}
+
+	
+	/**
+	 *  Get the default value for a result.
+	 */
+	public String	getResultDefaultValue(IModelInfo model, String arg, String config)
+	{
+		String	ret	= null;
+		ConfigurationInfo	ci	= config!=null ? model.getConfiguration(config) : null;
+		if(ci!=null)
+		{
+			UnparsedExpression[]	upes	= ci.getResults();
+			for(int i=0; ret==null && i<upes.length; i++)
+			{
+				if(upes[i].getName().equals(arg))
+				{
+					ret	= upes[i].getValue()!=null ? upes[i].getValue() : "";
+				}
+			}
+		}
+		if(ret==null)
+		{
+			IArgument	iarg	= model.getResult(arg);
+			if(iarg!=null)
+			{
+				ret	= iarg.getDefaultValue() instanceof UnparsedExpression
+					? ((UnparsedExpression)iarg.getDefaultValue()).getValue()!=null ? ((UnparsedExpression)iarg.getDefaultValue()).getValue() : ""
+					: ""+iarg.getDefaultValue();
+			}
+		}
+		if(ret==null)
+		{
+			ret	= "";
+		}
+		return ret;
+	}
 }
-
-

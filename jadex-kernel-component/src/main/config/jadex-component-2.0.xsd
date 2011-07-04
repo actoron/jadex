@@ -249,6 +249,11 @@
 					<xs:documentation>An argument an the instance level can be used for overriding the default value declared in the argument type.</xs:documentation>
 				</xs:annotation>
 			</xs:element>
+			<xs:element name="result" type="argument" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>A result an the instance level can be used for overriding the default value declared in the result type.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="configcomponents">

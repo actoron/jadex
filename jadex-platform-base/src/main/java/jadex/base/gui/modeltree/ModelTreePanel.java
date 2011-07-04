@@ -121,7 +121,7 @@ public class ModelTreePanel extends FileTreePanel
 									for(int i=0; i<children.size(); i++)
 									{
 										IFileNode child = (IFileNode)children.get(i);
-										String filename = child.getFileName();
+										String filename = child.getFilePath();
 										filenames.add(filename);
 									}
 									

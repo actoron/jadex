@@ -54,10 +54,12 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -404,23 +406,47 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
-		// Init the arguments with default values.
+		ConfigurationInfo	ci	= config!=null ? model.getConfiguration(config) : null;
+		
+		// Init the arguments with initial or default values.
+		Set	done	= new HashSet();
+		if(ci!=null)
+		{
+			UnparsedExpression[]	upes	= ci.getArguments();
+			for(int i=0; i<upes.length; i++)
+			{
+				addDefaultArgument(upes[i].getName(), UnparsedExpression.getParsedValue(upes[i], model.getAllImports(), getFetcher(), getClassLoader()));
+				done.add(upes[i].getName());
+			}
+		}
 		IArgument[] args = model.getArguments();
 		for(int i=0; i<args.length; i++)
 		{
-			if(args[i].getDefaultValue(config)!=null)
+			if(!done.contains(args[i].getName()))
 			{
-				addDefaultArgument(args[i].getName(), args[i].getDefaultValue(config));
+				addDefaultArgument(args[i].getName(),
+					UnparsedExpression.getParsedValue(args[i].getDefaultValue(), model.getAllImports(), getFetcher(), getClassLoader()));
 			}
 		}
 		
 		// Init the results with default values.
+		done	= new HashSet();
+		if(ci!=null)
+		{
+			UnparsedExpression[]	upes	= ci.getResults();
+			for(int i=0; i<upes.length; i++)
+			{
+				addDefaultResult(upes[i].getName(), UnparsedExpression.getParsedValue(upes[i], model.getAllImports(), getFetcher(), getClassLoader()));
+				done.add(upes[i].getName());
+			}
+		}
 		IArgument[] res = model.getResults();
 		for(int i=0; i<res.length; i++)
 		{
-			if(res[i].getDefaultValue(config)!=null)
+			if(!done.contains(res[i].getName()))
 			{
-				addDefaultResult(res[i].getName(), res[i].getDefaultValue(config));
+				addDefaultResult(res[i].getName(), 
+					UnparsedExpression.getParsedValue(res[i].getDefaultValue(), model.getAllImports(), getFetcher(), getClassLoader()));
 			}
 		}
 

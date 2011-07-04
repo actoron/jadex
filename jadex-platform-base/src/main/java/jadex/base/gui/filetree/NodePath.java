@@ -136,7 +136,7 @@ public class NodePath
 			}
 			else
 			{
-				path.add(0, node instanceof FileNode ? ((FileNode)node).getFile().getName() : ((RemoteFileNode)node).getFileName());
+				path.add(0, ((IFileNode)node).getFileName());
 				node	= node.getParent();
 			}
 		}

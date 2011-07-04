@@ -5,7 +5,6 @@ import jadex.bridge.IErrorReport;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
-import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
@@ -219,28 +218,6 @@ public class ComponentXMLReader
 			{
 				report.put(new Tuple(new Object[]{new StackElement(new QName("BpmnDiagram"), ret)}), "Package '"+mi.getPackage()+"' does not match file name '"+ret.getModelInfo().getFilename()+"'.");				
 			}
-
-			// todo: remove		
-			IArgument[] args = mi.getArguments(); 
-			if(args.length>0)
-			{
-				Map argsmap = new HashMap();
-				for(int i=0; i<args.length; i++)
-				{
-					argsmap.put(args[i].getName(), args[i]);
-				}
-				ConfigurationInfo[] configs = ret.getModelInfo().getConfigurations();
-				for(int i=0; i<configs.length; i++)
-				{
-					UnparsedExpression[] unexps = configs[i].getArguments();
-					for(int j=0; j<unexps.length; j++)
-					{
-						Object val = SJavaParser.evaluateExpression(unexps[j].getValue(), ret.getModelInfo().getAllImports(), null, ret.getModelInfo().getClassLoader());
-						Argument arg = (Argument)argsmap.get(unexps[j].getName());
-						arg.setDefaultValue(configs[i].getName(), val);
-					}
-				}
-			}
 		}
 		ret.setLastModified(rinfo.getLastModified());
 		
@@ -336,21 +313,30 @@ public class ComponentXMLReader
 				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown"))},
 				new SubobjectInfo[]{
 				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "component")}), new AccessInfo(new QName(uri, "component"), "componentInstance")),
+				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "result")}), new AccessInfo(new QName(uri, "result"), "result")),
 				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "providedservice")}), new AccessInfo(new QName(uri, "providedservice"), "providedService")),
 				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "requiredservice")}), new AccessInfo(new QName(uri, "requiredservice"), "requiredService")),
 			}), null, new BeanObjectReaderHandler()));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(Argument.class), 
-			new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)),
-			new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "classname"))}, null), null, new BeanObjectReaderHandler()));
-		
+				new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)),
+				new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "classname"))}, null), null, new BeanObjectReaderHandler()));
+			
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype"), new QName(uri, "arguments"), new QName(uri, "result")}), new ObjectInfo(Argument.class), 
+				new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)),
+				new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "classname"))}, null), null, new BeanObjectReaderHandler()));
+			
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "import")), new ObjectInfo(String.class), null, null, new BeanObjectReaderHandler()));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "configuration"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
-			new MappingInfo(null, null, "value", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "className"))
-			}, null)));
-		
+				new MappingInfo(null, null, "value", new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("class", "className"))
+				}, null)));
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "configuration"), new QName(uri, "arguments"), new QName(uri, "result")}), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
+				new MappingInfo(null, null, "value", new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("class", "className"))
+				}, null)));
+			
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttypes"), new QName(uri, "componenttype")}), new ObjectInfo(SubcomponentTypeInfo.class),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),

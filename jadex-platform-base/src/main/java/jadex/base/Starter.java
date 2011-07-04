@@ -235,8 +235,9 @@ public class Starter
 					String platformname = (String)cmdargs.get(PLATFORM_NAME);
 					if(platformname==null)
 					{
-						ConfigurationInfo	config	= (String)cmdargs.get("configname")!=null
-							? model.getConfiguration((String)cmdargs.get("configname")) 
+						String	configname	= (String)cmdargs.get("configname");
+						ConfigurationInfo	config	= configname!=null
+							? model.getConfiguration(configname) 
 							: model.getConfigurations().length>0 ? model.getConfigurations()[0] : null;
 							
 						boolean	found	= false;

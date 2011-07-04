@@ -1,12 +1,15 @@
 package jadex.tools.testcenter;
 
 import jadex.base.SComponentFactory;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.xml.annotation.XMLClassname;
 
 /**
  *  Helper class to identify test cases.
@@ -16,44 +19,50 @@ public class STestCenter
 	/**
 	 *  Check if a component model can be started as test case.
 	 */
-	public static IFuture	isTestcase(final String model, final IExternalAccess access)
+	public static IFuture	isTestcase(final String model, IExternalAccess access)
 	{
-		final Future	ret	= new Future();
-		
-		SComponentFactory.isLoadable(access, model).addResultListener(new DelegationResultListener(ret)
+		return access.scheduleImmediate(new IComponentStep()
 		{
-			public void customResultAvailable(Object result)
+			@XMLClassname("isTestcase")
+			public Object execute(IInternalAccess ia)
 			{
-				if(((Boolean)result).booleanValue())
+				final Future	ret	= new Future();
+				final IExternalAccess access	= ia.getExternalAccess();
+				SComponentFactory.isLoadable(access, model).addResultListener(new DelegationResultListener(ret)
 				{
-					SComponentFactory.loadModel(access, model).addResultListener(new DelegationResultListener(ret)
+					public void customResultAvailable(Object result)
 					{
-						public void customResultAvailable(Object result)
+						if(((Boolean)result).booleanValue())
 						{
-							boolean	istest	= false;
-							IModelInfo model = (IModelInfo)result;
-							if(model!=null && model.getReport()==null)
+							SComponentFactory.loadModel(access, model).addResultListener(new DelegationResultListener(ret)
 							{
-								IArgument[]	results	= model.getResults();
-								for(int i=0; !istest && i<results.length; i++)
+								public void customResultAvailable(Object result)
 								{
-									if(results[i].getName().equals("testresults") && results[i].getClassname().equals("Testcase"))
-										istest	= true;
+									boolean	istest	= false;
+									IModelInfo model = (IModelInfo)result;
+									if(model!=null && model.getReport()==null)
+									{
+										IArgument[]	results	= model.getResults();
+										for(int i=0; !istest && i<results.length; i++)
+										{
+											if(results[i].getName().equals("testresults") && results[i].getClassname().equals("Testcase"))
+												istest	= true;
+										}
+									}
+									
+									ret.setResult(Boolean.valueOf(istest));
 								}
-							}
-							
-							ret.setResult(Boolean.valueOf(istest));
+							});
 						}
-					});
-				}
-				else
-				{
-					ret.setResult(Boolean.FALSE);
-				}
+						else
+						{
+							ret.setResult(Boolean.FALSE);
+						}
+					}
+				});
+				return ret;
 			}
 		});
-		
-		return ret;
 	}
 }
 

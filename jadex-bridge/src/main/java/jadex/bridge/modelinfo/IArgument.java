@@ -34,12 +34,6 @@ public interface IArgument
 	 *  Get the default value.
 	 *  @return The default value.
 	 */
-	public Object getDefaultValue(String configname);
-	
-	/**
-	 *  Get the default value.
-	 *  @return The default value.
-	 */
 	public Object getDefaultValue();
 	
 	/**

@@ -1,10 +1,6 @@
 package jadex.bridge.modelinfo;
 
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -12,27 +8,22 @@ import java.util.Map;
  */
 public class Argument implements IArgument
 {
-	//-------- constants --------
-	
-	/** Constant for no configuration selected. */
-	public static final String ANY_CONFIG = "any_config";
-	
 	//-------- attributes --------
 	
 	/** The name. */
-	protected String name;
+	protected String	name;
 	
 	/** The description. */
-	protected String description;
+	protected String	description;
 	
 	/** The class name. */
-	protected String classname;
+	protected String	classname;
 	
 	/** The class. */
-	protected Class clazz;
+	protected Class	clazz;
 	
-	/** The default values. */
-	protected Map defaultvalues;
+	/** The default value. */
+	protected Object	defaultvalue;
 	
 	//-------- constructors --------
 	
@@ -58,18 +49,10 @@ public class Argument implements IArgument
 	 */
 	public Argument(String name, String description, String classname, Object defaultvalue)
 	{
-		this(name, description, classname, SUtil.createHashMap(new Object[]{ANY_CONFIG}, new Object[]{defaultvalue}));
-	}
-	
-	/**
-	 *  Create a new argument.
-	 */
-	public Argument(String name, String description, String classname, Map defaultvalues)
-	{
 		this.name = name;
 		this.description = description;
 		this.classname = classname;
-		this.defaultvalues = defaultvalues;
+		this.defaultvalue = defaultvalue;
 	}
 	
 	//-------- methods --------
@@ -140,36 +123,14 @@ public class Argument implements IArgument
 		}
 		return clazz;
 	}
-	
-	
+
 	/**
 	 *  Get the default value.
 	 *  @return The default value.
 	 */
 	public Object getDefaultValue()
 	{
-		return getDefaultValue(null);
-	}
-
-	
-	/**
-	 *  Get the default value.
-	 *  @return The default value.
-	 */
-	public Object getDefaultValue(String configname)
-	{
-		Object ret = null;
-		if(defaultvalues!=null)
-		{
-			ret = defaultvalues.get(configname!=null && defaultvalues.containsKey(configname)? configname: ANY_CONFIG);
-		
-			// todo: support default value for basic types
-//			if(ret==null && getClazz()!=null)
-//			{
-//				ret = SReflect.getDefaultValue(clazz);
-//			}
-		}
-		return ret;
+		return defaultvalue;
 	}
 	
 	/**
@@ -178,40 +139,9 @@ public class Argument implements IArgument
 	 */
 	public void setDefaultValue(Object defaultvalue)
 	{
-		if(defaultvalues==null)
-			defaultvalues = new HashMap();
-		defaultvalues.put(ANY_CONFIG, defaultvalue);
+		this.defaultvalue	= defaultvalue;
 	}
 	
-	/**
-	 *  Set the defaultvalue.
-	 *  @param defaultvalue The defaultvalue to set.
-	 */
-	public void setDefaultValue(String configname, Object defaultvalue)
-	{
-		if(defaultvalues==null)
-			defaultvalues = new HashMap();
-		defaultvalues.put(configname, defaultvalue);
-	}
-
-	/**
-	 *  Get the defaultvalues.
-	 *  @return the defaultvalues.
-	 */
-	public Map getDefaultValues()
-	{
-		return defaultvalues;
-	}
-
-	/**
-	 *  Set the defaultvalues.
-	 *  @param defaultvalues The defaultvalues to set.
-	 */
-	public void setDefaultValues(Map defaultvalues)
-	{
-		this.defaultvalues = defaultvalues;
-	}
-
 	/**
 	 *  Check the validity of an input.
 	 *  @param input The input.
@@ -229,7 +159,7 @@ public class Argument implements IArgument
 	 */
 	public String toString()
 	{
-		return "Argument(defaultvalues=" + this.defaultvalues + ", description="
+		return "Argument(defaultvalue=" + this.defaultvalue + ", description="
 			+ this.description + ", name=" + this.name + ", typename="
 			+ this.classname + ")";
 	}

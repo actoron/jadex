@@ -1,7 +1,6 @@
 package jadex.bridge.service.component;
 
 import jadex.bridge.IComponentAdapter;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;

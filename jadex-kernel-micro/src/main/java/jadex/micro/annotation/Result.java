@@ -31,4 +31,9 @@ public @interface Result
 	 *  The class.
 	 */
 	public Class clazz();
+	
+	/**
+	 *  The default value as expression string, i.e. will be parsed.
+	 */
+	public String defaultvalue() default "";
 }

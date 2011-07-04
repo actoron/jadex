@@ -109,7 +109,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					
 					if(content instanceof String)
 					{
-						// For debugging.
+//						// For debugging.
 //						String orig = (String)content;
 						
 						// Catch decode problems.

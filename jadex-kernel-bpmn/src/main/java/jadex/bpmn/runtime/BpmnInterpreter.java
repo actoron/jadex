@@ -484,7 +484,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 			if(!variables.containsKey(name))	// Don't overwrite arguments.
 			{
 				Object	value	= null;
-				IParsedExpression	exp	= model.getContextVariableExpression(name);
+				IParsedExpression	exp	= model.getContextVariableExpression(name, getConfiguration());
 				if(exp!=null)
 				{
 					try

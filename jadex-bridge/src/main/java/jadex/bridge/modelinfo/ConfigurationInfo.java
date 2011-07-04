@@ -24,6 +24,9 @@ public class ConfigurationInfo extends Startable
 	/** The list of argument default values. */
 	protected List arguments;
 	
+	/** The list of result default values. */
+	protected List results;
+	
 	/** The list of extensions. */
 	protected List extensions;
 	
@@ -118,6 +121,35 @@ public class ConfigurationInfo extends Startable
 		if(arguments==null)
 			arguments = new ArrayList();
 		arguments.add(argument);
+	}
+	
+	/**
+	 *  Get the list of results.
+	 *  @return The results.
+	 */
+	public UnparsedExpression[] getResults()
+	{
+		return results!=null? (UnparsedExpression[])results.toArray(new UnparsedExpression[results.size()]): new UnparsedExpression[0];
+	}
+	
+	/**
+	 *  Set the arguments.
+	 *  @param arguments The arguments to set.
+	 */
+	public void setResults(UnparsedExpression[] results)
+	{
+		this.results = SUtil.arrayToList(results);
+	}
+
+	/**
+	 *  Add a result.
+	 *  @param res The result.
+	 */
+	public void addResult(UnparsedExpression res)
+	{
+		if(results==null)
+			results = new ArrayList();
+		results.add(res);
 	}
 	
 	/**

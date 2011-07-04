@@ -103,7 +103,7 @@ public class ModelIconCache implements IIconCache
 			{
 				// Todo: remember ongoing searches for efficiency?
 	//			System.out.println("getIcon: "+type);
-				final String file = ((IFileNode)node).getFileName(); 
+				final String file = ((IFileNode)node).getFilePath(); 
 				
 				SComponentFactory.getFileType(exta, file)
 					.addResultListener(new SwingDefaultResultListener(tree)

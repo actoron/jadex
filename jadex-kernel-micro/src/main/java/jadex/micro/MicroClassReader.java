@@ -190,7 +190,7 @@ public class MicroClassReader
 			for(int i=0; i<vals.length; i++)
 			{
 				// Todo: clazz, language
-				props.put(vals[i].name(), new UnparsedExpression(vals[i].name(), null, vals[i].value(), null) );
+				props.put(vals[i].name(), new UnparsedExpression(vals[i].name(), vals[i].clazz(), vals[i].value(), null) );
 			}
 			modelinfo.setProperties(props);
 		}
@@ -230,7 +230,6 @@ public class MicroClassReader
 			}
 			modelinfo.setProvidedServices(psis);
 		}
-		Map argsmap = new HashMap();
 		if(cma.isAnnotationPresent(Arguments.class))
 		{
 			Arguments val = (Arguments)cma.getAnnotation(Arguments.class);
@@ -239,15 +238,12 @@ public class MicroClassReader
 			for(int i=0; i<vals.length; i++)
 			{
 //				Object arg = SJavaParser.evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
-				Object defval = evaluateExpression(vals[i].defaultvalue(), modelinfo.getAllImports(), null, classloader);
-				tmpargs[i] = createArgument(vals[i], defval);
 				tmpargs[i] = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
-					vals[i].description(), SReflect.getClassName(vals[i].clazz()), defval);
-				argsmap.put(tmpargs[i].getName(), tmpargs[i]);
+					vals[i].description(), SReflect.getClassName(vals[i].clazz()),
+					"".equals(vals[i].defaultvalue()) ? null : new UnparsedExpression(vals[i].name(), vals[i].clazz(), vals[i].defaultvalue(), null));
 			}
 			modelinfo.setArguments(tmpargs);
 		}
-		Map resmap = new HashMap();
 		if(cma.isAnnotationPresent(Results.class))
 		{
 			Results val = (Results)cma.getAnnotation(Results.class);
@@ -257,8 +253,8 @@ public class MicroClassReader
 			{
 //				Object res = evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
 				tmpresults[i] = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
-					vals[i].description(), SReflect.getClassName(vals[i].clazz()), null);
-				resmap.put(tmpresults[i].getName(), tmpresults[i]);
+					vals[i].description(), SReflect.getClassName(vals[i].clazz()),
+					"".equals(vals[i].defaultvalue()) ? null : new UnparsedExpression(vals[i].name(), vals[i].clazz(), vals[i].defaultvalue(), null));
 			}
 			modelinfo.setResults(tmpresults);
 		}
@@ -297,18 +293,12 @@ public class MicroClassReader
 				NameValue[] argvals = configs[i].arguments();
 				for(int j=0; j<argvals.length; j++)
 				{
-					jadex.bridge.modelinfo.Argument arg = (jadex.bridge.modelinfo.Argument)argsmap.get(argvals[j].name());
-//					Object val = SJavaParser.evaluateExpression(argvals[j].value(), imports, null, classloader);
-					Object val = evaluateExpression(argvals[j].value(), modelinfo.getAllImports(), null, classloader);
-					arg.setDefaultValue(confignames[i], val);
+					configinfo.addArgument(new UnparsedExpression(argvals[j].name(), argvals[j].clazz(), argvals[j].value(), null));
 				}
 				NameValue[] resvals = configs[i].results();
 				for(int j=0; j<resvals.length; j++)
 				{
-					jadex.bridge.modelinfo.Argument arg = (jadex.bridge.modelinfo.Argument)resmap.get(resvals[j].name());
-//					Object val = SJavaParser.evaluateExpression(resvals[j].value(), imports, null, classloader);
-					Object val = evaluateExpression(resvals[j].value(), modelinfo.getAllImports(), null, classloader);
-					arg.setDefaultValue(confignames[i], val);
+					configinfo.addResult(new UnparsedExpression(resvals[j].name(), resvals[j].clazz(), resvals[j].value(), null));
 				}
 				
 				ProvidedService[] provs = configs[i].providedservices();
@@ -370,7 +360,7 @@ public class MicroClassReader
 						UnparsedExpression[] exps = new UnparsedExpression[args.length];
 						for(int k=0; k<args.length; k++)
 						{
-							exps[k] = new UnparsedExpression(args[k].name(), null, args[k].value(), null);
+							exps[k] = new UnparsedExpression(args[k].name(), args[k].clazz(), args[k].value(), null);
 						}
 						comp.setArguments(exps);
 					}
@@ -472,15 +462,6 @@ public class MicroClassReader
 			}
 		}
 		return ret;
-	}
-	
-	/**
-	 * 
-	 */
-	protected IArgument createArgument(Argument arg, Object val)
-	{
-		return new jadex.bridge.modelinfo.Argument(arg.name(), 
-			arg.description(), SReflect.getClassName(arg.clazz()), val);
 	}
 	
 	/**

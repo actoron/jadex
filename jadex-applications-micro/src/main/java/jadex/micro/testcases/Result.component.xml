@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Component that contains a subcomponent producing an exception during init. -->
+<componenttype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex http://jadex.sourceforge.net/jadex-component-2.0.xsd"
+	name="Result" package="jadex.micro.testcases">
+
+	<arguments>
+		<result name="res">"default"</result>
+	</arguments>	
+	
+	<configurations>
+		<configuration name="config1">
+			<arguments>
+				<result name="res">"initial1"</result>
+			</arguments>
+		</configuration>
+		<configuration name="config2">
+			<arguments>
+				<result name="res">"initial2"</result>
+			</arguments>
+		</configuration>
+	</configurations>
+	
+</componenttype>

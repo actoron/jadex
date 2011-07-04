@@ -133,6 +133,12 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		{
 			final Future fut = new Future();
 			ret = fut;
+			
+//			if(method.getName().indexOf("test")!=-1)
+//			{
+//				System.out.println("seiophfip");
+//			}
+			
 			sic.invoke(service, method, myargs).addResultListener(new DelegationResultListener(fut)
 			{
 				public void customResultAvailable(Object result)
@@ -597,21 +603,21 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	/**
 	 *  Static method for creating a standard service proxy for a required service.
 	 */
-	public static IInternalService createRequiredServiceProxy(IInternalAccess ia, IExternalAccess ea, IComponentAdapter adapter, IInternalService service, 
+	public static IService createRequiredServiceProxy(IInternalAccess ia, IExternalAccess ea, IComponentAdapter adapter, IService service, 
 		IRequiredServiceFetcher fetcher, RequiredServiceInfo info, RequiredServiceBinding binding)
 	{
-		IInternalService ret = service;
+		IService ret = service;
 		
-		if(!PROXYTYPE_RAW.equals(binding.getProxytype()))
+		if(binding==null || !PROXYTYPE_RAW.equals(binding.getProxytype()))
 		{
 	//		System.out.println("create: "+service.getServiceIdentifier().getServiceType());
 			BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(service);
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
-			if(binding.isRecover())
+			if(binding!=null && binding.isRecover())
 				handler.addFirstServiceInterceptor(new RecoveryInterceptor(info, binding, fetcher));
-			if(PROXYTYPE_DECOUPLED.equals(binding.getProxytype()))
+			if(binding==null || PROXYTYPE_DECOUPLED.equals(binding.getProxytype()))
 				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(ea, adapter));
-			UnparsedExpression[] interceptors = binding.getInterceptors();
+			UnparsedExpression[] interceptors = binding!=null ? binding.getInterceptors() : null;
 			if(interceptors!=null && interceptors.length>0)
 			{
 				for(int i=0; i<interceptors.length; i++)
@@ -621,7 +627,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 					handler.addServiceInterceptor(interceptor);
 				}
 			}
-			ret = (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, 
+			ret = (IService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IService.class, 
 				service.getServiceIdentifier().getServiceType()}, handler); 
 		}
 		

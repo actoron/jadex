@@ -3,7 +3,6 @@ package jadex.micro.benchmarks;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;

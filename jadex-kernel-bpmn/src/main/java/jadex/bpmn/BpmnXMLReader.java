@@ -1453,28 +1453,10 @@ public class BpmnXMLReader
 							String typename = table.getCellValue(row, 4);
 							String val = table.getCellValue(row, 5).length()>0? table.getCellValue(row, 5): null;
 							
-							IParsedExpression exp = null;
-							Class clazz = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
+							boolean argi = isarg!=null && Boolean.parseBoolean(isarg);
+							boolean resu = isres!=null && Boolean.parseBoolean(isres);
 							
-							Argument arg	= null;
-							Object	argval	= null;
-							try
-							{
-								if(clazz!=null)
-								{
-									if(val!=null && val.length()>0)
-									{
-										exp = parser.parseExpression(val, model.getModelInfo().getAllImports(), null, context.getClassLoader());
-										argval	= exp!=null ? exp.getValue(null) : null;
-									}
-								}
-							}
-							catch(RuntimeException e)
-							{
-								// Hack!!! initial value for context variable might not be accessible statically.
-							}
-							arg = new Argument(name, desc, typename, argval);
-							
+							Map	inivals	= null;
 							if(table.getRowSize()>6)
 							{
 								String complexref = table.getCellValue(row, 6);
@@ -1488,34 +1470,41 @@ public class BpmnXMLReader
 										ConfigurationInfo ci = (ConfigurationInfo)configurations.get(configid);
 										if(ci!=null && valtext!=null && valtext.length()>0)
 										{
-											exp = parser.parseExpression(valtext, model.getModelInfo().getAllImports(), null, context.getClassLoader());
-											Object inival = exp!=null ? exp.getValue(null) : null;
-											arg.setDefaultValue(ci.getName(), inival);
-		
-											// Hack! Should add argument values in configurations not in argument!
-		//									ConfigurationInfo cinfo = mi.getConfiguration(configname);
-		//									if(cinfo!=null)
-		//									{
-		//										cinfo.addArgument(new UnparsedExpression(configname, clazz, valtext, null));
-		//									}
+											if(argi)
+											{
+												ci.addArgument(new UnparsedExpression(name, typename, valtext, null));
+											}
+											if(resu)
+											{
+												ci.addResult(new UnparsedExpression(name, typename, valtext, null));
+											}
+											if(!argi && !resu)
+											{
+												if(inivals==null)
+													inivals	= new HashMap();
+												inivals.put(ci.getName(), parser.parseExpression(val, model.getModelInfo().getAllImports(), null, context.getClassLoader()));
+											}
 										}
 									}
 								}
 							}
 							
-							boolean argi = isarg!=null && Boolean.parseBoolean(isarg);
-							boolean resu = isres!=null && Boolean.parseBoolean(isres);
 							if(argi)
 							{
-								model.addArgument(arg);
+								model.addArgument(new Argument(name, desc, typename, new UnparsedExpression(name, typename, val, null)));
 							}
 							if(resu)
 							{
-								model.addResult(arg);
+								model.addResult(new Argument(name, desc, typename, new UnparsedExpression(name, typename, val, null)));
 							}
 							if(!argi && !resu)
 							{
-								model.addContextVariable(name, clazz, exp);
+								IParsedExpression exp = null;
+								if(val!=null && val.length()>0)
+								{
+									exp = parser.parseExpression(val, model.getModelInfo().getAllImports(), null, context.getClassLoader());
+								}
+								model.addContextVariable(name, SReflect.findClass0(typename, model.getModelInfo().getAllImports(), context.getClassLoader()), exp, inivals);
 							}
 						
 //							System.out.println("Argument: "+arg);
@@ -1532,8 +1521,8 @@ public class BpmnXMLReader
 							
 							// normal property has 3 values
 							String name = null;
-							Class clazz = Object.class;
 							String value = null;
+							String typename	= null;
 							name = table.getCellValue(row, 0);
 							if(table.get(row).size()==2)
 							{
@@ -1541,14 +1530,12 @@ public class BpmnXMLReader
 							}
 							else if(table.get(row).size()==3)
 							{
-								String typename = table.getCellValue(row, 1);
+								typename = table.getCellValue(row, 1);
 								value = table.getCellValue(row, 2);
-								clazz = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
 							}
 							if(value!=null && value.length()>0)
 							{
-//								IParsedExpression exp = parser.parseExpression(value, mi.getAllImports(), null, context.getClassLoader());
-								model.addProperty(name, new UnparsedExpression(name, null, value, null));
+								model.addProperty(name, new UnparsedExpression(name, typename, value, null));
 							}
 						}
 					}
@@ -1806,7 +1793,7 @@ public class BpmnXMLReader
 										}
 										if(!argi && !resu)
 										{
-											model.addContextVariable(name, clazz, exp);
+											model.addContextVariable(name, clazz, exp, null);
 										}
 	//									System.out.println("Argument: "+arg);
 									}
@@ -1938,7 +1925,7 @@ public class BpmnXMLReader
 									exp = parser.parseExpression(init, mi.getAllImports(), null, context.getClassLoader());
 								}
 								
-								model.addContextVariable(name, clazz, exp);
+								model.addContextVariable(name, clazz, exp, null);
 							}
 						}
 					}

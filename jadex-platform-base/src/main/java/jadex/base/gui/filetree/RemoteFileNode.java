@@ -108,7 +108,14 @@ public class RemoteFileNode  extends AbstractTreeNode	implements IFileNode
 	 */
 	public String	getFileName()
 	{
-//		return file.getFilename();
+		return file.getFilename();
+	}
+	
+	/**
+	 *  Get the file path.
+	 */
+	public String	getFilePath()
+	{
 		return file.getPath();
 	}
 	

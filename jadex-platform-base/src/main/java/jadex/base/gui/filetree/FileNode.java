@@ -226,8 +226,17 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 	 */
 	public String	getFileName()
 	{
-		return file.getAbsolutePath();
+		return file.getName();
 	}
+	
+	/**
+	 *  Get the file path.
+	 */
+	public String	getFilePath()
+	{
+		return file.getAbsolutePath();		
+	}
+
 	
 	/**
 	 *  Check if the file is a directory. 

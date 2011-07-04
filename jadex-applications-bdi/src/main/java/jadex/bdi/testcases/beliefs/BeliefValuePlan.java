@@ -2,7 +2,7 @@ package jadex.bdi.testcases.beliefs;
 
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SUtil;
 
 import java.util.HashMap;
@@ -32,15 +32,17 @@ public class BeliefValuePlan extends Plan
 	{
 		TestReport tr = new TestReport("#1", "Test belief default values.");
 		Map	check	= new HashMap();
-		check.put("timeout", "20000L");
-		check.put("abel", "\"agent_initial_bel\"");
-		check.put("bbel", "\"capability_initial_bel\"");
-		check.put("cbel", "\"capability_default_bel\"");
-		IArgument[]	args	= getScope().getAgentModel().getArguments();
+		check.put("timeout", new Long(20000));
+		check.put("abel", "agent_initial_bel");
+		check.put("bbel", "capability_initial_bel");
+		check.put("cbel", "capability_default_bel");
+		UnparsedExpression[]	args	= getScope().getAgentModel().getConfiguration(getScope().getConfigurationName()).getArguments();
 		boolean	ok	= args.length==check.size();
 		for(int i=0; ok && i<args.length; i++)
 		{
-			ok	= SUtil.equals(args[i].getDefaultValue("default"), check.get(args[i].getName()));
+			ok	= SUtil.equals(
+				UnparsedExpression.getParsedValue(args[i], getScope().getAgentModel().getAllImports(), getInterpreter().getFetcher(), getScope().getClassLoader()),
+				check.get(args[i].getName()));
 		}
 		if(ok)
 		{

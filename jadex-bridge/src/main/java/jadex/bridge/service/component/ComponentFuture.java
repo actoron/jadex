@@ -1,10 +1,10 @@
 package jadex.bridge.service.component;
 
 import jadex.bridge.IComponentAdapter;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -15,56 +15,47 @@ import jadex.commons.future.IResultListener;
  */
 public class ComponentFuture extends Future
 {
+	//-------- attributes --------
+	
+	/** The adapter. */
+	protected IComponentAdapter	adapter;
+	
+	/** The external acces. */
+	protected IExternalAccess	ea;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new future.
 	 */
-	public ComponentFuture(final IExternalAccess ea, final IComponentAdapter adapter, final IFuture source)
+	public ComponentFuture(IExternalAccess ea, IComponentAdapter adapter, IFuture source)
 	{
-		source.addResultListener(new IResultListener()
+		this.ea	= ea;
+		this.adapter	= adapter;
+		source.addResultListener(new DelegationResultListener(this));
+	}
+	
+	/**
+	 *  Schedule listener notification on component thread. 
+	 */
+	protected void notifyListener(final IResultListener listener)
+	{
+		// Hack!!! Notify multiple listeners at once?
+		if(adapter.isExternalThread())
 		{
-			public void resultAvailable(final Object result)
+			ea.scheduleStep(new IComponentStep()
 			{
-				if(adapter.isExternalThread())
+				public Object execute(IInternalAccess ia)
 				{
-//					if(adapter.getDescription().getState().equals(IComponentDescription.STATE_SUSPENDED))
-//						adapter.getLogger().warning("Warning schedule step on suspended component");
-					ea.scheduleStep(new IComponentStep()
-					{
-						public Object execute(IInternalAccess ia)
-						{
-							setResult(result);
-							return null;
-						}
-					});
+					ComponentFuture.super.notifyListener(listener);
+					return null;
 				}
-				else
-				{
-					setResult(result);
-				}
-			}
-			
-			public void exceptionOccurred(final Exception exception)
-			{
-				if(adapter.isExternalThread())
-				{
-//					if(adapter.getDescription().getState().equals(IComponentDescription.STATE_SUSPENDED))
-//						adapter.getLogger().warning("Warning schedule step on suspended component");
-					ea.scheduleStep(new IComponentStep()
-					{
-						public Object execute(IInternalAccess ia)
-						{
-							setException(exception);
-							return null;
-						}
-					});
-				}
-				else
-				{
-					setException(exception);
-				}
-			}
-		});
+			});
+		}
+		else
+		{
+			super.notifyListener(listener);
+		}
+	
 	}
 }

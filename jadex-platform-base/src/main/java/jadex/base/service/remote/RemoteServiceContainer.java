@@ -10,7 +10,6 @@ import jadex.bridge.service.ISearchManager;
 import jadex.bridge.service.IVisitDecider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.component.ComponentFuture;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;

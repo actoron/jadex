@@ -1089,8 +1089,8 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				catch(InvocationTargetException e)
 				{
 					// Ignore -> try other way of setting attribute
-//					context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
-//						"attribute error", context, context.getParser().getLocation());
+					context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
+						"attribute error", context, context.getParser().getLocation());
 				}
 				catch(Exception e)
 				{

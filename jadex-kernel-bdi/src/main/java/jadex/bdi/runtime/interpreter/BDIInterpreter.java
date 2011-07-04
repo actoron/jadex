@@ -1779,8 +1779,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public void	addDefaultArgument(String name, Object value)
 	{
-		// Not supported by BDI XML schema -> Shouldn't be called
-//		throw new UnsupportedOperationException();
+		// Not supported by BDI XML schema -> Called during belief init to make arguments available to outside.
 		if(arguments==null)
 			arguments = new HashMap();
 		arguments.put(name, value);

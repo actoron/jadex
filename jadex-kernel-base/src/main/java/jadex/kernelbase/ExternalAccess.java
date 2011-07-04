@@ -315,7 +315,15 @@ public class ExternalAccess implements IExternalAccess
 				{
 					try
 					{
-						ret.setResult(step.execute(interpreter.getInternalAccess()));
+						Object	result	= step.execute(interpreter.getInternalAccess());
+						if(result instanceof IFuture)
+						{
+							((IFuture)result).addResultListener(new DelegationResultListener(ret));
+						}
+						else
+						{
+							ret.setResult(result);
+						}
 					}
 					catch(Exception e)
 					{

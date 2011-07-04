@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.BasicServiceContainer;
+import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -15,6 +16,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
 
 import java.util.Collections;
 import java.util.logging.Logger;
@@ -85,7 +88,15 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public IFuture searchService(Class type)
 	{
-		return new ComponentFuture(ea, adapter, SServiceProvider.getService(this, type));
+		final Future	fut	= new Future();
+		SServiceProvider.getService(this, type).addResultListener(new DelegationResultListener(fut)
+		{
+			public void customResultAvailable(Object result)
+			{
+				fut.setResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, ea, adapter, (IInternalService)result, null, null, null));
+			}
+		});
+		return new ComponentFuture(ea, adapter, fut);
 	}
 	
 	/**
@@ -95,7 +106,15 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public IFuture searchService(Class type, String scope)
 	{
-		return new ComponentFuture(ea, adapter, SServiceProvider.getService(this, type, scope));
+		final Future	fut	= new Future();
+		SServiceProvider.getService(this, type, scope).addResultListener(new DelegationResultListener(fut)
+		{
+			public void customResultAvailable(Object result)
+			{
+				fut.setResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, ea, adapter, (IInternalService)result, null, null, null));
+			}
+		});
+		return new ComponentFuture(ea, adapter, fut);
 	}
 	
 	// todo: remove
@@ -106,7 +125,15 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public IFuture searchServiceUpwards(Class type)
 	{
-		return new ComponentFuture(ea, adapter, SServiceProvider.getServiceUpwards(this, type));
+		final Future	fut	= new Future();
+		SServiceProvider.getServiceUpwards(this, type).addResultListener(new DelegationResultListener(fut)
+		{
+			public void customResultAvailable(Object result)
+			{
+				fut.setResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, ea, adapter, (IInternalService)result, null, null, null));
+			}
+		});
+		return new ComponentFuture(ea, adapter, fut);
 	}
 
 	/**
@@ -116,7 +143,15 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public IIntermediateFuture searchServices(Class type)
 	{
-		return new ComponentIntermediateFuture(ea, adapter, SServiceProvider.getServices(this, type));
+		final IntermediateFuture	fut	= new IntermediateFuture();
+		SServiceProvider.getServices(this, type).addResultListener(new IntermediateDelegationResultListener(fut)
+		{
+			public void customIntermediateResultAvailable(Object result)
+			{
+				fut.addIntermediateResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, ea, adapter, (IInternalService)result, null, null, null));
+			}
+		});
+		return new ComponentIntermediateFuture(ea, adapter, fut);
 	}
 	
 	/**
@@ -126,7 +161,15 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public IIntermediateFuture searchServices(Class type, String scope)
 	{
-		return new ComponentIntermediateFuture(ea, adapter, SServiceProvider.getServices(this, type, scope));
+		final IntermediateFuture	fut	= new IntermediateFuture();
+		SServiceProvider.getServices(this, type, scope).addResultListener(new IntermediateDelegationResultListener(fut)
+		{
+			public void customIntermediateResultAvailable(Object result)
+			{
+				fut.addIntermediateResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, ea, adapter, (IInternalService)result, null, null, null));
+			}
+		});
+		return new ComponentIntermediateFuture(ea, adapter, fut);
 	}
 	
 	/**

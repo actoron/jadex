@@ -5,7 +5,6 @@ import jadex.base.test.Testcase;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;

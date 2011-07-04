@@ -15,6 +15,11 @@ public interface IFileNode extends ITreeNode
 	public String	getFileName();
 	
 	/**
+	 *  Get the file path.
+	 */
+	public String	getFilePath();
+	
+	/**
 	 *  Check if the file is a directory. 
 	 */
 	public boolean	isDirectory();

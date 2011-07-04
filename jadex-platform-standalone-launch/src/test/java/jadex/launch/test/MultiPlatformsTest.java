@@ -32,6 +32,14 @@ public class MultiPlatformsTest extends TestCase
 			platforms[i]	= (IExternalAccess)futures[i].get(sus, timeout);
 		}
 		
+//		try
+//		{
+//			Thread.sleep(3000000);
+//		}
+//		catch(InterruptedException e)
+//		{
+//		}
+		
 		for(int i=0; i<futures.length; i++)
 		{
 //			System.out.println("Killing platform "+i);

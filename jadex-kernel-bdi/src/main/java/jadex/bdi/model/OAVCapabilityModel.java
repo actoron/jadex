@@ -3,9 +3,9 @@ package jadex.bdi.model;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.modelinfo.Argument;
-import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
@@ -92,19 +92,87 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	 */
 	public void initModelInfo()
 	{
+		// Add arguments and results as specified in beliefs.
 		try
 		{
-			// Add arguments as specified in beliefs.
-			IArgument[]	as	= getArguments();
-			for(int j=0; j<as.length; j++)
+			Collection bels = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefs) : null;
+			if(bels!=null)
 			{
-				modelinfo.addArgument(as[j]);
+				for(Iterator it=bels.iterator(); it.hasNext(); )
+				{
+					Object	bel	= it.next();
+					String	exported	= (String)state.getAttributeValue(bel, OAVBDIMetaModel.referenceableelement_has_exported);
+					Boolean	argu	= (Boolean)state.getAttributeValue(bel, OAVBDIMetaModel.belief_has_argument);
+					Boolean	result	= (Boolean)state.getAttributeValue(bel, OAVBDIMetaModel.belief_has_result);
+					if(!OAVBDIMetaModel.EXPORTED_FALSE.equals(exported) || Boolean.TRUE.equals(argu))
+					{
+						createArgument(state, handle, bel, false, true);
+					}
+					if(Boolean.TRUE.equals(result))
+					{
+						createArgument(state, handle, bel, false, false);
+					}
+				}
 			}
-			// Add results as specified in beliefs.
-			IArgument[]	rs	= getResults();
-			for(int j=0; j<rs.length; j++)
+			
+			Collection belrefs = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefrefs) : null;
+			if(belrefs!=null)
 			{
-				modelinfo.addResult(rs[j]);
+				for(Iterator it=belrefs.iterator(); it.hasNext(); )
+				{
+					Object belref = it.next();
+					String	exported	= (String)state.getAttributeValue(belref, OAVBDIMetaModel.referenceableelement_has_exported);
+					Boolean	argu	= (Boolean)state.getAttributeValue(belref, OAVBDIMetaModel.beliefreference_has_argument);
+					Boolean	result	= (Boolean)state.getAttributeValue(belref, OAVBDIMetaModel.beliefreference_has_result);
+					if(!OAVBDIMetaModel.EXPORTED_FALSE.equals(exported) || Boolean.TRUE.equals(argu))
+					{
+						createArgument(state, handle, belref, false, true);
+					}
+					if(Boolean.TRUE.equals(result))
+					{
+						createArgument(state, handle, belref, false, false);
+					}
+				}
+			}
+			
+			Collection belsets = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefsets) : null;
+			if(belsets!=null)
+			{
+				for(Iterator it=belsets.iterator(); it.hasNext(); )
+				{
+					Object belset = it.next();
+					String	exported	= (String)state.getAttributeValue(belset, OAVBDIMetaModel.referenceableelement_has_exported);
+					Boolean	argu	= (Boolean)state.getAttributeValue(belset, OAVBDIMetaModel.beliefset_has_argument);
+					Boolean	result	= (Boolean)state.getAttributeValue(belset, OAVBDIMetaModel.beliefset_has_result);
+					if(!OAVBDIMetaModel.EXPORTED_FALSE.equals(exported) || Boolean.TRUE.equals(argu))
+					{
+						createArgument(state, handle, belset, true, true);
+					}
+					if(Boolean.TRUE.equals(result))
+					{
+						createArgument(state, handle, belset, true, false);
+					}
+				}
+			}
+			
+			Collection belsetrefs = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefsetrefs) : null;
+			if(belsetrefs!=null)
+			{
+				for(Iterator it=belsetrefs.iterator(); it.hasNext(); )
+				{
+					Object belsetref = it.next();
+					String	exported	= (String)state.getAttributeValue(belsetref, OAVBDIMetaModel.referenceableelement_has_exported);
+					Boolean	argu	= (Boolean)state.getAttributeValue(belsetref, OAVBDIMetaModel.beliefsetreference_has_argument);
+					Boolean	result	= (Boolean)state.getAttributeValue(belsetref, OAVBDIMetaModel.beliefsetreference_has_result);
+					if(!OAVBDIMetaModel.EXPORTED_FALSE.equals(exported) || Boolean.TRUE.equals(argu))
+					{
+						createArgument(state, handle, belsetref, true, true);
+					}
+					if(Boolean.TRUE.equals(result))
+					{
+						createArgument(state, handle, belsetref, true, false);
+					}
+				}
 			}
 		}
 		catch(RuntimeException e)
@@ -284,140 +352,6 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 //		
 //		return ret;
 //	}
-	
-	/**
-	 *  Get the arguments.
-	 *  @return The arguments.
-	 */
-	public IArgument[] getArguments()
-	{
-		List ret = new ArrayList();
-		
-		Collection bels = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefs) : null;
-		if(bels!=null)
-		{
-			for(Iterator it=bels.iterator(); it.hasNext(); )
-			{
-				Object bel = it.next();
-				String exported = (String)state.getAttributeValue(bel, 
-					OAVBDIMetaModel.referenceableelement_has_exported);
-				Boolean argu = (Boolean)state.getAttributeValue(bel, 
-					OAVBDIMetaModel.belief_has_argument);
-				if(!OAVBDIMetaModel.EXPORTED_FALSE.equals(exported) || Boolean.TRUE.equals(argu))
-					ret.add(createArgument(state, handle, bel, false));
-			}
-		}
-		
-		Collection belrefs = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefrefs) : null;
-		if(belrefs!=null)
-		{
-			for(Iterator it=belrefs.iterator(); it.hasNext(); )
-			{
-				Object belref = it.next();
-				String exported = (String)state.getAttributeValue(belref, 
-					OAVBDIMetaModel.referenceableelement_has_exported);
-				Boolean argu = (Boolean)state.getAttributeValue(belref, 
-					OAVBDIMetaModel.beliefreference_has_argument);
-				if(!OAVBDIMetaModel.EXPORTED_FALSE.equals(exported) || Boolean.TRUE.equals(argu))
-					ret.add(createArgument(state, handle, belref, false));
-			}
-		}
-		
-		Collection belsets = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefsets) : null;
-		if(belsets!=null)
-		{
-			for(Iterator it=belsets.iterator(); it.hasNext(); )
-			{
-				Object belset = it.next();
-				String exported = (String)state.getAttributeValue(belset, 
-					OAVBDIMetaModel.referenceableelement_has_exported);
-				Boolean argu = (Boolean)state.getAttributeValue(belset, 
-					OAVBDIMetaModel.beliefset_has_argument);
-				if(!OAVBDIMetaModel.EXPORTED_FALSE.equals(exported) || Boolean.TRUE.equals(argu))
-					ret.add(createArgument(state, handle, belset, true));
-			}
-		}
-		
-		Collection belsetrefs = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefsetrefs) : null;
-		if(belsetrefs!=null)
-		{
-			for(Iterator it=belsetrefs.iterator(); it.hasNext(); )
-			{
-				Object belsetref = it.next();
-				String exported = (String)state.getAttributeValue(belsetref, 
-					OAVBDIMetaModel.referenceableelement_has_exported);
-				Boolean argu = (Boolean)state.getAttributeValue(belsetref, 
-					OAVBDIMetaModel.beliefsetreference_has_argument);
-				if(!OAVBDIMetaModel.EXPORTED_FALSE.equals(exported) || Boolean.TRUE.equals(argu))
-					ret.add(createArgument(state, handle, belsetref, true));
-			}
-		}
-		
-		return (IArgument[])ret.toArray(new IArgument[ret.size()]);
-	}
-	
-	/**
-	 *  Get the results.
-	 *  @return The results.
-	 */
-	public IArgument[] getResults()
-	{
-		List ret = new ArrayList();
-		
-		Collection bels = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefs) : null;
-		if(bels!=null)
-		{
-			for(Iterator it=bels.iterator(); it.hasNext(); )
-			{
-				Object bel = it.next();
-				Boolean result = (Boolean)state.getAttributeValue(bel, 
-					OAVBDIMetaModel.belief_has_result);
-				if(Boolean.TRUE.equals(result))
-					ret.add(createArgument(state, handle, bel, false));
-			}
-		}
-		
-		Collection belrefs = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefrefs) : null;
-		if(belrefs!=null)
-		{
-			for(Iterator it=belrefs.iterator(); it.hasNext(); )
-			{
-				Object belref = it.next();
-				Boolean result = (Boolean)state.getAttributeValue(belref, 
-					OAVBDIMetaModel.beliefreference_has_result);
-				if(Boolean.TRUE.equals(result))
-					ret.add(createArgument(state, handle, belref, false));
-			}
-		}
-		
-		Collection belsets = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefsets) : null;
-		if(belsets!=null)
-		{
-			for(Iterator it=belsets.iterator(); it.hasNext(); )
-			{
-				Object belset = it.next();
-				Boolean result = (Boolean)state.getAttributeValue(belset, 
-					OAVBDIMetaModel.beliefset_has_result);
-				if(Boolean.TRUE.equals(result))
-					ret.add(createArgument(state, handle, belset, true));
-			}
-		}
-		
-		Collection belsetrefs = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefsetrefs) : null;
-		if(belsetrefs!=null)
-		{
-			for(Iterator it=belsetrefs.iterator(); it.hasNext(); )
-			{
-				Object belsetref = it.next();
-				Boolean result = (Boolean)state.getAttributeValue(belsetref, 
-					OAVBDIMetaModel.beliefsetreference_has_result);
-				if(Boolean.TRUE.equals(result))
-					ret.add(createArgument(state, handle, belsetref, true));
-			}
-		}
-		
-		return (IArgument[])ret.toArray(new IArgument[ret.size()]);
-	}
 	
 //	/**
 //	 *  Is the model startable.
@@ -743,16 +677,13 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	/**
 	 *  Create an argument. 
 	 */
-	public static IArgument createArgument(IOAVState state, Object capa, Object handle, boolean beliefset)
+	public void	createArgument(IOAVState state, Object capa, Object handle, boolean beliefset, boolean isarg)
 	{
 		String name = (String)state.getAttributeValue(handle, OAVBDIMetaModel.modelelement_has_name);
 		String description = (String)state.getAttributeValue(handle, OAVBDIMetaModel.modelelement_has_description);
 		String typename = SReflect.getInnerClassName(beliefset? findBeliefSetType(state, capa, handle)
 			: findBeliefType(state, capa, handle));
 		
-		Argument arg = new Argument(name, description, typename);
-		
-		Map defvals = new HashMap();
 		Collection configs = (Collection)state.getAttributeValues(capa, OAVBDIMetaModel.capability_has_configurations);
 		if(configs!=null)
 		{
@@ -762,15 +693,27 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 				String configname = (String)state.getAttributeValue(config, OAVBDIMetaModel.modelelement_has_name);
 				Object val = beliefset? findBeliefSetDefaultValue(state, capa, handle, configname, name)
 					: findBeliefDefaultValue(state, capa, handle, configname, name);
-				defvals.put(configname, val);
+				
+				if(isarg)
+				{
+					modelinfo.getConfiguration(configname).addArgument(new UnparsedExpression(name, (String)null, ""+val, null));
+				}
+				else
+				{
+					modelinfo.getConfiguration(configname).addResult(new UnparsedExpression(name, (String)null, ""+val, null));					
+				}
 			}
 		}
 		Object val =beliefset? findBeliefSetDefaultValue(state, capa, handle, null, name)
 			: findBeliefDefaultValue(state, capa, handle, null, name);
-		defvals.put(Argument.ANY_CONFIG, val);
-		arg.setDefaultValues(defvals);
-
-		return arg;
+		if(isarg)
+		{
+			modelinfo.addArgument(new Argument(name, description, typename, new UnparsedExpression(name, (String)null, ""+val, null)));
+		}
+		else
+		{
+			modelinfo.addResult(new Argument(name, description, typename, new UnparsedExpression(name, (String)null, ""+val, null)));					
+		}
 	}
 	
 	/**

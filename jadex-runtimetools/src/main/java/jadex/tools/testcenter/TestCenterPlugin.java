@@ -452,7 +452,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 				final int[]	cnt	= new int[1];	
 				for(int i=0; i<leafs.size(); i++)
 				{
-					final String	model	= ((IFileNode)leafs.get(i)).getFileName();
+					final String	model	= ((IFileNode)leafs.get(i)).getFilePath();
 					STestCenter.isTestcase(model, getJCC().getPlatformAccess()).addResultListener(new SwingDefaultResultListener(mpanel)
 					{
 						public void customResultAvailable(Object result)
@@ -492,7 +492,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 			}
 			else
 			{
-				String model = node.getFileName();
+				String model = node.getFilePath();
 				tcpanel.getTestList().removeEntry(model);
 			}
 		}

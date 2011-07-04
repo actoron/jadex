@@ -859,14 +859,15 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  Add a context variable declaration.
 	 *  @param name	The variable name.
 	 *  @param clazz	The type of the variable
-	 *  @param exp	An initialization expression (if any).
+	 *  @param exp	Default initialization expression (if any).
+	 *  @param inivals	Initialization expressions for configurations.
 	 */
-	public void addContextVariable(String name, Class clazz, IParsedExpression exp)
+	public void addContextVariable(String name, Class clazz, IParsedExpression exp, Map inivals)
 	{
 		if(variables==null)
 			variables	= new HashMap();
 		
-		variables.put(name, new Object[]{clazz, exp});
+		variables.put(name, new Object[]{clazz, exp, inivals});
 	}
 
 	/**
@@ -910,9 +911,12 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  @param name	The variable name.
 	 *  @return The initialization expression (if any).
 	 */
-	public IParsedExpression getContextVariableExpression(String name)
+	public IParsedExpression getContextVariableExpression(String name, String config)
 	{
-		return (IParsedExpression)((Object[])variables.get(name))[1];
+		Object[]	var	= (Object[])variables.get(name);
+		return config!=null && var[2]!=null && ((Map)var[2]).containsKey(config)
+			? (IParsedExpression)((Map)var[2]).get(config)
+			: (IParsedExpression)var[1];
 	}
 
 	/**

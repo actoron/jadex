@@ -3,7 +3,6 @@ package jadex.micro.testcases;
 import jadex.base.test.TestReport;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.future.Future;
@@ -45,8 +44,9 @@ public class BAgent extends MicroAgent implements IBService
 			public void resultAvailable(Object result)
 			{
 //				System.out.println("found service");
-				IAService ser = (IAService)result;
-				tests.add(new TestReport("#B1", "Test if service could be found in init.", true, null));
+				final IAService ser = (IAService)result;
+				String reason = getComponentAdapter().isExternalThread()? "Wrong thread: "+Thread.currentThread(): null;
+				tests.add(new TestReport("#B1", "Test if service could be found in init.", !getComponentAdapter().isExternalThread(), reason));
 
 				ser.test().addResultListener(new IResultListener()
 				{
@@ -55,7 +55,7 @@ public class BAgent extends MicroAgent implements IBService
 						String reason = getComponentAdapter().isExternalThread()? "Wrong thread: "+Thread.currentThread(): null;
 						tests.add(new TestReport("#B2", "Test if comes back on component thread.", !getComponentAdapter().isExternalThread(), reason));
 						setResultValue("testcases", tests);
-//						System.out.println("invoked service");
+//						System.out.println("invoked service: "+ser);
 						ret.setResult(result);
 					}
 					

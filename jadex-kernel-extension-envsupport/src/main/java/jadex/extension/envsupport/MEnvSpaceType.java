@@ -51,6 +51,7 @@ import jadex.xml.reader.ReadContext;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -193,10 +194,9 @@ public class MEnvSpaceType
 	
 	//-------- static part --------
 	
-	/**
-	 *  Get the XML mapping.
-	 */
-	public static Set getXMLMapping()
+	protected static final Set	TYPES;
+	
+	static
 	{
 		Set types = new HashSet();
 		
@@ -1237,7 +1237,15 @@ public class MEnvSpaceType
 			new SubobjectInfo(new AccessInfo(new QName(uri, "property"), "properties", null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
 		
-		return types;
+		TYPES	= Collections.unmodifiableSet(types);
+	}
+	
+	/**
+	 *  Get the XML mapping.
+	 */
+	public static Set getXMLMapping()
+	{
+		return TYPES;
 	}
 		
 	/**

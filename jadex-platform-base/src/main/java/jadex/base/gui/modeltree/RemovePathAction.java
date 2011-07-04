@@ -12,7 +12,6 @@ import jadex.commons.gui.ToolTipAction;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.net.MalformedURLException;
 
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
@@ -97,9 +96,9 @@ public class RemovePathAction extends ToolTipAction
 					{
 						ls.removeURL(file.toURI().toURL());
 					}
-					catch(MalformedURLException ex)
+					catch(Exception ex)
 					{
-						ex.printStackTrace();
+//						ex.printStackTrace();
 					}
 //					resetCrawler();
 //					((ModelExplorerTreeModel)getModel()).fireNodeRemoved(getRootNode(), node, index);
