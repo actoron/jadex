@@ -71,6 +71,7 @@ public class CAgent extends MicroAgent implements ICService
 								testcases.add(tr);
 						
 								setResultValue("testcases", new Testcase(testcases.size(), (TestReport[])testcases.toArray(new TestReport[testcases.size()])));
+								killAgent();
 							}
 						});
 					}
