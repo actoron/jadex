@@ -9,11 +9,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import sodekovs.util.gnuplot.persistence.ConnectionMgr;
 import sodekovs.util.misc.FileHandler;
 import sodekovs.util.misc.GlobalConstants;
-import sodekovs.util.model.benchmarking.description.HistoricDataDescription;
-import sodekovs.util.model.benchmarking.description.IHistoricDataDescription;
 
 public class CapitalBikesLogDAO {
 
@@ -67,7 +64,9 @@ public class CapitalBikesLogDAO {
 	public void insertNewLog(String xmlLog) {
 
 		synchronized (insertNewLog) {
-			try {			
+			try {
+
+				
 				InputStream inSt = new ByteArrayInputStream(xmlLog.getBytes());
 				
 				insertNewLog.setAsciiStream(1, inSt, xmlLog.length());									
