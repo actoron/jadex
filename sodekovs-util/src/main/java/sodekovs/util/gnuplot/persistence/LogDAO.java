@@ -84,7 +84,7 @@ public class LogDAO {
 				insertNewLog.setAsciiStream(5, gnuPlotDataFileInStr, (int) gnuPlotDataFile.length());
 				insertNewLog.setString(6, logtimestamp);
 				int res = insertNewLog.executeUpdate();
-				insertNewLog.close();
+//				insertNewLog.close();
 				// conn.commit();
 				System.out.println("DAO insert done: " + res);
 			} catch (SQLException e) {

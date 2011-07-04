@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.sql.Connection;
 
 public class Test1 {
 
@@ -13,6 +14,8 @@ public class Test1 {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		
+		Connection con = sodekovs.util.bike.persistence.ConnectionMgr.getConnection();
 
 //		String cmd = "cmd cd c:\\ C:\\Users\\vilenica\\GnuPlot\\gp443win32\\gnuplot\\binary\\wgnuplot_pipes.exe pause";
 		String cmd = "cmd ";

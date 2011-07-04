@@ -33,8 +33,8 @@ public class ConnectionMgr {
 	private static void newConnection() {
 		
 		 NetworkServerControl serverControl;             
-			try {
-				serverControl = new NetworkServerControl(InetAddress.getByName("localhost"),1527);
+			try {				
+				serverControl = new NetworkServerControl(InetAddress.getByName("localhost"),1529);
 				serverControl.start(new PrintWriter(System.out,true));
 			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block
@@ -51,7 +51,7 @@ public class ConnectionMgr {
 			properties.put("user", "user2");
 			properties.put("password", "user2");
 			// conn = DriverManager.getConnection("jdbc:derby:C:/Users/vilenica/MyDB;create=true", properties);
-			conn = DriverManager.getConnection("jdbc:derby://localhost:1527/" + "AnteDB1" + ";create=true", properties);
+			conn = DriverManager.getConnection("jdbc:derby://localhost:1529/" + "AnteDB1" + ";create=true", properties);
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
