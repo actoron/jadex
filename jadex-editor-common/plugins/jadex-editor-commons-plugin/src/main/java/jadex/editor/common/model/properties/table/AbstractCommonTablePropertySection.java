@@ -634,7 +634,8 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 		 */
 		protected Object getValue(Object element)
 		{
-			return ((MultiColumnTableRow)element).getColumnValues()[attributeIndex];
+			String[] vals = ((MultiColumnTableRow)element).getColumnValues();
+			return attributeIndex<vals.length? vals[attributeIndex]: "";
 		}
 		
 		/**

@@ -732,7 +732,8 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 					}
 					else
 					{
-						rowToEdit.getColumnValues()[attributeIndex] = newValue;
+						rowToEdit.setColumnValueAt(attributeIndex, newValue);
+//						rowToEdit.getColumnValues()[attributeIndex] = newValue;
 					}
 					
 					// update the model annotation

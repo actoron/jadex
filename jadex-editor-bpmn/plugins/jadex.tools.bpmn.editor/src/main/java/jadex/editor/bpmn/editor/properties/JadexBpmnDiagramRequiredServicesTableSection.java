@@ -17,7 +17,7 @@ public class JadexBpmnDiagramRequiredServicesTableSection extends
 {
 	public static final String[] COLUMN_NAMES = new String[]{"Name", "Interface", "Multiple", "Proxytype", "Default Binding", "Initial Binding"};
 	public static final String[] COLUMN_TYPES = new String[]{TEXT, TEXT, CHECKBOX, COMBOBOX, TEXT, TEXT};
-	public static final boolean[] COLUMN_COMPLEX = new boolean[]{false, false, false, false, true};
+	public static final boolean[] COLUMN_COMPLEX = new boolean[]{false, false, false, false, false, true};
 	public static final int[] COLUMN_WEIGHTS = new int[]{2, 2, 1, 1, 2, 2};
 	public static final String[] DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "class", "false", "decoupled", "bindingname", ""};
 	public static final int UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX = 0;
