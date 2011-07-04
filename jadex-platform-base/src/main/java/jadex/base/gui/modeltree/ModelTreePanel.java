@@ -196,7 +196,7 @@ public class ModelTreePanel extends FileTreePanel
 	 */
 	protected void	addNode(final ITreeNode node)
 	{
-		if(node instanceof IFileNode)
+		if(node instanceof IFileNode && node.getParent().equals(getTree().getModel().getRoot()))
 		{
 			final String filename = ((IFileNode)node).getFileName();
 			SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)

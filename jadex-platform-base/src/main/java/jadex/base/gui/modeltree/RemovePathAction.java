@@ -15,6 +15,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 
 import javax.swing.Icon;
+import javax.swing.JOptionPane;
 import javax.swing.UIDefaults;
 
 /**
@@ -71,6 +72,13 @@ public class RemovePathAction extends ToolTipAction
 	 */
 	public void actionPerformed(ActionEvent e)
 	{
+		// Can be used from toolbar without considering enabled state.
+		if(!isEnabled())
+		{
+			JOptionPane.showMessageDialog(SGUI.getWindowParent(treepanel), "Only root folders can be removed.");
+			return;
+		}
+		
 		final ITreeNode	node = (ITreeNode)treepanel.getTree().getLastSelectedPathComponent();
 		treepanel.removeTopLevelNode(node);
 		

@@ -84,6 +84,7 @@ public abstract class AbstractCommonPropertySection extends AbstractPropertySect
 	
 	// ---- method overrides ----
 	
+	
 	public void refresh()
 	{
 		super.refresh();
@@ -106,7 +107,6 @@ public abstract class AbstractCommonPropertySection extends AbstractPropertySect
 		rootComposite = sectionComposite;
 		
 		increasePropertyViewScrolling(parent);
-				
 	}
 
 	/**

@@ -149,7 +149,6 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 		{
 			tableViewer.refresh();
 		}
-		
 	}
 	
 	/**
