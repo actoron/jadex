@@ -67,15 +67,13 @@ public class CapitalBikesLogDAO {
 	public void insertNewLog(String xmlLog) {
 
 		synchronized (insertNewLog) {
-			try {
-
-				
+			try {			
 				InputStream inSt = new ByteArrayInputStream(xmlLog.getBytes());
 				
 				insertNewLog.setAsciiStream(1, inSt, xmlLog.length());									
 				insertNewLog.setString(2, String.valueOf(System.currentTimeMillis()));
 				int res = insertNewLog.executeUpdate();
-				insertNewLog.close();
+//				insertNewLog.close();
 				// conn.commit();
 				System.out.println("CapBikeDAO insert done: " + res);
 			} catch (SQLException e) {

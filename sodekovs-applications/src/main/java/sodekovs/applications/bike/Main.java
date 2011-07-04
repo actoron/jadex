@@ -19,7 +19,7 @@ public class Main {
 		
 		// Timer is used to check when png is created and to re-load png to panel.
 		long TIME_TO_START = 500;
-		long DELAY_BETWEEN_POLLS = 10000;
+		long DELAY_BETWEEN_POLLS = 300000;
 		Timer timer = new Timer();		
 		timer.schedule(new DownloadFileThread(), TIME_TO_START, DELAY_BETWEEN_POLLS);
 			

@@ -25,7 +25,7 @@ public class DownloadFileThread extends TimerTask {
 
 	public void run() {
 		
-//		download();
+		download();
 		//	this.cancel();
 		
 	
