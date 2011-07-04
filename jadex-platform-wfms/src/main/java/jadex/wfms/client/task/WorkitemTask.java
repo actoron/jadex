@@ -9,6 +9,7 @@ import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -66,8 +67,7 @@ public class WorkitemTask implements ITask
 			public void resultAvailable(Object result)
 			{
 				IWorkitemHandlerService wh = (IWorkitemHandlerService) result;
-				wh.withdrawWorkitem(workitem);
-				ret.setResult(null);
+				wh.withdrawWorkitem(workitem).addResultListener(instance.createResultListener(new DelegationResultListener(ret)));
 			}
 		});
 		return ret;
@@ -92,6 +92,7 @@ public class WorkitemTask implements ITask
 			{
 				String pName = (String) it.next();
 				MParameter param = (MParameter) parameters.get(pName);
+				//System.out.println(context.getActivity().getName() + ": " +param.getName());
 				//MParameter param = (MParameter) it.next();
 				if (param.getName().startsWith("META_P_"))
 				{
@@ -166,7 +167,7 @@ public class WorkitemTask implements ITask
 		//System.out.println("Parent: " + process.getParent());
 		//System.out.println("Model: " + process.getModel());
 		//System.out.println("Modelname: " + process.getModel().getFilename());
-		Workitem wi = new Workitem(process.getComponentIdentifier(), context.getActivity().getName(), name, role, parameterTypes, parameterValues, metaProperties, readOnlyParameters);
+		Workitem wi = new Workitem(process.getComponentIdentifier(), process.getCreationTime(), context.getActivity().getName(), name, role, parameterTypes, parameterValues, metaProperties, readOnlyParameters);
 		wi.setId(context.getModelElement().getName() + "_" + String.valueOf(Integer.toHexString(System.identityHashCode(wi))));
 		return wi;
 	}
@@ -175,7 +176,6 @@ public class WorkitemTask implements ITask
 	{
 		IResultListener redirListener = new IResultListener()
 		{
-			
 			public void resultAvailable(Object result)
 			{
 				Workitem wi = (Workitem) result;

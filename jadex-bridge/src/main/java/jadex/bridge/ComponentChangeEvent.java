@@ -62,16 +62,16 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	 *  Create a new event.
 	 */
 	public ComponentChangeEvent(String eventtype, String sourcecategory, String sourcetype, 
-		String sourcename, IComponentIdentifier cid, Object details)
+		String sourcename, IComponentIdentifier cid, long componentcreationtime, Object details)
 	{
-		this(eventtype, sourcecategory, sourcetype, sourcename, cid, null, details, 0);
+		this(eventtype, sourcecategory, sourcetype, sourcename, cid, componentcreationtime, null, details, 0);
 	}
 	
 	/**
 	 *  Create a new event.
 	 */
 	public ComponentChangeEvent(String eventtype, String sourcecategory, String sourcetype, 
-		String sourcename, IComponentIdentifier cid, String reason, Object details, long time)
+		String sourcename, IComponentIdentifier cid, long componentcreationtime, String reason, Object details, long time)
 	{
 		this.eventtype = eventtype;
 		this.time = time;
@@ -79,6 +79,7 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 		this.sourcetype = sourcetype;
 		this.sourcecategory = sourcecategory;
 		this.component = cid;
+		this.componentcreationtime = componentcreationtime;
 		this.reason = reason;
 		this.details = details;
 	}
@@ -137,6 +138,15 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	public IComponentIdentifier getComponent()
 	{
 		return component;
+	}
+	
+	/**
+	 *  Returns creation time of the component that generated the event.
+	 *  @return Parent ID.
+	 */
+	public long getComponentCreationTime()
+	{
+		return componentcreationtime;
 	}
 	
 	/**
@@ -220,6 +230,15 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	public void setComponent(IComponentIdentifier id)
 	{
 		component = id;
+	}
+	
+	/**
+	 *  Sets the creation time of the component that generated the event.
+	 *  @param creationtime The creation time.
+	 */
+	public void setComponentCreationTime(long creationtime)
+	{
+		this.componentcreationtime = creationtime;
 	}
 	
 	/**
@@ -365,12 +384,13 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	/**
 	 *  Dispatch a "component terminated" event.
 	 *  @param adapter Component adapter.
+	 *  @param creationtime Creation time of the component.
 	 *  @param model Component model.
 	 *  @param provider Component service provider.
 	 *  @param componentlisteners Listeners of the component.
 	 *  @param finished Future, called when the event has been dispatched.
 	 */
-	public static final void dispatchTerminatedEvent(final IComponentAdapter adapter, final IModelInfo model,
+	public static final void dispatchTerminatedEvent(final IComponentAdapter adapter, final long creationtime, final IModelInfo model,
 		IServiceProvider provider, final Collection componentlisteners, final Future finished)
 	{
 		if (componentlisteners == null || componentlisteners.isEmpty())
@@ -385,7 +405,7 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 			{
 				ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
 					IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT, model.getName(), adapter.getComponentIdentifier().getName(),
-					adapter.getComponentIdentifier(), null, null, (Long) result);
+					adapter.getComponentIdentifier(), creationtime, null, null, (Long) result);
 				dispatchComponentChangeEvent(event, componentlisteners, finished);
 			}
 		});
@@ -394,12 +414,13 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	/**
 	 *  Dispatch a "component terminating" event.
 	 *  @param adapter Component adapter.
+	 *  @param creationtime Creation time of the component.
 	 *  @param model Component model.
 	 *  @param provider Component service provider.
 	 *  @param componentlisteners Listeners of the component.
 	 *  @param finished Future, called when the event has been dispatched.
 	 */
-	public static final void dispatchTerminatingEvent(final IComponentAdapter adapter, final IModelInfo model,
+	public static final void dispatchTerminatingEvent(final IComponentAdapter adapter, final long creationtime, final IModelInfo model,
 		IServiceProvider provider, final Collection componentlisteners, final Future finished)
 	{
 		if(componentlisteners == null || componentlisteners.isEmpty())
@@ -414,7 +435,7 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 			{
 				ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_OCCURRENCE,
 					 IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT, model.getName(), adapter.getComponentIdentifier().getName(),
-					adapter.getComponentIdentifier(), null, "terminating", (Long) result);
+					adapter.getComponentIdentifier(), creationtime, null, "terminating", (Long) result);
 				dispatchComponentChangeEvent(event, componentlisteners, finished);
 			}
 		});

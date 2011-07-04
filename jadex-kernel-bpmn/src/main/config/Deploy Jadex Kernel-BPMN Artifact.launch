@@ -9,7 +9,7 @@
 <listEntry value="gpg.homedir=../docs/keys"/>
 <listEntry value="gpg.passphrase=lax"/>
 </listAttribute>
-<stringAttribute key="M2_RUNTIME" value="C:\Files\Programs\apache-maven-2.2.1"/>
+<stringAttribute key="M2_RUNTIME" value="EMBEDDED"/>
 <booleanAttribute key="M2_SKIP_TESTS" value="false"/>
 <booleanAttribute key="M2_UPDATE_SNAPSHOTS" value="false"/>
 <booleanAttribute key="M2_WORKSPACE_RESOLUTION" value="false"/>

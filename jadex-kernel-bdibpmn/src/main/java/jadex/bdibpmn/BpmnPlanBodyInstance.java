@@ -135,6 +135,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 		this.state = interpreter.getState();
 		this.rcapa = rcapa;
 		this.rplan = rplan;
+		this.creationtime = interpreter.getCreationTime();
 		
 		// todo:
 		

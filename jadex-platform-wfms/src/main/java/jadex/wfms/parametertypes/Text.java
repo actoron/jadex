@@ -24,4 +24,9 @@ public class Text
 	{
 		this.text = text;
 	}
+	
+	public String toString()
+	{
+		return text;
+	}
 }

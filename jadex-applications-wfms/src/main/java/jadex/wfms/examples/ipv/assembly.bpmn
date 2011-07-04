@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_r3l6cZdAEeCjQ8Alff-ShA" iD="_r3l6cJdAEeCjQ8Alff-ShA">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wcm9wJdAEeCjQ8Alff-ShA" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wcm9wZdAEeCjQ8Alff-ShA" key="editor_version" value="1.0"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_L7t-QJdBEeCjQ8Alff-ShA" source="jadex_imports_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Smvr0JdBEeCjQ8Alff-ShA" key="dimension" value="1:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Smvr0ZdBEeCjQ8Alff-ShA" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Smvr0pdBEeCjQ8Alff-ShA" key="0:0" value="jadex.wfms.parametertypes.*"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_r3pk05dAEeCjQ8Alff-ShA" iD="_r3pk0pdAEeCjQ8Alff-ShA" name="Body">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_r3qL4ZdAEeCjQ8Alff-ShA" iD="_r3qL4JdAEeCjQ8Alff-ShA" outgoingEdges="_8YPpUZdAEeCjQ8Alff-ShA" incomingEdges="_8BkOsZdAEeCjQ8Alff-ShA" name="Einbau_durchführen" lanes="_tnpi0ZdAEeCjQ8Alff-ShA" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__2SdgJdAEeCjQ8Alff-ShA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KdVUsJdBEeCjQ8Alff-ShA" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_M-PyQJdBEeCjQ8Alff-ShA" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_PnK8UJdBEeCjQ8Alff-ShA" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_PnK8UZdBEeCjQ8Alff-ShA" key="uniqueColumnIndex" value="0"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_PnK8UpdBEeCjQ8Alff-ShA" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_PnK8U5dBEeCjQ8Alff-ShA" key="0:1" value="Text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_PnK8VJdBEeCjQ8Alff-ShA" key="0:2" value="Text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_PnK8VZdBEeCjQ8Alff-ShA" key="0:3" value="new Text(&quot;&lt;h2>Einbau durchführen.&lt;/h2>&quot;)"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_xUY6UZdAEeCjQ8Alff-ShA" iD="_xUY6UJdAEeCjQ8Alff-ShA" outgoingEdges="_8BkOsZdAEeCjQ8Alff-ShA" lanes="_tnpi0ZdAEeCjQ8Alff-ShA" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_x0ldUZdAEeCjQ8Alff-ShA" iD="_x0ldUJdAEeCjQ8Alff-ShA" incomingEdges="_8YPpUZdAEeCjQ8Alff-ShA" lanes="_tnpi0ZdAEeCjQ8Alff-ShA" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_8BkOsZdAEeCjQ8Alff-ShA" iD="_8BkOsJdAEeCjQ8Alff-ShA"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_8YPpUZdAEeCjQ8Alff-ShA" iD="_8YPpUJdAEeCjQ8Alff-ShA"/>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_tnpi0ZdAEeCjQ8Alff-ShA" iD="_tnpi0JdAEeCjQ8Alff-ShA" name="Zielwerker" activities="_r3qL4ZdAEeCjQ8Alff-ShA _xUY6UZdAEeCjQ8Alff-ShA _x0ldUZdAEeCjQ8Alff-ShA"/>
+  </pools>
+</bpmn:BpmnDiagram>

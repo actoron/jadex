@@ -95,6 +95,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/** The state. */
 	protected IOAVState state;
 	
+	/** Creation time, Hack? Should be in state? */
+	protected long creationtime;
+	
 	/** The reference to the agent instance in the state.*/
 	protected Object ragent;
 	
@@ -160,7 +163,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	protected transient int agenda_state;
 	
 	/** The flag for microplansteps. */
-	protected transient boolean microplansteps; 
+	protected transient boolean microplansteps;
 		
 	/** The map of flyweights (original element -> flyweight). */
 	protected Map volcache;
@@ -236,6 +239,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		
 		// Hack! todo:
 		interpreters.put(state, this);
+		
+		//TODO: Hack! Should be simulation time!
+		creationtime = System.currentTimeMillis();
 		
 //		System.out.println("arguments: "+adapter.getComponentIdentifier().getName()+" "+arguments);
 		
@@ -1799,6 +1805,16 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	public IInternalAccess	getInternalAccess()
 	{
 		return new CapabilityFlyweight(state, initcapa!=null ? findSubcapability(initcapa) : ragent);
+	}
+	
+	/**
+	 *  Return the creation time of the component.
+	 *  
+	 *  @return The creation time of the component.
+	 */
+	public long getCreationTime()
+	{
+		return creationtime;
 	}
 	
 	/**

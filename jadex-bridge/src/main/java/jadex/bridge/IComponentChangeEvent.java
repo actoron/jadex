@@ -52,6 +52,12 @@ public interface IComponentChangeEvent
 	public IComponentIdentifier getComponent();
 	
 	/**
+	 *  Returns creation time of the component that generated the event.
+	 *  @return Parent ID.
+	 */
+	public long getComponentCreationTime();
+	
+	/**
 	 *  Returns the parent of the source that generated the event, if any.
 	 *  @return Parent ID.
 	 */

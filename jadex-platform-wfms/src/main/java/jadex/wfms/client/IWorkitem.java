@@ -18,6 +18,12 @@ public interface IWorkitem
 	public IComponentIdentifier getProcess();
 	
 	/**
+	 *  Gets the creation time of the process which issued the workitem
+	 *  @return creation time of the process which issued the workitem.
+	 */
+	public long getProcessCreationTime();
+	
+	/**
 	 * Gets the name of the workitem.
 	 * 
 	 * @return name of the workitem

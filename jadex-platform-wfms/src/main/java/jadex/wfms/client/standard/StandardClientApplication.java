@@ -2,17 +2,16 @@ package jadex.wfms.client.standard;
 
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bridge.IComponentChangeEvent;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.wfms.client.ClientInfo;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.client.ProcessResource;
-import jadex.wfms.client.standard.parametergui.ActivityComponent;
 import jadex.wfms.gui.images.SImage;
 import jadex.wfms.guicomponents.CenteringLayout;
 import jadex.wfms.guicomponents.ComponentLoginPanel;
-import jadex.wfms.guicomponents.SGuiHelper;
 import jadex.wfms.service.IExternalWfmsService;
 import jadex.wfms.service.listeners.ActivityEvent;
 import jadex.wfms.service.listeners.IActivityListener;
@@ -31,7 +30,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.Map;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
@@ -39,17 +37,19 @@ import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
-public class StandardClientApplication
+public class StandardClientApplication implements IWfmsClient
 {
 	protected static final String WORKITEM_LIST_TAB_NAME = "Workitem List";
 	
 	protected static final String PROCESS_MODEL_TAB_NAME = "Process Models";
 	
 	protected static final String ADMIN_ACTIVITIES_TAB_NAME = "Activities";
+	
+	protected static final String MONITORING_TAB_NAME = "Monitoring";
 	
 	protected static final String DISCONNECT_TOOLTIP = "Disconnect";
 	
@@ -61,25 +61,31 @@ public class StandardClientApplication
 	
 	protected IExternalAccess ea;
 	
-	//protected JFrame mainFrame;
-	
 	protected JPanel mainPanel;
 	
 	protected StatusBar statusBar;
 	
-	protected JSplitPane mainSplitPane;
+	//protected JSplitPane mainSplitPane;
 	
 	protected JTabbedPane toolPane;
 	
+	/** Component displaying the workitem list and work area. */
 	protected WorkitemListComponent wlComponent;
 	
+	/** Component displaying the process models */
 	protected ProcessModelTreeComponent pmComponent;
 	
+	/** Component displaying administrative tools */
 	protected AdminActivitiesComponent aaComponent;
 	
+	/** The WfMS access. */
 	protected IExternalWfmsService wfms;
 	
+	/** Capabilities of the user account. */
 	protected Set capabilities;
+	
+	/** Component for displaying monitoring-related information. */
+	protected MonitoringComponent mocomponent;
 	
 	public StandardClientApplication(IExternalAccess access)
 	{
@@ -90,9 +96,17 @@ public class StandardClientApplication
 			
 			public void run()
 			{
+				/*try
+				{
+					UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+				}
+				catch (Exception e1)
+				{
+					e1.printStackTrace();
+				}*/
 				if (mainPanel == null)
 					mainPanel = new JPanel();
-				mainSplitPane = new JSplitPane();
+				/*mainSplitPane = new JSplitPane();
 				mainSplitPane.setOneTouchExpandable(true);
 				mainPanel.setLayout(new GridBagLayout());
 				GridBagConstraints g = new GridBagConstraints();
@@ -100,7 +114,18 @@ public class StandardClientApplication
 				g.weighty = 1.0;
 				g.fill = GridBagConstraints.BOTH;
 				g.anchor = GridBagConstraints.CENTER;
-				mainPanel.add(mainSplitPane, g);
+				mainPanel.add(mainSplitPane, g);*/
+				
+				mainPanel.setLayout(new GridBagLayout());
+				
+				toolPane = new JTabbedPane();
+				GridBagConstraints g = new GridBagConstraints();
+				g.gridy = 0;
+				g.weightx = 1.0;
+				g.weighty = 1.0;
+				g.fill = GridBagConstraints.BOTH;
+				g.anchor = GridBagConstraints.CENTER;
+				mainPanel.add(toolPane, g);
 				
 				statusBar = new StatusBar();
 				statusBar.addIcon(CONNECT_ICON_NAME, CONNECT_OFF_ICON_PATH, null);
@@ -111,18 +136,13 @@ public class StandardClientApplication
 				g.gridy = 1;
 				g.weightx = 1.0;
 				g.fill = GridBagConstraints.HORIZONTAL;
+				g.anchor = GridBagConstraints.PAGE_END;
 				mainPanel.add(statusBar, g);
 				
-				mainSplitPane.setRightComponent(new JTabbedPane());
-				
-				toolPane = new JTabbedPane();
-				mainSplitPane.setLeftComponent(toolPane);
-				
-				mainSplitPane.setDividerLocation(0.45);
-				
-				wlComponent = new WorkitemListComponent();
+				wlComponent = new WorkitemListComponent(StandardClientApplication.this);
 				pmComponent = new ProcessModelTreeComponent();
 				aaComponent = new AdminActivitiesComponent();
+				mocomponent = new MonitoringComponent();
 				
 				statusBar.setIconAction(CONNECT_ICON_NAME, new AbstractAction()
 				{
@@ -146,6 +166,16 @@ public class StandardClientApplication
 		return mainPanel;
 	}
 	
+	public IComponentIdentifier getComponentIdentifier()
+	{
+		return ea.getComponentIdentifier();
+	}
+	
+	public IExternalWfmsService getWfms()
+	{
+		return wfms;
+	}
+	
 	private void cleanUp()
 	{
 		pmComponent.clear();
@@ -155,12 +185,12 @@ public class StandardClientApplication
 		
 		//mainSplitPane.setLeftComponent(new JTabbedPane());
 		
-		if (mainSplitPane.getRightComponent() instanceof JTabbedPane)
+		/*if (mainSplitPane.getRightComponent() instanceof JTabbedPane)
 			mainSplitPane.setRightComponent(new JTabbedPane());
 		else
 			mainSplitPane.setRightComponent(EMPTY_PANEL);
 		
-		mainSplitPane.setDividerLocation(0.45);
+		mainSplitPane.setDividerLocation(0.45);*/
 		showConnectDialog();
 	}
 	
@@ -171,7 +201,7 @@ public class StandardClientApplication
 		final ComponentLoginPanel loginpanel = new ComponentLoginPanel(ea.getServiceProvider());
 		final JPanel centerpanel = CenteringLayout.createCenteringPanel(loginpanel);
 		loginpanel.setPreferredSize(new Dimension(500, 273));
-		mainPanel.remove(mainSplitPane);
+		mainPanel.remove(toolPane);
 		GridBagConstraints g = new GridBagConstraints();
 		g.weightx = 1.0;
 		g.weighty = 1.0;
@@ -190,7 +220,7 @@ public class StandardClientApplication
 					g.weighty = 1.0;
 					g.fill = GridBagConstraints.BOTH;
 					g.anchor = GridBagConstraints.CENTER;
-					mainPanel.add(mainSplitPane, g);
+					mainPanel.add(toolPane, g);
 					mainPanel.repaint();
 					IExternalWfmsService selectedwfms = loginpanel.getWfms();
 					connect(selectedwfms, loginpanel.getUserName(), loginpanel.getPassword());
@@ -235,6 +265,8 @@ public class StandardClientApplication
 							{
 								toolPane.add(ADMIN_ACTIVITIES_TAB_NAME, aaComponent);
 								setupAdminActivitiesComponent();
+								toolPane.add(MONITORING_TAB_NAME, mocomponent);
+								setupMonitoringComponent();
 							}
 							
 							
@@ -273,81 +305,6 @@ public class StandardClientApplication
 				}
 			});
 		}
-	}
-	
-	private ActivityComponent createActivityComponent(IClientActivity activity)
-	{
-		final ActivityComponent ac = new ActivityComponent(activity);
-		ac.setCancelAction(new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				cancelActivity(ac);
-			}
-		});
-		
-		ac.setSuspendAction(new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				suspendActivity(ac);
-			}
-		});
-		
-		ac.setFinishAction(new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				if (!ac.isReadyForFinish())
-					return;
-				
-				final IClientActivity activity = ac.getActivity();
-				activity.setMultipleParameterValues(ac.getParameterValues());
-				
-				wfms.finishActivity(ea.getComponentIdentifier(), activity).addResultListener(new SwingDefaultResultListener()
-				{
-					public void customResultAvailable(Object result)
-					{
-					}
-					
-					public void customExceptionOccurred(Exception exception)
-					{
-						JOptionPane.showMessageDialog(mainPanel, "Failed finishing activity.");
-					}
-				});
-			}
-		});
-		
-		return ac;
-	}
-	
-	private void suspendActivity(ActivityComponent ac)
-	{
-		IClientActivity activity = ac.getActivity();
-		Map parameterValues = ac.getParameterValues();
-		activity.setMultipleParameterValues(parameterValues);
-		
-		cancelActivity(ac);
-	}
-	
-	private void cancelActivity(ActivityComponent ac)
-	{
-		cancelActivity(ac.getActivity());
-	}
-	
-	private void cancelActivity(final IClientActivity activity)
-	{
-		wfms.cancelActivity(ea.getComponentIdentifier(), activity).addResultListener(new SwingDefaultResultListener()
-		{
-			public void customResultAvailable(Object result)
-			{
-			}
-			
-			public void customExceptionOccurred(Exception exception)
-			{
-				JOptionPane.showMessageDialog(mainPanel, "Activity cancelation failed.");
-			}
-		});
 	}
 	
 	private void setupWorkitemListComponent()
@@ -556,17 +513,21 @@ public class StandardClientApplication
 				return IFuture.DONE;
 			}
 		});
-		
-		setupMonitoringComponent();
 	}
 	
 	protected void setupMonitoringComponent()
 	{
 		wfms.addLogListener(ea.getComponentIdentifier(), new ILogListener()
 		{
-			public IFuture logMessage(IComponentChangeEvent event)
+			public IFuture logMessage(final IComponentChangeEvent event)
 			{
-				System.out.println("Client-side received event: " + event);
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						mocomponent.addLogEvent(event);
+					}
+				});
 				return IFuture.DONE;
 			}
 		}, true);
@@ -576,54 +537,29 @@ public class StandardClientApplication
 	{
 		wfms.addActivityListener(ea.getComponentIdentifier(), new IActivityListener()
 		{
-			public IFuture activityRemoved(ActivityEvent event)
+			public IFuture activityRemoved(final ActivityEvent event)
 			{
-				IClientActivity activity = event.getActivity();
-				
-				if (mainSplitPane.getRightComponent() instanceof ActivityComponent)
+				SwingUtilities.invokeLater(new Runnable()
 				{
-					ActivityComponent ac = (ActivityComponent) mainSplitPane.getRightComponent();
-					if (activity.equals(ac.getActivity()))
-						mainSplitPane.setRightComponent(EMPTY_PANEL);
-				}
-				else if (mainSplitPane.getRightComponent() instanceof JTabbedPane)
-				{
-					JTabbedPane tabPane = (JTabbedPane) mainSplitPane.getRightComponent();
-					for (int i = 0; i < tabPane.getTabCount(); ++i)
+					public void run()
 					{
-						ActivityComponent ac = (ActivityComponent) tabPane.getComponent(i);
-						if (ac.getActivity().equals(activity))
-						{
-							tabPane.remove(i);
-							return IFuture.DONE;
-						}
+						IClientActivity activity = event.getActivity();
+						wlComponent.removeActivity(activity);
 					}
-				}
+				});
+				
 				return IFuture.DONE;
 			}
 			
-			public IFuture activityAdded(ActivityEvent event)
+			public IFuture activityAdded(final ActivityEvent event)
 			{
-				if (mainSplitPane.getRightComponent() instanceof ActivityComponent)
+				SwingUtilities.invokeLater(new Runnable()
 				{
-					ActivityComponent currentAc = (ActivityComponent) mainSplitPane.getRightComponent();
-					cancelActivity(currentAc);
-					mainSplitPane.setRightComponent(EMPTY_PANEL);
-				}
-				
-				IClientActivity activity = event.getActivity();
-				ActivityComponent ac = createActivityComponent(activity);
-				
-				if (mainSplitPane.getRightComponent().equals(EMPTY_PANEL))
-				{
-					mainSplitPane.setRightComponent(ac);
-				}
-				else if (mainSplitPane.getRightComponent() instanceof JTabbedPane)
-				{
-					JTabbedPane tabPane = (JTabbedPane) mainSplitPane.getRightComponent();
-					tabPane.add(ac, SGuiHelper.beautifyName(ac.getActivity().getName()));
-					tabPane.setSelectedComponent(ac);
-				}
+					public void run()
+					{
+						wlComponent.addActivity(event.getActivity());
+					}
+				});
 				return IFuture.DONE;
 			}
 		});

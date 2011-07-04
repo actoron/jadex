@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
@@ -268,6 +269,21 @@ public class ProcessModelTreeComponent extends JPanel
 		fullMenu.add(startMenu);
 		fullMenu.add(addMenu);
 		fullMenu.add(removeMenu);
+		
+		AbstractAction expandaction = new AbstractAction("Expand All")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				for (int i = 0; i < processTree.getRowCount(); ++i)
+					processTree.expandRow(i);
+			}
+		};
+		JMenuItem expandmenu = new JMenuItem("Expand All");
+		expandmenu.setAction(expandaction);
+		fullMenu.add(expandmenu);
+		expandmenu = new JMenuItem("Expand All");
+		expandmenu.setAction(expandaction);
+		reducedMenu.add(expandmenu);
 		
 		processTree.addMouseListener(new MouseAdapter()
 		{

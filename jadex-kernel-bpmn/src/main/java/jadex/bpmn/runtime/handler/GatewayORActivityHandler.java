@@ -75,7 +75,7 @@ public class GatewayORActivityHandler implements IActivityHandler
 						thread.getThreadContext().addThread(newthread);
 		//				instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_ADDED, newthread);
 						ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
-							thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(newthread));
+							thread.getId(), instance.getComponentIdentifier(), instance.getCreationTime(), instance.createProcessThreadInfo(newthread));
 						instance.notifyListeners(cce);
 						threads.add(newthread);
 					}
@@ -184,7 +184,7 @@ public class GatewayORActivityHandler implements IActivityHandler
 					thread.getThreadContext().removeThread(pt);
 	//				instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, pt);
 					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
-						thread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(pt));
+						thread.getId(), instance.getComponentIdentifier(), instance.getCreationTime(), instance.createProcessThreadInfo(pt));
 					instance.notifyListeners(cce);
 				}
 			}

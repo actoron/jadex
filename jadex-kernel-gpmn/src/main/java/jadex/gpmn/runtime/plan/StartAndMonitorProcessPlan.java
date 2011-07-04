@@ -7,7 +7,9 @@ import jadex.bdi.runtime.Plan;
 import jadex.commons.SUtil;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *  Create a process and the corresponding parameters.
@@ -21,13 +23,10 @@ public class StartAndMonitorProcessPlan extends Plan
 	{
 		final String[] agoalnames = (String[])getParameterSet("achieve_goals").getValues();
 		String[] mgoalnames = (String[])getParameterSet("maintain_goals").getValues();
-		
-		System.out.println("Process start: "+SUtil.arrayToString(mgoalnames)+" "+SUtil.arrayToString(agoalnames));
 
 		List mgoals = new ArrayList();
 		for(int i=0; i<mgoalnames.length; i++)
 		{
-			System.out.println("Creating Goal: "+mgoalnames[i]);
 			IGoal goal = createGoal(mgoalnames[i]);
 			dispatchSubgoal(goal);
 			mgoals.add(goal);
@@ -65,7 +64,14 @@ public class StartAndMonitorProcessPlan extends Plan
 			goal.addGoalListener(listener);
 			dispatchSubgoal(goal);
 		}
-		lis.waitForResult();
+		try
+		{
+			lis.waitForResult();
+		}
+		catch(Exception e)
+		{
+			//TODO: Ignore?
+		}
 		
 		IGoal mviolated = null;
 		do

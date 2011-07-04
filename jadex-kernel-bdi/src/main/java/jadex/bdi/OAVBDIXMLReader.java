@@ -656,6 +656,7 @@ public class OAVBDIXMLReader
 						}
 						catch(Exception e)
 						{
+							e.printStackTrace();
 							reportError(context, e.toString());
 						}
 					}

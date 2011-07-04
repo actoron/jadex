@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpmn:GpmnDiagram xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" version="2.0">
+  <context>
+    <element name="PPG_Punkte" set="true" type="Object">
+      <value></value>
+    </element>
+    <element name="Prozesspunkte" set="true" type="Object">
+      <value></value>
+    </element>
+    <element name="Report_Done" type="boolean">
+      <value>false</value>
+    </element>
+  </context>
+  <goal id="_fqSVQJcuEeC8uP7JiAk7xA" name="Production&#xA;Preparation" goalType="AchieveGoal"/>
+  <goal id="_mLYDsJcuEeC8uP7JiAk7xA" name="Address&#xA;Part Issues" goalType="MaintainGoal" recur="true">
+    <dropcondition>$beliefbase.Report_Done &amp;&amp; $beliefbase.PPG_Punkte.length == 0</dropcondition>
+    <maintaincondition>$beliefbase.PPG_Punkte.length == 0</maintaincondition>
+  </goal>
+  <goal id="_meX4MJcuEeC8uP7JiAk7xA" name="Address&#xA;Process Issues" goalType="MaintainGoal" recur="true">
+    <dropcondition>$beliefbase.Report_Done &amp;&amp; $beliefbase.Prozesspunkte.length == 0</dropcondition>
+    <maintaincondition>$beliefbase.Prozesspunkte.length == 0</maintaincondition>
+  </goal>
+  <goal id="_fHoesJcvEeC8uP7JiAk7xA" name="Perform&#xA;Assembly" goalType="PerformGoal"/>
+  <goal id="_m9CUsJcvEeC8uP7JiAk7xA" name="Examine&#xA;Assembly" goalType="AchieveGoal"/>
+  <goal id="_0VNPsJcvEeC8uP7JiAk7xA" name="Report&#xA;Assembly Steps" goalType="AchieveGoal"/>
+  <goal id="_0itgMJcvEeC8uP7JiAk7xA" name="Report&#xA;Known Issues" goalType="AchieveGoal"/>
+  <goal id="_0yH1MJcvEeC8uP7JiAk7xA" name="Assemble Parts" goalType="AchieveGoal"/>
+  <goal id="_1PMLsJcvEeC8uP7JiAk7xA" name="Prepare&#xA;Report" goalType="AchieveGoal"/>
+  <goal id="_ydkjMJcwEeC8uP7JiAk7xA" name="Document&#xA;Issues" goalType="PerformGoal" retry="false">
+    <dropcondition>$beliefbase.Report_Done</dropcondition>
+  </goal>
+  <goal id="_p_a1sJcxEeC8uP7JiAk7xA" name="Document&#xA;Assembly Issues" exclude="never" goalType="PerformGoal" recur="false">
+    <dropcondition>$beliefbase.Report_Done</dropcondition>
+  </goal>
+  <goal id="_qTaIsJcxEeC8uP7JiAk7xA" name="Document&#xA;Faulty Parts" exclude="never" goalType="PerformGoal" recur="false" retry="true">
+    <dropcondition>$beliefbase.Report_Done</dropcondition>
+  </goal>
+  <plan xsi:type="gpmn:ActivationPlan" id="_oDm7MJcvEeC8uP7JiAk7xA"/>
+  <plan xsi:type="gpmn:ActivationPlan" id="_NW2vQJcwEeC8uP7JiAk7xA"/>
+  <plan xsi:type="gpmn:ActivationPlan" id="_gbZXMJcwEeC8uP7JiAk7xA" mode="Sequential"/>
+  <plan xsi:type="gpmn:ActivationPlan" id="_kiNwsJcyEeC8uP7JiAk7xA"/>
+  <plan xsi:type="gpmn:BpmnPlan" id="_B53nMJczEeC8uP7JiAk7xA" name="Assembly Issue&#xA;Report" planref="jadex/wfms/examples/ipv/ai_report.bpmn"/>
+  <plan xsi:type="gpmn:BpmnPlan" id="_DfpSMJczEeC8uP7JiAk7xA" name="Faulty Part&#xA;Report" planref="jadex/wfms/examples/ipv/fp_report.bpmn"/>
+  <plan xsi:type="gpmn:BpmnPlan" id="_OqXeMJczEeC8uP7JiAk7xA" name="Present Steps" planref="jadex/wfms/examples/ipv/present_steps.bpmn"/>
+  <plan xsi:type="gpmn:BpmnPlan" id="_Pn3BMJczEeC8uP7JiAk7xA" name="Present Issues" planref="jadex/wfms/examples/ipv/present_issues.bpmn"/>
+  <plan xsi:type="gpmn:BpmnPlan" id="_Qh19MJczEeC8uP7JiAk7xA" name="Assembly" planref="jadex/wfms/examples/ipv/assembly.bpmn"/>
+  <plan xsi:type="gpmn:BpmnPlan" id="_ROK3sJczEeC8uP7JiAk7xA" name="Write Report" planref="jadex/wfms/examples/ipv/write_report.bpmn"/>
+  <plan xsi:type="gpmn:BpmnPlan" id="_I9EHsJc0EeC8uP7JiAk7xA" name="Part Redesign" planref="jadex/wfms/examples/ipv/bauteil_bearbeiten.bpmn"/>
+  <plan xsi:type="gpmn:BpmnPlan" id="_PYD1MJc0EeC8uP7JiAk7xA" name="Process&#xA;Reengineering" planref="jadex/wfms/examples/ipv/prozess_bearbeiten.bpmn"/>
+  <activationEdge id="_oD7EQJcvEeC8uP7JiAk7xA" source="_oDm7MJcvEeC8uP7JiAk7xA" target="_fHoesJcvEeC8uP7JiAk7xA" order="1"/>
+  <activationEdge id="_NW6ZoJcwEeC8uP7JiAk7xA" source="_NW2vQJcwEeC8uP7JiAk7xA" target="_m9CUsJcvEeC8uP7JiAk7xA" order="1"/>
+  <activationEdge id="_qe9t4JcwEeC8uP7JiAk7xA" source="_gbZXMJcwEeC8uP7JiAk7xA" target="_0VNPsJcvEeC8uP7JiAk7xA" order="1"/>
+  <activationEdge id="_q1TxUJcwEeC8uP7JiAk7xA" source="_gbZXMJcwEeC8uP7JiAk7xA" target="_0itgMJcvEeC8uP7JiAk7xA" order="2"/>
+  <activationEdge id="_rJ_A0JcwEeC8uP7JiAk7xA" source="_gbZXMJcwEeC8uP7JiAk7xA" target="_0yH1MJcvEeC8uP7JiAk7xA" order="3"/>
+  <activationEdge id="_ri7sUJcwEeC8uP7JiAk7xA" source="_gbZXMJcwEeC8uP7JiAk7xA" target="_1PMLsJcvEeC8uP7JiAk7xA" order="4"/>
+  <activationEdge id="_zA_ZUJcwEeC8uP7JiAk7xA" source="_NW2vQJcwEeC8uP7JiAk7xA" target="_ydkjMJcwEeC8uP7JiAk7xA" order="2"/>
+  <activationEdge id="_nGkj0JcyEeC8uP7JiAk7xA" source="_kiNwsJcyEeC8uP7JiAk7xA" target="_p_a1sJcxEeC8uP7JiAk7xA" order="1"/>
+  <activationEdge id="_nboN0JcyEeC8uP7JiAk7xA" source="_kiNwsJcyEeC8uP7JiAk7xA" target="_qTaIsJcxEeC8uP7JiAk7xA" order="2"/>
+  <activationEdge id="_58z7gKZQEeClb_3OTnF02g" source="_oDm7MJcvEeC8uP7JiAk7xA" target="_mLYDsJcuEeC8uP7JiAk7xA" order="2"/>
+  <activationEdge id="_6WrNAKZQEeClb_3OTnF02g" source="_oDm7MJcvEeC8uP7JiAk7xA" target="_meX4MJcuEeC8uP7JiAk7xA" order="3"/>
+  <planEdge id="_oDyhYJcvEeC8uP7JiAk7xA" source="_fqSVQJcuEeC8uP7JiAk7xA" target="_oDm7MJcvEeC8uP7JiAk7xA"/>
+  <planEdge id="_NW4kcJcwEeC8uP7JiAk7xA" source="_fHoesJcvEeC8uP7JiAk7xA" target="_NW2vQJcwEeC8uP7JiAk7xA"/>
+  <planEdge id="_hnTwsJcwEeC8uP7JiAk7xA" source="_m9CUsJcvEeC8uP7JiAk7xA" target="_gbZXMJcwEeC8uP7JiAk7xA"/>
+  <planEdge id="_lUuLsJcyEeC8uP7JiAk7xA" source="_ydkjMJcwEeC8uP7JiAk7xA" target="_kiNwsJcyEeC8uP7JiAk7xA"/>
+  <planEdge id="_HO_RwJczEeC8uP7JiAk7xA" source="_p_a1sJcxEeC8uP7JiAk7xA" target="_B53nMJczEeC8uP7JiAk7xA"/>
+  <planEdge id="_HqOcQJczEeC8uP7JiAk7xA" source="_qTaIsJcxEeC8uP7JiAk7xA" target="_DfpSMJczEeC8uP7JiAk7xA"/>
+  <planEdge id="_So-BwJczEeC8uP7JiAk7xA" source="_0VNPsJcvEeC8uP7JiAk7xA" target="_OqXeMJczEeC8uP7JiAk7xA"/>
+  <planEdge id="_THQgQJczEeC8uP7JiAk7xA" source="_0itgMJcvEeC8uP7JiAk7xA" target="_Pn3BMJczEeC8uP7JiAk7xA"/>
+  <planEdge id="_Tln3QJczEeC8uP7JiAk7xA" source="_0yH1MJcvEeC8uP7JiAk7xA" target="_Qh19MJczEeC8uP7JiAk7xA"/>
+  <planEdge id="_UALFQJczEeC8uP7JiAk7xA" source="_1PMLsJcvEeC8uP7JiAk7xA" target="_ROK3sJczEeC8uP7JiAk7xA"/>
+  <planEdge id="_Kr2kwJc0EeC8uP7JiAk7xA" source="_mLYDsJcuEeC8uP7JiAk7xA" target="_I9EHsJc0EeC8uP7JiAk7xA"/>
+  <planEdge id="_R5qPQJc0EeC8uP7JiAk7xA" source="_meX4MJcuEeC8uP7JiAk7xA" target="_PYD1MJc0EeC8uP7JiAk7xA"/>
+</gpmn:GpmnDiagram>

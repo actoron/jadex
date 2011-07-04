@@ -73,7 +73,6 @@ public class LogService implements ILogService
 					public void customResultAvailable(Object result)
 					{
 						final IComponentManagementService cms = (IComponentManagementService) result;
-						final IExternalAccess exta = ia.getExternalAccess();
 						cmslistener = new ICMSComponentListener()
 						{
 							public IFuture componentRemoved(IComponentDescription desc, Map results)
@@ -88,19 +87,26 @@ public class LogService implements ILogService
 							
 							public IFuture componentAdded(final IComponentDescription desc)
 							{
-								return exta.scheduleStep(new IComponentStep()
+								final Future cret = new Future();
+								cms.getExternalAccess(desc.getName()).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 								{
-									public Object execute(IInternalAccess ia)
+									public void customResultAvailable(Object result)
 									{
 										//TODO: Hack!
 										if (!desc.getName().getParent().getName().toLowerCase().contains("execution"))
-											return null;
+										{
+											cret.setResult(null);
+											return;
+										}
+										
+										final IExternalAccess ncea = (IExternalAccess) result;
 										IComponentChangeEvent ce = new ComponentChangeEvent()
 										{
 											{
 												setTime(clockservice.getTime());
+												setComponentCreationTime(ncea.getCreationTime());
 												setEventType(IComponentChangeEvent.EVENT_TYPE_CREATION);
-												setSourceCategory(desc.getType());
+												setSourceCategory(IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT);
 												setSourceType(desc.getModelName());
 												setSourceName(desc.getName().getName());
 												setComponent(desc.getName());
@@ -108,31 +114,25 @@ public class LogService implements ILogService
 										};
 										logEvent(ce);
 										
-										cms.getExternalAccess(desc.getName()).addResultListener(new DefaultResultListener()
+										ncea.scheduleStep(new IComponentStep()
 										{
-											public void resultAvailable(Object result)
+											public Object execute(IInternalAccess ia)
 											{
-												((IExternalAccess) result).scheduleStep(new IComponentStep()
+												ia.addComponentListener(new ComponentAdapter()
 												{
-													public Object execute(IInternalAccess ia)
+													public IFuture eventOccured(
+															IComponentChangeEvent cce)
 													{
-														ia.addComponentListener(new ComponentAdapter()
-														{
-															public IFuture eventOccured(
-																	IComponentChangeEvent cce)
-															{
-																logEvent(cce);
-																return IFuture.DONE;
-															}
-														});
-														return null;
+														logEvent(cce);
+														return IFuture.DONE;
 													}
 												});
+												return null;
 											}
-										});
-										return null;
+										}).addResultListener(ia.createResultListener(new DelegationResultListener(cret)));
 									}
-								});
+								}));
+								return cret;
 							}
 						};
 						cms.addComponentListener(null, cmslistener);

@@ -219,7 +219,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				{	
 					exitState();
 					
-					ComponentChangeEvent.dispatchTerminatingEvent(adapter, getModel(), getServiceProvider(), componentlisteners, null);
+					ComponentChangeEvent.dispatchTerminatingEvent(adapter, getCreationTime(), getModel(), getServiceProvider(), componentlisteners, null);
 					
 					microagent.agentKilled().addResultListener(microagent.createResultListener(new IResultListener()
 					{
@@ -228,7 +228,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 							nosteps = true;
 							exitState();
 							
-							ComponentChangeEvent.dispatchTerminatedEvent(adapter, getModel(), getServiceProvider(), componentlisteners, null);
+							ComponentChangeEvent.dispatchTerminatedEvent(adapter, getCreationTime(), getModel(), getServiceProvider(), componentlisteners, null);
 							
 							IComponentIdentifier cid = adapter.getComponentIdentifier();
 							ret.setResult(cid);							
@@ -329,7 +329,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				// For coordination space step is set as detail (problem remote comm?)
 //				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, step[0].getClass().getName(), 
 //					step[0].toString(), microagent.getComponentIdentifier(), getStepDetails((IComponentStep)step[0])));
-				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, step[0].getClass().getName(), step[0].toString(), microagent.getComponentIdentifier(), step[0]));
+				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, step[0].getClass().getName(), step[0].toString(), microagent.getComponentIdentifier(), getCreationTime(), step[0]));
 			}
 		}
 	}
@@ -346,7 +346,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		if(componentlisteners!=null)
 		{
 			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_STEP, 
-				ret[0].getClass().getName(), ret[0].toString(), microagent.getComponentIdentifier(), getStepDetails((IComponentStep)ret[0])));
+				ret[0].getClass().getName(), ret[0].toString(), microagent.getComponentIdentifier(), getCreationTime(), getStepDetails((IComponentStep)ret[0])));
 		}
 //		notifyListeners(new ChangeEvent(this, "removeStep", new Integer(0)));
 		return ret;

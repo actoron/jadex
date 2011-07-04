@@ -18,6 +18,9 @@ public class Workitem implements IWorkitem, IClientActivity
 	/** Identifier of the process which issued the workitem */
 	private IComponentIdentifier process;
 	
+	/** Creation time of the process which issued the workitem */
+	private long processcreationtime;
+	
 	/** Identifier of element which issued the workitem */
 	private String parent;
 	
@@ -49,9 +52,10 @@ public class Workitem implements IWorkitem, IClientActivity
 	{
 	}
 	
-	public Workitem(IComponentIdentifier process, String parent, String name, String role, Map parameterTypes, Map parameterValues, Map guiProperties, Set readOnlyParameters)
+	public Workitem(IComponentIdentifier process, long processcreationtime, String parent, String name, String role, Map parameterTypes, Map parameterValues, Map guiProperties, Set readOnlyParameters)
 	{
 		this.process = process;
+		this.processcreationtime = processcreationtime;
 		this.parent = parent;
 		this.id = SUtil.createUniqueId("Workitem");
 		this.name = name;
@@ -77,6 +81,15 @@ public class Workitem implements IWorkitem, IClientActivity
 	public IComponentIdentifier getProcess()
 	{
 		return process;
+	}
+	
+	/**
+	 *  Gets the creation time of the process which issued the workitem
+	 *  @return creation time of the process which issued the workitem.
+	 */
+	public long getProcessCreationTime()
+	{
+		return processcreationtime;
 	}
 	
 	/**
@@ -254,6 +267,15 @@ public class Workitem implements IWorkitem, IClientActivity
 	public void setProcess(IComponentIdentifier process)
 	{
 		this.process = process;
+	}
+	
+	/**
+	 *  Sets the creation time of the process which issued the workitem
+	 *  @param creationtime Creation time of the process which issued the workitem.
+	 */
+	public void setProcessCreationTime(long creationtime)
+	{
+		this.processcreationtime = creationtime;
 	}
 	
 	/**

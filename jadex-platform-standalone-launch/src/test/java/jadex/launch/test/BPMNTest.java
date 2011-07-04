@@ -23,6 +23,7 @@ public class BPMNTest	extends ComponentTestSuite
 			new String[]
 			{
 				"WaitForTick",	// Doesn't work in simulation?
+				"Result",
 				"_diagram"
 			});
 	}

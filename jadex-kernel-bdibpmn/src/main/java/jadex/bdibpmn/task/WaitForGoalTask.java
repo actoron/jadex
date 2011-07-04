@@ -27,7 +27,6 @@ public class WaitForGoalTask	implements ITask
 		try
 		{
 			final IGoal	goal	= (IGoal)context.getParameterValue("goal");
-			
 			if(!goal.isFinished())
 			{
 				goal.addGoalListener(new IGoalListener()

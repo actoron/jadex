@@ -583,6 +583,11 @@ public class GpmnBDIConverter
 		state.setAttributeValue(goalhandle, OAVBDIMetaModel.modelelement_has_name, name);
 		state.addAttributeValue(scopehandle, OAVBDIMetaModel.capability_has_goals, goalhandle);
 		
+		//TODO:Hack! Fixme!!
+		//if (exclude == null)
+			//exclude = OAVBDIMetaModel.EXCLUDE_NEVER;
+		//System.out.println(name + " " + retry + " " + exclude);
+		
 		if(retry!=null)
 			state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_retry, retry);
 		if(retrydelay!=null)

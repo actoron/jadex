@@ -76,7 +76,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 							subcontext.addThread(subthread);
 //							instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_ADDED, subthread);
 							ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, subthread.getClass().getName(), 
-								subthread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(subthread));
+								subthread.getId(), instance.getComponentIdentifier(), instance.getCreationTime(), instance.createProcessThreadInfo(subthread));
 							instance.notifyListeners(cce);
 						}
 					}
@@ -96,7 +96,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 					subcontext.addThread(subthread);
 //					instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_ADDED, subthread);
 					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, subthread.getClass().getName(), 
-						subthread.getId(), instance.getComponentIdentifier(), instance.createProcessThreadInfo(subthread));
+						subthread.getId(), instance.getComponentIdentifier(), instance.getCreationTime(), instance.createProcessThreadInfo(subthread));
 					instance.notifyListeners(cce);
 				}
 			}

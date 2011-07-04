@@ -555,7 +555,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		final Future ret = new Future();
 		// Todo: cleanup required???
 		
-		ComponentChangeEvent.dispatchTerminatingEvent(getComponentAdapter(), getModel(), getServiceProvider(), getInternalComponentListeners(), null);
+		ComponentChangeEvent.dispatchTerminatingEvent(getComponentAdapter(), getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners(), null);
 		
 		terminateExtensions().addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
@@ -573,7 +573,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 //							System.out.println("Cancelling: "+pt.getActivity()+" "+pt.getId());
 						}
 						
-						ComponentChangeEvent.dispatchTerminatedEvent(getComponentAdapter(), getModel(), getServiceProvider(), getInternalComponentListeners(), ret);
+						ComponentChangeEvent.dispatchTerminatedEvent(getComponentAdapter(), getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners(), ret);
 					}
 				});
 			}
@@ -1293,7 +1293,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	public IComponentChangeEvent createThreadEvent(String type, ProcessThread thread)
 	{
 		return new ComponentChangeEvent(type, TYPE_THREAD, thread.getClass().getName(), 
-			thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread));
+			thread.getId(), getComponentIdentifier(), getCreationTime(), createProcessThreadInfo(thread));
 	}
 	
 	/**
@@ -1302,6 +1302,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	public IComponentChangeEvent createActivityEvent(String type, ProcessThread thread, MActivity activity)
 	{
 		return new ComponentChangeEvent(type, TYPE_ACTIVITY, activity.getName(), 
-			thread.getId(), getComponentIdentifier(), createProcessThreadInfo(thread));
+			thread.getId(), getComponentIdentifier(), getCreationTime(), createProcessThreadInfo(thread));
 	}
 }

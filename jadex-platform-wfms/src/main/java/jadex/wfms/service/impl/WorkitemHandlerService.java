@@ -149,7 +149,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 		{
 			public void resultAvailable(Object result)
 			{
-				LogService.dispatchLogServiceEvent(ia.getServiceContainer(), new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_CREATION, SOURCE_CATEGORY_WORKITEM, workitem.getName(), workitem.getId(), workitem.getProcess(), null, null, (Long) result));
+				LogService.dispatchLogServiceEvent(ia.getServiceContainer(), new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_CREATION, SOURCE_CATEGORY_WORKITEM, workitem.getName(), workitem.getId(), workitem.getProcess(), workitem.getProcessCreationTime(), null, null, (Long) result));
 			}
 		}));
 		
@@ -179,9 +179,9 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	public IFuture withdrawWorkitem(final IWorkitem workitem)
 	{
 		final Future ret = new Future();
-		terminateActivity((IClientActivity) workitem).addResultListener(ia.createResultListener(new DefaultResultListener()
+		terminateActivity((IClientActivity) workitem).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
 				IResultListener listener = (IResultListener) processWorkitemListeners.remove(workitem);
 				listener.exceptionOccurred(new RuntimeException("Workitem terminated."));
@@ -193,7 +193,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 				{
 					public void resultAvailable(Object result)
 					{
-						LogService.dispatchLogServiceEvent(ia.getServiceContainer(), new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_WORKITEM, workitem.getName(), workitem.toString(), workitem.getProcess(), "Withdrawn", null, (Long) result));
+						LogService.dispatchLogServiceEvent(ia.getServiceContainer(), new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_WORKITEM, workitem.getName(), workitem.getId(), workitem.getProcess(), workitem.getProcessCreationTime(), "Withdrawb", null, (Long) result));
 					}
 				}));
 				
@@ -249,7 +249,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 			{
 				public void resultAvailable(Object result)
 				{
-					LogService.dispatchLogServiceEvent(ia.getServiceContainer(), new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_ACTIVITY, activity.getName(), id, activity.getProcess(), "Terminated", user, (Long) result));
+					LogService.dispatchLogServiceEvent(ia.getServiceContainer(), new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_ACTIVITY, activity.getName(), id, activity.getProcess(), activity.getProcessCreationTime(), "Terminated", user, (Long) result));
 				}
 			}));
 			((Set) userActivities.get(userName)).remove(activity);
@@ -274,8 +274,8 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 		{
 			public void resultAvailable(Object result)
 			{
-				LogService.dispatchLogServiceEvent(ia.getServiceContainer(), new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_ACTIVITY, workitem.getName(), id, workitem.getProcess(), "Finished", userName, (Long) result));
-				LogService.dispatchLogServiceEvent(ia.getServiceContainer(), new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_WORKITEM, workitem.getName(), workitem.toString(), workitem.getProcess(), "Finished", null, (Long) result));
+				LogService.dispatchLogServiceEvent(ia.getServiceContainer(), new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_ACTIVITY, workitem.getName(), id, workitem.getProcess(), workitem.getProcessCreationTime(), "Finished", userName, (Long) result));
+				LogService.dispatchLogServiceEvent(ia.getServiceContainer(), new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_WORKITEM, workitem.getName(), workitem.getId(), workitem.getProcess(), workitem.getProcessCreationTime(), "Finished", null, (Long) result));
 			}
 		}));
 		IResultListener listener = (IResultListener) processWorkitemListeners.remove(activity);
@@ -299,7 +299,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 		{
 			public void resultAvailable(Object result)
 			{
-				ComponentChangeEvent event = new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_CREATION, SOURCE_CATEGORY_ACTIVITY, activity.getName(), activity.getActivityId(), activity.getProcess(), "Requested", userName, (Long) result);
+				ComponentChangeEvent event = new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_CREATION, SOURCE_CATEGORY_ACTIVITY, activity.getName(), activity.getActivityId(), activity.getProcess(), activity.getProcessCreationTime(), "Requested", userName, (Long) result);
 				event.setParent(activity.getId());
 				LogService.dispatchLogServiceEvent(ia.getServiceContainer(), event);
 			}
@@ -334,7 +334,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 		{
 			public void resultAvailable(Object result)
 			{
-				LogService.dispatchLogServiceEvent(ia.getServiceContainer(), new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_ACTIVITY, activity.getName(), id, activity.getProcess(), "Canceled", userName, (Long) result));
+				LogService.dispatchLogServiceEvent(ia.getServiceContainer(), new ComponentChangeEvent(ComponentChangeEvent.EVENT_TYPE_DISPOSAL, SOURCE_CATEGORY_ACTIVITY, activity.getName(), id, activity.getProcess(), activity.getProcessCreationTime(), "Cancelled", userName, (Long) result));
 			}
 		}));
 		((HashSet) userActivities.get(userName)).remove(activity);

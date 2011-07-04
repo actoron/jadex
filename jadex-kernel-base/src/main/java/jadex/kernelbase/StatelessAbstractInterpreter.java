@@ -145,13 +145,13 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		
 		final Future ret = new Future();
 
-		ComponentChangeEvent.dispatchTerminatingEvent(getComponentAdapter(), getModel(), getServiceProvider(), getInternalComponentListeners(), null);
+		ComponentChangeEvent.dispatchTerminatingEvent(getComponentAdapter(), getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners(), null);
 		
 		terminateExtensions().addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				ComponentChangeEvent.dispatchTerminatedEvent(getComponentAdapter(), getModel(), getServiceProvider(), getInternalComponentListeners(), ret);
+				ComponentChangeEvent.dispatchTerminatedEvent(getComponentAdapter(), getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners(), ret);
 			}
 		}));
 		
@@ -174,7 +174,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			public Object execute(IInternalAccess ia)
 			{
 //				System.out.println("created: "+desc.getName());
-				ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_COMPONENT, model.getFullName(), desc.getName().getName(), getComponentIdentifier(), desc);
+				ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_COMPONENT, model.getFullName(), desc.getName().getName(), getComponentIdentifier(), getCreationTime(), desc);
 				notifyListeners(event);
 				return null;
 			}
@@ -195,7 +195,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			public Object execute(IInternalAccess ia)
 			{
 //				System.out.println("destroyed: "+desc.getName());
-				ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_COMPONENT, desc.getModelName(), desc.getName().getName(), getComponentIdentifier(), desc);
+				ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_COMPONENT, desc.getModelName(), desc.getName().getName(), getComponentIdentifier(), getCreationTime(), desc);
 				notifyListeners(event);
 				return null;
 			}
@@ -276,6 +276,13 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  @param extension The extension instance.
 	 */
 	public abstract void addExtension(String name, IExtensionInstance extension);
+	
+	/**
+	 *  Return the creation time of the component.
+	 *  
+	 *  @return The creation time of the component.
+	 */
+	public abstract long getCreationTime();
 	
 	/**
 	 *  Get the component listeners.
