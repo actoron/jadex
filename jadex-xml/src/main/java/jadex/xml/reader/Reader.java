@@ -223,7 +223,7 @@ public class Reader
 		}
 		catch(RuntimeException e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			Location	loc	= readcontext.getStackSize()>0 ? readcontext.getTopStackElement().getLocation() : parser.getLocation();
 			readcontext.getReporter().report(e.toString(), "XML error", readcontext, loc);
 		}

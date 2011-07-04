@@ -115,7 +115,14 @@ public class MultiColumnTableEx extends MultiColumnTable
 		{
 			if(isComplexColumn[column])
 			{
-				row.setColumnValueAt(column, createUniqueValue(row.getColumnValueAt(column)));
+//				try
+//				{
+					row.setColumnValueAt(column, createUniqueValue(row.getColumnValueAt(column)));
+//				}
+//				catch(Exception e)
+//				{
+//					e.printStackTrace();
+//				}
 			}
 		}
 		

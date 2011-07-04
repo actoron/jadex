@@ -1319,9 +1319,6 @@ public class BpmnXMLReader
 
 						for(int row = 0; row < table.size(); row++) 
 						{
-							// normal import has 1 value
-//							assert table.get(row).size() == 1;
-
 							String imp = (String) table.get(row).getColumnValueAt(0);
 							if(imp.length() > 0)
 								model.addImport(imp);
@@ -1381,8 +1378,6 @@ public class BpmnXMLReader
 						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails(), annos);
 						for(int row = 0; row < table.size(); row++)
 						{
-							// normal configurations has 2 values
-//							assert table.get(row).size() == 3;
 							String id = table.getCellValue(row, 0);
 							String name = table.getCellValue(row, 1);
 							String poollane = table.getCellValue(row, 2);
@@ -1407,16 +1402,14 @@ public class BpmnXMLReader
 
 						for(int row = 0; row < table.size(); row++) 
 						{
-							// normal import has 7 values
-							//assert table.getRow(row).length == 7;
-
 							String name = table.getCellValue(row, 0);
 							String scope = table.getCellValue(row, 1);
 							String compname = table.getCellValue(row, 2);
 							String comptype = table.getCellValue(row, 3);
-							String dynamictxt = table.getCellValue(row, 4);
-							String createtxt = table.getCellValue(row, 5);
-							String recovertxt = table.getCellValue(row, 6);
+							String proxytype = table.getCellValue(row, 4);
+							String dynamictxt = table.getCellValue(row, 5);
+							String createtxt = table.getCellValue(row, 6);
+							String recovertxt = table.getCellValue(row, 7);
 							boolean dynamic = new Boolean(dynamictxt).booleanValue();
 							boolean create = new Boolean(createtxt).booleanValue();
 							boolean recover = new Boolean(recovertxt).booleanValue();
@@ -1424,7 +1417,8 @@ public class BpmnXMLReader
 							// todo: interceptors, proxytype
 							
 							RequiredServiceBinding binding = new RequiredServiceBinding(null, compname, comptype, dynamic, 
-								scope, create, recover, null, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED);
+								scope, create, recover, null, proxytype==null || proxytype.length()==0? 
+									BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED: proxytype);
 							bindings.put(name, binding);
 						}
 
@@ -1443,9 +1437,6 @@ public class BpmnXMLReader
 						
 						for(int row = 0; row < table.size(); row++)
 						{
-							// normal argument has 6 (+x) values
-//							assert table.get(row).size() == 7;
-							
 							String name = table.getCellValue(row, 0);
 							String isarg = table.getCellValue(row, 1);
 							String isres = table.getCellValue(row, 2);
@@ -1517,8 +1508,6 @@ public class BpmnXMLReader
 						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails(), annos);
 						for(int row=0; row<table.size(); row++)
 						{
-//							assert table.get(row).size() == 2;
-							
 							// normal property has 3 values
 							String name = null;
 							String value = null;
@@ -1544,8 +1533,6 @@ public class BpmnXMLReader
 						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails(), annos);
 						for(int row=0; row<table.size(); row++)
 						{
-							// normal property has 4 values
-//							assert table.get(row).size() == 4;
 							String name = table.getCellValue(row, 0);
 							String typename = table.getCellValue(row, 1);
 							String proxytype = table.getCellValue(row, 2);
@@ -1603,8 +1590,6 @@ public class BpmnXMLReader
 						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails(), annos);
 						for(int row=0; row<table.size(); row++)
 						{
-							// normal property has 4 values
-//							assert table.getRow(row).length == 4;
 							String name = table.getCellValue(row, 0);
 							String typename = table.getCellValue(row, 1);
 							String multi = table.getCellValue(row, 2);
@@ -1643,8 +1628,6 @@ public class BpmnXMLReader
 						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails(), annos);
 						for(int row=0; row<table.size(); row++)
 						{
-							// normal property has 5 values
-//							assert table.get(row).size() == 5;
 							String name = table.getCellValue(row, 0);
 							String filename = table.getCellValue(row, 1);
 							String instnameref = table.getCellValue(row, 2);
