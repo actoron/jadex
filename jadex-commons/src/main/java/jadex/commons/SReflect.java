@@ -5,16 +5,22 @@ import jadex.commons.collection.SCollection;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
+import java.util.Vector;
 import java.util.WeakHashMap;
 
 /**
@@ -41,6 +47,9 @@ public class SReflect
 
 	/** Mapping from basic class -> object type(class). */
 	protected static final Map wrappedtypes;
+	
+	/** The immutable types. */
+	protected static final Set immutabletypes;
 
 	static
 	{
@@ -63,6 +72,17 @@ public class SReflect
 		wrappedtypes.put(short.class, Short.class);
 		wrappedtypes.put(byte.class, Byte.class);
 		wrappedtypes.put(char.class, Character.class);
+		
+		immutabletypes = new HashSet();
+		immutabletypes.add(Boolean.class);
+		immutabletypes.add(Integer.class);
+		immutabletypes.add(Double.class);
+		immutabletypes.add(Float.class);
+		immutabletypes.add(Long.class);
+		immutabletypes.add(Short.class);
+		immutabletypes.add(Byte.class);
+		immutabletypes.add(Character.class);
+		immutabletypes.add(String.class);
 	}
 
 	//-------- methods --------
@@ -995,6 +1015,160 @@ public class SReflect
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Deep clone an object.
+	 */
+	public static Object deepClone(Object object)
+	{
+		return deepClone(object, null, new HashMap());
+	}
+	
+	/**
+	 *  Deep clone an object.
+	 */
+	public static Object deepClone(Object object, Class clazz, Map cloned)
+	{
+		Object ret = null;
+		
+		if(object!=null)
+		{
+			if(clazz==null)
+				clazz = object.getClass();
+			
+			if(immutabletypes.contains(clazz))
+			{
+				ret = object;
+			}
+			else if(clazz.isArray()) 
+			{
+				int length = Array.getLength(object);
+				Class type = clazz.getComponentType();
+				ret = Array.newInstance(type, length);
+				for(int i=0; i<length; i++) 
+				{
+					Object val = Array.get(object, i);
+					Array.set(ret, i, deepClone(val, type, cloned));
+				}
+			}
+			else if(isSupertype(Map.class, clazz))
+			{
+				try
+				{
+					ret = clazz.newInstance();
+				}
+				catch(Exception e)
+				{
+					ret = new HashSet();
+				}
+				((Map)ret).putAll((Map)object);
+			}
+			else if(isSupertype(Collection.class, clazz))
+			{
+				try
+				{
+					ret = clazz.newInstance();
+				}
+				catch(Exception e)
+				{
+					if(isSupertype(Set.class, clazz))
+					{
+						ret = new HashSet();
+					}
+					else //if(isSupertype(List.class, clazz))
+					{
+						ret = new ArrayList();
+					}
+				}
+				((Collection)ret).addAll((Collection)object);
+			}
+			else if(isSupertype(Enumeration.class, clazz))
+			{
+				ret = new Vector();
+				Vector target = (Vector)ret;
+				for(Enumeration source = (Enumeration)object; source.hasMoreElements(); )
+				{
+					target.add(source.nextElement());
+				}
+				ret = target.elements();
+			}
+			else if(isSupertype(Iterator.class, clazz))
+			{
+				ret = new ArrayList();
+				List target = (List)ret;
+				for(Iterator source=(Iterator)object; source.hasNext(); )
+				{
+					target.add(source.next());
+				}
+				ret = target.iterator();
+			}
+			else
+			{
+				try
+				{
+					ret = object.getClass().newInstance();
+					cloned.put(object, ret);
+					while(clazz!=null && !clazz.isInterface() && clazz!=Object.class) 
+					{
+						cloneFields(object, clazz, clazz, cloned);
+						clazz = clazz.getSuperclass();
+					}
+				}
+				catch(Exception e)
+				{
+					throw new RuntimeException(e);
+				}
+			}
+		}
+			
+		return ret;
+	}
+	
+	/**
+	 *  Clone all fields of an object.
+	 */
+	protected static void cloneFields(Object object, Object clone, Class clazz, Map cloned)
+	{
+		// Get all declared fields (public, protected and private)
+		Field[] fields = clazz.getDeclaredFields();
+		for(int i=0; i<fields.length; i++) 
+		{
+			if((fields[i].getModifiers() & Modifier.STATIC) != Modifier.STATIC) 
+			{
+				fields[i].setAccessible(true);
+				Object val = null;
+				try
+				{
+					val = fields[i].get(object);
+					if(val == null) 
+					{
+						fields[i].set(clone, val);
+					}
+					else 
+					{
+						fields[i].set(clone, deepClone(val, fields[i].getType(), cloned));
+					}
+				}
+				catch(Exception e)
+				{
+					throw new RuntimeException(e);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static void main(String[] args) throws Exception
+	{
+		Set test = new TreeSet();
+		test.add(new Integer(2));
+		test.add(new Integer(1));
+		test.add(new Integer(3));
+		
+		System.out.println("test deep cloning: "+test+" "+deepClone(test));
 	}
 }
 

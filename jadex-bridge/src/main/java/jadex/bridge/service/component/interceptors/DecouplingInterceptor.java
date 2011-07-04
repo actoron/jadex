@@ -5,16 +5,23 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IInternalService;
+import jadex.bridge.service.annotation.NoCopy;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
+import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -80,6 +87,35 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	public IFuture doExecute(ServiceInvocationContext sic)
 	{
 		Future ret = new Future();
+		
+		// Perform argument copy
+		
+//		Object[] args = sic.getArgumentArray();
+//		List copyargs = new ArrayList(); 
+//		if(args.length>0)
+//		{
+////			BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(sic.getProxy());
+////			Class si = handler.getServiceIdentifier().getServiceType();
+//			
+//			Method method = sic.getMethod();
+//			for(int i=0; i<args.length; i++)
+//			{
+//				Annotation[][] ann = method.getParameterAnnotations();
+//				boolean copy = true;
+//				for(int j=0; j<ann[i].length && copy; j++)
+//				{
+//					if(ann[i][j] instanceof NoCopy)
+//					{
+//						NoCopy nc = (NoCopy)ann[i][j];
+//						copy = nc.value();
+//					}
+//				}
+//				copyargs.add(copy? SReflect.deepClone(args[i]): args[i]);
+//			}
+//			sic.setArguments(copyargs);
+//		}
+		
+		// Perform decoupling
 		
 		boolean scheduleable = sic.getMethod().getReturnType().equals(IFuture.class) 
 			|| sic.getMethod().getReturnType().equals(void.class);

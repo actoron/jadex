@@ -264,7 +264,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		
 		Method method = null;
 		Field field = null;
-		XMLClassname	xmlc	= null;
+		XMLClassname xmlc = null;
 		
 		AccessInfo ai = info instanceof AttributeInfo? ((AttributeInfo)info).getAccessInfo(): 
 			info instanceof SubobjectInfo? ((SubobjectInfo)info).getAccessInfo(): null;
