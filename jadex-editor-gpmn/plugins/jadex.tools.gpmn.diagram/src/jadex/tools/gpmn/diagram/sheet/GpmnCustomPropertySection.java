@@ -100,4 +100,8 @@ public abstract class GpmnCustomPropertySection extends AbstractCommonPropertySe
 	{
 		return text == null ? "" : text;
 	}
+	
+	protected void updateSectionValues()
+	{
+	}
 }

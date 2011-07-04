@@ -497,5 +497,9 @@ public class GpmnContextElementsPropertySection extends
 		}
 		
 	}
+
+	protected void updateSectionValues()
+	{
+	}
 	
 }
