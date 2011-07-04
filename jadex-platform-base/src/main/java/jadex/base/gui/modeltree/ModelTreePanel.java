@@ -137,7 +137,7 @@ public class ModelTreePanel extends FileTreePanel
 												for(int i=0; i<filenames.size() && ret==-1; i++)
 												{
 													File test = new File(LibraryService.toURL((String)filenames.get(i)).toURI());
-													if(target.getAbsolutePath().equals(test.getAbsolutePath()))
+													if(target.getCanonicalPath().equals(test.getCanonicalPath()))
 														ret = i;
 												}
 											}
@@ -190,6 +190,87 @@ public class ModelTreePanel extends FileTreePanel
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Add a root node to the tree panel. 
+	 */
+	protected void	addNode(final ITreeNode node)
+	{
+		if(node instanceof IFileNode)
+		{
+			final String filename = ((IFileNode)node).getFileName();
+			SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object result)
+				{
+					final ILibraryService ls = (ILibraryService)result;
+					
+					ls.getAllURLs().addResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object result)
+						{
+							final List urls = (List)result;
+							
+							exta.scheduleStep(new IComponentStep()
+							{
+								@XMLClassname("fileexists")
+								public Object execute(IInternalAccess ia)
+								{
+									boolean ret = false;
+									try
+									{
+										File target = new File(LibraryService.toURL(filename).toURI());
+										for(int i=0; i<urls.size() && !ret; i++)
+										{
+											File test = new File(((URL)urls.get(i)).toURI());
+											if(target.getCanonicalPath().equals(test.getCanonicalPath()))
+												ret = true;
+										}
+									}
+									catch(Exception e)
+									{
+//										e.printStackTrace();
+									}
+									return new Boolean(ret);
+								}
+							}).addResultListener(new DefaultResultListener()
+							{
+								public void resultAvailable(Object result)
+								{
+									boolean res = ((Boolean)result).booleanValue();
+									if(!res)
+									{
+//										System.out.println("Need to add path: "+filename);
+										try
+										{
+											ls.addURL(LibraryService.toURL(filename));
+										}
+										catch(Exception e)
+										{
+											e.printStackTrace();
+										}
+									}
+										
+									SwingUtilities.invokeLater(new Runnable()
+									{
+										public void run()
+										{
+											ModelTreePanel.super.addNode(node);
+										}
+									});
+								}
+							});
+						}
+					});
+				}
+			});
+		}
+		else
+		{
+			super.addNode(node);
+		}
+	}
 	
 	/**
 	 *  Get the action.

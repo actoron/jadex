@@ -1,5 +1,8 @@
 package jadex.editor.bpmn.editor.properties;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.editor.bpmn.editor.properties.template.AbstractBpmnMultiColumnTablePropertySection;
 import jadex.editor.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
 
@@ -12,12 +15,17 @@ import org.eclipse.swt.widgets.TableColumn;
 public class JadexBpmnDiagramRequiredServicesTableSection extends
 	AbstractBpmnMultiColumnTablePropertySection
 {
-	public static final String[] COLUMN_NAMES = new String[]{"Name", "Interface", "Multiple", "Default Binding", "Initial Binding"};
-	public static final String[] COLUMN_TYPES = new String[]{TEXT, TEXT, CHECKBOX, TEXT, TEXT};
+	public static final String[] COLUMN_NAMES = new String[]{"Name", "Interface", "Multiple", "Proxytype", "Default Binding", "Initial Binding"};
+	public static final String[] COLUMN_TYPES = new String[]{TEXT, TEXT, CHECKBOX, COMBOBOX, TEXT, TEXT};
 	public static final boolean[] COLUMN_COMPLEX = new boolean[]{false, false, false, false, true};
-	public static final int[] COLUMN_WEIGHTS = new int[]{2, 2, 1, 2, 2};
-	public static final String[] DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "class", "false", "bindingname", ""};
+	public static final int[] COLUMN_WEIGHTS = new int[]{2, 2, 1, 1, 2, 2};
+	public static final String[] DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "class", "false", "decoupled", "bindingname", ""};
 	public static final int UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX = 0;
+	public static final Map VALUES = new HashMap();
+	static
+	{
+		VALUES.put("Proxytype", new String[]{"decoupled", "raw"});
+	}
 	
 	/**
 	 *  Default constructor, initializes super class.
@@ -35,7 +43,7 @@ public class JadexBpmnDiagramRequiredServicesTableSection extends
 
 	protected void createColumns(TableViewer viewer)
 	{
-		super.createColumns(viewer, COLUMN_NAMES, COLUMN_TYPES, null);
+		super.createColumns(viewer, COLUMN_NAMES, COLUMN_TYPES, VALUES);
 	}
 	
 	protected int[] getColumnWeights(TableColumn[] columns)
