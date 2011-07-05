@@ -1,28 +1,29 @@
-/**
- * 
- */
 package sodekovs.applications.bike2;
 
+import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.StringTokenizer;
 import java.util.Timer;
+import java.util.TimerTask;
+
+import javax.xml.bind.JAXBException;
+
+import sodekovs.applications.bike2.xml.XMLHandler;
+import sodekovs.applications.bike2.xml.urls.URLEntry;
+import sodekovs.applications.bike2.xml.urls.URLs;
 
 /**
- * @author thomas
+ * XML Downloader class which starts a {@link TimerTask} for every given URL from which XML data should be loaded periodically. The loaded XML data is being inserted into a MySQL database.
  * 
+ * @author Thomas Preisler
  */
 public class XMLDownloader {
-
-	/** All the URLs that should be polled */
-	private static final String[] URLS = { "London,http://www.tfl.gov.uk/tfl/syndication/feeds/cycle-hire/livecyclehireupdates.xml",
-			"Washington,http://www.capitalbikeshare.com/stations/bikeStations.xml" };
 
 	/** The delay for starting the download task in ms */
 	private static final int TIME_TO_START = 50;
 
-	/** The timer interval (ms) in which the download task is repeated */
-	private static final int DELAY_BETWEEN_POLLS = 180000;
+	/** The path to the XML file containing the urls */
+	private static final String URL_FILE = "urls.xml";
 
 	/**
 	 * Main method, starts a {@link DownloadFileTask} for every URL specified in {@link XMLDownloader#URLS}.
@@ -31,14 +32,17 @@ public class XMLDownloader {
 	 */
 	public static void main(String[] args) {
 		try {
-			for (String urlString : URLS) {
-				StringTokenizer tok = new StringTokenizer(urlString, ",");
-				String city = tok.nextToken();
-				URL url = new URL(tok.nextToken());
+			URLs urls = (URLs) XMLHandler.retrieveFromXML(URLs.class, URL_FILE);
 
+			for (URLEntry entry : urls.getEntries()) {
 				Timer timer = new Timer();
-				timer.schedule(new DownloadFileTask(city, url), TIME_TO_START, DELAY_BETWEEN_POLLS);
+				// start the timer task for every given url
+				timer.schedule(new DownloadFileTask(entry.getCity(), new URL(entry.getUrl())), TIME_TO_START, entry.getInterval());
 			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (JAXBException e) {
+			e.printStackTrace();
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}

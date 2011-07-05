@@ -1,9 +1,9 @@
-/**
- * 
- */
 package sodekovs.applications.bike2;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.Connection;
@@ -16,35 +16,55 @@ import java.util.TimerTask;
 import javax.xml.bind.JAXBException;
 
 import sodekovs.applications.bike2.database.DatabaseConnection;
-import sodekovs.applications.bike2.xml.Station;
-import sodekovs.applications.bike2.xml.Stations;
-import sodekovs.applications.bike2.xml.StationsXMLHandler;
+import sodekovs.applications.bike2.xml.XMLHandler;
+import sodekovs.applications.bike2.xml.stations.Station;
+import sodekovs.applications.bike2.xml.stations.Stations;
 
 /**
- * @author thomas
+ * Download Task fetches the XML data from the given URL for the given city and inserts it into the database.
  * 
+ * @author Thomas Preisler
  */
 public class DownloadFileTask extends TimerTask {
 
+	/** The city */
 	private String city = null;
 
+	/** The given URL */
 	private URL url = null;
 
+	/** The database connection */
 	private Connection connection = null;
 
+	/** Prepared SQL statement for the stations table */
 	private PreparedStatement insertStationsStmt = null;
 
+	/** Prepared SQL statement for the station table */
 	private PreparedStatement insertStationStmt = null;
 
+	/** Prepared SQL statement for the stationsxml table */
+	private PreparedStatement insertStationsXMLStmt = null;
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param city
+	 *            the given city
+	 * @param url
+	 *            the given {@link URL}
+	 */
 	public DownloadFileTask(String city, URL url) {
 		this.city = city;
 		this.url = url;
 
+		// get the database connection
 		this.connection = DatabaseConnection.getConnection();
 		try {
-			this.insertStationsStmt = this.connection.prepareStatement("INSERT INTO STATIONS(city, lastUpdate, version) VALUES(?, ?, ?)");
+			// prepare the SQL statements
+			this.insertStationsStmt = this.connection.prepareStatement("INSERT INTO STATIONS(city, lastUpdate, version) VALUES(?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
 			this.insertStationStmt = this.connection
-					.prepareStatement("INSERT INTO STATION(id, name, terminalName, lat, long, installed, locked, installDate, removalDate, temporary, nbBikes, nbEmptyBikes, nbDocks, stationsId) VALUES()");
+					.prepareStatement("INSERT INTO STATION(id, name, terminalName, lat, lon, installed, locked, installDate, removalDate, temp, nbBikes, nbEmptyDocks, nbDocks, stationsId) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+			this.insertStationsXMLStmt = this.connection.prepareStatement("INSERT INTO STATIONSXML(xml, stationsId) VALUES(?, ?)");
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -56,12 +76,19 @@ public class DownloadFileTask extends TimerTask {
 		try {
 			// open the connection
 			URLConnection connection = url.openConnection();
+			InputStream input = connection.getInputStream();
+
+			// fetch the data
+			ByteArrayOutputStream baos = getBytes(input);
+			String xml = baos.toString();
+
 			// transform the XML data from the url
-			Stations stations = StationsXMLHandler.retrieveFromXML(connection.getInputStream());
+			Stations stations = (Stations) XMLHandler.retrieveFromXML(Stations.class, xml.getBytes());
 
 			System.out.println("Fetched data from " + city + " at " + stations.getLastUpate());
 
-			writeToDatabase(stations);
+			// write all the data to the database
+			writeToDatabase(stations, xml);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (JAXBException e) {
@@ -69,11 +96,49 @@ public class DownloadFileTask extends TimerTask {
 		}
 	}
 
-	private void writeToDatabase(Stations stations) {
+	/**
+	 * Fetches the XML data from the given {@link URLConnection} {@link InputStream} and stores it into a {@link ByteArrayOutputStream}.
+	 * 
+	 * @param input
+	 *            the given {@link URLConnection} {@link InputStream}
+	 * @return a {@link ByteArrayOutputStream} containing the XML data
+	 */
+	private ByteArrayOutputStream getBytes(InputStream input) {
+		ByteArrayOutputStream result = new ByteArrayOutputStream();
+
+		try {
+			// XML Daten einlesen
+			result = new ByteArrayOutputStream();
+			byte[] buffer = new byte[1000];
+			int amount = 0;
+
+			// Inhalt lesen
+			while (amount != -1) {
+				result.write(buffer, 0, amount);
+				amount = input.read(buffer);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+
+	/**
+	 * Writes the given {@link Stations} and the XML String to the database.
+	 * 
+	 * @param stations
+	 *            the given {@link Stations}
+	 * @param xml
+	 *            the given XML String
+	 */
+	private void writeToDatabase(Stations stations, String xml) {
 		boolean result = false;
 		int stationsId = insertStations(stations);
 
 		if (stationsId >= 0) {
+			result = insertStationsXML(xml, stationsId);
+
 			for (Station station : stations.getStations()) {
 				result = insertStation(station, stationsId);
 			}
@@ -86,6 +151,15 @@ public class DownloadFileTask extends TimerTask {
 		}
 	}
 
+	/**
+	 * Inserts the given {@link Station} to the database referencing the given stationsId.
+	 * 
+	 * @param station
+	 *            the given {@link Station}
+	 * @param stationsId
+	 *            the given stationsId
+	 * @return <code>true</code> if the insert was successful else <code>false</code>
+	 */
 	private boolean insertStation(Station station, int stationsId) {
 		try {
 			insertStationStmt.setInt(1, station.getId());
@@ -100,7 +174,7 @@ public class DownloadFileTask extends TimerTask {
 			insertStationStmt.setBoolean(10, station.getTemporary());
 			insertStationStmt.setInt(11, station.getNbBikes());
 			insertStationStmt.setInt(12, station.getNbEmptyDocks());
-			insertStationsStmt.setInt(13, station.getNbDocks());
+			insertStationStmt.setInt(13, station.getNbDocks());
 			insertStationStmt.setInt(14, stationsId);
 
 			if (insertStationStmt.executeUpdate() != 0) {
@@ -113,6 +187,39 @@ public class DownloadFileTask extends TimerTask {
 		return false;
 	}
 
+	/**
+	 * Insert the given XML String to the database referencing the given stationsId.
+	 * 
+	 * @param xml
+	 *            the given XML String
+	 * @param stationsId
+	 *            the given stationsId
+	 * @return <code>true</code> if the insert was successful else <code>false</code>
+	 */
+	private boolean insertStationsXML(String xml, int stationsId) {
+		ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes());
+
+		try {
+			insertStationsXMLStmt.setAsciiStream(1, bais, xml.length());
+			insertStationsXMLStmt.setInt(2, stationsId);
+
+			if (insertStationsXMLStmt.executeUpdate() != 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
+	/**
+	 * Inserts the given {@link Stations} to the database.
+	 * 
+	 * @param stations
+	 *            the given {@link Stations}
+	 * @return the auto generated primary key
+	 */
 	private int insertStations(Stations stations) {
 		int id = -1;
 
@@ -121,8 +228,8 @@ public class DownloadFileTask extends TimerTask {
 			insertStationsStmt.setLong(2, stations.getLastUpate());
 			insertStationsStmt.setString(3, stations.getVersion());
 
-			int rs = insertStationsStmt.executeUpdate("INSERT", Statement.RETURN_GENERATED_KEYS);
-			if (rs != 0) {
+			int affectedRows = insertStationsStmt.executeUpdate();
+			if (affectedRows != 0) {
 				ResultSet key = insertStationsStmt.getGeneratedKeys();
 				if (key != null && key.next()) {
 					id = key.getInt(1);
