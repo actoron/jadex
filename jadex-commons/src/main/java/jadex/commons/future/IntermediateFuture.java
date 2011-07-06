@@ -99,14 +99,14 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 
 		for(int i=0; ilisteners!=null && i<ilisteners.size(); i++)
 		{
-			try
-			{
-				((IIntermediateResultListener)ilisteners.get(i)).intermediateResultAvailable(result);
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
+//			try
+//			{
+				notifyIntermediateResult(((IIntermediateResultListener)ilisteners.get(i)), result);
+//			}
+//			catch(Exception e)
+//			{
+//				e.printStackTrace();
+//			}
 		}
 	}
 	
@@ -205,19 +205,21 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
     	Object[] inter = null;
     	synchronized(this)
     	{
-	    	if(resultavailable)
-	    	{
-	    		notify	= true;
-	    	}
-	    	
     		if(listener instanceof IIntermediateResultListener && results!=null)
     		{
     			inter = results.toArray();
     		}
     		
-    		if(listeners==null)
-    			listeners	= new ArrayList();
-    		listeners.add(listener);
+	    	if(resultavailable)
+	    	{
+	    		notify	= true;
+	    	}
+	    	else
+	    	{
+	    		if(listeners==null)
+	    			listeners	= new ArrayList();
+	    		listeners.add(listener);
+	    	}
     	}
     	
     	if(intermediate && inter!=null)
@@ -239,10 +241,19 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
      *  Notify a result listener.
      *  @param listener The listener.
      */
+    protected void notifyIntermediateResult(IIntermediateResultListener listener, Object result)
+    {
+    	listener.intermediateResultAvailable(result);
+    }
+
+    /**
+     *  Notify a result listener.
+     *  @param listener The listener.
+     */
     protected void notifyListener(IResultListener listener)
     {
-    	try
-    	{
+//    	try
+//    	{
 			if(exception!=null)
 			{
 				listener.exceptionOccurred(exception);
@@ -264,7 +275,7 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 			    	{
 			    		for(int i=0; i<inter.length; i++)
 			    		{
-			    			lis.intermediateResultAvailable(inter[i]);
+			    			notifyIntermediateResult(lis, inter[i]);
 			    		}
 			    	}
 					lis.finished();
@@ -274,10 +285,10 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 					listener.resultAvailable(results); 
 				}
 			}
-    	}
-    	catch(Exception e)
-    	{
-    		e.printStackTrace();
-    	}
+//    	}
+//    	catch(Exception e)
+//    	{
+//    		e.printStackTrace();
+//    	}
     }
 }

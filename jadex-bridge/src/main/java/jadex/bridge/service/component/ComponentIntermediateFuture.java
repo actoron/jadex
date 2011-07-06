@@ -4,8 +4,10 @@ import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 
 /**
@@ -14,102 +16,69 @@ import jadex.commons.future.IntermediateFuture;
  */
 public class ComponentIntermediateFuture extends IntermediateFuture
 {
+	//-------- attributes --------
+	
+	/** The adapter. */
+	protected IComponentAdapter	adapter;
+	
+	/** The external acces. */
+	protected IExternalAccess	ea;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new future.
 	 */
-	public ComponentIntermediateFuture(final IExternalAccess ea, final IComponentAdapter adapter, final IIntermediateFuture source)
+	public ComponentIntermediateFuture(IExternalAccess ea, IComponentAdapter adapter, IFuture source)
 	{
-		source.addResultListener(new IIntermediateResultListener()
+		this.ea	= ea;
+		this.adapter	= adapter;
+		source.addResultListener(new IntermediateDelegationResultListener(this));
+	}
+		
+	/**
+	 *  Schedule listener notification on component thread. 
+	 */
+	protected void notifyListener(final IResultListener listener)
+	{
+		// Hack!!! Notify multiple listeners at once?
+		if(adapter.isExternalThread())
 		{
-			public void resultAvailable(final Object result)
+			ea.scheduleStep(new IComponentStep()
 			{
-				if(adapter.isExternalThread())
+				public Object execute(IInternalAccess ia)
 				{
-//					if(adapter.getDescription().getState().equals(IComponentDescription.STATE_SUSPENDED))
-//						adapter.getLogger().warning("Warning schedule step on suspended component");
-
-					ea.scheduleStep(new IComponentStep()
-					{		
-						public Object execute(IInternalAccess ia)
-						{
-							setResult(result);
-							return null;
-						}
-					});
+					ComponentIntermediateFuture.super.notifyListener(listener);
+					return null;
 				}
-				else
-				{
-					setResult(result);
-				}
-			}
-			
-			public void intermediateResultAvailable(final Object result)
-			{
-				if(adapter.isExternalThread())
-				{
-//					if(adapter.getDescription().getState().equals(IComponentDescription.STATE_SUSPENDED))
-//						adapter.getLogger().warning("Warning schedule step on suspended component");
+			});
+		}
+		else
+		{
+			super.notifyListener(listener);
+		}
+	}
 	
-					ea.scheduleStep(new IComponentStep()
-					{
-						public Object execute(IInternalAccess ia)
-						{
-							addIntermediateResult(result);
-							return null;
-						}
-					});
-				}
-				else
-				{
-					addIntermediateResult(result);
-				}
-			}
-			
-			public void finished()
+	/**
+	 *  Schedule listener notification on component thread. 
+	 */
+	protected void notifyIntermediateResult(final IIntermediateResultListener listener, final Object result)
+	{
+		// Hack!!! Notify multiple results at once?
+		if(adapter.isExternalThread())
+		{
+			ea.scheduleStep(new IComponentStep()
 			{
-				if(adapter.isExternalThread())
+				public Object execute(IInternalAccess ia)
 				{
-//					if(adapter.getDescription().getState().equals(IComponentDescription.STATE_SUSPENDED))
-//						adapter.getLogger().warning("Warning schedule step on suspended component");
-	
-					ea.scheduleStep(new IComponentStep()
-					{
-						public Object execute(IInternalAccess ia)
-						{
-							setFinished();
-							return null;
-						}
-					});
+					ComponentIntermediateFuture.super.notifyIntermediateResult(listener, result);
+					return null;
 				}
-				else
-				{
-					setFinished();
-				}
-			}
-			
-			public void exceptionOccurred(final Exception exception)
-			{
-				if(adapter.isExternalThread())
-				{
-//					if(adapter.getDescription().getState().equals(IComponentDescription.STATE_SUSPENDED))
-//						adapter.getLogger().warning("Warning schedule step on suspended component");
-	
-					ea.scheduleStep(new IComponentStep()
-					{
-						public Object execute(IInternalAccess ia)
-						{
-							setException(exception);
-							return null;
-						}
-					});
-				}
-				else
-				{
-					setException(exception);
-				}
-			}
-		});
+			});
+		}
+		else
+		{
+			super.notifyIntermediateResult(listener, result);
+		}
 	}
 }
