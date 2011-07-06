@@ -681,7 +681,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	{
 		String name = (String)state.getAttributeValue(handle, OAVBDIMetaModel.modelelement_has_name);
 		String description = (String)state.getAttributeValue(handle, OAVBDIMetaModel.modelelement_has_description);
-		String typename = SReflect.getInnerClassName(beliefset? findBeliefSetType(state, capa, handle)
+		String typename = SReflect.getClassName(beliefset? findBeliefSetType(state, capa, handle)
 			: findBeliefType(state, capa, handle));
 		
 		Collection configs = (Collection)state.getAttributeValues(capa, OAVBDIMetaModel.capability_has_configurations);

@@ -47,12 +47,9 @@ public class Starter
 	/** The component factory to be used for platform component. */
 	public static final String FALLBACK_COMPONENT_FACTORY = "jadex.component.ComponentComponentFactory";
 
-	/** The component factory to be used for platform adapter. */
-	public static final String FALLBACK_ADAPTER_FACTORY = "jadex.standalone.ComponentAdapterFactory";
-
-	/** The termination timeout. */
-	// Todo: use configuration/argument value if present.
-	public static final long	TERMINATION_TIMEOUT	= 2000000;
+//	/** The termination timeout. */
+//	// Todo: use configuration/argument value if present.
+//	public static final long	TERMINATION_TIMEOUT	= 20000;
 
 	
 	/** The configuration file. */
@@ -73,6 +70,9 @@ public class Starter
 	/** The autoshutdown flag. */
 	public static final String AUTOSHUTDOWN = "autoshutdown";
 
+	/** The welcome flag. */
+	public static final String WELCOME = "welcome";
+
 	/** The component flag (for starting an additional component). */
 	public static final String COMPONENT = "component";
 
@@ -88,6 +88,8 @@ public class Starter
 		RESERVED.add(PLATFORM_NAME);
 		RESERVED.add(COMPONENT_FACTORY);
 		RESERVED.add(ADAPTER_FACTORY);
+		RESERVED.add(AUTOSHUTDOWN);
+		RESERVED.add(WELCOME);
 		RESERVED.add(COMPONENT);
 	}
 	
@@ -177,9 +179,9 @@ public class Starter
 			// Absolute start time (for testing and benchmarking).
 			final long starttime = System.currentTimeMillis();
 		
-			final Map cmdargs = new HashMap();
-			final Map compargs = new HashMap();
-			final List components = new ArrayList();
+			final Map cmdargs = new HashMap();	// Starter arguments (required for instantiation of root component)
+			final Map compargs = new HashMap();	// Arguments of root component (platform)
+			final List components = new ArrayList();	// Additional components to start
 			for(int i=0; args!=null && i<args.length; i+=2)
 			{
 				String key = args[i].substring(1);
@@ -231,53 +233,9 @@ public class Starter
 						throw new RuntimeException("Error loading model:\n"+model.getReport().getErrorText());
 					
 					// Create an instance of the component.
-					
-					String platformname = (String)cmdargs.get(PLATFORM_NAME);
-					if(platformname==null)
-					{
-						String	configname	= (String)cmdargs.get("configname");
-						ConfigurationInfo	config	= configname!=null
-							? model.getConfiguration(configname) 
-							: model.getConfigurations().length>0 ? model.getConfigurations()[0] : null;
-							
-						boolean	found	= false;
-						Object	value	= null;
-						if(config!=null)
-						{
-							UnparsedExpression[]	upes	= config.getArguments();
-							for(int i=0; !found && i<upes.length; i++)
-							{
-								if(PLATFORM_NAME.equals(upes[i].getName()))
-								{
-									found	= true;
-									value	= null;
-								}
-							}
-						}
-						if(!found)
-						{
-							 IArgument	arg	= model.getArgument(PLATFORM_NAME);
-							 if(arg!=null)
-							 {
-								value	= arg.getDefaultValue(); 
-							 }
-						}
-						if(value instanceof UnparsedExpression)
-						{
-							// todo: language
-							UnparsedExpression	upe	= (UnparsedExpression)value;
-							value = SJavaParser.evaluateExpression(upe.getValue(), model.getAllImports(), null, null);
-						}
-						if(value instanceof String)
-						{
-							platformname	= (String)value;
-						}
-						else if(value!=null)
-						{
-							ret.setException(new RuntimeException("platformname not string: "+value));
-						}
-					}
-					if(platformname==null)
+					Object pfname = getArgumentValue(PLATFORM_NAME, model, cmdargs, compargs);
+					String	platformname; 
+					if(pfname==null)
 					{
 						try
 						{
@@ -287,6 +245,10 @@ public class Starter
 						{
 							platformname = SUtil.createUniqueId("platform", 3);
 						}
+					}
+					else
+					{
+						platformname	= pfname.toString(); 
 					}
 					
 					final IComponentIdentifier cid = new ComponentIdentifier(platformname);
@@ -299,12 +261,15 @@ public class Starter
 							try
 							{
 								String ctype = (String)result;
-								Boolean autosd = (Boolean)cmdargs.get(AUTOSHUTDOWN);
+								Boolean autosd = (Boolean)getArgumentValue(AUTOSHUTDOWN, model, cmdargs, compargs);
 								final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, null, null, autosd, model.getFullName(), null);
 								
-								String afclname = (String)cmdargs.get(ADAPTER_FACTORY)!=null? 
-									(String)cmdargs.get(ADAPTER_FACTORY): FALLBACK_ADAPTER_FACTORY;
-								Class afclass = SReflect.findClass(afclname, null, cl);
+								Object	af = getArgumentValue(ADAPTER_FACTORY, model, cmdargs, compargs);
+								if(af==null)
+								{
+									ret.setException(new RuntimeException("No adapterfactory found."));
+								}
+								Class afclass = af instanceof Class ? (Class)af : SReflect.findClass(af.toString(), null, cl);
 								final IComponentAdapterFactory afac = (IComponentAdapterFactory)afclass.newInstance();
 								
 								Future future = new Future();
@@ -322,9 +287,12 @@ public class Starter
 										{
 											public void customResultAvailable(Object result)
 											{
-												long startup = System.currentTimeMillis() - starttime;
-												//		platform.logger.info("Platform startup time: " + startup + " ms.");
-												System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
+												if(Boolean.TRUE.equals(getArgumentValue(WELCOME, model, cmdargs, compargs)))
+												{
+													long startup = System.currentTimeMillis() - starttime;
+													// platform.logger.info("Platform startup time: " + startup + " ms.");
+													System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
+												}
 												ret.setResult(instance.getExternalAccess());
 											}
 										});
@@ -377,7 +345,7 @@ public class Starter
 									}
 								});
 								
-								cfac.createComponentInstance(desc, afac, model, (String)cmdargs.get(CONFIGURATION_NAME),
+								cfac.createComponentInstance(desc, afac, model, getConfigurationName(model, cmdargs),
 									compargs, null, null, future).addResultListener(new SwingDefaultResultListener()
 								{
 									public void customResultAvailable(Object result)
@@ -417,6 +385,82 @@ public class Starter
 		}
 		
 		return ret;
+	}
+
+	/**
+	 *  Get an argument value from the command line or the model.
+	 *  Also puts parsed value into component args to be available at instance.
+	 */
+	protected static Object getArgumentValue(String name, IModelInfo model, Map cmdargs, Map compargs)
+	{
+		String	configname	= getConfigurationName(model, cmdargs);
+		ConfigurationInfo	config	= configname!=null
+			? model.getConfiguration(configname) 
+			: model.getConfigurations().length>0 ? model.getConfigurations()[0] : null;
+		
+		Object val = cmdargs.get(name);
+		if(val==null)
+		{
+			boolean	found	= false;
+			if(config!=null)
+			{
+				UnparsedExpression[]	upes	= config.getArguments();
+				for(int i=0; !found && i<upes.length; i++)
+				{
+					if(name.equals(upes[i].getName()))
+					{
+						found	= true;
+						val	= upes[i];
+					}
+				}
+			}
+			if(!found)
+			{
+				 IArgument	arg	= model.getArgument(name);
+				 if(arg!=null)
+				 {
+					val	= arg.getDefaultValue(); 
+				 }
+			}
+			val	= UnparsedExpression.getParsedValue(val, model.getAllImports(), null, model.getClassLoader());
+		}
+		else if(val instanceof String)
+		{
+			// Try to parse value from command line.
+			try
+			{
+				Object newval	= SJavaParser.evaluateExpression((String)val, null);
+				if(newval!=null)
+				{
+					val	= newval;
+				}
+			}
+			catch(RuntimeException e)
+			{
+			}
+		}
+		compargs.put(name, val);
+		return val;
+	}
+
+	/**
+	 * Get the configuration name.
+	 */
+	protected static String	getConfigurationName(IModelInfo model,	Map cmdargs)
+	{
+		String	configname	= (String)cmdargs.get(CONFIGURATION_NAME);
+		if(configname==null)
+		{
+			Object	val	= null;
+			IArgument	arg	= model.getArgument(CONFIGURATION_NAME);
+			if(arg!=null)
+			{
+				val	= arg.getDefaultValue();
+			}
+			val	= UnparsedExpression.getParsedValue(val, model.getAllImports(), null, model.getClassLoader());
+			configname	= val!=null ? val.toString() : null;
+		}
+		return configname;
 	}
 }
 

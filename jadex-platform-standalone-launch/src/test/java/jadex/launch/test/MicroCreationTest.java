@@ -33,7 +33,8 @@ public class MicroCreationTest extends TestCase
 	{
 		long timeout	= 300000;
 		ISuspendable	sus	= 	new ThreadSuspendable();
-		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-configname", "testcases"}).get(sus, timeout);
+		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "testcases",
+			"-configname", "allkernels", "-gui", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "true"}).get(sus, timeout);
 		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
 		ILibraryService libsrv	= (ILibraryService)SServiceProvider.getService(platform.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus, timeout);
 		

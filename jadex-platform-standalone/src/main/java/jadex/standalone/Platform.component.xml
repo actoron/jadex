@@ -39,20 +39,42 @@
 	</imports>
 	
 	<arguments>
+	
+		<!-- ======== Arguments used by starter unless supplied from command line. ======== -->
+	
+		<!-- The name of the platform component (null for auto generation). -->	
 		<argument name="platformname">"jadex"</argument>
+		<!-- The configuration to use. -->	
+		<argument name="configname">"auto"</argument>
+		<!-- Automatically shut down the platform when no user agents are running anymore. -->	
+		<argument name="autoshutdown">true</argument>
+		<!-- Tell the starter to use the standalone adapter factory (usually no need to change). -->	
+		<argument name="adapterfactory">ComponentAdapterFactory.class</argument>
+		<!-- Tell starter to print welcome message. -->
+		<argument name="welcome">true</argument>
+		
+		<!-- ======== Arguments used by platform components. ======== -->
+		
+		<!-- Start the awareness agent (awa) for automatic platform discovery. -->
+		<argument name="awareness">true</argument>
+		<!-- Start the JCC agent to open the platform GUI? -->
+		<argument name="gui">true</argument>
 		<!-- Save platform settings on shutdown? -->
 		<argument name="saveonexit">true</argument>
+		<!-- Use simulation execution mode? -->
 		<argument name="simulation">false</argument>
+		<!-- Additional library paths (classpath entries) for loading agent models and classes. -->
 		<argument name="libpath"></argument>
+		<!-- Port for TCP transport. -->
 		<argument name="tcpport">9876</argument>
+		<!-- Port for NIOTCP transport. -->
 		<argument name="niotcpport">8765</argument>
+		<!-- Include entries for awareness agent. -->
 		<argument name="awaincludes">""</argument>
+		<!-- Exclude entries for awareness agent. -->
 		<argument name="awaexcludes">""</argument>
 		
-		<!-- todo?! -->
-		<!-- <argument name="welcome">true</argument>
-		<argument name="autoshutdown">true</argument>
-		<argument name="platform_shutdown_time">1000</argument> -->
+		<!-- <argument name="platform_shutdown_time">1000</argument> -->
 	</arguments>
 	
 	<componenttypes>
@@ -158,7 +180,7 @@
 	</properties>
 	
 	<configurations>
-		<configuration name="all_kernels auto (rms, awa, jcc)">
+		<configuration name="auto">
 			<arguments>
 				<argument name="tcpport">0</argument>
 				<argument name="niotcpport">0</argument>
@@ -167,124 +189,70 @@
 			<components>
 				<component name="kernels" type="kernel_multi" daemon="true"/>
 				<component name="rms" type="rms" daemon="true"/>
-				<component name="awa" type="awa" daemon="true">
+				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>
 						<argument name="includes">$args.awaincludes</argument>
 						<argument name="excludes">$args.awaexcludes</argument>
 					</arguments>
 				</component>
-				<component name="jcc" type="jcc"/>
-			</components>
-		</configuration>
-	
-		<configuration name="all_kernels (rms, awa, jcc)">
-			<components>
-				<component name="kernel_component" type="kernel_component" daemon="true"/>
-				<component name="kernel_application" type="kernel_application" daemon="true"/>
-				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
-				<!-- <component type="kernel_bdi" daemon="true"/> -->
-				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
-				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
-				<component name="rms" type="rms" daemon="true"/>
-				<component name="awa" type="awa" daemon="true">
-					<arguments>
-						<argument name="includes">$args.awaincludes</argument>
-						<argument name="excludes">$args.awaexcludes</argument>
-					</arguments>
-				</component>
-				<component name="jcc" type="jcc"/>
+				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;)) ? 1 : 0"/>
 			</components>
 		</configuration>
 		
-		<configuration name="all_kernels (rms, jcc)">
-			<components>
-				<component name="kernel_component" type="kernel_component" daemon="true"/>
-				<component name="kernel_application" type="kernel_application" daemon="true"/>
-				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
-				<component type="kernel_bdi" daemon="true"/>
-				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
-				<!-- <component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/> -->
-				<component name="rms" type="rms" daemon="true"/>
-				<component name="jcc" type="jcc"/>
-			</components>
-		</configuration>
-		
-		<configuration name="multi_kernel (rms, jcc)">
+		<configuration name="fixed">
 			<components>
 				<component name="kernels" type="kernel_multi" daemon="true"/>
 				<component name="rms" type="rms" daemon="true"/>
-				<component name="jcc" type="jcc"/>
-			</components>
-		</configuration>
-		
-		<configuration name="all_kernels (rms, awa)">
-			<components>
-				<component name="kernel_component" type="kernel_component" daemon="true"/>
-				<component name="kernel_application" type="kernel_application" daemon="true"/>
-				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
-				<!-- <component type="kernel_bdi" daemon="true"/> -->
-				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
-				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
-				<component name="awa" type="awa" daemon="true">
+				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>
 						<argument name="includes">$args.awaincludes</argument>
 						<argument name="excludes">$args.awaexcludes</argument>
 					</arguments>
 				</component>
+				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;)) ? 1 : 0"/>
 			</components>
 		</configuration>
-		
-		<configuration name="all_kernels (rms)">
-			<components>
-				<component name="kernel_component" type="kernel_component" daemon="true"/>
-				<component name="kernel_application" type="kernel_application" daemon="true"/>
-				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
-				<!-- <component type="kernel_bdi" daemon="true"/> -->
-				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
-				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
-				<component name="rms" type="rms" daemon="true"/>
-			</components>
-		</configuration>
-		
-		<configuration name="all_kernels (jcc)">
-			<components>
-				<component name="kernel_component" type="kernel_component" daemon="true"/>
-				<component name="kernel_application" type="kernel_application" daemon="true"/>
-				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
-				<!-- <component type="kernel_bdi" daemon="true"/> -->
-				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
-				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
-				<component name="jcc" type="jcc"/>
-			</components>
-		</configuration>
-		
-		<!-- todo remove: support autoshutdown as instance level flag. -->
-		<configuration name="all_kernels_no_daemons">
-			<components>
-				<component name="kernel_component" type="kernel_component" daemon="true"/>
-				<component name="kernel_application" type="kernel_application" daemon="true"/>
-				<component name="kernel_micro" type="kernel_micro"/>
-				<!-- <component type="kernel_bdi"/> -->
-				<component name="kernel_bdibpmn" type="kernel_bdibpmn"/>
-				<component name="kernel_bpmn" type="kernel_bpmn"/>
-				<component name="rms" type="rms"/>
-			</components>
-		</configuration>
-		
-		<!-- Configuration used by jadex.base.test.ComponentTestSuite -->
-		<configuration name="testcases">
+	
+		<configuration name="allkernels">
 			<arguments>
-				<argument name="platformname">"testcases"</argument>
-				<argument name="saveonexit">false</argument>
 				<argument name="tcpport">0</argument>
 				<argument name="niotcpport">0</argument>
+				<argument name="platformname">null</argument>
 			</arguments>
 			<components>
 				<component name="kernel_component" type="kernel_component" daemon="true"/>
 				<component name="kernel_application" type="kernel_application" daemon="true"/>
-				<component name="kernel_micro" type="kernel_micro"/>
-				<component name="kernel_bdibpmn" type="kernel_bdibpmn"/>
-				<component name="kernel_bpmn" type="kernel_bpmn"/>
+				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
+				<!-- <component type="kernel_bdi" daemon="true"/> -->
+				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
+				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
+				<component name="rms" type="rms" daemon="true"/>
+				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
+					<arguments>
+						<argument name="includes">$args.awaincludes</argument>
+						<argument name="excludes">$args.awaexcludes</argument>
+					</arguments>
+				</component>
+				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;)) ? 1 : 0"/>
+			</components>
+		</configuration>
+		
+		<configuration name="allkernels_fixed">
+			<components>
+				<component name="kernel_component" type="kernel_component" daemon="true"/>
+				<component name="kernel_application" type="kernel_application" daemon="true"/>
+				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
+				<!-- <component type="kernel_bdi" daemon="true"/> -->
+				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
+				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
+				<component name="rms" type="rms" daemon="true"/>
+				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
+					<arguments>
+						<argument name="includes">$args.awaincludes</argument>
+						<argument name="excludes">$args.awaexcludes</argument>
+					</arguments>
+				</component>
+				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;)) ? 1 : 0"/>
 			</components>
 		</configuration>
 		

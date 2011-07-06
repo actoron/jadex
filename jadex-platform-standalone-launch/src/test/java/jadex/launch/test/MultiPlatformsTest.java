@@ -20,15 +20,18 @@ public class MultiPlatformsTest extends TestCase
 		IFuture[]	futures	= new IFuture[number];
 		for(int i=0; i<futures.length; i++)
 		{
-//			System.out.println("Starting platform "+i);
-			futures[i]	= Starter.createPlatform(new String[]{"-configname", "testcases"});
+			if(i%10==0)
+				System.out.println("Starting platform "+i);
+			futures[i]	= Starter.createPlatform(new String[]{"-platformname", "testcases",
+				"-gui", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"});
 		}
 		
 		IExternalAccess[]	platforms	= new IExternalAccess[futures.length];
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		for(int i=0; i<futures.length; i++)
 		{
-//			System.out.println("Waiting for platform "+i);
+			if(i%10==0)
+				System.out.println("Waiting for platform "+i);
 			platforms[i]	= (IExternalAccess)futures[i].get(sus, timeout);
 		}
 		
@@ -42,7 +45,8 @@ public class MultiPlatformsTest extends TestCase
 		
 		for(int i=0; i<futures.length; i++)
 		{
-//			System.out.println("Killing platform "+i);
+			if(i%10==0)
+				System.out.println("Killing platform "+i);
 			platforms[i].killComponent().get(sus, timeout);
 		}
 	}

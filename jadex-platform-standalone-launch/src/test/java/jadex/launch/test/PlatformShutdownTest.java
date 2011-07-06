@@ -25,7 +25,8 @@ public class PlatformShutdownTest extends TestCase
 	{
 		long timeout	= 10000;
 		ISuspendable	sus	= 	new ThreadSuspendable();
-		final IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-configname", "testcases"}).get(sus, timeout);
+		final IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "testcases",
+			"-gui", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}).get(sus, timeout);
 		final Future	fut	= new Future();
 		SServiceProvider.getService(platform.getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(new DelegationResultListener(fut)
