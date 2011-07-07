@@ -73,6 +73,9 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	/** The extension instances. */
 	protected Map extensions;
 
+	/** The parameter copy allowed flag. */
+	protected boolean copy;
+	
 	//-------- constructors --------
 	
 	/**
@@ -80,7 +83,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public AbstractInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, 
 		final IComponentAdapterFactory factory, final IExternalAccess parent, final Map arguments, 
-		final RequiredServiceBinding[] bindings, final Future inited)
+		final RequiredServiceBinding[] bindings, boolean copy, final Future inited)
 	{
 		try
 		{
@@ -90,9 +93,10 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 			this.parent = parent;
 			this.arguments = arguments;
 			this.bindings = bindings;
+			this.copy = copy;
 			if(factory != null)
 				this.adapter = factory.createComponentAdapter(desc, model, this, parent);
-			this.container = new ComponentServiceContainer(adapter, desc.getType());
+			this.container = new ComponentServiceContainer(adapter, desc.getType(), copy);
 			((ComponentServiceContainer)this.container).init(getExternalAccess());
 			this.creationtime = System.currentTimeMillis();
 		}
@@ -415,5 +419,14 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		assert container!=null;
 		
 		return container;
+	}
+
+	/**
+	 *  Get the copy.
+	 *  @return the copy.
+	 */
+	public boolean isCopy()
+	{
+		return copy;
 	}
 }

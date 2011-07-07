@@ -218,12 +218,12 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 * @return An instance of a component.
 	 */
 	public IFuture createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
-		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, Future inited)
+		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future inited)
 	{
 		try
 		{
 			MBpmnModel model = loader.loadBpmnModel(modelinfo.getFilename(), null, modelinfo.getClassLoader());
-			BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, model, arguments, config, parent, null, null, null, bindings, inited);
+			BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, model, arguments, config, parent, null, null, null, bindings, copy, inited);
 			return new Future(new Object[]{interpreter, interpreter.getComponentAdapter()});
 		}
 		catch(Exception e)

@@ -212,6 +212,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/** The currently inited mcapability. */
 	protected Object	initcapa;
 	
+	/** The parameter copy flag. */
+	protected boolean copy;
+	
 	//-------- constructors --------
 	
 	/**
@@ -222,7 +225,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 */
 	public BDIInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, final IOAVState state, final OAVAgentModel model, 
-		final String config, final Map arguments, final IExternalAccess parent, RequiredServiceBinding[] bindings, final Map kernelprops, final Future inited)
+		final String config, final Map arguments, final IExternalAccess parent, RequiredServiceBinding[] bindings, 
+		final Map kernelprops, boolean copy, final Future inited)
 	{	
 		this.initthread = Thread.currentThread();
 		
@@ -235,6 +239,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		this.stacache = new LRU(20);
 		this.microplansteps = true;
 		this.externalthreads	= Collections.synchronizedSet(SCollection.createLinkedHashSet());
+		this.copy = copy;
 		this.inited = inited;
 		
 		// Hack! todo:
@@ -311,7 +316,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		
 		// Init the external access
 		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
-		this.container = new ComponentServiceContainer(adapter, desc.getType());
+		this.container = new ComponentServiceContainer(adapter, desc.getType(), copy);
 		this.ea = new ExternalAccessFlyweight(state, ragent);
 		((ComponentServiceContainer)this.container).init(ea);
 
@@ -1958,4 +1963,14 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		}
 		return prefix;
 	}
+
+	/**
+	 *  Get the copy.
+	 *  @return the copy.
+	 */
+	public boolean isCopy()
+	{
+		return copy;
+	}
+	
 }

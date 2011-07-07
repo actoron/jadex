@@ -4,6 +4,9 @@ import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.JadexCloner;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.component.interceptors.DecouplingInterceptor;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
@@ -24,15 +27,19 @@ public class ComponentIntermediateFuture extends IntermediateFuture
 	/** The external acces. */
 	protected IExternalAccess	ea;
 	
+	/** The parameter copy flag. */
+	protected boolean copy;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new future.
 	 */
-	public ComponentIntermediateFuture(IExternalAccess ea, IComponentAdapter adapter, IFuture source)
+	public ComponentIntermediateFuture(IExternalAccess ea, IComponentAdapter adapter, IFuture source, boolean copy)
 	{
 		this.ea	= ea;
 		this.adapter	= adapter;
+		this.copy = copy;
 		source.addResultListener(new IntermediateDelegationResultListener(this));
 	}
 		
@@ -80,5 +87,25 @@ public class ComponentIntermediateFuture extends IntermediateFuture
 		{
 			super.notifyIntermediateResult(listener, result);
 		}
+	}
+	
+	/**
+	 *  Add an intermediate result.
+	 */
+	public void	addIntermediateResult(Object result)
+	{
+		// Copy result if
+		// - copy flag is true
+		// - and result is not a reference object
+		if(copy && result!=null)
+		{
+			boolean copy = !SServiceProvider.isReference(result);
+			if(copy)
+			{
+//				System.out.println("copy result: "+result);
+				result = JadexCloner.deepCloneObject(result);
+			}
+		}
+		super.addIntermediateResult(result);
 	}
 }

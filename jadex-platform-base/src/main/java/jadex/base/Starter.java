@@ -75,6 +75,9 @@ public class Starter
 
 	/** The component flag (for starting an additional component). */
 	public static final String COMPONENT = "component";
+	
+	/** The parameter copy flag. */
+	public static final String PARAMETERCOPY = "parametercopy";
 
 	
 	/** The reserved platform parameters. */
@@ -91,6 +94,7 @@ public class Starter
 		RESERVED.add(AUTOSHUTDOWN);
 		RESERVED.add(WELCOME);
 		RESERVED.add(COMPONENT);
+		RESERVED.add(PARAMETERCOPY);
 	}
 	
 	/** The shutdown in progress flag. */
@@ -345,8 +349,9 @@ public class Starter
 									}
 								});
 								
+								boolean copy = ((Boolean)getArgumentValue(PARAMETERCOPY, model, cmdargs, compargs)).booleanValue();
 								cfac.createComponentInstance(desc, afac, model, getConfigurationName(model, cmdargs),
-									compargs, null, null, future).addResultListener(new SwingDefaultResultListener()
+									compargs, null, null, copy, future).addResultListener(new SwingDefaultResultListener()
 								{
 									public void customResultAvailable(Object result)
 									{

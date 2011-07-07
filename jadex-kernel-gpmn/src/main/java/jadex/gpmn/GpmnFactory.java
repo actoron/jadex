@@ -195,7 +195,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 * @return An instance of a component.
 	 */
 	public IFuture createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
-		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, Future inited)
+		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future inited)
 	{
 //		ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 		System.out.println(factory.getClass().toString());
@@ -211,7 +211,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 			ret = converter.convertGpmnModelToBDIAgents((jadex.gpmn.model.MGpmnModel)ret, modelinfo.getClassLoader());
 	
 			//factory.createComponentAdapter(desc, model, instance, parent);
-			return new Future(this.factory.createComponentInstance(desc, factory, (OAVAgentModel)ret, config, arguments, parent, bindings, inited));
+			return new Future(this.factory.createComponentInstance(desc, factory, (OAVAgentModel)ret, config, arguments, parent, bindings, copy, inited));
 		}
 		catch(Exception e)
 		{

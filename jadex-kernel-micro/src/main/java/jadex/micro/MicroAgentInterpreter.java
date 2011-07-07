@@ -62,9 +62,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 */
 	public MicroAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
 		final IModelInfo model, Class microclass, final Map args, final String config, 
-		final IExternalAccess parent, RequiredServiceBinding[] bindings, final Future inited)
+		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, final Future inited)
 	{
-		super(desc, model, config, factory, parent, args, bindings, inited);
+		super(desc, model, config, factory, parent, args, bindings, copy, inited);
 		
 		try
 		{

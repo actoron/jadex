@@ -209,7 +209,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 * @return An instance of a component.
 	 */
 	public IFuture createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
-		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, Future ret)
+		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future ret)
 	{
 		try
 		{
@@ -235,7 +235,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 //				app = new MConfiguration("default");
 	
 			// Create context for application.
-			ComponentInterpreter interpreter = new ComponentInterpreter(desc, model.getModelInfo(), config, factory, parent, arguments, bindings, ret);
+			ComponentInterpreter interpreter = new ComponentInterpreter(desc, model.getModelInfo(), config, factory, parent, arguments, bindings, copy, ret);
 			
 			// todo: result listener?
 			// todo: create application context as return value?!

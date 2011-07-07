@@ -34,9 +34,9 @@ public class RMIPreProcessor implements IPreProcessor
 	//-------- methods --------
 
 	/**
-	 *  Pre-process an object after an XML has been loaded.
+	 *  Pre-process an object before the xml is written.
 	 *  @param context The context.
-	 *  @param object The object to post process.
+	 *  @param object The object to pre process.
 	 *  @return A possibly other object for replacing the original. 
 	 *  		Null for no change.
 	 *  		Only possibly when processor is applied in first pass.

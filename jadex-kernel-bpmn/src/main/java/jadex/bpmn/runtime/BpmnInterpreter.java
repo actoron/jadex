@@ -195,7 +195,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		IValueFetcher fetcher, IComponentManagementService cms, IClockService cs, IMessageService ms,
 		IServiceContainer container)
 	{
-		super(null, model.getModelInfo(), config, null, parent, arguments, null, new Future());
+		super(null, model.getModelInfo(), config, null, parent, arguments, null, true, new Future());
 		construct(model, activityhandlers, stephandlers);		
 		this.fetcher = fetcher!=null? fetcher: new BpmnInstanceFetcher(this, fetcher);
 		this.adapter = adapter;
@@ -223,9 +223,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	// Constructor for self-contained bpmn components
 	public BpmnInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, MBpmnModel model, Map arguments, 
 		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
-		IValueFetcher fetcher, RequiredServiceBinding[] bindings, final Future inited)
+		IValueFetcher fetcher, RequiredServiceBinding[] bindings, boolean copy, final Future inited)
 	{
-		super(desc, model.getModelInfo(), config, factory, parent, arguments, bindings, inited);
+		super(desc, model.getModelInfo(), config, factory, parent, arguments, bindings, copy, inited);
 		this.inited = inited;
 		this.variables	= new HashMap();
 		construct(model, activityhandlers, stephandlers);

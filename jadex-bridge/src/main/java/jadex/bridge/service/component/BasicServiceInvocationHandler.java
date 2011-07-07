@@ -283,7 +283,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  Static method for creating a standard service proxy for a provided service.
 	 */
 	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, Object service, 
-		String name, Class type, String proxytype, IServiceInvocationInterceptor[] ics)
+		String name, Class type, String proxytype, IServiceInvocationInterceptor[] ics, boolean copy)
 	{
 		IInternalService	ret;
 		
@@ -295,7 +295,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		if(!PROXYTYPE_RAW.equals(proxytype) || (ics!=null && ics.length>0))
 		{
 			BasicServiceInvocationHandler handler = createHandler(name, ia, type, service);
-			BasicServiceInvocationHandler.addInterceptors(handler, service, ics, adapter, ia, proxytype);
+			BasicServiceInvocationHandler.addInterceptors(handler, service, ics, adapter, ia, proxytype, copy);
 			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
 				.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 		}
@@ -310,149 +310,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 				throw new RuntimeException("Raw services must implement IInternalService (e.g. by extending BasicService).");
 			}
 		}
-		
-//		
-//		if(PROXYTYPE_RAW.equals(proxytype))
-//		{
-//			if(service instanceof IInternalService)
-//			{
-//				ret	= (IInternalService)service;
-//			}
-//			else
-//			{
-//				throw new RuntimeException("Raw services must implement IInternalService (e.g. by extending BasicService).");
-//			}
-//		}
-//		else
-//		{
-////			System.out.println("create: "+service.getServiceIdentifier().getServiceType());
-//			BasicServiceInvocationHandler handler;
-//			if(service instanceof IService)
-//			{
-//				IService ser = (IService)service;
-//				handler = new BasicServiceInvocationHandler(ser);
-////				if(type==null)
-////				{
-////					type = ser.getServiceIdentifier().getServiceType();
-////				}
-////				else if(!type.equals(ser.getServiceIdentifier().getServiceType()))
-////				{
-////					throw new RuntimeException("Service does not match its type: "+type+", "+ser.getServiceIdentifier().getServiceType());
-////				}
-//			}
-//			else
-//			{
-//				if(type==null)
-//				{
-//					// Try to find service interface via annotation
-//					if(service.getClass().isAnnotationPresent(ServiceInterface.class))
-//					{
-//						ServiceInterface si = (ServiceInterface)service.getClass().getAnnotation(ServiceInterface.class);
-//						type = si.value();
-//					}
-//					// Otherwise take interface if there is only one
-//					else
-//					{
-//						Class[] types = service.getClass().getInterfaces();
-//						if(types.length!=1)
-//							throw new RuntimeException("Unknown service interface: "+SUtil.arrayToString(types));
-//						type = types[0];
-//					}
-//				}
-//				
-//				BasicService mgmntservice = new BasicService(ia.getExternalAccess().getServiceProvider().getId(), type, null);
-//				mgmntservice.createServiceIdentifier(name, service.getClass());
-//				
-//				Field fields[] = service.getClass().getDeclaredFields();
-//				for(int i=0; i<fields.length; i++)
-//				{
-//					if(fields[i].isAnnotationPresent(ServiceIdentifier.class))
-//					{
-//						ServiceIdentifier si = (ServiceIdentifier)fields[i].getAnnotation(ServiceIdentifier.class);
-//						if (si.value().equals(Object.class) || si.value().equals(type))
-//						{
-//							if(SReflect.isSupertype(IServiceIdentifier.class, fields[i].getType()))
-//							{
-//								try
-//								{
-//									fields[i].setAccessible(true);
-//									fields[i].set(service, mgmntservice.getServiceIdentifier());
-//								}
-//								catch(Exception e)
-//								{
-//									e.printStackTrace();
-//								}
-//							}
-//							else
-//							{
-//								System.out.println("Field cannot store IServiceIdentifer: "+fields[i]);
-//							}
-//						}
-//					}
-//					
-//					if(fields[i].isAnnotationPresent(ServiceComponent.class))
-//					{
-//						Object val = null;
-//						if(SReflect.isSupertype(IInternalAccess.class, fields[i].getType()))
-//						{
-//							val = ia;
-//						}
-//						else if(SReflect.isSupertype(IExternalAccess.class, fields[i].getType()))
-//						{
-//							val = ia.getExternalAccess();
-//						}
-//						else
-//						{
-//							System.out.println("Field cannot store component: "+fields[i]);
-//						}
-//						if(val!=null)
-//						{
-//							try
-//							{
-//								fields[i].setAccessible(true);
-//								fields[i].set(service, val);
-//							}
-//							catch(Exception e)
-//							{
-//								e.printStackTrace();
-//							}
-//						}
-//					}
-//				}
-//				
-//				ServiceInfo si = new ServiceInfo(service, mgmntservice);
-//				handler = new BasicServiceInvocationHandler(si);
-//			}
-//			
-//			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
-//			if(!(service instanceof IService))
-//			{
-//				handler.addFirstServiceInterceptor(new ResolveInterceptor());
-//			}
-//			handler.addFirstServiceInterceptor(new ValidationInterceptor());
-//			if(!PROXYTYPE_DIRECT.equals(proxytype))
-//			{
-//				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia.getExternalAccess(), adapter));
-//			}
-//			
-//			if(ics!=null)
-//			{
-//				for(int i=0; i<ics.length; i++)
-//				{
-//					// todo: pos
-//					handler.addServiceInterceptor(ics[i], -1);
-//				}
-//			}
-//			
-//			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
-//				.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
-//		}
-		
 		return ret;
 	}
 	
 	/**
-	 * 
+	 *  Create a basic invocation handler.
 	 */
 	protected static BasicServiceInvocationHandler createHandler(String name, IInternalAccess ia, Class type, Object service)
 	{
@@ -561,7 +423,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  Add the standard and custom interceptors.
 	 */
 	protected static void addInterceptors(BasicServiceInvocationHandler handler, Object service, 
-		IServiceInvocationInterceptor[] ics, IComponentAdapter adapter, IInternalAccess ia, String proxytype)
+		IServiceInvocationInterceptor[] ics, IComponentAdapter adapter, IInternalAccess ia, String proxytype, boolean copy)
 	{
 		// Only add standard interceptors if not raw.
 		if(!PROXYTYPE_RAW.equals(proxytype))
@@ -574,7 +436,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			handler.addFirstServiceInterceptor(new ValidationInterceptor());
 			if(!PROXYTYPE_DIRECT.equals(proxytype))
 			{
-				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia.getExternalAccess(), adapter));
+				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia.getExternalAccess(), adapter, copy));
 			}
 		}
 		
@@ -592,11 +454,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  provided service that is not offered by the component itself.
 	 */
 	public static IInternalService createDelegationProvidedServiceProxy(IExternalAccess ea, IComponentAdapter adapter, IServiceIdentifier sid, 
-		RequiredServiceInfo info, RequiredServiceBinding binding)
+		RequiredServiceInfo info, RequiredServiceBinding binding, boolean copy)
 	{
 		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(sid);
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
-		handler.addFirstServiceInterceptor(new DelegationInterceptor(ea, info, binding, null));
+		handler.addFirstServiceInterceptor(new DelegationInterceptor(ea, info, binding, null, copy));
 		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, sid.getServiceType()}, handler); 
 	}
 
@@ -604,7 +466,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  Static method for creating a standard service proxy for a required service.
 	 */
 	public static IService createRequiredServiceProxy(IInternalAccess ia, IExternalAccess ea, IComponentAdapter adapter, IService service, 
-		IRequiredServiceFetcher fetcher, RequiredServiceInfo info, RequiredServiceBinding binding)
+		IRequiredServiceFetcher fetcher, RequiredServiceInfo info, RequiredServiceBinding binding, boolean copy)
 	{
 		IService ret = service;
 		
@@ -616,7 +478,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			if(binding!=null && binding.isRecover())
 				handler.addFirstServiceInterceptor(new RecoveryInterceptor(info, binding, fetcher));
 			if(binding==null || PROXYTYPE_DECOUPLED.equals(binding.getProxytype()))
-				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(ea, adapter));
+				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(ea, adapter, copy));
 			UnparsedExpression[] interceptors = binding!=null ? binding.getInterceptors() : null;
 			if(interceptors!=null && interceptors.length>0)
 			{

@@ -1,6 +1,7 @@
 package jadex.bridge;
 
 import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.future.IFuture;
@@ -19,7 +20,7 @@ public interface ISettingsService extends IService
 	 *  @param provider 	The properties provider.
 	 *  @return A future indicating when registration is finished.
 	 */
-	public IFuture	registerPropertiesProvider(String id, IPropertiesProvider provider);
+	public IFuture	registerPropertiesProvider(String id, @Reference IPropertiesProvider provider);
 	
 	/**
 	 *  Deregister a property provider.

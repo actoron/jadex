@@ -1,5 +1,6 @@
 package jadex.bridge.service;
 
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.IRemotable;
 import jadex.commons.future.IFuture;
 
@@ -9,6 +10,7 @@ import java.util.Map;
 /**
  *  The interface for platform services.
  */
+@Reference
 public interface IService extends IRemotable
 {
 	//-------- constants --------

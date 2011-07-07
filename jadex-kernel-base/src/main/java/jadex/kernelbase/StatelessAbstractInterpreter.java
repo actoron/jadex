@@ -327,6 +327,12 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 */
 	public abstract Map getArguments();
 	
+	/**
+	 *  Flag for parameter copy.
+	 *  @return True, if copy copy should be used. 
+	 */
+	public abstract boolean isCopy();
+	
 	//-------- methods --------
 	
 	/**
@@ -569,7 +575,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				RequiredServiceInfo info = new RequiredServiceInfo(BasicService.generateServiceName(services[i].getType())+":virtual", services[i].getType());
 				IServiceIdentifier sid = BasicService.createServiceIdentifier(getExternalAccess().getServiceProvider().getId(), 
 					info.getName(), info.getType(), BasicServiceInvocationHandler.class);
-				IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(getExternalAccess(), getComponentAdapter(), sid, info, impl.getBinding());
+				IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(getExternalAccess(), getComponentAdapter(), 
+					sid, info, impl.getBinding(), isCopy());
 				fut	= getServiceContainer().addService(service);
 			}
 			
@@ -695,12 +702,6 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		if(config!=null)
 		{
 			ConfigurationInfo conf = model.getConfiguration(config);
-			if(conf==null)
-			{
-				System.out.println("repair me!");
-				ret.setResult(null);
-				return ret;
-			}
 			final ComponentInstanceInfo[] components = conf.getComponentInstances();
 			SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
 				.addResultListener(createResultListener(new DelegationResultListener(ret)
@@ -867,7 +868,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		assert !getComponentAdapter().isExternalThread();
 		
 		IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
-			getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics);
+			getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics, isCopy());
 		return getServiceContainer().addService(proxy);
 	}
 	

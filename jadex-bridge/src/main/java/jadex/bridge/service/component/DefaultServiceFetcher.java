@@ -56,12 +56,16 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/** The result. */
 	protected Object result;
 	
+	/** The parameter copy flag. */
+	protected boolean copy;
+	
 	/**
 	 *  Create a new required service fetcher.
 	 */
-	public DefaultServiceFetcher(IServiceProvider provider)
+	public DefaultServiceFetcher(IServiceProvider provider, boolean copy)
 	{
 		this.provider = provider;
+		this.copy = copy;
 	}
 	
 	//-------- methods --------
@@ -698,13 +702,11 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 					{
 						final IExternalAccess ea = (IExternalAccess)result;
 						final IComponentAdapter adapter = cms.getComponentAdapter((IComponentIdentifier)provider.getId());
-						if(adapter==null)
-							System.out.println("this");
 						ea.scheduleStep(new IComponentStep()
 						{
 							public Object execute(IInternalAccess ia)
 							{
-								return BasicServiceInvocationHandler.createRequiredServiceProxy(ia, ea, adapter, service, DefaultServiceFetcher.this, info, binding);
+								return BasicServiceInvocationHandler.createRequiredServiceProxy(ia, ea, adapter, service, DefaultServiceFetcher.this, info, binding, copy);
 							}
 						}).addResultListener(new DelegationResultListener(ret));
 					}

@@ -272,7 +272,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 * @return An instance of a component.
 	 */
 	public IFuture createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo model, 
-		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] binding, Future ret)
+		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] binding, boolean copy, Future ret)
 	{
 		try
 		{
@@ -280,7 +280,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			CacheableKernelModel mm = loader.loadComponentModel(model.getFilename(), null, model.getClassLoader());
 	
 			MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, mm.getModelInfo(), getMicroAgentClass(model.getFullName()+"Agent", 
-				null, model.getClassLoader()), arguments, config, parent, binding, ret);
+				null, model.getClassLoader()), arguments, config, parent, binding, copy, ret);
 			return new Future(new Object[]{mai, mai.getAgentAdapter()});
 		}
 		catch(Exception e)

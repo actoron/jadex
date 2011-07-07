@@ -1,5 +1,9 @@
 package jadex.bridge.service;
 
+import jadex.bridge.JadexCloner;
+import jadex.bridge.service.annotation.Reference;
+import jadex.commons.IRemotable;
+import jadex.commons.collection.LRU;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -7,8 +11,13 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -47,6 +56,12 @@ public class SServiceProvider
 	public static Map avisitdeciders;
 	public static Map visitdeciders;
 	
+	/** The reference class cache (clazz->boolean (is reference)). */
+	public static Map references;
+	
+	/** The reference method cache (method -> boolean[] (is reference)). */
+	public static Map methodreferences;
+	
 	static
 	{
 		avisitdeciders = new HashMap();
@@ -63,6 +78,8 @@ public class SServiceProvider
 		visitdeciders.put(RequiredServiceInfo.SCOPE_PLATFORM, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_PLATFORM));
 		visitdeciders.put(RequiredServiceInfo.SCOPE_GLOBAL, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_GLOBAL));
 
+		references = Collections.synchronizedMap(new LRU(2000));
+		methodreferences = Collections.synchronizedMap(new LRU(2000));
 	}
 	
 	//-------- methods --------
@@ -580,6 +597,90 @@ public class SServiceProvider
 			ret	= sequentialmanager;
 		}
 		
+		return ret;
+	}
+	
+	/**
+	 *  Test if an object has reference semantics. It is a reference when:
+	 *  - it implements IRemotable
+	 *  - it is an IService, IExternalAccess or IFuture
+	 *  - if the object has used an @Reference annotation at type level
+	 */
+	public static boolean isReference(Object object)
+	{
+		boolean ret = object instanceof IRemotable || object instanceof IFuture;
+//			|| object instanceof IService || object instanceof IExternalAccess;
+		
+		if(!ret && object!=null)
+		{
+			Class cl = object.getClass();
+			Boolean isref = (Boolean)references.get(cl);
+			if(isref!=null)
+			{
+				ret = isref.booleanValue();
+			}
+			else
+			{
+				List todo = new ArrayList();
+				todo.add(cl);
+				
+				while(todo.size()>0 && !ret)
+				{
+					Class clazz = (Class)todo.remove(0);
+					Reference ref = (Reference)clazz.getAnnotation(Reference.class);
+					if(ref!=null)
+						ret = ref.local();
+					
+					if(!ret)
+					{
+						Class superclazz = clazz.getSuperclass();
+						if(superclazz!=null && !superclazz.equals(Object.class))
+							todo.add(superclazz);
+						Class[] interfaces = clazz.getInterfaces();
+						for(int i=0; i<interfaces.length; i++)
+						{
+							todo.add(interfaces[i]);
+						}
+					}
+				}
+				
+				references.put(cl, ret? Boolean.TRUE: Boolean.FALSE);
+//				System.out.println("refsize: "+references.size());
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the copy info for method parameters.
+	 */
+	public static boolean[] getReferenceInfo(Method method, boolean copydefault)
+	{
+		boolean[] ret = (boolean[])methodreferences.get(method);
+		
+		if(ret==null)
+		{
+			int params = method.getParameterTypes().length;
+			ret = new boolean[params];
+			
+			for(int i=0; i<params; i++)
+			{
+				Annotation[][] ann = method.getParameterAnnotations();
+				ret[i] = !copydefault;
+				for(int j=0; j<ann[i].length; j++)
+				{
+					if(ann[i][j] instanceof Reference)
+					{
+						Reference nc = (Reference)ann[i][j];
+						ret[i] = nc.local();
+						break;
+					}
+				}
+			}
+			
+			methodreferences.put(method, ret);
+		}
 		return ret;
 	}
 }

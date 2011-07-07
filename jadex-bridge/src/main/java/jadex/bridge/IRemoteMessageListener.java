@@ -2,6 +2,7 @@ package jadex.bridge;
 
 import jadex.commons.IRemotable;
 
+
 /**
  *  Message service listener interface.
  */

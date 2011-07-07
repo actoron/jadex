@@ -1,11 +1,13 @@
 package jadex.bridge;
 
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.annotation.Reference;
 
 
 /**
  *  Interface for platform specific component adapter factories.
  */
+@Reference
 public interface IComponentAdapterFactory
 {
 	/**

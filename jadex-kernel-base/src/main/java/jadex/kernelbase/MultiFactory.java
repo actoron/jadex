@@ -299,10 +299,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	/**
 	 * Load a model.
 	 * 
-	 * @param model
-	 *            The model (e.g. file name).
-	 * @param The
-	 *            imports (if any).
+	 * @param model The model (e.g. file name).
+	 * @param The imports (if any).
 	 * @return The loaded model.
 	 */
 	public IFuture loadModel(final String model, final String[] imports, final ClassLoader classloader)
@@ -313,10 +311,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	/**
 	 * Load a model.
 	 * 
-	 * @param model
-	 *            The model (e.g. file name).
-	 * @param The
-	 *            imports (if any).
+	 * @param model The model (e.g. file name).
+	 * @param The imports (if any).
 	 * @return The loaded model.
 	 */
 	public IFuture loadModel(final String model, final String[] imports, final ClassLoader classloader, boolean isrecur)
@@ -485,11 +481,11 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	public IFuture createComponentInstance(final IComponentDescription desc,
 			final IComponentAdapterFactory factory, final IModelInfo model, final String config,
 			final Map arguments, final IExternalAccess parent,
-			final RequiredServiceBinding[] bindings, final Future ret)
+			final RequiredServiceBinding[] bindings, final boolean copy, final Future ret)
 	{
 		IComponentFactory fac = (IComponentFactory) factorycache.get(getModelExtension(model.getFilename()));
 		if (fac != null)
-			return fac.createComponentInstance(desc, factory, model, config, arguments, parent, bindings, ret);
+			return fac.createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, ret);
 		
 		final Future res = new Future();
 		
@@ -497,7 +493,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		{
 			public void customResultAvailable(Object result)
 			{
-				((IComponentFactory) result).createComponentInstance(desc, factory, model, config, arguments, parent, bindings, ret).addResultListener(new DelegationResultListener(res));
+				((IComponentFactory) result).createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, ret).addResultListener(new DelegationResultListener(res));
 			}
 		}));
 		return res;

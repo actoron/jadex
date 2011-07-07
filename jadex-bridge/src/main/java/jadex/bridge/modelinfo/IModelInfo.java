@@ -3,6 +3,7 @@ package jadex.bridge.modelinfo;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Reference;
 
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import java.util.Map;
  *  Component types can be loaded by the kernel's component factory
  *  @link{IComponentFactory}. 
  */
+@Reference(remote=false)
 public interface IModelInfo
 {
 	/**

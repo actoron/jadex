@@ -45,9 +45,9 @@ public class ComponentManagementService extends jadex.base.service.cms.Component
 	 *  Create a new component execution service.
 	 *  @param exta	The service provider.
 	 */
-	public ComponentManagementService(IExternalAccess exta, IComponentAdapter root, IComponentFactory factory)
+	public ComponentManagementService(IExternalAccess exta, IComponentAdapter root, IComponentFactory factory, boolean copy)
 	{
-		super(exta, root, factory);
+		super(exta, root, factory, copy);
 	}
 	
 	/**

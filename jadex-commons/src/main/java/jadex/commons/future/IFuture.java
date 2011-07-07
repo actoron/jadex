@@ -5,6 +5,7 @@ package jadex.commons.future;
  * Interface for futures. Similar to Java Future interface but adds a listener
  * notification mechanism.
  */
+//@Reference
 public interface IFuture
 {
 	// -------- constants --------

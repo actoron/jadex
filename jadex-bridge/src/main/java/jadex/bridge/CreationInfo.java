@@ -24,10 +24,10 @@ public class CreationInfo
 	protected IComponentIdentifier	parent;
 	
 	/** The suspend flag (default: false). */
-	protected Boolean	suspend;
+	protected Boolean suspend;
 
 	/** The master flag (default: false). */
-	protected Boolean	master;
+	protected Boolean master;
 	
 	/** The daemon flag (default: false). */
 	protected Boolean daemon;
@@ -39,7 +39,7 @@ public class CreationInfo
 	protected Boolean platformloader;
 	
 	/** The imports. */
-	protected String[]	imports;
+	protected String[] imports;
 	
 	/** The bindings. */
 	protected RequiredServiceBinding[] bindings;

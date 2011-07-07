@@ -3,6 +3,7 @@ package jadex.micro.testcases;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -39,8 +40,8 @@ public class CAgent extends MicroAgent implements ICService
 			public void resultAvailable(Object result)
 			{
 				final ICService cservice = (ICService)result;
-				final Object arg = new String("arg");
-				cservice.testNoCopy(arg, arg.hashCode()).addResultListener(new DefaultResultListener()
+				final Object arg = new Object();
+				cservice.testArgumentReference(arg, arg.hashCode()).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -55,7 +56,7 @@ public class CAgent extends MicroAgent implements ICService
 						}
 						testcases.add(tr);
 						
-						cservice.testCopy(arg, arg.hashCode()).addResultListener(new DefaultResultListener()
+						cservice.testArgumentCopy(arg, arg.hashCode()).addResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
@@ -70,8 +71,42 @@ public class CAgent extends MicroAgent implements ICService
 								}
 								testcases.add(tr);
 						
-								setResultValue("testcases", new Testcase(testcases.size(), (TestReport[])testcases.toArray(new TestReport[testcases.size()])));
-								killAgent();
+								cservice.testResultReference(arg).addResultListener(new DefaultResultListener()
+								{
+									public void resultAvailable(Object result)
+									{
+										TestReport tr = new TestReport("#3", "Test if result is not copied.");
+										if(arg.hashCode()==result.hashCode())
+										{
+											tr.setSucceeded(true);
+										}
+										else
+										{
+											tr.setReason("Hashcode is not equal.");
+										}
+										testcases.add(tr);
+										
+										cservice.testResultCopy(arg).addResultListener(new DefaultResultListener()
+										{
+											public void resultAvailable(Object result)
+											{
+												TestReport tr = new TestReport("#4", "Test if result is not copied.");
+												if(arg.hashCode()!=result.hashCode())
+												{
+													tr.setSucceeded(true);
+												}
+												else
+												{
+													tr.setReason("Hashcode is equal.");
+												}
+												testcases.add(tr);
+												
+												setResultValue("testresults", new Testcase(testcases.size(), (TestReport[])testcases.toArray(new TestReport[testcases.size()])));
+												killAgent();
+											}
+										});
+									}
+								});
 							}
 						});
 					}
@@ -83,7 +118,7 @@ public class CAgent extends MicroAgent implements ICService
 	/**
 	 *  Test if no copy works.
 	 */
-	public IFuture testNoCopy(Object arg, int hash)
+	public IFuture testArgumentReference(Object arg, int hash)
 	{
 //		System.out.println("called service");
 		return new Future(arg.hashCode()==hash? Boolean.TRUE: Boolean.FALSE);
@@ -92,8 +127,24 @@ public class CAgent extends MicroAgent implements ICService
 	/**
 	 *  Test if no copy works.
 	 */
-	public IFuture testCopy(Object arg, int hash)
+	public IFuture testArgumentCopy(Object arg, int hash)
 	{
 		return new Future(arg.hashCode()!=hash? Boolean.TRUE: Boolean.FALSE);
+	}
+	
+	/**
+	 *  Test if result value can be passed by reference.
+	 */
+	public IFuture testResultReference(Object arg)
+	{
+		return new Future(arg);
+	}
+	
+	/**
+	 *  Test if result value can be passed by copy.
+	 */
+	public IFuture testResultCopy(Object arg)
+	{
+		return new Future(arg);
 	}
 }

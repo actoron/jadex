@@ -4,12 +4,17 @@ import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.JadexCloner;
 import jadex.bridge.service.IInternalService;
-import jadex.bridge.service.annotation.NoCopy;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
+import jadex.commons.IRemotable;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -66,15 +71,19 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	/** The component adapter. */
 	protected IComponentAdapter adapter;
 	
+	/** The argument copy allowed flag. */
+	protected boolean copy;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public DecouplingInterceptor(IExternalAccess ea, IComponentAdapter adapter)
+	public DecouplingInterceptor(IExternalAccess ea, IComponentAdapter adapter, boolean copy)
 	{
 		this.ea = ea;
 		this.adapter = adapter;
+		this.copy = copy;
 	}
 	
 	//-------- methods --------
@@ -90,30 +99,28 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		
 		// Perform argument copy
 		
-//		Object[] args = sic.getArgumentArray();
-//		List copyargs = new ArrayList(); 
-//		if(args.length>0)
-//		{
-////			BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(sic.getProxy());
-////			Class si = handler.getServiceIdentifier().getServiceType();
-//			
-//			Method method = sic.getMethod();
-//			for(int i=0; i<args.length; i++)
-//			{
-//				Annotation[][] ann = method.getParameterAnnotations();
-//				boolean copy = true;
-//				for(int j=0; j<ann[i].length && copy; j++)
-//				{
-//					if(ann[i][j] instanceof NoCopy)
-//					{
-//						NoCopy nc = (NoCopy)ann[i][j];
-//						copy = nc.value();
-//					}
-//				}
-//				copyargs.add(copy? SReflect.deepClone(args[i]): args[i]);
-//			}
-//			sic.setArguments(copyargs);
-//		}
+		// In case of remote call parameters are copied as part of marshalling.
+		
+		if(copy && !isRemoteCall(sic))
+		{
+			Method method = sic.getMethod();
+			boolean[] refs = SServiceProvider.getReferenceInfo(method, copy);
+			
+			Object[] args = sic.getArgumentArray();
+			List copyargs = new ArrayList(); 
+			if(args.length>0)
+			{
+				for(int i=0; i<args.length; i++)
+				{
+					boolean ref = refs[i] || SServiceProvider.isReference(args[i]);
+//					if(!ref && args[i]!=null)
+//						System.out.println("copy arg: "+args[i]);
+					copyargs.add(ref? args[i]: JadexCloner.deepCloneObject(args[i]));
+				}
+//				System.out.println("call: "+method.getName()+" "+notcopied+" "+SUtil.arrayToString(method.getParameterTypes()));//+" "+SUtil.arrayToString(args));
+				sic.setArguments(copyargs);
+			}
+		}
 		
 		// Perform decoupling
 		
@@ -144,6 +151,19 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	public IServiceInvocationInterceptor getInterceptor(ServiceInvocationContext sic)
 	{
 		return (IServiceInvocationInterceptor)SUBINTERCEPTORS.get(sic.getMethod());
+	}
+	
+	/**
+	 *  Test if a call is remote.
+	 *  @param sic The service invocation context.
+	 */
+	public boolean isRemoteCall(ServiceInvocationContext sic)
+	{
+		Object target = sic.getObject();
+		if(Proxy.isProxyClass(target.getClass()))
+			System.out.println("blubb "+Proxy.getInvocationHandler(target).getClass().getName());
+		// todo: remove string based remote check! RemoteMethodInvocationHandler is in package jadex.base.service.remote
+		return Proxy.isProxyClass(target.getClass()) && Proxy.getInvocationHandler(target).getClass().getName().indexOf("Remote")!=-1;
 	}
 	
 	/**

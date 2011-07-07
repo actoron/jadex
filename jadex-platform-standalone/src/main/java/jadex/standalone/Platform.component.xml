@@ -43,36 +43,38 @@
 		<!-- ======== Arguments used by starter unless supplied from command line. ======== -->
 	
 		<!-- The name of the platform component (null for auto generation). -->	
-		<argument name="platformname">"jadex"</argument>
+		<argument name="platformname" class="String">"jadex"</argument>
 		<!-- The configuration to use. -->	
-		<argument name="configname">"auto"</argument>
+		<argument name="configname" class="String">"auto"</argument>
 		<!-- Automatically shut down the platform when no user agents are running anymore. -->	
-		<argument name="autoshutdown">true</argument>
+		<argument name="autoshutdown" class="boolean">true</argument>
 		<!-- Tell the starter to use the standalone adapter factory (usually no need to change). -->	
-		<argument name="adapterfactory">ComponentAdapterFactory.class</argument>
+		<argument name="adapterfactory" class="Class">ComponentAdapterFactory.class</argument>
 		<!-- Tell starter to print welcome message. -->
-		<argument name="welcome">true</argument>
+		<argument name="welcome" class="boolean">true</argument>
 		
 		<!-- ======== Arguments used by platform components. ======== -->
 		
 		<!-- Start the awareness agent (awa) for automatic platform discovery. -->
-		<argument name="awareness">true</argument>
+		<argument name="awareness" class="boolean">true</argument>
 		<!-- Start the JCC agent to open the platform GUI? -->
-		<argument name="gui">true</argument>
+		<argument name="gui" class="boolean">true</argument>
 		<!-- Save platform settings on shutdown? -->
-		<argument name="saveonexit">true</argument>
+		<argument name="saveonexit" class="boolean">true</argument>
 		<!-- Use simulation execution mode? -->
-		<argument name="simulation">false</argument>
+		<argument name="simulation" class="boolean">false</argument>
 		<!-- Additional library paths (classpath entries) for loading agent models and classes. -->
-		<argument name="libpath"></argument>
+		<argument name="libpath" class="String"></argument>
 		<!-- Port for TCP transport. -->
-		<argument name="tcpport">9876</argument>
+		<argument name="tcpport" class="int">9876</argument>
 		<!-- Port for NIOTCP transport. -->
-		<argument name="niotcpport">8765</argument>
+		<argument name="niotcpport" class="int">8765</argument>
 		<!-- Include entries for awareness agent. -->
-		<argument name="awaincludes">""</argument>
+		<argument name="awaincludes" class="String">""</argument>
 		<!-- Exclude entries for awareness agent. -->
-		<argument name="awaexcludes">""</argument>
+		<argument name="awaexcludes" class="String">""</argument>
+		<!-- Flag if copying parameters for local service calls is allowed. -->
+		<argument name="parametercopy" class="boolean">false</argument>
 		
 		<!-- <argument name="platform_shutdown_time">1000</argument> -->
 	</arguments>
@@ -143,7 +145,8 @@
 		</providedservice>
 		<providedservice class="IComponentManagementService">
 			<implementation proxytype="raw">
-				new ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter(), $args.componentfactory)
+				new ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter(), 
+					$args.componentfactory, $args.parametercopy)
 			</implementation>
 		</providedservice>
 		<providedservice class="IDF">

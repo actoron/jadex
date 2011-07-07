@@ -174,7 +174,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	 * @return An instance of a component.
 	 */
 	public IFuture createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo modelinfo, 
-		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, Future ret)
+		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future ret)
 	{
 		try
 		{
@@ -189,7 +189,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 			IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 			state.addSubstate(amodel.getState());
 			
-			BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, props, ret);
+			BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, props, copy, ret);
 			return new Future(new Object[]{bdii, bdii.getAgentAdapter()});
 		}
 		catch(Exception e)
@@ -209,7 +209,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	 * @return An instance of a component.
 	 */
 	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, OAVAgentModel amodel, 
-		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, Future ret)
+		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future ret)
 	{
 		// Create type model for agent instance (e.g. holding dynamically loaded java classes).
 		OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
@@ -219,7 +219,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 		IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 		state.addSubstate(amodel.getState());
 		
-		BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, props, ret);
+		BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, props, copy, ret);
 		return new Object[]{bdii, bdii.getAgentAdapter()};
 	}
 	

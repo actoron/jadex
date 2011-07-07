@@ -3,6 +3,7 @@ package jadex.bridge;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.annotation.Excluded;
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -16,7 +17,19 @@ import java.util.Map;
  */
 public interface IComponentFactory
 {
-	//-------- methods --------
+	/**
+	 *  Get a default icon for a component type.
+	 */
+	public IFuture getComponentTypeIcon(String type);
+
+	//-------- cached --------
+	
+	/**
+	 *  Get the names of component types supported by this factory.
+	 */
+	public String[] getComponentTypes();
+
+	//-------- excluded --------
 	
 	/**
 	 *  Load a  model.
@@ -24,7 +37,8 @@ public interface IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture loadModel(String model, String[] imports, ClassLoader classloader);
+	@Excluded
+	public IFuture loadModel(String model, String[] imports, @Reference ClassLoader classloader);
 
 	/**
 	 *  Test if a model can be loaded by the factory.
@@ -32,7 +46,8 @@ public interface IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public IFuture isLoadable(String model, String[] imports, ClassLoader classloader);
+	@Excluded
+	public IFuture isLoadable(String model, String[] imports, @Reference ClassLoader classloader);
 	
 	/**
 	 *  Test if a model is startable (e.g. an component).
@@ -40,27 +55,17 @@ public interface IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture isStartable(String model, String[] imports, ClassLoader classloader);
+	@Excluded
+	public IFuture isStartable(String model, String[] imports, @Reference ClassLoader classloader);
 
 	/**
 	 *  Get the component type of a model.
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public IFuture getComponentType(String model, String[] imports, ClassLoader classloader);
+	@Excluded
+	public IFuture getComponentType(String model, String[] imports, @Reference ClassLoader classloader);
 
-	/**
-	 *  Get a default icon for a component type.
-	 */
-	public IFuture getComponentTypeIcon(String type);
-	
-	//-------- cached --------
-	
-	/**
-	 *  Get the names of component types supported by this factory.
-	 */
-	public String[] getComponentTypes();
-	
 	/**
 	 *  Get the properties (name/value pairs).
 	 *  Arbitrary properties that can e.g. be used to
@@ -68,8 +73,9 @@ public interface IComponentFactory
 	 *  @param type	The component type. 
 	 *  @return The properties or null, if the component type is not supported by this factory.
 	 */
+	@Excluded
 	public Map	getProperties(String type);
-
+	
 	/**
 	 * Create a component instance.
 	 * @param factory The component adapter factory.
@@ -80,8 +86,9 @@ public interface IComponentFactory
 	 * @return An instance of a component and the corresponding adapter.
 	 */
 	@Excluded
-	public IFuture createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo model, 
-		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, Future ret);
+	public IFuture createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
+		IModelInfo model, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, 
+		boolean copy, Future ret);
 
 }
 

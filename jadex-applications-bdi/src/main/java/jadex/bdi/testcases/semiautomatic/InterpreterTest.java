@@ -74,7 +74,7 @@ public class InterpreterTest
 				{
 				}
 			});
-			BDIInterpreter interpreter = new BDIInterpreter(null, new ComponentAdapterFactory(), loaded.getState(), loaded, null, null, null, null, config, ret);
+			BDIInterpreter interpreter = new BDIInterpreter(null, new ComponentAdapterFactory(), loaded.getState(), loaded, null, null, null, null, config, true, ret);
 			interpreter.getAgentAdapter().wakeup();
 			
 	//		System.out.println("Agent execution finished.");
@@ -121,7 +121,7 @@ class ComponentAdapter implements IComponentAdapter
 	public ComponentAdapter(final IComponentInstance interpreter)
 	{
 		IExternalAccess ea = ((BDIInterpreter)interpreter).getExternalAccess();
-		container = new ComponentServiceContainer(this, "platform");
+		container = new ComponentServiceContainer(this, "platform", true);
 		((ComponentServiceContainer)this.container).init(ea);
 		ThreadPoolService tps = new ThreadPoolService(ThreadPoolFactory.createThreadPool(), container);
 		container.addService(tps);

@@ -41,6 +41,8 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	/** The component type. */
 	protected String type;
 	
+	/** The parameter copy flag. */
+	protected boolean copy;
 	
 	//-------- constructors --------
 
@@ -48,11 +50,12 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  Create a new service container.
 	 */
 //	public ComponentServiceContainer(IExternalAccess ea, IComponentAdapter adapter, String type)
-	public ComponentServiceContainer(IComponentAdapter adapter, String type)
+	public ComponentServiceContainer(IComponentAdapter adapter, String type, boolean copy)
 	{
 		super(adapter.getComponentIdentifier());
 		this.adapter = adapter;
 		this.type	= type;
+		this.copy = copy;
 	}
 	
 	// Hack! necessary because external access already needs container in constructor
@@ -69,7 +72,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public IFuture getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
 	{
-		return new ComponentFuture(ea, adapter, super.getRequiredService(info, binding, rebind));
+		return new ComponentFuture(ea, adapter, super.getRequiredService(info, binding, rebind), false);
 	}
 	
 	/**
@@ -78,7 +81,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
 	{
-		return new ComponentIntermediateFuture(ea, adapter, super.getRequiredServices(info, binding, rebind));
+		return new ComponentIntermediateFuture(ea, adapter, super.getRequiredServices(info, binding, rebind), false);
 	}
 	
 	/**
@@ -93,10 +96,10 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		{
 			public void customResultAvailable(Object result)
 			{
-				fut.setResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, ea, adapter, (IInternalService)result, null, null, null));
+				fut.setResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, ea, adapter, (IInternalService)result, null, null, null, copy));
 			}
 		});
-		return new ComponentFuture(ea, adapter, fut);
+		return new ComponentFuture(ea, adapter, fut, false);
 	}
 	
 	/**
@@ -111,10 +114,10 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		{
 			public void customResultAvailable(Object result)
 			{
-				fut.setResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, ea, adapter, (IInternalService)result, null, null, null));
+				fut.setResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, ea, adapter, (IInternalService)result, null, null, null, copy));
 			}
 		});
-		return new ComponentFuture(ea, adapter, fut);
+		return new ComponentFuture(ea, adapter, fut, false);
 	}
 	
 	// todo: remove
@@ -130,10 +133,10 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		{
 			public void customResultAvailable(Object result)
 			{
-				fut.setResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, ea, adapter, (IInternalService)result, null, null, null));
+				fut.setResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, ea, adapter, (IInternalService)result, null, null, null, copy));
 			}
 		});
-		return new ComponentFuture(ea, adapter, fut);
+		return new ComponentFuture(ea, adapter, fut, false);
 	}
 
 	/**
@@ -148,10 +151,10 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		{
 			public void customIntermediateResultAvailable(Object result)
 			{
-				fut.addIntermediateResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, ea, adapter, (IInternalService)result, null, null, null));
+				fut.addIntermediateResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, ea, adapter, (IInternalService)result, null, null, null, copy));
 			}
 		});
-		return new ComponentIntermediateFuture(ea, adapter, fut);
+		return new ComponentIntermediateFuture(ea, adapter, fut, false);
 	}
 	
 	/**
@@ -166,10 +169,10 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		{
 			public void customIntermediateResultAvailable(Object result)
 			{
-				fut.addIntermediateResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, ea, adapter, (IInternalService)result, null, null, null));
+				fut.addIntermediateResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, ea, adapter, (IInternalService)result, null, null, null, copy));
 			}
 		});
-		return new ComponentIntermediateFuture(ea, adapter, fut);
+		return new ComponentIntermediateFuture(ea, adapter, fut, false);
 	}
 	
 	/**
@@ -266,7 +269,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public IRequiredServiceFetcher createServiceFetcher(String name)
 	{
-		return new DefaultServiceFetcher(this);
+		return new DefaultServiceFetcher(this, copy);
 	}
 	
 	/**

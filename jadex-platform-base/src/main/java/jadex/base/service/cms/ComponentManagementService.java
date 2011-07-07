@@ -122,6 +122,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	/** The bootstrap component factory. */
 	protected IComponentFactory componentfactory;
 	
+	/** The default copy parameters flag for service calls. */
+	protected boolean copy;
+	
     //-------- constructors --------
 
 	 /**
@@ -139,20 +142,22 @@ public abstract class ComponentManagementService extends BasicService implements
      */
     public ComponentManagementService(IExternalAccess exta, IComponentAdapter root)
 	{
-    	this(exta, root, null);
+    	this(exta, root, null, true);
     }
     
     /**
      *  Create a new component execution service.
      *  @param exta	The service provider.
      */
-    public ComponentManagementService(IExternalAccess exta, IComponentAdapter root, IComponentFactory componentfactory)
+    public ComponentManagementService(IExternalAccess exta, IComponentAdapter root, 
+    	IComponentFactory componentfactory, boolean copy)
 	{
 		super(exta.getServiceProvider().getId(), IComponentManagementService.class, null);
 
 		this.exta = exta;
 		this.root = root;
 		this.componentfactory = componentfactory;
+		this.copy = copy;
 		
 		this.adapters = Collections.synchronizedMap(SCollection.createHashMap());
 		this.ccs = SCollection.createLinkedHashMap();
@@ -258,7 +263,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param killlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 */
 	public IFuture createComponent(final String name, final String modelname, CreationInfo info, final IResultListener killlistener)
-	{				
+	{	
 //		System.out.println("create component: "+modelname+" "+name);
 		final Future inited = new Future();
 		
@@ -588,7 +593,7 @@ public abstract class ComponentManagementService extends BasicService implements
 													String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
 														: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
 													factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
-														config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), future).addResultListener(new DefaultResultListener()
+														config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, future).addResultListener(new DefaultResultListener()
 													{
 														public void resultAvailable(Object result)
 														{

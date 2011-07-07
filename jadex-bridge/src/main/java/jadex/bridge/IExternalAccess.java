@@ -2,12 +2,14 @@ package jadex.bridge;
 
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.IRemotable;
 import jadex.commons.future.IFuture;
 
 /**
  *  The interface for accessing components from the outside.
  */
+@Reference
 public interface IExternalAccess extends IRemotable
 {
 	//-------- cache --------

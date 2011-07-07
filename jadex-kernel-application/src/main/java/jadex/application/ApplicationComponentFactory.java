@@ -215,12 +215,12 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 * @return An instance of a component.
 	 */
 	public IFuture createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
-		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, Future ret)
+		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future ret)
 	{
 		try
 		{
 			CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, modelinfo.getClassLoader());
-			ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, ret);
+			ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, ret);
 			
 			// todo: result listener?
 			// todo: create application context as return value?!
