@@ -47,8 +47,7 @@ public class GpmnBpmnPlanPropertySection extends GpmnCustomPropertySection
 		addPreconditionControl(confGroup);
 		addContextconditionControl(confGroup);
 		
-		refresh()
-		get
+		refresh();
 	}
 	
 	protected void refreshControls()
