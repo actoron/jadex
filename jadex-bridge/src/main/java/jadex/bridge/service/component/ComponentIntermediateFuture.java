@@ -99,7 +99,7 @@ public class ComponentIntermediateFuture extends IntermediateFuture
 		// - and result is not a reference object
 		if(copy && result!=null)
 		{
-			boolean copy = !SServiceProvider.isReference(result);
+			boolean copy = !SServiceProvider.isLocalReference(result);
 			if(copy)
 			{
 //				System.out.println("copy result: "+result);

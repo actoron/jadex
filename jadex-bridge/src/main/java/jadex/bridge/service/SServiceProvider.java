@@ -32,7 +32,7 @@ public class SServiceProvider
 //	public static ISearchManager sequentialmanagerforced = new SequentialSearchManager(true, true, true);
 
 	/** The parallel search manager. */
-	public static ISearchManager parallelmanager = new ParallelSearchManager();
+	public static ISearchManager parallelmanager = sequentialmanager;//new ParallelSearchManager();
 //	public static ISearchManager parallelmanagerforced = new ParallelSearchManager(true, true, true);
 	
 	/** The sequential search manager that searches only upwards. */
@@ -78,8 +78,8 @@ public class SServiceProvider
 		visitdeciders.put(RequiredServiceInfo.SCOPE_PLATFORM, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_PLATFORM));
 		visitdeciders.put(RequiredServiceInfo.SCOPE_GLOBAL, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_GLOBAL));
 
-		references = Collections.synchronizedMap(new LRU(2000));
-		methodreferences = Collections.synchronizedMap(new LRU(2000));
+		references = Collections.synchronizedMap(new LRU(500));
+		methodreferences = Collections.synchronizedMap(new LRU(500));
 	}
 	
 	//-------- methods --------
@@ -606,32 +606,60 @@ public class SServiceProvider
 	 *  - it is an IService, IExternalAccess or IFuture
 	 *  - if the object has used an @Reference annotation at type level
 	 */
-	public static boolean isReference(Object object)
+	public static boolean isLocalReference(Object object)
 	{
-		boolean ret = object instanceof IRemotable || object instanceof IFuture;
+		return isReference(object, true);
+	}
+	
+	/**
+	 *  Test if an object has reference semantics. It is a reference when:
+	 *  - it implements IRemotable
+	 *  - it is an IService, IExternalAccess or IFuture
+	 *  - if the object has used an @Reference annotation at type level
+	 */
+	public static boolean isRemoteReference(Object object)
+	{
+		return isReference(object, false);
+	}
+		
+	/**
+	 *  Test if an object has reference semantics. It is a reference when:
+	 *  - it implements IRemotable
+	 *  - it is an IService, IExternalAccess or IFuture
+	 *  - if the object has used an @Reference annotation at type level
+	 */
+	public static boolean isReference(Object object, boolean local)
+	{
+		boolean ret = object==null || object instanceof IRemotable || object instanceof IFuture;
 //			|| object instanceof IService || object instanceof IExternalAccess;
 		
 		if(!ret && object!=null)
 		{
+			boolean localret = ret;
+			boolean remoteret = ret;
+			
 			Class cl = object.getClass();
-			Boolean isref = (Boolean)references.get(cl);
+			boolean[] isref = (boolean[])references.get(cl);
 			if(isref!=null)
 			{
-				ret = isref.booleanValue();
+				ret = local? isref[0]: isref[1]; 
 			}
 			else
 			{
 				List todo = new ArrayList();
 				todo.add(cl);
 				
-				while(todo.size()>0 && !ret)
+				while(todo.size()>0)
 				{
 					Class clazz = (Class)todo.remove(0);
 					Reference ref = (Reference)clazz.getAnnotation(Reference.class);
 					if(ref!=null)
-						ret = ref.local();
-					
-					if(!ret)
+					{
+						localret = ref.local();
+						remoteret = ref.remote();
+						break;
+					}
+					else
 					{
 						Class superclazz = clazz.getSuperclass();
 						if(superclazz!=null && !superclazz.equals(Object.class))
@@ -644,7 +672,8 @@ public class SServiceProvider
 					}
 				}
 				
-				references.put(cl, ret? Boolean.TRUE: Boolean.FALSE);
+				references.put(cl, new boolean[]{localret, remoteret});
+				ret = local? localret: remoteret;
 //				System.out.println("refsize: "+references.size());
 			}
 		}
@@ -655,32 +684,88 @@ public class SServiceProvider
 	/**
 	 *  Get the copy info for method parameters.
 	 */
-	public static boolean[] getReferenceInfo(Method method, boolean copydefault)
+	public static boolean[] getLocalReferenceInfo(Method method, boolean copydefault)
 	{
-		boolean[] ret = (boolean[])methodreferences.get(method);
-		
-		if(ret==null)
+		return getReferenceInfo(method, copydefault, true);
+	}
+	
+	/**
+	 *  Get the copy info for method parameters.
+	 */
+	public static boolean[] getRemoteReferenceInfo(Method method, boolean copydefault)
+	{
+		return getReferenceInfo(method, copydefault, false);
+	}
+	
+	/**
+	 *  Get the copy info for method parameters.
+	 */
+	public static boolean[] getReferenceInfo(Method method, boolean copydefault, boolean local)
+	{
+		boolean[] ret;
+		Object[] tmp = (Object[])methodreferences.get(method);
+		if(tmp!=null)
+		{
+			ret = (boolean[])tmp[local? 0: 1];
+		}
+		else
 		{
 			int params = method.getParameterTypes().length;
-			ret = new boolean[params];
+			boolean[] localret = new boolean[params];
+			boolean[] remoteret = new boolean[params];
 			
 			for(int i=0; i<params; i++)
 			{
 				Annotation[][] ann = method.getParameterAnnotations();
-				ret[i] = !copydefault;
+				localret[i] = !copydefault;
+				remoteret[i] = !copydefault;
 				for(int j=0; j<ann[i].length; j++)
 				{
 					if(ann[i][j] instanceof Reference)
 					{
 						Reference nc = (Reference)ann[i][j];
-						ret[i] = nc.local();
+						localret[i] = nc.local();
+						remoteret[i] = nc.remote();
 						break;
 					}
 				}
 			}
 			
-			methodreferences.put(method, ret);
+			methodreferences.put(method, new Object[]{localret, remoteret});
+			ret = local? localret: remoteret;
 		}
 		return ret;
 	}
+	
+//	/**
+//	 *  Get the copy info for method parameters.
+//	 */
+//	public static boolean[] getReferenceInfo(Method method, boolean copydefault)
+//	{
+//		boolean[] ret = (boolean[])methodreferences.get(method);
+//		
+//		if(ret==null)
+//		{
+//			int params = method.getParameterTypes().length;
+//			ret = new boolean[params];
+//			
+//			for(int i=0; i<params; i++)
+//			{
+//				Annotation[][] ann = method.getParameterAnnotations();
+//				ret[i] = !copydefault;
+//				for(int j=0; j<ann[i].length; j++)
+//				{
+//					if(ann[i][j] instanceof Reference)
+//					{
+//						Reference nc = (Reference)ann[i][j];
+//						ret[i] = nc.local();
+//						break;
+//					}
+//				}
+//			}
+//			
+//			methodreferences.put(method, ret);
+//		}
+//		return ret;
+//	}
 }

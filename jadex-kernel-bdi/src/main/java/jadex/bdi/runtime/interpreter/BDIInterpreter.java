@@ -198,7 +198,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 //	protected Set eal;
 	
 	/** The service container. */
-	protected ComponentServiceContainer container;
+	protected IServiceContainer container;
 	
 	/** The cms future for init return. */
 	protected Future inited;
@@ -316,9 +316,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		
 		// Init the external access
 		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
-		this.container = new ComponentServiceContainer(adapter, desc.getType(), copy);
+		this.container = createServiceContainer();
 		this.ea = new ExternalAccessFlyweight(state, ragent);
-		((ComponentServiceContainer)this.container).init(ea);
 
 		scheduleStep(new IComponentStep()
 		{
@@ -1971,6 +1970,16 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	public boolean isCopy()
 	{
 		return copy;
+	}
+	
+	/**
+	 *  Create the service container.
+	 *  @return The service conainer.
+	 */
+	public IServiceContainer createServiceContainer()
+	{
+		assert container==null;
+		return new ComponentServiceContainer(adapter, getComponentAdapter().getDescription().getType(), copy, this);
 	}
 	
 }

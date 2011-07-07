@@ -100,11 +100,10 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		// Perform argument copy
 		
 		// In case of remote call parameters are copied as part of marshalling.
-		
-		if(copy && !isRemoteCall(sic))
+		if(copy && !sic.isRemoteCall())
 		{
 			Method method = sic.getMethod();
-			boolean[] refs = SServiceProvider.getReferenceInfo(method, copy);
+			boolean[] refs = SServiceProvider.getLocalReferenceInfo(method, copy);
 			
 			Object[] args = sic.getArgumentArray();
 			List copyargs = new ArrayList(); 
@@ -112,7 +111,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 			{
 				for(int i=0; i<args.length; i++)
 				{
-					boolean ref = refs[i] || SServiceProvider.isReference(args[i]);
+					boolean ref = refs[i] || SServiceProvider.isLocalReference(args[i]);
 //					if(!ref && args[i]!=null)
 //						System.out.println("copy arg: "+args[i]);
 					copyargs.add(ref? args[i]: JadexCloner.deepCloneObject(args[i]));
@@ -151,19 +150,6 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	public IServiceInvocationInterceptor getInterceptor(ServiceInvocationContext sic)
 	{
 		return (IServiceInvocationInterceptor)SUBINTERCEPTORS.get(sic.getMethod());
-	}
-	
-	/**
-	 *  Test if a call is remote.
-	 *  @param sic The service invocation context.
-	 */
-	public boolean isRemoteCall(ServiceInvocationContext sic)
-	{
-		Object target = sic.getObject();
-		if(Proxy.isProxyClass(target.getClass()))
-			System.out.println("blubb "+Proxy.getInvocationHandler(target).getClass().getName());
-		// todo: remove string based remote check! RemoteMethodInvocationHandler is in package jadex.base.service.remote
-		return Proxy.isProxyClass(target.getClass()) && Proxy.getInvocationHandler(target).getClass().getName().indexOf("Remote")!=-1;
 	}
 	
 	/**

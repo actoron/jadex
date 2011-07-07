@@ -90,6 +90,12 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	public abstract IServiceContainer getServiceContainer();
 	
 	/**
+	 *  Create the service container.
+	 *  @return The service conainer.
+	 */
+	public abstract IServiceContainer createServiceContainer();
+	
+	/**
 	 *  Test if the component's execution is currently at one of the
 	 *  given breakpoints. If yes, the component will be suspended by
 	 *  the platform.

@@ -121,8 +121,7 @@ class ComponentAdapter implements IComponentAdapter
 	public ComponentAdapter(final IComponentInstance interpreter)
 	{
 		IExternalAccess ea = ((BDIInterpreter)interpreter).getExternalAccess();
-		container = new ComponentServiceContainer(this, "platform", true);
-		((ComponentServiceContainer)this.container).init(ea);
+		container = new ComponentServiceContainer(this, "platform", true, null);
 		ThreadPoolService tps = new ThreadPoolService(ThreadPoolFactory.createThreadPool(), container);
 		container.addService(tps);
 		ClockService clock = new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "system"), container);

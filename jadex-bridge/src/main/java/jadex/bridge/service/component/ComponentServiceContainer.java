@@ -2,6 +2,7 @@ package jadex.bridge.service.component;
 
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.BasicServiceContainer;
@@ -33,7 +34,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	protected IComponentAdapter adapter;
 	
 	/** The external access. */
-	protected IExternalAccess ea;
+	protected IComponentInstance instance;
 	
 	/** The cms. */
 	protected IComponentManagementService cms;
@@ -50,18 +51,13 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  Create a new service container.
 	 */
 //	public ComponentServiceContainer(IExternalAccess ea, IComponentAdapter adapter, String type)
-	public ComponentServiceContainer(IComponentAdapter adapter, String type, boolean copy)
+	public ComponentServiceContainer(IComponentAdapter adapter, String type, boolean copy, IComponentInstance instance)
 	{
 		super(adapter.getComponentIdentifier());
 		this.adapter = adapter;
 		this.type	= type;
 		this.copy = copy;
-	}
-	
-	// Hack! necessary because external access already needs container in constructor
-	public void init(IExternalAccess ea)
-	{
-		this.ea = ea;
+		this.instance = instance;
 	}
 	
 	//-------- interface methods --------
@@ -72,7 +68,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public IFuture getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
 	{
-		return new ComponentFuture(ea, adapter, super.getRequiredService(info, binding, rebind), false);
+		return new ComponentFuture(instance.getExternalAccess(), adapter, super.getRequiredService(info, binding, rebind), false);
 	}
 	
 	/**
@@ -81,7 +77,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
 	{
-		return new ComponentIntermediateFuture(ea, adapter, super.getRequiredServices(info, binding, rebind), false);
+		return new ComponentIntermediateFuture(instance.getExternalAccess(), adapter, super.getRequiredServices(info, binding, rebind), false);
 	}
 	
 	/**
@@ -96,10 +92,10 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		{
 			public void customResultAvailable(Object result)
 			{
-				fut.setResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, ea, adapter, (IInternalService)result, null, null, null, copy));
+				fut.setResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
 			}
 		});
-		return new ComponentFuture(ea, adapter, fut, false);
+		return new ComponentFuture(instance.getExternalAccess(), adapter, fut, false);
 	}
 	
 	/**
@@ -114,10 +110,10 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		{
 			public void customResultAvailable(Object result)
 			{
-				fut.setResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, ea, adapter, (IInternalService)result, null, null, null, copy));
+				fut.setResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
 			}
 		});
-		return new ComponentFuture(ea, adapter, fut, false);
+		return new ComponentFuture(instance.getExternalAccess(), adapter, fut, false);
 	}
 	
 	// todo: remove
@@ -133,10 +129,10 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		{
 			public void customResultAvailable(Object result)
 			{
-				fut.setResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, ea, adapter, (IInternalService)result, null, null, null, copy));
+				fut.setResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
 			}
 		});
-		return new ComponentFuture(ea, adapter, fut, false);
+		return new ComponentFuture(instance.getExternalAccess(), adapter, fut, false);
 	}
 
 	/**
@@ -151,10 +147,10 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		{
 			public void customIntermediateResultAvailable(Object result)
 			{
-				fut.addIntermediateResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, ea, adapter, (IInternalService)result, null, null, null, copy));
+				fut.addIntermediateResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
 			}
 		});
-		return new ComponentIntermediateFuture(ea, adapter, fut, false);
+		return new ComponentIntermediateFuture(instance.getExternalAccess(), adapter, fut, false);
 	}
 	
 	/**
@@ -169,10 +165,10 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		{
 			public void customIntermediateResultAvailable(Object result)
 			{
-				fut.addIntermediateResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, ea, adapter, (IInternalService)result, null, null, null, copy));
+				fut.addIntermediateResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
 			}
 		});
-		return new ComponentIntermediateFuture(ea, adapter, fut, false);
+		return new ComponentIntermediateFuture(instance.getExternalAccess(), adapter, fut, false);
 	}
 	
 	/**

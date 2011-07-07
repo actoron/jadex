@@ -15,6 +15,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.clock.ITimer;
+import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -70,13 +71,6 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		{
 			this.microagent = (MicroAgent)microclass.newInstance();
 			this.microagent.init(MicroAgentInterpreter.this);
-			
-			// Hack!!! Change service container to custom implementation (required only for ProxyAgent) 
-			IServiceContainer	cont	= microagent.createServiceContainer();
-			if(cont!=null)
-			{
-				this.container	= cont;
-			}
 			
 			addStep((new Object[]{new IComponentStep()
 			{
@@ -570,6 +564,18 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		}
 		
 		return access;
+	}
+	
+	/**
+	 *  Create the service container.
+	 *  @return The service conainer.
+	 */
+	public IServiceContainer createServiceContainer()
+	{
+		IServiceContainer ret = microagent.createServiceContainer();
+		if(ret==null)
+			ret = super.createServiceContainer();
+		return ret;
 	}
 	
 	/**

@@ -147,7 +147,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	//-------- methods --------
 	
 	/**
-	 *  Get a service proxies from a remote platform.
+	 *  Get service proxies from a remote platform.
 	 *  (called from arbitrary components)
 	 *  @param cid Component id that is used to start the search.
 	 *  @param manager The search manager.

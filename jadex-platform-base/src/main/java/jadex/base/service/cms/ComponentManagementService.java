@@ -125,6 +125,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	/** The default copy parameters flag for service calls. */
 	protected boolean copy;
 	
+//	/** The classloader cache. */
+//	protected Map classloadercache;
+	
     //-------- constructors --------
 
 	 /**
@@ -170,7 +173,8 @@ public abstract class ComponentManagementService extends BasicService implements
 		this.initinfos = Collections.synchronizedMap(SCollection.createHashMap());
 		this.childcounts = SCollection.createHashMap();
 		this.localtypes	= Collections.synchronizedMap(new LRU(100));
-    }
+//		this.classloadercache = Collections.synchronizedMap(new LRU(1000));
+   }
     
 	/**
 	 *  Get the component instance from an adapter.
@@ -1805,23 +1809,32 @@ public abstract class ComponentManagementService extends BasicService implements
 			&& !initinfos.containsKey(ci.getParent())
 			&& !Boolean.TRUE.equals(ci.getPlatformloader()))
 		{
-			SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new DelegationResultListener(ret)
-			{
-				public void customResultAvailable(Object result)
+//			ClassLoader cl = (ClassLoader)classloadercache.get(ci.getParent());
+//			if(cl!=null)
+//			{
+//				ret.setResult(cl);
+//			}
+//			else
+//			{
+				SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new DelegationResultListener(ret)
 				{
-					IComponentManagementService	cms	= (IComponentManagementService)result;
-					cms.getExternalAccess(ci.getParent()).addResultListener(new DelegationResultListener(ret)
+					public void customResultAvailable(Object result)
 					{
-						public void customResultAvailable(Object result)
+						IComponentManagementService	cms	= (IComponentManagementService)result;
+						cms.getExternalAccess(ci.getParent()).addResultListener(new DelegationResultListener(ret)
 						{
-							IExternalAccess	ea	= (IExternalAccess)result;
-//							System.err.println("Model class loader: "+ea.getModel().getName()+", "+ea.getModel().getClassLoader());
-							ret.setResult(ea.getModel().getClassLoader());
-						}
-					});
-				}
-			});
+							public void customResultAvailable(Object result)
+							{
+								IExternalAccess	ea	= (IExternalAccess)result;
+	//							System.err.println("Model class loader: "+ea.getModel().getName()+", "+ea.getModel().getClassLoader());
+//								classloadercache.put(ci.getParent(), ea.getModel().getClassLoader());
+								ret.setResult(ea.getModel().getClassLoader());
+							}
+						});
+					}
+				});
+//			}
 		}
 		
 		// Remote or no parent or platform as parent

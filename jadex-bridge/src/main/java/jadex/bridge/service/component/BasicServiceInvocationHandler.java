@@ -134,11 +134,6 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			final Future fut = new Future();
 			ret = fut;
 			
-//			if(method.getName().indexOf("test")!=-1)
-//			{
-//				System.out.println("seiophfip");
-//			}
-			
 			sic.invoke(service, method, myargs).addResultListener(new DelegationResultListener(fut)
 			{
 				public void customResultAvailable(Object result)

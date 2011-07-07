@@ -120,6 +120,9 @@ public class SequentialSearchManager implements ISearchManager
 	protected void processNode(final IServiceProvider start, final IServiceProvider source, final IServiceProvider provider,
 		final SearchContext context, final IntermediateFuture ret, final boolean up, final int callstack, final boolean ischild)//, final List res)
 	{
+//		if(provider!=null && provider.getId().toString().startsWith("Lars-PC"))
+//			System.out.println("processing node: "+provider.getId());
+		
 		// Hack!!! Break call stack when it becomes too large.
 		if(callstack>1000)
 		{
@@ -173,7 +176,9 @@ public class SequentialSearchManager implements ISearchManager
 								Collection res = (Collection)result;
 								for(Iterator it=res.iterator(); it.hasNext(); )
 								{
-									ret.addIntermediateResult(it.next());
+									Object o = it.next();
+//									System.out.println("found: "+provider.getId()+" "+o);
+									ret.addIntermediateResult(o);
 								}
 							}
 							processParent(start, source, provider, context, ret, up, 0);//, res);
@@ -201,11 +206,13 @@ public class SequentialSearchManager implements ISearchManager
 					{
 						// what to do with exception?
 					}
-					if(res!=null)
+					if(res!=null && res.size()>0)
 					{
 						for(Iterator it=res.iterator(); it.hasNext(); )
 						{
-							ret.addIntermediateResult(it.next());
+							Object o = it.next();
+//							System.out.println("found: "+provider.getId()+" "+o);
+							ret.addIntermediateResult(o);
 						}
 					}
 					processParent(start, source, provider, context, ret, up, callstack+1);//, res);

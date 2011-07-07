@@ -5,6 +5,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -158,98 +159,6 @@ public class ServiceInvocationContext
 		this.result.set(used.size()-1, result);
 	}
 
-	
-	
-//	/**
-//	 *  Get the objects.
-//	 *  @return The objects.
-//	 */
-//	public List getObjectStack()
-//	{
-//		return object;
-//	}
-//	
-//	/**
-//	 *  Get the objects.
-//	 *  @param objects The objects.
-//	 */
-//	public void setObjectStack(List objects)
-//	{
-//		this.object = objects;
-//	}
-//	
-//	/**
-//	 *  Get the method.
-//	 *  @return the method.
-//	 */
-//	public List getMethodStack()
-//	{
-//		return method;
-//	}
-//
-//	/**
-//	 *  Set the method.
-//	 *  @param method The method to set.
-//	 */
-//	public void setMethodStack(List methods)
-//	{
-//		this.method = methods;
-//	}
-//
-//	/**
-//	 *  Get the args.
-//	 *  @return the args.
-//	 */
-//	public List getArgumentStack()
-//	{
-//		return arguments;
-//	}
-//	
-//	/**
-//	 *  Set the arguments.
-//	 *  @param args The arguments to set.
-//	 */
-//	public void setArgumentStack(List args)
-//	{
-//		this.arguments = args;
-//	}
-//	
-//	/**
-//	 *  Get the result.
-//	 *  @return the result.
-//	 */
-//	public List getResultStack()
-//	{
-//		return result;
-//	}
-//
-//	/**
-//	 *  Set the results.
-//	 *  @param result The results to set.
-//	 */
-//	public void setResultStack(List results)
-//	{
-//		this.result = results;
-//	}
-//	
-//	/**
-//	 *  Get the cnt.
-//	 *  @return The cnt.
-//	 */
-//	public int getCounter()
-//	{
-//		return cnt;
-//	}
-//
-//	/**
-//	 *  Set the cnt.
-//	 *  @param cnt The cnt to set.
-//	 */
-//	public void setCounter(int cnt)
-//	{
-//		this.cnt = cnt;
-//	}
-
 	/**
 	 *  Invoke the next interceptor.
 	 */
@@ -356,6 +265,28 @@ public class ServiceInvocationContext
 			Object res = this.result.remove(this.result.size()-1);
 			result.set(result.size()-1, res);
 		}
+	}
+	
+//	/**
+//	 *  Test if this call is local.
+//	 *  @return True, if it is a local call. 
+//	 */
+//	public boolean isLocalCall()
+//	{
+//		return !Proxy.isProxyClass(getObject().getClass());
+//	}
+	
+	/**
+	 *  Test if a call is remote.
+	 *  @param sic The service invocation context.
+	 */
+	public boolean isRemoteCall()
+	{
+		Object target = getObject();
+//		if(Proxy.isProxyClass(target.getClass()))
+//			System.out.println("blubb "+Proxy.getInvocationHandler(target).getClass().getName());
+		// todo: remove string based remote check! RemoteMethodInvocationHandler is in package jadex.base.service.remote
+		return Proxy.isProxyClass(target.getClass()) && Proxy.getInvocationHandler(target).getClass().getName().indexOf("Remote")!=-1;
 	}
 	
 //	/**

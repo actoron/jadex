@@ -52,7 +52,7 @@ public class InterpreterFetcher extends SimpleValueFetcher
 		{
 			ret = interpreter.getInternalAccess();
 		}
-		else if(name.equals("$provider"))
+		else if(name.equals("$provider") || name.equals("container"))
 		{
 			ret = interpreter.getServiceContainer();
 		}
