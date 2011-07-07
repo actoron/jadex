@@ -593,8 +593,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 				@XMLClassname("send")
 				public Object execute(IInternalAccess ia)
 				{
-					assert !killed;
-					if(sendid.equals(getSendId()))
+					if(!killed && sendid.equals(getSendId()))
 					{
 //						System.out.println(System.currentTimeMillis()+" sending: "+getComponentIdentifier());
 						send(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes));
