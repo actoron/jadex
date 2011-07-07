@@ -171,7 +171,7 @@
 			<!--
 				copy all dependencies (including transitive dependencies) to lib
 				directory, ease starting jadex without eclipse
-			-->
+			- ->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -189,7 +189,7 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin> -->
 		</plugins>
 	</build>
 

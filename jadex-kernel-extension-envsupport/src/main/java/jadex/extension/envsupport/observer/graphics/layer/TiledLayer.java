@@ -11,8 +11,6 @@ import java.awt.Color;
  */
 public class TiledLayer extends Layer
 {
-	static private final long	serialVersionUID	= 0L;
-
 	/** Texture path. */
 	protected String			texturePath_;
 

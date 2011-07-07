@@ -56,20 +56,26 @@ import jadex.micro.annotation.RequiredServices;
 
 @Arguments({
 	@Argument(name="platformname", clazz=String.class, defaultvalue="\"jadex\""),
+	@Argument(name="config", clazz=String.class, defaultvalue="\"auto\""),
+	@Argument(name="autoshutdown", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="adapterfactory", clazz=Class.class, defaultvalue="ComponentAdapterFactory.class"),
+	@Argument(name="welcome", clazz=boolean.class, defaultvalue="true"),
+	
+	@Argument(name="awareness", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="gui", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="saveonexit", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="simulation", clazz=boolean.class, defaultvalue="false"),
 	@Argument(name="libpath", clazz=String[].class),
 	@Argument(name="tcpport", clazz=int.class, defaultvalue="9876"),
 	@Argument(name="niotcpport", clazz=int.class, defaultvalue="8765"),
 	@Argument(name="awaincludes", clazz=String.class, defaultvalue="\"\""),
-	@Argument(name="awaexcludes", clazz=String.class, defaultvalue="\"\"")
+	@Argument(name="awaexcludes", clazz=String.class, defaultvalue="\"\""),
+	@Argument(name="parametercopy", clazz=boolean.class, defaultvalue="true")
 })
 
 @ComponentTypes({
 	@ComponentType(name="kernel_component", filename="jadex/component/KernelComponentAgent.class"),
-//	@ComponentType(name="kernel_component", filename="jadex/component/KernelComponent.component.xml"),
 	@ComponentType(name="kernel_application", filename="jadex/application/KernelApplication.component.xml"),
-//	@ComponentType(name="kernel_micro", filename="jadex/micro/KernelMicro.component.xml"),
 	@ComponentType(name="kernel_micro", filename="jadex/micro/KernelMicroAgent.class"),
 	@ComponentType(name="kernel_bdi", filename="jadex/bdi/KernelBDI.component.xml"),
 	@ComponentType(name="kernel_bdibpmn", filename="jadex/bdibpmn/KernelBDIBPMN.component.xml"),
@@ -100,45 +106,53 @@ import jadex.micro.annotation.RequiredServices;
 })
 
 @Configurations({
-	@Configuration(name="micro_kernel multi auto (rms, awa, jcc)", arguments={
+	@Configuration(name="auto", arguments={
 		@NameValue(name="tcpport", value="0"),
 		@NameValue(name="niotcpport", value="0"),
 		@NameValue(name="platformname", value="null")
 	}, components={
 		@Component(name="kernels", type="kernel_multi", daemon=true),
 		@Component(name="rms", type="rms", daemon=true),
-		@Component(name="awa", type="awa", daemon=true, 
+		@Component(name="awa", type="awa", daemon=true, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
 			arguments={@NameValue(name="includes", value="$args.awaincludes"),
 				@NameValue(name="excludes", value="$args.awaexcludes")}),
-		@Component(name="jcc", type="jcc", daemon=true)
+		@Component(name="jcc", type="jcc", daemon=true, number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0")
 	}),
-	@Configuration(name="micro_kernel auto (rms, awa, jcc)", arguments={
-		@NameValue(name="tcpport", value="0"),
-		@NameValue(name="niotcpport", value="0"),
-		@NameValue(name="platformname", value="null")
-	}, components={
-		@Component(name="kernel_micro", type="kernel_micro", daemon=true),
+	@Configuration(name="fixed", components={
+		@Component(name="kernels", type="kernel_multi", daemon=true),
 		@Component(name="rms", type="rms", daemon=true),
-		@Component(name="awa", type="awa", daemon=true, 
+		@Component(name="awa", type="awa", daemon=true, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
 			arguments={@NameValue(name="includes", value="$args.awaincludes"),
 				@NameValue(name="excludes", value="$args.awaexcludes")}),
-		@Component(name="jcc", type="jcc", daemon=true)
+		@Component(name="jcc", type="jcc", daemon=true, number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0")
 	}),
-	@Configuration(name="all_kernels auto (rms, awa, jcc)", arguments={
+	@Configuration(name="allkernels", arguments={
 		@NameValue(name="tcpport", value="0"),
 		@NameValue(name="niotcpport", value="0"),
 		@NameValue(name="platformname", value="null")
 	}, components={
 		@Component(name="kernel_component", type="kernel_component", daemon=true),
 		@Component(name="kernel_application", type="kernel_application", daemon=true),
-//		@Component(name="kernel_micro", type="kernel_micro", daemon=true),
+		@Component(name="kernel_micro", type="kernel_micro", daemon=true),
 		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=true),
 		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=true),
 		@Component(name="rms", type="rms", daemon=true),
-		@Component(name="awa", type="awa", daemon=true, 
+		@Component(name="awa", type="awa", daemon=true, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
 			arguments={@NameValue(name="includes", value="$args.awaincludes"),
 				@NameValue(name="excludes", value="$args.awaexcludes")}),
-		@Component(name="jcc", type="jcc", daemon=true)
+		@Component(name="jcc", type="jcc", daemon=true, number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0")
+	}),
+	@Configuration(name="allkernels_fixed", components={
+		@Component(name="kernel_component", type="kernel_component", daemon=true),
+		@Component(name="kernel_application", type="kernel_application", daemon=true),
+		@Component(name="kernel_micro", type="kernel_micro", daemon=true),
+		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=true),
+		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=true),
+		@Component(name="rms", type="rms", daemon=true),
+		@Component(name="awa", type="awa", daemon=true, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
+			arguments={@NameValue(name="includes", value="$args.awaincludes"),
+				@NameValue(name="excludes", value="$args.awaexcludes")}),
+		@Component(name="jcc", type="jcc", daemon=true, number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0")
 	})
 })
 public class PlatformAgent extends MicroAgent

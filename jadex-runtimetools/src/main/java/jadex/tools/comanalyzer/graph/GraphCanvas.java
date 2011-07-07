@@ -507,7 +507,7 @@ public class GraphCanvas extends ToolCanvas
 		Set clusterSet = (Set)clusterer.transform(graph);
 //		List edges = clusterer.getEdgesRemoved();
 
-		int i = 0;
+//		int i = 0;
 		// cluster each group of vertices
 		for(Iterator cIt = clusterSet.iterator(); cIt.hasNext();)
 		{
@@ -516,7 +516,7 @@ public class GraphCanvas extends ToolCanvas
 			{
 				groupCluster(vertices);
 			}
-			i++;
+//			i++;
 		}
 	}
 

@@ -74,7 +74,7 @@
 		<!-- Exclude entries for awareness agent. -->
 		<argument name="awaexcludes" class="String">""</argument>
 		<!-- Flag if copying parameters for local service calls is allowed. -->
-		<argument name="parametercopy" class="boolean">false</argument>
+		<argument name="parametercopy" class="boolean">true</argument>
 		
 		<!-- <argument name="platform_shutdown_time">1000</argument> -->
 	</arguments>
@@ -86,6 +86,7 @@
 		<componenttype filename="jadex/bdi/KernelBDI.component.xml" name="kernel_bdi"/>
 		<componenttype filename="jadex/bdibpmn/KernelBDIBPMN.component.xml" name="kernel_bdibpmn"/>
 		<componenttype filename="jadex/bpmn/KernelBPMN.component.xml" name="kernel_bpmn"/>
+		<componenttype filename="jadex/gpmn/KernelGPMN.component.xml" name="kernel_gpmn"/>
 		<componenttype filename="jadex/component/KernelMulti.component.xml" name="kernel_multi"/>
 		<componenttype filename="jadex/base/service/remote/RemoteServiceManagementAgent.class" name="rms"/>
 		<componenttype filename="jadex/base/service/awareness/AwarenessAgent.class" name="awa"/>
@@ -229,6 +230,7 @@
 				<!-- <component type="kernel_bdi" daemon="true"/> -->
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
 				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
+				<component name="kernel_gpmn" type="kernel_gpmn" daemon="true"/>
 				<component name="rms" type="rms" daemon="true"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>
@@ -248,6 +250,7 @@
 				<!-- <component type="kernel_bdi" daemon="true"/> -->
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
 				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
+				<component name="kernel_gpmn" type="kernel_gpmn" daemon="true"/>
 				<component name="rms" type="rms" daemon="true"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>

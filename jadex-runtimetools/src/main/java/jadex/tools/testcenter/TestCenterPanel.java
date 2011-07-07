@@ -626,16 +626,16 @@ public class TestCenterPanel extends JSplitPanel
 		String[]	names	= suite.getTestcaseNames();
 		Testcase[]	testcases	= suite.getTestcases();
 		int performed	= 0;
-		int failed	= 0;
+//		int failed	= 0;
 		for(int i=0; i<testcases.length; i++)
 		{
 			if(testcases[i]!=null && testcases[i].isPerformed())
 			{
 				performed++;
-				if(!testcases[i].isSucceeded())
-				{
-					failed++;
-				}
+//				if(!testcases[i].isSucceeded())
+//				{
+//					failed++;
+//				}
 			}
 		}
 		

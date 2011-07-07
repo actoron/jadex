@@ -3,7 +3,6 @@ package jadex.micro.testcases;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

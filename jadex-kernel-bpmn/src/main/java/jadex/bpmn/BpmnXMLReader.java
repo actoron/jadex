@@ -1349,7 +1349,7 @@ public class BpmnXMLReader
 								if("imports".equals(key))
 								{
 									StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
-									for(int k = 0; stok.hasMoreElements(); k++)
+									while(stok.hasMoreElements())
 									{
 										String imp = stok.nextToken().trim();
 										if(imp.length() > 0)

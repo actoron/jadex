@@ -320,7 +320,7 @@ public class ChartMultiplePiePlot extends MultiplePiePlot
 
 			if(keys != null)
 			{
-				int section = 0;
+//				int section = 0;
 				Iterator iterator = keys.iterator();
 				while(iterator.hasNext())
 				{
@@ -348,7 +348,7 @@ public class ChartMultiplePiePlot extends MultiplePiePlot
 						result.add(item);
 					}
 
-					section++;
+//					section++;
 				}
 			}
 			if(getLimit() > 0.0)

@@ -7,8 +7,6 @@ import jadex.javaparser.IParsedExpression;
  */
 public class TexturedRectangle extends Primitive
 {
-	private static final long	serialVersionUID	= 1L;
-
 	/** Texture path. */
 	protected String			texturePath_;
 

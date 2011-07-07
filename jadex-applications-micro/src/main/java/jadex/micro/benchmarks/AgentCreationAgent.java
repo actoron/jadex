@@ -7,11 +7,11 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
@@ -206,7 +206,7 @@ public class AgentCreationAgent extends MicroAgent
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 				IComponentIdentifier aid = cms.createComponentIdentifier(name, true, null);
-				IResultListener lis = new IResultListener()
+				cms.destroyComponent(aid).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -222,13 +222,7 @@ public class AgentCreationAgent extends MicroAgent
 							killLastPeer(max, killstarttime, dur, pera, omem, upera);
 						}
 					}
-					public void exceptionOccurred(Exception exception)
-					{
-						exception.printStackTrace();
-					}
-				};
-				
-				cms.destroyComponent(aid).addResultListener(lis);
+				});
 			}
 		});
 	}
@@ -239,7 +233,7 @@ public class AgentCreationAgent extends MicroAgent
 	protected void killLastPeer(final int max, final long killstarttime, final double dur, final double pera, 
 		final long omem, final double upera)
 	{
-		getClock().addResultListener(new DefaultResultListener()
+		getClock().addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(final Object result)
 			{
@@ -268,7 +262,7 @@ public class AgentCreationAgent extends MicroAgent
 				setResultValue("micromem", new Tuple(""+upera, "kb"));
 				killComponent();
 			}
-		});
+		}));
 	}
 	
 	protected IFuture	getCMS()
@@ -276,7 +270,8 @@ public class AgentCreationAgent extends MicroAgent
 		IFuture ret = null;	// Uncomment for no caching.
 		if(ret==null)
 		{
-			ret	= getServiceContainer().searchServiceUpwards(IComponentManagementService.class); // Raw service
+			ret	= SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class);  // Raw service
+//			ret	= getServiceContainer().searchServiceUpwards(IComponentManagementService.class); // Decoupled service proxy
 //			cms	= getRequiredService("cmsservice");	// Required service proxy
 		}
 		return ret;
@@ -288,7 +283,8 @@ public class AgentCreationAgent extends MicroAgent
 		IFuture ret = null;	// Uncomment for no caching.
 		if(ret==null)
 		{
-			ret	= getServiceContainer().searchServiceUpwards(IClockService.class); // Raw service
+			ret	= SServiceProvider.getService(getServiceProvider(), IClockService.class);  // Raw service
+//			ret	= getServiceContainer().searchServiceUpwards(IClockService.class); // Decoupled service proxy
 //			clock	= getRequiredService("clockservice");	// Required service proxy
 		}
 		return ret;

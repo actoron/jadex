@@ -3,6 +3,7 @@ package jadex.base.test;
 import jadex.base.SComponentFactory;
 import jadex.base.Starter;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IErrorReport;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -17,6 +18,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -120,24 +122,47 @@ public class ComponentTestSuite extends TestSuite
 				{
 					if(((Boolean)SComponentFactory.isLoadable(rootcomp, abspath).get(ts)).booleanValue())
 					{
-						IModelInfo model = (IModelInfo)SComponentFactory.loadModel(rootcomp, abspath).get(ts);
-						boolean istest = false;
-						if(model!=null && model.getReport()==null)
+						try
 						{
-							IArgument[]	results	= model.getResults();
-							for(int i=0; !istest && i<results.length; i++)
+							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(rootcomp, abspath).get(ts);
+							boolean istest = false;
+							if(model!=null && model.getReport()==null)
 							{
-								if(results[i].getName().equals("testresults") && Testcase.class.equals(results[i].getClazz(model.getClassLoader(), model.getAllImports())))
-									istest	= true;
+								IArgument[]	results	= model.getResults();
+								for(int i=0; !istest && i<results.length; i++)
+								{
+									if(results[i].getName().equals("testresults") && Testcase.class.equals(results[i].getClazz(model.getClassLoader(), model.getAllImports())))
+										istest	= true;
+								}
+							}
+							if(istest)
+							{
+								addTest(new ComponentTest(cms, abspath));
+							}
+							else if(model.getReport()!=null)
+							{
+								addTest(new BrokenComponentTest(abspath, model.getReport()));
 							}
 						}
-						if(istest)
+						catch(final RuntimeException e)
 						{
-							addTest(new ComponentTest(cms, abspath));
-						}
-						else if(model.getReport()!=null)
-						{
-							addTest(new BrokenComponentTest(abspath, model.getReport()));
+							addTest(new BrokenComponentTest(abspath, new IErrorReport()
+							{
+								public String getErrorText()
+								{
+									return "Error loading model: "+e;
+								}
+								
+								public String getErrorHTML()
+								{
+									return getErrorText();
+								}
+								
+								public Map getDocuments()
+								{
+									return null;
+								}
+							}));							
 						}
 					}
 				}

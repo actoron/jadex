@@ -7,9 +7,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.commons.SUtil;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  *  Create a process and the corresponding parameters.

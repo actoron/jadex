@@ -123,7 +123,7 @@ public class DiffusionProcess extends SimplePropertyObject implements ISpaceProc
 				}
 			}
 			
-			double sum = 0;
+//			double sum = 0;
 			for(int x=0; x<sizex; x++)
 			{
 				for(int y=0; y<sizey; y++)
@@ -133,7 +133,7 @@ public class DiffusionProcess extends SimplePropertyObject implements ISpaceProc
 					double cool = oldheat*cooling;
 					double newheat = Math.max(0, oldheat+adds[x][y]-cool);
 					patch.setProperty("heat", new Double(newheat));
-					sum += newheat;
+//					sum += newheat;
 				}
 			}		
 //			System.out.println("Sum is: "+sum);

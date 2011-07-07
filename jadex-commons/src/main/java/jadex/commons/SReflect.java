@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
@@ -132,7 +131,6 @@ public class SReflect
 		
 		Object ret = basictypes.get(name);
 			
-		//		System.out.println("cFN0 cache: "+clazz);
 		if(ret==null)
 		{
 			if(classloader==null)
@@ -148,6 +146,8 @@ public class SReflect
 			
 			if(ret==null)
 			{
+//				System.out.println("cFN0 cachemiss: "+name);
+				
 				// For arrays get plain name and count occurrences of '['.
 				String	clname	= name;
 				if(clname.indexOf('[')!=-1)
@@ -508,111 +508,82 @@ public class SReflect
 	public static Class	findClass0(String clname, String[] imports, ClassLoader classloader)
 	{
 		Class	clazz	= null;
-		
-//		if(clname.indexOf("MTransport")!=-1)
-//			System.out.println("+++fC: "+clname+" "+imports);
-	
-		// Try to find in cache.
-		boolean	cachemiss	= false;
 		Map	cache	= (Map)classcache.get(classloader);
-		if(cache!=null)
+		if(cache==null)
 		{
-			// Hack!!! Tuple should be immutable, but currently doesn't copy entries, so we can do this to reduce number of created tuples
-			Object[]	entities	= new Object[]{clname, null};
-			Tuple	tuple	= new Tuple(entities);
+			cache	= Collections.synchronizedMap(new HashMap());
+			classcache.put(classloader, cache);
+		}
 
-			if(cache.containsKey(tuple))
-			{
-				clazz	= (Class)cache.get(tuple);
-			}
-			else
-			{
-				cachemiss	= true;
-			}
+		// Hack!!! Tuple should be immutable, but currently doesn't copy entries, so we can do this to reduce number of created tuples
+		Object[]	entities	= new Object[]{clname, null};
+		Tuple	tuple	= new Tuple(entities);
+
+		// Try to find fully qualified.
+		if(cache.containsKey(tuple))
+		{
+			clazz	= (Class)cache.get(tuple);
+		}
+		else
+		{
+			clazz	= classForName0(clname, classloader);
+			cache.put(new Tuple(clname, null), clazz);
+		}
 			
-			if(clazz==null && imports!=null)
+		// Try to find in imports.
+		if(clazz==null && imports!=null)
+		{
+			for(int i=0; clazz==null && i<imports.length; i++)
 			{
-				for(int i=0; clazz==null && i<imports.length; i++)
-				{
-					entities[1]	= imports[i];	
-					if(cache.containsKey(tuple))
-					{
-						clazz	= (Class)cache.get(tuple);
-					}
-					else
-					{
-						cachemiss	= true;
-					}
-				}
-			}
-			if(clazz==null)
-			{
-				entities[1]	= "java.lang.*";
+				entities[1]	= imports[i];	
 				if(cache.containsKey(tuple))
 				{
 					clazz	= (Class)cache.get(tuple);
 				}
 				else
 				{
-					cachemiss	= true;
-				}
-			}
-		}
-		else
-		{
-			cachemiss	= true;
-			cache	= Collections.synchronizedMap(new HashMap());
-			classcache.put(classloader, cache);
-		}
-
-		if(clazz==null && cachemiss)
-		{
-			// Try to find fully qualified.
-			clazz	= classForName0(clname, classloader);
-			cache.put(new Tuple(clname, null), clazz);
-	
-			// Try to find in imports.
-			if(clazz==null && imports!=null)
-			{
-				String	clwoa	=	clname;
-				String	brackets	= "";
-				while(clwoa.endsWith("[]"))
-				{
-					clwoa	= clwoa.substring(0, clwoa.length()-2);
-					brackets	+= "[]";
-				} 
-
-				for(int i=0; clazz==null && i<imports.length; i++)
-				{
+					String	clwoa	=	clname;
+					String	brackets	= "";
+					while(clwoa.endsWith("[]"))
+					{
+						clwoa	= clwoa.substring(0, clwoa.length()-2);
+						brackets	+= "[]";
+					}
+					
 					// Package import
 					if(imports[i].endsWith(".*"))
 					{
-						clazz	= classForName0(
-							imports[i].substring(0, imports[i].length()-1) + clname, classloader);
-	//					System.out.println("+++cFN1: "+imp.substring(0, imp.length()-1) + clname+", "+clazz);
+						clazz	= classForName0(imports[i].substring(0, imports[i].length()-1) + clname, classloader);
 					}
 					// Class import
 					else if(imports[i].endsWith(clwoa))
 					{
 						clazz	= classForName0(imports[i]+brackets, classloader);
-	//					System.out.println("+++cFN2: "+imp+", "+clazz);
 					}
 					cache.put(new Tuple(clname, imports[i]), clazz);
 				}
 			}
-	
-			// Try java.lang (imported by default).
-			if(clazz==null)
+		}
+		
+		// Try java.lang (imported by default).
+		if(clazz==null)
+		{
+			entities[1]	= "java.lang.*";
+			if(cache.containsKey(tuple))
+			{
+				clazz	= (Class)cache.get(tuple);
+			}
+			else
 			{
 				clazz	= classForName0("java.lang." + clname, classloader);
 				cache.put(new Tuple(clname, "java.lang.*"), clazz);
 			}
-			
-//			if(clazz==null)
-//			{
-//				System.err.println("Class not found: "+clname+", "+SUtil.arrayToString(imports));
-//			}
 		}
+
+//		if(clazz==null)
+//		{
+//			System.err.println("Class not found: "+clname+", "+SUtil.arrayToString(imports));
+//		}
 		
 		return clazz;
 	}

@@ -31,7 +31,7 @@ public abstract class HandleForcesPlan extends Plan
 			int number = ((Integer)disaster.getProperty(typename)).intValue();
 			final IBeliefSet busy = getBeliefbase().getBeliefSet("busy_entities");	
 							
-			int as = 0;
+//			int as = 0;
 			if(forces.size()>0)
 			{
 				List fs = new ArrayList(forces);
@@ -44,7 +44,7 @@ public abstract class HandleForcesPlan extends Plan
 					final Object provid = force.getServiceIdentifier().getProviderId();
 					if(!busy.containsFact(provid))
 					{
-						as++;
+//						as++;
 						busy.addFact(provid);
 						getParameterSet("units").addValue(force);
 					

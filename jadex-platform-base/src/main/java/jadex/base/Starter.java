@@ -349,7 +349,7 @@ public class Starter
 									}
 								});
 								
-								boolean copy = ((Boolean)getArgumentValue(PARAMETERCOPY, model, cmdargs, compargs)).booleanValue();
+								boolean copy = !Boolean.FALSE.equals(getArgumentValue(PARAMETERCOPY, model, cmdargs, compargs));
 								cfac.createComponentInstance(desc, afac, model, getConfigurationName(model, cmdargs),
 									compargs, null, null, copy, future).addResultListener(new SwingDefaultResultListener()
 								{
