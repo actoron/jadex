@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.IRemotable;
 import jadex.commons.future.IFuture;
 
@@ -9,7 +10,8 @@ import java.util.Map;
 /**
  *  Interface for locally listening to element changes.
  */
-public interface ICMSComponentListener extends IRemotable
+@Reference
+public interface ICMSComponentListener //extends IRemotable
 {
 	/**
 	 *  Called when a new element has been added.

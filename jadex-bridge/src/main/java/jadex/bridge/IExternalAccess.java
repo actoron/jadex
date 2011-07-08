@@ -10,7 +10,7 @@ import jadex.commons.future.IFuture;
  *  The interface for accessing components from the outside.
  */
 @Reference
-public interface IExternalAccess extends IRemotable
+public interface IExternalAccess //extends IRemotable
 {
 	//-------- cache --------
 	

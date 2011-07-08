@@ -47,10 +47,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 
 	/** The proxy reference. */
 	protected ProxyReference pr;
-	
-	/** The rmi preprocessor. */
-	protected RMIPreProcessor preproc;
-	
+		
 	//-------- constructors --------
 	
 	/**
@@ -60,7 +57,6 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	{
 		this.rsms = rsms;
 		this.pr = pr;
-		this.preproc = new RMIPreProcessor(rsms.getRemoteReferenceModule());
 //		System.out.println("handler: "+pi.getServiceIdentifier().getServiceType()+" "+pi.getCache());
 	}
 	
@@ -137,33 +133,8 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 //			if("getServices".equals(method.getName()))
 //				debugcallid	= callid;
 			
-			// Preprocess arguments and replace them if they are remote references.
-			if(args.length>0 && !pr.getRemoteReference().isObjectReference())
-			{
-				boolean[] refs = SServiceProvider.getRemoteReferenceInfo(method, true);
-				IComponentIdentifier rec = null;
-				Object ti = pr.getRemoteReference().getTargetIdentifier();
-				if(ti instanceof IComponentIdentifier)
-				{
-					rec = (IComponentIdentifier)ti;
-				}
-				else if(ti instanceof IServiceIdentifier)
-				{
-					rec = (IComponentIdentifier)((IServiceIdentifier)ti).getProviderId();
-				}
-				WriteContext context = new WriteContext(null, rec, null, null);
-				for(int i=0; i<args.length; i++)
-				{
-					if(refs[i] || SServiceProvider.isRemoteReference(args[i]))
-					{
-						System.out.println("found ref: "+args[i]);
-						args[i] = preproc.preProcess(context, args[i]);
-					}
-				}
-			}
-			
 			final RemoteMethodInvocationCommand content = new RemoteMethodInvocationCommand(
-				pr.getRemoteReference(), method.getName(), method.getParameterTypes(), args, callid);
+				pr.getRemoteReference(), method, args, callid);
 			
 			// Can be invoked directly, because internally redirects to agent thread.
 			rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
@@ -206,7 +177,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	{
 		return pr;
 	}
-
+	
 	/**
 	 *  Test equality.
 	 */

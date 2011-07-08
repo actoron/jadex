@@ -11,7 +11,7 @@ import java.util.Map;
  *  The interface for platform services.
  */
 @Reference
-public interface IService extends IRemotable
+public interface IService //extends IRemotable
 {
 	//-------- constants --------
 	

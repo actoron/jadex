@@ -1,8 +1,10 @@
 package jadex.base.service.remote;
 
 import jadex.base.fipa.SFipa;
+import jadex.base.service.remote.commands.AbstractRemoteCommand;
 import jadex.base.service.remote.commands.RemoteResultCommand;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IRemoteServiceManagementService;
 import jadex.bridge.MessageType;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -133,7 +135,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								else
 								{
 //									content	= null;
-									content = new RemoteResultCommand(null, new RuntimeException("Errors during XML decoding: "+errors), callid);
+									content = new RemoteResultCommand(null, new RuntimeException("Errors during XML decoding: "+errors), callid, false);
 								}
 								getLogger().info("Remote service management service could not decode message from: "+msg.get(SFipa.SENDER));
 //								getLogger().warning("Remote service management service could not decode message."+orig+"\n"+errors);
@@ -142,7 +144,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						catch(Exception e)
 						{
 //							content	= null;
-							content = new RemoteResultCommand(null, e, callid);
+							content = new RemoteResultCommand(null, e, callid, false);
 							getLogger().info("Remote service management service could not decode message from: "+msg.get(SFipa.SENDER));
 //							getLogger().warning("Remote service management service could not decode message."+orig);
 //							e.printStackTrace();
@@ -161,6 +163,9 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								if(result!=null)
 								{
 									final Object repcontent = result;
+									if(repcontent instanceof AbstractRemoteCommand)
+										((AbstractRemoteCommand)repcontent).preprocessCommand(rms.getRemoteReferenceModule(), (IComponentIdentifier)msg.get(SFipa.SENDER));
+									
 									createReply(msg, mt).addResultListener(createResultListener(new DefaultResultListener()
 									{
 										public void resultAvailable(Object result)

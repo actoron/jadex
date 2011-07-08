@@ -630,8 +630,8 @@ public class SServiceProvider
 	 */
 	public static boolean isReference(Object object, boolean local)
 	{
-		boolean ret = object==null || object instanceof IRemotable || object instanceof IFuture;
-//			|| object instanceof IService || object instanceof IExternalAccess;
+		boolean ret = object==null || object instanceof IRemotable || (local && object instanceof IFuture);
+//			|| object instanceof IService;// || object instanceof IExternalAccess;
 		
 		if(!ret && object!=null)
 		{
@@ -678,29 +678,31 @@ public class SServiceProvider
 			}
 		}
 		
+//		System.out.println("object ref? "+ret+" "+object.getClass()+" "+object);
+		
 		return ret;
 	}
 	
 	/**
 	 *  Get the copy info for method parameters.
 	 */
-	public static boolean[] getLocalReferenceInfo(Method method, boolean copydefault)
+	public static boolean[] getLocalReferenceInfo(Method method, boolean refdef)
 	{
-		return getReferenceInfo(method, copydefault, true);
+		return getReferenceInfo(method, refdef, true);
 	}
 	
 	/**
 	 *  Get the copy info for method parameters.
 	 */
-	public static boolean[] getRemoteReferenceInfo(Method method, boolean copydefault)
+	public static boolean[] getRemoteReferenceInfo(Method method, boolean refdef)
 	{
-		return getReferenceInfo(method, copydefault, false);
+		return getReferenceInfo(method, refdef, false);
 	}
 	
 	/**
 	 *  Get the copy info for method parameters.
 	 */
-	public static boolean[] getReferenceInfo(Method method, boolean copydefault, boolean local)
+	public static boolean[] getReferenceInfo(Method method, boolean refdef, boolean local)
 	{
 		boolean[] ret;
 		Object[] tmp = (Object[])methodreferences.get(method);
@@ -717,8 +719,8 @@ public class SServiceProvider
 			for(int i=0; i<params; i++)
 			{
 				Annotation[][] ann = method.getParameterAnnotations();
-				localret[i] = !copydefault;
-				remoteret[i] = !copydefault;
+				localret[i] = refdef;
+				remoteret[i] = refdef;
 				for(int j=0; j<ann[i].length; j++)
 				{
 					if(ann[i][j] instanceof Reference)
@@ -734,6 +736,30 @@ public class SServiceProvider
 			methodreferences.put(method, new Object[]{localret, remoteret});
 			ret = local? localret: remoteret;
 		}
+		return ret;
+	}
+	
+	/**
+	 *  Test if return value is local reference.
+	 */
+	public static boolean isReturnValueLocalReference(Method method, boolean refdef)
+	{
+		boolean ret = refdef;
+		Reference ref = (Reference)method.getAnnotation(Reference.class);
+		if(ref!=null)
+			ret = ref.local();
+		return ret;
+	}
+	
+	/**
+	 *  Get the copy info for method parameters.
+	 */
+	public static boolean isReturnValueRemoteReference(Method method, boolean refdef)
+	{
+		boolean ret = refdef;
+		Reference ref = (Reference)method.getAnnotation(Reference.class);
+		if(ref!=null)
+			ret = ref.remote();
 		return ret;
 	}
 	

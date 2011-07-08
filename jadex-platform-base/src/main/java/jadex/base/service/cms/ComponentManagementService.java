@@ -28,7 +28,6 @@ import jadex.bridge.service.ServiceNotFoundException;
 import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.bridge.service.execution.IExecutionService;
 import jadex.bridge.service.library.ILibraryService;
-import jadex.commons.IRemotable;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
@@ -276,7 +275,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		if(cinfo.getParent()!=null && isRemoteComponent(cinfo.getParent()))
 		{
 			final IResultListener	rkilllis;
-			if(killlistener!=null && !(killlistener instanceof IRemotable))
+			if(killlistener!=null && !SServiceProvider.isRemoteReference(killlistener))//(killlistener instanceof IRemotable))
 			{
 				Future	kill	= new Future();
 				rkilllis	= new RemoteDelegationResultListener(kill);

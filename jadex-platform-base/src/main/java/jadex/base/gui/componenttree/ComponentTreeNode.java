@@ -352,11 +352,18 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 									{
 										for(int i=0; i<services.size(); i++)
 										{
+											try
+											{
 											IService service	= (IService)services.get(i);
 											ProvidedServiceNode	sn	= (ProvidedServiceNode)getModel().getNode(service.getServiceIdentifier());
 											if(sn==null)
 												sn	= new ProvidedServiceNode(scn, getModel(), getTree(), service);
 											subchildren.add(sn);
+											}
+											catch(Exception e)
+											{
+												e.printStackTrace();
+											}
 										}
 									}
 									

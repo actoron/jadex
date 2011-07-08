@@ -1,5 +1,6 @@
 package jadex.bridge.service;
 
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.IRemotable;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;

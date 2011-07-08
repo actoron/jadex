@@ -1,6 +1,5 @@
 package jadex.base.service.remote.commands;
 
-import jadex.base.service.remote.IRemoteCommand;
 import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
@@ -23,7 +22,7 @@ import java.util.List;
 /**
  *  Command for performing a remote service search.
  */
-public class RemoteSearchCommand implements IRemoteCommand
+public class RemoteSearchCommand extends AbstractRemoteCommand
 {
 	//-------- attributes --------
 
@@ -120,26 +119,26 @@ public class RemoteSearchCommand implements IRemoteCommand
 									content = service;
 								}
 								
-								ret.setResult(new RemoteResultCommand(content, null , callid));
+								ret.setResult(new RemoteResultCommand(content, null , callid, false));
 							}
 							
 							public void exceptionOccurred(Exception exception)
 							{
-								ret.setResult(new RemoteResultCommand(null, exception, callid));
+								ret.setResult(new RemoteResultCommand(null, exception, callid, false));
 							}
 						});
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						ret.setResult(new RemoteResultCommand(null, exception, callid));
+						ret.setResult(new RemoteResultCommand(null, exception, callid, false));
 					}
 				});
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setResult(new RemoteResultCommand(null, exception, callid));
+				ret.setResult(new RemoteResultCommand(null, exception, callid, false));
 			}
 		});
 		

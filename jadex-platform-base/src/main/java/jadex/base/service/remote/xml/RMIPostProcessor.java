@@ -37,7 +37,15 @@ public class RMIPostProcessor implements IPostProcessor
 	 */
 	public Object postProcess(IContext context, Object object)
 	{
-		return rrm.getProxy((ProxyReference)object);
+		try
+		{
+			return rrm.getProxy((ProxyReference)object);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/**

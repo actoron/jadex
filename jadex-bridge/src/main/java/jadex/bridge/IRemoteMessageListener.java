@@ -1,11 +1,12 @@
 package jadex.bridge;
 
-import jadex.commons.IRemotable;
+import jadex.bridge.service.annotation.Reference;
 
 
 /**
  *  Message service listener interface.
  */
-public interface IRemoteMessageListener	extends IMessageListener, IRemotable
+@Reference
+public interface IRemoteMessageListener	extends IMessageListener//, IRemotable
 {
 }

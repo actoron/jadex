@@ -1,14 +1,15 @@
 package jadex.bridge;
 
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.IFilter;
-import jadex.commons.IRemotable;
 import jadex.commons.future.IFuture;
 
 /**
  *  Interface for entities that want to be 
  *  notified on certain component lifecycle events.
  */
-public interface IComponentListener extends IRemotable
+@Reference
+public interface IComponentListener //extends IRemotable
 {
 	/**
 	 *  Returns an event filter, indicating which events

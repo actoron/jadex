@@ -1597,7 +1597,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public IServiceContainer getServiceContainer()
 	{
-		assert container!=null;
+//		assert container!=null;
+		if(container==null)
+			container = createServiceContainer();
 		return container;
 	}
 	

@@ -1,6 +1,7 @@
 package jadex.base.service.remote;
 
 import jadex.base.fipa.SFipa;
+import jadex.base.service.remote.commands.AbstractRemoteCommand;
 import jadex.base.service.remote.commands.RemoteGetExternalAccessCommand;
 import jadex.base.service.remote.commands.RemoteSearchCommand;
 import jadex.base.service.remote.xml.RMIPostProcessor;
@@ -41,8 +42,10 @@ import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.Reader;
+import jadex.xml.writer.WriteContext;
 import jadex.xml.writer.Writer;
 
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -128,7 +131,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		typeinfosread.add(ti_rr);
 		
 		Set typeinfoswrite = JavaWriter.getTypeInfos();
-		TypeInfo ti_proxyable = new TypeInfo(new XMLInfo(pr, null, false, new RMIPreProcessor(rrm)), 
+		final RMIPreProcessor preproc = new RMIPreProcessor(rrm);
+		TypeInfo ti_proxyable = new TypeInfo(new XMLInfo(pr, null, false, preproc), 
 			new ObjectInfo(IRemotable.class));
 		typeinfoswrite.add(ti_proxyable);
 		
@@ -141,7 +145,22 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				errors.add(new Tuple(new Object[]{message, error, info, location}));
 			}
 		}, new BeanObjectReaderHandler(typeinfosread));
-		this.writer = new Writer(new BeanObjectWriterHandler(typeinfoswrite, true));
+		this.writer = new Writer(new BeanObjectWriterHandler(typeinfoswrite, true))
+		{
+			public void writeObject(WriteContext wc, Object object, QName tag) throws Exception 
+			{
+				if(SServiceProvider.isRemoteReference(object))
+				{
+//					System.out.println("changed: "+object.getClass()+" "+object);
+					object = preproc.preProcess(wc, object);
+				}
+//				else
+//				{
+//					System.out.println("kept: "+object.getClass()+" "+object);
+//				}
+				super.writeObject(wc, object, tag);
+			};
+		};
 	}
 	
 	//-------- methods --------
@@ -392,6 +411,11 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			@XMLClassname("sendMessage")
 			public Object execute(final IInternalAccess ia)
 			{
+				if(content instanceof AbstractRemoteCommand)
+				{
+					((AbstractRemoteCommand)content).preprocessCommand(rrm, receiver);
+				}
+				
 				final long timeout = to<=0? DEFAULT_TIMEOUT: to;
 				
 				putWaitingCall(callid, future);

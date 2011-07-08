@@ -1,12 +1,18 @@
 package jadex.base.service.remote.commands;
 
 import jadex.base.service.remote.IRemoteCommand;
+import jadex.base.service.remote.ProxyReference;
 import jadex.base.service.remote.RemoteReference;
+import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.base.service.remote.RemoteServiceManagementService;
+import jadex.base.service.remote.xml.RMIPreProcessor;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.IMicroExternalAccess;
+import jadex.xml.writer.WriteContext;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -14,12 +20,16 @@ import java.lang.reflect.Method;
 /**
  *  Command for executing a remote method.
  */
-public class RemoteMethodInvocationCommand implements IRemoteCommand
+public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 {
 	//-------- attributes --------
 	
 	/** The remote reference. */
 	protected RemoteReference rr;
+	
+	/** The method. */
+	// Is not transferred, only used for preprocessing
+	protected Method method;
 	
 	/** The methodname. */
 	protected String methodname;
@@ -29,6 +39,9 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 	
 	/** The parameter values. */
 	protected Object[] parametervalues;
+	
+	/** The declared reference flag for the return value. */
+	protected boolean returnisref;
 	
 	/** The call identifier. */
 	protected String callid;
@@ -45,12 +58,13 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 	/**
 	 *  Create a new remote method invocation command. 
 	 */
-	public RemoteMethodInvocationCommand(RemoteReference rr, String methodname, 
-		Class[] parametertypes, Object[] parametervalues, String callid)
+	public RemoteMethodInvocationCommand(RemoteReference rr, Method method, 
+		Object[] parametervalues, String callid)
 	{
 		this.rr = rr;
-		this.methodname = methodname;
-		this.parametertypes = parametertypes;
+		this.method = method;
+		this.methodname = method.getName();
+		this.parametertypes = method.getParameterTypes();
 		this.parametervalues = parametervalues;
 		this.callid = callid;
 //		System.out.println("rmi on client: "+callid+" "+methodname);
@@ -58,6 +72,28 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 	
 	//-------- methods --------
 
+	/**
+	 *  Preprocess command and replace  if they are remote references.
+	 */
+	public void preprocessCommand(RemoteReferenceModule rrm, IComponentIdentifier target)
+	{
+		if(parametervalues.length>0)
+		{
+			RMIPreProcessor preproc = new RMIPreProcessor(rrm);
+			boolean[] refs = SServiceProvider.getRemoteReferenceInfo(method, false);
+			WriteContext context = new WriteContext(null, target, null, null);
+			for(int i=0; i<parametertypes.length; i++)
+			{
+				if(refs[i] || SServiceProvider.isRemoteReference(parametervalues[i]))
+				{
+					System.out.println("found ref: "+parametervalues[i]);
+					parametervalues[i] = preproc.preProcess(context, parametervalues[i]);
+				}
+			}
+			returnisref = SServiceProvider.isReturnValueRemoteReference(method, false);
+		}
+	}
+	
 	/**
 	 *  Execute the command.
 	 *  @param lrms The local remote management service.
@@ -78,7 +114,8 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setResult(new RemoteResultCommand(null, new RuntimeException("Target object not found: "+getRemoteReference()), callid));
+				ret.setResult(new RemoteResultCommand(null, new RuntimeException(
+					"Target object not found: "+getRemoteReference()), callid, false));
 			}
 		});
 		
@@ -188,18 +225,18 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 				{
 					public void resultAvailable(Object result)
 					{
-						ret.setResult(new RemoteResultCommand(result, null, callid));
+						ret.setResult(new RemoteResultCommand(result, null, callid, returnisref));
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						ret.setResult(new RemoteResultCommand(null, exception, callid));
+						ret.setResult(new RemoteResultCommand(null, exception, callid, false));
 					}
 				});
 			}
 			else
 			{
-				ret.setResult(new RemoteResultCommand(res, null, callid));
+				ret.setResult(new RemoteResultCommand(res, null, callid, returnisref));
 			}
 		}
 		catch(Exception exception)
@@ -209,7 +246,7 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 			{
 				exception	= (Exception)((InvocationTargetException)exception).getTargetException();
 			}
-			ret.setResult(new RemoteResultCommand(null, exception, callid));
+			ret.setResult(new RemoteResultCommand(null, exception, callid, false));
 		}
 	}
 	
@@ -304,6 +341,24 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 	public void setRemoteReference(RemoteReference rr)
 	{
 		this.rr = rr;
+	}
+	
+	/**
+	 *  Get the returnisref.
+	 *  @return the returnisref.
+	 */
+	public boolean isReturnValueReference()
+	{
+		return returnisref;
+	}
+
+	/**
+	 *  Set the returnisref.
+	 *  @param returnisref The returnisref to set.
+	 */
+	public void setReturnValueReference(boolean returnisref)
+	{
+		this.returnisref = returnisref;
 	}
 
 	/**

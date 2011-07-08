@@ -3,6 +3,7 @@ package jadex.base.service.remote.xml;
 import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.IRemotable;
 import jadex.commons.SReflect;
 import jadex.xml.IContext;
@@ -62,18 +63,34 @@ public class RMIPreProcessor implements IPreProcessor
 		
 		if(object!=null)
 		{
-			Class clazz = object.getClass();
-			while(clazz!=null)
+			List todo = new ArrayList();
+			todo.add(object.getClass());
+			
+			while(todo.size()>0)
 			{
+				Class clazz = (Class)todo.remove(0);
+				if(clazz.isInterface())
+				{
+					boolean isref = SReflect.isSupertype(IRemotable.class, clazz);
+					if(!isref)
+					{
+						Reference ref = (Reference)clazz.getAnnotation(Reference.class);
+						isref = ref!=null && ref.remote();
+					}
+					if(isref)
+					{
+						if(!ret.contains(clazz))
+							ret.add(clazz);
+					}
+				}
+				Class superclazz = clazz.getSuperclass();
+				if(superclazz!=null && !superclazz.equals(Object.class))
+					todo.add(superclazz);
 				Class[] interfaces = clazz.getInterfaces();
 				for(int i=0; i<interfaces.length; i++)
 				{
-					if(SReflect.isSupertype(IRemotable.class, interfaces[i]))
-					{
-						ret.add(interfaces[i]);
-					}
+					todo.add(interfaces[i]);
 				}
-				clazz = clazz.getSuperclass();
 			}
 			
 			if(object instanceof IService)

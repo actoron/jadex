@@ -1,6 +1,5 @@
 package jadex.base.service.remote.commands;
 
-import jadex.base.service.remote.IRemoteCommand;
 import jadex.base.service.remote.RemoteReference;
 import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.IComponentIdentifier;
@@ -11,7 +10,7 @@ import jadex.micro.IMicroExternalAccess;
 /**
  *  Distributed garbage collection 'addRef(rr)' command.
  */
-public class RemoteDGCAddReferenceCommand implements IRemoteCommand
+public class RemoteDGCAddReferenceCommand extends AbstractRemoteCommand
 {
 	//-------- attributes --------
 	
@@ -58,7 +57,7 @@ public class RemoteDGCAddReferenceCommand implements IRemoteCommand
 		try
 		{
 			rsms.getRemoteReferenceModule().addRemoteReference(rr, holder);
-			ret.setResult(new RemoteResultCommand(null, null, callid));
+			ret.setResult(new RemoteResultCommand(null, null, callid, false));
 		}
 		catch(Exception e)
 		{

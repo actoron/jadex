@@ -2,16 +2,21 @@ package jadex.base.service.remote.commands;
 
 import jadex.base.service.remote.ExceptionInfo;
 import jadex.base.service.remote.IRemoteCommand;
+import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.base.service.remote.RemoteServiceManagementService;
+import jadex.base.service.remote.xml.RMIPreProcessor;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.IMicroExternalAccess;
+import jadex.xml.writer.WriteContext;
 
 /**
  *  Command that represents the result(s) of a remote command.
  *  Notifies the caller about the result.
  */
-public class RemoteResultCommand implements IRemoteCommand
+public class RemoteResultCommand extends AbstractRemoteCommand
 {
 	//-------- attributes --------
 	
@@ -23,6 +28,9 @@ public class RemoteResultCommand implements IRemoteCommand
 	
 	/** The callid. */
 	protected String callid;
+	
+	/** The falg if result is declared as reference. */
+	protected boolean isref;
 	
 	//-------- constructors --------
 	
@@ -36,15 +44,35 @@ public class RemoteResultCommand implements IRemoteCommand
 	/**
 	 *  Create a new remote result command.
 	 */
-	public RemoteResultCommand(Object result, Exception exception, String callid)
+	public RemoteResultCommand(Object result, Exception exception, String callid, boolean isref)
 	{
 //		System.out.println("result command: "+result+" "+callid);
 		this.result = result;
 		this.exceptioninfo = exception!=null? new ExceptionInfo(exception): null;
 		this.callid = callid;
+		this.isref = isref;
+		
+		if(isref)
+			System.out.println("hhhhu");
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Preprocess command and replace  if they are remote references.
+	 */
+	public void preprocessCommand(RemoteReferenceModule rrm, IComponentIdentifier target)
+	{
+		if(result!=null)
+		{
+			if(isref || SServiceProvider.isRemoteReference(result))
+			{
+				RMIPreProcessor preproc = new RMIPreProcessor(rrm);
+				WriteContext context = new WriteContext(null, target, null, null);
+				result = preproc.preProcess(context, result);
+			}
+		}
+	}
 	
 	/**
 	 *  Execute the command.

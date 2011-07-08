@@ -1,6 +1,5 @@
 package jadex.base.service.remote.commands;
 
-import jadex.base.service.remote.IRemoteCommand;
 import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
@@ -14,7 +13,7 @@ import jadex.micro.IMicroExternalAccess;
 /**
  *  Command for getting a remote external access.
  */
-public class RemoteGetExternalAccessCommand implements IRemoteCommand
+public class RemoteGetExternalAccessCommand extends AbstractRemoteCommand
 {
 	//-------- attributes --------
 	
@@ -71,19 +70,19 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 					{
 						IExternalAccess exta = (IExternalAccess)result;
 //						ProxyInfo pi = RemoteServiceManagementService.getProxyInfo(component.getComponentIdentifier(), cid, exta);
-						ret.setResult(new RemoteResultCommand(exta, null, callid));
+						ret.setResult(new RemoteResultCommand(exta, null, callid, true));
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						ret.setResult(new RemoteResultCommand(null, exception, callid));
+						ret.setResult(new RemoteResultCommand(null, exception, callid, false));
 					}
 				});
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setResult(new RemoteResultCommand(null, exception, callid));
+				ret.setResult(new RemoteResultCommand(null, exception, callid, false));
 			}
 		});
 		

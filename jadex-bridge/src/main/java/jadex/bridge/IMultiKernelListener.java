@@ -1,13 +1,14 @@
 package jadex.bridge;
 
-import jadex.commons.IRemotable;
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.IFuture;
 
 /**
  *  Kernel listener.
  *
  */
-public interface IMultiKernelListener extends IRemotable
+@Reference
+public interface IMultiKernelListener //extends IRemotable
 {
 	/**
 	 *  Called when new component types become available.

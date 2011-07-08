@@ -103,7 +103,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		if(copy && !sic.isRemoteCall())
 		{
 			Method method = sic.getMethod();
-			boolean[] refs = SServiceProvider.getLocalReferenceInfo(method, copy);
+			boolean[] refs = SServiceProvider.getLocalReferenceInfo(method, !copy);
 			
 			Object[] args = sic.getArgumentArray();
 			List copyargs = new ArrayList(); 
