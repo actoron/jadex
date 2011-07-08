@@ -109,7 +109,14 @@ public class StarterPluginPanel extends JPanel
 				if(node instanceof IFileNode && spanel!=null && spanel.lastfile!=null)
 				{
 					String	 path	= ((IFileNode)node).getFilePath();
-					System.out.println("path: "+path+", "+spanel.lastfile);
+					if(spanel.lastfile.startsWith(path))
+					{
+						
+					}
+					else
+					{
+						
+					}
 				}
 				super.removeTopLevelNode(node);
 			}

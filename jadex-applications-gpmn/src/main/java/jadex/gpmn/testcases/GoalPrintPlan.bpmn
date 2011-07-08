@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_slPC4alwEeCctOpIadPH1A" iD="_slPC4KlwEeCctOpIadPH1A">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_oiP5IKlxEeCEIvFWVERAlQ" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oiP5IalxEeCEIvFWVERAlQ" key="package" value="jadex.gpmn.textcases"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oiP5IalxEeCEIvFWVERAlQ" key="package" value="jadex.gpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_opV_oKlxEeCEIvFWVERAlQ" key="editor_version" value="1.0"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_slb3MKlwEeCctOpIadPH1A" iD="_slbQIKlwEeCctOpIadPH1A" name="Body">
