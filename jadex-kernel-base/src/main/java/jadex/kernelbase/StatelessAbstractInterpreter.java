@@ -353,62 +353,71 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
-		final Future ret = new Future();
+		final Future fut = new Future();
+		IFuture	ret	= fut;
 		
-		initFutureProperties(model).addResultListener(
-			createResultListener(new DelegationResultListener(ret)
+		if(config!=null && model.getConfiguration(config)==null)
 		{
-			public void customResultAvailable(Object result)
+			fut.setException(new RuntimeException("No such configuration in model: "+model.getFullName()+", "+config));
+		}
+		else
+		{
+			initFutureProperties(model).addResultListener(
+				createResultListener(new DelegationResultListener(fut)
 			{
-				initArguments(model, config).addResultListener(
-					createResultListener(new DelegationResultListener(ret)
+				public void customResultAvailable(Object result)
 				{
-					public void customResultAvailable(Object result)
+					initArguments(model, config).addResultListener(
+						createResultListener(new DelegationResultListener(fut)
 					{
-						initExtensions(model, config).addResultListener(
-							createResultListener(new DelegationResultListener(ret)
+						public void customResultAvailable(Object result)
 						{
-							public void customResultAvailable(Object result)
+							initExtensions(model, config).addResultListener(
+								createResultListener(new DelegationResultListener(fut)
 							{
-								initServices(model, config).addResultListener(
-									createResultListener(new DelegationResultListener(ret)
+								public void customResultAvailable(Object result)
 								{
-									public void customResultAvailable(Object result)
+									initServices(model, config).addResultListener(
+										createResultListener(new DelegationResultListener(fut)
 									{
-										initComponents(model, config).addResultListener(
-											createResultListener(new DelegationResultListener(ret)
+										public void customResultAvailable(Object result)
 										{
-											public void customResultAvailable(Object result)
+											initComponents(model, config).addResultListener(
+												createResultListener(new DelegationResultListener(fut)
 											{
-												super.customResultAvailable(new Object[]{StatelessAbstractInterpreter.this, getComponentAdapter()});
-											}		
-										}));
-									}
-								}));
-							}
-						}));
-					}
-				}));
-			}
-		}));
-		
-		final Future iret = new Future();
-		ret.addResultListener(createResultListener(new DelegationResultListener(iret)
-		{
-			public void exceptionOccurred(final Exception exception)
+												public void customResultAvailable(Object result)
+												{
+													super.customResultAvailable(new Object[]{StatelessAbstractInterpreter.this, getComponentAdapter()});
+												}		
+											}));
+										}
+									}));
+								}
+							}));
+						}
+					}));
+				}
+			}));
+			
+			// Terminate extensions on error.
+			final Future iret = new Future();
+			fut.addResultListener(createResultListener(new DelegationResultListener(iret)
 			{
-				terminateExtensions().addResultListener(new DelegationResultListener(iret)
+				public void exceptionOccurred(final Exception exception)
 				{
-					public void customResultAvailable(Object result)
+					terminateExtensions().addResultListener(new DelegationResultListener(iret)
 					{
-						super.exceptionOccurred(exception);
-					}
-				});
-			}
-		}));
+						public void customResultAvailable(Object result)
+						{
+							super.exceptionOccurred(exception);
+						}
+					});
+				}
+			}));
+			ret	= iret;
+		}
 		
-//		return ret;
-		return iret;
+		return ret;
 	}
 	
 	/**

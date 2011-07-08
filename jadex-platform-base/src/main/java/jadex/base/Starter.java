@@ -1,7 +1,6 @@
 package jadex.base;
 
 import jadex.base.fipa.CMSComponentDescription;
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentAdapter;
@@ -22,7 +21,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 
 import java.net.InetAddress;
@@ -167,6 +165,11 @@ public class Starter
 //					}
 //				}, 5000);
 			}
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+				System.exit(-1);
+			}
 		});
 	}
 	
@@ -277,9 +280,9 @@ public class Starter
 								final IComponentAdapterFactory afac = (IComponentAdapterFactory)afclass.newInstance();
 								
 								Future future = new Future();
-								future.addResultListener(new IResultListener()
+								future.addResultListener(new DelegationResultListener(ret)
 								{
-									public void resultAvailable(Object result)
+									public void customResultAvailable(Object result)
 									{
 										Object[] root = (Object[])result;
 										final IComponentInstance instance = (IComponentInstance)root[0];
@@ -342,16 +345,11 @@ public class Starter
 											});
 										}
 									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										ret.setException(exception);
-									}
 								});
 								
 								boolean copy = !Boolean.FALSE.equals(getArgumentValue(PARAMETERCOPY, model, cmdargs, compargs));
 								cfac.createComponentInstance(desc, afac, model, getConfigurationName(model, cmdargs),
-									compargs, null, null, copy, future).addResultListener(new SwingDefaultResultListener()
+									compargs, null, null, copy, future).addResultListener(new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(Object result)
 									{
@@ -361,15 +359,18 @@ public class Starter
 										
 										// Execute init steps of root component on main thread (i.e. platform).
 										boolean again = true;
-										while(again)
+										while(again && !ret.isDone())
 										{
 					//						System.out.println("Execute step: "+cid);
 											again = afac.executeStep(adapter);
 										}
 					//					System.out.println("starting component execution");
 										
-										// Start normal execution of root component (i.e. platform).
-										afac.initialWakeup(adapter);
+										// Start normal execution of root component (i.e. platform) unless an error occurred during init.
+										if(!ret.isDone())
+										{
+											afac.initialWakeup(adapter);
+										}
 									}
 								});
 							}
