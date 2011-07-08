@@ -21,7 +21,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.gui.PopupBuilder;
 import jadex.xml.annotation.XMLClassname;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -130,21 +129,7 @@ public class ModelTreePanel extends FileTreePanel
 										@XMLClassname("findchild")
 										public Object execute(IInternalAccess ia)
 										{
-											int ret = -1;
-											try
-											{
-												File target = new File(LibraryService.toURL(toremove).toURI());
-												for(int i=0; i<filenames.size() && ret==-1; i++)
-												{
-													File test = new File(LibraryService.toURL((String)filenames.get(i)).toURI());
-													if(target.getCanonicalPath().equals(test.getCanonicalPath()))
-														ret = i;
-												}
-											}
-											catch(Exception e)
-											{
-//												e.printStackTrace();
-											}
+											int ret = LibraryService.indexOfFilename(toremove, filenames);
 											return new Integer(ret);
 										}
 									}).addResultListener(new DefaultResultListener()
@@ -158,7 +143,7 @@ public class ModelTreePanel extends FileTreePanel
 												{
 													public void run()
 													{
-														root.removeChild((ITreeNode)children.get(res));
+														removeTopLevelNode((ITreeNode)children.get(res));
 													}
 												});
 											}
@@ -167,7 +152,7 @@ public class ModelTreePanel extends FileTreePanel
 								}
 								catch(Exception e)
 								{
-//									e.printStackTrace();
+									e.printStackTrace();
 								}
 							}
 						});
@@ -217,22 +202,19 @@ public class ModelTreePanel extends FileTreePanel
 								@XMLClassname("fileexists")
 								public Object execute(IInternalAccess ia)
 								{
-									boolean ret = false;
-									try
+									List	urlstrings	= new ArrayList();
+									for(int i=0; i<urls.size(); i++)
 									{
-										File target = new File(LibraryService.toURL(filename).toURI());
-										for(int i=0; i<urls.size() && !ret; i++)
+										try
 										{
-											File test = new File(((URL)urls.get(i)).toURI());
-											if(target.getCanonicalPath().equals(test.getCanonicalPath()))
-												ret = true;
+											urlstrings.add(((URL)urls.get(i)).toURI().toString());
+										}
+										catch(Exception e)
+										{
+											e.printStackTrace();
 										}
 									}
-									catch(Exception e)
-									{
-//										e.printStackTrace();
-									}
-									return new Boolean(ret);
+									return new Boolean(LibraryService.indexOfFilename(filename, urlstrings)!=-1);
 								}
 							}).addResultListener(new DefaultResultListener()
 							{

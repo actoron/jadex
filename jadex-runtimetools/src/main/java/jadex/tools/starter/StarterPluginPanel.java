@@ -8,6 +8,7 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.base.gui.filetree.FileNode;
+import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.modeltree.ModelTreePanel;
 import jadex.base.gui.plugin.AbstractJCCPlugin.ShowRemoteControlCenterHandler;
@@ -101,7 +102,18 @@ public class StarterPluginPanel extends JPanel
 		lsplit.setOneTouchExpandable(true);
 		lsplit.setResizeWeight(0.7);
 
-		mpanel = new ModelTreePanel(jcc.getPlatformAccess(), jcc.getJCCAccess(), !SUtil.equals(jcc.getPlatformAccess().getComponentIdentifier().getPlatformName(), jcc.getJCCAccess().getComponentIdentifier().getPlatformName()));
+		mpanel = new ModelTreePanel(jcc.getPlatformAccess(), jcc.getJCCAccess(), !SUtil.equals(jcc.getPlatformAccess().getComponentIdentifier().getPlatformName(), jcc.getJCCAccess().getComponentIdentifier().getPlatformName()))
+		{
+			public void removeTopLevelNode(ITreeNode node)
+			{
+				if(node instanceof IFileNode && spanel!=null && spanel.lastfile!=null)
+				{
+					String	 path	= ((IFileNode)node).getFilePath();
+					System.out.println("path: "+path+", "+spanel.lastfile);
+				}
+				super.removeTopLevelNode(node);
+			}
+		};
 		mpanel.getTree().addTreeSelectionListener(new TreeSelectionListener()
 		{
 			public void valueChanged(TreeSelectionEvent e)

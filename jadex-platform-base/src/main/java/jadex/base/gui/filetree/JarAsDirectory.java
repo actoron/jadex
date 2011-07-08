@@ -134,17 +134,18 @@ public class JarAsDirectory	extends File
 	public String getAbsolutePath()
 	{
 		String	ret;
+		String	jarname	= jarpath.replace('\\', '/');
 		if(entry!=null)
 		{
 			if(jarpath.startsWith("/"))
-				ret	= "jar:file:"+jarpath+"!/"+entry.getName();
+				ret	= "jar:file:"+jarname+"!/"+entry.getName();
 			else
-				ret	= "jar:file:/"+jarpath+"!/"+entry.getName();
+				ret	= "jar:file:/"+jarname+"!/"+entry.getName();
 		}
 		else
 		{
 //			ret	= jarpath;
-			ret = "jar:file:"+jarpath+"!/";
+			ret = "jar:file:"+jarname+"!/";
 		}
 		return ret;
 	}

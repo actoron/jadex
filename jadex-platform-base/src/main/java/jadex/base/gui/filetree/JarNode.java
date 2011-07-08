@@ -43,11 +43,7 @@ public class JarNode extends DirNode
 	 */
 	public File getFile()
 	{
-		if(file==null)
-		{
-			String absolute = new File(relative).getAbsolutePath();
-			file = new JarAsDirectory(absolute);
-		}
+		assert file!=null;
 		return this.file;
 	}
 }

@@ -667,14 +667,27 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 				entries	= new String[urls.size()];
 				for(int i=0; i<entries.length; i++)
 				{
-					URL	url	= (URL)urls.get(i);
-					if(url.getProtocol().equals("file"))
+					
+					String	url	= urls.get(i).toString();
+					File	file	= urlToFile(url.toString());
+					if(file!=null)
 					{
-						entries[i]	= SUtil.convertPathToRelative(SUtil.convertURLToString(url));
+						String	proto	= "";
+						if(url.startsWith("file:"))
+						{
+							proto	= "file:";
+						}
+						else if(url.startsWith("jar:file:"))
+						{
+							proto	= "jar:file:";
+						}
+						entries[i]	= proto + SUtil.convertPathToRelative(file.getAbsolutePath()).replace('\\', '/');
+						if(url.endsWith("!/") && entries[i].endsWith("!"))
+							entries[i]	+= "/";	// Stripped by new File(...).
 					}
 					else
 					{
-						entries[i]	= url.toString();
+						entries[i]	= url;
 					}
 				}
 			}
@@ -691,5 +704,48 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		}
 		return new Future(props);		
 	}
+
+
+	/**
+	 *  Test if a file name is contained.
+	 */
+	public static int indexOfFilename(String url, List urlstrings)
+	{
+		int ret = -1;
+		try
+		{
+			File file = urlToFile(url);
+			for(int i=0; file!=null && i<urlstrings.size() && ret==-1; i++)
+			{
+				String	totest	= (String)urlstrings.get(i);
+				File test = urlToFile(totest);
+				if(test!=null && file.getCanonicalPath().equals(test.getCanonicalPath()))
+					ret = i;
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return ret;
+	}
+
+	/**
+	 *  Convert an URL to a file.
+	 *  @return null, if the URL is neither 'file:' nor 'jar:file:' URL. 
+	 */
+	public static File urlToFile(String url)
+	{
+		File	file	= null;
+		if(url.startsWith("file:"))
+		{
+			file	= new File(url.substring(5));
+		}
+		else if(url.startsWith("jar:file:"))
+		{
+			file	= new File(url.substring(9));
+		}
+		return file;
+	}	
 }
 

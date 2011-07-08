@@ -2,17 +2,12 @@ package jadex.base.gui.modeltree;
 
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.FileTreePanel;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.SUtil;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.net.MalformedURLException;
 
 import javax.swing.Icon;
 import javax.swing.JFileChooser;
@@ -108,29 +103,6 @@ public class AddPathAction extends ToolTipAction
 					{
 						// Add file/directory to tree.
 						treepanel.addTopLevelNode(file);
-						
-						// todo: jars
-						if(treepanel.getExternalAccess()!=null)
-						{
-							final File fcopy = file;
-							SServiceProvider.getService(treepanel.getExternalAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-							{
-								public void resultAvailable(Object result)
-								{
-									ILibraryService ls = (ILibraryService)result;
-									File f = new File(fcopy.getParentFile(), fcopy.getName());
-									try
-									{
-	//									System.out.println("adding:"+f.toURI().toURL());
-										ls.addURL(f.toURI().toURL());
-									}
-									catch(MalformedURLException ex)
-									{
-										ex.printStackTrace();
-									}
-								}
-							});
-						}
 					}
 					else
 					{

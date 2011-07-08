@@ -8,11 +8,7 @@ import jadex.base.gui.filetree.FileData;
 import jadex.base.gui.filetree.FileTreePanel;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.SUtil;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
@@ -21,7 +17,6 @@ import jadex.xml.annotation.XMLClassname;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.net.MalformedURLException;
 
 import javax.swing.Icon;
 import javax.swing.JFileChooser;
@@ -140,38 +135,7 @@ public class AddRemotePathAction extends ToolTipAction
 							@XMLClassname("getRemoteFile")
 							public Object execute(IInternalAccess ia)
 							{
-								final Future	ret	= new Future();
-								SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
-								{
-									public void customResultAvailable(Object result)
-									{
-										ILibraryService ls = (ILibraryService)result;
-										File	file	= new File(path);
-//										File	f = new File(file.getParentFile(), file.getName());
-//										URL url = f.toURI().toURL();
-//										String filename = file.getAbsolutePath();
-//										if((filename.endsWith("\\") || filename.endsWith("/")) && 
-//											(!url.toString().endsWith("\\") || url.toString().endsWith("/")))
-//										{
-//											// Hack! f.toURI().toURL() does not append when file is not local
-//											// and it cannot be determined if it is a directory
-//											url = new URL(url.toString()+"/");
-//										}
-//										ls.addURL(url);
-										try
-										{
-											ls.addURL(file.toURI().toURL());
-											ret.setResult(new FileData(file));
-										}
-										catch(MalformedURLException mue)
-										{
-											ret.setException(mue);
-										}
-									}
-								}));
-
-								return ret;
+								return new FileData(new File(path));
 							}
 						}).addResultListener(new SwingDefaultResultListener()
 						{
