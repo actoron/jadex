@@ -111,7 +111,7 @@ public class StarterPluginPanel extends JPanel
 					String	 path	= ((IFileNode)node).getFilePath();
 					if(spanel.lastfile.startsWith(path))
 					{
-						
+						spanel.loadModel(null);
 					}
 					else
 					{
