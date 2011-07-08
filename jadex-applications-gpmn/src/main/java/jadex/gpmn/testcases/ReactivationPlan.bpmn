@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_IZOHMalxEeCctOpIadPH1A" iD="_IZOHMKlxEeCctOpIadPH1A">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_6ZC7kKlxEeCEIvFWVERAlQ" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6ZC7kalxEeCEIvFWVERAlQ" key="package" value="jadex.gpmn.testcases"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_61SLoKlxEeCEIvFWVERAlQ" key="editor_version" value="1.0"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_IZOuQqlxEeCctOpIadPH1A" iD="_IZOuQalxEeCctOpIadPH1A" name="Body">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_IZPVUalxEeCctOpIadPH1A" iD="_IZPVUKlxEeCctOpIadPH1A" outgoingEdges="_43aJsalxEeCEIvFWVERAlQ" incomingEdges="_3Ge-oalxEeCEIvFWVERAlQ" name="Reactivate Goal" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_udqHoKlxEeCEIvFWVERAlQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_udqHoalxEeCEIvFWVERAlQ" key="class" value="jadex.bdibpmn.task.DispatchGoalTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_u0TtEKlxEeCEIvFWVERAlQ" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zDecMKlxEeCEIvFWVERAlQ" key="dimension" value="2:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zDecMalxEeCEIvFWVERAlQ" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zDecMqlxEeCEIvFWVERAlQ" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zDfDQKlxEeCEIvFWVERAlQ" key="0:1" value="type"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zDfDQalxEeCEIvFWVERAlQ" key="0:2" value="java.lang.String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zDfDQqlxEeCEIvFWVERAlQ" key="0:3" value="&quot;Repeatable Subgoal&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zDfDQ6lxEeCEIvFWVERAlQ" key="1:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zDfDRKlxEeCEIvFWVERAlQ" key="1:1" value="wait"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zDfDRalxEeCEIvFWVERAlQ" key="1:2" value="boolean"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zDfDRqlxEeCEIvFWVERAlQ" key="1:3" value="true"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_3GY4AalxEeCEIvFWVERAlQ" iD="_3GY4AKlxEeCEIvFWVERAlQ" outgoingEdges="_3Ge-oalxEeCEIvFWVERAlQ" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_43TcAalxEeCEIvFWVERAlQ" iD="_43TcAKlxEeCEIvFWVERAlQ" incomingEdges="_43aJsalxEeCEIvFWVERAlQ" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_3Ge-oalxEeCEIvFWVERAlQ" iD="_3Ge-oKlxEeCEIvFWVERAlQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_43aJsalxEeCEIvFWVERAlQ" iD="_43aJsKlxEeCEIvFWVERAlQ"/>
+  </pools>
+</bpmn:BpmnDiagram>

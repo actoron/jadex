@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpmn:GpmnDiagram xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" name="FailedAchieveGoal" version="2.0">
+  <package>jadex.gpmn.testcases</package>
+  <context/>
+  <goal id="_K8S6MKlsEeC7G9rlRijbAA" name="Main Goal" goalType="AchieveGoal"/>
+  <goal id="_TkRcoKlsEeC7G9rlRijbAA" name="Failed Goal" goalType="AchieveGoal"/>
+  <goal id="_Zja7oKlsEeC7G9rlRijbAA" name="Never Used Goal" goalType="AchieveGoal"/>
+  <plan xsi:type="gpmn:ActivationPlan" id="_VdMGEKlsEeC7G9rlRijbAA" mode="Sequential"/>
+  <plan xsi:type="gpmn:BpmnPlan" id="_t5_MIKlsEeC7G9rlRijbAA" name="Failing Plan" planref="jadex/gpmn/testcases/FailingPlan.bpmn"/>
+  <plan xsi:type="gpmn:BpmnPlan" id="_yhZcIKlsEeC7G9rlRijbAA" name="Never Used Plan" planref="jadex/gpmn/testcases/FailingPlan.bpmn"/>
+  <activationEdge id="_Vfw48KlsEeC7G9rlRijbAA" source="_VdMGEKlsEeC7G9rlRijbAA" target="_TkRcoKlsEeC7G9rlRijbAA" order="1"/>
+  <activationEdge id="_ooak0KlsEeC7G9rlRijbAA" source="_VdMGEKlsEeC7G9rlRijbAA" target="_Zja7oKlsEeC7G9rlRijbAA" order="2"/>
+  <planEdge id="_VfaToKlsEeC7G9rlRijbAA" source="_K8S6MKlsEeC7G9rlRijbAA" target="_VdMGEKlsEeC7G9rlRijbAA"/>
+  <planEdge id="_0CSnIKlsEeC7G9rlRijbAA" source="_TkRcoKlsEeC7G9rlRijbAA" target="_t5_MIKlsEeC7G9rlRijbAA"/>
+  <planEdge id="_4FiaIKlsEeC7G9rlRijbAA" source="_Zja7oKlsEeC7G9rlRijbAA" target="_yhZcIKlsEeC7G9rlRijbAA"/>
+</gpmn:GpmnDiagram>
