@@ -1950,6 +1950,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			synchronized(adapters)
 			{
 				CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
+//				System.out.println("desc: "+desc.getName()+" "+desc.hashCode());
 				IComponentIdentifier[] tmp = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
 					IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS: IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS;
 				ret.setResult(tmp);

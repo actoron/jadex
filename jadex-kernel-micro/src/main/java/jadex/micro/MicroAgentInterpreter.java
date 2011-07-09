@@ -72,6 +72,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			this.microagent = (MicroAgent)microclass.newInstance();
 			this.microagent.init(MicroAgentInterpreter.this);
 			
+			this.container = createMyServiceContainer();
+			
 			addStep((new Object[]{new IComponentStep()
 			{
 				public Object execute(IInternalAccess ia)
@@ -571,6 +573,19 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 *  @return The service conainer.
 	 */
 	public IServiceContainer createServiceContainer()
+	{
+		// Overridden to ensure that super call does nothing.
+		// Container init must be done when microagent has
+		// already been created. Otherwise createServiceContainer
+		// cannot be delegated.
+		return null;
+	}
+	
+	/**
+	 *  Create the service container.
+	 *  @return The service conainer.
+	 */
+	public IServiceContainer createMyServiceContainer()
 	{
 		IServiceContainer ret = microagent.createServiceContainer();
 		if(ret==null)

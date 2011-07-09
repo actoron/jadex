@@ -608,7 +608,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 										}
 										public void exceptionOccurred(Exception exception)
 										{
-											exception.printStackTrace();
+//											exception.printStackTrace();
 											super.exceptionOccurred(exception);
 										}
 									});

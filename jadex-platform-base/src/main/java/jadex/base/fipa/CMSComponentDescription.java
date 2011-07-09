@@ -63,6 +63,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 */
 	public CMSComponentDescription()
 	{
+//		System.out.println("created desc: "+hashCode());
 	}
 
 	/**
@@ -71,6 +72,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	public CMSComponentDescription(IComponentIdentifier cid, String type, //IComponentIdentifier parent, 
 		Boolean master, Boolean daemon, Boolean autoshutdown, String modelname, String localtype)
 	{
+//		System.out.println("created desc: "+cid+" "+hashCode());
 		setName(cid);
 		setType(type);
 //		setParent(parent);
@@ -167,7 +169,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		// CMS / external access / component may access description concurrently?!
 		synchronized(this)
 		{
-//			System.out.println("add child: "+child+" "+getName());
+//			System.out.println("add child: "+child+" "+getName()+" "+hashCode());
 			if(children==null)
 				children = new LinkedHashSet();
 			children.add(child);

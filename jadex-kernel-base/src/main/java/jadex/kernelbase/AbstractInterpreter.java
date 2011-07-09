@@ -96,7 +96,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 			this.copy = copy;
 			if(factory != null)
 				this.adapter = factory.createComponentAdapter(desc, model, this, parent);
-//			this.container = createServiceContainer();
+			this.container = createServiceContainer();
 			this.creationtime = System.currentTimeMillis();
 		}
 		catch(Exception e)
@@ -425,9 +425,9 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public IServiceContainer getServiceContainer()
 	{
-//		assert container!=null;
-		if(container==null)
-			container = createServiceContainer();
+		assert container!=null;
+//		if(container==null)
+//			container = createServiceContainer();
 		return container;
 	}
 

@@ -86,8 +86,8 @@ public interface IComponentFactory
 	 * @return An instance of a component and the corresponding adapter.
 	 */
 	@Excluded
-	public IFuture createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
-		IModelInfo model, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, 
+	public IFuture createComponentInstance(@Reference IComponentDescription desc, IComponentAdapterFactory factory, 
+		IModelInfo model, String config, Map arguments, IExternalAccess parent, @Reference RequiredServiceBinding[] bindings, 
 		boolean copy, Future ret);
 
 }
