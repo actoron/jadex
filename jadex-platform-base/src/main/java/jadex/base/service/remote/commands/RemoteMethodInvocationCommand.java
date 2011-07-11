@@ -77,7 +77,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	 */
 	public void preprocessCommand(RemoteReferenceModule rrm, IComponentIdentifier target)
 	{
-		if(parametervalues.length>0)
+		if(parametertypes.length>0)
 		{
 			RMIPreProcessor preproc = new RMIPreProcessor(rrm);
 			boolean[] refs = SServiceProvider.getRemoteReferenceInfo(method, false);
