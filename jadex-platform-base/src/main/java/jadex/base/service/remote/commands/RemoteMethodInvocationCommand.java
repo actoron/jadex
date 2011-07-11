@@ -86,7 +86,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			{
 				if(refs[i] || SServiceProvider.isRemoteReference(parametervalues[i]))
 				{
-					System.out.println("found ref: "+parametervalues[i]);
+//					System.out.println("found ref: "+parametervalues[i]);
 					parametervalues[i] = preproc.preProcess(context, parametervalues[i]);
 				}
 			}

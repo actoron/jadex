@@ -8,6 +8,8 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 
@@ -630,7 +632,9 @@ public class SServiceProvider
 	 */
 	public static boolean isReference(Object object, boolean local)
 	{
-		boolean ret = object==null || object instanceof IRemotable || (local && object instanceof IFuture);
+		boolean ret = object instanceof IRemotable 
+			|| object instanceof IResultListener || object instanceof IIntermediateResultListener
+			|| object instanceof IFuture || object instanceof IIntermediateFuture;
 //			|| object instanceof IService;// || object instanceof IExternalAccess;
 		
 		if(!ret && object!=null)
