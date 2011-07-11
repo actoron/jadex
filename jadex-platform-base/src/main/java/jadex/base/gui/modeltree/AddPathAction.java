@@ -99,6 +99,8 @@ public class AddPathAction extends ToolTipAction
 					file	= file.getParentFile();
 				if(file.exists())
 				{
+					// Convert to relative file for comparability with loaded nodes.
+					file	= new File(SUtil.convertPathToRelative(file.getAbsolutePath()));
 					if(treepanel.getModel().getNode(file)==null)
 					{
 						// Add file/directory to tree.

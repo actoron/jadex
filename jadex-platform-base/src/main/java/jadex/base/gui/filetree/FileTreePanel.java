@@ -349,6 +349,8 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		final RootNode root = (RootNode)getModel().getRoot();
 		root.addChild(node);
 		
+		node.refresh(true);
+		
 		for(int i=0; i<root.getChildCount(); i++)
 			model.fireNodeChanged((ITreeNode) root.getCachedChildren().get(i));
 		tree.scrollPathToVisible(new TreePath(new Object[]{root, node}));
@@ -408,7 +410,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 					while(exp.hasMoreElements())
 					{
 						TreePath	path	= (TreePath)exp.nextElement();
-						if(path.getLastPathComponent() instanceof FileNode)
+						if(path.getLastPathComponent() instanceof IFileNode)
 						{
 							expanded.add(NodePath.createNodePath((ITreeNode)path.getLastPathComponent()));
 						}

@@ -426,27 +426,31 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		if(url instanceof String)
 		{
 			String	string	= (String) url;
-			File	file	= new File(string);
-			if(file.exists())
+			url	= string.startsWith("file:") ? new File(string.substring(5)) : null;
+			if(url==null)
 			{
-				url	= file;
-			}
-			else
-			{
-				file	= new File(System.getProperty("user.dir"), string);
+				File file	= new File(string);
 				if(file.exists())
 				{
 					url	= file;
 				}
 				else
 				{
-					try
+					file	= new File(System.getProperty("user.dir"), string);
+					if(file.exists())
 					{
-						url	= new URL(string);
+						url	= file;
 					}
-					catch (MalformedURLException e)
+					else
 					{
-						throw new RuntimeException(e);
+						try
+						{
+							url	= new URL(string);
+						}
+						catch (MalformedURLException e)
+						{
+							throw new RuntimeException(e);
+						}
 					}
 				}
 			}
@@ -715,10 +719,14 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		try
 		{
 			File file = urlToFile(url);
+			if(file==null)
+				file	= new File(url);
 			for(int i=0; file!=null && i<urlstrings.size() && ret==-1; i++)
 			{
 				String	totest	= (String)urlstrings.get(i);
 				File test = urlToFile(totest);
+				if(test==null)
+					test	= new File(totest);
 				if(test!=null && file.getCanonicalPath().equals(test.getCanonicalPath()))
 					ret = i;
 			}

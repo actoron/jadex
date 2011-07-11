@@ -93,7 +93,7 @@ public class ExpansionHandler extends TreeExpansionHandler
 	 */
 	protected IFuture handlePath(final TreePath path)
 	{
-//		if(path.toString().indexOf("jadex")!=-1)
+//		if(path.toString().indexOf("micro")!=-1)
 //			System.out.println("handle path: "+path);
 		
 		// Move from paths (loaded) to expanded nodes (created dynamically).

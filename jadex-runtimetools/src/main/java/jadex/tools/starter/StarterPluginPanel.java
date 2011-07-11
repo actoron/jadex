@@ -13,10 +13,13 @@ import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.modeltree.ModelTreePanel;
 import jadex.base.gui.plugin.AbstractJCCPlugin.ShowRemoteControlCenterHandler;
 import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.ISettingsService;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.library.LibraryService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
@@ -35,6 +38,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.IOException;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -108,17 +113,41 @@ public class StarterPluginPanel extends JPanel
 			{
 				if(node instanceof IFileNode && spanel!=null && spanel.lastfile!=null)
 				{
-					String	 path	= ((IFileNode)node).getFilePath();
-					if(spanel.lastfile.startsWith(path))
+					super.removeTopLevelNode(node);
+					final String	path	= ((IFileNode)node).getFilePath();
+					final String	model	= spanel.lastfile;
+					jcc.getPlatformAccess().scheduleImmediate(new IComponentStep()
 					{
-						spanel.loadModel(null);
-					}
-					else
+						public Object execute(IInternalAccess ia)
+						{
+							boolean	match	= false;
+							File	pathfile	= LibraryService.urlToFile(path);
+							File	modelfile	= LibraryService.urlToFile(model);
+							try
+							{
+								match	= pathfile!=null && modelfile!=null && modelfile.getCanonicalPath().startsWith(pathfile.getCanonicalPath());
+							}
+							catch(IOException e)
+							{
+							}
+							return Boolean.valueOf(match);
+						}
+					}).addResultListener(new SwingDefaultResultListener()
 					{
-						
-					}
+						public void customResultAvailable(Object result)
+						{
+							if(((Boolean)result).booleanValue() && model.equals(spanel.lastfile))
+							{
+								spanel.loadModel(null);
+								
+							}
+						}
+						public void customExceptionOccurred(Exception exception)
+						{
+							// ignore.
+						}
+					});
 				}
-				super.removeTopLevelNode(node);
 			}
 		};
 		mpanel.getTree().addTreeSelectionListener(new TreeSelectionListener()

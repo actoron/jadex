@@ -957,6 +957,11 @@ public class StarterPanel extends JLayeredPane
 			details.setExternals(null);
 			details.setText(error);
 		}
+		else
+		{
+			details.setExternals(null);
+			details.setText("");			
+		}
 
 		// Adjust state of start button depending on model checking state.
 		start.setEnabled(model!=null&& model.isStartable() && report==null);

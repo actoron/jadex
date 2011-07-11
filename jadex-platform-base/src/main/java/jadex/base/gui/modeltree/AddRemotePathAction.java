@@ -135,7 +135,7 @@ public class AddRemotePathAction extends ToolTipAction
 							@XMLClassname("getRemoteFile")
 							public Object execute(IInternalAccess ia)
 							{
-								return new FileData(new File(path));
+								return new FileData(new File(SUtil.convertPathToRelative(path)));
 							}
 						}).addResultListener(new SwingDefaultResultListener()
 						{

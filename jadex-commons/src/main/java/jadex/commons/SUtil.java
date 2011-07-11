@@ -1589,9 +1589,11 @@ public class SUtil
 	 */
 	public static String convertPathToRelative(String absolute)
 	{
-		// Special treatment for files in jar file -> just return full inner name 
+		// Special treatment for files in jar file -> just make jar file name relative and keep inner name 
 		if(absolute.startsWith("jar:file:") && absolute.indexOf("!")!=-1)
-			return absolute.substring(absolute.indexOf("!")+1);
+		{
+			return "jar:file:" +absolute.substring(9, absolute.indexOf("!")) + absolute.substring(absolute.indexOf("!"));
+		}
 		
 		// Build path as list of files (directories).
 		File basedir = new File(System.getProperty("user.dir"));

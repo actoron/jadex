@@ -184,7 +184,7 @@ public class ModelTreePanel extends FileTreePanel
 		if(node instanceof IFileNode && node.getParent().equals(getTree().getModel().getRoot()))
 		{
 			// Hack!!! add protocol if not present to allow comparison with library service URLs.
-			String filepath = ((IFileNode)node).getFilePath();
+			final String filepath = ((IFileNode)node).getFilePath();
 			final String filename = filepath.startsWith("file:") || filepath.startsWith("jar:file:")
 				? filepath : "file:"+filepath;
 			SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -229,7 +229,7 @@ public class ModelTreePanel extends FileTreePanel
 //										System.out.println("Need to add path: "+filename);
 										try
 										{
-											ls.addURL(LibraryService.toURL(filename));
+											ls.addURL(LibraryService.toURL(filepath));
 										}
 										catch(Exception e)
 										{

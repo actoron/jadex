@@ -137,10 +137,10 @@ public class JarAsDirectory	extends File
 		String	jarname	= jarpath.replace('\\', '/');
 		if(entry!=null)
 		{
-			if(jarpath.startsWith("/"))
+//			if(jarpath.startsWith("/"))
 				ret	= "jar:file:"+jarname+"!/"+entry.getName();
-			else
-				ret	= "jar:file:/"+jarname+"!/"+entry.getName();
+//			else
+//				ret	= "jar:file:/"+jarname+"!/"+entry.getName();
 		}
 		else
 		{
