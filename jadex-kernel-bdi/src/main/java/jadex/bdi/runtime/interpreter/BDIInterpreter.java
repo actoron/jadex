@@ -343,6 +343,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public void startBehavior()
 	{
+		assert !isExternalThread();
+
+		// Use step in case agent is started as suspended.
 		scheduleStep(new IComponentStep()
 		{
 			public Object execute(IInternalAccess ia)
@@ -355,7 +358,6 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 					state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
 
 				rulesystem.init();
-				
 				return null;
 			}
 		});
@@ -1746,6 +1748,15 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	public IModelInfo	getModel()
 	{
 		return model.getModelInfo();
+	}
+	
+	/**
+	 *  Get the configuration.
+	 *  @return The configuration.
+	 */
+	public String getConfiguration()
+	{
+		return (String)getState().getAttributeValue(getAgent(), OAVBDIRuntimeModel.capability_has_configuration);
 	}
 	
 	/**

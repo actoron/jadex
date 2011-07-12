@@ -36,6 +36,12 @@ public class ConfigurationInfo extends Startable
 	/** The required service overridings. */
 	protected List requiredservices;
 	
+	/** The initial steps. */
+	protected List initialsteps;
+	
+	/** The end steps. */
+	protected List endsteps;
+	
 	//-------- constructors --------
 	
 	/**
@@ -237,5 +243,65 @@ public class ConfigurationInfo extends Startable
 		if(requiredservices==null)
 			requiredservices = new ArrayList();
 		requiredservices.add(requiredservice);
+	}
+	
+	/**
+	 *  Get the initial steps.
+	 *  @return The initial steps.
+	 */
+	public UnparsedExpression[] getInitialSteps()
+	{
+		return initialsteps==null? new UnparsedExpression[0]: 
+			(UnparsedExpression[])initialsteps.toArray(new UnparsedExpression[initialsteps.size()]);
+	}
+
+	/**
+	 *  Set the initial steps.
+	 *  @param initial steps The initial steps to set.
+	 */
+	public void setInitialSteps(UnparsedExpression[] initialsteps)
+	{
+		this.initialsteps = SUtil.arrayToList(initialsteps);
+	}
+	
+	/**
+	 *  Add a initial step.
+	 *  @param initialstep The initial step.
+	 */
+	public void addInitialStep(UnparsedExpression initialstep)
+	{
+		if(initialsteps==null)
+			initialsteps = new ArrayList();
+		initialsteps.add(initialstep);
+	}
+	
+	/**
+	 *  Get the end steps.
+	 *  @return The end steps.
+	 */
+	public UnparsedExpression[] getEndSteps()
+	{
+		return endsteps==null? new UnparsedExpression[0]: 
+			(UnparsedExpression[])endsteps.toArray(new UnparsedExpression[endsteps.size()]);
+	}
+
+	/**
+	 *  Set the end steps.
+	 *  @param end steps The end steps to set.
+	 */
+	public void setEndSteps(UnparsedExpression[] endsteps)
+	{
+		this.endsteps = SUtil.arrayToList(endsteps);
+	}
+	
+	/**
+	 *  Add a end step.
+	 *  @param endstep The end step.
+	 */
+	public void addEndStep(UnparsedExpression endstep)
+	{
+		if(endsteps==null)
+			endsteps = new ArrayList();
+		endsteps.add(endstep);
 	}
 }

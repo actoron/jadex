@@ -237,6 +237,7 @@
 			<xs:element name="components" type="configcomponents" minOccurs="0"/>
 			<xs:element name="services" type="configservices" minOccurs="0"/>
 			<xs:element name="extensions" type="extensions" minOccurs="0"/>
+			<xs:element name="steps" type="configsteps" minOccurs="0"/>
 		</xs:all>
 	</xs:group>
 	<xs:complexType name="configarguments">
@@ -294,7 +295,12 @@
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="configprovidedservices"/>
+	<xs:complexType name="configsteps">
+		<xs:sequence>
+			<xs:element name="initialstep" minOccurs="0" maxOccurs="unbounded" type="steptype"/>
+			<xs:element name="endstep" minOccurs="0" maxOccurs="unbounded" type="steptype"/>
+		</xs:sequence>
+	</xs:complexType>
 	<xs:complexType name="extensions">
 		<xs:annotation>
 			<xs:documentation>
@@ -467,5 +473,9 @@
 	<xs:complexType name="interceptortype" mixed="true">
 		<xs:attribute name="class" type="xs:string" use="optional"/>
 		<xs:attribute name="language" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="steptype" mixed="true">
+		<xs:attribute name="language" type="xs:string" use="optional"/>
+		<xs:attribute name="class" type="xs:string" use="optional"/>
 	</xs:complexType>
 </xs:schema>

@@ -1317,7 +1317,15 @@ public abstract class ComponentManagementService extends BasicService implements
 								{
 									try
 									{
-										instance.startBehavior();
+										final IComponentInstance	ci	= instance;
+										instance.getExternalAccess().scheduleImmediate(new IComponentStep()
+										{
+											public Object execute(IInternalAccess ia)
+											{
+												ci.startBehavior();
+												return null;
+											}
+										});
 									}
 									catch(ComponentTerminatedException e)
 									{

@@ -155,11 +155,17 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 
 		ComponentChangeEvent.dispatchTerminatingEvent(getComponentAdapter(), getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners(), null);
 		
-		terminateExtensions().addResultListener(createResultListener(new DelegationResultListener(ret)
+		startEndSteps().addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				ComponentChangeEvent.dispatchTerminatedEvent(getComponentAdapter(), getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners(), ret);
+				terminateExtensions().addResultListener(createResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						ComponentChangeEvent.dispatchTerminatedEvent(getComponentAdapter(), getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners(), ret);
+					}
+				}));
 			}
 		}));
 		
@@ -211,11 +217,124 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	}
 	
 	/**
+	 *  Start the initial steps of the component.
+	 *  Called as part of start behavior.
+	 */
+	public void startInitialSteps()
+	{
+		ConfigurationInfo	ci	= getConfiguration()!=null
+			? getModel().getConfiguration(getConfiguration())
+			: getModel().getConfigurations().length>0 ? getModel().getConfigurations()[0] : null;
+		
+		if(ci!=null)
+		{
+			UnparsedExpression[]	upes	= ci.getInitialSteps();
+			for(int i=0; i<upes.length; i++)
+			{
+				Object	step;
+				if(upes[i].getValue()!=null)
+				{
+					step	= UnparsedExpression.getParsedValue(upes[i], getModel().getAllImports(), getFetcher(), getModel().getClassLoader());
+				}
+				else
+				{
+					Class	clazz	= SReflect.findClass0(upes[i].getClassName(), getModel().getAllImports(), getModel().getClassLoader());
+					try
+					{
+						step	= clazz.newInstance();
+					}
+					catch(Exception e)
+					{
+						throw new RuntimeException("Cannot instantiate class: "+clazz, e);
+					}
+				}
+				
+				if(step instanceof IComponentStep)
+				{
+					scheduleStep((IComponentStep)step);
+				}
+				else
+				{
+					throw new RuntimeException("Unsupported initial component step, class="+upes[i].getClassName()+", value="+upes[i].getValue());
+				}
+			}
+		}
+	}
+	
+	/**
+	 *  Start the end steps of the component.
+	 *  Called as part of cleanup behavior.
+	 */
+	public IFuture	startEndSteps()
+	{
+		Future	ret	= new Future();
+		ConfigurationInfo	ci	= getConfiguration()!=null
+			? getModel().getConfiguration(getConfiguration())
+			: getModel().getConfigurations().length>0 ? getModel().getConfigurations()[0] : null;
+		
+		if(ci!=null)
+		{
+			UnparsedExpression[]	upes	= ci.getEndSteps();
+			List	steps	= new ArrayList();
+			for(int i=0; !ret.isDone() && i<upes.length; i++)
+			{
+				Object	step	= null;
+				if(upes[i].getValue()!=null)
+				{
+					step	= UnparsedExpression.getParsedValue(upes[i], getModel().getAllImports(), getFetcher(), getModel().getClassLoader());
+				}
+				else
+				{
+					Class	clazz	= SReflect.findClass0(upes[i].getClassName(), getModel().getAllImports(), getModel().getClassLoader());
+					try
+					{
+						step	= clazz.newInstance();
+					}
+					catch(Exception e)
+					{
+						ret.setException(new RuntimeException("Cannot instantiate class: "+clazz, e));
+					}
+				}
+				
+				if(step instanceof IComponentStep)
+				{
+					steps.add(step);
+				}
+				else if(step!=null)
+				{
+					ret.setException(new RuntimeException("Unsupported component end step, class="+upes[i].getClassName()+", value="+upes[i].getValue()));
+				}
+			}
+			
+			if(!ret.isDone())
+			{
+				CounterResultListener	crl	= new CounterResultListener(steps.size(), new DelegationResultListener(ret));
+				for(int i=0; i<steps.size(); i++)
+					scheduleStep((IComponentStep)steps.get(i)).addResultListener(crl);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
+	
+	
+	/**
 	 *  Start the component behavior.
 	 */
 	public void startBehavior()
 	{
+		startInitialSteps();
 	}
+	
+	/**
+	 *  Get the configuration.
+	 *  @return The configuration.
+	 */
+	public abstract String getConfiguration();
 	
 	/**
 	 *  Schedule a step of the component.

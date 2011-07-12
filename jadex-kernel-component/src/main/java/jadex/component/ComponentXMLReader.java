@@ -316,6 +316,8 @@ public class ComponentXMLReader
 				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "result")}), new AccessInfo(new QName(uri, "result"), "result")),
 				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "providedservice")}), new AccessInfo(new QName(uri, "providedservice"), "providedService")),
 				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "requiredservice")}), new AccessInfo(new QName(uri, "requiredservice"), "requiredService")),
+				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "steps"), new QName(uri, "initialstep")}), new AccessInfo(new QName(uri, "initialstep"), "initialStep")),
+				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "steps"), new QName(uri, "endstep")}), new AccessInfo(new QName(uri, "endstep"), "endStep")),
 			}), null, new BeanObjectReaderHandler()));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(Argument.class), 
@@ -384,10 +386,20 @@ public class ComponentXMLReader
 //				new AttributeInfo(new AccessInfo("class", "className"))
 //			}, null)));
 					
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "initialstep")), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
+				new MappingInfo(null, null, "value", new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("class", "className"))
+				}, null), null, new BeanObjectReaderHandler()));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "endstep")), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
+				new MappingInfo(null, null, "value", new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("class", "className"))
+				}, null), null, new BeanObjectReaderHandler()));
+		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
-			new MappingInfo(null, null, "value", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "className"))
-			}, null), null, new BeanObjectReaderHandler()));
+				new MappingInfo(null, null, "value", new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("class", "className"))
+				}, null), null, new BeanObjectReaderHandler()));
 		
 		for(int i=0; mappings!=null && i<mappings.length; i++)
 		{

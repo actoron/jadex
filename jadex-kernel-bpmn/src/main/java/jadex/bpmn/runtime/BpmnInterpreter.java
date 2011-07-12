@@ -1,5 +1,6 @@
 package jadex.bpmn.runtime;
 
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
@@ -455,6 +456,12 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	 */
 	public void startBehavior()
 	{
+		assert !isExternalThread();
+		
+		// Start initial steps (if any).
+		super.startBehavior();
+		
+		// Use step in case agent is started as suspended.
 		scheduleStep(new IComponentStep()
 		{
 			public Object execute(IInternalAccess ia)
@@ -557,25 +564,31 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		
 		ComponentChangeEvent.dispatchTerminatingEvent(getComponentAdapter(), getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners(), null);
 		
-		terminateExtensions().addResultListener(createResultListener(new DelegationResultListener(ret)
+		startEndSteps().addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				getComponentAdapter().invokeLater(new Runnable()
+				terminateExtensions().addResultListener(createResultListener(new DelegationResultListener(ret)
 				{
-					public void run()
-					{	
-						// Call cancel on all running threads.
-						for(Iterator it= getThreadContext().getAllThreads().iterator(); it.hasNext(); )
+					public void customResultAvailable(Object result)
+					{
+						getComponentAdapter().invokeLater(new Runnable()
 						{
-							ProcessThread pt = (ProcessThread)it.next();
-							getActivityHandler(pt.getActivity()).cancel(pt.getActivity(), BpmnInterpreter.this, pt);
-//							System.out.println("Cancelling: "+pt.getActivity()+" "+pt.getId());
-						}
-						
-						ComponentChangeEvent.dispatchTerminatedEvent(getComponentAdapter(), getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners(), ret);
+							public void run()
+							{	
+								// Call cancel on all running threads.
+								for(Iterator it= getThreadContext().getAllThreads().iterator(); it.hasNext(); )
+								{
+									ProcessThread pt = (ProcessThread)it.next();
+									getActivityHandler(pt.getActivity()).cancel(pt.getActivity(), BpmnInterpreter.this, pt);
+		//							System.out.println("Cancelling: "+pt.getActivity()+" "+pt.getId());
+								}
+								
+								ComponentChangeEvent.dispatchTerminatedEvent(getComponentAdapter(), getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners(), ret);
+							}
+						});
 					}
-				});
+				}));
 			}
 		}));
 		
