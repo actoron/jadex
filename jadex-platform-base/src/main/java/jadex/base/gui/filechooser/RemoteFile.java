@@ -103,6 +103,14 @@ public class RemoteFile extends File
     }
     
     /**
+     *  Get the path.
+     */
+    public String getPath()
+    {
+    	return filedata.getPath();
+    }
+    
+    /**
      *  Get the parent name.
      *  @return The parent name.
      */
