@@ -16,11 +16,13 @@ import jadex.commons.future.IFuture;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -117,24 +119,32 @@ public class NIOTCPTransport implements ITransport
 			
 			// Determine all transport addresses.
 			InetAddress iaddr = InetAddress.getLocalHost();
-			String lhostname = iaddr.getHostName().toLowerCase();
+			String lhostname = iaddr.getCanonicalHostName();
 			InetAddress[] laddrs = InetAddress.getAllByName(lhostname);
 	
 			Set addrs = new HashSet();
-			addrs.add(getAddress(iaddr.getHostAddress(), this.port));
-			
-			// Get the ip addresses
-			for(int i=0; i<laddrs.length; i++)
+			for(Enumeration nis = NetworkInterface.getNetworkInterfaces(); nis.hasMoreElements(); )
 			{
-				String hostname = laddrs[i].getHostName().toLowerCase();
-				String ip_addr = laddrs[i].getHostAddress();
-				addrs.add(getAddress(ip_addr, this.port));
-				if(!ip_addr.equals(hostname))
+				NetworkInterface ni = (NetworkInterface)nis.nextElement();
+				for(Enumeration iadrs = ni.getInetAddresses(); iadrs.hasMoreElements(); )
 				{
-					// We have a fully qualified domain name.
-					addrs.add(getAddress(hostname, this.port));
+					addrs.add(getAddress(((InetAddress)iadrs.nextElement()).getHostAddress(), this.port));
 				}
 			}
+			
+//			addrs.add(getAddress(iaddr.getHostAddress(), this.port));
+//			// Get the ip addresses
+//			for(int i=0; i<laddrs.length; i++)
+//			{
+//				String hostname = laddrs[i].getHostName().toLowerCase();
+//				String ip_addr = laddrs[i].getHostAddress();
+//				addrs.add(getAddress(ip_addr, this.port));
+//				if(!ip_addr.equals(hostname))
+//				{
+//					// We have a fully qualified domain name.
+//					addrs.add(getAddress(hostname, this.port));
+//				}
+//			}
 			addresses = (String[])addrs.toArray(new String[addrs.size()]);
 			
 			// Start receiver thread.
