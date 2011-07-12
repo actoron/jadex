@@ -66,7 +66,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	protected IControlCenter jcc;
 	
 	/** The component. */
-	protected IMicroExternalAccess component;
+	protected IExternalAccess component;
 	
 	/** The update timer. */
 	protected Timer timer;
@@ -118,7 +118,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	public IFuture init(final IControlCenter jcc, IExternalAccess component)
 	{
 		this.jcc = jcc;
-		this.component = (IMicroExternalAccess)component;
+		this.component = component;
 		
 		this.panel = new JPanel(new GridBagLayout());
 		
@@ -224,8 +224,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		pbuts.add(burefresh);
 		pbuts.add(buapply);
 		pbuts.add(bucancel);
-		
-		
 		
 		JPanel pdisinfos = new JPanel(new BorderLayout());
 		pdisinfos.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Discovery Infos "));

@@ -1,11 +1,13 @@
 package jadex.bdi.runtime;
 
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.IFuture;
 
 /**
  *  The interface for external threads.
  */
+@Reference
 public interface IBDIExternalAccess extends IExternalAccess
 {
 	/**

@@ -3,6 +3,7 @@ package jadex.micro;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.MessageType;
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.IFuture;
 
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.Map;
 /**
  *  External access interface for micro agents.
  */
+@Reference
 public interface IMicroExternalAccess	extends IExternalAccess
 {
 	/**
