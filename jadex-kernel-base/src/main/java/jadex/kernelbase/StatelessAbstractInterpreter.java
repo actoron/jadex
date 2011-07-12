@@ -1101,8 +1101,11 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			for(int i=0; i<arguments.length; i++)
 			{
 				// todo: language
-				Object val = SJavaParser.evaluateExpression(arguments[i].getValue(), model.getAllImports(), getFetcher(), model.getClassLoader());
-				ret.put(arguments[i].getName(), val);
+				if(arguments[i].getValue()!=null && arguments[i].getValue().length()>0)
+				{
+					Object val = SJavaParser.evaluateExpression(arguments[i].getValue(), model.getAllImports(), getFetcher(), model.getClassLoader());
+					ret.put(arguments[i].getName(), val);
+				}
 			}
 		}
 		else if(argumentsexp!=null && argumentsexp.getValue()!=null && argumentsexp.getValue().length()>0)
