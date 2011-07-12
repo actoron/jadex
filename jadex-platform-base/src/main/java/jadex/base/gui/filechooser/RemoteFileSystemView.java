@@ -6,6 +6,7 @@ import jadex.base.gui.filetree.FileData;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
@@ -451,7 +452,7 @@ public class RemoteFileSystemView extends FileSystemView
 					if(chooser!=null)
 						chooser.rescanCurrentDirectory();
 					
-//					System.out.println("Found roots: "+SUtil.arrayToString(files));
+					System.out.println("Found roots: "+SUtil.arrayToString(files));
 				}
 			});
 		}
@@ -639,7 +640,7 @@ public class RemoteFileSystemView extends FileSystemView
 				{
 					FileData[] remfiles = (FileData[])result;
 					RemoteFile[] files = FileData.convertToFiles(remfiles);
-//					System.out.println("children: "+dir+" "+SUtil.arrayToString(files));
+					System.out.println("children: "+dir+" "+SUtil.arrayToString(files));
 					children.put(dir.getAbsolutePath(), files);
 					for(int i=0; i<files.length; i++)
 					{

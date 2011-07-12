@@ -215,7 +215,7 @@ public class CMSUpdateHandler
 				}
 				public void customExceptionOccurred(Exception exception)
 				{
-					System.out.println("remove: "+cid+", "+listener+", "+this);
+//					System.out.println("remove: "+cid+", "+listener+", "+this);
 					if(listeners!=null)
 						listeners.remove(cid, listener);
 					

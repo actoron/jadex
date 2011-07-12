@@ -472,7 +472,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 												{
 													public void printStackTrace()
 													{
-														Thread.dumpStack();
+//														Thread.dumpStack();
 														super.printStackTrace();
 													}
 												});
