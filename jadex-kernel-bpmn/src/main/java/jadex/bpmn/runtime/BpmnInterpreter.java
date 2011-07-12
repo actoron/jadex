@@ -1,6 +1,5 @@
 package jadex.bpmn.runtime;
 
-import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
