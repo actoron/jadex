@@ -17,6 +17,7 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.xml.annotation.XMLClassname;
 
 import java.util.Collection;
@@ -45,7 +46,8 @@ public class CMSUpdateHandler
 	
 	/** Update delay. */
 	// todo: make configurable.
-	protected static final long UPDATE_DELAY	= 1000;	
+	// Used in RemoteCMSListener
+	protected static final long UPDATE_DELAY	= 500;	
 	
 	/** Maximum number of events per delay period. */
 	// todo: make configurable.
@@ -213,7 +215,7 @@ public class CMSUpdateHandler
 				}
 				public void customExceptionOccurred(Exception exception)
 				{
-//					System.out.println("remove: "+cid+", "+listener+", "+this);
+					System.out.println("remove: "+cid+", "+listener+", "+this);
 					if(listeners!=null)
 						listeners.remove(cid, listener);
 					
@@ -239,7 +241,7 @@ public class CMSUpdateHandler
 	{
 		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
-//		System.out.println("removed: "+cid+" "+listener+" "+this);
+//		System.out.println("removed lis: "+cid+" "+listener+" "+this);
 		
 		IFuture	ret	= IFuture.DONE;
 		
@@ -276,14 +278,38 @@ public class CMSUpdateHandler
 		{
 			for(int i=0; i<cls.length; i++)
 			{
-				cls[i].componentAdded((IComponentDescription)event.getValue());
+				final ICMSComponentListener lis = cls[i];
+				lis.componentAdded((IComponentDescription)event.getValue())
+					.addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object result)
+					{
+					}
+					
+					public void customExceptionOccurred(Exception exception)
+					{
+						removeCMSListener(((IComponentDescription)event.getValue()).getName(), lis);
+					}
+				});
 			}
 		}
 		else if(EVENT_COMPONENT_CHANGED.equals(event.getType()))
 		{
 			for(int i=0; i<cls.length; i++)
 			{
-				cls[i].componentChanged((IComponentDescription)event.getValue());
+				final ICMSComponentListener lis = cls[i];
+				lis.componentChanged((IComponentDescription)event.getValue())
+					.addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object result)
+					{
+					}
+					
+					public void customExceptionOccurred(Exception exception)
+					{
+						removeCMSListener(((IComponentDescription)event.getValue()).getName(), lis);
+					}
+				});
 			}
 		}
 		else if(EVENT_COMPONENT_REMOVED.equals(event.getType()))
@@ -291,7 +317,20 @@ public class CMSUpdateHandler
 			for(int i=0; i<cls.length; i++)
 			{
 				// Todo: component results?
-				cls[i].componentRemoved((IComponentDescription)event.getValue(), null);
+				final ICMSComponentListener lis = cls[i];
+//				System.out.println("rem compo: "+((IComponentDescription)event.getValue()).getName());
+				cls[i].componentRemoved((IComponentDescription)event.getValue(), null)
+					.addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object result)
+					{
+					}
+					
+					public void customExceptionOccurred(Exception exception)
+					{
+						removeCMSListener(((IComponentDescription)event.getValue()).getName(), lis);
+					}
+				});
 			}
 		}
 		else if(EVENT_BULK.equals(event.getType()))

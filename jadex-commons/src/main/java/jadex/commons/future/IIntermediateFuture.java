@@ -6,6 +6,7 @@ import java.util.Collection;
 /**
  *  Future that support intermediate results.
  */
+//@Reference
 public interface IIntermediateFuture extends IFuture
 {
     /**

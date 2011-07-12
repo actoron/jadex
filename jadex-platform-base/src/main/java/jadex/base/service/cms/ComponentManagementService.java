@@ -12,6 +12,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -458,24 +459,7 @@ public abstract class ComponentManagementService extends BasicService implements
 																	
 																	// todo: can be called after listener has (concurrently) deregistered
 																	// notify listeners without holding locks
-																	ICMSComponentListener[] alisteners;
-																	synchronized(listeners)
-																	{
-																		Set	slisteners	= new HashSet(listeners.getCollection(null));
-																		slisteners.addAll(listeners.getCollection(cid));
-																		alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
-																	}
-																	for(int i=0; i<alisteners.length; i++)
-																	{
-																		try
-																		{
-																			alisteners[i].componentAdded(ad);
-																		}
-																		catch(Exception e)
-																		{
-																			e.printStackTrace();
-																		}
-																	}
+																	notifyListenersAdded(cid, ad);
 																			
 			//														System.out.println("created: "+cid.getLocalName()+" "+(parent!=null?parent.getComponentIdentifier().getLocalName():"null"));
 			//														System.out.println("added: "+descs.size()+", "+aid);
@@ -1234,29 +1218,7 @@ public abstract class ComponentManagementService extends BasicService implements
 //					exeservice.cancel(adapter).addResultListener(new DelegationResultListener(ret));
 			}
 			
-			notifyListeners(cid, desc);
-//			ICMSComponentListener[]	alisteners;
-//			synchronized(listeners)
-//			{
-//				Set	slisteners	= new HashSet(listeners.getCollection(null));
-//				slisteners.addAll(listeners.getCollection(cid));
-//				alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
-//			}
-//			// todo: can be called after listener has (concurrently) deregistered
-//			for(int i=0; i<alisteners.length; i++)
-//			{
-//				alisteners[i].componentChanged(ad).addResultListener(new IResultListener()
-//				{
-//					public void resultAvailable(Object result)
-//					{
-//					}
-//					
-//					public void exceptionOccurred(Exception exception)
-//					{
-//						System.out.println("prob: "+exception);
-//					}
-//				});
-//			}
+			notifyListenersChanged(cid, desc);
 		}
 		
 		return ret;
@@ -1397,7 +1359,7 @@ public abstract class ComponentManagementService extends BasicService implements
 							}
 							
 							if(changed)
-								notifyListeners(cid, desc);
+								notifyListenersChanged(cid, desc);
 						
 							ret.setResult(desc);
 						}
@@ -1504,19 +1466,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				ad.setBreakpoints(breakpoints);
 			}
 			
-			notifyListeners(cid, ad);
-//			ICMSComponentListener[]	alisteners;
-//			synchronized(listeners)
-//			{
-//				Set	slisteners	= new HashSet(listeners.getCollection(null));
-//				slisteners.addAll(listeners.getCollection(cid));
-//				alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
-//			}
-//			// todo: can be called after listener has (concurrently) deregistered
-//			for(int i=0; i<alisteners.length; i++)
-//			{
-//				alisteners[i].componentChanged(ad);
-//			}
+			notifyListenersChanged(cid, ad);
 			
 			ret.setResult(null);
 		}
@@ -1665,29 +1615,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			
 			exitDestroy(cid, desc, exception, results);
 
-			
-			ICMSComponentListener[] alisteners;
-			synchronized(listeners)
-			{
-				Set	slisteners	= new HashSet(listeners.getCollection(null));
-				slisteners.addAll(listeners.getCollection(cid));
-				alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
-			}
-			
-			// todo: can be called after listener has (concurrently) deregistered
-//			logger.info("Component removed: "+cid.getName()+", "+SUtil.arrayToString(alisteners));
-			for(int i=0; i<alisteners.length; i++)
-			{
-				try
-				{
-					alisteners[i].componentRemoved(desc, results);
-				}
-				catch(Exception e)
-				{
-//					e.printStackTrace();
-					System.out.println("WARNING: Exception when removing component: "+desc+", "+e);
-				}
-			}
+			notifyListenersRemoved(cid, desc, results);
 			
 			Exception	ex	= adapter.getException();
 //			if(exceptions!=null && exceptions.containsKey(cid))
@@ -2438,50 +2366,9 @@ public abstract class ComponentManagementService extends BasicService implements
 			desc.setState(state);			
 		}
 		
-		notifyListeners(comp, desc);
-//		ICMSComponentListener[]	alisteners;
-//		synchronized(listeners)
-//		{
-//			Set	slisteners	= new HashSet(listeners.getCollection(null));
-//			slisteners.addAll(listeners.getCollection(comp));
-//			alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
-//		}
-//		// todo: can be called after listener has (concurrently) deregistered
-//		for(int i=0; i<alisteners.length; i++)
-//		{
-//			try
-//			{
-//				alisteners[i].componentChanged(desc);
-//			}
-//			catch(Exception e)
-//			{
-//				System.out.println("WARNING: Exception when changing component state: "+desc+", "+e);
-//			}
-//		}
+		notifyListenersChanged(comp, desc);
 	}
 
-//	/**
-//	 *  Set the exception of a component.
-//	 *  @param comp	The component.
-//	 *  @param e	The exception.
-//	 */
-//	public void setComponentException(IComponentIdentifier comp, Exception e)
-//	{
-//		synchronized(descs)
-//		{
-//			if(exceptions==null)
-//				exceptions	= new HashMap();
-//			
-//			exceptions.put(comp, e);
-//
-//			Object[] infos = (Object[])initinfos.get(comp);
-//			if(infos!=null)
-//			{
-//				((Future)infos[4]).setException(e);
-//			}
-//		}
-//	}
-	
 	//-------- IService interface --------
 	
 	/**
@@ -2805,9 +2692,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	}*/
 	
 	/**
-	 * 
+	 *  Notify the cms listeners of a change.
 	 */
-	protected void notifyListeners(IComponentIdentifier cid, IComponentDescription desc)
+	protected void notifyListenersChanged(final IComponentIdentifier cid, IComponentDescription desc)
 	{
 		ICMSComponentListener[]	alisteners;
 		synchronized(listeners)
@@ -2823,7 +2710,8 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		for(int i=0; i<alisteners.length; i++)
 		{
-			alisteners[i].componentChanged(desc).addResultListener(new IResultListener()
+			final ICMSComponentListener lis = alisteners[i];
+			lis.componentChanged(desc).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -2831,7 +2719,78 @@ public abstract class ComponentManagementService extends BasicService implements
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					System.out.println("prob: "+exception);
+//					System.out.println("prob: "+exception);
+					removeComponentListener(cid, lis);
+				}
+			});
+		}
+	}
+	
+	/**
+	 *  Notify the cms listeners of a removal.
+	 */
+	protected void notifyListenersRemoved(final IComponentIdentifier cid, IComponentDescription desc, Map results)
+	{
+		ICMSComponentListener[]	alisteners;
+		synchronized(listeners)
+		{
+			Set	slisteners	= new HashSet(listeners.getCollection(null));
+			slisteners.addAll(listeners.getCollection(cid));
+			alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
+		}
+		// todo: can be called after listener has (concurrently) deregistered
+		
+//		System.out.println("comp changed: "+desc+" "+listeners);
+//		logger.info("Component changed: "+desc+" "+listeners);
+		
+		for(int i=0; i<alisteners.length; i++)
+		{
+			final ICMSComponentListener lis = alisteners[i];
+			lis.componentRemoved(desc, results).addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object result)
+				{
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+//					System.out.println("prob: "+exception);
+					removeComponentListener(cid, lis);
+				}
+			});
+		}
+	}
+	
+	/**
+	 *  Notify the cms listeners of an addition.
+	 */
+	protected void notifyListenersAdded(final IComponentIdentifier cid, IComponentDescription desc)
+	{
+		ICMSComponentListener[]	alisteners;
+		synchronized(listeners)
+		{
+			Set	slisteners	= new HashSet(listeners.getCollection(null));
+			slisteners.addAll(listeners.getCollection(cid));
+			alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
+		}
+		// todo: can be called after listener has (concurrently) deregistered
+		
+//		System.out.println("comp changed: "+desc+" "+listeners);
+//		logger.info("Component changed: "+desc+" "+listeners);
+		
+		for(int i=0; i<alisteners.length; i++)
+		{
+			final ICMSComponentListener lis = alisteners[i];
+			lis.componentAdded(desc).addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object result)
+				{
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+//					System.out.println("prob: "+exception);
+					removeComponentListener(cid, lis);
 				}
 			});
 		}

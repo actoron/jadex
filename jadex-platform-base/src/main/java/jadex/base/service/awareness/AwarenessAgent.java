@@ -681,6 +681,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 				IComponentIdentifier cid = dif.getProxy();
 				if(cid!=null)
 				{
+//					System.out.println("awareness destroy: "+cid);
 					cms.destroyComponent(cid).addResultListener(createResultListener(new DelegationResultListener(ret)
 					{
 						public void customResultAvailable(Object result)
@@ -839,7 +840,6 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 									else if(deleteproxy)
 									{
 										deleteProxy(dif);
-										
 									}
 								}
 							}

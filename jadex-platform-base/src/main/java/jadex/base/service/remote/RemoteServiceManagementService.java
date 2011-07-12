@@ -496,8 +496,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //												System.out.println("Waitingcalls: "+waitingcalls.size());
 //												System.out.println("Cancel timeout (ex): "+callid+" "+future);
 //												errors.put(callid, new Object[]{"Cancel timeout (ex):", exception});
-												ia.getLogger().warning("Remote request failed: "+content);
-												ia.getLogger().info("Failure: "+exception.toString());
+//												ia.getLogger().warning("Remote request failed: "+content);
+												ia.getLogger().info("Remote exception occurred: "+exception.toString());
 											}
 										}));
 									}

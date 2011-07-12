@@ -4,6 +4,7 @@ package jadex.commons.future;
 /**
  *  Result listener with additional notifications in case of intermediate results.
  */
+//@Reference
 public interface IIntermediateResultListener extends IResultListener
 {
 	/**
