@@ -93,7 +93,15 @@ public class RemoteFile extends File
     {
     	return filedata.getFilename();
     }
-
+    
+    /**
+     *  Get the path.
+     */
+    public String getAbsolutePath()
+    {
+    	return filedata.getPath();
+    }
+    
     /**
      *  Get the parent name.
      *  @return The parent name.
