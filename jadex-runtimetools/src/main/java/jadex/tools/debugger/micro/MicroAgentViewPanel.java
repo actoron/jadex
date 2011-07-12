@@ -1,5 +1,7 @@
 package jadex.tools.debugger.micro;
 
+import jadex.bridge.BulkComponentChangeEvent;
+import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
@@ -9,6 +11,7 @@ import jadex.commons.IBreakpointPanel;
 import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.JSplitPanel;
+import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentInterpreter;
 import jadex.xml.annotation.XMLClassname;
 
@@ -17,10 +20,14 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JList;
@@ -47,10 +54,13 @@ public class MicroAgentViewPanel extends JPanel
 	/** The change listener. */
 	protected IComponentListener listener;
 	
-	/** The list for the history. */
-//	protected IOAVState step;
-	protected JTextArea step;
+	/** The list of steps. */
 	protected DefaultListModel steps;
+
+	/** The details view. */
+	protected JTextArea step;
+	
+	/** The last displayed step. */
 	protected Object laststep;
 	
 	/** The list for the history. */
@@ -71,7 +81,7 @@ public class MicroAgentViewPanel extends JPanel
 		
 		steps = new DefaultListModel();
 		final JList sl = new JList(steps);
-		sl.setCellRenderer(new DefaultListCellRenderer()
+		DefaultListCellRenderer	eventrenderer	= new DefaultListCellRenderer()
 		{
 			public Component getListCellRendererComponent(JList list, Object value,
 				int index, boolean isSelected, boolean cellHasFocus)
@@ -79,13 +89,15 @@ public class MicroAgentViewPanel extends JPanel
 				value = ((IComponentChangeEvent)value).getSourceName();
 				return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			}
-		});
+		};
+		sl.setCellRenderer(eventrenderer);
 		JPanel ul = new JPanel(new BorderLayout());
 		ul.add(new JScrollPane(sl));
 		ul.setBorder(BorderFactory.createTitledBorder("Steps"));
 		
 		history = new DefaultListModel();
 		final JList hl = new JList(history);
+		hl.setCellRenderer(eventrenderer);
 		JPanel ur = new JPanel(new BorderLayout());
 		JScrollPane sp = new JScrollPane(hl);
 		ur.add(sp);
@@ -105,6 +117,20 @@ public class MicroAgentViewPanel extends JPanel
 		// todo: problem should be called on process execution thread!
 //		instance.setHistoryEnabled(true);	// Todo: Disable history on close?
 		
+		sl.setSelectionModel(new DefaultListSelectionModel()
+		{
+			public void	setSelectionInterval(int index0, int index1)
+			{
+				if(isSelectedIndex(index0))
+				{
+					super.removeSelectionInterval(index0, index1);
+				}
+				else
+				{
+					super.setSelectionInterval(index0, index1);
+				}
+		    }
+		});
 		sl.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		sl.getSelectionModel().addListSelectionListener(new ListSelectionListener()
 		{
@@ -123,14 +149,56 @@ public class MicroAgentViewPanel extends JPanel
 						laststep = step;
 					}
 				}
-				else if(laststep!=null)
+				else if(laststep!=null && steps.contains(laststep))
 				{
 //					step.removeJavaRootObject(laststep);
+					step.setText("");
 					laststep = null;
 				}
 			}
 		});
-		
+
+		hl.setSelectionModel(new DefaultListSelectionModel()
+		{
+			public void	setSelectionInterval(int index0, int index1)
+			{
+				if(isSelectedIndex(index0))
+				{
+					super.removeSelectionInterval(index0, index1);
+				}
+				else
+				{
+					super.setSelectionInterval(index0, index1);
+				}
+		    }
+		});
+		hl.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		hl.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+		{
+			public void valueChanged(ListSelectionEvent e)
+			{
+				int idx = hl.getSelectedIndex();
+//				System.out.println("sel: "+idx);
+				if(idx!=-1)
+				{
+					IComponentChangeEvent cce = (IComponentChangeEvent)history.get(idx);
+					if(cce!=null && cce!=laststep)
+					{
+//						if(laststep!=null)
+//							step.removeJavaRootObject(laststep);
+						step.setText(cce.getDetails().toString());
+						laststep = step;
+					}
+				}
+				else if(laststep!=null && history.contains(laststep))
+				{
+//					step.removeJavaRootObject(laststep);
+					step.setText("");
+					laststep = null;
+				}
+			}
+		});
+
 		final JCheckBox hon = new JCheckBox("Store History");
 		hon.setSelected(true);
 
@@ -189,16 +257,9 @@ public class MicroAgentViewPanel extends JPanel
 						if(IComponentChangeEvent.EVENT_TYPE_CREATION.equals(cce.getEventType()) && MicroAgentInterpreter.TYPE_STEP.equals(cce.getSourceCategory()))
 						{
 							steps.addElement(cce);
-							if(steps.size()==1)
+							if(laststep==null && steps.size()==1)
 							{
 								sl.setSelectedIndex(0);
-							}
-							if(hon.isSelected())
-							{
-								history.addElement(cce.getSourceName());
-								hl.ensureIndexIsVisible(history.size()-1);
-								hl.invalidate();
-								hl.repaint();
 							}
 						}
 						else if(IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()) && MicroAgentInterpreter.TYPE_STEP.equals(cce.getSourceCategory()))
@@ -212,10 +273,13 @@ public class MicroAgentViewPanel extends JPanel
 									steps.removeElementAt(i);
 									break;
 								}
-								if(steps.size()>0)
-								{
-									sl.setSelectedIndex(0);
-								}
+							}
+							if(hon.isSelected())
+							{
+								history.addElement(cce);
+								hl.ensureIndexIsVisible(history.size()-1);
+								hl.invalidate();
+								hl.repaint();
 							}
 						}
 					}
@@ -230,17 +294,29 @@ public class MicroAgentViewPanel extends JPanel
 			@XMLClassname("installListener")
 			public Object execute(IInternalAccess ia)
 			{
-				// Post current state to remote listener
-//				final List	events	= new ArrayList();
-//				for(Iterator it=((MicroAgentInterpreter)ia).getThreadContext().getAllThreads().iterator(); it.hasNext(); )
-//				{
-//					ProcessThread	thread	= (ProcessThread)it.next();
-//					events.add(new ChangeEvent(null, BpmnInterpreter.EVENT_THREAD_ADDED,
-//						new ProcessThreadInfo(thread.getId(), thread.getActivity().getBreakpointId(),
-//							thread.getActivity().getPool()!=null ? thread.getActivity().getPool().getName() : null,
-//							thread.getActivity().getLane()!=null ? thread.getActivity().getLane().getName() : null)));
-//				}
-//				rcl.changeOccurred(new ChangeEvent(null, RemoteChangeListenerHandler.EVENT_BULK, events));
+				List	events	= new ArrayList();
+				try
+				{
+					// Hack!!! Better way to access steps!?
+					MicroAgent	ma	= (MicroAgent)ia;
+					Field	fi	= MicroAgent.class.getDeclaredField("interpreter");
+					fi.setAccessible(true);
+					MicroAgentInterpreter	interpreter	= (MicroAgentInterpreter)fi.get(ma);
+					Field	fs	= MicroAgentInterpreter.class.getDeclaredField("steps");
+					fs.setAccessible(true);
+					List	steps	= (List)fs.get(interpreter);
+					for(int i=0; steps!=null && i<steps.size(); i++)
+					{
+						Object[]	step	= (Object[])steps.get(i);
+						events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, MicroAgentInterpreter.TYPE_STEP, step[0].getClass().getName(),
+							step[0].toString(), ma.getComponentIdentifier(), interpreter.getCreationTime(), interpreter.getStepDetails((IComponentStep)step[0])));
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+				lis.eventOccured(new BulkComponentChangeEvent((IComponentChangeEvent[])events.toArray(new IComponentChangeEvent[events.size()])));
 				
 				ia.addComponentListener(lis);
 				return null;

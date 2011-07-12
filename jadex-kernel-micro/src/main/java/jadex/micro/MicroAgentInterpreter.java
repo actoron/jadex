@@ -11,11 +11,11 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
+import jadex.bridge.ITransferableStep;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.clock.ITimer;
-import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -322,10 +322,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			steps.add(step);
 			if(componentlisteners!=null)
 			{
-				// For coordination space step is set as detail (problem remote comm?)
-//				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, step[0].getClass().getName(), 
-//					step[0].toString(), microagent.getComponentIdentifier(), getStepDetails((IComponentStep)step[0])));
-				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, step[0].getClass().getName(), step[0].toString(), microagent.getComponentIdentifier(), getCreationTime(), step[0]));
+				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, step[0].getClass().getName(), 
+					step[0].toString(), microagent.getComponentIdentifier(), getCreationTime(), getStepDetails((IComponentStep)step[0])));
 			}
 		}
 	}
@@ -341,8 +339,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			steps	= null;
 		if(componentlisteners!=null)
 		{
-			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_STEP, 
-				ret[0].getClass().getName(), ret[0].toString(), microagent.getComponentIdentifier(), getCreationTime(), getStepDetails((IComponentStep)ret[0])));
+			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_STEP, ret[0].getClass().getName(),
+				ret[0].toString(), microagent.getComponentIdentifier(), getCreationTime(), getStepDetails((IComponentStep)ret[0])));
 		}
 //		notifyListeners(new ChangeEvent(this, "removeStep", new Integer(0)));
 		return ret;
@@ -646,34 +644,45 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	/**
 	 *  Get the details of a step.
 	 */
-	public String getStepDetails(IComponentStep step)
+	public Object getStepDetails(IComponentStep step)
 	{
-		StringBuffer buf = new StringBuffer();
+		Object	ret;
 		
-		buf.append("Class = ").append(SReflect.getClassName(step.getClass()));
-		
-		Field[] fields = step.getClass().getDeclaredFields();
-		for(int i=0; i<fields.length; i++)
+		if(step instanceof ITransferableStep)
 		{
-			String valtext = null;
-			try
+			ret	= ((ITransferableStep)step).getTransferableObject();
+		}
+		else
+		{
+			StringBuffer buf = new StringBuffer();
+			
+			buf.append("Class = ").append(SReflect.getClassName(step.getClass()));
+			
+			Field[] fields = step.getClass().getDeclaredFields();
+			for(int i=0; i<fields.length; i++)
 			{
-				fields[i].setAccessible(true);
-				Object val = fields[i].get(step);
-				valtext = val==null? "null": val.toString();
-			}
-			catch(Exception e)
-			{
-				valtext = e.getMessage();
+				String valtext = null;
+				try
+				{
+					fields[i].setAccessible(true);
+					Object val = fields[i].get(step);
+					valtext = val==null? "null": val.toString();
+				}
+				catch(Exception e)
+				{
+					valtext = e.getMessage();
+				}
+				
+				if(valtext!=null)
+				{
+					buf.append("\n");
+					buf.append(fields[i].getName()).append(" = ").append(valtext);
+				}
 			}
 			
-			if(valtext!=null)
-			{
-				buf.append("\n");
-				buf.append(fields[i].getName()).append(" = ").append(valtext);
-			}
-		}
+			ret	= buf.toString();
+		}		
 		
-		return buf.toString();
+		return ret;
 	}
 }
