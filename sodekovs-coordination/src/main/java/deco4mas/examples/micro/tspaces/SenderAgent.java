@@ -1,10 +1,10 @@
 package deco4mas.examples.micro.tspaces;
 
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import deco4mas.coordinate.annotation.CoordinationParameter;
+import deco4mas.coordinate.interpreter.agent_state.CoordinationComponentStep;
 
 /**
  * This class is under observation by the coordination framework. Whenever the
@@ -40,7 +40,7 @@ public class SenderAgent extends MicroAgent {
 	 * 
 	 * @author Thomas Preisler
 	 */
-	public class CounterIncrementStep implements IComponentStep {
+	public class CounterIncrementStep extends CoordinationComponentStep {
 
 		/**
 		 * This attribute is propagated through the coordination framework. It

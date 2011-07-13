@@ -35,7 +35,7 @@
 	<events>
 		<!-- This internal event is called by the coordination framework -->
 		<internalevent name="receive_message">
-			<parameter name="message" class="String" />
+			<parameter name="receivedId" class="String" />
 		</internalevent>
 	</events>
 	
@@ -60,7 +60,7 @@
 				<internalevent ref="receive_message" />
 			</trigger>
 			<parameter name="message" class="String">
-				<internaleventmapping ref="receive_message.message"/>
+				<internaleventmapping ref="receive_message.receivedId"/>
 			</parameter>
 		</plan>
 	</plans>

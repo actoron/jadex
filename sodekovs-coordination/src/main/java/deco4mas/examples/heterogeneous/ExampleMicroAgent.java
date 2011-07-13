@@ -6,6 +6,7 @@ import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import deco4mas.coordinate.annotation.CoordinationParameter;
 import deco4mas.coordinate.annotation.CoordinationStep;
+import deco4mas.coordinate.interpreter.agent_state.CoordinationComponentStep;
 
 /**
  * The example micro agent. After creation the agents waits for 10s before the {@link SayHelloStep} is started. This {@link IComponentStep} is observed by the coordination framework and the parameter
@@ -35,7 +36,7 @@ public class ExampleMicroAgent extends MicroAgent {
 	}
 
 	@CoordinationStep
-	public class SayHelloStep implements IComponentStep {
+	public class SayHelloStep extends CoordinationComponentStep {
 
 		@CoordinationParameter
 		public String message = null;
@@ -53,7 +54,7 @@ public class ExampleMicroAgent extends MicroAgent {
 	}
 
 	@CoordinationParameter
-	public class ReceiveHelloStep implements IComponentStep {
+	public class ReceiveHelloStep extends CoordinationComponentStep {
 
 		@CoordinationParameter
 		public String message = null;

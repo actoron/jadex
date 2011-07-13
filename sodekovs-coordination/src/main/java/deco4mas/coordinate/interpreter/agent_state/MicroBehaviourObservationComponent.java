@@ -67,60 +67,35 @@ public class MicroBehaviourObservationComponent extends BehaviorObservationCompo
 		ExternalAccess externalAccess = (ExternalAccess) extAccess;
 		MicroAgentInterpreter interpreter = (MicroAgentInterpreter) externalAccess.getInterpreter();
 		interpreter.addComponentListener(new IComponentListener() {
-			
+
 			@Override
 			public IFilter getFilter() {
-				return new IFilter()
-				{
-					public boolean filter(Object obj)
-					{
+				return new IFilter() {
+					public boolean filter(Object obj) {
 						// Nur EVENT_TYPE_CREATION Events sind interessant
 						IComponentChangeEvent cce = (IComponentChangeEvent) obj;
 						return IComponentChangeEvent.EVENT_TYPE_CREATION.equals(cce.getEventType());
 					}
 				};
 			}
-			
+
 			@Override
 			public IFuture eventOccured(IComponentChangeEvent cce) {
 				if (cce.getSourceCategory().equals(MicroAgentInterpreter.TYPE_STEP)) {
-					IComponentStep step = (IComponentStep) cce.getDetails();
-					if (step instanceof MicroAgent.ExecuteWaitForStep) {
-						MicroAgent.ExecuteWaitForStep waitForStep = (MicroAgent.ExecuteWaitForStep) step;
-						IComponentStep runStep = waitForStep.getComponentStep();
-						String nameOfElement = runStep.getClass().getSimpleName();
-						
+					if (cce.getDetails() instanceof CoordinationStepDetails) {
+						CoordinationStepDetails details = (CoordinationStepDetails) cce.getDetails();
+						String nameOfElement = details.getSimpleClassName();
+						IComponentStep runStep = details.getStep();
+
 						if (agentElement.getElement_id().equals(nameOfElement)) {
 							checkAndPublishIfApplicable(runStep, AgentElementType.MICRO_STEP, nameOfElement);
 						}
 					}
 				}
-				
+
 				return IFuture.DONE;
 			}
 		});
-		
-		
-//		interpreter.setHistoryEnabled(true);
-//		interpreter.addChangeListener(new IChangeListener() {
-//
-//			@Override
-//			public void changeOccurred(ChangeEvent event) {
-//				if (event.getType().equals("addStep")) {
-//					Object[] values = (Object[]) event.getValue();
-//					IComponentStep step = (IComponentStep) values[0];
-//					if (step instanceof MicroAgent.ExecuteWaitForStep) {
-//						MicroAgent.ExecuteWaitForStep waitForStep = (MicroAgent.ExecuteWaitForStep) step;
-//						IComponentStep runStep = waitForStep.getComponentStep();
-//						String nameOfElement = runStep.getClass().getSimpleName();
-//
-//						if (agentElement.getAgentElementType().equals(AgentElementType.MICRO_STEP.toString()) && agentElement.getElement_id().equals(nameOfElement)) {
-//							checkAndPublishIfApplicable(runStep, AgentElementType.MICRO_STEP, nameOfElement);
-//						}
-//					}
-//				}
-//			}
-//		});
 	}
 
 	/**
@@ -189,13 +164,13 @@ public class MicroBehaviourObservationComponent extends BehaviorObservationCompo
 		IExternalAccess parent = ma.getParent();
 		for (String spaceName : spaces) {
 			parent.getExtension(spaceName).addResultListener(new IResultListener() {
-				
+
 				@Override
 				public void resultAvailable(Object result) {
 					CoordinationSpace space = (CoordinationSpace) result;
 					eventPublication.publishEvent(coordInfo, space);
 				}
-				
+
 				@Override
 				public void exceptionOccurred(Exception exception) {
 				}

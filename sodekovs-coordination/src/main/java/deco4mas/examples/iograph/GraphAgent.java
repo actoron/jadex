@@ -3,12 +3,12 @@
  */
 package deco4mas.examples.iograph;
 
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import deco4mas.coordinate.annotation.CoordinationParameter;
 import deco4mas.coordinate.annotation.CoordinationStep;
+import deco4mas.coordinate.interpreter.agent_state.CoordinationComponentStep;
 import deco4mas.mechanism.graph.IOGraph;
 
 /**
@@ -44,7 +44,7 @@ public class GraphAgent extends MicroAgent {
 	 * This step is called to send the id as a coordination information to the next agent specified in the {@link IOGraph}.
 	 */
 	@CoordinationStep
-	public class SendStep implements IComponentStep {
+	public class SendStep extends CoordinationComponentStep {
 
 		@CoordinationParameter
 		public String id = null;
@@ -64,7 +64,7 @@ public class GraphAgent extends MicroAgent {
 	 * This step is called when a coordination information is received.
 	 */
 	@CoordinationStep
-	public class ReceiveStep implements IComponentStep {
+	public class ReceiveStep extends CoordinationComponentStep {
 
 		@CoordinationParameter
 		public String receivedId = null;
