@@ -648,41 +648,39 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	{
 		Object	ret;
 		
-		if(step instanceof ITransferableStep)
+		if(step instanceof MicroAgent.ExecuteWaitForStep)
 		{
-			ret	= ((ITransferableStep)step).getTransferableObject();
-		}
-		else
-		{
-			StringBuffer buf = new StringBuffer();
-			
-			buf.append("Class = ").append(SReflect.getClassName(step.getClass()));
-			
-			Field[] fields = step.getClass().getDeclaredFields();
-			for(int i=0; i<fields.length; i++)
+			MicroAgent.ExecuteWaitForStep waitForStep = (MicroAgent.ExecuteWaitForStep) step;
+			if(waitForStep.getComponentStep() instanceof ITransferableStep)
 			{
-				String valtext = null;
-				try
-				{
-					fields[i].setAccessible(true);
-					Object val = fields[i].get(step);
-					valtext = val==null? "null": val.toString();
-				}
-				catch(Exception e)
-				{
-					valtext = e.getMessage();
-				}
-				
-				if(valtext!=null)
-				{
-					buf.append("\n");
-					buf.append(fields[i].getName()).append(" = ").append(valtext);
-				}
+				ret = ((ITransferableStep) waitForStep.getComponentStep()).getTransferableObject();
+				return ret;
 			}
-			
-			ret	= buf.toString();
-		}		
+		}
 		
+		StringBuffer buf = new StringBuffer();
+
+		buf.append("Class = ").append(SReflect.getClassName(step.getClass()));
+
+		Field[] fields = step.getClass().getDeclaredFields();
+		for (int i = 0; i < fields.length; i++) {
+			String valtext = null;
+			try {
+				fields[i].setAccessible(true);
+				Object val = fields[i].get(step);
+				valtext = val == null ? "null" : val.toString();
+			} catch (Exception e) {
+				valtext = e.getMessage();
+			}
+
+			if (valtext != null) {
+				buf.append("\n");
+				buf.append(fields[i].getName()).append(" = ").append(valtext);
+			}
+		}
+
+		ret = buf.toString();
+			
 		return ret;
 	}
 }
