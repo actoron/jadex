@@ -630,6 +630,7 @@ public class RemoteFileSystemView extends FileSystemView
 					}
 					else
 					{
+						System.out.println("file does not exist: "+dir);
 						files = new File[0];
 					}
 					return FileData.convertToRemoteFiles(files);
@@ -727,4 +728,12 @@ public class RemoteFileSystemView extends FileSystemView
 //		}
 //	}
 	
+	/**
+	 *  Main for testing.
+	 */
+	public static void main(String[] args) throws Exception
+	{
+		File f = new File("C:\\projects\\jadex.jar");
+		System.out.println(f.getName()+" "+f.getPath()+" "+f.getAbsolutePath()+" "+f.getCanonicalPath());
+	}
 }

@@ -2,8 +2,6 @@ package jadex.commons;
 
 import jadex.commons.collection.SCollection;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -95,12 +93,12 @@ public class SUtil
 		htmlwraps.put("'", "&apos;");
 		htmlwraps.put("<", "&lt;");
 		htmlwraps.put(">", "&gt;");
-		htmlwraps.put("ï¿½", "&auml;");
-		htmlwraps.put("ï¿½", "&Auml;");
-		htmlwraps.put("ï¿½", "&uuml;");
-		htmlwraps.put("ï¿½", "&Uuml;");
-		htmlwraps.put("ï¿½", "&ouml;");
-		htmlwraps.put("ï¿½", "&Ouml;");
+		htmlwraps.put("ä", "&auml;");
+		htmlwraps.put("Ä", "&Auml;");
+		htmlwraps.put("ü", "&uuml;");
+		htmlwraps.put("Ü", "&Uuml;");
+		htmlwraps.put("ö", "&ouml;");
+		htmlwraps.put("Ö", "&Ouml;");
 
 		htmlwraps.put("ï¿½", "&acute;");
 		htmlwraps.put("ï¿½", "&agrave;");
@@ -752,39 +750,6 @@ public class SUtil
 				res += tmp;
 		}
 		return res;
-	}
-
-	/**
-	 * Convert a color to an html representation.
-	 * 
-	 * @param color The color.
-	 * @return The html string representing the color.
-	 */
-	public static String colorToHTML(Color color)
-	{
-		return "#" + Integer.toHexString(color.getRed())
-				+ Integer.toHexString(color.getGreen())
-				+ Integer.toHexString(color.getBlue());
-	}
-
-	/**
-	 * Convert a font to an html representation.
-	 * 
-	 * @param font The font.
-	 * @return The html string representing the font.
-	 */
-	public static String fontToHTML(Font font)
-	{
-		String style;
-		if(font.isBold())
-		{
-			style = font.isItalic() ? "bolditalic " : "bold ";
-		}
-		else
-		{
-			style = font.isItalic() ? "italic " : "";
-		}
-		return style + font.getSize() + " " + font.getName();
 	}
 
 	/**

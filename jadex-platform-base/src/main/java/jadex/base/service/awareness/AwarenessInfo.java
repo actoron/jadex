@@ -32,10 +32,10 @@ public class AwarenessInfo
 	protected long	delay;
 	
 	/** The includes list. */
-	protected List	includes;
+	protected String[] includes;
 	
 	/** The excludes list. */
-	protected List	excludes;
+	protected String[] excludes;
 	
 	//-------- constructors --------
 	
@@ -57,7 +57,7 @@ public class AwarenessInfo
 	/**
 	 *  Create a new awareness info.
 	 */
-	public AwarenessInfo(IComponentIdentifier sender, String state, long delay, List includes, List excludes)
+	public AwarenessInfo(IComponentIdentifier sender, String state, long delay, String[] includes, String[] excludes)
 	{
 		this.sender = sender;
 		this.state = state;
@@ -128,7 +128,7 @@ public class AwarenessInfo
 	 */
 	public String[] getIncludes()
 	{
-		return includes!=null ? (String[])includes.toArray(new String[includes.size()]) : SUtil.EMPTY_STRING_ARRAY;
+		return includes!=null? includes: SUtil.EMPTY_STRING_ARRAY;
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class AwarenessInfo
 	 */
 	public void setIncludes(String[] includes)
 	{
-		this.includes	= new ArrayList(Arrays.asList(includes));
+		this.includes	= includes;
 	}
 
 	/**
@@ -146,7 +146,7 @@ public class AwarenessInfo
 	 */
 	public void setExcludes(String[] excludes)
 	{
-		this.excludes	= new ArrayList(Arrays.asList(excludes));
+		this.excludes	= excludes;
 	}
 	
 	/**
@@ -155,7 +155,7 @@ public class AwarenessInfo
 	 */
 	public String[] getExcludes()
 	{
-		return excludes!=null ? (String[])excludes.toArray(new String[excludes.size()]) : SUtil.EMPTY_STRING_ARRAY;
+		return excludes!=null? excludes: SUtil.EMPTY_STRING_ARRAY;
 	}
 
 	/**

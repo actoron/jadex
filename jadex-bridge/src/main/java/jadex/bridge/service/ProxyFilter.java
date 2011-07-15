@@ -5,7 +5,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.lang.reflect.Proxy;
-import java.rmi.server.RemoteObjectInvocationHandler;
 
 /**
  *  Test if a class is a proxy.
@@ -25,7 +24,9 @@ public class ProxyFilter implements IRemoteFilter
 	public IFuture filter(Object obj)
 	{
 		return new Future(!Proxy.isProxyClass(obj.getClass()) || 
-			!(Proxy.getInvocationHandler(obj) instanceof RemoteObjectInvocationHandler));
+			// todo: fix this Hack	
+			!(Proxy.getInvocationHandler(obj).getClass().getName().indexOf("RemoteMethodInvocationHandler")!=-1));
+//			!(Proxy.getInvocationHandler(obj) instanceof RemoteMethodInvocationHandler));
 	}
 	
 	/**

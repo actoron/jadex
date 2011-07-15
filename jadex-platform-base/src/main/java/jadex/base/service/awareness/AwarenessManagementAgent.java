@@ -7,10 +7,8 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ISettingsService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.threadpool.IThreadPoolService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Property;
-import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -20,23 +18,21 @@ import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
+import jadex.micro.annotation.ComponentType;
+import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.xml.annotation.XMLClassname;
-import jadex.xml.bean.JavaReader;
-import jadex.xml.bean.JavaWriter;
-import jadex.xml.reader.Reader;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -48,10 +44,6 @@ import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.xml.stream.Location;
-import javax.xml.stream.XMLReporter;
-import javax.xml.stream.XMLStreamException;
-
 
 /**
  *  Agent that sends multicasts to locate other Jadex awareness agents.
@@ -59,43 +51,58 @@ import javax.xml.stream.XMLStreamException;
 @Description("This agent looks for other awareness agents in the local net.")
 @Arguments(
 {
-	@Argument(name="address", clazz=String.class, defaultvalue="\"224.0.0.0\"", description="The ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255)."),
-	@Argument(name="port", clazz=int.class, defaultvalue="55667", description="The port used for finding other agents."),
+//	@Argument(name="address", clazz=String.class, defaultvalue="\"224.0.0.0\"", description="The ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255)."),
+//	@Argument(name="port", clazz=int.class, defaultvalue="55667", description="The port used for finding other agents."),
 	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
-	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
+//	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
 	@Argument(name="autocreate", clazz=boolean.class, defaultvalue="true", description="Set if new proxies should be automatically created when discovering new components."),
 	@Argument(name="autodelete", clazz=boolean.class, defaultvalue="true", description="Set if proxies should be automatically deleted when not discovered any longer."),
 	@Argument(name="proxydelay", clazz=long.class, defaultvalue="15000", description="The delay used by proxies."),
 	@Argument(name="includes", clazz=String.class, defaultvalue="\"\"", description="A list of platforms/IPs/hostnames to include (comma separated). Matches start of platform/IP/hostname."),
 	@Argument(name="excludes", clazz=String.class, defaultvalue="\"\"", description="A list of platforms/IPs/hostnames to exclude (comma separated). Matches start of platform/IP/hostname.")
 })
+@ComponentTypes({
+	@ComponentType(name="multidis", filename="jadex/base/service/awareness/MulticastDiscoveryAgent.class"),
+	@ComponentType(name="scannerdis", filename="jadex/base/service/awareness/IPScannerDiscoveryAgent.class")
+})
 @Configurations(
 {
-	@Configuration(name="Frequent updates (10s)", arguments=@NameValue(name="delay", value="10000")),
-	@Configuration(name="Medium updates (20s)", arguments=@NameValue(name="delay", value="20000")),
-	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"))
+	@Configuration(name="Frequent updates (10s)", arguments=@NameValue(name="delay", value="10000"), 
+		components=
+		{
+			@Component(name="multidis", type="multidis"),
+//			@Component(name="scannerdis", type="scannerdis")
+		}),
+	@Configuration(name="Medium updates (20s)", arguments=@NameValue(name="delay", value="20000"),
+		components=
+		{
+			@Component(name="multidis", type="multidis"),
+//			@Component(name="scannerdis", type="scannerdis")
+		}),
+	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"),
+		components=
+		{
+			@Component(name="multidis", type="multidis"),
+//			@Component(name="scannerdis", type="scannerdis")
+		}),
 })
 @Properties(@NameValue(name="componentviewer.viewerclass", value="\"jadex.base.service.awareness.AwarenessAgentPanel\""))
+@ProvidedServices(
+	@ProvidedService(type=IManagementService.class, implementation=@Implementation(expression="$component"))
+)
 @RequiredServices(
 {
 	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="threadpool", type=IThreadPoolService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 //	@RequiredService(name="clock", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
-	@RequiredService(name="settings", type=ISettingsService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+	@RequiredService(name="settings", type=ISettingsService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+	@RequiredService(name="discovery", type=IDiscoveryService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
-public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
+public class AwarenessManagementAgent extends MicroAgent implements IPropertiesProvider, IManagementService
 {
 	//-------- attributes --------
 	
-	/** The multicast internet address. */
-	protected InetAddress address;
-	
-	/** The receiver port. */
-	protected int port;
-	
-	/** Flag for enabling fast startup awareness (pingpong send behavior). */
-	protected boolean	fast;
-	
+	/** The send delay. */
+	protected long delay;
 	
 	/** Flag indicating if proxies should be automatically created. */
 	protected boolean autocreate;
@@ -105,26 +112,6 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 
 	/** The discovered components. */
 	protected Map discovered;
-	
-	
-	/** The socket to send. */
-	protected MulticastSocket sendsocket;
-	
-	/** The send delay. */
-	protected long delay;
-		
-	/** The current send id. */
-	protected String sendid;
-	
-	
-	/** The socket to send. */
-	protected MulticastSocket receivesocket;
-	
-	/** Flag indicating agent killed. */
-	protected boolean killed;
-	
-//	/** The clock service. */
-//	protected IClockService clock;
 	
 	/** The timer. */
 	protected Timer	timer;
@@ -138,15 +125,6 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	/** The excludes list. */
 	protected List	excludes;
 	
-	/** The java reader for parsing received awareness infos. */
-	protected Reader	reader;
-	
-	/** Flag indicating that the agent is started and the send behavior may be activated. */
-	protected boolean	started;
-	
-	/** Flag indicating that the agent has received its own discovery info. */
-	protected boolean	received_self;
-	
 	//-------- methods --------
 	
 	/**
@@ -156,24 +134,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	{
 		initArguments();
 		
-		try
-		{
-			this.sendsocket = new MulticastSocket();
-			this.sendsocket.setLoopbackMode(true);
-		}
-		catch(IOException e)
-		{
-			throw new RuntimeException(e);
-		}
 		this.discovered = new LinkedHashMap();
-		this.reader	= JavaReader.getReader(new XMLReporter()
-		{
-			public void report(String message, String type, Object related, Location location) throws XMLStreamException
-			{
-				// Ignore XML exceptions.
-//				getLogger().warning(message);
-			}
-		});
 		
 		final Future	ret	= new Future();
 		getServiceContainer().getRequiredService("settings").addResultListener(createResultListener(new IResultListener()
@@ -181,7 +142,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 			public void resultAvailable(Object result)
 			{
 				ISettingsService	settings	= (ISettingsService)result;
-				settings.registerPropertiesProvider(getAgentName(), AwarenessAgent.this)
+				settings.registerPropertiesProvider(getAgentName(), AwarenessManagementAgent.this)
 					.addResultListener(new DelegationResultListener(ret));
 			}
 			
@@ -200,19 +161,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	 */
 	protected void initArguments()
 	{
-		try
-		{
-			this.address = InetAddress.getByName((String)getArgument("address"));			
-		}
-		catch(UnknownHostException e)
-		{
-			throw new RuntimeException(e);
-		}
-		if(address==null)
-			throw new NullPointerException("Cannot get address: "+getArgument("address"));
-		this.port = ((Number)getArgument("port")).intValue();
 		this.delay = ((Number)getArgument("delay")).longValue();
-		this.fast = ((Boolean)getArgument("fast")).booleanValue();
 		this.autocreate = ((Boolean)getArgument("autocreate")).booleanValue();
 		this.autodelete = ((Boolean)getArgument("autodelete")).booleanValue();
 		
@@ -241,23 +190,24 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 		discovered.put(root, new DiscoveryInfo(root, null, getClockTime(), delay, false));
 		
 		startRemoveBehaviour();
-		// Wait before starting send behavior to not miss fast awareness pingpong replies,
-		// because receiver thread is not yet running. (hack???)
-		startReceiving().addResultListener(createResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				started	= true;
-				startSendBehaviour();
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				// Send also when receiving does not work?
-				started	= true;
-				startSendBehaviour();
-			}
-		}));
+		
+//		// Wait before starting send behavior to not miss fast awareness pingpong replies,
+//		// because receiver thread is not yet running. (hack???)
+//		startReceiving().addResultListener(createResultListener(new IResultListener()
+//		{
+//			public void resultAvailable(Object result)
+//			{
+//				started	= true;
+//				startSendBehaviour();
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				// Send also when receiving does not work?
+//				started	= true;
+//				startSendBehaviour();
+//			}
+//		}));
 	}
 	
 	/**
@@ -266,36 +216,6 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	 */
 	public IFuture	agentKilled()
 	{
-		killed = true;
-		
-		if(sendsocket!=null)
-		{
-			send(new AwarenessInfo(root, AwarenessInfo.STATE_OFFLINE, delay));
-		}
-		
-//		System.out.println("killed set to true: "+getComponentIdentifier());
-		synchronized(AwarenessAgent.this)
-		{
-			if(sendsocket!=null)
-			{
-				sendsocket.close();
-			}
-			if(receivesocket!=null)
-			{
-				try
-				{
-					receivesocket.leaveGroup(address);
-				}
-				catch(Exception e)
-				{
-				}
-				finally
-				{
-					receivesocket.close();
-				}
-			}
-		}
-		
 		final Future	ret	= new Future();
 		getServiceContainer().getRequiredService("settings").addResultListener(createResultListener(new IResultListener()
 		{
@@ -314,46 +234,98 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 		}));
 		
 		return ret;
-
 	}
 	
 	/**
-	 *  Start sending of message
+	 *  Announce the discovered components.
+	 *  @param infos The infos.
 	 */
-	public void send(final AwarenessInfo info)
+	public void addAwarenessInfo(AwarenessInfo info)
 	{
-		try
+		// Fix broken awareness infos for backwards compatibility.
+		if(info.getDelay()==0)
+			info.setDelay(delay);
+		if(info.getState()==null)
+			info.setState(AwarenessInfo.STATE_ONLINE);
+//		System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
+
+		IComponentIdentifier sender = info.getSender();
+		boolean	online	= AwarenessInfo.STATE_ONLINE.equals(info.getState());
+//			boolean	initial	= false;	// Initial discovery of component.
+		DiscoveryInfo dif;
+		
+		dif = (DiscoveryInfo)discovered.get(sender);
+		if(online)
 		{
-			byte[] data = JavaWriter.objectToByteArray(info, getModel().getClassLoader());
-			DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
-			sendsocket.send(packet);
-//			System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");
+			boolean	remoteexcluded	= !isIncluded(root, info.getIncludes(), info.getExcludes());
+			if(dif==null)
+			{
+				dif = new DiscoveryInfo(sender, null, getClockTime(), getDelay(), remoteexcluded);
+				discovered.put(sender, dif);
+//					initial	= true;
+			}
+			
+			dif.setTime(getClockTime());
+			
+			if(isIncluded(sender, getIncludes(), getExcludes())
+				&& !remoteexcluded && isAutoCreateProxy() && dif.getProxy()==null)
+			{
+				createProxy(sender);
+				
+//					if(initial && fast && started && !killed)
+//					{
+////						System.out.println(System.currentTimeMillis()+" fast discovery: "+getComponentIdentifier()+", "+sender);
+//						received_self	= false;
+//						waitFor((long)(Math.random()*500), new IComponentStep()
+//						{
+//							int	cnt;
+//							public Object execute(IInternalAccess ia)
+//							{
+//								if(!received_self)
+//								{
+//									cnt++;
+////									System.out.println("CSMACD try #"+(++cnt));
+//									send(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes));
+//									waitFor((long)(Math.random()*500*cnt), this);
+//								}
+//								return null;
+//							}
+//						});
+//					}
+			}
 		}
-		catch(Exception e)
+		else
 		{
-			getLogger().warning("Could not send awareness message: "+e);
-//			e.printStackTrace();
-		}	
+			if(dif!=null && dif.getProxy()!=null)
+			{
+				deleteProxy(dif);
+			}
+		}
 	}
 	
 	/**
-	 *  Get the address.
-	 *  @return the address.
+	 *  Get the delay.
+	 *  @return the delay.
 	 */
-	public synchronized Object[] getAddressInfo()
+	public synchronized long getDelay()
 	{
-		return new Object[]{address, new Integer(port)};
+		return delay;
 	}
 
 	/**
-	 *  Set the address.
-	 *  @param address The address to set.
+	 *  Set the delay.
+	 *  @param delay The delay to set.
 	 */
-	public synchronized void setAddressInfo(InetAddress address, int port)
+	public synchronized void setDelay(long delay)
 	{
-//		System.out.println("setAddress: "+address+" "+port);
-		this.address = address;
-		this.port = port;
+//		System.out.println("setDelay: "+delay+" "+getComponentIdentifier());
+//		if(this.delay>=0 && delay>0)
+//			scheduleStep(send);
+		if(this.delay!=delay)
+		{
+			this.delay = delay;
+//			startSendBehaviour();
+		}
 	}
 	
 	/**
@@ -393,47 +365,6 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	}
 
 	/**
-	 *  Get the delay.
-	 *  @return the delay.
-	 */
-	public synchronized long getDelay()
-	{
-		return delay;
-	}
-
-	/**
-	 *  Set the delay.
-	 *  @param delay The delay to set.
-	 */
-	public synchronized void setDelay(long delay)
-	{
-//		System.out.println("setDelay: "+delay+" "+getComponentIdentifier());
-//		if(this.delay>=0 && delay>0)
-//			scheduleStep(send);
-		if(this.delay!=delay)
-		{
-			this.delay = delay;
-			startSendBehaviour();
-		}
-	}
-	
-	/**
-	 *  Set the fast startup awareness flag
-	 */
-	public synchronized void	setFastAwareness(boolean fast)
-	{
-		this.fast	= fast;
-	}
-	
-	/**
-	 *  Get the fast startup awareness flag
-	 */
-	public synchronized boolean	isFastAwareness()
-	{
-		return this.fast;
-	}
-	
-	/**
 	 *  Get the includes.
 	 *  @return the includes.
 	 */
@@ -446,18 +377,42 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	 *  Set the includes.
 	 *  @param includes The includes to set.
 	 */
-	public synchronized void setIncludes(String[] includes)
+	public void setIncludes(final String[] includes)
 	{
-		this.includes	= new ArrayList(Arrays.asList(includes));
+		synchronized(this)
+		{
+			this.includes	= new ArrayList(Arrays.asList(includes));
+		}
+		
+		getRequiredService("discovery").addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				IDiscoveryService ds = (IDiscoveryService)result;
+				ds.setIncludes(includes);
+			}
+		});
 	}
 
 	/**
 	 *  Set the excludes.
 	 *  @param excludes The excludes to set.
 	 */
-	public synchronized void setExcludes(String[] excludes)
+	public void setExcludes(final String[] excludes)
 	{
-		this.excludes	= new ArrayList(Arrays.asList(excludes));
+		synchronized(this)
+		{
+			this.excludes	= new ArrayList(Arrays.asList(excludes));
+		}
+		
+		getRequiredService("discovery").addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				IDiscoveryService ds = (IDiscoveryService)result;
+				ds.setExcludes(excludes);
+			}
+		});
 	}
 	
 	/**
@@ -479,24 +434,6 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	}
 
 	/**
-	 *  Get the sendid.
-	 *  @return the sendid.
-	 */
-	public String getSendId()
-	{
-		return sendid;
-	}
-
-	/**
-	 *  Set the sendid.
-	 *  @param sendid The sendid to set.
-	 */
-	public void setSendId(String sendid)
-	{
-		this.sendid = sendid;
-	}
-	
-	/**
 	 *  Start removing discovered proxies.
 	 */
 	protected void startRemoveBehaviour()
@@ -507,7 +444,7 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 			public Object execute(IInternalAccess ia)
 			{
 				List todel = autodelete? new ArrayList(): null;
-				synchronized(AwarenessAgent.this)
+				synchronized(AwarenessManagementAgent.this)
 				{
 					long time = getClockTime();
 					for(Iterator it=discovered.values().iterator(); it.hasNext(); )
@@ -575,36 +512,6 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 				getLogger().warning("Could not get cms: "+exception);
 			}
 		}));
-	}
-	
-	/**
-	 *  Start sending awareness infos.
-	 *  (Ends automatically when a new send behaviour is started).
-	 */
-	protected void startSendBehaviour()
-	{
-		if(started)
-		{
-			final String sendid = SUtil.createUniqueId(getAgentName());
-			this.sendid = sendid;	
-			
-			scheduleStep(new IComponentStep()
-			{
-				@XMLClassname("send")
-				public Object execute(IInternalAccess ia)
-				{
-					if(!killed && sendid.equals(getSendId()))
-					{
-//						System.out.println(System.currentTimeMillis()+" sending: "+getComponentIdentifier());
-						send(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes));
-						
-						if(delay>0)
-							doWaitFor(delay, this);
-					}
-					return null;
-				}
-			});
-		}
 	}
 	
 	/**
@@ -698,190 +605,6 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 	}
 	
 	/**
-	 *  Start receiving awareness infos.
-	 *  @return A future indicating when the receiver thread is ready.
-	 */
-	public IFuture	startReceiving()
-	{
-		final Future	ret	= new Future();
-		
-		// Start the receiver thread.
-		getServiceContainer().getRequiredService("threadpool").addResultListener(createResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				final IThreadPoolService tp = (IThreadPoolService)result;
-				
-				tp.execute(new Runnable()
-				{
-					public void run()
-					{
-						// todo: max ip datagram length (is there a better way to determine length?)
-						byte buf[] = new byte[65535];
-						
-						InetAddress myaddress = null;
-						
-						while(!killed)
-						{
-							try
-							{
-								// reopen when
-								Object[] ai = getAddressInfo();
-								InetAddress curaddress = (InetAddress)ai[0];
-								int curport = ((Integer)ai[1]).intValue();
-								
-								synchronized(AwarenessAgent.this)
-								{
-									if(!killed)
-									{
-										if(receivesocket!=null && (receivesocket.getPort()!=curport || !SUtil.equals(curaddress, myaddress)))
-										{
-											receivesocket.leaveGroup(myaddress);
-											receivesocket.close();
-											receivesocket = null;
-										}
-										if(receivesocket==null)
-										{
-											try
-											{
-												receivesocket = new MulticastSocket(curport);
-												receivesocket.joinGroup(curaddress);
-												myaddress = curaddress;
-											}
-											catch(Exception e)
-											{
-												receivesocket	= null;
-												getLogger().warning("Awareness error when joining mutlicast group: "+e);
-												ret.setExceptionIfUndone(e);
-												break;
-											}
-										}
-									}
-								}
-								
-								DatagramPacket pack = new DatagramPacket(buf, buf.length);
-//								if(!ret.isDone())
-//									System.out.println(System.currentTimeMillis()+" receiving: "+getComponentIdentifier());
-								ret.setResultIfUndone(null);
-								receivesocket.receive(pack);
-//								System.out.println("received: "+getComponentIdentifier());
-								
-								byte[] target = new byte[pack.getLength()];
-								System.arraycopy(buf, 0, target, 0, pack.getLength());
-								
-								AwarenessInfo info = (AwarenessInfo)Reader.objectFromByteArray(reader, target, getModel().getClassLoader());
-								if(info.getSender()!=null)
-								{
-									if(info.getSender().equals(root))
-										received_self	= true;
-									
-									// Fix broken awareness infos for backwards compatibility.
-									if(info.getDelay()==0)
-										info.setDelay(delay);
-									if(info.getState()==null)
-										info.setState(AwarenessInfo.STATE_ONLINE);
-//									System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
-							
-									IComponentIdentifier sender = info.getSender();
-									boolean	online	= AwarenessInfo.STATE_ONLINE.equals(info.getState());
-									boolean deleteproxy	= false;
-									boolean createproxy	= false;
-									boolean	initial	= false;	// Initial discovery of component.
-									DiscoveryInfo dif;
-									
-									synchronized(AwarenessAgent.this)
-									{
-										dif = (DiscoveryInfo)discovered.get(sender);
-										if(online)
-										{
-											boolean	remoteexcluded	= !isIncluded(root, info.getIncludes(), info.getExcludes());
-											if(dif==null)
-											{
-												dif = new DiscoveryInfo(sender, null, getClockTime(), getDelay(), remoteexcluded);
-												discovered.put(sender, dif);
-												initial	= true;
-											}
-											
-											createproxy = isIncluded(sender, getIncludes(), getExcludes())
-												&& !remoteexcluded && isAutoCreateProxy() && dif.getProxy()==null;
-											dif.setTime(getClockTime());
-										}
-										else
-										{
-											deleteproxy	= dif!=null && dif.getProxy()!=null;
-										}
-									}
-										
-									if(createproxy)
-									{
-//										System.out.println("Creating new proxy for: "+sender+" "+getComponentIdentifier());
-										createProxy(sender);
-										if(initial && fast && started && !killed)
-										{
-//											System.out.println(System.currentTimeMillis()+" fast discovery: "+getComponentIdentifier()+", "+sender);
-											received_self	= false;
-											waitFor((long)(Math.random()*500), new IComponentStep()
-											{
-												int	cnt;
-												public Object execute(IInternalAccess ia)
-												{
-													if(!received_self)
-													{
-														cnt++;
-//														System.out.println("CSMACD try #"+(++cnt));
-														send(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes));
-														waitFor((long)(Math.random()*500*cnt), this);
-													}
-													return null;
-												}
-											});
-										}
-									}
-									else if(deleteproxy)
-									{
-										deleteProxy(dif);
-									}
-								}
-							}
-							catch(Exception e)
-							{
-//								getLogger().warning("Receiving awareness info error: "+e);
-								ret.setExceptionIfUndone(e);
-							}
-						}
-						
-						synchronized(AwarenessAgent.this)
-						{
-							if(receivesocket!=null)
-							{
-								try
-								{
-									receivesocket.leaveGroup(address);
-									receivesocket.close();
-								}
-								catch(Exception e)
-								{
-//									getLogger().warning("Receiving socket closing error: "+e);
-								}
-							}
-						}
-//						System.out.println("comp and receiver terminated: "+getComponentIdentifier());
-					}
-				});
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				getLogger().warning("Awareness agent problem, could not get threadpool service: "+exception);
-//				exception.printStackTrace();
-				ret.setExceptionIfUndone(exception);
-			}
-		}));
-		
-		return ret;
-	}
-	
-	/**
 	 *  Test if a platform is included and/or not excluded.
 	 */
 	protected synchronized boolean	isIncluded(IComponentIdentifier cid, String[] includes, String[] excludes)
@@ -948,6 +671,9 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 		return System.currentTimeMillis();
 	}
 	
+	/**
+	 *  Wait for impl.
+	 */
 	protected void	doWaitFor(long delay, final IComponentStep step)
 	{
 //		waitFor(delay, step);
@@ -977,9 +703,9 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 			{
 				try
 				{
-					setAddressInfo(InetAddress.getByName(props.getStringProperty("address")), props.getIntProperty("port"));
+//					setAddressInfo(InetAddress.getByName(props.getStringProperty("address")), props.getIntProperty("port"));
 					setDelay(props.getLongProperty("delay"));
-					setFastAwareness(props.getProperty("fast")!=null ? props.getBooleanProperty("fast") : true);
+//					setFastAwareness(props.getProperty("fast")!=null ? props.getBooleanProperty("fast") : true);
 					setAutoCreateProxy(props.getProperty("autocreate")!=null ? props.getBooleanProperty("autocreate") : true);
 					setAutoDeleteProxy(props.getProperty("autodelete")!=null ? props.getBooleanProperty("autodelete") : true);
 					
@@ -1015,10 +741,10 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 			public Object execute(IInternalAccess ia)
 			{
 				jadex.commons.Properties	props	= new jadex.commons.Properties();
-				props.addProperty(new Property("address", address.getHostAddress()));
-				props.addProperty(new Property("port", ""+port));
-				props.addProperty(new Property("delay", ""+delay));
-				props.addProperty(new Property("fast", ""+fast));
+//				props.addProperty(new Property("address", address.getHostAddress()));
+//				props.addProperty(new Property("port", ""+port));
+//				props.addProperty(new Property("delay", ""+delay));
+//				props.addProperty(new Property("fast", ""+fast));
 				props.addProperty(new Property("autocreate", ""+autocreate));
 				props.addProperty(new Property("autodelete", ""+autodelete));
 				for(int i=0; i<includes.size(); i++)
@@ -1030,3 +756,4 @@ public class AwarenessAgent extends MicroAgent	implements IPropertiesProvider
 		});		
 	}
 }
+

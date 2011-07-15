@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
@@ -630,6 +631,39 @@ public class SGUI
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 * Convert a color to an html representation.
+	 * 
+	 * @param color The color.
+	 * @return The html string representing the color.
+	 */
+	public static String colorToHTML(Color color)
+	{
+		return "#" + Integer.toHexString(color.getRed())
+				+ Integer.toHexString(color.getGreen())
+				+ Integer.toHexString(color.getBlue());
+	}
+
+	/**
+	 * Convert a font to an html representation.
+	 * 
+	 * @param font The font.
+	 * @return The html string representing the font.
+	 */
+	public static String fontToHTML(Font font)
+	{
+		String style;
+		if(font.isBold())
+		{
+			style = font.isItalic() ? "bolditalic " : "bold ";
+		}
+		else
+		{
+			style = font.isItalic() ? "italic " : "";
+		}
+		return style + font.getSize() + " " + font.getName();
 	}
 	
 //	/** Lookup table for divider locations (split->Integer).*/

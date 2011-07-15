@@ -284,7 +284,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 							@XMLClassname("createProxy")
 							public Object execute(IInternalAccess ia)
 							{
-								AwarenessAgent agent = (AwarenessAgent)ia;
+								AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
 								return agent.createProxy(cid);
 							}
 						}).addResultListener(new SwingDefaultResultListener(panel)
@@ -325,7 +325,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 							@XMLClassname("deleteProxy")
 							public Object execute(IInternalAccess ia)
 							{
-								AwarenessAgent agent = (AwarenessAgent)ia;
+								AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
 								return agent.deleteProxy(dif);
 							}
 						}).addResultListener(new SwingDefaultResultListener(panel)
@@ -468,13 +468,13 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			@XMLClassname("refreshSettings")
 			public Object execute(IInternalAccess ia)
 			{
-				AwarenessAgent agent = (AwarenessAgent)ia;
+				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
 				AwarenessSettings	ret	= new AwarenessSettings();
-				Object[]	ai	= agent.getAddressInfo();
-				ret.address	= (InetAddress)ai[0];
-				ret.port	= (Integer)ai[1];
+//				Object[]	ai	= agent.getAddressInfo();
+//				ret.address	= (InetAddress)ai[0];
+//				ret.port	= (Integer)ai[1];
 				ret.delay	= agent.getDelay();
-				ret.fast	= agent.isFastAwareness();
+//				ret.fast	= agent.isFastAwareness();
 				ret.autocreate	= agent.isAutoCreateProxy();
 				ret.autodelete	= agent.isAutoDeleteProxy();
 				ret.includes	= agent.getIncludes();
@@ -502,7 +502,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			@XMLClassname("getDiscoveryInfos")
 			public Object execute(IInternalAccess ia)
 			{
-				AwarenessAgent agent = (AwarenessAgent)ia;
+				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
 				return agent.getDiscoveryInfos();
 			}
 		}).addResultListener(new SwingDefaultResultListener(jtdis)
@@ -559,10 +559,10 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				@XMLClassname("applySettings")
 				public Object execute(IInternalAccess ia)
 				{
-					AwarenessAgent	agent	= (AwarenessAgent)ia;
-					agent.setAddressInfo(settings.address, settings.port);
+					AwarenessManagementAgent agent	= (AwarenessManagementAgent)ia;
+//					agent.setAddressInfo(settings.address, settings.port);
 					agent.setDelay(settings.delay);
-					agent.setFastAwareness(settings.fast);
+//					agent.setFastAwareness(settings.fast);
 					agent.setAutoCreateProxy(settings.autocreate);
 					agent.setAutoDeleteProxy(settings.autodelete);
 					agent.setIncludes(settings.includes);
