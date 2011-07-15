@@ -1,4 +1,4 @@
-package sodekovs.applications.bike2.xml;
+package sodekovs.applications.bikes.datafetcher.xml;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
@@ -10,7 +10,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import sodekovs.applications.bike2.xml.stations.Stations;
+import sodekovs.applications.bikes.datafetcher.xml.stations.Stations;
 
 /**
  * Helper class with static methods for retrieving objects from XML files and vice versa.

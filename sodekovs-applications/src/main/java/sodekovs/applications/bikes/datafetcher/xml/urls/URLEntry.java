@@ -1,4 +1,4 @@
-package sodekovs.applications.bike2.xml.urls;
+package sodekovs.applications.bikes.datafetcher.xml.urls;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;

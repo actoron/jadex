@@ -1,4 +1,4 @@
-package sodekovs.applications.bike2.xml.stations;
+package sodekovs.applications.bikes.datafetcher.xml.stations;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package sodekovs.applications.bike2;
+package sodekovs.applications.bikes.datafetcher;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -15,10 +15,10 @@ import java.util.TimerTask;
 
 import javax.xml.bind.JAXBException;
 
-import sodekovs.applications.bike2.database.DatabaseConnection;
-import sodekovs.applications.bike2.xml.XMLHandler;
-import sodekovs.applications.bike2.xml.stations.Station;
-import sodekovs.applications.bike2.xml.stations.Stations;
+import sodekovs.applications.bikes.datafetcher.database.DatabaseConnection;
+import sodekovs.applications.bikes.datafetcher.xml.XMLHandler;
+import sodekovs.applications.bikes.datafetcher.xml.stations.Station;
+import sodekovs.applications.bikes.datafetcher.xml.stations.Stations;
 
 /**
  * Download Task fetches the XML data from the given URL for the given city and inserts it into the database.

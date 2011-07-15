@@ -1,4 +1,4 @@
-package sodekovs.applications.bike2.xml.urls;
+package sodekovs.applications.bikes.datafetcher.xml.urls;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -8,7 +8,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import sodekovs.applications.bike2.xml.XMLHandler;
+import sodekovs.applications.bikes.datafetcher.xml.XMLHandler;
 
 /**
  * Object representation for the XML configuration file.

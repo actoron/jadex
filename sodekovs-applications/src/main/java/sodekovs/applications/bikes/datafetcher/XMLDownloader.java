@@ -1,6 +1,8 @@
-package sodekovs.applications.bike2;
+package sodekovs.applications.bikes.datafetcher;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Timer;
@@ -8,9 +10,9 @@ import java.util.TimerTask;
 
 import javax.xml.bind.JAXBException;
 
-import sodekovs.applications.bike2.xml.XMLHandler;
-import sodekovs.applications.bike2.xml.urls.URLEntry;
-import sodekovs.applications.bike2.xml.urls.URLs;
+import sodekovs.applications.bikes.datafetcher.xml.XMLHandler;
+import sodekovs.applications.bikes.datafetcher.xml.urls.URLEntry;
+import sodekovs.applications.bikes.datafetcher.xml.urls.URLs;
 
 /**
  * XML Downloader class which starts a {@link TimerTask} for every given URL from which XML data should be loaded periodically. The loaded XML data is being inserted into a MySQL database.
@@ -23,7 +25,7 @@ public class XMLDownloader {
 	private static final int TIME_TO_START = 50;
 
 	/** The path to the XML file containing the urls */
-	private static final String URL_FILE = "urls.xml";
+	private static final String URL_FILE ="/sodekovs-applications/src/main/java/sodekovs/applications/bikes/datafetcher/urls.xml";
 
 	/**
 	 * Main method, starts a {@link DownloadFileTask} for every URL specified in {@link XMLDownloader#URLS}.
@@ -32,7 +34,7 @@ public class XMLDownloader {
 	 */
 	public static void main(String[] args) {
 		try {
-			URLs urls = (URLs) XMLHandler.retrieveFromXML(URLs.class, URL_FILE);
+			URLs urls = (URLs) XMLHandler.retrieveFromXML(URLs.class, new File("..").getCanonicalPath() + URL_FILE);
 
 			for (URLEntry entry : urls.getEntries()) {
 				Timer timer = new Timer();
@@ -44,6 +46,8 @@ public class XMLDownloader {
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
