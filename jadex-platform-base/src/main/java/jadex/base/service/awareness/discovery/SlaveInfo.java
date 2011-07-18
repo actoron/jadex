@@ -1,4 +1,6 @@
-package jadex.base.service.awareness;
+package jadex.base.service.awareness.discovery;
+
+import jadex.base.service.awareness.AwarenessInfo;
 
 /**
  * 

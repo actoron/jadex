@@ -1,4 +1,4 @@
-package jadex.base.service.awareness;
+package jadex.base.service.awareness.management;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;

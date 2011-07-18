@@ -1,4 +1,6 @@
-package jadex.base.service.awareness;
+package jadex.base.service.awareness.management;
+
+import jadex.base.service.awareness.AwarenessInfo;
 
 /**
  *  Service for managing discovery infos.

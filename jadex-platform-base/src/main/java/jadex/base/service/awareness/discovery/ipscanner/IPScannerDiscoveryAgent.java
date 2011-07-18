@@ -1,6 +1,10 @@
-package jadex.base.service.awareness;
+package jadex.base.service.awareness.discovery.ipscanner;
 
-import jadex.base.service.message.transport.codecs.GZIPCodec;
+import jadex.base.service.awareness.AwarenessInfo;
+import jadex.base.service.awareness.discovery.IDiscoveryService;
+import jadex.base.service.awareness.discovery.SDiscovery;
+import jadex.base.service.awareness.discovery.SlaveInfo;
+import jadex.base.service.awareness.management.IManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -32,17 +36,11 @@ import jadex.xml.reader.Reader;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-/* $if !android $ */
-import java.net.InterfaceAddress;
-/* $endif $ */
-import java.net.NetworkInterface;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,7 +51,7 @@ import java.util.TimerTask;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLReporter;
 import javax.xml.stream.XMLStreamException;
-/* $else $
+/* $else $ 
 import javaxx.xml.stream.Location;
 import javaxx.xml.stream.XMLReporter;
 import javaxx.xml.stream.XMLStreamException;
@@ -67,8 +65,9 @@ $endif $ */
 {
 	@Argument(name="port", clazz=int.class, defaultvalue="55668", description="The port used for finding other agents."),
 	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
+	@Argument(name="scanfactor", clazz=long.class, defaultvalue="5", description="The delay between scanning as factor of delay time, e.g. 1=10000, 2=20000."),
 //	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
-	@Argument(name="buffersize", clazz=int.class, defaultvalue="1024*1024", description="The size of the send buffer (determines the number of messages that can be sent at once).")
+	@Argument(name="buffersize", clazz=int.class, defaultvalue="1024*1024", description="The size of the send buffer (determines the number of messages that can be sent at once)."),
 })
 @Configurations(
 {
@@ -116,7 +115,7 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	protected int currentip;
 	
 	
-	/** The socket to send. */
+	/** The socket to receive. */
 	protected DatagramSocket receivesocket;
 	
 	/** Flag indicating agent killed. */
@@ -144,9 +143,14 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	/** The local send socket. */
 	protected DatagramSocket localsocket;
 	
-	
 	/** The remotes discovery services. */
 	protected Set remotes;
+	
+	/** The scan delay factor. */
+	protected int scanfactor;
+	
+	/** The send counter. */
+	protected int sendcount;
 	
 	//-------- methods --------
 	
@@ -192,6 +196,7 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	{
 		this.port = ((Number)getArgument("port")).intValue();
 		this.delay = ((Number)getArgument("delay")).longValue();
+		this.scanfactor = ((Number)getArgument("scanfactor")).intValue();
 //		this.fast = ((Boolean)getArgument("fast")).booleanValue();
 	}
 	
@@ -230,10 +235,6 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	{
 		killed = true;
 		
-//		if(sendsocket!=null)
-//		{
-//			send(new AwarenessInfo(root, AwarenessInfo.STATE_OFFLINE, delay));
-//		}
 		if(sendchannel!=null)
 		{
 			send(new AwarenessInfo(root, AwarenessInfo.STATE_OFFLINE, delay));
@@ -242,10 +243,6 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 //		System.out.println("killed set to true: "+getComponentIdentifier());
 		synchronized(IPScannerDiscoveryAgent.this)
 		{
-//			if(sendsocket!=null)
-//			{
-//				sendsocket.close();
-//			}
 			if(sendchannel!=null)
 			{
 				try
@@ -296,8 +293,7 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	{
 		try
 		{
-			byte[] data = GZIPCodec.encodeBytes(JavaWriter.objectToByteArray(info, 
-				getModel().getClassLoader()), getModel().getClassLoader());
+			byte[] data = SDiscovery.encodeObject(info, getModel().getClassLoader());
 			
 			int maxsend = sendchannel.socket().getSendBufferSize()/data.length;
 			int sent = 0;
@@ -312,12 +308,15 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			}
 			
 			// Send to possibly new ones via ip guessing
-			allowed = maxsend-sent;
-			int discover = 0;
-			if(allowed>0)
+			if(sendcount%scanfactor==0)
 			{
-				discover += sendToDiscover(data, allowed);
-				sent+= discover;
+				allowed = maxsend-sent;
+				int discover = 0;
+				if(allowed>0)
+				{
+					discover += sendToDiscover(data, allowed);
+					sent+= discover;
+				}
 			}
 			
 			// Send to all locals a refresh awareness
@@ -331,10 +330,14 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			getLogger().warning("Could not send awareness message: "+e);
 //			e.printStackTrace();
 		}	
+		
+		sendcount++;
 	}
 
 	/**
 	 *  Send awareness info to remote scanner services.
+	 *  @param data The data to be send.
+	 *  @param maxsend The maximum number of messages to send.
 	 */
 	protected int sendToRemotes(byte[] data, int maxsend)
 	{
@@ -353,7 +356,7 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 					break;
 			}
 			
-			System.out.println("sent to remotes: "+ret);
+//			System.out.println("sent to remotes: "+ret+" "+SUtil.arrayToString(remotes));
 		}
 		catch(Exception e)
 		{
@@ -364,18 +367,20 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	}
 	
 	/**
-	 * 
+	 *  Send messages to discover new platforms.
+	 *  @param data The data to be send.
+	 *  @param maxsend The maximum number of messages to send.
 	 */
 	protected int sendToDiscover(byte[] data, int maxsend)
 	{
 		int ret = 0;
 		try
 		{
-			InetAddress iadr = getInet4Address();
-			short sublen = getNetworkPrefixLength(iadr);
+			InetAddress iadr = SDiscovery.getInet4Address();
+			short sublen = SDiscovery.getNetworkPrefixLength(iadr);
 			if(sublen==-1) // Guess C class if nothing can be determined.
 				sublen = 24;
-			byte[] byinet = getInet4Address().getAddress();
+			byte[] byinet = SDiscovery.getInet4Address().getAddress();
 			int hostbits = 32-sublen;
 			int numips = (int)Math.pow(2, hostbits);
 			
@@ -401,13 +406,14 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 				}
 				catch(Exception e)
 				{
-					System.out.println("ex: "+address);
+					// Can happen in case of specific reserved ips, e.g. 0 or 255=broacast.
+//					System.out.println("ex: "+address);
 				}
 				ipnum = (ipnum+1)%numips;
 			}
 			currentip = ipnum;
 			
-			System.out.println("sent to discover: "+ret+" "+currentip);
+//			System.out.println("sent to discover: "+ret+" "+currentip);
 		}
 		catch(Exception e)
 		{
@@ -415,6 +421,40 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Forward to locals.
+	 *  @param data The data to be send.
+	 *  @param port The port the local slave listens.
+	 */
+	protected void sendToLocal(byte[] data, int port)
+	{
+		try
+		{
+			if(localsocket==null)
+				localsocket = new DatagramSocket();
+			InetAddress address = SDiscovery.getInet4Address();
+			DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
+			localsocket.send(packet);
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 *  Send/forward to locals.
+	 *  @param data The data to be send.
+	 */
+	protected void sendToLocals(byte[] data)
+	{
+		Integer[] locals = getlocals();
+		for(int i=0; i<locals.length; i++)
+		{
+			sendToLocal(data, locals[i].intValue());
+		}
 	}
 	
 	/**
@@ -533,81 +573,16 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 						{
 							try
 							{
-								synchronized(IPScannerDiscoveryAgent.this)
-								{
-									if(!killed)
-									{
-										if(receivesocket==null)
-										{
-											try
-											{
-												receivesocket = new DatagramSocket(port);
-												System.out.println("local master at: "+getInet4Address()+" "+port);
-											}
-											catch(Exception e)
-											{
-												// In case the receiversocket cannot be opened
-												// open another local socket at an arbitrary port
-												// and send this port to the master.
-												receivesocket = new DatagramSocket();
-												InetAddress address = getInet4Address();
-												AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes);
-												SlaveInfo si = new SlaveInfo(info);
-												byte[] data = JavaWriter.objectToByteArray(si, getModel().getClassLoader());
-												DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
-												receivesocket.send(packet);
-
-												System.out.println("local slave at: "+getInet4Address()+" "+receivesocket.getLocalPort());
-												
-//												getLogger().warning("Running in local mode: "+e);
-											}
-										}
-									}
-								}
+								// Init receive socket
+								getReceiveSocket();
+								
+								ret.setResultIfUndone(null);
 								
 								DatagramPacket pack = new DatagramPacket(buf, buf.length);
-//								if(!ret.isDone())
-//									System.out.println(System.currentTimeMillis()+" receiving: "+getComponentIdentifier());
-								ret.setResultIfUndone(null);
-								receivesocket.receive(pack);
+								getReceiveSocket().receive(pack);
 //								System.out.println("received: "+getComponentIdentifier());
 								
-								byte[] data = new byte[pack.getLength()];
-								System.arraycopy(buf, 0, data, 0, pack.getLength());
-								
-								Object obj = Reader.objectFromByteArray(reader, GZIPCodec.decodeBytes(data, 
-									getModel().getClassLoader()), getModel().getClassLoader());
-								
-								if(obj instanceof SlaveInfo)
-								{
-									// Received local port -> forward all awareness package to local.
-									SlaveInfo si = (SlaveInfo)obj;
-									addLocal(pack.getPort());
-									AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes);
-									byte[] mydata = JavaWriter.objectToByteArray(info, getModel().getClassLoader());
-									sendToLocal(mydata, pack.getPort());
-									announceAwareness(si.getAwarenessInfo());
-								}
-								else if(obj instanceof AwarenessInfo)
-								{
-									System.out.println("rec awa: "+obj);
-									final AwarenessInfo info = (AwarenessInfo)obj;
-									if(info.getSender()!=null)
-									{
-										sendToLocals(data);
-										
-										if(info.getSender().equals(root))
-										{
-											received_self	= true;
-										}
-										else
-										{
-											announceAwareness(info);
-											addRemotes(pack.getAddress());
-										}
-	//									System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
-									}
-								}
+								handleReceivedPacket(pack);
 							}
 							catch(Exception e)
 							{
@@ -647,11 +622,97 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	}
 	
 	/**
-	 * 
+	 *  Get or create a receiver socket.
+	 */
+	protected synchronized DatagramSocket getReceiveSocket()
+	{
+		if(!killed)
+		{
+			if(receivesocket==null)
+			{
+				try
+				{
+					receivesocket = new DatagramSocket(port);
+					System.out.println("local master at: "+SDiscovery.getInet4Address()+" "+port);
+				}
+				catch(Exception e)
+				{
+					try
+					{
+						// In case the receiversocket cannot be opened
+						// open another local socket at an arbitrary port
+						// and send this port to the master.
+						receivesocket = new DatagramSocket();
+						InetAddress address = SDiscovery.getInet4Address();
+						AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes);
+						SlaveInfo si = new SlaveInfo(info);
+						byte[] data = SDiscovery.encodeObject(si, getModel().getClassLoader());
+						DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
+						receivesocket.send(packet);
+	
+						System.out.println("local slave at: "+SDiscovery.getInet4Address()+" "+receivesocket.getLocalPort());
+						
+	//						getLogger().warning("Running in local mode: "+e);
+					}
+					catch(Exception e2)
+					{
+						throw new RuntimeException(e2);
+					}
+				}
+			}
+		}
+		
+		return receivesocket;
+	}
+	
+	/**
+	 *  Handle a received packet.
+	 */
+	protected void handleReceivedPacket(DatagramPacket pack)
+	{
+		byte[] data = new byte[pack.getLength()];
+		System.arraycopy(pack.getData(), 0, data, 0, pack.getLength());
+		Object obj = SDiscovery.decodeObject(data, getModel().getClassLoader());
+//		Object obj = decodePacket(pack);
+		
+		if(obj instanceof SlaveInfo)
+		{
+			// Received local port -> forward all awareness package to local.
+			SlaveInfo si = (SlaveInfo)obj;
+			addLocal(pack.getPort());
+			AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes);
+			byte[] mydata = SDiscovery.encodeObject(info, getModel().getClassLoader());
+			sendToLocal(mydata, pack.getPort());
+			announceAwareness(si.getAwarenessInfo());
+		}
+		else if(obj instanceof AwarenessInfo)
+		{
+//			System.out.println("rec awa: "+obj);
+			final AwarenessInfo info = (AwarenessInfo)obj;
+			if(info.getSender()!=null)
+			{
+				sendToLocals(data);
+				
+				if(info.getSender().equals(root))
+				{
+					received_self	= true;
+				}
+				else
+				{
+					announceAwareness(info);
+					addRemote(pack.getAddress());
+				}
+//				System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
+			}
+		}
+	}
+	
+	/**
+	 *  Announce newly arrived awareness info to management service.
 	 */
 	protected void announceAwareness(final AwarenessInfo info)
 	{
-		System.out.println("announcing: "+info);
+//		System.out.println("announcing: "+info);
 		getRequiredService("management").addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -684,13 +745,14 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	}
 		
 	/**
-	 *  Add a remote discovery service ip.
+	 *  Add a remote discovery service ip of another platform.
+	 *  @param address The remote ip address.
 	 */
-	protected synchronized void addRemotes(InetAddress address)
+	protected synchronized void addRemote(InetAddress address)
 	{
 		try
 		{
-			if(!getInet4Address().equals(address))
+			if(!SDiscovery.getInet4Address().equals(address))
 			{
 				if(remotes==null)
 					remotes = new LinkedHashSet();
@@ -707,6 +769,7 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	
 	/**
 	 *  Get the remotes other discovery services (at most one per ip).
+	 *  @return All known remote platforms.
 	 */
 	protected synchronized InetAddress[] getRemotes()
 	{
@@ -714,7 +777,8 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	}
 	
 	/**
-	 *  Add a local.
+	 *  Add a local platform.
+	 *  @param port The port.
 	 */
 	protected synchronized void addLocal(int port)
 	{
@@ -727,41 +791,11 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	
 	/**
 	 *  Get all locals.
+	 *  @return All local slave platforms.
 	 */
 	protected synchronized Integer[] getlocals()
 	{
 		return locals==null? new Integer[0]: (Integer[])locals.toArray(new Integer[locals.size()]);
-	}
-	
-	/**
-	 *  Forward to locals.
-	 */
-	protected void sendToLocal(byte[] data, int port)
-	{
-		try
-		{
-			if(localsocket==null)
-				localsocket = new DatagramSocket();
-			InetAddress address = getInet4Address();
-			DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
-			localsocket.send(packet);
-		}
-		catch(IOException e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 *  Send/forward to locals.
-	 */
-	protected void sendToLocals(byte[] data)
-	{
-		Integer[] locals = getlocals();
-		for(int i=0; i<locals.length; i++)
-		{
-			sendToLocal(data, locals[i].intValue());
-		}
 	}
 	
 	/**
@@ -790,74 +824,5 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 				scheduleStep(step);
 			}
 		}, delay);
-	}
-	
-	/**
-	 * 
-	 */
-	protected static InetAddress getInet4Address()
-	{
-		InetAddress ret = null;
-		
-		try
-		{
-			Enumeration e = NetworkInterface.getNetworkInterfaces();
-			while(e.hasMoreElements() && ret==null)
-			{
-				NetworkInterface ni = (NetworkInterface)e.nextElement();
-				Enumeration e2 = ni.getInetAddresses();
-				while(e2.hasMoreElements() && ret==null)
-				{
-					InetAddress tmp = (InetAddress)e2.nextElement();
-					if(tmp instanceof Inet4Address && !tmp.isLoopbackAddress())
-						ret = (InetAddress)tmp;
-				}
-			}
-			
-			if(ret==null)
-			{
-				InetAddress tmp = InetAddress.getLocalHost();
-				if(tmp instanceof Inet4Address && !tmp.isLoopbackAddress())
-					ret = (InetAddress)tmp;
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 * 
-	 */
-	protected static short getNetworkPrefixLength(InetAddress iadr)
-	{
-		short ret = -1;
-		
-		/* $if !android $ */
-		try
-		{
-			NetworkInterface ni = NetworkInterface.getByInetAddress(iadr);
-			List iads = ni.getInterfaceAddresses();
-			if(iads!=null)
-			{
-				for(int i=0; i<iads.size() && ret==-1; i++)
-				{
-					InterfaceAddress ia = (InterfaceAddress)iads.get(i);
-					if(ia.getAddress() instanceof Inet4Address)
-						ret = ia.getNetworkPrefixLength();
-				}
-			}
-			
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		/* $endif $ */
-		
-		return ret;
 	}
 }

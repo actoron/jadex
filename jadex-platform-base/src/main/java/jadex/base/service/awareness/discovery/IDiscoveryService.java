@@ -1,4 +1,4 @@
-package jadex.base.service.awareness;
+package jadex.base.service.awareness.discovery;
 
 /**
  *  Service interface for discovering other platforms.

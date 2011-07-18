@@ -1,6 +1,6 @@
 package jadex.tools.generic;
 
-import jadex.base.service.awareness.AwarenessAgentPanel;
+import jadex.base.service.awareness.gui.AwarenessAgentPanel;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
