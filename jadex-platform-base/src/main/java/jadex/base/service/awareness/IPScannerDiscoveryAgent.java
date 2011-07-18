@@ -1,7 +1,5 @@
 package jadex.base.service.awareness;
 
-import jadex.base.service.message.transport.codecs.ICodec;
-import jadex.base.service.message.transport.tcpmtp.TCPTransport;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -36,10 +34,15 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -56,6 +59,7 @@ import javax.xml.stream.XMLStreamException;
 	@Argument(name="port", clazz=int.class, defaultvalue="55668", description="The port used for finding other agents."),
 	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
 	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
+	@Argument(name="buffersize", clazz=int.class, defaultvalue="1024*1024", description="The size of the send buffer (determines the number of messages that can be sent at once)."),
 })
 @Configurations(
 {
@@ -90,13 +94,17 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	
 	
 	/** The socket to send. */
-	protected DatagramSocket sendsocket;
+//	protected DatagramSocket sendsocket;
+	protected DatagramChannel sendchannel;
 	
-	/** The send delay. */
+	/** The send (remotes) delay. */
 	protected long delay;
 		
 	/** The current send id. */
 	protected String sendid;
+	
+	/** The current ip to send probes to. */
+	protected int currentip;
 	
 	
 	/** The socket to send. */
@@ -121,8 +129,15 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	protected boolean received_self;
 	
 	
-	/** The slave scanners. */
-	protected List slaves;
+	/** The local discovery services. */
+	protected List locals;
+	
+	/** The local send socket. */
+	protected DatagramSocket localsocket;
+	
+	
+	/** The remotes discovery services. */
+	protected Set remotes;
 	
 	//-------- methods --------
 	
@@ -137,8 +152,13 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		
 		try
 		{
-			this.sendsocket = new DatagramSocket();
-			
+//			this.sendsocket = new DatagramSocket();
+//			sendsocket.setSoTimeout(1);
+			sendchannel = DatagramChannel.open();
+			sendchannel.configureBlocking(false);
+			sendchannel.socket().setSendBufferSize(((Integer)getArgument("buffersize")).intValue());
+//			this.sendsocket = sendchannel.socket();
+					
 			this.reader	= JavaReader.getReader(new XMLReporter()
 			{
 				public void report(String message, String type, Object related, Location location) throws XMLStreamException
@@ -203,7 +223,11 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	{
 		killed = true;
 		
-		if(sendsocket!=null)
+//		if(sendsocket!=null)
+//		{
+//			send(new AwarenessInfo(root, AwarenessInfo.STATE_OFFLINE, delay));
+//		}
+		if(sendchannel!=null)
 		{
 			send(new AwarenessInfo(root, AwarenessInfo.STATE_OFFLINE, delay));
 		}
@@ -211,9 +235,19 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 //		System.out.println("killed set to true: "+getComponentIdentifier());
 		synchronized(IPScannerDiscoveryAgent.this)
 		{
-			if(sendsocket!=null)
+//			if(sendsocket!=null)
+//			{
+//				sendsocket.close();
+//			}
+			if(sendchannel!=null)
 			{
-				sendsocket.close();
+				try
+				{
+					sendchannel.close();
+				}
+				catch(Exception e)
+				{
+				}
 			}
 			if(receivesocket!=null)
 			{
@@ -257,47 +291,31 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		{
 			byte[] data = JavaWriter.objectToByteArray(info, getModel().getClassLoader());
 
-			InetAddress inet = Inet4Address.getLocalHost();
-			NetworkInterface ni = NetworkInterface.getByInetAddress(inet);
-			short sublen = ni.getInterfaceAddresses().get(0).getNetworkPrefixLength();
-			byte[] byinet = inet.getAddress();
+			int maxsend = sendchannel.socket().getSendBufferSize()/data.length;
+			int sent = 0;
 			
-			// Class C
-			if(sublen==24)
+			// Send to all remote other nodes a refresh awareness
+			int allowed = maxsend-sent;
+			int remotes = 0;
+			if(allowed>0)
 			{
-				for(int i=0; i<255; i++)
-				{
-					byinet[3] = (byte)i;
-					InetAddress address = InetAddress.getByAddress(byinet);
-					DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
-					sendsocket.send(packet);
-				}
+				remotes = sendToRemotes(data, allowed);
+				sent += remotes;
 			}
-			// Class B
-			else if(sublen==16)
+			
+			// Send to possibly new ones via ip guessing
+			allowed = maxsend-sent;
+			int discover = 0;
+			if(allowed>0)
 			{
-				for(int i=0; i<255; i++)
-				{
-					byinet[2] = (byte)i;
-					for(int j=0; j<255; j++)
-					{
-						byinet[3] = (byte)i;
-						InetAddress address = InetAddress.getByAddress(byinet);
-						DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
-						sendsocket.send(packet);
-					}
-				}
+				discover += sendToDiscover(data, allowed);
+				sent+= discover;
 			}
-			// Class A
-			else if(sublen==8)
-			{
-				System.out.println("Cannot handle class A networks.");
-			}
-			else
-			{
-				System.out.println("Cannot handle mixed classes.");
-			}
-		
+			
+			// Send to all locals a refresh awareness
+			sendToLocals(data);
+
+			System.out.println(" sent:"+sent+" remotes: "+remotes+" discover: "+discover);
 //			System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");
 		}
 		catch(Exception e)
@@ -305,6 +323,90 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			getLogger().warning("Could not send awareness message: "+e);
 //			e.printStackTrace();
 		}	
+	}
+
+	/**
+	 * 
+	 */
+	protected int sendToRemotes(byte[] data, int maxsend)
+	{
+		int ret = 0;
+		try
+		{
+			InetAddress[] remotes = getRemotes();
+			for(; ret<remotes.length && ret<maxsend; ret++)
+			{
+	//			DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
+	//			sendsocket.send(packet);
+	//			sendchannel.send(src, target);
+				ByteBuffer buf = ByteBuffer.allocate(data.length);
+				buf.clear();
+				buf.put(data);
+				buf.flip();
+	//			for(int bytes=0; bytes<data.length; )
+				int	bytes = sendchannel.send(buf, new InetSocketAddress(remotes[ret], port));
+				if(bytes!=data.length)
+					break;
+			}
+			
+			System.out.println("sent to remotes: "+ret);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected int sendToDiscover(byte[] data, int maxsend)
+	{
+		int ret = 0;
+		try
+		{
+			InetAddress inet = Inet4Address.getLocalHost();
+			NetworkInterface ni = NetworkInterface.getByInetAddress(inet);
+			short sublen = ni.getInterfaceAddresses().get(0).getNetworkPrefixLength();
+			byte[] byinet = inet.getAddress();
+			int hostbits = 32-sublen;
+			int numips = (int)Math.pow(2, hostbits);
+			
+			int mask = ~(numips-1);
+			int iinet = SUtil.bytesToInt(byinet);
+			int prefix = iinet & mask;
+			
+			int ipnum = currentip;
+			for(; ret<numips && ret<maxsend; ret++)
+			{
+				int iip = prefix | ipnum; 
+				byte[] bip = SUtil.intToBytes(iip);
+				InetAddress address = InetAddress.getByAddress(bip);
+	//			DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
+	//			sendsocket.send(packet);
+	//			sendchannel.send(src, target);
+				ByteBuffer buf = ByteBuffer.allocate(data.length);
+				buf.clear();
+				buf.put(data);
+				buf.flip();
+	//			for(int bytes=0; bytes<data.length; )
+				int	bytes = sendchannel.send(buf, new InetSocketAddress(address, port));
+				if(bytes!=data.length)
+					break;
+				ipnum = (ipnum+1)%numips;
+			}
+			currentip = ipnum;
+			
+			System.out.println("sent to discover: "+ret+" "+currentip);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -435,10 +537,18 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 											}
 											catch(Exception e)
 											{
-												receivesocket = null;
-												getLogger().warning("Cannot open default port: "+e);
-//												ret.setExceptionIfUndone(e);
-												break;
+												// In case the receiversocket cannot be opened
+												// open another local socket at an arbitrary port
+												// and send this port to the master.
+												receivesocket = new DatagramSocket();
+												InetAddress address = Inet4Address.getLocalHost();
+												AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes);
+												SlaveInfo si = new SlaveInfo(info);
+												byte[] data = JavaWriter.objectToByteArray(si, getModel().getClassLoader());
+												DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
+												receivesocket.send(packet);
+
+//												getLogger().warning("Running in local mode: "+e);
 											}
 										}
 									}
@@ -451,56 +561,39 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 								receivesocket.receive(pack);
 //								System.out.println("received: "+getComponentIdentifier());
 								
-								byte[] target = new byte[pack.getLength()];
-								System.arraycopy(buf, 0, target, 0, pack.getLength());
+								byte[] data = new byte[pack.getLength()];
+								System.arraycopy(buf, 0, data, 0, pack.getLength());
 								
-								Object obj = Reader.objectFromByteArray(reader, target, getModel().getClassLoader());
+								Object obj = Reader.objectFromByteArray(reader, data, getModel().getClassLoader());
 								
 								if(obj instanceof SlaveInfo)
 								{
-									// Received slave port -> forward all awareness package to slave.
-									int port = ((SlaveInfo)obj).getPort();
-									addSlave(port);
+									// Received local port -> forward all awareness package to local.
+									SlaveInfo si = (SlaveInfo)obj;
+									addLocal(pack.getPort());
+									AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes);
+									byte[] mydata = JavaWriter.objectToByteArray(info, getModel().getClassLoader());
+									sendToLocal(mydata, pack.getPort());
+									announceAwareness(si.getAwarenessInfo());
 								}
 								else if(obj instanceof AwarenessInfo)
 								{
+									System.out.println("rec awa: "+obj);
 									final AwarenessInfo info = (AwarenessInfo)obj;
 									if(info.getSender()!=null)
 									{
+										sendToLocals(data);
+										
 										if(info.getSender().equals(root))
-											received_self	= true;
-										
-	//									System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
-										
-										getRequiredService("management").addResultListener(new DefaultResultListener()
 										{
-											public void resultAvailable(Object result)
-											{
-												IManagementService ms = (IManagementService)result;
-												ms.addAwarenessInfo(info);
-												
-	//											if(initial && fast && started && !killed)
-	//											{
-	////												System.out.println(System.currentTimeMillis()+" fast discovery: "+getComponentIdentifier()+", "+sender);
-	//												received_self	= false;
-	//												waitFor((long)(Math.random()*500), new IComponentStep()
-	//												{
-	//													int	cnt;
-	//													public Object execute(IInternalAccess ia)
-	//													{
-	//														if(!received_self)
-	//														{
-	//															cnt++;
-	////															System.out.println("CSMACD try #"+(++cnt));
-	//															send(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes));
-	//															waitFor((long)(Math.random()*500*cnt), this);
-	//														}
-	//														return null;
-	//													}
-	//												});
-	//											}
-											}
-										});
+											received_self	= true;
+										}
+										else
+										{
+											announceAwareness(info);
+											addRemotes(pack.getAddress());
+										}
+	//									System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
 									}
 								}
 							}
@@ -542,47 +635,120 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	}
 	
 	/**
-	 *  Add a slave.
+	 * 
 	 */
-	protected void addSlave(int port)
+	protected void announceAwareness(final AwarenessInfo info)
+	{
+		System.out.println("announcing: "+info);
+		getRequiredService("management").addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				IManagementService ms = (IManagementService)result;
+				ms.addAwarenessInfo(info);
+				
+//				if(initial && fast && started && !killed)
+//				{
+////												System.out.println(System.currentTimeMillis()+" fast discovery: "+getComponentIdentifier()+", "+sender);
+//					received_self	= false;
+//					waitFor((long)(Math.random()*500), new IComponentStep()
+//					{
+//						int	cnt;
+//						public Object execute(IInternalAccess ia)
+//						{
+//							if(!received_self)
+//							{
+//								cnt++;
+////															System.out.println("CSMACD try #"+(++cnt));
+//								send(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes));
+//								waitFor((long)(Math.random()*500*cnt), this);
+//							}
+//							return null;
+//						}
+//					});
+//				}
+			}
+		});
+	}
+		
+	/**
+	 *  Add a remote discovery service ip.
+	 */
+	protected synchronized void addRemotes(InetAddress address)
 	{
 		try
 		{
-			Socket client = new Socket(Inet4Address.getLocalHost(), port);
-			if(slaves==null)
-				slaves = new ArrayList();
-			slaves.add(client);
+			if(!Inet4Address.getLocalHost().equals(address))
+			{
+				if(remotes==null)
+					remotes = new LinkedHashSet();
+				remotes.add(address);
+				
+				System.out.println("remotes: "+remotes);
+			}
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
-	}	
+	}
 	
 	/**
-	 *  Forward to slaves.
+	 *  Get the remotes other discovery services (at most one per ip).
 	 */
-	protected void forwardToSlaves(byte[] data)
+	protected synchronized InetAddress[] getRemotes()
 	{
-		if(slaves!=null)
+		return remotes==null? new InetAddress[0]: (InetAddress[])remotes.toArray(new InetAddress[remotes.size()]);
+	}
+	
+	/**
+	 *  Add a local.
+	 */
+	protected synchronized void addLocal(int port)
+	{
+		if(locals==null)
+			locals = new ArrayList();
+		locals.add(new Integer(port));
+		
+		System.out.println("locals: "+locals);
+	}
+	
+	/**
+	 *  Get all locals.
+	 */
+	protected synchronized Integer[] getlocals()
+	{
+		return locals==null? new Integer[0]: (Integer[])locals.toArray(new Integer[locals.size()]);
+	}
+	
+	/**
+	 *  Forward to locals.
+	 */
+	protected void sendToLocal(byte[] data, int port)
+	{
+		try
 		{
-			for(int i=0; i<slaves.size(); i++)
-			{
-				try
-				{
-					Socket sock = (Socket)slaves.get(i);
-					BufferedOutputStream bos = new BufferedOutputStream(sock.getOutputStream());
-
-//					System.out.println("len: "+size);
-					bos.write(SUtil.intToBytes(data.length));
-					bos.write(data);
-					bos.flush();
-				}
-				catch(IOException e)
-				{
-					e.printStackTrace();
-				}
-			}
+			if(localsocket==null)
+				localsocket = new DatagramSocket();
+			InetAddress address = Inet4Address.getLocalHost();
+			DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
+			localsocket.send(packet);
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 *  Send/forward to locals.
+	 */
+	protected void sendToLocals(byte[] data)
+	{
+		Integer[] locals = getlocals();
+		for(int i=0; i<locals.length; i++)
+		{
+			sendToLocal(data, locals[i].intValue());
 		}
 	}
 	

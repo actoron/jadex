@@ -5,9 +5,9 @@ package jadex.base.service.awareness;
  */
 public class SlaveInfo
 {
-	/** The receiver port. */
-	protected int port;
-
+	/** The awareness info. */
+	protected AwarenessInfo info;
+	
 	/**
 	 *  Create a new slave info.
 	 */
@@ -18,26 +18,26 @@ public class SlaveInfo
 	/**
 	 *  Create a new slave info.
 	 */
-	public SlaveInfo(int port)
+	public SlaveInfo(AwarenessInfo info)
 	{
-		this.port = port;
+		this.info = info;
 	}
 
 	/**
-	 *  Get the port.
-	 *  @return the port.
+	 *  Get the info.
+	 *  @return The info.
 	 */
-	public int getPort()
+	public AwarenessInfo getAwarenessInfo()
 	{
-		return port;
+		return info;
 	}
 
 	/**
-	 *  Set the port.
-	 *  @param port The port to set.
+	 *  Set the info.
+	 *  @param info The info to set.
 	 */
-	public void setPort(int port)
+	public void setAwarenessInfo(AwarenessInfo info)
 	{
-		this.port = port;
+		this.info = info;
 	}
 }
