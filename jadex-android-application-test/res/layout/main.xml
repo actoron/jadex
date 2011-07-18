@@ -4,35 +4,42 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-    <LinearLayout 
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="50dip">
 <!-- 	<TextView   -->
 <!--     android:layout_width="fill_parent"  -->
 <!--     android:layout_height="wrap_content"  -->
 <!--     android:text="@string/hello"/> -->
-    <Button
-    android:id="@+id/startPlatformButton"
+
+	<TextView 
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="@string/hello"/>
+	<Spinner 
+	android:id="@+id/configurationDropDown" 
+	android:layout_width="match_parent" 
+	android:layout_height="wrap_content"
+	android:prompt="@string/configurationSpinnerPrompt">
+	</Spinner>
+	
+    <LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="50dip">
+	<Button
+    android:id="@+id/main_startPlatformButton"
     android:text="@string/startButton"
     android:layout_width="wrap_content" 
     android:layout_height="50dip"/>
-        <Button
-    android:id="@+id/clearLogButton"
-    android:text="@string/clearLogButton"
-    android:layout_width="wrap_content" 
-    android:layout_height="50dip"/>
     <Button
-    android:id="@+id/exitButton"
+    android:id="@+id/main_exitButton"
     android:text="@string/exitButton"
     android:layout_width="wrap_content"
     android:layout_height="50dip"/>
     </LinearLayout>
     
-     <ListView xmlns:android="http://schemas.android.com/apk/res/android"
-		android:id="@android:id/list"
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent" />
+<!--      <ListView xmlns:android="http://schemas.android.com/apk/res/android" -->
+<!-- 		android:id="@android:id/list" -->
+<!-- 	    android:layout_width="fill_parent" -->
+<!-- 	    android:layout_height="fill_parent" /> -->
 
 <!-- 	<TextView xmlns:android="http://schemas.android.com/apk/res/android" -->
 <!-- 		android:id="@android:id/empty" -->

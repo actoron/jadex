@@ -17,6 +17,8 @@
  */
 package de.unihamburg.vsis.jadexAndroid_test;
 
+import jadex.commons.future.DefaultResultListener;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,13 +91,12 @@ public class Logger extends ListActivity implements OnClickListener {
     final CharSequence[] buffers = {"Main", "Radio", "Events"};
     final CharSequence[] types = {"Logcat", "Dmesg"};
 	private Button exitButton;
-	private Button startPlatformButton;
 	private Button clearLogButton;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.log);
 
         getListView().setStackFromBottom(true);
         getListView().setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
@@ -105,11 +106,30 @@ public class Logger extends ListActivity implements OnClickListener {
         setListAdapter(mAdapter);
         
         exitButton = (Button) findViewById(R.id.exitButton);
+        exitButton.setEnabled(false);
         exitButton.setOnClickListener(this);
-        startPlatformButton = (Button) findViewById(R.id.startPlatformButton);
-        startPlatformButton.setOnClickListener(this);
         clearLogButton = (Button) findViewById(R.id.clearLogButton);
         clearLogButton.setOnClickListener(this);
+        
+        final String component = getIntent().getExtras().getString("component");
+        
+        Helper.jLog("Starting Agent Creation test: " + component);
+		 new Thread(new ThreadGroup("bla"), 
+				 new Runnable() {
+			public void run() {
+				
+				Startup.startComponent(component).addResultListener(new DefaultResultListener() {
+					
+					public void resultAvailable(Object result) {
+						Helper.jLog("result Available");
+						exitButton.setEnabled(true);
+					}
+				});
+			}
+		},
+		"jadex",
+		256000
+		).start();
     }
     
     @Override
@@ -122,7 +142,7 @@ public class Logger extends ListActivity implements OnClickListener {
         if (f.exists()) {
             f.deleteOnExit();
         }
-
+        
     }
 
     @Override
@@ -245,17 +265,6 @@ public class Logger extends ListActivity implements OnClickListener {
     public void onClick(View arg0) {
 		 if (arg0 == exitButton) {
 			 this.finish();
-		 } else if (arg0 == startPlatformButton) {
-			Helper.jLog("Starting micro Agent Creation test");
-			 new Thread(new ThreadGroup("bla"), 
-					 new Runnable() {
-				public void run() {
-					Startup.createPlatform();
-				}
-			},
-			"jadex",
-			256000
-			).start();
 		 } else if (arg0 == clearLogButton) {
 			 mAdapter.resetLines();
 		 }
@@ -442,6 +451,7 @@ public class Logger extends ListActivity implements OnClickListener {
             try {
                 mService.run(mLogType);
                 mServiceRunning = true;
+                mAdapter.resetLines();
             } catch (RemoteException e) {
                 Log.e("Logger", "Could not start logging");
             }

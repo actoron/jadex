@@ -17,13 +17,17 @@ import jadex.bridge.service.library.ILibraryServiceListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+/* $if !android $ */
 import jadex.commons.gui.SGUI;
+/* $endif $ */
 
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+/* $if !android $ */
 import javax.swing.UIDefaults;
+/* $endif $ */
 
 /**
  *  Foctory for loading bpmn processes.
@@ -38,10 +42,12 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	/**
 	 * The image icons.
 	 */
+	/* $if !android $ */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"bpmn_process",	SGUI.makeIcon(BpmnFactory.class, "/jadex/bpmn/images/bpmn_process.png"),
 	});
+	/* $endif $ */
 	
 	//-------- attributes --------
 	
@@ -193,10 +199,12 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	/**
 	 *  Get a default icon for a file type.
 	 */
+	/* $if !android $ */
 	public IFuture getComponentTypeIcon(String type)
 	{
 		return new Future(type.equals(FILETYPE_BPMNPROCESS)? icons.getIcon("bpmn_process") : null);
 	}
+	/* $endif $ */
 
 	/**
 	 *  Get the component type of a model.

@@ -158,7 +158,11 @@ public class MultiColumnTableEx extends MultiColumnTable
 	{
 		boolean[] marker = null;
 		
+		/* $if android && androidVersion < 9 $
+		if (markerString != null && !(markerString.trim().length() == 0))
+		$else $ */
 		if (markerString != null && !markerString.trim().isEmpty())
+			/* $endif $ */
 		{
 			String[] split = markerString
 					.split(":");

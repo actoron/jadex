@@ -84,7 +84,7 @@ import java.util.TimerTask;
 		{
 //			@Component(name="multidis", type="multidis"),
 			@Component(name="scannerdis", type="scannerdis")
-		}),
+		})
 })
 @Properties(@NameValue(name="componentviewer.viewerclass", value="\"jadex.base.service.awareness.AwarenessAgentPanel\""))
 @ProvidedServices(

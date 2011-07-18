@@ -59,7 +59,7 @@
 					<resourceDirectory>${project.basedir}/res</resourceDirectory>
 					<nativeLibrariesDirectory>${project.basedir}/src/main/native</nativeLibrariesDirectory>
 					<sdk>
-						<path>/home/julakali/android/sdk</path>
+						<path>${env.ANDROID_HOME}</path>
 						<platform>2.2</platform>
 					</sdk>
 					<deleteConflictingFiles>true</deleteConflictingFiles>

@@ -575,6 +575,7 @@
 				<module>jadex-android-misc</module>
 				<module>jadex-android-stax</module>
 				<module>jadex-android-core</module>
+				<module>jadex-android-application-test</module>
 			</modules>
 		</profile>
 	</profiles>
