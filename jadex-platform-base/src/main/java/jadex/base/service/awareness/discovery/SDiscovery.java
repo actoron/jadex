@@ -7,7 +7,9 @@ import jadex.xml.bean.JavaWriter;
 import java.net.DatagramPacket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+/* $if !android $ */
 import java.net.InterfaceAddress;
+/* $endif $ */
 import java.net.NetworkInterface;
 import java.util.Enumeration;
 import java.util.List;
@@ -102,7 +104,7 @@ public class SDiscovery
 	public static short getNetworkPrefixLength(InetAddress iadr)
 	{
 		short ret = -1;
-		
+		/* $if !android $ */
 		try
 		{
 			NetworkInterface ni = NetworkInterface.getByInetAddress(iadr);
@@ -122,6 +124,7 @@ public class SDiscovery
 		{
 //			e.printStackTrace();
 		}
+		/* $endif $ */
 		
 		return ret;
 	}

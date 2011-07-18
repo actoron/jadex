@@ -62,536 +62,570 @@ import com.michaelrnovak.util.logger.service.LogProcessor;
 import de.unihamburg.vsis.jadexAndroid_test.R;
 
 public class Logger extends ListActivity implements OnClickListener {
-    private ILogProcessor mService;
-    private AlertDialog mDialog;
-    private ProgressDialog mProgressDialog;
-    private LoggerListAdapter mAdapter;
-    private LayoutInflater mInflater;
-    private int mFilter = -1;
-    private int mBuffer = 0;
-    private int mLogType = 0;
-    private String mFilterTag = "jadex";
-    private boolean mServiceRunning = false;
-    public int MAX_LINES = 250;
-    public static final int DIALOG_FILTER_ID = 1;
-    public static final int DIALOG_SAVE_ID = 2;
-    public static final int DIALOG_SAVE_PROGRESS_ID = 3;
-    public static final int DIALOG_EMAIL_ID = 4;
-    public static final int DIALOG_BUFFER_ID = 5;
-    public static final int DIALOG_TYPE_ID = 6;
-    public static final int DIALOG_TAG_ID = 7;
-    public static final int FILTER_OPTION = Menu.FIRST;
-    public static final int EMAIL_OPTION = Menu.FIRST + 1;
-    public static final int SAVE_OPTION = Menu.FIRST + 2;
-    public static final int BUFFER_OPTION = Menu.FIRST + 3;
-    public static final int TYPE_OPTION = Menu.FIRST + 4;
-    public static final int TAG_OPTION = Menu.FIRST + 5;
-    final CharSequence[] items = {"Debug", "Error", "Info", "Verbose", "Warn", "All"};
-    final char[] mFilters = {'D', 'E', 'I', 'V', 'W'};
-    final CharSequence[] buffers = {"Main", "Radio", "Events"};
-    final CharSequence[] types = {"Logcat", "Dmesg"};
+	private ILogProcessor mService;
+	private AlertDialog mDialog;
+	private ProgressDialog mProgressDialog;
+	private LoggerListAdapter mAdapter;
+	private LayoutInflater mInflater;
+	private int mFilter = -1;
+	private int mBuffer = 0;
+	private int mLogType = 0;
+	private String mFilterTag = "jadex";
+	private boolean mServiceRunning = false;
+	public int MAX_LINES = 250;
+	public static final int DIALOG_FILTER_ID = 1;
+	public static final int DIALOG_SAVE_ID = 2;
+	public static final int DIALOG_SAVE_PROGRESS_ID = 3;
+	public static final int DIALOG_EMAIL_ID = 4;
+	public static final int DIALOG_BUFFER_ID = 5;
+	public static final int DIALOG_TYPE_ID = 6;
+	public static final int DIALOG_TAG_ID = 7;
+	public static final int FILTER_OPTION = Menu.FIRST;
+	public static final int EMAIL_OPTION = Menu.FIRST + 1;
+	public static final int SAVE_OPTION = Menu.FIRST + 2;
+	public static final int BUFFER_OPTION = Menu.FIRST + 3;
+	public static final int TYPE_OPTION = Menu.FIRST + 4;
+	public static final int TAG_OPTION = Menu.FIRST + 5;
+	final CharSequence[] items = { "Debug", "Error", "Info", "Verbose", "Warn",
+			"All" };
+	final char[] mFilters = { 'D', 'E', 'I', 'V', 'W' };
+	final CharSequence[] buffers = { "Main", "Radio", "Events" };
+	final CharSequence[] types = { "Logcat", "Dmesg" };
 	private Button exitButton;
 	private Button clearLogButton;
-	
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.log);
 
-        getListView().setStackFromBottom(true);
-        getListView().setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
-        getListView().setDividerHeight(0);
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.log);
 
-        mAdapter = new LoggerListAdapter(this);
-        setListAdapter(mAdapter);
-        
-        exitButton = (Button) findViewById(R.id.exitButton);
-        exitButton.setEnabled(false);
-        exitButton.setOnClickListener(this);
-        clearLogButton = (Button) findViewById(R.id.clearLogButton);
-        clearLogButton.setOnClickListener(this);
-        
-        final String component = getIntent().getExtras().getString("component");
-        
-        Helper.jLog("Starting Agent Creation test: " + component);
-		 new Thread(new ThreadGroup("bla"), 
-				 new Runnable() {
+		getListView().setStackFromBottom(true);
+		getListView().setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
+		getListView().setDividerHeight(0);
+
+		mAdapter = new LoggerListAdapter(this);
+		setListAdapter(mAdapter);
+
+		exitButton = (Button) findViewById(R.id.exitButton);
+		// exitButton.setEnabled(false);
+		exitButton.setOnClickListener(this);
+		clearLogButton = (Button) findViewById(R.id.clearLogButton);
+		clearLogButton.setOnClickListener(this);
+
+		final String component = getIntent().getExtras().getString("component");
+
+		Helper.jLog("Starting Agent Creation test: " + component);
+		new Thread(new ThreadGroup("bla"), new Runnable() {
 			public void run() {
-				
-				Startup.startComponent(component).addResultListener(new DefaultResultListener() {
-					
-					public void resultAvailable(Object result) {
-						Helper.jLog("result Available");
-						exitButton.setEnabled(true);
-					}
-				});
+
+				Startup.startComponent(component).addResultListener(
+						new DefaultResultListener() {
+
+							public void resultAvailable(Object result) {
+								Helper.jLog("result Available");
+								// exitButton.setEnabled(true);
+							}
+						});
 			}
-		},
-		"jadex",
-		256000
-		).start();
-    }
-    
-    @Override
-    public void onResume() {
-        super.onResume();
-        bindService(new Intent(this, LogProcessor.class), mConnection, Context.BIND_AUTO_CREATE);
-
-        //TODO: make sure this actually deletes and doesn't append.
-        File f = new File("/sdcard/tmp.log");
-        if (f.exists()) {
-            f.deleteOnExit();
-        }
-        
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        unbindService(mConnection);
-    }
-    
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem item = menu.getItem(0);
-
-        if (mBuffer != 0) {
-            item.setEnabled(false);
-        } else {
-            item.setEnabled(true);
-        }
-
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-//        if (mBuffer == 0) {
-//            menu.add(Menu.NONE, FILTER_OPTION, 1, "Filter Log").setIcon(R.drawable.ic_menu_filter);
-//        } else {
-//            menu.add(Menu.NONE, FILTER_OPTION, 1, "Filter Log").setIcon(R.drawable.ic_menu_filter).setEnabled(false);
-//        }
-//
-//        menu.add(Menu.NONE, TAG_OPTION, 2, "Filter Tag").setIcon(R.drawable.ic_menu_tag);
-//        menu.add(Menu.NONE, BUFFER_OPTION, 3, "Select Buffer").setIcon(android.R.drawable.ic_menu_manage);
-//        menu.add(Menu.NONE, EMAIL_OPTION, 4, "Email Log").setIcon(android.R.drawable.ic_menu_send);
-//        menu.add(Menu.NONE, SAVE_OPTION, 5, "Save Log").setIcon(android.R.drawable.ic_menu_save);
-//        menu.add(Menu.NONE, TYPE_OPTION, 6, "Select Log").setIcon(R.drawable.ic_menu_monitor);
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
-//        case FILTER_OPTION:
-//            onCreateDialog(DIALOG_FILTER_ID);
-//            break;
-//        case EMAIL_OPTION:
-//            generateEmailMessage();
-//            break;
-//        case SAVE_OPTION:
-//            onCreateDialog(DIALOG_SAVE_ID);
-//            break;
-//        case BUFFER_OPTION:
-//            onCreateDialog(DIALOG_BUFFER_ID);
-//            break;
-//        case TYPE_OPTION:
-//            onCreateDialog(DIALOG_TYPE_ID);
-//            break;
-//        case TAG_OPTION:
-//            onCreateDialog(DIALOG_TAG_ID);
-//            break;
-//        default:
-//            break;
-//        }
-//
-        return false;
-    }
-    
-//    protected Dialog onCreateDialog(int id) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//
-//        switch (id) {
-//        case DIALOG_FILTER_ID:
-//            builder.setTitle("Select a filter level");
-//            builder.setSingleChoiceItems(items, mFilter, mClickListener);
-//            mDialog = builder.create();
-//            break;
-//        case DIALOG_SAVE_ID:
-//            builder.setTitle("Enter filename:");
-//            LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-//            View v = inflater.inflate(R.layout.file_save, (ViewGroup) findViewById(R.id.layout_root));
-//            builder.setView(v);
-//            builder.setNegativeButton("Cancel", mButtonListener);
-//            builder.setPositiveButton("Save", mButtonListener);
-//            mDialog = builder.create();
-//            break;
-//        case DIALOG_SAVE_PROGRESS_ID:
-//            mProgressDialog = ProgressDialog.show(this, "", "Saving...", true);
-//            return mProgressDialog;
-//        case DIALOG_EMAIL_ID:
-//            mProgressDialog = ProgressDialog.show(this, "", "Generating attachment...", true);
-//            return mProgressDialog;
-//        case DIALOG_BUFFER_ID:
-//            builder.setTitle("Select a buffer");
-//            builder.setSingleChoiceItems(buffers, mBuffer, mBufferListener);
-//            mDialog = builder.create();
-//            break;
-//        case DIALOG_TYPE_ID:
-//            builder.setTitle("Select a log");
-//            builder.setSingleChoiceItems(types, mLogType, mTypeListener);
-//            mDialog = builder.create();
-//            break;
-//        case DIALOG_TAG_ID:
-//            builder.setTitle("Enter tag name");
-//            LayoutInflater inflate = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-//            View t = inflate.inflate(R.layout.file_save, (ViewGroup) findViewById(R.id.layout_root));
-//            EditText et = (EditText) t.findViewById(R.id.filename);
-//            et.setText(mFilterTag);
-//            builder.setView(t);
-//            builder.setNegativeButton("Clear Filter", mTagListener);
-//            builder.setPositiveButton("Filter", mTagListener);
-//            mDialog = builder.create();
-//            break;
-//        default:
-//            break;
-//        }
-//
-//        mDialog.show();
-//        return mDialog;
-//    }
-    
-    public void onClick(View arg0) {
-		 if (arg0 == exitButton) {
-			 this.finish();
-		 } else if (arg0 == clearLogButton) {
-			 mAdapter.resetLines();
-		 }
+		}, "jadex", 256000).start();
 	}
 
-    DialogInterface.OnClickListener mClickListener = new DialogInterface.OnClickListener() {
-        public void onClick(DialogInterface dialog, int which) {
-            if (which == 5) {
-                mFilter = -1;
-            } else {
-                mFilter = which;
-            }
+	@Override
+	public void onResume() {
+		super.onResume();
+		bindService(new Intent(this, LogProcessor.class), mConnection,
+				Context.BIND_AUTO_CREATE);
 
-            updateFilter();
-        }
-    };
+		// TODO: make sure this actually deletes and doesn't append.
+		File f = new File("/sdcard/tmp.log");
+		if (f.exists()) {
+			f.deleteOnExit();
+		}
 
-//    DialogInterface.OnClickListener mBufferListener = new DialogInterface.OnClickListener() {
-//        public void onClick(DialogInterface dialog, int which) {
-//            mBuffer = which;
-//            updateBuffer();
-//        }
-//    };
-//
-//    DialogInterface.OnClickListener mTypeListener = new DialogInterface.OnClickListener() {
-//        public void onClick(DialogInterface dialog, int which) {
-//            mLogType = which;
-//            updateLog();
-//        }
-//    };
-//
-//    DialogInterface.OnClickListener mButtonListener = new DialogInterface.OnClickListener() {
-//        public void onClick(DialogInterface dialog, int which) {
-//            if (which == -1) {
-//                EditText et = (EditText) mDialog.findViewById(R.id.filename);
-//                onCreateDialog(DIALOG_SAVE_PROGRESS_ID);
-//                Log.d("Logger", "Filename: " + et.getText().toString());
-//
-//                try {
-//                    mService.write(et.getText().toString(), mFilterTag);
-//                } catch (RemoteException e) {
-//                    Log.e("Logger", "Trouble writing the log to a file");
-//                }
-//            }
-//        }
-//    };
-//
-//    DialogInterface.OnClickListener mTagListener = new DialogInterface.OnClickListener() {
-//        public void onClick(DialogInterface dialog, int which) {
-//            if (which == -1) {
-//                EditText et = (EditText) mDialog.findViewById(R.id.filename);
-//                mFilterTag = et.getText().toString().trim();
-//                updateFilterTag();
-//            } else {
-//                EditText et = (EditText) mDialog.findViewById(R.id.filename);
-//                et.setText("");
-//                mFilterTag = "";
-//                updateFilterTag();
-//            }
-//        }
-//    };
+	}
 
-    public void stopLogging() {
-        unbindService(mConnection);
-        mServiceRunning = false;
+	@Override
+	public void onPause() {
+		super.onPause();
+		unbindService(mConnection);
+	}
 
-        if (mServiceRunning) {
-            Log.d("Logger", "mServiceRunning is still TRUE");
-        }
-    }
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		MenuItem item = menu.getItem(0);
 
-    public void startLogging() {
-        bindService(new Intent(this, LogProcessor.class), mConnection, Context.BIND_AUTO_CREATE);
+		if (mBuffer != 0) {
+			item.setEnabled(false);
+		} else {
+			item.setEnabled(true);
+		}
 
-        try {
-            mService.run(mLogType);
-            mServiceRunning = true;
-        } catch (RemoteException e) {
-            Log.e("Logger", "Could not start logging");
-        }
-    }
+		return super.onPrepareOptionsMenu(menu);
+	}
 
-    private void updateFilter() {
-        mAdapter.resetLines();
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// if (mBuffer == 0) {
+		// menu.add(Menu.NONE, FILTER_OPTION, 1,
+		// "Filter Log").setIcon(R.drawable.ic_menu_filter);
+		// } else {
+		// menu.add(Menu.NONE, FILTER_OPTION, 1,
+		// "Filter Log").setIcon(R.drawable.ic_menu_filter).setEnabled(false);
+		// }
+		//
+		// menu.add(Menu.NONE, TAG_OPTION, 2,
+		// "Filter Tag").setIcon(R.drawable.ic_menu_tag);
+		// menu.add(Menu.NONE, BUFFER_OPTION, 3,
+		// "Select Buffer").setIcon(android.R.drawable.ic_menu_manage);
+		// menu.add(Menu.NONE, EMAIL_OPTION, 4,
+		// "Email Log").setIcon(android.R.drawable.ic_menu_send);
+		// menu.add(Menu.NONE, SAVE_OPTION, 5,
+		// "Save Log").setIcon(android.R.drawable.ic_menu_save);
+		// menu.add(Menu.NONE, TYPE_OPTION, 6,
+		// "Select Log").setIcon(R.drawable.ic_menu_monitor);
 
-        try {
-            mService.reset(buffers[mBuffer].toString());
-        } catch (RemoteException e) {
-            Log.e("Logger", "Service is gone...");
-        }
+		return super.onCreateOptionsMenu(menu);
+	}
 
-        mDialog.dismiss();
-    }
-    
-    private void updateBuffer() {
-        mAdapter.resetLines();
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// switch (item.getItemId()) {
+		// case FILTER_OPTION:
+		// onCreateDialog(DIALOG_FILTER_ID);
+		// break;
+		// case EMAIL_OPTION:
+		// generateEmailMessage();
+		// break;
+		// case SAVE_OPTION:
+		// onCreateDialog(DIALOG_SAVE_ID);
+		// break;
+		// case BUFFER_OPTION:
+		// onCreateDialog(DIALOG_BUFFER_ID);
+		// break;
+		// case TYPE_OPTION:
+		// onCreateDialog(DIALOG_TYPE_ID);
+		// break;
+		// case TAG_OPTION:
+		// onCreateDialog(DIALOG_TAG_ID);
+		// break;
+		// default:
+		// break;
+		// }
+		//
+		return false;
+	}
 
-        try {
-            mService.reset(buffers[mBuffer].toString());
-        } catch (RemoteException e) {
-            Log.e("Logger", "Service is gone...");
-        }
+	// protected Dialog onCreateDialog(int id) {
+	// AlertDialog.Builder builder = new AlertDialog.Builder(this);
+	//
+	// switch (id) {
+	// case DIALOG_FILTER_ID:
+	// builder.setTitle("Select a filter level");
+	// builder.setSingleChoiceItems(items, mFilter, mClickListener);
+	// mDialog = builder.create();
+	// break;
+	// case DIALOG_SAVE_ID:
+	// builder.setTitle("Enter filename:");
+	// LayoutInflater inflater = (LayoutInflater)
+	// getSystemService(LAYOUT_INFLATER_SERVICE);
+	// View v = inflater.inflate(R.layout.file_save, (ViewGroup)
+	// findViewById(R.id.layout_root));
+	// builder.setView(v);
+	// builder.setNegativeButton("Cancel", mButtonListener);
+	// builder.setPositiveButton("Save", mButtonListener);
+	// mDialog = builder.create();
+	// break;
+	// case DIALOG_SAVE_PROGRESS_ID:
+	// mProgressDialog = ProgressDialog.show(this, "", "Saving...", true);
+	// return mProgressDialog;
+	// case DIALOG_EMAIL_ID:
+	// mProgressDialog = ProgressDialog.show(this, "",
+	// "Generating attachment...", true);
+	// return mProgressDialog;
+	// case DIALOG_BUFFER_ID:
+	// builder.setTitle("Select a buffer");
+	// builder.setSingleChoiceItems(buffers, mBuffer, mBufferListener);
+	// mDialog = builder.create();
+	// break;
+	// case DIALOG_TYPE_ID:
+	// builder.setTitle("Select a log");
+	// builder.setSingleChoiceItems(types, mLogType, mTypeListener);
+	// mDialog = builder.create();
+	// break;
+	// case DIALOG_TAG_ID:
+	// builder.setTitle("Enter tag name");
+	// LayoutInflater inflate = (LayoutInflater)
+	// getSystemService(LAYOUT_INFLATER_SERVICE);
+	// View t = inflate.inflate(R.layout.file_save, (ViewGroup)
+	// findViewById(R.id.layout_root));
+	// EditText et = (EditText) t.findViewById(R.id.filename);
+	// et.setText(mFilterTag);
+	// builder.setView(t);
+	// builder.setNegativeButton("Clear Filter", mTagListener);
+	// builder.setPositiveButton("Filter", mTagListener);
+	// mDialog = builder.create();
+	// break;
+	// default:
+	// break;
+	// }
+	//
+	// mDialog.show();
+	// return mDialog;
+	// }
 
-        mDialog.dismiss();
-    }
+	public void onClick(View arg0) {
+		if (arg0 == exitButton) {
+			this.finish();
+		} else if (arg0 == clearLogButton) {
+			mAdapter.resetLines();
+		}
+	}
 
-    private void updateLog() {
-        mAdapter.resetLines();
+	DialogInterface.OnClickListener mClickListener = new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface dialog, int which) {
+			if (which == 5) {
+				mFilter = -1;
+			} else {
+				mFilter = which;
+			}
 
-        try {
-            mService.restart(mLogType);
-        } catch (RemoteException e) {
-            Log.e("Logger", "Service is gone...");
-        }
+			updateFilter();
+		}
+	};
 
-        mDialog.dismiss();
-    }
-    
-    private void updateFilterTag() {
-        mAdapter.resetLines();
+	// DialogInterface.OnClickListener mBufferListener = new
+	// DialogInterface.OnClickListener() {
+	// public void onClick(DialogInterface dialog, int which) {
+	// mBuffer = which;
+	// updateBuffer();
+	// }
+	// };
+	//
+	// DialogInterface.OnClickListener mTypeListener = new
+	// DialogInterface.OnClickListener() {
+	// public void onClick(DialogInterface dialog, int which) {
+	// mLogType = which;
+	// updateLog();
+	// }
+	// };
+	//
+	// DialogInterface.OnClickListener mButtonListener = new
+	// DialogInterface.OnClickListener() {
+	// public void onClick(DialogInterface dialog, int which) {
+	// if (which == -1) {
+	// EditText et = (EditText) mDialog.findViewById(R.id.filename);
+	// onCreateDialog(DIALOG_SAVE_PROGRESS_ID);
+	// Log.d("Logger", "Filename: " + et.getText().toString());
+	//
+	// try {
+	// mService.write(et.getText().toString(), mFilterTag);
+	// } catch (RemoteException e) {
+	// Log.e("Logger", "Trouble writing the log to a file");
+	// }
+	// }
+	// }
+	// };
+	//
+	// DialogInterface.OnClickListener mTagListener = new
+	// DialogInterface.OnClickListener() {
+	// public void onClick(DialogInterface dialog, int which) {
+	// if (which == -1) {
+	// EditText et = (EditText) mDialog.findViewById(R.id.filename);
+	// mFilterTag = et.getText().toString().trim();
+	// updateFilterTag();
+	// } else {
+	// EditText et = (EditText) mDialog.findViewById(R.id.filename);
+	// et.setText("");
+	// mFilterTag = "";
+	// updateFilterTag();
+	// }
+	// }
+	// };
 
-        try {
-            mService.reset(buffers[mBuffer].toString());
-        } catch (RemoteException e) {
-            Log.e("Logger", "Service is gone...");
-        }
+	public void stopLogging() {
+		unbindService(mConnection);
+		mServiceRunning = false;
 
-        mDialog.dismiss();
-    }
-    
-    private void saveResult(String msg) {
-        mProgressDialog.dismiss();
+		if (mServiceRunning) {
+			Log.d("Logger", "mServiceRunning is still TRUE");
+		}
+	}
 
-        if (msg.equals("error")) {
-            Toast.makeText(this, "Error while saving the log to file!", Toast.LENGTH_LONG).show();
-        } else if (msg.equals("saved")) {
-            Toast.makeText(this, "Log has been saved to file.", Toast.LENGTH_LONG).show();
-        } else if (msg.equals("attachment")) {
-            Intent mail = new Intent(Intent.ACTION_SEND);
-            mail.setType("text/plain");
-            mail.putExtra(Intent.EXTRA_SUBJECT, "Logger Debug Output");
-            mail.putExtra(Intent.EXTRA_STREAM, Uri.parse("file:///sdcard/tmp.log"));
-            mail.putExtra(Intent.EXTRA_TEXT, "Here's the output from my log file. Thanks!");
-            startActivity(Intent.createChooser(mail, "Email:"));
-        }
-    }
-    
-    private void generateEmailMessage() {
-        onCreateDialog(DIALOG_EMAIL_ID);
+	public void startLogging() {
+		bindService(new Intent(this, LogProcessor.class), mConnection,
+				Context.BIND_AUTO_CREATE);
 
-        try {
-            mService.write("tmp.log", mFilterTag);
-        } catch (RemoteException e) {
-            Log.e("Logger", "Error generating email attachment.");
-        }
-    }
+		try {
+			mService.run(mLogType);
+			mServiceRunning = true;
+		} catch (RemoteException e) {
+			Log.e("Logger", "Could not start logging");
+		}
+	}
 
-    public Handler mHandler = new Handler() {
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-            case LogProcessor.MSG_READ_FAIL:
-                Log.d("Logger", "MSG_READ_FAIL");
-                break;
-            case LogProcessor.MSG_LOG_FAIL:
-                Log.d("Logger", "MSG_LOG_FAIL");
-                break;
-            case LogProcessor.MSG_NEW_LINE:
-                mAdapter.addLine((String) msg.obj);
-                break;
-            case LogProcessor.MSG_LOG_SAVE:
-                saveResult((String) msg.obj);
-                break;
-            default:
-                super.handleMessage(msg);
-            }
-        }
-    };
+	private void updateFilter() {
+		mAdapter.resetLines();
 
-    private ServiceConnection mConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            mService = ILogProcessor.Stub.asInterface((IBinder)service);
-            LogProcessor.setHandler(mHandler);
+		try {
+			mService.reset(buffers[mBuffer].toString());
+		} catch (RemoteException e) {
+			Log.e("Logger", "Service is gone...");
+		}
 
-            try {
-                mService.run(mLogType);
-                mServiceRunning = true;
-                mAdapter.resetLines();
-            } catch (RemoteException e) {
-                Log.e("Logger", "Could not start logging");
-            }
-        }
+		mDialog.dismiss();
+	}
 
-        public void onServiceDisconnected(ComponentName className) {
-            Log.i("Logger", "onServiceDisconnected has been called");
-            mService = null;
-        }
-    };
+	private void updateBuffer() {
+		mAdapter.resetLines();
 
-    /*
-     * This is the list adapter for the Logger, it holds an array of strings and adds them
-     * to the list view recycling views for obvious performance reasons.
-     */
-    public class LoggerListAdapter extends BaseAdapter {
-        private Context mContext;
-        private ArrayList<String> mLines;
+		try {
+			mService.reset(buffers[mBuffer].toString());
+		} catch (RemoteException e) {
+			Log.e("Logger", "Service is gone...");
+		}
 
-        public LoggerListAdapter(Context c) {
-            mContext = c;
-            mLines = new ArrayList<String>();
-            mInflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        }
+		mDialog.dismiss();
+	}
 
-        public int getCount() {
-            return mLines.size();
-        }
+	private void updateLog() {
+		mAdapter.resetLines();
 
-        public long getItemId(int pos) {
-            return pos;
-        }
+		try {
+			mService.restart(mLogType);
+		} catch (RemoteException e) {
+			Log.e("Logger", "Service is gone...");
+		}
 
-        public Object getItem(int pos) {
-            return mLines.get(pos);
-        }
+		mDialog.dismiss();
+	}
 
-        public View getView(int pos, View convertView, ViewGroup parent) {
-            TextView holder;
-            String line = mLines.get(pos);
+	private void updateFilterTag() {
+		mAdapter.resetLines();
 
-            if (convertView == null) {
-                //inflate the view here because there's no existing view object.
-                convertView = mInflater.inflate(R.layout.log_item, parent, false);
+		try {
+			mService.reset(buffers[mBuffer].toString());
+		} catch (RemoteException e) {
+			Log.e("Logger", "Service is gone...");
+		}
 
-                holder = (TextView) convertView.findViewById(R.id.log_line);
-                holder.setTypeface(Typeface.MONOSPACE);
+		mDialog.dismiss();
+	}
 
-                convertView.setTag(holder);
-            } else {
-                holder = (TextView) convertView.getTag();
-            }
+	private void saveResult(String msg) {
+		mProgressDialog.dismiss();
 
-            if (mLogType == 0) {
-                holder.setText(new LogFormattedString(line));
-            } else {
-                holder.setText(line);
-            }
+		if (msg.equals("error")) {
+			Toast.makeText(this, "Error while saving the log to file!",
+					Toast.LENGTH_LONG).show();
+		} else if (msg.equals("saved")) {
+			Toast.makeText(this, "Log has been saved to file.",
+					Toast.LENGTH_LONG).show();
+		} else if (msg.equals("attachment")) {
+			Intent mail = new Intent(Intent.ACTION_SEND);
+			mail.setType("text/plain");
+			mail.putExtra(Intent.EXTRA_SUBJECT, "Logger Debug Output");
+			mail.putExtra(Intent.EXTRA_STREAM,
+					Uri.parse("file:///sdcard/tmp.log"));
+			mail.putExtra(Intent.EXTRA_TEXT,
+					"Here's the output from my log file. Thanks!");
+			startActivity(Intent.createChooser(mail, "Email:"));
+		}
+	}
 
-            final boolean autoscroll = 
-                    (getListView().getScrollY() + getListView().getHeight() >= getListView().getBottom()) ? true : false;
+	private void generateEmailMessage() {
+		onCreateDialog(DIALOG_EMAIL_ID);
 
-            if (autoscroll) {
-                getListView().setSelection(mLines.size() - 1);
-            }
+		try {
+			mService.write("tmp.log", mFilterTag);
+		} catch (RemoteException e) {
+			Log.e("Logger", "Error generating email attachment.");
+		}
+	}
 
-            return convertView;
-        }
+	public Handler mHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case LogProcessor.MSG_READ_FAIL:
+				Log.d("Logger", "MSG_READ_FAIL");
+				break;
+			case LogProcessor.MSG_LOG_FAIL:
+				Log.d("Logger", "MSG_LOG_FAIL");
+				break;
+			case LogProcessor.MSG_NEW_LINE:
+				mAdapter.addLine((String) msg.obj);
+				break;
+			case LogProcessor.MSG_LOG_SAVE:
+				saveResult((String) msg.obj);
+				break;
+			default:
+				super.handleMessage(msg);
+			}
+		}
+	};
 
-        public void addLine(String line) {
-            if (mFilter != -1 && line.charAt(0) != mFilters[mFilter]) {
-                return;
-            }
+	private ServiceConnection mConnection = new ServiceConnection() {
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			mService = ILogProcessor.Stub.asInterface((IBinder) service);
+			LogProcessor.setHandler(mHandler);
 
-            if (!mFilterTag.equals("")) {
-                String tag = line.substring(2, line.indexOf("("));
+			try {
+				mService.run(mLogType);
+				mServiceRunning = true;
+				mAdapter.resetLines();
+			} catch (RemoteException e) {
+				Log.e("Logger", "Could not start logging");
+			}
+		}
 
-                if (!	((mFilterTag.toLowerCase().equals(tag.toLowerCase().trim()))
-                		|| ("system.err".equals(tag.toLowerCase().trim()))) ) {
-                    return;
-                }
-            }
+		public void onServiceDisconnected(ComponentName className) {
+			Log.i("Logger", "onServiceDisconnected has been called");
+			mService = null;
+		}
+	};
 
-            mLines.add(line);
-            notifyDataSetChanged();
-            getListView().setSelection(mLines.size() - 1);
-        }
- 
-        public void resetLines() {
-            mLines.clear();
-            notifyDataSetChanged();
-        }
+	/*
+	 * This is the list adapter for the Logger, it holds an array of strings and
+	 * adds them to the list view recycling views for obvious performance
+	 * reasons.
+	 */
+	public class LoggerListAdapter extends BaseAdapter {
+		private Context mContext;
+		private ArrayList<String> mLines;
 
-        public void updateView() {
-            notifyDataSetChanged();
-        }
-    }
+		public LoggerListAdapter(Context c) {
+			mContext = c;
+			mLines = new ArrayList<String>();
+			mInflater = (LayoutInflater) c
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		}
 
-    private static class LogFormattedString extends SpannableString {
-        public static final HashMap<Character, Integer> LABEL_COLOR_MAP;
+		public int getCount() {
+			return mLines.size();
+		}
 
-        public LogFormattedString(String line) {
-            super(line);
+		public long getItemId(int pos) {
+			return pos;
+		}
 
-            try {
-                if (line.length() < 4) {
-                    throw new RuntimeException();
-                }
+		public Object getItem(int pos) {
+			return mLines.get(pos);
+		}
 
-                if (line.charAt(1) != '/') {
-                    throw new RuntimeException();
-                }
+		public View getView(int pos, View convertView, ViewGroup parent) {
+			TextView holder;
+			String line = mLines.get(pos);
 
-                Integer labelColor = LABEL_COLOR_MAP.get(line.charAt(0));
+			if (convertView == null) {
+				// inflate the view here because there's no existing view
+				// object.
+				convertView = mInflater.inflate(R.layout.log_item, parent,
+						false);
 
-                if (labelColor == null) {
-                    labelColor = LABEL_COLOR_MAP.get('E');
-                }
+				holder = (TextView) convertView.findViewById(R.id.log_line);
+				holder.setTypeface(Typeface.MONOSPACE);
 
-                setSpan(new ForegroundColorSpan(labelColor), 0, 1, 0);
-                setSpan(new StyleSpan(Typeface.BOLD), 0, 1, 0);
+				convertView.setTag(holder);
+			} else {
+				holder = (TextView) convertView.getTag();
+			}
 
-                int leftIdx;
- 
-                if ((leftIdx = line.indexOf(':', 2)) >= 0) {
-                    setSpan(new ForegroundColorSpan(labelColor), 2, leftIdx, 0);
-                    setSpan(new StyleSpan(Typeface.ITALIC), 2, leftIdx, 0);
-                }
-            } catch (Exception e) {
-                setSpan(new ForegroundColorSpan(0xffddaacc), 0, length(), 0);
-            }
-        }
-    	
-        static {
-            LABEL_COLOR_MAP = new HashMap<Character, Integer>();
-            LABEL_COLOR_MAP.put('D', 0xff9999ff);
-            LABEL_COLOR_MAP.put('V', 0xffcccccc);
-            LABEL_COLOR_MAP.put('I', 0xffeeeeee);
-            LABEL_COLOR_MAP.put('E', 0xffff9999);
-            LABEL_COLOR_MAP.put('W', 0xffffff99);
-        }
-    }
+			if (mLogType == 0) {
+				holder.setText(new LogFormattedString(line));
+			} else {
+				holder.setText(line);
+			}
+
+			final boolean autoscroll = (getListView().getScrollY()
+					+ getListView().getHeight() >= getListView().getBottom()) ? true
+					: false;
+
+			if (autoscroll) {
+				getListView().setSelection(mLines.size() - 1);
+			}
+
+			return convertView;
+		}
+
+		public void addLine(String line) {
+			if (mFilter != -1 && line.charAt(0) != mFilters[mFilter]) {
+				return;
+			}
+
+			if (!mFilterTag.equals("")) {
+				String tag = line.substring(2, line.indexOf("("));
+
+				if (mFilterTag.toLowerCase().equals(tag.toLowerCase().trim())) {
+					if (line.length() > 19) {
+						line = line.substring(0, 2) + line.substring(19);
+					}
+				} else if ("system.err".equals(tag.toLowerCase().trim())) {
+					// dont change error messages
+				} else if ("system.out".equals(tag.toLowerCase().trim())) {
+					if (line.length() > 19) {
+						line = line.substring(0, 2) + line.substring(21);
+					}
+				} else {
+					return;
+				}
+			}
+
+			mLines.add(line);
+			notifyDataSetChanged();
+			getListView().setSelection(mLines.size() - 1);
+		}
+
+		public void resetLines() {
+			mLines.clear();
+			notifyDataSetChanged();
+		}
+
+		public void updateView() {
+			notifyDataSetChanged();
+		}
+	}
+
+	private static class LogFormattedString extends SpannableString {
+		public static final HashMap<Character, Integer> LABEL_COLOR_MAP;
+
+		public LogFormattedString(String line) {
+			super(line);
+
+			try {
+				if (line.length() < 4) {
+					throw new RuntimeException();
+				}
+
+				if (line.charAt(1) != '/') {
+					throw new RuntimeException();
+				}
+
+				Integer labelColor = LABEL_COLOR_MAP.get(line.charAt(0));
+
+				if (labelColor == null) {
+					labelColor = LABEL_COLOR_MAP.get('E');
+				}
+
+				setSpan(new ForegroundColorSpan(labelColor), 0, 1, 0);
+				setSpan(new StyleSpan(Typeface.BOLD), 0, 1, 0);
+
+				int leftIdx;
+
+				if ((leftIdx = line.indexOf(':', 2)) >= 0) {
+					setSpan(new ForegroundColorSpan(labelColor), 2, leftIdx, 0);
+					setSpan(new StyleSpan(Typeface.ITALIC), 2, leftIdx, 0);
+				}
+			} catch (Exception e) {
+				setSpan(new ForegroundColorSpan(0xffddaacc), 0, length(), 0);
+			}
+		}
+
+		static {
+			LABEL_COLOR_MAP = new HashMap<Character, Integer>();
+			LABEL_COLOR_MAP.put('D', 0xff9999ff);
+			LABEL_COLOR_MAP.put('V', 0xffcccccc);
+			LABEL_COLOR_MAP.put('I', 0xffeeeeee);
+			LABEL_COLOR_MAP.put('E', 0xffff9999);
+			LABEL_COLOR_MAP.put('W', 0xffffff99);
+		}
+	}
 }

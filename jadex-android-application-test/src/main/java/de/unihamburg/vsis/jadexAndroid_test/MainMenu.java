@@ -50,7 +50,7 @@ public class MainMenu extends Activity implements OnClickListener {
 				 startActivity(i);
 			 } else if ("BPMN Creation Test".equals(configurationSpinner.getSelectedItem())) {
 				 Intent i = new Intent(MainMenu.this, Logger.class);
-				 i.putExtra("component", "jadex/bpmn/benchmarks/AgentCreation.bpmn");
+				 i.putExtra("component", "jadex/bpmn/benchmarks/AgentCreation2.bpmn");
 				 MainMenu.this.startActivity(i);
 			 } else {
 				 Toast.makeText(this, "Please choose a configuration first", Toast.LENGTH_SHORT);

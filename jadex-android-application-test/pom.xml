@@ -44,6 +44,7 @@
 				</excludes>
 				<includes>
 					<include>**/*.xml</include>
+					<include>**/*.bpmn*</include>
 				</includes>
 			</resource>
 		</resources>
@@ -65,6 +66,10 @@
 					<deleteConflictingFiles>true</deleteConflictingFiles>
 					<undeployBeforeDeploy>true</undeployBeforeDeploy>
 					<generateApk>true</generateApk>
+					<jvmArguments>
+						<argument>-Xms256m</argument>
+						<argument>-Xmx512m</argument>
+					</jvmArguments>
 				</configuration>
 				<extensions>true</extensions>
 			</plugin>

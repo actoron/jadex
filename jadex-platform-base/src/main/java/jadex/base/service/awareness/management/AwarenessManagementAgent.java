@@ -74,23 +74,23 @@ import java.util.TimerTask;
 		components=
 		{
 //			@Component(name="broadcastdis", type="broadcastdis"),
-			@Component(name="multicastdis", type="multicastdis"),
+			@Component(name="multicastdis", type="multicastdis")
 //			@Component(name="scannerdis", type="scannerdis")
 		}),
 	@Configuration(name="Medium updates (20s)", arguments=@NameValue(name="delay", value="20000"),
 		components=
 		{
-			@Component(name="broadcastdis", type="broadcastdis"),
+			@Component(name="broadcastdis", type="broadcastdis")
 //			@Component(name="multicastdis", type="multicastdis"),
 //			@Component(name="scannerdis", type="scannerdis")
 		}),
 	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"),
 		components=
 		{
-			@Component(name="broadcastdis", type="broadcastdis"),
+			@Component(name="broadcastdis", type="broadcastdis")
 //			@Component(name="multicastdis", type="multicastdis"),
 //			@Component(name="scannerdis", type="scannerdis")
-		}),
+		})
 })
 @Properties(@NameValue(name="componentviewer.viewerclass", value="\"jadex.base.service.awareness.AwarenessAgentPanel\""))
 @ProvidedServices(
