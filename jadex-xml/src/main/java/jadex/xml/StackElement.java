@@ -7,8 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/* $if !android $ */
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
+/* $else $
+import javaxx.xml.namespace.QName;
+import javaxx.xml.stream.Location;
+$endif $ */
 
 /**
  *  A struct to represent an element on the stack while parsing.

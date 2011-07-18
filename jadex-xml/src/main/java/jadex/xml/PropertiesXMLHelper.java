@@ -10,7 +10,11 @@ import jadex.xml.writer.Writer;
 import java.util.HashSet;
 import java.util.Set;
 
+/* $if !android $ */
 import javax.xml.namespace.QName;
+/* $else $
+import javaxx.xml.namespace.QName;
+$endif $ */
 
 /**
  *  A simple static helper class for reading and writing jadex.commons.Properties.

@@ -298,8 +298,10 @@ public class SComponentFactory
 				{
 					public void customResultAvailable(Object result)
 					{
+						/* $if !android $ */
 						IComponentFactory fac = (IComponentFactory)result;
 						fac.getComponentTypeIcon(type).addResultListener(new DelegationResultListener(ret));
+						/* $endif $ */
 					}
 					
 					public void exceptionOccurred(Exception exception)

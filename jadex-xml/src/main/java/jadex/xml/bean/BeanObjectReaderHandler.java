@@ -36,7 +36,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+/* $if !android $ */
 import javax.xml.namespace.QName;
+/* $else $
+import javaxx.xml.namespace.QName;
+$endif $ */
 
 /**
  *  Handler for reading XML into Java beans.
@@ -61,8 +65,8 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	protected Set no_typeinfos;
 	
 	/** The bean introspector. */
-//	protected IBeanIntrospector introspector = new BeanReflectionIntrospector();
-	protected IBeanIntrospector introspector = new BeanInfoIntrospector();
+	protected IBeanIntrospector introspector = new BeanReflectionIntrospector();
+//	protected IBeanIntrospector introspector = new BeanInfoIntrospector();
 	
 	//-------- constructors --------
 	

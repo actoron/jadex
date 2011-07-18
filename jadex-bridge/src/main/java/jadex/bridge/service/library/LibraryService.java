@@ -87,7 +87,11 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		super(provider.getId(), ILibraryService.class, properties);
 		
 		this.provider = provider;
+		/* $if !android $ */
 		this.libcl = new DelegationClassLoader(ClassLoader.getSystemClassLoader(), urls);
+		/* $else $
+		this.libcl = new DelegationClassLoader(LibraryService.class.getClassLoader(), urls);
+		$endif $ */
 		
 		listeners	= Collections.synchronizedSet(new HashSet());
 		urlrefcount = Collections.synchronizedMap(new HashMap());

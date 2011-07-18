@@ -8,7 +8,9 @@ import jadex.commons.collection.LRU;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
+/* $if !android $ */
 import java.awt.Desktop;
+/* $endif $ */
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -279,7 +281,9 @@ public class DeploymentService extends BasicService implements IDeploymentServic
 		try
 		{
 			File file = new File(path);
+			/* $if !android $ */
 			Desktop.getDesktop().open(file);
+			/* $endif $ */
 			// exec produces strange exceptions?!
 //			Runtime.getRuntime().exec(path);
 			ret.setResult(null);

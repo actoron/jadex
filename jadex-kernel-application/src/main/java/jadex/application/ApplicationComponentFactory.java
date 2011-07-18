@@ -18,7 +18,9 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+/* $if !android $ */
 import jadex.commons.gui.SGUI;
+/* $endif $ */
 import jadex.component.ComponentInterpreter;
 import jadex.kernelbase.CacheableKernelModel;
 
@@ -28,8 +30,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
+/* $if !android $ */
 import javax.swing.UIDefaults;
+/* $endif $ */
 
 /**
  *  Factory for default contexts.
@@ -48,10 +51,12 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	/**
 	 * The image icons.
 	 */
+	/* $if !android $ */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"application", SGUI.makeIcon(ApplicationComponentFactory.class, "/jadex/application/images/application.png"),
 	});
+	/* $endif $ */
 	
 	//-------- attributes --------
 	
@@ -267,10 +272,12 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	/**
 	 *  Get a default icon for a file type.
 	 */
+	/* $if !android $ */
 	public IFuture getComponentTypeIcon(String type)
 	{
 		return new Future(type.equals(FILETYPE_APPLICATION)? icons.getIcon("application"): null);
 	}
+	/* $endif $ */
 
 	/**
 	 *  Get the component type of a model.

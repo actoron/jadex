@@ -11,9 +11,11 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-
+/* $if !android $ */
 import javax.xml.namespace.QName;
-
+/* $else $
+import javaxx.xml.namespace.QName;
+$endif $ */
 /**
  *  Mapping from tag (or path fragment) to object.
  */

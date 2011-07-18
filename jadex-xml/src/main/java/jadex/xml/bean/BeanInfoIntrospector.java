@@ -7,9 +7,15 @@ import jadex.xml.annotation.XMLClassname;
 import jadex.xml.annotation.XMLExclude;
 import jadex.xml.annotation.XMLInclude;
 
+/* $if !android $ */
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+/* $else $
+import javaa.beans.BeanInfo;
+import javaa.beans.Introspector;
+import javaa.beans.PropertyDescriptor;
+$endif $ */
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;

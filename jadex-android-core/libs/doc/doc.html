@@ -1,0 +1,450 @@
+<html>
+<head>
+	<title>preprocess Ant Task</title>
+</head>
+<body>
+	<h1>preprocess Ant Task</h1>
+	<h2>preprocess task</h2>
+	<p>Each <code>preprocess</code> task copies a single directory 
+		(recursively) from input to output, transforming preprocessor comments 
+		as it goes.</p>
+	<h3>preprocess attributes</h3>
+	<table cellspacing="4" cellpadding="4" border="1">
+		<tr>
+			<th align="left">Name</th>
+			<th align="left">Value(s)</th>
+			<th align="left">Description</th>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code>indir</code>
+			</td>
+			<td valign="top">File path</td>
+			<td valign="top">The input directory to be preprocessed. This 
+				directory, all sub-directories (recursively) and files in them 
+				are copied to the output directory. Files with ".java" and 
+				".xml" extensions are examined for preprocessor comments, 
+				which, if found, are transformed as described below.</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code>outdir</code>
+			</td>
+			<td valign="top">File path</td>
+			<td valign="top">The output target directory. If the value of the 
+				<code>out</code> attribute is "create", this directory must not 
+				already exist.</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code>out</code>
+			</td>
+			<td valign="top">"create", "replace" or "merge"</td>
+			<td valign="top">Specify "create" if the output directory does not 
+				already exist and is to be created. Specify "replace" to delete 
+				the existing output directory, if any, and replace it with the 
+				new directory and contents. Specify "merge" to leave the 
+				existing output directory, if any, and merge the result of 
+				preprocess into it. Default is "create".</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code>except</code>
+			</td>
+			<td valign="top">Comma-separated list of names</td>
+			<td valign="top">A directory or file in the input directory whose 
+				name is in the list is skipped. Names must be simple names, 
+				e.g., "bin, FunnyClass.java", and must not contain / 
+				characters. Whitespace is trimmed from the begin and end of 
+				each name, but left alone in the middle of a name.</td>
+		</tr>
+	</table>
+	<h2>var element</h2>
+	<p>The <code>var</code> element sets the value of a preprocessor variable 
+		which can be tested in preprocessor comments in the input.</p>
+	<h3>var attributes</h3>
+	<table cellspacing="4" cellpadding="4" border="1">
+		<tr>
+			<th align="left">Name</th>
+			<th align="left">Value</th>
+			<th align="left">Description</th>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code>name</code>
+			</td>
+			<td valign="top">identifier</td>
+			<td valign="top">The var name must begin with an ASCII alphabetic 
+				character a-z or A-Z. It may continue with any number of 
+				alphabetic characters, numeric digits 0-9, and the characters 
+				'_' (underscore), '-' (dash) or '.' (dot).</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code>value</code>
+			</td>
+			<td valign="top">string</td>
+			<td valign="top">The value may be any string, but the following 
+				strings are treated specially: "true" and "false" are treated 
+				as the boolean values true and false. Any string beginning with 
+				a digit 0-9 is treated as a hierarchical number, and must match 
+				the regular expression 
+				<code>"[0-9]+(\.[0-9]+)?(\.[0-9]*)?"</code>, for example, 1, 
+				1., 10.2 and 2.1.2 are valid numbers with 1, 1, 2, and 3 
+				hierarchical levels, respectively.</td>
+		</tr>
+	</table>
+	<h2>filetype element</h2>
+	<p>The <code>filetype</code> element extends the file types examined by the 
+		preprocessor.</p>
+	<h3>filetype attributes</h3>
+	<table cellspacing="4" cellpadding="4" border="1">
+		<tr>
+			<th align="left">Name</th>
+			<th align="left">Value</th>
+			<th align="left">Description</th>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code>name</code>
+			</td>
+			<td valign="top">identifier</td>
+			<td valign="top">Optional human-readable name; used only in error 
+				messages.</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code>extensions</code>
+			</td>
+			<td valign="top">comma-separated list of file extensions</td>
+			<td valign="top">E.g., <code>extensions="xml, xsl, xsd"</code>.</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code>commentbegin</code>
+			</td>
+			<td valign="top">comment BEGIN bracket</td>
+			<td valign="top">The comment start string, e.g., 
+				<code>commentbegin="&amp;lt;!--"</code>.</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code>commentend</code>
+			</td>
+			<td valign="top">comment END bracket</td>
+			<td valign="top">The comment stop string, e.g., 
+				<code>commentend="-->"</code>.</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code>outextensions</code>
+			</td>
+			<td valign="top">comma-separated list of file 
+				extensions</td>
+			<td valign="top">Optional output extensions. E.g., <code>extensions="xml"</code>.</td>
+		</tr>
+	</table>
+	<p>These two filetypes illustrate how to preprocess Java and XML files:</p>
+	<pre>
+	&lt;filetype name="Java" extensions="java" commentbegin="/*" commentend="*&#47;"/>
+	&lt;filetype name="XML" extensions="xml" commentbegin="&amp;lt;!--" commentend="-->"/></pre>
+	<p>The outextensions attribute allows you to use the preprocessor as a code 
+		generator. The output file will be written to a file with the same root name 
+		but a different extension. outextensions can specify one or more 
+		extensions. If the number of outextensions is greater than or 
+		equal to the number of extensions listed, each corresponding item in 
+		the outextensions list is used for the item in the extensions list; any 
+		extra outextensions are ignored. If there are more extensions than 
+		outextensions, the last extension in the outextensions list is used 
+		repeatedly.</p>
+	<h2>Examples</h2>
+	<h3>Example 1: Split by multiple versions</h3>
+	<pre>
+&lt;project name="com.objfac.prebop.split" default="split" basedir=".">
+	&lt;target name="properties">
+		&lt;property name="sourcedir" value="${basedir}"/>
+		&lt;property name="targetdir" value="${basedir}/../../versions"/>
+		&lt;property name="target2dir" value="${targetdir}/e2.1"/>
+		&lt;property name="target2prodir" value="${targetdir}/e2.1pro"/>
+		&lt;property name="target3dir" value="${targetdir}/e3.0"/>
+		&lt;property name="target3prodir" value="${targetdir}/e3.0pro"/>
+		&lt;property name="skip" value="xerces.jar,draw.jar,dtdparser.jar,genjava.jar,isorelax.jar,jaxen.jar,jing.jar,moved.jar,saxon.jar,saxpath.jar,trang.jar,trangutils.jar,util.jar,walker.jar,xml-apis.jar,xml-commons-resolver.jar,xml.jar,xmleditor.jar,xsdlib.jar"/>
+	&lt;/target>
+	&lt;target name="split" depends="properties">
+		&lt;!-- A two-dimensional split by (Eclipse) version and pro
+			 for a particular appversion -->
+		&lt;preprocess indir="${sourcedir}" outdir="${target2dir}" out="replace" 
+			except="${skip}">
+			&lt;var name="version" value="2.1.2"/>
+			&lt;var name="pro" value="false"/>
+			&lt;var name="appversion" value="2.0.4"/>
+			&lt;filetype commentend="*/" commentbegin="/*" extensions="java"/>
+			&lt;filetype commentend="-->" commentbegin="&lt;!--" extensions="xml"/>
+		&lt;/preprocess>
+		&lt;preprocess indir="${sourcedir}" outdir="${target2prodir}" 
+			out="replace" except="${skip}">
+			&lt;var name="version" value="2.1.2"/>
+			&lt;var name="pro" value="true"/>
+			&lt;var name="appversion" value="2.0.4"/>
+			&lt;filetype commentend="*/" commentbegin="/*" extensions="java"/>
+			&lt;filetype commentend="-->" commentbegin="&lt;!--" extensions="xml"/>
+		&lt;/preprocess>
+		&lt;preprocess indir="${sourcedir}" outdir="${target3dir}" out="replace" 
+			except="${skip}">
+			&lt;var name="version" value="3.0.0"/>
+			&lt;var name="pro" value="false"/>
+			&lt;var name="appversion" value="2.0.4"/>
+			&lt;filetype commentend="*/" commentbegin="/*" extensions="java"/>
+			&lt;filetype commentend="-->" commentbegin="&lt;!--" extensions="xml"/>
+		&lt;/preprocess>
+		&lt;preprocess indir="${sourcedir}" outdir="${target3prodir}" 
+			out="replace" except="${skip}">
+			&lt;var name="version" value="3.0.0"/>
+			&lt;var name="pro" value="true"/>
+			&lt;var name="appversion" value="2.0.4"/>
+			&lt;filetype commentend="*/" commentbegin="/*" extensions="java"/>
+			&lt;filetype commentend="-->" commentbegin="&lt;!--" extensions="xml"/>
+		&lt;/preprocess>
+	&lt;/target>
+&lt;/project></pre>
+	<p>In the example, the common source code is copied into four different 
+		output folders, each based on different values of the "version", "pro" 
+		and "appversion" preprocessor variables. This is often done as the 
+		first step in a multi-version scripted build.</p>
+	<h3>Example 2: Preprocess in place</h3>
+	<pre>
+&lt;project name="com.objfac.prebop.split" default="this" basedir=".">
+	&lt;target name="properties">
+		&lt;property name="sourcedir" value="${basedir}"/>
+		&lt;property name="targetdir" value="${basedir}"/>
+	&lt;/target>
+	&lt;target name="this" depends="properties">
+		&lt;!-- Update in place for particular settings -->
+		&lt;preprocess indir="${sourcedir}" outdir="${targetdir}" out="merge" 
+			except="${skip}">
+			&lt;var name="version" value="2.1.2"/>
+			&lt;var name="pro" value="true"/>
+			&lt;var name="appversion" value="2.1.0"/>
+			&lt;filetype commentend="*/" commentbegin="/*" extensions="java"/>
+			&lt;filetype commentend="-->" commentbegin="&lt;!--" extensions="xml"/>
+		&lt;/preprocess>
+	&lt;/target>
+&lt;/project></pre>
+	<p>Preprocessing in place allows you to change only the files affected by 
+		changes in preprocessor variables, e.g., to quickly test multiple 
+		configurations of the same source code.</p>
+	<h3>Example 3: Generate files</h3>
+	<pre>
+&lt;project name="com.objfac.prebop.split" default="this" basedir=".">
+	&lt;target name="properties">
+		&lt;property name="sourcedir" value="${basedir}"/>
+		&lt;property name="targetdir" value="${basedir}"/>
+	&lt;/target>
+	&lt;target name="this" depends="properties">
+		&lt;preprocess indir="${sourcedir}" outdir="${targetdir}" out="merge" 
+			except="${skip}">
+			&lt;var name="version" value="2.1.2"/>
+			&lt;filetype commentend="*/" commentbegin="/*" extensions="jtem" outextensions="java"/>
+		&lt;/preprocess>
+	&lt;/target>
+&lt;/project></pre>
+	<p>To use the preprocessor as a file generator, specify a different 
+		extension as the value of the <code>outextensions</code> attribute. The 
+		preprocessed file will be written to a file with the same root name but 
+		a different file extension.</p>
+	<p>As with all code generators, you should check into source control either 
+		the template files or the generated files, but not both. Check in the 
+		generated files if the templates are to be used only once; otherwise, 
+		the best practice is to check in the template files and generate the 
+		other files each time you check out.</p>
+	<p>Using templates is slightly more complicated than using the preprocessor 
+		to modify files in place (merge), as if you want to change one of the 
+		generated files, you need to change the template file, instead. On the 
+		other hand, template files make it easier to avoid conflicts.</p>
+	<h2>How the preprocessor works</h2>
+	<p>The preprocess task copies files and folders from the input directory to 
+		the output directory, and allows conditional inclusion of source 
+		contents for, e.g., Java (.java extension) and XML (.xml extension) 
+		source files.</p>
+	<p>The preprocessor works by examining comments within source files. If it 
+		finds a comment that begins with the characters "$if" it enters 
+		replacement mode. In replacement mode:</p>
+	<ul>
+		<li>Every comment or non-comment line that begins with the characters 
+			"$if", "$elseif", "$else" or "$endif" is interpreted as a 
+			preprocessor statement.</li>
+		<li>Preprocessor statements must be written entirely on one line with 
+			nothing but optional whitespace or opening comment brackets to the 
+			left of the statement</li>
+		<li>Preprocessor statements use the comment brackets <code>/* 
+			*&#47;</code> (for Java) and <code>&lt;!-- --&gt;</code> (for XML). 
+			Comments beginning with // are not treated specially.</li>
+	</ul>
+	<p>The formats of the preprocessor statements are as follows.</p>
+	<pre>
+	[BEGIN] $if condition $ [END]
+	[BEGIN] $elseif condition $ [END]
+	[BEGIN] $else $ [END]
+	[BEGIN] $endif $ [END]</pre>
+	<p>In the above, BEGIN stands for, e.g., <code>/*</code> in Java or 
+		<code>&lt;!--</code> in XML. END stands for, e.g., <code>*&#47;</code> 
+		in Java or <code>--&gt;</code> in XML. [] enclose optional parts. The 
+		BEGIN at the start of the first preprocessor <code>$if</code> in a 
+		comment group and the END at the end of the last preprocessor 
+		<code>$endif</code> in a comment group are required. All others are 
+		optional.</p>
+	<p>Every preprocessor <code>$if</code> must be followed by a balancing 
+		<code>$endif</code>. <code>$else</code> must follow all occurrences of 
+		<code>$elseif</code> at the same level.</p>
+	<p>The basic operation of the preprocessor is to add or remove BEGIN and 
+		END brackets as needed to honor the conditions. A simple example makes 
+		this obvious:</p>
+	<pre>
+	/* $if version >= 3.0.0 $ *&#47;
+	import org.eclipse.ide.*;
+	/* $endif$ *&#47;</pre>
+	<p>The above would be the result if the value of the <code>version</code> 
+		preprocessor variable was, e.g., "3.0.0". On the other hand, if the 
+		value of the <code>version</code> variable were "2.1.2", the result would 
+		be:</p>
+	<pre>
+	/* $if version >= 3.0.0 $
+	import org.eclipse.ide.*;
+	$endif$ *&#47;</pre>
+	<p>Because the condition evaluates to false, the contents between the $if 
+		and $endif are "commented out" by removing the appropriate BEGIN and 
+		END brackets. Note that the $ characters in a preprocessor statement 
+		and everything between them are always preserved, as is the leading 
+		whitespace on the line.</p>
+	<p>Here is a more complicated example, assuming that the variables 
+		<code>verson</code> and <code>lite</code> have the values "2.1.2" and 
+		"false", respectively.</p>
+	<pre>
+	/* $if version &lt; 3.0.0 $
+	  $if lite$
+	  foo();
+	  $else$ *&#47;
+	  bar(); // this line is included
+	  /* $endif$
+	$else$
+	  $if lite$
+	  foo3();
+	  $else$
+	  bar3();
+	  $endif$
+	$endif$ *&#47;</pre>
+	<p>Nested conditionals like this are allowed but are difficult for humans 
+		to read. (In most editors, the above would be much easier to read than 
+		it is here, because only one line would be colored like Java code, 
+		while the rest would be colored like a Java multi-line comment.) </p>
+	<p>You can sometimes make conditionals easier to read by using more complex 
+		expressions and removing levels of nesting. For example, here is the 
+		same example rewritten with compound conditionals:</p>
+	<pre>
+	/* $if version &lt; 3.0.0 &amp;&amp; lite$
+	foo();
+	$elseif version &lt; 3.0.0 &amp;&amp; !lite$ *&#47;
+	bar(); // this line is included
+	/* $elseif version >= 3.0.0 &amp;&amp; lite$
+	foo3();
+	$else$
+	bar3();
+	$endif$ *&#47;</pre>
+	<p>Although the preprocessor must do an insignificant amount more work, it is 
+		much easier for the human reader to see what is going on. Readability pays 
+		big divendends in maintainability.</p>
+	<p>The BEGIN/END brackets in preprocessor statements do not have to be 
+		written correctly in the input. The only requirements are:</p>
+	<ul>
+		<li>The leading <code>$if</code> of each preprocessor statement block 
+			must be preceded by BEGIN comment brackets.</li>
+		<li>Within a preprocessor statement block, <code>$if</code>, 
+			<code>$elseif</code>, <code>$else</code> and <code>$endif</code> 
+			statements must be written on a single line preceded by no more 
+			than whitespace and an optional BEGIN bracket.</li>
+	</ul>
+	<p>Note that anything after the second $ in a preprocessor statement is 
+		discarded by the preprocessor.</p>
+	<p>Multi-line comments that do not contain preprocessor statements are
+		not allowed between <code>[BEGIN]</code> <code>$if</code> 
+		and <code>$endif$</code> <code>[END]</code>. Single-line
+		comments, like // in Java, are fine, as long as they are not
+		on the same line as a preprocessor statement.</p>
+	<h3>Conditions</h3>
+	<p>Preprocessor conditions are boolean expressions involving:</p>
+	<ul>
+		<li>The names of variables declared in a &lt;var> element,</li>
+		<li>The boolean constants <code>true</code> and <code>false</code>,</li>
+		<li>Non-negative numbers, beginning with a digit 0-9 and containing 
+			digits and up to two decimal points ('.'),</li>
+		<li>String constants delimited by " or ' characters,</li>
+		<li>The comparison operators ==, !=, &lt;, &lt;=, > and >=,</li>
+		<li>The boolean binary operators &amp;&amp; and ||, and the unary ! 
+			(not) operator, and</li>
+		<li>Left and right parenthesis ( ).</li>
+	</ul>
+	<p>There are three types of primitive values: boolean, numeric and string. 
+		Only values with like types can be compared; there is no value 
+		promotion or coercion.</p>
+	<p>Boolean values are compared by <code>false</code> &lt; 
+		<code>true</code>.</p>
+	<p>String values are compared using UTF-16 numeric ordering (Java 
+		comparison).</p>
+	<p>Numeric values are compared by comparing the corresponding numeric 
+		values at each hierarchical level for up to three levels. For example, 
+		1 &lt; 2, 2 &lt; 2.1, 2.1 &lt; 2.3, 2.3 &lt; 2.3.1, etc. 3 is equal to 
+		3.0 and 3.0.0. This allows standard integer comparisons while 
+		integrating version number comparison in a natural way. Two numbers 
+		with no decimal points compare like non-negative integers, and two 
+		numbers with two decimal points each compare like, e.g., Eclipse 
+		version numbers.</p>
+	<p>Note that numeric values with decimal points do <i>not</i> compare like 
+		decimal numbers. For example, in Prebop 1.5 &lt; 1.10.</p>
+	<p>The complete expression syntax is:</p>
+	<pre>
+	condition ::= compare (('&amp;&amp;' | '||') compare)*
+	compare ::= term (('==' | '!=' | '&lt;' | '&lt;=' | '>' | '>=') term)*
+	term ::= '!'? primary
+	primary ::= number | string | 'true' | 'false' | '(' condition ')'</pre>
+	<p>Binary operators associate to the left and there is no precedence order 
+		between &amp;&amp; and ||. Thus, <code>a||b&amp;&amp;c</code> equals 
+		<code>(a||b)&amp;&amp;c</code> and <code>1&lt;2&lt;true</code> equals 
+		<code>(1&lt;2)&lt;true</code> (which is false). Full parenthesization 
+		will clarify your intentions and increase maintainability.</p>
+	<h2>DTD extension</h2>
+	<p>You can improve your Ant editing experience in Eclipse, using XMLBuddy or the
+		built-in Ant editor, or other IDEs by adding the following lines to the DTD
+		used to drive code assist.</p>
+	<pre>
+&lt;!ELEMENT preprocess (((var+,filetype)|(filetype+,var)),(var|filetype)*)>
+&lt;!ATTLIST preprocess
+	indir CDATA #REQUIRED
+	outdir CDATA #REQUIRED
+	out (create|replace|merge) #IMPLIED
+	except CDATA #IMPLIED>
+
+&lt;!ELEMENT var EMPTY>
+&lt;!ATTLIST var
+	name CDATA #REQUIRED
+	value CDATA #REQUIRED>
+
+&lt;!ELEMENT filetype EMPTY>
+&lt;!ATTLIST filetype
+	name CDATA #IMPLIED
+	extensions CDATA #REQUIRED
+	commentbegin CDATA #REQUIRED
+	commentend CDATA #REQUIRED
+	outextensions CDATA #IMPLIED></pre>
+	<p>Be sure to add the <code>preprocess</code> task to the list of tasks
+		defined at the start of the Ant DTD. E.g.,</p>
+	<pre>
+&lt;!ENTITY % tasks "preprocess | propertyfile | ...rest of tasks..."></pre>
+	<p>(All XMLBuddy or XMLBuddy Pro versions later than 2.0.4 will have Prebop
+		support built-in to the Ant DTDs supplied with the product.)</p>
+	<p>Author: Bob Foster</p>
+	<h3>Acknowledgement</h3>
+	<p>The idea for a preprocessor as a comment transformer came from the 
+		CodePro Preprocessor from <a 
+		href="http://www.instantiations.com/">Instantiations</a>.</p>
+</body>
+</html>

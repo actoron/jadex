@@ -5,7 +5,11 @@ import jadex.xml.annotation.XMLClassname;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+/* $if !android $ */
 import javax.xml.namespace.QName;
+/* $else $
+import javaxx.xml.namespace.QName;
+$endif $ */
 
 /**
  *  Constants for xml handling.

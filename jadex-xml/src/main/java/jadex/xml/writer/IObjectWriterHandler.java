@@ -3,7 +3,11 @@ package jadex.xml.writer;
 import jadex.xml.IContext;
 import jadex.xml.TypeInfo;
 
+/* $if !android $ */
 import javax.xml.namespace.QName;
+/* $else $
+import javaxx.xml.namespace.QName;
+$endif $ */
 
 
 /**

@@ -1,8 +1,11 @@
 package jadex.base;
 
+/* $if !android $ */
 import jadex.commons.BrowserLauncher2;
-
 import java.applet.Applet;
+/* $else $
+import javaa.applet.Applet;
+$endif $ */
 import java.util.StringTokenizer;
 
 /**
@@ -13,7 +16,9 @@ public class PlatformApplet extends Applet
 	public void init()
 	{
 		// Initialize browser launcher.
+		/* $if !android $ */
 		BrowserLauncher2.applet	= this;
+		/* $endif $ */
 		
 		// Start platform.
 		String[]	args;

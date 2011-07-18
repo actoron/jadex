@@ -3,7 +3,9 @@ package jadex.xml.bean;
 import jadex.commons.Base64;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
+/* $if !android $ */
 import jadex.commons.gui.SGUI;
+/* $endif $ */
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -16,8 +18,10 @@ import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.writer.Writer;
 
+/* $if !android $ */
 import java.awt.Color;
 import java.awt.Image;
+/* $endif $ */
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.Date;
@@ -27,7 +31,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+/* $if !android $ */
 import javax.xml.namespace.QName;
+/* $else $
+import javaxx.xml.namespace.QName;
+$endif $ */
 
 /**
  * Java specific reader that supports collection classes and arrays.
@@ -39,7 +47,9 @@ public class JavaWriter extends Writer
 	/** The static writer instance. */
 	protected static Writer writer;
 	
+	/* $if !android $ */
 	protected static final Color TRANSPARENT_WHITE = new Color( 255, 255, 255, 0); 
+	/* $endif $ */
 	
 	//-------- constructors --------
 	
@@ -139,11 +149,20 @@ public class JavaWriter extends Writer
 			{
 				public String convertObject(Object val, IContext context)
 				{
+					/* $if !android $ */
 					return ""+((Color)val).getRGB();
+					/* $else $
+					return "";
+					$endif $ */
 				}
 			};
+			/* $if !android $ */
 			TypeInfo ti_color = new TypeInfo(null, new ObjectInfo(Color.class), new MappingInfo(null, null,
 				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, coconv))));
+			/* $else $
+			TypeInfo ti_color = new TypeInfo(null, new ObjectInfo(null), new MappingInfo(null, null,
+					new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, coconv))));
+			$endif $ */
 			typeinfos.add(ti_color);
 			
 			// java.util.Date
@@ -216,8 +235,12 @@ public class JavaWriter extends Writer
 				{
 					try
 					{
+						/* $if !android $ */
 						byte[] buf = SGUI.imageToStandardBytes((Image)val, "image/png");
-						return new String(Base64.encode(buf));						
+						return new String(Base64.encode(buf));	
+						/* $else $
+						return "";
+						$endif $ */
 					}
 					catch(Exception e)
 					{
@@ -226,6 +249,7 @@ public class JavaWriter extends Writer
 					}
 				}
 			};
+			/* $if !android $ */
 			TypeInfo ti_image = new TypeInfo(new XMLInfo(new QName("typeinfo:java.awt.image", "Image")), 
 				new ObjectInfo(Image.class), new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("imgdata", AccessInfo.THIS), new AttributeConverter(null, imgconv)),
@@ -233,6 +257,15 @@ public class JavaWriter extends Writer
 				new AttributeInfo(new AccessInfo("classname", null, null, null, new BeanAccessInfo(null, Object.class.getMethod("getClass", new Class[0]))))},
 				null
 			));
+			/* $else $
+			TypeInfo ti_image = new TypeInfo(new XMLInfo(new QName("typeinfo:java.awt.image", "Image")), 
+					new ObjectInfo(null), new MappingInfo(null, new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("imgdata", AccessInfo.THIS), new AttributeConverter(null, imgconv)),
+					new AttributeInfo(new AccessInfo("data", null, AccessInfo.IGNORE_READWRITE)),
+					new AttributeInfo(new AccessInfo("classname", null, null, null, new BeanAccessInfo(null, Object.class.getMethod("getClass", new Class[0]))))},
+					null
+				));
+			$endif $ */
 			typeinfos.add(ti_image);
 			
 			// java.lang.String

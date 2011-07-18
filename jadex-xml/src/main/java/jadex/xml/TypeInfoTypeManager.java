@@ -6,7 +6,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+/* $if !android $ */
 import javax.xml.namespace.QName;
+/* $else $
+import javaxx.xml.namespace.QName;
+$endif $ */
 
 /**
  *  The type info type manager organizes type infos via their objects

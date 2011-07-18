@@ -12,8 +12,10 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
+/* $if !android $ */
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+/* $endif $ */
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -28,7 +30,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+/* $if !android $ */
 import javax.swing.Timer;
+/* $else $
+import java.util.Timer;
+$endif $ */
 
 /**
  * The selector thread waits for NIO events and issues the appropriate actions
@@ -454,7 +460,9 @@ public class SelectorThread implements Runnable
 			assert finished;
 			Cleaner	cleaner	= new Cleaner(address);
 			NIOTCPOutputConnection	con	= new NIOTCPOutputConnection(sc, address, cleaner);
+			/* $if !android $ */
 			cleaner.refresh();
+			/* $endif $ */
 			synchronized(connections)
 			{
 				connections.put(address, con);
@@ -521,7 +529,9 @@ public class SelectorThread implements Runnable
 						}
 					}
 					
+					/* $if !android $ */
 					con.getCleaner().refresh();
+					/* $endif $ */
 //					System.out.println("Wrote data to: "+sc.socket().getRemoteSocketAddress());
 				}
 			}
@@ -555,7 +565,11 @@ public class SelectorThread implements Runnable
 	 *  Class for cleaning output connections after 
 	 *  max keep alive time has been reached.
 	 */
+	/* $if !android $ */
 	protected class Cleaner	implements	ActionListener
+	/* $else $
+	protected class Cleaner
+	$endif $ */
 	{
 		//-------- attributes --------
 		
@@ -583,6 +597,7 @@ public class SelectorThread implements Runnable
 		/**
 		 *  Called when timepoint was reached.
 		 */
+		/* $if !android $ */
 	    public void actionPerformed(ActionEvent event)
 		{
 			Object	con;
@@ -602,10 +617,12 @@ public class SelectorThread implements Runnable
 				logger.info("Removed connection to : "+address);
 			}
 		}
+	    /* $endif $ */
 		
 		/**
 		 *  Refresh the timeout.
 		 */
+		/* $if !android $ */
 		public void refresh()
 		{
 			if(timer==null)
@@ -618,14 +635,17 @@ public class SelectorThread implements Runnable
 				timer.restart();
 			}
 		}
+		/* $endif $ */
 		
 		/**
 		 *  Remove this cleaner.
 		 */
+		/* $if !android $ */
 		public void remove()
 		{
 			if(timer!=null)
 				timer.stop();
 		}
+		/* $endif $ */
 	}
 }

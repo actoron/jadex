@@ -19,8 +19,10 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
+/* $if !android $ */
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+/* $endif $ */
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -37,7 +39,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
+/* $if !android $ */
 import javax.swing.Timer;
+/* $else $
+import java.util.Timer;
+$endif $ */
 
 /**
  *  The tcp transport for sending messages over
@@ -523,7 +529,11 @@ public class TCPTransport implements ITransport
 	 *  Class for cleaning output connections after 
 	 *  max keep alive time has been reached.
 	 */
+	/* $if !android $ */
 	protected class Cleaner implements ActionListener
+	/* $else $
+	protected class Cleaner
+	$endif $ */
 	{
 		//-------- attributes --------
 		
@@ -550,15 +560,18 @@ public class TCPTransport implements ITransport
 		/**
 		 *  Called when timepoint was reached.
 		 */
+		/* $if !android $ */
 	    public void actionPerformed(ActionEvent e)
 		{
 			logger.info("Timeout reached for: "+address);
 			removeConnection(address);
 		}
+	    /* $endif $ */
 		
 		/**
 		 *  Refresh the timeout.
 		 */
+	    /* $if !android $ */
 		public void refresh()
 		{
 			if(timer==null)
@@ -571,14 +584,17 @@ public class TCPTransport implements ITransport
 				timer.restart();
 			}
 		}
+		/* $endif $ */
 		
 		/**
 		 *  Remove this cleaner.
 		 */
+		/* $if !android $ */
 		public void remove()
 		{
 			if(timer!=null)
 				timer.stop();
 		}
+		/* $endif $ */
 	}
 }

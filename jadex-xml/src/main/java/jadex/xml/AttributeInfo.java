@@ -1,6 +1,10 @@
 package jadex.xml;
 
+/* $if !android $ */
 import javax.xml.namespace.QName;
+/* $else $
+import javaxx.xml.namespace.QName;
+$endif $ */
 
 /**
  *  Base class for attribute infos.

@@ -20,9 +20,11 @@ import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.reader.Reader;
 
+/* $if !android $ */
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
+/* $endif $ */
 import java.io.ByteArrayInputStream;
 import java.net.InetAddress;
 import java.net.URL;
@@ -37,9 +39,14 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 
+/* $if !android $ */
 import javax.imageio.ImageIO;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLReporter;
+/* $else $
+import javaxx.xml.namespace.QName;
+import javaxx.xml.stream.XMLReporter;
+$endif $ */
 
 /**
  *  Java specific reader that supports collection classes and arrays.
@@ -187,7 +194,11 @@ public class JavaReader
 			{
 				public Object convertString(String val, IContext context)
 				{
+					/* $if !android $ */
 					return Color.decode(val);
+					/* $else $
+					return null;
+					$endif $ */
 				}
 			};
 			
@@ -401,6 +412,7 @@ public class JavaReader
 				{
 					public Object createObject(IContext context, Map rawattributes) throws Exception
 					{
+						/* $if !android $ */
 						Image ret = null;
 						String encdata = (String)rawattributes.get("imgdata");
 						byte[] data = Base64.decode(encdata.getBytes());
@@ -416,6 +428,9 @@ public class JavaReader
 							ret = ImageIO.read(new ByteArrayInputStream(data));
 						}
 						return ret;
+						/* $else $
+						return null;
+						$endif $ */
 					}
 				}),
 				new MappingInfo(null, new AttributeInfo[]{

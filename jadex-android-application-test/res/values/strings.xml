@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello jadexAndroid-test!</string>
+    <string name="startButton">creation test</string>
+    <string name="clearLogButton">clear log</string>
+    <string name="exitButton">exit</string>
+    <string name="app_name">jadexAndroid-test</string>
+</resources>

@@ -20,7 +20,9 @@ public interface IComponentFactory
 	/**
 	 *  Get a default icon for a component type.
 	 */
+	/* $if !android $ */
 	public IFuture getComponentTypeIcon(String type);
+	/* $endif $ */
 
 	//-------- cached --------
 	

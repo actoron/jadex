@@ -5,7 +5,9 @@ import jadex.commons.SUtil;
 
 import java.io.File;
 
+/* $if !android $ */
 import javax.swing.filechooser.FileSystemView;
+/* $endif $ */
 
 /**
  *  A file data represents a java.io.File that
@@ -64,8 +66,10 @@ public class FileData
 		this.path = file.getPath();
 		this.directory = SUtil.arrayToSet(File.listRoots()).contains(file) || file.isDirectory();	// Hack to avoid access to floppy disk.
 		this.displayname = getDisplayName(file);
+		/* $if !android $ */
 		this.lastmodified = FileSystemView.getFileSystemView().isFloppyDrive(file)
 			? 0 : file.lastModified();
+		/* $endif $ */
 //		this.root = SUtil.arrayToSet(file.listRoots()).contains(file);
 	}
 	
@@ -148,8 +152,12 @@ public class FileData
 	 */
 	public static String getDisplayName(File file)
 	{
+		/* $if !android $ */
 		String ret = FileSystemView.getFileSystemView().isFloppyDrive(file) 
 			? null : FileSystemView.getFileSystemView().getSystemDisplayName(file);
+		/* $else $
+		String ret = null;
+		$endif $ */
 		if(ret==null || ret.length()==0)
 			ret = file.getName();
 		if(ret==null || ret.length()==0)

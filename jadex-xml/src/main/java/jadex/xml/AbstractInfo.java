@@ -5,7 +5,11 @@ import jadex.commons.SReflect;
 
 import java.util.Comparator;
 
+/* $if !android $ */
 import javax.xml.namespace.QName;
+/* $else $
+import javaxx.xml.namespace.QName;
+$endif $ */
 
 
 /**

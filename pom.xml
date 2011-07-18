@@ -566,6 +566,17 @@
 				<module>jadex-distributed</module>
 			</modules>
 		</profile>
+		<profile>
+			<id>jadex-android</id>
+			<build>
+				<finalName>jadex-android-${project.version}</finalName>
+			</build>
+			<modules>
+				<module>jadex-android-misc</module>
+				<module>jadex-android-stax</module>
+				<module>jadex-android-core</module>
+			</modules>
+		</profile>
 	</profiles>
 
 	<!-- <url>http://jadex.sourceforge.net</url> -->

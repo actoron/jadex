@@ -1,6 +1,10 @@
 package jadex.xml.reader;
 
+/* $if !android $ */
 import javax.xml.namespace.QName;
+/* $else $
+import javaxx.xml.namespace.QName;
+$endif $ */
 
 /**
  *  Interface for sequential linker. 

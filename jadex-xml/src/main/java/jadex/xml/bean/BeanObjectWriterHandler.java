@@ -26,7 +26,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/* $if !android $ */
 import javax.xml.namespace.QName;
+/* $else $
+import javaxx.xml.namespace.QName;
+$endif $ */
 
 /**
  *  Java bean version for fetching write info for an object. 

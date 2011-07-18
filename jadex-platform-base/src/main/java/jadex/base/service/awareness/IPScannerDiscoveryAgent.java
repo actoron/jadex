@@ -35,7 +35,9 @@ import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+/* $if !android $ */
 import java.net.InterfaceAddress;
+/* $endif $ */
 import java.net.NetworkInterface;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
@@ -47,9 +49,15 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/* $if !android $ */
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLReporter;
 import javax.xml.stream.XMLStreamException;
+/* $else $
+import javaxx.xml.stream.Location;
+import javaxx.xml.stream.XMLReporter;
+import javaxx.xml.stream.XMLStreamException;
+$endif $ */
 
 /**
  *  Agent that sends multicasts to locate other Jadex awareness agents.
@@ -60,7 +68,7 @@ import javax.xml.stream.XMLStreamException;
 	@Argument(name="port", clazz=int.class, defaultvalue="55668", description="The port used for finding other agents."),
 	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
 //	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
-	@Argument(name="buffersize", clazz=int.class, defaultvalue="1024*1024", description="The size of the send buffer (determines the number of messages that can be sent at once)."),
+	@Argument(name="buffersize", clazz=int.class, defaultvalue="1024*1024", description="The size of the send buffer (determines the number of messages that can be sent at once).")
 })
 @Configurations(
 {
@@ -828,6 +836,7 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	{
 		short ret = -1;
 		
+		/* $if !android $ */
 		try
 		{
 			NetworkInterface ni = NetworkInterface.getByInetAddress(iadr);
@@ -847,6 +856,7 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		{
 			e.printStackTrace();
 		}
+		/* $endif $ */
 		
 		return ret;
 	}

@@ -1,8 +1,15 @@
 package jadex.base.service.message.transport.codecs;
 
+/* $if !android $ */
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
+/* $else $
+import javaa.beans.ExceptionListener;
+import javaa.beans.XMLDecoder;
+import javaa.beans.XMLEncoder;
+
+$endif $ */
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

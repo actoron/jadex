@@ -1,0 +1,275 @@
+<?xml version="1.0"?>
+<project name="jadex-android" default="generateSources" basedir=".">
+	<!-- Sets variables which can later be used. -->
+	<!-- The value of a property is accessed via ${} -->
+	<property name="src0" location="../jadex-bridge/src/main/java" />
+	<property name="src1" location="../jadex-commons/src/main/java" />
+	<property name="src2" location="../jadex-javaparser/src/main/java" />
+	<property name="src3" location="../jadex-kernel-application/src/main/java" />
+	<property name="src4" location="../jadex-kernel-base/src/main/java" />
+	<property name="src5" location="../jadex-kernel-component/src/main/java" />
+	<property name="src6" location="../jadex-kernel-micro/src/main/java" />
+	<property name="src7" location="../jadex-platform-base/src/main/java" />
+	<property name="src8" location="../jadex-platform-standalone/src/main/java" />
+	<property name="src9" location="../jadex-xml/src/main/java" />
+	<property name="src10" location="./src-fix" />
+
+	<property name="androidVersion" value="8" />
+
+	<!-- jadex.base.gui -->
+	<property name="skip" value=".svn,
+		AboutDialog.java,
+		CMSUpdateHandler.java,
+		ComponentIdentifierDialog.java,
+		ComponentIdentifierPanel.java,
+		ComponentSelectorDialog.java,
+		ConfigurationDialog.java,
+		JadexLogoButton.java,
+		JAutoPositionDialog.java,
+		ObjectInspectorPanel.java,
+		ObjectTreeModel.java,
+		ParserValidator.java,
+		RemoteCMSListener.java,
+		StatusBar.java,
+		SwingDelegationResultListener.java,
+		SwingDefaultResultListener.java,
+		
+		AwarenessAgentPanel.java,
+		ComponentIconCache.java,
+		ComponentProperties.java,
+		ComponentTreeNode.java,
+		ComponentTreePanel.java,
+		IActiveComponentTreeNode.java,
+		ProvidedServiceNode.java,
+		ProvidedServiceProperties.java,
+		ProxyComponentTreeNode.java,
+		RequiredServiceNode.java,
+		RequiredServiceProperties.java,
+		ServiceContainerNode.java,
+		AbstractComponentViewerPanel.java,
+		AbstractServiceViewerPanel.java,
+		ComponentViewerPlugin.java,
+		DefaultComponentServiceViewerPanel.java,
+		IAbstractViewerPanel.java,
+		IComponentViewerPanel.java,
+		IServiceViewerPanel.java,
+		RemoteFileSystemView.java,
+		DefaultFileFilter.java,
+		DefaultFileFilterMenuItemConstructor.java,
+		DefaultIconCache.java,
+		DefaultNodeFactory.java,
+		DefaultNodeHandler.java,
+		DirNode.java,
+		ExpansionHandler.java,
+		FileNode.java,
+		FileTreePanel.java,
+		IFileNode.java,
+		IIconCache.java,
+		INodeFactory.java,
+		JarAsDirectory.java,
+		JarNode.java,
+		NodePath.java,
+		RefreshAction.java,
+		RefreshSubtreeAction.java,
+		RemoteDirNode.java,
+		RemoteFileNode.java,
+		RemoteJarFile.java,
+		RemoteJarNode.java,
+		RootNode.java,
+		TreeProperties.java,
+		ComponentIdentifierRenderer.java,
+		ComponentIdentifiersRenderer.java,
+		AddPathAction.java,
+		AddRemotePathAction.java,
+		ModelFileFilter.java,
+		ModelFileFilterMenuItemConstructor.java,
+		ModelIconCache.java,
+		ModelTreePanel.java,
+		RemovePathAction.java,
+		TreePanelKernelListener.java,
+		AbstractJCCPlugin.java,
+		IControlCenter.java,
+		IControlCenterPlugin.java,
+		SJCC.java,
+		AbstractTreeNode.java,
+		AsyncTreeCellRenderer.java,
+		AsyncTreeModel.java,
+		INodeHandler.java,
+		INodeListener.java,
+		ITreeNode.java,
+		TreePopupListener.java,
+		XMLCodec.java,
+		JavaXMLContentCodec.java,
+		BeanInfoIntrospector.java
+" />
+
+	<!-- these are skipped in jadex-commons -->
+	<property name="skip2" value=".svn,
+		BrowserPane.java,
+		CombiIcon.java,
+		EditableListEvent.java,
+		EditableList.java,
+		IMenuItemConstructor.java,
+		JSplitPanel.java,
+		JValidatorTextField.java,
+		ObjectCardLayout.java,
+		PopupBuilder.java,
+		PropertiesPanel.java,
+		ScrollablePanel.java,
+		SGUI.java,
+		ToolTipAction.java,
+		TreeCombo.java,
+		TreeExpansionHandler.java,
+		jtable,
+		jtreetable, 
+		FixedJComboBox.java,
+		SUtil.java,
+		BrowserLauncher2.java"/>
+
+	<property name="src_android" location="src/main/java" />
+	<property name="" location="" />
+
+
+	<taskdef name="preprocess" classname="com.objfac.prebop.ant.PreprocessorTask">
+		<classpath>
+			<pathelement location="libs/preprocessor.jar" />
+		</classpath>
+	</taskdef>
+
+	<target name="clean">
+		<delete dir="${src_android}" />
+	</target>
+
+	<!-- Creates the source directory-->
+	<target name="makedir">
+		<mkdir dir="${src_android}" />
+	</target>
+
+	<!-- Preprocesses .java files -->
+	<target name="generateSources" depends="clean">
+		<property name="android" value="true" />
+		<echo level="info">preprocessing ${src0}</echo>
+		<preprocess indir="${src0}" outdir="${src_android}" out="merge" except="${skip}">
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+		</preprocess>
+		<echo level="info">preprocessing ${src1}</echo>
+		<preprocess indir="${src1}" outdir="${src_android}" out="merge" except="${skip2}">
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+		</preprocess>
+		<echo level="info">preprocessing ${src2}</echo>
+		<preprocess indir="${src2}" outdir="${src_android}" out="merge" except="${skip}">
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+		</preprocess>
+		<echo level="info">preprocessing ${src3}</echo>
+		<preprocess indir="${src3}" outdir="${src_android}" out="merge" except="${skip}">
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+		</preprocess>
+		<echo level="info">preprocessing ${src4}</echo>
+		<preprocess indir="${src4}" outdir="${src_android}" out="merge" except="${skip}">
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+		</preprocess>
+		<echo level="info">preprocessing ${src5}</echo>
+		<preprocess indir="${src5}" outdir="${src_android}" out="merge" except="${skip}">
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+		</preprocess>
+		<echo level="info">preprocessing ${src6}</echo>
+		<preprocess indir="${src6}" outdir="${src_android}" out="merge" except="${skip}">
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+		</preprocess>
+		<echo level="info">preprocessing ${src7}</echo>
+		<preprocess indir="${src7}" outdir="${src_android}" out="merge" except="${skip}">
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+		</preprocess>
+		<echo level="info">preprocessing ${src8}</echo>
+		<preprocess indir="${src8}" outdir="${src_android}" out="merge" except="${skip}">
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+		</preprocess>
+		<echo level="info">preprocessing ${src9}</echo>
+		<preprocess indir="${src9}" outdir="${src_android}" out="merge" except="${skip}">
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+		</preprocess>
+		<echo level="info">preprocessing ${src10}</echo>
+		<preprocess indir="${src10}" outdir="${src_android}" out="merge">
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+		</preprocess>
+	</target>
+
+	<!-- This target preprocesses and applies changes IN-PLACE. 
+	The original files are altered. -->
+	<target name="inplace">
+		<property name="android" value="false" />
+		<property name="androidVersion" value="8" />
+		<preprocess indir="${src0}" outdir="${src0}" out="merge" except="${skip}">
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+		</preprocess>
+		<preprocess indir="${src1}" outdir="${src1}" out="merge" except="${skip}">
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+		</preprocess>
+		<preprocess indir="${src2}" outdir="${src2}" out="merge" except="${skip}">
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+		</preprocess>
+		<preprocess indir="${src3}" outdir="${src3}" out="merge" except="${skip}">
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+		</preprocess>
+		<preprocess indir="${src4}" outdir="${src4}" out="merge" except="${skip}">
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+		</preprocess>
+		<preprocess indir="${src5}" outdir="${src5}" out="merge" except="${skip}">
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+		</preprocess>
+		<preprocess indir="${src6}" outdir="${src6}" out="merge" except="${skip}">
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+		</preprocess>
+		<preprocess indir="${src7}" outdir="${src7}" out="merge" except="${skip}">
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+		</preprocess>
+		<preprocess indir="${src8}" outdir="${src8}" out="merge" except="${skip}">
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+		</preprocess>
+		<preprocess indir="${src9}" outdir="${src9}" out="merge" except="${skip}">
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+		</preprocess>
+	</target>
+</project>
