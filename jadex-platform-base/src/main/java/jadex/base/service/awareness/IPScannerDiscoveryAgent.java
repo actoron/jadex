@@ -1,5 +1,6 @@
 package jadex.base.service.awareness;
 
+import jadex.base.service.message.transport.codecs.GZIPCodec;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -58,7 +59,7 @@ import javax.xml.stream.XMLStreamException;
 {
 	@Argument(name="port", clazz=int.class, defaultvalue="55668", description="The port used for finding other agents."),
 	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
-	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
+//	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
 	@Argument(name="buffersize", clazz=int.class, defaultvalue="1024*1024", description="The size of the send buffer (determines the number of messages that can be sent at once)."),
 })
 @Configurations(
@@ -153,11 +154,9 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		try
 		{
 //			this.sendsocket = new DatagramSocket();
-//			sendsocket.setSoTimeout(1);
 			sendchannel = DatagramChannel.open();
 			sendchannel.configureBlocking(false);
 			sendchannel.socket().setSendBufferSize(((Integer)getArgument("buffersize")).intValue());
-//			this.sendsocket = sendchannel.socket();
 					
 			this.reader	= JavaReader.getReader(new XMLReporter()
 			{
@@ -289,8 +288,9 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	{
 		try
 		{
-			byte[] data = JavaWriter.objectToByteArray(info, getModel().getClassLoader());
-
+			byte[] data = GZIPCodec.encodeBytes(JavaWriter.objectToByteArray(info, 
+				getModel().getClassLoader()), getModel().getClassLoader());
+			
 			int maxsend = sendchannel.socket().getSendBufferSize()/data.length;
 			int sent = 0;
 			
@@ -315,7 +315,7 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			// Send to all locals a refresh awareness
 			sendToLocals(data);
 
-			System.out.println(" sent:"+sent+" remotes: "+remotes+" discover: "+discover);
+//			System.out.println(" sent:"+sent+" remotes: "+remotes+" discover: "+discover);
 //			System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");
 		}
 		catch(Exception e)
@@ -326,7 +326,7 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	}
 
 	/**
-	 * 
+	 *  Send awareness info to remote scanner services.
 	 */
 	protected int sendToRemotes(byte[] data, int maxsend)
 	{
@@ -336,14 +336,10 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			InetAddress[] remotes = getRemotes();
 			for(; ret<remotes.length && ret<maxsend; ret++)
 			{
-	//			DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
-	//			sendsocket.send(packet);
-	//			sendchannel.send(src, target);
 				ByteBuffer buf = ByteBuffer.allocate(data.length);
 				buf.clear();
 				buf.put(data);
 				buf.flip();
-	//			for(int bytes=0; bytes<data.length; )
 				int	bytes = sendchannel.send(buf, new InetSocketAddress(remotes[ret], port));
 				if(bytes!=data.length)
 					break;
@@ -369,6 +365,8 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		{
 			InetAddress iadr = getInet4Address();
 			short sublen = getNetworkPrefixLength(iadr);
+			if(sublen==-1) // Guess C class if nothing can be determined.
+				sublen = 24;
 			byte[] byinet = getInet4Address().getAddress();
 			int hostbits = 32-sublen;
 			int numips = (int)Math.pow(2, hostbits);
@@ -383,17 +381,20 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 				int iip = prefix | ipnum; 
 				byte[] bip = SUtil.intToBytes(iip);
 				InetAddress address = InetAddress.getByAddress(bip);
-	//			DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
-	//			sendsocket.send(packet);
-	//			sendchannel.send(src, target);
 				ByteBuffer buf = ByteBuffer.allocate(data.length);
 				buf.clear();
 				buf.put(data);
 				buf.flip();
-	//			for(int bytes=0; bytes<data.length; )
-				int	bytes = sendchannel.send(buf, new InetSocketAddress(address, port));
-				if(bytes!=data.length)
-					break;
+				try
+				{
+					int	bytes = sendchannel.send(buf, new InetSocketAddress(address, port));
+					if(bytes!=data.length)
+						break;
+				}
+				catch(Exception e)
+				{
+					System.out.println("ex: "+address);
+				}
 				ipnum = (ipnum+1)%numips;
 			}
 			currentip = ipnum;
@@ -433,22 +434,22 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		}
 	}
 	
-	/**
-	 *  Set the fast startup awareness flag
-	 */
-	public void setFastAwareness(boolean fast)
-	{
-		this.fast = fast;
-	}
-	
-	/**
-	 *  Get the fast startup awareness flag.
-	 *  @return The fast flag.
-	 */
-	public boolean isFastAwareness()
-	{
-		return this.fast;
-	}
+//	/**
+//	 *  Set the fast startup awareness flag
+//	 */
+//	public void setFastAwareness(boolean fast)
+//	{
+//		this.fast = fast;
+//	}
+//	
+//	/**
+//	 *  Get the fast startup awareness flag.
+//	 *  @return The fast flag.
+//	 */
+//	public boolean isFastAwareness()
+//	{
+//		return this.fast;
+//	}
 	
 	/**
 	 *  Get the sendid.
@@ -566,7 +567,8 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 								byte[] data = new byte[pack.getLength()];
 								System.arraycopy(buf, 0, data, 0, pack.getLength());
 								
-								Object obj = Reader.objectFromByteArray(reader, data, getModel().getClassLoader());
+								Object obj = Reader.objectFromByteArray(reader, GZIPCodec.decodeBytes(data, 
+									getModel().getClassLoader()), getModel().getClassLoader());
 								
 								if(obj instanceof SlaveInfo)
 								{

@@ -19,19 +19,15 @@ public class GZIPCodec implements ICodec
 	public static final byte CODEC_ID = 5;
 
 	/** The debug flag. */
-	protected boolean DEBUG = false;
-	
-	/** The underlying codec. */
-	protected ICodec codec;
+	protected static boolean DEBUG = false;
 	
 	//-------- methods --------
 	
 	/**
-	 * 
+	 *  Create a new codec.
 	 */
 	protected GZIPCodec()
 	{
-		codec = new JadexXMLCodec();
 	}
 	
 	/**
@@ -40,6 +36,26 @@ public class GZIPCodec implements ICodec
 	 *  @throws IOException
 	 */
 	public Object encode(Object val, ClassLoader classloader)
+	{
+		return encodeBytes((byte[])val, classloader);
+	}
+	
+	/**
+	 *  Decode an object.
+	 *  @return The decoded object.
+	 *  @throws IOException
+	 */
+	public Object decode(Object bytes, ClassLoader classloader)
+	{
+		return decodeBytes((byte[])bytes, classloader);
+	}
+	
+	/**
+	 *  Encode an object.
+	 *  @param obj The object.
+	 *  @throws IOException
+	 */
+	public static byte[] encodeBytes(byte[] val, ClassLoader classloader)
 	{
 		byte[] ret = (byte[])val;
 
@@ -70,36 +86,33 @@ public class GZIPCodec implements ICodec
 	}
 
 	/**
-	 *  Decode an object.
-	 *  @return The decoded object.
+	 *  Decode bytes.
+	 *  @return The decoded bytes.
 	 *  @throws IOException
 	 */
-	public Object decode(Object bytes, ClassLoader classloader)
+	public static byte[] decodeBytes(byte[] bytes, ClassLoader classloader)
 	{
-		Object ret = null;
-		byte[] decbytes;
+		byte[] ret = null;
 		try
 		{
 			byte[] buf = new byte[4];
 			ByteArrayInputStream bais = new ByteArrayInputStream((byte[])bytes);
 			bais.read(buf);
 			int len = SUtil.bytesToInt(buf);
-			decbytes = new byte[len];
+			ret = new byte[len];
 			GZIPInputStream gzis = new GZIPInputStream(bais);
 			// read method only reads up to length of bytes :-(
 			int sum = 0;
-			while((len = gzis.read(decbytes, sum, decbytes.length-sum))>0) 
+			while((len = gzis.read(ret, sum, ret.length-sum))>0) 
 			{
 				sum += len;
 			}
-			ret = decbytes;
 		}
 		catch (Exception e) 
 		{
 			e.printStackTrace();
 		}
 	
-		
 		if(DEBUG)
 			System.out.println("decode message: "+(new String((byte[])bytes)));
 		return ret;
