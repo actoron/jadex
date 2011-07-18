@@ -70,20 +70,20 @@ import java.util.TimerTask;
 	@Configuration(name="Frequent updates (10s)", arguments=@NameValue(name="delay", value="10000"), 
 		components=
 		{
-			@Component(name="multidis", type="multidis"),
-//			@Component(name="scannerdis", type="scannerdis")
+//			@Component(name="multidis", type="multidis"),
+			@Component(name="scannerdis", type="scannerdis")
 		}),
 	@Configuration(name="Medium updates (20s)", arguments=@NameValue(name="delay", value="20000"),
 		components=
 		{
-			@Component(name="multidis", type="multidis"),
-//			@Component(name="scannerdis", type="scannerdis")
+//			@Component(name="multidis", type="multidis"),
+			@Component(name="scannerdis", type="scannerdis")
 		}),
 	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"),
 		components=
 		{
-			@Component(name="multidis", type="multidis"),
-//			@Component(name="scannerdis", type="scannerdis")
+//			@Component(name="multidis", type="multidis"),
+			@Component(name="scannerdis", type="scannerdis")
 		}),
 })
 @Properties(@NameValue(name="componentviewer.viewerclass", value="\"jadex.base.service.awareness.AwarenessAgentPanel\""))
@@ -247,7 +247,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			info.setDelay(delay);
 		if(info.getState()==null)
 			info.setState(AwarenessInfo.STATE_ONLINE);
-//		System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
+		System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
 
 		IComponentIdentifier sender = info.getSender();
 		boolean	online	= AwarenessInfo.STATE_ONLINE.equals(info.getState());
