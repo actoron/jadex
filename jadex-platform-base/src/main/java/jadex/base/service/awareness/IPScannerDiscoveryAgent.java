@@ -90,8 +90,8 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	/** The receiver port. */
 	protected int port;
 	
-	/** Flag for enabling fast startup awareness (pingpong send behavior). */
-	protected boolean fast;
+//	/** Flag for enabling fast startup awareness (pingpong send behavior). */
+//	protected boolean fast;
 	
 	
 	/** The socket to send. */
@@ -184,7 +184,7 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	{
 		this.port = ((Number)getArgument("port")).intValue();
 		this.delay = ((Number)getArgument("delay")).longValue();
-		this.fast = ((Boolean)getArgument("fast")).booleanValue();
+//		this.fast = ((Boolean)getArgument("fast")).booleanValue();
 	}
 	
 	/**
