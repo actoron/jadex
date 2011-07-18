@@ -119,8 +119,8 @@ public class NIOTCPTransport implements ITransport
 			
 			// Determine all transport addresses.
 			InetAddress iaddr = InetAddress.getLocalHost();
-			String lhostname = iaddr.getCanonicalHostName();
-			InetAddress[] laddrs = InetAddress.getAllByName(lhostname);
+//			String lhostname = iaddr.getCanonicalHostName();
+//			InetAddress[] laddrs = InetAddress.getAllByName(lhostname);
 	
 			Set addrs = new HashSet();
 			for(Enumeration nis = NetworkInterface.getNetworkInterfaces(); nis.hasMoreElements(); )
@@ -132,7 +132,7 @@ public class NIOTCPTransport implements ITransport
 				}
 			}
 			
-//			addrs.add(getAddress(iaddr.getHostAddress(), this.port));
+			addrs.add(getAddress(iaddr.getHostAddress(), this.port));
 //			// Get the ip addresses
 //			for(int i=0; i<laddrs.length; i++)
 //			{

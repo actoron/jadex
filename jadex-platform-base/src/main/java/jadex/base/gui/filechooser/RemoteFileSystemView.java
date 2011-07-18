@@ -489,7 +489,7 @@ public class RemoteFileSystemView extends FileSystemView
 					}
 					if(chooser!=null)
 						chooser.setCurrentDirectory(homedir);
-//					System.out.println("home: "+homedir);
+					System.out.println("home: "+homedir);
 				}
 			});
 		}
@@ -527,7 +527,7 @@ public class RemoteFileSystemView extends FileSystemView
 					}
 					if(chooser!=null)
 						chooser.setCurrentDirectory(currentdir);
-//					System.out.println("currentdir: "+currentdir);
+					System.out.println("currentdir: "+currentdir);
 				}
 			});
 		}
@@ -566,7 +566,7 @@ public class RemoteFileSystemView extends FileSystemView
 					}
 					if(chooser!=null)
 						chooser.setCurrentDirectory(defaultdir);
-//					System.out.println("default: "+defaultdir);
+					System.out.println("default: "+defaultdir);
 				}
 			});
 		}

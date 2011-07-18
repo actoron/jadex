@@ -28,18 +28,17 @@ import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 import jadex.xml.reader.Reader;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
-import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -367,10 +366,8 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		int ret = 0;
 		try
 		{
-			InetAddress inet = Inet4Address.getLocalHost();
-			NetworkInterface ni = NetworkInterface.getByInetAddress(inet);
-			short sublen = ni.getInterfaceAddresses().get(0).getNetworkPrefixLength();
-			byte[] byinet = inet.getAddress();
+			short sublen = getNetworkPrefixLength();
+			byte[] byinet = InetAddress.getLocalHost().getAddress();
 			int hostbits = 32-sublen;
 			int numips = (int)Math.pow(2, hostbits);
 			
@@ -534,6 +531,7 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 											try
 											{
 												receivesocket = new DatagramSocket(port);
+												System.out.println("local master at: "+InetAddress.getLocalHost()+" "+port);
 											}
 											catch(Exception e)
 											{
@@ -541,13 +539,15 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 												// open another local socket at an arbitrary port
 												// and send this port to the master.
 												receivesocket = new DatagramSocket();
-												InetAddress address = Inet4Address.getLocalHost();
+												InetAddress address = InetAddress.getLocalHost();
 												AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes);
 												SlaveInfo si = new SlaveInfo(info);
 												byte[] data = JavaWriter.objectToByteArray(si, getModel().getClassLoader());
 												DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
 												receivesocket.send(packet);
 
+												System.out.println("local slave at: "+InetAddress.getLocalHost()+" "+receivesocket.getLocalPort());
+												
 //												getLogger().warning("Running in local mode: "+e);
 											}
 										}
@@ -678,7 +678,7 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	{
 		try
 		{
-			if(!Inet4Address.getLocalHost().equals(address))
+			if(!InetAddress.getLocalHost().equals(address))
 			{
 				if(remotes==null)
 					remotes = new LinkedHashSet();
@@ -730,7 +730,7 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		{
 			if(localsocket==null)
 				localsocket = new DatagramSocket();
-			InetAddress address = Inet4Address.getLocalHost();
+			InetAddress address = InetAddress.getLocalHost();
 			DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
 			localsocket.send(packet);
 		}
@@ -778,5 +778,34 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 				scheduleStep(step);
 			}
 		}, delay);
+	}
+	
+	/**
+	 * 
+	 */
+	protected static short getNetworkPrefixLength()
+	{
+		short ret = -1;
+		
+		try
+		{
+			Enumeration e = NetworkInterface.getNetworkInterfaces();
+			if(e.hasMoreElements())
+			{
+				NetworkInterface ni = (NetworkInterface)e.nextElement();
+				List iads = ni.getInterfaceAddresses();
+				if(iads!=null && iads.size()>0)
+				{
+					InterfaceAddress iadr = (InterfaceAddress)iads.get(0);
+					ret = iadr.getNetworkPrefixLength();
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ret;
 	}
 }
