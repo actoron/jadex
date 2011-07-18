@@ -31,6 +31,7 @@ import jadex.xml.reader.Reader;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
@@ -366,8 +367,9 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		int ret = 0;
 		try
 		{
-			short sublen = getNetworkPrefixLength();
-			byte[] byinet = InetAddress.getLocalHost().getAddress();
+			InetAddress iadr = getInet4Address();
+			short sublen = getNetworkPrefixLength(iadr);
+			byte[] byinet = getInet4Address().getAddress();
 			int hostbits = 32-sublen;
 			int numips = (int)Math.pow(2, hostbits);
 			
@@ -531,7 +533,7 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 											try
 											{
 												receivesocket = new DatagramSocket(port);
-												System.out.println("local master at: "+InetAddress.getLocalHost()+" "+port);
+												System.out.println("local master at: "+getInet4Address()+" "+port);
 											}
 											catch(Exception e)
 											{
@@ -539,14 +541,14 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 												// open another local socket at an arbitrary port
 												// and send this port to the master.
 												receivesocket = new DatagramSocket();
-												InetAddress address = InetAddress.getLocalHost();
+												InetAddress address = getInet4Address();
 												AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes);
 												SlaveInfo si = new SlaveInfo(info);
 												byte[] data = JavaWriter.objectToByteArray(si, getModel().getClassLoader());
 												DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
 												receivesocket.send(packet);
 
-												System.out.println("local slave at: "+InetAddress.getLocalHost()+" "+receivesocket.getLocalPort());
+												System.out.println("local slave at: "+getInet4Address()+" "+receivesocket.getLocalPort());
 												
 //												getLogger().warning("Running in local mode: "+e);
 											}
@@ -678,7 +680,7 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	{
 		try
 		{
-			if(!InetAddress.getLocalHost().equals(address))
+			if(!getInet4Address().equals(address))
 			{
 				if(remotes==null)
 					remotes = new LinkedHashSet();
@@ -730,7 +732,7 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		{
 			if(localsocket==null)
 				localsocket = new DatagramSocket();
-			InetAddress address = InetAddress.getLocalHost();
+			InetAddress address = getInet4Address();
 			DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
 			localsocket.send(packet);
 		}
@@ -783,23 +785,61 @@ public class IPScannerDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	/**
 	 * 
 	 */
-	protected static short getNetworkPrefixLength()
+	protected static InetAddress getInet4Address()
+	{
+		InetAddress ret = null;
+		
+		try
+		{
+			Enumeration e = NetworkInterface.getNetworkInterfaces();
+			while(e.hasMoreElements() && ret==null)
+			{
+				NetworkInterface ni = (NetworkInterface)e.nextElement();
+				Enumeration e2 = ni.getInetAddresses();
+				while(e2.hasMoreElements() && ret==null)
+				{
+					InetAddress tmp = (InetAddress)e2.nextElement();
+					if(tmp instanceof Inet4Address && !tmp.isLoopbackAddress())
+						ret = (InetAddress)tmp;
+				}
+			}
+			
+			if(ret==null)
+			{
+				InetAddress tmp = InetAddress.getLocalHost();
+				if(tmp instanceof Inet4Address && !tmp.isLoopbackAddress())
+					ret = (InetAddress)tmp;
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected static short getNetworkPrefixLength(InetAddress iadr)
 	{
 		short ret = -1;
 		
 		try
 		{
-			Enumeration e = NetworkInterface.getNetworkInterfaces();
-			if(e.hasMoreElements())
+			NetworkInterface ni = NetworkInterface.getByInetAddress(iadr);
+			List iads = ni.getInterfaceAddresses();
+			if(iads!=null)
 			{
-				NetworkInterface ni = (NetworkInterface)e.nextElement();
-				List iads = ni.getInterfaceAddresses();
-				if(iads!=null && iads.size()>0)
+				for(int i=0; i<iads.size() && ret==-1; i++)
 				{
-					InterfaceAddress iadr = (InterfaceAddress)iads.get(0);
-					ret = iadr.getNetworkPrefixLength();
+					InterfaceAddress ia = (InterfaceAddress)iads.get(i);
+					if(ia.getAddress() instanceof Inet4Address)
+						ret = ia.getNetworkPrefixLength();
 				}
 			}
+			
 		}
 		catch(Exception e)
 		{
