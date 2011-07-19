@@ -26,7 +26,7 @@ public class AwarenessInfo
 	protected IComponentIdentifier	sender;
 
 	/** The component state. */
-	protected String	state;
+	protected String state;
 	
 	/** The current send time delay (interval). */
 	protected long	delay;

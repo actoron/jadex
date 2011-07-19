@@ -119,14 +119,9 @@ public class MultiColumnTableEx extends MultiColumnTable
 
 	// ---- overrides ----
 
-	
-	
-	
-	
 //	/**
 //	 * @see jadex.editor.common.model.properties.table.MultiColumnTable#add(int, jadex.editor.common.model.properties.table.MultiColumnTable.MultiColumnTableRow)
 //	 */
-//	@Override
 //	public void add(int index, MultiColumnTableRow row)
 //	{
 //		// no complex type in table
@@ -333,7 +328,6 @@ class TableCellIndex
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
-	@Override
 	public String toString()
 	{
 		return rowCount + ":" + columnCount;

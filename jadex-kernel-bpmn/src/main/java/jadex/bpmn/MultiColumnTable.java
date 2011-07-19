@@ -300,7 +300,6 @@ public class MultiColumnTable
 		/**
 		 * @see java.lang.Object#equals(java.lang.Object)
 		 */
-		@Override
 		public boolean equals(Object obj)
 		{
 			if (!(obj instanceof MultiColumnTableRow))
@@ -322,7 +321,6 @@ public class MultiColumnTable
 		/**
 		 * @see java.lang.Object#hashCode()
 		 */
-		@Override
 		public int hashCode()
 		{
 			int returnHash = 31;
@@ -338,7 +336,6 @@ public class MultiColumnTable
 		/**
 		 * @see java.lang.Object#toString()
 		 */
-		@Override
 		public String toString()
 		{
 			StringBuffer buffer = new StringBuffer();
