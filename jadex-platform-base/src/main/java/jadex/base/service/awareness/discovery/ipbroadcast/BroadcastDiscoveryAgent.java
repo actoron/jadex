@@ -284,8 +284,20 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		try
 		{
 			byte[] data = SDiscovery.encodeObject(info, getModel().getClassLoader());
-			
-			InetAddress address = InetAddress.getByAddress(new byte[]{(byte)255, (byte)255, (byte)255, (byte)255,});
+
+			// Global broadcast address 255.255.255.255 does not work in windows xp/7 :-(
+			// Directed broadcast address = !netmask | IP
+//			InetAddress address = InetAddress.getByAddress(new byte[]{(byte)255, (byte)255, (byte)255, (byte)255,});
+			InetAddress iadr = SDiscovery.getInet4Address();
+			short sublen = SDiscovery.getNetworkPrefixLength(iadr);
+			if(sublen==-1) // Guess C class if nothing can be determined.
+				sublen = 24;
+			byte[] byinet = iadr.getAddress();
+			int hostbits = 32-sublen;
+			int mask = (int)Math.pow(2, hostbits)-1;
+			int iinet = SUtil.bytesToInt(byinet);
+			int badr = iinet | mask;
+			InetAddress address = InetAddress.getByAddress(SUtil.intToBytes(badr));
 			sendsocket.send(new DatagramPacket(data, data.length, address, port));
 			
 			// Send to all locals a refresh awareness
@@ -555,7 +567,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		Object obj = SDiscovery.decodeObject(data, getModel().getClassLoader());
 //		Object obj = decodePacket(pack);
 		
-		System.out.println("received: "+obj);
+		System.out.println("received: "+obj+" "+pack.getAddress());
 		
 		if(obj instanceof SlaveInfo)
 		{
