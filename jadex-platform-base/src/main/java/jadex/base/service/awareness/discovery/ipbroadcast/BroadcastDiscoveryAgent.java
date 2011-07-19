@@ -303,7 +303,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			// Send to all locals a refresh awareness
 			sendToLocals(data);
 
-			System.out.println("sent: "+address);
+//			System.out.println("sent: "+address);
 //			System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");
 		}
 		catch(Exception e)
@@ -567,7 +567,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		Object obj = SDiscovery.decodeObject(data, getModel().getClassLoader());
 //		Object obj = decodePacket(pack);
 		
-		System.out.println("received: "+obj+" "+pack.getAddress());
+//		System.out.println("received: "+obj+" "+pack.getAddress());
 		
 		if(obj instanceof SlaveInfo)
 		{
@@ -647,7 +647,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			locals = new ArrayList();
 		locals.add(new Integer(port));
 		
-		System.out.println("locals: "+locals);
+//		System.out.println("locals: "+locals);
 	}
 	
 	/**
