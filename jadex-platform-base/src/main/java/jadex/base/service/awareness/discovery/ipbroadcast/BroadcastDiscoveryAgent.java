@@ -508,7 +508,9 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 							}
 							catch(Exception e)
 							{
-								getLogger().warning("Receiving awareness info error: "+e);
+								// Can happen if is slave and master goes down.
+								// In that case it tries to find new master.
+//								getLogger().warning("Receiving awareness info error: "+e);
 								ret.setExceptionIfUndone(e);
 							}
 						}
