@@ -345,9 +345,9 @@ public class MultiColumnTable
 			buffer.append("MultiColumnTableRow(");
 			for (int i = 0; i < this.columnValues.length; i++)
 			{
-				buffer.append("`");
+				buffer.append("\"");
 				buffer.append(columnValues[i]);
-				buffer.append("´" + ", ");
+				buffer.append("\"" + ", ");
 			}
 			// remove last delimiter
 			buffer.delete(buffer.length()-", ".length(), buffer.length());
