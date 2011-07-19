@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hello">This is jadex-android-application-test.
-    					Please choose a configuration to launch!</string>
-    <string name="startButton">start Platform</string>
-    <string name="clearLogButton">clear log</string>
-    <string name="exitButton">exit</string>
+    					Please choose a configuration to launch.
+    					Then click on the start Platform Button!</string>
+    <string name="main_startButton">start Platform</string>
+    <string name="log_clearLogButton">clear log</string>
+    <string name="log_exitButton">exit</string>
+        <string name="main_exitButton">exit</string>
     <string name="app_name">jadexAndroid-test</string>
     <string name="configurationSpinnerPrompt">Please choose a configuration</string>
 </resources>

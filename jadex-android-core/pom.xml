@@ -118,7 +118,7 @@
 				<version>1.6</version>
 				<executions>
 					<execution>
-						<phase>generate-sources</phase>
+						<phase>process-sources</phase>
 						<configuration>
 
 							<taskdef name="preprocess" classname="com.objfac.prebop.Preprocessor"

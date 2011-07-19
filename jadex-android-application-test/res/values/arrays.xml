@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string-array name="configurations">
-    <item>Micro Agent Creation Test</item>
-    <item>BPMN Creation Test</item>
-    </string-array>
-</resources>

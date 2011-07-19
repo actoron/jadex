@@ -15,13 +15,13 @@
     android:layout_width="fill_parent"
     android:layout_height="50dip">
     <Button
-    android:id="@+id/clearLogButton"
-    android:text="@string/clearLogButton"
+    android:id="@+id/log_clearLogButton"
+    android:text="@string/log_clearLogButton"
     android:layout_width="wrap_content" 
     android:layout_height="50dip"/>
     <Button
-    android:id="@+id/exitButton"
-    android:text="@string/exitButton"
+    android:id="@+id/log_exitButton"
+    android:text="@string/log_exitButton"
     android:layout_width="wrap_content"
     android:layout_height="50dip"/>
     </LinearLayout>

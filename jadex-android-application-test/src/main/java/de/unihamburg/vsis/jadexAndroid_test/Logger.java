@@ -106,12 +106,13 @@ public class Logger extends ListActivity implements OnClickListener {
 		mAdapter = new LoggerListAdapter(this);
 		setListAdapter(mAdapter);
 
-		exitButton = (Button) findViewById(R.id.exitButton);
+		exitButton = (Button) findViewById(R.id.log_exitButton);
 		// exitButton.setEnabled(false);
 		exitButton.setOnClickListener(this);
-		clearLogButton = (Button) findViewById(R.id.clearLogButton);
+		clearLogButton = (Button) findViewById(R.id.log_clearLogButton);
 		clearLogButton.setOnClickListener(this);
-
+		mAdapter.resetLines();
+		
 		final String component = getIntent().getExtras().getString("component");
 
 		Helper.jLog("Starting Agent Creation test: " + component);
