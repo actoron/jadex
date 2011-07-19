@@ -53,7 +53,7 @@
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>maven-android-plugin</artifactId>
-				<version>2.9.0-beta-4</version>
+				<version>2.9.0-beta-5</version>
 				<configuration>
 					<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
 					<assetsDirectory>${project.basedir}/assets</assetsDirectory>
@@ -82,6 +82,7 @@
 					<target>1.5</target>
 				</configuration>
 			</plugin>
+
 		</plugins>
 	</build>
 </project>

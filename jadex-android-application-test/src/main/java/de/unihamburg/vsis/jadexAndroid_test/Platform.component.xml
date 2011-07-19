@@ -24,6 +24,7 @@
 		<import>jadex.base.service.remote.*</import>
 		<import>jadex.standalone.service.*</import>
 		<import>jadex.base.service.message.*</import>
+		<import>jadex.base.service.awareness.management.*</import>
 		<import>jadex.base.service.message.transport.*</import>
 		<import>jadex.base.service.message.transport.localmtp.*</import>
 		<import>jadex.base.service.message.transport.tcpmtp.*</import>

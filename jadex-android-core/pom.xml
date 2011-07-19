@@ -15,13 +15,15 @@
 	</parent>
 
 	<dependencies>
-<!-- 		<dependency> -->
-<!-- 		<groupId>proprietary</groupId> -->
-<!-- 		<artifactId>android</artifactId> -->
-<!-- 		<version>2.2.1</version> -->
-<!-- 		<scope>system</scope> -->
-<!-- 		<systemPath>/home/julakali/android/sdk/platforms/android-8/android.jar</systemPath> -->
-<!-- 		</dependency> -->
+		<!-- To get all android-related errors, uncomment the following dependency 
+			and remove the JRE from eclipse build path. -->
+		<!-- <dependency> -->
+		<!-- <groupId>proprietary</groupId> -->
+		<!-- <artifactId>android</artifactId> -->
+		<!-- <version>2.2.1</version> -->
+		<!-- <scope>system</scope> -->
+		<!-- <systemPath>/home/julakali/android/sdk/platforms/android-8/android.jar</systemPath> -->
+		<!-- </dependency> -->
 
 		<dependency>
 			<groupId>com.google.android</groupId>
@@ -36,56 +38,18 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 			<artifactId>jadex-android-beans</artifactId> -->
-<!-- 			<version>0.0.1-SNAPSHOT</version> -->
-<!-- 		</dependency> -->
-
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-android-misc</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
-		<!-- <dependency> -->
-		<!-- <groupId>net.sourceforge.jadex</groupId> -->
-		<!-- <artifactId>jadex-kernel-micro</artifactId> -->
-		<!-- <version>2.0-rc7</version> -->
-		<!-- </dependency> -->
-
-		<!-- <dependency> -->
-		<!-- <groupId>net.sourceforge.jadex</groupId> -->
-		<!-- <artifactId>jadex-kernel-component</artifactId> -->
-		<!-- <version>2.0-rc7</version> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>net.sourceforge.jadex</groupId> -->
-		<!-- <artifactId>jadex-platform-standalone</artifactId> -->
-		<!-- <version>2.0-rc7</version> -->
-		<!-- </dependency> -->
-
-
-
-		<!-- <dependency> -->
-		<!-- <groupId>net.sourceforge.jadex</groupId> -->
-		<!-- <artifactId>jadex-platform-base</artifactId> -->
-		<!-- <version>2.0-rc7</version> -->
-		<!-- </dependency> -->
-
 		<dependency>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-antrun-plugin</artifactId>
-			<version>1.6</version>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.2</version>
+			<scope>provided</scope>
 		</dependency>
-
-
-
-		<!-- <dependency> -->
-		<!-- <groupId>net.sf.antenna</groupId> -->
-		<!-- <artifactId>antenna</artifactId> -->
-		<!-- <version>1.0.2</version> -->
-		<!-- </dependency> -->
 
 	</dependencies>
 
