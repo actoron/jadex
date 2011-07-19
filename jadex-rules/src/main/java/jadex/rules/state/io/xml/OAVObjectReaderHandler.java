@@ -21,7 +21,11 @@ import jadex.xml.reader.ReadContext;
 import java.util.List;
 import java.util.Map;
 
+/* $if !android $ */
 import javax.xml.namespace.QName;
+/* $else $
+import javaxx.xml.namespace.QName;
+$endif $ */
 
 
 /**

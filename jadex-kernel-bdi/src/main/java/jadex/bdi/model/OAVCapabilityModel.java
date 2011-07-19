@@ -28,7 +28,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/* $if !android $ */
 import javax.xml.namespace.QName;
+/* $else $
+import javaxx.xml.namespace.QName;
+$endif $ */
 
 /**
  *  The capability model contains the OAV capability model in a state

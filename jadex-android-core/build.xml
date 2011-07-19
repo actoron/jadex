@@ -230,7 +230,7 @@
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
 		</preprocess>
-<!--		<preprocess indir="${jadex-kernel-bdi}" outdir="${src_android}" out="merge" except="${exclude}">
+		<preprocess indir="${jadex-kernel-bdi}" outdir="${src_android}" out="merge" except="${exclude}">
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
@@ -239,7 +239,7 @@
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
-		</preprocess> -->
+		</preprocess> 
 
 
 		<echo level="info">preprocessing ${src-fix}</echo>
@@ -305,7 +305,6 @@
 			<var name="androidVersion" value="${androidVersion}" />
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 		</preprocess>
-		<echo level="info">preprocessing ${jadex-kernel-bpmn}</echo>
 		<preprocess indir="${jadex-kernel-bpmn}" outdir="${jadex-kernel-bpmn}" out="merge" except="${exclude}, ${exclude-jadex-kernel-bpmn}">
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 			<var name="android" value="${android}" />

@@ -50,6 +50,9 @@ public class MainMenu extends Activity implements OnClickListener {
 				"jadex/micro/benchmarks/AgentCreationAgent.class"));
 		adapter.add(new ConfigurationItem("BPMN Creation Test",
 				"jadex/bpmn/benchmarks/AgentCreation2.bpmn"));
+		
+		adapter.add(new ConfigurationItem("BDI Creation Test", 
+				"jadex/bdi/benchmarks/AgentCreation.agent.xml"));
 
 		configurationSpinner.setAdapter(adapter);
 		

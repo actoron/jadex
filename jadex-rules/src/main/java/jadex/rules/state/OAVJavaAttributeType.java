@@ -4,7 +4,11 @@ import jadex.commons.IPropertyObject;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
+/* $if !android $ */
 import java.beans.PropertyDescriptor;
+/* $else $
+import javaa.beans.PropertyDescriptor;
+$endif $ */
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
  

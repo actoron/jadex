@@ -3,11 +3,19 @@ package jadex.rules.state;
 import jadex.commons.IPropertyObject;
 import jadex.commons.SReflect;
 
+/* $if !android $ */
 import java.beans.BeanInfo;
 import java.beans.IndexedPropertyDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+/* $else $
+import javaa.beans.BeanInfo;
+import javaa.beans.IndexedPropertyDescriptor;
+import javaa.beans.IntrospectionException;
+import javaa.beans.Introspector;
+import javaa.beans.PropertyDescriptor;
+$endif $ */
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;

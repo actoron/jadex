@@ -13,7 +13,11 @@ import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 
+/* $if !android $ */
 import java.beans.PropertyChangeListener;
+/* $else $
+import javaa.beans.PropertyChangeListener;
+$endif $ */
 import java.util.HashMap;
 import java.util.Map;
 

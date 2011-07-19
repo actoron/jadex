@@ -18,7 +18,11 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+/* $if !android $ */
 import javax.xml.namespace.QName;
+/* $else $
+import javaxx.xml.namespace.QName;
+$endif $ */
 
 
 /**

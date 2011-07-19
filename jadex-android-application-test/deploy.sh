@@ -1,6 +1,27 @@
 #!/bin/bash
 ADB_PATH=$ANDROID_HOME/tools/adb
 MVN_PATH=$(which mvn)
+AWK_PATH=$(which awk)
+PROJECT_PATH=$(pwd)
+
+function checkAdbPermissions () {
+$ADB_PATH devices | grep -q "no permissions"
+	if [ $? -eq "0" ]; then
+		echo "No Permissions to access usb device."
+		echo "Restarting adb daemon as root..."
+		sudo $ADB_PATH kill-server
+		sudo $ADB_PATH start-server
+		sleep 1
+		checkAdbPermissions
+	fi
+
+	DEVICES=$($ADB_PATH devices | $AWK_PATH 'NR==2 {print;exit}')
+	if [ -z "$DEVICES" ]; then
+		echo "No device attached. Attach a device and press enter"
+		read
+		checkAdbPermissions
+	fi
+}
 
 if [ -z $ANDROID_HOME ]; then 
 	echo "ANDROID_HOME nicht gesetzt!"
@@ -9,6 +30,11 @@ fi
 
 if [ -z $MVN_PATH ]; then
 	echo "mvn Befehl nicht gefunden!"
+	exit 1
+fi
+
+if [ -z $AWK_PATH ]; then
+	echo "awk Befehl nicht gefunden!"
 	exit 1
 fi
 
@@ -26,10 +52,12 @@ fi
 
 cd ..
 $MVN_PATH install -P jadex-android
-if [ "$?" -eq "0" ]
-then
-cd jadex-android-application-test
-$ADB_PATH install -r target/jadex-android-0.0.1-SNAPSHOT.apk
-else
+if [ ! "$?" -eq "0" ]; then
 	echo "Maven Build failed. Not deploying."
+	exit 1
+else
+	cd $PROJECT_PATH
+	checkAdbPermissions
+	echo "Transferring file to device..."
+	$ADB_PATH install -r target/jadex-android-0.0.1-SNAPSHOT.apk
 fi

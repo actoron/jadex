@@ -18,6 +18,7 @@
 package de.unihamburg.vsis.jadexAndroid_test;
 
 import jadex.commons.future.DefaultResultListener;
+import jadex.kernelbase.ExternalAccess;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -112,23 +113,25 @@ public class Logger extends ListActivity implements OnClickListener {
 		clearLogButton = (Button) findViewById(R.id.log_clearLogButton);
 		clearLogButton.setOnClickListener(this);
 		mAdapter.resetLines();
-		
+
 		final String component = getIntent().getExtras().getString("component");
 
 		Helper.jLog("Starting Agent Creation test: " + component);
-		new Thread(new ThreadGroup("bla"), new Runnable() {
-			public void run() {
 
+		new Thread(new Runnable() {
+			public void run() {
 				Startup.startComponent(component).addResultListener(
 						new DefaultResultListener() {
 
 							public void resultAvailable(Object result) {
-								Helper.jLog("result Available");
+								ExternalAccess extAcc = (ExternalAccess) result;
+								Helper.jLog("result Available:"
+										+ result.toString());
 								// exitButton.setEnabled(true);
 							}
 						});
 			}
-		}, "jadex", 256000).start();
+		}).start();
 	}
 
 	@Override

@@ -114,7 +114,10 @@ public class NIOTCPTransport implements ITransport
 			ServerSocket serversocket = ssc.socket();
 			serversocket.bind(new InetSocketAddress(port));
 			this.port = serversocket.getLocalPort();
-			final Selector	selector = Selector.open();
+			// ANDROID: the following line causes an exception in a 2.2
+			// emulator, see:
+			// http://code.google.com/p/android/issues/detail?id=9431
+			final Selector selector = Selector.open();
 			ssc.register(selector, SelectionKey.OP_ACCEPT);
 			
 			// Determine all transport addresses.

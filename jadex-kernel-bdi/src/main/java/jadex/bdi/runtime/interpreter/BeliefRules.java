@@ -19,7 +19,11 @@ import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
+/* $if !android $ */
 import java.beans.PropertyChangeListener;
+/* $else $
+import javaa.beans.PropertyChangeListener;
+$endif $ */
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;

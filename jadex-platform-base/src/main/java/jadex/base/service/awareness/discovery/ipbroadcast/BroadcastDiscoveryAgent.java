@@ -56,7 +56,7 @@ $endif $ */
 @Arguments(
 {
 	@Argument(name="port", clazz=int.class, defaultvalue="55670", description="The port used for finding other agents."),
-	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
+	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds).")
 //	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
 })
 @Configurations(

@@ -30,6 +30,14 @@
 		</developerConnection>
 	</scm>
 	
+<!--  uncomment to enable UTF-8 source Encoding for all subprojects.
+		DOES NOT affect eclipse source encoding setting, see
+		https://issues.sonatype.org/browse/MNGECLIPSE-1782
+		 -->
+<!-- 	<properties> -->
+<!-- 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> -->
+<!--   	</properties> -->
+	
 	<profiles>
 
 		<!-- XML -->
@@ -575,6 +583,7 @@
 				<module>jadex-android-misc</module>
 				<module>jadex-android-stax</module>
 				<module>jadex-android-core</module>
+				<module>jadex-android-beans</module>
 				<module>jadex-android-application-test</module>
 			</modules>
 		</profile>
