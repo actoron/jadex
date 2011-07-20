@@ -66,7 +66,7 @@ import java.util.TimerTask;
 @ComponentTypes({
 	@ComponentType(name="broadcastdis", filename="jadex/base/service/awareness/discovery/ipbroadcast/BroadcastDiscoveryAgent.class"),
 	@ComponentType(name="multicastdis", filename="jadex/base/service/awareness/discovery/ipmulticast/MulticastDiscoveryAgent.class"),
-	@ComponentType(name="scannerdis", filename="jadex/base/service/awareness/discovery/ipscanner/IPScannerDiscoveryAgent.class")
+	@ComponentType(name="scannerdis", filename="jadex/base/service/awareness/discovery/ipscanner/ScannerDiscoveryAgent.class")
 })
 @Configurations(
 {
@@ -81,14 +81,14 @@ import java.util.TimerTask;
 		components=
 		{
 			@Component(name="broadcastdis", type="broadcastdis")
-//			@Component(name="multicastdis", type="multicastdis"),
+//			@Component(name="multicastdis", type="multicastdis")
 //			@Component(name="scannerdis", type="scannerdis")
 		}),
 	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"),
 		components=
 		{
 			@Component(name="broadcastdis", type="broadcastdis")
-//			@Component(name="multicastdis", type="multicastdis"),
+//			@Component(name="multicastdis", type="multicastdis")
 //			@Component(name="scannerdis", type="scannerdis")
 		})
 })

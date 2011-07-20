@@ -1,9 +1,10 @@
 package jadex.base.service.awareness.discovery.ipmulticast;
 
 import jadex.base.service.awareness.AwarenessInfo;
+import jadex.base.service.awareness.discovery.DiscoveryState;
 import jadex.base.service.awareness.discovery.IDiscoveryService;
 import jadex.base.service.awareness.discovery.SDiscovery;
-import jadex.base.service.awareness.discovery.SlaveInfo;
+import jadex.base.service.awareness.discovery.SendHandler;
 import jadex.base.service.awareness.management.IManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -28,10 +29,6 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-import jadex.xml.annotation.XMLClassname;
-import jadex.xml.bean.JavaReader;
-import jadex.xml.bean.JavaWriter;
-import jadex.xml.reader.Reader;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -39,8 +36,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /* $if !android $ */
 import javax.xml.stream.Location;
@@ -81,11 +76,11 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 {
 	//-------- attributes --------
 	
-	/** The includes list. */
-	protected String[] includes;
-	
-	/** The excludes list. */
-	protected String[] excludes;
+	/** The agent state. */
+	protected DiscoveryState state;
+
+	/** The send handler. */
+	protected SendHandler sender;
 	
 	
 	/** The multicast internet address. */
@@ -94,44 +89,21 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	/** The receiver port. */
 	protected int port;
 	
-	/** Flag for enabling fast startup awareness (pingpong send behavior). */
-	protected boolean fast;
-	
-	
 	/** The socket to send. */
 	protected MulticastSocket sendsocket;
-	
-	/** The send delay. */
-	protected long delay;
-		
-	/** The current send id. */
-	protected String sendid;
-	
-	
+
 	/** The socket to send. */
 	protected MulticastSocket receivesocket;
-	
-	/** Flag indicating agent killed. */
-	protected boolean killed;
-	
-	/** The timer. */
-	protected Timer	timer;
-	
+
 	/** The root component id. */
 	protected IComponentIdentifier root;
-	
-	/** The java reader for parsing received awareness infos. */
-	protected Reader reader;
-	
-	/** Flag indicating that the agent is started and the send behavior may be activated. */
-	protected boolean started;
 	
 	/** Flag indicating that the agent has received its own discovery info. */
 	protected boolean received_self;
 	
 	/** The current receive address. */
 	protected InetAddress myaddress;
-	
+
 	//-------- methods --------
 	
 	/**
@@ -139,6 +111,8 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	 */
 	public IFuture	agentCreated()
 	{
+		this.state = new DiscoveryState(getExternalAccess());
+		
 		initArguments();
 		
 		try
@@ -150,14 +124,14 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		{
 			throw new RuntimeException(e);
 		}
-		this.reader	= JavaReader.getReader(new XMLReporter()
-		{
-			public void report(String message, String type, Object related, Location location) throws XMLStreamException
-			{
-				// Ignore XML exceptions.
-//				getLogger().warning(message);
-			}
-		});
+//		this.reader	= JavaReader.getReader(new XMLReporter()
+//		{
+//			public void report(String message, String type, Object related, Location location) throws XMLStreamException
+//			{
+//				// Ignore XML exceptions.
+////				getLogger().warning(message);
+//			}
+//		});
 		
 		return IFuture.DONE;
 	}
@@ -178,8 +152,8 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		if(address==null)
 			throw new NullPointerException("Cannot get address: "+getArgument("address"));
 		this.port = ((Number)getArgument("port")).intValue();
-		this.delay = ((Number)getArgument("delay")).longValue();
-		this.fast = ((Boolean)getArgument("fast")).booleanValue();
+		state.setDelay(((Number)getArgument("delay")).longValue());
+		state.setFastAwareness(((Boolean)getArgument("fast")).booleanValue());
 	}
 	
 	/**
@@ -196,15 +170,15 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		{
 			public void resultAvailable(Object result)
 			{
-				started	= true;
-				startSendBehaviour();
+				state.setStarted(true);
+				sender = new MulticastSendHandler(state);
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
 				// Send also when receiving does not work?
-				started	= true;
-				startSendBehaviour();
+				state.setStarted(true);
+				sender = new MulticastSendHandler(state);
 			}
 		}));
 	}
@@ -215,11 +189,11 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	 */
 	public IFuture	agentKilled()
 	{
-		killed = true;
+		state.setKilled(true);
 		
 		if(sendsocket!=null)
 		{
-			send(new AwarenessInfo(root, AwarenessInfo.STATE_OFFLINE, delay));
+			sender.send(new AwarenessInfo(root, AwarenessInfo.STATE_OFFLINE, state.getDelay()));
 		}
 		
 //		System.out.println("killed set to true: "+getComponentIdentifier());
@@ -254,7 +228,7 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	 */
 	public void setIncludes(String[] includes)
 	{
-		this.includes = includes;
+		state.setIncludes(includes);
 	}
 	
 	/**
@@ -263,26 +237,7 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	 */
 	public void setExcludes(String[] excludes)
 	{
-		this.excludes = excludes;
-	}
-	
-	/**
-	 *  Start sending of message
-	 */
-	public void send(final AwarenessInfo info)
-	{
-		try
-		{
-			byte[] data = SDiscovery.encodeObject(info, getModel().getClassLoader());
-			DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
-			sendsocket.send(packet);
-//			System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");
-		}
-		catch(Exception e)
-		{
-			getLogger().warning("Could not send awareness message: "+e);
-//			e.printStackTrace();
-		}	
+		state.setExcludes(excludes);
 	}
 	
 	/**
@@ -306,15 +261,6 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	}
 	
 	/**
-	 *  Get the delay.
-	 *  @return the delay.
-	 */
-	public synchronized long getDelay()
-	{
-		return delay;
-	}
-
-	/**
 	 *  Set the delay.
 	 *  @param delay The delay to set.
 	 */
@@ -323,75 +269,10 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 //		System.out.println("setDelay: "+delay+" "+getComponentIdentifier());
 //		if(this.delay>=0 && delay>0)
 //			scheduleStep(send);
-		if(this.delay!=delay)
+		if(state.getDelay()!=delay)
 		{
-			this.delay = delay;
-			startSendBehaviour();
-		}
-	}
-	
-	/**
-	 *  Set the fast startup awareness flag
-	 */
-	public void setFastAwareness(boolean fast)
-	{
-		this.fast = fast;
-	}
-	
-	/**
-	 *  Get the fast startup awareness flag.
-	 *  @return The fast flag.
-	 */
-	public boolean isFastAwareness()
-	{
-		return this.fast;
-	}
-	
-	/**
-	 *  Get the sendid.
-	 *  @return the sendid.
-	 */
-	public String getSendId()
-	{
-		return sendid;
-	}
-
-	/**
-	 *  Set the sendid.
-	 *  @param sendid The sendid to set.
-	 */
-	public void setSendId(String sendid)
-	{
-		this.sendid = sendid;
-	}
-	
-	/**
-	 *  Start sending awareness infos.
-	 *  (Ends automatically when a new send behaviour is started).
-	 */
-	protected void startSendBehaviour()
-	{
-		if(started)
-		{
-			final String sendid = SUtil.createUniqueId(getAgentName());
-			this.sendid = sendid;	
-			
-			scheduleStep(new IComponentStep()
-			{
-				@XMLClassname("send")
-				public Object execute(IInternalAccess ia)
-				{
-					if(!killed && sendid.equals(getSendId()))
-					{
-//						System.out.println(System.currentTimeMillis()+" sending: "+getComponentIdentifier());
-						send(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes));
-						
-						if(delay>0)
-							doWaitFor(delay, this);
-					}
-					return null;
-				}
-			});
+			state.setDelay(delay);
+			sender.startSendBehavior();
 		}
 	}
 	
@@ -419,20 +300,26 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 						
 //						InetAddress myaddress = null;
 						
-						while(!killed)
+						// Init receive socket
+						getReceiveSocket();
+						ret.setResultIfUndone(null);
+						
+						while(!state.isKilled())
 						{
 							try
 							{
-								// Init receive socket
-								getReceiveSocket();
-								
-								ret.setResultIfUndone(null);
-								
-								DatagramPacket pack = new DatagramPacket(buf, buf.length);
+								final DatagramPacket pack = new DatagramPacket(buf, buf.length);
 								getReceiveSocket().receive(pack);
 //								System.out.println("received: "+getComponentIdentifier());
 								
-								handleReceivedPacket(pack);
+								scheduleStep(new IComponentStep()
+								{
+									public Object execute(IInternalAccess ia) 
+									{
+										handleReceivedPacket(pack);
+										return null;
+									};
+								});
 							}
 							catch(Exception e)
 							{
@@ -477,7 +364,7 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	 */
 	protected synchronized DatagramSocket getReceiveSocket()
 	{
-		if(!killed)
+		if(!state.isKilled())
 		{
 			Object[] ai = getAddressInfo();
 			InetAddress curaddress = (InetAddress)ai[0];
@@ -570,30 +457,35 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	}
 	
 	/**
-	 *  Get the current time.
+	 *  Handle sending.
 	 */
-	protected long getClockTime()
+	class MulticastSendHandler extends SendHandler
 	{
-//		return clock.getTime();
-		return System.currentTimeMillis();
-	}
-	
-	/**
-	 *  Overriden wait for to not use platform clock.
-	 */
-	protected void	doWaitFor(long delay, final IComponentStep step)
-	{
-//		waitFor(delay, step);
-		
-		if(timer==null)
-			timer	= new Timer(true);
-		
-		timer.schedule(new TimerTask()
+		/**
+		 *  Create a new lease time handling object.
+		 */
+		public MulticastSendHandler(DiscoveryState state)
 		{
-			public void run()
+			super(state);
+		}
+		
+		/**
+		 *  Method to send messages.
+		 */
+		public void send(AwarenessInfo info)
+		{
+			try
 			{
-				scheduleStep(step);
+				byte[] data = SDiscovery.encodeObject(info, getModel().getClassLoader());
+				DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
+				sendsocket.send(packet);
+//				System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");
 			}
-		}, delay);
+			catch(Exception e)
+			{
+				getLogger().warning("Could not send awareness message: "+e);
+//				e.printStackTrace();
+			}
+		}
 	}
 }

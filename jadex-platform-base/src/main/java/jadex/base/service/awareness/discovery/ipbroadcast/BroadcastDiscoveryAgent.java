@@ -2,10 +2,12 @@ package jadex.base.service.awareness.discovery.ipbroadcast;
 
 import jadex.base.service.awareness.AwarenessInfo;
 import jadex.base.service.awareness.discovery.DiscoveryEntry;
+import jadex.base.service.awareness.discovery.DiscoveryState;
 import jadex.base.service.awareness.discovery.IDiscoveryService;
 import jadex.base.service.awareness.discovery.LeaseTimeHandler;
 import jadex.base.service.awareness.discovery.MasterInfo;
 import jadex.base.service.awareness.discovery.SDiscovery;
+import jadex.base.service.awareness.discovery.SendHandler;
 import jadex.base.service.awareness.discovery.SlaveInfo;
 import jadex.base.service.awareness.management.IManagementService;
 import jadex.bridge.IComponentIdentifier;
@@ -31,14 +33,11 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-import jadex.xml.annotation.XMLClassname;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /* $if !android $ */
 import javax.xml.stream.Location;
@@ -77,61 +76,33 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 {
 	//-------- attributes --------
 	
-	/** The includes list. */
-	protected String[] includes;
-	
-	/** The excludes list. */
-	protected String[] excludes;
+	/** The agent state. */
+	protected DiscoveryState state;
 
-	
-	/** The receiver port. */
-	protected int port;
-	
-//	/** Flag for enabling fast startup awareness (pingpong send behavior). */
-//	protected boolean fast;
-	
-	
-	/** The socket to send. */
-	protected DatagramSocket sendsocket;
-	
-	/** The send (remotes) delay. */
-	protected long delay;
-		
-	/** The current send id. */
-	protected String sendid;
-	
-	/** The current ip to send probes to. */
-	protected int currentip;
-	
-	
-	/** The socket to receive. */
-	protected DatagramSocket receivesocket;
-	
-	/** Flag indicating agent killed. */
-	protected boolean killed;
-	
-	/** The timer. */
-	protected Timer	timer;
-	
-	/** The root component id. */
-	protected IComponentIdentifier root;
-	
-	/** Flag indicating that the agent is started and the send behavior may be activated. */
-	protected boolean started;
-	
-	/** Flag indicating that the agent has received its own discovery info. */
-	protected boolean received_self;
-	
+	/** The send handler. */
+	protected SendHandler sender;
 	
 	/** The local slaves. */
 	protected LeaseTimeHandler locals;
 	
-	/** The local send socket. */
-	protected DatagramSocket localsocket;
-	
-	
 	/** The local slaves. */
 	protected LeaseTimeHandler remotes;
+
+	
+	/** The receiver port. */
+	protected int port;
+		
+	/** The socket to send. */
+	protected DatagramSocket sendsocket;		
+	
+	/** The socket to receive. */
+	protected DatagramSocket receivesocket;
+		
+	/** The root component id. */
+	protected IComponentIdentifier root;
+	
+	/** Flag indicating that the agent has received its own discovery info. */
+//	protected boolean received_self;
 	
 	//-------- methods --------
 	
@@ -142,6 +113,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	{
 		Future ret = new Future();
 		
+		this.state = new DiscoveryState(getExternalAccess());
 		initArguments();
 		
 		try
@@ -174,8 +146,42 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	protected void initArguments()
 	{
 		this.port = ((Number)getArgument("port")).intValue();
-		this.delay = ((Number)getArgument("delay")).longValue();
+		state.setDelay(((Number)getArgument("delay")).longValue());
 //		this.fast = ((Boolean)getArgument("fast")).booleanValue();
+	}
+	
+	/**
+	 *  Set the delay.
+	 *  @param delay The delay to set.
+	 */
+	public void setDelay(long delay)
+	{
+//		System.out.println("setDelay: "+delay+" "+getComponentIdentifier());
+//		if(this.delay>=0 && delay>0)
+//			scheduleStep(send);
+		if(state.getDelay()!=delay)
+		{
+			state.setDelay(delay);
+			sender.startSendBehavior();
+		}
+	}
+	
+	/**
+	 *  Set the includes.
+	 *  @param includes The includes.
+	 */
+	public void setIncludes(String[] includes)
+	{
+		state.setIncludes(includes);
+	}
+	
+	/**
+	 *  Set the excludes.
+	 *  @param excludes The excludes.
+	 */
+	public void setExcludes(String[] excludes)
+	{
+		state.setExcludes(excludes);
 	}
 	
 	/**
@@ -186,15 +192,15 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	{
 		root = getComponentIdentifier().getRoot();
 		
-		this.locals = new LeaseTimeHandler(getExternalAccess());
-		this.remotes = new LeaseTimeHandler(getExternalAccess())
+		this.locals = new LeaseTimeHandler(state);
+		this.remotes = new LeaseTimeHandler(state)
 		{
 			public void entryDeleted(DiscoveryEntry entry)
 			{
 				// If master is lost, try to become master
 				if(entry.isMaster())
 				{
-					System.out.println("Master deleted.");
+//					System.out.println("Master deleted.");
 					
 					try
 					{
@@ -219,15 +225,15 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		{
 			public void resultAvailable(Object result)
 			{
-				started	= true;
-				startSendBehaviour();
+				state.setStarted(true);
+				sender = new BroadcastSendHandler(state);
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
 				// Send also when receiving does not work?
-				started	= true;
-				startSendBehaviour();
+				state.setStarted(true);
+				sender = new BroadcastSendHandler(state);
 			}
 		}));
 	}
@@ -238,11 +244,11 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	 */
 	public IFuture	agentKilled()
 	{
-		killed = true;
+		state.setKilled(true);
 		
 		if(sendsocket!=null)
 		{
-			send(new AwarenessInfo(root, AwarenessInfo.STATE_OFFLINE, delay));
+			sender.send(new AwarenessInfo(root, AwarenessInfo.STATE_OFFLINE, state.getDelay()));
 		}
 		
 //		System.out.println("killed set to true: "+getComponentIdentifier());
@@ -274,52 +280,6 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	}
 	
 	/**
-	 *  Set the includes.
-	 *  @param includes The includes.
-	 */
-	public void setIncludes(String[] includes)
-	{
-		this.includes = includes;
-	}
-	
-	/**
-	 *  Set the excludes.
-	 *  @param excludes The excludes.
-	 */
-	public void setExcludes(String[] excludes)
-	{
-		this.excludes = excludes;
-	}
-	
-	/**
-	 *  Start sending of message
-	 */
-	public void send(final AwarenessInfo info)
-	{
-		try
-		{
-			byte[] data = SDiscovery.encodeObject(info, getModel().getClassLoader());
-
-			// Broadcast info to lan.
-			sendToDiscover(data);
-			
-			// Does not need to send to known components
-			// as broadcast reaches all.
-			
-			// Send to all locals a refresh awareness
-			sendToLocals(data);
-
-//			System.out.println("sent: "+address);
-//			System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");
-		}
-		catch(Exception e)
-		{
-			getLogger().warning("Could not send awareness message: "+e);
-			e.printStackTrace();
-		}	
-	}
-
-	/**
 	 *  Send/forward to discover.
 	 *  @param data The data to be send.
 	 */
@@ -328,6 +288,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		try
 		{
 			// Global broadcast address 255.255.255.255 does not work in windows xp/7 :-(
+			// http://serverfault.com/questions/72112/how-to-alter-the-global-broadcast-address-255-255-255-255-behavior-on-windows
 			// Directed broadcast address = !netmask | IP
 	//		InetAddress address = InetAddress.getByAddress(new byte[]{(byte)255, (byte)255, (byte)255, (byte)255,});
 			InetAddress iadr = SDiscovery.getInet4Address();
@@ -369,105 +330,13 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	{
 		try
 		{
-			if(localsocket==null)
-				localsocket = new DatagramSocket();
 			InetAddress address = SDiscovery.getInet4Address();
 			DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
-			localsocket.send(packet);
+			sendsocket.send(packet);
 		}
 		catch(IOException e)
 		{
 			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 *  Get the delay.
-	 *  @return the delay.
-	 */
-	public synchronized long getDelay()
-	{
-		return delay;
-	}
-
-	/**
-	 *  Set the delay.
-	 *  @param delay The delay to set.
-	 */
-	public synchronized void setDelay(long delay)
-	{
-//		System.out.println("setDelay: "+delay+" "+getComponentIdentifier());
-//		if(this.delay>=0 && delay>0)
-//			scheduleStep(send);
-		if(this.delay!=delay)
-		{
-			this.delay = delay;
-			startSendBehaviour();
-		}
-	}
-	
-//	/**
-//	 *  Set the fast startup awareness flag
-//	 */
-//	public void setFastAwareness(boolean fast)
-//	{
-//		this.fast = fast;
-//	}
-//	
-//	/**
-//	 *  Get the fast startup awareness flag.
-//	 *  @return The fast flag.
-//	 */
-//	public boolean isFastAwareness()
-//	{
-//		return this.fast;
-//	}
-	
-	/**
-	 *  Get the sendid.
-	 *  @return the sendid.
-	 */
-	public String getSendId()
-	{
-		return sendid;
-	}
-
-	/**
-	 *  Set the sendid.
-	 *  @param sendid The sendid to set.
-	 */
-	public void setSendId(String sendid)
-	{
-		this.sendid = sendid;
-	}
-	
-	/**
-	 *  Start sending awareness infos.
-	 *  (Ends automatically when a new send behaviour is started).
-	 */
-	protected void startSendBehaviour()
-	{
-		if(started)
-		{
-			final String sendid = SUtil.createUniqueId(getAgentName());
-			this.sendid = sendid;	
-			
-			scheduleStep(new IComponentStep()
-			{
-				@XMLClassname("send")
-				public Object execute(IInternalAccess ia)
-				{
-					if(!killed && sendid.equals(getSendId()))
-					{
-//						System.out.println(System.currentTimeMillis()+" sending: "+getComponentIdentifier());
-						send(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes));
-						
-						if(delay>0)
-							doWaitFor(delay, this);
-					}
-					return null;
-				}
-			});
 		}
 	}
 	
@@ -497,14 +366,21 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 						getReceiveSocket();
 						ret.setResultIfUndone(null);
 						
-						while(!killed)
+						while(!state.isKilled())
 						{
 							try
 							{
-								DatagramPacket pack = new DatagramPacket(buf, buf.length);
+								final DatagramPacket pack = new DatagramPacket(buf, buf.length);
 								getReceiveSocket().receive(pack);
+								scheduleStep(new IComponentStep()
+								{
+									public Object execute(IInternalAccess ia)
+									{
+										handleReceivedPacket(pack);
+										return null;
+									}
+								});
 //								System.out.println("received: "+getComponentIdentifier());
-								handleReceivedPacket(pack);
 							}
 							catch(Exception e)
 							{
@@ -547,17 +423,20 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	
 	/**
 	 *  Get or create a receiver socket.
+	 *  
+	 *  Note, this method has to be synchronized.
+	 *  Is called from receiver as well as component thread.
 	 */
 	protected synchronized DatagramSocket getReceiveSocket()
 	{
-		if(!killed)
+		if(!state.isKilled())
 		{
 			if(receivesocket==null)
 			{
 				try
 				{
 					receivesocket = new DatagramSocket(port);
-					System.out.println("local master at: "+SDiscovery.getInet4Address()+" "+port);
+//					System.out.println("local master at: "+SDiscovery.getInet4Address()+" "+port);
 				}
 				catch(Exception e)
 				{
@@ -568,13 +447,13 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 						// and send this port to the master.
 						receivesocket = new DatagramSocket();
 						InetAddress address = SDiscovery.getInet4Address();
-						AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes);
+						AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, state.getDelay(), state.getIncludes(), state.getExcludes());
 						SlaveInfo si = new SlaveInfo(info);
 						byte[] data = SDiscovery.encodeObject(si, getModel().getClassLoader());
 						DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
 						receivesocket.send(packet);
 	
-						System.out.println("local slave at: "+SDiscovery.getInet4Address()+" "+receivesocket.getLocalPort());
+//						System.out.println("local slave at: "+SDiscovery.getInet4Address()+" "+receivesocket.getLocalPort());
 						
 //						getLogger().warning("Running in local mode: "+e);
 					}
@@ -607,15 +486,15 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		{
 			sendToLocals(data);
 			
-			if(info.getSender().equals(root))
-			{
-				received_self	= true;
-			}
-			else
+			if(!info.getSender().equals(root))
 			{
 				announceAwareness(info);
 			}
-//				System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
+//			else
+//			{
+//				received_self	= true;
+//			}
+//			System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
 		}
 			
 		if(obj instanceof SlaveInfo)
@@ -623,8 +502,8 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			// Received slaveinfo -> save slave, reply with masterinfo.
 			SlaveInfo si = (SlaveInfo)obj;
 			locals.addOrUpdateEntry(new DiscoveryEntry(si.getAwarenessInfo().getSender(), 
-				getClockTime(), si.getAwarenessInfo().getDelay(), new Integer(pack.getPort()), false));
-			AwarenessInfo myinfo = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes);
+				state.getClockTime(), si.getAwarenessInfo().getDelay(), new Integer(pack.getPort()), false));
+			AwarenessInfo myinfo = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, state.getDelay(), state.getIncludes(), state.getExcludes());
 			MasterInfo mi = new MasterInfo(myinfo);
 			byte[] mydata = SDiscovery.encodeObject(mi, getModel().getClassLoader());
 			sendToLocal(mydata, pack.getPort());
@@ -635,14 +514,14 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			// Received masterinfo -> save master
 			MasterInfo mi = (MasterInfo)obj;
 			remotes.addOrUpdateEntry(new DiscoveryEntry(mi.getAwarenessInfo().getSender(), 
-				getClockTime(), mi.getAwarenessInfo().getDelay(), null, true));
+				state.getClockTime(), mi.getAwarenessInfo().getDelay(), pack.getAddress(), true));
 //			System.out.println("received master info: "+getComponentIdentifier().getLocalName()+" "+mi.getAwarenessInfo().getSender());
 		}
 		else if(obj instanceof AwarenessInfo)
 		{
 			// Received awareness info -> save known
 			remotes.addOrUpdateEntry(new DiscoveryEntry(info.getSender(), 
-				getClockTime(), info.getDelay(), null, false));
+				state.getClockTime(), info.getDelay(), null, false));
 //			System.out.println("received awa info: "+getComponentIdentifier().getLocalName()+" "+info.getSender());
 		}
 	}
@@ -662,7 +541,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 				
 //				if(initial && fast && started && !killed)
 //				{
-////												System.out.println(System.currentTimeMillis()+" fast discovery: "+getComponentIdentifier()+", "+sender);
+////				System.out.println(System.currentTimeMillis()+" fast discovery: "+getComponentIdentifier()+", "+sender);
 //					received_self	= false;
 //					waitFor((long)(Math.random()*500), new IComponentStep()
 //					{
@@ -672,7 +551,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 //							if(!received_self)
 //							{
 //								cnt++;
-////															System.out.println("CSMACD try #"+(++cnt));
+////							System.out.println("CSMACD try #"+(++cnt));
 //								send(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes));
 //								waitFor((long)(Math.random()*500*cnt), this);
 //							}
@@ -683,32 +562,122 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			}
 		});
 	}
-		
-	/**
-	 *  Get the current time.
-	 */
-	protected long getClockTime()
-	{
-//		return clock.getTime();
-		return System.currentTimeMillis();
-	}
 	
 	/**
-	 *  Overriden wait for to not use platform clock.
+	 *  Handle sending.
 	 */
-	protected void	doWaitFor(long delay, final IComponentStep step)
+	class BroadcastSendHandler extends SendHandler
 	{
-//		waitFor(delay, step);
-		
-		if(timer==null)
-			timer	= new Timer(true);
-		
-		timer.schedule(new TimerTask()
+		/**
+		 *  Create a new lease time handling object.
+		 */
+		public BroadcastSendHandler(DiscoveryState state)
 		{
-			public void run()
+			super(state);
+		}
+		
+		/**
+		 *  Method to send messages.
+		 */
+		public void send(AwarenessInfo info)
+		{
+			try
 			{
-				scheduleStep(step);
+				byte[] data = SDiscovery.encodeObject(info, getModel().getClassLoader());
+		
+				// Broadcast info to lan.
+				sendToDiscover(data);
+				
+				// Does not need to send to known components
+				// as broadcast reaches all.
+				
+				// Send to all locals a refresh awareness
+				sendToLocals(data);
+				
+				// Test if master is available.
+//				getReceiveSocket();
+		
+		//		System.out.println("sent: "+address);
+		//		System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");
 			}
-		}, delay);
+			catch(Exception e)
+			{
+				getLogger().warning("Could not send awareness message: "+e);
+				e.printStackTrace();
+			}	
+		}
 	}
+	
+	
+//	/**
+//	 *  This method version ensures that new master is selected
+//   *  automatically. Problem other slaves do not recognize new master.
+//	 *  Get or create a receiver socket.
+//	 *  
+//	 *  Note, this method has to be synchronized.
+//	 *  Is called from receiver as well as component thread.
+//	 */
+//	protected synchronized DatagramSocket getReceiveSocket()
+//	{
+//		DatagramSocket ret = receivesocket;
+//		
+//		if(!state.isKilled())
+//		{
+//			if(receivesocket==null)
+//			{
+//				try
+//				{
+//					receivesocket = new DatagramSocket(port);
+//					ret = receivesocket;
+//					
+//					// Was slave and is now master -> reset slave socket
+//					if(slavereceivesocket!=null)
+//					{
+//						try
+//						{
+//							slavereceivesocket.close();
+//						}
+//						catch(Exception e)
+//						{
+//						}
+//						slavereceivesocket = null;
+//					}
+//					
+//					System.out.println("local master at: "+SDiscovery.getInet4Address()+" "+port);
+//				}
+//				catch(Exception e)
+//				{
+//					if(slavereceivesocket==null)
+//					{
+//						try
+//						{
+//							// In case the receiversocket cannot be opened
+//							// open another local socket at an arbitrary port
+//							// and send this port to the master.
+//							slavereceivesocket = new DatagramSocket();
+//							InetAddress address = SDiscovery.getInet4Address();
+//							AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, state.getDelay(), state.getIncludes(), state.getExcludes());
+//							SlaveInfo si = new SlaveInfo(info);
+//							byte[] data = SDiscovery.encodeObject(si, getModel().getClassLoader());
+//							DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
+//							slavereceivesocket.send(packet);
+//		
+//							System.out.println("local slave at: "+SDiscovery.getInet4Address()+" "+slavereceivesocket.getLocalPort());
+//							
+//	//						getLogger().warning("Running in local mode: "+e);
+//						}
+//						catch(Exception e2)
+//						{
+//							throw new RuntimeException(e2);
+//						}
+//					}
+//					ret = slavereceivesocket;
+//				}
+//			}
+//		}
+//		
+//		return ret;
+//	}
 }
+
+

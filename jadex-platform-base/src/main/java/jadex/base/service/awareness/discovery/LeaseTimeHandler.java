@@ -19,8 +19,8 @@ import java.util.TimerTask;
  */
 public class LeaseTimeHandler
 {
-	/** The external access. */
-	protected IExternalAccess access;
+	/** The state. */
+	protected DiscoveryState state;
 	
 	/** The entries. */
 	protected Map entries;
@@ -31,9 +31,9 @@ public class LeaseTimeHandler
 	/**
 	 *  Create a new lease time handling object.
 	 */
-	public LeaseTimeHandler(IExternalAccess access)
+	public LeaseTimeHandler(DiscoveryState state)
 	{
-		this.access = access;
+		this.state = state;
 		startRemoveBehavior();
 	}
 	
@@ -74,7 +74,7 @@ public class LeaseTimeHandler
 	 */
 	public void startRemoveBehavior()
 	{
-		access.scheduleStep(new IComponentStep()
+		state.getExternalAccess().scheduleStep(new IComponentStep()
 		{
 			@XMLClassname("rem")
 			public Object execute(IInternalAccess ia)
@@ -128,7 +128,7 @@ public class LeaseTimeHandler
 		{
 			public void run()
 			{
-				access.scheduleStep(step);
+				state.getExternalAccess().scheduleStep(step);
 			}
 		}, delay);
 	}
