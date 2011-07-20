@@ -452,13 +452,13 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 						byte[] data = SDiscovery.encodeObject(si, getModel().getClassLoader());
 						DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
 						receivesocket.send(packet);
-	
 //						System.out.println("local slave at: "+SDiscovery.getInet4Address()+" "+receivesocket.getLocalPort());
 						
 //						getLogger().warning("Running in local mode: "+e);
 					}
 					catch(Exception e2)
 					{
+						e2.printStackTrace();
 						throw new RuntimeException(e2);
 					}
 				}
