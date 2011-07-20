@@ -585,6 +585,8 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			{
 				byte[] data = SDiscovery.encodeObject(info, getModel().getClassLoader());
 		
+//				System.out.println("packet size: "+data.length);
+				
 				// Broadcast info to lan.
 				sendToDiscover(data);
 				
