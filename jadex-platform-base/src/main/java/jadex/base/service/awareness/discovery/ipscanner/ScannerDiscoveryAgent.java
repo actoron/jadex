@@ -234,7 +234,7 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 		
 		if(sendchannel!=null)
 		{
-			send(new AwarenessInfo(root, AwarenessInfo.STATE_OFFLINE, state.getDelay()));
+			sender.send(new AwarenessInfo(root, AwarenessInfo.STATE_OFFLINE, state.getDelay()));
 		}
 		
 //		System.out.println("killed set to true: "+getComponentIdentifier());
@@ -283,54 +283,6 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 		state.setExcludes(excludes);
 	}
 	
-	/**
-	 *  Start sending of message
-	 */
-	public void send(final AwarenessInfo info)
-	{
-		try
-		{
-			byte[] data = DiscoveryState.encodeObject(info, getModel().getClassLoader());
-			
-			int maxsend = sendchannel.socket().getSendBufferSize()/data.length;
-			int sent = 0;
-			
-			// Send to all remote other nodes a refresh awareness
-			int allowed = maxsend-sent;
-			int remotes = 0;
-			if(allowed>0)
-			{
-				remotes = sendToRemotes(data, allowed);
-				sent += remotes;
-			}
-			
-			// Send to possibly new ones via ip guessing
-			if(sendcount%scanfactor==0)
-			{
-				allowed = maxsend-sent;
-				int discover = 0;
-				if(allowed>0)
-				{
-					discover += sendToDiscover(data, allowed);
-					sent+= discover;
-				}
-			}
-			
-			// Send to all locals a refresh awareness
-			sendToLocals(data);
-
-//			System.out.println(" sent:"+sent+" remotes: "+remotes+" discover: "+discover);
-//			System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");
-		}
-		catch(Exception e)
-		{
-			getLogger().warning("Could not send awareness message: "+e);
-//			e.printStackTrace();
-		}	
-		
-		sendcount++;
-	}
-
 	/**
 	 * 
 	 */
