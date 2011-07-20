@@ -3,12 +3,17 @@ package jadex.base.service.awareness.discovery;
 import jadex.base.service.awareness.AwarenessInfo;
 
 /**
- * 
+ *  For local master/slave protocol.
+ *  Indicates awareness message from a master.
  */
 public class MasterInfo
 {
+	//-------- attributes --------
+	
 	/** The awareness info. */
 	protected AwarenessInfo info;
+	
+	//-------- constructors --------
 	
 	/**
 	 *  Create a new master info.
@@ -24,6 +29,8 @@ public class MasterInfo
 	{
 		this.info = info;
 	}
+	
+	//-------- methods --------
 
 	/**
 	 *  Get the info.

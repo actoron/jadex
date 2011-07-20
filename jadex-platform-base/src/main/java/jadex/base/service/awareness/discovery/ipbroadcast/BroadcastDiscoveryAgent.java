@@ -6,7 +6,6 @@ import jadex.base.service.awareness.discovery.DiscoveryState;
 import jadex.base.service.awareness.discovery.IDiscoveryService;
 import jadex.base.service.awareness.discovery.LeaseTimeHandler;
 import jadex.base.service.awareness.discovery.MasterInfo;
-import jadex.base.service.awareness.discovery.SDiscovery;
 import jadex.base.service.awareness.discovery.SendHandler;
 import jadex.base.service.awareness.discovery.SlaveInfo;
 import jadex.base.service.awareness.management.IManagementService;
@@ -291,8 +290,8 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			// http://serverfault.com/questions/72112/how-to-alter-the-global-broadcast-address-255-255-255-255-behavior-on-windows
 			// Directed broadcast address = !netmask | IP
 	//		InetAddress address = InetAddress.getByAddress(new byte[]{(byte)255, (byte)255, (byte)255, (byte)255,});
-			InetAddress iadr = SDiscovery.getInet4Address();
-			short sublen = SDiscovery.getNetworkPrefixLength(iadr);
+			InetAddress iadr = SUtil.getInet4Address();
+			short sublen = SUtil.getNetworkPrefixLength(iadr);
 			if(sublen==-1) // Guess C class if nothing can be determined.
 				sublen = 24;
 			byte[] byinet = iadr.getAddress();
@@ -330,7 +329,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	{
 		try
 		{
-			InetAddress address = SDiscovery.getInet4Address();
+			InetAddress address = SUtil.getInet4Address();
 			DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
 			sendsocket.send(packet);
 		}
@@ -446,10 +445,10 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 						// open another local socket at an arbitrary port
 						// and send this port to the master.
 						receivesocket = new DatagramSocket();
-						InetAddress address = SDiscovery.getInet4Address();
+						InetAddress address = SUtil.getInet4Address();
 						AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, state.getDelay(), state.getIncludes(), state.getExcludes());
 						SlaveInfo si = new SlaveInfo(info);
-						byte[] data = SDiscovery.encodeObject(si, getModel().getClassLoader());
+						byte[] data = DiscoveryState.encodeObject(si, getModel().getClassLoader());
 						DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
 						receivesocket.send(packet);
 //						System.out.println("local slave at: "+SDiscovery.getInet4Address()+" "+receivesocket.getLocalPort());
@@ -475,7 +474,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	{
 		byte[] data = new byte[pack.getLength()];
 		System.arraycopy(pack.getData(), 0, data, 0, pack.getLength());
-		Object obj = SDiscovery.decodeObject(data, getModel().getClassLoader());
+		Object obj = DiscoveryState.decodeObject(data, getModel().getClassLoader());
 		AwarenessInfo info = obj instanceof AwarenessInfo? (AwarenessInfo)obj:
 			obj instanceof SlaveInfo? ((SlaveInfo)obj).getAwarenessInfo(): 
 			obj instanceof MasterInfo? ((MasterInfo)obj).getAwarenessInfo(): null;
@@ -505,7 +504,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 				state.getClockTime(), si.getAwarenessInfo().getDelay(), new Integer(pack.getPort()), false));
 			AwarenessInfo myinfo = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, state.getDelay(), state.getIncludes(), state.getExcludes());
 			MasterInfo mi = new MasterInfo(myinfo);
-			byte[] mydata = SDiscovery.encodeObject(mi, getModel().getClassLoader());
+			byte[] mydata = DiscoveryState.encodeObject(mi, getModel().getClassLoader());
 			sendToLocal(mydata, pack.getPort());
 //			System.out.println("received slave info: "+getComponentIdentifier().getLocalName()+" "+si.getAwarenessInfo().getSender());
 		}
@@ -583,7 +582,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		{
 			try
 			{
-				byte[] data = SDiscovery.encodeObject(info, getModel().getClassLoader());
+				byte[] data = DiscoveryState.encodeObject(info, getModel().getClassLoader());
 		
 //				System.out.println("packet size: "+data.length);
 				

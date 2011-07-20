@@ -10,10 +10,16 @@ import jadex.xml.annotation.XMLClassname;
 import java.util.Timer;
 
 /**
- * 
+ *  Automatically reinvokes send method in intervals
+ *  determined by the delay (in state).
+ *  
+ *  Subclasses should override send to perform
+ *  specific actions.
  */
-public class SendHandler
+public abstract class SendHandler
 {
+	//-------- attributes --------
+	
 	/** The agent. */
 	protected DiscoveryState state;
 
@@ -26,6 +32,8 @@ public class SendHandler
 	/** The current send id. */
 	protected String sendid;
 	
+	//-------- constructors --------
+	
 	/**
 	 *  Create a new lease time handling object.
 	 */
@@ -35,6 +43,8 @@ public class SendHandler
 		this.root = state.getExternalAccess().getComponentIdentifier().getRoot();
 		startSendBehavior();
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Start sending awareness infos.
@@ -87,7 +97,5 @@ public class SendHandler
 	/**
 	 *  Method to send messages.
 	 */
-	public void send(AwarenessInfo info)
-	{
-	}
+	public abstract void send(AwarenessInfo info);
 }

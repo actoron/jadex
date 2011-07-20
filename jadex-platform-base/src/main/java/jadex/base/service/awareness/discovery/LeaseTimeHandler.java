@@ -1,11 +1,9 @@
 package jadex.base.service.awareness.discovery;
 
 import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.xml.annotation.XMLClassname;
 
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -15,10 +13,19 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * 
+ *  Used to a list of entries that is automatically
+ *  removed in case no updates are received via
+ *  addOrUpdate method.
+ *  
+ *  Subclasses may override
+ *  entryDeleted(DiscoveryEntry entry)
+ *  to perform actions whenever an etry
+ *  was deleted.
  */
 public class LeaseTimeHandler
 {
+	//-------- attributes --------
+	
 	/** The state. */
 	protected DiscoveryState state;
 	
@@ -27,15 +34,31 @@ public class LeaseTimeHandler
 	
 	/** The timer. */
 	protected Timer	timer;
+	
+	/** The timeout factor. */
+	protected double factor;
 
+	//-------- constructors --------
+	
 	/**
 	 *  Create a new lease time handling object.
 	 */
 	public LeaseTimeHandler(DiscoveryState state)
 	{
+		this(state, 2.2);
+	}
+	
+	/**
+	 *  Create a new lease time handling object.
+	 */
+	public LeaseTimeHandler(DiscoveryState state, double factor)
+	{
 		this.state = state;
+		this.factor = factor;
 		startRemoveBehavior();
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Add a new entry or update an existing entry.
@@ -88,8 +111,8 @@ public class LeaseTimeHandler
 						for(Iterator it=entries.values().iterator(); it.hasNext(); )
 						{
 							DiscoveryEntry entry = (DiscoveryEntry)it.next();
-							// five seconds buffer
-							if(time>entry.getTime()+entry.getDelay()*3.2) // Have some time buffer before delete
+							 // Have some time buffer before delete
+							if(time>entry.getTime()+entry.getDelay()*factor)
 							{
 //								System.out.println("Removing: "+entry);
 								it.remove();

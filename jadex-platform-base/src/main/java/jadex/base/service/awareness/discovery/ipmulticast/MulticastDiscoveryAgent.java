@@ -3,7 +3,6 @@ package jadex.base.service.awareness.discovery.ipmulticast;
 import jadex.base.service.awareness.AwarenessInfo;
 import jadex.base.service.awareness.discovery.DiscoveryState;
 import jadex.base.service.awareness.discovery.IDiscoveryService;
-import jadex.base.service.awareness.discovery.SDiscovery;
 import jadex.base.service.awareness.discovery.SendHandler;
 import jadex.base.service.awareness.management.IManagementService;
 import jadex.bridge.IComponentIdentifier;
@@ -409,7 +408,7 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	{
 		byte[] data = new byte[pack.getLength()];
 		System.arraycopy(pack.getData(), 0, data, 0, pack.getLength());
-		Object obj = SDiscovery.decodeObject(data, getModel().getClassLoader());
+		Object obj = DiscoveryState.decodeObject(data, getModel().getClassLoader());
 //		Object obj = decodePacket(pack);
 
 		if(obj instanceof AwarenessInfo)
@@ -476,7 +475,7 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		{
 			try
 			{
-				byte[] data = SDiscovery.encodeObject(info, getModel().getClassLoader());
+				byte[] data = DiscoveryState.encodeObject(info, getModel().getClassLoader());
 				DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
 				sendsocket.send(packet);
 //				System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");

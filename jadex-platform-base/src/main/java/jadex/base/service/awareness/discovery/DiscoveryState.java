@@ -1,17 +1,23 @@
 package jadex.base.service.awareness.discovery;
 
+import jadex.base.service.message.transport.codecs.GZIPCodec;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 
+import java.net.DatagramPacket;
 import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * 
+ *  State for discovery agents.
  */
 public class DiscoveryState
 {
+	//-------- attributes --------
+	
 	/** The external access. */
 	protected IExternalAccess access;
 	
@@ -39,13 +45,17 @@ public class DiscoveryState
 	/** The root component id. */
 	protected IComponentIdentifier root;
 
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new state.
 	 */
 	public DiscoveryState(IExternalAccess access)
 	{
 		this.access = access;
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Get the includes.
@@ -225,5 +235,41 @@ public class DiscoveryState
 				access.scheduleStep(step);
 			}
 		}, delay);
+	}
+	
+	/**
+	 *  Encode an object.
+	 *  @param object The object.
+	 *  @return The byte array.
+	 */
+	public static byte[] encodeObject(Object object, ClassLoader classloader)
+	{
+		return GZIPCodec.encodeBytes(JavaWriter.objectToByteArray(object, 
+			classloader), classloader);
+	}
+	
+	/**
+	 *  Decode an object.
+	 *  @param data The byte array.
+	 *  @return The object.
+	 */
+	public static Object decodeObject(byte[] data, ClassLoader classloader)
+	{
+		return JavaReader.objectFromByteArray(GZIPCodec.decodeBytes(data, 
+			classloader), classloader);
+//		return Reader.objectFromByteArray(reader, GZIPCodec.decodeBytes(data, 
+//			classloader), classloader);
+	}
+	
+	/**
+	 *  Decode a datagram packet.
+	 *  @param data The byte array.
+	 *  @return The object.
+	 */
+	public static Object decodePacket(DatagramPacket pack, ClassLoader classloader)
+	{
+		byte[] data = new byte[pack.getLength()];
+		System.arraycopy(pack.getData(), 0, data, 0, pack.getLength());
+		return decodeObject(data, classloader);
 	}
 }

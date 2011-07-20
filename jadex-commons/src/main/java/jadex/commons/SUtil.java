@@ -13,8 +13,12 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.InterfaceAddress;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
+import java.net.NetworkInterface;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -1750,6 +1754,80 @@ public class SUtil
 		{
 			((ListenableStream)((AccessiblePrintStream)System.err).out).removeLineListener(listener);
 		}
+	}
+	
+	/**
+	 *  Get a IPV4 address of the local host.
+	 *  Ignores loopback address and V6 addresses.
+	 *  @return First found IPV4 address.
+	 */
+	public static InetAddress getInet4Address()
+	{
+		InetAddress ret = null;
+		
+		try
+		{
+			Enumeration e = NetworkInterface.getNetworkInterfaces();
+			while(e.hasMoreElements() && ret==null)
+			{
+				NetworkInterface ni = (NetworkInterface)e.nextElement();
+				Enumeration e2 = ni.getInetAddresses();
+				while(e2.hasMoreElements() && ret==null)
+				{
+					InetAddress tmp = (InetAddress)e2.nextElement();
+					if(tmp instanceof Inet4Address && !tmp.isLoopbackAddress())
+						ret = (InetAddress)tmp;
+				}
+			}
+			
+			if(ret==null)
+			{
+				InetAddress tmp = InetAddress.getLocalHost();
+				if(tmp instanceof Inet4Address && !tmp.isLoopbackAddress())
+					ret = (InetAddress)tmp;
+			}
+		}
+		catch(Exception e)
+		{
+//			e.printStackTrace();
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the network prefix length for IPV4 address
+	 *  24=C, 16=B, 8=A classes. 
+	 *  Returns -1 in case of V6 address.
+	 *  @param iadr The address.
+	 *  @return The length of the prefix.
+	 */
+	public static short getNetworkPrefixLength(InetAddress iadr)
+	{
+		short ret = -1;
+		/* $if !android $ */
+		try
+		{
+			NetworkInterface ni = NetworkInterface.getByInetAddress(iadr);
+			List iads = ni.getInterfaceAddresses();
+			if(iads!=null)
+			{
+				for(int i=0; i<iads.size() && ret==-1; i++)
+				{
+					InterfaceAddress ia = (InterfaceAddress)iads.get(i);
+					if(ia.getAddress() instanceof Inet4Address)
+						ret = ia.getNetworkPrefixLength();
+				}
+			}
+			
+		}
+		catch(Exception e)
+		{
+//			e.printStackTrace();
+		}
+		/* $endif $ */
+		
+		return ret;
 	}
 	
 	/**

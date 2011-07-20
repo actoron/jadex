@@ -3,10 +3,12 @@ package jadex.base.service.awareness.discovery;
 import jadex.bridge.IComponentIdentifier;
 
 /**
- * 
+ *  Simple data struct for saving discovery info.
  */
 public class DiscoveryEntry
 {	
+	//-------- attributes --------
+	
 	/** The component identifier of the remote component. */
 	public IComponentIdentifier cid;
 
@@ -22,6 +24,8 @@ public class DiscoveryEntry
 	/** Is master. */
 	public boolean master;
 	
+	//-------- constructors --------
+	
 	/**
 	 *  Create an entry.
 	 */
@@ -33,6 +37,8 @@ public class DiscoveryEntry
 		this.entry = entry;
 		this.master = master;
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Get the time.

@@ -6,7 +6,6 @@ import jadex.base.service.awareness.discovery.DiscoveryState;
 import jadex.base.service.awareness.discovery.IDiscoveryService;
 import jadex.base.service.awareness.discovery.LeaseTimeHandler;
 import jadex.base.service.awareness.discovery.MasterInfo;
-import jadex.base.service.awareness.discovery.SDiscovery;
 import jadex.base.service.awareness.discovery.SendHandler;
 import jadex.base.service.awareness.discovery.SlaveInfo;
 import jadex.base.service.awareness.management.IManagementService;
@@ -291,7 +290,7 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 	{
 		try
 		{
-			byte[] data = SDiscovery.encodeObject(info, getModel().getClassLoader());
+			byte[] data = DiscoveryState.encodeObject(info, getModel().getClassLoader());
 			
 			int maxsend = sendchannel.socket().getSendBufferSize()/data.length;
 			int sent = 0;
@@ -394,11 +393,11 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 		int ret = 0;
 		try
 		{
-			InetAddress iadr = SDiscovery.getInet4Address();
-			short sublen = SDiscovery.getNetworkPrefixLength(iadr);
+			InetAddress iadr = SUtil.getInet4Address();
+			short sublen = SUtil.getNetworkPrefixLength(iadr);
 			if(sublen==-1) // Guess C class if nothing can be determined.
 				sublen = 24;
-			byte[] byinet = SDiscovery.getInet4Address().getAddress();
+			byte[] byinet = SUtil.getInet4Address().getAddress();
 			int hostbits = 32-sublen;
 			int numips = (int)Math.pow(2, hostbits);
 			
@@ -436,7 +435,7 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 	 */
 	protected void sendToLocal(byte[] data, int port)
 	{
-		InetAddress address = SDiscovery.getInet4Address();
+		InetAddress address = SUtil.getInet4Address();
 		send(data, address, port);
 	}
 	
@@ -568,11 +567,11 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 						// open another local socket at an arbitrary port
 						// and send this port to the master.
 						receivesocket = new DatagramSocket();
-						InetAddress address = SDiscovery.getInet4Address();
+						InetAddress address = SUtil.getInet4Address();
 						AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, state.getDelay(), 
 							state.getIncludes(), state.getExcludes());
 						SlaveInfo si = new SlaveInfo(info);
-						byte[] data = SDiscovery.encodeObject(si, getModel().getClassLoader());
+						byte[] data = DiscoveryState.encodeObject(si, getModel().getClassLoader());
 						DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
 						receivesocket.send(packet);
 	
@@ -598,7 +597,7 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 	{
 		byte[] data = new byte[pack.getLength()];
 		System.arraycopy(pack.getData(), 0, data, 0, pack.getLength());
-		Object obj = SDiscovery.decodeObject(data, getModel().getClassLoader());
+		Object obj = DiscoveryState.decodeObject(data, getModel().getClassLoader());
 		AwarenessInfo info = obj instanceof AwarenessInfo? (AwarenessInfo)obj:
 			obj instanceof SlaveInfo? ((SlaveInfo)obj).getAwarenessInfo(): 
 			obj instanceof MasterInfo? ((MasterInfo)obj).getAwarenessInfo(): null;
@@ -628,7 +627,7 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 				state.getClockTime(), si.getAwarenessInfo().getDelay(), new Integer(pack.getPort()), false));
 			AwarenessInfo myinfo = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, state.getDelay(), state.getIncludes(), state.getExcludes());
 			MasterInfo mi = new MasterInfo(myinfo);
-			byte[] mydata = SDiscovery.encodeObject(mi, getModel().getClassLoader());
+			byte[] mydata = DiscoveryState.encodeObject(mi, getModel().getClassLoader());
 			sendToLocal(mydata, pack.getPort());
 //			System.out.println("received slave info: "+getComponentIdentifier().getLocalName()+" "+si.getAwarenessInfo().getSender());
 		}
@@ -706,7 +705,7 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 		{
 			try
 			{
-				byte[] data = SDiscovery.encodeObject(info, getModel().getClassLoader());
+				byte[] data = DiscoveryState.encodeObject(info, getModel().getClassLoader());
 				
 				int maxsend = sendchannel.socket().getSendBufferSize()/data.length;
 				int sent = 0;
