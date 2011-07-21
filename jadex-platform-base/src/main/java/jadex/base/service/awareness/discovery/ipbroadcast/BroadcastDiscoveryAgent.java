@@ -91,11 +91,8 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	/** The receiver port. */
 	protected int port;
 		
-	/** The socket to send. */
-	protected DatagramSocket sendsocket;		
-	
-	/** The socket to receive. */
-	protected DatagramSocket receivesocket;
+	/** The socket. */
+	protected DatagramSocket socket;
 		
 	/** The root component id. */
 	protected IComponentIdentifier root;
@@ -110,33 +107,31 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	 */
 	public IFuture	agentCreated()
 	{
-		Future ret = new Future();
-		
 		this.state = new DiscoveryState(getExternalAccess());
 		initArguments();
 		
-		try
-		{
-			this.sendsocket = new DatagramSocket();
-			sendsocket.setBroadcast(true);
-					
-//			this.reader	= JavaReader.getReader(new XMLReporter()
-//			{
-//				public void report(String message, String type, Object related, Location location) throws XMLStreamException
-//				{
-//					// Ignore XML exceptions.
-////					getLogger().warning(message);
-//				}
-//			});
-			
-			ret.setResult(null);
-		}
-		catch(IOException e)
-		{
-			ret.setException(new RuntimeException(e));
-		}
+//		try
+//		{
+//			this.sendsocket = new DatagramSocket();
+//			sendsocket.setBroadcast(true);
+//					
+////			this.reader	= JavaReader.getReader(new XMLReporter()
+////			{
+////				public void report(String message, String type, Object related, Location location) throws XMLStreamException
+////				{
+////					// Ignore XML exceptions.
+//////					getLogger().warning(message);
+////				}
+////			});
+//			
+//			ret.setResult(null);
+//		}
+//		catch(IOException e)
+//		{
+//			ret.setException(new RuntimeException(e));
+//		}
 		
-		return ret;
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -205,9 +200,9 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 					{
 						synchronized(BroadcastDiscoveryAgent.this)
 						{
-							receivesocket.close();
-							receivesocket = null;
-							getReceiveSocket();
+							socket.close();
+							socket = null;
+							getSocket();
 						}
 					}
 					catch (Exception e) 
@@ -245,7 +240,8 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	{
 		state.setKilled(true);
 		
-		if(sendsocket!=null)
+		DatagramSocket socket = getSocket();
+		if(socket!=null)
 		{
 			sender.send(new AwarenessInfo(root, AwarenessInfo.STATE_OFFLINE, state.getDelay()));
 		}
@@ -253,21 +249,11 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 //		System.out.println("killed set to true: "+getComponentIdentifier());
 		synchronized(BroadcastDiscoveryAgent.this)
 		{
-			if(sendsocket!=null)
+			if(socket!=null)
 			{
 				try
 				{
-					sendsocket.close();
-				}
-				catch(Exception e)
-				{
-				}
-			}
-			if(receivesocket!=null)
-			{
-				try
-				{
-					receivesocket.close();
+					socket.close();
 				}
 				catch(Exception e)
 				{
@@ -290,20 +276,42 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			// http://serverfault.com/questions/72112/how-to-alter-the-global-broadcast-address-255-255-255-255-behavior-on-windows
 			// Directed broadcast address = !netmask | IP
 	//		InetAddress address = InetAddress.getByAddress(new byte[]{(byte)255, (byte)255, (byte)255, (byte)255,});
-			InetAddress iadr = SUtil.getInet4Address();
-			short sublen = SUtil.getNetworkPrefixLength(iadr);
-			if(sublen==-1) // Guess C class if nothing can be determined.
-				sublen = 24;
-			byte[] byinet = iadr.getAddress();
-			int hostbits = 32-sublen;
-			int mask = (int)Math.pow(2, hostbits)-1;
-			int iinet = SUtil.bytesToInt(byinet);
-			int badr = iinet | mask;
-			InetAddress address = InetAddress.getByAddress(SUtil.intToBytes(badr));
-			sendsocket.send(new DatagramPacket(data, data.length, address, port));
+			
+			InetAddress address = SUtil.getInet4Address();
+			short prefixlen = SUtil.getNetworkPrefixLength(address);
+			if(prefixlen==-1) // Guess C class if nothing can be determined.
+				prefixlen = 24;
+			
+			getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)24), port));
+			getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)16), port));
+			getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)8), port));
+			
+			if(prefixlen!=-1 && prefixlen!=24 && prefixlen!=16 && prefixlen!=8)
+				getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, prefixlen), port));
 		}
 		catch(Exception e)
 		{
+		}
+	}
+	
+	/**
+	 *  Create broadcast address according to prefix length.
+	 */
+	protected InetAddress createBroadcastAddress(InetAddress address, short prefixlen)
+	{
+		try
+		{
+//			InetAddress iadr = SUtil.getInet4Address();
+			byte[] byinet = address.getAddress();
+			int hostbits = 32-prefixlen;
+			int mask = (int)Math.pow(2, hostbits)-1;
+			int iinet = SUtil.bytesToInt(byinet);
+			int badr = iinet | mask;
+			return InetAddress.getByAddress(SUtil.intToBytes(badr));
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -331,7 +339,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		{
 			InetAddress address = SUtil.getInet4Address();
 			DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
-			sendsocket.send(packet);
+			getSocket().send(packet);
 		}
 		catch(IOException e)
 		{
@@ -361,48 +369,40 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 						// todo: max ip datagram length (is there a better way to determine length?)
 						byte buf[] = new byte[65535];
 						
-						// Init receive socket
-						getReceiveSocket();
-						ret.setResultIfUndone(null);
-						
-						while(!state.isKilled())
+						try
 						{
-							try
-							{
-								final DatagramPacket pack = new DatagramPacket(buf, buf.length);
-								getReceiveSocket().receive(pack);
-								scheduleStep(new IComponentStep()
-								{
-									public Object execute(IInternalAccess ia)
-									{
-										handleReceivedPacket(pack);
-										return null;
-									}
-								});
-//								System.out.println("received: "+getComponentIdentifier());
-							}
-							catch(Exception e)
-							{
-								// Can happen if is slave and master goes down.
-								// In that case it tries to find new master.
-//								getLogger().warning("Receiving awareness info error: "+e);
-								ret.setExceptionIfUndone(e);
-							}
-						}
+							// Init receive socket
+							getSocket();
+							ret.setResultIfUndone(null);
 						
-						synchronized(BroadcastDiscoveryAgent.this)
-						{
-							if(receivesocket!=null)
+							while(!state.isKilled())
 							{
 								try
 								{
-									receivesocket.close();
+									final DatagramPacket pack = new DatagramPacket(buf, buf.length);
+									getSocket().receive(pack);
+									scheduleStep(new IComponentStep()
+									{
+										public Object execute(IInternalAccess ia)
+										{
+											handleReceivedPacket(pack);
+											return null;
+										}
+									});
+	//								System.out.println("received: "+getComponentIdentifier());
 								}
 								catch(Exception e)
 								{
-//									getLogger().warning("Receiving socket closing error: "+e);
+									// Can happen if is slave and master goes down.
+									// In that case it tries to find new master.
+	//								getLogger().warning("Receiving awareness info error: "+e);
+									ret.setExceptionIfUndone(e);
 								}
 							}
+						}
+						catch(Exception e) 
+						{
+							ret.setExceptionIfUndone(e);
 						}
 //						System.out.println("comp and receiver terminated: "+getComponentIdentifier());
 					}
@@ -426,15 +426,16 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	 *  Note, this method has to be synchronized.
 	 *  Is called from receiver as well as component thread.
 	 */
-	protected synchronized DatagramSocket getReceiveSocket()
+	protected synchronized DatagramSocket getSocket()
 	{
 		if(!state.isKilled())
 		{
-			if(receivesocket==null)
+			if(socket==null)
 			{
 				try
 				{
-					receivesocket = new DatagramSocket(port);
+					socket = new DatagramSocket(port);
+					socket.setBroadcast(true);
 //					System.out.println("local master at: "+SDiscovery.getInet4Address()+" "+port);
 				}
 				catch(Exception e)
@@ -444,13 +445,14 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 						// In case the receiversocket cannot be opened
 						// open another local socket at an arbitrary port
 						// and send this port to the master.
-						receivesocket = new DatagramSocket();
+						socket = new DatagramSocket();
+						socket.setBroadcast(true);
 						InetAddress address = SUtil.getInet4Address();
 						AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, state.getDelay(), state.getIncludes(), state.getExcludes());
 						SlaveInfo si = new SlaveInfo(info);
 						byte[] data = DiscoveryState.encodeObject(si, getModel().getClassLoader());
 						DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
-						receivesocket.send(packet);
+						socket.send(packet);
 //						System.out.println("local slave at: "+SDiscovery.getInet4Address()+" "+receivesocket.getLocalPort());
 						
 //						getLogger().warning("Running in local mode: "+e);
@@ -464,7 +466,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			}
 		}
 		
-		return receivesocket;
+		return socket;
 	}
 	
 	/**

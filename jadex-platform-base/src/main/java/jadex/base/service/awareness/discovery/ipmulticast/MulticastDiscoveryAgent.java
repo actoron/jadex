@@ -88,11 +88,8 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	/** The receiver port. */
 	protected int port;
 	
-	/** The socket to send. */
-	protected MulticastSocket sendsocket;
-
-	/** The socket to send. */
-	protected MulticastSocket receivesocket;
+	/** The socket to send/receive. */
+	protected MulticastSocket socket;
 
 	/** The root component id. */
 	protected IComponentIdentifier root;
@@ -114,15 +111,15 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		
 		initArguments();
 		
-		try
-		{
-			this.sendsocket = new MulticastSocket();
-			this.sendsocket.setLoopbackMode(true);
-		}
-		catch(IOException e)
-		{
-			throw new RuntimeException(e);
-		}
+//		try
+//		{
+//			this.sendsocket = new MulticastSocket();
+//			this.sendsocket.setLoopbackMode(true);
+//		}
+//		catch(IOException e)
+//		{
+//			throw new RuntimeException(e);
+//		}
 //		this.reader	= JavaReader.getReader(new XMLReporter()
 //		{
 //			public void report(String message, String type, Object related, Location location) throws XMLStreamException
@@ -190,7 +187,8 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	{
 		state.setKilled(true);
 		
-		if(sendsocket!=null)
+		MulticastSocket socket = getSocket();
+		if(socket!=null)
 		{
 			sender.send(new AwarenessInfo(root, AwarenessInfo.STATE_OFFLINE, state.getDelay()));
 		}
@@ -198,23 +196,16 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 //		System.out.println("killed set to true: "+getComponentIdentifier());
 		synchronized(MulticastDiscoveryAgent.this)
 		{
-			if(sendsocket!=null)
-			{
-				sendsocket.close();
-			}
-			if(receivesocket!=null)
+			if(socket!=null)
 			{
 				try
 				{
-					receivesocket.leaveGroup(address);
+					socket.leaveGroup(address);
 				}
 				catch(Exception e)
 				{
 				}
-				finally
-				{
-					receivesocket.close();
-				}
+				socket.close();
 			}
 		}
 		
@@ -243,7 +234,7 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	 *  Get the address.
 	 *  @return the address.
 	 */
-	public synchronized Object[] getAddressInfo()
+	public Object[] getAddressInfo()
 	{
 		return new Object[]{address, new Integer(port)};
 	}
@@ -252,7 +243,7 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	 *  Set the address.
 	 *  @param address The address to set.
 	 */
-	public synchronized void setAddressInfo(InetAddress address, int port)
+	public void setAddressInfo(InetAddress address, int port)
 	{
 //		System.out.println("setAddress: "+address+" "+port);
 		this.address = address;
@@ -263,7 +254,7 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	 *  Set the delay.
 	 *  @param delay The delay to set.
 	 */
-	public synchronized void setDelay(long delay)
+	public void setDelay(long delay)
 	{
 //		System.out.println("setDelay: "+delay+" "+getComponentIdentifier());
 //		if(this.delay>=0 && delay>0)
@@ -297,51 +288,41 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 						// todo: max ip datagram length (is there a better way to determine length?)
 						byte buf[] = new byte[65535];
 						
-//						InetAddress myaddress = null;
-						
-						// Init receive socket
-						getReceiveSocket();
-						ret.setResultIfUndone(null);
-						
-						while(!state.isKilled())
+						try
 						{
-							try
-							{
-								final DatagramPacket pack = new DatagramPacket(buf, buf.length);
-								getReceiveSocket().receive(pack);
-//								System.out.println("received: "+getComponentIdentifier());
-								
-								scheduleStep(new IComponentStep()
-								{
-									public Object execute(IInternalAccess ia) 
-									{
-										handleReceivedPacket(pack);
-										return null;
-									};
-								});
-							}
-							catch(Exception e)
-							{
-//								getLogger().warning("Receiving awareness info error: "+e);
-								ret.setExceptionIfUndone(e);
-							}
-						}
-						
-						synchronized(MulticastDiscoveryAgent.this)
-						{
-							if(receivesocket!=null)
+							// Init receive socket
+							getSocket();
+							ret.setResultIfUndone(null);
+							
+							while(!state.isKilled())
 							{
 								try
 								{
-									receivesocket.leaveGroup(address);
-									receivesocket.close();
+									final DatagramPacket pack = new DatagramPacket(buf, buf.length);
+									getSocket().receive(pack);
+//									System.out.println("received: "+getComponentIdentifier());
+									
+									scheduleStep(new IComponentStep()
+									{
+										public Object execute(IInternalAccess ia) 
+										{
+											handleReceivedPacket(pack);
+											return null;
+										};
+									});
 								}
 								catch(Exception e)
 								{
-//									getLogger().warning("Receiving socket closing error: "+e);
+	//								getLogger().warning("Receiving awareness info error: "+e);
+									ret.setExceptionIfUndone(e);
 								}
 							}
 						}
+						catch(Exception e)
+						{
+							ret.setExceptionIfUndone(e);
+						}
+						
 //						System.out.println("comp and receiver terminated: "+getComponentIdentifier());
 					}
 				});
@@ -359,9 +340,9 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	}
 	
 	/**
-	 *  Get or create a receiver socket.
+	 *  Get or create a socket.
 	 */
-	protected synchronized DatagramSocket getReceiveSocket()
+	protected synchronized MulticastSocket getSocket()
 	{
 		if(!state.isKilled())
 		{
@@ -369,36 +350,38 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			InetAddress curaddress = (InetAddress)ai[0];
 			int curport = ((Integer)ai[1]).intValue();
 			
-			if(receivesocket!=null && (receivesocket.getPort()!=curport || !SUtil.equals(curaddress, myaddress)))
+			if(socket!=null && (socket.getLocalPort()!=curport || !SUtil.equals(curaddress, myaddress)))
 			{
 				try
 				{
-					receivesocket.leaveGroup(myaddress);
-					receivesocket.close();
+					socket.leaveGroup(myaddress);
+					socket.close();
 				}
 				catch(Exception e)
 				{
 				}
-				receivesocket = null;
+				socket = null;
 			}
-			if(receivesocket==null)
+			if(socket==null)
 			{
 				try
 				{
-					receivesocket = new MulticastSocket(curport);
-					receivesocket.joinGroup(curaddress);
+					socket = new MulticastSocket(curport);
+					// Does not receive messages on same host if disabled.
+//					socket.setLoopbackMode(true);
+					socket.joinGroup(curaddress);
 					myaddress = curaddress;
 				}
 				catch(Exception e)
 				{
-					receivesocket	= null;
+					socket	= null;
 					getLogger().warning("Awareness error when joining mutlicast group: "+e);
 					throw new RuntimeException(e);
 				}
 			}
 		}
 		
-		return receivesocket;
+		return socket;
 	}
 	
 	/**
@@ -420,7 +403,7 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 				if(info.getSender().equals(root))
 					received_self	= true;
 				
-	//			System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
+//				System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
 				
 				getRequiredService("management").addResultListener(new DefaultResultListener()
 				{
@@ -477,8 +460,8 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			{
 				byte[] data = DiscoveryState.encodeObject(info, getModel().getClassLoader());
 				DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
-				sendsocket.send(packet);
-//				System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");
+				getSocket().send(packet);
+//				System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)"+" "+port+" "+address);
 			}
 			catch(Exception e)
 			{

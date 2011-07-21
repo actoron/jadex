@@ -269,33 +269,40 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 						// todo: max ip datagram length (is there a better way to determine length?)
 						byte buf[] = new byte[65535];
 						
-						// Init receive socket
-						getSocket();
-						ret.setResultIfUndone(null);
-						
-						while(!state.isKilled())
+						try
 						{
-							try
+							// Init receive socket
+							getSocket();
+							ret.setResultIfUndone(null);
+							
+							while(!state.isKilled())
 							{
-								final DatagramPacket pack = new DatagramPacket(buf, buf.length);
-								getSocket().receive(pack);
-								scheduleStep(new IComponentStep()
+								try
 								{
-									public Object execute(IInternalAccess ia)
+									final DatagramPacket pack = new DatagramPacket(buf, buf.length);
+									getSocket().receive(pack);
+									scheduleStep(new IComponentStep()
 									{
-										handleReceivedPacket(pack);
-										return null;
-									}
-								});
-//								System.out.println("received: "+getComponentIdentifier());
+										public Object execute(IInternalAccess ia)
+										{
+											handleReceivedPacket(pack);
+											return null;
+										}
+									});
+//									System.out.println("received: "+getComponentIdentifier());
+								}
+								catch(Exception e)
+								{
+									// Can happen if is slave and master goes down.
+									// In that case it tries to find new master.
+//									getLogger().warning("Receiving awareness info error: "+e);
+									ret.setExceptionIfUndone(e);
+								}
 							}
-							catch(Exception e)
-							{
-								// Can happen if is slave and master goes down.
-								// In that case it tries to find new master.
-//								getLogger().warning("Receiving awareness info error: "+e);
-								ret.setExceptionIfUndone(e);
-							}
+						}
+						catch(Exception e) 
+						{
+							ret.setException(e);
 						}
 						
 //						System.out.println("comp and receiver terminated: "+getComponentIdentifier());
@@ -444,11 +451,17 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 	public boolean isRegistry(InetAddress address, int port)
 	{
 		boolean ret = false;
-		DatagramSocket s = getSocket();
-		if(s!=null)
+		try
 		{
-//			System.out.println("a: "+s.getLocalPort()+" "+port+" "+address+" "+SUtil.getInet4Address());
-			ret = s.getLocalPort()== port && address.equals(SUtil.getInet4Address()); 
+			DatagramSocket s = getSocket();
+			if(s!=null)
+			{
+	//			System.out.println("a: "+s.getLocalPort()+" "+port+" "+address+" "+SUtil.getInet4Address());
+				ret = s.getLocalPort()== port && address.equals(SUtil.getInet4Address()); 
+			}
+		}
+		catch(Exception e) 
+		{
 		}
 		return ret;
 //		return registry;
