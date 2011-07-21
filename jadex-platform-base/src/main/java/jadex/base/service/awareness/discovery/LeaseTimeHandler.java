@@ -74,6 +74,7 @@ public class LeaseTimeHandler
 		if(oldentry!=null)
 		{
 			oldentry.setInfo(entry.getInfo());
+			oldentry.setTime(getClockTime());
 		}
 		else
 		{

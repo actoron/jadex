@@ -36,7 +36,11 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 
 /* $if !android $ */
 import javax.xml.stream.Location;
@@ -100,7 +104,7 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 	protected IComponentIdentifier root;
 	
 	/** Flag if is registry. */
-	protected boolean registry;
+//	protected boolean registry;
 	
 	//-------- methods --------
 	
@@ -183,8 +187,20 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 			{
 				System.out.println("Entry deleted: "+entry.getInfo().getSender());
 				
-				// todo: make myself to registry when disappeared from same ip
-				// and not already registry
+				Object[] tmp = (Object[])entry.getEntry();
+				if(isRegistry((InetAddress)tmp[0], ((Integer)tmp[1]).intValue()))
+				{
+					try
+					{
+						if(socket!=null)
+							socket.close();
+					}
+					catch(Exception e)
+					{
+					}
+					socket = null;
+					getSocket();
+				}
 			}
 		};
 		
@@ -325,7 +341,7 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 					{
 						// First one on dest ip becomes registry.
 						socket = new DatagramSocket(port);
-						registry = true;
+//						registry = true;
 						System.out.println("registry: "+getComponentIdentifier());
 //						System.out.println("local master at: "+SDiscovery.getInet4Address()+" "+port);
 					}
@@ -427,7 +443,23 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 	 */
 	public boolean isRegistry()
 	{
-		return registry;
+		return isRegistry(address, port);
+	}
+	
+	/**
+	 *  Get the registry.
+	 *  @return the registry.
+	 */
+	public boolean isRegistry(InetAddress address, int port)
+	{
+		boolean ret = false;
+		DatagramSocket s = getSocket();
+		if(s!=null)
+		{
+			ret = s.getPort()== port && address.equals(SUtil.getInet4Address()); 
+		}
+		return ret;
+//		return registry;
 	}
 
 	/**
