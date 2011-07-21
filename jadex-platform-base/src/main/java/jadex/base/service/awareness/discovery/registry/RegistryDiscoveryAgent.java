@@ -32,15 +32,10 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.xml.annotation.XMLClassname;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
 
 /* $if !android $ */
 import javax.xml.stream.Location;
@@ -102,9 +97,6 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 	
 	/** The root component id. */
 	protected IComponentIdentifier root;
-	
-	/** Flag if is registry. */
-//	protected boolean registry;
 	
 	//-------- methods --------
 	
@@ -334,15 +326,14 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 		{
 			if(socket==null)
 			{
-				// Try to become master
+				// Try to become registry
 				if(address.equals(SUtil.getInet4Address()))
 				{
 					try
 					{
 						// First one on dest ip becomes registry.
 						socket = new DatagramSocket(port);
-//						registry = true;
-						System.out.println("registry: "+getComponentIdentifier());
+//						System.out.println("registry: "+getComponentIdentifier());
 //						System.out.println("local master at: "+SDiscovery.getInet4Address()+" "+port);
 					}
 					catch(Exception e)
@@ -382,7 +373,7 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 		Object obj = DiscoveryState.decodeObject(data, getModel().getClassLoader());
 		AwarenessInfo info = obj instanceof AwarenessInfo? (AwarenessInfo)obj: null;
 		
-		System.out.println("received: "+obj+" "+pack.getAddress()+" "+pack.getPort());
+//		System.out.println("received: "+obj+" "+pack.getAddress()+" "+pack.getPort());
 		
 		if(info!=null && info.getSender()!=null)
 		{
@@ -471,7 +462,7 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 		try
 		{
 			getSocket().send(new DatagramPacket(data, data.length, address, port));
-			System.out.println("sent to registry");
+//			System.out.println("sent to registry");
 		}
 		catch(Exception e)
 		{
@@ -491,11 +482,10 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 			for(int i=0; i<rems.length; i++)
 			{
 				Object[] tmp = (Object[])rems[i].getEntry();
-				System.out.println("to: "+tmp[0]+" "+tmp[1]);
+//				System.out.println("to: "+tmp[0]+" "+tmp[1]);
 				getSocket().send(new DatagramPacket(data, data.length, (InetAddress)tmp[0], ((Integer)tmp[1]).intValue()));
 			}
-			
-			System.out.println("sent to knwons: "+rems.length);
+//			System.out.println("sent to knwons: "+rems.length);
 		}
 		catch(Exception e)
 		{

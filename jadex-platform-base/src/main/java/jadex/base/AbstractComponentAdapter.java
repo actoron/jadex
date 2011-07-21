@@ -218,7 +218,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			// http://bugs.sun.com/view_bug.do;jsessionid=bbdb212815ddc52fcd1384b468b?bug_id=4811930
 			
 			// Todo: include parent name for nested loggers.
-			String name = getComponentIdentifier().getLocalName();
+//			String name = getComponentIdentifier().getLocalName();
+			String name = getModel().getFullName()+"."+getComponentIdentifier().getLocalName();
+//			System.out.println("logname: "+name);
 			logger = LogManager.getLogManager().getLogger(name);
 			
 			// if logger does not already exists, create it
@@ -259,6 +261,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //		Level level = prop==null? Level.INFO: (Level)prop;
 		Level level = prop==null? Level.WARNING: (Level)prop;
 		logger.setLevel(level);
+		
+//		System.out.println("set: "+logger.getName()+" "+level);
 
 		// if logger should use Handlers of parent (global) logger
 		// the global logger has a ConsoleHandler(Level:INFO) by default

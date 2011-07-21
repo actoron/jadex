@@ -166,7 +166,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		this.ccs = SCollection.createLinkedHashMap();
 		this.cfs = SCollection.createLinkedHashMap();
 //		this.children	= SCollection.createMultiCollection();
-		this.logger = Logger.getLogger(exta.getServiceProvider().getId()+".cms");
+		this.logger = Logger.getLogger(exta.getModel().getFullName()+"."+exta.getServiceProvider().getId()+".cms");
 		this.listeners = SCollection.createMultiCollection();
 		this.killresultlisteners = Collections.synchronizedMap(SCollection.createHashMap());
 //		this.initfutures = Collections.synchronizedMap(SCollection.createHashMap());
