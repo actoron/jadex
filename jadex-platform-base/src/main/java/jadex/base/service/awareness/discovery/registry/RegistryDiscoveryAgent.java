@@ -456,7 +456,8 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 		DatagramSocket s = getSocket();
 		if(s!=null)
 		{
-			ret = s.getPort()== port && address.equals(SUtil.getInet4Address()); 
+//			System.out.println("a: "+s.getLocalPort()+" "+port+" "+address+" "+SUtil.getInet4Address());
+			ret = s.getLocalPort()== port && address.equals(SUtil.getInet4Address()); 
 		}
 		return ret;
 //		return registry;
