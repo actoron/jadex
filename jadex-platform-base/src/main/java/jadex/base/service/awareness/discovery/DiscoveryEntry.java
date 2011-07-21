@@ -1,5 +1,6 @@
 package jadex.base.service.awareness.discovery;
 
+import jadex.base.service.awareness.AwarenessInfo;
 import jadex.bridge.IComponentIdentifier;
 
 /**
@@ -9,40 +10,55 @@ public class DiscoveryEntry
 {	
 	//-------- attributes --------
 	
-	/** The component identifier of the remote component. */
-	public IComponentIdentifier cid;
-
-	/** Time when last awareness info was received. */
-	public long time;
-
-	/** The current send delay time. */
-	public long delay;
+	/** The awareness info. */
+	protected AwarenessInfo info;
+	
+	/** The time. */
+	protected long time;
 	
 	/** The entry. */
-	public Object entry;
+	protected Object entry;
 	
 	/** Is master. */
-	public boolean master;
+	protected boolean master;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create an entry.
 	 */
-	public DiscoveryEntry(IComponentIdentifier cid, long time, long delay, Object entry, boolean master)
+	public DiscoveryEntry(AwarenessInfo info, long time, Object entry, boolean master)
 	{
-		this.cid = cid;
+		this.info = info;
 		this.time = time;
-		this.delay = delay;
 		this.entry = entry;
 		this.master = master;
 	}
 	
 	//-------- methods --------
 	
+	
+	/**
+	 *  Get the info.
+	 *  @return The info.
+	 */
+	public AwarenessInfo getInfo()
+	{
+		return info;
+	}
+
+	/**
+	 *  Set the info.
+	 *  @param info The info to set.
+	 */
+	public void setInfo(AwarenessInfo info)
+	{
+		this.info = info;
+	}
+	
 	/**
 	 *  Get the time.
-	 *  @return the time.
+	 *  @return The time.
 	 */
 	public long getTime()
 	{
@@ -56,24 +72,6 @@ public class DiscoveryEntry
 	public void setTime(long time)
 	{
 		this.time = time;
-	}
-	
-	/**
-	 *  Get the delay.
-	 *  @return the delay.
-	 */
-	public long getDelay()
-	{
-		return delay;
-	}
-
-	/**
-	 *  Set the delay.
-	 *  @param delay The delay to set.
-	 */
-	public void setDelay(long delay)
-	{
-		this.delay = delay;
 	}
 
 	/**
@@ -92,24 +90,6 @@ public class DiscoveryEntry
 	public void setEntry(Object entry)
 	{
 		this.entry = entry;
-	}
-	
-	/**
-	 *  Get the component identifier.
-	 *  @return the component identifier.
-	 */
-	public IComponentIdentifier getComponentIdentifier()
-	{
-		return cid;
-	}
-
-	/**
-	 *  Set the component identifier.
-	 *  @param component identifier The component identifier to set.
-	 */
-	public void setComponentIdentifier(IComponentIdentifier componentIdentifier)
-	{
-		this.cid = componentIdentifier;
 	}
 
 	/**

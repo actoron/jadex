@@ -53,7 +53,8 @@ $endif $ */
 @Description("This agent looks for other awareness agents in the local net.")
 @Arguments(
 {
-	@Argument(name="address", clazz=String.class, defaultvalue="\"134.100.11.217\"", description="The ip address of registry."),
+	@Argument(name="address", clazz=String.class, defaultvalue="\"192.168.56.1\"", description="The ip address of registry."),
+//	@Argument(name="address", clazz=String.class, defaultvalue="\"134.100.11.217\"", description="The ip address of registry."),
 	@Argument(name="port", clazz=int.class, defaultvalue="55699", description="The port used for finding other agents."),
 	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds).")
 //	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
@@ -196,7 +197,7 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 		{
 			public void entryDeleted(DiscoveryEntry entry)
 			{
-				System.out.println("Entry deleted: "+entry.getComponentIdentifier());
+				System.out.println("Entry deleted: "+entry.getInfo().getSender());
 				
 				// todo: make myself to registry when disappeared from same ip
 				// and not already registry
@@ -377,7 +378,8 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 				{
 					try
 					{
-						receivesocket = new DatagramSocket();
+						receivesocket = new DatagramSocket(port+1);
+//						receivesocket = new DatagramSocket();
 					}
 					catch(Exception e)
 					{
@@ -415,8 +417,7 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 //			System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
 		}
 			
-		knowns.addOrUpdateEntry(new DiscoveryEntry(info.getSender(), state.getClockTime(), 
-			info.getDelay(), new Object[]{pack.getAddress(), pack.getPort()}, false));
+		knowns.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), new Object[]{pack.getAddress(), pack.getPort()}, false));
 	}
 	
 	/**
@@ -546,8 +547,7 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 								DiscoveryEntry[] kns = knowns.getEntries();
 								for(int i=0; i<kns.length; i++)
 								{
-									// todo: better save awa info
-									send(new AwarenessInfo(kns[i].getComponentIdentifier(), AwarenessInfo.STATE_ONLINE, kns[i].getDelay(), SUtil.EMPTY_STRING_ARRAY, SUtil.EMPTY_STRING_ARRAY));
+									send(kns[i].getInfo());
 								}
 							}
 							

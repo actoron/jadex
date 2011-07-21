@@ -500,8 +500,8 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		{
 			// Received slaveinfo -> save slave, reply with masterinfo.
 			SlaveInfo si = (SlaveInfo)obj;
-			locals.addOrUpdateEntry(new DiscoveryEntry(si.getAwarenessInfo().getSender(), 
-				state.getClockTime(), si.getAwarenessInfo().getDelay(), new Integer(pack.getPort()), false));
+			locals.addOrUpdateEntry(new DiscoveryEntry(si.getAwarenessInfo(), 
+				state.getClockTime(), new Integer(pack.getPort()), false));
 			AwarenessInfo myinfo = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, state.getDelay(), state.getIncludes(), state.getExcludes());
 			MasterInfo mi = new MasterInfo(myinfo);
 			byte[] mydata = DiscoveryState.encodeObject(mi, getModel().getClassLoader());
@@ -512,15 +512,14 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		{
 			// Received masterinfo -> save master
 			MasterInfo mi = (MasterInfo)obj;
-			remotes.addOrUpdateEntry(new DiscoveryEntry(mi.getAwarenessInfo().getSender(), 
-				state.getClockTime(), mi.getAwarenessInfo().getDelay(), pack.getAddress(), true));
+			remotes.addOrUpdateEntry(new DiscoveryEntry(mi.getAwarenessInfo(), 
+				state.getClockTime(), pack.getAddress(), true));
 //			System.out.println("received master info: "+getComponentIdentifier().getLocalName()+" "+mi.getAwarenessInfo().getSender());
 		}
 		else if(obj instanceof AwarenessInfo)
 		{
 			// Received awareness info -> save known
-			remotes.addOrUpdateEntry(new DiscoveryEntry(info.getSender(), 
-				state.getClockTime(), info.getDelay(), null, false));
+			remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), pack.getAddress(), false));
 //			System.out.println("received awa info: "+getComponentIdentifier().getLocalName()+" "+info.getSender());
 		}
 	}

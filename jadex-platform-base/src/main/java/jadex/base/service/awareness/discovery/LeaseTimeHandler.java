@@ -70,15 +70,14 @@ public class LeaseTimeHandler
 			entries = new LinkedHashMap();
 		
 		// If already contained update old entry (to not loose fixed entries like master flag).
-		DiscoveryEntry oldentry = (DiscoveryEntry)entries.get(entry.getComponentIdentifier());
+		DiscoveryEntry oldentry = (DiscoveryEntry)entries.get(entry.getInfo().getSender());
 		if(oldentry!=null)
 		{
-			oldentry.setDelay(entry.getDelay());
-			oldentry.setTime(entry.getTime());
+			oldentry.setInfo(entry.getInfo());
 		}
 		else
 		{
-			entries.put(entry.getComponentIdentifier(), entry);
+			entries.put(entry.getInfo().getSender(), entry);
 		}
 	}
 	
@@ -112,7 +111,7 @@ public class LeaseTimeHandler
 						{
 							DiscoveryEntry entry = (DiscoveryEntry)it.next();
 							 // Have some time buffer before delete
-							if(time>entry.getTime()+entry.getDelay()*factor)
+							if(time>entry.getTime()+entry.getInfo().getDelay()*factor)
 							{
 //								System.out.println("Removing: "+entry);
 								it.remove();
