@@ -53,8 +53,8 @@ $endif $ */
 @Description("This agent looks for other awareness agents in the local net.")
 @Arguments(
 {
-	@Argument(name="address", clazz=String.class, defaultvalue="\"192.168.56.1\"", description="The ip address of registry."),
-//	@Argument(name="address", clazz=String.class, defaultvalue="\"134.100.11.217\"", description="The ip address of registry."),
+//	@Argument(name="address", clazz=String.class, defaultvalue="\"192.168.56.1\"", description="The ip address of registry."),
+	@Argument(name="address", clazz=String.class, defaultvalue="\"134.100.11.217\"", description="The ip address of registry."),
 	@Argument(name="port", clazz=int.class, defaultvalue="55699", description="The port used for finding other agents."),
 	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds).")
 //	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
@@ -93,12 +93,9 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 	/** The receiver port. */
 	protected int port;
 		
-	/** The socket to send. */
-	protected DatagramSocket sendsocket;		
+	/** The socket to send/receive. */
+	protected DatagramSocket socket;		
 	
-	/** The socket to receive. */
-	protected DatagramSocket receivesocket;
-		
 	/** The root component id. */
 	protected IComponentIdentifier root;
 	
@@ -112,23 +109,10 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 	 */
 	public IFuture	agentCreated()
 	{
-		Future ret = new Future();
-		
 		this.state = new DiscoveryState(getExternalAccess());
 		initArguments();
-		
-		try
-		{
-			this.sendsocket = new DatagramSocket();
-			sendsocket.setBroadcast(true);
-			ret.setResult(null);
-		}
-		catch(IOException e)
-		{
-			ret.setException(new RuntimeException(e));
-		}
-		
-		return ret;
+			
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -231,7 +215,8 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 	{
 		state.setKilled(true);
 		
-		if(sendsocket!=null)
+		DatagramSocket socket = getSocket();
+		if(socket!=null)
 		{
 			sender.send(new AwarenessInfo(root, AwarenessInfo.STATE_OFFLINE, state.getDelay()));
 		}
@@ -239,21 +224,11 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 //		System.out.println("killed set to true: "+getComponentIdentifier());
 		synchronized(RegistryDiscoveryAgent.this)
 		{
-			if(sendsocket!=null)
+			if(socket!=null)
 			{
 				try
 				{
-					sendsocket.close();
-				}
-				catch(Exception e)
-				{
-				}
-			}
-			if(receivesocket!=null)
-			{
-				try
-				{
-					receivesocket.close();
+					socket.close();
 				}
 				catch(Exception e)
 				{
@@ -287,7 +262,7 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 						byte buf[] = new byte[65535];
 						
 						// Init receive socket
-						getReceiveSocket();
+						getSocket();
 						ret.setResultIfUndone(null);
 						
 						while(!state.isKilled())
@@ -295,7 +270,7 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 							try
 							{
 								final DatagramPacket pack = new DatagramPacket(buf, buf.length);
-								getReceiveSocket().receive(pack);
+								getSocket().receive(pack);
 								scheduleStep(new IComponentStep()
 								{
 									public Object execute(IInternalAccess ia)
@@ -315,20 +290,6 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 							}
 						}
 						
-						synchronized(RegistryDiscoveryAgent.this)
-						{
-							if(receivesocket!=null)
-							{
-								try
-								{
-									receivesocket.close();
-								}
-								catch(Exception e)
-								{
-//									getLogger().warning("Receiving socket closing error: "+e);
-								}
-							}
-						}
 //						System.out.println("comp and receiver terminated: "+getComponentIdentifier());
 					}
 				});
@@ -351,11 +312,11 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 	 *  Note, this method has to be synchronized.
 	 *  Is called from receiver as well as component thread.
 	 */
-	protected synchronized DatagramSocket getReceiveSocket()
+	protected synchronized DatagramSocket getSocket()
 	{
 		if(!state.isKilled())
 		{
-			if(receivesocket==null)
+			if(socket==null)
 			{
 				// Try to become master
 				if(address.equals(SUtil.getInet4Address()))
@@ -363,7 +324,7 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 					try
 					{
 						// First one on dest ip becomes registry.
-						receivesocket = new DatagramSocket(port);
+						socket = new DatagramSocket(port);
 						registry = true;
 						System.out.println("registry: "+getComponentIdentifier());
 //						System.out.println("local master at: "+SDiscovery.getInet4Address()+" "+port);
@@ -374,12 +335,11 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 					}
 				}
 				
-				if(receivesocket==null)
+				if(socket==null)
 				{
 					try
 					{
-						receivesocket = new DatagramSocket(port+1);
-//						receivesocket = new DatagramSocket();
+						socket = new DatagramSocket();
 					}
 					catch(Exception e)
 					{
@@ -388,8 +348,12 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 				}
 			}
 		}
+		else if(socket==null)
+		{
+			throw new RuntimeException("No creation of socket in killed state.");
+		}
 		
-		return receivesocket;
+		return socket;
 	}
 	
 	/**
@@ -473,8 +437,7 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 	{
 		try
 		{
-			sendsocket.send(new DatagramPacket(data, data.length, address, port));
-			
+			getSocket().send(new DatagramPacket(data, data.length, address, port));
 			System.out.println("sent to registry");
 		}
 		catch(Exception e)
@@ -496,7 +459,7 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 			{
 				Object[] tmp = (Object[])rems[i].getEntry();
 				System.out.println("to: "+tmp[0]+" "+tmp[1]);
-				sendsocket.send(new DatagramPacket(data, data.length, (InetAddress)tmp[0], ((Integer)tmp[1]).intValue()));
+				getSocket().send(new DatagramPacket(data, data.length, (InetAddress)tmp[0], ((Integer)tmp[1]).intValue()));
 			}
 			
 			System.out.println("sent to knwons: "+rems.length);
