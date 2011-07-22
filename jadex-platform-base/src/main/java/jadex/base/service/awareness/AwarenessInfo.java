@@ -25,6 +25,9 @@ public class AwarenessInfo
 	/** The sending component's identifier. */
 	protected IComponentIdentifier	sender;
 
+	/** The flag if should not be answered. */
+	protected boolean ignore;
+
 	/** The component state. */
 	protected String state;
 	
@@ -51,19 +54,20 @@ public class AwarenessInfo
 	 */
 	public AwarenessInfo(IComponentIdentifier sender, String state, long delay)
 	{
-		this(sender, state, delay, null, null);
+		this(sender, state, delay, null, null, false);
 	}
 	
 	/**
 	 *  Create a new awareness info.
 	 */
-	public AwarenessInfo(IComponentIdentifier sender, String state, long delay, String[] includes, String[] excludes)
+	public AwarenessInfo(IComponentIdentifier sender, String state, long delay, String[] includes, String[] excludes, boolean ignore)
 	{
 		this.sender = sender;
 		this.state = state;
 		this.delay = delay;
 		this.includes	= includes;
 		this.excludes	= excludes;
+		this.ignore = ignore;
 	}
 	
 	//-------- methods --------
@@ -156,6 +160,24 @@ public class AwarenessInfo
 	public String[] getExcludes()
 	{
 		return excludes!=null? excludes: SUtil.EMPTY_STRING_ARRAY;
+	}
+	
+	/**
+	 *  Get the ignore.
+	 *  @return the ignore.
+	 */
+	public boolean isIgnore()
+	{
+		return ignore;
+	}
+
+	/**
+	 *  Set the ignore.
+	 *  @param ignore The ignore to set.
+	 */
+	public void setIgnore(boolean ignore)
+	{
+		this.ignore = ignore;
 	}
 
 	/**

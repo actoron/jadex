@@ -448,7 +448,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 						socket = new DatagramSocket();
 						socket.setBroadcast(true);
 						InetAddress address = SUtil.getInet4Address();
-						AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, state.getDelay(), state.getIncludes(), state.getExcludes());
+						AwarenessInfo info = createAwarenessInfo();
 						SlaveInfo si = new SlaveInfo(info);
 						byte[] data = DiscoveryState.encodeObject(si, getModel().getClassLoader());
 						DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
@@ -504,7 +504,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			SlaveInfo si = (SlaveInfo)obj;
 			locals.addOrUpdateEntry(new DiscoveryEntry(si.getAwarenessInfo(), 
 				state.getClockTime(), new Integer(pack.getPort()), false));
-			AwarenessInfo myinfo = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, state.getDelay(), state.getIncludes(), state.getExcludes());
+			AwarenessInfo myinfo = createAwarenessInfo();
 			MasterInfo mi = new MasterInfo(myinfo);
 			byte[] mydata = DiscoveryState.encodeObject(mi, getModel().getClassLoader());
 			sendToLocal(mydata, pack.getPort());
@@ -524,6 +524,14 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), pack.getAddress(), false));
 //			System.out.println("received awa info: "+getComponentIdentifier().getLocalName()+" "+info.getSender());
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected AwarenessInfo createAwarenessInfo()
+	{
+		return new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, state.getDelay(), state.getIncludes(), state.getExcludes(), false);
 	}
 	
 	/**

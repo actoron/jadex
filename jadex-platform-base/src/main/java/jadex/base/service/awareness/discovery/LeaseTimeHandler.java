@@ -63,8 +63,9 @@ public class LeaseTimeHandler
 	/**
 	 *  Add a new entry or update an existing entry.
 	 *  @param entry The entry.
+	 *  @return True, if new entry.
 	 */
-	public synchronized void addOrUpdateEntry(DiscoveryEntry entry)
+	public synchronized boolean addOrUpdateEntry(DiscoveryEntry entry)
 	{
 		if(entries==null)
 			entries = new LinkedHashMap();
@@ -79,6 +80,30 @@ public class LeaseTimeHandler
 		else
 		{
 			entries.put(entry.getInfo().getSender(), entry);
+		}
+		
+		return oldentry==null;
+	}
+	
+	/**
+	 *  Add a new entry or update an existing entry.
+	 *  @param entry The entry.
+	 */
+	public synchronized void updateEntry(DiscoveryEntry entry)
+	{
+		if(entries==null)
+			entries = new LinkedHashMap();
+		
+		// If already contained update old entry (to not loose fixed entries like master flag).
+		DiscoveryEntry oldentry = (DiscoveryEntry)entries.get(entry.getInfo().getSender());
+		if(oldentry!=null)
+		{
+			oldentry.setInfo(entry.getInfo());
+			oldentry.setTime(getClockTime());
+		}
+		else
+		{
+			throw new RuntimeException("Entry not contained: "+entry.getInfo().getSender());
 		}
 	}
 	

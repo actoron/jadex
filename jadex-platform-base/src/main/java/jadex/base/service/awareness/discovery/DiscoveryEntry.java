@@ -108,5 +108,12 @@ public class DiscoveryEntry
 	{
 		this.master = master;
 	}
-	
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "DiscoveryEntry(cid=" + info.getSender() + ", master=" + master + ")";
+	}
 }
