@@ -190,7 +190,7 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		MulticastSocket socket = getSocket();
 		if(socket!=null)
 		{
-			sender.send(new AwarenessInfo(root, AwarenessInfo.STATE_OFFLINE, state.getDelay()));
+			sender.send(state.createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, false));
 		}
 		
 //		System.out.println("killed set to true: "+getComponentIdentifier());

@@ -1,5 +1,6 @@
 package jadex.base.service.awareness.discovery;
 
+import jadex.base.service.awareness.AwarenessInfo;
 import jadex.base.service.message.transport.codecs.GZIPCodec;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -271,5 +272,13 @@ public class DiscoveryState
 		byte[] data = new byte[pack.getLength()];
 		System.arraycopy(pack.getData(), 0, data, 0, pack.getLength());
 		return decodeObject(data, classloader);
+	}
+	
+	/**
+	 *  Create awareness info of myself.
+	 */
+	public AwarenessInfo createAwarenessInfo(String state, boolean ignore)
+	{
+		return new AwarenessInfo(root, state, getDelay(), getIncludes(), getExcludes(), ignore);
 	}
 }

@@ -49,13 +49,13 @@ public class AwarenessInfo
 	{
 	}
 	
-	/**
-	 *  Create a new awareness info.
-	 */
-	public AwarenessInfo(IComponentIdentifier sender, String state, long delay)
-	{
-		this(sender, state, delay, null, null, false);
-	}
+//	/**
+//	 *  Create a new awareness info.
+//	 */
+//	public AwarenessInfo(IComponentIdentifier sender, String state, long delay)
+//	{
+//		this(sender, state, delay, null, null, false);
+//	}
 	
 	/**
 	 *  Create a new awareness info.

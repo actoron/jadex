@@ -226,7 +226,7 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 		DatagramChannel channel = getChannel();
 		if(channel!=null)
 		{
-			sender.send(new AwarenessInfo(root, AwarenessInfo.STATE_OFFLINE, state.getDelay()));
+			sender.send(state.createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, !isMaster()));
 		}
 		
 //		System.out.println("killed set to true: "+getComponentIdentifier());
@@ -363,6 +363,15 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 	}
 	
 	/**
+	 *  Send to local masters.
+	 *  @param data The data to be send.
+	 */
+	protected void sendToMaster(byte[] data)
+	{
+		send(data, SUtil.getInet4Address(), port);
+	}
+	
+	/**
 	 *  Send messages to discover new platforms.
 	 *  @param data The data to be send.
 	 *  @param maxsend The maximum number of messages to send.
@@ -478,6 +487,11 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 							try
 							{
 								selector.select();
+								// Let thread wait for new channel being registered.
+								synchronized(ScannerDiscoveryAgent.this)
+								{
+								}
+								
 //								System.out.println("selector");
 							    Iterator it = selector.selectedKeys().iterator();
 							    while(it.hasNext()) 
@@ -541,12 +555,17 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 			{
 				try
 				{
-//					receivesocket = new DatagramSocket(port);
 					channel = DatagramChannel.open();
 					channel.configureBlocking(false);
 					channel.socket().bind(new InetSocketAddress(port));
 					channel.socket().setSendBufferSize(((Integer)getArgument("buffersize")).intValue());
-					channel.register(selector, SelectionKey.OP_READ);
+					// Register blocks when other thread waits in it.
+					// Must be synchronized due to selector wakeup freeing other thread.
+					synchronized(ScannerDiscoveryAgent.this)
+					{
+						selector.wakeup();
+						channel.register(selector, SelectionKey.OP_READ);
+					}
 					System.out.println("local master at: "+SUtil.getInet4Address()+" "+port);
 				}
 				catch(Exception e)
@@ -556,22 +575,22 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 						// In case the receiversocket cannot be opened
 						// open another local socket at an arbitrary port
 						// and send this port to the master.
-//						receivesocket = new DatagramSocket();
 						channel = DatagramChannel.open();
 						channel.configureBlocking(false);
 						channel.socket().bind(new InetSocketAddress(0));
 						channel.socket().setSendBufferSize(((Integer)getArgument("buffersize")).intValue());
-						channel.register(selector, SelectionKey.OP_READ);
+						synchronized(ScannerDiscoveryAgent.this)
+						{
+							selector.wakeup();
+							channel.register(selector, SelectionKey.OP_READ);
+						}
 						InetAddress address = SUtil.getInet4Address();
-						AwarenessInfo info = createAwarenessInfo();
+						AwarenessInfo info = state.createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, !isMaster());
 						SlaveInfo si = new SlaveInfo(info);
 						byte[] data = DiscoveryState.encodeObject(si, getModel().getClassLoader());
 						send(data, address, port);
-//						DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
-//						receivesocket.send(packet);
 						
 						System.out.println("local slave at: "+SUtil.getInet4Address()+" "+channel.socket().getLocalPort());
-						
 //						getLogger().warning("Running in local mode: "+e);
 					}
 					catch(Exception e2)
@@ -606,9 +625,6 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 			
 		if(info!=null && info.getSender()!=null)
 		{
-//			if(obj.getClass().equals(AwarenessInfo.class))
-//				sendToLocals(data);
-			
 			if(!info.getSender().equals(root))
 			{
 				announceAwareness(info);
@@ -634,7 +650,7 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 			SlaveInfo si = (SlaveInfo)obj;
 			locals.addOrUpdateEntry(new DiscoveryEntry(si.getAwarenessInfo(), 
 				state.getClockTime(), sa, false));
-			AwarenessInfo myinfo = createAwarenessInfo();
+			AwarenessInfo myinfo = state.createAwarenessInfo(AwarenessInfo.STATE_ONLINE, !isMaster());
 			MasterInfo mi = new MasterInfo(myinfo);
 			byte[] mydata = DiscoveryState.encodeObject(mi, getModel().getClassLoader());
 			send(mydata, address, port);
@@ -654,18 +670,36 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 		}
 		else if(obj instanceof AwarenessInfo)
 		{
-			// Received awareness info -> save known
-			if(address.equals(SUtil.getInet4Address()) && isMaster())
+			// Received awareness info
+			// When master -> 
+			//   if slave info -> save in locals and sent to remote masters and local slaves
+			//   if remote info -> save in remotes and send to local slaves
+			// When slave ->
+			//   save as remote info (also other slaves, for lease time management)
+			
+			if(isMaster())
 			{
-				locals.updateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
+				if(address.equals(SUtil.getInet4Address()))
+				{
+					// If awareness message comes from local slave.
+					locals.updateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
+					
+					// Forward the slave update to remote masters.
+					sendToRemotes(data);
+				}
+				else
+				{
+					// If awareness message comes from remove node.
+					remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
+				}
+				
+				sendToLocals(data);
 			}
 			else
 			{
-				if(remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false)))
-				{
-					sendToLocals(data);
-				}
+				remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
 			}
+			
 			System.out.println("received awa info: "+getComponentIdentifier().getLocalName()+" "+info.getSender());
 		}
 	}
@@ -676,14 +710,6 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 	protected boolean isMaster()
 	{
 		return this.port==getChannel().socket().getLocalPort();
-	}
-	
-	/**
-	 * 
-	 */
-	protected AwarenessInfo createAwarenessInfo()
-	{
-		return new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, state.getDelay(), state.getIncludes(), state.getExcludes(), !isMaster());
 	}
 	
 	/**
@@ -737,6 +763,14 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 		}
 		
 		/**
+		 *  Create the awareness info.
+		 */
+		public AwarenessInfo createAwarenessInfo()
+		{
+			return state.createAwarenessInfo(AwarenessInfo.STATE_ONLINE, !isMaster());
+		}
+		
+		/**
 		 *  Method to send messages.
 		 */
 		public void send(AwarenessInfo info)
@@ -751,10 +785,21 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 				// Send to all remote other nodes a refresh awareness
 				int allowed = maxsend-sent;
 				int remotes = 0;
-				if(allowed>0)
+				
+				if(isMaster())
 				{
-					remotes = sendToRemotes(data, allowed);
-					sent += remotes;
+					if(allowed>0)
+					{
+						remotes = sendToRemotes(data, allowed);
+						sent += remotes;
+					}
+					
+					// Send to all locals a refresh awareness
+					sendToLocals(data);
+				}
+				else
+				{
+					sendToMaster(data);
 				}
 				
 				// Send to possibly new ones via ip guessing
@@ -768,9 +813,6 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 //						sent+= discover;
 //					}
 //				}
-				
-				// Send to all locals a refresh awareness
-				sendToLocals(data);
 
 //				System.out.println(" sent:"+sent+" remotes: "+remotes);//+" discover: "+discover);
 //				System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");

@@ -65,7 +65,7 @@ public abstract class SendHandler
 					if(!state.isKilled() && sendid.equals(getSendId()))
 					{
 //						System.out.println(System.currentTimeMillis()+" sending: "+getComponentIdentifier());
-						send(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, state.getDelay(), state.getIncludes(), state.getExcludes(), false));
+						send(createAwarenessInfo());
 						
 						if(state.getDelay()>0)
 							state.doWaitFor(state.getDelay(), this);
@@ -95,7 +95,16 @@ public abstract class SendHandler
 	}
 	
 	/**
+	 *  Create the awareness info.
+	 */
+	public AwarenessInfo createAwarenessInfo()
+	{
+		return state.createAwarenessInfo(AwarenessInfo.STATE_ONLINE, false);
+	}
+	
+	/**
 	 *  Method to send messages.
 	 */
 	public abstract void send(AwarenessInfo info);
+
 }
