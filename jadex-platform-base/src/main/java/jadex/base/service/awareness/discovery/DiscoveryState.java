@@ -54,6 +54,7 @@ public class DiscoveryState
 	public DiscoveryState(IExternalAccess access)
 	{
 		this.access = access;
+		this.root = access.getComponentIdentifier().getRoot();
 	}
 	
 	//-------- methods --------

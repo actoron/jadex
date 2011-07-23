@@ -33,10 +33,10 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
 /* $if !android $ */
 import javax.xml.stream.Location;
@@ -109,28 +109,6 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	{
 		this.state = new DiscoveryState(getExternalAccess());
 		initArguments();
-		
-//		try
-//		{
-//			this.sendsocket = new DatagramSocket();
-//			sendsocket.setBroadcast(true);
-//					
-////			this.reader	= JavaReader.getReader(new XMLReporter()
-////			{
-////				public void report(String message, String type, Object related, Location location) throws XMLStreamException
-////				{
-////					// Ignore XML exceptions.
-//////					getLogger().warning(message);
-////				}
-////			});
-//			
-//			ret.setResult(null);
-//		}
-//		catch(IOException e)
-//		{
-//			ret.setException(new RuntimeException(e));
-//		}
-		
 		return IFuture.DONE;
 	}
 	
@@ -316,35 +294,71 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	}
 	
 	/**
+	 *  Send awareness info to remote scanner services.
+	 *  @param data The data to be send.
+	 *  @param maxsend The maximum number of messages to send.
+	 */
+	protected int sendToRemotes(byte[] data)
+	{
+		return sendToRemotes(data, -1);
+	}
+	
+	/**
+	 *  Send awareness info to remote scanner services.
+	 *  @param data The data to be send.
+	 *  @param maxsend The maximum number of messages to send.
+	 */
+	protected int sendToRemotes(byte[] data, int maxsend)
+	{
+		int ret = 0;
+		try
+		{
+			DiscoveryEntry[] rems = remotes.getEntries();
+			for(; ret<rems.length && (maxsend==-1 || ret<maxsend); ret++)
+			{
+				// Only send to remote masters directly.
+				// A master will forward a message to its slaves.
+				if(!rems[ret].getInfo().isIgnore())
+				{
+					InetSocketAddress sa = (InetSocketAddress)rems[ret].getEntry();
+					// Use received port, as enables slave to slave communication
+					if(!send(data, sa.getAddress(), sa.getPort()))
+						break;
+				}
+			}
+			
+			System.out.println("sent to remotes: "+ret+" "+SUtil.arrayToString(remotes));
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Send to local masters.
+	 *  @param data The data to be send.
+	 */
+	protected void sendToMaster(byte[] data)
+	{
+		send(data, SUtil.getInet4Address(), port);
+	}
+	
+	/**
 	 *  Send/forward to locals.
 	 *  @param data The data to be send.
 	 */
 	protected void sendToLocals(byte[] data)
 	{
-		DiscoveryEntry[] locals = this.locals.getEntries();
-		for(int i=0; i<locals.length; i++)
+		DiscoveryEntry[] locs = locals.getEntries();
+		for(int i=0; i<locs.length; i++)
 		{
-			sendToLocal(data, ((Integer)locals[i].getEntry()).intValue());
+			InetSocketAddress sa = (InetSocketAddress)locs[i].getEntry();
+			send(data, sa.getAddress(), sa.getPort());
 		}
-	}
-	
-	/**
-	 *  Forward to locals.
-	 *  @param data The data to be send.
-	 *  @param port The port the local slave listens.
-	 */
-	protected void sendToLocal(byte[] data, int port)
-	{
-		try
-		{
-			InetAddress address = SUtil.getInet4Address();
-			DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
-			getSocket().send(packet);
-		}
-		catch(IOException e)
-		{
-			e.printStackTrace();
-		}
+		System.out.println("sent to locals: "+locs.length+" "+SUtil.arrayToString(locs));
 	}
 	
 	/**
@@ -367,13 +381,20 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 					public void run()
 					{
 						// todo: max ip datagram length (is there a better way to determine length?)
-						byte buf[] = new byte[65535];
+						byte buf[] = new byte[8192];
 						
 						try
 						{
 							// Init receive socket
-							getSocket();
-							ret.setResultIfUndone(null);
+							try
+							{
+								getSocket();
+								ret.setResultIfUndone(null);
+							}
+							catch(Exception e)
+							{
+								ret.setExceptionIfUndone(e);
+							}
 						
 							while(!state.isKilled())
 							{
@@ -448,7 +469,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 						socket = new DatagramSocket();
 						socket.setBroadcast(true);
 						InetAddress address = SUtil.getInet4Address();
-						AwarenessInfo info = createAwarenessInfo();
+						AwarenessInfo info = state.createAwarenessInfo(AwarenessInfo.STATE_ONLINE, !isMaster());
 						SlaveInfo si = new SlaveInfo(info);
 						byte[] data = DiscoveryState.encodeObject(si, getModel().getClassLoader());
 						DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
@@ -472,21 +493,23 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	/**
 	 *  Handle a received packet.
 	 */
-	protected void handleReceivedPacket(DatagramPacket pack)
+	protected void handleReceivedPacket(DatagramPacket packet)
 	{
-		byte[] data = new byte[pack.getLength()];
-		System.arraycopy(pack.getData(), 0, data, 0, pack.getLength());
-		Object obj = DiscoveryState.decodeObject(data, getModel().getClassLoader());
+		InetAddress address = packet.getAddress();
+		int port = packet.getPort();
+		InetSocketAddress sa = new InetSocketAddress(address, port);
+				
+//		byte[] data = new byte[pack.getLength()];
+//		System.arraycopy(pack.getData(), 0, data, 0, pack.getLength());
+		Object obj = DiscoveryState.decodeObject(packet.getData(), getModel().getClassLoader());
 		AwarenessInfo info = obj instanceof AwarenessInfo? (AwarenessInfo)obj:
 			obj instanceof SlaveInfo? ((SlaveInfo)obj).getAwarenessInfo(): 
 			obj instanceof MasterInfo? ((MasterInfo)obj).getAwarenessInfo(): null;
 		
-//		System.out.println("received: "+obj+" "+pack.getAddress());
-		
+//		System.out.println("received: "+obj+" "+address);
+			
 		if(info!=null && info.getSender()!=null)
 		{
-			sendToLocals(data);
-			
 			if(!info.getSender().equals(root))
 			{
 				announceAwareness(info);
@@ -496,43 +519,94 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 //				received_self	= true;
 //			}
 //			System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
-		}
+		}	
 			
 		if(obj instanceof SlaveInfo)
 		{
-			// Received slaveinfo -> save slave, reply with masterinfo.
+			if(this.port!=getSocket().getLocalPort())
+				return;
+			
+			// Send new slave to all others (then can subsequently communicate directly with him).
+			byte[] slavedata = DiscoveryState.encodeObject(info, getModel().getClassLoader());
+			sendToLocals(slavedata);
+			sendToRemotes(slavedata);
+			
+			// Received slaveinfo -> save slave, reply with masterinfo, forward new slave to other slaves.
 			SlaveInfo si = (SlaveInfo)obj;
 			locals.addOrUpdateEntry(new DiscoveryEntry(si.getAwarenessInfo(), 
-				state.getClockTime(), new Integer(pack.getPort()), false));
-			AwarenessInfo myinfo = createAwarenessInfo();
+				state.getClockTime(), new InetSocketAddress(address, port), false));
+			AwarenessInfo myinfo = state.createAwarenessInfo(AwarenessInfo.STATE_ONLINE, !isMaster());
 			MasterInfo mi = new MasterInfo(myinfo);
 			byte[] mydata = DiscoveryState.encodeObject(mi, getModel().getClassLoader());
-			sendToLocal(mydata, pack.getPort());
-//			System.out.println("received slave info: "+getComponentIdentifier().getLocalName()+" "+si.getAwarenessInfo().getSender());
+			send(mydata, address, port);
+//			System.out.println("send mi to new slave: "+port);
+			System.out.println("received slave info: "+getComponentIdentifier().getLocalName()+" "+si.getAwarenessInfo().getSender());
 		}
 		else if(obj instanceof MasterInfo)
 		{
+			if(this.port==getSocket().getLocalPort())
+				return;
+			
 			// Received masterinfo -> save master
 			MasterInfo mi = (MasterInfo)obj;
 			remotes.addOrUpdateEntry(new DiscoveryEntry(mi.getAwarenessInfo(), 
-				state.getClockTime(), pack.getAddress(), true));
+				state.getClockTime(), sa, true));
 //			System.out.println("received master info: "+getComponentIdentifier().getLocalName()+" "+mi.getAwarenessInfo().getSender());
 		}
 		else if(obj instanceof AwarenessInfo)
 		{
-			// Received awareness info -> save known
-			remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), pack.getAddress(), false));
-//			System.out.println("received awa info: "+getComponentIdentifier().getLocalName()+" "+info.getSender());
+			// Received awareness info
+			// When master -> 
+			//   if slave info -> save in locals and sent to remote masters and local slaves
+			//   if remote info -> save in remotes and send to local slaves
+			// When slave ->
+			//   save as remote info (also other slaves, for lease time management)
+			
+			if(isMaster())
+			{
+				if(address.equals(SUtil.getInet4Address()))
+				{
+					// If awareness message comes from local slave.
+					locals.updateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
+					
+					// Forward the slave update to remote masters.
+					sendToRemotes(packet.getData());
+				}
+				else
+				{
+					// If awareness message comes from remove node.
+					remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
+				}
+				
+				sendToLocals(packet.getData());
+			}
+			else
+			{
+				remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
+			}
+			
+			System.out.println("received awa info: "+getComponentIdentifier().getLocalName()+" "+info.getSender());
 		}
 	}
 	
 	/**
-	 * 
+	 *  Send a packet over the channel.
 	 */
-	protected AwarenessInfo createAwarenessInfo()
+	protected boolean send(byte[] data, InetAddress address, int port)
 	{
-		return new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, state.getDelay(), state.getIncludes(), state.getExcludes(), false);
+		boolean ret = true;
+		try
+		{
+			DatagramPacket p = new DatagramPacket(data, data.length, new InetSocketAddress(address, port));
+			getSocket().send(p);
+		}
+		catch(Exception e)
+		{
+			ret = false;
+		}
+		return ret;
 	}
+	
 	
 	/**
 	 *  Announce newly arrived awareness info to management service.
@@ -572,6 +646,14 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	}
 	
 	/**
+	 *  Test if is master.
+	 */
+	protected boolean isMaster()
+	{
+		return this.port==getSocket().getLocalPort();
+	}
+	
+	/**
 	 *  Handle sending.
 	 */
 	class BroadcastSendHandler extends SendHandler
@@ -585,6 +667,14 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		}
 		
 		/**
+		 *  Create the awareness info.
+		 */
+		public AwarenessInfo createAwarenessInfo()
+		{
+			return state.createAwarenessInfo(AwarenessInfo.STATE_ONLINE, !isMaster());
+		}
+		
+		/**
 		 *  Method to send messages.
 		 */
 		public void send(AwarenessInfo info)
@@ -594,21 +684,26 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 				byte[] data = DiscoveryState.encodeObject(info, getModel().getClassLoader());
 		
 //				System.out.println("packet size: "+data.length);
-				
+
 				// Broadcast info to lan.
-				sendToDiscover(data);
-				
 				// Does not need to send to known components
 				// as broadcast reaches all.
+//				sendToDiscover(data);
 				
-				// Send to all locals a refresh awareness
-				sendToLocals(data);
+				if(isMaster())
+				{
+					sendToRemotes(data);
+					
+					// Send to all locals a refresh awareness
+					sendToLocals(data);
+				}
+				else
+				{
+					sendToMaster(data);
+				}
 				
-				// Test if master is available.
-//				getReceiveSocket();
-		
-		//		System.out.println("sent: "+address);
-		//		System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");
+//		System.out.println("sent: "+address);
+//		System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");
 			}
 			catch(Exception e)
 			{
@@ -618,76 +713,6 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		}
 	}
 	
-	
-//	/**
-//	 *  This method version ensures that new master is selected
-//   *  automatically. Problem other slaves do not recognize new master.
-//	 *  Get or create a receiver socket.
-//	 *  
-//	 *  Note, this method has to be synchronized.
-//	 *  Is called from receiver as well as component thread.
-//	 */
-//	protected synchronized DatagramSocket getReceiveSocket()
-//	{
-//		DatagramSocket ret = receivesocket;
-//		
-//		if(!state.isKilled())
-//		{
-//			if(receivesocket==null)
-//			{
-//				try
-//				{
-//					receivesocket = new DatagramSocket(port);
-//					ret = receivesocket;
-//					
-//					// Was slave and is now master -> reset slave socket
-//					if(slavereceivesocket!=null)
-//					{
-//						try
-//						{
-//							slavereceivesocket.close();
-//						}
-//						catch(Exception e)
-//						{
-//						}
-//						slavereceivesocket = null;
-//					}
-//					
-//					System.out.println("local master at: "+SDiscovery.getInet4Address()+" "+port);
-//				}
-//				catch(Exception e)
-//				{
-//					if(slavereceivesocket==null)
-//					{
-//						try
-//						{
-//							// In case the receiversocket cannot be opened
-//							// open another local socket at an arbitrary port
-//							// and send this port to the master.
-//							slavereceivesocket = new DatagramSocket();
-//							InetAddress address = SDiscovery.getInet4Address();
-//							AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, state.getDelay(), state.getIncludes(), state.getExcludes());
-//							SlaveInfo si = new SlaveInfo(info);
-//							byte[] data = SDiscovery.encodeObject(si, getModel().getClassLoader());
-//							DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
-//							slavereceivesocket.send(packet);
-//		
-//							System.out.println("local slave at: "+SDiscovery.getInet4Address()+" "+slavereceivesocket.getLocalPort());
-//							
-//	//						getLogger().warning("Running in local mode: "+e);
-//						}
-//						catch(Exception e2)
-//						{
-//							throw new RuntimeException(e2);
-//						}
-//					}
-//					ret = slavereceivesocket;
-//				}
-//			}
-//		}
-//		
-//		return ret;
-//	}
 }
 
 
