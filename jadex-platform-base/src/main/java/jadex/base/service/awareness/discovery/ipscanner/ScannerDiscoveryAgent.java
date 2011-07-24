@@ -341,14 +341,17 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 		try
 		{
 			DiscoveryEntry[] rems = remotes.getEntries();
-			for(; ret<rems.length && (maxsend==-1 || ret<maxsend); ret++)
+			for(int i=0; i<rems.length && (maxsend==-1 || ret<maxsend); ret++)
 			{
-				if(!rems[ret].getInfo().isIgnore())
+				// Only send to remote masters directly.
+				// A master will forward a message to its slaves.
+				if(!rems[i].getInfo().isIgnore())
 				{
-					InetSocketAddress sa = (InetSocketAddress)rems[ret].getEntry();
+					InetSocketAddress sa = (InetSocketAddress)rems[i].getEntry();
 					// Use received port, as enables slave to slave communication
 					if(!send(data, sa.getAddress(), sa.getPort()))
 						break;
+					ret++;
 				}
 			}
 			

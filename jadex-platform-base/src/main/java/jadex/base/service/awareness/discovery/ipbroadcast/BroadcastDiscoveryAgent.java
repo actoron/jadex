@@ -314,16 +314,17 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		try
 		{
 			DiscoveryEntry[] rems = remotes.getEntries();
-			for(; ret<rems.length && (maxsend==-1 || ret<maxsend); ret++)
+			for(int i=0; i<rems.length && (maxsend==-1 || ret<maxsend); ret++)
 			{
 				// Only send to remote masters directly.
 				// A master will forward a message to its slaves.
-				if(!rems[ret].getInfo().isIgnore())
+				if(!rems[i].getInfo().isIgnore())
 				{
-					InetSocketAddress sa = (InetSocketAddress)rems[ret].getEntry();
+					InetSocketAddress sa = (InetSocketAddress)rems[i].getEntry();
 					// Use received port, as enables slave to slave communication
 					if(!send(data, sa.getAddress(), sa.getPort()))
 						break;
+					ret++;
 				}
 			}
 			
@@ -506,13 +507,17 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			obj instanceof SlaveInfo? ((SlaveInfo)obj).getAwarenessInfo(): 
 			obj instanceof MasterInfo? ((MasterInfo)obj).getAwarenessInfo(): null;
 		
-//		System.out.println("received: "+obj+" "+address);
+		System.out.println("received: "+obj+" "+address);
 			
 		if(info!=null && info.getSender()!=null)
 		{
 			if(!info.getSender().equals(root))
 			{
 				announceAwareness(info);
+			}
+			else
+			{
+				return;
 			}
 //			else
 //			{
@@ -567,7 +572,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 				if(address.equals(SUtil.getInet4Address()))
 				{
 					// If awareness message comes from local slave.
-					locals.updateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
+					locals.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
 					
 					// Forward the slave update to remote masters.
 					sendToRemotes(packet.getData());
@@ -688,22 +693,22 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 				// Broadcast info to lan.
 				// Does not need to send to known components
 				// as broadcast reaches all.
-//				sendToDiscover(data);
+				sendToDiscover(data);
 				
 				if(isMaster())
 				{
-					sendToRemotes(data);
+//					sendToRemotes(data);
 					
 					// Send to all locals a refresh awareness
 					sendToLocals(data);
 				}
-				else
-				{
-					sendToMaster(data);
-				}
+//				else
+//				{
+//					sendToMaster(data);
+//				}
 				
-//		System.out.println("sent: "+address);
-//		System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");
+				System.out.println("sent");
+//				System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");
 			}
 			catch(Exception e)
 			{
