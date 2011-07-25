@@ -1,7 +1,12 @@
 package jadex.commons;
 
+/* $if !android $ */
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+/* $else $
+import javaa.beans.PropertyChangeEvent;
+import javaa.beans.PropertyChangeListener;
+$endif $ */
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;

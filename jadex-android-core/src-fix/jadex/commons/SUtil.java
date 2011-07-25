@@ -13,8 +13,11 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
+import java.net.NetworkInterface;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -93,12 +96,12 @@ public class SUtil
 		htmlwraps.put("'", "&apos;");
 		htmlwraps.put("<", "&lt;");
 		htmlwraps.put(">", "&gt;");
-		htmlwraps.put("�", "&auml;");
-		htmlwraps.put("�", "&Auml;");
-		htmlwraps.put("�", "&uuml;");
-		htmlwraps.put("�", "&Uuml;");
-		htmlwraps.put("�", "&ouml;");
-		htmlwraps.put("�", "&Ouml;");
+		htmlwraps.put("ä", "&auml;");
+		htmlwraps.put("Ä", "&Auml;");
+		htmlwraps.put("ü", "&uuml;");
+		htmlwraps.put("Ü", "&Uuml;");
+		htmlwraps.put("ö", "&ouml;");
+		htmlwraps.put("Ö", "&Ouml;");
 
 		htmlwraps.put("�", "&acute;");
 		htmlwraps.put("�", "&agrave;");
@@ -1554,9 +1557,11 @@ public class SUtil
 	 */
 	public static String convertPathToRelative(String absolute)
 	{
-		// Special treatment for files in jar file -> just return full inner name 
+		// Special treatment for files in jar file -> just make jar file name relative and keep inner name 
 		if(absolute.startsWith("jar:file:") && absolute.indexOf("!")!=-1)
-			return absolute.substring(absolute.indexOf("!")+1);
+		{
+			return "jar:file:" +absolute.substring(9, absolute.indexOf("!")) + absolute.substring(absolute.indexOf("!"));
+		}
 		
 		// Build path as list of files (directories).
 		File basedir = new File(System.getProperty("user.dir"));
@@ -1748,6 +1753,62 @@ public class SUtil
 		{
 			((ListenableStream)((AccessiblePrintStream)System.err).out).removeLineListener(listener);
 		}
+	}
+	
+	/**
+	 *  Get a IPV4 address of the local host.
+	 *  Ignores loopback address and V6 addresses.
+	 *  @return First found IPV4 address.
+	 */
+	public static InetAddress getInet4Address()
+	{
+		InetAddress ret = null;
+		
+		try
+		{
+			Enumeration e = NetworkInterface.getNetworkInterfaces();
+			while(e.hasMoreElements() && ret==null)
+			{
+				NetworkInterface ni = (NetworkInterface)e.nextElement();
+				Enumeration e2 = ni.getInetAddresses();
+				while(e2.hasMoreElements() && ret==null)
+				{
+					InetAddress tmp = (InetAddress)e2.nextElement();
+					if(tmp instanceof Inet4Address && !tmp.isLoopbackAddress())
+						ret = (InetAddress)tmp;
+				}
+			}
+			
+			if(ret==null)
+			{
+				InetAddress tmp = InetAddress.getLocalHost();
+				if(tmp instanceof Inet4Address && !tmp.isLoopbackAddress())
+					ret = (InetAddress)tmp;
+			}
+		}
+		catch(Exception e)
+		{
+//			e.printStackTrace();
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the network prefix length for IPV4 address
+	 *  24=C, 16=B, 8=A classes. 
+	 *  Returns -1 in case of V6 address.
+	 *  @param iadr The address.
+	 *  @return The length of the prefix.
+	 */
+	public static short getNetworkPrefixLength(InetAddress iadr)
+	{
+		short ret = -1;
+		/* $if !android $ */
+		
+		/* $endif $ */
+		
+		return ret;
 	}
 	
 	/**

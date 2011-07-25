@@ -7,7 +7,7 @@ import jadex.standalone.ComponentAdapterFactory;
 
 public class Startup {
 	public static void main(String[] args) {
-		bpmn_test();
+		bdi_test();
 	}
 
 	public static void micro_test() {
@@ -29,6 +29,17 @@ public class Startup {
 				"-saveonexit", "false",
 				"-gui", "false",
 				"-component", "jadex/bpmn/benchmarks/AgentCreation.bpmn"
+		});
+	}
+	
+	public static void bdi_test() {
+		Starter.main(new String[] {
+				"-conf", "de/unihamburg/vsis/jadexAndroid_test/Platform.component.xml",
+				"-configname", "allkernels_fixed",
+				"-platformname", "testcases",
+				"-saveonexit", "false",
+				"-gui", "false",
+				"-component", "jadex/bdi/benchmarks/AgentCreation.agent.xml"
 		});
 	}
 	

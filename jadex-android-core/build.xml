@@ -15,8 +15,11 @@
 	<property name="jadex-kernel-bpmn" location="../jadex-kernel-bpmn/src/main/java" />
 
 	<property name="jadex-kernel-bdi" location="../jadex-kernel-bdi/src/main/java" />
+	<property name="jadex-kernel-bdibpmn" location="../jadex-kernel-bdibpmn/src/main/java" />
 	<property name="jadex-rules" location="../jadex-rules/src/main/java" />
+	<property name="jadex-applib-bdi" location="../jadex-applib-bdi/src/main/java" />
 
+	<property name="jadex-kernel-extension-agr" location="../jadex-kernel-extension-agr/src/main/java" />
 	<!-- this is for fixed source files -->
 	<property name="src-fix" location="./src-fix" />
 
@@ -145,6 +148,15 @@
 		UserInteractionActivityHandler.java,
 		UserInteractionTask.java
 		"/>
+	<property name="exclude-jadex-kernel-bdibpmn" value="
+		CreateSpaceObjectTaskTask.java,
+		RemoveSpaceObjectTaskTask.java,
+		WaitForSpaceObjectTaskTask.java
+		"/>
+	
+	<property name="exclude-jadex-kernel-extension-agr" value="
+	"/>
+	
 
 	<taskdef name="preprocess" classname="com.objfac.prebop.ant.PreprocessorTask">
 		<classpath>
@@ -230,17 +242,31 @@
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
 		</preprocess>
+		<echo level="info">preprocessing ${jadex-kernel-bdi}</echo>
 		<preprocess indir="${jadex-kernel-bdi}" outdir="${src_android}" out="merge" except="${exclude}">
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
 		</preprocess>
+		<echo level="info">preprocessing ${jadex-rules-bpmn}</echo>
 		<preprocess indir="${jadex-rules}" outdir="${src_android}" out="merge" except="${exclude}">
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
 		</preprocess> 
-
+		<echo level="info">preprocessing ${jadex-kernel-bdibpmn}</echo>
+		<preprocess indir="${jadex-kernel-bdibpmn}" outdir="${src_android}" out="merge" except="${exclude}, ${exclude-jadex-kernel-bdibpmn}">
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+		</preprocess> 
+		<echo level="info">preprocessing ${jadex-kernel-extension-agr}</echo>
+		<preprocess indir="${jadex-kernel-extension-agr}" outdir="${src_android}" out="merge" except="${exclude}, ${exclude-jadex-kernel-extension-agr}">
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+		</preprocess> 
+		
 
 		<echo level="info">preprocessing ${src-fix}</echo>
 		<preprocess indir="${src-fix}" outdir="${src_android}" out="merge">
@@ -260,7 +286,7 @@
 			<var name="androidVersion" value="${androidVersion}" />
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 		</preprocess>
-		<preprocess indir="${jadex-commons}" outdir="${jadex-commons}" out="merge" except="${exclude}">
+		<preprocess indir="${jadex-commons}" outdir="${jadex-commons}" out="merge" except="${exclude}, ${exclude-jadex-commons}">
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
@@ -320,5 +346,15 @@
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
 		</preprocess>
+		<preprocess indir="${jadex-kernel-bdibpmn}" outdir="${jadex-kernel-bdibpmn}" out="merge" except="${exclude}">
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+		</preprocess> 
+		<preprocess indir="${jadex-kernel-extension-agr}" outdir="${jadex-kernel-extension-agr}" out="merge" except="${exclude}, ${exclude-jadex-kernel-extension-agr}">
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+		</preprocess> 
 	</target>
 </project>

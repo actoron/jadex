@@ -3,6 +3,9 @@ ADB_PATH=$ANDROID_HOME/tools/adb
 MVN_PATH=$(which mvn)
 AWK_PATH=$(which awk)
 PROJECT_PATH=$(pwd)
+APPLICATION_PACKAGE="de.unihamburg.vsis.jadexAndroid_test"
+MAIN_ACTIVITY="MainMenu"
+
 
 function checkAdbPermissions () {
 $ADB_PATH devices | grep -q "no permissions"
@@ -60,4 +63,6 @@ else
 	checkAdbPermissions
 	echo "Transferring file to device..."
 	$ADB_PATH install -r target/jadex-android-0.0.1-SNAPSHOT.apk
+	echo "Starting Application on device"
+	$ADB_PATH shell am start -n $APPLICATION_PACKAGE/$APPLICATION_PACKAGE.$MAIN_ACTIVITY
 fi
