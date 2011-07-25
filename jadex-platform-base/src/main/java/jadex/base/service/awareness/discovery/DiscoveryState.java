@@ -197,7 +197,7 @@ public class DiscoveryState
 	/**
 	 *  Set the fast startup awareness flag
 	 */
-	public void setFastAwareness(boolean fast)
+	public void setFast(boolean fast)
 	{
 		this.fast = fast;
 	}
@@ -206,7 +206,7 @@ public class DiscoveryState
 	 *  Get the fast startup awareness flag.
 	 *  @return The fast flag.
 	 */
-	public boolean isFastAwareness()
+	public boolean isFast()
 	{
 		return this.fast;
 	}
@@ -273,6 +273,14 @@ public class DiscoveryState
 		byte[] data = new byte[pack.getLength()];
 		System.arraycopy(pack.getData(), 0, data, 0, pack.getLength());
 		return decodeObject(data, classloader);
+	}
+	
+	/**
+	 *  Create awareness info of myself.
+	 */
+	public AwarenessInfo createAwarenessInfo()
+	{
+		return new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, getDelay(), getIncludes(), getExcludes(), false);
 	}
 	
 	/**

@@ -260,10 +260,10 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			if(prefixlen==-1) // Guess C class if nothing can be determined.
 				prefixlen = 24;
 			
-//			getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)24), port));
-//			getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)16), port));
-//			getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)8), port));
-//			if(prefixlen!=-1 && prefixlen!=24 && prefixlen!=16 && prefixlen!=8)
+			getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)24), port));
+			getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)16), port));
+			getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)8), port));
+			if(prefixlen!=-1 && prefixlen!=24 && prefixlen!=16 && prefixlen!=8)
 				getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, prefixlen), port));
 		}
 		catch(Exception e)
@@ -582,6 +582,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 					remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
 				}
 				
+//				System.out.println("to locals, from: "+address+" "+port+" "+info.getSender());
 				sendToLocals(packet.getData());
 			}
 			else

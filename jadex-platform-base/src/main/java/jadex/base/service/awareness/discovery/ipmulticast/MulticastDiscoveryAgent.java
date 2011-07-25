@@ -108,27 +108,7 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	public IFuture	agentCreated()
 	{
 		this.state = new DiscoveryState(getExternalAccess());
-		
 		initArguments();
-		
-//		try
-//		{
-//			this.sendsocket = new MulticastSocket();
-//			this.sendsocket.setLoopbackMode(true);
-//		}
-//		catch(IOException e)
-//		{
-//			throw new RuntimeException(e);
-//		}
-//		this.reader	= JavaReader.getReader(new XMLReporter()
-//		{
-//			public void report(String message, String type, Object related, Location location) throws XMLStreamException
-//			{
-//				// Ignore XML exceptions.
-////				getLogger().warning(message);
-//			}
-//		});
-		
 		return IFuture.DONE;
 	}
 	
@@ -412,26 +392,26 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 						IManagementService ms = (IManagementService)result;
 						ms.addAwarenessInfo(info);
 						
-	//					if(initial && fast && started && !killed)
-	//					{
-	////						System.out.println(System.currentTimeMillis()+" fast discovery: "+getComponentIdentifier()+", "+sender);
-	//						received_self	= false;
-	//						waitFor((long)(Math.random()*500), new IComponentStep()
-	//						{
-	//							int	cnt;
-	//							public Object execute(IInternalAccess ia)
-	//							{
-	//								if(!received_self)
-	//								{
-	//									cnt++;
-	////									System.out.println("CSMACD try #"+(++cnt));
-	//									send(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes));
-	//									waitFor((long)(Math.random()*500*cnt), this);
-	//								}
-	//								return null;
-	//							}
-	//						});
-	//					}
+						if(initial && state.isFast() && state.isStarted() && !state.isKilled())
+						{
+	//						System.out.println(System.currentTimeMillis()+" fast discovery: "+getComponentIdentifier()+", "+sender);
+							received_self	= false;
+							state.doWaitFor((long)(Math.random()*500), new IComponentStep()
+							{
+								int	cnt;
+								public Object execute(IInternalAccess ia)
+								{
+									if(!received_self)
+									{
+										cnt++;
+	//									System.out.println("CSMACD try #"+(++cnt));
+										send(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes));
+										state.doWaitFor((long)(Math.random()*500*cnt), this);
+									}
+									return null;
+								}
+							});
+						}
 					}
 				});
 			}
