@@ -37,11 +37,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-
-/* $if !android $ */
-import javax.xml.stream.Location;
-import javax.xml.stream.XMLReporter;
-import javax.xml.stream.XMLStreamException;
 /* $else $ 
 import javaxx.xml.stream.Location;
 import javaxx.xml.stream.XMLReporter;
@@ -450,7 +445,6 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	 */
 	protected synchronized DatagramSocket getSocket()
 	{
-		System.out.println("gss");
 		if(!state.isKilled())
 		{
 			if(socket==null)
@@ -459,7 +453,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 				{
 					socket = new DatagramSocket(port);
 					socket.setBroadcast(true);
-//					System.out.println("local master at: "+SDiscovery.getInet4Address()+" "+port);
+					System.out.println("local master at: "+SUtil.getInet4Address()+" "+port);
 				}
 				catch(Exception e)
 				{
@@ -476,7 +470,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 						byte[] data = DiscoveryState.encodeObject(si, getModel().getClassLoader());
 						DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
 						socket.send(packet);
-//						System.out.println("local slave at: "+SDiscovery.getInet4Address()+" "+receivesocket.getLocalPort());
+						System.out.println("local slave at: "+SUtil.getInet4Address()+" "+socket.getLocalPort());
 						
 //						getLogger().warning("Running in local mode: "+e);
 					}
@@ -488,7 +482,6 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 				}
 			}
 		}
-		System.out.println("gse");
 
 		return socket;
 	}
@@ -592,8 +585,10 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 				remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
 			}
 			
-			System.out.println("received awa info: "+getComponentIdentifier().getLocalName()+" "+info.getSender());
+//			System.out.println("received awa info: "+getComponentIdentifier().getLocalName()+" "+info.getSender());
 		}
+		
+		System.out.println("received awa info: "+getComponentIdentifier().getLocalName()+" "+info.getSender());
 	}
 	
 	/**
