@@ -129,7 +129,7 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			throw new NullPointerException("Cannot get address: "+getArgument("address"));
 		this.port = ((Number)getArgument("port")).intValue();
 		state.setDelay(((Number)getArgument("delay")).longValue());
-		state.setFastAwareness(((Boolean)getArgument("fast")).booleanValue());
+		state.setFast(((Boolean)getArgument("fast")).booleanValue());
 	}
 	
 	/**
@@ -392,26 +392,26 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 						IManagementService ms = (IManagementService)result;
 						ms.addAwarenessInfo(info);
 						
-						if(initial && state.isFast() && state.isStarted() && !state.isKilled())
-						{
-	//						System.out.println(System.currentTimeMillis()+" fast discovery: "+getComponentIdentifier()+", "+sender);
-							received_self	= false;
-							state.doWaitFor((long)(Math.random()*500), new IComponentStep()
-							{
-								int	cnt;
-								public Object execute(IInternalAccess ia)
-								{
-									if(!received_self)
-									{
-										cnt++;
-	//									System.out.println("CSMACD try #"+(++cnt));
-										send(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes));
-										state.doWaitFor((long)(Math.random()*500*cnt), this);
-									}
-									return null;
-								}
-							});
-						}
+//						if(initial && state.isFast() && state.isStarted() && !state.isKilled())
+//						{
+//	//						System.out.println(System.currentTimeMillis()+" fast discovery: "+getComponentIdentifier()+", "+sender);
+//							received_self	= false;
+//							state.doWaitFor((long)(Math.random()*500), new IComponentStep()
+//							{
+//								int	cnt;
+//								public Object execute(IInternalAccess ia)
+//								{
+//									if(!received_self)
+//									{
+//										cnt++;
+//	//									System.out.println("CSMACD try #"+(++cnt));
+//										send();
+//										state.doWaitFor((long)(Math.random()*500*cnt), this);
+//									}
+//									return null;
+//								}
+//							});
+//						}
 					}
 				});
 			}

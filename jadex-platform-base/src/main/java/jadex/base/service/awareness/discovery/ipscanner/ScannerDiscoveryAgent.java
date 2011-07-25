@@ -5,9 +5,7 @@ import jadex.base.service.awareness.discovery.DiscoveryEntry;
 import jadex.base.service.awareness.discovery.DiscoveryState;
 import jadex.base.service.awareness.discovery.IDiscoveryService;
 import jadex.base.service.awareness.discovery.LeaseTimeHandler;
-import jadex.base.service.awareness.discovery.MasterInfo;
 import jadex.base.service.awareness.discovery.SendHandler;
-import jadex.base.service.awareness.discovery.SlaveInfo;
 import jadex.base.service.awareness.management.IManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -585,8 +583,7 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 						}
 						InetAddress address = SUtil.getInet4Address();
 						AwarenessInfo info = state.createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, !isMaster());
-						SlaveInfo si = new SlaveInfo(info);
-						byte[] data = DiscoveryState.encodeObject(si, getModel().getClassLoader());
+						byte[] data = DiscoveryState.encodeObject(info, getModel().getClassLoader());
 						send(data, address, port);
 						
 						System.out.println("local slave at: "+SUtil.getInet4Address()+" "+channel.socket().getLocalPort());
@@ -615,10 +612,7 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 				
 //		byte[] data = new byte[pack.getLength()];
 //		System.arraycopy(pack.getData(), 0, data, 0, pack.getLength());
-		Object obj = DiscoveryState.decodeObject(data, getModel().getClassLoader());
-		AwarenessInfo info = obj instanceof AwarenessInfo? (AwarenessInfo)obj:
-			obj instanceof SlaveInfo? ((SlaveInfo)obj).getAwarenessInfo(): 
-			obj instanceof MasterInfo? ((MasterInfo)obj).getAwarenessInfo(): null;
+		AwarenessInfo info = (AwarenessInfo)DiscoveryState.decodeObject(data, getModel().getClassLoader());
 		
 //		System.out.println("received: "+obj+" "+address);
 			
@@ -634,73 +628,38 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 //			}
 //			System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
 		}	
-			
-		if(obj instanceof SlaveInfo)
+		
+		// Received awareness info
+		// When master -> 
+		//   if slave info -> save in locals and sent to remote masters and local slaves
+		//   if remote info -> save in remotes and send to local slaves
+		// When slave ->
+		//   save as remote info (also other slaves, for lease time management)
+		
+		if(isMaster())
 		{
-			if(this.port!=getChannel().socket().getLocalPort())
-				return;
-			
-			// Send new slave to all others (then can subsequently communicate directly with him).
-			byte[] slavedata = DiscoveryState.encodeObject(info, getModel().getClassLoader());
-			sendToLocals(slavedata);
-			sendToRemotes(slavedata);
-			
-			// Received slaveinfo -> save slave, reply with masterinfo, forward new slave to other slaves.
-			SlaveInfo si = (SlaveInfo)obj;
-			locals.addOrUpdateEntry(new DiscoveryEntry(si.getAwarenessInfo(), 
-				state.getClockTime(), sa, false));
-			AwarenessInfo myinfo = state.createAwarenessInfo(AwarenessInfo.STATE_ONLINE, !isMaster());
-			MasterInfo mi = new MasterInfo(myinfo);
-			byte[] mydata = DiscoveryState.encodeObject(mi, getModel().getClassLoader());
-			send(mydata, address, port);
-//			System.out.println("send mi to new slave: "+port);
-			System.out.println("received slave info: "+getComponentIdentifier().getLocalName()+" "+si.getAwarenessInfo().getSender());
-		}
-		else if(obj instanceof MasterInfo)
-		{
-			if(this.port==getChannel().socket().getLocalPort())
-				return;
-			
-			// Received masterinfo -> save master
-			MasterInfo mi = (MasterInfo)obj;
-			remotes.addOrUpdateEntry(new DiscoveryEntry(mi.getAwarenessInfo(), 
-				state.getClockTime(), sa, true));
-//			System.out.println("received master info: "+getComponentIdentifier().getLocalName()+" "+mi.getAwarenessInfo().getSender());
-		}
-		else if(obj instanceof AwarenessInfo)
-		{
-			// Received awareness info
-			// When master -> 
-			//   if slave info -> save in locals and sent to remote masters and local slaves
-			//   if remote info -> save in remotes and send to local slaves
-			// When slave ->
-			//   save as remote info (also other slaves, for lease time management)
-			
-			if(isMaster())
+			if(address.equals(SUtil.getInet4Address()))
 			{
-				if(address.equals(SUtil.getInet4Address()))
-				{
-					// If awareness message comes from local slave.
-					locals.updateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
-					
-					// Forward the slave update to remote masters.
-					sendToRemotes(data);
-				}
-				else
-				{
-					// If awareness message comes from remove node.
-					remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
-				}
+				// If awareness message comes from local slave.
+				locals.updateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
 				
-				sendToLocals(data);
+				// Forward the slave update to remote masters.
+				sendToRemotes(data);
 			}
 			else
 			{
+				// If awareness message comes from remove node.
 				remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
 			}
 			
-			System.out.println("received awa info: "+getComponentIdentifier().getLocalName()+" "+info.getSender());
+			sendToLocals(data);
 		}
+		else
+		{
+			remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
+		}
+			
+		System.out.println("received awa info: "+getComponentIdentifier().getLocalName()+" "+info.getSender());
 	}
 	
 	/**
