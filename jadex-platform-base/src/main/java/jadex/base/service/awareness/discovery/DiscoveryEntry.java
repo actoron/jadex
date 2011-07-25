@@ -18,20 +18,16 @@ public class DiscoveryEntry
 	/** The entry. */
 	protected Object entry;
 	
-	/** Is master. */
-	protected boolean master;
-	
 	//-------- constructors --------
 	
 	/**
 	 *  Create an entry.
 	 */
-	public DiscoveryEntry(AwarenessInfo info, long time, Object entry, boolean master)
+	public DiscoveryEntry(AwarenessInfo info, long time, Object entry)
 	{
 		this.info = info;
 		this.time = time;
 		this.entry = entry;
-		this.master = master;
 	}
 	
 	//-------- methods --------
@@ -92,28 +88,10 @@ public class DiscoveryEntry
 	}
 
 	/**
-	 *  Get the master.
-	 *  @return the master.
-	 */
-	public boolean isMaster()
-	{
-		return master;
-	}
-
-	/**
-	 *  Set the master.
-	 *  @param master The master to set.
-	 */
-	public void setMaster(boolean master)
-	{
-		this.master = master;
-	}
-
-	/**
 	 *  Get the string representation.
 	 */
 	public String toString()
 	{
-		return "DiscoveryEntry(cid=" + info.getSender() + ", master=" + master + ")";
+		return "DiscoveryEntry(cid=" + info.getSender() + ", master=" + info.getMasterId() + ")";
 	}
 }

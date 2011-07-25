@@ -74,10 +74,10 @@ import java.util.TimerTask;
 	@Configuration(name="Frequent updates (10s)", arguments=@NameValue(name="delay", value="10000"), 
 		components=
 		{
-			@Component(name="broadcastdis", type="broadcastdis")
+//			@Component(name="broadcastdis", type="broadcastdis")
 //			@Component(name="multicastdis", type="multicastdis")
 //			@Component(name="scannerdis", type="scannerdis")
-//			@Component(name="registrydis", type="registrydis")
+			@Component(name="registrydis", type="registrydis")
 		}),
 	@Configuration(name="Medium updates (20s)", arguments=@NameValue(name="delay", value="20000"),
 		components=
@@ -232,8 +232,11 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	 *  Announce the discovered components.
 	 *  @param infos The infos.
 	 */
-	public void addAwarenessInfo(AwarenessInfo info)
+	public IFuture addAwarenessInfo(AwarenessInfo info)
 	{
+		// Return if inital discovery.
+		boolean ret = false;
+		
 		// Fix broken awareness infos for backwards compatibility.
 		if(info.getDelay()==0)
 			info.setDelay(delay);
@@ -254,7 +257,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			{
 				dif = new DiscoveryInfo(sender, null, getClockTime(), getDelay(), remoteexcluded);
 				discovered.put(sender, dif);
-//					initial	= true;
+				ret	= true;
 			}
 			
 			dif.setTime(getClockTime());
@@ -293,6 +296,8 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 				deleteProxy(dif);
 			}
 		}
+		
+		return new Future(ret);
 	}
 	
 	/**

@@ -30,7 +30,7 @@ public class AwarenessComponentPlugin extends AbstractComponentPlugin
 	 */
 	public String getModelName()
 	{
-		return "jadex.base.service.awareness.AwarenessManagement";
+		return "jadex.base.service.awareness.management.AwarenessManagement";
 	}
 	
 	/**

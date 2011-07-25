@@ -25,9 +25,6 @@ public class AwarenessInfo
 	/** The sending component's identifier. */
 	protected IComponentIdentifier	sender;
 
-	/** The flag if should not be answered. */
-	protected boolean ignore;
-
 	/** The component state. */
 	protected String state;
 	
@@ -39,6 +36,9 @@ public class AwarenessInfo
 	
 	/** The excludes list. */
 	protected String[] excludes;
+
+	/** The masterid (or null if not a master). */
+	protected String masterid;
 	
 	//-------- constructors --------
 	
@@ -60,14 +60,15 @@ public class AwarenessInfo
 	/**
 	 *  Create a new awareness info.
 	 */
-	public AwarenessInfo(IComponentIdentifier sender, String state, long delay, String[] includes, String[] excludes, boolean ignore)
+	public AwarenessInfo(IComponentIdentifier sender, String state, long delay, 
+		String[] includes, String[] excludes, String masterid)
 	{
 		this.sender = sender;
 		this.state = state;
 		this.delay = delay;
 		this.includes	= includes;
 		this.excludes	= excludes;
-		this.ignore = ignore;
+		this.masterid = masterid;
 	}
 	
 	//-------- methods --------
@@ -163,21 +164,21 @@ public class AwarenessInfo
 	}
 	
 	/**
-	 *  Get the ignore.
-	 *  @return the ignore.
+	 *  Get the masterid.
+	 *  @return the masterid.
 	 */
-	public boolean isIgnore()
+	public String getMasterId()
 	{
-		return ignore;
+		return masterid;
 	}
 
 	/**
-	 *  Set the ignore.
-	 *  @param ignore The ignore to set.
+	 *  Set the masterid.
+	 *  @param masterid The masterid to set.
 	 */
-	public void setIgnore(boolean ignore)
+	public void setMasterId(String masterid)
 	{
-		this.ignore = ignore;
+		this.masterid = masterid;
 	}
 
 	/**

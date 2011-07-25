@@ -96,7 +96,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	protected IComponentIdentifier root;
 	
 	/** Flag indicating that the agent has received its own discovery info. */
-//	protected boolean received_self;
+	protected boolean received_self;
 	
 	//-------- methods --------
 	
@@ -137,6 +137,17 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	}
 	
 	/**
+	 *  Set the fast awareness flag.
+	 *  @param fast The fast flag.
+	 */
+	public void setFast(boolean fast)
+	{
+		state.setFast(fast);
+		// todo: implement me
+	}
+
+	
+	/**
 	 *  Set the includes.
 	 *  @param includes The includes.
 	 */
@@ -168,7 +179,11 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			public void entryDeleted(DiscoveryEntry entry)
 			{
 				// If master is lost, try to become master
-				if(entry.isMaster())
+				// If master is lost, try to become master
+				String mid = entry.getInfo().getMasterId();
+				String mymid = createMasterId(SUtil.getInet4Address(), port);
+//				System.out.println("mid:_"+mid+" "+mymid);
+				if(mid!=null && mid.equals(mymid))
 				{
 //					System.out.println("Master deleted.");
 					
@@ -183,7 +198,8 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 					}
 					catch (Exception e) 
 					{
-						e.printStackTrace();
+						getLogger().warning("Socket problem: "+e);
+//						e.printStackTrace();
 					}
 				}
 			}
@@ -219,7 +235,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		DatagramSocket socket = getSocket();
 		if(socket!=null)
 		{
-			sender.send(state.createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, false));
+			sender.send(state.createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, createMasterId()));
 		}
 		
 //		System.out.println("killed set to true: "+getComponentIdentifier());
@@ -315,7 +331,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			{
 				// Only send to remote masters directly.
 				// A master will forward a message to its slaves.
-				if(!rems[i].getInfo().isIgnore())
+				if(rems[i].getInfo().getMasterId()!=null)
 				{
 					InetSocketAddress sa = (InetSocketAddress)rems[i].getEntry();
 					// Use received port, as enables slave to slave communication
@@ -329,7 +345,8 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			getLogger().warning("Send to remotes problem:_"+e);
+//			e.printStackTrace();
 		}
 		
 		return ret;
@@ -467,7 +484,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 						socket = new DatagramSocket();
 						socket.setBroadcast(true);
 						InetAddress address = SUtil.getInet4Address();
-						AwarenessInfo info = state.createAwarenessInfo(AwarenessInfo.STATE_ONLINE, !isMaster());
+						AwarenessInfo info = state.createAwarenessInfo(AwarenessInfo.STATE_ONLINE, createMasterId());
 						byte[] data = DiscoveryState.encodeObject(info, getModel().getClassLoader());
 						DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
 						socket.send(packet);
@@ -477,7 +494,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 					}
 					catch(Exception e2)
 					{
-						e2.printStackTrace();
+//						e2.printStackTrace();
 						throw new RuntimeException(e2);
 					}
 				}
@@ -529,7 +546,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			if(address.equals(SUtil.getInet4Address()))
 			{
 				// If awareness message comes from local slave.
-				locals.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
+				locals.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa));
 				
 				// Forward the slave update to remote masters.
 				sendToRemotes(packet.getData());
@@ -537,15 +554,15 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			else
 			{
 				// If awareness message comes from remove node.
-				remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
+				remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa));
 			}
 			
-//				System.out.println("to locals, from: "+address+" "+port+" "+info.getSender());
+//			System.out.println("to locals, from: "+address+" "+port+" "+info.getSender());
 			sendToLocals(packet.getData());
 		}
 		else
 		{
-			remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
+			remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa));
 		}
 		
 //		System.out.println("received awa info: "+getComponentIdentifier().getLocalName()+" "+info.getSender());
@@ -577,35 +594,49 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	protected void announceAwareness(final AwarenessInfo info)
 	{
 //		System.out.println("announcing: "+info);
-		getRequiredService("management").addResultListener(new DefaultResultListener()
+		
+		if(info.getSender()!=null)
 		{
-			public void resultAvailable(Object result)
+			if(info.getSender().equals(root))
+				received_self	= true;
+			
+//			System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
+			
+			getRequiredService("management").addResultListener(new DefaultResultListener()
 			{
-				IManagementService ms = (IManagementService)result;
-				ms.addAwarenessInfo(info);
-				
-//				if(initial && fast && started && !killed)
-//				{
-////				System.out.println(System.currentTimeMillis()+" fast discovery: "+getComponentIdentifier()+", "+sender);
-//					received_self	= false;
-//					waitFor((long)(Math.random()*500), new IComponentStep()
-//					{
-//						int	cnt;
-//						public Object execute(IInternalAccess ia)
-//						{
-//							if(!received_self)
-//							{
-//								cnt++;
-////							System.out.println("CSMACD try #"+(++cnt));
-//								send(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, delay, includes, excludes));
-//								waitFor((long)(Math.random()*500*cnt), this);
-//							}
-//							return null;
-//						}
-//					});
-//				}
-			}
-		});
+				public void resultAvailable(Object result)
+				{
+					IManagementService ms = (IManagementService)result;
+					ms.addAwarenessInfo(info).addResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object result)
+						{
+							boolean initial = ((Boolean)result).booleanValue();
+							if(initial && state.isFast() && state.isStarted() && !state.isKilled())
+							{
+		//						System.out.println(System.currentTimeMillis()+" fast discovery: "+getComponentIdentifier()+", "+sender);
+								received_self = false;
+								state.doWaitFor((long)(Math.random()*500), new IComponentStep()
+								{
+									int	cnt;
+									public Object execute(IInternalAccess ia)
+									{
+										if(!received_self)
+										{
+											cnt++;
+		//									System.out.println("CSMACD try #"+(++cnt));
+											sender.send(state.createAwarenessInfo());
+											state.doWaitFor((long)(Math.random()*500*cnt), this);
+										}
+										return null;
+									}
+								});
+							}
+						}
+					});
+				}
+			});
+		}
 	}
 	
 	/**
@@ -614,6 +645,23 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	protected boolean isMaster()
 	{
 		return this.port==getSocket().getLocalPort();
+	}
+	
+	/**
+	 *  Create the master id.
+	 */
+	protected String createMasterId()
+	{
+		return isMaster()? createMasterId(SUtil.getInet4Address(),
+			getSocket().getLocalPort()): null;
+	}
+	
+	/**
+	 *  Create the master id.
+	 */
+	protected String createMasterId(InetAddress address, int port)
+	{
+		return address+":"+port;
 	}
 	
 	/**
@@ -634,7 +682,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		 */
 		public AwarenessInfo createAwarenessInfo()
 		{
-			return state.createAwarenessInfo(AwarenessInfo.STATE_ONLINE, !isMaster());
+			return state.createAwarenessInfo(AwarenessInfo.STATE_ONLINE, createMasterId());
 		}
 		
 		/**
@@ -671,7 +719,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			catch(Exception e)
 			{
 				getLogger().warning("Could not send awareness message: "+e);
-				e.printStackTrace();
+//				e.printStackTrace();
 			}	
 		}
 	}

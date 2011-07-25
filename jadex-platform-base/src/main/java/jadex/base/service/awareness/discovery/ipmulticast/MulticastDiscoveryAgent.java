@@ -29,9 +29,7 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
@@ -170,7 +168,7 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		MulticastSocket socket = getSocket();
 		if(socket!=null)
 		{
-			sender.send(state.createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, false));
+			sender.send(state.createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, null));
 		}
 		
 //		System.out.println("killed set to true: "+getComponentIdentifier());
@@ -244,6 +242,15 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			state.setDelay(delay);
 			sender.startSendBehavior();
 		}
+	}
+	
+	/**
+	 *  Set the fast awareness flag.
+	 *  @param fast The fast flag.
+	 */
+	public void setFast(boolean fast)
+	{
+		state.setFast(fast);
 	}
 	
 	/**
@@ -390,28 +397,33 @@ public class MulticastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 					public void resultAvailable(Object result)
 					{
 						IManagementService ms = (IManagementService)result;
-						ms.addAwarenessInfo(info);
-						
-//						if(initial && state.isFast() && state.isStarted() && !state.isKilled())
-//						{
-//	//						System.out.println(System.currentTimeMillis()+" fast discovery: "+getComponentIdentifier()+", "+sender);
-//							received_self	= false;
-//							state.doWaitFor((long)(Math.random()*500), new IComponentStep()
-//							{
-//								int	cnt;
-//								public Object execute(IInternalAccess ia)
-//								{
-//									if(!received_self)
-//									{
-//										cnt++;
-//	//									System.out.println("CSMACD try #"+(++cnt));
-//										send();
-//										state.doWaitFor((long)(Math.random()*500*cnt), this);
-//									}
-//									return null;
-//								}
-//							});
-//						}
+						ms.addAwarenessInfo(info).addResultListener(new DefaultResultListener()
+						{
+							public void resultAvailable(Object result)
+							{
+								boolean initial = ((Boolean)result).booleanValue();
+								if(initial && state.isFast() && state.isStarted() && !state.isKilled())
+								{
+			//						System.out.println(System.currentTimeMillis()+" fast discovery: "+getComponentIdentifier()+", "+sender);
+									received_self = false;
+									state.doWaitFor((long)(Math.random()*500), new IComponentStep()
+									{
+										int	cnt;
+										public Object execute(IInternalAccess ia)
+										{
+											if(!received_self)
+											{
+												cnt++;
+			//									System.out.println("CSMACD try #"+(++cnt));
+												sender.send(state.createAwarenessInfo());
+												state.doWaitFor((long)(Math.random()*500*cnt), this);
+											}
+											return null;
+										}
+									});
+								}
+							}
+						});
 					}
 				});
 			}

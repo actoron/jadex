@@ -99,7 +99,7 @@ public abstract class SendHandler
 	 */
 	public AwarenessInfo createAwarenessInfo()
 	{
-		return state.createAwarenessInfo(AwarenessInfo.STATE_ONLINE, false);
+		return state.createAwarenessInfo();
 	}
 	
 	/**

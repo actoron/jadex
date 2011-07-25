@@ -35,6 +35,7 @@ import jadex.xml.annotation.XMLClassname;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
 /* $if !android $ */
@@ -148,6 +149,16 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 	}
 	
 	/**
+	 *  Set the fast awareness flag.
+	 *  @param fast The fast flag.
+	 */
+	public void setFast(boolean fast)
+	{
+		state.setFast(fast);
+		// todo: implement me
+	}
+	
+	/**
 	 *  Set the includes.
 	 *  @param includes The includes.
 	 */
@@ -226,7 +237,7 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 		DatagramSocket socket = getSocket();
 		if(socket!=null)
 		{
-			sender.send(state.createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, false));
+			sender.send(state.createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, null));
 		}
 		
 //		System.out.println("killed set to true: "+getComponentIdentifier());
@@ -272,8 +283,15 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 						try
 						{
 							// Init receive socket
-							getSocket();
-							ret.setResultIfUndone(null);
+							try
+							{
+								getSocket();
+								ret.setResult(null);
+							}
+							catch(Exception e)
+							{
+								ret.setResultIfUndone(null);
+							}
 							
 							while(!state.isKilled())
 							{
@@ -395,7 +413,8 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 //			System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
 		}
 			
-		knowns.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), new Object[]{pack.getAddress(), pack.getPort()}, false));
+		knowns.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), 
+			new InetSocketAddress(pack.getAddress(), pack.getPort())));
 	}
 	
 	/**
@@ -494,9 +513,8 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 			DiscoveryEntry[] rems = knowns.getEntries();
 			for(int i=0; i<rems.length; i++)
 			{
-				Object[] tmp = (Object[])rems[i].getEntry();
-//				System.out.println("to: "+tmp[0]+" "+tmp[1]);
-				getSocket().send(new DatagramPacket(data, data.length, (InetAddress)tmp[0], ((Integer)tmp[1]).intValue()));
+				InetSocketAddress isa = (InetSocketAddress)rems[i].getEntry();
+				getSocket().send(new DatagramPacket(data, data.length, isa.getAddress(), isa.getPort()));
 			}
 //			System.out.println("sent to knwons: "+rems.length);
 		}
@@ -504,14 +522,6 @@ public class RegistryDiscoveryAgent extends MicroAgent implements IDiscoveryServ
 		{
 			e.printStackTrace();
 		}
-	}
-	
-	/**
-	 * 
-	 */
-	protected AwarenessInfo createAwarenessInfo()
-	{
-		return new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, state.getDelay(), state.getIncludes(), state.getExcludes(), false);
 	}
 	
 	/**

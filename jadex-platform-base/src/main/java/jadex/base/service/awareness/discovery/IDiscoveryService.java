@@ -12,6 +12,12 @@ public interface IDiscoveryService
 	public void setDelay(long delay);
 	
 	/**
+	 *  Set the fast awareness flag.
+	 *  @param fast The fast flag.
+	 */
+	public void setFast(boolean fast);
+	
+	/**
 	 *  Set the includes.
 	 *  @param includes The includes.
 	 */

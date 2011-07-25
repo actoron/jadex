@@ -280,14 +280,14 @@ public class DiscoveryState
 	 */
 	public AwarenessInfo createAwarenessInfo()
 	{
-		return new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, getDelay(), getIncludes(), getExcludes(), false);
+		return new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, getDelay(), getIncludes(), getExcludes(), null);
 	}
 	
 	/**
 	 *  Create awareness info of myself.
 	 */
-	public AwarenessInfo createAwarenessInfo(String state, boolean ignore)
+	public AwarenessInfo createAwarenessInfo(String state, String masterid)
 	{
-		return new AwarenessInfo(root, state, getDelay(), getIncludes(), getExcludes(), ignore);
+		return new AwarenessInfo(root, state, getDelay(), getIncludes(), getExcludes(), masterid);
 	}
 }

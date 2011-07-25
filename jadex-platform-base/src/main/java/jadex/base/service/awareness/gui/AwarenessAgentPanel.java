@@ -79,11 +79,11 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/** The latest settings of the agent. */
 	protected AwarenessSettings	settings;
 	
-	/** The IP address text field. */
-	protected JTextField	tfipaddress;
-
-	/** The port text field. */
-	protected JTextField	tfport;
+//	/** The IP address text field. */
+//	protected JTextField	tfipaddress;
+//
+//	/** The port text field. */
+//	protected JTextField	tfport;
 
 	/** The delay spinner. */
 	protected JSpinner	spdelay;
@@ -126,14 +126,14 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		
 		this.timerdelay = 5000;
 				
-		tfipaddress = new JTextField(9);
-		tfipaddress.setPreferredSize(tfipaddress.getPreferredSize());
-		tfipaddress.setMinimumSize(tfipaddress.getPreferredSize());
-		tfipaddress.setHorizontalAlignment(JTextField.RIGHT);
-		tfport = new JTextField(4);
-		tfport.setPreferredSize(tfport.getPreferredSize());
-		tfport.setMinimumSize(tfport.getPreferredSize());
-		tfport.setHorizontalAlignment(JTextField.RIGHT);
+//		tfipaddress = new JTextField(9);
+//		tfipaddress.setPreferredSize(tfipaddress.getPreferredSize());
+//		tfipaddress.setMinimumSize(tfipaddress.getPreferredSize());
+//		tfipaddress.setHorizontalAlignment(JTextField.RIGHT);
+//		tfport = new JTextField(4);
+//		tfport.setPreferredSize(tfport.getPreferredSize());
+//		tfport.setMinimumSize(tfport.getPreferredSize());
+//		tfport.setHorizontalAlignment(JTextField.RIGHT);
 		SpinnerNumberModel spmdelay = new SpinnerNumberModel(0, 0, 100000, 1);
 		spdelay = new JSpinner(spmdelay);
 		cbfast = new JCheckBox();
@@ -152,13 +152,13 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		final JPanel pdissettings = new JPanel(new GridBagLayout());
 		pdissettings.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Discovery Settings "));
 		int y=0;
-		pdissettings.add(new JLabel("Multicast address [ip:port]", JLabel.LEFT), 
-			new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
-			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
-		pdissettings.add(tfipaddress, new GridBagConstraints(1, y, 1, 1, 1, 0, GridBagConstraints.NORTHWEST, 
-			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
-		pdissettings.add(tfport, new GridBagConstraints(2, y, 1, 1, 1, 0, GridBagConstraints.NORTHWEST, 
-			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
+//		pdissettings.add(new JLabel("Multicast address [ip:port]", JLabel.LEFT), 
+//			new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
+//			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
+//		pdissettings.add(tfipaddress, new GridBagConstraints(1, y, 1, 1, 1, 0, GridBagConstraints.NORTHWEST, 
+//			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
+//		pdissettings.add(tfport, new GridBagConstraints(2, y, 1, 1, 1, 0, GridBagConstraints.NORTHWEST, 
+//			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
 		y++;
 		pdissettings.add(new JLabel("Info send delay (0=off) [s]", JLabel.LEFT), 
 				new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
@@ -547,8 +547,8 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		try
 		{
 			final AwarenessSettings	settings	= new AwarenessSettings();	// local variable for XML transfer
-			settings.address	= InetAddress.getByName(tfipaddress.getText());
-			settings.port = Integer.parseInt(tfport.getText());
+//			settings.address	= InetAddress.getByName(tfipaddress.getText());
+//			settings.port = Integer.parseInt(tfport.getText());
 			settings.delay = ((Number)spdelay.getValue()).longValue()*1000;
 			settings.fast = cbfast.isSelected();
 			settings.autocreate = cbautocreate.isSelected();
@@ -608,8 +608,8 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	protected void updateSettings(AwarenessSettings settings)
 	{
 		this.settings	= settings;
-		tfipaddress.setText(settings.address.getHostAddress());
-		tfport.setText(""+settings.port);
+//		tfipaddress.setText(settings.address.getHostAddress());
+//		tfport.setText(""+settings.port);
 		spdelay.setValue(new Long(settings.delay/1000));
 		cbfast.setSelected(settings.fast);
 		cbautocreate.setSelected(settings.autocreate);

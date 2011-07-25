@@ -1,5 +1,7 @@
 package jadex.tools.simcenter;
 
+import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.componentviewer.AbstractServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.service.simulation.ISimulationService;
@@ -7,7 +9,6 @@ import jadex.bridge.service.IService;
 import jadex.commons.Properties;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
 import javax.swing.JComponent;
 
@@ -32,17 +33,12 @@ public class SimServiceViewerPanel extends AbstractServiceViewerPanel
 	public IFuture init(final IControlCenter jcc, final IService service)
 	{
 		final Future ret = new Future();
-		super.init(jcc, service).addResultListener(new IResultListener()
+		super.init(jcc, service).addResultListener(new SwingDelegationResultListener(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
 				panel = new SimCenterPanel(jcc, (ISimulationService)service);
 				ret.setResult(null);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
 			}
 		});
 		return ret;

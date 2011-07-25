@@ -163,9 +163,12 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 			public void entryDeleted(DiscoveryEntry entry)
 			{
 				// If master is lost, try to become master
-				if(entry.isMaster())
+				String mid = entry.getInfo().getMasterId();
+				String mymid = createMasterId(SUtil.getInet4Address(), port);
+//				System.out.println("mid:_"+mid+" "+mymid);
+				if(mid!=null && mid.equals(mymid))
 				{
-					System.out.println("Master deleted.");
+//					System.out.println("Master deleted.");
 					try
 					{
 						synchronized(ScannerDiscoveryAgent.this)
@@ -182,7 +185,8 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 					}
 					catch (Exception e) 
 					{
-						e.printStackTrace();
+						getLogger().warning("Socket problem: "+e);
+//						e.printStackTrace();
 					}
 				}
 			}
@@ -220,7 +224,7 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 		DatagramChannel channel = getChannel();
 		if(channel!=null)
 		{
-			sender.send(state.createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, !isMaster()));
+			sender.send(state.createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, createMasterId()));
 		}
 		
 //		System.out.println("killed set to true: "+getComponentIdentifier());
@@ -339,7 +343,7 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 			{
 				// Only send to remote masters directly.
 				// A master will forward a message to its slaves.
-				if(!rems[i].getInfo().isIgnore())
+				if(rems[i].getInfo().getMasterId()!=null)
 				{
 					InetSocketAddress sa = (InetSocketAddress)rems[i].getEntry();
 					// Use received port, as enables slave to slave communication
@@ -349,11 +353,12 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 				}
 			}
 			
-			System.out.println("sent to remotes: "+ret+" "+SUtil.arrayToString(remotes));
+//			System.out.println("sent to remotes: "+ret+" "+SUtil.arrayToString(remotes));
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			getLogger().warning("Send failed: "+e);
+//			e.printStackTrace();
 		}
 		
 		return ret;
@@ -403,11 +408,12 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 			}
 			currentip = ipnum;
 			
-			System.out.println("sent to discover: "+ret+" "+currentip);
+//			System.out.println("sent to discover: "+ret+" "+currentip);
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
+			getLogger().warning("Discovery failed: "+e);
 		}
 		
 		return ret;
@@ -425,7 +431,7 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 			InetSocketAddress sa = (InetSocketAddress)locs[i].getEntry();
 			send(data, sa.getAddress(), sa.getPort());
 		}
-		System.out.println("sent to locals: "+locs.length+" "+SUtil.arrayToString(locs));
+//		System.out.println("sent to locals: "+locs.length+" "+SUtil.arrayToString(locs));
 	}
 	
 	/**
@@ -444,6 +450,15 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 		}
 	}
 	
+	/**
+	 *  Set the fast awareness flag.
+	 *  @param fast The fast flag.
+	 */
+	public void setFast(boolean fast)
+	{
+		state.setFast(fast);
+		// todo: implement me
+	}
 	
 	/**
 	 *  Start receiving awareness infos.
@@ -563,7 +578,7 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 						selector.wakeup();
 						channel.register(selector, SelectionKey.OP_READ);
 					}
-					System.out.println("local master at: "+SUtil.getInet4Address()+" "+port);
+//					System.out.println("local master at: "+SUtil.getInet4Address()+" "+port);
 				}
 				catch(Exception e)
 				{
@@ -582,16 +597,16 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 							channel.register(selector, SelectionKey.OP_READ);
 						}
 						InetAddress address = SUtil.getInet4Address();
-						AwarenessInfo info = state.createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, !isMaster());
+						AwarenessInfo info = state.createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, createMasterId());
 						byte[] data = DiscoveryState.encodeObject(info, getModel().getClassLoader());
 						send(data, address, port);
 						
-						System.out.println("local slave at: "+SUtil.getInet4Address()+" "+channel.socket().getLocalPort());
+//						System.out.println("local slave at: "+SUtil.getInet4Address()+" "+channel.socket().getLocalPort());
 //						getLogger().warning("Running in local mode: "+e);
 					}
 					catch(Exception e2)
 					{
-						e2.printStackTrace();
+//						e2.printStackTrace();
 						throw new RuntimeException(e2);
 					}
 				}
@@ -641,7 +656,7 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 			if(address.equals(SUtil.getInet4Address()))
 			{
 				// If awareness message comes from local slave.
-				locals.updateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
+				locals.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa));
 				
 				// Forward the slave update to remote masters.
 				sendToRemotes(data);
@@ -649,25 +664,17 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 			else
 			{
 				// If awareness message comes from remove node.
-				remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
+				remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa));
 			}
 			
 			sendToLocals(data);
 		}
 		else
 		{
-			remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa, false));
+			remotes.addOrUpdateEntry(new DiscoveryEntry(info, state.getClockTime(), sa));
 		}
 			
-		System.out.println("received awa info: "+getComponentIdentifier().getLocalName()+" "+info.getSender());
-	}
-	
-	/**
-	 *  Test if is master.
-	 */
-	protected boolean isMaster()
-	{
-		return this.port==getChannel().socket().getLocalPort();
+//		System.out.println("received awa info: "+getComponentIdentifier().getLocalName()+" "+info.getSender());
 	}
 	
 	/**
@@ -708,6 +715,31 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 	}
 		
 	/**
+	 *  Test if is master.
+	 */
+	protected boolean isMaster()
+	{
+		return this.port==getChannel().socket().getLocalPort();
+	}
+	
+	/**
+	 *  Create the master id.
+	 */
+	protected String createMasterId()
+	{
+		return isMaster()? createMasterId(SUtil.getInet4Address(),
+			getChannel().socket().getLocalPort()): null;
+	}
+	
+	/**
+	 *  Create the master id.
+	 */
+	protected String createMasterId(InetAddress address, int port)
+	{
+		return address+":"+port;
+	}
+	
+	/**
 	 *  Handle sending.
 	 */
 	class ScannerSendHandler extends SendHandler
@@ -725,7 +757,7 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 		 */
 		public AwarenessInfo createAwarenessInfo()
 		{
-			return state.createAwarenessInfo(AwarenessInfo.STATE_ONLINE, !isMaster());
+			return state.createAwarenessInfo(AwarenessInfo.STATE_ONLINE, createMasterId());
 		}
 		
 		/**
@@ -761,16 +793,16 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 				}
 				
 				// Send to possibly new ones via ip guessing
-//				if(sendcount%scanfactor==0)
-//				{
-//					allowed = maxsend-sent;
-//					int discover = 0;
-//					if(allowed>0)
-//					{
-//						discover += sendToDiscover(data, allowed);
-//						sent+= discover;
-//					}
-//				}
+				if(sendcount%scanfactor==0)
+				{
+					allowed = maxsend-sent;
+					int discover = 0;
+					if(allowed>0)
+					{
+						discover += sendToDiscover(data, allowed);
+						sent+= discover;
+					}
+				}
 
 //				System.out.println(" sent:"+sent+" remotes: "+remotes);//+" discover: "+discover);
 //				System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");
@@ -778,7 +810,7 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 			catch(Exception e)
 			{
 				getLogger().warning("Could not send awareness message: "+e);
-				e.printStackTrace();
+//				e.printStackTrace();
 			}	
 			
 			sendcount++;
