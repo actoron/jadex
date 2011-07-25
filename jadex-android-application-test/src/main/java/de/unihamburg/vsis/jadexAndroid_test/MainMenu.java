@@ -45,17 +45,19 @@ public class MainMenu extends Activity implements OnClickListener {
 		ArrayAdapter<ConfigurationItem> adapter = new ArrayAdapter<ConfigurationItem>(
 				this, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		
+
 		adapter.add(new ConfigurationItem("Micro Agent Creation Test",
 				"jadex/micro/benchmarks/AgentCreationAgent.class"));
 		adapter.add(new ConfigurationItem("BPMN Creation Test",
 				"jadex/bpmn/benchmarks/AgentCreation2.bpmn"));
-		
-		adapter.add(new ConfigurationItem("BDI Creation Test", 
+
+		adapter.add(new ConfigurationItem("BDI Creation Test",
 				"jadex/bdi/benchmarks/AgentCreation.agent.xml"));
 
+		adapter.add(new ConfigurationItem("Interactive Platform", "interactive"));
+
 		configurationSpinner.setAdapter(adapter);
-		
+
 		configurationSpinner.setSelection(-1);
 	}
 
@@ -66,9 +68,14 @@ public class MainMenu extends Activity implements OnClickListener {
 			Object selectedItem = configurationSpinner.getSelectedItem();
 			if (selectedItem != null) {
 				ConfigurationItem conf = (ConfigurationItem) selectedItem;
-				Intent i = new Intent(this, Logger.class);
-				i.putExtra("component", conf.get_configFile());
-				MainMenu.this.startActivity(i);
+				if (!conf.get_configFile().equals("interactive")) {
+					Intent i = new Intent(this, Logger.class);
+					i.putExtra("component", conf.get_configFile());
+					MainMenu.this.startActivity(i);
+				} else {
+					Intent i = new Intent(this, AgentActivity.class);
+					MainMenu.this.startActivity(i);
+				}
 			}
 		} else {
 			Toast.makeText(this, "Please choose a configuration first",

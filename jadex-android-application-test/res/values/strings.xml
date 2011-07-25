@@ -9,4 +9,7 @@
         <string name="main_exitButton">exit</string>
     <string name="app_name">jadexAndroid-test</string>
     <string name="configurationSpinnerPrompt">Please choose a configuration</string>
+
+	<string name="agent_activity:launchAgent">launch Agent</string>
+
 </resources>

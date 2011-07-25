@@ -54,5 +54,16 @@ public class Startup {
 		});
 	}
 	
+	public static IFuture startEmptyPlatform() {
+		IFuture future = Starter.createPlatform(new String[] {
+				"-conf", "de/unihamburg/vsis/jadexAndroid_test/Platform.component.xml",
+				"-configname", "android_fixed",
+				"-platformname", "testcases",
+				"-saveonexit", "false",
+				"-gui", "false"
+		});
+		return future;
+	}
+	
 	
 }

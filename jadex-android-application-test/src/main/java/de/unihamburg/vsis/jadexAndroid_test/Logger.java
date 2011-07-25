@@ -103,14 +103,13 @@ public class Logger extends ListActivity implements OnClickListener {
 		getListView().setStackFromBottom(true);
 		getListView().setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
 		getListView().setDividerHeight(0);
-
 		mAdapter = new LoggerListAdapter(this);
 		setListAdapter(mAdapter);
 
-		exitButton = (Button) findViewById(R.id.log_exitButton);
+		exitButton = (Button) findViewById(R.id.logexitButton);
 		// exitButton.setEnabled(false);
 		exitButton.setOnClickListener(this);
-		clearLogButton = (Button) findViewById(R.id.log_clearLogButton);
+		clearLogButton = (Button) findViewById(R.id.logclearLogButton);
 		clearLogButton.setOnClickListener(this);
 		mAdapter.resetLines();
 
