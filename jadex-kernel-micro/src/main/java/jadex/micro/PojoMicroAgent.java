@@ -1,0 +1,113 @@
+package jadex.micro;
+
+import jadex.bridge.MessageType;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.AgentMessageArrived;
+
+import java.lang.reflect.Method;
+import java.util.Map;
+
+/**
+ *  Micro agent class that redirects calls to a pojo agent object.
+ */
+public class PojoMicroAgent extends MicroAgent
+{
+	//-------- attributes --------
+	
+	/** The agent. */
+	protected Object agent;
+
+	//-------- constructors --------
+	
+	/**
+	 *  Init the micro agent with the interpreter.
+	 *  @param interpreter The interpreter.
+	 */
+	public void init(MicroAgentInterpreter interpreter, Object agent)
+	{
+		super.init(interpreter);
+		this.agent = agent;
+	}
+	
+	//-------- interface methods --------
+	
+	/**
+	 *  Called once after agent creation.
+	 */
+	public IFuture agentCreated()
+	{
+		return invokeMethod(AgentCreated.class, null);
+	}
+		
+	/**
+	 *  Execute the functional body of the agent.
+	 *  Is only called once.
+	 */
+	public void executeBody()
+	{
+		invokeMethod(AgentBody.class, null);
+	}
+
+	/**
+	 *  Called, whenever a message is received.
+	 *  @param msg The message.
+	 *  @param mt The message type.
+	 */
+	public void messageArrived(Map msg, MessageType mt)
+	{
+		invokeMethod(AgentMessageArrived.class, new Object[]{msg, mt});
+	}
+
+	/**
+	 *  Called just before the agent is removed from the platform.
+	 *  @return The result of the component.
+	 */
+	public IFuture agentKilled()
+	{
+		return invokeMethod(AgentKilled.class, null);
+	}
+
+	/**
+	 *  Invoke double methods.
+	 *  The boolean 'firstorig' determines if basicservice method is called first.
+	 */
+	protected IFuture invokeMethod(Class annotation, Object[] args)
+	{
+		final Future ret = new Future();
+		
+		Method[] methods = agent.getClass().getMethods();
+		boolean found = false;
+		
+		for(int i=0; i<methods.length && !found; i++)
+		{
+			if(methods[i].isAnnotationPresent(annotation))
+			{
+				try
+				{
+					Object res = methods[i].invoke(agent, args);
+					if(res instanceof IFuture)
+					{
+						((IFuture)res).addResultListener(createResultListener(
+							new DelegationResultListener(ret)));
+					}
+				}
+				catch(Exception e)
+				{
+					break;
+				}
+			}
+		}
+		
+		if(!found)
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
+}

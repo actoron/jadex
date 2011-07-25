@@ -356,7 +356,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 				if(fields[i].isAnnotationPresent(ServiceIdentifier.class))
 				{
 					ServiceIdentifier si = (ServiceIdentifier)fields[i].getAnnotation(ServiceIdentifier.class);
-					if (si.value().equals(Object.class) || si.value().equals(type))
+					if(si.value().equals(Object.class) || si.value().equals(type))
 					{
 						if(SReflect.isSupertype(IServiceIdentifier.class, fields[i].getType()))
 						{

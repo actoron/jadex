@@ -22,6 +22,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.kernelbase.AbstractInterpreter;
+import jadex.micro.annotation.Agent;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -69,9 +70,34 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		
 		try
 		{
-			this.microagent = (MicroAgent)microclass.newInstance();
-			this.microagent.init(MicroAgentInterpreter.this);
-			
+			Object agent = microclass.newInstance();
+			if(agent instanceof MicroAgent)
+			{
+				this.microagent = (MicroAgent)agent;
+				this.microagent.init(MicroAgentInterpreter.this);
+			}
+			else
+			{
+				PojoMicroAgent magent = new PojoMicroAgent();
+				magent.init(MicroAgentInterpreter.this, agent);
+				this.microagent = magent;
+				Field[] fields = microclass.getDeclaredFields();
+				for(int i=0; i<fields.length; i++)
+				{
+					if(fields[i].isAnnotationPresent(Agent.class))
+					{
+						try
+						{
+							fields[i].setAccessible(true);
+							fields[i].set(agent, microagent);
+						}
+						catch(Exception e)
+						{
+						}
+					}
+				}
+			}
+						
 			this.container = createMyServiceContainer();
 			
 			addStep((new Object[]{new IComponentStep()

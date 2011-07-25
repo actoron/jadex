@@ -17,6 +17,7 @@ import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.javaparser.SJavaParser;
 import jadex.kernelbase.CacheableKernelModel;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
