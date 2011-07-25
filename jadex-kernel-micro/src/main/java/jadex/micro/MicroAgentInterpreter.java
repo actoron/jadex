@@ -23,6 +23,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.kernelbase.AbstractInterpreter;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -151,6 +152,50 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				return "microagent.executeBody()_#"+this.hashCode();
 			}
 		});
+	}
+	
+	/**
+	 *  Override to set value also in fields.
+	 *  @param name The name.
+	 *  @param value The value.
+	 */
+	public void addDefaultArgument(String name, Object value)
+	{
+		super.addDefaultArgument(name, value);
+	
+		if(microagent instanceof PojoMicroAgent)
+		{
+			Object agent = ((PojoMicroAgent)microagent).getAgent();
+			Class microclass = agent.getClass();
+			Field[] fields = microclass.getDeclaredFields();
+			for(int i=0; i<fields.length; i++)
+			{
+				if(fields[i].isAnnotationPresent(AgentArgument.class))
+				{
+					AgentArgument aa = (AgentArgument)fields[i].getAnnotation(AgentArgument.class);
+					String aname = aa.value().length()==0? fields[i].getName(): aa.value();
+					if(aname.equals(name))
+					{
+						if(SReflect.isSupertype(fields[i].getType(), value.getClass()))
+						{
+							try
+							{
+								fields[i].setAccessible(true);
+								fields[i].set(agent, value);
+							}
+							catch(Exception e)
+							{
+								getLogger().warning("Argument injection failed: "+e);
+							}
+						}
+						else
+						{
+							getLogger().warning("Wrong argument type: "+fields[i].getType()+" "+value.getClass());
+						}
+					}
+				}
+			}
+		}
 	}
 	
 	//-------- IKernelAgent interface --------

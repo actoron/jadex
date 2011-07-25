@@ -282,6 +282,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 		}
 	}
 	

@@ -110,4 +110,13 @@ public class PojoMicroAgent extends MicroAgent
 		
 		return ret;
 	}
+
+	/**
+	 *  Get the agent.
+	 *  @return The agent.
+	 */
+	public Object getAgent()
+	{
+		return agent;
+	}
 }

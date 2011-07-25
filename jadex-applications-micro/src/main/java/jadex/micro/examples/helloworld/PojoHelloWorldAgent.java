@@ -4,6 +4,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -24,6 +25,10 @@ public class PojoHelloWorldAgent
 	@Agent
 	protected MicroAgent agent;
 	
+	/** The welcome text. */
+	@AgentArgument("welcome text")
+	protected String text;
+	
 	//-------- methods --------
 	
 	/**
@@ -32,7 +37,8 @@ public class PojoHelloWorldAgent
 	@AgentBody
 	public void executeBody()
 	{
-		System.out.println(agent.getArgument("welcome text"));
+//		System.out.println(agent.getArgument("welcome text"));
+		System.out.println(text);
 		agent.waitFor(2000, new IComponentStep()
 		{			
 			public Object execute(IInternalAccess ia)
