@@ -426,7 +426,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 						{
 							ret.setExceptionIfUndone(e);
 						}
-//						System.out.println("comp and receiver terminated: "+getComponentIdentifier());
+						System.out.println("comp and receiver terminated: "+getComponentIdentifier());
 					}
 				});
 			}
@@ -450,6 +450,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	 */
 	protected synchronized DatagramSocket getSocket()
 	{
+		System.out.println("gss");
 		if(!state.isKilled())
 		{
 			if(socket==null)
@@ -487,7 +488,8 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 				}
 			}
 		}
-		
+		System.out.println("gse");
+
 		return socket;
 	}
 	
@@ -507,7 +509,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			obj instanceof SlaveInfo? ((SlaveInfo)obj).getAwarenessInfo(): 
 			obj instanceof MasterInfo? ((MasterInfo)obj).getAwarenessInfo(): null;
 		
-		System.out.println("received: "+obj+" "+address);
+//		System.out.println("received: "+obj+" "+address);
 			
 		if(info!=null && info.getSender()!=null)
 		{
@@ -545,7 +547,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			byte[] mydata = DiscoveryState.encodeObject(mi, getModel().getClassLoader());
 			send(mydata, address, port);
 //			System.out.println("send mi to new slave: "+port);
-			System.out.println("received slave info: "+getComponentIdentifier().getLocalName()+" "+si.getAwarenessInfo().getSender());
+//			System.out.println("received slave info: "+getComponentIdentifier().getLocalName()+" "+si.getAwarenessInfo().getSender());
 		}
 		else if(obj instanceof MasterInfo)
 		{
