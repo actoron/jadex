@@ -37,6 +37,11 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+
+/* $if !android $ */
+import javax.xml.stream.Location;
+import javax.xml.stream.XMLReporter;
+import javax.xml.stream.XMLStreamException;
 /* $else $ 
 import javaxx.xml.stream.Location;
 import javaxx.xml.stream.XMLReporter;
@@ -255,11 +260,10 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			if(prefixlen==-1) // Guess C class if nothing can be determined.
 				prefixlen = 24;
 			
-			getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)24), port));
-			getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)16), port));
-			getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)8), port));
-			
-			if(prefixlen!=-1 && prefixlen!=24 && prefixlen!=16 && prefixlen!=8)
+//			getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)24), port));
+//			getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)16), port));
+//			getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)8), port));
+//			if(prefixlen!=-1 && prefixlen!=24 && prefixlen!=16 && prefixlen!=8)
 				getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, prefixlen), port));
 		}
 		catch(Exception e)
@@ -309,7 +313,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 		try
 		{
 			DiscoveryEntry[] rems = remotes.getEntries();
-			for(int i=0; i<rems.length && (maxsend==-1 || ret<maxsend); ret++)
+			for(int i=0; i<rems.length && (maxsend==-1 || ret<maxsend); i++)
 			{
 				// Only send to remote masters directly.
 				// A master will forward a message to its slaves.
@@ -323,7 +327,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 				}
 			}
 			
-			System.out.println("sent to remotes: "+ret+" "+SUtil.arrayToString(remotes));
+//			System.out.println("sent to remotes: "+ret+" "+SUtil.arrayToString(remotes));
 		}
 		catch(Exception e)
 		{
@@ -354,7 +358,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 			InetSocketAddress sa = (InetSocketAddress)locs[i].getEntry();
 			send(data, sa.getAddress(), sa.getPort());
 		}
-		System.out.println("sent to locals: "+locs.length+" "+SUtil.arrayToString(locs));
+//		System.out.println("sent to locals: "+locs.length+" "+SUtil.arrayToString(locs));
 	}
 	
 	/**
@@ -421,7 +425,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 						{
 							ret.setExceptionIfUndone(e);
 						}
-						System.out.println("comp and receiver terminated: "+getComponentIdentifier());
+//						System.out.println("comp and receiver terminated: "+getComponentIdentifier());
 					}
 				});
 			}
@@ -453,7 +457,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 				{
 					socket = new DatagramSocket(port);
 					socket.setBroadcast(true);
-					System.out.println("local master at: "+SUtil.getInet4Address()+" "+port);
+//					System.out.println("local master at: "+SUtil.getInet4Address()+" "+port);
 				}
 				catch(Exception e)
 				{
@@ -470,7 +474,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 						byte[] data = DiscoveryState.encodeObject(si, getModel().getClassLoader());
 						DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
 						socket.send(packet);
-						System.out.println("local slave at: "+SUtil.getInet4Address()+" "+socket.getLocalPort());
+//						System.out.println("local slave at: "+SUtil.getInet4Address()+" "+socket.getLocalPort());
 						
 //						getLogger().warning("Running in local mode: "+e);
 					}
@@ -588,7 +592,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 //			System.out.println("received awa info: "+getComponentIdentifier().getLocalName()+" "+info.getSender());
 		}
 		
-		System.out.println("received awa info: "+getComponentIdentifier().getLocalName()+" "+info.getSender());
+//		System.out.println("received awa info: "+getComponentIdentifier().getLocalName()+" "+info.getSender());
 	}
 	
 	/**
@@ -596,6 +600,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 	 */
 	protected boolean send(byte[] data, InetAddress address, int port)
 	{
+//		System.out.println("sent packet: "+address+" "+port);
 		boolean ret = true;
 		try
 		{
@@ -704,7 +709,7 @@ public class BroadcastDiscoveryAgent extends MicroAgent implements IDiscoverySer
 //					sendToMaster(data);
 //				}
 				
-				System.out.println("sent");
+//				System.out.println("sent");
 //				System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");
 			}
 			catch(Exception e)

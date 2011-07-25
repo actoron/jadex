@@ -33,9 +33,6 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -43,7 +40,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 
 /* $if !android $ */
@@ -341,7 +337,7 @@ public class ScannerDiscoveryAgent extends MicroAgent implements IDiscoveryServi
 		try
 		{
 			DiscoveryEntry[] rems = remotes.getEntries();
-			for(int i=0; i<rems.length && (maxsend==-1 || ret<maxsend); ret++)
+			for(int i=0; i<rems.length && (maxsend==-1 || ret<maxsend); i++)
 			{
 				// Only send to remote masters directly.
 				// A master will forward a message to its slaves.
