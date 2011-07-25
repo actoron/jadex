@@ -82,7 +82,7 @@ import java.util.TimerTask;
 	@Configuration(name="Medium updates (20s)", arguments=@NameValue(name="delay", value="20000"),
 		components=
 		{
-			@Component(name="broadcastdis", type="broadcastdis"),
+			@Component(name="broadcastdis", type="broadcastdis")
 //			@Component(name="multicastdis", type="multicastdis")
 //			@Component(name="scannerdis", type="scannerdis")
 //			@Component(name="registrydis", type="registrydis")
@@ -90,7 +90,7 @@ import java.util.TimerTask;
 	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"),
 		components=
 		{
-			@Component(name="broadcastdis", type="broadcastdis"),
+			@Component(name="broadcastdis", type="broadcastdis")
 //			@Component(name="multicastdis", type="multicastdis")
 //			@Component(name="scannerdis", type="scannerdis")
 //			@Component(name="registrydis", type="registrydis")
