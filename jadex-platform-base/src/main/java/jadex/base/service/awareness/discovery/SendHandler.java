@@ -36,7 +36,7 @@ public abstract class SendHandler
 	public SendHandler(DiscoveryAgent agent)
 	{
 		this.agent = agent;
-		startSendBehavior();
+//		startSendBehavior();
 	}
 	
 	//-------- methods --------
@@ -47,28 +47,25 @@ public abstract class SendHandler
 	 */
 	public void startSendBehavior()
 	{
-		if(agent.isStarted())
+		final String sendid = SUtil.createUniqueId(agent.getMicroAgent().getComponentIdentifier().getLocalName());
+		this.sendid = sendid;	
+		
+		agent.getMicroAgent().scheduleStep(new IComponentStep()
 		{
-			final String sendid = SUtil.createUniqueId(agent.getMicroAgent().getComponentIdentifier().getLocalName());
-			this.sendid = sendid;	
-			
-			agent.getMicroAgent().scheduleStep(new IComponentStep()
+			@XMLClassname("send")
+			public Object execute(IInternalAccess ia)
 			{
-				@XMLClassname("send")
-				public Object execute(IInternalAccess ia)
+				if(!agent.isKilled() && sendid.equals(getSendId()))
 				{
-					if(!agent.isKilled() && sendid.equals(getSendId()))
-					{
 //						System.out.println(System.currentTimeMillis()+" sending: "+getComponentIdentifier());
-						send(createAwarenessInfo());
-						
-						if(agent.getDelay()>0)
-							agent.doWaitFor(agent.getDelay(), this);
-					}
-					return null;
+					send(createAwarenessInfo());
+					
+					if(agent.getDelay()>0)
+						agent.doWaitFor(agent.getDelay(), this);
 				}
-			});
-		}
+				return null;
+			}
+		});
 	}
 	
 	/**

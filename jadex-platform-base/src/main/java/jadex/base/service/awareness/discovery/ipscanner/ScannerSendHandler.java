@@ -146,7 +146,7 @@ public class ScannerSendHandler extends MasterSlaveSendHandler
 	{
 		boolean ret = true;
 		
-		System.out.println("sending to: "+address+" "+port);
+//		System.out.println("sending to: "+address+" "+port);
 		
 		try
 		{

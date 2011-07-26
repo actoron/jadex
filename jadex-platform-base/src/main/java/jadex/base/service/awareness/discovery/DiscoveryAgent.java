@@ -77,6 +77,7 @@ public abstract class DiscoveryAgent
 		// Wait before starting send behavior to not miss fast awareness pingpong replies,
 		// because receiver thread is not yet running. (hack???)
 		
+		this.sender = createSendHandler();
 		this.receiver = createReceiveHandler();
 		receiver.startReceiving().addResultListener(getMicroAgent()
 			.createResultListener(new IResultListener()
@@ -84,14 +85,14 @@ public abstract class DiscoveryAgent
 			public void resultAvailable(Object result)
 			{
 				setStarted(true);
-				sender = createSendHandler();
+				sender.startSendBehavior();
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
 				// Send also when receiving does not work?
 				setStarted(true);
-				sender = createSendHandler();
+				sender.startSendBehavior();
 			}
 		}));
 	}

@@ -152,7 +152,7 @@ public class BroadcastSendHandler extends MasterSlaveSendHandler
 	 */
 	public boolean send(byte[] data, InetAddress address, int port)
 	{
-		System.out.println("sent packet: "+address+" "+port);
+//		System.out.println("sent packet: "+address+" "+port);
 		boolean ret = true;
 		try
 		{
