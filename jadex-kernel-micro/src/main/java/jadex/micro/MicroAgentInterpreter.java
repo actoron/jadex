@@ -21,6 +21,8 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.javaparser.SJavaParser;
+import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.AbstractInterpreter;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -77,25 +79,33 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				this.microagent = (MicroAgent)agent;
 				this.microagent.init(MicroAgentInterpreter.this);
 			}
-			else
+			else // if pojoagent
 			{
 				PojoMicroAgent magent = new PojoMicroAgent();
 				magent.init(MicroAgentInterpreter.this, agent);
 				this.microagent = magent;
-				Field[] fields = microclass.getDeclaredFields();
-				for(int i=0; i<fields.length; i++)
+				boolean found = false;
+				Class aclass = microclass;
+				while(!Object.class.equals(aclass) && !found)
 				{
-					if(fields[i].isAnnotationPresent(Agent.class))
+					Field[] fields = aclass.getDeclaredFields();
+					for(int i=0; i<fields.length; i++)
 					{
-						try
+						if(fields[i].isAnnotationPresent(Agent.class))
 						{
-							fields[i].setAccessible(true);
-							fields[i].set(agent, microagent);
-						}
-						catch(Exception e)
-						{
+							try
+							{
+								fields[i].setAccessible(true);
+								fields[i].set(agent, microagent);
+								found = true;
+							}
+							catch(Exception e)
+							{
+								getLogger().warning("Agent injection failed: "+e);
+							}
 						}
 					}
+					aclass = aclass.getSuperclass();
 				}
 			}
 						
@@ -163,12 +173,14 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	{
 		super.addDefaultArgument(name, value);
 	
-		if(microagent instanceof PojoMicroAgent)
+		Object agent = microagent instanceof PojoMicroAgent? ((PojoMicroAgent)microagent).getPojoAgent(): microagent;
+		
+		boolean found = false;
+		Class microclass = agent.getClass();
+		while(!Object.class.equals(microclass) && !MicroAgent.class.equals(microclass) && !found)
 		{
-			Object agent = ((PojoMicroAgent)microagent).getAgent();
-			Class microclass = agent.getClass();
 			Field[] fields = microclass.getDeclaredFields();
-			for(int i=0; i<fields.length; i++)
+			for(int i=0; i<fields.length && !found; i++)
 			{
 				if(fields[i].isAnnotationPresent(AgentArgument.class))
 				{
@@ -176,12 +188,27 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					String aname = aa.value().length()==0? fields[i].getName(): aa.value();
 					if(aname.equals(name))
 					{
+						String ce = aa.convert();
+						if(ce.length()>0)
+						{
+							SimpleValueFetcher fetcher = new SimpleValueFetcher(getFetcher());
+							fetcher.setValue("$value", value);
+							try
+							{
+								value = SJavaParser.evaluateExpression(ce, getModel().getAllImports(), fetcher, getModel().getClassLoader());
+							}
+							catch(Exception e)
+							{
+								getLogger().warning("Argument conversion failed: "+e);
+							}
+						}
 						if(SReflect.isSupertype(fields[i].getType(), value.getClass()))
 						{
 							try
 							{
 								fields[i].setAccessible(true);
 								fields[i].set(agent, value);
+								found = true;
 							}
 							catch(Exception e)
 							{
@@ -195,6 +222,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					}
 				}
 			}
+			microclass = microclass.getSuperclass();
 		}
 	}
 	

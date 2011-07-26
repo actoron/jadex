@@ -1,7 +1,6 @@
 package jadex.base.service.awareness.discovery;
 
 import jadex.base.service.awareness.AwarenessInfo;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
@@ -21,11 +20,8 @@ public abstract class SendHandler
 	//-------- attributes --------
 	
 	/** The agent. */
-	protected DiscoveryState state;
+	protected DiscoveryAgent agent;
 
-	/** The root component identifier. */
-	protected IComponentIdentifier root;
-	
 	/** The timer. */
 	protected Timer	timer;
 
@@ -37,10 +33,9 @@ public abstract class SendHandler
 	/**
 	 *  Create a new lease time handling object.
 	 */
-	public SendHandler(DiscoveryState state)
+	public SendHandler(DiscoveryAgent agent)
 	{
-		this.state = state;
-		this.root = state.getExternalAccess().getComponentIdentifier().getRoot();
+		this.agent = agent;
 		startSendBehavior();
 	}
 	
@@ -52,23 +47,23 @@ public abstract class SendHandler
 	 */
 	public void startSendBehavior()
 	{
-		if(state.isStarted())
+		if(agent.isStarted())
 		{
-			final String sendid = SUtil.createUniqueId(state.getExternalAccess().getComponentIdentifier().getLocalName());
+			final String sendid = SUtil.createUniqueId(agent.getMicroAgent().getComponentIdentifier().getLocalName());
 			this.sendid = sendid;	
 			
-			state.getExternalAccess().scheduleStep(new IComponentStep()
+			agent.getMicroAgent().scheduleStep(new IComponentStep()
 			{
 				@XMLClassname("send")
 				public Object execute(IInternalAccess ia)
 				{
-					if(!state.isKilled() && sendid.equals(getSendId()))
+					if(!agent.isKilled() && sendid.equals(getSendId()))
 					{
 //						System.out.println(System.currentTimeMillis()+" sending: "+getComponentIdentifier());
 						send(createAwarenessInfo());
 						
-						if(state.getDelay()>0)
-							state.doWaitFor(state.getDelay(), this);
+						if(agent.getDelay()>0)
+							agent.doWaitFor(agent.getDelay(), this);
 					}
 					return null;
 				}
@@ -99,7 +94,7 @@ public abstract class SendHandler
 	 */
 	public AwarenessInfo createAwarenessInfo()
 	{
-		return state.createAwarenessInfo();
+		return agent.createAwarenessInfo();
 	}
 	
 	/**

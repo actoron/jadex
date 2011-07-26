@@ -390,7 +390,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 					}
 					else
 					{
-						System.out.println("Field cannot store component: "+fields[i]);
+						System.out.println("Field cannot store component: "+fields[i].getName()+" "+fields[i].getType());
 					}
 					if(val!=null)
 					{

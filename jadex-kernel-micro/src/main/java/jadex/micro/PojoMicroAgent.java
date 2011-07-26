@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  *  Micro agent class that redirects calls to a pojo agent object.
  */
-public class PojoMicroAgent extends MicroAgent
+public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 {
 	//-------- attributes --------
 	
@@ -71,6 +71,15 @@ public class PojoMicroAgent extends MicroAgent
 	{
 		return invokeMethod(AgentKilled.class, null);
 	}
+	
+	/**
+	 *  Get the agent.
+	 *  @return The agent.
+	 */
+	public Object getPojoAgent()
+	{
+		return agent;
+	}
 
 	/**
 	 *  Invoke double methods.
@@ -95,6 +104,7 @@ public class PojoMicroAgent extends MicroAgent
 						((IFuture)res).addResultListener(createResultListener(
 							new DelegationResultListener(ret)));
 					}
+					found = true;
 				}
 				catch(Exception e)
 				{
@@ -109,14 +119,5 @@ public class PojoMicroAgent extends MicroAgent
 		}
 		
 		return ret;
-	}
-
-	/**
-	 *  Get the agent.
-	 *  @return The agent.
-	 */
-	public Object getAgent()
-	{
-		return agent;
 	}
 }

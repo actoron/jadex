@@ -27,7 +27,7 @@ public class LeaseTimeHandler
 	//-------- attributes --------
 	
 	/** The state. */
-	protected DiscoveryState state;
+	protected DiscoveryAgent agent;
 	
 	/** The entries. */
 	protected Map entries;
@@ -43,7 +43,7 @@ public class LeaseTimeHandler
 	/**
 	 *  Create a new lease time handling object.
 	 */
-	public LeaseTimeHandler(DiscoveryState state)
+	public LeaseTimeHandler(DiscoveryAgent state)
 	{
 		this(state, 2.2);
 	}
@@ -51,9 +51,9 @@ public class LeaseTimeHandler
 	/**
 	 *  Create a new lease time handling object.
 	 */
-	public LeaseTimeHandler(DiscoveryState state, double factor)
+	public LeaseTimeHandler(DiscoveryAgent agent, double factor)
 	{
-		this.state = state;
+		this.agent = agent;
 		this.factor = factor;
 		startRemoveBehavior();
 	}
@@ -124,7 +124,7 @@ public class LeaseTimeHandler
 	 */
 	public void startRemoveBehavior()
 	{
-		state.getExternalAccess().scheduleStep(new IComponentStep()
+		agent.getMicroAgent().scheduleStep(new IComponentStep()
 		{
 			@XMLClassname("rem")
 			public Object execute(IInternalAccess ia)
@@ -178,7 +178,7 @@ public class LeaseTimeHandler
 		{
 			public void run()
 			{
-				state.getExternalAccess().scheduleStep(step);
+				agent.getMicroAgent().scheduleStep(step);
 			}
 		}, delay);
 	}

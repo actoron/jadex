@@ -18,4 +18,10 @@ public @interface AgentArgument
 	 *  must correspond to the argument name.
 	 */
 	public String value() default "";
+	
+	/**
+	 *  The argument conversion expression.
+	 *  Is optional. 
+	 */
+	public String convert() default "";
 }
