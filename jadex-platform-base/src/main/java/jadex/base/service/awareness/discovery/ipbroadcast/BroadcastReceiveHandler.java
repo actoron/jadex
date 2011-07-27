@@ -43,7 +43,7 @@ public class BroadcastReceiveHandler extends MasterSlaveReceiveHandler
 		}
 		catch(Exception e)
 		{
-			getAgent().getMicroAgent().getLogger().warning("Message receival error: "+e);
+//			getAgent().getMicroAgent().getLogger().warning("Message receival error: "+e);
 		}
 		
 		return ret;

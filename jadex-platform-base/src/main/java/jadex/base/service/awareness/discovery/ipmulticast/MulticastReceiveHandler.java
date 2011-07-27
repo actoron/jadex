@@ -44,7 +44,7 @@ public class MulticastReceiveHandler extends ReceiveHandler
 		}
 		catch(Exception e)
 		{
-			getAgent().getMicroAgent().getLogger().warning("Message receival error: "+e);
+//			getAgent().getMicroAgent().getLogger().warning("Message receival error: "+e);
 		}
 		
 		return ret;
