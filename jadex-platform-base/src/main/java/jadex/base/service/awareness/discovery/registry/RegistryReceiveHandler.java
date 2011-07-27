@@ -1,14 +1,8 @@
 package jadex.base.service.awareness.discovery.registry;
 
-import jadex.base.service.awareness.AwarenessInfo;
-import jadex.base.service.awareness.discovery.DiscoveryEntry;
 import jadex.base.service.awareness.discovery.MasterSlaveReceiveHandler;
-import jadex.base.service.awareness.discovery.MasterSlaveSendHandler;
-import jadex.commons.SUtil;
 
 import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 
 /**
  * 
@@ -48,7 +42,7 @@ public class RegistryReceiveHandler extends MasterSlaveReceiveHandler
 		}
 		catch(Exception e)
 		{
-			getAgent().getMicroAgent().getLogger().warning("Message receival error: "+e);
+//			getAgent().getMicroAgent().getLogger().warning("Message receival error: "+e);
 		}
 		
 		return ret;

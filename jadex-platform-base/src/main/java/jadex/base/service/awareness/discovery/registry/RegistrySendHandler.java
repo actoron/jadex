@@ -126,9 +126,9 @@ class RegistrySendHandler extends MasterSlaveSendHandler
 			else if(getAgent().isMaster())
 			{
 				// As master always send my info to registry.
-//				sendToRegistry(data);
-				// Send to all locals a refresh awareness
-//				sendToLocals(data);
+				// Sends its info also to slave to allow local awareness without registry online.
+				sendToRegistry(data);
+				sendToLocals(data);
 			}
 			else
 			{
@@ -169,7 +169,7 @@ class RegistrySendHandler extends MasterSlaveSendHandler
 	 */
 	public void sendToRegistry(byte[] data)
 	{
-		System.out.println("sent to reg: "+getAgent().getAddress()+" "+getAgent().getPort());
+//		System.out.println("sent to reg: "+getAgent().getAddress()+" "+getAgent().getPort());
 		send(data, getAgent().getAddress(), getAgent().getPort());
 	}
 	
@@ -178,7 +178,7 @@ class RegistrySendHandler extends MasterSlaveSendHandler
 	 */
 	public void sendToMaster(byte[] data)
 	{
-		System.out.println("sent to master: "+SUtil.getInet4Address()+" "+getAgent().getPort());
+//		System.out.println("sent to master: "+SUtil.getInet4Address()+" "+getAgent().getPort());
 		send(data, SUtil.getInet4Address(), getAgent().getPort());
 	}
 	

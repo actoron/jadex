@@ -28,7 +28,7 @@ public abstract class MasterSlaveReceiveHandler extends ReceiveHandler
 //		int port = packet.getPort();
 		InetSocketAddress sa = new InetSocketAddress(address, port);
 				
-		System.out.println("received: "+info+" "+address+" "+port);
+//		System.out.println("received: "+info+" "+address+" "+port);
 			
 		if(info!=null && info.getSender()!=null)
 		{

@@ -34,10 +34,10 @@ public abstract class MasterSlaveDiscoveryAgent extends DiscoveryAgent
 				// If master is lost, try to become master
 				String mid = entry.getInfo().getMasterId();
 				String mymid = getMyMasterId();
-				System.out.println("mid:_"+mid+" "+mymid);
+//				System.out.println("mid:_"+mid+" "+mymid);
 				if(mid!=null && mid.equals(mymid))
 				{
-					System.out.println("Master deleted.");
+//					System.out.println("Master deleted.");
 					
 					try
 					{

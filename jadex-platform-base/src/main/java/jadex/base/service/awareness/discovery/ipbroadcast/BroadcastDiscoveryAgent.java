@@ -177,7 +177,8 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 				{
 					socket = new DatagramSocket(port);
 					socket.setBroadcast(true);
-					System.out.println("local master at: "+SUtil.getInet4Address()+" "+port);
+//					System.out.println("local master at: "+SUtil.getInet4Address()+" "+port);
+					getMicroAgent().getLogger().info("local master at: "+SUtil.getInet4Address()+" "+port);
 				}
 				catch(Exception e)
 				{
@@ -192,9 +193,8 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 						AwarenessInfo info = createAwarenessInfo(AwarenessInfo.STATE_ONLINE, createMasterId());
 						byte[] data = DiscoveryState.encodeObject(info, getMicroAgent().getModel().getClassLoader());
 						((BroadcastSendHandler)sender).send(data, address, port);
-						System.out.println("local slave at: "+SUtil.getInet4Address()+" "+socket.getLocalPort());
-						
-//						getLogger().warning("Running in local mode: "+e);
+//						System.out.println("local slave at: "+SUtil.getInet4Address()+" "+socket.getLocalPort());
+						getMicroAgent().getLogger().info("local slave at: "+SUtil.getInet4Address()+" "+socket.getLocalPort());
 					}
 					catch(Exception e2)
 					{

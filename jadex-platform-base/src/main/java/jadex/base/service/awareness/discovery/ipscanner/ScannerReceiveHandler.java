@@ -49,7 +49,7 @@ public class ScannerReceiveHandler extends MasterSlaveReceiveHandler
 		}
 		catch(Exception e)
 		{
-			getAgent().getMicroAgent().getLogger().warning("Receive message failed: "+e);
+//			getAgent().getMicroAgent().getLogger().warning("Receive message failed: "+e);
 //			e.printStackTrace();
 //			System.out.println("ex: "+address);
 		}

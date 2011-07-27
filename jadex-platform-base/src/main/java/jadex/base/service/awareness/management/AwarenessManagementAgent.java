@@ -242,7 +242,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			info.setDelay(delay);
 		if(info.getState()==null)
 			info.setState(AwarenessInfo.STATE_ONLINE);
-//		System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
+//		System.out.println("received: "+getComponentIdentifier()+" "+info.getSender());
 
 		IComponentIdentifier sender = info.getSender();
 		boolean	online	= AwarenessInfo.STATE_ONLINE.equals(info.getState());

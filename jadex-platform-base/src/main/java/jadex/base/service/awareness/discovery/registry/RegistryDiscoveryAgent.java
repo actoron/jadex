@@ -1,11 +1,7 @@
 package jadex.base.service.awareness.discovery.registry;
 
-import jadex.base.service.awareness.AwarenessInfo;
-import jadex.base.service.awareness.discovery.DiscoveryAgent;
-import jadex.base.service.awareness.discovery.DiscoveryEntry;
 import jadex.base.service.awareness.discovery.DiscoveryService;
 import jadex.base.service.awareness.discovery.IDiscoveryService;
-import jadex.base.service.awareness.discovery.LeaseTimeHandler;
 import jadex.base.service.awareness.discovery.MasterSlaveDiscoveryAgent;
 import jadex.base.service.awareness.discovery.ReceiveHandler;
 import jadex.base.service.awareness.discovery.SendHandler;
@@ -14,7 +10,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -30,10 +25,14 @@ import jadex.micro.annotation.RequiredServices;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 
 /**
- *  Agent that sends multicasts to locate other Jadex awareness agents.
+ *  The registry awareness uses a dedicated registry awareness service at
+ *  which all nodes register. Communication is done only via masters.
+ *  Slaves send their infos to their master, which forwards them to the
+ *  registry. Also the registry only sends infos to the masters that
+ *  distribute them to their slaves. This avoids sending the infos to
+ *  all slaves over the network.
  */
 @Description("This agent looks for other awareness agents in the local net.")
 @Arguments(
@@ -258,10 +257,8 @@ public class RegistryDiscoveryAgent extends MasterSlaveDiscoveryAgent
 				{
 					// First one on dest ip becomes master.
 					socket = new DatagramSocket(port);
-					if(address.equals(SUtil.getInet4Address()))
-						System.out.println("registry: "+SUtil.getInet4Address()+" "+port);
-					else
-						System.out.println("master: "+SUtil.getInet4Address()+" "+port);
+					getMicroAgent().getLogger().info((address.equals(SUtil.getInet4Address())? 
+						"registry: ": "master: ")+SUtil.getInet4Address()+" "+port);
 				}
 				catch(Exception e)
 				{
@@ -276,7 +273,8 @@ public class RegistryDiscoveryAgent extends MasterSlaveDiscoveryAgent
 					}
 					catch(Exception e)
 					{
-						e.printStackTrace();
+						getMicroAgent().getLogger().warning("Socket creation error: "+e);
+//						e.printStackTrace();
 					}
 				}
 			}

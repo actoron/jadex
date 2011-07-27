@@ -119,7 +119,8 @@ public class ScannerSendHandler extends MasterSlaveSendHandler
 			}
 			currentip = ipnum;
 			
-			System.out.println("sent to discover: "+ret+" "+currentip);
+//			System.out.println("sent to discover: "+ret+" "+currentip);
+			getAgent().getMicroAgent().getLogger().info("sent to discover: "+ret+" "+currentip);
 		}
 		catch(Exception e)
 		{
