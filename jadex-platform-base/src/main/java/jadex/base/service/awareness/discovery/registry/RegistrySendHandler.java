@@ -113,7 +113,7 @@ class RegistrySendHandler extends MasterSlaveSendHandler
 		{
 			byte[] data = DiscoveryState.encodeObject(info, agent.getMicroAgent().getModel().getClassLoader());
 	
-			System.out.println("packet size: "+data.length);
+//			System.out.println("packet size: "+data.length);
 
 			sendToDiscover(data);
 			
@@ -126,7 +126,7 @@ class RegistrySendHandler extends MasterSlaveSendHandler
 			else if(getAgent().isMaster())
 			{
 				// As master always send my info to registry.
-				sendToRegistry(data);
+//				sendToRegistry(data);
 				// Send to all locals a refresh awareness
 //				sendToLocals(data);
 			}
@@ -178,7 +178,7 @@ class RegistrySendHandler extends MasterSlaveSendHandler
 	 */
 	public void sendToMaster(byte[] data)
 	{
-//		System.out.println("sent to reg: "+address+" "+port);
+		System.out.println("sent to master: "+SUtil.getInet4Address()+" "+getAgent().getPort());
 		send(data, SUtil.getInet4Address(), getAgent().getPort());
 	}
 	

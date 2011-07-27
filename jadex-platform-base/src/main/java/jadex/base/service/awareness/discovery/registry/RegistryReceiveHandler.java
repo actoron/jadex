@@ -42,7 +42,9 @@ public class RegistryReceiveHandler extends MasterSlaveReceiveHandler
 
 			final DatagramPacket pack = new DatagramPacket(buffer, buffer.length);
 			getAgent().getSocket().receive(pack);
-			ret = new Object[]{pack.getAddress(), new Integer(pack.getPort()), pack.getData()};
+			byte[] data = new byte[pack.getLength()];
+			System.arraycopy(buffer, 0, data, 0, pack.getLength());
+			ret = new Object[]{pack.getAddress(), new Integer(pack.getPort()), data};
 		}
 		catch(Exception e)
 		{
