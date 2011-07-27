@@ -254,19 +254,18 @@ public class RegistryDiscoveryAgent extends MasterSlaveDiscoveryAgent
 		{
 			if(socket==null)
 			{
-				// Try to become registry
-				if(address.equals(SUtil.getInet4Address()))
+				try
 				{
-					try
-					{
-						// First one on dest ip becomes registry.
-						socket = new DatagramSocket(port);
+					// First one on dest ip becomes master.
+					socket = new DatagramSocket(port);
+					if(address.equals(SUtil.getInet4Address()))
 						System.out.println("registry: "+SUtil.getInet4Address()+" "+port);
-					}
-					catch(Exception e)
-					{
-						// If not first it will be client and use any port.
-					}
+					else
+						System.out.println("master: "+SUtil.getInet4Address()+" "+port);
+				}
+				catch(Exception e)
+				{
+					// If not first it will be client and use any port.
 				}
 				
 				if(socket==null)
