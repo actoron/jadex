@@ -97,14 +97,14 @@ public class AgentCreationAgent extends MicroAgent
 			args.put("num", new Integer(num+1));
 //			System.out.println("Args: "+num+" "+args);
 
-			getCMS().addResultListener(new DefaultResultListener()
+			getCMS().addResultListener(createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
 					((IComponentManagementService)result).createComponent(createPeerName(num+1, getComponentIdentifier()), AgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class",
 						new CreationInfo(args, nested ? getComponentIdentifier() : null), null);
 				}
-			});
+			}));
 		}
 		else
 		{

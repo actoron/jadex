@@ -14,7 +14,7 @@ public class MultiPlatformsTest extends TestCase
 {
 	public void	testMultiplePlatforms()
 	{
-		int number	= 100;
+		int number	= 50;
 		long timeout	= 10000;
 		
 		IFuture[]	futures	= new IFuture[number];
