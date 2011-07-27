@@ -28,7 +28,7 @@ public abstract class MasterSlaveReceiveHandler extends ReceiveHandler
 //		int port = packet.getPort();
 		InetSocketAddress sa = new InetSocketAddress(address, port);
 				
-//		System.out.println("received: "+obj+" "+address);
+		System.out.println("received: "+info+" "+address+" "+port);
 			
 		if(info!=null && info.getSender()!=null)
 		{
@@ -70,7 +70,7 @@ public abstract class MasterSlaveReceiveHandler extends ReceiveHandler
 				// If awareness message comes from remove node.
 				getAgent().getRemotes().addOrUpdateEntry(new DiscoveryEntry(info, getAgent().getClockTime(), sa));
 			
-				// Forward remote update to local slaves
+				// Forward remote update to local slaves.
 				((MasterSlaveSendHandler)getAgent().getSender()).sendToLocals(data);
 			}
 			

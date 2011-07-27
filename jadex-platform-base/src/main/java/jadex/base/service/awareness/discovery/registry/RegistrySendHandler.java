@@ -169,7 +169,7 @@ class RegistrySendHandler extends MasterSlaveSendHandler
 	 */
 	public void sendToRegistry(byte[] data)
 	{
-//		System.out.println("sent to reg: "+address+" "+port);
+		System.out.println("sent to reg: "+getAgent().getAddress()+" "+getAgent().getPort());
 		send(data, getAgent().getAddress(), getAgent().getPort());
 	}
 	
