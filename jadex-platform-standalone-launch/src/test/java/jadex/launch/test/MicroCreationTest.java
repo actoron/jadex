@@ -51,7 +51,7 @@ public class MicroCreationTest extends TestCase
 		
 		final Future	fut	= new Future();
 		Map	args	= new HashMap();
-		args.put("max", new Integer(30000));
+		args.put("max", new Integer(10000));
 		cms.createComponent(null, "jadex/micro/benchmarks/AgentCreationAgent.class", new CreationInfo(args), new DelegationResultListener(fut))
 			.addResultListener(new DelegationResultListener(fut)
 		{
