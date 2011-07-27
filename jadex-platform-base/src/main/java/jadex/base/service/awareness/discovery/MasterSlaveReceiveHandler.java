@@ -67,7 +67,7 @@ public abstract class MasterSlaveReceiveHandler extends ReceiveHandler
 			}
 			else
 			{
-				// If awareness message comes from remove node.
+				// If awareness message comes from remode node.
 				getAgent().getRemotes().addOrUpdateEntry(new DiscoveryEntry(info, getAgent().getClockTime(), sa));
 			
 				// Forward remote update to local slaves.

@@ -182,6 +182,27 @@ class RegistrySendHandler extends MasterSlaveSendHandler
 		send(data, SUtil.getInet4Address(), getAgent().getPort());
 	}
 	
+	/**
+	 *  Send awareness info to remote scanner services.
+	 *  @param data The data to be send.
+	 *  @param maxsend The maximum number of messages to send.
+	 */
+	public int sendToRemotes(byte[] data, int maxsend)
+	{
+		if(getAgent().isRegistry())
+		{
+			return super.sendToRemotes(data);
+		}
+		else
+		{
+			// For bootstrapping of masters
+			// Forward the slave update to registry. 
+			// ((MasterSlaveSendHandler)getAgent().getSender()).sendToRemotes(data);
+			sendToRegistry(data);
+			return 1;
+		}
+	}
+	
 //	/**
 //	 *  Send info to all knowns.
 //	 *  @param data The data to be send.
