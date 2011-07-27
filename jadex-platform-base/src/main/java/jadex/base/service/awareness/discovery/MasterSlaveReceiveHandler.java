@@ -69,6 +69,9 @@ public abstract class MasterSlaveReceiveHandler extends ReceiveHandler
 			{
 				// If awareness message comes from remove node.
 				getAgent().getRemotes().addOrUpdateEntry(new DiscoveryEntry(info, getAgent().getClockTime(), sa));
+			
+				// Forward remote update to local slaves
+				((MasterSlaveSendHandler)getAgent().getSender()).sendToLocals(data);
 			}
 			
 //			System.out.println("to locals, from: "+address+" "+port+" "+info.getSender());

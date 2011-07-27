@@ -6,6 +6,7 @@ import jadex.base.service.awareness.discovery.DiscoveryEntry;
 import jadex.base.service.awareness.discovery.DiscoveryService;
 import jadex.base.service.awareness.discovery.IDiscoveryService;
 import jadex.base.service.awareness.discovery.LeaseTimeHandler;
+import jadex.base.service.awareness.discovery.MasterSlaveDiscoveryAgent;
 import jadex.base.service.awareness.discovery.ReceiveHandler;
 import jadex.base.service.awareness.discovery.SendHandler;
 import jadex.base.service.awareness.management.IManagementService;
@@ -57,7 +58,7 @@ import java.net.InetSocketAddress;
 	@RequiredService(name="threadpool", type=IThreadPoolService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="management", type=IManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
-public class RegistryDiscoveryAgent extends DiscoveryAgent
+public class RegistryDiscoveryAgent extends MasterSlaveDiscoveryAgent
 {
 	//-------- attributes --------
 	
@@ -69,8 +70,8 @@ public class RegistryDiscoveryAgent extends DiscoveryAgent
 	@AgentArgument
 	protected int port;
 	
-	/** The known platforms. */
-	protected LeaseTimeHandler knowns;
+//	/** The known platforms. */
+//	protected LeaseTimeHandler knowns;
 		
 	/** The socket to send/receive. */
 	protected DatagramSocket socket;		
@@ -93,30 +94,30 @@ public class RegistryDiscoveryAgent extends DiscoveryAgent
 		return new RegistryReceiveHandler(this);
 	}
 	
-	/**
-	 *  Execute the functional body of the agent.
-	 *  Is only called once.
-	 */
-	@AgentBody
-	public void executeBody()
-	{
-		this.knowns = new LeaseTimeHandler(this)
-		{
-			public void entryDeleted(DiscoveryEntry entry)
-			{
-				System.out.println("Entry deleted: "+entry.getInfo().getSender());
-				
-				InetSocketAddress addr = (InetSocketAddress)entry.getEntry();
-				if(isRegistry(addr.getAddress(), addr.getPort()))
-				{
-					System.out.println("Master deleted");
-					initNetworkRessource();
-				}
-			}
-		};
-		
-		super.executeBody();
-	}
+//	/**
+//	 *  Execute the functional body of the agent.
+//	 *  Is only called once.
+//	 */
+//	@AgentBody
+//	public void executeBody()
+//	{
+//		this.knowns = new LeaseTimeHandler(this)
+//		{
+//			public void entryDeleted(DiscoveryEntry entry)
+//			{
+//				System.out.println("Entry deleted: "+entry.getInfo().getSender());
+//				
+//				InetSocketAddress addr = (InetSocketAddress)entry.getEntry();
+//				if(isRegistry(addr.getAddress(), addr.getPort()))
+//				{
+//					System.out.println("Registry deleted");
+//					initNetworkRessource();
+//				}
+//			}
+//		};
+//		
+//		super.executeBody();
+//	}
 	
 	/**
 	 *  Get the address.
@@ -136,13 +137,13 @@ public class RegistryDiscoveryAgent extends DiscoveryAgent
 		return port;
 	}
 	
-	/**
-	 *  Get the knwon entries.
-	 */
-	public LeaseTimeHandler getKnowns()
-	{
-		return knowns;
-	}
+//	/**
+//	 *  Get the knwon entries.
+//	 */
+//	public LeaseTimeHandler getKnowns()
+//	{
+//		return knowns;
+//	}
 	
 	/**
 	 *  Get the registry.
@@ -173,6 +174,39 @@ public class RegistryDiscoveryAgent extends DiscoveryAgent
 	public boolean isRegistry(InetAddress address, int port)
 	{
 		return address.equals(this.address) && port==this.port;
+	}
+	
+	/**
+	 *  Test if is master.
+	 */
+	protected boolean isMaster()
+	{
+		return this.port==getSocket().getLocalPort();
+	}
+	
+	/**
+	 *  Create the master id.
+	 */
+	protected String createMasterId()
+	{
+		return isMaster()? createMasterId(SUtil.getInet4Address(),
+			getSocket().getLocalPort()): null;
+	}
+	
+	/**
+	 *  Get the local master id.
+	 */
+	protected String getMyMasterId()
+	{
+		return createMasterId(SUtil.getInet4Address(), port);
+	}
+	
+	/**
+	 *  Create the master id.
+	 */
+	protected String createMasterId(InetAddress address, int port)
+	{
+		return address+":"+port;
 	}
 
 	/**

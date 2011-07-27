@@ -1,9 +1,10 @@
 package jadex.base.service.awareness.discovery.registry;
 
 import jadex.base.service.awareness.AwarenessInfo;
-import jadex.base.service.awareness.discovery.DiscoveryAgent;
 import jadex.base.service.awareness.discovery.DiscoveryEntry;
-import jadex.base.service.awareness.discovery.ReceiveHandler;
+import jadex.base.service.awareness.discovery.MasterSlaveReceiveHandler;
+import jadex.base.service.awareness.discovery.MasterSlaveSendHandler;
+import jadex.commons.SUtil;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -12,7 +13,7 @@ import java.net.InetSocketAddress;
 /**
  * 
  */
-public class RegistryReceiveHandler extends ReceiveHandler
+public class RegistryReceiveHandler extends MasterSlaveReceiveHandler
 {
 	/** The receive buffer. */
 	protected byte[] buffer;
@@ -20,7 +21,7 @@ public class RegistryReceiveHandler extends ReceiveHandler
 	/**
 	 *  Create a new lease time handling object.
 	 */
-	public RegistryReceiveHandler(DiscoveryAgent agent)
+	public RegistryReceiveHandler(RegistryDiscoveryAgent agent)
 	{
 		super(agent);
 	}
@@ -49,17 +50,6 @@ public class RegistryReceiveHandler extends ReceiveHandler
 		}
 		
 		return ret;
-	}
-	
-	/**
-	 *  Handle a received packet.
-	 */
-	public void handleReceivedPacket(InetAddress address, int port, byte[] data, AwarenessInfo info)
-	{
-		super.handleReceivedPacket(address, port, data, info);
-		InetSocketAddress sa = new InetSocketAddress(address, port);
-		getAgent().getKnowns().addOrUpdateEntry(new DiscoveryEntry(info, getAgent().getClockTime(), sa));
-//		System.out.println("received awa info: "+getComponentIdentifier().getLocalName()+" "+info.getSender());
 	}
 	
 	/**
