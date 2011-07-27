@@ -206,7 +206,7 @@ public class AgentCreationAgent extends MicroAgent
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 				IComponentIdentifier aid = cms.createComponentIdentifier(name, true, null);
-				cms.destroyComponent(aid).addResultListener(new DefaultResultListener()
+				cms.destroyComponent(aid).addResultListener(createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -222,7 +222,7 @@ public class AgentCreationAgent extends MicroAgent
 							killLastPeer(max, killstarttime, dur, pera, omem, upera);
 						}
 					}
-				});
+				}));
 			}
 		});
 	}
