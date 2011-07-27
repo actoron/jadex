@@ -191,7 +191,7 @@ class RegistrySendHandler extends MasterSlaveSendHandler
 	{
 		if(getAgent().isRegistry())
 		{
-			return super.sendToRemotes(data);
+			return super.sendToRemotes(data, maxsend);
 		}
 		else
 		{
