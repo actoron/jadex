@@ -125,7 +125,7 @@ class RegistrySendHandler extends MasterSlaveSendHandler
 			}
 			else if(getAgent().isMaster())
 			{
-				// As master always send my info to registry.
+				// As master always send info to registry.
 				// Sends its info also to slave to allow local awareness without registry online.
 				sendToRegistry(data);
 				sendToLocals(data);
