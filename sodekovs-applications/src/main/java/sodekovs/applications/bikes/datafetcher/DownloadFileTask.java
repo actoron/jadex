@@ -12,6 +12,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
@@ -27,6 +29,8 @@ import sodekovs.applications.bikes.datafetcher.xml.stations.Stations;
  */
 public class DownloadFileTask extends TimerTask {
 
+	private Logger logger = null;
+	
 	/** The city */
 	private String city = null;
 
@@ -53,9 +57,10 @@ public class DownloadFileTask extends TimerTask {
 	 * @param url
 	 *            the given {@link URL}
 	 */
-	public DownloadFileTask(String city, URL url) {
+	public DownloadFileTask(String city, URL url, Logger logger) {
 		this.city = city;
 		this.url = url;
+		this.logger = logger;
 
 		// get the database connection
 		this.connection = DatabaseConnection.getConnection();
@@ -65,9 +70,10 @@ public class DownloadFileTask extends TimerTask {
 			this.insertStationStmt = this.connection
 					.prepareStatement("INSERT INTO STATION(id, name, terminalName, lat, lon, installed, locked, installDate, removalDate, temp, nbBikes, nbEmptyDocks, nbDocks, stationsId) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			this.insertStationsXMLStmt = this.connection.prepareStatement("INSERT INTO STATIONSXML(xml, stationsId) VALUES(?, ?)");
+			
+			logger.log(Level.INFO, "Started Download Task for " + city);
 		} catch (SQLException e) {
-			e.printStackTrace();
-			System.exit(1);
+			logger.log(Level.SEVERE, e.getMessage());
 		}
 	}
 
@@ -85,14 +91,14 @@ public class DownloadFileTask extends TimerTask {
 			// transform the XML data from the url
 			Stations stations = (Stations) XMLHandler.retrieveFromXML(Stations.class, xml.getBytes());
 
-			System.out.println("Fetched data from " + city + " at " + stations.getLastUpate());
+			logger.log(Level.INFO, "Fetched data from " + city + " at " + stations.getLastUpate());
 
 			// write all the data to the database
 			writeToDatabase(stations, xml);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage());
 		} catch (JAXBException e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage());
 		}
 	}
 
@@ -118,7 +124,7 @@ public class DownloadFileTask extends TimerTask {
 				amount = input.read(buffer);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage());
 		}
 
 		return result;
@@ -145,9 +151,9 @@ public class DownloadFileTask extends TimerTask {
 		}
 
 		if (result) {
-			System.out.println("Inserted data for " + city + " from " + stations.getLastUpate());
+			logger.log(Level.INFO, "Inserted data for " + city + " from " + stations.getLastUpate());
 		} else {
-			System.err.println("Error could not insert data for " + city + " from " + stations.getLastUpate());
+			logger.log(Level.WARNING, "Error could not insert data for " + city + " from " + stations.getLastUpate());
 		}
 	}
 
@@ -181,7 +187,7 @@ public class DownloadFileTask extends TimerTask {
 				return true;
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage());
 		}
 
 		return false;
@@ -207,7 +213,7 @@ public class DownloadFileTask extends TimerTask {
 				return true;
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage());
 		}
 
 		return false;
@@ -236,7 +242,7 @@ public class DownloadFileTask extends TimerTask {
 				}
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage());
 		}
 
 		return id;

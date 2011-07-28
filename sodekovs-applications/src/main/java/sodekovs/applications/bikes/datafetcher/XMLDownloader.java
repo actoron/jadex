@@ -7,6 +7,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import javax.xml.bind.JAXBException;
 
@@ -26,6 +30,8 @@ public class XMLDownloader {
 
 	/** The path to the XML file containing the urls */
 	private static final String URL_FILE ="/sodekovs-applications/src/main/java/sodekovs/applications/bikes/datafetcher/urls.xml";
+	
+	private static final String LOG_FILE = "Datafetcher.log";
 
 	/**
 	 * Main method, starts a {@link DownloadFileTask} for every URL specified in {@link XMLDownloader#URLS}.
@@ -34,12 +40,25 @@ public class XMLDownloader {
 	 */
 	public static void main(String[] args) {
 		try {
-			URLs urls = (URLs) XMLHandler.retrieveFromXML(URLs.class, new File("..").getCanonicalPath() + URL_FILE);
+			Logger logger = Logger.getLogger("Datafetcher");
+			logger.setLevel(Level.ALL);
+			
+			FileHandler fh = new FileHandler(LOG_FILE, true);
+			
+			SimpleFormatter formatter = new SimpleFormatter();
+			fh.setFormatter(formatter);
+			
+			logger.addHandler(fh);
 
+			logger.log(Level.INFO, "XML Bike Data Fetcher started.");
+			String filePath = new File("..").getCanonicalPath() + URL_FILE;
+			URLs urls = (URLs) XMLHandler.retrieveFromXML(URLs.class, filePath);
+			logger.log(Level.INFO, "URLs retrieved from " + filePath);
+			
 			for (URLEntry entry : urls.getEntries()) {
 				Timer timer = new Timer();
 				// start the timer task for every given url
-				timer.schedule(new DownloadFileTask(entry.getCity(), new URL(entry.getUrl())), TIME_TO_START, entry.getInterval());
+				timer.schedule(new DownloadFileTask(entry.getCity(), new URL(entry.getUrl()), logger), TIME_TO_START, entry.getInterval());
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
