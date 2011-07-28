@@ -114,10 +114,15 @@ public class NIOTCPTransport implements ITransport
 			ServerSocket serversocket = ssc.socket();
 			serversocket.bind(new InetSocketAddress(port));
 			this.port = serversocket.getLocalPort();
+			
 			// ANDROID: the following line causes an exception in a 2.2
 			// emulator, see:
 			// http://code.google.com/p/android/issues/detail?id=9431
+			
+			// Causes problem with maven too (only with Win firewall?)
+			// http://www.thatsjava.com/java-core-apis/28232/
 			final Selector selector = Selector.open();
+			
 			ssc.register(selector, SelectionKey.OP_ACCEPT);
 			
 			// Determine all transport addresses.
@@ -185,7 +190,7 @@ public class NIOTCPTransport implements ITransport
 		catch(Exception e)
 		{
 			ret.setException(new RuntimeException("Transport initialization error: "+e.getMessage()));
-			//e.printStackTrace();
+			e.printStackTrace();
 //			throw new RuntimeException("Transport initialization error: "+e.getMessage());
 		}
 		

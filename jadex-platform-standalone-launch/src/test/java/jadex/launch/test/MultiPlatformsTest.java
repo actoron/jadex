@@ -22,7 +22,7 @@ public class MultiPlatformsTest extends TestCase
 		{
 			if(i%10==0)
 				System.out.println("Starting platform "+i);
-			futures[i]	= Starter.createPlatform(new String[]{"-platformname", "testcases",
+			futures[i]	= Starter.createPlatform(new String[]{"-platformname", "testcases", "-niotransport", "false",
 				"-gui", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"});
 		}
 		
