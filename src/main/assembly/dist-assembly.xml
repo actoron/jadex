@@ -62,7 +62,7 @@
 		<!-- Hack!!! Manually copying junit jar (required by jadex.platform.base.ComponentTest)
 		   - due to Maven assembly bug: http://jira.codehaus.org/browse/MASSEMBLY-558 -->
 		<file>
-			<source>jadex-platform-standalone-launch/target/lib/junit-3.8.1.jar</source>
+			<source>docs/junit-3.8.1.jar</source>
 			<outputDirectory>lib</outputDirectory>
 		</file>
 		<file>

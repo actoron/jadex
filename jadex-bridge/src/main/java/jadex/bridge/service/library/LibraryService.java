@@ -18,9 +18,11 @@ import jadex.commons.future.IResultListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -430,6 +432,17 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		if(url instanceof String)
 		{
 			String	string	= (String) url;
+			if(string.startsWith("file:"))
+			{
+				try
+				{
+					string	= URLDecoder.decode(string, "UTF-8");
+				}
+				catch(UnsupportedEncodingException e)
+				{
+				}
+			}
+			
 			url	= string.startsWith("file:") ? new File(string.substring(5)) : null;
 			if(url==null)
 			{
