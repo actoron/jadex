@@ -1,6 +1,5 @@
 package sodekovs.applications.bikes.datafetcher.database;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -16,7 +15,10 @@ import java.util.Properties;
  */
 public class DatabaseConnection {
 	
-	private static final String DB_FILE = "/sodekovs-applications/src/main/java/sodekovs/applications/bikes/datafetcher/database.properties";	
+	/**
+	 * The Path to the database properties file
+	 */
+	public static String DB_FILE = null;	
 
 	/**
 	 * The {@link Connection} to the Database
@@ -33,7 +35,7 @@ public class DatabaseConnection {
 			if (connection == null || connection.isClosed()) {
 
 				Properties properties = new Properties();
-				properties.load(new FileInputStream(new File("..").getCanonicalPath() + DB_FILE));
+				properties.load(new FileInputStream(DB_FILE));
 
 				String dbUrl = properties.getProperty("database.url");
 				String dbUser = properties.getProperty("database.user");
