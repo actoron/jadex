@@ -14,4 +14,11 @@ public interface IManagementService
 	 *  @return True, if was new awareness info. 
 	 */
 	public IFuture addAwarenessInfo(AwarenessInfo info);
+	
+	// todo:
+//	/**
+//	 *  Get the current awareness infos.
+//	 *  @return The awareness infos.
+//	 */
+//	public IFuture getAwarenessInfos();
 }

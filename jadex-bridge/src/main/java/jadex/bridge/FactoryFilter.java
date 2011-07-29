@@ -114,7 +114,7 @@ public class FactoryFilter implements IRemoteFilter
 		for(int index = 0; index < array.length; index++)
 		{
 			result = prime * result
-					+ (array[index] == null ? 0 : array[index].hashCode());
+				+ (array[index] == null ? 0 : array[index].hashCode());
 		}
 		return result;
 	}

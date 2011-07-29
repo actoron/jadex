@@ -300,6 +300,15 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		return new Future(ret);
 	}
 	
+//	/**
+//	 *  Get the current awareness infos.
+//	 *  @return The awareness infos.
+//	 */
+//	public IFuture getAwarenessInfos()
+//	{
+//		
+//	}
+	
 	/**
 	 *  Get the delay.
 	 *  @return the delay.
