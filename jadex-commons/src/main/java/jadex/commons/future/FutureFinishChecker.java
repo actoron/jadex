@@ -45,7 +45,10 @@ public class FutureFinishChecker
 		synchronized(this)
 		{
 			if(finished)
+			{
+				finishedex.printStackTrace();
 				throw new RuntimeException("Add task not allowed after finished.");
+			}
 			if(tasks==null)
 				tasks = Collections.synchronizedList(new ArrayList());
 			tasks.add(future);
@@ -67,6 +70,9 @@ public class FutureFinishChecker
 		});
 	}
 	
+	
+	Exception finishedex;
+	
 	/**
 	 *  Set to finished.
 	 */
@@ -74,6 +80,8 @@ public class FutureFinishChecker
 	{
 		synchronized(this)
 		{
+			finishedex	= new RuntimeException("finished called: "+this);
+			finishedex.fillInStackTrace();
 			finished = true;
 		}
 		check();

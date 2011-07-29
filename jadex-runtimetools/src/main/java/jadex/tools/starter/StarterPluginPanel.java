@@ -111,9 +111,10 @@ public class StarterPluginPanel extends JPanel
 		{
 			public void removeTopLevelNode(ITreeNode node)
 			{
+				super.removeTopLevelNode(node);
+				
 				if(node instanceof IFileNode && spanel!=null && spanel.lastfile!=null)
 				{
-					super.removeTopLevelNode(node);
 					final String	path	= ((IFileNode)node).getFilePath();
 					final String	model	= spanel.lastfile;
 					jcc.getPlatformAccess().scheduleImmediate(new IComponentStep()

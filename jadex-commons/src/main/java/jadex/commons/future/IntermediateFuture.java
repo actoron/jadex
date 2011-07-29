@@ -70,13 +70,9 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
             		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_EXCEPTION, this, result, exception);        			
         		}
         	}
-        }
 	   	
-		intermediate = true;
+        	intermediate = true;
 		
-		List	ilisteners	= null;
-		synchronized(this)
-		{
 			if(results==null)
 				results	= new ArrayList();
 			
@@ -89,25 +85,13 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 				{
 					if(listeners.get(i) instanceof IIntermediateResultListener)
 					{
-						if(ilisteners==null)
-							ilisteners	= new ArrayList();
-						ilisteners.add(listeners.get(i));
+						scheduleNotification((IResultListener)listeners.get(i), true, result);
 					}
 				}
 			}
 		}
 
-		for(int i=0; ilisteners!=null && i<ilisteners.size(); i++)
-		{
-//			try
-//			{
-				notifyIntermediateResult(((IIntermediateResultListener)ilisteners.get(i)), result);
-//			}
-//			catch(Exception e)
-//			{
-//				e.printStackTrace();
-//			}
-		}
+		startScheduledNotifications();
 	}
 	
 	/**
@@ -201,18 +185,21 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
     	if(listener==null)
     		throw new RuntimeException();
     	
-    	boolean	notify	= false;
-    	Object[] inter = null;
     	synchronized(this)
     	{
-    		if(listener instanceof IIntermediateResultListener && results!=null)
+    		if(intermediate && listener instanceof IIntermediateResultListener)
     		{
-    			inter = results.toArray();
+    			Object[]	inter = results.toArray();
+	    		IIntermediateResultListener lis =(IIntermediateResultListener)listener;
+	    		for(int i=0; i<inter.length; i++)
+	    		{
+	    			scheduleNotification(lis, true, inter[i]);
+	    		}
     		}
     		
 	    	if(resultavailable)
 	    	{
-	    		notify	= true;
+	    		scheduleNotification(listener, false, null);
 	    	}
 	    	else
 	    	{
@@ -221,20 +208,8 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 	    		listeners.add(listener);
 	    	}
     	}
-    	
-    	if(intermediate && inter!=null)
-    	{
-    		IIntermediateResultListener lis =(IIntermediateResultListener)listener;
-    		for(int i=0; i<inter.length; i++)
-    		{
-    			lis.intermediateResultAvailable(inter[i]);
-    		}
-    	}
-    	if(notify)
-    	{
-    		notifyListener(listener);
-    	}
-    		
+
+    	startScheduledNotifications();
     }
     
     /**
@@ -251,6 +226,16 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
      *  @param listener The listener.
      */
     protected void notifyListener(IResultListener listener)
+    {
+    	scheduleNotification(listener, false, null);
+    	startScheduledNotifications();
+    }
+    
+    /**
+     *  Notify a result listener.
+     *  @param listener The listener.
+     */
+    protected void doNotifyListener(IResultListener listener)
     {
 //    	try
 //    	{
@@ -290,5 +275,72 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 //    	{
 //    		e.printStackTrace();
 //    	}
+    }
+    
+    List	scheduled;
+    /**
+     *  Schedule a listener notification.
+     *  @param listener The listener to be notified.
+     *  @param intermediate	True for intermediate result, false for final results.
+     *  @param result	The intermediate result (if any).
+     */
+    protected void	scheduleNotification(IResultListener listener, boolean intermediate, Object result)
+    {
+    	synchronized(this)
+    	{
+    		if(scheduled==null)
+    		{
+    			scheduled	= new ArrayList();
+    		}
+    		scheduled.add(intermediate ? new Object[]{listener, result} : listener);
+    	}
+    }
+    
+    boolean	notifying;
+    /**
+     *  Start scheduled listener notifications if not already running.
+     *  Must not be called from synchronized block.
+     */
+    protected void	startScheduledNotifications()
+    {
+    	boolean	notify	= false;
+    	synchronized(this)
+    	{
+    		if(!notifying && scheduled!=null)
+    		{
+    			notifying	= true;
+    			notify	= true;
+    		}
+    	}
+    	
+    	while(notify)
+    	{
+    		Object	next	= null;
+        	synchronized(this)
+        	{
+        		if(scheduled.isEmpty())
+        		{
+        			notify	= false;
+        			notifying	= false;
+        			scheduled	= null;
+        		}
+        		else
+        		{
+        			next	=  scheduled.remove(0);
+            	}
+        	}
+        	
+        	if(next!=null)
+        	{
+        		if(next instanceof IResultListener)
+        		{
+        			doNotifyListener((IResultListener)next);
+        		}
+        		else
+        		{
+        			notifyIntermediateResult((IIntermediateResultListener)((Object[])next)[0], ((Object[])next)[1]);
+        		}
+        	}
+    	}
     }
 }

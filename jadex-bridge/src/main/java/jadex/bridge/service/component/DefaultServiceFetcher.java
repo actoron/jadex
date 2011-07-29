@@ -267,8 +267,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 					else
 					{
 						// Search service using search specification.
-						SServiceProvider.getServices(provider, info.getType(), binding.getScope())
-							.addResultListener(new StoreIntermediateDelegationResultListener(ret, provider, info, binding)
+						IIntermediateFuture	ifut	= SServiceProvider.getServices(provider, info.getType(), binding.getScope());
+						ifut.addResultListener(new StoreIntermediateDelegationResultListener(ret, provider, info, binding)
 						{
 							public void exceptionOccurred(Exception exception)
 							{

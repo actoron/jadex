@@ -7,6 +7,7 @@ import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.JarURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -134,18 +135,26 @@ public class JarAsDirectory	extends File
 	public String getAbsolutePath()
 	{
 		String	ret;
-		String	jarname	= jarpath.replace('\\', '/');
+		String jarurl;
+		try
+		{
+			jarurl = new File(jarpath).toURI().toURL().toString();
+		}
+		catch(MalformedURLException e)
+		{
+			jarurl	= "file:"+jarpath.replace('\\', '/');
+		}
 		if(entry!=null)
 		{
 //			if(jarpath.startsWith("/"))
-				ret	= "jar:file:"+jarname+"!/"+entry.getName();
+				ret	= "jar:"+jarurl+"!/"+entry.getName();
 //			else
 //				ret	= "jar:file:/"+jarname+"!/"+entry.getName();
 		}
 		else
 		{
 //			ret	= jarpath;
-			ret = "jar:file:"+jarname+"!/";
+			ret = "jar:"+jarurl+"!/";
 		}
 		return ret;
 	}

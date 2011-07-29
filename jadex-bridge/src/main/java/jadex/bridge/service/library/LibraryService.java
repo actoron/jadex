@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
@@ -693,16 +694,25 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 					File	file	= urlToFile(url.toString());
 					if(file!=null)
 					{
-						String	proto	= "";
-						if(url.startsWith("file:"))
+						String	filename	= SUtil.convertPathToRelative(file.getAbsolutePath());
+						String fileurl;
+						try
 						{
-							proto	= "file:";
+							// URI wouldn't allow relative names, so pretend its an absolute path.
+							fileurl = "file:"+new URI("file", null, "/"+filename.replace('\\', '/'), null).toURL().toString().substring(6);
 						}
-						else if(url.startsWith("jar:file:"))
+						catch(Exception e)
 						{
-							proto	= "jar:file:";
+							fileurl	= "file:"+filename.replace('\\', '/');
 						}
-						entries[i]	= proto + SUtil.convertPathToRelative(file.getAbsolutePath()).replace('\\', '/');
+						if(url.startsWith("jar:file:"))
+						{
+							entries[i]	= "jar:" + fileurl;
+						}
+						else
+						{
+							entries[i]	= fileurl;
+						}
 						if(url.endsWith("!/") && entries[i].endsWith("!"))
 							entries[i]	+= "/";	// Stripped by new File(...).
 					}
@@ -764,10 +774,24 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		File	file	= null;
 		if(url.startsWith("file:"))
 		{
+			try
+			{
+				url	= URLDecoder.decode(url, "UTF-8");
+			}
+			catch(UnsupportedEncodingException uee)
+			{
+			}
 			file	= new File(url.substring(5));
 		}
 		else if(url.startsWith("jar:file:"))
 		{
+			try
+			{
+				url	= URLDecoder.decode(url, "UTF-8");
+			}
+			catch(UnsupportedEncodingException uee)
+			{
+			}
 			file	= new File(url.substring(9));
 		}
 		return file;
