@@ -51,6 +51,8 @@ public class MicroPreyAgent extends MicroAgent
 			{
 				if(result==null)
 					return;
+				
+				env	= (Grid2D)result;
 		
 				myself	= env.getAvatar(getComponentDescription());
 				listener = new IResultListener()
