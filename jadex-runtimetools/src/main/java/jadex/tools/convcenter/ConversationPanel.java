@@ -626,7 +626,7 @@ public class ConversationPanel extends JSplitPane
 			public Object execute(final IInternalAccess ia)
 			{
 				final Future	ret	= new Future();
-				SServiceProvider.getService(agent.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(ia.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)

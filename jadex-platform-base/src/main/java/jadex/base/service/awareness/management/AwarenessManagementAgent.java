@@ -96,7 +96,7 @@ import java.util.TimerTask;
 //			@Component(name="registrydis", type="registrydis")
 		})
 })
-@Properties(@NameValue(name="componentviewer.viewerclass", value="\"jadex.base.service.awareness.AwarenessAgentPanel\""))
+@Properties(@NameValue(name="componentviewer.viewerclass", value="\"jadex.base.service.awareness.gui.AwarenessAgentPanel\""))
 @ProvidedServices(
 	@ProvidedService(type=IManagementService.class, implementation=@Implementation(expression="$component"))
 )

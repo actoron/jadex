@@ -641,7 +641,7 @@ public class RemoteFileSystemView extends FileSystemView
 				{
 					FileData[] remfiles = (FileData[])result;
 					RemoteFile[] files = FileData.convertToFiles(remfiles);
-					System.out.println("children: "+dir+" "+SUtil.arrayToString(files));
+//					System.out.println("children: "+dir+" "+SUtil.arrayToString(files));
 					children.put(dir.getAbsolutePath(), files);
 					for(int i=0; i<files.length; i++)
 					{
