@@ -19,19 +19,19 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 /**
- *  Chat micro agent provides a basic chat service. 
+ *  Chat micro agent provides . 
  */
 @Description("This agent provides a basic chat service.")
 @Agent
-@ProvidedServices(@ProvidedService(type=IChatService.class, 
-	implementation=@Implementation(ChatServiceD1.class)))
+@ProvidedServices(@ProvidedService(type=IExtendedChatService.class, 
+	implementation=@Implementation(ChatServiceD3.class)))
 @RequiredServices({
 	@RequiredService(name="clockservice", type=IClockService.class, 
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="chatservices", type=IChatService.class, multiple=true,
+	@RequiredService(name="chatservices", type=IExtendedChatService.class, multiple=true,
 		binding=@Binding(dynamic=true, scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
-public class ChatD1Agent
+public class ChatD3Agent
 {
 	/** The underlying mirco agent. */
 	@Agent
@@ -51,8 +51,14 @@ public class ChatD1Agent
 			{
 				for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
 				{
-					IChatService cs = (IChatService)it.next();
-					cs.message(agent.getComponentIdentifier().getName(), "Hello");
+					IExtendedChatService cs = (IExtendedChatService)it.next();
+					cs.getUserProfile().addResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object result)
+						{
+							System.out.println("Profile: "+result);
+						}
+					});
 				}
 			}
 		});
