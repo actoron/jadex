@@ -8,11 +8,11 @@
 	<packaging>jar</packaging>
 	<name>jadex-android-core</name>
 
-	<parent>
-		<groupId>net.sourceforge.jadex</groupId>
-		<artifactId>jadex</artifactId>
-		<version>2.0-rc7</version>
-	</parent>
+<!-- 	<parent> -->
+<!-- 		<groupId>net.sourceforge.jadex</groupId> -->
+<!-- 		<artifactId>jadex</artifactId> -->
+<!-- 		<version>2.0-rc7</version> -->
+<!-- 	</parent> -->
 
 	<dependencies>
 		<!-- To get all android-related errors, uncomment the following dependency 

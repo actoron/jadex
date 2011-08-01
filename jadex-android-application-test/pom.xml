@@ -8,16 +8,13 @@
 	<packaging>apk</packaging>
 	<name>jadex-android-application-test</name>
 
-
-	<parent>
-		<groupId>net.sourceforge.jadex</groupId>
-		<artifactId>jadex</artifactId>
-		<version>2.0-rc7</version>
-	</parent>
-
+<!-- 	<parent> -->
+<!-- 		<groupId>net.sourceforge.jadex</groupId> -->
+<!-- 		<artifactId>jadex</artifactId> -->
+<!-- 		<version>2.0-rc7</version> -->
+<!-- 	</parent> -->
 
 	<dependencies>
-
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-android-core</artifactId>
@@ -30,7 +27,6 @@
 			<version>2.2.1</version>
 			<scope>provided</scope>
 		</dependency>
-
 	</dependencies>
 
 	<build>

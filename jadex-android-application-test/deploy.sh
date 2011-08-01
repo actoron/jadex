@@ -1,8 +1,8 @@
 #!/bin/bash
 ##########################################
-# Android Deployment Script		 #
-# v3 					 #
-# 8kalinow@informatik.uni-hamburg.de	 #
+# Android Deployment Script              #
+# v3                                     #
+# 8kalinow@informatik.uni-hamburg.de     #
 ##########################################
 ADB_PATH=$ANDROID_HOME/tools/adb
 MVN_PATH=$(which mvn)
@@ -10,9 +10,11 @@ AWK_PATH=$(which awk)
 PROJECT_PATH=$(pwd)
 APPLICATION_PACKAGE="de.unihamburg.vsis.jadexAndroid_test"
 MAIN_ACTIVITY="MainMenu"
+APKFILE="target/jadex-android-application-test-0.0.1-SNAPSHOT.apk"
 skip_build=false
 adb_device=""
 remove_app=false
+clean=false
 
 function echo_green {
 	echo -en '\E[1;32m'"\033[1m$1\033[0m"
@@ -20,12 +22,26 @@ function echo_green {
 }
 
 function echo_red {
-	echo -e '\E[1;31m'"\033[1m$1\033[0m"
+	echo -en '\E[1;31m'"\033[1m$1\033[0m"
 	tput sgr0
 }
 
 function echo_bold {
 	echo -en "\033[1m$1\033[0m"
+}
+
+function e {
+    echo_green "[deploy]   "
+    params=$1
+    shift
+    echo $params "$@"
+}
+
+function f {
+    echo_red "[deploy]   "
+    params=$1
+    shift
+    echo $params "$@"
 }
 
 function display_help () {
@@ -34,9 +50,10 @@ function display_help () {
 	echo	"Builds $APPLICATION_PACKAGE using maven and deploys it to all connected android devices."
 	echo	""
 	echo	"Arguments:"
-	echo	"  -s, --skip-build 	skips build, just deploys"
-	echo 	"  -d, --device=DEVICE	deploys/removes only on DEVICE, see 'adb devices' for device ID"
-	echo 	"  -r, --remove		remove app from devices"
+	echo	"  -s, --skip-build     skips build, just deploys"
+	echo 	"  -d, --device=DEVICE  deploys/removes only on DEVICE, see 'adb devices' for device ID"
+	echo 	"  -r, --remove         remove app from devices"
+    echo    "  -c, --clean          clean before build"
 	echo	""
 	echo	"Need ANDROID_HOME to be set and 'awk' to be in PATH"
 
@@ -49,8 +66,8 @@ function display_usage () {
 function checkAdbPermissions () {
 $ADB_PATH devices | grep -q "no permissions"
 	if [ $? -eq "0" ]; then
-		echo "No Permissions to access usb device."
-		echo "Restarting adb daemon as root..."
+		e "No Permissions to access usb device."
+		e "Restarting adb daemon as root..."
 		sudo $ADB_PATH kill-server
 		sudo $ADB_PATH start-server
 		sleep 1
@@ -88,6 +105,10 @@ while [ "${1+isset}" ]; do
       remove_app=true
       shift
       ;;
+    -c|--clean)
+      clean=true
+      shift
+      ;;
     *)
       echo "Error: Unknown option: $1" >&2
       display_usage
@@ -97,17 +118,17 @@ while [ "${1+isset}" ]; do
 done
 
 if [ -z $ANDROID_HOME ]; then 
-	echo "ANDROID_HOME not set!"
+	f "ANDROID_HOME not set!"
 	exit 1
 fi
 
 if [ -z $MVN_PATH ]; then
-	echo "mvn Befehl not set!"
+	f "mvn Befehl not set!"
 	exit 1
 fi
 
 if [ -z $AWK_PATH ]; then
-	echo "awk Befehl not set!"
+	f "awk Befehl not set!"
 	exit 1
 fi
 
@@ -119,34 +140,50 @@ if [ ! -e $ADB_PATH ]; then
 fi
 
 if [ ! -e $ADB_PATH ]; then
-	echo_red "$ANDROID_HOME/tools/adb does not exist!"
+	f "$ANDROID_HOME/tools/adb does not exist!"
 	exit 1
 fi
 
 if [ $remove_app == "true" ]; then
-	if [ ! -z $adb_device ]; then
+    checkAdbPermissions	
+    if [ ! -z $adb_device ]; then
 		DEVICES=$adb_device
 	fi
-	echo -n "Removing app from " 
-	echo_bold $(num_devices)
-	echo " devices"
+	e "Removing app from $(echo_bold $(num_devices)) devices"
 	for d in $DEVICES; do
-		echo -n "Removing app from device: "
-		echo_bold "$d\n"
+		e "Removing app from device: $(echo_bold $d)"
 		$ADB_PATH -s $d shell pm uninstall -k $APPLICATION_PACKAGE
 		if [ ! "$?" -eq "0" ]; then
-			echo_red "Removing app from device $d failed."
-		fi
+			f "Removing app from device $d failed."
+		else
+            e "App removed."    
+        fi
 	done
 	exit
 fi
 
+if $clean && $skip_build ; then
+    f "--clean does not work in combination with --skip-build!"
+    exit 1
+fi
+
+if [ $clean ]; then
+    e $(echo_bold "Cleaning...")
+    cd .. 
+    $MVN_PATH clean -P jadex-android
+    if [ ! "$?" -eq 0 ]; then
+        f "Cleaning failed."
+        exit 1
+    fi
+    cd $PROJECT_PATH
+fi
+
 if [ $skip_build == false ]; then
-	echo_bold "Building...\n"
+	e $(echo_bold "Building...")
 	cd ..
 	$MVN_PATH install -P jadex-android
 	if [ ! "$?" -eq "0" ]; then
-		echo_red "Maven Build failed. Not deploying."
+		f "Maven Build failed. Not deploying."
 		exit 1
 	fi
 fi
@@ -156,18 +193,21 @@ if [ ! -z $adb_device ]; then
 	DEVICES=$adb_device
 fi
 
-echo_bold "Deploying to "
-echo_green $(echo $DEVICES | awk '{print NF;}') 
-echo_bold " devices.\n"
+e $(echo_bold "Deploying...")
+e "Deploying to $(echo_bold $(echo $DEVICES | awk '{print NF;}')) devices"
 for d in $DEVICES; do
-	echo -n "Transferring file to device: "
-	echo_bold "$d\n"
-	$ADB_PATH -s $d install -r target/jadex-android-0.0.1-SNAPSHOT.apk
+	e "Transferring file to device: $(echo_bold $d)"
+	$ADB_PATH -s $d install -r $APKFILE
 	if [ ! "$?" -eq "0" ]; then
-		echo_red "Transfer to device $d failed."
+		f "Transfer to device $d failed."
 	else 
-		echo "Starting Application on device $d"
+		e "Starting Application on device $d"
 		$ADB_PATH -s $d shell am start -n $APPLICATION_PACKAGE/$APPLICATION_PACKAGE.$MAIN_ACTIVITY
+        if [ ! "$?" -eq "0" ]; then
+            f "Failed to start Apllication on device $d."
+        else
+            e "Application started on device $d."
+        fi
 	fi
 done
 
