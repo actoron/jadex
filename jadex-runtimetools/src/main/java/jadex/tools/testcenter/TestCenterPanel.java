@@ -513,7 +513,7 @@ public class TestCenterPanel extends JSplitPanel
 			}
 		}).addResultListener(new SwingDelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object result) throws Exception
+			public void customResultAvailable(Object result)
 			{
 				String[]	entries	= (String[])result;
 				Properties	props	= new Properties();

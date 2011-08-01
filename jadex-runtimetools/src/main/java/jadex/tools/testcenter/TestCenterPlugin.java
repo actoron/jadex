@@ -281,13 +281,13 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		SServiceProvider.getService(getJCC().getPlatformAccess().getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object result) throws Exception
+			public void customResultAvailable(Object result)
 			{
 				ISettingsService	settings	= (ISettingsService)result;
 				settings.getProperties("TestCenterPlugin")
 					.addResultListener(new SwingDelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object result) throws Exception
+					public void customResultAvailable(Object result)
 					{
 						if(result!=null)
 						{
@@ -295,7 +295,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 							mpanel.setProperties(props.getSubproperty("mpanel"))
 								.addResultListener(new SwingDelegationResultListener(ret)
 							{
-								public void customResultAvailable(Object result) throws Exception
+								public void customResultAvailable(Object result)
 								{
 									tcpanel.setProperties(props.getSubproperty("tcpanel"))
 										.addResultListener(new SwingDelegationResultListener(ret));
@@ -329,7 +329,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		SServiceProvider.getService(getJCC().getPlatformAccess().getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object result) throws Exception
+			public void customResultAvailable(Object result)
 			{
 				final ISettingsService	settings	= (ISettingsService)result;
 				mpanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
@@ -412,7 +412,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 					final	List	list	= new ArrayList();
 					CounterResultListener	crl	= new CounterResultListener(children.size(), new SwingDelegationResultListener(fut)
 					{
-						public void customResultAvailable(Object result) throws Exception
+						public void customResultAvailable(Object result)
 						{
 							fut.setResult(list);
 						}

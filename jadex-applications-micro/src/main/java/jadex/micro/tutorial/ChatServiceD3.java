@@ -1,5 +1,6 @@
 package jadex.micro.tutorial;
 
+import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -9,21 +10,13 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 
+ *  This chat service can provide a user profile.
  */
-public class ChatServiceD3 extends ChatServiceD1 implements IExtendedChatService
+public class ChatServiceD3 extends ChatServiceD2 implements IExtendedChatService
 {
 	protected static List profiles;
 
 	protected UserProfileD3 profile;
-	
-	/**
-	 * 
-	 */
-	public ChatServiceD3()
-	{
-		this.profile = (UserProfileD3)profiles.get((int)(Math.random()*profiles.size()));
-	}
 	
 	static
 	{
@@ -39,6 +32,16 @@ public class ChatServiceD3 extends ChatServiceD1 implements IExtendedChatService
 	 */
 	public IFuture getUserProfile()
 	{
+		if(profile==null)
+			this.profile = (UserProfileD3)profiles.get((int)(Math.random()*profiles.size()));
 		return new Future(profile);
+	}
+	
+	/**
+	 *  Create the gui.
+	 */
+	protected ChatGuiD2 createGui(IExternalAccess agent)
+	{
+		return new ChatGuiD3(agent);
 	}
 }

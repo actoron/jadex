@@ -66,15 +66,22 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		SServiceProvider.getService(controlcenter.getJCCAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object result)	throws Exception
+			public void customResultAvailable(Object result)
 			{
 				ClassLoader cl = ((ILibraryService)result).getClassLoader();
 				for(int i=0; i<plugin_classes.length; i++)
 				{
-					Class plugin_class = SReflect.classForName(plugin_classes[i], cl);
-					IControlCenterPlugin p = (IControlCenterPlugin)plugin_class.newInstance();
-					plugins.put(p, null);
-					setStatusText("Plugin loaded successfully: "+ p.getName());
+					try
+					{
+						Class plugin_class = SReflect.classForName(plugin_classes[i], cl);
+						IControlCenterPlugin p = (IControlCenterPlugin)plugin_class.newInstance();
+						plugins.put(p, null);
+						setStatusText("Plugin loaded successfully: "+ p.getName());
+					}
+					catch(Exception e)
+					{
+						setStatusText("Plugin error: "+plugin_classes[i]);
+					}
 				}
 				ret.setResult(null);
 			}
@@ -128,13 +135,13 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 //		System.out.println("Pushing platform settings: "+aplugins.length);
 		CounterResultListener	crl	= new CounterResultListener(aplugins.length, new SwingDelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object result) throws Exception
+			public void customResultAvailable(Object result)
 			{
 //				System.out.println("Pushed platform settings");
 				SServiceProvider.getService(getPlatformAccess().getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingDelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object result) throws Exception
+					public void customResultAvailable(Object result)
 					{
 //						System.out.println("Fetched settings service");
 						ISettingsService	settings	= (ISettingsService)result;
@@ -276,7 +283,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		}
 		pccpanel.setProperties(ccprops).addResultListener(new SwingDelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object result) throws Exception
+			public void customResultAvailable(Object result)
 			{
 				// Consider only settings of plugins, which have a panel associated.
 				List	plugs	= new ArrayList();
@@ -320,7 +327,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 //			System.out.println("Fetching panel properties.");
 			pccpanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
 			{
-				public void customResultAvailable(Object result) throws Exception
+				public void customResultAvailable(Object result)
 				{
 					props.removeSubproperties("controlcenter");
 					props.addSubproperties("controlcenter", (Properties)result);
@@ -340,7 +347,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 					final CounterResultListener	crl	= new CounterResultListener(plugs.size(),
 						new SwingDelegationResultListener(ret)
 					{
-						public void customResultAvailable(Object result) throws Exception
+						public void customResultAvailable(Object result)
 						{
 //							System.out.println("Fetched all plugin properties.");
 							ret.setResult(props);
@@ -352,7 +359,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 //						System.out.println("Fetching plugin properties: "+plugin.getName());
 						plugin.getProperties().addResultListener(new SwingDelegationResultListener(ret)
 						{
-							public void customResultAvailable(Object result)	throws Exception
+							public void customResultAvailable(Object result)
 							{
 								if(result!=null)
 								{

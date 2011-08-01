@@ -1,7 +1,7 @@
 package jadex.micro.tutorial;
 
 /**
- * 
+ *  The chat service interface.
  */
 public interface IChatService
 {

@@ -103,13 +103,13 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 		
 		p1props.addResultListener(new SwingDelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object result) throws Exception
+			public void customResultAvailable(Object result)
 			{
 				if(result!=null)
 					props.addSubproperties("first", (Properties)result);
 				p2props.addResultListener(new SwingDelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object result) throws Exception
+					public void customResultAvailable(Object result)
 					{
 						if(result!=null)
 							props.addSubproperties("second", (Properties)result);

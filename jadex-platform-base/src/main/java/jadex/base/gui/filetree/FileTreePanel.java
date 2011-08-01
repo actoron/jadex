@@ -399,7 +399,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		
 		rootdone.addResultListener(new SwingDelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object result) throws Exception
+			public void customResultAvailable(Object result)
 			{
 				mep.setSelectedNode(getTree().getSelectionPath()==null ? null
 					: NodePath.createNodePath((ITreeNode)getTree().getSelectionPath().getLastPathComponent()));
@@ -499,7 +499,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 								}
 							}).addResultListener(new SwingDelegationResultListener(rootdone)
 							{
-								public void customResultAvailable(Object result) throws Exception
+								public void customResultAvailable(Object result)
 								{
 									FileData[]	entries	= (FileData[])result;
 									for(int i=0; i<entries.length; i++)
@@ -525,7 +525,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 
 				rootdone.addResultListener(new SwingDelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object result) throws Exception
+					public void customResultAvailable(Object result)
 					{
 						// Select the last selected model in the tree.
 						if(mep.getSelectedNode()!=null)

@@ -321,7 +321,7 @@ public class SimulationServicePlugin extends AbstractServicePlugin
 		final Future	ret	= new Future();
 		super.setProperties(props).addResultListener(new SwingDelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object result) throws Exception
+			public void customResultAvailable(Object result)
 			{
 				updateMenu();
 				ret.setResult(null);

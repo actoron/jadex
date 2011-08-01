@@ -410,13 +410,13 @@ public class StarterPluginPanel extends JPanel
 		SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object result) throws Exception
+			public void customResultAvailable(Object result)
 			{
 				ISettingsService	settings	= (ISettingsService)result;
 				settings.getProperties("StarterServicePanel")
 					.addResultListener(new SwingDelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object result) throws Exception
+					public void customResultAvailable(Object result)
 					{
 						if(result!=null)
 						{
@@ -424,7 +424,7 @@ public class StarterPluginPanel extends JPanel
 							mpanel.setProperties(props.getSubproperty("mpanel"))
 								.addResultListener(new SwingDelegationResultListener(ret)
 							{
-								public void customResultAvailable(Object result) throws Exception
+								public void customResultAvailable(Object result)
 								{
 									spanel.setProperties(props.getSubproperty("spanel"));
 									ret.setResult(null);
@@ -459,7 +459,7 @@ public class StarterPluginPanel extends JPanel
 		SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object result) throws Exception
+			public void customResultAvailable(Object result)
 			{
 //				System.out.println("fetching mpanel properties");
 				final ISettingsService	settings	= (ISettingsService)result;

@@ -1038,7 +1038,7 @@ public class StarterPanel extends JLayeredPane
 			}
 		}).addResultListener(new SwingDelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object result) throws Exception
+			public void customResultAvailable(Object result)
 			{
 				Properties	props	= new Properties();
 				

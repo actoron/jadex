@@ -104,7 +104,7 @@ public class SwingDelegationResultListener implements IResultListener
 	 *  Called when the result is available.
 	 *  @param result The result.
 	 */
-	public void customResultAvailable(Object result)	throws Exception
+	public void customResultAvailable(Object result)
 	{
 		future.setResult(result);
 	}

@@ -3,7 +3,6 @@ package jadex.micro.tutorial;
 import java.util.Collection;
 import java.util.Iterator;
 
-import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;

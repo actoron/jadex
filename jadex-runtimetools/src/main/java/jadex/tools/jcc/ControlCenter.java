@@ -98,7 +98,7 @@ public class ControlCenter
 		
 		SJCC.getRootAccess(jccaccess).addResultListener(new SwingDelegationResultListener(inited)
 		{
-			public void customResultAvailable(Object result) throws Exception
+			public void customResultAvailable(Object result)
 			{
 				IExternalAccess	platformaccess	= (IExternalAccess)result;
 				pccs.put(platformaccess.getComponentIdentifier(), pcc);
@@ -209,7 +209,7 @@ public class ControlCenter
 		saveSettings(new File(jccaccess.getComponentIdentifier().getLocalName() + SETTINGS_EXTENSION))
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object result) throws Exception
+			public void customResultAvailable(Object result)
 			{
 //				System.out.println("Saving platform settings");
 				pcc.savePlatformProperties().addResultListener(new SwingDelegationResultListener(ret));
@@ -230,7 +230,7 @@ public class ControlCenter
 		// Get properties of latest platform panel.
 		pcc.getProperties().addResultListener(new SwingDelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object result) throws Exception
+			public void customResultAvailable(Object result)
 			{
 //				System.out.println("Fetched JCC properties.");
 				final Properties	props	= (Properties)result;
@@ -253,7 +253,7 @@ public class ControlCenter
 				SServiceProvider.getService(jccaccess.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingDelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object result) throws Exception
+					public void customResultAvailable(Object result)
 					{
 						try
 						{
@@ -266,8 +266,8 @@ public class ControlCenter
 						}
 						catch(Exception e)
 						{
-							e.printStackTrace();
-							throw e;
+//							e.printStackTrace();
+							throw new RuntimeException(e);
 						}
 					}
 				});
@@ -349,7 +349,7 @@ public class ControlCenter
 				
 				saved.addResultListener(new SwingDelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object result) throws Exception
+					public void customResultAvailable(Object result)
 					{
 //						System.out.println("JCC settings saved.");
 						
@@ -367,7 +367,7 @@ public class ControlCenter
 
 						handlerdisposed.addResultListener(new SwingDelegationResultListener(ret)
 						{
-							public void customResultAvailable(Object result) throws Exception
+							public void customResultAvailable(Object result)
 							{
 //								System.out.println("CMS handlers disposed.");
 								if(!Starter.isShutdown())
@@ -464,7 +464,7 @@ public class ControlCenter
 			tmp.init(platformaccess, this, plugin_classes)
 				.addResultListener(new SwingDelegationResultListener(newpcc)
 			{
-				public void customResultAvailable(Object result) throws Exception
+				public void customResultAvailable(Object result)
 				{
 					newpcc.setResult(tmp);
 				}
