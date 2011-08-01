@@ -134,29 +134,47 @@ public class JarAsDirectory	extends File
 	
 	public String getAbsolutePath()
 	{
+		// Old
 		String	ret;
-		String jarurl;
-		try
-		{
-			jarurl = new File(jarpath).toURI().toURL().toString();
-		}
-		catch(MalformedURLException e)
-		{
-			jarurl	= "file:"+jarpath.replace('\\', '/');
-		}
+		String	jarname	= jarpath.replace('\\', '/');
 		if(entry!=null)
 		{
 //			if(jarpath.startsWith("/"))
-				ret	= "jar:"+jarurl+"!/"+entry.getName();
+				ret	= "jar:file:"+jarname+"!/"+entry.getName();
 //			else
 //				ret	= "jar:file:/"+jarname+"!/"+entry.getName();
 		}
 		else
 		{
 //			ret	= jarpath;
-			ret = "jar:"+jarurl+"!/";
+			ret = "jar:file:"+jarname+"!/";
 		}
 		return ret;
+
+		// New
+//		String	ret;
+//		String jarurl;
+//		try
+//		{
+//			jarurl = new File(jarpath).toURI().toURL().toString();
+//		}
+//		catch(MalformedURLException e)
+//		{
+//			jarurl	= "file:"+jarpath.replace('\\', '/');
+//		}
+//		if(entry!=null)
+//		{
+////			if(jarpath.startsWith("/"))
+//				ret	= "jar:"+jarurl+"!/"+entry.getName();
+////			else
+////				ret	= "jar:file:/"+jarname+"!/"+entry.getName();
+//		}
+//		else
+//		{
+////			ret	= jarpath;
+//			ret = "jar:"+jarurl+"!/";
+//		}
+//		return ret;
 	}
 	
 	public long lastModified()
