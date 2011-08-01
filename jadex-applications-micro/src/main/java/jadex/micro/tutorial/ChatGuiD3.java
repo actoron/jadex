@@ -8,10 +8,12 @@ import jadex.commons.future.DefaultResultListener;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.nio.ByteOrder;
 import java.util.Collection;
 import java.util.Iterator;
 
 import javax.swing.JButton;
+import javax.swing.JPanel;
 
 /**
  *  The chat gui with profile button.
@@ -25,7 +27,9 @@ public class ChatGuiD3 extends ChatGuiD2
 	{
 		super(agent);
 		JButton profiles = new JButton("Profiles");
-		getContentPane().add(profiles, BorderLayout.NORTH);
+		JPanel p = new JPanel();//new BorderLayout());
+		p.add(profiles);//, BorderLayout.CENTER);
+		getContentPane().add(p, BorderLayout.NORTH);
 		profiles.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)

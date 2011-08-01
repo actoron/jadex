@@ -8,7 +8,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Simple interceptor that refuses messages of spammers.
  */
-public class SpamInterceptorD9 implements IServiceInvocationInterceptor
+public class SpamInterceptorD4 implements IServiceInvocationInterceptor
 {
 	/**
 	 *  Test if the interceptor is applicable.
@@ -33,8 +33,11 @@ public class SpamInterceptorD9 implements IServiceInvocationInterceptor
 	 */
 	public IFuture execute(ServiceInvocationContext context)
 	{
-		if(((String)context.getArgumentArray()[0]).startsWith("Spammer"))
+		String sender = (String)context.getArgumentArray()[0];
+		String text = (String)context.getArgumentArray()[1];
+		if(sender.indexOf("Bot")!=-1)
 		{
+			System.out.println("Blocked spam message: "+sender+" "+text);
 			return new Future((new RuntimeException("No spammers allowed.")));
 		}
 		else

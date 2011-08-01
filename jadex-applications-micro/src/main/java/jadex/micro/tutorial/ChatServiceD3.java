@@ -5,9 +5,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  *  This chat service can provide a user profile.
@@ -24,6 +22,8 @@ public class ChatServiceD3 extends ChatServiceD2 implements IExtendedChatService
 		profiles.add(new UserProfileD3("John Doh", 33, false, "I like football, dart and beer."));
 		profiles.add(new UserProfileD3("Anna Belle", 21, true, "I like classic music."));
 		profiles.add(new UserProfileD3("Prof. Smith", 58, false, "I like Phdcomics."));
+		profiles.add(new UserProfileD3("Jim Carry", 44, false, "I like me."));
+		profiles.add(new UserProfileD3("Maria Calati", 44, false, "I like flowers and showers."));
 	}
 	
 	/**
