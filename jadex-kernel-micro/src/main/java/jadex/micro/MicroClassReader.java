@@ -477,7 +477,14 @@ public class MicroClassReader
 		while(ret==null && (idx=clname.indexOf('.'))!=-1)
 		{
 			clname	= clname.substring(idx+1);
-			ret = SReflect.findClass0(clname, imports, classloader);
+			try
+			{
+				ret = SReflect.findClass0(clname, imports, classloader);
+			}
+			catch(IllegalArgumentException iae)
+			{
+				// Hack!!! Sun URL class loader doesn't like if classnames start with (e.g.) 'C:'.
+			}
 //			System.out.println(clname+" "+cma+" "+ret);
 		}
 		if(ret==null)// || !cma.isAssignableFrom(IMicroAgent.class))
