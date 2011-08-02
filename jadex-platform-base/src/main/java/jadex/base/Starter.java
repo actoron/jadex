@@ -289,7 +289,6 @@ public class Starter
 			//							final IComponentAdapter adapter = (IComponentAdapter)root[1];
 			//							System.out.println("Instance: "+instance);
 										
-										
 										final CounterResultListener	crl	= new CounterResultListener(components.size(), new DelegationResultListener(ret)
 										{
 											public void customResultAvailable(Object result)
@@ -361,10 +360,8 @@ public class Starter
 										boolean again = true;
 										while(again && !ret.isDone())
 										{
-					//						System.out.println("Execute step: "+cid);
 											again = afac.executeStep(adapter);
 										}
-					//					System.out.println("starting component execution");
 										
 										// Start normal execution of root component (i.e. platform) unless an error occurred during init.
 										if(!ret.isDone())

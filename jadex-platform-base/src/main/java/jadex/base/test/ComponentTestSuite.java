@@ -40,7 +40,7 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	public ComponentTestSuite(File path, File root, String[] excludes) throws Exception
 	{
-		this(path, root, excludes, 300000);
+		this(path, root, excludes, 600000);
 	}
 	
 	/**
@@ -85,7 +85,9 @@ public class ComponentTestSuite extends TestSuite
 		// Todo: get rid of thread suspendable!?
 		ISuspendable	ts	= new ThreadSuspendable();
 		
+		System.out.println("start platform");
 		IExternalAccess	rootcomp	= (IExternalAccess)Starter.createPlatform(args).get(ts);
+		System.out.println("end platform");
 		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(rootcomp.getServiceProvider(), IComponentManagementService.class).get(ts);
 		ILibraryService libsrv	= (ILibraryService)SServiceProvider.getService(rootcomp.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(ts);
 		
@@ -102,8 +104,10 @@ public class ComponentTestSuite extends TestSuite
 		// Scan for test cases.
 		List	todo	= new LinkedList();
 		todo.add(path);
+//		System.out.println("Path: "+path);
 		while(!todo.isEmpty())
 		{
+//			System.out.println("todo: "+todo);
 			File	file	= (File)todo.remove(0);
 			final String	abspath	= file.getAbsolutePath();
 			boolean	exclude	= false;

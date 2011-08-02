@@ -189,7 +189,6 @@ class ComponentAdapter implements IComponentAdapter
 
 	public Exception getException()
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
