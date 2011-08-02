@@ -16,7 +16,13 @@ public class GlobalConstants {
 	public static final String GNUPLOT_EXE_FILEPATH = "C:\\Program Files\\GnuPlot\\gp443win32\\gnuplot\\binary\\gnuplot.exe";
 	public static final String LOGGING_DIRECTORY = System.getProperty("user.dir") + "\\Benchmarking-Schedule-Logs";
 	
-	//Capital Bike Share
+	//Capital Bike Share - Derby DB Properties
 	public static final String CAPITAL_BIKE_SHARE_SCHEMA = "CapBikeShare";
 	public static final String CAPITAL_BIKE_SHARE_LOGTABLE = "Logs";
+	
+	//Properties for HAW-MySQL DB
+	public static final String BIKE_DB_TABLE = "bikes";
+	public static final String BIKE_DB_STATION_SCHEMA = "station";
+	public static final String BIKE_DB_STATIONS = "stations";
+	public static final String BIKE_DB_STATIONS_XML = "stationsxml";
 }
