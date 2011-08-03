@@ -16,12 +16,12 @@ import jadex.micro.annotation.RequiredServices;
  */
 @Description("This agent provides a basic chat service.")
 @Agent
-@ProvidedServices(@ProvidedService(type=IExtendedChatService.class, 
+@ProvidedServices(@ProvidedService(type=IChatService.class, 
 	implementation=@Implementation(value=ChatServiceD5.class)))
 @RequiredServices({
 	@RequiredService(name="clockservice", type=IClockService.class, 
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="chatservices", type=IExtendedChatService.class, multiple=true,
+	@RequiredService(name="chatservices", type=IChatService.class, multiple=true,
 		binding=@Binding(dynamic=true, scope=RequiredServiceInfo.SCOPE_GLOBAL))
 })
 public class ChatD5Agent
