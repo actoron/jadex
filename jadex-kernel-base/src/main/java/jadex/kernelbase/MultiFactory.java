@@ -486,7 +486,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			final RequiredServiceBinding[] bindings, final boolean copy, final Future ret)
 	{
 		IComponentFactory fac = (IComponentFactory) factorycache.get(getModelExtension(model.getFilename()));
-		if (fac != null)
+		if(fac != null)
 			return fac.createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, ret);
 		
 		final Future res = new Future();
@@ -495,7 +495,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		{
 			public void customResultAvailable(Object result)
 			{
-				((IComponentFactory) result).createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, ret).addResultListener(new DelegationResultListener(res));
+				((IComponentFactory)result).createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, ret).addResultListener(new DelegationResultListener(res));
 			}
 		}));
 		return res;

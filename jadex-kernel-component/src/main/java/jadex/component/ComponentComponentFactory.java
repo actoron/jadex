@@ -250,7 +250,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 		}
 		catch(Exception e)
 		{
-			throw new RuntimeException(e);
+			return new Future(e);
 		}
 	}
 		

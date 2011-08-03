@@ -200,7 +200,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 		}
 		catch(Exception e)
 		{
-			throw new RuntimeException(e);
+			return new Future(e);
 		}
 	}
 	

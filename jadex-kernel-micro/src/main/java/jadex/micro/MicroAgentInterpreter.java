@@ -140,6 +140,14 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		catch(Exception e)
 		{
 			inited.setException(e);
+			if(e instanceof RuntimeException)
+			{
+				throw (RuntimeException)e;
+			}
+			else
+			{
+				throw new RuntimeException(e);
+			}
 		}
 	}
 	

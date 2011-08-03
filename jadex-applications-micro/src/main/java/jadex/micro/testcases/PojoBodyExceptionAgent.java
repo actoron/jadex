@@ -10,6 +10,14 @@ import jadex.micro.annotation.AgentBody;
 public class PojoBodyExceptionAgent
 {
 	/**
+	 *  Create a new agent.
+	 */
+	public PojoBodyExceptionAgent()
+	{
+		throw new RuntimeException("Exception in constructor");
+	}
+	
+	/**
 	 *  The agent body.
 	 */
 	@AgentBody

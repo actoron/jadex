@@ -215,7 +215,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 		}
 		catch(Exception e)
 		{
-			throw new RuntimeException(e);
+			return new Future(e);
 		}
 	}
 	
