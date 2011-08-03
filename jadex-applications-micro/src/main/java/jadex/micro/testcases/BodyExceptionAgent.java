@@ -2,9 +2,14 @@ package jadex.micro.testcases;
 
 import jadex.micro.MicroAgent;
 
-
-public class ExceptionAgent extends MicroAgent
+/**
+ *  Test what happens if an exception is thrown in body.
+ */
+public class BodyExceptionAgent extends MicroAgent
 {
+	/**
+	 *  The agent body.
+	 */
 	public void executeBody()
 	{
 		System.out.println("execute ExceptionTest ...");

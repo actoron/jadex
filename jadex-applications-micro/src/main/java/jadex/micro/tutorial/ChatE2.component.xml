@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Chat application component with configurations and subcomponents.
+-->
+<componenttype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
+	name="ChatE2" package="jadex.micro.tutorial">
+	
+	<arguments>
+		<argument name="chatters" class="int">2</argument>
+	</arguments>
+	
+	<componenttypes>
+		<componenttype name="chatagent" filename="jadex.micro.tutorial.ChatD5Agent.class"/>
+	</componenttypes>
+	
+	<configurations>
+		<configuration name="Argument number of chatters">
+			<components>
+				<component type="chatagent" number="$args.chatters"/>
+			</components>
+		</configuration>
+		<configuration name="One chatter">
+			<components>
+				<component type="chatagent"/>
+			</components>
+		</configuration>
+		<configuration name="Ten chatters">
+			<components>
+				<component type="chatagent" number="10"/>
+			</components>
+		</configuration>
+	</configurations>
+</componenttype>

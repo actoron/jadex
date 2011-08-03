@@ -1,6 +1,7 @@
 package jadex.micro;
 
 import jadex.bridge.MessageType;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -50,7 +51,12 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 	 */
 	public void executeBody()
 	{
-		invokeMethod(AgentBody.class, null);
+		invokeMethod(AgentBody.class, null).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+			}
+		});
 	}
 
 	/**
@@ -60,7 +66,12 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 	 */
 	public void messageArrived(Map msg, MessageType mt)
 	{
-		invokeMethod(AgentMessageArrived.class, new Object[]{msg, mt});
+		invokeMethod(AgentMessageArrived.class, new Object[]{msg, mt}).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+			}
+		});
 	}
 
 	/**
@@ -96,6 +107,7 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 		{
 			if(methods[i].isAnnotationPresent(annotation))
 			{
+				found = true;
 				try
 				{
 					Object res = methods[i].invoke(agent, args);
@@ -104,10 +116,10 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 						((IFuture)res).addResultListener(createResultListener(
 							new DelegationResultListener(ret)));
 					}
-					found = true;
 				}
 				catch(Exception e)
 				{
+					ret.setException(e);
 					break;
 				}
 			}

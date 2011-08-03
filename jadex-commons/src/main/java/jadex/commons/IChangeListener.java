@@ -3,6 +3,7 @@ package jadex.commons;
 /**
  *  Listener for being notified on change events.
  */
+// @Reference
 public interface IChangeListener
 {
 	/**

@@ -6,6 +6,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Remote version of the change listener.
  */
+// @Reference
 public interface IRemoteChangeListener extends IRemotable
 {
 	/**
