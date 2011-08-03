@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  *  Gui representation for a service.
  *  
- *  Applicable the type.
+ *  Applicable to the type.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

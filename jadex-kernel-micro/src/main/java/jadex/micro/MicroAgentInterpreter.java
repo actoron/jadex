@@ -272,7 +272,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				}
 				catch(RuntimeException e)
 				{
-					future.setException(e);
+					future.setExceptionIfUndone(e);
 					throw e;
 				}
 			}

@@ -828,12 +828,11 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	protected void fatalError(final Exception e)
 	{
-		System.err.println("fatal error: "+getComponentIdentifier());
+//		System.err.println("fatal error: "+getComponentIdentifier());
 //		e.printStackTrace();
 		
 		// Fatal error!
 		exception = e;
-//		e.printStackTrace();
 		
 		if(killfuture!=null)
 		{

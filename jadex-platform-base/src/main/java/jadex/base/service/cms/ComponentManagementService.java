@@ -12,7 +12,6 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -580,7 +579,7 @@ public abstract class ComponentManagementService extends BasicService implements
 													String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
 														: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
 													factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
-														config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, future).addResultListener(new DefaultResultListener()
+														config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, future).addResultListener(new IResultListener()
 													{
 														public void resultAvailable(Object result)
 														{
@@ -593,14 +592,23 @@ public abstract class ComponentManagementService extends BasicService implements
 																initinfos.put(cid, new Object[]{ad, comp[1], cinfo, lmodel, future, comp[0]});
 															}
 															
-															// Start the init procedure by waking up the adapter.
 															try
 															{
+																// Start the init procedure by waking up the adapter.
 																getComponentAdapterFactory().initialWakeup((IComponentAdapter)comp[1]);
 															}
-															catch(Exception e)
+															catch(RuntimeException e)
 															{
-																inited.setException(e);
+																exceptionOccurred(e);
+															}
+														}
+														
+														public void exceptionOccurred(Exception exception)
+														{
+															// Init problem might be notified already in other future.
+															if(!future.isDone())
+															{
+																inited.setExceptionIfUndone(exception);
 															}
 														}
 													});

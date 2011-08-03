@@ -282,6 +282,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	{
 		IInternalService	ret;
 		
+		if(!SReflect.isSupertype(type, service.getClass()))
+		{
+			throw new RuntimeException("Service implementation '"+service.getClass().getName()+"' does not implement service interface: "+type.getName());
+		}
+		
 		if(service instanceof IInternalService)
 		{
 			((IInternalService)service).createServiceIdentifier(name, service.getClass());

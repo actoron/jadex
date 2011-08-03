@@ -7,7 +7,7 @@ import jadex.micro.IPojoMicroAgent;
 /**
  * 
  */
-public class DiscoveryService
+public class DiscoveryService	implements IDiscoveryService
 {
 	/** The agent. */
 	@ServiceComponent

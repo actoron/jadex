@@ -10,10 +10,12 @@ import jadex.commons.gui.SGUI;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -21,10 +23,14 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -33,7 +39,9 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.event.ChangeEvent;
@@ -137,7 +145,7 @@ public class ControlCenterWindow extends JFrame
 	 *  @param errormessage An optional error message displayed before the exception.
 	 *  @param exception The exception (if any).
 	 */
-	public void displayError(final String errortitle, String errormessage, Exception exception)
+	public void displayError(final String errortitle, String errormessage, final Exception exception)
 	{
 		final String	text;
 		String	exmsg	= exception==null ? null : exception.getMessage();
@@ -161,7 +169,50 @@ public class ControlCenterWindow extends JFrame
 		{
 			public void run()
 			{
-				JOptionPane.showMessageDialog(ControlCenterWindow.this, SUtil.wrapText(text), errortitle, JOptionPane.ERROR_MESSAGE);
+				Object	message	= SUtil.wrapText(text);
+				if(exception!=null)
+				{
+					final JPanel	panel	= new JPanel(new BorderLayout());
+					final JButton	details	= new JButton("Show Details")
+					{
+						public Insets getInsets()
+						{
+							return new Insets(1, 1, 1, 1);
+						}
+					};
+					details.addActionListener(new ActionListener()
+					{
+						JComponent	area	= null;
+						boolean shown	= false;
+						public void actionPerformed(ActionEvent e)
+						{
+							if(shown)
+							{
+								panel.remove(area);
+								details.setText("Show Details");
+							}
+							else
+							{
+								if(area==null)
+								{
+									StringWriter	sw	= new StringWriter();
+									exception.printStackTrace(new PrintWriter(sw));
+									area	= new JScrollPane(new JTextArea(sw.toString(), 10, 40));
+								}
+								panel.add(area, BorderLayout.CENTER);
+								details.setText("Hide Details");
+							}
+							SGUI.getWindowParent(panel).pack();
+							shown	= !shown;
+						}
+					});
+					JPanel	but	= new JPanel(new FlowLayout(FlowLayout.RIGHT));
+					but.add(details);
+					panel.add(new JLabel(message.toString()), BorderLayout.NORTH);
+					panel.add(but, BorderLayout.SOUTH);
+					message	= panel;
+				}
+				JOptionPane.showMessageDialog(ControlCenterWindow.this, message, errortitle, JOptionPane.ERROR_MESSAGE);
 			}
 		});
 	}

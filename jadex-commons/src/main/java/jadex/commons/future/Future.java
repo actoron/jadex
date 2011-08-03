@@ -28,7 +28,7 @@ public class Future implements IFuture
 	protected final String	CALLER_SUSPENDED	= "suspended";
 	
 	/** Debug flag. */
-	public final boolean DEBUG = false;
+	public final boolean DEBUG = true;
 	
 	//-------- attributes --------
 	
@@ -217,9 +217,14 @@ public class Future implements IFuture
     		throw new IllegalArgumentException();
     	synchronized(this)
 		{
-    		// If done just return.
+    		// If done propagate exception.
         	if(resultavailable)
-        		return;
+        	{
+        		if(exception instanceof RuntimeException)
+        			throw (RuntimeException)exception;
+        		else
+        			throw new RuntimeException(exception);
+        	}
         		
 //        	System.out.println(this+" setResult: "+result);
         	this.exception = exception;

@@ -21,7 +21,7 @@ public class ChatC1Agent
 {
 	@Agent
 	protected MicroAgent	agent;
-
+	
 	@AgentBody
 	public void executeBody()
 	{

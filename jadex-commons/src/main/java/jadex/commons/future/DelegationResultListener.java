@@ -11,6 +11,8 @@ public class DelegationResultListener implements IResultListener
 	/** The future to which calls are delegated. */
 	protected Future future;
 	
+	protected Exception	ex;
+	
 	//-------- constructors --------
 	
 	/**
@@ -19,6 +21,8 @@ public class DelegationResultListener implements IResultListener
 	public DelegationResultListener(Future future)
 	{
 		this.future = future;
+		this.ex	= new Exception();
+		ex.fillInStackTrace();
 	}
 	
 	//-------- methods --------

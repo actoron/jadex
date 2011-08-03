@@ -38,12 +38,14 @@ public interface IServiceContainer extends IServiceProvider
 	 *  Add a service to the container.
 	 *  The service is started, if the container is already running.
 	 *  @param service The service.
+	 *  @return A future that is done when the service has completed starting.  
 	 */
 	public IFuture	addService(IInternalService service);
 
 	/**
 	 *  Removes a service from the container (shutdowns also the service if the container is running).
 	 *  @param service The service identifier.
+	 *  @return A future that is done when the service has completed its shutdown.  
 	 */
 	public IFuture	removeService(IServiceIdentifier sid);
 		
@@ -89,7 +91,7 @@ public interface IServiceContainer extends IServiceProvider
 	/**
 	 *  Get a required services of a given name.
 	 *  @param name The services name.
-	 *  @return The service.
+	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
 	public IIntermediateFuture getRequiredServices(String name);
 	
@@ -101,7 +103,7 @@ public interface IServiceContainer extends IServiceProvider
 	
 	/**
 	 *  Get a required services.
-	 *  @return The services.
+	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
 	public IIntermediateFuture getRequiredServices(String name, boolean rebind);
 	
@@ -152,14 +154,14 @@ public interface IServiceContainer extends IServiceProvider
 	/**
 	 *  Get all services of a type.
 	 *  @param type The class.
-	 *  @return The corresponding services.
+	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
 	public IIntermediateFuture searchServices(Class type);
 	
 	/**
 	 *  Get all services of a type.
 	 *  @param type The class.
-	 *  @return The corresponding services.
+	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
 	public IIntermediateFuture searchServices(Class type, String scope);
 }
