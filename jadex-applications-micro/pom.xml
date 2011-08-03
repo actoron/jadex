@@ -84,7 +84,7 @@
 					<exclude>**/*.java</exclude>
 					<exclude>**/.svn/*</exclude>
 					<exclude>**/dungeonkeeper/</exclude>
-					<exclude>**/tutorial/</exclude>
+					<!-- <exclude>**/tutorial/</exclude> -->
 				</excludes>
 			</resource>
 		</resources>
@@ -99,7 +99,7 @@
 					<target>1.6</target>
 					<excludes>
 						<exclude>**/dungeonkeeper/</exclude>
-						<exclude>**/tutorial/</exclude>
+						<!-- <exclude>**/tutorial/</exclude> -->
 					</excludes>
 				</configuration>
 			</plugin>
@@ -120,7 +120,7 @@
 				<configuration>
 					<excludes>
 						<exclude>**/dungeonkeeper/</exclude>
-						<exclude>**/tutorial/</exclude>
+						<!-- <exclude>**/tutorial/</exclude> -->
 					</excludes>
 				</configuration>
 			</plugin>
@@ -140,7 +140,7 @@
 				</executions>
 				<configuration>
 					<excludePackageNames>*.dungeonkeeper.*</excludePackageNames>
-					<excludePackageNames>*.tutorial.*</excludePackageNames>
+					<!-- <excludePackageNames>*.tutorial.*</excludePackageNames> -->
 				</configuration>
 			</plugin>
 

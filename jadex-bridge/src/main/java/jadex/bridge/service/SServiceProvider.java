@@ -2,7 +2,9 @@ package jadex.bridge.service;
 
 import jadex.bridge.JadexCloner;
 import jadex.bridge.service.annotation.Reference;
+import jadex.commons.IChangeListener;
 import jadex.commons.IRemotable;
+import jadex.commons.IRemoteChangeListener;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -34,7 +36,7 @@ public class SServiceProvider
 //	public static ISearchManager sequentialmanagerforced = new SequentialSearchManager(true, true, true);
 
 	/** The parallel search manager. */
-	public static ISearchManager parallelmanager = sequentialmanager;//new ParallelSearchManager();
+	public static ISearchManager parallelmanager = new ParallelSearchManager();
 //	public static ISearchManager parallelmanagerforced = new ParallelSearchManager(true, true, true);
 	
 	/** The sequential search manager that searches only upwards. */
@@ -634,7 +636,8 @@ public class SServiceProvider
 	{
 		boolean ret = object instanceof IRemotable 
 			|| object instanceof IResultListener || object instanceof IIntermediateResultListener
-			|| object instanceof IFuture || object instanceof IIntermediateFuture;
+			|| object instanceof IFuture || object instanceof IIntermediateFuture
+			|| object instanceof IChangeListener || object instanceof IRemoteChangeListener;
 //			|| object instanceof IService;// || object instanceof IExternalAccess;
 		
 		if(!ret && object!=null)

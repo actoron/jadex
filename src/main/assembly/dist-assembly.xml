@@ -34,7 +34,7 @@
 						</includes>
 						<excludes>
 							<exclude>**/dungeonkeeper/</exclude>
-							<exclude>**/tutorial/</exclude>
+							<!--  <exclude>**/tutorial/</exclude>-->
 						</excludes>
 					</fileSet>
 					<fileSet>
