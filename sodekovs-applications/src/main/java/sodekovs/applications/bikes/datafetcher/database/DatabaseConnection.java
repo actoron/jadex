@@ -33,13 +33,19 @@ public class DatabaseConnection {
 	public static Connection getConnection() {
 		try {
 			if (connection == null || connection.isClosed()) {
-
+				
+				
 				Properties properties = new Properties();
-				properties.load(new FileInputStream(DB_FILE));
+				//Version for server
+				//properties.load(new FileInputStream(DB_FILE));
+				properties.load(new FileInputStream("../sodekovs-applications/src/main/java/sodekovs/applications/bikes/datafetcher/database.properties"));
+				
 
 				String dbUrl = properties.getProperty("database.url");
 				String dbUser = properties.getProperty("database.user");
 				String dbPwd = properties.getProperty("database.password");
+				
+				//Version for local instance
 
 				Class.forName("com.mysql.jdbc.Driver").newInstance();
 				connection = DriverManager.getConnection(dbUrl, dbUser, dbPwd);
