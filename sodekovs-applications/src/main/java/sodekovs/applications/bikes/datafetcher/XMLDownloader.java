@@ -3,7 +3,6 @@ package sodekovs.applications.bikes.datafetcher;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.FileHandler;
@@ -13,9 +12,9 @@ import java.util.logging.SimpleFormatter;
 
 import javax.xml.bind.JAXBException;
 
+import sodekovs.applications.bikes.datafetcher.brisbane.DownloadBrisbaneTask;
 import sodekovs.applications.bikes.datafetcher.database.DatabaseConnection;
 import sodekovs.applications.bikes.datafetcher.xml.XMLHandler;
-import sodekovs.applications.bikes.datafetcher.xml.urls.URLEntry;
 import sodekovs.applications.bikes.datafetcher.xml.urls.URLs;
 
 /**
@@ -54,11 +53,15 @@ public class XMLDownloader {
 				URLs urls = (URLs) XMLHandler.retrieveFromXML(URLs.class, urlFilePath);
 				logger.log(Level.INFO, "URLs retrieved from " + urlFilePath);
 
-				for (URLEntry entry : urls.getEntries()) {
-					Timer timer = new Timer();
-					// start the timer task for every given url
-					timer.schedule(new DownloadFileTask(entry.getCity(), new URL(entry.getUrl()), logger), TIME_TO_START, entry.getInterval());
-				}
+//				for (URLEntry entry : urls.getEntries()) {
+//					Timer timer = new Timer();
+//					// start the timer task for every given url
+//					timer.schedule(new DownloadFileTask(entry.getCity(), new URL(entry.getUrl()), logger), TIME_TO_START, entry.getInterval());
+//				}
+				
+				// start the download task for brisbane
+				Timer timer = new Timer();
+				timer.schedule(new DownloadBrisbaneTask(logger), TIME_TO_START, 180000);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (JAXBException e) {
