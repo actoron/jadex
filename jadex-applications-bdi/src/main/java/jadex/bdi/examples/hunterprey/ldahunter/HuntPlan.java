@@ -42,22 +42,22 @@ public class HuntPlan extends Plan {
 
 		prey = (ISpaceObject) getBeliefbase().getBelief("next_sheep").getFact();
 
-		if(prey!=null)
-		{
-			IVector2	ppos	= (IVector2)prey.getProperty(Space2D.PROPERTY_POSITION);
-			if(env.getDistance(myLoc, ppos).getAsInteger()>2)
-				throw new RuntimeException("Wurks0: "+getScope().getAgentName()+", "+prey);			
-				
-			
-			try
-			{
-				env.getSpaceObject(prey.getId());
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException("Wurks1: "+getScope().getAgentName()+", "+prey);			
-			}
-		}
+//		if(prey!=null)
+//		{
+//			IVector2	ppos	= (IVector2)prey.getProperty(Space2D.PROPERTY_POSITION);
+//			if(env.getDistance(myLoc, ppos).getAsInteger()>2)
+//				throw new RuntimeException("Wurks0: "+getScope().getAgentName()+", "+prey);			
+//				
+//			
+//			try
+//			{
+//				env.getSpaceObject(prey.getId());
+//			}
+//			catch(Exception e)
+//			{
+//				throw new RuntimeException("Wurks1: "+getScope().getAgentName()+", "+prey);			
+//			}
+//		}
 		
 		jf.update(vis, myself);
 

@@ -3528,6 +3528,11 @@ public class AgentRules
 		
 		// Remove kill listeners.
 		Collection	killlisteners	= state.getAttributeValues(ragent, OAVBDIRuntimeModel.agent_has_killlisteners);
+
+		// Clean up state listeners.
+		state.dispose();
+		
+		// Inform kill listeners.		
 		if(killlisteners!=null)
 		{
 			for(Iterator it=killlisteners.iterator(); it.hasNext(); )
@@ -3535,8 +3540,5 @@ public class AgentRules
 				((IResultListener)it.next()).resultAvailable(interpreter.getAgentAdapter().getComponentIdentifier());
 			}
 		}
-		
-		// Clean up state listeners.
-		state.dispose();
 	}
 }

@@ -181,6 +181,7 @@ public abstract class OAVAbstractState	implements IOAVState
 			dropObject(internalGetObjects().iterator().next());
 		}
 		
+//		System.out.println("Beanlisteners: "+getTypeModel().getName()+", "+beanlistenercnt);
 		assert nocheck || beanlistenercnt == 0: getTypeModel().getName()+", "+beanlistenercnt;
 	}
 	
@@ -2134,6 +2135,7 @@ public abstract class OAVAbstractState	implements IOAVState
 							}
 							catch(Exception e)
 							{
+								e.printStackTrace();
 								System.out.println("Synchronizer invalid: "+evt+", "+e);
 							}
 						}

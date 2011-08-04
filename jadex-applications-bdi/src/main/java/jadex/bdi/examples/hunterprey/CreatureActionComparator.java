@@ -48,8 +48,8 @@ public class CreatureActionComparator implements Comparator
 			IComponentDescription actor2 = (IComponentDescription)entry2.parameters.get(ISpaceAction.ACTOR_ID);
 			ISpaceObject avatar2 = space.getAvatar(actor2);
 
-			if(avatar1!=null && avatar2!=null && ret>0 && avatar1.getType().equals("hunter") && avatar2.getType().equals("prey")
-				|| ret<0 && avatar1.getType().equals("prey") && avatar2.getType().equals("hunter"))
+			if(avatar1!=null && avatar2!=null && (ret>0 && avatar1.getType().equals("hunter") && avatar2.getType().equals("prey")
+				|| ret<0 && avatar1.getType().equals("prey") && avatar2.getType().equals("hunter")))
 			{
 				ret	= -ret;
 			}
