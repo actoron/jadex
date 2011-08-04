@@ -45,7 +45,6 @@ import jadex.xml.reader.Reader;
 import jadex.xml.writer.WriteContext;
 import jadex.xml.writer.Writer;
 
-import java.io.OutputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -54,17 +53,10 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/* $if !android $ */
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLReporter;
 import javax.xml.stream.XMLStreamException;
-/* $else $
-import javaxx.xml.namespace.QName;
-import javaxx.xml.stream.Location;
-import javaxx.xml.stream.XMLReporter;
-import javaxx.xml.stream.XMLStreamException;
-$endif $ */
 
 /**
  *  The remote service management service is responsible for 
@@ -471,20 +463,22 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 										{
 											public void run()
 											{
-//												System.out.println("timeout triggered: "+msg);
-												removeWaitingCall(callid);
-//												waitingcalls.remove(callid);
-//												System.out.println("Waitingcalls: "+waitingcalls.size());
-												future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+callid)
+												ia.getExternalAccess().scheduleStep(new IComponentStep()
 												{
-													public void printStackTrace()
+													public Object execute(IInternalAccess ia)
 													{
-//														Thread.dumpStack();
-														super.printStackTrace();
+														if(!future.isDone())
+														{
+															removeWaitingCall(callid);
+															future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+callid));
+														}
+														return null;
 													}
 												});
+//												System.out.println("timeout triggered: "+msg);
 											}
 										}, timeout);
+										
 
 										future.addResultListener(ia.createResultListener(new IResultListener()
 										{

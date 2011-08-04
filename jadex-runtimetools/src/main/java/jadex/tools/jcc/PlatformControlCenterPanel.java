@@ -416,9 +416,17 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 		prop	= props.getProperty("consoleheights");
 		if(prop!=null)
 		{
-			consoleheights	= (Map)JavaReader.objectFromXML(prop.getValue(), getClass().getClassLoader());
+			try
+			{
+				consoleheights	= (Map)JavaReader.objectFromXML(prop.getValue(), getClass().getClassLoader());
+			}
+			catch(RuntimeException e)
+			{
+				System.err.println("Cannot load console settings: "+e.getClass().getName());
+//				return new Future(e);	// Todo: Propagate exception?
+			}
 		}
-
+	
 		// If no perspective selected use first plugin.
 		if(currentperspective==null)
 		{
