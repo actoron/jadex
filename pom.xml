@@ -214,17 +214,33 @@
 							<archiverConfig>
 								<duplicateBehavior>skip</duplicateBehavior>
 							</archiverConfig>
-							<descriptors>
-								<descriptor>src/main/assembly/dist-assembly.xml</descriptor>
-							</descriptors>
 						</configuration>
 						<executions>
+							<execution>
+								<id>sources</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>sources</finalName>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-srczip.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
 							<execution>
 								<id>make-assembly</id>
 								<phase>package</phase>
 								<goals>
 									<goal>single</goal>
 								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly.xml</descriptor>
+									</descriptors>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin><!-- 

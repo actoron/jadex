@@ -22,42 +22,35 @@
 				<outputDirectory>lib</outputDirectory>
 				<unpack>false</unpack>
 			</binaries>
-
+<!-- 
 			<sources>
 				<includeModuleDirectory>false</includeModuleDirectory>
 				<fileSets>
 					<fileSet>
 						<outputDirectory>sources/${module.artifactId}</outputDirectory>
 						<includes>
-							<include>src/**</include>
+							<!- - <include>src/**</include> - ->
+							<include>lib/**</include>
 							<include>pom.xml</include>
 						</includes>
+						<!- - 
 						<excludes>
 							<exclude>**/dungeonkeeper/</exclude>
-							<!--  <exclude>**/tutorial/</exclude>-->
 						</excludes>
+						- ->
 					</fileSet>
 					<fileSet>
+						<directory>target</directory>
 						<outputDirectory>sources/${module.artifactId}</outputDirectory>
 						<includes>
-							<include>lib/**</include>
+							<include>*-sources.jar</include>
 						</includes>
 					</fileSet>
 				</fileSets>
 			</sources>
-
+ -->
 		</moduleSet>
 	</moduleSets>
-
-	<fileSets>
-		<fileSet>
-			<directory>/target/site/</directory>
-			<outputDirectory>/</outputDirectory>
-			<includes>
-				<include>apidocs/**</include>
-			</includes>
-		</fileSet>
-	</fileSets>
 
 	<files>
 		<!-- Hack!!! Manually copying junit jar (required by jadex.platform.base.ComponentTest)
@@ -67,12 +60,8 @@
 			<outputDirectory>lib</outputDirectory>
 		</file>
 		<file>
-			<source>pom.xml</source>
-			<outputDirectory>sources</outputDirectory>
-		</file>
-		<file>
-			<source>src/main/assembly/dist-assembly.xml</source>
-			<outputDirectory>sources/src/main/assembly</outputDirectory>
+			<source>target/sources.zip</source>
+			<outputDirectory>/</outputDirectory>
 		</file>
 		<file>
 			<source>docs/readme.txt</source>

@@ -85,9 +85,9 @@ public class ComponentTestSuite extends TestSuite
 		// Todo: get rid of thread suspendable!?
 		ISuspendable	ts	= new ThreadSuspendable();
 		
-		System.out.println("start platform");
+//		System.out.println("start platform");
 		IExternalAccess	rootcomp	= (IExternalAccess)Starter.createPlatform(args).get(ts);
-		System.out.println("end platform");
+//		System.out.println("end platform");
 		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(rootcomp.getServiceProvider(), IComponentManagementService.class).get(ts);
 		ILibraryService libsrv	= (ILibraryService)SServiceProvider.getService(rootcomp.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(ts);
 		
