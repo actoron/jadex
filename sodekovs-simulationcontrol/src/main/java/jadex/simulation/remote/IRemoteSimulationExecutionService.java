@@ -27,4 +27,10 @@ public interface IRemoteSimulationExecutionService	extends IService
 	 */
 	public IFuture executeExperiment(Map applicationArgs, HashMap<String,Object> clientArgs);
 	
+	/**
+	 * Get the workload of this service, i.e. the number of currently executed experiments
+	 * @return  number of experiments as int
+	 */
+	public IFuture getWorkload();
+	
 }

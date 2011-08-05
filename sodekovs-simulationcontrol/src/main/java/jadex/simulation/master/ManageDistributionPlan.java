@@ -55,7 +55,8 @@ public class ManageDistributionPlan extends Plan
 				System.out.println("#ManageDistributionPlan# Distributed new Simulation Experiment remotely. Nr.:" + clientArgs.get(Constants.EXPERIMENT_ID) + "(" + beliefbaseFacts.get(Constants.TOTAL_EXPERIMENT_COUNTER) + ") with Optimization Values: "
 						+ simConf.getOptimization().getParameterSweeping().getCurrentConfiguration());
 				
-//				clientArgs.remove(new String ("ConfigurationFileAsXMLString"));
+
+				//TODO: current workload einbeziehen bei der auswahl von services
 				IFuture fut = services.iterator().next().executeExperiment(applicationArgs, clientArgs);
 //				fut.addResultListener(new IResultListener() {
 //					public void resultAvailable(Object source, Object result) {

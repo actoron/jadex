@@ -36,6 +36,7 @@ import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.Source;
 import jadex.simulation.model.TargetFunction;
 import jadex.simulation.model.Time;
+import jadex.simulation.model.result.ExperimentResult;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -69,19 +70,34 @@ public class RuntimeManagerPlan extends Plan {
 	private IClockService clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 	private IComponentManagementService cms = null;
 	private OnlineVisualisation vis = null;
-//	private String appFilePath = null;
+	private int localExperimentCounter = -1;
 
 	public void body() {
+		//Increment the number of currently running experiments on this agent
+		numberOfRunningExperimens(1);
+
+		//Get local id for this experiment to be conducted and increment counter																	  
+		localExperimentCounter = (Integer) getBeliefbase().getBelief("experimentCounter").getFact();
+		getBeliefbase().getBelief("experimentCounter").setFact(localExperimentCounter+1);
+		
+		//init mapping between calling service and the executed experiment. needed in order to be able to execute experiments in parallel.
+		HashMap<Long,Integer>callerExperimentReference = (HashMap<Long,Integer>)getBeliefbase().getBelief("callerExperimentReference").getFact();
+		callerExperimentReference.put((Long) getParameter("callerID").getValue(),localExperimentCounter);
+		getBeliefbase().getBelief("callerExperimentReference").setFact(callerExperimentReference);
+
+		
 		HashMap<String,Object> clientConfMap = (HashMap<String, Object>) getParameter("clientConf").getValue();
 		SimulationConfiguration simConf  = (SimulationConfiguration) XMLHandler.parseXMLFromString((String) clientConfMap.get(Constants.CONFIGURATION_FILE_AS_XML_STRING), SimulationConfiguration.class);
 		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this);
-//		HashMap simFacts = (HashMap) getBeliefbase().getBelief("simulationFacts").getFact();
 		
+		//Test
+		HashMap<Integer,HashMap> wow = new HashMap<Integer,HashMap>();
 		
 		
 		startApplication((Map) getParameter("applicationConf").getValue(), clientConfMap, simConf);
 		System.out.println("#RumtimeManagerPlan# Startet Simulation Experiment Nr.:" + clientConfMap.get(Constants.EXPERIMENT_ID) + ") with Optimization Values: "
 				+ clientConfMap.get(Constants.CURRENT_PARAMETER_CONFIGURATION));
+		System.out.println("Number of Exp at this agent: " + (Integer) getBeliefbase().getBelief("numberOfRunningExperiments").getFact());
 
 		IFuture fut = exta.getExtension(simConf.getNameOfSpace());
 		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
@@ -168,20 +184,33 @@ public class RuntimeManagerPlan extends Plan {
 //		FileHandler.deleteFile(appFilePath);
 //		appFilePath = null;
 		
-
+//		Decrement the number of currently running experiments on this agent
+		numberOfRunningExperimens(-1);
 		cms.destroyComponent(exta.getComponentIdentifier());
+		System.out.println("Number of Exp at this agent: " + (Integer) getBeliefbase().getBelief("numberOfRunningExperiments").getFact());
 //		System.out.println("#RuntimeManagerPlan# Goal over???");
 	}
 
 	private void prepareResult(ConcurrentHashMap<Long, ArrayList<ObservedEvent>> observedEvents, String experimentID) {
-		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
+		
+		
+		Map factsAboutAllExperiments = (HashMap<Integer,HashMap>) getBeliefbase().getBelief("factsAboutAllExperiments").getFact();
+		
+//		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
+		Map facts = (Map) factsAboutAllExperiments.get(localExperimentCounter);
+		
+		System.out.println("GGG: Size"  + facts.size());
+		
 		facts.put(Constants.EXPERIMENT_END_TIME, new Long(clockservice.getTime()));
 		facts.put(Constants.OBSERVED_EVENTS_MAP, observedEvents);
 		facts.put(Constants.EXPERIMENT_ID, experimentID);
 		// does not need to be send back to master agent
 //		facts.remove(Constants.SIMULATION_FACTS_FOR_CLIENT);
 		
-		getBeliefbase().getBelief("simulationFacts").setFact(facts);
+		System.out.println("GGG2: Size"  + facts.size());
+			
+//		getBeliefbase().getBelief("simulationFacts").setFact(facts);
+		getBeliefbase().getBelief("factsAboutAllExperiments").setFact(factsAboutAllExperiments);
 	}
 
 	/**
@@ -221,7 +250,7 @@ public class RuntimeManagerPlan extends Plan {
 			System.out.println("#RuntimeManagerPlan# StartTime: " + TimeConverter.longTime2DateString(currentTime) + " - TerminationTime: " + TimeConverter.longTime2DateString(terminationTime));
 			return new Long(value);
 		} else {// TODO: There might be a problem with Day Light Savings Time!
-			Calendar cal = Calendar.getInstance();
+//			Calendar cal = Calendar.getInstance();
 			// Date terminationTime = cal.getTime();
 			Long duration = new Long(value - currentTime.longValue());
 			System.out.println("#RuntimeManagerPlan# StartTime: " + TimeConverter.longTime2DateString(currentTime) + " TerminationTime: " + TimeConverter.longTime2DateString(new Long(value)) + ", Duration: "
@@ -264,7 +293,11 @@ public class RuntimeManagerPlan extends Plan {
 		// Save initial facts of this simulation run.
 		Map facts = new HashMap();
 		facts.put(Constants.EXPERIMENT_START_TIME, new Long(startTime));
-		getBeliefbase().getBelief("simulationFacts").setFact(facts);
+//		getBeliefbase().getBelief("simulationFacts").setFact(facts);
+		Map factsAboutAllExperiments = (HashMap<Integer,HashMap>) getBeliefbase().getBelief("factsAboutAllExperiments").getFact();
+		factsAboutAllExperiments.put(localExperimentCounter, facts);
+//		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
+		getBeliefbase().getBelief("factsAboutAllExperiments").setFact(factsAboutAllExperiments);
 
 
 		
@@ -391,6 +424,15 @@ public class RuntimeManagerPlan extends Plan {
 				chartDataConsumer.add((AbstractChartDataConsumer) abstractConsumer);
 		}
 		this.vis =  new OnlineVisualisation(chartDataConsumer);
+	}
+			
+	/**
+	 * Increment / Decrement the counter which contains the number of currently executed experiments
+	 * @param i
+	 */
+	private void numberOfRunningExperimens(int i){
+		int n = (Integer) getBeliefbase().getBelief("numberOfRunningExperiments").getFact();
+		getBeliefbase().getBelief("numberOfRunningExperiments").setFact(n+i);		
 	}
 	
 	/***
