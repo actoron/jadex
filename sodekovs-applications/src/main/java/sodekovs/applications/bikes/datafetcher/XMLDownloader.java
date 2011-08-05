@@ -15,6 +15,7 @@ import javax.xml.bind.JAXBException;
 
 import sodekovs.applications.bikes.datafetcher.brisbane.DownloadBrisbaneTask;
 import sodekovs.applications.bikes.datafetcher.database.DatabaseConnection;
+import sodekovs.applications.bikes.datafetcher.rennes.DownloadRennesTask;
 import sodekovs.applications.bikes.datafetcher.xml.XMLHandler;
 import sodekovs.applications.bikes.datafetcher.xml.urls.URLEntry;
 import sodekovs.applications.bikes.datafetcher.xml.urls.URLs;
@@ -30,7 +31,7 @@ public class XMLDownloader {
 	private static final int TIME_TO_START = 50;
 
 	/**
-	 * Main method, starts a {@link DownloadFileTask} for every URL specified in {@link XMLDownloader#URLS}.
+	 * Main method, starts a {@link DownloadURLTask} for every URL specified in {@link XMLDownloader#URLS}.
 	 * 
 	 * @param args
 	 */
@@ -40,7 +41,7 @@ public class XMLDownloader {
 				String urlFilePath = args[0];
 				String logFilePath = args[1];
 				DatabaseConnection.DB_FILE = args[2];
-				
+
 				Logger logger = Logger.getLogger("Datafetcher");
 				logger.setLevel(Level.ALL);
 
@@ -58,12 +59,16 @@ public class XMLDownloader {
 				for (URLEntry entry : urls.getEntries()) {
 					Timer timer = new Timer();
 					// start the timer task for every given url
-					timer.schedule(new DownloadFileTask(entry.getCity(), new URL(entry.getUrl()), logger), TIME_TO_START, entry.getInterval());
+					timer.schedule(new DownloadURLTask(entry.getCity(), new URL(entry.getUrl()), logger), TIME_TO_START, entry.getInterval());
 				}
-				
+
 				// start the download task for brisbane
-				Timer timer = new Timer();
-				timer.schedule(new DownloadBrisbaneTask(logger), TIME_TO_START, 180000);
+				Timer timerBrisbane = new Timer();
+				timerBrisbane.schedule(new DownloadBrisbaneTask(logger, "Brisbane"), TIME_TO_START, 180000);
+
+				// start the download task for rennes
+				Timer timerRennes = new Timer();
+				timerRennes.schedule(new DownloadRennesTask(logger, "Rennes"), TIME_TO_START, 180000);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (JAXBException e) {

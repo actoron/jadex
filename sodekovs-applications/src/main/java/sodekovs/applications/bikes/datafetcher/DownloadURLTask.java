@@ -6,18 +6,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
-import sodekovs.applications.bikes.datafetcher.database.DatabaseConnection;
 import sodekovs.applications.bikes.datafetcher.xml.XMLHandler;
 import sodekovs.applications.bikes.datafetcher.xml.stations.Station;
 import sodekovs.applications.bikes.datafetcher.xml.stations.Stations;
@@ -27,24 +23,10 @@ import sodekovs.applications.bikes.datafetcher.xml.stations.Stations;
  * 
  * @author Thomas Preisler
  */
-public class DownloadFileTask extends TimerTask {
-
-	private Logger logger = null;
-	
-	/** The city */
-	private String city = null;
+public class DownloadURLTask extends DownloadTask {
 
 	/** The given URL */
 	private URL url = null;
-
-	/** The database connection */
-	private Connection connection = null;
-
-	/** Prepared SQL statement for the stations table */
-	private PreparedStatement insertStationsStmt = null;
-
-	/** Prepared SQL statement for the station table */
-	private PreparedStatement insertStationStmt = null;
 
 	/** Prepared SQL statement for the stationsxml table */
 	private PreparedStatement insertStationsXMLStmt = null;
@@ -57,20 +39,13 @@ public class DownloadFileTask extends TimerTask {
 	 * @param url
 	 *            the given {@link URL}
 	 */
-	public DownloadFileTask(String city, URL url, Logger logger) {
-		this.city = city;
+	public DownloadURLTask(String city, URL url, Logger logger) {
+		super(logger, city);
 		this.url = url;
-		this.logger = logger;
 
-		// get the database connection
-		this.connection = DatabaseConnection.getConnection();
 		try {
-			// prepare the SQL statements
-			this.insertStationsStmt = this.connection.prepareStatement("INSERT INTO STATIONS(city, lastUpdate, version) VALUES(?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-			this.insertStationStmt = this.connection
-					.prepareStatement("INSERT INTO STATION(id, name, terminalName, lat, lon, installed, locked, installDate, removalDate, temp, nbBikes, nbEmptyDocks, nbDocks, stationsId) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			this.insertStationsXMLStmt = this.connection.prepareStatement("INSERT INTO STATIONSXML(xml, stationsId) VALUES(?, ?)");
-			
+
 			logger.log(Level.INFO, "Started Download Task for " + city);
 		} catch (SQLException e) {
 			logger.log(Level.SEVERE, e.getMessage());
@@ -100,34 +75,6 @@ public class DownloadFileTask extends TimerTask {
 		} catch (JAXBException e) {
 			logger.log(Level.SEVERE, e.getMessage());
 		}
-	}
-
-	/**
-	 * Fetches the XML data from the given {@link URLConnection} {@link InputStream} and stores it into a {@link ByteArrayOutputStream}.
-	 * 
-	 * @param input
-	 *            the given {@link URLConnection} {@link InputStream}
-	 * @return a {@link ByteArrayOutputStream} containing the XML data
-	 */
-	private ByteArrayOutputStream getBytes(InputStream input) {
-		ByteArrayOutputStream result = new ByteArrayOutputStream();
-
-		try {
-			// XML Daten einlesen
-			result = new ByteArrayOutputStream();
-			byte[] buffer = new byte[1000];
-			int amount = 0;
-
-			// Inhalt lesen
-			while (amount != -1) {
-				result.write(buffer, 0, amount);
-				amount = input.read(buffer);
-			}
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, e.getMessage());
-		}
-
-		return result;
 	}
 
 	/**
