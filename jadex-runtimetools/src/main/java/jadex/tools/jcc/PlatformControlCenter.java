@@ -119,7 +119,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	/**
 	 *  Get the control center panel.
 	 */
-	public JComponent	getPanel()
+	public PlatformControlCenterPanel	getPanel()
 	{
 		return pccpanel;
 	}

@@ -98,7 +98,9 @@ public class ChartPanel extends ToolTab implements ActionListener
 				double optionsWidth = options.getPreferredSize().getWidth();
 				// consider scrollbar width if visible
 				double scrollWidth = options.getVerticalScrollBar().isVisible() ? options.getVerticalScrollBar().getWidth() : 0;
-				main.setDividerLocation((mainWidth - optionsWidth - scrollWidth) / mainWidth);
+				double	loc	= (mainWidth - optionsWidth - scrollWidth) / mainWidth;
+				if(loc>=0 && loc<=1)	// Might be NaN, if plugin is switched before panel is shown.
+					main.setDividerLocation(loc);
 
 			}
 		});

@@ -82,14 +82,14 @@ public class ControlCenter
 	/**
 	 *  Create a control center.
 	 */
-	public IFuture	init(IExternalAccess jccaccess, final String[] plugin_classes)
+	public IFuture	init(IExternalAccess jccaccess, final String[] plugin_classes, boolean saveonexit)
 	{
 		final Future	ret	= new Future();
 		
 		this.jccaccess = jccaccess;
 		this.plugin_classes	= plugin_classes;
 		this.pccs	= new HashMap();
-		this.saveonexit	= true;
+		this.saveonexit	= saveonexit;
 		this.window = new ControlCenterWindow(this);
 		
 		// Default platform control center for local platform.
@@ -522,5 +522,15 @@ public class ControlCenter
 				pcc.dispose();
 			}
 		});
+	}
+	
+	//-------- used for test case --------
+	
+	/**
+	 *  Get the current platform control center.
+	 */
+	public PlatformControlCenter	getPCC()
+	{
+		return pcc;
 	}
 }

@@ -212,8 +212,10 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 	/**
 	 * This method may only be called from the swing thread
 	 */
-	protected void setPerspective(final IControlCenterPlugin plugin)
+	// return future only used for testing
+	public IFuture	setPerspective(final IControlCenterPlugin plugin)
 	{
+		final Future	ret	= new Future();
 		controlcenter.getControlCenter().getWindow().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		
 		controlcenter.activatePlugin(plugin).addResultListener(new SwingDefaultResultListener()
@@ -263,6 +265,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 					clayout.show(content, plugin.getName());
 					controlcenter.getControlCenter().getWindow().validate();
 					controlcenter.getControlCenter().getWindow().repaint();
+					ret.setResult(null);
 				}
 				catch(RuntimeException e)
 				{
@@ -285,6 +288,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 						controlcenter.getControlCenter().getWindow().validate();
 						controlcenter.getControlCenter().getWindow().repaint();
 					}
+					ret.setResult(null);
 				}
 				
 				controlcenter.getControlCenter().getWindow().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -294,8 +298,11 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 			{
 				controlcenter.getControlCenter().getWindow().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				controlcenter.displayError("Plugin Error", "Plugin could not be activated: "+plugin.getName(), exception);
+				ret.setException(exception);
 			}
 		});
+		
+		return ret;
 	}
 	
 	/**

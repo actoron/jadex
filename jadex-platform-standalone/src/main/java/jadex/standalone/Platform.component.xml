@@ -202,7 +202,11 @@
 						<argument name="excludes">$args.awaexcludes</argument>
 					</arguments>
 				</component>
-				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;)) ? 1 : 0"/>
+				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;)) ? 1 : 0">
+					<arguments>
+						<argument name="saveonexit">$args.saveonexit</argument>
+					</arguments>
+				</component>
 			</components>
 		</configuration>
 		
@@ -216,7 +220,11 @@
 						<argument name="excludes">$args.awaexcludes</argument>
 					</arguments>
 				</component>
-				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;)) ? 1 : 0"/>
+				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;)) ? 1 : 0">
+					<arguments>
+						<argument name="saveonexit">$args.saveonexit</argument>
+					</arguments>
+				</component>
 			</components>
 		</configuration>
 	
@@ -241,7 +249,11 @@
 						<argument name="excludes">$args.awaexcludes</argument>
 					</arguments>
 				</component>
-				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;)) ? 1 : 0"/>
+				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;)) ? 1 : 0">
+					<arguments>
+						<argument name="saveonexit">$args.saveonexit</argument>
+					</arguments>
+				</component>
 			</components>
 		</configuration>
 		
@@ -261,7 +273,11 @@
 						<argument name="excludes">$args.awaexcludes</argument>
 					</arguments>
 				</component>
-				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;)) ? 1 : 0"/>
+				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;)) ? 1 : 0">
+					<arguments>
+						<argument name="saveonexit">$args.saveonexit</argument>
+					</arguments>
+				</component>
 			</components>
 		</configuration>
 		
