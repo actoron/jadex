@@ -377,12 +377,12 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	public abstract IValueFetcher getFetcher();
 	
 	/**
-	 *  Add a default value for an argument (if not already present).
+	 *  Add a value for an argument (if not already present).
 	 *  Called once for each argument during init.
 	 *  @param name	The argument name.
 	 *  @param value	The argument value.
 	 */
-	public abstract void addDefaultArgument(String name, Object value);
+	public abstract boolean addArgument(String name, Object value);
 
 	/**
 	 *  Add a default value for a result (if not already present).
@@ -468,7 +468,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  - init required and provided services
 	 *  - init subcomponents
 	 */
-	public IFuture init(final IModelInfo model, final String config)
+	public IFuture init(final IModelInfo model, final String config, final Map arguments)
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
@@ -486,7 +486,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			{
 				public void customResultAvailable(Object result)
 				{
-					initArguments(model, config).addResultListener(
+					initArguments(model, config, arguments).addResultListener(
 						createResultListener(new DelegationResultListener(fut)
 					{
 						public void customResultAvailable(Object result)
@@ -542,9 +542,19 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	/**
 	 *  Init the arguments and results.
 	 */
-	public IFuture initArguments(IModelInfo model, final String config)
+	public IFuture initArguments(IModelInfo model, final String config, Map arguments)
 	{
 		assert !getComponentAdapter().isExternalThread();
+		
+		// Call add default argument also for passed arguments.
+		if(arguments!=null)
+		{
+			for(Iterator it=arguments.keySet().iterator(); it.hasNext(); )
+			{
+				String key = (String)it.next();
+				addArgument(key, arguments.get(key));
+			}
+		}
 		
 		ConfigurationInfo	ci	= config!=null ? model.getConfiguration(config) : null;
 		
@@ -555,17 +565,17 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			UnparsedExpression[]	upes	= ci.getArguments();
 			for(int i=0; i<upes.length; i++)
 			{
-				addDefaultArgument(upes[i].getName(), UnparsedExpression.getParsedValue(upes[i], model.getAllImports(), getFetcher(), getClassLoader()));
+				addArgument(upes[i].getName(), UnparsedExpression.getParsedValue(upes[i], model.getAllImports(), getFetcher(), getClassLoader()));
 				done.add(upes[i].getName());
 			}
 		}
-		IArgument[] args = model.getArguments();
-		for(int i=0; i<args.length; i++)
+		IArgument[] margs = model.getArguments();
+		for(int i=0; i<margs.length; i++)
 		{
-			if(!done.contains(args[i].getName()))
+			if(!done.contains(margs[i].getName()))
 			{
-				addDefaultArgument(args[i].getName(),
-					UnparsedExpression.getParsedValue(args[i].getDefaultValue(), model.getAllImports(), getFetcher(), getClassLoader()));
+				addArgument(margs[i].getName(),
+					UnparsedExpression.getParsedValue(margs[i].getDefaultValue(), model.getAllImports(), getFetcher(), getClassLoader()));
 			}
 		}
 		

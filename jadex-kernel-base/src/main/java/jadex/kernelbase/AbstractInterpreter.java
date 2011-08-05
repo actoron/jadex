@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -91,13 +92,13 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 				model.getConfigurationNames()[0]: null;
 			this.model = model;
 			this.parent = parent;
-			this.arguments = arguments;
 			this.bindings = bindings;
 			this.copy = copy;
 			if(factory != null)
 				this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 			this.container = createServiceContainer();
 			this.creationtime = System.currentTimeMillis();
+			this.arguments = arguments!=null? new HashMap(arguments): null; // clone arguments
 		}
 		catch(Exception e)
 		{
@@ -292,9 +293,12 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  @param name	The argument name.
 	 *  @param value	The argument value.
 	 */
-	public void	addDefaultArgument(String name, Object value)
+	public boolean addArgument(String name, Object value)
 	{
-		assert !getComponentAdapter().isExternalThread();
+		boolean ret = false;
+		
+		// Also called from constructor.
+//		assert !getComponentAdapter().isExternalThread();
 		
 		if(arguments==null)
 		{
@@ -303,7 +307,10 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		if(!arguments.containsKey(name))
 		{
 			arguments.put(name, value);
+			ret = true;
 		}
+		
+		return ret;
 	}
 
 	/**

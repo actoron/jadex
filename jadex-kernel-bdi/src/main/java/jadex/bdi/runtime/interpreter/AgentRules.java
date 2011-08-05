@@ -1695,7 +1695,7 @@ public class AgentRules
 						if(isarg)
 						{
 							String name = (String)state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name);
-							BDIInterpreter.getInterpreter(state).addDefaultArgument(name, result);
+							BDIInterpreter.getInterpreter(state).addArgument(name, result);
 						}
 					}
 					
@@ -2001,7 +2001,7 @@ public class AgentRules
 						if(isarg)
 						{
 							String name = (String)state.getAttributeValue(mbelset, OAVBDIMetaModel.modelelement_has_name);
-							BDIInterpreter.getInterpreter(state).addDefaultArgument(name, result);
+							BDIInterpreter.getInterpreter(state).addArgument(name, result);
 						}
 					}
 

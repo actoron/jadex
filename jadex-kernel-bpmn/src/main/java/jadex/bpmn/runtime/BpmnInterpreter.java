@@ -221,7 +221,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	 *  @param adapter The adapter.
 	 */
 	// Constructor for self-contained bpmn components
-	public BpmnInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, MBpmnModel model, Map arguments, 
+	public BpmnInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, MBpmnModel model, final Map arguments, 
 		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
 		IValueFetcher fetcher, RequiredServiceBinding[] bindings, boolean copy, final Future inited)
 	{
@@ -234,7 +234,20 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		{
 			public Object execute(IInternalAccess ia)
 			{
-				executeInitStep2();
+//				executeInitStep2();
+				// Initialize context variables.
+				variables.put("$interpreter", this);
+				init(getModel(), getConfiguration(), arguments)
+					.addResultListener(createResultListener(new DelegationResultListener(inited)
+				{
+					public void customResultAvailable(Object result)
+					{
+						// Notify cms that init is finished.
+						initContextVariables();
+
+						inited.setResult(new Object[]{BpmnInterpreter.this, adapter});
+					}
+				}));
 				return null;
 			}
 		}).addResultListener(new IResultListener()
@@ -437,26 +450,26 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		}));
 	}*/
 	
-	/**
-	 *  Execute the init step 2.
-	 */
-	protected void executeInitStep2()
-	{
-		// Initialize context variables.
-		variables.put("$interpreter", this);
-		
-		init(getModel(), getConfiguration())
-			.addResultListener(createResultListener(new DelegationResultListener(inited)
-		{
-			public void customResultAvailable(Object result)
-			{
-				// Notify cms that init is finished.
-				initContextVariables();
-
-				inited.setResult(new Object[]{BpmnInterpreter.this, adapter});
-			}
-		}));
-	}
+//	/**
+//	 *  Execute the init step 2.
+//	 */
+//	protected void executeInitStep2()
+//	{
+//		// Initialize context variables.
+//		variables.put("$interpreter", this);
+//		
+//		init(getModel(), getConfiguration(), arguments)
+//			.addResultListener(createResultListener(new DelegationResultListener(inited)
+//		{
+//			public void customResultAvailable(Object result)
+//			{
+//				// Notify cms that init is finished.
+//				initContextVariables();
+//
+//				inited.setResult(new Object[]{BpmnInterpreter.this, adapter});
+//			}
+//		}));
+//	}
 
 	/**
 	 *  Start the component behavior.

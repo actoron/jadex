@@ -115,7 +115,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			{
 				public Object execute(IInternalAccess ia)
 				{
-					init(model, MicroAgentInterpreter.this.config)
+					init(model, MicroAgentInterpreter.this.config, arguments)
 						.addResultListener(createResultListener(new DelegationResultListener(inited)
 					{
 						public void customResultAvailable(Object result)
@@ -177,61 +177,68 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 *  @param name The name.
 	 *  @param value The value.
 	 */
-	public void addDefaultArgument(String name, Object value)
+	public boolean addArgument(String name, Object value)
 	{
-		super.addDefaultArgument(name, value);
+		boolean ret = super.addArgument(name, value);
 	
-		Object agent = microagent instanceof PojoMicroAgent? ((PojoMicroAgent)microagent).getPojoAgent(): microagent;
-		
-		boolean found = false;
-		Class microclass = agent.getClass();
-		while(!Object.class.equals(microclass) && !MicroAgent.class.equals(microclass) && !found)
+		if(ret)
 		{
-			Field[] fields = microclass.getDeclaredFields();
-			for(int i=0; i<fields.length && !found; i++)
+			Object agent = microagent instanceof PojoMicroAgent? ((PojoMicroAgent)microagent).getPojoAgent(): microagent;
+			
+			boolean found = false;
+			Class microclass = agent.getClass();
+			
+			while(!Object.class.equals(microclass) && !MicroAgent.class.equals(microclass) && !found)
 			{
-				if(fields[i].isAnnotationPresent(AgentArgument.class))
+				Field[] fields = microclass.getDeclaredFields();
+				for(int i=0; i<fields.length && !found; i++)
 				{
-					AgentArgument aa = (AgentArgument)fields[i].getAnnotation(AgentArgument.class);
-					String aname = aa.value().length()==0? fields[i].getName(): aa.value();
-					if(aname.equals(name))
+					if(fields[i].isAnnotationPresent(AgentArgument.class))
 					{
-						String ce = aa.convert();
-						if(ce.length()>0)
+						AgentArgument aa = (AgentArgument)fields[i].getAnnotation(AgentArgument.class);
+						String aname = aa.value().length()==0? fields[i].getName(): aa.value();
+						if(aname.equals(name))
 						{
-							SimpleValueFetcher fetcher = new SimpleValueFetcher(getFetcher());
-							fetcher.setValue("$value", value);
-							try
+							String ce = aa.convert();
+							if(ce.length()>0)
 							{
-								value = SJavaParser.evaluateExpression(ce, getModel().getAllImports(), fetcher, getModel().getClassLoader());
+								SimpleValueFetcher fetcher = new SimpleValueFetcher(getFetcher());
+								fetcher.setValue("$value", value);
+								try
+								{
+									value = SJavaParser.evaluateExpression(ce, getModel().getAllImports(), fetcher, getModel().getClassLoader());
+								}
+								catch(Exception e)
+								{
+									getLogger().warning("Argument conversion failed: "+e);
+								}
 							}
-							catch(Exception e)
+							if(SReflect.isSupertype(fields[i].getType(), value.getClass()))
 							{
-								getLogger().warning("Argument conversion failed: "+e);
+								try
+								{
+									fields[i].setAccessible(true);
+									fields[i].set(agent, value);
+									found = true;
+									System.out.println("set: "+agent+" "+fields[i].getName()+" "+value);
+								}
+								catch(Exception e)
+								{
+									getLogger().warning("Argument injection failed: "+e);
+								}
 							}
-						}
-						if(SReflect.isSupertype(fields[i].getType(), value.getClass()))
-						{
-							try
+							else
 							{
-								fields[i].setAccessible(true);
-								fields[i].set(agent, value);
-								found = true;
+								getLogger().warning("Wrong argument type: "+fields[i].getType()+" "+value.getClass());
 							}
-							catch(Exception e)
-							{
-								getLogger().warning("Argument injection failed: "+e);
-							}
-						}
-						else
-						{
-							getLogger().warning("Wrong argument type: "+fields[i].getType()+" "+value.getClass());
 						}
 					}
 				}
+				microclass = microclass.getSuperclass();
 			}
-			microclass = microclass.getSuperclass();
 		}
+		
+		return ret;
 	}
 	
 	//-------- IKernelAgent interface --------

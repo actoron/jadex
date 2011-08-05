@@ -382,7 +382,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		
 		final Future	ret	= new Future();
 		initcapa	= oavmodel.getHandle();
-		BDIInterpreter.super.init(oavmodel.getModelInfo(), config)
+		BDIInterpreter.super.init(oavmodel.getModelInfo(), config, null)
 			.addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -1782,7 +1782,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/**
 	 *  Init the arguments and results.
 	 */
-	public IFuture initArguments(IModelInfo model, final String config)
+	public IFuture initArguments(IModelInfo model, final String config, Map arguments)
 	{
 		// Do nothing: args and results are inited as beliefs.
 		return IFuture.DONE;
@@ -1794,12 +1794,12 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  @param name	The argument name.
 	 *  @param value	The argument value.
 	 */
-	public void	addDefaultArgument(String name, Object value)
+	public boolean	addArgument(String name, Object value)
 	{
 		// Not supported by BDI XML schema -> Called during belief init to make arguments available to outside.
 		if(arguments==null)
 			arguments = new HashMap();
-		arguments.put(name, value);
+		return arguments.put(name, value) == null;
 	}
 
 	/**

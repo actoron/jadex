@@ -57,7 +57,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 		{
 			public Object execute(IInternalAccess ia)
 			{
-				init(getModel(), ComponentInterpreter.this.config)
+				init(getModel(), ComponentInterpreter.this.config, arguments)
 					.addResultListener(createResultListener(new DelegationResultListener(inited)
 				{
 					public void customResultAvailable(Object result)
