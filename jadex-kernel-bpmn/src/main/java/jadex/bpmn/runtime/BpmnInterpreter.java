@@ -251,6 +251,14 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 				else
 				{
 					inited.setException(exception);
+					if(exception instanceof RuntimeException)
+					{
+						throw (RuntimeException)exception;
+					}
+					else
+					{
+						throw new RuntimeException(exception);
+					}
 				}
 			}
 		});

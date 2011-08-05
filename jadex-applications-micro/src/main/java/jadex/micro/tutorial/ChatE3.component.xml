@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Chat application component with configurations and subcomponents.
+-->
+<componenttype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
+	name="ChatE3" package="jadex.micro.tutorial">
+	
+	<componenttypes>
+		<componenttype name="chatagent" filename="jadex.micro.tutorial.ChatE3Agent.class"/>
+		<componenttype name="registry" filename="jadex.micro.tutorial.RegistryE3Agent.class"/>
+	</componenttypes>
+	
+	<configurations>
+		<configuration name="One chatter">
+			<components>
+				<component name="reg" type="registry">
+				</component>
+				<component name="chatter1" type="chatagent">
+					<requiredservices>
+						<binding name="regservice" componentname="reg" scope="parent"/>	
+					</requiredservices>
+				</component>
+				<!-- <component name="chatter2" type="chatagent">
+					<requiredservices>
+						<binding name="regservice" componentname="reg" scope="parent"/>	
+					</requiredservices>	
+				</component>-->
+			</components>
+		</configuration>
+	</configurations>
+</componenttype>

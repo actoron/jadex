@@ -116,6 +116,10 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 						((IFuture)res).addResultListener(createResultListener(
 							new DelegationResultListener(ret)));
 					}
+					else
+					{
+						ret.setResult(null);
+					}
 				}
 				catch(Exception e)
 				{
