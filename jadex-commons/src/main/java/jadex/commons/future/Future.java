@@ -28,7 +28,7 @@ public class Future implements IFuture
 	protected final String	CALLER_SUSPENDED	= "suspended";
 	
 	/** Debug flag. */
-	public final boolean DEBUG = true;
+	public final boolean DEBUG = false;
 	
 	//-------- attributes --------
 	

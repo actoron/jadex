@@ -361,7 +361,9 @@ public abstract class ComponentManagementService extends BasicService implements
 															cid = new ComponentIdentifier(name+"@"+paname);
 															if(adapters.containsKey(cid) || initinfos.containsKey(cid))
 															{
-																throw new RuntimeException("Component "+cid+" already exists.");
+																inited.setException(new RuntimeException("Component "+cid+" already exists."));
+																return;
+//																throw new RuntimeException("Component "+cid+" already exists.");
 															}
 															if(msgservice!=null)
 															{

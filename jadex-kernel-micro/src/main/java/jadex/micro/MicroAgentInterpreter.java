@@ -69,7 +69,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		final IModelInfo model, Class microclass, final Map args, final String config, 
 		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, final Future inited)
 	{
-		super(desc, model, config, factory, parent, args, bindings, copy, inited);
+		super(desc, model, config, factory, parent, bindings, copy, inited);
 		
 		try
 		{
@@ -115,7 +115,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			{
 				public Object execute(IInternalAccess ia)
 				{
-					init(model, MicroAgentInterpreter.this.config, arguments)
+					init(model, MicroAgentInterpreter.this.config, args)
 						.addResultListener(createResultListener(new DelegationResultListener(inited)
 					{
 						public void customResultAvailable(Object result)
@@ -181,7 +181,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	{
 		boolean ret = super.addArgument(name, value);
 	
-		if(ret)
+		if(ret && value!=null)
 		{
 			Object agent = microagent instanceof PojoMicroAgent? ((PojoMicroAgent)microagent).getPojoAgent(): microagent;
 			
@@ -220,7 +220,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 									fields[i].setAccessible(true);
 									fields[i].set(agent, value);
 									found = true;
-									System.out.println("set: "+agent+" "+fields[i].getName()+" "+value);
+//									System.out.println("set: "+agent+" "+fields[i].getName()+" "+value);
 								}
 								catch(Exception e)
 								{

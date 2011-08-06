@@ -50,7 +50,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 		final IComponentAdapterFactory factory, final IExternalAccess parent, final Map arguments, 
 		final RequiredServiceBinding[] bindings, boolean copy, final Future inited)
 	{
-		super(desc, model, config, factory, parent, arguments, bindings, copy, inited);
+		super(desc, model, config, factory, parent, bindings, copy, inited);
 		this.steps = new ArrayList();
 	
 		addStep((new Object[]{new IComponentStep()

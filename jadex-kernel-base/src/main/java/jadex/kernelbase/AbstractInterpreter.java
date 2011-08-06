@@ -39,7 +39,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	protected String config;
 	
 	/** The arguments. */
-	protected Map arguments;
+	private Map arguments;
 	
 	/** The arguments. */
 	protected Map results;
@@ -83,7 +83,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  Create a new context.
 	 */
 	public AbstractInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, 
-		final IComponentAdapterFactory factory, final IExternalAccess parent, final Map arguments, 
+		final IComponentAdapterFactory factory, final IExternalAccess parent, 
 		final RequiredServiceBinding[] bindings, boolean copy, final Future inited)
 	{
 		try
@@ -98,7 +98,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 				this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 			this.container = createServiceContainer();
 			this.creationtime = System.currentTimeMillis();
-			this.arguments = arguments!=null? new HashMap(arguments): null; // clone arguments
+//			this.arguments = arguments!=null? new HashMap(arguments): null; // clone arguments
 		}
 		catch(Exception e)
 		{

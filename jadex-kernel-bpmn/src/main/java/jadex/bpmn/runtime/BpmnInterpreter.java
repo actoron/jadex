@@ -195,7 +195,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		IValueFetcher fetcher, IComponentManagementService cms, IClockService cs, IMessageService ms,
 		IServiceContainer container)
 	{
-		super(null, model.getModelInfo(), config, null, parent, arguments, null, true, new Future());
+		super(null, model.getModelInfo(), config, null, parent, null, true, new Future());
 		construct(model, activityhandlers, stephandlers);		
 		this.fetcher = fetcher!=null? fetcher: new BpmnInstanceFetcher(this, fetcher);
 		this.adapter = adapter;
@@ -208,7 +208,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		initContextVariables();
 		
 		// Create initial thread(s). 
-		List	startevents	= model.getStartActivities(null, null);
+		List startevents = model.getStartActivities(null, null);
 		for(int i=0; startevents!=null && i<startevents.size(); i++)
 		{
 			ProcessThread	thread	= new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
@@ -225,7 +225,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
 		IValueFetcher fetcher, RequiredServiceBinding[] bindings, boolean copy, final Future inited)
 	{
-		super(desc, model.getModelInfo(), config, factory, parent, arguments, bindings, copy, inited);
+		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, inited);
 		this.inited = inited;
 		this.variables	= new HashMap();
 		construct(model, activityhandlers, stephandlers);
