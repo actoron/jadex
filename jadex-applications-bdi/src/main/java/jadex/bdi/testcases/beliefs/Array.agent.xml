@@ -4,8 +4,9 @@
 
 	Tests if a special array expression can be loaded.
 	<p>
-	<b>This testcase fails with janino parser due to a bug in janino.
-	Works with javacc parser.</b>
+	This testcase fails with janino parser due to a bug in janino.
+	Works with javacc parser.
+	</p>
 -->
 <agent xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

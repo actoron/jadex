@@ -1,5 +1,6 @@
 package jadex.bridge.service;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.commons.Tuple;
@@ -376,6 +377,17 @@ public class CacheServiceContainer	implements IServiceContainer
 
 	// todo: factor out this part of service management?!
 
+	/**
+	 *  Get one service of a type from a specific component.
+	 *  @param type The class.
+	 *  @param cid The component identifier of the target component.
+	 *  @return The corresponding service.
+	 */
+	public IFuture getService(final Class type, final IComponentIdentifier cid)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
 	/**
 	 *  Get provided (declared) service.
 	 *  @param name The service name.

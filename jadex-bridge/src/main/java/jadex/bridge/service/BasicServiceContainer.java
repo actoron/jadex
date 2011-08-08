@@ -1,5 +1,8 @@
 package jadex.bridge.service;
 
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.commons.future.CounterResultListener;
@@ -292,6 +295,35 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	/** The service bindings. */
 //	protected Map bindings;
 
+	
+	/**
+	 *  Get one service of a type from a specific component.
+	 *  @param type The class.
+	 *  @param cid The component identifier of the target component.
+	 *  @return The corresponding service.
+	 */
+	public IFuture getService(final Class type, final IComponentIdentifier cid)
+	{
+		final Future ret = new Future();
+		SServiceProvider.getServiceUpwards(this, IComponentManagementService.class)
+			.addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				IComponentManagementService cms = (IComponentManagementService)result;
+				cms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						IExternalAccess	ea	= (IExternalAccess)result;
+						SServiceProvider.getService(ea.getServiceProvider(), type)
+							.addResultListener(new DelegationResultListener(ret));
+					}
+				});
+			}
+		});
+		return ret;
+	}
 
 	/**
 	 *  Get provided (declared) service.

@@ -1,6 +1,7 @@
 package jadex.bridge.service;
 
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -128,6 +129,14 @@ public interface IServiceContainer extends IServiceProvider
 	 *  @return The interceptors.
 	 */
 	public IServiceInvocationInterceptor[] getInterceptors(Object service);
+	
+	/**
+	 *  Get one service of a type from a specific component.
+	 *  @param type The class.
+	 *  @param cid The component identifier of the target component.
+	 *  @return The corresponding service.
+	 */
+	public IFuture getService(Class type, IComponentIdentifier cid);
 	
 	/**
 	 *  Get one service of a type.

@@ -20,7 +20,7 @@ public class RegistryServiceE3 implements IRegistryServiceE3
 	 */
 	public void register(IComponentIdentifier cid, String nickname)
 	{
-		entries.put(cid, nickname);
+		entries.put(nickname, cid);
 	}
 	
 	/**

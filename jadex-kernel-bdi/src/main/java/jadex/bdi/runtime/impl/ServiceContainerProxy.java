@@ -1,6 +1,7 @@
 package jadex.bdi.runtime.impl;
 
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IResultSelector;
 import jadex.bridge.service.ISearchManager;
@@ -69,7 +70,6 @@ public class ServiceContainerProxy implements IServiceContainer
 		return interpreter.getServiceContainer().addService(service);
 	}
 	
-
 	/**
 	 *  Removes a service from the container (shutdowns also the service if the container is running).
 	 *  @param service The service identifier.
@@ -80,6 +80,17 @@ public class ServiceContainerProxy implements IServiceContainer
 	}
 	
 	//-------- internal user methods --------
+	
+	/**
+	 *  Get one service of a type from a specific component.
+	 *  @param type The class.
+	 *  @param cid The component identifier of the target component.
+	 *  @return The corresponding service.
+	 */
+	public IFuture getService(final Class type, final IComponentIdentifier cid)
+	{
+		return interpreter.getServiceContainer().getService(type, cid);
+	}
 	
 	/**
 	 *  Get provided (declared) service.
