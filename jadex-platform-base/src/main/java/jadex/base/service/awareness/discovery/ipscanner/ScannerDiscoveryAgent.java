@@ -116,7 +116,7 @@ public class ScannerDiscoveryAgent extends MasterSlaveDiscoveryAgent
 	 */
 	protected boolean isMaster()
 	{
-		return this.port==getChannel().socket().getLocalPort();
+		return getChannel()!=null && this.port==getChannel().socket().getLocalPort();
 	}
 	
 	/**

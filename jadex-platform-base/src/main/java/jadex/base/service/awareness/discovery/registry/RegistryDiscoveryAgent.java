@@ -180,7 +180,7 @@ public class RegistryDiscoveryAgent extends MasterSlaveDiscoveryAgent
 	 */
 	protected boolean isMaster()
 	{
-		return this.port==getSocket().getLocalPort();
+		return getSocket()!=null && this.port==getSocket().getLocalPort();
 	}
 	
 	/**
