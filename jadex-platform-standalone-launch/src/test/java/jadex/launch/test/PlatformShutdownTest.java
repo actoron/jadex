@@ -21,13 +21,14 @@ import junit.framework.TestCase;
  */
 //Todo: Doesn't work on hudson server
 //(race condition in init leads to micro factory not being found?)
-public class PlatformShutdownTest2 extends TestCase
+public class PlatformShutdownTest extends TestCase
 {
 	public void	testPlatformShutdown()
 	{
 		long timeout	= 10000;
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		final IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "testcases",
+			"-configname", "allkernels",	// Todo: does not work with multi-kernel on Hudson!?
 			"-niotransport", "false", "-gui", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}).get(sus, timeout);
 		final Future	fut	= new Future();
 		SServiceProvider.getService(platform.getServiceProvider(), IComponentManagementService.class)
