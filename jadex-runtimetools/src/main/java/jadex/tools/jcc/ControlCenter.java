@@ -174,7 +174,9 @@ public class ControlCenter
 						window.setExtendedState(es);
 			
 						jccexit = windowprops.getStringProperty("jccexit");
-						saveonexit = windowprops.getBooleanProperty("saveonexit");
+						
+						// Do not override saveonexit agent argument to true by loaded properties.
+						saveonexit = saveonexit && windowprops.getBooleanProperty("saveonexit");
 					}
 				}
 				catch(Exception e)

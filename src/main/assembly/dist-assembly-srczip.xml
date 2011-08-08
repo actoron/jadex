@@ -31,6 +31,14 @@
 			</sources>
 		</moduleSet>
 	</moduleSets>
+	
+	<fileSets>
+		<fileSet>
+			<directory>docs/jadex-example-project</directory>
+			<outputDirectory>sources/docs/jadex-example-project</outputDirectory>
+		</fileSet>
+	</fileSets>	
+	
 
 	<files>
 		<file>
@@ -85,10 +93,6 @@
 		</file>
 		<file>
 			<source>docs/jadex_no_awareness.sh</source>
-			<outputDirectory>sources/docs</outputDirectory>
-		</file>
-		<file>
-			<source>docs/jadex-example-project.zip</source>
 			<outputDirectory>sources/docs</outputDirectory>
 		</file>
 		<file>

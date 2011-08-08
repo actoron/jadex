@@ -6,7 +6,7 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex</artifactId>
 	<packaging>pom</packaging>
-	<version>2.0-rc8</version>
+	<version>2.0-rc9</version>
 	<name>jadex</name>
 
 	<!--
@@ -216,6 +216,20 @@
 							</archiverConfig>
 						</configuration>
 						<executions>
+							<execution>
+								<id>jadex-example-project</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>jadex-example-project</finalName>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-exampleprojectzip.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
 							<execution>
 								<id>sources</id>
 								<phase>package</phase>

@@ -302,7 +302,11 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 			{
 //				if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
 //					System.err.println("searchChildren done2e: "+ComponentTreeNode.this);
-				ret.setExceptionIfUndone(exception);
+				ready[0]	= true;
+				if(ready[0] &&  ready[1])
+				{
+					ret.setExceptionIfUndone(exception);
+				}
 			}
 		});
 		
@@ -403,7 +407,11 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 							{
 	//							if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
 	//								System.err.println("searchChildren done7: "+ComponentTreeNode.this);
-								ret.setExceptionIfUndone(exception);
+								ready[1]	= true;
+								if(ready[0] &&  ready[1])
+								{
+									ret.setExceptionIfUndone(exception);
+								}
 							}
 						});
 					}
@@ -412,7 +420,11 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 			
 			public void customExceptionOccurred(Exception exception)
 			{
-				ret.setExceptionIfUndone(exception);
+				ready[1]	= true;
+				if(ready[0] &&  ready[1])
+				{
+					ret.setExceptionIfUndone(exception);
+				}
 			}
 		});
 		

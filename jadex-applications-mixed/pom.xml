@@ -4,7 +4,7 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-applications-mixed</artifactId>
 	<packaging>jar</packaging>
-	<version>2.0-rc8</version>
+	<version>2.0-rc9</version>
 	<name>jadex-applications-mixed</name>
 	<url>http://jadex.sourceforge.net</url>
 
@@ -155,43 +155,43 @@
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-bridge</artifactId>
-			<version>2.0-rc8</version>
+			<version>2.0-rc9</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform-base</artifactId>
-			<version>2.0-rc8</version>
+			<version>2.0-rc9</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-application</artifactId>
-			<version>2.0-rc8</version>
+			<version>2.0-rc9</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-micro</artifactId>
-			<version>2.0-rc8</version>
+			<version>2.0-rc9</version>
 		</dependency>		
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bdi</artifactId>
-			<version>2.0-rc8</version>
+			<version>2.0-rc9</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bpmn</artifactId>
-			<version>2.0-rc8</version>
+			<version>2.0-rc9</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-applications-bdi</artifactId>
-			<version>2.0-rc8</version>
+			<version>2.0-rc9</version>
 		</dependency>
 	</dependencies>
 </project>

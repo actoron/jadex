@@ -60,6 +60,10 @@
 			<outputDirectory>lib</outputDirectory>
 		</file>
 		<file>
+			<source>target/jadex-example-project.zip</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+		<file>
 			<source>target/sources.zip</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
@@ -99,10 +103,6 @@
 		</file>
 		<file>
 			<source>docs/jadex_no_awareness.sh</source>
-			<outputDirectory>/</outputDirectory>
-		</file>
-		<file>
-			<source>docs/jadex-example-project.zip</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
 		<file>

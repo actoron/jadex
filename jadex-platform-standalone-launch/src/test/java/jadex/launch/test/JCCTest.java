@@ -29,9 +29,10 @@ public class JCCTest extends TestCase
 {
 	public void	testJCC()
 	{
-		long timeout	= 1000000;
+		long timeout	= 10000;
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		final IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "testcases",
+			"-configname", "allkernels",	// Todo: does not work with multi-kernel on Hudson!?
 			"-niotransport", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}).get(sus, timeout);
 		
 		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider

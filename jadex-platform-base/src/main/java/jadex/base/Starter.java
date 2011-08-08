@@ -246,7 +246,14 @@ public class Starter
 					{
 						try
 						{
-							platformname = SUtil.createUniqueId(InetAddress.getLocalHost().getHostName(), 3);
+							String	name	= InetAddress.getLocalHost().getHostName();
+							// Replace special characters used in component ids.
+							if(name!=null)
+							{
+								name	= name.replace('.', '$'); // Dot in host name on Mac !?
+								name	= name.replace('@', '$'); // Probably not needed, but just to be sure.
+							}
+							platformname = SUtil.createUniqueId(name, 3);
 						}
 						catch(UnknownHostException e)
 						{
