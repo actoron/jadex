@@ -27,6 +27,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.ThreadSuspendable;
@@ -151,7 +152,27 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		}
 		else if(method.getReturnType().equals(void.class))
 		{
-			sic.invoke(service, method, myargs);
+			IFuture	myvoid	= sic.invoke(service, method, myargs);
+			
+			// Check result and propagate exception, if any.
+			if(myvoid.isDone())
+			{
+				myvoid.get(null);	// throws exception, if any.
+			}
+			else
+			{
+				myvoid.addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+					}
+				});
+			}
 		}
 		else
 		{

@@ -40,14 +40,14 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 //				e.printStackTrace();
 				Throwable	t	= e instanceof InvocationTargetException
 					? ((InvocationTargetException)e).getTargetException() : e;
-				throw /*t instanceof RuntimeException ? (RuntimeException)t :*/ new RuntimeException(t)
-				{
-					public void printStackTrace()
-					{
-						Thread.dumpStack();
-						super.printStackTrace();
-					}
-				};
+				throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+//				{
+//					public void printStackTrace()
+//					{
+//						Thread.dumpStack();
+//						super.printStackTrace();
+//					}
+//				};
 			}
 		}
 		return IFuture.DONE;
