@@ -1,8 +1,5 @@
 package jadex.micro.tutorial;
 
-import java.util.Collection;
-import java.util.Iterator;
-
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -10,7 +7,10 @@ import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
@@ -24,20 +24,25 @@ import jadex.micro.annotation.RequiredServices;
  */
 @Description("This agent provides a basic chat service.")
 @Agent
-@ProvidedServices(@ProvidedService(type=IExtendedChatService.class, 
+@ProvidedServices(@ProvidedService(type=IChatService.class, 
 	implementation=@Implementation(value=ChatServiceD5.class)))
 @RequiredServices({
 	@RequiredService(name="clockservice", type=IClockService.class, 
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="chatservices", type=IExtendedChatService.class, multiple=true,
+	@RequiredService(name="chatservices", type=IChatService.class, multiple=true,
 		binding=@Binding(dynamic=true, scope=RequiredServiceInfo.SCOPE_GLOBAL)),
 	@RequiredService(name="regservice", type=IRegistryServiceE3.class)
 })
+@Arguments(@Argument(name="nickname", clazz=String.class, defaultvalue="\"Willi\""))
 public class ChatE3Agent
 {
 	/** The agent. */
 	@Agent
 	protected MicroAgent agent;
+	
+	/** The nickname. */
+	@AgentArgument
+	protected String nickname;
 	
 	/**
 	 *  Execute the functional body of the agent.
@@ -52,7 +57,7 @@ public class ChatE3Agent
 			public void resultAvailable(Object result)
 			{
 				final IRegistryServiceE3 rs = (IRegistryServiceE3)result;
-				rs.register(agent.getComponentIdentifier(), "my_nick");
+				rs.register(agent.getComponentIdentifier(), nickname);
 				
 				agent.waitFor(10000, new IComponentStep()
 				{

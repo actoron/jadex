@@ -2,6 +2,7 @@ package jadex.base.service.cms;
 
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.base.fipa.SearchConstraints;
+import jadex.bridge.ComponentCreationException;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.CreationInfo;
@@ -301,7 +302,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			
 			if(name!=null && name.indexOf('@')!=-1)
 			{
-				inited.setException(new RuntimeException("No '@' allowed in component name."));
+				inited.setException(new ComponentCreationException("No '@' allowed in component name.", ComponentCreationException.REASON_WRONG_ID));
 			}
 			else
 			{
@@ -334,7 +335,8 @@ public abstract class ComponentManagementService extends BasicService implements
 										final IModelInfo lmodel = (IModelInfo)result;
 										if(lmodel.getReport()!=null)
 										{
-											inited.setException(new RuntimeException("Errors loading model: "+model+"\n"+lmodel.getReport().getErrorText()));
+											inited.setException(new ComponentCreationException("Errors loading model: "+model+"\n"+lmodel.getReport().getErrorText(), 
+												ComponentCreationException.REASON_MODEL_ERROR));
 										}
 										else
 										{
@@ -361,7 +363,7 @@ public abstract class ComponentManagementService extends BasicService implements
 															cid = new ComponentIdentifier(name+"@"+paname);
 															if(adapters.containsKey(cid) || initinfos.containsKey(cid))
 															{
-																inited.setException(new RuntimeException("Component "+cid+" already exists."));
+																inited.setException(new ComponentCreationException("Component "+cid+" already exists.", ComponentCreationException.REASON_COMPONENT_EXISTS));
 																return;
 //																throw new RuntimeException("Component "+cid+" already exists.");
 															}
@@ -829,14 +831,14 @@ public abstract class ComponentManagementService extends BasicService implements
 					}
 					else
 					{
-						ret.setException(new RuntimeException("No factory found for: "+model));
+						ret.setException(new ComponentCreationException("No factory found for: "+model, ComponentCreationException.REASON_NO_COMPONENT_FACTORY));
 					}
 				}
 			});
 		}
 		else
 		{
-			ret.setException(new RuntimeException("No factory found for: "+model));
+			ret.setException(new ComponentCreationException("No factory found for: "+model, ComponentCreationException.REASON_NO_COMPONENT_FACTORY));
 		}
 		
 		return ret;

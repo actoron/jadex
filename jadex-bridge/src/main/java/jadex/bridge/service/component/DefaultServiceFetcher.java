@@ -1,5 +1,6 @@
 package jadex.bridge.service.component;
 
+import jadex.bridge.ComponentCreationException;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
@@ -609,7 +610,15 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 										public void exceptionOccurred(Exception exception)
 										{
 //											exception.printStackTrace();
-											super.exceptionOccurred(exception);
+											if(exception instanceof ComponentCreationException && ComponentCreationException.REASON_COMPONENT_EXISTS.equals(
+												((ComponentCreationException)exception).getReason()))
+											{
+												super.exceptionOccurred(exception);
+											}
+											else
+											{
+												super.exceptionOccurred(exception);
+											}
 										}
 									});
 								}
