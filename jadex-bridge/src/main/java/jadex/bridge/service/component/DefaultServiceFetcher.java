@@ -613,7 +613,9 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 											if(exception instanceof ComponentCreationException && ComponentCreationException.REASON_COMPONENT_EXISTS.equals(
 												((ComponentCreationException)exception).getReason()))
 											{
-												super.exceptionOccurred(exception);
+//												super.exceptionOccurred(exception);
+												getExternalAccess(provider, (IComponentIdentifier)((ComponentCreationException)exception).getInfo())
+													.addResultListener(new DelegationResultListener(ret));
 											}
 											else
 											{
