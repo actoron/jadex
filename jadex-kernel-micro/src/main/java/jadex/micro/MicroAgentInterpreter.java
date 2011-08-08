@@ -109,7 +109,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				}
 			}
 						
-			this.container = createMyServiceContainer();
+			this.container = createMyServiceContainer(args);
 			
 			addStep((new Object[]{new IComponentStep()
 			{
@@ -697,9 +697,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 *  Create the service container.
 	 *  @return The service conainer.
 	 */
-	public IServiceContainer createMyServiceContainer()
+	public IServiceContainer createMyServiceContainer(Map args)
 	{
-		IServiceContainer ret = microagent.createServiceContainer();
+		IServiceContainer ret = microagent.createServiceContainer(args);
 		if(ret==null)
 			ret = super.createServiceContainer();
 		return ret;

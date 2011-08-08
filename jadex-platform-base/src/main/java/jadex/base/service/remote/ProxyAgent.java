@@ -7,6 +7,8 @@ import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
 
+import java.util.Map;
+
 
 
 /**
@@ -27,10 +29,10 @@ public class ProxyAgent extends MicroAgent
 	 *  Get the service container.
 	 *  @return The service container.
 	 */
-	public IServiceContainer createServiceContainer()
+	public IServiceContainer createServiceContainer(Map args)
 	{
 		// Hack!!! Can not be done in agentCreated, because service container is created first. 
-		this.rcid	= (IComponentIdentifier)getArgument("component");
+		this.rcid	= (IComponentIdentifier)args.get("component");
 		
 		return new RemoteServiceContainer(rcid, getAgentAdapter());
 	}

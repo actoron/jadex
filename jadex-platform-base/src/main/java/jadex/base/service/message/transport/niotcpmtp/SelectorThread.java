@@ -299,7 +299,7 @@ public class SelectorThread implements Runnable
 					public void exceptionOccurred(Exception exception)
 					{
 						cnt++;
-						if(cnt==num)
+						if(cnt==num && !ret.isDone())
 						{
 							ret.setExceptionIfUndone(new RuntimeException("Cannot open connection: no working addresses. "+SUtil.arrayToString(addresses)));
 						}

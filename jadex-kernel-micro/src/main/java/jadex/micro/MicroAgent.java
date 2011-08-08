@@ -831,7 +831,8 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	/**
 	 *  May be overriden to provide a custom service container implementations.
 	 */
-	public IServiceContainer createServiceContainer()
+	// Only needed for ProxyAgent. Todo: remove
+	public IServiceContainer createServiceContainer(Map args)
 	{
 		return null;
 	}
