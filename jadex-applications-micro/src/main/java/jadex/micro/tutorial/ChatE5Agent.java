@@ -94,7 +94,7 @@ public class ChatE5Agent
 										public void resultAvailable(Object result)
 										{
 											IChatService cs = (IChatService)result;
-											cs.message(agent.getComponentIdentifier().toString(), "Private hello!");
+											cs.message(agent.getComponentIdentifier().toString(), "Private hello from: "+nickname);
 										}
 									});
 								}
