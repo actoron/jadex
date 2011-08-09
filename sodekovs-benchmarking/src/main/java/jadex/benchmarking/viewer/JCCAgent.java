@@ -25,7 +25,7 @@ import jadex.tools.testcenter.TestCenterPlugin;
  *  Micro component for opening the JCC gui.
  */
 @Description("Micro component for opening the JCC gui.")
-@Arguments(@Argument(name="saveonexit", clazz=boolean.class, defaultvalue="true", description="Save settings on exit? Overriden by loaded settings, if any."))
+@Arguments(@Argument(name="saveonexit", clazz=boolean.class, defaultvalue="true",description="Save settings on exit?"))
 public class JCCAgent extends MicroAgent
 {
 	//-------- attributes --------
@@ -44,7 +44,7 @@ public class JCCAgent extends MicroAgent
 	 */
 	public IFuture	agentCreated()
 	{
-		this.saveonexit	= ((Boolean)getArgument("saveonexit")).booleanValue();
+//		this.saveonexit	= ((Boolean)getArgument("saveonexit")).booleanValue();
 		
 		Future	ret	= new Future();
 		this.cc	= new ControlCenter();
@@ -65,8 +65,8 @@ public class JCCAgent extends MicroAgent
 				ComponentViewerPlugin.class.getName(),
 				BenchmarkingPlugin.class.getName(),
 				DeployerPlugin.class.getName()
-			}
-		).addResultListener(createResultListener(new DelegationResultListener(ret)));
+		},
+		saveonexit).addResultListener(createResultListener(new DelegationResultListener(ret)));
 		return ret;
 	}
 	
