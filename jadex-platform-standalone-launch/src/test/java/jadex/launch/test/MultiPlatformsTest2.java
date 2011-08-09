@@ -12,7 +12,7 @@ import junit.framework.TestCase;
  */
 // Todo: Doesn't work on hudson server
 // (race condition in init leads to micro factory not being found?)
-public class MultiPlatformsTest extends TestCase
+public class MultiPlatformsTest2 extends TestCase
 {
 	public void	testMultiplePlatforms()
 	{
