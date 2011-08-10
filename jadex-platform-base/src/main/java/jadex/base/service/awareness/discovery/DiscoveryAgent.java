@@ -106,7 +106,10 @@ public abstract class DiscoveryAgent
 	{
 		setKilled(true);
 		
-		sender.send(createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, createMasterId()));
+		if(sender!=null)
+		{
+			sender.send(createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, createMasterId()));
+		}
 		
 		terminateNetworkRessource();
 //		System.out.println("killed set to true: "+getComponentIdentifier());

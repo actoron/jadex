@@ -20,10 +20,11 @@ public interface IComponentManagementService extends IService
 
 	/**
 	 *  Create a new component on the platform.
-	 *  @param name The component name.
+	 *  @param name The component name or null for automatic generation.
 	 *  @param model The model identifier (e.g. file name).
-	 *  @param listener The result listener (if any). Will receive the id of the component as result, when the component has been created.
+	 *  @param info Additional start information such as parent component or arguments (optional).
 	 *  @param killlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
+	 *  @return The id of the component as future result, when the component has been created and initialized.
 	 */
 	public IFuture createComponent(String name, String model, CreationInfo info, IResultListener killlistener);
 		
