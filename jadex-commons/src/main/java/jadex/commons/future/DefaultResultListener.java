@@ -14,8 +14,8 @@ public abstract class DefaultResultListener implements IResultListener
 	/** The logger. */
 	private Logger logger;	// Private to prevent accidental use.
 	
-	/** The static instance. */
-	private static IResultListener instance;
+//	/** The static instance. */
+//	private static IResultListener instance;
 	
 	//-------- constructors --------
 	
@@ -37,24 +37,24 @@ public abstract class DefaultResultListener implements IResultListener
 		this.logger = logger;
 	}
 	
-	/**
-	 *  Get the listener instance.
-	 *  @return The listener.
-	 */
-	public static IResultListener getInstance()
-	{
-		// Hack! Implement that logger can be passed
-		if(instance==null)
-		{
-			instance = new DefaultResultListener(Logger.getLogger("default"))
-			{
-				public void resultAvailable(Object result)
-				{
-				}
-			};
-		}
-		return instance;
-	}
+//	/**
+//	 *  Get the listener instance.
+//	 *  @return The listener.
+//	 */
+//	public static IResultListener getInstance()
+//	{
+//		// Hack! Implement that logger can be passed
+//		if(instance==null)
+//		{
+//			instance = new DefaultResultListener()
+//			{
+//				public void resultAvailable(Object result)
+//				{
+//				}
+//			};
+//		}
+//		return instance;
+//	}
 	
 	//-------- methods --------
 	
@@ -62,7 +62,7 @@ public abstract class DefaultResultListener implements IResultListener
 	 *  Called when the result is available.
 	 *  @param result The result.
 	 * /
-	public void resultAvailable(Object source, Object result)
+	public void resultAvailable(Object result)
 	{
 		//logger.info(""+result);
 	}*/

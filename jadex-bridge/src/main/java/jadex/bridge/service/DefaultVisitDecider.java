@@ -74,8 +74,8 @@ public class DefaultVisitDecider implements IVisitDecider
 			}
 			else if(RequiredServiceInfo.SCOPE_COMPONENT.equals(scope))
 			{
-				// Ok when target is child of source.
-				ret = ischild && !isRemoteComponent(target);
+				// Ok when target is child of source or source itself.
+				ret = source==null || ischild && !isRemoteComponent(target);
 			}
 			else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
 			{

@@ -17,7 +17,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.jtable.DateTimeRenderer;
-import jadex.micro.IMicroExternalAccess;
 import jadex.xml.annotation.XMLClassname;
 import jadex.xml.annotation.XMLIncludeFields;
 
@@ -44,12 +43,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -108,6 +110,15 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	
 	/** The complete awareness panel. */
 	protected JPanel panel;
+	
+	/** The apply button. */
+	protected JButton	buapply;
+		
+	/** The refresh button. */
+	protected JButton	burefresh;
+		
+	/** The cancel button. */
+	protected JButton	bucancel;
 		
 	//-------- methods --------
 	
@@ -149,6 +160,37 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		pexcludes.setMinimumSize(new Dimension(0, 0));
 		pexcludes.setPreferredSize(new Dimension(0, 0));
 		
+		// Enable apply/cancel buttons on settings changes.
+		spdelay.addChangeListener(new ChangeListener()
+		{
+			public void stateChanged(ChangeEvent e)
+			{
+				buapply.setEnabled(true);
+				bucancel.setEnabled(true);
+			}
+		});
+		ActionListener	al	= new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				buapply.setEnabled(true);
+				bucancel.setEnabled(true);
+			}
+		};
+		TableModelListener	tml	= new TableModelListener()
+		{
+			public void tableChanged(TableModelEvent e)
+			{
+				buapply.setEnabled(true);
+				bucancel.setEnabled(true);
+			}
+		};
+		cbfast.addActionListener(al);
+		cbautocreate.addActionListener(al);
+		cbautodelete.addActionListener(al);
+		includes.getModel().addTableModelListener(tml);
+		excludes.getModel().addTableModelListener(tml);
+		
 		final JPanel pdissettings = new JPanel(new GridBagLayout());
 		pdissettings.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Discovery Settings "));
 		int y=0;
@@ -189,8 +231,8 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
 		y++;
 		
-		final JButton buapply = new JButton("Apply");
-		buapply.setToolTipText("Apply setting changes.");
+		buapply = new JButton("Apply");
+		buapply.setToolTipText("Apply setting changes to component.");
 		buapply.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent ae)
@@ -198,8 +240,8 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				applySettings();
 			}
 		});
-		final JButton bucancel = new JButton("Cancel");
-		bucancel.setToolTipText("Cancel changes and reset original values.");
+		bucancel = new JButton("Cancel");
+		bucancel.setToolTipText("Cancel changes and reset to previous values.");
 		bucancel.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -208,7 +250,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				updateSettings(settings);
 			}
 		});
-		JButton burefresh = new JButton("Refresh");
+		burefresh = new JButton("Refresh");
 		burefresh.setToolTipText("Refresh settings from underlying component.");
 		burefresh.addActionListener(new ActionListener()
 		{
@@ -476,7 +518,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 //				ret.address	= (InetAddress)ai[0];
 //				ret.port	= (Integer)ai[1];
 				ret.delay	= agent.getDelay();
-//				ret.fast	= agent.isFastAwareness();
+				ret.fast	= agent.isFastAwareness();
 				ret.autocreate	= agent.isAutoCreateProxy();
 				ret.autodelete	= agent.isAutoDeleteProxy();
 				ret.includes	= agent.getIncludes();
@@ -564,7 +606,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					AwarenessManagementAgent agent	= (AwarenessManagementAgent)ia;
 //					agent.setAddressInfo(settings.address, settings.port);
 					agent.setDelay(settings.delay);
-//					agent.setFastAwareness(settings.fast);
+					agent.setFastAwareness(settings.fast);
 					agent.setAutoCreateProxy(settings.autocreate);
 					agent.setAutoDeleteProxy(settings.autodelete);
 					agent.setIncludes(settings.includes);
@@ -575,6 +617,8 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			{
 				public void customResultAvailable(Object result)
 				{
+					buapply.setEnabled(false);
+					bucancel.setEnabled(false);
 				}
 			});
 		}
@@ -616,6 +660,9 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		cbautodelete.setSelected(settings.autodelete);
 		includes.setEntries(settings.includes);
 		excludes.setEntries(settings.excludes);
+		
+		buapply.setEnabled(false);
+		bucancel.setEnabled(false);
 	}
 
 	/**

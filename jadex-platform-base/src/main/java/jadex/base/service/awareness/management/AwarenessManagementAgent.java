@@ -16,6 +16,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -56,7 +57,7 @@ import java.util.TimerTask;
 //	@Argument(name="address", clazz=String.class, defaultvalue="\"224.0.0.0\"", description="The ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255)."),
 //	@Argument(name="port", clazz=int.class, defaultvalue="55667", description="The port used for finding other agents."),
 	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
-//	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
+	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
 	@Argument(name="autocreate", clazz=boolean.class, defaultvalue="true", description="Set if new proxies should be automatically created when discovering new components."),
 	@Argument(name="autodelete", clazz=boolean.class, defaultvalue="true", description="Set if proxies should be automatically deleted when not discovered any longer."),
 	@Argument(name="proxydelay", clazz=long.class, defaultvalue="15000", description="The delay used by proxies."),
@@ -105,7 +106,7 @@ import java.util.TimerTask;
 	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 //	@RequiredService(name="clock", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
 	@RequiredService(name="settings", type=ISettingsService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="discovery", type=IDiscoveryService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+	@RequiredService(name="discoveries", type=IDiscoveryService.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_COMPONENT))
 })
 public class AwarenessManagementAgent extends MicroAgent implements IPropertiesProvider, IManagementService
 {
@@ -113,6 +114,9 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	
 	/** The send delay. */
 	protected long delay;
+	
+	/** Flag for enabling fast startup awareness (pingpong send behavior). */
+	protected boolean fast;
 	
 	/** Flag indicating if proxies should be automatically created. */
 	protected boolean autocreate;
@@ -322,7 +326,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	 *  Set the delay.
 	 *  @param delay The delay to set.
 	 */
-	public synchronized void setDelay(long delay)
+	public synchronized void setDelay(final long delay)
 	{
 //		System.out.println("setDelay: "+delay+" "+getComponentIdentifier());
 //		if(this.delay>=0 && delay>0)
@@ -332,7 +336,44 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			this.delay = delay;
 //			startSendBehaviour();
 		}
+		
+		getRequiredServices("discoveries").addResultListener(new IntermediateDefaultResultListener()
+		{
+			public void intermediateResultAvailable(Object result)
+			{
+				IDiscoveryService ds = (IDiscoveryService)result;
+				ds.setDelay(delay);
+			}
+		});
 	}
+	
+
+	/**
+	 *  Set the fast startup awareness flag
+	 */
+	public void setFastAwareness(final boolean fast)
+	{
+		this.fast = fast;
+
+		getRequiredServices("discoveries").addResultListener(new IntermediateDefaultResultListener()
+		{
+			public void intermediateResultAvailable(Object result)
+			{
+				IDiscoveryService ds = (IDiscoveryService)result;
+				ds.setFast(fast);
+			}
+		});
+}
+	
+	/**
+	 *  Get the fast startup awareness flag.
+	 *  @return The fast flag.
+	 */
+	public boolean isFastAwareness()
+	{
+		return this.fast;
+	}
+
 	
 	/**
 	 *  Get the autocreate.
@@ -390,9 +431,9 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			this.includes	= new ArrayList(Arrays.asList(includes));
 		}
 		
-		getRequiredService("discovery").addResultListener(new DefaultResultListener()
+		getRequiredServices("discoveries").addResultListener(new IntermediateDefaultResultListener()
 		{
-			public void resultAvailable(Object result)
+			public void intermediateResultAvailable(Object result)
 			{
 				IDiscoveryService ds = (IDiscoveryService)result;
 				ds.setIncludes(includes);
@@ -411,9 +452,9 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			this.excludes	= new ArrayList(Arrays.asList(excludes));
 		}
 		
-		getRequiredService("discovery").addResultListener(new DefaultResultListener()
+		getRequiredServices("discoveries").addResultListener(new IntermediateDefaultResultListener()
 		{
-			public void resultAvailable(Object result)
+			public void intermediateResultAvailable(Object result)
 			{
 				IDiscoveryService ds = (IDiscoveryService)result;
 				ds.setExcludes(excludes);
@@ -713,7 +754,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 					long delay = props.getLongProperty("delay");
 					if(delay>0)
 						setDelay(delay);
-//					setFastAwareness(props.getProperty("fast")!=null ? props.getBooleanProperty("fast") : true);
+					setFastAwareness(props.getProperty("fast")!=null ? props.getBooleanProperty("fast") : true);
 					setAutoCreateProxy(props.getProperty("autocreate")!=null ? props.getBooleanProperty("autocreate") : true);
 					setAutoDeleteProxy(props.getProperty("autodelete")!=null ? props.getBooleanProperty("autodelete") : true);
 					
@@ -752,7 +793,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 //				props.addProperty(new Property("address", address.getHostAddress()));
 //				props.addProperty(new Property("port", ""+port));
 //				props.addProperty(new Property("delay", ""+delay));
-//				props.addProperty(new Property("fast", ""+fast));
+				props.addProperty(new Property("fast", ""+fast));
 				props.addProperty(new Property("autocreate", ""+autocreate));
 				props.addProperty(new Property("autodelete", ""+autodelete));
 				for(int i=0; i<includes.size(); i++)

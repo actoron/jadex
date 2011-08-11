@@ -1,6 +1,5 @@
 package jadex.bridge.service;
 
-import jadex.bridge.JadexCloner;
 import jadex.bridge.service.annotation.Reference;
 import jadex.commons.IChangeListener;
 import jadex.commons.IRemotable;
