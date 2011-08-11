@@ -482,7 +482,10 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		{
 			try
 			{
-				ret	= (new File(System.getProperty("user.dir"), SUtil.convertPathToRelative(((File)url).getAbsolutePath()))).toURI().toURL();
+				String	abs	= ((File)url).getAbsolutePath();
+				String	rel	= SUtil.convertPathToRelative(abs);
+				ret	= abs.equals(rel) ? new File(abs).toURI().toURL()
+					: new File(System.getProperty("user.dir"), rel).toURI().toURL();
 			}
 			catch (MalformedURLException e)
 			{

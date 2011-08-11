@@ -208,7 +208,12 @@ public class ControlCenterWindow extends JFrame
 					});
 					JPanel	but	= new JPanel(new FlowLayout(FlowLayout.RIGHT));
 					but.add(details);
-					panel.add(new JLabel(message.toString()), BorderLayout.NORTH);
+					JTextArea	msg	= new JTextArea(message.toString());
+					msg.setEditable(false);  
+					msg.setCursor(null);  
+					msg.setOpaque(false);  
+//					msg.setFocusable(false);
+					panel.add(msg, BorderLayout.NORTH);
 					panel.add(but, BorderLayout.SOUTH);
 					message	= panel;
 				}
