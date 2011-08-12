@@ -111,7 +111,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 //						System.out.println("store command: "+callid+" "+getComponentIdentifier());
 
 //					// For debugging.
-					final String orig = (String)content;
+//					final String orig = (String)content;
 
 					if(content instanceof String)
 					{
