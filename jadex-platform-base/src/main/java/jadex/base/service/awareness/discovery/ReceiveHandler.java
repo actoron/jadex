@@ -91,6 +91,7 @@ public abstract class ReceiveHandler
 											public Object execute(IInternalAccess ia)
 											{
 												AwarenessInfo info = (AwarenessInfo)DiscoveryState.decodeObject((byte[])packet[2], agent.getMicroAgent().getModel().getClassLoader());
+//												System.out.println("received info: "+info);
 												handleReceivedPacket((InetAddress)packet[0], ((Integer)packet[1]).intValue(), (byte[])packet[2], info);
 												return null;
 											}

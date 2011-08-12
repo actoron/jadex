@@ -1,9 +1,9 @@
 package jadex.base.service.awareness.discovery;
 
+import jadex.base.service.awareness.AwarenessInfo;
+
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-
-import jadex.base.service.awareness.AwarenessInfo;
 
 /**
  *  Handle sending.

@@ -40,10 +40,12 @@ public class BroadcastReceiveHandler extends MasterSlaveReceiveHandler
 			byte[] data = new byte[pack.getLength()];
 			System.arraycopy(buffer, 0, data, 0, pack.getLength());
 			ret = new Object[]{pack.getAddress(), new Integer(pack.getPort()), data};
+//			System.out.println("received packet: "+pack.getAddress());
 		}
 		catch(Exception e)
 		{
 //			getAgent().getMicroAgent().getLogger().warning("Message receival error: "+e);
+//			e.printStackTrace();
 		}
 		
 		return ret;
