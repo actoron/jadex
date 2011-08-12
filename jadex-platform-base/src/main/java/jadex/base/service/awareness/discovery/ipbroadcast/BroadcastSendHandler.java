@@ -53,13 +53,14 @@ public class BroadcastSendHandler extends MasterSlaveSendHandler
 				// Send to all locals a refresh awareness
 				sendToLocals(data);
 			}
-//			else
-//			{
-//				getAgent().sendToMaster(data);
-//			}
+			else
+			{
+				// In some networks broadcast might be restricted. Send extra message to master if only unicast works.
+				sendToMaster(data);
+			}
 			
 //			System.out.println("sent");
-//			System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");
+//			System.out.println(agent.getMicroAgent().getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)");
 		}
 		catch(Exception e)
 		{
