@@ -11,6 +11,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceInterface;
@@ -212,6 +213,15 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	public Object getService()
 	{
 		return service;
+	}
+	
+	/**
+	 *  Get the domain service.
+	 *  @return The domain service.
+	 */
+	public Object getDomainService()
+	{
+		return service instanceof ServiceInfo? ((ServiceInfo)service).getDomainService(): service;
 	}
 
 	/**

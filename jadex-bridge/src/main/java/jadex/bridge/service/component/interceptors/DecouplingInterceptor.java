@@ -100,7 +100,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		// Perform argument copy
 		
 		// In case of remote call parameters are copied as part of marshalling.
-		if(copy && !sic.isRemoteCall())
+		if(copy && !SServiceProvider.isRemoteObject(sic.getObject()))
 		{
 			Method method = sic.getMethod();
 			boolean[] refs = SServiceProvider.getLocalReferenceInfo(method, !copy);

@@ -1,6 +1,7 @@
 package jadex.bridge.service;
 
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.IChangeListener;
 import jadex.commons.IRemotable;
 import jadex.commons.IRemoteChangeListener;
@@ -16,6 +17,7 @@ import jadex.commons.future.IntermediateFuture;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -767,6 +769,34 @@ public class SServiceProvider
 		if(ref!=null)
 			ret = ref.remote();
 		return ret;
+	}
+	
+	/**
+	 *  Test if a call is remote.
+	 *  @param sic The service invocation context.
+	 */
+	public static boolean isRemoteObject(Object target)
+	{
+		boolean ret = false;
+		if(Proxy.isProxyClass(target.getClass()))
+		{
+			Object handler = Proxy.getInvocationHandler(target);
+			if(handler instanceof BasicServiceInvocationHandler)
+			{
+				BasicServiceInvocationHandler bsh = (BasicServiceInvocationHandler)handler;
+				return isRemoteObject(bsh.getDomainService());
+			}
+			else 
+			{
+				// todo: remove string based remote check! RemoteMethodInvocationHandler is in package jadex.base.service.remote
+				ret = Proxy.getInvocationHandler(target).getClass().getName().indexOf("Remote")!=-1;
+			}
+		}
+		return ret;
+//		Object target = getObject();
+//		if(Proxy.isProxyClass(target.getClass()))
+//			System.out.println("blubb "+Proxy.getInvocationHandler(target).getClass().getName());
+//		return Proxy.isProxyClass(target.getClass()) && Proxy.getInvocationHandler(target).getClass().getName().indexOf("Remote")!=-1;
 	}
 	
 //	/**

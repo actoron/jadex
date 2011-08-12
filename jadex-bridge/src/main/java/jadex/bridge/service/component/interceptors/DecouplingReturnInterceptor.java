@@ -2,6 +2,7 @@ package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.component.ComponentFuture;
 import jadex.bridge.service.component.ComponentIntermediateFuture;
@@ -65,14 +66,14 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 				{
 					Method method = sic.getMethod();
 					Reference ref = method.getAnnotation(Reference.class);
-					boolean copy = !sic.isRemoteCall() && (ref!=null? !ref.local(): true);
+					boolean copy = !SServiceProvider.isRemoteObject(sic.getObject()) && (ref!=null? !ref.local(): true);
 					sic.setResult(new ComponentIntermediateFuture(ea, adapter, (IFuture)res, copy));
 				}
 				else if(res instanceof IFuture)
 				{
 					Method method = sic.getMethod();
 					Reference ref = method.getAnnotation(Reference.class);
-					boolean copy = !sic.isRemoteCall() && (ref!=null? !ref.local(): true);
+					boolean copy = !SServiceProvider.isRemoteObject(sic.getObject()) && (ref!=null? !ref.local(): true);
 					sic.setResult(new ComponentFuture(ea, adapter, (IFuture)res, copy));
 				}
 				super.customResultAvailable(null);

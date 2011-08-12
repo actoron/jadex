@@ -32,6 +32,9 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	/** The falg if result is declared as reference. */
 	protected boolean isref;
 	
+	/** The method name. For debugging. */
+	protected String methodname;
+	
 	//-------- constructors --------
 	
 	/**
@@ -46,14 +49,20 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	 */
 	public RemoteResultCommand(Object result, Exception exception, String callid, boolean isref)
 	{
+		this(result, exception, callid, isref, null);
+	}
+	
+	/**
+	 *  Create a new remote result command.
+	 */
+	public RemoteResultCommand(Object result, Exception exception, String callid, boolean isref, String methodname)
+	{
 //		System.out.println("result command: "+result+" "+callid);
 		this.result = result;
 		this.exceptioninfo = exception!=null? new ExceptionInfo(exception): null;
 		this.callid = callid;
 		this.isref = isref;
-		
-		if(isref)
-			System.out.println("hhhhu");
+		this.methodname = methodname;
 	}
 	
 	//-------- methods --------
@@ -167,6 +176,23 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	{
 		this.callid = callid;
 	}
-	
+
+	/**
+	 *  Get the methodname.
+	 *  @return the methodname.
+	 */
+	public String getMethodName()
+	{
+		return methodname;
+	}
+
+	/**
+	 *  Set the methodname.
+	 *  @param methodname The methodname to set.
+	 */
+	public void setMethodName(String methodname)
+	{
+		this.methodname = methodname;
+	}
 	
 }

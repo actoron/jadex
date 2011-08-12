@@ -276,18 +276,18 @@ public class ServiceInvocationContext
 //		return !Proxy.isProxyClass(getObject().getClass());
 //	}
 	
-	/**
-	 *  Test if a call is remote.
-	 *  @param sic The service invocation context.
-	 */
-	public boolean isRemoteCall()
-	{
-		Object target = getObject();
-//		if(Proxy.isProxyClass(target.getClass()))
-//			System.out.println("blubb "+Proxy.getInvocationHandler(target).getClass().getName());
-		// todo: remove string based remote check! RemoteMethodInvocationHandler is in package jadex.base.service.remote
-		return Proxy.isProxyClass(target.getClass()) && Proxy.getInvocationHandler(target).getClass().getName().indexOf("Remote")!=-1;
-	}
+//	/**
+//	 *  Test if a call is remote.
+//	 *  @param sic The service invocation context.
+//	 */
+//	public boolean isRemoteCall()
+//	{
+//		Object target = getObject();
+////		if(Proxy.isProxyClass(target.getClass()))
+////			System.out.println("blubb "+Proxy.getInvocationHandler(target).getClass().getName());
+//		// todo: remove string based remote check! RemoteMethodInvocationHandler is in package jadex.base.service.remote
+//		return Proxy.isProxyClass(target.getClass()) && Proxy.getInvocationHandler(target).getClass().getName().indexOf("Remote")!=-1;
+//	}
 	
 //	/**
 //	 * 

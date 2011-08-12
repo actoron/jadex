@@ -115,7 +115,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			public void exceptionOccurred(Exception exception)
 			{
 				ret.setResult(new RemoteResultCommand(null, new RuntimeException(
-					"Target object not found: "+getRemoteReference()), callid, false));
+					"Target object not found: "+getRemoteReference()), callid, false, methodname));
 			}
 		});
 		
@@ -225,18 +225,18 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 				{
 					public void resultAvailable(Object result)
 					{
-						ret.setResult(new RemoteResultCommand(result, null, callid, returnisref));
+						ret.setResult(new RemoteResultCommand(result, null, callid, returnisref, methodname));
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						ret.setResult(new RemoteResultCommand(null, exception, callid, false));
+						ret.setResult(new RemoteResultCommand(null, exception, callid, false, methodname));
 					}
 				});
 			}
 			else
 			{
-				ret.setResult(new RemoteResultCommand(res, null, callid, returnisref));
+				ret.setResult(new RemoteResultCommand(res, null, callid, returnisref, methodname));
 			}
 		}
 		catch(Exception exception)
@@ -246,7 +246,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			{
 				exception	= (Exception)((InvocationTargetException)exception).getTargetException();
 			}
-			ret.setResult(new RemoteResultCommand(null, exception, callid, false));
+			ret.setResult(new RemoteResultCommand(null, exception, callid, false, methodname));
 		}
 	}
 	

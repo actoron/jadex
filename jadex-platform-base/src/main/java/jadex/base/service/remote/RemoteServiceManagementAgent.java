@@ -11,6 +11,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.library.ILibraryService;
+import jadex.commons.IResultCommand;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -106,14 +107,14 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					
 //					System.out.println("received: "+callid);
 					
-//					if(((String)content).indexOf("DiscoveryInfo")!=-1)
-//						System.out.println("DiscoveryInfo: "+callid);
-					
+//					if(((String)content).indexOf("store")!=-1)
+//						System.out.println("store command: "+callid+" "+getComponentIdentifier());
+
+//					// For debugging.
+					final String orig = (String)content;
+
 					if(content instanceof String)
 					{
-//						// For debugging.
-//						String orig = (String)content;
-						
 						// Catch decode problems.
 						// Should be ignored or be a warning.
 						try
@@ -155,11 +156,15 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					{
 						final IRemoteCommand com = (IRemoteCommand)content;
 						
+//						if(content instanceof RemoteResultCommand && ((RemoteResultCommand)content).getMethodName()!=null && ((RemoteResultCommand)content).getMethodName().indexOf("store")!=-1)
+//							System.out.println("result of command1: "+com+" "+result);
+						
 						com.execute((IMicroExternalAccess)getExternalAccess(), rms).addResultListener(createResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
-		//						System.out.println("result of command: "+com+" "+result);
+//								if(((String)orig).indexOf("store")!=-1)
+//									System.out.println("result of command2: "+com+" "+result);
 								if(result!=null)
 								{
 									final Object repcontent = result;

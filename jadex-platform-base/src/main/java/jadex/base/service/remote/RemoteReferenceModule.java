@@ -18,6 +18,8 @@ import jadex.bridge.service.annotation.Replacement;
 import jadex.bridge.service.annotation.Synchronous;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.annotation.Uncached;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -517,40 +519,75 @@ public class RemoteReferenceModule
 	 */
 	protected RemoteReference getRemoteReference(Object target)
 	{
+		return getRemoteReference(target, target);
+	}
+	
+	/**
+	 *  Get a remote reference.
+	 *  @param target The (local) remote object.
+	 */
+	protected RemoteReference getRemoteReference(Object target, Object orig)
+	{
 		checkThread();
 		RemoteReference ret = (RemoteReference)remoterefs.get(target);
 		
 		// Create a remote reference if not yet available.
 		if(ret==null)
 		{
-			if(Proxy.isProxyClass(target.getClass()) && Proxy.getInvocationHandler(target) instanceof RemoteMethodInvocationHandler)
+			if(Proxy.isProxyClass(target.getClass()))
 			{
-				RemoteMethodInvocationHandler	rmih	= (RemoteMethodInvocationHandler)Proxy.getInvocationHandler(target);
-				ret	= rmih.pr.getRemoteReference();
+				Object handler = Proxy.getInvocationHandler(target);
+				if(handler instanceof BasicServiceInvocationHandler)
+				{
+					BasicServiceInvocationHandler bsh = (BasicServiceInvocationHandler)handler;
+					return getRemoteReference(bsh.getService(), orig);
+				}
+				else if(handler instanceof RemoteMethodInvocationHandler)
+				{
+					RemoteMethodInvocationHandler	rmih	= (RemoteMethodInvocationHandler)Proxy.getInvocationHandler(target);
+					ret	= rmih.pr.getRemoteReference();
+				}
 			}
 			else if(target instanceof IExternalAccess)
 			{
 				ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((IExternalAccess)target).getComponentIdentifier());
-				remoterefs.put(target, ret);
-				targetcomps.put(ret, target);
+				remoterefs.put(orig, ret);
+				targetcomps.put(ret, orig);
 //				System.out.println("component ref: "+ret);
 			}
 			else if(target instanceof IService)
 			{
 				ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((IService)target).getServiceIdentifier());
-				remoterefs.put(target, ret);
-				targetcomps.put(ret, target);
+				remoterefs.put(orig, ret);
+				targetcomps.put(ret, orig);
 //				System.out.println("service ref: "+ret);
+			}
+			else if(target instanceof ServiceInfo)
+			{
+				ServiceInfo si = (ServiceInfo)target;
+				if(Proxy.isProxyClass(si.getDomainService().getClass()))
+				{
+					return getRemoteReference(si.getDomainService(), orig);
+				}
+				else
+				{
+					ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((ServiceInfo)target).getManagementService().getServiceIdentifier());
+					remoterefs.put(orig, ret);
+					targetcomps.put(ret, orig);
+	//				System.out.println("service ref: "+ret);
+				}
 			}
 			else
 			{
 				ret = generateRemoteReference();
 //				System.out.println("Adding rr: "+ret+" "+target);
-				remoterefs.put(target, ret);
-				targetobjects.put(ret, target);
+				remoterefs.put(orig, ret);
+				targetobjects.put(ret, orig);
 			}
 		}
 
+//		System.out.println("rr: "+target+" "+ret);
+		
 		return ret;
 	}
 	
@@ -747,6 +784,8 @@ public class RemoteReferenceModule
 //				}
 //			}
 		}
+		
+//		System.out.println("resolved proxy ref to: "+ret+" "+pr.getRemoteReference());
 		
 		return ret;
 	}
