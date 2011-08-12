@@ -161,23 +161,27 @@ public class AbstractInfo
 	{
 		public int compare(Object arg0, Object arg1)
 		{
-			AbstractInfo m1 = (AbstractInfo)arg0;
-			AbstractInfo m2 = (AbstractInfo)arg1;
-			int ret = m2.getXMLPathDepth() - m1.getXMLPathDepth();
-			if(ret==0)
-				ret = m1.getXMLPath()!=null && m2.getXMLPath()==null? 1:
-					m1.getXMLPath()==null && m2.getXMLPath()!=null? -1:
-					m1.getXMLPath()!=null && m2.getXMLPath()!=null? 
-					m2.getXMLPath().length() - m1.getXMLPath().length()!=0?
-					m2.getXMLPath().length() - m1.getXMLPath().length():
-					m2.getXMLPath().compareTo(m1.getXMLPath()): 0;
-			if(ret==0)
-				ret = m1.getFilter()!=null && m2.getFilter()==null? 1: 
-					m1.getFilter()==null && m2.getFilter()!=null? -1: 
-					m1.getFilter()!=null && m2.getFilter()!=null? m2.getId()-m1.getId()
-					: 0;
-			if(ret==0)
-				throw new RuntimeException("Info should differ: "+m1+" "+m2);
+			int	ret	= 0;
+			if(arg0!=arg1)
+			{
+				AbstractInfo m1 = (AbstractInfo)arg0;
+				AbstractInfo m2 = (AbstractInfo)arg1;
+				ret = m2.getXMLPathDepth() - m1.getXMLPathDepth();
+				if(ret==0)
+					ret = m1.getXMLPath()!=null && m2.getXMLPath()==null? 1:
+						m1.getXMLPath()==null && m2.getXMLPath()!=null? -1:
+						m1.getXMLPath()!=null && m2.getXMLPath()!=null? 
+						m2.getXMLPath().length() - m1.getXMLPath().length()!=0?
+						m2.getXMLPath().length() - m1.getXMLPath().length():
+						m2.getXMLPath().compareTo(m1.getXMLPath()): 0;
+				if(ret==0)
+					ret = m1.getFilter()!=null && m2.getFilter()==null? 1: 
+						m1.getFilter()==null && m2.getFilter()!=null? -1: 
+						m1.getFilter()!=null && m2.getFilter()!=null? m2.getId()-m1.getId()
+						: 0;
+				if(ret==0)
+					throw new RuntimeException("Info should differ: "+m1+" "+m2);
+			}
 			return ret;
 		}
 	}
