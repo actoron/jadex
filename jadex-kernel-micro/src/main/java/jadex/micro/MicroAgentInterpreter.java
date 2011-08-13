@@ -17,6 +17,7 @@ import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.clock.ITimer;
 import jadex.commons.SReflect;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -26,6 +27,7 @@ import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.AbstractInterpreter;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.AgentService;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -73,7 +75,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		
 		try
 		{
-			Object agent = microclass.newInstance();
+			final Object agent = microclass.newInstance();
 			if(agent instanceof MicroAgent)
 			{
 				this.microagent = (MicroAgent)agent;
@@ -108,9 +110,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					aclass = aclass.getSuperclass();
 				}
 			}
-						
+
 			this.container = createMyServiceContainer(args);
-			
+						
 			addStep((new Object[]{new IComponentStep()
 			{
 				public Object execute(IInternalAccess ia)
@@ -120,14 +122,20 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					{
 						public void customResultAvailable(Object result)
 						{
-							// Call user code init.
-							microagent.agentCreated().addResultListener(new DelegationResultListener(inited)
+							injectServices(agent).addResultListener(new DelegationResultListener(inited)
 							{
 								public void customResultAvailable(Object result)
 								{
-//									System.out.println("initend: "+getComponentAdapter().getComponentIdentifier());
-									// Init is now finished. Notify cms.
-									inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
+									// Call user code init.
+									microagent.agentCreated().addResultListener(new DelegationResultListener(inited)
+									{
+										public void customResultAvailable(Object result)
+										{
+//											System.out.println("initend: "+getComponentAdapter().getComponentIdentifier());
+											// Init is now finished. Notify cms.
+											inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
+										}
+									});
 								}
 							});
 						}
@@ -149,6 +157,63 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				throw new RuntimeException(e);
 			}
 		}
+	}
+	
+	/**
+	 *  Inject the services to the annotated fields.
+	 */
+	protected IFuture injectServices(final Object agent)
+	{
+		Future ret = new Future();
+		// Inject services for annotated field
+		
+		List allfields = new ArrayList();
+		Class microclass = agent.getClass();
+		while(!Object.class.equals(microclass) && !MicroAgent.class.equals(microclass))
+		{
+			Field[] fields = microclass.getDeclaredFields();
+			for(int i=0; i<fields.length; i++)
+			{
+				allfields.add(fields[i]);
+			}
+			microclass = microclass.getSuperclass();
+		}
+			
+		CounterResultListener lis = new CounterResultListener(allfields.size(), new DelegationResultListener(ret));
+		for(int i=0; i<allfields.size(); i++)
+		{
+			final Future fut = new Future();
+			fut.addResultListener(lis);
+			final Field field = (Field)allfields.get(i);
+			if(field.isAnnotationPresent(AgentService.class))
+			{
+				AgentService as = (AgentService)field.getAnnotation(AgentService.class);
+				String name = as.name().length()>0? as.name(): field.getName();
+				getServiceContainer().getRequiredService(name).addResultListener(new DelegationResultListener(fut)
+				{
+					public void customResultAvailable(Object result)
+					{
+						try
+						{
+							field.setAccessible(true);
+							field.set(agent, result);
+							fut.setResult(null);
+						}
+						catch(Exception e)
+						{
+							getLogger().warning("Field injection failed: "+e);
+							fut.setException(e);
+						}	
+					}
+				});
+			}
+			else
+			{
+				fut.setResult(null);
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**
