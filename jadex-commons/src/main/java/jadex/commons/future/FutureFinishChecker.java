@@ -1,5 +1,7 @@
 package jadex.commons.future;
 
+import jadex.commons.DebugException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -80,8 +82,7 @@ public class FutureFinishChecker
 	{
 		synchronized(this)
 		{
-			finishedex	= new RuntimeException("finished called: "+this);
-			finishedex.fillInStackTrace();
+			finishedex	= new DebugException("finished called: "+this);
 			finished = true;
 		}
 		check();

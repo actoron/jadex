@@ -175,15 +175,22 @@ public class SettingsService extends BasicService implements ISettingsService
 		{
 			IPropertiesProvider	provider	= (IPropertiesProvider)providers.remove(id);
 //			System.out.println("Removed provider: "+id+", "+provider);
-			provider.getProperties().addResultListener(access.createResultListener(new DelegationResultListener(ret)
+			if(saveonexit)
 			{
-				public void customResultAvailable(Object result)
+				provider.getProperties().addResultListener(access.createResultListener(new DelegationResultListener(ret)
 				{
-					props.removeSubproperties(id);
-					props.addSubproperties(id, (Properties)result);
-					ret.setResult(null);
-				}
-			}));
+					public void customResultAvailable(Object result)
+					{
+						props.removeSubproperties(id);
+						props.addSubproperties(id, (Properties)result);
+						ret.setResult(null);
+					}
+				}));
+			}
+			else
+			{
+				ret.setResult(null);
+			}
 		}
 		return ret;
 	}

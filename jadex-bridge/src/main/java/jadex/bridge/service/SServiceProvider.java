@@ -592,14 +592,16 @@ public class SServiceProvider
 		{
 			ret	= localmanager;
 		}
-		else if(multiple)
+		else if(multiple || RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 		{
 			ret	= parallelmanager;
 		}
 		else
 		{
 			// Todo: use parallel also for single searches?
+			// Very inefficient for basic platform services :-(
 			ret	= sequentialmanager;
+//			ret	= parallelmanager;
 		}
 		
 		return ret;

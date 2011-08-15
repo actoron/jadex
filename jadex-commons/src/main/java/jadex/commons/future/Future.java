@@ -1,6 +1,8 @@
 package jadex.commons.future;
 
 
+import jadex.commons.DebugException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -194,8 +196,7 @@ public class Future implements IFuture
         	}
         	else if(DEBUG)
         	{
-        		first	= new RuntimeException("first setException()");
-        		first.fillInStackTrace();
+        		first	= new DebugException("first setException()");
         	}
         	
 //        	System.out.println(this+" setResult: "+result);
@@ -257,8 +258,7 @@ public class Future implements IFuture
         	}
         	else if(DEBUG)
         	{
-        		first	= new RuntimeException("first setResult()");
-        		first.fillInStackTrace();
+        		first	= new DebugException("first setResult()");
         	}
         	
 //        	System.out.println(this+" setResult: "+result);

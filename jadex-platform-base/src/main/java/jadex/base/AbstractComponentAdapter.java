@@ -644,8 +644,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //			rte.printStackTrace();
 			new RuntimeException("executing: "+getComponentIdentifier()).printStackTrace();
 		}
-//		rte	= new RuntimeException("executing: "+getComponentIdentifier());
-//		rte.fillInStackTrace();
+//		rte	= new DebugException("executing: "+getComponentIdentifier());
 		executing	= true;
 		wokenup	= false;	
 		

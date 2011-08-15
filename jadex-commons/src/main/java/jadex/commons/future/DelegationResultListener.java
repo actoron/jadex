@@ -1,5 +1,7 @@
 package jadex.commons.future;
 
+import jadex.commons.DebugException;
+
 
 /**
  *  Result listener that delegates calls to a future.
@@ -11,7 +13,7 @@ public class DelegationResultListener implements IResultListener
 	/** The future to which calls are delegated. */
 	protected Future future;
 	
-	protected Exception	ex;
+//	protected DebugException	ex;
 	
 	//-------- constructors --------
 	
@@ -21,8 +23,7 @@ public class DelegationResultListener implements IResultListener
 	public DelegationResultListener(Future future)
 	{
 		this.future = future;
-		this.ex	= new Exception();
-		ex.fillInStackTrace();
+//		this.ex	= new DebugException();
 	}
 	
 	//-------- methods --------
