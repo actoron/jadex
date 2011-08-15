@@ -285,9 +285,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		try
 		{
 			// todo: is model info ok also in remote case?
-			CacheableKernelModel mm = loader.loadComponentModel(model.getFilename(), null, model.getClassLoader());
+			MicroModel mm = loader.loadComponentModel(model.getFilename(), null, model.getClassLoader());
 	
-			MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, mm.getModelInfo(), getMicroAgentClass(model.getFullName()+"Agent", 
+			MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+"Agent", 
 				null, model.getClassLoader()), arguments, config, parent, binding, copy, ret);
 			return new Future(new Object[]{mai, mai.getAgentAdapter()});
 		}

@@ -18,6 +18,8 @@ import jadex.commons.SReflect;
 import jadex.javaparser.SJavaParser;
 import jadex.kernelbase.CacheableKernelModel;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -39,6 +41,7 @@ import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.annotation.Value;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,7 +59,7 @@ public class MicroClassReader
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public CacheableKernelModel read(String model, String[] imports, ClassLoader classloader)
+	public MicroModel read(String model, String[] imports, ClassLoader classloader)
 	{
 //		System.out.println("loading micro: "+model);
 		String clname = model;
@@ -75,10 +78,10 @@ public class MicroClassReader
 	/**
 	 *  Load the model.
 	 */
-	protected CacheableKernelModel read(String model, Class cma, ClassLoader classloader)
+	protected MicroModel read(String model, Class cma, ClassLoader classloader)
 	{
 		ModelInfo modelinfo = new ModelInfo();
-		CacheableKernelModel ret = new CacheableKernelModel(modelinfo);
+		MicroModel ret = new MicroModel(modelinfo);
 		
 		String name = SReflect.getUnqualifiedClassName(cma);
 		if(name.endsWith("Agent"))
@@ -169,7 +172,7 @@ public class MicroClassReader
 	/**
 	 *  Fill the model details using annotation.
 	 */
-	protected void fillMicroModelFromAnnotations(CacheableKernelModel micromodel, String model, Class cma, ClassLoader classloader)
+	protected void fillMicroModelFromAnnotations(MicroModel micromodel, String model, Class cma, ClassLoader classloader)
 	{
 		ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
 		
@@ -416,6 +419,33 @@ public class MicroClassReader
 			GuiClassName gui = (GuiClassName)cma.getAnnotation(GuiClassName.class);
 			String clazzname = gui.value();
 			modelinfo.addProperty("componentviewer.viewerclass", clazzname);
+		}
+		
+		// Find injection targets by reflection (agent, arguments, services)
+		Class microclass = cma;
+		while(!Object.class.equals(microclass) && !MicroAgent.class.equals(microclass))
+		{
+			Field[] fields = microclass.getDeclaredFields();
+			for(int i=0; i<fields.length; i++)
+			{
+				if(fields[i].isAnnotationPresent(Agent.class))
+				{
+					micromodel.addAgentInjection(fields[i]);
+				}
+				else if(fields[i].isAnnotationPresent(AgentArgument.class))
+				{
+					AgentArgument arg = (AgentArgument)fields[i].getAnnotation(AgentArgument.class);
+					String name = arg.value().length()>0? arg.value(): fields[i].getName();
+					micromodel.addArgumentInjection(name, fields[i]);
+				}
+				else if(fields[i].isAnnotationPresent(AgentService.class))
+				{
+					AgentService ser = (AgentService)fields[i].getAnnotation(AgentService.class);
+					String name = ser.name().length()>0? ser.name(): fields[i].getName();
+					micromodel.addServiceInjection(name, fields[i]);
+				}
+			}
+			microclass = microclass.getSuperclass();
 		}
 	}
 	

@@ -33,7 +33,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -68,10 +70,10 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 *  @param microagent The microagent.
 	 */
 	public MicroAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
-		final IModelInfo model, Class microclass, final Map args, final String config, 
+		final MicroModel model, Class microclass, final Map args, final String config, 
 		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, final Future inited)
 	{
-		super(desc, model, config, factory, parent, bindings, copy, inited);
+		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, inited);
 		
 		try
 		{
@@ -86,28 +88,22 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				PojoMicroAgent magent = new PojoMicroAgent();
 				magent.init(MicroAgentInterpreter.this, agent);
 				this.microagent = magent;
-				boolean found = false;
-				Class aclass = microclass;
-				while(!Object.class.equals(aclass) && !found)
+
+				Field[] fields = model.getAgentInjections();
+				for(int i=0; i<fields.length; i++)
 				{
-					Field[] fields = aclass.getDeclaredFields();
-					for(int i=0; i<fields.length; i++)
+					if(fields[i].isAnnotationPresent(Agent.class))
 					{
-						if(fields[i].isAnnotationPresent(Agent.class))
+						try
 						{
-							try
-							{
-								fields[i].setAccessible(true);
-								fields[i].set(agent, microagent);
-								found = true;
-							}
-							catch(Exception e)
-							{
-								getLogger().warning("Agent injection failed: "+e);
-							}
+							fields[i].setAccessible(true);
+							fields[i].set(agent, microagent);
+						}
+						catch(Exception e)
+						{
+							getLogger().warning("Agent injection failed: "+e);
 						}
 					}
-					aclass = aclass.getSuperclass();
 				}
 			}
 
@@ -117,23 +113,29 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			{
 				public Object execute(IInternalAccess ia)
 				{
-					init(model, MicroAgentInterpreter.this.config, args)
+					init(model.getModelInfo(), MicroAgentInterpreter.this.config, args)
 						.addResultListener(createResultListener(new DelegationResultListener(inited)
 					{
 						public void customResultAvailable(Object result)
 						{
-							injectServices(agent).addResultListener(new DelegationResultListener(inited)
+							injectArguments(agent, model).addResultListener(new DelegationResultListener(inited)
 							{
 								public void customResultAvailable(Object result)
 								{
-									// Call user code init.
-									microagent.agentCreated().addResultListener(new DelegationResultListener(inited)
+									injectServices(agent, model).addResultListener(new DelegationResultListener(inited)
 									{
 										public void customResultAvailable(Object result)
 										{
-//											System.out.println("initend: "+getComponentAdapter().getComponentIdentifier());
-											// Init is now finished. Notify cms.
-											inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
+											// Call user code init.
+											microagent.agentCreated().addResultListener(new DelegationResultListener(inited)
+											{
+												public void customResultAvailable(Object result)
+												{
+		//											System.out.println("initend: "+getComponentAdapter().getComponentIdentifier());
+													// Init is now finished. Notify cms.
+													inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
+												}
+											});
 										}
 									});
 								}
@@ -160,43 +162,71 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	}
 	
 	/**
-	 *  Inject the services to the annotated fields.
+	 *  Inject the arguments to the annotated fields.
 	 */
-	protected IFuture injectServices(final Object agent)
+	protected IFuture injectArguments(final Object agent, final MicroModel model)
 	{
 		Future ret = new Future();
-		// Inject services for annotated field
-		
-		List allfields = new ArrayList();
-		Class microclass = agent.getClass();
-		while(!Object.class.equals(microclass) && !MicroAgent.class.equals(microclass))
+
+		String[] names = model.getArgumentInjectionNames();
+		if(names.length>0)
 		{
-			Field[] fields = microclass.getDeclaredFields();
-			for(int i=0; i<fields.length; i++)
+			for(int i=0; i<names.length; i++)
 			{
-				allfields.add(fields[i]);
+				Object val = getArguments().get(names[i]);
+				final Field[] fields = model.getServiceInjections(names[i]);
+				
+				try
+				{
+					for(int j=0; j<fields.length; j++)
+					{
+						fields[j].setAccessible(true);
+						fields[j].set(agent, val);
+					}
+				}
+				catch(Exception e)
+				{
+					getLogger().warning("Field injection failed: "+e);
+					ret.setException(e);
+				}	
 			}
-			microclass = microclass.getSuperclass();
 		}
-			
-		CounterResultListener lis = new CounterResultListener(allfields.size(), new DelegationResultListener(ret));
-		for(int i=0; i<allfields.size(); i++)
+		
+		if(!ret.isDone())
+			ret.setResult(null);
+		
+		return ret;
+	}
+	
+	/**
+	 *  Inject the services to the annotated fields.
+	 */
+	protected IFuture injectServices(final Object agent, final MicroModel model)
+	{
+		Future ret = new Future();
+
+		String[] sernames = model.getServiceInjectionNames();
+		
+		if(sernames.length>0)
 		{
-			final Future fut = new Future();
-			fut.addResultListener(lis);
-			final Field field = (Field)allfields.get(i);
-			if(field.isAnnotationPresent(AgentService.class))
+			CounterResultListener lis = new CounterResultListener(sernames.length, new DelegationResultListener(ret));
+	
+			for(int i=0; i<sernames.length; i++)
 			{
-				AgentService as = (AgentService)field.getAnnotation(AgentService.class);
-				String name = as.name().length()>0? as.name(): field.getName();
-				getServiceContainer().getRequiredService(name).addResultListener(new DelegationResultListener(fut)
+				final Field[] fields = model.getServiceInjections(sernames[i]);
+				final Future fut = new Future();
+				fut.addResultListener(lis);
+				getServiceContainer().getRequiredService(sernames[i]).addResultListener(new DelegationResultListener(fut)
 				{
 					public void customResultAvailable(Object result)
 					{
 						try
 						{
-							field.setAccessible(true);
-							field.set(agent, result);
+							for(int j=0; j<fields.length; j++)
+							{
+								fields[j].setAccessible(true);
+								fields[j].set(agent, result);
+							}
 							fut.setResult(null);
 						}
 						catch(Exception e)
@@ -207,10 +237,10 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					}
 				});
 			}
-			else
-			{
-				fut.setResult(null);
-			}
+		}
+		else
+		{
+			ret.setResult(null);
 		}
 		
 		return ret;
@@ -237,74 +267,74 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		});
 	}
 	
-	/**
-	 *  Override to set value also in fields.
-	 *  @param name The name.
-	 *  @param value The value.
-	 */
-	public boolean addArgument(String name, Object value)
-	{
-		boolean ret = super.addArgument(name, value);
-	
-		if(ret && value!=null)
-		{
-			Object agent = microagent instanceof PojoMicroAgent? ((PojoMicroAgent)microagent).getPojoAgent(): microagent;
-			
-			boolean found = false;
-			Class microclass = agent.getClass();
-			
-			while(!Object.class.equals(microclass) && !MicroAgent.class.equals(microclass) && !found)
-			{
-				Field[] fields = microclass.getDeclaredFields();
-				for(int i=0; i<fields.length && !found; i++)
-				{
-					if(fields[i].isAnnotationPresent(AgentArgument.class))
-					{
-						AgentArgument aa = (AgentArgument)fields[i].getAnnotation(AgentArgument.class);
-						String aname = aa.value().length()==0? fields[i].getName(): aa.value();
-						if(aname.equals(name))
-						{
-							String ce = aa.convert();
-							if(ce.length()>0)
-							{
-								SimpleValueFetcher fetcher = new SimpleValueFetcher(getFetcher());
-								fetcher.setValue("$value", value);
-								try
-								{
-									value = SJavaParser.evaluateExpression(ce, getModel().getAllImports(), fetcher, getModel().getClassLoader());
-								}
-								catch(Exception e)
-								{
-									getLogger().warning("Argument conversion failed: "+e);
-								}
-							}
-							if(SReflect.isSupertype(fields[i].getType(), value.getClass()))
-							{
-								try
-								{
-									fields[i].setAccessible(true);
-									fields[i].set(agent, value);
-									found = true;
-//									System.out.println("set: "+agent+" "+fields[i].getName()+" "+value);
-								}
-								catch(Exception e)
-								{
-									getLogger().warning("Argument injection failed: "+e);
-								}
-							}
-							else
-							{
-								getLogger().warning("Wrong argument type: "+fields[i].getType()+" "+value.getClass());
-							}
-						}
-					}
-				}
-				microclass = microclass.getSuperclass();
-			}
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Override to set value also in fields.
+//	 *  @param name The name.
+//	 *  @param value The value.
+//	 */
+//	public boolean addArgument(String name, Object value)
+//	{
+//		boolean ret = super.addArgument(name, value);
+//	
+//		if(ret && value!=null)
+//		{
+//			Object agent = microagent instanceof PojoMicroAgent? ((PojoMicroAgent)microagent).getPojoAgent(): microagent;
+//			
+//			boolean found = false;
+//			Class microclass = agent.getClass();
+//			
+//			while(!Object.class.equals(microclass) && !MicroAgent.class.equals(microclass) && !found)
+//			{
+//				Field[] fields = microclass.getDeclaredFields();
+//				for(int i=0; i<fields.length && !found; i++)
+//				{
+//					if(fields[i].isAnnotationPresent(AgentArgument.class))
+//					{
+//						AgentArgument aa = (AgentArgument)fields[i].getAnnotation(AgentArgument.class);
+//						String aname = aa.value().length()==0? fields[i].getName(): aa.value();
+//						if(aname.equals(name))
+//						{
+//							String ce = aa.convert();
+//							if(ce.length()>0)
+//							{
+//								SimpleValueFetcher fetcher = new SimpleValueFetcher(getFetcher());
+//								fetcher.setValue("$value", value);
+//								try
+//								{
+//									value = SJavaParser.evaluateExpression(ce, getModel().getAllImports(), fetcher, getModel().getClassLoader());
+//								}
+//								catch(Exception e)
+//								{
+//									getLogger().warning("Argument conversion failed: "+e);
+//								}
+//							}
+//							if(SReflect.isSupertype(fields[i].getType(), value.getClass()))
+//							{
+//								try
+//								{
+//									fields[i].setAccessible(true);
+//									fields[i].set(agent, value);
+//									found = true;
+////									System.out.println("set: "+agent+" "+fields[i].getName()+" "+value);
+//								}
+//								catch(Exception e)
+//								{
+//									getLogger().warning("Argument injection failed: "+e);
+//								}
+//							}
+//							else
+//							{
+//								getLogger().warning("Wrong argument type: "+fields[i].getType()+" "+value.getClass());
+//							}
+//						}
+//					}
+//				}
+//				microclass = microclass.getSuperclass();
+//			}
+//		}
+//		
+//		return ret;
+//	}
 	
 	//-------- IKernelAgent interface --------
 	

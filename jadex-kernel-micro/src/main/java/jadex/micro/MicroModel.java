@@ -1,72 +1,120 @@
 package jadex.micro;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.commons.ICacheableModel;
+import jadex.commons.SUtil;
+import jadex.commons.collection.MultiCollection;
+import jadex.kernelbase.CacheableKernelModel;
 
 /**
  * 
  */
-public class MicroModel implements ICacheableModel
+public class MicroModel extends CacheableKernelModel
 {
-	/** The last modified date. */
-	protected long lastmodified;
-	
-	/** The last check date. */
-	protected long lastchecked;
+	/** The agent injection targets. */
+	protected List agentinjections;
 
-	/** The model info. */
-	protected IModelInfo modelinfo;
+	/** The argument injection targets. */
+	protected Map argumentinjections;
+
+	/** The service injection targets. */
+	protected Map serviceinjections;
+
 	
 	/**
-	 * 
+	 *  Create a new model.
 	 */
 	public MicroModel(IModelInfo modelinfo)
 	{
-		this.modelinfo = modelinfo;
+		super(modelinfo);
+	}
+
+	/**
+	 *  Add an injection field.
+	 *  @param field The field. 
+	 */
+	public void addAgentInjection(Field field)
+	{
+		if(agentinjections==null)
+			agentinjections = new ArrayList();
+		agentinjections.add(field);
 	}
 	
 	/**
-	 *  Get the modelinfo.
-	 *  @return the modelinfo.
+	 *  Get the agent injection fields.
+	 *  @return The fields.
 	 */
-	public IModelInfo getModelInfo()
+	public Field[] getAgentInjections()
 	{
-		return modelinfo;
+		return agentinjections==null? new Field[0]: (Field[])agentinjections.toArray(new Field[agentinjections.size()]);
 	}
 	
 	/**
-	 *  Get the lastmodified.
-	 *  @return the lastmodified.
+	 *  Add an injection field.
+	 *  @param name The name.
+	 *  @param field The field. 
 	 */
-	public long getLastModified()
+	public void addArgumentInjection(String name, Field field)
 	{
-		return lastmodified;
+		if(argumentinjections==null)
+			argumentinjections = new MultiCollection();
+		argumentinjections.put(name, field);
 	}
-
+	
 	/**
-	 *  Set the lastmodified.
-	 *  @param lastmodified The lastmodified to set.
+	 *  Get the argument injection fields.
+	 *  @return The fields.
 	 */
-	public void setLastModified(long lastmodified)
+	public Field[] getArgumentInjections(String name)
 	{
-		this.lastmodified = lastmodified;
+		Collection col = argumentinjections==null? null: (Collection)argumentinjections.get(name);
+		return col==null? new Field[0]: (Field[])col.toArray(new Field[col.size()]);
 	}
-
+	
 	/**
-	 *  Get the lastchecked.
-	 *  @return the lastchecked.
+	 *  Get the argument injection names.
+	 *  @return The names.
 	 */
-	public long getLastChecked()
+	public String[] getArgumentInjectionNames()
 	{
-		return lastchecked;
+		return argumentinjections==null? SUtil.EMPTY_STRING_ARRAY: 
+			(String[])argumentinjections.keySet().toArray(new String[argumentinjections.size()]);
 	}
-
+	
 	/**
-	 *  Set the lastchecked.
-	 *  @param lastchecked The lastchecked to set.
+	 *  Add an injection field.
+	 *  @param name The name.
+	 *  @param field The field. 
 	 */
-	public void setLastChecked(long lastchecked)
+	public void addServiceInjection(String name, Field field)
 	{
-		this.lastchecked = lastchecked;
+		if(serviceinjections==null)
+			serviceinjections = new MultiCollection();
+		serviceinjections.put(name, field);
+	}
+	
+	/**
+	 *  Get the service injection fields.
+	 *  @return The fields.
+	 */
+	public Field[] getServiceInjections(String name)
+	{
+		Collection col = serviceinjections==null? null: (Collection)serviceinjections.get(name);
+		return col==null? new Field[0]: (Field[])col.toArray(new Field[col.size()]);
+	}
+	
+	/**
+	 *  Get the service injection names.
+	 *  @return The names.
+	 */
+	public String[] getServiceInjectionNames()
+	{
+		return serviceinjections==null? SUtil.EMPTY_STRING_ARRAY: 
+			(String[])serviceinjections.keySet().toArray(new String[serviceinjections.size()]);
 	}
 }
