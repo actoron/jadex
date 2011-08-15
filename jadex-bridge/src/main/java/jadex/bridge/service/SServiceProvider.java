@@ -784,7 +784,10 @@ public class SServiceProvider
 			if(handler instanceof BasicServiceInvocationHandler)
 			{
 				BasicServiceInvocationHandler bsh = (BasicServiceInvocationHandler)handler;
-				return isRemoteObject(bsh.getDomainService());
+				// Hack! Needed for dynamically bound delegation services of composites (virtual)
+				ret = bsh.getDomainService()==null;
+				if(!ret)
+					return isRemoteObject(bsh.getDomainService());
 			}
 			else 
 			{
