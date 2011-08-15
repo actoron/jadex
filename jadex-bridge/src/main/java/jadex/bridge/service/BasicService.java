@@ -2,6 +2,7 @@ package jadex.bridge.service;
 
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -211,6 +212,9 @@ public class BasicService implements IInternalService
 	 */
 	public IFuture	shutdownService()
 	{
+		// Deregister pojo->sid mapping in shutdown.
+		BasicServiceInvocationHandler.removePojoServiceIdentifier(sid);
+		
 		final Future ret = new Future();
 		isValid().addResultListener(new DelegationResultListener(ret)
 		{

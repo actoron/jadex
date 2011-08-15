@@ -9,13 +9,21 @@ import jadex.commons.SUtil;
 import jadex.commons.gui.SGUI;
 
 import java.awt.BorderLayout;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -216,7 +224,26 @@ public class ControlCenterWindow extends JFrame
 					panel.add(msg, BorderLayout.NORTH);
 					panel.add(but, BorderLayout.SOUTH);
 					message	= panel;
+					
+					// Make dialogs resizable
+					panel.addHierarchyListener(new HierarchyListener()
+					{
+						public void hierarchyChanged(HierarchyEvent e)
+						{
+							Window window = SwingUtilities.getWindowAncestor(panel);
+							if(window instanceof Dialog)
+			                {
+			                    Dialog dialog = (Dialog)window;
+			                    if(!dialog.isResizable()) 
+			                    {
+			                        dialog.setResizable(true);
+			                    }
+			                }
+							
+						}
+					});
 				}
+				
 				JOptionPane.showMessageDialog(ControlCenterWindow.this, message, errortitle, JOptionPane.ERROR_MESSAGE);
 			}
 		});

@@ -7,8 +7,11 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.JadexCloner;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceInterface;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
@@ -112,6 +115,16 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				for(int i=0; i<args.length; i++)
 				{
 					boolean ref = refs[i] || SServiceProvider.isLocalReference(args[i]);
+					
+					// Test if it is pojo service impl.
+					// Has to be mapped to new proxy then
+					if(!ref && args[i]!=null && args[i].getClass().isAnnotationPresent(Service.class))
+					{
+						IServiceIdentifier sid = BasicServiceInvocationHandler.getPojoServiceIdentifier(args[i]);
+						System.out.println("sid: "+sid);
+//						SServiceProvider.getService(ea.getServiceProvider(), sid).addResultListener(new )
+					}
+					
 //					if(!ref && args[i]!=null)
 //						System.out.println("copy arg: "+args[i]);
 					copyargs.add(ref? args[i]: JadexCloner.deepCloneObject(args[i]));

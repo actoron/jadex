@@ -39,7 +39,10 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Basic service invocation interceptor.
@@ -70,6 +73,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 
 	/** The list of interceptors. */
 	protected List interceptors;
+	
+	/** The pojo service map (pojo -> proxy). */
+	protected static Map pojosids;
 	
 	//-------- constructors --------
 	
@@ -385,7 +391,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			
 			BasicService mgmntservice = new BasicService(ia.getExternalAccess().getServiceProvider().getId(), type, null);
 			mgmntservice.createServiceIdentifier(name, service.getClass());
-			
+						
 			boolean found = false;
 			Class serclass = service.getClass();
 			while(!Object.class.equals(serclass) && !found)
@@ -451,6 +457,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			
 			ServiceInfo si = new ServiceInfo(service, mgmntservice);
 			handler = new BasicServiceInvocationHandler(si);
+			addPojoServiceIdentifier(service, mgmntservice.getServiceIdentifier());
 		}
 		
 		return handler;
@@ -531,6 +538,45 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public static void addPojoServiceIdentifier(Object pojo, IServiceIdentifier sid)
+	{
+		if(pojosids==null)
+		{
+			synchronized(BasicServiceInvocationHandler.class)
+			{
+				if(pojosids==null)
+				{
+					pojosids = Collections.synchronizedMap(new HashMap());
+				}
+			}
+		}
+		pojosids.put(pojo, sid);
+//		System.out.println("add: "+pojosids.size());
+	}
+	
+	/**
+	 * 
+	 */
+	public static void removePojoServiceIdentifier(IServiceIdentifier sid)
+	{
+		if(pojosids!=null)
+		{
+			pojosids.values().remove(sid);
+//			System.out.println("rem: "+pojosids.size());
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static IServiceIdentifier getPojoServiceIdentifier(Object pojo)
+	{
+		return (IServiceIdentifier)pojosids.get(pojo);
 	}
 }
 

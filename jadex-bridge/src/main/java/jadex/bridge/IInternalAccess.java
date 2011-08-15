@@ -24,6 +24,12 @@ public interface IInternalAccess
 	public IModelInfo getModel();
 
 	/**
+	 *  Get the configuration.
+	 *  @return	The configuration.
+	 */
+	public String getConfiguration();
+	
+	/**
 	 *  Get the parent (if any).
 	 *  @return The parent.
 	 */

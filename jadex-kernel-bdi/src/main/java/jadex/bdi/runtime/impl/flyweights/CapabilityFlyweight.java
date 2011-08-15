@@ -878,6 +878,29 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		}
 	}
 	
+	/**
+	 *  Get the configuration.
+	 *  @return	The configuration.
+	 */
+	public String getConfiguration()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					string = (String)getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.capability_has_configuration);
+				}
+			};
+			return invoc.string;
+		}
+		else
+		{
+			return (String)getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.capability_has_configuration);
+		}
+	}
+	
 //	/**
 //	 *  Get a required service.
 //	 *  @return The service.
