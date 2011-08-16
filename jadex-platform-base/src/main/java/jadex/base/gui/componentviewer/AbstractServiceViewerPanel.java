@@ -63,7 +63,7 @@ public abstract class AbstractServiceViewerPanel implements IServiceViewerPanel
 	 */
 	public IFuture setProperties(Properties ps)
 	{
-		return new Future();
+		return IFuture.DONE;
 	}
 
 	/**
@@ -72,7 +72,7 @@ public abstract class AbstractServiceViewerPanel implements IServiceViewerPanel
 	 */
 	public IFuture getProperties()
 	{
-		return new Future(null);
+		return IFuture.DONE;
 	}
 
 	/**
