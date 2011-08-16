@@ -1,5 +1,7 @@
 package jadex.micro.testcases;
 
+import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
@@ -40,7 +42,7 @@ public class PojoDService implements IDService
 				public void customResultAvailable(Object result)
 				{	
 					IComponentManagementService cms = (IComponentManagementService)result;
-					cms.createComponent(null, "jadex.micro.testcases.ServiceParameterAgent.class", new CreationInfo("second", null), null)
+					cms.createComponent(null, "jadex.micro.testcases.ServiceParameterAgent.class", new CreationInfo("second", null, agent.getComponentIdentifier()), null)
 						.addResultListener(new DelegationResultListener(ret)
 					{
 						public void customResultAvailable(Object result)
@@ -64,6 +66,34 @@ public class PojoDService implements IDService
 		{
 			ret.setResult(null);
 		}
+		
+		ret.addResultListener(agent.createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				TestReport tr = new TestReport("#1", "Test if pojo service can be passed as parameter value.");
+				
+				if(result==null || (result instanceof Boolean && ((Boolean)result).booleanValue()))
+				{
+					tr.setSucceeded(true);
+				}
+				else
+				{
+					tr.setReason("Wrong parameter value received.");
+				}
+				
+				agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+				
+				if(result!=null)
+					agent.killComponent();
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				agent.setResultValue("testresults", new Testcase(0, new TestReport[]{}));
+				agent.killComponent();
+			}
+		}));
 		
 		return ret;
 	}

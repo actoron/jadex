@@ -4,14 +4,18 @@ import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MCapabilityFlyweight;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bdi.runtime.IBelief;
+import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.ICapability;
 import jadex.bdi.runtime.IEventbase;
 import jadex.bdi.runtime.IExpressionbase;
 import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.IPlanbase;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.ServiceContainerProxy;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.BeliefRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
@@ -26,6 +30,7 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.clock.ITimedObject;
 import jadex.commons.IValueFetcher;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -363,8 +368,6 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	{
 		return getInterpreter().getComponentDescription();
 	}
-
-
 	
 	/**
 	 *  Get the platform specific agent object.
@@ -875,6 +878,80 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		else
 		{
 			return getInterpreter().getResults();
+		}
+	}
+	
+	/**
+	 *  Set a result value.
+	 *  @param name The result name.
+	 *  @param value The result value.
+	 */
+	public void setResultValue(final String name, final Object value)
+	{
+		if(!getHandle().equals(getInterpreter().getAgent()))
+			throw new RuntimeException("Set result only allowed in agent, not in capabilities.");
+		
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					if(SUtil.arrayToSet(SFlyweightFunctionality.getBeliefNames(getState(), getHandle(), getScope())).contains(name))
+					{
+						 IBelief bel = (IBelief)SFlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), name);
+						 bel.setFact(value);
+					}
+					else if(SUtil.arrayToSet(SFlyweightFunctionality.getBeliefSetNames(getState(), getHandle(), getScope())).contains(name))
+					{
+						IBeliefSet belset = (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), name);
+						belset.removeFacts();
+						if(SReflect.isIterable(value))
+						{
+							for(Iterator it=SReflect.getIterator(value); it.hasNext(); )
+							{
+								belset.addFact(it.next());
+							}
+						}
+						else
+						{
+							belset.addFact(value);
+						}
+					}
+					else
+					{
+						throw new RuntimeException("Unknown belief/set name: "+name);
+					}
+				}
+			};
+		}
+		else
+		{
+			if(SUtil.arrayToSet(SFlyweightFunctionality.getBeliefNames(getState(), getHandle(), getScope())).contains(name))
+			{
+				 IBelief bel = (IBelief)SFlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), name);
+				 bel.setFact(value);
+			}
+			else if(SUtil.arrayToSet(SFlyweightFunctionality.getBeliefSetNames(getState(), getHandle(), getScope())).contains(name))
+			{
+				IBeliefSet belset = (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), name);
+				belset.removeFacts();
+				if(SReflect.isIterable(value))
+				{
+					for(Iterator it=SReflect.getIterator(value); it.hasNext(); )
+					{
+						belset.addFact(it.next());
+					}
+				}
+				else
+				{
+					belset.addFact(value);
+				}
+			}
+			else
+			{
+				throw new RuntimeException("Unknown belief/set name: "+name);
+			}
 		}
 	}
 	

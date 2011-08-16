@@ -75,7 +75,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	protected List interceptors;
 	
 	/** The pojo service map (pojo -> proxy). */
-	protected static Map pojosids;
+	protected static Map pojoproxies;
 	
 	//-------- constructors --------
 	
@@ -549,17 +549,17 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 */
 	public static void addPojoServiceProxy(Object pojo, IService proxy)
 	{
-		if(pojosids==null)
+		if(pojoproxies==null)
 		{
 			synchronized(BasicServiceInvocationHandler.class)
 			{
-				if(pojosids==null)
+				if(pojoproxies==null)
 				{
-					pojosids = Collections.synchronizedMap(new HashMap());
+					pojoproxies = Collections.synchronizedMap(new HashMap());
 				}
 			}
 		}
-		pojosids.put(pojo, proxy);
+		pojoproxies.put(pojo, proxy);
 //		System.out.println("add: "+pojosids.size());
 	}
 	
@@ -569,11 +569,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 */
 	public static void removePojoServiceProxy(IServiceIdentifier sid)
 	{
-		if(pojosids!=null)
+		if(pojoproxies!=null)
 		{
 			synchronized(BasicServiceInvocationHandler.class)
 			{
-				for(Iterator it=pojosids.values().iterator(); it.hasNext(); )
+				for(Iterator it=pojoproxies.values().iterator(); it.hasNext(); )
 				{
 					IService proxy = (IService)it.next();
 					if(sid.equals(proxy.getServiceIdentifier()))
@@ -593,7 +593,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 */
 	public static IService getPojoServiceProxy(Object pojo)
 	{
-		return (IService)pojosids.get(pojo);
+		return (IService)pojoproxies.get(pojo);
 	}
 	
 //	/**

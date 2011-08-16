@@ -138,7 +138,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				if(arg!=null && arg.getClass().isAnnotationPresent(Service.class))
 				{
 					Object proxy = BasicServiceInvocationHandler.getPojoServiceProxy(arg);
-					System.out.println("proxy: "+proxy);
+//					System.out.println("proxy: "+proxy);
 					args.set(i, proxy);
 				}
 			}

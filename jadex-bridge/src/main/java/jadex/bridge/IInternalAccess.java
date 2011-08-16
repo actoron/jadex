@@ -112,6 +112,13 @@ public interface IInternalAccess
 	 */
 	public Map getResults();
 	
+	/**
+	 *  Set a result value.
+	 *  @param name The result name.
+	 *  @param value The result value.
+	 */
+	public void setResultValue(String name, Object value);
+	
 //	/**
 //	 *  Get the model name of a component type.
 //	 *  @param ctype The component type.
