@@ -1,6 +1,7 @@
 package jadex.bridge.service;
 
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.IChangeListener;
 import jadex.commons.IRemotable;
@@ -640,7 +641,8 @@ public class SServiceProvider
 		boolean ret = object instanceof IRemotable 
 			|| object instanceof IResultListener || object instanceof IIntermediateResultListener
 			|| object instanceof IFuture || object instanceof IIntermediateFuture
-			|| object instanceof IChangeListener || object instanceof IRemoteChangeListener;
+			|| object instanceof IChangeListener || object instanceof IRemoteChangeListener
+			|| (object!=null && object.getClass().isAnnotationPresent(Service.class));
 //			|| object instanceof IService;// || object instanceof IExternalAccess;
 		
 		if(!ret && object!=null)

@@ -213,7 +213,7 @@ public class BasicService implements IInternalService
 	public IFuture	shutdownService()
 	{
 		// Deregister pojo->sid mapping in shutdown.
-		BasicServiceInvocationHandler.removePojoServiceIdentifier(sid);
+		BasicServiceInvocationHandler.removePojoServiceProxy(sid);
 		
 		final Future ret = new Future();
 		isValid().addResultListener(new DelegationResultListener(ret)

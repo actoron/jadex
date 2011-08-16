@@ -116,21 +116,31 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				{
 					boolean ref = refs[i] || SServiceProvider.isLocalReference(args[i]);
 					
-					// Test if it is pojo service impl.
-					// Has to be mapped to new proxy then
-					if(!ref && args[i]!=null && args[i].getClass().isAnnotationPresent(Service.class))
-					{
-						IServiceIdentifier sid = BasicServiceInvocationHandler.getPojoServiceIdentifier(args[i]);
-						System.out.println("sid: "+sid);
-//						SServiceProvider.getService(ea.getServiceProvider(), sid).addResultListener(new )
-					}
-					
 //					if(!ref && args[i]!=null)
 //						System.out.println("copy arg: "+args[i]);
 					copyargs.add(ref? args[i]: JadexCloner.deepCloneObject(args[i]));
 				}
 //				System.out.println("call: "+method.getName()+" "+notcopied+" "+SUtil.arrayToString(method.getParameterTypes()));//+" "+SUtil.arrayToString(args));
 				sic.setArguments(copyargs);
+			}
+		}
+		
+		// Perform pojo service replacement (for local and remote calls).
+		
+		List args = sic.getArguments();
+		if(args!=null)
+		{
+			for(int i=0; i<args.size(); i++)
+			{
+				// Test if it is pojo service impl.
+				// Has to be mapped to new proxy then
+				Object arg = args.get(i);
+				if(arg!=null && arg.getClass().isAnnotationPresent(Service.class))
+				{
+					Object proxy = BasicServiceInvocationHandler.getPojoServiceProxy(arg);
+					System.out.println("proxy: "+proxy);
+					args.set(i, proxy);
+				}
 			}
 		}
 		

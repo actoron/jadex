@@ -11,7 +11,6 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceInterface;
@@ -41,6 +40,7 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -335,6 +335,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			BasicServiceInvocationHandler.addInterceptors(handler, service, ics, adapter, ia, proxytype, copy);
 			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
 				.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
+			if(!(service instanceof IService))
+				addPojoServiceProxy(service, ret);
 		}
 		else
 		{
@@ -457,7 +459,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			
 			ServiceInfo si = new ServiceInfo(service, mgmntservice);
 			handler = new BasicServiceInvocationHandler(si);
-			addPojoServiceIdentifier(service, mgmntservice.getServiceIdentifier());
+//			addPojoServiceIdentifier(service, mgmntservice.getServiceIdentifier());
 		}
 		
 		return handler;
@@ -541,9 +543,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	}
 	
 	/**
-	 * 
+	 *  Add a service proxy.
+	 *  @param pojo The pojo.
+	 *  @param proxy The proxy.
 	 */
-	public static void addPojoServiceIdentifier(Object pojo, IServiceIdentifier sid)
+	public static void addPojoServiceProxy(Object pojo, IService proxy)
 	{
 		if(pojosids==null)
 		{
@@ -555,29 +559,81 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 				}
 			}
 		}
-		pojosids.put(pojo, sid);
+		pojosids.put(pojo, proxy);
 //		System.out.println("add: "+pojosids.size());
 	}
 	
 	/**
-	 * 
+	 *  Remove a pojo - proxy pair.
+	 *  @param sid The service identifier.
 	 */
-	public static void removePojoServiceIdentifier(IServiceIdentifier sid)
+	public static void removePojoServiceProxy(IServiceIdentifier sid)
 	{
 		if(pojosids!=null)
 		{
-			pojosids.values().remove(sid);
-//			System.out.println("rem: "+pojosids.size());
+			synchronized(BasicServiceInvocationHandler.class)
+			{
+				for(Iterator it=pojosids.values().iterator(); it.hasNext(); )
+				{
+					IService proxy = (IService)it.next();
+					if(sid.equals(proxy.getServiceIdentifier()))
+					{
+						it.remove();
+//						System.out.println("rem: "+pojosids.size());	
+					}
+				}
+			}
 		}
 	}
 	
 	/**
-	 * 
+	 *  Get the proxy of a pojo service.
+	 *  @param pojo The pojo service.
+	 *  @return The proxy of the service.
 	 */
-	public static IServiceIdentifier getPojoServiceIdentifier(Object pojo)
+	public static IService getPojoServiceProxy(Object pojo)
 	{
-		return (IServiceIdentifier)pojosids.get(pojo);
+		return (IService)pojosids.get(pojo);
 	}
+	
+//	/**
+//	 * 
+//	 */
+//	public static void addPojoServiceIdentifier(Object pojo, IServiceIdentifier sid)
+//	{
+//		if(pojosids==null)
+//		{
+//			synchronized(BasicServiceInvocationHandler.class)
+//			{
+//				if(pojosids==null)
+//				{
+//					pojosids = Collections.synchronizedMap(new HashMap());
+//				}
+//			}
+//		}
+//		pojosids.put(pojo, sid);
+////		System.out.println("add: "+pojosids.size());
+//	}
+//	
+//	/**
+//	 * 
+//	 */
+//	public static void removePojoServiceIdentifier(IServiceIdentifier sid)
+//	{
+//		if(pojosids!=null)
+//		{
+//			pojosids.values().remove(sid);
+////			System.out.println("rem: "+pojosids.size());
+//		}
+//	}
+//	
+//	/**
+//	 * 
+//	 */
+//	public static IServiceIdentifier getPojoServiceIdentifier(Object pojo)
+//	{
+//		return (IServiceIdentifier)pojosids.get(pojo);
+//	}
 }
 
 

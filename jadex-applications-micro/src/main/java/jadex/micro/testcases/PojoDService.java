@@ -52,20 +52,7 @@ public class PojoDService implements IDService
 								public void customResultAvailable(Object result)
 								{
 									IDService otherser = (IDService)result;
-									otherser.testServiceArgument(PojoDService.this).addResultListener(new IResultListener()
-									{
-										public void resultAvailable(Object result)
-										{
-											System.out.println("res is: "+result);
-											ret.setResult(null);
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-											System.out.println("ex is: "+exception);
-											ret.setResult(null);
-										}
-									});
+									otherser.testServiceArgument(PojoDService.this).addResultListener(new DelegationResultListener(ret));
 								}
 							});
 						}
