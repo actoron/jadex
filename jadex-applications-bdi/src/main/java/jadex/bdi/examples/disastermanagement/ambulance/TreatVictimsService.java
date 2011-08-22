@@ -6,6 +6,7 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -14,6 +15,7 @@ import jadex.extension.envsupport.environment.ISpaceObject;
 /**
  *   Treat victims service.
  */
+@Service
 public class TreatVictimsService implements ITreatVictimsService
 {
 	//-------- attributes --------
