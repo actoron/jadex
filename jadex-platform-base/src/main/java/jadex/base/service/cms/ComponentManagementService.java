@@ -268,6 +268,8 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	public IFuture createComponent(final String name, final String modelname, CreationInfo info, final IResultListener killlistener)
 	{	
+//		final DebugException	de	= new DebugException();
+		
 //		System.out.println("create component: "+modelname+" "+name);
 		final Future inited = new Future();
 		
@@ -363,6 +365,7 @@ public abstract class ComponentManagementService extends BasicService implements
 															cid = new ComponentIdentifier(name+"@"+paname);
 															if(adapters.containsKey(cid) || initinfos.containsKey(cid))
 															{
+//																de.printStackTrace();
 																inited.setException(new ComponentCreationException("Component "+cid+" already exists.", ComponentCreationException.REASON_COMPONENT_EXISTS, cid));
 																return;
 //																throw new RuntimeException("Component "+cid+" already exists.");

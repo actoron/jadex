@@ -16,7 +16,6 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.commons.IFilter;
 import jadex.commons.IPropertyObject;
 import jadex.commons.IValueFetcher;
-import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -26,10 +25,10 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.meta.IPropertyMetaDataSet;
 import jadex.extension.envsupport.IObjectCreator;
+import jadex.extension.envsupport.MEnvSpaceInstance;
 import jadex.extension.envsupport.MEnvSpaceType;
 import jadex.extension.envsupport.MObjectType;
 import jadex.extension.envsupport.MObjectTypeProperty;
-import jadex.extension.envsupport.MEnvSpaceInstance;
 import jadex.extension.envsupport.dataview.IDataView;
 import jadex.extension.envsupport.environment.ComponentActionList.ActionEntry;
 import jadex.extension.envsupport.environment.space2d.Space2D;
@@ -1551,10 +1550,14 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 									IComponentManagementService cms = (IComponentManagementService)result;
 									// cannot be dummy cid because agent calls getAvatar(cid) in init and needs its avatar
 									// the cid must be the final cid of the component hence it creates unique ids
-									IComponentIdentifier cid = cms.generateComponentIdentifier(SUtil.createUniqueId(compotype, 3), getExternalAccess().getComponentIdentifier().getName().replace("@", "."));
-//									IComponentIdentifier cid = new ComponentIdentifier("dummy@hummy");				
+///									IComponentIdentifier cid = cms.generateComponentIdentifier(SUtil.createUniqueId(compotype, 3), getExternalAccess().getComponentIdentifier().getName().replace("@", "."));
+									// SUtil.createUniqueId(compotype, 3) might lead to conflicts due to race conditions. Use object id as it is really unique.
+									IComponentIdentifier cid = cms.generateComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getComponentIdentifier().getName().replace("@", "."));
+//									IComponentIdentifier cid = new ComponentIdentifier("dummy@hummy");
+									// Hack!!! Should have actual description and not just name and local type!?
 									CMSComponentDescription desc = new CMSComponentDescription();
 									desc.setName(cid);
+									desc.setLocalType(compotype);
 									setOwner(ret.getId(), desc);
 									IFuture	future	= cms.createComponent(cid.getLocalName(), filename,
 										new CreationInfo(null, null, getExternalAccess().getComponentIdentifier(), false, getExternalAccess().getModel().getAllImports()), null);
@@ -1686,6 +1689,10 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 			{
 				String componenttype = desc.getLocalType();
 				AvatarMapping mapping = getAvatarMapping(componenttype, objecttype);
+				if(mapping==null)
+				{
+					System.out.println("gruetzi");
+				}
 				if(mapping.isKillComponent())
 				{
 					SServiceProvider.getServiceUpwards(getExternalAccess().getServiceProvider(), IComponentManagementService.class)
