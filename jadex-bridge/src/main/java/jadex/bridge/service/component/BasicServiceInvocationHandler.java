@@ -11,9 +11,9 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
-import jadex.bridge.service.annotation.ServiceInterface;
 import jadex.bridge.service.component.interceptors.DecouplingInterceptor;
 import jadex.bridge.service.component.interceptors.DecouplingReturnInterceptor;
 import jadex.bridge.service.component.interceptors.DelegationInterceptor;
@@ -336,7 +336,13 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
 				.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 			if(!(service instanceof IService))
+			{
+				if(!service.getClass().isAnnotationPresent(Service.class))
+				{
+					throw new RuntimeException("Pojo service must declare @Service annotation: "+service.getClass());
+				}
 				addPojoServiceProxy(service, ret);
+			}
 		}
 		else
 		{
@@ -376,10 +382,13 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			if(type==null)
 			{
 				// Try to find service interface via annotation
-				if(service.getClass().isAnnotationPresent(ServiceInterface.class))
+				if(service.getClass().isAnnotationPresent(Service.class))
 				{
-					ServiceInterface si = (ServiceInterface)service.getClass().getAnnotation(ServiceInterface.class);
-					type = si.value();
+					Service si = (Service)service.getClass().getAnnotation(Service.class);
+					if(!si.value().equals(Object.class))
+					{
+						type = si.value();
+					}
 				}
 				// Otherwise take interface if there is only one
 				else

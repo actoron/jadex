@@ -6,7 +6,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.JadexCloner;
 import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.component.interceptors.DecouplingInterceptor;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -29,6 +28,9 @@ public class ComponentFuture extends Future
 	/** The result copy flag. */
 	protected boolean copy;
 	
+	/** The source. */
+//	protected IFuture source;
+	
 	//-------- constructors --------
 	
 	/**
@@ -39,6 +41,7 @@ public class ComponentFuture extends Future
 		this.ea	= ea;
 		this.adapter	= adapter;
 		this.copy = copy;
+//		this.source = source;
 		source.addResultListener(new DelegationResultListener(this));
 	}
 	
@@ -86,4 +89,13 @@ public class ComponentFuture extends Future
 		}
 		super.setResult(result);
     }
+ 
+//    /**
+//     *  Test if done, i.e. result is available.
+//     *  @return True, if done.
+//     */
+//    public synchronized boolean isDone()
+//    {
+//    	return source.isDone();
+//    }
 }

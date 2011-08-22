@@ -268,7 +268,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	public IFuture createComponent(final String name, final String modelname, CreationInfo info, final IResultListener killlistener)
 	{	
-//		System.out.println("create component: "+modelname+" "+name);
+		System.out.println("create component: "+modelname+" "+name);
 		final Future inited = new Future();
 		
 		final CreationInfo cinfo = info!=null? info: new CreationInfo();	// Dummy default info, if null.
@@ -525,7 +525,7 @@ public abstract class ComponentManagementService extends BasicService implements
 														{
 															logger.info("Starting component failed: "+cid+", "+exception);
 	//														exception.printStackTrace();
-			//												System.out.println("Ex: "+cid+" "+exception);
+															System.out.println("Ex: "+cid+" "+exception);
 															final Runnable	cleanup	= new Runnable()
 															{
 																public void run()
@@ -1013,7 +1013,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				infos = (Object[])initinfos.get(cid);
 			}
 			// Terminate component that is shut down during init.
-			if(infos!=null && infos.length>0)
+			if(infos!=null && infos.length>0 && !((IFuture)infos[4]).isDone())
 			{
 				logger.info("Queued component termination during init: "+cid.getName());
 			}
@@ -1054,7 +1054,7 @@ public abstract class ComponentManagementService extends BasicService implements
 								// Component may be already killed (e.g. when autoshutdown).
 								if(adapter!=null)
 								{
-//											System.out.println("destroy1: "+cid);//+" "+component.getParent().getComponentIdentifier().getLocalName());
+//									System.out.println("destroy1: "+cid);//+" "+component.getParent().getComponentIdentifier().getLocalName());
 									
 									// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
 									// todo: killcomponent should only be called once for each component?

@@ -3,6 +3,7 @@ package jadex.micro.testcases;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -25,6 +26,7 @@ import java.util.List;
 @ProvidedServices(@ProvidedService(type=ICService.class, implementation=@Implementation(expression="$component")))
 @RequiredServices(@RequiredService(name="cservice", type=ICService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_LOCAL)))
 @Results(@Result(name="testresults", clazz=Testcase.class))
+@Service(ICService.class)
 public class CAgent extends MicroAgent implements ICService
 {
 	/**

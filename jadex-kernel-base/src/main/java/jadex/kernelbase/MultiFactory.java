@@ -17,6 +17,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.Excluded;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
@@ -59,6 +60,7 @@ import java.util.jar.JarFile;
  *  Kernel that delegates calls to sub-kernels it finds using on-demand searches.
  *
  */
+@Service
 public class MultiFactory implements IComponentFactory, IMultiKernelNotifierService
 {
 	/** Kernel model property for extensions */

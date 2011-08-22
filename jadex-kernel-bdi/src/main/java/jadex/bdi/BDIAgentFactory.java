@@ -17,6 +17,7 @@ import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
@@ -49,6 +50,7 @@ import javax.swing.UIDefaults;
 /**
  *  Factory for creating Jadex V2 BDI agents.
  */
+@Service
 public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 {
 	//-------- constants --------

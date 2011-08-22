@@ -1,12 +1,14 @@
 package jadex.base.service.awareness.discovery;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.micro.IPojoMicroAgent;
 
 /**
  * 
  */
+@Service
 public class DiscoveryService	implements IDiscoveryService
 {
 	/** The agent. */

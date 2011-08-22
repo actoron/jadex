@@ -11,6 +11,7 @@ $endif $ */
 
 import jadex.bridge.IComponentFactoryExtensionService;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.xml.AccessInfo;
@@ -25,6 +26,7 @@ import jadex.xml.XMLInfo;
 /**
  *  Extension service for loading AGR (agent, group, role) models.
  */
+@Service
 public class AGRExtensionService implements IComponentFactoryExtensionService
 {
 	/**

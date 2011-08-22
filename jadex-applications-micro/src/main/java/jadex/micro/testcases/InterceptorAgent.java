@@ -2,6 +2,7 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.DefaultResultListener;
@@ -32,6 +33,7 @@ import java.util.List;
 	@Implementation(expression="$component", interceptors=@Value("$component.provinter"))))
 @RequiredServices(@RequiredService(name="aservice", type=IAService.class, 
 	binding=@Binding(scope="local", interceptors=@Value("$component.reqinter"))))
+@Service(IAService.class)
 public class InterceptorAgent extends MicroAgent implements IAService
 {	
 	public SimpleInterceptor provinter = new SimpleInterceptor();

@@ -56,6 +56,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 	{
 //		return sic.invoke();
 		Future	fut	= new Future();
+//		return sic.invoke();
 		sic.invoke().addResultListener(new DelegationResultListener(fut)
 		{
 			public void customResultAvailable(Object result)

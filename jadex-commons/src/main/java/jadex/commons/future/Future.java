@@ -112,7 +112,7 @@ public class Future implements IFuture
     	boolean suspend = false;
     	synchronized(this)
     	{
-	    	if(!resultavailable)
+	    	if(!isDone())
 	    	{
 	    	   	if(caller==null)
 	    	   		throw new RuntimeException("No suspendable element.");
@@ -162,7 +162,7 @@ public class Future implements IFuture
 	    		throw exception instanceof RuntimeException? (RuntimeException)exception 
 	    			:new RuntimeException(exception);
 	    	}
-	    	else if(resultavailable)
+	    	else if(isDone())
 	    	{
 	    	   	return result;
 	    	}
@@ -182,7 +182,7 @@ public class Future implements IFuture
     {
     	synchronized(this)
 		{
-        	if(resultavailable)
+        	if(isDone())
         	{
         		if(this.exception!=null)
         		{
@@ -219,7 +219,7 @@ public class Future implements IFuture
     	synchronized(this)
 		{
     		// If done propagate exception.
-        	if(resultavailable)
+        	if(isDone())
         	{
         		if(exception instanceof RuntimeException)
         			throw (RuntimeException)exception;
@@ -244,7 +244,7 @@ public class Future implements IFuture
     {
     	synchronized(this)
 		{
-        	if(resultavailable)
+        	if(isDone())
         	{
         		if(this.exception!=null)
         		{
@@ -279,7 +279,7 @@ public class Future implements IFuture
     {
     	synchronized(this)
 		{
-        	if(resultavailable)
+        	if(isDone())
         		return;
         	
 //        	System.out.println(this+" setResult: "+result);
@@ -340,7 +340,7 @@ public class Future implements IFuture
     	boolean	notify	= false;
     	synchronized(this)
     	{
-	    	if(resultavailable)
+	    	if(isDone())
 	    	{
 	    		notify	= true;
 	    	}

@@ -9,6 +9,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ISettingsService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Property;
 import jadex.commons.future.DefaultResultListener;
@@ -108,6 +109,7 @@ import java.util.TimerTask;
 	@RequiredService(name="settings", type=ISettingsService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="discoveries", type=IDiscoveryService.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_COMPONENT))
 })
+@Service(IManagementService.class)
 public class AwarenessManagementAgent extends MicroAgent implements IPropertiesProvider, IManagementService
 {
 	//-------- attributes --------

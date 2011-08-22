@@ -3,6 +3,7 @@ package jadex.micro.testcases;
 import jadex.base.test.TestReport;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.future.Future;
@@ -24,6 +25,7 @@ import java.util.List;
 @ProvidedServices(@ProvidedService(type=IBService.class, implementation=@Implementation(expression="$component")))
 //@Results(@Result(name="exception", typename="Exception"))
 @Results(@Result(name="testcases", clazz=List.class))
+@Service(IBService.class)
 public class BAgent extends MicroAgent implements IBService
 {
 	@ServiceComponent

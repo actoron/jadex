@@ -2,9 +2,9 @@ package jadex.micro.testcases.semiautomatic.compositeservice;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
-import jadex.bridge.service.annotation.ServiceInterface;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.future.Future;
@@ -13,7 +13,7 @@ import jadex.commons.future.IFuture;
 /**
  * 
  */
-@ServiceInterface(IAddService.class)
+@Service(IAddService.class)
 public class PojoAddService implements IAddService
 {
 	/** The service identifier. */

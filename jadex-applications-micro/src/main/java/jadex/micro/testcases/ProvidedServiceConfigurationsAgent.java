@@ -2,6 +2,7 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -24,6 +25,7 @@ import jadex.micro.annotation.Results;
 	@Configuration(name="b")
 })
 @Results(@Result(name="testresults", clazz=Testcase.class)) 
+@Service(IAService.class)
 public class ProvidedServiceConfigurationsAgent extends MicroAgent implements IAService
 {
 	/**
@@ -75,13 +77,23 @@ public class ProvidedServiceConfigurationsAgent extends MicroAgent implements IA
 	 */
 	public static IAService getService()
 	{
-		return new IAService()
+		return new MyAService();
+//		return new IAService()
+//		{
+//			public IFuture test()
+//			{
+//				return new Future("a");
+//			}
+//		};
+	}
+	
+	@Service
+	public static class MyAService implements IAService
+	{
+		public IFuture test()
 		{
-			public IFuture test()
-			{
-				return new Future("a");
-			}
-		};
+			return new Future("a");
+		}
 	}
 }
 

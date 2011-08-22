@@ -2,6 +2,7 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -29,6 +30,7 @@ import jadex.micro.testcases.semiautomatic.compositeservice.ISubService;
 	@RequiredService(name="sub", type=ISubService.class)
 })
 @Results(@Result(name="testresults", clazz=Testcase.class))
+@Service(IAddService.class) // todo: multi interfaces?
 public class MultiServiceAgent	extends MicroAgent	implements IAddService, ISubService
 {
 	//-------- testcase implementation --------
