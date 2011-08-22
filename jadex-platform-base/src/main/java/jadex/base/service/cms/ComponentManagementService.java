@@ -268,7 +268,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	public IFuture createComponent(final String name, final String modelname, CreationInfo info, final IResultListener killlistener)
 	{	
-		System.out.println("create component: "+modelname+" "+name);
+//		System.out.println("create component: "+modelname+" "+name);
 		final Future inited = new Future();
 		
 		final CreationInfo cinfo = info!=null? info: new CreationInfo();	// Dummy default info, if null.
@@ -525,7 +525,7 @@ public abstract class ComponentManagementService extends BasicService implements
 														{
 															logger.info("Starting component failed: "+cid+", "+exception);
 	//														exception.printStackTrace();
-															System.out.println("Ex: "+cid+" "+exception);
+//															System.out.println("Ex: "+cid+" "+exception);
 															final Runnable	cleanup	= new Runnable()
 															{
 																public void run()

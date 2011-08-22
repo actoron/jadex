@@ -5,6 +5,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.JadexCloner;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.Service;
@@ -128,14 +129,14 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				// Test if it is pojo service impl.
 				// Has to be mapped to new proxy then
 				Object arg = args.get(i);
-				if(arg!=null && arg.getClass().isAnnotationPresent(Service.class))
+				if(arg!=null && !(arg instanceof BasicService) && arg.getClass().isAnnotationPresent(Service.class))
 				{
 					// Check if the argument type refers to the pojo service
 					Service ser = arg.getClass().getAnnotation(Service.class);
-//					if(SReflect.isSupertype(ser.value(), sic.getMethod().getParameterTypes()[i]))
+					if(SReflect.isSupertype(ser.value(), sic.getMethod().getParameterTypes()[i]))
 					{
 						Object proxy = BasicServiceInvocationHandler.getPojoServiceProxy(arg);
-						System.out.println("proxy: "+proxy);
+//						System.out.println("proxy: "+proxy);
 						args.set(i, proxy);
 					}
 				}
