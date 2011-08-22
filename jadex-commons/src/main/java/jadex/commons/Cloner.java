@@ -94,7 +94,7 @@ public class Cloner
 		
 		if(object!=null)
 		{
-			if(clazz==null)
+			if(clazz==null || SReflect.isSupertype(clazz, object.getClass()))
 				clazz = object.getClass();
 		
 			if(isImmutable(clazz))
