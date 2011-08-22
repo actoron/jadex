@@ -19,21 +19,24 @@ public class DelegationClassLoader extends ClassLoader
 	{
 		super(basecl);
 		this.delegates = Collections.synchronizedMap(new HashMap<URL, ClassLoader>());
+//		System.out.println("d1 : "+this);
 	}
 	
 	public DelegationClassLoader(ClassLoader basecl, Map<URL, ClassLoader> delegates)
 	{
 		super(basecl);
 		this.delegates = delegates;
+//		System.out.println("d2 : "+this);
 	}
 	
 	public DelegationClassLoader(ClassLoader basecl, Object[] urls)
 	{
 		super(basecl);
+//		System.out.println("d3 : "+this);
 		
 		this.delegates = new HashMap<URL, ClassLoader>();
 		
-		if (urls != null)
+		if(urls != null)
 		{
 			for (int i = 0; i < urls.length; ++i)
 			{
@@ -51,7 +54,6 @@ public class DelegationClassLoader extends ClassLoader
 		}
 	}
 	
-	@Override
 	protected Class<?> findClass(String name) throws ClassNotFoundException
 	{
 		synchronized(delegates)
@@ -71,7 +73,6 @@ public class DelegationClassLoader extends ClassLoader
 		return super.findClass(name);
 	}
 	
-	@Override
 	protected URL findResource(String name)
 	{
 		synchronized(delegates)
@@ -86,7 +87,6 @@ public class DelegationClassLoader extends ClassLoader
 		return super.findResource(name);
 	}
 	
-	@Override
 	protected Enumeration<URL> findResources(String name) throws IOException
 	{
 		Set<URL> res = new HashSet<URL>();

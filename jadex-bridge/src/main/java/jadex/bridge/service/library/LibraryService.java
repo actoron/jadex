@@ -51,6 +51,9 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	
 	/** The urls. */
 	//protected List urls;
+	
+	/** The init urls. */
+	protected Object[] initurls;
 
 	/** Current ClassLoader. */
 	protected DelegationClassLoader	libcl;
@@ -89,6 +92,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	{
 		super(provider.getId(), ILibraryService.class, properties);
 		
+		this.initurls = urls;
 		this.provider = provider;
 		/* $if !android $ */
 		this.libcl = new DelegationClassLoader(ClassLoader.getSystemClassLoader(), urls);
@@ -164,6 +168,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 */
 	public void removeURL(URL url)
 	{
+//		System.out.println("remove "+url);
 		ILibraryServiceListener[] lis = null;
 		synchronized(this)
 		{
@@ -209,6 +214,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 */
 	public void removeURLCompletely(URL url)
 	{
+//		System.out.println("rem all "+url);
 		ILibraryServiceListener[] lis = null;
 		synchronized(this)
 		{
@@ -324,6 +330,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 */
 	public IFuture	shutdownService()
 	{
+		System.out.println("shut");
 		final Future	saved	= new Future();
 		SServiceProvider.getService(provider,ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new DelegationResultListener(saved)
@@ -665,8 +672,10 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 */
 	public IFuture setProperties(Properties props)
 	{
+		// Do not remove existing urls?
+		// todo: treat arguments and 
 		// Remove existing urls
-		libcl = new DelegationClassLoader(ClassLoader.getSystemClassLoader());
+		libcl = new DelegationClassLoader(ClassLoader.getSystemClassLoader(), initurls);
 		
 		// Add new urls.
 		Property[]	entries	= props.getProperties("entry");
