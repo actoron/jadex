@@ -362,7 +362,6 @@
 				<module>jadex-kernel-base</module>
 				<module>jadex-kernel-component</module>
 				<module>jadex-kernel-application</module>
-				<module>jadex-kernel-extension-envsupport-opengl</module>
 				<module>jadex-kernel-bdi</module>
 				<module>jadex-kernel-micro</module>
 				<module>jadex-kernel-bpmn</module>
@@ -420,7 +419,6 @@
 				<module>jadex-kernel-bdibpmn</module>
 				<module>jadex-kernel-gpmn</module>
 				<module>jadex-kernel-extension-envsupport</module>
-				<!-- <module>jadex-kernel-extension-envsupport-opengl</module> -->
 				<module>jadex-kernel-extension-agr</module>
 
 				<module>jadex-applib-bdi</module>
@@ -481,7 +479,6 @@
 				<module>jadex-rules-tools</module>
 				<module>jadex-kernel-component</module>
 				<module>jadex-kernel-application</module>
-				<module>jadex-kernel-extension-envsupport-opengl</module>
 				<module>jadex-platform-jade-launch</module>
 				<module>jadex-platform-jade</module>
 			</modules>

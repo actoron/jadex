@@ -507,7 +507,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		
 		killfuture = new Future();
 		
-//		System.out.println("killComponent: "+listener);
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 		{
 			killfuture.setException(new ComponentTerminatedException(desc.getName()));

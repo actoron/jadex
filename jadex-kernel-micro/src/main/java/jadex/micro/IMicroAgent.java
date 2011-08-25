@@ -9,6 +9,8 @@ import java.util.Map;
  *  This is a base interface for a minimal kernel agent.
  *  All methods are called on agent thread (i.e. not concurrently)
  */
+//todo change interface from methods to be implemented to methods that may be called
+// currently interface is not useful for pojo micro agents
 public interface IMicroAgent
 {
 	/**

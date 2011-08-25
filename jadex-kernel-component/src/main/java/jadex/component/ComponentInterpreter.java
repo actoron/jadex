@@ -85,7 +85,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	public IFuture scheduleStep(final IComponentStep step)
 	{
 		final Future ret = new Future();
-//		System.out.println("ss: "+getAgentAdapter().getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
+//		System.out.println("ss: "+getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
 		try
 		{
 			if(adapter.isExternalThread())
@@ -94,6 +94,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 				{			
 					public void run()
 					{
+//						System.out.println("as1: "+getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
 						addStep(new Object[]{step, ret});
 					}
 					
@@ -105,11 +106,13 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 			}
 			else
 			{
+//				System.out.println("as2: "+getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
 				addStep(new Object[]{step, ret});
 			}
 		}
 		catch(Exception e)
 		{
+			System.out.println("as3: "+getComponentIdentifier()+" "+Thread.currentThread()+" "+step+", "+e);
 			ret.setException(e);
 		}
 		return ret;

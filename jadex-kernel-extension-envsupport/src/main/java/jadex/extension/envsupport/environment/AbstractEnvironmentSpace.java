@@ -1568,10 +1568,16 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 //											setOwner(ret.getId(), (IComponentIdentifier)result);
 										}
 										
-										public void exceptionOccurred(Exception exception)
+										public void exceptionOccurred(final Exception exception)
 										{
-											// Todo: propagate exception: kills application!?
-											exception.printStackTrace();
+											exta.scheduleStep(new IComponentStep()
+											{
+												public Object execute(IInternalAccess ia)
+												{
+													// Propagate exception: kills application!?
+													throw new RuntimeException("Could not create component: "+compotype, exception);
+												}
+											});
 										}
 									});
 								}

@@ -2,6 +2,7 @@ package jadex.micro.examples.dungeonkeeper;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -11,6 +12,8 @@ import jadex.extension.envsupport.environment.space2d.action.GetPosition;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.micro.MicroAgent;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +21,7 @@ import java.util.Map;
 /**
  *  The imp agent.
  */
+@Properties(@NameValue(name="space", clazz=IFuture.class, value="getParent().getExtension(\"mygc2dspace\")"))
 public class ImpAgent extends MicroAgent
 {
 	//-------- methods --------
@@ -27,7 +31,7 @@ public class ImpAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		final Grid2D space = (Grid2D)getParent().getExtension("mygc2dspace");
+		final Grid2D space = (Grid2D)getProperty("space");
 		
 		IComponentStep com = new IComponentStep()
 		{

@@ -101,6 +101,16 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	//-------- methods --------
 	
 	/**
+	 *  Get a property.
+	 *  @param name	The name of the property.
+	 *  @return The property value or null.
+	 */
+	public Object	getProperty(String name)
+	{
+		return interpreter.getProperties()!=null ? interpreter.getProperties().get(name) : null;
+	}
+	
+	/**
 	 *  Get the service provider.
 	 *  @return The service provider.
 	 */

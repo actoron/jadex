@@ -502,6 +502,7 @@ public abstract class ComponentManagementService extends BasicService implements
 																	
 																	if(killfut!=null)
 																	{
+																		// Kill component if destroy called during init.
 																		destroyComponent(cid, killfut);
 																	}
 																	else
@@ -527,7 +528,7 @@ public abstract class ComponentManagementService extends BasicService implements
 														public void exceptionOccurred(final Exception exception)
 														{
 															logger.info("Starting component failed: "+cid+", "+exception);
-	//														exception.printStackTrace();
+//															exception.printStackTrace();
 //															System.out.println("Ex: "+cid+" "+exception);
 															final Runnable	cleanup	= new Runnable()
 															{
@@ -963,7 +964,6 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	public IFuture destroyComponent(final IComponentIdentifier cid)
 	{
-//		System.out.println("destroy component: "+cid);
 		boolean contains = false;
 		Future tmp;
 		synchronized(adapters)
@@ -1018,7 +1018,18 @@ public abstract class ComponentManagementService extends BasicService implements
 			// Terminate component that is shut down during init.
 			if(infos!=null && infos.length>0 && !((IFuture)infos[4]).isDone())
 			{
-				logger.info("Queued component termination during init: "+cid.getName());
+				// Propagate failed component init.
+				ad	= (IComponentAdapter)infos[1];
+				if(ad.getException()!=null)
+				{
+					((Future)infos[4]).setException(ad.getException());
+				}
+				
+				// Component terminated from outside: wait for init to complete, will be removed as cleanup future is registered (cfs).
+				else
+				{
+					logger.info("Queued component termination during init: "+cid.getName());
+				}
 			}
 			// Terminate normally inited component.
 			else 
@@ -1050,43 +1061,53 @@ public abstract class ComponentManagementService extends BasicService implements
 						public void resultAvailable(Object result)
 						{
 							logger.info("Terminated component structure: "+cid.getName());
-							boolean	exit	= false;
+							CleanupCommand	cc	= null;
+							IFuture	fut	= null;
 							synchronized(adapters)
 							{
-								IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
-								// Component may be already killed (e.g. when autoshutdown).
-								if(adapter!=null)
+								try
 								{
-//									System.out.println("destroy1: "+cid);//+" "+component.getParent().getComponentIdentifier().getLocalName());
-									
-									// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
-									// todo: killcomponent should only be called once for each component?
-									if(!ccs.containsKey(cid))
+									IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
+									// Component may be already killed (e.g. when autoshutdown).
+									if(adapter!=null)
 									{
-//										System.out.println("killing a: "+cid);
+//										System.out.println("destroy1: "+cid);//+" "+component.getParent().getComponentIdentifier().getLocalName());
 										
-										CleanupCommand	cc	= new CleanupCommand(cid);
-										ccs.put(cid, cc);
-										logger.info("Terminating component: "+cid.getName());
-										killComponent(adapter).addResultListener(cc);
-	//									component.killComponent(cc);	
-									}
-									else
-									{
-//										System.out.println("killing b: "+cid);
-										
-										CleanupCommand cc = (CleanupCommand)ccs.get(cid);
-										if(cc==null)
+										// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
+										// todo: killcomponent should only be called once for each component?
+										if(!ccs.containsKey(cid))
 										{
-											// Todo: what is this case?
-											exit	= true;
+	//										System.out.println("killing a: "+cid);
+											
+											cc	= new CleanupCommand(cid);
+											ccs.put(cid, cc);
+											logger.info("Terminating component: "+cid.getName());
+											fut	= killComponent(adapter);
+		//									component.killComponent(cc);	
+										}
+										else
+										{
+	//										System.out.println("killing b: "+cid);
+											
+											cc = (CleanupCommand)ccs.get(cid);
 										}
 									}
 								}
+								catch(Throwable e)
+								{
+									e.printStackTrace();
+								}
 							}
 							
-							if(exit)
+							// Add listener outside synchronized block to avoid deadlocks
+							if(fut!=null && cc!=null)
 							{
+								fut.addResultListener(cc);
+							}
+							
+							if(cc==null)
+							{
+								// Todo: what is this case?
 								exitDestroy(cid, desc, new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()), null);
 							}
 							else
