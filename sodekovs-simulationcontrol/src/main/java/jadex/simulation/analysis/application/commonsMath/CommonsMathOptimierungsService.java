@@ -9,8 +9,8 @@ import jadex.simulation.analysis.common.data.IAExperimentBatch;
 import jadex.simulation.analysis.common.data.parameter.IAParameter;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
 import jadex.simulation.analysis.service.basic.analysis.ABasicAnalysisSessionService;
-import jadex.simulation.analysis.service.continuative.optimisation.IAOptimierungsService;
-import jadex.simulation.analysis.service.continuative.optimisation.IAZielfunktion;
+import jadex.simulation.analysis.service.continuative.optimisation.IAOptimisationService;
+import jadex.simulation.analysis.service.continuative.optimisation.IAObjectiveFunction;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -35,19 +35,19 @@ import org.apache.commons.math.optimization.direct.NelderMeadSimplex;
 import org.apache.commons.math.util.Incrementor;
 import org.apache.commons.math.util.MathUtils;
 
-public class CommonsMathOptimierungsService extends ABasicAnalysisSessionService implements IAOptimierungsService
+public class CommonsMathOptimierungsService extends ABasicAnalysisSessionService implements IAOptimisationService
 {
 	Set<String> methods = new HashSet<String>();
 	Map<UUID, Map<String, Object>> sessionState = new HashMap<UUID, Map<String, Object>>();
 
 	public CommonsMathOptimierungsService(IExternalAccess access)
 	{
-		super(access, IAOptimierungsService.class, true);
+		super(access, IAOptimisationService.class, true);
 		methods.add("Simplex Algorithmus");
 	}
 
 	@Override
-	public IFuture configurateOptimisation(UUID session, String method, IAParameterEnsemble methodParameter, IAParameterEnsemble solution, IAZielfunktion objective, IAParameterEnsemble config)
+	public IFuture configurateOptimisation(UUID session, String method, IAParameterEnsemble methodParameter, IAParameterEnsemble solution, IAObjectiveFunction objective, IAParameterEnsemble config)
 
 	{
 		// session erstellen
@@ -170,7 +170,7 @@ public class CommonsMathOptimierungsService extends ABasicAnalysisSessionService
 		Boolean terminate = (Boolean) sessionState.get(session).get("terminate");
 		List<Map.Entry<String, IAParameter>> mappings = (List<Map.Entry<String, IAParameter>>) sessionState.get(session).get("mappings");
 		Integer iteration = (Integer) sessionState.get(session).get("iteration");
-		IAZielfunktion objective = (IAZielfunktion) sessionState.get(session).get("objective");
+		IAObjectiveFunction objective = (IAObjectiveFunction) sessionState.get(session).get("objective");
 		
 		
 		

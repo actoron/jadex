@@ -10,16 +10,16 @@ import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.simulation.analysis.common.defaultViews.controlComponent.ComponentServiceViewerPanel;
-import jadex.simulation.analysis.service.continuative.computation.IAKonfidenzService;
-import jadex.simulation.analysis.service.continuative.optimisation.IAOptimierungsService;
-import jadex.simulation.analysis.service.dataBased.engineering.IADatenobjekteErstellenService;
+import jadex.simulation.analysis.service.continuative.computation.IAConfidenceService;
+import jadex.simulation.analysis.service.continuative.optimisation.IAOptimisationService;
+import jadex.simulation.analysis.service.dataBased.engineering.IAEngineerDataobjectService;
 
 /**
  *  Agent offering common math services
  */
 @Description(" Agent offering common math services")
-@ProvidedServices({@ProvidedService(type=IAKonfidenzService.class, implementation=@Implementation(expression="new CommonsMathKonfidenzService($component.getExternalAccess())")),
-	@ProvidedService(type=IAOptimierungsService.class, implementation=@Implementation(expression="new CommonsMathOptimierungsService($component.getExternalAccess())"))})
+@ProvidedServices({@ProvidedService(type=IAConfidenceService.class, implementation=@Implementation(expression="new CommonsMathKonfidenzService($component.getExternalAccess())")),
+	@ProvidedService(type=IAOptimisationService.class, implementation=@Implementation(expression="new CommonsMathOptimierungsService($component.getExternalAccess())"))})
 @GuiClass(ComponentServiceViewerPanel.class)
 @Properties(
 {

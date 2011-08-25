@@ -14,19 +14,19 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.simulation.analysis.common.defaultViews.controlComponent.ComponentServiceViewerPanel;
-import jadex.simulation.analysis.service.continuative.computation.IAKonfidenzService;
-import jadex.simulation.analysis.service.dataBased.engineering.IADatenobjekteErstellenService;
-import jadex.simulation.analysis.service.highLevel.IAAllgemeinPlanenService;
-import jadex.simulation.analysis.service.simulation.execution.IAExperimentAusfuehrenService;
+import jadex.simulation.analysis.service.continuative.computation.IAConfidenceService;
+import jadex.simulation.analysis.service.dataBased.engineering.IAEngineerDataobjectService;
+import jadex.simulation.analysis.service.highLevel.IAGeneralPlanningService;
+import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
 
 /**
  * Agent just for testing
  */
-@Description("Agent just test the IAAllgemeinPlanenService")
- @ProvidedServices({@ProvidedService(type=IAAllgemeinPlanenService.class,
+@Description("Agent just test the IAGeneralPlanningService")
+ @ProvidedServices({@ProvidedService(type=IAGeneralPlanningService.class,
  implementation=@Implementation(expression="new AAllgemeinePlanenService($component.getExternalAccess())"))})
  @RequiredServices({
-	@RequiredService(name="DatenobjektErstellenServices", type=IADatenobjekteErstellenService.class,  binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+	@RequiredService(name="DatenobjektErstellenServices", type=IAEngineerDataobjectService.class,  binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="cmsService", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 })
 

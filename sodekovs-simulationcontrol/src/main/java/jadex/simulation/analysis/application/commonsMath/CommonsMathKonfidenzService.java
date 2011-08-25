@@ -7,18 +7,18 @@ import jadex.commons.future.ThreadSuspendable;
 import jadex.simulation.analysis.common.data.parameter.IAMultiValueParameter;
 import jadex.simulation.analysis.service.basic.analysis.ABasicAnalysisService;
 import jadex.simulation.analysis.service.basic.analysis.ABasicAnalysisSessionService;
-import jadex.simulation.analysis.service.continuative.computation.IAKonfidenzService;
+import jadex.simulation.analysis.service.continuative.computation.IAConfidenceService;
 
 import org.apache.commons.math.stat.inference.TTest;
 import org.apache.commons.math.stat.inference.TTestImpl;
 
-public class CommonsMathKonfidenzService extends ABasicAnalysisSessionService implements IAKonfidenzService
+public class CommonsMathKonfidenzService extends ABasicAnalysisSessionService implements IAConfidenceService
 {
 	private TTest ttest = new TTestImpl();
 
 	public CommonsMathKonfidenzService(IExternalAccess access)
 	{
-		super(access, IAKonfidenzService.class, true);
+		super(access, IAConfidenceService.class, true);
 	}
 
 	@Override

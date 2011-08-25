@@ -6,6 +6,7 @@ import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.AExperimentBatch;
 import jadex.simulation.analysis.common.data.IAExperiment;
 import jadex.simulation.analysis.common.data.IAExperimentBatch;
+import jadex.simulation.analysis.common.data.parameter.ABasicParameter;
 import jadex.simulation.analysis.common.data.parameter.AParameterEnsemble;
 import jadex.simulation.analysis.common.data.parameter.IAParameter;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
@@ -14,10 +15,10 @@ import jadex.simulation.analysis.common.util.AConstants;
 import jadex.simulation.analysis.process.basicTasks.IATaskView;
 import jadex.simulation.analysis.process.basicTasks.user.AServiceCallTaskView;
 import jadex.simulation.analysis.service.basic.analysis.ABasicAnalysisSessionService;
-import jadex.simulation.analysis.service.continuative.optimisation.IAOptimierungsService;
-import jadex.simulation.analysis.service.continuative.optimisation.IAZielfunktion;
+import jadex.simulation.analysis.service.continuative.optimisation.IAOptimisationService;
+import jadex.simulation.analysis.service.continuative.optimisation.IAObjectiveFunction;
 import jadex.simulation.analysis.service.simulation.Modeltype;
-import jadex.simulation.analysis.service.simulation.execution.IAExperimentAusfuehrenService;
+import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
 
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -42,16 +43,16 @@ import org.nlogo.lite.InterfaceComponent;
 import com.google.inject.Module;
 
 /**
- * Opt4J implementation of {@link IAOptimierungsService}vice
+ * Opt4J implementation of {@link IAOptimisationService}vice
  */
-public class Opt4JOptimierungsService extends ABasicAnalysisSessionService implements IAOptimierungsService
+public class Opt4JOptimisationService extends ABasicAnalysisSessionService implements IAOptimisationService
 {
 	Set<String> methods = new HashSet<String>();
 	Map<UUID, Map<String, Object>> sessionState = new HashMap<UUID, Map<String, Object>>();
 
-	public Opt4JOptimierungsService(IExternalAccess access)
+	public Opt4JOptimisationService(IExternalAccess access)
 	{
-		super(access, IAOptimierungsService.class, true);
+		super(access, IAOptimisationService.class, true);
 		methods.add("Evolutionaerer Algorithmus");
 	}
 
@@ -67,7 +68,13 @@ public class Opt4JOptimierungsService extends ABasicAnalysisSessionService imple
 		Future result = new Future();
 		if (methodName.equals("Evolutionaerer Algorithmus"))
 		{
-			//TODO
+			AParameterEnsemble ens = new AParameterEnsemble("methodParameter");
+			ens.addParameter(new ABasicParameter("generations", Integer.class, 10));
+			ens.addParameter(new ABasicParameter("alpha", Integer.class, 10));
+			ens.addParameter(new ABasicParameter("lambda", Integer.class, 4));
+			ens.addParameter(new ABasicParameter("crossover", Double.class, 0.5));
+			ens.addParameter(new ABasicParameter("mu", Double.class, 4));
+			result.setResult(ens);
 		}
 		return result;
 	}
@@ -94,7 +101,7 @@ public class Opt4JOptimierungsService extends ABasicAnalysisSessionService imple
 	}
 
 	@Override
-	public IFuture configurateOptimisation(UUID session, String method, IAParameterEnsemble methodParameter, IAParameterEnsemble solution, IAParameterEnsemble result, IAZielfunktion objective, IAParameterEnsemble config)
+	public IFuture configurateOptimisation(UUID session, String method, IAParameterEnsemble methodParameter, IAParameterEnsemble solution, IAObjectiveFunction objective, IAParameterEnsemble config)
 	{
 		// session erstellen
 		UUID newSession = null;

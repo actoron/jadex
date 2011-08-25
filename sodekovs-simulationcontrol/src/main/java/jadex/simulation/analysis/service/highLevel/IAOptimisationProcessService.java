@@ -6,7 +6,7 @@ import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.service.basic.analysis.IAnalysisService;
 import jadex.simulation.analysis.service.basic.analysis.IAnalysisSessionService;
 
-public interface IAOptimierungsprozessService extends IAnalysisSessionService
+public interface IAOptimisationProcessService extends IAnalysisSessionService
 {
 	public IFuture optimieren(UUID session);
 }

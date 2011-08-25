@@ -13,7 +13,7 @@ import jadex.simulation.analysis.process.basicTasks.IATaskView;
 import jadex.simulation.analysis.process.basicTasks.user.AServiceCallTaskView;
 import jadex.simulation.analysis.service.basic.analysis.ABasicAnalysisSessionService;
 import jadex.simulation.analysis.service.simulation.Modeltype;
-import jadex.simulation.analysis.service.simulation.execution.IAExperimentAusfuehrenService;
+import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
 
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -32,7 +32,7 @@ import org.nlogo.lite.InterfaceComponent;
 /**
  * Implementation of a NetLogo service for (single) experiments.
  */
-public class NetLogoExperimentAusfuehrenService extends ABasicAnalysisSessionService implements IAExperimentAusfuehrenService {
+public class NetLogoExperimentAusfuehrenService extends ABasicAnalysisSessionService implements IAExecuteExperimentsService {
 
 	JTextArea compLite = new JTextArea();
 	
@@ -43,29 +43,20 @@ public class NetLogoExperimentAusfuehrenService extends ABasicAnalysisSessionSer
 	 *            The active generalComp.
 	 */
 	public NetLogoExperimentAusfuehrenService(IExternalAccess access) {
-		super(access, IAExperimentAusfuehrenService.class, true);
+		super(access, IAExecuteExperimentsService.class, true);
 	}
 	
-	public IFuture createSession(IAParameterEnsemble configuration)
-	{
-		UUID id = UUID.randomUUID();
-		if (configuration == null) configuration = new AParameterEnsemble("Session Konfiguration");
-		sessions.put(id, configuration);
-		configuration.setEditable(false);
-		sessionViews.put(id, new NetLogoSessionView(this, id, configuration));
-		serviceChanged(new AServiceEvent(this,AConstants.SERVICE_SESSION_START, id));
-		return new Future(id);
-	}
-
 	/**
 	 * Simulate an experiment
 	 */
 	public IFuture executeExperiment(UUID session, final IAExperiment exp) {
 		final Future res = new Future();
 
+		if (session == null) session = (UUID) createSession(null).get(susThread);
+		
 		if ((Boolean)exp.getExperimentParameter("Visualisierung").getValue())
 		{		
-			NetLogoSessionView view = ((NetLogoSessionView)sessionViews.get(session));
+//			NetLogoSessionView view = ((NetLogoSessionView)sessionViews.get(session));
 //			final JFrame frame = (JFrame)SwingUtilities.getRoot(taskview.getComponent());
 			final JFrame frame = new JFrame();
 

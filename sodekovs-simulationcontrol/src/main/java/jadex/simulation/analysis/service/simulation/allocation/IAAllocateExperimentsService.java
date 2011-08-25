@@ -11,13 +11,13 @@ import jadex.simulation.analysis.service.basic.analysis.IAnalysisSessionService;
 /**
  *  A Service to allocate an experiment
  */
-public interface IAExperimenteVerteilenService extends IAnalysisSessionService
+public interface IAAllocateExperimentsService extends IAnalysisSessionService
 {
 
 	/**
 	 *  Allocate a experimentBatch with default strategy
 	 *  @param experiment the experiment
-	 *  @return List<IAExperimentAusfuehrenService>
+	 *  @return List<IAExecuteExperimentsService>
 	 */
 	public IFuture allocateExperiment(UUID sessionId, IAExperimentBatch experiments);
 }

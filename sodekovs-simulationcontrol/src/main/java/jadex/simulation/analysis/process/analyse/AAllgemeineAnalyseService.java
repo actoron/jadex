@@ -13,19 +13,19 @@ import jadex.simulation.analysis.common.events.service.AServiceEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 import jadex.simulation.analysis.service.basic.analysis.ASubProcessService;
 import jadex.simulation.analysis.service.basic.view.session.subprocess.ASubProcessView;
-import jadex.simulation.analysis.service.highLevel.IAAllgemeinPlanenService;
-import jadex.simulation.analysis.service.highLevel.IAAllgemeinAusfuehrenService;
-import jadex.simulation.analysis.service.highLevel.IAAllgemeineAnalyseService;
+import jadex.simulation.analysis.service.highLevel.IAGeneralPlanningService;
+import jadex.simulation.analysis.service.highLevel.IAGeneralExecuteService;
+import jadex.simulation.analysis.service.highLevel.IAGeneralAnalysisProcessService;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class AAllgemeineAnalyseService extends ASubProcessService implements IAAllgemeineAnalyseService
+public class AAllgemeineAnalyseService extends ASubProcessService implements IAGeneralAnalysisProcessService
 {
 	public AAllgemeineAnalyseService(IExternalAccess access)
 	{
-		super(access, IAAllgemeineAnalyseService.class);
+		super(access, IAGeneralAnalysisProcessService.class);
 	}
 	
 	@Override
@@ -42,7 +42,7 @@ public class AAllgemeineAnalyseService extends ASubProcessService implements IAA
 	}
 
 	@Override
-	public IFuture analysieren(UUID session)
+	public IFuture analyse(UUID session)
 	{
 		return startSubprocess(session, "AllgemeineAnalyse", "jadex/simulation/analysis/process/analyse/AllgemeineAnalyse.bpmn", null);
 	}

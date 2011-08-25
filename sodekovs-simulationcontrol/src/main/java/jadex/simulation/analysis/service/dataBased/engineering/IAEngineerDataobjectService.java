@@ -9,7 +9,7 @@ import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
 import jadex.simulation.analysis.service.basic.analysis.IAnalysisSessionService;
 import jadex.simulation.analysis.service.simulation.Modeltype;
 
-public interface IADatenobjekteErstellenService extends IAnalysisSessionService
+public interface IAEngineerDataobjectService extends IAnalysisSessionService
 {
 	public IFuture engineerGuiDataObject(UUID sessionId, ADataObject dataObject);
 	

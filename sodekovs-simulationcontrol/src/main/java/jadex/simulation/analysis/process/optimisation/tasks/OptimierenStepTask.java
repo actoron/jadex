@@ -2,25 +2,10 @@ package jadex.simulation.analysis.process.optimisation.tasks;
 
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
-import jadex.bpmn.runtime.task.ParameterMetaInfo;
-import jadex.bpmn.runtime.task.TaskMetaInfo;
-import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.simulation.analysis.common.data.IAModel;
-import jadex.simulation.analysis.common.data.factories.AModelFactory;
-import jadex.simulation.analysis.common.events.task.ATaskEvent;
-import jadex.simulation.analysis.common.util.AConstants;
 import jadex.simulation.analysis.process.basicTasks.ATask;
 import jadex.simulation.analysis.process.basicTasks.user.AServiceCallUserTaskView;
-import jadex.simulation.analysis.service.dataBased.parameterize.IADatenobjekteParametrisierenGUIService;
-import jadex.simulation.analysis.service.simulation.Modeltype;
-
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import java.util.UUID;
-
-import javax.swing.JComponent;
 
 public class OptimierenStepTask extends ATask
 {

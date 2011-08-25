@@ -1,6 +1,7 @@
 package jadex.simulation.analysis.application.standalone;
 
 import jadex.commons.future.ThreadSuspendable;
+import jadex.simulation.analysis.application.hibernate.HibernateSaveDataobjectService;
 import jadex.simulation.analysis.common.data.IADataObject;
 
 import java.awt.Dimension;
@@ -20,11 +21,11 @@ import javax.swing.event.ListSelectionListener;
 
 public class ADatenobjekteSpeichernView extends JPanel
 {
-	final protected ADatenobjekteSpeichernService service;
+	final protected HibernateSaveDataobjectService service;
 	protected JList list;
 	protected JSplitPane splitP;
 
-	public ADatenobjekteSpeichernView(ADatenobjekteSpeichernService dservice)
+	public ADatenobjekteSpeichernView(HibernateSaveDataobjectService dservice)
 	{
 		super(new GridBagLayout());
 		this.service = dservice;

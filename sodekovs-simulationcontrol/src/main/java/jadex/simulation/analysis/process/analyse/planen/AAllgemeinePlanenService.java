@@ -11,17 +11,17 @@ import jadex.simulation.analysis.common.events.service.AServiceEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 import jadex.simulation.analysis.service.basic.analysis.ASubProcessService;
 import jadex.simulation.analysis.service.basic.view.session.subprocess.ASubProcessView;
-import jadex.simulation.analysis.service.highLevel.IAAllgemeinPlanenService;
+import jadex.simulation.analysis.service.highLevel.IAGeneralPlanningService;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class AAllgemeinePlanenService extends ASubProcessService implements IAAllgemeinPlanenService
+public class AAllgemeinePlanenService extends ASubProcessService implements IAGeneralPlanningService
 {
 	public AAllgemeinePlanenService(IExternalAccess access)
 	{
-		super(access, IAAllgemeinPlanenService.class);
+		super(access, IAGeneralPlanningService.class);
 	}
 
 	@Override

@@ -24,10 +24,10 @@ import jadex.simulation.analysis.common.data.parameter.ABasicParameter;
 import jadex.simulation.analysis.common.data.parameter.AParameterEnsemble;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
 import jadex.simulation.analysis.common.defaultViews.controlComponent.ComponentServiceViewerPanel;
-import jadex.simulation.analysis.service.continuative.computation.IAKonfidenzService;
-import jadex.simulation.analysis.service.continuative.optimisation.IAOptimierungsService;
-import jadex.simulation.analysis.service.continuative.optimisation.IAZielfunktion;
-import jadex.simulation.analysis.service.dataBased.engineering.IADatenobjekteErstellenService;
+import jadex.simulation.analysis.service.continuative.computation.IAConfidenceService;
+import jadex.simulation.analysis.service.continuative.optimisation.IAOptimisationService;
+import jadex.simulation.analysis.service.continuative.optimisation.IAObjectiveFunction;
+import jadex.simulation.analysis.service.dataBased.engineering.IAEngineerDataobjectService;
 
 /**
  *  Agent offering common math services
@@ -38,7 +38,7 @@ public class TestOptCommonsMathAgent extends MicroAgent
 	@Override
 	public IFuture agentCreated()
 	{
-		IAOptimierungsService service = (IAOptimierungsService) SServiceProvider.getService(getServiceProvider(), IAOptimierungsService.class).get(new ThreadSuspendable(this));
+		IAOptimisationService service = (IAOptimisationService) SServiceProvider.getService(getServiceProvider(), IAOptimisationService.class).get(new ThreadSuspendable(this));
 		AParameterEnsemble ensConf = new AParameterEnsemble("config");
 		
 		AParameterEnsemble ensSol = new AParameterEnsemble("solution");
@@ -51,7 +51,7 @@ public class TestOptCommonsMathAgent extends MicroAgent
 		ensRes.addParameter(new ABasicParameter("out2", Double.class, Double.NaN));
 		ensRes.addParameter(new ABasicParameter("out3", Double.class, Double.NaN));
 		
-		IAZielfunktion zf = new IAZielfunktion()
+		IAObjectiveFunction zf = new IAObjectiveFunction()
 		{
 			
 			@Override
@@ -69,7 +69,7 @@ public class TestOptCommonsMathAgent extends MicroAgent
 		};
 		
 		
-		UUID session = (UUID) service.configurateOptimisation(null, "Simplex Algorithmus", null, ensSol, ensRes, zf, ensConf).get(new ThreadSuspendable(this));
+		UUID session = (UUID) service.configurateOptimisation(null, "Simplex Algorithmus", null, ensSol, zf, ensConf).get(new ThreadSuspendable(this));
 		
 		AExperiment exp = new AExperiment("exp1", null, null, ensSol, ensRes);
 		AExperimentBatch batch = new AExperimentBatch("batch1");

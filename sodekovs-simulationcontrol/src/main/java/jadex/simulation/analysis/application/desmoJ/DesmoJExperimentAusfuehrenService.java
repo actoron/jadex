@@ -12,7 +12,7 @@ import jadex.simulation.analysis.common.events.service.AServiceEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 import jadex.simulation.analysis.service.basic.analysis.ABasicAnalysisSessionService;
 import jadex.simulation.analysis.service.simulation.Modeltype;
-import jadex.simulation.analysis.service.simulation.execution.IAExperimentAusfuehrenService;
+import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -30,7 +30,7 @@ import desmoj.core.simulator.TimeInstant;
 /**
  * Implementation of a DesmoJ service for (single) experiments.
  */
-public class DesmoJExperimentAusfuehrenService extends ABasicAnalysisSessionService implements IAExperimentAusfuehrenService
+public class DesmoJExperimentAusfuehrenService extends ABasicAnalysisSessionService implements IAExecuteExperimentsService
 {
 
 	/**
@@ -41,7 +41,7 @@ public class DesmoJExperimentAusfuehrenService extends ABasicAnalysisSessionServ
 	 */
 	public DesmoJExperimentAusfuehrenService(IExternalAccess access)
 	{
-		super(access, IAExperimentAusfuehrenService.class, true);
+		super(access, IAExecuteExperimentsService.class, true);
 
 	}
 

@@ -7,22 +7,22 @@ import jadex.commons.future.IResultListener;
 import jadex.simulation.analysis.common.data.IAExperiment;
 import jadex.simulation.analysis.common.data.IAExperimentBatch;
 import jadex.simulation.analysis.service.basic.analysis.ASubProcessService;
-import jadex.simulation.analysis.service.highLevel.IAAllgemeinPlanenService;
-import jadex.simulation.analysis.service.highLevel.IAAllgemeinAusfuehrenService;
+import jadex.simulation.analysis.service.highLevel.IAGeneralPlanningService;
+import jadex.simulation.analysis.service.highLevel.IAGeneralExecuteService;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class AAllgemeinAusfuehrenService extends ASubProcessService implements IAAllgemeinAusfuehrenService
+public class AAllgemeinAusfuehrenService extends ASubProcessService implements IAGeneralExecuteService
 {
 	public AAllgemeinAusfuehrenService(IExternalAccess access)
 	{
-		super(access, IAAllgemeinAusfuehrenService.class);
+		super(access, IAGeneralExecuteService.class);
 	}
 
 	@Override
-	public IFuture ausführen(UUID session, IAExperimentBatch experiment)
+	public IFuture execute(UUID session, IAExperimentBatch experiment)
 	{
 		synchronized (mutex)
 		{

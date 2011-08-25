@@ -13,20 +13,20 @@ import jadex.simulation.analysis.common.events.service.AServiceEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 import jadex.simulation.analysis.service.basic.analysis.ASubProcessService;
 import jadex.simulation.analysis.service.basic.view.session.subprocess.ASubProcessView;
-import jadex.simulation.analysis.service.highLevel.IAAllgemeinPlanenService;
-import jadex.simulation.analysis.service.highLevel.IAAllgemeinAusfuehrenService;
-import jadex.simulation.analysis.service.highLevel.IAAllgemeineAnalyseService;
-import jadex.simulation.analysis.service.highLevel.IAOptimierungsprozessService;
+import jadex.simulation.analysis.service.highLevel.IAGeneralPlanningService;
+import jadex.simulation.analysis.service.highLevel.IAGeneralExecuteService;
+import jadex.simulation.analysis.service.highLevel.IAGeneralAnalysisProcessService;
+import jadex.simulation.analysis.service.highLevel.IAOptimisationProcessService;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class AOptimierungsprozessService extends ASubProcessService implements IAOptimierungsprozessService
+public class AOptimierungsprozessService extends ASubProcessService implements IAOptimisationProcessService
 {
 	public AOptimierungsprozessService(IExternalAccess access)
 	{
-		super(access, IAOptimierungsprozessService.class);
+		super(access, IAOptimisationProcessService.class);
 	}
 	
 	@Override

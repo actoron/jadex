@@ -14,7 +14,7 @@ import jadex.simulation.analysis.process.basicTasks.ASubProcessTaskView;
 import jadex.simulation.analysis.process.basicTasks.ATask;
 import jadex.simulation.analysis.process.basicTasks.user.AServiceCallUserTaskView;
 import jadex.simulation.analysis.service.basic.view.session.subprocess.ASubProcessView;
-import jadex.simulation.analysis.service.highLevel.IAAllgemeinPlanenService;
+import jadex.simulation.analysis.service.highLevel.IAGeneralPlanningService;
 
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -35,7 +35,7 @@ public class AllgemeinPlanenTask extends ATask
 	public IFuture execute(ITaskContext context, BpmnInterpreter instance)
 	{
 		super.execute(context, instance);
-		IAAllgemeinPlanenService service = (IAAllgemeinPlanenService) SServiceProvider.getService(instance.getServiceProvider(), IAAllgemeinPlanenService.class).get(susThread);
+		IAGeneralPlanningService service = (IAGeneralPlanningService) SServiceProvider.getService(instance.getServiceProvider(), IAGeneralPlanningService.class).get(susThread);
 		UUID session = (UUID) service.createSession(null).get(susThread);
 //		service.getSessionView(session).get(susThread);
 		((ASubProcessTaskView)view).init((ASubProcessView) service.getSessionView(session).get(susThread));

@@ -1,4 +1,4 @@
-package jadex.simulation.analysis.application.opt4j;
+package jadex.simulation.analysis.application.hibernate;
 
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.micro.MicroAgent;
@@ -9,16 +9,16 @@ import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.simulation.analysis.common.defaultViews.controlComponent.ComponentServiceViewerPanel;
-import jadex.simulation.analysis.service.continuative.optimisation.IAOptimierungsService;
-import jadex.simulation.analysis.service.simulation.execution.IAExperimentAusfuehrenService;
+import jadex.simulation.analysis.service.dataBased.persist.IASaveDataobjectService;
 
-@Description("Agent offer IAOptimierungsService")
- @ProvidedServices({@ProvidedService(type=IAOptimierungsService.class,
- implementation=@Implementation(expression="new Opt4JOptimierungsService($component.getExternalAccess())"))})
+@Description("Agent bietet eine IASaveDataobjectService an")
+@ProvidedServices({@ProvidedService(type=IASaveDataobjectService.class, implementation=@Implementation(expression="new jadex.simulation.analysis.application.hibernate.HibernateSaveDataobjectService($component.getExternalAccess())"))})
 @GuiClass(ComponentServiceViewerPanel.class)
 @Properties(
 {
 	@NameValue(name="viewerpanel.componentviewerclass", value="\"jadex.simulation.analysis.common.defaultViews.controlComponent.ControlComponentViewerPanel\"")
 })
-public class OptJOptimierenAgent extends MicroAgent
-{}
+public class HibernateAgent extends MicroAgent
+{	
+
+}

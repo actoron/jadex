@@ -9,20 +9,14 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.IAExperiment;
 import jadex.simulation.analysis.common.data.IAExperimentBatch;
-import jadex.simulation.analysis.common.data.IAModel;
-import jadex.simulation.analysis.common.data.factories.AModelFactory;
 import jadex.simulation.analysis.common.events.task.ATaskEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 import jadex.simulation.analysis.process.basicTasks.ATask;
 import jadex.simulation.analysis.process.basicTasks.user.AServiceCallTaskView;
-import jadex.simulation.analysis.process.basicTasks.user.AServiceCallUserTaskView;
-import jadex.simulation.analysis.service.dataBased.parameterize.IADatenobjekteParametrisierenGUIService;
-import jadex.simulation.analysis.service.dataBased.persist.IADatenobjekteSpeichernService;
-import jadex.simulation.analysis.service.simulation.Modeltype;
+import jadex.simulation.analysis.service.dataBased.persist.IASaveDataobjectService;
 
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import java.util.UUID;
 
 import javax.swing.JComponent;
 
@@ -38,7 +32,7 @@ public class ASeichernTask extends ATask
 	public IFuture execute(ITaskContext context, BpmnInterpreter instance)
 	{
 		super.execute(context, instance);
-		IADatenobjekteSpeichernService service = (IADatenobjekteSpeichernService) SServiceProvider.getService(instance.getServiceProvider(), IADatenobjekteSpeichernService.class).get(susThread);
+		IASaveDataobjectService service = (IASaveDataobjectService) SServiceProvider.getService(instance.getServiceProvider(), IASaveDataobjectService.class).get(susThread);
 		// service.getSessionView(session).get(susThread);
 		((AServiceCallTaskView) view).addServiceGUI((JComponent) service.getView().get(susThread), new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
 

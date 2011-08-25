@@ -19,7 +19,7 @@ import jadex.simulation.analysis.process.basicTasks.ATask;
 import jadex.simulation.analysis.process.basicTasks.user.AServiceCallTaskView;
 import jadex.simulation.analysis.process.basicTasks.user.AServiceCallUserTaskView;
 import jadex.simulation.analysis.service.basic.view.session.IASessionView;
-import jadex.simulation.analysis.service.simulation.execution.IAExperimentAusfuehrenService;
+import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
 
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -49,13 +49,13 @@ public class AExperimentAusfuehrenTask extends ATask
 			final IAExperimentBatch experiments = (IAExperimentBatch) context.getParameterValue("experiments");
 			for (IAExperiment exp : experiments.getExperiments().values())
 			{
-				IAExperimentAusfuehrenService service = null;
+				IAExecuteExperimentsService service = null;
 				if (experiments.getAllocation(exp) != null)
 				{
-					service = (IAExperimentAusfuehrenService) experiments.getAllocation(exp);
+					service = (IAExecuteExperimentsService) experiments.getAllocation(exp);
 				} else
 				{
-					service = (IAExperimentAusfuehrenService) SServiceProvider.getService(instance.getServiceProvider(), IAExperimentAusfuehrenService.class).get(susThread);
+					service = (IAExecuteExperimentsService) SServiceProvider.getService(instance.getServiceProvider(), IAExecuteExperimentsService.class).get(susThread);
 				}
 				UUID session = (UUID) service.createSession(null).get(susThread);
 				JComponent sesview =  (JComponent) service.getSessionView(session).get(susThread);

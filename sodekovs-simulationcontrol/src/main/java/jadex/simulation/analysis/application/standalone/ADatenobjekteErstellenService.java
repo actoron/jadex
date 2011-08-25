@@ -11,17 +11,17 @@ import jadex.simulation.analysis.common.data.factories.AModelFactory;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
 import jadex.simulation.analysis.service.basic.analysis.ABasicAnalysisSessionService;
 import jadex.simulation.analysis.service.basic.view.session.IASessionView;
-import jadex.simulation.analysis.service.dataBased.engineering.IADatenobjekteErstellenService;
+import jadex.simulation.analysis.service.dataBased.engineering.IAEngineerDataobjectService;
 import jadex.simulation.analysis.service.simulation.Modeltype;
 
 import java.util.UUID;
 
-public class ADatenobjekteErstellenService extends ABasicAnalysisSessionService implements IADatenobjekteErstellenService
+public class ADatenobjekteErstellenService extends ABasicAnalysisSessionService implements IAEngineerDataobjectService
 {
 
 	public ADatenobjekteErstellenService(IExternalAccess instance)
 	{
-		super(instance, IADatenobjekteErstellenService.class, true);
+		super(instance, IAEngineerDataobjectService.class, true);
 	}
 
 	@Override
@@ -29,7 +29,7 @@ public class ADatenobjekteErstellenService extends ABasicAnalysisSessionService 
 	{
 		IFuture res = new Future();
 		
-//		IADatenobjekteErstellenService service = (IADatenobjekteErstellenService) SServiceProvider.getServices(instance.getServiceProvider(), IADatenobjekteErstellenService.class,  RequiredServiceInfo.SCOPE_GLOBAL).get(new ThreadSuspendable(this));
+//		IAEngineerDataobjectService service = (IAEngineerDataobjectService) SServiceProvider.getServices(instance.getServiceProvider(), IAEngineerDataobjectService.class,  RequiredServiceInfo.SCOPE_GLOBAL).get(new ThreadSuspendable(this));
 		dataObject.setEditable(true);
 		IADataView view =dataObject.getView();
 

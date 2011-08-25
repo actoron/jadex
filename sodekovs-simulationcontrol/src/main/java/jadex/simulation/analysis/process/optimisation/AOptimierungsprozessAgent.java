@@ -9,10 +9,10 @@ import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.simulation.analysis.common.defaultViews.controlComponent.ComponentServiceViewerPanel;
-import jadex.simulation.analysis.service.highLevel.IAOptimierungsprozessService;
+import jadex.simulation.analysis.service.highLevel.IAOptimisationProcessService;
 
-@Description("Agent just offer the IAOptimierungsprozessService")
- @ProvidedServices({@ProvidedService(type=IAOptimierungsprozessService.class,
+@Description("Agent just offer the IAOptimisationProcessService")
+ @ProvidedServices({@ProvidedService(type=IAOptimisationProcessService.class,
  implementation=@Implementation(expression="new AOptimierungsprozessService($component.getExternalAccess())"))})
 @GuiClass(ComponentServiceViewerPanel.class)
 @Properties(

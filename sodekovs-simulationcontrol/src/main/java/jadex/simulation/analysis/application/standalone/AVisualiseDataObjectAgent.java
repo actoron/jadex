@@ -9,18 +9,16 @@ import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.simulation.analysis.common.defaultViews.controlComponent.ComponentServiceViewerPanel;
-import jadex.simulation.analysis.service.dataBased.engineering.IADatenobjekteErstellenService;
-import jadex.simulation.analysis.service.dataBased.parameterize.IADatenobjekteParametrisierenGUIService;
-import jadex.simulation.analysis.service.dataBased.persist.IADatenobjekteSpeichernService;
+import jadex.simulation.analysis.service.dataBased.visualisation.IAVisualiseDataobjectService;
 
-@Description("Agent bietet eine IADatenobjekteSpeichernService an")
-@ProvidedServices({@ProvidedService(type=IADatenobjekteSpeichernService.class, implementation=@Implementation(expression="new jadex.simulation.analysis.application.standalone.ADatenobjekteSpeichernService($component.getExternalAccess())"))})
+@Description("Agent bietet eine IADatenobjekteParametrisierenGUIService an")
+@ProvidedServices({@ProvidedService(type=IAVisualiseDataobjectService.class, implementation=@Implementation(expression="new jadex.simulation.analysis.application.standalone.AVisualiseDataobjectService($component.getExternalAccess())"))})
 @GuiClass(ComponentServiceViewerPanel.class)
 @Properties(
 {
 	@NameValue(name="viewerpanel.componentviewerclass", value="\"jadex.simulation.analysis.common.defaultViews.controlComponent.ControlComponentViewerPanel\"")
 })
-public class ADatenobjekteSpeichernAgent extends MicroAgent
+public class AVisualiseDataObjectAgent extends MicroAgent
 {	
 
 }

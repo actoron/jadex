@@ -9,17 +9,16 @@ import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.simulation.analysis.common.defaultViews.controlComponent.ComponentServiceViewerPanel;
-import jadex.simulation.analysis.service.dataBased.engineering.IADatenobjekteErstellenService;
-import jadex.simulation.analysis.service.simulation.allocation.IAExperimenteVerteilenService;
+import jadex.simulation.analysis.service.simulation.allocation.IAAllocateExperimentsService;
 
-@Description("Agent bietet eine IAExperimenteVerteilenService an")
-@ProvidedServices({@ProvidedService(type=IAExperimenteVerteilenService.class, implementation=@Implementation(expression="new jadex.simulation.analysis.application.standalone.AExperimenteVerteilenService($component.getExternalAccess())"))})
+@Description("Agent bietet eine IAAllocateExperimentsService an")
+@ProvidedServices({@ProvidedService(type=IAAllocateExperimentsService.class, implementation=@Implementation(expression="new jadex.simulation.analysis.application.standalone.AAllocateExperimentsService($component.getExternalAccess())"))})
 @GuiClass(ComponentServiceViewerPanel.class)
 @Properties(
 {
 	@NameValue(name="viewerpanel.componentviewerclass", value="\"jadex.simulation.analysis.common.defaultViews.controlComponent.ControlComponentViewerPanel\"")
 })
-public class AExperimenteVerteilenAgent extends MicroAgent
+public class AAllocateExperimentsAgent extends MicroAgent
 {	
 
 }

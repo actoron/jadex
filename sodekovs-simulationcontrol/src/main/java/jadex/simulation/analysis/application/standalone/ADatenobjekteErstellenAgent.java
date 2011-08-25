@@ -9,13 +9,13 @@ import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.simulation.analysis.common.defaultViews.controlComponent.ComponentServiceViewerPanel;
-import jadex.simulation.analysis.service.dataBased.engineering.IADatenobjekteErstellenService;
+import jadex.simulation.analysis.service.dataBased.engineering.IAEngineerDataobjectService;
 
 /**
  *  Agent just offering the dataObject engineering service..
  */
 @Description("Agent just offering the dataObject engineering service.")
-@ProvidedServices({@ProvidedService(type=IADatenobjekteErstellenService.class, implementation=@Implementation(expression="new jadex.simulation.analysis.application.standalone.ADatenobjekteErstellenService($component.getExternalAccess())"))})
+@ProvidedServices({@ProvidedService(type=IAEngineerDataobjectService.class, implementation=@Implementation(expression="new jadex.simulation.analysis.application.standalone.ADatenobjekteErstellenService($component.getExternalAccess())"))})
 @GuiClass(ComponentServiceViewerPanel.class)
 @Properties(
 {

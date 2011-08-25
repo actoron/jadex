@@ -1,32 +1,20 @@
 package jadex.simulation.analysis.process.basicTasks.user;
 
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.simulation.analysis.process.basicTasks.ATaskView;
+import jadex.simulation.analysis.process.basicTasks.IATask;
+import jadex.simulation.analysis.process.basicTasks.IATaskView;
+
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
-import java.util.UUID;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.SServiceProvider;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
-import jadex.simulation.analysis.common.data.IAModel;
-import jadex.simulation.analysis.process.basicTasks.ATaskView;
-import jadex.simulation.analysis.process.basicTasks.IATask;
-import jadex.simulation.analysis.process.basicTasks.IATaskView;
-import jadex.simulation.analysis.service.basic.view.session.IASessionView;
-import jadex.simulation.analysis.service.dataBased.engineering.IADatenobjekteErstellenService;
-import jadex.simulation.analysis.service.dataBased.parameterize.IADatenobjekteParametrisierenGUIService;
 
 public class AServiceCallUserTaskView extends ATaskView implements IATaskView
 {

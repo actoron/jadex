@@ -7,14 +7,14 @@ import jadex.simulation.analysis.common.data.IAExperimentBatch;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
 import jadex.simulation.analysis.service.basic.analysis.IAnalysisSessionService;
 
-public interface IAOptimierungsService extends IAnalysisSessionService
+public interface IAOptimisationService extends IAnalysisSessionService
 {
 	/**
 	 * Ermöglicht die Konfiguration einer Session zur Optimierung durch ein IAParameterEnsemble.
 	 * 
 	 * @return session UUID
 	 */
-	public IFuture configurateOptimisation(UUID session, String method, IAParameterEnsemble methodParameter, IAParameterEnsemble solution, IAZielfunktion objective, IAParameterEnsemble config);
+	public IFuture configurateOptimisation(UUID session, String method, IAParameterEnsemble methodParameter, IAParameterEnsemble solution, IAObjectiveFunction objective, IAParameterEnsemble config);
 
 	/**
 	 * Gibt die unterstützten Verfahren des Services zurück

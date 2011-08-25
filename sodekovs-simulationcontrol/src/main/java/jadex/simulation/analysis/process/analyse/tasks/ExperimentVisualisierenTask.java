@@ -14,7 +14,7 @@ import jadex.simulation.analysis.process.basicTasks.ASubProcessTaskView;
 import jadex.simulation.analysis.process.basicTasks.ATask;
 import jadex.simulation.analysis.process.basicTasks.user.AServiceCallUserTaskView;
 import jadex.simulation.analysis.service.basic.view.session.subprocess.ASubProcessView;
-import jadex.simulation.analysis.service.highLevel.IAAllgemeinAusfuehrenService;
+import jadex.simulation.analysis.service.highLevel.IAGeneralExecuteService;
 
 import java.util.Map;
 import java.util.UUID;
@@ -31,12 +31,12 @@ public class ExperimentVisualisierenTask extends ATask
 	public IFuture execute(ITaskContext context, BpmnInterpreter instance)
 	{
 		super.execute(context, instance);
-		IAAllgemeinAusfuehrenService service = (IAAllgemeinAusfuehrenService) SServiceProvider.getService(instance.getServiceProvider(), IAAllgemeinAusfuehrenService.class).get(susThread);
+		IAGeneralExecuteService service = (IAGeneralExecuteService) SServiceProvider.getService(instance.getServiceProvider(), IAGeneralExecuteService.class).get(susThread);
 		UUID session = (UUID) service.createSession(null).get(susThread);
 		((ASubProcessTaskView)view).init((ASubProcessView) service.getSessionView(session).get(susThread));
 		IAExperimentBatch experiments = (IAExperimentBatch) context.getParameterValue("experiments");
 		
-		Map results = (Map) service.ausführen(session, experiments).get(susThread);
+		Map results = (Map) service.execute(session, experiments).get(susThread);
 		experiments = (IAExperimentBatch)results.get("experiments");
 //		results = (Map) service.nachgelagerteTätigkeiten(null, experiments);
 		context.setParameterValue("experiments", (IAExperimentBatch)results.get("experiments"));

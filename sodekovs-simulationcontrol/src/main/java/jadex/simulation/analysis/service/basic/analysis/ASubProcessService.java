@@ -36,7 +36,7 @@ import jadex.simulation.analysis.process.basicTasks.IATaskView;
 import jadex.simulation.analysis.service.basic.view.session.ADefaultSessionView;
 import jadex.simulation.analysis.service.basic.view.session.IASessionView;
 import jadex.simulation.analysis.service.basic.view.session.subprocess.ASubProcessView;
-import jadex.simulation.analysis.service.highLevel.IAAllgemeinPlanenService;
+import jadex.simulation.analysis.service.highLevel.IAGeneralPlanningService;
 
 public class ASubProcessService extends ABasicAnalysisSessionService
 {

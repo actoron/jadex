@@ -4,7 +4,7 @@ import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.parameter.IAMultiValueParameter;
 import jadex.simulation.analysis.service.basic.analysis.IAnalysisSessionService;
 
-public interface IAKonfidenzService extends IAnalysisSessionService
+public interface IAConfidenceService extends IAnalysisSessionService
 {
 	public IFuture computeTTest(IAMultiValueParameter parameter, Double intervallPercent);
 

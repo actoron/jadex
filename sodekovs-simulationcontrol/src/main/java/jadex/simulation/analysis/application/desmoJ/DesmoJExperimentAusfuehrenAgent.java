@@ -9,10 +9,10 @@ import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.simulation.analysis.common.defaultViews.controlComponent.ComponentServiceViewerPanel;
-import jadex.simulation.analysis.service.simulation.execution.IAExperimentAusfuehrenService;
+import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
 
-@Description("Agent offer IAExperimentAusfuehrenService")
- @ProvidedServices({@ProvidedService(type=IAExperimentAusfuehrenService.class,
+@Description("Agent offer IAExecuteExperimentsService")
+ @ProvidedServices({@ProvidedService(type=IAExecuteExperimentsService.class,
  implementation=@Implementation(expression="new DesmoJExperimentAusfuehrenService($component.getExternalAccess())"))})
 @GuiClass(ComponentServiceViewerPanel.class)
 @Properties(
