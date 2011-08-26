@@ -1,11 +1,17 @@
 package jadex.simulation.analysis.process.optimisation.tasks;
 
+import java.util.UUID;
+
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.simulation.analysis.common.data.IAExperimentBatch;
+import jadex.simulation.analysis.common.events.task.ATaskEvent;
+import jadex.simulation.analysis.common.util.AConstants;
 import jadex.simulation.analysis.process.basicTasks.ATask;
 import jadex.simulation.analysis.process.basicTasks.user.AServiceCallUserTaskView;
+import jadex.simulation.analysis.service.continuative.optimisation.IAOptimisationService;
 
 public class OptimierenStepTask extends ATask
 {
@@ -19,17 +25,30 @@ public class OptimierenStepTask extends ATask
 	public IFuture execute(ITaskContext context, BpmnInterpreter instance)
 	{
 		super.execute(context, instance);
-//		IADatenobjekteParametrisierenGUIService service = (IADatenobjekteParametrisierenGUIService) SServiceProvider.getService(instance.getServiceProvider(), IADatenobjekteParametrisierenGUIService.class).get(susThread);
-//		UUID session = (UUID) service.createSession(null).get(susThread);
-//		// service.getSessionView(session).get(susThread);
-//		((AServiceCallUserTaskView) view).addServiceGUI((JComponent) service.getSessionView(session).get(susThread), new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
-//
-//		IAModel model = (IAModel)service.engineerGuiDataObject(session, AModelFactory.createTestAModel(Modeltype.DesmoJ)).get(susThread);
-//		taskChanged(new ATaskEvent(this, context, instance, AConstants.TASK_USER));
-//		((AServiceCallUserTaskView)view).startGUI().get(susThread);
-//		context.setParameterValue("modell", model);
-//		taskChanged(new ATaskEvent(this, context, instance, AConstants.TASK_BEENDET));
-		return new Future(model);
+		taskChanged(new ATaskEvent(this, context, instance, AConstants.TASK_LÄUFT));
+
+		IAExperimentBatch experiments = (IAExperimentBatch) context.getParameterValue("experiments");
+		IAOptimisationService service = (IAOptimisationService) context.getParameterValue("service");
+		UUID session = (UUID) context.getParameterValue("session");
+		experiments = (IAExperimentBatch) service.nextSolutions(session, experiments).get(susThread);
+		context.setParameterValue("experiments", experiments);
+		context.setParameterValue("service", service);
+		context.setParameterValue("session", session);
+		
+		Boolean terminate = (Boolean) service.checkEndofOptimisation(session).get(susThread);
+		if (terminate)
+		{
+			context.setParameterValue("again", Boolean.FALSE);
+			System.out.println(service.getOptimum(session));
+			System.out.println(service.getOptimumValue(session));
+		} else
+		{
+			context.setParameterValue("again", Boolean.TRUE);
+		}
+		
+		taskChanged(new ATaskEvent(this, context, instance, AConstants.TASK_BEENDET));
+
+		return new Future(experiments);
 	}
 
 //	/**

@@ -30,7 +30,7 @@ import desmoj.core.simulator.TimeInstant;
 /**
  * Implementation of a DesmoJ service for (single) experiments.
  */
-public class DesmoJExperimentAusfuehrenService extends ABasicAnalysisSessionService implements IAExecuteExperimentsService
+public class DesmoJExecuteExperimentsService extends ABasicAnalysisSessionService implements IAExecuteExperimentsService
 {
 
 	/**
@@ -39,7 +39,7 @@ public class DesmoJExperimentAusfuehrenService extends ABasicAnalysisSessionServ
 	 * @param comp
 	 *            The active generalComp.
 	 */
-	public DesmoJExperimentAusfuehrenService(IExternalAccess access)
+	public DesmoJExecuteExperimentsService(IExternalAccess access)
 	{
 		super(access, IAExecuteExperimentsService.class, true);
 
@@ -181,12 +181,5 @@ public class DesmoJExperimentAusfuehrenService extends ABasicAnalysisSessionServ
 		sessionViews.put(id, new DesmoJSessionView(this, id, configuration));
 		serviceChanged(new AServiceEvent(this, AConstants.SERVICE_SESSION_START, id));
 		return new Future(id);
-	}
-
-	public static void main(String[] args)
-	{
-		IAExperiment exp = AExperimentFactory.createTestAExperiment();
-		new DesmoJExperimentAusfuehrenService(null).executeExperiment(null, exp);
-
 	}
 }

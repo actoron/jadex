@@ -12,11 +12,11 @@ import jadex.simulation.analysis.service.continuative.computation.IAConfidenceSe
 import org.apache.commons.math.stat.inference.TTest;
 import org.apache.commons.math.stat.inference.TTestImpl;
 
-public class CommonsMathKonfidenzService extends ABasicAnalysisSessionService implements IAConfidenceService
+public class CommonsMathConfidenceService extends ABasicAnalysisSessionService implements IAConfidenceService
 {
 	private TTest ttest = new TTestImpl();
 
-	public CommonsMathKonfidenzService(IExternalAccess access)
+	public CommonsMathConfidenceService(IExternalAccess access)
 	{
 		super(access, IAConfidenceService.class, true);
 	}

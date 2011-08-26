@@ -9,7 +9,7 @@ public interface IAObjectiveFunction
 	 * Wertet die Lösungsalternative des Ensembles aus
 	 * und gibt ein Zielfunktinswert zurück.
 	 */
-	public IFuture benchmark(IAParameterEnsemble ensemble);
+	public IFuture evaluate(IAParameterEnsemble ensemble);
 	
 	/**
 	 * Ziel der Minimierung oder Maximierung

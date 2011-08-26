@@ -16,10 +16,10 @@ import jadex.simulation.analysis.service.simulation.Modeltype;
 
 import java.util.UUID;
 
-public class ADatenobjekteErstellenService extends ABasicAnalysisSessionService implements IAEngineerDataobjectService
+public class AEngineerDataobjectService extends ABasicAnalysisSessionService implements IAEngineerDataobjectService
 {
 
-	public ADatenobjekteErstellenService(IExternalAccess instance)
+	public AEngineerDataobjectService(IExternalAccess instance)
 	{
 		super(instance, IAEngineerDataobjectService.class, true);
 	}

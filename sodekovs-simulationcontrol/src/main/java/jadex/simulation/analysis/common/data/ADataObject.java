@@ -1,11 +1,13 @@
 package jadex.simulation.analysis.common.data;
 
+import jadex.bridge.service.annotation.Reference;
 import jadex.simulation.analysis.common.events.data.ADataEvent;
 import jadex.simulation.analysis.common.events.data.ADataObservable;
 import jadex.simulation.analysis.common.util.AConstants;
 
 import java.util.UUID;
 
+@Reference
 public class ADataObject extends ADataObservable implements IADataObject
 {
 	private UUID id = UUID.randomUUID();

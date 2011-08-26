@@ -49,7 +49,9 @@ public interface IAOptimisationService extends IAnalysisSessionService
 	 *            Session der Optimierung
 	 * @return true, wenn Abbruchkriterium erreicht
 	 */
-	public Boolean checkEndofOptimisation(UUID session);
+	public IFuture checkEndofOptimisation(UUID session);
 
-	IAParameterEnsemble getOptimum(UUID session);
+	public IFuture getOptimum(UUID session);
+
+	IFuture getOptimumValue(UUID session);
 }

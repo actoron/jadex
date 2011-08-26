@@ -3,7 +3,6 @@ package jadex.simulation.analysis.application.hibernate;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.simulation.analysis.application.standalone.ADatenobjekteSpeichernView;
 import jadex.simulation.analysis.common.data.IADataObject;
 import jadex.simulation.analysis.service.basic.analysis.ABasicAnalysisService;
 import jadex.simulation.analysis.service.dataBased.persist.IASaveDataobjectService;
@@ -23,7 +22,7 @@ public class HibernateSaveDataobjectService extends ABasicAnalysisService implem
 		synchronized (mutex)
 		{
 			saveMap = Collections.synchronizedMap(new HashMap<String, IADataObject>());
-			view = new ADatenobjekteSpeichernView(this);
+			view = new ASaveDataobjectView(this);
 		}
 		
 	}
@@ -32,7 +31,7 @@ public class HibernateSaveDataobjectService extends ABasicAnalysisService implem
 	public IFuture saveObject(IADataObject object)
 	{
 		saveMap.put(object.getName(), object);
-		((ADatenobjekteSpeichernView)view).addObject(object.getName());
+		((ASaveDataobjectView)view).addObject(object.getName());
 		
 		return new Future(object);
 	}

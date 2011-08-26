@@ -2,7 +2,9 @@ package jadex.simulation.analysis.process.analyse;
 
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.GuiClass;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
@@ -25,7 +27,7 @@ import jadex.simulation.analysis.service.highLevel.IAGeneralAnalysisProcessServi
  */
 @Description("Agent just test the IAGeneralAnalysisProcessService")
  @ProvidedServices({@ProvidedService(type=IAGeneralAnalysisProcessService.class,
- implementation=@Implementation(expression="new AOptimierungsprozessService($component.getExternalAccess())"))})
+ implementation=@Implementation(expression="new AAllgemeineAnalyseService($component.getExternalAccess())"))})
  @RequiredServices({
 	@RequiredService(name="AllgemeinPlanen", type=IAGeneralPlanningService.class,  binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="Allgemein Ausfuehren", type=IAGeneralExecuteService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
@@ -37,4 +39,11 @@ import jadex.simulation.analysis.service.highLevel.IAGeneralAnalysisProcessServi
 	@NameValue(name="viewerpanel.componentviewerclass", value="\"jadex.simulation.analysis.common.defaultViews.controlComponent.ControlComponentViewerPanel\"")
 })
 public class AllgemeineAnalyseAgent extends MicroAgent
-{}
+{
+	@Override
+	public void executeBody()
+	{
+		IAGeneralAnalysisProcessService service = (IAGeneralAnalysisProcessService) SServiceProvider.getService(getServiceProvider(), IAGeneralAnalysisProcessService.class).get(new ThreadSuspendable(this));
+		service.analyse(null);
+	}
+}

@@ -4,10 +4,12 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_NQoLgZ2_EeCFIOg7m4cZCA" key="editor_version" value="1.0"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_8sAncMRyEeC9CpdGXeYTdw" source="jadex_imports_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9rPP0MRyEeC9CpdGXeYTdw" key="dimension" value="1:1"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9rPP0cRyEeC9CpdGXeYTdw" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9rPP0sRyEeC9CpdGXeYTdw" key="complexColumns" value="false"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9rPP08RyEeC9CpdGXeYTdw" key="0:0" value="jadex.simulation.analysis.service.continuative.optimisation.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FDWG4M_ZEeCq2aT63iBzUg" key="dimension" value="3:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FDWG4c_ZEeCq2aT63iBzUg" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FDWG4s_ZEeCq2aT63iBzUg" key="complexColumns" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FDWG48_ZEeCq2aT63iBzUg" key="0:0" value="jadex.simulation.analysis.service.continuative.optimisation.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FDWG5M_ZEeCq2aT63iBzUg" key="1:0" value="jadex.simulation.analysis.common.data.parameter.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FDWG5c_ZEeCq2aT63iBzUg" key="2:0" value="jadex.simulation.analysis.common.data.*"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-Uvf0MRyEeC9CpdGXeYTdw" source="jadex_arguments_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FXrXEMRzEeC9CpdGXeYTdw" key="dimension" value="1:7"/>
@@ -43,29 +45,33 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_kaXogcRyEeC9CpdGXeYTdw" key="class" value="jadex.simulation.analysis.process.optimisation.tasks.OptimierenKonfigTask"/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ndHAwMRyEeC9CpdGXeYTdw" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtUMRyEeC9CpdGXeYTdw" key="dimension" value="5:4"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtUcRyEeC9CpdGXeYTdw" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtUsRyEeC9CpdGXeYTdw" key="complexColumns" value="false:false:false:false"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtU8RyEeC9CpdGXeYTdw" key="0:0" value="inout"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtVMRyEeC9CpdGXeYTdw" key="0:1" value="experiments"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtVcRyEeC9CpdGXeYTdw" key="0:2" value="IAExperimentBatch"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtVsRyEeC9CpdGXeYTdw" key="0:3" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtV8RyEeC9CpdGXeYTdw" key="1:0" value="out"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtWMRyEeC9CpdGXeYTdw" key="1:1" value="method"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtWcRyEeC9CpdGXeYTdw" key="1:2" value="String"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtWsRyEeC9CpdGXeYTdw" key="1:3" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtW8RyEeC9CpdGXeYTdw" key="2:0" value="out"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtXMRyEeC9CpdGXeYTdw" key="2:1" value="methodParameter"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtXcRyEeC9CpdGXeYTdw" key="2:2" value="String"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtXsRyEeC9CpdGXeYTdw" key="2:3" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtX8RyEeC9CpdGXeYTdw" key="3:0" value="out"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtYMRyEeC9CpdGXeYTdw" key="3:1" value="solution"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtYcRyEeC9CpdGXeYTdw" key="3:2" value="Object"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtYsRyEeC9CpdGXeYTdw" key="3:3" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtY8RyEeC9CpdGXeYTdw" key="4:0" value="out"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtZMRyEeC9CpdGXeYTdw" key="4:1" value="objective"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtZcRyEeC9CpdGXeYTdw" key="4:2" value="IAZielfunktion"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5EqtZsRyEeC9CpdGXeYTdw" key="4:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5TYM_YEeCq2aT63iBzUg" key="dimension" value="6:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5TYc_YEeCq2aT63iBzUg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5TYs_YEeCq2aT63iBzUg" key="complexColumns" value="false:false:false:false"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5TY8_YEeCq2aT63iBzUg" key="0:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5TZM_YEeCq2aT63iBzUg" key="0:1" value="experiments"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5TZc_YEeCq2aT63iBzUg" key="0:2" value="IAExperimentBatch"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5TZs_YEeCq2aT63iBzUg" key="0:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5TZ8_YEeCq2aT63iBzUg" key="1:0" value="out"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5TaM_YEeCq2aT63iBzUg" key="1:1" value="method"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5Tac_YEeCq2aT63iBzUg" key="1:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5Tas_YEeCq2aT63iBzUg" key="1:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5Ta8_YEeCq2aT63iBzUg" key="2:0" value="out"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5TbM_YEeCq2aT63iBzUg" key="2:1" value="methodParameter"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5Tbc_YEeCq2aT63iBzUg" key="2:2" value="IAParameterEnsemble"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5Tbs_YEeCq2aT63iBzUg" key="2:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5Tb8_YEeCq2aT63iBzUg" key="3:0" value="out"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5TcM_YEeCq2aT63iBzUg" key="3:1" value="solution"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5Tcc_YEeCq2aT63iBzUg" key="3:2" value="IAParameterEnsemble"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5Tcs_YEeCq2aT63iBzUg" key="3:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5Tc8_YEeCq2aT63iBzUg" key="4:0" value="out"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5TdM_YEeCq2aT63iBzUg" key="4:1" value="objective"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5Tdc_YEeCq2aT63iBzUg" key="4:2" value="IAObjectiveFunction"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5Tds_YEeCq2aT63iBzUg" key="4:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5Td8_YEeCq2aT63iBzUg" key="5:0" value="out"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5TeM_YEeCq2aT63iBzUg" key="5:1" value="config"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5Tec_YEeCq2aT63iBzUg" key="5:2" value="IAParameterEnsemble"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ft5Tes_YEeCq2aT63iBzUg" key="5:3" value=""/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="__W9tAZ2-EeCFIOg7m4cZCA" iD="__W9tAJ2-EeCFIOg7m4cZCA" outgoingEdges="_wH2_0cRxEeC9CpdGXeYTdw" incomingEdges="_r48IUcRxEeC9CpdGXeYTdw _w1YNIcRxEeC9CpdGXeYTdw" name="Allgemein Ausführung" activityType="Task">
@@ -73,13 +79,21 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-UalIcRxEeC9CpdGXeYTdw" key="class" value="jadex.simulation.analysis.process.analyse.tasks.AllgemeinAusfuehrenTask"/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ATBm4MRyEeC9CpdGXeYTdw" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KLdroMRyEeC9CpdGXeYTdw" key="dimension" value="1:4"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KLdrocRyEeC9CpdGXeYTdw" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KLdrosRyEeC9CpdGXeYTdw" key="complexColumns" value="false:false:false:false"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KLdro8RyEeC9CpdGXeYTdw" key="0:0" value="inout"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KLdrpMRyEeC9CpdGXeYTdw" key="0:1" value="experiments"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KLdrpcRyEeC9CpdGXeYTdw" key="0:2" value="IAExperimentBatch"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KLdrpsRyEeC9CpdGXeYTdw" key="0:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q8nOkM_YEeCq2aT63iBzUg" key="dimension" value="3:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q8nOkc_YEeCq2aT63iBzUg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q8nOks_YEeCq2aT63iBzUg" key="complexColumns" value="false:false:false:false"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q8nOk8_YEeCq2aT63iBzUg" key="0:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q8nOlM_YEeCq2aT63iBzUg" key="0:1" value="experiments"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q8nOlc_YEeCq2aT63iBzUg" key="0:2" value="IAExperimentBatch"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q8nOls_YEeCq2aT63iBzUg" key="0:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q8nOl8_YEeCq2aT63iBzUg" key="1:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q8nOmM_YEeCq2aT63iBzUg" key="1:1" value="service"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q8nOmc_YEeCq2aT63iBzUg" key="1:2" value="IAOptimisationService"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q8nOms_YEeCq2aT63iBzUg" key="1:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q8nOm8_YEeCq2aT63iBzUg" key="2:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q8w_kM_YEeCq2aT63iBzUg" key="2:1" value="session"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q8w_kc_YEeCq2aT63iBzUg" key="2:2" value="UUID"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q8w_ks_YEeCq2aT63iBzUg" key="2:3" value=""/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_JJv1sZ2_EeCFIOg7m4cZCA" iD="_JJv1sJ2_EeCFIOg7m4cZCA" outgoingEdges="_w1YNIcRxEeC9CpdGXeYTdw _5APD0cRzEeC9CpdGXeYTdw" incomingEdges="_wUgUscRxEeC9CpdGXeYTdw" activityType="GatewayDataBasedExclusive"/>
@@ -88,33 +102,41 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_PQQlwcRzEeC9CpdGXeYTdw" key="class" value="jadex.simulation.analysis.process.optimisation.tasks.OptimierenInitTask"/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_SYW_IMRzEeC9CpdGXeYTdw" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5m8MRzEeC9CpdGXeYTdw" key="dimension" value="6:4"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5m8cRzEeC9CpdGXeYTdw" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5m8sRzEeC9CpdGXeYTdw" key="complexColumns" value="false:false:false:false"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5m88RzEeC9CpdGXeYTdw" key="0:0" value="inout"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5m9MRzEeC9CpdGXeYTdw" key="0:1" value="experiments"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5m9cRzEeC9CpdGXeYTdw" key="0:2" value="IAExperimentBatch"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5m9sRzEeC9CpdGXeYTdw" key="0:3" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5m98RzEeC9CpdGXeYTdw" key="1:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5m-MRzEeC9CpdGXeYTdw" key="1:1" value="method"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5m-cRzEeC9CpdGXeYTdw" key="1:2" value="String"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5m-sRzEeC9CpdGXeYTdw" key="1:3" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5m-8RzEeC9CpdGXeYTdw" key="2:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5m_MRzEeC9CpdGXeYTdw" key="2:1" value="methodParameter"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5m_cRzEeC9CpdGXeYTdw" key="2:2" value="String"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5m_sRzEeC9CpdGXeYTdw" key="2:3" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5m_8RzEeC9CpdGXeYTdw" key="3:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5nAMRzEeC9CpdGXeYTdw" key="3:1" value="solution"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5nAcRzEeC9CpdGXeYTdw" key="3:2" value="IAParameterEnsemble"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5nAsRzEeC9CpdGXeYTdw" key="3:3" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5nA8RzEeC9CpdGXeYTdw" key="4:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5nBMRzEeC9CpdGXeYTdw" key="4:1" value="objective"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5nBcRzEeC9CpdGXeYTdw" key="4:2" value="IAZielfunktion"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5nBsRzEeC9CpdGXeYTdw" key="4:3" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5nB8RzEeC9CpdGXeYTdw" key="5:0" value="out"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5nCMRzEeC9CpdGXeYTdw" key="5:1" value="session"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5nCcRzEeC9CpdGXeYTdw" key="5:2" value="UUID"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_by5nCsRzEeC9CpdGXeYTdw" key="5:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKgM_ZEeCq2aT63iBzUg" key="dimension" value="8:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKgc_ZEeCq2aT63iBzUg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKgs_ZEeCq2aT63iBzUg" key="complexColumns" value="false:false:false:false"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKg8_ZEeCq2aT63iBzUg" key="0:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKhM_ZEeCq2aT63iBzUg" key="0:1" value="experiments"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKhc_ZEeCq2aT63iBzUg" key="0:2" value="IAExperimentBatch"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKhs_ZEeCq2aT63iBzUg" key="0:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKh8_ZEeCq2aT63iBzUg" key="1:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKiM_ZEeCq2aT63iBzUg" key="1:1" value="method"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKic_ZEeCq2aT63iBzUg" key="1:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKis_ZEeCq2aT63iBzUg" key="1:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKi8_ZEeCq2aT63iBzUg" key="2:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKjM_ZEeCq2aT63iBzUg" key="2:1" value="methodParameter"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKjc_ZEeCq2aT63iBzUg" key="2:2" value="IAParameterEnsemble"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKjs_ZEeCq2aT63iBzUg" key="2:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKj8_ZEeCq2aT63iBzUg" key="3:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKkM_ZEeCq2aT63iBzUg" key="3:1" value="solution"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKkc_ZEeCq2aT63iBzUg" key="3:2" value="IAParameterEnsemble"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKks_ZEeCq2aT63iBzUg" key="3:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKk8_ZEeCq2aT63iBzUg" key="4:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKlM_ZEeCq2aT63iBzUg" key="4:1" value="objective"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKlc_ZEeCq2aT63iBzUg" key="4:2" value="IAObjectiveFunction"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKls_ZEeCq2aT63iBzUg" key="4:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKl8_ZEeCq2aT63iBzUg" key="5:0" value="out"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKmM_ZEeCq2aT63iBzUg" key="5:1" value="session"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKmc_ZEeCq2aT63iBzUg" key="5:2" value="UUID"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKms_ZEeCq2aT63iBzUg" key="5:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKm8_ZEeCq2aT63iBzUg" key="6:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKnM_ZEeCq2aT63iBzUg" key="6:1" value="config"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKnc_ZEeCq2aT63iBzUg" key="6:2" value="IAParameterEnsemble"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKns_ZEeCq2aT63iBzUg" key="6:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKn8_ZEeCq2aT63iBzUg" key="7:0" value="out"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKoM_ZEeCq2aT63iBzUg" key="7:1" value="service"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKoc_ZEeCq2aT63iBzUg" key="7:2" value="IAOptimisationService"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i1uKos_ZEeCq2aT63iBzUg" key="7:3" value=""/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_uhgGAcRxEeC9CpdGXeYTdw" iD="_uhgGAMRxEeC9CpdGXeYTdw" outgoingEdges="_wUgUscRxEeC9CpdGXeYTdw" incomingEdges="_wH2_0cRxEeC9CpdGXeYTdw" name="Iteration durchführen">
@@ -122,21 +144,33 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fQtxocRzEeC9CpdGXeYTdw" key="class" value="jadex.simulation.analysis.process.optimisation.tasks.OptimierenStepTask"/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_hRjoAMRzEeC9CpdGXeYTdw" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GwE38MR0EeC9CpdGXeYTdw" key="dimension" value="3:4"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GwE38cR0EeC9CpdGXeYTdw" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GwE38sR0EeC9CpdGXeYTdw" key="complexColumns" value="false:false:false:false"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GwE388R0EeC9CpdGXeYTdw" key="0:0" value="inout"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GwE39MR0EeC9CpdGXeYTdw" key="0:1" value="experiments"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GwE39cR0EeC9CpdGXeYTdw" key="0:2" value="IAExperimentBatch"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GwE39sR0EeC9CpdGXeYTdw" key="0:3" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GwE398R0EeC9CpdGXeYTdw" key="1:0" value="inout"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GwE3-MR0EeC9CpdGXeYTdw" key="1:1" value="session"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GwE3-cR0EeC9CpdGXeYTdw" key="1:2" value="UUID"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GwE3-sR0EeC9CpdGXeYTdw" key="1:3" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GwE3-8R0EeC9CpdGXeYTdw" key="2:0" value="out"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GwE3_MR0EeC9CpdGXeYTdw" key="2:1" value="again"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GwE3_cR0EeC9CpdGXeYTdw" key="2:2" value="Boolean"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GwE3_sR0EeC9CpdGXeYTdw" key="2:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFawM_aEeCq2aT63iBzUg" key="dimension" value="6:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFawc_aEeCq2aT63iBzUg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFaws_aEeCq2aT63iBzUg" key="complexColumns" value="false:false:false:false"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFaw8_aEeCq2aT63iBzUg" key="0:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFaxM_aEeCq2aT63iBzUg" key="0:1" value="experiments"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFaxc_aEeCq2aT63iBzUg" key="0:2" value="IAExperimentBatch"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFaxs_aEeCq2aT63iBzUg" key="0:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFax8_aEeCq2aT63iBzUg" key="1:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFayM_aEeCq2aT63iBzUg" key="1:1" value="session"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFayc_aEeCq2aT63iBzUg" key="1:2" value="UUID"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFays_aEeCq2aT63iBzUg" key="1:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFay8_aEeCq2aT63iBzUg" key="2:0" value="out"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFazM_aEeCq2aT63iBzUg" key="2:1" value="again"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFazc_aEeCq2aT63iBzUg" key="2:2" value="Boolean"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFazs_aEeCq2aT63iBzUg" key="2:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFaz8_aEeCq2aT63iBzUg" key="3:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFa0M_aEeCq2aT63iBzUg" key="3:1" value="service"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFa0c_aEeCq2aT63iBzUg" key="3:2" value="IAOptimisationService"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFa0s_aEeCq2aT63iBzUg" key="3:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFa08_aEeCq2aT63iBzUg" key="4:0" value="out"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFa1M_aEeCq2aT63iBzUg" key="4:1" value="optimum"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFa1c_aEeCq2aT63iBzUg" key="4:2" value="IAParameterEnsemble"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFa1s_aEeCq2aT63iBzUg" key="4:3" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFa18_aEeCq2aT63iBzUg" key="5:0" value="out"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFa2M_aEeCq2aT63iBzUg" key="5:1" value="optimumvalue"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFa2c_aEeCq2aT63iBzUg" key="5:2" value="Double"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tlFa2s_aEeCq2aT63iBzUg" key="5:3" value=""/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_2TXN4cRzEeC9CpdGXeYTdw" iD="_2TXN4MRzEeC9CpdGXeYTdw" outgoingEdges="__PiescRzEeC9CpdGXeYTdw" incomingEdges="_5APD0cRzEeC9CpdGXeYTdw" name="Optimierung visualisieren">
@@ -166,11 +200,15 @@
     </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_r48IUcRxEeC9CpdGXeYTdw" iD="_r48IUMRxEeC9CpdGXeYTdw">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ufx80MRzEeC9CpdGXeYTdw" source="jadex_mappings_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uxCE4MRzEeC9CpdGXeYTdw" key="dimension" value="1:2"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uxCE4cRzEeC9CpdGXeYTdw" key="uniqueColumnIndex" value="0"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uxCE4sRzEeC9CpdGXeYTdw" key="complexColumns" value="false:false"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uxCE48RzEeC9CpdGXeYTdw" key="0:0" value="experiments"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uxCE5MRzEeC9CpdGXeYTdw" key="0:1" value="experiments"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vw4O0M_YEeCq2aT63iBzUg" key="dimension" value="3:2"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vw4O0c_YEeCq2aT63iBzUg" key="uniqueColumnIndex" value="0"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vw4O0s_YEeCq2aT63iBzUg" key="complexColumns" value="false:false"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vw4O08_YEeCq2aT63iBzUg" key="0:0" value="experiments"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vw4O1M_YEeCq2aT63iBzUg" key="0:1" value="experiments"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vw4O1c_YEeCq2aT63iBzUg" key="1:0" value="service"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vw4O1s_YEeCq2aT63iBzUg" key="1:1" value="service"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vw4O18_YEeCq2aT63iBzUg" key="2:0" value="session"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vw4O2M_YEeCq2aT63iBzUg" key="2:1" value="session"/>
       </eAnnotations>
     </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_sKM3ccRxEeC9CpdGXeYTdw" iD="_sKM3cMRxEeC9CpdGXeYTdw">
@@ -190,30 +228,70 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yvllLMRzEeC9CpdGXeYTdw" key="4:1" value="objective"/>
       </eAnnotations>
     </sequenceEdges>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_wH2_0cRxEeC9CpdGXeYTdw" iD="_wH2_0MRxEeC9CpdGXeYTdw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_wH2_0cRxEeC9CpdGXeYTdw" iD="_wH2_0MRxEeC9CpdGXeYTdw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_v7I-EM_YEeCq2aT63iBzUg" source="jadex_mappings_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yFf80M_YEeCq2aT63iBzUg" key="dimension" value="3:2"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yFf80c_YEeCq2aT63iBzUg" key="uniqueColumnIndex" value="0"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yFf80s_YEeCq2aT63iBzUg" key="complexColumns" value="false:false"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yFf808_YEeCq2aT63iBzUg" key="0:0" value="experiments"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yFf81M_YEeCq2aT63iBzUg" key="0:1" value="experiments"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yFf81c_YEeCq2aT63iBzUg" key="1:0" value="session"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yFf81s_YEeCq2aT63iBzUg" key="1:1" value="session"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yFf818_YEeCq2aT63iBzUg" key="2:0" value="service"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yFf82M_YEeCq2aT63iBzUg" key="2:1" value="service"/>
+      </eAnnotations>
+    </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_wUgUscRxEeC9CpdGXeYTdw" iD="_wUgUsMRxEeC9CpdGXeYTdw">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_lLo38MRzEeC9CpdGXeYTdw" source="jadex_mappings_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mycdsMRzEeC9CpdGXeYTdw" key="dimension" value="2:2"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mycdscRzEeC9CpdGXeYTdw" key="uniqueColumnIndex" value="0"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mycdssRzEeC9CpdGXeYTdw" key="complexColumns" value="false:false"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mycds8RzEeC9CpdGXeYTdw" key="0:0" value="session"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mycdtMRzEeC9CpdGXeYTdw" key="0:1" value="session"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mycdtcRzEeC9CpdGXeYTdw" key="1:0" value="experiments"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mycdtsRzEeC9CpdGXeYTdw" key="1:1" value="experiments"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wewWkM_aEeCq2aT63iBzUg" key="dimension" value="5:2"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wewWkc_aEeCq2aT63iBzUg" key="uniqueColumnIndex" value="0"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wewWks_aEeCq2aT63iBzUg" key="complexColumns" value="false:false"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wewWk8_aEeCq2aT63iBzUg" key="0:0" value="session"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wewWlM_aEeCq2aT63iBzUg" key="0:1" value="session"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wewWlc_aEeCq2aT63iBzUg" key="1:0" value="experiments"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wewWls_aEeCq2aT63iBzUg" key="1:1" value="experiments"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wewWl8_aEeCq2aT63iBzUg" key="2:0" value="service"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wewWmM_aEeCq2aT63iBzUg" key="2:1" value="service"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wewWmc_aEeCq2aT63iBzUg" key="3:0" value="optimum"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wewWms_aEeCq2aT63iBzUg" key="3:1" value="optimum"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wewWm8_aEeCq2aT63iBzUg" key="4:0" value="optimumValue"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wewWnM_aEeCq2aT63iBzUg" key="4:1" value="optimumValue"/>
       </eAnnotations>
     </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_w1YNIcRxEeC9CpdGXeYTdw" iD="_w1YNIMRxEeC9CpdGXeYTdw">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_r8ReQMRzEeC9CpdGXeYTdw" source="jadex_mappings_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_t3UOoMRzEeC9CpdGXeYTdw" key="dimension" value="2:2"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_t3UOocRzEeC9CpdGXeYTdw" key="uniqueColumnIndex" value="0"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_t3UOosRzEeC9CpdGXeYTdw" key="complexColumns" value="false:false"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_t3UOo8RzEeC9CpdGXeYTdw" key="0:0" value="session"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_t3UOpMRzEeC9CpdGXeYTdw" key="0:1" value="session"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_t3UOpcRzEeC9CpdGXeYTdw" key="1:0" value="experiments"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_t3UOpsRzEeC9CpdGXeYTdw" key="1:1" value="experiments"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0Nx38M_YEeCq2aT63iBzUg" key="dimension" value="3:2"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0Nx38c_YEeCq2aT63iBzUg" key="uniqueColumnIndex" value="0"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0Nx38s_YEeCq2aT63iBzUg" key="complexColumns" value="false:false"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0Nx388_YEeCq2aT63iBzUg" key="0:0" value="session"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0Nx39M_YEeCq2aT63iBzUg" key="0:1" value="session"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0Nx39c_YEeCq2aT63iBzUg" key="1:0" value="experiments"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0Nx39s_YEeCq2aT63iBzUg" key="1:1" value="experiments"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0Nx398_YEeCq2aT63iBzUg" key="2:0" value="service"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0Nx3-M_YEeCq2aT63iBzUg" key="2:1" value="service"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_2dpBwM_YEeCq2aT63iBzUg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2dpBwc_YEeCq2aT63iBzUg" key="condition" value="again"/>
       </eAnnotations>
     </sequenceEdges>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_5APD0cRzEeC9CpdGXeYTdw" iD="_5APD0MRzEeC9CpdGXeYTdw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_5APD0cRzEeC9CpdGXeYTdw" iD="_5APD0MRzEeC9CpdGXeYTdw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_3Gjb4M_YEeCq2aT63iBzUg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3Gjb4c_YEeCq2aT63iBzUg" key="condition" value="!again"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_3cIDQM_YEeCq2aT63iBzUg" source="jadex_mappings_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yIrhwM_aEeCq2aT63iBzUg" key="dimension" value="4:2"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yIrhwc_aEeCq2aT63iBzUg" key="uniqueColumnIndex" value="0"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yIrhws_aEeCq2aT63iBzUg" key="complexColumns" value="false:false"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yIrhw8_aEeCq2aT63iBzUg" key="0:0" value="experiments"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yIrhxM_aEeCq2aT63iBzUg" key="0:1" value="experiments"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yIrhxc_aEeCq2aT63iBzUg" key="1:0" value="service"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yIrhxs_aEeCq2aT63iBzUg" key="1:1" value="service"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yIrhx8_aEeCq2aT63iBzUg" key="2:0" value="optimumValue"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yIrhyM_aEeCq2aT63iBzUg" key="2:1" value="optimumValue"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yIrhyc_aEeCq2aT63iBzUg" key="3:0" value="optimum"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yIrhys_aEeCq2aT63iBzUg" key="3:1" value="optimum"/>
+      </eAnnotations>
+    </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="__PiescRzEeC9CpdGXeYTdw" iD="__PiesMRzEeC9CpdGXeYTdw"/>
   </pools>
 </bpmn:BpmnDiagram>

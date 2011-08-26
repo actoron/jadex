@@ -2,7 +2,9 @@ package jadex.simulation.analysis.service.basic.analysis;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.DefaultListModel;
@@ -41,6 +43,9 @@ import jadex.simulation.analysis.service.highLevel.IAGeneralPlanningService;
 public class ASubProcessService extends ABasicAnalysisSessionService
 {
 	protected Map<UUID, IExternalAccess> sessionValues;
+	
+	//damit nich tSystem.gc
+	protected Set<ASubProcessView> views = new HashSet<ASubProcessView>();
 
 	public ASubProcessService(IExternalAccess access, Class serviceInterface)
 	{
@@ -93,7 +98,9 @@ public class ASubProcessService extends ABasicAnalysisSessionService
 								final IComponentIdentifier cid = (IComponentIdentifier) result;
 								final ExternalAccess access = (ExternalAccess) cms.getExternalAccess(cid).get(susThread);
 								((BpmnInterpreter) access.getInterpreter()).setContextVariable("subProcessView", ((ASubProcessView) sessionViews.get(session)));
-								((ASubProcessView) sessionViews.get(session)).init(access, session, sessions.get(session));
+								ASubProcessView view = ((ASubProcessView) sessionViews.get(session));
+								view.init(access, session, sessions.get(session));
+								views.add(view);
 								sessionValues.put(session, access);
 							}
 

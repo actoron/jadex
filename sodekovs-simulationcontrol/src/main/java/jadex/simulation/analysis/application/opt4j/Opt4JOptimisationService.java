@@ -1,6 +1,7 @@
 package jadex.simulation.analysis.application.opt4j;
 
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.AExperimentBatch;
@@ -24,9 +25,12 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -37,14 +41,30 @@ import javax.swing.JFrame;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
+import org.apache.commons.math.analysis.MultivariateRealFunction;
+import org.apache.commons.math.exception.MaxCountExceededException;
+import org.apache.commons.math.optimization.RealPointValuePair;
+import org.apache.commons.math.optimization.direct.AbstractSimplex;
+import org.apache.commons.math.util.Incrementor;
 import org.nlogo.headless.HeadlessWorkspace;
 import org.nlogo.lite.InterfaceComponent;
+import org.opt4j.core.Archive;
+import org.opt4j.core.Individual;
+import org.opt4j.core.Objective;
+import org.opt4j.core.Objectives;
+import org.opt4j.core.Population;
+import org.opt4j.core.Objective.Sign;
+import org.opt4j.core.optimizer.Optimizer;
+import org.opt4j.core.problem.Phenotype;
+import org.opt4j.core.problem.PhenotypeWrapper;
+import org.opt4j.start.Opt4JTask;
 
 import com.google.inject.Module;
 
 /**
  * Opt4J implementation of {@link IAOptimisationService}vice
  */
+@Service
 public class Opt4JOptimisationService extends ABasicAnalysisSessionService implements IAOptimisationService
 {
 	Set<String> methods = new HashSet<String>();
@@ -82,22 +102,93 @@ public class Opt4JOptimisationService extends ABasicAnalysisSessionService imple
 	@Override
 	public IFuture nextSolutions(UUID session, IAExperimentBatch previousSolutions)
 	{
+		Map<String, Object> state = sessionState.get(session);
 		
-		//FIRST: set Experiment results
+		Boolean terminate = (Boolean) sessionState.get(session).get("terminate");
+		List<Map.Entry<String, IAParameter>> mappings = (List<Map.Entry<String, IAParameter>>) sessionState.get(session).get("mappings");
+		Collection<Module> modules =  (Collection<Module>) sessionState.get(session).get("modules");
+		Opt4JTask task =  (Opt4JTask) sessionState.get(session).get("task");
+		Integer iteration = (Integer) sessionState.get(session).get("iteration");
+		IAExperiment baseExperiment = (IAExperiment) sessionState.get(session).get("baseExperiment");
 		
+		Archive archive = task.getInstance(Archive.class);
+		EvolutionaryAlgorithmSim opti = (EvolutionaryAlgorithmSim) task.getInstance(Optimizer.class);
+//		
+		if (iteration > 0)
+		{
+			//set Experiment results
+			Population pop = opti.getPopulation();
+			for (IAExperiment exp : previousSolutions.getExperiments().values())
+			{
+				for (Individual individual : pop)
+				{
+					Boolean found = true;
+					Phenotype point = individual.getPhenotype();
+					System.out.println(point.getClass());
+					System.out.println(point);
+					Objectives objectives = new Objectives();
+					Objective objective = new Objective("Sum", Sign.MIN);
+					objectives.add(objective, 10);
+					individual.setObjectives(objectives);
+				}
+			}
+
+			//check converged
+			if (opti.getTerminated())
+			{
+				// We have found an optimum.
+				terminate = true;
+				sessionState.get(session).put("terminate", terminate);
+				
+				System.out.println("OPTIMUM!");
+				Individual best = archive.iterator().next();
+				PhenotypeWrapper<Map<String, Double>> pheno = (PhenotypeWrapper<Map<String, Double>>) best.getPhenotype();
+				
+				IAParameterEnsemble result = (IAParameterEnsemble) ((IAExperiment) state.get("baseExperiment")).getInputParameters().clonen();
+
+				Iterator it = pheno.get().values().iterator();
+				for (int j = 0; j < 2; j++)
+				{
+					result.getParameter(mappings.get(j).getKey()).setValue(it.next());
+				}
+				
+				state.put("optimum",result);
+				state.put("optimumValue", best.getObjectives().getValues().iterator().next());
+			}
+		} else
+		{
+			state.put("baseExperiment", (IAExperiment) previousSolutions.getExperiments().values().iterator().next());
+			baseExperiment = (IAExperiment) sessionState.get(session).get("baseExperiment");
+
+		}
 		
-		// set next;
+		// next iteration
 		IAExperimentBatch newExperiments = new AExperimentBatch("solutions");
-		
-		
-		
+		if (!terminate)
+		{
+			try
+			{
+				task.execute();
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+			Population pop = opti.getPopulation();
+			for (Individual individual : pop)
+			{
+				newExperiments.addExperiment((IAExperiment)baseExperiment.clonen());
+			}
+			iteration++;
+			sessionState.get(session).put("iteration", iteration);
+		}
 		return new Future(newExperiments);
 	}
 
 	@Override
-	public Boolean checkEndofOptimisation(UUID session)
+	public IFuture checkEndofOptimisation(UUID session)
 	{
-		return (Boolean) sessionState.get(session).get("terminate");
+		return new Future((Boolean) sessionState.get(session).get("terminate"));
 	}
 
 	@Override
@@ -139,7 +230,7 @@ public class Opt4JOptimisationService extends ABasicAnalysisSessionService imple
 			state.put("start", start);
 			
 			EvolutionaryAlgorithmSimModule evolutionaryAlgorithm = new EvolutionaryAlgorithmSimModule();
-			evolutionaryAlgorithm.setGenerations(1000);		
+			evolutionaryAlgorithm.setGenerations(10);		
 			evolutionaryAlgorithm.setAlpha(10);
 			evolutionaryAlgorithm.setLambda(5);
 			evolutionaryAlgorithm.setCrossoverRate(1);
@@ -159,6 +250,14 @@ public class Opt4JOptimisationService extends ABasicAnalysisSessionService imple
 			modules.add(viewer);
 			
 			state.put("modules", modules);
+			state.put("iteration", new Integer(0));
+			state.put("terminate", false);
+			
+			Opt4JTask task = new Opt4JTask(false);
+			task.init(modules);
+			task.open();
+			state.put("task", task);
+			
 			sessionState.put(sess, state);
 		}
 		
@@ -167,8 +266,16 @@ public class Opt4JOptimisationService extends ABasicAnalysisSessionService imple
 	}
 
 	@Override
-	public IAParameterEnsemble getOptimum(UUID session)
+	public IFuture getOptimum(UUID session)
 	{
-		return (IAParameterEnsemble) sessionState.get(session).get("optimum");
+		return new Future((IAParameterEnsemble) sessionState.get(session).get("optimum"));
 	}
+
+	@Override
+	public IFuture getOptimumValue(UUID session)
+	{
+		return new Future((Double) sessionState.get(session).get("optimumValue"));
+	}
+	
+	
 }

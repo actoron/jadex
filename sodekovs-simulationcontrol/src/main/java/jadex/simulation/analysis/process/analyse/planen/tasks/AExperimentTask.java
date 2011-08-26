@@ -40,20 +40,19 @@ public class AExperimentTask extends ATask
 		super.execute(context, instance);
 		IAVisualiseDataobjectService service = (IAVisualiseDataobjectService) SServiceProvider.getService(instance.getServiceProvider(), IAVisualiseDataobjectService.class).get(new ThreadSuspendable(this));
 		IAModel model = (IAModel) context.getParameterValue("modell");
-				
-		UUID session = (UUID) service.createSession(null).get(susThread);
-//		service.getSessionView(session).get(susThread);
-		((AServiceCallUserTaskView)view).addServiceGUI((JComponent) service.getSessionView(session).get(susThread),new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
+		IAExperiment exp = AExperimentFactory.createDefaultExperiment(model);
+		UUID session = (UUID) service.show(null, exp).get(susThread);
 		
+		((AServiceCallUserTaskView) view).addServiceGUI((JComponent) service.getSessionView(session).get(susThread), new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
 		taskChanged(new ATaskEvent(this, context, instance, AConstants.TASK_USER));
-		IAExperiment exp = (IAExperiment) service.show(session, AExperimentFactory.createDefaultExperiment(model)).get(susThread);
 		((AServiceCallUserTaskView)view).startGUI().get(susThread);
+		
 		AExperimentBatch experiments = new AExperimentBatch("Experimente");
 		experiments.addExperiment(exp);
 		context.setParameterValue("experiments", experiments);
 		instance.setResultValue("experiments", experiments);
 		taskChanged(new ATaskEvent(this, context, instance, AConstants.TASK_BEENDET));
-		return new Future(model);
+		return new Future(experiments);
 	}
 	
 	/**

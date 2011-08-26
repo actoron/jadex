@@ -13,11 +13,11 @@ import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimen
 
 @Description("Agent offer IAExecuteExperimentsService")
  @ProvidedServices({@ProvidedService(type=IAExecuteExperimentsService.class,
- implementation=@Implementation(expression="new DesmoJExperimentAusfuehrenService($component.getExternalAccess())"))})
+ implementation=@Implementation(expression="new DesmoJExecuteExperimentsService($component.getExternalAccess())"))})
 @GuiClass(ComponentServiceViewerPanel.class)
 @Properties(
 {
 	@NameValue(name="viewerpanel.componentviewerclass", value="\"jadex.simulation.analysis.common.defaultViews.controlComponent.ControlComponentViewerPanel\"")
 })
-public class DesmoJExperimentAusfuehrenAgent extends MicroAgent
+public class DesmoJAgent extends MicroAgent
 {}

@@ -32,7 +32,7 @@ import org.nlogo.lite.InterfaceComponent;
 /**
  * Implementation of a NetLogo service for (single) experiments.
  */
-public class NetLogoExperimentAusfuehrenService extends ABasicAnalysisSessionService implements IAExecuteExperimentsService {
+public class NetLogoExecuteExperimentsService extends ABasicAnalysisSessionService implements IAExecuteExperimentsService {
 
 	JTextArea compLite = new JTextArea();
 	
@@ -42,7 +42,7 @@ public class NetLogoExperimentAusfuehrenService extends ABasicAnalysisSessionSer
 	 * @param comp
 	 *            The active generalComp.
 	 */
-	public NetLogoExperimentAusfuehrenService(IExternalAccess access) {
+	public NetLogoExecuteExperimentsService(IExternalAccess access) {
 		super(access, IAExecuteExperimentsService.class, true);
 	}
 	

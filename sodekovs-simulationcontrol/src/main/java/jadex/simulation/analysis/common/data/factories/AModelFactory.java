@@ -41,6 +41,15 @@ public class AModelFactory
 			inputParameters.addParameter(new ABasicParameter("SimTime", Double.class, 15000.0));
 			outputParameters.addParameter(new ASummaryParameter("Truck Wait Times"));
 			path = "/sodekovs-simulationcontrol/src/main/java/jadex/simulation/analysis/application/desmoJ/models/";
+		} else if (type == Modeltype.Jadex)
+		{
+			modelName = "DisasterManagement";
+			inputParameters.addParameter(new ABasicParameter("firePositionx",Double.class, 0.5));
+			inputParameters.addParameter(new ABasicParameter("firePositiony", Double.class, 0.5));
+			outputParameters.addParameter(new ASummaryParameter("Chemicals"));
+			outputParameters.addParameter(new ASummaryParameter("Fire"));
+			outputParameters.addParameter(new ASummaryParameter("Victims"));
+			path = "/sodekovs-simulationcontrol/src/main/java/jadex/simulation/analysis/application/Jadex/model/disastermanagement/DisasterManagement.application.xml";
 		}
 		else
 		{

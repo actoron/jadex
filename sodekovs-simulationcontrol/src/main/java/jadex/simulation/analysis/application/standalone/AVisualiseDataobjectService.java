@@ -1,6 +1,7 @@
 package jadex.simulation.analysis.application.standalone;
 
 import jadex.bridge.IExternalAccess;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.IADataObject;
 import jadex.simulation.analysis.service.dataBased.visualisation.IAVisualiseDataobjectService;
@@ -18,12 +19,14 @@ public class AVisualiseDataobjectService extends ADatabasedService implements IA
 	@Override
 	public IFuture show(UUID sessionId, IADataObject dataObject)
 	{
-		synchronized (mutex)
-		{
+//		synchronized (mutex)
+//		{
 			if (sessionId == null) sessionId = (UUID) createSession(null).get(susThread);
 			ADataSessionView view = (ADataSessionView) sessionViews.get(sessionId);
-			return view.startGUI(dataObject);
-		}
+			view.startGUI(dataObject);
+			 sessionViews.put(sessionId,view);
+			return new Future(sessionId);
+//		}
 	}
 
 }

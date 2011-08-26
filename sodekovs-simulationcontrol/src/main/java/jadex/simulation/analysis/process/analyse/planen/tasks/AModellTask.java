@@ -35,11 +35,13 @@ public class AModellTask extends ATask
 	{
 		super.execute(context, instance);
 		IAVisualiseDataobjectService service = (IAVisualiseDataobjectService) SServiceProvider.getService(instance.getServiceProvider(), IAVisualiseDataobjectService.class).get(susThread);
-		UUID session = (UUID) service.createSession(null).get(susThread);
+//		UUID session = (UUID) service.createSession(null).get(susThread);
 		// service.getSessionView(session).get(susThread);
-		((AServiceCallUserTaskView) view).addServiceGUI((JComponent) service.getSessionView(session).get(susThread), new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
 
-		IAModel model = (IAModel)service.show(session, AModelFactory.createTestAModel(Modeltype.DesmoJ)).get(susThread);
+		IAModel model = AModelFactory.createTestAModel(Modeltype.Jadex); 
+		UUID session = (UUID) service.show(null, model).get(susThread);
+		
+		((AServiceCallUserTaskView) view).addServiceGUI((JComponent) service.getSessionView(session).get(susThread), new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
 		taskChanged(new ATaskEvent(this, context, instance, AConstants.TASK_USER));
 		((AServiceCallUserTaskView)view).startGUI().get(susThread);
 		context.setParameterValue("modell", model);
