@@ -368,6 +368,7 @@
 				<module>jadex-kernel-bdibpmn</module>
 				<module>jadex-kernel-gpmn</module>
 				<module>jadex-kernel-extension-envsupport</module>
+				<module>jadex-kernel-extension-envsupport-opengl</module>
 				<module>jadex-kernel-extension-agr</module>
 
 				<module>jadex-applib-bdi</module>
@@ -419,6 +420,7 @@
 				<module>jadex-kernel-bdibpmn</module>
 				<module>jadex-kernel-gpmn</module>
 				<module>jadex-kernel-extension-envsupport</module>
+				<!-- <module>jadex-kernel-extension-envsupport-opengl</module> -->
 				<module>jadex-kernel-extension-agr</module>
 
 				<module>jadex-applib-bdi</module>

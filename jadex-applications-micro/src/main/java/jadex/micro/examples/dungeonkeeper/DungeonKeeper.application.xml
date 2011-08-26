@@ -21,16 +21,17 @@
 	</imports>
 	
 	<extensiontypes>
-		<env:envspacetype name="gc2dspace" width="1" height="1" class="Grid2D">
+		<env:envspacetype name="gc2dspace" width="32" height="32" class="Grid2D">
 			<!-- <env:property name="neighborhood">Grid2D.NEIGHBORHOOD_MOORE</env:property> -->
 
 			<env:objecttypes>
 				<env:objecttype name="field">
-					<env:property name="type" class="String"></env:property>
+					<env:property name="position" class="IVector2"/>
+					<env:property name="type" class="String"/>
 				</env:objecttype>
 				<env:objecttype name="imp">
-					<env:property name="position"/>
-					<env:property name="direction">0.0</env:property>
+					<env:property name="position" class="IVector2"/>
+					<env:property name="direction" class="double">0.0</env:property>
 				</env:objecttype>
 			</env:objecttypes>
 						

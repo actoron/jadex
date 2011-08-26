@@ -19,30 +19,14 @@ import java.util.StringTokenizer;
 /**
  *  Environment process for creating wastes.
  */
-public class InitMapProcess extends SimplePropertyObject implements ISpaceProcess
-{
-	public static final String IMPENETRABLE_ROCK = "impenetrable_rock";
-	public static final String ROCK = "rock";
-	public static final String REINFORCED_WALL = "reinforced_wall";
-	public static final String GOLD = "gold";
-	public static final String GEMS = "gems";
-
-	public static final String DIRT_PATH = "dirt_path";
-	public static final String CLAIMED_PATH = "claimed_path";
-	public static final String WATER = "water";
-	public static final String LAVA = "lava";
-	
-	public static final String DUNGEONHEART = "dungeonheart";
-	public static final String TREASURY = "treasury";
-	public static final String HATCHERY = "hatchery";
-	public static final String LAIR = "lair";
-	
+public class InitMapProcess extends SimplePropertyObject implements ISpaceProcess, IMap
+{	
 	public static Map imagenames;
 	
 	static
 	{
 		imagenames = new HashMap();
-//		images.put("Oa", "?");
+		imagenames.put("Oa", IMPENETRABLE_ROCK);	// Outer border
 		
 		imagenames.put("Ob", IMPENETRABLE_ROCK);
 		imagenames.put("Oc", ROCK);
@@ -97,19 +81,19 @@ public class InitMapProcess extends SimplePropertyObject implements ISpaceProces
 		        	int del = size.indexOf("X");
 		        	String xstr = size.substring(0, del-1);
 		        	String ystr = size.substring(del+1);
-		        	int sizex = Integer.parseInt(xstr.trim())-2;
-		        	int sizey = Integer.parseInt(ystr.trim())-2;
+		        	int sizex = Integer.parseInt(xstr.trim());
+		        	int sizey = Integer.parseInt(ystr.trim());
 		        	
 		    		grid.setAreaSize(new Vector2Int(sizex, sizey));
 		        
 		    		// Now init the field
-		    		String line = br.readLine();
+//		    		String line = br.readLine();
 		    		for(int y=0; y<sizey; y++)
 	    			{
-		    			line = br.readLine();
+		    			String	line = br.readLine();
 	    				for(int x=0; x<sizex; x++)
 	    				{
-	    					String key = line.substring(x*2+2, x*2+4);
+	    					String key = line.substring(x*2, x*2+2);
 	    					String type = (String)imagenames.get(key);
 	    					Map props = new HashMap();
 	    					props.put("type", type);

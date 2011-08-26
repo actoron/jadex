@@ -23,11 +23,14 @@ public class MoveAction extends SimplePropertyObject implements ISpaceAction
 	static
 	{
 		allowedfields = new HashSet();
-		allowedfields.add(InitMapProcess.DIRT_PATH);
-		allowedfields.add(InitMapProcess.CLAIMED_PATH);
-		allowedfields.add(InitMapProcess.WATER);
-		allowedfields.add(InitMapProcess.LAVA);
-		allowedfields.add(InitMapProcess.DUNGEONHEART);
+		allowedfields.add(IMap.DIRT_PATH);
+		allowedfields.add(IMap.CLAIMED_PATH);
+		allowedfields.add(IMap.WATER);
+		allowedfields.add(IMap.LAVA);
+		allowedfields.add(IMap.DUNGEONHEART);
+		allowedfields.add(IMap.HATCHERY);
+		allowedfields.add(IMap.LAIR);
+		allowedfields.add(IMap.TREASURY);
 	}
 	
 	/**
