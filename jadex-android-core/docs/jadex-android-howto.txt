@@ -1,0 +1,49 @@
+Jadex-Android Howto
+
+This document will guide you through installing everything that is needed to develop Android applications with jadex-android. You have multiple Options:
+If you don't use eclipse or maven, just follow step 1.
+If you want to use eclipse, but not maven, follow step 1 and 2
+If you want to use eclipse and maven, follow step 1, 2 and 3
+
+To compile the example project with eclipse, follow steps 1-4, you can however also compile it without using eclipse by following steps 1 and 3 and then manually starting the maven build ("mvn package").
+
+
+1. To develop Android applications with jadex-android you need to:
+
+ - Install the Android SDK (from http://developer.android.com/sdk/index.html)
+ - Download the SDK Platform API for Android 2.2 or higher using the Android SDK Manager
+ - Download and extract jadex-android (http://jadex.informatik.uni-hamburg.de/nightlybuilds/2011-08-31/jadex-android-0.0.1.zip)
+ - Include the libraries in the extracted folder "lib" in your build path
+
+2. In order to develop Android applications using Eclipse (with or without maven), you need:
+
+ - Eclipse 3.6 (Helios) (http://www.eclipse.org/downloads/packages/release/helios/sr2)
+ - The Android Developer Tools (ADT), Eclipse Update Site: https://dl-ssl.google.com/android/eclipse/
+ - In Eclipse, set the path to the Android SDK in "Window -> Preferences -> Android" and click "Apply"
+ - Add the extraced jadex-android libraries to the build path of a project in eclipse
+ - If you get Exceptions related to Memory ("Out of Heap Space", "GC overhead limit") during compilation, try setting "-Xms128m -Xmx1024m" in your eclipse.ini.
+
+3. If you want to use Maven as Build System (required for the included example project):
+
+ - set the $ANDROID_HOME Environment Variable to the directory where the Android SDK is located
+ - Eclipse users: install m2eclipse plugin, eclipse update site: http://download.eclipse.org/technology/m2e/releases
+
+Because jadex-android artifacts are not available through a maven repository yet, you need to install those manually in your local maven repository:
+ - Download and install Maven (http://maven.apache.org/download.html)
+ - unpack the "sources.zip" which is included in the jadex-android distribution.
+ - open a terminal emulator (windows: "cmd"), change to the extracted sources directory, and run: "mvn package install -P jadex-android-dist" (maybe you need to substitute "mvn" with the path to the mvn executable you installed before)
+
+4. To import the sample project in eclipse (after following steps 2 and 3)
+ - Extract the "jadex-android-example-project.zip", which is included in the jadex-android distribution
+ - Choose "File -> Import -> Maven -> Existing Maven Projects"
+ - Select the Folder you extracted the example project to and click "next"/"finish" until import is completed
+ - You will be prompted to install some Eclipse Plugins ("m2e android connector") and to restart eclipse
+ - After restarting, the Project should build without any errors
+ - To build the project, use the included launch config "Build example project with maven" (which uses the "clean package" goals) as eclipse WILL NOT BUILD A USEFULL APK (its missing xml files from dependencies)
+ - To run the project, use the included launch config "Run example project with maven", which will deploy and run the project on any android devices plugged in or emulators running. (Currently, running doesn't work, but deploying does, so launch the application manually)
+
+
+Hints: 
+ - to see Android related errors, remove the JRE System Library from the eclipse Build Path. 
+ - there is a bug in m2e-android (https://github.com/rgladwell/m2e-android/issues/31)
+

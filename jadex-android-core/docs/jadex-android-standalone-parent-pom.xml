@@ -46,7 +46,7 @@
 									<goal>single</goal>
 								</goals>
 								<configuration>
-									<finalName>jadex-android-example-project</finalName>
+									<finalName>jadex-android-example-projects</finalName>
 									<descriptors>
 										<descriptor>src/main/assembly/dist-assembly-androidexampleprojectzip.xml</descriptor>
 									</descriptors>
