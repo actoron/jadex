@@ -49,6 +49,14 @@
 			<source>target/sources.zip</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
+		<file>
+			<source>jadex-android-core/docs/jadex-android-howto.txt</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+		<file>
+			<source>target/jadex-android-example-projects.zip</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
 		<!-- Hack!!! Manually copying junit jar (required by jadex.platform.base.ComponentTest)
 		   - due to Maven assembly bug: http://jira.codehaus.org/browse/MASSEMBLY-558 -->
 <!-- 		<file> -->

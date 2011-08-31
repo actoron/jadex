@@ -76,11 +76,6 @@
 			<source>src/main/assembly/dist-assembly-androidexampleprojectzip.xml</source>
 			<outputDirectory>sources/src/main/assembly</outputDirectory>
 		</file>
-
-		<file>
-			<source>target/jadex-android-example-project.zip</source>
-			<outputDirectory>sources</outputDirectory>
-		</file>
 	</files>
 
 </assembly>

@@ -3,18 +3,22 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
 
-	<id>jadex-example-project</id>
+	<id>jadex-android-example-projects</id>
 
 	<formats>
 		<format>zip</format>
 	</formats>
-
+	
 	<includeBaseDirectory>false</includeBaseDirectory>
 	
 	<fileSets>
 		<fileSet>
 			<directory>jadex-android-core/docs/jadex-android-example-project</directory>
 			<outputDirectory>jadex-android-example-project</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>jadex-android-core/docs/jadex-android-example-project-maven</directory>
+			<outputDirectory>jadex-android-example-project-maven</outputDirectory>
 		</fileSet>
 	</fileSets>	
 
