@@ -155,7 +155,7 @@
 					</env:dataproviders>
 			
 					<env:dataconsumers>
-						<!-- <env:dataconsumer class="CSVFileDataConsumer">
+						<!-- <env:dataconsumer name="unhappiness_file" class="CSVFileDataConsumer">
 							<env:property name="dataprovider">"unhappiness"</env:property>
 							<env:property name="filename">"unhappiness.csv"</env:property>
 						</env:dataconsumer> -->
@@ -166,7 +166,7 @@
 							<env:property name="labelx">"Time"</env:property>
 							<env:property name="labely">"Unhappiness"</env:property>
 							<env:property name="bgimage">"unhappy.jpg"</env:property>
-							<env:property name="maxitemcount">30</env:property>
+							<!-- <env:property name="maxitemcount">30</env:property> -->
 							<!-- <env:property name="autorepaint">true</env:property> -->
 							<!-- <env:property name="timescale">org.jfree.data.time.Second.class</env:property> -->
 							
@@ -176,15 +176,15 @@
 							<env:property name="valuex" dynamic="true">$object.getData($rowcnt, $object.getColumnIndex("time"))</env:property>
 							<env:property name="valuey" dynamic="true">$object.getData($rowcnt, $object.getColumnIndex("unhappiness"))</env:property>-->
 							
-							<!-- Defines a multi series (as many series as seriesid's) -->
-							<env:property name="seriesid_0">"id"</env:property>
-							<env:property name="valuex_0">"time"</env:property>
-							<env:property name="valuey_0">"unhappiness"</env:property>
-		
 							<!-- Defines a normal series. -->
-							<env:property name="seriesname_1">"Average unhappiness"</env:property>
+							<env:property name="seriesname_0">"Average unhappiness"</env:property>
+							<env:property name="valuex_0">"time"</env:property>
+							<env:property name="valuey_0">"avg_unhappiness"</env:property>
+
+							<!-- Defines a multi series (as many series as seriesid's) - ->
+							<env:property name="seriesid_1">"id"</env:property>
 							<env:property name="valuex_1">"time"</env:property>
-							<env:property name="valuey_1">"avg_unhappiness"</env:property>
+							<env:property name="valuey_1">"unhappiness"</env:property>-->		
 						</env:dataconsumer>
 						
 						<env:dataconsumer name="unhappiness_histogram" class="HistogramDataConsumer">
@@ -328,6 +328,33 @@
 					</env:dataproviders>
 			
 					<env:dataconsumers>
+						<env:dataconsumer name="unhappiness_chart" class="XYChartDataConsumer">
+							<env:property name="dataprovider">"unhappiness"</env:property>
+							<env:property name="title">"Global Bug Unhappiness"</env:property>
+							<env:property name="labelx">"Time"</env:property>
+							<env:property name="labely">"Unhappiness"</env:property>
+							<env:property name="bgimage">"unhappy.jpg"</env:property>
+							<!-- <env:property name="maxitemcount">30</env:property> -->
+							<!-- <env:property name="autorepaint">true</env:property> -->
+							<!-- <env:property name="timescale">org.jfree.data.time.Second.class</env:property> -->
+							
+							<!-- <env:property name="seriesid">"id"</env:property>
+							<env:property name="valuex">"time"</env:property>
+							<env:property name="valuey">"unhappiness"</env:property> 
+							<env:property name="valuex" dynamic="true">$object.getData($rowcnt, $object.getColumnIndex("time"))</env:property>
+							<env:property name="valuey" dynamic="true">$object.getData($rowcnt, $object.getColumnIndex("unhappiness"))</env:property>-->
+							
+							<!-- Defines a normal series. -->
+							<env:property name="seriesname_0">"Average unhappiness"</env:property>
+							<env:property name="valuex_0">"time"</env:property>
+							<env:property name="valuey_0">"avg_unhappiness"</env:property>
+
+							<!-- Defines a multi series (as many series as seriesid's) - ->
+							<env:property name="seriesid_1">"id"</env:property>
+							<env:property name="valuex_1">"time"</env:property>
+							<env:property name="valuey_1">"unhappiness"</env:property>-->		
+						</env:dataconsumer>
+			
 						<env:dataconsumer name="unhappiness_histogram" class="HistogramDataConsumer">
 							<env:property name="dataprovider">"unhappiness"</env:property>
 							<env:property name="title">"Global Bug Unhappiness"</env:property>
@@ -350,7 +377,8 @@
 					<env:observers>
 						<env:observer name="world" dataview="view_all" perspective="main">
 							<env:plugin name="evaluation" class="EvaluationPlugin">
-								<env:property name="component_0">((AbstractChartDataConsumer)$space.getDataConsumer("unhappiness_histogram")).getChartPanel()</env:property>
+								<env:property name="component_0">((AbstractChartDataConsumer)$space.getDataConsumer("unhappiness_chart")).getChartPanel()</env:property>
+								<env:property name="component_1">((AbstractChartDataConsumer)$space.getDataConsumer("unhappiness_histogram")).getChartPanel()</env:property>
 							</env:plugin>
 						</env:observer>
 					</env:observers>

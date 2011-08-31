@@ -330,7 +330,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 */
 	public IFuture	shutdownService()
 	{
-		System.out.println("shut");
+//		System.out.println("shut");
 		final Future	saved	= new Future();
 		SServiceProvider.getService(provider,ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new DelegationResultListener(saved)
