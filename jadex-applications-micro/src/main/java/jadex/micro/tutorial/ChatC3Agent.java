@@ -1,18 +1,13 @@
 package jadex.micro.tutorial;
 
-import java.util.Date;
-
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
-import jadex.micro.annotation.ComponentType;
-import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;

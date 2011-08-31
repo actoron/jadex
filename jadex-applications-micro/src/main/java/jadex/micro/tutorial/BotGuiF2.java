@@ -15,10 +15,12 @@ import javax.swing.border.EtchedBorder;
 /**
  *  The gui for the chat bot allows
  *  changing the keyword and reply message. 
- *
  */
 public class BotGuiF2 extends AbstractComponentViewerPanel
 {
+	/**
+	 *  Get the component.
+	 */
 	public JComponent getComponent()
 	{
 		JPanel	panel	= new JPanel(new GridBagLayout());

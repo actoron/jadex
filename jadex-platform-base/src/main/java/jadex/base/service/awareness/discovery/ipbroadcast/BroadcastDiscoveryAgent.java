@@ -198,7 +198,7 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 					}
 					catch(Exception e2)
 					{
-//						e2.printStackTrace();
+						e2.printStackTrace();
 						throw new RuntimeException(e2);
 					}
 				}

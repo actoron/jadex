@@ -1,5 +1,6 @@
 package jadex.micro.examples.mandelbrot;
 
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.IFuture;
 
@@ -7,6 +8,7 @@ import jadex.commons.future.IFuture;
  *  The service allows displaying results in the frame
  *  managed by the service providing agent.
  */
+@Service
 public class DisplayService implements IDisplayService
 {
 	//-------- attributes --------

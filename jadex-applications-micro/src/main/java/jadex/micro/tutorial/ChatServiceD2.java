@@ -3,6 +3,7 @@ package jadex.micro.tutorial;
 import jadex.base.gui.SwingDelegationResultListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
@@ -19,6 +20,7 @@ import javax.swing.SwingUtilities;
 /**
  *  Chat service implementation.
  */
+@Service
 public class ChatServiceD2 implements IChatService
 {
 	//-------- attributes --------

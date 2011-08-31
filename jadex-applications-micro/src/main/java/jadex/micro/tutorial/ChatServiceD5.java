@@ -9,6 +9,7 @@ import javax.swing.SwingUtilities;
 import jadex.base.gui.SwingDelegationResultListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
@@ -19,6 +20,7 @@ import jadex.commons.future.IFuture;
 /**
  *  The chat service.
  */
+@Service
 public class ChatServiceD5 implements IChatService
 {
 	//-------- attributes --------

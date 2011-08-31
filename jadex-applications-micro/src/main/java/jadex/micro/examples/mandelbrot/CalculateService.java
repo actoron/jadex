@@ -1,5 +1,6 @@
 package jadex.micro.examples.mandelbrot;
 
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -7,6 +8,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Calculate service implementation.
  */
+@Service
 public class CalculateService implements ICalculateService
 {
 	//-------- attributes --------

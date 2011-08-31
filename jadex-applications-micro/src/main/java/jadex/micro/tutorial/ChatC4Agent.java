@@ -3,7 +3,6 @@ package jadex.micro.tutorial;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.commons.future.DefaultResultListener;
-import jadex.component.ComponentComponentFactory;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentFactory;
 import jadex.micro.annotation.Agent;

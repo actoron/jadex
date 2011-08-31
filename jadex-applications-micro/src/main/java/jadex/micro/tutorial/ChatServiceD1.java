@@ -1,6 +1,7 @@
 package jadex.micro.tutorial;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.clock.IClockService;
@@ -15,6 +16,7 @@ import java.util.Date;
 /**
  *  Chat service implementation.
  */
+@Service
 public class ChatServiceD1 implements IChatService
 {
 	//-------- attributes --------

@@ -1,6 +1,7 @@
 package jadex.micro.tutorial;
 
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -10,6 +11,7 @@ import java.util.List;
 /**
  *  This chat service can provide a user profile.
  */
+@Service
 public class ChatServiceD3 extends ChatServiceD2 implements IExtendedChatService
 {
 	protected static List profiles;

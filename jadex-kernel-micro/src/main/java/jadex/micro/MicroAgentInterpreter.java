@@ -174,21 +174,24 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			for(int i=0; i<names.length; i++)
 			{
 				Object val = getArguments().get(names[i]);
-				final Field[] fields = model.getServiceInjections(names[i]);
+				final Field[] fields = model.getArgumentInjections(names[i]);
 				
 				try
 				{
 					for(int j=0; j<fields.length; j++)
 					{
-						fields[j].setAccessible(true);
-						fields[j].set(agent, val);
+						if(val!=null || !SReflect.isBasicType(fields[j].getType()))
+						{
+							fields[j].setAccessible(true);
+							fields[j].set(agent, val);
+						}
 					}
 				}
 				catch(Exception e)
 				{
 					getLogger().warning("Field injection failed: "+e);
 					ret.setException(e);
-				}	
+				}
 			}
 		}
 		

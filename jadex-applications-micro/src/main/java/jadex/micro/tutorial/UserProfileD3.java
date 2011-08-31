@@ -1,10 +1,12 @@
 package jadex.micro.tutorial;
 
 /**
- * 
+ *  Simple user profile struct.
  */
 public class UserProfileD3
 {
+	//-------- attributes --------
+	
 	/** The name. */
 	protected String name;
 	
@@ -17,15 +19,18 @@ public class UserProfileD3
 	/** The description. */
 	protected String description;
 
+	//-------- constructors --------
+
 	/**
-	 * 
+	 *  Create a new user profile.
 	 */
 	public UserProfileD3()
 	{
+		// Empty bean constrcutor.
 	}
 
 	/**
-	 * 
+	 *  Create a new user profile.
 	 */
 	public UserProfileD3(String name, int age, boolean gender, String description)
 	{
@@ -35,6 +40,8 @@ public class UserProfileD3
 		this.description = description;
 	}
 
+	//-------- methods --------
+	
 	/**
 	 *  Get the name.
 	 *  @return The name.

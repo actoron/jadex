@@ -7,6 +7,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.SUtil;
@@ -26,6 +27,7 @@ import javax.swing.SwingUtilities;
 /**
  *  Generate service implementation. 
  */
+@Service
 public class GenerateService implements IGenerateService
 {
 	//-------- constants --------

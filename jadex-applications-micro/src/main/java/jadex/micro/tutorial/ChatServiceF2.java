@@ -1,6 +1,7 @@
 package jadex.micro.tutorial;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.DefaultResultListener;
 import jadex.micro.IPojoMicroAgent;
@@ -11,6 +12,7 @@ import java.util.Iterator;
 /**
  *  Chat service implementation.
  */
+@Service
 public class ChatServiceF2 implements IChatService
 {
 	//-------- attributes --------

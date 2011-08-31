@@ -8,7 +8,6 @@ import jadex.commons.future.DefaultResultListener;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.nio.ByteOrder;
 import java.util.Collection;
 import java.util.Iterator;
 
