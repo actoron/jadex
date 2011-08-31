@@ -1,0 +1,86 @@
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+
+	<id>sources</id>
+
+	<formats>
+		<format>zip</format>
+	</formats>
+
+	<includeBaseDirectory>false</includeBaseDirectory>
+
+	<moduleSets>
+		<moduleSet>
+			<sources>
+				<includeModuleDirectory>false</includeModuleDirectory>
+				<fileSets>
+					<fileSet>
+						<outputDirectory>sources/${module.artifactId}</outputDirectory>
+						<includes>
+							<include>src/**</include>
+							<include>lib/**</include>
+							<include>docs/**</include>
+							<!-- <include>pom.xml</include> -->
+						</includes>
+					</fileSet>
+				</fileSets>
+			</sources>
+		</moduleSet>
+	</moduleSets>
+
+	<!-- <fileSets> -->
+	<!-- <fileSet> -->
+	<!-- <directory>docs/jadex-android-example-project</directory> -->
+	<!-- <outputDirectory>sources/docs/jadex-android-example-project</outputDirectory> -->
+	<!-- </fileSet> -->
+	<!-- </fileSets> -->
+
+
+	<files>
+		<file>
+			<source>jadex-android-core/docs/jadex-android-standalone-parent-pom.xml</source>
+			<outputDirectory>sources</outputDirectory>
+			<destName>pom.xml</destName>
+		</file>
+		<file>
+			<source>jadex-android-core/docs/jadex-android-core-standalone-pom.xml</source>
+			<outputDirectory>sources/jadex-android-core/</outputDirectory>
+			<destName>pom.xml</destName>
+		</file>
+		<file>
+			<source>jadex-android-beans/pom.xml</source>
+			<outputDirectory>sources/jadex-android-beans/</outputDirectory>
+			<destName>pom.xml</destName>
+		</file>
+		<file>
+			<source>jadex-android-stax/pom.xml</source>
+			<outputDirectory>sources/jadex-android-stax/</outputDirectory>
+			<destName>pom.xml</destName>
+		</file>
+		<file>
+			<source>jadex-android-misc/pom.xml</source>
+			<outputDirectory>sources/jadex-android-misc/</outputDirectory>
+			<destName>pom.xml</destName>
+		</file>
+		<file>
+			<source>src/main/assembly/dist-assembly-androidsrczip.xml</source>
+			<outputDirectory>sources/src/main/assembly</outputDirectory>
+		</file>
+		<file>
+			<source>src/main/assembly/dist-assembly-android.xml</source>
+			<outputDirectory>sources/src/main/assembly</outputDirectory>
+		</file>
+		<file>
+			<source>src/main/assembly/dist-assembly-androidexampleprojectzip.xml</source>
+			<outputDirectory>sources/src/main/assembly</outputDirectory>
+		</file>
+
+		<file>
+			<source>target/jadex-android-example-project.zip</source>
+			<outputDirectory>sources</outputDirectory>
+		</file>
+	</files>
+
+</assembly>

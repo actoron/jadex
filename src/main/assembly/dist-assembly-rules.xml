@@ -59,7 +59,7 @@
 			<outputDirectory>sources</outputDirectory>
 		</file>
 		<file>
-			<source>/src/main/assembly/dist-assembly-rules.xml</source>
+			<source>src/main/assembly/dist-assembly-rules.xml</source>
 			<outputDirectory>sources/src/main/assembly</outputDirectory>
 		</file>
 		<file>

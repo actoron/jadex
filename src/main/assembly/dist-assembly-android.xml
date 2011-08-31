@@ -1,0 +1,135 @@
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+
+	<id>androiddist</id>
+
+	<formats>
+		<!-- <format>dir</format> -->
+		<format>zip</format>
+	</formats>
+
+	<includeBaseDirectory>true</includeBaseDirectory>
+
+	<moduleSets>
+		<moduleSet>
+			<!-- Selected by profile. <includes> <include>jadex:*</include> </includes> -->
+			<binaries>
+				<outputFileNameMapping>${artifact.artifactId}-${artifact.version}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
+				<!-- <outputFileNameMapping>${module.artifactId}-${module.version}${dashClassifier?}.${module.extension}</outputFileNameMapping> -->
+				<!-- <outputFileNameMapping>${artifactId}-${version}${dashClassifier?}.${extension}</outputFileNameMapping> -->
+				<outputDirectory>lib</outputDirectory>
+				<unpack>false</unpack>
+			</binaries>
+			
+<!-- 			<sources> -->
+<!-- 				<includeModuleDirectory>false</includeModuleDirectory> -->
+<!-- 				<fileSets> -->
+<!-- 					<fileSet> -->
+<!-- 						<outputDirectory>sources/${module.artifactId}</outputDirectory> -->
+<!-- 						<includes> -->
+<!-- 							<include>src/**</include> -->
+<!-- 							<include>pom.xml</include> -->
+<!-- 						</includes> -->
+<!-- 					</fileSet> -->
+<!-- 					<fileSet> -->
+<!-- 						<outputDirectory>sources/${module.artifactId}</outputDirectory> -->
+<!-- 						<includes> -->
+<!-- 							<include>lib/**</include> -->
+<!-- 						</includes> -->
+<!-- 					</fileSet> -->
+<!-- 				</fileSets> -->
+<!-- 			</sources> -->
+		</moduleSet>
+	</moduleSets>
+
+	<files>
+		<file>
+			<source>target/sources.zip</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+		<!-- Hack!!! Manually copying junit jar (required by jadex.platform.base.ComponentTest)
+		   - due to Maven assembly bug: http://jira.codehaus.org/browse/MASSEMBLY-558 -->
+<!-- 		<file> -->
+<!-- 			<source>docs/junit-3.8.1.jar</source> -->
+<!-- 			<outputDirectory>lib</outputDirectory> -->
+<!-- 		</file> -->
+<!-- 		<file> -->
+<!-- 			<source>target/jadex-example-project.zip</source> -->
+<!-- 			<outputDirectory>/</outputDirectory> -->
+<!-- 		</file> -->
+<!-- 		<file> -->
+<!-- 			<source>target/sources.zip</source> -->
+<!-- 			<outputDirectory>/</outputDirectory> -->
+<!-- 		</file> -->
+<!-- 		<file> -->
+<!-- 			<source>docs/readme.txt</source> -->
+<!-- 			<outputDirectory>/</outputDirectory> -->
+<!-- 			<filtered>true</filtered> -->
+<!-- 		</file> -->
+<!-- 		<file> -->
+<!-- 			<source>docs/license.txt</source> -->
+<!-- 			<outputDirectory>/</outputDirectory> -->
+<!-- 		</file> -->
+<!-- 		<file> -->
+<!-- 			<source>docs/api-changes.txt</source> -->
+<!-- 			<outputDirectory>/</outputDirectory> -->
+<!-- 			<filtered>true</filtered> -->
+<!-- 		</file> -->
+<!-- 		<file> -->
+<!-- 			<source>docs/jcc.settings.xml</source> -->
+<!-- 			<outputDirectory>/lib</outputDirectory> -->
+<!-- 		</file> -->
+<!-- 		<file> -->
+<!-- 			<source>docs/default.settings.xml</source> -->
+<!-- 			<outputDirectory>/lib</outputDirectory> -->
+<!-- 		</file> -->
+<!-- 		<file> -->
+<!-- 			<source>docs/jadex.bat</source> -->
+<!-- 			<outputDirectory>/</outputDirectory> -->
+<!-- 		</file> -->
+<!-- 		<file> -->
+<!-- 			<source>docs/jadex_no_awareness.bat</source> -->
+<!-- 			<outputDirectory>/</outputDirectory> -->
+<!-- 		</file> -->
+<!-- 		<file> -->
+<!-- 			<source>docs/jadex.sh</source> -->
+<!-- 			<outputDirectory>/</outputDirectory> -->
+<!-- 		</file> -->
+<!-- 		<file> -->
+<!-- 			<source>docs/jadex_no_awareness.sh</source> -->
+<!-- 			<outputDirectory>/</outputDirectory> -->
+<!-- 		</file> -->
+<!-- 		<file> -->
+<!-- 			<source>docs/howtostart.txt</source> -->
+<!-- 			<outputDirectory>/</outputDirectory> -->
+<!-- 		</file> -->
+		<!-- 
+		<file>
+			<source>target/application_guide.pdf</source>
+			<outputDirectory>/docs</outputDirectory>
+		</file>
+		<file>
+			<source>target/standalone_platform_guide.pdf</source>
+			<outputDirectory>/docs</outputDirectory>
+		</file>
+		<file>
+			<source>target/bdi_tutorial.pdf</source>
+			<outputDirectory>/docs</outputDirectory>
+		</file>
+		<file>
+			<source>target/micro_user_guide.pdf</source>
+			<outputDirectory>/docs</outputDirectory>
+		</file>
+		<file>
+			<source>target/bpmn_tutorial.pdf</source>
+			<outputDirectory>/docs</outputDirectory>
+		</file>
+		<file>
+			<source>target/environment_user_guide.pdf</source>
+			<outputDirectory>/docs</outputDirectory>
+		</file> -->
+	</files>
+
+</assembly>

@@ -604,7 +604,7 @@
 			</modules>
 		</profile>
 		<profile>
-			<id>jadex-android</id>
+			<id>jadex-android-artifacts</id>
 			<build>
 				<finalName>jadex-android-${project.version}</finalName>
 			</build>
@@ -613,7 +613,74 @@
 				<module>jadex-android-stax</module>
 				<module>jadex-android-core</module>
 				<module>jadex-android-beans</module>
-				<module>jadex-android-application-test</module>
+<!-- 				<module>jadex-android-application-test</module> -->
+			</modules>
+		</profile>
+		
+		<profile>
+			<id>jadex-android-dist</id>
+			<build>
+			<finalName>jadex-android-0.0.1</finalName>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>2.2</version>
+						<configuration>
+							<appendAssemblyId>false</appendAssemblyId>
+							<archiverConfig>
+								<duplicateBehavior>skip</duplicateBehavior>
+							</archiverConfig>
+						</configuration>
+						<executions>
+							<execution>
+								<id>jadex-android-example-project</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<finalName>jadex-android-example-project</finalName>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-androidexampleprojectzip.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+							<execution>
+								<id>sources</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<finalName>sources</finalName>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-androidsrczip.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+							<execution>
+								<id>make-assembly</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-android.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+			<modules>
+				<module>jadex-android-misc</module>
+				<module>jadex-android-stax</module>
+				<module>jadex-android-core</module>
+				<module>jadex-android-beans</module>
+<!-- 				<module>jadex-android-application-test</module> -->
 			</modules>
 		</profile>
 	</profiles>
