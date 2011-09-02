@@ -35,7 +35,10 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.ProvidedServiceImplementation;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
@@ -43,6 +46,7 @@ import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.clock.ITimedObject;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -54,8 +58,11 @@ import jadex.kernelbase.AbstractInterpreter;
 import jadex.kernelbase.InterpreterFetcher;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1298,6 +1305,90 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	public IInternalAccess getInternalAccess()
 	{
 		return this;
+	}
+	
+	/**
+	 *  Init a service.
+	 *  Overriden to allow for service implementations as BPMN processes using signal events.
+	 */
+	protected IFuture initService(ProvidedServiceInfo info, IModelInfo model)
+	{
+		IFuture	ret;
+		ProvidedServiceImplementation	impl	= info.getImplementation();
+		
+		// Service implementation inside BPMN: find start events for service methods.
+		if(impl!=null && impl.getExpression()==null && impl.getImplementation()==null && info.getName()!=null)
+		{
+			// Build map of potentially matching events: method name -> {list of matching signal event activities}
+			MultiCollection	events	= new MultiCollection();
+			List	starts	= this.model.getStartActivities(pool, lane);
+			for(int i=0; i<starts.size(); i++)
+			{
+				MActivity	act	= (MActivity)starts.get(i);
+				if(MBpmnModel.EVENT_START_MULTIPLE.equals(act.getActivityType())
+					&& info.getName().equals(act.getName()))
+				{
+					List	edges	= act.getOutgoingSequenceEdges();
+					for(int k=0; k<edges.size(); k++)
+					{
+						MActivity	target	= ((MSequenceEdge)edges.get(k)).getTarget();
+						if(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL.equals(target.getActivityType()))
+						{
+							events.put(target.getName(), target);
+						}
+					}
+				}
+				else if(MBpmnModel.EVENT_START_SIGNAL.equals(act.getActivityType())
+					&& act.getName().startsWith(info.getName()+"."))
+				{
+					events.put(act.getName().substring(info.getName().length()+1), act);
+				}
+			}
+
+			// Find matching events for each method.
+			Future	fut	= new Future();
+			ret	= fut;
+			Class	type	= info.getType();
+			Method[]	meths	= type.getMethods();
+			Map	methods	= new HashMap(); // method -> event.
+			for(int i=0; !fut.isDone() && i<meths.length; i++)
+			{
+				Collection	es	= events.getCollection(meths[i].getName());
+				for(Iterator it=es.iterator(); it.hasNext(); )
+				{
+					MActivity	event	= (MActivity)it.next();
+					if(event.getPropertyNames().length==meths[i].getParameterTypes().length)
+					{
+						if(methods.containsKey(meths[i]))
+						{
+							fut.setException(new RuntimeException("Ambiguous start events found for service method: "+meths[i]));
+						}
+						else
+						{
+							methods.put(meths[i], event);
+						}
+					}
+				}
+				
+				if(!methods.containsKey(meths[i]))
+				{
+					fut.setException(new RuntimeException("No start event found for service method: "+meths[i]));
+				}
+			}
+
+//			System.out.println("Found mapping: "+methods);
+			// Todo: interceptors
+			ret	= addService(info.getName(), info.getType(), info.getImplementation().getProxytype(), null,
+				Proxy.newProxyInstance(getClassLoader(), new Class[]{info.getType()}, new ProcessServiceInvocationHandler(this, methods)));
+		}
+		
+		// External service implementation
+		else
+		{
+			ret	= super.initService(info, model);
+		}
+		
+		return ret;
 	}
 	
 	/**

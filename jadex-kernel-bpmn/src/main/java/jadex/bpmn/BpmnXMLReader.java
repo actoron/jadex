@@ -1544,11 +1544,13 @@ public class BpmnXMLReader
 							String typename = table.getCellValue(row, 1);
 							String proxytype = table.getCellValue(row, 2);
 							String implname = table.getCellValue(row, 3);
+							if("".equals(implname))
+								implname	= null;
 
-							Class impltype = SReflect.findClass0(implname, mi.getAllImports(), context.getClassLoader());
+							Class impltype = implname!=null ? SReflect.findClass0(implname, mi.getAllImports(), context.getClassLoader()) : null;
 							Class type = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
-							RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(implname);
-							ProvidedServiceImplementation psim;
+							RequiredServiceBinding binding = implname!=null ? (RequiredServiceBinding)bindings.get(implname) : null;
+							ProvidedServiceImplementation psim	= null;
 							if(binding!=null)
 							{
 								// todo: interceptors
@@ -1571,11 +1573,13 @@ public class BpmnXMLReader
 								{
 									String configid = (String)it.next();
 									implname = (String)vals.get(configid);
+									if("".equals(implname))
+										implname	= null;
 									ConfigurationInfo ci = (ConfigurationInfo)configurations.get(configid);
 									if(ci!=null)
 									{
-										impltype = SReflect.findClass0(implname, mi.getAllImports(), context.getClassLoader());
-										binding = (RequiredServiceBinding)bindings.get(implname);
+										impltype = implname!=null ? SReflect.findClass0(implname, mi.getAllImports(), context.getClassLoader()) : null;
+										binding = implname!=null ? (RequiredServiceBinding)bindings.get(implname) : null;
 										if(binding!=null)
 										{
 											// todo: interceptors

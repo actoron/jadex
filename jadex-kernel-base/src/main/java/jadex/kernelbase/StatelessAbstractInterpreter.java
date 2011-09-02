@@ -703,7 +703,21 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			ret	= new Future();
 			IFuture	fut;
 			ProvidedServiceImplementation impl = services[i].getImplementation(); 
-			if(impl!=null && (impl.getExpression()!=null || impl.getImplementation()!=null))
+			
+			// Virtual service (e.g. promoted)
+			if(impl!=null && impl.getBinding()!=null)
+			{
+				RequiredServiceInfo info = new RequiredServiceInfo(BasicService.generateServiceName(services[i].getType())+":virtual", services[i].getType());
+				IServiceIdentifier sid = BasicService.createServiceIdentifier(getExternalAccess().getServiceProvider().getId(), 
+					info.getName(), info.getType(), BasicServiceInvocationHandler.class);
+				IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(getExternalAccess(), getComponentAdapter(), 
+					sid, info, impl.getBinding(), isCopy());
+				fut	= getServiceContainer().addService(service);
+				
+			}
+			
+			// Directly provided service.
+			else
 			{
 				try
 				{
@@ -713,15 +727,6 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				{
 					fut	= new Future(e);
 				}
-			}
-			else 
-			{
-				RequiredServiceInfo info = new RequiredServiceInfo(BasicService.generateServiceName(services[i].getType())+":virtual", services[i].getType());
-				IServiceIdentifier sid = BasicService.createServiceIdentifier(getExternalAccess().getServiceProvider().getId(), 
-					info.getName(), info.getType(), BasicServiceInvocationHandler.class);
-				IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(getExternalAccess(), getComponentAdapter(), 
-					sid, info, impl.getBinding(), isCopy());
-				fut	= getServiceContainer().addService(service);
 			}
 			
 			fut.addResultListener(createResultListener(new DelegationResultListener((Future)ret)
@@ -1029,20 +1034,20 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		{
 			ProvidedServiceImplementation	impl	= info.getImplementation();
 			Object	ser	= null;
-			if(impl.getExpression()!=null)
+			if(impl!=null && impl.getExpression()!=null)
 			{
 				// todo: other Class imports, how can be found out?
 				ser = SJavaParser.evaluateExpression(impl.getExpression(), model.getAllImports(), getFetcher(), model.getClassLoader());
 //				System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
 			}
-			else if(impl.getImplementation()!=null)
+			else if(impl!=null && impl.getImplementation()!=null)
 			{
 				ser = impl.getImplementation().newInstance();
 			}
 			
 			if(ser==null)
 			{
-				ret = new Future(new RuntimeException("Service creation error: "+impl.getImplementation()+" "+impl.getExpression()+" "+impl.getBinding()));
+				ret = new Future(new RuntimeException("Service creation error: "+info));
 			}
 			else
 			{

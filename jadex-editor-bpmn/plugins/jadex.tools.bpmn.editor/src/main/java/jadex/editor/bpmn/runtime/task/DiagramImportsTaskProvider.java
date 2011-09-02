@@ -40,9 +40,6 @@ public class DiagramImportsTaskProvider extends PackageBasedTaskProvider
 	@Override
 	public void setInput(EModelElement selectedElement)
 	{
-		// Possibly a hack, invocation with improperly initialized elements?
-		if (selectedElement == null || (selectedElement.eContainer() == null && (selectedElement instanceof BpmnDiagram)))
-			return;
 		super.setInput(selectedElement);
 		updateBpmnDiagram(selectedElement);
 	}
@@ -76,6 +73,10 @@ public class DiagramImportsTaskProvider extends PackageBasedTaskProvider
 		
 		while (!(container instanceof BpmnDiagram)  && depth < maxRecursion)
 		{
+			// Hack!!! Why null!?
+			if(container==null)
+				return;
+			
 			container = container.eContainer();
 			depth++;
 		}

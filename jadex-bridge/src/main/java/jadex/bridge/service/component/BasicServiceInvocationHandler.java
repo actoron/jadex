@@ -39,7 +39,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -337,7 +337,10 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 				.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 			if(!(service instanceof IService))
 			{
-				if(!service.getClass().isAnnotationPresent(Service.class))
+				if(!service.getClass().isAnnotationPresent(Service.class)
+					// Hack!!! BPMN uses a proxy as service implementation.
+					&& !(Proxy.isProxyClass(service.getClass())
+							&& Proxy.getInvocationHandler(service).getClass().isAnnotationPresent(Service.class)))
 				{
 					throw new RuntimeException("Pojo service must declare @Service annotation: "+service.getClass());
 				}
@@ -564,7 +567,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			{
 				if(pojoproxies==null)
 				{
-					pojoproxies = Collections.synchronizedMap(new HashMap());
+					pojoproxies = Collections.synchronizedMap(new IdentityHashMap());
 				}
 			}
 		}

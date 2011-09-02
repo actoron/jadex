@@ -12,7 +12,7 @@
    <feature url="features/jadex.tools.model.bpmn.feature_1.0.0.201011181333.jar" id="jadex.tools.model.bpmn.feature" version="1.0.0.201011181333">
       <category name="jadex.editor.outdated"/>
    </feature>
-   <feature url="features/jadex.editor.bpmn.feature_1.0.1.201103090940.jar" id="jadex.editor.bpmn.feature" version="1.0.1.201103090940">
+   <feature url="features/jadex.editor.bpmn.feature_1.0.1.201109021531.jar" id="jadex.editor.bpmn.feature" version="1.0.1.201109021531">
       <category name="jadex.editor.xpmn"/>
    </feature>
    <feature url="features/jadex.editor.adf.feature_1.0.1.201103090940.jar" id="jadex.editor.adf.feature" version="1.0.1.201103090940">
