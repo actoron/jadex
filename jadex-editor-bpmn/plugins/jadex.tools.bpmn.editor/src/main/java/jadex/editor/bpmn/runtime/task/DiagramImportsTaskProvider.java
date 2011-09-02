@@ -14,6 +14,8 @@ import java.util.List;
 import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.stp.bpmn.BpmnDiagram;
+import org.eclipse.stp.bpmn.Vertex;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * @author Claas
@@ -38,6 +40,9 @@ public class DiagramImportsTaskProvider extends PackageBasedTaskProvider
 	@Override
 	public void setInput(EModelElement selectedElement)
 	{
+		// Possibly a hack, invocation with improperly initialized elements?
+		if (selectedElement == null || (selectedElement.eContainer() == null && (selectedElement instanceof BpmnDiagram)))
+			return;
 		super.setInput(selectedElement);
 		updateBpmnDiagram(selectedElement);
 	}
@@ -58,11 +63,10 @@ public class DiagramImportsTaskProvider extends PackageBasedTaskProvider
 	/**
 	 * @param selectedElement
 	 */
-	private void updateBpmnDiagram(EModelElement selectedElement)
+	private void updateBpmnDiagram(final EModelElement selectedElement)
 	{
 		if (selectedElement == null)
 			return;
-		
 		// max recursive search depth
 		int maxRecursion = 30;
 		int depth = 1;
