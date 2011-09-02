@@ -496,8 +496,9 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 		
 		/**
 		 * The image provider for checkboxes
+		 * This one is _evil_ and causes flicker, privatized, access only via getCheckboxImageProvider() with lazy init.
 		 */
-		protected CheckboxImages checkboxImageProvider;
+		private CheckboxImages checkboxImageProvider;
 		
 		// ---- constructors ----
 		
@@ -516,7 +517,16 @@ public abstract class AbstractCommonTablePropertySection extends AbstractCommonP
 		{
 			assert columIndex >= 0 : "column index < 0";
 			this.columIndex = columIndex;
-			this.checkboxImageProvider = new CheckboxImages(JFaceResources.getImageRegistry(), PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+			// don't do this here, evil flickering!
+			//this.checkboxImageProvider = new CheckboxImages(JFaceResources.getImageRegistry(), PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+		}
+		
+		// ---- Checkbox provider lazy init ----
+		public CheckboxImages getCheckboxImageProvider()
+		{
+			if (checkboxImageProvider == null)
+				this.checkboxImageProvider = new CheckboxImages(JFaceResources.getImageRegistry(), PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+			return checkboxImageProvider;
 		}
 		
 		// ---- ColumnLabelProvider overrides ----

@@ -416,9 +416,9 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 			{
 				if(Boolean.valueOf(((MultiColumnTableRow)element).getColumnValueAt(idx)))
 				{
-					return checkboxImageProvider.getCheckboxImage(true, true);
+					return getCheckboxImageProvider().getCheckboxImage(true, true);
 				}
-				return checkboxImageProvider.getCheckboxImage(false, true);
+				return getCheckboxImageProvider().getCheckboxImage(false, true);
 			}
 	
 			public String getColumnText(Object element, int columnIndex)
