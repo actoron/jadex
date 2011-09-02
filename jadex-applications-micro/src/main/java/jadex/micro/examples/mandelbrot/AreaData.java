@@ -10,46 +10,46 @@ import jadex.commons.Base64;
 public class AreaData
 {
 	/** The x start. */
-	protected double				xstart;
+	protected double xstart;
 
 	/** The x end. */
-	protected double				xend;
+	protected double xend;
 
 	/** The y start. */
-	protected double				ystart;
+	protected double ystart;
 
 	/** The y end. */
-	protected double				yend;
+	protected double yend;
 
 	/** The x offset. */
-	protected int					xoff;
+	protected int xoff;
 
 	/** The y offset. */
-	protected int					yoff;
+	protected int yoff;
 
 	/** The x size. */
-	protected int					sizex;
+	protected int sizex;
 
 	/** The y size. */
-	protected int					sizey;
+	protected int sizey;
 
 	/** The max value where iteration is stopped. */
-	protected short					max;
+	protected short max;
 
 	/** The number of parallel workers. */
-	protected int					par;
+	protected int par;
 
 	/** The calculator service provider id. */
-	protected IComponentIdentifier	cid;
+	protected IComponentIdentifier cid;
 
 	/** The tasksize of a task (in pixel/points). */
-	protected int					tasksize;
+	protected int tasksize;
 	
 	/** The algorithm used to calculate the data. */
 	protected IFractalAlgorithm	algorithm;
 
 	/** The result data. */
-	protected short[][]				data;
+	protected short[][]	data;
 	
 	/**
 	 *  Create an empty area data.

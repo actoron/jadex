@@ -1,6 +1,7 @@
 package jadex.micro;
 
 import jadex.bridge.MessageType;
+import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -131,7 +132,32 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 		
 		if(!found)
 		{
-			ret.setResult(null);
+			// Check if annotation is present and complain that method is not public.
+			
+			Class clazz = agent.getClass();
+			
+			while(!Object.class.equals(clazz) && !found)
+			{
+				methods =clazz.getDeclaredMethods();
+				
+				for(int i=0; i<methods.length && !found; i++)
+				{
+					if(methods[i].isAnnotationPresent(annotation))
+					{
+						found = true;
+						ret.setException(new RuntimeException(
+							"Method must be declared public: "+methods[i]));
+						break;
+					}
+				}
+				
+				clazz = clazz.getSuperclass();
+			}
+			
+			if(!found)
+			{
+				ret.setResult(null);
+			}
 		}
 		
 		return ret;

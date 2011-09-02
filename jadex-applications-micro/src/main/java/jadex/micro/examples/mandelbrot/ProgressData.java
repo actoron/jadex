@@ -16,7 +16,7 @@ public class ProgressData
 	protected IComponentIdentifier	providerid;
 	
 	/** The task id. */
-	protected Object	taskid;
+	protected Object taskid;
 	
 	/** The area. */
 	protected Rectangle	area;
@@ -28,7 +28,7 @@ public class ProgressData
 	protected int imageheight;
 	
 	/** The state (finished or not). */
-	protected boolean	finished;
+	protected boolean finished;
 	
 	//-------- constructors --------
 	
