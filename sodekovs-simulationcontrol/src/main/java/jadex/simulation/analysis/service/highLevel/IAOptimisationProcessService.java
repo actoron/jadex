@@ -5,7 +5,19 @@ import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisS
 
 import java.util.UUID;
 
+/**
+ * Service to perform a optimization
+ * 
+ * @author 5Haubeck
+ */
 public interface IAOptimisationProcessService extends IAnalysisSessionService
 {
-	public IFuture optimieren(UUID session);
+	/**
+	 * Perform a optimization
+	 * 
+	 * @param session
+	 *            if any, already opened session
+	 * @return Object, if any, result of execution
+	 */
+	public IFuture optimize(UUID session);
 }

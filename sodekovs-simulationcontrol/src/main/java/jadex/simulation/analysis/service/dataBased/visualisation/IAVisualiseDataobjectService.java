@@ -6,7 +6,21 @@ import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisS
 
 import java.util.UUID;
 
+/**
+ * Service to display a data object
+ * 
+ * @author 5Haubeck
+ */
 public interface IAVisualiseDataobjectService extends IAnalysisSessionService
 {
-	public IFuture show(UUID sessionId, IADataObject dataObject);
+	/**
+	 * Displays the view of given object
+	 * 
+	 * @param session
+	 *            if any, already opened session
+	 * @param dataObject
+	 *            IADataObject to display
+	 * @return IADataObject, displayed object
+	 */
+	public IFuture show(UUID session, IADataObject dataObject);
 }

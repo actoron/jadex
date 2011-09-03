@@ -6,11 +6,35 @@ import jadex.simulation.analysis.common.data.IAExperimentBatch;
 import jadex.simulation.analysis.common.data.IAModel;
 import jadex.simulation.analysis.common.data.IAModelHypothesis;
 
+/**
+ * Service to define experiments an evaluate hypothesis
+ * 
+ * @author 5Haubeck
+ */
 public interface IAValidationService
 {
-	public IFuture defineExperimentsForHypothese(IAExperiment experiment,
-			 IAModelHypothesis hypothesis, Double sampleSize);
+	/**
+	 * Define some experiments to evaluate hypothesis
+	 * 
+	 * @param experiment
+	 *            normal experiment
+	 * @param hypothesis
+	 *            hypothesis to evaluate
+	 * @param sampleSize
+	 *            number of experiments to define
+	 * @return IAExperimentBatch, experiments to evaluate
+	 */
+	public IFuture defineExperimentsForHypothesis(IAExperiment experiment,
+				IAModelHypothesis hypothesis, Double sampleSize);
 
-	public IFuture evaluateHypothese(IAExperimentBatch experiments,
-			 IAModelHypothesis hypothesis);
+	/**
+	 * Evaluate the hypothesis with given (evaluated) experiments
+	 * 
+	 * @param experiments
+	 *            evaluated experiments
+	 * @param hypothesis
+	 *            hypothesis to evaluate
+	 */
+	public IFuture evaluateHypothesis(IAExperimentBatch experiments,
+				IAModelHypothesis hypothesis);
 }

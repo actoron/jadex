@@ -5,8 +5,20 @@ import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisS
 
 import java.util.UUID;
 
+/**
+ * Service to perform a general analysis
+ * 
+ * @author 5Haubeck
+ */
 public interface IAGeneralAnalysisProcessService extends IAnalysisSessionService
 {
+	/**
+	 * Perform a general analysis
+	 * 
+	 * @param session
+	 *            if any, already opened session
+	 * @return Object, if any, result of execution
+	 */
 	public IFuture analyse(UUID session);
 
 }

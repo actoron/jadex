@@ -6,7 +6,21 @@ import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisS
 
 import java.util.UUID;
 
+/**
+ * Service to perform a execution phase of the general analysis
+ * 
+ * @author 5Haubeck
+ */
 public interface IAGeneralExecuteService extends IAnalysisSessionService
 {
-	public IFuture execute(UUID session, IAExperimentBatch experiment);
+	/**
+	 * Simulate/Evaluate given experiments
+	 * 
+	 * @param session
+	 *            if any, already opened session
+	 * @param experiments
+	 *            experiments to evaluate
+	 * @return IAExperimentBatch, executed results
+	 */
+	public IFuture execute(UUID session, IAExperimentBatch experiments);
 }

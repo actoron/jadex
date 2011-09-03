@@ -2,56 +2,88 @@ package jadex.simulation.analysis.service.continuative.optimisation;
 
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.IAExperimentBatch;
+import jadex.simulation.analysis.common.data.optimisation.IAObjectiveFunction;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
 import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisSessionService;
 
 import java.util.UUID;
 
+/**
+ * Service to optimize variables
+ * 
+ * @author 5Haubeck
+ */
 public interface IAOptimisationService extends IAnalysisSessionService
 {
 	/**
-	 * Ermöglicht die Konfiguration einer Session zur Optimierung durch ein IAParameterEnsemble.
+	 * Configurate optimization with IAParameterEnsemble.
 	 * 
-	 * @return session UUID
+	 * @param session
+	 *            session to use
+	 * @param method
+	 *            method to use
+	 * @param methodParameter
+	 *            method parameter to use
+	 * @param solution
+	 *            variables to use in optimization
+	 * @param objective
+	 *            objective function of optimization
+	 * @param config
+	 *            special configurations for this optimizationsession
+	 * @return UUID session of configuration
 	 */
 	public IFuture configurateOptimisation(UUID session, String method, IAParameterEnsemble methodParameter, IAParameterEnsemble solution, IAObjectiveFunction objective, IAParameterEnsemble config);
 
 	/**
-	 * Gibt die unterstützten Verfahren des Services zurück
+	 * Returns supported methods
 	 * 
-	 * @return Set<String> der Verfahren
+	 * @return Set<String> sets of methods
 	 */
 	public IFuture supportedMethods();
 
 	/**
-	 * Gibt die Kontrollparameter eines bestimmten Verfahren zurück
+	 * Returns Parameter of given method
 	 * 
-	 * @return ParameterEnsemble der Kontrollparameter
+	 * @return IAParameterEnsemble method parameters
 	 */
 	public IFuture getMethodParameter(String methodName);
 
 	/**
-	 * Gibt eine Lösungen zu dem gegebenen Experiment. Eine Konfiguration der Session wird vorausgesetzt.
+	 * Execute next step of optimization
 	 * 
 	 * @param session
-	 *            Session der Optimierung
+	 *            session to use
 	 * @param previousSolutions
-	 *            Zu optimierendes Experiment
-	 * @return Experimente zur Simulation als IAExperimentBatch
+	 *            evaluated experiments
+	 * @return IAExperimentBatch next experiments to evaluate
 	 */
 	public IFuture nextSolutions(UUID session,
 			IAExperimentBatch previousSolutions);
 
 	/**
-	 * Überprüft den Abbruch der Optimierung
+	 * Checks for termination
 	 * 
 	 * @param session
-	 *            Session der Optimierung
-	 * @return true, wenn Abbruchkriterium erreicht
+	 *            session of optimization
+	 * @return Boolean true if optimization is terminated
 	 */
 	public IFuture checkEndofOptimisation(UUID session);
 
+	/**
+	 * Optimum of optimization
+	 * 
+	 * @param session
+	 *            session of optimization
+	 * @return IAParameterEnsemble experiment with highest objectives
+	 */
 	public IFuture getOptimum(UUID session);
 
-	IFuture getOptimumValue(UUID session);
+	/**
+	 * Value of optimization
+	 * 
+	 * @param session
+	 *            session of optimization
+	 * @return IAParameterEnsemble value of best experiment
+	 */
+	public IFuture getOptimumValue(UUID session);
 }
