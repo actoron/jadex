@@ -1,10 +1,9 @@
 package jadex.simulation.analysis.common.data;
 
 import jadex.simulation.analysis.common.data.factories.AExperimentFactory;
-import jadex.simulation.analysis.common.data.factories.AModelFactory;
-import jadex.simulation.analysis.common.data.parameter.AParameterEnsemble;
-import jadex.simulation.analysis.common.events.data.ADataEvent;
-import jadex.simulation.analysis.common.events.data.IADataObservable;
+import jadex.simulation.analysis.common.superClasses.events.IAEvent;
+import jadex.simulation.analysis.common.superClasses.events.IAObservable;
+import jadex.simulation.analysis.common.superClasses.events.data.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 
 import java.awt.Component;
@@ -39,7 +38,7 @@ public class AExperimentView extends ADataObjectView implements IADataView
 
 	protected JCheckBox evaBoolean;
 
-	public AExperimentView(IADataObservable dataObject)
+	public AExperimentView(IAObservable dataObject)
 	{
 		super(dataObject);
 		component = new JPanel(new GridBagLayout());
@@ -62,9 +61,7 @@ public class AExperimentView extends ADataObjectView implements IADataView
 					@Override
 					public void actionPerformed(ActionEvent e)
 				{
-					synchronized (mutex)
-					{
-						if (e.getActionCommand().equals("model"))
+					if (e.getActionCommand().equals("model"))
 					{
 						if (state != 4)
 						{
@@ -78,13 +75,6 @@ public class AExperimentView extends ADataObjectView implements IADataView
 									state = 4;
 								}
 							}
-//							JComponent comp = (JComponent) component.getComponent(4);
-//							GridBagConstraints constraint = ((GridBagLayout) component.getLayout()).getConstraints(comp);
-//							((JComponent) component).add(modelComponent, constraint);
-//							component.remove(comp);
-//							// comp.revalidate();
-//							// comp.repaint();
-//							state = 4;
 						}
 					}
 					else
@@ -102,13 +92,6 @@ public class AExperimentView extends ADataObjectView implements IADataView
 									state = 1;
 								}
 							}
-//							JComponent comp = (JComponent) component.getComponent(4);
-//							GridBagConstraints constraint = ((GridBagLayout) component.getLayout()).getConstraints(comp);
-//							((JComponent) component).add(expComponent, constraint);
-//							component.remove(comp);
-//							// comp.revalidate();
-//							// comp.repaint();
-//							state = 1;
 						}
 
 					}
@@ -126,13 +109,6 @@ public class AExperimentView extends ADataObjectView implements IADataView
 									state = 2;
 								}
 							}
-//							JComponent comp = (JComponent) component.getComponent(4);
-//							GridBagConstraints constraint = ((GridBagLayout) component.getLayout()).getConstraints(comp);
-//							((JComponent) component).add(inputComponent, constraint);
-//							component.remove(comp);
-//							// comp.revalidate();
-//							// comp.repaint();
-//							state = 2;
 						}
 
 					}
@@ -150,17 +126,11 @@ public class AExperimentView extends ADataObjectView implements IADataView
 									state = 3;
 								}
 							}
-//							JComponent comp = (JComponent) component.getComponent(4);
-							
-							// comp.revalidate();
-							// comp.repaint();
-							
 						}
 					}
 					component.revalidate();
 					component.repaint();
 				}
-			}
 				};
 
 				JRadioButton expButton = new JRadioButton("Experimentparamter");
@@ -219,10 +189,7 @@ public class AExperimentView extends ADataObjectView implements IADataView
 					@Override
 					public void actionPerformed(ActionEvent e)
 					{
-						synchronized (mutex)
-						{
-							frame.setEvaluated(evaBoolean.isSelected());
-						}
+						frame.setEvaluated(evaBoolean.isSelected());
 					}
 				});
 				evaBoolean.setEnabled(false);
@@ -237,9 +204,10 @@ public class AExperimentView extends ADataObjectView implements IADataView
 	}
 
 	@Override
-	public void dataEventOccur(final ADataEvent event)
+	public void update(final IAEvent event)
 	{
-		super.dataEventOccur(event);
+
+		super.update(event);
 
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -248,7 +216,8 @@ public class AExperimentView extends ADataObjectView implements IADataView
 				String command = event.getCommand();
 				if (command.equals(AConstants.EXPERIMENT_EVA))
 				{
-					evaBoolean.setSelected((Boolean)event.getValue());
+
+					evaBoolean.setSelected((Boolean) ((ADataEvent) event).getValue());
 				}
 				component.revalidate();
 				component.repaint();

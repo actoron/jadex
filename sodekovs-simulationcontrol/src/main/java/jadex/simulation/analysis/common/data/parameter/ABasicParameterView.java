@@ -3,7 +3,8 @@ package jadex.simulation.analysis.common.data.parameter;
 import jadex.commons.gui.JValidatorTextField;
 import jadex.simulation.analysis.common.data.ADataObjectView;
 import jadex.simulation.analysis.common.data.IADataView;
-import jadex.simulation.analysis.common.events.data.ADataEvent;
+import jadex.simulation.analysis.common.superClasses.events.IAEvent;
+import jadex.simulation.analysis.common.superClasses.events.data.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 import jadex.simulation.analysis.common.util.ParserClassValidator;
 import jadex.simulation.analysis.common.util.SAnalysisClassLoader;
@@ -45,32 +46,25 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 	public ABasicParameterView(ABasicParameter parameter)
 	{
 		super(parameter);
-		synchronized (mutex)
-		{
-			componentP = new JPanel(new GridBagLayout());
-			component = new JScrollPane(componentP);
-			this.parameter = (ABasicParameter) parameter;
-			controller = new ABasicParameterController(parameter, this);
-			init();
-		}
+		componentP = new JPanel(new GridBagLayout());
+		component = new JScrollPane(componentP);
+		this.parameter = (ABasicParameter) parameter;
+		controller = new ABasicParameterController(parameter, this);
+		init();
 	}
 
 	private void init()
 	{
-		synchronized (mutex)
-		{
-			SwingUtilities.invokeLater(new Runnable()
+		SwingUtilities.invokeLater(new Runnable()
 			{
 				public void run()
 				{
-					synchronized (mutex)
-					{
 					Insets insets = new Insets(1, 1, 1, 1);
 					int gridY = 0;
 
 					// Parameter Type
 					JLabel paraType = new JLabel("Parametertyp");
-					paraType.setPreferredSize(new Dimension(150,20));
+					paraType.setPreferredSize(new Dimension(150, 20));
 					componentP.add(paraType, new GridBagConstraints(0, gridY, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 
 					paraTypeValue = new JTextField("ABasicParameter");
@@ -91,7 +85,7 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 					componentP.add(innerTypValue, new GridBagConstraints(1, gridY, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 					innerTypValue.setToolTipText("Klasse die der Parameter hält");
 					gridY++;
-					
+
 					// Parameter Name
 					JLabel paraName = new JLabel("Parametername");
 					paraName.setPreferredSize(new Dimension(150, 20));
@@ -102,27 +96,26 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 					paraNameValue.setPreferredSize(new Dimension(400, 20));
 					componentP.add(paraNameValue, new GridBagConstraints(1, gridY, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 					paraNameValue.addFocusListener(new FocusListener()
-					{
-						
-						@Override
-						public void focusLost(FocusEvent e)
+						{
+
+							@Override
+							public void focusLost(FocusEvent e)
 						{
 							controller.setName(paraNameValue.getText());
 						}
-						
-						@Override
-						public void focusGained(FocusEvent e)
+
+							@Override
+							public void focusGained(FocusEvent e)
 						{
-//							controller.setName(paraNameValue.getText());
-						}
-					});
+								// controller.setName(paraNameValue.getText());
+							}
+						});
 					paraNameValue.setToolTipText("Name des Parameters");
 					gridY++;
 
 					componentP.add(new JPanel(), new GridBagConstraints(0, gridY, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 					gridY++;
-					
-					
+
 					valueLabel = new JLabel("Aktueller Wert");
 					valueLabel.setPreferredSize(new Dimension(150, 20));
 					componentP.add(valueLabel, new GridBagConstraints(0, gridY, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
@@ -137,10 +130,7 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 					@Override
 					public void actionPerformed(ActionEvent e)
 					{
-						synchronized (mutex)
-						{
-							controller.setValue(Boolean.toString(valueBoolean.isSelected()));
-						}
+						controller.setValue(Boolean.toString(valueBoolean.isSelected()));
 					}
 				});
 				valueBoolean.setEnabled(parameter.isValueEditable());
@@ -168,68 +158,38 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 					@Override
 					public void actionPerformed(ActionEvent e)
 					{
-						synchronized (mutex)
-						{
-							controller.setValue(valueField.getText());
-						}
+						controller.setValue(valueField.getText());
 					}
 				});
 				valueField.setEnabled(parameter.isValueEditable());
 				valueComp = valueField;
-				
+
 				valueComp.setToolTipText("Wert des Parameters");
 			}
 			componentP.add(valueComp, new GridBagConstraints(1, gridY, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 			gridY++;
 
-			// Verwendung
-//				JLabel value = new JLabel("Verwendung");
-//				value.setPreferredSize(new Dimension(150, 20));
-//				componentP.add(value, new GridBagConstraints(0, gridY, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
+			freePanel = new JPanel();
+			componentP.add(freePanel, new GridBagConstraints(0, gridY, GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 
-//				paraVariableBox = new JCheckBox("");
-//				paraVariableBox.setSelected(parameter.isUsage());
-//				paraVariableBox.setPreferredSize(new Dimension(350, 20));
-//				paraVariableBox.addActionListener(new ActionListener()
-//				{
-//					@Override
-//					public void actionPerformed(ActionEvent e)
-//				{
-//					synchronized (mutex)
-//					{
-//						controller.setUsage(new Boolean(paraVariableBox.isSelected()));
-//					}
-//				}
-//				});
-//				paraVariableBox.setEnabled(parameter.isEditable());
-//				componentP.add(paraVariableBox, new GridBagConstraints(1, gridY, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
-//				paraVariableBox.setToolTipText("Gibt an ob der Parameter im weiteren Verlauf der Analyse veränderbar sein soll");
-//				gridY++;
+			componentP.setPreferredSize(new Dimension(500, 250));
 
-				freePanel = new JPanel();
-				componentP.add(freePanel, new GridBagConstraints(0, gridY, GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
-
-				componentP.setPreferredSize(new Dimension(500, 250));
-
-				componentP.updateUI();
-				componentP.validate();
-				}
-				}});	
+			componentP.updateUI();
+			componentP.validate();
 		}
-		
+			});
 	}
 
 	@Override
-	public void dataEventOccur(final ADataEvent event)
+	public void update(final IAEvent event)
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				synchronized (mutex)
-		{
-			String command = event.getCommand();
-			if (command.equals(AConstants.PARAMETER_VALUE))
+
+				String command = event.getCommand();
+				if (command.equals(AConstants.PARAMETER_VALUE))
 			{
 				if (valueComp instanceof JCheckBox)
 				{
@@ -262,16 +222,9 @@ public class ABasicParameterView extends ADataObjectView implements IADataView
 				}
 
 			}
-
-			// if (command.equals(AConstants.PARAMETER_USAGE))
-			// {
-			// paraVariableBox.setSelected(parameter.isUsage());
-			// }
-
 			componentP.revalidate();
 			componentP.repaint();
 		}
-	}
 		});
 	}
 

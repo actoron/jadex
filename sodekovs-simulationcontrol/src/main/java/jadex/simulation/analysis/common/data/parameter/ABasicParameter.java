@@ -3,7 +3,7 @@ package jadex.simulation.analysis.common.data.parameter;
 import jadex.simulation.analysis.common.data.ADataObject;
 import jadex.simulation.analysis.common.data.AExperimentView;
 import jadex.simulation.analysis.common.data.IADataView;
-import jadex.simulation.analysis.common.events.data.ADataEvent;
+import jadex.simulation.analysis.common.superClasses.events.data.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 
 public class ABasicParameter extends ADataObject implements IAParameter
@@ -62,10 +62,13 @@ public class ABasicParameter extends ADataObject implements IAParameter
 	{
 		synchronized (mutex)
 		{
+//			System.out.println(value.getClass());
+//			System.out.println(getValueClass());
 			if (value == null)
 			{
 				this.value = "";
 			}
+			
 			else if (value.getClass().equals(getValueClass()))
 			{
 				synchronized (mutex)
@@ -78,7 +81,7 @@ public class ABasicParameter extends ADataObject implements IAParameter
 			{
 				throw new RuntimeException("Parametervalue falsch gesetzt " + this);
 			}
-			dataChanged(new ADataEvent(this, AConstants.PARAMETER_VALUE,value));
+			notify(new ADataEvent(this, AConstants.PARAMETER_VALUE,value));
 		}
 	}
 
@@ -117,7 +120,7 @@ public class ABasicParameter extends ADataObject implements IAParameter
 //		{
 //			this.usage = usage;
 //		}
-//		dataChanged(new ADataEvent(this, AConstants.PARAMETER_USAGE, usage));
+//		update(new ADataEvent(this, AConstants.PARAMETER_USAGE, usage));
 //	}
 
 	@Override
@@ -139,7 +142,7 @@ public class ABasicParameter extends ADataObject implements IAParameter
 		{
 			onlyValue = editable;
 		}
-		dataChanged(new ADataEvent(this, AConstants.PARAMETER_EDITABLE, editable));
+		notify(new ADataEvent(this, AConstants.PARAMETER_EDITABLE, editable));
 		
 	}
 

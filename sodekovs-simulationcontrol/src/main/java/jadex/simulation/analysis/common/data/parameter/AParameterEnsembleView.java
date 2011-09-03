@@ -2,8 +2,8 @@ package jadex.simulation.analysis.common.data.parameter;
 
 import jadex.simulation.analysis.common.data.ADataObjectView;
 import jadex.simulation.analysis.common.data.IADataView;
-import jadex.simulation.analysis.common.events.data.ADataEvent;
-import jadex.simulation.analysis.common.events.data.IADataObservable;
+import jadex.simulation.analysis.common.superClasses.events.IAEvent;
+import jadex.simulation.analysis.common.superClasses.events.data.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 
 import java.awt.Dimension;
@@ -14,7 +14,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.swing.DefaultListModel;
@@ -24,7 +23,6 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -51,7 +49,7 @@ public class AParameterEnsembleView extends ADataObjectView implements IADataVie
 		this.parameterEnsemble = (AParameterEnsemble) parameter;
 		for (IAParameter para : parameterEnsemble.getParameters().values())
 		{
-			para.addDataListener(this);
+			para.addListener(this);
 		}
 		init();
 	}
@@ -86,21 +84,16 @@ public class AParameterEnsembleView extends ADataObjectView implements IADataVie
 					@Override
 					public void valueChanged(ListSelectionEvent e)
 				{
-					synchronized (mutex)
-				{
+
 					if (parameterEnsemble.containsParameter((String) list.getSelectedValue()))
 					{
 						((JSplitPane) component).setRightComponent(parameterEnsemble.getParameter((String) list.getSelectedValue()).getView().getComponent());
 						component.revalidate();
+
 					}
-					// generalComp.repaint();
 				}
-			}
 				});
 
-				// listScroller = new JScrollPane(list);
-				// listScroller.setPreferredSize(new Dimension(150, 300));
-				// listScroller.getViewport().setView(list);
 				addParameter = new JButton("+");
 				addParameter.addActionListener(new ActionListener()
 				{
@@ -115,7 +108,7 @@ public class AParameterEnsembleView extends ADataObjectView implements IADataVie
 						freePanel = new JPanel();
 						freePanel.setPreferredSize(new Dimension(500, 200));
 
-						String[] typeString = { "ASummaryParameter","ABasicParameter", "AConstraintParameter", "ASeriesParameter" };
+						String[] typeString = { "ASummaryParameter", "ABasicParameter", "AConstraintParameter", "ASeriesParameter" };
 						final JComboBox paraBox = new JComboBox(typeString);
 						paraBox.setPreferredSize(new Dimension(500, 20));
 						paraBox.setSelectedItem("ABasicParameter");
@@ -144,7 +137,6 @@ public class AParameterEnsembleView extends ADataObjectView implements IADataVie
 								{
 									para = new ASeriesParameter("");
 								}
-								
 
 								JComponent comp = (JComponent) chose.getComponent(1);
 								GridBagConstraints constraint = ((GridBagLayout) chose.getLayout()).getConstraints(comp);
@@ -253,9 +245,9 @@ public class AParameterEnsembleView extends ADataObjectView implements IADataVie
 	}
 
 	@Override
-	public void dataEventOccur(final ADataEvent event)
+	public void update(final IAEvent event)
 	{
-		super.dataEventOccur(event);
+		super.update(event);
 
 		SwingUtilities.invokeLater(new Runnable()
 			{
@@ -276,7 +268,7 @@ public class AParameterEnsembleView extends ADataObjectView implements IADataVie
 							}
 							else if (command.equals(AConstants.ENSEMBLE_ADD_PARAMETERS))
 							{
-								IAParameter parameter = ((IAParameter) event.getValue());
+								IAParameter parameter = ((IAParameter) ((ADataEvent) event).getValue());
 								// parameter.setEditable(false);
 								// parameter.setValueEditable(true);
 								if (!((DefaultListModel) list.getModel()).contains(parameter.getName()))
@@ -289,9 +281,9 @@ public class AParameterEnsembleView extends ADataObjectView implements IADataVie
 							}
 							else if (command.equals(AConstants.ENSEMBLE_REMOVE_PARAMETERS))
 							{
-								if (((DefaultListModel) list.getModel()).contains(((String) event.getValue())))
+								if (((DefaultListModel) list.getModel()).contains(((String) ((ADataEvent) event).getValue())))
 								{
-									((DefaultListModel) list.getModel()).removeElement((String) event.getValue());
+									((DefaultListModel) list.getModel()).removeElement((String) ((ADataEvent) event).getValue());
 									list.setSelectedIndex(-1);
 									list.revalidate();
 									list.repaint();
@@ -313,13 +305,13 @@ public class AParameterEnsembleView extends ADataObjectView implements IADataVie
 							else if (command.equals(AConstants.DATA_EDITABLE))
 							{
 								// paraVariableBox.setEnabled(parameter.isEditable());
-								addParameter.setEnabled((Boolean)event.getValue());
-								removeParameter.setEnabled((Boolean)event.getValue());
+								addParameter.setEnabled((Boolean) ((ADataEvent) event).getValue());
+								removeParameter.setEnabled((Boolean) ((ADataEvent) event).getValue());
 							}
 
-					component.revalidate();
-					component.repaint();
-				}
+							component.revalidate();
+							component.repaint();
+						}
 			});
 	}
 
@@ -348,7 +340,7 @@ public class AParameterEnsembleView extends ADataObjectView implements IADataVie
 		frame.setVisible(true);
 		ens.addParameter(para3);
 		ens.removeParameter(para2.getName());
-//		ens.setName("New Parameter Ensemble");
-//		ens.setEditable(false);
+		// ens.setName("New Parameter Ensemble");
+		// ens.setEditable(false);
 	}
 }

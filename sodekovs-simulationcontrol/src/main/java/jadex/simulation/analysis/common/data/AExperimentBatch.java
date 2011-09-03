@@ -1,18 +1,14 @@
 package jadex.simulation.analysis.common.data;
 
+import jadex.simulation.analysis.common.data.allocation.AllocationStrategyWorkload;
+import jadex.simulation.analysis.common.data.allocation.IAllocationStrategy;
+import jadex.simulation.analysis.common.superClasses.events.data.ADataEvent;
+import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisService;
+import jadex.simulation.analysis.common.util.AConstants;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import jadex.bridge.service.IServiceIdentifier;
-import jadex.simulation.analysis.common.data.allocation.AllocationStrategyRandom;
-import jadex.simulation.analysis.common.data.allocation.AllocationStrategyWorkload;
-import jadex.simulation.analysis.common.data.allocation.IAllocationStrategy;
-import jadex.simulation.analysis.common.data.parameter.IAParameter;
-import jadex.simulation.analysis.common.events.data.ADataEvent;
-import jadex.simulation.analysis.common.events.data.IADataObservable;
-import jadex.simulation.analysis.common.util.AConstants;
-import jadex.simulation.analysis.service.basic.analysis.IAnalysisService;
 
 public class AExperimentBatch extends ADataObject implements IAExperimentBatch
 {
@@ -51,7 +47,7 @@ public class AExperimentBatch extends ADataObject implements IAExperimentBatch
 		synchronized (mutex)
 		{
 			experimentMap.put(experiment.getName(), experiment);
-			experiment.addDataListener(view);
+			experiment.addListener(view);
 		}
 	}
 
@@ -72,7 +68,7 @@ public class AExperimentBatch extends ADataObject implements IAExperimentBatch
 		{
 			if (experiment.isEvaluated() == false) evaluated = false;
 		}
-		dataChanged(new ADataEvent(this, AConstants.EXPBATCH_EVA, evaluated));
+		notify(new ADataEvent(this, AConstants.EXPBATCH_EVA, evaluated));
 		return evaluated;
 	}
 
@@ -101,7 +97,7 @@ public class AExperimentBatch extends ADataObject implements IAExperimentBatch
 			{
 				allocation.put(exp, allocations.get(exp));
 			}
-			dataChanged(new ADataEvent(this, AConstants.EXPBATCH_ALLO, allocation));
+			notify(new ADataEvent(this, AConstants.EXPBATCH_ALLO, allocation));
 			
 		}
 	}

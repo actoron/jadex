@@ -1,14 +1,14 @@
 package jadex.simulation.analysis.common.data;
 
 import jadex.bridge.service.annotation.Reference;
-import jadex.simulation.analysis.common.events.data.ADataEvent;
-import jadex.simulation.analysis.common.events.data.ADataObservable;
+import jadex.simulation.analysis.common.superClasses.events.AObservable;
+import jadex.simulation.analysis.common.superClasses.events.data.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 
 import java.util.UUID;
 
 @Reference
-public class ADataObject extends ADataObservable implements IADataObject
+public class ADataObject extends AObservable implements IADataObject
 {
 	private UUID id = UUID.randomUUID();
 	protected Boolean editable = Boolean.TRUE;
@@ -32,7 +32,7 @@ public class ADataObject extends ADataObservable implements IADataObject
 		{
 			this.name = name;
 		}
-		dataChanged(new ADataEvent(this, AConstants.DATA_NAME, name));
+		notify(new ADataEvent(this, AConstants.DATA_NAME, name));
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public class ADataObject extends ADataObservable implements IADataObject
 		{
 			this.editable = editable;
 		}
-		dataChanged(new ADataEvent(this, AConstants.DATA_EDITABLE, editable));
+		notify(new ADataEvent(this, AConstants.DATA_EDITABLE, editable));
 	}
 
 	@Override
@@ -72,8 +72,11 @@ public class ADataObject extends ADataObservable implements IADataObject
 	@Override
 	public ADataObject clonen()
 	{
-		ADataObject clone = new ADataObject(name);
-		clone.setEditable(editable);
-		return clone;
+		synchronized (mutex)
+		{
+			ADataObject clone = new ADataObject(name);
+			clone.setEditable(editable);
+			return clone;
+		}
 	}
 }

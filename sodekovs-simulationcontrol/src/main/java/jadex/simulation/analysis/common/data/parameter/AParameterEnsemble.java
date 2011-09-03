@@ -2,21 +2,18 @@ package jadex.simulation.analysis.common.data.parameter;
 
 import jadex.simulation.analysis.common.data.ADataObject;
 import jadex.simulation.analysis.common.data.IADataView;
-import jadex.simulation.analysis.common.events.data.ADataEvent;
-import jadex.simulation.analysis.common.events.data.IADataListener;
+import jadex.simulation.analysis.common.superClasses.events.IAEvent;
+import jadex.simulation.analysis.common.superClasses.events.data.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class AParameterEnsemble extends ADataObject implements IAParameterEnsemble
 {
 
 	private Map<String, IAParameter> parametersMap;
-//	private String name = "ParameterEnsemble";
 
 	public AParameterEnsemble(String name)
 	{
@@ -53,8 +50,7 @@ public class AParameterEnsemble extends ADataObject implements IAParameterEnsemb
 			parameter.setEditable(false);
 			if (isEditable())	parameter.setValueEditable(true);
 		}
-		dataChanged(new ADataEvent(this, AConstants.ENSEMBLE_ADD_PARAMETERS, parameter));
-
+		notify(new ADataEvent(this, AConstants.ENSEMBLE_ADD_PARAMETERS, parameter));
 	}
 
 	@Override
@@ -64,9 +60,7 @@ public class AParameterEnsemble extends ADataObject implements IAParameterEnsemb
 		{
 			parametersMap.remove(name);
 		}
-		dataChanged(new ADataEvent(this, AConstants.ENSEMBLE_REMOVE_PARAMETERS, name));
-
-
+		notify(new ADataEvent(this, AConstants.ENSEMBLE_REMOVE_PARAMETERS, name));
 	}
 
 	@Override
@@ -76,7 +70,7 @@ public class AParameterEnsemble extends ADataObject implements IAParameterEnsemb
 		{
 			parametersMap.clear();
 		}
-		dataChanged(new ADataEvent(this, AConstants.ENSEMBLE_PARAMETERS, parametersMap));
+		notify(new ADataEvent(this, AConstants.ENSEMBLE_PARAMETERS, parametersMap));
 	}
 
 	@Override
@@ -109,60 +103,32 @@ public class AParameterEnsemble extends ADataObject implements IAParameterEnsemb
 		return parametersMap.size();
 	}
 
-//	@Override
-//	public Object getValue(String name)
-//	{
-//		return parametersMap.get(name).getValue();
-//	}
-//
-//	@Override
-//	public void setValue(String name, Object value)
-//	{
-//		synchronized (mutex)
-//		{
-//			parametersMap.get(name).setValue(value);
-//		}
-//	}
-
 	@Override
-	public void dataChanged(ADataEvent e)
+	public void notify(IAEvent event)
 	{
-		super.dataChanged(e);
+		super.notify(event);
 		if (parametersMap != null)
 		{
 			for (IAParameter parameter : parametersMap.values())
 			{
-				parameter.dataChanged(e);
+				parameter.notify(event);
 			}
 		}
 	}
 
-//	@Override
-//	public void setName(String name)
-//	{
-//		synchronized (mutex)
-//		{
-//			this.name = name;
-//		}
-//		dataChanged(new ADataEvent(this, AConstants.ENSEMBLE_NAME, name));
-//	}
-
 	@Override
 	public void setEditable(Boolean editable)
 	{
-		super.setEditable(editable);
-		for (IAParameter parameter : getParameters().values())
+		synchronized (mutex)
 		{
-			parameter.setEditable(editable);
+			super.setEditable(editable);
+			for (IAParameter parameter : getParameters().values())
+			{
+				parameter.setEditable(editable);
+			}
 		}
 	}
 
-	@Override
-	public String toString()
-	{
-		return "AParamterEnsemble: " + "name=" + getName() + ", " + "parameters=" + getParameters();
-	}
-	
 	@Override
 	public IADataView getView()
 	{
@@ -171,13 +137,15 @@ public class AParameterEnsemble extends ADataObject implements IAParameterEnsemb
 
 	public ADataObject clonen()
 	{
-		AParameterEnsemble ens = new AParameterEnsemble(name);
-		for (IAParameter para : getParameters().values())
+		synchronized (mutex)
 		{
-			ens.addParameter((IAParameter) para.clonen());
+			AParameterEnsemble ens = new AParameterEnsemble(name);
+			for (IAParameter para : getParameters().values())
+			{
+				ens.addParameter((IAParameter) para.clonen());
+			}
+			ens.setEditable(editable);
+			return ens;
 		}
-		ens.setEditable(editable);
-		return ens;
-			
 	}
 }

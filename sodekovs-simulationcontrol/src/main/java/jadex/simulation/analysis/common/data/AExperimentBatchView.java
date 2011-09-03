@@ -1,43 +1,30 @@
 package jadex.simulation.analysis.common.data;
 
-import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.ServiceIdentifier;
 import jadex.simulation.analysis.common.data.factories.AExperimentFactory;
-import jadex.simulation.analysis.common.data.factories.AModelFactory;
-import jadex.simulation.analysis.common.data.parameter.AParameterEnsemble;
-import jadex.simulation.analysis.common.events.data.ADataEvent;
-import jadex.simulation.analysis.common.events.data.IADataObservable;
+import jadex.simulation.analysis.common.superClasses.events.IAEvent;
+import jadex.simulation.analysis.common.superClasses.events.IAObservable;
+import jadex.simulation.analysis.common.superClasses.events.data.ADataEvent;
+import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisService;
 import jadex.simulation.analysis.common.util.AConstants;
-import jadex.simulation.analysis.service.basic.analysis.IAnalysisService;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.AbstractButton;
-import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
 
 public class AExperimentBatchView extends ADataObjectView implements IADataView
 {
@@ -49,10 +36,11 @@ public class AExperimentBatchView extends ADataObjectView implements IADataView
 	protected JScrollPane pane;
 
 
-	public AExperimentBatchView(IADataObservable dataObject)
+	public AExperimentBatchView(IAObservable dataObject)
 	{
 		super(dataObject);
 		
+		//todo: Swing Thread
 		componentP = new JTabbedPane();
 		component.removeAll();
 		component.add(componentP, new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
@@ -164,9 +152,9 @@ public class AExperimentBatchView extends ADataObjectView implements IADataView
 	}
 
 	@Override
-	public void dataEventOccur(final ADataEvent event)
+	public void update(final IAEvent event)
 	{
-		super.dataEventOccur(event);
+		super.update(event);
 		
 		
 		SwingUtilities.invokeLater(new Runnable()
@@ -180,11 +168,11 @@ public class AExperimentBatchView extends ADataObjectView implements IADataView
 				}
 				if (command.equals(AConstants.EXPBATCH_EVA))
 				{
-					evaBoolean.setSelected((Boolean)event.getValue());
+					evaBoolean.setSelected((Boolean)((ADataEvent)event).getValue());
 				}
 				if (command.equals(AConstants.EXPBATCH_ALLO))
 				{
-					pane = createAllocationTable((Map<IAExperiment, IAnalysisService>) event.getValue());
+					pane = createAllocationTable((Map<IAExperiment, IAnalysisService>) ((ADataEvent)event).getValue());
 					pane.revalidate();
 					pane.repaint();
 				}
@@ -228,29 +216,11 @@ public class AExperimentBatchView extends ADataObjectView implements IADataView
 			
 		batch.addExperiment(exp);
 		batch.addExperiment(exp2);
-//		batch.addExperiment(AExperimentFactory.createTestAExperiment());
-//		batch.addExperiment(AExperimentFactory.createTestAExperiment());
-//		batch.addExperiment(AExperimentFactory.createTestAExperiment());
-//		batch.addExperiment(AExperimentFactory.createTestAExperiment());
-//		batch.addExperiment(AExperimentFactory.createTestAExperiment());
-//		batch.addExperiment(AExperimentFactory.createTestAExperiment());
-//		batch.addExperiment(AExperimentFactory.createTestAExperiment());
-		
 
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(750, 750);
-//		batch.getView().getComponent()
 		frame.add(new AExperimentBatchView(batch).getComponent());
 		frame.setVisible(true);
-//		exp.setEvaluated(true);
-//		Map<IAExperiment,IServiceIdentifier> map = new HashMap<IAExperiment, IServiceIdentifier>();
-//		ServiceIdentifier ser = new ServiceIdentifier();
-//		ser.setServiceName("Serv1");
-//		map.put(exp, ser);
-//		ServiceIdentifier ser2 = new ServiceIdentifier();
-//		ser2.setServiceName("Serv2");
-//		map.put(exp2, ser2);
-//		batch.setAllocation(map);
 	}
 }

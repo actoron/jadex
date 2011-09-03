@@ -1,38 +1,32 @@
 package jadex.simulation.analysis.common.data.parameter;
 
+import jadex.commons.gui.JValidatorTextField;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+import jadex.simulation.analysis.common.data.IADataView;
+import jadex.simulation.analysis.common.superClasses.events.IAEvent;
+import jadex.simulation.analysis.common.superClasses.events.data.ADataEvent;
+import jadex.simulation.analysis.common.util.AConstants;
+import jadex.simulation.analysis.common.util.ParserClassValidator;
+import jadex.simulation.analysis.common.util.SAnalysisClassLoader;
+
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-
-import jadex.commons.gui.JValidatorTextField;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
-import jadex.simulation.analysis.common.data.IADataView;
-import jadex.simulation.analysis.common.events.data.ADataEvent;
-import jadex.simulation.analysis.common.util.AConstants;
-import jadex.simulation.analysis.common.util.ParserClassValidator;
-import jadex.simulation.analysis.common.util.SAnalysisClassLoader;
 
 public class AConstraintParameterView extends ABasicParameterView implements IADataView
 {
 	private AConstraintParameter parameter;
 	JValidatorTextField obenField_;
 	JValidatorTextField untenField_;
-	
 
 	public AConstraintParameterView(AConstraintParameter parameter)
 	{
@@ -163,24 +157,20 @@ public class AConstraintParameterView extends ABasicParameterView implements IAD
 	}
 
 	@Override
-	public void dataEventOccur(final ADataEvent event)
+	public void update(final IAEvent event)
 	{
-		super.dataEventOccur(event);
+		super.update(event);
 
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				synchronized (mutex)
-				{
-					if (event.getCommand().equals(AConstants.DATA_EDITABLE))
+				if (event.getCommand().equals(AConstants.DATA_EDITABLE))
 					{
-						untenField_.setEditable((Boolean)event.getValue());
-						obenField_.setEditable((Boolean)event.getValue());
+						untenField_.setEditable((Boolean) ((ADataEvent) event).getValue());
+						obenField_.setEditable((Boolean) ((ADataEvent) event).getValue());
 					}
-					
 				}
-			}
 		});
 	}
 

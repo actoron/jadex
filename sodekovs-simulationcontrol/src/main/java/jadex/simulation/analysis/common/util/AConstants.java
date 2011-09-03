@@ -17,10 +17,13 @@ public class AConstants
 
 	public static final String MODEL_TYPE = "MODEL_TYPE";
 	
+	public static final String HYPO_CORRELATION = "HYPO_CORRELATION";
+	public static final String HYPO_INPUT = "HYPO_INPUT";
+	public static final String HYPO_OUTPUT = "HYPO_OUTPUT";
+	
 	public static final String EXPERIMENT_EVA = "EXPERIMENT_EVA";
 	
 	
-	//Event
 	public final static String EVENT = "EVENT";
     public final static String DATA_EVENT = "DATA_EVENT";
     public final static String TASK_EVENT = "TASK_EVENT";

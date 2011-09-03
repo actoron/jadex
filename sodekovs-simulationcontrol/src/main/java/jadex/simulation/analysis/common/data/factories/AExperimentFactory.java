@@ -29,7 +29,7 @@ public class AExperimentFactory
 	public static IAExperiment createDefaultExperiment(IAModel model)
 	{
 		IAParameterEnsemble expParameters = new AParameterEnsemble("Experiment Parameter");
-		expParameters.addParameter(new ABasicParameter("Wiederholungen", Integer.class, 1));
+		expParameters.addParameter(new ABasicParameter("Wiederholungen", Integer.class, 3));
 		expParameters.addParameter(new ABasicParameter("Visualisierung", Boolean.class, Boolean.TRUE));
 		expParameters.addParameter(new ABasicParameter("Mittelwert Prozent", Double.class, 10.0));
 		expParameters.addParameter(new ABasicParameter("alpha", Double.class, 95.0));

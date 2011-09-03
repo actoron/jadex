@@ -1,6 +1,6 @@
 package jadex.simulation.analysis.common.data.allocation;
 
-import jadex.simulation.analysis.service.basic.analysis.IAnalysisService;
+import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisService;
 
 import java.util.Set;
 import java.util.SortedSet;

@@ -1,12 +1,9 @@
 package jadex.simulation.analysis.common.data;
 
-import java.util.Map;
-
-import jadex.bridge.service.IServiceIdentifier;
 import jadex.simulation.analysis.common.data.allocation.IAllocationStrategy;
-import jadex.simulation.analysis.common.data.parameter.IAParameter;
-import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
-import jadex.simulation.analysis.service.basic.analysis.IAnalysisService;
+import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisService;
+
+import java.util.Map;
 
 public interface IAExperimentBatch extends IADataObject
 {

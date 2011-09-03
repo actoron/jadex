@@ -1,7 +1,7 @@
 package jadex.simulation.analysis.common.data;
 
-import jadex.simulation.analysis.common.events.data.ADataEvent;
-import jadex.simulation.analysis.common.events.data.IADataObservable;
+import jadex.simulation.analysis.common.superClasses.events.IAEvent;
+import jadex.simulation.analysis.common.superClasses.events.IAObservable;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -9,25 +9,20 @@ import java.awt.Insets;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 public class ADataObjectView implements IADataView
 {
 	protected JComponent component;
-	protected IADataObservable displayedDataObject;
-	protected Object mutex = new Object();
+	protected IAObservable displayedDataObject;
 
-	public ADataObjectView(IADataObservable dataObject)
+	public ADataObjectView(IAObservable dataObject)
 	{
-		synchronized (mutex)
-		{
-			displayedDataObject = dataObject;
-			dataObject.addDataListener(this);
-			//TODO: Swing Thread
-			component = new JPanel(new GridBagLayout());
-			JComponent freePanel = new JPanel();
-			component.add(freePanel, new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
-		}
+		displayedDataObject = dataObject;
+		dataObject.addListener(this);
+		//TODO: Swing Thread
+		component = new JPanel(new GridBagLayout());
+		JComponent freePanel = new JPanel();
+		component.add(freePanel, new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
 	}
 
 	@Override
@@ -37,30 +32,22 @@ public class ADataObjectView implements IADataView
 	}
 
 	@Override
-	public IADataObservable getDisplayedObject()
+	public IAObservable getDisplayedObject()
 	{
 		return displayedDataObject;
 	}
 
 	@Override
-	public Object getMutex()
-	{
-		return mutex;
-	}
-
-	@Override
-	public void setDisplayedObject(IADataObservable dataObject)
+	public void setDisplayedObject(IAObservable dataObject)
 	{
 		this.displayedDataObject = dataObject;
-
 	}
 
-	// -------- IADataListener --------
+	// -------- IAListener --------
 
 	@Override
-	public void dataEventOccur(ADataEvent event)
+	public void update(IAEvent event)
 	{
 	// omit
 	}
-
 }

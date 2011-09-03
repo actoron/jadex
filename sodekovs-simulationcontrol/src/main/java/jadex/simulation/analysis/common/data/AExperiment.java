@@ -3,7 +3,8 @@ package jadex.simulation.analysis.common.data;
 import jadex.simulation.analysis.common.data.parameter.AParameterEnsemble;
 import jadex.simulation.analysis.common.data.parameter.IAParameter;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
-import jadex.simulation.analysis.common.events.data.ADataEvent;
+import jadex.simulation.analysis.common.superClasses.events.IAEvent;
+import jadex.simulation.analysis.common.superClasses.events.data.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 
 public class AExperiment extends ADataObject implements IAExperiment
@@ -92,7 +93,6 @@ public class AExperiment extends ADataObject implements IAExperiment
 	}
 
 	// Output
-
 	@Override
 	public IAParameterEnsemble getOutputParameters()
 	{
@@ -133,7 +133,6 @@ public class AExperiment extends ADataObject implements IAExperiment
 	}
 
 	// Experiment
-
 	@Override
 	public void addExperimentParamter(IAParameter parameter)
 	{
@@ -174,14 +173,14 @@ public class AExperiment extends ADataObject implements IAExperiment
 	}
 
 	@Override
-	public void dataChanged(ADataEvent e)
+	public void notify(IAEvent event)
 	{
-		super.dataChanged(e);
+		super.notify(event);
 
-		if (model != null) model.dataChanged(e);
-		if (expParameters != null) expParameters.dataChanged(e);
-		if (inputParameters != null) inputParameters.dataChanged(e);
-		if (outputParameters != null) outputParameters.dataChanged(e);
+		if (model != null) model.notify(event);
+		if (expParameters != null) expParameters.notify(event);
+		if (inputParameters != null) inputParameters.notify(event);
+		if (outputParameters != null) outputParameters.notify(event);
 	}
 
 	@Override
@@ -195,7 +194,7 @@ public class AExperiment extends ADataObject implements IAExperiment
 			expParameters.setEditable(editable);
 			inputParameters.setEditable(editable);
 			outputParameters.setEditable(editable);
-			dataChanged(new ADataEvent(this, AConstants.DATA_EDITABLE, editable));
+			notify(new ADataEvent(this, AConstants.DATA_EDITABLE, editable));
 		}
 	}
 
@@ -211,7 +210,7 @@ public class AExperiment extends ADataObject implements IAExperiment
 		synchronized (mutex)
 		{
 			this.evaluated = evaluated;
-			dataChanged(new ADataEvent(this, AConstants.EXPERIMENT_EVA, evaluated));
+			notify(new ADataEvent(this, AConstants.EXPERIMENT_EVA, evaluated));
 		}
 	}
 	

@@ -1,8 +1,9 @@
 package jadex.simulation.analysis.common.data;
 
 import jadex.simulation.analysis.common.data.factories.AModelFactory;
-import jadex.simulation.analysis.common.events.data.ADataEvent;
-import jadex.simulation.analysis.common.events.data.IADataObservable;
+import jadex.simulation.analysis.common.superClasses.events.IAEvent;
+import jadex.simulation.analysis.common.superClasses.events.IAObservable;
+import jadex.simulation.analysis.common.superClasses.events.data.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 import jadex.simulation.analysis.service.simulation.Modeltype;
 
@@ -41,7 +42,7 @@ public class AModelView extends ADataObjectView implements IADataView
 	private JComponent inputParameter;
 	private JComponent outputParameter;
 
-	public AModelView(IADataObservable dataObject)
+	public AModelView(IAObservable dataObject)
 	{
 		super(dataObject);
 		component = new JPanel(new GridBagLayout());
@@ -91,11 +92,8 @@ public class AModelView extends ADataObjectView implements IADataView
 					@Override
 					public void actionPerformed(ActionEvent e)
 				{
-					synchronized (mutex)
-				{
 					model.setName(nameField.getText());
 				}
-			}
 				});
 				nameField.setToolTipText("Name des Modells: Modell muss sich im Ordner analysis/model/'modeltyp'/'modelname' befinden");
 				modelFieldP.add(nameField, new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
@@ -104,7 +102,7 @@ public class AModelView extends ADataObjectView implements IADataView
 				modelTypeLabel.setPreferredSize(new Dimension(150, 20));
 				modelLabelP.add(modelTypeLabel, new GridBagConstraints(0, 1, GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 
-				String[] typeString = { "netLogo", "desmoJ" , "Jadex", "Math"};
+				String[] typeString = { "netLogo", "desmoJ", "Jadex", "Math" };
 				modelTypeCombo = new JComboBox(typeString);
 				modelTypeCombo.setPreferredSize(new Dimension(400, 20));
 				modelTypeCombo.setSelectedItem(model.getType().toString());
@@ -112,7 +110,7 @@ public class AModelView extends ADataObjectView implements IADataView
 				modelTypeCombo.setToolTipText("Typ des Modells");
 				modelTypeCombo.addItemListener(new ItemListener()
 				{
-					
+
 					@Override
 					public void itemStateChanged(ItemEvent e)
 					{
@@ -124,10 +122,10 @@ public class AModelView extends ADataObjectView implements IADataView
 				modelParaPanel.setLeftComponent(modelLabelP);
 				modelParaPanel.setRightComponent(modelFieldP);
 
-//				modelParaPanel.setDividerLocation(250);
+				// modelParaPanel.setDividerLocation(250);
 
 				component.add(modelParaPanel, new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
-				
+
 				// parameterEnsemble
 				inputParameter = model.getInputParameters().getView().getComponent();
 				outputParameter = model.getOutputParameters().getView().getComponent();
@@ -135,7 +133,7 @@ public class AModelView extends ADataObjectView implements IADataView
 				component.add(inputParameter, new GridBagConstraints(0, 2, GridBagConstraints.REMAINDER, 1, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 				component.add(outputParameter, new GridBagConstraints(0, 3, GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 
-				component.setPreferredSize(new Dimension(750,7500));
+				component.setPreferredSize(new Dimension(750, 7500));
 				component.validate();
 				component.updateUI();
 			}
@@ -143,31 +141,29 @@ public class AModelView extends ADataObjectView implements IADataView
 	}
 
 	@Override
-	public void dataEventOccur(final ADataEvent event)
+	public void update(final IAEvent event)
 	{
-		super.dataEventOccur(event);
+		super.update(event);
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				synchronized (mutex)
+				if (event.getCommand().equals(AConstants.DATA_NAME))
 				{
-					if (event.getCommand().equals(AConstants.DATA_NAME))
-				{
-					nameField.setText((String) event.getValue());
+					nameField.setText((String) ((ADataEvent)event).getValue());
 				}
 				else if (event.getCommand().equals(AConstants.MODEL_TYPE))
 				{
-					modelTypeCombo.setSelectedItem(event.getValue());
-				} else if(event.getCommand().equals(AConstants.DATA_EDITABLE))
+					modelTypeCombo.setSelectedItem(((ADataEvent)event).getValue());
+				}
+				else if (event.getCommand().equals(AConstants.DATA_EDITABLE))
 				{
 					modelTypeCombo.setEnabled(model.isEditable());
 					nameField.setEnabled(model.isEditable());
 				}
-					component.revalidate();
-					component.repaint();
+				component.revalidate();
+				component.repaint();
 			}
-		}
 		});
 	}
 
@@ -180,8 +176,8 @@ public class AModelView extends ADataObjectView implements IADataView
 	{
 		IAModel model = AModelFactory.createTestAModel(Modeltype.NetLogo);
 		// IAModel model = AModelFactory.createAModel("AntsStop", "netLogo");
-//		model.setEditable(false);
-		
+		// model.setEditable(false);
+
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(750, 750);
