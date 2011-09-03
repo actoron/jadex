@@ -1,11 +1,11 @@
 package jadex.simulation.analysis.common.data;
 
 import jadex.simulation.analysis.common.data.factories.AModelFactory;
+import jadex.simulation.analysis.common.data.simulation.Modeltype;
 import jadex.simulation.analysis.common.superClasses.events.IAEvent;
 import jadex.simulation.analysis.common.superClasses.events.IAObservable;
 import jadex.simulation.analysis.common.superClasses.events.data.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
-import jadex.simulation.analysis.service.simulation.Modeltype;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -29,6 +29,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
+/**
+ * View of AModel
+ * @author 5Haubeck
+ *
+ */
 public class AModelView extends ADataObjectView implements IADataView
 {
 	private IAModel model;

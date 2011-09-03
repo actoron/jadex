@@ -6,11 +6,15 @@ import jadex.simulation.analysis.common.data.IADataView;
 import jadex.simulation.analysis.common.superClasses.events.data.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 
+/**
+ * ABasicParameter class, which holds a parameter with value and class
+ * @author 5Haubeck
+ *
+ */
 public class ABasicParameter extends ADataObject implements IAParameter
 {
 	protected Object value = "";
 	private Class type = Object.class;
-//	private Boolean usage = Boolean.TRUE;
 	protected Boolean onlyValue = Boolean.TRUE;
 
 	public ABasicParameter(String name, Class type, Object value)
@@ -50,7 +54,6 @@ public class ABasicParameter extends ADataObject implements IAParameter
 	}
 
 	// value
-
 	@Override
 	public Object getValue()
 	{
@@ -87,54 +90,6 @@ public class ABasicParameter extends ADataObject implements IAParameter
 
 	// ----- override ADataObject -----
 
-//	@Override
-//	public boolean equals(Object obj)
-//	{
-//		if (obj instanceof ABasicParameter)
-//		{
-//			ABasicParameter parameter = (ABasicParameter) obj;
-//			if (this.getName().equalsIgnoreCase(parameter.getName()))
-//			{
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-
-//	@Override
-//	public int hashCode()
-//	{
-//		return getName().hashCode();
-//	}
-
-//	@Override
-//	public Boolean isUsage()
-//	{
-//		return usage;
-//	}
-//
-//	@Override
-//	public void setUsage(Boolean usage)
-//	{
-//		synchronized (mutex)
-//		{
-//			this.usage = usage;
-//		}
-//		update(new ADataEvent(this, AConstants.PARAMETER_USAGE, usage));
-//	}
-
-	@Override
-	public String toString()
-	{
-		return "ABasicParameter: " + "name=" + getName() + ", " + "value=" + getValue() + ", " + "type=" + getValueClass();
-	}
-	
-//	@Override
-//	public IADataView getView()
-//	{
-//		return new ABasicParameterView(this);
-//	}
-
 	@Override
 	public void setValueEditable(Boolean editable)
 	{
@@ -169,5 +124,4 @@ public class ABasicParameter extends ADataObject implements IAParameter
 		
 		return clone;
 	}
-
 }

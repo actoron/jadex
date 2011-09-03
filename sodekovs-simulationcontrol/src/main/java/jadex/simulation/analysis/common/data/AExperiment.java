@@ -7,6 +7,11 @@ import jadex.simulation.analysis.common.superClasses.events.IAEvent;
 import jadex.simulation.analysis.common.superClasses.events.data.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 
+/**
+ * AExperiment Implementation
+ * @author 5Haubeck
+ *
+ */
 public class AExperiment extends ADataObject implements IAExperiment
 {
 
@@ -27,8 +32,8 @@ public class AExperiment extends ADataObject implements IAExperiment
 
 			setModel(model);
 			setExperimentParamters(expParameters);
-			setInputParamters(inputParameters);
-			setOutputParamters(outputParameters);
+			setConfigParamters(inputParameters);
+			setResultParamters(outputParameters);
 			view = new AExperimentView(this);
 		}
 	}
@@ -54,7 +59,7 @@ public class AExperiment extends ADataObject implements IAExperiment
 	// Input
 
 	@Override
-	public void removeInputParamter(String name)
+	public void removeConfigParamter(String name)
 	{
 		synchronized (mutex)
 		{
@@ -63,7 +68,7 @@ public class AExperiment extends ADataObject implements IAExperiment
 	}
 
 	@Override
-	public void setInputParamters(IAParameterEnsemble parameters)
+	public void setConfigParamters(IAParameterEnsemble parameters)
 	{
 		synchronized (mutex)
 		{
@@ -72,19 +77,19 @@ public class AExperiment extends ADataObject implements IAExperiment
 	}
 
 	@Override
-	public IAParameter getInputParameter(String name)
+	public IAParameter getConfigParameter(String name)
 	{
 		return inputParameters.getParameter(name);
 	}
 
 	@Override
-	public IAParameterEnsemble getInputParameters()
+	public IAParameterEnsemble getConfigParameters()
 	{
 		return inputParameters;
 	}
 
 	@Override
-	public void addInputParamter(IAParameter parameter)
+	public void addConfigParamter(IAParameter parameter)
 	{
 		synchronized (mutex)
 		{
@@ -94,13 +99,13 @@ public class AExperiment extends ADataObject implements IAExperiment
 
 	// Output
 	@Override
-	public IAParameterEnsemble getOutputParameters()
+	public IAParameterEnsemble getResultParameters()
 	{
 		return outputParameters;
 	}
 
 	@Override
-	public void setOutputParamters(IAParameterEnsemble parameters)
+	public void setResultParamters(IAParameterEnsemble parameters)
 	{
 		synchronized (mutex)
 		{
@@ -109,7 +114,7 @@ public class AExperiment extends ADataObject implements IAExperiment
 	}
 
 	@Override
-	public void addOutputParamter(IAParameter parameter)
+	public void addResultParamter(IAParameter parameter)
 	{
 		synchronized (mutex)
 		{
@@ -118,7 +123,7 @@ public class AExperiment extends ADataObject implements IAExperiment
 	}
 
 	@Override
-	public void removeOutputParamter(String name)
+	public void removeResultParamter(String name)
 	{
 		synchronized (mutex)
 		{
@@ -127,7 +132,7 @@ public class AExperiment extends ADataObject implements IAExperiment
 	}
 
 	@Override
-	public IAParameter getOutputParameter(String name)
+	public IAParameter getResultParameter(String name)
 	{
 		return outputParameters.getParameter(name);
 	}

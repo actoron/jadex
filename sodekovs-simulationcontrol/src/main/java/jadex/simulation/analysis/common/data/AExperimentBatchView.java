@@ -26,6 +26,11 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
+/**
+ * View of the AExperimentBatch
+ * @author 5Haubeck
+ *
+ */
 public class AExperimentBatchView extends ADataObjectView implements IADataView
 {
 	private IAExperimentBatch batch;

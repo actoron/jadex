@@ -4,6 +4,11 @@ import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
 
 import javax.swing.JComponent;
 
+/**
+ * Viewer Panel for the jadex componentviewer
+ * @author 5Haubeck
+ *
+ */
 public class ControlComponentViewerPanel extends AbstractComponentViewerPanel {
 
 	@Override

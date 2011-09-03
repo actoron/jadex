@@ -1,10 +1,16 @@
-package jadex.simulation.analysis.common.data;
+package jadex.simulation.analysis.common.data.validation;
 
+import jadex.simulation.analysis.common.data.ADataObject;
 import jadex.simulation.analysis.common.data.parameter.IAParameter;
 import jadex.simulation.analysis.common.superClasses.events.IAEvent;
 import jadex.simulation.analysis.common.superClasses.events.data.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
 
+/**
+ * AModelHypothesis Impl
+ * @author 5Haubeck
+ *
+ */
 public class AModelHypothesis extends ADataObject implements IAModelHypothesis
 {
 	private IAParameter inputParameter; //= new ABasicParameter("defaultIn", Double.class, new Double(0));
@@ -38,7 +44,7 @@ public class AModelHypothesis extends ADataObject implements IAModelHypothesis
 	}
 
 	@Override
-	public void setSecondParameters(IAParameter parameter)
+	public void setOutputParameter(IAParameter parameter)
 	{
 		synchronized (mutex)
 		{
@@ -48,13 +54,13 @@ public class AModelHypothesis extends ADataObject implements IAModelHypothesis
 	}
 
 	@Override
-	public IAParameter getSecondParameter()
+	public IAParameter getOutputParameter()
 	{
 		return outputParameter;
 	}
 
 	@Override
-	public void setFirstParameters(IAParameter parameter)
+	public void setInputParameter(IAParameter parameter)
 	{
 		synchronized (mutex)
 		{
@@ -64,7 +70,7 @@ public class AModelHypothesis extends ADataObject implements IAModelHypothesis
 	}
 
 	@Override
-	public IAParameter getFirstParameter()
+	public IAParameter getInputParameter()
 	{
 		return inputParameter;
 	}

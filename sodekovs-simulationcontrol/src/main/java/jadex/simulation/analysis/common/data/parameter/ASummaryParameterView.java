@@ -11,6 +11,10 @@ import javax.swing.SwingUtilities;
 
 import jadex.simulation.analysis.common.data.IADataView;
 
+/**
+ * View of ASummaryParameter
+ * @author 5Haubeck
+ */
 public class ASummaryParameterView extends ABasicParameterView implements IADataView
 {
 	private ASummaryParameter parameter;

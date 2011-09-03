@@ -3,6 +3,11 @@ package jadex.simulation.analysis.common.util.workflowGraph;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 
+/**
+ * Analysis user object of the Jgraph
+ * @author 5Haubeck
+ *
+ */
 public class ActivityUserObject
 {
 	MActivity activity;

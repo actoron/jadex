@@ -1,5 +1,11 @@
 package jadex.simulation.analysis.common.data.parameter.statistics;
 
+/**
+ * Code was created by the Author within a Simulation Project at the University of Hamburg
+ * Maximal Value
+ * @author 5Haubeck
+ *
+ */
 public class Max extends AbstractSingleStatistic
 {
 

@@ -1,6 +1,11 @@
 package jadex.simulation.analysis.common.data.parameter.statistics;
 
-
+/**
+ * Code was created by the Author within a Simulation Project at the University of Hamburg
+ * Abstract Single Statistic
+ * @author 5Haubeck
+ *
+ */
 public abstract class AbstractSingleStatistic implements ISingleStatistic
 {
 	public abstract Double getResult();

@@ -1,5 +1,7 @@
-package jadex.simulation.analysis.common.data;
+package jadex.simulation.analysis.common.data.validation;
 
+import jadex.simulation.analysis.common.data.ADataObjectView;
+import jadex.simulation.analysis.common.data.IADataView;
 import jadex.simulation.analysis.common.data.parameter.ABasicParameter;
 import jadex.simulation.analysis.common.data.parameter.AConstraintParameter;
 import jadex.simulation.analysis.common.data.parameter.ASeriesParameter;
@@ -33,6 +35,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
+/**
+ * View of AModelHypothesis
+ * @author 5Haubeck
+ *
+ */
 public class AModelHypothesisView extends ADataObjectView implements IADataView
 {
 	private IAModelHypothesis hypo;
@@ -176,7 +183,7 @@ public class AModelHypothesisView extends ADataObjectView implements IADataView
 					@Override
 					public void actionPerformed(ActionEvent e)
 					{
-						if (paraSet.iterator().hasNext()) hypo.setFirstParameters(paraSet.iterator().next());
+						if (paraSet.iterator().hasNext()) hypo.setInputParameter(paraSet.iterator().next());
 					}
 				});
 				JButton cancel = new JButton("Cancel");
@@ -276,7 +283,7 @@ public class AModelHypothesisView extends ADataObjectView implements IADataView
 					@Override
 					public void actionPerformed(ActionEvent e)
 					{
-						if (para2Set.iterator().hasNext()) hypo.setSecondParameters(para2Set.iterator().next());
+						if (para2Set.iterator().hasNext()) hypo.setOutputParameter(para2Set.iterator().next());
 					}
 				});
 				JButton cancel2 = new JButton("Cancel");

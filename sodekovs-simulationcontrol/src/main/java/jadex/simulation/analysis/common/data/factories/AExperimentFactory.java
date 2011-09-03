@@ -4,11 +4,15 @@ import jadex.simulation.analysis.common.data.AExperiment;
 import jadex.simulation.analysis.common.data.IAExperiment;
 import jadex.simulation.analysis.common.data.IAModel;
 import jadex.simulation.analysis.common.data.parameter.ABasicParameter;
-import jadex.simulation.analysis.common.data.parameter.AConstraintParameter;
 import jadex.simulation.analysis.common.data.parameter.AParameterEnsemble;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
-import jadex.simulation.analysis.service.simulation.Modeltype;
+import jadex.simulation.analysis.common.data.simulation.Modeltype;
 
+/**
+ * Factoryclass for IAExperiment
+ * @author 5Haubeck
+ *
+ */
 public class AExperimentFactory
 {
 
@@ -36,7 +40,7 @@ public class AExperimentFactory
 
 		return createExperiment(model, expParameters);
 	}
-
+	
 	public static IAExperiment createExperiment(IAModel model, IAParameterEnsemble expParameters)
 	{
 		return createExperiment(model, expParameters, ((AParameterEnsemble) model.getInputParameters().clonen()),  ((AParameterEnsemble) model.getOutputParameters().clonen()));

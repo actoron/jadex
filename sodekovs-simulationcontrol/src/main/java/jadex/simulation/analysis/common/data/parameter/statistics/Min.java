@@ -1,17 +1,16 @@
 package jadex.simulation.analysis.common.data.parameter.statistics;
 
+/**
+ * Code was created by the Author within a Simulation Project at the University of Hamburg
+ * Minimal value
+ * 
+ * @author 5Haubeck
+ */
 public class Min extends AbstractSingleStatistic
 {
-
-	/** Number of values */
 	private Double n;
-
-	/** Current value (min) */
 	private double value;
 
-	/**
-	 * Construct a Min
-	 */
 	public Min()
 	{
 		n = 0.0;

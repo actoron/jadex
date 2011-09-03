@@ -7,6 +7,12 @@ import jadex.simulation.analysis.common.util.SAnalysisClassLoader;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+/**
+ * Controller of ABasicParameter
+ * Validate the Input with a Jadex IParsedExpression
+ * @author 5Haubeck
+ *
+ */
 public class ABasicParameterController
 {
 	protected ABasicParameter parameter;
@@ -61,9 +67,4 @@ public class ABasicParameterController
 		}
 		
 	}
-
-//	public void setUsage(Boolean bool)
-//	{
-//		parameter.setUsage(bool);
-//	}
 }

@@ -3,8 +3,8 @@ package jadex.simulation.analysis.common.superClasses.events.task;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.simulation.analysis.common.superClasses.events.AEvent;
+import jadex.simulation.analysis.common.superClasses.tasks.IATask;
 import jadex.simulation.analysis.common.util.AConstants;
-import jadex.simulation.analysis.process.basicTasks.IATask;
 
 public class ATaskEvent extends AEvent
 {

@@ -10,6 +10,11 @@ import java.awt.Insets;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+/**
+ * View of DataObject
+ * @author 5Haubeck
+ *
+ */
 public class ADataObjectView implements IADataView
 {
 	protected JComponent component;

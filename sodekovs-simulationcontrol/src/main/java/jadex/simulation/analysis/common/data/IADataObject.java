@@ -4,6 +4,11 @@ import jadex.simulation.analysis.common.superClasses.events.IAObservable;
 
 import java.util.UUID;
 
+/**
+ * Basic Object of DataObject
+ * @author 5Haubeck
+ *
+ */
 public interface IADataObject extends IAObservable
 {
 

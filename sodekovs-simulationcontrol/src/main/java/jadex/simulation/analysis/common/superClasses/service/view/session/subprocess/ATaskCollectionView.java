@@ -4,11 +4,11 @@ import jadex.bpmn.model.MActivity;
 import jadex.simulation.analysis.common.superClasses.events.IAEvent;
 import jadex.simulation.analysis.common.superClasses.events.IAListener;
 import jadex.simulation.analysis.common.superClasses.events.task.ATaskEvent;
+import jadex.simulation.analysis.common.superClasses.tasks.ATaskView;
+import jadex.simulation.analysis.common.superClasses.tasks.IATask;
+import jadex.simulation.analysis.common.superClasses.tasks.IATaskView;
+import jadex.simulation.analysis.common.superClasses.tasks.TaskProperties;
 import jadex.simulation.analysis.common.util.AConstants;
-import jadex.simulation.analysis.process.basicTasks.ATaskView;
-import jadex.simulation.analysis.process.basicTasks.IATask;
-import jadex.simulation.analysis.process.basicTasks.IATaskView;
-import jadex.simulation.analysis.process.basicTasks.TaskProperties;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;

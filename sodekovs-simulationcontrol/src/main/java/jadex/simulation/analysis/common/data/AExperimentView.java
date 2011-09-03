@@ -26,6 +26,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
+/**
+ * VIew of AExperiment
+ * @author 5Haubeck
+ *
+ */
 public class AExperimentView extends ADataObjectView implements IADataView
 {
 	private IAExperiment frame;
@@ -170,8 +175,8 @@ public class AExperimentView extends ADataObjectView implements IADataView
 
 				modelComponent = frame.getModel().getView().getComponent();
 				expComponent = frame.getExperimentParameters().getView().getComponent();
-				inputComponent = frame.getInputParameters().getView().getComponent();
-				outputComponent = frame.getOutputParameters().getView().getComponent();
+				inputComponent = frame.getConfigParameters().getView().getComponent();
+				outputComponent = frame.getResultParameters().getView().getComponent();
 
 				component.add(expComponent, new GridBagConstraints(0, 1, GridBagConstraints.REMAINDER, 1, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 				state = 1;

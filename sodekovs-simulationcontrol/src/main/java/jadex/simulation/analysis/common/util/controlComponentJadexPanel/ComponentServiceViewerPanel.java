@@ -30,7 +30,10 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 /**
+ * Jadex:
  *  Default panel for viewing BDI agents that include viewable capabilities. 
+ *  
+ *  Extended by 5haubeck
  */
 public class ComponentServiceViewerPanel extends AbstractComponentViewerPanel
 {

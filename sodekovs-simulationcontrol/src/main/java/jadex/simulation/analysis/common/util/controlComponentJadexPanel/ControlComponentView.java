@@ -18,6 +18,11 @@ import javax.swing.JTabbedPane;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
+/**
+ * The View for the jadex componentviewer
+ * @author 5Haubeck
+ *
+ */
 public class ControlComponentView extends JTabbedPane
 {
 	protected IExternalAccess instance;

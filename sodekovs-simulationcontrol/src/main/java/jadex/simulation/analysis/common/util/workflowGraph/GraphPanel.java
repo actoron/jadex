@@ -43,6 +43,12 @@ import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphSelectionModel;
 import com.mxgraph.view.mxStylesheet;
 
+/**
+ * JGraph panel. Adds all Tasks, gateways and Events of a given Jadex Workflow
+ * Soft the elements
+ * @author 5Haubeck
+ *
+ */
 public class GraphPanel extends mxGraphComponent
 {
 	final protected Map<MActivity, Object> vertex = new HashMap<MActivity, Object>();

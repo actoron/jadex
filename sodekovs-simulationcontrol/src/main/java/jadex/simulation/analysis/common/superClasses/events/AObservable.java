@@ -1,7 +1,7 @@
 package jadex.simulation.analysis.common.superClasses.events;
 
 
-import jadex.simulation.analysis.process.basicTasks.IATaskView;
+import jadex.simulation.analysis.common.superClasses.tasks.IATaskView;
 
 import java.util.HashSet;
 import java.util.Set;

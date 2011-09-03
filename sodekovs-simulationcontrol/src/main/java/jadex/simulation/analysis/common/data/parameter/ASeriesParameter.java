@@ -1,99 +1,35 @@
 package jadex.simulation.analysis.common.data.parameter;
 
+import jadex.simulation.analysis.common.data.parameter.statistics.ISingleStatistic;
+import jadex.simulation.analysis.common.data.parameter.statistics.Max;
+import jadex.simulation.analysis.common.data.parameter.statistics.Mean;
+import jadex.simulation.analysis.common.data.parameter.statistics.Min;
+import jadex.simulation.analysis.common.data.parameter.statistics.Sum;
+import jadex.simulation.analysis.common.data.parameter.statistics.Variance;
+
+import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeMap;
 
 public class ASeriesParameter extends ABasicParameter implements IASeriesParameter
 {
+	/* values are ordered by key in this treemap*/
+	TreeMap<Double, Double> values = new TreeMap<Double, Double>();
 
-	// TODO
 	public ASeriesParameter(String name)
 	{
 		super(name, Double.class, null);
-		
 	}
 
 	@Override
-	public void addValue(Double value)
+	public void update(Double time, Double value)
 	{
-		// TODO Auto-generated method stub
-		
+		values.put(time, value);	
 	}
 
 	@Override
-	public void addValues(Double[] values)
+	public TreeMap<Double, Double> getSeries()
 	{
-		// TODO Auto-generated method stub
-		
+		return values;
 	}
-
-	@Override
-	public List<Double> getValues()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Double getN()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Double getSum()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Double getMean()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Double getStandardDeviation()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Double getVariance()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Double getMax()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Double getMin()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean isEmpty()
-	{
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void clear()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
 }

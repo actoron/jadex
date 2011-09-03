@@ -1,19 +1,18 @@
 package jadex.simulation.analysis.common.data.parameter.statistics;
 
+/**
+ * Code was created by the Author within a Simulation Project at the University of Hamburg
+ * sum value
+ * 
+ * @author 5Haubeck
+ */
 public class Sum extends AbstractSingleStatistic
 {
 
-	/** sample size */
 	private double n;
 
-	/**
-	 * The currently sum.
-	 */
 	private double value;
 
-	/**
-	 * Create a Sum instance
-	 */
 	public Sum()
 	{
 		n = 0.0;

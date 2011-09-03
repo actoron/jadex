@@ -7,7 +7,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.JFrame;
-
+/**
+ * AConstraintParameter class, which holds a Parameter, double value and contraints
+ * @author 5Haubeck
+ *
+ */
 public class AConstraintParameter extends ABasicParameter implements IAParameter
 {
 	protected Set<IAConstraint> constraints;

@@ -5,8 +5,10 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 /**
- * Static sclass to create a Classloader which adds the \\sodekovs-simulationcontrol\\target\\classes\\
+ * Static class to create a Classloader which adds the \\sodekovs-simulationcontrol\\target\\classes\\
  * as a url
+ * 
+ * @author 5haubeck
  */
 public class SAnalysisClassLoader
 {

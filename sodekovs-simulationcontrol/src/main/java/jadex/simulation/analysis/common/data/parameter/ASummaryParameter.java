@@ -14,7 +14,12 @@ import jadex.simulation.analysis.common.data.parameter.statistics.Min;
 import jadex.simulation.analysis.common.data.parameter.statistics.Sum;
 import jadex.simulation.analysis.common.data.parameter.statistics.Variance;
 
-public class ASummaryParameter extends ABasicParameter implements IAMultiValueParameter
+/**
+ * ASummaryParameter class, which holds some values
+ * @author 5Haubeck
+ *
+ */
+public class ASummaryParameter extends ABasicParameter implements IASummaryParameter
 {
 	public ASummaryParameter(String name)
 	{
@@ -67,15 +72,9 @@ public class ASummaryParameter extends ABasicParameter implements IAMultiValuePa
 		return getMean();
 	}
 
-//	@Override
-//	public Class getValueClass()
-//	{
-//		return Double.class;
-//	}
-
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IAMultiValueParameter#addValue(java.lang.Double)
+	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#addValue(java.lang.Double)
 	 */
 	@Override
 	public void addValue(Double value)
@@ -94,7 +93,7 @@ public class ASummaryParameter extends ABasicParameter implements IAMultiValuePa
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IAMultiValueParameter#addValues(java.lang.Double[])
+	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#addValues(java.lang.Double[])
 	 */
 	@Override
 	public void addValues(Double[] values)
@@ -110,7 +109,7 @@ public class ASummaryParameter extends ABasicParameter implements IAMultiValuePa
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IAMultiValueParameter#getN()
+	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#getN()
 	 */
 	@Override
 	public Double getN()
@@ -120,7 +119,7 @@ public class ASummaryParameter extends ABasicParameter implements IAMultiValuePa
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IAMultiValueParameter#getSum()
+	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#getSum()
 	 */
 	@Override
 	public Double getSum()
@@ -130,7 +129,7 @@ public class ASummaryParameter extends ABasicParameter implements IAMultiValuePa
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IAMultiValueParameter#getMean()
+	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#getMean()
 	 */
 	@Override
 	public Double getMean()
@@ -148,7 +147,7 @@ public class ASummaryParameter extends ABasicParameter implements IAMultiValuePa
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IAMultiValueParameter#getStandardDeviation()
+	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#getStandardDeviation()
 	 */
 	@Override
 	public Double getStandardDeviation()
@@ -173,7 +172,7 @@ public class ASummaryParameter extends ABasicParameter implements IAMultiValuePa
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IAMultiValueParameter#getVariance()
+	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#getVariance()
 	 */
 	@Override
 	public Double getVariance()
@@ -183,7 +182,7 @@ public class ASummaryParameter extends ABasicParameter implements IAMultiValuePa
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IAMultiValueParameter#getMax()
+	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#getMax()
 	 */
 	@Override
 	public Double getMax()
@@ -193,7 +192,7 @@ public class ASummaryParameter extends ABasicParameter implements IAMultiValuePa
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IAMultiValueParameter#getMin()
+	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#getMin()
 	 */
 	@Override
 	public Double getMin()
@@ -203,7 +202,7 @@ public class ASummaryParameter extends ABasicParameter implements IAMultiValuePa
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IAMultiValueParameter#isEmpty()
+	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#isEmpty()
 	 */
 	@Override
 	public boolean isEmpty()
@@ -220,7 +219,7 @@ public class ASummaryParameter extends ABasicParameter implements IAMultiValuePa
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IAMultiValueParameter#clear()
+	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#clear()
 	 */
 	@Override
 	public void clear()

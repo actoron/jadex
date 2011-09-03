@@ -7,7 +7,10 @@ import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 
 /**
+ *  Jadex:
  *  A validator that tries to parse the text of a textfield in context of a spezified Class
+ *  
+ *  Extended by 5Haubeck:
  *  Uses extra analyse import
  */
 public class ParserClassValidator implements IValidator

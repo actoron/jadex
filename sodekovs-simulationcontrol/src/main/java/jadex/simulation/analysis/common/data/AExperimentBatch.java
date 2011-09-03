@@ -10,6 +10,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * AExperimentBatch Implementation
+ * @author 5Haubeck
+ *
+ */
 public class AExperimentBatch extends ADataObject implements IAExperimentBatch
 {
 	IAllocationStrategy strategy = new AllocationStrategyWorkload();

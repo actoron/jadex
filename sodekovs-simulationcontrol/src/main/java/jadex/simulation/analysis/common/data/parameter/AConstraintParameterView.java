@@ -22,11 +22,16 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
+/**
+ * View of AConstraintParameter 
+ * @author 5Haubeck
+ *
+ */
 public class AConstraintParameterView extends ABasicParameterView implements IADataView
 {
 	private AConstraintParameter parameter;
-	JValidatorTextField obenField_;
-	JValidatorTextField untenField_;
+	protected JValidatorTextField obenField_;
+	protected JValidatorTextField untenField_;
 
 	public AConstraintParameterView(AConstraintParameter parameter)
 	{

@@ -18,7 +18,7 @@ import java.util.UUID;
 
 public class ABasicAnalysisSessionService extends ABasicAnalysisService implements IAnalysisSessionService
 {
-	//TODO: IMPLEMENT concurrent
+	//TODO: IMPLEMENT concurrent boolean
 	protected Boolean concurrent = true;  
 	protected Map<UUID, IAParameterEnsemble> sessions;
 	protected Map<UUID, IASessionView> sessionViews;

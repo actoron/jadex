@@ -1,5 +1,10 @@
 package jadex.simulation.analysis.common.data.parameter;
 
+/**
+ * IAContraint for AContrainParameter. Double borders
+ * @author 5Haubeck
+ *
+ */
 public class ABorderConstraint extends Object implements IAConstraint
 {
 	Double upperBorder;

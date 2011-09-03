@@ -7,12 +7,16 @@ import jadex.simulation.analysis.common.data.parameter.AConstraintParameter;
 import jadex.simulation.analysis.common.data.parameter.AParameterEnsemble;
 import jadex.simulation.analysis.common.data.parameter.ASummaryParameter;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
-import jadex.simulation.analysis.service.simulation.Modeltype;
+import jadex.simulation.analysis.common.data.simulation.Modeltype;
 
+/**
+ * Factoryclass for IAModel
+ * @author 5Haubeck
+ *
+ */
 public class AModelFactory
 {
 	// Test
-
 	public static IAModel createTestAModel()
 	{
 		return createTestAModel(Modeltype.DesmoJ);
@@ -60,7 +64,6 @@ public class AModelFactory
 	}
 
 	// Default
-
 	public static IAModel createAModel(String name, Modeltype type)
 	{
 		String path = "";

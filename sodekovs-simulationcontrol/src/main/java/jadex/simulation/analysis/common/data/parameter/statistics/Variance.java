@@ -1,27 +1,22 @@
 package jadex.simulation.analysis.common.data.parameter.statistics;
 
 /**
+ * /**
+ * Code was created by the Author within a Simulation Project at the University of Hamburg
  * the variance of values
  * 
- * @see Chan, T. F. and J. G. Lewis 1979, Communications of the ACM, vol. 22 no.
- *      9, pp. 526-531.
+ * @author 5Haubeck
  */
 public class Variance extends AbstractSingleStatistic
 {
-
-	/** sample size */
 	protected double n;
 
-	/** current varaince */
 	protected double meanVar;
 
-	/** current varaince */
 	protected double value;
 
-	/** mean of values */
 	protected Mean mean;
 
-	/** Constructs a Mean. */
 	public Variance()
 	{
 		n = 0.0;

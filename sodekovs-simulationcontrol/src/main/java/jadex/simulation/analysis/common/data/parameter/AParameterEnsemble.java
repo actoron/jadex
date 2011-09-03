@@ -9,10 +9,13 @@ import jadex.simulation.analysis.common.util.AConstants;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
+/**
+ * AParameterEnsemble, which saves a set of parameters
+ * @author 5Haubeck
+ *
+ */
 public class AParameterEnsemble extends ADataObject implements IAParameterEnsemble
 {
-
 	private Map<String, IAParameter> parametersMap;
 
 	public AParameterEnsemble(String name)
@@ -27,7 +30,7 @@ public class AParameterEnsemble extends ADataObject implements IAParameterEnsemb
 
 	// TODO: Add to view
 	@Override
-	public Boolean isFeasable()
+	public Boolean isFeasible()
 	{
 		synchronized (mutex)
 		{
@@ -74,7 +77,7 @@ public class AParameterEnsemble extends ADataObject implements IAParameterEnsemb
 	}
 
 	@Override
-	public boolean containsParameter(String name)
+	public Boolean containsParameter(String name)
 	{
 		return parametersMap.containsKey(name);
 	}
@@ -92,7 +95,7 @@ public class AParameterEnsemble extends ADataObject implements IAParameterEnsemb
 	}
 
 	@Override
-	public boolean hasParameters()
+	public Boolean hasParameters()
 	{
 		return parametersMap.isEmpty();
 	}

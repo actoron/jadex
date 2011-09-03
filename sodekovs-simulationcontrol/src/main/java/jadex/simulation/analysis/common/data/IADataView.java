@@ -6,6 +6,11 @@ import jadex.simulation.analysis.common.superClasses.events.IAObservable;
 
 import javax.swing.JComponent;
 
+/**
+ * Basic View of a Dataobject
+ * @author 5Haubeck
+ *
+ */
 public interface IADataView extends IAListener
 {
 	/**

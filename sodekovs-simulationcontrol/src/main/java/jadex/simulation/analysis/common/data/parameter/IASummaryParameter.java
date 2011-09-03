@@ -3,7 +3,12 @@ package jadex.simulation.analysis.common.data.parameter;
 import java.util.List;
 import java.util.Set;
 
-public interface IAMultiValueParameter extends IAParameter
+/**
+ * Super Class for Parameters with more than one double value
+ * @author 5Haubeck
+ *
+ */
+public interface IASummaryParameter extends IAParameter
 {
 
 	/**

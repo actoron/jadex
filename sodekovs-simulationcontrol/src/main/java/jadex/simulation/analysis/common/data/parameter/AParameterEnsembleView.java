@@ -31,14 +31,16 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+/**
+ * View of AParameterEnsembl
+ * @author 5Haubeck
+ *
+ */
 public class AParameterEnsembleView extends ADataObjectView implements IADataView
 {
-	// TODO: Bug bei Parameter ADD
 	private AParameterEnsemble parameterEnsemble;
 
-	private JList list;
-	// private JScrollPane listScroller;
-
+	protected JList list;
 	protected JButton removeParameter;
 	protected JButton addParameter;
 

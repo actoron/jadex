@@ -1,8 +1,12 @@
 package jadex.simulation.analysis.common.util;
 
+/**
+ * the constants of the analysis software
+ * @author 5Haubeck
+ *
+ */
 public class AConstants
 {
-	//Data
 	public static final String DATA_EDITABLE = "DATA_EDITABLE";
 	public static final String DATA_NAME = "DATA_NAME";
 	

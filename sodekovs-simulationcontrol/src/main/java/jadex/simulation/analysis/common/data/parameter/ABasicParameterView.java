@@ -28,6 +28,11 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
+/**
+ * View of ABasicParameter
+ * 
+ * @author 5Haubeck
+ */
 public class ABasicParameterView extends ADataObjectView implements IADataView
 {
 	private ABasicParameter parameter;

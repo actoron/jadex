@@ -3,11 +3,16 @@ package jadex.simulation.analysis.common.data;
 import jadex.simulation.analysis.common.data.parameter.AParameterEnsemble;
 import jadex.simulation.analysis.common.data.parameter.IAParameter;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
+import jadex.simulation.analysis.common.data.simulation.Modeltype;
 import jadex.simulation.analysis.common.superClasses.events.IAEvent;
 import jadex.simulation.analysis.common.superClasses.events.data.ADataEvent;
 import jadex.simulation.analysis.common.util.AConstants;
-import jadex.simulation.analysis.service.simulation.Modeltype;
 
+/**
+ * AModel Implementation
+ * @author 5Haubeck
+ *
+ */
 public class AModel extends ADataObject implements IAModel
 {
 	private Modeltype type;

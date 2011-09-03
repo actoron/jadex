@@ -14,10 +14,10 @@ import jadex.simulation.analysis.common.superClasses.events.service.AServiceEven
 import jadex.simulation.analysis.common.superClasses.events.task.ATaskEvent;
 import jadex.simulation.analysis.common.superClasses.service.view.session.IASessionView;
 import jadex.simulation.analysis.common.superClasses.service.view.session.SessionProperties;
+import jadex.simulation.analysis.common.superClasses.tasks.IATask;
+import jadex.simulation.analysis.common.superClasses.tasks.IATaskView;
 import jadex.simulation.analysis.common.util.AConstants;
 import jadex.simulation.analysis.common.util.workflowGraph.GraphPanel;
-import jadex.simulation.analysis.process.basicTasks.IATask;
-import jadex.simulation.analysis.process.basicTasks.IATaskView;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
