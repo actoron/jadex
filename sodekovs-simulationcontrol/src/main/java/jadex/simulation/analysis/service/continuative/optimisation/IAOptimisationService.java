@@ -1,11 +1,11 @@
 package jadex.simulation.analysis.service.continuative.optimisation;
 
-import java.util.UUID;
-
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.IAExperimentBatch;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
-import jadex.simulation.analysis.service.basic.analysis.IAnalysisSessionService;
+import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisSessionService;
+
+import java.util.UUID;
 
 public interface IAOptimisationService extends IAnalysisSessionService
 {

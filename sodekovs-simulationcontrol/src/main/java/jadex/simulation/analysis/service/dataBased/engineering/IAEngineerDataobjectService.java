@@ -1,13 +1,13 @@
 package jadex.simulation.analysis.service.dataBased.engineering;
 
-import java.util.UUID;
-
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.ADataObject;
 import jadex.simulation.analysis.common.data.IAModel;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
-import jadex.simulation.analysis.service.basic.analysis.IAnalysisSessionService;
+import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisSessionService;
 import jadex.simulation.analysis.service.simulation.Modeltype;
+
+import java.util.UUID;
 
 public interface IAEngineerDataobjectService extends IAnalysisSessionService
 {
