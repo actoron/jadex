@@ -6,10 +6,10 @@ import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.AExperimentBatch;
 import jadex.simulation.analysis.common.data.IAExperiment;
 import jadex.simulation.analysis.common.data.IAExperimentBatch;
+import jadex.simulation.analysis.common.data.optimisation.IAObjectiveFunction;
 import jadex.simulation.analysis.common.data.parameter.IAParameter;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
 import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
-import jadex.simulation.analysis.service.continuative.optimisation.IAObjectiveFunction;
 import jadex.simulation.analysis.service.continuative.optimisation.IAOptimisationService;
 
 import java.util.Arrays;
@@ -32,6 +32,11 @@ import org.apache.commons.math.optimization.RealPointValuePair;
 import org.apache.commons.math.optimization.SimpleScalarValueChecker;
 import org.apache.commons.math.util.Incrementor;
 
+/**
+ * Optimisation with CommonsMath. Simplex Algorithmus
+ * @author 5Haubeck
+ *
+ */
 public class CommonsMathOptimisationService extends ABasicAnalysisSessionService implements IAOptimisationService
 {
 	private CommonsMathOptimisationService me = this;
@@ -43,7 +48,6 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 		super(access, IAOptimisationService.class, true);
 		sessionState = new HashMap<UUID, Map<String, Object>>();
 		methods.add("Simplex Algorithmus");
-
 	}
 
 	@Override
@@ -198,7 +202,7 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 				terminate = true;
 				System.out.println("OPTIMUM!");
 				double[] best = simplex.getPoint(0).getPoint();
-				IAParameterEnsemble result = (IAParameterEnsemble) ((IAExperiment) state.get("baseExperiment")).getInputParameters().clonen();
+				IAParameterEnsemble result = (IAParameterEnsemble) ((IAExperiment) state.get("baseExperiment")).getConfigParameters().clonen();
 
 				for (int j = 0; j < best.length; j++)
 				{
@@ -232,11 +236,11 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 							double[] point = realPointValuePair.getPoint();
 							for (int j = 0; j < point.length; j++)
 							{
-								if (point[j] == (Double) exp.getInputParameter(mappings.get(j).getKey()).getValue()) found++;
+								if (point[j] == (Double) exp.getConfigParameter(mappings.get(j).getKey()).getValue()) found++;
 							}
 							if (found == point.length)
 							{
-								RealPointValuePair newPoint = new RealPointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getOutputParameters()).get(susThread), true);
+								RealPointValuePair newPoint = new RealPointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getResultParameters()).get(susThread), true);
 								lastsimplex[k] = newPoint;
 							}
 						}
@@ -280,7 +284,7 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 				{
 					// reflect
 					IAExperiment exp = (IAExperiment) previousSolutions.getExperiments().values().iterator().next();
-					RealPointValuePair reflected = new RealPointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getOutputParameters()).get(susThread), true);
+					RealPointValuePair reflected = new RealPointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getResultParameters()).get(susThread), true);
 					if (simplex.tryReflect(reflected, comparator))
 					{
 						state.put("state", new Integer(0));
@@ -346,7 +350,7 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 				{
 					// expand!
 					IAExperiment exp = (IAExperiment) previousSolutions.getExperiments().values().iterator().next();
-					RealPointValuePair expanded = new RealPointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getOutputParameters()).get(susThread), true);
+					RealPointValuePair expanded = new RealPointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getResultParameters()).get(susThread), true);
 					RealPointValuePair reflected = (RealPointValuePair) sessionState.get(session).get("reflected");
 					simplex.tryExpand(reflected, expanded, comparator);
 					state.put("state", new Integer(0));
@@ -356,7 +360,7 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 				{
 					// outcontract!
 					IAExperiment exp = (IAExperiment) previousSolutions.getExperiments().values().iterator().next();
-					RealPointValuePair outContracted = new RealPointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getOutputParameters()).get(susThread), true);
+					RealPointValuePair outContracted = new RealPointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getResultParameters()).get(susThread), true);
 					RealPointValuePair reflected = (RealPointValuePair) sessionState.get(session).get("reflected");
 					if (simplex.tryOutContracted(reflected, outContracted, comparator))
 					{
@@ -396,7 +400,7 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 				{
 					// incontract!
 					IAExperiment exp = (IAExperiment) previousSolutions.getExperiments().values().iterator().next();
-					RealPointValuePair inContracted = new RealPointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getOutputParameters()).get(susThread), true);
+					RealPointValuePair inContracted = new RealPointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getResultParameters()).get(susThread), true);
 					RealPointValuePair reflected = (RealPointValuePair) sessionState.get(session).get("reflected");
 					if (simplex.tryOutContracted(reflected, inContracted, comparator))
 					{
@@ -465,14 +469,14 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 			sessionState.get(session).put("iteration", iteration);
 		}
 		
-		//TODO: Hack for Constraints
+		//TODO: "Hack" for Constraints
 		for (IAExperiment exp : newExperiments.getExperiments().values())
 		{
-			for (IAParameter para : exp.getInputParameters().getParameters().values())
+			for (IAParameter para : exp.getConfigParameters().getParameters().values())
 			{
 				if (((Double)para.getValue()) < 0.0 || ((Double)para.getValue()) > 1.0)
 				{
-					for (IAParameter opara : exp.getOutputParameters().getParameters().values())
+					for (IAParameter opara : exp.getResultParameters().getParameters().values())
 					{
 						opara.setValue(Double.MAX_VALUE);
 					}
@@ -499,7 +503,7 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 		for (Iterator iterator = mappings.iterator(); iterator.hasNext();)
 		{
 			Entry<String, IAParameter> entry = (Entry<String, IAParameter>) iterator.next();
-			points[i] = (Double) exp.getInputParameter(entry.getKey()).getValue();
+			points[i] = (Double) exp.getConfigParameter(entry.getKey()).getValue();
 			i++;
 		}
 		return points;
@@ -510,7 +514,7 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 		IAExperiment exp = (IAExperiment) baseExp.clonen();
 		for (int j = 0; j < points.length; j++)
 		{
-			exp.getInputParameter(mappings.get(j).getKey()).setValue(points[j]);
+			exp.getConfigParameter(mappings.get(j).getKey()).setValue(points[j]);
 		}
 		exp.setName("ExpEva" + i);
 		return exp;
@@ -534,66 +538,3 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 		return new Future((Double) sessionState.get(session).get("optimumValue"));
 	}
 }
-
-// next iteration
-// IAExperimentBatch newExperiments = new AExperimentBatch("solutions");
-// if (!terminate)
-// {
-// //sort simplex
-// Arrays.sort(lastsimplex, comparator);
-// simplex.setNewSimplex(lastsimplex);
-//
-// RealPointValuePair[] evasimplex = simplex.getPoints();
-// System.out.println("Evasimplex: ");
-// for (int i = 0; i < evasimplex.length; i++)
-// {
-// System.out.print("Point" + i +":");
-// double[] poin = evasimplex[i].getPoint();
-// for (int j = 0; j < poin.length; j++)
-// {
-// System.out.print(poin[j] +",");
-// }
-// System.out.println("=" + evasimplex[i].getValue());
-// }
-//
-//
-// //check converged
-// boolean converged = true;
-// for (int i = 0; i < simplex.getSize(); i++)
-// {
-// RealPointValuePair last = lastsimplex[i];
-// converged &= checker.converged(evaluations.getCount(), last, simplex.getPoint(i));
-// }
-// if (converged && evaluations.getCount() >= 20)
-// {
-// // We have found an optimum.
-// terminate = true;
-// System.out.println("OPTIMUM!");
-// double[] best = lastsimplex[0].getPoint();
-// for (double d : best)
-// {
-// System.out.print(d +"|");
-// }
-// System.out.println();
-// state.put("terminate", terminate);
-// }
-// }
-// System.out.println("-OUT-");
-// iteration++;
-// sessionState.get(session).put("iteration", iteration);
-
-// for (IAExperiment exp : previousSolutions.getExperiments().values())
-// {
-// for (int i = 0; i < lastsimplex.length; i++)
-// {
-// Integer found = 0;
-// RealPointValuePair realPointValuePair = lastsimplex[i];
-// double[] point = realPointValuePair.getPoint();
-// for (int j = 0; j < point.length; j++)
-// {
-// if (point[j] == (Double)exp.getInputParameter(mappings.get(j).getKey()).getValue()) found++;
-// }
-// if (found == point.length)
-// {
-// RealPointValuePair newPoint = new RealPointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getOutputParameters()).get(susThread), true);
-// lastsimplex[i] = newPoint;

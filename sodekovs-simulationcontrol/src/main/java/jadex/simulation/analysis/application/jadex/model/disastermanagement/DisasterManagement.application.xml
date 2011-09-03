@@ -26,8 +26,10 @@
 	</imports>
 	
 	<arguments>
-		<argument name="postionx" class="double">0.2</argument>
-		<argument name="postiony" class="double">0.8</argument>
+		<argument name="positionx" class="double">0.625</argument>
+		<argument name="positiony" class="double">0.5</argument>
+		<argument name="nEins" class="double">5.0</argument>
+		<argument name="nZwei" class="double">5.0</argument>
 	</arguments>
 	
 	<extensiontypes>
@@ -44,25 +46,28 @@
 					<env:property name="chemicals" class="int"/>
 				</env:objecttype>
 
-				<env:objecttype name="firestation">
-					<env:property name="posix" class="double">$args.postionx</env:property>
-					<env:property name="posiy" class="double">$args.postiony</env:property>
-				</env:objecttype>
+				<env:objecttype name="firestation"/>
+
 				<env:objecttype name="firebrigade">
-					<env:property name="speed" class="double">0.05</env:property>
+					<env:property name="speed" class="double">0.02</env:property>
 					<env:property name="extinguished" class="double">0</env:property>
 					<env:property name="cleared" class="double">0</env:property>
 					<env:property name="state" class="String"></env:property>
-					<env:property name="posix" class="double">$args.postionx</env:property>
-					<env:property name="posiy" class="double">$args.postiony</env:property>
+					<env:property name="nbEins" class="Double">$args.nEins</env:property>
+					<env:property name="nbZwei" class="Double">$args.nZwei</env:property>
 				</env:objecttype>
 				
-				<env:objecttype name="hospital"/>
+				<env:objecttype name="hospital">
+					<env:property name="posix" class="double">$args.positionx</env:property>
+					<env:property name="posiy" class="double">$args.positiony</env:property>
+				</env:objecttype>
 				<env:objecttype name="ambulance">
-					<env:property name="speed" class="double">0.05</env:property>
+					<env:property name="speed" class="double">0.01</env:property>
 					<env:property name="treated" class="double">0</env:property>
 					<env:property name="patient" class="boolean">false</env:property>
 					<env:property name="state" class="String"></env:property>
+					<env:property name="posix" class="double">$args.positionx</env:property>
+					<env:property name="posiy" class="double">$args.positiony</env:property>
 				</env:objecttype>
 			</env:objecttypes>
 			
@@ -192,34 +197,34 @@
 						<env:object type="firestation">
 							<env:property name="position">new Vector2Double(0.8, 0.4)</env:property>
 						</env:object>
-						<env:object type="firebrigade" number="3">
+						<env:object type="firebrigade" number="4">
 							<env:property name="position">new Vector2Double(0.8, 0.4)</env:property>
 						</env:object>
 						
 						<!-- Firestation with 3 brigades -->
 						<env:object type="firestation">
 <!-- 							<env:property name="position" dynamic="true">new Vector2Double($args.firePositionx, $args.firePositiony)</env:property> -->
-							<env:property name="position" dynamic="true">new Vector2Double($object.posix, $object.posiy)</env:property>
+							<env:property name="position">new Vector2Double(0.2, 0.7)</env:property>
 						</env:object>
-						<env:object type="firebrigade" number="3">
+						<env:object type="firebrigade" number="4">
 <!-- 							<env:property name="position" dynamic="true" >new Vector2Double($args.firePositionx, $args.firePositiony)</env:property> -->
-							<env:property name="position" dynamic="true" >new Vector2Double($object.posix, $object.posiy)</env:property>
+							<env:property name="position">new Vector2Double(0.2, 0.7)</env:property>
 						</env:object>
 						
 						<!-- Hospital with 5 ambulances -->
 						<env:object type="hospital">
-							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
+							<env:property name="position">new Vector2Double(0.25, 0.25)</env:property>
 						</env:object>
-						<env:object type="ambulance" number="5">
-							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
+						<env:object type="ambulance" number="7">
+							<env:property name="position">new Vector2Double(0.25, 0.25)</env:property>
 						</env:object>
 						
-						<!-- Hospital with 5 ambulances -->
+<!-- 						Hospital with 5 ambulances -->
 						<env:object type="hospital" >
-							<env:property name="position">new Vector2Double(0.7, 0.7)</env:property>
+							<env:property name="position" dynamic="true" >new Vector2Double($object.posix, $object.posiy)</env:property>
 						</env:object>
-						<env:object type="ambulance" number="5">
-							<env:property name="position">new Vector2Double(0.7, 0.7)</env:property>
+						<env:object type="ambulance" number="4">
+							<env:property name="position" dynamic="true" >new Vector2Double($object.posix, $object.posiy)</env:property>
 						</env:object>
 						
 					</env:objects>
@@ -279,57 +284,6 @@
 			</components>
  		</configuration>
 
-		<configuration name="No Evaluation">
-			<extensions>
-				<env:envspace name="my2dspace" type="2dspace">
-					<env:objects>
-						<!-- Firestation with 3 brigades -->
-						<env:object type="firestation">
-							<env:property name="position">new Vector2Double(0.8, 0.4)</env:property>
-						</env:object>
-						<env:object type="firebrigade" number="3">
-							<env:property name="position">new Vector2Double(0.8, 0.4)</env:property>
-						</env:object>
-						
-						<!-- Firestation with 3 brigades -->
-						<env:object type="firestation">
-							<env:property name="position">new Vector2Double(0.2, 0.7)</env:property>
-						</env:object>
-						<env:object type="firebrigade" number="3">
-							<env:property name="position">new Vector2Double(0.2, 0.7)</env:property>
-						</env:object>
-						
-						<!-- Hospital with 5 ambulances -->
-						<env:object type="hospital">
-							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
-						</env:object>
-						<env:object type="ambulance" number="5">
-							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
-						</env:object>
-						
-						<!-- Hospital with 5 ambulances -->
-						<env:object type="hospital" >
-							<env:property name="position">new Vector2Double(0.7, 0.7)</env:property>
-						</env:object>
-						<env:object type="ambulance" number="5">
-							<env:property name="position">new Vector2Double(0.7, 0.7)</env:property>
-						</env:object>
-						
-					</env:objects>
-
-					<env:processes>
-						<env:process type="create"/>
-					</env:processes>
-					
-					<env:observers>
-						<env:observer name="DisasterManagement" dataview="view_all" perspective="icons"/>
-					</env:observers>
-	 			</env:envspace>
-			</extensions>
-			<components>
-				<component type="Commander"/>
-			</components>
- 		</configuration>
 	</configurations>
 
 </applicationtype>

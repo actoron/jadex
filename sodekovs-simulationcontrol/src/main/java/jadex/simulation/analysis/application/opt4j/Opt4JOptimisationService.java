@@ -7,12 +7,12 @@ import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.AExperimentBatch;
 import jadex.simulation.analysis.common.data.IAExperiment;
 import jadex.simulation.analysis.common.data.IAExperimentBatch;
+import jadex.simulation.analysis.common.data.optimisation.IAObjectiveFunction;
 import jadex.simulation.analysis.common.data.parameter.ABasicParameter;
 import jadex.simulation.analysis.common.data.parameter.AParameterEnsemble;
 import jadex.simulation.analysis.common.data.parameter.IAParameter;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
 import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
-import jadex.simulation.analysis.service.continuative.optimisation.IAObjectiveFunction;
 import jadex.simulation.analysis.service.continuative.optimisation.IAOptimisationService;
 
 import java.util.ArrayList;
@@ -122,7 +122,7 @@ public class Opt4JOptimisationService extends ABasicAnalysisSessionService imple
 				Individual best = archive.iterator().next();
 				PhenotypeWrapper<Map<String, Double>> pheno = (PhenotypeWrapper<Map<String, Double>>) best.getPhenotype();
 				
-				IAParameterEnsemble result = (IAParameterEnsemble) ((IAExperiment) state.get("baseExperiment")).getInputParameters().clonen();
+				IAParameterEnsemble result = (IAParameterEnsemble) ((IAExperiment) state.get("baseExperiment")).getConfigParameters().clonen();
 
 				Iterator it = pheno.get().values().iterator();
 				for (int j = 0; j < 2; j++)

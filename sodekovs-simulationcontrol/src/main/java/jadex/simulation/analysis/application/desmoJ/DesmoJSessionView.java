@@ -8,16 +8,24 @@ import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisS
 import jadex.simulation.analysis.common.superClasses.service.view.session.IASessionView;
 import jadex.simulation.analysis.common.superClasses.service.view.session.SessionProperties;
 
+import java.awt.GridBagLayout;
 import java.util.UUID;
 
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
+/**
+ * Textview of DesmoJ
+ * @author 5Haubeck
+ *
+ */
 public class DesmoJSessionView extends JTextArea implements IASessionView
 {
 	protected IAnalysisSessionService service;
 	private SessionProperties prop = null;
-//	private JTextArea comp = new JTextArea();
+	private JTextArea component = new JTextArea();
 	
 	public DesmoJSessionView( IAnalysisSessionService service, final UUID id, final IAParameterEnsemble config)
 	{
@@ -27,13 +35,18 @@ public class DesmoJSessionView extends JTextArea implements IASessionView
 
 	}
 	
+	/**
+	 * Add the desmoJ Test to TextArea
+	 * @param text the text to add
+	 * @return null
+	 */
 	public IFuture addText(final String text)
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				append(text);
+				component.append(text);
 			}
 		});
 		return new Future(null);
@@ -51,6 +64,9 @@ public class DesmoJSessionView extends JTextArea implements IASessionView
 		return prop ;
 	}
 	
-
-
+	@Override
+	public JComponent getComponent()
+	{
+		return component;
+	}
 }

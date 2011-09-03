@@ -14,8 +14,8 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.simulation.analysis.common.data.IAExperiment;
 import jadex.simulation.analysis.common.data.factories.AExperimentFactory;
 import jadex.simulation.analysis.common.data.parameter.IAParameter;
+import jadex.simulation.analysis.common.data.simulation.Modeltype;
 import jadex.simulation.analysis.common.util.controlComponentJadexPanel.ComponentServiceViewerPanel;
-import jadex.simulation.analysis.service.simulation.Modeltype;
 import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
 
 @Description("Agent offer IAExecuteExperimentsService")
@@ -37,7 +37,7 @@ public class JadexAgent extends MicroAgent
 			public void resultAvailable(Object result)
 			{
 				IAExperiment exp = (IAExperiment) result;
-				for (IAParameter para : exp.getOutputParameters().getParameters().values())
+				for (IAParameter para : exp.getResultParameters().getParameters().values())
 				{
 					System.out.println(para.getName() + "==" + para.getValue());
 				}

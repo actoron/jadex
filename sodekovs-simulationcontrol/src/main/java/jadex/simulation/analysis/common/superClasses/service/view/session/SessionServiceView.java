@@ -13,6 +13,11 @@ import java.util.UUID;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
+/**
+ * A Tab for a SessionSerivceView
+ * @author 5Haubeck
+ *
+ */
 public class SessionServiceView extends DefaultServiceView
 {
 	IAnalysisSessionService sservice;

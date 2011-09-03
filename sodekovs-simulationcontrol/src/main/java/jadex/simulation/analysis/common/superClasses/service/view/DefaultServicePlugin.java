@@ -10,7 +10,7 @@ import jadex.tools.generic.AbstractServicePlugin;
 import javax.swing.Icon;
 
 /**
- *  Used to show a service view
+ * Plugin for Jadex COmponentviwer
  */
 public abstract class DefaultServicePlugin extends AbstractServicePlugin
 {

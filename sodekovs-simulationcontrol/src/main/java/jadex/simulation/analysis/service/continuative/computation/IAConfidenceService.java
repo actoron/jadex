@@ -1,7 +1,7 @@
 package jadex.simulation.analysis.service.continuative.computation;
 
 import jadex.commons.future.IFuture;
-import jadex.simulation.analysis.common.data.parameter.IAMultiValueParameter;
+import jadex.simulation.analysis.common.data.parameter.IASummaryParameter;
 import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisSessionService;
 
 /**
@@ -20,7 +20,7 @@ public interface IAConfidenceService extends IAnalysisSessionService
 	 *            probability to test with
 	 * @return probability value of confidence interval
 	 */
-	public IFuture computeTTest(IAMultiValueParameter parameter, Double probability);
+	public IFuture computeTTest(IASummaryParameter parameter, Double probability);
 
 	/**
 	 * Tests, if alpha <= probability value of confidence interval (computeTTest())
@@ -33,5 +33,5 @@ public interface IAConfidenceService extends IAnalysisSessionService
 	 *            probability to test with
 	 * @return probability value of confidence interval
 	 */
-	public IFuture testTTest(IAMultiValueParameter parameters, Double alpha, Double probability);
+	public IFuture testTTest(IASummaryParameter parameters, Double alpha, Double probability);
 }

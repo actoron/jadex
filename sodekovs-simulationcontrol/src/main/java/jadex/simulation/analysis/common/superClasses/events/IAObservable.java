@@ -1,7 +1,11 @@
 package jadex.simulation.analysis.common.superClasses.events;
 
 
-
+/**
+ * A Class with this Interface can be observed
+ * @author 5Haubeck
+ *
+ */
 public interface IAObservable
 {
 	/**

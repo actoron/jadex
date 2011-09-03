@@ -8,6 +8,11 @@ import jadex.simulation.analysis.common.superClasses.events.IAListener;
 import jadex.simulation.analysis.common.superClasses.events.IAObservable;
 import jadex.simulation.analysis.common.superClasses.events.task.ATaskEvent;
 
+/**
+ * A task extended for analysis functions
+ * @author 5Haubeck
+ *
+ */
 public interface IATask extends ITask, IAObservable
 {
 	public Object getMutex();

@@ -4,7 +4,7 @@ import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.IAExperiment;
 import jadex.simulation.analysis.common.data.IAExperimentBatch;
 import jadex.simulation.analysis.common.data.IAModel;
-import jadex.simulation.analysis.common.data.IAModelHypothesis;
+import jadex.simulation.analysis.common.data.validation.IAModelHypothesis;
 
 /**
  * Service to define experiments an evaluate hypothesis

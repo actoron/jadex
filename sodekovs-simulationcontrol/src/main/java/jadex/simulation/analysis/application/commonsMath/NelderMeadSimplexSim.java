@@ -7,6 +7,11 @@ import org.apache.commons.math.exception.MathUserException;
 import org.apache.commons.math.optimization.RealPointValuePair;
 import org.apache.commons.math.optimization.direct.NelderMeadSimplex;
 
+/**
+ * Extended NelderSimplex for Simulation
+ * @author 5Haubeck
+ *
+ */
 public class NelderMeadSimplexSim extends NelderMeadSimplex
 {
 	/** Reflection coefficient. */

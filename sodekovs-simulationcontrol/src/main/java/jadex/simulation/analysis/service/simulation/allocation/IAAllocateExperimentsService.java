@@ -14,15 +14,6 @@ import java.util.UUID;
  */
 public interface IAAllocateExperimentsService extends IAnalysisSessionService
 {
-	/**
-	 * Set the strategy to allocate
-	 * 
-	 * @param strategy
-	 *            strategy to allocate experiments
-	 * @param session
-	 *            if any, already opened session
-	 */
-	public void setStrategy(UUID session, IAllocationStrategy strategy);
 
 	/**
 	 * Allocate experiments with strategy

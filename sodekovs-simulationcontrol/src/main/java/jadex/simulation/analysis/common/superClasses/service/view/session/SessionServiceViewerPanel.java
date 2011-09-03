@@ -5,6 +5,11 @@ import jadex.simulation.analysis.common.superClasses.service.view.DefaultService
 
 import javax.swing.JComponent;
 
+/**
+ * Service Panel for Jadex componentviewer
+ * @author 5Haubeck
+ *
+ */
 public class SessionServiceViewerPanel extends DefaultServiceViewerPanel
 {
 	@Override

@@ -4,6 +4,11 @@ import jadex.simulation.analysis.common.superClasses.events.AEvent;
 import jadex.simulation.analysis.common.superClasses.events.IAObservable;
 import jadex.simulation.analysis.common.util.AConstants;
 
+/**
+ * A event, which occur in a dataobject
+ * @author 5Haubeck
+ *
+ */
 public class ADataEvent extends AEvent
 {
 	protected Object newValue; 
@@ -21,6 +26,10 @@ public class ADataEvent extends AEvent
     	
     }
     
+    /**
+     * the value, which was set in the dataobjecz
+     * @return the object
+     */
     public Object getValue()
 	{
 		return newValue;

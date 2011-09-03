@@ -16,11 +16,11 @@ import jadex.simulation.analysis.common.data.AExperiment;
 import jadex.simulation.analysis.common.data.AExperimentBatch;
 import jadex.simulation.analysis.common.data.IAExperiment;
 import jadex.simulation.analysis.common.data.factories.AModelFactory;
+import jadex.simulation.analysis.common.data.optimisation.IAObjectiveFunction;
 import jadex.simulation.analysis.common.data.parameter.ABasicParameter;
 import jadex.simulation.analysis.common.data.parameter.AParameterEnsemble;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
 import jadex.simulation.analysis.common.util.controlComponentJadexPanel.ComponentServiceViewerPanel;
-import jadex.simulation.analysis.service.continuative.optimisation.IAObjectiveFunction;
 import jadex.simulation.analysis.service.continuative.optimisation.IAOptimisationService;
 
 import java.util.UUID;
@@ -84,9 +84,9 @@ public class OptJTestAgent extends MicroAgent
 		{
 			for (IAExperiment experiment : batch.getExperiments().values())
 			{
-				experiment.getOutputParameter("out1").setValue(new Double(2));
-				experiment.getOutputParameter("out2").setValue(new Double(1));
-				experiment.getOutputParameter("out3").setValue(new Double(3));
+				experiment.getResultParameter("out1").setValue(new Double(2));
+				experiment.getResultParameter("out2").setValue(new Double(1));
+				experiment.getResultParameter("out3").setValue(new Double(3));
 			}
 			batch = (AExperimentBatch) service.nextSolutions(session, batch).get(new ThreadSuspendable(this));
 			System.out.println(batch);

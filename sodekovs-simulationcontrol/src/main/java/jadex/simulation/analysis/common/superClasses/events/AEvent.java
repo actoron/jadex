@@ -4,6 +4,11 @@ import jadex.simulation.analysis.common.util.AConstants;
 
 import java.util.EventObject;
 
+/**
+ * Basic Event Implementation
+ * @author 5Haubeck
+ *
+ */
 public class AEvent extends EventObject implements IAEvent
 {
 	private Object mutex = new Object();

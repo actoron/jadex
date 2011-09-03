@@ -7,10 +7,10 @@ import jadex.simulation.analysis.common.data.IAExperiment;
 import jadex.simulation.analysis.common.data.parameter.AParameterEnsemble;
 import jadex.simulation.analysis.common.data.parameter.IAParameter;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
+import jadex.simulation.analysis.common.data.simulation.Modeltype;
 import jadex.simulation.analysis.common.superClasses.events.service.AServiceEvent;
 import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
 import jadex.simulation.analysis.common.util.AConstants;
-import jadex.simulation.analysis.service.simulation.Modeltype;
 import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
 
 import java.io.File;
@@ -74,7 +74,7 @@ public class DesmoJExecuteExperimentsService extends ABasicAnalysisSessionServic
 		{
 			e1.printStackTrace();
 		}
-		IAParameterEnsemble input = exp.getInputParameters();
+		IAParameterEnsemble input = exp.getConfigParameters();
 		Map<String, Field> fieldSet = new HashMap<String, Field>();
 		for (Map.Entry<String, IAParameter> para : input.getParameters().entrySet())
 		{
@@ -139,7 +139,7 @@ public class DesmoJExecuteExperimentsService extends ABasicAnalysisSessionServic
 				String[] results = report.createReporter().getEntries();
 				for (int i = 0; i < headings.length; i++)
 				{
-					for (Map.Entry<String, IAParameter> para : exp.getOutputParameters().getParameters().entrySet())
+					for (Map.Entry<String, IAParameter> para : exp.getResultParameters().getParameters().entrySet())
 					{
 						if (headings[i].equals(para.getKey()))
 						{

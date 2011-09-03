@@ -9,12 +9,20 @@ import jadex.simulation.analysis.common.superClasses.service.view.session.Sessio
 import java.awt.GridBagLayout;
 import java.util.UUID;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+/**
+ * View of the JOpt Service
+ * @author 5Haubeck
+ *
+ */
 public class OptSessionView extends JPanel implements IASessionView
 {
+	//not integrated yet
 	protected IAnalysisSessionService service;
 	private SessionProperties prop = null;
+	private JComponent component = new JPanel();
 	
 	public OptSessionView(IAnalysisSessionService service, final UUID id, final IAParameterEnsemble config)
 	{
@@ -33,6 +41,12 @@ public class OptSessionView extends JPanel implements IASessionView
 	public SessionProperties getSessionProperties()
 	{
 		return prop;
+	}
+
+	@Override
+	public JComponent getComponent()
+	{
+		return component;
 	}
 
 }

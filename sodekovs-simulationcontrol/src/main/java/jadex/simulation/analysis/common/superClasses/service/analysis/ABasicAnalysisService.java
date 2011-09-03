@@ -20,6 +20,11 @@ import java.util.Set;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+/**
+ * Basis Implementation for a Analysis Service
+ * @author 5Haubeck
+ *
+ */
 public class ABasicAnalysisService extends BasicService implements IAnalysisService
 {
 	protected Object mutex = new Object();

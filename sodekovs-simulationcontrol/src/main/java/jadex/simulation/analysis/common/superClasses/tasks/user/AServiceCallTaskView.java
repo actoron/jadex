@@ -8,6 +8,11 @@ import java.awt.GridBagConstraints;
 
 import javax.swing.JComponent;
 
+/**
+ * A Service which can use a service
+ * @author 5Haubeck
+ *
+ */
 public class AServiceCallTaskView extends ATaskView implements IATaskView
 {
 	public AServiceCallTaskView(IATask taskObject)

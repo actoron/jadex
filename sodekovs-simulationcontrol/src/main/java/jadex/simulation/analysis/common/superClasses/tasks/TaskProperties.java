@@ -7,6 +7,11 @@ import jadex.commons.gui.PropertiesPanel;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
 import jadex.simulation.analysis.common.util.AConstants;
 
+/**
+ * Properties for a analysis Task. See Jadex PropertiesPanel
+ * @author 5Haubeck
+ *
+ */
 public class TaskProperties extends PropertiesPanel
 {
 	public TaskProperties()

@@ -13,6 +13,11 @@ import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+/**
+ * Basic View for a analysis Task
+ * @author 5Haubeck
+ *
+ */
 public class ATaskView implements IATaskView
 {
 	protected JComponent component;

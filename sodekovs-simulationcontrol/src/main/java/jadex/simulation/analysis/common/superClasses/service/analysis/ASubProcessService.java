@@ -24,11 +24,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Basis Implementation for a Subprocess
+ * @author 5Haubeck
+ *
+ */
 public class ASubProcessService extends ABasicAnalysisSessionService
 {
 	protected Map<UUID, IExternalAccess> sessionValues;
 	
-	//damit nich tSystem.gc
+	//damit nicht Garbage collected?
 	protected Set<ASubProcessView> views = new HashSet<ASubProcessView>();
 
 	public ASubProcessService(IExternalAccess access, Class serviceInterface)

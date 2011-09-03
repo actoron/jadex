@@ -14,12 +14,15 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.UUID;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 public class ADataSessionView extends JPanel implements IASessionView
 {
 	protected IAnalysisSessionService service;
 	private SessionProperties prop = null;
+	private JComponent component = new JPanel(new GridBagLayout());
 
 	public ADataSessionView( IAnalysisSessionService service, final UUID id, final IAParameterEnsemble config)
 	{
@@ -32,19 +35,18 @@ public class ADataSessionView extends JPanel implements IASessionView
 	public IFuture startGUI(final IADataObject dataObj)
 	{
 		final Future ret = new Future(dataObj);
-//		SwingUtilities.invokeLater(new Runnable()
-//		{
-//			public void run()
-//			{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
 				final Insets insets = new Insets(1, 1, 1, 1);
-//				setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Service: "+ service.getServiceIdentifier().getServiceName() ));
 				JPanel basicPanel = new JPanel(new GridBagLayout());
 
 				basicPanel.add(dataObj.getView().getComponent(), new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 				
-				add(basicPanel, new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
-//			}
-//		});
+				component.add(basicPanel, new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
+			}
+		});
 		return ret;
 	}
 
@@ -58,6 +60,12 @@ public class ADataSessionView extends JPanel implements IASessionView
 	public SessionProperties getSessionProperties()
 	{
 		return prop ;
+	}
+	
+	@Override
+	public JComponent getComponent()
+	{
+		return component ;
 	}
 	
 

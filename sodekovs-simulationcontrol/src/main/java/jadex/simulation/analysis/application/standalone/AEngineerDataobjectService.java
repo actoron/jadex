@@ -9,10 +9,10 @@ import jadex.simulation.analysis.common.data.IAModel;
 import jadex.simulation.analysis.common.data.factories.AExperimentFactory;
 import jadex.simulation.analysis.common.data.factories.AModelFactory;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
+import jadex.simulation.analysis.common.data.simulation.Modeltype;
 import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
 import jadex.simulation.analysis.common.superClasses.service.view.session.IASessionView;
 import jadex.simulation.analysis.service.dataBased.engineering.IAEngineerDataobjectService;
-import jadex.simulation.analysis.service.simulation.Modeltype;
 
 import java.util.UUID;
 
@@ -22,19 +22,6 @@ public class AEngineerDataobjectService extends ABasicAnalysisSessionService imp
 	public AEngineerDataobjectService(IExternalAccess instance)
 	{
 		super(instance, IAEngineerDataobjectService.class, true);
-	}
-
-	@Override
-	public IFuture engineerGuiDataObject(UUID sessionId, ADataObject dataObject)
-	{
-		IFuture res = new Future();
-		
-//		IAEngineerDataobjectService service = (IAEngineerDataobjectService) SServiceProvider.getServices(instance.getServiceProvider(), IAEngineerDataobjectService.class,  RequiredServiceInfo.SCOPE_GLOBAL).get(new ThreadSuspendable(this));
-		dataObject.setEditable(true);
-		IADataView view =dataObject.getView();
-
-		sessionViews.put(sessionId, (IASessionView) view.getComponent());
-		return res;
 	}
 
 	@Override

@@ -20,6 +20,11 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+/**
+ * A tasks with a user interaction. OK-CANCEL Option
+ * @author 5Haubeck
+ *
+ */
 public class AServiceCallUserTask2OptionView extends ATaskView implements IATaskView
 {
 	protected JTextField paraTypeValue;

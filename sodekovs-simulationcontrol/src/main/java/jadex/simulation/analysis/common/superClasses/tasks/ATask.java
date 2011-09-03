@@ -14,6 +14,11 @@ import jadex.simulation.analysis.common.util.AConstants;
 
 import java.util.UUID;
 
+/**
+ * Basic Task Implementation
+ * @author 5Haubeck
+ *
+ */
 public class ATask extends AObservable implements IATask
 {
 	protected Integer taskNumber;

@@ -7,6 +7,11 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 
+/**
+ * A Task View for analysis tasks
+ * @author 5Haubeck
+ *
+ */
 public interface IATaskView extends IAListener
 {
 	/**

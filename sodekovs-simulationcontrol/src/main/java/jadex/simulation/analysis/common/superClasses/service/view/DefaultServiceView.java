@@ -12,6 +12,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
+/**
+ * A default view for Services
+ * @author 5Haubeck
+ *
+ */
 public class DefaultServiceView extends JTabbedPane implements IAListener
 {
 	// -------- attributes --------

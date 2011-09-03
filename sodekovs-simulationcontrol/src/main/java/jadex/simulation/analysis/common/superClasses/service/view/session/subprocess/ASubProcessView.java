@@ -197,4 +197,10 @@ public class ASubProcessView extends JDesktopPane implements IASessionView, IALi
 		return prop;
 	}
 
+	@Override
+	public JComponent getComponent()
+	{
+		return me;
+	}
+
 }

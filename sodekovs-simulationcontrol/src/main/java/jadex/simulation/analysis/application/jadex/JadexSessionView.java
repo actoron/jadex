@@ -8,12 +8,16 @@ import jadex.simulation.analysis.common.superClasses.service.view.session.Sessio
 
 import java.util.UUID;
 
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 public class JadexSessionView extends JTextArea implements IASessionView
 {
+	//not integraded yet
 	protected IAnalysisSessionService service;
 	private SessionProperties prop = null;
+	private JComponent component = new JPanel();
 	
 	public JadexSessionView( IAnalysisSessionService service, final UUID id, final IAParameterEnsemble config)
 	{
@@ -34,6 +38,11 @@ public class JadexSessionView extends JTextArea implements IASessionView
 		return prop ;
 	}
 	
+	@Override
+	public JComponent getComponent()
+	{
+		return component;
+	}
 
 
 }

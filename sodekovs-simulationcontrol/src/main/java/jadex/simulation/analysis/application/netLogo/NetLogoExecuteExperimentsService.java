@@ -6,8 +6,8 @@ import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.IAExperiment;
 import jadex.simulation.analysis.common.data.parameter.IAParameter;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
+import jadex.simulation.analysis.common.data.simulation.Modeltype;
 import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
-import jadex.simulation.analysis.service.simulation.Modeltype;
 import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
 
 import java.io.File;
@@ -22,11 +22,11 @@ import org.nlogo.headless.HeadlessWorkspace;
 import org.nlogo.lite.InterfaceComponent;
 
 /**
- * Implementation of a NetLogo service for (single) experiments.
+ * Implementation of a NetLogo service for a experiment object.
  */
 public class NetLogoExecuteExperimentsService extends ABasicAnalysisSessionService implements IAExecuteExperimentsService {
 
-	JTextArea compLite = new JTextArea();
+	
 	
 	/**
 	 * Create a new netLogo Simulation Service
@@ -54,10 +54,7 @@ public class NetLogoExecuteExperimentsService extends ABasicAnalysisSessionServi
 
 			final InterfaceComponent comp = new InterfaceComponent(frame);
 			frame.add(comp);
-				
-//			(JFrame) SwingUtilities.getRoot(view)
-//			((AServiceCallTaskView) taskview).addServiceGUI(comp, new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
-//			view.showFull(comp);
+			((NetLogoSessionView)sessionViews.get(session)).showFull(comp);
 
 			try 
 	        {
@@ -90,7 +87,7 @@ public class NetLogoExecuteExperimentsService extends ABasicAnalysisSessionServi
 				comp.command("setup");
 		        comp.command("go");
 		        for (IAParameter parameter : exp.getModel().getOutputParameters().getParameters().values()) {
-		        	exp.getOutputParameter(parameter.getName()).setValue(comp.report(parameter.getName()));
+		        	exp.getResultParameter(parameter.getName()).setValue(comp.report(parameter.getName()));
 				}
 		        
 				rep++;
@@ -102,6 +99,7 @@ public class NetLogoExecuteExperimentsService extends ABasicAnalysisSessionServi
         	}
 		} else
 		{
+			JTextArea compLite = new JTextArea();
 			((NetLogoSessionView)sessionViews.get(session)).showLite(compLite);
 			HeadlessWorkspace workspace =
 				HeadlessWorkspace.newInstance();
@@ -126,7 +124,7 @@ public class NetLogoExecuteExperimentsService extends ABasicAnalysisSessionServi
 					compLite.append("Start " +  exp.getModel().getName() + "\n");
 					workspace.command("setup");
 					workspace.command("go");
-			        exp.getOutputParameter("ticks").setValue(workspace.report("ticks"));
+			        exp.getResultParameter("ticks").setValue(workspace.report("ticks"));
 					compLite.append("End " +  exp.getModel().getName() + "\n");
 					rep++;
 				}

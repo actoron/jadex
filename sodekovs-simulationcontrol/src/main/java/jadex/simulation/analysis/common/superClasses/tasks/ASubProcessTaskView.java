@@ -5,6 +5,11 @@ import jadex.simulation.analysis.common.superClasses.service.view.session.subpro
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 
+/**
+ * View for a SubProcess Task
+ * @author 5Haubeck
+ *
+ */
 public class ASubProcessTaskView extends ATaskView implements IATaskView
 {
 	public ASubProcessTaskView(IATask taskObject)

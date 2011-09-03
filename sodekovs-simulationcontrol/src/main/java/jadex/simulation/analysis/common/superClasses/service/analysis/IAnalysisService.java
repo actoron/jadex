@@ -4,6 +4,11 @@ import jadex.bridge.service.IInternalService;
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.superClasses.events.IAObservable;
 
+/**
+ * A Analysis task. Has a View and Workload
+ * @author 5Haubeck
+ *
+ */
 public interface IAnalysisService extends IInternalService, IAObservable
 {
 	/**

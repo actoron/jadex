@@ -1,5 +1,7 @@
 package jadex.simulation.analysis.service.dataBased.persist;
 
+import java.util.Set;
+
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.IADataObject;
 import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisService;
@@ -27,4 +29,10 @@ public interface IASaveDataobjectService extends IAnalysisService
 	 * @return IADataObject loaded object reference
 	 */
 	public IFuture loadObject(String name);
+	
+	/**
+	 * Returns all names of saved Object
+	 * @return Set<String> of saved Names
+	 */
+	public IFuture getObjects();
 }

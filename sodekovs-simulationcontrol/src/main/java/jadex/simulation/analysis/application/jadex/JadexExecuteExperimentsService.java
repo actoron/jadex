@@ -11,8 +11,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.simulation.analysis.common.data.IAExperiment;
+import jadex.simulation.analysis.common.data.simulation.Modeltype;
 import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
-import jadex.simulation.analysis.service.simulation.Modeltype;
 import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
 
 import java.util.HashSet;
@@ -60,9 +60,9 @@ public class JadexExecuteExperimentsService extends ABasicAnalysisSessionService
 				// {
 				// exp.getOutputParameter(outputName).setValue(resMap.get(outputName));
 				// }
-				exp.getOutputParameter("Chemicals").setValue(resMap.get("Chemicals"));
-				exp.getOutputParameter("Fire").setValue(resMap.get("Fire"));
-				exp.getOutputParameter("Victims").setValue(resMap.get("Victims"));
+				exp.getResultParameter("Chemicals").setValue(resMap.get("Chemicals"));
+				exp.getResultParameter("Fire").setValue(resMap.get("Fire"));
+				exp.getResultParameter("Victims").setValue(resMap.get("Victims"));
 				res.setResult(exp);
 			}
 
@@ -115,9 +115,9 @@ public class JadexExecuteExperimentsService extends ABasicAnalysisSessionService
 			public void resultAvailable(Object result)
 			{
 				Map resMap = (Map) result;
-				exp.getOutputParameter("Chemicals").setValue(resMap.get("Chemicals"));
-				exp.getOutputParameter("Fire").setValue(resMap.get("Fire"));
-				exp.getOutputParameter("Victims").setValue(resMap.get("Victims"));
+				exp.getResultParameter("Chemicals").setValue(resMap.get("Chemicals"));
+				exp.getResultParameter("Fire").setValue(resMap.get("Fire"));
+				exp.getResultParameter("Victims").setValue(resMap.get("Victims"));
 			}
 
 			@Override

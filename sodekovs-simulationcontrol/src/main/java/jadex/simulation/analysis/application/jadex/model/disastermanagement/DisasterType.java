@@ -19,10 +19,10 @@ public class DisasterType
 	/** The disaster types. */
 	public static final DisasterType[]	DISASTER_TYPES	= new DisasterType[]
 	{
-		new DisasterType("Car Crash", 1, 0.5,  new int[]{15, 25}, 0.15, 0.05, 0), 
-		new DisasterType("Explosion", 0.3, 0.5,  new int[]{25, 40}, 0.25, 0.8, 0.1), 
-		new DisasterType("Chemical Leakage", 0.3, 0.5,  new int[]{25, 40}, 0.25, 0, 0.25), 
-		new DisasterType("Earthquake", 0.05, 0.5,  new int[]{100, 150}, 0.2, 0.05, 0.10) 
+		new DisasterType("Car Crash", 1, 0,  new int[]{15, 16}, 0.1, 0.1, 0), 
+		new DisasterType("Explosion", 0.3, 0,  new int[]{25, 26}, 0.10, 0.65, 0.1), 
+		new DisasterType("Chemical Leakage", 0.3, 0,  new int[]{40, 41}, 0.1, 0, 0.5), 
+		new DisasterType("Earthquake", 0.05, 0,  new int[]{80, 81}, 0.1, 0.1, 0.10) 
 	};
 	
 	/** The random number generator. */
@@ -135,42 +135,48 @@ public class DisasterType
 	{
 		// Select disaster based on occurrence probability.
 		int	index	= -1;
+		Vector2Double vec = null;
 		switch (event)
 		{
-		case 1:	index = 2;	break;
-		case 2:	index = 0;	break;
-		case 3:	index = 1;	break;
-		case 4:	index = 0;	break;
-		case 5:	index = 3;	break;
-		case 6:	index = 0;	break;
-		case 7:	index = 1;	break;
-		case 8:	index = 2;	break;
-		case 9:	index = 0;	break;
-		case 10: index = 1;	break;
-		case 11: index = 2;	break;
-		case 12: index = 0;	break;
-		case 13: index = 1;	break;
-		case 14: index = 0;	break;
-		case 15: index = 0;	break;
-		case 16: index = 3;	break;
-		case 17: index = 1;	break;
-		case 18: index = 0;	break;
-		case 19: index = 2;	break;
-		case 20: index = 0;	event = 0;break;
+		case 1:	index = 2;	vec = new Vector2Double(0.5,0.5); break;
+		case 2:	index = 0;	vec = new Vector2Double(0.3,0.5);break;
+		case 3:	index = 1;	vec = new Vector2Double(0.5,0.75);break;
+		case 4:	index = 3;	vec = new Vector2Double(0.6,0.65);break;
+		case 5:	index = 0;	vec = new Vector2Double(0.8,0.7);break;
+		case 6:	index = 2;	vec = new Vector2Double(0.6,0.4);break;
+		case 7:	index = 1;	vec = new Vector2Double(0.3,0.4);break;
+		case 8:	index = 2;	vec = new Vector2Double(0.8,0.8);break;
+		case 9:	index = 0;	vec = new Vector2Double(0.6,0.5);break;
+		case 10: index = 1;	vec = new Vector2Double(0.75,0.4);break;
+		case 11: index = 2;	vec = new Vector2Double(0.7,0.7);break;
+		case 12: index = 2;	vec = new Vector2Double(0.5,0.85);break;
+		case 13: index = 1;	vec = new Vector2Double(0.85,0.85);break;
+		case 14: index = 2;	vec = new Vector2Double(0.5,0.75);break;
+		case 15: index = 0;	vec = new Vector2Double(0.3,0.25);break;
+		case 16: index = 3;	vec = new Vector2Double(0.6,0.6);break;
+		case 17: index = 1;	vec = new Vector2Double(0.5,0.4);break;
+		case 18: index = 0;	vec = new Vector2Double(0.6,0.25);break;
+		case 19: index = 2;	vec = new Vector2Double(0.7,0.4);break;
+		case 20: index = 2;	vec = new Vector2Double(0.85,0.85);break;
+		case 21: index = 2;	vec = new Vector2Double(0.5,0.65);break;
+		case 22: index = 1;	vec = new Vector2Double(0.85,0.8);break;
+		case 23: index = 0;	vec = new Vector2Double(0.4,0.8);break;
+		case 24: index = 2;	vec = new Vector2Double(0.3,0.7);break;
+		case 25: index = 0;	vec = new Vector2Double(0.5,0.5); event = 0;break;
 		}
 		event++;
 		
 		Map	ret	= new HashMap();
 		ret.put("type", DISASTER_TYPES[index].getName());
-		ret.put("severe", new Boolean(random.nextDouble()<DISASTER_TYPES[index].getSevere()));
+		ret.put("severe", new Boolean(false));
 		int[]	range	= DISASTER_TYPES[index].getSize();
-		int	size	= range[0]+random.nextInt(range[1]-range[0]);
+		int	size	= range[0];
 		ret.put("size", new Integer(size));
 		
-		// Use random +/- 12,5% for victims/fire/chemicals value
-		ret.put("victims", new Integer(DISASTER_TYPES[index].getVictims()>0 ? (int)((0.875+random.nextDouble()/4)*DISASTER_TYPES[index].getVictims()*size): 0));
-		ret.put("fire", new Integer(DISASTER_TYPES[index].getFire()>0 ? (int)((0.875+random.nextDouble()/4)*DISASTER_TYPES[index].getFire()*size): 0));
-		ret.put("chemicals", new Integer(DISASTER_TYPES[index].getChemicals()>0 ? (int)((0.875+random.nextDouble()/4)*DISASTER_TYPES[index].getChemicals()*size): 0));
+		// victims/fire/chemicals value
+		ret.put("victims", new Integer(DISASTER_TYPES[index].getVictims()>0 ? (int)(DISASTER_TYPES[index].getVictims()*size): 0));
+		ret.put("fire", new Integer(DISASTER_TYPES[index].getFire()>0 ? (int)(DISASTER_TYPES[index].getFire()*size): 0));
+		ret.put("chemicals", new Integer(DISASTER_TYPES[index].getChemicals()>0 ? (int)(DISASTER_TYPES[index].getChemicals()*size): 0));
 		
 		// Check for disaster without content. 
 		assert !ret.get("victims").equals(new Integer(0))
@@ -187,6 +193,7 @@ public class DisasterType
 		double	y	= random.nextDouble();
 		while(y<mapsize/2 || y+mapsize/2>1)
 			y	= random.nextDouble();
+//		ret.put("position", vec);
 		ret.put("position", new Vector2Double(x,y));
 		
 		return ret;
@@ -297,6 +304,14 @@ public class DisasterType
 	public static double get10Sample(double mean)
 	{
 		return (0.90 + (random.nextDouble()/5)) * mean;
+	}
+	
+	/**
+	 *  Get an exponential sample value.
+	 */
+	public static void reset()
+	{
+		event = 1;
 	}
 	
 }

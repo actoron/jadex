@@ -9,6 +9,7 @@ import jadex.simulation.analysis.common.data.IAExperimentBatch;
 import jadex.simulation.analysis.common.data.allocation.IAllocationStrategy;
 import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
 import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisService;
+import jadex.simulation.analysis.common.superClasses.service.view.session.IASessionView;
 import jadex.simulation.analysis.service.simulation.allocation.IAAllocateExperimentsService;
 import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
 
@@ -35,6 +36,7 @@ public class AAllocateExperimentsService extends ABasicAnalysisSessionService im
 		ADataSessionView view = (ADataSessionView) sessionViews.get(sessionId);
 		view.startGUI(experiments);
 		
+		sessionViews.put(sessionId, view);
 		Collection<IAExecuteExperimentsService> services = (Collection<IAExecuteExperimentsService>) SServiceProvider.getServices(access.getServiceProvider(), IAExecuteExperimentsService.class).get(susThread);
 		if (experiments.getAllocationStrategy() != null)
 		{
@@ -55,6 +57,4 @@ public class AAllocateExperimentsService extends ABasicAnalysisSessionService im
 		
 		return new Future(experiments);
 	}
-
-
 }

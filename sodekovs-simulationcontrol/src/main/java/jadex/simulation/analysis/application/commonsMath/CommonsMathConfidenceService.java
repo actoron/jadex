@@ -4,7 +4,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
-import jadex.simulation.analysis.common.data.parameter.IAMultiValueParameter;
+import jadex.simulation.analysis.common.data.parameter.IASummaryParameter;
 import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
 import jadex.simulation.analysis.service.continuative.computation.IAConfidenceService;
 
@@ -21,7 +21,7 @@ public class CommonsMathConfidenceService extends ABasicAnalysisSessionService i
 	}
 
 	@Override
-	public IFuture computeTTest(IAMultiValueParameter parameter, Double intervallPercent)
+	public IFuture computeTTest(IASummaryParameter parameter, Double intervallPercent)
 	{
 		if (parameter.getN() <2 )
 		{
@@ -46,7 +46,7 @@ public class CommonsMathConfidenceService extends ABasicAnalysisSessionService i
 	}
 
 	@Override
-	public IFuture testTTest(IAMultiValueParameter parameter, Double intervallPercent, Double alpha)
+	public IFuture testTTest(IASummaryParameter parameter, Double intervallPercent, Double alpha)
 	{
 		if ((Double)computeTTest(parameter,intervallPercent).get(new ThreadSuspendable(this)) >= alpha)
 		{

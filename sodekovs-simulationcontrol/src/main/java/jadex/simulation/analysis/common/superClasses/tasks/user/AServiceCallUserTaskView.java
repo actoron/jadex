@@ -16,6 +16,11 @@ import java.beans.PropertyVetoException;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 
+/**
+ * A tasks with a user interaction. OK Option
+ * @author 5Haubeck
+ *
+ */
 public class AServiceCallUserTaskView extends ATaskView implements IATaskView
 {
 	public AServiceCallUserTaskView(IATask taskObject)

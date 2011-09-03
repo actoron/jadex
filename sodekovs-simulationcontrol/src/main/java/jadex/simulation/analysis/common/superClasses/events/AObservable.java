@@ -6,6 +6,11 @@ import jadex.simulation.analysis.common.superClasses.tasks.IATaskView;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Implementation of some function to be observed
+ * @author 5Haubeck
+ *
+ */
 public class AObservable implements IAObservable
 {
 

@@ -4,6 +4,11 @@ import jadex.simulation.analysis.common.superClasses.events.AEvent;
 import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisService;
 import jadex.simulation.analysis.common.util.AConstants;
 
+/**
+ * A event, which occur in a service
+ * @author 5Haubeck
+ *
+ */
 public class AServiceEvent extends AEvent
 {
 protected Object newValue; 
@@ -20,6 +25,10 @@ protected Object newValue;
     	this.newValue = newValue;
     }
     
+    /**
+     * Gets the new value in the service
+     * @return a object
+     */
     public Object getValue()
 	{
 		return newValue;

@@ -12,10 +12,16 @@ import java.awt.Insets;
 import java.beans.PropertyVetoException;
 import java.util.UUID;
 
+import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+/**
+ * Default view for a session
+ * @author 5Haubeck
+ *
+ */
 public class ADefaultSessionView extends JDesktopPane implements IASessionView
 {
 	protected SessionProperties prop = null;
@@ -64,6 +70,12 @@ public class ADefaultSessionView extends JDesktopPane implements IASessionView
 	public SessionProperties getSessionProperties()
 	{
 		return prop;
+	}
+
+	@Override
+	public JComponent getComponent()
+	{
+		return content;
 	}
 
 }
