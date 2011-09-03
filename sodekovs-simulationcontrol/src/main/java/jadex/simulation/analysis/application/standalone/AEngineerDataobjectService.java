@@ -9,8 +9,8 @@ import jadex.simulation.analysis.common.data.IAModel;
 import jadex.simulation.analysis.common.data.factories.AExperimentFactory;
 import jadex.simulation.analysis.common.data.factories.AModelFactory;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
-import jadex.simulation.analysis.service.basic.analysis.ABasicAnalysisSessionService;
-import jadex.simulation.analysis.service.basic.view.session.IASessionView;
+import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
+import jadex.simulation.analysis.common.superClasses.service.view.session.IASessionView;
 import jadex.simulation.analysis.service.dataBased.engineering.IAEngineerDataobjectService;
 import jadex.simulation.analysis.service.simulation.Modeltype;
 

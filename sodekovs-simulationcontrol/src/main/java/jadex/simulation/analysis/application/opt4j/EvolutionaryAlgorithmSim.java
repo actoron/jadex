@@ -1,7 +1,6 @@
 package jadex.simulation.analysis.application.opt4j;
 
 import java.util.Collection;
-import java.util.HashSet;
 
 import org.opt4j.core.Archive;
 import org.opt4j.core.Individual;
@@ -50,6 +49,7 @@ public class EvolutionaryAlgorithmSim extends EvolutionaryAlgorithm
 		{
 			if (iteration == 0)
 			{
+				System.out.println("*****" + getIteration());
 //				System.out.println("ITERATION:" + iteration);
 //				System.out.println("GENERATION:" + generations);
 				selector.init(alpha + lambda);

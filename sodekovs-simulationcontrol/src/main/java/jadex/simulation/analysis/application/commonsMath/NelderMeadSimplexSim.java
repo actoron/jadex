@@ -3,7 +3,6 @@ package jadex.simulation.analysis.application.commonsMath;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.apache.commons.math.analysis.MultivariateRealFunction;
 import org.apache.commons.math.exception.MathUserException;
 import org.apache.commons.math.optimization.RealPointValuePair;
 import org.apache.commons.math.optimization.direct.NelderMeadSimplex;
@@ -33,6 +32,17 @@ public class NelderMeadSimplexSim extends NelderMeadSimplex
 			final double gamma, final double sigma)
 	{
 		super(n, sideLength);
+		this.rho = rho;
+		this.khi = khi;
+		this.gamma = gamma;
+		this.sigma = sigma;
+	}
+	
+	public NelderMeadSimplexSim(double[][] reference,
+			final double rho, final double khi,
+			final double gamma, final double sigma)
+	{
+		super(reference);
 		this.rho = rho;
 		this.khi = khi;
 		this.gamma = gamma;

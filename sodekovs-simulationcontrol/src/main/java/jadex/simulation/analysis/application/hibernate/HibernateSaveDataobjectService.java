@@ -4,7 +4,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.IADataObject;
-import jadex.simulation.analysis.service.basic.analysis.ABasicAnalysisService;
+import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisService;
 import jadex.simulation.analysis.service.dataBased.persist.IASaveDataobjectService;
 
 import java.util.Collections;

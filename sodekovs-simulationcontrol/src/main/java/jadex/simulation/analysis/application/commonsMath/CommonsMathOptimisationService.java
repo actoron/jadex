@@ -3,16 +3,14 @@ package jadex.simulation.analysis.application.commonsMath;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.simulation.analysis.common.data.AExperimentBatch;
 import jadex.simulation.analysis.common.data.IAExperiment;
 import jadex.simulation.analysis.common.data.IAExperimentBatch;
-import jadex.simulation.analysis.common.data.parameter.ABasicParameter;
 import jadex.simulation.analysis.common.data.parameter.IAParameter;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
-import jadex.simulation.analysis.service.basic.analysis.ABasicAnalysisSessionService;
-import jadex.simulation.analysis.service.continuative.optimisation.IAOptimisationService;
+import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
 import jadex.simulation.analysis.service.continuative.optimisation.IAObjectiveFunction;
+import jadex.simulation.analysis.service.continuative.optimisation.IAOptimisationService;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -32,12 +30,7 @@ import org.apache.commons.math.exception.MaxCountExceededException;
 import org.apache.commons.math.optimization.ConvergenceChecker;
 import org.apache.commons.math.optimization.RealPointValuePair;
 import org.apache.commons.math.optimization.SimpleScalarValueChecker;
-import org.apache.commons.math.optimization.direct.AbstractSimplex;
-import org.apache.commons.math.optimization.direct.NelderMeadSimplex;
-import org.apache.commons.math.util.FastMath;
 import org.apache.commons.math.util.Incrementor;
-import org.apache.commons.math.util.MathUtils;
-import org.apache.derby.impl.sql.execute.BaseExpressionActivation;
 
 public class CommonsMathOptimisationService extends ABasicAnalysisSessionService implements IAOptimisationService
 {
@@ -79,7 +72,7 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 
 			// evaluations (counts numbers of evaluations)
 			Incrementor evaluations = new Incrementor();
-			evaluations.setMaximalCount(10);
+			evaluations.setMaximalCount(20);
 			evaluations.resetCount();
 			state.put("evaluations", evaluations);
 
@@ -142,10 +135,20 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 
 			// simplex
 			double[] sSet = new double[2];
-			sSet[0] = 0.1;
-			sSet[1] = 0.1;
-			NelderMeadSimplexSim simplex = new NelderMeadSimplexSim(sSet, 1, 2, 0.5, 0.5);
-			simplex.build(start);
+			sSet[0] = 0.25;
+			sSet[1] = 0.25;
+			
+			double[][] referencesimplex = new double[3][2];
+			referencesimplex[0][0] = 0.1;
+			referencesimplex[0][1] = 0.1;
+			
+			referencesimplex[1][0] = 0.2;	
+			referencesimplex[1][1] = 0.1;
+			
+			referencesimplex[2][0] = 0.1;
+			referencesimplex[2][1] = 0.2;
+			NelderMeadSimplexSim simplex = new NelderMeadSimplexSim(referencesimplex, 1, 2, 0.5, 0.5);
+			simplex.build(sSet);
 			state.put("simplex", simplex);
 
 			sessionState.put(sess, state);
@@ -242,8 +245,8 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 					simplex.setSimplex(lastsimplex);
 					
 
-					iteration++;
-					sessionState.get(session).put("iteration", iteration);
+					
+					
 
 					System.out.println("Iteration" + iteration + ":");
 					for (int i = 0; i < lastsimplex.length; i++)
@@ -259,8 +262,12 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 
 					double[] reflected = simplex.iterate(comparator);
 					state.put("state", new Integer(1));
+					iteration++;
+					sessionState.get(session).put("iteration", iteration);
+					
 					IAExperiment experiment = setNewExperiment(startExp, reflected, mappings, evaluations.getCount());
 					newExperiments.addExperiment(experiment);
+					
 					try
 					{
 						evaluations.incrementCount();

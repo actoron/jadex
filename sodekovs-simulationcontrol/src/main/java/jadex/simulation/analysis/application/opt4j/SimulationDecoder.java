@@ -5,21 +5,21 @@ import java.util.Map;
 
 import org.opt4j.core.problem.Decoder;
 import org.opt4j.core.problem.PhenotypeWrapper;
-import org.opt4j.genotype.IntegerMapGenotype;
+import org.opt4j.genotype.DoubleMapGenotype;
 
 public class SimulationDecoder implements
-		Decoder<IntegerMapGenotype<String>, PhenotypeWrapper<Map<String, Integer>>>
+		Decoder<DoubleMapGenotype<String>, PhenotypeWrapper<Map<String, Double>>>
 {
 
 	@Override
-	public PhenotypeWrapper<Map<String, Integer>> decode(IntegerMapGenotype<String> genotype)
+	public PhenotypeWrapper<Map<String, Double>> decode(DoubleMapGenotype<String> genotype)
 	{
-		Map<String, Integer> map = new HashMap<String, Integer>();
+		Map<String, Double> map = new HashMap<String, Double>();
 		for (String key : genotype.getKeys())
 		{
 			map.put(key, genotype.getValue(key));
 		}
-		return new PhenotypeWrapper<Map<String, Integer>>(map);
+		return new PhenotypeWrapper<Map<String, Double>>(map);
 	}
 
 }

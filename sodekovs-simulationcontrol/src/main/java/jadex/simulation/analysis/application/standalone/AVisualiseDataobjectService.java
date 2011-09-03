@@ -4,11 +4,12 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.IADataObject;
+import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
 import jadex.simulation.analysis.service.dataBased.visualisation.IAVisualiseDataobjectService;
 
 import java.util.UUID;
 
-public class AVisualiseDataobjectService extends ADatabasedService implements IAVisualiseDataobjectService
+public class AVisualiseDataobjectService extends ABasicAnalysisSessionService implements IAVisualiseDataobjectService
 {
 
 	public AVisualiseDataobjectService(IExternalAccess instance)
@@ -19,14 +20,11 @@ public class AVisualiseDataobjectService extends ADatabasedService implements IA
 	@Override
 	public IFuture show(UUID sessionId, IADataObject dataObject)
 	{
-//		synchronized (mutex)
-//		{
 			if (sessionId == null) sessionId = (UUID) createSession(null).get(susThread);
 			ADataSessionView view = (ADataSessionView) sessionViews.get(sessionId);
 			view.startGUI(dataObject);
 			 sessionViews.put(sessionId,view);
 			return new Future(sessionId);
-//		}
 	}
 
 }

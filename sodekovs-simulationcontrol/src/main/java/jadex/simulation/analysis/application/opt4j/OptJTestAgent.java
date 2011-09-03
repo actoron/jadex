@@ -1,11 +1,7 @@
 package jadex.simulation.analysis.application.opt4j;
 
-import java.util.UUID;
-
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.GuiClass;
-import jadex.bridge.service.annotation.NoCopy;
-import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
@@ -23,10 +19,11 @@ import jadex.simulation.analysis.common.data.factories.AModelFactory;
 import jadex.simulation.analysis.common.data.parameter.ABasicParameter;
 import jadex.simulation.analysis.common.data.parameter.AParameterEnsemble;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
-import jadex.simulation.analysis.common.defaultViews.controlComponent.ComponentServiceViewerPanel;
+import jadex.simulation.analysis.common.util.controlComponentJadexPanel.ComponentServiceViewerPanel;
 import jadex.simulation.analysis.service.continuative.optimisation.IAObjectiveFunction;
 import jadex.simulation.analysis.service.continuative.optimisation.IAOptimisationService;
-import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
+
+import java.util.UUID;
 
 @Description("Agent offer IAOptimisationService")
  @ProvidedServices({@ProvidedService(type=IAOptimisationService.class,
@@ -34,7 +31,7 @@ import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimen
 @GuiClass(ComponentServiceViewerPanel.class)
 @Properties(
 {
-	@NameValue(name="viewerpanel.componentviewerclass", value="\"jadex.simulation.analysis.common.defaultViews.controlComponent.ControlComponentViewerPanel\"")
+	@NameValue(name="viewerpanel.componentviewerclass", value="\"jadex.simulation.analysis.common.util.controlComponentJadexPanel.ControlComponentViewerPanel\"")
 })
 public class OptJTestAgent extends MicroAgent
 {

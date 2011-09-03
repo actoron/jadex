@@ -1,10 +1,10 @@
 package jadex.simulation.analysis.application.jadex;
 
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
-import jadex.simulation.analysis.common.events.service.AServiceEvent;
-import jadex.simulation.analysis.service.basic.analysis.IAnalysisSessionService;
-import jadex.simulation.analysis.service.basic.view.session.IASessionView;
-import jadex.simulation.analysis.service.basic.view.session.SessionProperties;
+import jadex.simulation.analysis.common.superClasses.events.IAEvent;
+import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisSessionService;
+import jadex.simulation.analysis.common.superClasses.service.view.session.IASessionView;
+import jadex.simulation.analysis.common.superClasses.service.view.session.SessionProperties;
 
 import java.util.UUID;
 
@@ -23,9 +23,9 @@ public class JadexSessionView extends JTextArea implements IASessionView
 	}
 
 	@Override
-	public void serviceEventOccur(AServiceEvent event)
+	public void update(IAEvent event)
 	{
-		// omitt
+		// omit
 	}
 
 	@Override

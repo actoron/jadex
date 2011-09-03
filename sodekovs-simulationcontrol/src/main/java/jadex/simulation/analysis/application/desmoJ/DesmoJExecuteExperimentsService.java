@@ -4,13 +4,12 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.IAExperiment;
-import jadex.simulation.analysis.common.data.factories.AExperimentFactory;
 import jadex.simulation.analysis.common.data.parameter.AParameterEnsemble;
 import jadex.simulation.analysis.common.data.parameter.IAParameter;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
-import jadex.simulation.analysis.common.events.service.AServiceEvent;
+import jadex.simulation.analysis.common.superClasses.events.service.AServiceEvent;
+import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
 import jadex.simulation.analysis.common.util.AConstants;
-import jadex.simulation.analysis.service.basic.analysis.ABasicAnalysisSessionService;
 import jadex.simulation.analysis.service.simulation.Modeltype;
 import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
 
@@ -28,7 +27,7 @@ import desmoj.core.simulator.Reportable;
 import desmoj.core.simulator.TimeInstant;
 
 /**
- * Implementation of a DesmoJ service for (single) experiments.
+ * Implementation of a DesmoJ service for (single) experiment.
  */
 public class DesmoJExecuteExperimentsService extends ABasicAnalysisSessionService implements IAExecuteExperimentsService
 {
@@ -170,16 +169,5 @@ public class DesmoJExecuteExperimentsService extends ABasicAnalysisSessionServic
 		Set<Modeltype> result = new HashSet<Modeltype>();
 		result.add(Modeltype.DesmoJ);
 		return result;
-	}
-
-	public IFuture createSession(IAParameterEnsemble configuration)
-	{
-		UUID id = UUID.randomUUID();
-		if (configuration == null) configuration = new AParameterEnsemble("Session Konfiguration");
-		sessions.put(id, configuration);
-		configuration.setEditable(false);
-		sessionViews.put(id, new DesmoJSessionView(this, id, configuration));
-		serviceChanged(new AServiceEvent(this, AConstants.SERVICE_SESSION_START, id));
-		return new Future(id);
 	}
 }

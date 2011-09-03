@@ -8,6 +8,11 @@ import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 
 public class SetResultProcess extends DefaultObjectCreationProcess
 {
+	public SetResultProcess()
+	{
+		super();
+		DisasterType.reset();
+	}
 	@Override
 	public void execute(IClockService clock, IEnvironmentSpace space)
 	{
@@ -22,7 +27,7 @@ public class SetResultProcess extends DefaultObjectCreationProcess
 				comp.setResultValue("Fire", ((XYMeanChartDataConsumer)((ContinuousSpace2D)space).getDataConsumer("statistics_chart")).getMean("Fire"));
 				comp.setResultValue("Victims", ((XYMeanChartDataConsumer)((ContinuousSpace2D)space).getDataConsumer("statistics_chart")).getMean("Victims"));
 				comp.setResultValue("Chemicals", ((XYMeanChartDataConsumer)((ContinuousSpace2D)space).getDataConsumer("statistics_chart")).getMean("Chemicals"));
-				System.out.println(comp.getResults());
+//				System.out.println(comp.getResults());
 				this.lastrate = ((Number) getProperty("timerate")).doubleValue();
 			}
 		}

@@ -7,7 +7,8 @@ import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.IAExperiment;
 import jadex.simulation.analysis.common.data.IAExperimentBatch;
 import jadex.simulation.analysis.common.data.allocation.IAllocationStrategy;
-import jadex.simulation.analysis.service.basic.analysis.IAnalysisService;
+import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
+import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisService;
 import jadex.simulation.analysis.service.simulation.allocation.IAAllocateExperimentsService;
 import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
 
@@ -19,7 +20,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.UUID;
 
-public class AAllocateExperimentsService extends ADatabasedService implements IAAllocateExperimentsService
+public class AAllocateExperimentsService extends ABasicAnalysisSessionService implements IAAllocateExperimentsService
 {
 
 	public AAllocateExperimentsService(IExternalAccess access)

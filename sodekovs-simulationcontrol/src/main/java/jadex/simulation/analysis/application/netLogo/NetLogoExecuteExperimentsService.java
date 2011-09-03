@@ -4,19 +4,12 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.IAExperiment;
-import jadex.simulation.analysis.common.data.parameter.AParameterEnsemble;
 import jadex.simulation.analysis.common.data.parameter.IAParameter;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
-import jadex.simulation.analysis.common.events.service.AServiceEvent;
-import jadex.simulation.analysis.common.util.AConstants;
-import jadex.simulation.analysis.process.basicTasks.IATaskView;
-import jadex.simulation.analysis.process.basicTasks.user.AServiceCallTaskView;
-import jadex.simulation.analysis.service.basic.analysis.ABasicAnalysisSessionService;
+import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
 import jadex.simulation.analysis.service.simulation.Modeltype;
 import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
 
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,7 +17,6 @@ import java.util.UUID;
 
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
 
 import org.nlogo.headless.HeadlessWorkspace;
 import org.nlogo.lite.InterfaceComponent;

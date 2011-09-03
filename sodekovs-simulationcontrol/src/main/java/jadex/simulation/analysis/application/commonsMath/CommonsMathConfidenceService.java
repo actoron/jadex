@@ -5,8 +5,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.simulation.analysis.common.data.parameter.IAMultiValueParameter;
-import jadex.simulation.analysis.service.basic.analysis.ABasicAnalysisService;
-import jadex.simulation.analysis.service.basic.analysis.ABasicAnalysisSessionService;
+import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
 import jadex.simulation.analysis.service.continuative.computation.IAConfidenceService;
 
 import org.apache.commons.math.stat.inference.TTest;

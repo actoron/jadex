@@ -11,27 +11,20 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.simulation.analysis.common.data.IAExperiment;
-import jadex.simulation.analysis.service.basic.analysis.ABasicAnalysisSessionService;
+import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
 import jadex.simulation.analysis.service.simulation.Modeltype;
 import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
-import org.apache.commons.collections15.map.UnmodifiableMap;
-
 
 /**
  * Implementation of a DesmoJ service for (single) experiments.
  */
 public class JadexExecuteExperimentsService extends ABasicAnalysisSessionService implements IAExecuteExperimentsService
 {
-	static Integer count = 0;
-
 	/**
 	 * Create a new DesmoJ Simulation Service
 	 * 
@@ -52,71 +45,114 @@ public class JadexExecuteExperimentsService extends ABasicAnalysisSessionService
 	public IFuture executeExperiment(UUID session, final IAExperiment exp)
 	{
 		final Future res = new Future();
-		// if (session==null) session = (UUID) createSession(null).get(susThread);
-
 		// not integrated yet
 		// JadexSessionView view = (JadexSessionView) sessionViews.get(session);
-		// Integer executions = 0;
-		// Integer replicationen = (Integer) exp.getExperimentParameter("Wiederholungen").getValue()-1;
+		final Integer replicationen = (Integer) exp.getExperimentParameter("Wiederholungen").getValue();
 
 		IResultListener kill = new IResultListener()
 		{
-			
+
 			@Override
 			public void resultAvailable(Object result)
 			{
-					System.out.println(result);	
-					System.out.println(result.getClass());	
-					UnmodifiableMap resMap = (UnmodifiableMap) result;
-					System.out.println(result.getClass());	
-					resMap.get("Chimicals");
-//					exp.getOutputParameter("Chimicals").setValue(resMap.get("Chimicals"));
-//					exp.getOutputParameter("Fire").setValue(resMap.get("Fire"));
-//					exp.getOutputParameter("Victims").setValue(resMap.get("Victims"));
-					res.setResult(exp);
+				Map resMap = (Map) result;
+				// for (String outputName : exp.getOutputParameters().getParameters().keySet())
+				// {
+				// exp.getOutputParameter(outputName).setValue(resMap.get(outputName));
+				// }
+				exp.getOutputParameter("Chemicals").setValue(resMap.get("Chemicals"));
+				exp.getOutputParameter("Fire").setValue(resMap.get("Fire"));
+				exp.getOutputParameter("Victims").setValue(resMap.get("Victims"));
+				res.setResult(exp);
 			}
-			
+
 			@Override
 			public void exceptionOccurred(Exception exception)
-			{
-				
-			}
+			{}
 		};
-		
+		final IClockService clock = (IClockService) SServiceProvider.getService(access.getServiceProvider(), IClockService.class).get(susThread);
+
 		final IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class).get(susThread);
-		cms.createComponent("dm" + count, "jadex/simulation/analysis/application/jadex/model/disastermanagement/DisasterManagement.application.xml",
+		cms.createComponent("dm", "jadex/simulation/analysis/application/jadex/model/disastermanagement/DisasterManagement.application.xml",
 				new CreationInfo("default", null, access.getComponentIdentifier(),
-						false, false, false, false, access.getModel().getAllImports(), null), kill).addResultListener(new IResultListener()
+						false, false, false, false, access.getModel().getAllImports(), null), kill).
+						addResultListener(new IResultListener()
 						{
-							
+
 							@Override
 							public void resultAvailable(final Object result)
+						{
+							final IComponentIdentifier cid = (IComponentIdentifier) result;
+							// System.out.println(clock.getTime());
+							clock.createTimer(750000L, new ITimedObject()
 							{
-								final IClockService clock = (IClockService) SServiceProvider.getService(access.getServiceProvider(), IClockService.class).get(susThread);
-								final IComponentIdentifier cid = (IComponentIdentifier)result;
-//								System.out.println(clock.getTime());
-								clock.createTimer(30000L, new ITimedObject()
+
+								@Override
+								public void timeEventOccurred(long currenttime)
 								{
-									
-									@Override
-									public void timeEventOccurred(long currenttime)
-									{
-//										System.out.println(clock.getTime());
-										cms.destroyComponent(cid);
-									}
-								});
-							}
-							
+									cms.destroyComponent(cid);
+								}
+							});
+						}
+
 							@Override
 							public void exceptionOccurred(Exception exception)
-							{
-								// TODO Auto-generated method stub
-								
-							}
+						{
+								}
 						});
-		
-		
+
+		// simExperiment(exp);
+		// res.setResult(exp);
 		return res;
+	}
+
+	private void simExperiment(final IAExperiment exp)
+	{
+		IResultListener kill = new IResultListener()
+		{
+
+			@Override
+			public void resultAvailable(Object result)
+			{
+				Map resMap = (Map) result;
+				exp.getOutputParameter("Chemicals").setValue(resMap.get("Chemicals"));
+				exp.getOutputParameter("Fire").setValue(resMap.get("Fire"));
+				exp.getOutputParameter("Victims").setValue(resMap.get("Victims"));
+			}
+
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{}
+		};
+		final IClockService clock = (IClockService) SServiceProvider.getService(access.getServiceProvider(), IClockService.class).get(susThread);
+
+		final IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class).get(susThread);
+		cms.createComponent("dm", "jadex/simulation/analysis/application/jadex/model/disastermanagement/DisasterManagement.application.xml",
+				new CreationInfo("default", null, access.getComponentIdentifier(),
+						false, false, false, false, access.getModel().getAllImports(), null), kill).addResultListener(new IResultListener()
+					{
+
+						@Override
+						public void resultAvailable(final Object result)
+						{
+							final IComponentIdentifier cid = (IComponentIdentifier) result;
+							// System.out.println(clock.getTime());
+							clock.createTimer(10000L, new ITimedObject()
+							{
+
+								@Override
+								public void timeEventOccurred(long currenttime)
+								{
+									cms.destroyComponent(cid);
+								}
+							});
+						}
+
+						@Override
+						public void exceptionOccurred(Exception exception)
+						{
+						}
+					});
 	}
 
 	@Override

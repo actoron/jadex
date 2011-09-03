@@ -14,9 +14,7 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.simulation.analysis.common.data.IAExperiment;
 import jadex.simulation.analysis.common.data.factories.AExperimentFactory;
 import jadex.simulation.analysis.common.data.parameter.IAParameter;
-import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
-import jadex.simulation.analysis.common.defaultViews.controlComponent.ComponentServiceViewerPanel;
-import jadex.simulation.analysis.service.highLevel.IAGeneralAnalysisProcessService;
+import jadex.simulation.analysis.common.util.controlComponentJadexPanel.ComponentServiceViewerPanel;
 import jadex.simulation.analysis.service.simulation.Modeltype;
 import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
 
@@ -24,7 +22,7 @@ import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimen
 @ProvidedServices({ @ProvidedService(type = IAExecuteExperimentsService.class,
 		implementation = @Implementation(expression = "new JadexExecuteExperimentsService($component.getExternalAccess())")) })
 @GuiClass(ComponentServiceViewerPanel.class)
-@Properties({ @NameValue(name = "viewerpanel.componentviewerclass", value = "\"jadex.simulation.analysis.common.defaultViews.controlComponent.ControlComponentViewerPanel\"") })
+@Properties({ @NameValue(name = "viewerpanel.componentviewerclass", value = "\"jadex.simulation.analysis.common.util.controlComponentJadexPanel.ControlComponentViewerPanel\"") })
 public class JadexAgent extends MicroAgent
 {
 	@Override
@@ -43,6 +41,7 @@ public class JadexAgent extends MicroAgent
 				{
 					System.out.println(para.getName() + "==" + para.getValue());
 				}
+				killAgent();
 				
 			}
 			

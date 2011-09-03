@@ -5,35 +5,33 @@ import java.util.List;
 import java.util.Random;
 
 import org.opt4j.core.problem.Creator;
-import org.opt4j.genotype.IntegerBounds;
-import org.opt4j.genotype.IntegerMapGenotype;
+import org.opt4j.genotype.Bounds;
+import org.opt4j.genotype.DoubleBounds;
+import org.opt4j.genotype.DoubleMapGenotype;
 
-public class SimulationCreator implements Creator<IntegerMapGenotype<String>>
+public class SimulationCreator implements Creator<DoubleMapGenotype<String>>
 {
 
 	Random random = new Random();
 
 	List<String> keys = new LinkedList<String>();
-	List<Integer> lower = new LinkedList<Integer>();
-	List<Integer> upper = new LinkedList<Integer>();
+	List<Double> lower = new LinkedList<Double>();
+	List<Double> upper = new LinkedList<Double>();
 	{
-		keys.add("Wert1");
-		lower.add(0);
-		upper.add(10000);
-		keys.add("Wert2");
-		lower.add(0);
-		upper.add(10000);
-		keys.add("Wert3");
-		lower.add(0);
-		upper.add(10000);
+		keys.add("xKoordinate");
+		lower.add(0.35);
+		upper.add(0.75);
+		keys.add("yKoordinate");
+		lower.add(0.35);
+		upper.add(0.75);
 	}
-	IntegerBounds bounds = new IntegerBounds(lower, upper);
+	Bounds<Double> bounds = new DoubleBounds(lower, upper);
 
 	@Override
-	public IntegerMapGenotype<String> create()
+	public DoubleMapGenotype<String> create()
 	{
-
-		IntegerMapGenotype<String> genotype = new IntegerMapGenotype<String>(keys, bounds);
+//		System.out.println("create");
+		DoubleMapGenotype<String> genotype = new DoubleMapGenotype<String>(keys, bounds);
 		genotype.init(random);
 		return genotype;
 	}
