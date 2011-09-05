@@ -18,6 +18,9 @@ public @interface Implementation
 	/** The (default) decoupled proxy type (decouples from caller thread to component thread). */
 	public static final String	PROXYTYPE_DECOUPLED	= BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED;
 	
+	/** Identifier for null binding, as annotations don't support null values (grrr). */
+	public static final String	BINDING_NULL	= "null-binding";
+	
 	//-------- properties --------
 	
 	/**
@@ -38,7 +41,7 @@ public @interface Implementation
 	/**
 	 *  The binding for forwarding service calls to another component.
 	 */
-	public Binding binding() default @Binding();
+	public Binding binding() default @Binding(name=BINDING_NULL);
 	
 	/**
 	 *  The interceptors.
