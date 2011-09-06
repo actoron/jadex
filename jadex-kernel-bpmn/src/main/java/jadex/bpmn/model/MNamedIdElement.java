@@ -2,7 +2,7 @@ package jadex.bpmn.model;
 
 import jadex.commons.SUtil;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -66,7 +66,7 @@ public class MNamedIdElement extends MAnnotationElement
 	public void setPropertyValue(String name, Object value)
 	{
 		if(properties==null)
-			properties = new HashMap();
+			properties = new LinkedHashMap();
 		properties.put(name, value);
 	}
 	

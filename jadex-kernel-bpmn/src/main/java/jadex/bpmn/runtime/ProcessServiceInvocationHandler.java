@@ -2,7 +2,7 @@ package jadex.bpmn.runtime;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bridge.service.annotation.Service;
-import jadex.commons.future.IFuture;
+import jadex.commons.future.Future;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -15,6 +15,15 @@ import java.util.Map;
 @Service	// Hack!!! Let BasicServiceInvocationHandler know that this is a service implementation.
 public class ProcessServiceInvocationHandler implements InvocationHandler
 {
+	//-------- constants --------
+	
+	/** The future result parameter name. */
+	public static final String	THREAD_PARAMETER_SERVICE_RESULT	= "$$service_result";
+	
+	/** The user result parameter name. */
+	// Todo: remove. use explicit model.
+	public static final String	EVENT_PARAMETER_SERVICE_RESULT	= "service_result";
+	
 	//-------- attributes --------
 	
 	/** The process instance. */
@@ -41,6 +50,8 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 	 */
 	public Object invoke(Object proxy, Method method, Object[] args)	throws Throwable
 	{
+		Future	ret	= new Future();
+		
 		MActivity	act	= (MActivity)events.get(method);
 		ThreadContext	tc	= instance.getThreadContext();
 		ProcessThread	thread	= new ProcessThread(""+instance.idcnt++, act, tc, instance);
@@ -51,9 +62,10 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 		{
 			thread.setParameterValue(params[i], args[i]);
 		}
+		thread.setParameterValue(THREAD_PARAMETER_SERVICE_RESULT, ret);
 		
 		instance.step(act, instance, thread, null);
 		
-		return IFuture.DONE;
+		return ret;
 	}
 }

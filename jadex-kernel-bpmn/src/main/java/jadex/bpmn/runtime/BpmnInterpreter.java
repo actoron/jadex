@@ -8,6 +8,7 @@ import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.bpmn.runtime.handler.DefaultStepHandler;
 import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler;
+import jadex.bpmn.runtime.handler.EventEndSignalActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateErrorActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateMessageActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateMultipleActivityHandler;
@@ -147,6 +148,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		activityhandlers.put(MBpmnModel.EVENT_END_EMPTY, new DefaultActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_END_ERROR, new EventEndErrorActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_END_MESSAGE, new EventIntermediateMessageActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_END_SIGNAL, new EventEndSignalActivityHandler());
 
 		DEFAULT_ACTIVITY_HANDLERS = Collections.unmodifiableMap(activityhandlers);
 	}

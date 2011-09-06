@@ -70,6 +70,9 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	/** Constant for event end message. */
 	public static final String EVENT_END_MESSAGE = "EventEndMessage";
 		
+	/** Constant for event end signal. */
+	public static final String EVENT_END_SIGNAL = "EventEndSignal";
+		
 	
 	/** Constant for event start empty. */
 	public static final String EVENT_INTERMEDIATE_EMPTY = "EventIntermediateEmpty";

@@ -686,6 +686,7 @@ public class ProcessThread	implements ITaskContext
 			// todo: parameter direction / class
 			
 			Set before = data!=null? new HashSet(data.keySet()): Collections.EMPTY_SET;
+			before.remove(ProcessServiceInvocationHandler.THREAD_PARAMETER_SERVICE_RESULT);	// Hack!!! Keep future available locally for thread.
 			IValueFetcher fetcher = new ProcessThreadValueFetcher(this, true, instance.getFetcher());
 			Map params = getActivity().getParameters();
 			if(params!=null)

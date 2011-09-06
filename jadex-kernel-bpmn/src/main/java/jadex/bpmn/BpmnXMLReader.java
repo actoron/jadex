@@ -1605,13 +1605,24 @@ public class BpmnXMLReader
 							String typename = table.getCellValue(row, 1);
 							String multi = table.getCellValue(row, 2);
 							String bindingname = table.getCellValue(row, 3);
+							if("".equals(bindingname))
+								bindingname	= null;
 							Class type = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
 							boolean multiple = new Boolean(multi).booleanValue();
 							
-							RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(bindingname);
-							if(binding==null)
-								throw new RuntimeException("Unknown binding: "+bindingname);
-							RequiredServiceInfo rsi = new RequiredServiceInfo(name, type, multiple, binding);
+							RequiredServiceInfo rsi;
+							if(bindingname!=null)
+							{
+								RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(bindingname);
+								if(binding==null)
+									throw new RuntimeException("Unknown binding: "+bindingname);
+								rsi = new RequiredServiceInfo(name, type, multiple, binding);
+							}
+							else
+							{
+								rsi = new RequiredServiceInfo(name, type);
+								rsi.setMultiple(multiple);
+							}
 							mi.addRequiredService(rsi);
 							
 							if(table.getRowSize()>4)
@@ -1622,13 +1633,24 @@ public class BpmnXMLReader
 								{
 									String configid = (String)it.next();
 									bindingname = (String)vals.get(configid);
+									if("".equals(bindingname))
+										bindingname	= null;
 									ConfigurationInfo ci = (ConfigurationInfo)configurations.get(configid);
 									if(ci!=null)
 									{
-										binding = (RequiredServiceBinding)bindings.get(bindingname);
-										if(binding==null)
-											throw new RuntimeException("Unknown binding: "+bindingname);
-										ci.addRequiredService(new RequiredServiceInfo(name, type, multiple, binding));
+										if(bindingname!=null)
+										{
+											RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(bindingname);
+											if(binding==null)
+												throw new RuntimeException("Unknown binding: "+bindingname);
+											rsi = new RequiredServiceInfo(name, type, multiple, binding);
+										}
+										else
+										{
+											rsi = new RequiredServiceInfo(name, type);
+											rsi.setMultiple(multiple);
+										}
+										ci.addRequiredService(rsi);
 									}
 								}
 							}

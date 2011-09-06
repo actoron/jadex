@@ -34,15 +34,31 @@ public class ServiceClientAgent
 		{
 			public void resultAvailable(Object result)
 			{
-				ICalculatorService	calc	= (ICalculatorService)result;
+				final ICalculatorService	calc	= (ICalculatorService)result;
 				System.out.println(agent.getAgentName()+" adding 1+2");
-				calc.addValues(1, 2);
-
-				System.out.println(agent.getAgentName()+" adding 1+2+3");
-				calc.addValues(1, 2, 3);
-
-				System.out.println(agent.getAgentName()+" subtracting 17+4");
-				calc.subtractValues(17, 4);
+				calc.addValues(1, 2).addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+						System.out.println(agent.getAgentName()+" Result is: "+result);
+						System.out.println(agent.getAgentName()+" adding 1+2+3");
+						calc.addValues(1, 2, 3).addResultListener(new DefaultResultListener()
+						{
+							public void resultAvailable(Object result)
+							{
+								System.out.println(agent.getAgentName()+" Result is: "+result);
+								System.out.println(agent.getAgentName()+" subtracting 4 from 17");
+								calc.subtractValues(17, 4).addResultListener(new DefaultResultListener()
+								{
+									public void resultAvailable(Object result)
+									{
+										System.out.println(agent.getAgentName()+" Result is: "+result);
+									}
+								});
+							}
+						});
+					}
+				});
 			}
 		});
 	}
