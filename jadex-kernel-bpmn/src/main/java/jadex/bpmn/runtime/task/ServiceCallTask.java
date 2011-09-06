@@ -121,7 +121,7 @@ public class ServiceCallTask implements ITask
 		final String	fmethod	= method;
 		final String	fresultparam	= resultparam;
 		process.getServiceContainer().getRequiredService(service, rebind)
-			.addResultListener(process.createResultListener(new DelegationResultListener(ret)
+			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -135,7 +135,7 @@ public class ServiceCallTask implements ITask
 					Object	val	= m.invoke(result, args.toArray());
 					if(val instanceof IFuture)
 					{
-						((IFuture)val).addResultListener(process.createResultListener(new DelegationResultListener(ret)
+						((IFuture)val).addResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
 							{
@@ -143,7 +143,7 @@ public class ServiceCallTask implements ITask
 									context.setParameterValue(fresultparam, result);
 								ret.setResult(null);
 							}
-						}));
+						});
 					}
 					else
 					{
@@ -161,7 +161,7 @@ public class ServiceCallTask implements ITask
 					ret.setException(e);					
 				}
 			}
-		}));
+		});
 		
 		return ret;
 	}
