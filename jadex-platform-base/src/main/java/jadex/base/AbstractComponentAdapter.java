@@ -632,7 +632,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //			AsyncExecutionService.DEBUG.put(this, "adapter execute()");
 //		}
 		
-//		System.out.println("entering exe: "+getComponentIdentifier());
+//		if(getComponentIdentifier().getLocalName().indexOf("Alex")!=-1)
+//			System.out.println("entering exe: "+getComponentIdentifier());
 		
 		if(executing)
 		{
@@ -816,6 +817,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //		{
 //			AsyncExecutionService.DEBUG.put(this, "adapter execute() finished");
 //		}
+		
+//		if(getComponentIdentifier().getLocalName().indexOf("Alex")!=-1)
+//			System.out.println("exiting exe: "+getComponentIdentifier());
 		
 		return ret;
 	}

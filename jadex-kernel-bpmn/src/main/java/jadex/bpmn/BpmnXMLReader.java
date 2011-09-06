@@ -362,6 +362,7 @@ public class BpmnXMLReader
 			new AttributeInfo(new AccessInfo("name", "description")),
 			new AttributeInfo(new AccessInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
 			new AttributeInfo(new AccessInfo("incomingEdges", "incomingSequenceEdgesDescription")),
+			new AttributeInfo(new AccessInfo("lanes", "laneDescription")),
 			new AttributeInfo(new AccessInfo("iD", null, AccessInfo.IGNORE_READWRITE)),
 			},
 			new SubobjectInfo[]{

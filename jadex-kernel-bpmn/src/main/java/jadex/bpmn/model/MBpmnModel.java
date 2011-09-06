@@ -434,6 +434,19 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 				}
 			}
 		}
+		List	handlers	= proc.getEventHandlers();
+		if(handlers!=null)
+		{
+			for(int i=0; i<handlers.size(); i++)
+			{
+				MActivity mact = (MActivity)handlers.get(i);
+				allactivities.put(mact.getId(), handlers.get(i));
+				if(mact instanceof MSubProcess)
+				{
+					addAllSubActivities((MSubProcess)mact, activities);
+				}
+			}
+		}
 	}
 	
 	/**

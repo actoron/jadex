@@ -107,8 +107,8 @@
 		</providedservice>
 		<providedservice class="IThreadPool">
 			<implementation proxytype="raw">
-				//new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
-				new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 500)), $component.getServiceProvider())
+				new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
+				//new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 500)), $component.getServiceProvider())
 			</implementation>
 		</providedservice>
 		<providedservice class="IExecutionService">

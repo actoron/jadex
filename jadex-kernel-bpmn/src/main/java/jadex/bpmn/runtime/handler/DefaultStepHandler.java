@@ -135,6 +135,8 @@ public class DefaultStepHandler implements IStepHandler
 		{
 			thread	= remove.getInitiator();
 			thread.setNonWaiting();
+			if(ex!=null)
+				thread.setException(ex);
 			// Todo: Callbacks for aborted threads (to abort external activities)
 			thread.getThreadContext().removeSubcontext(remove);
 			
@@ -152,13 +154,7 @@ public class DefaultStepHandler implements IStepHandler
 //			instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_CHANGED, thread);
 		}
 
-		if(next!=null)
-		{
-			// Todo: store exception as parameter!?
-			if(ex!=null)
-				thread.setException(null);
-		}
-		else if(ex!=null)
+		if(ex!=null && next==null)
 		{
 			if(ex instanceof RuntimeException)
 				throw (RuntimeException)ex;

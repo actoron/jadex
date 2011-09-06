@@ -23,4 +23,9 @@ public interface ICalculatorService
 	 *  @param b	The value to subtract from the first.
 	 */
 	public IFuture	subtractValues(int a, int b);
+	
+	/**
+	 *  Method produces an exception.
+	 */
+	public IFuture	broken(int a);
 }

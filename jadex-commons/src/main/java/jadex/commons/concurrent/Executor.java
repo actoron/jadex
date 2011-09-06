@@ -82,7 +82,11 @@ public class Executor implements Runnable
 		boolean	iwanttorun	= true;
 		while(iwanttorun && !shutdown)
 		{
+//			if(executable.toString().indexOf("(Alex")!=-1)
+//				System.out.println("Executor.code(): "+this+", "+executable);
 			iwanttorun	=	code();
+//			if(executable.toString().indexOf("(Alex")!=-1)
+//				System.out.println("Executor.code() finished: "+this+", "+executable);
 
 			// Setting flags in synchronized block assures,
 			// that execute is not called in between.
@@ -97,7 +101,9 @@ public class Executor implements Runnable
 				running	= iwanttorun;
 				wanttorun	= false;	// reset until execute() is called again.
 			}
-			
+//			if(executable.toString().indexOf("(Alex")!=-1)
+//				System.out.println("Executor.code() continuing: "+iwanttorun+", "+this);
+
 //			try
 //			{
 //				Thread.sleep(10);
