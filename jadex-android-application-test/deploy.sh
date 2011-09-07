@@ -167,7 +167,17 @@ do
 		break
 	fi	
 done < $MANIFEST
-	
+
+if [ -z $APPLICATION_PACKAGE ] ; then
+	f "Application Package could not be read from $MANIFEST!"
+	exit 1
+fi
+
+if [ -z $MAIN_ACTIVITY ] ; then
+	f "Application Package could not be read from $MANIFEST!"
+	exit 1
+fi
+
 e "Application Package is: $(echo_bold $APPLICATION_PACKAGE)"
 e "Application Main Activity is: $(echo_bold $MAIN_ACTIVITY)"
 

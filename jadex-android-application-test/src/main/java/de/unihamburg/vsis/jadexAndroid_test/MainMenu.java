@@ -1,7 +1,6 @@
 package de.unihamburg.vsis.jadexAndroid_test;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -53,7 +52,9 @@ public class MainMenu extends Activity implements OnClickListener {
 
 		adapter.add(new ConfigurationItem("BDI Creation Test",
 				"jadex/bdi/benchmarks/AgentCreation.agent.xml"));
-
+		
+		adapter.add(new ConfigurationItem("Awareness Notifier", "awareness"));
+		
 		adapter.add(new ConfigurationItem("Interactive Platform", "interactive"));
 
 		configurationSpinner.setAdapter(adapter);
@@ -68,12 +69,17 @@ public class MainMenu extends Activity implements OnClickListener {
 			Object selectedItem = configurationSpinner.getSelectedItem();
 			if (selectedItem != null) {
 				ConfigurationItem conf = (ConfigurationItem) selectedItem;
-				if (!conf.get_configFile().equals("interactive")) {
+				if (conf.get_configFile().equals("interactive")) {
+					Intent i = new Intent(this, AgentActivity.class);
+					MainMenu.this.startActivity(i);
+				}
+				else if (conf.get_configFile().equals("awareness")) {
+					Intent i = new Intent(this, AwarenessActivity.class);
+					MainMenu.this.startActivity(i);
+				}
+				else {
 					Intent i = new Intent(this, Logger.class);
 					i.putExtra("component", conf.get_configFile());
-					MainMenu.this.startActivity(i);
-				} else {
-					Intent i = new Intent(this, AgentActivity.class);
 					MainMenu.this.startActivity(i);
 				}
 			}

@@ -16,6 +16,7 @@
     <service android:label="Log Processor" android:name="com.michaelrnovak.util.logger.service.LogProcessor"></service>
     <activity android:name=".Logger"></activity>
     <activity android:name=".AgentActivity"></activity>
+    <activity android:name=".AwarenessActivity"></activity>
     
   </application>
 
