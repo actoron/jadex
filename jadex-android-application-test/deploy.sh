@@ -1,16 +1,15 @@
 #!/bin/bash
 ##########################################
 # Android Deployment Script              #
-# v3                                     #
+# v4                                     #
 # 8kalinow@informatik.uni-hamburg.de     #
 ##########################################
 ADB_PATH=$ANDROID_HOME/tools/adb
 MVN_PATH=$(which mvn)
 AWK_PATH=$(which awk)
 PROJECT_PATH=$(pwd)
-APPLICATION_PACKAGE="de.unihamburg.vsis.jadexAndroid_test"
-MAIN_ACTIVITY="MainMenu"
 APKFILE="target/jadex-android-application-test-0.0.1-SNAPSHOT.apk"
+MANIFEST="AndroidManifest.xml"
 skip_build=false
 adb_device=""
 remove_app=false
@@ -47,20 +46,19 @@ function f {
 function display_help () {
 	echo 	"Android build and deployment script"
 	display_usage
-	echo	"Builds $APPLICATION_PACKAGE using maven and deploys it to all connected android devices."
+	echo	"Builds your android application using maven and deploys it to all connected android devices."
+	echo	"Requirements: \$ANDROID_HOME must be set, 'awk' must be installed and AndroidManifest.xml should be in the current directory, as well as your pom.xml"
 	echo	""
 	echo	"Arguments:"
 	echo	"  -s, --skip-build     skips build, just deploys"
 	echo 	"  -d, --device=DEVICE  deploys/removes only on DEVICE, see 'adb devices' for device ID"
 	echo 	"  -r, --remove         remove app from devices"
-    echo    "  -c, --clean          clean before build"
+    	echo    "  -c, --clean          clean before build"
 	echo	""
-	echo	"Need ANDROID_HOME to be set and 'awk' to be in PATH"
-
 }
 
 function display_usage () {
-	echo "USAGE: $0 [-d=DEVICE | --device=DEVICE] [-s | --skip-build] [-r | --remove]"
+	echo "USAGE: $0 [-d=DEVICE | --device=DEVICE] [-s | --skip-build] [-r | --remove] [-c | --clean]"
 }
 
 function checkAdbPermissions () {
@@ -93,11 +91,15 @@ while [ "${1+isset}" ]; do
       shift
       ;;
     -d|--device)
+      if [ -z "$2" ]; then
+	f "No device given."
+	exit 1
+      fi
       adb_device="$2"
       shift 2
       ;;
     -h|--help)
-      display_help # a function ;-)
+      display_help
       # no shifting needed here, we'll quit!
       exit
       ;;
@@ -144,6 +146,31 @@ if [ ! -e $ADB_PATH ]; then
 	exit 1
 fi
 
+if [ ! -e $MANIFEST ] ; then
+	f "Manifest $MANIFEST not found!"
+	exit 1
+fi
+
+# get package and main activity name from Manifest:
+
+e $(echo_bold "Parsing $MANIFEST...")
+APPLICATION_PACKAGE=$(grep -Eo package="\S*" $MANIFEST | sed -rn 's/package="(\S*)"/\1/p')
+while read line; 
+do
+	temp=$(echo "$line" | sed -rn 's/<activity.*name.*"(\S*).*">.*/\1/p')
+	if [ ! -z $temp ] ; then
+		activity_name=$temp
+	fi
+	temp=$(echo $line | grep -r '<action.*android.intent.action.MAIN')
+	if [ ! -z  "$temp" ] ; then
+		MAIN_ACTIVITY=$activity_name
+		break
+	fi	
+done < $MANIFEST
+	
+e "Application Package is: $(echo_bold $APPLICATION_PACKAGE)"
+e "Application Main Activity is: $(echo_bold $MAIN_ACTIVITY)"
+
 if [ $remove_app == "true" ]; then
     checkAdbPermissions	
     if [ ! -z $adb_device ]; then
@@ -167,10 +194,10 @@ if $clean && $skip_build ; then
     exit 1
 fi
 
-if [ $clean ]; then
+if [ $clean == true ]; then
     e $(echo_bold "Cleaning...")
-    cd .. 
-    $MVN_PATH clean -P jadex-android
+    #cd .. 
+    $MVN_PATH clean #-P jadex-android
     if [ ! "$?" -eq 0 ]; then
         f "Cleaning failed."
         exit 1
@@ -180,8 +207,8 @@ fi
 
 if [ $skip_build == false ]; then
 	e $(echo_bold "Building...")
-	cd ..
-	$MVN_PATH install -P jadex-android
+	#cd ..
+	$MVN_PATH package
 	if [ ! "$?" -eq "0" ]; then
 		f "Maven Build failed. Not deploying."
 		exit 1
