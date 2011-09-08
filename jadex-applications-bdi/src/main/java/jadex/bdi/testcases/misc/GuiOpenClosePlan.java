@@ -17,7 +17,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 
 /**
  *  Tests to open and close a gui.
@@ -31,6 +30,9 @@ public class GuiOpenClosePlan extends Plan
 
 	/** The button. */
 	protected JButton button;
+	
+	/** Set to true when event was dispatched. */
+	protected boolean	dispatched;
 
 	//-------- constructors --------
 
@@ -55,6 +57,7 @@ public class GuiOpenClosePlan extends Plan
 							IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
 							IInternalEvent	event	= scope.getEventbase().createInternalEvent("gui_closed");
 							scope.getEventbase().dispatchInternalEvent(event);
+							dispatched	= true;
 							return null;
 						}
 					});
@@ -77,33 +80,37 @@ public class GuiOpenClosePlan extends Plan
 	 */
 	public void body()
 	{
-		// Timeout fails in sim mode because clock doesn't wait -> wait before event. (hack???)
 		getWaitqueue().addInternalEvent("gui_closed");
 		
-		final Timer t = new Timer(50, null);
-		t.addActionListener(new ActionListener()
+		SwingUtilities.invokeLater(new Runnable()
 		{
-			public void actionPerformed(ActionEvent e)
+			public void run()
 			{
-				t.stop();
 				button.doClick();
 			}
 		});
-		t.start();
 		
-		TestReport tr = new TestReport("#1", "Test closing a gui throws gui_event.");
-		getLogger().info("Plan is waiting 3 seconds for gui close.");
-		try
+		// Wait until event is dispatched.
+		while(!dispatched)
 		{
+			// Plan wait for freeing component thread.
+			waitFor(50);
+			
+			// Thread wait for freeing CPU in sim mode.
 			try
 			{
-				Thread.sleep(250);
+				Thread.sleep(50);
 			}
 			catch(InterruptedException e)
 			{
 			}
-			
-			waitForInternalEvent("gui_closed", 3000); 
+		}
+
+		TestReport tr = new TestReport("#1", "Test closing a gui throws gui_event.");
+		getLogger().info("Plan is waiting 3 seconds for gui close.");
+		try
+		{
+			waitForInternalEvent("gui_closed", 3000);
 			getLogger().info("Gui was closed.");
 			tr.setSucceeded(true);
 		}
