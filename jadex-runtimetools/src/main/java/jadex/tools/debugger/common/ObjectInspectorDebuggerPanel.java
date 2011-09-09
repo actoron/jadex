@@ -1,14 +1,11 @@
 package jadex.tools.debugger.common;
 
+import jadex.base.gui.ObjectInspectorPanel;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.gui.SGUI;
-import jadex.rules.state.IOAVState;
-import jadex.rules.state.OAVJavaType;
-import jadex.rules.state.javaimpl.OAVStateFactory;
-import jadex.rules.tools.stateviewer.OAVPanel;
 import jadex.tools.debugger.IDebuggerPanel;
 
 import javax.swing.Icon;
@@ -33,7 +30,7 @@ public class ObjectInspectorDebuggerPanel	implements IDebuggerPanel
 	//-------- attributes --------
 	
 	/** The gui component. */
-	protected OAVPanel oavpanel;
+	protected ObjectInspectorPanel	beanpanel;
 
 	//-------- IDebuggerPanel methods --------
 
@@ -47,9 +44,7 @@ public class ObjectInspectorDebuggerPanel	implements IDebuggerPanel
 	 */
 	public void init(IControlCenter jcc, IBreakpointPanel bpp, IComponentIdentifier name, IExternalAccess access)
 	{
-		IOAVState	dummystate	= OAVStateFactory.createOAVState(OAVJavaType.java_type_model);
-		dummystate.addJavaRootObject(access);
-		this.oavpanel	= new OAVPanel(dummystate);
+		this.beanpanel	= new ObjectInspectorPanel(access);
 	}
 
 	/**
@@ -76,7 +71,7 @@ public class ObjectInspectorDebuggerPanel	implements IDebuggerPanel
 	 */
 	public JComponent getComponent()
 	{
-		return oavpanel;
+		return beanpanel;
 	}
 	
 	/**
@@ -93,9 +88,5 @@ public class ObjectInspectorDebuggerPanel	implements IDebuggerPanel
 	 */
 	public void dispose()
 	{
-		if(oavpanel!=null)
-		{
-			oavpanel.dispose();
-		}
 	}
 }

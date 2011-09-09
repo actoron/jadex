@@ -30,7 +30,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.kernelbase.ExternalAccess;
+import jadex.micro.ExternalAccess;
 import jadex.xml.annotation.XMLClassname;
 
 import java.lang.reflect.Method;

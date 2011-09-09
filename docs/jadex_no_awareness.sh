@@ -1,2 +1,2 @@
 #!/bin/sh
-(cd lib && java -jar jadex-platform-standalone-launch-2.0-rc9.jar -awareness false
+(cd lib && java -jar jadex-platform-standalone-launch-2.0-rc10.jar -awareness false

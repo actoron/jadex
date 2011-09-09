@@ -47,7 +47,7 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"refresh", SGUI.makeIcon(DFBrowserPanel.class, "/jadex/base/gui/images/new_refresh_anim00.png")
+		"refresh", SGUI.makeIcon(DFBrowserPanel.class, "/jadex/tools/common/images/new_refresh_anim00.png")
 	});
 	
 	//-------- attributes --------

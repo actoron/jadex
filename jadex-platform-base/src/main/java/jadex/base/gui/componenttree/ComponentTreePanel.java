@@ -191,7 +191,7 @@ public class ComponentTreePanel extends JSplitPane
 					for(int i=0; paths!=null && i<paths.length; i++)
 					{
 						// note: cannot use getComponentIdenfier() due to proxy components return their remote cid
-						final IActiveComponentTreeNode sel = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
+//						final IActiveComponentTreeNode sel = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
 //						final ITreeNode sel = (ITreeNode)paths[i].getLastPathComponent();
 						cms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)

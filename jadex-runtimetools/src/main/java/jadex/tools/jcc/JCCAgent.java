@@ -10,7 +10,6 @@ import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
 import jadex.tools.awareness.AwarenessComponentPlugin;
-import jadex.tools.comanalyzer.ComanalyzerPlugin;
 import jadex.tools.convcenter.ConversationPlugin;
 import jadex.tools.debugger.DebuggerPlugin;
 import jadex.tools.deployer.DeployerPlugin;
@@ -52,7 +51,7 @@ public class JCCAgent extends MicroAgent
 //				StarterServicePlugin.class.getName(),
 				DFServicePlugin.class.getName(),
 				ConversationPlugin.class.getName(),
-				ComanalyzerPlugin.class.getName(),
+				"jadex.tools.comanalyzer.ComanalyzerPlugin",
 				TestCenterPlugin.class.getName(),
 //				JadexdocPlugin.class.getName(),
 				SimulationServicePlugin.class.getName(),

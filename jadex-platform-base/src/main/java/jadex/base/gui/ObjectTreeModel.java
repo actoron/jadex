@@ -1066,7 +1066,7 @@ public class ObjectTreeModel implements TreeModel
 					// create a new object inspector node for inspectable attribute
 					if(ObjectTreeModel.isInspectable(attributeValue))
 					{
-						children.add(new ObjectInspectorNode(this, type, name, attributeValue));	
+						children.add(new ObjectInspectorNode(this, type, null, attributeValue));	
 					}
 					// else add a simple value node 
 					else

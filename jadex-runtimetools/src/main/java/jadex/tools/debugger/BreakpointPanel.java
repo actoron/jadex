@@ -12,7 +12,7 @@ import jadex.commons.IChangeListener;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.rules.tools.common.TableSorter;
+import jadex.commons.gui.jtable.TableSorter;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -50,7 +50,7 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 	/** The image icons. */
 	protected static UIDefaults	icons	= new UIDefaults(new Object[]
 	{
-		"breakpoint", SGUI.makeIcon(BreakpointPanel.class,	"/jadex/rules/tools/reteviewer/images/lockoverlay.png"),
+		"breakpoint", SGUI.makeIcon(BreakpointPanel.class,	"/jadex/tools/common/images/lockoverlay.png"),
 	});
 
 	//-------- attributes --------

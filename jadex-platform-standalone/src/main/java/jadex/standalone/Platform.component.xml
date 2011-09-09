@@ -59,6 +59,11 @@
 		<argument name="awareness" class="boolean">true</argument>
 		<!-- Start the JCC agent to open the platform GUI? -->
 		<argument name="gui" class="boolean">true</argument>
+		<!-- The file name(s) of extension component(s) to load (separated by comma). -->
+		<argument name="extensions" class="String">
+			"jadex/extension/envsupport/EnvSupport.component.xml, "
+			+"jadex/extension/agr/AGR.component.xml"
+		</argument>
 		<!-- Save platform settings on shutdown? -->
 		<argument name="saveonexit" class="boolean">true</argument>
 		<!-- Use simulation execution mode? -->
@@ -82,6 +87,8 @@
 	</arguments>
 	
 	<componenttypes>
+		<componenttype filename="jadex/standalone/extensions/Extensions.component.xml" name="extensions"/>
+		
 		<componenttype filename="jadex/component/KernelComponent.component.xml" name="kernel_component"/>
 		<componenttype filename="jadex/application/KernelApplication.component.xml" name="kernel_application"/>
 		<componenttype filename="jadex/micro/KernelMicro.component.xml" name="kernel_micro"/>
@@ -168,12 +175,6 @@
 				new DeploymentService($component.getServiceProvider())
 			</implementation>		
 		</providedservice>
-		<providedservice name="envextension" class="IComponentFactoryExtensionService">
-			<implementation class="jadex.extension.envsupport.EnvSupportExtensionService"/>
-		</providedservice>
-		<providedservice name="agrextension" class="IComponentFactoryExtensionService">
-			<implementation class="jadex.extension.agr.AGRExtensionService"/>
-		</providedservice>
 		
 		<requiredservice name="factoryservices" class="IComponentFactory" multiple="true"/>
 	</services>
@@ -194,6 +195,11 @@
 				<argument name="platformname">null</argument>
 			</arguments>
 			<components>
+				<component name="extensions" type="extensions" daemon="true">
+					<arguments>
+						<argument name="extensions">$args.extensions</argument>
+					</arguments>
+				</component>
 				<component name="kernels" type="kernel_multi" daemon="true"/>
 				<component name="rms" type="rms" daemon="true"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
@@ -212,6 +218,11 @@
 		
 		<configuration name="fixed">
 			<components>
+				<component name="extensions" type="extensions" daemon="true">
+					<arguments>
+						<argument name="extensions">$args.extensions</argument>
+					</arguments>
+				</component>
 				<component name="kernels" type="kernel_multi" daemon="true"/>
 				<component name="rms" type="rms" daemon="true"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
@@ -235,6 +246,11 @@
 				<argument name="platformname">null</argument>
 			</arguments>
 			<components>
+				<component name="extensions" type="extensions" daemon="true">
+					<arguments>
+						<argument name="extensions">$args.extensions</argument>
+					</arguments>
+				</component>
 				<component name="kernel_component" type="kernel_component" daemon="true"/>
 				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
@@ -259,6 +275,11 @@
 		
 		<configuration name="allkernels_fixed">
 			<components>
+				<component name="extensions" type="extensions" daemon="true">
+					<arguments>
+						<argument name="extensions">$args.extensions</argument>
+					</arguments>
+				</component>
 				<component name="kernel_component" type="kernel_component" daemon="true"/>
 				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>

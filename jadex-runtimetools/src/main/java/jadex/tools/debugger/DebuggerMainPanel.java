@@ -157,7 +157,6 @@ public class DebuggerMainPanel extends JSplitPane
 														}
 														catch(Exception e)
 														{
-															e.printStackTrace();
 															DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panel.", "Debugger panel class: "+classname, e);
 														}
 													}
