@@ -76,6 +76,8 @@
 		<argument name="awaexcludes" class="String">""</argument>
 		<!-- Flag if copying parameters for local service calls is allowed. -->
 		<argument name="parametercopy" class="boolean">true</argument>
+		<!-- Flag if nio typ or normal tcp transport should be used. -->
+		<argument name="niotransport" class="boolean">false</argument>
 		
 		<!-- <argument name="platform_shutdown_time">1000</argument> -->
 	</arguments>
@@ -134,10 +136,10 @@
 				new MessageService($component.getExternalAccess(), $component.getLogger(),
 				new ITransport[]
 				{
-					new LocalTransport($component.getServiceProvider()),
 					//new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, java.util.logging.Logger.getLogger("test"))
-					new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger())
-					//new TCPTransport($component.getServiceProvider(), $args.tcpport)
+					new LocalTransport($component.getServiceProvider()),
+					$args.niotransport? new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger())
+					: new TCPTransport($component.getServiceProvider(), $args.tcpport)
 				},
 				new MessageType[]
 				{

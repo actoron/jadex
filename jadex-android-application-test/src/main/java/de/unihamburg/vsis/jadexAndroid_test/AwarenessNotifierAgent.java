@@ -157,11 +157,11 @@ public class AwarenessNotifierAgent extends MicroAgent implements
 					}
 				}));
 
-		Bundle data = new Bundle();
-		data.putString("text", "Awareness Notifier Agent started.");
-		Message message = AwarenessActivity.handler.obtainMessage();
-		message.setData(data);
-		message.sendToTarget();
+//		Bundle data = new Bundle();
+//		data.putString("text", "Awareness Notifier Agent started.");
+//		Message message = AwarenessActivity.handler.obtainMessage();
+//		message.setData(data);
+//		message.sendToTarget();
 
 		return ret;
 	}

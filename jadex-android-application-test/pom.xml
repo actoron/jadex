@@ -49,7 +49,7 @@
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>maven-android-plugin</artifactId>
-				<version>3.0.0-alpha-5</version>
+				<version>3.0.0-alpha-7</version>
 				<configuration>
 					<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
 					<assetsDirectory>${project.basedir}/assets</assetsDirectory>
@@ -67,6 +67,17 @@
 					</jvmArguments>
 				</configuration>
 				<extensions>true</extensions>
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<id>update-manifest</id> -->
+<!-- 						<goals> -->
+<!-- 							<goal>manifest-update</goal> -->
+<!-- 						</goals> -->
+<!-- 						<configuration> -->
+<!-- 							<debuggable>true</debuggable> -->
+<!-- 						</configuration> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
 			</plugin>
 
 			<plugin>

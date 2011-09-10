@@ -7,7 +7,7 @@ import jadex.standalone.ComponentAdapterFactory;
 
 public class Startup {
 	public static void main(String[] args) {
-		bdi_test();
+		startNotifyingPlatform("java");
 	}
 
 	public static void micro_test() {
@@ -65,11 +65,11 @@ public class Startup {
 		return future;
 	}
 	
-	public static IFuture startNotifyingPlatform() {
+	public static IFuture startNotifyingPlatform(String platformname) {
 		IFuture future = Starter.createPlatform(new String[] {
 				"-conf", "de/unihamburg/vsis/jadexAndroid_test/Platform.component.xml",
 				"-configname", "android_fixed",
-				"-platformname", "testcases",
+				"-platformname", platformname,
 				"-saveonexit", "false",
 				"-gui", "false",
 		});
