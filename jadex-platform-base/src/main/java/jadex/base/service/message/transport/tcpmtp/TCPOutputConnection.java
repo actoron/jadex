@@ -106,9 +106,7 @@ class TCPOutputConnection
 			sos.write(res);
 			sos.flush();
 			ret = true;
-			/* $if !android $ */
 			cleaner.refresh();
-			/* $endif $ */
 		}
 		catch(IOException e)
 		{
@@ -140,8 +138,6 @@ class TCPOutputConnection
 		{
 			//e.printStackTrace();
 		}
-		/* $if !android $ */
 		cleaner.remove();
-		/* $endif $ */
 	}
 }

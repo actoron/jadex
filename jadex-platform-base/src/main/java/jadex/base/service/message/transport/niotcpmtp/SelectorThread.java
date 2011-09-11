@@ -33,7 +33,8 @@ import java.util.logging.Logger;
 /* $if !android $ */
 import javax.swing.Timer;
 /* $else $
-import java.util.Timer;
+import jadex.base.service.message.Timer;
+import jadex.base.service.message.TimerListener;
 $endif $ */
 
 /**
@@ -460,9 +461,7 @@ public class SelectorThread implements Runnable
 			assert finished;
 			Cleaner	cleaner	= new Cleaner(address);
 			NIOTCPOutputConnection	con	= new NIOTCPOutputConnection(sc, address, cleaner);
-			/* $if !android $ */
 			cleaner.refresh();
-			/* $endif $ */
 			synchronized(connections)
 			{
 				connections.put(address, con);
@@ -529,9 +528,7 @@ public class SelectorThread implements Runnable
 						}
 					}
 					
-					/* $if !android $ */
 					con.getCleaner().refresh();
-					/* $endif $ */
 //					System.out.println("Wrote data to: "+sc.socket().getRemoteSocketAddress());
 				}
 			}
@@ -568,7 +565,7 @@ public class SelectorThread implements Runnable
 	/* $if !android $ */
 	protected class Cleaner	implements	ActionListener
 	/* $else $
-	protected class Cleaner
+	protected class Cleaner implements TimerListener
 	$endif $ */
 	{
 		//-------- attributes --------
@@ -599,6 +596,9 @@ public class SelectorThread implements Runnable
 		 */
 		/* $if !android $ */
 	    public void actionPerformed(ActionEvent event)
+	    /* $else    
+	    public void actionPerformed()
+	    $endif $ */
 		{
 			Object	con;
 			synchronized(connections)
@@ -617,12 +617,10 @@ public class SelectorThread implements Runnable
 				logger.info("Removed connection to : "+address);
 			}
 		}
-	    /* $endif $ */
 		
 		/**
 		 *  Refresh the timeout.
 		 */
-		/* $if !android $ */
 		public void refresh()
 		{
 			if(timer==null)
@@ -635,17 +633,14 @@ public class SelectorThread implements Runnable
 				timer.restart();
 			}
 		}
-		/* $endif $ */
 		
 		/**
 		 *  Remove this cleaner.
 		 */
-		/* $if !android $ */
 		public void remove()
 		{
 			if(timer!=null)
 				timer.stop();
 		}
-		/* $endif $ */
 	}
 }

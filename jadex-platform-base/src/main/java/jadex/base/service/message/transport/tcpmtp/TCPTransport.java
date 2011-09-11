@@ -42,7 +42,8 @@ import java.util.logging.Logger;
 /* $if !android $ */
 import javax.swing.Timer;
 /* $else $
-import java.util.Timer;
+import jadex.base.service.message.Timer;
+import jadex.base.service.message.TimerListener;
 $endif $ */
 
 /**
@@ -532,7 +533,7 @@ public class TCPTransport implements ITransport
 	/* $if !android $ */
 	protected class Cleaner implements ActionListener
 	/* $else $
-	protected class Cleaner
+	protected class Cleaner implements TimerListener
 	$endif $ */
 	{
 		//-------- attributes --------
@@ -562,16 +563,17 @@ public class TCPTransport implements ITransport
 		 */
 		/* $if !android $ */
 	    public void actionPerformed(ActionEvent e)
+		/* $else       
+		public void actionPerformed()
+	    $endif $ */
 		{
 			logger.info("Timeout reached for: "+address);
 			removeConnection(address);
 		}
-	    /* $endif $ */
 		
 		/**
 		 *  Refresh the timeout.
 		 */
-	    /* $if !android $ */
 		public void refresh()
 		{
 			if(timer==null)
@@ -584,17 +586,14 @@ public class TCPTransport implements ITransport
 				timer.restart();
 			}
 		}
-		/* $endif $ */
 		
 		/**
 		 *  Remove this cleaner.
 		 */
-		/* $if !android $ */
 		public void remove()
 		{
 			if(timer!=null)
 				timer.stop();
 		}
-		/* $endif $ */
 	}
 }
