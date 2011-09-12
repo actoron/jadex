@@ -87,7 +87,7 @@ public interface IServiceContainer extends IServiceProvider
 	 *  @param name The service name.
 	 *  @return The service.
 	 */
-	public IFuture getRequiredService(String name);
+	public IFuture<?> getRequiredService(String name);
 	
 	/**
 	 *  Get a required services of a given name.

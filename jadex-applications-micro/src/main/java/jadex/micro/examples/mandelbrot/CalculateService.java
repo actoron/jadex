@@ -36,7 +36,7 @@ public class CalculateService implements ICalculateService
 		// is just set to -1 without calculation. This is more
 		// efficient for areas with 'much black'.
 		
-		Future ret = new Future();
+		Future<AreaData> ret = new Future<AreaData>();
 		
 		double stepx = (data.getXEnd()-data.getXStart())/data.getSizeX();
 		double stepy = (data.getYEnd()-data.getYStart())/data.getSizeY();

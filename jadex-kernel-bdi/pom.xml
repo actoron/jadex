@@ -4,7 +4,7 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-kernel-bdi</artifactId>
 	<packaging>jar</packaging>
-	<version>2.0-rc10</version>
+	<version>2.0-rc10-SNAPSHOT</version>
 	<name>jadex-kernel-bdi</name>
 	<url>http://jadex.sourceforge.net</url>
 
@@ -70,6 +70,12 @@
 			<url>http://oss.sonatype.org/service/local/staging/deploy/maven2/
 			</url>
 		</repository>
+		<snapshotRepository>
+			<id>sonatype-nexus-snapshots</id>
+			<name>Nexus Snapshot Repository</name>
+			<url>http://oss.sonatype.org/content/repositories/snapshots/</url>
+			<uniqueVersion>false</uniqueVersion>
+		</snapshotRepository>
 	</distributionManagement>
 
 	<!--
@@ -167,43 +173,43 @@
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-commons</artifactId>
-			<version>2.0-rc10</version>
+			<version>2.0-rc10-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-xml</artifactId>
-			<version>2.0-rc10</version>
+			<version>2.0-rc10-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-rules</artifactId>
-			<version>2.0-rc10</version>
+			<version>2.0-rc10-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-javaparser</artifactId>
-			<version>2.0-rc10</version>
+			<version>2.0-rc10-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-bridge</artifactId>
-			<version>2.0-rc10</version>
+			<version>2.0-rc10-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-base</artifactId>
-			<version>2.0-rc10</version>
+			<version>2.0-rc10-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-component</artifactId>
-			<version>2.0-rc10</version>
+			<version>2.0-rc10-SNAPSHOT</version>
 		</dependency>
 
 	</dependencies>

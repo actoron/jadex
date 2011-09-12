@@ -28,6 +28,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JComponent;
@@ -337,12 +338,11 @@ public class DisplayPanel extends JComponent
 								{
 									public Object execute(IInternalAccess ia)
 									{
-										ia.getServiceContainer().getRequiredService("cmsservice")
-											.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+										((IFuture<IComponentManagementService>)ia.getServiceContainer().getRequiredService("cmsservice"))
+											.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(DisplayPanel.this)
 										{
-											public void customResultAvailable(Object result)
+											public void customResultAvailable(IComponentManagementService cms)
 											{
-												IComponentManagementService	cms	= (IComponentManagementService)result;
 												if(progressdata!=null)
 												{
 													Object[]	pds	= progressdata.keySet().toArray();

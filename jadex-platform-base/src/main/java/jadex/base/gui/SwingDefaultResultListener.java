@@ -15,7 +15,7 @@ import javax.swing.SwingUtilities;
 /**
  *  Result listener that redirects callbacks on the swing thread.
  */
-public abstract class SwingDefaultResultListener extends DefaultResultListener
+public abstract class SwingDefaultResultListener<E> extends DefaultResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -55,7 +55,7 @@ public abstract class SwingDefaultResultListener extends DefaultResultListener
 	 *  Called when the result is available.
 	 * @param result The result.
 	 */
-	final public void resultAvailable(final Object result)
+	final public void resultAvailable(final E result)
 	{
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
@@ -106,7 +106,7 @@ public abstract class SwingDefaultResultListener extends DefaultResultListener
 	 *  Called when the result is available.
 	 * @param result The result.
 	 */
-	public abstract void customResultAvailable(Object result);
+	public abstract void customResultAvailable(E result);
 	
 	/**
 	 *  Called when an exception occurred.

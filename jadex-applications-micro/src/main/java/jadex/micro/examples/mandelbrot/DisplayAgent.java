@@ -52,9 +52,9 @@ public class DisplayAgent extends MicroAgent
 	/**
 	 *  Called once after agent creation.
 	 */
-	public IFuture	agentCreated()
+	public IFuture<Void>	agentCreated()
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		
 		// Hack!!! Swing code not on swing thread!?
 		DisplayAgent.this.panel	= new DisplayPanel(getExternalAccess());
