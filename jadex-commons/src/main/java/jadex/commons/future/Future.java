@@ -16,7 +16,7 @@ import java.util.Map;
  *  a) a blocking call to get() should be used
  *  b) a callback shall be invoked
  */
-public class Future implements IFuture
+public class Future<E> implements IFuture<E>
 {
 	//-------- constants --------
 	
@@ -35,7 +35,7 @@ public class Future implements IFuture
 	//-------- attributes --------
 	
 	/** The result. */
-	protected Object result;
+	protected E result;
 	
 	/** The exception (if any). */
 	protected Exception exception;
@@ -67,7 +67,7 @@ public class Future implements IFuture
 	 *  Create a future that is already done.
 	 *  @param result	The result, if any.
 	 */
-	public Future(Object result)
+	public Future(E result)
 	{
 		setResult(result);
 	}
@@ -96,7 +96,7 @@ public class Future implements IFuture
      *  Get the result - blocking call.
      *  @return The future result.
      */
-    public Object get(ISuspendable caller)
+    public E get(ISuspendable caller)
     {
     	return get(caller, -1);
     }
@@ -107,7 +107,7 @@ public class Future implements IFuture
      *  @param timeout The timeout in millis.
      *  @return The future result.
      */
-    public Object get(ISuspendable caller, long timeout)
+    public E get(ISuspendable caller, long timeout)
     {
     	boolean suspend = false;
     	synchronized(this)
@@ -240,7 +240,7 @@ public class Future implements IFuture
      *  Listener notifications occur on calling thread of this method.
      *  @param result The result.
      */
-    public void	setResult(Object result)
+    public void	setResult(E result)
     {
     	synchronized(this)
 		{
@@ -275,7 +275,7 @@ public class Future implements IFuture
      *  Listener notifications occur on calling thread of this method.
      *  @param result The result.
      */
-    public void	setResultIfUndone(Object result)
+    public void	setResultIfUndone(E result)
     {
     	synchronized(this)
 		{
@@ -323,7 +323,7 @@ public class Future implements IFuture
 		{
 	    	for(int i=0; i<listeners.size(); i++)
 	    	{
-	    		notifyListener((IResultListener)listeners.get(i));
+	    		notifyListener((IResultListener<E>)listeners.get(i));
 	    	}
 		}
 	}
@@ -332,7 +332,7 @@ public class Future implements IFuture
      *  Add a result listener.
      *  @param listsner The listener.
      */
-    public void	addResultListener(IResultListener listener)
+    public void	addResultListener(IResultListener<E> listener)
     {
     	if(listener==null)
     		throw new RuntimeException();
@@ -359,7 +359,7 @@ public class Future implements IFuture
      *  Notify a result listener.
      *  @param listener The listener.
      */
-    protected void notifyListener(IResultListener listener)
+    protected void notifyListener(IResultListener<E> listener)
     {
 //    	try
 //    	{

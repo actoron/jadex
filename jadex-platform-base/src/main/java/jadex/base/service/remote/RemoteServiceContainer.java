@@ -72,7 +72,7 @@ public class RemoteServiceContainer extends BasicServiceContainer
 				if(!decider.searchNode(RemoteServiceContainer.this, null, RemoteServiceContainer.this, false, (Collection)result)
 					|| rms==null || componentid==null)// || selector instanceof ComponentFactorySelector)
 				{
-					ret.setResult(result);
+					ret.setResult((Collection)result);
 				}
 				else
 				{

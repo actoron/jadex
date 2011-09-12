@@ -5,6 +5,6 @@ import jadex.commons.IRemotable;
 /**
  *  Remoteable version of the result listener interface.
  */
-public interface IRemoteResultListener extends IResultListener, IRemotable
+public interface IRemoteResultListener<E> extends IResultListener<E>, IRemotable
 {
 }

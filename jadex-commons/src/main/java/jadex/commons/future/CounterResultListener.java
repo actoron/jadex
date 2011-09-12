@@ -1,12 +1,14 @@
 package jadex.commons.future;
 
+import java.util.Collection;
+
 
 
 /**
  *  Counter result listener for counting a specified number of resultAvailable calls.
  *  On each call the custom
  */
-public class CounterResultListener implements IResultListener
+public class CounterResultListener<E> implements IResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -17,7 +19,7 @@ public class CounterResultListener implements IResultListener
 	protected int cnt;
 	
 	/** The delegate result listener. */
-	protected IResultListener	delegate;
+	protected IResultListener<E> delegate;
 	
 	/** Flag to indicate that the delegate already has been notified. */
 	protected boolean notified;
@@ -31,7 +33,7 @@ public class CounterResultListener implements IResultListener
 	 *  Create a new counter listener.
 	 *  @param num The number of sub callbacks.
 	 */
-	public CounterResultListener(int num, IResultListener delegate)
+	public CounterResultListener(int num, IResultListener<E> delegate)
 	{
 		this(num, false, delegate);
 	}
@@ -40,7 +42,7 @@ public class CounterResultListener implements IResultListener
 	 *  Create a new counter listener.
 	 *  @param num The number of sub callbacks.
 	 */
-	public CounterResultListener(int num, boolean ignorefailures, IResultListener delegate)
+	public CounterResultListener(int num, boolean ignorefailures, IResultListener<E> delegate)
 	{
 		this.num = num;
 		this.ignorefailures = ignorefailures;
@@ -59,7 +61,7 @@ public class CounterResultListener implements IResultListener
 	 *  Called when the result is available.
 	 * @param result The result.
 	 */
-	public void resultAvailable(Object result)
+	public void resultAvailable(E result)
 	{
 //		System.out.println("here: "+cnt+" "+num);
 		boolean	notify	= false;
@@ -136,7 +138,7 @@ public class CounterResultListener implements IResultListener
 	 *  Method that can be overridden to do sth. on each
 	 *  result available call. 
 	 */
-	public void intermediateResultAvailable(Object result)
+	public void intermediateResultAvailable(E result)
 	{
 	}
 	

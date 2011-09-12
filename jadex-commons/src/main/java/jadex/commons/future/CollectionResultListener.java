@@ -8,7 +8,7 @@ import java.util.Collection;
 /**
  *  Collection result listener collects a number of results and return a collection.
  */
-public class CollectionResultListener	implements IResultListener
+public class CollectionResultListener<E>	implements IResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -16,10 +16,10 @@ public class CollectionResultListener	implements IResultListener
 	protected int num;
 	
 	/** The original result collection. */
-	protected Collection	results;
+	protected Collection<E>	results;
 
 	/** The delegate result listener. */
-	protected IResultListener	delegate;
+	protected IResultListener<Collection<E>>delegate;
 	
 	/** Flag to indicate that the delegate already has been notified. */
 	protected boolean	notified;
@@ -37,7 +37,7 @@ public class CollectionResultListener	implements IResultListener
 	 *  	tolerated and just not be added to the result collection.
 	 *  @param delegate	The delegate result listener.
 	 */
-	public CollectionResultListener(int num, boolean ignorefailures, IResultListener delegate)
+	public CollectionResultListener(int num, boolean ignorefailures, IResultListener<Collection<E>> delegate)
 	{
 		this.num = num;
 		this.ignorefailures	= ignorefailures;
@@ -59,7 +59,7 @@ public class CollectionResultListener	implements IResultListener
 	 *  Called when some result is available.
 	 * @param result The result.
 	 */
-	public void resultAvailable(Object result)
+	public void resultAvailable(E result)
 	{
 		boolean	notify	= false;
 		synchronized(this)

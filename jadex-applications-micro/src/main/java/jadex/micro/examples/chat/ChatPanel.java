@@ -176,9 +176,9 @@ public class ChatPanel extends JPanel
 			public Object execute(IInternalAccess ia)
 			{
 				ia.getServiceContainer().getRequiredServices("chatservices")
-					.addResultListener(new IIntermediateResultListener()
+					.addResultListener(new IIntermediateResultListener<Object>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(Collection result)
 					{
 //						System.out.println("bulk");
 						if(result!=null)

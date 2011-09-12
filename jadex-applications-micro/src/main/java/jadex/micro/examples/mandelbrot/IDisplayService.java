@@ -10,10 +10,10 @@ public interface IDisplayService
 	/**
 	 *  Display the result of a calculation.
 	 */
-	public IFuture displayResult(AreaData result);
+	public IFuture<Void> displayResult(AreaData result);
 
 	/**
 	 *  Display intermediate calculation results.
 	 */
-	public IFuture displayIntermediateResult(ProgressData progress);
+	public IFuture<Void> displayIntermediateResult(ProgressData progress);
 }

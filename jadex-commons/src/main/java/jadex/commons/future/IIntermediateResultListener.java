@@ -1,11 +1,13 @@
 package jadex.commons.future;
 
+import java.util.Collection;
+
 
 /**
  *  Result listener with additional notifications in case of intermediate results.
  */
 //@Reference
-public interface IIntermediateResultListener extends IResultListener
+public interface IIntermediateResultListener<E> extends IResultListener<Collection <E>>
 {
 	/**
 	 *  Called when the result is available.
@@ -14,7 +16,7 @@ public interface IIntermediateResultListener extends IResultListener
 	 *  intermediateResultAvailable method has not been called.
 	 *  @param result The final result.
 	 */
-	public void resultAvailable(Object result);
+	public void resultAvailable(Collection<E> result);
 	
 	/**
 	 *  Called when an exception occurred.
@@ -26,7 +28,7 @@ public interface IIntermediateResultListener extends IResultListener
 	 *  Called when an intermediate result is available.
 	 *  @param result The result.
 	 */
-	public void intermediateResultAvailable(Object result);
+	public void intermediateResultAvailable(E result);
 	
 	/**
      *  Declare that the future is finished.

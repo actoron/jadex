@@ -154,7 +154,7 @@ public class CacheServiceContainer	implements IServiceContainer
 				
 				if(data!=null)
 				{
-					ret.setResult(data);			
+					ret.setResult((Collection)data);			
 				}
 				else
 				{
@@ -177,7 +177,7 @@ public class CacheServiceContainer	implements IServiceContainer
 							}
 //							if(result==null)
 //								System.out.println("found null: "+key);
-							ret.setResult(result);
+							ret.setResult((Collection)result);
 						}
 						
 						public void exceptionOccurred(Exception exception)

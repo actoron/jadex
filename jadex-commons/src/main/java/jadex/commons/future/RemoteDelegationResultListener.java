@@ -5,19 +5,19 @@ package jadex.commons.future;
  *  Result listener that delegates calls to a future
  *  and can be called from remote.
  */
-public class RemoteDelegationResultListener implements IRemoteResultListener
+public class RemoteDelegationResultListener<E> implements IRemoteResultListener<E>
 {
 	//-------- attributes --------
 	
 	/** The future to which calls are delegated. */
-	protected Future future;
+	protected Future<E> future;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new listener.
 	 */
-	public RemoteDelegationResultListener(Future future)
+	public RemoteDelegationResultListener(Future<E> future)
 	{
 		this.future = future;
 	}
@@ -28,7 +28,7 @@ public class RemoteDelegationResultListener implements IRemoteResultListener
 	 *  Called when the result is available.
 	 * @param result The result.
 	 */
-	public final void resultAvailable(Object result)
+	public final void resultAvailable(E result)
 	{
 		try
 		{
@@ -46,7 +46,7 @@ public class RemoteDelegationResultListener implements IRemoteResultListener
 	 *  Called when the result is available.
 	 * @param result The result.
 	 */
-	public void customResultAvailable(Object result)
+	public void customResultAvailable(E result)
 	{
 		future.setResult(result);
 	}

@@ -10,5 +10,5 @@ public interface IGenerateService
 	/**
 	 *  Generate a specific area using a defined x and y size.
 	 */
-	public IFuture generateArea(AreaData data);
+	public IFuture<AreaData> generateArea(AreaData data);
 }

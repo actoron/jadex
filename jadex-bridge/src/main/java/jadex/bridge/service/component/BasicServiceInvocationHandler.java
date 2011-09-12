@@ -38,6 +38,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -132,7 +133,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 					}
 					else
 					{
-						fut.setResult(sic.getResult());
+						fut.setResult((Collection)sic.getResult());
 					}
 				}
 			});

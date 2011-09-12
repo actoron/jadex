@@ -19,6 +19,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 
 import java.awt.Rectangle;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -183,7 +184,7 @@ public class GenerateService implements IGenerateService
 	/**
 	 *  Generate a specific area using a defined x and y size.
 	 */
-	public IFuture generateArea(final AreaData data)
+	public IFuture<AreaData> generateArea(final AreaData data)
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -199,9 +200,9 @@ public class GenerateService implements IGenerateService
 	/**
 	 *  Distribute the work to available or newly created calculation services.
 	 */
-	protected IFuture	distributeWork(final AreaData data)
+	protected IFuture<AreaData>	distributeWork(final AreaData data)
 	{
-		final Future ret = new Future();	
+		final Future<AreaData> ret = new Future<AreaData>();	
 
 		// Split area into work units.
 		final Set	areas	= new HashSet();	// {AreaData}
@@ -247,11 +248,11 @@ public class GenerateService implements IGenerateService
 		final int number	= areas.size();
 		manager.setMax(data.getParallel());
 		manager.performTasks(areas, true, data).addResultListener(agent.createResultListener(
-			new IIntermediateResultListener()
+			new IIntermediateResultListener<Object>()
 		{
 			int	cnt	= 0;
 			
-			public void resultAvailable(Object result)
+			public void resultAvailable(Collection result)
 			{
 				// ignored.
 			}

@@ -22,7 +22,7 @@ public class DisplayService implements IDisplayService
 	/**
 	 *  Display the result of a calculation.
 	 */
-	public IFuture displayResult(AreaData result)
+	public IFuture<Void> displayResult(AreaData result)
 	{
 //		System.out.println("displayRes");
 		agent.getPanel().setResults(result);
@@ -33,7 +33,7 @@ public class DisplayService implements IDisplayService
 	/**
 	 *  Display intermediate calculation results.
 	 */
-	public IFuture displayIntermediateResult(ProgressData progress)
+	public IFuture<Void> displayIntermediateResult(ProgressData progress)
 	{
 //		System.out.println("displayInRes");
 		agent.getPanel().addProgress(progress);

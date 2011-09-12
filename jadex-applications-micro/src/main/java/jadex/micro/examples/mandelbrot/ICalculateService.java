@@ -14,5 +14,5 @@ public interface ICalculateService
 	 *  @return	A future containing the calculated area.
 	 */
 	@Timeout(30000)
-	public IFuture calculateArea(AreaData data);
+	public IFuture<AreaData> calculateArea(AreaData data);
 }

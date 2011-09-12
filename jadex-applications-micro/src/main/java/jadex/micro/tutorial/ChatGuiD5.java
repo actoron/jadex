@@ -59,9 +59,9 @@ public class ChatGuiD5 extends JFrame
 					public Object execute(IInternalAccess ia)
 					{
 						ia.getServiceContainer().getRequiredServices("chatservices")
-							.addResultListener(new IIntermediateResultListener()
+							.addResultListener(new IIntermediateResultListener<Object>()
 						{
-							public void resultAvailable(Object result)
+							public void resultAvailable(Collection result)
 							{
 								for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
 								{
@@ -84,6 +84,7 @@ public class ChatGuiD5 extends JFrame
 							public void exceptionOccurred(Exception exception)
 							{
 							}
+							
 						});
 						return null;
 					}

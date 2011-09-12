@@ -24,7 +24,7 @@ public class CalculateService implements ICalculateService
 	 *  @param data	The area to be calculated.
 	 *  @return	A future containing the calculated area.
 	 */
-	public IFuture calculateArea(AreaData data)
+	public IFuture<AreaData> calculateArea(AreaData data)
 	{
 //		System.out.println("calc: "+data.getId()+" "+agent.getComponentIdentifier());
 		

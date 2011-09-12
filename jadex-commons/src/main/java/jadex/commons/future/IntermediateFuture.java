@@ -9,12 +9,12 @@ import java.util.List;
 /**
  *  Default implementation of an intermediate future.
  */
-public class IntermediateFuture extends Future	implements	IIntermediateFuture
+public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIntermediateFuture<E>
 {
 	//-------- attributes --------
 	
 	/** The intermediate results. */
-	protected Collection results;
+	protected Collection<E> results;
 	
 	/** Flag indicating that addIntermediateResult()has been called. */
 	protected boolean intermediate;
@@ -33,7 +33,7 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 	 *  Create a future that is already done.
 	 *  @param result	The result, if any.
 	 */
-	public IntermediateFuture(Collection results)
+	public IntermediateFuture(Collection<E> results)
 	{
 		super(results);
 	}
@@ -54,7 +54,7 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 	/**
 	 *  Add an intermediate result.
 	 */
-	public void	addIntermediateResult(Object result)
+	public void	addIntermediateResult(E result)
 	{
 	   	synchronized(this)
 		{
@@ -99,7 +99,7 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
      *  Listener notifications occur on calling thread of this method.
      *  @param result The result.
      */
-    public void	setResult(Object result)
+    public void	setResult(Collection<E> result)
     {
     	boolean ex = false;
     	synchronized(this)
@@ -131,7 +131,7 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
      *  Listener notifications occur on calling thread of this method.
      *  @param result The result.
      */
-    public void	setResultIfUndone(Object result)
+    public void	setResultIfUndone(Collection<E> result)
     {
     	boolean ex = false;
     	synchronized(this)
@@ -180,7 +180,7 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
      *  Add a result listener.
      *  @param listsner The listener.
      */
-    public void	addResultListener(IResultListener listener)
+    public void	addResultListener(IResultListener<Collection<E>> listener)
     {
     	if(listener==null)
     		throw new RuntimeException();
@@ -216,7 +216,7 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
      *  Notify a result listener.
      *  @param listener The listener.
      */
-    protected void notifyIntermediateResult(IIntermediateResultListener listener, Object result)
+    protected void notifyIntermediateResult(IIntermediateResultListener<E> listener, E result)
     {
     	listener.intermediateResultAvailable(result);
     }
@@ -225,7 +225,7 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
      *  Notify a result listener.
      *  @param listener The listener.
      */
-    protected void notifyListener(IResultListener listener)
+    protected void notifyListener(IResultListener<Collection<E>> listener)
     {
     	scheduleNotification(listener, false, null);
     	startScheduledNotifications();
@@ -235,7 +235,7 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
      *  Notify a result listener.
      *  @param listener The listener.
      */
-    protected void doNotifyListener(IResultListener listener)
+    protected void doNotifyListener(IResultListener<Collection<E>> listener)
     {
 //    	try
 //    	{
@@ -260,7 +260,7 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 			    	{
 			    		for(int i=0; i<inter.length; i++)
 			    		{
-			    			notifyIntermediateResult(lis, inter[i]);
+			    			notifyIntermediateResult(lis, (E)inter[i]);
 			    		}
 			    	}
 					lis.finished();
@@ -284,7 +284,7 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
      *  @param intermediate	True for intermediate result, false for final results.
      *  @param result	The intermediate result (if any).
      */
-    protected void	scheduleNotification(IResultListener listener, boolean intermediate, Object result)
+    protected void	scheduleNotification(IResultListener<Collection<E>> listener, boolean intermediate, Object result)
     {
     	synchronized(this)
     	{
@@ -334,11 +334,11 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
         	{
         		if(next instanceof IResultListener)
         		{
-        			doNotifyListener((IResultListener)next);
+        			doNotifyListener((IResultListener<Collection<E>>)next);
         		}
         		else
         		{
-        			notifyIntermediateResult((IIntermediateResultListener)((Object[])next)[0], ((Object[])next)[1]);
+        			notifyIntermediateResult((IIntermediateResultListener<E>)((Object[])next)[0], (E)((Object[])next)[1]);
         		}
         	}
     	}

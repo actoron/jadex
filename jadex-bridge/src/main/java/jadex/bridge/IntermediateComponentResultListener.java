@@ -2,10 +2,12 @@ package jadex.bridge;
 
 import jadex.commons.future.IIntermediateResultListener;
 
+import java.util.Collection;
+
 /**
  * 
  */
-public class IntermediateComponentResultListener extends ComponentResultListener implements IIntermediateResultListener
+public class IntermediateComponentResultListener<E> extends ComponentResultListener<Collection<E>> implements IIntermediateResultListener<E>
 {
 	//-------- constructors --------
 	
@@ -14,7 +16,7 @@ public class IntermediateComponentResultListener extends ComponentResultListener
 	 *  @param listener The listener.
 	 *  @param adapter The adapter.
 	 */
-	public IntermediateComponentResultListener(IIntermediateResultListener listener, IComponentAdapter adapter)
+	public IntermediateComponentResultListener(IIntermediateResultListener<E> listener, IComponentAdapter adapter)
 	{
 		super(listener, adapter);
 	}
@@ -25,7 +27,7 @@ public class IntermediateComponentResultListener extends ComponentResultListener
 	 *  Called when an intermediate result is available.
 	 * @param result The result.
 	 */
-	public void intermediateResultAvailable(final Object result)
+	public void intermediateResultAvailable(final E result)
 	{
 		if(adapter.isExternalThread())
 		{
@@ -35,7 +37,7 @@ public class IntermediateComponentResultListener extends ComponentResultListener
 				{
 					public void run()
 					{
-						((IIntermediateResultListener)listener).intermediateResultAvailable(result);
+						((IIntermediateResultListener<E>)listener).intermediateResultAvailable(result);
 					}
 					
 					public String toString()
@@ -51,7 +53,7 @@ public class IntermediateComponentResultListener extends ComponentResultListener
 		}
 		else
 		{
-			((IIntermediateResultListener)listener).intermediateResultAvailable(result);
+			((IIntermediateResultListener<E>)listener).intermediateResultAvailable(result);
 		}
 	}
 	
@@ -68,7 +70,7 @@ public class IntermediateComponentResultListener extends ComponentResultListener
 				{
 					public void run()
 					{
-						((IIntermediateResultListener)listener).finished();
+						((IIntermediateResultListener<E>)listener).finished();
 					}
 					
 					public String toString()
@@ -84,7 +86,7 @@ public class IntermediateComponentResultListener extends ComponentResultListener
 		}
 		else
 		{
-			((IIntermediateResultListener)listener).finished();
+			((IIntermediateResultListener<E>)listener).finished();
 		}
     }
 }

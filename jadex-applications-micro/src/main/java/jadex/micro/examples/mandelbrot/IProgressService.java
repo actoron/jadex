@@ -12,5 +12,5 @@ public interface IProgressService
 	 *  @param taskid	The id of the task.
 	 *  @return	A future object holding the progress as a percentage integer value.
 	 */
-	public IFuture getProgress(Object taskid);
+	public IFuture<Integer> getProgress(Object taskid);
 }

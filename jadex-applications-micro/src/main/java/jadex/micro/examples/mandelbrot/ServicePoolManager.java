@@ -13,6 +13,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -189,7 +190,7 @@ public class ServicePoolManager
 			
 //			System.out.println("wurksn0");
 			component.getServiceContainer().getRequiredServices(name).addResultListener(
-				new IIntermediateResultListener()
+				new IIntermediateResultListener<Object>()
 			{
 				/**
 				 *  A service has been found.
@@ -251,7 +252,7 @@ public class ServicePoolManager
 //					}
 				}
 				
-				public void resultAvailable(Object result)
+				public void resultAvailable(Collection result)
 				{
 					// ignored
 //					System.out.println("wurksnrr");

@@ -9,7 +9,7 @@ import java.util.logging.Logger;
  *  The default listener for just printing out result information.
  *  Is used as fallback when no other listener is available.
  */
-public abstract class IntermediateDefaultResultListener	extends DefaultResultListener	implements IIntermediateResultListener
+public abstract class IntermediateDefaultResultListener<E>	extends DefaultResultListener<Collection<E>>	implements IIntermediateResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -56,7 +56,7 @@ public abstract class IntermediateDefaultResultListener	extends DefaultResultLis
 	 *  Called when an intermediate result is available.
 	 *  @param result The result.
 	 */
-	public abstract void intermediateResultAvailable(Object result);
+	public abstract void intermediateResultAvailable(E result);
 	
 	/**
      *  Declare that the future is finished.
@@ -74,19 +74,11 @@ public abstract class IntermediateDefaultResultListener	extends DefaultResultLis
 	 *  Called when the result is available.
 	 *  @param result The result.
 	 */
-	public void resultAvailable(Object result)
+	public void resultAvailable(Collection<E> result)
 	{
-		if(result instanceof Collection)
+		for(Iterator<E> it=result.iterator(); it.hasNext(); )
 		{
-			Collection	coll	= (Collection)result;
-			for(Iterator it=coll.iterator(); it.hasNext(); )
-			{
-				intermediateResultAvailable(it.next());
-			}
-		}
-		else
-		{
-			exceptionOccurred(new RuntimeException("Result not java.util.Collection: "+result));
+			intermediateResultAvailable(it.next());
 		}
 	}
 }

@@ -1,11 +1,13 @@
 package jadex.commons.future;
 
+import java.util.Collection;
+
 
 
 /**
  *  Intermediate version of the delegation result listener.
  */
-public class IntermediateDelegationResultListener implements IIntermediateResultListener
+public class IntermediateDelegationResultListener<E> implements IIntermediateResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -17,7 +19,7 @@ public class IntermediateDelegationResultListener implements IIntermediateResult
 	/**
 	 *  Create a new listener.
 	 */
-	public IntermediateDelegationResultListener(IntermediateFuture future)
+	public IntermediateDelegationResultListener(IntermediateFuture<E> future)
 	{
 		this.future = future;
 	}
@@ -28,7 +30,7 @@ public class IntermediateDelegationResultListener implements IIntermediateResult
 	 *  Called when the result is available.
 	 * @param result The result.
 	 */
-	public final void resultAvailable(Object result)
+	public final void resultAvailable(Collection<E> result)
 	{
 		try
 		{
@@ -59,7 +61,7 @@ public class IntermediateDelegationResultListener implements IIntermediateResult
 	 *  Called when an intermediate result is available.
 	 *  @param result The result.
 	 */
-	public void intermediateResultAvailable(Object result)
+	public void intermediateResultAvailable(E result)
 	{
 		try
 		{
@@ -98,7 +100,7 @@ public class IntermediateDelegationResultListener implements IIntermediateResult
 	 *  Called when the result is available.
 	 *  @param result The result.
 	 */
-	public void customResultAvailable(Object result)
+	public void customResultAvailable(Collection<E> result)
 	{
 		future.setResult(result);
 	}
@@ -116,7 +118,7 @@ public class IntermediateDelegationResultListener implements IIntermediateResult
 	 *  Called when an intermediate result is available.
 	 * @param result The result.
 	 */
-	public void customIntermediateResultAvailable(Object result)
+	public void customIntermediateResultAvailable(E result)
 	{
 		future.addIntermediateResult(result);
 	}

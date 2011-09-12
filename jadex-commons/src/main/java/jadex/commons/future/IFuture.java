@@ -6,7 +6,7 @@ package jadex.commons.future;
  * notification mechanism.
  */
 //@Reference
-public interface IFuture
+public interface IFuture<E>
 {
 	// -------- constants --------
 
@@ -15,7 +15,7 @@ public interface IFuture
 	 *  value of methods that do not perform asynchronous operations and do not
 	 *  return a result value.
 	 */
-	public static final IFuture	DONE	= new Future(null);
+	public static final IFuture<Void>	DONE	= new Future(null);
 
 	// -------- methods --------
 
@@ -29,18 +29,18 @@ public interface IFuture
 	 *  Get the result - blocking call.
 	 *  @return The future result.
 	 */
-	public Object get(ISuspendable caller);
+	public E get(ISuspendable caller);
 
 	/**
 	 *  Get the result - blocking call.
 	 *  @param timeout The timeout in millis.
 	 *  @return The future result.
 	 */
-	public Object get(ISuspendable caller, long timeout);
+	public E get(ISuspendable caller, long timeout);
 
 	/**
 	 *  Add a result listener.
 	 *  @param listener The listener.
 	 */
-	public void addResultListener(IResultListener listener);
+	public void addResultListener(IResultListener<E> listener);
 }

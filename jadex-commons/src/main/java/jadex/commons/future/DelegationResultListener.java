@@ -5,7 +5,7 @@ package jadex.commons.future;
 /**
  *  Result listener that delegates calls to a future.
  */
-public class DelegationResultListener implements IResultListener
+public class DelegationResultListener<E> implements IResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -19,7 +19,7 @@ public class DelegationResultListener implements IResultListener
 	/**
 	 *  Create a new listener.
 	 */
-	public DelegationResultListener(Future future)
+	public DelegationResultListener(Future<E> future)
 	{
 		this.future = future;
 //		this.ex	= new DebugException();
@@ -31,7 +31,7 @@ public class DelegationResultListener implements IResultListener
 	 *  Called when the result is available.
 	 * @param result The result.
 	 */
-	public final void resultAvailable(Object result)
+	public final void resultAvailable(E result)
 	{
 		try
 		{
@@ -62,7 +62,7 @@ public class DelegationResultListener implements IResultListener
 	 *  Called when the result is available.
 	 * @param result The result.
 	 */
-	public void customResultAvailable(Object result)
+	public void customResultAvailable(E result)
 	{
 		future.setResult(result);
 	}

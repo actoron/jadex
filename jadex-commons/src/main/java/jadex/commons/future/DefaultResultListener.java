@@ -7,7 +7,7 @@ import java.util.logging.Logger;
  *  The default listener for just printing out result information.
  *  Is used as fallback when no other listener is available.
  */
-public abstract class DefaultResultListener implements IResultListener
+public abstract class DefaultResultListener<E> implements IResultListener<E>
 {
 	//-------- attributes --------
 	

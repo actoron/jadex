@@ -5,12 +5,12 @@ import jadex.commons.future.IResultListener;
 /**
  *  The result listener for executing listener invocations as a component step.
  */
-public class ComponentResultListener implements IResultListener
+public class ComponentResultListener<E> implements IResultListener<E>
 {
 	//-------- attributes --------
 	
 	/** The result listener. */
-	protected IResultListener listener;
+	protected IResultListener<E> listener;
 	
 	/** The component adapter. */
 	protected IComponentAdapter adapter;
@@ -22,7 +22,7 @@ public class ComponentResultListener implements IResultListener
 	 *  @param listener The listener.
 	 *  @param adapter The adapter.
 	 */
-	public ComponentResultListener(IResultListener listener, IComponentAdapter adapter)
+	public ComponentResultListener(IResultListener<E> listener, IComponentAdapter adapter)
 	{
 		if(listener==null)
 			throw new NullPointerException("Listener must not null.");
@@ -36,7 +36,7 @@ public class ComponentResultListener implements IResultListener
 	 *  Called when the result is available.
 	 * @param result The result.
 	 */
-	public void resultAvailable(final Object result)
+	public void resultAvailable(final E result)
 	{
 		if(adapter.isExternalThread())
 		{
