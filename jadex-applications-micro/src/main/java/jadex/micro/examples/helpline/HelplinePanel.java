@@ -245,10 +245,10 @@ public class HelplinePanel extends JPanel
 	 *  @param name The person's name.
 	 *  @return Future that contains the information.
 	 */
-	public IIntermediateFuture getInformation(final String name, final boolean remote)
+	public IIntermediateFuture<InformationEntry> getInformation(final String name, final boolean remote)
 	{
 //		SServiceProvider.getServices(agent.getServiceProvider(), IHelpline.class, remote, true)
-		final IntermediateFuture ret = new IntermediateFuture();
+		final IntermediateFuture<InformationEntry> ret = new IntermediateFuture<InformationEntry>();
 		
 		IFuture fut = agent.scheduleStep(new IComponentStep()
 		{
@@ -310,7 +310,15 @@ public class HelplinePanel extends JPanel
 					for(Iterator it=coll.iterator(); it.hasNext(); )
 					{
 						IHelpline hl = (IHelpline)it.next();
-						hl.getInformation(name).addResultListener(crl);
+						IFuture res = hl.getInformation(name);
+						res.addResultListener(new DefaultResultListener()
+						{
+							public void resultAvailable(Object result)
+							{
+								System.out.println("result"+result);
+							}
+						});
+						res.addResultListener(crl);
 					}
 				}
 			}

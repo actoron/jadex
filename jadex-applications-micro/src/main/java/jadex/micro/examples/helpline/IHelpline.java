@@ -14,7 +14,7 @@ public interface IHelpline
 	 *  @param name The person's name.
 	 *  @return Future that contains all information records as collection.
 	 */
-	public IIntermediateFuture getInformation(String name);
+	public IIntermediateFuture<InformationEntry> getInformation(String name);
 	
 	/**
 	 *  Add an information about a person.

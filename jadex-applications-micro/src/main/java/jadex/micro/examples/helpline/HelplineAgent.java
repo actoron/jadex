@@ -95,7 +95,7 @@ public class HelplineAgent extends MicroAgent
 	 *  @param name The person's name.
 	 *  @return Future that contains the information.
 	 */
-	public Collection getInformation(String name)
+	public Collection<InformationEntry> getInformation(String name)
 	{
 		Collection ret	= (Collection)infos.get(name); 
 		return ret!=null ? ret : Collections.EMPTY_LIST;

@@ -1,5 +1,6 @@
 package jadex.micro.examples.helpline;
 
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
@@ -7,6 +8,7 @@ import jadex.commons.future.IntermediateFuture;
 /**
  *  Helpline service implementation.
  */
+@Service
 public class HelplineService implements IHelpline
 {
 	//-------- attributes --------
@@ -32,7 +34,7 @@ public class HelplineService implements IHelpline
 	 *  @param name The person's name.
 	 *  @return Future that contains the information.
 	 */
-	public IIntermediateFuture getInformation(final String name)
+	public IIntermediateFuture<InformationEntry> getInformation(final String name)
 	{
 		return new IntermediateFuture(agent.getInformation(name));
 	}
