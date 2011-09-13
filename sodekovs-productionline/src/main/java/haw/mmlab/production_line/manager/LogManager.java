@@ -113,7 +113,6 @@ public class LogManager {
 	 */
 	private void createStatistics() {
 		Map<String, Integer> capCounter = new HashMap<String, Integer>();
-		double n = 0;
 		double redundancy = 0;
 		int roleCount = 0;
 		double workload = 0;
@@ -125,7 +124,6 @@ public class LogManager {
 					count = 0;
 				}
 				capCounter.put(cap.getId(), count++);
-				n++;
 			}
 
 			workload += (double) robot.getRoles().size() / (double) robot.getBufferSize();

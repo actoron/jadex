@@ -16,7 +16,6 @@ import haw.mmlab.production_line.domain.HelpRequest;
 import haw.mmlab.production_line.logging.database.DatabaseLogger;
 import haw.mmlab.production_line.service.IProcessWorkpieceService;
 import haw.mmlab.production_line.service.ProcessWorkpieceService;
-import haw.mmlab.production_line.service.ServiceHelper;
 import haw.mmlab.production_line.state.MainState;
 import haw.mmlab.production_line.strategies.AgentData;
 import haw.mmlab.production_line.strategies.EvaluationResult;
@@ -24,13 +23,19 @@ import haw.mmlab.production_line.strategies.IStrategy;
 import haw.mmlab.production_line.strategies.StrategyFactory;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.modelinfo.Argument;
-import jadex.bridge.modelinfo.IArgument;
-import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.commons.future.ThreadSuspendable;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Description;
+import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 
 import java.util.Collection;
 import java.util.List;
@@ -38,12 +43,15 @@ import java.util.Map;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 
-
 /**
  * The robot agents, processes workpieces, stores them in his {@link Buffer} and sends them further to the next transport agent.
  * 
  * @author thomas
  */
+@Description("Robot agent.")
+@Arguments({ @Argument(clazz = Robot.class, name = "config"), @Argument(clazz = Map.class, name = "taskMap"), @Argument(clazz = IStrategy.class, name = "strategy") })
+@ProvidedServices(@ProvidedService(implementation = @Implementation(ProcessWorkpieceService.class), type = IProcessWorkpieceService.class))
+@RequiredServices({ @RequiredService(name = "processWorkpieceServices", type = IProcessWorkpieceService.class, multiple = true, binding = @Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL)) })
 public class RobotAgent extends ProcessWorkpieceAgent {
 
 	/** The output {@link Buffer} */
@@ -54,7 +62,7 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public IFuture agentCreated() {
+	public IFuture<Void> agentCreated() {
 		// initialize the agents variables
 		Robot conf = (Robot) getArgument("config");
 
@@ -82,9 +90,6 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 
 		getLogger().info(id + " created");
 
-		// add the service
-		addService("ProcessWorkpieceService", IProcessWorkpieceService.class, new ProcessWorkpieceService(this, id, AgentConstants.AGENT_TYPE_ROBOT, getLogger()));
-
 		return IFuture.DONE;
 	}
 
@@ -93,23 +98,10 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 		waitForTick(new SendWorkpieceStep());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public IFuture agentKilled() {
+	public IFuture<Void> agentKilled() {
 		return super.agentKilled();
-	}
-
-	/**
-	 * Returns the {@link MicroAgentMetaInfo}.
-	 * 
-	 * @return the {@link MicroAgentMetaInfo}
-	 */
-	public static MicroAgentMetaInfo getMetaInfo() {
-		MicroAgentMetaInfo meta = new MicroAgentMetaInfo();
-		meta.setDescription("Robot agent");
-		meta.setArguments(new IArgument[] { new Argument("config", "The robot's configuration", "Robot"), new Argument("taskMap", "A map with all the tasks", "Map"),
-				new Argument("strategy", "The reconfiguration strategy", "IStrategy") });
-		meta.setProvidedServices(new ProvidedServiceInfo[] { new ProvidedServiceInfo(IProcessWorkpieceService.class) });
-		return meta;
 	}
 
 	/**
@@ -212,52 +204,42 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 		 * @param ia
 		 *            the given {@link IInternalAccess}
 		 */
+		@SuppressWarnings("unchecked")
 		private void sendWorkpiece(final BufferElement element, IInternalAccess ia) {
 			// Rolle aus Pufferelement holen
 			final Role role = element.getRole();
-			
-			SServiceProvider.getServices(getServiceProvider(), IProcessWorkpieceService.class).addResultListener(new IResultListener() {
 
-				public void resultAvailable(Object result) {
-					@SuppressWarnings("unchecked")
-					Collection<IProcessWorkpieceService> services = (Collection<IProcessWorkpieceService>) result;
+			getRequiredServices("processWorkpieceServices").addResultListener(new DefaultResultListener<Collection<IProcessWorkpieceService>>() {
+
+				public void resultAvailable(Collection<IProcessWorkpieceService> services) {
 					for (IProcessWorkpieceService service : services) {
 						final String target = role.getPostcondition().getTargetAgent();
-						if (service.getId().equals(target)) {
+						if (service.getId().get(new ThreadSuspendable(this)).equals(target)) {
 							// Workpiece aus Pufferelement holen
 							final Workpiece wp = element.getWorkpiece();
 
-							service.process(wp, id).addResultListener(new IResultListener() {
+							service.process(wp, id).addResultListener(new DefaultResultListener<Boolean>() {
 
-								public void resultAvailable(Object result) {
-									Boolean processResult = (Boolean) result;
-									if (processResult) {
+								public void resultAvailable(Boolean result) {
+									if (result) {
 										String msg = id + " successfully delivered " + wp + " to " + target;
 										getLogger().fine(msg);
-										ServiceHelper.handleConsoleMsg(getServiceProvider(), new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+										handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
 										// Element aus Puffer entfernen
 										buffer.dequeue();
 									} else {
 										String msg = id + " could not hand over workpiece " + wp + " to " + target;
 										getLogger().fine(msg);
-										ServiceHelper.handleConsoleMsg(getServiceProvider(), new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+										handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
 										// Element neu queuen
 										buffer.enqueue(buffer.dequeue());
 									}
 
 									waitFor(200, SendWorkpieceStep.this);
 								}
-
-								public void exceptionOccurred(Exception exception) {
-									getLogger().severe(exception.getMessage());
-								}
 							});
 						}
 					}
-				}
-
-				public void exceptionOccurred(Exception exception) {
-					getLogger().severe(exception.getMessage());
 				}
 			});
 		}
@@ -279,9 +261,8 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 				List<Role> takeRoles = result.getTakeRoles();
 				List<Role> giveAwayRoles = result.getGiveAwayRoles();
 
-				ServiceHelper.handleConsoleMsg(getServiceProvider(), new ConsoleMessage(ConsoleMessage.TYPE_ADAPTIVITY, id + " takes " + takeRoles.size() + " roles " + takeRoles), getLogger());
-				ServiceHelper.handleConsoleMsg(getServiceProvider(), new ConsoleMessage(ConsoleMessage.TYPE_ADAPTIVITY, id + " gives away " + giveAwayRoles.size() + " roles " + giveAwayRoles),
-						getLogger());
+				handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_ADAPTIVITY, id + " takes " + takeRoles.size() + " roles " + takeRoles), getLogger());
+				handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_ADAPTIVITY, id + " gives away " + giveAwayRoles.size() + " roles " + giveAwayRoles), getLogger());
 
 				assignedRoles.removeAll(giveAwayRoles);
 				assignedRoles.addAll(takeRoles);
@@ -305,14 +286,13 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 			// if the max escalation level is not reached, increment the escalation level and resend the request
 			if (request.getEscalationLevel() < strategy.getMaximumEscalationLevel()) {
 				request.incrementEscalationLevel();
-				ServiceHelper.handleConsoleMsg(getServiceProvider(),
-						new ConsoleMessage(ConsoleMessage.TYPE_ADAPTIVITY, id + " resends HelpRequest after increment excalation level to " + request.getEscalationLevel() + " for "
-								+ request.getDeficientRoles().size() + " roles: " + request.getDeficientRoles()), getLogger());
+				handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_ADAPTIVITY, id + " resends HelpRequest after increment excalation level to " + request.getEscalationLevel() + " for "
+						+ request.getDeficientRoles().size() + " roles: " + request.getDeficientRoles()), getLogger());
 				waitForTick(new SendMediumMessageStep(request));
 			}
 			// if the max escalation level is reached and their are still deficient roles, the reconfiguration failed
 			else {
-				ServiceHelper.handleConsoleMsg(getServiceProvider(), new ConsoleMessage(ConsoleMessage.TYPE_ADAPTIVITY, id + ": received its own request. Nothing will be done anymore"), getLogger());
+				handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_ADAPTIVITY, id + ": received its own request. Nothing will be done anymore"), getLogger());
 			}
 		}
 	}

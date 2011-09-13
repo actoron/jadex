@@ -8,13 +8,16 @@ import haw.mmlab.production_line.dropout.config.DropoutConfig;
 import haw.mmlab.production_line.service.IProcessWorkpieceService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.modelinfo.Argument;
-import jadex.bridge.modelinfo.IArgument;
-import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Description;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -29,6 +32,9 @@ import javax.xml.bind.JAXBException;
  * 
  * @author thomas
  */
+@Description("The dropout agent.")
+@Arguments(@Argument(clazz = String.class, name = "configuration_model"))
+@RequiredServices({ @RequiredService(name = "processWorkpieceServices", type = IProcessWorkpieceService.class, multiple = true, binding = @Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL)) })
 public class DropoutAgent extends MicroAgent {
 
 	public static final String CATEGORY_ROBOT = "ROBOT";
@@ -52,7 +58,7 @@ public class DropoutAgent extends MicroAgent {
 	 * @see jadex.micro.MicroAgent#agentCreated()
 	 */
 	@Override
-	public IFuture agentCreated() {
+	public IFuture<Void> agentCreated() {
 		String confFile = (String) getArgument("configuration_model");
 
 		try {
@@ -79,16 +85,6 @@ public class DropoutAgent extends MicroAgent {
 		for (Configuration conf : config.getConfigurations()) {
 			waitFor(conf.getRate() * 1000, new QueryStep(conf));
 		}
-	}
-
-	/**
-	 * Returns the {@link MicroAgentMetaInfo}.
-	 * 
-	 * @return the {@link MicroAgentMetaInfo}
-	 */
-	public static MicroAgentMetaInfo getMetaInfo() {
-		MicroAgentMetaInfo meta = new MicroAgentMetaInfo("Dropout agent", null, new IArgument[] { new Argument("configuration_model", "The dropout's configuration", "String") }, null);
-		return meta;
 	}
 
 	private class QueryStep implements IComponentStep {
@@ -133,26 +129,26 @@ public class DropoutAgent extends MicroAgent {
 		@SuppressWarnings("unchecked")
 		private List<IProcessWorkpieceService> getReceiver(AgentQuery query) {
 			List<IProcessWorkpieceService> receiver = new ArrayList<IProcessWorkpieceService>();
-			IFuture future = SServiceProvider.getServices(getServiceProvider(), IProcessWorkpieceService.class);
-			Collection<IProcessWorkpieceService> services = (Collection<IProcessWorkpieceService>) future.get(new ThreadSuspendable(this));
+			IFuture<Collection<IProcessWorkpieceService>> future = (IFuture<Collection<IProcessWorkpieceService>>) getRequiredServices("processWorkpieceServices").get(new ThreadSuspendable(this));
+			Collection<IProcessWorkpieceService> services = future.get(new ThreadSuspendable(this));
 
 			if (query.getCategory().equals(CATEGORY_ALL)) {
 				receiver.addAll(services);
 			} else if (query.getCategory().equals(CATEGORY_ROBOT)) {
 				for (IProcessWorkpieceService service : services) {
-					if (service.getType().equals(AgentConstants.AGENT_TYPE_ROBOT)) {
+					if (service.getType().get(new ThreadSuspendable(this)).equals(AgentConstants.AGENT_TYPE_ROBOT)) {
 						receiver.add(service);
 					}
 				}
 			} else if (query.getCategory().equals(CATEGORY_TRANSPORT)) {
 				for (IProcessWorkpieceService service : services) {
-					if (service.getType().equals(AgentConstants.AGENT_TYPE_TRANSPORT)) {
+					if (service.getType().get(new ThreadSuspendable(this)).equals(AgentConstants.AGENT_TYPE_TRANSPORT)) {
 						receiver.add(service);
 					}
 				}
 			} else if (query.getCategory().equals(CATEGORY_NONE)) {
 				for (IProcessWorkpieceService service : services) {
-					if (query.getAgents().contains(service.getId())) {
+					if (query.getAgents().contains(service.getId().get(new ThreadSuspendable(this)))) {
 						receiver.add(service);
 					}
 				}

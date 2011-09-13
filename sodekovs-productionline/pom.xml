@@ -19,8 +19,7 @@
 					<exclude>**/*.java</exclude>
 					<exclude>**/.svn/*</exclude>
 				</excludes>
-			</resource><!-- <resource> <directory>src/test/java</directory> <excludes> 
-				<exclude>**/*.java</exclude> <exclude>**/.svn/*</exclude> </excludes> </resource> -->
+			</resource>
 		</resources>
 
 		<plugins>

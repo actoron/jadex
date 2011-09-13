@@ -1,11 +1,13 @@
 package haw.mmlab.production_line.service;
 
+import haw.mmlab.production_line.common.AgentConstants;
 import haw.mmlab.production_line.common.ConsoleMessage;
 import haw.mmlab.production_line.common.ProcessWorkpieceAgent;
 import haw.mmlab.production_line.configuration.Workpiece;
 import haw.mmlab.production_line.dropout.config.Action;
 import haw.mmlab.production_line.robot.RobotAgent;
-import jadex.bridge.service.BasicService;
+import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -16,40 +18,12 @@ import java.util.logging.Logger;
  * 
  * @author thomas
  */
-public class ProcessWorkpieceService extends BasicService implements IProcessWorkpieceService {
-
-	/** The agents id */
-	protected String id = null;
-
-	/** The logger */
-	protected Logger logger = null;
-
-	/** The agents type */
-	protected String type = null;
+@Service
+public class ProcessWorkpieceService implements IProcessWorkpieceService {
 
 	/** Reference to the agent */
+	@ServiceComponent
 	protected ProcessWorkpieceAgent agent = null;
-
-	/**
-	 * Constructor.
-	 * 
-	 * @param agent
-	 *            reference to the {@link RobotAgent}
-	 * @param id
-	 *            the agents id
-	 * @param type
-	 *            the agents type
-	 * @param logger
-	 *            reference to the agents {@link Logger}
-	 */
-	public ProcessWorkpieceService(ProcessWorkpieceAgent agent, String id, String type, Logger logger) {
-		super(agent.getServiceProvider().getId(), IProcessWorkpieceService.class, null);
-
-		this.agent = agent;
-		this.id = id;
-		this.type = type;
-		this.logger = logger;
-	}
 
 	/**
 	 * Get the services id.
@@ -58,8 +32,8 @@ public class ProcessWorkpieceService extends BasicService implements IProcessWor
 	 * 
 	 * @directcall (Is called on caller thread).
 	 */
-	public String getId() {
-		return id;
+	public IFuture<String> getId() {
+		return new Future<String>(agent.getId());
 	}
 
 	/**
@@ -69,8 +43,12 @@ public class ProcessWorkpieceService extends BasicService implements IProcessWor
 	 * 
 	 * @directcall (Is called on caller thread).
 	 */
-	public String getType() {
-		return type;
+	public IFuture<String> getType() {
+		if (agent instanceof RobotAgent) {
+			return new Future<String>(AgentConstants.AGENT_TYPE_ROBOT);
+		} else {
+			return new Future<String>(AgentConstants.AGENT_TYPE_TRANSPORT);
+		}
 	}
 
 	/**
@@ -82,24 +60,27 @@ public class ProcessWorkpieceService extends BasicService implements IProcessWor
 	 *            the agent id of the sender
 	 * @return
 	 */
-	public IFuture process(Workpiece workpiece, String agentId) {
-		Future result = new Future();
+	public IFuture<Boolean> process(Workpiece workpiece, String agentId) {
+		Future<Boolean> result = new Future<Boolean>();
+
+		String id = agent.getId();
+		Logger logger = agent.getLogger();
 
 		String msg = id + " has received " + workpiece + " from " + agentId;
 		logger.fine(msg);
-		ServiceHelper.handleConsoleMsg(agent.getServiceProvider(), new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), logger);
+		agent.handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), logger);
 
 		if (agent.receiveWorkpiece(workpiece, agentId)) {
 			msg = id + " successfully processed " + workpiece + " from " + agentId;
 			logger.fine(msg);
-			ServiceHelper.handleConsoleMsg(agent.getServiceProvider(), new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), logger);
+			agent.handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), logger);
 			result.setResult(Boolean.TRUE);
 			return result;
 		}
 
 		msg = id + " could not process " + workpiece + " from " + agentId;
 		logger.fine(msg);
-		ServiceHelper.handleConsoleMsg(agent.getServiceProvider(), new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), logger);
+		agent.handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), logger);
 		result.setResult(Boolean.FALSE);
 		return result;
 	}
@@ -111,7 +92,7 @@ public class ProcessWorkpieceService extends BasicService implements IProcessWor
 	 *            the {@link Action} to be executed
 	 */
 	public void executeDropoutAction(Action action) {
-		logger.fine("executeDropoutAction was called in " + id);
+		agent.getLogger().fine("executeDropoutAction was called in " + agent.getId());
 		agent.handleDropout(action);
 	}
 }

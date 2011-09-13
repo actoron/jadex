@@ -2,29 +2,20 @@ package haw.mmlab.production_line.manager;
 
 import haw.mmlab.production_line.common.ConsoleMessage;
 import haw.mmlab.production_line.service.IManagerService;
-import jadex.bridge.service.BasicService;
+import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceComponent;
 
 /**
  * Service methods provided by the manager agent.
  * 
  * @author thomas
  */
-public class ManagerService extends BasicService implements IManagerService {
+@Service
+public class ManagerService implements IManagerService {
 
 	/** Reference to the manager agent */
+	@ServiceComponent
 	private ManagerAgent agent = null;
-
-	/**
-	 * Constructor
-	 * 
-	 * @param agent
-	 *            reference to the {@link ManagerAgent}
-	 */
-	public ManagerService(ManagerAgent agent) {
-		super(agent.getServiceProvider().getId(), IManagerService.class, null);
-
-		this.agent = agent;
-	}
 
 	public void informWPProduced(String taskId) {
 		if (agent.getProducedWPs().containsKey(taskId)) {

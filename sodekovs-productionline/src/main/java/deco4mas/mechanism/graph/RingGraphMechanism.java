@@ -13,6 +13,7 @@ import java.util.List;
 import javax.xml.bind.JAXBException;
 
 import deco4mas.coordinate.environment.CoordinationSpace;
+import deco4mas.mechanism.graph.GenericGraphMechanism;
 import deco4mas.util.file.FileFinder;
 import deco4mas.util.xml.XmlUtil;
 

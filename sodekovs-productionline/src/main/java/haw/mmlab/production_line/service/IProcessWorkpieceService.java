@@ -2,7 +2,6 @@ package haw.mmlab.production_line.service;
 
 import haw.mmlab.production_line.configuration.Workpiece;
 import haw.mmlab.production_line.dropout.config.Action;
-import jadex.bridge.service.IService;
 import jadex.commons.future.IFuture;
 
 /**
@@ -10,21 +9,21 @@ import jadex.commons.future.IFuture;
  * 
  * @author thomas
  */
-public interface IProcessWorkpieceService extends IService {
+public interface IProcessWorkpieceService {
 
 	/**
 	 * Get the services id.
 	 * 
 	 * @return the services id
 	 */
-	public String getId();
+	public IFuture<String> getId();
 
 	/**
 	 * Get the type of the agent offering this service.
 	 * 
 	 * @return the type of the agent offering this service
 	 */
-	public String getType();
+	public IFuture<String> getType();
 
 	/**
 	 * Processes of the given workpiece.
@@ -35,7 +34,7 @@ public interface IProcessWorkpieceService extends IService {
 	 *            the agent id of the sender
 	 * @return
 	 */
-	public IFuture process(Workpiece workpiece, String senderId);
+	public IFuture<Boolean> process(Workpiece workpiece, String senderId);
 
 	/**
 	 * Executes a Dropout-{@link Action}.

@@ -1,14 +1,13 @@
 package haw.mmlab.production_line.service;
 
 import haw.mmlab.production_line.common.ConsoleMessage;
-import jadex.bridge.service.IService;
 
 /**
  * The manager service interface.
  * 
  * @author thomas
  */
-public interface IManagerService extends IService {
+public interface IManagerService {
 
 	/**
 	 * Inform the manager that a workpiece was produced in the given task.

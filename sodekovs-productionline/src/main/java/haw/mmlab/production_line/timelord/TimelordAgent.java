@@ -5,13 +5,14 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Description;
 
 /**
  * The almighty timelord agent!
  * 
  * @author thomas
  */
+@Description("This is the almighty timelord agent!")
 public class TimelordAgent extends MicroAgent {
 
 	/** The interval in which the time should by increased */
@@ -33,17 +34,7 @@ public class TimelordAgent extends MicroAgent {
 	}
 
 	/**
-	 * Returns the {@link MicroAgentMetaInfo}.
-	 * 
-	 * @return the {@link MicroAgentMetaInfo}
-	 */
-	public static MicroAgentMetaInfo getMetaInfo() {
-		return new MicroAgentMetaInfo("This is the almighty timelord agent!", null, null, null, null, null, null, null);
-	}
-
-	/**
-	 * Private class which periodically increments the interval time in the
-	 * database.
+	 * Private class which periodically increments the interval time in the database.
 	 * 
 	 * @author thomas
 	 */
@@ -55,7 +46,7 @@ public class TimelordAgent extends MicroAgent {
 			logger.setIntervalTime(time);
 			time++;
 
-			IFuture result = waitFor(interval, this);
+			IFuture<?> result = waitFor(interval, this);
 			return result;
 		}
 	}

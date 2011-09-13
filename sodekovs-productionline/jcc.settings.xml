@@ -1,139 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
 <p0:properties xmlns:p0="http://jadex.sourceforge.net/jadexconf" __ID="0">
 	<p0:properties __ID="1">
-		<p0:properties __ID="2">
-			<p0:property __ID="3" type="leftsplit_location">377</p0:property>
-			<p0:property __ID="4" type="mainsplit_location">240</p0:property>
-			<p0:properties __ID="5">
-				<p0:property __ID="6" type="tree"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
-<p0:TreeProperties xmlns:p0="typeinfo:jadex.base.gui.filetree" __ID="0">
-	<selectedNode>
-		<p0:NodePath __ID="1" entry="0">
-			<path>
-				<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="2" __len="4">
-					<entries>
-						<p1:String __ID="3">haw</p1:String>
-						<p1:String __ID="4">mmlab</p1:String>
-						<p1:String __ID="5">production_line</p1:String>
-						<p1:String __ID="6">ProductionLine.application.xml</p1:String>
-					</entries>
-				</p1:String__1>
-			</path>
-		</p0:NodePath>
-	</selectedNode>
-	<expandedNodes>
-		<p0:NodePath__1 __ID="7" __len="4">
-			<entries>
-				<p0:NodePath __ID="8" entry="0">
-					<path>
-						<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="9" __len="3">
-							<entries>
-								<p1:String __ID="10">haw</p1:String>
-								<p1:String __ID="11">mmlab</p1:String>
-								<p1:String __ID="12">production_line</p1:String>
-							</entries>
-						</p1:String__1>
-					</path>
-				</p0:NodePath>
-				<p0:NodePath __ID="13" entry="0">
-					<path>
-						<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="14" __len="1">
-							<entries>
-								<p1:String __ID="15">haw</p1:String>
-							</entries>
-						</p1:String__1>
-					</path>
-				</p0:NodePath>
-				<p0:NodePath __ID="16" entry="0">
-					<path>
-						<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="17" __len="2">
-							<entries>
-								<p1:String __ID="18">haw</p1:String>
-								<p1:String __ID="19">mmlab</p1:String>
-							</entries>
-						</p1:String__1>
-					</path>
-				</p0:NodePath>
-				<p0:NodePath __ID="20" entry="0">
-					<path>
-						<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="21" __len="0"></p1:String__1>
-					</path>
-				</p0:NodePath>
-			</entries>
-		</p0:NodePath__1>
-	</expandedNodes>
-	<rootPathEntries>
-		<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="22" __len="1">
-			<entries>
-				<p1:String __ID="23">target\classes</p1:String>
-			</entries>
-		</p1:String__1>
-	</rootPathEntries>
-</p0:TreeProperties>
-]]></p0:property>
-				<p0:properties __ID="7">
-					<p0:property __ID="8" type="BPMN Process">true</p0:property>
-					<p0:property __ID="9" type="BDI Agent">true</p0:property>
-					<p0:property __ID="10" type="BDI Capability">true</p0:property>
-					<p0:property __ID="11" type="Application">true</p0:property>
-					<p0:property __ID="12" type="Component">true</p0:property>
-					<p0:property __ID="13" type="Micro Agent">true</p0:property>
-					<type __ID="14">filter</type>
-				</p0:properties>
-				<type __ID="15">mpanel</type>
-			</p0:properties>
-			<p0:properties __ID="16">
-				<p0:property __ID="17" type="model">target\classes\haw\mmlab\production_line\ProductionLine.application.xml</p0:property>
-				<p0:property __ID="18" type="config">Default</p0:property>
-				<p0:property __ID="19" type="startsuspended">false</p0:property>
-				<p0:property __ID="20" type="autogenerate">false</p0:property>
-				<p0:property __ID="21" type="name">ProductionLine</p0:property>
-				<type __ID="22">spanel</type>
-			</p0:properties>
-			<type __ID="23">panelproperties</type>
-		</p0:properties>
-		<type __ID="24">IComponentManagementService</type>
-	</p0:properties>
-	<p0:properties __ID="25">
-		<p0:property __ID="26" type="perspective">Starter</p0:property>
-		<p0:property __ID="27" type="consoleenabled">false</p0:property>
-		<p0:property __ID="28" type="consoleheights"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
+		<p0:property __ID="2" type="perspective">Debugger</p0:property>
+		<p0:property __ID="3" type="consoleenabled">false</p0:property>
+		<p0:property __ID="4" type="consoleheights"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
 <p0:HashMap xmlns:p0="typeinfo:java.util" __ID="0">
 	<entries>
 		<entry __ID="1">
 			<key>
-				<p1:String xmlns:p1="typeinfo:java.lang" __ID="2">Starter.console.height</p1:String>
+				<p1:String xmlns:p1="typeinfo:java.lang" __ID="2">Awareness Settings.console.height</p1:String>
 			</key>
 			<value>
-				<p1:Integer xmlns:p1="typeinfo:java.lang" __ID="3" content="10"></p1:Integer>
+				<p1:Double xmlns:p1="typeinfo:java.lang" __ID="3" content="1.0"></p1:Double>
 			</value>
 		</entry>
 		<entry __ID="4">
 			<key>
-				<p1:String xmlns:p1="typeinfo:java.lang" __ID="5">IComponentManagementService.console.height</p1:String>
+				<p1:String xmlns:p1="typeinfo:java.lang" __ID="5">Test Center.console.height</p1:String>
 			</key>
 			<value>
-				<p1:Integer xmlns:p1="typeinfo:java.lang" __ID="6" content="10"></p1:Integer>
+				<p1:Double xmlns:p1="typeinfo:java.lang" __ID="6" content="1.0"></p1:Double>
+			</value>
+		</entry>
+		<entry __ID="7">
+			<key>
+				<p1:String xmlns:p1="typeinfo:java.lang" __ID="8">Starter.console.height</p1:String>
+			</key>
+			<value>
+				<p1:Double xmlns:p1="typeinfo:java.lang" __ID="9" content="1.0"></p1:Double>
+			</value>
+		</entry>
+		<entry __ID="10">
+			<key>
+				<p1:String xmlns:p1="typeinfo:java.lang" __ID="11">ISimulationService.console.height</p1:String>
+			</key>
+			<value>
+				<p1:Double xmlns:p1="typeinfo:java.lang" __ID="12" content="1.0"></p1:Double>
+			</value>
+		</entry>
+		<entry __ID="13">
+			<key>
+				<p1:String xmlns:p1="typeinfo:java.lang" __ID="14">Debugger.console.height</p1:String>
+			</key>
+			<value>
+				<p1:Double xmlns:p1="typeinfo:java.lang" __ID="15" content="1.0"></p1:Double>
 			</value>
 		</entry>
 	</entries>
 </p0:HashMap>
 ]]></p0:property>
-		<type __ID="29">controlcenter</type>
+		<type __ID="5">controlcenter</type>
 	</p0:properties>
-	<p0:properties __ID="30">
-		<p0:property __ID="31" type="leftsplit_location">0.5282758620689655</p0:property>
-		<p0:property __ID="32" type="mainsplit_location">0.1359416445623342</p0:property>
-		<type __ID="33">Starter</type>
+	<p0:properties __ID="6">
+		<p0:property __ID="7" type="leftsplit_location">0.6993103448275862</p0:property>
+		<p0:property __ID="8" type="mainsplit_location">0.29973474801061006</p0:property>
+		<type __ID="9">Starter</type>
 	</p0:properties>
-	<p0:properties __ID="34">
-		<p0:property __ID="35" type="width">1536</p0:property>
-		<p0:property __ID="36" type="height">864</p0:property>
-		<p0:property __ID="37" type="x">532</p0:property>
-		<p0:property __ID="38" type="y">99</p0:property>
-		<p0:property __ID="39" type="extendedState">0</p0:property>
-		<p0:property __ID="40" type="jccexit">shutdown</p0:property>
-		<p0:property __ID="41" type="saveonexit">false</p0:property>
-		<type __ID="42">window</type>
+	<p0:properties __ID="10">
+		<p0:property __ID="11" type="mainsplit_location">0.29973474801061006</p0:property>
+		<p0:property __ID="12" type="tcsplit_location">0.6993103448275862</p0:property>
+		<type __ID="13">Test Center</type>
+	</p0:properties>
+	<p0:properties __ID="14">
+		<p0:properties __ID="15">
+			<p0:property __ID="16" type="timemode">2</p0:property>
+			<type __ID="17">panelproperties</type>
+		</p0:properties>
+		<type __ID="18">ISimulationService</type>
+	</p0:properties>
+	<p0:properties __ID="19">
+		<p0:properties __ID="20">
+			<p0:property __ID="21" type="gui-refresh">5</p0:property>
+			<type __IDREF="17"></type>
+		</p0:properties>
+		<type __ID="22">Awareness Settings</type>
+	</p0:properties>
+	<p0:properties __ID="23">
+		<p0:property __ID="24" type="width">1536</p0:property>
+		<p0:property __ID="25" type="height">864</p0:property>
+		<p0:property __ID="26" type="x">568</p0:property>
+		<p0:property __ID="27" type="y">97</p0:property>
+		<p0:property __ID="28" type="extendedState">0</p0:property>
+		<p0:property __ID="29" type="jccexit">shutdown</p0:property>
+		<p0:property __ID="30" type="saveonexit">true</p0:property>
+		<type __ID="31">window</type>
 	</p0:properties>
 </p0:properties>

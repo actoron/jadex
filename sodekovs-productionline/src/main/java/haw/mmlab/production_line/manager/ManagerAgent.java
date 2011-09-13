@@ -14,14 +14,19 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.modelinfo.Argument;
-import jadex.bridge.modelinfo.IArgument;
-import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Description;
+import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -38,6 +43,10 @@ import java.util.logging.Level;
  * 
  * @author thomas
  */
+@Description("The Manager Agent who manages the whole application.")
+@ProvidedServices(@ProvidedService(type = IManagerService.class, implementation = @Implementation(ManagerService.class)))
+@RequiredServices({ @RequiredService(name = "cmsservice", type = IComponentManagementService.class, binding = @Binding(scope = RequiredServiceInfo.SCOPE_PLATFORM)) })
+@Arguments(@Argument(clazz = String.class, name = "configuration_modell"))
 public class ManagerAgent extends MicroAgent {
 
 	/** The path to the configuration file */
@@ -96,10 +105,7 @@ public class ManagerAgent extends MicroAgent {
 	private boolean firstWPConsumed = false;
 
 	@Override
-	public IFuture agentCreated() {
-		// add the manager service
-		addService("ManagerService", IManagerService.class, new ManagerService(this));
-
+	public IFuture<Void> agentCreated() {
 		// initialize the logger
 		getLogger().setLevel(Level.ALL);
 		ConsoleHandler handler = new ConsoleHandler();
@@ -164,24 +170,11 @@ public class ManagerAgent extends MicroAgent {
 	}
 
 	@Override
-	public IFuture agentKilled() {
+	public IFuture<Void> agentKilled() {
 		closeWriters();
 		getParent().killComponent();
 
 		return IFuture.DONE;
-	}
-
-	/**
-	 * Returns the {@link MicroAgentMetaInfo}.
-	 * 
-	 * @return the {@link MicroAgentMetaInfo}
-	 */
-	public static MicroAgentMetaInfo getMetaInfo() {
-		MicroAgentMetaInfo meta = new MicroAgentMetaInfo();
-		meta.setDescription("This agent manages the application");
-		meta.setArguments(new IArgument[] { new Argument("configuration_model", "The path to the configuration modell", "String") });
-		meta.setProvidedServices(new ProvidedServiceInfo[] { new ProvidedServiceInfo(IManagerService.class) });
-		return meta;
 	}
 
 	/**
@@ -216,12 +209,11 @@ public class ManagerAgent extends MicroAgent {
 	/**
 	 * Starts all the participating agents.
 	 */
+	@SuppressWarnings("unchecked")
 	private void startAgents() {
-		SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(new IResultListener() {
+		this.getRequiredService("cmsservice").addResultListener(new DefaultResultListener<IComponentManagementService>() {
 
-			public void resultAvailable(Object result) {
-				IComponentManagementService cms = (IComponentManagementService) result;
-
+			public void resultAvailable(IComponentManagementService cms) {
 				IExternalAccess parent = ManagerAgent.this.getParent();
 
 				// start the robot agents
@@ -233,15 +225,10 @@ public class ManagerAgent extends MicroAgent {
 					args.put("strategy", strategyName);
 					CreationInfo cr = new CreationInfo(args, parent.getComponentIdentifier());
 
-					cms.createComponent(robot.getAgentId(), "haw/mmlab/production_line/robot/RobotAgent.class", cr, null).addResultListener(new IResultListener() {
+					cms.createComponent(robot.getAgentId(), "haw/mmlab/production_line/robot/RobotAgent.class", cr, null).addResultListener(new DefaultResultListener<IComponentIdentifier>() {
 
-						public void resultAvailable(Object result) {
-							IComponentIdentifier identifier = (IComponentIdentifier) result;
+						public void resultAvailable(IComponentIdentifier identifier) {
 							startedAgents.add(identifier);
-						}
-
-						public void exceptionOccurred(Exception exception) {
-							getLogger().severe(exception.getMessage());
 						}
 					});
 				}
@@ -254,37 +241,23 @@ public class ManagerAgent extends MicroAgent {
 					args.put("taskMap", tasks);
 					CreationInfo cr = new CreationInfo(args, parent.getComponentIdentifier());
 
-					cms.createComponent(transport.getAgentId(), "haw/mmlab/production_line/transport/TransportAgent.class", cr, null).addResultListener(new IResultListener() {
+					cms.createComponent(transport.getAgentId(), "haw/mmlab/production_line/transport/TransportAgent.class", cr, null).addResultListener(
+							new DefaultResultListener<IComponentIdentifier>() {
 
-						public void resultAvailable(Object result) {
-							IComponentIdentifier identifier = (IComponentIdentifier) result;
-							startedAgents.add(identifier);
-						}
-
-						public void exceptionOccurred(Exception exception) {
-							getLogger().severe(exception.getMessage());
-						}
-					});
+								public void resultAvailable(IComponentIdentifier identifier) {
+									startedAgents.add(identifier);
+								}
+							});
 				}
 
 				// start the timelord agent
 				getLogger().info("Manager agent is starting the timelord agent...");
-				cms.createComponent("Timelord", "haw/mmlab/production_line/timelord/TimelordAgent.class", null, null).addResultListener(new IResultListener() {
+				cms.createComponent("Timelord", "haw/mmlab/production_line/timelord/TimelordAgent.class", null, null).addResultListener(new DefaultResultListener<IComponentIdentifier>() {
 
-					public void resultAvailable(Object result) {
-						IComponentIdentifier identifier = (IComponentIdentifier) result;
+					public void resultAvailable(IComponentIdentifier identifier) {
 						startedAgents.add(identifier);
 					}
-
-					public void exceptionOccurred(Exception exception) {
-						getLogger().severe(exception.getMessage());
-					}
 				});
-			}
-
-			public void exceptionOccurred(Exception exception) {
-				getLogger().severe(exception.getMessage());
-				killAgent();
 			}
 		});
 	}
@@ -352,22 +325,16 @@ public class ManagerAgent extends MicroAgent {
 	/**
 	 * Kills all the started agents.
 	 */
+	@SuppressWarnings("unchecked")
 	private void killAgents() {
-		SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(new IResultListener() {
+		this.getRequiredService("cmsservice").addResultListener(new DefaultResultListener<IComponentManagementService>() {
 
-			public void resultAvailable(Object result) {
-				IComponentManagementService cms = (IComponentManagementService) result;
-
+			public void resultAvailable(IComponentManagementService cms) {
 				getLogger().info("Manager agent is killing agents...");
 				for (IComponentIdentifier identifier : startedAgents) {
 					cms.destroyComponent(identifier);
 				}
 				getLogger().info("Manager agent is done killing agents!");
-			}
-
-			public void exceptionOccurred(Exception exception) {
-				getLogger().severe(exception.getMessage());
-				killAgent();
 			}
 		});
 	}
@@ -475,32 +442,23 @@ public class ManagerAgent extends MicroAgent {
 	/**
 	 * Starts the Dropout Agent
 	 */
+	@SuppressWarnings("unchecked")
 	public void startDropout() {
-		SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(new IResultListener() {
+		this.getRequiredService("cmsservice").addResultListener(new DefaultResultListener<IComponentManagementService>() {
 
-			public void resultAvailable(Object result) {
-				IComponentManagementService cms = (IComponentManagementService) result;
+			public void resultAvailable(IComponentManagementService cms) {
 				// start the dropout agent
 				getLogger().info("Manager agent is starting the dropout agent...");
 				Map<String, Object> args = new HashMap<String, Object>();
 				args.put("configuration_model", dropOutConfFile);
 				CreationInfo ci = new CreationInfo(args);
 
-				cms.createComponent("Dropout", "haw/mmlab/production_line/dropout/DropoutAgent.class", ci, null).addResultListener(new IResultListener() {
+				cms.createComponent("Dropout", "haw/mmlab/production_line/dropout/DropoutAgent.class", ci, null).addResultListener(new DefaultResultListener<IComponentIdentifier>() {
 
-					public void resultAvailable(Object result) {
-						IComponentIdentifier identifier = (IComponentIdentifier) result;
+					public void resultAvailable(IComponentIdentifier identifier) {
 						startedAgents.add(identifier);
 					}
-
-					public void exceptionOccurred(Exception exception) {
-						getLogger().severe(exception.getMessage());
-					}
 				});
-			}
-
-			public void exceptionOccurred(Exception exception) {
-				getLogger().severe(exception.getMessage());
 			}
 		});
 	}
