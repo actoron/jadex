@@ -226,7 +226,7 @@ class WorkspaceClassLoaderHelper
 								// no inner classes allowed
 								&& !entry.getName().contains("$")
 								// no sub packages allowed
-								&& entry.getName().indexOf('/', pkgName.length()) == -1) {
+								&& entry.getName().indexOf('/', pkgName.length()+1) == -1) {
 							
 							// remove class extension
 							String className = entry.getName().replace("/", ".")

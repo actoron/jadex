@@ -206,7 +206,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	{
 		super(null, model.getModelInfo(), config, null, parent, null, true, new Future());
 		construct(model, activityhandlers, stephandlers);		
-		this.fetcher = fetcher!=null? fetcher: new BpmnInstanceFetcher(this, fetcher);
+		this.fetcher = fetcher!=null? new BpmnInstanceFetcher(this, fetcher) :null;
 		this.adapter = adapter;
 		this.container = container;
 		
@@ -813,6 +813,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		// Thread may be null when external entry has not changed waiting state of any active plan. 
 		if(thread!=null)
 		{
+//			if("End".equals(thread.getActivity().getName()))
+//				System.out.println("end: "+thread);
 			// Update parameters based on edge inscriptions and initial values.
 			thread.updateParametersBeforeStep(this);
 			

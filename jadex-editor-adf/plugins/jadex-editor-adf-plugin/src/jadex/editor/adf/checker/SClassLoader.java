@@ -31,7 +31,7 @@ public class SClassLoader
 	 */
 	public static ClassLoader getProjectClassLoader(IProject project)
 	{
-		List urls = new ArrayList();
+		List<URL> urls = new ArrayList<URL>();
 		IJavaProject javaproject = JavaCore.create(project);
 		IPath workspacePath = ResourcesPlugin.getWorkspace().getRoot().getLocation();
 		
