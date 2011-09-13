@@ -15,7 +15,7 @@ import jadex.commons.future.IResultListener;
  *  The component future ensures that future result/exception notifications
  *  are executed on the calling component thread.
  */
-public class ComponentFuture extends Future
+public class ComponentFuture<E> extends Future<E>
 {
 	//-------- attributes --------
 	
@@ -42,13 +42,13 @@ public class ComponentFuture extends Future
 		this.adapter	= adapter;
 		this.copy = copy;
 //		this.source = source;
-		source.addResultListener(new DelegationResultListener(this));
+		source.addResultListener(new DelegationResultListener<E>(this));
 	}
 	
 	/**
 	 *  Schedule listener notification on component thread. 
 	 */
-	protected void notifyListener(final IResultListener listener)
+	protected void notifyListener(final IResultListener<E> listener)
 	{
 		// Hack!!! Notify multiple listeners at once?
 		if(adapter.isExternalThread())
@@ -73,7 +73,7 @@ public class ComponentFuture extends Future
      *  Listener notifications occur on calling thread of this method.
      *  @param result The result.
      */
-    public void	setResult(Object result)
+    public void	setResult(E result)
     {
 		// Copy result if
 		// - copy flag is true
@@ -84,7 +84,7 @@ public class ComponentFuture extends Future
 			if(copy)
 			{
 //				System.out.println("copy result: "+result);
-				result = JadexCloner.deepCloneObject(result);
+				result = (E)JadexCloner.deepCloneObject(result);
 			}
 		}
 		super.setResult(result);

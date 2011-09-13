@@ -1,5 +1,7 @@
 package jadex.bridge.service.component;
 
+import java.util.Collection;
+
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -17,7 +19,7 @@ import jadex.commons.future.IntermediateFuture;
  *  The component future ensures that intermediate future notifications
  *  are executed on the calling component thread.
  */
-public class ComponentIntermediateFuture extends IntermediateFuture
+public class ComponentIntermediateFuture<E> extends IntermediateFuture<E>
 {
 	//-------- attributes --------
 	
@@ -40,13 +42,13 @@ public class ComponentIntermediateFuture extends IntermediateFuture
 		this.ea	= ea;
 		this.adapter	= adapter;
 		this.copy = copy;
-		source.addResultListener(new IntermediateDelegationResultListener(this));
+		source.addResultListener(new IntermediateDelegationResultListener<E>(this));
 	}
 		
 	/**
 	 *  Schedule listener notification on component thread. 
 	 */
-	protected void notifyListener(final IResultListener listener)
+	protected void notifyListener(final IResultListener<Collection<E>> listener)
 	{
 		// Hack!!! Notify multiple listeners at once?
 		if(adapter.isExternalThread())
@@ -69,7 +71,7 @@ public class ComponentIntermediateFuture extends IntermediateFuture
 	/**
 	 *  Schedule listener notification on component thread. 
 	 */
-	protected void notifyIntermediateResult(final IIntermediateResultListener listener, final Object result)
+	protected void notifyIntermediateResult(final IIntermediateResultListener<E> listener, final E result)
 	{
 		// Hack!!! Notify multiple results at once?
 		if(adapter.isExternalThread())
@@ -92,7 +94,7 @@ public class ComponentIntermediateFuture extends IntermediateFuture
 	/**
 	 *  Add an intermediate result.
 	 */
-	public void	addIntermediateResult(Object result)
+	public void	addIntermediateResult(E result)
 	{
 		// Copy result if
 		// - copy flag is true
@@ -103,7 +105,7 @@ public class ComponentIntermediateFuture extends IntermediateFuture
 			if(copy)
 			{
 //				System.out.println("copy result: "+result);
-				result = JadexCloner.deepCloneObject(result);
+				result = (E)JadexCloner.deepCloneObject(result);
 			}
 		}
 		super.addIntermediateResult(result);

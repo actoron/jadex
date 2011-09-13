@@ -125,7 +125,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			ret = fut;
 			sic.invoke(service, method, myargs).addResultListener(new IntermediateDelegationResultListener(fut)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Collection result)
 				{
 					if(sic.getResult() instanceof IFuture)
 					{
