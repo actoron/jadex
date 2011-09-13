@@ -1,11 +1,9 @@
 package deco4mas.examples.V2.tspaces;
 
-
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.SimplePropertyObject;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceProcess;
-import jadex.extension.envsupport.environment.space2d.Grid2D;
 import deco.lang.dynamics.AgentElementType;
 import deco4mas.annotation.agent.CoordinationAnnotation.CoordinationType;
 import deco4mas.coordinate.environment.CoordinationSpaceObject;
@@ -34,8 +32,7 @@ public class CreateEventsProcess extends SimplePropertyObject implements ISpaceP
 	// -------- ISpaceProcess interface --------
 
 	/**
-	 * This method will be executed by the object before the process gets added
-	 * to the execution queue.
+	 * This method will be executed by the object before the process gets added to the execution queue.
 	 * 
 	 * @param clock
 	 *            The clock.
@@ -48,8 +45,7 @@ public class CreateEventsProcess extends SimplePropertyObject implements ISpaceP
 	}
 
 	/**
-	 * This method will be executed by the object before the process is removed
-	 * from the execution queue.
+	 * This method will be executed by the object before the process is removed from the execution queue.
 	 * 
 	 * @param clock
 	 *            The clock.
@@ -70,7 +66,7 @@ public class CreateEventsProcess extends SimplePropertyObject implements ISpaceP
 	 */
 	public void execute(IClockService clock, IEnvironmentSpace space) {
 
-		Grid2D grid = (Grid2D) space;
+		// Grid2D grid = (Grid2D) space;
 
 		double delta = clock.getTick() - lasttick;
 

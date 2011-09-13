@@ -21,7 +21,7 @@ public class GraphAgent extends MicroAgent {
 	private String name = null;
 
 	@Override
-	public IFuture agentCreated() {
+	public IFuture<Void> agentCreated() {
 		name = getComponentDescription().getName().getLocalName();
 
 		return IFuture.DONE;
@@ -33,11 +33,6 @@ public class GraphAgent extends MicroAgent {
 			System.out.println("GraphAgent " + name + " is going to send a coordination information containing his id.");
 			waitFor(7000, new SendStep(name));
 		}
-	}
-
-	@Override
-	public IFuture agentKilled() {
-		return super.agentKilled();
 	}
 
 	/**

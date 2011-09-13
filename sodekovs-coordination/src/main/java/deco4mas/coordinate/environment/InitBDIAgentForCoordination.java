@@ -243,7 +243,7 @@ public class InitBDIAgentForCoordination {
 			// // "receiver");
 			// // space.addAvatarMappings(avatarMapping);
 			try {
-				Map props = new HashMap();
+				Map<String, IComponentDescription> props = new HashMap<String, IComponentDescription>();
 				props.put(ISpaceObject.PROPERTY_OWNER, ai);
 				space.createSpaceObject(ai.getLocalType(), props, null);
 			} catch (RuntimeException e) {

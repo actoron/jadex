@@ -1,7 +1,6 @@
 package deco4mas.examples.micro.tspaces;
 
 import jadex.bridge.IInternalAccess;
-import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import deco4mas.coordinate.annotation.CoordinationParameter;
 import deco4mas.coordinate.interpreter.agent_state.CoordinationComponentStep;
@@ -14,21 +13,6 @@ import deco4mas.examples.micro.tspaces.SenderAgent.CounterIncrementStep;
  * @author Thomas Preisler
  */
 public class ReceiverAgent extends MicroAgent {
-
-	@Override
-	public IFuture agentCreated() {
-		return super.agentCreated();
-	}
-
-	@Override
-	public void executeBody() {
-		// does nothing
-	}
-
-	@Override
-	public IFuture agentKilled() {
-		return super.agentKilled();
-	}
 
 	/**
 	 * This step is called from the coordination framework. The class attributes match the match the coordination parameters. They have to be "public" so they are accessible from the coordination

@@ -1,25 +1,17 @@
 package deco4mas.examples.micro.tspaces;
 
 import jadex.bridge.IInternalAccess;
-import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import deco4mas.coordinate.annotation.CoordinationParameter;
 import deco4mas.coordinate.interpreter.agent_state.CoordinationComponentStep;
 
 /**
- * This class is under observation by the coordination framework. Whenever the
- * {@link CounterIncrementStep} is started this is event is observed by the
- * coordination framework and the attribute {@link SenderAgent#counter} is
- * propagated to the {@link ReceiverAgent}.
+ * This class is under observation by the coordination framework. Whenever the {@link CounterIncrementStep} is started this is event is observed by the coordination framework and the attribute
+ * {@link SenderAgent#counter} is propagated to the {@link ReceiverAgent}.
  * 
  * @author Thomas Preisler
  */
 public class SenderAgent extends MicroAgent {
-
-	@Override
-	public IFuture agentCreated() {
-		return super.agentCreated();
-	}
 
 	@Override
 	public void executeBody() {
@@ -27,26 +19,17 @@ public class SenderAgent extends MicroAgent {
 		waitFor(7000, new CounterIncrementStep(0));
 	}
 
-	@Override
-	public IFuture agentKilled() {
-		return super.agentKilled();
-	}
-
 	/**
-	 * Whenever this step is started the coordination framework observes this
-	 * event and propagates the {@link SenderAgent#counter} attribute to the
-	 * {@link ReceiverAgent}. The step is referenced in the DeCoMAS
-	 * configuration file by it simple class name (not full qualified).
+	 * Whenever this step is started the coordination framework observes this event and propagates the {@link SenderAgent#counter} attribute to the {@link ReceiverAgent}. The step is referenced in the
+	 * DeCoMAS configuration file by it simple class name (not full qualified).
 	 * 
 	 * @author Thomas Preisler
 	 */
 	public class CounterIncrementStep extends CoordinationComponentStep {
 
 		/**
-		 * This attribute is propagated through the coordination framework. It
-		 * has to be public so it could be read using reflection in the
-		 * coordination framework. The annotation is currently optional and only
-		 * helps to understand the code better.
+		 * This attribute is propagated through the coordination framework. It has to be public so it could be read using reflection in the coordination framework. The annotation is currently optional
+		 * and only helps to understand the code better.
 		 */
 		@CoordinationParameter
 		public int counter = -1;
@@ -58,8 +41,7 @@ public class SenderAgent extends MicroAgent {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * jadex.bridge.IComponentStep#execute(jadex.bridge.IInternalAccess)
+		 * @see jadex.bridge.IComponentStep#execute(jadex.bridge.IInternalAccess)
 		 */
 		@Override
 		public Object execute(IInternalAccess ia) {

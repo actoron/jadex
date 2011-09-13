@@ -18,21 +18,16 @@ import deco4mas.coordinate.interpreter.agent_state.CoordinationComponentStep;
 public class ExampleMicroAgent extends MicroAgent {
 
 	@Override
-	public IFuture agentCreated() {
+	public IFuture<Void> agentCreated() {
 		System.out.println("ExampleMicroAgent created.");
 
-		return super.agentCreated();
+		return IFuture.DONE;
 	}
 
 	@Override
 	public void executeBody() {
 		System.out.println("ExampleMicroAgent executeBody() called.");
 		waitFor(10000, new SayHelloStep("Hello, I'm the example micro agent and it is nice to chat with you!"));
-	}
-
-	@Override
-	public IFuture agentKilled() {
-		return super.agentKilled();
 	}
 
 	@CoordinationStep

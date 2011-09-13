@@ -6,8 +6,8 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.IValueFetcher;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.extension.envsupport.MEnvSpaceInstance;
 import jadex.extension.envsupport.MObjectType;
@@ -190,13 +190,12 @@ public class CoordinationSpace extends Grid2D {
 				new ThreadSuspendable());
 
 		// get the external access for the agent
-		IFuture fut = cms.getExternalAccess(ai.getName());
-		fut.addResultListener(new IResultListener() {
+		@SuppressWarnings("unchecked")
+		IFuture<IExternalAccess> fut = cms.getExternalAccess(ai.getName());
+		fut.addResultListener(new DefaultResultListener<IExternalAccess>() {
 
 			@Override
-			public void resultAvailable(Object result) {
-				IExternalAccess externalAccess = (IExternalAccess) result;
-
+			public void resultAvailable(IExternalAccess externalAccess) {
 				// check if an external access for an BDI or Micro agent is
 				// needed
 				if (externalAccess instanceof IBDIExternalAccess) {
@@ -208,11 +207,6 @@ public class CoordinationSpace extends Grid2D {
 
 					new InitMicroAgentForCoordination().startInits(ai, exta, CoordinationSpace.this, masDnyModel);
 				}
-			}
-
-			@Override
-			public void exceptionOccurred(Exception exception) {
-				exception.printStackTrace();
 			}
 		});
 	}

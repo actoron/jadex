@@ -7,8 +7,8 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IChangeListener;
 import jadex.commons.IFilter;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.micro.ExternalAccess;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
@@ -157,22 +157,18 @@ public class MicroBehaviourObservationComponent extends BehaviorObservationCompo
 	 * @param dmlRealizationName
 	 * @param ma
 	 */
+	@SuppressWarnings("unchecked")
 	private void publishEvent(Object value, HashMap<String, Object> parameterDataMappings, String agentElementName, AgentElementType agentElementType, String dmlRealizationName, MicroAgent ma) {
 		final CoordinationInfo coordInfo = createCoordinationInfo(value, parameterDataMappings, agentElementName, agentElementType, dmlRealizationName);
 		coordInfo.addValue(CoordinationSpaceObject.AGENT_ARCHITECTURE, "Micro");
 
 		IExternalAccess parent = ma.getParent();
 		for (String spaceName : spaces) {
-			parent.getExtension(spaceName).addResultListener(new IResultListener() {
+			parent.getExtension(spaceName).addResultListener(new DefaultResultListener<CoordinationSpace>() {
 
 				@Override
-				public void resultAvailable(Object result) {
-					CoordinationSpace space = (CoordinationSpace) result;
+				public void resultAvailable(CoordinationSpace space) {
 					eventPublication.publishEvent(coordInfo, space);
-				}
-
-				@Override
-				public void exceptionOccurred(Exception exception) {
 				}
 			});
 		}
