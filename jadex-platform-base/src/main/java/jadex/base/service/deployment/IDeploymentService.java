@@ -1,6 +1,8 @@
 package jadex.base.service.deployment;
 
+import jadex.base.gui.filetree.FileData;
 import jadex.bridge.service.IService;
+import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 
 /**
@@ -12,7 +14,7 @@ public interface IDeploymentService extends IService
 //	 *  Get a file.
 //	 *  @return The file data.
 //	 */
-//	public IFuture getFile(String path, int fragment, int fileid);
+//	public IFuture<Tuple2<FileContent,String>> getFile(String path, int fragment, int fileid);
 
 	/**
 	 *  Put a file.
@@ -20,7 +22,7 @@ public interface IDeploymentService extends IService
 	 *  @param path The target path.
 	 *  @return True, when the file has been copied.
 	 */
-	public IFuture putFile(FileContent filedata, String path, String fileid);
+	public IFuture<String> putFile(FileContent filedata, String path, String fileid);
 	
 	/**
 	 *  Rename a file.
@@ -28,24 +30,24 @@ public interface IDeploymentService extends IService
 	 *  @param name The name.
 	 *  @return True, if rename was successful.
 	 */
-	public IFuture renameFile(String path, String name);
+	public IFuture<String> renameFile(String path, String name);
 	
 	/**
 	 *  Delete a file.
 	 *  @param path The target path.
 	 *  @return True, if delete was successful.
 	 */
-	public IFuture deleteFile(String path);
+	public IFuture<Void> deleteFile(String path);
 	
 	/**
 	 *  Open a file.
 	 *  @param path The filename to open.
 	 */
-	public IFuture openFile(String path);
+	public IFuture<Void> openFile(String path);
 	
 	/**
 	 *  Get the root devices.
 	 *  @return The root device files.
 	 */
-	public IFuture getRoots();
+	public IFuture<FileData[]> getRoots();
 }

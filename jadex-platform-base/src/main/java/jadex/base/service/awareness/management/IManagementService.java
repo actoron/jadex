@@ -13,7 +13,7 @@ public interface IManagementService
 	 *  @param info The info.
 	 *  @return True, if was new awareness info. 
 	 */
-	public IFuture addAwarenessInfo(AwarenessInfo info);
+	public IFuture<Boolean> addAwarenessInfo(AwarenessInfo info);
 	
 	// todo:
 //	/**

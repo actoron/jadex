@@ -238,7 +238,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	 *  Announce the discovered components.
 	 *  @param infos The infos.
 	 */
-	public IFuture addAwarenessInfo(AwarenessInfo info)
+	public IFuture<Boolean> addAwarenessInfo(AwarenessInfo info)
 	{
 		// Return if inital discovery.
 		boolean ret = false;
@@ -303,7 +303,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			}
 		}
 		
-		return new Future(ret);
+		return new Future<Boolean>(ret? Boolean.TRUE: Boolean.FALSE);
 	}
 	
 //	/**

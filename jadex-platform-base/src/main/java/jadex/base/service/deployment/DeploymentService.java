@@ -3,6 +3,7 @@ package jadex.base.service.deployment;
 import jadex.base.gui.filetree.FileData;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.Future;
@@ -83,9 +84,9 @@ public class DeploymentService extends BasicService implements IDeploymentServic
 	 *  Get a file.
 	 *  @return The file data as FileData.
 	 */
-	public IFuture getFile(String path, String fileid)
+	public IFuture<Tuple2<FileContent,String>> getFile(String path, String fileid)
 	{
-		Future ret = new Future();
+		Future<Tuple2<FileContent,String>> ret = new Future<Tuple2<FileContent,String>>();
 		
 		File file = new File(path);
 		
@@ -129,7 +130,7 @@ public class DeploymentService extends BasicService implements IDeploymentServic
 				readstreams.remove(fileid);
 			}
 			
-			ret.setResult(new Object[]{fc, fileid});
+			ret.setResult(new Tuple2<FileContent,String>(fc, fileid));
 		}
 		catch(Exception e)
 		{
@@ -155,9 +156,9 @@ public class DeploymentService extends BasicService implements IDeploymentServic
 	 *  @param path The target path.
 	 *  @return null when all was ok.
 	 */
-	public IFuture putFile(FileContent filecontent, String path, String fileid)
+	public IFuture<String> putFile(FileContent filecontent, String path, String fileid)
 	{
-		Future ret = new Future();
+		Future<String> ret = new Future<String>();
 		
 		try
 		{
@@ -210,9 +211,9 @@ public class DeploymentService extends BasicService implements IDeploymentServic
 	 *  @param path The target path.
 	 *  @return True, if rename was successful.
 	 */
-	public IFuture renameFile(String path, String name)
+	public IFuture<String> renameFile(String path, String name)
 	{
-		Future ret = new Future();
+		Future<String> ret = new Future<String>();
 		try
 		{
 			File file = new File(path);
@@ -238,9 +239,9 @@ public class DeploymentService extends BasicService implements IDeploymentServic
 	 *  @param path The target path.
 	 *  @return True, if delete was successful.
 	 */
-	public IFuture deleteFile(String path)
+	public IFuture<Void> deleteFile(String path)
 	{
-		Future ret = new Future();
+		Future<Void> ret = new Future<Void>();
 		try
 		{
 			// file.toPath().delete(); since 1.7 throws Exception
@@ -265,19 +266,19 @@ public class DeploymentService extends BasicService implements IDeploymentServic
 	 *  Get the root devices.
 	 *  @return The root device files.
 	 */
-	public IFuture getRoots()
+	public IFuture<FileData[]> getRoots()
 	{
 		File[] roots = File.listRoots();
-		return new Future(FileData.convertToRemoteFiles(roots));
+		return new Future<FileData[]>(FileData.convertToRemoteFiles(roots));
 	}
 	
 	/**
 	 *  Execute a file.
 	 *  @param path The filename to execute.
 	 */
-	public IFuture openFile(String path)
+	public IFuture<Void> openFile(String path)
 	{
-		Future ret = new Future();
+		Future<Void> ret = new Future<Void>();
 		try
 		{
 			File file = new File(path);

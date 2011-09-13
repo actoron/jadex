@@ -190,17 +190,17 @@ public abstract class ComponentManagementService extends BasicService implements
 	/**
 	 *  Invoke kill on adapter.
 	 */
-	public abstract IFuture killComponent(IComponentAdapter adapter);
+	public abstract IFuture<Void> killComponent(IComponentAdapter adapter);
 	
 	/**
 	 *  Cancel the execution.
 	 */
-	public abstract IFuture cancel(IComponentAdapter adapter);
+	public abstract IFuture<Void> cancel(IComponentAdapter adapter);
 
 	/**
 	 *  Do a step.
 	 */
-	public abstract IFuture doStep(IComponentAdapter adapter);
+	public abstract IFuture<Void> doStep(IComponentAdapter adapter);
 	
     //-------- IComponentManagementService interface --------
     
@@ -209,16 +209,16 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param name The component name.
 	 *  @return The model info of the 
 	 */
-	public IFuture loadComponentModel(final String filename)
+	public IFuture<IModelInfo> loadComponentModel(final String filename)
 	{
-		final Future ret = new Future();
+		final Future<IModelInfo> ret = new Future<IModelInfo>();
 		
 		exta.scheduleStep(new IComponentStep()
 		{
 			@XMLClassname("loadModel")
 			public Object execute(final IInternalAccess ia)
 			{
-				final Future ret = new Future();
+				final Future<IModelInfo> ret = new Future<IModelInfo>();
 				
 				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
@@ -234,7 +234,7 @@ public abstract class ComponentManagementService extends BasicService implements
 							{
 								IComponentFactory fac = (IComponentFactory)result;
 								fac.loadModel(filename, null, ls.getClassLoader())
-									.addResultListener(new DelegationResultListener(ret));
+									.addResultListener(new DelegationResultListener<IModelInfo>(ret));
 							}
 							
 							public void exceptionOccurred(Exception exception)
@@ -267,12 +267,12 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param listener The result listener (if any). Will receive the id of the component as result, when the component has been created.
 	 *  @param killlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 */
-	public IFuture createComponent(final String name, final String modelname, CreationInfo info, final IResultListener killlistener)
+	public IFuture<IComponentIdentifier> createComponent(final String name, final String modelname, CreationInfo info, final IResultListener killlistener)
 	{	
 //		final DebugException	de	= new DebugException();
 		
 //		System.out.println("create component: "+modelname+" "+name);
-		final Future inited = new Future();
+		final Future<IComponentIdentifier> inited = new Future<IComponentIdentifier>();
 		
 		final CreationInfo cinfo = info!=null? info: new CreationInfo();	// Dummy default info, if null.
 		
@@ -963,7 +963,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  Destroy (forcefully terminate) an component on the platform.
 	 *  @param cid	The component to destroy.
 	 */
-	public IFuture destroyComponent(final IComponentIdentifier cid)
+	public IFuture<Map> destroyComponent(final IComponentIdentifier cid)
 	{
 		boolean contains = false;
 		Future tmp;
@@ -994,7 +994,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *	@param cid The component to destroy.
 	 *  @param ret The future to be informed.
 	 */
-	protected void destroyComponent(final IComponentIdentifier cid,	final Future ret)
+	protected void destroyComponent(final IComponentIdentifier cid,	final Future<Map> ret)
 	{
 		if(isRemoteComponent(cid))
 		{
@@ -1202,9 +1202,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  Suspend the execution of an component.
 	 *  @param cid The component identifier.
 	 */
-	public IFuture suspendComponent(final IComponentIdentifier cid)
+	public IFuture<Void> suspendComponent(final IComponentIdentifier cid)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		if(isRemoteComponent(cid))
 		{
@@ -1265,7 +1265,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  Resume the execution of an component.
 	 *  @param componentid The component identifier.
 	 */
-	public IFuture resumeComponent(IComponentIdentifier cid)
+	public IFuture<Void> resumeComponent(IComponentIdentifier cid)
 	{
 		return resumeComponent(cid, false);
 	}
@@ -1274,9 +1274,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  Resume the execution of an component.
 	 *  @param componentid The component identifier.
 	 */
-	public IFuture resumeComponent(final IComponentIdentifier cid, final boolean initresume)
+	public IFuture<Void> resumeComponent(final IComponentIdentifier cid, final boolean initresume)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		if(isRemoteComponent(cid))
 		{
@@ -1406,7 +1406,8 @@ public abstract class ComponentManagementService extends BasicService implements
 							if(changed)
 								notifyListenersChanged(cid, desc);
 						
-							ret.setResult(desc);
+							ret.setResult(null);
+							//ret.setResult(desc);
 						}
 					}
 				});
@@ -1430,9 +1431,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  Execute a step of a suspended component.
 	 *  @param componentid The component identifier.
 	 */
-	public IFuture stepComponent(final IComponentIdentifier cid)
+	public IFuture<Void> stepComponent(final IComponentIdentifier cid)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		if(isRemoteComponent(cid))
 		{
@@ -1487,9 +1488,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param cid The component identifier.
 	 *  @param breakpoints The new breakpoints (if any).
 	 */
-	public IFuture setComponentBreakpoints(final IComponentIdentifier cid, final String[] breakpoints)
+	public IFuture<Void> setComponentBreakpoints(final IComponentIdentifier cid, final String[] breakpoints)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		if(isRemoteComponent(cid))
 		{
@@ -2164,9 +2165,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  
 	 *  This method should be used with caution when the agent population is large. <- TODO and the reason is...?
 	 */
-	public IFuture getComponentIdentifiers()
+	public IFuture<IComponentIdentifier[]> getComponentIdentifiers()
 	{
-		Future fut = new Future();
+		Future<IComponentIdentifier[]> fut = new Future<IComponentIdentifier[]>();
 		
 		IComponentIdentifier[] ret;
 		
@@ -2186,7 +2187,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  Search for components matching the given description.
 	 *  @return An array of matching component descriptions.
 	 */
-	public IFuture searchComponents(IComponentDescription adesc, ISearchConstraints con)
+	public IFuture<IComponentDescription[]> searchComponents(IComponentDescription adesc, ISearchConstraints con)
 	{
 		return searchComponents(adesc, con, false);
 	}
@@ -2195,9 +2196,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  Search for components matching the given description.
 	 *  @return An array of matching component descriptions.
 	 */
-	public IFuture searchComponents(final IComponentDescription adesc, final ISearchConstraints con, boolean remote)
+	public IFuture<IComponentDescription[]> searchComponents(final IComponentDescription adesc, final ISearchConstraints con, boolean remote)
 	{
-		final Future fut = new Future();
+		final Future<IComponentDescription[]> fut = new Future<IComponentDescription[]>();
 		
 //		System.out.println("search: "+components);
 		final List ret = new ArrayList();
@@ -2268,7 +2269,7 @@ public abstract class ComponentManagementService extends BasicService implements
 							}
 //							open.remove(fut);
 //							System.out.println("Federated search: "+ret);//+" "+open);
-							fut.setResult(ret.toArray(new CMSComponentDescription[ret.size()]));
+							fut.setResult((CMSComponentDescription[])ret.toArray(new CMSComponentDescription[ret.size()]));
 						}
 						
 						public void exceptionOccurred(Exception exception)
@@ -2295,7 +2296,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				public void exceptionOccurred(Exception exception)
 				{
 //					open.remove(fut);
-					fut.setResult(ret.toArray(new CMSComponentDescription[ret.size()]));
+					fut.setResult((CMSComponentDescription[])ret.toArray(new CMSComponentDescription[ret.size()]));
 				}
 			});
 		}
@@ -2303,7 +2304,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		{
 //			open.remove(fut);
 //			System.out.println("Local search: "+ret+" "+open);
-			fut.setResult(ret.toArray(new CMSComponentDescription[ret.size()]));
+			fut.setResult((CMSComponentDescription[])ret.toArray(new CMSComponentDescription[ret.size()]));
 		}
 		
 		return fut;
