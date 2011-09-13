@@ -20,6 +20,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
@@ -36,6 +37,7 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.commons.IValueFetcher;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.ISynchronizator;
@@ -226,7 +228,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public BDIInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, final IOAVState state, final OAVAgentModel model, 
 		final String config, final Map arguments, final IExternalAccess parent, RequiredServiceBinding[] bindings, 
-		final Map kernelprops, boolean copy, final Future inited)
+		final Map kernelprops, boolean copy, final Future<Tuple2<IComponentInstance, IComponentAdapter>> inited)
 	{	
 		this.initthread = Thread.currentThread();
 		
@@ -328,7 +330,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 					public void customResultAvailable(Object result)
 					{
 						// When init has finished -> notify cms.
-						inited.setResult(new Object[]{BDIInterpreter.this, getAgentAdapter()});
+						inited.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(BDIInterpreter.this, getAgentAdapter()));
 					}
 				}));
 				return null;

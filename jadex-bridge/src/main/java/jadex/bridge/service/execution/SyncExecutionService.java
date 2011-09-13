@@ -114,9 +114,9 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	 *  be not executed in future. 
 	 *  @param task The task to execute.
 	 */
-	public synchronized IFuture cancel(IExecutable task)
+	public synchronized IFuture<Void> cancel(IExecutable task)
 	{
-		Future ret = new Future();
+		Future<Void> ret = new Future<Void>();
 		
 		if(!customIsValid())
 		{
@@ -359,17 +359,17 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	/**
 	 *  Get the future indicating that executor is idle.
 	 */
-	public synchronized IFuture getNextIdleFuture()
+	public synchronized IFuture<IFuture> getNextIdleFuture()
 	{
-		Future ret;
+		Future<IFuture> ret;
 		if(shutdown)
 		{
-			ret = new Future(new RuntimeException("Shutdown"));
+			ret = new Future<IFuture>(new RuntimeException("Shutdown"));
 		}
 		else
 		{
 			if(idlefuture==null)
-				idlefuture = new Future();
+				idlefuture = new Future<IFuture>();
 			ret = idlefuture;
 		}
 		return ret;

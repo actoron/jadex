@@ -2,9 +2,11 @@ package jadex.bpmn;
 
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.BpmnInterpreter;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
+import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
@@ -14,6 +16,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -26,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /* $if !android $ */
+import javax.swing.Icon;
 import javax.swing.UIDefaults;
 /* $endif $ */
 
@@ -172,9 +176,9 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public IFuture isLoadable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
-		return new Future(model.endsWith(".bpmn"));
+		return new Future<Boolean>(model.endsWith(".bpmn")? Boolean.TRUE: Boolean.FALSE);
 	}
 
 	/**
@@ -183,9 +187,9 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture isStartable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isStartable(String model, String[] imports, ClassLoader classloader)
 	{
-		return new Future(model.endsWith(".bpmn"));
+		return new Future<Boolean>(model.endsWith(".bpmn")? Boolean.TRUE: Boolean.FALSE);
 	}
 	
 	/**
@@ -200,9 +204,9 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 *  Get a default icon for a file type.
 	 */
 	/* $if !android $ */
-	public IFuture getComponentTypeIcon(String type)
+	public IFuture<Icon> getComponentTypeIcon(String type)
 	{
-		return new Future(type.equals(FILETYPE_BPMNPROCESS)? icons.getIcon("bpmn_process") : null);
+		return new Future<Icon>(type.equals(FILETYPE_BPMNPROCESS)? icons.getIcon("bpmn_process") : null);
 	}
 	/* $endif $ */
 
@@ -211,9 +215,9 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public IFuture getComponentType(String model, String[] imports, ClassLoader classloader)
+	public IFuture<String> getComponentType(String model, String[] imports, ClassLoader classloader)
 	{
-		return new Future(model.toLowerCase().endsWith(".bpmn") ? FILETYPE_BPMNPROCESS: null);
+		return new Future<String>(model.toLowerCase().endsWith(".bpmn") ? FILETYPE_BPMNPROCESS: null);
 	}
 	
 	/**
@@ -225,18 +229,18 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public IFuture createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
-		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future inited)
+	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
+		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future<Tuple2<IComponentInstance, IComponentAdapter>> inited)
 	{
 		try
 		{
 			MBpmnModel model = loader.loadBpmnModel(modelinfo.getFilename(), null, modelinfo.getClassLoader());
 			BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, model, arguments, config, parent, null, null, null, bindings, copy, inited);
-			return new Future(new Object[]{interpreter, interpreter.getComponentAdapter()});
+			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 		}
 		catch(Exception e)
 		{
-			return new Future(e);
+			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(e);
 		}
 	}
 	

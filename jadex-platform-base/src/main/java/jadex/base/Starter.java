@@ -16,6 +16,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -291,8 +292,8 @@ public class Starter
 								{
 									public void customResultAvailable(Object result)
 									{
-										Object[] root = (Object[])result;
-										final IComponentInstance instance = (IComponentInstance)root[0];
+										Tuple2<IComponentInstance,IComponentAdapter> root = (Tuple2<IComponentInstance,IComponentAdapter>)result;
+										final IComponentInstance instance = root.getFirstEntity();
 			//							final IComponentAdapter adapter = (IComponentAdapter)root[1];
 			//							System.out.println("Instance: "+instance);
 										
@@ -359,9 +360,9 @@ public class Starter
 								{
 									public void customResultAvailable(Object result)
 									{
-										Object[] root = (Object[]) result;
+										Tuple2<IComponentInstance, IComponentAdapter> root = (Tuple2<IComponentInstance, IComponentAdapter>)result;
 										
-										IComponentAdapter adapter = (IComponentAdapter)root[1];
+										IComponentAdapter adapter = root.getSecondEntity();
 										
 										// Execute init steps of root component on main thread (i.e. platform).
 										boolean again = true;

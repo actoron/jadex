@@ -4,10 +4,13 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.util.Map;
+
+import javax.swing.Icon;
 
 
 /**
@@ -21,7 +24,7 @@ public interface IComponentFactory
 	 *  Get a default icon for a component type.
 	 */
 	/* $if !android $ */
-	public IFuture getComponentTypeIcon(String type);
+	public IFuture<Icon> getComponentTypeIcon(String type);
 	/* $endif $ */
 
 	//-------- cached --------
@@ -40,7 +43,7 @@ public interface IComponentFactory
 	 *  @return The loaded model.
 	 */
 	@Excluded
-	public IFuture loadModel(String model, String[] imports, @Reference ClassLoader classloader);
+	public IFuture<IModelInfo> loadModel(String model, String[] imports, @Reference ClassLoader classloader);
 
 	/**
 	 *  Test if a model can be loaded by the factory.
@@ -49,7 +52,7 @@ public interface IComponentFactory
 	 *  @return True, if model can be loaded.
 	 */
 	@Excluded
-	public IFuture isLoadable(String model, String[] imports, @Reference ClassLoader classloader);
+	public IFuture<Boolean> isLoadable(String model, String[] imports, @Reference ClassLoader classloader);
 	
 	/**
 	 *  Test if a model is startable (e.g. an component).
@@ -58,7 +61,7 @@ public interface IComponentFactory
 	 *  @return True, if startable (and loadable).
 	 */
 	@Excluded
-	public IFuture isStartable(String model, String[] imports, @Reference ClassLoader classloader);
+	public IFuture<Boolean> isStartable(String model, String[] imports, @Reference ClassLoader classloader);
 
 	/**
 	 *  Get the component type of a model.
@@ -66,7 +69,7 @@ public interface IComponentFactory
 	 *  @param The imports (if any).
 	 */
 	@Excluded
-	public IFuture getComponentType(String model, String[] imports, @Reference ClassLoader classloader);
+	public IFuture<String> getComponentType(String model, String[] imports, @Reference ClassLoader classloader);
 
 	/**
 	 *  Get the properties (name/value pairs).
@@ -88,9 +91,9 @@ public interface IComponentFactory
 	 * @return An instance of a component and the corresponding adapter.
 	 */
 	@Excluded
-	public IFuture createComponentInstance(@Reference IComponentDescription desc, IComponentAdapterFactory factory, 
+	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(@Reference IComponentDescription desc, IComponentAdapterFactory factory, 
 		IModelInfo model, String config, Map arguments, IExternalAccess parent, @Reference RequiredServiceBinding[] bindings, 
-		boolean copy, Future ret);
+		boolean copy, Future<Tuple2<IComponentInstance, IComponentAdapter>> ret);
 
 }
 

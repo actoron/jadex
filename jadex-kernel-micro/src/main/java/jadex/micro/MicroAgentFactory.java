@@ -1,8 +1,10 @@
 package jadex.micro;
 
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
+import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
@@ -12,7 +14,9 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
+import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -29,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 /* $if !android $ */
+import javax.swing.Icon;
 import javax.swing.UIDefaults;
 /* $endif $ */
 
@@ -148,9 +153,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture loadModel(String model, String[] imports, ClassLoader classloader)
+	public IFuture<IModelInfo> loadModel(String model, String[] imports, ClassLoader classloader)
 	{
-		Future ret = new Future();
+		Future<IModelInfo> ret = new Future<IModelInfo>();
 //		System.out.println("filename: "+filename);
 		try
 		{
@@ -217,7 +222,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public IFuture isLoadable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
 		boolean ret = model.toLowerCase().endsWith("agent.class");
 //		if(model.toLowerCase().endsWith("Agent.class"))
@@ -228,7 +233,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 //			ret = cma!=null && cma.isAssignableFrom(IMicroAgent.class);
 //			System.out.println(clname+" "+cma+" "+ret);
 //		}
-		return new Future(ret);
+		return new Future<Boolean>(ret? Boolean.TRUE: Boolean.FALSE);
 	}
 	
 	/**
@@ -237,7 +242,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture isStartable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isStartable(String model, String[] imports, ClassLoader classloader)
 	{
 		return isLoadable(model, imports, classloader);
 	}
@@ -254,9 +259,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  Get a default icon for a file type.
 	 */
 	/* $if !android $ */
-	public IFuture getComponentTypeIcon(String type)
+	public IFuture<Icon> getComponentTypeIcon(String type)
 	{
-		return new Future(type.equals(FILETYPE_MICROAGENT) ? icons.getIcon("micro_agent") : null);
+		return new Future<Icon>(type.equals(FILETYPE_MICROAGENT) ? icons.getIcon("micro_agent") : null);
 	}
 	/* $endif $ */
 
@@ -265,9 +270,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public IFuture getComponentType(String model, String[] imports, ClassLoader classloader)
+	public IFuture<String> getComponentType(String model, String[] imports, ClassLoader classloader)
 	{
-		return new Future(model.toLowerCase().endsWith("agent.class") ? FILETYPE_MICROAGENT: null);
+		return new Future<String>(model.toLowerCase().endsWith("agent.class") ? FILETYPE_MICROAGENT: null);
 	}
 	
 	/**
@@ -279,8 +284,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public IFuture createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo model, 
-		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] binding, boolean copy, Future ret)
+	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo model, 
+		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] binding, boolean copy, Future<Tuple2<IComponentInstance, IComponentAdapter>> ret)
 	{
 		try
 		{
@@ -289,11 +294,11 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	
 			MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+"Agent", 
 				null, model.getClassLoader()), arguments, config, parent, binding, copy, ret);
-			return new Future(new Object[]{mai, mai.getAgentAdapter()});
+			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getAgentAdapter()));
 		}
 		catch(Exception e)
 		{
-			return new Future(e);
+			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(e);
 		}
 	}
 	

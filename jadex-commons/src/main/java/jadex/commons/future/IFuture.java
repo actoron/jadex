@@ -15,7 +15,7 @@ public interface IFuture<E>
 	 *  value of methods that do not perform asynchronous operations and do not
 	 *  return a result value.
 	 */
-	public static final IFuture<Void>	DONE	= new Future(null);
+	public static final IFuture<Void>	DONE	= new Future<Void>((Void)null);
 
 	// -------- methods --------
 

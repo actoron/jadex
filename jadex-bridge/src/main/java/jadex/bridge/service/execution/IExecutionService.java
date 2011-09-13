@@ -33,7 +33,7 @@ public interface IExecutionService	extends IService
 	 *  @param task The task to execute.
 	 *  @return Future signaling cancellation.
 	 */
-	public IFuture cancel(IExecutable task);
+	public IFuture<Void> cancel(IExecutable task);
 	
 	/**
 	 *  Get the currently running or waiting tasks.
@@ -49,7 +49,7 @@ public interface IExecutionService	extends IService
 	/**
 	 *  Get the future indicating that executor is idle.
 	 */
-	public IFuture getNextIdleFuture();
+	public IFuture<IFuture> getNextIdleFuture();
 	
 //	/**
 //	 *  Add a command to be executed whenever the executor

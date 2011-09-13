@@ -1,5 +1,8 @@
 package jadex.bridge;
 
+import java.util.Map;
+
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -16,7 +19,7 @@ public interface IComponentManagementService extends IService
 	 *  @param name The component name.
 	 *  @return The model info of the 
 	 */
-	public IFuture loadComponentModel(String filename);
+	public IFuture<IModelInfo> loadComponentModel(String filename);
 
 	/**
 	 *  Create a new component on the platform.
@@ -26,25 +29,25 @@ public interface IComponentManagementService extends IService
 	 *  @param killlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 *  @return The id of the component as future result, when the component has been created and initialized.
 	 */
-	public IFuture createComponent(String name, String model, CreationInfo info, IResultListener killlistener);
+	public IFuture<IComponentIdentifier> createComponent(String name, String model, CreationInfo info, IResultListener killlistener);
 		
 	/**
 	 *  Destroy (forcefully terminate) an component on the platform.
 	 *  @param componentid	The component to destroy.
 	 */
-	public IFuture destroyComponent(IComponentIdentifier componentid);
+	public IFuture<Map> destroyComponent(IComponentIdentifier componentid);
 
 	/**
 	 *  Suspend the execution of an component.
 	 *  @param componentid The component identifier.
 	 */
-	public IFuture suspendComponent(IComponentIdentifier componentid);
+	public IFuture<Void> suspendComponent(IComponentIdentifier componentid);
 	
 	/**
 	 *  Resume the execution of an component.
 	 *  @param componentid The component identifier.
 	 */
-	public IFuture resumeComponent(IComponentIdentifier componentid);
+	public IFuture<Void> resumeComponent(IComponentIdentifier componentid);
 	
 	//-------- debugging methods --------
 	
@@ -53,7 +56,7 @@ public interface IComponentManagementService extends IService
 	 *  @param componentid The component identifier.
 	 *  @param listener Called when the step is finished (result will be the component description).
 	 */
-	public IFuture stepComponent(IComponentIdentifier componentid);
+	public IFuture<Void> stepComponent(IComponentIdentifier componentid);
 	
 	/**
 	 *  Set breakpoints for a component.
@@ -62,7 +65,7 @@ public interface IComponentManagementService extends IService
 	 *  @param componentid The component identifier.
 	 *  @param breakpoints The new breakpoints (if any).
 	 */
-	public IFuture setComponentBreakpoints(IComponentIdentifier componentid, String[] breakpoints);
+	public IFuture<Void> setComponentBreakpoints(IComponentIdentifier componentid, String[] breakpoints);
 	
 	//-------- information methods --------
 	
@@ -71,32 +74,32 @@ public interface IComponentManagementService extends IService
 	 *  @return The component identifiers.
 	 *  This method should be used with caution when the agent population is large.
 	 */
-	public IFuture getComponentIdentifiers();
+	public IFuture<IComponentIdentifier[]> getComponentIdentifiers();
 	
 	/**
 	 *  Get the component description of a single component.
 	 *  @param cid The component identifier.
 	 *  @return The component description of this component.
 	 */
-	public IFuture getComponentDescription(IComponentIdentifier cid);
+	public IFuture<IComponentDescription> getComponentDescription(IComponentIdentifier cid);
 	
 	/**
 	 *  Get all component descriptions.
 	 *  @return The component descriptions of the platform.
 	 */
-	public IFuture getComponentDescriptions();
+	public IFuture<IComponentDescription[]> getComponentDescriptions();
 	
 	/**
 	 * Search for components matching the given description.
 	 * @return An array of matching component descriptions.
 	 */
-	public IFuture searchComponents(IComponentDescription adesc, ISearchConstraints con);
+	public IFuture<IComponentDescription[]> searchComponents(IComponentDescription adesc, ISearchConstraints con);
 
 	/**
 	 *  Search for components matching the given description.
 	 *  @return An array of matching component descriptions.
 	 */
-	public IFuture searchComponents(IComponentDescription adesc, ISearchConstraints con, boolean remote);
+	public IFuture<IComponentDescription[]> searchComponents(IComponentDescription adesc, ISearchConstraints con, boolean remote);
 	
 	//-------- listener methods --------
 	
@@ -122,7 +125,7 @@ public interface IComponentManagementService extends IService
 	 *  @param cid The component identifier.
 	 *  @param listener The result listener (recieves an IExternalAccess object).
 	 */
-	public IFuture getExternalAccess(IComponentIdentifier cid);
+	public IFuture<IExternalAccess> getExternalAccess(IComponentIdentifier cid);
 
 	//-------- parent/child component accessors --------
 	
@@ -131,21 +134,21 @@ public interface IComponentManagementService extends IService
 	 *  @param cid The component identifier.
 	 *  @return The parent component identifier.
 	 */
-	public IFuture getParent(IComponentIdentifier cid);
+	public IFuture<IComponentIdentifier> getParent(IComponentIdentifier cid);
 	
 	/**
 	 *  Get the children components of a component.
 	 *  @param cid The component identifier.
 	 *  @return The children component identifiers.
 	 */
-	public IFuture getChildren(IComponentIdentifier cid);
+	public IFuture<IComponentIdentifier[]> getChildren(IComponentIdentifier cid);
 	
 	/**
 	 *  Get the children components of a component.
 	 *  @param cid The component identifier.
 	 *  @return The children component descriptions.
 	 */
-	public IFuture getChildrenDescriptions(IComponentIdentifier cid);
+	public IFuture<IComponentDescription[]> getChildrenDescriptions(IComponentIdentifier cid);
 	
 	//-------- create methods for cms objects --------
 	

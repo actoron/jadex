@@ -32,6 +32,7 @@ import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
@@ -406,7 +407,7 @@ public abstract class ComponentManagementService extends BasicService implements
 //																System.out.println("created: "+ad);
 																
 																// Init successfully finished. Add description and adapter.
-																adapter = (IComponentAdapter)((Object[])result)[1];
+																adapter = ((Tuple2<IComponentInstance,IComponentAdapter>)result).getSecondEntity();
 																
 																// Init finished. Set to suspended until parent registration is finished.
 																// not set to suspend to allow other initing sibling components invoking services
@@ -591,19 +592,19 @@ public abstract class ComponentManagementService extends BasicService implements
 													{
 														public void resultAvailable(Object result)
 														{
-															Object[] comp = (Object[]) result;
+															Tuple2<IComponentInstance, IComponentAdapter> comp = (Tuple2<IComponentInstance, IComponentAdapter>)result;
 															// Store (invalid) desc, adapter and info for children
 															synchronized(adapters)
 															{
 																// 0: description, 1: adapter, 2: creation info, 3: model, 4: initfuture, 5: component instance
 	//															System.out.println("infos: "+ad.getName());
-																initinfos.put(cid, new Object[]{ad, comp[1], cinfo, lmodel, future, comp[0]});
+																initinfos.put(cid, new Object[]{ad, comp.getSecondEntity(), cinfo, lmodel, future, comp.getFirstEntity()});
 															}
 															
 															try
 															{
 																// Start the init procedure by waking up the adapter.
-																getComponentAdapterFactory().initialWakeup((IComponentAdapter)comp[1]);
+																getComponentAdapterFactory().initialWakeup(comp.getSecondEntity());
 															}
 															catch(RuntimeException e)
 															{

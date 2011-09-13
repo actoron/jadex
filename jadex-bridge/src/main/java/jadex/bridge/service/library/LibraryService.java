@@ -251,31 +251,31 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 *  Get all managed entries as URLs.
 	 *  @return url The urls.
 	 */
-	public synchronized IFuture getURLs()
+	public synchronized IFuture<List<URL>> getURLs()
 	{
-		return new Future(new ArrayList(libcl.getDelegates().keySet()));
+		return new Future<List<URL>>(new ArrayList<URL>(libcl.getDelegates().keySet()));
 	}
 
 	/**
 	 *  Get other contained (but not directly managed) URLs.
 	 *  @return The list of urls.
 	 */
-	public synchronized IFuture getNonManagedURLs()
+	public synchronized IFuture<List<URL>> getNonManagedURLs()
 	{
-		return new Future(SUtil.getClasspathURLs(libcl));	
+		return new Future<List<URL>>(SUtil.getClasspathURLs(libcl));	
 	}
 	
 	/**
 	 *  Get all urls (managed and non-managed).
 	 *  @return The list of urls.
 	 */
-	public IFuture getAllURLs()
+	public IFuture<List<URL>> getAllURLs()
 	{
-		List ret = new ArrayList();
+		List<URL> ret = new ArrayList<URL>();
 		ret.addAll(libcl.getDelegates().keySet());
 		ret.addAll(SUtil.getClasspathURLs(libcl));
 		ret.addAll(SUtil.getClasspathURLs(null));
-		return new Future(ret);
+		return new Future<List<URL>>(ret);
 	}
 	
 	/** 
@@ -507,22 +507,22 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 *  Get the non-managed classpath entries as strings.
 	 *  @return Classpath entries as a list of strings.
 	 */
-	public IFuture getURLStrings()
+	public IFuture<List<String>> getURLStrings()
 	{
-		final Future ret = new Future();
+		final Future<List<String>> ret = new Future<List<String>>();
 		
-		getURLs().addResultListener(new IResultListener()
+		getURLs().addResultListener(new IResultListener<List<URL>>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(List<URL> result)
 			{
-				List urls = (List)result;
+//				List urls = (List)result;
 				// TODO Auto-generated method stub
-				List tmp = new ArrayList();
+				List<String> tmp = new ArrayList<String>();
 				// todo: hack!!!
 				
-				for(Iterator it=urls.iterator(); it.hasNext(); )
+				for(Iterator<URL> it=result.iterator(); it.hasNext(); )
 				{
-					URL	url	= (URL)it.next();
+					URL	url	= it.next();
 					tmp.add(url.toString());
 					
 //					String file = url.getFile();
@@ -556,21 +556,21 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 *  Get the non-managed classpath entries.
 	 *  @return Classpath entries as a list of strings.
 	 */
-	public IFuture getNonManagedURLStrings()
+	public IFuture<List<String>> getNonManagedURLStrings()
 	{
-		final Future ret = new Future();
+		final Future<List<String>> ret = new Future<List<String>>();
 		
-		getNonManagedURLs().addResultListener(new IResultListener()
+		getNonManagedURLs().addResultListener(new IResultListener<List<URL>>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(List<URL> result)
 			{
-				List urls = (List)result;
-				List tmp = new ArrayList();
+//				List urls = (List)result;
+				List<String> tmp = new ArrayList<String>();
 				// todo: hack!!!
 				
-				for(Iterator it=urls.iterator(); it.hasNext(); )
+				for(Iterator<URL> it=result.iterator(); it.hasNext(); )
 				{
-					URL	url	= (URL)it.next();
+					URL	url	= it.next();
 					tmp.add(url.toString());
 					
 //					String file = url.getFile();
@@ -635,9 +635,9 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 *  @param name The class name.
 	 *  @return The class definition as byte array.
 	 */
-	public IFuture getClassDefinition(String name)
+	public IFuture<byte[]> getClassDefinition(String name)
 	{
-		Future ret = new Future();
+		Future<byte[]> ret = new Future<byte[]>();
 		
 		Class clazz = SReflect.findClass0(name, null, libcl);
 		if(clazz!=null)

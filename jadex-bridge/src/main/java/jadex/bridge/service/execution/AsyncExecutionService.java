@@ -430,17 +430,17 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	/**
 	 *  Get the future indicating that executor is idle.
 	 */
-	public synchronized IFuture getNextIdleFuture()
+	public synchronized IFuture<IFuture> getNextIdleFuture()
 	{
-		Future ret;
+		Future<IFuture> ret;
 		if(shutdown)
 		{
-			ret = new Future(new RuntimeException("Shutdown"));
+			ret = new Future<IFuture>(new RuntimeException("Shutdown"));
 		}
 		else
 		{
 			if(idlefuture==null)
-				idlefuture = new Future();
+				idlefuture = new Future<IFuture>();
 			ret = idlefuture;
 		}
 		return ret;

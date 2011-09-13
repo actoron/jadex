@@ -1,9 +1,11 @@
 package jadex.kernelbase;
 
 import jadex.bridge.CreationInfo;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
+import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -26,6 +28,7 @@ import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.CallMultiplexer;
 import jadex.commons.future.CollectionResultListener;
@@ -307,7 +310,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 * @param The imports (if any).
 	 * @return The loaded model.
 	 */
-	public IFuture loadModel(final String model, final String[] imports, final ClassLoader classloader)
+	public IFuture<IModelInfo> loadModel(final String model, final String[] imports, final ClassLoader classloader)
 	{
 		return loadModel(model, imports, classloader, false);
 	}
@@ -319,23 +322,23 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 * @param The imports (if any).
 	 * @return The loaded model.
 	 */
-	public IFuture loadModel(final String model, final String[] imports, final ClassLoader classloader, boolean isrecur)
+	public IFuture<IModelInfo> loadModel(final String model, final String[] imports, final ClassLoader classloader, boolean isrecur)
 	{
-		final Future ret = new Future();
+		final Future<IModelInfo> ret = new Future<IModelInfo>();
 		
 		findKernel(model, imports, classloader, isrecur).addResultListener(ia.createResultListener(ia.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				if (result != null)
-					((IComponentFactory) result).loadModel(model, imports, classloader).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
+					((IComponentFactory)result).loadModel(model, imports, classloader).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 				else
 					ret.setException(new RuntimeException("Factory not found: " + model));
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setResult(exception);
+				ret.setException(exception);
 			}
 		})));
 		return ret;
@@ -348,9 +351,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 * @param The imports (if any).
 	 * @return True, if model can be loaded.
 	 */
-	public IFuture isLoadable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
-		final Future ret = new Future();
+		final Future<Boolean> ret = new Future<Boolean>();
 		findKernel(model, imports, classloader).addResultListener(ia.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -378,9 +381,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 *            imports (if any).
 	 * @return True, if startable (and loadable).
 	 */
-	public IFuture isStartable(final String model, final String[] imports, final ClassLoader classloader)
+	public IFuture<Boolean> isStartable(final String model, final String[] imports, final ClassLoader classloader)
 	{
-		final Future ret = new Future();
+		final Future<Boolean> ret = new Future<Boolean>();
 		findKernel(model, imports, classloader).addResultListener(ia.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -407,9 +410,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 * @param The
 	 *            imports (if any).
 	 */
-	public IFuture getComponentType(final String model, final String[] imports, final ClassLoader classloader)
+	public IFuture<String> getComponentType(final String model, final String[] imports, final ClassLoader classloader)
 	{
-		final Future ret = new Future();
+		final Future<String> ret = new Future<String>();
 		findKernel(model, imports, classloader).addResultListener(ia.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -426,7 +429,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setResult(exception);
+				ret.setException(exception);
 			}
 		}));
 		return ret;
@@ -482,16 +485,16 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 * @return An instance of a component and the corresponding adapter.
 	 */
 	@Excluded
-	public IFuture createComponentInstance(final IComponentDescription desc,
+	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc,
 			final IComponentAdapterFactory factory, final IModelInfo model, final String config,
 			final Map arguments, final IExternalAccess parent,
-			final RequiredServiceBinding[] bindings, final boolean copy, final Future ret)
+			final RequiredServiceBinding[] bindings, final boolean copy, final Future<Tuple2<IComponentInstance, IComponentAdapter>> ret)
 	{
-		IComponentFactory fac = (IComponentFactory) factorycache.get(getModelExtension(model.getFilename()));
+		IComponentFactory fac = (IComponentFactory)factorycache.get(getModelExtension(model.getFilename()));
 		if(fac != null)
 			return fac.createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, ret);
 		
-		final Future res = new Future();
+		final Future<Tuple2<IComponentInstance, IComponentAdapter>> res = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
 		
 		findKernel(model.getFilename(), null, model.getClassLoader()).addResultListener(ia.createResultListener(new DelegationResultListener(res)
 		{

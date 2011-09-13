@@ -3,6 +3,7 @@ package jadex.kernelbase;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.RemoteComponentListener;
@@ -12,6 +13,7 @@ import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.commons.IValueFetcher;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -83,7 +85,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public AbstractInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, 
 		final IComponentAdapterFactory factory, final IExternalAccess parent, 
-		final RequiredServiceBinding[] bindings, boolean copy, final Future inited)
+		final RequiredServiceBinding[] bindings, boolean copy, final Future<Tuple2<IComponentInstance, IComponentAdapter>> inited)
 	{
 		try
 		{

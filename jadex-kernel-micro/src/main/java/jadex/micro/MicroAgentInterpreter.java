@@ -7,6 +7,7 @@ import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -17,6 +18,7 @@ import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.clock.ITimer;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -71,7 +73,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 */
 	public MicroAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
 		final MicroModel model, Class microclass, final Map args, final String config, 
-		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, final Future inited)
+		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, final Future<Tuple2<IComponentInstance, IComponentAdapter>> inited)
 	{
 		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, inited);
 		
@@ -133,7 +135,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 												{
 		//											System.out.println("initend: "+getComponentAdapter().getComponentIdentifier());
 													// Init is now finished. Notify cms.
-													inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
+													inited.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(MicroAgentInterpreter.this, adapter));
 												}
 											});
 										}

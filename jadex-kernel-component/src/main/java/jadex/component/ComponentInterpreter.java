@@ -1,8 +1,10 @@
 package jadex.component;
 
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -13,6 +15,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.clock.ITimedObject;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -48,7 +51,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	 */
 	public ComponentInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, 
 		final IComponentAdapterFactory factory, final IExternalAccess parent, final Map arguments, 
-		final RequiredServiceBinding[] bindings, boolean copy, final Future inited)
+		final RequiredServiceBinding[] bindings, boolean copy, final Future<Tuple2<IComponentInstance, IComponentAdapter>> inited)
 	{
 		super(desc, model, config, factory, parent, bindings, copy, inited);
 		this.steps = new ArrayList();
@@ -62,7 +65,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 				{
 					public void customResultAvailable(Object result)
 					{
-						inited.setResult(new Object[]{ComponentInterpreter.this, adapter});
+						inited.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(ComponentInterpreter.this, adapter));
 					}
 					public void exceptionOccurred(Exception exception)
 					{

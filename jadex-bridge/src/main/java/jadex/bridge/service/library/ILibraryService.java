@@ -6,6 +6,7 @@ import jadex.bridge.service.annotation.GuiClassName;
 import jadex.commons.future.IFuture;
 
 import java.net.URL;
+import java.util.List;
 
 /** 
  *  Interface for the Library Service. It provides a platform service
@@ -46,38 +47,38 @@ public interface ILibraryService extends IService
 	 *  Get all managed entries as URLs.
 	 *  @return The list of urls.
 	 */
-	public IFuture getURLs();
+	public IFuture<List<URL>> getURLs();
 	
 	/**
 	 *  Get other contained (but not directly managed) URLs.
 	 *  @return The list of urls.
 	 */
-	public IFuture getNonManagedURLs();
+	public IFuture<List<URL>> getNonManagedURLs();
 	
 	/**
 	 *  Get all urls (managed and non-managed).
 	 *  @return The list of urls.
 	 */
-	public IFuture getAllURLs();
+	public IFuture<List<URL>> getAllURLs();
 	
 	/**
 	 *  Get the non-managed classpath entries as strings.
 	 *  @return Classpath entries as a list of strings.
 	 */
-	public IFuture getURLStrings();
+	public IFuture<List<String>> getURLStrings();
 	
 	/**
 	 *  Get the non-managed classpath entries.
 	 *  @return Classpath entries as a list of strings.
 	 */
-	public IFuture getNonManagedURLStrings();
+	public IFuture<List<String>> getNonManagedURLStrings();
 	
 	/**
 	 *  Get a class definition.
 	 *  @param name The class name.
 	 *  @return The class definition as byte array.
 	 */
-	public IFuture getClassDefinition(String name);
+	public IFuture<byte[]> getClassDefinition(String name);
 	
 	/** 
 	 *  Returns the current ClassLoader.

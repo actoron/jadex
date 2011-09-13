@@ -4,9 +4,11 @@ import jadex.bdi.BDIAgentFactory;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.runtime.impl.JavaStandardPlanExecutor;
 import jadex.bdibpmn.BpmnPlanExecutor;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
+import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -17,6 +19,7 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.threadpool.IThreadPoolService;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -28,6 +31,7 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.Icon;
 import javax.swing.UIDefaults;
 
 /**
@@ -117,10 +121,10 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture loadModel(String model, String[] imports, ClassLoader classloader)
+	public IFuture<IModelInfo> loadModel(String model, String[] imports, ClassLoader classloader)
 	{
 		// Todo: support imports for GPMN models (-> use abstract model loader). 
-		Future ret = new Future();
+		Future<IModelInfo> ret = new Future<IModelInfo>();
 		try
 		{
 //			ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
@@ -143,9 +147,9 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public IFuture isLoadable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
-		return new Future(model.endsWith(".gpmn"));
+		return new Future<Boolean>(model.endsWith(".gpmn")? Boolean.TRUE: Boolean.FALSE);
 	}
 	
 	/**
@@ -154,9 +158,9 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture isStartable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isStartable(String model, String[] imports, ClassLoader classloader)
 	{
-		return new Future(model.endsWith(".gpmn"));
+		return new Future<Boolean>(model.endsWith(".gpmn")? Boolean.TRUE: Boolean.FALSE);
 	}
 	
 	/**
@@ -170,9 +174,9 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	/**
 	 *  Get a default icon for a file type.
 	 */
-	public IFuture getComponentTypeIcon(String type)
+	public IFuture<Icon> getComponentTypeIcon(String type)
 	{
-		return new Future(type.equals(FILETYPE_GPMNPROCESS) ? icons.getIcon("gpmn_process") : null);
+		return new Future<Icon>(type.equals(FILETYPE_GPMNPROCESS) ? icons.getIcon("gpmn_process") : null);
 	}
 
 	/**
@@ -180,9 +184,9 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public IFuture getComponentType(String model, String[] imports, ClassLoader classloader)
+	public IFuture<String> getComponentType(String model, String[] imports, ClassLoader classloader)
 	{
-		return new Future(model.toLowerCase().endsWith(".gpmn") ? FILETYPE_GPMNPROCESS: null);
+		return new Future<String>(model.toLowerCase().endsWith(".gpmn") ? FILETYPE_GPMNPROCESS: null);
 	}
 	
 	/**
@@ -194,8 +198,8 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public IFuture createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
-		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future inited)
+	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
+		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future<Tuple2<IComponentInstance, IComponentAdapter>> inited)
 	{
 //		ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 		System.out.println(factory.getClass().toString());
@@ -211,11 +215,11 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 			ret = converter.convertGpmnModelToBDIAgents((jadex.gpmn.model.MGpmnModel)ret, modelinfo.getClassLoader());
 	
 			//factory.createComponentAdapter(desc, model, instance, parent);
-			return new Future(this.factory.createComponentInstance(desc, factory, (OAVAgentModel)ret, config, arguments, parent, bindings, copy, inited));
+			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(this.factory.createComponentInstance(desc, factory, (OAVAgentModel)ret, config, arguments, parent, bindings, copy, inited));
 		}
 		catch(Exception e)
 		{
-			return new Future(e);
+			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(e);
 		}
 	}
 	

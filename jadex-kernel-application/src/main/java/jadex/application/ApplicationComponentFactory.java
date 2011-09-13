@@ -1,9 +1,11 @@
 package jadex.application;
 
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentFactoryExtensionService;
+import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
@@ -13,6 +15,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
+import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -31,6 +34,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 /* $if !android $ */
+import javax.swing.Icon;
 import javax.swing.UIDefaults;
 /* $endif $ */
 
@@ -194,9 +198,9 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture loadModel(String model, String[] imports, ClassLoader classloader)
+	public IFuture<IModelInfo> loadModel(String model, String[] imports, ClassLoader classloader)
 	{
-		Future ret = new Future();
+		Future<IModelInfo> ret = new Future<IModelInfo>();
 //		System.out.println("filename: "+filename);
 		try
 		{
@@ -219,8 +223,8 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public IFuture createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
-		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future ret)
+	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
+		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future<Tuple2<IComponentInstance, IComponentAdapter>> ret)
 	{
 		try
 		{
@@ -230,7 +234,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 			// todo: result listener?
 			// todo: create application context as return value?!
 					
-			return new Future(new Object[]{interpreter, interpreter.getComponentAdapter()});
+			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 		}
 		catch(Exception e)
 		{
@@ -245,9 +249,9 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public IFuture isLoadable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
-		return new Future(model.endsWith(ApplicationModelLoader.FILE_EXTENSION_APPLICATION));
+		return new Future<Boolean>(model.endsWith(ApplicationModelLoader.FILE_EXTENSION_APPLICATION));
 	}
 	
 	/**
@@ -256,9 +260,9 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture isStartable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isStartable(String model, String[] imports, ClassLoader classloader)
 	{
-		return new Future(model.endsWith(ApplicationModelLoader.FILE_EXTENSION_APPLICATION));
+		return new Future<Boolean>(model.endsWith(ApplicationModelLoader.FILE_EXTENSION_APPLICATION));
 	}
 
 	/**
@@ -273,9 +277,9 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  Get a default icon for a file type.
 	 */
 	/* $if !android $ */
-	public IFuture getComponentTypeIcon(String type)
+	public IFuture<Icon> getComponentTypeIcon(String type)
 	{
-		return new Future(type.equals(FILETYPE_APPLICATION)? icons.getIcon("application"): null);
+		return new Future<Icon>(type.equals(FILETYPE_APPLICATION)? icons.getIcon("application"): null);
 	}
 	/* $endif $ */
 
@@ -284,9 +288,9 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public IFuture getComponentType(String model, String[] imports, ClassLoader classloader)
+	public IFuture<String> getComponentType(String model, String[] imports, ClassLoader classloader)
 	{
-		return new Future(model.toLowerCase().endsWith(ApplicationModelLoader.FILE_EXTENSION_APPLICATION)? FILETYPE_APPLICATION: null);
+		return new Future<String>(model.toLowerCase().endsWith(ApplicationModelLoader.FILE_EXTENSION_APPLICATION)? FILETYPE_APPLICATION: null);
 	}
 
 	/**

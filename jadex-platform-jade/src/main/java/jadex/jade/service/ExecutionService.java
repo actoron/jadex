@@ -52,7 +52,7 @@ public class ExecutionService extends BasicService implements IExecutionService
 	 *  @param task The task to execute.
 	 *  @return Future signaling cancellation.
 	 */
-	public IFuture cancel(IExecutable task)
+	public IFuture<Void> cancel(IExecutable task)
 	{
 		if(task instanceof JadeComponentAdapter)
 		{
@@ -85,9 +85,9 @@ public class ExecutionService extends BasicService implements IExecutionService
 	/**
 	 *  Get the next idle future.
 	 */
-	public IFuture getNextIdleFuture()
+	public IFuture<IFuture> getNextIdleFuture()
 	{
-		Future ret = new Future();
+		Future<IFuture> ret = new Future<IFuture>();
 		ret.setException(new UnsupportedOperationException("Operation unavailable in JADE."));
 		return ret;
 	}

@@ -7,9 +7,11 @@ import jadex.bdi.model.editable.IMECapability;
 import jadex.bdi.model.impl.flyweights.MCapabilityFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
+import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -23,6 +25,7 @@ import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -44,6 +47,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 /* $if !android $ */
+import javax.swing.Icon;
 import javax.swing.UIDefaults;
 /* $endif $ */
 
@@ -181,8 +185,8 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public IFuture createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo modelinfo, 
-		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future ret)
+	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo modelinfo, 
+		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future<Tuple2<IComponentInstance, IComponentAdapter>> ret)
 	{
 		try
 		{
@@ -198,11 +202,11 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 			state.addSubstate(amodel.getState());
 			
 			BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, props, copy, ret);
-			return new Future(new Object[]{bdii, bdii.getAgentAdapter()});
+			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
 		}
 		catch(Exception e)
 		{
-			return new Future(e);
+			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(e);
 		}
 	}
 	
@@ -216,8 +220,8 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, OAVAgentModel amodel, 
-		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future ret)
+	public Tuple2<IComponentInstance, IComponentAdapter> createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, OAVAgentModel amodel, 
+		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future<Tuple2<IComponentInstance, IComponentAdapter>> ret)
 	{
 		// Create type model for agent instance (e.g. holding dynamically loaded java classes).
 		OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
@@ -228,7 +232,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 		state.addSubstate(amodel.getState());
 		
 		BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, props, copy, ret);
-		return new Object[]{bdii, bdii.getAgentAdapter()};
+		return new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter());
 	}
 	
 	/**
@@ -237,9 +241,9 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture loadModel(String filename, String[] imports, ClassLoader classloader)
+	public IFuture<IModelInfo> loadModel(String filename, String[] imports, ClassLoader classloader)
 	{
-		Future ret = new Future();
+		Future<IModelInfo> ret = new Future<IModelInfo>();
 		try
 		{
 //			System.out.println("loading bdi: "+filename);
@@ -261,11 +265,11 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public IFuture isLoadable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
 //		init();
-
-		return new Future(model.toLowerCase().endsWith(".agent.xml") || model.toLowerCase().endsWith(".capability.xml"));
+		boolean loadable = model.toLowerCase().endsWith(".agent.xml") || model.toLowerCase().endsWith(".capability.xml");
+		return new Future<Boolean>(loadable? Boolean.TRUE: Boolean.FALSE);
 //		return loader.isLoadable(model, null);
 //		return model.toLowerCase().endsWith(".agent.xml") || model.toLowerCase().endsWith(".capability.xml");
 		
@@ -283,9 +287,10 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture isStartable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isStartable(String model, String[] imports, ClassLoader classloader)
 	{
-		return new Future(model!=null && model.toLowerCase().endsWith(".agent.xml"));
+		boolean startable = model!=null && model.toLowerCase().endsWith(".agent.xml");
+		return new Future(startable? Boolean.TRUE: Boolean.FALSE);
 //		return SXML.isAgentFilename(model);
 	}
 
@@ -302,9 +307,9 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	 *  Get a default icon for a file type.
 	 */
 	/* $if !android $ */
-	public IFuture getComponentTypeIcon(String type)
+	public IFuture<Icon> getComponentTypeIcon(String type)
 	{
-		return new Future(type.equals(FILETYPE_BDIAGENT) ? icons.getIcon("bdi_agent")
+		return new Future<Icon>(type.equals(FILETYPE_BDIAGENT) ? icons.getIcon("bdi_agent")
 			: type.equals(FILETYPE_BDICAPABILITY) ? icons.getIcon("bdi_capability") : null);
 	}
 	/* $endif $ */
@@ -314,9 +319,9 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public IFuture getComponentType(String model, String[] imports, ClassLoader classloader)
+	public IFuture<String> getComponentType(String model, String[] imports, ClassLoader classloader)
 	{
-		return new Future(model.toLowerCase().endsWith(".agent.xml") ? FILETYPE_BDIAGENT
+		return new Future<String>(model.toLowerCase().endsWith(".agent.xml") ? FILETYPE_BDIAGENT
 			: model.toLowerCase().endsWith(".capability.xml") ? FILETYPE_BDICAPABILITY
 			: null);
 	}
