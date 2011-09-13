@@ -35,9 +35,9 @@ public class TreatVictimsService implements ITreatVictimsService
 	 *  @param disaster The disaster.
 	 *  @return Future, null when done.
 	 */
-	public IFuture treatVictims(final ISpaceObject disaster)
+	public IFuture<Void> treatVictims(final ISpaceObject disaster)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		IGoal[] goals = (IGoal[])agent.getGoalbase().getGoals("treat_victims");
 		if(goals.length>0)
@@ -74,9 +74,9 @@ public class TreatVictimsService implements ITreatVictimsService
 	 *  Abort extinguishing fire.
 	 *  @return Future, null when done.
 	 */
-	public IFuture abort()
+	public IFuture<Void> abort()
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		ISpaceObject myself	= (ISpaceObject)agent.getBeliefbase().getBelief("myself").getFact();
 		if(((Boolean)myself.getProperty(DeliverPatientTask.PROPERTY_PATIENT)).booleanValue())

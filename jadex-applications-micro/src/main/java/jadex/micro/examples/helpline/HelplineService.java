@@ -36,7 +36,7 @@ public class HelplineService implements IHelpline
 	 */
 	public IIntermediateFuture<InformationEntry> getInformation(final String name)
 	{
-		return new IntermediateFuture(agent.getInformation(name));
+		return new IntermediateFuture<InformationEntry>(agent.getInformation(name));
 	}
 
 	/**

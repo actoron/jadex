@@ -25,7 +25,7 @@ public class BuyItemPlan extends Plan
 		
 		// Buy the item at the shop (the shop is a service at another agent)
 //		System.out.println(getComponentName()+" buying item: "+name);
-		IFuture	future	= shop.buyItem(name, price);
+		IFuture<ItemInfo>	future	= shop.buyItem(name, price);
 //		System.out.println(getComponentName()+" getting item: "+future);
 		ItemInfo item = (ItemInfo)future.get(this);
 //		System.out.println(getComponentName()+" bought item: "+item);

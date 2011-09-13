@@ -13,11 +13,11 @@ public interface IClearChemicalsService
 	 *  @param disaster The disaster.
 	 *  @return Future, null when done.
 	 */
-	public IFuture clearChemicals(ISpaceObject disaster);
+	public IFuture<Void> clearChemicals(ISpaceObject disaster);
 
 	/**
 	 *  Abort clearing chemicals.
 	 *  @return Future, null when done.
 	 */
-	public IFuture abort();
+	public IFuture<Void> abort();
 }

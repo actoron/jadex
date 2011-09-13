@@ -13,12 +13,12 @@ public interface ITreatVictimsService
 	 *  @param disaster The disaster.
 	 *  @return Future, null when done.
 	 */
-	public IFuture treatVictims(ISpaceObject disaster);
+	public IFuture<Void> treatVictims(ISpaceObject disaster);
 
 	/**
 	 *  Abort treating victims.
 	 *  @return Future, null when done.
 	 */
-	public IFuture abort();
+	public IFuture<Void> abort();
 }
 

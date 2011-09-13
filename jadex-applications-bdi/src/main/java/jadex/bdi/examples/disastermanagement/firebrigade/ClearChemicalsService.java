@@ -30,9 +30,9 @@ public class ClearChemicalsService implements IClearChemicalsService
 	 *  @param disaster The disaster.
 	 *  @return Future, null when done.
 	 */
-	public IFuture clearChemicals(final ISpaceObject disaster)
+	public IFuture<Void> clearChemicals(final ISpaceObject disaster)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		IGoal[] exgoals = (IGoal[])agent.getGoalbase().getGoals("extinguish_fire");
 		if(exgoals.length>0)
@@ -75,9 +75,9 @@ public class ClearChemicalsService implements IClearChemicalsService
 	 *  Abort clearing chemicals.
 	 *  @return Future, null when done.
 	 */
-	public IFuture abort()
+	public IFuture<Void> abort()
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		IGoal[] goals = (IGoal[])agent.getGoalbase().getGoals("clear_chemicals");
 		for(int i=0; i<goals.length; i++)

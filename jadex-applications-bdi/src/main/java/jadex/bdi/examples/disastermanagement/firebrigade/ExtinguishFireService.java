@@ -29,9 +29,9 @@ public class ExtinguishFireService implements IExtinguishFireService
 	 *  Extinguish a fire.
 	 *  @param disaster The disaster.
 	 */
-	public IFuture extinguishFire(final ISpaceObject disaster)
+	public IFuture<Void> extinguishFire(final ISpaceObject disaster)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		IGoal[] exgoals = (IGoal[])agent.getGoalbase().getGoals("extinguish_fire");
 		if(exgoals.length>0)
@@ -74,10 +74,10 @@ public class ExtinguishFireService implements IExtinguishFireService
 	 *  Abort extinguishing fire.
 	 *  @return Future, null when done.
 	 */
-	public IFuture abort()
+	public IFuture<Void> abort()
 	{
 //		System.out.println("Aborting force: "+agent.getAgentName());
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		IGoal[] goals = (IGoal[])agent.getGoalbase().getGoals("extinguish_fire");
 		for(int i=0; i<goals.length; i++)

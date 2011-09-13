@@ -13,12 +13,12 @@ public interface IExtinguishFireService
 	 *  @param disaster The disaster.
 	 *  @return Future, null when done.
 	 */
-	public IFuture extinguishFire(ISpaceObject disaster);
+	public IFuture<Void> extinguishFire(ISpaceObject disaster);
 	
 
 	/**
 	 *  Abort extinguishing fire.
 	 *  @return Future, null when done.
 	 */
-	public IFuture abort();
+	public IFuture<Void> abort();
 }

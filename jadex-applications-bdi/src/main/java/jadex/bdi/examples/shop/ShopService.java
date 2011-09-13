@@ -59,9 +59,9 @@ public class ShopService implements IShopService
 	 *  Buy an item.
 	 *  @param item The item.
 	 */
-	public IFuture buyItem(final String item, final double price)
+	public IFuture<ItemInfo> buyItem(final String item, final double price)
 	{
-		final Future ret = new Future();
+		final Future<ItemInfo> ret = new Future<ItemInfo>();
 		
 		final IGoal sell = comp.getGoalbase().createGoal("sell");
 		sell.getParameter("name").setValue(item);
@@ -71,7 +71,7 @@ public class ShopService implements IShopService
 			public void goalFinished(AgentEvent ae)
 			{
 				if(sell.isSucceeded())
-					ret.setResult(sell.getParameter("result").getValue());
+					ret.setResult((ItemInfo)sell.getParameter("result").getValue());
 				else
 					ret.setException(sell.getException());
 			}
@@ -89,10 +89,10 @@ public class ShopService implements IShopService
 	 *  Get the item catalog.
 	 *  @return  The catalog.
 	 */	
-	public IFuture getCatalog()
+	public IFuture<ItemInfo[]> getCatalog()
 	{
-		final Future ret = new Future();
-		ret.setResult(comp.getBeliefbase().getBeliefSet("catalog").getFacts());
+		final Future<ItemInfo[]> ret = new Future<ItemInfo[]>();
+		ret.setResult((ItemInfo[])comp.getBeliefbase().getBeliefSet("catalog").getFacts());
 		return ret;
 	}
 

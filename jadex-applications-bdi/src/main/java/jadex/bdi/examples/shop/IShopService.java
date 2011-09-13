@@ -17,11 +17,11 @@ public interface IShopService
 	 *  Buy an item.
 	 *  @param item The item.
 	 */
-	public IFuture buyItem(String item, double price);
+	public IFuture<ItemInfo> buyItem(String item, double price);
 	
 	/**
 	 *  Get the item catalog.
 	 *  @return  The catalog.
 	 */
-	public IFuture getCatalog();
+	public IFuture<ItemInfo[]> getCatalog();
 }

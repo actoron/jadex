@@ -311,13 +311,13 @@ public class HelplinePanel extends JPanel
 					{
 						IHelpline hl = (IHelpline)it.next();
 						IFuture res = hl.getInformation(name);
-						res.addResultListener(new DefaultResultListener()
-						{
-							public void resultAvailable(Object result)
-							{
-								System.out.println("result"+result);
-							}
-						});
+//						res.addResultListener(new DefaultResultListener()
+//						{
+//							public void resultAvailable(Object result)
+//							{
+//								System.out.println("result"+result);
+//							}
+//						});
 						res.addResultListener(crl);
 					}
 				}
