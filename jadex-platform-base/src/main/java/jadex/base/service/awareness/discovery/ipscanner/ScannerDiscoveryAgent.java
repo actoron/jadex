@@ -1,12 +1,12 @@
 package jadex.base.service.awareness.discovery.ipscanner;
 
 import jadex.base.service.awareness.AwarenessInfo;
+import jadex.base.service.awareness.discovery.DiscoveryService;
 import jadex.base.service.awareness.discovery.DiscoveryState;
 import jadex.base.service.awareness.discovery.IDiscoveryService;
 import jadex.base.service.awareness.discovery.MasterSlaveDiscoveryAgent;
 import jadex.base.service.awareness.discovery.ReceiveHandler;
 import jadex.base.service.awareness.discovery.SendHandler;
-import jadex.base.service.awareness.discovery.ipbroadcast.BroadcastSendHandler;
 import jadex.base.service.awareness.management.IManagementService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.threadpool.IThreadPoolService;
@@ -27,7 +27,6 @@ import jadex.micro.annotation.RequiredServices;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -51,7 +50,7 @@ import java.nio.channels.Selector;
 	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"))
 })
 @ProvidedServices(
-	@ProvidedService(type=IDiscoveryService.class, implementation=@Implementation(expression="$component"))
+	@ProvidedService(type=IDiscoveryService.class, implementation=@Implementation(DiscoveryService.class))
 )
 @RequiredServices(
 {

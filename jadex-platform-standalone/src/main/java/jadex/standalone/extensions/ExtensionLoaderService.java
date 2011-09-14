@@ -77,10 +77,6 @@ public class ExtensionLoaderService implements IExtensionLoaderService
 				});
 			}
 		}
-		else
-		{
-			component.killComponent();
-		}
 		
 		return ret;
 	}

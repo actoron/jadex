@@ -74,18 +74,19 @@ public class CallMultiplexer
 	 */
 	public IFuture doCall(Object keyargs, IResultCommand call, boolean commandaskey)
 	{
-		if (keyargs != null && keyargs.getClass().isArray())
+		if(keyargs!=null && keyargs.getClass().isArray())
 			keyargs = new Tuple((Object[]) keyargs);
-		if (commandaskey)
+		if(commandaskey)
 			keyargs = new Tuple(keyargs, call.getClass());
 		
-		final Future ret = new Future();
-		IFuture res = (IFuture) futureMap.get(keyargs);
-		if (res == null)
+		IFuture ret = (IFuture) futureMap.get(keyargs);
+		if(ret==null)
 		{
 			final Object key = keyargs;
-			res = (IFuture) call.execute(null);
+			ret	= (IFuture)call.execute(null);
 			futureMap.put(key, ret);
+			
+			// Todo: result listener on correct thread?
 			ret.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -95,18 +96,10 @@ public class CallMultiplexer
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					resultAvailable(exception);
+					futureMap.remove(key);
 				}
 			});
 		}
-		res.addResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				futureMap.remove(ret);
-				super.customResultAvailable(result);
-			}
-		});
 		return ret;
 	}
 }

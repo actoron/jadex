@@ -11,6 +11,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -37,6 +38,7 @@ import java.util.Set;
 /**
  *  The meta execution service wraps all specific process execution services.
  */
+@Service
 public class ExecutionService implements IExecutionService
 {
 	//-------- attributes --------

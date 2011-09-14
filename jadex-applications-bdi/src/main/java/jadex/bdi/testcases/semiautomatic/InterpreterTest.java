@@ -58,7 +58,7 @@ public class InterpreterTest
 			config.put("planexecutor_standard", new jadex.bdi.runtime.impl.JavaStandardPlanExecutor(
 				jadex.commons.concurrent.ThreadPoolFactory.createThreadPool()));
 			
-			OAVBDIModelLoader loader = new OAVBDIModelLoader();
+			OAVBDIModelLoader loader = new OAVBDIModelLoader(config);
 			OAVAgentModel loaded = loader.loadAgentModel(model, null, null);
 			
 			// Initialize agent interpreter.

@@ -3,6 +3,7 @@ package jadex.wfms.service.impl;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.ICommand;
 import jadex.commons.future.DefaultResultListener;
@@ -28,6 +29,7 @@ import jadex.wfms.service.listeners.IWorkitemListener;
 
 import java.util.Set;
 
+@Service
 public class ExternalWfmsService implements IExternalWfmsService
 {
 	/** Component access. */

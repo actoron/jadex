@@ -97,6 +97,14 @@ public interface IComponentInstance
 	public Map getResults();
 	
 	/**
+	 *  Get a property of the component.
+	 *  May only be called after the component's init has finished.
+	 *  @param name	The property name.
+	 *  @return	The property value
+	 */
+	public Object	getProperty(String name);
+	
+	/**
 	 *  Test if the component's execution is currently at one of the
 	 *  given breakpoints. If yes, the component will be suspended by
 	 *  the platform.

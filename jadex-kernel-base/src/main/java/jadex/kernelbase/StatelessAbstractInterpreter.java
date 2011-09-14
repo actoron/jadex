@@ -357,6 +357,18 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 */
 	public abstract IExtensionInstance[] getExtensions();
 	
+	/**
+	 *  Get a property of the component.
+	 *  May only be called after the component's init has finished.
+	 *  @param name	The property name.
+	 *  @return	The property value
+	 */
+	public Object	getProperty(String name)
+	{
+		Map	props	= getProperties();
+		return props!=null ? props.get(name) : null;
+	}
+
 	//-------- internally used methods --------
 	
 	/**
@@ -481,12 +493,13 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		}
 		else
 		{
-			initFutureProperties(model).addResultListener(
+			initArguments(model, config, arguments).addResultListener(
 				createResultListener(new DelegationResultListener(fut)
 			{
 				public void customResultAvailable(Object result)
 				{
-					initArguments(model, config, arguments).addResultListener(
+					// properties depend on arguments (e.g. logging_level in Platform.component.xml)
+					initFutureProperties(model).addResultListener(
 						createResultListener(new DelegationResultListener(fut)
 					{
 						public void customResultAvailable(Object result)

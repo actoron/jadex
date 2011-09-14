@@ -3,6 +3,7 @@ package jadex.micro.examples.watchdog;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -30,6 +31,7 @@ import java.util.Map;
 @RequiredServices(@RequiredService(name="watchdogs", type=IWatchdogService.class, multiple=true,
 	binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL, dynamic=true)))
 @Arguments(@Argument(clazz=long.class, name="delay", description="Delay between pings.", defaultvalue="3000"))
+@Service
 public class WatchdogAgent	extends MicroAgent	implements IWatchdogService
 {
 	//-------- attributes --------

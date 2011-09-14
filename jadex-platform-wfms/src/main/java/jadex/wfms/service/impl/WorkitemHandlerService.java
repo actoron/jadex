@@ -7,6 +7,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
@@ -36,6 +37,7 @@ import java.util.Set;
 /**
  * 
  */
+@Service
 public class WorkitemHandlerService implements IWorkitemHandlerService
 {
 	/** Component access. */

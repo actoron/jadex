@@ -23,7 +23,7 @@
 		<configuration name="b">
 			<services>
 				<providedservice name="IAService">
-					<implementation>ServiceConfigurationsAgent.getService()</implementation>
+					<implementation>ProvidedServiceConfigurationsAgent()</implementation>
 				</providedservice>
 			</services>
 		</configuration>

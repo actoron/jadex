@@ -13,6 +13,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
@@ -34,6 +35,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+@Service
 public class LogService implements ILogService
 {
 	/** Component access. */

@@ -338,8 +338,8 @@ public class DisplayPanel extends JComponent
 								{
 									public Object execute(IInternalAccess ia)
 									{
-										((IFuture<IComponentManagementService>)ia.getServiceContainer().getRequiredService("cmsservice"))
-											.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(DisplayPanel.this)
+										IFuture<IComponentManagementService>	fut	= ia.getServiceContainer().getRequiredService("cmsservice");
+										fut.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(DisplayPanel.this)
 										{
 											public void customResultAvailable(IComponentManagementService cms)
 											{

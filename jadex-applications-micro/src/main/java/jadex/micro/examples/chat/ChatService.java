@@ -1,6 +1,7 @@
 package jadex.micro.examples.chat;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.ChangeEvent;
@@ -13,6 +14,7 @@ import java.util.List;
 /**
  *  Chat service implementation.
  */
+@Service
 public class ChatService implements IChatService
 {
 	//-------- attributes --------

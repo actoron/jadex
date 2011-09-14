@@ -4,9 +4,15 @@ import jadex.bdi.OAVBDIModelLoader;
 import jadex.bdi.OAVBDIXMLReader;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.runtime.impl.JavaStandardPlanExecutor;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bdibpmn.BpmnPlanExecutor;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.threadpool.IThreadPoolService;
+import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.component.ComponentXMLReader;
 import jadex.gpmn.model.MActivationEdge;
 import jadex.gpmn.model.MActivationPlan;
@@ -55,7 +61,17 @@ public class GpmnBDIConverter
 	 */
 	public GpmnBDIConverter()
 	{
-		this.loader = new OAVBDIModelLoader();
+		// Todo: use original OAVBDIModelLoader (via service?) for accurate properties.
+		this.loader = new OAVBDIModelLoader(SUtil.createHashMap(new String[]
+			{
+				"planexecutor_standard", 
+				"planexecutor_bpmn"
+			},
+			new Object[]
+			{
+				null,
+				null
+			}));
 	}
 	
 	//-------- methods --------

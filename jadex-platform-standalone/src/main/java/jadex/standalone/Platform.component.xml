@@ -34,6 +34,7 @@
 		<import>jadex.component.*</import>
 		<import>jadex.application.*</import>
 		<import>java.util.*</import>
+		<import>java.util.logging.Level</import>
 		<import>java.lang.reflect.*</import>
 		<import>jadex.benchmarking.services.*</import>
 	</imports>
@@ -82,6 +83,8 @@
 		<argument name="parametercopy" class="boolean">true</argument>
 		<!-- Flag if nio typ or normal tcp transport should be used. -->
 		<argument name="niotransport" class="boolean">true</argument>
+		<!-- Logging level for platform (default SEVERE). -->
+		<argument name="logging_level" class="Level">Level.SEVERE</argument>
 		
 		<!-- <argument name="platform_shutdown_time">1000</argument> -->
 	</arguments>
@@ -184,7 +187,7 @@
 		<!-- <property name="viewerpanel.componentviewerclass">""</property> -->
 		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
 		<!-- <property name="logging.level">java.util.logging.Level.WARNING</property> -->
-		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+		<property name="logging.level">$args.logging_level</property>
 	</properties>
 	
 	<configurations>
@@ -195,7 +198,7 @@
 				<argument name="platformname">null</argument>
 			</arguments>
 			<components>
-				<component name="extensions" type="extensions" daemon="true">
+				<component name="extensions" type="extensions" daemon="true" number="$args.extensions!=null ? 1 : 0">
 					<arguments>
 						<argument name="extensions">$args.extensions</argument>
 					</arguments>
@@ -218,7 +221,7 @@
 		
 		<configuration name="fixed">
 			<components>
-				<component name="extensions" type="extensions" daemon="true">
+				<component name="extensions" type="extensions" daemon="true" number="$args.extensions!=null ? 1 : 0">
 					<arguments>
 						<argument name="extensions">$args.extensions</argument>
 					</arguments>
@@ -246,7 +249,7 @@
 				<argument name="platformname">null</argument>
 			</arguments>
 			<components>
-				<component name="extensions" type="extensions" daemon="true">
+				<component name="extensions" type="extensions" daemon="true" number="$args.extensions!=null ? 1 : 0">
 					<arguments>
 						<argument name="extensions">$args.extensions</argument>
 					</arguments>
@@ -275,7 +278,7 @@
 		
 		<configuration name="allkernels_fixed">
 			<components>
-				<component name="extensions" type="extensions" daemon="true">
+				<component name="extensions" type="extensions" daemon="true" number="$args.extensions!=null ? 1 : 0">
 					<arguments>
 						<argument name="extensions">$args.extensions</argument>
 					</arguments>

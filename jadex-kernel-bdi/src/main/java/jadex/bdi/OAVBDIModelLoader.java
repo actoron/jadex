@@ -89,6 +89,9 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	
 	//-------- attributes --------
 	
+	/** The kernel properties (i.e. plan executors). */
+	protected Map	properties;
+	
 	/** The reader (cached for speed, todo: weak for memory). */
 	protected Reader	reader;
 	
@@ -97,9 +100,10 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	/**
 	 *  Create an OAV BDI Model loader.
 	 */
-	public OAVBDIModelLoader()
+	public OAVBDIModelLoader(Map properties)
 	{
 		super(new String[]{FILE_EXTENSION_AGENT, FILE_EXTENSION_CAPABILITY, FILE_EXTENSION_PROPERTIES});
+		this.properties	= properties;
 		this.reader	= OAVBDIXMLReader.getReader();
 	}
 
@@ -402,6 +406,18 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 			for(Iterator it=mplans.iterator(); it.hasNext(); )
 			{
 				Object mplan = it.next();
+				
+				// Check if body types are supported.
+				Object	mbody	= state.getAttributeValue(mplan, OAVBDIMetaModel.plan_has_body);
+				String	type	= (String)state.getAttributeValue(mbody, OAVBDIMetaModel.body_has_type);
+				if(!properties.containsKey("planexecutor_"+type))
+				{
+					Tuple	se	= new Tuple(new Object[]{
+						new StackElement(new QName(model instanceof OAVAgentModel ? "agent" : "capability"), mcapa),
+						new StackElement(new QName(state.getType(mplan).getName()), mplan),
+						new StackElement(new QName(state.getType(mbody).getName()), mbody)});
+					model.addEntry(se, "No executor for plan body type: "+type);					
+				}
 				
 				// Create rules for plans
 				
