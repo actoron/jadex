@@ -71,7 +71,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	 *  @param props
 	 *  @return
 	 */
-	public IFuture setProperties(Properties props)
+	public IFuture<Void> setProperties(Properties props)
 	{
 		return ftp.setProperties(props);
 	}
@@ -80,7 +80,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	 *  Get the properties.
 	 *  @return
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
 		return ftp.getProperties();
 	}

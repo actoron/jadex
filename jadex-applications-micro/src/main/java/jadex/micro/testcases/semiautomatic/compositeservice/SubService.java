@@ -28,8 +28,8 @@ public class SubService extends BasicService implements ISubService
 	 *  @param b Number two.
 	 *  @return The result of a minus b.
 	 */
-	public IFuture sub(double a, double b)
+	public IFuture<Double> sub(double a, double b)
 	{
-		return new Future(new Double(a-b));
+		return new Future<Double>(new Double(a-b));
 	}
 }

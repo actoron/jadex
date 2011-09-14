@@ -42,7 +42,7 @@ public class ThreadPoolService extends BasicService implements IThreadPoolServic
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public synchronized IFuture	shutdownService()
+	public synchronized IFuture<Void>	shutdownService()
 	{
 		threadpool.dispose();
 		return super.shutdownService();

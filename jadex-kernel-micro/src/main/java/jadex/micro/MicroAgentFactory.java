@@ -112,9 +112,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	/**
 	 *  Start the service.
 	 */
-	public IFuture startService()
+	public IFuture<Void> startService()
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new DelegationResultListener(ret)
 		{
@@ -132,7 +132,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public synchronized IFuture	shutdownService()
+	public synchronized IFuture<Void>	shutdownService()
 	{
 		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{

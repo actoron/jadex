@@ -13,5 +13,5 @@ public interface IAddService
 	 *  @param b Number two.
 	 *  @return The sum of a and b.
 	 */
-	public IFuture add(double a, double b);
+	public IFuture<Double> add(double a, double b);
 }

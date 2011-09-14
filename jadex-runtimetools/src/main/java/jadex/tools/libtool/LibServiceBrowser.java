@@ -324,7 +324,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 	/**
 	 *  Advices the the panel to restore its properties from the argument
 	 */
-	public IFuture setProperties(Properties props)
+	public IFuture<Void> setProperties(Properties props)
 	{
 		return IFuture.DONE;
 	}
@@ -333,9 +333,8 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 	 *  Advices the panel provide its setting as properties (if any).
 	 *  This is done on project close or save.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
-		Future ret = new Future(null);
-		return ret;
+		return Future.getEmptyFuture();
 	}
 }

@@ -10,5 +10,5 @@ public interface IPrintHelloService
 	/**
 	 *  Print hello.
 	 */
-	public IFuture printHello();
+	public IFuture<Void> printHello();
 }

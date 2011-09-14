@@ -554,7 +554,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/**
 	 *  Called when the service is shut down.
 	 */
-	public IFuture shutdownService()
+	public IFuture<Void> shutdownService()
 	{
 		timer.cancel();
 		return super.shutdownService();

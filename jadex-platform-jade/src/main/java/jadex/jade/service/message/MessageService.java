@@ -584,9 +584,9 @@ public class MessageService  extends BasicService implements IMessageService
 	/**
 	 *  Start the service.
 	 */
-	public IFuture startService()
+	public IFuture<Void> startService()
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
 		{

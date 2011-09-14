@@ -478,7 +478,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/**
 	 *  Advices the the panel to restore its properties from the argument
 	 */
-	public IFuture setProperties(Properties ps)
+	public IFuture<Void> setProperties(Properties ps)
 	{
 		Property	settings	= ps.getProperty(PROPERTY_GUI_REFRESH);
 		if(settings!=null)
@@ -493,11 +493,11 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 *  Advices the panel provide its setting as properties (if any).
 	 *  This is done on project close or save.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
 		Properties	props	= new Properties();
 		props.addProperty(new Property(PROPERTY_GUI_REFRESH, sprefresh.getValue().toString()));
-		Future	ret	= new Future(props);
+		Future<Properties>	ret	= new Future<Properties>(props);
 		return ret;
 	}
 	

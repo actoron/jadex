@@ -176,10 +176,10 @@ public class BasicService implements IInternalService
 	 *  Start the service.
 	 *  @return A future that is done when the service has completed starting.  
 	 */
-	public IFuture	startService()
+	public IFuture<Void>	startService()
 	{
 //		System.out.println("start: "+this);
-		Future ret = new Future();
+		Future<Void> ret = new Future<Void>();
 		
 		boolean ex = false;
 		synchronized(this)
@@ -200,7 +200,8 @@ public class BasicService implements IInternalService
 		}
 		else 
 		{
-			ret.setResult(getServiceIdentifier());
+			ret.setResult(null);
+//			ret.setResult(getServiceIdentifier());
 		}
 		
 		return ret;
@@ -210,7 +211,7 @@ public class BasicService implements IInternalService
 	 *  Shutdown the service.
 	 *  @return A future that is done when the service has completed its shutdown.  
 	 */
-	public IFuture	shutdownService()
+	public IFuture<Void>	shutdownService()
 	{
 		// Deregister pojo->sid mapping in shutdown.
 		BasicServiceInvocationHandler.removePojoServiceProxy(sid);

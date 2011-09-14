@@ -2421,9 +2421,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  Start the service.
 	 *  @return A future that is done when the service has completed starting.  
 	 */
-	public IFuture	startService()
+	public IFuture<Void> startService()
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		
 		super.startService().addResultListener(new DelegationResultListener(ret)
 		{
@@ -2443,7 +2443,8 @@ public abstract class ComponentManagementService extends BasicService implements
 							setresult	= services[0] && services[1];
 						}
 						if(setresult)
-							ret.setResult(getServiceIdentifier());
+							ret.setResult(null);
+//							ret.setResult(getServiceIdentifier());
 					}
 				});
 				
@@ -2493,7 +2494,8 @@ public abstract class ComponentManagementService extends BasicService implements
 						}
 						
 						if(setresult)
-							ret.setResult(getServiceIdentifier());
+							ret.setResult(null);
+//							ret.setResult(getServiceIdentifier());
 					}
 				});
 			}
@@ -2506,7 +2508,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  Shutdown the service.
 	 *  @return A future that is done when the service has completed its shutdown.  
 	 */
-	public IFuture	shutdownService()
+	public IFuture<Void>	shutdownService()
 	{
 //		System.out.println(": "+this);
 		return super.shutdownService();

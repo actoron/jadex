@@ -161,9 +161,9 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Send a message.
 	 *  @param message The native message.
 	 */
-	public IFuture sendMessage(final Map msg, final MessageType type, final IComponentIdentifier sender, final ClassLoader cl, final byte[] codecids)
+	public IFuture<Void> sendMessage(final Map msg, final MessageType type, final IComponentIdentifier sender, final ClassLoader cl, final byte[] codecids)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 //		IComponentIdentifier sender = adapter.getComponentIdentifier();
 		if(sender==null)
@@ -589,9 +589,9 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Start the service.
 	 */
-	public IFuture startService()
+	public IFuture<Void> startService()
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 
 		super.startService().addResultListener(new DelegationResultListener(ret)
 		{
@@ -619,7 +619,8 @@ public class MessageService extends BasicService implements IMessageService
 									public void customResultAvailable(Object result)
 									{
 										clockservice = (IClockService)result;
-										ret.setResult(getServiceIdentifier());
+										ret.setResult(null);
+//										ret.setResult(getServiceIdentifier());
 									}
 								});
 							}
@@ -660,9 +661,9 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Called when the platform shuts down. Do necessary cleanup here (if any).
 	 */
-	public IFuture shutdownService()
+	public IFuture<Void> shutdownService()
 	{
-		Future	ret	= new Future();
+		Future<Void>	ret	= new Future<Void>();
 //		ret.addResultListener(new IResultListener()
 //		{
 //			public void resultAvailable(Object result)
@@ -740,7 +741,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  @param listener The change listener.
 	 *  @param filter An optional filter to only receive notifications for matching messages. 
 	 */
-	public synchronized IFuture addMessageListener(IMessageListener listener, IFilter filter)
+	public synchronized IFuture<Void> addMessageListener(IMessageListener listener, IFilter filter)
 	{
 		if(listeners==null)
 			listeners = new LinkedHashMap();
@@ -752,7 +753,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Remove a message listener.
 	 *  @param listener The change listener.
 	 */
-	public synchronized IFuture removeMessageListener(IMessageListener listener)
+	public synchronized IFuture<Void> removeMessageListener(IMessageListener listener)
 	{
 		listeners.remove(listener);
 		return new Future(null);
@@ -762,7 +763,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Add content codec type.
 	 *  @param codec The codec type.
 	 */
-	public IFuture addContentCodec(IContentCodec codec)
+	public IFuture<Void> addContentCodec(IContentCodec codec)
 	{
 		if(contentcodecs==null)
 			contentcodecs = new ArrayList();
@@ -774,7 +775,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Remove content codec type.
 	 *  @param codec The codec type.
 	 */
-	public IFuture removeContentCodec(IContentCodec codec)
+	public IFuture<Void> removeContentCodec(IContentCodec codec)
 	{
 		if(contentcodecs!=null)
 			contentcodecs.remove(codec);
@@ -785,7 +786,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Add message codec type.
 	 *  @param codec The codec type.
 	 */
-	public IFuture addMessageCodec(Class codec)
+	public IFuture<Void> addMessageCodec(Class codec)
 	{
 		codecfactory.addCodec(codec);
 		return new Future(null);
@@ -795,7 +796,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Remove message codec type.
 	 *  @param codec The codec type.
 	 */
-	public IFuture removeMessageCodec(Class codec)
+	public IFuture<Void> removeMessageCodec(Class codec)
 	{
 		codecfactory.removeCodec(codec);
 		return new Future(null);

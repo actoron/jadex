@@ -744,7 +744,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	/**
 	 *  Update from given properties.
 	 */
-	public IFuture setProperties(final jadex.commons.Properties props)
+	public IFuture<Void> setProperties(final jadex.commons.Properties props)
 	{
 		return scheduleStep(new IComponentStep()
 		{
@@ -785,7 +785,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	/**
 	 *  Write current state into properties.
 	 */
-	public IFuture getProperties()
+	public IFuture<jadex.commons.Properties> getProperties()
 	{
 		return scheduleStep(new IComponentStep()
 		{

@@ -664,7 +664,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	/**
 	 *  Start the service.
 	 */
-	public IFuture startService()
+	public IFuture<Void> startService()
 	{
 		return IFuture.DONE;
 	}

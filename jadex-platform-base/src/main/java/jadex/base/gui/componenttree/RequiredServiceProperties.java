@@ -74,16 +74,23 @@ public class RequiredServiceProperties	extends	PropertiesPanel
 		String[] parameters	= new String[methods.length];
 		for(int i=0; i<methods.length; i++)
 		{
-			returntypes[i]	= SReflect.getUnqualifiedClassName(methods[i].getReturnType());
+			returntypes[i] = SReflect.getUnqualifiedTypeName(methods[i].getGenericReturnType().toString());
+//			returntypes[i]	= SReflect.getUnqualifiedClassName(methods[i].getReturnType());
 			names[i]	= methods[i].getName();
 			Class[]	params	= methods[i].getParameterTypes();
 			String	pstring	= "";
 			for(int j=0; j<params.length; j++)
 			{
 				if(j==0)
-					pstring	= SReflect.getUnqualifiedClassName(params[j]);
+				{
+//					pstring	= SReflect.getUnqualifiedClassName(params[j]);
+					pstring	= SReflect.getUnqualifiedTypeName(params[j].toString());
+				}
 				else
-					pstring	+= ", "+SReflect.getUnqualifiedClassName(params[j]);
+				{
+//					pstring	+= ", "+SReflect.getUnqualifiedClassName(params[j]);
+					pstring	+= ", "+SReflect.getUnqualifiedTypeName(params[j].toString());
+				}
 			}
 			parameters[i]	= pstring;
 		}

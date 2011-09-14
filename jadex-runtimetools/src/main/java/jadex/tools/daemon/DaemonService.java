@@ -39,9 +39,9 @@ public class DaemonService extends BasicService implements IDaemonService
 	 *  Start a platform using a configuration.
 	 *  @param args The arguments.
 	 */
-	public IFuture startPlatform(final StartOptions opt)
+	public IFuture<Void> startPlatform(final StartOptions opt)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		agent.scheduleStep(new IComponentStep()
 		{
@@ -61,9 +61,9 @@ public class DaemonService extends BasicService implements IDaemonService
 	 *  Shutdown a platform.
 	 *  @param cid The platform id.
 	 */
-	public IFuture shutdownPlatform(final IComponentIdentifier cid)
+	public IFuture<Void> shutdownPlatform(final IComponentIdentifier cid)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		agent.scheduleStep(new IComponentStep()
 		{

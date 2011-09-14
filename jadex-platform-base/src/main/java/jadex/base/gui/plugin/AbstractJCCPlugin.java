@@ -117,7 +117,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	/**
 	 *  Set properties loaded from project.
 	 */
-	public IFuture setProperties(Properties ps)
+	public IFuture<Void> setProperties(Properties ps)
 	{
 		return IFuture.DONE;
 	}
@@ -125,9 +125,9 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	/**
 	 *  Return properties to be saved in project.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
-		return new Future(null);
+		return Future.getEmptyFuture();
 	}
 	
 	/**

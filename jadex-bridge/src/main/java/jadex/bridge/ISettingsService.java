@@ -20,7 +20,7 @@ public interface ISettingsService extends IService
 	 *  @param provider 	The properties provider.
 	 *  @return A future indicating when registration is finished.
 	 */
-	public IFuture	registerPropertiesProvider(String id, @Reference IPropertiesProvider provider);
+	public IFuture<Void>	registerPropertiesProvider(String id, @Reference IPropertiesProvider provider);
 	
 	/**
 	 *  Deregister a property provider.
@@ -29,7 +29,7 @@ public interface ISettingsService extends IService
 	 *  @param id 	A unique id to identify the properties (e.g. component or service name).
 	 *  @return A future indicating when registration is finished.
 	 */
-	public IFuture	deregisterPropertiesProvider(String id);
+	public IFuture<Void>	deregisterPropertiesProvider(String id);
 	
 	/**
 	 *  Set the properties for a given id.
@@ -38,24 +38,24 @@ public interface ISettingsService extends IService
 	 *  @param properties 	The properties to set.
 	 *  @return A future indicating when properties have been set.
 	 */
-	public IFuture	setProperties(String id, Properties props);
+	public IFuture<Void>	setProperties(String id, Properties props);
 	
 	/**
 	 *  Get the properties for a given id.
 	 *  @param id 	A unique id to identify the properties (e.g. component or service name).
 	 *  @return A future containing the properties (if any).
 	 */
-	public IFuture	getProperties(String id);
+	public IFuture<Properties>	getProperties(String id);
 	
 	/**
 	 *  Load the default platform properties.
 	 *  @return A future indicating when properties have been loaded.
 	 */
-	public IFuture	loadProperties();
+	public IFuture<Properties>	loadProperties();
 	
 	/**
 	 *  Save the platform properties to the default location.
 	 *  @return A future indicating when properties have been saved.
 	 */
-	public IFuture	saveProperties();
+	public IFuture<Void>	saveProperties();
 }

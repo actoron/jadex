@@ -91,9 +91,9 @@ public class SimulationService extends BasicService implements ISimulationServic
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public IFuture	shutdownService()
+	public IFuture<Void>	shutdownService()
 	{
-		final Future	deregistered	= new Future();
+		final Future<Void>	deregistered	= new Future<Void>();
 		SServiceProvider.getService(access.getServiceContainer(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(access.createResultListener(new IResultListener()
 		{
@@ -145,9 +145,9 @@ public class SimulationService extends BasicService implements ISimulationServic
 	/**
 	 *  Start (and run) the execution. 
 	 */
-	public IFuture	startService()
+	public IFuture<Void>	startService()
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		
 		super.startService().addResultListener(access.createResultListener(new DelegationResultListener(ret)
 		{
@@ -205,7 +205,8 @@ public class SimulationService extends BasicService implements ISimulationServic
 									}
 									else
 									{
-										ret.setResult(getServiceIdentifier());
+										ret.setResult(null);
+//										ret.setResult(getServiceIdentifier());
 									}
 								}
 							}
@@ -233,7 +234,8 @@ public class SimulationService extends BasicService implements ISimulationServic
 									}
 									else
 									{
-										ret.setResult(getServiceIdentifier());
+										ret.setResult(null);
+//										ret.setResult(getServiceIdentifier());
 									}
 								}
 							}
@@ -249,9 +251,9 @@ public class SimulationService extends BasicService implements ISimulationServic
 	/**
 	 *  Pause the execution (can be resumed via start or step).
 	 */
-	public IFuture pause()
+	public IFuture<Void> pause()
 	{
-		IFuture	ret;
+		IFuture<Void>	ret;
 		if(!executing)
 		{
 //			System.out.println("Not pausing");
@@ -276,9 +278,9 @@ public class SimulationService extends BasicService implements ISimulationServic
 	/**
 	 *  Restart the execution after pause.
 	 */
-	public IFuture start()
+	public IFuture<Void> start()
 	{
-		IFuture	ret;
+		IFuture<Void>	ret;
 		if(executing)
 		{
 //			System.out.println("Not starting");
@@ -299,19 +301,19 @@ public class SimulationService extends BasicService implements ISimulationServic
 	/**
 	 *  Perform one event.
 	 */
-	public IFuture stepEvent()
+	public IFuture<Void> stepEvent()
 	{
-		IFuture	ret;
+		IFuture<Void>	ret;
 		if(executing)
 		{
 //			System.out.println("Not stepping");
-			ret	= new Future(new IllegalStateException("Simulation already running."));
+			ret	= new Future<Void>(new IllegalStateException("Simulation already running."));
 		}
 		else if(IClock.TYPE_CONTINUOUS.equals(getClockService().getClockType())
 				|| IClock.TYPE_SYSTEM.equals(getClockService().getClockType()))
 		{
 //			System.out.println("Not stepping");
-			ret	= new Future(new IllegalStateException("Step only possible in simulation mode."));
+			ret	= new Future<Void>(new IllegalStateException("Step only possible in simulation mode."));
 		}
 		else
 		{
@@ -320,7 +322,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 			getClockService().start();
 			setExecuting(true);
 			assert stepfuture==null;
-			stepfuture	= new Future();
+			stepfuture	= new Future<Void>();
 			ret	= stepfuture;
 			scheduleAdvanceClock();
 		}
@@ -330,19 +332,19 @@ public class SimulationService extends BasicService implements ISimulationServic
 	/**
 	 *  Perform all actions belonging to one time point.
 	 */
-	public IFuture stepTime()
+	public IFuture<Void> stepTime()
 	{
-		IFuture	ret;
+		IFuture<Void>	ret;
 		if(executing)
 		{
 //			System.out.println("Not stepping");
-			ret	= new Future(new IllegalStateException("Simulation already running."));
+			ret	= new Future<Void>(new IllegalStateException("Simulation already running."));
 		}
 		else if(IClock.TYPE_CONTINUOUS.equals(getClockService().getClockType())
 				|| IClock.TYPE_SYSTEM.equals(getClockService().getClockType()))
 		{
 //			System.out.println("Not stepping");
-			ret	= new Future(new IllegalStateException("Step only possible in simulation mode."));
+			ret	= new Future<Void>(new IllegalStateException("Step only possible in simulation mode."));
 		}
 		else
 		{
@@ -372,9 +374,9 @@ public class SimulationService extends BasicService implements ISimulationServic
 	 *  Get the execution mode.
 	 *  @return The mode.
 	 */
-	public IFuture getMode()
+	public IFuture<String> getMode()
 	{
-		return new Future(mode);
+		return new Future<String>(mode);
 	}
 	
 	/**
@@ -390,13 +392,13 @@ public class SimulationService extends BasicService implements ISimulationServic
 	 *  Set the clock type.
 	 *  @param type The clock type.
 	 */
-	public IFuture setClockType(final String type)
+	public IFuture<Void> setClockType(final String type)
 	{
-		IFuture	ret;
+		IFuture<Void>	ret;
 		if(executing)
 		{
 //			System.out.println("Not setting clock");
-			ret	= new Future(new IllegalStateException("Change clock not allowed during execution."));
+			ret	= new Future<Void>(new IllegalStateException("Change clock not allowed during execution."));
 		}
 		else
 		{
@@ -430,9 +432,9 @@ public class SimulationService extends BasicService implements ISimulationServic
 	/**
 	 *  Test if context is executing.
 	 */
-	public IFuture isExecuting()
+	public IFuture<Boolean> isExecuting()
 	{
-		return new Future(executing ? Boolean.TRUE : Boolean.FALSE);
+		return new Future<Boolean>(executing ? Boolean.TRUE : Boolean.FALSE);
 	}
 	
 	/**
@@ -644,7 +646,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 	/**
 	 *  Update from given properties.
 	 */
-	public IFuture setProperties(Properties props)
+	public IFuture<Void> setProperties(Properties props)
 	{
 		final boolean	exe	= props.getBooleanProperty("executing");
 		return access.getExternalAccess().scheduleImmediate(new IComponentStep()
@@ -673,11 +675,11 @@ public class SimulationService extends BasicService implements ISimulationServic
 	/**
 	 *  Write current state into properties.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
 		Properties	props	= new Properties();
 		// Only save as executing when in normal mode.
 		props.addProperty(new Property("executing", ""+(executing && MODE_NORMAL.equals(mode))));
-		return new Future(props);
+		return new Future<Properties>(props);
 	}
 }

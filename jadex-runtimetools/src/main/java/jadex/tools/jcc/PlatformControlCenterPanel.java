@@ -396,7 +396,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 	/**
 	 *  Write current state into properties.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
 		Properties	props	= new Properties();
 		if(currentperspective!=null)
@@ -404,13 +404,13 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 		props.addProperty(new Property("consoleenabled", consoleenabled ? "true" : "false"));
 		consoleheights.put(currentperspective.getName()+".console.height", new Double(getConsoleHeight()));
 		props.addProperty(new Property("consoleheights", JavaWriter.objectToXML(consoleheights, getClass().getClassLoader())));
-		return new Future(props);
+		return new Future<Properties>(props);
 	}
 	
 	/**
 	 *  Update from given properties.
 	 */
-	public IFuture setProperties(Properties props)
+	public IFuture<Void> setProperties(Properties props)
 	{
 		Property	prop	= props.getProperty("perspective");
 		if(prop!=null)

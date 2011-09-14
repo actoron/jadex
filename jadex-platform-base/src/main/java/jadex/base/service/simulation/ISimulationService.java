@@ -3,7 +3,6 @@ package jadex.base.service.simulation;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.GuiClassName;
-import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.execution.IExecutionService;
 import jadex.commons.IChangeListener;
@@ -31,39 +30,41 @@ public interface ISimulationService	extends IService
 	/**
 	 *  Pause the execution (can be resumed via start or step).
 	 */
-	public IFuture pause();
+	public IFuture<Void> pause();
 	
 	/**
 	 *  Restart the execution after pause.
 	 */
-	public IFuture start();
+	public IFuture<Void> start();
 	
 	/**
 	 *  Perform one event.
 	 */
-	public IFuture stepEvent();
+	public IFuture<Void> stepEvent();
 	
 	/**
 	 *  Perform all actions belonging to one time point.
 	 */
-	public IFuture stepTime();
+	public IFuture<Void> stepTime();
 	
 	/**
 	 *  Set the clock type.
 	 *  @param type The clock type.
 	 */
-	public IFuture setClockType(String type);
+	public IFuture<Void> setClockType(String type);
 	
 	/**
 	 *  Get the execution mode.
 	 *  @return The mode.
 	 */
-	public IFuture getMode();
+	public IFuture<String> getMode();
 	
 	/**
 	 *  Test if context is executing.
 	 */
-	public IFuture isExecuting();
+	public IFuture<Boolean> isExecuting();
+	
+	// todo: remove the following methods
 	
 	/**
 	 *  Get the platform clock.

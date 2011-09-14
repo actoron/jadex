@@ -282,9 +282,9 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	 *  Start the execution service.
 	 *  Resumes all scheduled tasks. 
 	 */
-	public synchronized IFuture	startService()
+	public synchronized IFuture<Void>	startService()
 	{
-		final  Future ret = new Future();
+		final  Future<Void> ret = new Future<Void>();
 		
 		super.startService().addResultListener(new DelegationResultListener(ret)
 		{
@@ -336,7 +336,8 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 									if(idf!=null)
 										idf.setResult(null);
 								}
-								ret.setResult(getServiceIdentifier());
+								ret.setResult(null);
+//								ret.setResult(getServiceIdentifier());
 							}
 							catch(RuntimeException e)
 							{
@@ -360,9 +361,9 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	 *  Shutdown the executor service.
 	 *  // todo: make callable more than once
 	 */
-	public synchronized IFuture	shutdownService()
+	public synchronized IFuture<Void>	shutdownService()
 	{
-		final Future ret	= new Future();
+		final Future<Void> ret	= new Future<Void>();
 		
 		super.shutdownService().addResultListener(new DelegationResultListener(ret)
 		{
@@ -398,7 +399,8 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 					}
 					else
 					{
-						ret.setResult(getServiceIdentifier());
+//						ret.setResult(getServiceIdentifier());
+						ret.setResult(null);
 					}
 				}
 			}

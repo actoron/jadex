@@ -80,9 +80,9 @@ public class SettingsService extends BasicService implements ISettingsService
 	 *  Start the service.
 	 *  @return A future that is done when the service has completed starting.  
 	 */
-	public IFuture	startService()
+	public IFuture<Void>	startService()
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		super.startService().addResultListener(access.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -103,9 +103,9 @@ public class SettingsService extends BasicService implements ISettingsService
 	 *  Shutdown the service.
 	 *  @return A future that is done when the service has completed its shutdown.  
 	 */
-	public IFuture	shutdownService()
+	public IFuture<Void>	shutdownService()
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		if(saveonexit)
 		{
 			// Cannot use access.createResultListener() as component is already terminated.
@@ -133,10 +133,10 @@ public class SettingsService extends BasicService implements ISettingsService
 	 *  @param id 	A unique id to identify the properties (e.g. component or service name).
 	 *  @param provider 	The properties provider.
 	 */
-	public IFuture	registerPropertiesProvider(String id, IPropertiesProvider provider)
+	public IFuture<Void>	registerPropertiesProvider(String id, IPropertiesProvider provider)
 	{
 //		System.out.println("register: "+id);
-		Future	ret	= new Future();
+		Future<Void>	ret	= new Future<Void>();
 		if(providers.containsKey(id))
 		{
 			ret.setException(new IllegalArgumentException("Id already contained: "+id));
@@ -164,9 +164,9 @@ public class SettingsService extends BasicService implements ISettingsService
 	 *  before the property provider is removed.
 	 *  @param id 	A unique id to identify the properties (e.g. component or service name).
 	 */
-	public IFuture	deregisterPropertiesProvider(final String id)
+	public IFuture<Void>	deregisterPropertiesProvider(final String id)
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		if(!providers.containsKey(id))
 		{
 			ret.setException(new IllegalArgumentException("Id not contained: "+id));
@@ -204,10 +204,10 @@ public class SettingsService extends BasicService implements ISettingsService
 	 *  @param save 	Save platform properties after setting.
 	 *  @return A future indicating when properties have been set.
 	 */
-	public IFuture	setProperties(String id, Properties props)
+	public IFuture<Void>	setProperties(String id, Properties props)
 	{
 //		System.out.println("Set properties: "+id);
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		this.props.removeSubproperties(id);
 		this.props.addSubproperties(id, props);
 		
@@ -229,9 +229,9 @@ public class SettingsService extends BasicService implements ISettingsService
 	 *  @param id 	A unique id to identify the properties (e.g. component or service name).
 	 *  @return A future containing the properties (if any).
 	 */
-	public IFuture	getProperties(String id)
+	public IFuture<Properties>	getProperties(String id)
 	{
-		return new Future(props.getSubproperty(id));
+		return new Future<Properties>(props.getSubproperty(id));
 	}
 	
 	
@@ -239,9 +239,9 @@ public class SettingsService extends BasicService implements ISettingsService
 	 *  Load the default platform properties.
 	 *  @return A future indicating when properties have been loaded.
 	 */
-	public IFuture	loadProperties()
+	public IFuture<Properties> loadProperties()
 	{
-		final Future	ret	= new Future();
+		final Future<Properties>	ret	= new Future<Properties>();
 		
 		try
 		{
@@ -280,7 +280,7 @@ public class SettingsService extends BasicService implements ISettingsService
 	 *  Save the platform properties to the default location.
 	 *  @return A future indicating when properties have been saved.
 	 */
-	public IFuture	saveProperties()
+	public IFuture<Void>	saveProperties()
 	{
 		return saveProperties(false);
 	}
@@ -290,10 +290,10 @@ public class SettingsService extends BasicService implements ISettingsService
 	 *  @param shutdown	Flag indicating if called during shutdown.
 	 *  @return A future indicating when properties have been saved.
 	 */
-	public IFuture	saveProperties(boolean shutdown)
+	public IFuture<Void>	saveProperties(boolean shutdown)
 	{
 //		System.out.println("Save properties"+(shutdown?" (shutdown)":""));
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		
 		IResultListener	rl	= new DelegationResultListener(ret)
 		{

@@ -102,9 +102,9 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	/**
 	 *  Start the service.
 	 */
-	public IFuture startService()
+	public IFuture<Void> startService()
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		super.startService().addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)

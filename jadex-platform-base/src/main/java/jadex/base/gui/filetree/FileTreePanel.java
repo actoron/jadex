@@ -359,9 +359,9 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	/**
 	 *  Write current state into properties.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
-		final Future ret = new Future();
+		final Future<Properties> ret = new Future<Properties>();
 		final Properties props = new Properties();
 		
 		// Save tree properties.
@@ -449,9 +449,9 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	/**
 	 *  Update tool from given properties.
 	 */
-	public IFuture setProperties(final Properties props)
+	public IFuture<Void> setProperties(final Properties props)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		// Load root node.
 		String	treexml	= props.getStringProperty("tree");

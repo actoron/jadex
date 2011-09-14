@@ -165,13 +165,14 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	 *  Start the executor service.
 	 *  Resumes all tasks.
 	 */
-	public synchronized IFuture	startService()
+	public synchronized IFuture<Void>	startService()
 	{	
-		final  Future ret = new Future();
+		final  Future<Void> ret = new Future<Void>();
 	
 		if(shutdown)
 		{
-			ret.setResult(getServiceIdentifier());
+			ret.setResult(null);
+//			ret.setResult(getServiceIdentifier());
 			return ret;
 		}
 		
@@ -282,7 +283,8 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 							}
 						});
 						
-						ret.setResult(getServiceIdentifier());
+						ret.setResult(null);
+//						ret.setResult(getServiceIdentifier());
 					}
 					
 					public void exceptionOccurred(Exception exception)

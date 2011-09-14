@@ -61,7 +61,7 @@ public abstract class AbstractComponentViewerPanel implements IComponentViewerPa
 	/**
 	 *  Advices the the panel to restore its properties from the argument
 	 */
-	public IFuture setProperties(Properties ps)
+	public IFuture<Void> setProperties(Properties ps)
 	{
 //		System.out.println("Warning: setProperties not implemented "+getClass());
 		return IFuture.DONE;
@@ -71,10 +71,10 @@ public abstract class AbstractComponentViewerPanel implements IComponentViewerPa
 	 *  Advices the panel provide its setting as properties (if any).
 	 *  This is done on project close or save.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
 //		System.out.println("Warning: getProperties not implemented "+getClass());
-		return new Future(null);
+		return new Future<Properties>((Properties)null);
 	}
 	
 	/**

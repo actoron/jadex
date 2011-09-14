@@ -290,9 +290,9 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	/**
 	 *  Start the service.
 	 */
-	public IFuture	startService()
+	public IFuture<Void>	startService()
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		super.startService().addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -315,7 +315,8 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 					public void exceptionOccurred(Exception exception)
 					{
 						// No settings service: ignore
-						ret.setResult(getServiceIdentifier());
+						ret.setResult(null);
+//						ret.setResult(getServiceIdentifier());
 					}
 				});
 			}
@@ -328,7 +329,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 *  Releases all cached resources and shuts down the library service.
 	 *  @param listener The listener.
 	 */
-	public IFuture	shutdownService()
+	public IFuture<Void>	shutdownService()
 	{
 //		System.out.println("shut");
 		final Future	saved	= new Future();
@@ -348,7 +349,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 			}
 		});
 		
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		saved.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -670,7 +671,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	/**
 	 *  Update from given properties.
 	 */
-	public IFuture setProperties(Properties props)
+	public IFuture<Void> setProperties(Properties props)
 	{
 		// Do not remove existing urls?
 		// todo: treat arguments and 
@@ -690,7 +691,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	/**
 	 *  Write current state into properties.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
 		String[]	entries;
 		if(libcl != null)
@@ -745,7 +746,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		{
 			props.addProperty(new Property("entry", entries[i]));
 		}
-		return new Future(props);		
+		return new Future<Properties>(props);		
 	}
 
 

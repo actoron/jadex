@@ -1,5 +1,7 @@
 package jadex.commons.future;
 
+import java.util.Collections;
+
 
 /**
  * Interface for futures. Similar to Java Future interface but adds a listener
@@ -16,7 +18,7 @@ public interface IFuture<E>
 	 *  return a result value.
 	 */
 	public static final IFuture<Void>	DONE	= new Future<Void>((Void)null);
-
+	
 	// -------- methods --------
 
 	/**

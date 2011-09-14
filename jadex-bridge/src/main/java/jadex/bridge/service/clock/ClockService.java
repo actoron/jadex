@@ -244,11 +244,11 @@ public class ClockService extends BasicService implements IClockService, IProper
 	/**
 	 *  Start the service.
 	 */
-	public IFuture startService()
+	public IFuture<Void> startService()
 	{
 //		System.out.println("start clock: "+this);
 		
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		SServiceProvider.getServiceUpwards(provider, IThreadPoolService.class)
 			.addResultListener(new DelegationResultListener(ret)
@@ -281,7 +281,8 @@ public class ClockService extends BasicService implements IClockService, IProper
 							public void exceptionOccurred(Exception exception)
 							{
 								// No settings service: ignore.
-								ret.setResult(getServiceIdentifier());
+								ret.setResult(null);
+//								ret.setResult(getServiceIdentifier());
 							}
 						});
 					}
@@ -407,7 +408,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 	/**
 	 *  Update from given properties.
 	 */
-	public IFuture setProperties(Properties props)
+	public IFuture<Void> setProperties(Properties props)
 	{
 		String	type	= props.getStringProperty("type");
 		long	delta	= props.getLongProperty("delta");
@@ -424,7 +425,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 	/**
 	 *  Write current state into properties.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
 		Properties	props	= new Properties();
 		props.addProperty(new Property("type", clock.getType()));
@@ -432,6 +433,6 @@ public class ClockService extends BasicService implements IClockService, IProper
 		if(clock instanceof ContinuousClock)
 			props.addProperty(new Property("dilation", ""+((ContinuousClock)clock).getDilation()));
 		
-		return new Future(props);
+		return new Future<Properties>(props);
 	}
 }

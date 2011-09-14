@@ -86,9 +86,9 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 	/**
 	 *  Get the properties.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
-		final Future ret = new Future();
+		final Future<Properties> ret = new Future<Properties>();
 
 		final Properties props = new Properties();
 		props.addProperty(new Property("split_location", ""+splitpanel.getDividerLocation()));
@@ -125,7 +125,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 	/**
 	 *  Set the properties.
 	 */
-	public IFuture setProperties(Properties props)
+	public IFuture<Void> setProperties(Properties props)
 	{
 		Properties firstprops = props.getSubproperty("first");
 		if(firstprops!=null)

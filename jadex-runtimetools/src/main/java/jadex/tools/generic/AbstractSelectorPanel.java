@@ -255,9 +255,9 @@ public abstract class AbstractSelectorPanel extends JSplitPanel implements IProp
 	/**
 	 *  Set properties loaded from project.
 	 */
-	public IFuture setProperties(final Properties props)
+	public IFuture<Void> setProperties(final Properties props)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		this.props = props;
 		
@@ -266,7 +266,7 @@ public abstract class AbstractSelectorPanel extends JSplitPanel implements IProp
 		{
 			IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.get(selcb.getSelectedItem());
 			panel.setProperties(props.getSubproperty(PANELPROPERTIES))
-				.addResultListener(new DelegationResultListener(ret));
+				.addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		else
 		{
@@ -279,18 +279,18 @@ public abstract class AbstractSelectorPanel extends JSplitPanel implements IProp
 	/**
 	 *  Return properties to be saved in JCC settings.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
-		final Future ret = new Future();
+		final Future<Properties> ret = new Future<Properties>();
 		final Properties props = new Properties(null, getName(), null);
 		if(selcb.getSelectedItem()!=null && panels.containsKey(selcb.getSelectedItem()))
 		{
 			IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.get(selcb.getSelectedItem());
-			panel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+			panel.getProperties().addResultListener(new SwingDelegationResultListener<Properties>(ret)
 			{
-				public void customResultAvailable(Object result) 
+				public void customResultAvailable(Properties subprops) 
 				{
-					Properties subprops = (Properties)result;
+//					Properties subprops = (Properties)result;
 					props.addSubproperties(PANELPROPERTIES, subprops!=null ? subprops : new Properties());
 					ret.setResult(props);
 				};

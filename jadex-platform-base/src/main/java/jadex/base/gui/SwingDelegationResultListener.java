@@ -12,19 +12,19 @@ import javax.swing.SwingUtilities;
  *  Delegation result listener that calls customResultAvailable and
  *  customExceptionOccurred on swing thread.
  */
-public class SwingDelegationResultListener implements IResultListener
+public class SwingDelegationResultListener<E> implements IResultListener<E>
 {
 	//-------- attributes --------
 	
 	/** The future to which calls are delegated. */
-	protected Future future;
+	protected Future<E> future;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new listener.
 	 */
-	public SwingDelegationResultListener(Future future)
+	public SwingDelegationResultListener(Future<E> future)
 	{
 		this.future = future;
 	}
@@ -35,7 +35,7 @@ public class SwingDelegationResultListener implements IResultListener
 	 *  Called when the result is available.
 	 * @param result The result.
 	 */
-	final public void resultAvailable(final Object result)
+	final public void resultAvailable(final E result)
 	{
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
@@ -104,7 +104,7 @@ public class SwingDelegationResultListener implements IResultListener
 	 *  Called when the result is available.
 	 *  @param result The result.
 	 */
-	public void customResultAvailable(Object result)
+	public void customResultAvailable(E result)
 	{
 		future.setResult(result);
 	}

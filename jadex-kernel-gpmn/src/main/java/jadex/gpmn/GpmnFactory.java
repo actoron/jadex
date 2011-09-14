@@ -85,10 +85,10 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 		this.converter = new GpmnBDIConverter();
 	}
 	
-	public IFuture startService()
+	public IFuture<Void> startService()
 	{
-		final IFuture sfuture = super.startService();
-		final Future ret = new Future();
+		final IFuture<Void> sfuture = super.startService();
+		final Future<Void> ret = new Future<Void>();
 		SServiceProvider.getService(ia.getServiceContainer(), IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)

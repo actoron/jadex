@@ -28,9 +28,9 @@ public class AddService extends BasicService implements IAddService
 	 *  @param b Number two.
 	 *  @return The sum of a and b.
 	 */
-	public IFuture add(double a, double b)
+	public IFuture<Double> add(double a, double b)
 	{
 		System.out.println("add service called on: "+getServiceIdentifier().getProviderId());
-		return new Future(new Double(a+b));
+		return new Future<Double>(new Double(a+b));
 	}
 }

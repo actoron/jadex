@@ -19,32 +19,34 @@ public interface IDF	extends IService
 	 *  Register an component description.
 	 *  @throws RuntimeException when the component is already registered.
 	 */
-	public IFuture register(IDFComponentDescription adesc);
+	public IFuture<IDFComponentDescription> register(IDFComponentDescription adesc);
 	
 	/**
 	 *  Deregister an component description.
 	 *  @throws RuntimeException when the component is not registered.
 	 */
-	public IFuture deregister(IDFComponentDescription adesc);
+	public IFuture<Void> deregister(IDFComponentDescription adesc);
 	
 	/**
 	 *  Modify an component description.
 	 *  @throws RuntimeException when the component is not registered.
 	 */
-	public IFuture modify(IDFComponentDescription adesc);
+	public IFuture<IDFComponentDescription> modify(IDFComponentDescription adesc);
 	
 	/**
 	 *  Search for components matching the given description.
 	 *  @return An array of matching component descriptions. 
 	 */
-	public IFuture search(IDFComponentDescription adesc, ISearchConstraints con);
+	public IFuture<IDFComponentDescription[]> search(IDFComponentDescription adesc, ISearchConstraints con);
 	
 	/**
 	 *  Search for components matching the given description.
 	 *  @return An array of matching component descriptions. 
 	 */
-	public IFuture search(IDFComponentDescription adesc, ISearchConstraints con, boolean remote);
+	public IFuture<IDFComponentDescription[]> search(IDFComponentDescription adesc, ISearchConstraints con, boolean remote);
 
+	// todo: remove following methods
+	
 	/**
 	 *  Create a df service description.
 	 *  @param name The name.

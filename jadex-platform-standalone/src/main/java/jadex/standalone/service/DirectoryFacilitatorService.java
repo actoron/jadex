@@ -78,9 +78,9 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	 *  Register a component description.
 	 *  @throws RuntimeException when the component description is already registered.
 	 */
-	public IFuture register(IDFComponentDescription cdesc)
+	public IFuture<IDFComponentDescription> register(IDFComponentDescription cdesc)
 	{
-		Future ret = new Future();
+		Future<IDFComponentDescription> ret = new Future<IDFComponentDescription>();
 		
 		//System.out.println("Registered: "+adesc.getName()+" "+adesc.getLeaseTime());
 		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(cdesc, cms, this);
@@ -112,9 +112,9 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	 *  Deregister a component description.
 	 *  @throws RuntimeException when the component is not registered.
 	 */
-	public IFuture deregister(IDFComponentDescription cdesc)
+	public IFuture<Void> deregister(IDFComponentDescription cdesc)
 	{
-		Future ret = new Future();
+		Future<Void> ret = new Future<Void>();
 		
 		synchronized(components)
 		{
@@ -138,9 +138,9 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	 *  Modify a component description.
 	 *  @throws RuntimeException when the component is not registered.
 	 */
-	public IFuture modify(IDFComponentDescription cdesc)
+	public IFuture<IDFComponentDescription> modify(IDFComponentDescription cdesc)
 	{
-		Future ret = new Future();
+		Future<IDFComponentDescription> ret = new Future<IDFComponentDescription>();
 		
 		// Use clone to avoid caller manipulating object after insertion.
 		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(cdesc, cms, this);
@@ -169,7 +169,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	 *  Search for components matching the given description.
 	 *  @return An array of matching component descriptions. 
 	 */
-	public IFuture search(final IDFComponentDescription adesc, final ISearchConstraints con)
+	public IFuture<IDFComponentDescription[]> search(final IDFComponentDescription adesc, final ISearchConstraints con)
 	{
 		return search(adesc, con, false);
 	}
@@ -179,9 +179,9 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	 *  Search for components matching the given description.
 	 *  @return An array of matching component descriptions. 
 	 */
-	public IFuture search(final IDFComponentDescription adesc, final ISearchConstraints con, boolean remote)
+	public IFuture<IDFComponentDescription[]> search(final IDFComponentDescription adesc, final ISearchConstraints con, boolean remote)
 	{
-		final Future fut = new Future();
+		final Future<IDFComponentDescription[]> fut = new Future<IDFComponentDescription[]>();
 		
 		//System.out.println("Searching: "+adesc.getName());
 
@@ -258,7 +258,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 							}
 //							open.remove(fut);
 //							System.out.println("Federated search: "+ret);//+" "+open);
-							fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
+							fut.setResult((DFComponentDescription[])ret.toArray(new DFComponentDescription[ret.size()]));
 						}
 						
 						public void exceptionOccurred(Exception exception)
@@ -285,7 +285,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 				public void exceptionOccurred(Exception exception)
 				{
 //					open.remove(fut);
-					fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
+					fut.setResult((DFComponentDescription[])ret.toArray(new DFComponentDescription[ret.size()]));
 				}
 			});
 		}
@@ -293,7 +293,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		{
 //			open.remove(fut);
 //			System.out.println("Local search: "+ret+" "+open);
-			fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
+			fut.setResult((DFComponentDescription[])ret.toArray(new DFComponentDescription[ret.size()]));
 		}
 
 		//System.out.println("Searched: "+ret);
@@ -426,9 +426,9 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	/**
 	 *  Start the service.
 	 */
-	public synchronized IFuture	startService()
+	public synchronized IFuture<Void>	startService()
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		super.startService().addResultListener(new DelegationResultListener(ret)
 		{
@@ -448,7 +448,8 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 							setresult	= services[0] && services[1];
 						}
 						if(setresult)
-							ret.setResult(getServiceIdentifier());
+							ret.setResult(null);
+//							ret.setResult(getServiceIdentifier());
 					}
 				});
 				
@@ -465,7 +466,8 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 							setresult	= services[0] && services[1];
 						}
 						if(setresult)
-							ret.setResult(getServiceIdentifier());
+							ret.setResult(null);
+//							ret.setResult(getServiceIdentifier());
 					}
 				});
 				

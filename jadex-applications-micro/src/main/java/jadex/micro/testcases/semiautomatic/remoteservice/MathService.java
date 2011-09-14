@@ -30,7 +30,7 @@ public class MathService extends BasicService implements IMathService
 	 *  @param b Second number.
 	 *  @return Future that will deliver the sum of a and b.
 	 */
-	public IFuture addNB(int a, int b)
+	public IFuture<Integer> addNB(int a, int b)
 	{
 		System.out.println("addNB: "+a+" "+b);
 		return new Future(new Integer(a+b));
@@ -77,13 +77,14 @@ public class MathService extends BasicService implements IMathService
 	 *  
 	 *  Does a divide by zero operation and causes an exception.
 	 */
-	public IFuture divZero()
+	public IFuture<Void> divZero()
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		try
 		{
 			int tmp = 1/0;
-			ret.setResult(new Integer(tmp));
+			ret.setResult(null);
+//			ret.setResult(new Integer(tmp));
 		}
 		catch(Exception e)
 		{

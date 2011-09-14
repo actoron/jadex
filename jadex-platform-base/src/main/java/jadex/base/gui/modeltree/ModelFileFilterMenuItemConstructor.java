@@ -305,9 +305,9 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 	/**
 	 *  Write current state into properties.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
-		final Future ret = new Future();
+		final Future<Properties> ret = new Future<Properties>();
 		Properties	filterprops	= new Properties();
 		List ctypes = getSelectedComponentTypes();
 		for(int i=0; i<ctypes.size(); i++)
@@ -323,7 +323,7 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 	/**
 	 *  Update tool from given properties.
 	 */
-	public IFuture setProperties(final Properties props)
+	public IFuture<Void> setProperties(final Properties props)
 	{
 		if(props!=null)
 		{

@@ -250,7 +250,7 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 	/**
 	 *  Advices the the panel to restore its properties from the argument
 	 */
-	public IFuture setProperties(Properties ps)
+	public IFuture<Void> setProperties(Properties ps)
 	{
 		int	refresh	= 5000;
 		if(ps!=null)
@@ -272,9 +272,9 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 	 *  Advices the panel provide its setting as properties (if any).
 	 *  This is done on project close or save.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
-		final Future ret = new Future();
+		final Future<Properties> ret = new Future<Properties>();
 		Properties	props	= new Properties();
 		props.addProperty(new Property("defrefresh", Integer.toString(defrefresh)));
 		props.addProperty(new Property("dfremote", Boolean.toString(remotecb.isSelected())));

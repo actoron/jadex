@@ -1,8 +1,11 @@
 package jadex.base.gui.componentviewer;
 
+import java.util.Collections;
+
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.service.IService;
 import jadex.commons.Properties;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import javax.swing.JComponent;
@@ -60,7 +63,7 @@ public abstract class AbstractServiceViewerPanel implements IServiceViewerPanel
 	/**
 	 *  Advices the the panel to restore its properties from the argument
 	 */
-	public IFuture setProperties(Properties ps)
+	public IFuture<Void> setProperties(Properties ps)
 	{
 		return IFuture.DONE;
 	}
@@ -69,9 +72,9 @@ public abstract class AbstractServiceViewerPanel implements IServiceViewerPanel
 	 *  Advices the panel provide its setting as properties (if any).
 	 *  This is done on project close or save.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
-		return IFuture.DONE;
+		return Future.getEmptyFuture();
 	}
 
 	/**

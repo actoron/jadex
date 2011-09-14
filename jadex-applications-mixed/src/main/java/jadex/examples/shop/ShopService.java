@@ -1,6 +1,7 @@
 package jadex.examples.shop;
 
 import jadex.bdi.examples.shop.IShopService;
+import jadex.bdi.examples.shop.ItemInfo;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -52,7 +53,7 @@ public class ShopService extends BasicService implements IShopService
 	 *  Buy an item.
 	 *  @param item The item.
 	 */
-	public IFuture buyItem(final String item, final double price)
+	public IFuture<ItemInfo> buyItem(final String item, final double price)
 	{
 		return comp.scheduleStep(new IComponentStep()
 		{
@@ -68,7 +69,7 @@ public class ShopService extends BasicService implements IShopService
 	 *  Get the item catalog.
 	 *  @return  The catalog.
 	 */	
-	public IFuture getCatalog()
+	public IFuture<ItemInfo[]> getCatalog()
 	{
 		return comp.scheduleStep(new IComponentStep()
 		{

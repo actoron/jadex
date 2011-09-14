@@ -267,11 +267,11 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	/**
 	 *  Set state from given properties.
 	 */
-	public IFuture setProperties(final Properties props)
+	public IFuture<Void> setProperties(final Properties props)
 	{
 		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		
 		this.props	= props;
 		
@@ -312,11 +312,11 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	/**
 	 *  Get the current state as properties.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
 		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
-		final Future	ret	= new Future();
+		final Future<Properties> ret	= new Future<Properties>();
 		
 		if(props==null)
 		{

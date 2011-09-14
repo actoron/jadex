@@ -18,7 +18,7 @@ public interface IMathService extends IService
 	 *  @return Future that will deliver the sum of a and b.
 	 */
 //	@Timeout(1234567)
-	public IFuture addNB(int a, int b);
+	public IFuture<Integer> addNB(int a, int b);
 	
 	/**
 	 *  Tests a blocking call (should be avoided!).
@@ -65,5 +65,5 @@ public interface IMathService extends IService
 	 *  Does a divide by zero operation and causes an exception.
 	 */
 //	@Excluded
-	public IFuture divZero();
+	public IFuture<Void> divZero();
 }

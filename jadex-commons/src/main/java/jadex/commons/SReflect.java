@@ -235,14 +235,42 @@ public class SReflect
 	public static String	getUnqualifiedClassName(Class clazz)
 	{
 		String	classname	= getClassName(clazz);
-		StringTokenizer	stok	= new StringTokenizer(classname,".");
-		while(stok.hasMoreTokens())
+		return getUnqualifiedTypeName(classname);
+	}
+	
+	/**
+	 *	Get unqualified type name.
+	 *  @return The unqualified (without package) name of a class.
+	 */
+	public static String getUnqualifiedTypeName(String name)
+	{
+		int lpos = name.indexOf("<");
+		if(lpos>0)
 		{
-			classname	= stok.nextToken();
+			String left = name.substring(0, lpos);
+			int pos = left.lastIndexOf(".");
+			if(pos!=-1)
+				left = left.substring(pos+1);
+			
+			String right = name.substring(lpos+1);
+			right = getUnqualifiedTypeName(right);
+			name = left+"<"+right;
 		}
-		return classname;
+		else
+		{
+			int pos = name.lastIndexOf(".");
+			if(pos!=-1)
+				name = name.substring(pos+1);
+		}
+		
+		return name;
 	}
 
+//	public static void main(String[] args)
+//	{
+//		System.out.println(getUnqualifiedTypeName("a.b.c.D<aa.F<ab.V><a.B>>>"));
+//	}
+	
 	/**
 	 *	Get inner class name.
 	 *  @return The inner class's name (without declaring class).

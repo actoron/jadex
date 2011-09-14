@@ -30,7 +30,7 @@ public interface IService //extends IRemotable
 	 *  Test if the service is valid.
 	 *  @return True, if service can be used.
 	 */
-	public IFuture isValid();
+	public IFuture<Boolean> isValid();
 	
 	/**
 	 *  Get the map of properties (considered as constant).
