@@ -217,13 +217,9 @@ public class ModelTreePanel extends FileTreePanel
 											e.printStackTrace();
 										}
 									}
-									return new Boolean(LibraryService.indexOfFilename(filename, urlstrings)!=-1);
-								}
-							}).addResultListener(new DefaultResultListener()
-							{
-								public void resultAvailable(Object result)
-								{
-									boolean res = ((Boolean)result).booleanValue();
+									boolean res = LibraryService.indexOfFilename(filename, urlstrings)!=-1;
+									
+//									boolean res = ((Boolean)result).booleanValue();
 									if(!res)
 									{
 //										System.out.println("Need to add path: "+filename);
@@ -236,7 +232,13 @@ public class ModelTreePanel extends FileTreePanel
 											e.printStackTrace();
 										}
 									}
-										
+									
+									return new Boolean(LibraryService.indexOfFilename(filename, urlstrings)!=-1);
+								}
+							}).addResultListener(new DefaultResultListener()
+							{
+								public void resultAvailable(Object result)
+								{
 									SwingUtilities.invokeLater(new Runnable()
 									{
 										public void run()

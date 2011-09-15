@@ -604,7 +604,9 @@ public class RemoteFileSystemView extends FileSystemView
 	public File createFileObject(String path)
 	{
 		System.out.println("createFileObject: "+path);
-		return super.createFileObject(path);
+		RemoteFile file = new RemoteFile(new FileData(null, path, false, null, 0, '/', 0));
+		return file;
+//		return super.createFileObject(path);
 //		File f = new File(path);
 //		if(isFileSystemRoot(f))
 //		{

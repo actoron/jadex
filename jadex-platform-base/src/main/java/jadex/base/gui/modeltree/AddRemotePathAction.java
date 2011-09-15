@@ -129,7 +129,9 @@ public class AddRemotePathAction extends ToolTipAction
 					File file = filechooser.getSelectedFile();
 					if(file!=null)
 					{
-						final String	path	= file.getAbsolutePath();
+//						final String	path	= file.getAbsolutePath();
+						final String	path	= file.getPath();
+						
 						treepanel.getExternalAccess().scheduleStep(new IComponentStep()
 						{
 							@XMLClassname("getRemoteFile")
