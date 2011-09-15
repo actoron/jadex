@@ -253,46 +253,53 @@ public class RemoteFileSystemView extends FileSystemView
 //		}
 //	}
 
-//	/**
-//	 * On Windows, a file can appear in multiple folders, other than its parent
-//	 * directory in the filesystem. Folder could for example be the "Desktop"
-//	 * folder which is not the same as file.getParentFile().
-//	 * 
-//	 * @param folder a <code>File</code> object repesenting a directory or
-//	 *        special folder
-//	 * @param file a <code>File</code> object
-//	 * @return <code>true</code> if <code>folder</code> is a directory or
-//	 *         special folder and contains <code>file</code>.
-//	 * @since 1.4
-//	 */
-//	public boolean isParent(File folder, File file)
-//	{
-//		if(folder == null || file == null)
-//		{
-//			return false;
-//		}
-//		else if(folder instanceof ShellFolder)
-//		{
-//			File parent = file.getParentFile();
-//			if(parent != null && parent.equals(folder))
-//			{
-//				return true;
-//			}
-//			File[] children = getFiles(folder, false);
-//			for(int i = 0; i < children.length; i++)
-//			{
-//				if(file.equals(children[i]))
-//				{
-//					return true;
-//				}
-//			}
-//			return false;
-//		}
-//		else
-//		{
-//			return folder.equals(file.getParentFile());
-//		}
-//	}
+	/**
+	 * On Windows, a file can appear in multiple folders, other than its parent
+	 * directory in the filesystem. Folder could for example be the "Desktop"
+	 * folder which is not the same as file.getParentFile().
+	 * 
+	 * @param folder a <code>File</code> object repesenting a directory or
+	 *        special folder
+	 * @param file a <code>File</code> object
+	 * @return <code>true</code> if <code>folder</code> is a directory or
+	 *         special folder and contains <code>file</code>.
+	 * @since 1.4
+	 */
+	public boolean isParent(File folder, File file)
+	{
+		if(folder instanceof RemoteFile && file instanceof RemoteFile)
+		{
+			String p1 = folder.getAbsolutePath();
+			String p2 = file.getAbsolutePath();
+			
+			if(p2.startsWith(p1))
+			{
+				String end = p2.substring(p1.length());
+				int cnt = 0;
+				boolean allowed = true;
+				for(int i=0; i<end.length(); i++)
+				{
+					char c = end.charAt(i);
+					if(allowed && (c=='/' || c=='\\'))
+					{
+						cnt++;
+						allowed = false;
+					}
+					else
+					{
+						allowed = true;
+					}
+				}
+				return cnt==1;
+			}
+			
+			return false;
+		}
+		else
+		{
+			return super.isParent(folder, file);
+		}
+	}
 
 //	/**
 //	 * @param parent a <code>File</code> object repesenting a directory or
@@ -362,7 +369,6 @@ public class RemoteFileSystemView extends FileSystemView
 	{
 		return f.isHidden();
 	}
-
 
 	/**
 	 * Is dir the root of a tree in the file system, such as a drive or
@@ -495,7 +501,7 @@ public class RemoteFileSystemView extends FileSystemView
 			});
 		}
 		
-		return homedir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown", 0)): homedir;
+		return homedir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown", 0, File.separatorChar)): homedir;
 	}
 
 	/**
@@ -533,7 +539,7 @@ public class RemoteFileSystemView extends FileSystemView
 			});
 		}
 		
-		return currentdir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown", 0)): currentdir;
+		return currentdir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown", 0, File.separatorChar)): currentdir;
 	}
 	
 	/**
@@ -572,14 +578,16 @@ public class RemoteFileSystemView extends FileSystemView
 			});
 		}
 		
-		return defaultdir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown", 0)): defaultdir;
+		return defaultdir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown", 0, File.separatorChar)): defaultdir;
 	}
 
-//	/**
-//	 * Returns a File object constructed in dir from the given filename.
-//	 */
-//	public File createFileObject(File dir, String filename)
-//	{
+	/**
+	 * Returns a File object constructed in dir from the given filename.
+	 */
+	public File createFileObject(File dir, String filename)
+	{
+		System.out.println("createFileObject: "+dir+" "+filename);
+		return super.createFileObject(dir, filename);
 //		if(dir == null)
 //		{
 //			return new File(filename);
@@ -588,20 +596,22 @@ public class RemoteFileSystemView extends FileSystemView
 //		{
 //			return new File(dir, filename);
 //		}
-//	}
+	}
 
-//	/**
-//	 * Returns a File object constructed from the given path string.
-//	 */
-//	public File createFileObject(String path)
-//	{
+	/**
+	 * Returns a File object constructed from the given path string.
+	 */
+	public File createFileObject(String path)
+	{
+		System.out.println("createFileObject: "+path);
+		return super.createFileObject(path);
 //		File f = new File(path);
 //		if(isFileSystemRoot(f))
 //		{
 //			f = createFileSystemRoot(f);
 //		}
 //		return f;
-//	}
+	}
 
 
 	/**
@@ -707,6 +717,7 @@ public class RemoteFileSystemView extends FileSystemView
 			});
 		}
 		
+		System.out.println("parent: "+dir+" "+parent);
 		return parent;
 	}
 

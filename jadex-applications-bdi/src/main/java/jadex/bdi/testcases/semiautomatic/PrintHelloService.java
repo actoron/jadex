@@ -20,7 +20,7 @@ public class PrintHelloService extends BasicService implements IPrintHelloServic
 	/**
 	 *  Print hello.
 	 */
-	public IFuture printHello()
+	public IFuture<Void> printHello()
 	{
 		System.out.println("Hello");
 		return IFuture.DONE;

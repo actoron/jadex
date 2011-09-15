@@ -31,9 +31,9 @@ public class ExtensionLoaderService implements IExtensionLoaderService
 	 *  Start service.
 	 */
 	@ServiceStart
-	public IFuture	start()
+	public IFuture<Void>	start()
 	{
-		IFuture	ret	= IFuture.DONE;
+		IFuture<Void>	ret	= IFuture.DONE;
 		
 		String	extensions	= component.getArguments()!=null
 			? (String)component.getArguments().get("extensions") : null;

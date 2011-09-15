@@ -30,9 +30,9 @@ public class RemoteJarFile extends FileData
 	 *  Create a remote jar file.
 	 */
 	public RemoteJarFile(String filename, String path, boolean directory, String displayname, 
-		Map jarentries, String relativepath, long lastmodified)
+		Map jarentries, String relativepath, long lastmodified, char separator)
 	{
-		super(filename, path, directory, displayname, lastmodified);
+		super(filename, path, directory, displayname, lastmodified, separator);
 		this.jarentries = jarentries;
 		this.relativepath = relativepath;
 	}

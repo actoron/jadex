@@ -34,6 +34,9 @@ public class FileData
 	/** The last modified date. */
 	protected long lastmodified;
 	
+	/** The separator char. */
+	protected char separator;
+	
 	//-------- constructors --------
 
 	/**
@@ -48,13 +51,14 @@ public class FileData
 	 *  Create a new remote file.
 	 */
 	public FileData(String filename, String path, boolean directory, 
-		String displayname, long lastmodified)
+		String displayname, long lastmodified, char separator)
 	{
 		this.filename = filename;
 		this.path = path;
 		this.directory = directory;
 		this.displayname = displayname;
 		this.lastmodified = lastmodified;
+		this.separator = separator;
 	}
 	
 	/**
@@ -71,6 +75,7 @@ public class FileData
 			? 0 : file.lastModified();
 		/* $endif $ */
 //		this.root = SUtil.arrayToSet(file.listRoots()).contains(file);
+		this.separator = file.separatorChar;
 	}
 	
 	//-------- methods --------
@@ -207,6 +212,24 @@ public class FileData
 			ret[i] = new FileData(files[i]);
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Get the separator char.
+	 *  @return the separator char.
+	 */
+	public char getSeparatorChar()
+	{
+		return separator;
+	}
+
+	/**
+	 *  Set the separator char.
+	 *  @param separator The separator char to set.
+	 */
+	public void setSeparatorChar(char separator)
+	{
+		this.separator = separator;
 	}
 
 	/**

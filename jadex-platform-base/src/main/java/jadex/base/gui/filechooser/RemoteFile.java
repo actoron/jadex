@@ -121,15 +121,15 @@ public class RemoteFile extends File
     	String oldpath = getPath();
     	if(oldpath!=null)
     	{
-      		int findex = oldpath.indexOf(separatorChar, 1);
-      		int lindex = oldpath.lastIndexOf(separatorChar);
+      		int findex = oldpath.indexOf(filedata.getSeparatorChar(), 1);
+      		int lindex = oldpath.lastIndexOf(filedata.getSeparatorChar());
       		if(findex!=-1 && lindex!=0 && lindex!=oldpath.length()-1)
     		{
       			boolean last = findex==lindex || findex==lindex+1;
     			ret = oldpath.substring(0, last? lindex+1: lindex);
     		}
     	}
-//    	System.out.println("getPa: "+oldpath+" "+ret);
+    	System.out.println("getPa: "+oldpath+" "+ret);
     	return ret;
     }
 
@@ -145,15 +145,15 @@ public class RemoteFile extends File
     	{
     		String name = "";
     		String path = pa;
-    		int findex = pa.indexOf(separatorChar, 1);
-      		int lindex = pa.lastIndexOf(separatorChar);
+    		int findex = pa.indexOf(filedata.getSeparatorChar(), 1);
+      		int lindex = pa.lastIndexOf(filedata.getSeparatorChar());
      		if(findex!=-1 && lindex!=0 && lindex!=pa.length())
     		{
     			name = pa.substring(lindex+1);
     		}
-    		ret = new RemoteFile(new FileData(name, path, true, name, filedata.getLastModified()));
+    		ret = new RemoteFile(new FileData(name, path, true, name, filedata.getLastModified(), filedata.getSeparatorChar()));
     	}
-//    	System.out.println("getPaF: "+getPath()+" "+pa);
+    	System.out.println("getPaF: "+getPath()+" "+pa);
     	return ret;
     }
 
@@ -320,15 +320,15 @@ public class RemoteFile extends File
 		return "RemoteFile(filedata="+filedata+")";
 	}
 	
-//	/**
-//	 *  Main for testing.
-//	 */
-//	public static void main(String[] args)
-//	{
+	/**
+	 *  Main for testing.
+	 */
+	public static void main(String[] args) throws Exception
+	{
 //		System.out.println(getParent("C:\\"));
 //		System.out.println(getParent("C:\\\\"));
 //		System.out.println(getParent("C:\\projects\\jadex"));
-//		File f = new File("C:\\");
-//		System.out.println(SUtil.arrayToString(f.listFiles()));
-//	}
+		File f = new File("C:\\projects\\jadex\\jadex-commons\\pom.xml");
+		System.out.println(f.getName()+" "+f.getPath()+" "+f.getAbsolutePath()+" "+f.getCanonicalPath());
+	}
 }
