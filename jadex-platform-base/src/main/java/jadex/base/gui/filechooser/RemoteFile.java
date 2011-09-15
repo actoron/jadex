@@ -124,7 +124,10 @@ public class RemoteFile extends File
     	    if((filedata.getPrefixLength() > 0) && (getPath().length() > filedata.getPrefixLength()))
     	    	ret =  getPath().substring(0, filedata.getPrefixLength());
     	}
-    	
+    	else
+    	{
+    		ret = getPath().substring(0, index);
+    	}
 //    	return path.substring(0, index);
 //    	super.getParent()
 //    	String ret = null;
