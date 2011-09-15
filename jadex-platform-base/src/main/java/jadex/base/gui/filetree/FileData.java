@@ -5,6 +5,7 @@ import jadex.commons.SUtil;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 /* $if !android $ */
 import javax.swing.filechooser.FileSystemView;
@@ -273,9 +274,9 @@ public class FileData
 	{
 		try
 		{
-			Field pl = File.class.getField("prefixLength");
-			pl.setAccessible(true);
-			return ((Integer)pl.get(file)).intValue();
+			Method m = File.class.getDeclaredMethod("getPrefixLength", new Class[0]);
+			m.setAccessible(true);
+			return ((Integer)m.invoke(file, new Object[0])).intValue();
 		}
 		catch(Exception e)
 		{
@@ -283,4 +284,12 @@ public class FileData
 		}
 	}
 	
+	/**
+	 * 
+	 */
+	public static void main(String[] args)
+	{
+		File f = new File("c:\\projects");
+		System.out.println(getPrefixLength(f));
+	}
 }
