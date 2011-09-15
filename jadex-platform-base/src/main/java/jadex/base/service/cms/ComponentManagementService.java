@@ -521,7 +521,9 @@ public abstract class ComponentManagementService extends BasicService implements
 																
 																public void exceptionOccurred(Exception exception)
 																{
-																	exception.printStackTrace();
+																	// Todo: use some logger for user error?
+																	if(!(exception instanceof ComponentTerminatedException))
+																		exception.printStackTrace();
 																}
 															});								
 														}

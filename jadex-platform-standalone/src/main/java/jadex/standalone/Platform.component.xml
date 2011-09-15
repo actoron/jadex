@@ -81,7 +81,7 @@
 		<argument name="awaexcludes" class="String">""</argument>
 		<!-- Flag if copying parameters for local service calls is allowed. -->
 		<argument name="parametercopy" class="boolean">true</argument>
-		<!-- Flag if nio typ or normal tcp transport should be used. -->
+		<!-- Flag if nio type or normal tcp transport should be used. -->
 		<argument name="niotransport" class="boolean">true</argument>
 		<!-- Logging level for platform (default SEVERE). -->
 		<argument name="logging_level" class="Level">Level.SEVERE</argument>

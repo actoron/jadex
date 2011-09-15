@@ -3,6 +3,7 @@ package jadex.bpmn.runtime.handler;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
@@ -39,7 +40,15 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 				{
 					public void timeEventOccurred(long currenttime)
 					{
-						instance.notify(activity, thread, TIMER_EVENT);
+						try
+						{
+//							System.out.println("timer notification: "+activity+", "+thread+", "+this);
+							instance.notify(activity, thread, TIMER_EVENT);
+						}
+						catch(ComponentTerminatedException cte)
+						{
+							// ignore outdated timers, e.g. when process was terminated with fatal error.
+						}
 					}
 				};
 				
@@ -71,12 +80,14 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 	 *  @param thread The process thread.
 	 *  @param info The info object.
 	 */
-	public void cancel(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+	public void cancel(final MActivity activity, BpmnInterpreter instance, final ProcessThread thread)
 	{
+//		System.out.println("cancel called: "+activity+", "+thread);
 		((IFuture)thread.getWaitInfo()).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
+//				System.out.println("executing cancel: "+activity+", "+thread+", "+result);
 				if(result instanceof ITimer)
 				{
 					((ITimer)result).cancel();

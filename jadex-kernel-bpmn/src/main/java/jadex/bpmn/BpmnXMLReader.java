@@ -1550,6 +1550,17 @@ public class BpmnXMLReader
 
 							Class impltype = implname!=null ? SReflect.findClass0(implname, mi.getAllImports(), context.getClassLoader()) : null;
 							Class type = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
+							if(type==null)
+							{
+								try
+								{
+									((ReadContext)context).getReporter().report("Type not found: "+typename, null, null, null);
+								}
+								catch(XMLStreamException e)
+								{
+									throw new RuntimeException(e);
+								}
+							}
 							RequiredServiceBinding binding = implname!=null ? (RequiredServiceBinding)bindings.get(implname) : null;
 							ProvidedServiceImplementation psim	= null;
 							if(binding!=null)

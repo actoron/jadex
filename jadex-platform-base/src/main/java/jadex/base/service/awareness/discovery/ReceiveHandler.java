@@ -2,6 +2,7 @@ package jadex.base.service.awareness.discovery;
 
 import jadex.base.service.awareness.AwarenessInfo;
 import jadex.base.service.awareness.management.IManagementService;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.threadpool.IThreadPoolService;
@@ -119,7 +120,8 @@ public abstract class ReceiveHandler
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				agent.getMicroAgent().getLogger().warning("Awareness agent problem, could not get threadpool service: "+exception);
+				if(!(exception instanceof ComponentTerminatedException))
+					agent.getMicroAgent().getLogger().warning("Awareness agent problem, could not get threadpool service: "+exception);
 //				exception.printStackTrace();
 				ret.setExceptionIfUndone(exception);
 			}

@@ -65,33 +65,33 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1pjMQZvsEeCjj9yzP5OiyQ" key="id1" value="inibindingb"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_En2MAJv3EeCF4Y7HOcQrlg" source="jadex_bindings_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkR9gKZ8EeCJXZsoADOJFw" key="dimension" value="3:8"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkSkkKZ8EeCJXZsoADOJFw" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkSkkaZ8EeCJXZsoADOJFw" key="complexColumns" value="false:false:false:false:false:false:false:false"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkTLoKZ8EeCJXZsoADOJFw" key="0:0" value="defbinding"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkTLoaZ8EeCJXZsoADOJFw" key="0:1" value="local"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkTLoqZ8EeCJXZsoADOJFw" key="0:2" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkTLo6Z8EeCJXZsoADOJFw" key="0:3" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkTLpKZ8EeCJXZsoADOJFw" key="0:4" value="decoupled"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkTLpaZ8EeCJXZsoADOJFw" key="0:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkTLpqZ8EeCJXZsoADOJFw" key="0:6" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkTysKZ8EeCJXZsoADOJFw" key="0:7" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkTysaZ8EeCJXZsoADOJFw" key="1:0" value="inibindinga"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkTysqZ8EeCJXZsoADOJFw" key="1:1" value="application"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkTys6Z8EeCJXZsoADOJFw" key="1:2" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkTytKZ8EeCJXZsoADOJFw" key="1:3" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkTytaZ8EeCJXZsoADOJFw" key="1:4" value="decoupled"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkTytqZ8EeCJXZsoADOJFw" key="1:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkTyt6Z8EeCJXZsoADOJFw" key="1:6" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkTyuKZ8EeCJXZsoADOJFw" key="1:7" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkTyuaZ8EeCJXZsoADOJFw" key="2:0" value="inibindingb"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkUZwKZ8EeCJXZsoADOJFw" key="2:1" value="platform"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkUZwaZ8EeCJXZsoADOJFw" key="2:2" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkUZwqZ8EeCJXZsoADOJFw" key="2:3" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkUZw6Z8EeCJXZsoADOJFw" key="2:4" value="decoupled"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkUZxKZ8EeCJXZsoADOJFw" key="2:5" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkUZxaZ8EeCJXZsoADOJFw" key="2:6" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkUZxqZ8EeCJXZsoADOJFw" key="2:7" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQYN-lEeCuL5wLZq-Bwg" key="dimension" value="3:8"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQYd-lEeCuL5wLZq-Bwg" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQYt-lEeCuL5wLZq-Bwg" key="complexColumns" value="false:false:false:false:false:false:false:false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQY9-lEeCuL5wLZq-Bwg" key="0:0" value="defbinding"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQZN-lEeCuL5wLZq-Bwg" key="0:1" value="local"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQZd-lEeCuL5wLZq-Bwg" key="0:2" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQZt-lEeCuL5wLZq-Bwg" key="0:3" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQZ9-lEeCuL5wLZq-Bwg" key="0:4" value="decoupled"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQaN-lEeCuL5wLZq-Bwg" key="0:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQad-lEeCuL5wLZq-Bwg" key="0:6" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQat-lEeCuL5wLZq-Bwg" key="0:7" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQa9-lEeCuL5wLZq-Bwg" key="1:0" value="inibindinga"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQbN-lEeCuL5wLZq-Bwg" key="1:1" value="application"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQbd-lEeCuL5wLZq-Bwg" key="1:2" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQbt-lEeCuL5wLZq-Bwg" key="1:3" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQb9-lEeCuL5wLZq-Bwg" key="1:4" value="decoupled"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQcN-lEeCuL5wLZq-Bwg" key="1:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQcd-lEeCuL5wLZq-Bwg" key="1:6" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQct-lEeCuL5wLZq-Bwg" key="1:7" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQc9-lEeCuL5wLZq-Bwg" key="2:0" value="inibindingb"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQdN-lEeCuL5wLZq-Bwg" key="2:1" value="platform"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQdd-lEeCuL5wLZq-Bwg" key="2:2" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQdt-lEeCuL5wLZq-Bwg" key="2:3" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQd9-lEeCuL5wLZq-Bwg" key="2:4" value="decoupled"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQeN-lEeCuL5wLZq-Bwg" key="2:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQed-lEeCuL5wLZq-Bwg" key="2:6" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s4CQet-lEeCuL5wLZq-Bwg" key="2:7" value=""/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_hNORAJv3EeCF4Y7HOcQrlg" source="jadex_subcomponents_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmmxwJxBEeC3-cIdV9ycxw" key="dimension" value="1:6"/>

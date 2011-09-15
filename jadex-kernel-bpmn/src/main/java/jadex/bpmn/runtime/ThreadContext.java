@@ -1,5 +1,6 @@
 package jadex.bpmn.runtime;
 
+import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MSubProcess;
@@ -122,6 +123,14 @@ public class ThreadContext
 	{
 		if(threads!=null)
 		{
+			if(getSubcontext(thread)!=null)
+				removeSubcontext(getSubcontext(thread));
+			
+			// Cancel activity (e.g. timer).
+			MActivity	act	= thread.getActivity();
+			if(act!=null)
+				thread.getInstance().getActivityHandler(act).cancel(act, thread.getInstance(), thread);
+			
 			boolean rem = threads.containsKey(thread);
 			threads.remove(thread);
 			thread.setThreadContext(null);
@@ -131,12 +140,13 @@ public class ThreadContext
 		
 			if(rem)
 			{
+//				System.out.println("remove1: "+thread);
 				BpmnInterpreter in = thread.getInstance();
 				in.notifyListeners(in.createThreadEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, thread));
 			}
 		}
 		
-//		System.out.println("remove: "+thread);
+//		System.out.println("remove0: "+thread);
 	}
 	
 	/**
@@ -218,6 +228,15 @@ public class ThreadContext
 	public void removeSubcontext(ThreadContext context)
 	{
 		assert threads!=null && threads.containsKey(context.getInitiator());
+		
+		Set	subthreads	= context.getThreads();
+		if(subthreads!=null)
+		{
+			for(Iterator it=subthreads.iterator(); it.hasNext(); )
+			{
+				context.removeThread((ProcessThread)it.next());
+			}
+		}
 
 		threads.put(context.getInitiator(), null);
 	}

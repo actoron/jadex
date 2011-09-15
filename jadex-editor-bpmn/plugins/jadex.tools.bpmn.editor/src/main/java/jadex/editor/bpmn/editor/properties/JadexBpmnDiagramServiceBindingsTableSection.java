@@ -17,8 +17,8 @@ public class JadexBpmnDiagramServiceBindingsTableSection extends
 {
 	public static final String[] COLUMN_NAMES = new String[]{"Name", "Scope", "Component Name", "Component Type", "Proxytype", "Dynamic", "Create", "Recover"};
 	public static final String[] COLUMN_TYPES = new String[]{TEXT, COMBOBOX, TEXT, TEXT, COMBOBOX, CHECKBOX, CHECKBOX, CHECKBOX};
-	public static final int[] COLUMN_WEIGHTS = new int[]{3, 3, 3, 3, 1, 1, 1};
-	public static final String[] DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "application", "", "", "", "", ""};
+	public static final int[] COLUMN_WEIGHTS = new int[]{3, 3, 3, 3, 1, 1, 1, 1};
+	public static final String[] DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "application", "", "", "", "", "", ""};
 	public static final int UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX = 0;
 	public static final Map VALUES = new HashMap();
 	

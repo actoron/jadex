@@ -86,6 +86,7 @@ public class ProcessViewPanel extends JPanel
 		this.hmodel	= new HistoryModel();
 		
 		TableSorter sorter = new TableSorter(ptmodel);
+		sorter.setSortingStatus(0, TableSorter.ASCENDING);
 		this.threads = new JTable(sorter);
 		ResizeableTableHeader header = new ResizeableTableHeader(threads.getColumnModel());
 		header.setIncludeHeaderWidth(true);
@@ -128,10 +129,10 @@ public class ProcessViewPanel extends JPanel
 			public IFuture eventOccured(final IComponentChangeEvent cce)
 			{
 				// todo: hide decomposing bulk events
-				if(cce.getBulkEvents().length>0)
+				if(cce instanceof BulkComponentChangeEvent)
 				{
 					IComponentChangeEvent[] events = cce.getBulkEvents();
-					for(int i=0; i<events.length; i++)
+					for(int i=0; events!=null && i<events.length; i++)
 					{
 						eventOccured(events[i]);
 					}

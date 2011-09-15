@@ -13,7 +13,7 @@ public class JadexBpmnDiagramSubcomponentsTableSection extends
 	AbstractBpmnMultiColumnTablePropertySection
 {
 	public static final String[] COLUMN_NAMES = new String[]{"Local Type Name", "Filename", "Instance Name", "Number", "Arguments"};//, "Suspend", "Master", "Daemon", "Autoshutdown"};
-	public static final String[] COLUMN_TYPES = new String[]{TEXT, TEXT, TEXT, SPINNER, TEXT};// CHECKBOX, CHECKBOX, CHECKBOX, CHECKBOX};
+	public static final String[] COLUMN_TYPES = new String[]{TEXT, TEXT, TEXT, TEXT, TEXT};// CHECKBOX, CHECKBOX, CHECKBOX, CHECKBOX};
 	public static final boolean[] COLUMN_COMPLEX = new boolean[]{false, false, true, true, true};
 	public static final int[] COLUMN_WEIGHTS = new int[]{2, 2, 1, 1, 1, 1};
 	public static final String[] DEFAULT_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{"name", "filename", "", "", "", ""};

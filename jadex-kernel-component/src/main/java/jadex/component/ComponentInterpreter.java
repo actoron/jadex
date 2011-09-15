@@ -115,7 +115,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 		}
 		catch(Exception e)
 		{
-			System.out.println("as3: "+getComponentIdentifier()+" "+Thread.currentThread()+" "+step+", "+e);
+//			System.out.println("as3: "+getComponentIdentifier()+" "+Thread.currentThread()+" "+step+", "+e);
 			ret.setException(e);
 		}
 		return ret;

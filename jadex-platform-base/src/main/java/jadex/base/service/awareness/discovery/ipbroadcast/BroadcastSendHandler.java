@@ -111,7 +111,8 @@ public class BroadcastSendHandler extends MasterSlaveSendHandler
 		}
 		catch(Exception e)
 		{
-			getAgent().getMicroAgent().getLogger().warning("Discover error: "+e);
+			if(!getAgent().isKilled())
+				getAgent().getMicroAgent().getLogger().warning("Discover error: "+e);
 //			e.printStackTrace();
 		}
 		
