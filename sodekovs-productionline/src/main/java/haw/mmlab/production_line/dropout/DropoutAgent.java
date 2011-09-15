@@ -9,8 +9,8 @@ import haw.mmlab.production_line.service.IProcessWorkpieceService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -108,8 +108,7 @@ public class DropoutAgent extends MicroAgent {
 			while (count <= 0 || i < count) {
 				AgentQuery query = configuration.getQuery();
 				Action action = configuration.getAction();
-				List<IProcessWorkpieceService> receiver = getReceiver(query);
-				executeAction(action, receiver);
+				getReceiverAndExecute(query, action);
 				if (count > 0) {
 					i++;
 				}
@@ -127,44 +126,48 @@ public class DropoutAgent extends MicroAgent {
 		}
 
 		@SuppressWarnings("unchecked")
-		private List<IProcessWorkpieceService> getReceiver(AgentQuery query) {
-			List<IProcessWorkpieceService> receiver = new ArrayList<IProcessWorkpieceService>();
-			IFuture<Collection<IProcessWorkpieceService>> future = (IFuture<Collection<IProcessWorkpieceService>>) getRequiredServices("processWorkpieceServices").get(new ThreadSuspendable(this));
-			Collection<IProcessWorkpieceService> services = future.get(new ThreadSuspendable(this));
+		private void getReceiverAndExecute(final AgentQuery query, final Action action) {
+			getRequiredServices("processWorkpieceServices").addResultListener(new DefaultResultListener<Collection<IProcessWorkpieceService>>() {
 
-			if (query.getCategory().equals(CATEGORY_ALL)) {
-				receiver.addAll(services);
-			} else if (query.getCategory().equals(CATEGORY_ROBOT)) {
-				for (IProcessWorkpieceService service : services) {
-					if (service.getType().get(new ThreadSuspendable(this)).equals(AgentConstants.AGENT_TYPE_ROBOT)) {
-						receiver.add(service);
+				@Override
+				public void resultAvailable(Collection<IProcessWorkpieceService> services) {
+					List<IProcessWorkpieceService> receiver = new ArrayList<IProcessWorkpieceService>();
+
+					if (query.getCategory().equals(CATEGORY_ALL)) {
+						receiver.addAll(services);
+					} else if (query.getCategory().equals(CATEGORY_ROBOT)) {
+						for (IProcessWorkpieceService service : services) {
+							if (service.getType().equals(AgentConstants.AGENT_TYPE_ROBOT)) {
+								receiver.add(service);
+							}
+						}
+					} else if (query.getCategory().equals(CATEGORY_TRANSPORT)) {
+						for (IProcessWorkpieceService service : services) {
+							if (service.getType().equals(AgentConstants.AGENT_TYPE_TRANSPORT)) {
+								receiver.add(service);
+							}
+						}
+					} else if (query.getCategory().equals(CATEGORY_NONE)) {
+						for (IProcessWorkpieceService service : services) {
+							if (query.getAgents().contains(service.getId())) {
+								receiver.add(service);
+							}
+						}
+					}
+
+					List<IProcessWorkpieceService> result = new ArrayList<IProcessWorkpieceService>();
+					if (query.getRandom() != null && query.getRandom() >= 0) {
+						for (int i = 0; i < query.getRandom(); i++) {
+							Collections.shuffle(receiver);
+							result.add(receiver.remove(0));
+						}
+
+						executeAction(action, result);
+					} else {
+						executeAction(action, receiver);
 					}
 				}
-			} else if (query.getCategory().equals(CATEGORY_TRANSPORT)) {
-				for (IProcessWorkpieceService service : services) {
-					if (service.getType().get(new ThreadSuspendable(this)).equals(AgentConstants.AGENT_TYPE_TRANSPORT)) {
-						receiver.add(service);
-					}
-				}
-			} else if (query.getCategory().equals(CATEGORY_NONE)) {
-				for (IProcessWorkpieceService service : services) {
-					if (query.getAgents().contains(service.getId().get(new ThreadSuspendable(this)))) {
-						receiver.add(service);
-					}
-				}
-			}
-
-			List<IProcessWorkpieceService> result = new ArrayList<IProcessWorkpieceService>();
-			if (query.getRandom() != null && query.getRandom() > 0) {
-				for (int i = 0; i < query.getRandom(); i++) {
-					Collections.shuffle(receiver);
-					result.add(receiver.remove(0));
-				}
-
-				return result;
-			} else {
-				return receiver;
-			}
+			});
 		}
 	}
 }

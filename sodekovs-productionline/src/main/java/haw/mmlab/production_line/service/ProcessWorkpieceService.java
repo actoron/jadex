@@ -25,6 +25,10 @@ public class ProcessWorkpieceService implements IProcessWorkpieceService {
 	@ServiceComponent
 	protected ProcessWorkpieceAgent agent = null;
 
+	private String id = null;
+
+	private String type = null;
+
 	/**
 	 * Get the services id.
 	 * 
@@ -32,8 +36,11 @@ public class ProcessWorkpieceService implements IProcessWorkpieceService {
 	 * 
 	 * @directcall (Is called on caller thread).
 	 */
-	public IFuture<String> getId() {
-		return new Future<String>(agent.getId());
+	public String getId() {
+		if (id == null) {
+			id = agent.getId();
+		}
+		return id;
 	}
 
 	/**
@@ -43,12 +50,15 @@ public class ProcessWorkpieceService implements IProcessWorkpieceService {
 	 * 
 	 * @directcall (Is called on caller thread).
 	 */
-	public IFuture<String> getType() {
-		if (agent instanceof RobotAgent) {
-			return new Future<String>(AgentConstants.AGENT_TYPE_ROBOT);
-		} else {
-			return new Future<String>(AgentConstants.AGENT_TYPE_TRANSPORT);
+	public String getType() {
+		if (type == null) {
+			if (agent instanceof RobotAgent) {
+				type = AgentConstants.AGENT_TYPE_ROBOT;
+			} else {
+				type = AgentConstants.AGENT_TYPE_TRANSPORT;
+			}
 		}
+		return type;
 	}
 
 	/**

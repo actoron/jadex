@@ -14,6 +14,7 @@ import haw.mmlab.production_line.configuration.Workpiece;
 import haw.mmlab.production_line.domain.HelpReply;
 import haw.mmlab.production_line.domain.HelpRequest;
 import haw.mmlab.production_line.logging.database.DatabaseLogger;
+import haw.mmlab.production_line.service.IManagerService;
 import haw.mmlab.production_line.service.IProcessWorkpieceService;
 import haw.mmlab.production_line.service.ProcessWorkpieceService;
 import haw.mmlab.production_line.state.MainState;
@@ -26,7 +27,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -51,7 +51,8 @@ import java.util.logging.Level;
 @Description("Robot agent.")
 @Arguments({ @Argument(clazz = Robot.class, name = "config"), @Argument(clazz = Map.class, name = "taskMap"), @Argument(clazz = IStrategy.class, name = "strategy") })
 @ProvidedServices(@ProvidedService(implementation = @Implementation(ProcessWorkpieceService.class), type = IProcessWorkpieceService.class))
-@RequiredServices({ @RequiredService(name = "processWorkpieceServices", type = IProcessWorkpieceService.class, multiple = true, binding = @Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL)) })
+@RequiredServices({ @RequiredService(name = "processWorkpieceServices", type = IProcessWorkpieceService.class, multiple = true, binding = @Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL)),
+		@RequiredService(name = "managerService", type = IManagerService.class) })
 public class RobotAgent extends ProcessWorkpieceAgent {
 
 	/** The output {@link Buffer} */
@@ -114,6 +115,10 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 	 * @return <code>true</code> if the workpiece could be processed else <code>false</code>
 	 */
 	public boolean receiveWorkpiece(final Workpiece workpiece, String agentId) {
+		if (agentId.equals("Transport18") && this.id.equals("Robot3")) {
+			System.out.println("break here!");
+		}
+
 		if (mainState == MainState.RUNNING_IDLE && this.workpiece == null) {
 			final Role role = getMatchingRole(workpiece, agentId);
 			if (role != null) {
@@ -214,7 +219,7 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 				public void resultAvailable(Collection<IProcessWorkpieceService> services) {
 					for (IProcessWorkpieceService service : services) {
 						final String target = role.getPostcondition().getTargetAgent();
-						if (service.getId().get(new ThreadSuspendable(this)).equals(target)) {
+						if (service.getId().equals(target)) {
 							// Workpiece aus Pufferelement holen
 							final Workpiece wp = element.getWorkpiece();
 

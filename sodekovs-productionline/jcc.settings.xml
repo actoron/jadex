@@ -1,9 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <p0:properties xmlns:p0="http://jadex.sourceforge.net/jadexconf" __ID="0">
 	<p0:properties __ID="1">
-		<p0:property __ID="2" type="perspective">Debugger</p0:property>
-		<p0:property __ID="3" type="consoleenabled">false</p0:property>
-		<p0:property __ID="4" type="consoleheights"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
+		<p0:property __ID="2" type="mainsplit_location">0.29973474801061006</p0:property>
+		<p0:property __ID="3" type="tcsplit_location">0.6993103448275862</p0:property>
+		<type __ID="4">Test Center</type>
+	</p0:properties>
+	<p0:properties __ID="5">
+		<p0:properties __ID="6">
+			<p0:property __ID="7" type="timemode">2</p0:property>
+			<type __ID="8">panelproperties</type>
+		</p0:properties>
+		<type __ID="9">ISimulationService</type>
+	</p0:properties>
+	<p0:properties __ID="10">
+		<p0:properties __ID="11">
+			<p0:property __ID="12" type="gui-refresh">5</p0:property>
+			<type __IDREF="8"></type>
+		</p0:properties>
+		<type __ID="13">Awareness Settings</type>
+	</p0:properties>
+	<p0:properties __ID="14">
+		<p0:property __ID="15" type="perspective">Starter</p0:property>
+		<p0:property __ID="16" type="consoleenabled">false</p0:property>
+		<p0:property __ID="17" type="consoleheights"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
 <p0:HashMap xmlns:p0="typeinfo:java.util" __ID="0">
 	<entries>
 		<entry __ID="1">
@@ -49,31 +68,12 @@
 	</entries>
 </p0:HashMap>
 ]]></p0:property>
-		<type __ID="5">controlcenter</type>
-	</p0:properties>
-	<p0:properties __ID="6">
-		<p0:property __ID="7" type="leftsplit_location">0.6993103448275862</p0:property>
-		<p0:property __ID="8" type="mainsplit_location">0.29973474801061006</p0:property>
-		<type __ID="9">Starter</type>
-	</p0:properties>
-	<p0:properties __ID="10">
-		<p0:property __ID="11" type="mainsplit_location">0.29973474801061006</p0:property>
-		<p0:property __ID="12" type="tcsplit_location">0.6993103448275862</p0:property>
-		<type __ID="13">Test Center</type>
-	</p0:properties>
-	<p0:properties __ID="14">
-		<p0:properties __ID="15">
-			<p0:property __ID="16" type="timemode">2</p0:property>
-			<type __ID="17">panelproperties</type>
-		</p0:properties>
-		<type __ID="18">ISimulationService</type>
+		<type __ID="18">controlcenter</type>
 	</p0:properties>
 	<p0:properties __ID="19">
-		<p0:properties __ID="20">
-			<p0:property __ID="21" type="gui-refresh">5</p0:property>
-			<type __IDREF="17"></type>
-		</p0:properties>
-		<type __ID="22">Awareness Settings</type>
+		<p0:property __ID="20" type="leftsplit_location">0.6993103448275862</p0:property>
+		<p0:property __ID="21" type="mainsplit_location">0.29973474801061006</p0:property>
+		<type __ID="22">Starter</type>
 	</p0:properties>
 	<p0:properties __ID="23">
 		<p0:property __ID="24" type="width">1536</p0:property>

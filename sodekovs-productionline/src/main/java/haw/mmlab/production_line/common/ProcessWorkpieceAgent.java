@@ -14,12 +14,9 @@ import haw.mmlab.production_line.service.IManagerService;
 import haw.mmlab.production_line.state.DeficientState;
 import haw.mmlab.production_line.state.MainState;
 import haw.mmlab.production_line.transport.TransportAgent;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.DefaultResultListener;
 import jadex.micro.MicroAgent;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,14 +27,13 @@ import java.util.logging.Logger;
 
 import deco4mas.coordinate.annotation.CoordinationParameter;
 import deco4mas.coordinate.annotation.CoordinationStep;
+import deco4mas.coordinate.interpreter.agent_state.CoordinationComponentStep;
 
 /**
  * Abstract class which holds all the similarities of workpiece processing agents ({@link RobotAgent} and {@link TransportAgent}).
  * 
  * @author thomas
  */
-// @ProvidedServices(@ProvidedService(implementation = @Implementation(ProcessWorkpieceService.class), type = IProcessWorkpieceService.class))
-@RequiredServices({ @RequiredService(name = "managerService", type = IManagerService.class) })
 public abstract class ProcessWorkpieceAgent extends MicroAgent {
 
 	/** The agents id */
@@ -177,7 +173,7 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 	}
 
 	@CoordinationStep
-	public class SendMediumMessageStep implements IComponentStep {
+	public class SendMediumMessageStep extends CoordinationComponentStep {
 
 		public MediumMessage message = null;
 
@@ -202,7 +198,8 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 		}
 	}
 
-	public class ReceiveMediumMessageStep implements IComponentStep {
+	@CoordinationStep
+	public class ReceiveMediumMessageStep extends CoordinationComponentStep {
 
 		@CoordinationParameter
 		public MediumMessage message = null;

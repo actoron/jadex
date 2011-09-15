@@ -16,14 +16,14 @@ public interface IProcessWorkpieceService {
 	 * 
 	 * @return the services id
 	 */
-	public IFuture<String> getId();
+	public String getId();
 
 	/**
 	 * Get the type of the agent offering this service.
 	 * 
 	 * @return the type of the agent offering this service
 	 */
-	public IFuture<String> getType();
+	public String getType();
 
 	/**
 	 * Processes of the given workpiece.

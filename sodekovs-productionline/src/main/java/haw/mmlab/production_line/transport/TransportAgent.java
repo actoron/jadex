@@ -22,7 +22,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -174,7 +173,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 					for (final IProcessWorkpieceService service : services) {
 						final String target = role.getPostcondition().getTargetAgent();
 
-						if (service.getId().get(new ThreadSuspendable(this)).equals(target)) {
+						if (service.getId().equals(target)) {
 							String msg = id + " tries to send workpieces to " + target;
 							getLogger().fine(msg);
 							handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
@@ -196,7 +195,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 										String msg = id + " has failed to send workpiece to " + target;
 										getLogger().fine(msg);
 										handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-										waitForTick(new RetrySendStep(service, task, role, workpiece));
+										waitForTick(new RetrySendStep(task, role, workpiece));
 									}
 								}
 							});
@@ -216,38 +215,47 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 	 */
 	private class RetrySendStep implements IComponentStep {
 
-		private IProcessWorkpieceService service = null;
 		private Task task = null;
 		private Role role = null;
 		private Workpiece workpiece = null;
 
-		public RetrySendStep(IProcessWorkpieceService service, Task task, Role role, Workpiece workpiece) {
-			this.service = service;
+		public RetrySendStep(Task task, Role role, Workpiece workpiece) {
 			this.task = task;
 			this.role = role;
 			this.workpiece = workpiece;
 		}
 
+		@SuppressWarnings("unchecked")
 		public Object execute(IInternalAccess ia) {
 			final String target = role.getPostcondition().getTargetAgent();
-			service.process(workpiece, id).addResultListener(new DefaultResultListener<Boolean>() {
+			getRequiredServices("processWorkpieceServices").addResultListener(new DefaultResultListener<Collection<IProcessWorkpieceService>>() {
 
-				public void resultAvailable(Boolean result) {
-					if (result) {
-						String msg = id + " has successfully sended workpiece to " + target;
-						getLogger().fine(msg);
-						handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-						if (wpCount.get(task.getId()) != null) {
-							wpCount.put(task.getId(), wpCount.get(task.getId()) + 1);
-						} else {
-							wpCount.put(task.getId(), 1);
+				@Override
+				public void resultAvailable(Collection<IProcessWorkpieceService> services) {
+					for (IProcessWorkpieceService service : services) {
+						if (service.getId().equals(target)) {
+							service.process(workpiece, id).addResultListener(new DefaultResultListener<Boolean>() {
+
+								public void resultAvailable(Boolean result) {
+									if (result) {
+										String msg = id + " has successfully sended workpiece to " + target;
+										getLogger().fine(msg);
+										handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+										if (wpCount.get(task.getId()) != null) {
+											wpCount.put(task.getId(), wpCount.get(task.getId()) + 1);
+										} else {
+											wpCount.put(task.getId(), 1);
+										}
+										waitFor(role.getProcessingTime(), new ProduceStep(role));
+									} else {
+										String msg = id + " has failed to send workpiece to " + target;
+										getLogger().fine(msg);
+										handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+										waitForTick(RetrySendStep.this);
+									}
+								}
+							});
 						}
-						waitFor(role.getProcessingTime(), new ProduceStep(role));
-					} else {
-						String msg = id + " has failed to send workpiece to " + target;
-						getLogger().fine(msg);
-						handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-						waitForTick(RetrySendStep.this);
 					}
 				}
 			});
@@ -337,7 +345,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 				public void resultAvailable(Collection<IProcessWorkpieceService> services) {
 					for (IProcessWorkpieceService service : services) {
 						final String target = role.getPostcondition().getTargetAgent();
-						if (service.getId().get(new ThreadSuspendable(this)).equals(target)) {
+						if (service.getId().equals(target)) {
 							service.process(workpiece, id).addResultListener(new DefaultResultListener<Boolean>() {
 
 								public void resultAvailable(Boolean result) {
@@ -374,6 +382,10 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 	 * @return The role to process the workpiece or <code>null</code>.
 	 */
 	private Role getMatchingRole(Workpiece workpiece, String source) {
+		if (id.equals("Transport27")) {
+			System.out.println("break here");
+		}
+
 		for (Role role : assignedRoles) {
 			Condition preCond = role.getPrecondition();
 			if (taskMap.get(preCond.getTaskId()) != null && taskMap.get(preCond.getTaskId()).equals(workpiece.getTask())) {

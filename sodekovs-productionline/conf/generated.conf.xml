@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <production_line_setup>
-    <error_condition_timeout>600000</error_condition_timeout>
+    <error_condition_timeout>60000</error_condition_timeout>
     <robots>
         <robot id="Robot1">
             <capabilities>
                 <capability id="A"/>
                 <capability id="B"/>
                 <capability id="C"/>
-                <capability id="E"/>
-                <capability id="D"/>
+                <capability id="H"/>
+                <capability id="G"/>
             </capabilities>
             <input>Producer1</input>
             <output>Robot4</output>
@@ -27,7 +27,7 @@
                         <target_agent>Producer1</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>315</processingtime>
+                    <processingtime>181</processingtime>
                 </role>
                 <role>
                     <capability id="B"/>
@@ -62,7 +62,7 @@
                         <target_agent>Transport9</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>252</processingtime>
+                    <processingtime>365</processingtime>
                 </role>
                 <role>
                     <capability id="A"/>
@@ -78,7 +78,7 @@
                         <target_agent>Producer2</target_agent>
                         <task_id>2</task_id>
                     </precondition>
-                    <processingtime>250</processingtime>
+                    <processingtime>400</processingtime>
                 </role>
                 <role>
                     <capability id="C"/>
@@ -105,7 +105,7 @@
                         <target_agent>Transport21</target_agent>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>257</processingtime>
+                    <processingtime>303</processingtime>
                 </role>
                 <role>
                     <capability id="C"/>
@@ -132,18 +132,18 @@
                         <target_agent>Transport30</target_agent>
                         <task_id>4</task_id>
                     </precondition>
-                    <processingtime>393</processingtime>
+                    <processingtime>258</processingtime>
                 </role>
             </roles>
-            <buffer_size>6</buffer_size>
+            <buffer_size>8</buffer_size>
         </robot>
         <robot id="Robot4">
             <capabilities>
                 <capability id="D"/>
                 <capability id="I"/>
-                <capability id="C"/>
                 <capability id="A"/>
                 <capability id="G"/>
+                <capability id="C"/>
             </capabilities>
             <input>Robot1</input>
             <output>Robot5</output>
@@ -169,7 +169,7 @@
                         <target_agent>Transport3</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>291</processingtime>
+                    <processingtime>235</processingtime>
                 </role>
                 <role>
                     <capability id="D"/>
@@ -194,7 +194,7 @@
                         <target_agent>Transport13</target_agent>
                         <task_id>2</task_id>
                     </precondition>
-                    <processingtime>362</processingtime>
+                    <processingtime>347</processingtime>
                 </role>
                 <role>
                     <capability id="I"/>
@@ -225,7 +225,7 @@
                         <target_agent>Transport16</target_agent>
                         <task_id>2</task_id>
                     </precondition>
-                    <processingtime>165</processingtime>
+                    <processingtime>243</processingtime>
                 </role>
                 <role>
                     <capability id="I"/>
@@ -241,7 +241,7 @@
                         <target_agent>Producer3</target_agent>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>174</processingtime>
+                    <processingtime>238</processingtime>
                 </role>
                 <role>
                     <capability id="D"/>
@@ -260,7 +260,7 @@
                         <target_agent>Transport17</target_agent>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>272</processingtime>
+                    <processingtime>379</processingtime>
                 </role>
                 <role>
                     <capability id="D"/>
@@ -285,18 +285,18 @@
                         <target_agent>Transport20</target_agent>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>350</processingtime>
+                    <processingtime>218</processingtime>
                 </role>
             </roles>
-            <buffer_size>6</buffer_size>
+            <buffer_size>8</buffer_size>
         </robot>
         <robot id="Robot5">
             <capabilities>
                 <capability id="B"/>
                 <capability id="E"/>
                 <capability id="D"/>
-                <capability id="C"/>
                 <capability id="G"/>
+                <capability id="A"/>
             </capabilities>
             <input>Robot4</input>
             <output>Robot2</output>
@@ -328,7 +328,7 @@
                         <target_agent>Transport6</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>341</processingtime>
+                    <processingtime>400</processingtime>
                 </role>
                 <role>
                     <capability id="E"/>
@@ -359,7 +359,7 @@
                         <target_agent>Transport7</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>162</processingtime>
+                    <processingtime>313</processingtime>
                 </role>
                 <role>
                     <capability id="E"/>
@@ -386,7 +386,7 @@
                         <target_agent>Transport14</target_agent>
                         <task_id>2</task_id>
                     </precondition>
-                    <processingtime>231</processingtime>
+                    <processingtime>321</processingtime>
                 </role>
                 <role>
                     <capability id="E"/>
@@ -415,7 +415,7 @@
                         <target_agent>Transport22</target_agent>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>393</processingtime>
+                    <processingtime>158</processingtime>
                 </role>
                 <role>
                     <capability id="B"/>
@@ -448,7 +448,7 @@
                         <target_agent>Transport24</target_agent>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>323</processingtime>
+                    <processingtime>298</processingtime>
                 </role>
                 <role>
                     <capability id="D"/>
@@ -473,7 +473,7 @@
                         <target_agent>Transport29</target_agent>
                         <task_id>4</task_id>
                     </precondition>
-                    <processingtime>259</processingtime>
+                    <processingtime>287</processingtime>
                 </role>
                 <role>
                     <capability id="E"/>
@@ -506,17 +506,17 @@
                         <target_agent>Transport33</target_agent>
                         <task_id>4</task_id>
                     </precondition>
-                    <processingtime>164</processingtime>
+                    <processingtime>166</processingtime>
                 </role>
             </roles>
-            <buffer_size>7</buffer_size>
+            <buffer_size>8</buffer_size>
         </robot>
         <robot id="Robot2">
             <capabilities>
                 <capability id="B"/>
                 <capability id="C"/>
                 <capability id="E"/>
-                <capability id="A"/>
+                <capability id="G"/>
                 <capability id="H"/>
             </capabilities>
             <input>Robot5</input>
@@ -539,7 +539,7 @@
                         <target_agent>Transport1</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>337</processingtime>
+                    <processingtime>376</processingtime>
                 </role>
                 <role>
                     <capability id="C"/>
@@ -560,7 +560,7 @@
                         <target_agent>Transport2</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>329</processingtime>
+                    <processingtime>191</processingtime>
                 </role>
                 <role>
                     <capability id="E"/>
@@ -579,7 +579,7 @@
                         <target_agent>Transport10</target_agent>
                         <task_id>2</task_id>
                     </precondition>
-                    <processingtime>186</processingtime>
+                    <processingtime>251</processingtime>
                 </role>
                 <role>
                     <capability id="C"/>
@@ -602,7 +602,7 @@
                         <target_agent>Transport19</target_agent>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>239</processingtime>
+                    <processingtime>330</processingtime>
                 </role>
                 <role>
                     <capability id="C"/>
@@ -637,7 +637,7 @@
                         <target_agent>Transport25</target_agent>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>239</processingtime>
+                    <processingtime>235</processingtime>
                 </role>
                 <role>
                     <capability id="E"/>
@@ -653,7 +653,7 @@
                         <target_agent>Producer4</target_agent>
                         <task_id>4</task_id>
                     </precondition>
-                    <processingtime>155</processingtime>
+                    <processingtime>375</processingtime>
                 </role>
                 <role>
                     <capability id="C"/>
@@ -676,18 +676,18 @@
                         <target_agent>Transport28</target_agent>
                         <task_id>4</task_id>
                     </precondition>
-                    <processingtime>349</processingtime>
+                    <processingtime>383</processingtime>
                 </role>
             </roles>
-            <buffer_size>7</buffer_size>
+            <buffer_size>8</buffer_size>
         </robot>
         <robot id="Robot3">
             <capabilities>
                 <capability id="C"/>
                 <capability id="H"/>
                 <capability id="A"/>
+                <capability id="E"/>
                 <capability id="G"/>
-                <capability id="I"/>
             </capabilities>
             <input>Robot2</input>
             <output>Robot6</output>
@@ -715,7 +715,7 @@
                         <target_agent>Transport4</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>400</processingtime>
+                    <processingtime>264</processingtime>
                 </role>
                 <role>
                     <capability id="C"/>
@@ -742,7 +742,7 @@
                         <target_agent>Transport5</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>259</processingtime>
+                    <processingtime>378</processingtime>
                 </role>
                 <role>
                     <capability id="H"/>
@@ -763,7 +763,7 @@
                         <target_agent>Transport11</target_agent>
                         <task_id>2</task_id>
                     </precondition>
-                    <processingtime>360</processingtime>
+                    <processingtime>248</processingtime>
                 </role>
                 <role>
                     <capability id="C"/>
@@ -786,7 +786,7 @@
                         <target_agent>Transport12</target_agent>
                         <task_id>2</task_id>
                     </precondition>
-                    <processingtime>300</processingtime>
+                    <processingtime>254</processingtime>
                 </role>
                 <role>
                     <capability id="C"/>
@@ -805,7 +805,7 @@
                         <target_agent>Transport26</target_agent>
                         <task_id>4</task_id>
                     </precondition>
-                    <processingtime>169</processingtime>
+                    <processingtime>355</processingtime>
                 </role>
                 <role>
                     <capability id="A"/>
@@ -836,18 +836,18 @@
                         <target_agent>Transport32</target_agent>
                         <task_id>4</task_id>
                     </precondition>
-                    <processingtime>244</processingtime>
+                    <processingtime>393</processingtime>
                 </role>
             </roles>
-            <buffer_size>6</buffer_size>
+            <buffer_size>8</buffer_size>
         </robot>
         <robot id="Robot6">
             <capabilities>
                 <capability id="G"/>
                 <capability id="E"/>
                 <capability id="H"/>
-                <capability id="C"/>
-                <capability id="B"/>
+                <capability id="I"/>
+                <capability id="A"/>
             </capabilities>
             <input>Robot3</input>
             <output>Transport19</output>
@@ -883,7 +883,7 @@
                         <target_agent>Transport8</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>380</processingtime>
+                    <processingtime>162</processingtime>
                 </role>
                 <role>
                     <capability id="G"/>
@@ -912,7 +912,7 @@
                         <target_agent>Transport15</target_agent>
                         <task_id>2</task_id>
                     </precondition>
-                    <processingtime>310</processingtime>
+                    <processingtime>217</processingtime>
                 </role>
                 <role>
                     <capability id="E"/>
@@ -933,7 +933,7 @@
                         <target_agent>Transport18</target_agent>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>360</processingtime>
+                    <processingtime>363</processingtime>
                 </role>
                 <role>
                     <capability id="H"/>
@@ -964,7 +964,7 @@
                         <target_agent>Transport23</target_agent>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>287</processingtime>
+                    <processingtime>260</processingtime>
                 </role>
                 <role>
                     <capability id="E"/>
@@ -985,7 +985,7 @@
                         <target_agent>Transport27</target_agent>
                         <task_id>4</task_id>
                     </precondition>
-                    <processingtime>213</processingtime>
+                    <processingtime>351</processingtime>
                 </role>
                 <role>
                     <capability id="H"/>
@@ -1014,15 +1014,15 @@
                         <target_agent>Transport31</target_agent>
                         <task_id>4</task_id>
                     </precondition>
-                    <processingtime>241</processingtime>
+                    <processingtime>187</processingtime>
                 </role>
             </roles>
-            <buffer_size>6</buffer_size>
+            <buffer_size>8</buffer_size>
         </robot>
     </robots>
     <run_count>1</run_count>
     <tasks>
-        <task max_workpiece_count="100" id="1">
+        <task max_workpiece_count="20" id="1">
             <operations>
                 <operation id="A"/>
                 <operation id="B"/>
@@ -1036,7 +1036,7 @@
                 <operation id="B"/>
             </operations>
         </task>
-        <task max_workpiece_count="100" id="2">
+        <task max_workpiece_count="20" id="2">
             <operations>
                 <operation id="A"/>
                 <operation id="E"/>
@@ -1048,7 +1048,7 @@
                 <operation id="I"/>
             </operations>
         </task>
-        <task max_workpiece_count="100" id="3">
+        <task max_workpiece_count="20" id="3">
             <operations>
                 <operation id="I"/>
                 <operation id="D"/>
@@ -1062,7 +1062,7 @@
                 <operation id="C"/>
             </operations>
         </task>
-        <task max_workpiece_count="100" id="4">
+        <task max_workpiece_count="20" id="4">
             <operations>
                 <operation id="E"/>
                 <operation id="C"/>
@@ -1101,7 +1101,7 @@
                         <target_agent>Robot6</target_agent>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>158</processingtime>
+                    <processingtime>389</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1127,7 +1127,7 @@
                         <target_agent>Robot4</target_agent>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>278</processingtime>
+                    <processingtime>192</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1168,7 +1168,7 @@
                         <target_agent>Robot1</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>214</processingtime>
+                    <processingtime>347</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1187,7 +1187,7 @@
                         <states/>
                         <task_id>4</task_id>
                     </precondition>
-                    <processingtime>264</processingtime>
+                    <processingtime>219</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1224,7 +1224,7 @@
                         <target_agent>Robot4</target_agent>
                         <task_id>2</task_id>
                     </precondition>
-                    <processingtime>355</processingtime>
+                    <processingtime>314</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1265,7 +1265,7 @@
                         <target_agent>Robot2</target_agent>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>269</processingtime>
+                    <processingtime>207</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1304,7 +1304,7 @@
                         <target_agent>Robot5</target_agent>
                         <task_id>4</task_id>
                     </precondition>
-                    <processingtime>346</processingtime>
+                    <processingtime>274</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1342,7 +1342,7 @@
                         <target_agent>Robot3</target_agent>
                         <task_id>4</task_id>
                     </precondition>
-                    <processingtime>295</processingtime>
+                    <processingtime>161</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1361,7 +1361,7 @@
                         <states/>
                         <task_id>2</task_id>
                     </precondition>
-                    <processingtime>206</processingtime>
+                    <processingtime>154</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1397,7 +1397,7 @@
                         <target_agent>Robot6</target_agent>
                         <task_id>4</task_id>
                     </precondition>
-                    <processingtime>158</processingtime>
+                    <processingtime>152</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1416,7 +1416,7 @@
                         <states/>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>191</processingtime>
+                    <processingtime>223</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1450,7 +1450,7 @@
                         <target_agent>Robot1</target_agent>
                         <task_id>4</task_id>
                     </precondition>
-                    <processingtime>150</processingtime>
+                    <processingtime>276</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1482,7 +1482,7 @@
                         <target_agent>Robot5</target_agent>
                         <task_id>4</task_id>
                     </precondition>
-                    <processingtime>168</processingtime>
+                    <processingtime>231</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1522,7 +1522,7 @@
                         <target_agent>Robot6</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>309</processingtime>
+                    <processingtime>225</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1546,7 +1546,7 @@
                         <target_agent>Robot1</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>188</processingtime>
+                    <processingtime>338</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1572,7 +1572,7 @@
                         <target_agent>Robot2</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>284</processingtime>
+                    <processingtime>346</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1600,7 +1600,7 @@
                         <target_agent>Robot2</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>256</processingtime>
+                    <processingtime>381</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1630,7 +1630,7 @@
                         <target_agent>Robot4</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>204</processingtime>
+                    <processingtime>286</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1662,7 +1662,7 @@
                         <target_agent>Robot3</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>279</processingtime>
+                    <processingtime>330</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1696,7 +1696,7 @@
                         <target_agent>Robot3</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>381</processingtime>
+                    <processingtime>189</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1732,7 +1732,7 @@
                         <target_agent>Robot5</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>322</processingtime>
+                    <processingtime>232</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1770,7 +1770,7 @@
                         <target_agent>Robot5</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>230</processingtime>
+                    <processingtime>284</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1794,7 +1794,7 @@
                         <target_agent>Robot1</target_agent>
                         <task_id>2</task_id>
                     </precondition>
-                    <processingtime>298</processingtime>
+                    <processingtime>267</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1820,7 +1820,7 @@
                         <target_agent>Robot2</target_agent>
                         <task_id>2</task_id>
                     </precondition>
-                    <processingtime>169</processingtime>
+                    <processingtime>343</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1848,7 +1848,7 @@
                         <target_agent>Robot3</target_agent>
                         <task_id>2</task_id>
                     </precondition>
-                    <processingtime>290</processingtime>
+                    <processingtime>283</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1878,7 +1878,7 @@
                         <target_agent>Robot3</target_agent>
                         <task_id>2</task_id>
                     </precondition>
-                    <processingtime>183</processingtime>
+                    <processingtime>334</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1910,7 +1910,7 @@
                         <target_agent>Robot4</target_agent>
                         <task_id>2</task_id>
                     </precondition>
-                    <processingtime>210</processingtime>
+                    <processingtime>397</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1944,7 +1944,7 @@
                         <target_agent>Robot5</target_agent>
                         <task_id>2</task_id>
                     </precondition>
-                    <processingtime>298</processingtime>
+                    <processingtime>230</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1980,7 +1980,7 @@
                         <target_agent>Robot6</target_agent>
                         <task_id>2</task_id>
                     </precondition>
-                    <processingtime>197</processingtime>
+                    <processingtime>271</processingtime>
                 </role>
             </roles>
         </transport>
@@ -2004,7 +2004,7 @@
                         <target_agent>Robot4</target_agent>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>272</processingtime>
+                    <processingtime>150</processingtime>
                 </role>
             </roles>
         </transport>
@@ -2028,7 +2028,7 @@
                         <target_agent>Robot2</target_agent>
                         <task_id>4</task_id>
                     </precondition>
-                    <processingtime>245</processingtime>
+                    <processingtime>286</processingtime>
                 </role>
             </roles>
         </transport>
@@ -2068,7 +2068,7 @@
                         <target_agent>Robot5</target_agent>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>153</processingtime>
+                    <processingtime>388</processingtime>
                 </role>
             </roles>
         </transport>
@@ -2096,7 +2096,7 @@
                         <target_agent>Robot6</target_agent>
                         <task_id>4</task_id>
                     </precondition>
-                    <processingtime>247</processingtime>
+                    <processingtime>255</processingtime>
                 </role>
             </roles>
         </transport>
@@ -2122,7 +2122,7 @@
                         <target_agent>Robot3</target_agent>
                         <task_id>4</task_id>
                     </precondition>
-                    <processingtime>320</processingtime>
+                    <processingtime>246</processingtime>
                 </role>
             </roles>
         </transport>
@@ -2156,7 +2156,7 @@
                         <target_agent>Robot1</target_agent>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>198</processingtime>
+                    <processingtime>262</processingtime>
                 </role>
             </roles>
         </transport>
@@ -2188,7 +2188,7 @@
                         <target_agent>Robot4</target_agent>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>193</processingtime>
+                    <processingtime>387</processingtime>
                 </role>
             </roles>
         </transport>
@@ -2226,7 +2226,7 @@
                         <target_agent>Robot6</target_agent>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>183</processingtime>
+                    <processingtime>237</processingtime>
                 </role>
             </roles>
         </transport>
@@ -2262,7 +2262,7 @@
                         <target_agent>Robot5</target_agent>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>354</processingtime>
+                    <processingtime>376</processingtime>
                 </role>
             </roles>
         </transport>
@@ -2292,7 +2292,7 @@
                         <target_agent>Robot2</target_agent>
                         <task_id>3</task_id>
                     </precondition>
-                    <processingtime>191</processingtime>
+                    <processingtime>251</processingtime>
                 </role>
             </roles>
         </transport>
@@ -2322,7 +2322,7 @@
                         <target_agent>Robot2</target_agent>
                         <task_id>4</task_id>
                     </precondition>
-                    <processingtime>276</processingtime>
+                    <processingtime>229</processingtime>
                 </role>
             </roles>
         </transport>
@@ -2341,7 +2341,7 @@
                         <states/>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>344</processingtime>
+                    <processingtime>205</processingtime>
                 </role>
             </roles>
         </transport>
