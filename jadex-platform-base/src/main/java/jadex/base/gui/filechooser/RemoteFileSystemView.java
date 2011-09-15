@@ -189,6 +189,7 @@ public class RemoteFileSystemView extends FileSystemView
 		}
 		else
 		{
+			System.out.println("normal file:" +f.getName());
 			return super.getSystemDisplayName(f);
 		}
 	}
@@ -627,6 +628,7 @@ public class RemoteFileSystemView extends FileSystemView
 					{
 						FileSystemView view = FileSystemView.getFileSystemView();
 						files = view.getFiles(dir, useFileHiding);
+						System.out.println("children: "+dir+" "+SUtil.arrayToString(files));
 					}
 					else
 					{
@@ -651,6 +653,10 @@ public class RemoteFileSystemView extends FileSystemView
 						chooser.rescanCurrentDirectory();
 				}
 			});
+		}
+		else
+		{
+			System.out.println("cached children: "+dir+" "+SUtil.arrayToString(ret));
 		}
 
 		return ret==null? new File[0]: ret;

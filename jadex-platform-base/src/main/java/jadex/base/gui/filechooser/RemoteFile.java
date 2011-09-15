@@ -48,6 +48,7 @@ public class RemoteFile extends File
 	 */
 	public boolean isDirectory()
 	{
+		System.out.println("isDir: "+getName()+" "+filedata.isDirectory());
 		return filedata.isDirectory();
 	}
 	
@@ -192,6 +193,7 @@ public class RemoteFile extends File
     {
     	return this;
     }
+   
     
 //    public boolean canRead() 
 //    {
