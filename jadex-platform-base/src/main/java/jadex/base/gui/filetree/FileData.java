@@ -4,6 +4,7 @@ import jadex.base.gui.filechooser.RemoteFile;
 import jadex.commons.SUtil;
 
 import java.io.File;
+import java.lang.reflect.Field;
 
 /* $if !android $ */
 import javax.swing.filechooser.FileSystemView;
@@ -36,6 +37,9 @@ public class FileData
 	
 	/** The separator char. */
 	protected char separator;
+
+	/** The prefix length. */
+	protected int prefix;
 	
 	//-------- constructors --------
 
@@ -51,7 +55,7 @@ public class FileData
 	 *  Create a new remote file.
 	 */
 	public FileData(String filename, String path, boolean directory, 
-		String displayname, long lastmodified, char separator)
+		String displayname, long lastmodified, char separator, int prefix)
 	{
 		this.filename = filename;
 		this.path = path;
@@ -59,6 +63,7 @@ public class FileData
 		this.displayname = displayname;
 		this.lastmodified = lastmodified;
 		this.separator = separator;
+		this.prefix = prefix;
 	}
 	
 	/**
@@ -76,6 +81,7 @@ public class FileData
 		/* $endif $ */
 //		this.root = SUtil.arrayToSet(file.listRoots()).contains(file);
 		this.separator = file.separatorChar;
+		this.prefix = getPrefixLength(file);
 	}
 	
 	//-------- methods --------
@@ -231,6 +237,24 @@ public class FileData
 	{
 		this.separator = separator;
 	}
+	
+	/**
+	 *  Get the prefix.
+	 *  @return the prefix.
+	 */
+	public int getPrefixLength()
+	{
+		return prefix;
+	}
+
+	/**
+	 *  Set the prefix.
+	 *  @param prefix The prefix to set.
+	 */
+	public void setPrefixLength(int prefix)
+	{
+		this.prefix = prefix;
+	}
 
 	/**
 	 *  Get the string representation.
@@ -242,5 +266,21 @@ public class FileData
 			+ ", directory=" + directory + ", displayname=" + displayname+ ")";
 	}
 	
+	/**
+	 *  Get the prefix length of a file.
+	 */
+	public static int getPrefixLength(File file)
+	{
+		try
+		{
+			Field pl = file.getClass().getField("prefixLength");
+			pl.setAccessible(true);
+			return ((Integer)pl.get(file)).intValue();
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
 	
 }

@@ -501,7 +501,7 @@ public class RemoteFileSystemView extends FileSystemView
 			});
 		}
 		
-		return homedir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown", 0, File.separatorChar)): homedir;
+		return homedir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown", 0, File.separatorChar, 3)): homedir;
 	}
 
 	/**
@@ -539,7 +539,7 @@ public class RemoteFileSystemView extends FileSystemView
 			});
 		}
 		
-		return currentdir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown", 0, File.separatorChar)): currentdir;
+		return currentdir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown", 0, File.separatorChar, 3)): currentdir;
 	}
 	
 	/**
@@ -578,7 +578,7 @@ public class RemoteFileSystemView extends FileSystemView
 			});
 		}
 		
-		return defaultdir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown", 0, File.separatorChar)): defaultdir;
+		return defaultdir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown", 0, File.separatorChar, 3)): defaultdir;
 	}
 
 	/**

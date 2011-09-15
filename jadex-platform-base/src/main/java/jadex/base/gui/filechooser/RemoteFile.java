@@ -118,18 +118,29 @@ public class RemoteFile extends File
     public String getParent() 
     {
     	String ret = null;
-    	String oldpath = getPath();
-    	if(oldpath!=null)
+    	int index = getPath().lastIndexOf(filedata.getSeparatorChar());
+    	if(index < filedata.getPrefixLength()) 
     	{
-      		int findex = oldpath.indexOf(filedata.getSeparatorChar(), 1);
-      		int lindex = oldpath.lastIndexOf(filedata.getSeparatorChar());
-      		if(findex!=-1 && lindex!=0 && lindex!=oldpath.length()-1)
-    		{
-      			boolean last = findex==lindex || findex==lindex+1;
-    			ret = oldpath.substring(0, last? lindex+1: lindex);
-    		}
+    	    if((filedata.getPrefixLength() > 0) && (getPath().length() > filedata.getPrefixLength()))
+    	    	ret =  getPath().substring(0, filedata.getPrefixLength());
     	}
-    	System.out.println("getPa: "+oldpath+" "+ret);
+    	
+//    	return path.substring(0, index);
+//    	super.getParent()
+//    	String ret = null;
+//    	String oldpath = getPath();
+//    	if(oldpath!=null)
+//    	{
+//      		int findex = oldpath.indexOf(filedata.getSeparatorChar(), 1);
+//      		int lindex = oldpath.lastIndexOf(filedata.getSeparatorChar());
+//      		if(findex!=-1 && lindex!=0 && lindex!=oldpath.length()-1)
+//    		{
+//      			boolean last = findex==lindex || findex==lindex+1;
+//    			ret = oldpath.substring(0, last? lindex+1: lindex);
+//    		}
+//    	}
+    	
+    	System.out.println("getPa: "+getPath()+" "+ret);
     	return ret;
     }
 
@@ -138,6 +149,10 @@ public class RemoteFile extends File
      */
     public File getParentFile() 
     {
+//    	String p = this.getParent();
+//    	if(p == null) return null;
+//    	return new File(p, this.prefixLength);
+    	
     	RemoteFile ret = null;
     	
     	String pa = getParent();
@@ -151,7 +166,8 @@ public class RemoteFile extends File
     		{
     			name = pa.substring(lindex+1);
     		}
-    		ret = new RemoteFile(new FileData(name, path, true, name, filedata.getLastModified(), filedata.getSeparatorChar()));
+    		ret = new RemoteFile(new FileData(name, path, true, name, filedata.getLastModified(), 
+    			filedata.getSeparatorChar(), filedata.getPrefixLength()));
     	}
     	System.out.println("getPaF: "+getPath()+" "+pa);
     	return ret;
