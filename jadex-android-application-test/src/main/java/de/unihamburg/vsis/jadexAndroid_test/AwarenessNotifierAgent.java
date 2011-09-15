@@ -230,7 +230,7 @@ public class AwarenessNotifierAgent extends MicroAgent implements
 	 * @param infos
 	 *            The infos.
 	 */
-	public IFuture addAwarenessInfo(AwarenessInfo info) {
+	public IFuture<Boolean> addAwarenessInfo(AwarenessInfo info) {
 		// Return if inital discovery.
 		boolean ret = false;
 
@@ -293,7 +293,7 @@ public class AwarenessNotifierAgent extends MicroAgent implements
 			}
 		}
 
-		return new Future(ret);
+		return new Future<Boolean>(ret);
 	}
 
 	// /**
