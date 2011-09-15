@@ -273,7 +273,7 @@ public class FileData
 	{
 		try
 		{
-			Field pl = file.getClass().getField("prefixLength");
+			Field pl = File.class.getField("prefixLength");
 			pl.setAccessible(true);
 			return ((Integer)pl.get(file)).intValue();
 		}
