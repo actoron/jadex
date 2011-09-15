@@ -19,7 +19,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_wZApp56zEeCFndhRlqCkxg" iD="_wZAppp6zEeCFndhRlqCkxg" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_wZApqZ6zEeCFndhRlqCkxg" iD="_wZApqJ6zEeCFndhRlqCkxg" outgoingEdges="_zMSCiJ6zEeCFndhRlqCkxg" incomingEdges="_ykHPQZ6zEeCFndhRlqCkxg" name="Planung" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_IFOT8J87EeCy3vgwd892HA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IFO7AJ87EeCy3vgwd892HA" key="class" value="jadex.simulation.analysis.process.analyse.tasks.AllgemeinPlanenTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IFO7AJ87EeCy3vgwd892HA" key="class" value="jadex.simulation.analysis.process.analyse.tasks.GeneralPlanningTask"/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_IapxYJ87EeCy3vgwd892HA" source="jadex_parameters_table">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BhuOoMRyEeC9CpdGXeYTdw" key="dimension" value="1:4"/>
@@ -34,7 +34,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_x52xUZ6zEeCFndhRlqCkxg" iD="_x52xUJ6zEeCFndhRlqCkxg" outgoingEdges="_ykHPQZ6zEeCFndhRlqCkxg" activityType="EventStartEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_zMIRgZ6zEeCFndhRlqCkxg" iD="_zMIRgJ6zEeCFndhRlqCkxg" outgoingEdges="_06X8Cp6zEeCFndhRlqCkxg" incomingEdges="_zMSCiJ6zEeCFndhRlqCkxg" name="Ausführung" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_LlmqcJ87EeCy3vgwd892HA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LlnRgJ87EeCy3vgwd892HA" key="class" value="jadex.simulation.analysis.process.analyse.tasks.AllgemeinAusfuehrenTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LlnRgJ87EeCy3vgwd892HA" key="class" value="jadex.simulation.analysis.process.analyse.tasks.GeneralExecuteTask"/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_6SKO4J9JEeCy3vgwd892HA" source="jadex_parameters_table">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6SKO4Z9JEeCy3vgwd892HA" key="dimension" value="1:4"/>

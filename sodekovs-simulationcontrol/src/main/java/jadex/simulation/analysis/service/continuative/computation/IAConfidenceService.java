@@ -2,6 +2,7 @@ package jadex.simulation.analysis.service.continuative.computation;
 
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.parameter.IASummaryParameter;
+import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisService;
 import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisSessionService;
 
 /**
@@ -9,7 +10,7 @@ import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisS
  * 
  * @author 5Haubeck
  */
-public interface IAConfidenceService extends IAnalysisSessionService
+public interface IAConfidenceService extends IAnalysisService
 {
 	/**
 	 * Compute a confidence interval for given parameters and probability

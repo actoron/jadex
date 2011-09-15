@@ -7,7 +7,7 @@ import jadex.simulation.analysis.common.superClasses.service.view.session.IASess
 import java.util.UUID;
 
 /**
- * A Task with Sessions
+ * A Service with Sessions
  * @author 5Haubeck
  *
  */

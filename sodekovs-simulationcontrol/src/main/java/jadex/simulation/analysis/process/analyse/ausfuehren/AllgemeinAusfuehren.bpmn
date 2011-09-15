@@ -27,7 +27,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_N4kS8Z84EeCy3vgwd892HA" iD="_N4kS8J84EeCy3vgwd892HA" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_N4k6AZ84EeCy3vgwd892HA" iD="_N4k6AJ84EeCy3vgwd892HA" outgoingEdges="_kZ3PAaJAEeCu4oQG190uRw" incomingEdges="_g9YhEaJAEeCu4oQG190uRw" name="Experimente simulieren" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_RRFG4J84EeCy3vgwd892HA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_RRFG4Z84EeCy3vgwd892HA" key="class" value="jadex.simulation.analysis.process.analyse.ausfuehren.tasks.AExperimentAusfuehrenTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_RRFG4Z84EeCy3vgwd892HA" key="class" value="jadex.simulation.analysis.process.analyse.ausfuehren.tasks.AExecuteExperimentTask"/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Rw5PYJ84EeCy3vgwd892HA" source="jadex_parameters_table">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_f3uiAJ9KEeCy3vgwd892HA" key="dimension" value="1:4"/>
@@ -43,7 +43,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_UrmF8Z84EeCy3vgwd892HA" iD="_UrmF8J84EeCy3vgwd892HA" incomingEdges="_xJJlEaJAEeCu4oQG190uRw" activityType="EventEndEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_dVvsAaJAEeCu4oQG190uRw" iD="_dVvsAKJAEeCu4oQG190uRw" outgoingEdges="_g9YhEaJAEeCu4oQG190uRw" incomingEdges="_dV5dCKJAEeCu4oQG190uRw _1-mREaJAEeCu4oQG190uRw" name="Experimente verteilen" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_zFIWUKJQEeCu4oQG190uRw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zFIWUaJQEeCu4oQG190uRw" key="class" value="jadex.simulation.analysis.process.analyse.ausfuehren.tasks.AVerteilungTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zFIWUaJQEeCu4oQG190uRw" key="class" value="jadex.simulation.analysis.process.analyse.ausfuehren.tasks.AAllocateTask"/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_zUJpwKJQEeCu4oQG190uRw" source="jadex_parameters_table">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4SZBMKJXEeCu4oQG190uRw" key="dimension" value="1:4"/>
@@ -57,7 +57,7 @@
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_kZuFEaJAEeCu4oQG190uRw" iD="_kZuFEKJAEeCu4oQG190uRw" outgoingEdges="_nGl7CqJAEeCu4oQG190uRw" incomingEdges="_kZ3PAaJAEeCu4oQG190uRw" name="Experimente speichern" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_mxk10KJXEeCu4oQG190uRw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mxk10aJXEeCu4oQG190uRw" key="class" value="jadex.simulation.analysis.process.analyse.ausfuehren.tasks.ASeichernTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mxk10aJXEeCu4oQG190uRw" key="class" value="jadex.simulation.analysis.process.analyse.ausfuehren.tasks.ASaveTask"/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_m9Uy0KJXEeCu4oQG190uRw" source="jadex_parameters_table">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_m9Uy0aJXEeCu4oQG190uRw" key="dimension" value="1:4"/>
@@ -71,7 +71,7 @@
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_nGl7AaJAEeCu4oQG190uRw" iD="_nGl7AKJAEeCu4oQG190uRw" outgoingEdges="_w0UkkaJAEeCu4oQG190uRw" incomingEdges="_nGl7CqJAEeCu4oQG190uRw" name="Sicherheiten berechen" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ozJsAKJXEeCu4oQG190uRw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ozJsAaJXEeCu4oQG190uRw" key="class" value="jadex.simulation.analysis.process.analyse.ausfuehren.tasks.AKonfidenzTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ozJsAaJXEeCu4oQG190uRw" key="class" value="jadex.simulation.analysis.process.analyse.ausfuehren.tasks.AConfidenceTask"/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_LDeOsKJlEeCu4oQG190uRw" source="jadex_parameters_table">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LDeOsaJlEeCu4oQG190uRw" key="dimension" value="2:4"/>

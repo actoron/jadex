@@ -13,7 +13,7 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-import jadex.simulation.analysis.common.defaultViews.controlComponent.ComponentServiceViewerPanel;
+import jadex.simulation.analysis.common.util.controlComponentJadexPanel.ComponentServiceViewerPanel;
 import jadex.simulation.analysis.service.continuative.computation.IAConfidenceService;
 import jadex.simulation.analysis.service.highLevel.IAGeneralExecuteService;
 import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
@@ -23,7 +23,7 @@ import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimen
  */
 @Description("Agent just test the IAGeneralExecuteService")
  @ProvidedServices({@ProvidedService(type=IAGeneralExecuteService.class,
- implementation=@Implementation(expression="new AAllgemeinAusfuehrenService($component.getExternalAccess())"))})
+ implementation=@Implementation(expression="new AGeneralExecuteService($component.getExternalAccess())"))})
  @RequiredServices({
 	@RequiredService(name="experimentService", type=IAExecuteExperimentsService.class),
 	@RequiredService(name="KonfidenzServices", type=IAConfidenceService.class,  binding=@Binding(create=true, componentfilename="jadex/simulation/analysis/process/analyse/ausfuehren/AllgemeinAusfuehren.bpmn", scope=RequiredServiceInfo.SCOPE_PLATFORM)),
@@ -32,7 +32,7 @@ import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimen
 @GuiClass(ComponentServiceViewerPanel.class)
 @Properties(
 {
-	@NameValue(name="viewerpanel.componentviewerclass", value="\"jadex.simulation.analysis.common.defaultViews.controlComponent.ControlComponentViewerPanel\"")
+	@NameValue(name="viewerpanel.componentviewerclass", value="\"jadex.simulation.analysis.common.util.controlComponentJadexPanel.ControlComponentViewerPanel\"")
 })
-public class AllgemeinAusfuehrenAgent extends MicroAgent
+public class GeneralExecuteAgent extends MicroAgent
 {}

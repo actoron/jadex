@@ -34,7 +34,7 @@ public class ABasicAnalysisSessionService extends ABasicAnalysisService implemen
 			sessions = Collections.synchronizedMap(new HashMap<UUID, IAParameterEnsemble>());
 			sessionViews = Collections.synchronizedMap(new HashMap<UUID, IASessionView>());
 			Map prop = getPropertyMap();
-			prop.put(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, "jadex.simulation.analysis.common.superclasses.service.view.session.SessionServiceViewerPanel");
+			prop.put(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, "jadex.simulation.analysis.common.superClasses.service.view.session.SessionServiceViewerPanel");
 			setPropertyMap(prop);
 		}
 	}
@@ -83,5 +83,17 @@ public class ABasicAnalysisSessionService extends ABasicAnalysisService implemen
 	public IFuture getSessionConfiguration(UUID id)
 	{
 		return new Future(sessions.get(id));
+	}
+	
+	@Override
+	public IFuture getWorkload()
+	{
+		if (sessions.size() > 0)
+		{
+			return new Future(new Double(100.0));
+		} else
+		{
+			return  new Future(new Double(0.0));
+		}
 	}
 }

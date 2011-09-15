@@ -13,6 +13,7 @@ import jadex.simulation.analysis.common.util.AConstants;
  */
 public class AModelHypothesis extends ADataObject implements IAModelHypothesis
 {
+	//TODO: Add Evaluation Flag
 	private IAParameter inputParameter; //= new ABasicParameter("defaultIn", Double.class, new Double(0));
 	private IAParameter outputParameter; //= new ABasicParameter("defaultOut", Double.class, new Double(0));
 	private Boolean correlation = true;

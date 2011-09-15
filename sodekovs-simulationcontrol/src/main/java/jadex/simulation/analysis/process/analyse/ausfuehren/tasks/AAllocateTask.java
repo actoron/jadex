@@ -8,10 +8,10 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.IAExperimentBatch;
-import jadex.simulation.analysis.common.events.task.ATaskEvent;
+import jadex.simulation.analysis.common.superClasses.events.task.ATaskEvent;
+import jadex.simulation.analysis.common.superClasses.tasks.ATask;
+import jadex.simulation.analysis.common.superClasses.tasks.user.AServiceCallTaskView;
 import jadex.simulation.analysis.common.util.AConstants;
-import jadex.simulation.analysis.process.basicTasks.ATask;
-import jadex.simulation.analysis.process.basicTasks.user.AServiceCallTaskView;
 import jadex.simulation.analysis.service.simulation.allocation.IAAllocateExperimentsService;
 
 import java.awt.GridBagConstraints;
@@ -20,12 +20,12 @@ import java.util.UUID;
 
 import javax.swing.JComponent;
 
-public class AVerteilungTask extends ATask
+public class AAllocateTask extends ATask
 {
-	public AVerteilungTask()
+	public AAllocateTask()
 	{
 		view = new AServiceCallTaskView(this);
-		addTaskListener(view);
+		addListener(view);
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class AVerteilungTask extends ATask
 		experiments = (IAExperimentBatch)service.allocateExperiment(session, experiments).get(susThread);
 
 		context.setParameterValue("experiments", experiments);
-		taskChanged(new ATaskEvent(this, context, instance, AConstants.TASK_BEENDET));
+		notify(new ATaskEvent(this, context, instance, AConstants.TASK_BEENDET));
 		return new Future(experiments);
 	}
 

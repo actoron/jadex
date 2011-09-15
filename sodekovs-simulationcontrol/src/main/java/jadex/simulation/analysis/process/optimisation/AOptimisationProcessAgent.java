@@ -10,24 +10,23 @@ import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.simulation.analysis.common.defaultViews.controlComponent.ComponentServiceViewerPanel;
-import jadex.simulation.analysis.service.highLevel.IAGeneralAnalysisProcessService;
+import jadex.simulation.analysis.common.util.controlComponentJadexPanel.ComponentServiceViewerPanel;
 import jadex.simulation.analysis.service.highLevel.IAOptimisationProcessService;
 
-@Description("Agent just offer the IAOptimisationProcessService")
+@Description("Agent offer the IAOptimisationProcessService")
  @ProvidedServices({@ProvidedService(type=IAOptimisationProcessService.class,
- implementation=@Implementation(expression="new AOptimierungsprozessService($component.getExternalAccess())"))})
+ implementation=@Implementation(expression="new AOptimisationProcessService($component.getExternalAccess())"))})
 @GuiClass(ComponentServiceViewerPanel.class)
 @Properties(
 {
-	@NameValue(name="viewerpanel.componentviewerclass", value="\"jadex.simulation.analysis.common.defaultViews.controlComponent.ControlComponentViewerPanel\"")
+	@NameValue(name="viewerpanel.componentviewerclass", value="\"jadex.simulation.analysis.common.util.controlComponentJadexPanel.ControlComponentViewerPanel\"")
 })
-public class AOptimierungsprozessAgent extends MicroAgent
+public class AOptimisationProcessAgent extends MicroAgent
 {
 	@Override
 	public void executeBody()
 	{
 		IAOptimisationProcessService service = (IAOptimisationProcessService) SServiceProvider.getService(getServiceProvider(), IAOptimisationProcessService.class).get(new ThreadSuspendable(this));
-		service.optimieren(null);
+		service.optimize(null);
 	}
 }

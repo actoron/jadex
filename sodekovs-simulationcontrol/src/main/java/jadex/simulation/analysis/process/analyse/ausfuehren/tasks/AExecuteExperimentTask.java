@@ -4,41 +4,32 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.bpmn.runtime.task.TaskMetaInfo;
-import jadex.bridge.IComponentManagementService;
-import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.simulation.analysis.common.data.IAExperiment;
 import jadex.simulation.analysis.common.data.IAExperimentBatch;
-import jadex.simulation.analysis.common.data.allocation.IAllocationStrategy;
-import jadex.simulation.analysis.common.events.task.ATaskEvent;
+import jadex.simulation.analysis.common.superClasses.events.task.ATaskEvent;
+import jadex.simulation.analysis.common.superClasses.tasks.ATask;
+import jadex.simulation.analysis.common.superClasses.tasks.user.AServiceCallTaskView;
 import jadex.simulation.analysis.common.util.AConstants;
-import jadex.simulation.analysis.process.basicTasks.ATask;
-import jadex.simulation.analysis.process.basicTasks.user.AServiceCallTaskView;
-import jadex.simulation.analysis.process.basicTasks.user.AServiceCallUserTaskView;
-import jadex.simulation.analysis.service.basic.view.session.IASessionView;
 import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
 
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.SortedSet;
 import java.util.UUID;
 
 import javax.swing.JComponent;
 
-public class AExperimentAusfuehrenTask extends ATask
+public class AExecuteExperimentTask extends ATask
 {
-	AExperimentAusfuehrenTask me = this;
+	AExecuteExperimentTask me = this;
 
-	public AExperimentAusfuehrenTask()
+	public AExecuteExperimentTask()
 	{
 		view = new AServiceCallTaskView(this);
-		addTaskListener(view);
+		addListener(view);
 	}
 
 	@Override
@@ -70,7 +61,7 @@ public class AExperimentAusfuehrenTask extends ATask
 						exp.setEvaluated(true);
 						if (experiments.isEvaluated())
 						{
-							me.taskChanged(new ATaskEvent(me, context, instance, AConstants.TASK_BEENDET));
+							me.notify(new ATaskEvent(me, context, instance, AConstants.TASK_BEENDET));
 							ret.setResult(experiments);
 						}
 					}
@@ -95,7 +86,7 @@ public class AExperimentAusfuehrenTask extends ATask
 		String desc = "Führt ein ExperimentBatch aus";
 
 		ParameterMetaInfo expmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_INOUT,
-				IAExperimentBatch.class, "experiments", null, "Auszuführendes Batch von Experimenten (alternativ zu Experiment)");
+				IAExperimentBatch.class, "experiments", null, "Auszuführendes Batch von Experimenten");
 
 		return new TaskMetaInfo(desc, new ParameterMetaInfo[] { expmi });
 	}

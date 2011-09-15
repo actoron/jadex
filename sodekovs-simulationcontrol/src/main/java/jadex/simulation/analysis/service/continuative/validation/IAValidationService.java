@@ -5,13 +5,15 @@ import jadex.simulation.analysis.common.data.IAExperiment;
 import jadex.simulation.analysis.common.data.IAExperimentBatch;
 import jadex.simulation.analysis.common.data.IAModel;
 import jadex.simulation.analysis.common.data.validation.IAModelHypothesis;
+import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisService;
+import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisSessionService;
 
 /**
  * Service to define experiments an evaluate hypothesis
  * 
  * @author 5Haubeck
  */
-public interface IAValidationService
+public interface IAValidationService extends IAnalysisSessionService
 {
 	/**
 	 * Define some experiments to evaluate hypothesis
@@ -34,6 +36,7 @@ public interface IAValidationService
 	 *            evaluated experiments
 	 * @param hypothesis
 	 *            hypothesis to evaluate
+	 *  @return Boolean, true if accepted
 	 */
 	public IFuture evaluateHypothesis(IAExperimentBatch experiments,
 				IAModelHypothesis hypothesis);

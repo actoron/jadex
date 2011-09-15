@@ -9,11 +9,14 @@ import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.simulation.analysis.common.util.controlComponentJadexPanel.ComponentServiceViewerPanel;
+import jadex.simulation.analysis.service.continuative.computation.IAConfidenceService;
 import jadex.simulation.analysis.service.continuative.optimisation.IAOptimisationService;
+import jadex.simulation.analysis.service.continuative.validation.IAValidationService;
 
-@Description("Agent offer IAOptimisationService")
- @ProvidedServices({@ProvidedService(type=IAOptimisationService.class,
- implementation=@Implementation(expression="new CommonsMathOptimisationService($component.getExternalAccess())"))})
+@Description("Agent offer IAOptimisationService, IAValidationService and IAConfidenceService")
+ @ProvidedServices({@ProvidedService(type=IAOptimisationService.class, implementation=@Implementation(expression="new CommonsMathOptimisationService($component.getExternalAccess())")),
+ 		@ProvidedService(type=IAValidationService.class, implementation=@Implementation(expression="new CommonsMathValidationService($component.getExternalAccess())")),
+ 		@ProvidedService(type=IAConfidenceService.class, implementation=@Implementation(expression="new CommonsMathConfidenceService($component.getExternalAccess())"))})
 @GuiClass(ComponentServiceViewerPanel.class)
 @Properties(
 {

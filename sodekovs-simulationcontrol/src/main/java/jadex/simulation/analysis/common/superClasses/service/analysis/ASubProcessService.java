@@ -118,18 +118,4 @@ public class ASubProcessService extends ABasicAnalysisSessionService
 		}
 	}
 
-	@Override
-	public IFuture getWorkload()
-	{
-		if (sessions.size() > 0)
-		{
-			return new Future(new Double(100.0));
-		}
-		else
-		{
-			return new Future(new Double(0.0));
-		}
-
-	}
-
 }

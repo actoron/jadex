@@ -13,18 +13,16 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-import jadex.simulation.analysis.common.defaultViews.controlComponent.ComponentServiceViewerPanel;
-import jadex.simulation.analysis.service.continuative.computation.IAConfidenceService;
+import jadex.simulation.analysis.common.util.controlComponentJadexPanel.ComponentServiceViewerPanel;
 import jadex.simulation.analysis.service.dataBased.engineering.IAEngineerDataobjectService;
 import jadex.simulation.analysis.service.highLevel.IAGeneralPlanningService;
-import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
 
 /**
  * Agent just for testing
  */
 @Description("Agent just test the IAGeneralPlanningService")
  @ProvidedServices({@ProvidedService(type=IAGeneralPlanningService.class,
- implementation=@Implementation(expression="new AAllgemeinePlanenService($component.getExternalAccess())"))})
+ implementation=@Implementation(expression="new AGeneralPanningService($component.getExternalAccess())"))})
  @RequiredServices({
 	@RequiredService(name="DatenobjektErstellenServices", type=IAEngineerDataobjectService.class,  binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="cmsService", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
@@ -33,7 +31,7 @@ import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimen
 @GuiClass(ComponentServiceViewerPanel.class)
 @Properties(
 {
-	@NameValue(name="viewerpanel.componentviewerclass", value="\"jadex.simulation.analysis.common.defaultViews.controlComponent.ControlComponentViewerPanel\"")
+	@NameValue(name="viewerpanel.componentviewerclass", value="\"jadex.simulation.analysis.common.util.controlComponentJadexPanel.ControlComponentViewerPanel\"")
 })
-public class AllgemeinPlanenAgent extends MicroAgent
+public class GeneralPlanningAgent extends MicroAgent
 {}

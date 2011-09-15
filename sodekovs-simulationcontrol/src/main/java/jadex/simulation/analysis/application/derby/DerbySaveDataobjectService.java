@@ -4,17 +4,18 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.IADataObject;
+import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisService;
 import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
 import jadex.simulation.analysis.service.dataBased.persist.IASaveDataobjectService;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class DerbySaveDataobjectService extends ABasicAnalysisSessionService implements IASaveDataobjectService
+public class DerbySaveDataobjectService extends ABasicAnalysisService implements IASaveDataobjectService
 {
-	public DerbySaveDataobjectService(IExternalAccess access, Class serviceInterface, Boolean concurrent)
+	public DerbySaveDataobjectService(IExternalAccess access)
 	{
-		super(access, serviceInterface, concurrent);
+		super(access, IASaveDataobjectService.class);
 	}
 
 	//TODO: USE DERBY HERE

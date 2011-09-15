@@ -258,7 +258,7 @@ public class GraphPanel extends mxGraphComponent
 			mxStylesheet stylesheet = graph.getStylesheet();
 
 			String path = new File("..").getCanonicalPath()
-							+ "/sodekovs-simulationcontrol/src/main/java/jadex/simulation/analysis/common/graph/shapes/";
+							+ "/sodekovs-simulationcontrol/src/main/java/jadex/simulation/analysis/common/util/workflowGraph/shapes/";
 
 			for (File f : new File(path).listFiles(
 							new FilenameFilter()

@@ -5,6 +5,7 @@ import java.util.Set;
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.IADataObject;
 import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisService;
+import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisSessionService;
 
 /**
  * Service to save a data object

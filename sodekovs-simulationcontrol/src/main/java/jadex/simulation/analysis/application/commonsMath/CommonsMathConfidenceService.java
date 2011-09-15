@@ -5,19 +5,20 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.simulation.analysis.common.data.parameter.IASummaryParameter;
+import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisService;
 import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
 import jadex.simulation.analysis.service.continuative.computation.IAConfidenceService;
 
 import org.apache.commons.math.stat.inference.TTest;
 import org.apache.commons.math.stat.inference.TTestImpl;
 
-public class CommonsMathConfidenceService extends ABasicAnalysisSessionService implements IAConfidenceService
+public class CommonsMathConfidenceService extends ABasicAnalysisService implements IAConfidenceService
 {
 	private TTest ttest = new TTestImpl();
 
 	public CommonsMathConfidenceService(IExternalAccess access)
 	{
-		super(access, IAConfidenceService.class, true);
+		super(access, IAConfidenceService.class);
 	}
 
 	@Override
