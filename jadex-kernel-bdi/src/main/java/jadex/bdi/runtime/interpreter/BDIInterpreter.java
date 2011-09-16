@@ -1292,8 +1292,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 								// Hack!!! During init phase use invokeLater() as rule engine isn't running.
 								try
 								{
-									((IComponentStep)step).execute(getInternalAccess());
-									ret.setResult(null);
+									Object	result	= ((IComponentStep)step).execute(getInternalAccess());
+									ret.setResult(result);
 								}
 								catch(Exception e)
 								{
@@ -1324,8 +1324,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				// Hack!!! During init phase use invokeLater() as rule engine isn't running.
 				try
 				{
-					((IComponentStep)step).execute(getInternalAccess());
-					ret.setResult(null);
+					Object	result	= ((IComponentStep)step).execute(getInternalAccess());
+					ret.setResult(result);
 				}
 				catch(Exception e)
 				{

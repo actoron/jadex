@@ -697,6 +697,16 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	public IFuture createProxy(final IService service, final RequiredServiceInfo info, final RequiredServiceBinding binding)
 	{
 		final Future ret = new Future();
+//		ret.addResultListener(new IResultListener()
+//		{
+//			public void exceptionOccurred(Exception exception)
+//			{
+//			}
+//			public void resultAvailable(Object result)
+//			{
+//				System.out.println("createProxy for "+service+": "+result);
+//			}
+//		});
 //		return service;
 //		if(!service.getServiceIdentifier().getProviderId().equals(ea.getServiceProvider().getId()) || !Proxy.isProxyClass(service.getClass()))
 		
@@ -705,20 +715,34 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		{
 			public void customResultAvailable(Object result)
 			{
+//				System.out.println("createProxy 1:"+service);
 				final IComponentManagementService cms = (IComponentManagementService)result;
 				cms.getExternalAccess((IComponentIdentifier)provider.getId()).addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result) 
 					{
+//						System.out.println("createProxy 2:"+service);
 						final IExternalAccess ea = (IExternalAccess)result;
 						final IComponentAdapter adapter = cms.getComponentAdapter((IComponentIdentifier)provider.getId());
-						ea.scheduleStep(new IComponentStep()
+						IFuture	fut	= ea.scheduleStep(new IComponentStep()
 						{
 							public Object execute(IInternalAccess ia)
 							{
+//								System.out.println("createProxy 3:"+service);
 								return BasicServiceInvocationHandler.createRequiredServiceProxy(ia, ea, adapter, service, DefaultServiceFetcher.this, info, binding, copy);
 							}
-						}).addResultListener(new DelegationResultListener(ret));
+						});
+//						fut.addResultListener(new IResultListener()
+//						{
+//							public void exceptionOccurred(Exception exception)
+//							{
+//							}
+//							public void resultAvailable(Object result)
+//							{
+//								System.out.println("createProxy 4 for "+service+": "+result);
+//							}
+//						});
+						fut.addResultListener(new DelegationResultListener(ret));
 					}
 				});
 			}

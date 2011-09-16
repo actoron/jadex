@@ -16,6 +16,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -128,11 +129,13 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			@XMLClassname("dealerpan")
 			public Object execute(IInternalAccess ia)
 			{
-				ia.getServiceContainer().getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
+				IFuture<IComponentManagementService>	cms	= ia.getServiceContainer().getRequiredService("cms");
+//				if(cms.isDone() && cms.get(null)==null)
+//					Thread.dumpStack();
+				cms.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(ManagerFrame.this)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(final IComponentManagementService ces)
 					{
-						final IComponentManagementService ces = (IComponentManagementService)result;
 						dealeraid = ces.createComponentIdentifier(LOCAL_DEALER, access.getComponentIdentifier().getParent(), null);
 						dealertf.setText(dealeraid.getName());
 					}

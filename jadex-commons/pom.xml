@@ -4,7 +4,7 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-commons</artifactId>
 	<packaging>jar</packaging>
-	<version>2.0-rc10-SNAPSHOT</version>
+	<version>2.0-rc10</version>
 	<name>jadex-commons</name>
 	<url>http://jadex.sourceforge.net</url>
 
