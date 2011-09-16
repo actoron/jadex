@@ -100,35 +100,10 @@ public class MessageFailureException	extends RuntimeException
 		this.unknown = unknown;
 	}
 	
-	public void printStackTrace()
-	{
-		Thread.dumpStack();
-		super.printStackTrace();
-	}
-	
-	@Override
-	public void printStackTrace(PrintStream s)
-	{
-		// TODO Auto-generated method stub
-		Thread.dumpStack();
-		super.printStackTrace(s);
-	}
-	
-	@Override
-	public void printStackTrace(PrintWriter s)
-	{
-		// TODO Auto-generated method stub
-		Thread.dumpStack();
-		super.printStackTrace(s);
-	}
-	
-	@Override
-	public StackTraceElement[] getStackTrace()
-	{
-		// TODO Auto-generated method stub
-		Thread.dumpStack();
-		return super.getStackTrace();
-	}
-	
-	
+//	public void printStackTrace()
+//	{
+//		Thread.dumpStack();
+//		super.printStackTrace();
+//	}
+
 }

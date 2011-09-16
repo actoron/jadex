@@ -29,6 +29,7 @@ import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.IMenuItemConstructor;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -119,6 +120,7 @@ public class StarterPluginPanel extends JPanel
 					final String	model	= spanel.lastfile;
 					jcc.getPlatformAccess().scheduleImmediate(new IComponentStep()
 					{
+						@XMLClassname("matchModel")
 						public Object execute(IInternalAccess ia)
 						{
 							boolean	match	= false;
@@ -140,7 +142,6 @@ public class StarterPluginPanel extends JPanel
 							if(((Boolean)result).booleanValue() && model.equals(spanel.lastfile))
 							{
 								spanel.loadModel(null);
-								
 							}
 						}
 						public void customExceptionOccurred(Exception exception)

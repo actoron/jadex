@@ -586,6 +586,8 @@ public class RemoteFileSystemView extends FileSystemView
 	 */
 	public File createFileObject(File dir, String filename)
 	{
+		// Method is called to create file that is saved as selected file.
+		
 		File ret = null;
 		File[] cs = (File[])children.get(dir.getAbsolutePath());
 		if(cs!=null)
