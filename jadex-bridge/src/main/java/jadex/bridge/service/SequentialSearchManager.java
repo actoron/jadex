@@ -122,6 +122,9 @@ public class SequentialSearchManager implements ISearchManager
 	{
 //		if(provider!=null && provider.getId().toString().startsWith("Lars-PC"))
 //			System.out.println("processing node: "+provider.getId());
+//		if(context.selector instanceof TypeResultSelector && ((TypeResultSelector)context.selector).getType().toString().indexOf("IComponentMana")!=-1)
+//			System.out.println("processing: "+provider.getId());
+
 		
 		// Hack!!! Break call stack when it becomes too large.
 		if(callstack>1000)
@@ -171,6 +174,7 @@ public class SequentialSearchManager implements ISearchManager
 					{
 						public void resultAvailable(Object result)
 						{
+//							System.out.println("found: "+provider.getId()+" "+result);
 							if(result!=null)
 							{
 								Collection res = (Collection)result;
@@ -186,6 +190,7 @@ public class SequentialSearchManager implements ISearchManager
 						
 						public void exceptionOccurred(Exception exception)
 						{
+//							System.out.println("nothing found: "+provider.getId());
 							// do not terminate serach when one node fails
 							// what to do with exception?
 							resultAvailable(null);
@@ -215,6 +220,11 @@ public class SequentialSearchManager implements ISearchManager
 							ret.addIntermediateResult(o);
 						}
 					}
+//					else
+//					{
+//						if(context.selector instanceof TypeResultSelector && ((TypeResultSelector)context.selector).getType().toString().indexOf("IComponentMana")!=-1)
+//							System.out.println("nothing found: "+provider.getId());
+//					}
 					processParent(start, source, provider, context, ret, up, callstack+1);//, res);
 				}
 			}
@@ -312,6 +322,8 @@ public class SequentialSearchManager implements ISearchManager
 //			ret.setResult(context.selector.getResult(context.results));
 //			ret.setResult(context.results);
 			ret.setFinished();
+//			if(context.selector instanceof TypeResultSelector && ((TypeResultSelector)context.selector).getType().toString().indexOf("IComponentMana")!=-1)
+//				System.out.println("found "+ret.getIntermediateResults());
 		}
 		
 		// Continue with current list of children (if any)
