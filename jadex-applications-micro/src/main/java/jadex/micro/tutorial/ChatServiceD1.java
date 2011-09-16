@@ -37,16 +37,16 @@ public class ChatServiceD1 implements IChatService
 	 *  Init the service.
 	 */
 	@ServiceStart
-	public IFuture startService()
+	public IFuture<Void> startService()
 	{
 		final Future ret = new Future();
 		this.format = new SimpleDateFormat("hh:mm:ss");
-		agent.getServiceContainer().getRequiredService("clockservice")
-			.addResultListener(new DelegationResultListener(ret)
+		IFuture<IClockService>	clockservice	= agent.getServiceContainer().getRequiredService("clockservice");
+		clockservice.addResultListener(new DelegationResultListener<IClockService>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IClockService result)
 			{
-				clock = (IClockService)result;
+				ChatServiceD1.this.clock = result;
 				super.customResultAvailable(null);
 			}
 		});

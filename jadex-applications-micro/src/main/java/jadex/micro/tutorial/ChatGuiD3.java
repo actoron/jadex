@@ -46,9 +46,9 @@ public class ChatGuiD3 extends ChatGuiD2
 								for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
 								{
 									IExtendedChatService cs = (IExtendedChatService)it.next();
-									cs.getUserProfile().addResultListener(new DefaultResultListener()
+									cs.getUserProfile().addResultListener(new DefaultResultListener<UserProfileD3>()
 									{
-										public void resultAvailable(Object result)
+										public void resultAvailable(UserProfileD3 result)
 										{
 											addMessage(result.toString());
 										}

@@ -44,19 +44,19 @@ public class ChatServiceD2 implements IChatService
 	 *  Init the service.
 	 */
 	@ServiceStart
-	public IFuture startService()
+	public IFuture<Void> startService()
 	{
 		final Future ret = new Future();
 		
 		this.format = new SimpleDateFormat("hh:mm:ss");
 		final IExternalAccess exta = agent.getExternalAccess();
-		agent.getServiceContainer().getRequiredService("clockservice")
-			.addResultListener(new SwingDelegationResultListener(ret)
+		IFuture<IClockService>	clockservice	= agent.getServiceContainer().getRequiredService("clockservice");
+		clockservice.addResultListener(new SwingDelegationResultListener<IClockService>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IClockService result)
 			{
-				clock = (IClockService)result;
-				gui = createGui(agent.getExternalAccess());
+				ChatServiceD2.this.clock = result;
+				ChatServiceD2.this.gui = createGui(exta);
 				super.customResultAvailable(null);
 			}
 		});
