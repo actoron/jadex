@@ -62,13 +62,13 @@ public interface IInternalAccess
 	 *  Create a result listener that is executed on the
 	 *  component thread.
 	 */
-	public IResultListener createResultListener(IResultListener listener);
+	public <T> IResultListener<T> createResultListener(IResultListener<T> listener);
 	
 	/**
 	 *  Create a result listener that is executed on the
 	 *  component thread.
 	 */
-	public IIntermediateResultListener createResultListener(IIntermediateResultListener listener);
+	public <T> IIntermediateResultListener<T> createResultListener(IIntermediateResultListener<T> listener);
 	
 	/**
 	 *  Get the external access.

@@ -1,8 +1,10 @@
 package jadex.micro.tutorial;
 
+import jadex.bridge.IComponentFactory;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentFactory;
 import jadex.micro.annotation.Agent;
@@ -27,11 +29,11 @@ public class ChatC4Agent
 	@AgentBody
 	public void executeBody()
 	{
-		SServiceProvider.getService(agent.getServiceContainer(), 
-			new ComponentFactorySelector(MicroAgentFactory.FILETYPE_MICROAGENT))
-			.addResultListener(agent.createResultListener(new DefaultResultListener()
+		IFuture<IComponentFactory>	factory	= SServiceProvider.getService(agent.getServiceContainer(), 
+			new ComponentFactorySelector(MicroAgentFactory.FILETYPE_MICROAGENT));
+		factory.addResultListener(agent.createResultListener(new DefaultResultListener<IComponentFactory>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(IComponentFactory result)
 			{
 				System.out.println("Found: "+result);
 			}

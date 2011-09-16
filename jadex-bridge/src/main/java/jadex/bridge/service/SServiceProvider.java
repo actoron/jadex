@@ -272,7 +272,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public static IFuture getService(IServiceProvider provider, final IResultSelector selector)
+	public static <T> IFuture<T> getService(IServiceProvider provider, final IResultSelector selector)
 	{
 //		synchronized(profiling)
 //		{

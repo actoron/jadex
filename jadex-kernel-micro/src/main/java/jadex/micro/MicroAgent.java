@@ -256,7 +256,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  Create a result listener that is executed as an agent step.
 	 *  @param listener The listener to be executed as an agent step.
 	 */
-	public IResultListener createResultListener(IResultListener listener)
+	public <T> IResultListener<T> createResultListener(IResultListener<T> listener)
 	{
 		return interpreter.createResultListener(listener);
 	}
@@ -265,7 +265,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  Create a result listener that is executed as an agent step.
 	 *  @param listener The listener to be executed as an agent step.
 	 */
-	public IIntermediateResultListener createResultListener(IIntermediateResultListener listener)
+	public <T> IIntermediateResultListener<T> createResultListener(IIntermediateResultListener<T> listener)
 	{
 		return interpreter.createResultListener(listener);
 	}

@@ -4,6 +4,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -58,14 +59,14 @@ public class ChatGuiD2 extends JFrame
 				{
 					public Object execute(IInternalAccess ia)
 					{
-						ia.getServiceContainer().getRequiredServices("chatservices")
-							.addResultListener(new DefaultResultListener()
+						IFuture<Collection<IChatService>>	chatservices	= ia.getServiceContainer().getRequiredServices("chatservices");
+						chatservices.addResultListener(new DefaultResultListener<Collection<IChatService>>()
 						{
-							public void resultAvailable(Object result)
+							public void resultAvailable(Collection<IChatService> result)
 							{
-								for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
+								for(Iterator<IChatService> it=result.iterator(); it.hasNext(); )
 								{
-									IChatService cs = (IChatService)it.next();
+									IChatService cs = it.next();
 									cs.message(agent.getComponentIdentifier().getName(), text);
 								}
 							}

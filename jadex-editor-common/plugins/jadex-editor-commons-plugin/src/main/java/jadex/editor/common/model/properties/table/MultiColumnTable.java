@@ -610,6 +610,9 @@ public class MultiColumnTable
 		 */
 		public void setColumnValueAt(int columnIndex, String value)
 		{
+			if(columnIndex>=columnValues.length)
+				System.out.println("BPMN debug");
+			
 			this.columnValues[columnIndex] = value;
 		}
 

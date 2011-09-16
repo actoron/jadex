@@ -594,6 +594,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 				else
 				{
 					CreationInfo ci = new CreationInfo(args);
+					ci.setDaemon(true);
 					cms.createComponent(cid.getLocalName(), "jadex/base/service/remote/ProxyAgent.class", ci, 
 						createResultListener(new DefaultResultListener()
 					{
