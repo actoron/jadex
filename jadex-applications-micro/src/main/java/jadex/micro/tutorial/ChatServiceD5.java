@@ -50,8 +50,8 @@ public class ChatServiceD5 implements IChatService
 		
 		this.format = new SimpleDateFormat("hh:mm:ss");
 		final IExternalAccess exta = agent.getExternalAccess();
-		agent.getServiceContainer().getRequiredService("clockservice")
-			.addResultListener(new SwingDelegationResultListener(ret)
+		IFuture<IClockService> fut = agent.getServiceContainer().getRequiredService("clockservice");
+		fut.addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
