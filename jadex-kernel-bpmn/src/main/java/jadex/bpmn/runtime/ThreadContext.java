@@ -232,9 +232,10 @@ public class ThreadContext
 		Set	subthreads	= context.getThreads();
 		if(subthreads!=null)
 		{
-			for(Iterator it=subthreads.iterator(); it.hasNext(); )
+			ProcessThread[] subt = (ProcessThread[])subthreads.toArray(new ProcessThread[subthreads.size()]);
+			for(int i=0; i<subt.length; i++)
 			{
-				context.removeThread((ProcessThread)it.next());
+				context.removeThread(subt[i]);
 			}
 		}
 

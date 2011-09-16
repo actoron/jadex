@@ -128,9 +128,13 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 								{
 									newrecs.add(cms.createComponentIdentifier((String)recs, instance.getComponentIdentifier().getParent(), null));
 								}
-								else
+								else if(recs!=null)
 								{
 									newrecs.add(recs);
+								}
+								else
+								{
+									throw new RuntimeException("Receiver nulls.");
 								}
 							}
 							msg.put(ri, newrecs);
