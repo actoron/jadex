@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.jar.Attributes;
@@ -43,7 +43,7 @@ public class ManifestStarter
 			}
 		}
 		
-		Set manifestclasspath = new HashSet();
+		Set manifestclasspath = new LinkedHashSet();
 
         try 
         {
