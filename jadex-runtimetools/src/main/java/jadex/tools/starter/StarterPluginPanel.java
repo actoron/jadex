@@ -108,7 +108,9 @@ public class StarterPluginPanel extends JPanel
 		lsplit.setOneTouchExpandable(true);
 		lsplit.setResizeWeight(0.7);
 
-		mpanel = new ModelTreePanel(jcc.getPlatformAccess(), jcc.getJCCAccess(), !SUtil.equals(jcc.getPlatformAccess().getComponentIdentifier().getPlatformName(), jcc.getJCCAccess().getComponentIdentifier().getPlatformName()))
+		mpanel = new ModelTreePanel(jcc.getPlatformAccess(), jcc.getJCCAccess(), 
+			!SUtil.equals(jcc.getPlatformAccess().getComponentIdentifier().getPlatformName(), 
+			jcc.getJCCAccess().getComponentIdentifier().getPlatformName()))
 		{
 			public void removeTopLevelNode(ITreeNode node)
 			{

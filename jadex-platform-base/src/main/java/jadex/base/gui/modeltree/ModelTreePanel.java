@@ -1,10 +1,13 @@
 package jadex.base.gui.modeltree;
 
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.DefaultNodeHandler;
 import jadex.base.gui.filetree.FileTreePanel;
 import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.filetree.RootNode;
+import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -15,6 +18,7 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
 import jadex.bridge.service.library.LibraryService;
+import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -48,7 +52,22 @@ public class ModelTreePanel extends FileTreePanel
 	/** The library service listener */
 	protected ILibraryServiceListener libservicelistener;
 	
+	/** The local external access. */
+	protected IExternalAccess localexta;
+	
+//	/** The jcc. */
+//	protected IControlCenter jcc;
+	
 	//-------- constructors --------
+	
+//	public ModelTreePanel(IControlCenter jcc)
+//	{
+//		this(jcc.getPlatformAccess(), jcc.getJCCAccess(), 
+//			!SUtil.equals(jcc.getPlatformAccess().getComponentIdentifier().getPlatformName(), 
+//			jcc.getJCCAccess().getComponentIdentifier().getPlatformName()));
+//		this.jcc = jcc;
+//	}
+
 	
 	/**
 	 *  Create a new model tree panel.
@@ -56,6 +75,7 @@ public class ModelTreePanel extends FileTreePanel
 	public ModelTreePanel(final IExternalAccess exta, IExternalAccess localexta, boolean remote)
 	{
 		super(exta, remote, false);
+		this.localexta = localexta;
 		actions = new HashMap();
 		
 		ModelFileFilterMenuItemConstructor mic = new ModelFileFilterMenuItemConstructor(getModel(), exta);
@@ -205,7 +225,8 @@ public class ModelTreePanel extends FileTreePanel
 								@XMLClassname("fileexists")
 								public Object execute(IInternalAccess ia)
 								{
-									List	urlstrings	= new ArrayList();
+									List urlstrings	= new ArrayList();
+									List exceptions = new ArrayList();
 									for(int i=0; i<urls.size(); i++)
 									{
 										try
@@ -214,7 +235,8 @@ public class ModelTreePanel extends FileTreePanel
 										}
 										catch(Exception e)
 										{
-											e.printStackTrace();
+											exceptions.add(e);
+//											e.printStackTrace();
 										}
 									}
 									boolean res = LibraryService.indexOfFilename(filename, urlstrings)!=-1;
@@ -229,24 +251,36 @@ public class ModelTreePanel extends FileTreePanel
 										}
 										catch(Exception e)
 										{
-											e.printStackTrace();
+											exceptions.add(e);
+//											e.printStackTrace();
 										}
 									}
 									
-									return new Boolean(LibraryService.indexOfFilename(filename, urlstrings)!=-1);
+									return exceptions;//new Boolean(LibraryService.indexOfFilename(filename, urlstrings)!=-1);
 								}
-							}).addResultListener(new DefaultResultListener()
+							}).addResultListener(new SwingDefaultResultListener()
 							{
-								public void resultAvailable(Object result)
+								public void customResultAvailable(final Object result) 
 								{
-									SwingUtilities.invokeLater(new Runnable()
+									ModelTreePanel.super.addNode(node);
+									
+									if(result instanceof List)
 									{
-										public void run()
+										localexta.scheduleStep(new IComponentStep()
 										{
-											ModelTreePanel.super.addNode(node);
-										}
-									});
-								}
+											public Object execute(IInternalAccess ia)
+											{
+												List exs = (List)result;
+												
+												for(int i=0; i<exs.size(); i++)
+												{
+													ia.getLogger().warning(exs.get(i).toString());
+												}
+												return null;
+											}
+										});
+									}
+								};
 							});
 						}
 					});

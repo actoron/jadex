@@ -15,6 +15,9 @@ public class ComponentResultListener<E> implements IResultListener<E>
 	/** The component adapter. */
 	protected IComponentAdapter adapter;
 	
+	/** The external acess. */
+	protected IExternalAccess access;
+	
 	//-------- constructors --------
 	
 	/**
@@ -29,41 +32,85 @@ public class ComponentResultListener<E> implements IResultListener<E>
 		this.listener = listener;
 		this.adapter = adapter;
 	}
+	
+	/**
+	 *  Create a new component result listener.
+	 *  @param listener The listener.
+	 *  @param adapter The adapter.
+	 */
+	public ComponentResultListener(IResultListener<E> listener, IExternalAccess access)
+	{
+		if(listener==null)
+			throw new NullPointerException("Listener must not null.");
+		this.listener = listener;
+		this.access = access;
+	}
 
 	//-------- methods --------
 	
 	/**
 	 *  Called when the result is available.
-	 * @param result The result.
+	 *  @param result The result.
 	 */
 	public void resultAvailable(final E result)
 	{
-		if(adapter.isExternalThread())
+		if(access!=null)
 		{
-			try
+			access.scheduleStep(new IComponentStep()
 			{
-				adapter.invokeLater(new Runnable()
+				public static final String XML_CLASSNAME = "res";
+				public Object execute(IInternalAccess ia)
 				{
-					public void run()
+					try
 					{
 						listener.resultAvailable(result);
 					}
-					
-					public String toString()
+					catch(Exception e)
 					{
-						return "resultAvailable("+result+")_#"+this.hashCode();
+						// always return null to ensure that listener is not invoked twice
 					}
-				});
-			}
-			catch(Exception e)
+					return null;
+				}
+			}).addResultListener(new IResultListener()
 			{
-				listener.exceptionOccurred(e);
-			}
+				public void resultAvailable(Object result)
+				{
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					listener.exceptionOccurred(exception);
+				}
+			});
 		}
 		else
 		{
-			listener.resultAvailable(result);
-		}		
+			if(adapter.isExternalThread())
+			{
+				try
+				{
+					adapter.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							listener.resultAvailable(result);
+						}
+						
+						public String toString()
+						{
+							return "resultAvailable("+result+")_#"+this.hashCode();
+						}
+					});
+				}
+				catch(Exception e)
+				{
+					listener.exceptionOccurred(e);
+				}
+			}
+			else
+			{
+				listener.resultAvailable(result);
+			}	
+		}
 	}
 	
 	/**
@@ -72,31 +119,62 @@ public class ComponentResultListener<E> implements IResultListener<E>
 	 */
 	public void exceptionOccurred(final Exception exception)
 	{
-		if(adapter.isExternalThread())
+		if(access!=null)
 		{
-			try
+			access.scheduleStep(new IComponentStep()
 			{
-				adapter.invokeLater(new Runnable()
+				public static final String XML_CLASSNAME = "ex";
+				public Object execute(IInternalAccess ia)
 				{
-					public void run()
+					try
 					{
 						listener.exceptionOccurred(exception);
 					}
-					
-					public String toString()
+					catch(Exception e)
 					{
-						return "exceptionOccurred("+exception+")_#"+this.hashCode();
+						// always return null to ensure that listener is not invoked twice
 					}
-				});
-			}
-			catch(Exception e)
+					return null;
+				}
+			}).addResultListener(new IResultListener()
 			{
-				listener.exceptionOccurred(e);
-			}
+				public void resultAvailable(Object result)
+				{
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					listener.exceptionOccurred(exception);
+				}
+			});
 		}
 		else
 		{
-			listener.exceptionOccurred(exception);
+			if(adapter.isExternalThread())
+			{
+				try
+				{
+					adapter.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							listener.exceptionOccurred(exception);
+						}
+						
+						public String toString()
+						{
+							return "exceptionOccurred("+exception+")_#"+this.hashCode();
+						}
+					});
+				}
+				catch(Exception e)
+				{
+					listener.exceptionOccurred(e);
+				}
+			}
+			else
+			{
+				listener.exceptionOccurred(exception);
+			}
 		}
 	}
 }
