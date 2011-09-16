@@ -151,7 +151,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 			{
 				connected = false;
 				setChildren(Collections.EMPTY_LIST);
-				exception.printStackTrace();
+//				exception.printStackTrace();
 			}
 		});				
 	}
