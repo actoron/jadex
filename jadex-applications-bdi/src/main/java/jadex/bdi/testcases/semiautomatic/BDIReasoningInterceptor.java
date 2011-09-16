@@ -40,9 +40,9 @@ public class BDIReasoningInterceptor implements IServiceInvocationInterceptor
 	 *  Execute the interceptor.
 	 *  @param context The invocation context.
 	 */
-	public IFuture execute(final ServiceInvocationContext sic)
+	public IFuture<Void> execute(final ServiceInvocationContext sic)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		final IGoal g = ia.getGoalbase().createGoal("reasoncall");
 		g.addGoalListener(new IGoalListener()
 		{
@@ -50,7 +50,7 @@ public class BDIReasoningInterceptor implements IServiceInvocationInterceptor
 			{
 				if(((Boolean)g.getParameter("execute").getValue()).booleanValue())
 				{
-					sic.invoke().addResultListener(new DelegationResultListener(ret));
+					sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
 				}
 				else
 				{

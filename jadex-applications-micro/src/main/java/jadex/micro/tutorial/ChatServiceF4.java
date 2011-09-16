@@ -4,6 +4,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.micro.IPojoMicroAgent;
 
 import java.util.Collection;
@@ -34,14 +35,14 @@ public class ChatServiceF4 implements IChatService
 		final ChatBotF4Agent	chatbot	= (ChatBotF4Agent)((IPojoMicroAgent)agent).getPojoAgent();
 		if(text.toLowerCase().indexOf(chatbot.getKeyword().toLowerCase())!=-1)
 		{
-			agent.getServiceContainer().getRequiredServices("chatservices")
-				.addResultListener(new DefaultResultListener()
+			IFuture<Collection<IChatService>> fut = agent.getServiceContainer().getRequiredServices("chatservices");
+			fut.addResultListener(new DefaultResultListener<Collection<IChatService>>()
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(Collection<IChatService> result)
 				{
-					for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
+					for(Iterator<IChatService> it=result.iterator(); it.hasNext(); )
 					{
-						IChatService cs = (IChatService)it.next();
+						IChatService cs = it.next();
 						cs.message(agent.getComponentIdentifier().getName(), chatbot.getReply()+": "+sender);
 					}
 				}

@@ -11,5 +11,5 @@ public interface IExtendedChatService extends IChatService
 	 *  Get the user profile.
 	 *  @return The user profile.
 	 */
-	public IFuture getUserProfile();
+	public IFuture<UserProfileD3> getUserProfile();
 }

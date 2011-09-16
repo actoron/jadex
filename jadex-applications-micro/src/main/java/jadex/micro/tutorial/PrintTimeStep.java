@@ -6,6 +6,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 
 /**
  *  Component step that prints the time.
@@ -19,12 +20,12 @@ public class PrintTimeStep implements IComponentStep
 	 */
 	public Object execute(IInternalAccess ia)
 	{
-		ia.getServiceContainer().getRequiredService("clockservice")
-			.addResultListener(new DefaultResultListener()
+		IFuture<IClockService> fut = ia.getServiceContainer().getRequiredService("clockservice");
+		fut.addResultListener(new DefaultResultListener<IClockService>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(IClockService cs)
 			{
-				IClockService cs = (IClockService)result;
+//				IClockService cs = (IClockService)result;
 				System.out.println("Time for a chat buddy: "+new Date(cs.getTime()));
 			}
 		});

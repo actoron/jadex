@@ -44,9 +44,9 @@ public class ChatServiceD5 implements IChatService
 	 *  Init the service.
 	 */
 	@ServiceStart
-	public IFuture startService()
+	public IFuture<Void> startService()
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		this.format = new SimpleDateFormat("hh:mm:ss");
 		final IExternalAccess exta = agent.getExternalAccess();

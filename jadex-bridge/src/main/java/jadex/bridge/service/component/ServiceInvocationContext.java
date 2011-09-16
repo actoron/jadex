@@ -162,9 +162,9 @@ public class ServiceInvocationContext
 	/**
 	 *  Invoke the next interceptor.
 	 */
-	public IFuture invoke(Object object, Method method, List args)
+	public IFuture<Void> invoke(Object object, Method method, List args)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 //		if(method.getName().equals("add"))
 //			System.out.println("invoke: "+Thread.currentThread());
@@ -178,9 +178,9 @@ public class ServiceInvocationContext
 		
 		if(interceptor!=null)
 		{
-			interceptor.execute(this).addResultListener(new IResultListener()
+			interceptor.execute(this).addResultListener(new IResultListener<Void>()
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(Void result)
 				{
 					pop();
 					ret.setResult(null);
@@ -234,7 +234,7 @@ public class ServiceInvocationContext
 	/**
 	 *  Invoke the next interceptor.
 	 */
-	public IFuture invoke()
+	public IFuture<Void> invoke()
 	{
 		return invoke(getObject(), getMethod(), getArguments());
 	}

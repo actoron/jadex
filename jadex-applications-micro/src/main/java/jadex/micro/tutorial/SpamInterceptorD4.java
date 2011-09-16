@@ -31,14 +31,14 @@ public class SpamInterceptorD4 implements IServiceInvocationInterceptor
 	 *  Execute the interceptor.
 	 *  @param context The invocation context.
 	 */
-	public IFuture execute(ServiceInvocationContext context)
+	public IFuture<Void> execute(ServiceInvocationContext context)
 	{
 		String sender = (String)context.getArgumentArray()[0];
 		String text = (String)context.getArgumentArray()[1];
 		if(sender.indexOf("Bot")!=-1)
 		{
 			System.out.println("Blocked spam message: "+sender+" "+text);
-			return new Future((new RuntimeException("No spammers allowed.")));
+			return new Future<Void>((new RuntimeException("No spammers allowed.")));
 		}
 		else
 		{

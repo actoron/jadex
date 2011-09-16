@@ -15,9 +15,9 @@ public abstract class AbstractMultiInterceptor implements IServiceInvocationInte
 	 *  @param args The argument(s) for the call.
 	 *  @return The result of the command.
 	 */
-	public IFuture execute(ServiceInvocationContext sic) 	
+	public IFuture<Void> execute(ServiceInvocationContext sic) 	
 	{
-		IFuture ret;
+		IFuture<Void> ret;
 		IServiceInvocationInterceptor subic = getInterceptor(sic);
 		if(subic!=null)
 		{
@@ -44,7 +44,7 @@ public abstract class AbstractMultiInterceptor implements IServiceInvocationInte
 	 *  @param args The argument(s) for the call.
 	 *  @return The result of the command.
 	 */
-	public abstract IFuture doExecute(ServiceInvocationContext sic);
+	public abstract IFuture<Void> doExecute(ServiceInvocationContext sic);
 	
 	/**
 	 *  Get a sub interceptor for special cases.

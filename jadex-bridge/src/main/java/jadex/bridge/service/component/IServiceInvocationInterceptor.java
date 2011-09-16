@@ -12,7 +12,7 @@ public interface IServiceInvocationInterceptor
 	 *  Execute the interceptor.
 	 *  @param context The invocation context.
 	 */
-	public IFuture execute(ServiceInvocationContext context); 
+	public IFuture<Void> execute(ServiceInvocationContext context); 
 	
 	/**
 	 *  Test if the interceptor is applicable.

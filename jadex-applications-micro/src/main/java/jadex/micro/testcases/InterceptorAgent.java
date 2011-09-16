@@ -126,7 +126,7 @@ public class InterceptorAgent extends MicroAgent implements IAService
 	/**
 	 *  Init service method.
 	 */
-	public IFuture test()
+	public IFuture<Void> test()
 	{
 //		System.out.println("called service");
 		return IFuture.DONE;
@@ -161,7 +161,7 @@ class SimpleInterceptor implements IServiceInvocationInterceptor
 	 *  Execute the interceptor.
 	 *  @param context The invocation context.
 	 */
-	public IFuture execute(ServiceInvocationContext context)
+	public IFuture<Void> execute(ServiceInvocationContext context)
 	{
 		interceptcnt++;
 //		System.out.println("exe: "+interceptcnt);
