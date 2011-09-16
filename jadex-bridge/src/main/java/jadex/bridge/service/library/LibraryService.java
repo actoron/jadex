@@ -154,7 +154,8 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						exception.printStackTrace();
+						// todo: how to handle timeouts?! allow manual retry?
+//						exception.printStackTrace();
 						removeLibraryServiceListener(liscopy);
 					}
 				});
