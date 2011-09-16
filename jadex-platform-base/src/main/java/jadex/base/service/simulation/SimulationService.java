@@ -408,7 +408,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 //				System.out.println("Setting clock");
 				final Future	fut	= new Future();
 				ret	= fut;
-				SServiceProvider.getService(access.getServiceContainer(), IThreadPoolService.class)
+				SServiceProvider.getServiceUpwards(access.getServiceContainer(), IThreadPoolService.class)
 					.addResultListener(access.createResultListener(new DelegationResultListener(fut)
 				{
 					public void customResultAvailable(Object result)

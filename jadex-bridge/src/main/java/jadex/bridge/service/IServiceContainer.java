@@ -94,7 +94,7 @@ public interface IServiceContainer extends IServiceProvider
 	 *  @param name The services name.
 	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
-	public IIntermediateFuture getRequiredServices(String name);
+	public <T> IIntermediateFuture<T> getRequiredServices(String name);
 	
 	/**
 	 *  Get a required service.
@@ -136,7 +136,7 @@ public interface IServiceContainer extends IServiceProvider
 	 *  @param cid The component identifier of the target component.
 	 *  @return The corresponding service.
 	 */
-	public IFuture getService(Class type, IComponentIdentifier cid);
+	public <T> IFuture<T> getService(Class<T> type, IComponentIdentifier cid);
 	
 	/**
 	 *  Get one service of a type.

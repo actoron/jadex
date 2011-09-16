@@ -17,6 +17,27 @@ public @interface Binding
 {
 	//-------- constants --------
 	
+	/** Local component scope. */
+	public static final String SCOPE_LOCAL = "local";
+	
+	/** Component scope. */
+	public static final String SCOPE_COMPONENT = "component";
+	
+	/** Application scope. */
+	public static final String SCOPE_APPLICATION = "application";
+
+	/** Platform scope. */
+	public static final String SCOPE_PLATFORM = "platform";
+
+	/** Global scope. */
+	public static final String SCOPE_GLOBAL = "global";
+	
+	/** Upwards scope. */
+	public static final String SCOPE_UPWARDS = "upwards";
+	
+	/** Parent scope. */
+	public static final String SCOPE_PARENT = "parent";
+	
 	/** The raw proxy type (i.e. no proxy). */
 	public static final String	PROXYTYPE_RAW	= BasicServiceInvocationHandler.PROXYTYPE_RAW;
 	

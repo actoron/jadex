@@ -1,5 +1,7 @@
 package jadex.bridge.service;
 
+import jadex.bridge.IComponentIdentifier;
+
 import java.util.Collection;
 
 /**
@@ -184,7 +186,9 @@ public class DefaultVisitDecider implements IVisitDecider
 	 */
 	protected boolean isApplication(IServiceProvider source)
 	{
-		return source!=null && source.getType()!=null && source.getType().toLowerCase().indexOf("application")!=-1;
+		IComponentIdentifier	cid	= source!=null ? (IComponentIdentifier)source.getId() : null;
+		return source!=null && cid.getParent()!=null && cid.getParent().getParent()==null;
+//		return source!=null && source.getType()!=null && source.getType().toLowerCase().indexOf("application")!=-1;
 	}
 	
 	/**

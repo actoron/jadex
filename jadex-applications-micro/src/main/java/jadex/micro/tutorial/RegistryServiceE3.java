@@ -17,7 +17,7 @@ public class RegistryServiceE3 implements IRegistryServiceE3
 	//-------- attributes --------
 	
 	/** The entries map. */
-	protected Map entries = new HashMap();
+	protected Map<String, IComponentIdentifier> entries = new HashMap<String, IComponentIdentifier>();
 	
 	//-------- methods --------
 
@@ -32,8 +32,8 @@ public class RegistryServiceE3 implements IRegistryServiceE3
 	/**
 	 *  Get the registered chatters.
 	 */
-	public IFuture getChatters()
+	public IFuture<Map<String, IComponentIdentifier>> getChatters()
 	{
-		return new Future(entries);
+		return new Future<Map<String, IComponentIdentifier>>(entries);
 	}
 }

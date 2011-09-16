@@ -314,7 +314,7 @@ public class Starter
 										// Start additional components.
 										if(!components.isEmpty())
 										{
-											SServiceProvider.getService(instance.getServiceContainer(), IComponentManagementService.class)
+											SServiceProvider.getServiceUpwards(instance.getServiceContainer(), IComponentManagementService.class)
 												.addResultListener(new DelegationResultListener(ret)
 											{
 												public void customResultAvailable(Object result)

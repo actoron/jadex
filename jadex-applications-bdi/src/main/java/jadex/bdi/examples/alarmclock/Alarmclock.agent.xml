@@ -121,8 +121,12 @@
 	</plans>
 
 	<services>
-		<requiredservice name="clockservice" class="IClockService"/>
-		<requiredservice name="tpservice" class="IThreadPoolService"/>
+		<requiredservice name="clockservice" class="IClockService">
+			<binding scope="platform"/>
+		</requiredservice>
+		<requiredservice name="tpservice" class="IThreadPoolService">
+			<binding scope="platform"/>
+		</requiredservice>
 	</services>
 	
 	<properties>

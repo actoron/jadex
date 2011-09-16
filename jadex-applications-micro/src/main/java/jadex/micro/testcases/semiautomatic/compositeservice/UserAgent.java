@@ -3,6 +3,7 @@ package jadex.micro.testcases.semiautomatic.compositeservice;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -11,7 +12,7 @@ import jadex.micro.annotation.RequiredServices;
  *  The user agent uses services for testing them.
  */
 @Description("This agent uses an add service.")
-@RequiredServices(@RequiredService(name="addservice", type=IAddService.class))
+@RequiredServices(@RequiredService(name="addservice", type=IAddService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
 public class UserAgent extends MicroAgent
 {
 	/**

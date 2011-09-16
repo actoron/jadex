@@ -34,7 +34,7 @@ public class ExternalAccessInvokerAgent extends MicroAgent
 				final IComponentIdentifier cid = agentselector.selectAgent(null);
 				if(cid!=null)
 				{
-					SServiceProvider.getService(getExternalAccess().getServiceProvider(), IComponentManagementService.class)
+					SServiceProvider.getServiceUpwards(getExternalAccess().getServiceProvider(), IComponentManagementService.class)
 						.addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)

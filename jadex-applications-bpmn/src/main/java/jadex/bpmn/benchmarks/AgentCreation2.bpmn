@@ -48,7 +48,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_iC77YKMmEeC5HPORDO2-ow" key="dimension" value="1:2"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_iC77YaMmEeC5HPORDO2-ow" key="uniqueColumnIndex" value="0"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_iC77YqMmEeC5HPORDO2-ow" key="0:0" value="clock"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_iC77Y6MmEeC5HPORDO2-ow" key="0:1" value="SServiceProvider.getService($provider, IClockService.class)"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_iC77Y6MmEeC5HPORDO2-ow" key="0:1" value="SServiceProvider.getService($provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_fZ7WEdkMEd6KRaQAf_IpCg" iD="_fZ7WENkMEd6KRaQAf_IpCg" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_fZ7WE9kMEd6KRaQAf_IpCg" iD="_fZ7WEtkMEd6KRaQAf_IpCg" outgoingEdges="_6dcU2tkOEd6KRaQAf_IpCg" name="Print Creation Notice" activityType="Task">

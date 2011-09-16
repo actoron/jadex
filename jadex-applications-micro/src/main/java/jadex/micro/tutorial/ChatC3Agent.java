@@ -2,8 +2,8 @@ package jadex.micro.tutorial;
 
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -18,7 +18,7 @@ import jadex.micro.annotation.RequiredServices;
 @Description("This agent uses the component management service.")
 @Agent
 @RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, 
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+	binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
 public class ChatC3Agent
 {
 	/** The underlying mirco agent. */
@@ -32,17 +32,16 @@ public class ChatC3Agent
 	@AgentBody
 	public void executeBody()
 	{
-		agent.getServiceContainer().getRequiredService("cms")
-			.addResultListener(new DefaultResultListener()
+		IFuture<IComponentManagementService>	cms	= agent.getServiceContainer().getRequiredService("cms");
+		cms.addResultListener(new DefaultResultListener<IComponentManagementService>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(final IComponentManagementService cms)
 			{
-				final IComponentManagementService cms = (IComponentManagementService)result;
-				cms.getComponentDescriptions().addResultListener(new DefaultResultListener()
+				cms.getComponentDescriptions().addResultListener(
+					new DefaultResultListener<IComponentDescription[]>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(IComponentDescription[] descs)
 					{
-						IComponentDescription[] descs = (IComponentDescription[])result;
 						for(int i=0; i<descs.length; i++)
 						{
 							System.out.println("Found: "+descs[i]);

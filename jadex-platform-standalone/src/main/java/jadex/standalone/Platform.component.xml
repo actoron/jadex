@@ -179,7 +179,9 @@
 			</implementation>		
 		</providedservice>
 		
-		<requiredservice name="factoryservices" class="IComponentFactory" multiple="true"/>
+		<requiredservice name="factoryservices" class="IComponentFactory" multiple="true">
+			<binding scope="platform"/>
+		</requiredservice>
 	</services>
 
 	<properties>

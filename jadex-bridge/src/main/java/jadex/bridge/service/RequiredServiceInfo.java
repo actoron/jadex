@@ -52,7 +52,7 @@ public class RequiredServiceInfo
 	protected RequiredServiceBinding binding;
 	
 	/** The list of interceptors. */
-	protected List interceptors;
+	protected List<UnparsedExpression> interceptors;
 	
 	//-------- constructors --------
 	
@@ -175,7 +175,7 @@ public class RequiredServiceInfo
 	public void addInterceptor(UnparsedExpression interceptor)
 	{
 		if(interceptors==null)
-			interceptors = new ArrayList();
+			interceptors = new ArrayList<UnparsedExpression>();
 		interceptors.add(interceptor);
 	}
 	
@@ -194,7 +194,7 @@ public class RequiredServiceInfo
 	 */
 	public UnparsedExpression[] getInterceptors()
 	{
-		return interceptors==null? new UnparsedExpression[0]: (UnparsedExpression[])
+		return interceptors==null? new UnparsedExpression[0]: 
 			interceptors.toArray(new UnparsedExpression[interceptors.size()]);
 	}
 }

@@ -15,7 +15,9 @@
 	</arguments>
 	
 	<services>
-		<requiredservice name="cms" class="IComponentManagementService"/>
+		<requiredservice name="cms" class="IComponentManagementService">
+			<binding scope="platform"/>
+		</requiredservice>
 	</services>	
 	
 	<configurations>

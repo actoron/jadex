@@ -373,7 +373,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 						final IActiveComponentTreeNode node = (IActiveComponentTreeNode)tmp;
 						final IComponentIdentifier cid = node.getComponentIdentifier();
 						
-						SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), IComponentManagementService.class)
+						SServiceProvider.getServiceUpwards(getJCC().getJCCAccess().getServiceProvider(), IComponentManagementService.class)
 							.addResultListener(new SwingDefaultResultListener(comptree)
 						{
 							public void customResultAvailable(Object result)
@@ -501,7 +501,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 				else
 				{
 					// Unknown -> start search to find out asynchronously
-					SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), IComponentManagementService.class)
+					SServiceProvider.getServiceUpwards(getJCC().getJCCAccess().getServiceProvider(), IComponentManagementService.class)
 						.addResultListener(new SwingDefaultResultListener(comptree)
 					{
 						public void customResultAvailable(Object result)

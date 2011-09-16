@@ -1,10 +1,8 @@
 package jadex.micro.tutorial;
 
-import java.util.Date;
-
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -13,12 +11,14 @@ import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
+import java.util.Date;
+
 /**
  *  Chat micro agent that uses the clock service. 
  */
 @Description("This agent uses the clock service.")
 @Agent
-@RequiredServices(@RequiredService(name="clockservice", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="clockservice", type=IClockService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
 public class ChatC2Agent
 {
 	/** The underlying mirco agent. */
@@ -32,13 +32,12 @@ public class ChatC2Agent
 	@AgentBody
 	public void executeBody()
 	{
-		agent.getServiceContainer().getRequiredService("clockservice")
-			.addResultListener(new DefaultResultListener()
+		IFuture<IClockService>	cs	= agent.getServiceContainer().getRequiredService("clockservice");
+		cs.addResultListener(new DefaultResultListener<IClockService>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(IClockService cs)
 			{
-				IClockService cs = (IClockService)result;
-				System.out.println("Time for a chat buddy: "+new Date(cs.getTime()));
+				System.out.println("Time for a chat, buddy: "+new Date(cs.getTime()));
 			}
 		});
 	}

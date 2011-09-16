@@ -1,5 +1,7 @@
 package jadex.micro.tutorial;
 
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.future.IFuture;
 
@@ -16,6 +18,6 @@ public interface IRegistryServiceE3
 	/**
 	 *  Get the registered chatters.
 	 */
-	public IFuture getChatters();
+	public IFuture<Map<String, IComponentIdentifier>> getChatters();
 }
 

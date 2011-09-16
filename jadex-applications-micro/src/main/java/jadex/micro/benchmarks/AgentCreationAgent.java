@@ -270,7 +270,7 @@ public class AgentCreationAgent extends MicroAgent
 		IFuture ret = null;	// Uncomment for no caching.
 		if(ret==null)
 		{
-			ret	= SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class);  // Raw service
+			ret	= SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class);  // Raw service
 //			ret	= getServiceContainer().searchServiceUpwards(IComponentManagementService.class); // Decoupled service proxy
 //			cms	= getRequiredService("cmsservice");	// Required service proxy
 		}
@@ -283,7 +283,7 @@ public class AgentCreationAgent extends MicroAgent
 		IFuture ret = null;	// Uncomment for no caching.
 		if(ret==null)
 		{
-			ret	= SServiceProvider.getService(getServiceProvider(), IClockService.class);  // Raw service
+			ret	= SServiceProvider.getServiceUpwards(getServiceProvider(), IClockService.class);  // Raw service
 //			ret	= getServiceContainer().searchServiceUpwards(IClockService.class); // Decoupled service proxy
 //			clock	= getRequiredService("clockservice");	// Required service proxy
 		}

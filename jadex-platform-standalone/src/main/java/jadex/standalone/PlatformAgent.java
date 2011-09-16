@@ -15,6 +15,7 @@ import jadex.commons.concurrent.IThreadPool;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -102,7 +103,7 @@ import jadex.micro.annotation.RequiredServices;
 })
 
 @RequiredServices({
-	@RequiredService(name="factoryservices", type=IComponentFactory.class, multiple=true)
+	@RequiredService(name="factoryservices", type=IComponentFactory.class, multiple=true, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
 })
 
 @Configurations({

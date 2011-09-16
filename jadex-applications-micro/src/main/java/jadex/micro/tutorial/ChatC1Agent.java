@@ -1,6 +1,5 @@
 package jadex.micro.tutorial;
 
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.clock.IClockService;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
@@ -15,7 +14,7 @@ import java.util.Date;
 
 @Description("This agent uses the clock service.")
 @Agent
-@RequiredServices(@RequiredService(name = "clockservice", type = IClockService.class, binding = @Binding(scope = RequiredServiceInfo.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name = "clockservice", type = IClockService.class, binding = @Binding(scope = Binding.SCOPE_PLATFORM)))
 public class ChatC1Agent
 {
 	@Agent
@@ -27,7 +26,7 @@ public class ChatC1Agent
 	@AgentBody
 	public void executeBody()
 	{
-		System.out.println("Time for a chat buddy: "+ new Date(clockservice.getTime()));
+		System.out.println("Time for a chat, buddy: "+ new Date(clockservice.getTime()));
 	}
 }
 

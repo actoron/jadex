@@ -67,7 +67,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 //				agents.add(ca.getParameter("componentidentifier").getValue());
 				
 //				SyncResultListener	listener	= new SyncResultListener();
-				IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getService(
+				IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getServiceUpwards(
 					getServiceContainer(), IComponentManagementService.class).get(this);
 				IFuture ret = ces.createComponent(null, type, new CreationInfo(config, args[i]), null);
 				IComponentIdentifier aid = (IComponentIdentifier)ret.get(this);
@@ -100,7 +100,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 //				dispatchSubgoalAndWait(da);
 				
 //				SyncResultListener	listener	= new SyncResultListener();
-				IComponentManagementService ces	= (IComponentManagementService)SServiceProvider.getService(
+				IComponentManagementService ces	= (IComponentManagementService)SServiceProvider.getServiceUpwards(
 					getServiceContainer(), IComponentManagementService.class).get(this);
 				IFuture ret = ces.destroyComponent((IComponentIdentifier)agents.get(i));
 				ret.get(this);

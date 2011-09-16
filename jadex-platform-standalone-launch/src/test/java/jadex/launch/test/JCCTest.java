@@ -36,7 +36,7 @@ public class JCCTest extends TestCase
 			"-niotransport", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}).get(sus, timeout);
 		
 		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider
-			.getService(platform.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
+			.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
 		
 		IExternalAccess	jcc	= (IExternalAccess)cms.getExternalAccess(
 			new ComponentIdentifier("jcc", platform.getComponentIdentifier())).get(sus, timeout);

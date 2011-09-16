@@ -46,7 +46,7 @@ public class EndStatePlan extends Plan
 		// Check if worker agent has been correctly removed.
 		waitFor(1000);	// Hack!!! how to ensure that agent has time to remove itself?
 		IGoal	search	= createGoal("cmscap.cms_search_components");
-		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getService(
+		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(
 			getServiceContainer(), IComponentManagementService.class).get(this);
 		search.getParameter("description").setValue(cms.createComponentDescription(worker, null, null, null, null, null));
 		dispatchSubgoalAndWait(search);
@@ -76,7 +76,7 @@ public class EndStatePlan extends Plan
 
 		// Check if deregister agent is registered.
 		waitFor(100);	// Hack!!! how to ensure that agent has time to register itself?
-		IDF df = (IDF)SServiceProvider.getService(getServiceContainer(), IDF.class).get(this);
+		IDF df = (IDF)SServiceProvider.getServiceUpwards(getServiceContainer(), IDF.class).get(this);
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "endstate_testservice", null);
 		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 		

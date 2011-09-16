@@ -358,7 +358,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 				finishing = true;
 //				((IComponentManagementService)variables.get("$cms")).destroyComponent(adapter.getComponentIdentifier());
 				
-				SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+				SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
 					.addResultListener(createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)

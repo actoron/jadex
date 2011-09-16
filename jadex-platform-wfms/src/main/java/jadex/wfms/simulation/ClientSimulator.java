@@ -112,7 +112,7 @@ public class ClientSimulator
 						updateGui();
 					}
 				});
-				SServiceProvider.getService(agent.getServiceProvider(), ILibraryService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getServiceUpwards(agent.getServiceProvider(), ILibraryService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{

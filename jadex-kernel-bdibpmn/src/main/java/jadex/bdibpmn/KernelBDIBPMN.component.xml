@@ -40,7 +40,7 @@
 					},
 					new Object[]
 					{
-						new JavaStandardPlanExecutor((IThreadPoolService)SServiceProvider.getService($component.getServiceProvider(), IThreadPoolService.class).get(new ThreadSuspendable())),
+						new JavaStandardPlanExecutor((IThreadPoolService)SServiceProvider.getServiceUpwards($component.getServiceProvider(), IThreadPoolService.class).get(new ThreadSuspendable())),
 						Boolean.TRUE,
 						new BpmnPlanExecutor(),
 						"jadex.tools.debugger.bdi.BDIViewerDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"

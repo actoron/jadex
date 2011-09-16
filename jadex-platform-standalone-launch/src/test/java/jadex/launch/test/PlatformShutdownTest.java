@@ -31,7 +31,7 @@ public class PlatformShutdownTest extends TestCase
 			"-configname", "allkernels",	// Todo: does not work with multi-kernel on Hudson!?
 			"-niotransport", "false", "-gui", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}).get(sus, timeout);
 		final Future	fut	= new Future();
-		SServiceProvider.getService(platform.getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(new DelegationResultListener(fut)
 		{
 			public void customResultAvailable(Object result)

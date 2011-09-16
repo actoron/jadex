@@ -5,11 +5,13 @@ import jadex.base.test.Testcase;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -21,7 +23,7 @@ import jadex.micro.annotation.Results;
  */
 @Description("Testing broken init.")
 @Results(@Result(name="testresults", clazz=Testcase.class))
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class))
+@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
 public class BrokenInitTestAgent extends MicroAgent
 {
 	/**

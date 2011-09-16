@@ -46,14 +46,14 @@ public class DFTestPlan extends Plan
 	 */
 	public int	performInitialTests(int num)
 	{
-		IDFComponentDescription desc = ((IDF)SServiceProvider.getService(getScope().getServiceContainer(), IDF.class).get(this))
+		IDFComponentDescription desc = ((IDF)SServiceProvider.getServiceUpwards(getScope().getServiceContainer(), IDF.class).get(this))
 			.createDFComponentDescription(null, new IDFServiceDescription[]
 			{
-				((IDF)SServiceProvider.getService(getServiceContainer(), IDF.class).get(this))
+				((IDF)SServiceProvider.getServiceUpwards(getServiceContainer(), IDF.class).get(this))
 					.createDFServiceDescription("service_a", "a", "a"),
-				((IDF)SServiceProvider.getService(getServiceContainer(), IDF.class).get(this))
+				((IDF)SServiceProvider.getServiceUpwards(getServiceContainer(), IDF.class).get(this))
 					.createDFServiceDescription("service_b", "b", "b"),
-				((IDF)SServiceProvider.getService(getServiceContainer(), IDF.class).get(this))
+				((IDF)SServiceProvider.getServiceUpwards(getServiceContainer(), IDF.class).get(this))
 					.createDFServiceDescription("service_c", "c", "c")
 			}, null, null, null, null);
 
@@ -117,21 +117,21 @@ public class DFTestPlan extends Plan
 	 */
 	public int performTests(int num, IComponentIdentifier df)
 	{
-		IDFComponentDescription desc = ((IDF)SServiceProvider.getService(getServiceContainer(), IDF.class).get(this))
+		IDFComponentDescription desc = ((IDF)SServiceProvider.getServiceUpwards(getServiceContainer(), IDF.class).get(this))
 			.createDFComponentDescription(null, new IDFServiceDescription[]
 			{
-				((IDF)SServiceProvider.getService(getServiceContainer(), IDF.class).get(this))
+				((IDF)SServiceProvider.getServiceUpwards(getServiceContainer(), IDF.class).get(this))
 					.createDFServiceDescription("service_a", "a", "a"),
-				((IDF)SServiceProvider.getService(getServiceContainer(), IDF.class).get(this))
+				((IDF)SServiceProvider.getServiceUpwards(getServiceContainer(), IDF.class).get(this))
 					.createDFServiceDescription("service_b", "b", "b"),
-				((IDF)SServiceProvider.getService(getServiceContainer(), IDF.class).get(this))
+				((IDF)SServiceProvider.getServiceUpwards(getServiceContainer(), IDF.class).get(this))
 					.createDFServiceDescription("service_c", "c", "c")
 			}, null, null, null, null);
 		
 		long olt = getTime()+2000;
 //		desc_clone.setLeaseTime(new Date(olt));
 		
-		IDF dfservice = (IDF)SServiceProvider.getService(getServiceContainer(), IDF.class).get(this);
+		IDF dfservice = (IDF)SServiceProvider.getServiceUpwards(getServiceContainer(), IDF.class).get(this);
 		// Hack! does not clone services
 		IDFComponentDescription desc_clone = dfservice.createDFComponentDescription(desc.getName(), desc.getServices(), desc.getLanguages(), desc.getOntologies(), desc.getProtocols(), new Date(olt));
 

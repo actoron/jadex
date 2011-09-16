@@ -36,8 +36,12 @@
 	</plans>
 	
 	<services>
-		<requiredservice name="factory" class="IDynamicBDIFactory"/>
-		<requiredservice name="cms" class="IComponentManagementService"/>
+		<requiredservice name="factory" class="IDynamicBDIFactory">
+			<binding scope="platform"/>
+		</requiredservice>
+		<requiredservice name="cms" class="IComponentManagementService">
+			<binding scope="platform"/>
+		</requiredservice>
 	</services>
 
 	<configurations>

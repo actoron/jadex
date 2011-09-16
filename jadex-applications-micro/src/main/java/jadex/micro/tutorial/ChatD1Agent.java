@@ -1,11 +1,8 @@
 package jadex.micro.tutorial;
 
-import java.util.Collection;
-import java.util.Iterator;
-
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -17,6 +14,9 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 /**
  *  Chat micro agent provides a basic chat service. 
  */
@@ -26,9 +26,9 @@ import jadex.micro.annotation.RequiredServices;
 	implementation=@Implementation(ChatServiceD1.class)))
 @RequiredServices({
 	@RequiredService(name="clockservice", type=IClockService.class, 
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+		binding=@Binding(scope=Binding.SCOPE_PLATFORM)),
 	@RequiredService(name="chatservices", type=IChatService.class, multiple=true,
-		binding=@Binding(dynamic=true, scope=RequiredServiceInfo.SCOPE_PLATFORM))
+		binding=@Binding(dynamic=true, scope=Binding.SCOPE_PLATFORM))
 })
 public class ChatD1Agent
 {
@@ -43,14 +43,14 @@ public class ChatD1Agent
 	@AgentBody
 	public void executeBody()
 	{
-		agent.getServiceContainer().getRequiredServices("chatservices")
-			.addResultListener(new DefaultResultListener()
+		IFuture<Collection<IChatService>>	chatservices	= agent.getServiceContainer().getRequiredServices("chatservices");
+		chatservices.addResultListener(new DefaultResultListener<Collection<IChatService>>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Collection<IChatService> result)
 			{
-				for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
+				for(Iterator<IChatService> it=result.iterator(); it.hasNext(); )
 				{
-					IChatService cs = (IChatService)it.next();
+					IChatService cs = it.next();
 					cs.message(agent.getComponentIdentifier().getName(), "Hello");
 				}
 			}
