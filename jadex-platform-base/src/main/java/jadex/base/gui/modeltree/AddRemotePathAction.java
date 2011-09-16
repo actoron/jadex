@@ -15,12 +15,19 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
 import jadex.xml.annotation.XMLClassname;
 
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.UIDefaults;
 import javax.swing.filechooser.FileFilter;
 
@@ -108,6 +115,19 @@ public class AddRemotePathAction extends ToolTipAction
 						{
 							String name = f.getName().toLowerCase();
 							return f.isDirectory() || name.endsWith(".jar");
+						}
+					});
+					JPanel pan = new JPanel(new GridBagLayout());
+					JButton refresh = new JButton("Refresh");
+					pan.add(refresh, new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.NORTHEAST,
+						GridBagConstraints.NONE, new Insets(0,0,0,0), 0, 0));
+					filechooser.setAccessory(pan);
+					refresh.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							view.clearCache();
+							filechooser.rescanCurrentDirectory();
 						}
 					});
 					fut.setResult(null);

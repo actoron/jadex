@@ -586,8 +586,35 @@ public class RemoteFileSystemView extends FileSystemView
 	 */
 	public File createFileObject(File dir, String filename)
 	{
-		System.out.println("createFileObject: "+dir+" "+filename);
-		return super.createFileObject(dir, filename);
+		File ret = null;
+		File[] cs = (File[])children.get(dir.getAbsolutePath());
+		if(cs!=null)
+		{
+			for(int i=0; i<cs.length; i++)
+			{
+				if(cs[i].getName().equals(filename))
+				{
+					ret = cs[i];
+					break;
+				}
+			}
+		}
+		if(ret==null && dir instanceof RemoteFile)
+		{
+			RemoteFile rdir = (RemoteFile)dir;
+			FileData fd = rdir.getFiledata();
+			String path = fd.getPath()+fd.getSeparatorChar()+filename;
+			boolean isdir = filename.indexOf(".")==-1; // directory if no point in name
+			ret = new RemoteFile(new FileData(filename, path, isdir, null, fd.getLastModified(), fd.getSeparatorChar(), fd.getPrefixLength()));
+		}
+		else if(ret==null)
+		{
+			ret = super.createFileObject(dir, filename);
+		}
+		
+//		System.out.println("createFileObject: "+dir+" "+filename);
+		return ret;
+		
 //		if(dir == null)
 //		{
 //			return new File(filename);
@@ -603,9 +630,8 @@ public class RemoteFileSystemView extends FileSystemView
 	 */
 	public File createFileObject(String path)
 	{
-		System.out.println("createFileObject: "+path);
-		RemoteFile file = new RemoteFile(new FileData(null, path, false, null, 0, '/', 0));
-		return file;
+//		System.out.println("createFileObject: "+path);
+		return createFileObject(chooser.getCurrentDirectory(), path);
 //		return super.createFileObject(path);
 //		File f = new File(path);
 //		if(isFileSystemRoot(f))
@@ -640,11 +666,11 @@ public class RemoteFileSystemView extends FileSystemView
 					{
 						FileSystemView view = FileSystemView.getFileSystemView();
 						files = view.getFiles(dir, useFileHiding);
-						System.out.println("children: "+dir+" "+SUtil.arrayToString(files));
+//						System.out.println("children: "+dir+" "+SUtil.arrayToString(files));
 					}
 					else
 					{
-						System.out.println("file does not exist: "+dir);
+//						System.out.println("file does not exist: "+dir);
 						files = new File[0];
 					}
 					return FileData.convertToRemoteFiles(files);
@@ -666,10 +692,10 @@ public class RemoteFileSystemView extends FileSystemView
 				}
 			});
 		}
-		else
-		{
-			System.out.println("cached children: "+dir+" "+SUtil.arrayToString(ret));
-		}
+//		else
+//		{
+//			System.out.println("cached children: "+dir+" "+SUtil.arrayToString(ret));
+//		}
 
 		return ret==null? new File[0]: ret;
 	}
@@ -719,7 +745,7 @@ public class RemoteFileSystemView extends FileSystemView
 			});
 		}
 		
-		System.out.println("parent: "+dir+" "+parent);
+//		System.out.println("parent: "+dir+" "+parent);
 		return parent;
 	}
 
@@ -746,6 +772,15 @@ public class RemoteFileSystemView extends FileSystemView
 //			return null;
 //		}
 //	}
+	
+	/**
+	 *  Clear the cache.
+	 */
+	public void clearCache()
+	{
+		children.clear();
+		parents.clear();
+	}
 	
 	/**
 	 *  Main for testing.

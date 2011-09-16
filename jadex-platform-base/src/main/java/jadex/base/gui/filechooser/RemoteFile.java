@@ -143,7 +143,7 @@ public class RemoteFile extends File
 //    		}
 //    	}
     	
-    	System.out.println("getPa: "+getPath()+" "+ret);
+//    	System.out.println("getPa: "+getPath()+" "+ret);
     	return ret;
     }
 
@@ -172,7 +172,7 @@ public class RemoteFile extends File
     		ret = new RemoteFile(new FileData(name, path, true, name, filedata.getLastModified(), 
     			filedata.getSeparatorChar(), filedata.getPrefixLength()));
     	}
-    	System.out.println("getPaF: "+getPath()+" "+pa);
+//    	System.out.println("getPaF: "+getPath()+" "+pa);
     	return ret;
     }
 
@@ -338,6 +338,7 @@ public class RemoteFile extends File
 	{
 		return "RemoteFile(filedata="+filedata+")";
 	}
+	
 	
 	/**
 	 *  Main for testing.
