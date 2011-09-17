@@ -32,8 +32,8 @@ public class ChatC2Agent
 	@AgentBody
 	public void executeBody()
 	{
-		IFuture<IClockService>	cs	= agent.getServiceContainer().getRequiredService("clockservice");
-		cs.addResultListener(new DefaultResultListener<IClockService>()
+		IFuture<IClockService> fut = agent.getServiceContainer().getRequiredService("clockservice");
+		fut.addResultListener(new DefaultResultListener<IClockService>()
 		{
 			public void resultAvailable(IClockService cs)
 			{

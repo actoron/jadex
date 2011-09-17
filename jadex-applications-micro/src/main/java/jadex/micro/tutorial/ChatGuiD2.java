@@ -67,7 +67,14 @@ public class ChatGuiD2 extends JFrame
 								for(Iterator<IChatService> it=result.iterator(); it.hasNext(); )
 								{
 									IChatService cs = it.next();
-									cs.message(agent.getComponentIdentifier().getName(), text);
+									try
+									{
+										cs.message(agent.getComponentIdentifier().getName(), text);
+									}
+									catch(Exception e)
+									{
+										System.out.println("Could not send message to: "+cs);
+									}
 								}
 							}
 						});
