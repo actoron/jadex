@@ -57,6 +57,8 @@ public class EventMultipleStepHandler implements IStepHandler
 			throw new RuntimeException("Could not determine next edge: "+this);
 		
 		thread.setWaitInfo(wi);
+		// Move thread to triggered event. Todo: process edge in between
+		thread.setActivity(next.getTarget());	
 		instance.step(next.getTarget(), instance, thread, event);
 	}
 }

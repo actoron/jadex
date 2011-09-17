@@ -64,8 +64,8 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 		List outgoing = activity.getOutgoingSequenceEdges();
 		Object[] waitinfos = (Object[])thread.getWaitInfo();
 		
-		if(waitinfos==null)
-			System.out.println("here");
+//		if(waitinfos==null)
+//			System.out.println("here");
 	
 		for(int i=0; i<outgoing.size(); i++)
 		{

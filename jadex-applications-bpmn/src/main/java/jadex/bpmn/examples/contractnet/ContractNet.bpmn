@@ -64,6 +64,17 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_doEvFwRPEeCnwcpWvxOwkg" key="7:4" value="String"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_doEvGARPEeCnwcpWvxOwkg" key="7:5" value="SUtil.createUniqueId($component.getComponentIdentifier().getName())"/>
   </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_fymvQOEmEeCfCOXK9ag5nA" source="jadex_configurations_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lC_DwOEmEeCfCOXK9ag5nA" key="dimension" value="2:3"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lC_DweEmEeCfCOXK9ag5nA" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lC_DwuEmEeCfCOXK9ag5nA" key="complexColumns" value="false:false:false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lC_Dw-EmEeCfCOXK9ag5nA" key="0:0" value="id"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lC_DxOEmEeCfCOXK9ag5nA" key="0:1" value="Initiator"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lC_DxeEmEeCfCOXK9ag5nA" key="0:2" value="Initiator"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lC_DxuEmEeCfCOXK9ag5nA" key="1:0" value="id1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lC_Dx-EmEeCfCOXK9ag5nA" key="1:1" value="Participant"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lC_DyOEmEeCfCOXK9ag5nA" key="1:2" value="Participant"/>
+  </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_cNIeoVT6Ed-32983CGnnJA" iD="_cNIeoFT6Ed-32983CGnnJA" name="Initiator">
     <vertices xmi:type="bpmn:Activity" xmi:id="_cOd7YVT6Ed-32983CGnnJA" iD="_cOd7YFT6Ed-32983CGnnJA" outgoingEdges="_y8pRoVapEd-1RJ7RXx1qjA" name="Initiate" activityType="EventStartEmpty" looping="false"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_vpa4QVanEd-1RJ7RXx1qjA" iD="_vpa4QFanEd-1RJ7RXx1qjA" outgoingEdges="_xfIcsVanEd-1RJ7RXx1qjA _ncPh0VavEd-1RJ7RXx1qjA" incomingEdges="_8af54VauEd-1RJ7RXx1qjA _9R7RIVauEd-1RJ7RXx1qjA" activityType="GatewayDataBasedExclusive"/>
