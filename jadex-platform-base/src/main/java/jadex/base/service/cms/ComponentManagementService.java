@@ -386,7 +386,7 @@ public abstract class ComponentManagementService extends BasicService implements
 														{
 															cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName(), paname);
 														}
-														initinfos.put(cid, new Object[0]);
+														initinfos.put(cid, new InitInfo(null, null, cinfo, null, inited, null));
 													}
 													
 													Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
@@ -425,10 +425,10 @@ public abstract class ComponentManagementService extends BasicService implements
 	//																initinfos.remove(cid);
 																
 																CMSComponentDescription padesc;
-																Object[] painfo = getParentInfo(cinfo);
-																if(painfo!=null)
+																InitInfo painfo = getParentInfo(cinfo);
+																if(painfo!=null && painfo.getDescription()!=null)
 																{
-																	padesc = (CMSComponentDescription)painfo[0];
+																	padesc = (CMSComponentDescription)painfo.getDescription();
 																}
 																else
 																{
@@ -546,7 +546,7 @@ public abstract class ComponentManagementService extends BasicService implements
 																	synchronized(adapters)
 																	{
 																		adapters.remove(cid);
-																		initinfos.remove(cid);		
+																		removeInitInfo(cid);
 																	}
 																	
 																	IResultListener reslis = (IResultListener)killresultlisteners.remove(cid);
@@ -606,7 +606,12 @@ public abstract class ComponentManagementService extends BasicService implements
 															{
 																// 0: description, 1: adapter, 2: creation info, 3: model, 4: initfuture, 5: component instance
 	//															System.out.println("infos: "+ad.getName());
-																initinfos.put(cid, new Object[]{ad, comp.getSecondEntity(), cinfo, lmodel, future, comp.getFirstEntity()});
+																InitInfo ii = getInitInfo(cid);
+																ii.setDescription(ad);
+																ii.setInstance(comp.getFirstEntity());
+																ii.setAdapter(comp.getSecondEntity());
+																ii.setModel(lmodel);
+//																initinfos.put(cid, new Object[]{ad, comp.getSecondEntity(), cinfo, lmodel, future, comp.getFirstEntity()});
 															}
 															
 															try
@@ -860,10 +865,10 @@ public abstract class ComponentManagementService extends BasicService implements
 	/**
 	 *  Get the info of the parent component.
 	 */
-	protected Object[] getParentInfo(CreationInfo cinfo)
+	protected InitInfo getParentInfo(CreationInfo cinfo)
 	{
 		final IComponentIdentifier paid = getParentIdentifier(cinfo);
-		Object[] ret;
+		InitInfo ret;
 		synchronized(adapters)
 		{
 			ret = getInitInfo(paid);
@@ -883,7 +888,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			adapter = (IComponentAdapter)adapters.get(paid);
 			if(adapter==null)
 			{
-				adapter = (IComponentAdapter)getParentInfo(cinfo)[1];
+				adapter = getParentInfo(cinfo).getAdapter();
 			}
 		}
 		return adapter;
@@ -900,7 +905,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		{
 			desc = adapters.containsKey(paid)
 				? (CMSComponentDescription)((IComponentAdapter)adapters.get(paid)).getDescription()
-				: (CMSComponentDescription)getParentInfo(cinfo)[0];
+				: (CMSComponentDescription)getParentInfo(cinfo).getDescription();
 		}
 		return desc;
 	}
@@ -1018,20 +1023,21 @@ public abstract class ComponentManagementService extends BasicService implements
 		else
 		{
 			IComponentAdapter ad;
-			Object[] infos;
+			InitInfo infos;
 			synchronized(adapters)
 			{
 				ad = (IComponentAdapter)adapters.get(cid);
-				infos = (Object[])initinfos.get(cid);
+				infos = getInitInfo(cid);
 			}
 			// Terminate component that is shut down during init.
-			if(infos!=null && infos.length>0 && !((IFuture)infos[4]).isDone())
+//			if(infos!=null && infos.length>0 && !((IFuture)infos[4]).isDone())
+			if(infos!=null && !infos.getInitFuture().isDone())
 			{
 				// Propagate failed component init.
-				ad	= (IComponentAdapter)infos[1];
-				if(ad.getException()!=null)
+				ad	= infos.getAdapter();
+				if(ad==null || ad.getException()!=null)
 				{
-					((Future)infos[4]).setException(ad.getException());
+					infos.getInitFuture().setException(ad.getException());
 				}
 				
 				// Component terminated from outside: wait for init to complete, will be removed as cleanup future is registered (cfs).
@@ -1333,14 +1339,12 @@ public abstract class ComponentManagementService extends BasicService implements
 									// Not killed during init.
 									if(!cfs.containsKey(cid))
 									{
-										Object[] ii = (Object[])initinfos.remove(cid);
+										InitInfo ii = removeInitInfo(cid);
 			//							System.out.println("removed: "+cid+" "+ii);
-										if(ii!=null && ii.length>=6)
+										if(ii!=null && ii.getInstance()!=null)
 										{
-											CreationInfo cinfo = (CreationInfo)ii[2];
-											IModelInfo lmodel = (IModelInfo)ii[3];
-											boolean	suspend = isInitSuspend(cinfo, lmodel);
-											instance = (IComponentInstance)ii[5];
+											boolean	suspend = isInitSuspend(ii.getInfo(), ii.getModel());
+											
 											if(suspend)
 											{
 												desc.setState(IComponentDescription.STATE_SUSPENDED);
@@ -1353,7 +1357,7 @@ public abstract class ComponentManagementService extends BasicService implements
 									// Killed after init but before init resume -> execute queued destroy.
 									else if(initinfos.containsKey(cid))
 									{
-										initinfos.remove(cid);
+										removeInitInfo(cid);
 										destroy	= (Future)cfs.remove(cid);
 									}									
 								}
@@ -1804,22 +1808,21 @@ public abstract class ComponentManagementService extends BasicService implements
 				if(adapter==null)
 				{
 					// Hack? Allows components to getExternalAccess in init phase
-					Object[] ii = getInitInfo(cid);
-					if(ii!=null && ii.length>0)
+					InitInfo ii = getInitInfo(cid);
+					if(ii!=null)
 					{
-						final IComponentAdapter ada = (IComponentAdapter)ii[1];
-						if(ada.isExternalThread())
+						if(ii.getAdapter()==null || ii.getAdapter().isExternalThread())
 						{
-							System.out.println("delayed");
+//							System.out.println("delayed");
 							delayed = true;
-							IFuture fut = (IFuture)ii[4];
+							IFuture fut = ii.getInitFuture();
 							fut.addResultListener(new DelegationResultListener(ret)
 							{
 								public void customResultAvailable(Object result)
 								{
 									try
 									{
-										ret.setResult(getComponentInstance(ada).getExternalAccess());
+										ret.setResult(getComponentInstance(getComponentAdapter(cid)).getExternalAccess());
 									}
 									catch(Exception e)
 									{
@@ -1830,7 +1833,7 @@ public abstract class ComponentManagementService extends BasicService implements
 						}
 						else
 						{
-							adapter = ada;
+							adapter = ii.getAdapter();
 						}
 					}
 				}
@@ -1936,9 +1939,9 @@ public abstract class ComponentManagementService extends BasicService implements
 			// Hack, to retrieve description from component itself in init phase
 			if(ret==null)
 			{
-				Object[] ii= getInitInfo(cid);
-				if(ii!=null && ii.length>0)
-					ret	= (IComponentAdapter)ii[1];
+				InitInfo ii= getInitInfo(cid);
+				if(ii!=null)
+					ret	= ii.getAdapter();
 			}
 		}
 		return ret;
@@ -2203,9 +2206,9 @@ public abstract class ComponentManagementService extends BasicService implements
 				// Hack, to retrieve description from component itself in init phase
 				if(desc==null)
 				{
-					Object[] ii= getInitInfo(cid);
+					InitInfo ii= getInitInfo(cid);
 					if(ii!=null)
-						desc	= (IComponentDescription) ii[0];
+						desc = ii.getDescription();
 				}
 				
 				// Todo: addresses required for communication across platforms.
@@ -2667,12 +2670,12 @@ public abstract class ComponentManagementService extends BasicService implements
 	protected boolean isInitSuspend(CreationInfo cinfo, IModelInfo lmodel)
 	{
 		boolean pasuspend = false;
-		Object[] painfo = getParentInfo(cinfo);
+		InitInfo painfo = getParentInfo(cinfo);
 		
 		// Parent also still in init.
-		if(painfo!=null)
+		if(painfo!=null && painfo.getModel()!=null)
 		{
-			pasuspend	= isInitSuspend((CreationInfo)painfo[2], (IModelInfo)painfo[3]);
+			pasuspend	= isInitSuspend(painfo.getInfo(), painfo.getModel());
 		}
 		
 		// Parent already running.
@@ -2718,9 +2721,9 @@ public abstract class ComponentManagementService extends BasicService implements
 			// Hack? Allows components to getExternalAccess in init phase
 			if(adapter==null)
 			{
-				Object[] ii = getInitInfo(cid);
+				InitInfo ii = getInitInfo(cid);
 				if(ii!=null)
-					adapter = (IComponentAdapter)ii[1];
+					adapter = ii.getAdapter();
 			}
 			return adapter!=null ? adapter.getDescription() : null;
 		}
@@ -2956,14 +2959,184 @@ public abstract class ComponentManagementService extends BasicService implements
 		return ret;
 	}
 	
+//	/**
+//	 *  Get the init info for a component identifier.
+//	 */
+//	protected Object[] getInitInfo(IComponentIdentifier cid)
+//	{
+//		Object[] ret = (Object[])initinfos.get(cid);
+//		if(ret!=null && ret.length==0)
+//			ret = null;
+//		return ret;
+//	}
+	
 	/**
 	 *  Get the init info for a component identifier.
 	 */
-	protected Object[] getInitInfo(IComponentIdentifier cid)
+	protected InitInfo getInitInfo(IComponentIdentifier cid)
 	{
-		Object[] ret = (Object[])initinfos.get(cid);
-		if(ret!=null && ret.length==0)
-			ret = null;
-		return ret;
+		return (InitInfo)initinfos.get(cid);
+	}
+	
+	/**
+	 *  Put an init info.
+	 */
+	protected void putInitInfo(IComponentIdentifier cid, InitInfo info)
+	{
+		initinfos.put(cid, info);
+	}
+	
+	/**
+	 *  Remove an init info.
+	 */
+	protected InitInfo removeInitInfo(IComponentIdentifier cid)
+	{
+		return (InitInfo)initinfos.remove(cid);
+	}
+	
+	static class InitInfo
+	{
+		// 0: description, 1: adapter, 2: creation info, 3: model, 4: initfuture, 5: component instance
+		
+		/** The component description. */
+		protected IComponentDescription description;
+		
+		/** The adapter. */
+		protected IComponentAdapter adapter;
+		
+		/** The creation info. */
+		protected CreationInfo info;
+		
+		/** The model. */
+		protected IModelInfo model;
+		
+		/** The init future. */
+		protected Future initfuture;
+		
+		/** The component instance. */
+		protected IComponentInstance instance;
+
+		/**
+		 *  Create a new init info.
+		 */
+		public InitInfo(IComponentDescription description,
+			IComponentAdapter adapter, CreationInfo info, IModelInfo model,
+			Future initfuture, IComponentInstance instance)
+		{
+			this.description = description;
+			this.adapter = adapter;
+			this.info = info;
+			this.model = model;
+			this.initfuture = initfuture;
+			this.instance = instance;
+		}
+
+		/**
+		 *  Get the description.
+		 *  @return The description.
+		 */
+		public IComponentDescription getDescription()
+		{
+			return description;
+		}
+
+		/**
+		 *  Set the description.
+		 *  @param description The description to set.
+		 */
+		public void setDescription(IComponentDescription description)
+		{
+			this.description = description;
+		}
+
+		/**
+		 *  Get the adapter.
+		 *  @return The adapter.
+		 */
+		public IComponentAdapter getAdapter()
+		{
+			return adapter;
+		}
+
+		/**
+		 *  Set the adapter.
+		 *  @param adapter The adapter to set.
+		 */
+		public void setAdapter(IComponentAdapter adapter)
+		{
+			this.adapter = adapter;
+		}
+
+		/**
+		 *  Get the info.
+		 *  @return The info.
+		 */
+		public CreationInfo getInfo()
+		{
+			return info;
+		}
+
+		/**
+		 *  Set the info.
+		 *  @param info The info to set.
+		 */
+		public void setInfo(CreationInfo info)
+		{
+			this.info = info;
+		}
+
+		/**
+		 *  Get the model.
+		 *  @return The model.
+		 */
+		public IModelInfo getModel()
+		{
+			return model;
+		}
+
+		/**
+		 *  Set the model.
+		 *  @param model The model to set.
+		 */
+		public void setModel(IModelInfo model)
+		{
+			this.model = model;
+		}
+
+		/**
+		 *  Get the initfuture.
+		 *  @return The initfuture.
+		 */
+		public Future getInitFuture()
+		{
+			return initfuture;
+		}
+
+		/**
+		 *  Set the initfuture.
+		 *  @param initfuture The initfuture to set.
+		 */
+		public void setInitFuture(Future initfuture)
+		{
+			this.initfuture = initfuture;
+		}
+
+		/**
+		 *  Get the instance.
+		 *  @return The instance.
+		 */
+		public IComponentInstance getInstance()
+		{
+			return instance;
+		}
+
+		/**
+		 *  Set the instance.
+		 *  @param instance The instance to set.
+		 */
+		public void setInstance(IComponentInstance instance)
+		{
+			this.instance = instance;
+		}
 	}
 }

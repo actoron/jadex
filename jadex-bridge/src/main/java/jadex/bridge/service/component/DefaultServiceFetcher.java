@@ -386,7 +386,14 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 			public void exceptionOccurred(Exception exception)
 			{
 				// No component found with cid -> create.
-				createComponent(provider, info, binding).addResultListener(new DelegationResultListener(ret));
+				createComponent(provider, info, binding).addResultListener(new DelegationResultListener(ret)
+				{
+					public void exceptionOccurred(Exception exception)
+					{
+						System.out.println("kuku");
+						super.exceptionOccurred(exception);
+					}
+				});
 			}
 		});
 		return ret;
@@ -618,7 +625,13 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 											{
 //												super.exceptionOccurred(exception);
 												getExternalAccess(provider, (IComponentIdentifier)((ComponentCreationException)exception).getInfo())
-													.addResultListener(new DelegationResultListener(ret));
+													.addResultListener(new DelegationResultListener(ret)
+													{
+														public void exceptionOccurred(Exception exception) 
+														{
+															exception.printStackTrace();
+														};
+													});
 											}
 											else
 											{

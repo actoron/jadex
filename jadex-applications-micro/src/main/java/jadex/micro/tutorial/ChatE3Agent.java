@@ -76,6 +76,11 @@ public class ChatE3Agent
 					}
 				});
 			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				super.exceptionOccurred(exception);
+			}
 		});
 	}
 }
