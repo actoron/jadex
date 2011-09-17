@@ -1722,62 +1722,6 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param cid The component identifier.
 	 *  @param listener The result listener.
 	 */
-	public IFuture getExternalAccess(final IComponentIdentifier cid)
-	{
-		final Future ret = new Future();
-		
-		if(cid==null)
-		{
-			ret.setException(new IllegalArgumentException("Identifier is null."));
-			return ret;
-		}
-		
-		if(isRemoteComponent(cid))
-		{
-			getRemoteCMS(cid).addResultListener(new DelegationResultListener(ret)
-			{
-				public void customResultAvailable(Object result)
-				{
-					final IComponentManagementService rcms = (IComponentManagementService)result;
-					rcms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret));
-				}
-			});
-		}
-		else
-		{
-			IComponentAdapter adapter = null;
-			synchronized(adapters)
-			{
-				adapter = (IComponentAdapter)adapters.get(cid);
-				if(adapter==null)
-				{
-					// Hack? Allows components to getExternalAccess in init phase
-					InitInfo ii = getInitInfo(cid);
-					if(ii!=null)
-						adapter = (IComponentAdapter)ii.getAdapter();
-				}
-			}
-			
-			if(adapter==null)
-			{
-				ret.setException(new RuntimeException("No local component found for component identifier: "+cid));
-			}
-			else
-			{
-				try
-				{
-					ret.setResult(getComponentInstance(adapter).getExternalAccess());
-				}
-				catch(Exception e)
-				{
-					ret.setException(e);
-				}
-			}
-		}
-		
-		return ret;
-	}
-	
 //	public IFuture getExternalAccess(final IComponentIdentifier cid)
 //	{
 //		final Future ret = new Future();
@@ -1804,63 +1748,124 @@ public abstract class ComponentManagementService extends BasicService implements
 //			IComponentAdapter adapter = null;
 //			synchronized(adapters)
 //			{
-//				boolean delayed = false;
 //				adapter = (IComponentAdapter)adapters.get(cid);
-//				
 //				if(adapter==null)
 //				{
 //					// Hack? Allows components to getExternalAccess in init phase
 //					InitInfo ii = getInitInfo(cid);
 //					if(ii!=null)
-//					{
-//						if(ii.getAdapter()==null || ii.getAdapter().isExternalThread())
-//						{
-////							System.out.println("delayed");
-//							delayed = true;
-//							IFuture fut = ii.getInitFuture();
-//							fut.addResultListener(new DelegationResultListener(ret)
-//							{
-//								public void customResultAvailable(Object result)
-//								{
-//									try
-//									{
-//										ret.setResult(getComponentInstance(getComponentAdapter(cid)).getExternalAccess());
-//									}
-//									catch(Exception e)
-//									{
-//										ret.setException(e);
-//									}
-//								}
-//							});
-//						}
-//						else
-//						{
-//							adapter = ii.getAdapter();
-//						}
-//					}
-//				}
-//				
-//				if(adapter!=null)
-//				{
-//					try
-//					{
-//						ret.setResult(getComponentInstance(adapter).getExternalAccess());
-//					}
-//					catch(Exception e)
-//					{
-//						ret.setException(e);
-//					}
-//				}
-//				else if(!delayed)
-//				{
-//					ret.setException(new RuntimeException("No local component found for component identifier: "+cid));
+//						adapter = (IComponentAdapter)ii.getAdapter();
 //				}
 //			}
 //			
+//			if(adapter==null)
+//			{
+//				ret.setException(new RuntimeException("No local component found for component identifier: "+cid));
+//			}
+//			else
+//			{
+//				try
+//				{
+//					ret.setResult(getComponentInstance(adapter).getExternalAccess());
+//				}
+//				catch(Exception e)
+//				{
+//					ret.setException(e);
+//				}
+//			}
 //		}
 //		
 //		return ret;
 //	}
+	
+	/**
+	 *  Get the external access of a component.
+	 *  @param cid The component identifier.
+	 *  @param listener The result listener.
+	 */
+	public IFuture getExternalAccess(final IComponentIdentifier cid)
+	{
+		final Future ret = new Future();
+		
+		if(cid==null)
+		{
+			ret.setException(new IllegalArgumentException("Identifier is null."));
+			return ret;
+		}
+		
+		if(isRemoteComponent(cid))
+		{
+			getRemoteCMS(cid).addResultListener(new DelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+					final IComponentManagementService rcms = (IComponentManagementService)result;
+					rcms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret));
+				}
+			});
+		}
+		else
+		{
+			IComponentAdapter adapter = null;
+			synchronized(adapters)
+			{
+				boolean delayed = false;
+				adapter = (IComponentAdapter)adapters.get(cid);
+				
+				if(adapter==null)
+				{
+					// Hack? Allows components to getExternalAccess in init phase
+					InitInfo ii = getInitInfo(cid);
+					if(ii!=null)
+					{
+						if(ii.getAdapter()==null || ii.getAdapter().isExternalThread())
+						{
+//							System.out.println("delayed");
+							delayed = true;
+							IFuture fut = ii.getInitFuture();
+							fut.addResultListener(new DelegationResultListener(ret)
+							{
+								public void customResultAvailable(Object result)
+								{
+									try
+									{
+										ret.setResult(getComponentInstance(getComponentAdapter(cid)).getExternalAccess());
+									}
+									catch(Exception e)
+									{
+										ret.setException(e);
+									}
+								}
+							});
+						}
+						else
+						{
+							adapter = ii.getAdapter();
+						}
+					}
+				}
+				
+				if(adapter!=null)
+				{
+					try
+					{
+						ret.setResult(getComponentInstance(adapter).getExternalAccess());
+					}
+					catch(Exception e)
+					{
+						ret.setException(e);
+					}
+				}
+				else if(!delayed)
+				{
+					ret.setException(new RuntimeException("No local component found for component identifier: "+cid));
+				}
+			}
+			
+		}
+		
+		return ret;
+	}
 	
 	/**
 	 *  Find the class loader for a new (local) component.
