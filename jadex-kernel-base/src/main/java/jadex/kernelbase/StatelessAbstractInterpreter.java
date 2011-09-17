@@ -1437,40 +1437,47 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		final Future ret = new Future();
 		final String filename = getComponentFilename(type);
 		
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new DelegationResultListener(ret)
+		if(filename==null)
 		{
-			public void customResultAvailable(Object result)
+			ret.setException(new IllegalArgumentException("Unknown type: "+type));
+		}
+		else
+		{
+			SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(createResultListener(new DelegationResultListener(ret)
 			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				cms.loadComponentModel(filename).addResultListener(createResultListener(new DelegationResultListener(ret)
+				public void customResultAvailable(Object result)
 				{
-					public void customResultAvailable(Object result)
+					IComponentManagementService cms = (IComponentManagementService)result;
+					cms.loadComponentModel(filename).addResultListener(createResultListener(new DelegationResultListener(ret)
 					{
-						IModelInfo model = (IModelInfo)result;
-						final String modelname = model.getFullName();
-					
-						getChildren().addResultListener(createResultListener(new DelegationResultListener(ret)
+						public void customResultAvailable(Object result)
 						{
-							public void customResultAvailable(Object result)
+							IModelInfo model = (IModelInfo)result;
+							final String modelname = model.getFullName();
+						
+							getChildren().addResultListener(createResultListener(new DelegationResultListener(ret)
 							{
-								Collection col = (Collection)result;
-								List res = new ArrayList();
-								for(Iterator it=col.iterator(); it.hasNext(); )
+								public void customResultAvailable(Object result)
 								{
-									IExternalAccess subcomp = (IExternalAccess)it.next();
-									if(modelname.equals(subcomp.getModel().getFullName()))
+									Collection col = (Collection)result;
+									List res = new ArrayList();
+									for(Iterator it=col.iterator(); it.hasNext(); )
 									{
-										res.add(subcomp.getComponentIdentifier());
+										IExternalAccess subcomp = (IExternalAccess)it.next();
+										if(modelname.equals(subcomp.getModel().getFullName()))
+										{
+											res.add(subcomp.getComponentIdentifier());
+										}
 									}
+									super.customResultAvailable(res);
 								}
-								super.customResultAvailable(res);
-							}
-						}));
-					}
-				}));
-			}	
-		}));
+							}));
+						}
+					}));
+				}	
+			}));
+		}
 		
 		return ret;
 	}

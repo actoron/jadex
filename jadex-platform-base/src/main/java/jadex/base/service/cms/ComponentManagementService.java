@@ -213,49 +213,55 @@ public abstract class ComponentManagementService extends BasicService implements
 	{
 		final Future<IModelInfo> ret = new Future<IModelInfo>();
 		
-		exta.scheduleStep(new IComponentStep()
+		if(filename==null)
 		{
-			@XMLClassname("loadModel")
-			public Object execute(final IInternalAccess ia)
+			ret.setException(new IllegalArgumentException("Filename must not null"));
+		}
+		else
+		{
+			exta.scheduleStep(new IComponentStep()
 			{
-				final Future<IModelInfo> ret = new Future<IModelInfo>();
-				
-				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				@XMLClassname("loadModel")
+				public Object execute(final IInternalAccess ia)
 				{
-					public void customResultAvailable(Object result)
+					final Future<IModelInfo> ret = new Future<IModelInfo>();
+					
+					SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 					{
-						final ILibraryService ls = (ILibraryService)result;
-						
-						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(filename, null, ls.getClassLoader()))
-							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+						public void customResultAvailable(Object result)
 						{
-							public void customResultAvailable(Object result)
-							{
-								IComponentFactory fac = (IComponentFactory)result;
-								fac.loadModel(filename, null, ls.getClassLoader())
-									.addResultListener(new DelegationResultListener<IModelInfo>(ret));
-							}
+							final ILibraryService ls = (ILibraryService)result;
 							
-							public void exceptionOccurred(Exception exception)
+							SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(filename, null, ls.getClassLoader()))
+								.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 							{
-								if(exception instanceof ServiceNotFoundException)
+								public void customResultAvailable(Object result)
 								{
-									ret.setResult(null);
+									IComponentFactory fac = (IComponentFactory)result;
+									fac.loadModel(filename, null, ls.getClassLoader())
+										.addResultListener(new DelegationResultListener<IModelInfo>(ret));
 								}
-								else
+								
+								public void exceptionOccurred(Exception exception)
 								{
-									super.exceptionOccurred(exception);
+									if(exception instanceof ServiceNotFoundException)
+									{
+										ret.setResult(null);
+									}
+									else
+									{
+										super.exceptionOccurred(exception);
+									}
 								}
-							}
-						}));
-					}
-				}));
-				
-				return ret;
-			}
-		}).addResultListener(new DelegationResultListener(ret));
-		
+							}));
+						}
+					}));
+					
+					return ret;
+				}
+			}).addResultListener(new DelegationResultListener(ret));
+		}
 		return ret;
 	}
 	
@@ -1710,6 +1716,62 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param cid The component identifier.
 	 *  @param listener The result listener.
 	 */
+//	public IFuture getExternalAccess(final IComponentIdentifier cid)
+//	{
+//		final Future ret = new Future();
+//		
+//		if(cid==null)
+//		{
+//			ret.setException(new IllegalArgumentException("Identifier is null."));
+//			return ret;
+//		}
+//		
+//		if(isRemoteComponent(cid))
+//		{
+//			getRemoteCMS(cid).addResultListener(new DelegationResultListener(ret)
+//			{
+//				public void customResultAvailable(Object result)
+//				{
+//					final IComponentManagementService rcms = (IComponentManagementService)result;
+//					rcms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret));
+//				}
+//			});
+//		}
+//		else
+//		{
+//			IComponentAdapter adapter = null;
+//			synchronized(adapters)
+//			{
+//				adapter = (IComponentAdapter)adapters.get(cid);
+//				if(adapter==null)
+//				{
+//					// Hack? Allows components to getExternalAccess in init phase
+//					Object[] ii = getInitInfo(cid);
+//					if(ii!=null)
+//						adapter = (IComponentAdapter)ii[1];
+//				}
+//			}
+//			
+//			if(adapter==null)
+//			{
+//				ret.setException(new RuntimeException("No local component found for component identifier: "+cid));
+//			}
+//			else
+//			{
+//				try
+//				{
+//					ret.setResult(getComponentInstance(adapter).getExternalAccess());
+//				}
+//				catch(Exception e)
+//				{
+//					ret.setException(e);
+//				}
+//			}
+//		}
+//		
+//		return ret;
+//	}
+	
 	public IFuture getExternalAccess(final IComponentIdentifier cid)
 	{
 		final Future ret = new Future();
@@ -1736,31 +1798,60 @@ public abstract class ComponentManagementService extends BasicService implements
 			IComponentAdapter adapter = null;
 			synchronized(adapters)
 			{
+				boolean delayed = false;
 				adapter = (IComponentAdapter)adapters.get(cid);
+				
 				if(adapter==null)
 				{
 					// Hack? Allows components to getExternalAccess in init phase
 					Object[] ii = getInitInfo(cid);
-					if(ii!=null)
-						adapter = (IComponentAdapter)ii[1];
+					if(ii!=null && ii.length>0)
+					{
+						final IComponentAdapter ada = (IComponentAdapter)ii[1];
+						if(ada.isExternalThread())
+						{
+							System.out.println("delayed");
+							delayed = true;
+							IFuture fut = (IFuture)ii[4];
+							fut.addResultListener(new DelegationResultListener(ret)
+							{
+								public void customResultAvailable(Object result)
+								{
+									try
+									{
+										ret.setResult(getComponentInstance(ada).getExternalAccess());
+									}
+									catch(Exception e)
+									{
+										ret.setException(e);
+									}
+								}
+							});
+						}
+						else
+						{
+							adapter = ada;
+						}
+					}
+				}
+				
+				if(adapter!=null)
+				{
+					try
+					{
+						ret.setResult(getComponentInstance(adapter).getExternalAccess());
+					}
+					catch(Exception e)
+					{
+						ret.setException(e);
+					}
+				}
+				else if(!delayed)
+				{
+					ret.setException(new RuntimeException("No local component found for component identifier: "+cid));
 				}
 			}
 			
-			if(adapter==null)
-			{
-				ret.setException(new RuntimeException("No local component found for component identifier: "+cid));
-			}
-			else
-			{
-				try
-				{
-					ret.setResult(getComponentInstance(adapter).getExternalAccess());
-				}
-				catch(Exception e)
-				{
-					ret.setException(e);
-				}
-			}
 		}
 		
 		return ret;

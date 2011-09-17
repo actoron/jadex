@@ -41,12 +41,12 @@ public class ChatServiceD1 implements IChatService
 	{
 		final Future ret = new Future();
 		this.format = new SimpleDateFormat("hh:mm:ss");
-		IFuture<IClockService>	clockservice	= agent.getServiceContainer().getRequiredService("clockservice");
-		clockservice.addResultListener(new DelegationResultListener<IClockService>(ret)
+		IFuture<IClockService>	fut	= agent.getServiceContainer().getRequiredService("clockservice");
+		fut.addResultListener(new DelegationResultListener<IClockService>(ret)
 		{
 			public void customResultAvailable(IClockService result)
 			{
-				ChatServiceD1.this.clock = result;
+				clock = result;
 				super.customResultAvailable(null);
 			}
 		});

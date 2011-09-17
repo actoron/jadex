@@ -17,7 +17,7 @@ import jadex.micro.annotation.RequiredServices;
 @Description("Agent offering a generate service.")
 @ProvidedServices(@ProvidedService(type=IGenerateService.class, implementation=@Implementation(GenerateService.class)))
 @RequiredServices({
-	@RequiredService(name="displayservice", type=IDisplayService.class),
+	@RequiredService(name="displayservice", type=IDisplayService.class, binding=@Binding(create=true, dynamic=true, componenttype="Display", scope=RequiredServiceInfo.SCOPE_PARENT)),
 	@RequiredService(name="calculateservices", type=ICalculateService.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL)),
 	@RequiredService(name="cmsservice", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="generateservice", type=IGenerateService.class)

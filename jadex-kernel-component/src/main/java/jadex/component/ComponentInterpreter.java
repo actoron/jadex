@@ -195,7 +195,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 				catch(RuntimeException e)
 				{
 //					e.printStackTrace();
-					future.setException(e);
+					future.setExceptionIfUndone(e);
 					throw e;
 				}
 			}

@@ -193,6 +193,9 @@ public class SServiceProvider
 	 */
 	public static IFuture getService(final IServiceProvider provider, final Class type, final String scope)
 	{
+//		if(type.toString().indexOf("IReg")!=-1 && scope.equals("local"))
+//			System.out.println("here22");
+		
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(type);

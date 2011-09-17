@@ -75,6 +75,9 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	 */
 	public IFuture getService(final RequiredServiceInfo info, RequiredServiceBinding bd, final boolean rebind)
 	{
+//		if(info.getType().toString().indexOf("IDis")!=-1)
+//			System.out.println("diss" );
+		
 		final Future ret = new Future();
 		final RequiredServiceBinding binding = bd!=null? bd: info.getDefaultBinding();
 		
