@@ -85,7 +85,7 @@ public class BotGuiF3 extends AbstractComponentViewerPanel
 		});
 		
 		// Set new reply message.
-		tfkeyword.addActionListener(new ActionListener()
+		tfreply.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{

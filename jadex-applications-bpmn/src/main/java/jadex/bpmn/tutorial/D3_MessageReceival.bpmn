@@ -11,19 +11,18 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__VBdQUJVEd-lXM2_JTGF5Q" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wAU4kARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4kQRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4kgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4kwRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4lARPEeCnwcpWvxOwkg" key="0:1" value="text"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4lQRPEeCnwcpWvxOwkg" key="0:2" value="java.lang.String"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4lgRPEeCnwcpWvxOwkg" key="0:3" value="&quot;Send this process a message using the conversation center.&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AyagwOE-EeCaWpd5N4uTqA" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AyagweE-EeCaWpd5N4uTqA" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AyagwuE-EeCaWpd5N4uTqA" key="complexColumns" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AybH0OE-EeCaWpd5N4uTqA" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AybH0eE-EeCaWpd5N4uTqA" key="0:1" value="text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AybH0uE-EeCaWpd5N4uTqA" key="0:2" value="java.lang.String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AybH0-E-EeCaWpd5N4uTqA" key="0:3" value="&quot;Send this process a message with performative 'request' using the conversation center.&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_GvBwsUJWEd-lXM2_JTGF5Q" iD="_GvBwsEJWEd-lXM2_JTGF5Q" outgoingEdges="_WoxQmkJWEd-lXM2_JTGF5Q" incomingEdges="_GvBwukJWEd-lXM2_JTGF5Q" activityType="EventIntermediateMessage">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_HjxnYEJWEd-lXM2_JTGF5Q" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HjxnYUJWEd-lXM2_JTGF5Q" key="mode" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HjxnYkJWEd-lXM2_JTGF5Q" key="msgtype" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HjxnY0JWEd-lXM2_JTGF5Q" key="message" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HjxnZEJWEd-lXM2_JTGF5Q" key="filter" value=""/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wAU4lwRPEeCnwcpWvxOwkg" source="jadex_parameters_table">

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_yQl4kdCREd6MVLxz8V9N3w" iD="_yQl4kNCREd6MVLxz8V9N3w">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KRLQcBciEd-OSKK6OfNWqA" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KRLQchciEd-OSKK6OfNWqA" key="Description" value="&lt;h3>Message performance benchmark&lt;/h3> The process sends a number of agents to itself and measures the time it needs for this."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KRVBcBciEd-OSKK6OfNWqA" key="Package" value="jadex.bpmn.benchmarks"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dDI16gRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_soi6YOE7EeCaWpd5N4uTqA" key="description" value="&lt;h3>Message performance benchmark&lt;/h3> The process sends a number of agents to itself and measures the time it needs for this."/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_c6DyUARPEeCnwcpWvxOwkg" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6DyUQRPEeCnwcpWvxOwkg" key="dimension" value="4:1"/>
@@ -14,14 +14,15 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6DyVgRPEeCnwcpWvxOwkg" key="3:0" value="jadex.base.fipa.*"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_c6M8QARPEeCnwcpWvxOwkg" source="jadex_arguments_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6M8QQRPEeCnwcpWvxOwkg" key="dimension" value="1:6"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6M8QgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6M8QwRPEeCnwcpWvxOwkg" key="0:0" value="starttime"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6M8RARPEeCnwcpWvxOwkg" key="0:1" value="false"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6M8RQRPEeCnwcpWvxOwkg" key="0:2" value="false"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6M8RgRPEeCnwcpWvxOwkg" key="0:3" value="starttime"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6M8RwRPEeCnwcpWvxOwkg" key="0:4" value="long"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6M8SARPEeCnwcpWvxOwkg" key="0:5" value="$clock.getTime()"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugMYgOE7EeCaWpd5N4uTqA" key="dimension" value="1:6"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugMYgeE7EeCaWpd5N4uTqA" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugM_kOE7EeCaWpd5N4uTqA" key="complexColumns" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugM_keE7EeCaWpd5N4uTqA" key="0:0" value="starttime"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugM_kuE7EeCaWpd5N4uTqA" key="0:1" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugNmoOE7EeCaWpd5N4uTqA" key="0:2" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugNmoeE7EeCaWpd5N4uTqA" key="0:3" value="starttime"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugNmouE7EeCaWpd5N4uTqA" key="0:4" value="long"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugNmo-E7EeCaWpd5N4uTqA" key="0:5" value="System.currentTimeMillis()"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_ySq8MdCREd6MVLxz8V9N3w" iD="_ySq8MNCREd6MVLxz8V9N3w" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_yTuFEdCREd6MVLxz8V9N3w" iD="_yTuFENCREd6MVLxz8V9N3w" outgoingEdges="_7XGUodCSEd6MVLxz8V9N3w" incomingEdges="_DtIWAdCUEd6MVLxz8V9N3w _23xCkdCSEd6MVLxz8V9N3w" name="PreSend" activityType="Task">
@@ -90,12 +91,13 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XurFcRckEd-OSKK6OfNWqA" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dDI11gRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dDI11wRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dDI12ARPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dDI12QRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dDI12gRPEeCnwcpWvxOwkg" key="0:1" value="text"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dDI12wRPEeCnwcpWvxOwkg" key="0:2" value="String"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dDI13ARPEeCnwcpWvxOwkg" key="0:3" value="&quot;Needed: &quot;+($clock.getTime() - starttime)"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xFY5IOE7EeCaWpd5N4uTqA" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xFY5IeE7EeCaWpd5N4uTqA" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xFZgMOE7EeCaWpd5N4uTqA" key="complexColumns" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xFZgMeE7EeCaWpd5N4uTqA" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xFZgMuE7EeCaWpd5N4uTqA" key="0:1" value="text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xFZgM-E7EeCaWpd5N4uTqA" key="0:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xFaHQOE7EeCaWpd5N4uTqA" key="0:3" value="&quot;Needed: &quot;+(System.currentTimeMillis() - starttime)"/>
       </eAnnotations>
     </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_23xCkdCSEd6MVLxz8V9N3w" iD="_23xCkNCSEd6MVLxz8V9N3w"/>

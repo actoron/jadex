@@ -1,6 +1,7 @@
 package jadex.tools.testcenter;
 
 import jadex.base.SComponentFactory;
+import jadex.base.test.Testcase;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -45,7 +46,7 @@ public class STestCenter
 										IArgument[]	results	= model.getResults();
 										for(int i=0; !istest && i<results.length; i++)
 										{
-											if(results[i].getName().equals("testresults") && results[i].getClassname().equals("Testcase"))
+											if(results[i].getName().equals("testresults") && Testcase.class.equals(results[i].getClazz(model.getClassLoader(), model.getAllImports())))
 												istest	= true;
 										}
 									}

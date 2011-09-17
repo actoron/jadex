@@ -9,8 +9,8 @@ public interface IVersionInfo
 	public static final String	RELEASE_NUMBER	= "2.0-rc10";
 
 	/** The release date (e.g. 2007/12/31). */
-	public static final String	RELEASE_DATE	= "2011/09/16";
+	public static final String	RELEASE_DATE	= "2011/09/17";
 
 	/** The release date as text (e.g. 31. December 2007). */
-	public static final String	RELEASE_DATE_TEXT	= "16. September 2011";
+	public static final String	RELEASE_DATE_TEXT	= "17. September 2011";
 }

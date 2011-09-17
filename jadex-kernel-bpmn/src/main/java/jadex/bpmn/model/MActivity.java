@@ -559,7 +559,7 @@ public class MActivity extends MAssociationTarget
 		// eclipse STP has bugs regarding lanes.
 		// The following at least identifies some inconsistencies (activity in multiple lanes).
 		if(this.lane!=null && lane!=this.lane && lane!=null)
-			throw new RuntimeException("Cannot add activity to lane '"+lane.getName()+"'. Already contained in '"+this.lane.getName()+"'");
+			throw new RuntimeException("Cannot add activity "+this+" to lane '"+lane.getName()+"'. Already contained in '"+this.lane.getName()+"'");
 		
 		this.lane	= lane;
 	}
