@@ -279,6 +279,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 //		System.out.println("create component: "+modelname+" "+name);
 		final Future<IComponentIdentifier> inited = new Future<IComponentIdentifier>();
+		final Future resfut = new Future();
 		
 		final CreationInfo cinfo = info!=null? info: new CreationInfo();	// Dummy default info, if null.
 		
@@ -386,7 +387,7 @@ public abstract class ComponentManagementService extends BasicService implements
 														{
 															cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName(), paname);
 														}
-														initinfos.put(cid, new InitInfo(null, null, cinfo, null, inited, null));
+														initinfos.put(cid, new InitInfo(null, null, cinfo, null, resfut, null));
 													}
 													
 													Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
@@ -397,8 +398,7 @@ public abstract class ComponentManagementService extends BasicService implements
 													logger.info("Starting component: "+cid.getName());
 			//										System.err.println("Pre-Init: "+cid);
 													
-													final Future future = new Future();
-													future.addResultListener(new IResultListener()
+													resfut.addResultListener(new IResultListener()
 													{
 														public void resultAvailable(Object result)
 														{
@@ -474,7 +474,7 @@ public abstract class ComponentManagementService extends BasicService implements
 																	// notify listeners without holding locks
 																	notifyListenersAdded(cid, ad);
 																			
-			//														System.out.println("created: "+cid.getLocalName()+" "+(parent!=null?parent.getComponentIdentifier().getLocalName():"null"));
+//																	System.out.println("created: "+cid.getLocalName());//+" "+(parent!=null?parent.getComponentIdentifier().getLocalName():"null"));
 			//														System.out.println("added: "+descs.size()+", "+aid);
 																	
 																	if(killlistener!=null)
@@ -519,7 +519,7 @@ public abstract class ComponentManagementService extends BasicService implements
 																		// or the parent is already running
 																		if(cinfo.getParent()==null || initinfos.get(cinfo.getParent())==null)
 																		{
-		//																	System.err.println("start: "+cid);
+//																			System.out.println("start: "+cid);
 																			resumeComponent(cid, true);
 																		}
 																	}
@@ -596,7 +596,7 @@ public abstract class ComponentManagementService extends BasicService implements
 													String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
 														: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
 													factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
-														config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, future).addResultListener(new IResultListener()
+														config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, resfut).addResultListener(new IResultListener()
 													{
 														public void resultAvailable(Object result)
 														{
@@ -608,10 +608,11 @@ public abstract class ComponentManagementService extends BasicService implements
 	//															System.out.println("infos: "+ad.getName());
 																InitInfo ii = getInitInfo(cid);
 																ii.setDescription(ad);
+																ii.setInfo(cinfo);
 																ii.setInstance(comp.getFirstEntity());
 																ii.setAdapter(comp.getSecondEntity());
 																ii.setModel(lmodel);
-//																initinfos.put(cid, new Object[]{ad, comp.getSecondEntity(), cinfo, lmodel, future, comp.getFirstEntity()});
+//																initinfos.put(cid, new Object[]{ad, comp.getSecondEntity(), cinfo, lmodel, resfut, comp.getFirstEntity()});
 															}
 															
 															try
@@ -628,7 +629,7 @@ public abstract class ComponentManagementService extends BasicService implements
 														public void exceptionOccurred(Exception exception)
 														{
 															// Init problem might be notified already in other future.
-															if(!future.isDone())
+															if(!resfut.isDone())
 															{
 																inited.setExceptionIfUndone(exception);
 															}
@@ -1341,7 +1342,8 @@ public abstract class ComponentManagementService extends BasicService implements
 									{
 										InitInfo ii = removeInitInfo(cid);
 			//							System.out.println("removed: "+cid+" "+ii);
-										if(ii!=null && ii.getInstance()!=null)
+										instance = ii.getInstance();
+										if(ii!=null && instance!=null)
 										{
 											boolean	suspend = isInitSuspend(ii.getInfo(), ii.getModel());
 											
@@ -1720,62 +1722,6 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param cid The component identifier.
 	 *  @param listener The result listener.
 	 */
-//	public IFuture getExternalAccess(final IComponentIdentifier cid)
-//	{
-//		final Future ret = new Future();
-//		
-//		if(cid==null)
-//		{
-//			ret.setException(new IllegalArgumentException("Identifier is null."));
-//			return ret;
-//		}
-//		
-//		if(isRemoteComponent(cid))
-//		{
-//			getRemoteCMS(cid).addResultListener(new DelegationResultListener(ret)
-//			{
-//				public void customResultAvailable(Object result)
-//				{
-//					final IComponentManagementService rcms = (IComponentManagementService)result;
-//					rcms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret));
-//				}
-//			});
-//		}
-//		else
-//		{
-//			IComponentAdapter adapter = null;
-//			synchronized(adapters)
-//			{
-//				adapter = (IComponentAdapter)adapters.get(cid);
-//				if(adapter==null)
-//				{
-//					// Hack? Allows components to getExternalAccess in init phase
-//					Object[] ii = getInitInfo(cid);
-//					if(ii!=null)
-//						adapter = (IComponentAdapter)ii[1];
-//				}
-//			}
-//			
-//			if(adapter==null)
-//			{
-//				ret.setException(new RuntimeException("No local component found for component identifier: "+cid));
-//			}
-//			else
-//			{
-//				try
-//				{
-//					ret.setResult(getComponentInstance(adapter).getExternalAccess());
-//				}
-//				catch(Exception e)
-//				{
-//					ret.setException(e);
-//				}
-//			}
-//		}
-//		
-//		return ret;
-//	}
-	
 	public IFuture getExternalAccess(final IComponentIdentifier cid)
 	{
 		final Future ret = new Future();
@@ -1802,63 +1748,119 @@ public abstract class ComponentManagementService extends BasicService implements
 			IComponentAdapter adapter = null;
 			synchronized(adapters)
 			{
-				boolean delayed = false;
 				adapter = (IComponentAdapter)adapters.get(cid);
-				
 				if(adapter==null)
 				{
 					// Hack? Allows components to getExternalAccess in init phase
 					InitInfo ii = getInitInfo(cid);
 					if(ii!=null)
-					{
-						if(ii.getAdapter()==null || ii.getAdapter().isExternalThread())
-						{
-//							System.out.println("delayed");
-							delayed = true;
-							IFuture fut = ii.getInitFuture();
-							fut.addResultListener(new DelegationResultListener(ret)
-							{
-								public void customResultAvailable(Object result)
-								{
-									try
-									{
-										ret.setResult(getComponentInstance(getComponentAdapter(cid)).getExternalAccess());
-									}
-									catch(Exception e)
-									{
-										ret.setException(e);
-									}
-								}
-							});
-						}
-						else
-						{
-							adapter = ii.getAdapter();
-						}
-					}
-				}
-				
-				if(adapter!=null)
-				{
-					try
-					{
-						ret.setResult(getComponentInstance(adapter).getExternalAccess());
-					}
-					catch(Exception e)
-					{
-						ret.setException(e);
-					}
-				}
-				else if(!delayed)
-				{
-					ret.setException(new RuntimeException("No local component found for component identifier: "+cid));
+						adapter = (IComponentAdapter)ii.getAdapter();
 				}
 			}
 			
+			if(adapter==null)
+			{
+				ret.setException(new RuntimeException("No local component found for component identifier: "+cid));
+			}
+			else
+			{
+				try
+				{
+					ret.setResult(getComponentInstance(adapter).getExternalAccess());
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}
+			}
 		}
 		
 		return ret;
 	}
+	
+//	public IFuture getExternalAccess(final IComponentIdentifier cid)
+//	{
+//		final Future ret = new Future();
+//		
+//		if(cid==null)
+//		{
+//			ret.setException(new IllegalArgumentException("Identifier is null."));
+//			return ret;
+//		}
+//		
+//		if(isRemoteComponent(cid))
+//		{
+//			getRemoteCMS(cid).addResultListener(new DelegationResultListener(ret)
+//			{
+//				public void customResultAvailable(Object result)
+//				{
+//					final IComponentManagementService rcms = (IComponentManagementService)result;
+//					rcms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret));
+//				}
+//			});
+//		}
+//		else
+//		{
+//			IComponentAdapter adapter = null;
+//			synchronized(adapters)
+//			{
+//				boolean delayed = false;
+//				adapter = (IComponentAdapter)adapters.get(cid);
+//				
+//				if(adapter==null)
+//				{
+//					// Hack? Allows components to getExternalAccess in init phase
+//					InitInfo ii = getInitInfo(cid);
+//					if(ii!=null)
+//					{
+//						if(ii.getAdapter()==null || ii.getAdapter().isExternalThread())
+//						{
+////							System.out.println("delayed");
+//							delayed = true;
+//							IFuture fut = ii.getInitFuture();
+//							fut.addResultListener(new DelegationResultListener(ret)
+//							{
+//								public void customResultAvailable(Object result)
+//								{
+//									try
+//									{
+//										ret.setResult(getComponentInstance(getComponentAdapter(cid)).getExternalAccess());
+//									}
+//									catch(Exception e)
+//									{
+//										ret.setException(e);
+//									}
+//								}
+//							});
+//						}
+//						else
+//						{
+//							adapter = ii.getAdapter();
+//						}
+//					}
+//				}
+//				
+//				if(adapter!=null)
+//				{
+//					try
+//					{
+//						ret.setResult(getComponentInstance(adapter).getExternalAccess());
+//					}
+//					catch(Exception e)
+//					{
+//						ret.setException(e);
+//					}
+//				}
+//				else if(!delayed)
+//				{
+//					ret.setException(new RuntimeException("No local component found for component identifier: "+cid));
+//				}
+//			}
+//			
+//		}
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Find the class loader for a new (local) component.

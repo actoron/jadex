@@ -34,12 +34,14 @@ public class AgentCreationAgent extends MicroAgent
 //	protected IFuture	clock;
 	
 	//-------- methods --------
-	
+		
 	/**
 	 *  Execute an agent step.
 	 */
 	public void executeBody()
 	{
+//		System.out.println("body");
+		
 		Map arguments = getArguments();	
 		if(arguments==null)
 			arguments = new HashMap();
