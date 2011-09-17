@@ -1,10 +1,15 @@
 Jadex Releases Overview
 
-Current
+Release 2.0 rc10 (FedCSIS release 09/2011)
+	- Pojo Micro agents
+	- Pojo service implementations
 	- Annotations for remote method invocations (jadex.base.service.remote.annotation)
 	- Message handlers and sendMessageAndWait() for micro agents
 	- Example project for use with eclipse/Maven
-	- Minor bug fixes
+	- Many bug fixes
+	- Improved tools (e.g. new BDIViewer)
+	- Remote platform administration
+	- Deployment tool
 
 Release 2.0 rc6 (Service release 12/2010)
 	- Improved service model (provided/required services)
