@@ -125,5 +125,11 @@
 			<version>10.8.1.2</version>
 			<scope>compile</scope>
 			</dependency>
+			<dependency>
+			<groupId>com.derby</groupId>
+			<artifactId>net</artifactId>
+			<version>10.8.1.2</version>
+			<scope>compile</scope>
+			</dependency>
 	</dependencies>	
 </project>

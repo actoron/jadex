@@ -10,7 +10,6 @@ import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
 import jadex.tools.awareness.AwarenessComponentPlugin;
-import jadex.tools.comanalyzer.ComanalyzerPlugin;
 import jadex.tools.convcenter.ConversationPlugin;
 import jadex.tools.debugger.DebuggerPlugin;
 import jadex.tools.deployer.DeployerPlugin;
@@ -22,70 +21,56 @@ import jadex.tools.starter.StarterPlugin;
 import jadex.tools.testcenter.TestCenterPlugin;
 
 /**
- *  Micro component for opening the JCC gui.
+ * Micro component for opening the JCC gui.
  */
 @Description("Micro component for opening the JCC gui.")
-@Arguments(@Argument(name="saveonexit", clazz=boolean.class, defaultvalue="true",description="Save settings on exit?"))
-public class JCCAgent extends MicroAgent
-{
-	//-------- attributes --------
-	
+@Arguments(@Argument(name = "saveonexit", clazz = boolean.class, defaultvalue = "true", description = "Save settings on exit?"))
+public class JCCAgent extends MicroAgent {
+	// -------- attributes --------
+
 	/** The saveonexit argument. */
 	@AgentArgument
-	protected boolean	saveonexit;
-	
+	protected boolean saveonexit;
+
 	/** The control center. */
-	protected ControlCenter	cc;
-	
-	//-------- micro agent methods --------
-	
+	protected ControlCenter cc;
+
+	// -------- micro agent methods --------
+
 	/**
-	 *  Open the gui on agent startup.
+	 * Open the gui on agent startup.
 	 */
-	public IFuture	agentCreated()
-	{
-//		this.saveonexit	= ((Boolean)getArgument("saveonexit")).booleanValue();
-		
-		Future	ret	= new Future();
-		this.cc	= new ControlCenter();
-		cc.init(getExternalAccess(),
-			new String[]{
-				StarterPlugin.class.getName(),
-//				StarterServicePlugin.class.getName(),
-				DFServicePlugin.class.getName(),
-				ConversationPlugin.class.getName(),
-				ComanalyzerPlugin.class.getName(),
-				TestCenterPlugin.class.getName(),
-//				JadexdocPlugin.class.getName(),
-				SimulationServicePlugin.class.getName(),
-				DebuggerPlugin.class.getName(),
-//				RuleProfilerPlugin.class.getName(),
-				LibraryServicePlugin.class.getName(),
-				AwarenessComponentPlugin.class.getName(),
-				ComponentViewerPlugin.class.getName(),
+	public IFuture agentCreated() {
+		// this.saveonexit = ((Boolean)getArgument("saveonexit")).booleanValue();		
+		Future ret = new Future();
+		this.cc = new ControlCenter();
+		cc.init(getExternalAccess(), new String[] { StarterPlugin.class.getName(),
+				// StarterServicePlugin.class.getName(),
+				DFServicePlugin.class.getName(), ConversationPlugin.class.getName(), "jadex.tools.comanalyzer.ComanalyzerPlugin", TestCenterPlugin.class.getName(),
+				// JadexdocPlugin.class.getName(),
+				SimulationServicePlugin.class.getName(), DebuggerPlugin.class.getName(),
+				// RuleProfilerPlugin.class.getName(),
+				LibraryServicePlugin.class.getName(), AwarenessComponentPlugin.class.getName(), ComponentViewerPlugin.class.getName(), 
 				BenchmarkingPlugin.class.getName(),
-				DeployerPlugin.class.getName()
-		},
-		saveonexit).addResultListener(createResultListener(new DelegationResultListener(ret)));
+				DeployerPlugin.class.getName() }, saveonexit).addResultListener(
+				createResultListener(new DelegationResultListener(ret)));
 		return ret;
 	}
-	
+
 	/**
-	 *  Close the gui on agent shutdown.
+	 * Close the gui on agent shutdown.
 	 */
-	public IFuture	agentKilled()
-	{
-		Future	ret	= new Future();
+	public IFuture agentKilled() {
+		Future ret = new Future();
 		cc.shutdown().addResultListener(createResultListener(new DelegationResultListener(ret)));
 		return ret;
 	}
-	
+
 	/**
-	 *  Get the control center.
+	 * Get the control center.
 	 */
 	// Used for test case.
-	public ControlCenter	getControlCenter()
-	{
+	public ControlCenter getControlCenter() {
 		return cc;
 	}
 }

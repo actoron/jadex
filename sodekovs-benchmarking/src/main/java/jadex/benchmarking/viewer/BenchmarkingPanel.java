@@ -55,7 +55,7 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 	// -------- constants --------
 
 	/** The image icons. */
-	protected static final UIDefaults icons = new UIDefaults(new Object[] { "refresh", SGUI.makeIcon(BenchmarkingPanel.class, "/jadex/base/gui/images/new_refresh_anim00.png"), "png_not_found",
+	protected static final UIDefaults icons = new UIDefaults(new Object[] { "refresh", SGUI.makeIcon(BenchmarkingPanel.class, "/jadex/tools/common/images/new_refresh_anim00.png"), "png_not_found",
 			SGUI.makeIcon(BenchmarkingPanel.class, "/jadex/benchmarking/viewer/images/PNGFileNotFound.png"), "manual_injection",
 			SGUI.makeIcon(BenchmarkingPanel.class, "/jadex/benchmarking/viewer/images/injection.png") });
 
