@@ -28,9 +28,7 @@ import java.util.Set;
 import javax.xml.bind.JAXBException;
 
 /**
- * This class generates a {@link ProductionLineConfiguration} and writes it to a
- * file. The generation is based on simulation configuration file, which is
- * passed as parameter.
+ * This class generates a {@link ProductionLineConfiguration} and writes it to a file. The generation is based on simulation configuration file, which is passed as parameter.
  * 
  * @author Peter
  * 
@@ -46,8 +44,7 @@ public class SimulationGenerator {
 	private Integer robotCount = 0;
 
 	/**
-	 * Creates a new SimulationGenerator that works on the given configuration
-	 * file.
+	 * Creates a new SimulationGenerator that works on the given configuration file.
 	 * 
 	 * @param confFile
 	 *            The file name of the configuration file.
@@ -69,8 +66,7 @@ public class SimulationGenerator {
 	}
 
 	/**
-	 * Gets the {@link ProductionLineConfiguration} generated out of the
-	 * configuration.
+	 * Gets the {@link ProductionLineConfiguration} generated out of the configuration.
 	 * 
 	 * @return The {@link ProductionLineConfiguration}
 	 */
@@ -79,8 +75,7 @@ public class SimulationGenerator {
 	}
 
 	/**
-	 * Saves the generated {@link ProductionLineConfiguration} to the given
-	 * file.
+	 * Saves the generated {@link ProductionLineConfiguration} to the given file.
 	 * 
 	 * @param filename
 	 */
@@ -171,8 +166,7 @@ public class SimulationGenerator {
 	}
 
 	/**
-	 * Generates the redundant capabilities for the agents within the given
-	 * bounds.
+	 * Generates the redundant capabilities for the agents within the given bounds.
 	 * 
 	 * @param redMin
 	 *            the lower bound
@@ -267,6 +261,9 @@ public class SimulationGenerator {
 					robot.setAgentId(robotId);
 					robots.put(robotId, robot);
 					Capability cap = capPool.get((i - 1) % capPool.size());
+					if (!robot.getCapabilities().contains(cap)) {
+						robot.getCapabilities().add(cap);
+					}
 					Role robotRole = new Role();
 					robotRole.setCapability(cap);
 					Condition robotPrecon = new Condition();
@@ -412,9 +409,7 @@ public class SimulationGenerator {
 	}
 
 	/**
-	 * Generates a random list of capabilities. The size of the list is between
-	 * minCaps and maxCaps. The currentCaps are contained in the list in every
-	 * case.
+	 * Generates a random list of capabilities. The size of the list is between minCaps and maxCaps. The currentCaps are contained in the list in every case.
 	 * 
 	 * @param currentCaps
 	 *            The capabilities that must be contained in the list.
@@ -432,8 +427,7 @@ public class SimulationGenerator {
 		if (count >= available.size()) {
 			caps.addAll(available);
 			if (!caps.containsAll(currentCaps)) {
-				throw new IllegalStateException(
-						"The current capabilities were not found in the list of available capabilities");
+				throw new IllegalStateException("The current capabilities were not found in the list of available capabilities");
 			}
 		} else {
 
