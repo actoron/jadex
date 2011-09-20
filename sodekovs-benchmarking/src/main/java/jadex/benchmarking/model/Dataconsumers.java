@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{}Property" maxOccurs="unbounded"/>
+ *         &lt;element ref="{}Dataconsumer" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -38,41 +38,41 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "property"
+    "dataconsumer"
 })
-@XmlRootElement(name = "Properties")
-public class Properties {
+@XmlRootElement(name = "Dataconsumers")
+public class Dataconsumers {
 
-    @XmlElement(name = "Property", required = true)
-    protected List<Property> property;
+    @XmlElement(name = "Dataconsumer", required = true)
+    protected List<Dataconsumer> dataconsumer;
 
     /**
-     * Gets the value of the property property.
+     * Gets the value of the dataconsumer property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the property property.
+     * This is why there is not a <CODE>set</CODE> method for the dataconsumer property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getProperty().add(newItem);
+     *    getDataconsumer().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Property }
+     * {@link Dataconsumer }
      * 
      * 
      */
-    public List<Property> getProperty() {
-        if (property == null) {
-            property = new ArrayList<Property>();
+    public List<Dataconsumer> getDataconsumer() {
+        if (dataconsumer == null) {
+            dataconsumer = new ArrayList<Dataconsumer>();
         }
-        return this.property;
+        return this.dataconsumer;
     }
 
 }

@@ -25,6 +25,14 @@
 							<xs:element ref="Sequence" maxOccurs="unbounded"/>							
 						</xs:sequence>
 					</xs:complexType>
+				</xs:element>
+				<xs:element name="Evaluation">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="Dataproviders"/>
+							<xs:element ref="Dataconsumers"/>
+						</xs:sequence>
+					</xs:complexType>
 				</xs:element>				
 			</xs:sequence>
 			<xs:attribute name="type" use="required">
@@ -89,8 +97,62 @@
 		<xs:attribute name="componentmodel" type="xs:string" use="required"/>
 		<xs:attribute name="numberOfComponents" type="xs:int" default="1"/>
 		</xs:complexType>
+	</xs:element>	
+	<xs:element name="Dataconsumers">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Dataconsumer" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
 	</xs:element>
-	
+	<xs:element name="Dataconsumer">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MixedProperty" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="clazz" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MixedProperty">
+		<xs:complexType mixed="true">
+			<xs:attribute name="name" type="xs:string"/>
+			<xs:attribute name="filter" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Dataproviders">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Dataprovider" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Dataprovider">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Source" maxOccurs="unbounded"/>
+				<xs:element ref="Data" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Source">
+		<xs:complexType mixed="true">
+			<xs:attribute name="name" type="xs:string"/>
+			<xs:attribute name="objecttype" type="xs:string"/>
+			<xs:attribute name="sourcetype" type="xs:string"/>
+			<xs:attribute name="aggregate" type="xs:boolean"/>			
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Data">
+		<xs:complexType mixed="true">			
+			<xs:attribute name="name" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
 	<xs:element name="Properties">
 		<xs:complexType>			
 			<xs:sequence>
