@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{}Dataconsumer" maxOccurs="unbounded"/>
+ *         &lt;element ref="{}Import" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -38,41 +38,41 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "dataconsumer"
+    "_import"
 })
-@XmlRootElement(name = "Dataconsumers")
-public class Dataconsumers {
+@XmlRootElement(name = "Imports")
+public class Imports {
 
-    @XmlElement(name = "Dataconsumer", required = true)
-    protected List<Dataconsumer> dataconsumer;
+    @XmlElement(name = "Import", required = true)
+    protected List<String> _import;
 
     /**
-     * Gets the value of the dataconsumer property.
+     * Gets the value of the import property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the dataconsumer property.
+     * This is why there is not a <CODE>set</CODE> method for the import property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getDataconsumer().add(newItem);
+     *    getImport().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Dataconsumer }
+     * {@link String }
      * 
      * 
      */
-    public List<Dataconsumer> getDataconsumer() {
-        if (dataconsumer == null) {
-            dataconsumer = new ArrayList<Dataconsumer>();
+    public List<String> getImport() {
+        if (_import == null) {
+            _import = new ArrayList<String>();
         }
-        return this.dataconsumer;
+        return this._import;
     }
 
 }

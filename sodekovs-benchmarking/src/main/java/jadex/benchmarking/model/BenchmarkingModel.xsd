@@ -33,7 +33,8 @@
 							<xs:element ref="Dataconsumers"/>
 						</xs:sequence>
 					</xs:complexType>
-				</xs:element>				
+				</xs:element>
+			<xs:element ref="Imports"/>				
 			</xs:sequence>
 			<xs:attribute name="type" use="required">
 				<xs:simpleType>
@@ -194,6 +195,15 @@
 				</xs:simpleType>
 			</xs:attribute>
 			<xs:attribute name="name" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="Import" type="xs:string"/>
+	<xs:element name="Imports">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Import" maxOccurs="unbounded"/>
+			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 </xs:schema>

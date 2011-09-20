@@ -18,6 +18,7 @@
 			<Property name="appFilePath"
 				value="../sodekovs-simulationcontrol/src/main/java/jadex/simulation/examples/marsworld/MarsWorld4Benchmarking.application.xml"></Property>
 			<Property name="appConfiguration" value="TestRemote"></Property>
+			<!-- This property is required. -->
 			<Property name="spaceName" value="my2dspace"></Property>
 		</Properties>
 	</SytemUnderTest>

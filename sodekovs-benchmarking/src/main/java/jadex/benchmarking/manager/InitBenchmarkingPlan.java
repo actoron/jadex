@@ -6,9 +6,14 @@ import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.benchmarking.helper.Constants;
 import jadex.benchmarking.helper.Methods;
 import jadex.benchmarking.logger.ScheduleLogger;
+import jadex.benchmarking.model.Data;
+import jadex.benchmarking.model.Dataconsumer;
+import jadex.benchmarking.model.Dataprovider;
+import jadex.benchmarking.model.Property;
 import jadex.benchmarking.model.Schedule;
 import jadex.benchmarking.model.SemanticCondition;
 import jadex.benchmarking.model.Sequence;
+import jadex.benchmarking.model.Source;
 import jadex.benchmarking.model.SuTinfo;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
@@ -17,14 +22,29 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.library.ILibraryService;
+import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
+import jadex.extension.envsupport.MEnvSpaceType;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.extension.envsupport.evaluation.AbstractChartDataConsumer;
+import jadex.extension.envsupport.evaluation.DefaultDataProvider;
+import jadex.extension.envsupport.evaluation.IObjectSource;
+import jadex.extension.envsupport.evaluation.ITableDataConsumer;
+import jadex.extension.envsupport.evaluation.ITableDataProvider;
+import jadex.extension.envsupport.evaluation.SpaceObjectSource;
+import jadex.javaparser.IExpressionParser;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.state.IOAVState;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import sodekovs.util.gnuplot.persistence.LogDAO;
 import sodekovs.util.math.GetRandom;
@@ -46,7 +66,7 @@ public class InitBenchmarkingPlan extends Plan {
 	private AbstractEnvironmentSpace sutSpace = null;
 	// Component Identifier of scheduler
 	private IComponentIdentifier schedulerCID = null;
-	//private Log events
+	// private Log events
 	private ScheduleLogger scheduleLogger = null;
 
 	public void body() {
@@ -70,29 +90,30 @@ public class InitBenchmarkingPlan extends Plan {
 
 		getBeliefbase().getBelief("suTinfo").setFact(new SuTinfo(sortedSequenceList, sutCID, sutExta, sutSpace));
 
-		//initLogger
-		//Attention: Logger has still to be initialized! (starttime and clockservice)
-		scheduleLogger = new ScheduleLogger();		
+		// initLogger
+		// Attention: Logger has still to be initialized! (starttime and clockservice)
+		scheduleLogger = new ScheduleLogger();
 
-		
 		// Start scheduler, that handles the execution of the sequences of the conducted benchmark.
 		// Scheduler is started in suspend mode.
 		startScheduler();
-	
+
+		// init dataprovider, dataconsumer and online visualization
+		addDataConsumerAndProvider();
+
 		// Resume SuT
 		cms.resumeComponent(sutCID).get(this);
-		
+
 		// start warm up phase, if defined. Schedule starts after this phase its execution
 		if (benchConf.getWarmUpTime() != null) {
 			waitFor(benchConf.getWarmUpTime());
-//			myLogger.log("Warm-up finished");
+			// myLogger.log("Warm-up finished");
 		}
-		
-	
+
 		// Resume scheduler
 		cms.resumeComponent(schedulerCID).get(this);
 		getBeliefbase().getBelief("benchmarkStatus").setFact(Constants.RUNNING);
-//		myLogger.log("Resumed Scheduler");
+		// myLogger.log("Resumed Scheduler");
 
 		// TODO: Hack: Synchronize start time!
 		long startTime = clockservice.getTime();
@@ -101,9 +122,9 @@ public class InitBenchmarkingPlan extends Plan {
 		// Handle termination of benchmark
 		terminateBenchmark(benchConf);
 		getBeliefbase().getBelief("benchmarkStatus").setFact(Constants.TERMINATED);
-		scheduleLogger.log(Constants.PREPARE_GNUPLOT_SUFFIX);		
+		scheduleLogger.log(Constants.PREPARE_GNUPLOT_SUFFIX);
 		persistLogs(scheduleLogger.getFileName(), benchConf);
-//		ConnectionManager.getInstance().executeStatement("Over and out");
+		// ConnectionManager.getInstance().executeStatement("Over and out");
 	}
 
 	/*
@@ -203,12 +224,12 @@ public class InitBenchmarkingPlan extends Plan {
 		long starttime = ((Long) sutSpace.getProperty("BENCHMARK_REAL_START_TIME_OF_SIMULATION")).longValue();
 		return clockservice.getTime() - starttime;
 	}
-	
-	private void persistLogs(String fileName, Schedule benchConf){
-//		ConnectionManager conMgr = new ConnectionManager();
-//		conMgr.storeGnuPlotLogs(fileName,benchConf.getType(),benchConf.getName(), scheduleLogger.getTimestamp());
-		LogDAO.getInstance().insertNewGnuPlotLog(fileName,benchConf.getType(),benchConf.getName(), scheduleLogger.getTimestamp());
-		
+
+	private void persistLogs(String fileName, Schedule benchConf) {
+		// ConnectionManager conMgr = new ConnectionManager();
+		// conMgr.storeGnuPlotLogs(fileName,benchConf.getType(),benchConf.getName(), scheduleLogger.getTimestamp());
+		LogDAO.getInstance().insertNewGnuPlotLog(fileName, benchConf.getType(), benchConf.getName(), scheduleLogger.getTimestamp());
+
 	}
 
 	/*
@@ -220,5 +241,148 @@ public class InitBenchmarkingPlan extends Plan {
 				return Long.valueOf(((Sequence) arg0).getStarttime()).compareTo(Long.valueOf(((Sequence) arg1).getStarttime()));
 			}
 		});
+	}
+
+	private void addDataConsumerAndProvider(Schedule benchConf) {
+
+		IFuture fut = (sutExta).getExtension(getProperty(benchConf.getSytemUnderTest().getProperties().getProperty(), "spaceName"));		
+		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
+
+		// AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) (exta).getExtension(simConf.getNameOfSpace()));
+		IExpressionParser parser = new JavaCCExpressionParser();
+
+		// add new data provider
+		List<Dataprovider> providers = benchConf.getEvaluation().getDataproviders().getDataprovider();
+		// List tmp = si.getPropertyList("dataproviders");
+
+		// System.out.println("data providers: "+providers);
+		if (providers != null) {
+			// iteration through all dataprovider
+			for (int i = 0; i < providers.size(); i++) {
+				// Map dcol = (Map)providers.get(i);
+
+				List<Source> sources = providers.get(i).getSource();
+				IObjectSource[] provs = new IObjectSource[sources.size()];
+				for (int j = 0; j < sources.size(); j++) {
+					Source source = sources.get(j);
+					String varname = source.getName() != null ? source.getName() : "$object";
+					String objecttype = source.getObjecttype();
+					boolean aggregate = source.isAggregate() == null ? false : source.isAggregate();
+					IParsedExpression dataexp = EvaluateExpression.getParsedExpression(source.getContent(), parser);
+					// Hack: Includeconditon is not implemented, yet.
+					IParsedExpression includeexp = null;
+					provs[j] = new SpaceObjectSource(varname, space, objecttype, aggregate, dataexp, includeexp);
+				}
+
+				String tablename = providers.get(i).getName();
+				List<Data> subdatas = providers.get(i).getData();
+				String[] columnnames = new String[subdatas.size()];
+				IParsedExpression[] exps = new IParsedExpression[subdatas.size()];
+				for (int j = 0; j < subdatas.size(); j++) {
+					Data subdata = subdatas.get(j);
+					columnnames[j] = subdata.getName();
+					exps[j] = EvaluateExpression.getParsedExpression((String) subdata.getContent().get(0), parser);
+				}
+
+				ITableDataProvider tprov = new DefaultDataProvider(space, provs, tablename, columnnames, exps);
+				space.addDataProvider(tablename, tprov);
+			}
+		}
+
+		// Create the data consumers.
+		List<Dataconsumer> consumers = benchConf.getEvaluation().getDataconsumers().getDataconsumer();
+
+		// System.out.println("data consumers: "+consumers);
+		if (consumers != null) {
+			for (int i = 0; i < consumers.size(); i++) {
+				Dataconsumer dcon = consumers.get(i);
+				String name = dcon.getName();
+
+				// Class clazz = (Class)MEnvSpaceInstance.getProperty(dcon,
+				// "clazz");
+				Class clazz = null;
+				try {
+					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) benchConf.getImports().getImport()),
+							((ILibraryService) SServiceProvider.getService(getScope().getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this)).getClassLoader());
+
+					// clazz = SReflect.findClass0(classname, imports, classloader);
+
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				ITableDataConsumer con = null;
+				try {
+					con = (ITableDataConsumer) clazz.newInstance();
+				} catch (InstantiationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				// List of Hashmaps with dynamic=false
+				List<Map> tmpPropertyList = new ArrayList<Map>();
+				for (int j = 0; j < dcon.getMixedProperty().size(); j++) {
+					Map map = new HashMap();
+					map.put("dynamic", false);
+					map.put("name", dcon.getMixedProperty().get(j).getName());
+					// map.put("value",
+					// dcon.getPropertyList().get(j).getValue());
+					// Hack: has to be "initially" an expression that can be
+					// parsed
+					map.put("value", EvaluateExpression.getParsedExpression(dcon.getMixedProperty().get(j).getContent(), parser));
+					tmpPropertyList.add(map);
+				}
+				// MEnvSpaceInstance.setProperties(con,
+				// (List)dcon.get("properties"), fetcher);
+				MEnvSpaceType.setProperties(con, tmpPropertyList, space.getFetcher());//
+				con.setProperty("envspace", space);
+				space.addDataConsumer(name, con);
+			}
+		}
+		// System.out.println("nnnnnnnnnnneded iterations: " + counterTmp);
+	}
+
+	private void startOnlineVisualization(Schedule benchConf) {
+		
+		IFuture fut = exta.getExtension(getProperty(benchConf.getSytemUnderTest().getProperties().getProperty(), "spaceName"));
+		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
+
+		// init online visualization
+		ArrayList<AbstractChartDataConsumer> chartDataConsumer = new ArrayList<AbstractChartDataConsumer>();
+		for (Iterator it = space.getDataConsumers().iterator(); it.hasNext();) {
+			Object abstractConsumer = it.next();
+
+			if (abstractConsumer instanceof AbstractChartDataConsumer)
+				chartDataConsumer.add((AbstractChartDataConsumer) abstractConsumer);
+		}
+		this.vis = new OnlineVisualisation(chartDataConsumer);
+	}
+
+	/***
+	 * Transforms an ArrayList<String> into String[]
+	 * 
+	 * @param list
+	 * @return
+	 */
+	private String[] toStringArray(ArrayList<String> list) {
+		String[] array = new String[list.size()];
+
+		for (int i = 0; i < list.size(); i++) {
+			array[i] = list.get(i);
+		}
+
+		return array;
+	}
+
+	private String getProperty(List<Property> properties, String name) {
+		for (Property prop : properties) {
+			if(prop.getName().equalsIgnoreCase(name)){
+				return prop.getValue();
+			}
+		}
+		System.err.print("#InitBenchmarkingPlan# Property <" + name + "> not found in propertyList");
+		return null;
 	}
 }
