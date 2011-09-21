@@ -86,8 +86,9 @@ public class DatabaseLogger {
 	 * 
 	 * @param i
 	 *            - the new run id.
+	 * @return true if the new value was successfully inserted, else false.
 	 */
-	private void setRunId(final int i) {
+	private boolean setRunId(int i) {
 		String query;
 
 		if (i == 1) {
@@ -102,10 +103,12 @@ public class DatabaseLogger {
 
 			System.out.println("setting next run id to: " + i);
 			runId = i;
-			st.execute(query);
+			return st.execute(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+
+		return false;
 	}
 
 	/**
@@ -228,32 +231,27 @@ public class DatabaseLogger {
 	 *            - the new logical time value.
 	 * @return true if the new value was successfully inserted, else false.
 	 */
-	public void setIntervalTime(final int time) {
-		new Runnable() {
+	public boolean setIntervalTime(int time) {
+		if (loggingEnabled) {
+			String query;
 
-			@Override
-			public void run() {
-
-				if (loggingEnabled) {
-					String query;
-
-					if (time == 0) {
-						query = "INSERT INTO IntervalTime(currentTime) VALUES (" + time + ")";
-					} else {
-						query = "UPDATE IntervalTime SET currentTime=" + time + " WHERE currentTime=" + (time - 1);
-					}
-
-					Statement st;
-					try {
-						st = getConnection().createStatement();
-
-						st.execute(query);
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-				}
+			if (time == 0) {
+				query = "INSERT INTO IntervalTime(currentTime) VALUES (" + time + ")";
+			} else {
+				query = "UPDATE IntervalTime SET currentTime=" + time + " WHERE currentTime=" + (time - 1);
 			}
-		};
+
+			Statement st;
+			try {
+				st = getConnection().createStatement();
+
+				return st.execute(query);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -329,39 +327,35 @@ public class DatabaseLogger {
 	 * 
 	 * @return <code>true</code> if the meta data was inserted.
 	 */
-	public void insertMetadata(final double redundancyRate, final int robotCount, final int transportCount, final int capabilityCount, final int roleCount, final String strategy, final double workload) {
-		new Runnable() {
+	public boolean insertMetadata(double redundancyRate, int robotCount, int transportCount, int capabilityCount, int roleCount, String strategy, double workload) {
+		if (isLoggingEnabled()) {
+			StringBuffer sql = new StringBuffer("INSERT INTO RunMetadata (runid, redundancyRate, ");
+			sql.append("robotCount, transportCount, capabilityCount, roleCount, strategy, workload)");
+			sql.append("VALUES (");
+			sql.append(getRunId());
+			sql.append(", ");
+			sql.append(redundancyRate);
+			sql.append(", ");
+			sql.append(robotCount);
+			sql.append(", ");
+			sql.append(transportCount);
+			sql.append(", ");
+			sql.append(capabilityCount);
+			sql.append(", ");
+			sql.append(roleCount);
+			sql.append(",  ");
+			sql.append("'" + strategy + "',");
+			sql.append(workload + ")");
 
-			@Override
-			public void run() {
-				if (isLoggingEnabled()) {
-					StringBuffer sql = new StringBuffer("INSERT INTO RunMetadata (runid, redundancyRate, ");
-					sql.append("robotCount, transportCount, capabilityCount, roleCount, strategy, workload)");
-					sql.append("VALUES (");
-					sql.append(getRunId());
-					sql.append(", ");
-					sql.append(redundancyRate);
-					sql.append(", ");
-					sql.append(robotCount);
-					sql.append(", ");
-					sql.append(transportCount);
-					sql.append(", ");
-					sql.append(capabilityCount);
-					sql.append(", ");
-					sql.append(roleCount);
-					sql.append(",  ");
-					sql.append("'" + strategy + "',");
-					sql.append(workload + ")");
-
-					try {
-						Statement stmt = getConnection().createStatement();
-						stmt.execute(sql.toString());
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-				}
+			try {
+				Statement stmt = getConnection().createStatement();
+				return stmt.execute(sql.toString());
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
-		};
+		}
+
+		return false;
 	}
 
 	/**
@@ -369,24 +363,19 @@ public class DatabaseLogger {
 	 * 
 	 * @return <code>true</code> if the value was successfully updated, else <code>false</code>
 	 */
-	public void setErrorRun() {
-		new Runnable() {
+	public boolean setErrorRun() {
+		if (isLoggingEnabled()) {
+			String sql = "UPDATE RunMetadata SET runError=1 WHERE runid=" + getRunId();
 
-			@Override
-			public void run() {
-
-				if (isLoggingEnabled()) {
-					String sql = "UPDATE RunMetadata SET runError=1 WHERE runid=" + getRunId();
-
-					try {
-						Statement stmt = getConnection().createStatement();
-						stmt.execute(sql);
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-				}
+			try {
+				Statement stmt = getConnection().createStatement();
+				return stmt.execute(sql);
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
-		};
+		}
+
+		return false;
 	}
 
 	/**
@@ -397,24 +386,19 @@ public class DatabaseLogger {
 	 * 
 	 * @return <code>true</code> if the value was successfully updated, else <code>false</code>
 	 */
-	public void incrementRoleChangeAction(final int count) {
-		new Runnable() {
+	public boolean incrementRoleChangeAction(int count) {
+		if (isLoggingEnabled()) {
+			String sql = "UPDATE RunMetadata SET roleChangeCount=roleChangeCount+" + count + " WHERE runid=" + getRunId();
 
-			@Override
-			public void run() {
-				if (isLoggingEnabled()) {
-					String sql = "UPDATE RunMetadata SET roleChangeCount=roleChangeCount+" + count + " WHERE runid=" + getRunId();
-
-					try {
-						Statement stmt = getConnection().createStatement();
-						stmt.execute(sql);
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-				}
+			try {
+				Statement stmt = getConnection().createStatement();
+				return stmt.execute(sql);
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
-		};
+		}
 
+		return false;
 	}
 
 	/**
@@ -424,23 +408,19 @@ public class DatabaseLogger {
 	 *            the value by which should by incremented
 	 * @return <code>true</code> if the value was successfully updated, else <code>false</code>
 	 */
-	public void incrementMessageCountBy(final int increment) {
-		new Runnable() {
+	public boolean incrementMessageCountBy(int increment) {
+		if (isLoggingEnabled()) {
+			String sql = "UPDATE RunMetadata SET messageCount=messageCount+" + increment + " WHERE runid=" + getRunId();
 
-			@Override
-			public void run() {
-				if (isLoggingEnabled()) {
-					String sql = "UPDATE RunMetadata SET messageCount=messageCount+" + increment + " WHERE runid=" + getRunId();
-
-					try {
-						Statement stmt = getConnection().createStatement();
-						stmt.execute(sql);
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-				}
+			try {
+				Statement stmt = getConnection().createStatement();
+				return stmt.execute(sql);
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
-		};
+		}
+
+		return false;
 	}
 
 	/**
@@ -450,31 +430,26 @@ public class DatabaseLogger {
 	 *            - the given {@link HelpRequest}
 	 * @return <code>true</code> if the role change distance was inserted, else <code>false</code>
 	 */
-	public void storeRoleChangeDistance(final HelpRequest request) {
-		new Runnable() {
+	public boolean storeRoleChangeDistance(HelpRequest request) {
+		if (isLoggingEnabled()) {
+			StringBuilder sb = new StringBuilder("INSERT INTO RunMessageHops(runid, messageType, sender, hops) VALUES(");
+			sb.append(getRunId());
+			sb.append(", ");
+			sb.append("'" + request.getClass().getName() + "', ");
+			sb.append("'" + request.getAgentId() + "', ");
+			sb.append(request.getHopCount());
+			sb.append(")");
 
-			@Override
-			public void run() {
-				if (isLoggingEnabled()) {
-					StringBuilder sb = new StringBuilder("INSERT INTO RunMessageHops(runid, messageType, sender, hops) VALUES(");
-					sb.append(getRunId());
-					sb.append(", ");
-					sb.append("'" + request.getClass().getName() + "', ");
-					sb.append("'" + request.getAgentId() + "', ");
-					sb.append(request.getHopCount());
-					sb.append(")");
-
-					String sql = sb.toString();
-					try {
-						Statement stmt = getConnection().createStatement();
-						stmt.execute(sql);
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-				}
+			String sql = sb.toString();
+			try {
+				Statement stmt = getConnection().createStatement();
+				return stmt.execute(sql);
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
-		};
+		}
 
+		return false;
 	}
 
 	/**
@@ -484,23 +459,18 @@ public class DatabaseLogger {
 	 *            the value by which should be incremented
 	 * @return <code>true</code> if the value was successfully updated, else <code>false</code>
 	 */
-	public void incrementHopCount(final int increment) {
-		new Runnable() {
+	public boolean incrementHopCount(int increment) {
+		if (isLoggingEnabled()) {
+			String sql = "UPDATE RunMetadata SET hopCount=hopCount+" + increment + " WHERE runid=" + getRunId();
 
-			@Override
-			public void run() {
-				if (isLoggingEnabled()) {
-					String sql = "UPDATE RunMetadata SET hopCount=hopCount+" + increment + " WHERE runid=" + getRunId();
-
-					try {
-						Statement stmt = getConnection().createStatement();
-						stmt.execute(sql);
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-				}
+			try {
+				Statement stmt = getConnection().createStatement();
+				return stmt.execute(sql);
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
-		};
+		}
 
+		return false;
 	}
 }

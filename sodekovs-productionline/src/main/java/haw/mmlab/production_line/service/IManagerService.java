@@ -1,6 +1,7 @@
 package haw.mmlab.production_line.service;
 
 import haw.mmlab.production_line.common.ConsoleMessage;
+import jadex.commons.future.IFuture;
 
 /**
  * The manager service interface.
@@ -15,7 +16,7 @@ public interface IManagerService {
 	 * @param taskId
 	 *            the given taskId
 	 */
-	public void informWPProduced(String taskId);
+	public IFuture<Void> informWPProduced(String taskId);
 
 	/**
 	 * Inform the manager that a workpiece was consumed in the given task.
@@ -23,7 +24,7 @@ public interface IManagerService {
 	 * @param taskId
 	 *            the given taskId
 	 */
-	public void informWPConsumed(String taskId);
+	public IFuture<Void> informWPConsumed(String taskId);
 
 	/**
 	 * Inform the manager that the given task has finished his execution.
@@ -31,7 +32,7 @@ public interface IManagerService {
 	 * @param taskId
 	 *            the given taskId
 	 */
-	public void informFinished(String taskId);
+	public IFuture<Void> informFinished(String taskId);
 
 	/**
 	 * Handles a {@link ConsoleMessage} to by printed by the manager
@@ -39,5 +40,5 @@ public interface IManagerService {
 	 * @param message
 	 *            the given {@link ConsoleMessage}
 	 */
-	public void handleConsoleMsg(ConsoleMessage message);
+	public IFuture<Void> handleConsoleMsg(ConsoleMessage message);
 }

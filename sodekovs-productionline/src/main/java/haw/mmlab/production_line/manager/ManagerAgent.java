@@ -6,8 +6,9 @@ import haw.mmlab.production_line.configuration.ProductionLineConfiguration;
 import haw.mmlab.production_line.configuration.Robot;
 import haw.mmlab.production_line.configuration.Task;
 import haw.mmlab.production_line.configuration.Transport;
-import haw.mmlab.production_line.logging.database.DatabaseLogger;
+import haw.mmlab.production_line.service.IDatabaseService;
 import haw.mmlab.production_line.service.IManagerService;
+import haw.mmlab.production_line.service.ManagerService;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
@@ -45,7 +46,8 @@ import java.util.logging.Level;
  */
 @Description("The Manager Agent who manages the whole application.")
 @ProvidedServices(@ProvidedService(type = IManagerService.class, implementation = @Implementation(ManagerService.class)))
-@RequiredServices({ @RequiredService(name = "cmsservice", type = IComponentManagementService.class, binding = @Binding(scope = RequiredServiceInfo.SCOPE_PLATFORM)) })
+@RequiredServices({ @RequiredService(name = "cmsservice", type = IComponentManagementService.class, binding = @Binding(scope = RequiredServiceInfo.SCOPE_PLATFORM)),
+		@RequiredService(name = "dbService", type = IDatabaseService.class) })
 @Arguments(@Argument(clazz = String.class, name = "configuration_modell"))
 public class ManagerAgent extends MicroAgent {
 
@@ -103,6 +105,8 @@ public class ManagerAgent extends MicroAgent {
 
 	/** Flag indicating whether at least one workpiece was consumed */
 	private boolean firstWPConsumed = false;
+
+	private IDatabaseService dbService = null;
 
 	@Override
 	public IFuture<Void> agentCreated() {
@@ -215,6 +219,22 @@ public class ManagerAgent extends MicroAgent {
 
 			public void resultAvailable(IComponentManagementService cms) {
 				IExternalAccess parent = ManagerAgent.this.getParent();
+
+				getLogger().info("Manager agent is starting database agent...");
+				cms.createComponent("DatabaseAgent", "haw/mmlab/production_line/logging/database/DatabaseAgent.class", null, null).addResultListener(new DefaultResultListener<IComponentIdentifier>() {
+
+					@Override
+					public void resultAvailable(IComponentIdentifier identifier) {
+						startedAgents.add(identifier);
+						getRequiredService("dbService").addResultListener(new DefaultResultListener<IDatabaseService>() {
+
+							@Override
+							public void resultAvailable(IDatabaseService result) {
+								dbService = result;
+							}
+						});
+					}
+				});
 
 				// start the robot agents
 				getLogger().info("Manager agent is starting robots...");
@@ -369,7 +389,7 @@ public class ManagerAgent extends MicroAgent {
 				waitFor(errorTimeout, step);
 			} else {
 				getLogger().warning("Manager agent has detected a error condition timeout");
-				DatabaseLogger.getInstance().setErrorRun();
+				dbService.setErrorRun();
 				finishRun();
 			}
 

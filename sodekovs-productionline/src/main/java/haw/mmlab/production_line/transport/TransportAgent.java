@@ -10,7 +10,7 @@ import haw.mmlab.production_line.configuration.Role;
 import haw.mmlab.production_line.configuration.Task;
 import haw.mmlab.production_line.configuration.Transport;
 import haw.mmlab.production_line.configuration.Workpiece;
-import haw.mmlab.production_line.logging.database.DatabaseLogger;
+import haw.mmlab.production_line.service.IDatabaseService;
 import haw.mmlab.production_line.service.IManagerService;
 import haw.mmlab.production_line.service.IProcessWorkpieceService;
 import haw.mmlab.production_line.service.ProcessWorkpieceService;
@@ -47,7 +47,7 @@ import java.util.logging.Level;
 @Arguments({ @Argument(clazz = Transport.class, name = "config"), @Argument(clazz = Map.class, name = "taskMap") })
 @ProvidedServices(@ProvidedService(implementation = @Implementation(ProcessWorkpieceService.class), type = IProcessWorkpieceService.class))
 @RequiredServices({ @RequiredService(name = "processWorkpieceServices", type = IProcessWorkpieceService.class, multiple = true, binding = @Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL)),
-		@RequiredService(name = "managerService", type = IManagerService.class) })
+		@RequiredService(name = "managerService", type = IManagerService.class), @RequiredService(name = "dbService", type = IDatabaseService.class) })
 public class TransportAgent extends ProcessWorkpieceAgent {
 
 	/**
@@ -59,9 +59,19 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 	@SuppressWarnings("unused")
 	private IStrategy strategy = null;
 
+	private IDatabaseService dbService = null;
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public IFuture<Void> agentCreated() {
+		getRequiredService("dbService").addResultListener(new DefaultResultListener<IDatabaseService>() {
+
+			@Override
+			public void resultAvailable(IDatabaseService result) {
+				dbService = result;
+			}
+		});
+
 		Transport conf = (Transport) getArgument("config");
 
 		id = conf.getAgentId();
@@ -402,10 +412,16 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 	 * @param mainState
 	 *            the mainState to set
 	 */
-	protected void setMainState(int mainState) {
+	protected void setMainState(final int mainState) {
 		this.mainState = mainState;
 
-		DatabaseLogger logger = DatabaseLogger.getInstance();
-		logger.insertLog(id, AgentConstants.AGENT_TYPE_TRANSPORT, logger.getCurrentTime(), mainState, 0, assignedRoles.size(), 0, 0);
+		dbService.getCurrentTime().addResultListener(new DefaultResultListener<Integer>() {
+
+			@Override
+			public void resultAvailable(Integer result) {
+				dbService.insertLog(id, AgentConstants.AGENT_TYPE_TRANSPORT, result, mainState, 0, assignedRoles.size(), 0, 0);
+			}
+		});
+
 	}
 }

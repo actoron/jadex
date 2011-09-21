@@ -42,5 +42,5 @@ public interface IProcessWorkpieceService {
 	 * @param action
 	 *            the {@link Action} to be executed
 	 */
-	public void executeDropoutAction(Action action);
+	public IFuture<Void> executeDropoutAction(Action action);
 }

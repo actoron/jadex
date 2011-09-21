@@ -1,9 +1,10 @@
-package haw.mmlab.production_line.manager;
+package haw.mmlab.production_line.service;
 
 import haw.mmlab.production_line.common.ConsoleMessage;
-import haw.mmlab.production_line.service.IManagerService;
+import haw.mmlab.production_line.manager.ManagerAgent;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.commons.future.IFuture;
 
 /**
  * Service methods provided by the manager agent.
@@ -17,7 +18,7 @@ public class ManagerService implements IManagerService {
 	@ServiceComponent
 	private ManagerAgent agent = null;
 
-	public void informWPProduced(String taskId) {
+	public IFuture<Void> informWPProduced(String taskId) {
 		if (agent.getProducedWPs().containsKey(taskId)) {
 			// increment by 1
 			agent.getProducedWPs().put(taskId, agent.getProducedWPs().get(taskId) + 1);
@@ -29,23 +30,31 @@ public class ManagerService implements IManagerService {
 				agent.startDropout();
 			}
 		}
+
+		return IFuture.DONE;
 	}
 
-	public void informWPConsumed(String taskId) {
+	public IFuture<Void> informWPConsumed(String taskId) {
 		if (agent.getConsumedWPs().containsKey(taskId)) {
 			// increment by 1
 			agent.getConsumedWPs().put(taskId, agent.getConsumedWPs().get(taskId) + 1);
 		} else {
 			agent.getConsumedWPs().put(taskId, 1);
 		}
+
+		return IFuture.DONE;
 	}
 
-	public void informFinished(String taskId) {
+	public IFuture<Void> informFinished(String taskId) {
 		agent.getFinishedTasks().put(taskId, Boolean.TRUE);
 		agent.checkFinish();
+
+		return IFuture.DONE;
 	}
 
-	public void handleConsoleMsg(ConsoleMessage message) {
+	public IFuture<Void> handleConsoleMsg(ConsoleMessage message) {
 		agent.printConsoleMsg(message);
+
+		return IFuture.DONE;
 	}
 }

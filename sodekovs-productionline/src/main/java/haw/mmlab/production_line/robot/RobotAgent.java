@@ -13,7 +13,7 @@ import haw.mmlab.production_line.configuration.Task;
 import haw.mmlab.production_line.configuration.Workpiece;
 import haw.mmlab.production_line.domain.HelpReply;
 import haw.mmlab.production_line.domain.HelpRequest;
-import haw.mmlab.production_line.logging.database.DatabaseLogger;
+import haw.mmlab.production_line.service.IDatabaseService;
 import haw.mmlab.production_line.service.IManagerService;
 import haw.mmlab.production_line.service.IProcessWorkpieceService;
 import haw.mmlab.production_line.service.ProcessWorkpieceService;
@@ -61,9 +61,19 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 	/** The used reconfiguration strategety */
 	private IStrategy strategy = null;
 
+	private IDatabaseService dbService = null;
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public IFuture<Void> agentCreated() {
+		getRequiredService("dbService").addResultListener(new DefaultResultListener<IDatabaseService>() {
+
+			@Override
+			public void resultAvailable(IDatabaseService result) {
+				dbService = result;
+			}
+		});
+
 		// initialize the agents variables
 		Robot conf = (Robot) getArgument("config");
 
@@ -175,11 +185,16 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 	 * @param mainState
 	 *            the mainState to set
 	 */
-	protected void setMainState(int mainState) {
+	protected void setMainState(final int mainState) {
 		this.mainState = mainState;
 
-		DatabaseLogger logger = DatabaseLogger.getInstance();
-		logger.insertLog(id, AgentConstants.AGENT_TYPE_ROBOT, logger.getCurrentTime(), mainState, 0, assignedRoles.size(), buffer.size(), buffer.capacity());
+		dbService.getCurrentTime().addResultListener(new DefaultResultListener<Integer>() {
+
+			@Override
+			public void resultAvailable(Integer result) {
+				dbService.insertLog(id, AgentConstants.AGENT_TYPE_ROBOT, result, mainState, 0, assignedRoles.size(), buffer.size(), buffer.capacity());
+			}
+		});
 	}
 
 	/**
@@ -274,8 +289,8 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 
 				request.getDeficientRoles().removeAll(takeRoles);
 
-				DatabaseLogger.getInstance().incrementMessageCountBy(1);
-				DatabaseLogger.getInstance().incrementRoleChangeAction(takeRoles.size() + giveAwayRoles.size());
+				dbService.incrementMessageCountBy(1);
+				dbService.incrementRoleChangeAction(takeRoles.size() + giveAwayRoles.size());
 
 				answerHelpRequest(takeRoles, giveAwayRoles, request);
 			}
@@ -283,7 +298,7 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 			if (!request.getDeficientRoles().isEmpty()) {
 				waitForTick(new SendMediumMessageStep(request));
 			} else {
-				DatabaseLogger.getInstance().storeRoleChangeDistance(request);
+				dbService.storeRoleChangeDistance(request);
 			}
 		}
 		// received its own help request
@@ -312,7 +327,7 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 		addReceivers(reply, giveAwayRoles);
 		reply.addReceiver(request.getAgentId());
 
-		DatabaseLogger.getInstance().incrementHopCount(1);
+		dbService.incrementHopCount(1);
 
 		waitForTick(new SendMediumMessageStep(reply));
 	}

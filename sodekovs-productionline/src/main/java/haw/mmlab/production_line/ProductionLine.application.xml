@@ -49,6 +49,7 @@
 		<componenttype name="Robot" filename="haw/mmlab/production_line/robot/RobotAgent.class"/>
 		<componenttype name="Timelord" filename="haw/mmlab/production_line/timelord/TimelordAgent.class"/>
 		<componenttype name="Dropout" filename="haw/mmlab/production_line/dropout/DropoutAgent.class"/>
+		<componenttype name="DatabaseAgent" filename="haw/mmlab/production_line/logging/database/DatabaseAgent.class"/>
 	</componenttypes>
 	
 	<applications>

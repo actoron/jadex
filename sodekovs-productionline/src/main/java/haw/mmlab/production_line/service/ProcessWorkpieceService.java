@@ -101,8 +101,10 @@ public class ProcessWorkpieceService implements IProcessWorkpieceService {
 	 * @param action
 	 *            the {@link Action} to be executed
 	 */
-	public void executeDropoutAction(Action action) {
+	public IFuture<Void> executeDropoutAction(Action action) {
 		agent.getLogger().fine("executeDropoutAction was called in " + agent.getId());
 		agent.handleDropout(action);
+
+		return IFuture.DONE;
 	}
 }
